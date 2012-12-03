@@ -384,7 +384,7 @@ class ParentClassItem extends JModelAdmin
 						$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id' . $limit_to_cid);
 
 						$nullDate = $db->Quote($db->getNullDate());
-						$nowDate = $db->Quote(JFactory::getDate()->toMySQL());
+						$nowDate = $db->Quote( FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL() );
 				
 						// Join on category table.
 						$query->select('c.title AS category_title, c.alias AS category_alias, c.access AS category_access');
@@ -433,7 +433,7 @@ class ParentClassItem extends JModelAdmin
 					else
 					{
 						$jnow		=& JFactory::getDate();
-						$now		= $jnow->toMySQL();
+						$now		= FLEXI_J16GE ? $jnow->toSql() : $jnow->toMySQL();
 						$nullDate	= $db->getNullDate();
 						// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists
 						$version_join =  $version ? ' LEFT JOIN #__flexicontent_versions AS ver ON ver.item_id = i.id AND ver.version_id = '. $db->Quote($version) : '';
@@ -644,7 +644,7 @@ class ParentClassItem extends JModelAdmin
 					// Retrieve unversioned value
 					$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
 					$db->setQuery($query);
-					$item->tags = $db->loadResultArray();
+					$item->tags = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				}
 				
 				// -- Retrieve categories field value (if not using versioning)
@@ -655,7 +655,7 @@ class ParentClassItem extends JModelAdmin
 				} else {
 					$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
 					$db->setQuery($query);
-					$item->categories = $db->loadResultArray();
+					$item->categories = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				}
 				// 'cats' is an alias of categories
 				$item->cats = & $item->categories;
@@ -695,7 +695,7 @@ class ParentClassItem extends JModelAdmin
 				// Retrieve Creator NAME and email (used to display the gravatar)
 				$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->created_by;
 				$db->setQuery($query);
-				$creator_data = $db->loadResultArray();
+				$creator_data = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				$creator_found = count($creator_data);
 				$item->creator = $creator_found ? $creator_data[0] : '';
 				$item->creatoremail = $creator_found ? $creator_data[0] : '';
@@ -1370,10 +1370,10 @@ class ParentClassItem extends JModelAdmin
 		$view = JRequest::getVar('view', false);
 		JRequest::setVar("isflexicontent", "yes");
 		
-		// Display dates inside from are in user timezone for J2.5 and in site's default timezone for J1.5
-		$site_zone = $config->getValue('config.offset');
-		$user_zone = $user->getParam('timezone', $config->getValue('config.offset'));
-		$tzoffset = FLEXI_J16GE ? $user_zone : $site_zone ;
+		// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
+		$site_zone = $app->getCfg('offset');
+		$user_zone = $user->getParam('timezone', $site_zone);
+		$tz_offset = FLEXI_J16GE ? $user_zone : $site_zone ;
 		
 		// Sanitize id and approval flag as integers
 		$data['vstate'] = (int)$data['vstate'];
@@ -1396,7 +1396,7 @@ class ParentClassItem extends JModelAdmin
 			// Get item's assigned categories
 			$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
 			$db->setQuery($query);
-			$item->categories = $db->loadResultArray();
+			$item->categories = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 			
 			// We need to fake joomla's states ... when triggering the before save content event
 			$fc_state = $item->state;
@@ -1678,7 +1678,7 @@ class ParentClassItem extends JModelAdmin
 			$item->modified_by = 0;
 		} else {
 			$datenow =& JFactory::getDate();
-			$item->modified    = $datenow->toMySQL();
+			$item->modified    = FLEXI_J16GE ? $datenow->toSql() : $datenow->toMySQL();
 			$item->modified_by = $user->get('id');
 		}
 			
@@ -1693,11 +1693,11 @@ class ParentClassItem extends JModelAdmin
 		}
 		if (FLEXI_J16GE) {
 			$date =& JFactory::getDate($item->created);
-			$date->setTimeZone( new DateTimeZone( $tzoffset ) );    // J2.5: Date from form field is in user's timezone
+			$date->setTimeZone( new DateTimeZone( $tz_offset ) );    // J2.5: Date from form field is in user's timezone
 		} else {
-			$date =& JFactory::getDate($item->created, $tzoffset);  // J1.5: Date from form field is in site's default timezone
+			$date =& JFactory::getDate($item->created, $tz_offset);  // J1.5: Date from form field is in site's default timezone
 		}
-		$item->created = $date->toMySQL();
+		$item->created = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 			
 		// -- Publish UP Date
 		if ($item->publish_up && JString::strlen(trim( $item->publish_up )) <= 10) {
@@ -1705,11 +1705,11 @@ class ParentClassItem extends JModelAdmin
 		}
 		if (FLEXI_J16GE) {
 			$date =& JFactory::getDate($item->publish_up);
-			$date->setTimeZone( new DateTimeZone( $tzoffset ) );       // J2.5: Date from form field is in user's timezone
+			$date->setTimeZone( new DateTimeZone( $tz_offset ) );       // J2.5: Date from form field is in user's timezone
 		} else {
-			$date =& JFactory::getDate($item->publish_up, $tzoffset);  // J1.5: Date from form field is in site's default timezone
+			$date =& JFactory::getDate($item->publish_up, $tz_offset);  // J1.5: Date from form field is in site's default timezone
 		}
-		$item->publish_up = $date->toMySQL();
+		$item->publish_up = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 
 		// -- Publish Down Date
 		if (trim($item->publish_down) == JText::_('FLEXI_NEVER') || trim( $item->publish_down ) == '')
@@ -1723,11 +1723,11 @@ class ParentClassItem extends JModelAdmin
 			}
 			if (FLEXI_J16GE) {
 				$date =& JFactory::getDate($item->publish_down);
-				$date->setTimeZone( new DateTimeZone( $tzoffset ) );         // J2.5: Date from form field is in user's timezone
+				$date->setTimeZone( new DateTimeZone( $tz_offset ) );         // J2.5: Date from form field is in user's timezone
 			} else {
-				$date =& JFactory::getDate($item->publish_down, $tzoffset);  // J1.5: Date from form field is in site's default timezone
+				$date =& JFactory::getDate($item->publish_down, $tz_offset);  // J1.5: Date from form field is in site's default timezone
 			}
-			$item->publish_down = $date->toMySQL();
+			$item->publish_down = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 		}
 		
 		// auto assign the section
@@ -1880,7 +1880,7 @@ class ParentClassItem extends JModelAdmin
 				JError::raiseNotice(10, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE') );
 			
 			$datenow =& JFactory::getDate();
-			$item->modified			= $datenow->toMySQL();
+			$item->modified			= FLEXI_J16GE ? $datenow->toSql() : $datenow->toMySQL();
 			$item->modified_by	= $user->get('id');
 		}
 		
@@ -1989,7 +1989,7 @@ class ParentClassItem extends JModelAdmin
 				.' FROM #__flexicontent_items_ext as ie'
 				.' WHERE ie.lang_parent_id = ' . (int)$this->_id;
 			$this->_db->setQuery($query);
-			$translation_ids = $this->_db->loadResultArray();
+			$translation_ids = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		}
 		if (empty($translation_ids)) $translation_ids = array();
 		
@@ -2306,7 +2306,7 @@ class ParentClassItem extends JModelAdmin
 			. ' WHERE itemid = '.$item->id
 			;
 		$this->_db->setQuery($query);
-		$used = $this->_db->loadResultArray();
+		$used = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 
 		foreach($cats as $cat) {
 			// insert only the new records
@@ -2440,7 +2440,7 @@ class ParentClassItem extends JModelAdmin
 			// Not current item, or current item's tags are not set
 			$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid ='".$item_id."'";
 			$this->_db->setQuery($query);
-			$tags = $this->_db->loadResultArray();
+			$tags = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 			if ($this->_id == $item_id) {
 				// Retrieved tags of current item, set them
 				$this->_item->tags = $tags;
@@ -2709,7 +2709,7 @@ class ParentClassItem extends JModelAdmin
 			// Not current item, or current item's categories are not set
 			$query = "SELECT tid FROM #__flexicontent_cats_item_relations WHERE itemid ='".$item_id."'";
 			$this->_db->setQuery($query);
-			$categories = $this->_db->loadResultArray();
+			$categories = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 			if ($this->_id == $item_id) {
 				// Retrieved categories of current item, set them
 				$this->_item->categories = & $categories;
@@ -2872,7 +2872,7 @@ class ParentClassItem extends JModelAdmin
 			.' ORDER BY valueorder'
 			;
 		$this->_db->setQuery($query);
-		$field_value = $this->_db->loadResultArray();
+		$field_value = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		
 		// It is problematic to unserialize here
 		// !!! The FLEXIcontent field plugin itself will always know better how to handle the values !!!
@@ -3171,7 +3171,7 @@ class ParentClassItem extends JModelAdmin
 			$cats = $this->get('categories');
 			$query = "SELECT params FROM #__categories WHERE id IN (".implode(',',$cats).")";
 			$db->setQuery( $query );
-			$mcats_params = $db->loadResultArray();
+			$mcats_params = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 			
 			foreach ($mcats_params as $cat_params) {
 				$cat_params = new JParameter($cat_params);
@@ -3228,7 +3228,7 @@ class ParentClassItem extends JModelAdmin
 			{
 				$query = "SELECT DISTINCT email FROM #__users WHERE id IN (".implode(",",$nConf->{$ulist[$ntype]}).")";
 				$db->setQuery( $query );
-				$user_emails_ulist = $db->loadResultArray();
+				$user_emails_ulist = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { echo "<pre>"; print_r($user_emails_ulist); exit; }
 			}
 			
@@ -3243,7 +3243,7 @@ class ParentClassItem extends JModelAdmin
 						." JOIN #__user_usergroup_map ugm ON u.id=ugm.user_id AND ugm.group_id IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
 				}
 				$db->setQuery( $query );
-				$user_emails_ugrps = $db->loadResultArray();
+				$user_emails_ugrps = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { print_r($user_emails_ugrps); exit; }
 			}
 			
@@ -3261,7 +3261,7 @@ class ParentClassItem extends JModelAdmin
 				$query = "SELECT DISTINCT email FROM #__users as u"
 					." JOIN #__flexiaccess_groups ugm ON u.username=ugm.name AND ugm.type=2 AND ugm.id IN (".implode(",",$final_groups).")";
 				$db->setQuery( $query );
-				$user_emails_ugrps_fa_individual = $db->loadResultArray();
+				$user_emails_ugrps_fa_individual = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();
 				
 				
@@ -3269,7 +3269,7 @@ class ParentClassItem extends JModelAdmin
 				$query = "SELECT DISTINCT email FROM #__users as u"
 					." JOIN #__flexiaccess_members ugm ON u.id=ugm.member_id AND ugm.group_id IN (".implode(",",$final_groups).")";
 				$db->setQuery( $query );
-				$user_emails_ugrps_fa_collective = $db->loadResultArray();
+				$user_emails_ugrps_fa_collective = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();
 				
 				$user_emails_ugrps_fa = array_unique( array_merge ($user_emails_ugrps_fa_individual, $user_emails_ugrps_fa_collective) );
@@ -3401,18 +3401,28 @@ class ParentClassItem extends JModelAdmin
 		}
 		$body .= "<br/>\r\n";
 		
-		// ADD INFO about creation / modification times
+		// ADD INFO about creation / modification times. Use site's timezone !!
+		$tz_offset = JFactory::getApplication()->getCfg('offset');
+		if (FLEXI_J16GE) $tz = new DateTimeZone($tz_offset);
 		if ( in_array('created',$nf_extra_properties) )
 		{
 			$date_created  =& JFactory::getDate($this->get('created'));
-			$date_created->setOffset($config->getValue('config.offset'));    // Use site's timezone
+			if (FLEXI_J16GE) {
+				$date_created->setTimezone($tz);
+			} else {
+				$date_created->setOffset($tz_offset);
+			}
 			$body .= '<u>'.JText::_( 'FLEXI_NF_CREATION_TIME' ) . "</u>: ";
 			$body .= $date_created->toFormat(). "<br/>\r\n";
 		}
 		if ( in_array('modified',$nf_extra_properties) && !$isnew )
 		{
 			$date_modified =& JFactory::getDate($this->get('modified'));
-			$date_modified->setOffset($config->getValue('config.offset'));   // Use site's timezone
+			if (FLEXI_J16GE) {
+				$date_modified->setTimezone($tz);
+			} else {
+				$date_modified->setOffset($tz_offset);
+			}
 			$body .= '<u>'.JText::_( 'FLEXI_NF_MODIFICATION_TIME' ) . "</u>: ";
 			$body .= $date_modified->toFormat(). "<br/>\r\n";
 		}
@@ -3632,7 +3642,7 @@ class ParentClassItem extends JModelAdmin
 					. ' OR 	( axosection = ' . $this->_db->Quote('item') . ' AND axo = ' . $id . ' ) )'
 					;
 			$this->_db->setQuery($query);
-			$publishers = $this->_db->loadResultArray();
+			$publishers = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		
 			// find all nested groups
 			if ($publishers) {
@@ -3650,7 +3660,7 @@ class ParentClassItem extends JModelAdmin
 					. ' AND u.sendEmail = 1'
 					;		
 			$this->_db->setQuery($query);
-			$validators->notify_emails = $this->_db->loadResultArray();
+			$validators->notify_emails = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 			$validators->notify_text = '';
 		} else {*/
 			// J1.5 with no FLEXIaccess or J2.5+

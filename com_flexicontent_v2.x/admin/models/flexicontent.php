@@ -586,7 +586,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 									. ' AND position = ' . $this->_db->Quote($group)
 									;
 							$this->_db->setQuery( $query );
-							$fieldstopos = $this->_db->loadResultArray();
+							$fieldstopos = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 							
 							if ($fieldstopos) {
 								$field = implode(',', $fieldstopos);
@@ -986,7 +986,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				// Add the 'categories' field to the fields array for adding to versioning table
 				$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
-				$categories = $db->loadResultArray();
+				$categories = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				if(!$categories || !count($categories)) {
 					$categories = array($catid = $row->catid);
 					$query = "INSERT INTO #__flexicontent_cats_item_relations VALUES('$catid','".$row->id."', '0');";
@@ -1004,7 +1004,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				// Add the 'tags' field to the fields array for adding to versioning table
 				$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
-				$tags = $db->loadResultArray();
+				$tags = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				$f = new stdClass();
 				$f->id 					= 14;
 				$f->iscore			= 1;

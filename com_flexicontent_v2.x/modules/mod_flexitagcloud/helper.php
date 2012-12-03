@@ -92,7 +92,7 @@ class modFlexiTagCloudHelper
 				;
 
 		$db->setQuery($query, 0, $limit);
-		$result = $db->loadResultArray();
+		$result = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 
 		//Do we have any tags?
 		if (!$result) {

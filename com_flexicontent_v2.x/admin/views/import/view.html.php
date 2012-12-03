@@ -65,7 +65,7 @@ class FlexicontentViewImport extends JViewLegacy {
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_COPYMOVE_ITEM' ), 'import' );
 		$ctrl_task = FLEXI_J16GE ? 'items.importcsv' : 'importcsv';
-		JToolBarHelper::customX( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT', $list_check = false );  // list_check will check that at least one row is checked in listing-like views
+		JToolBarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT', $list_check = false );  // list_check will check that at least one row is checked in listing-like views
 		JToolBarHelper::cancel();
 		
 		$db = &JFactory::getDBO();

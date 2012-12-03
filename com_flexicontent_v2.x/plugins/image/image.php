@@ -1693,7 +1693,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				;
 		}
 		$db->setQuery($query);
-		$values = $db->loadResultArray();
+		$values = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		
 		// Create original filenames array skipping any empty records
 		if (!$any_field_records) {
@@ -1753,7 +1753,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				. ' WHERE field_id = '. (int) $field->id
 				;
 		$db->setQuery($query);
-		$values = $db->loadResultArray();
+		$values = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		
 		$i = 0;
 		for($n=0, $c=count($values); $n<$c; $n++)

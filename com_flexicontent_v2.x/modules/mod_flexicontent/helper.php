@@ -940,7 +940,7 @@ class modFlexicontentHelper
 							$where2
 							;
 					$db->setQuery($query3);
-					$related = $db->loadResultArray();
+					$related = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 					$related = is_array($related) ? array_map( 'intval', $related ) : $related;
 				}
 								
@@ -959,7 +959,7 @@ class modFlexicontentHelper
 						' FROM #__flexicontent_tags_item_relations' .
 						' WHERE itemid = '.(int) $id;
 				$db->setQuery($query2);
-				$tags = $db->loadResultArray();
+				$tags = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				$tags = array_diff($tags,$excluded_tags);
 				
 				unset($related);
@@ -973,7 +973,7 @@ class modFlexicontentHelper
 							$where2
 							;
 					$db->setQuery($query3);
-					$related = $db->loadResultArray();
+					$related = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				}
 								
 				if (isset($related) && count($related)) {
@@ -1001,7 +1001,7 @@ class modFlexicontentHelper
 						$where2
 						;
 				$db->setQuery($query3);
-				$tagged = $db->loadResultArray();
+				$tagged = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 			}
 			
 			if ( isset($tagged) && count($tagged) ) {

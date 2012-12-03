@@ -241,14 +241,14 @@ window.addEvent('domready', function(){
 				<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
 				<?php
 				if (FLEXI_J16GE) {
-					$tz_string = JFactory::getConfig()->getValue('config.offset');
+					$tz_string = JFactory::getApplication()->getCfg('offset');
 					$tz = new DateTimeZone( $tz_string );
 					$tz_offset = $tz->getOffset(new JDate()) / 3600;
 					$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
 					$tz_info .= ' ('.$tz_string.')';
 					echo JText::sprintf( 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE', '', $tz_info);
 				} else {
-					$tz_offset = JFactory::getConfig()->getValue('config.offset');
+					$tz_offset = JFactory::getApplication()->getCfg('offset');
 					$tz_info =  ($tz_offset > 0) ? ' UTC +'. $tz_offset : ' UTC '. $tz_offset;
 					echo JText::sprintf( 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '', $tz_info );
 				}

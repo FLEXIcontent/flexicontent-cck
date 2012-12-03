@@ -503,14 +503,19 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// Get current seconds
 		$date = JFactory::getDate('now');
-		$date->setOffset($app->getCfg('offset'));
+		if (FLEXI_J16GE) {
+			$tz	= new DateTimeZone($app->getCfg('offset'));
+			$date->setTimezone($tz);
+		} else {
+			$date->setOffset($app->getCfg('offset'));
+		}
 		$current_time_secs = $date->toUnix();
 		//echo $date->toFormat()." <br>";
 		
 		if ($checkin_on_session_end) {
 			$query = 'SELECT DISTINCT userid FROM #__session WHERE guest=0';
 			$db->setQuery($query);
-			$logged = $db->loadResultArray(0);
+			$logged = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 			$logged = array_flip($logged);
 		}
 		// echo "Logged users:<br>"; print_r($logged); echo "<br><br>";
@@ -538,7 +543,8 @@ class plgSystemFlexisystem extends JPlugin
 				if ( $limit_checkout_hours) {
 					if (FLEXI_J16GE) {
 						$date = JFactory::getDate($record->checked_out_time);
-						$date->setOffset($app->getCfg('offset'));
+						$tz	= new DateTimeZone($app->getCfg('offset'));
+						$date->setTimezone($tz);
 						$checkout_time_secs = $date->toUnix();
 						//echo $date->toFormat()." <br>";
 					} else {

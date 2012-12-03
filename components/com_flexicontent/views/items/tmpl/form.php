@@ -712,9 +712,18 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		
 			<div class='fc_mini_note_box'>
 			<?php
-				$tz_offset = JFactory::getConfig()->getValue('config.offset');
-				$tz_info =  ($tz_offset > 0) ? ' UTC +'. $tz_offset : ' UTC '. $tz_offset;
-				echo JText::sprintf( 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '', $tz_info );
+				// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
+				$site_zone = JFactory::getApplication()->getCfg('offset');
+				$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
+				if (FLEXI_J16GE) {
+					$tz = new DateTimeZone( $user_zone );
+					$tz_offset = $tz->getOffset(new JDate()) / 3600;
+				} else {
+					$tz_offset = $site_zone;
+				}
+				$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
+				if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
+				echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '<br>', $tz_info );
 			?>
 			</div>
 			

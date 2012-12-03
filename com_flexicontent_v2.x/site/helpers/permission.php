@@ -161,7 +161,7 @@ class FlexicontentHelperPerm {
 			. ' WHERE extension='.$db->Quote(FLEXI_CAT_EXTENSION)
 			. ($check_published ? '  AND c.published = 1 ' : '');
 		$db->setQuery($query);
-		$allcats = $db->loadResultArray();
+		$allcats = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		$usercats = array();
 		foreach ($allcats as $category_id)
 		{
@@ -224,7 +224,7 @@ class FlexicontentHelperPerm {
 			// Query the assets table to retrieve the asset names for the specified section
 			$query = "SELECT name FROM #__assets WHERE name like '{$asset_partial}.%';";
 			$db->setQuery($query);
-			$names = $db->loadResultArray();
+			$names = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 			if ($db->getErrorNum()) {
 				$jAp=& JFactory::getApplication();
 				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');

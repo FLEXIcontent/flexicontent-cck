@@ -44,6 +44,13 @@ $items_list_cols += count($this->extra_fields);
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
 $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
 
+$tz_string = JFactory::getApplication()->getCfg('offset');
+if (FLEXI_J16GE) {
+	$tz = new DateTimeZone( $tz_string );
+	$tz_offset = $tz->getOffset(new JDate()) / 3600;
+} else {
+	$tz_offset = $tz_string;
+}
 ?>
 <script language="javascript" type="text/javascript">
 
@@ -429,14 +436,10 @@ window.addEvent('domready', function() {
 				<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
 				<?php
 				if (FLEXI_J16GE) {
-					$tz_string = JFactory::getConfig()->getValue('config.offset');
-					$tz = new DateTimeZone( $tz_string );
-					$tz_offset = $tz->getOffset(new JDate()) / 3600;
 					$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
 					$tz_info .= ' ('.$tz_string.')';
 					echo JText::sprintf( 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE', '', $tz_info);
 				} else {
-					$tz_offset = JFactory::getConfig()->getValue('config.offset');
 					$tz_info =  ($tz_offset > 0) ? ' UTC +'. $tz_offset : ' UTC '. $tz_offset;
 					echo JText::sprintf( 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '', $tz_info );
 				}
@@ -506,8 +509,13 @@ window.addEvent('domready', function() {
 
 			$publish_up =& JFactory::getDate($row->publish_up);
 			$publish_down =& JFactory::getDate($row->publish_down);
-			$publish_up->setOffset($config->getValue('config.offset'));
-			$publish_down->setOffset($config->getValue('config.offset'));
+			if (FLEXI_J16GE) {
+				$publish_up->setTimezone($tz);
+				$publish_down->setTimezone($tz);
+			} else {
+				$publish_up->setOffset($tz_offset);
+				$publish_down->setOffset($tz_offset);
+			}
 
 			$link = 'index.php?option=com_flexicontent&'.$items_task.'edit&cid[]='. $row->id;
 
@@ -743,7 +751,7 @@ window.addEvent('domready', function() {
 			JToolBarHelper::spacer();
 			JToolBarHelper::divider();
 			JToolBarHelper::spacer();
-			JToolBarHelper::customX( $ctrl_task, 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
+			JToolBarHelper::custom( $ctrl_task, 'person2.png', 'person2_f2.png', 'FLEXI_APPROVAL_REQUEST' );
 		}
 		JToolBarHelper::spacer();
 		JToolBarHelper::spacer();

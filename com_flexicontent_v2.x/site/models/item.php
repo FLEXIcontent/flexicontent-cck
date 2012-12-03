@@ -293,7 +293,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$aid		= !FLEXI_J16GE ? (int) $user->get('aid', 0) : max ($user->getAuthorisedViewLevels()) ;
 
 		$jnow		=& JFactory::getDate();
-		$now		= $jnow->toMySQL();
+		$now		= FLEXI_J16GE ? $jnow->toSql() : $jnow->toMySQL();
 		$nullDate	= $this->_db->getNullDate();
 
 		//

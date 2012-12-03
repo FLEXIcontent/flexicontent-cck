@@ -580,11 +580,25 @@ class flexicontent_html
 		$stateicon = flexicontent_html::stateicon( $state, $tmpparams, $state_text );
 		
 	 	
+		$tz_string = JFactory::getApplication()->getCfg('offset');
+		if (FLEXI_J16GE) {
+			$tz = new DateTimeZone( $tz_string );
+			$tz_offset = $tz->getOffset(new JDate()) / 3600;
+		} else {
+			$tz_offset = $tz_string;
+		}
+		
 	 	// Calculate common variables used to produce output
 		$publish_up =& JFactory::getDate($item->publish_up);
 		$publish_down =& JFactory::getDate($item->publish_down);
-		$publish_up->setOffset($config->getValue('config.offset'));
-		$publish_down->setOffset($config->getValue('config.offset'));
+		if (FLEXI_J16GE) {
+			$publish_up->setTimezone($tz);
+			$publish_down->setTimezone($tz);
+		} else {
+			$publish_up->setOffset($tz_offset);
+			$publish_down->setOffset($tz_offset);
+		}
+		
 		$img_path = JURI::root()."/components/com_flexicontent/assets/images/";
 		
 		
@@ -594,14 +608,14 @@ class flexicontent_html
 			if ($item->publish_up == $nullDate) {
 				$publish_info .= JText::_( 'FLEXI_START_ALWAYS' );
 			} else {
-				$publish_info .= JText::_( 'FLEXI_START' ) .": ". $publish_up->toFormat();
+				$publish_info .= JText::_( 'FLEXI_START' ) .": ". JHTML::_('date', FLEXI_J16GE ? $publish_up->toSql() : $publish_up->toMySQL(), FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S');
 			}
 		}
 		if (isset($item->publish_down)) {
 			if ($item->publish_down == $nullDate) {
 				$publish_info .= "<br />". JText::_( 'FLEXI_FINISH_NO_EXPIRY' );
 			} else {
-				$publish_info .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". $publish_down->toFormat();
+				$publish_info .= "<br />". JText::_( 'FLEXI_FINISH' ) .": ". JHTML::_('date', FLEXI_J16GE ? $publish_down->toSql() : $publish_down->toMySQL(), FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S');
 			}
 		}
 		$publish_info = $state_text.'<br /><br />'.$publish_info;
@@ -1109,7 +1123,7 @@ class flexicontent_html
 			." LEFT JOIN #__users AS u ON u.id=ff.userid "
 			." WHERE ff.itemid=" . $item->id;
 		$db->setQuery($query);
-		$favusers = $db->loadResultArray();
+		$favusers = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		if (!is_array($favusers) || !count($favusers)) return $favuserlist ? $favuserlist.']' : '';
 		
 		$seperator = ': ';
@@ -1298,7 +1312,7 @@ class flexicontent_html
 		. ' ORDER BY ext ASC'
 		;		
 		$db->setQuery($query);
-		$exts = $db->loadResultArray();
+		$exts = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		
 		$options[] = JHTML::_( 'select.option', '', '- '.JText::_( 'FLEXI_ALL_EXT' ).' -');
 		
@@ -1913,6 +1927,8 @@ class flexicontent_upload
 		//$regex = array('#(\.){2,}#', '#[^A-Za-z0-9\.\_\- ]#', '#^\.#');
 		return preg_replace($regex, '', $file);
 	}
+	
+	
 	/**
 	 * Gets the extension of a file name
 	 *
@@ -1938,6 +1954,17 @@ class flexicontent_upload
 		$dot = strpos($file, '.') + 1;
 		return substr($file, $dot);
 	}
+	
+	
+	/**
+	 * Checks uploaded file
+	 *
+	 * @param string $file The file name
+	 * @param string $err  Set (return) the error string in it
+	 * @param string $file view 's parameters
+	 * @return string The file extension
+	 * @since 1.5
+	 */
 	function check(&$file, &$err, &$params)
 	{
 		if (!$params) {
@@ -2112,6 +2139,8 @@ class flexicontent_upload
 	}
 }
 
+
+
 class flexicontent_tmpl
 {
 	/**
@@ -2122,6 +2151,7 @@ class flexicontent_tmpl
 	 */
 	function parseTemplates($tmpldir='')
 	{
+		jimport('joomla.filesystem.folder');
 		jimport('joomla.filesystem.file');
 		jimport('joomla.form.form');
 		$themes = new stdClass();
@@ -2354,7 +2384,7 @@ class flexicontent_tmpl
 
 	function getThemes($tmpldir='')
 	{
-		jimport('joomla.filesystem.file');
+		jimport('joomla.filesystem.folder');
 
 		$tmpldir = $tmpldir?$tmpldir:JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'templates';
 		$themes = JFolder::folders($tmpldir);
