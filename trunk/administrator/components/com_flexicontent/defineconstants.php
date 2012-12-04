@@ -82,9 +82,8 @@ if( FLEXI_J30GE )
 			if(strlen(trim(($string))) > 0){
 				$data = json_decode($string, true);
 				$this->params = $data;
-			}else{
-				$this->params = array();
 			}
+			if (!$this->params) $this->params = array();
 		}
 		
 		function toString(){
@@ -159,5 +158,5 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/
 
 // Version constants
 define('FLEXI_VERSION',	FLEXI_J16GE ? '2.0.0' : '1.5.6');
-define('FLEXI_RELEASE',	'RC9b (r1581)');
+define('FLEXI_RELEASE',	'RC9b (r1582)');
 ?>

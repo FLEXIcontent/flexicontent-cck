@@ -389,5 +389,53 @@ class flexicontent_cats
 		
 		return $results;
 	}
+	
+	
+	/**
+	 * Find and return extra parent/children/etc categories of given categories
+	 *
+	 * @param string $cids		the category ids for field object used as filter
+	 * @param string $force				controls whether to force only available values, ('all', 'limit', any other value uses the category configuration)
+	 * @return array							the available values
+	 */
+
+	function getExtraCats($cids, $treeinclude, $curritemcats)
+	{
+		global $globalcats;
+		
+		if ( $treeinclude==0 ) {
+			// Only given categories, nothing more to do 
+			return $cids;
+		} else if ( $treeinclude == 4 ) {
+			// Also include current item's categories
+			$all_cats = array_merge($all_cats, $curritemcats);
+			return $all_cats;
+		} else {
+			// other cases, we will need to examine every given category
+			$all_cats = $cids;
+		}
+		
+		// Examine every given category, and include appropriate related categories
+		foreach ($cids as $cid)
+		{
+			$cats = array();
+			switch ($treeinclude) {
+				case 1: // current category + children
+					$cats = $globalcats[$cid]->descendantsarray;
+					break;
+				case 2: // current category + parents
+					$cats = $globalcats[$cid]->ancestorsarray;
+					break;
+				case 3: // current category + children + parents
+					$cats = array_unique(array_merge($globalcats[$cid]->descendantsarray, $globalcats[$cid]->ancestorsarray));						
+					break;
+				default: // other cases UNKNOWN cases, just do not add any other categories
+					break;
+			}
+			$all_cats = array_merge($all_cats, $cats);
+		}
+		return array_unique($all_cats);
+	}
+
 }
 ?>

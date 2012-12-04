@@ -490,7 +490,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($return === null) {
 			// Try to open phpThumb cache directory
 			$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
-			$return = (JPath::getPermissions($phpthumbcache) == 'rwxrwxrwx') ? true : false;
+			$return = preg_match('/rwxr.xr.x/i', JPath::getPermissions($phpthumbcache) ) ? true : false;
 		}
 		return $return;
 	}
@@ -742,7 +742,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_EDIT_FIELD_VALUE'), 'message' );
 			}*/
 			
-			$query = "SELECT count(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='assocanytrans'";
+			// Delete wrong rule names
+			$query = "DELETE FROM #__flexiaccess_rules WHERE acosection='com_flexicontent' AND aco='associateanyitem'";
+			$db->setQuery($query);
+			$db->query();
+			
+			$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='assocanytrans'";
 			$db->setQuery($query);
 			$assocanytrans_rule = $db->loadResult();
 			
