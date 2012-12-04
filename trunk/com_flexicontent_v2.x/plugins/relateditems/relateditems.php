@@ -50,6 +50,7 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		$method_cat = $field->parameters->get('method_cat', 1);
 		$usesubcats = $field->parameters->get('usesubcats', 0 );
 		
+		$catids = $field->parameters->get('catids');
 		if ( empty($catids) )							$catids = array();
 		else if ( ! is_array($catids) )		$catids = !FLEXI_J16GE ? array($catids) : explode("|", $catids);
 				
@@ -120,7 +121,6 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		// CATEGORY SCOPE
 		$allowed_cats = $disallowed_cats = false;
 		
-		if(!is_array($catids)) $catids = explode(",", $catids);
 		if ($usesubcats) {
 			// Find descendants of the categories
 			$subcats = array();
