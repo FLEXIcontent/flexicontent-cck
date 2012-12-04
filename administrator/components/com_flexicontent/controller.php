@@ -462,7 +462,7 @@ VALUES
 		$format		= JRequest::getVar('format', '');
 		// PhpThumb cache directory
 		$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
-		$success = JPath::setPermissions($phpthumbcache, '0777', '0777');
+		$success = JPath::setPermissions($phpthumbcache, '0644', '0755');
 		if (!$success) {
 			if ($format == 'raw') {
 				echo '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="index.php?option=com_flexicontent&task=cachethumbchmod&format=raw">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';

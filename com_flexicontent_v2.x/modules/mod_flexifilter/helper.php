@@ -35,10 +35,23 @@ class modFlexifilterHelper
 
 	function decideCats( &$params )
 	{
+		global $globalcats;
+		
 		$display_cat_list = $params->get('display_cat_list', 0);
 		$catids = $params->get('catids', array());
+		$usesubcats = $params->get('usesubcats', 0 );
 		
+		// FIND categories to display
 		$allowed_cats = $disallowed_cats = false;
+		
+		if ($usesubcats) {
+			// Find descendants of the categories
+			$subcats = array();
+			foreach ($catids as $catid) {
+				$subcats = array_merge($subcats, array_map('trim',explode(",",$globalcats[$catid]->descendants)) );
+			}
+			$catids = array_unique($subcats);
+		}
 		
     if ( $display_cat_list == 1 ) {  // include method
     	$allowed_cats = $catids;

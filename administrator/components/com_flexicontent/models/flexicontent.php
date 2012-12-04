@@ -486,7 +486,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($return === null) {
 			// Try to open phpThumb cache directory
 			$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
-			$return = (JPath::getPermissions($phpthumbcache) == 'rwxrwxrwx') ? true : false;
+			$return = preg_match('/rwxr.xr.x/i', JPath::getPermissions($phpthumbcache) ) ? true : false;
 		}
 		return $return;
 	}
@@ -751,14 +751,19 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_EDIT_FIELD_VALUE'), 'message' );
 			}*/
 			
-			$query = "SELECT count(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='associate_any_item'";
+			// Delete wrong rule names
+			$query = "DELETE FROM #__flexiaccess_rules WHERE acosection='com_flexicontent' AND aco='associateanyitem'";
 			$db->setQuery($query);
-			$associate_any_item_rule = $db->loadResult();
+			$db->query();
 			
-			if (!$associate_any_item_rule)
+			$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='assocanytrans'";
+			$db->setQuery($query);
+			$assocanytrans_rule = $db->loadResult();
+			
+			if (!$assocanytrans_rule)
 			{
 				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
-					." VALUES ('com_flexicontent', '', 'associateanyitem', '', '', 'Associate any translation', '', '')";
+					." VALUES ('com_flexicontent', '', 'assocanytrans', '', '', 'Associate any translation', '', '')";
 				$db->setQuery($query);
 				$db->query();
 				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_ASSOCIATE_ANY_TRANSLATION'), 'message' );
@@ -1072,6 +1077,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$query = 'UPDATE #__plugins SET name = ' . $db->Quote('FLEXIcontent - '.$fp->name) . ' WHERE id = ' . (int)$fp->id;
 				$db->setQuery($query);
 				$db->query();
+				if ($db->getErrorNum()) echo $db->getErrorMsg();
 			}
 		}
 	}

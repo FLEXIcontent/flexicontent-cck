@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: mod_flexiadvsearch.php 1193 2012-03-14 09:20:15Z emmanuel.danan@gmail.com $
+ * @version 1.0 $Id: mod_flexiadvsearch.php 1572 2012-11-30 21:03:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIadvsearch Module
  * @copyright (C) 2011 flexicontent.org
