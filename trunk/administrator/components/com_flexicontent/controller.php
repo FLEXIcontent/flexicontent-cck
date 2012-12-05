@@ -170,20 +170,21 @@ class FlexicontentController extends JControllerLegacy
 		$nooldfieldsdata	= & $model->getNoOldFieldsData();
 		$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 		
-		//$initialpermission	= $model->checkInitialPermission();  // For J2.5
+		$initialpermission = FLEXI_J16GE ? $model->checkInitialPermission() : true;
 		
 		//echo "(!$existmenuitems) || (!$existtype) || (!$existfields) ||<br>";
 		//echo "     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
 		//echo "     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
 		//echo "     (!$oldbetafiles) || (!$nooldfieldsdata) || (!$missingversion) ||<br>";
 		//echo "     (!$initialpermission)<br>";
-
+		
+		// Display POST installation tasks if any task-check fails (returns false)
 		$dopostinstall = true;
-		if ( (!$existmenuitems) || (!$existtype) || (!$existfields) ||
-		     //(!$existfplg) || (!$existseplg) || (!$existsyplg) ||
-		     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) ||
-		     (!$oldbetafiles) || (!$nooldfieldsdata) || (!$missingversion) || (!$cachethumb)
-				 //|| (!$initialpermission)
+		if ( !$existmenuitems || !$existtype || !$existfields ||
+		     //!$existfplg || !$existseplg || existsyplg ||
+		     !$existlang || !$existversions || !$existversionsdata || !$existauthors ||
+		     !$oldbetafiles || !$nooldfieldsdata || !$missingversion || !$cachethumb ||
+				 !$initialpermission
 		   ) {
 			$dopostinstall = false;
 		}
@@ -313,7 +314,11 @@ class FlexicontentController extends JControllerLegacy
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
 		$db 	=& JFactory::getDBO();
-		$db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
+		if (FLEXI_J16GE) {
+			$db->setQuery("SELECT extension_id FROM #__extensions WHERE element='com_flexicontent' AND type='component' ");
+		} else {
+			$db->setQuery("SELECT id FROM #__components WHERE admin_menu_link='option=com_flexicontent'");
+		}
 		$flexi_comp_id = $db->loadResult();	
 		
 		$db->setQuery("DELETE FROM #__menu_types WHERE menutype='flexihiddenmenu' ");	
@@ -350,9 +355,9 @@ class FlexicontentController extends JControllerLegacy
 
 			$flexi =& JComponentHelper::getComponent('com_flexicontent');
 
-			$query 	= 'UPDATE #__components'
+			$query 	= 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__components')
 					. ' SET params = ' . $db->Quote($cparams)
-					. ' WHERE id = ' . $flexi->id;
+					. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .' = '. $flexi->id
 					;
 			$db->setQuery($query);
 			$result = $db->query();
@@ -419,9 +424,9 @@ VALUES
 		$format		= JRequest::getVar('format', '');
 		$db =& JFactory::getDBO();
 		
-		$query	= 'UPDATE #__plugins'
-				. ' SET published = 1'
-				. ' WHERE 1 '
+		$query	= 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__plugins')
+				. ' SET '. (FLEXI_J16GE ? 'enabled' : 'published') .' = 1'
+				. ' WHERE '. (FLEXI_J16GE ? ' `type`= ' . $db->Quote('plugin') : '1')
 				. ' AND (folder = ' . $db->Quote('flexicontent_fields')
 				. ' OR element = ' . $db->Quote('flexisearch')
 				. ' OR element = ' . $db->Quote('flexisystem')

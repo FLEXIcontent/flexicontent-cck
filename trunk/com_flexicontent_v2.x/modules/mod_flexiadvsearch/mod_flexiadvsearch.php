@@ -31,7 +31,7 @@ $show_in_views = !is_array($show_in_views) ? array($show_in_views) : $show_in_vi
 $views_show_mod =!count($show_in_views) || in_array($_view,$show_in_views);
 
 if ($params->get('enable_php_rule', 0))
-	eval('$php_show_mod='.$params->get('php_rule').';');
+	$php_show_mod = eval($params->get('php_rule'));
 else
 	$php_show_mod = true;
 
