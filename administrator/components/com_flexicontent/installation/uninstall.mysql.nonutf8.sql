@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS 
+`#__flexicontent_templates`,
 `#__flexicontent_cats_item_relations`,
 `#__flexicontent_favourites`,
 `#__flexicontent_fields`,
