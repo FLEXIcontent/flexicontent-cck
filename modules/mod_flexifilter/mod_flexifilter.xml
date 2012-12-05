@@ -91,7 +91,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_EXPRESSION" description="FLEXI_PHP_EXPRESSION_DESC" />
+			<param name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" />
 			
 			
 			<param name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
