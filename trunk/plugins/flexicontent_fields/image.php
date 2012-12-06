@@ -48,12 +48,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$maxval     = $field->parameters->get( 'max_values', 0 ) ;
 		$image_source= $field->parameters->get( 'image_source', 0 ) ;
 		
-		// TODO work around limitation of unsaved item (no item id yet)
-		/*if ($image_source) {
-			$field->html = '<div class="fc_mini_note_box">Current content must be saved ONCE (submitted) before you can add images</div>';
-			return;
-		}*/
-		
 		// Get a unique id to use as item id if current item is new
 		$user = & JFactory::getUser();
 		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
@@ -77,7 +71,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$usealt    = $field->parameters->get( 'use_alt', 1 ) ;
 		$usetitle  = $field->parameters->get( 'use_title', 1 ) ;
 		$usedesc   = $field->parameters->get( 'use_desc', 1 ) ;
-		
 		
 		$app      = & JFactory::getApplication();
 		$document = & JFactory::getDocument();
@@ -104,7 +97,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		$n = 0;
-		$filter->html = '';
+		$field->html = '';
 		
 		// Make sure value is an array of values
 		if ( !$field->value ) {

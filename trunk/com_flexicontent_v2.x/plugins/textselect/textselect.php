@@ -131,7 +131,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 	
 	
 	// Get item ids having the value(s) of filter
-	function getFiltered($field_id, $value, $field_type = '')
+	/*function getFiltered($field_id, $value, $field_type = '')
 	{
 		// execute the code only if the field type match the plugin type
 		if($field_type != 'textselect' ) return;
@@ -139,7 +139,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		$field_type = 'text';
 		plgFlexicontent_fieldsText::getFiltered($field_id, $value, $field_type);
 		$field_type = 'textselect';
-	}
+	}*/
 	
 	
 	

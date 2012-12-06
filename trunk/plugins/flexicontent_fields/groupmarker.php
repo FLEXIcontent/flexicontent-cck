@@ -34,7 +34,7 @@ class plgFlexicontent_fieldsGroupmarker extends JPlugin
 		$cont_cssclass   = $field->parameters->get( 'cont_cssclass' ) ;
 		$custom_html_sep = $field->parameters->get( 'custom_html_sep' ) ;
 		
-		$filter->html = '';
+		$field->html = '';
 		switch ($marker_type) {
 			case 'tabset_start':
 				$field->html .= "<div style='margin-top:24px; width:100%; float:left; clear:both;'></div>\n";
