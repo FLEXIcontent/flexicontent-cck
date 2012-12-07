@@ -269,7 +269,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			
 			$draft_from_non_publisher = $item->state==$draft_state && !$canPublish;
 			
-			if (!$draft_from_non_publisher) {
+			if ($draft_from_non_publisher) {
 				// Suppress notifications for draft-state items (new or existing ones), for these each author will publication approval manually via a button
 				$nConf = false;
 			} else {
@@ -277,11 +277,25 @@ class FlexicontentControllerItems extends FlexicontentController
 				$nConf = & $model->getNotificationsConf($params);  //echo "<pre>"; print_r($nConf); "</pre>";
 			}
 			
-			if ($nConf) {
+			if ($nConf)
+			{
+				$states_notify_new = $params->get('states_notify_new', array(1,0,(FLEXI_J16GE ? 2:-1),-3,-4,-5));
+				if ( empty($states_notify_new) )						$states_notify_new = array();
+				else if ( ! is_array($states_notify_new) )	$states_notify_new = !FLEXI_J16GE ? array($states_notify_new) : explode("|", $states_notify_new);
+				
+				$states_notify_existing = $params->get('states_notify_existing', array(1,0,(FLEXI_J16GE ? 2:-1),-3,-4,-5));
+				if ( empty($states_notify_existing) )						$states_notify_existing = array();
+				else if ( ! is_array($states_notify_existing) )	$states_notify_existing = !FLEXI_J16GE ? array($states_notify_existing) : explode("|", $states_notify_existing);
+
+				$n_state_ok = in_array($item->state, $states_notify_new);
+				$e_state_ok = in_array($item->state, $states_notify_existing);
+				
 				if ($needs_publication_approval)   $notify_emails = $nConf->emails->notify_new_pending;
-				else if ($isnew)                   $notify_emails = $nConf->emails->notify_new;
+				else if ($isnew && $n_state_ok)    $notify_emails = $nConf->emails->notify_new;
+				else if ($isnew)                   $notify_emails = array();
 				else if ($needs_version_reviewal)  $notify_emails = $nConf->emails->notify_existing_reviewal;
-				else if (!$isnew)                  $notify_emails = $nConf->emails->notify_existing;
+				else if (!$isnew && $e_state_ok)   $notify_emails = $nConf->emails->notify_existing;
+				else if (!$isnew)                  $notify_emails = array();
 				
 				if ($needs_publication_approval)   $notify_text = $params->get('text_notify_new_pending');
 				else if ($isnew)                   $notify_text = $params->get('text_notify_new');
@@ -340,7 +354,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
 			$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
 		} else {
-			// This will effectively return always true since we are in backend, all backend users (managers and above) can edit items
+			// This is meaningful when executed in frontend, since all backend users (managers and above) can edit items
 			$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
 		}
 		
@@ -550,7 +564,7 @@ class FlexicontentControllerItems extends FlexicontentController
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn	= in_array('editown', $rights) && $itemdata[$id]->created_by == $user->id;
 				} else {
-					// This will effectively return always true since we are in backend, all backend users (managers and above) can edit items
+					// This is meaningful when executed in frontend, since all backend users (managers and above) can edit items
 					$canEdit = $user->authorize('com_content', 'edit', 'content', 'all');
 					$canEditOwn	= $user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id');
 				}
@@ -656,7 +670,7 @@ class FlexicontentControllerItems extends FlexicontentController
 					$canEdit 		= in_array('edit', $rights);
 					$canEditOwn	= in_array('editown', $rights) && $itemdata[$id]->created_by == $user->id;
 				} else {
-					// This will effectively return always true since we are in backend, all backend users (managers and above) can edit items
+					// This is meaningful when executed in frontend, since all backend users (managers and above) can edit items
 					$canEdit = $user->authorize('com_content', 'edit', 'content', 'all');
 					$canEditOwn	= $user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id');
 				}
