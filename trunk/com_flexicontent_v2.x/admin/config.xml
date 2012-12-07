@@ -655,6 +655,11 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_NOTIFY_UGRP_NEW_CONTENT_SUBMITTED" description="FLEXI_NOTIFY_UGRP_NEW_CONTENT_SUBMITTED_desc" label="" level="level2" menu="hide" />
+			<field name="states_notify_new" type="fccheckbox" default=""
+				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_PENDING,FLEXI_TO_WRITE,FLEXI_IN_PROGRESS"
+				checkvals="1,0,2,-3,-4,-5"
+				defaultvals="1,0,2,-3,-4,-5"
+				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" menu="hide"/>
 			<field name="usergrps_notify_new" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<field name="userlist_notify_new" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
 			<field name="text_notify_new" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
@@ -665,6 +670,11 @@
 			<field name="text_notify_new_pending" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED" description="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED_DESC" label="" level="level2" menu="hide" />
+			<field name="states_notify_existing" type="fccheckbox" default=""
+				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_PENDING,FLEXI_TO_WRITE,FLEXI_IN_PROGRESS"
+				checkvals="1,0,2,-3,-4,-5"
+				defaultvals="1,0,2,-3,-4,-5"
+				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" menu="hide"/>
 			<field name="usergrps_notify_existing" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<field name="userlist_notify_existing" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
 			<field name="text_notify_existing" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />

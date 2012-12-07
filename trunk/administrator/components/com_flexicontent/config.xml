@@ -655,6 +655,11 @@
 			</param>
 			
 			<param name="" type="separator" default="FLEXI_NOTIFY_UGRP_NEW_CONTENT_SUBMITTED" description="FLEXI_NOTIFY_UGRP_NEW_CONTENT_SUBMITTED_desc" label="" level="level2" menu="hide" />
+			<param name="states_notify_new" type="fccheckbox" default=""
+				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_PENDING,FLEXI_TO_WRITE,FLEXI_IN_PROGRESS"
+				checkvals="1,0,-1,-3,-4,-5"
+				defaultvals="1,0,-1,-3,-4,-5"
+				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" menu="hide"/>
 			<param name="usergrps_notify_new_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="usergrps_notify_new" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="userlist_notify_new" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
@@ -667,6 +672,11 @@
 			<param name="text_notify_new_pending" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
 			
 			<param name="" type="separator" default="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED" description="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED_DESC" label="" level="level2" menu="hide" />
+			<param name="states_notify_existing" type="fccheckbox" default=""
+				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_PENDING,FLEXI_TO_WRITE,FLEXI_IN_PROGRESS"
+				checkvals="1,0,-1,-3,-4,-5"
+				defaultvals="1,0,-1,-3,-4,-5"
+				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" menu="hide"/>
 			<param name="usergrps_notify_existing_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="usergrps_notify_existing" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
 			<param name="userlist_notify_existing" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
