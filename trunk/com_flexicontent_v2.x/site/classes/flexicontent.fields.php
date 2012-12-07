@@ -917,7 +917,8 @@ class FlexicontentFields
 			}
 			
 		} else if ( !isset($fdata[$tindex][$field->name]) ) {
-			// CUSTOM field, create once per field			
+			// CUSTOM field, create once per field
+			$fdata[$tindex][$field->name] = new stdClass();
 			$fdata[$tindex][$field->name]->parameters = new JParameter($field->attribs);
 		}
 		

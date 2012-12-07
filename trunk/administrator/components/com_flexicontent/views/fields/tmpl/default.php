@@ -118,11 +118,20 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 				}
 			}
 			
-			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'field', $row->id);
-				
-			$canEdit			= 1; //in_array('editfield', $rights);
-			$canPublish		= 1; //in_array('publishfield', $rights);
-			$canDelete		= 1; //in_array('deletefield', $rights);
+			if (FLEXI_J16GE) {
+				$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'field', $row->id);
+				$canEdit			= in_array('editfield', $rights);
+				$canPublish		= in_array('publishfield', $rights);
+				$canDelete		= in_array('deletefield', $rights);
+			} else if (FLEXI_ACCESS) {
+				$canEdit		= $user->gid==25 ? 1 : FAccess::checkAllContentAccess('com_content','edit','users', $user->gmid, 'field', $row->id);
+				$canPublish	= $user->gid==25 ? 1 : FAccess::checkAllContentAccess('com_content','publish','users', $user->gmid, 'field', $row->id);
+				$canDelete	= $user->gid==25 ? 1 : FAccess::checkAllContentAccess('com_content','delete','users', $user->gmid, 'field', $row->id);
+			} else {
+				$canEdit			= $user->gid >= 24;
+				$canPublish		= $user->gid >= 24;
+				$canDelete		= $user->gid >= 24;
+			}
 			
 			$link 		= 'index.php?option=com_flexicontent&'.$fields_task.'edit&cid[]='. $row->id;
 			if ($row->id < 7) {  // First 6 core field are not unpublishable
@@ -156,11 +165,18 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 				$isadvsearch = "publish_x_f2.png";
 			}
 			
-			if (FLEXI_ACCESS) {
+			if (FLEXI_J16GE) {
+				if ($canPublish) {
+					$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\''.$ctrl.'access\')"');
+				} else {
+					$access = $this->escape($row->access_level);
+				}
+			} else if (FLEXI_ACCESS) {
 				$access 	= FAccess::accessswitch('field', $row, $i);
 			} else {
 				$access 	= JHTML::_('grid.access', $row, $i );
 			}
+			
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$warning	= '<span class="hasTip" title="'. JText::_ ( 'FLEXI_WARNING' ) .'::'. JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/error.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
    		?>
@@ -192,7 +208,11 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 				<?php $row->field_friendlyname = str_ireplace("FLEXIcontent - ","",$row->field_friendlyname); ?>
 				<?php
 				echo "<strong>".$row->type."</strong><br><small>-&nbsp;";
-				echo $row->iscore?"[Core]" : "{$row->field_friendlyname}";
+				if ($row->field_type=='groupmarker') {
+					echo $grpm_params->get('marker_type');
+				} else {
+					echo $row->iscore?"[Core]" : "{$row->field_friendlyname}";
+				}
 				echo "&nbsp;-</small>";
 				?>
 			</td>
