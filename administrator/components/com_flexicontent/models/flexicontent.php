@@ -1097,7 +1097,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$refadminpath 	= JPATH_ADMINISTRATOR.DS.'language'.DS.'en-GB'.DS;
 
 		$adminfiles = array(
+		// component files
 			'com_flexicontent',
+			'com_flexicontent.sys',
+		// plugin files  --  flexicontent_fields
 			'plg_flexicontent_fields_checkbox',
 			'plg_flexicontent_fields_checkboximage',
 			'plg_flexicontent_fields_core',
@@ -1107,12 +1110,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'plg_flexicontent_fields_fcloadmodule',
 			'plg_flexicontent_fields_fcpagenav',
 			'plg_flexicontent_fields_file',
+			'plg_flexicontent_fields_groupmarker',
 			'plg_flexicontent_fields_image',
 			'plg_flexicontent_fields_linkslist',
 			'plg_flexicontent_fields_minigallery',
 			'plg_flexicontent_fields_radio',
 			'plg_flexicontent_fields_radioimage',
 			'plg_flexicontent_fields_relateditems',
+			'plg_flexicontent_fields_relateditems_backlinks',
 			'plg_flexicontent_fields_select',
 			'plg_flexicontent_fields_selectmultiple',
 			'plg_flexicontent_fields_text',
@@ -1120,9 +1125,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'plg_flexicontent_fields_textselect',
 			'plg_flexicontent_fields_toolbar',
 			'plg_flexicontent_fields_weblink',
+		// plugin files  --  flexicontent
 			'plg_flexicontent_flexinotify',
+		// plugin files  --  search
 			'plg_search_flexiadvsearch',
 			'plg_search_flexisearch',
+		// plugin files  --  system
 			'plg_system_flexiadvroute',
 			'plg_system_flexisystem'
 		);
@@ -1130,10 +1138,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$sitepath 		= JPATH_SITE.DS.'language'.DS.$code.DS;
 		$refsitepath 	= JPATH_SITE.DS.'language'.DS.'en-GB'.DS;
 		$sitefiles 	= array(
+		// component files
 			'com_flexicontent',
+		// module files
 			'mod_flexiadvsearch',
 			'mod_flexicontent',
-			'mod_flexitagcloud'
+			'mod_flexitagcloud',
+			'mod_flexifilter'
 		);
 		$targetfolder = JPATH_SITE.DS.'tmp'.DS.$code."_".time();
 		
@@ -1174,7 +1185,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$mailfrom 	= @$params['email']	? $params['email']	: 'emmanuel.danan@gmail.com';
 			$fromname 	= @$params['name'] 	? $params['name'] 	: 'Emmanuel Danan';
 			$website 	= @$params['web'] 	? $params['web'] 	: 'http://www.flexicontent.org';
-				
+			
 			// prepare the manifest of the language archive
 			$date =& JFactory::getDate();
 		
