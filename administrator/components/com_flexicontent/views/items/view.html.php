@@ -44,6 +44,9 @@ class FlexicontentViewItems extends JViewLegacy {
 		$cid      = JRequest::getVar('cid', array());
 		$extlimit = JRequest::getInt('extlimit', 100);
 		
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		flexicontent_html::loadJQuery();
+		
 		if($task == 'copy') {
 			$this->setLayout('copy');
 			$this->_displayCopyMove($tpl, $cid);
@@ -53,35 +56,32 @@ class FlexicontentViewItems extends JViewLegacy {
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.calendar');
 
-		//get vars
-		$default_order_arr = array(""=>"i.ordering",  "lang"=>"lang", "type_name"=>"type_name",  "access"=>"i.access", "i.title"=>"i.title", "i.ordering"=>"i.ordering", "i.created"=>"i.created", "i.modified"=>"i.modified", "i.hits"=>"i.hits", "i.id"=>"i.id");
-		$default_order = $cparams->get('items_manager_order', 'i.ordering');
-		$default_order_dir = $cparams->get('items_manager_order_dir', 'ASC');
+		// Get filters
+		$filter_cats       = $mainframe->getUserStateFromRequest( $option.'.items.filter_cats',				'filter_cats',			'',		'int' );
+		$filter_subcats    = $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',		'filter_subcats',		1,		'int' );
 		
-		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
-		$filter_subcats 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',		'filter_subcats', 	1, 				'int' );
+		$filter_order_type = $mainframe->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type',	0,		'int' );
+		$filter_order      = $mainframe->getUserStateFromRequest( $option.'.items.filter_order',			'filter_order',				'',		'cmd' );
+		$filter_order_Dir  = $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',		'',		'word' );
 		
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', $default_order, 'cmd' );
-		if ($filter_cats && $filter_order == 'i.ordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.items.filter_order', 'catsordering' );
-		} else if (!$filter_cats && $filter_order == 'catsordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.items.filter_order', $default_order );
-		}
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	$default_order_dir, 'word' );
-
-		$filter_type			= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 		'filter_type', 		0,		 		'int' );
-		$filter_authors		= $mainframe->getUserStateFromRequest( $option.'.items.filter_authors', 	'filter_authors', 	0, 				'int' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 		'filter_state', 	'', 			'word' );
-		$filter_stategrp	= $mainframe->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp', 	'', 			'word' );
+		$filter_type			= $mainframe->getUserStateFromRequest( $option.'.items.filter_type',				'filter_type',			0,		'int' );
+		$filter_authors		= $mainframe->getUserStateFromRequest( $option.'.items.filter_authors',			'filter_authors',		0,		'int' );
+		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state',				'filter_state',			'',		'word' );
+		$filter_stategrp	= $mainframe->getUserStateFromRequest( $option.'.items.filter_stategrp',		'filter_stategrp',	'',		'word' );
+		
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang	 = $mainframe->getUserStateFromRequest( $option.'.items.filter_lang', 		'filter_lang', 		'', 			'cmd' );
 		}
-		$scope	 			= $mainframe->getUserStateFromRequest( $option.'.items.scope', 			'scope', 			1, 				'int' );
-		$date	 				= $mainframe->getUserStateFromRequest( $option.'.items.date', 			'date', 			1, 				'int' );
-		$startdate	 	= $mainframe->getUserStateFromRequest( $option.'.items.startdate', 	'startdate', 		'', 			'cmd' );
+		
+		$scope	 			= $mainframe->getUserStateFromRequest( $option.'.items.scope', 			'scope', 			1, 			'int' );
+		$date	 				= $mainframe->getUserStateFromRequest( $option.'.items.date', 			'date', 			1, 			'int' );
+		
+		$startdate	 	= $mainframe->getUserStateFromRequest( $option.'.items.startdate', 	'startdate',	'',			'cmd' );
 		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $mainframe->setUserState( $option.'.items.startdate', '' ); }
-		$enddate	 		= $mainframe->getUserStateFromRequest( $option.'.items.enddate', 		'enddate', 			'', 			'cmd' );
+		
+		$enddate	 		= $mainframe->getUserStateFromRequest( $option.'.items.enddate', 		'enddate', 		'', 		'cmd' );
 		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $mainframe->setUserState( $option.'.items.enddate', '' ); }
+		
 		$filter_id 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 	'filter_id', 		'', 			'int' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.items.search', 		'search', 			'', 			'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
@@ -275,6 +275,8 @@ class FlexicontentViewItems extends JViewLegacy {
 		if ($CanDelete || $CanDeleteOwn || $CanArchives)   // Create state group filter only if user can delete or archive
 		{
 			$sgn[''] = JText::_( 'FLEXI_GRP_NORMAL' );
+			$sgn['published'] = JText::_( 'FLEXI_GRP_PUBLISHED' );
+			$sgn['unpublished'] = JText::_( 'FLEXI_GRP_UNPUBLISHED' );
 			if ($CanDelete || $CanDeleteOwn)
 				$sgn['trashed']  = JText::_( 'FLEXI_GRP_TRASHED' );
 			if ($CanArchives)
@@ -292,7 +294,13 @@ class FlexicontentViewItems extends JViewLegacy {
 		}
 		
 		// build the include subcats boolean list
-		$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox"', $filter_subcats );
+		$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox" onchange="submitform();"', $filter_subcats );
+		
+		// build the order type boolean list
+		$order_types = array();
+		$order_types[] = JHTML::_('select.option', '0', JText::_( 'FLEXI_ORDER_JOOMLA' ).'<br/>' );
+		$order_types[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_ORDER_FLEXICONTENT' ) );
+		$lists['filter_order_type'] = JHTML::_('select.radiolist', $order_types, 'filter_order_type', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_order_type );
 		
 		// build the categories select list for filter
 		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', $check_published=true, $check_perms=false);
@@ -343,7 +351,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$lists['order'] = $filter_order;
 
 		// filter ordering
-		if ($filter_cats == '' || $filter_cats == 0)
+		if ( !$filter_order_type )
 		{
 			$ordering = ($lists['order'] == 'i.ordering');
 		} else {
@@ -378,6 +386,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$this->assignRef('filter_type'		, $filter_type);
 		$this->assignRef('filter_cats'		, $filter_cats);
 		$this->assignRef('filter_subcats'	, $filter_subcats);
+		$this->assignRef('filter_order_type', $filter_order_type);
 		$this->assignRef('filter_lang'		, $filter_lang);
 		$this->assignRef('inline_ss_max'	, $inline_ss_max);
 		$this->assignRef('scope'			, $scope);

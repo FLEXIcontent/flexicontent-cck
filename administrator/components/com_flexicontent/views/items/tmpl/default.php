@@ -44,6 +44,29 @@ $items_list_cols += count($this->extra_fields);
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
 $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
 
+$ordering_draggable = $cparams->get('draggable_reordering', 1);
+if ($this->ordering) {
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_ENABLED_TIP').'" />' .' ';
+	$drag_handle_box = '<div class="fc_drag_handle%s" alt="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE').'" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE').'"></div>';
+} else {
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_DISABLED_TIP').'" />' .' ';
+	$drag_handle_box = '<div class="fc_drag_handle %s" alt="'.JText::_('FLEXI_ORDER_COLUMN_FIRST').'" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST').'" ></div>';
+	$image_saveorder    = '';
+}
+
+if ( !$this->filter_order_type ) {
+	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_ORDER_JOOMLA').'::'.JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP').'" />';
+	$ord_catid = 'catid';
+	$ord_col = 'ordering';
+} else {
+	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_ORDER_FLEXICONTENT').'::'.JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_FLEXICONTENT')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP').'" />';
+	$ord_catid = 'rel_catid';
+	$ord_col = 'catsordering';
+}
+$ord_grp = 1;
+
+$stategrps = array(1=>'published', 0=>'unpublished', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
+
 $tz_string = JFactory::getApplication()->getCfg('offset');
 if (FLEXI_J16GE) {
 	$tz = new DateTimeZone( $tz_string );
@@ -125,7 +148,115 @@ function delAllFilters() {
 	<?php echo (FLEXI_FISH || FLEXI_J16GE) ? "delFilter('filter_lang');" : ""; ?>
 }
 
+<?php if ($ordering_draggable) : ?>
+
+function updateDragImg( index ) {
+	var row = jQuery("#sortable_fcitems tr").get(index);
+	if (!row) return;
+	row = jQuery(row);
+	
+	row_drag_handle = row.find("td div.fc_drag_handle");
+	row_ord_grp  = row.find("td input[name=ord_grp\\[\\]]");
+	prev_ord_grp = row.prev() ? row.prev().find("td input[name=ord_grp\\[\\]]") : false;
+	next_ord_grp = row.next() ? row.next().find("td input[name=ord_grp\\[\\]]") : false;
+	
+	has_ordUp   = prev_ord_grp && prev_ord_grp.val() == row_ord_grp.val();
+	has_ordDown = next_ord_grp && next_ord_grp.val() == row_ord_grp.val();
+	
+	if (has_ordUp && has_ordDown) {
+		new_drag_handle_class = 'fc_drag_handle_both';
+	} else if (has_ordUp) {
+		new_drag_handle_class = 'fc_drag_handle_uponly';
+	} else if (has_ordDown) {
+		new_drag_handle_class = 'fc_drag_handle_downonly';
+	} else {
+		new_drag_handle_class = 'fc_drag_handle_none';
+	}
+
+	if ( !row_drag_handle.hasClass(new_drag_handle_class) ) {
+		row_drag_handle.removeClass('fc_drag_handle_both');
+		row_drag_handle.removeClass('fc_drag_handle_uponly');
+		row_drag_handle.removeClass('fc_drag_handle_downonly');
+		row_drag_handle.addClass(new_drag_handle_class);
+	}
+}
+
 window.addEvent('domready', function(){
+
+	var moved_row_order;
+	var next_row_order;
+	
+	var row_old_index;
+	var row_new_index;
+	
+	jQuery("#sortable_fcitems").sortable({
+		handle: 'div.fc_drag_handle',
+		revert: 100,
+		start: function(event, ui) {
+			moved_row_order = ui.item.find("td input[name=order\\[\\]]").val();
+			row_old_index  = ui.item.index();
+		},
+		stop: function(event, ui) {
+			
+			row_new_index = ui.item.index();
+			moved_row_ord_grp = ui.item.find("td input[name=ord_grp\\[\\]]").val();
+			
+			if (row_new_index == row_old_index) {
+				return;
+			} else if (row_new_index < row_old_index) {
+				start_ord_grp = ui.item.next().find("td input[name=ord_grp\\[\\]]").val();
+				if (start_ord_grp!=moved_row_ord_grp) {
+					alert(<?php echo '"'.JText::_('FLEXI_MOVE_WITHIN_ORDERING_GROUPS_LIMITS').'"'; ?>);
+					jQuery(this).sortable('cancel');
+					return;
+				}
+			} else {
+				end_ord_grp = ui.item.prev().find("td input[name=ord_grp\\[\\]]").val();
+				if (end_ord_grp!=moved_row_ord_grp) {
+					alert(<?php echo '"'.JText::_('FLEXI_MOVE_WITHIN_ORDERING_GROUPS_LIMITS').'"'; ?>);
+					jQuery(this).sortable('cancel');
+					return;
+				}
+			}
+			
+			updateDragImg(row_new_index);
+			updateDragImg(row_old_index);
+			if ( ui.item.prev() )  updateDragImg( ui.item.prev().index() );
+			if ( ui.item.next() )  updateDragImg( ui.item.next().index() );
+			
+			var start_row_index = row_old_index < row_new_index ? row_old_index : row_new_index;
+			var end_row_index = row_new_index > row_old_index ? row_new_index: row_old_index;
+			
+			var rows = jQuery("#sortable_fcitems tr").get();
+			for (i=start_row_index; i<=end_row_index; i++) {
+				row = jQuery(rows[i]);
+				
+				if (row_new_index < row_old_index) {
+					if (i>=start_row_index && i<end_row_index) {
+						next_row_order = row.next().find("td input[name=order\\[\\]]").val();
+						row.find("td input[name=order\\[\\]]").val( next_row_order );
+					} else if (i==end_row_index) {
+						row.find("td input[name=order\\[\\]]").val( moved_row_order );
+					}
+				} else {
+					if (i>start_row_index && i<=end_row_index) {
+						tmp_row_order = row.find("td input[name=order\\[\\]]").val();
+						row.find("td input[name=order\\[\\]]").val( next_row_order );
+						next_row_order = tmp_row_order;
+				} else if (i==start_row_index) {
+						next_row_order = row.find("td input[name=order\\[\\]]").val();
+						row.find("td input[name=order\\[\\]]").val( moved_row_order );
+					}
+				}
+			}
+			
+		}
+	});//.disableSelection();
+});
+<?php endif; ?>
+
+window.addEvent('domready', function(){
+	
 	var startdate	= $('startdate');
 	var enddate 	= $('enddate');
 	if(MooTools.version>="1.2.4") {
@@ -305,16 +436,16 @@ window.addEvent('domready', function() {
 			<?php endif; ?>
 			<th width="<?php echo $this->CanOrder ? '' : ''; ?>" class="center">
 				<?php
-				if ($this->filter_cats == '' || $this->filter_cats == 0) :
+				echo $this->CanOrder ? $image_ordering_tip : '';
+				
+				if (!$this->filter_order_type) :
 					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] );
-					if ($this->CanOrder) :
-						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' ) : '';
-					endif;
 				else :
 					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] );
-					if ($this->CanOrder) :
-						echo $this->ordering ? JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' ) : '';
-					endif;
+				endif;
+				
+				if ($this->CanOrder && $this->ordering) :
+					echo JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' );
 				endif;
 				?>
 			</th>
@@ -404,8 +535,12 @@ window.addEvent('domready', function() {
 		<?php if ( $enable_translation_groups ) : ?>
 			<td class="left"></td>
 		<?php endif; ?>
-			<td class="left"></td>
-			<td class="left"></td>
+			<td class="left" colspan="2">
+				<?php echo $ordering_type_tip . JText::_('FLEXI_ORDER_TYPE'); ?>:
+				<div style="float:none; width:20px; clear:both;"></div>
+				<?php echo $this->lists['filter_order_type']; ?>
+			</td>
+			<!--td class="left"></td-->
 			<td class="left col_cats">
 				<label for="filter_subcats"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
 				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
@@ -467,7 +602,7 @@ window.addEvent('domready', function() {
 		</tr>
 	</tfoot>
 
-	<tbody>
+	<tbody id="sortable_fcitems">
 		<?php
 		$k 			= 0;
 		if (FLEXI_J16GE)
@@ -478,7 +613,7 @@ window.addEvent('domready', function() {
 		$unpublishableFound = false;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
-			$row = $this->rows[$i];
+			$row = & $this->rows[$i];
 
 			if (FLEXI_J16GE) {
 				$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
@@ -555,7 +690,7 @@ window.addEvent('domready', function() {
 			$row->lang = @$row->lang ? $row->lang : $lang_default;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td class="sort_handle"><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $cid_checkbox; ?></td>
 			<td width="1%">
 				<?php
@@ -662,23 +797,48 @@ window.addEvent('domready', function() {
 			<?php endif ; ?>
 			
 			<?php if ($this->CanOrder) : ?>
-			<td class="order">
-				<span><?php echo $this->pageNav->orderUpIcon( $i, true, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
-
-				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
-
-				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
-
-				<?php if ($this->filter_cats == '' || $this->filter_cats == 0) : ?>
-				<input type="text" name="order[]" size="5" value="<?php echo $row->ordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align:center;" />
-				<?php else : ?>
-				<input type="text" name="order[]" size="5" value="<?php echo $row->catsordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
+			<td class="order ">
+				<?php
+					$row_stategrp_prev = @ $stategrps[@$this->rows[$i-1]->state];
+					$row_stategrp = @ $stategrps[$this->rows[$i]->state];
+					$row_stategrp_next = @ $stategrps[@$this->rows[$i+1]->state];
+					
+					$show_orderUp   = @$this->rows[$i-1]->$ord_catid == $this->rows[$i]->$ord_catid && $row_stategrp_prev == $row_stategrp;
+					$show_orderDown = $this->rows[$i]->$ord_catid == @$this->rows[$i+1]->$ord_catid && $row_stategrp == $row_stategrp_next;
+					if (
+						($this->filter_order_type && (FLEXI_FISH || FLEXI_J16GE)) ||   // FLEXIcontent order supports language in J1.5 too
+						(!$this->filter_order_type && FLEXI_J16GE)   // Joomla order does not support language in J1.5
+					) {
+						$show_orderUp   = $show_orderUp   && @$this->rows[$i-1]->lang == $this->rows[$i]->lang;
+						$show_orderDown = $show_orderDown && $this->rows[$i]->lang == @$this->rows[$i+1]->lang;
+					}
+				?>
+				<?php if ($ordering_draggable) : ?>
+					<?php
+						if (!$this->ordering) echo sprintf($drag_handle_box,' fc_drag_handle_disabled');
+						else if ($show_orderUp && $show_orderDown) echo sprintf($drag_handle_box,' fc_drag_handle_both');
+						else if ($show_orderUp) echo sprintf($drag_handle_box,' fc_drag_handle_uponly');
+						else if ($show_orderDown) echo sprintf($drag_handle_box,' fc_drag_handle_downonly');
+						else echo sprintf($drag_handle_box,'_none');
+					?>
+				<?php else: ?>
+					<span><?php echo $this->pageNav->orderUpIcon( $i, $show_orderUp, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
+					<span><?php echo $this->pageNav->orderDownIcon( $i, $n, $show_orderDown, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
 				<?php endif; ?>
+				
+				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
+				<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
+				
+				<input type="hidden" name="item_cb[]" style="display:none;" value="<?php echo $row->id; ?>" />
+				<input type="hidden" name="ord_catid[]" style="display:none;" value="<?php echo $row->$ord_catid; ?>" />
+				<input type="hidden" name="prev_order[]" style="display:none;" value="<?php echo $row->$ord_col; ?>" />
+				<input type="hidden" name="ord_grp[]" style="display:none;" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
+				
 			</td>
 			<?php else : ?>
 			<td align="center">
 				<?php
-				if ($this->filter_cats == '' || $this->filter_cats == 0) {
+				if (!$this->filter_order_type) {
 					echo $row->ordering;
 				} else {
 					echo $row->catsordering;
@@ -786,7 +946,7 @@ window.addEvent('domready', function() {
 	<?php if ( $enable_translation_groups )	: ?>
 		<sup>[3]</sup> <?php echo JText::_('FLEXI_SORT_TO_GROUP_TRANSLATION'); ?><br />
 	<?php endif; ?>
-	<sup>[4]</sup> <?php echo JText::_('FLEXI_DEFINE_ITEM_ORDER_FILTER_BY_CAT'); ?></><br />
+	<sup>[4]</sup> <?php echo JText::_('FLEXI_MULTIPLE_ITEM_ORDERINGS'); ?></><br />
 		
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />

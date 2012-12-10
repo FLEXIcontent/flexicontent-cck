@@ -27,6 +27,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
+			<param name="draggable_reordering" type="radio" default="1" label="FLEXI_DRAGGABLE_REORDERING" description="FLEXI_DRAGGABLE_REORDERING_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
 			<param name="show_usability_messages" type="radio" default="1" label="FLEXI_SHOW_USABILITY_MESSAGES" description="FLEXI_SHOW_USABILITY_MESSAGES_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
