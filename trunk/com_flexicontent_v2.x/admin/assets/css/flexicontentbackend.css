@@ -841,6 +841,35 @@ div#cpanel div.icon  a {
 	border-radius: 8px;
 }
 
+.fc_drag_handle_none, .fc_drag_handle {
+	display: block !important;
+	width: 16px;
+	height: 16px;
+	float: left !important;
+	margin: 0px !important;
+	padding: 0px !important;
+}
+
+.fc_drag_handle {
+	cursor: move;
+}
+
+.fc_drag_handle_none {
+	background: url(../images/move2_none.png) 0% 0% no-repeat transparent;
+}
+
+.fc_drag_handle.fc_drag_handle_disabled {
+	background: url(../images/move3.png) 0% 0% no-repeat transparent !important;
+}
+.fc_drag_handle.fc_drag_handle_both {
+	background: url(../images/move2.png) 0% 0% no-repeat transparent !important;
+}
+.fc_drag_handle.fc_drag_handle_uponly {
+	background: url(../images/move2_uponly.png) 0% 0% no-repeat transparent !important;
+}
+.fc_drag_handle.fc_drag_handle_downonly {
+	background: url(../images/move2_downonly.png) 0% 0% no-repeat transparent !important;
+}
 
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/
 

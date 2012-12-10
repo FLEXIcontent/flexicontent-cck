@@ -70,6 +70,19 @@ class FlexicontentModelItems extends JModelLegacy
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
+		$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
+		$default_order = $cparams->get('items_manager_order', 'i.ordering');
+		$default_order_dir = $cparams->get('items_manager_order_dir', 'ASC');
+		
+		$filter_order_type = $mainframe->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type', 0, 'int' );
+		$filter_order      = $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', $default_order, 'cmd' );
+		$default_order_dir = $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', $default_order_dir, 'cmd' );
+		
+		// Filter order is selected via current setting of filter_order_type selector
+		$filter_order	= ($filter_order_type && ($filter_order == 'i.ordering')) ? 'catsordering' : $filter_order;
+		$filter_order	= (!$filter_order_type && ($filter_order == 'catsordering')) ? 'i.ordering' : $filter_order;
+		JRequest::setVar( 'filter_order', $filter_order );
+		
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.items.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.items.limitstart', 'limitstart', 0, 'int' );
 
@@ -115,6 +128,10 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 			$this->_db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $this->_db->loadResult();
+			if ($this->_db->getErrorNum()) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+			}
 			
 			$k = 0;
 			$count = count($this->_data);
@@ -458,14 +475,18 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function _buildQuery()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = & JFactory::getApplication();
+		$option    = JRequest::getCmd( 'option' );
 		
 		// Get the WHERE and ORDER BY clauses for the query
 		$where		= $this->_buildContentWhere();
 		$orderby	= $this->_buildContentOrderBy();
 		$lang  = (FLEXI_FISH || FLEXI_J16GE) ? 'ie.language AS lang, ie.lang_parent_id, ' : '';
 		$lang .= (FLEXI_FISH || FLEXI_J16GE) ? 'CASE WHEN ie.lang_parent_id=0 THEN i.id ELSE ie.lang_parent_id END AS lang_parent_id, ' : '';
-		$filter_state = $mainframe->getUserStateFromRequest( 'com_flexicontent.items.filter_state', 	'filter_state', '', 'word' );
+		
+		$filter_state     = $mainframe->getUserStateFromRequest( $option.'.items.filter_state',			'filter_state',			'',		'word' );
+		$filter_order     = $mainframe->getUserStateFromRequest( $option.'.items.filter_order',			'filter_order',			'',		'cmd' );
+		$filter_stategrp  = $mainframe->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp',	'',		'word' );
 		
 		$nullDate = $this->_db->Quote($this->_db->getNullDate());
 		$nowDate = $this->_db->Quote( FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL() );
@@ -481,8 +502,11 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$subquery 	= 'SELECT name FROM #__users WHERE id = i.created_by';
 		
-		$query 		= 'SELECT SQL_CALC_FOUND_ROWS i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS catid, u.name AS editor, '
+		$query 		= 'SELECT SQL_CALC_FOUND_ROWS i.*, ie.search_index AS searchindex, ' . $lang . 'i.catid AS catid, u.name AS editor, rel.catid as rel_catid, '
 				. (FLEXI_J16GE ? 'level.title as access_level, g.title AS groupname, ' : 'g.name AS groupname, ')
+				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
+					'CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN ('.(FLEXI_J16GE ? 2:-1).') THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order,' : ''
+					)
 				. 'CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled,'
 				. 'CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired,'
 				. 't.name AS type_name, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
@@ -510,29 +534,33 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function _buildContentOrderBy()
 	{
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$mainframe = & JFactory::getApplication();
+		$option    = JRequest::getVar('option');
+		$cparams   = & JComponentHelper::getParams( 'com_flexicontent' );
 		
-		$default_order_arr = array(""=>"i.ordering",  "lang"=>"lang", "type_name"=>"type_name",  "access"=>"i.access", "i.title"=>"i.title", "i.ordering"=>"i.ordering", "i.created"=>"i.created", "i.modified"=>"i.modified", "i.hits"=>"i.hits", "i.id"=>"i.id");
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
-		$default_order = $cparams->get('items_manager_order', 'i.ordering');
-		$default_order_dir = $cparams->get('items_manager_order_dir', 'ASC');
+		$filter_order_type= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type', 0, 'int' );
+		$filter_order     = $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', '', 'cmd' );
+		$filter_order_Dir = $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 		
-		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', $default_order, 'cmd' );
-		if ($filter_cats && $filter_order == 'i.ordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.items.filter_order', 'catsordering' );
-		} else if (!$filter_cats && $filter_order == 'catsordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.items.filter_order', $default_order );
+		$filter_stategrp = $mainframe->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp', '', 'word' );
+		$extra_order  = 'state_order, ';
+		if (
+			($filter_order_type && (FLEXI_FISH || FLEXI_J16GE)) ||   // FLEXIcontent order supports language in J1.5 too
+			(!$filter_order_type && FLEXI_J16GE)   // Joomla order does not support language in J1.5
+		) {
+			$extra_order .= ' ie.language, ';
 		}
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	$default_order_dir, 'word' );
-
-		if($filter_order == 'ie.lang_parent_id') {
+		
+		if ($filter_order == 'ie.lang_parent_id') {
 			$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir .", i.id ASC";
+		} else if ($filter_order == 'i.ordering') {
+			$orderby 	= ' ORDER BY i.catid, ' .$extra_order. $filter_order .' '. $filter_order_Dir .", i.id ASC";
+		} else if ($filter_order == 'catsordering') {
+			$orderby 	= ' ORDER BY rel.catid, ' .$extra_order. $filter_order.' '.$filter_order_Dir .", i.id ASC";
 		} else {
 			$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
 		}
-
+		
 		return $orderby;
 	}
 
@@ -551,9 +579,9 @@ class FlexicontentModelItems extends JModelLegacy
 
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );
 		$filter_cats 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_cats',	'filter_cats', '', 'int' );
-		$filter_subcats 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 	'filter_state', '', 'word' );
-		$filter_stategrp	= $mainframe->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp', '', 'word' );
+		$filter_subcats	= $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
+		$filter_state 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_state', 	'filter_state', '', 'word' );
+		$filter_stategrp= $mainframe->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp', '', 'word' );
 		$filter_id	 		= $mainframe->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', '', 'int' );
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_lang', 	'filter_lang', '', 'cmd' );
@@ -697,6 +725,10 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		if ( $filter_stategrp=='all' ) {
 			// no limitations
+		} else if ( $filter_stategrp=='published' ) {
+			$where[] = 'i.state IN (1,-5)';
+		} else if ( $filter_stategrp=='unpublished' ) {
+			$where[] = 'i.state IN (0,-3,-4)';
 		} else if ( $filter_stategrp=='trashed' ) {
 			$where[] = 'i.state = -2';
 		} else if ( $filter_stategrp=='archived' ) {
@@ -1262,111 +1294,150 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function move($direction)
+	function move($direction, $ord_catid, $prev_order)
 	{
 		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$option   = JRequest::getVar('option');
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		
-		$filter_cats = $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
-
-		if ($filter_cats == '' || $filter_cats == 0)
+		// Every state group has different ordering
+		$row =& JTable::getInstance('flexicontent_items', '');
+		if (!$row->load( $this->_id ) ) {
+			$this->setError($this->_db->getErrorMsg());
+			return false;
+		}
+		$stategrps = array(1=>'published', 0=>'unpublished', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
+		$row_stategrp = @ $stategrps[$row->state];
+		
+		switch ($row_stategrp)
 		{
-			$row =& JTable::getInstance('flexicontent_items', '');
-
-			if (!$row->load( $this->_id ) ) {
+		case 'published':
+			$item_states = JText::_( 'FLEXI_GRP_PUBLISHED' );
+			$state_where = 'state IN (1,-5)';
+			break;
+		case 'unpublished':
+			$item_states = JText::_( 'FLEXI_GRP_UNPUBLISHED' );
+			$state_where = 'state IN (0,-3,-4)';
+			break;
+		case 'trashed':
+			$item_states = JText::_( 'FLEXI_GRP_TRASHED' );
+			$state_where = 'state = -2';
+			break;
+		case 'archived':
+			$item_states = JText::_( 'FLEXI_GRP_ARCHIVED' );
+			$state_where = 'state = '.(FLEXI_J16GE ? 2:-1);
+			break;
+		default:
+			JError::raiseWarning( 500, 'Item state seems to be unknown. Ordering groups include items in state groups: (a) published (b) unpublished (c) archived (d) trashed"');
+			return false;
+			break;
+		}
+		
+		$filter_order_type= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type', 0, 'int' );
+		
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$direction = strtolower($filter_order_Dir) == 'desc' ? - $direction : $direction;
+		
+		if ( !$filter_order_type )
+		{
+			$where = 'catid = '. $row->catid .' AND '. $state_where .(FLEXI_J16GE ? ' AND language ='. $this->_db->Quote($row->language) : '');
+			
+			if ( !$row->move($direction, $where) ) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
-
-			if (!$row->move( $direction )) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-
+			
+			//$mainframe->enqueueMessage(JText::sprintf('Current re-ordering involved items in %s item states',$item_states) ,'message');
 			return true;
 		}
 		else
 		{
+			$item_cb = JRequest::getVar( 'item_cb', array(0), 'post', 'array' );
+			$row_item_cb = array_search($this->_id, $item_cb);
+			$row_ord_catid  = $ord_catid [$row_item_cb];
+			$row_prev_order = $prev_order[$row_item_cb];
+			
+			// Verify currently moved item exists in given category !!!
 			$query = 'SELECT itemid, ordering'
 					.' FROM #__flexicontent_cats_item_relations'
-					.' WHERE catid = ' . $filter_cats
+					.' WHERE catid = ' . $row_ord_catid
 					.' AND itemid = ' . $this->_id
 					;
-			$this->_db->setQuery( $query, 0, 1 );
+			$this->_db->setQuery( $query, 0, 1 );  //echo "<pre>". $query."\n";
 			$origin = $this->_db->loadObject();
-
-			$sql = 'SELECT itemid, ordering FROM #__flexicontent_cats_item_relations';
-
+			
+			if (!$origin) {
+				$this->setError('Some error occured item to move is not assigned to given category: '.$this->_db->getErrorMsg());
+				return false;
+			} else if ($row_prev_order != (int) $origin->ordering) {
+				JError::raiseNotice( 500, 'Someone has already changed order of this item, but doing reordering anyway' );
+				$row_prev_order = (int) $origin->ordering;
+			}
+			
+			// Find the NEXT or PREVIOUS item in category to use it for swapping the ordering numbers
+			$sql = 'SELECT rel.itemid, rel.ordering, i.state, ie.language'
+					. ' FROM #__flexicontent_cats_item_relations AS rel'
+					. ((FLEXI_FISH || FLEXI_J16GE) ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id' : '')
+					. ' JOIN #__content AS i ON i.id=rel.itemid'
+					;
 			if ($direction < 0)
 			{
-				$sql .= ' WHERE ordering < '.(int) $origin->ordering;
-				$sql .= ' AND catid = ' . $filter_cats;
+				$sql .= ' WHERE rel.ordering >= 0 AND rel.ordering < '.(int) $origin->ordering;
+				$sql .= ' AND rel.catid = ' . $row_ord_catid .' AND '. $state_where .((FLEXI_FISH || FLEXI_J16GE) ? ' AND ie.language ='. $this->_db->Quote($row->language) : '');
 				$sql .= ' ORDER BY ordering DESC';
 			}
 			else if ($direction > 0)
 			{
-				$sql .= ' WHERE ordering > '.(int) $origin->ordering;
-				$sql .= ' AND catid = ' . $filter_cats;
-				$sql .= ' ORDER BY ordering';
+				$sql .= ' WHERE rel.ordering >= 0 AND rel.ordering > '.(int) $origin->ordering;
+				$sql .= ' AND rel.catid = ' . $row_ord_catid .' AND '. $state_where .((FLEXI_FISH || FLEXI_J16GE) ? ' AND ie.language ='. $this->_db->Quote($row->language) : '');
+				$sql .= ' ORDER BY rel.ordering';
 			}
 			else
 			{
-				$sql .= ' WHERE ordering = '.(int) $origin->ordering;
-				$sql .= ' AND catid = ' . $filter_cats;
-				$sql .= ' ORDER BY ordering';
+				JError::raiseWarning( 500, 'Cannot move item, neither UP nor Down, because given direction is zero' );
+				return false;
 			}
-			$this->_db->setQuery( $sql, 0, 1 );
-
-			$row = null;
+			
+			$this->_db->setQuery( $sql, 0, 1 );  //echo $sql."\n";
 			$row = $this->_db->loadObject();
+			
+			if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
 			
 			if (isset($row))
 			{
+				// NEXT or PREVIOUS item found, swap its order with currently moved item
 				$query = 'UPDATE #__flexicontent_cats_item_relations'
-				. ' SET ordering = '. (int) $row->ordering
-				. ' WHERE itemid = '. (int) $origin->itemid
-				. ' AND catid = ' . $filter_cats
-				;
-				$this->_db->setQuery( $query );
+					. ' SET ordering = '. (int) $row->ordering
+					. ' WHERE itemid = '. (int) $origin->itemid
+					. ' AND catid = ' . $row_ord_catid
+					;
+				$this->_db->setQuery( $query );  //echo $query."\n";
+				$this->_db->query();
 
-				if (!$this->_db->query())
-				{
-					$err = $this->_db->getErrorMsg();
-					JError::raiseError( 500, $err );
-				}
+				if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
 
 				$query = 'UPDATE #__flexicontent_cats_item_relations'
-				. ' SET ordering = '.(int) $origin->ordering
-				. ' WHERE itemid = '. (int) $row->itemid
-				. ' AND catid = ' . $filter_cats
-				;
-				$this->_db->setQuery( $query );
-	
-				if (!$this->_db->query())
-				{
-					$err = $this->_db->getErrorMsg();
-					JError::raiseError( 500, $err );
-				}
+					. ' SET ordering = '.(int) $origin->ordering
+					. ' WHERE itemid = '. (int) $row->itemid
+					. ' AND catid = ' . $row_ord_catid
+					;
+				$this->_db->setQuery( $query );  //echo $query."\n";
+				$this->_db->query();
+
+				if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
 
 				$origin->ordering = $row->ordering;
 			}
 			else
 			{
-				$query = 'UPDATE #__flexicontent_cats_item_relations'
-				. ' SET ordering = '.(int) $origin->ordering
-				. ' WHERE itemid = '. (int) $origin->itemid
-				. ' AND catid = ' . $filter_cats
-				;
-				$this->_db->setQuery( $query );
-	
-				if (!$this->_db->query())
-				{
-					$err = $this->_db->getErrorMsg();
-					JError::raiseError( 500, $err );
-				}
+				// NEXT or PREVIOUS item NOT found, raise a notice
+				JError::raiseNotice( 500, JText::sprintf('Previous/Next item in category and in STATE group (%s) was not found or has same ordering,
+					trying saving ordering to create incrementing ordering numbers for those items that have positive orderings
+					NOTE: negative are reserved as "sticky" and are not automatically reordered', $filter_stategrp) );
+				return true;
 			}
-
-		return true;
+			//exit;
+			return true;
 		}
 	}
 
@@ -1377,112 +1448,174 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function saveorder($cid = array(), $order)
+	function saveorder($cid = array(), $order, $ord_catid=array(), $prev_order=array())
 	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$filter_cats = $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
-		$filter_subcats 	= $mainframe->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
-		if ($filter_subcats) {
-			$this->setError( JText::_( 'FLEXI_CANNOT_SAVEORDER_SUBCAT_ITEMS' ) );
-			return false;
-		}
-
-		if ($filter_cats == '' || $filter_cats == 0)
+		$filter_order_type= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type', 0, 'int' );
+		
+		$state_grp_arr   = array(1=>'published', 0=>'unpublished', (FLEXI_J16GE ? 2:-1)=>'archived', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
+		$state_where_arr = array(
+			'published'=>'state IN (1,-5)', 'unpublished'=>'state IN (0,-3,-4)', 'trashed'=>'state = -2',
+			'archived'=>'state = '.(FLEXI_J16GE ? 2:-1), ''=> 'state NOT IN ('.(FLEXI_J16GE ? 2:-1).',1,0,-2,-3,-4,-5)'
+		);
+		
+		if (!$filter_order_type)
 		{
 
 			$row =& JTable::getInstance('flexicontent_items', '');
 		
-			// update ordering values
+			// Update ordering values
+			$altered_catids = array();
+			$ord_count = array();
 			for( $i=0; $i < count($cid); $i++ )
 			{
 				$row->load( (int) $cid[$i] );
-	
-				if ($row->ordering != $order[$i])
-				{
+				$row_stategrp = @ $state_grp_arr[$row->state];
+				
+				if ($row->ordering != $order[$i]) {
+					$altered_catids[$row->catid][$row_stategrp][ FLEXI_J16GE ? $row->language : '_' ] = 1;
 					$row->ordering = $order[$i];
 					if (!$row->store()) {
 						$this->setError($this->_db->getErrorMsg());
 						return false;
 					}
+					
+				} else {
+					// Detect columns with duplicate orderings, to force reordering them
+					$_cid = $row->catid;  $_ord = $row->ordering;
+
+					if ( isset( $ord_count[$_cid][$row_stategrp][ FLEXI_J16GE ? $row->language : '_' ][$_ord] ) ) {
+						$altered_catids[$_cid][$row_stategrp][ FLEXI_J16GE ? $row->language : '_' ] = 1;
+						$ord_count[$_cid][$row_stategrp][ FLEXI_J16GE ? $row->language : '_' ][$_ord] ++;
+					} else {
+						$ord_count[$_cid][$row_stategrp][ FLEXI_J16GE ? $row->language : '_' ][$_ord] = 1;
+					}
+					
+				}
+				
+			}
+			
+			//echo "<pre>"; print_r($altered_catids);
+			
+			foreach ($altered_catids as $altered_catid => $state_groups)
+			{
+				foreach ($state_groups as $state_group => $lang_groups)
+				{
+					foreach ($lang_groups as $lang_group => $ignore)
+					{
+						if ( $lang_group != '_' ) {
+							$mainframe->enqueueMessage(JText::sprintf('FLEXI_REORDER_GROUP_RESULTS_LANG', JText::_('FLEXI_ORDER_JOOMLA'), $state_group, $lang_group, $altered_catid), "message");
+							$row->reorder('catid = '.$altered_catid.' AND '.$state_where_arr[$state_group] .' AND language ='. $this->_db->Quote($lang_group));
+						} else {
+							$mainframe->enqueueMessage(JText::sprintf('FLEXI_REORDER_GROUP_RESULTS', JText::_('FLEXI_ORDER_JOOMLA'), $state_group, $altered_catid), "message");
+							$row->reorder('catid = '.$altered_catid.' AND '.$state_where_arr[$state_group]);
+						}
+					}
 				}
 			}
 			
-			$where = ''; 
-			if (!FLEXI_J16GE) {
-				$where = $this->_db->nameQuote('sectionid').' = '.$this->_db->Quote(FLEXI_SECTION);
-			}
-			$row->reorder($where);
+			//exit;
 			return true;
-
 		}
 		else
 		{
+			$row =& JTable::getInstance('flexicontent_items', '');
+			
 			// Here goes the second method for saving order.
 			// As there is a composite primary key in the relations table we aren't able to use the standard methods from JTable
-		
-			$query = 'SELECT itemid, ordering'
-					.' FROM #__flexicontent_cats_item_relations'
-					.' WHERE catid = ' . $filter_cats
-					.' ORDER BY ordering'
-					;
-			// on utilise la methode _getList pour s'assurer de ne charger que les résultats compris entre les limites
-			$rows = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-
+			$altered_catids = array();
+			$ord_count = array();
 			for( $i=0; $i < count($cid); $i++ )
 			{
-				if ($rows[$i]->ordering != $order[$i])
-				{
-					$rows[$i]->ordering = $order[$i];
+				$query 	= 'SELECT rel.itemid, rel.ordering, i.state, ie.language'
+						. ' FROM #__flexicontent_cats_item_relations AS rel'
+						. ((FLEXI_FISH || FLEXI_J16GE) ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id' : '')
+						. ' JOIN #__content AS i ON i.id=rel.itemid'
+						. ' WHERE rel.ordering >= 0'
+						. ' AND rel.itemid = ' . (int)$cid[$i]
+						;
+				$this->_db->setQuery( $query );  //echo "<pre>". $query."\n";
+				$row = $this->_db->loadObject();
+				if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
+				
+				$row_stategrp = @ $state_grp_arr[$row->state];
+				
+				if ($prev_order[$i] != $order[$i]) {
 					
+					$altered_catids[ (int)$ord_catid[$i] ][$row_stategrp][ (FLEXI_FISH || FLEXI_J16GE) ? $row->language : '_' ] = 1;
 					$query = 'UPDATE #__flexicontent_cats_item_relations'
-							.' SET ordering=' . $order[$i]
-							.' WHERE catid = ' . $filter_cats
-							.' AND itemid = ' . $cid[$i]
+							.' SET ordering=' . (int)$order[$i]
+							.' WHERE catid = ' . (int)$ord_catid[$i]
+							.' AND itemid = ' . (int)$cid[$i]
 							;
-
-					$this->_db->setQuery($query);
-
-					if (!$this->_db->query()) {
-						$this->setError($this->_db->getErrorMsg());
-						return false;
+					$this->_db->setQuery($query);  //echo "$query <br/>";
+					$this->_db->query();
+					if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
+					
+				} else {
+					// Detect columns with duplicate orderings, to force reordering them
+					$_cid = $ord_catid[$i];  $_ord = $prev_order[$i];
+					if ( isset( $ord_count[$_cid][$row_stategrp][ (FLEXI_FISH || FLEXI_J16GE) ? $row->language : '_' ][$_ord] ) ) {
+						$altered_catids[$_cid][$row_stategrp][ (FLEXI_FISH || FLEXI_J16GE) ? $row->language : '_' ] = 1;
+						$ord_count[$_cid][$row_stategrp][ (FLEXI_FISH || FLEXI_J16GE) ? $row->language : '_' ][$_ord] ++;
+					} else {
+						$ord_count[$_cid][$row_stategrp][ (FLEXI_FISH || FLEXI_J16GE) ? $row->language : '_' ][$_ord] = 1;
 					}
 				}
 			}
-
-			// Specific reorder procedure because the relations table has a composite primary key 
-			$query 	= 'SELECT itemid, ordering'
-					. ' FROM #__flexicontent_cats_item_relations'
-					. ' WHERE ordering >= 0'
-					. ' AND catid = '.(int) $filter_cats
-					. ' ORDER BY ordering'
-					;
-			$this->_db->setQuery( $query );
-			if (!($orders = $this->_db->loadObjectList()))
+			
+			//echo "<pre>"; print_r($altered_catids); echo "</pre>";
+			
+			foreach ($altered_catids as $altered_catid => $state_groups)
 			{
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-			// compact the ordering numbers
-			for ($i=0, $n=count( $orders ); $i < $n; $i++)
-			{
-				if ($orders[$i]->ordering >= 0)
+				foreach ($state_groups as $state_group => $lang_groups)
 				{
-					if ($orders[$i]->ordering != $i+1)
+					foreach ($lang_groups as $lang_group => $ignore)
 					{
-						$orders[$i]->ordering = $i+1;
-						$query 	= 'UPDATE #__flexicontent_cats_item_relations'
-								. ' SET ordering = '. (int) $orders[$i]->ordering
-								. ' WHERE itemid = '. (int) $orders[$i]->itemid
-								. ' AND catid = '.(int) $filter_cats
+						// Specific reorder procedure because the relations table has a composite primary key 
+						$query 	= 'SELECT rel.itemid, rel.ordering, state'
+								. ' FROM #__flexicontent_cats_item_relations AS rel'
+								. ((FLEXI_FISH || FLEXI_J16GE) ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id' : '')
+								. ' JOIN #__content AS i ON i.id=rel.itemid'
+								. ' WHERE rel.ordering >= 0'
+								. ' AND rel.catid = '. $altered_catid .' AND '. $state_where_arr[$state_group] . ( $lang_group != '_' ? ' AND ie.language ='. $this->_db->Quote($lang_group) : '')
+								. ' ORDER BY rel.ordering'
 								;
-						$this->_db->setQuery( $query);
-						$this->_db->query();
+						$this->_db->setQuery( $query );  //echo "$query <br/>";
+						$rows = $this->_db->loadObjectList();
+						if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
+						
+						// Compact the ordering numbers
+						$cnt = 0;
+						foreach ($rows as $row)
+						{
+							if ($row->ordering >= 0)
+							{
+								if ($row->ordering != $i+1)
+								{
+									$row->ordering = $cnt++;
+									$query 	= 'UPDATE #__flexicontent_cats_item_relations'
+											. ' SET ordering = '. (int) $row->ordering
+											. ' WHERE itemid = '. (int) $row->itemid
+											. ' AND catid = '. $altered_catid
+											;
+									$this->_db->setQuery( $query);  //echo "$query <br/>";
+									$this->_db->query();
+									if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
+								}
+							}
+						}
+						if ( $lang_group != '_' )
+							$mainframe->enqueueMessage(JText::sprintf('FLEXI_REORDER_GROUP_RESULTS_LANG', JText::_('FLEXI_ORDER_FLEXICONTENT'), $state_group, $lang_group, $altered_catid), "message");
+						else
+							$mainframe->enqueueMessage(JText::sprintf('FLEXI_REORDER_GROUP_RESULTS', JText::_('FLEXI_ORDER_FLEXICONTENT'), $state_group, $altered_catid), "message");
 					}
 				}
 			}
-
+			
+			//exit;
 			return true;
 		}
 

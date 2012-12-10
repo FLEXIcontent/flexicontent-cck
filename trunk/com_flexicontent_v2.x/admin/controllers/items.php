@@ -425,6 +425,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		$model = $this->getModel('items');
 		$user  =& JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$ord_catid = JRequest::getVar( 'ord_catid', array(0), 'post', 'array' );
+		$prev_order = JRequest::getVar( 'prev_order', array(0), 'post', 'array' );
 		
 		// calculate access
 		if (FLEXI_J16GE) {
@@ -436,7 +438,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// check access
 		if ( !$canOrder ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-		} else if ( $model->move($dir) ){
+		} else if ( $model->move($dir, $ord_catid, $prev_order) ){
 			// success
 		} else {
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_ORDER' );
@@ -489,6 +491,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		$user  =& JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$order = JRequest::getVar( 'order', array(0), 'post', 'array' );
+		$ord_catid = JRequest::getVar( 'ord_catid', array(0), 'post', 'array' );
+		$prev_order = JRequest::getVar( 'prev_order', array(0), 'post', 'array' );
 		
 		// calculate access
 		if (FLEXI_J16GE) {
@@ -500,7 +504,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// check access
 		if ( !$canOrder ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-		} else if (!$model->saveorder($cid, $order)) {
+		} else if (!$model->saveorder($cid, $order, $ord_catid, $prev_order)) {
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_ORDER' );
 			JError::raiseWarning( 500, $msg ." " . $model->getError() );
 			$msg = '';

@@ -493,7 +493,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$filter_order_dir	= 'DESC';
 				break;
 				case 'order' :
-				$filter_order		= 'rel.ordering';
+				$filter_order		= 'rel.catid, rel.ordering';
 				$filter_order_dir	= 'ASC';
 				break;
 			}

@@ -108,7 +108,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			$contenttypes = $params->get('contenttypes', array());
 		}
 		if((count($contenttypes)>0) && !is_array($contenttypes)) $contenttypes = array($contenttypes);
-		$dispatcher =& JDispatcher::getInstance();
+		//$dispatcher =& JDispatcher::getInstance();
 		
 		// define section
 		if (!defined('FLEXI_SECTION')) define('FLEXI_SECTION', $params->get('flexi_section'));
@@ -262,7 +262,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Once per (advanced searchable) field TYPE we will search for ITEMs having specified field value(s)
 		// *************************************************************************************************
 		
-		JPluginHelper::importPlugin( 'flexicontent_fields');
+		//JPluginHelper::importPlugin( 'flexicontent_fields');
 		$fields_matched_arr = array();
 		foreach($fields as $field)
 		{

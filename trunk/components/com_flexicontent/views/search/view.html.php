@@ -40,7 +40,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Initialize some variables
 		$pathway  =& $mainframe->getPathway();
 		$uri      =& JFactory::getURI();
-		$dispatcher = & JDispatcher::getInstance();
+		//$dispatcher = & JDispatcher::getInstance();
 		$document 	= & JFactory::getDocument();
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
@@ -84,7 +84,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$fields			= & $itemmodel->getAdvSearchFields($search_fields);
 		
 		//Import fields
-		JPluginHelper::importPlugin('flexicontent_fields');
+		//JPluginHelper::importPlugin('flexicontent_fields');
 		
 		// Add html to field object trought plugins
 		$custom = FLEXI_J16GE ? JRequest::getVar('custom', array()) : false;
