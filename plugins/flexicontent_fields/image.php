@@ -852,7 +852,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 
 
-		if ( $app->isSite() && !$gallerificadded &&	$usepopup && $popuptype == 4 )
+		if ( $app->isSite() && !$gallerificadded &&	$usepopup && $popuptype == 5 )
 		{
 			flexicontent_html::loadJQuery($add_jquery = 1, $add_jquery_ui = 0, $add_jquery_ui_css = 0);
 

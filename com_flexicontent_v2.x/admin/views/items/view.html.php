@@ -222,6 +222,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$unassociated	= & $this->get( 'UnassociatedItems' );
 		$status				= & $this->get( 'ExtdataStatus' );
 		$extra_fields	= & $this->get( 'ItemList_ExtraFields' );
+		$this->get( 'ItemList_ExtraFieldValues' );
 		
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$langs	= & FLEXIUtilities::getLanguages('code');

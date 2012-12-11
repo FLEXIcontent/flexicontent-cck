@@ -120,7 +120,7 @@ class FlexicontentModelCategories extends JModelList
 		}
 		$query->group('c.id');
 		// Add the list ordering clause.
-		$query->order($db->Quote($db->getEscaped($filter_order.' '.$filter_order_Dir)));
+		$query->order($db->getEscaped($filter_order.' '.$filter_order_Dir));
 		//echo nl2br(str_replace('#__','jos_',$query));
 		//echo str_replace('#__', 'jos_', $query->__toString());
 		return $query;
