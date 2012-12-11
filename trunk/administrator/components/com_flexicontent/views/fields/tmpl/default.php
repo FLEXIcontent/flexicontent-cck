@@ -97,10 +97,12 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 			$padspacer = '';
 			$row_css = '';
 			
+			if ($row->field_type=='groupmarker') {
+				$grpm_params = new JParameter($row->attribs);
+			}
 			if ( $this->filter_type ) // Create coloring and padding for groupmarker fields if filtering by specific type is enabled
 			{
 				if ($row->field_type=='groupmarker') {
-					$grpm_params = new JParameter($row->attribs);
 					if ( in_array ($grpm_params->get('marker_type'), array( 'tabset_start', 'tabset_end' ) ) ) {
 						$row_css = 'color:black;';
 					} else if ( in_array ($grpm_params->get('marker_type'), array( 'tab_open', 'fieldset_open' ) ) ) {

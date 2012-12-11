@@ -593,6 +593,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 		static $multiboxadded = false;
 		static $fancyboxadded = false;
+		static $gallerificadded = false;
 		
 		$values = $values ? $values : $field->value;
 		
@@ -823,16 +824,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		if ( $app->isSite() && !$fancyboxadded &&	$usepopup && $popuptype == 4 )
 		{
-			if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-				$document->addScript(JURI::root().'administrator/components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
-				// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
-				//$document->addCustomTag('<script>jQuery.noConflict();</script>');
-			}
+			// Add jQuery if not already added
+			flexicontent_html::loadJQuery($add_jquery = 1, $add_jquery_ui = 0, $add_jquery_ui_css = 0);
 			
 			// Add mousewheel plugin (this is optional)
 			$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/lib/jquery.mousewheel-3.0.6.pack.js');
 			
-			// Add fancyBox
+			// Add fancyBox CSS / JS
 			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/fancybox/source/jquery.fancybox.css?v=2.1.1');
 			$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/jquery.fancybox.pack.js?v=2.1.1');
 			
@@ -854,19 +852,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 
 
-		if ( $app->isSite() && !$fancyboxadded &&	$usepopup && $popuptype == 4 )
+		if ( $app->isSite() && !$gallerificadded &&	$usepopup && $popuptype == 4 )
 		{
-			if(!JPluginHelper::isEnabled('system', 'jquerysupport')) {
-				$document->addScript(JURI::root().'administrator/components/com_flexicontent/assets/js/jquery-'.FLEXI_JQUERY_VER.'.js');
-				// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
-				//$document->addCustomTag('<script>jQuery.noConflict();</script>');
-			}
+			flexicontent_html::loadJQuery($add_jquery = 1, $add_jquery_ui = 0, $add_jquery_ui_css = 0);
 
-			// Add fancyBox
+			// Add gallerific CSS / JS
 			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/galleriffic/css/basic.css');
 			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/galleriffic/css/galleriffic-2.css');
 			$document->addScript(JURI::root().'components/com_flexicontent/librairies/galleriffic/js/jquery.galleriffic.js');
 			$document->addScript(JURI::root().'components/com_flexicontent/librairies/galleriffic/js/jquery.opacityrollover.js');
+			
+			$gallerificadded = 1;
 		}
 		
 		

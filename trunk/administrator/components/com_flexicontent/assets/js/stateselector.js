@@ -60,7 +60,7 @@ var processstate = new Class(
 				update: 'row' + id
 				//,onComplete: hider
 			});
-			setstate.request();		
+			setstate.request();
 		}
 		
 		//function hider(response) {

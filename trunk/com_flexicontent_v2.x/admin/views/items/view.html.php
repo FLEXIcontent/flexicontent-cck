@@ -45,14 +45,14 @@ class FlexicontentViewItems extends JViewLegacy {
 		$extlimit = JRequest::getInt('extlimit', 100);
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
-		flexicontent_html::loadJQuery();
 		
 		if($task == 'copy') {
 			$this->setLayout('copy');
 			$this->_displayCopyMove($tpl, $cid);
 			return;
 		}
-
+		
+		flexicontent_html::loadJQuery();
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.calendar');
 
@@ -86,31 +86,11 @@ class FlexicontentViewItems extends JViewLegacy {
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.items.search', 		'search', 			'', 			'string' );
 		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
 		
-		$inline_ss_max = 30;
-		if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
-		{
-			$limit = $mainframe->getUserStateFromRequest( $option.'.items.limit',	'limit',	0, 'int' );
-			$notice_iss_disabled = $mainframe->getUserStateFromRequest( $option.'.items.notice_iss_disabled',	'notice_iss_disabled',	0, 'int' );
-			if (!$notice_iss_disabled && $limit > $inline_ss_max) {
-				$mainframe->setUserState( $option.'.items.notice_iss_disabled', 1 );
-				$mainframe->enqueueMessage(JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $inline_ss_max), 'notice');
-				$show_turn_off_notice = 1;
-			}
-			
-			$notice_define_item_order = 30;
-			$notice_define_item_order = $mainframe->getUserStateFromRequest( $option.'.items.notice_define_item_order',	'notice_define_item_order',	0, 'int' );
-			if (!$notice_define_item_order) {
-				$mainframe->setUserState( $option.'.items.notice_define_item_order', 1 );
-				$mainframe->enqueueMessage(JText::_('FLEXI_DEFINE_ITEM_ORDER_FILTER_BY_CAT'), 'notice');
-				$show_turn_off_notice = 1;
-			}
-			if (!empty($show_turn_off_notice))
-				$mainframe->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
-		}
 		
-		//add css and submenu to document
+		// Add custom css and js to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/stateselector.js' );
+		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/flexi-lib.js' );
 
 		$js = "window.addEvent('domready', function(){";
 		if ($filter_cats) {
@@ -148,7 +128,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$js .= "});";
 		$document->addScriptDeclaration($js);
 		
-		if (FLEXI_J16GE) {
+		if (FLEXI_J16GE || FLEXI_ACCESS) {
 			$permission 	= FlexicontentHelperPerm::getPerm();
 			$CanAdd				= $permission->CanAdd;
 			
@@ -166,24 +146,8 @@ class FlexicontentViewItems extends JViewLegacy {
 			$CanCopy		= $permission->CanCopy;
 			$CanArchives= $permission->CanArchives;
 			
-		} else if (FLEXI_ACCESS) {
-			$CanAdd			= ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'submit', 'users', $user->gmid) || FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) : 1;
-			
-			$CanEdit		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'edit', 'users', $user->gmid)		: 1;
-			$CanPublish	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'publish', 'users', $user->gmid)	: 1;
-			$CanDelete	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'delete', 'users', $user->gmid)	: 1;
-			
-			$CanEditOwn			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'editown', 'users', $user->gmid)			: 1;
-			$CanPublishOwn	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)	: 1;
-			$CanDeleteOwn		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'deleteown', 'users', $user->gmid)		: 1;
-			
-			$CanCats		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid)	: 1;
-			$CanRights	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid)			: 1;
-			$CanOrder		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid)			: 1;
-			$CanCopy		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'copyitems', 'users', $user->gmid)	: 1;
-			$CanArchives= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid)		: 1;
-			
 		} else {
+			
 			$CanAdd			= 1;
 			$CanEdit		= 1;
 			$CanPublish	= 1;
@@ -246,7 +210,11 @@ class FlexicontentViewItems extends JViewLegacy {
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 		
-		//Get data from the model
+		
+		// ***********************
+		// Get data from the model
+		// ***********************
+		
 		$rows     	= & $this->get( 'Data');
 		$pageNav 		= & $this->get( 'Pagination' );
 		$types			= & $this->get( 'Typeslist' );
@@ -254,12 +222,45 @@ class FlexicontentViewItems extends JViewLegacy {
 		$unassociated	= & $this->get( 'UnassociatedItems' );
 		$status				= & $this->get( 'ExtdataStatus' );
 		$extra_fields	= & $this->get( 'ItemList_ExtraFields' );
-		$this->get( 'ItemList_ExtraFieldValues' );
 		
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$langs	= & FLEXIUtilities::getLanguages('code');
 		}
-		$categories = $globalcats?$globalcats:array();
+		$categories = $globalcats ? $globalcats : array();
+		
+		
+		$limit = $pageNav->limit;
+		$inline_ss_max = 30;
+		$drag_reorder_max = 100;
+		if ( $limit > $drag_reorder_max ) $cparams->set('draggable_reordering', 0);
+		
+		// ******************************************
+		// Add usability notices if these are enabled
+		// ******************************************
+		
+		if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
+		{
+			$notice_iss_disabled = $mainframe->getUserStateFromRequest( $option.'.items.notice_iss_disabled',	'notice_iss_disabled',	0, 'int' );
+			if (!$notice_iss_disabled && $limit > $inline_ss_max) {
+				$mainframe->setUserState( $option.'.items.notice_iss_disabled', 1 );
+				$mainframe->enqueueMessage(JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $inline_ss_max), 'notice');
+				$show_turn_off_notice = 1;
+			}
+			
+			$notice_drag_reorder_disabled = $mainframe->getUserStateFromRequest( $option.'.items.notice_drag_reorder_disabled',	'notice_drag_reorder_disabled',	0, 'int' );
+			if (!$notice_drag_reorder_disabled && $limit > $drag_reorder_max) {
+				$mainframe->setUserState( $option.'.items.notice_drag_reorder_disabled', 1 );
+				$mainframe->enqueueMessage(JText::sprintf('FLEXI_DRAG_REORDER_DISABLED', $drag_reorder_max), 'notice');
+				$show_turn_off_notice = 1;
+			}
+			if (!empty($show_turn_off_notice))
+				$mainframe->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
+		}
+		
+		
+		// *******************
+		// Create Filters HTML
+		// *******************
 		
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
 		$state[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
