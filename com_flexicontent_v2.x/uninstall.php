@@ -39,7 +39,13 @@ if (!defined('FLEXI_J16GE')) {
 		$extensions = array();
 		$db =& JFactory::getDBO();
 		
-		// Uninstall additional flexicontent modules/plugins found in Joomla DB
+		// Uninstall additional flexicontent modules/plugins found in Joomla DB,
+		// This code part (for uninstalling additional extensions) originates from Zoo Component:
+		// Original uninstall.php file
+		// @package   Zoo Component
+		// @author    YOOtheme http://www.yootheme.com
+		// @copyright Copyright (C) 2007 - 2009 YOOtheme GmbH
+		// @license   http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 only
 		if (FLEXI_J16GE) {
 			$manifest = isset($parent) ? $parent->getParent()->manifest : $this->manifest;
 			$add_array =& $manifest->xpath('additional');
