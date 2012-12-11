@@ -157,15 +157,26 @@ class flexicontent_html
 	 */
 	function loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1 )
 	{
+		static $jquery_added = false;
+		static $jquery_ui_added = false;
+		static $jquery_ui_css_added = false;
+		
 		$document = & JFactory::getDocument();
 		if ( $add_jquery && !JPluginHelper::isEnabled('system', 'jquerysupport') )
 		{
 			$document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-'.FLEXI_JQUERY_VER.'.js');
 			// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
 			//$document->addCustomTag('<script>jQuery.noConflict();</script>');
+			$jquery_added = 1;
 		}
-		if ( $add_jquery_ui )     $document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-ui-'.FLEXI_JQUERY_UI_VER.'.js');
-		if ( $add_jquery_ui_css ) $document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/jquery/css/ui-lightness/jquery-ui-'.FLEXI_JQUERY_UI_CSS_VER.'.css');
+		if ( $add_jquery_ui ) {
+			$document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-ui-'.FLEXI_JQUERY_UI_VER.'.js');
+			$jquery_ui_added = 1;
+		}
+		if ( $add_jquery_ui_css ) {
+			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/jquery/css/ui-lightness/jquery-ui-'.FLEXI_JQUERY_UI_CSS_VER.'.css');
+			$jquery_ui_css_added = 1;
+		}
 	}
 	
 	
@@ -555,7 +566,7 @@ class flexicontent_html
 		
 	 	if (!$js_and_css_added && $canChangeState && $addToggler )
 	 	{
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/stateselector.js' );
+			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/stateselector.js' );
 	 		$js ='
 				if(MooTools.version>="1.2.4") {
 					window.addEvent("domready", function() {stateselector.init()});

@@ -33,8 +33,8 @@ var processstate = new Class(
 {  
 	options:  {
 		id: "",
-		script_url: "index.php?option=com_flexicontent&tmpl=component",
-		task: "items.setitemstate",
+		script_url: "index.php?option=com_flexicontent&controller=items&format=raw",
+		task: "setitemstate",
 		state: ""
 	},
 
@@ -60,7 +60,7 @@ var processstate = new Class(
 				update: 'row' + id
 				//,onComplete: hider
 			});
-			setstate.request();		
+			setstate.request();
 		}
 		
 		//function hider(response) {
