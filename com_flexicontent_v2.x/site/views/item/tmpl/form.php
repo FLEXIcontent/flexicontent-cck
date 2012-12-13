@@ -714,6 +714,8 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		<ul class="adminformlist">
 		<?php if ($this->perms['isSuperAdmin'] && $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ?>
 			<li><?php echo $this->form->getLabel('created_by')     . $this->form->getInput('created_by'); ?></li>
+		<?php endif; ?>
+		<?php if ($this->perms['editcreationdate'] && $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ?>
 			<li><?php echo $this->form->getLabel('created')        . $this->form->getInput('created');?></li>
 		<?php endif; ?>
 			<li><?php echo $this->form->getLabel('created_by_alias') . $this->form->getInput('created_by_alias');?></li>

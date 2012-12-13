@@ -160,17 +160,21 @@ class FlexicontentController extends JControllerLegacy
 		$existseplg 		= & $model->getExistSearchPlugin();
 		$existsyplg 		= & $model->getExistSystemPlugin();
 		
-		$existlang	 	= $model->getExistLanguageColumn() && !$model->getItemsNoLang();
+		$existlang				= $model->getExistLanguageColumn() && !$model->getItemsNoLang();
 		$existversions 		= & $model->getExistVersionsTable();
-		$existversionsdata	= !$use_versioning || $model->getExistVersionsPopulated();
-		$existauthors 		= & $model->getExistAuthorsTable();
-		$cachethumb			= & $model->getCacheThumbChmod();
+		$existversionsdata= !$use_versioning || $model->getExistVersionsPopulated();
 		
-		$oldbetafiles		= & $model->getOldBetaFiles();
+		$existauthors 		= & $model->getExistAuthorsTable();
+		$cachethumb				= & $model->getCacheThumbChmod();
+		$oldbetafiles			= & $model->getOldBetaFiles();
 		$nooldfieldsdata	= & $model->getNoOldFieldsData();
 		$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 		
 		$initialpermission = FLEXI_J16GE ? $model->checkInitialPermission() : true;
+		
+		// This will check and add custom FLEXI_ACCESS privileges
+		if (!FLEXI_J16GE)
+			$model->checkExtraAclRules();  // For J1.5
 		
 		//echo "(!$existmenuitems) || (!$existtype) || (!$existfields) ||<br>";
 		//echo "     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
@@ -190,6 +194,8 @@ class FlexicontentController extends JControllerLegacy
 		}
 		return $dopostinstall;
 	}
+	
+	
 	/**
 	 * Display the view
 	 */
