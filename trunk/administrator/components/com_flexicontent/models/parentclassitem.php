@@ -1627,13 +1627,13 @@ class ParentClassItem extends JModelLegacy
 			if (!FLEXI_J16GE) {
 				if ($isnew)  $data['details']['created_by'] = $user->get('id');
 				else         unset( $data['details']['created_by'] );
-				if ( !$user->authorise('flexicontent.editcreationdate', 'com_flexicontent') )
-					unset( $data['details']['created'] );
+				unset( $data['details']['created'] );
 				unset( $data['details']['created_by_alias'] );
 			} else {
 				if ($isnew)  $data['created_by'] = $user->get('id');
 				else         unset( $data['created_by'] );
-				unset( $data['created'] );
+				if ( !$user->authorise('flexicontent.editcreationdate', 'com_flexicontent') )
+					unset( $data['created'] );
 				unset( $data['created_by_alias'] );
 			}
 		}
