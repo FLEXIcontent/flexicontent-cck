@@ -183,7 +183,6 @@ class FlexicontentModelItems extends JModelLegacy
 			$tparams = new JParameter($type_attribs);
 			$im_extra_fields = $tparams->get("items_manager_extra_fields");
 			$item_instance = new stdClass();
-			$item->type_id = $filter_type;
 		} else {
 			$item_instance = null;
 			$im_extra_fields = $flexiparams->get("items_manager_extra_fields");
