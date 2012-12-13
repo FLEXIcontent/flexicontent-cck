@@ -89,6 +89,10 @@
 				<field name="searchareas" type="radio" default="" label="Search Areas" description="The site's (non-FC content) search areas, that the search will include. NOTE: if user is allowed to select Search Areas, then the selection list will be LIMITED to display ONLY the search areas selected here" multiple="true" >
 					<option value="">FLEXI_ALL</option>
 				</field>
+				<field name="show_searchordering" type="radio" default="1" label="Show ordering" description="Allow frontend users to select ordering of results of other areas of the website content. NOTE this is different ordering from the ordering used for main content results.">
+					<option value="0">FLEXI_NO</option>
+					<option value="1">FLEXI_YES</option>
+				</field>
 				
 				<field name="default_searchordering" type="list" default="newest" label="Default value" description="Default ordering for sorting the results of the search">
 					<option value="newest">FLEXI_ADV_NEWEST_FIRST</option>

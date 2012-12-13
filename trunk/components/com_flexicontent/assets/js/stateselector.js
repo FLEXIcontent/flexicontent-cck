@@ -8,18 +8,13 @@ var stateselector = {
 
 		$$('ul.statetoggler a.opener').each(function(lnk, index){
 			lnk.addEvent('click', function(){
-				this.sliders.each(function(slider, sliderIndex){
-					if (sliderIndex == index) this.sliders[sliderIndex].toggle();
-					else this.sliders[sliderIndex].slideOut();
-				}, this);
+				this.sliders[index].toggle();
 			}.bind(this));
 		}, this);
 		
-		$$('ul.statetoggler a.closer').each(function(lnk, index){
+		$$('ul.statetoggler .options').each(function(lnk, index){
 			lnk.addEvent('click', function(){
-				this.sliders.each(function(slider, sliderIndex){
-					this.sliders[sliderIndex].slideOut();
-				}, this);
+				this.sliders[index].toggle();
 			}.bind(this));
 		}, this);
 	},

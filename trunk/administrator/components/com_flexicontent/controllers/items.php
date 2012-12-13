@@ -1330,7 +1330,8 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		echo $msg;
 	}
-
+	
+	
 	/**
 	 * Bind fields, category relations and items_ext data to Joomla! com_content imported articles
 	 *
@@ -1345,18 +1346,6 @@ class FlexicontentControllerItems extends FlexicontentController
 		$rows 		= $model->getUnassociatedItems($extdata);
 		
 		echo ($model->addFlexiData($rows));
-	}
-
-	/**
-	 * Logic to change the state of an item
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.0
-	 */
-	function setitemstate()
-	{
-		flexicontent_html::setitemstate();
 	}
 	
 	
@@ -2112,5 +2101,18 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		echo count($status['no']);
 	}
-
+	
+	
+	/**
+	 * Logic to change the state of an item
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function setitemstate()
+	{
+		flexicontent_html::setitemstate();
+	}
+	
 }

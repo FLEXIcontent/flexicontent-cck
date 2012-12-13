@@ -227,6 +227,10 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$lists['orderby'] = flexicontent_html::ordery_selector( $params, 'searchForm', $autosubmit=0 );
 		}
 		
+		if($limit_override = $params->get('limit_override', 1)) {
+			$lists['limit'] = flexicontent_html::limit_selector( $params, 'searchForm', $autosubmit=0 );
+		}
+		
 		// Non-FLEXIcontent Results Ordering
 		if($show_searchordering = $params->get('show_searchordering', 1)) {
 			$default_searchordering = $params->get('default_searchordering', 'newest');

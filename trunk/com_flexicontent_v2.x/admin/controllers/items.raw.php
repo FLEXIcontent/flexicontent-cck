@@ -105,6 +105,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		} else if (FLEXI_ACCESS) {
 			$CanUseTags = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
 		} else {
+			// no FLEXIAccess everybody can create / use tags
 			$CanUseTags = 1;
 		}
 		if($CanUseTags) {
@@ -147,9 +148,9 @@ class FlexicontentControllerItems extends FlexicontentController
 			$auth_delete   = ($user->gid < 25) ? (FAccess::checkComponentAccess('com_content', 'delete', 'users', $user->gmid) || FAccess::checkComponentAccess('com_content', 'deleteown', 'users', $user->gmid)) : 1;
 			$auth_archive  = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid) : 1;
 		} else {
-			$auth_publish = 1;
-			$auth_delete  = 1;
-			$auth_archive = 1;
+			$auth_publish = $user->authorize('com_content', 'publish', 'content', 'all');
+			$auth_delete  = $user->gid >= 23; // is at least manager
+			$auth_archive = $user->gid >= 23; // is at least manager
 		}
 		
 		if($auth_publish || $auth_archive || $auth_delete) {
@@ -221,5 +222,18 @@ class FlexicontentControllerItems extends FlexicontentController
 
 		echo count($status['no']);
 	}
-
+	
+	
+	/**
+	 * Logic to change the state of an item
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function setitemstate()
+	{
+		flexicontent_html::setitemstate();
+	}
+	
 }
