@@ -204,7 +204,7 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 			</tbody>
 		</table>
 
-		<?
+		<?php
 		// Rollback on installation errors, abort() will be called on every additional extension installed above
 		if ($error) {
 			for ($i = 0; $i < count($extensions); $i++) { 
