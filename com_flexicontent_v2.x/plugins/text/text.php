@@ -385,7 +385,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
 			
 			foreach($results as $result) {
-				if (!trim($result->value)) continue;
+				if ( !strlen($result->value) ) continue;
 				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
 			}
 			if ($label_filter == 1) $filter->html  .= $filter->label.': ';
