@@ -756,6 +756,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$db->setQuery($query);
 			$db->query();
 			
+			// Check for assocanytrans : Allow users to associate translations (items) authored by any user
 			$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='assocanytrans'";
 			$db->setQuery($query);
 			$assocanytrans_rule = $db->loadResult();
@@ -763,10 +764,38 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			if (!$assocanytrans_rule)
 			{
 				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
-					." VALUES ('com_flexicontent', '', 'assocanytrans', '', '', 'Associate any translation', '', '')";
+					." VALUES ('com_flexicontent', '', 'assocanytrans', '', '', 'Associate any translation (items)', '', '')";
 				$db->setQuery($query);
 				$db->query();
 				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_ASSOCIATE_ANY_TRANSLATION'), 'message' );
+			}
+			
+			// Check for editcreationdate : Allow users to edit creation date of an item
+			/*$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='editcreationdate'";
+			$db->setQuery($query);
+			$editcreationdate_rule = $db->loadResult();
+			
+			if (!$editcreationdate_rule)
+			{
+				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
+					." VALUES ('com_flexicontent', '', 'editcreationdate', '', '', 'Edit creation date (items)', '', '')";
+				$db->setQuery($query);
+				$db->query();
+				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_EDIT_CREATION_DATE'), 'message' );
+			}*/
+			
+			// Check for ignoreviewstate : Allow users to view unpublished, archived, trashed, scheduled, expired items in frontend content lists e.g. category view
+			$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='ignoreviewstate'";
+			$db->setQuery($query);
+			$ignoreviewstate_rule = $db->loadResult();
+			
+			if (!$ignoreviewstate_rule)
+			{
+				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
+					." VALUES ('com_flexicontent', '', 'ignoreviewstate', '', '', 'Ignore view state (items)', '', '')";
+				$db->setQuery($query);
+				$db->query();
+				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_IGNORE_VIEW_STATE'), 'message' );
 			}
 		}
 	}

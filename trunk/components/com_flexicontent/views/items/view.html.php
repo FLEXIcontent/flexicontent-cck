@@ -976,7 +976,7 @@ class FlexicontentViewItems extends JViewLegacy
 				$perms['canpublish']	= $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
 				$perms['candelete']		= $user->authorise('core.delete', 'com_flexicontent') || $user->authorise('core.delete.own', 'com_flexicontent');
 			}
-			
+			$perms['editcreationdate'] = $user->authorise('flexicontent.editcreationdate', 'com_flexicontent');
 			$perms['canright']		= $permission->CanConfig;
 		} else if (FLEXI_ACCESS) {
 			$perms['isSuperAdmin']= $user->gid >= 25;
@@ -1004,6 +1004,7 @@ class FlexicontentViewItems extends JViewLegacy
 				$perms['candelete']		= ($user->gid < 25) ? $canDeletehAll || $canDeleteOwnAll : 1;
 				$perms['canright']		= ($user->gid < 25) ? 0 : 1;
 			}
+			//$perms['editcreationdate'] = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'editcreationdate', 'users', $user->gmid) : 1;
 		} else {
 			// J1.5 permissions with no FLEXIaccess are only general, no item specific permissions
 			$perms['isSuperAdmin']= $user->gid >= 25;
@@ -1015,6 +1016,7 @@ class FlexicontentViewItems extends JViewLegacy
 			$perms['canpublish']	= ($user->gid >= 21);
 			$perms['candelete']		= ($user->gid >= 21);
 			$perms['canright']		= ($user->gid >= 21);
+			//$perms['editcreationdate'] = ($user->gid >= 25);
 		}
 		
 		return $perms;

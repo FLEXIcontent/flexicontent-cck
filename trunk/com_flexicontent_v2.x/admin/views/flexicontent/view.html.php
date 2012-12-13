@@ -138,21 +138,22 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$existmenuitems		= & $this->get( 'ExistMenuItems' );
 			$existtype 			= & $this->get( 'ExistType' );
 			$existfields 		= & $this->get( 'ExistFields' );
+			
 			$existfplg 			= & $this->get( 'ExistFieldsPlugins' );
 			$existseplg 		= & $this->get( 'ExistSearchPlugin' );
 			$existsyplg 		= & $this->get( 'ExistSystemPlugin' );
-			$existlang	 		= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
-			$existversions 		= & $this->get( 'ExistVersionsTable' );
+			
+			$existlang	 				= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
+			$existversions 			= & $this->get( 'ExistVersionsTable' );
 			$existversionsdata	= !$use_versioning || $this->get( 'ExistVersionsPopulated' );
+			
 			$existauthors			= & $this->get( 'ExistAuthorsTable' );
-			$cachethumb			= & $this->get( 'CacheThumbChmod' );
-			$oldbetafiles		= & $this->get( 'OldBetaFiles' );
+			$cachethumb				= & $this->get( 'CacheThumbChmod' );
+			$oldbetafiles			= & $this->get( 'OldBetaFiles' );
 			$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
 			$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
-			if (FLEXI_J16GE)
-				$initialpermission	= $model->checkInitialPermission();  // For J1.6+
-			else
-				$model->checkExtraAclRules();  // For J1.5
+			
+			$initialpermission = FLEXI_J16GE ? $model->checkInitialPermission() : true;
 		}
 		
 		// 4. SILENTLY CHECKED and EXECUTED TASKs WITHOUT ALERTING THE USER

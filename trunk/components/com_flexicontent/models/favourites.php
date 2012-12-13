@@ -370,26 +370,24 @@ class FlexicontentModelFavourites extends JModelLegacy
 		// First thing we need to do is to select only the requested FAVOURED items
 		$where = ' WHERE fav.userid = '.(int)$user->get('id');
 		
-		// Limit to published items. Exception when user can edit item
-		// but NO CLEAN WAY OF CHECKING individual item EDIT ACTION while creating this query !!!
-		// *** so we will rely only on item created or modified by the user ***
-		// when view is created the edit button will check individual item EDIT ACTION
-		// NOTE: *** THE ABOVE MENTIONED EXCEPTION WILL NOT OVERRIDE ACCESS
-		if (FLEXI_J16GE) {
-			$ignoreState = $user->authorise('core.admin', 'com_flexicontent');  // Super user privelege, can edit all for sure
-		} else if (FLEXI_ACCESS) {
-			$ignoreState = (int)$user->gid >= 25;  // Super admin, can edit all for sure
-		} else {
-			$ignoreState = (int)$user->get('gid') > 19;  // author has 19 and editor has 20
+		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
+		// NOTE:  ACL view level is checked at a different place
+		if ( FLEXI_J16GE )
+			$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
+		else if (FLEXI_ACCESS)
+			$ignoreState = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'ignoreviewstate', 'users', $user->gmid) : 1;
+		else
+			$ignoreState = $user->gid  > 19;  // author has 19 and editor has 20
+		
+		if (!$ignoreState) {
+			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
+			$where .= ' AND ( i.state IN (1, -5) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			
+			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
+			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		}
 		
-		$states = $ignoreState ? '1, -5, 0, -3, -4' : '1, -5';
-		$where .= ' AND ( i.state IN ('.$states.') OR i.created_by = '.$user->id.' )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-		
-		// Limit by publication date. Exception: when displaying personal user items or items modified by the user
-		$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-		$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-
 		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
 
 		/*
