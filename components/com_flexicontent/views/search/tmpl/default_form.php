@@ -135,7 +135,22 @@ $other_search_areas_title_tip = ' title="'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN
 					</td>
 				</tr>
 				
-			<?php endif; ?>			
+			<?php endif; ?>
+			
+			<?php if( $show_orderby ) : ?>
+			
+				<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+					<td class='fc_search_label_cell' valign='top'>
+						<label for="limit" class="hasTip" title='<?php echo JText::_('FLEXI_PAGINATION'); ?>::<?php echo JText::_('FLEXI_PAGINATION_INFO'); ?>'>
+							<?php echo JText::_( 'FLEXI_PAGINATION' );?>:
+						</label>
+					</td>
+					<td colspan="2" class="fc_search_option_cell">
+						<?php echo $this->lists['limit'];?>
+					</td>
+				</tr>
+				
+			<?php endif; ?>
 			
 			<?php if ($autodisplayadvoptions) :
 				$use_advsearch_options = JRequest::getInt('use_advsearch_options', 0);
@@ -163,120 +178,114 @@ $other_search_areas_title_tip = ' title="'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN
 	<fieldset id='fc_advsearch_options_set' class='fc_search_set'>
 		<legend><?php echo JText::_('FLEXI_SEARCH_ADVANCED_SEARCH_OPTIONS'); ?></legend>
 		
-		<?php if(count($search_fields)>0) {?>
-		<fieldset id='fc_fieldfilters_set' class='fc_search_set'>
-			<legend><span class="hasTip" <?php echo $field_filters_title_tip;?> ><?php echo $infoimage; ?></span><?php echo JText::_('FLEXI_FIELD_FILTERS')." ".JText::_('FLEXI_TO_FILTER_TEXT_SEARCH_RESULTS'); ?></legend>
-	
-			<table id="fc_fieldfilters_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">		
-			
-			<?php if($show_operator = $this->params->get('show_filtersop', 1)) : ?>
-				<tr class="fc_search_row_<?php echo (($r++)%2);?>">
-					<td colspan="3" class="fc_search_option_cell">
-						<label for="operator" class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_FILTERS_REQUIRED'); ?>::<?php echo JText::_('FLEXI_SEARCH_FILTERS_REQUIRED_TIP'); ?>'>
-							<?php echo JText::_("FLEXI_SEARCH_FILTERS_REQUIRED"); ?>:
-						</label>
-						<?php echo $this->lists['filtersop']; ?>:
-					</td>
-				</tr>
-			<?php endif; ?>
+		<?php if ( count($search_fields) > 0 ) : ?>
+			<fieldset id='fc_fieldfilters_set' class='fc_search_set'>
+				<legend><span class="hasTip" <?php echo $field_filters_title_tip;?> ><?php echo $infoimage; ?></span><?php echo JText::_('FLEXI_FIELD_FILTERS')." ".JText::_('FLEXI_TO_FILTER_TEXT_SEARCH_RESULTS'); ?></legend>
 				
-			<?php
-				foreach($search_fields as $f) {
-					if(!isset($fields[$f])) continue;
-			?>
-				<tr class="fc_search_row_<?php echo (($r++)%2);?>">
-					<td class='fc_search_label_cell' valign='top'>
-					<?php if ($fields[$f]->description) : ?>
-						<label for="<?php echo $fields[$f]->name; ?>" class="hasTip" title="<?php echo $fields[$f]->label; ?>::<?php echo $fields[$f]->description; ?>">
-							<?php echo $fields[$f]->label; ?>:
-						</label>
-					<?php else : ?>
-						<label for="<?php echo $fields[$f]->name; ?>" class="hasTip" title="<?php echo JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'); ?>::<?php echo JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $fields[$f]->label ); ?>">
-							<?php echo $fields[$f]->label; ?>:
-						</label>
-					<?php endif; ?>
-					</td>
-					<td colspan="2" class="fc_search_option_cell">
-						<?php
-						$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-						if(isset($fields[$f]->html)) {
-							echo $fields[$f]->html;
-						} else {
-							echo $noplugin;
-						}
-						?>
-					</td>
-				</tr>
+				<table id="fc_fieldfilters_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">		
+				
+				<?php if($show_operator = $this->params->get('show_filtersop', 1)) : ?>
+					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+						<td colspan="3" class="fc_search_option_cell">
+							<label for="operator" class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_FILTERS_REQUIRED'); ?>::<?php echo JText::_('FLEXI_SEARCH_FILTERS_REQUIRED_TIP'); ?>'>
+								<?php echo JText::_("FLEXI_SEARCH_FILTERS_REQUIRED"); ?>:
+							</label>
+							<?php echo $this->lists['filtersop']; ?>:
+						</td>
+					</tr>
+				<?php endif; ?>
+				
 				<?php
-					//}
-				}
+					foreach($search_fields as $f) {
+						if(!isset($fields[$f])) continue;
 				?>
-			</table>
+					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+						<td class='fc_search_label_cell' valign='top'>
+						<?php if ($fields[$f]->description) : ?>
+							<label for="<?php echo $fields[$f]->name; ?>" class="hasTip" title="<?php echo $fields[$f]->label; ?>::<?php echo $fields[$f]->description; ?>">
+								<?php echo $fields[$f]->label; ?>:
+							</label>
+						<?php else : ?>
+							<label for="<?php echo $fields[$f]->name; ?>" class="hasTip" title="<?php echo JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'); ?>::<?php echo JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $fields[$f]->label ); ?>">
+								<?php echo $fields[$f]->label; ?>:
+							</label>
+						<?php endif; ?>
+						</td>
+						<td colspan="2" class="fc_search_option_cell">
+							<?php
+							$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+							if(isset($fields[$f]->html)) {
+								echo $fields[$f]->html;
+							} else {
+								echo $noplugin;
+							}
+							?>
+						</td>
+					</tr>
+					
+				<?php } ?>
+				
+				</table>
+				
+			</fieldset>
 			
-		</fieldset>
-		<?php } ?>	
-		<fieldset id='fc_search_behavior_set' class='fc_search_set'>
-			<legend>
-				<span class="hasTip" <?php echo $other_search_areas_title_tip;?> ><?php echo $infoimage; ?></span><?php echo JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS'); ?>
-			</legend>
+		<?php endif; ?>
+
+		<?php if ( $show_searchareas ) : ?>
 			
-			<table id="fc_search_behavior_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
+			<fieldset id='fc_search_behavior_set' class='fc_search_set'>
+				<legend>
+					<span class="hasTip" <?php echo $other_search_areas_title_tip;?> ><?php echo $infoimage; ?></span><?php echo JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS'); ?>
+				</legend>
 				
-			<?php if ( $show_searchareas ) : ?>
+				<table id="fc_search_behavior_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
+					
+					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+						<td class='fc_search_label_cell' valign='top'>
+							<label class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_INCLUDE_AREAS'); ?>::<?php echo JText::_('FLEXI_SEARCH_INCLUDE_AREAS_TIP'); ?>'>
+								<?php echo JText::_( 'FLEXI_SEARCH_INCLUDE_AREAS' );?> :
+							</label>
+						</td>
+						<td colspan="2" class="fc_search_option_cell">
+							<?php echo $this->lists['areas']; ?>
+						</td>
+					</tr>	
+					
+				<?php if( $show_searchordering ) : ?>
+					
+					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
+						<td class='fc_search_label_cell' valign='top'>
+							<label for="ordering" class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_ORDERING'); ?>::<?php echo JText::_('FLEXI_SEARCH_ORDERING_TIP'); ?>'>
+								<?php echo JText::_( 'FLEXI_SEARCH_ORDERING' );?>:
+							</label>
+						</td>
+						<td colspan="2" class="fc_search_option_cell">
+							<?php echo $this->lists['ordering'];?>
+						</td>
+					</tr>
+					
+				<?php endif; ?>
 				
-				<tr class="fc_search_row_<?php echo (($r++)%2);?>">
-					<td class='fc_search_label_cell' valign='top'>
-						<label class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_INCLUDE_AREAS'); ?>::<?php echo JText::_('FLEXI_SEARCH_INCLUDE_AREAS_TIP'); ?>'>
-							<?php echo JText::_( 'FLEXI_SEARCH_INCLUDE_AREAS' );?> :
-						</label>
-					</td>
-					<td colspan="2" class="fc_search_option_cell">
-						<?php echo $this->lists['areas']; ?>
-					</td>
-				</tr>	
+				</table>
 				
-			<?php endif; ?>
-				
-			<?php if( $show_searchordering ) : ?>
+			</fieldset>
 			
-				<tr class="fc_search_row_<?php echo (($r++)%2);?>">
-					<td class='fc_search_label_cell' valign='top'>
-						<label for="ordering" class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_ORDERING'); ?>::<?php echo JText::_('FLEXI_SEARCH_ORDERING_TIP'); ?>'>
-							<?php echo JText::_( 'FLEXI_SEARCH_ORDERING' );?>:
-						</label>
-					</td>
-					<td colspan="2" class="fc_search_option_cell">
-						<?php echo $this->lists['ordering'];?>
-					</td>
-				</tr>
-				
-			<?php endif; ?>
-				
-			</table>
-			
-		</fieldset>
+		<?php endif; ?>
 		
 	</fieldset>
 
 <?php endif; /* END OF IF autodisplayadvoptions */ ?>
 
 
-
-
-	<table class="searchintro<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
-	<tr>
-		<td colspan="3" >
-			<br />
-			<?php echo JText::_( 'FLEXI_SEARCH_KEYWORD' ) .' <b>'. $this->escape($this->searchword) .'</b>'; ?>
-		</td>
-	</tr>
+<table class="searchintro<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
 	<tr>
 		<td>
-			<br />
 			<?php echo $this->result; ?>
+			<br />
 		</td>
 	</tr>
 </table>
+
 
 <?php if( !$show_searchphrase ) : ?>
 	<input type="hidden" name="searchphrase" value="<?php echo $default_searchphrase;?>" />
