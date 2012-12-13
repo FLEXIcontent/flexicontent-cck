@@ -281,7 +281,7 @@ class com_flexicontentInstallerScript
 			</tbody>
 		</table>
 
-		<?
+		<?php
 		// Rollback on installation errors, abort() will be called on every additional extension installed above
 		if ($error) {
 			for ($i = 0; $i < count($extensions); $i++) { 
@@ -327,7 +327,7 @@ class com_flexicontentInstallerScript
 
 		echo '<p> -- ' . JText::_('Performing POST-installation Task/Checks') .'</p>';
 
-		$db = &JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		// Delete orphan entries ?
 		$query="DELETE FROM `#__extensions` WHERE folder='flexicontent_fields' AND element IN ('flexisystem', 'flexiadvroute', 'flexisearch', 'flexiadvsearch', 'flexinotify')";
