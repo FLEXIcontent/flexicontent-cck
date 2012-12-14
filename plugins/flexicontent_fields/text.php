@@ -389,7 +389,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
 			}
 			if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-			$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\'adminForm\').submit();"', 'value', 'text', $value);
+			$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
 		} else {
 			//print_r($value);
 			$size = (int)($filter->parameters->get( 'size', 30 ) / 2);

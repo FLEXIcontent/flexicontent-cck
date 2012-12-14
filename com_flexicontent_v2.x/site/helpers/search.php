@@ -125,14 +125,12 @@ class FLEXIadvsearchHelper
 	 */
 	function prepareSearchContent( $text, $length = 200, $searchword_arr )
 	{
-		foreach ($searchword_arr as $searchword) {
-			// strips tags won't remove the actual jscript
-			$text = preg_replace( "'<script[^>]*>.*?</script>'si", "", $text );
-			$text = preg_replace( '/{.+?}/', '', $text);
-			//$text = preg_replace( '/<a\s+.*?href="([^"]+)"[^>]*>([^<]+)<\/a>/is','\2', $text );
-			// replace line breaking tags with whitespace
-			$text = preg_replace( "'<(br[^/>]*?/|hr[^/>]*?/|/(div|h[1-6]|li|p|td))>'si", ' ', $text );
-		}
+		// strips tags won't remove the actual jscript
+		$text = preg_replace( "'<script[^>]*>.*?</script>'si", "", $text );
+		$text = preg_replace( '/{.+?}/', '', $text);
+		//$text = preg_replace( '/<a\s+.*?href="([^"]+)"[^>]*>([^<]+)<\/a>/is','\2', $text );
+		// replace line breaking tags with whitespace
+		$text = preg_replace( "'<(br[^/>]*?/|hr[^/>]*?/|/(div|h[1-6]|li|p|td))>'si", ' ', $text );
 		
 		if (($wordpos = @JString::strpos($text, ' ', $length)) !== false) {
 			$start_part = JString::substr($text, 0, $wordpos) . '&nbsp;...';
