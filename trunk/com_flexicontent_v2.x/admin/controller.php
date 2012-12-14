@@ -152,7 +152,7 @@ class FlexicontentController extends JControllerLegacy
 		$params 	= & JComponentHelper::getParams('com_flexicontent');
 		$use_versioning = $params->get('use_versioning', 1);
 
-		$existmenuitems	 	= & $model->getExistMenuItems();
+		$existmenuitems	= & $model->getExistMenuItems();
 		$existtype 			= & $model->getExistType();
 		$existfields 		= & $model->getExistFields();
 

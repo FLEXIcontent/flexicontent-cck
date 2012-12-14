@@ -361,6 +361,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 						$text_search_header = "<u><b>".JText::_('Text Search (exact phrase)').": </b></u><br/>";
 					}
 					$results[$i]->text = $text_search_header . $results[$i]->text;
+				} else {
+					$parts = FLEXIadvsearchHelper::prepareSearchContent( $row, 200, array() );
+					$row = implode($parts, " <br/> ");
 				}
 				
 				if ( !empty($results[$i]->fields_text) ) {
@@ -377,9 +380,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				} else {
 					$created = '';
 				}
-
-			    $result->created	= $created;
-			    $result->count		= $i + 1;
+				
+				$result->created	= $created;
+				$result->count		= $i + 1;
 			}
 		}
 		$this->result	= JText::sprintf( 'FLEXI_TOTALRESULTSFOUND', $total );

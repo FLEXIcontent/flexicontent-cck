@@ -1040,7 +1040,7 @@ class FlexicontentFields
 			$v = ($v === 'b:0;' || $data !== false) ? $data : $v;
 			
 			// Check value that current should be inclued in search index
-			if ( !$v ) continue;
+			if ( !is_array($v) && !strlen($v) ) continue;
 			foreach ($required_props as $cp) if (!@$v[$cp]) return;
 			
 			// Create search value
@@ -1208,7 +1208,7 @@ class FlexicontentFields
 		// Get the labels of used values in an display[] array
 		$values = array();
 		foreach($value_indexes as $val_index) {
-			if ( !$val_index ) continue;
+			if ( !strlen($val_index) ) continue;
 			if ( !isset($elements[$val_index]) ) continue;
 			$values[$val_index] = get_object_vars($elements[$val_index] );
 			//print_r($values[$val_index]); echo "<br/>\n";

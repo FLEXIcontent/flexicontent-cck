@@ -2359,6 +2359,8 @@ class ParentClassItem extends JModelAdmin
 					$tabs_text .= $tab_text;
 				}
 				$jfdata['text'] = & $tabs_text;
+			} else if ( empty($jfdata['text']) ) {
+				$jfdata['text'] = '';
 			}
 			
 			// Search for the {readmore} tag and split the text up accordingly.
@@ -2380,7 +2382,7 @@ class ParentClassItem extends JModelAdmin
 			// Apply new translation data
 			$translated_fields = array('title','alias','introtext','fulltext','metadesc','metakey');
 			foreach ($translated_fields as $fieldname) {
-				if ( !JString::strlen(trim(str_replace("&nbsp;", "", strip_tags($jfdata[$fieldname])))) ) continue;   // skip empty content
+				if ( !JString::strlen(trim(str_replace("&nbsp;", "", strip_tags(@$jfdata[$fieldname])))) ) continue;   // skip empty content
 				//echo "<br/><b>#__jf_content($fieldname) :</b><br/>";
 				$query = "INSERT INTO #__jf_content (language_id, reference_id, reference_table, reference_field, value, original_value, original_text, modified, modified_by, published) ".
 					"VALUES ( {$langs->$shortcode->id}, {$item->id}, 'content', '$fieldname', ".$db->Quote($jfdata[$fieldname]).", '".md5($item->{$fieldname})."', '', '$modified', '$modified_by', 1)";
