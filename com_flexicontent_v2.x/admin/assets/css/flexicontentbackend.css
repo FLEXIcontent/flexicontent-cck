@@ -626,7 +626,10 @@ div#tags #input_new_tag {
     padding: 0px !important;
 }
 
-.clear { border: 0; clear: both; float: none; font-size: 1px; height: 0; line-height: 1px; margin: 0; padding: 0; visibility: hidden;}
+.flexicontent .clear,
+#flexicontent .clear,
+.clear
+{ border: 0; clear: both; float: none; font-size: 1px; height: 0; line-height: 1px; margin: 0; padding: 0; visibility: hidden;}
 
 .mcat, .scat { width: 235px; }
 .mcat { min-height: 400px; }

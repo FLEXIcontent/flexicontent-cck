@@ -21,6 +21,10 @@
 				<option value="5">FLEXI_LEVEL_5</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_CONFIGURATION_CATEGORY" description="FLEXI_CONFIGURATION_CATEGORY_DESC" level="level2" />
+			<field name="persistent_filters" default="" type="textarea" rows="5" cols="40" label="Persistent Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##alue %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword" />
+			<field name="initial_filters" default="" type="textarea" rows="5" cols="40" label="Initial Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##alue %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword" />
+			
 		</fieldset>
 		
 		
