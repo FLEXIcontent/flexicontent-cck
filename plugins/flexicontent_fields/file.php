@@ -219,6 +219,17 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$display_filename	= $field->parameters->get( 'display_filename', 0 ) ;
 		$display_descr		= $field->parameters->get( 'display_descr', 0 ) ;
 		
+		$noaccess_display	     = $field->parameters->get( 'noaccess_display', 1 ) ;
+		$noaccess_url_unlogged = $field->parameters->get( 'noaccess_url_unlogged', false ) ;
+		$noaccess_url_logged   = $field->parameters->get( 'noaccess_url_logged', false ) ;
+		$noaccess_msg_unlogged = JText::_($field->parameters->get( 'noaccess_msg_unlogged', '' ));
+		$noaccess_msg_logged   = JText::_($field->parameters->get( 'noaccess_msg_logged', '' ));
+		$noaccess_addvars      = $field->parameters->get( 'noaccess_addvars', 0);
+		
+		// Select appropriate messages depending if user is logged on
+		$noaccess_url = JFactory::getUser()->guest ? $noaccess_url_unlogged : $noaccess_url_logged;
+		$noaccess_msg = JFactory::getUser()->guest ? $noaccess_msg_unlogged : $noaccess_msg_logged;
+		
 		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
@@ -267,15 +278,19 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			//print_r($filedata); exit;
 			if ( $filedata )
 			{
+				$authorized = true;
 				// Check user access on the file
 				if ( !empty($filedata->access) ) {
 					if (FLEXI_J16GE) {
-						if ( !in_array($filedata->access,$aid_arr) ) continue;
+						$authorized = in_array($filedata->access,$aid_arr);
 					} else {
-						if ( $aid < $filedata->access ) continue;
+						$authorized = $aid >= $filedata->access;
 					}
 				}
-				 
+				
+				// If no access and set not to show then continue
+				if ( !$authorized && !$noaccess_display ) continue;
+				
 				// --. Create icon according to filetype
 				if ($useicon) {
 					$filedata	= $this->addIcon( $filedata );
@@ -289,7 +304,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				// --. Description as tooltip or inline text ... prepare related variables
 				$alt_str = $class_str = $text_html  = '';
 				if (!empty($filedata->description)) {
-					if ($display_descr==1) {   // As tooltip
+					if ( !$authorized) {
+						if ($noaccess_display != 2 ) {
+							$alt_str    = $name_str . '::' . $filedata->description;
+							$class_str  = ' hasTip';
+							$text_html  = '';
+						}
+					} else if ($display_descr==1) {   // As tooltip
 						$alt_str    = $name_str . '::' . $filedata->description;
 						$class_str  = ' hasTip';
 						$text_html  = '';
@@ -300,19 +321,41 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					}
 				}
 				
-				// --. Create the download link
-				$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
+				// --. Create the download link or use no authorized link ...
+				if ( !$authorized ) {
+					$dl_link = $noaccess_url;
+					$str = $noaccess_msg . ($noaccess_msg ? ': ' : '') . $icon;
+					$class_str .= ' fc_file_noauth';   // Add an extra css class
+				} else {
+					$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
+					$str = '';
+				}
 				
 				// --. Finally create displayed html ... a download button (*) OR a download link
 				// (*) with file manager 's description of file as tooltip or as inline text
-				if ($usebutton) {
+				if (!$dl_link) {
+					// no link ... (case of current user not authorized to download file)
+					$str = $icon . '<span class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</span>' ." ". $text_html;
+				} else if ($usebutton) {
 					$class_str .= ' button';   // Add an extra css class
 					$str  = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'">';
 					$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'. $name_html ." ". $text_html;
+					// Add variables for target URL to use (case of current user not authorized to download file)
+					if ( !$authorized && $noaccess_addvars) {
+						$str .= '<input type="hidden" name="fc_file_id" value="'.$value.'"/>'."\n";
+						$str .= '<input type="hidden" name="fc_field_id" value="'.$field->id.'"/>'."\n";
+						$str .= '<input type="hidden" name="fc_item_id" value="'.$field->item_id.'"/>'."\n";
+					}
 					$str .= '</form>';
 				} else {
-					$name_str = $filedata->altname;   // no download button, force display of filename
-					$str = $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_str . '</a>' ." ". $text_html;
+					$name_html = $filedata->altname;   // no download button, force display of filename
+					// Add variables for target URL to use (case of current user not authorized to download file)
+					if ( !$authorized && $noaccess_addvars) {
+						$dl_link .= '&fc_file_id="'.$value;
+						$dl_link .= '&fc_field_id="'.$field->id;
+						$dl_link .= '&fc_item_id="'.$field->item_id;
+					}
+					$str = $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</a>' ." ". $text_html;
 				}
 				
 				// Values Prefix and Suffox Texts

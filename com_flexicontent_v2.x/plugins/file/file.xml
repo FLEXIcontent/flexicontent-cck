@@ -68,6 +68,26 @@
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_DISPLAY_INACCESSIBLE_FILES_PARAMS_LABEL" level="level2" menu="hide" />
+			<field name="noaccess_display" type="radio" default="1" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_FILE_YES_NO_DESCRIPTION</option>
+			</field>
+			<field name="noaccess_addvars" type="radio" default="0" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_FILE_UNLOGGED_USERS" level="level3" menu="hide" />
+			<field name="noaccess_url_unlogged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_UNLOGGED_DESC" />
+			<field name="noaccess_msg_unlogged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_UNLOGGED_DESC" />
+		
+			<field name="" type="separator" default="FLEXI_FILE_LOGGED_USERS" level="level3" menu="hide" />
+			<field name="noaccess_url_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_LOGGED_DESC" />
+			<field name="noaccess_msg_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_LOGGED_DESC" />
+		
 			
 		</fieldset>
 	</fields>
