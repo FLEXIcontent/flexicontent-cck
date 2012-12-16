@@ -35,31 +35,31 @@ class FlexicontentViewFileselement extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function display( $tpl = null ) {
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
-		
+	function display( $tpl = null )
+	{
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 
 		//Load pane behavior
 		jimport('joomla.html.pane');
 
-		//initialise variables
-		$document	= & JFactory::getDocument();
-		$app		= & JFactory::getApplication();
-		$pane   	= & JPane::getInstance('Tabs');
-		$db  		= & JFactory::getDBO();
-		$user  		= & JFactory::getUser();
-		$params 	= & JComponentHelper::getParams('com_flexicontent');
-		$fieldid	= JRequest::getVar( 'field', null, 'request', 'int' );
-
-		$client		= $app->isAdmin() ? '../' : '';
-
 		JHTML::_('behavior.tooltip');
 		// Load the form validation behavior
 		JHTML::_('behavior.formvalidation');
-
+		
+		//initialise variables
+		$mainframe = &JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		$document	= & JFactory::getDocument();
+		$app			= & JFactory::getApplication();
+		$pane   	= & JPane::getInstance('Tabs');
+		$db  			= & JFactory::getDBO();
+		$user			= & JFactory::getUser();
+		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		
+		$fieldid	= JRequest::getVar( 'field', null, 'request', 'int' );
+		$client		= $app->isAdmin() ? '../' : '';
+		
 		//get vars
 		$filter_order     = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_order',     'filter_order',    'f.filename', 'cmd' );
 		$filter_order_Dir = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_order_Dir', 'filter_order_Dir', '',          'word' );
@@ -73,7 +73,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$itemid 	      	= $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.itemid',           'itemid',           0,           'string' );
 		$autoselect       = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.autoselect',       'autoselect',       0, 				  'int' );
 		$autoassign       = $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.autoassign',       'autoassign',       0, 				  'int' );
-
+		
 		$folder_mode			= $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.folder_mode',      'folder_mode',      0, 				  'int' );
 		$folder_param			= $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.folder_param',     'folder_param',		 'dir',				'string' );
 		$append_item			= $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.append_item',      'append_item',      1, 				  'int' );
@@ -82,10 +82,10 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$thumb_w					= $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.thumb_w',    			 'thumb_w',     		 120, 				'int' );
 		$thumb_h					= $mainframe->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.thumb_h',    			 'thumb_h',     		 90, 				  'int' );
 		
-    $search      = $db->getEscaped( trim(JString::strtolower( $search ) ) );
-		$newfileid   = JRequest::getInt('newfileid');
-		$newfilename = base64_decode(JRequest::getVar('newfilename', ''));
-		$delfilename = base64_decode(JRequest::getVar('delfilename', ''));
+		$search				= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$newfileid		= JRequest::getInt('newfileid');
+		$newfilename	= base64_decode(JRequest::getVar('newfilename', ''));
+		$delfilename	= base64_decode(JRequest::getVar('delfilename', ''));
 		
 		//add css and submenu to document
 		$document->addStyleSheet( ($mainframe->isSite() ? 'administrator/' : '' ) . 'components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -106,20 +106,21 @@ class FlexicontentViewFileselement extends JViewLegacy
 		';
 		$document->addStyleDeclaration($css);
 		
-		if (FLEXI_J16GE) {
+		if (FLEXI_J16GE || FLEXI_ACCESS) {
 			$permission = FlexicontentHelperPerm::getPerm();
-			$CanUpload = $permission->CanUpload;
-			$CanViewAllFiles = $permission->CanViewAllFiles;
-		} else if (FLEXI_ACCESS) {
-			$CanUpload	 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'uploadfiles', 'users', $user->gmid) : 1;
-			$CanViewAllFiles	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'viewallfiles', 'users', $user->gmid) : 1;
+			$CanFiles         = $permission->CanFiles;
+			$CanUpload        = $permission->CanUpload;
+			$CanViewAllFiles  = $permission->CanViewAllFiles;
 		} else {
-			$CanUpload			= 1;
+			$CanFiles         = 1;
+			$CanUpload				= 1;
 			$CanViewAllFiles	= 1;
 		}
-
-		//Get data from the model
-		$model = $this->getModel();
+		
+		// ***********************
+		// Get data from the model
+		// ***********************
+		$model		= & $this->getModel();
 		if ($folder_mode) {
 			$rows = & $model->getFilesFromPath($itemid, $fieldid, $append_item, $append_field, $folder_param);
 			$img_folder = & $model->getFieldFolderPath($itemid, $fieldid, $append_item, $append_field, $folder_param);
@@ -134,10 +135,17 @@ class FlexicontentViewFileselement extends JViewLegacy
 		//echo $upload_path_var . "<br>";
 		//echo $mainframe->getUserState( $upload_path_var, 'noset' );
 		
+		$pageNav	= & $this->get('Pagination');
+		//$users = & $this->get('Users');
 		
-		$pageNav 	= & $this->get( 'Pagination' );
-		$items = & $this->get('Items');
-		$users = &$this->get('Users');
+		// Get item using at least one file (-of- the currently listed files)
+		$items_single	= & $model->getItemsSingleprop( array('file','minigallery') );
+		$items_multi	= & $model->getItemsMultiprop ( $field_props=array('image'=>'originalname'), $value_props=array('image'=>'filename') );
+		$items = array();
+		foreach ($items_single as $item_id => $_item) $items[$item_id] = $_item;
+		foreach ($items_multi  as $item_id => $_item) $items[$item_id] = $_item;
+		ksort($items);
+		
 		
 		$fname = $model->getFieldName($fieldid);
 		$formfieldname = FLEXI_J16GE ? 'custom['.$fname.'][]' : $fname.'[]';
@@ -235,15 +243,16 @@ class FlexicontentViewFileselement extends JViewLegacy
 		}
 		
 		$files_selected = $model->getItemFiles($itemid);
-
+		
+		// search
+		$lists 				= array();
+		$lists['search'] 	= $search;
+		
 		//search filter
 		$filters = array();
 		$filters[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_FILENAME' ) );
 		$filters[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_DISPLAY_NAME' ) );
 		$lists['filter'] = JHTML::_('select.genericlist', $filters, 'filter', 'size="1" class="inputbox"', 'value', 'text', $filter );
-
-		// search
-		$lists['search']= $search;
 
 		//build url/file filterlist
 		$url 	= array();
@@ -257,15 +266,15 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$items_list = array();
 		$items_list[] = JHTML::_('select.option', '', '- '. JText::_( 'FLEXI_FILTER_BY_ITEM' ) .' -' );
 		foreach($items as $item) {
-			$items_list[] = JHTML::_('select.option', $item->id, $item->title . ' (#' . $item->id . ')' );
+			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) . ' (#' . $item->id . ')' );
 		}
-		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" style="width:200px;" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
+		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
 		
 		//build secure/media filterlist
 		$secure 	= array();
 		$secure[] 	= JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_DIRECTORIES' ) .' -' );
-		$secure[] 	= JHTML::_('select.option',  'S', JText::_( 'FLEXI_SECURE' ) );
-		$secure[] 	= JHTML::_('select.option',  'M', JText::_( 'FLEXI_MEDIA' ) );
+		$secure[] 	= JHTML::_('select.option',  'S', JText::_( 'FLEXI_SECURE_DIR' ) );
+		$secure[] 	= JHTML::_('select.option',  'M', JText::_( 'FLEXI_MEDIA_DIR' ) );
 
 		$lists['secure'] = JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_secure );
 
@@ -276,8 +285,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$lists['uploader'] = flexicontent_html::builduploaderlist('filter_uploader', 'class="inputbox" size="1" onchange="submitform( );"', $filter_uploader);
 
 		// table ordering
-		$lists['order_Dir'] = $filter_order_Dir;
-		$lists['order'] = $filter_order;
+		$lists['order_Dir']	= $filter_order_Dir;
+		$lists['order']			= $filter_order;
 
 		// removed files
 		$filelist = JRequest::getString('files');
@@ -300,26 +309,28 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$files .= $file;
 
 		//assign data to template
-		$this->assignRef('session'			, JFactory::getSession());
-		$this->assignRef('params'				, $params);
-		$this->assignRef('client'				, $client);
-		$this->assignRef('pane'					, $pane);
-		$this->assignRef('lists'    	 	, $lists);
-		$this->assignRef('rows'     	 	, $rows);
-		$this->assignRef('folder_mode'	, $folder_mode);
-		$this->assignRef('img_folder'		, $img_folder);
-		$this->assignRef('thumb_w'			, $thumb_w);
-		$this->assignRef('thumb_h'			, $thumb_h);
 		
-		$this->assignRef('pageNav' 			, $pageNav);
-		$this->assignRef('files' 				, $files);
-		$this->assignRef('fieldid' 			, $fieldid);
-		$this->assignRef('itemid' 			, $itemid);
-		$this->assignRef('targetid' 		, $targetid);
-		$this->assignRef('CanUpload' 		, $CanUpload);
-		$this->assignRef('CanViewAllFiles'	, $CanViewAllFiles);
-		$this->assignRef('files_selected'		, $files_selected);
-
+		$this->assignRef('session'    , JFactory::getSession());
+		$this->assignRef('params'     , $params);
+		$this->assignRef('client'     , $client);
+		$this->assignRef('pane'       , $pane);
+		$this->assignRef('lists'      , $lists);
+		$this->assignRef('rows'       , $rows);
+		$this->assignRef('folder_mode', $folder_mode);
+		$this->assignRef('img_folder' , $img_folder);
+		$this->assignRef('thumb_w'    , $thumb_w);
+		$this->assignRef('thumb_h'    , $thumb_h);
+		
+		$this->assignRef('pageNav'    , $pageNav);
+		$this->assignRef('files' 			, $files);
+		$this->assignRef('fieldid' 		, $fieldid);
+		$this->assignRef('itemid' 		, $itemid);
+		$this->assignRef('targetid' 	, $targetid);
+		$this->assignRef('CanFiles'        , $CanFiles);
+		$this->assignRef('CanUpload'       , $CanUpload);
+		$this->assignRef('CanViewAllFiles' , $CanViewAllFiles);
+		$this->assignRef('files_selected'  , $files_selected);
+		
 		parent::display($tpl);
 	}
 }

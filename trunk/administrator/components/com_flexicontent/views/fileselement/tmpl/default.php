@@ -156,11 +156,16 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 				<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 			</td>
 			<td nowrap="nowrap">
-				<?php echo $this->lists['item_id']; ?>
 				<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
+			 	<?php
+			 	if ($this->CanViewAllFiles) {
+			 		echo " &nbsp;-&nbsp; ". $this->lists['uploader'];
+			 		echo " <span style='font-size:16px; font-family:tahoma;'>&#8594;</span> ";
+			 	}
+			 	?>
+				<?php echo $this->lists['item_id']; ?>
 			</td>
 		</tr>
 	</table>
@@ -170,17 +175,19 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
 <?php if ($this->folder_mode) { ?>
 			<th width="5">&nbsp;</th>
 <?php } ?>
 			<th width="5"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_NAME', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_NAME', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
-			<th width="10%"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
+			<th width=""><?php echo JText::_( 'FLEXI_ACCESS' ); ?></th>
+			<th width=""><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
 			<th width="15"><?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'f.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 <?php if (!$this->folder_mode) { ?>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 <?php } ?>
@@ -189,7 +196,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo $this->folder_mode ? 10 : 10; ?>">
+			<td colspan="<?php echo $this->folder_mode ? 12 : 12; ?>">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
@@ -206,6 +213,8 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 			unset($thumb_or_icon);
 			$filename    = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 			if ( !in_array($row->ext, $imageexts)) $thumb_or_icon = JHTML::image($row->icon, $row->filename);
+			
+			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			
 			$path		= $row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
 			$file_path = $row->filename;
@@ -232,6 +241,9 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td width="7">
+				<?php echo $checked; ?>
+			</td>
 <?php if ($this->folder_mode) { ?>
 			<td>
 				<a href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE'); ?>')) { document.adminForm.filename.value='<?php echo $row->filename;?>'; document.adminForm.controller.value='filemanager'; <?php echo FLEXI_J16GE ? "Joomla." : ""; ?>submitbutton('<?php echo $del_task; ?>'); }" href="#">
@@ -267,6 +279,29 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 				<?php echo JHTML::image('components/com_flexicontent/assets/images/'. ($row->published ? 'tick.png' : 'publish_x.png'), JText::_('FLEXI_REMOVE') ); ?>
 			</td>
 <?php } ?>
+			
+			<td align="center">
+			<?php
+			$is_authorised = $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by);
+			if (FLEXI_J16GE) {
+				if ($is_authorised) {
+					$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'filemanager.access\')"');
+				} else {
+					$access = strlen($row->access_level) ? $this->escape($row->access_level) : '-';
+				}
+			} else if (FLEXI_ACCESS) {
+				if ($is_authorised) {
+					$access 	= FAccess::accessswitch('file', $row, $i);
+				} else {
+					$access 	= FAccess::accessswitch('file', $row, $i, 'content', 1);
+				}
+			} else {
+				$access = JHTML::_('grid.access', $row, $i );
+			}
+			echo $access;
+			?>
+			</td>
+			
 			<td align="center"><?php echo $row->size; ?></td>
 			<td align="center"><?php echo $row->hits; ?></td>
 			<td align="center"><?php echo $row->uploader; ?></td>
@@ -284,7 +319,8 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 
 	</table>
 	<?php echo JHTML::_( 'form.token' ); ?>
-	<input type="hidden" name="controller" value="" />
+	<input type="hidden" name="boxchecked" value="0" />
+	<input type="hidden" name="controller" value="filemanager" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="file" value="" />
 	<input type="hidden" name="files" value="<?php echo $this->files; ?>" />
