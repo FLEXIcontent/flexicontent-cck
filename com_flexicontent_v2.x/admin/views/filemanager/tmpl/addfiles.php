@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: addfiles.php 950 2011-11-03 14:45:09Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: addfiles.php 1577 2012-12-02 15:10:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

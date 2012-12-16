@@ -21,7 +21,11 @@ $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;
 $ctrl_task_authors = FLEXI_J16GE ? 'task=users.'  :  'controller=users&amp;task=';
 $permissions = FlexicontentHelperPerm::getPerm();
 ?>
-
+<style>
+table#filemanager-zone label {
+	clear:none;
+}
+</style>
 <table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;" id="filemanager-zone">
 	<tr>
 		<td>
@@ -273,11 +277,16 @@ $permissions = FlexicontentHelperPerm::getPerm();
 				<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 			</td>
 			<td nowrap="nowrap">
-				<?php echo $this->lists['item_id']; ?>
 				<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
+			 	<?php
+			 	if ($this->CanViewAllFiles) {
+			 		echo " &nbsp;-&nbsp; ". $this->lists['uploader'];
+			 		echo " <span style='font-size:16px; font-family:tahoma;'>&#8594;</span> ";
+			 	}
+			 	?>
+				<?php echo $this->lists['item_id']; ?>
 			</td>
 		</tr>
 	</table>
@@ -289,27 +298,49 @@ $permissions = FlexicontentHelperPerm::getPerm();
 			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
 			<th width="5"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_NAME', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_NAME', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
-			<th width="7%"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
+			<th width=""><?php echo JText::_( 'FLEXI_ACCESS' ); ?></th>
+			<th width=""><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
 			<th width="15"><?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'f.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="10%"><?php echo JText::_( 'FLEXI_ASSIGNED' ); ?></th>
-			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JText::_( 'FLEXI_FILE_ITEM_ASSIGNMENTS' ); ?> </th>
+			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
+
 	</thead>
 
 	<tfoot>
 		<tr>
-			<td colspan="11">
+			<td colspan="13">
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
+		
+		<?php
+		$field_legend = array();
+		$this->assigned_fields_labels;
+		foreach($this->assigned_fields_labels as $field_type => $field_label) {
+			$icon_name = $this->assigned_fields_icons[$field_type];
+			$tip = $field_label;
+			$image = JHTML::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip);
+			$field_legend[$field_type] = $image. " ".$field_label;
+		}
+		?>
+		
+		<tr>
+			<td colspan="13" align="center" style="border-top:0px solid black;">
+				<span class="fc_legend_box hasTip" title="<?php echo JText::_('FLEXI_FILE_ITEM_ASSIGNMENTS_LEGEND').'::'.JText::_('FLEXI_FILE_ITEM_ASSIGNMENTS_LEGEND_TIP'); ?> " ><?php echo JText::_('FLEXI_FILE_ITEM_ASSIGNMENTS_LEGEND'); ?></span> : &nbsp; 
+				<?php echo implode(' &nbsp; &nbsp; | &nbsp; &nbsp; ', $field_legend); ?>
+			</td>
+		</tr>
+				
 	</tfoot>
 
 	<tbody>
 		<?php
+		
 		$imageexts = array('jpg','gif','png','bmp');
 		$index = JRequest::getInt('index', 0);
 		$k = 0;
@@ -337,20 +368,21 @@ $permissions = FlexicontentHelperPerm::getPerm();
 				$thumb_or_icon = "<img src=\"$thumb_or_icon\" alt=\"$filename\" />";
 			}
 			
-			if ($row->nrassigned + $row->iassigned)
+			$row->count_assigned = 0;
+			foreach($this->assigned_fields_labels as $field_type => $ignore) {
+				$row->count_assigned += $row->{'assigned_'.$field_type};
+			}
+			if ($row->count_assigned)
 			{
 				$row->assigned = array();
-				if ($row->iassigned)
-				{
-					$tip = $row->iassigned . ' ' . JText::_( 'FLEXI_IMAGES' );
-					$image = JHTML::image('administrator/components/com_flexicontent/assets/images/picture_link.png', $tip);
-					$row->assigned[] = $row->iassigned . ' ' . $image;
-				}
-				if ($row->nrassigned)
-				{
-					$tip = $row->nrassigned . ' ' . JText::_( 'FLEXI_FILES' );
-					$image = JHTML::image('administrator/components/com_flexicontent/assets/images/page_link.png', $tip);
-					$row->assigned[] = $row->nrassigned . ' ' . $image;
+				foreach($this->assigned_fields_labels as $field_type => $field_label) {
+					if ( $row->{'assigned_'.$field_type} )
+					{
+						$icon_name = $this->assigned_fields_icons[$field_type];
+						$tip = $row->{'assigned_'.$field_type} . ' ' . $field_label;
+						$image = JHTML::image('administrator/components/com_flexicontent/assets/images/'.$icon_name.'.png', $tip, 'title="'.$field_type.' '.JText::_('FLEXI_FIELDS').'"' );
+						$row->assigned[] = $row->{'assigned_'.$field_type} . ' ' . $image;
+					}
 				}
 				$row->assigned = implode('&nbsp;&nbsp;| ', $row->assigned);
 			} else {
@@ -360,7 +392,7 @@ $permissions = FlexicontentHelperPerm::getPerm();
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
 			<td width="7">
-   				<?php echo $checked; ?>
+				<?php echo $checked; ?>
 			</td>
 			<td align="center">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' ); ?>::<?php echo $row->filename; ?>">
@@ -384,6 +416,29 @@ $permissions = FlexicontentHelperPerm::getPerm();
 			<td align="center">
 				<?php echo FLEXI_J16GE  ?  JHTML::_('jgrid.published', $row->published, $i, 'filemanager.' )  :  JHTML::_('grid.published', $row, $i ); ?>
 			</td>
+			
+			<td align="center">
+			<?php
+			$is_authorised = $this->CanFiles && ($this->CanViewAllFiles || $user->id == $row->uploaded_by);
+			if (FLEXI_J16GE) {
+				if ($is_authorised) {
+					$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'filemanager.access\')"');
+				} else {
+					$access = strlen($row->access_level) ? $this->escape($row->access_level) : '-';
+				}
+			} else if (FLEXI_ACCESS) {
+				if ($is_authorised) {
+					$access 	= FAccess::accessswitch('file', $row, $i);
+				} else {
+					$access 	= FAccess::accessswitch('file', $row, $i, 'content', 1);
+				}
+			} else {
+				$access = JHTML::_('grid.access', $row, $i );
+			}
+			echo $access;
+			?>
+			</td>
+			
 			<td align="center"><?php echo $row->size; ?></td>
 			<td align="center"><?php echo $row->hits; ?></td>
 			<td align="center"><?php echo $row->assigned; ?></td>

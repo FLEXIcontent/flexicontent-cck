@@ -874,6 +874,11 @@ div#cpanel div.icon  a {
 	background: url(../images/move2_downonly.png) 0% 0% no-repeat transparent !important;
 }
 
+.fc_legend_box {
+	font-weight: bottom;
+	border-bottom: 1px dashed gray;
+}
+
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/
 
 /*******************************/

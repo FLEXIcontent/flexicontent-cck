@@ -37,6 +37,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	function __construct()
 	{
 		parent::__construct();
+		if (!FLEXI_J16GE) {
+			$this->registerTask( 'accesspublic', 	'access' );
+			$this->registerTask( 'accessregistered','access' );
+			$this->registerTask( 'accessspecial', 	'access' );
+		}
 	}
 	
 	/**
@@ -713,5 +718,76 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', $msg );
 	}
-
+	
+	
+	/**
+	 * Logic to set the access level of the Fields
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function access( )
+	{
+		// Check for request forgeries
+		JRequest::checkToken() or jexit( 'Invalid Token' );
+		
+		$user	=& JFactory::getUser();
+		$model = $this->getModel('filemanager');
+		$task  = JRequest::getVar( 'task' );
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$file_id = (int)$cid[0];
+		$row =& JTable::getInstance('flexicontent_files', '');
+		$row->load($file_id);
+		
+		// calculate access
+		if (FLEXI_J16GE || FLEXI_ACCESS) {
+			$perms = FlexicontentHelperPerm::getPerm();
+			$is_authorised = $perms->CanFiles && ($perms->CanViewAllFiles || $user->id == $row->uploaded_by);
+		} else {
+			// Only manager/admin/super admin or uploader can change view level of file
+			$is_authorised = $user->gid >= 23 || $user->id == $row->uploaded_by;
+		}
+		
+		// check access
+		if ( !$is_authorised ) {
+			JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
+			return;
+		}
+		
+		if (FLEXI_J16GE) {
+			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
+			$access = $accesses[$file_id];
+		} else {
+			if ($task == 'accesspublic') {
+				$access = 0;
+			} elseif ($task == 'accessregistered') {
+				$access = 1;
+			} else {
+				if (FLEXI_ACCESS) {
+					$access = 3;
+				} else {
+					$access = 2;
+				}
+			}
+		}
+		
+		if(!$model->saveaccess( $file_id, $access )) {
+			$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
+			JError::raiseWarning( 500, $model->getError() );
+		} else {
+			$msg = '';
+			$cache = &JFactory::getCache('com_flexicontent');
+			$cache->clean();
+		}
+		
+		$view = JRequest::getVar('view', 'filemanager');
+		if ($view!='filemanager') {
+			$url = $_SERVER['HTTP_REFERER'];
+		} else {
+			$url = 'index.php?option=com_flexicontent&view=filemanager';
+		}
+		$this->setRedirect($url, $msg);
+	}
 }
