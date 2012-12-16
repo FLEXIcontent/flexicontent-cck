@@ -310,7 +310,6 @@ class FlexicontentModelTypes extends JModelList
 	function saveaccess($id, $access)
 	{
 		$mainframe = &JFactory::getApplication();
-
 		$row =& JTable::getInstance('flexicontent_types', '');
 
 		$row->load( $id );
@@ -325,9 +324,7 @@ class FlexicontentModelTypes extends JModelList
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-		$mainframe->redirect( 'index.php?option=com_flexicontent&view=types' );
-
+		return true;
 	}
 }
 ?>

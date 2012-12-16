@@ -441,9 +441,7 @@ class FlexicontentModelFields extends JModelList
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-		$mainframe->redirect( 'index.php?option=com_flexicontent&view=fields' );
-
+		return true;
 	}
 
 	/**

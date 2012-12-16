@@ -1921,8 +1921,7 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->setError($this->_db->getErrorMsg());
 			return false;
 		}
-		
-		$mainframe->redirect( 'index.php?option=com_flexicontent&view=items' );
+		return true;
 	}
 
 	/**
