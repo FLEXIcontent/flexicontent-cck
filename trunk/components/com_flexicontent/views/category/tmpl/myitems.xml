@@ -25,10 +25,8 @@
 			</param>
 			
 			<param name="" type="separator" default="FLEXI_CONFIGURATION_CATEGORY" description="FLEXI_CONFIGURATION_CATEGORY_DESC" level="level2" />
-			<param name="override_defaultconf" default="0" type="radio" label="FLEXI_ENABLE_OVERRIDE_CATEGORY" description="FLEXI_ENABLE_OVERRIDE_CATEGORY_DESC" >
-				<option value="0">FLEXI_OVERRIDE_CONF_NO</option>
-				<option value="1">FLEXI_OVERRIDE_CONF_YES</option>
-			</param>
+			<param name="persistent_filters" default="" type="textarea" rows="5" cols="40" label="Persistent Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##alue %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword" />
+			<param name="initial_filters" default="" type="textarea" rows="5" cols="40" label="Initial Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##alue %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword" />
 			
 		<param name="" type="jparamstab" description="FLEXI_PARAMETERS_CAT_INFO_OPTIONS" />
 			

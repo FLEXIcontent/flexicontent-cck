@@ -1053,8 +1053,13 @@ class FlexicontentModelItems extends JModelLegacy
 				}
 
 				if ($method == 3)
-				{				
+				{
 					$this->moveitem($copyid, $maincat, $seccats);
+				}
+				else if ($method == 99 && ($maincat || $seccats))
+				{
+					$row->catid = $maincat ? $maincat : $row->catid;
+					$this->moveitem($copyid, $row->catid, $seccats);
 				}
 			}
 		}

@@ -29,6 +29,8 @@
 				<option value="0">FLEXI_OVERRIDE_CONF_NO</option>
 				<option value="1">FLEXI_OVERRIDE_CONF_YES</option>
 			</param>
+			<param name="persistent_filters" default="" type="textarea" rows="5" cols="40" label="Persistent Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##alue %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword" />
+			<param name="initial_filters" default="" type="textarea" rows="5" cols="40" label="Initial Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##alue %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword" />
 			
 		<param name="" type="jparamstab" description="FLEXI_PARAMETERS_CAT_INFO_OPTIONS_OVERRIDE" />
 			

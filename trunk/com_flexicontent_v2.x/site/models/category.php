@@ -1150,15 +1150,27 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$cid_ok       = @$menu->query['cid']      == JRequest::getInt('cid');
 				$layout_ok    = @$menu->query['layout']   == JRequest::getVar('layout','');
 				$authorid_ok  = @$menu->query['authorid'] == JRequest::getInt('authorid');
+				
 				// We will merge menu parameters last, thus overriding the default categories parameters if either
 				// (a) override is enabled in the menu or (b) category Layout is 'myitems' which has no default parameters
 				$overrideconf = $menuParams->get('override_defaultconf',0) || JRequest::getVar('layout','')=='myitems';
+				$menu_matches = $view_ok && $cid_ok & $layout_ok && $authorid_ok;
 				
-				$menu_matches = $view_ok && $cid_ok & $layout_ok && $authorid_ok && $overrideconf;
-				if ( $menu_matches ) {
+				if ( $menu_matches && $overrideconf ) {
+					// Add - all - menu parameters related or not related to category parameters override
 					$params->merge($menuParams);
+				} else if ($menu_matches) {
+					// Add menu parameters - not - related to category parameters override
+					$partial_param_arr = array('item_depth', 'persistent_filters', 'initial_filters');
+					foreach ($partial_param_arr as $partial_param) {
+						$params->set( $partial_param, $menuParams->get($partial_param));
+					}
 				}
 			}
+			
+			// Set filters via menu parameters
+			$this->_setFilters( $params, 'persistent_filters', $is_persistent=1);
+			$this->_setFilters( $params, 'initial_filters'   , $is_persistent=0);
 			
 			// Bugs of v2.0 RC2
 			if (FLEXI_J16GE) {
@@ -1175,7 +1187,44 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		return $currcat_data['params'] = $params;
 	}
-
+	
+	
+	/**
+	 * Method to set MENU Item filters as HTTP Request variables thus filtering the category view
+	 * 
+	 * @access public
+	 * @return object
+	 * @since 1.5
+	 */
+	function _setFilters( & $params, $mfilter_name='persistent_filters', $is_persistent=1 )
+	{
+		$mfilter_data = $params->get($mfilter_name, '');
+		if ($mfilter_data) {
+			// Parse filter values
+			$mfilter_arr = preg_split("/[\s]*%%[\s]*/", $mfilter_data);
+			if ( empty($mfilter_arr[count($mfilter_arr)-1]) ) {
+				unset($mfilter_arr[count($mfilter_arr)-1]);
+			}
+			
+			// Split elements into their properties: filter_id, filter_value
+			$filter_vals = array();
+			$results = array();
+			$n = 0;
+			foreach ($mfilter_arr as $mfilter) {
+				$_data  = preg_split("/[\s]*##[\s]*/", $mfilter);
+				$filter_id = (int) $_data[0];  $filter_value = @$_data[1];
+				if ( $filter_id ) {
+					$filter_vals[$filter_id] = $filter_value;
+					if ($is_persistent || JRequest::getVar('filter_'.$filter_id, false) === false ) {
+						//echo "filter_.$filter_id, $filter_value <br/>";
+						JRequest::setVar('filter_'.$filter_id, $filter_value);
+					}
+				}
+			}
+		}
+	}
+	
+	
 	/**
 	 * Method to get the filter
 	 * 
