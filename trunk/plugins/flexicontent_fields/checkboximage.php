@@ -41,13 +41,13 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		if($field->field_type != 'checkboximage') return;
 		
 		$field->label = JText::_($field->label);
-
+		
 		$app =& JFactory::getApplication();
 		$prefix = $app->isAdmin() ? '../':'';
-
+		
 		// Import the file system library
 		jimport('joomla.filesystem.file');
-
+		
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
@@ -61,7 +61,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		
 		$required 	= $field->parameters->get( 'required', 0 ) ;
 		//$required 	= $required ? ' required validate-checkbox' : '';
-
+		
 		$size		= $field->parameters->get( 'size', 6 ) ;
 		$size		= $size ? ' size="'.$size.'"' : '';
 		
@@ -130,27 +130,27 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		if ($class)  $attribs .= ' class="'.$class.'" ';
 		
 		// Create field's HTML display for item form
-		// (a) Display as checkbox images
-		if ( !$field->parameters->get( 'display_as_select', 0 ) ) {
-			$i = 0;
-			$options = "";
-			foreach ($elements as $element) {
-				$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
-				$img = '<img src="'.$imgpath . $element->image .'"  alt="'.JText::_($element->text).'" />';
-				$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($element->text).'"><input type="checkbox" id="'.$elementid.'_'.$i.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.' />'.$img.'</label>'.$separator;
-				$i++;
-			}
-			$field->html = $options;
-			
-		// (b) Display as drop-down select ...
-		} else {
+		// (a) Display as drop-down select ...
+		if ( $field->parameters->get( 'display_as_select', 0 ) ) {
 			$options = array();
 			if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 			foreach ($elements as $element) {
 				$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
 			}
 			$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'multiple="multiple" class="'.$required.'"'.$size, 'value', 'text', $field->value, $elementid);
+			return;
+		} // else ...
+		
+		// (b) Display as checkbox images
+		$i = 0;
+		$options = "";
+		foreach ($elements as $element) {
+			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
+			$img = '<img src="'.$imgpath . $element->image .'"  alt="'.JText::_($element->text).'" />';
+			$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($element->text).'"><input type="checkbox" id="'.$elementid.'_'.$i.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.' />'.$img.'</label>'.$separator;
+			$i++;
 		}
+		$field->html = $options;
 		
 		// Add message box about allowed # values
 		if ($exact_values) {
@@ -175,6 +175,9 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
+		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext			= $field->parameters->get( 'pretext', '' ) ;
+		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
 		$imagedir 		= preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
@@ -182,7 +185,9 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$separatorf		= $field->parameters->get( 'separatorf' ) ;
 		$opentag			= $field->parameters->get( 'opentag', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag', '' ) ;
-		$default_values = $field->parameters->get( 'default_values', '' ) ;
+		
+		if($pretext) 	{ $pretext 	= $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext	= $remove_space ? $posttext : ' ' . $posttext; }
 
 		switch($separatorf)
 		{
@@ -226,7 +231,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		for($n=0, $c=count($values); $n<$c; $n++) {
 			$element = @$elements[ $values[$n] ];
 			if ( $element ) {
-				$display[] = '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.JText::_($element->text).'" />';
+				$display[] = $pretext . '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.JText::_($element->text).'" />' . $posttext;
 				$display_index[] = $element->value;
 			}
 		}

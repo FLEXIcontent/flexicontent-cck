@@ -41,7 +41,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		if($field->field_type != 'checkbox') return;
 		
 		$field->label = JText::_($field->label);
-
+		
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
@@ -50,7 +50,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		
 		$required 	= $field->parameters->get( 'required', 0 ) ;
 		//$required 	= $required ? ' required validate-checkbox' : '';
-
+		
 		$max_values		= $field->parameters->get( 'max_values', 0 ) ;
 		$min_values		= $field->parameters->get( 'min_values', 0 ) ;
 		$exact_values	= $field->parameters->get( 'exact_values', 0 ) ;
@@ -116,6 +116,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		if ($class)  $attribs .= ' class="'.$class.'" ';
 		
 		// Create field's HTML display for item form
+		// Display as checkboxes
 		$i = 0;
 		$options = "";
 		foreach ($elements as $element) {
@@ -145,6 +146,9 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
+		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext			= $field->parameters->get( 'pretext', '' ) ;
+		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
 		$separatorf		= $field->parameters->get( 'separatorf' ) ;
@@ -178,6 +182,9 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			break;
 		}
 		
+		if($pretext) 	{ $pretext 	= $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext	= $remove_space ? $posttext : ' ' . $posttext; }
+		
 		if ( !$values ) { $field->{$prop}=''; return; }
 		
 		// Get indexed element values
@@ -193,7 +200,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		for($n=0, $c=count($values); $n<$c; $n++) {
 			$element = @$elements[ $values[$n] ];
 			if ( $element ) {
-				$display[] = JText::_($element->text);
+				$display[] = $pretext . JText::_($element->text) . $posttext;
 				$display_index[] = $element->value;
 			}
 		}

@@ -41,7 +41,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		if($field->field_type != 'select') return;
 		
 		$field->label = JText::_($field->label);
-
+		
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
@@ -54,7 +54,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$required 	= $required ? ' required' : '';
 
 		// initialise property
-		if(!$field->value && $default_value) {
+		if (!$field->value && $default_value) {
 			$field->value = array();
 			$field->value[0] = $default_value;
 		} else if (!$field->value) {
@@ -117,13 +117,13 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$display_index = '';
 		if ( count($values) ) {
 			$element = @$elements[ $values[0] ];
-			if ($element) {
+			if ( $element ) {
 				$display	= $pretext . JText::_($text_or_value ? $element->text : $element->value) . $posttext;
 				$display_index = $values[0];
 			}
 		}
 		$field->{$prop}	= $display;
-		$field->display_index	= $display_index;
+		$field->display_index = $display_index;
 	}
 	
 	

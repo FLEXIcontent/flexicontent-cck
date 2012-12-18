@@ -12,49 +12,72 @@
 	<files>
 		<filename plugin="checkbox">checkbox.php</filename>
 	</files>
-	<params group="standard">
-		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-	</params>
-	<params group="group-checkbox">
-		<param name="field_elements" type="textarea" default="1::Yes%% 0::No" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
-		<param name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
-		<param name="separator" type="list" default="0" label="FLEXI_FIELD_SEPARATOR_BACKEND" description="FLEXI_FIELD_SEPARATOR_BACKEND_DESC">
-			<option value="0">FLEXI_SPACE</option>
-			<option value="1">FLEXI_LINE_BREAK</option>
-			<option value="2">FLEXI_PIPE</option>
-			<option value="3">FLEXI_COMMA</option>
-		</param>
-		<param name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND" description="FLEXI_VALUE_SEPARATOR_FRONTEND_DESC">
-			<option value="0">FLEXI_SPACE</option>
-			<option value="1">FLEXI_LINE_BREAK</option>
-			<option value="2">FLEXI_PIPE</option>
-			<option value="3">FLEXI_COMMA</option>
-			<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
-		</param>
-		<param name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-		<param name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-		<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_BEFORE_SELECT</option>
-			<option value="2">FLEXI_IN_SELECT</option>
-		</param>
-		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-
-		<param name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
-		<param name="min_values" type="text" default="0" size="2" label="FLEXI_FIELD_MIN_VALUES" description="FLEXI_FIELD_MIN_VALUES_DESC" />
-		<param name="exact_values" type="text" default="0" size="2" label="FLEXI_FIELD_EXACT_VALUES" description="FLEXI_FIELD_EXACT_VALUES_DESC" />
-		<!--param name="js_popup_err" type="radio" default="0" label="FLEXI_FIELD_JS_POPUP_ERROR" description="FLEXI_FIELD_JS_POPUP_ERROR_DESC" >
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param-->
-
-	</params>
+		<params group="standard">
+			<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+		</params>
+		<params group="group-checkbox" addpath="/administrator/components/com_flexicontent/elements">
+			<param name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
+			<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="" type="separator" default="FLEXI_VALUE_HANDLING_LABEL" level="level1" />
+			<param name="sql_mode" type="radio" default="0" label="FLEXI_FIELD_SQL_MODE" description="FLEXI_FIELD_SQL_MODE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="field_elements" type="textarea" default="1::Yes%% 0::No" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
+			<param name="" type="separator" default="FLEXI_ITEM_FORM" description="" level="level2" />
+			<param name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
+			<param name="separator" type="list" default="0" label="FLEXI_VALUE_SEPARATOR_ITEM_FORM" description="FLEXI_VALUE_SEPARATOR_ITEM_FORM_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+			</param>
+			
+			<param name="" type="separator" default="NUMBER OR VALUES" description="" level="level3" />
+			<param name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+			<param name="min_values" type="text" default="0" size="2" label="FLEXI_FIELD_MIN_VALUES" description="FLEXI_FIELD_MIN_VALUES_DESC" />
+			<param name="exact_values" type="text" default="0" size="2" label="FLEXI_FIELD_EXACT_VALUES" description="FLEXI_FIELD_EXACT_VALUES_DESC" />
+			<!--param name="js_popup_err" type="radio" default="0" label="FLEXI_FIELD_JS_POPUP_ERROR" description="FLEXI_FIELD_JS_POPUP_ERROR_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param-->
+			
+			<param name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level1" />
+			<param name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<param name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<param name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+			</param>
+			<param name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<param name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			
+			<param name="" type="separator" default="FLEXI_CATEGORY_SEARCH_FILTER_CONF" level="level1" />
+			<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_BEFORE_SELECT</option>
+				<option value="2">FLEXI_IN_SELECT</option>
+			</param>
+		</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_checkbox.ini</language>
 	</languages>

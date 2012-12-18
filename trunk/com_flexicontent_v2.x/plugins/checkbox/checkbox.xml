@@ -20,16 +20,50 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
-		<fieldset name="group-checkbox">
+		<fieldset name="group-checkbox" addfieldpath="/administrator/components/com_flexicontent/elements">
+			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
+			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_VALUE_HANDLING_LABEL" level="level1" />
+			<field name="sql_mode" type="radio" default="0" label="FLEXI_FIELD_SQL_MODE" description="FLEXI_FIELD_SQL_MODE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="field_elements" type="textarea" default="1::Yes%% 0::No" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
+			<field name="" type="separator" default="FLEXI_ITEM_FORM" description="" level="level2" />
 			<field name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
-			<field name="separator" type="list" default="0" label="FLEXI_FIELD_SEPARATOR_BACKEND" description="FLEXI_FIELD_SEPARATOR_BACKEND_DESC">
+			<field name="separator" type="list" default="0" label="FLEXI_VALUE_SEPARATOR_ITEM_FORM" description="FLEXI_VALUE_SEPARATOR_ITEM_FORM_DESC">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
 			</field>
-			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND" description="FLEXI_VALUE_SEPARATOR_FRONTEND_DESC">
+			
+			<field name="" type="separator" default="NUMBER OR VALUES" description="" level="level3" />
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+			<field name="min_values" type="text" default="0" size="2" label="FLEXI_FIELD_MIN_VALUES" description="FLEXI_FIELD_MIN_VALUES_DESC" />
+			<field name="exact_values" type="text" default="0" size="2" label="FLEXI_FIELD_EXACT_VALUES" description="FLEXI_FIELD_EXACT_VALUES_DESC" />
+			<!--field name="js_popup_err" type="radio" default="0" label="FLEXI_FIELD_JS_POPUP_ERROR" description="FLEXI_FIELD_JS_POPUP_ERROR_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field-->
+			
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level1" />
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>
@@ -38,23 +72,13 @@
 			</field>
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_CATEGORY_SEARCH_FILTER_CONF" level="level1" />
 			<field name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>
 			</field>
-			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-
-			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
-			<field name="min_values" type="text" default="0" size="2" label="FLEXI_FIELD_MIN_VALUES" description="FLEXI_FIELD_MIN_VALUES_DESC" />
-			<field name="exact_values" type="text" default="0" size="2" label="FLEXI_FIELD_EXACT_VALUES" description="FLEXI_FIELD_EXACT_VALUES_DESC" />
-			<!--field name="js_popup_err" type="radio" default="0" label="FLEXI_FIELD_JS_POPUP_ERROR" description="FLEXI_FIELD_JS_POPUP_ERROR_DESC" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field-->
 		</fieldset>
 	</fields>
 	</config>
