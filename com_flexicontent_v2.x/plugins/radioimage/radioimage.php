@@ -41,13 +41,13 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		if($field->field_type != 'radioimage') return;
 		
 		$field->label = JText::_($field->label);
-
+		
 		$app =& JFactory::getApplication();
 		$prefix = $app->isAdmin() ? '../':'';
-
+		
 		// Import the file system library
 		jimport('joomla.filesystem.file');
-
+		
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
@@ -61,7 +61,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		
 		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required validate-radio' : '';
-
+		
 		switch($separator)
 		{
 			case 0:
@@ -90,7 +90,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		}
 
 		// initialise property
-		if(!$field->value && $default_value) {
+		if (!$field->value && $default_value) {
 			$field->value = array();
 			$field->value[0] = $default_value;
 		} else if (!$field->value) {
@@ -109,27 +109,27 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		}
 		
 		// Create field's HTML display for item form
-		// (a) Display as checkbox images
-		if ( !$field->parameters->get( 'display_as_select', 0 ) ) {
-			$i = 0;
-			$options = "";
+		// (a) Display as drop-down select ...
+		if ( $field->parameters->get( 'display_as_select', 0 ) ) {
+			$options = array();
+			if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 			foreach ($elements as $element) {
-				$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
-				$img = '<img src="'.$imgpath . $element->image .'"  alt="'.JText::_($element->text).'" />';
-				$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($element->text).'"><input type="radio" id="'.$elementid.'_'.$i.'" name="'.$fieldname.'" class="'.$required.'" value="'.$element->value.'" '.$checked.' />'.$img.'</label>'.$separator;
-				$i++;
+				$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
 			}
-			$field->html = $options;
+			$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'class="'.$required.'"', 'value', 'text', $field->value);
 			return;
-		}
+		} // else ...
 		
-		// (b) Display as drop-down select ...
-		$options = array();
-		if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
+		// (b) Display as checkbox images
+		$i = 0;
+		$options = "";
 		foreach ($elements as $element) {
-			$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
+			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
+			$img = '<img src="'.$imgpath . $element->image .'"  alt="'.JText::_($element->text).'" />';
+			$options .= '<label class="hasTip" title="'.$field->label.'::'.JText::_($element->text).'"><input type="radio" id="'.$elementid.'_'.$i.'" name="'.$fieldname.'" class="'.$required.'" value="'.$element->value.'" '.$checked.' />'.$img.'</label>'.$separator;
+			$i++;
 		}
-		$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'class="'.$required.'"', 'value', 'text', $field->value);
+		$field->html = $options;
 	}
 	
 	
@@ -147,10 +147,17 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
+		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext			= $field->parameters->get( 'pretext', '' ) ;
+		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
+		
 		$imagedir 		= preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
 		$imgpath			= $prefix . $imagedir;
+		
+		if($pretext) 	{ $pretext 	= $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext	= $remove_space ? $posttext : ' ' . $posttext; }
 		
 		if ( !$values ) { $field->{$prop}=''; return; }
 		
@@ -167,7 +174,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		if ( count($values) ) {
 			$element = @$elements[ $values[0] ];
 			if ( $element ) {
-				$display = '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.JText::_($element->text).'" />';
+				$display = $pretext . '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.JText::_($element->text).'" />' . $posttext;
 				$display_index = $element->value;
 			}
 		}

@@ -41,7 +41,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		if($field->field_type != 'selectmultiple') return;
 		
 		$field->label = JText::_($field->label);
-
+		
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;

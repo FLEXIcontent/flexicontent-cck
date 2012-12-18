@@ -41,16 +41,16 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		if($field->field_type != 'radio') return;
 		
 		$field->label = JText::_($field->label);
-
+		
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
 		$separator			= $field->parameters->get( 'separator' ) ;
-		$default_value		= $field->parameters->get( 'default_value', '' ) ;
+		$default_value	= $field->parameters->get( 'default_value', '' ) ;
 		
 		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required validate-radio' : '';
-
+		
 		switch($separator)
 		{
 			case 0:
@@ -98,6 +98,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		}
 		
 		// Create field's HTML display for item form
+		// Display as radio buttons
 		$i = 0;
 		$options = "";
 		foreach ($elements as $element) {
@@ -120,8 +121,14 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		$values = $values ? $values : $field->value;
 
 		// some parameter shortcuts
+		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext			= $field->parameters->get( 'pretext', '' ) ;
+		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
+		
+		if($pretext) 	{ $pretext 	= $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext	= $remove_space ? $posttext : ' ' . $posttext; }
 		
 		if ( !$values ) { $field->{$prop}=''; return; }
 		
@@ -132,13 +139,13 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 			return;
 		}
 		
-
+		// Create display of field
 		$display = '';
 		$display_index = '';
 		if ( count($values) ) {
 			$element = @$elements[ $values[0] ];
 			if ( $element ) {
-				$display = JText::_($element->text);
+				$display = $pretext . JText::_($element->text) . $posttext;
 				$display_index = $element->value;
 			}
 		}

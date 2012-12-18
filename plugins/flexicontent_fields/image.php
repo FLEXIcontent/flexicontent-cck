@@ -1673,7 +1673,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$query = 'SELECT filename'
 				. ' FROM #__flexicontent_files'
 				. ' WHERE secure=1 AND ext IN ("jpg","gif","png","jpeg") '
-				.(($limit_by_uploader)?" AND uploaded_by={$user->id}":"")
+				.( $limit_by_uploader ? " AND uploaded_by = ". $user->id : "")
 				;
 		} else {
 			$query = 'SELECT value'
@@ -1684,7 +1684,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$db->setQuery($query);
 		$values = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		
-		// Create original filenames array skipping any empty records
+		// Create original filenames array skipping any empty records, 
+		// NOTE: if any_field_records is ON the we already retrieved filenames above
 		if (!$any_field_records) {
 			for($n=0, $c=count($values); $n<$c; $n++) {
 				if (!$values[$n]) { unset($values[$n]); continue; }
@@ -1735,22 +1736,41 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 	function canDeleteImage( $field, $record )
 	{
-		$db =& JFactory::getDBO();
-
-		$query = 'SELECT value'
+		$db   = & JFactory::getDBO();
+		$app  = & JFactory::getApplication();
+		$user = & JFactory::getUser();
+		
+		// Get configuration parameters
+		$any_field_records = $field->parameters->get('list_all_media_files', 0);
+		$limit_by_uploader = $field->parameters->get('limit_by_uploader', 0);  // USED ONLY WHEN any_field_records is ENABLED
+		
+		// Retrieve available (and appropriate) images from the DB
+		if ($any_field_records) {
+			$query = 'SELECT filename'
+				. ' FROM #__flexicontent_files'
+				. ' WHERE secure=1 AND ext IN ("jpg","gif","png","jpeg") '
+				.( $limit_by_uploader ? " AND uploaded_by = ". $user->id : "")
+				;
+		} else {
+			$query = 'SELECT value'
 				. ' FROM #__flexicontent_fields_item_relations'
 				. ' WHERE field_id = '. (int) $field->id
 				;
+		}
 		$db->setQuery($query);
 		$values = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		
 		$i = 0;
 		for($n=0, $c=count($values); $n<$c; $n++)
 		{
-			$values[$n] = unserialize($values[$n]);
-			$values[$n] = $values[$n]['originalname'];
+			// Create original filenames array skipping any empty records, 
+			// NOTE: if any_field_records is ON the we already retrieved filenames above
+			if (!$any_field_records) {
+				$values[$n] = unserialize($values[$n]);
+				$values[$n] = $values[$n]['originalname'];
+			}
 			if ($values[$n] == $record) {
-				if (++$i > 1) return false;
+				if (++$i > 1) return false;  // More than one usages found return false (can not delete)
 			}
 		}
 		
