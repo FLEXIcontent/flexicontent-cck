@@ -461,7 +461,7 @@ div.flexi_edit .flexi_buttons {
 	-webkit-border-radius: 5px !important;
 	border: 1px solid #cccccc !important;
 	background: #eeeeee !important;
-	color: white !important;	
+	color: black !important;	
 	margin: 2px 6px 2px 0px;
 	padding:1px 4px 1px 2px;
 	font-weight:bold;
@@ -981,13 +981,13 @@ table.admintable td {
  * Directory view
  ****************/
 
-#flexicontent.directory .fccatcolumn {
+#flexicontent.fcdirectory .fccatcolumn {
 	float: left;
 	margin: 0% 1% 0% 0% !important;
 	padding: 0px !important;
 }
 
-#flexicontent.directory h2.fccat_title_box {
+#flexicontent.fcdirectory h2.fccat_title_box {
 	background-color: #dddddd;
 	border: 1px solid #ffffff;
 	color: #ffffff;
@@ -996,7 +996,7 @@ table.admintable td {
 	width: auto;
 }
 
-#flexicontent.directory .fccat_title {
+#flexicontent.fcdirectory .fccat_title {
 	border: 2px solid #dddddd;
 	display: block;
 	font-size: 14px;
@@ -1006,18 +1006,18 @@ table.admintable td {
 	position: relative;
 }
 
-#flexicontent.directory span.fccat_title {
+#flexicontent.fcdirectory span.fccat_title {
 	color: darkred;
 }
 
-#flexicontent.directory .fccat_title:hover {
+#flexicontent.fcdirectory .fccat_title:hover {
 	text-decoration: none;
 }
 
-#flexicontent.directory .fccat_assigned {
+#flexicontent.fcdirectory .fccat_assigned {
 }
 
-#flexicontent.directory .fccat_image {
+#flexicontent.fcdirectory .fccat_image {
 	border: 1px solid #dddddd;
 	border-radius:5px;
 	-moz-border-radius: 5px;
@@ -1027,38 +1027,38 @@ table.admintable td {
 	padding: 1px;
 }
 
-#flexicontent.directory .fccat_descr {
+#flexicontent.fcdirectory .fccat_descr {
 }
 
-#flexicontent.directory ul.fcsubcats_list {
+#flexicontent.fcdirectory ul.fcsubcats_list {
 	border-top: 1px dashed #dddddd !important;
 	list-style: none;
 	margin: 3px 0 7px;
 	padding: 0 7px;
 }
 
-#flexicontent.directory li.fcsubcat {
+#flexicontent.fcdirectory li.fcsubcat {
 	border-bottom: 1px dashed #dddddd !important;
 	margin: 2px 0px 2px 0px !important;
 }
 
-#flexicontent.directory li.fcsubcat.odd {
+#flexicontent.fcdirectory li.fcsubcat.odd {
 }
 
-#flexicontent.directory li.fcsubcat.even {
+#flexicontent.fcdirectory li.fcsubcat.even {
 }
 
-#flexicontent.directory a.fcsubcat_title {
+#flexicontent.fcdirectory a.fcsubcat_title {
 }
 
-#flexicontent.directory a.fcsubcat_title:hover {
+#flexicontent.fcdirectory a.fcsubcat_title:hover {
 	text-decoration: none;
 }
 
-#flexicontent.directory .fcsubcat_assigned {
+#flexicontent.fcdirectory .fcsubcat_assigned {
 }
 
-#flexicontent.directory .fcsubcat_image {
+#flexicontent.fcdirectory .fcsubcat_image {
 	border: 1px solid #dddddd;
 	border-radius:5px;
 	-moz-border-radius: 5px;
@@ -1068,7 +1068,7 @@ table.admintable td {
 	padding: 1px;
 }
 
-#flexicontent.directory .fcsubcat_descr {
+#flexicontent.fcdirectory .fcsubcat_descr {
 }
 
 
@@ -1231,10 +1231,12 @@ table.admintable td {
 	border-width:0px;
 }
 
-#flexicontent ul.tabbernav li.tabberactive a, #flexicontent ul.tabbernav li.tabberactive a:hover {
-	background-color: darkred;
-	color: white;
-	border-bottom: 1px solid darkred;
+#flexicontent ul.tabbernav li.tabberactive a,
+#flexicontent ul.tabbernav li.tabberactive a:hover
+{
+	color: black;
+	background-color: white !important;
+	border-bottom: 1px solid white;
 }
 
 #flexicontent ul.tabbernav {
@@ -1244,6 +1246,25 @@ table.admintable td {
 	padding: 3px !important;
 }
 
+/*#flexicontent.fctypeNN*/ #fc_subtitle_tabset ul.tabbernav li a {  padding-left: 20px;  }
+/*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_1, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_2, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_3,
+/*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_4, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_5, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_6,
+/*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_7, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_8, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_9,
+/*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_10, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_11, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_12 {
+	background-image: url(../images/information.png) !important;
+	background-position: 1px 2px !important;
+	background-repeat: no-repeat !important;
+}
+
+/*#flexicontent.fctypeNN*/ #fc_bottom_tabset ul.tabbernav li a {  padding-left: 20px;  }
+/*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_1, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_2, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_3,
+/*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_4, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_5, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_6,
+/*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_7, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_8, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_9,
+/*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_10, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_11, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_12 {
+	background-image: url(../images/information.png) !important;
+	background-position: 1px 2px !important;
+	background-repeat: no-repeat !important;
+}
 
 
 /*************************************

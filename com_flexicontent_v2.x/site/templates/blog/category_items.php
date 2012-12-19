@@ -111,7 +111,7 @@ if ($leadnum) :
 							
 								$value{$i} = unserialize($img_field->value[0]);
 								
-								if ( $img_field->parameters->get('image_source') && empty($img_field->value[0]['is_default_value'] ) ) {
+								if ( $img_field->parameters->get('image_source') && empty($value{$i}['is_default_value'] ) ) {
 									$dir{$i}	 = $img_field->parameters->get('dir') .'/'. 'item_'.$items[$i]->id.'_field_'.$img_field->id;
 								} else {
 									$dir{$i}	 = $img_field->parameters->get('dir');
@@ -393,7 +393,7 @@ if ($leadnum) :
 							
 								$value{$i} = unserialize($img_field->value[0]);
 								
-								if ( $img_field->parameters->get('image_source') && empty($img_field->value[0]['is_default_value'] ) ) {
+								if ( $img_field->parameters->get('image_source') && empty($value{$i}['is_default_value'] ) ) {
 									$dir{$i}	 = $img_field->parameters->get('dir') .'/'. 'item_'.$items[$i]->id.'_field_'.$img_field->id;
 								} else {
 									$dir{$i}	 = $img_field->parameters->get('dir');

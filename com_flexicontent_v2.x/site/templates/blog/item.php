@@ -35,8 +35,8 @@ switch ($this->params->get( 'columnmode', 2 )) {
 
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
-$page_classes .= ' items item'.$this->item->id;
-$page_classes .= ' type'.$this->item->type_id;
+$page_classes .= ' fcitems fcitem'.$this->item->id;
+$page_classes .= ' fctype'.$this->item->type_id;
 ?>
 
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
