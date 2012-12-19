@@ -59,7 +59,7 @@ if ($fields[0]=='') $fields = array();
 
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
-$page_classes .= ' tags tag'.$this->tag->id;
+$page_classes .= ' fctags fctag'.$this->tag->id;
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 ?>

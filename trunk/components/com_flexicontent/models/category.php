@@ -659,7 +659,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$alpha = JRequest::getVar('letter', NULL, 'request', 'string');
 		
 		// Security check, just refuse any quotes
-		$alpha = preg_match ("/'|\"/u", $alpha) ? "" : $alpha;
+		$alpha = preg_replace ("/(\(|\)\'|\"|\\\)/u", "", $alpha);
 		
 		/*if($alpha===NULL) {
 			$alpha =  $session->get($option.'.category.letter');
@@ -700,9 +700,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$range_length = $endord - $startord;
 			
 			// ERROR CHECK: Character range has at least one character
-			if ($range_length > 200 || $range_length < 1) {
+			if ($range_length > 50 || $range_length < 1) {
 				// A sanity check that the range is something logical and that 
-				echo "Error in Alpha Index<br>letter range: ".$alpha.", is incorrect or contains more that 200 characters<br>";
+				echo "Error in Alpha Index<br>letter range: ".$alpha.", is incorrect or contains more that 50 characters<br>";
 				return $where;
 			}
 			

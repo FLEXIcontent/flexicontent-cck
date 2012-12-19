@@ -25,7 +25,7 @@ if ($html5) {  /* BOF html5  */
 
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
-$page_classes .= ' category cat'.$this->category->id;
+$page_classes .= ' fccategory fccat'.$this->category->id;
 ?>
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 

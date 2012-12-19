@@ -23,8 +23,8 @@ $tmpl = $this->tmpl; // for backwards compatiblity
 
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
-$page_classes .= ' items item'.$this->item->id;
-$page_classes .= ' type'.$this->item->type_id;
+$page_classes .= ' fcitems fcitem'.$this->item->id;
+$page_classes .= ' fctype'.$this->item->type_id;
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');
@@ -148,20 +148,21 @@ for ($tc=1; $tc<=$tabcount; $tc++) $createtabs = @$createtabs ||  isset($this->i
 
 /* BOF fctabber */
 if (@$createtabs) :
-	echo '<div class="fctabber group">'."\n";
+	echo '<div id="fc_subtitle_tabset" class="fctabber group">'."\n";
 	
 	for ($tc=1; $tc<=$tabcount; $tc++) :
 		$tabpos_name  = 'subtitle_tab'.$tc;
 		$tabpos_label = JText::_($this->params->get('subtitle_tab'.$tc.'_label', $tabpos_name));
+		$tab_id = 'fc_'.$tabpos_name;
 		if (isset($this->item->positions[$tabpos_name])):
     /*BOF subtitle_tabN block*/
 ?>
-        
-		<section class="tabbertab"><!-- tab start -->
-			<header>
+
+		<section id="<?php echo $tab_id; ?>" class="tabbertab"><!-- tab start -->
+
 			<h3><?php echo $tabpos_label; ?></h3><!-- tab title -->
-			</header>
-			<div class="flexi lineinfo <?php echo $tabpos_label; ?>">
+
+			<div class="flexi lineinfo">
 				<?php foreach ($this->item->positions[$tabpos_name] as $field) : ?>
 				<div class="flexi element">
 					<?php if ($field->label) : ?>
@@ -247,20 +248,21 @@ for ($tc=1; $tc<=$tabcount; $tc++) $createtabs = @$createtabs ||  isset($this->i
 
 /* BOF fctabber */
 if (@$createtabs) :
-	echo '<div class="fctabber group">'."\n";
+	echo '<div id="fc_bottom_tabset" class="fctabber group">'."\n";
 	
 	for ($tc=1; $tc<=$tabcount; $tc++) :
 		$tabpos_name  = 'bottom_tab'.$tc;
 		$tabpos_label = JText::_($this->params->get('bottom_tab'.$tc.'_label', $tabpos_name));
+		$tab_id = 'fc_'.$tabpos_name;
 		if (isset($this->item->positions[$tabpos_name])):
     /*BOF subtitle_tabN block*/
 ?>
-        
-		<section class="tabbertab"><!-- tab start -->
-			<header>
+
+		<section id="<?php echo $tab_id; ?>" class="tabbertab"><!-- tab start -->
+			
 			<h3><?php echo $tabpos_label; ?></h3><!-- tab title -->
-			</header>
-			<div class="flexi lineinfo <?php echo $tabpos_label; ?>">
+			
+			<div class="flexi lineinfo">
 				<?php foreach ($this->item->positions[$tabpos_name] as $field) : ?>
 				<div class="flexi element">
 					<?php if ($field->label) : ?>

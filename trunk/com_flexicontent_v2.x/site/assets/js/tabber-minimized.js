@@ -87,7 +87,7 @@ function tabberObj(argsObj)
   this.removeTitle = true;
 
   /* If you want to add an id to each link set this to true */
-  this.addLinkId = false;
+  this.addLinkId = true;
 
   /* If addIds==true, then you can set a format for the ids.
      <tabberid> will be replaced with the id of the main tabber div.
@@ -98,7 +98,7 @@ function tabberObj(argsObj)
      <tabtitle> will be replaced by the tab title
        (with all non-alphanumeric characters removed)
    */
-  this.linkIdFormat = '<tabberid>nav<tabnumberone>';
+  this.linkIdFormat = '<tabberid>_nav_<tabnumberone>';
 
   /* You can override the defaults listed above by passing in an object:
      var mytab = new tabber({property:value,property:value});

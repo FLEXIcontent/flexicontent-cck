@@ -3,7 +3,7 @@
 <?php
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
-$page_classes .= ' search';
+$page_classes .= ' fcsearch';
 ?>
 
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >

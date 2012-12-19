@@ -20,7 +20,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
-$page_classes .= ' category cat'.$this->category->id;
+$page_classes .= ' fccategory fccat'.$this->category->id;
 ?>
 
 <?php echo ( ($this->params->get( 'show_page_heading', 1 ) || $this->params->get('show_cat_title', 1) ) ? '<section' : '<div'); ?> id="flexicontent" class="flexicontent <?php echo $page_classes; ?> group" >

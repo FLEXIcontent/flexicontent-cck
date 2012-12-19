@@ -34,8 +34,8 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
 JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
 // Get component parameters and add tooltips css and js code
-$params =& JComponentHelper::getParams('com_flexicontent');
-if ($params->get('add_tooltips', 1)) JHTML::_('behavior.tooltip');
+$cparams =& JComponentHelper::getParams('com_flexicontent');
+if ($cparams->get('add_tooltips', 1)) JHTML::_('behavior.tooltip');
 
 //include constants file
 require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
@@ -97,10 +97,10 @@ $controller->redirect();
 
 // TO BE MOVED TO HELPER FILE ...
 // Remove (thus prevent) the default menu item from showing in the pathway
-if ( $params->get('default_menuitem_nopathway',1) ) {
+if ( $cparams->get('default_menuitem_nopathway',1) ) {
 	$mainframe = & JFactory::getApplication();
 	$pathway 	= & $mainframe->getPathWay();
-	$default_menu_itemid = $params->get('default_menu_itemid', 0);
+	$default_menu_itemid = $cparams->get('default_menu_itemid', 0);
 	$pathway_arr = $pathway->getPathway();
 	if ( count($pathway_arr) && preg_match("/Itemid=([0-9]+)/",$pathway_arr[0]->link, $matches) ) {
 		if ($matches[1] == $default_menu_itemid) {
@@ -111,7 +111,7 @@ if ( $params->get('default_menuitem_nopathway',1) ) {
 	}
 }
 
-if ( $params->get('print_logging_info') ) {
+if ( $cparams->get('print_logging_info') ) {
 	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	$app = & JFactory::getApplication();
 	$msg = sprintf( 'FLEXIcontent page creation is %.2f secs, (including content plugins: %.2f secs)', $elapsed_microseconds/1000000, $fc_content_plg_microtime/1000000);

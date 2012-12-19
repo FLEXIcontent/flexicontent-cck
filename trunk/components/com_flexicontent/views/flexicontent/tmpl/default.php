@@ -20,7 +20,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
-$page_classes .= ' directory rootcat'.$this->params->get('rootcat', FLEXI_J16GE ? 1:0);
+$page_classes .= ' fcdirectory rootcat'.$this->params->get('rootcat', FLEXI_J16GE ? 1:0);
 ?>
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 

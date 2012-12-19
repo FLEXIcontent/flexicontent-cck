@@ -59,7 +59,7 @@ if ($fields[0]=='') $fields = array();
 
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
-$page_classes .= ' favourites';
+$page_classes .= ' fcfavourites';
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 ?>
