@@ -408,7 +408,9 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->featured 	= 1;
 					
 					if ($use_fields_feat && @$row->fields && $fields_feat) {
+						$lists[$ord]['featured'][$i]->fields = array();
 						foreach ($fields_feat as $field) {
+							$lists[$ord]['featured'][$i]->fields[$field] = new stdClass();
 							if ($display_label_feat) {
 								$lists[$ord]['featured'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
 							}
@@ -557,7 +559,9 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->featured 	= 0;
 	
 					if ($use_fields && @$row->fields && $fields) {
+						$lists[$ord]['standard'][$i]->fields = array();
 						foreach ($fields as $field) {
+							$lists[$ord]['standard'][$i]->fields[$field] = new stdClass();
 							if ($display_label) {
 								$lists[$ord]['standard'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
 							}

@@ -42,7 +42,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		if (!is_array($globalnoroute))	$globalnoroute	= array();
 		if (!is_array($globalcats))     $globalcats	= array();
 		
-		$mainframe =& JFactory::getApplication();
+		$mainframe = & JFactory::getApplication();
+		$session = & JFactory::getSession();
 		$option = JRequest::getVar('option');
 
 		//initialize variables
@@ -98,14 +99,18 @@ class FlexicontentViewCategory extends JViewLegacy
 		// CATEGORY LAYOUT handling
 		// ************************
 		
-		// (a) Get from category parameters, allowing URL override
-		$clayout = JRequest::getVar('clayout', false);
-		$clayout = $clayout ? $clayout : $params->get('clayout', 'blog');
+		// (a) Decide to use mobile or normal category template layout
+		$use_mobile = $session->get('fc_use_mobile', false, 'flexicontent');
+		$_clayout = $use_mobile ? 'clayout_mobile' : 'clayout';
 		
-		// (b) Get cached template data
+		// (b) Get from category parameters, allowing URL override
+		$clayout = JRequest::getVar($_clayout, false);
+		$clayout = $clayout ? $clayout : $params->get($_clayout, 'blog');
+		
+		// (c) Get cached template data
 		$themes = flexicontent_tmpl::getTemplates( $lang_files = array($clayout) );
 		
-		// (c) Verify the category layout exists
+		// (d) Verify the category layout exists
 		if ( !isset($themes->category->{$clayout}) ) {
 			$fixed_clayout = 'blog';
 			$mainframe->enqueueMessage("<small>Current Category Layout Template is '$clayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
@@ -113,7 +118,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			if (FLEXI_FISH || FLEXI_J16GE) FLEXIUtilities::loadTemplateLanguageFile( $clayout );  // Manually load Template-Specific language file of back fall clayout
 		}
 		
-		// (d) finally set the template name back into the category's parameters
+		// (e) finally set the template name back into the category's parameters
 		$params->set('clayout', $clayout);
 		
 		// Get URL variables

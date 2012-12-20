@@ -219,46 +219,47 @@ div.comments {
    margin-left: 1%
 }
 
-figure.image.right, 
-div.image.right {
-	float: right;
-	margin: 8px 2px 0px 10px;
-}
-figure.image.left,
-div.image.left {
-	float: left;
-	margin: 8px 10px 0px 2px;
+#flexicontent figure.image.right, 
+#flexicontent div.image.right {
+	float: right !important;
+	margin: 8px 2px 0px 10px !important;
 }
 
-figure.image.right img, 
-figure.image.left img, 
-div.image.right img,
-div.image.left img {
+#flexicontent figure.image.left,
+#flexicontent div.image.left {
+	float: left !important;
+	margin: 8px 10px 0px 2px !important;
+	width:auto !important;
+}
+
+#flexicontent figure.image.right img, 
+#flexicontent figure.image.left img, 
+#flexicontent div.image.right img,
+#flexicontent div.image.left img {
 	padding: 1px;
 	border: 1px solid lightgray;
 }
 
 /* lines */
-.lineinfo {
+#flexicontent .lineinfo {
 	display: block;
-	clear: left;
 	overflow: hidden;
 	margin: 0 0 0.5em 0;
 }
-.lineinfo {
+#flexicontent .lineinfo {
 	vertical-align: middle;
 }
-.lineinfo .element {
+#flexicontent .lineinfo .element {
 	display: block;
 	float: left;
 	margin-right: 10px;
 }
-.lineinfo .element .label {
+#flexicontent .lineinfo .element .label {
 	margin-right: 5px;
 }
-.lineinfo .element,
-.lineinfo .element .label,
-.lineinfo .element .value {
+#flexicontent .lineinfo .element,
+#flexicontent .lineinfo .element .label,
+#flexicontent .lineinfo .element .value {
 	display: block;
 	float: left;
 }

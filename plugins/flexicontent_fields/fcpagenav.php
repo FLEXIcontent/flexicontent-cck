@@ -245,7 +245,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					$start = floor($location / $limit)*$limit;
 					if (!empty($rows[$location]->catslug)) {
 						$html .= '
-						<span class="return_category">
+						<span class="btn return_category">
 							<a href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$location]->catslug)).'?start='.$start .'">' . htmlspecialchars($category_label, ENT_NOQUOTES) . '</a>
 						</span>';
 					}
@@ -255,7 +255,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				{
 					$prev_count = $show_prevnext_count ? '&nbsp;['.($location).']' : '';
 					$html .= '
-					<span class="pagenav_prev' . ($use_tooltip ? ' hasTip' : '') . '"' . ($use_tooltip ? 'title="'.$tooltip_title_prev.'::'.$field->prevtitle.'"' : '') . '>
+					<span class="btn pagenav_prev' . ($use_tooltip ? ' hasTip' : '') . '"' . ($use_tooltip ? 'title="'.$tooltip_title_prev.'::'.$field->prevtitle.'"' : '') . '>
 						<a href="'. $field->prevurl .'">' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES) ) . '</a>'.$prev_count.'
 					</span>'
 					;
@@ -265,7 +265,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				{
 					$next_count = $show_prevnext_count ? '&nbsp;['.(count($list)-$location-1).']' : '';
 					$html .= '
-					<span class="pagenav_next' . ($use_tooltip ? ' hasTip' : '') . '"' . ($use_tooltip ? 'title="'.$tooltip_title_next.'::'.$field->nexttitle.':: "' : '') . '>
+					<span class="btn pagenav_next' . ($use_tooltip ? ' hasTip' : '') . '"' . ($use_tooltip ? 'title="'.$tooltip_title_next.'::'.$field->nexttitle.':: "' : '') . '>
 						<a href="'. $field->nexturl .'">' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES) ) .'</a>'.$next_count.'
 					</span>'
 					;

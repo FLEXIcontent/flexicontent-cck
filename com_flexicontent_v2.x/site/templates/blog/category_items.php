@@ -150,11 +150,11 @@ if ($leadnum) :
 					?>
 					<div class="image<?php echo $this->params->get('lead_position') ? ' right' : ' left'; ?>">
 						<?php if ($this->params->get('lead_link_image', 1)) : ?>
-						<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . addslashes($items[$i]->title); ?>">
-							<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
+						<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
+							<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
 						</a>
 						<?php else : ?>
-						<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
+						<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
 						<?php endif; ?>
 					</div>
 					<?php
@@ -432,11 +432,11 @@ if ($leadnum) :
 					?>
 				<div class="image<?php echo $this->params->get('intro_position') ? ' right' : ' left'; ?>">
 					<?php if ($this->params->get('intro_link_image', 1)) : ?>
-						<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . addslashes($items[$i]->title); ?>">
-							<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
+						<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
+							<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
 						</a>
 					<?php else : ?>
-						<img src="<?php echo $thumb; ?>" alt="<?php echo addslashes($items[$i]->title); ?>" />
+						<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
 					<?php endif; ?>
 				</div>
 					<?php
@@ -488,7 +488,7 @@ if ($leadnum) :
 				
 				<!-- BOF above-description-nolabel-line2 block -->
 				<?php if (isset($items[$i]->positions['above-description-line2-nolabel'])) : ?>
-				<div class="lineinfo line1">
+				<div class="lineinfo line2">
 					<?php foreach ($items[$i]->positions['above-description-line2-nolabel'] as $field) : ?>
 					<span class="element">
 						<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
@@ -496,7 +496,7 @@ if ($leadnum) :
 					<?php endforeach; ?>
 				</div>
 				<?php endif; ?>
-				<!-- EOF above-description-nolabel-line1 block -->
+				<!-- EOF above-description-nolabel-line2 block -->
 
 				<p>
 				<?php

@@ -76,12 +76,13 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$filter_order_type = $mainframe->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type', 0, 'int' );
 		$filter_order      = $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', $default_order, 'cmd' );
-		$default_order_dir = $mainframe->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', $default_order_dir, 'cmd' );
+		$filter_order_Dir = $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
 		
 		// Filter order is selected via current setting of filter_order_type selector
 		$filter_order	= ($filter_order_type && ($filter_order == 'i.ordering')) ? 'catsordering' : $filter_order;
 		$filter_order	= (!$filter_order_type && ($filter_order == 'catsordering')) ? 'i.ordering' : $filter_order;
 		JRequest::setVar( 'filter_order', $filter_order );
+		JRequest::setVar( 'filter_order_Dir', $filter_order_Dir );
 		
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.items.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.items.limitstart', 'limitstart', 0, 'int' );
