@@ -27,7 +27,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="draggable_reordering" type="radio" default="1" label="FLEXI_DRAGGABLE_REORDERING" description="FLEXI_DRAGGABLE_REORDERING_DESC" menu="hide">
+			<field name="draggable_reordering" type="radio" default="1" label="FLEXI_DRAG_AND_DROP_ORDERING" description="FLEXI_DRAG_AND_DROP_ORDERING_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -53,7 +53,7 @@
 			
 			<field name="always_create_fields_display" type="list" default="2" label="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY" description="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY_DESC" menu="hide">
 				<option value="0">FLEXI_ONLY_WHEN_NEEDED</option>
-				<option value="1">FLEXI_ALWAYS</option>
+				<option value="1">FLEXI_ALWAYS_NOT_RECOMMENDED</option>
 				<option value="2">FLEXI_ONLY_IN_ITEM_VIEW</option>
 				<option value="3">FLEXI_NEVER_UNLESS_IN_POSITION</option>
 			</field>
@@ -70,6 +70,30 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
+		<field name="" type="separator" default="Handling of Mobile Devices (EXPERIMENTAL)" label="" level="level1" menu="hide" />
+			
+			<field name="detect_mobile" type="radio" default="0" label="FLEXI_DETECT_USE_MOBILE" description="FLEXI_DETECT_USE_MOBILE_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="mobile_conditions" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
+				checkoptions="FLEXI_USING_MOBILE_BROWSER,FLEXI_HAVING_LOW_RESOLUTION"
+				checkvals="mobile_browser,low_resolution" defaultvals="mobile_browser,low_resolution"
+				label="FLEXI_MOBILE_REQUIREMENTS" description="FLEXI_MOBILE_REQUIREMENTS_DESC"  />
+			<field name="debug_mobile" type="radio" default="0" label="FLEXI_DEBUG_MOBILE" description="FLEXI_DEBUG_MOBILE_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+				
+			<field name="" type="separator" default="FLEXI_LOW_SCREEN_RESOLUTION" label="" level="level2" menu="hide" />
+			<field name="check_lowres" type="radio" default="0" label="FLEXI_CHECK_LOW_RESOLUTION" description="FLEXI_CHECK_LOW_RESOLUTION_DESC" menu="hide">
+				<option value="0">FLEXI_ONLY_IF_MOBILE_BROWSER</option>
+				<option value="1">FLEXI_ALWAYS</option>
+			</field>
+			<field name="lowres_minwidth" type="text" size="8" default="800" label="FLEXI_LOW_RES_MINWIDTH" description="FLEXI_LOW_RES_MINHEIGHT_DESC" menu="hide"/>
+			<field name="lowres_minheight" type="text" size="8" default="480" label="FLEXI_LOW_RES_MINHEIGHT" description="FLEXI_LOW_RES_MINHEIGHT_DESC" menu="hide"/>
+
 		<field name="" type="separator" default="FLEXI_SEF_URL_OPTIONS" label="" level="level1" menu="hide" />
 			
 			<field name="default_menu_itemid" type="text" default="" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" menu="hide" />

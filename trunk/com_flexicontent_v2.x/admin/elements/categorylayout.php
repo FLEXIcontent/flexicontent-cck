@@ -64,6 +64,11 @@ class JFormFieldCategorylayout extends JFormFieldList
 		}
 		$lays = implode("','", $lays);
 		
+		if ( @$attributes['enableparam'] ) {
+			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+			if ( !$cparams->get($attributes['enableparam']) ) return FLEXI_J16GE ? '' : JText::_('FLEXI_DISABLED');
+		}
+		
 if ( ! @$attributes['skipparams'] ) {
 		$doc 	= & JFactory::getDocument();
 		$js 	= "
@@ -116,6 +121,10 @@ window.addEvent('domready', function(){
 		$doc->addScriptDeclaration($js);
 }
 	
+		$layouts = array();
+		if (  @$attributes['firstoption'] ) {
+			$layouts[] = JHTMLSelect::option('', JText::_( $attributes['firstoption'] ));
+		}
 		if ($tmpls !== false) {
 			if ($view != 'category' && $view != 'user') {
 				$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_USE_GLOBAL' ));
@@ -146,6 +155,19 @@ window.addEvent('domready', function(){
 	
 	function getLabel()
 	{
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+		
+		if ( @$attributes['enableparam'] ) {
+			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+			if ( !$cparams->get($attributes['enableparam']) ) return '';
+		}
+		
 		$label = $this->element['label'];
 		$class = "hasTip"; $title = "";
 		if ($this->element['description']) {

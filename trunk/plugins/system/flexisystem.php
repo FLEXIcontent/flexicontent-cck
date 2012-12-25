@@ -40,32 +40,41 @@ class plgSystemFlexisystem extends JPlugin
 		JFactory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB'	, true);
 		JFactory::getLanguage()->load($extension_name, JPATH_SITE, null		, true);
 	}
-        
+	
+	    
 	function onAfterInitialise()
 	{
 		$username	= JRequest::getVar('fcu', null);
 		$password	= JRequest::getVar('fcp', null);
 		$fparams 	=& JComponentHelper::getParams('com_flexicontent');
-		$redirect_pdf_format = $this->params->get('redirect_pdf_format', 1);
 		
+		// (a) Check-in DB table records according to time limits set
+		$this->checkinRecords();
+		
+		// (b) Autologin for frontend preview
 		if (!empty($username) && !empty($password) && $fparams->get('autoflogin', 0)) {
 			$result = $this->loginUser();
 		}
 		
-		// Redirect PDF format to HTML
+		// (b) Route PDF format to HTML format for J1.6+
+		$redirect_pdf_format = $this->params->get('redirect_pdf_format', 1);
 		if (FLEXI_J16GE && $redirect_pdf_format && JRequest::getVar('format') == 'pdf' ) {
 			$app =& JFactory::getApplication();
 			JRequest::setVar('format', 'html');
 			//$app->enqueueMessage('flexisystem: PDF generation is no longer supported, the HTML version is displayed instead');
 		}
 		
-		return;	
+		return;
 	}
 	
 	function onAfterRoute()
 	{
 		// ensure the PHP version is correct
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) return;
+		$fparams 	=& JComponentHelper::getParams('com_flexicontent');
+		
+		// Detect mobile devices, and set fc_use_mobile session flag
+		if ($fparams->get('detect_mobile')) $this->detectMobileClient($fparams);
 		
 		$app =& JFactory::getApplication();
 		$option = JRequest::getCMD('option');
@@ -236,11 +245,11 @@ class plgSystemFlexisystem extends JPlugin
 		$view		= JRequest::getCMD('view');
 		$db 		= & JFactory::getDBO();
 		
-		// Let's Redirect Joomla's article view & form to FLEXIcontent item view & form respectively !!
-		// NOTE: we do not redirect Joomla's category views (blog,list,featured for J2.5 etc),
+		// Let's Redirect/Reroute Joomla's article view & form to FLEXIcontent item view & form respectively !!
+		// NOTE: we do not redirect/reroute Joomla's category views (blog,list,featured for J2.5 etc),
 		//       thus site administrator can still utilize them
 		if ( $option == 'com_content' && (
-	      $view == 'article'       ||  // a. CASE :  com_content ARTICLE link that is redirected to its corresponding flexicontent link
+	      $view == 'article'       ||  // a. CASE :  com_content ARTICLE link that is redirected/rerouted to its corresponding flexicontent link
 	      $view == FLEXI_ITEMVIEW  ||  // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
 		    $view == 'form'              // c. CASE :  com_content link to article edit form (J2.5 only)
 				)
@@ -274,7 +283,7 @@ class plgSystemFlexisystem extends JPlugin
 	      // NOTE: we only need to set REQUEST variable that must be changed,
 	      //       but setting any other variables to same value will not hurt
 	      if (
-		      $view == 'article'   ||   // a. CASE :  com_content ARTICLE link that is redirected to its corresponding flexicontent link
+		      $view == 'article'   ||   // a. CASE :  com_content ARTICLE link that is rerouted to its corresponding flexicontent link
 		      $view == FLEXI_ITEMVIEW   // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
 		    ) {
 		      $newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
@@ -490,10 +499,229 @@ class plgSystemFlexisystem extends JPlugin
 	public function onAfterRender()
 	{
 		$db =& JFactory::getDBO();
-		$app = JFactory::getApplication();
+		$app      = & JFactory::getApplication();
+		$session 	= & JFactory::getSession();
 		
+		// If this is reached we now that the code for setting screen cookie has been added
+		if ( $session->get('screenSizeCookieToBeAdded', 0, 'flexicontent') ) {
+			$session->set('screenSizeCookieTried', 1, 'flexicontent');
+			$session->set('screenSizeCookieToBeAdded', 0, 'flexicontent');
+		}
+
 		// Only execute in administrator environment ?
 		//if ($app->getName() == 'site' ) return true;
+		
+		return true;
+	}
+	
+	
+	/**
+	 * Utility function to detect mobile browser and / or low resolution
+	 *
+	 * @param 	boolean 	$_is_lowres
+	 * @param 	boolean 	$_is_mobile
+	 * @param 	boolean 	$force_check_lowres
+	 * @return 	void
+	 * @since 1.5
+	 */
+	function detectMobileClient(& $fparams)
+	{
+
+		$app      = & JFactory::getApplication();
+		$session 	= & JFactory::getSession();
+		$fparams 	= & JComponentHelper::getParams('com_flexicontent');
+		
+		$debug_mobile = $fparams->get('debug_mobile');
+		
+		// Get session variables
+		$use_mobile = $session->get('fc_use_mobile', null, 'flexicontent');
+		$is_mobile  = $session->get('fc_is_mobile', null, 'flexicontent');
+		$is_lowres  = $session->get('fc_is_lowres', null, 'flexicontent');
+		
+		// Decide conditions to require
+		$mobile_conditions = $fparams->get('mobile_conditions');
+		if ( empty($mobile_conditions) )						$mobile_conditions = array();
+		else if ( ! is_array($mobile_conditions) )	$mobile_conditions = !FLEXI_J16GE ? array($mobile_conditions) : explode("|", $mobile_conditions);
+		
+		$require_mobile = in_array('mobile_browser', $mobile_conditions)  ||  (in_array('low_resolution', $mobile_conditions) && $fparams->get('check_lowres')==0);
+		$require_lowres = in_array('low_resolution', $mobile_conditions);
+		
+		// Screen resolution is known after second reload
+		if ( $is_lowres===null && isset($_COOKIE["fc_is_lowres"]) ) {
+			$is_lowres = $_COOKIE["fc_is_lowres"];
+			$session->set('fc_is_lowres', $is_lowres, 'flexicontent');
+			
+			// Set use mobile according to calculated data
+			$use_mobile = true;
+			if ($require_mobile) $use_mobile = $use_mobile && $is_mobile;
+			if ($require_lowres) $use_mobile = $use_mobile && $is_lowres;
+			$session->set('fc_use_mobile', $use_mobile, 'flexicontent');
+		}
+		
+		// Decide if detection is finished
+		if ( $use_mobile !== null && (!$require_mobile || $is_mobile!==null) && (!$require_lowres || $is_lowres!==null) ) {
+			if ($debug_mobile) {
+				$app->enqueueMessage( "FC DEBUG_MOBILE: (cached) use Mobile FLAG: ". (int)$use_mobile, 'message');
+				if ($require_mobile) $app->enqueueMessage( "FC DEBUG_MOBILE: (cached) Mobile BROWSER FLAG: ". (int)$is_mobile, 'message');
+				else $app->enqueueMessage( "FC DEBUG_MOBILE: (cached) Mobile BROWSER FLAG: not required" );
+				if ($require_lowres) $app->enqueueMessage( "FC DEBUG_MOBILE: (cached) Low resolution FLAG: ". $is_lowres, 'message');
+				else $app->enqueueMessage( "FC DEBUG_MOBILE: (cached) Low resolution FLAG: not required" );
+				if ($require_lowres && isset($_COOKIE["fc_screen_resolution"]))
+					$app->enqueueMessage( "FC DEBUG_MOBILE: (cached) Screen Resolution: ".$_COOKIE["fc_screen_resolution"], 'message');
+			}
+			return;
+		} else {
+			if ($debug_mobile) $app->enqueueMessage( "FC DEBUG_MOBILE: Trying to detect Browser/Screen Information", 'message');
+		}
+		
+		// Calculate "mobile browser" if needed
+		if ($require_mobile && $is_mobile === null)
+		{
+			$useragent = $_SERVER['HTTP_USER_AGENT'];
+			
+			// Detect mobile browser
+			$is_mobile =
+				preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',$useragent, $matches_a)
+				||
+				preg_match('/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',substr($useragent,0,4), $matches_b)
+			;
+			$session->set('fc_is_mobile', $is_mobile, 'flexicontent');
+			
+			if ($debug_mobile) {
+				if (!$is_mobile) {
+					$app->enqueueMessage( "FC DEBUG_MOBILE: Detected desktop browser", 'message');
+				} else {
+					$app->enqueueMessage( "FC DEBUG_MOBILE: Detected mobile browser: ".$matches_a[0]." - ".$matches_b[0], 'message');
+				}
+			}
+		}
+		
+		// Calculate "low screen resolution" if needed
+		if ($require_lowres && $is_lowres === null)
+		{
+			if ( isset($_COOKIE["fc_is_lowres"]) ) {
+				$is_lowres = $_COOKIE["fc_is_lowres"];
+				$session->set('fc_is_lowres', $is_lowres, 'flexicontent');
+				if ($debug_mobile) {
+					$msg = "FC DEBUG_MOBILE: Detected resolution: ".$_COOKIE["fc_screen_resolution"]. ", Low resolution FLAG: ". (int)$_COOKIE["fc_is_lowres"];
+					$app->enqueueMessage( $msg, 'message');
+				}
+			} else if ( $session->has('screenSizeCookieTried', 'flexicontent') ) {
+				$is_lowres = (boolean) $is_mobile;    // (failed to check) , permanently set to is_mobile FLAG, (we set session too, and thus avoid rechecking)
+				$session->set('fc_is_lowres', $is_lowres, 'flexicontent');
+				if ($debug_mobile) {
+					$app->enqueueMessage( "FC DEBUG_MOBILE: Detecting resolution failed, setting lowres to false", 'message');
+				}
+			} else {
+				// Add JS code to detect Screen Size if not within limits (this will be known to us on next reload)
+				if ($debug_mobile) {
+					$app->enqueueMessage( "FC DEBUG_MOBILE: Added JS code to detect and set resolution cookie", 'message');
+				}
+				$this->setScreenSizeCookie();
+				$session->set('screenSizeCookieToBeAdded', 1, 'flexicontent');
+				// (decided on next reload) , temporarily set to is_mobile FLAG, (we do not set session too, and thus we will recheck)
+				$is_lowres = (boolean) $is_mobile;
+			}
+		}
+		
+		// Set use mobile according to calculated or estimated data
+		$use_mobile = true;
+		if ($require_mobile) $use_mobile = $use_mobile && $is_mobile;
+		if ($require_lowres) $use_mobile = $use_mobile && $is_lowres;
+		$session->set('fc_use_mobile', $use_mobile, 'flexicontent');
+	}
+	
+	
+	/**
+	 * Utility function to add JS code for detect screen resolution and setting appropriate Browser Cookies
+	 *
+	 * @return 	void
+	 * @since 1.5
+	 */
+	function setScreenSizeCookie( $lowres_minwidth=0, $lowres_minheight=0 )
+	{
+		static $screenSizeCookieAdded = false;
+		if ($screenSizeCookieAdded) return;
+		
+		$fparams = & JComponentHelper::getParams('com_flexicontent');
+		$debug_mobile = $fparams->get('debug_mobile');
+		$lowres_minwidth  = $lowres_minwidth  ?  $lowres_minwidth  :  (int) $fparams->get('lowres_minwidth' , 800);
+		$lowres_minheight = $lowres_minheight ?  $lowres_minheight :  (int) $fparams->get('lowres_minheight', 480);
+		
+		$document = & JFactory::getDocument();
+		$js = ' 
+			function fc_getScreenWidth()
+			{
+				xWidth = null;
+				if(window.screen != null)
+					xWidth = window.screen.availWidth;
+		 
+				if(window.innerWidth != null)
+					xWidth = window.innerWidth;
+		 
+				if(document.body != null)
+					xWidth = document.body.clientWidth;
+		 
+				return xWidth;
+			}
+			function fc_getScreenHeight() {
+				xHeight = null;
+				if(window.screen != null)
+					xHeight = window.screen.availHeight;
+			 
+				if(window.innerHeight != null)
+					xHeight =   window.innerHeight;
+			 
+				if(document.body != null)
+					xHeight = document.body.clientHeight;
+			 
+				return xHeight;
+			}
+			
+			function fc_setCookie(cookieName, cookieValue, nDays) {
+				var today = new Date();
+				var expire = new Date();
+				var path = "'.JURI::base(true).'";
+				if (nDays==null || nDays<0) nDays=0;
+				if (nDays) {
+					expire.setTime(today.getTime() + 3600000*24*nDays);
+					document.cookie = cookieName+"="+escape(cookieValue) + ";path=" + path + ";expires="+expire.toGMTString();
+				} else {
+					document.cookie = cookieName+"="+escape(cookieValue) + ";path=" + path;
+				}
+				//alert(cookieName+"="+escape(cookieValue) + ";path=" + path);
+			}
+			
+			fc_screen_width  = fc_getScreenWidth();
+			fc_screen_height = fc_getScreenHeight();
+			var fc_screen_resolution = "" + fc_screen_width + "x" + fc_screen_height;
+			fc_setCookie("fc_screen_resolution", fc_screen_resolution, 0);
+			
+			// Set the screen resolution cookie and low resolution flag
+			if (fc_screen_width<'.$lowres_minwidth.' || fc_screen_height<'.$lowres_minheight.') {
+				fc_setCookie("fc_is_lowres", 1, 0);
+				' . /*($debug_mobile ? 'alert("detected low res: " + fc_screen_resolution + " this info will be used on next load");' : '') .*/ '
+				' . /*'window.location="'.$_SERVER["REQUEST_URI"].'"; ' .*/ '
+			} else {
+				fc_setCookie("fc_is_lowres", 0, 0);
+				' . /*($debug_mobile ? 'alert("detected normal res: " + fc_screen_resolution + " this info will be used on next load");' : '') .*/ '
+			}
+		';
+		$document->addScriptDeclaration($js);
+		$screenSizeCookieAdded = true;
+	}
+	
+	
+	/**
+	 * Utility function to check DB table records when some conditions (e.g. time) are applicable
+	 *
+	 * @return 	void
+	 * @since 1.5
+	 */
+	function checkinRecords() {
+		
+		$db =& JFactory::getDBO();
+		$app = JFactory::getApplication();
 		
 		$limit_checkout_hours   = $this->params->get('limit_checkout_hours', 1);
 		$checkin_on_session_end = $this->params->get('checkin_on_session_end', 1);
@@ -573,9 +801,8 @@ class plgSystemFlexisystem extends JPlugin
 				$db->query();
 			}
 		}
-		
-		return true;
 	}
+	
 	
 	
 	// ***********************

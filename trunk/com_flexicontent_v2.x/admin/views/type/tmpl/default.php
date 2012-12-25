@@ -80,6 +80,7 @@ defined('_JEXEC') or die('Restricted access');
 				foreach ($this->form->getFieldset('themes') as $field) :
 					if ($field->hidden) echo $field->input;
 					else echo $field->label . $field->input;
+					?><div class="clear"></div><?php
 				endforeach;
 				
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));

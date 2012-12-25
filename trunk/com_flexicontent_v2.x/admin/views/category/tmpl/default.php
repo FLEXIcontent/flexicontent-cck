@@ -207,18 +207,23 @@ dump($this->row);
 				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
 				?>
 				
+				<div class="fc_fieldset">
 				<?php foreach($this->form->getGroup('templates') as $field): ?>
 					<?php if ($field->hidden): ?>
 						<?php echo $field->input; ?>
 					<?php else: ?>
 						<?php 
 							echo $field->label;
-							$field->set('input', null);
-							$field->set('value', @$this->row->params[$field->fieldname]);
+							if (method_exists ( $field , 'set' )) {
+								$field->set('input', null);
+								$field->set('value', @$this->row->params[$field->fieldname]);
+							}
 							echo $field->input;
 						?>
 					<?php endif; ?>
+					<div class="clear"></div>
 				<?php endforeach; ?>
+				</div>
 				
 				<?php
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));

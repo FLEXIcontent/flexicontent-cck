@@ -40,8 +40,16 @@ class JFormFieldItemlayout extends JFormFieldList
 	 */
 	protected $type = 'Itemlayout';
 
-	protected function getOptions()
+	protected function getInput()
 	{
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+		
 		$themes	= flexicontent_tmpl::getTemplates();
 		$tmpls_all	= $themes->items ? $themes->items : array();
 		$value = FLEXI_J16GE ? $this->value : $value;
@@ -50,11 +58,13 @@ class JFormFieldItemlayout extends JFormFieldList
 		$controller	= JRequest::getVar('controller');
 		$app = &JFactory::getApplication();
 		$db =& JFactory::getDBO();
+		$cparams = & JComponentHelper::getParams('com_flexicontent');
 		
 		// GET LIMITING to specific templates according to item's type, or according to type of new item
 		$allowed_tmpls = array();
 		$all_tmpl_allowed = true;
 		$type_default_layout = '';
+		$type_default_layout_mobile = '';
 		if ( $view==FLEXI_ITEMVIEW || ($app->isAdmin() && 'items'==$controller) )
 		{
 			// Get item id
@@ -85,12 +95,15 @@ class JFormFieldItemlayout extends JFormFieldList
 			// Finally get allowed templates
 			if ($typedata) {
 				$tparams = new JParameter($typedata->attribs);
-				$type_default_layout = $tparams->get('ilayout');
+				$type_default_layout = $tparams->get('ilayout', 'default');
+				$type_default_layout_mobile = $tparams->get('ilayout_mobile', JText::_('FLEXI_USE_NORMAL'));
 				$allowed_tmpls = $tparams->get('allowed_ilayouts');
 				if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
 				else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
 				$all_tmpl_allowed = count($allowed_tmpls) == 0;
 				if ( !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
+				if ($cparams->get('detect_mobile') && $type_default_layout_mobile)
+					if ( !in_array( $type_default_layout_mobile, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout_mobile;
 				//echo "Allowed Templates: "; print_r($allowed_tmpls); echo "<br>\n";
 			}
 		}
@@ -105,6 +118,12 @@ class JFormFieldItemlayout extends JFormFieldList
 		}
 		$lays = implode("','", $lays);
 		
+		if ( @$attributes['enableparam'] ) {
+			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+			if ( !$cparams->get($attributes['enableparam']) ) return FLEXI_J16GE ? '' : JText::_('FLEXI_DISABLED');
+		}
+		
+if ( ! @$attributes['skipparams'] ) {
 		$doc 	= & JFactory::getDocument();
 		$js 	= "
 var tmpl = ['".$lays."'];	
@@ -162,16 +181,62 @@ window.addEvent('domready', function() {
 });
 ";
 		$doc->addScriptDeclaration($js);
+}
 		
 		$layouts = array();
 		if ($view != 'type') {
-			$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_TYPE_DEFAULT' ) .' :: '. $type_default_layout .' ::' );
+			$type_layout = ($attributes['name'] == 'ilayout_mobile') ? $type_default_layout_mobile : $type_default_layout;
+			$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_TYPE_DEFAULT' ) .' :: '. $type_layout .' ::' );
+		}
+		else if (  @$attributes['firstoption'] ) {
+			$layouts[] = JHTMLSelect::option('', JText::_( $attributes['firstoption'] ));
 		}
 		foreach ($tmpls as $tmpl) {
 			$layouts[] = JHTMLSelect::option( $tmpl->name, ':: ' . $tmpl->name . ' ::');
 		}
 		
-		return $layouts;
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		
+		$attribs = !FLEXI_J16GE ? ' style="float:left;" ' : '';
+		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
+			$attribs .= ' multiple="true" ';
+			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
+			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
+		} else {
+			$attribs .= 'class="inputbox"';
+		}
+		if ( ! @$attributes['skipparams'] )
+		{
+			$attribs .= ' onchange="activatePanel(this.value);"';
+		}
+		
+		return JHTML::_('select.genericlist', $layouts, $fieldname, $attribs, 'value', 'text', $value, $element_id);
+	}
+	
+	
+	function getLabel()
+	{
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+		
+		if ( @$attributes['enableparam'] ) {
+			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+			if ( !$cparams->get($attributes['enableparam']) ) return '';
+		}
+		
+		$label = $this->element['label'];
+		$class = "hasTip"; $title = "";
+		if ($this->element['description']) {
+			$class = "hasTip";
+			$title = JText::_($label)."::".JText::_($this->element['description']);
+		}
+		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.JText::_($label).'</label> &nbsp; ';
 	}
 }
 ?>

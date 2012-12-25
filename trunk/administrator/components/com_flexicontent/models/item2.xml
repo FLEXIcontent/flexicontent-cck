@@ -73,13 +73,15 @@
 	</params>
 	
 	<params group="metadata">
-		<!--param name="description" type="textarea" rows="5" cols="19" default="" label="FLEXI_Description" description="FLEXI_METADESC" /-->
-		<!--param name="keywords" type="textarea" rows="5" cols="19" default="" label="FLEXI_Keywords" description="FLEXI_METAKEYS" /-->
+		<!--param name="description" type="textarea" rows="5" cols="27" default="" label="FLEXI_Description" description="FLEXI_METADESC" /-->
+		<!--param name="keywords" type="textarea" rows="5" cols="27" default="" label="FLEXI_Keywords" description="FLEXI_METAKEYS" /-->
 		<param name="robots" type="text" size="34" default="" label="FLEXI_Robots" description="FLEXI_METAROBOTS" />
 		<param name="author" type="text" size="34" default="" label="FLEXI_Author" description="FLEXI_METAAUTHOR" />
 	</params>
 	
 	<params group="themes">
+		<param name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 		<param name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" />
 	</params>
+	
 </form>

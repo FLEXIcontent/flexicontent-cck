@@ -38,6 +38,7 @@ class FlexicontentViewType extends JViewLegacy {
 
 		//initialise variables
 		$document	= & JFactory::getDocument();
+		$cparams    = & JComponentHelper::getParams('com_flexicontent');
 		$user 		= & JFactory::getUser();
 		if (!FLEXI_J16GE)
 			$pane 		= & JPane::getInstance('sliders');
@@ -89,6 +90,14 @@ class FlexicontentViewType extends JViewLegacy {
 			//create the parameter form
 			$form = new JParameter($row->attribs, JPATH_COMPONENT.DS.'models'.DS.'type.xml');
 			//$form->loadINI($row->attribs);
+			
+			//echo "<pre>"; print_r($form->_xml['themes']->_children[0]);  echo "<pre>"; print_r($form->_xml['themes']->param[0]); exit;
+			foreach($form->_xml['themes']->_children as $i => $child) {
+				if ( isset($child->_attributes['enableparam']) && !$cparams->get($child->_attributes['enableparam']) ) {
+					unset($form->_xml['themes']->_children[$i]);
+					unset($form->_xml['themes']->param[$i]);
+				}
+			}
 		}
 		
 		// Apply Template Parameters values into the form fields structures 

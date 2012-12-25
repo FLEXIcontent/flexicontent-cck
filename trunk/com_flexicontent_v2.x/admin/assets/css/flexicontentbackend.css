@@ -686,10 +686,12 @@ div label.lang_box {
 	border-width:0px;
 }
 
-#flexicontent ul.tabbernav li.tabberactive a, #flexicontent ul.tabbernav li.tabberactive a:hover {
-	background-color: darkred;
-	color: white;
-	border-bottom: 1px solid darkred;
+#flexicontent ul.tabbernav li.tabberactive a,
+#flexicontent ul.tabbernav li.tabberactive a:hover
+{
+	color: black;
+	background-color: white !important;
+	border-bottom: 1px solid white;
 }
 
 #flexicontent ul.tabbernav {
@@ -916,7 +918,7 @@ div fieldset.panelform {
 	border-bottom:1px solid black;
 }
 
-div fieldset.panelform label.hasTip, #jform_attribs_ilayout-lbl {
+div fieldset.panelform label.hasTip, #jform_attribs_ilayout-lbl, .fc_fieldset label.hasTip {
 	clear: both;
 	padding: 3px 3px 3px 3px;
 	margin:3px 0px 0px 0px;
@@ -928,6 +930,7 @@ div fieldset.panelform label.hasTip, #jform_attribs_ilayout-lbl {
 	text-align: right;
 	width: 132px;
 	overflow:hidden;
+	display: inline-block;
 }
 
 div fieldset label {

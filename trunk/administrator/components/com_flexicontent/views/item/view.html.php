@@ -419,7 +419,7 @@ class FlexicontentViewItem extends JViewLegacy
 			} else {
 				$formparams = new JParameter('', JPATH_COMPONENT.DS.'models'.DS.'item.xml');
 			}
-
+			
 			// Details Group
 			$active = (intval($row->created_by) ? intval($row->created_by) : $user->get('id'));
 			if (!FLEXI_ACCESS) {
@@ -437,7 +437,15 @@ class FlexicontentViewItem extends JViewLegacy
 
 			// Advanced Group
 			$formparams->loadINI($row->attribs);
-
+			
+			//echo "<pre>"; print_r($formparams->_xml['themes']->_children[0]);  echo "<pre>"; print_r($formparams->_xml['themes']->param[0]); exit;
+			foreach($formparams->_xml['themes']->_children as $i => $child) {
+				if ( isset($child->_attributes['enableparam']) && !$cparams->get($child->_attributes['enableparam']) ) {
+					unset($formparams->_xml['themes']->_children[$i]);
+					unset($formparams->_xml['themes']->param[$i]);
+				}
+			}
+			
 			// Metadata Group
 			$formparams->set('description', $row->metadesc);
 			$formparams->set('keywords', $row->metakey);
