@@ -85,6 +85,8 @@
 	</params>
 	
 	<params group="themes">
+		<param name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 		<param name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" />
 	</params>
+	
 </form>

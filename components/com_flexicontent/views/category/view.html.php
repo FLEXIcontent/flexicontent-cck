@@ -100,7 +100,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ************************
 		
 		// (a) Decide to use mobile or normal category template layout
-		$use_mobile = $session->get('fc_use_mobile', false, 'flexicontent');
+		$use_mobile = $params->get('detect_mobile') && $session->get('fc_use_mobile', false, 'flexicontent');
 		$_clayout = $use_mobile ? 'clayout_mobile' : 'clayout';
 		
 		// (b) Get from category parameters, allowing URL override

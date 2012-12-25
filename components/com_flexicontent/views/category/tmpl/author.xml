@@ -371,10 +371,10 @@
 			<param name="feed_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<param name="feed_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
-			
+		
 		<param name="" type="jparamstab" description="FLEXI_PARAMETERS_LAYOUT_THEMES_OVERRIDE" />
-			
-			<param name="clayout" type="categorylayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" skipparams="1" />
+			<param name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
+			<param name="clayout" type="categorylayout" skipparams="1" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
 			<param name="" type="separator" default="Template parameters ..." description="Please note you cannot set template parameters here. &lt;br&gt;&lt;br&gt; Template parameters for the choosen template will be retrieved from the author configuration. &lt;br&gt;&lt;br&gt;For fields shown, please add your fields in layout positions in template configuration management tab" level="level2"/>
 		</params>
 		

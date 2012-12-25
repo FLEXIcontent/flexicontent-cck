@@ -25,6 +25,9 @@ if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
 	ini_set('display_errors',1);
 }
 
+// Logging Info variables
+$start_microtime = microtime(true);
+
 //include constants file
 require_once (JPATH_COMPONENT.DS.'defineconstants.php');
 //include the needed classes and helpers
@@ -50,6 +53,9 @@ JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
 // load english language file for 'com_flexicontent' component then override with current language file
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+
+// Get component parameters
+$cparams =& JComponentHelper::getParams('com_flexicontent');
 
 if(!function_exists('FLEXISubmenu')) {
 	function FLEXISubmenu($cando)
@@ -139,6 +145,13 @@ if (FLEXI_J16GE) {
 
 // Perform the Request task
 $controller->execute( JRequest::getCmd('task') );
+
+if ( $cparams->get('print_logging_info') ) {
+	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+	$app = & JFactory::getApplication();
+	$msg = sprintf( 'FLEXIcontent page creation is %.2f secs', $elapsed_microseconds/1000000);
+	$app->enqueueMessage( $msg, 'notice' );
+}
 
 // Redirect if set by the controller
 $controller->redirect();

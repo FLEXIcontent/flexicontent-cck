@@ -866,6 +866,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		foreach ($this->form->getFieldset('themes') as $field) :
 			if ($field->hidden) echo $field->input;
 			else echo $field->label . $field->input;
+			?><div class="clear"></div><?php
 		endforeach;
 		
 	?>

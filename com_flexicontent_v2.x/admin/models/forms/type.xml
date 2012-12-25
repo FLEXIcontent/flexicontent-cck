@@ -308,15 +308,15 @@
 		</fieldset>		
 		
 		<fieldset name="items_manager" label="FLEXI_ITEMS_MANAGER_CONF">
-		
 			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC"  />
 			
 		</fieldset>
+		
 		<fieldset name="themes" label="FLEXI_PARAMETERS_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
-			
+			<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 			<field name="ilayout" type="itemlayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" onchange="activatePanel(this.value);" />
-			
 		</fieldset>
+		
 	</fields>
 	
 	<fields name="metadata">

@@ -193,7 +193,7 @@ class plgSearchFlexisearch extends JPlugin
 				if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'a.title LIKE '.$text;}
 				if (in_array('FlexisearchDesc', $searchAreas))		{$wheres2[]	= 'a.introtext LIKE '.$text;	$wheres2[]	= 'a.fulltext LIKE '.$text;}
 				if (in_array('FlexisearchMeta', $searchAreas))		{$wheres2[]	= 'a.metakey LIKE '.$text;		$wheres2[]	= 'a.metadesc LIKE '.$text;}
-				if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type='text' AND f.issearch=1 AND fir.value LIKE ".$text;}
+				if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type IN ('text','textselect') AND f.issearch=1 AND fir.value LIKE ".$text;}
 				if (in_array('FlexisearchTags', $searchAreas))		{$wheres2[]	= 't.name LIKE '.$text;}
 				if (count($wheres2)) $where		= '(' . implode(') OR (', $wheres2) . ')';
 				break;
@@ -208,7 +208,7 @@ class plgSearchFlexisearch extends JPlugin
 					if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'a.title LIKE '.$word;}
 					if (in_array('FlexisearchDesc', $searchAreas))		{$wheres2[]	= 'a.introtext LIKE '.$word;	$wheres2[]	= 'a.fulltext LIKE '.$word;}
 					if (in_array('FlexisearchMeta', $searchAreas))		{$wheres2[]	= 'a.metakey LIKE '.$word;		$wheres2[]	= 'a.metadesc LIKE '.$word;}
-					if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type='text' AND f.issearch=1 AND fir.value LIKE ".$word;}
+					if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type IN ('text','textselect') AND f.issearch=1 AND fir.value LIKE ".$word;}
 					if (in_array('FlexisearchTags', $searchAreas))		{$wheres2[]	= 't.name LIKE '.$word;}
 					if (count($wheres2)) $wheres[]	= '(' . implode(') OR (', $wheres2) . ')';
 				}

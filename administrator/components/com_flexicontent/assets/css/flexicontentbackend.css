@@ -686,10 +686,12 @@ div label.lang_box {
 	border-width:0px;
 }
 
-#flexicontent ul.tabbernav li.tabberactive a, #flexicontent ul.tabbernav li.tabberactive a:hover {
-	background-color: darkred;
-	color: white;
-	border-bottom: 1px solid darkred;
+#flexicontent ul.tabbernav li.tabberactive a,
+#flexicontent ul.tabbernav li.tabberactive a:hover
+{
+	color: black;
+	background-color: white !important;
+	border-bottom: 1px solid white;
 }
 
 #flexicontent ul.tabbernav {

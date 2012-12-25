@@ -981,6 +981,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			foreach ($this->form->getFieldset('themes') as $field) :
 				if ($field->hidden) echo $field->input;
 				else echo $field->label . $field->input;
+				?><div class="clear"></div><?php
 			endforeach;
 		?>
 		

@@ -222,6 +222,14 @@ class FlexicontentViewCategory extends JViewLegacy
 			// Create the form
 			$form = new JParameter($row->params, JPATH_COMPONENT.DS.'models'.DS.'category.xml');
 			//$form->loadINI($row->attribs);
+			
+			//echo "<pre>"; print_r($form->_xml['templates']->_children[0]);  echo "<pre>"; print_r($form->_xml['templates']->param[0]); exit;
+			foreach($form->_xml['templates']->_children as $i => $child) {
+				if ( isset($child->_attributes['enableparam']) && !$cparams->get($child->_attributes['enableparam']) ) {
+					unset($form->_xml['templates']->_children[$i]);
+					unset($form->_xml['templates']->param[$i]);
+				}
+			}
 		}
 		
 		

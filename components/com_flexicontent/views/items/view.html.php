@@ -55,6 +55,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// Initialize variables
 		$mainframe  = &JFactory::getApplication();
+		$session    = & JFactory::getSession();
 		$dispatcher = & JDispatcher::getInstance();
 		$document   = & JFactory::getDocument();
 		$user       = & JFactory::getUser();
@@ -111,30 +112,34 @@ class FlexicontentViewItems extends JViewLegacy
 		// ITEM LAYOUT handling
 		// ********************
 		
-		// (a) Get from item parameters, allowing URL override
-		$ilayout = JRequest::getVar('ilayout', false);
-		$ilayout = $ilayout ? $ilayout : $params->get('ilayout', 'default');
+		// (a) Decide to use mobile or normal item template layout
+		$use_mobile = $params->get('detect_mobile') && $session->get('fc_use_mobile', false, 'flexicontent');
+		$_ilayout = $use_mobile ? 'ilayout_mobile' : 'ilayout';
 		
-		// (b) Create the type parameters
+		// (b) Get from item parameters, allowing URL override
+		$ilayout = JRequest::getVar($_ilayout, false);
+		$ilayout = $ilayout ? $ilayout : $params->get($_ilayout, 'default');
+		
+		// (c) Create the type parameters
 		$tparams = & $this->get( 'Typeparams' );
 		$tparams = new JParameter($tparams);
 		
-		// (c) Verify the layout is within templates, Content Type default template OR Content Type allowed templates
+		// (d) Verify the layout is within templates, Content Type default template OR Content Type allowed templates
 		$allowed_tmpls = $tparams->get('allowed_ilayouts');
 		$type_default_layout = $tparams->get('ilayout', 'default');
 		if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
 		else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
 		
-		// (d) Verify the item layout is within templates: Content Type default template OR Content Type allowed templates
+		// (e) Verify the item layout is within templates: Content Type default template OR Content Type allowed templates
 		if ( $ilayout!=$type_default_layout && count($allowed_tmpls) && !in_array($ilayout,$allowed_tmpls) ) {
 			$mainframe->enqueueMessage("<small>Current Item Layout Template is '$ilayout':<br>- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Content Type Default Template Layout: '$type_default_layout'</small>", 'notice');
 			$ilayout = $type_default_layout;
 		}
 		
-		// (e) Get cached template data
+		// (f) Get cached template data
 		$themes = flexicontent_tmpl::getTemplates( $lang_files = array($ilayout) );
 		
-		// (f) Verify the item layout exists
+		// (g) Verify the item layout exists
 		if ( !isset($themes->items->{$ilayout}) ) {
 			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : 'default';
 			$mainframe->enqueueMessage("<small>Current Item Layout Template is '$ilayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_ilayout'</small>", 'notice');
@@ -142,7 +147,7 @@ class FlexicontentViewItems extends JViewLegacy
 			if (FLEXI_FISH || FLEXI_J16GE) FLEXIUtilities::loadTemplateLanguageFile( $ilayout ); // Manually load Template-Specific language file of back fall ilayout
 		}
 		
-		// (g) finally set the template name back into the item's parameters
+		// (h) finally set the template name back into the item's parameters
 		$params->set('ilayout', $ilayout);		
 		
 		// Bind Fields
@@ -425,6 +430,7 @@ class FlexicontentViewItems extends JViewLegacy
 
 		// Initialize variables
 		$mainframe	= & JFactory::getApplication();
+		$cparams    = & JComponentHelper::getParams('com_flexicontent');
 		$dispatcher	= & JDispatcher::getInstance();
 		$document		= & JFactory::getDocument();
 		$user				= & JFactory::getUser();
@@ -735,7 +741,15 @@ class FlexicontentViewItems extends JViewLegacy
 			// Set:  Attributes (parameters) Group, (these are retrieved from the item table column 'attribs')
 			// (also contains templates parameters, but we will use these individual for every template ... see below)
 			$formparams->loadINI($item->attribs);
-	
+			
+			//echo "<pre>"; print_r($formparams->_xml['themes']->_children[0]);  echo "<pre>"; print_r($formparams->_xml['themes']->param[0]); exit;
+			foreach($formparams->_xml['themes']->_children as $i => $child) {
+				if ( isset($child->_attributes['enableparam']) && !$cparams->get($child->_attributes['enableparam']) ) {
+					unset($formparams->_xml['themes']->_children[$i]);
+					unset($formparams->_xml['themes']->param[$i]);
+				}
+			}
+			
 			// Set: Metadata (parameters) Group
 			// NOTE: (2 params from 2 item table columns, and then multiple params from item table column 'metadata')
 			$formparams->set('description', $item->metadesc);
