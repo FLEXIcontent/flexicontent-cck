@@ -2044,6 +2044,14 @@ class ParentClassItem extends JModelLegacy
 					$postdata[$field->name] = !FLEXI_J16GE  ?   @$data[$field->name]  :  @$data['custom'][$field->name];
 				}
 				
+				// Unserialize value , e.g. if current values used are from DB or and imported CSV file
+				$postdata[$field->name] = !is_array($postdata[$field->name]) ? array($postdata[$field->name]) : $postdata[$field->name];
+				foreach ($postdata[$field->name] as $i => $postdata_val) {
+					if ( @unserialize($postdata_val)!== false || $postdata_val === 'b:0;' ) {
+						$postdata[$field->name][$i] = unserialize($postdata_val);
+					}
+				}
+				
 				// Trigger plugin Event 'onBeforeSaveField'
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
 				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item ));
