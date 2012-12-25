@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1294 2012-05-11 16:49:37Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1601 2012-12-14 03:34:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -761,6 +761,101 @@ class FlexicontentFields
 	}
 	
 	
+	
+	function _getTypeToCoreFieldParams ($type_id, & $tinfo, & $tparams) {
+		
+		static $core_field_names = null;
+		if ( $core_field_names == null ) {
+			$query = "SELECT field_type FROM #__flexicontent_fields WHERE iscore=1";
+			//echo $query;
+			$db =& JFactory::getDBO();
+			$db->setQuery($query);
+			$core_field_names = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			
+			$core_field_names[] = 'maintext';
+			$core_field_names = array_flip($core_field_names);
+			unset($core_field_names['text']);
+		}
+		
+		$query = 'SELECT t.attribs, t.name, t.alias FROM #__flexicontent_types AS t WHERE t.id = ' . $type_id;
+		$db =& JFactory::getDBO();
+		$db->setQuery($query);
+		$typedata = $db->loadObject();
+		if ( $typedata ) {
+			$tinfo['typename']  = $typedata->name;
+			$tinfo['typealias'] = $typedata->alias;
+			$tparams = new JParameter($typedata->attribs);
+			
+			$_tparams = $tparams->toArray();
+			$tinfo['params'] = array();
+			
+			// Extra voting parameters of --voting-- field parameters are overriden contiditionally
+			if ( $tparams->get('voting_override_extra_votes', 0) ) {
+				$tinfo['params']['voting']['voting_extra_votes'] = $tparams->get('voting_extra_votes', '');
+				$main_label = $tparams->get('voting_main_label', '') ? $tparams->get('voting_main_label', '') : JText::_('FLEXI_OVERALL');  // Set default label in case of empty
+				$tinfo['params']['voting']['main_label'] = $main_label;
+			}
+			
+			foreach ($_tparams as $param_name => $param_value) {
+				$res = preg_split('/_/', $param_name, 2);
+				if ( count($res) < 2 ) continue;
+				
+				$o_field_type = $res[0];  $o_param_name = $res[1];
+				if ( !isset($core_field_names[$o_field_type]) ) continue;
+				
+				//echo "$o_field_type _ $o_param_name = $param_value <br>\n";
+				$skipparam = false;
+				
+				if ( strlen($param_value) ) {
+					if ($o_field_type=='maintext' && $o_param_name=='hide_html') {
+						$tinfo['params'][$o_field_type]['use_html'] = !$param_value;
+					} else if ($o_field_type=='voting') {
+						$skipparam = in_array($o_param_name, array('override_extra_votes','voting_extra_votes','voting_main_label'));
+					} else if ( in_array($o_param_name, array('label','desc','viewdesc')) ) {
+						$skipparam = true;
+					}
+					if (!$skipparam) {
+						$tinfo['params'][$o_field_type][$o_param_name] = $param_value;
+						//echo "$o_field_type _ $o_param_name = $param_value <br>\n";
+					}
+				}
+			}
+			//echo "<pre>"; print_r($tinfo['params']); echo "</pre>";
+		}
+	}
+	
+	
+	function _getLangSpecificValue ($type_id, $type_prop_value, $prop_name, & $fdata)
+	{
+		//--. Get a 2 character language tag
+		static $lang = null;
+		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
+		$urlLang  = JRequest::getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
+		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
+		
+		// --. SET a type specific label for the current field
+		// a. Try field label to get for current language
+		$result = preg_match("/(\[$lang\])=([^[]+)/i", $type_prop_value, $matches);
+		if ($result) {
+			$fdata->{$prop_name} = $matches[2];
+		} else if ($type_prop_value) {
+			// b. Try to get default for all languages
+			$result = preg_match("/(\[default\])=([^[]+)/i", $type_prop_value, $matches);
+			if ($result) {
+				$fdata->{$prop_name} = $matches[2];
+			} else {
+				// c. Check that no languages specific string are defined
+				$result = preg_match("/(\[??\])=([^[]+)/i", $type_prop_value, $matches);
+				if (!$result) {
+					$fdata->{$prop_name} = $type_prop_value;
+				}
+			}
+		} else {
+			// d. Maintain field 's default label
+		}
+	}
+	
+	
 	/**
 	 * Method to create field parameters in an optimized way, and also apply Type Customization for CORE fields
 	 *
@@ -769,171 +864,96 @@ class FlexicontentFields
 	 * @since	1.5
 	 */
 	function loadFieldConfig(&$field, &$item, $name='', $field_type='', $label='', $desc='', $iscore=1) {
+		$db =& JFactory::getDBO();
 		static $tparams = array();
 		static $tinfo   = array();
 		static $fdata   = array();
-		static $lang = null;
 		static $no_typeparams = null;
 		if ($no_typeparams) $no_typeparams = new JParameter("");
 		static $is_form;
 		$is_form = JRequest::getVar('edit')=='edit' && JRequest::getVar('option')=='com_flexicontent';
 		
-		//--. Create basic field data if no field given
+		// Create basic field data if no field given
 		if (!empty($name)) {
-			$field->iscore = $iscore;
-			$field->name = $name;
-			$field->field_type = $field_type;
-			$field->label = $label; 
-			$field->description = $desc;
-			$field->attribs = '';
+			$field->iscore = $iscore;  $field->name = $name;  $field->field_type = $field_type;  $field->label = $label;  $field->description = $desc;  $field->attribs = '';
 		}
 		
-		//--. Get a 2 character language tag
-		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
-		$urlLang  = JRequest::getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
-		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
-		
-		//--. Get Content Type parameters if not already retrieved
+		// Get Content Type parameters if not already retrieved
 		$type_id = @$item->type_id;
 		if ($type_id && ( !isset($tinfo[$type_id]) || !isset($tparams[$type_id]) ) )
 		{
-			$query = 'SELECT t.attribs, t.name, t.alias FROM #__flexicontent_types AS t WHERE t.id = ' . $type_id;
-			$db =& JFactory::getDBO();
-			$db->setQuery($query);
-			$typedata = $db->loadObject();
-			if ( $typedata ) {
-				$tinfo[$type_id]['typename']  = $typedata->name;
-				$tinfo[$type_id]['typealias'] = $typedata->alias;
-				$tparams[$type_id] = new JParameter($typedata->attribs);
-			}
+			$tinfo[$type_id] = $tparams[$type_id] = null;
+			FlexicontentFields::_getTypeToCoreFieldParams ($type_id, $tinfo[$type_id], $tparams[$type_id]);
 		}
 		
-		//--. Set Content Type parameters otherwise set empty defaults (e.g. new item form with not typeid set)
-		if ( $type_id && isset($tinfo[$type_id]) && isset($tparams[$type_id]) )
-		{
-			$typename   = $tinfo[$type_id]['typename'];
-			$typealias  = $tinfo[$type_id]['typealias'];
-			$typeparams = & $tparams[$type_id];
-			$tindex = $typename.'_'.$typealias;
-		} else {
-			$typename   = '';
-			$typealias  = '';
-			$typeparams = & $no_typeparams;
-			$tindex = 'no_type';
-		}
+		// Set Content Type parameters otherwise set empty defaults (e.g. new item form with not typeid set)
+		$type_data_exist = $type_id && $tinfo[$type_id] && $tparams[$type_id] ;
 		
-		//--. Extract any Custom LABELs and DESCRIPTIONs from Content Type parameters
-		if ($type_id && $field->iscore && !isset($fdata[$tindex][$field->name]))
-		{
-			// CORE field, create parameters once per field - Content Type pair
-			$fdata[$tindex][$field->name] = new stdClass();
-			$pn_prefix = $field->field_type!='maintext' ? $field->name : $field->field_type;
+		$typename   = $type_data_exist  ?  $tinfo[$type_id]['typename']    :  '';
+		$typealias  = $type_data_exist  ?  $tinfo[$type_id]['typealias']   :  '';
+		$tindex     = $type_data_exist  ?  $typename.'_'.$typealias        :  'no_type';
+		if ($type_data_exist)  $typeparams = & $tparams[$type_id];  else  $typeparams = & $no_typeparams;
+		
+
+		// Create the (CREATED ONCE per field) SHARED object that will contain: (a) label, (b) description, (c) all (merged) field parameters
+		// Create parameters once per custom field OR once per pair of:  Core FIELD type - Item CONTENT type
+		if ( !isset($fdata[$tindex][$field->name]) ) {
 			
-			// --. SET a type specific label for the current field
-			// a. Try field label to get for current language
-			$field_label_type = $tparams[$type_id]->get($pn_prefix.'_label', '');
-			$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_label_type, $matches);
-			if ($result) {
-				$fdata[$tindex][$field->name]->label = $matches[2];
-			} else if ($field_label_type) {
-				// b. Try to get default for all languages
-				$result = preg_match("/(\[default\])=([^[]+)/i", $field_label_type, $matches);
-				if ($result) {
-					$fdata[$tindex][$field->name]->label = $matches[2];
-				} else {
-					// c. Check that no languages specific string are defined
-					$result = preg_match("/(\[??\])=([^[]+)/i", $field_label_type, $matches);
-					if (!$result) {
-						$fdata[$tindex][$field->name]->label = $field_label_type;
-					}
-				}
-			} else {
-				// d. Maintain field 's default label
-			}
-			
-			// --. SET a type specific description for the current field
-			// a. Try field description to get for current language
-			$field_desc_type = $tparams[$type_id]->get($pn_prefix.($is_form ? '_desc' : '_viewdesc'), '');
-			$result = preg_match("/(\[$lang\])=([^[]+)/i", $field_desc_type, $matches);
-			if ($result) {
-				$fdata[$tindex][$field->name]->description = $matches[2];
-			} else if ($field_label_type) {
-				// b. Try to get default for all languages
-				$result = preg_match("/(\[default\])=([^[]+)/i", $field_desc_type, $matches);
-				if ($result) {
-					$fdata[$tindex][$field->name]->description = $matches[2];
-				} else {
-					// c. Check that no languages specific string are defined
-					$result = preg_match("/(\[??\])=([^[]+)/i", $field_desc_type, $matches);
-					if (!$result) {
-						$fdata[$tindex][$field->name]->description = $field_desc_type;
-					}
-				}
-			} else {
-				// d. Maintain field 's default description
-			}
-			
-			//--. Create type specific parameters for the CORE field that we will be used by all subsequent calls to retrieve parameters
-			$fdata[$tindex][$field->name]->parameters = new JParameter($field->attribs);
-			
-			//--. In future we may automate this?, although this is faster
-			if ($field->field_type == 'voting') {
-				$voting_override_extra_votes = $tparams[$type_id]->get('voting_override_extra_votes', '');
-				$voting_extra_votes          = $tparams[$type_id]->get('voting_extra_votes', '');
-				$voting_main_label           = $tparams[$type_id]->get('voting_main_label', '');
+			if ( !$field->iscore || !$type_id ) {
 				
-				// Override --voting field-- configuration regarding extra votes
-				if ( $voting_override_extra_votes ) {
-					$fdata[$tindex][$field->name]->parameters->set('extra_votes', $voting_extra_votes );
-					// Set a Default main label if one was not given but extra votes exist
-					$main_label = $voting_main_label ? $voting_main_label : JText::_('FLEXI_OVERALL');
+				// CUSTOM field or CORE field with no type
+				$fdata[$tindex][$field->name] = new stdClass();
+				$fdata[$tindex][$field->name]->parameters = new JParameter($field->attribs);
+				
+			} else {
+				
+				$pn_prefix = $field->field_type!='maintext' ? $field->name : $field->field_type;
+				
+				// Initialize an empty object, and create parameters object of the field
+				$fdata[$tindex][$field->name] = new stdClass();
+				$fdata[$tindex][$field->name]->parameters = new JParameter($field->attribs);
+				
+				// SET a type specific label, description for the current CORE  field (according to current language)
+				$field_label_type = $tparams[$type_id]->get($pn_prefix.'_label', '');
+				$field_desc_type = $tparams[$type_id]->get($pn_prefix.($is_form ? '_desc' : '_viewdesc'), '');
+				FlexicontentFields::_getLangSpecificValue ($type_id, $field_label_type, 'label', $fdata[$tindex][$field->name]);
+				FlexicontentFields::_getLangSpecificValue ($type_id, $field_desc_type, 'description', $fdata[$tindex][$field->name]);
+				
+				// Override field parameters with Type specific Parameters
+				if ( isset($tinfo[$type_id]['params'][$pn_prefix]) ) {
+					foreach ($tinfo[$type_id]['params'][$pn_prefix] as $param_name => $param_value) {
+						$fdata[$tindex][$field->name]->parameters->set( $param_name, $param_value) ;
+					}
 				}
-				if ( $voting_override_extra_votes ) {
-					$fdata[$tindex][$field->name]->parameters->set('main_label', $voting_main_label );
+				
+				// SPECIAL CASE: check if it exists a FAKE (custom) field that customizes CORE field per Content Type
+				$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name=".$db->Quote($field->name."_".$typealias);
+				//echo $query;
+				$db->setQuery($query);
+				$data = $db->loadObject();
+				//print_r($data);
+				if ($db->getErrorNum()) {
+					$jAp=& JFactory::getApplication();
+					$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+				} else if (@$data->published) {
+					$jAp=& JFactory::getApplication();
+					$jAp->enqueueMessage(__FUNCTION__."(): Please unpublish plugin with name: ".$field->name."_".$typealias." it is used for customizing a core field",'error');
 				}
+				
+				// Finally merge custom field parameters with the type specific parameters ones
+				if ($data) {
+					$ts_params = new JParameter($data->attribs);
+					$fdata[$tindex][$field->name]->parameters->merge($ts_params);
+				}
+				
 			}
-			
-			//--. Check if a custom field that customizes core field per Type
-			$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name='".$field->name."_".$typealias."'";
-			//echo $query;
-			$db =& JFactory::getDBO();
-			$db->setQuery($query);
-			$data = $db->loadObject();
-			//print_r($data);
-			if ($db->getErrorNum()) {
-				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-			} else if (@$data->published) {
-				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(__FUNCTION__."(): Please unpublish plugin with name: ".$field->name."_".$typealias." it is used for customizing a core field",'error');
-			}
-			
-			//--. Finally merge custom field parameters with the type specific parameters ones
-			if ($data) {
-				$ts_params = new JParameter($data->attribs);
-				$fdata[$tindex][$field->name]->parameters->merge($ts_params);
-			} else if ($field->field_type=='maintext') {
-				$fdata[$tindex][$field->name]->parameters->set( 'use_html',  !$tparams[$type_id]->get('hide_html', 0) ) ;
-			}
-			
-		} else if ( !isset($fdata[$tindex][$field->name]) ) {
-			// CUSTOM field, create once per field
-			$fdata[$tindex][$field->name] = new stdClass();
-			$fdata[$tindex][$field->name]->parameters = new JParameter($field->attribs);
 		}
 		
-		//--. Set custom label or maintain default
-		if (isset($fdata[$tindex][$field->name]->label)) {
-			$field->label = $fdata[$tindex][$field->name]->label;
-		}
-		//--. Set custom description or maintain default
-		if (isset($fdata[$tindex][$field->name]->description)) {
-			$field->description = $fdata[$tindex][$field->name]->description;
-		} else if (!$field->description) {
-			$field->description = '';
-		}
+		// Set custom label, description or maintain default
+		$field->label       =  isset($fdata[$tindex][$field->name]->label)        ?  $fdata[$tindex][$field->name]->label        :  $field->label;
+		$field->description =  isset($fdata[$tindex][$field->name]->description)  ?  $fdata[$tindex][$field->name]->description  :  $field->description;
 		
-		//--. Finally set field's parameters, but to clone ... or not to clone, better clone to allow customizations for individual item fields ...
+		// Finally set field's parameters, but to clone ... or not to clone, better clone to allow customizations for individual item fields ...
 		$field->parameters = clone($fdata[$tindex][$field->name]->parameters);
 		
 		return $field;
