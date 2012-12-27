@@ -243,7 +243,8 @@ div.comments {
 /* lines */
 #flexicontent .lineinfo {
 	display: block;
-	overflow: hidden;
+	float:left;
+	clear:both;
 	margin: 0 0 0.5em 0;
 }
 #flexicontent .lineinfo {
@@ -262,6 +263,12 @@ div.comments {
 #flexicontent .lineinfo .element .value {
 	display: block;
 	float: left;
+}
+
+#flexicontent .readmore {
+	display: inline-block;
+	float:left;
+	clear:both;
 }
 
 /* =============================================

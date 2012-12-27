@@ -49,7 +49,13 @@ if ($this->limitstart != 0) $leadnum = 0;
 if ($leadnum) :
 ?>
 	<ul class="leadingblock">
-		<?php for ($i=0; $i<$leadnum; $i++) : 
+		<?php
+		if ($this->params->get('lead_use_image', 1) && $this->params->get('lead_image')) {
+			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small');
+			$img_field_size = $img_size_map[ $this->params->get('lead_image_size' , 'l') ];
+			$img_field_name = $this->params->get('lead_image');
+		}
+		for ($i=0; $i<$leadnum; $i++) : 
 		?>
 		<li class="">
 			<div style="overflow: hidden;">
@@ -100,29 +106,10 @@ if ($leadnum) :
 
 				<?php 
 					if ($this->params->get('lead_use_image', 1)) :
-						if ($this->params->get('lead_image')) :
-							FlexicontentFields::getFieldDisplay($items[$i], $this->params->get('lead_image'), $values=null, $method='display');
-							
-							$img_field_name = $this->params->get('lead_image');
+						if ($img_field_name) :
+							FlexicontentFields::getFieldDisplay($items[$i], $img_field_name, $values=null, $method='display');
 							$img_field = & $items[$i]->fields[$img_field_name];
-							$img_field_size = $this->params->get('lead_image_size');
-							$img_field_size = $img_field_size ? $img_field_size : 'l';
-							if ( !empty($img_field->value[0]) ) :
-							
-								$value{$i} = unserialize($img_field->value[0]);
-								
-								if ( $img_field->parameters->get('image_source') && empty($value{$i}['is_default_value'] ) ) {
-									$dir{$i}	 = $img_field->parameters->get('dir') .'/'. 'item_'.$items[$i]->id.'_field_'.$img_field->id;
-								} else {
-									$dir{$i}	 = $img_field->parameters->get('dir');
-								}
-								
-								$image{$i} = $value{$i}['originalname'];
-								$scr{$i}	 = $dir{$i}.'/'.$img_field_size.'_'.$image{$i};
-							else :
-								$scr{$i}	= '';
-							endif;
-							$src = str_replace('\\','/', $scr{$i});
+							$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 						else :
 							$src = flexicontent_html::extractimagesrc($items[$i]);
 						endif;
@@ -329,7 +316,12 @@ if ($leadnum) :
 		$classnum = $intro_cols_classes[$intro_cols];
 ?>
 	<ul class="introblock <?php echo $classnum; ?>">	
-		<?php 
+		<?php
+		if ($this->params->get('intro_use_image', 1) && $this->params->get('intro_image')) {
+			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small');
+			$img_field_size = $img_size_map[ $this->params->get('intro_image_size' , 'l') ];
+			$img_field_name = $this->params->get('intro_image');
+		}
 		for ($i=$leadnum; $i<$count; $i++) :
 			$li_item_classes  = ($i-$leadnum)%2 ? 'even' : 'odd';
 			$li_item_classes .= ' col'.($i%$intro_cols + 1);
@@ -382,29 +374,10 @@ if ($leadnum) :
 					
 					<?php 
 					if ($this->params->get('intro_use_image', 1)) :
-						if ($this->params->get('intro_image')) :
-							FlexicontentFields::getFieldDisplay($items[$i], $this->params->get('intro_image'), $values=null, $method='display');
-							
-							$img_field_name = $this->params->get('intro_image');
+						if ($img_field_name) :
+							FlexicontentFields::getFieldDisplay($items[$i], $img_field_name, $values=null, $method='display');
 							$img_field = & $items[$i]->fields[$img_field_name];
-							$img_field_size = $this->params->get('intro_image_size');
-							$img_field_size = $img_field_size ? $img_field_size : 'l';
-							if ( !empty($img_field->value[0]) ) :
-							
-								$value{$i} = unserialize($img_field->value[0]);
-								
-								if ( $img_field->parameters->get('image_source') && empty($value{$i}['is_default_value'] ) ) {
-									$dir{$i}	 = $img_field->parameters->get('dir') .'/'. 'item_'.$items[$i]->id.'_field_'.$img_field->id;
-								} else {
-									$dir{$i}	 = $img_field->parameters->get('dir');
-								}
-								
-								$image{$i} = $value{$i}['originalname'];
-								$scr{$i}	 = $dir{$i}.'/'.$img_field_size.'_'.$image{$i};
-							else :
-								$scr{$i}	= '';
-							endif;
-							$src = str_replace('\\','/', $scr{$i});
+							$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 						else :
 							$src = flexicontent_html::extractimagesrc($items[$i]);
 						endif;
