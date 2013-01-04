@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: import.php 1193 2012-03-14 09:20:15Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: import.php 1561 2012-11-26 05:23:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

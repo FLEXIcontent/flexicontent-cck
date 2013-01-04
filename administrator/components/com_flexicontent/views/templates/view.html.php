@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent templates screen
@@ -52,13 +52,19 @@ class FlexicontentViewTemplates extends JViewLegacy
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
+		
 		//Create Submenu
 		FLEXISubmenu('CanTemplates');
 		
-		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
-
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TEMPLATES' ), 'templates' );
+		//JToolBarHelper::Back();
+		if ($perms->CanConfig) {
+			//JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		}
 		
 		$tmpldirectory 	= JPATH_COMPONENT_SITE . DS . 'templates' . DS;
 		$source			= JRequest::getString('source', '');

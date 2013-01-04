@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1277 2012-05-09 21:59:48Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1604 2012-12-16 11:55:43Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * HTML View class for the Filemanager View
@@ -69,16 +69,8 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		
-		if (FLEXI_J16GE || FLEXI_ACCESS) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$CanFiles         = $permission->CanFiles;
-			$CanUpload        = $permission->CanUpload;
-			$CanViewAllFiles  = $permission->CanViewAllFiles;
-		} else {
-			$CanFiles         = 1;
-			$CanUpload				= 1;
-			$CanViewAllFiles	= 1;
-		}
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
 		
 		// **************************
 		// Create Submenu and toolbar
@@ -88,9 +80,12 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		JToolBarHelper::title( JText::_( 'FLEXI_FILEMANAGER' ), 'files' );
 		if (FLEXI_J16GE) {
 			JToolBarHelper::deleteList('Are you sure?', 'filemanager.remove');
-			if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		} else {
 			JToolBarHelper::deleteList();
+		}
+		if ($perms->CanConfig) {
+			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 		
 		// ***********************
@@ -174,9 +169,9 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$this->assignRef('rows'       , $rows);
 		$this->assignRef('pageNav'    , $pageNav);
 		
-		$this->assignRef('CanFiles'        , $CanFiles);
-		$this->assignRef('CanUpload'       , $CanUpload);
-		$this->assignRef('CanViewAllFiles' , $CanViewAllFiles);
+		$this->assignRef('CanFiles'        , $perms->CanFiles);
+		$this->assignRef('CanUpload'       , $perms->CanUpload);
+		$this->assignRef('CanViewAllFiles' , $perms->CanViewAllFiles);
 		
 		$this->assignRef('assigned_fields_labels' , $assigned_fields_labels);
 		$this->assignRef('assigned_fields_icons'  , $assigned_fields_icons);

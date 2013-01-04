@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the itemelement screen
@@ -70,6 +70,17 @@ class FlexicontentViewItemelement extends JViewLegacy {
 			$langs	= & FLEXIUtilities::getLanguages('code');
 		}
 		$categories = $globalcats;
+		
+		if (FLEXI_J16GE) {
+			JLoader::import('joomla.application.component.model');
+			JLoader::import( 'qfcategoryelement', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' );
+			$cats_model = & JModelLegacy::getInstance('qfcategoryelement', 'FlexicontentModel');
+			$categories = $cats_model->getData();
+			//echo "<pre>"; var_dump($categories); echo "</pre>"; 
+			for ($i=0; $i<count($categories); $i++) {
+				$categories[$i]->treename .= $categories[$i]->title;
+			}
+		}
 		
 		// build the categories select list for filter
 		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', false, false);

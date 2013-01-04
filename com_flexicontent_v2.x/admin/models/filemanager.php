@@ -703,6 +703,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function countFieldRelationsMultiProp(&$rows, $value_prop, $field_prop, $field_type)
 	{
+		if (!$rows || !count($rows)) return array();  // No file records to check
+		
 		// Some fields may not be using DB, create a limitation for them
 		$field_ids = $this->getFieldsUsingDBmode($field_type);
 		$field_ids_list = !$field_ids  ?  ""  :  " AND fi.id IN ('". implode("','", $field_ids) ."')";

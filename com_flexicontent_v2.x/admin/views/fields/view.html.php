@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1219 2012-03-23 03:44:13Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1579 2012-12-03 03:37:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent categories screen
@@ -27,9 +27,14 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewFields extends JViewLegacy {
-
-	function display($tpl = null)
+class FlexicontentViewFields extends JViewLegacy 
+{
+	/**
+	 * Creates the Entrypage
+	 *
+	 * @since 1.0
+	 */
+	function display( $tpl = null )
 	{
 		$mainframe = JFactory::getApplication();
 		$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
@@ -41,7 +46,7 @@ class FlexicontentViewFields extends JViewLegacy {
 		$option   = JRequest::getVar('option');
 		
 		JHTML::_('behavior.tooltip');
-
+		
 		//get vars
 		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_assigned', 	'filter_assigned', 	'', 'word' );
 		$filter_fieldtype		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
@@ -70,42 +75,36 @@ class FlexicontentViewFields extends JViewLegacy {
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-		} else {
-			$permission = new stdClass();
-			$permission->CanCopyFields = 1;
-			$permission->CanAddField = 1;
-			$permission->CanEditField = 1;
-			$permission->CanDeleteField = 1;
-			$permission->CanOrderFields = 1;
-			$permission->CanCopyFields = 1;
-		}
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
 		
-		$contrl = FLEXI_J16GE ? "fields." : "";
-		
-		//Create Submenu
+		// Create Submenu and check access
 		FLEXISubmenu('CanFields');
 
 		//create the toolbar
+		$contrl = FLEXI_J16GE ? "fields." : "";
 		JToolBarHelper::title( JText::_( 'FLEXI_FIELDS' ), 'fields' );
-		if ($permission->CanCopyFields) {
+		if ($perms->CanCopyFields) {
 			JToolBarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
 			JToolBarHelper::custom( $contrl.'copy_wvalues', 'copy.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
+			JToolBarHelper::divider();
 		}
 		JToolBarHelper::publishList($contrl.'publish');
 		JToolBarHelper::unpublishList($contrl.'unpublish');
-		if ($permission->CanAddField) {
+		if ($perms->CanAddField) {
 			JToolBarHelper::addNew($contrl.'add');
 		}
-		if ($permission->CanEditField) {
+		if ($perms->CanEditField) {
 			JToolBarHelper::editList($contrl.'edit');
 		}
-		if ($permission->CanDeleteField) {
+		if ($perms->CanDeleteField) {
 			JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
 		}
-		if(FLEXI_J16GE && $permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
-
+		if ($perms->CanConfig) {
+			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		}
+		
 		//Get data from the model
 		$rows      	= & $this->get( FLEXI_J16GE ? 'Items' : 'Data' );
 		$pageNav 	= & $this->get( 'Pagination' );
@@ -156,7 +155,7 @@ class FlexicontentViewFields extends JViewLegacy {
 		}
 
 		//assign data to template
-		$this->assignRef('permission'		, $permission);
+		$this->assignRef('permission'		, $perms);
 		$this->assignRef('filter_type'  , $filter_type);
 		$this->assignRef('lists'      	, $lists);
 		$this->assignRef('rows'      	, $rows);

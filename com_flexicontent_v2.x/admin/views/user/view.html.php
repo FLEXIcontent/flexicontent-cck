@@ -1,6 +1,6 @@
 <?php
 /**
-* @version		$Id: view.html.php 1192 2012-03-14 09:00:59Z emmanuel.danan@gmail.com $
+* @version		$Id: view.html.php 1579 2012-12-03 03:37:21Z ggppdk $
 * @package		Joomla
 * @subpackage	Users
 * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
@@ -15,7 +15,7 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * HTML View class for the Users component

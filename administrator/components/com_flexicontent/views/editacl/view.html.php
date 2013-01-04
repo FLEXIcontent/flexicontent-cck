@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent ACL edit screen
@@ -37,7 +37,7 @@ class FlexicontentViewEditacl extends JViewLegacy
 		$document	= & JFactory::getDocument();
 		$user 		= & JFactory::getUser();
 		
-		//only admins have access to this view
+		//only admins have access to this view (view is used only in J1.5)
 		if ($user->get('gid') < 24) {
 			JError::raiseWarning( 'SOME_ERROR_CODE', JText::_( 'FLEXI_ALERTNOTAUTH' ));
 			$mainframe->redirect( 'index.php?option=com_flexicontent&view=flexicontent' );

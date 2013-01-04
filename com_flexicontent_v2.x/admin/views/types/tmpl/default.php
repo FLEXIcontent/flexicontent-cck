@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: default.php 1539 2012-11-06 08:58:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -65,9 +65,15 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
 			$row = $this->rows[$i];
-			$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;cid[]='. $row->id;
-			$published 	= JHTML::_('jgrid.published', $row->published, $i, 'types.' );
-			$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')"');
+			if (FLEXI_J16GE) {
+				$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;cid[]='. $row->id;
+				$published 	= JHTML::_('jgrid.published', $row->published, $i, 'types.' );
+				$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'types.access\')"');
+			} else {
+				$link 		= 'index.php?option=com_flexicontent&amp;controller=types&amp;task=edit&amp;cid[]='. $row->id;
+				$published 	= JHTML::_('grid.published', $row, $i );
+				$access 	= JHTML::_('grid.access', $row, $i );
+			}
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$fields		= 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_type='. $row->id;

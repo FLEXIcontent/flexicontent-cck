@@ -797,6 +797,20 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$db->query();
 				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_IGNORE_VIEW_STATE'), 'message' );
 			}
+			
+			// Check for import : Allow management of (Content) Import
+			$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='import'";
+			$db->setQuery($query);
+			$import_rule = $db->loadResult();
+			
+			if (!$import_rule)
+			{
+				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
+					." VALUES ('com_flexicontent', '', 'import', '', '', 'Manage (Content) Import', '', '')";
+				$db->setQuery($query);
+				$db->query();
+				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_MANAGE_CONTENT_IMPORT'), 'message' );
+			}
 		}
 	}
 	

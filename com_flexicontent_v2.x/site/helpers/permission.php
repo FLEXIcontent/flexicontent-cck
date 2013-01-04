@@ -22,7 +22,8 @@ class FlexicontentHelperPerm {
 	{
 		static $permission = null;
 		
-		if(!$permission || $force) {
+		if(!$permission || $force)
+		{
 			// handle jcomments integration
 			if (JPluginHelper::isEnabled('system', 'jcomments.system') || JPluginHelper::isEnabled('system', 'jcomments')) {
 				$Comments_Enabled 	= 1;
@@ -55,22 +56,22 @@ class FlexicontentHelperPerm {
 			//!!! ALLOWs USERS to change component's CONFIGURATION						(==> (for J2.5) core.admin ACTION allowed on COMPONENT ASSET: e.g. 'com_flexicontent')
 			$permission->CanConfig		= $user->authorise('core.admin', 				'com_flexicontent');
 					
-			//!!! ALLOWs USERS in JOOMLA BACKEND :
+			//!!! ALLOWs USERS in JOOMLA BACKEND : (not used in J1.5)
 			//   (a) to view the FLEXIcontent menu item in Components Menu and
 			//   (b) to access the FLEXIcontent component screens (whatever they are allowed to see by individual FLEXIcontent area permissions)
-			//       NOTE: the initially installed permissions allows all areas to be managed for J2.5 and none (excepti items) for J1.5
+			//       NOTE: the initially installed permissions allows all areas to be managed for J2.5 and none (except for items) for J1.5
 			$permission->CanManage		= $user->authorise('core.manage', 			'com_flexicontent');
 			
 			// ITEMS/CATEGORIES: category-inherited permissions, (NOTE: these are the global settings, so:)
 			// *** 1. the action permissions of individual items are checked seperately per item
 			// *** 2. the view permission is checked via the access level of each item
 			$permission->CanAdd				= $user->authorise('core.create', 				'com_flexicontent');
-			$permission->CanDelete		= $user->authorise('core.delete', 				'com_flexicontent');
-			$permission->CanDeleteOwn	= $user->authorise('core.delete.own', 		'com_flexicontent');
 			$permission->CanEdit			= $user->authorise('core.edit', 					'com_flexicontent');
 			$permission->CanEditOwn		= $user->authorise('core.edit.own', 			'com_flexicontent');
 			$permission->CanPublish		= $user->authorise('core.edit.state',			'com_flexicontent');
 			$permission->CanPublishOwn= $user->authorise('core.edit.state.own',	'com_flexicontent');
+			$permission->CanDelete		= $user->authorise('core.delete', 				'com_flexicontent');
+			$permission->CanDeleteOwn	= $user->authorise('core.delete.own', 		'com_flexicontent');
 			
 			// Permission for changing the access level of items and categories that user can edit
 			// (a) In J1.5, this is the FLEXIaccess component access permission, and
@@ -83,6 +84,10 @@ class FlexicontentHelperPerm {
 			$permission->CanOrder			= $user->authorise('flexicontent.orderitems',	'com_flexicontent'); // (backend) Reorder items inside the category
 			$permission->CanParams		= $user->authorise('flexicontent.paramsitem',	'com_flexicontent'); // (backend) Edit item parameters like meta data and template parameters
 			$permission->CanVersion		= $user->authorise('flexicontent.versioning',	'com_flexicontent'); // (backend) Use item versioning
+			
+			$permission->AssocAnyTrans		= $user->authorise('flexicontent.assocanytrans',		'com_flexicontent'); // (item edit form) associate any translation
+			$permission->EditCreationDate	= $user->authorise('flexicontent.editcreationdate',	'com_flexicontent'); // (item edit form) edit creation date (frontend)
+			$permission->IgnoreViewState	= $user->authorise('flexicontent.ignoreviewstate',	'com_flexicontent'); // (Frontend Content Lists) ignore view state
 			
 			// CATEGORIES: management tab and usage
 			$permission->CanCats			= $user->authorise('flexicontent.managecats',	'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
@@ -101,6 +106,7 @@ class FlexicontentHelperPerm {
 			$permission->CanArchives	= $user->authorise('flexicontent.managearchives', 	'com_flexicontent'); // (backend) Allow management of Archives
 			$permission->CanTemplates	= $user->authorise('flexicontent.managetemplates',	'com_flexicontent'); // (backend) Allow management of Templates
 			$permission->CanStats			= $user->authorise('flexicontent.managestats', 			'com_flexicontent'); // (backend) Allow management of Statistics
+			$permission->CanImport		= $user->authorise('flexicontent.manageimport',			'com_flexicontent'); // (backend) Allow management of (Content) Import
 			
 			// FIELDS: management tab
 			$permission->CanFields			= $user->authorise('flexicontent.managefields', 'com_flexicontent'); // (backend) Allow management of Fields
@@ -120,10 +126,7 @@ class FlexicontentHelperPerm {
 			$permission->CanAuthors		= $user->authorise('core.manage', 'com_users');
 			
 			// SEARCH INDEX: management tab
-			$permission->CanIndex			= $permission->CanFields && ($permission->CanEditField || $permission->CanEditField);
-			
-			// IMPORT: management tab
-			$permission->CanImport		= $permission->CanAdd;
+			$permission->CanIndex			= $permission->CanFields && ($permission->CanAddField || $permission->CanEditField);
 			
 			// OTHER components permissions
 			$permission->CanPlugins	 	= $user->authorise('core.manage', 'com_plugins');
@@ -153,38 +156,124 @@ class FlexicontentHelperPerm {
 	 */
 	function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false )
 	{
-		static $usercats = null;
+		global $globalcats;
 		$db =& JFactory::getDBO();
-		
-		$query = 'SELECT c.id '
-			. ' FROM #__categories AS c'
-			. ' WHERE extension='.$db->Quote(FLEXI_CAT_EXTENSION)
-			. ($check_published ? '  AND c.published = 1 ' : '');
-		$db->setQuery($query);
-		$allcats = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 		$usercats = array();
-		foreach ($allcats as $category_id)
+		
+		if (FLEXI_J16GE)
 		{
-			// Construct asset name for the category
-			$asset = 'com_content.category.'.$category_id;
-			
-			// We start with FALSE for OR and TRUE for AND
-			$has_access = $require_all ? false : true;
-			
-			// Check all actions with Logical OR or Logical AND
-			foreach ($actions_allowed as $action_name)
+			// *** J1.6+ ***
+			$query = 'SELECT c.id '
+				. ' FROM #__categories AS c'
+				. ' WHERE extension='.$db->Quote(FLEXI_CAT_EXTENSION)
+				. ($check_published ? '  AND c.published = 1 ' : '');
+			$db->setQuery($query);
+			$allcats = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			$usercats = array();
+			foreach ($allcats as $category_id)
 			{
-				if ($require_all) {
-					$has_access = $has_access | $user->authorise($action_name, $asset);
-				} else {
-					$has_access = $has_access & $user->authorise($action_name, $asset);
+				// Construct asset name for the category
+				$asset = 'com_content.category.'.$category_id;
+				
+				// Check all actions with Logical OR or Logical AND
+				// We start with FALSE for OR and TRUE for AND
+				$has_access = $require_all ? false : true;
+				foreach ($actions_allowed as $action_name)
+				{
+					$has_access = $require_all ? ($has_access | $user->authorise($action_name, $asset)) : ($has_access & $user->authorise($action_name, $asset));
+				}
+				if ($has_access) $usercats[] = $category_id;
+			}
+			return $usercats;
+			
+		} else if (!FLEXI_ACCESS || $user->gid == 25) {
+			
+			// *** J1.5 without FLEXIaccess or user is super admin, return all category ids ***
+			foreach ($globalcats as $k => $v) {
+				if(!$check_published || $v->published) {
+					$usercats[] = $k;
 				}
 			}
-			if ($has_access) $usercats[] = $category_id;
+			$usercats = array_unique($usercats);
+			return $usercats;
+			
+		} else {
+			
+			// *** J1.5 with FLEXIaccess ***
+			$aro_value = $user->gmid; // FLEXIaccess group
+			
+			// Create a limit for aco (ACTION privilege)
+			$limit_aco = array();
+			if ( in_array('core.create',$actions_allowed) )
+				$limit_aco[] = 'aco = ' . $db->Quote('add');
+			if ( in_array('core.edit',$actions_allowed) )
+				$limit_aco[] = 'aco = ' . $db->Quote('edit');
+			if ( in_array('core.edit.own',$actions_allowed) )
+				$limit_aco[] = 'aco = ' . $db->Quote('editown');
+			
+			$oper = $require_all ? ' AND ' : ' OR ';
+			if  (count($limit_aco) ) {
+				$limit_aco = implode($oper, $limit_aco);
+			} else {
+				$limit_aco = 'aco = ' . $db->Quote('add') . $oper . ' aco = ' . $db->Quote('edit') . $oper . ' aco = ' . $db->Quote('editown');
+			}
+			
+			// We will search for permission all on the given permission (add,edit,editown),
+			// if found it means that there are no ACL limitations for given user, aka return all cats
+			$query	= 'SELECT COUNT(*) FROM #__flexiaccess_acl'
+					. ' WHERE acosection = ' . $db->Quote('com_content')
+					. ' AND ( ' . $limit_aco . ' )'
+					. ' AND arosection = ' . $db->Quote('users')
+					. ' AND aro IN ( ' . $aro_value . ' )'
+					. ' AND axosection = ' . $db->Quote('content')
+					. ' AND axo = ' . $db->Quote('all')
+					;
+			$db->setQuery($query);
+			
+			
+			// *** No limitations found, return all category ids ***
+			
+			if ($db->loadResult()) {
+				foreach ($globalcats as $k => $v) {
+					if(!$check_published || $v->published) {
+						$usercats[] = $k;
+					}
+				}
+				$usercats = array_unique($usercats);
+				return $usercats;
+			}
+			
+			
+			// *** Limitations found, check and return category ids with 'create' permission ***
+			
+			// creating for -content- axosection is 'add' but for -category- axosection is 'submit'
+			$limit_aco = str_replace('add', 'submit', $limit_aco);
+			
+			$query	= 'SELECT axo FROM #__flexiaccess_acl'
+					. ' WHERE acosection = ' . $db->Quote('com_content')
+					. ' AND ( ' . $limit_aco . ' )'
+					. ' AND arosection = ' . $db->Quote('users')
+					. ' AND aro IN ( ' . $aro_value . ' )'
+					. ' AND axosection = ' . $db->Quote('category')
+					;
+			$db->setQuery($query);
+			$allowedcats = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			
+			$allowedcats = $allowedcats ? $allowedcats : array();
+			// we add all descendent to the array
+			foreach ($allowedcats as $allowedcat) {
+				$usercats[] = $allowedcat;
+				if ($globalcats[$allowedcat]->children) {
+					foreach ($globalcats[$allowedcat]->descendantsarray as $k => $v) {
+						if(!$check_published || $globalcats[$v]->published) {
+							$usercats[] = $v;
+						}
+					}
+				}
+			}
+			$usercats = array_unique($usercats);
+			return $usercats;
 		}
-		
-		// Return allowed category ids
-		return $usercats;
 	}
 	
 	

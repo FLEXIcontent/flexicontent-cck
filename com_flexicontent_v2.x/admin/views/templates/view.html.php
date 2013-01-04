@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: view.html.php 1577 2012-12-02 15:10:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent templates screen
@@ -52,13 +52,19 @@ class FlexicontentViewTemplates extends JViewLegacy
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
+		
 		//Create Submenu
 		FLEXISubmenu('CanTemplates');
 		
-		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
-
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TEMPLATES' ), 'templates' );
+		//JToolBarHelper::Back();
+		if ($perms->CanConfig) {
+			//JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		}
 		
 		$tmpldirectory 	= JPATH_COMPONENT_SITE . DS . 'templates' . DS;
 		$source			= JRequest::getString('source', '');

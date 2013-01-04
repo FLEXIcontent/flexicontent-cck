@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent file screen
@@ -31,7 +31,7 @@ class FlexicontentViewFile extends JViewLegacy {
 
 	function display($tpl = null)
 	{
-		global $mainframe;
+		$mainframe = &JFactory::getApplication();
 
 		//initialise variables
 		$document	= & JFactory::getDocument();
@@ -43,12 +43,18 @@ class FlexicontentViewFile extends JViewLegacy {
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FILE' ), 'fileedit' );
 		
-		JToolBarHelper::apply();
-		JToolBarHelper::save();
-		JToolBarHelper::cancel();
-
+		if (FLEXI_J16GE) {
+			JToolBarHelper::apply('filemanager.apply');
+			JToolBarHelper::save('filemanager.save');
+			JToolBarHelper::cancel('filemanager.cancel');
+		} else {
+			JToolBarHelper::apply();
+			JToolBarHelper::save();
+			JToolBarHelper::cancel();
+		}
 		//Get data from the model
 		$model		= & $this->getModel();
+		if (FLEXI_J16GE) $form = & $this->get('Form');
 		$row     	= & $this->get( 'File' );
 		
 		// fail if checked out not by 'me'
@@ -71,9 +77,10 @@ class FlexicontentViewFile extends JViewLegacy {
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
 
 		//assign data to template
-		$this->assignRef('row'    	, $row);
-		$this->assignRef('lists'      , $lists);
-		$this->assignRef('document'      , $document);
+		if (FLEXI_J16GE) $this->assignRef('form'				, $form);
+		$this->assignRef('row'				, $row);
+		$this->assignRef('lists'			, $lists);
+		$this->assignRef('document'		, $document);
 
 		parent::display($tpl);
 	}

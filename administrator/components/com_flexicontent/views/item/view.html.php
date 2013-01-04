@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * HTML View class for the Items View
@@ -163,7 +163,7 @@ class FlexicontentViewItem extends JViewLegacy
 				FlexicontentFields::loadFieldConfig($field, $row);
 			}
 			
-			// b. Create field 's editing HTML
+			// b. Create field 's editing HTML (the form field)
 			// NOTE: this is DONE only for CUSTOM fields, since form field html is created by the form for all CORE fields, EXCEPTION is the 'text' field (see bellow)
 			if (!$field->iscore)
 			{
@@ -188,9 +188,9 @@ class FlexicontentViewItem extends JViewLegacy
 			if ($field->field_type == 'maintext')
 			{
 				if ( isset($row->item_translations) ) {
-					$itemlang = substr($row->language ,0,2);
+					$shortcode = substr($row->language ,0,2);
 					foreach ($row->item_translations as $lang_id => $t)	{
-						if ($itemlang == $t->shortcode) continue;
+						if ($shortcode == $t->shortcode) continue;
 						$field->name = array('jfdata',$t->shortcode,'text');
 						$field->value[0] = html_entity_decode($t->fields->text->value, ENT_QUOTES, 'UTF-8');
 						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$row) );

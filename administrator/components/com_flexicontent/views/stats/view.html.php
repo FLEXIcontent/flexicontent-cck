@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * HTML View class for the Stats View
@@ -56,23 +56,23 @@ class FlexicontentViewStats extends JViewLegacy
 		$creators	= & $this->get( 'Creators' );
 		$editors	= & $this->get( 'Editors' );
 		
-		$permission = FlexicontentHelperPerm::getPerm();
-
-		//build toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_STATISTICS' ), 'stats' );
-		JToolBarHelper::Back();
-		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
-
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		
-		if (!$permission->CanStats) {
-			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
-		}
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
 		
-		//Create Submenu
+		// Create Submenu and check access
 		FLEXISubmenu('CanStats');
 
+		//create the toolbar
+		JToolBarHelper::title( JText::_( 'FLEXI_STATISTICS' ), 'stats' );
+		//JToolBarHelper::Back();
+		if ($perms->CanConfig) {
+			//JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		}
+		
 		$this->assignRef('pane'				, $pane);
 		$this->assignRef('genstats'		, $genstats);
 		$this->assignRef('popular'		, $popular);
@@ -85,42 +85,5 @@ class FlexicontentViewStats extends JViewLegacy
 		$this->assignRef('editors'		, $editors);
 
 		parent::display($tpl);
-	}
-	
-	/**
-	 * Creates the buttons view
-	 *
-	 * @param string $link targeturl
-	 * @param string $image path to image
-	 * @param string $text image description
-	 * @param boolean $modal 1 for loading in modal
-	 */
-	function quickiconButton( $link, $image, $text, $modal = 0 )
-	{
-		//initialise variables
-		$lang 		= & JFactory::getLanguage();
-  		?>
-
-		<div style="float:<?php echo ($lang->isRTL()) ? 'right' : 'left'; ?>;">
-			<div class="icon">
-				<?php
-				if ($modal == 1) {
-					JHTML::_('behavior.modal');
-				?>
-					<a href="<?php echo $link.'&amp;tmpl=component'; ?>" style="cursor:pointer" class="modal" rel="{handler: 'iframe', size: {x: 650, y: 400}}">
-				<?php
-				} else {
-				?>
-					<a href="<?php echo $link; ?>">
-				<?php
-				}
-
-					echo JHTML::_('image', 'administrator/components/com_flexicontent/assets/images/'.$image, $text );
-				?>
-					<span><?php echo $text; ?></span>
-				</a>
-			</div>
-		</div>
-		<?php
 	}
 }

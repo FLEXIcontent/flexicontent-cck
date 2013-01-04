@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1193 2012-03-14 09:20:15Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: view.html.php 1579 2012-12-03 03:37:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent categories screen
@@ -27,9 +27,10 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewImport extends JViewLegacy {
+class FlexicontentViewImport extends JViewLegacy
+{
 
-	function display($tpl = null)
+	function display( $tpl = null )
 	{
 		global $globalcats;
 		$mainframe = JFactory::getApplication();
@@ -60,13 +61,21 @@ class FlexicontentViewImport extends JViewLegacy {
 		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.items.filter_order', 		'filter_order', 	'', 	'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.items.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
 
-		FLEXISubmenu('notvariable');
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
+		
+		// Create Submenu (and also check access to current view)
+		FLEXISubmenu('CanImport');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_COPYMOVE_ITEM' ), 'import' );
 		$ctrl_task = FLEXI_J16GE ? 'items.importcsv' : 'importcsv';
 		JToolBarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT', $list_check = false );  // list_check will check that at least one row is checked in listing-like views
-		JToolBarHelper::cancel();
+		//JToolBarHelper::Back();
+		if ($perms->CanConfig) {
+			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		}
 		
 		$db = &JFactory::getDBO();
 		$query = 'SELECT id, name'
@@ -110,8 +119,8 @@ class FlexicontentViewImport extends JViewLegacy {
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', flexicontent_html::getSiteDefaultLang(), 6, $allowed_langs);
 		} else {
 			$default_lang = flexicontent_html::getSiteDefaultLang();
-			$languages[] = JHTML::_('select.option', $default_lang, JText::_( 'FLEXI_DEFAULT' ).' ('.flexicontent_html::getSiteDefaultLang().')' );
-			$lists['languages'] = JHTML::_('select.genericlist', $languages, 'language', $class='', 'value', 'text', $default_lang );
+			$languages[] = JHTML::_('select.option', $default_lang, JText::_( 'Default' ).' ('.flexicontent_html::getSiteDefaultLang().')' );
+			$lists['languages'] = JHTML::_('select.radiolist', $languages, 'language', $class='', 'value', 'text', $default_lang );
 		}
 		
 		$lists['states'] = flexicontent_html::buildstateslist('state', '', '', 2);

@@ -19,7 +19,7 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 class FLEXIcontentViewSearch extends JViewLegacy
 {
 	function display($tpl = null) {
@@ -56,7 +56,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 
-		FLEXISubmenu('notvariable');
+		// Create Submenu and check access
+		FLEXISubmenu('CanIndex');
 		
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_SEARCH_INDEX' ), FLEXI_J16GE ? 'searchtext.png' : 'searchindex' );
@@ -134,18 +135,14 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$toolbar = &JToolBar::getInstance('toolbar');
 
 		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_BASIC',    'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic',     500, 210);
-		JToolBarHelper::spacer();
-		JToolBarHelper::divider();
-		JToolBarHelper::spacer();
+		JToolBarHelper::divider();  JToolBarHelper::spacer();
 		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_ADVANCED', 'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced',  500, 210);
 		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_PURGE_INDEX', FLEXI_J16GE ? 'search.purge' : 'purge', false);
 		
 		$user = &JFactory::getUser();
-		$permission = FlexicontentHelperPerm::getPerm();
-		if($permission->CanConfig) {
-			JToolBarHelper::spacer();
-			JToolBarHelper::divider();
-			JToolBarHelper::spacer();
+		$perms = FlexicontentHelperPerm::getPerm();
+		if ($perms->CanConfig) {
+			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 	}

@@ -36,12 +36,12 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 */
 	function __construct()
 	{
+		if (FLEXI_J16GE) {
+			$this->text_prefix = 'com_content';
+		}
 		parent::__construct();
 
 		// Register Extra task
-		//$this->registerTask( 'add'  ,		 	'edit' );
-		//$this->registerTask( 'apply', 			'save' );
-		//$this->registerTask( 'saveandnew', 		'save' );
 		$this->registerTask( 'params', 			'params' );
 	}
 
@@ -78,18 +78,21 @@ class FlexicontentControllerCategories extends FlexicontentController
 			$unauthorized = array();
 			foreach ($destid as $id)
 			{
-				if ($user->authorise('core.edit', 'com_content.category.'.$id)) {
-					if ($model->copyParams($id, $params)) {
-						$y++;
-					} else {
-						$n++;				
-					}
-				} else {
+				// Check unauthorized categories is for J1.6+ only (categories have ACL edit action)
+				if ( FLEXI_J16GE && !$user->authorise('core.edit', 'com_content.category.'.$id) ) {
 					$unauthorized[] = $id;
+					continue;
+				}
+				if ($model->copyParams($id, $params)) {
+					$y++;
+				} else {
+					$n++;				
 				}
 			}
 			echo '<div class="copyok">'.JText::sprintf( 'FLEXI_CAT_PARAMS_COPIED', $y, $n ).'</div>';
-			if (count($unauthorized)) echo '<div class="copyfailed">'.'Skipped '.count($unauthorized).' uneditable categories with ids: '.implode(', ',$unauthorized).'</div>';
+			if ( FLEXI_J16GE && count($unauthorized) ) {
+				echo '<div class="copyfailed">'.'Skipped '.count($unauthorized).' uneditable categories with ids: '.implode(', ',$unauthorized).'</div>';
+			}
 		} else {
 			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_SOURCE' ).'</div>';
 		}

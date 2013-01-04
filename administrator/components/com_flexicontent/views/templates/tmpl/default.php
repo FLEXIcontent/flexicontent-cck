@@ -16,10 +16,10 @@
  * GNU General Public License for more details.
  */
 
-defined('_JEXEC') or die('Restricted access'); ?>
+defined('_JEXEC') or die('Restricted access');
 
-<?php
- $basetemplates = array('default', 'blog', 'faq', 'items-tabbed', 'presentation');
+$basetemplates = array('default', 'blog', 'faq', 'items-tabbed', 'presentation');
+$ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 ?>
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
@@ -44,7 +44,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		$k = 0;
 		$i = 1;
 		foreach ($this->rows as $row) {
-			$copylink 	= 'index.php?option=com_flexicontent&amp;view=templates&amp;task=duplicate&amp;layout=duplicate&amp;tmpl=component&amp;source='. $row->name;
+			$copylink 	= 'index.php?option=com_flexicontent&amp;view=templates&amp;layout=duplicate&amp;tmpl=component&amp;source='. $row->name;
 			$itemlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;folder='.$row->name;
 			$catlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;folder='.$row->name;
 			if (!in_array($row->name, $basetemplates)) {
@@ -60,16 +60,24 @@ defined('_JEXEC') or die('Restricted access'); ?>
 						return;
 					}
 
-					$('<?php echo 'up-'.$row->name ?>').setHTML('<td colspan="5" align="center"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></td>');
 					e = new Event(e).stop();
-		
-					var url = "index.php?option=com_flexicontent&controller=templates&task=remove&format=raw&dir=<?php echo $row->name ?>&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1";
-		 
-					var ajax = new Ajax(url, {
-						method: 'get',
-						update: $('<?php echo 'up-'.$row->name ?>')
-					});
-					ajax.request.delay(500, ajax);
+					var url = "index.php?option=com_flexicontent&<?php echo $ctrl_task;?>remove&format=raw&dir=<?php echo $row->name ?>&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1";
+					
+					if (MooTools.version>="1.2.4") {
+						$('<?php echo 'up-'.$row->name ?>').set('html','<td colspan="5" align="center"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></td>');
+						var ajax = new Request.HTML({
+							method: 'get',
+							url: url,
+							update: $('<?php echo 'up-'.$row->name ?>')
+						}).send();
+					} else {
+						$('<?php echo 'up-'.$row->name ?>').setHTML('<td colspan="5" align="center"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></td>');
+						var ajax = new Ajax(url, {
+							method: 'get',
+							update: $('<?php echo 'up-'.$row->name ?>')
+						});
+						ajax.request.delay(500, ajax);
+					}
 				});
 			});
 		</script>
