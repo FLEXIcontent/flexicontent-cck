@@ -18,8 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
-jimport('joomla.form.form');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent field screen
@@ -28,8 +27,8 @@ jimport('joomla.form.form');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewField extends JViewLegacy {
-
+class FlexicontentViewField extends JViewLegacy
+{
 	function display($tpl = null)
 	{
 		$mainframe = &JFactory::getApplication();
@@ -37,13 +36,12 @@ class FlexicontentViewField extends JViewLegacy {
 
 		//initialise variables
 		$document	= & JFactory::getDocument();
-		$user 		= & JFactory::getUser();
-
-		//get vars
-		$cid 		= JRequest::getVar( 'cid' );
+		$user			= & JFactory::getUser();
+		$cid			= JRequest::getVar( 'cid' );
 
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		
 		//add js function to overload the joomla submitform
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		$document->addScript('components/com_flexicontent/assets/js/admin.js');
@@ -52,7 +50,6 @@ class FlexicontentViewField extends JViewLegacy {
 		//create the toolbar
 		if ( $cid ) {
 			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' );
-
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
 		}
@@ -75,20 +72,20 @@ class FlexicontentViewField extends JViewLegacy {
 		jimport('joomla.filesystem.file');
 
 		//Get data from the model
-		$model				= & $this->getModel();
-		$row     			= & $this->get( 'Field' );
+		$model	= & $this->getModel();
+		$row		= & $this->get( 'Field' );
 		if (FLEXI_J16GE) {
-			$form				= $this->get('Form');
+			$form	= $this->get('Form');
 		} else {
 			$types				= & $this->get( 'Typeslist' );
-			$typesselected		= & $this->get( 'Typesselected' );
+			$typesselected= & $this->get( 'Typesselected' );
 		}
 		JHTML::_('behavior.tooltip');
 		
-		// Import field file
+		// Import Joomla plugin that implements the type of current flexi field
 		JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
 			
-		//support checking.
+		//check which properties are supported by current field
 		$supportsearch          = true;
 		$supportadvsearch       = false;
 		$supportfilter          = false;

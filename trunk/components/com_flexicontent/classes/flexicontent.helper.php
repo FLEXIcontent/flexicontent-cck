@@ -1928,6 +1928,39 @@ class flexicontent_html
 		return $output;
 	}
 	
+	function addToolBarButton($text='Button Text', $name='btnname', $full_js='', $err_msg='', $confirm_msg='', $task='btntask', $extra_js='', $list=true, $menu=true, $confirm=true)
+	{
+		$toolbar = & JToolBar::getInstance('toolbar');
+		$text  = JText::_( $text );
+		$class = 'icon-32-'.$name;
+		
+		if ( !$full_js )
+		{
+			$err_msg = $err_msg ? $err_msg : JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', $name );
+			$err_msg = addslashes($err_msg);
+			$confirm_msg = $confirm_msg ? $confirm_msg : JText::_('FLEXI_ARE_YOU_SURE');
+			
+			$full_js = $extra_js ."; submitbutton('$task');";
+			if ($confirm) {
+				$full_js = "if (confirm('".$confirm_msg."')) { ".$full_js." }";
+			}
+			if (!$menu) {
+				$full_js = "hideMainMenu(); " . $full_js;
+			}
+			if ($list) {
+				$full_js = "if (document.adminForm.boxchecked.value==0) { alert('".$err_msg."') ;} else { ".$full_js." }";
+			}
+		}
+		$full_js = "javascript: $full_js";
+		
+		$button_html	= "<a href=\"#\" onclick=\"$full_js\" class=\"toolbar\">\n";
+		$button_html .= "<span class=\"$class\" title=\"$text\">\n";
+		$button_html .= "</span>\n";
+		$button_html	.= "$text\n";
+		$button_html	.= "</a>\n";
+		
+		$toolbar->appendButton('Custom', $button_html, 'archive');
+	}
 }
 
 class flexicontent_upload

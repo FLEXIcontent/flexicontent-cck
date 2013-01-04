@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: default.php 1189 2012-03-14 06:43:38Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,6 +18,9 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+$ctrl_items = FLEXI_J16GE ? "task=items." : "controller=items&amp;task=";
+$ctrl_users = FLEXI_J16GE ? "task=users." : "controller=users&amp;task=";
+
 echo $this->pane->startPane( 'stat-pane' );
 echo $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' );
 ?>
@@ -33,7 +36,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' );
 			<thead>
 				<tr>
 					<th><?php echo JText::_( 'FLEXI_TYPE' ); ?></th>
-					<th><?php echo JText::_( 'FLEXI_COUNT' ); ?></th>
+					<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -92,7 +95,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' );
 				$k = 0;
 				for ($i=0, $n=count($this->popular); $i < $n; $i++) {
 				$row = $this->popular[$i];
-				$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+				$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
 				?>
 				<tr>
 					<td width="65%">
@@ -136,7 +139,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' );
 		<thead>
 				<tr>
 					<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
-					<th><?php echo JText::_( 'FLEXI_COUNT' ); ?></th>
+					<th><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -144,7 +147,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' );
 			$k = 0;
 			for ($i=0, $n=count($this->favoured); $i < $n; $i++) {
 			$row = $this->favoured[$i];
-			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+			$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
 			?>
 			<tr>
 				<td>
@@ -199,7 +202,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_RATING_STATS' ), 'ratings' );
 			$k = 0;
 			for ($i=0, $n=count($this->rating); $i < $n; $i++) {
 			$row = $this->rating[$i];
-			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+			$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
 			?>
 			<tr>
 				<td>
@@ -238,7 +241,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_RATING_STATS' ), 'ratings' );
 			$k = 0;
 			for ($i=0, $n=count($this->worstrating); $i < $n; $i++) {
 			$row = $this->worstrating[$i];
-			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+			$link = 'index.php?option=com_flexicontent&amp;'.$ctrl_items.'edit&amp;cid[]='. $row->id;
 			?>
 			<tr>
 				<td>
@@ -283,7 +286,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_USER_STATS' ), 'users' );
 			$k = 0;
 			for ($i=0, $n=count($this->creators); $i < $n; $i++) {
 			$row = $this->creators[$i];
-			$link 		= 'index.php?option=com_flexicontent&amp;view=user&amp;task=edit&amp;cid[]='. $row->id;
+			$link = 'index.php?option=com_flexicontent&amp;view=user&amp;'.$ctrl_users.'edit&amp;cid[]='. $row->id;
 			?>
 			<tr>
 				<td>
@@ -320,7 +323,7 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_USER_STATS' ), 'users' );
 			$k = 0;
 			for ($i=0, $n=count($this->editors); $i < $n; $i++) {
 			$row = $this->editors[$i];
-			$link 		= 'index.php?option=com_flexicontent&amp;view=user&amp;task=edit&amp;cid[]='. $row->id;
+			$link = 'index.php?option=com_flexicontent&amp;view=user&amp;'.$ctrl_users.'edit&amp;cid[]='. $row->id;
 			?>
 			<tr>
 				<td>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 376 2010-08-24 04:12:01Z enjoyman $
+ * @version 1.5 stable $Id: view.html.php 1577 2012-12-02 15:10:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent file screen
@@ -29,7 +29,8 @@ jimport( 'joomla.application.component.view');
  */
 class FlexicontentViewFile extends JViewLegacy {
 
-	function display($tpl = null) {
+	function display($tpl = null)
+	{
 		$mainframe = &JFactory::getApplication();
 
 		//initialise variables
@@ -39,18 +40,21 @@ class FlexicontentViewFile extends JViewLegacy {
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 
-		$permission = FlexicontentHelperPerm::getPerm();
-		
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FILE' ), 'fileedit' );
 		
-		JToolBarHelper::apply('filemanager.apply');
-		JToolBarHelper::save('filemanager.save');
-		JToolBarHelper::cancel('filemanager.cancel');
-
+		if (FLEXI_J16GE) {
+			JToolBarHelper::apply('filemanager.apply');
+			JToolBarHelper::save('filemanager.save');
+			JToolBarHelper::cancel('filemanager.cancel');
+		} else {
+			JToolBarHelper::apply();
+			JToolBarHelper::save();
+			JToolBarHelper::cancel();
+		}
 		//Get data from the model
 		$model		= & $this->getModel();
-		$form			= & $this->get('Form');
+		if (FLEXI_J16GE) $form = & $this->get('Form');
 		$row     	= & $this->get( 'File' );
 		
 		// fail if checked out not by 'me'
@@ -62,16 +66,19 @@ class FlexicontentViewFile extends JViewLegacy {
 		}
 		
 		//build access level list
-		$lists['access'] 	= JHTML::_('list.accesslevel', $row );
+		if (FLEXI_ACCESS) {
+			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 0, 0, 0, 0, 0, 0, 0, 0 );
+		} else {
+			$lists['access'] 	= JHTML::_('list.accesslevel', $row );
+		}
 		$document	= & JFactory::getDocument();
 
 		//clean data
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
 
 		//assign data to template
-		$this->assignRef('permission'	, $permission);
+		if (FLEXI_J16GE) $this->assignRef('form'				, $form);
 		$this->assignRef('row'				, $row);
-		$this->assignRef('form'				, $form);
 		$this->assignRef('lists'			, $lists);
 		$this->assignRef('document'		, $document);
 

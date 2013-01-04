@@ -17,34 +17,42 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+$ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
+$close_popup_js = FLEXI_J16GE ? "window.parent.SqueezeBox.close();" : "window.parent.document.getElementById('sbox-window').close();";
 ?>
 <script type="text/javascript">
 window.addEvent('domready', function(){
 	$('adminForm').addEvent('submit', function(e) {
-		$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 		e = new Event(e).stop();
-
-		new Request.HTML({
-			 url: this.get('action'),
-		   evalScripts: true,
-		   update: $('log-bind'),
-		   data: $('adminForm')
-		}).send();
-		
+		if (MooTools.version>="1.2.4") {
+			$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+			new Request.HTML({
+				 url: this.get('action'),
+			   evalScripts: true,
+			   update: $('log-bind'),
+			   data: $('adminForm')
+			}).send();
+		} else {
+			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+			this.send({
+				update: 	$('log-bind')
+			});
+		}
 	});
 }); 
 </script>
 
-<form action="index.php?option=com_flexicontent&task=templates.duplicate&layout=duplicate&format=raw" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&".$ctrl_task."duplicate&layout=duplicate&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
 		<legend>
-			<?php echo trim(JText::_( 'FLEXI_DUPLICATE_TEMPLATE' )); ?>
+			<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE' ); ?>
 			<span class="editlinktip hasTip tags" title="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_DESC' ); ?>" style="text-decoration: none; color: #333;">
 				<img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
 			</span>
 		</legend>
-		<br />
+		<?php echo FLEXI_J16GE ? '<br />' : ''; ?>
 		<input type="text" id="dest" name="dest" value="<?php echo $this->dest; ?>" size="52" />
 		<input type="hidden" id="source" name="source" value="<?php echo $this->source; ?>" />
 	</fieldset>
@@ -54,15 +62,23 @@ window.addEvent('domready', function(){
 			<input id="import" type="submit" class="button" value="<?php echo JText::_( 'FLEXI_DUPLICATE_TEMPLATE_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="button" onclick="window.parent.document.adminForm.submit();window.parent.SqueezeBox.close();;" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
+			<input type="button" class="button" onclick="window.parent.document.adminForm.submit();<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
 			</td>
 		</tr>
 	</table>
 	<div id="log-bind"></div>
 
-<?php echo JHTML::_( 'form.token' ); ?>
-<input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="task" value="templates.duplicate" />
-<input type="hidden" name="layout" value="templates.duplicate" />
-<input type="hidden" name="format" value="raw" />
+	<?php echo JHTML::_( 'form.token' ); ?>
+	<input type="hidden" name="option" value="com_flexicontent" />
+
+<?php if (FLEXI_J16GE) : ?>
+	<input type="hidden" name="task" value="templates.duplicate" />
+	<input type="hidden" name="layout" value="templates.duplicate" />
+	<input type="hidden" name="format" value="raw" />
+<?php else : ?>
+	<input type="hidden" name="task" value="duplicate" />
+	<input type="hidden" name="controller" value="templates" />
+	<input type="hidden" name="view" value="templates" />
+	<input type="hidden" name="tmpl" value="component" />
+<?php endif; ?>
 </form>

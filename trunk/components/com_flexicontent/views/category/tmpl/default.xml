@@ -25,6 +25,7 @@
 			</param>
 			
 			<param name="" type="separator" default="FLEXI_CONFIGURATION_CATEGORY" description="FLEXI_CONFIGURATION_CATEGORY_DESC" level="level2" />
+			<param name="" type="separator" default="FLEXI_MENU_ITEM_SELECTABLE_VIA_DIRECT_CLICK_ONLY" description="" level="level3" />
 			<param name="override_defaultconf" default="0" type="radio" label="FLEXI_ENABLE_OVERRIDE_CATEGORY" description="FLEXI_ENABLE_OVERRIDE_CATEGORY_DESC" >
 				<option value="0">FLEXI_OVERRIDE_CONF_NO</option>
 				<option value="1">FLEXI_OVERRIDE_CONF_YES</option>

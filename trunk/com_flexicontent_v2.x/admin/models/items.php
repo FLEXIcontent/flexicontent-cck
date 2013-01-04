@@ -2225,7 +2225,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		// Find item having tags
 		$items_with_tags = array();
-		if ($get_items_with_tags == true) {
+		if ( !empty($get_items_with_tags) ) {
 			$query  = 'SELECT DISTINCT itemid FROM #__flexicontent_tags_item_relations';
 			$this->_db->setQuery($query);
 			$items_with_tags = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();

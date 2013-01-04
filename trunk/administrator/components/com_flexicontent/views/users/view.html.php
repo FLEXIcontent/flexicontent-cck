@@ -15,7 +15,7 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * HTML View class for the Users component
@@ -99,16 +99,28 @@ class FlexicontentViewUsers extends JViewLegacy
 		$js .= "});";
 		$document->addScriptDeclaration($js);
 
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
+		
+		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanAuthors');
-		$contrl = FLEXI_J16GE ? "users." : "";
 
 		//create the toolbar
+		$contrl = FLEXI_J16GE ? "users." : "";
 		JToolBarHelper::title( JText::_( 'FLEXI_AUTHORS' ), 'authors' );
 		JToolBarHelper::custom( 'logout', 'cancel.png', 'cancel_f2.png', 'Logout' );
 		JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
 		JToolBarHelper::addNew($contrl.'add');
 		JToolBarHelper::editList($contrl.'edit');
-		JToolBarHelper::help( 'screen.users' );
+		JToolBarHelper::divider(); JToolBarHelper::spacer();
+		if (!FLEXI_J16GE)
+			JToolBarHelper::help( 'screen.users' );
+		else
+			JToolBarHelper::help('JHELP_USERS_USER_MANAGER');
+		if ($perms->CanConfig) {
+			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		}
 
 		$limit		= $mainframe->getUserStateFromRequest( 'global.list.limit', 'limit', $mainframe->getCfg('list_limit'), 'int' );
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.limitstart', 'limitstart', 0, 'int' );

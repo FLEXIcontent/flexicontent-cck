@@ -111,7 +111,7 @@ if ( $cparams->get('default_menuitem_nopathway',1) ) {
 	}
 }
 
-if ( $cparams->get('print_logging_info') ) {
+if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='component' && JRequest::getWord('format')!='raw') {
 	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	$app = & JFactory::getApplication();
 	$msg = sprintf( 'FLEXIcontent page creation is %.2f secs, (including content plugins: %.2f secs)', $elapsed_microseconds/1000000, $fc_content_plg_microtime/1000000);

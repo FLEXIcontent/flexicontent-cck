@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1364 2012-07-02 02:09:20Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1608 2012-12-25 04:31:58Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent category screen
@@ -64,31 +64,25 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		
-		// ************************************************************************************
-		// Check access (note some checks maybe done in the controller or the model (above) too
-		// ************************************************************************************
+		// ***************************************************************************
+		// Currently access checking for category add/edit form , it is done here, for
+		// most other views we force going though the controller and checking it there
+		// ***************************************************************************
 		
 		// *****************
 		// Global Permssions
 		// *****************
 		
 		// Get global permissions
-		if (FLEXI_J16GE || FLEXI_ACCESS) {
-			$perms = FlexicontentHelperPerm::getPerm();  // handles super admins correctly
-			$CanCats = $perms->CanCats;
-			$CanAddCats = $perms->CanAdd;
-		} else {
-			$CanCats		= 1;
-			$CanAddCats	= 1;
-		}
+		$perms = FlexicontentHelperPerm::getPerm();  // handles super admins correctly
 		
 		// Check no access to categories management (Global permission)
-		if ( !$CanCats ) {
+		if ( !$perms->CanCats ) {
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
 		// Check no privilege to create new categories (Global permission)
-		if ( $isNew && !$CanAddCats ) {
+		if ( $isNew && !$perms->CanAddCats ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
 			$mainframe->redirect( 'index.php?option=com_flexicontent' );
 		}

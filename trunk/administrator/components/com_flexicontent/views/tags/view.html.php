@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent categories screen
@@ -52,22 +52,19 @@ class FlexicontentViewTags extends JViewLegacy
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 
-		$permission = FlexicontentHelperPerm::getPerm();
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
 
-		if (!$permission->CanTags) {
-			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
-		}
-		
-		//Create Submenu
+		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanTags');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TAGS' ), 'tags' );
-		if ($permission->CanConfig) {
-			$toolbar =&JToolBar::getInstance('toolbar');
+		$toolbar =&JToolBar::getInstance('toolbar');
+		if ($perms->CanConfig) {
 			$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), JURI::base().'index.php?option=com_flexicontent&amp;view=tags&amp;layout=import&amp;tmpl=component', 430, 500);
+			JToolBarHelper::divider();  JToolBarHelper::spacer();
 		}
-		
 		if (FLEXI_J16GE) {
 			JToolBarHelper::publishList('tags.publish');
 			JToolBarHelper::unpublishList('tags.unpublish');
@@ -81,8 +78,8 @@ class FlexicontentViewTags extends JViewLegacy
 			JToolBarHelper::editList();
 			JToolBarHelper::deleteList();
 		}
-		
-		if($permission->CanConfig) {
+		if ($perms->CanConfig) {
+			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 

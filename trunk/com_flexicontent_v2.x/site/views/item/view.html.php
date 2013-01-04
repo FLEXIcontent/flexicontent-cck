@@ -955,12 +955,9 @@ class FlexicontentViewItem extends JViewLegacy
 		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
-		if (FLEXI_J16GE) {
+		if (FLEXI_J16GE || FLEXI_FISH) {
 			$item_lang = $isnew ? $site_default_lang : $item->language;
-			$lists['languages'] = flexicontent_html::buildlanguageslist('jform[language]', '', $item_lang, 3, $allowed_langs);
-		} else if (FLEXI_FISH) {
-			$item_lang = $isnew ? $site_default_lang : $item->language;
-			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $item_lang, 3, $allowed_langs);
+			$lists['languages'] = flexicontent_html::buildlanguageslist( (FLEXI_J16GE ? 'jform[language]' : 'language') , '', $item_lang, 3, $allowed_langs);
 		} else {
 			$item->language = $site_default_lang;
 		}

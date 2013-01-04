@@ -17,21 +17,34 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+$ctrl_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&task=';
+$close_popup_js = FLEXI_J16GE ? "window.parent.SqueezeBox.close();" : "window.parent.document.getElementById('sbox-window').close();";
 ?>
 <script type="text/javascript">
 window.addEvent('domready', function(){
 	$('adminForm').addEvent('submit', function(e) {
-		$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
 		e = new Event(e).stop();
+		if (MooTools.version>="1.2.4") {
+			$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+			new Request.HTML({
+				 url: this.get('action'),
+			   evalScripts: true,
+			   update: $('log-bind'),
+			   data: $('adminForm')
+			}).send();
+		} else {
+			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+			this.send({
+				update: 	$('log-bind')
+			});
+		}
 		
-		this.send({
-			update: 	$('log-bind')
-		});
 	});
 }); 
 </script>
 
-<form action="index.php?option=com_flexicontent&controller=tags&task=import&layout=import&format=raw" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&".$ctrl_task."import&layout=import&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
 		<legend>
@@ -40,6 +53,7 @@ window.addEvent('domready', function(){
 				<img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
 			</span>
 		</legend>
+		<?php echo FLEXI_J16GE ? '<br />' : ''; ?>
 		<textarea id="taglist" name="taglist" rows="20" cols="52"></textarea>
 	</fieldset>
 	<table width="100%" align="center">
@@ -48,15 +62,24 @@ window.addEvent('domready', function(){
 			<input id="import" type="submit" class="button" value="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="button" onclick="window.parent.document.adminForm.submit();window.parent.document.getElementById('sbox-window').close();" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
+			<input type="button" class="button" onclick="window.parent.document.adminForm.submit();<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
 			</td>
 		</tr>
 	</table>
 	<div id="log-bind"></div>
 
-<?php echo JHTML::_( 'form.token' ); ?>
-<input type="hidden" name="option" value="com_flexicontent" />
-<input type="hidden" name="controller" value="tags" />
-<input type="hidden" name="view" value="tags" />
-<input type="hidden" name="task" value="import" />
+	<?php echo JHTML::_( 'form.token' ); ?>
+	<input type="hidden" name="option" value="com_flexicontent" />
+
+<?php if (FLEXI_J16GE) : ?>
+	<input type="hidden" name="task" value="tags.import" />
+	<input type="hidden" name="layout" value="import" />
+	<input type="hidden" name="format" value="raw" />
+<?php else : ?>
+	<input type="hidden" name="task" value="import" />
+	<input type="hidden" name="controller" value="tags" />
+	<input type="hidden" name="view" value="tags" />
+	<input type="hidden" name="tmpl" value="component" />
+<?php endif; ?>
+
 </form>

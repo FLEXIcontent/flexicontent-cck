@@ -39,6 +39,7 @@
 		<!--action name="flexicontent.newtags" title="&lt;b&gt;Tags (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; add new tags to item" description="Allow users in the group to add new Tags to items" /-->
 		
 		<!-- VARIOUS management tabs -->
+		<action name="flexicontent.manageimport" title="&lt;b&gt;Types: -- manage --&lt;/b&gt;" description="Allow users in the group to have access to the (Content) Import Management." />
 		<action name="flexicontent.managetypes" title="&lt;b&gt;Types: -- manage --&lt;/b&gt;" description="Allow users in the group to have access to the Types Management. NOTE: There are more permissions that control what the user can do with types." />
 		<action name="flexicontent.managearchives" title="&lt;b&gt;Archives: -- manage --&lt;/b&gt;" description="Allow users in the group to have FULL access to the Archives Management" />
 		<action name="flexicontent.managetemplates" title="&lt;b&gt;Templates: -- manage --&lt;/b&gt;" description="Allow users in the group to have FULL access to the Templates Management" />

@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent Archive screen
@@ -49,13 +49,9 @@ class FlexicontentViewArchive extends JViewLegacy
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-		$permission = FlexicontentHelperPerm::getPerm();
-
-		if (!$permission->CanArchives) {
-			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
-		}
+		$perms = FlexicontentHelperPerm::getPerm();
 		
-		//Create Submenu
+		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanArchives');
 
 		//create the toolbar
@@ -67,7 +63,10 @@ class FlexicontentViewArchive extends JViewLegacy
 			JToolBarHelper::unarchiveList();
 			JToolBarHelper::deleteList();
 		}
-		if($permission->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		if ($perms->CanConfig) {
+			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		}
 
 		//Get data from the model
 		$rows			= & $this->get( 'Data');
@@ -83,11 +82,11 @@ class FlexicontentViewArchive extends JViewLegacy
 		$ordering = ($lists['order'] == 'i.ordering');
 
 		//assign data to template
-		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('rows'      	, $rows);
-		$this->assignRef('pageNav' 		, $pageNav);
+		$this->assignRef('lists'			, $lists);
+		$this->assignRef('rows'				, $rows);
+		$this->assignRef('pageNav'		, $pageNav);
 		$this->assignRef('ordering'		, $ordering);
-		$this->assignRef('user'			, $user);
+		$this->assignRef('user'				, $user);
 
 		parent::display($tpl);
 	}

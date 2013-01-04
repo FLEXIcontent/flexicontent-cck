@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: indexer.php 1193 2012-03-14 09:20:15Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: indexer.php 1528 2012-10-30 01:51:10Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,6 +17,7 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+$search_task = FLEXI_J16GE ? 'task=search.' : 'controller=search&task=';
 ?>
 <div style="heading">Indexer Running</div>
 <script type="text/javascript">
@@ -43,7 +44,7 @@ jQuery(document).ready(function() {
 		fieldindex = Math.floor((looper-1)/items.length)%fields.length;
 		itemindex = (looper-1)%items.length;
 		jQuery.ajax({
-			url: "index.php?option=com_flexicontent&task=search.index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo JRequest::getVar('indexer','advanced');?>",
+			url: "index.php?option=com_flexicontent&<?php echo $search_task; ?>index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo JRequest::getVar('indexer','advanced');?>",
 			success: function(response, status2, xhr2) {
 				var arr = response.split('|');
 				if(arr[0]=='fail') {
@@ -63,7 +64,7 @@ jQuery(document).ready(function() {
 		looper=looper+items_per_call;
 	}
 	jQuery.ajax({
-		url: "index.php?option=com_flexicontent&task=search.countrows",
+		url: "index.php?option=com_flexicontent&<?php echo $search_task; ?>countrows"+"&indexer=<?php echo JRequest::getVar('indexer','advanced');?>",
 		success: function(response, status, xhr) {
 			var arr = response.split('|');
 			if(arr[0]=='fail') {

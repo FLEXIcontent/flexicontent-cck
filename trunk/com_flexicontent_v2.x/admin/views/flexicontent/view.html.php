@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1212 2012-03-20 13:33:31Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: view.html.php 1598 2012-12-13 12:18:49Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * HTML View class for the FLEXIcontent View
@@ -176,27 +176,8 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 				 .install-notok { background: url(components/com_flexicontent/assets/images/delete.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; float:left;}';		
 		$document->addStyleDeclaration($css);
 		
-		if (FLEXI_J16GE || FLEXI_ACCESS) {
-			$perms = FlexicontentHelperPerm::getPerm();
-		} else {
-			$perms->CanAdd			= 1;
-			$perms->CanAddCats 	= 1;
-			$perms->CanCats 		= 1;
-			$perms->CanTypes 		= 1;
-			$perms->CanFields		= 1;
-			$perms->CanTags 		= 1;
-			$perms->CanAuthors	= 1;
-			$perms->CanArchives	= 1;
-			$perms->CanFiles		= 1;
-			$perms->CanStats		= 1;
-			$perms->CanRights		= 1;
-			$perms->CanPlugins	= 1;
-			$perms->CanTemplates= 1;
-			$perms->CanImport		= 1;
-			$perms->CanIndex		= 1;
-			$perms->CanConfig		= 1;
-			$perms->CanComments	= 1;
-		}
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
 
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
 			if($perms->CanConfig)  {

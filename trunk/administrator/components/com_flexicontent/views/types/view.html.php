@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent categories screen
@@ -27,9 +27,14 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewTypes extends JViewLegacy {
-
-	function display($tpl = null)
+class FlexicontentViewTypes extends JViewLegacy
+{
+	/**
+	 * Creates the Entrypage
+	 *
+	 * @since 1.0
+	 */
+	function display( $tpl = null )
 	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -40,7 +45,7 @@ class FlexicontentViewTypes extends JViewLegacy {
 		$user 		= & JFactory::getUser();
 		
 		JHTML::_('behavior.tooltip');
-
+		
 		//get vars
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.types.filter_order', 		'filter_order', 	't.name', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.types.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
@@ -50,34 +55,34 @@ class FlexicontentViewTypes extends JViewLegacy {
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-
-		if (FLEXI_J16GE || FLEXI_ACCESS) {
-			$perms = FlexicontentHelperPerm::getPerm();
-		} else {
-			$perms = new stdClass();
-			$perms->CanTypes 		= 1;
-			$perms->CanConfig		= 1;
-		}
 		
-		if (!$perms->CanTypes) {
-			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
-		}
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
 		
-		//Create Submenu
+		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanTypes');
 
 		//create the toolbar
+		$contrl = FLEXI_J16GE ? "types." : "";
 		JToolBarHelper::title( JText::_( 'FLEXI_TYPES' ), 'types' );
-		JToolBarHelper::custom( 'copy', 'copy.png', 'copy_f2.png', 'Copy' );
-		JToolBarHelper::publishList();
-		JToolBarHelper::unpublishList();
-		JToolBarHelper::addNew();
-		JToolBarHelper::editList();
-		JToolBarHelper::deleteList();
-		if($perms->CanConfig) JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
-
+		JToolBarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
+		JToolBarHelper::divider(); JToolBarHelper::spacer();
+		JToolBarHelper::publishList($contrl.'publish');
+		JToolBarHelper::unpublishList($contrl.'unpublish');
+		JToolBarHelper::addNew($contrl.'add');
+		JToolBarHelper::editList($contrl.'edit');
+		JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
+		if ($perms->CanConfig) {
+			JToolBarHelper::divider(); JToolBarHelper::spacer();
+			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+		}
+		
 		//Get data from the model
-		$rows             = & $this->get( 'Data');
+		if (FLEXI_J16GE) {
+			$rows = & $this->get( 'Items');
+		} else {
+			$rows = & $this->get( 'Data');
+		}
 		foreach($rows as $type) {
 			$type->config = new JParameter($type->config);
 		}

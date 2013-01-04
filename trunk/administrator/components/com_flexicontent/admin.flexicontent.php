@@ -57,78 +57,84 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, tru
 // Get component parameters
 $cparams =& JComponentHelper::getParams('com_flexicontent');
 
-if(!function_exists('FLEXISubmenu')) {
+if (!function_exists('FLEXISubmenu'))
+{
 	function FLEXISubmenu($cando)
 	{
-		if (FLEXI_J16GE || FLEXI_ACCESS) {
-			$perms = FlexicontentHelperPerm::getPerm();
-			//$CanEditPublished = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'editpublished', 'users', $user->gmid) : 1;
-			//echo "<br>CanEditPublished: $CanEditPublished<br>";
-		} else {
-			$perms->CanCats     = 1;
-			$perms->CanTypes    = 1;
-			$perms->CanFields   = 1;
-			$perms->CanTags     = 1;
-			$perms->CanArchives = 1;
-			$perms->CanFiles    = 1;
-			$perms->CanStats    = 1;
-			$perms->CanRights   = 1;
-			$perms->CanTemplates= 1;
-			$perms->CanAuthors  = 1;
-			$perms->CanImport   = 1;
-			$perms->CanIndex    = 1;
-		}
+		$perms = FlexicontentHelperPerm::getPerm();
 		
-		$authorized = isset($perms->$cando) && !$perms->$cando;
-		if ($authorized) {
+		// Check access to current management tab
+		$not_authorized = isset($perms->$cando) && !$perms->$cando;
+		if ( $not_authorized ) {
 			$mainframe = &JFactory::getApplication();
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
+		
+		// Get post-installation FLAG (session variable), and current view (HTTP request variable)
 		$session  =& JFactory::getSession();
 		$dopostinstall = $session->get('flexicontent.postinstall');
 		$view = JRequest::getVar('view', 'flexicontent');
-		//Create Submenu
+		
+		// Create Submenu, Dashboard (HOME is always added, other will appear only if post-installation tasks are done)
 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
-		// ensures the PHP version is correct
 		if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>'))
 		{
 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items');
-			if ($perms->CanTypes)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
-			if ($perms->CanCats) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
-			if ($perms->CanFields) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
-			if ($perms->CanTags) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
-			if ($perms->CanAuthors)	JSubMenuHelper::addEntry( JText::_( 'FLEXI_AUTHORS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
-			//if ($perms->CanArchives) JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
-			if ($perms->CanFiles) 	JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
-			if ($perms->CanIndex)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_SEARCH_INDEX' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
-			if ($perms->CanTemplates) JSubMenuHelper::addEntry( JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
-			if ($perms->CanImport)	JSubMenuHelper::addEntry( JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
-			if ($perms->CanStats)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
+			if ($perms->CanTypes)			JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
+			if ($perms->CanCats) 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
+			if ($perms->CanFields) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
+			if ($perms->CanTags) 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
+			if ($perms->CanAuthors)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_AUTHORS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
+		//if ($perms->CanArchives)	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
+			if ($perms->CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
+			if ($perms->CanIndex)			JSubMenuHelper::addEntry( JText::_( 'FLEXI_SEARCH_INDEX' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
+			if ($perms->CanTemplates)	JSubMenuHelper::addEntry( JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
+			if ($perms->CanImport)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
+			if ($perms->CanStats)			JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
 		}
 	}
 }
 
-// Require the base controller
+// Include the base controller
 require_once (JPATH_COMPONENT.DS.'controller.php');
 
-// SECURITY CONCERN !!!: Force permission checking by requiring to go through the custom controller when view is specified
-$controller = JRequest::getWord( 'controller' );
-$view = JRequest::getWord( 'view' );
-$view2ctrl = array('type'=>'types', 'item'=>'items', 'field'=>'fields', 'tag'=>'tags', 'category'=>'categories', 'user'=>'users');
+// ***********************************
+// PREPARE Calling the controller task
+// ***********************************
 
-if( !$controller && isset($view2ctrl[$view]) ) {
-	JRequest::setVar('controller', $view2ctrl[$view]);
-	$task = JRequest::getWord( 'task' );
-	if ( !$task ) {
-		JRequest::setVar('task', 'edit');
+// a. Get view, task, controller REQUEST variables
+$view = JRequest::getWord( 'view' );
+$controller = JRequest::getWord( 'controller' );
+$task = JRequest::getVar( 'task' );
+// In J1.6+ controller is set via task variable ...
+if (FLEXI_J16GE) {
+	$_p = explode('.', $task);
+	$task = $_p[ count($_p) - 1];
+	if (count($_p) > 1) $controller = $_p[0];
+}
+
+
+$alt_path = JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php';
+if ( file_exists($alt_path) ) {
+	// b. FORCE (if it exists) using controller named as current view name (thus ignoring controller set in HTTP REQUEST)
+	$controller = $view;
+} else {
+	// c. Singular views do not (usually) have a controller, instead the 'Plural' controller is used
+	$view2ctrl = array('type'=>'types', 'item'=>'items', 'field'=>'fields', 'tag'=>'tags', 'category'=>'categories', 'user'=>'users', 'file'=>'filemanager');
+	if ( isset($view2ctrl[$view]) ) {
+		$controller = $view2ctrl[$view];
+		if ( !$task ) $task = 'edit';  // default task for singular views is edit
 	}
 }
 
-if (FLEXI_J16GE) {
-	//Create the controller
-	$controller	= JControllerLegacy::getInstance('Flexicontent');
-} else {
-	// Require specific controller if requested
+// d. Set changes to controller/task variables back to HTTP REQUEST
+if ( FLEXI_J16GE && $controller && $task) $task = $controller.'.'.$task;
+JRequest::setVar('controller', $controller);
+JRequest::setVar('task', $task);
+//echo "$controller -- $task <br/>\n";
+
+// Include the specific controller file (if one was given in the HTTP request). This is needed for J1.5 only, since in J1.6+ this is done automatically
+if (!FLEXI_J16GE) {
 	if( $controller = JRequest::getWord('controller') ) {
 		$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
 		if (file_exists($path)) {
@@ -137,22 +143,26 @@ if (FLEXI_J16GE) {
 			$controller = '';
 		}
 	}
-	
-	//Create the controller
-	$classname  = 'FlexicontentController'.$controller;
-	$controller = new $classname( );
 }
 
-// Perform the Request task
+// Create a controller instance
+if (FLEXI_J16GE) {
+	$controller	= JControllerLegacy::getInstance('Flexicontent');
+} else {
+	$classname  = 'FlexicontentController'.$controller;
+	$controller = new $classname();
+}
+
+// Perform the requested task
 $controller->execute( JRequest::getCmd('task') );
 
-if ( $cparams->get('print_logging_info') ) {
+if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='component' && JRequest::getWord('format')!='raw') {
 	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	$app = & JFactory::getApplication();
 	$msg = sprintf( 'FLEXIcontent page creation is %.2f secs', $elapsed_microseconds/1000000);
 	$app->enqueueMessage( $msg, 'notice' );
 }
 
-// Redirect if set by the controller
+// Redirect if a redirect URL was set, e.g. by the executed controller task
 $controller->redirect();
 ?>

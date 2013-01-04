@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 376 2010-08-24 04:12:01Z enjoyman $
+ * @version 1.5 stable $Id: default.php 1604 2012-12-16 11:55:43Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -71,6 +71,7 @@ function submitbutton(pressbutton) {
 				<input name="ext" value="<?php echo $this->row->ext; ?>" size="5" maxlength="100"<?php echo $disabled; ?> />
 			</td>
 		</tr>
+		<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
 		<tr>
 			<td class="key">
 				<label for="access">
@@ -81,6 +82,7 @@ function submitbutton(pressbutton) {
 				<?php echo $this->lists['access']; ?>
 			</td>
 		</tr>
+		<?php endif; ?>
 		<tr>
 			<td class="key">
 				<label for="file-desc">
@@ -95,13 +97,7 @@ function submitbutton(pressbutton) {
 
 
 <?php
-
-// We do not use assets for files it seems like an overkill,
-// INSTEAD we use 8 Component permissions:  uploadfiles, viewallfiles,
-// editfile, publishfile, deletefile, editownfile, publishownfile, deleteownfile
-
-/*
-if ($this->permission->CanConfig) :
+if (FLEXI_ACCESS) :
 $this->document->addScriptDeclaration("
 	window.addEvent('domready', function() {
 	var slideaccess = new Fx.Slide('tabacces');
@@ -119,7 +115,7 @@ $this->document->addScriptDeclaration("
 	<table id="tabacces" class="admintable" width="100%">
 	<tr>
 		<td>
-		<div id="access"><?php echo $this->form->getInput('rules'); ?></div>
+		<div id="access"><?php echo $this->lists['access']; ?></div>
 	</td>
 	</tr>
 </table>
@@ -127,10 +123,7 @@ $this->document->addScriptDeclaration("
 	<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
 </div>
 </fieldset>
-<?php
-endif;
-*/
-?>
+<?php endif; ?>
 
 
 <?php echo JHTML::_( 'form.token' ); ?>

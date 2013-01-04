@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: default.php 833 2011-08-18 09:13:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -16,7 +16,11 @@
  * GNU General Public License for more details.
  */
 
-defined('_JEXEC') or die('Restricted access'); ?>
+defined('_JEXEC') or die('Restricted access');
+$ctrl = FLEXI_J16GE ? 'archive.' : '';
+$items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
+$categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp;task=';
+?>
 <div class="qickfaq">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
@@ -57,7 +61,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		for ($i=0, $n=count($this->rows); $i < $n; $i++) {
 			$row = $this->rows[$i];
 
-			$link 		= 'index.php?option=com_flexicontent&amp;task=items.edit&amp;cid[]='. $row->id;
+			$link 		= 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
    		?>
 		<tr class="<?php echo "row$k"; ?>">
@@ -90,11 +94,10 @@ defined('_JEXEC') or die('Restricted access'); ?>
 				<?php 
 				$nr = count($row->categories);
 				$ix = 0;
-				if (!is_array($row->categories))
-					$row->categories = array();
+				$row->categories = is_array($row->categories) ? $row->categories : array();
 				foreach ($row->categories as $key => $category) :
 				
-					$catlink	= 'index.php?option=com_flexicontent&amp;task=categories.edit&amp;cid[]='. $category->id;
+					$catlink	= 'index.php?option=com_flexicontent&amp;'.$categories_task.'edit&amp;cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $title; ?>">

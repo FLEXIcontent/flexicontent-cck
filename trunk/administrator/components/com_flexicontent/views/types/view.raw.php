@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 class FlexicontentViewTypes extends JViewLegacy{
 	

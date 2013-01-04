@@ -560,8 +560,14 @@ class FlexicontentControllerCategories extends FlexicontentController
 		{
 			$y = 0;
 			$n = 0;
+			$unauthorized = array();
 			foreach ($destid as $id)
 			{
+				// Check unauthorized categories is for J1.6+ only (categories have ACL edit action)
+				if ( FLEXI_J16GE && !$user->authorise('core.edit', 'com_content.category.'.$id) ) {
+					$unauthorized[] = $id;
+					continue;
+				}
 				if ($model->copyParams($id, $params)) {
 					$y++;
 				} else {
@@ -569,6 +575,9 @@ class FlexicontentControllerCategories extends FlexicontentController
 				}
 			}
 			echo '<div class="copyok">'.JText::sprintf( 'FLEXI_CAT_PARAMS_COPIED', $y, $n ).'</div>';
+			if ( FLEXI_J16GE && count($unauthorized) ) {
+				echo '<div class="copyfailed">'.'Skipped '.count($unauthorized).' uneditable categories with ids: '.implode(', ',$unauthorized).'</div>';
+			}
 		} else {
 			echo '<div class="copyfailed">'.JText::_( 'FLEXI_NO_SOURCE' ).'</div>';
 		}

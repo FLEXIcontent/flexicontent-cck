@@ -71,7 +71,7 @@ function submitbutton(pressbutton) {
 				<input name="ext" value="<?php echo $this->row->ext; ?>" size="5" maxlength="100"<?php echo $disabled; ?> />
 			</td>
 		</tr>
-		<?php if (!FLEXI_ACCESS) : ?>
+		<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
 		<tr>
 			<td class="key">
 				<label for="access">

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1222 2012-03-27 20:27:49Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1593 2012-12-11 21:41:25Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * View class for the FLEXIcontent categories screen
@@ -42,7 +42,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$option   = JRequest::getCmd( 'option' );
 		$task     = JRequest::getVar('task', '');
 		$cid      = JRequest::getVar('cid', array());
-		$extlimit = JRequest::getInt('extlimit', 100);
+		$extlimit = JRequest::getInt('extlimit', 500);
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		
@@ -125,69 +125,115 @@ class FlexicontentViewItems extends JViewLegacy {
 		} else {
 			$js .= "$$('.col_title').each(function(el){ el.removeClass('yellow'); });";
 		}
-		$js .= "});";
-		$document->addScriptDeclaration($js);
 		
-		if (FLEXI_J16GE || FLEXI_ACCESS) {
-			$permission 	= FlexicontentHelperPerm::getPerm();
-			$CanAdd				= $permission->CanAdd;
-			
-			$CanEdit			= $permission->CanEdit;
-			$CanPublish		= $permission->CanPublish;
-			$CanDelete		= $permission->CanDelete;
-			
-			$CanEditOwn			= $permission->CanEditOwn;
-			$CanPublishOwn	= $permission->CanPublishOwn;
-			$CanDeleteOwn		= $permission->CanDeleteOwn;
-			
-			$CanCats		= $permission->CanCats;
-			$CanRights	= $permission->CanConfig;
-			$CanOrder		= $permission->CanOrder;
-			$CanCopy		= $permission->CanCopy;
-			$CanArchives= $permission->CanArchives;
-			
-		} else {
-			
-			$CanAdd			= 1;
-			$CanEdit		= 1;
-			$CanPublish	= 1;
-			$CanDelete	= 1;
-			$CanCats		= 1;
-			$CanRights	= 1;
-			$CanOrder		= 1;
-			$CanCopy		= 1;
-			$CanArchives= 1;
-		}
+		$perms 	= FlexicontentHelperPerm::getPerm();
+		$CanAdd				= $perms->CanAdd;
+		
+		$CanEdit			= $perms->CanEdit;
+		$CanPublish		= $perms->CanPublish;
+		$CanDelete		= $perms->CanDelete;
+		
+		$CanEditOwn			= $perms->CanEditOwn;
+		$CanPublishOwn	= $perms->CanPublishOwn;
+		$CanDeleteOwn		= $perms->CanDeleteOwn;
+		
+		$CanCats		= $perms->CanCats;
+		$CanRights	= $perms->CanConfig;
+		$CanOrder		= $perms->CanOrder;
+		$CanCopy		= $perms->CanCopy;
+		$CanArchives= $perms->CanArchives;
+		
 		FLEXISubmenu('notvariable');
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );
 		$toolbar =&JToolBar::getInstance('toolbar');
 		
+		$add_divider = false;
+		if ( $filter_stategrp != '') {
+			$btn_task    = FLEXI_J16GE ? 'items.display' : 'display';
+			$extra_js    = "document.getElementById('filter_stategrp').checked=true;";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_DISPLAY_NORMAL', 'preview', $full_js='', $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false);
+			$add_divider = true;
+		}
+		if ( ($CanDelete || $CanDeleteOwn) && $filter_stategrp != 'trashed' ) {
+			$btn_task    = FLEXI_J16GE ? 'items.display' : 'display';
+			$extra_js    = "document.getElementById('filter_stategrptrashed').checked=true;";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_DISPLAY_TRASH', 'preview', $full_js='', $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false);
+			$add_divider = true;
+		}
+		if ($CanArchives && $filter_stategrp != 'archived') {
+			$btn_task    = FLEXI_J16GE ? 'items.display' : 'display';
+			$extra_js    = "document.getElementById('filter_stategrparchived').checked=true;";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_DISPLAY_ARCHIVE', 'preview', $full_js='', $msg_alert='', $msg_confirm='',
+				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false);
+			$add_divider = true;
+		}
+		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
+		
+		$add_divider = false;
 		if ( $CanPublish || $CanPublishOwn ) {
 			// Implementation of multiple-item state selector
-			$ctrl_task = FLEXI_J16GE ? '&task=items.selectstate' : '&controller=items&task=selectstate';
-			$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), JURI::base().'index.php?option=com_flexicontent'.$ctrl_task.'&format=raw', 840, 200);
-			JToolBarHelper::spacer();
-			JToolBarHelper::divider();
-			JToolBarHelper::spacer();
+			$btn_task = FLEXI_J16GE ? '&task=items.selectstate' : '&controller=items&task=selectstate';
+			$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), JURI::base().'index.php?option=com_flexicontent'.$btn_task.'&format=raw', 840, 200);
+			//function fetchButton( $type='Popup', $name = '', $text = '', $url = '', $width=640, $height=480, $top=0, $left=0 )
+			$add_divider = true;
 		}
+		if ($CanDelete || $CanDeleteOwn) {
+			if ( $filter_stategrp == 'trashed' ) {
+				$btn_msg = 'FLEXI_ARE_YOU_SURE';
+				$btn_task = FLEXI_J16GE ? 'items.remove' : 'remove';
+				JToolBarHelper::deleteList($btn_msg, $btn_task);
+			} else {
+				$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_TRASH') );
+				$msg_confirm = JText::_('FLEXI_TRASH_CONFIRM');
+				$btn_task    = FLEXI_J16GE ? 'items.changestate' : 'changestate';
+				$extra_js    = "document.adminForm.newstate.value='T';";
+				flexicontent_html::addToolBarButton(
+					'FLEXI_TRASH', 'trash', '', $msg_alert, $msg_confirm,
+					$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+			}
+			$add_divider = true;
+		}
+		if ($CanArchives && $filter_stategrp != 'archived') {
+			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_ARCHIVE')  );
+			$msg_confirm = JText::_('FLEXI_ARCHIVE_CONFIRM');
+			$btn_task    = FLEXI_J16GE ? 'items.changestate' : 'changestate';
+			$extra_js    = "document.adminForm.newstate.value='A';";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_ARCHIVE', 'archive', $full_js='', $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+			$add_divider = true;
+		}
+		if ( ($CanArchives && $filter_stategrp=='archived') || (($CanDelete || $CanDeleteOwn) && $filter_stategrp=='trashed') ) {
+			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_RESTORE') );
+			$msg_confirm = JText::_('FLEXI_RESTORE_CONFIRM');
+			$btn_task    = FLEXI_J16GE ? 'items.changestate' : 'changestate';
+			$extra_js    = "document.adminForm.newstate.value='P';";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_RESTORE', 'restore', $full_js='', $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+		}
+		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
 		
 		if ($CanAdd) {
-			//$ctrl_task = FLEXI_J16GE ? 'items.add' : 'add';
+			//$btn_task = FLEXI_J16GE ? 'items.add' : 'add';
 			//$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
 			//$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&format=raw');\n";
 			//$js .="$$('li#toolbar-new a.toolbar').set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');\n";
-			//$js .= "});";
-			//$document->addScriptDeclaration($js);
-			//JToolBarHelper::addNew($ctrl_task);
+			//JToolBarHelper::addNew($btn_task);
 			//JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
 			
 			$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), JURI::base().'index.php?option=com_flexicontent&view=types&format=raw', 600, 240);
 			
 			if ($CanCopy) {
-				$ctrl_task = FLEXI_J16GE ? 'items.copy' : 'copy';
-				JToolBarHelper::custom( $ctrl_task, 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
+				$btn_task = FLEXI_J16GE ? 'items.copy' : 'copy';
+				JToolBarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
 				$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 				if ($enable_translation_groups) {
 					JToolBarHelper::custom( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
@@ -195,21 +241,17 @@ class FlexicontentViewItems extends JViewLegacy {
 			}
 		}
 		if ($CanEdit || $CanEditOwn) {
-			$ctrl_task = FLEXI_J16GE ? 'items.edit' : 'edit';
-			JToolBarHelper::editList($ctrl_task);
-		}
-		if ( ($CanDelete || $CanDeleteOwn) && $filter_stategrp == 'trashed' ) {
-			$ctrl_task = FLEXI_J16GE ? 'items.remove' : 'remove';
-			JToolBarHelper::deleteList('Are you sure?', $ctrl_task);
+			$btn_task = FLEXI_J16GE ? 'items.edit' : 'edit';
+			JToolBarHelper::editList($btn_task);
 		}
 		
-		if(FLEXI_J16GE && $permission->CanConfig) {
-			JToolBarHelper::spacer();
-			JToolBarHelper::divider();
-			JToolBarHelper::spacer();
+		if ($perms->CanConfig) {
+			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 		
+		$js .= "});";
+		$document->addScriptDeclaration($js);
 		
 		// ***********************
 		// Get data from the model
@@ -423,10 +465,10 @@ class FlexicontentViewItems extends JViewLegacy {
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
 		
 		if (FLEXI_J16GE) {
-			$permission 	= FlexicontentHelperPerm::getPerm();
-			$CanCats		= $permission->CanCats;
-			$CanRights	= $permission->CanConfig;
-			$CanOrder		= $permission->CanOrder;
+			$perms 	= FlexicontentHelperPerm::getPerm();
+			$CanCats		= $perms->CanCats;
+			$CanRights	= $perms->CanConfig;
+			$CanOrder		= $perms->CanOrder;
 			
 		} else if (FLEXI_ACCESS) {
 			$CanCats		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid)	: 1;
