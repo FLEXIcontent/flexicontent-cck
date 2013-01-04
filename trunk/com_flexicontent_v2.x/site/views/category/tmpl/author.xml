@@ -23,6 +23,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_CONFIGURATION_AUTHOR" description="FLEXI_CONFIGURATION_AUTHOR_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_MENU_ITEM_SELECTABLE_VIA_DIRECT_CLICK_ONLY" description="" level="level3" />
 			<field name="override_defaultconf" default="0" type="radio" label="FLEXI_ENABLE_OVERRIDE_AUTHOR" description="FLEXI_ENABLE_OVERRIDE_AUTHOR_DESC" >
 				<option value="0">FLEXI_OVERRIDE_CONF_NO</option>
 				<option value="1">FLEXI_OVERRIDE_CONF_YES</option>

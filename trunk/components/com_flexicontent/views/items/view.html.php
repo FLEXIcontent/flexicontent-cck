@@ -71,17 +71,17 @@ class FlexicontentViewItems extends JViewLegacy
 		$Itemid		= JRequest::getInt('Itemid', 0);
 		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($mainframe->getParams('com_flexicontent'));
+		$cparams = clone($mainframe->getParams('com_flexicontent'));
 		
 		if ($menu) {
 			$menuParams = new JParameter($menu->params);
 			// In J1.6+ the above function does not merge current menu item parameters,
 			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
-			if (FLEXI_J16GE) $params->merge($menuParams);
+			if (FLEXI_J16GE) $cparams->merge($menuParams);
 		}
 		
 		//add css file
-		if (!$params->get('disablecss', '')) {
+		if (!$cparams->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
@@ -92,7 +92,7 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 		//special to hide the joomfish language selector on item views
 		$css = '#jflanguageselection { visibility:hidden; }'; 
-		if ($params->get('disable_lang_select', 1)) {
+		if ($cparams->get('disable_lang_select', 1)) {
 			$document->addStyleDeclaration($css);
 		}
 
@@ -559,7 +559,7 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 		
 		// Check if saving an item that translates an original content in site's default language
-		$enable_translation_groups = $params->get('enable_translation_groups');
+		$enable_translation_groups = $cparams->get('enable_translation_groups');
 		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($item->language, 0,2);
 		$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
 		
@@ -581,8 +581,17 @@ class FlexicontentViewItems extends JViewLegacy
 			// NOTE: this is DONE only for CUSTOM fields, since form field html is created by the form for all CORE fields, EXCEPTION is the 'text' field (see bellow)
 			if (!$field->iscore)
 			{
-				if ($modify_untraslatable_values && $field->untranslatable) {
-					$field->html = JText::_( 'FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE' );
+				if (FLEXI_J16GE)
+					$is_editable = !$field->valueseditable || $user->authorise('flexicontent.editfieldvalues', 'com_flexicontent.field.' . $field->id);
+				else if (FLEXI_ACCESS && $user->gid < 25)
+					$is_editable = !$field->valueseditable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'field', $field->id);
+				else
+					$is_editable = 1;
+					
+				if ( !$is_editable ) {
+					$field->html = '<div class="fc_mini_note_box">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
+				} else if ($modify_untraslatable_values && $field->untranslatable) {
+					$field->html = '<div class="fc_mini_note_box">'. JText::_('FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE') . '</div>';
 				} else {
 					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
 				}

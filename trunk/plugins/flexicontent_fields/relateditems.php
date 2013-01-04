@@ -14,7 +14,6 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsRelateditems extends JPlugin
@@ -38,11 +37,11 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		global $globalcats;
-		
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'relateditems') return;
+		
+		global $globalcats;
+		$field->label = JText::_($field->label);
 		
 		// SCOPE PARAMETERS
 		
@@ -173,17 +172,17 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		}
 		if ($onlypublished) {
 			$where .= ($where=="") ? "" : " AND ";
-			$where .= " c.state IN (1, -5) ";
+			$where .= " i.state IN (1, -5) ";
 		}
 		
 		if ($where!="") $where = " WHERE " . $where;
 		
 		$orderby 	= $this->_buildItemOrderBy($order);
 		
-		$query = "SELECT c.title, c.id, c.catid, c.state, GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist, c.alias FROM #__content AS c "
-			. (($samelangonly || $method_types>1) ? " LEFT JOIN #__flexicontent_items_ext AS ie on c.id=ie.item_id " : "")
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel on c.id=rel.itemid '
-			. ' LEFT JOIN #__users AS u ON u.id = c.created_by'
+		$query = "SELECT i.title, i.id, i.catid, i.state, GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist, i.alias FROM #__content AS i "
+			. (($samelangonly || $method_types>1) ? " LEFT JOIN #__flexicontent_items_ext AS ie on i.id=ie.item_id " : "")
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel on i.id=rel.itemid '
+			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			. $where
 			. " GROUP BY rel.itemid "
 			. $orderby
@@ -349,31 +348,33 @@ window.addEvent( 'domready', function() {
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'relateditems') return;
+		
+		$field->label = JText::_($field->label);
+		$values = $values ? $values : $field->value;
+		
+		// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
+		$values = ( $field_data = @unserialize($values) ) ? $field_data : $field->value;
 		
 		global $globalcats;
 		global $globalnoroute;
 		if (!is_array($globalnoroute)) $globalnoroute = array();
 		
-		$values = $values ? $values : $field->value ;
-		// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
-		$values = ( $field_data = @unserialize($values) ) ? $field_data : $field->value;
-
+		
 		// some parameter shortcuts
-		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
+		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext			= $field->parameters->get( 'pretext', '' ) ;
 		$posttext			= $field->parameters->get( 'posttext', '' ) ;
-		$separatorf			= $field->parameters->get( 'separatorf' ) ;
+		$separatorf		= $field->parameters->get( 'separatorf' ) ;
 		$opentag			= $field->parameters->get( 'opentag', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag', '' ) ;
-		$maxtitlechars 	= $field->parameters->get( 'maxtitlechars', 40 ) ;
+		$maxtitlechars= $field->parameters->get( 'maxtitlechars', 40 ) ;
 						
 		switch($separatorf)
 		{
 			case 0:
-			$separatorf = ' ';
+			$separatorf = '&nbsp;';
 			break;
 
 			case 1:
@@ -381,11 +382,11 @@ window.addEvent( 'domready', function() {
 			break;
 
 			case 2:
-			$separatorf = ' | ';
+			$separatorf = '&nbsp;|&nbsp;';
 			break;
 
 			case 3:
-			$separatorf = ', ';
+			$separatorf = ',&nbsp;';
 			break;
 
 			case 4:
@@ -393,14 +394,17 @@ window.addEvent( 'domready', function() {
 			break;
 
 			default:
-			$separatorf = ' ';
+			$separatorf = '&nbsp;';
 			break;
 		}
 		
 		if($pretext) 	{ $pretext 	= $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) 	{ $posttext	= $remove_space ? $posttext : ' ' . $posttext; }
-			
-		$db =& JFactory::getDBO();
+		if($posttext) { $posttext	= $remove_space ? $posttext : ' ' . $posttext; }
+		
+		if ( !count($values) ) {
+			$field->{$prop} = '';
+			return;
+		}
 		
 		$fieldval = array();
 		foreach($values as $i => $val) {
@@ -418,33 +422,29 @@ window.addEvent( 'domready', function() {
 			$nullDate	= $db->getNullDate();
 			$mainframe =& JFactory::getApplication();
 			$now		= $mainframe->get('requestTime');
-			$publish_where  = ' AND ( c.publish_up = '.$db->Quote($nullDate).' OR c.publish_up <= '.$db->Quote($now).' )'; 
-			$publish_where .= ' AND ( c.publish_down = '.$db->Quote($nullDate).' OR c.publish_down >= '.$db->Quote($now).' )';
+			$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )'; 
+			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
 		}
 		
 		$order = $field->parameters->get('orderby_frontend');
 		$orderby 	= $this->_buildItemOrderBy($order);
 		
-		$where = " WHERE c.id IN (". implode(",", array_keys($fieldval)) .")";
-		
-		$query = "SELECT c.title, c.id, c.alias, c.state, c.catid as maincatid, "
-			." GROUP_CONCAT(cat.id SEPARATOR  ',') AS catidlist, "
-			." GROUP_CONCAT(cat.alias SEPARATOR  ',') AS  cataliaslist "
-			." FROM #__content AS c "
-			." LEFT JOIN #__flexicontent_cats_item_relations AS rel ON c.id=rel.itemid "
-			." LEFT JOIN #__categories AS cat ON rel.catid=cat.id "
-			. $where
+		$db =& JFactory::getDBO();
+		$query = 'SELECT i.title, i.id, i.alias, i.state, i.catid, '
+			.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
+			.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
+			.' FROM #__content AS i '
+			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id=rel.itemid '
+			.' LEFT JOIN #__categories AS c ON c.id=rel.catid '
+			.' WHERE i.id IN ('. implode(",", array_keys($fieldval)) .')'
 			. $publish_where
-			. " GROUP BY c.id "
+			.' GROUP BY i.id '
 			. $orderby
 			;
 		$db->setQuery($query);
-		if (count($values))
-			$results = $db->loadObjectList();
-		else
-			$results = array();
-			
-		if($db->getErrorNum()) {
+		$results = $db->loadObjectList();
+		
+		if ($db->getErrorNum()) {
 			echo $db->getErrorMsg();
 			$field->{$prop} = '';
 			return false;
@@ -454,11 +454,14 @@ window.addEvent( 'domready', function() {
 			$field->{$prop} = '';
 		} else {
 			$display = array();
-			foreach($results as $result) {
+			foreach($results as $result)
+			{
 				// Check if related item is published and skip if not published
 				if ($result->state != 1 && $result->state != -5) continue;
 				
+				$itemslug = $result->id.":".$result->alias;
 				$catslug = "";
+				
 				// Check if removed from category or inside a noRoute category or inside a non-published category
 				// and use main category slug or other routable & published category slug
 				$catid_arr = explode(",", $result->catidlist);
@@ -470,8 +473,8 @@ window.addEvent( 'domready', function() {
 				$rel_catid = $fieldval[$rel_itemid]->catid;
 				if ( isset($itemcataliases[$rel_catid]) && !in_array($rel_catid, $globalnoroute) && $globalcats[$catid]->published) {
 					$catslug = $rel_catid.":".$itemcataliases[$rel_catid];
-				} else if (!in_array($result->maincatid, $globalnoroute) && $globalcats[$result->maincatid]->published ) {
-					$catslug = $globalcats[$result->maincatid]->slug;
+				} else if (!in_array($result->catid, $globalnoroute) && $globalcats[$result->catid]->published ) {
+					$catslug = $globalcats[$result->catid]->slug;
 				} else {
 					foreach ($catid_arr as $catid) {
 						if ( !in_array($catid, $globalnoroute) && $globalcats[$catid]->published) {
@@ -481,17 +484,13 @@ window.addEvent( 'domready', function() {
 					}
 				}
 				
-				$itemslug = $result->id.":".$result->alias;
 				$itemtitle = (mb_strlen($result->title) > $maxtitlechars) ? mb_substr($result->title,0,$maxtitlechars) . "..." : $result->title;
 				$link= "<a href='". JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $catslug)) ."' class='hasTip relateditem' title='". JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . addslashes($result->title) ."'>".$itemtitle."</a>\n";
 				$display[] = trim($pretext . $link . $posttext);
 			}
-			if ($values) {
-				$field->{$prop} = implode($separatorf, $display);
-				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-			} else {
-				$field->{$prop} = '';
-			}
+			
+			$field->{$prop} = implode($separatorf, $display);
+			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 		}
 	}
 	
@@ -521,6 +520,43 @@ window.addEvent( 'domready', function() {
 	
 	
 	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a category filter for the category view
+	/*function onDisplayFilter(&$filter, $value='', $formName='adminForm')
+	{
+		// execute the code only if the field type match the plugin type
+		if($filter->field_type != 'relateditems_backlinks') return;
+		// some parameter shortcuts
+		
+		$field_id = $filter->id;
+		
+		$db =& JFactory::getDBO();
+		$field_elements= 'SELECT DISTINCT fir.item_id as value, i.title as text'
+						 .' FROM #__content as i'
+						 .' LEFT JOIN #__flexicontent_fields_item_relations as fir ON i.id=fir.item_id AND fir.field_id='.$field_id
+						 ;
+		$db->setQuery($query);
+		$results = $db->loadObjectList();
+		echo $db->getErrorMsg();
+		
+		if (!$results) {
+			$filter->html = '';
+		} else {
+			$options = array();
+			$options[] = JHTML::_('select.option', '', '-'.JText::_('All').'-');
+			foreach($results as $result) {
+				$options[] = JHTML::_('select.option', $result->value, $result->text);
+			}
+			$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+		}
+
+	}*/
+	
+	
+	
 	// **********************
 	// VARIOUS HELPER METHODS
 	// **********************
@@ -535,23 +571,23 @@ window.addEvent( 'domready', function() {
 		if ($order) {
 			switch ($order) {
 				case 'date' :
-				$filter_order		= 'c.created';
+				$filter_order		= 'i.created';
 				$filter_order_dir	= 'ASC';
 				break;
 				case 'rdate' :
-				$filter_order		= 'c.created';
+				$filter_order		= 'i.created';
 				$filter_order_dir	= 'DESC';
 				break;
 				case 'modified' :
-				$filter_order		= 'c.modified';
+				$filter_order		= 'i.modified';
 				$filter_order_dir	= 'DESC';
 				break;
 				case 'alpha' :
-				$filter_order		= 'c.title';
+				$filter_order		= 'i.title';
 				$filter_order_dir	= 'ASC';
 				break;
 				case 'ralpha' :
-				$filter_order		= 'c.title';
+				$filter_order		= 'i.title';
 				$filter_order_dir	= 'DESC';
 				break;
 				case 'author' :
@@ -563,11 +599,11 @@ window.addEvent( 'domready', function() {
 				$filter_order_dir	= 'DESC';
 				break;
 				case 'hits' :
-				$filter_order		= 'c.hits';
+				$filter_order		= 'i.hits';
 				$filter_order_dir	= 'ASC';
 				break;
 				case 'rhits' :
-				$filter_order		= 'c.hits';
+				$filter_order		= 'i.hits';
 				$filter_order_dir	= 'DESC';
 				break;
 				case 'order' :
@@ -579,9 +615,9 @@ window.addEvent( 'domready', function() {
 		}
 
 		if ($filter_order)
-			$orderby = ' ORDER BY '.$filter_order.' '.$filter_order_dir.', c.title';
+			$orderby = ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.title';
 		else
-			$orderby = ' ORDER BY c.title';
+			$orderby = ' ORDER BY i.title';
 
 		return $orderby;
 	}

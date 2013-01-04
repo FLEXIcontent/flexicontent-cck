@@ -241,7 +241,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				if ($value) $skipped_vals[] = $value;
 				$date = '';
 			}
-			$calendar = JHTML::_('calendar', $date, $fieldname, $elementid.'_'.$n, '%Y-%m-%d', 'class="'.$required.'"');
+			
+			// Create JS calendar
+			$date_formats_map = array('0'=>'%Y-%m-%d', '1'=>'%Y-%m-%d %H:%M', '2'=>'%Y-%m-%d 00:00');
+			$date_format = $date_formats_map[$date_allowtime];
+			$calendar = JHTML::_('calendar', $date, $fieldname, $elementid.'_'.$n, $date_format, 'class="'.$required.'"');			
 			
 			$field->html[] =
 				$calendar.'

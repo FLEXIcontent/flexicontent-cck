@@ -38,11 +38,11 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		global $globalcats;
-		
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'relateditems') return;
+		
+		global $globalcats;
+		$field->label = JText::_($field->label);
 		
 		// SCOPE PARAMETERS
 		
@@ -362,13 +362,13 @@ window.addEvent( 'domready', function() {
 		$values = ( $field_data = @unserialize($values) ) ? $field_data : $field->value;
 
 		// some parameter shortcuts
-		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
+		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext			= $field->parameters->get( 'pretext', '' ) ;
 		$posttext			= $field->parameters->get( 'posttext', '' ) ;
-		$separatorf			= $field->parameters->get( 'separatorf' ) ;
+		$separatorf		= $field->parameters->get( 'separatorf' ) ;
 		$opentag			= $field->parameters->get( 'opentag', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag', '' ) ;
-		$maxtitlechars 	= $field->parameters->get( 'maxtitlechars', 40 ) ;
+		$maxtitlechars= $field->parameters->get( 'maxtitlechars', 40 ) ;
 						
 		switch($separatorf)
 		{

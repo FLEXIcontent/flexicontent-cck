@@ -121,7 +121,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$cols      = $field->parameters->get( 'cols', 75 ) ;
 		$rows      = $field->parameters->get( 'rows', 20 ) ;
 		$height    = $field->parameters->get( 'height', 400 ) ;
-		$use_html  = $field->parameters->get( 'use_html', 0 ) ;
+		$use_html  = $field->parameters->get( 'use_html', 1 ) ;  // Default to 1 to avoid problems with rendering the maintext description field
 		$required  = $field->parameters->get( 'required', 0 ) ;
 		$required  = $required ? ' required' : '';
 		
