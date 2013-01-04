@@ -317,6 +317,8 @@ class FlexicontentHelperRoute
 						// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
 						if (!isset($menuitem->jparams)) $menuitem->jparams = new JParameter($menuitem->params);
 						if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
+						if ( $menuitem->jparams->get('persistent_filters', '') ) continue;
+						if ( $menuitem->jparams->get('initial_filters', '') ) continue;
 
 						$match = $menuitem;
 						break;
