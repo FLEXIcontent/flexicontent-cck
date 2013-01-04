@@ -64,14 +64,15 @@ class FlexicontentViewCategories extends JViewLegacy
 
 		//create the toolbar
 		$contrl = FLEXI_J16GE ? "categories." : "";
+		$contrl_singular = FLEXI_J16GE ? "category." : "";
 		JToolBarHelper::title( JText::_( 'FLEXI_CATEGORIES' ), 'fc_categories' );
 		$toolbar =&JToolBar::getInstance('toolbar');
 		$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=params&amp;tmpl=component', 400, 440);
 		JToolBarHelper::divider(); JToolBarHelper::spacer();
 		JToolBarHelper::publishList($contrl.'publish');
 		JToolBarHelper::unpublishList($contrl.'unpublish');
-		JToolBarHelper::addNew($contrl.'add');
-		JToolBarHelper::editList($contrl.'edit');
+		JToolBarHelper::addNew($contrl_singular.'add');
+		JToolBarHelper::editList($contrl_singular.'edit');
 		JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
 		if ($perms->CanConfig) {
 			JToolBarHelper::divider(); JToolBarHelper::spacer();

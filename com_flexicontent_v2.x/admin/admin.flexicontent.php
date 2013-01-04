@@ -112,7 +112,9 @@ if (FLEXI_J16GE) {
 	$task = $_p[ count($_p) - 1];
 	if (count($_p) > 1) $controller = $_p[0];
 }
-
+// Cases that view variable must be ignored
+$forced_views = array('category'=>1);
+if ( isset($forced_views[$controller]) )  JRequest::setVar('view', $view=$controller);
 
 $alt_path = JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php';
 if ( file_exists($alt_path) ) {
@@ -120,16 +122,18 @@ if ( file_exists($alt_path) ) {
 	$controller = $view;
 } else {
 	// c. Singular views do not (usually) have a controller, instead the 'Plural' controller is used
-	$view2ctrl = array('type'=>'types', 'item'=>'items', 'field'=>'fields', 'tag'=>'tags', 'category'=>'categories', 'user'=>'users', 'file'=>'filemanager');
-	if ( isset($view2ctrl[$view]) ) {
-		$controller = $view2ctrl[$view];
+	// Going through the controller makes sure that appropriate code is always executed
+	// Views/Layouts that can be called without a forced controller task (and without redirect to them, these must contain permission checking)
+	$view_to_ctrl = array('type'=>'types', 'item'=>'items', 'field'=>'fields', 'tag'=>'tags', 'category'=>'categories', 'user'=>'users', 'file'=>'filemanager');
+	if ( isset($view_to_ctrl[$view]) ) {
+		$controller = $view_to_ctrl[$view];
 		if ( !$task ) $task = 'edit';  // default task for singular views is edit
 	}
 }
 
 // d. Set changes to controller/task variables back to HTTP REQUEST
 if ( FLEXI_J16GE && $controller && $task) $task = $controller.'.'.$task;
-JRequest::setVar('controller', $controller);
+JRequest::setVar('controller', $ctrlname=$controller);
 JRequest::setVar('task', $task);
 //echo "$controller -- $task <br/>\n";
 
@@ -161,6 +165,8 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	$app = & JFactory::getApplication();
 	$msg = sprintf( 'FLEXIcontent page creation is %.2f secs', $elapsed_microseconds/1000000);
+	if ($task) $msg .= " (TASK: ".(!FLEXI_J16GE ? $ctrlname.'.' : "").$task.")";
+	else $msg .= " (LAYOUT: ".JRequest::getWord('layout','display')." -- VIEW: ".JRequest::getWord('view','flexicontent').")";
 	$app->enqueueMessage( $msg, 'notice' );
 }
 

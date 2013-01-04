@@ -69,9 +69,9 @@ class FlexicontentViewCategory extends JViewLegacy
 		// most other views we force going though the controller and checking it there
 		// ***************************************************************************
 		
-		// *****************
-		// Global Permssions
-		// *****************
+		// *********************************************************************************************
+		// Global Permssions checking (needed because this view can be called without a controller task)
+		// *********************************************************************************************
 		
 		// Get global permissions
 		$perms = FlexicontentHelperPerm::getPerm();  // handles super admins correctly
@@ -88,10 +88,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		
-		// *****************
-		// Record Permssions
-		// *****************
-		
+		// ************************************************************************************
+		// Record Permssions (needed because this view can be called without a controller task)
+		// ************************************************************************************
+				
 		// Get edit privilege for current category
 		if (!$isNew) {
 			if (FLEXI_J16GE) {
