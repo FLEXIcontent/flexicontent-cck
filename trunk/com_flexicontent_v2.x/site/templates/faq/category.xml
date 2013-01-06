@@ -16,33 +16,6 @@
 			<option value="3">FLEXI_3_COLS</option>
 			<option value="4">FLEXI_4_COLS</option>
 		</field>
-
-		<field name="" type="separator" default="FLEXI_SUBCATEGORY_INFO" description="FLEXI_SUBCATEGORY_INFO_DESC" level="level2" hr="false" menu="hide" />
-		<field name="show_description_image_subcat" type="radio" default="1" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
-			<option value="0">FLEXI_HIDE</option>
-			<option value="1">FLEXI_SHOW</option>
-		</field>
-		<field name="subcat_image_source" type="list" default="2" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" >
-			<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
-			<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
-			<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
-		</field>
-		<field name="subcat_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</field>
-		<field name="subcat_image_method" type="radio" default="1" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
-			<option value="0">FLEXI_SCALE</option>
-			<option value="1">FLEXI_CROP</option>
-		</field>		
-		<field name="subcat_image_width" type="text" size="4" default="24" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-		<field name="subcat_image_height" type="text" size="4" default="24" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-		
-		<field name="show_description_subcat" type="radio" default="1" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
-			<option value="0">FLEXI_HIDE</option>
-			<option value="1">FLEXI_SHOW</option>
-		</field>
-		<field name="description_cut_text_subcat" type="text" size="3" default="120" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
 		
 		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPALTE_HTML_MODE" level="level2" menu="hide" />
 		<field name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
@@ -55,7 +28,7 @@
 		<group readonly="true">subcategory_title</group>
 		<group readonly="true">subcategory_description</group>
 		<group>aftertitle</group>
-	</fieldgroups>	
+	</fieldgroups>
 	<csscategory>
 		<file>css/category.css</file>
 	</csscategory>

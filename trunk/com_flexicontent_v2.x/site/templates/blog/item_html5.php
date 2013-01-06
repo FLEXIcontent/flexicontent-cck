@@ -82,7 +82,7 @@ $itemTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this-
     
 	<?php if ($this->params->get('show_title', 1)) : /* BOF item title */ ?>
     <header class="group">
-	<h<?php echo $itemTitleHeaderLevel; ?> class="contentheading"><span class="fc_item_title">
+		<?php echo "<h".$itemTitleHeaderLevel; ?> class="contentheading"><span class="fc_item_title">
 		<?php
 		if ( mb_strlen($this->item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
 			echo mb_substr ($this->item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
@@ -90,7 +90,7 @@ $itemTitleHeaderLevel = ( $this->params->get( 'show_page_heading', 1 ) && $this-
 			echo $this->item->title;
 		endif;
 		?>
-	</span></h<?php echo $itemTitleHeaderLevel; ?>>
+	</span><?php echo "</h".$itemTitleHeaderLevel; ?>>
 	<?php endif; /* EOF item title */ ?>
 
     <?php if ($this->item->event->afterDisplayTitle) : /* BOF afterDisplayTitle */ ?>

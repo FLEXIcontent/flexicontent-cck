@@ -403,4 +403,4 @@ endif;
 
 <?php elseif ($this->getModel()->getState('limit')) : // Check case of creating a category view without items ?>
 	<div class="noitems group"><?php echo JText::_( 'FLEXI_NO_ITEMS_CAT' ); ?></div>
-<?php endif; ?>
+<?php endif; // if ($this->params->get('show_title', 1) || count($columns)) elseif ... limit ?> 

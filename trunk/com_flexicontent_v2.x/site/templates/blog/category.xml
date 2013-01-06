@@ -16,15 +16,15 @@
 			<option value="3">FLEXI_3_COLS</option>
 			<option value="4">FLEXI_4_COLS</option>
 		</field>
-		<field name="sep_leading_items" type="separator" hr="false" default="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" level="level1" menu="hide" />
-		<field name="sep_leading_text" type="separator" hr="false" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
+		<field name="" type="separator" hr="false" default="FLEXI_LEADING_ITEMS" description="FLEXI_LEADING_ITEMS_DESC" level="level1" menu="hide" />
+		<field name="" type="separator" hr="false" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
 		<field name="lead_strip_html" type="list" default="1" label="FLEXI_STRIP_N_CUT" description="FLEXI_STRIP_N_CUT_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES_FORCE_READ_MORE</option>
 			<option value="2">FLEXI_YES</option>
 		</field>
 		<field name="lead_cut_text" type="text" size="4" default="400" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
-		<field name="sep_leading_image" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
+		<field name="" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
 		<field name="lead_use_image" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -50,15 +50,15 @@
 			<option value="0">FLEXI_SCALE</option>
 			<option value="1">FLEXI_CROP</option>
 		</field>		
-		<field name="sep_intro_items" type="separator" hr="false" default="FLEXI_INTRO_ITEMS" description="FLEXI_INTRO_ITEMS_DESC" level="level1" menu="hide" />
- 		<field name="sep_intro_text" type="separator" hr="false" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
+		<field name="" type="separator" hr="false" default="FLEXI_INTRO_ITEMS" description="FLEXI_INTRO_ITEMS_DESC" level="level1" menu="hide" />
+ 		<field name="" type="separator" hr="false" default="FLEXI_TEXT" description="FLEXI_TEXT_DESC" level="level2" menu="hide" />
 		<field name="intro_strip_html" type="list" default="1" label="FLEXI_STRIP_N_CUT" description="FLEXI_STRIP_N_CUT_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES_FORCE_READ_MORE</option>
 			<option value="2">FLEXI_YES</option>
 		</field>
 		<field name="intro_cut_text" type="text" size="4" default="200" label="FLEXI_CUT_INTRO" description="FLEXI_CUT_INTRO_DESC" />
- 		<field name="sep_intro_image" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
+ 		<field name="" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
 		<field name="intro_use_image" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>

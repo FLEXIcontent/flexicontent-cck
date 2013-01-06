@@ -95,6 +95,7 @@
 			</field>
 			<field name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 			
+			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" menu="hide" />
 			<field name="show_description_image" type="list" default="" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
@@ -119,6 +120,7 @@
 			<field name="cat_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="cat_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
+			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" menu="hide" />
 			<field name="show_description" type="list" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
@@ -133,19 +135,66 @@
 			<field name="" type="separator" default="FLEXI_SUBCATEGORY_INFO" description="FLEXI_SUBCATEGORY_INFO_DESC" level="level2" />
 			<field name="show_subcategories" type="list" default="" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<!--param name="subcategories_display" type="list" default="" label="Subcategories display" description="Choose the way you wish to display the Subcategories">
+			<field name="show_label_subcats" type="radio" default="" label="FLEXI_SHOW_SUBCATS_LABEL" description="FLEXI_SHOW_SUBCATS_LABEL_DESC" menu="hide" >
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">List</option>
-				<option value="1">Comma separated list</option>
-			</param-->
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
 			<field name="show_itemcount" type="list" default="" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
+
+			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" menu="hide" />
+			<field name="show_description_image_subcat" type="list" default="" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="subcat_image_source" type="list" default="" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
+				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
+				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
+			</field>
+			<field name="subcat_link_image" type="list" default="" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="subcat_image_method" type="list" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>		
+			<field name="subcat_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="subcat_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			
+			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" menu="hide" />
+			<field name="show_description_subcat" type="list" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="description_cut_text_subcat" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_SUBCATEGORY_ENCLOSING" level="level3" />
+			<field name="subcat_pretext" type="text" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
+			<field name="subcat_posttext" type="text" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
+			<field name="subcat_separatorf" type="list" default="" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+			</field>
+			<field name="subcat_opentag" type="text" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
+			<field name="subcat_closetag" type="text" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
 			
 		</fieldset>
 		
