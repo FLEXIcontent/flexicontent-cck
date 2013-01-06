@@ -142,15 +142,19 @@
 	margin: 0 0 0.5em 0;
 }
 
-#flexicontent .subcategories {
-	border-bottom: 2px solid #dddddd;
-	/* font-size: 1.2em; font-weight: bold; */
-	margin: 0.8em 0;
-	padding: 0.5em 0.3em;
+#flexicontent .subcategorieslabel {
+	display:inline-block !important;
+	margin:0px 0px 6px;
+	font-weight:bold;
+	border-bottom:1px dashed gray;
 }
 
 #flexicontent .subcategorieslist {
 	margin: 0 0 1em 0;
+}
+
+#flexicontent .subcat {
+	margin: 0px;
 }
 
 
@@ -1282,7 +1286,7 @@ table.admintable td {
 	font-weight: bold;
 	cursor: pointer !important;
 	float: left;
-	
+	white-space:nowrap;
 	background-color: white !important;
 	color: black !important;
 }

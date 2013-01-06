@@ -115,7 +115,7 @@ if ($leadnum) :
 
 				<?php 
 					if ($this->params->get('lead_use_image', 1)) :
-						if ($img_field_name) :
+						if (!empty($img_field_name)) :
 							FlexicontentFields::getFieldDisplay($items[$i], $img_field_name, $values=null, $method='display');
 							$img_field = & $items[$i]->fields[$img_field_name];
 							$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
@@ -141,22 +141,8 @@ if ($leadnum) :
 							// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 							$thumb = $src;
 						}
-						
-						if ($src) : // case source
+					endif;
 					?>
-					<figure class="image<?php echo $this->params->get('lead_position') ? ' right' : ' left'; ?>">
-						<?php if ($this->params->get('lead_link_image', 1)) : ?>
-						<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
-							<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
-						</a>
-						<?php else : ?>
-						<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
-						<?php endif; ?>
-					</figure>
-					<?php
-						endif; // case source
-					endif; 
-					?>			
 				
 				<!-- BOF above-description-line1 block -->
 				<?php if (isset($items[$i]->positions['above-description-line1'])) : ?>
@@ -212,16 +198,29 @@ if ($leadnum) :
 				<?php endif; ?>
 				<!-- EOF above-description-nolabel-line2 block -->
 				
+				<div class="lineinfo image_descr">
+				<?php if ($this->params->get('lead_use_image', 1) && $src) : ?>
+				<figure class="image<?php echo $this->params->get('lead_position') ? ' right' : ' left'; ?>">
+					<?php if ($this->params->get('lead_link_image', 1)) : ?>
+					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
+						<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
+					</a>
+					<?php else : ?>
+					<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
+					<?php endif; ?>
+				</figure>
+				<?php endif; ?>
 				<p>
 				<?php
-				FlexicontentFields::getFieldDisplay($items[$i], 'text', $values=null, $method='display');
-				if ($this->params->get('lead_strip_html', 1)) :
-				echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('lead_cut_text', 400) );
-				else :
-				echo $items[$i]->fields['text']->display;
-				endif;
+					FlexicontentFields::getFieldDisplay($items[$i], 'text', $values=null, $method='display');
+					if ($this->params->get('lead_strip_html', 1)) :
+						echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('lead_cut_text', 400) );
+					else :
+						echo $items[$i]->fields['text']->display;
+					endif;
 				?>
 				</p>
+				</div>
 
 				<!-- BOF under-description-line1 block -->
 				<?php if (isset($items[$i]->positions['under-description-line1'])) : ?>
@@ -400,7 +399,7 @@ if ($leadnum) :
 					
 					<?php 
 					if ($this->params->get('intro_use_image', 1)) :
-						if ($img_field_name) :
+						if (!empty($img_field_name)) :
 							FlexicontentFields::getFieldDisplay($items[$i], $img_field_name, $values=null, $method='display');
 							$img_field = & $items[$i]->fields[$img_field_name];
 							$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
@@ -426,22 +425,8 @@ if ($leadnum) :
 							// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 							$thumb = $src;
 						}
-						
-						if ($src) : // case source
+					endif;
 					?>
-				<figure class="image<?php echo $this->params->get('intro_position') ? ' right' : ' left'; ?>">
-					<?php if ($this->params->get('intro_link_image', 1)) : ?>
-						<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
-							<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
-						</a>
-					<?php else : ?>
-						<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
-					<?php endif; ?>
-				</figure>
-					<?php
-						endif; // case source
-					endif; 
-					?>			
 				
 				<!-- BOF above-description-line1 block -->
 				<?php if (isset($items[$i]->positions['above-description-line1'])) : ?>
@@ -497,16 +482,29 @@ if ($leadnum) :
 				<?php endif; ?>
 				<!-- EOF above-description-nolabel-line2 block -->
 
+				<div class="lineinfo image_descr">
+				<?php if ($this->params->get('intro_use_image', 1) && $src) : ?>
+				<figure class="image<?php echo $this->params->get('intro_position') ? ' right' : ' left'; ?>">
+					<?php if ($this->params->get('intro_link_image', 1)) : ?>
+						<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
+							<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
+						</a>
+					<?php else : ?>
+						<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
+					<?php endif; ?>
+				</figure>
+				<?php endif; ?>
 				<p>
 				<?php
-				FlexicontentFields::getFieldDisplay($items[$i], 'text', $values=null, $method='display');
-				if ($this->params->get('intro_strip_html', 1)) :
-				echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('intro_cut_text', 200) );
-				else :
-				echo $items[$i]->fields['text']->display;
-				endif;
+					FlexicontentFields::getFieldDisplay($items[$i], 'text', $values=null, $method='display');
+					if ($this->params->get('intro_strip_html', 1)) :
+						echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('intro_cut_text', 200) );
+					else :
+						echo $items[$i]->fields['text']->display;
+					endif;
 				?>
 				</p>
+				</div>
 
 				<!-- BOF under-description-line1 block -->
 				<?php if (isset($items[$i]->positions['under-description-line1'])) : ?>

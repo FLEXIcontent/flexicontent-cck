@@ -223,6 +223,7 @@ div.comments {
 #flexicontent div.image.right {
 	float: right !important;
 	margin: 8px 2px 0px 10px !important;
+	width:auto !important;
 }
 
 #flexicontent figure.image.left,
@@ -256,7 +257,10 @@ div.comments {
 	margin-right: 10px;
 }
 #flexicontent .lineinfo .element .label {
-	margin-right: 5px;
+	border-bottom: 1px dashed silver;
+	color: #555555;
+	font-size: 90%;
+	margin-right: 8px;
 }
 #flexicontent .lineinfo .element,
 #flexicontent .lineinfo .element .label,

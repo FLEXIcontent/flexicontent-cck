@@ -37,7 +37,7 @@
 		<group>description</group>
 		<group>bottom</group>
 		<group>renderonly</group>
-	</fieldgroups>	
+	</fieldgroups>
 	<csscategory>
 		<file>css/category.css</file>
 	</csscategory>
