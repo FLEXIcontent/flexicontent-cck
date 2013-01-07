@@ -587,9 +587,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'image') return;
+		$field->label = JText::_($field->label);
 
 		static $multiboxadded = false;
 		static $fancyboxadded = false;

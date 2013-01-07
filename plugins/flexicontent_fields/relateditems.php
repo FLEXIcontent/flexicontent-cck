@@ -1,10 +1,10 @@
 <?php
 /**
- * @version 1.0 $Id: relateditems.php 687 2011-07-26 04:55:37Z enjoyman@gmail.com $
+ * @version 1.0 $Id: relateditems.php
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.relateditems
- * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @copyright (C) 2011 ggppdk
  * @license GNU/GPL v2
  *
  * FLEXIcontent is distributed in the hope that it will be useful,
@@ -65,8 +65,6 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		$onlypublished = $field->parameters->get( 'onlypublished', 1 );
 		
 		// EDITING OPTIONS
-		// Ordering
-		$order = $field->parameters->get( 'orderby', 'alpha' );
 		
 		// Field height
 		$size				= $field->parameters->get( 'size', 12 ) ;
@@ -177,7 +175,8 @@ class plgFlexicontent_fieldsRelateditems extends JPlugin
 		
 		if ($where!="") $where = " WHERE " . $where;
 		
-		$orderby 	= $this->_buildItemOrderBy($order);
+		$order = $field->parameters->get( 'orderby_form', 'alpha' );
+		$orderby = $this->_buildItemOrderBy($order);
 		
 		$query = "SELECT i.title, i.id, i.catid, i.state, GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist, i.alias FROM #__content AS i "
 			. (($samelangonly || $method_types>1) ? " LEFT JOIN #__flexicontent_items_ext AS ie on i.id=ie.item_id " : "")
@@ -352,25 +351,139 @@ window.addEvent( 'domready', function() {
 		if($field->field_type != 'relateditems') return;
 		
 		$field->label = JText::_($field->label);
+		$field->{$prop} = '';
 		$values = $values ? $values : $field->value;
 		
 		// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed !!!
 		$values = ( $field_data = @unserialize($values) ) ? $field_data : $field->value;
 		
+		// No related items, return
+		if ( !$values || !count($values) ) return;
+		
+		$fieldval = array();
+		foreach($values as $i => $val) {
+			//echo $val."<br>";
+			list ($itemid,$catid) = explode(":", $val);
+			$fieldval[$itemid] = new stdClass();
+			$fieldval[$itemid]->itemid = $itemid;
+			$fieldval[$itemid]->catid = $catid;
+			$fieldval[$itemid]->val = $val;
+		}
+		$values = $fieldval;
+		
+		// Execute query to get item list data 
+		$db = & JFactory::getDBO();
+		$query = $this->_createItemsQuery($field, $item, $isform=0, $values);
+		$db->setQuery($query);
+		$item_list = & $db->loadObjectList('id');
+		$field->value_item_list = & $item_list;
+		//echo "<pre>"; print_r($item_list); echo "</pre>";
+		
+		if ($db->getErrorNum()) {
+			//echo $db->getErrorMsg();
+			$field->{$prop} = 'Field [id:'.$field->id.'] : SQL query error: '.$db->getErrorMsg();
+			return;
+		}
+		
+		// No published related items or SQL query failed, return
+		if ( !$item_list ) return;
+		
+		$field->{$prop} = $this->_createItemsList($field, $item, $values, $item_list, $isform=0);
+	}
+	
+	
+	// Helper private method to create SQL query for retrieving items list data
+	function &_createItemsQuery(&$field, &$item, $isform=0, $values=null)
+	{
+		$db = & JFactory::getDBO();
+		$order = $field->parameters->get( $isform ? 'orderby_form' : 'orderby', 'alpha' );
+		
+		// Get data like aliases and published state
+		$publish_where = '';
+		if ($field->parameters->get('use_publish_dates', 1 )) {
+			$nullDate	= $db->getNullDate();
+			$mainframe =& JFactory::getApplication();
+			$now		= $mainframe->get('requestTime');
+			$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )'; 
+			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
+		}
+		
+		$orderby = $this->_buildItemOrderBy($order);
+		//$query = 'SELECT i.title, i.id, i.alias, i.state, i.catid, '
+		$query = 'SELECT i.*, ext.type_id,'
+			.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
+			.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
+			.' FROM #__content AS i '
+			.' LEFT JOIN #__flexicontent_items_ext AS ext ON i.id=ext.item_id '
+			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id=rel.itemid '
+			.' LEFT JOIN #__categories AS c ON c.id=rel.catid '
+			.' LEFT JOIN #__users AS u ON u.id = i.created_by'
+			.' WHERE i.id IN ('. implode(",", array_keys($values)) .')'
+			. $publish_where
+			.' GROUP BY i.id '
+			. $orderby
+			;
+		//echo "<pre>".$query."</pre>";
+		return $query;
+	}
+	
+	
+	//  Build the order clause
+	function &_createItemsList(&$field, &$item, $values, &$item_list, $isform=0)
+	{
+		$db = & JFactory::getDBO();
 		global $globalcats;
 		global $globalnoroute;
 		if (!is_array($globalnoroute)) $globalnoroute = array();
 		
+		// Get fields of type relateditems
+		static $related_items_fields = null;
+		if ($related_items_fields===null) {
+			$query = "SELECT name FROM #__flexicontent_fields WHERE field_type='relateditems'";
+			$db->setQuery($query);
+			$field_name_col = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			$related_items_fields = !$field_name_col ? array() : array_flip($field_name_col);
+		}
 		
 		// some parameter shortcuts
 		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext			= $field->parameters->get( 'pretext', '' ) ;
-		$posttext			= $field->parameters->get( 'posttext', '' ) ;
-		$separatorf		= $field->parameters->get( 'separatorf' ) ;
-		$opentag			= $field->parameters->get( 'opentag', '' ) ;
-		$closetag			= $field->parameters->get( 'closetag', '' ) ;
-		$maxtitlechars= $field->parameters->get( 'maxtitlechars', 40 ) ;
-						
+		$pretext			= $field->parameters->get( $isform ? 'pretext_form' : 'pretext', '' ) ;
+		$posttext			= $field->parameters->get( $isform ? 'posttext_form' : 'posttext', '' ) ;
+		$separatorf		= $field->parameters->get( $isform ? 'separator' : 'separatorf' ) ;
+		$opentag			= $field->parameters->get( $isform ? 'opentag_form' : 'opentag', '' ) ;
+		$closetag			= $field->parameters->get( $isform ? 'closetag_form' : 'closetag', '' ) ;
+		$relitem_html = $field->parameters->get( $isform ? 'relitem_html_form' : 'relitem_html', '__display_text__' ) ;
+		$displayway		= $field->parameters->get( $isform ? 'displayway_form' : 'displayway', 1 ) ;
+		$addlink 			= $field->parameters->get( $isform ? 'addlink_form' : 'addlink', 1 ) ;
+		$addtooltip		= $field->parameters->get( $isform ? 'addtooltip_form' : 'addtooltip', 1 ) ;
+		
+		// Parse and identify custom fields
+		$result = preg_match_all("/\{\{([a-zA-Z_0-9]+)(##)?([a-zA-Z_0-9]+)?\}\}/", $relitem_html, $field_matches);
+		if ($result) {
+			$custom_field_names   = $field_matches[1];
+			$custom_field_methods = $field_matches[3];
+		} else {
+			$custom_field_names   = array();
+			$custom_field_methods = array();
+		}
+		
+		/*echo "Fields for Related Items List: "; $sep = "";
+		foreach ($custom_field_names as $i => $custom_field_name) {
+			echo $sep . $custom_field_names[$i] . ($custom_field_methods[$i] ? "->". $custom_field_methods[$i] : ""); $sep = " , ";
+		}
+		echo "<br/>\n";*/
+		
+		// Parse and identify language strings and then make language replacements
+		$result = preg_match_all("/\%\%([^%]+)\%\%/", $relitem_html, $translate_matches);
+		if ($result) {
+			$translate_strings = $translate_matches[1];
+		} else {
+			$translate_strings = array('FLEXI_READ_MORE_ABOUT');
+		}
+		foreach ($translate_strings as $translate_string) {
+			$relitem_html = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $relitem_html);
+		}
+		
 		switch($separatorf)
 		{
 			case 0:
@@ -401,97 +514,93 @@ window.addEvent( 'domready', function() {
 		if($pretext) 	{ $pretext 	= $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext	= $remove_space ? $posttext : ' ' . $posttext; }
 		
-		if ( !count($values) ) {
-			$field->{$prop} = '';
-			return;
-		}
 		
-		$fieldval = array();
-		foreach($values as $i => $val) {
-			//echo $val."<br>";
-			list ($itemid,$catid) = explode(":", $val);
-			$fieldval[$itemid] = new stdClass();
-			$fieldval[$itemid]->itemid = $itemid;
-			$fieldval[$itemid]->catid = $catid;
-			$fieldval[$itemid]->val = $val;
-		}
+		global $fc_run_times;
+		$fc_run_times['render_subfields'][$item->id."_".$field->id] = 0;
 		
-		// Get data like aliases and published state
-		$publish_where = '';
-		if ($field->parameters->get('use_publish_dates', 1 )) {
-			$nullDate	= $db->getNullDate();
-			$mainframe =& JFactory::getApplication();
-			$now		= $mainframe->get('requestTime');
-			$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )'; 
-			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
-		}
-		
-		$order = $field->parameters->get('orderby_frontend');
-		$orderby 	= $this->_buildItemOrderBy($order);
-		
-		$db =& JFactory::getDBO();
-		$query = 'SELECT i.title, i.id, i.alias, i.state, i.catid, '
-			.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
-			.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
-			.' FROM #__content AS i '
-			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id=rel.itemid '
-			.' LEFT JOIN #__categories AS c ON c.id=rel.catid '
-			.' WHERE i.id IN ('. implode(",", array_keys($fieldval)) .')'
-			. $publish_where
-			.' GROUP BY i.id '
-			. $orderby
-			;
-		$db->setQuery($query);
-		$results = $db->loadObjectList();
-		
-		if ($db->getErrorNum()) {
-			echo $db->getErrorMsg();
-			$field->{$prop} = '';
-			return false;
-		}
-		
-		if (!$results) {
-			$field->{$prop} = '';
-		} else {
-			$display = array();
-			foreach($results as $result)
-			{
-				// Check if related item is published and skip if not published
-				if ($result->state != 1 && $result->state != -5) continue;
-				
-				$itemslug = $result->id.":".$result->alias;
-				$catslug = "";
-				
-				// Check if removed from category or inside a noRoute category or inside a non-published category
-				// and use main category slug or other routable & published category slug
-				$catid_arr = explode(",", $result->catidlist);
-				$catalias_arr = explode(",", $result->cataliaslist);
-				for($i=0; $i<count($catid_arr); $i++) {
-					$itemcataliases[$catid_arr[$i]] = $catalias_arr[$i];
-				}
-				$rel_itemid = $result->id;
-				$rel_catid = $fieldval[$rel_itemid]->catid;
-				if ( isset($itemcataliases[$rel_catid]) && !in_array($rel_catid, $globalnoroute) && $globalcats[$catid]->published) {
-					$catslug = $rel_catid.":".$itemcataliases[$rel_catid];
-				} else if (!in_array($result->catid, $globalnoroute) && $globalcats[$result->catid]->published ) {
-					$catslug = $globalcats[$result->catid]->slug;
-				} else {
-					foreach ($catid_arr as $catid) {
-						if ( !in_array($catid, $globalnoroute) && $globalcats[$catid]->published) {
-							$catslug = $globalcats[$catid]->slug;
-							break;
-						}
+		foreach($item_list as $result)
+		{
+			// Check if related item is published and skip if not published
+			if ($result->state != 1 && $result->state != -5) continue;
+			
+			$itemslug = $result->id.":".$result->alias;
+			$catslug = "";
+			
+			// Check if removed from category or inside a noRoute category or inside a non-published category
+			// and use main category slug or other routable & published category slug
+			$catid_arr = explode(",", $result->catidlist);
+			$catalias_arr = explode(",", $result->cataliaslist);
+			for($i=0; $i<count($catid_arr); $i++) {
+				$itemcataliases[$catid_arr[$i]] = $catalias_arr[$i];
+			}
+			$rel_itemid = $result->id;
+			$rel_catid = isset($values[$rel_itemid]->catid) ? $values[$rel_itemid]->catid : $result->catid;
+			if ( isset($itemcataliases[$rel_catid]) && !in_array($rel_catid, $globalnoroute) && $globalcats[$rel_catid]->published) {
+				$catslug = $rel_catid.":".$itemcataliases[$rel_catid];
+			} else if (!in_array($result->catid, $globalnoroute) && $globalcats[$result->catid]->published ) {
+				$catslug = $globalcats[$result->catid]->slug;
+			} else {
+				foreach ($catid_arr as $catid) {
+					if ( !in_array($catid, $globalnoroute) && $globalcats[$catid]->published) {
+						$catslug = $globalcats[$catid]->slug;
+						break;
 					}
 				}
-				
-				$itemtitle = (mb_strlen($result->title) > $maxtitlechars) ? mb_substr($result->title,0,$maxtitlechars) . "..." : $result->title;
-				$link= "<a href='". JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $catslug)) ."' class='hasTip relateditem' title='". JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . addslashes($result->title) ."'>".$itemtitle."</a>\n";
-				$display[] = trim($pretext . $link . $posttext);
 			}
-			
-			$field->{$prop} = implode($separatorf, $display);
-			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			$result->slug = $itemslug;
+			$result->categoryslug = $catslug;
 		}
+		
+		foreach($custom_field_names as $i => $custom_field_name) {
+			if ( !isset($related_items_fields[$custom_field_name]) ) {
+				$display_var = $custom_field_methods[$i] ? $custom_field_methods[$i] : 'display';
+				$start_microtime = microtime(true);
+				FlexicontentFields::getFieldDisplay($item_list, $custom_field_name, $custom_field_values=null, $display_var);
+				$fc_run_times['render_subfields'][$item->id."_".$field->id] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			} else {
+				//$custom_field_display = 'cannot replace field: "'.$custom_field_name.'" because it is of type "related_items", which can cause loop';
+			}
+		}
+		
+		$display = array();
+		foreach($item_list as $result)
+		{
+			// Check if related item is published and skip if not published
+			if ($result->state != 1 && $result->state != -5) continue;
+			
+			// a. Replace some custom made strings
+			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($result->slug, $result->categoryslug));
+			$item_title_escaped = htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8');
+			$item_tooltip = ' class="hasTip relateditem" title="'. JText::_('FLEXI_READ_MORE_ABOUT').'::'.$item_title_escaped.'" ';
+			
+			$display_text = $displayway ? $result->title : $result->id;
+			$display_text = !$addlink ? $display_text : '<a href="'.$item_url.'"'.($addtooltip ? $item_tooltip : '').' >' .$display_text. '</a>';
+			
+			$curr_relitem_html = $relitem_html;
+			$curr_relitem_html = str_replace('__item_url__', $item_url, $curr_relitem_html);
+			$curr_relitem_html = str_replace('__item_title_escaped__', $item_title_escaped, $curr_relitem_html);
+			$curr_relitem_html = str_replace('__item_tooltip__', $item_tooltip, $curr_relitem_html);
+			$curr_relitem_html = str_replace('__display_text__', $display_text, $curr_relitem_html);
+			
+			// b. Replace item properties, e.g. {item->id}, (item->title}, etc
+			FlexicontentFields::doQueryReplacements($curr_relitem_html, $result);
+			
+			// c. Replace HTML display of various item fields
+			foreach($custom_field_names as $i => $custom_field_name) {
+				if ( !isset($related_items_fields[$custom_field_name]) ) {
+					$display_var = $custom_field_methods[$i] ? $custom_field_methods[$i] : 'display';
+					$custom_field_display = $result->fields[$custom_field_name]->{$display_var};
+				} else {
+					$custom_field_display = 'cannot replace field: "'.$custom_field_name.'" because it is of type "related_items", which can cause loop';
+				}
+				$custom_field_str = $custom_field_name . ($custom_field_methods[$i] ? "##".$custom_field_methods[$i] : "");
+				$curr_relitem_html = str_replace('{{'.$custom_field_str.'}}', $custom_field_display, $curr_relitem_html);
+			}
+			$display[] = trim($pretext . $curr_relitem_html . $posttext);
+		}
+		
+		$display = $opentag . implode($separatorf, $display) . $closetag;
+		return $display;
 	}
 	
 	

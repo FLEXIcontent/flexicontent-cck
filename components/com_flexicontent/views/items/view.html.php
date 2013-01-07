@@ -151,8 +151,8 @@ class FlexicontentViewItems extends JViewLegacy
 		$params->set('ilayout', $ilayout);		
 		
 		// Bind Fields
-		$item 	= FlexicontentFields::getFields($item, FLEXI_ITEMVIEW, $params, $aid);
-		$item	= $item[0];
+		$_items = array(&$item);
+		FlexicontentFields::getFields($_items, FLEXI_ITEMVIEW, $params, $aid);
 		
 		// Note : This parameter doesn't exist yet but it will be used by the future gallery template
 		if ($params->get('use_panes', 1)) {

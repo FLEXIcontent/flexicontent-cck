@@ -34,18 +34,21 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function & getFields(&$items, $view = FLEXI_ITEMVIEW, $params = null, $aid = 0)
+	function &getFields(&$items, $view = FLEXI_ITEMVIEW, $params = null, $aid = 0, $use_tmpl = true)
 	{
 		if (!$items) return $items;
 		if (!is_array($items)) {
-			$rows[] = $items;
-			$items	= $rows;
+			$items = array( $items );
 		}
-
+		
 		$user 		= &JFactory::getUser();
-
 		$mainframe	= &JFactory::getApplication();
 		$cparams	=& $mainframe->getParams('com_flexicontent');
+		
+		if ( $print_logging_info = $cparams->get('print_logging_info') ) {
+			global $fc_run_times;
+			$start_microtime = microtime(true);
+		}
 		
 		$itemcache 	=& JFactory::getCache('com_flexicontent_items');
 		$itemcache->setCaching(FLEXI_CACHE); 		//force cache
@@ -98,8 +101,15 @@ class FlexicontentFields
 			} else {
 				$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view, $aid);
 			}
-
-			// ***** SERIOUS PERFORMANCE ISSUE FIX -- ESPECIALLY IMPORTANT ON CATEGORY VIEW WITH A LOT OF ITEMS --
+		}
+		if ( $print_logging_info ) {
+			@$fc_run_times['field_value_retrieval'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		}
+		
+		// CHECK if 'always_create_fields_display' enabled and create the display for all item's fields
+		// *** This should be normally set to ZERO (never), to avoid a serious performance penalty !!!
+		for ($i=0; $i < sizeof($items); $i++)
+		{
 			$always_create_fields_display = $cparams->get('always_create_fields_display',0);
 			$flexiview = JRequest::getVar('view', false);
 			// 0: never, 1: always, 2: only in item view 
@@ -115,8 +125,8 @@ class FlexicontentFields
 			}
 		}
 		
-		$cparams->merge($params);  // merge components parameters into field parameters
-		$items = FlexicontentFields::renderPositions($items, $view, $params);
+		// Render field positions
+		if ($params) $items = FlexicontentFields::renderPositions($items, $view, $params, $use_tmpl);
 
 		return $items;
 	}
@@ -205,50 +215,63 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5.5
 	 */
-	function getFieldDisplay(&$item, $fieldname, $values=null, $method='display', $view = FLEXI_ITEMVIEW)
+	function &getFieldDisplay(&$item_data, $fieldname, $values=null, $method='display', $view = FLEXI_ITEMVIEW)
 	{
-	  if (!isset($item->fields)) {
-	  	// This if will succeed once per item ... because getFields will retrieve all values
-	  	// getFields() will not render the display of fields because we passed no params variable ...
-			$items = array(&$item);
-	  	FlexicontentFields::getFields($items, $view);
-	  }
-
-	  // Check if we have already created the display and return it
-	  if ( isset($item->onDemandFields[$fieldname]->{$method}) ) {
-	    return $item->onDemandFields[$fieldname]->{$method};
-	  } else {
+		// 1. Convert to array of items if not an array already
+		if ( !is_array($item_data)  ) 
+			$items = array($item_data);
+		else
+			$items = &$item_data;
+		
+  	// 2. Make sure that fields have been created for all given items
+		$_items = array();
+	  foreach ($items as $i => $item)  if (!isset($item->fields))  $_items[] = & $items[$i];
+	  if ( count($_items) )  FlexicontentFields::getFields($_items, $view);
+	  
+	  // 3. Check and create HTML display for the given field name
+	  $_return = array();
+	  foreach ($items as $item)
+	  {
+		  // Check if we have already created the display and skip current item
+		  if ( isset($item->onDemandFields[$fieldname]->{$method}) )  continue;
+		  
+		  // Find the field inside item
+		  foreach ($item->fields as $field)  if ($field->name==$fieldname) break;
+		  
+		  // Check for not found field, and skip it, this is either due to no access or wrong name ...
 	    $item->onDemandFields[$fieldname] = new stdClass();
-	  }
-	  
-	  // Find the field inside item
-	  foreach ($item->fields as $field) {
-	    if ($field->name==$fieldname) break;
-	  }
-	  
-	  // Field not found, this is either due to no access or wrong name ...
-	  $item->onDemandFields[$fieldname]->noaccess = false;
-	  if ($field->name!=$fieldname) {
-		  $item->onDemandFields[$fieldname]->label = '';
-	  	$item->onDemandFields[$fieldname]->noaccess = true;
-	  	$item->onDemandFields[$fieldname]->errormsg = 'field not assigned to this type of item or current user has no access';
-	  	$item->onDemandFields[$fieldname]->{$method} = '';
-	  	return $item->onDemandFields[$fieldname]->{$method};
-	  }
-	  
-	  // Get field's values
-	  if ($values===null) {
-	  	$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
-	  }
-	  
-	  // Set other field data like label and field itself !!!
-	  $item->onDemandFields[$fieldname]->label = $field->label;
-	  $item->onDemandFields[$fieldname]->field = & $field;
-	  
-	  // Render the (display) method of the field and return it
-	  $field = FlexicontentFields::renderField($item, $field, $values, $method);
-	  $item->onDemandFields[$fieldname]->{$method} = @$field->{$method};
-	  return $item->onDemandFields[$fieldname]->{$method};
+		  if ($field->name!=$fieldname) {
+			  $item->onDemandFields[$fieldname]->label = '';
+		  	$item->onDemandFields[$fieldname]->noaccess = true;
+		  	$item->onDemandFields[$fieldname]->errormsg = 'field not assigned to this type of item or current user has no access';
+		  	$item->onDemandFields[$fieldname]->{$method} = '';
+		  	continue;
+		  }
+		  
+		  // Get field's values if they were custom values were not given
+		  if ($values===null) {
+		  	$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
+		  }
+		  
+		  // Set other field data like label and field itself !!!
+		  $item->onDemandFields[$fieldname]->label = $field->label;
+		  $item->onDemandFields[$fieldname]->noaccess = false;
+		  $item->onDemandFields[$fieldname]->field = & $field;
+		  
+		  
+		  
+		  // Render the (display) method of the field
+		  if (!isset($field->{$method})) $field = FlexicontentFields::renderField($item, $field, $values, $method);
+		  if (!isset($field->{$method})) $field->{$method} = '';
+		  $item->onDemandFields[$fieldname]->{$method} = & $field->{$method};
+		  $_method_html[$item->id] = & $field->{$method};
+		}
+		
+		
+		
+		// Return field(s) HTML (in case of multiple items this will be an array indexable by item ids
+		if ( !is_array($item_data) )  $_method_html = & $_method_html[$item_data->id];
+  	return $_method_html;
 	}
 	
 	/**
@@ -262,6 +285,10 @@ class FlexicontentFields
 	{
 		// If $method (e.g. display method) is already created, then return the $field without recreating the $method
 		if (isset($field->{$method})) return $field;
+		
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ($print_logging_info)  global $fc_run_times;
 		
 		// Append some values to the field object
 		$field->item_id 	= (int)$item->id;
@@ -281,6 +308,8 @@ class FlexicontentFields
 		//         For CORE field, both the above ('values' method parameter and 'value' field property) are
 		//         ignored and instead the other method parameters are used, along with the ITEM properties
 		// ****************************************************************************************************
+		// Log content plugin and other performance information
+		if ($print_logging_info)  $start_microtime = microtime(true);
 		if ($field->iscore == 1)  // CORE field
 		{
 			//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$item->parameters, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
@@ -290,6 +319,15 @@ class FlexicontentFields
 		{
 			//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 			FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array(&$field, $item, null, $method) );
+		}
+		if ($print_logging_info) {
+			$field_render_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			if ( isset($fc_run_times['render_subfields'][$item->id."_".$field->id]) ) {
+				$field_render_time = $field_render_time - $fc_run_times['render_subfields'][$item->id."_".$field->id];
+				@$fc_run_times['render_subfields'][$field->field_type] += $fc_run_times['render_subfields'][$item->id."_".$field->id];
+				unset($fc_run_times['render_subfields'][$item->id."_".$field->id]);
+			}
+			@$fc_run_times['render_field'][$field->field_type] += $field_render_time;
 		}
 		
 		
@@ -326,7 +364,7 @@ class FlexicontentFields
 		$flexiview	= JRequest::getVar('view');
 		
 		// Log content plugin and other performance information
-		if ($print_logging_info) 	global $fc_content_plg_microtime;
+		if ($print_logging_info) 	global $fc_run_times;
 		
 		if ($field->parameters->get('trigger_onprepare_content', 0))
 		{
@@ -383,7 +421,7 @@ class FlexicontentFields
 				if (FLEXI_J16GE) $results = $fcdispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$item->parameters, $limitstart), $plg_arr);
 				else             $results = $fcdispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, $limitstart), false, $plg_arr);
 				
-				if ($print_logging_info)  $fc_content_plg_microtime += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				if ($print_logging_info)  $fc_run_times['content_plg'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			}
 			
 			// Set the view and option back to items and com_flexicontent
@@ -408,7 +446,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function & renderPositions(&$items, $view = FLEXI_ITEMVIEW, $params = null)
+	function &renderPositions(&$items, $view = FLEXI_ITEMVIEW, $params = null, $use_tmpl = true)
 	{
 		if (!$items) return;
 		if (!$params) return $items;
@@ -419,12 +457,13 @@ class FlexicontentFields
 		// field's source code, can use this JRequest variable, to detect who rendered the fields (e.g. they can detect rendering from 'module')
 		JRequest::setVar("flexi_callview", $view);
 
-		if ($view == 'category' || $view == FLEXI_ITEMVIEW) {
+		if ( $use_tmpl && ($view == 'category' || $view == FLEXI_ITEMVIEW) ) {
 		  $fbypos = flexicontent_tmpl::getFieldsByPositions($params->get($layout, 'default'), $view);
 		}	else { // $view == 'module', or other
-			// Create a fake template position, for module fields
+			// Create a fake template position, for fields defined via parameters
 		  $fbypos[0] = new stdClass();
 		  $fbypos[0]->fields = explode(',', $params->get('fields'));
+		  $fbypos[0]->methods = explode(',', $params->get('methods'));
 		  $fbypos[0]->position = $view;
 		}
 		
@@ -452,7 +491,7 @@ class FlexicontentFields
 		  
 		  // RENDER fields if they are present in a template position (or in a dummy template position ... e.g. when called by module)
 			foreach ($fbypos as $pos) {
-				foreach ($pos->fields as $f) {
+				foreach ($pos->fields as $c => $f) {
 					// Check that field with given name: $f exists, (this will handle deleted fields, that still exist in a template position)
 					if (!isset($items[$i]->fields[$f])) {	
 						continue;
@@ -463,7 +502,8 @@ class FlexicontentFields
 					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
 					
 					// Render field (if already rendered above, the function will return result immediately)
-					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display');
+					$method = (isset($pos->methods[$c]) && $pos->methods[$c]) ? $pos->methods[$c] : 'display';
+					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method);
 					
 					// Set template position field data
 					if (isset($field->display) && strlen($field->display))
@@ -1248,7 +1288,7 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function & searchIndex_getFieldValues(&$field, &$item)
+	function &searchIndex_getFieldValues(&$field, &$item)
 	{
 		$db = &JFactory::getDBO();
 		
