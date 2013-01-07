@@ -25,10 +25,10 @@ $n = count($this->categories);
 $i = 0;
 
 // Sub-category prefix/suffix/separator parameters
-$pretext = $this->params->get( 'pretext', '' ); $posttext = $this->params->get( 'posttext', '' );
-$opentag = $this->params->get( 'opentag', '' ); $closetag = $this->params->get( 'closetag', '' );
+$pretext = $this->params->get( 'subcat_pretext', '' ); $posttext = $this->params->get( 'subcat_posttext', '' );
+$opentag = $this->params->get( 'subcat_opentag', '' ); $closetag = $this->params->get( 'subcat_closetag', '' );
 
-$separatorf = $this->params->get( 'separatorf' ); 
+$separatorf = $this->params->get( 'subcat_separatorf' ); 
 $separators_arr = array( 0 => '&nbsp;', 1 => '<br />', 2 => '&nbsp;|&nbsp;', 3 => ',&nbsp;', 4 => $closetag.$opentag);
 $separatorf = isset($separators_arr[$separatorf]) ? $separators_arr[$separatorf] : '&nbsp;';
 

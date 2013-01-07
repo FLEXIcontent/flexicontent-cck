@@ -165,8 +165,10 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	$app = & JFactory::getApplication();
 	$msg = sprintf( 'FLEXIcontent page creation is %.2f secs', $elapsed_microseconds/1000000);
-	if ($task) $msg .= " (TASK: ".(!FLEXI_J16GE ? $ctrlname.'.' : "").$task.")";
-	else $msg .= " (LAYOUT: ".JRequest::getWord('layout','display')." -- VIEW: ".JRequest::getWord('view','flexicontent').")";
+	$_view = JRequest::getWord('view','flexicontent');
+	$_layout = JRequest::getWord('layout','');
+	if ($task) $msg .= ' (TASK: '.(!FLEXI_J16GE ? $ctrlname.'.' : '').$task.')';
+	else $msg .= ' (VIEW: ' .$_view. ($_layout ? ' -- LAYOUT: '.$_layout : '') .')';
 	$app->enqueueMessage( $msg, 'notice' );
 }
 

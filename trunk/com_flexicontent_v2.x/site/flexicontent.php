@@ -26,8 +26,8 @@ if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
 
 // Logging Info variables
 $start_microtime = microtime(true);
-global $fc_content_plg_microtime;
-$fc_content_plg_microtime = 0;
+global $fc_run_times;
+$fc_run_times['content_plg'] = 0; $fc_run_times['field_value_retrieval'] = 0; $fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
 
 // load english language file for 'com_flexicontent' component then override with current language file
 JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
@@ -114,8 +114,22 @@ if ( $cparams->get('default_menuitem_nopathway',1) ) {
 if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='component' && JRequest::getWord('format')!='raw') {
 	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	$app = & JFactory::getApplication();
-	$msg = sprintf( 'FLEXIcontent page creation is %.2f secs, (including content plugins: %.2f secs)', $elapsed_microseconds/1000000, $fc_content_plg_microtime/1000000);
-	$app->enqueueMessage( $msg, 'notice' );
+	$fc_field_render_display_microtime_total = 0;
+	$fld_times = "";
+	/*foreach ($fc_run_times['render_field'] as $field_type => $fc_field_render_display_microtime_fld) {
+		$fc_field_render_display_microtime_total += $fc_field_render_display_microtime_fld;
+		$fld_times .= "<br/> - ".$field_type."=". sprintf("%.3f s",$fc_field_render_display_microtime_fld/1000000);
+		if ( isset($fc_run_times['render_subfields'][$field_type]) )
+			$fld_times .= " subfields (retrieval+render)= ". sprintf("%.3f s",$fc_run_times['render_subfields'][$field_type]/1000000);
+	}*/
+	$msg = sprintf(
+		'FC execution is %.2f s including:<br/> [Fields Value Retrieval: %.2f s] + [Fields Rendering: %.2f s] + [content plgs: %.2f s] ',
+		$elapsed_microseconds/1000000,
+		$fc_run_times['field_value_retrieval']/1000000,
+		$fc_field_render_display_microtime_total/1000000,
+		$fc_run_times['content_plg']/1000000
+	);
+	$app->enqueueMessage( $msg.$fld_times, 'notice' );
 }
 
 ?>
