@@ -915,10 +915,12 @@ class modFlexicontentHelper
 			if ( !$isflexi_itemview ) {
 				return;
 			} else {			
-				if ($behaviour_types == 1) {
+				if ($behaviour_auth == 1) {
 					$where .= ' AND i.created_by = ' . (int)$curitem->created_by;		
-				} else {
+				} else if ($behaviour_auth == 2) {
 					$where .= ' AND i.created_by <> ' . (int)$curitem->created_by;		
+				}  else {  // $behaviour_auth == 3
+					$where .= ' AND i.created_by = ' . (int)$user->id;
 				}
 			}
 		}

@@ -153,7 +153,7 @@
 				<option value="2">FLEXI_NOT_SAME_TYPE</option>
 			</param>
 	
-			<param name="" type="separator" default="FLEXI_AUTH_SCOPE" level="level1" menu="hide" />
+			<param name="" type="separator" default="FLEXI_AUTH_MY_ITEMS_SCOPE" level="level1" menu="hide" />
 			<param name="method_auth" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC">
 				<option value="1">FLEXI_ALL</option>
 				<option value="2">FLEXI_EXCLUDE</option>
@@ -164,6 +164,7 @@
 				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_CURRENT_ITEM</option>
 				<option value="1">FLEXI_SAME_AUTHOR</option>
 				<option value="2">FLEXI_NOT_SAME_AUTHOR</option>
+				<option value="3">FLEXI_CURRENT_USER_MY_ITEMS</option>
 			</param>
 			
 			<param name="" type="separator" default="FLEXI_ITEM_SCOPE" level="level1" menu="hide" />

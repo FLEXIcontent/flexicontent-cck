@@ -74,7 +74,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$app      = & JFactory::getApplication();
 		$document = & JFactory::getDocument();
-		$adminprefix = $app->isAdmin() ? '../' : '';
 		
 		if ( !$common_js_css_added ) {
 			$js = "
@@ -307,6 +306,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Common JS/CSS
 		$js .= "
+			var fc_db_img_path='".JURI::root().$field->parameters->get('dir')."';
 			function qmAssignFile".$field->id."(tagid, file, file_url) {
 				var replacestr = (tagid.indexOf('_existingname') > -1) ? '_existingname' : '_newfile';
 				var elementid = tagid.replace(replacestr,'');
@@ -486,7 +486,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
 				
-				$img_link  = $adminprefix.$field->parameters->get('dir');
+				$img_link  = JURI::root().$field->parameters->get('dir');
 				$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : "");
 				$img_link .= '/s_'.$value['originalname'];
 				$imgpreview = '<img class="preview_image" id="'.$elementid.'_preview_image" src="'.$img_link.'" style="border: 1px solid silver; float:left;" />';
@@ -1635,9 +1635,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$default_heights = array('l'=>600,'m'=>300,'s'=>90,'b'=>30);
 		
 		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
+		$boolres = true;
 		foreach ($sizes as $size)
 		{
-			$path	= JPath::clean( $thumbpath .DS. $size . '_' . $extra_prefix . $filename);
+			$thumbname = $size . '_' . $extra_prefix . $filename;
+			$path	= JPath::clean( $thumbpath .DS. $thumbname);
 			
 			$thumbnail_exists = false;
 			if (file_exists($path)) {
@@ -1669,13 +1671,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					)
 				 )
 			 {
-				//echo "SIZE: $size, ".($crop ? "CROP" : "SCALE").", OLDSIZE(w,h): $filesize_w,$filesize_h  NEWSIZE(w,h): $param_w,$param_h <br />";
-				$boolres = $this->create_thumb( $field, $filename, $size, $onlypath, $destpath, $copy_original, $extra_prefix );
-				return ($images_processed[$pindex][$filepath] = $boolres);
+				//echo "FILENAME: ".$thumbname.", ".($crop ? "CROP" : "SCALE").", ".($thumbnail_exists ? "OLDSIZE(w,h): $filesize_w,$filesize_h" : "")."  NEWSIZE(w,h): $param_w,$param_h <br />";
+				$boolres &= $this->create_thumb( $field, $filename, $size, $onlypath, $destpath, $copy_original, $extra_prefix );
 			}
 		}
 		
-		return ($images_processed[$pindex][$filepath] = true);
+		return ($images_processed[$pindex][$filepath] = $boolres);
 	}
 
 
@@ -1691,7 +1692,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$autoupload = $field->parameters->get('autoupload', 1);
 		$all_media  = $field->parameters->get('list_all_media_files', 0);
 		$limit_by_uploader = $field->parameters->get('limit_by_uploader', 0);  // USED ONLY WHEN all_media is ENABLED
-		$adminprefix = $app->isAdmin() ? '../' : '';
 		
 		// Retrieve available (and appropriate) images from the DB
 		if ($all_media) {
@@ -1739,7 +1739,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$onchange = ' onchange="';
 		$onchange .= ($required) ? '' : '';
-		$onchange .= " qmAssignFile".$field->id."(this.id, '', '".$adminprefix.$field->parameters->get('dir')."/s_'+this.value);";
+		$onchange .= " qmAssignFile".$field->id."(this.id, '', fc_db_img_path+'/s_'+this.value);";
 		$onchange .= ' "';
 		
 		$attribs = $onchange." ".$class;
