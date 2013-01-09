@@ -161,7 +161,8 @@ class FlexicontentModelItems extends ParentClassItem
 				$inactive_notice_set = true;
 			} else if ( !$item_is_published && !$ignore_publication ) {
 				// Raise error that the item is unpublished
-				JError::raiseError( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') . $title_str );
+				$msg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') . $title_str;
+				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 			} else if ( !$item_is_published && !$inactive_notice_set ) {
 				// Item edittable, set warning that ...
 				JError::raiseNotice( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_UNPUBLISHED') );
@@ -173,7 +174,8 @@ class FlexicontentModelItems extends ParentClassItem
 			// (b) Check that item has expired publication date
 			if ( $item_is_expired && !$ignore_publication ) {
 				// Raise error that the item is scheduled for publication
-				JError::raiseError( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') . $title_str );
+				$msg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') . $title_str;
+				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 			} else if ( $item_is_expired && !$inactive_notice_set ) {
 				// Item edittable, set warning that ...
 				JError::raiseNotice( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_EXPIRED') );
@@ -183,7 +185,8 @@ class FlexicontentModelItems extends ParentClassItem
 			// (c) Check that item has scheduled publication date
 			if ( $item_is_scheduled && !$ignore_publication ) {
 				// Raise error that the item is scheduled for publication
-				JError::raiseError( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') . $title_str );
+				$msg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') . $title_str;
+				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 			} else if ( $item_is_scheduled && !$inactive_notice_set ) {
 				// Item edittable, set warning that ...
 				JError::raiseNotice( 404, JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_SCHEDULED') );
@@ -193,7 +196,8 @@ class FlexicontentModelItems extends ParentClassItem
 			// (d) Check that current item category or all items categories are published
 			if ( !$cats_are_published && !$ignore_publication ) {
 				// Terminate execution with a HTTP not-found Server Error
-				JError::raiseError( 404, $cats_np_err_mssg . $title_str );
+				$msg = $cats_np_err_mssg . $title_str;
+				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 			} else if( !$cats_are_published && !$inactive_notice_set ) {
 				// Item edittable, set warning that item's (ancestor) category is unpublished
 				JError::raiseNotice( 404, $cats_np_err_mssg );
@@ -266,7 +270,8 @@ class FlexicontentModelItems extends ParentClassItem
 						$app->redirect($cparams->get('unauthorized_page'));				
 					} else {
 						// (e) finally raise a 403 forbidden Server Error if user is unauthorized to access item
-						JError::raiseError( 403, JText::_("FLEXI_ALERTNOTAUTH_VIEW"));
+						$msg = JText::_( 'FLEXI_ALERTNOTAUTH_VIEW');
+						if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 					}
 				}
 			} else {

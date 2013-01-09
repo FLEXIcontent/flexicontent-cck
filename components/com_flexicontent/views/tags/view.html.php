@@ -80,7 +80,8 @@ class FlexicontentViewTags extends JViewLegacy
 		//set 404 if tag doesn't exist or access isn't permitted
 		if ( empty($tag) ) {
 			$tid = JRequest::getInt('id', 0);
-			return JError::raiseError( 404, JText::sprintf( 'Tag #%d not found', $tid ) );
+			$msg = JText::sprintf( 'Tag #%d not found', $tid );
+			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 		}
 		
 		

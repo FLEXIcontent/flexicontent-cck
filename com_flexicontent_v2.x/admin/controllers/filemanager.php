@@ -535,7 +535,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		} else {
 
 			if (!$model->delete($cid)) {
-				JError::raiseError(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 			}
 			
 			$msg = count($cid).' '.JText::_( 'FLEXI_FILES_DELETED' );
@@ -597,10 +598,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$cache->clean();
 
 		} else {
-
-			$msg = JText::_( 'FLEXI_ERROR_SAVING_FILENAME' );
-			JError::raiseError( 500, $model->getError() );
-			$link 	= 'index.php?option=com_flexicontent&view=filemanager';
+			$msg = JText::_( 'FLEXI_ERROR_SAVING_FILENAME' ).' : '.$model->getError();
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 
 		$this->setRedirect($link, $msg);
@@ -707,7 +706,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$model = $this->getModel('filemanager');
 
 			if(!$model->publish($cid, $state)) {
-				JError::raiseError(500, $model->getError());
+				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 			}
 
 			$msg 	= JText::_( $state ? 'Published file' : 'Unpublished file' );

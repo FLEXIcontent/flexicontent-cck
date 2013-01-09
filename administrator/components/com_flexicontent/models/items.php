@@ -1406,7 +1406,11 @@ class FlexicontentModelItems extends JModelLegacy
 			$this->_db->setQuery( $sql, 0, 1 );  //echo $sql."\n";
 			$row = $this->_db->loadObject();
 			
-			if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
+			if ( $this->_db->getErrorNum() ) {
+				$msg = $this->_db->getErrorMsg();
+				$this->setError( $msg );
+				return false;
+			}
 			
 			if (isset($row))
 			{
@@ -1419,7 +1423,11 @@ class FlexicontentModelItems extends JModelLegacy
 				$this->_db->setQuery( $query );  //echo $query."\n";
 				$this->_db->query();
 
-				if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
+				if ( $this->_db->getErrorNum() ) {
+					$msg = $this->_db->getErrorMsg();
+					$this->setError( $msg );
+					return false;
+				}
 
 				$query = 'UPDATE #__flexicontent_cats_item_relations'
 					. ' SET ordering = '.(int) $origin->ordering
@@ -1429,7 +1437,11 @@ class FlexicontentModelItems extends JModelLegacy
 				$this->_db->setQuery( $query );  //echo $query."\n";
 				$this->_db->query();
 
-				if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
+				if ( $this->_db->getErrorNum() ) {
+					$msg = $this->_db->getErrorMsg();
+					$this->setError( $msg );
+					return false;
+				}
 
 				$origin->ordering = $row->ordering;
 			}
@@ -1543,7 +1555,12 @@ class FlexicontentModelItems extends JModelLegacy
 						;
 				$this->_db->setQuery( $query );  //echo "<pre>". $query."\n";
 				$row = $this->_db->loadObject();
-				if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
+				
+				if ( $this->_db->getErrorNum() ) {
+					$msg = $this->_db->getErrorMsg();
+					$this->setError( $msg );
+					return false;
+				}
 				
 				$row_stategrp = @ $state_grp_arr[$row->state];
 				
@@ -1557,7 +1574,12 @@ class FlexicontentModelItems extends JModelLegacy
 							;
 					$this->_db->setQuery($query);  //echo "$query <br/>";
 					$this->_db->query();
-					if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
+					
+					if ( $this->_db->getErrorNum() ) {
+						$msg = $this->_db->getErrorMsg();
+						$this->setError( $msg );
+						return false;
+					}
 					
 				} else {
 					// Detect columns with duplicate orderings, to force reordering them
@@ -1590,7 +1612,12 @@ class FlexicontentModelItems extends JModelLegacy
 								;
 						$this->_db->setQuery( $query );  //echo "$query <br/>";
 						$rows = $this->_db->loadObjectList();
-						if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
+						
+						if ( $this->_db->getErrorNum() ) {
+							$msg = $this->_db->getErrorMsg();
+							$this->setError( $msg );
+							return false;
+						}
 						
 						// Compact the ordering numbers
 						$cnt = 0;
@@ -1608,7 +1635,12 @@ class FlexicontentModelItems extends JModelLegacy
 											;
 									$this->_db->setQuery( $query);  //echo "$query <br/>";
 									$this->_db->query();
-									if ( $this->_db->getErrorNum() ) { $err = $this->_db->getErrorMsg();  JError::raiseError( 500, $err ); }
+									
+									if ( $this->_db->getErrorNum() ) {
+										$msg = $this->_db->getErrorMsg();
+										$this->setError( $msg );
+										return false;
+									}
 								}
 							}
 						}

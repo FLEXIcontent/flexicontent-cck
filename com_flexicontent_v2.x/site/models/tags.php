@@ -532,8 +532,8 @@ class FlexicontentModelTags extends JModelLegacy
 
 		// bind it to the table
 		if (!$row->bind($data)) {
-			JError::raiseError(500, $this->_db->getErrorMsg() );
-			return false;
+			$msg = $this->_db->getErrorMsg();
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 
 		// Make sure the data is valid
@@ -544,8 +544,8 @@ class FlexicontentModelTags extends JModelLegacy
 
 		// Store it in the db
 		if (!$row->store()) {
-			JError::raiseError(500, $this->_db->getErrorMsg() );
-			return false;
+			$msg = $this->_db->getErrorMsg();
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 		$this->_tag = &$row;
 		return $row->id;

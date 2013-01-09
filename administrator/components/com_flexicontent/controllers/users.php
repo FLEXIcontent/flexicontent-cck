@@ -313,7 +313,8 @@ class FlexicontentControllerusers extends FlexicontentController
 		JArrayHelper::toInteger( $cid );
 		
 		if (count( $cid ) < 1) {
-			JError::raiseError(500, JText::_( 'Select a User to delete', true ) );
+			$msg = JText::_( 'Select a User to delete' );
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 		
 		$msg = '';
@@ -413,7 +414,8 @@ class FlexicontentControllerusers extends FlexicontentController
 		}
 		
 		if (count( $cid ) < 1) {
-			JError::raiseError(500, JText::_( 'Select a User to '.$this->getTask(), true ) );
+			$msg = JText::_( 'Select a User to '.$this->getTask() );
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 		
 		$msg = '';

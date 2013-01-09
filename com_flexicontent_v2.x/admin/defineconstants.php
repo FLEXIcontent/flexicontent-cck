@@ -140,11 +140,11 @@ if (!FLEXI_J16GE) {
 }
 
 // Define configuration constants
-if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS'			, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
-if (!defined('FLEXI_CACHE')) 			define('FLEXI_CACHE'			, $params->get('advcache', 1));
+if (!defined('FLEXI_ACCESS')) 		define('FLEXI_ACCESS'		, (JPluginHelper::isEnabled('system', 'flexiaccess') && version_compare(PHP_VERSION, '5.0.0', '>')) ? 1 : 0);
+if (!defined('FLEXI_CACHE')) 		define('FLEXI_CACHE'		, $params->get('advcache', 1));
 if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $params->get('advcache_time', 3600));
-if (!defined('FLEXI_GC'))					define('FLEXI_GC'					, $params->get('purge_gc', 1));
-if (!defined('FLEXI_FISH'))				define('FLEXI_FISH'				, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
+if (!defined('FLEXI_GC'))			define('FLEXI_GC'			, $params->get('purge_gc', 1));
+if (!defined('FLEXI_FISH'))			define('FLEXI_FISH'			, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', 'jfdatabase'))) ? 1 : 0);
 if ( FLEXI_FISH ) {
 	$db = & JFactory::getDBO();
 	$config =& JFactory::getConfig();
@@ -158,5 +158,5 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/
 
 // Version constants
 define('FLEXI_VERSION',	FLEXI_J16GE ? '2.0.0' : '1.5.6');
-define('FLEXI_RELEASE',	'RC9c (r1617)');
+define('FLEXI_RELEASE',	'RC9c (r1619)');
 ?>
