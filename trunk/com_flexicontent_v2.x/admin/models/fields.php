@@ -666,8 +666,9 @@ class FlexicontentModelFields extends JModelList
 
 				if (!$this->_db->query())
 				{
-					$err = $this->_db->getErrorMsg();
-					JError::raiseError( 500, $err );
+					$msg = $this->_db->getErrorMsg();
+					$this->setError( $msg );
+					return false;
 				}
 
 				$query = 'UPDATE #__flexicontent_fields_type_relations'
@@ -679,8 +680,9 @@ class FlexicontentModelFields extends JModelList
 	
 				if (!$this->_db->query())
 				{
-					$err = $this->_db->getErrorMsg();
-					JError::raiseError( 500, $err );
+					$msg = $this->_db->getErrorMsg();
+					$this->setError( $msg );
+					return false;
 				}
 
 				$origin->ordering = $row->ordering;
@@ -696,8 +698,9 @@ class FlexicontentModelFields extends JModelList
 	
 				if (!$this->_db->query())
 				{
-					$err = $this->_db->getErrorMsg();
-					JError::raiseError( 500, $err );
+					$msg = $this->_db->getErrorMsg();
+					$this->setError( $msg );
+					return false;
 				}
 			}
 		return true;

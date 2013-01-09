@@ -209,8 +209,8 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Check for new content
 		if ( ($isnew && !$canAdd) || (!$isnew && !$canEdit)) {
-			JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-			return;
+			$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
+			if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 		}
 		
 		
@@ -621,11 +621,13 @@ class FlexicontentController extends JControllerLegacy
 					$mainframe->redirect($unauthorized_page);				
 				} else {
 					// user isn't authorize to edit this content
-					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+					$msg = JText::_( 'FLEXI_ALERTNOTAUTH_TASK' );
+					if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 				}
 			}
 		} else {
-			JError::raiseError( 500, 'Can not edit item, because item id is not set' );
+			$msg = JText::_( 'Can not edit item, because item id is not set' );
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 
 		//checked out?
@@ -715,7 +717,8 @@ class FlexicontentController extends JControllerLegacy
 				$mainframe->redirect($unauthorized_page);				
 			} else {
 				// user isn't authorize to add ANY content
-				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+				$msg = JText::_( 'FLEXI_ALERTNOTAUTH_TASK' );
+				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 			}
 		}
 
@@ -1088,8 +1091,8 @@ class FlexicontentController extends JControllerLegacy
 		if ($model->addfav()) {
 			$msg = JText::_( 'FLEXI_FAVOURITE_ADDED' );
 		} else {
-			JError::raiseError( 500, $model->getError() );
-			$msg = JText::_( 'FLEXI_FAVOURITE_NOT_ADDED' );
+			$msg = JText::_( 'FLEXI_FAVOURITE_NOT_ADDED' ).': '.$model->getError();
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 		
 		$cache = &JFactory::getCache('com_flexicontent');
@@ -1114,8 +1117,8 @@ class FlexicontentController extends JControllerLegacy
 		if ($model->removefav()) {
 			$msg = JText::_( 'FLEXI_FAVOURITE_REMOVED' );
 		} else {
-			JError::raiseError( 500, $model->getError() );
-			$msg = JText::_( 'FLEXI_FAVOURITE_NOT_REMOVED' );
+			$msg = JText::_( 'FLEXI_FAVOURITE_NOT_REMOVED' ).': '.$model->getError();
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 		
 		$cache = &JFactory::getCache('com_flexicontent');

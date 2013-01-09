@@ -39,9 +39,10 @@ class FlexicontentControllerTags extends FlexicontentController
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'add'  ,			'edit' );
+		$this->registerTask( 'add'  ,				'edit' );
 		$this->registerTask( 'apply', 			'save' );
-		$this->registerTask( 'saveandnew', 		'save' );
+		$this->registerTask( 'saveandnew',	'save' );
+		$this->registerTask( 'import', 			'import' );
 	}
 
 	/**
@@ -114,7 +115,8 @@ class FlexicontentControllerTags extends FlexicontentController
 			$model = $this->getModel('tags');
 
 			if(!$model->publish($cid, 1)) {
-				JError::raiseError( 500, $model->getError() );
+				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 			}
 
 			$total = count( $cid );
@@ -142,7 +144,8 @@ class FlexicontentControllerTags extends FlexicontentController
 			$model = $this->getModel('tags');
 
 			if(!$model->publish($cid, 0)) {
-				JError::raiseError( 500, $model->getError() );
+				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 			}
 
 			$total = count( $cid );
@@ -172,7 +175,8 @@ class FlexicontentControllerTags extends FlexicontentController
 			$model = $this->getModel('tags');
 
 			if (!$model->delete($cid)) {
-				JError::raiseError(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 			}
 			
 			$msg = count($cid).' '.JText::_( 'FLEXI_TAGS_DELETED' );

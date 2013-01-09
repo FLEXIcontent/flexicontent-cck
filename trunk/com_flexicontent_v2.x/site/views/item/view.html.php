@@ -505,7 +505,8 @@ class FlexicontentViewItem extends JViewLegacy
 
 			if (!$has_edit) {
 				// user isn't authorize to edit THIS item
-				JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+				$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
+				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 			}
 		} else {
 			// CREATE action
@@ -531,7 +532,8 @@ class FlexicontentViewItem extends JViewLegacy
 				$notauth_itemid = $params->get('notauthurl');
 				if (!$notauth_itemid) {
 					// no custom unauthorized page is set in menu item parameters
-					JError::raiseError( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+					$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
+					if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 				} else {
 					// custom unauthorized page is set in menu item parameters, retrieve url and redirect
 					$notauth_menu = JSite::getMenu()->getItem($notauth_itemid);

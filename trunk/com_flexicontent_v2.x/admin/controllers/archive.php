@@ -60,7 +60,8 @@ class FlexicontentControllerArchive extends FlexicontentController
 		$model = $this->getModel('archive');
 
 		if(!$model->unarchive($cid)) {
-			JError::raiseError(500, $model->getError());
+			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 
 		$total = count( $cid );
@@ -89,7 +90,8 @@ class FlexicontentControllerArchive extends FlexicontentController
 		
 		$model = $this->getModel('archive');
 		if(!$model->delete($cid)) {
-			JError::raiseError(500, $model->getError());
+			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 
 		$total = count( $cid );

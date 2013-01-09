@@ -314,8 +314,9 @@ class FlexicontentModelCategories extends JModelLegacy
 		$params = & JComponentHelper::getParams('com_flexicontent');
 		$table  = & $this->getTable('flexicontent_categories', '');
 		$user 	= & JFactory::getUser();
+		if (!$cids || !is_array($cids) || !count($cids)) return "No categories given for deletion";
 		
-		// Add all children to the list
+		// Add all children to the list, since we must check if they have assigned items
 		foreach ($cids as $id)
 		{
 			$this->_addCategories($id, $cids);
@@ -330,10 +331,27 @@ class FlexicontentModelCategories extends JModelLegacy
 				. ' GROUP BY c.id'
 				;
 		$this->_db->setQuery( $query );
-
-		if (!($rows = $this->_db->loadObjectList())) {
-			JError::raiseError( 500, $this->_db->stderr() );
+		
+		$rows = $this->_db->loadObjectList();
+		if ( !$rows ) {
+			$msg = $this->_db->getErrorNum() ? $this->_db->stderr() : 'Given category(ies) were not found';
+			$this->setError( $msg );
 			return false;
+		}
+		
+		if (FLEXI_J16GE) {
+			// Check access to delete of categories, this may seem redundant, but it is a security check in case user manipulates the backend adminform ...
+			foreach ($rows as $row) {
+				$canDelete		= $user->authorise('core.delete', 'com_content.category.'.$row->id);
+				$canDeleteOwn	= $user->authorise('core.delete.own', 'com_content.category.'.$row->id) && $row->created_user_id == $user->get('id');
+				if	( !$canDelete && !$canDeleteOwn ) {
+					$this->setError(
+						'You are not authorised to delete category with id: '. $row->id
+						.'<br />NOTE: when deleting a category the children categories will get deleted too'
+					);
+					return false;
+				}
+			}
 		}
 		
 		$err = array();
@@ -348,17 +366,28 @@ class FlexicontentModelCategories extends JModelLegacy
 			}
 		}
 		
+		// Remove categories only if no errors were found
 		if (count( $cid ) && count($err) == 0)
 		{
-			$cids = implode( ',', $cid );
-			$query = 'DELETE FROM #__categories'
-					. ' WHERE id IN ('. $cids .')';
+			if (FLEXI_J16GE) {
+				// table' is object of 'JTableNested' extended class, which will also delete assets
+				$cids = $cid;
+				foreach ($cids as $id) {
+					$table-> id = $id;
+					$table->delete($id);
+				}
+			} else {
 
-			$this->_db->setQuery( $query );
-
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
+				$cids = implode( ',', $cid );
+				$query = 'DELETE FROM #__categories'
+						. ' WHERE id IN ('. $cids .')';
+				
+				$this->_db->setQuery( $query );
+				
+				if(!$this->_db->query()) {
+					$this->setError($this->_db->getErrorMsg());
+					return false;
+				}
 			}
 			
 			// remove also categories acl if applicable
@@ -369,27 +398,22 @@ class FlexicontentModelCategories extends JModelLegacy
 						. ' AND axo IN ('. $cids .')'
 						;
 				$this->_db->setQuery( $query );
-			}
-			
-			if(!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
+				
+				if(!$this->_db->query()) {
+					$this->setError($this->_db->getErrorMsg());
+					return false;
+				}
 			}
 		}
-
-		if (count($err)) {
-			$cids 	= implode( ', ', $err );
-			if (count($err) < 2) {
-	    		$msg 	= JText::sprintf( 'FLEXI_ITEM_ASSIGNED_CATEGORY', $cids );
-			} else {
-	    		$msg 	= JText::sprintf( 'FLEXI_ITEMS_ASSIGNED_CATEGORY', $cids );
-			}
-			return $msg;
+		
+		// Create result message and return it
+		if ( count($err) ) {
+			$err_string = count($err)==1 ? 'FLEXI_ITEM_ASSIGNED_CATEGORY' : 'FLEXI_ITEMS_ASSIGNED_CATEGORY';
+			$msg = JText::sprintf( $err_string, implode( ', ', $err ) ) ."<br/>\n";
 		} else {
-			$total 	= count( $cid );
-			$msg 	= $total.' '.JText::_( 'FLEXI_CATEGORIES_DELETED' );
-			return $msg;
+			$msg = count( $cid ) .' '. JText::_( 'FLEXI_CATEGORIES_DELETED' );
 		}
+		return $msg;
 	}
 	
 	/**

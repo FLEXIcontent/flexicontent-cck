@@ -235,7 +235,8 @@ class ParentClassItem extends JModelLegacy
 		// --. Failed to load existing item, or check_view_access indicates not to create a new item object
 		else if ( $pk || $check_view_access===2 )
 		{
-			JError::raiseError(404, JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $pk));
+			$msg = JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $pk);
+			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 		}
 		
 		// --. Initialize new item, currently this succeeds always
@@ -737,7 +738,8 @@ class ParentClassItem extends JModelLegacy
 				
 				if ($e->getCode() == 404) {
 					// Need to go thru the error handler to allow Redirect to work.
-					JError::raiseError(404, $e->getMessage());
+					$msg = $e->getMessage();
+					if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 				}
 				else {
 					$this->setError($e);

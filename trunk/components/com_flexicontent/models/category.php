@@ -129,7 +129,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		} else if ($this->_layout=='myitems') {
 			$user =& JFactory::getUser();
 			if ($user->guest) {
-				JError::raiseError(404, JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT'));
+				$msg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
+				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 			}
 			$this->_authorid = $user->id;
 		}
@@ -1012,8 +1013,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		//Make sure the category is published
 		if (!$this->_category)
 		{
-			JError::raiseError(404, JText::sprintf( 'Content category with id: %d, was not found or is not published', $this->_id ));
-			return false;
+			$msg = JText::sprintf( 'Content category with id: %d, was not found or is not published', $this->_id );
+			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 		}
 		
 		// Set category parameters, these have already been loaded
@@ -1144,7 +1145,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$params->merge( new JParameter($author_catparams) );
 			}
 	
-			// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+			// Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
 			if ( !empty($menu) ) {
 				$view_ok      = @$menu->query['view']     == 'category';
 				$cid_ok       = @$menu->query['cid']      == JRequest::getInt('cid');

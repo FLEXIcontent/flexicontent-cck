@@ -132,7 +132,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 			$model = $this->getModel('types');
 
 			if(!$model->publish($cid, 1)) {
-				JError::raiseError( 500, $model->getError() );
+				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 			}
 
 			$total = count( $cid );
@@ -162,7 +163,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 		} else {
 
 			if (!$model->publish($cid, 0)) {
-				JError::raiseError(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 			}
 			
 			$msg = count($cid).' '.JText::_( 'FLEXI_TYPE_UNPUBLISHED' );
@@ -193,7 +195,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 		} else {
 
 			if (!$model->delete($cid)) {
-				JError::raiseError(500, JText::_( 'FLEXI_OPERATION_FAILED' ));
+				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 			}
 			
 			$msg = count($cid).' '.JText::_( 'FLEXI_TYPES_DELETED' );
@@ -279,7 +282,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$model = $this->getModel('types');
 		
 		if(!$model->saveaccess( $id, $access )) {
-			JError::raiseError(500, $model->getError());
+			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		} else {
 			$cache = &JFactory::getCache('com_flexicontent');
 			$cache->clean();
