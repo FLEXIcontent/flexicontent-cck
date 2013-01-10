@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="Categories (Experimental)">
+	<layout title="FLEXICONTENT_MCATS">
 		<message>
-			<![CDATA[Multiple categories listing , parameters used are global component and then overriden but these menu parameters]]>
+			<![CDATA[FLEXICONTENT_MCATS_DESC]]>
 		</message>
 	</layout>
 	<state>
-		<name>FLEXICONTENT_MYITEMS</name>
-		<description>FLEXICONTENT_MYITEMS_DESC</description>
+		<name>FLEXICONTENT_MCATS</name>
+		<description>FLEXICONTENT_MCATS_DESC</description>
 		<url addpath="/administrator/components/com_flexicontent/elements">
 			<param name="cids" type="flexicategories" joinwith="," multiple="true" default="0" label="FLEXI_CATEGORIES" required="required" description="FLEXI_CATEGORIES_DESC" />
 		</url>
