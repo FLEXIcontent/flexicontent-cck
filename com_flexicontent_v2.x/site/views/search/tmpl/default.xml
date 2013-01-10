@@ -70,7 +70,7 @@
 					<option value="AND">FLEXI_ALL</option>
 				</field>
 				
-				<field name="advsearch_fieldlist" type="fields" default="" label="Add Filter (below)" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvsearch="1"  onchange="javascript:f=document.getElementById('paramssearch_fields');if(f.value)f.value+=','+this.value;else f.value=this.value;this.value='';" />
+				<field name="advsearch_fieldlist" type="fields" default="" label="Add Filter (below)" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvsearch="1"  onchange="f=document.getElementById('{control_name}search_fields'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
 				<field name="search_fields" type="textarea" default="" label="Attribute Filters" description="Enter Content Attibute Filters used to limit the text search result list, these will be included in the search form, and will appear inside advanced search options box. You can separate each field by comma(,)." cols="40" rows="3" />
 				
 				<field name="" type="separator" level="level2" default="Optional selections" description="Optional selection parameters like content types and Other Search Areas of Site (non FC Content Data)"/>
