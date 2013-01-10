@@ -511,6 +511,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'author.php',
 			'myitems.xml',
 			'myitems.php',
+			'mcats.xml',
+			'mcats.php',
 			'default.xml',
 			'default.php',
 			'index.html',

@@ -37,6 +37,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 	var $_id = null;
 	
 	/**
+	 * Category ids (multiple category view)
+	 *
+	 * @var int
+	 */
+	var $_ids = array();
+	
+	/**
 	 * Category properties
 	 *
 	 * @var object
@@ -58,8 +65,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	var $_data = null;
 	
 	/**
-	 * Array of subcategory ids (includes category id too) used to create the ITEMS list
-	 *
+	 * Array of subcategory ids, including category id (or ids for multi-category view) too, used to create the ITEMS list
 	 * @var array
 	 */
 	var $_data_cats = array();
@@ -133,11 +139,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 			}
 			$this->_authorid = $user->id;
+		} else if ($this->_layout=='mcats') {
+			$this->_ids = JRequest::getVar('cids',  '', '', 'string');
+			$this->_ids = explode(',', $this->_ids);
+			// make sure given data are integers ... !!
+			foreach ($this->_ids as $i => $_id) $this->_ids[$i] = (int)$_id;
 		}
 		
 		// Set layout and authorid variables into state
 		$this->setState('layout', $this->_layout);
 		$this->setState('authorid', $this->_authorid);
+		$this->setState('cids', $this->_ids);
 
 		// We need to merge parameters here to get the correct page limit value, we must call this after populating layput and author variables
 		$this->_params = $this->_loadCategoryParams($this->_id);
@@ -263,7 +275,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access public
 	 * @return integer
 	 */
-	function & getParams()
+	function &getParams()
 	{
 		return $this->_params;
 	}
@@ -357,7 +369,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access public
 	 * @return string
 	 */
-	function & _getDataCats($id)
+	function &_getDataCats($id_arr)
 	{
 		if ( $this->_data_cats ) return $this->_data_cats;
 
@@ -392,33 +404,41 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$andaccess = '';
 		}		
 		
-		// filter by depth level
-		$display_subcats = $cparams->get('display_subcategories_items', 0);
-		if ($display_subcats==0) {
-			//$anddepth = ' AND c.id = '. $this->_id;
-			$this->_data_cats = array($id);
-			return $this->_data_cats;
-		} else if ($display_subcats==1) {
-			$anddepth = ' AND ( c.parent_id = ' .$id. ' OR c.id='.$id.')';
-		} else {
-			$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
-			$anddepth = ' AND c.id IN ('.$catlist.')';
+		$_data_cats = array();
+		foreach ($id_arr as $id)
+		{
+			// filter by depth level
+			$display_subcats = $cparams->get('display_subcategories_items', 0);
+			if ($display_subcats==0) {
+				//$anddepth = ' AND c.id = '. $this->_id;
+				$_data_cats[] = array($id);
+				continue;
+			} else if ($display_subcats==1) {
+				$anddepth = ' AND ( c.parent_id = ' .$id. ' OR c.id='.$id.')';
+			} else {
+				$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
+				$anddepth = ' AND c.id IN ('.$catlist.')';
+			}
+			
+			// finally create the query string
+			$query = 'SELECT c.id'
+				. ' FROM #__categories AS c'
+				. ' WHERE c.published = 1'
+				. $andaccess
+				. $anddepth
+				. ' ORDER BY '.$ordering
+				;
+			
+			$this->_db->setQuery($query);
+			$_data_cats[] = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+			if ( $this->_db->getErrorNum() ) {
+				$jAp=& JFactory::getApplication();
+				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+			}
 		}
-		
-		// finally create the query string
-		$query = 'SELECT c.id'
-			. ' FROM #__categories AS c'
-			. ' WHERE c.published = 1'
-			. $andaccess
-			. $anddepth
-			. ' ORDER BY '.$ordering
-			;
-		
-		$this->_db->setQuery($query);
-		$this->_data_cats = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-		if ( $this->_db->getErrorNum() ) {
-			$jAp=& JFactory::getApplication();
-			$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+		$this->_data_cats = array();
+		foreach ($_data_cats as $cats) {
+			$this->_data_cats = array_unique(array_merge($this->_data_cats, $cats));
 		}
 		
 		return $this->_data_cats;
@@ -548,9 +568,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$where = ' WHERE 1=1';
 		if ($this->_authorid)
 			$where .= ' AND i.created_by = ' . $this->_db->Quote($this->_authorid);
-		if ($this->_id) {
+		
+		if ($this->_id || count($this->_ids)) {
+			$id_arr = $this->_id ? array($this->_id) : $this->_ids;
 			// Get sub categories used to create items list, according to configuration and user access
-			$_data_cats = $this->_getDataCats($this->_id);
+			$this->_getDataCats($id_arr);
 			$_data_cats = "'".implode("','", $this->_data_cats)."'";
 			$where .= ' AND rel.catid IN ('.$_data_cats.')';
 		} 
@@ -614,6 +636,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$filter  = $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter', 'filter', '', 'string' );
 			} else if ($this->_authorid) {
 				$filter  = $mainframe->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter', 'filter', '', 'string' );
+			} else if (count($this->_ids)) {
+				$filter  = $mainframe->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
 			} else {
 				$filter  = JRequest::getVar('filter', NULL, 'default');
 			}
@@ -631,13 +655,26 @@ class FlexicontentModelCategory extends JModelLegacy {
 			foreach ($filters as $filtre)
 			{
 				if ($this->_id) {
-					$filtervalue 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+					$filtervalue 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
 				} else if ($this->_authorid) {
-					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+				} else if (count($this->_ids)) {
+					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.author'.$this->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
 				} else {
-					$filtervalue  = JRequest::getString('filter_'.$filtre->id, '', 'default');
+					$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
 				}
-				if (strlen($filtervalue)>0) {
+				if (is_array($filtervalue)) {
+					foreach ($filtervalue as $i => $v) {
+						if ( !strlen($filtervalue[$i]) ) unset($filtervalue[$i]);
+					}
+				}
+				
+				if ( 
+							( is_array($filtervalue) && count($filtervalue) ) ||
+							( !is_array($filtervalue) && strlen($filtervalue) )
+						)
+				{
+					//echo "category model found filters: "; print_r($filtervalue);
 					$where .= $this->_getFiltered($filtre->id, $filtervalue, $filtre->field_type);
 				}
 			}
@@ -773,12 +810,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 		} else {
 			$andaccess = '';
 		}
-
+		
+		$id_arr  = $this->_id ? array($this->_id) : $this->_ids;
+		$id_list = implode(',', $id_arr);
+		
 		$query = 'SELECT c.*,'
 			. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug'
 			. ' FROM #__categories AS c'
 			. ' WHERE c.published = 1'
-			. ' AND c.parent_id = '. $this->_id
+			. ' AND c.parent_id IN ('. $id_list .')'
 			. $andaccess
 			. ' ORDER BY '.$ordering
 			;
@@ -948,14 +988,16 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 	function getChilds()
 	{
+		if ( !$this->_id && !count($this->_ids)) return array();
+		
 		$query = $this->_buildChildsQuery();
 		$this->_childs = $this->_getList($query);
 		$id = $this->_id;  // save id in case we need to change it
 		$k = 0;
 		$count = count($this->_childs);
-		for($i = 0; $i < $count; $i++) {
+		for($i = 0; $i < $count; $i++)
+		{
 			$category =& $this->_childs[$i];
-			
 			$category->assigneditems = $this->_getassigned( $category->id );
 			$category->subcats       = $this->_getsubs( $category->id );
 			//$this->_id          = $category->id;
@@ -999,7 +1041,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$jAp->enqueueMessage('Please report to website administrator.','message');
 				$jAp->redirect( 'index.php' );
 			}
-		} else if ($this->_authorid) {
+		} else if ($this->_authorid || count($this->_ids)) {
 			$this->_category = new stdClass;
 			$this->_category->published = 1;
 			$this->_category->id = $this->_id;  // zero
@@ -1146,15 +1188,18 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 	
 			// Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
-			if ( !empty($menu) ) {
+			if ( !empty($menu) )
+			{
+				$this->_menu_itemid = $menu->id;
+				
 				$view_ok      = @$menu->query['view']     == 'category';
-				$cid_ok       = @$menu->query['cid']      == JRequest::getInt('cid');
-				$layout_ok    = @$menu->query['layout']   == JRequest::getVar('layout','');
-				$authorid_ok  = @$menu->query['authorid'] == JRequest::getInt('authorid');
+				$cid_ok       = @$menu->query['cid']      == $this->_id;
+				$layout_ok    = @$menu->query['layout']   == $this->_layout;
+				$authorid_ok  = @$menu->query['authorid'] == $this->_authorid;
 				
 				// We will merge menu parameters last, thus overriding the default categories parameters if either
 				// (a) override is enabled in the menu or (b) category Layout is 'myitems' which has no default parameters
-				$overrideconf = $menuParams->get('override_defaultconf',0) || JRequest::getVar('layout','')=='myitems';
+				$overrideconf = $menuParams->get('override_defaultconf',0) || $this->_layout=='myitems' || $this->_layout=='mcats';
 				$menu_matches = $view_ok && $cid_ok & $layout_ok && $authorid_ok;
 				
 				if ( $menu_matches && $overrideconf ) {
@@ -1405,7 +1450,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	}
 	
 	
-	function & getCommentsInfo ( $_item_ids = false)
+	function &getCommentsInfo ( $_item_ids = false)
 	{
 		// handle jcomments integration
 		if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
