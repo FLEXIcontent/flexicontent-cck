@@ -55,6 +55,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		$user		= & JFactory::getUser();
 		$aid		= FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
 		
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		flexicontent_html::loadJQuery();
+		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/rounded-corners.js' );
+		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($mainframe->getParams('com_flexicontent'));
 		
@@ -633,11 +637,11 @@ class FlexicontentViewCategory extends JViewLegacy
 			foreach ($filters as $filtre)
 			{
 				if ($category->id) {
-					$value  = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+					$value  = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
 				} else if ($authorid) {
-					$value  = $mainframe->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', 'string' );
+					$value  = $mainframe->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
 				} else {
-					$value  = JRequest::getString('filter_'.$filtre->id, '', 'default');
+					$value  = JRequest::getVar('filter_'.$filtre->id, '', '');
 				}
 				//$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
 				

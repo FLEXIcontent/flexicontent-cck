@@ -1285,8 +1285,8 @@ table.admintable td {
 	text-decoration: none !important;
 	font-weight: bold;
 	cursor: pointer !important;
-	float: left;
-	white-space:nowrap;
+	float: left !important;
+	white-space:nowrap !important;
 	background-color: white !important;
 	color: black !important;
 }
@@ -1297,7 +1297,8 @@ table.admintable td {
 }
 
 .flexi_radiotab input {
-	float: left;
+	float: left !important;
+	display:none !important;
 }
 
 

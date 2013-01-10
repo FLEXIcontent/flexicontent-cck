@@ -23,6 +23,7 @@ if (FLEXI_J16GE) {
 	jimport('joomla.form.formfield');
 }
 
+JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 // Load the category class
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
 
@@ -46,7 +47,6 @@ class JFormFieldFlexicategories extends JFormField
 	function getInput()
 	{
 		static $function_added = false;
-		$doc	= & JFactory::getDocument();
 		if (FLEXI_J16GE) {
 			$node = & $this->element;
 			$attributes = get_object_vars($node->attributes());
@@ -56,32 +56,21 @@ class JFormFieldFlexicategories extends JFormField
 		}
 		
 		$values			= FLEXI_J16GE ? $this->value : $value;
+		if ( !empty($attributes['joinwith']) ) {
+			$values = explode( $attributes['joinwith'],  $values );
+		}
 		if ( empty($values) )							$values = array();
 		else if ( ! is_array($values) )		$values = !FLEXI_J16GE ? array($values) : explode("|", $values);
 		
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		$ffname = @$attributes['name'];
 		
-		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');		
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		require_once(JPATH_ROOT.DS."components".DS."com_flexicontent".DS."classes".DS."flexicontent.categories.php");
 		$tree = flexicontent_cats::getCategoriesTree();
-		/*if (!$function_added) {
-			$function_added = true;
-			$js = "
-			function FLEXIClickCategory(obj, name) {
-				values=new Array();
-				for(i=0,j=0;i<obj.options.length;i++) {
-					if(obj.options[i].selected==true)
-						values[j++] = obj.options[i].value;
-				}
-				values = values.concat();
-				document.getElementById('a_id_'+name).value = values;
-			}";
-			$doc->addScriptDeclaration($js);
-		}*/
 		
-		$attribs = ' style="float:left;" ';
+		$attribs = '';
+		
+		// Steps needed for multi-value select field element, e.g. code to maximize select field
 		if ( @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="8" ';
@@ -106,25 +95,49 @@ class JFormFieldFlexicategories extends JFormField
 			$maximize_link = '';
 		}
 		
-		$classes = '';
-		if ( @$attributes['required'] && @$attributes['required']!='false' ) {
-			$classes .= ' required';
-		}
-		if ( $node->attributes('validation_class') ) {
-			$classes .= ' '.$node->attributes('validation_class');
+		$top = @$attributes['top'] ? $attributes['top'] : false;
+		
+		$classes = ' inputbox ';
+		$classes .= ( @$attributes['required'] && @$attributes['required']!='false' ) ? ' required' : '';
+		$classes .= $node->attributes('validation_class') ? ' '.$node->attributes('validation_class') : '';
+		$classes = ' class="'.$classes.'"';
+		$attribs .= $classes .' style="float:left;" ';
+		
+		
+		// Add onClick functions (e.g. joining values to a string)
+		if ( !empty($attributes['joinwith']) && !$function_added) {
+			$function_added = true;
+			$js = "
+			function FLEXIClickCategory(obj, name) {
+				values=new Array();
+				for(i=0,j=0;i<obj.options.length;i++) {
+					if(obj.options[i].selected==true)
+						values[j++] = obj.options[i].value;
+				}
+				value_list = values.join(',');
+				document.getElementById('a_id_'+name).value = value_list;
+				//alert(document.getElementById('a_id_'+name).value);
+			}";
+			$doc = JFactory::getDocument();
+			$doc->addScriptDeclaration($js);
 		}
 		
-		$top = false;
-		if ( @$attributes['top'] ) {
-			$top = @$attributes['top'];
+		$html = '';
+		if ( !empty($attributes['joinwith']) ) {
+			$select_fieldname = '_'.$ffname.'_';
+			$text_fieldname = str_replace('[]', '', $fieldname);
+			
+			$attribs .= ' onclick="FLEXIClickCategory(this,\''.$ffname.'\');" ';
+			$html    .= "\n<input type=\"hidden\" id=\"a_id_{$ffname}\" name=\"$text_fieldname\" value=\"$values\" />";
+		} else {
+			$select_fieldname = $fieldname;
 		}
 		
-		$ffname = @$attributes['name'];
-		$html = flexicontent_cats::buildcatselect($tree, $fieldname, $values, $top,
-			/*' onClick="javascript:FLEXIClickCategory(this,\''.$ffname.'\');"*/
-			' class="inputbox '.$classes.'" '.$attribs,
-			false, true, $actions_allowed=array('core.create') );
-		//$html .= "\n<input type=\"hidden\" id=\"a_id_{$ffname}\" name=\"$fieldname\" value=\"$values\" />";
+		$html .= flexicontent_cats::buildcatselect
+		(
+			$tree, $select_fieldname, $values, $top, $attribs,
+			false, true, $actions_allowed=array('core.create')
+		);
 		
 		return $html.$maximize_link;
 	}
