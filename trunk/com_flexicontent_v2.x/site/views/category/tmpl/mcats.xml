@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<layout title="Categories (Experimental)">
+	<layout title="FLEXICONTENT_MCATS">
 		<message>
-			<![CDATA[Multiple categories listing , parameters used are global component and then overriden but these menu parameters]]>
+			<![CDATA[FLEXICONTENT_MCATS_DESC]]>
 		</message>
 	</layout>
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">

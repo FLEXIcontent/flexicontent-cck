@@ -69,10 +69,11 @@
 			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
 			
 			var matches = element.name.match(/(filter[.]*|letter|clayout|limit|orderby)/);
-			if (matches && element.value != '') {
-				extra_action += var_sep + element.name + '=' + element.value;
-				var_sep = '&';
-			}
+			if (!matches || element.value == '') continue;
+			if ((element.type=='radio' || element.type=='checkbox') && !element.checked) continue;
+			
+			extra_action += var_sep + element.name + '=' + element.value;
+			var_sep = '&';
 		}
 		form.action += extra_action;   //alert(extra_action);
 	}
@@ -87,6 +88,43 @@
 			var matches = element.name.match(/(filter[.]*|letter)/);
 			if (matches) {
 				element.value = '';
+			}
+		}
+	}
+	
+	function fc_toggleClass(ele,cls, fc_all=0) {
+		if (!fc_all) {
+		  if (jQuery(ele).hasClass(cls)) {
+		  	jQuery(ele).removeClass(cls);
+		  } else {
+		  	jQuery(ele).addClass(cls);
+		  }
+		  // Handle disabling 'select all' checkbox (if it exists)
+			var inputs = ele.parentNode.getElementsByTagName('input');
+			if (inputs[0].value=='__FC_ALL__') {
+				inputs[0].checked = 0;
+				jQuery(inputs[0].parentNode).removeClass(cls);
+			}
+		} else {
+			var inputs = ele.parentNode.getElementsByTagName('input');
+			var check_all = inputs[0].checked;
+			for (var i = 0; i < inputs.length; ++i) {
+				if (check_all) {
+					jQuery(inputs[i].parentNode).addClass(cls);
+				} else {
+					jQuery(inputs[i].parentNode).removeClass(cls);
+				}
+			}
+		}
+	}
+	
+	function fc_toggleClassGrp(ele, cls, fc_all=0) {
+		var inputs = ele.getElementsByTagName('input');
+		for (var i = 0; i < inputs.length; ++i) {
+			if (inputs[i].checked) {
+				jQuery(inputs[i].parentNode).addClass(cls);
+			} else {
+				jQuery(inputs[i].parentNode).removeClass(cls);
 			}
 		}
 	}

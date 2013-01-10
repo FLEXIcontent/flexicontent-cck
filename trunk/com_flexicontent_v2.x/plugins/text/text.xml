@@ -84,6 +84,14 @@
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>
 			</field>
+			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
+				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+				<option value="2">FLEXI_DISPLAY_AS_DUAL_SELECT_FIELD_RANGE</option>
+				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
+				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
+				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+			</field>
 		</fieldset>
 	</fields>
 	</config>
