@@ -926,9 +926,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// Decide thumbnail to use
 			$thumb_size = 0;
 			if ($view == 'category')
-				$thumb_size =  $field->parameters->get('thumbincatview',2);
+				$thumb_size =  $field->parameters->get('thumbincatview',1);
 			if($view == FLEXI_ITEMVIEW)
-				$thumb_size =  $field->parameters->get('thumbinitemview',1);
+				$thumb_size =  $field->parameters->get('thumbinitemview',2);
 			switch ($thumb_size)
 			{
 				case 1: $src = $srcs; break;

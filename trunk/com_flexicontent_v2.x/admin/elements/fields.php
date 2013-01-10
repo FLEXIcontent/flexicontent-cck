@@ -99,6 +99,9 @@ class JFormFieldFields extends JFormField
 		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		
+		$name = FLEXI_J16GE ? $attributes['name'] : $name;
+		$control_name = FLEXI_J16GE ? str_replace($name, '', $element_id) : $control_name;
+		
 		$attribs = ' style="float:left;" ';
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="true" ';
@@ -111,6 +114,7 @@ class JFormFieldFields extends JFormField
 			$maximize_link = '';
 		}
 		if ($onchange = @$attributes['onchange']) {
+			$onchange = str_replace('{control_name}', $control_name, $onchange);
 			$attribs .= ' onchange="'.$onchange.'"';
 		}
 

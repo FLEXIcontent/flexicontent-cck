@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: text.php 1281 2012-05-10 08:09:05Z ggppdk $
+ * @version 1.0 $Id: text.php 1601 2012-12-14 03:34:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.text
@@ -402,12 +402,12 @@ class plgFlexicontent_fieldsText extends JPlugin
 				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
 			} else {
 				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id.'[1]', ' class="fc_field_filter" ', 'value', 'text', @ $value[1]);
-				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id,'[2]', ' class="fc_field_filter" ', 'value', 'text', @ $value[2]);
+				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id.'[2]', ' class="fc_field_filter" ', 'value', 'text', @ $value[2]);
 			}
 			break;
 		case 1: case 3:
-			if ($display_filter_as==0) {
-				$filter->html	.='<input name="filter_'.$filter->id.' class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value.'" /> - ';
+			if ($display_filter_as==1) {
+				$filter->html	.='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value.'" />';
 			} else {
 				$size = (int)($size / 2);
 				$filter->html	.='<input name="filter_'.$filter->id.'[1]" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value[1].'" /> - ';
@@ -415,27 +415,32 @@ class plgFlexicontent_fieldsText extends JPlugin
 			}
 			break;
 		case 4: case 5:
+			$i = 0;
+			$checked = ($display_filter_as==5) ? in_array('__FC_ALL__', $value) : '__FC_ALL__'==$value;
+			$checked_attr = $checked ? 'checked=checked' : '';
+			$checked_class = $checked ? 'highlight' : '';
+			$filter->html .= '<label class="flexi_radiotab rc5 '.$checked_class.'" for="filter_'.$filter->id.'_val'.$i.'">';
 			if ($display_filter_as==4) {
-				$checked_attr = count($values) ? 'checked=checked' : '';
-				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode.parentNode, \'highlight\');" ';
-				$filter->html .= '  id="filter_'.$filter->id.'_val_all" type="radio" name="filter_'.$filter->id.'[0]" ';
+				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode.parentNode, \'highlight\', 1);" ';
+				$filter->html .= '  id="filter_'.$filter->id.'_val'.$i.'" type="radio" name="filter_'.$filter->id.'" ';
 				$filter->html .= '  value="__FC_ALL__" '.$checked_attr.' />';
 			} else {
-				$checked_attr = count($values) ? 'checked=checked' : '';
-				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" ';
-				$filter->html .= '  id="filter_'.$filter->id.'_val_all" type="checkbox" name="filter_'.$filter->id.'[0]" ';
+				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\', 1);" ';
+				$filter->html .= '  id="filter_'.$filter->id.'_val'.$i.'" type="checkbox" name="filter_'.$filter->id.'['.$i.']" ';
 				$filter->html .= '  value="__FC_ALL__" '.$checked_attr.' />';
 			}
-			$i = 1;
+			$filter->html .= ' <span style="float:left; display:inline-block;" >'.JText::_('FLEXI_ALL').'</span>';
+			$filter->html .= '</label>';
+			$i++;
 			foreach($results as $result) {
 				if ( !strlen($result->value) ) continue;
-				$checked = in_array($result->value, $value);
+				$checked = ($display_filter_as==5) ? in_array($result->value, $value) : $result->value==$value;
 				$checked_attr = $checked ? 'checked=checked' : '';
 				$checked_class = $checked ? 'highlight' : '';
 				$filter->html .= '<label class="flexi_radiotab rc5 '.$checked_class.'" for="filter_'.$filter->id.'_val'.$i.'">';
 				if ($display_filter_as==4) {
 					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode.parentNode, \'highlight\');" ';
-					$filter->html .= '  id="filter_'.$filter->id.'_val'.$i.'" type="radio" name="filter_'.$filter->id.'['.$i.']" ';
+					$filter->html .= '  id="filter_'.$filter->id.'_val'.$i.'" type="radio" name="filter_'.$filter->id.'" ';
 					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.' />';
 				} else {
 					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" ';
@@ -451,7 +456,6 @@ class plgFlexicontent_fieldsText extends JPlugin
 	}
 	
 	
-	// Method to get item ids having value(s) according to current field filtering
 	function getFiltered($field_id, $value, & $filtered)
 	{
 		$db = & JFactory::getDBO();
@@ -477,11 +481,15 @@ class plgFlexicontent_fieldsText extends JPlugin
 		switch ($display_filter_as) {
 		// RANGE cases
 		case 2: case 3:
-			$and_value .= ' AND value >=' . $db->Quote(@ $value[0]);
-			$and_value .= ' AND value =<' . $db->Quote(@ $value[1]);
+			if (@ $value[1]) $and_value .= ' AND value >=' . $db->Quote($value[1]);
+			if (@ $value[2]) $and_value .= ' AND value =<' . $db->Quote($value[2]);
+			break;
+		// SINGLE TEXT select value cases
+		case 1:
+			$and_value .= ' AND value LIKE ' . $db->Quote( '%'.$value[0].'%' );
 			break;
 		// EXACT value cases
-		case 0: case 1: case 4: case 5: default:
+		case 0: case 4: case 5: default:
 			$or_values = array();
 			foreach ($value as $val) {
 				$or_values[] = 'value=' . $db->Quote( $val );
@@ -490,7 +498,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			break;
 		}
 		
-		$query  = 'SELECT item_id'
+		echo $query  = 'SELECT item_id'
 			. ' FROM #__flexicontent_fields_item_relations'
 			. ' WHERE field_id = ' . $field_id
 			. $and_value
