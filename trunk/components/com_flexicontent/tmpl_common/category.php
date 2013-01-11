@@ -35,10 +35,11 @@ $page_classes .= ' fccategory fccat'.$this->category->id;
 		|| $this->params->get('show_email_icon')
 		|| JRequest::getCmd('print')
 		|| $this->params->get('show_feed_icon', 1)
+		|| $this->params->get('show_addbutton', 1)
 		) {
 	?>
 	<p class="buttons">
-		<?php //echo flexicontent_html::addbutton( $this->params ); ?>
+		<?php if ($this->params->get('show_addbutton', 1)) echo flexicontent_html::addbutton( $this->params, $this->category ); ?>
 		<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
 		<?php echo flexicontent_html::mailbutton( 'category', $this->params, $this->category->slug ); ?>
 		<?php echo flexicontent_html::feedbutton( 'category', $this->params, $this->category->slug ); ?>

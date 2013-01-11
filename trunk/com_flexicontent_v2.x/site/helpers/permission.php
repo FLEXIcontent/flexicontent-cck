@@ -5,9 +5,8 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-class FlexicontentHelperPerm {
-	
-	
+class FlexicontentHelperPerm
+{
 	/*
 	 * Calculates global component PERMISSIONS of the current USER
 	 *
@@ -154,7 +153,7 @@ class FlexicontentHelperPerm {
 	 * @return array									The category IDs
 	 * @since	2.0
 	 */
-	function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false )
+	function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false )
 	{
 		global $globalcats;
 		$db =& JFactory::getDBO();
@@ -166,10 +165,12 @@ class FlexicontentHelperPerm {
 			$query = 'SELECT c.id '
 				. ' FROM #__categories AS c'
 				. ' WHERE extension='.$db->Quote(FLEXI_CAT_EXTENSION)
-				. ($check_published ? '  AND c.published = 1 ' : '');
+				. ($check_published ? '  AND c.published = 1 ' : '')
+				. ($specific_catids ? '  AND c.id IN ('.implode(",", $specific_catids).')' : '')
+				;
 			$db->setQuery($query);
 			$allcats = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
-			$usercats = array();
+			
 			foreach ($allcats as $category_id)
 			{
 				// Construct asset name for the category
@@ -189,13 +190,9 @@ class FlexicontentHelperPerm {
 		} else if (!FLEXI_ACCESS || $user->gid == 25) {
 			
 			// *** J1.5 without FLEXIaccess or user is super admin, return all category ids ***
-			foreach ($globalcats as $k => $v) {
-				if(!$check_published || $v->published) {
-					$usercats[] = $k;
-				}
-			}
-			$usercats = array_unique($usercats);
-			return $usercats;
+			
+			if ($user->gid < 19) return array();  // Less than J1.5 Author
+			return FlexicontentHelperPerm::_returnAllCats ($check_published, $specific_catids);
 			
 		} else {
 			
@@ -234,15 +231,8 @@ class FlexicontentHelperPerm {
 			// *** No limitations found, return all category ids ***
 			
 			if ($db->loadResult()) {
-				foreach ($globalcats as $k => $v) {
-					if(!$check_published || $v->published) {
-						$usercats[] = $k;
-					}
-				}
-				$usercats = array_unique($usercats);
-				return $usercats;
+				return FlexicontentHelperPerm::_returnAllCats ($check_published, $specific_catids);
 			}
-			
 			
 			// *** Limitations found, check and return category ids with 'create' permission ***
 			
@@ -255,6 +245,7 @@ class FlexicontentHelperPerm {
 					. ' AND arosection = ' . $db->Quote('users')
 					. ' AND aro IN ( ' . $aro_value . ' )'
 					. ' AND axosection = ' . $db->Quote('category')
+					. ($specific_catids ? '  AND axo IN ('.implode(",", $specific_catids).')' : '')
 					;
 			$db->setQuery($query);
 			$allowedcats = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
@@ -277,6 +268,32 @@ class FlexicontentHelperPerm {
 	}
 	
 	
+	/*
+	 * Method to return all categories ids checking if published and if in specific subset
+	 */
+	function _returnAllCats ($check_published, $specific_catids)
+	{
+		global $globalcats;
+		$usercats = array();
+		
+		if ($specific_catids) {
+			foreach ($specific_catids as $k) {
+				if (!$check_published || $globalcats[$k]->published) {
+					$usercats[] = $k;
+				}
+			}
+		} else {
+			foreach ($globalcats as $k => $v) {
+				if(!$check_published || $v->published) {
+					$usercats[] = $k;
+				}
+			}
+		}
+		$usercats = array_unique($usercats);
+		return $usercats;
+	}
+	
+		
 	/*
 	 * Lookups the SECTION ids on which the given USER can perform the given ACTION
 	 *

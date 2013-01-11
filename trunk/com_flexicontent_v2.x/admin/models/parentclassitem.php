@@ -1570,7 +1570,7 @@ class ParentClassItem extends JModelAdmin
 			
 			// Check multi category tampering
 			$postcats = @ $submit_conf['postcats'];
-			if ( !$isnew || empty($data['submit_conf']) || $postcats==2 )
+			if ( !$isnew || !$overridecatperms || $postcats==2 )
 				$data['categories'] = array_intersect ($data['categories'], $allowed_cid );
 			else if ( $postcats==0 )
 				$data['categories'] = $allowed_cid;
