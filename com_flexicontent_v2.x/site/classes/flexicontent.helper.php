@@ -795,26 +795,41 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	function addbutton(&$params)
+	function addbutton(&$params, &$maincat = null)
 	{
 		$user	= & JFactory::getUser();
-
-		if ($user->authorize('com_flexicontent', 'add')) {
-
-			if ( $params->get('show_icons') ) {
-				$image = JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_ADD' ));
-			} else {
-				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_ADD' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
-			}
-			$overlib = JText::_( 'FLEXI_ADD_TIP' );
-			$text = JText::_( 'FLEXI_ADD' );
-
-			$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&task=add';
-			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
-
-			return $output;
+		if (!$user->id) return '';
+		
+		// Check if current view / layout can use ADD button
+		$view = JRequest::getVar('view');
+		$layout = JRequest::getVar('layout', 'default');
+		if ( $view!='category' || !in_array($layout, array('default','mcats','myitems')) ) return '';
+		
+		// Check if user can ADD to current category or to any category
+		if ($maincat && $layout == 'default') {
+			$add_label = JText::_('FLEXI_ADD_NEW_CONTENT_TO_CURR_CAT');
+			$permission = FlexicontentHelperPerm::getPerm();
+			$canAdd = $permission->CanAdd;
+		} else {
+			$add_label = JText::_('FLEXI_ADD_NEW_CONTENT_TO_LIST');
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, $specific_catids=array($maincat->id) );
+			$canAdd = count($allowedcats);
 		}
-		return;
+		if ( !$canAdd) return '';
+		
+		// Create the button
+		if ( $params->get('show_icons') ) {
+			$image = JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_ADD_NEW_CONTENT' ), ' style="margin-right:4px;" width="16" align="top" ');
+		} else {
+			$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_ADD_NEW_CONTENT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
+		}
+		$overlib = $add_label;
+		$text = JText::_( 'FLEXI_ADD' );
+
+		$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&task=add&maincat='.$maincat->id;
+		$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.JText::_( 'FLEXI_ADD_NEW_CONTENT' ).'</a>';
+
+		return $output;
 	}
 
 	/**

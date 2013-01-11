@@ -392,6 +392,10 @@
 		<field name="" type="separator" default="FLEXI_ITEMS_LIST_CREATION_CONF" label="" level="level1" menu="hide" />
 		
 			<field name="" type="separator" default="FLEXI_ITEMS_LIST" level="level2" menu="hide" />
+			<field name="show_addbutton" type="radio" default="0" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_CAT_BUTTON_DESC" menu="hide" >
+				<option value="0">FLEXI_Hide</option>
+				<option value="1">FLEXI_Show</option>
+			</field>
 			<field name="show_editbutton" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" menu="hide" >
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>

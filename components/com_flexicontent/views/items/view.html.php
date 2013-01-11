@@ -852,6 +852,15 @@ class FlexicontentViewItems extends JViewLegacy
 		$typesselected = '';
 		$isnew = !$item->id;
 		
+		// Case for preselected main category for new items
+		if ($isnew) {
+			$maincat = JRequest::getInt('maincat', 0);
+			if ($maincat) {
+				$selectedcats = array($maincat);
+				$item->catid = $maincat;
+			}
+		}
+		
 		// Retrieve author configuration
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
 		if ( $authorparams = $db->loadResult() )
