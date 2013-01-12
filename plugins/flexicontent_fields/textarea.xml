@@ -12,92 +12,116 @@
 	<files>
 		<filename plugin="textarea">textarea.php</filename>
 	</files>
-	<params group="standard">
-		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-	</params>
-	<params group="group-textarea" addpath="/administrator/components/com_flexicontent/elements">
-		<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC"  menu="hide">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC"  menu="hide">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-		<param name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
-		<param name="rows" type="text" default="10" size="2" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" />
-		<param name="cols" type="text" default="75" size="2" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
-		<param name="use_html" type="radio" default="0" label="FLEXI_FIELD_USE_HTML" description="FLEXI_FIELD_USE_HTML_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="height" type="text" default="350" size="2" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
-		<param name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-		<param name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="adv_size" type="text" default="30" size="2" label="Adv. search field size" description="Advanced search field size" />
-		
-		<param name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />
-		<param name="useogp" type="radio" default="0" label="FLEXI_SOCIAL_SUGGEST_FIELD" description="FLEXI_SOCIAL_SUGGEST_TXT_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="ogpinview" type="fccheckbox" default=""
-			checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE" checkvals="items,category,module" defaultvals="items,category,module"
-			label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
-		<param name="ogpusage" type="radio" default="1" label="FLEXI_SOCIAL_USAGE_IN_LISTING" description="FLEXI_SOCIAL_USAGE_IN_LISTING_DESC">
-			<option value="1">FLEXI_TITLE</option>
-			<option value="2">FLEXI_DESCRIPTION</option>
-		</param>
-		<param name="ogpmaxlen" type="text" default="300" label="FLEXI_SOCIAL_TXT_MAXLEN_LISTING" description="FLEXI_SOCIAL_TXT_MAXLEN_LISTING_DESC" />
-		
-		<param name="" type="separator" default="Textarea Tabbing Parameters" level="level1" menu="hide" />
-		
-		<param name="" type="separator" default="FOR DEVELOPERS ONLY. &lt;br/&gt; DO NOT ENABLE AS IT MAY LEAD TO DATA LOSS.  &lt;br/&gt;&lt;br/&gt; -- The following parameters allows to make your textarea TABBED, in both ITEM DISPLAY VIEW and in ITEM EDIT FORM.&lt;br/&gt;&lt;br/&gt; -- Enabling this requires very good knowledge of regular expressions, AND knowledge of the syntax of some TAB-CREATING joomla plugins. &lt;br/&gt;&lt;br/&gt; -- Future versions may come with predefined configurations, thus allowing easy use." level="level2" menu="hide" />
 	
-		<param name="editorarea_per_tab" type="radio" default="0" label="One editor area per tab" description="...">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
+		<params group="standard">
+			<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+		</params>
+		<params group="group-textarea" addpath="/administrator/components/com_flexicontent/elements">
+			
+			<param name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
+			<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<param name="container_width" type="text" default="100%" size="6" label="FLEXI_FIELD_CONTAINER_WIDTH" description="FLEXI_FIELD_CONTAINER_WIDTH_DESC" />
+			<param name="filter_size" type="text" default="30" size="2" label="Filter Size" description="Size of text field filter" />
+			<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="" type="separator" default="FLEXI_SIMPLE_TEXTAREA" description="FLEXI_SIMPLE_TEXTAREA_DESC" level="level2" />
+			<param name="rows" type="text" default="10" size="2" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" />
+			<param name="cols" type="text" default="75" size="2" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
+			
+			<param name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" />
+			<param name="use_html" type="radio" default="0" label="FLEXI_FIELD_USE_HTML" description="FLEXI_FIELD_USE_HTML_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="height" type="text" default="350px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
+			<param name="" type="separator" default="FLEXI_EDITOR_BUTTONS" description="..." level="level3" />
+			<param name="show_buttons" type="radio" default="1" label="FLEXI_SHOW_EDITOR_BUTTONS" description="FLEXI_SHOW_EDITOR_BUTTONS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_BUTTONS_JCE_ONLY" description="FLEXI_SKIP_BUTTONS_JCE_ONLY_DESC" />
+			
+			<param name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level1" />
+			<param name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<param name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			
+			<param name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />
+			<param name="useogp" type="radio" default="0" label="FLEXI_SOCIAL_SUGGEST_FIELD" description="FLEXI_SOCIAL_SUGGEST_TXT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="ogpinview" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE" checkvals="items,category,module" defaultvals="items,category,module"
+				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
+			<param name="ogpusage" type="radio" default="1" label="FLEXI_SOCIAL_USAGE_IN_LISTING" description="FLEXI_SOCIAL_USAGE_IN_LISTING_DESC">
+				<option value="1">FLEXI_TITLE</option>
+				<option value="2">FLEXI_DESCRIPTION</option>
+			</param>
+			<param name="ogpmaxlen" type="text" default="300" label="FLEXI_SOCIAL_TXT_MAXLEN_LISTING" description="FLEXI_SOCIAL_TXT_MAXLEN_LISTING_DESC" />
+			
+			<param name="" type="separator" default="FLEXI_VALUE_HANDLING_LABEL" level="level1" />
+			<param name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
+			<param name="default_value_use" type="list" default="0" label="FLEXI_FIELD_DEFAULT_VALUE_USE" description="FLEXI_FIELD_DEFAULT_VALUE_USE_DESC">
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
+			</param>
+			
+			<param name="" type="separator" default="Textarea Tabbing Parameters" level="level1" menu="hide" />
+			
+			<param name="" type="separator" default="FOR DEVELOPERS ONLY. &lt;br/&gt; DO NOT ENABLE AS IT MAY LEAD TO DATA LOSS.  &lt;br/&gt;&lt;br/&gt; -- The following parameters allows to make your textarea TABBED, in both ITEM DISPLAY VIEW and in ITEM EDIT FORM.&lt;br/&gt;&lt;br/&gt; -- Enabling this requires very good knowledge of regular expressions, AND knowledge of the syntax of some TAB-CREATING joomla plugins. &lt;br/&gt;&lt;br/&gt; -- Future versions may come with predefined configurations, thus allowing easy use." level="level2" menu="hide" />
 		
-		<param name="allow_tab_insertion" type="radio" default="0" label="Allow insertion of tabs" description="...">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		
-		<param name="allow_tabs_code_editing" type="radio" default="1" label="Allow edit of tabs code" description="Display the code of tabs in editable areas so that it can be changed">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		
-		<param name="force_beforetabs" type="radio" default="1" label="Force before tabs editor textarea" description="Display editor area even if no text exists">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		
-		<param name="force_aftertabs" type="radio" default="1" label="Force after tabs editor textarea" description="Display editor area even if no text exists">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		
-		<param name="start_of_tabs_pattern" type="text" default="" size="80" label="Start of tabs pattern" description="..." />
-		<param name="start_of_tabs_default_text" type="textarea" default="" cols="45" rows="4" label="start of tabs default text" description="..." />
-		<param name="start_of_tab_pattern" type="text" default="" size="80" label="Start of tab pattern" description="..." />
-		
-		<param name="title_tab_pattern" type="text" default="" size="80" label="Tab title pattern" description="..." />
-		<param name="default_tab_list" type="textarea" default="" cols="45" rows="4" label="Default tab list" description="..." />
-		
-		<param name="end_of_tab_pattern" type="text" default="" size="80" label="End of tab" description="Can be empty for some type of tabs" />
-		<param name="end_of_tabs_pattern" type="text" default="" size="80" label="End of tabs" description="..." />
-		
+			<param name="editorarea_per_tab" type="radio" default="0" label="One editor area per tab" description="...">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="allow_tab_insertion" type="radio" default="0" label="Allow insertion of tabs" description="...">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="allow_tabs_code_editing" type="radio" default="1" label="Allow edit of tabs code" description="Display the code of tabs in editable areas so that it can be changed">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="force_beforetabs" type="radio" default="1" label="Force before tabs editor textarea" description="Display editor area even if no text exists">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="force_aftertabs" type="radio" default="1" label="Force after tabs editor textarea" description="Display editor area even if no text exists">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="start_of_tabs_pattern" type="text" default="" size="80" label="Start of tabs pattern" description="..." />
+			<param name="start_of_tabs_default_text" type="textarea" default="" cols="45" rows="4" label="start of tabs default text" description="..." />
+			<param name="start_of_tab_pattern" type="text" default="" size="80" label="Start of tab pattern" description="..." />
+			
+			<param name="title_tab_pattern" type="text" default="" size="80" label="Tab title pattern" description="..." />
+			<param name="default_tab_list" type="textarea" default="" cols="45" rows="4" label="Default tab list" description="..." />
+			
+			<param name="end_of_tab_pattern" type="text" default="" size="80" label="End of tab" description="Can be empty for some type of tabs" />
+			<param name="end_of_tabs_pattern" type="text" default="" size="80" label="End of tabs" description="..." />
+			
 	</params>
+	
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_textarea.ini</language>
 	</languages>

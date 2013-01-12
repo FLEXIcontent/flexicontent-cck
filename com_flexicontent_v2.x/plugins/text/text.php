@@ -498,7 +498,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			break;
 		}
 		
-		echo $query  = 'SELECT item_id'
+		$query  = 'SELECT item_id'
 			. ' FROM #__flexicontent_fields_item_relations'
 			. ' WHERE field_id = ' . $field_id
 			. $and_value

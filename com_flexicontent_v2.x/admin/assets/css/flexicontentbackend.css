@@ -54,7 +54,7 @@
 	color: black;
 	text-decoration: none;
 }
-div .button2-left {	margin-left: 5px; }
+div .button2-left {	margin:-2px 4px 2px 0px; }
 
 /* Copy parameters */
 .copyok {
@@ -965,11 +965,6 @@ fieldset.panelform select, fieldset.panelform img, fieldset.panelform button {
 div fieldset.panelform label {
 	min-width:132px;
 	text-align: right;
-}
-
-div.button2-left {
-	margin-left:8px;
-	margin-top:-2px;
 }
 
 div fieldset.panelform td {

@@ -513,6 +513,9 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								echo $field->html;
 								continue;
 							endif;
+							
+							$width = $field->parameters->get('container_width', '' );
+							if ($width)  $width = 'width:' .$width. ($width != (int)$width ? 'px' : '');
 						?>
 							<!--tr-->
 								<!--td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'-->
@@ -522,7 +525,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<?php echo $field->label; ?>
 									</label>
 										
-									<div style='float:left!important; padding:0px!important; margin:0px!important; '>
+									<div style="float:left!important; padding:0px!important; margin:0px!important; <?php echo $width; ?>;">
 										
 								<?php	if ($field->field_type=='maintext' && isset($this->row->item_translations) ) : ?>
 										
