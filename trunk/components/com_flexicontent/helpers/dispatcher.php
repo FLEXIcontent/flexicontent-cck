@@ -65,7 +65,7 @@ class FCDispatcher extends JDispatcher
 	 * only creating it, if it doesn't already exist.
 	 *
 	 * This method must be invoked as:
-	 * 		<pre>  $dispatcher = &FCDispatcher::getInstance();</pre>
+	 *  $dispatcher = FCDispatcher::getInstance();
 	 *
 	 * @access	public
 	 * @return	FCDispatcher	The EventDispatcher object.
@@ -96,7 +96,7 @@ class FCDispatcher extends JDispatcher
 		
 		$path	= JPATH_PLUGINS.DS.$plugin->type.DS.$plugin->name.'.php';
 		$plugin_code = file_get_contents($path);
-		$fname_pattern='[\s]*[\'"]([a-zA-Z]+)[\'"][\s]*';
+		$fname_pattern='[\s]*[\'"]([^\'"]+)[\'"][\s]*';
 		
 		if ( preg_match_all('/->registerEvent[\s]*\('.$fname_pattern.','.$fname_pattern.'\)/', $plugin_code, $matches) )
 		{
@@ -109,8 +109,8 @@ class FCDispatcher extends JDispatcher
 		}
 		if ($this->debug) echo "<br>";
 	}
-
-
+	
+	
 	/**
 	 * Registers an event handler to the event dispatcher
 	 *

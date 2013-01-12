@@ -55,6 +55,17 @@ class FCDispatcher extends JDispatcher
 	}
 	
 	
+	/**
+	 * Returns a reference to the global Event FC Dispatcher object,
+	 * only creating it, if it doesn't already exist.
+	 *
+	 * This method must be invoked as:
+	 *  $dispatcher = FCDispatcher::getInstance();
+	 *
+	 * @access	public
+	 * @return	FCDispatcher	The EventDispatcher object.
+	 * @since	1.5
+	 */
 	function & getInstance_FC($debug)
 	{
 		static $instance;
@@ -80,7 +91,7 @@ class FCDispatcher extends JDispatcher
 		
 		$path	= JPATH_PLUGINS.DS.$plugin->type.DS.$plugin->name.DS.$plugin->name.'.php';
 		$plugin_code = file_get_contents($path);
-		$fname_pattern='[\s]*[\'"]([a-zA-Z]+)[\'"][\s]*';
+		$fname_pattern='[\s]*[\'"]([^\'"]+)[\'"][\s]*';
 		
 		if ( preg_match_all('/->registerEvent[\s]*\('.$fname_pattern.','.$fname_pattern.'\)/', $plugin_code, $matches) )
 		{
