@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: textarea.php 1279 2012-05-10 02:07:42Z ggppdk $
+ * @version 1.0 $Id: textarea.php 1613 2013-01-04 00:43:58Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea
@@ -108,24 +108,42 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textarea' && $field->field_type != 'maintext') return;
-
+		
+		$field->label = JText::_($field->label);
+		
 		$app =& JFactory::getApplication();
 		$user = JFactory::getUser();
 		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
 		$editor = & JFactory::getEditor($editor_name);
 		
 		// some parameter shortcuts
-		$cols      = $field->parameters->get( 'cols', 75 ) ;
-		$rows      = $field->parameters->get( 'rows', 20 ) ;
-		$height    = $field->parameters->get( 'height', 400 ) ;
-		$use_html  = $field->parameters->get( 'use_html', 1 ) ;  // Default to 1 to avoid problems with rendering the maintext description field
-		$required  = $field->parameters->get( 'required', 0 ) ;
-		$required  = $required ? ' required' : '';
+		$default_value_use = $field->parameters->get( 'default_value_use', 0 ) ;
+		$default_value     = ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		
-		$default_value = $field->parameters->get( 'default_value' ) ;
+		$cols         = $field->parameters->get( 'cols', 75 ) ;
+		$rows         = $field->parameters->get( 'rows', 20 ) ;
+		$required		= $field->parameters->get( 'required', 0 ) ;
+		$required		= $required ? ' required' : '';
+		
+		$use_html     = $field->parameters->get( 'use_html', 1 ) ;  // Default to 1 to avoid problems with rendering the maintext description field
+		$height       = $field->parameters->get( 'height', ($field->field_type == 'textarea') ? '300px' : '400px' ) ;
+		if ($height != (int)$height) $height .= 'px';
+		
+		$show_buttons = $field->parameters->get( 'show_buttons', 1 ) ;
+		$skip_buttons = $field->parameters->get( 'skip_buttons', '' ) ;
+		
+		if (FLEXI_J16GE) {
+			$skip_buttons = explode('|',$skip_buttons);
+		} else if ( !is_array($skip_buttons) ) {
+			$skip_buttons = array($skip_buttons);
+		}
+		if ($field->field_type == 'textarea') {
+			if ( !in_array('pagebreak', $skip_buttons) ) $skip_buttons[] = 'pagebreak';
+			if ( !in_array('readmore',  $skip_buttons) )  $skip_buttons[] = 'readmore';
+		}
+		$skip_buttons_arr = ($show_buttons && $editor_name=='jce' && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
 		
 		// tabbing parameters
 		$editorarea_per_tab = $field->parameters->get('editorarea_per_tab', 0);
@@ -136,18 +154,17 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		
 		// initialise property
-		if($field->field_type == 'textarea') {
-			if($item->version == 0 && $default_value) {
-				$field->value = array();
-				$field->value[0] = JText::_($default_value);
-			} elseif (!$field->value) {
-				$field->value = array();
-				$field->value[0] = '';
-			}
+		if (!$field->value) {
+			$field->value = array();
+			$field->value[0] = JText::_($default_value);
+		}
+		if ($field->field_type == 'textarea')
+		{
 			$field_name = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
 			$field_idtag = FLEXI_J16GE ? 'custom_'.$field->name :  $field->name;
-			$skip_buttons_arr = array('pagebreak', 'readmore');
-		} else if ($field->field_type == 'maintext') {
+		}
+		else if ($field->field_type == 'maintext')
+		{
 			if ( !is_array($field->name) ) {
 				$field_name = FLEXI_J16GE ? 'jform['.$field->name.']' : $field->name;
 				$field_idtag = FLEXI_J16GE ? 'jform_'.$field->name : $field->name;
@@ -162,7 +179,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				}
 			}
 			$required = '';
-			$skip_buttons_arr = array();
 		}
 		$field_value = & $field->value[0];
 		
@@ -259,29 +275,39 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				$ta_count++;
 			}
 		}
-		
 	}
 	
-
+	
 	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display') {
-		$field->label = JText::_($field->label);
+	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textarea') return;
+		
+		$field->label = JText::_($field->label);
 		
 		// some parameter shortcuts
 		$use_html			= $field->parameters->get( 'use_html', 0 ) ;
 		$opentag			= $field->parameters->get( 'opentag', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag', '' ) ;
-
-		$values = $values ? $values : $field->value ;
-
+		
+		$default_value_use= $field->parameters->get( 'default_value_use', 0 ) ;
+		$default_value		= ($default_value_use == 2) ? $field->parameters->get( 'default_value', '' ) : '';
+		if ( empty($values) && !strlen($default_value) ) {
+			$field->{$prop} = '';
+			return;
+		} else if ( empty($values) && strlen($default_value) ) {
+			$values = array($default_value);
+		}
+		
+		$values = $values ? $values : $field->value;
+		
 		if ($values) {
 			$field->{$prop}	 = $opentag;
 			$field->{$prop}	.= $values ? ($use_html ? $values[0] : nl2br($values[0])) : '';
 			$field->{$prop}	.= $closetag;
 		} else {
-			$field->{$prop}	 = '';
+			$field->{$prop} = '';
 		}
 
 		// Some variables
@@ -313,13 +339,13 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	
 	
 	
-	
 	// **************************************************************
 	// METHODS HANDLING before & after saving / deleting field events
 	// **************************************************************
 	
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField( &$field, &$post, &$file, &$item ) {
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
+	{
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textarea') return;
 		if ( !FLEXI_J16GE && $field->parameters->get( 'use_html', 0 ) ) {
@@ -372,7 +398,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	// SEARCH / INDEXING METHODS
 	// *************************
 	
-
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item) {
 		if ($field->field_type != 'textarea') return;
@@ -401,5 +426,5 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		FlexicontentFields::onFLEXIAdvSearch($field);
 	}
-		
+	
 }

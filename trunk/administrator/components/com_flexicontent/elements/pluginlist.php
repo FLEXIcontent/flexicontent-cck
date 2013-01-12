@@ -42,7 +42,15 @@ class JElementPluginlist extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		if (FLEXI_J16GE)  $node = & $this->element;
+		$doc	= & JFactory::getDocument();
+		$db		= & JFactory::getDBO();
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
 		
 		$values			= FLEXI_J16GE ? $this->value : $value;
 		if ( empty($values) )							$values = array();
@@ -54,29 +62,48 @@ class JElementPluginlist extends JElement
 		// 'multiple' attribute in XML adds '[]' automatically in J2.5 and manually in J1.5
 		// This field is always multiple, we will add '[]' WHILE checking for the attribute ...
 		$is_multiple = @$attributes['multiple']=='multiple' || @$attributes['multiple']=='true';
-		if (!FLEXI_J16GE || !$is_multiple)
-			$fieldname .= '[]';
+		if (!FLEXI_J16GE || !$is_multiple) $fieldname .= '[]';
+		
+		$plggroup = @$attributes['plggroup'];
+		$plggroup = $plggroup ? $plggroup : 'content';
+		
+		$query  = 'SELECT element AS name'
+				. ' FROM '. (FLEXI_J16GE ? '#__extensions' : '#__plugins')
+				. ' WHERE folder = ' . $db->Quote($plggroup)
+				.  (FLEXI_J16GE ? ' AND `type`=' . $db->Quote('plugin') : '')
+				. ' AND element NOT IN ('.$db->Quote('pagebreak').','.$db->Quote('pagenavigation').','.$db->Quote('vote').')'
+				. ' ORDER BY name'
+				;
+		$db->setQuery($query);
+		$plgs = $db->loadObjectList();
 		
 		$plugins 	= array();
 		//$plugins[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_ENABLE_ALL_PLUGINS' )); 
-
-		$db =& JFactory::getDBO();
-		
-		$query  = 'SELECT element AS name'
-				. ' FROM #__plugins'
-				. ' WHERE folder = ' . $db->Quote('content')
-				. ' AND element NOT IN ('.$db->Quote('pagenavigation').','.$db->Quote('vote').')'
-				. ' ORDER BY name';
-		
-		$db->setQuery($query);
-		$plgs = $db->loadObjectList();
-
 		foreach ($plgs as $plg) {
 			$plugins[] = JHTMLSelect::option($plg->name, $plg->name); 
 		}
-
+		
 		$class = 'class="inputbox" multiple="true" size="5"';
 		
-		return JHTMLSelect::genericList($plugins, $fieldname, $class, 'value', 'text', $values, $element_id);
+		$html = JHTMLSelect::genericList($plugins, $fieldname, $class, 'value', 'text', $values, $element_id);
+		
+		$onclick = ""
+			."${element_id} = document.getElementById(\"${element_id}\");"
+			."if (${element_id}.size<40) {"
+			."	${element_id}_oldsize = ${element_id}.size;"
+			."	${element_id}.size=40;"
+			."} else {"
+			."	${element_id}.size = ${element_id}_oldsize;"
+			."}"
+			."parent = ${element_id}.getParent(); upcnt=0;"
+			."while(upcnt<10 && !parent.hasClass(\"jpane-slider\")) {"
+			."	upcnt++; parent = parent.getParent();"
+			."}"
+			."if (parent.hasClass(\"jpane-slider\")) parent.setStyle(\"height\", \"auto\");"
+		;
+		$style = 'display:inline-block;'.(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px');
+		$maximize_link = "<a style='$style' href='javascript:;' onclick='$onclick' >Maximize/Minimize</a>";
+		
+		return $html.$maximize_link;
 	}
 }

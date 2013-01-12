@@ -585,6 +585,9 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 					echo $field->html;
 					continue;
 				endif;
+				
+				$width = $field->parameters->get('container_width', '' );
+				if ($width)  $width = 'width:' .$width. ($width != (int)$width ? 'px' : '');
 			?>
 				
 			<!--tr-->
@@ -595,7 +598,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 						<?php echo $field->label; ?>
 					</label>
 					
-					<div style='float:left!important; padding:0px!important; margin:0px!important; '>
+					<div style="float:left!important; padding:0px!important; margin:0px!important; <?php echo $width; ?>;">
 					
 				<?php	if ($field->field_type=='maintext' && isset($this->item->item_translations) ) : ?>
 					
