@@ -126,6 +126,8 @@ class FlexicontentViewField extends JViewLegacy
 			
 			$supportuntranslatable = !$row->iscore && $cparams->get('enable_translation_groups');
 			$supportvalueseditable = !$row->iscore;
+			
+			$supportedithelp = !$row->iscore || $row->field_type=='maintext';
 		}
 				
 		//build selectlists, (for J1.6+ most of these are defined via XML file and custom form field classes)
@@ -144,6 +146,13 @@ class FlexicontentViewField extends JViewLegacy
 			$valueseditable_fieldname = FLEXI_J16GE ? 'jform[valueseditable]' : 'valueseditable';
 			$lists['valueseditable'] = JHTML::_('select.radiolist',   $valueseditable, $valueseditable_fieldname, '', 'value', 'text', $row->valueseditable );
 		}
+		
+		$edithelp[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_EDIT_HELP_NONE' ) );
+		$edithelp[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_EDIT_HELP_LABEL_TOOLTIP' ) );
+		$edithelp[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_EDIT_HELP_LABEL_TOOLTIP_WICON' ) );
+		$edithelp[] = JHTML::_('select.option',  3, JText::_( 'FLEXI_EDIT_HELP_INLINE' ) );
+		$edithelp_fieldname = FLEXI_J16GE ? 'jform[edithelp]' : 'edithelp';
+		$lists['edithelp'] = JHTML::_('select.radiolist', $edithelp, $edithelp_fieldname, '', 'value', 'text', $row->edithelp );
 		
 		//build type select list
 		$lists['tid'] 			= flexicontent_html::buildtypesselect($types, 'tid[]', $typesselected, false, 'multiple="multiple" size="6"');
@@ -230,6 +239,7 @@ class FlexicontentViewField extends JViewLegacy
 		$this->assignRef('supportfilter'           , $supportfilter);
 		$this->assignRef('supportuntranslatable'   , $supportuntranslatable);
 		$this->assignRef('supportvalueseditable'   , $supportvalueseditable);
+		$this->assignRef('supportedithelp'         , $supportedithelp);
 
 		parent::display($tpl);
 	}

@@ -153,6 +153,17 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					<?php endif; ?>
 					
+					<tr<?php echo !$this->supportedithelp?' style="display:none;"':'';?>>
+						<td class="key">
+							<label for="access" class="hasTip" title="<?php echo JText::_('FLEXI_EDIT_HELP').'::'.JText::_('FLEXI_EDIT_HELP_DESC');?>">
+								<?php echo JText::_( 'FLEXI_EDIT_HELP' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo $this->lists['edithelp']; ?>
+						</td>
+					</tr>
+					
 					<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
 					<tr>
 						<td class="key">
