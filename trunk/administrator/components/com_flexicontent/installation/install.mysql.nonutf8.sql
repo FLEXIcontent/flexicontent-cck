@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `untranslatable` tinyint(1) NOT NULL default '0',
   `formhidden` tinyint(1) NOT NULL default '0',
   `valueseditable` tinyint(1) NOT NULL default '0',
+  `edithelp` tinyint(1) NOT NULL default '2',
   `positions` text NOT NULL,
   `published` tinyint(1) NOT NULL default '0',
   `attribs` text NOT NULL,

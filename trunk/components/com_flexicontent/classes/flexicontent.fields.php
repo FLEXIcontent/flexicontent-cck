@@ -968,24 +968,15 @@ class FlexicontentFields
 				
 				// SPECIAL CASE: check if it exists a FAKE (custom) field that customizes CORE field per Content Type
 				$query = "SELECT attribs, published FROM #__flexicontent_fields WHERE name=".$db->Quote($field->name."_".$typealias);
-				//echo $query;
-				$db->setQuery($query);
-				$data = $db->loadObject();
-				//print_r($data);
-				if ($db->getErrorNum()) {
-					$jAp=& JFactory::getApplication();
-					$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-				} else if (@$data->published) {
-					$jAp=& JFactory::getApplication();
-					$jAp->enqueueMessage(__FUNCTION__."(): Please unpublish plugin with name: ".$field->name."_".$typealias." it is used for customizing a core field",'error');
-				}
+				$db->setQuery($query);  //echo $query;
+				$data = $db->loadObject(); //print_r($data);
+				if (@$data->published) JFactory::getApplication()->enqueueMessage(__FUNCTION__."(): Please unpublish plugin with name: ".$field->name."_".$typealias." it is used for customizing a core field",'error');
 				
 				// Finally merge custom field parameters with the type specific parameters ones
 				if ($data) {
 					$ts_params = new JParameter($data->attribs);
 					$fdata[$tindex][$field->name]->parameters->merge($ts_params);
 				}
-				
 			}
 		}
 		
@@ -1355,10 +1346,12 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function doQueryReplacements(&$query, &$item)
+	function doQueryReplacements(&$query, &$item, &$item_pros=true)
 	{
 		// replace item properties
 		preg_match_all("/{item->[^}]+}/", $query, $matches);
+		if ( !$item_pros && count($matches[0]) ) { $item_pros = count($matches[0]); return ''; }
+		
 		foreach ($matches[0] as $replacement_tag) {
 			$replacement_value = '$'.substr($replacement_tag, 1, -1);
 			eval ("\$replacement_value = \" $replacement_value\";");

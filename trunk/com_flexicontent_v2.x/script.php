@@ -616,6 +616,36 @@ class com_flexicontentInstallerScript
 				</tr>
 		
 		<?php
+		// Alter DB table flexicontent_fields: Add edithelp column
+		?>
+				<tr class="row0">
+					<td class="key">Adding column `edithelp` to TABLE #__flexicontent_fields"
+					<?php
+					$already = true;
+					$result = false;
+					if ( $fields_tbl_exists && !array_key_exists('edithelp', $fields_tbl_cols)) {
+						$already = false;
+						$query = "ALTER TABLE `#__flexicontent_fields` ADD `edithelp` SMALLINT(8) NOT NULL DEFAULT '2' AFTER `formhidden`";
+						$db->setQuery($query);
+						$result = $db->query();
+					}
+					?>
+					</td>
+					<td>
+						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
+						<span style="<?php echo $style; ?>"><?php
+						if($already) {
+							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'edithelp' already exists.");
+						} elseif($result) {
+							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'edithelp' added.");
+						} else {
+							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
+						}
+						?></span>
+					</td>
+				</tr>
+		
+		<?php
 		if (FLEXI_J16GE) :
 		// Alter table __flexicontent_fields: Add asset_id column
 		?>

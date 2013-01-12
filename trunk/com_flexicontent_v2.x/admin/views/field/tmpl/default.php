@@ -118,6 +118,15 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					<?php endif; ?>
 					
+					<tr<?php echo !$this->supportedithelp?' style="display:none;"':'';?>>
+						<td class="key">
+							<?php echo $this->form->getLabel('edithelp').':'; ?>
+						</td>
+						<td>
+							<?php echo $this->form->getInput('edithelp'); ?>
+						</td>
+					</tr>
+					
 					<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
 					<tr>
 						<td class="key">

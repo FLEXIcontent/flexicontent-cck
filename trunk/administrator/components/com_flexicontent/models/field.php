@@ -194,6 +194,7 @@ class FlexicontentModelField extends JModelLegacy
 			$field->untranslatable= 0;
 			$field->formhidden		= 0;
 			$field->valueseditable= 0;
+			$field->edithelp			= 2;
 			$field->positions			= array();
 			$field->published			= 1;
 			$field->attribs				= null;

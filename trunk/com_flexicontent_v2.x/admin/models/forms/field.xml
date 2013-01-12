@@ -24,6 +24,12 @@
 		<option value="0">FLEXI_ANY_EDITOR</option>
 		<option value="1">FLEXI_USE_ACL_PERMISSION</option>
 	</field>
+	<field name="edithelp" type="radio" default="2" label="FLEXI_EDIT_HELP" description="FLEXI_EDIT_HELP_DESC">
+		<option value="0">FLEXI_EDIT_HELP_NONE</option>
+		<option value="1">FLEXI_EDIT_HELP_LABEL_TOOLTIP</option>
+		<option value="2">FLEXI_EDIT_HELP_LABEL_TOOLTIP_WICON</option>
+		<option value="3">FLEXI_EDIT_HELP_INLINE</option>
+	</field>
 
 	<field name="published" type="booleanlist" default="1" label="FLEXI_PUBLISHED" description ="FLEXI_FIELD_PUBLISHED_DESC" class="inputbox" />
 	<field id="access" name="access" type="accesslevel" label="JField_Access_Label" description="FLEXI_FIELD_ACCESSLEVEL_DESC" class="inputbox" size="1" default="" />

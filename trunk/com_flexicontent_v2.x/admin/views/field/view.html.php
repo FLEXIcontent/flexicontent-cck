@@ -126,6 +126,8 @@ class FlexicontentViewField extends JViewLegacy
 			
 			$supportuntranslatable = !$row->iscore && $cparams->get('enable_translation_groups');
 			$supportvalueseditable = !$row->iscore;
+			
+			$supportedithelp = !$row->iscore || $row->field_type=='maintext';
 		}
 
 		//build field_type list
@@ -177,6 +179,7 @@ class FlexicontentViewField extends JViewLegacy
 		$this->assignRef('supportfilter'           , $supportfilter);
 		$this->assignRef('supportuntranslatable'   , $supportuntranslatable);
 		$this->assignRef('supportvalueseditable'   , $supportvalueseditable);
+		$this->assignRef('supportedithelp'         , $supportedithelp);
 
 		parent::display($tpl);
 	}
