@@ -894,6 +894,14 @@ div#cpanel div.icon  a {
 	border-bottom: 1px dashed gray;
 }
 
+.key.tbl_group {
+	text-align:center !important;
+	color: darkgreen !important;
+	border: 1px dashed #bbbbbb !important;
+	font-size: 12px !important;
+	padding: 6px !important;
+}
+
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/
 
 /*******************************/
@@ -1035,7 +1043,7 @@ div table.adminform select { font-size:10px; }
 
 div table.admintable td {
 	/*background-color:#F9F9F9;*/
-	border:1px solid #F0F0F0;
+	border: 0px solid #F0F0F0;
 	font-weight: normal;
 	text-align: left;
 	padding: 2px 4px 2px 8px;
@@ -1046,6 +1054,7 @@ div table.admintable td.key, div table.admintable td.paramlist_key {
 	border-right: 1px solid #E9E9E9;
 	color: #666666;
 	font-weight: bold;
+	font-size: 11px;
 	text-align: right;
 	width: 140px;
 	padding: 2px 4px 2px 4px;

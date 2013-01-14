@@ -101,14 +101,23 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Create WHERE and ORDER BY clauses for the query
 		// ***********************************************
 		
+		// Get Search Field Filters included in the Search Form
+		$search_fields = $params->get('search_fields', '');
+		$search_fields = preg_replace("/[\"'\\\]/u", "", $search_fields);
+		$search_fields = array_unique(preg_split("/\s*,\s*/u", $search_fields));
+		
+		// Get Content Types from HTTP request (if user is allowed to use them)
 		if($cantypes = $params->get('cantypes', 1)) {
-			$contenttypes = JRequest::getVar('contenttypes', array());
+			$search_contenttypes = JRequest::getVar('contenttypes', array());
 		}
-		if(!$cantypes || (count($contenttypes)<=0)) {
-			$contenttypes = $params->get('contenttypes', array());
+		
+		// Fallback to configuration Content Types if they were not set in HTTP request (or if user is not allowed to use them)
+		if(!$cantypes || (count($search_contenttypes)<=0)) {
+			// Get Content Types allowed for user selection in the Search Form
+			$search_contenttypes = $params->get('contenttypes', array());
+			$search_contenttypes = !is_array($search_contenttypes)  ?  array($search_contenttypes)  :  $search_contenttypes;
+			$search_contenttypes = array_unique($search_contenttypes);
 		}
-		if((count($contenttypes)>0) && !is_array($contenttypes)) $contenttypes = array($contenttypes);
-		//$dispatcher =& JDispatcher::getInstance();
 		
 		// define section
 		if (!defined('FLEXI_SECTION')) define('FLEXI_SECTION', $params->get('flexi_section'));
@@ -234,21 +243,14 @@ class plgSearchFlexiadvsearch extends JPlugin
 		) {
 			$andlang .= ' AND ( ie.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
-		$contenttypes_str = "'".implode("','", $contenttypes)."'";
-		$search_fields = $params->get('search_fields', '');
-		$search_fields = "'".preg_replace("/\s*,\s*/u", "','", $search_fields)."'";
-		$query = "SELECT f.* "
-			//." FROM #__flexicontent_fields_item_relations as fir "
-			//." JOIN #__flexicontent_fields_type_relations as ftr ON f.id=ftr.field_id"
-			//." LEFT JOIN #__flexicontent_fields as f ON f.id=fir.field_id"
-			." FROM #__flexicontent_fields as f " //." ON f.id=fir.field_id"
-			//." WHERE f.published='1' AND f.isadvsearch='1' AND ftr.type_id IN({$contenttypes_str})"
-			." WHERE f.published='1' AND f.isadvsearch='1' AND f.name IN({$search_fields})"
-			//." GROUP BY fir.field_id,fir.item_id"
-		;
-		$db->setQuery($query);
-		$fields = $db->loadObjectList();
-		$fields = is_array($fields) ? $fields : array();
+		
+		// Get advanced search fields
+		$fieldnames_list = "'".implode("','", array_unique($search_fields))."'";
+		$contenttypes_list = "'".implode("','", array_unique($search_contenttypes))."'";
+		$fields = FlexicontentFields::getSearchFields($key='name', $indexer='advanced', $fieldnames_list, $contenttypes_list, $load_params=true);
+		
+		// Check if each field type supports advanced search, this will remove fields, wrongly marked as advanced searchable
+		foreach($fields as $k => $field) if ( ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, 'supportadvsearch') )  $fields[$k];
 		
 		$CONDITION = '';
 		$items = array();
@@ -266,17 +268,17 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$fields_matched_arr = array();
 		foreach($fields as $field)
 		{
-			$field->parameters = new JParameter($field->attribs);
-			
-			//echo "<br/>Field name:". $field->name;
+			// Skip filters without value
+			$field_value = JRequest::getVar('filter_'.$field->id, false);
+			if ( !$field_value && !strlen($field_value) ) continue;
 			
 			// Call advanced search 
+			//echo "<br/>Field name:". $field->name;
 			$fieldname = $field->iscore ? 'core' : $field->field_type;
 			FLEXIUtilities::call_FC_Field_Func($fieldname, 'onFLEXIAdvSearch', array( &$field ));
 			
-			// A not SET results property, indicates field filter was not used in the search, skip it
-			if( !isset($field->results) ) continue;
-			
+			// An 'empty' results property, indicates field filter matched ZERO items
+			if( empty($field->results) ) continue;
 			//echo "<pre>"; print_r($field->results);echo "</pre>"; 
 			
 			// Add field to fields that were used in the search
@@ -295,13 +297,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		if ( count($items) )
 		{
-			if ($FILTERSOP == 'OR') {
-				$items = array_unique($items);
-				$items = "'".implode("','", $items)."'";
-				$CONDITION = " {$SEARCH_FILTERS_OP_TEXT_SEARCH} a.id IN ({$items}) ";
-			} else {
-				$itemid_arr = array();
-				
+			if ($FILTERSOP == 'all')
+			{
 				// Count number of time each item was matched by search filters
 				foreach($fields_matched_arr as $fieldid => $itemid_matched_arr) {
 					foreach ($itemid_matched_arr as $itemid_matched) 
@@ -314,10 +311,19 @@ class plgSearchFlexiadvsearch extends JPlugin
 				foreach ($itemid_match_count as $itemid_matched => $infields_count) {
 					if ($infields_count == $ffcount) $items[] = $itemid_matched;
 				}
+			}
+			
+			if (count($items))
+			{
+				$items = array_unique($items);
 				$items = "'".implode("','", $items)."'";
 				$CONDITION = " {$SEARCH_FILTERS_OP_TEXT_SEARCH} a.id IN ({$items}) ";
 			}
 		}
+		
+		// CHECK if the (recalculated) items array matching the FILTERS is empty but filters are required ...
+		if ( !count($items) && $SEARCH_FILTERS_OP_TEXT_SEARCH=='AND' )  return array();
+		
 		$query 	= 'SELECT DISTINCT a.id,a.title AS title, a.sectionid,'
 			. ' a.created AS created,'
 			. ' ie.search_index AS text,'
@@ -340,7 +346,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. ' AND ( a.publish_down = '.$db->Quote($nullDate).' OR a.publish_down >= '.$db->Quote($now).' )'
 			. $andaccess
 			. $andlang
-			. (count($contenttypes)?" AND ie.type_id IN ({$contenttypes_str})":"")
+			. (count($search_contenttypes)?" AND ie.type_id IN ({$contenttypes_list})":"")
 			. ' ORDER BY '. $order
 		;
 		$db->setQuery( $query, $limitstart, $limit );

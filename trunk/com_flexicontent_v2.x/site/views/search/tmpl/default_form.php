@@ -60,17 +60,12 @@ if($autodisplayadvoptions) {
 
 $this->document->addScriptDeclaration($js);
 
-$r = 0;
-
-//params[search_fields]
-$search_fields = $this->params->get('search_fields', '');
-$search_fields = $search_fields?explode(",", $search_fields):array();
-$fields = &$this->fields;
-
 $infoimage = JHTML::image ( 'components/com_flexicontent/assets/images/information.png', '', ' style="float:left; margin: 0px 8px 0px 2px;" ' );
 $text_search_title_tip   = ' title="'.JText::_('FLEXI_TEXT_SEARCH').'::'.JText::_('FLEXI_TEXT_SEARCH_INFO').'" ';
 $field_filters_title_tip = ' title="'.JText::_('FLEXI_FIELD_FILTERS').'::'.JText::_('FLEXI_FIELD_FILTERS_INFO').'" ';
 $other_search_areas_title_tip = ' title="'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS').'::'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS_TIP').'" ';
+
+$r = 0;
 ?>
 
 <form id="searchForm" action="<?php echo JRoute::_('index.php?option=com_flexicontent&task=search&Itemid='.(JRequest::getVar('Itemid')));?>" method="get" name="searchForm">
@@ -178,7 +173,7 @@ $other_search_areas_title_tip = ' title="'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN
 	<fieldset id='fc_advsearch_options_set' class='fc_search_set'>
 		<legend><?php echo JText::_('FLEXI_SEARCH_ADVANCED_SEARCH_OPTIONS'); ?></legend>
 		
-		<?php if ( count($search_fields) > 0 ) : ?>
+		<?php if ( count($this->fields) > 0 ) : ?>
 			<fieldset id='fc_fieldfilters_set' class='fc_search_set'>
 				<legend><span class="hasTip" <?php echo $field_filters_title_tip;?> ><?php echo $infoimage; ?></span><?php echo JText::_('FLEXI_FIELD_FILTERS')." ".JText::_('FLEXI_TO_FILTER_TEXT_SEARCH_RESULTS'); ?></legend>
 				
@@ -195,27 +190,24 @@ $other_search_areas_title_tip = ' title="'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN
 					</tr>
 				<?php endif; ?>
 				
-				<?php
-					foreach($search_fields as $f) {
-						if(!isset($fields[$f])) continue;
-				?>
+				<?php foreach($this->fields as $field) { ?>
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 						<td class='fc_search_label_cell' valign='top'>
-						<?php if ($fields[$f]->description) : ?>
-							<label for="<?php echo $fields[$f]->name; ?>" class="hasTip" title="<?php echo $fields[$f]->label; ?>::<?php echo $fields[$f]->description; ?>">
-								<?php echo $fields[$f]->label; ?>:
+						<?php if ($field->description) : ?>
+							<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
+								<?php echo $field->label; ?>:
 							</label>
 						<?php else : ?>
-							<label for="<?php echo $fields[$f]->name; ?>" class="hasTip" title="<?php echo JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'); ?>::<?php echo JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $fields[$f]->label ); ?>">
-								<?php echo $fields[$f]->label; ?>:
+							<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'); ?>::<?php echo JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $field->label ); ?>">
+								<?php echo $field->label; ?>:
 							</label>
 						<?php endif; ?>
 						</td>
 						<td colspan="2" class="fc_search_option_cell">
 							<?php
 							$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-							if(isset($fields[$f]->html)) {
-								echo $fields[$f]->html;
+							if(isset($field->html)) {
+								echo $field->html;
 							} else {
 								echo $noplugin;
 							}

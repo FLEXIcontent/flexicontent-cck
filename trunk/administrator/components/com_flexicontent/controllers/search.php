@@ -51,26 +51,24 @@ class FlexicontentControllerSearch extends FlexicontentController
 		// Check for request forgeries
 		//JRequest::checkToken() or jexit( 'Invalid Token' );
 		//$params =& JComponentHelper::getParams( 'com_flexicontent' );
-		//$typeid_for_advsearch = $params->get('typeid_for_advsearch');
 		
 		@ob_end_clean();
-		//if($typeid_for_advsearch) {
-			$indexer = JRequest::getVar('indexer','advanced');
-			
-			$itemmodel = $this->getModel('items');
-			//$fields = & $itemmodel->getAdvSearchFields($typeid_for_advsearch, 'id');
-			$fields = & $itemmodel->getSearchFields('id', $indexer);
-			$keys = array_keys($fields);
-			//$items	= & $itemmodel->getFieldsItems($keys, $typeid_for_advsearch);
-			$items	= & $itemmodel->getFieldsItems($keys);
-			echo 'success|';
-			//echo $typeid_for_advsearch.'|';
-			//echo count($keys)*count($items).'|';
-			echo json_encode($keys).'|';
-			echo json_encode($items);    // warning: json_encode will output object if given an array with gaps in the indexing
-		//}else{
-		//	echo 'fail|0';
-		//}
+		$indexer = JRequest::getVar('indexer','advanced');
+		
+		// Get ids of searchable and ids of item having values for these fields
+		$itemsmodel = $this->getModel('items');          // Get items model to call needed methods
+		$fields   = FlexicontentFields::getSearchFields('id', $indexer);  // Retrieve fields, that are assigned as (advanced/basic) searchable (thus indexable too)
+		$fieldids = array_keys($fields);                             // Get the field ids of the searchable fields
+		$itemids	= & $itemsmodel->getFieldsItems($fieldids);        // Get the items ids that have value for any of the searchable fields
+		
+		// Set item ids into session to avoid recalculation ...
+		$session = & JFactory::getSession();
+		$session->set($indexer.'_items_to_index', $itemids, 'flexicontent');
+		$session->set($indexer.'_items_to_index', $itemids, 'flexicontent');
+		
+		echo 'success|';
+		//echo count($fieldids)*count($itemids).'|';
+		echo json_encode($fieldids) .'|'. json_encode($itemids);    // warning: json_encode will output object if given an array with gaps in the indexing
 		exit;
 	}
 	
@@ -82,37 +80,35 @@ class FlexicontentControllerSearch extends FlexicontentController
 		
 		$items_per_call = JRequest::getVar('items_per_call', 50);  // Number of item to index per HTTP request
 		$itemcnt = JRequest::getVar('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
-		$itemmodel = $this->getModel('items');
-		$fields = & $itemmodel->getSearchFields('id', $indexer);          // Retrieve fields, that are assigned as (advanced) searchable
-		$fieldid_arr = array_keys($fields);                        // Get the field ids of the (advanced) searchable fields
-		$itemid_arr	= & $itemmodel->getFieldsItems($fieldid_arr);  // Get the items ids that have value for any of the searchable fields
+		
+		$itemsmodel = $this->getModel('items');          // Get items model to call needed methods
+		$fields   = FlexicontentFields::getSearchFields('id', $indexer);  // Retrieve fields, that are assigned as (advanced/basic) searchable (thus indexable too)
+		$fieldids = array_keys($fields);                             // Get the field ids of the searchable fields
+		
+		// Get item ids from session to avoid recalculation ...
+		$session = & JFactory::getSession();
+		if ($session->has($indexer.'_items_to_index', 'flexicontent')) {
+			$itemids = $session->get($indexer.'_items_to_index', array(),'flexicontent');
+		} else {
+			$itemids	= & $itemsmodel->getFieldsItems($fieldids);        // Get the items ids that have value for any of the searchable fields
+		}
 
 		$db = &JFactory::getDBO();
-		$fields = array();
 		for ( $cnt=$itemcnt; $cnt < $itemcnt+$items_per_call; $cnt++ )
 		{
 			// Check if items have finished, otherwise continue with -current- item
-			if ($cnt >= count($itemid_arr)) break; 
-			$itemid = $itemid_arr[$cnt];
+			if ($cnt >= count($itemids)) break; 
+			$itemid = $itemids[$cnt];
 			
 			$item = & JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
 			$item->load( $itemid );
 			if ($indexer == 'basic') $searchindex = '';
 			
 			// For current item: Loop though all searchable fields according to their type
-			foreach($fieldid_arr as $fieldid)
+			foreach($fieldids as $fieldid)
 			{
-				if(!isset($fields[$fieldid])) {
-					$query = 'SELECT * FROM #__flexicontent_fields WHERE id='.$fieldid.' AND published=1 AND '.($indexer=='advanced' ? 'isadvsearch' : 'issearch').'=1';
-					$db->setQuery($query);
-					if(!$fields[$fieldid] = $db->loadObject()) {
-						echo "fail|1";
-						exit;
-					}
-				}
 				$field = clone($fields[$fieldid]);
 				$field->item_id = $itemid;
-				$field->parameters = new JParameter($field->attribs);
 				
 				// Indicate that the indexing fuction should retrieve the values
 				$values = null;

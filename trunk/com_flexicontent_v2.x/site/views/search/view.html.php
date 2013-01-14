@@ -40,8 +40,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Initialize some variables
 		$pathway  =& $mainframe->getPathway();
 		$uri      =& JFactory::getURI();
-		//$dispatcher = & JDispatcher::getInstance();
-		$document 	= & JFactory::getDocument();
+		$document	=& JFactory::getDocument();
+		$menus  = &JSite::getMenu();
+		$menu   = $menus->getActive();
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();
@@ -56,60 +57,43 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$state	= & $this->get('state');
 		$searchword = $state->get('keyword');
 
-		$params = &$mainframe->getParams();
-		//$params->bind($params->_raw);
-		//$typeid_for_advsearch = $params->get('typeid_for_advsearch');
-
+		// Get the parameters of the active menu item
+		$params	= &$mainframe->getParams();
+		
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
-
-		$searchkeywordlabel = $params->get('searchkeywordlabel', 'Search Keyword');
-		//require_once(JPATH_COMPONENT.DS.'classes'.DS.'flexicontent.fields.php');
-		//JRequest::setVar('typeid', $typeid_for_advsearch, '', 'int');
 		
-		if(!($itemmodel = @$this->getModel(FLEXI_ITEMVIEW))) {
-			require_once(JPATH_COMPONENT.DS.'models'.DS.FLEXI_ITEMVIEW.'.php');
-			$itemmodel = !FLEXI_J16GE ? new FlexicontentModelItems() : new FlexicontentModelItem();
-		}
-		
-		// Dummy object for passing to onDisplayField of some fields
-		$item = new stdClass;
-		$item->version = 0;
-		
+		// Get Search Field Filters included in the Search Form
 		$search_fields = $params->get('search_fields', '');
-		$search_fields = explode(",", $search_fields);
-		$search_fields = "'".implode("','", array_unique($search_fields))."'";
-		$fields			= & $itemmodel->getAdvSearchFields($search_fields);
+		$search_fields = preg_replace("/[\"'\\\]/u", "", $search_fields);
+		$search_fields = array_unique(preg_split("/\s*,\s*/u", $search_fields));
 		
-		//Import fields
-		//JPluginHelper::importPlugin('flexicontent_fields');
+		// Get Content Types allowed for user selection in the Search Form
+		$search_contenttypes = $params->get('contenttypes', array());
+		$search_contenttypes = !is_array($search_contenttypes)  ?  array($search_contenttypes)  :  $search_contenttypes;
+		$search_contenttypes = array_unique($search_contenttypes);
+		
+		// Get Fields according to configuration, that are also assigned to configuration's Content Types
+		$fieldnames_list = "'".implode("','", array_unique($search_fields))."'";
+		$contenttypes_list = "'".implode("','", array_unique($search_contenttypes))."'";
+		$fields = FlexicontentFields::getSearchFields($key='name', $indexer='advanced', $fieldnames_list, $contenttypes_list);
+		
+		// Check if each field type supports advanced search, this will remove fields, wrongly marked as advanced searchable
+		foreach($fields as $k => $field) if ( ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, 'supportadvsearch') )  $fields[$k];
 		
 		// Add html to field object trought plugins
 		$custom = FLEXI_J16GE ? JRequest::getVar('custom', array()) : false;
-		foreach ($fields as $field) {
-			$field->parameters->set( 'use_html', 0 );
-			$field->parameters->set( 'allow_multiple', 0 );
-			/*if( ($field->field_type == 'title') || ($field->field_type == 'maintext') || ($field->field_type == 'textarea')) {
-				$field->field_type = 'text';
-			}*/
-			$label = $field->label;
-			$fieldsearch = JRequest::getVar('filter_'.$field->id, array(), 'array');
+		foreach ($fields as $field)
+		{
+			$field->value = JRequest::getVar('filter_'.$field->id, false);
 			//$fieldsearch = $mainframe->getUserStateFromRequest( 'flexicontent.search.'.'filter_'.$field->id, 'filter_'.$field->id, array(), 'array' );
-			$field->value = isset($fieldsearch[0]) ? $fieldsearch : array();
 			//echo "FIELD value: "; print_r($field->value);
 			
-			//$results = $dispatcher->trigger('onAdvSearchDisplayFilter', array( &$field, &$item ));
 			$fieldname = $field->iscore ? 'core' : $field->field_type;
 			FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAdvSearchDisplayFilter', array( &$field, $field->value, 'searchForm'));
-			
-			$field->label = $label;
 		}
-		//FlexicontentFields::getItemFields();
-		$menus	= &JSite::getMenu();
-		$menu	= $menus->getActive();
-		$document	= &JFactory::getDocument();
 		
 		
 		// **********************
@@ -177,15 +161,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		}		
 		
 		
-		// Get the parameters of the active menu item
-		$params	= &$mainframe->getParams();
 		$lists = array();
-		
-		// Get Content Types allowed for user selection in the Search Form
-		$search_contenttypes = $params->get('contenttypes', array());
-		if ( $search_contenttypes && !is_array($search_contenttypes) ) {
-			$search_contenttypes = array($search_contenttypes);
-		}
 		
 		if( $params->get('cantypes', 1) && count($search_contenttypes) )
 		{
@@ -262,7 +238,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		}
 		if($show_filtersop = $params->get('show_filtersop', 1)) {
 			$default_filtersop = $params->get('default_filtersop', 'all');
-			$filtersop = JRequest::getVar('operator', $default_filtersop);
+			$filtersop = JRequest::getVar('filtersop', $default_filtersop);
 			$filtersop_arr		= array();
 			$filtersop_arr[] = JHTML::_('select.option',  'all', JText::_( 'FLEXI_SEARCH_ALL' ) );
 			$filtersop_arr[] = JHTML::_('select.option',  'any', JText::_( 'FLEXI_SEARCH_ANY' ) );
@@ -406,8 +382,6 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$this->assign('total',			$total);
 		$this->assign('error',			$error);
 		$this->assign('action', 	    $uri->toString());
-		
-		$this->assign('searchkeywordlabel', 	    $searchkeywordlabel);
 		$this->assignRef('document', $document);
 		
 		parent::display($tpl);

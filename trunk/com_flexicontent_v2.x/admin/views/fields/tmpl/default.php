@@ -20,6 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 
 $ctrl = FLEXI_J16GE ? 'fields.' : '';
 $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
+//$field_model = & JModel::getInstance('field', 'FlexicontentModel'); 
 ?>
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
@@ -44,19 +45,18 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 	<table class="adminlist" cellspacing="1">
 	<thead>
 		<tr>
-			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
-			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_LABEL', 't.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_ISFILTER', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_IS_SEARCHABLE', 't.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_IS_ADVANCED_SEARCHABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="20"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="<?php echo $this->permission->CanOrderFields ? '90' : '60'; ?>" class="center">
+			<th rowspan="2" width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
+			<th rowspan="2" width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
+			<th rowspan="2" class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_LABEL', 't.label', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th rowspan="2" class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th rowspan="2" class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th rowspan="2" width=""><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th colspan="2" class="center" nowrap="nowrap"><?php echo JText::_( 'FLEXI_CONTENT_LISTS_S' ); ?></th>
+			<th colspan="1" class="center" nowrap="nowrap"><?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW' ); ?></th>
+			<th rowspan="2" width="20"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th rowspan="2" width=""><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th rowspan="2" width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th rowspan="2" width="<?php echo $this->permission->CanOrderFields ? '90' : '60'; ?>">
 				<?php if ( !$this->filter_type ) : ?>
 					<?php echo JHTML::_('grid.sort', 'FLEXI_GLOBAL_ORDER', 't.ordering', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 					<?php
@@ -73,8 +73,14 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 					?>
 				<?php endif; ?>
 			</th>
-			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th rowspan="2" width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 't.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
+		<tr>
+			<th nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE', 't.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_FILTER', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_ADVANCED_INDEXABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+		</tr>
+		
 	</thead>
 
 	<tfoot>
@@ -149,23 +155,16 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 					$published 	= JHTML::_('grid.published', $row, $i );
 			}
 			
-			if( $row->isfilter ) {
-				$isfilter = "tick_f2.png";
-			}else{
-				$isfilter = "publish_x_f2.png";
-			}
+			//check which properties are supported by current field
+			$ft_support = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
 			
-			if( $row->issearch ) {
-				$issearch = "tick_f2.png";
-			}else{
-				$issearch = "publish_x_f2.png";
-			}
+			$supportsearch          = $ft_support->supportsearch;
+			$supportadvsearch       = $ft_support->supportadvsearch;
+			$supportfilter          = $ft_support->supportfilter;
 			
-			if( $row->isadvsearch ) {
-				$isadvsearch = "tick_f2.png";
-			}else{
-				$isadvsearch = "publish_x_f2.png";
-			}
+			$issearch    = ($row->issearch && $supportsearch)       ? "tick.png" : "publish_x".(!$supportsearch ? '_f2' : '').".png";
+			$isfilter    = ($row->isfilter && $supportfilter)       ? "tick.png" : "publish_x".(!$supportfilter ? '_f2' : '').".png";
+			$isadvsearch = ($row->isadvsearch && $supportadvsearch) ? "tick.png" : "publish_x".(!$supportadvsearch ? '_f2' : '').".png";
 			
 			if (FLEXI_J16GE) {
 				if ($canPublish) {
@@ -227,9 +226,21 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 				}
 				?>
 			</td>
-			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isfilter ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
-			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->issearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
-			<td align="center"><img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isadvsearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" /></td>
+			<td align="center">
+				<?php if($supportsearch) : ?> <a title="Toggle property" onclick="document.adminForm.propname.value='issearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);"> <?php endif; ?>
+					<img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->issearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" />
+				</a> <php endif; ?>
+			</td>
+			<td align="center">
+				<?php if($supportfilter) : ?> <a title="Toggle property" onclick="document.adminForm.propname.value='isfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);"> <?php endif; ?>
+					<img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isfilter ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" />
+				</a> <php endif; ?>
+			</td>
+			<td align="center">
+				<?php if($supportadvsearch) : ?> <a title="Toggle property" onclick="document.adminForm.propname.value='isadvsearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);"> <?php endif; ?>
+					<img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isadvsearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" />
+				</a> <php endif; ?>
+			</td>
 			<td align="center"><?php echo $row->nrassigned ? $row->nrassigned : $warning; ?></td>
 			<td align="center">
 				<?php echo $access; ?>
@@ -275,6 +286,7 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 	<input type="hidden" name="controller" value="fields" />
 	<input type="hidden" name="view" value="fields" />
 	<input type="hidden" name="task" value="" />
+	<input type="hidden" name="propname" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>

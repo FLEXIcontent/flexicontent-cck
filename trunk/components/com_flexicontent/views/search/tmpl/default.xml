@@ -73,7 +73,7 @@
 				</param>
 				
 				<param name="advsearch_fieldlist" type="fields" default="" label="Add Filter (below)" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvsearch="1"  onchange="f=document.getElementById('{control_name}search_fields'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
-				<param name="search_fields" type="textarea" default="" label="Attribute Filters" description="Enter Content Attibute Filters used to limit the text search result list, these will be included in the search form, and will appear inside advanced search options box. You can separate each field by comma(,)." cols="40" rows="3" />
+				<param name="search_fields" type="textarea" default="" label="Field (Attribute) Filters" description="Enter Content Attibute Filters (their fieldnames) used to limit the text search result list, these will be included in the search form, and will appear inside advanced search options box. You can separate each fieldname by comma(,). NOTE that fields not marked as Search View Indexable (=Searchable) will be skipped even if you add them here" cols="40" rows="3" />
 				
 				<param name="" type="separator" level="level2" default="Optional selections" description="Optional selection parameters like content types and Other Search Areas of Site (non FC Content Data)"/>
 				<param name="" type="separator" level="level3" default="Content types" description=""/>
@@ -81,7 +81,7 @@
 					<option value="0">FLEXI_NO</option>
 					<option value="1">FLEXI_YES</option>
 				</param>
-				<param name="contenttypes" type="types" default="" label="Searchable Types" description="The content types the search will include. NOTE: if user is allowed to select Content Types, then the selection list will be LIMITED to display ONLY the types selected here" multiple="true" />
+				<param name="contenttypes" type="types" default="" label="Searchable Types" description="The content types the search will include, selecting none will include ALL. NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here" multiple="true" />
 				
 				<param name="" type="separator" level="level3" default="Search Areas (non-FC Content)" description=""/>
 				<param name="show_searchareas" type="radio" default="0" label="Show selection" description="Allow the user to select and search other areas of the website content, e.g. like weblinks, user contacts, etc">

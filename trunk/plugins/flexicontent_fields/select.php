@@ -50,9 +50,9 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$firstoptiontext	= $field->parameters->get( 'firstoptiontext', 'Please Select' ) ;
 		$usefirstoption		= $field->parameters->get( 'usefirstoption', 1 ) ;
 		
-		$required 	= $field->parameters->get( 'required', 0 ) ;
-		$required 	= $required ? ' required' : '';
-
+		$required		= $field->parameters->get( 'required', 0 ) ;
+		$required		= $required ? ' required' : '';
+		
 		// initialise property
 		if (!$field->value && $default_value!=='') {
 			$field->value = array();
@@ -187,70 +187,30 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($filter->field_type != 'select') return;
 
-		// ** some parameter shortcuts
-		$field_elements		= $filter->parameters->get( 'field_elements' ) ;
-		$sql_mode			= $filter->parameters->get( 'sql_mode', 0 ) ;
-		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
+		// some parameter shortcuts
+		$sql_mode				= $filter->parameters->get( 'sql_mode', 0 ) ;
+		$label_filter 	= $filter->parameters->get( 'display_label_filter', 0 ) ;
 		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('FLEXI_ALL');
 		$filter->html = '';
 		
-		
-		// *** Retrieve values
-		if ($sql_mode) {  // CASE 1: SQL mode
-			
-			$db =& JFactory::getDBO();
-			$jAp=& JFactory::getApplication();
-			
-			// !! CHECK: The field depends on item data so it cannot be used as filter in category
-			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
-			preg_match_all("/{item->[^}]+}/", $query, $matches);
-			if (count($matches[0])) {
-				$filter->html = sprintf( JText::_('FLEXI_WARNING_ITEM_SPECIFIC_AS_CATEGORY_FILTER'), $filter->label );
-				return;
-			}
-			
-			// Execute SQL query to retrieve the field value - label pair
-			$db->setQuery($query);
-			$results = $db->loadObjectList('value');
-			
-			// !! CHECK: DB query had an error, set a message to warn the user
-			if ($db->getErrorNum()) {
-				JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br />".$query."<br />");
-				$filter->html	 = "<br />Filter for : $field->label cannot be displayed, error during db query, please correct field configuration<br />";
-				return;
-			}
-			
-			// !! CHECK: DB query produced no data, do not create the filter
-			if (!$results) {
-				$filter->html = '';
-				return;
-			}
-
-		} else { // CASE 2: Elements mode
-
-			$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
-			if (empty($listelements[count($listelements)-1])) {
-				unset($listelements[count($listelements)-1]);
-			}
-
-			$listarrays = array();
-			foreach ($listelements as $listelement) {
-				list($val, $label) = explode("::", $listelement);
-				$results[$val] = new stdClass();
-				$results[$val]->value = $val;
-				$results[$val]->text  = $label;
-			}
-			
+		// Get indexed element values
+		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, $extra_props=array(), $item_pros=false);
+		if ( !$elements ) {
+			if ($sql_mode && $item_pros > 0)
+				$filter->html = sprintf( JText::_('FLEXI_FIELD_ITEM_SPECIFIC_AS_FILTERABLE'), $filter->label );
+			else if ($sql_mode)
+				$filter->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+			else
+				$filter->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+			return;
 		}
 		
-		
-		// *** Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
+		// Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
 		$view = JRequest::getVar('view');
 		$force_all = $view!='category';
-		$results = array_intersect_key($results, flexicontent_cats::getFilterValues($filter, $force_all));
+		$results = array_intersect_key($elements, flexicontent_cats::getFilterValues($filter, $force_all));
 		
-		
-		// *** Create the select form field used for filtering
+		// Create the select form field used for filtering
 		$options = array();
 		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
 		

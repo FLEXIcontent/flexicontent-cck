@@ -8,12 +8,12 @@
 	<field name="ordering" type="fieldordering" default="999" label="Ordering" description ="FLEXI_FIELD_ORDER_DESC" class="inputbox" />
 	<field name="description" type="textarea" cols="30"  rows="5" default="" label="FLEXI_FIELD_DESCRIPTION" description ="FLEXI_FIELD_DESCRIPTION_DESC" class="inputbox" />
 	<field name="description" type="editor" default="" label="FLEXI_FIELD_DESCRIPTION" description ="" class="inputbox" />
-	<field name="isfilter" type="booleanlist" default="1" label="FLEXI_FIELD_ISFILTER" description ="FLEXI_FIELD_ISFILTER_DESC" class="inputbox" />
+	<field name="isfilter" type="booleanlist" default="1" label="FLEXI_FIELD_CONTENT_LIST_FILTER" description ="FLEXI_FIELD_CONTENT_LIST_FILTER_DESC" class="inputbox" />
 	<field name="iscore" type="hidden" default="0" label="iscore" description ="" class="inputbox" />
-	<field name="issearch" type="booleanlist" default="1" label="FLEXI_FIELD_IS_SEARCHABLE" description ="" class="inputbox" />
-	<field name="isadvsearch" type="booleanlist" default="1" label="FLEXI_FIELD_IS_ADVANCED_SEARCHABLE" description ="FLEXI_FIELD_IS_ADVSEARCH_DESC" class="inputbox" />
+	<field name="issearch" type="booleanlist" default="1" label="FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE" description ="FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC" class="inputbox" />
+	<field name="isadvsearch" type="booleanlist" default="1" label="FLEXI_FIELD_ADVANCED_INDEXABLE" description ="FLEXI_FIELD_ADVANCED_INDEXABLE_DESC" class="inputbox" />
+	
 	<field name="untranslatable" type="booleanlist" default="0" label="FLEXI_FIELD_UNTRANSLATABLE" description ="FLEXI_FIELD_UNTRANSLATABLE_DESC" class="inputbox" />
-
 	<field name="formhidden" type="radio" default="0" label="FLEXI_FORM_HIDDEN" description="FLEXI_FORM_HIDDEN_DESC">
 		<option value="0">FLEXI_NO</option>
 		<option value="1">FLEXI_FRONTEND</option>

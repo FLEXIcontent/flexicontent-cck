@@ -14,7 +14,6 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsText extends JPlugin
@@ -222,12 +221,12 @@ class plgFlexicontent_fieldsText extends JPlugin
 		}
 		
 		// some parameter shortcuts
+		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext			= $field->parameters->get( 'pretext', '' ) ;
 		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$separatorf		= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag			= $field->parameters->get( 'opentag', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag', '' ) ;
-		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
 		
 		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }

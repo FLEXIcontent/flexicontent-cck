@@ -134,8 +134,7 @@ function delAllFilters() {
 					<?php endif; ?>
 	
 					<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
-					<?php
-					?>
+					<span class="radio flexi_tabbox" style="margin-left:60px;"><?php echo '<span class="flexi_tabbox_label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_indextype']; ?></span>
 					</div>
 	
 	<!--

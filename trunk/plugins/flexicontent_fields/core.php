@@ -271,11 +271,6 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	{
 		if($filter->iscore != 1) return;
 		
-		if ( !in_array( $filter->field_type, array('createdby', 'modifiedby', 'type', 'state', 'categories', 'tags') ) ) {
-			$filter->html	= 'Field type: '.$filter->field_type.' can not be used as search filter';
-			return;
-		}
-		
 		plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName);
 	}
 	
@@ -285,16 +280,16 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	{
 		if($filter->iscore != 1) return; // performance check
 		
-		if ( !in_array( $filter->field_type, array('createdby', 'modifiedby', 'type', 'state', 'categories', 'tags') ) ) {
-			$filter->html	= 'Field type: '.$filter->field_type.' can not be used as category filter';
-			return;
-		}
-		
 		$db =& JFactory::getDBO();
 		$formfieldname = 'filter_'.$filter->id;
 		
 		switch ($filter->field_type)
 		{
+			case 'title':
+			case 'maintext':
+				$filter->html	.='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="20" value="'.$value.'" />';
+			break;
+			
 			case 'createdby': // Created by
 				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
 				if ($label_filter == 2) 
@@ -448,6 +443,10 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
 				
 				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+			break;
+			
+			default:
+				$filter->html	= 'Field type: '.$filter->field_type.' can not be used as search filter';
 			break;
 		}
 	}
