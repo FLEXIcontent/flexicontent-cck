@@ -131,7 +131,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						if ($this->dopostinstall && $this->perms->CanIndex)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=search';
-							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-searchindex.png', JText::_( 'FLEXI_SEARCH_INDEX' ) );
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-searchindex.png', JText::_( 'FLEXI_SEARCH_INDEXES' ) );
 						}
 						
 						if ($this->dopostinstall && $this->perms->CanTemplates)

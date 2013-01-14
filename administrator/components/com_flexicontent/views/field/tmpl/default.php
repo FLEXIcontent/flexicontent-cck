@@ -77,10 +77,40 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							?>
 						</td>
 					</tr>
+					
+					<?php if ($this->row->iscore == 0) : ?>
+					<tr>
+						<td class="key">
+							<label for="field_type" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_TYPE').'::'.JText::_('FLEXI_FIELD_FIELDTYPE_DESC');?>">
+								<?php echo JText::_( 'FLEXI_FIELD_TYPE' ).': *'; ?>
+							</label>
+						</td>
+						<td>
+							<?php echo $this->lists['field_type']; ?> &nbsp;&nbsp;&nbsp;
+							[ <span id="field_typename"><?php echo $this->row->field_type; ?></span> ]
+						</td>
+					</tr>
+					<?php endif; ?>
+					<tr>
+						<td class="key">
+							<label for="ordering" class="hasTip" title="<?php echo JText::_('Ordering').'::'.JText::_('FLEXI_FIELD_ORDER_DESC');?>">
+								<?php echo JText::_( 'Ordering' ).': '; ?>
+							</label>
+						</td>
+						<td>
+							<?php echo $this->lists['ordering']; ?>
+						</td>
+					</tr>
+					
+					<tr<?php echo (!$this->supportsearch && !$this->supportfilter)?' style="display:none;"':'';?>>
+						<td colspan="2" class="key tbl_group" >
+							<?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?>
+						</td>
+					</tr>
 					<tr<?php echo !$this->supportsearch?' style="display:none;"':'';?>>
 						<td class="key">
-							<label for="issearch">
-								<?php echo JText::_( 'FLEXI_FIELD_IS_SEARCHABLE' ).':'; ?>
+							<label for="issearch" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE').'::'.JText::_('FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC');?>">
+								<?php echo JText::_( 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE' ).':'; ?>
 							</label>
 						</td>
 						<td>
@@ -90,10 +120,29 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							?>
 						</td>
 					</tr>
+					<tr<?php echo !$this->supportfilter?' style="display:none;"':'';?>>
+						<td class="key">
+							<label for="isfilter" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_CONTENT_LIST_FILTER').'::'.JText::_('FLEXI_FIELD_CONTENT_LIST_FILTER_DESC');?>">
+								<?php echo JText::_( 'FLEXI_FIELD_CONTENT_LIST_FILTER' ).':'; ?>
+							</label>
+						</td>
+						<td>
+							<?php
+							$html = JHTML::_('select.booleanlist', 'isfilter', 'class="inputbox"', $this->row->isfilter );
+							echo $html;
+							?>
+						</td>
+					</tr>
+					
+					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
+						<td colspan="2" class="key tbl_group" >
+							<?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW' ); ?>
+						</td>
+					</tr>
 					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
 						<td class="key">
-							<label for="isadvsearch" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_IS_ADVANCED_SEARCHABLE').'::'.JText::_('FLEXI_FIELD_IS_ADVSEARCH_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_IS_ADVANCED_SEARCHABLE' ).':'; ?>
+							<label for="isadvsearch" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ADVANCED_INDEXABLE').'::'.JText::_('FLEXI_FIELD_ADVANCED_INDEXABLE_DESC');?>">
+								<?php echo JText::_( 'FLEXI_FIELD_ADVANCED_INDEXABLE' ).':'; ?>
 							</label>
 						</td>
 						<td>
@@ -103,17 +152,10 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							?>
 						</td>
 					</tr>
-					<tr<?php echo !$this->supportfilter?' style="display:none;"':'';?>>
-						<td class="key">
-							<label for="isfilter" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ISFILTER').'::'.JText::_('FLEXI_FIELD_ISFILTER_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_ISFILTER' ).':'; ?>
-							</label>
-						</td>
-						<td>
-							<?php
-							$html = JHTML::_('select.booleanlist', 'isfilter', 'class="inputbox"', $this->row->isfilter );
-							echo $html;
-							?>
+
+					<tr>
+						<td colspan="2" class="key tbl_group" >
+							<?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?>
 						</td>
 					</tr>
 					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>
@@ -129,6 +171,8 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							?>
 						</td>
 					</tr>
+
+					<tr<?php echo !$this->supportformhidden?' style="display:none;"':'';?>>
 					<tr>
 						<td class="key">
 							<label for="access" class="hasTip" title="<?php echo JText::_('FLEXI_FORM_HIDDEN').'::'.JText::_('FLEXI_FORM_HIDDEN_DESC');?>">
@@ -164,6 +208,17 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						</td>
 					</tr>
 					
+					<tr>
+						<td class="key">
+							<label for="description" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_DESCRIPTION').'::'.JText::_('FLEXI_FIELD_DESCRIPTION_DESC');?>">
+								<?php echo JText::_( 'FLEXI_FIELD_DESCRIPTION' ).': '; ?>
+							</label>
+						</td>
+						<td>
+							<textarea id="description" cols="30" rows="5" name="description"><?php echo $this->row->description; ?></textarea>
+						</td>
+					</tr>					
+					
 					<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
 					<tr>
 						<td class="key">
@@ -177,41 +232,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					<?php endif; ?>
 					
-					<?php if ($this->row->iscore == 0) : ?>
-					<tr>
-						<td class="key">
-							<label for="field_type" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_TYPE').'::'.JText::_('FLEXI_FIELD_FIELDTYPE_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_TYPE' ).': *'; ?>
-							</label>
-						</td>
-						<td>
-							<?php echo $this->lists['field_type']; ?>
-								&nbsp;&nbsp;&nbsp;&nbsp;[ <span id="field_typename">
-									<?php echo $this->row->field_type; ?>
-								</span> ]
-						</td>
-					</tr>
-					<?php endif; ?>
-					<tr>
-						<td class="key">
-							<label for="ordering" class="hasTip" title="<?php echo JText::_('Ordering').'::'.JText::_('FLEXI_FIELD_ORDER_DESC');?>">
-								<?php echo JText::_( 'Ordering' ).': '; ?>
-							</label>
-						</td>
-						<td>
-							<?php echo $this->lists['ordering']; ?>
-						</td>
-					</tr>
-					<tr>
-						<td class="key">
-							<label for="description" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_DESCRIPTION').'::'.JText::_('FLEXI_FIELD_DESCRIPTION_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_DESCRIPTION' ).': '; ?>
-							</label>
-						</td>
-						<td>
-							<textarea id="description" cols="30" rows="5" name="description"><?php echo $this->row->description; ?></textarea>
-						</td>
-					</tr>
+
 				</table>
 			</fieldset>
 			

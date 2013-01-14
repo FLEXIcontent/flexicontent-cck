@@ -28,7 +28,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 		
 			<fieldset>
 			<legend><?php echo JText::_( 'FLEXI_FIELD_PROPERTIES' ); ?></legend>
-				<table class="admintable" width="100%">
+				<table class="admintable">
 					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('label').': *'; ?>
@@ -66,20 +66,38 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('published'); ?>
 						</td>
 					</tr>
+					
+					<?php if ($this->form->getValue("iscore") == 0) : ?>
+					<tr>
+						<td class="key">
+							<?php echo $this->form->getLabel('field_type').': *'; ?>
+						</td>
+						<td>
+							<?php echo $this->form->getInput('field_type'); ?> &nbsp;&nbsp;&nbsp;
+							[ <span id="field_typename"><?php echo $this->form->getValue('field_type'); ?></span> ]
+						</td>
+					</tr>
+					<?php endif; ?>
+					<tr>
+						<td class="key">
+							<?php echo $this->form->getLabel('ordering').': '; ?>
+						</td>
+						<td>
+							<?php echo $this->form->getInput('ordering'); ?>
+						</td>
+					</tr>
+					
+					<tr<?php echo (!$this->supportsearch && !$this->supportfilter)?' style="display:none;"':'';?>>
+						<td colspan="2" class="key tbl_group" >
+							<?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?>
+						</td>
+					</tr>
 					<tr<?php echo !$this->supportsearch?' style="display:none;"':'';?>>
 						<td class="key">
 							<?php echo $this->form->getLabel('issearch').':'; ?>
 						</td>
 						<td>
 							<?php echo $this->form->getInput('issearch'); ?>
-						</td>
-					</tr>
-					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
-						<td class="key">
-							<?php echo $this->form->getLabel('isadvsearch').':'; ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('isadvsearch'); ?>
 						</td>
 					</tr>
 					<tr<?php echo !$this->supportfilter?' style="display:none;"':'';?>>
@@ -90,6 +108,26 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('isfilter'); ?>
 						</td>
 					</tr>
+					
+					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
+						<td colspan="2" class="key tbl_group" >
+							<?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW' ); ?>
+						</td>
+					</tr>
+					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
+						<td class="key">
+							<?php echo $this->form->getLabel('isadvsearch').':'; ?>
+						</td>
+						<td>
+							<?php echo $this->form->getInput('isadvsearch'); ?>
+						</td>
+					</tr>
+
+					<tr>
+						<td colspan="2" class="key tbl_group" >
+							<?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?>
+						</td>
+					</tr>
 					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>
 						<td class="key">
 							<?php echo $this->form->getLabel('untranslatable').':'; ?>
@@ -98,6 +136,8 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('untranslatable'); ?>
 						</td>
 					</tr>
+
+					<tr<?php echo !$this->supportformhidden?' style="display:none;"':'';?>>
 					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('formhidden').':'; ?>
@@ -138,27 +178,6 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					<?php endif; ?>
 					
-					<?php if ($this->form->getValue("iscore") == 0) : ?>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('field_type').': *'; ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('field_type'); ?>
-								&nbsp;&nbsp;&nbsp;&nbsp;[ <span id="field_typename">
-									<?php echo $this->form->getValue('field_type'); ?>
-								</span> ]
-						</td>
-					</tr>
-					<?php endif; ?>
-					<tr>
-						<td class="key">
-							<?php echo $this->form->getLabel('ordering').': '; ?>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('ordering'); ?>
-						</td>
-					</tr>
 					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('description'); ?>

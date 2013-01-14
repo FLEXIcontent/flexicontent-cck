@@ -100,6 +100,26 @@ class FlexicontentViewFields extends JViewLegacy
 		if ($perms->CanDeleteField) {
 			JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
 		}
+		
+		JToolBarHelper::divider(); JToolBarHelper::spacer();
+		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
+		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='issearch';";
+		flexicontent_html::addToolBarButton(
+			'FLEXI_TOGGLE_TEXT_SEARCHABLE', 'refresh', $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
+		
+		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
+		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isfilter';";
+		flexicontent_html::addToolBarButton(
+			'FLEXI_TOGGLE_FILTERABLE', 'refresh', $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
+		
+		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
+		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isadvsearch';";
+		flexicontent_html::addToolBarButton(
+			'FLEXI_TOGGLE_ADVINDEXABLE', 'refresh', $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
+		
 		if ($perms->CanConfig) {
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');

@@ -330,7 +330,53 @@ class FlexicontentModelFields extends JModelLegacy
 		}
 		return true;
 	}
-
+	
+	
+	/**
+	 * Method to toggle the given property of given field
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.0
+	 */
+	function toggleprop($cid = array(), $propname=null)
+	{
+		if (!$propname) return false;
+		$user 	=& JFactory::getUser();
+		
+		if (count( $cid ))
+		{
+			$query = 'SELECT field_type, iscore, id'
+					. ' FROM #__flexicontent_fields'
+					. ' WHERE id IN ('. implode( ',', $cid ) .') '
+					;
+			$this->_db->setQuery($query);
+			$rows = $this->_db->loadObjectList('id');
+			
+			$support_ids = array();
+			$supportprop_name = 'support'.str_replace('is','',$propname);
+			foreach ($rows as $id => $row) {
+				$ft_support = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
+				$supportprop = isset($ft_support->{$supportprop_name}) ? $ft_support->{$supportprop_name} : false;
+				if ($supportprop) $support_ids[] = $id;
+			}
+			if ( !count($support_ids) ) return 0;
+			
+			$query = 'UPDATE #__flexicontent_fields'
+				. ' SET '. $propname .' = 1-'. $propname
+				. ' WHERE id IN ('. implode(",",$support_ids) .')'
+				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
+			;
+			$this->_db->setQuery( $query );
+			if (!$this->_db->query()) {
+				$this->setError($this->_db->getErrorMsg());
+				return false;
+			}
+		}
+		return count($support_ids);
+	}
+		
+	
 	/**
 	 * Method to check if we can remove a field
 	 *

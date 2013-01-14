@@ -894,4 +894,12 @@ div#cpanel div.icon  a {
 	border-bottom: 1px dashed gray;
 }
 
+.key.tbl_group {
+	text-align:center !important;
+	color: darkgreen !important;
+	border: 1px dashed #bbbbbb !important;
+	font-size: 12px !important;
+	padding: 6px !important;
+}
+
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/

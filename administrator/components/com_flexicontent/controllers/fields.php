@@ -234,6 +234,64 @@ class FlexicontentControllerFields extends FlexicontentController
 
 
 	/**
+	 * Logic to toggele boolean property of fields
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function toggleprop()
+	{
+		$user	=& JFactory::getUser();
+		$model 		= $this->getModel('fields');
+		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$propname = JRequest::getCmd( 'propname', null, 'default' );
+		$field_id		= (int)$cid[0];
+
+		if (!is_array( $cid ) || count( $cid ) < 1) {
+			$msg = '';
+			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_TOGGLE_PROPERTY' ) );
+		/*} else if (!$model->cantoggleprop($cid, $propname)) {
+			$msg = '';
+			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_TOGGLE_PROPERTIES_THESE_FIELDS' ));*/
+		} else {
+			
+			if (FLEXI_J16GE) {
+				$asset = 'com_flexicontent.field.' . $field_id;
+				$is_authorised = $user->authorise('flexicontent.publishfield', $asset);
+			} else if (FLEXI_ACCESS && $user->gid < 25) {
+				$is_authorised = FAccess::checkAllContentAccess('com_content','publish','users', $user->gmid, 'field', $field_id);
+			} else {
+				// Only admin or super admin can unpublish fields
+				$is_authorised = $user->gid >= 24;
+			}
+			
+			if ( !$is_authorised ) {
+				$msg = '';
+				JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			} else {
+				$total = $model->toggleprop($cid, $propname);
+				if ($total === false) {
+					$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
+					JError::raiseWarning( 500, $model->getError() );
+				} else {
+					if ($total && $propname=='issearch')    JError::raiseNotice( 403, JText::_( 'FLEXI_ALERT_RECALCULATE_BASIC_INDEX' ) );
+					if ($total && $propname=='isadvsearch') JError::raiseNotice( 403, JText::_( 'FLEXI_ALERT_RECALCULATE_ADVANCED_INDEX' ) );
+					$msg 	= JText::sprintf( 'FLEXI_FIELD_PROPERTY_TOGGLED', $total);
+					if ($total < count($cid)) $msg .= '<br/>'.JText::sprintf( 'FLEXI_FIELD_PROPERTY_TOGGLED_SKIPPED', count($cid) - $total);
+					$cache = &JFactory::getCache('com_flexicontent');
+					$cache->clean();
+					$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+					$itemcache->clean();
+				}
+			}
+		}
+		
+		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', $msg );
+	}
+
+
+	/**
 	 * Logic to delete fields
 	 *
 	 * @access public

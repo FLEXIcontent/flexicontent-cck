@@ -44,6 +44,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$search_index			= $db->getEscaped( trim(JString::strtolower( $search_index ) ) );
 		$search_itemtitle	= $mainframe->getUserStateFromRequest( $option.'.search.search_itemtitle',	'search_itemtitle', '', 'string' );
 		$search_itemid		= $mainframe->getUserStateFromRequest( $option.'.search.search_itemid',	'search_itemid', '', 'int' );
+		$filter_indextype	= $mainframe->getUserStateFromRequest( $option.'.search.filter_indextype',		'filter_indextype',	'advanced',		'word' );
 		
 		$f_active['filter_fieldtype']	= (boolean)$filter_fieldtype;
 		$f_active['filter_itemtype']	= (boolean)$filter_itemtype;
@@ -91,6 +92,17 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$ffstate[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
 		$lists['filter_itemstate'] = JHTML::_('select.genericlist', $ffstate, 'filter_itemstate', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_itemstate );
 		
+		// build filter index type record listing
+		//$itn['basic'] = JText::_( 'FLEXI_INDEX_BASIC' );
+		$itn['advanced'] = JText::_( 'FLEXI_INDEX_ADVANCED' );
+		$indextypes = array();
+		foreach ($itn as $i => $v) {
+			if ($filter_indextype == $i) $v = "<span class='flexi_radiotab highlight'>".$v."</span>";
+			else                        $v = "<span class='flexi_radiotab downlight'>".$v."</span>";
+			$indextypes[] = JHTML::_('select.option', $i, $v);
+		}
+		$lists['filter_indextype'] = JHTML::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_indextype );
+		
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
@@ -134,10 +146,10 @@ class FLEXIcontentViewSearch extends JViewLegacy
 	function setToolbar() {
 		$toolbar = &JToolBar::getInstance('toolbar');
 
-		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_BASIC',    'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic',     500, 210);
+		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_BASIC_CONTENT_LISTS',    'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic',     500, 210);
 		JToolBarHelper::divider();  JToolBarHelper::spacer();
-		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_ADVANCED', 'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced',  500, 210);
-		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_PURGE_INDEX', FLEXI_J16GE ? 'search.purge' : 'purge', false);
+		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', 'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced',  500, 210);
+		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', FLEXI_J16GE ? 'search.purge' : 'purge', false);
 		
 		$user = &JFactory::getUser();
 		$perms = FlexicontentHelperPerm::getPerm();

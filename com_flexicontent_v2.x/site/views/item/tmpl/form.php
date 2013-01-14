@@ -577,7 +577,10 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
 				
 				// -- Tooltip for the current field label
-				$label_tooltip = $field->description ? 'class="flexi_label hasTip" title="'.$field->label.'::'.$field->description.'"' : ' class="flexi_label" ';
+				$edithelp = $field->parameters->get('edithelp', 1 );
+				$label_tooltip = ( $field->description && ($edithelp==1 || $edithelp==2) ) ?
+					' class="flexi_label hasTip '.($edithelp==2 ? ' fc_tooltip_icon_fe ' : '').'" title="'.$field->label.'::'.$field->description.'" ' :
+					' class="flexi_label" ';
 				$label_style = ""; //( $field->field_type == 'maintext' || $field->field_type == 'textarea' ) ? " style='clear:both; float:none;' " : "";
 				$not_in_tabs = "";
 				
@@ -599,6 +602,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 					</label>
 					
 					<div style="float:left!important; padding:0px!important; margin:0px!important; <?php echo $width; ?>;">
+						<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>
 					
 				<?php	if ($field->field_type=='maintext' && isset($this->item->item_translations) ) : ?>
 					

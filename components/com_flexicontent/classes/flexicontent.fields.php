@@ -1002,12 +1002,11 @@ class FlexicontentFields
 	{
 		$db = &JFactory::getDBO();
 		
-		if ( $field->iscore && !in_array( $field->field_type, array('title', 'maintext', 'categories', 'tags') ) ) {
-			$field->html	= 'Field type: '.$field->field_type.' can be used as search filter' ;
-			return;
-		}
+		static $fi = null;
+		if ($fi === null) $fi = FlexicontentFields::get_BuiltIn_FieldInfo();
 		
-		$indexable_fields = array('categories', 'tags', 'select', 'selectmultiple', 'checkbox', 'checkboximage', 'radio', 'radioimage');
+		// Check if field type supports advanced search, this will skip fields, wrongly marked as advanced searchable
+		if ( ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, 'supportadvsearch') )  return;
 		
 		$field_vals = JRequest::getVar('filter_'.$field->id,'');
 		$field_vals = is_array($field_vals) ? $field_vals : array($field_vals);
@@ -1021,7 +1020,7 @@ class FlexicontentFields
 		//echo " &nbsp; :: &nbsp; "; print_r($values);
 		
 		// EITHER MATCH TEXT or VALUE IDs
-		if ( in_array($field->field_type, $indexable_fields) ) {
+		if ( in_array($field->field_type, $fi->indexable_fields) ) {
 			$match_criteria_str = " ai.value_id IN ( '". implode("', '", $values) ."')";
 		} else {
 			$match_criteria_str = " ai.search_index LIKE '%". implode("%' OR ai.search_index LIKE '%", $values) ."%'";
@@ -1073,9 +1072,8 @@ class FlexicontentFields
 		$db->setQuery($query);
 		$db->query();
 		
-		if ( $field->iscore && !in_array( $field->field_type, array('title', 'maintext', 'categories', 'tags') ) ) {
-			return;
-		}
+		// Check if field type supports advanced search, this will skip fields, wrongly marked as advanced searchable
+		if ( ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, 'supportadvsearch') )  return;
 		
 		// A null indicates to retrieve values
 		if ($values===null) $values = & FlexicontentFields::searchIndex_getFieldValues($field,$item);
@@ -1127,7 +1125,8 @@ class FlexicontentFields
 	 */
 	function onIndexSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null)
 	{
-		if ( $field->iscore && !in_array( $field->field_type, array('title', 'maintext', 'categories', 'tags') ) ) {
+		// Check if field type supports advanced search, this will skip fields, wrongly marked as text searchable
+		if ( ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, 'supportsearch') )  {
 			$field->search = '';
 			return;
 		}
@@ -1177,7 +1176,7 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function indexedField_getElements(&$field, $item, $extra_props=array())
+	function indexedField_getElements(&$field, $item, $extra_props=array(), &$item_pros=true)
 	{
 		$field_elements		= $field->parameters->get( 'field_elements', '' ) ;
 		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;   // For fields that use this parameter
@@ -1187,12 +1186,17 @@ class FlexicontentFields
 			$db =& JFactory::getDBO();
 			$jAp=& JFactory::getApplication();
 			
-			// Get/verify query string and replace item properties in it
+			// Get/verify query string, check if item properties and other replacements are allowed and replace them
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
-			$query = FlexicontentFields::doQueryReplacements($field_elements, $item);
-			$db->setQuery($query);
-			$results = $db->loadObjectList();
+			$query = FlexicontentFields::doQueryReplacements($field_elements, $item, $item_pros);
 			
+			// Execute SQL query to retrieve the field value - label pair, and any other extra properties
+			if ( $query ) {
+				$db->setQuery($query);
+				$results = $db->loadObjectList('value');
+			}
+			
+			// !! CHECK: DB query failed or produced no data
 			if (!$query || !is_array($results)) {
 				return false;
 			}
@@ -1208,29 +1212,25 @@ class FlexicontentFields
 			// Split elements into their properties: value, label, extra_prop1, extra_prop2
 			$listarrays = array();
 			$results = array();
-			$n = 0;
 			foreach ($listelements as $listelement) {
 				$listelement_props  = preg_split("/[\s]*::[\s]*/", $listelement);
-				$results[$n] = new stdClass();
-				$results[$n]->value = $listelement_props[0];
-				$results[$n]->text  = $listelement_props[1];  // the text label
+				$val = $listelement_props[0];
+				$results[$val] = new stdClass();
+				$results[$val]->value = $listelement_props[0];
+				$results[$val]->text  = $listelement_props[1];  // the text label
 				$el_prop_count = 2;
 				foreach ($extra_props as $extra_prop) {
-					$results[$n]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it
+					$results[$val]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it
 					$el_prop_count++;
 				}
-				$n++;
 			}
 			
 		}
 		
-		$elements = array();
-		if ($results) foreach($results as $result) {
-			$elements[$result->value] = $result;
-		}
-		
-		return $elements;
-	}	
+		// Return found elements
+		return $results;
+	}
+	
 	
 	/**
 	 * Common method to map element value INDEXES to value objects for fields that use indexed values
@@ -1363,5 +1363,125 @@ class FlexicontentFields
 		return $query;
 	}
 	
+	
+	/**
+	 * Method to get used the properties supported by given field_type
+	 * 
+	 * @return array
+	 * @since 1.5
+	 */
+	function getPropertySupport($field_type, $iscore, $spname=null)
+	{
+		static $fi = null;
+		if ($fi === null) $fi = FlexicontentFields::get_BuiltIn_FieldInfo();
+		
+		static $cparams = null;
+		if ($cparams === null) $cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		
+		static $support_ft = array();
+		if ( isset( $support_ft[$field_type] ) ) return !$spname ? $support_ft[$field_type] : $support_ft[$field_type]->{$spname};
+		
+		// Existing fields with field type
+		if ($field_type) {
+			
+			// Make sure that the Joomla plugin that implements the type of current flexi field, has been imported
+			JPluginHelper::importPlugin('flexicontent_fields', $field_type);
+			
+			// Get Methods implemented by the field
+			$classname	= 'plgFlexicontent_fields'.($iscore ? 'core' : $field_type);
+			$classmethods	= get_class_methods($classname);
+			
+			// SEARCH/FILTER related properties
+			$supportsearch    = $iscore ? in_array($field_type, $fi->core_search)    : in_array('onIndexSearch', $classmethods);
+			$supportfilter    = $iscore ? in_array($field_type, $fi->core_filters)   : in_array('onDisplayFilter', $classmethods);
+			$supportadvsearch = $iscore ? in_array($field_type, $fi->core_advsearch) : in_array('onIndexAdvSearch', $classmethods);
+			
+			// ITEM FORM related properties
+			$supportuntranslatable = !$iscore || $field_type=='maintext';
+			$supportvalueseditable = !$iscore || $field_type=='maintext';
+			$supportformhidden     = !$iscore || $field_type=='maintext';
+			$supportedithelp       = !$iscore || $field_type=='maintext';
+		
+		// New fields without field type
+		} else {
+			
+			// SEARCH/FILTER related properties
+			$supportsearch    = false;
+			$supportfilter    = false;
+			$supportadvsearch = false;
+			
+			// ITEM FORM related properties
+			$supportuntranslatable = !$iscore;
+			$supportvalueseditable = !$iscore;
+			$supportformhidden     = !$iscore;
+			$supportedithelp       = !$iscore;
+		}
+		
+		// This property is usable only when Translation Groups are enabled
+		$supportuntranslatable = $supportuntranslatable && $cparams->get('enable_translation_groups');
+		
+		$support_ft[$field_type] = new stdClass();
+		$support_ft[$field_type]->supportsearch = $supportsearch;
+		$support_ft[$field_type]->supportfilter = $supportfilter;
+		$support_ft[$field_type]->supportadvsearch = $supportadvsearch;
+		$support_ft[$field_type]->supportuntranslatable = $supportuntranslatable;
+		$support_ft[$field_type]->supportformhidden = $supportformhidden;
+		$support_ft[$field_type]->supportedithelp = $supportedithelp;
+		
+		return !$spname ? $support_ft[$field_type] : $support_ft[$field_type]->{$spname};
+	}
+	
+	
+	function &get_BuiltIn_FieldInfo()
+	{
+		static $info = null;
+		if ($info!==null) return $info;
+		
+		$info = new stdClass();
+		$info->core_search    = array('title', 'maintext', 'tags', 'categories');    // TEXT SEARCHABLE FIELDS
+		$info->core_filters   = array('createdby', 'modifiedby', 'type', 'state', 'categories', 'tags');  // CORE fields as filters
+		$info->core_advsearch = array('title', 'maintext', 'tags', 'categories');    // ADVANCED SEARCHABLE FIELDS
+		$info->indexable_fields = array('categories', 'tags', 'select', 'selectmultiple', 'checkbox', 'checkboximage', 'radio', 'radioimage');
+		
+		return $info;
+	}
+	
+	
+	/**
+	 * Method to get advanced search fields which belongs to the item type
+	 * 
+	 * @return object
+	 * @since 1.5
+	 */
+	function getSearchFields($key='name', $indexer='advanced', $search_fields=null, $content_types=null, $load_params=true, $item_id=0)
+	{
+		$db = &JFactory::getDBO();
+		$where =
+			 " WHERE f.published='1' AND f.isadvsearch='1' "      // Limit to published fields, marked as advanced searchable (indexable)
+			.($search_fields ? " AND f.name IN({$search_fields}) " : "")       // Limit to advanced search fields set in configuration
+			.($content_types ? " AND ftr.type_id IN({$content_types}) " : "")  // Limit to fields assigned to specified Content Types ??
+			;
+		$query = 'SELECT f.*'
+			.' FROM #__flexicontent_fields AS f'
+			.' JOIN #__flexicontent_fields_type_relations AS ftr ON ftr.field_id = f.id'
+			.' WHERE f.'.($indexer=='advanced' ? 'isadvsearch' : 'issearch').'= 1 AND f.published = 1'
+			.' GROUP BY f.id'
+			.' ORDER BY ftr.ordering, f.ordering, f.name'
+		;
+		$db->setQuery($query);
+		$fields = $db->loadObjectList($key);
+		
+		$spname = $indexer=='advanced' ? 'supportadvsearch' : 'supportsearch';
+		foreach ($fields as $field)
+		{
+			// Skip fields not being capable of advanced/basic search
+			if ( ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, $spname) )  continue;
+			
+			$field->item_id		= $item_id;
+			$field->value     = !$item_id ? false : $this->getExtrafieldvalue($field->id, $version=0, $item_id);  // WARNING: getExtrafieldvalue() is Frontend method
+			if ($load_params) $field->parameters = new JParameter($field->attribs);
+		}
+		return $fields;
+	}
 }
 ?>

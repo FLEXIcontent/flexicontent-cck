@@ -84,52 +84,23 @@ class FlexicontentViewField extends JViewLegacy
 		
 		// Import Joomla plugin that implements the type of current flexi field
 		JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
-			
+		
+		// load plugin's english language file then override with current language file
+		$extension_name = 'plg_flexicontent_fields_'. ($iscore ? 'core' : $field_type);
+		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', true);
+		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, true);
+		
 		//check which properties are supported by current field
-		$supportsearch          = true;
-		$supportadvsearch       = false;
-		$supportfilter          = false;
-		$supportuntranslatable  = false;
+		$ft_support = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
 		
-		// CATEGORY FILTERS: hard-coded
-		$standard_filters = array(
-			'createdby', 'modifiedby', 'type', 'state', 'tags', 'categories',  // CORE fields as filters
-			'checkbox', 'checkboximage', 'radio', 'radioimage', 'select', 'selectmultiple',  // Indexable fields as filters
-			'text', 'date', 'textselect'  // Other fields as filters
-		);
+		$supportsearch          = $ft_support->supportsearch;
+		$supportadvsearch       = $ft_support->supportadvsearch;
+		$supportfilter          = $ft_support->supportfilter;
+		$supportuntranslatable  = $ft_support->supportuntranslatable;
+		$supportformhidden      = $ft_support->supportformhidden;
+		$supportedithelp        = $ft_support->supportedithelp;
 		
-		// CATEGORY FILTERS: via configuration
-		$config_filters = explode(',', $cparams->get('filter_types', ''));
 		
-		// ALL CATEGORY FILTERS
-		$all_filters = array_unique(array_merge($standard_filters, $config_filters));
-		
-		// ADVANCED SEARCHABLE FIELDS
-		$core_advsearch = array('title', 'maintext', 'tags', 'categories');
-		
-		if ($row->field_type)
-		{
-			// load plugin's english language file then override with current language file
-			$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
-			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, true);
-			
-			$classname	= 'plgFlexicontent_fields'.($row->iscore ? 'core' : $row->field_type);
-			$classmethods	= get_class_methods($classname);
-			if ($row->iscore) {
-				$supportadvsearch = in_array($row->field_type, $core_advsearch);
-				$supportfilter = in_array($row->field_type, $all_filters);
-			} else {
-				$supportadvsearch = (in_array('onAdvSearchDisplayField', $classmethods) || in_array('onFLEXIAdvSearch', $classmethods));
-				$supportfilter = in_array('onDisplayFilter', $classmethods);
-			}
-			
-			$supportuntranslatable = !$row->iscore && $cparams->get('enable_translation_groups');
-			$supportvalueseditable = !$row->iscore;
-			
-			$supportedithelp = !$row->iscore || $row->field_type=='maintext';
-		}
-				
 		//build selectlists, (for J1.6+ most of these are defined via XML file and custom form field classes)
 		$lists = array();
 		
@@ -168,6 +139,7 @@ class FlexicontentViewField extends JViewLegacy
 			$lists['ordering'] 			= JHTML::_('list.specificordering',  $row, $row->id, $query );
 		else
 			$lists['ordering'] 			= JHTML::_('list.specificordering',  $row, '', $query );
+		
 		
 		//build field_type list
 		if ($row->iscore == 1) { $class = 'disabled="disabled"'; } else {
@@ -239,6 +211,7 @@ class FlexicontentViewField extends JViewLegacy
 		$this->assignRef('supportfilter'           , $supportfilter);
 		$this->assignRef('supportuntranslatable'   , $supportuntranslatable);
 		$this->assignRef('supportvalueseditable'   , $supportvalueseditable);
+		$this->assignRef('supportformhidden'       , $supportformhidden);
 		$this->assignRef('supportedithelp'         , $supportedithelp);
 
 		parent::display($tpl);

@@ -469,7 +469,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		if($filter->field_type != 'extendedweblink') return;
 		
 		$size = (int)$filter->parameters->get( 'size', 30 );
-		$filter->html	='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value[0].'" />';
+		$filter->html	='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="'.$size.'" value="'.$value.'" />';
 	}	
 	
 	
