@@ -20,13 +20,10 @@
 		<language tag="en-GB">languages/en-GB.mod_flexiadvsearch.ini</language>
 	</languages>
 	
-	<params>
-
+	<params addpath="/modules/mod_flexicontent/elements">
 		
 			<param name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
 
-			<param name="moduleclass_sfx" type="text" default="" label="Module Class Suffix" description="PARAMMODULECLASSSUFFIX" />
-			<param name="@spacer" type="spacer" default="" label="" description="" />
 			<param name="width" type="text" default="20" label="FLEXI_BOX_WIDTH" description="FLEXI_BOX_WIDTH_DESC" />
 			<param name="text" type="text" default="" label="FLEXI_TEXT" description="FLEXI_TEXT_DESC" />
 			<param name="@spacer" type="spacer" default="" label="" description="" />
@@ -57,7 +54,8 @@
 			</param>
 			<param name="linkadvsearch_txt" type="text" default="Advanced Search" label="FLEXI_ADV_SEARCH_TEXT" description="FLEXI_ADV_SEARCH_TEXT_DESC" />
 			
-			<param name="" type="separator" default="FLEXI_MODULE_DISPLAY_RULES" description="FLEXI_MODULE_DISPLAY_RULES_DESC" level="level1" menu="hide" />
+		
+		<param type="jparamstab" title="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC" />
 			<param name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC">
 				<option value="OR">FLEXI_OR</option>
 				<option value="AND">FLEXI_AND</option>
@@ -76,14 +74,18 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" />
-			
-	</params>
 
-	<params group="advanced">
+		<param name="" type="jparamstab" title="FLEXI_MOD_ADVANCED" />
+			<param name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
+			<param name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
+			
+			<param name="" type="separator" default="FLEXI_CACHING" level="level1" menu="hide" />
 			<param name="cache" type="list" default="1" label="FLEXI_CACHING" description="FLEXI_CACHING_DESC">
+				<option value="2">FLEXI_FORCE_CACHE</option>
 				<option value="1">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO_CACHING</option>
 			</param>
 			<param name="cache_time" type="text" default="900" label="FLEXI_CACHE_TIME" description="FLEXI_CACHE_TIME_DESC" />
+			
 	</params>
 </install>

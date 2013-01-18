@@ -86,7 +86,7 @@ class FlexicontentViewField extends JViewLegacy
 		JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
 		
 		// load plugin's english language file then override with current language file
-		$extension_name = 'plg_flexicontent_fields_'. ($iscore ? 'core' : $field_type);
+		$extension_name = 'plg_flexicontent_fields_'. ($row->iscore ? 'core' : $row->field_type);
 		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB', true);
 		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null, true);
 		

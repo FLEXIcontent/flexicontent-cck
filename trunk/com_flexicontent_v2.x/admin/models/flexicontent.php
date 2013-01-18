@@ -1503,6 +1503,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				// Save the category asset (create or update it)
 				if (!$asset->check() || !$asset->store(false)) {
 					echo $asset->getError();
+					echo " Problem for asset with id: ".$asset ->id;
+					echo " Problem for category with id: ".$category->id. "(".$category->title.")";
 					$this->setError($asset->getError());
 					return false;
 				}

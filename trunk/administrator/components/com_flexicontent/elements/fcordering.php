@@ -45,7 +45,15 @@ class JElementFcordering extends JElement
 	
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		$class = 'class="inputbox" multiple="true" size="9"';
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+		$size = @$attributes['size'] ? $attributes['size'] : 9 ;
+		$class = 'class="inputbox" multiple="true" size="'.$size.'"';
 
 		$ordering[] = JHTML::_('select.option',  'popular', 	JText::_( 'FLEXI_MOST_POPULAR' ) );
 		$ordering[] = JHTML::_('select.option',  'commented',	JText::_( 'FLEXI_MOST_COMMENTED' ) );
@@ -57,6 +65,7 @@ class JElementFcordering extends JElement
 		$ordering[] = JHTML::_('select.option',  'alpharev', 	JText::_( 'FLEXI_ALPHABETICAL_REVERSE' ) );
 		$ordering[] = JHTML::_('select.option',  'catorder', 	JText::_( 'FLEXI_CAT_ORDER' ) );
 		$ordering[] = JHTML::_('select.option',  'random', 		JText::_( 'FLEXI_RANDOM' ) );
+		$ordering[] = JHTML::_('select.option',  'field', 		JText::_( 'FLEXI_CUSTOM_FIELD' ) );
 
 		return JHTML::_('select.genericlist', $ordering, $control_name.'['.$name.'][]', $class, 'value', 'text', $value );
 	}

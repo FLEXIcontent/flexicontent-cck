@@ -162,8 +162,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('limitstart', $limitstart);
 
 		// Set filter order variables into state
-		$this->setState('filter_order', 	JRequest::getCmd('filter_order', 'i.title'));
-		$this->setState('filter_order_dir', JRequest::getCmd('filter_order_Dir', 'ASC'));
+		$this->setState('filter_order', 'i.title');
+		$this->setState('filter_order_dir', 'ASC');
 	}
 
 
@@ -453,85 +453,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _buildItemOrderBy()
 	{
-		$mainframe = &JFactory::getApplication();
-		$params = & $this->_params;
+		$request_var = $this->_params->get('orderby_override') ? 'orderby' : '';
+		$default_order = $this->getState('filter_order');
+		$default_order_dir = $this->getState('filter_order_dir');
 		
-		// NOTE: *** 'filter_order' AND 'filter_order_dir' are the real ORDERING DB column names
-		
-		// Get ordering columns set in state
-		$filter_order     = $this->getState('filter_order');
-		$filter_order_dir = $this->getState('filter_order_dir');
-		
-		// If ordering columns state were not set in state use ASCENDING title as fall back default
-		$filter_order     = $filter_order     ? $filter_order      :  'i.title';
-		$filter_order_dir = $filter_order_dir ? $filter_order_dir  :  'ASC';
-		
-		// NOTE: *** 'orderby' is a symbolic order variable ***
-		
-		// Get user setting, and if not set, then fall back to category / global configuration setting
-		$request_orderby = JRequest::getVar('orderby');
-		
-		// A symbolic order name to indicate using the category / global ordering setting
-		$order = $request_orderby ? $request_orderby : $params->get('orderby');
-		
-		if ($order)
-		{
-			switch ($order) {
-				case 'date' :
-				$filter_order		= 'i.created';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'rdate' :
-				$filter_order		= 'i.created';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'modified' :
-				$filter_order		= 'i.modified';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'alpha' :
-				$filter_order		= 'i.title';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'ralpha' :
-				$filter_order		= 'i.title';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'author' :
-				$filter_order		= 'u.name';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'rauthor' :
-				$filter_order		= 'u.name';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'hits' :
-				$filter_order		= 'i.hits';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'rhits' :
-				$filter_order		= 'i.hits';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'order' :
-				$filter_order		= 'rel.catid, rel.ordering';
-				$filter_order_dir	= 'ASC';
-				break;
-			}
-			
-		}
-		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
-		if (empty($request_orderby) && $params->get('orderbycustomfieldid', 0) != 0)
-		{
-			if ($params->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
-			$filter_order		= 'f.value'.$int;
-			$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
-		}
-		
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir;
-		$orderby .= $filter_order!='i.title' ? ', i.title' : '';   // Order by title after default ordering
-		
-		return $orderby;
+		// Precedence: $request_var ==> $order ==> $config_param ==> $default_order
+		return flexicontent_db::buildItemOrderBy(
+			$this->_params,
+			$order='', $request_var, $config_param='orderby',
+			$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
+			$default_order, $default_order_dir
+		);
 	}
 	
 	

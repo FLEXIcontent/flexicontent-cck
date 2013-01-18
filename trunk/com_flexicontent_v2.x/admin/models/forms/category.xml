@@ -206,7 +206,7 @@
 		<fieldset name="cat_items_list" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_LIST" description="FLEXI_ITEMS_LIST_DESC" level="level2" />
-			<field name="show_addbutton" type="radio" default="" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_CAT_BUTTON_DESC" menu="hide" >
+			<field name="show_addbutton" type="list" default="" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_LIST_BUTTON_DESC" menu="hide" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>

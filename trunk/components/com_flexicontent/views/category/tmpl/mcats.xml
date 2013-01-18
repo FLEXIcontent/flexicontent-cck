@@ -132,7 +132,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</param>
-			<param name="show_label_subcats" type="radio" default="" label="FLEXI_SHOW_SUBCATS_LABEL" description="FLEXI_SHOW_SUBCATS_LABEL_DESC" menu="hide" >
+			<param name="show_label_subcats" type="list" default="" label="FLEXI_SHOW_SUBCATS_LABEL" description="FLEXI_SHOW_SUBCATS_LABEL_DESC" menu="hide" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -194,7 +194,7 @@
 		
 			
 			<param name="" type="separator" default="FLEXI_ITEMS_LIST" description="FLEXI_ITEMS_LIST_DESC" level="level2" />
-			<param name="show_addbutton" type="radio" default="" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_CAT_BUTTON_DESC" menu="hide" >
+			<param name="show_addbutton" type="list" default="" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_LIST_BUTTON_DESC" menu="hide" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>

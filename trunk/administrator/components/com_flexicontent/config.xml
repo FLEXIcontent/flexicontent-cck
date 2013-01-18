@@ -47,7 +47,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="3" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" menu="hide" />
+			<!--param name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="3" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" menu="hide" /-->
 			
 		<param name="" type="separator" default="FLEXI_PERFORMANCE_CONF" label="" level="level1" menu="hide" />
 			
@@ -392,7 +392,7 @@
 		<param name="" type="separator" default="FLEXI_ITEMS_LIST_CREATION_CONF" label="" level="level1" menu="hide" />
 		
 			<param name="" type="separator" default="FLEXI_ITEMS_LIST" level="level2" menu="hide" />
-			<param name="show_addbutton" type="radio" default="0" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_CAT_BUTTON_DESC" menu="hide" >
+			<param name="show_addbutton" type="radio"" default="0" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_LIST_BUTTON_DESC" menu="hide" >
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</param>

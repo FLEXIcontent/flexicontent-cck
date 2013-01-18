@@ -3342,6 +3342,109 @@ class FLEXIUtilities
 }
 
 
+/*
+ * CLASS with common methods for handling interaction with DB 
+ */
+class flexicontent_db
+{
+	/**
+	 * Build the order clause
+	 * precedence: $request_var ==> $order ==> $config_param ==> $default_order (& $default_order_dir)
+	 * @access private
+	 * @return string
+	 */
+	function buildItemOrderBy(&$params=null, $order='',  $config_param='orderby', $request_var='orderby', $i_as='i', $rel_as='rel', $default_order, $default_order_dir='')
+	{
+		// Use global params ordering if parameters were not given
+		if (!$params) $params = JComponentHelper::getParams( 'com_flexicontent' );
+		
+		// 1. If forced ordering not given, then use ordering parameters from configuration
+		if (!$order) {
+			$order = $params->get('orderbycustomfieldid', 0) ? 'field' : $params->get($config_param, 'default');
+		}
+		
+		// 2. If allowing user ordering override, then get ordering from HTTP request variable
+		$order = $request_var ? JRequest::getVar($request_var, $order) : $order;
+		
+		// 'order' contains a symbolic order name to indicate using the category / global ordering setting
+		switch ($order) {
+			case 'date': case 'addedrev': /* 2nd is for module */
+				$filter_order		= $i_as.'.created';
+				$filter_order_dir	= 'ASC';
+				break;
+			case 'rdate': case 'added': /* 2nd is for module */
+				$filter_order		= $i_as.'.created';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'modified': case 'updated': /* 2nd is for module */
+				$filter_order		= $i_as.'.modified';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'alpha':
+				$filter_order		= $i_as.'.title';
+				$filter_order_dir	= 'ASC';
+				break;
+			case 'ralpha': case 'alpharev': /* 2nd is for module */
+				$filter_order		= $i_as.'.title';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'author':
+				$filter_order		= 'u.name';
+				$filter_order_dir	= 'ASC';
+				break;
+			case 'rauthor':
+				$filter_order		= 'u.name';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'hits':
+				$filter_order		= $i_as.'.hits';
+				$filter_order_dir	= 'ASC';
+				break;
+			case 'rhits': case 'popular': /* 2nd is for module */
+				$filter_order		= $i_as.'.hits';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'order': case 'catorder': /* 2nd is for module */
+				$filter_order		= $rel_as.'.catid, '.$rel_as.'.ordering';
+				$filter_order_dir	= 'ASC';
+				break;
+			
+			// SPECIAL case custom field
+			case 'field':
+				if ($params->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
+				$filter_order		= 'f.value'.$int;
+				$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
+				break;
+				
+			// NEW ADDED
+			case 'random':
+				$filter_order = 'RAND()';
+				$filter_order_dir	= '';
+				break;
+			case 'commented':
+				$filter_order = 'comments_total';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'rated':
+				$filter_order = 'votes';
+				$filter_order_dir	= 'DESC';
+				break;
+			
+			case 'default':
+			default:
+				$filter_order     = $default_order ? $default_order : $i_as.'.title';
+				$filter_order_dir = $default_order_dir ? $default_order_dir : 'ASC';
+				break;
+		}
+		
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir;
+		$orderby .= ($filter_order!=$i_as.'.title')  ?  ', '.$i_as.'.title'  :  '';   // Order by title after default ordering
+		
+		return $orderby;
+	}
+}
+
+
 if(!function_exists('diff_version')) {
 	function diff_version(&$array1, &$array2) {
 		$difference = $array1;
