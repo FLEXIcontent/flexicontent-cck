@@ -698,7 +698,7 @@ class FlexicontentModelItems extends JModelLegacy
 
 		if ( $filter_type ) {
 			$where[] = 'ie.type_id = ' . $filter_type;
-			}
+		}
 
 		if ( $filter_cats ) {
 			if ( $filter_subcats ) {

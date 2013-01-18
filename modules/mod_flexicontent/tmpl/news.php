@@ -82,6 +82,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 		'alpharev'=>JText::_( 'FLEXI_ALPHABETICAL_REVERSE'),
 		'catorder'=>JText::_( 'FLEXI_CAT_ORDER'),
 		'random'=>JText::_( 'FLEXI_RANDOM' ),
+		'field'=>JText::_( 'FLEXI_CUSTOM_FIELD' ),
 		 0=>'Default' );
 	
 	$separator = "";

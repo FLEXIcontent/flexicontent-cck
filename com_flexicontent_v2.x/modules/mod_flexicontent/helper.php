@@ -256,11 +256,6 @@ class modFlexicontentHelper
 				$lists[$ord]	= array();
 			}
 			
-			// Get comments information if needed
-			if ($display_comments_feat || $display_comments) {
-				$commentsInfo = modFlexicontentHelper::getCommentsInfo($rows);
-			}
-			
 			$ord = "__start__";
 			foreach ( $rows as $row )  // Single pass of rows
 			{
@@ -391,10 +386,10 @@ class modFlexicontentHelper
 						$lists[$ord]['featured'][$i]->voting .= '<span class="voting_value_feat">' . flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars_feat',1), $params->get('allow_vote_feat',0), $params->get('vote_counter_feat',1), !$params->get('voting_label_feat') ) .'</span>';
 					}
 					if ($display_comments_feat) {
-						$lists[$ord]['featured'][$i]->comments = $commentsInfo[$row->id]->total;
+						$lists[$ord]['featured'][$i]->comments = $row->comments_total;
 						$lists[$ord]['featured'][$i]->comments_rendered = $params->get('comments_label_feat') ? '<span class="comments_label_feat">'.JText::_('FLEXI_COMMENTS').':</span> ' : '';
 						$lists[$ord]['featured'][$i]->comments_rendered .= JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS' ));
-						$lists[$ord]['featured'][$i]->comments_rendered .= ' ('.$commentsInfo[$row->id]->total.(!$params->get('comments_label_feat') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
+						$lists[$ord]['featured'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label_feat') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
 					$lists[$ord]['featured'][$i]->catid = $row->catid; 
 					$lists[$ord]['featured'][$i]->itemcats = explode("," , $row->itemcats);
@@ -542,10 +537,10 @@ class modFlexicontentHelper
 						$lists[$ord]['standard'][$i]->voting .= '<span class="voting_value">' . flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get('vote_counter',1), !$params->get('voting_label')) .'</span>';
 					}
 					if ($display_comments) {
-						$lists[$ord]['standard'][$i]->comments = $commentsInfo[$row->id]->total;
+						$lists[$ord]['standard'][$i]->comments = $row->comments_total;
 						$lists[$ord]['standard'][$i]->comments_rendered = $params->get('comments_label') ? '<span class="comments_label">'.JText::_('FLEXI_COMMENTS').':</span> ' : '';
 						$lists[$ord]['standard'][$i]->comments_rendered .= JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
-						$lists[$ord]['standard'][$i]->comments_rendered .= ' ('.$commentsInfo[$row->id]->total.(!$params->get('comments_label') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
+						$lists[$ord]['standard'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
 					$lists[$ord]['standard'][$i]->catid = $row->catid;
 					$lists[$ord]['standard'][$i]->itemcats = explode("," , $row->itemcats);
@@ -778,11 +773,11 @@ class modFlexicontentHelper
 		// current user favourites scope
 		$curruserid = (int)$user->get('id');
   	if ($method_curuserfavs == 1) { // exclude method  ---  exclude currently logged user favourites
-			$join_favs  = ' LEFT OUTER JOIN #__flexicontent_favourites AS f ON f.itemid = i.id AND f.userid = '.$curruserid;
-			$where .= ' AND f.itemid IS NULL';
+			$join_favs  = ' LEFT OUTER JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id AND fav.userid = '.$curruserid;
+			$where .= ' AND fav.itemid IS NULL';
 		} else if ($method_curuserfavs == 2) { // include method  ---  include currently logged user favourites
-			$join_favs  = ' LEFT JOIN #__flexicontent_favourites AS f ON f.itemid = i.id';
-			$where .= ' AND f.userid = '.$curruserid;
+			$join_favs  = ' LEFT JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id';
+			$where .= ' AND fav.userid = '.$curruserid;
 		} else {
 		  // All Items regardless of being favoured by current user
 		  $join_favs = '';
@@ -1152,101 +1147,63 @@ class modFlexicontentHelper
 			$join_image		= '';
 		}
 		
-		$query = ""; // make sure the query variable is empty, since we will check it after switch !!
-		switch ($ordering) {
-			case 'popular':
-				$orderby = ' ORDER BY i.hits DESC';
-			break;
-				
-			case 'commented':
-				// handle jcomments integration
-				if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
-					echo "jcomments not installed, you need jcomments to use 'Most commented' ordering.<br>\n";
-					$query = "";  // prevents output of any items
-					break;
-				}
-				
-				$query 	= 'SELECT i.*, ie.*, count(com.object_id) AS nr, ty.name AS typename,'
-						. ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,'
-						. $select_image
-						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
-						. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
-						. ' FROM #__content AS i'
-						. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
-						. ' LEFT JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
-						. ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id'
-						. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-						. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-						. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
-						. $join_favs
-						. $join_image
-						. $join_date
-						. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
-						. ' AND com.object_group = ' . $db->Quote('com_flexicontent')
-						. ' AND com.published = 1'
-						. ' GROUP BY i.id'
-						. ' ORDER BY nr DESC'
-						;
-				break;
-
-			case 'rated':
-				$query 	= 'SELECT i.*, ie.*, (cr.rating_sum / cr.rating_count) * 20 AS votes, ty.name AS typename,'
-						. ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,'
-						. $select_image
-						. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-						. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
-						. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
-						. ' FROM #__content AS i'
-						. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
-						. ' LEFT JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
-						. ' INNER JOIN #__content_rating AS cr ON cr.content_id = i.id'
-						. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-						. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-						. $join_favs
-						. $join_image
-						. $join_date
-						. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
-						. ' GROUP BY i.id'
-						. ' ORDER BY votes DESC'
-						;
-				break;
-				
-			case 'added':
-				$orderby = ' ORDER BY i.created DESC';
-				break;
-
-			case 'addedrev':
-				$orderby = ' ORDER BY i.created ASC';
-				break;
-
-			case 'updated':
-				$orderby = ' ORDER BY i.modified DESC';
-				break;
-
-			case 'alpha':
-				$orderby = ' ORDER BY i.title ASC';
-				break;
-
-			case 'alpharev':
-				$orderby = ' ORDER BY i.title DESC';
-				break;
-
-			case 'catorder':
-				$orderby = ' ORDER BY rel.ordering ASC';
-				break;
-
-			case 'random':
-				$orderby = ' ORDER BY RAND()';
-				break;
-			default:
-				$orderby = '';
+		// EXTRA join of field used in custom ordering
+		if ($ordering=='field' && $params->get('orderbycustomfieldid') ) {
+			$join_field = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
+		} else {
+			$join_field = '';
 		}
 		
-		if ( !$query ) {
+		// some parameter aliases
+		$display_comments	= $params->get('display_comments');
+		$display_comments_feat = $params->get('display_comments_feat');
+		$display_voting	= $params->get('display_voting');
+		$display_voting_feat = $params->get('display_voting_feat');
+		
+		// Check (when needed) if jcomments are installed, and also clear 'commented' ordering if they jcomments is missing
+		if ($display_comments_feat || $display_comments || $ordering=='commented') {
+			// handle jcomments integration
+			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
+				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br>\n";
+				$jcomments_exist = false;
+			} else {
+				$jcomments_exist = true;
+			}
+			if (!$jcomments_exist && $ordering=='commented') $ordering='';
+		}
+		
+		// Decide to JOIN (or not) with comments TABLE, needed when displaying comments and/or when ordering by comments
+		$add_comments = ($display_comments_feat || $display_comments || $ordering=='commented') && $jcomments_exist;
+		$join_comments_type = $ordering=='commented' ? ' INNER JOIN' : ' LEFT JOIN';
+		// Additional select and joins for comments
+		$select_comments = $add_comments ? ' count(com.object_id) AS comments_total,' : '';
+		$join_comments   = $add_comments ? $join_comments_type.' #__jcomments AS com ON com.object_id = i.id' : '' ;
+		
+		// Decide to JOIN (or not) with rating TABLE, needed when displaying ratings and/or when ordering by ratings
+		$add_rated = $display_voting_feat || $display_voting || $ordering=='rated';
+		$join_rated_type = $ordering=='rated' ? ' INNER JOIN' : ' LEFT JOIN';
+		// Additional select and joins for ratings
+		$select_rated = $ordering=='rated' ? ' (cr.rating_sum / cr.rating_count) * 20 AS votes,' : '';
+		$select_rated = $add_rated ? ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,' : '';
+		$join_rated   = $add_rated ? $join_rated_type.' #__content_rating AS cr ON cr.content_id = i.id' : '' ;
+		
+		// Get ordering
+		if ($ordering) {
+			$orderby = flexicontent_db::buildItemOrderBy(
+				$params,
+				$ordering, $request_var='', $config_param = '',
+				$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
+				$default_order = '', $default_order_dir = ''
+			);
+		} else {
+			$orderby = '';
+		}
+		
+		if ( empty($query) ) {  // If a custom query has not been set above then use the default one ...
 			$query 	= 'SELECT i.*, ie.*, ty.name AS typename,'
-					. ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,'
 					. $select_image
+					. $select_comments
+					. $select_rated
 					. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
 						. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
@@ -1255,10 +1212,12 @@ class modFlexicontentHelper
 					. ' LEFT JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 					. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-					. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
 					. $join_favs
 					. $join_image
 					. $join_date
+					. $join_comments
+					. $join_rated
+					. $join_field
 					. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
 					. ' GROUP BY i.id'
 					. $orderby
@@ -1464,39 +1423,5 @@ class modFlexicontentHelper
 		return array_unique($all_cats);
 	}
 	
-	
-	// Find and return comment information about give item ids
-	function getCommentsInfo ( & $items )
-	{
-		// handle jcomments integration
-		if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
-			return array();
-		}
-		
-		if (!$items || !count($items)) return array();
-		$item_ids = array();
-		foreach ($items as $item) $item_ids[] = $item->id;
-		
-		$db =& JFactory::getDBO();
-		$query = 'SELECT COUNT(com.object_id) AS total, com.object_id AS item_id'
-		      . ' FROM #__jcomments AS com'
-		      . ' WHERE com.object_id in (' . implode(',',$item_ids) .')'
-		      . ' AND com.object_group = ' . $db->Quote('com_flexicontent')
-		      . ' AND com.published = 1'
-		      . ' GROUP BY com.object_id'
-		      ;
-		$db->setQuery($query);
-		$comments = $db->loadObjectList('item_id');
-		
-		// create non-existing records
-		foreach ($items as $item) {
-			if ( !isset($comments[$item->id]) ) {
-				$comments[$item->id] = new stdClass();
-				$comments[$item->id]->item_id = $item->id;
-				$comments[$item->id]->total = 0;
-			}
-		}
-		return $comments;
-	}	
 }
 

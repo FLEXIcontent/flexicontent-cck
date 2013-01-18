@@ -71,9 +71,8 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			
-			
-			<param name="" type="separator" default="FLEXI_MODULE_DISPLAY_RULES" description="FLEXI_MODULE_DISPLAY_RULES_DESC" level="level1" menu="hide" />
+		
+		<param type="jparamstab" title="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC" />
 			<param name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC">
 				<option value="OR">FLEXI_OR</option>
 				<option value="AND">FLEXI_AND</option>
@@ -92,8 +91,8 @@
 				<option value="1">FLEXI_YES</option>
 			</param>
 			<param name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" />
-			
-			
+		
+		<param name="" type="jparamstab" title="FLEXI_MOD_ADVANCED" />
 			<param name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
 			<param name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
 			<param name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC">
