@@ -583,7 +583,7 @@ window.addEvent( 'domready', function() {
 			$curr_relitem_html = str_replace('__display_text__', $display_text, $curr_relitem_html);
 			
 			// b. Replace item properties, e.g. {item->id}, (item->title}, etc
-			FlexicontentFields::doQueryReplacements($curr_relitem_html, $result);
+			FlexicontentFields::doQueryReplacements($curr_relitem_html, $null_field=null, $result);
 			
 			// c. Replace HTML display of various item fields
 			foreach($custom_field_names as $i => $custom_field_name) {

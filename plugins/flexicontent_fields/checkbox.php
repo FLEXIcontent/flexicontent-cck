@@ -97,9 +97,12 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 		
 		// Get indexed element values
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array('image'));
-		if ($elements==false && $sql_mode) {
-			$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array());
+		if ( !$elements ) {
+			if ($sql_mode)
+				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+			else
+				$field->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
 			return;
 		}
 		
@@ -188,9 +191,12 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		if ( !$values ) { $field->{$prop}=''; return; }
 		
 		// Get indexed element values
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array('image'));
-		if ($elements==false && $sql_mode) {
-			$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array());
+		if ( !$elements ) {
+			if ($sql_mode)
+				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+			else
+				$field->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
 			return;
 		}
 		
@@ -317,7 +323,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		if ( !$field->isadvsearch ) return;
 		
 		if ($post===null) $post = & FlexicontentFields::searchIndex_getFieldValues($field,$item);
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array('image'));
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array());
 		$values = FlexicontentFields::indexedField_getValues($field, $elements, $post, $prepost_prop='text');
 		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
 		return true;
@@ -331,7 +337,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		if ( !$field->issearch ) return;
 		
 		if ($post===null) $post = & FlexicontentFields::searchIndex_getFieldValues($field,$item);
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array('image'));
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array());
 		$values = FlexicontentFields::indexedField_getValues($field, $elements, $post, $prepost_prop='text');
 		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
 		return true;

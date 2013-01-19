@@ -501,7 +501,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		}
 		$field->{$prop} = implode($separatorf, $field->{$prop});
 		
-		if ( !$field->{$prop} && $show_no_value ) $field->{$prop} = JText::_($no_value_msg);
+		if ( !$field->{$prop} && $show_no_value )
+			$field->{$prop} = JText::_($no_value_msg);
+		else
+			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 	}
 	
 	

@@ -1188,7 +1188,7 @@ class FlexicontentFields
 			
 			// Get/verify query string, check if item properties and other replacements are allowed and replace them
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
-			$query = FlexicontentFields::doQueryReplacements($field_elements, $item, $item_pros);
+			$query = FlexicontentFields::doQueryReplacements($field_elements, $field, $item, $item_pros);
 			
 			// Execute SQL query to retrieve the field value - label pair, and any other extra properties
 			if ( $query ) {
@@ -1209,11 +1209,16 @@ class FlexicontentFields
 				unset($listelements[count($listelements)-1]);
 			}
 			
+			$props_needed = 2 + count($extra_props);
 			// Split elements into their properties: value, label, extra_prop1, extra_prop2
 			$listarrays = array();
 			$results = array();
 			foreach ($listelements as $listelement) {
 				$listelement_props  = preg_split("/[\s]*::[\s]*/", $listelement);
+				if (count($listelement_props) < $props_needed) {
+					echo "Error in field: ".$field->label." while splitting element: ".$listelement." properties needed: ".$props_needed." properties found: ".count($listelement_props);
+					return false;
+				}
 				$val = $listelement_props[0];
 				$results[$val] = new stdClass();
 				$results[$val]->value = $listelement_props[0];
@@ -1346,17 +1351,29 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function doQueryReplacements(&$query, &$item, &$item_pros=true)
+	function doQueryReplacements(&$query, &$field, &$item, &$item_pros=true)
 	{
 		// replace item properties
 		preg_match_all("/{item->[^}]+}/", $query, $matches);
 		if ( !$item_pros && count($matches[0]) ) { $item_pros = count($matches[0]); return ''; }
 		
+		// replace item properties
 		foreach ($matches[0] as $replacement_tag) {
 			$replacement_value = '$'.substr($replacement_tag, 1, -1);
 			eval ("\$replacement_value = \" $replacement_value\";");
 			$query = str_replace($replacement_tag, $replacement_value, $query);
 		}
+		
+		// replace field properties
+		if ($field) {
+			preg_match_all("/{field->[^}]+}/", $query, $matches);
+			foreach ($matches[0] as $replacement_tag) {
+				$replacement_value = '$'.substr($replacement_tag, 1, -1);
+				eval ("\$replacement_value = \" $replacement_value\";");
+				$query = str_replace($replacement_tag, $replacement_value, $query);
+			}
+		}
+		
 		// replace current user language
 		$query = str_replace("{curr_userlang_shorttag}", flexicontent_html::getUserCurrentLang(), $query);
 		$query = str_replace("{curr_userlang_fulltag}", flexicontent_html::getUserCurrentLang(), $query);

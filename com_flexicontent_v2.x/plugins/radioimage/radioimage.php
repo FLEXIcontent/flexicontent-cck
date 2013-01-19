@@ -107,7 +107,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 			if ($sql_mode)
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
 			else
-				$field->html = JText::_('FLEXI_INVALID_ELEMENTS_IN_CONFIGURATION');
+				$field->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
 			return;
 		}
 		
@@ -170,7 +170,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 			if ($sql_mode)
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
 			else
-				$field->html = JText::_('FLEXI_INVALID_ELEMENTS_IN_CONFIGURATION');
+				$field->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
 			return;
 		}
 		

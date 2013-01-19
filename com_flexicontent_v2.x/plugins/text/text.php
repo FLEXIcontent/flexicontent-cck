@@ -14,7 +14,6 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsText extends JPlugin
@@ -39,7 +38,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'text') return;
+		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
 		
 		$field->label = JText::_($field->label);
 		
@@ -102,7 +101,13 @@ class plgFlexicontent_fieldsText extends JPlugin
 					thisNewField.getFirst().setProperty('value','');  /* First element is the text input field, second is e.g remove button */
 
 					thisNewField.injectAfter(thisField);
-		
+					";
+			
+			if ($field->field_type=='textselect') $js .= "
+					thisNewField.getParent().getElement('select.fcfield_textselval').setProperty('value','');
+					";
+					
+			$js .="
 					new Sortables($('sortables_".$field->id."'), {
 						'constrain': true,
 						'clone': true,
@@ -170,6 +175,16 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$css = '';
 		}
 		
+		// Drop-Down select for textselect field type
+		if ($field->field_type=='textselect') {
+			$fieldname_sel = FLEXI_J16GE ? 'custom['.$field->name.'_sel][]' : $field->name.'_sel[]';
+		  $selonchange = "this.getParent().getElement('input.fcfield_textval').setProperty('value', this.getProperty('value')); this.setProperty('value', ''); ";
+			$selops = plgFlexicontent_fieldsText::buildSelectOptions($field, $item);
+			$selhtml = JHTML::_('select.genericlist', $selops, $fieldname_sel, ' class="fcfield_textselval" onchange="'.$selonchange.'"', 'value', 'text', array());
+		} else {
+			$selhtml='';
+		}
+		
 		$document->addStyleDeclaration($css);
 		
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
@@ -179,7 +194,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$n = 0;
 		foreach ($field->value as $value) {
 			$field->html[] = '
-				<input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />
+				<input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="fcfield_textval inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />
+				'.$selhtml.'
 				'.$remove_button.'
 				'.$move2.'
 				';
@@ -202,7 +218,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'text') return;
+		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
 		
 		$field->label = JText::_($field->label);
 		
@@ -222,12 +238,12 @@ class plgFlexicontent_fieldsText extends JPlugin
 		}
 		
 		// some parameter shortcuts
+		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext			= $field->parameters->get( 'pretext', '' ) ;
 		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$separatorf		= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag			= $field->parameters->get( 'opentag', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag', '' ) ;
-		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
 		
 		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
@@ -315,7 +331,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'text') return;
+		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
 		if(!is_array($post) && !strlen($post)) return;
 		
 		// Make sure posted data is an array 
@@ -516,7 +532,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 	
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item) {
-		if ($field->field_type != 'text') return;
+		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
 		if ( !$field->isadvsearch ) return;
 		
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
@@ -527,7 +543,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ($field->field_type != 'text') return;
+		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
 		if ( !$field->issearch ) return;
 		
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
@@ -538,9 +554,41 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// Method to get ALL items that have matching search values for the current field id
 	function onFLEXIAdvSearch(&$field)
 	{
-		if ($field->field_type != 'text') return;
+		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
 		
 		FlexicontentFields::onFLEXIAdvSearch($field);
+	}
+	
+	
+	function buildSelectOptions(&$field, &$item)
+	{
+		// Drop-down select elements depend on 'select_field_mode'
+		$select_field_mode = $field->parameters->get('select_field_mode', 0);
+		if ( $select_field_mode == 0 ) {
+			// All existing values
+			$field_elements = ' SELECT DISTINCT value, value as text '
+				.' FROM #__flexicontent_fields_item_relations '
+				.' WHERE field_id={field->id} AND value != "" GROUP BY value';
+		} else {
+			// Predefined elements or Elements via an SQL query
+			$field_elements = $field->parameters->get('select_field_elements');
+		}
+		
+		// Call function that parses or retrieves element via sql
+		$field->parameters->set('sql_mode', $select_field_mode==0 || $select_field_mode==2);
+		$field->parameters->set('field_elements', $field_elements);
+		$results = FlexicontentFields::indexedField_getElements($field, $item);
+		
+		$options = array();
+		$default_prompt = $select_field_mode==0 ? 'FLEXI_FIELD_SELECT_EXISTING_VALUE' : 'FLEXI_FIELD_SELECT_VALUE';
+		$field_prompt = $field->parameters->get('select_field_prompt', $default_prompt);
+		$options[] = JHTML::_('select.option', '', '-'.JText::_($field_prompt).'-');
+		
+		if ($results) foreach($results as $result) {
+			if ( !strlen($result->value) ) continue;
+			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
+		}
+		return $options;
 	}
 	
 }

@@ -438,7 +438,7 @@ class plgSystemFlexisystem extends JPlugin
 		{
 			$descendants[] = $v->id;
 		
-			if ($v->childrenarray) {
+			if ( !empty($v->childrenarray) ) {
 				plgSystemFlexisystem::_getDescendants($v->childrenarray, $descendants);
 			}
 		}

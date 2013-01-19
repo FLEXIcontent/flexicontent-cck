@@ -67,8 +67,11 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array());
-		if ($elements==false && $sql_mode) {
-			$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+		if ( !$elements ) {
+			if ($sql_mode)
+				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+			else
+				$field->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
 			return;
 		}
 		
@@ -107,8 +110,11 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array());
-		if ($elements==false && $sql_mode) {
-			$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+		if ( !$elements ) {
+			if ($sql_mode)
+				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+			else
+				$field->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
 			return;
 		}
 		

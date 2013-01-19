@@ -153,8 +153,8 @@ class flexicontent_cats
 		$rows = $db->loadObjectList();
 		$rows = is_array($rows)?$rows:array();
 		
-		//set depth limit
-		$levellimit = 10;
+		//set depth limit, no detect loop ?
+		$levellimit = 99;
 		
 		//get children
 		$children = array();
