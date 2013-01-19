@@ -78,7 +78,7 @@
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_CATEGORY_SEARCH_FILTER_CONF" level="level1" />
-			<field name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<field name="display_label_filter" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>

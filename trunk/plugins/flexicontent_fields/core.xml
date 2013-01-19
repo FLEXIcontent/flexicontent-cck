@@ -42,7 +42,7 @@
 				<option value="1">FLEXI_DISPLAY_NAME</option>
 				<option value="2">FLEXI_DISPLAY_USERNAME</option>
 			</param>
-			<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<param name="display_label_filter" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>
@@ -69,7 +69,7 @@
 				<option value="1">FLEXI_DISPLAY_NAME</option>
 				<option value="2">FLEXI_DISPLAY_USERNAME</option>
 			</param>
-			<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<param name="display_label_filter" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>
@@ -81,7 +81,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</param>
-			<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<param name="display_label_filter" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>
@@ -96,12 +96,12 @@
 		<params group="group-type"><!-- document type -->
 			<param name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<param name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<param name="display_label_filter" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>
 			</param>
-			<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<param name="display_label_filter" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>
@@ -158,7 +158,7 @@
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
 			</param>
-			<param name="display_label_filter" type="radio" default="0" label="FLEXI_LABEL_FILTER" description="FLEXI_LABEL_FILTER_DESC">
+			<param name="display_label_filter" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>

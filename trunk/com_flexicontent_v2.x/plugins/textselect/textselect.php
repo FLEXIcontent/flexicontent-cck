@@ -43,9 +43,8 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textselect') return;
 		
-		$field->field_type = 'text';
+		// field_type is not changed text field can handle this field type
 		plgFlexicontent_fieldsText::onDisplayField($field, $item);
-		$field->field_type = 'textselect';
 	}
 	
 	
@@ -55,9 +54,8 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textselect') return;
 		
-		$field->field_type = 'text';
+		// field_type is not changed text field can handle this field type
 		plgFlexicontent_fieldsText::onDisplayFieldValue($field, $item, $values, $prop);
-		$field->field_type = 'textselect';
 	}
 	
 	
@@ -72,9 +70,8 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textselect') return;
 		
-		$field->field_type = 'text';
+		// field_type is not changed text field can handle this field type
 		plgFlexicontent_fieldsText::onBeforeSaveField($field, $post, $file, $item);
-		$field->field_type = 'textselect';
 	}
 	
 	
@@ -83,9 +80,8 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textselect') return;
 		
-		$field->field_type = 'text';
+		// field_type is not changed text field can handle this field type
 		plgFlexicontent_fieldsText::onAfterSaveField($field, $post, $file, $item);
-		$field->field_type = 'textselect';
 	}
 	
 	
@@ -94,9 +90,8 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if($field->field_type != 'textselect') return;
 		
-		$field->field_type = 'text';
+		// field_type is not changed text field can handle this field type
 		plgFlexicontent_fieldsText::onBeforeDeleteField($field, $item);
-		$field->field_type = 'textselect';
 	}
 	
 	
@@ -213,7 +208,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		
 		if ( !$field->parameters->get('sql_mode_override') ) {
 			// Default is to use all text's field values
-			$query = "SELECT DISTINCT value, value as text FROM #__flexicontent_fields_item_relations as fir WHERE field_id='{field_id}' AND value != '' GROUP BY value";
+			$query = "SELECT value, value as text FROM #__flexicontent_fields_item_relations as fir WHERE field_id='{field_id}' AND value != '' GROUP BY value";
 		} else {
 			// Custom query for value retrieval
 			$query = $field->parameters->set('sql_mode_query');
