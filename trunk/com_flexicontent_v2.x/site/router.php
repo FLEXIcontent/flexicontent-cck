@@ -26,9 +26,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 function FLEXIcontentBuildRoute(&$query)
 {
 	$segments = array();
+	$app = JFactory::getApplication();
 
 	// 1. Get a menu item based on Itemid or currently active
-	$menus = &JSite::getMenu();
+	$menus = $app->getMenu();
 	if (empty($query['Itemid'])) {
 		//  USE current Active ID it is now handled in route.php and also add a global config option whether to enable this
 		//$menu = &$menus->getActive();
