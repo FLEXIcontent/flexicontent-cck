@@ -1306,7 +1306,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$catscache = FLEXIUtilities::getCache();
 			$catscache->clean('com_flexicontent_cats');
 		}
-		$msg  = JText::_( 'FLEXI_IMPORT_SUCCESSULL' );
+		$msg  = JText::_( 'FLEXI_IMPORT_SUCCESSFUL' );
 		$msg .= '<ul class="import-ok">';
 		if (!FLEXI_J16GE) {
 			$msg .= '<li>' . $logs->sec . ' ' . JText::_( 'FLEXI_IMPORT_SECTIONS' ) . '</li>';

@@ -272,9 +272,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						?>
 						<span style="<?php echo $style; ?>"><?php
 						if($success) {
-							echo JText::_("Task <b>SUCCESSFULL</b>");
+							echo JText::_("Task Successful");
 						} else {
-							echo JText::_("Setting phpThumb Cache folder permissions UNSUCCESSFULL.");
+							echo JText::_("Setting phpThumb Cache folder permissions UNSUCCESSFUL.");
 						}
 						?></span>
 					</td>
@@ -353,9 +353,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
 						<span style="<?php echo $style; ?>"><?php
 						if($already) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: No deprecated fields found.");
+							echo JText::_("Task Successful: No deprecated fields found.");
 						} elseif($result) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Deprecated Fields converted to 'text' field type.");
+							echo JText::_("Task Successful: Deprecated Fields converted to 'text' field type.");
 						} else {
 							echo JText::_("UPDATE TABLE command UNSUCCESSFUL.");
 						}
@@ -383,9 +383,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
 						<span style="<?php echo $style; ?>"><?php
 						if($already) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'value_id' already exists.");
+							echo JText::_("Task Successful: Column 'value_id' already exists.");
 						} elseif($result) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'value_id' added.");
+							echo JText::_("Task Successful: Column 'value_id' added.");
 						} else {
 							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
 						}
@@ -413,9 +413,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
 						<span style="<?php echo $style; ?>"><?php
 						if($already) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'description' already exists.");
+							echo JText::_("Task Successful: Column 'description' already exists.");
 						} elseif($result) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'description' added.");
+							echo JText::_("Task Successful: Column 'description' added.");
 						} else {
 							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
 						}
@@ -443,9 +443,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
 						<span style="<?php echo $style; ?>"><?php
 						if($already) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'untranslatable' already exists.");
+							echo JText::_("Task Successful: Column 'untranslatable' already exists.");
 						} elseif($result) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'untranslatable' added.");
+							echo JText::_("Task Successful: Column 'untranslatable' added.");
 						} else {
 							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
 						}
@@ -473,9 +473,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
 						<span style="<?php echo $style; ?>"><?php
 						if($already) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'formhidden' already exists.");
+							echo JText::_("Task Successful: Column 'formhidden' already exists.");
 						} elseif($result) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'formhidden' added.");
+							echo JText::_("Task Successful: Column 'formhidden' added.");
 						} else {
 							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
 						}
@@ -503,9 +503,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
 						<span style="<?php echo $style; ?>"><?php
 						if($already) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'valueseditable' already exists.");
+							echo JText::_("Task Successful: Column 'valueseditable' already exists.");
 						} elseif($result) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'valueseditable' added.");
+							echo JText::_("Task Successful: Column 'valueseditable' added.");
 						} else {
 							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
 						}
@@ -533,9 +533,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
 						<span style="<?php echo $style; ?>"><?php
 						if($already) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'edithelp' already exists.");
+							echo JText::_("Task Successful: Column 'edithelp' already exists.");
 						} elseif($result) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'edithelp' added.");
+							echo JText::_("Task Successful: Column 'edithelp' added.");
 						} else {
 							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
 						}
@@ -564,9 +564,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
 						<span style="<?php echo $style; ?>"><?php
 						if($already) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'asset_id' already exists.");
+							echo JText::_("Task Successful: Column 'asset_id' already exists.");
 						} elseif($result) {
-							echo JText::_("Task <b>SUCCESSFULL</b>: Column 'asset_id' added.");
+							echo JText::_("Task Successful: Column 'asset_id' added.");
 						} else {
 							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
 						}
