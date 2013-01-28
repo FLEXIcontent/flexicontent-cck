@@ -8,7 +8,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>1.3</version>
-	<description>Universal content module for the FLEXIcontent Component</description>
+	<description>Universal Content Module for FLEXIcontent</description>
 	
 	<files>
 		<filename module="mod_flexicontent">mod_flexicontent.php</filename>
