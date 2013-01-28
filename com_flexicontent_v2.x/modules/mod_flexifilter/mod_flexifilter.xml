@@ -8,7 +8,7 @@
 	<authorEmail></authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>1.0</version>
-	<description>Content lists filter module for the FLEXIcontent Component</description>
+	<description>Content Lists Filter Module for FLEXIcontent</description>
 	
 	<files>
 		<filename module="mod_flexifilter">mod_flexifilter.php</filename>
