@@ -116,7 +116,7 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 	endif;
 	?>
 
-	<?php if (count($this->items)) : ?>
+	<?php if (count($this->items) && ($this->params->get('show_item_total', 1) || $limit_selector || $orderby_selector )) : ?>
 
 	<!-- BOF items total-->
 	<div id="item_total" class="item_total group">
