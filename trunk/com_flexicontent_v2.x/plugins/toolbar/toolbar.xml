@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Article toolbar</name>
+	<name>FLEXIcontent - Toolbar</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>March 2011</creationDate>
 	<copyright>Copyright (C) 2009-2012 Emmanuel Danan</copyright>
@@ -8,11 +8,15 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.vistamedia.fr</authorUrl>
 	<version>1.2</version>
-	<description>Article toolbar for FLEXIcontent</description>
+	<description>Toolbar Field for FLEXIcontent</description>
+
 	<files>
 		<filename plugin="toolbar">toolbar.php</filename>
 		<folder plugin="toolbar">toolbar</folder>
-	</files>	<config>	<fields name="attribs">
+	</files>
+
+	<config>
+	<fields name="attribs">
 		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="1">FLEXI_YES</option>
@@ -61,14 +65,23 @@
 				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="spacer_size" type="text" default="21" size="4" label="FLEXI_FIELD_TOOLBAR_SPACER" description="FLEXI_FIELD_TOOLBAR_SPACER_DESC" />
-<!-- 			<field name="module_position" type="text" default="" size="20" label="Position du module" description="Position du module pour le cache avancé (expérimental)" /> -->
-<!--			<field name="required" type="radio" default="0" label="Required" description="Required">
+			<!--
+			<field name="module_position" type="text" default="" size="20" 
+				label="Position du module" 
+				description="Position du module pour le cache avancé (expérimental)" /> 
+			-->
+			<!--
+			<field name="required" type="radio" default="0" label="Required" description="Required">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
--->
+			-->
 		</fieldset>
-	</fields>	</config>	<languages>
+	</fields>
+	</config>
+
+	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_toolbar.ini</language>
 	</languages>
+
 </extension>

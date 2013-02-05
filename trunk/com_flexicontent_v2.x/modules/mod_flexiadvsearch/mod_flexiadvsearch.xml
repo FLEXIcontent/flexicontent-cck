@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6" client="site" method="upgrade">
-	<name>FLEXIcontent Advanced Search Module</name>
+	<name>Advanced Search Module for FLEXIcontent</name>
 	<author>Suriya Kaewmungmuang</author>
 	<creationDate>29/06/2011</creationDate>
 	<copyright>(C) 2011 flexicontent.org</copyright>

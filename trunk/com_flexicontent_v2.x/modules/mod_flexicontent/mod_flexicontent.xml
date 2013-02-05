@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6" client="site" method="upgrade">
-	<name>FLEXIcontent Universal Content Module</name>
+	<name>Universal Content Module for FLEXIcontent</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>12/04/2011</creationDate>
 	<copyright>(C) 2009 Emmanuel Danan</copyright>
