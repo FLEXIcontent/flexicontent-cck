@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="module" version="1.6" client="site" method="upgrade">
-	<name>FLEXIcontent Content Lists Filter Module</name>
+	<name>Content Lists Filter Module for FLEXIcontent</name>
 	<author>George Papadakis</author>
 	<creationDate>November 2012</creationDate>
 	<copyright>Copyright © 2012 George Papadakis</copyright>

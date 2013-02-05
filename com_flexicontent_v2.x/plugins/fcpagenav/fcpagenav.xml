@@ -8,7 +8,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.vistamedia.fr</authorUrl>
 	<version>1.2</version>
-	<description>Page navigation field plugin for FLEXIcontent</description>
+	<description>Page Navigation Field Plugin for FLEXIcontent</description>
 	<files>
 		<filename plugin="fcpagenav">fcpagenav.php</filename>
 		<folder plugin="fcpagenav">fcpagenav</folder>

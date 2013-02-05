@@ -8,7 +8,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
-	<description>Notifications plugin for FLEXIcontent</description>
+	<description>Notifications Plugin for FLEXIcontent</description>
 	<files>
 		<filename plugin="flexinotify">flexinotify.php</filename>
 	</files>
