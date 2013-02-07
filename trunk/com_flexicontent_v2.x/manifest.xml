@@ -144,20 +144,20 @@
 	<plugin name="text"            folder="plugins/text"            instfolder="flexicontent_fields">Text Field</plugin>
 	<plugin name="textarea"        folder="plugins/textarea"        instfolder="flexicontent_fields">Textarea Field</plugin>
 	<plugin name="textselect"      folder="plugins/textselect"      instfolder="flexicontent_fields">TextSelect Field</plugin>
-	<plugin name="toolbar"         folder="plugins/toolbar"         instfolder="flexicontent_fields">Article Toolbar Field</plugin>
+	<plugin name="toolbar"         folder="plugins/toolbar"         instfolder="flexicontent_fields">Toolbar Field</plugin>
 	<plugin name="weblink"         folder="plugins/weblink"         instfolder="flexicontent_fields">Weblink Field</plugin>
 	
-	<plugin name="flexinotify"     folder="plugins/flexicontent"    instfolder="flexicontent">Notifications Plugin for FLEXIcontent (new!!!)</plugin>
+	<plugin name="flexinotify"     folder="plugins/flexicontent"    instfolder="flexicontent">Notifications Plugin for FLEXIcontent</plugin>
 	
 	<plugin name="flexisearch"     folder="plugins/flexisearch"     instfolder="search">Search Plugin - FLEXIcontent</plugin>
 	<plugin name="flexiadvsearch"  folder="plugins/flexiadvsearch"  instfolder="search">Advanced Search Plugin - FLEXIcontent</plugin>
 	<plugin name="flexisystem"     folder="plugins/flexisystem"     instfolder="system">System Plugin - FLEXIcontent</plugin>
 	<plugin name="flexiadvroute"   folder="plugins/flexiadvroute"   instfolder="system">System Plugin - FLEXIcontent Advanced Routing</plugin>
 	
-	<module name="mod_flexicontent"   folder="modules/mod_flexicontent">Universal Content Module for FLEXIcontent</module>
-	<module name="mod_flexifilter"    folder="modules/mod_flexifilter">Content Lists Lilter Lodule for FLEXIcontent</module>
-	<module name="mod_flexitagcloud"  folder="modules/mod_flexitagcloud">Tag Cloud Module for FLEXIcontent</module>
-	<module name="mod_flexiadvsearch" folder="modules/mod_flexiadvsearch">Advanced Search Module for FLEXIcontent</module>
+	<module name="mod_flexicontent"   folder="modules/mod_flexicontent">Universal Content for FLEXIcontent</module>
+	<module name="mod_flexifilter"    folder="modules/mod_flexifilter">Content Lists Filter for FLEXIcontent</module>
+	<module name="mod_flexitagcloud"  folder="modules/mod_flexitagcloud">Tag Cloud for FLEXIcontent</module>
+	<module name="mod_flexiadvsearch" folder="modules/mod_flexiadvsearch">Advanced Search for FLEXIcontent</module>
 </additional>
 
 	<!--installfile>install.php</installfile-->
