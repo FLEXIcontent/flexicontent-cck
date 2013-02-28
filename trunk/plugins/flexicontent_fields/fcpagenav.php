@@ -19,6 +19,8 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsFcpagenav extends JPlugin
 {
+	static $field_types = array('fcpagenav');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -39,7 +41,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'fcpagenav') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 	}
 	
 	
@@ -47,7 +49,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'fcpagenav') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 
 		$mainframe =& JFactory::getApplication();
 		$view = JRequest::getString('view', FLEXI_ITEMVIEW);
@@ -153,6 +155,10 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			
 			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
 			$field_item = '';
+			if ( is_array($orderbycustomfieldid = $cparams->get('orderbycustomfieldid', 0)) ) {
+				echo "FLEXIcontent versions prior to v2.0 RC3, had a bug, please open category of item and resave the category, you can use 'copy parameters' to quickly update many categories";
+				$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
+			}
 			if ($cparams->get('orderbycustomfieldid', 0) != 0) {
 				if ($cparams->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
 				$orderby		= 'f.value'.$int.' '.$cparams->get('orderbycustomfielddir', 'ASC');

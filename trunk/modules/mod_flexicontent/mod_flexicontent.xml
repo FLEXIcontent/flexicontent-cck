@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="module" version="1.5" method="upgrade">
-	<name>FLEXIcontent Universal Content Module</name>
+	<name>Universal Content Module for FLEXIcontent</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>12/04/2011</creationDate>
 	<copyright>(C) 2009 Emmanuel Danan</copyright>
@@ -8,7 +8,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>1.3</version>
-	<description>Universal content module for the FLEXIcontent Component</description>
+	<description>Universal Content Module for FLEXIcontent</description>
 	
 	<files>
 		<filename module="mod_flexicontent">mod_flexicontent.php</filename>
@@ -90,9 +90,10 @@
 			</param>
 
 			<param name="" type="separator" default="FLEXI_EMPTY_FIELD_FILTER" level="level3" menu="hide" />
-			<param name="skip_items" type="radio" default="0" label="FLEXI_SKIP_ITEMS" description="FLEXI_SKIP_ITEMS_DESC">
+			<param name="skip_items" type="list" default="0" label="FLEXI_SKIP_ITEMS" description="FLEXI_SKIP_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="1">FLEXI_YES_CHECK_FIELD_VALUE_EMPTY_FAST</option>
+				<option value="2">FLEXI_YES_CHECK_FIELD_DISPLAY_EMPTY_SLOWER</option>
 			</param>
 			<param name="skiponempty_fields" type="textarea" cols="35" rows="4" default="" label="FLEXI_EMPTY_FIELDS_LIST" description="FLEXI_EMPTY_FIELDS_LIST_DESC" />
 			<param name="maxskipcount" type="text" default="50" size="4" label="FLEXI_MAX_SKIP_COUNT" description="FLEXI_MAX_SKIP_COUNT_DESC" />
@@ -298,6 +299,11 @@
 				"You can use the HTML produced by any custom field in place of image.&lt;br&gt; -- Leave blank: to use the above drop-down select box value,&lt;br&gt; -- &lt;b&gt;Note: image size and other parameters are not used&lt;/b&gt;,&lt;br&gt; -- Write: like fieldname##varname e.g. for image fields use: imgfieldname##display_small, imgfieldname##display_medium, imgfieldname##display_large" />
 			<param name="mod_image_custom_url" type="text" size="48" default="" label="Field URL as Image" description=
 				"You can use the URL produced by any custom field in place of image.&lt;br&gt; -- Leave blank: to use the above drop-down select box value,&lt;br&gt; -- &lt;b&gt;Note: image size and other parameters are applied to the given URL&lt;/b&gt;,&lt;br&gt; -- Write: like fieldname##varname e.g. for image fields use: imgfieldname##display_small_src, imgfieldname##display_medium_src, imgfieldname##display_large_src" />
+			<param name="mod_image_fallback_img" type="list" default="" label="FLEXI_FALLBACK_IMG" description="FLEXI_FALLBACK_IMG_DESC" >
+				<option value="0">FLEXI_NO_FALLBACK</option>
+				<option value="1">FLEXI_USE_INTROTEXT_FALLBACK</option>
+				<option value="2">FLEXI_USE_INTROTEXT_FALLBACK_IGNORE_DEFAULTIMG</option>
+			</param>
 			<param name="" type="separator" default="FLEXI_STD" level="level3" menu="hide" />
 			<param name="mod_use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 				<option value="0">FLEXI_NO</option>

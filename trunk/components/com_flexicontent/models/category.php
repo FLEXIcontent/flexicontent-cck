@@ -289,47 +289,48 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _buildQuery()
 	{
-		static $query;
-		if(!$query) {
-			// Get the WHERE and ORDER BY clauses for the query
-			$where			= $this->_buildItemWhere();
-			$orderby		= $this->_buildItemOrderBy();
-			$params = $this->_params;
+		static $query = null;
+		if ( $query!==null ) return $query;
+		
+		// Get the WHERE and ORDER BY clauses for the query
+		$where   = $this->_buildItemWhere();
+		$orderby = $this->_buildItemOrderBy();
+		$params  = & $this->_params;
 
-			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
-			$order_field_join = '';
-			if ($params->get('orderbycustomfieldid', 0) != 0) {
-				$order_field_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
-			}
-			
-			// Add image field used as item image in RSS feed
-			$feed_image_source = 0;
-			if (JRequest::getVar("type", "") == "rss") {
-				$feed_image_source = (int) $params->get('feed_image_source', '');
-			}
-			$feed_img_join= '';
-			$feed_img_col = '';
-			if ($feed_image_source) {
-				$feed_img_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS img ON img.item_id = i.id AND img.field_id='.$feed_image_source;
-				$feed_img_col = ' img.value as image,';
-			}
-			
-			$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'.$feed_img_col 
-			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-			. ' FROM #__content AS i'
-			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-			. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-			. $feed_img_join
-			. $order_field_join
-		//. ' LEFT JOIN #__categories AS c ON c.id = '. $this->_id
-			. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
-			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-			. $where
-			. $orderby
-			;
+		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
+		$order_field_join = '';
+		if ($params->get('orderbycustomfieldid', 0) != 0) {
+			$order_field_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
 		}
+		
+		// Add image field used as item image in RSS feed
+		$feed_image_source = 0;
+		if (JRequest::getVar("type", "") == "rss") {
+			$feed_image_source = (int) $params->get('feed_image_source', '');
+		}
+		$feed_img_join= '';
+		$feed_img_col = '';
+		if ($feed_image_source) {
+			$feed_img_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS img ON img.item_id = i.id AND img.field_id='.$feed_image_source;
+			$feed_img_col = ' img.value as image,';
+		}
+		
+		$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename,'.$feed_img_col 
+		. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+		. ' FROM #__content AS i'
+		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+		. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+		. $feed_img_join
+		. $order_field_join
+		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
+		. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+		. $where
+		. ' GROUP BY i.id '
+		. $orderby
+		;
+		
 		return $query;
 	}
 
@@ -473,21 +474,21 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access private
 	 * @return array
 	 */
-	function _buildItemWhere( $no_alpha=0 )
+	function _buildItemWhere( $wherepart='where' )
 	{
-		global $globalcats, $currcat_data;
-		if ( $no_alpha && isset($currcat_data['where_no_alpha']) ) return $currcat_data['where_no_alpha'];
-		if ( isset($currcat_data['where']) ) return $currcat_data['where'];
+		global $globalcats, $fc_catviev;
+		if ( isset($fc_catviev[$wherepart]) ) return $fc_catviev[$wherepart];
 		
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$user		= & JFactory::getUser();
-		$db =& JFactory::getDBO();
+		$user		= JFactory::getUser();
+		$db     = JFactory::getDBO();
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$now		= $mainframe->get('requestTime');
-		$now			= FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
+		//$now = $mainframe->get('requestTime');  // NOT correct behavior it should be UTC (below)
+		//$now = FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
+		$_now = 'UTC_TIMESTAMP()'; //$this->_db->Quote($now);
 		$nullDate	= $db->getNullDate();
 		
 		$cparams = & $this->_params;                      // Get the category parameters
@@ -523,8 +524,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$where .= ' AND ( i.state IN (1, -5) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$_now.' ) OR i.created_by = '.$user->id.' )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$_now.' ) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		}
 		
 		// Filter the category view with the active language
@@ -558,60 +559,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Get session
 		$session  =& JFactory::getSession();
 		
-		/*
-		 * If we have a filter, and this is enabled... lets tack the AND clause
-		 * for the filter onto the WHERE clause of the item query.
-		 */
-		if ( $cparams->get('use_filters') || $cparams->get('use_search') )
-		{
-			if ($this->_id) {
-				$filter  = $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter', 'filter', '', 'string' );
-			} else if ($this->_authorid) {
-				$filter  = $mainframe->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter', 'filter', '', 'string' );
-			} else if (count($this->_ids)) {
-				$filter  = $mainframe->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
-			} else {
-				$filter  = JRequest::getVar('filter', NULL, 'default');
-			}
-			
-			if ($filter)
-			{
-				$where .= ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $this->_db->getEscaped( $filter, true ), false ).' IN BOOLEAN MODE)';
-			}
-		}
-		
-		$filters = $this->getFilters();
-
-		if ($filters)
-		{
-			foreach ($filters as $filtre)
-			{
-				if ($this->_id) {
-					$filtervalue 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
-				} else if ($this->_authorid) {
-					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
-				} else if (count($this->_ids)) {
-					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.author'.$this->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
-				} else {
-					$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
-				}
-				if (is_array($filtervalue)) {
-					foreach ($filtervalue as $i => $v) {
-						if ( !strlen($filtervalue[$i]) ) unset($filtervalue[$i]);
-					}
-				}
-				
-				if ( 
-							( is_array($filtervalue) && count($filtervalue) ) ||
-							( !is_array($filtervalue) && strlen($filtervalue) )
-						)
-				{
-					//echo "category model found filters: "; print_r($filtervalue);
-					$where .= $this->_getFiltered($filtre->id, $filtervalue, $filtre->field_type);
-				}
-			}
-		}
-		
 		// Featured items, this item property exists in J1.6+ only
 		if (FLEXI_J16GE) {
 			$featured = $cparams->get('featured');
@@ -622,38 +569,130 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 		}
 		
-		// In case alpha parsing fails ...
-		$currcat_data['where_no_alpha'] = $where;
-		$currcat_data['where'] = $where;
+		$filters_where = $this->_buildFiltersWhere();
+		$alpha_where   = $this->_buildAlphaIndexWhere();
 		
+		$fc_catviev['filters_where'] = $filters_where;
+		$fc_catviev['alpha_where'] = $alpha_where;
+		
+		$filters_where = implode(' ', $filters_where);
+		
+		$fc_catviev['where_no_alpha']   = $where . $filters_where;
+		$fc_catviev['where_no_filters'] = $where . $alpha_where;
+		$fc_catviev['where_conf_only']  = $where;
+		
+		$fc_catviev['where'] = $where . $filters_where . $alpha_where;
+		
+		return $fc_catviev[$wherepart];
+	}
+	
+	
+	/**
+	 * Method to build the part of WHERE clause related to Alpha Index
+	 *
+	 * @access private
+	 * @return array
+	 */
+	function _buildFiltersWhere()
+	{
+		global $fc_catviev;
+		$mainframe = JFactory::getApplication();
+		$option    = JRequest::getVar('option');
+		$cparams   = & $this->_params;
+		
+		$filters_where = array();
+		
+		//if ( $cparams->get('use_search',1) )  // Commented out to allow using persistent filters via menu
+		if ( 1 )
+		{
+			// Get value of search text ('filter') , setting into appropriate session variables
+			/*if ($this->_id) {
+				$filter  = $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter', 'filter', '', 'string' );
+			} else if ($this->_authorid) {
+				$filter  = $mainframe->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter', 'filter', '', 'string' );
+			} else if (count($this->_ids)) {
+				$filter  = $mainframe->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
+			} else {
+				$filter  = JRequest::getVar('filter', NULL, 'default');
+			}*/
+			$filter  = JRequest::getVar('filter', NULL, 'default');
+			
+			if ($filter)
+			{
+				$filters_where[ 'search' ] = ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $this->_db->getEscaped( $filter, true ), false ).' IN BOOLEAN MODE)';
+			}
+		}
+		
+		//if ( $cparams->get('use_filters',1) )  // Commented out to allow using persistent filters via menu
+		if ( 1 )
+		{
+			$filters = $this->getFilters();
+			if ($filters) foreach ($filters as $filtre)
+			{
+				// Get filter values, setting into appropriate session variables
+				/*if ($this->_id) {
+					$filtervalue 	= $mainframe->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+				} else if ($this->_authorid) {
+					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+				} else if (count($this->_ids)) {
+					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+				} else {
+					$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
+				}*/
+				$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
+				
+				// Skip filters without value
+				$empty_filtervalue_array  = is_array($filtervalue)  && !strlen(trim(implode('',$filtervalue)));
+				$empty_filtervalue_string = !is_array($filtervalue) && !strlen(trim($filtervalue));
+				if ($empty_filtervalue_array || $empty_filtervalue_string) continue;
+				
+				//echo "category model found filters: "; print_r($filtervalue);
+				$filters_where[ $filtre->id ] = $this->_getFiltered($filtre, $filtervalue);
+			}
+		}
+		
+		return $filters_where;
+	}
+	
+	
+	/**
+	 * Method to build the part of WHERE clause related to Alpha Index
+	 *
+	 * @access private
+	 * @return array
+	 */
+	function _buildAlphaIndexWhere()
+	{
+		// Get alpha index request variable and do some security checks, by removing any quotes and other non-valid characters
 		$alpha = JRequest::getVar('letter', NULL, 'request', 'string');
-		
-		// Security check, just refuse any quotes
 		$alpha = preg_replace ("/(\(|\)\'|\"|\\\)/u", "", $alpha);
 		
-		/*if($alpha===NULL) {
-			$alpha =  $session->get($option.'.category.letter');
-		} else {
-			$session->set($option.'.category.letter', $alpha);
-		}*/
-		
-		// WARNING DO THIS because utf8 is multibyte and MySQL regexp doesnot support multibyte, so we cannot use [] with utf8
-		$range = explode("-", $alpha);
-		
-		$regexp='';
 		if (JString::strlen($alpha)==0) {
 			// nothing to do
-		} else if (count($range) > 2) {
+			return '';
+		}
+		
+		// Detect and handle character groups and character ranges,  WARNING: The following is needed because
+		// utf8 is multibyte and MySQL regexp doesnot support multibyte, thus we can not use [] with utf8
+		
+		$range = explode("-", $alpha);
+		if (count($range) > 2)
+		{
 			echo "Error in Alpha Index please correct letter range: ".$alpha."<br>";
-		} else if (count($range) == 1) {
-			
+			return '';
+		}
+		
+		else if (count($range) == 1)
+		{
 			$regexp = '"^('.JString::substr($alpha,0,1);
 			for($i=1; $i<JString::strlen($alpha); $i++) :
 				$regexp .= '|'.JString::substr($alpha,$i,1);
 			endfor;
 			$regexp .= ')"';
-			
-		} else if (count($range) == 2) {
+		}
+		
+		else if (count($range) == 2)
+		{
 			
 			// Get range characters
 			$startletter = $range[0];  $endletter = $range[1];
@@ -661,7 +700,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// ERROR CHECK: Range START and END are single character strings
 			if (JString::strlen($startletter) != 1 || JString::strlen($endletter) != 1) {
 				echo "Error in Alpha Index<br>letter range: ".$alpha." start and end must be one character<br>";
-				return $where;
+				return '';
 			}
 			
 			// Get ord of characters and their rangle length
@@ -673,7 +712,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ($range_length > 50 || $range_length < 1) {
 				// A sanity check that the range is something logical and that 
 				echo "Error in Alpha Index<br>letter range: ".$alpha.", is incorrect or contains more that 50 characters<br>";
-				return $where;
+				return '';
 			}
 			
 			// Check if any character out of the range characters exists
@@ -686,24 +725,28 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 		} else {
 			echo "Error in Alpha Index<br>incorrect letter range: ".$alpha."<br>";
+			return '';
 		}
 		
-		if ($regexp) {
-			
-			if ($alpha == '0') {
-				$where .= ' AND ( CONVERT (( i.title ) USING BINARY) REGEXP CONVERT ('.$regexp.' USING BINARY) )' ;
-				//$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
+		$where = '';
+		if ( !empty($regexp) )
+		{
+			if ($alpha == '0')
+			{
+				$where = ' AND ( CONVERT (( i.title ) USING BINARY) REGEXP CONVERT ('.$regexp.' USING BINARY) )' ;
+				//$where = ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
 			}
-			elseif (!empty($alpha)) {
-				$where .= ' AND ( CONVERT (LOWER( i.title ) USING BINARY) REGEXP CONVERT ('.$regexp.' USING BINARY) )' ;
-				//$where .= ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
+			elseif (!empty($alpha))
+			{
+				$where = ' AND ( CONVERT (LOWER( i.title ) USING BINARY) REGEXP CONVERT ('.$regexp.' USING BINARY) )' ;
+				//$where = ' AND LOWER( i.title ) RLIKE '.$this->_db->Quote( $this->_db->getEscaped( '^['.$alpha.']', true ), false );
 			}
 		}
 		
-		return $currcat_data['where'] = $where;
+		return $where;
 	}
-
-
+	
+	
 	/**
 	 * Method to build the childs categories query
 	 *
@@ -776,8 +819,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$now		= $mainframe->get('requestTime');
-		$now			= FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
+		//$now = $mainframe->get('requestTime');  // NOT correct behavior it should be UTC (below)
+		//$now = FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
+		$_now = 'UTC_TIMESTAMP()'; //$this->_db->Quote($now);
 		$nullDate	= $db->getNullDate();
 		
 		// Show assigned items, this should not cause problems, category parameters says not to display itemcount for subcategories
@@ -813,8 +857,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$where .= ' AND ( i.state IN (1, -5) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 			
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$_now.' ) OR i.created_by = '.$user->id.' )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$_now.' ) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		}
 		
 		// Count items according to full depth level !!!
@@ -976,13 +1020,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 		} else if ($this->_authorid || count($this->_ids)) {
 			$this->_category = new stdClass;
 			$this->_category->published = 1;
-			$this->_category->id = $this->_id;  // zero
+			$this->_category->id = $this->_id;   // can be zero for author/myitems/etc layouts
 			$this->_category->title = '';
 			$this->_category->description = '';
 			$this->_category->slug = '';
 		} else {
 			$this->_category = false;
 		}
+		// non-empty for multi-cats
+		$this->_category->ids = $this->_ids;
 		
 		//Make sure the category is published
 		if (!$this->_category)
@@ -1041,8 +1087,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _loadCategoryParams($id)
 	{
-		global $currcat_data;
-		if ( !empty($currcat_data['params']) ) return $currcat_data['params'];
+		global $fc_catviev;
+		if ( !empty($fc_catviev['params']) ) return $fc_catviev['params'];
 		
 		if ($this->_params === NULL) {
 			jimport("joomla.html.parameter");
@@ -1163,7 +1209,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 		}
 		
-		return $currcat_data['params'] = $params;
+		return $fc_catviev['params'] = $params;
 	}
 	
 	
@@ -1210,7 +1256,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @return object
 	 * @since 1.5
 	 */
-	function getFilters()
+	function & getFilters()
 	{
 		static $filters;
 		if($filters) return $filters;
@@ -1265,87 +1311,72 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @return string
 	 * @since 1.5
 	 */
-	function _getFiltered($field_id, $value, $field_type = '')
+	function _getFiltered( &$filter, $value )
 	{
+		$field_type = $filter->field_type;
+		
+		// Sanitize filter values as integers for field that use integer values
+		if ( in_array($field_type, array('createdby','modifiedby','type','categories','tags')) ) {
+			$values = is_array($value) ? $value : array($value);
+			foreach ($values as $i => $v) $values[$i] = (int)$v;
+		}
+		
 		switch($field_type) 
 		{
 			case 'createdby':
-				$filter_query = ' AND i.created_by = ' . $this->_db->Quote($value);
+				$filter_query = ' AND i.created_by IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
 			break;
 
 			case 'modifiedby':
-				$filter_query = ' AND i.modified_by = ' . $this->_db->Quote($value);
+				$filter_query = ' AND i.modified_by IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
 			break;
 			
 			case 'type':
-				$filter_query = ' AND ie.type_id = ' . $this->_db->Quote($value);
+				$filter_query = ' AND ie.type_id IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
 			break;
 			
 			case 'state':
-				if ( $value == 'P' ) {
-					$filter_query = ' AND i.state = 1';
-				} else if ($value == 'U' ) {
-					$filter_query = ' AND i.state = 0';
-				} else if ($value == 'PE' ) {
-					$filter_query = ' AND i.state = -3';
-				} else if ($value == 'OQ' ) {
-					$filter_query = ' AND i.state = -4';
-				} else if ($value == 'IP' ) {
-					$filter_query = ' AND i.state = -5';
-				}
+				$stateids = array ( 'PE' => -3, 'OQ' => -4, 'IP' => -5, 'P' => 1, 'U' => 0, 'A' => (FLEXI_J16GE ? 2:-1), 'T' => -2 );
+				$values = is_array($value) ? $value : array($value);
+				$filt_states = array();
+				foreach ($values as $i => $v) if (isset($stateids[$v])) $filt_states[] = $stateids[$v];
+				$filter_query = !count($values) ? ' AND 1=0 ' : ' AND i.state IN ('. implode(",", $filt_states) .')';   // no db quoting needed since these were typecasted to ints
 			break;
 			
 			case 'categories':
-				$_data_cats = array_intersect(array($value), $this->_data_cats);
-				$_data_cats = "'".implode("','", $_data_cats)."'";
-				$where = ' catid IN ('.$_data_cats.')';
-				$query  = 'SELECT id'
-					. ' FROM #__content'
-					. ' WHERE ' . $where
-					;
-				$this->_db->setQuery($query);
-				$filtered1 = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-				$query  = 'SELECT itemid'
-					. ' FROM #__flexicontent_cats_item_relations'
-					. ' WHERE ' . $where
-					;
-				$this->_db->setQuery($query);
-				$filtered2 = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-				$filtered = array_unique(array_merge($filtered1, $filtered2));
-				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
+				$filter_query = ' AND rel.catid IN ('. implode(",", $values) .')';
 			break;
 			
 			case 'tags':
 				$query  = 'SELECT itemid'
 						. ' FROM #__flexicontent_tags_item_relations'
-						. ' WHERE tid = ' . $this->_db->Quote($value)
+						. ' WHERE tid IN ('. implode(",", $values) .')';
 						;
-				$this->_db->setQuery($query);
-				$filtered = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
+				$filter_query = ' AND i.id IN (' . $query . ')';
 			break;
 			
 			default:
-				$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($field_type).(FLEXI_J16GE ? DS.strtolower($field_type) : "").'.php';
-				if(file_exists($path)) require_once($path);
-				require_once($path);
-				$method_exists = method_exists("plgFlexicontent_fields{$field_type}", "getFiltered");
-				if ($method_exists) {
-					$filtered = array();
-					FLEXIUtilities::call_FC_Field_Func($field_type, 'getFiltered', array( &$field_id, &$value, &$filtered ));
-				} else {
-					$query  = 'SELECT item_id'
-						. ' FROM #__flexicontent_fields_item_relations'
-						. ' WHERE field_id = ' . $field_id
-						. ' AND value LIKE ' . $this->_db->Quote($value)
-						. ' GROUP BY item_id'
-					;
-					$this->_db->setQuery($query);
-					$filtered = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+				// Make sure plugin file of current file is loaded and then check if custom filtering function exists
+				$field_type_file = $filter->iscore ? 'core' : $field_type;
+				$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($field_type_file).(FLEXI_J16GE ? DS.strtolower($field_type_file) : "").'.php';
+				if ( file_exists($path) ) {
+					require_once($path);
+					$method_exists = method_exists("plgFlexicontent_fields{$field_type_file}", "getFiltered");
 				}
-				$filter_query = $filtered ? ' AND i.id IN (' . implode(',', $filtered) . ')' : ' AND i.id = 0';
+				
+				// Use custom field filtering if 'getFiltered' plugin method exists, otherwise try to use our default filtering function
+				$filtered = ! @ $method_exists ?
+					FlexicontentFields::getFiltered($filter, $value, $return_sql=true) :
+					FLEXIUtilities::call_FC_Field_Func($field_type_file, 'getFiltered', array( &$filter, &$value ));
+				
+				// An empty return value means no matching values we found
+				$filtered = empty($filtered) ? ' AND 1=0' : $filtered;
+				
+				// A string mean a subquery was returned, while an array means that item ids we returned
+				$filter_query = is_array($filtered) ?  ' AND i.id IN ('. implode(',', $filtered) .')' : $filtered;
 			break; 
 		}
+		//echo "<br/>".$filter_query."<br/>";
 		
 		return $filter_query;
 	}
@@ -1359,7 +1390,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
  	function getAlphaindex()
 	{
-		$where  = $this->_buildItemWhere($no_alpha=1);
+		$where = $this->_buildItemWhere('where_no_alpha');
 		
 		$query	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
 				. ' FROM #__content AS i'

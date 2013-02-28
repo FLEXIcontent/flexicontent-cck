@@ -19,6 +19,8 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsWeblink extends JPlugin
 {
+	static $field_types = array('weblink');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -39,7 +41,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'weblink') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
@@ -255,28 +257,29 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'weblink') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
 		$values = $values ? $values : $field->value;
-		if ( !$values ) {	$field->{$prop} = '';	return;	}
+		if ( !$values ) { $field->{$prop} = ''; return; }
+		
+		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
+		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
+		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
 		// some parameter shortcuts
-		$pretext			= $field->parameters->get( 'pretext', '' ) ;
-		$posttext			= $field->parameters->get( 'posttext', '' ) ;
-		$separatorf		= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag			= $field->parameters->get( 'opentag', '' ) ;
-		$closetag			= $field->parameters->get( 'closetag', '' ) ;
 		$target = $field->parameters->get( 'targetblank', 0 ) ? ' target="_blank"' : '';
-		
-		
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
-		
-		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
 		switch($separatorf)
 		{
@@ -298,6 +301,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 
 			case 4:
 			$separatorf = $closetag . $opentag;
+			break;
+
+			case 5:
+			$separatorf = '';
 			break;
 
 			default:
@@ -359,10 +366,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'weblink') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 		
-		$is_importcsv = JRequest::getVar('task') == 'importcsv';
+		//$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -372,14 +379,14 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$new = 0;
 		foreach ($post as $n=>$v)
 		{
-			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($post[$n]) ) {
+			// support for basic CSV import / export,  TO BE REMOVED added to the 'store' function of the model
+			/*if ( $is_importcsv && !is_array($post[$n]) ) {
 				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
 					$post[$n] = unserialize($post[$n]);
 				} else {
-					$post[$n] = array('link' => $post[$n], 'title' => '', 'hits'=>0);
+					$post[$n] = array('link' => $post[$n], 'title' => '', 'id' => '', 'class' => '', 'linktext' => '', 'hits'=>0);
 				}
-			}
+			}*/
 			
 			if ($post[$n]['link'] !== '')
 			{
@@ -418,10 +425,21 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if($filter->field_type != 'weblink') return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
-		$size = (int)$filter->parameters->get( 'size', 30 );
-		$filter->html	='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="'.$size.'" value="'.$value.'" />';
+		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+		FlexicontentFields::createFilter($filter, $value, $formName);
+	}
+	
+	
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for search view
+	function getFilteredSearch(&$field, $value)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
+		$field->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
 	}
 	
 	
@@ -433,10 +451,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item)
 	{
-		if ($field->field_type != 'weblink') return;
-		if ( !$field->isadvsearch ) return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
-		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('link'), $search_properties=array('link','title'), $properties_spacer=' ', $filter_func=null);
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('link','title'), $search_properties=array('title'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	
@@ -444,20 +462,11 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ($field->field_type != 'weblink') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
-		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('link'), $search_properties=array('link','title'), $properties_spacer=' ', $filter_func=null);
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('link','title'), $search_properties=array('title'), $properties_spacer=' ', $filter_func=null);
 		return true;
-	}
-	
-	
-	// Method to get ALL items that have matching search values for the current field id
-	function onFLEXIAdvSearch(&$field)
-	{
-		if ($field->field_type!='weblink') return;
-		
-		FlexicontentFields::onFLEXIAdvSearch($field);
 	}
 	
 	

@@ -46,7 +46,19 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		$username	= JRequest::getVar('fcu', null);
 		$password	= JRequest::getVar('fcp', null);
-		$fparams 	=& JComponentHelper::getParams('com_flexicontent');
+		$fparams 	= JComponentHelper::getParams('com_flexicontent');
+		$option   = JRequest::getVar('option', null);
+		if ( $option=='com_flexicontent' && $fparams->get('print_logging_info')==1 )
+		{
+			$session = & JFactory::getSession();
+			// Try request variable first then session variable
+			$fcdebug = JRequest::getVar('fcdebug', '');
+			$fcdebug = strlen($fcdebug) ? (int)$fcdebug : $session->get('fcdebug', 0, 'flexicontent');
+			// Enable/Disable debugging
+			$session->set('fcdebug', $fcdebug, 'flexicontent');
+			$fparams->set('print_logging_info', $fcdebug);
+		}
+
 		
 		// (a) Check-in DB table records according to time limits set
 		$this->checkinRecords();
@@ -498,18 +510,13 @@ class plgSystemFlexisystem extends JPlugin
 	
 	public function onAfterRender()
 	{
-		$db = JFactory::getDBO();
-		$app      = JFactory::getApplication();
-		$session 	= JFactory::getSession();
+		$session 	= & JFactory::getSession();
 		
 		// If this is reached we now that the code for setting screen cookie has been added
 		if ( $session->get('screenSizeCookieToBeAdded', 0, 'flexicontent') ) {
 			$session->set('screenSizeCookieTried', 1, 'flexicontent');
 			$session->set('screenSizeCookieToBeAdded', 0, 'flexicontent');
 		}
-
-		// Only execute in administrator environment ?
-		//if ($app->getName() == 'site' ) return true;
 		
 		return true;
 	}

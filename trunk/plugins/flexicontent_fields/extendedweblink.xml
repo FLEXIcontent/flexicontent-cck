@@ -13,107 +13,119 @@
 		<filename plugin="extendedweblink">extendedweblink.php</filename>
 	</files>
 		<params group="standard">
-			<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
+			</field>
 		</params>
 		<params group="group-extendedweblink" addpath="/administrator/components/com_flexicontent/elements">
 			
-			<param name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" menu="hide" />
-			<param name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
-			<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" menu="hide" />
+			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
+			</field>
 
-			<param name="" type="separator" default="FLEXI_VALUE_HANDLING_LABEL" level="level1" menu="hide" />
-			<param name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" menu="hide" />
+			<field name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
-			<param name="allow_relative_addrs" type="radio" default="0" label="FLEXI_EXTWL_RELATIVE_ADDRESSES" description="FLEXI_EXTWL_RELATIVE_ADDRESSES_DESC">
+			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+			<field name="allow_relative_addrs" type="radio" default="0" label="FLEXI_EXTWL_RELATIVE_ADDRESSES" description="FLEXI_EXTWL_RELATIVE_ADDRESSES_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_USER_CAN_SELECT</option>
-			</param>
+			</field>
 			
-			<param name="target" type="list" default="" label="FLEXI_EXTWL_URLTARGET" description="FLEXI_EXTWL_URLTARGET" >
+			<field name="target" type="list" default="" label="FLEXI_EXTWL_URLTARGET" description="FLEXI_EXTWL_URLTARGET" >
 				<option value=""> - No target - </option>
 				<option value="_blank">open in new window</option>
 				<option value="_parent">open in the parent frameset</option>
 				<option value="_self">open in the same frame</option>
 				<option value="_top">open in the full body of the window</option>
-			</param>
-			<param name="default_link" type="text" default="" label="FLEXI_EXTWL_DEFAULT_LINK" description="FLEXI_EXTWL_DEFAULT_LINK_DESC" />
-			<param name="default_link_usage" type="list" default="0" label="FLEXI_EXTWL_DEFAULT_LINK_USAGE" description="FLEXI_EXTWL_DEFAULT_LINK_USAGE_DESC">
+			</field>
+			<field name="default_link" type="text" default="" label="FLEXI_EXTWL_DEFAULT_LINK" description="FLEXI_EXTWL_DEFAULT_LINK_DESC" />
+			<field name="default_link_usage" type="list" default="0" label="FLEXI_EXTWL_DEFAULT_LINK_USAGE" description="FLEXI_EXTWL_DEFAULT_LINK_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
-			</param>
+			</field>
 			
-			<param name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level1" menu="hide" />
 			
-			<param name="" type="separator" default="FLEXI_EXTWL_URLTITLE" level="level2" menu="hide" />
-			<param name="use_title" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
+			<field name="" type="separator" default="FLEXI_EXTWL_URLTITLE" level="level2" menu="hide" />
+			<field name="use_title" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="default_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<param name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			</field>
+			<field name="default_title" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="title_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
-			</param>
+			</field>
 
-			<param name="" type="separator" default="FLEXI_EXTWL_URLLINK_TEXT" level="level2" menu="hide" />
-			<param name="use_text" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
+			<field name="" type="separator" default="FLEXI_EXTWL_URLLINK_TEXT" level="level2" menu="hide" />
+			<field name="use_text" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="default_text" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<param name="text_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			</field>
+			<field name="default_text" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="text_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
-			</param>
+			</field>
 
-			<param name="" type="separator" default="FLEXI_EXTWL_URLCLASS" level="level2" menu="hide" />
-			<param name="use_class" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
+			<field name="" type="separator" default="FLEXI_EXTWL_URLCLASS" level="level2" menu="hide" />
+			<field name="use_class" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="default_class" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<param name="class_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			</field>
+			<field name="default_class" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="class_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
-			</param>
+			</field>
 
-			<param name="" type="separator" default="FLEXI_EXTWL_URLID" level="level2" menu="hide" />
-			<param name="use_id" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
+			<field name="" type="separator" default="FLEXI_EXTWL_URLID" level="level2" menu="hide" />
+			<field name="use_id" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="default_id" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<param name="id_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
+			</field>
+			<field name="default_id" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="id_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
-			</param>
+			</field>
 
-			<param name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level1" menu="hide" />
-			<param name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
-			<param name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			<param name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" menu="hide" />
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
 				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
-			</param>
-			<param name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-			<param name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			</field>
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
+			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+			</field>
+			
 		</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_extendedweblink.ini</language>

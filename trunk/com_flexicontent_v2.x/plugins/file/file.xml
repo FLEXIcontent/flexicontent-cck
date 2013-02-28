@@ -33,7 +33,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" menu="hide" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -87,8 +87,14 @@
 			<field name="" type="separator" default="FLEXI_FILE_LOGGED_USERS" level="level3" menu="hide" />
 			<field name="noaccess_url_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_LOGGED_DESC" />
 			<field name="noaccess_msg_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_LOGGED_DESC" />
-		
 			
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
+			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+			</field>
+		
 		</fieldset>
 	</fields>
 	</config>

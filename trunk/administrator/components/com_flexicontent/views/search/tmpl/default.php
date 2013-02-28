@@ -67,17 +67,17 @@ function delAllFilters() {
 				<th width="5">
 					<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->data); ?>);" />
 				</th>
-				<th nowrap="nowrap" width="10%">
-					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_LABEL'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				</th>
-				<th nowrap="nowrap" width="10%">
-					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_NAME'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				</th>
 				<th nowrap="nowrap" width="20%">
 					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEMS'), 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
 				<th nowrap="nowrap" width="10%">
-					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_TYPE'), 'ai.extratable', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_LABEL'), 'f.label', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				</th>
+				<th nowrap="nowrap" width="10%">
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_INDEX').' '.JText::_('FLEXI_FIELD_NAME'), 'f.name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				</th>
+				<th nowrap="nowrap" width="10%">
+					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_FIELD_TYPE'), 'f.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				</th>
 				<th nowrap="nowrap" width="5%">
 					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_INDEX_VALUE_COUNT'), 'ai.extraid', $this->lists['order_Dir'], $this->lists['order'] ); ?>
@@ -98,13 +98,11 @@ function delAllFilters() {
 				</td-->
 				<td class="left"></td>
 				<td class="left"></td>
-				<td class="left"></td>
-				<td class="left"></td>
-				<td class="left">
+				<td class="left" colspan="3">
 					<?php echo '<b class="'.($this->f_active['search_itemtitle'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_TITLE').':</b> '; ?> &nbsp;
-					<input type="text" name="search_itemtitle" id="search_itemtitle" value="<?php echo $this->lists['search_itemtitle']; ?>" class="text_area" onChange="document.adminForm.submit();" />
+					<input type="text" name="search_itemtitle" id="search_itemtitle" value="<?php echo $this->lists['search_itemtitle']; ?>" class="text_area" onChange="document.adminForm.submit();" size="30"/>
 					<?php echo '<b class="'.($this->f_active['search_itemid'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_ID').':</b> '; ?> &nbsp;
-					<input type="text" name="search_itemid" id="search_itemid" value="<?php echo $this->lists['search_itemid']; ?>" class="text_area" onChange="document.adminForm.submit();" />
+					<input type="text" name="search_itemid" id="search_itemid" value="<?php echo $this->lists['search_itemid']; ?>" class="text_area" onChange="document.adminForm.submit();" size="6" />
 					<br/>
 					<?php echo '<b class="'.($this->f_active['filter_itemtype'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_TYPE_NAME').':</b> '; ?> &nbsp;
 					<?php echo $this->lists['filter_itemtype']; ?>
@@ -180,12 +178,6 @@ function delAllFilters() {
 					<?php echo JHTML::_('grid.id', $n, $row->field_id.'|'.$row->item_id); ?>
 				</td>
 				<td>
-					<?php echo $this->escape($row->label); ?>
-				</td>
-				<td>
-					<?php echo $this->escape($row->name); ?>
-				</td>
-				<td>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
 					<?php
 						$link = 'index.php?option=com_flexicontent&'.$items_task.'edit&cid[]='. $row->id;
@@ -193,16 +185,22 @@ function delAllFilters() {
 					?>
 					</span>
 				</td>
+				<td>
+					<?php echo $this->escape($row->label); ?>
+				</td>
+				<td>
+					<?php echo $this->escape($row->name); ?>
+				</td>
 				<td nowrap="nowrap" style="text-align: center" class="col_fieldtype">
-					<?php echo $row->extratable; ?>
+					<?php echo $row->field_type; ?>
 				</td>
 				<td nowrap="nowrap" style="text-align: center;">
 					<?php echo $row->extraid; ?>
 				</td>
 				<td style="text-align: left;" class="col_search_index">
 					<?php
-						if(iconv_strlen($row->search_index, "UTF-8")>200)
-							echo iconv_substr($row->search_index, 0, 200, "UTF-8").'...';
+						if(iconv_strlen($row->search_index, "UTF-8")>400)
+							echo iconv_substr($row->search_index, 0, 400, "UTF-8").'...';
 						else
 							echo $row->search_index;
 					?>

@@ -39,10 +39,9 @@ class JElementTag extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		$doc 		=& JFactory::getDocument();
-		$value = FLEXI_J16GE ? $this->value : $value;
-		
-		$fieldName	= $control_name.'['.$name.']';
+		$doc = JFactory::getDocument();
+		$value     = FLEXI_J16GE ? $this->value : $value;
+		$fieldname = FLEXI_J16GE ? "jform[request][".$this->element["name"]."]" : $control_name.'['.$name.']';
 
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
@@ -67,7 +66,7 @@ class JElementTag extends JElement
 
 		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"a_name\" value=\"$item->name\" disabled=\"disabled\" /></div>";
 		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x: 650, y: 375}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
-		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldName\" value=\"$value\" />";
+		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldname\" value=\"$value\" />";
 
 		return $html;
 	}

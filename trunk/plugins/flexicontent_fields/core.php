@@ -46,16 +46,21 @@ class plgFlexicontent_fieldsCore extends JPlugin
 
 		if($field->iscore != 1) return;
 		
-		$pretext			= $field->parameters->get( 'pretext', '' ) ;
-		$posttext			= $field->parameters->get( 'posttext', '' ) ;
-		$separatorf			= $field->parameters->get( 'separatorf', 1 ) ;
+		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
+		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$separatorf	= $field->parameters->get( 'separatorf', 3 ) ;       // used by some fields
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );     // used by some fields
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );   // used by some fields
+		
+		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
+		
+		// some parameter shortcuts
 		$dateformat			= $field->parameters->get( 'date_format', '' ) ;
 		$customdate			= $field->parameters->get( 'custom_date', '' ) ;		
-						
-		if($pretext) $pretext = $pretext . ' ';
-
-		if($posttext) $posttext = ' ' . $posttext . ' ';
-
+		
 		switch($separatorf)
 		{
 			case 0:
@@ -74,8 +79,16 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			$separatorf = ', ';
 			break;
 
+			case 4:
+			$separatorf = $closetag . $opentag;
+			break;
+
+			case 5:
+			$separatorf = '';
+			break;
+
 			default:
-			$separatorf = ' ';
+			$separatorf = '&nbsp;';
 			break;
 		}
 			
@@ -126,25 +139,25 @@ class plgFlexicontent_fieldsCore extends JPlugin
 
 			case 'state': // state
 				$field->value[] = $item->state;
-				$field->display = flexicontent_html::stateicon( $item->state, $field->parameters );
+				$field->display = $pretext.flexicontent_html::stateicon( $item->state, $field->parameters ).$posttext;
 				break;
 
 			case 'voting': // voting button
 				$field->value[] = 'button'; // dummy value to force display
-				$field->display = flexicontent_html::ItemVote( $field, 'all', $vote );
+				$field->display = $pretext.flexicontent_html::ItemVote( $field, 'all', $vote ).$posttext;
 				break;
 
 			case 'favourites': // favourites button
 				$field->value[] = 'button'; // dummy value to force display
 				$favs = flexicontent_html::favoured_userlist( $field, $item, $favourites);
-				$field->display = '
+				$field->display = $pretext.'
 				<span class="fav-block">
 					'.flexicontent_html::favicon( $field, $favoured, $item ).'
 					<span id="fcfav-reponse_'.$field->item_id.'" class="fcfav-reponse">
 						<small>'.$favs.'</small>
 					</span>
 				</span>
-					';
+					'.$posttext;
 				break;
 
 			case 'categories': // assigned categories
@@ -158,11 +171,14 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$field->display = array();
 					foreach ($categories as $category) {
 						if (!in_array($category->id, @$globalnoroute)) :
-							$field->display[]  = '<a class="fc_categories link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug)) . '">' . $category->title . '</a>';
+							$cat_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
+							$display = '<a class="fc_categories link_' . $field->name . '" href="' . $cat_link . '">' . $category->title . '</a>';
+							$field->display[] = $pretext. $display .$posttext;
 							$field->value[] = $category->title;
 						endif;
 					}
 					$field->display = implode($separatorf, $field->display);
+					$field->display = $opentag . $field->display . $closetag;
 				endif;
 				break;
 
@@ -172,10 +188,13 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					// Create list of tag links
 					$field->display = array();
 					foreach ($tags as $tag) :
+						$tag_link = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug));
+						$display = '<a class="fc_tags link_' . $field->name . '" href="' . $tag_link . '">' . $tag->name . '</a>';
+						$field->display[] = $pretext. $display .$posttext;
 						$field->value[] = $tag->name; 
-						$field->display[]  = '<a class="fc_tags link_' . $field->name . '" href="' . JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug)) . '">' . $tag->name . '</a>';
 					endforeach;
 					$field->display = implode($separatorf, $field->display);
+					$field->display = $opentag . $field->display . $closetag;
 				endif;
 				break;
 			
@@ -205,7 +224,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					{
 						$field->display = $item->introtext . chr(13).chr(13) . $item->fulltext;
 					} else {
-						$field->{$prop} = $item->introtext;
+						$field->display = $item->introtext;
 					}
 				}
 					
@@ -271,7 +290,17 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	{
 		if($filter->iscore != 1) return;
 		
-		plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName);
+		if ($filter->field_type == 'maintext' || $filter->field_type == 'title') {
+			$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+		}
+		
+		$indexed_elements = in_array($filter->field_type, array('tags', 'createdby', 'modifiedby', 'created', 'modified', 'type'));
+		
+		if ($filter->field_type == 'categories') {
+			plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName);
+		} else {
+			FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
+		}
 	}
 	
 	
@@ -283,173 +312,200 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$db =& JFactory::getDBO();
 		$formfieldname = 'filter_'.$filter->id;
 		
+		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
+		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
+		
+		$show_matching_items = $filter->parameters->get('show_matching_items', 1);
+		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
+		$count_column = $show_matches ? ', COUNT(*) as found ' : '';
+		
+		// Create first prompt option of drop-down select
+		$label_filter = $filter->parameters->get( 'display_label_filter', 2 ) ;
+		$first_option_txt = $label_filter==2 ? $filter->label : JText::_('FLEXI_ALL');
+		
+		// Prepend Field's Label to filter HTML
+		$filter->html = $label_filter==1 ? $filter->label.': ' : '';
+		
 		switch ($filter->field_type)
 		{
 			case 'title':
-			case 'maintext':
 				$filter->html	.='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="20" value="'.$value.'" />';
 			break;
 			
-			case 'createdby': // Created by
-				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
-				if ($label_filter == 2) 
-					$text_select = $filter->label; 
-				else 
-					$text_select = JText::_('FLEXI_ALL');
+			case 'createdby':     // Authors
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
+				// partial SQL clauses
+				$filter->filter_valuesselect = ' i.created_by AS value, u.name AS text'. $count_column;
+				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
+				$filter->filter_valueswhere  = ' AND i.created_by <> 0';
+				// full SQL clauses
+				$filter->filter_groupby = ' GROUP BY i.created_by ';
+				$filter->filter_having  = null;   // use default
+				$filter->filter_orderby = ' ORDER BY text ASC ';
 				
-				$query 	= ' SELECT DISTINCT i.created_by AS value, u.name AS text'
-						. ' FROM #__content AS i'
-						. ' LEFT JOIN #__users AS u'
-						. ' ON i.created_by = u.id'
-						. ' WHERE i.created_by <> 0'
-						. ' ORDER BY u.name ASC'
-						;
-				$db->setQuery($query);
-				$lists = $db->loadObjectList();
-				
-				$options = array(); 
-				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-				foreach ($lists as $list) {
-					$options[] = JHTML::_('select.option', $list->value, $list->text); 
-					}			
-				
-				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
-				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
-
-			case 'modifiedby': // Modified by
-				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
-				if ($label_filter == 2) 
-					$text_select = $filter->label; 
-				else 
-					$text_select = JText::_('FLEXI_ALL');
+			
+			case 'modifiedby':   // Modifiers
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
+				// partial SQL clauses
+				$filter->filter_valuesselect = ' i.modified_by AS value, u.name AS text'. $count_column;
+				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
+				$filter->filter_usersjoinon  = ' u.id = i.modified_by';
+				$filter->filter_valueswhere  = ' AND i.modified_by <> 0';
+				// full SQL clauses
+				$filter->filter_groupby = ' GROUP BY i.modified_by ';
+				$filter->filter_having  = null;   // use default
+				$filter->filter_orderby = ' ORDER BY text ASC ';
 				
-				$query 	= ' SELECT DISTINCT i.modified_by AS value, u.name AS text'
-					. ' FROM #__content AS i'
-					. ' LEFT JOIN #__users AS u'
-					. ' ON i.modified_by = u.id'
-					. ' WHERE i.modified_by <> 0'
-					. ' ORDER BY u.name ASC'
-					;
-				$db->setQuery($query);
-				$lists = $db->loadObjectList();
-				
-				$options = array(); 
-				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-				foreach ($lists as $list) {
-					$options[] = JHTML::_('select.option', $list->value, $list->text); 
-					}			
-				
-				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
-				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
-
-			case 'type': // Type
-				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
-				if ($label_filter == 2) 
-					$text_select = $filter->label; 
-				else 
-					$text_select = JText::_('FLEXI_ALL');
+			
+			case 'type':  // Document Type
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
+				// partial SQL clauses
+				$filter->filter_valuesselect = ' ty.id AS value, ty.name AS text'. $count_column;
+				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
+				$filter->filter_valueswhere  = ' ';  // ... a space, (indicates not needed and prevents using default)
+				// full SQL clauses
+				$filter->filter_groupby = ' GROUP BY ty.id';
+				$filter->filter_having  = null;   // use default
+				$filter->filter_orderby = ' ORDER BY text ASC ';
 				
-				$query 	= ' SELECT id AS value, name AS text'
-						. ' FROM #__flexicontent_types'
-						. ' ORDER BY name ASC'
-						;
-				$db->setQuery($query);
-				$lists = $db->loadObjectList();
-				
-				$options = array(); 
-				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-				foreach ($lists as $list) {
-					$options[] = JHTML::_('select.option', $list->value, $list->text); 
-					}			
-				
-				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
-				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+				FlexicontentFields::createFilter($filter, $value, $formName);
 			break;
-
-			case 'state': // State
-				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
-				if ($label_filter == 2) 
-					$text_select = $filter->label; 
-				else 
-					$text_select = JText::_('FLEXI_ALL');
-				
+			
+			case 'state':
 				$options = array(); 
-				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+				$options[] = JHTML::_('select.option', '', '-'.$first_option_txt.'-');
 				$options[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 				$options[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
 				$options[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
 				$options[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
 				$options[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
-				
-				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
-				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
-			break;
-
-			case 'categories': // Categories
-				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
-				$rootcatid = $filter->parameters->get( 'rootcatid', '' ) ;
-				if ($label_filter == 2) 
-					$text_select = $filter->label; 
-				else 
-					$text_select = JText::_('FLEXI_ALL');
-
-				global $globalcats;
-
-				$options = array(); 
-				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-				if($rootcatid) {
-					$options[] = JHTML::_('select.option', $globalcats[$rootcatid]->id, $globalcats[$rootcatid]->treename);
-					foreach ($globalcats[$rootcatid]->childrenarray as $k=>$list) {
-						$options[] = JHTML::_('select.option', $list->id, $list->treename); 
-					}
-				}else{
-					foreach ($globalcats as $k=>$list) {
-						$options[] = JHTML::_('select.option', $list->id, $list->treename); 
-					}
-				}
-
-				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
-				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
-				$filter->html	= str_replace('&lt;sup&gt;|_&lt;/sup&gt;', '\'-', $filter->html);
-			break;
-
-			case 'tags': // Tags
-				$label_filter 		= $filter->parameters->get( 'display_label_filter', 2 ) ;
-				if ($label_filter == 2) 
-					$text_select = $filter->label; 
-				else 
-					$text_select = JText::_('FLEXI_ALL');
-				
-				$query 	= ' SELECT id AS value, name AS text'
-						. ' FROM #__flexicontent_tags'
-						. ' ORDER BY name ASC'
-						;
-				$db->setQuery($query);
-				$lists = $db->loadObjectList();
-				
-				$options = array(); 
-				$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-				foreach ($lists as $list) {
-					$options[] = JHTML::_('select.option', $list->value, $list->text); 
-				}			
-				
-				if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
-				
-				$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+				$options[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
+				//$options[] = JHTML::_('select.option',  'T', JText::_( 'FLEXI_TRASHED' ) );
 			break;
 			
+			case 'categories':
+				global $globalcats;
+				$rootcatid = $filter->parameters->get( 'rootcatid', '' ) ;
+				$options = array(); 
+				$options[] = JHTML::_('select.option', '', '-'.$first_option_txt.'-');
+				$option = JRequest::getVar('option', '');
+				$view   = JRequest::getVar('view', '');
+				$cid    = JRequest::getInt('cid', '');
+				if ($option=='com_flexicontent' && $view=='category' && $cid) {   // Current view is category view limit to descendants
+					$options[] = JHTML::_('select.option', $globalcats[$cid]->id, $globalcats[$cid]->treename);
+					$cats = & $globalcats[$cid]->childrenarray;
+				} else if ( $rootcatid ) {     // If configured ... limit to subcategory tree of a specified category
+					$options[] = JHTML::_('select.option', $globalcats[$rootcatid]->id, $globalcats[$rootcatid]->treename);
+					$cats = & $globalcats[$rootcatid]->childrenarray;
+				} else {
+					$cats = & $globalcats;  // All categories by default
+				}
+				foreach ($cats as $k => $list) $options[] = JHTML::_('select.option', $list->id, $list->treename);
+			break;
+			
+			case 'tags':
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
+				// partial SQL clauses
+				$filter->filter_valuesselect = ' tags.id AS value, tags.name AS text'. $count_column;
+				$filter->filter_valuesjoin   =
+					 ' JOIN #__flexicontent_tags_item_relations AS tagsrel ON tagsrel.itemid = i.id '
+					.' JOIN #__flexicontent_tags AS tags ON tags.id =  tagsrel.tid ';
+				$filter->filter_valueswhere  = ' ';  // ... a space, (indicates not needed and prevents using default)
+				// full SQL clauses
+				$filter->filter_groupby = ' GROUP BY tags.id ';
+				$filter->filter_having  = null;   // use default
+				$filter->filter_orderby = ' ORDER BY text ';
+				
+				FlexicontentFields::createFilter($filter, $value, $formName);
+			break;
+			
+			case 'created':  // creation dates
+			case 'modified': // modification dates
+				$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
+				if ($date_filter_group=='year') { $date_valformat='%Y'; $date_txtformat='%Y'; }
+				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; $date_txtformat='%Y-%b'; }
+				else { $date_valformat='%Y-%m-%d'; $date_txtformat='%Y-%b-%d'; }
+				
+				$valuecol = sprintf(' DATE_FORMAT(i.%s, "%s") ', $filter->field_type, $date_valformat);
+				$textcol  = sprintf(' DATE_FORMAT(i.%s, "%s") ', $filter->field_type, $date_txtformat);
+				
+				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
+				// partial SQL clauses
+				$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text'. $count_column;
+				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
+				$filter->filter_valueswhere  = ' AND i.'.$filter->field_type.' IS NOT NULL';
+				// full SQL clauses
+				$filter->filter_groupby = ' GROUP BY '.$valuecol;
+				$filter->filter_having  = null;   // use default
+				$filter->filter_orderby = ' ORDER BY '.$valuecol;
+				FlexicontentFields::createFilter($filter, $value, $formName);
+			break;
+
 			default:
-				$filter->html	= 'Field type: '.$filter->field_type.' can not be used as search filter';
+				$filter->html	.= 'Field type: '.$filter->field_type.' can not be used as search filter';
 			break;
 		}
+		
+		// a. If field filter has defined a custom SQL query to create filter (drop-down select) options, execute it and then create the options
+		if ( !empty($query) ) {
+			$db->setQuery($query);
+			$lists = $db->loadObjectList();
+			$options = array();
+			$options[] = JHTML::_('select.option', '', '-'.$first_option_txt.'-');
+			foreach ($lists as $list) $options[] = JHTML::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
+		}
+		
+		// b. If field filter has defined drop-down select options the create the drop-down select form field
+		if ( !empty($options) ) {
+			if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
+			$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname,
+				' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+		}
+		
+		// Special CASE 'categories' filter, replace some tags in filter HTML ...
+		if ( $filter->field_type == 'categories') $filter->html = str_replace('&lt;sup&gt;|_&lt;/sup&gt;', '\'-', $filter->html);
 	}
+	
+	
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for content lists e.g. category view, and not for search view
+	function getFiltered(&$filter, $value)
+	{
+		if ( !$filter->iscore ) return;
+		
+		$isdate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
+		if ($isdate) {
+			$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
+			if ($date_filter_group=='year') { $date_valformat='%Y'; }
+			else if ($date_filter_group=='month') { $date_valformat='%Y-%m';}
+			else { $date_valformat='%Y-%m-%d'; }
+			
+			$filter->filter_colname    = sprintf(' DATE_FORMAT(c.%s, "%s") ', $filter->field_type, $date_valformat);
+			$filter->filter_valuesjoin = ' ';   // ... a space, (indicates not needed)
+			$filter->filter_valueformat = sprintf(' DATE_FORMAT("__filtervalue__", "%s") ', $date_valformat);
+			return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
+		} else {
+			return array(0);
+		}
+	}	
+	
+	
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for search view
+	function getFilteredSearch(&$field, $value)
+	{
+		if($field->iscore != 1) return;
+		
+		if ($field->field_type == 'maintext' || $field->field_type == 'title') {
+			$field->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+		}
+		
+		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
+	}	
 	
 	
 	
@@ -461,9 +517,12 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !$field->iscore ) return;
-		if ( !$field->isadvsearch ) return;
+		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
-		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');
+		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=1);
+		$filter_func = $field->field_type == 'maintext' ? 'strip_tags' : null;
+		
+		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func);
 		return true;
 	}
 	
@@ -474,16 +533,64 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		if ( !$field->iscore ) return;
 		if ( !$field->issearch ) return;
 		
-		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');
+		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=0);
+		$filter_func = $field->field_type == 'maintext' ? 'strip_tags' : null;
+		
+		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func);
 		return true;
 	}
 	
 	
-	// Method to get ALL items that have matching search values for the current field id
-	function onFLEXIAdvSearch(&$field)
+	// Method to prepare for indexing, either preparing SQL query (if post is null) or formating/preparing given $post data for usage bu index
+	function _prepareForSearchIndexing(&$field, &$post, $for_advsearch=0)
 	{
-		if($field->iscore != 1) return;
+		static $nullDate = null;
 		
-		FlexicontentFields::onFLEXIAdvSearch($field);
+		if ($post!==null && isset($post[0])) {
+			$db = &JFactory::getDBO();
+			$values = array();
+			if ($field->field_type=='type') {
+				$textcol = 't.name';
+				$query 	= ' SELECT t.id AS value_id, '.$textcol.' AS value FROM #__flexicontent_types AS t WHERE t.id<>0 AND t.id = '.(int)$post[0];
+				
+			} else if ($field->field_type=='categories') {
+				$query 	= ' SELECT c.id AS value_id, c.title AS value FROM #__categories AS c WHERE c.id<>0 AND c.id IN ('.implode(",",$post).')';
+				
+			} else if ($field->field_type=='tags') {
+				$query 	= ' SELECT t.id AS value_id, t.name AS value FROM #__flexicontent_tags AS t WHERE t.id<>0 AND t.id IN ('.implode(",",$post).')';
+				
+			} else if ($field->field_type=='createdby' || $field->field_type=='modifiedby') {
+				$textcol = 'u.name';
+				$query 	= ' SELECT u.id AS value_id, '.$textcol.' AS value FROM #__users AS u WHERE u.id<>0 AND u.id = '.(int)$post[0];
+				
+			} else if ($field->field_type=='created' || $field->field_type=='modified') {
+				if ($nullDate===null) $nullDate	= $db->getNullDate();
+				
+				$date_filter_group = $field->parameters->get( $for_advsearch ? 'date_filter_group_s' : 'date_filter_group', 'month');
+				if ($date_filter_group=='year') { $date_valformat='%Y'; }
+				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; }
+				else { $date_valformat='%Y-%m-%d'; }
+				$valuecol = sprintf(' DATE_FORMAT(i.%s, "%s") ', $field->field_type, $date_valformat);
+				
+				$query 	= 'SELECT '.$valuecol.' AS value_id'
+					.' FROM #__content AS i'
+					.' WHERE i.'.$field->name.'<>'.$db->Quote($nullDate).' AND i.id='.$field->item_id;
+				$db->setQuery($query);
+				$value = $db->loadResult();
+				$values = !$value ? false : array( $value => $value) ;
+				unset($query);
+				
+			} else {
+				$values = $post;  // Other fields will be entered as is into the index !!
+			}
+			
+			if (!empty($query)) {
+				$db->setQuery($query);
+				$values = $db->loadAssocList('value_id', 'value');
+			}
+		} else {
+			$values = null;
+		}
+		return $values;
 	}
 }

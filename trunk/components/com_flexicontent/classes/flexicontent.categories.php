@@ -260,17 +260,10 @@ class flexicontent_cats
 		if (is_array($cid)) $cid = $cid[0];
 		
 		// Privilege of (a) viewing all categories (even if disabled) and (b) viewing as a tree
-		if (FLEXI_J16GE) {
-			require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
-			$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
-			$viewtree			= FlexicontentHelperPerm::getPerm()->ViewTree;
-		} else if (FLEXI_ACCESS) {
-			$viewallcats 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1;
-			$viewtree 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'cattree', 'users', $user->gmid) : 1;
-		} else {
-			$viewallcats = 1;
-			$viewtree    = 1;
-		}
+		require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
+		$viewallcats	= FlexicontentHelperPerm::getPerm()->ViewAllCats;
+		$viewtree			= FlexicontentHelperPerm::getPerm()->ViewTree;
+		
 		// Global parameter to force always displaying of categories as tree
 		if (JComponentHelper::getParams('com_flexicontent')->get('cats_always_astree', 1)) {
 			$viewtree = 1;
@@ -341,53 +334,6 @@ class flexicontent_cats
 		$idtag = preg_replace('/(\]|\[)+/', $replace_char, $name);
 		$idtag = preg_replace('/_$/', '', $idtag);
 		return JHTML::_('select.genericlist', $catlist, $name, $class, 'value', 'text', $selected, $idtag );
-	}
-	
-	
-	/**
-	 * Retrieves all available values of the given field,
-	 * that are used by any item visible via current category filtering (search box, alpha-index, filters, language, etc)
-	 *
-	 *
-	 * @param string $filter			the field object used as filter
-	 * @param string $force				controls whether to force only available values, ('all', 'limit', any other value uses the category configuration)
-	 * @return array							the available values
-	 */
-	function getFilterValues (&$filter, $force='default') {
-		
-		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
-		global $currcat_data;
-		$db =& JFactory::getDBO();
-		
-		if ($force=='all') $limit_filter_values=0;
-		else if ($force=='limit') $limit_filter_values=1;
-		else $limit_filter_values = $currcat_data['params']->get('limit_filter_values', 0);
-		
-		$limit_filter_values = $limit_filter_values && isset($currcat_data['where']);
-		
-		$query = 'SELECT DISTINCT fi.value as value, fi.value as text'
-		. ' FROM #__content AS i'
-		. ' LEFT JOIN #__flexicontent_fields_item_relations AS fi ON i.id = fi.item_id'
-		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-		. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
-		. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-		. ($limit_filter_values ? $currcat_data['where'] : ' WHERE 1=1 ')
-		. ' AND fi.field_id ='.$filter->id;
-		;
-		
-		//echo $query;
-		// Make sure there aren't any errors
-		$db->setQuery($query);
-		$results = $db->loadObjectList('value');
-		if ($db->getErrorNum()) {
-			JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br /><br />" .$query);
-			$filter->html	 = "Filter for : $field->label cannot be displayed, error during db query<br />";
-			return array();
-		}
-		
-		return $results;
 	}
 	
 	

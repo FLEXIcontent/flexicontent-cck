@@ -462,7 +462,7 @@ window.addEvent('domready', function() {
 				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 				<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<?php if (isset($this->lists['filter_stategrp'])) : ?>
-					<span class="radio flexi_tabbox" style="margin-left:60px;"><?php echo '<span class="flexi_tabbox_label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_stategrp']; ?></span>
+					<span class="radio flexi_tabbox" style="margin-left:16px;"><?php echo $this->lists['filter_stategrp']; ?></span>
 				<?php endif; ?>
 
 				<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
@@ -499,9 +499,9 @@ window.addEvent('domready', function() {
 		</tr>
 	</tfoot>
 
-	<tbody id="sortable_fcitems">
+	<tbody id="<?php echo $ordering_draggable && $this->CanOrder && $this->ordering ? 'sortable_fcitems' : ''; ?>">
 		<?php
-		$k 			= 0;
+		$k = 0;
 		if (FLEXI_J16GE)
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE') ? "d/m/y H:i" : $date_format;
 		else

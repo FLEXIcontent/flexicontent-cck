@@ -167,25 +167,25 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	{
 		return $this->_total;
 	}
-
+	
+	
 	/**
 	 * Method to get a pagination object of the weblink items for the category
 	 *
 	 * @access public
 	 * @return integer
 	 */
-	function getPagination()
-	{
-		// Lets load the content if it doesn't already exist
-		if (empty($this->_pagination))
-		{
-			jimport('joomla.html.pagination');
-			$this->_pagination = new JPagination( $this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+	public function getPagination() {
+		// Load the content if it doesn't already exist
+		if (empty($this->_pagination)) {
+			//jimport('joomla.html.pagination');
+			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
+			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
 		}
-
 		return $this->_pagination;
 	}
-
+	
+	
 	/**
 	 * Method to get the search areas
 	 *

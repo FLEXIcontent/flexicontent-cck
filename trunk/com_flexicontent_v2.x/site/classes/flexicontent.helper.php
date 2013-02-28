@@ -26,9 +26,43 @@ class flexicontent_html
 	function escape($str) {
 		return addslashes(htmlspecialchars($str, ENT_COMPAT, 'UTF-8'));
 	}
-
+	
+	function get_basedomain($url)
+	{
+		$pieces = parse_url($url);
+		$domain = isset($pieces['host']) ? $pieces['host'] : '';   echo " ";
+		if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs)) {
+			return $regs['domain'];
+		}
+		return false;
+	}
+	
+	function is_safe_url($url, $baseonly=true)
+	{
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$allowed_redirecturls = $cparams->get('allowed_redirecturls', 'internal_base');
+		
+		// prefix the URL if needed so that parse_url will work
+		$has_prefix = preg_match("#^http|^https|^ftp#i", $url);
+		$url = (!$has_prefix ? "http://" : "") . $url;
+		
+		// Require full internal url
+		if ( $allowed_redirecturls == 'internal_full' )
+			return parse_url($url, PHP_URL_HOST) == parse_url(JURI::base(), PHP_URL_HOST);
+		
+		// Require baseonly internal url
+		else //if ( $allowed_redirecturls == 'internal_base' )
+			return flexicontent_html::get_basedomain($url) == flexicontent_html::get_basedomain(JURI::base());
+		
+		// Allow any URL, (external too) this may be considered a vulnerability for unlogged/logged users, since
+		// users may be redirected to an offsite URL despite clicking an internal site URL received e.g. by an email
+		//else 
+		//	return true;
+	}
+	
+	
 	/**
-	 * Function to reand the item view of a given item id
+	 * Function to render the item view of a given item id
 	 *
 	 * @param 	int 		$item_id
 	 * @return 	string  : the HTML of the item view, also the CSS / JS file would have been loaded
@@ -38,7 +72,7 @@ class flexicontent_html
 		require_once (JPATH_ADMINISTRATOR.DS.'components/com_flexicontent/defineconstants.php');
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once("components/com_flexicontent/classes/flexicontent.fields.php");
-		require_once("components/com_flexicontent/classes/flexicontent.helper.php");
+		//require_once("components/com_flexicontent/classes/flexicontent.helper.php");
 		require_once("components/com_flexicontent/models/".FLEXI_ITEMVIEW.".php");
 		 
 		$mainframe = & JFactory::getApplication();
@@ -116,7 +150,7 @@ class flexicontent_html
 		return JHTML::_('select.genericlist', $limiting, 'limit', $attribs, 'value', 'text', $limit );
 	}
 	
-	function ordery_selector(&$params, $formname='adminForm', $autosubmit=1)
+	function ordery_selector(&$params, $formname='adminForm', $autosubmit=1, $extra_order_types=array())
 	{
 		if ( !$params->get('orderby_override') ) return '';
 		
@@ -136,6 +170,11 @@ class flexicontent_html
 		'author'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL','rauthor'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE',
 		'hits'=>'FLEXI_ORDER_MOST_HITS','rhits'=>'FLEXI_ORDER_LEAST_HITS','order'=>'FLEXI_ORDER_CONFIGURED_ORDER');
 		
+		$ordering = array();
+		foreach ($extra_order_types as $value => $text) {
+			$text = JText::_( $text );
+			$ordering[] = JHTML::_('select.option',  $value,  $text);
+		}
 		foreach ($orderby_options as $orderby_option) {
 			if ($orderby_option=='__SAVED__') continue;
 			$value = ($orderby_option!='_preconfigured_') ? $orderby_option : '';
@@ -810,10 +849,15 @@ class flexicontent_html
 			$add_label = JText::_('FLEXI_ADD_NEW_CONTENT_TO_CURR_CAT');
 			$permission = FlexicontentHelperPerm::getPerm();
 			$canAdd = $permission->CanAdd;
-		} else {
+		} else  {
 			$add_label = JText::_('FLEXI_ADD_NEW_CONTENT_TO_LIST');
-			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, $specific_catids=array($maincat->id) );
-			$canAdd = count($allowedcats);
+			$specific_catids = $maincat->id ? array( $maincat->id ) : $maincat->ids;
+			if ( !empty($specific_catids ) ) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, $specific_catids );
+				$canAdd = count($allowedcats);
+			} else {
+				$canAdd = FlexicontentHelperPerm::getPerm()->CanAdd;
+			}
 		}
 		if ( !$canAdd) return '';
 		
@@ -826,7 +870,7 @@ class flexicontent_html
 		$overlib = $add_label;
 		$text = JText::_( 'FLEXI_ADD' );
 
-		$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&task=add&maincat='.$maincat->id;
+		$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&task=add'.($maincat->id ? '&maincat='.$maincat->id : '');
 		$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.JText::_( 'FLEXI_ADD_NEW_CONTENT' ).'</a>';
 
 		return $output;
@@ -2431,16 +2475,21 @@ class flexicontent_tmpl
 
 	function getTemplates($lang_files = 'all')
 	{
-		if ( !FLEXI_J30GE && FLEXI_CACHE)
-		{
+		$flexiparams = JComponentHelper::getParams('com_flexicontent');
+		$print_logging_info = $flexiparams->get('print_logging_info');
+		
+		// Log content plugin and other performance information
+		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
+		
+		if ( !FLEXI_J30GE && FLEXI_CACHE) {
 			// add the templates to templates cache
 			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
 			$tmplcache->setCaching(1); 		//force cache
 			$tmplcache->setLifeTime(84600); //set expiry to one day
 			$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates'));
+			$cached = 1;
 		}
-		else 
-		{
+		else {
 			$tmpls = flexicontent_tmpl::parseTemplates();
 		}
 		
@@ -2450,6 +2499,8 @@ class flexicontent_tmpl
 			else if ( is_array($lang_files) )  foreach ($lang_files as $tmpl) FLEXIUtilities::loadTemplateLanguageFile( $tmpl );
 			else if ( is_string($lang_files) && $load_lang ) FLEXIUtilities::loadTemplateLanguageFile( $lang_files );
 		}
+		
+		if ($print_logging_info) $fc_run_times[$cached ? 'templates_parsing_cached' : 'templates_parsing_noncached'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		return $tmpls;
 	}
 
@@ -2925,7 +2976,7 @@ class FLEXIUtilities
 			if(file_exists($path)) require_once($path);
 			else {
 				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br("Cannot load FC Field: $fieldtype\n Please correct field name"),'error');
+				$jAp->enqueueMessage(nl2br("While calling field method: $func(): cann find field type: $fieldtype. This is internal error or wrong field name"),'error');
 				return;
 			}
 			
@@ -2948,6 +2999,7 @@ class FLEXIUtilities
 		}
 		
 		// 3. Execute only if it exists
+		if (!$func) return;
 		$class = "plgFlexicontent_fields{$fieldtype}";
 		if(in_array($func, get_class_methods($class))) {
 			return call_user_func_array(array($fc_plgs[$fieldtype], $func), $args);
@@ -2967,7 +3019,7 @@ class FLEXIUtilities
 			if(file_exists($path)) require_once($path);
 			else {
 				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $plgname\n Please correct field name"),'error');
+				$jAp->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $plgname\n Plugin may have been uninistalled"),'error');
 				return;
 			}
 			
@@ -3353,7 +3405,7 @@ class flexicontent_db
 	 * @access private
 	 * @return string
 	 */
-	function buildItemOrderBy(&$params=null, $order='',  $config_param='orderby', $request_var='orderby', $i_as='i', $rel_as='rel', $default_order, $default_order_dir='')
+	function buildItemOrderBy(&$params=null, $order='',  $config_param='orderby', $request_var='orderby', $i_as='i', $rel_as='rel', $default_order='', $default_order_dir='')
 	{
 		// Use global params ordering if parameters were not given
 		if (!$params) $params = JComponentHelper::getParams( 'com_flexicontent' );

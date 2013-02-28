@@ -195,10 +195,9 @@ class FlexicontentModelItems extends JModelLegacy
 			$methodnames[$fieldname] = empty($methodname) ? 'display' : $methodname;
 		}
 		
-		$field_name = 'tstimga';
 		$query = ' SELECT fi.*'
 		   .' FROM #__flexicontent_fields AS fi'
-		   .' WHERE fi.name IN '. '("' . implode('","',array_keys($methodnames)) . '")'
+		   .' WHERE fi.name IN ("' . implode('","',array_keys($methodnames)) . '")'
 		   .' ORDER BY FIELD(fi.name, "'. implode('","',array_keys($methodnames)) . '" )';
 		$this->_db->setQuery($query);
 		$extra_fields = $this->_db->loadObjectList();
@@ -698,7 +697,7 @@ class FlexicontentModelItems extends JModelLegacy
 
 		if ( $filter_type ) {
 			$where[] = 'ie.type_id = ' . $filter_type;
-			}
+		}
 
 		if ( $filter_cats ) {
 			if ( $filter_subcats ) {
@@ -1345,7 +1344,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		if ( !$filter_order_type )
 		{
-			$where = 'catid = '. $row->catid .' AND '. $state_where .(FLEXI_J16GE ? ' AND language ='. $this->_db->Quote($row->language) : '');
+			$where = 'catid = '. $row->catid .' AND '. $state_where .((FLEXI_FISH || FLEXI_J16GE) ? ' AND language ='. $this->_db->Quote($row->language) : '');
 			
 			if ( !$row->move($direction, $where) ) {
 				$this->setError($this->_db->getErrorMsg());
@@ -1380,7 +1379,7 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 			
 			// Find the NEXT or PREVIOUS item in category to use it for swapping the ordering numbers
-			$sql = 'SELECT rel.itemid, rel.ordering, i.state, ie.language'
+			$sql = 'SELECT rel.itemid, rel.ordering, i.state' . ((FLEXI_FISH || FLEXI_J16GE) ? ' , ie.language' : '')
 					. ' FROM #__flexicontent_cats_item_relations AS rel'
 					. ((FLEXI_FISH || FLEXI_J16GE) ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id' : '')
 					. ' JOIN #__content AS i ON i.id=rel.itemid'
@@ -1546,7 +1545,7 @@ class FlexicontentModelItems extends JModelLegacy
 			$ord_count = array();
 			for( $i=0; $i < count($cid); $i++ )
 			{
-				$query 	= 'SELECT rel.itemid, rel.ordering, i.state, ie.language'
+				$query 	= 'SELECT rel.itemid, rel.ordering, i.state' . ((FLEXI_FISH || FLEXI_J16GE) ? ' , ie.language' : '')
 						. ' FROM #__flexicontent_cats_item_relations AS rel'
 						. ((FLEXI_FISH || FLEXI_J16GE) ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid=ie.item_id' : '')
 						. ' JOIN #__content AS i ON i.id=rel.itemid'
@@ -2196,6 +2195,8 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @since 1.5
 	 */
 	function getFieldsItems($fields) {
+		if ( !count($fields) ) return array();
+		
 		// Get field data, so that we can identify the fields and take special action for each of them
 		$field_list = "'".implode("','", $fields)."'";
 		$query = "SELECT * FROM #__flexicontent_fields WHERE id IN ({$field_list})";
@@ -2241,8 +2242,11 @@ class FlexicontentModelItems extends JModelLegacy
 			$non_core_fields_list = "'".implode("','", $non_core_fields)."'";
 			$query = "SELECT DISTINCT firel.item_id FROM #__flexicontent_fields_item_relations as firel"
 				." JOIN #__content as a ON firel.item_id=a.id "
-				." WHERE firel.field_id IN ({$non_core_fields_list}) AND a.state IN (1, -5)" // ." AND ie.type_id='{$typeid}' "
+				." WHERE firel.field_id IN ({$non_core_fields_list}) "
 				." AND firel.value<>'' "
+				// NOTE: Must include all items regardless of state to avoid problems when
+				// (a) item changes state and (b) to allow priveleged users to search any item
+				//."  AND a.state IN (1, -5)"
 			;
 			//echo $query;
 			$this->_db->setQuery($query);
@@ -2252,7 +2256,8 @@ class FlexicontentModelItems extends JModelLegacy
 		$item_list = array_merge($items_with_tags,$items_with_noncore);
 		//echo count($item_list);
 		
-		// array_unique() creates gaps in the index of the array, and if passed to json_encode it will output object !!! so we use array_values()
+		// NOTE: array_unique() creates gaps in the index of the array,
+		// and if passed to json_encode it will output object !!! so we use array_values()
 		return array_values(array_unique($item_list));
 	}	
 	

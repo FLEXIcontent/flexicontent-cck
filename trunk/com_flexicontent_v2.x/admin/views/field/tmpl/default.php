@@ -87,20 +87,30 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						</td>
 					</tr>
 					
-					<tr<?php echo (!$this->supportsearch && !$this->supportfilter)?' style="display:none;"':'';?>>
+					<?php if ($this->supportsearch || $this->supportfilter) : ?>
+					<tr>
 						<td colspan="2" class="key tbl_group" >
 							<?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?>
 						</td>
 					</tr>
-					<tr<?php echo !$this->supportsearch?' style="display:none;"':'';?>>
+					<?php endif; ?>
+					
+					<?php if ($this->supportsearch) : ?>
+					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('issearch').':'; ?>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('issearch'); ?>
+							<?php echo
+								in_array($this->form->getValue('issearch'),array(-1,2)) ?
+									JText::_($this->form->getValue('issearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_BASIC_INDEX_PROPERTY_DIRTY') :
+									$this->form->getInput('issearch'); ?>
 						</td>
 					</tr>
-					<tr<?php echo !$this->supportfilter?' style="display:none;"':'';?>>
+					<?php endif; ?>
+					
+					<?php if ($this->supportfilter) : ?>
+					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('isfilter').':'; ?>
 						</td>
@@ -108,21 +118,45 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('isfilter'); ?>
 						</td>
 					</tr>
+					<?php endif; ?>
 					
-					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
+
+					<?php if ($this->supportadvsearch || $this->supportadvfilter) : ?>
+					<tr>
 						<td colspan="2" class="key tbl_group" >
 							<?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW' ); ?>
 						</td>
 					</tr>
-					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
+					<?php endif; ?>
+					
+					<?php if ($this->supportadvsearch) : ?>
+					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('isadvsearch').':'; ?>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('isadvsearch'); ?>
+							<?php echo
+								in_array($this->form->getValue('isadvsearch'),array(-1,2)) ?
+									JText::_($this->form->getValue('isadvsearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
+									$this->form->getInput('isadvsearch'); ?>
 						</td>
 					</tr>
-
+					<?php endif; ?>
+					
+					<?php if ($this->supportadvfilter) : ?>
+					<tr>
+						<td class="key">
+							<?php echo $this->form->getLabel('isadvfilter').':'; ?>
+						</td>
+						<td>
+							<?php echo
+								in_array($this->form->getValue('isadvfilter'),array(-1,2)) ?
+									JText::_($this->form->getValue('isadvfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
+									$this->form->getInput('isadvfilter'); ?>
+						</td>
+					</tr>
+					<?php endif; ?>
+					
 					<tr>
 						<td colspan="2" class="key tbl_group" >
 							<?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?>
@@ -186,6 +220,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getInput('description'); ?>
 						</td>
 					</tr>
+					
 				</table>
 			</fieldset>
 			

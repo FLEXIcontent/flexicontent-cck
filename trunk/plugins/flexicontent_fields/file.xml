@@ -12,81 +12,88 @@
 	<files>
 		<filename plugin="file">file.php</filename>
 	</files>
-	<params group="standard">
-		<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-	</params>
-	<params group="group-file" addpath="/administrator/components/com_flexicontent/elements">
-		
-		<param name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level2" menu="hide" />
-		<param name="size" type="text" default="50" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
-		<param name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		
-		<param name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" menu="hide" />
-		<param name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
-		<param name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-		<param name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
-			<option value="0">FLEXI_SPACE</option>
-			<option value="1">FLEXI_LINE_BREAK</option>
-			<option value="2">FLEXI_PIPE</option>
-			<option value="3">FLEXI_COMMA</option>
-			<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
-		</param>
-		<param name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-		<param name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-		
-		<param name="" type="separator" default="FLEXI_DISPLAY_PARAMS_LABEL" level="level2" menu="hide" />
-		<param name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC">
-			<option value="1">FLEXI_YES</option>
-			<option value="0">FLEXI_NO</option>
-		</param>
-		<param name="usebutton" type="radio" default="0" label="FLEXI_FIELD_DOWNLOAD_BUTTON" description="FLEXI_FIELD_DOWNLOAD_BUTTON_DESC">
-			<option value="1">FLEXI_YES</option>
-			<option value="0">FLEXI_NO</option>
-		</param>
-		<param name="display_filename" type="radio" default="0" label="FLEXI_FIELD_FILE_SHOW_FILENAME" description="FLEXI_FIELD_FILE_SHOW_FILENAME_DESC">
-			<option value="1">FLEXI_YES</option>
-			<option value="0">FLEXI_NO</option>
-		</param>
-		<param name="display_descr" type="list" default="1" label="FLEXI_FIELD_FILE_SHOW_DESCR" description="FLEXI_FIELD_FILE_SHOW_DESCR_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES_AS_TIP</option>
-			<option value="2">FLEXI_YES_AS_INLINE</option>
-		</param>
+		<params group="standard">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+		</params>
+		<params group="group-file" addpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level2" menu="hide" />
+			<field name="size" type="text" default="50" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="autoselect" type="radio" default="1" label="FLEXI_UPLOADED_FILE_AUTO_SELECT" description="FLEXI_UPLOADED_FILE_AUTO_SELECT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" menu="hide" />
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+			</field>
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMS_LABEL" level="level2" menu="hide" />
+			<field name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			<field name="usebutton" type="radio" default="0" label="FLEXI_FIELD_DOWNLOAD_BUTTON" description="FLEXI_FIELD_DOWNLOAD_BUTTON_DESC">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			<field name="display_filename" type="radio" default="0" label="FLEXI_FIELD_FILE_SHOW_FILENAME" description="FLEXI_FIELD_FILE_SHOW_FILENAME_DESC">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			<field name="display_descr" type="list" default="1" label="FLEXI_FIELD_FILE_SHOW_DESCR" description="FLEXI_FIELD_FILE_SHOW_DESCR_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES_AS_TIP</option>
+				<option value="2">FLEXI_YES_AS_INLINE</option>
+			</field>
 
-		<param name="" type="separator" default="FLEXI_DISPLAY_INACCESSIBLE_FILES_PARAMS_LABEL" level="level2" menu="hide" />
-		<param name="noaccess_display" type="radio" default="1" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-			<option value="2">FLEXI_FILE_YES_NO_DESCRIPTION</option>
-		</param>
-		<param name="noaccess_addvars" type="radio" default="0" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS_DESC">
-			<option value="0">FLEXI_NO</option>
-			<option value="1">FLEXI_YES</option>
-		</param>
+			<field name="" type="separator" default="FLEXI_DISPLAY_INACCESSIBLE_FILES_PARAMS_LABEL" level="level2" menu="hide" />
+			<field name="noaccess_display" type="radio" default="1" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_FILE_YES_NO_DESCRIPTION</option>
+			</field>
+			<field name="noaccess_addvars" type="radio" default="0" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_ADD_VARS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 
-		<param name="" type="separator" default="FLEXI_FILE_UNLOGGED_USERS" level="level3" menu="hide" />
-		<param name="noaccess_url_unlogged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_UNLOGGED_DESC" />
-		<param name="noaccess_msg_unlogged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_UNLOGGED_DESC" />
+			<field name="" type="separator" default="FLEXI_FILE_UNLOGGED_USERS" level="level3" menu="hide" />
+			<field name="noaccess_url_unlogged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_UNLOGGED_DESC" />
+			<field name="noaccess_msg_unlogged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_UNLOGGED_DESC" />
 		
-		<param name="" type="separator" default="FLEXI_FILE_LOGGED_USERS" level="level3" menu="hide" />
-		<param name="noaccess_url_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_LOGGED_DESC" />
-		<param name="noaccess_msg_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_LOGGED_DESC" />
+			<field name="" type="separator" default="FLEXI_FILE_LOGGED_USERS" level="level3" menu="hide" />
+			<field name="noaccess_url_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_LOGGED_DESC" />
+			<field name="noaccess_msg_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_LOGGED_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
+			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+			</field>
 		
-	</params>
+		</params>
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_file.ini</language>
 	</languages>

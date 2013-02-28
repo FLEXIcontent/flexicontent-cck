@@ -182,16 +182,13 @@
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
 				<option value="1">FLEXI_FORCE_SHOW_ALL</option>
 				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
-			</param>
+			</param-->
 			
-			<param name="limit_filter_values" type="list" default="" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC">
+			<!--param name="limit_filtervalues" type="list" default="" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_ALL_FIELD_VALUES</option>
-				<option value="1">FLEXI_CURRCAT_FIELD_VALUES</option>
-				<option value="2">FLEXI_CURRFILTER_FIELD_VALUES</option>
-			</param>
-			<param name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" /-->
-			<!--field name="filter_chains" type="text" size="10" default="0" label="FLEXI_CHAINED_FILTERS" description="FLEXI_CHAINED_FILTERS_DESC" /-->
+				<option value="1">FLEXI_CURRFILTER_FIELD_VALUES</option>
+			</param-->
+			<!--param name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" /-->
 			
 		</params>
 

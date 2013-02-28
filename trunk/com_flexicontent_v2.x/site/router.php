@@ -264,9 +264,22 @@ function FLEXIcontentParseRoute($segments)
 	
 	// 6. *** OTHER explicit view, when Segments Length GREATER that 2 ***
 	if($count > 2) { // COMPATIBILITY with old code of router.php
-		$vars['view'] 	= $segments[0];
-		// $segments[1] is id with new code, with old bookmaked SEF URLs is ??? ...
-		$vars['id'] 	= $segments[2];
+		$flexi_view_paths = glob( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'[a-zA-Z_0-9]*', GLOB_ONLYDIR);
+		foreach ($flexi_view_paths as $flexi_view_path) {
+			$flexi_view = basename($flexi_view_path);
+			if ($flexi_view == '.' || $flexi_view == '..') continue;
+			$flexi_views[$flexi_view] = 1;
+		}
+		
+		$explicit_view = $segments[0];
+		if ( !isset( $flexi_views[$explicit_view]) ) {
+			$msg = "The request content or the requested view '$explicit_view' was not found";
+			JError::raiseError(404, $msg);  // Cannot throw exception here since it will not be caught
+		}
+		
+		$vars['view'] = $segments[0];
+		// Compatibility with old bookmaked SEF URLs ??? ...
+		$vars['id']   = $segments[2];
 		return $vars;
 	}
 }

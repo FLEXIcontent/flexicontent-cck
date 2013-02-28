@@ -19,6 +19,8 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 {
+	static $field_types = array('fcloadmodule');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -39,7 +41,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'fcloadmodule') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
@@ -80,7 +82,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'fcloadmodule') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		global $addthis;
 		$mainframe =& JFactory::getApplication();
@@ -160,7 +162,7 @@ echo '</xmp>';
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'fcloadmodule') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 		
 		// Make sure posted data is an array 

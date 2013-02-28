@@ -24,6 +24,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	 * @var array
 	 */
 	protected $_attribs = array();
+	static $field_types = array('linkslist');
 
 	// ***********
 	// CONSTRUCTOR
@@ -45,7 +46,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'linkslist') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 
@@ -114,7 +115,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'linkslist') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 
 		$values = $values ? $values : $field->value;
 
@@ -159,7 +160,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'linkslist') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 		
 		// create the fulltext search index
@@ -214,9 +215,9 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	// *********************************
 	
 	// Method to display a search filter for the advanced search view
-	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	/*function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if($filter->field_type != 'linkslist') return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 		
 		$size = (int)$filter->parameters->get( 'size', 30 );
 		$filter->html	='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="'.$size.'" value="'.$value.'" />';
@@ -227,12 +228,12 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		// execute the code only if the field type match the plugin type
-		if($filter->field_type != 'linkslist') return;
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
 
 		// some parameter shortcuts
 		$field_elements		= $filter->parameters->get( 'field_elements' ) ;
 						
-		$listelements = preg_split("/[\s]*%%[\s]*/", $field_elements);
+		$listelements = preg_split("#[\s]*%%[\s]*#", $field_elements);
 		if (empty($listelements[count($listelements)-1])) {
 				unset($listelements[count($listelements)-1]);
 		}
@@ -249,7 +250,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 			}			
 			
 		$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
-	}
+	}*/
 	
 	
 	

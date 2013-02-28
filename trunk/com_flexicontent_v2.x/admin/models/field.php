@@ -188,6 +188,7 @@ class FlexicontentModelField extends JModelAdmin
 			$field->label					= null;
 			$field->description		= '';
 			$field->isfilter			= 0;
+			$field->isadvfilter   = 0;
 			$field->iscore				= 0;
 			$field->issearch			= 1;
 			$field->isadvsearch		= 0;
@@ -287,6 +288,30 @@ class FlexicontentModelField extends JModelAdmin
 		// NOTE: 'data' is post['jform'] for J2.5 (this is done by the controller or other caller)
 		$field  	=& $this->getTable('flexicontent_fields', '');
 		$types		= $data['tid'];
+		
+		// Support for 'dirty' field properties
+		if ($data['id']) {
+			$field->load($data['id']);
+			
+			if ($field->issearch==-1 || $field->issearch==2) unset($data['issearch']);  // Already dirty
+			else if ($data['issearch']==0 && $field->issearch==1) $data['issearch']=-1; // Becomes dirty OFF
+			else if ($data['issearch']==1 && $field->issearch==0) $data['issearch']=2;  // Becomes dirty ON
+			
+			if ($field->isadvsearch==-1 || $field->isadvsearch==2) unset($data['isadvsearch']);  // Already dirty
+			else if ($data['isadvsearch']==0 && $field->isadvsearch==1) $data['isadvsearch']=-1; // Becomes dirty OFF
+			else if ($data['isadvsearch']==1 && $field->isadvsearch==0) $data['isadvsearch']=2;  // Becomes dirty ON
+			
+			if ($field->isadvfilter==-1 || $field->isadvfilter==2) unset($data['isadvfilter']);  // Already dirty
+			else if ($data['isadvfilter']==0 && $field->isadvfilter==1) $data['isadvfilter']=-1; // Becomes dirty OFF
+			else if ($data['isadvfilter']==1 && $field->isadvfilter==0) $data['isadvfilter']=2;  // Becomes dirty ON
+			
+			// FORCE dirty OFF, if field is being unpublished -and- is not already normal OFF
+			if ($data['published']==0 && $field->published==1) {
+				if ($field->issearch!=0) $data['issearch'] = -1;
+				if ($field->isadvsearch!=0) $data['isadvsearch'] = -1;
+				if ($field->isadvfilter!=0) $data['isadvfilter'] = -1;
+			}
+		}
 		
 		// bind it to the table
 		if (!$field->bind($data)) {

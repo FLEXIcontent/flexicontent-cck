@@ -24,7 +24,7 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
  */
 class FLEXIadvsearchHelper
 {
-	function santiseSearchWord(&$searchword, $searchphrase, $min=3)
+	function santiseSearchWord(&$searchword, $searchphrase, $min=2)
 	{
 		$ignored = false;
 
@@ -61,7 +61,7 @@ class FLEXIadvsearchHelper
 		return $ignored;
 	}
 
-	function limitSearchWord(&$searchword, $min=3, $max=20)
+	function limitSearchWord(&$searchword, $min=2, $max=20)
 	{
 		$restriction = false;
 

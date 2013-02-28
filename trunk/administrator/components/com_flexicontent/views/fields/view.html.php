@@ -45,6 +45,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$user     = JFactory::getUser();
 		$option   = JRequest::getVar('option');
 		
+		flexicontent_html::loadJQuery();
 		JHTML::_('behavior.tooltip');
 		
 		//get vars
@@ -74,6 +75,7 @@ class FlexicontentViewFields extends JViewLegacy
 		
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/flexi-lib.js' );
 
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
@@ -117,7 +119,13 @@ class FlexicontentViewFields extends JViewLegacy
 		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isadvsearch';";
 		flexicontent_html::addToolBarButton(
-			'FLEXI_TOGGLE_ADVINDEXABLE', 'refresh', $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
+			'FLEXI_TOGGLE_ADV_TEXT_SEARCHABLE', 'refresh', $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
+		
+		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
+		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isadvfilter';";
+		flexicontent_html::addToolBarButton(
+			'FLEXI_TOGGLE_ADV_FILTERABLE', 'refresh', $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
 		
 		if ($perms->CanConfig) {

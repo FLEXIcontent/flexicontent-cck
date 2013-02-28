@@ -24,10 +24,17 @@ if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
 	ini_set('display_errors',1);
 }
 
+global $is_fc_component;
+$is_fc_component = 1;
+
 // Logging Info variables
-$start_microtime = microtime(true);
 global $fc_run_times;
-$fc_run_times['content_plg'] = 0; $fc_run_times['field_value_retrieval'] = 0; $fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
+$fc_run_times['content_plg'] = 0; $fc_run_times['filter_creation'] = 0; $fc_run_times['field_value_retrieval'] = 0;
+$fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
+
+global $fc_jprof;
+$fc_jprof = new JProfiler();
+$fc_jprof->mark('START: FLEXIcontent component');
 
 // load english language file for 'com_flexicontent' component then override with current language file
 JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
@@ -65,6 +72,7 @@ if ( FLEXI_J16GE && JRequest::getVar('format') == 'pdf' )
 // Require the base controller
 require_once (JPATH_COMPONENT.DS.'controller.php');
 
+$view = JRequest::getCmd('view');
 $task = JRequest::getCmd('task');
 $tasks = explode(".", $task);
 if(count($tasks)>=2) {
@@ -112,24 +120,44 @@ if ( $cparams->get('default_menuitem_nopathway',1) ) {
 }
 
 if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='component' && JRequest::getWord('format')!='raw') {
-	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+	$fc_jprof->mark('END: FLEXIcontent component');
+	$fields_render_total=0;
+	$fields_render_times = FlexicontentFields::getFieldRenderTimes($fields_render_total);
+	
 	$app = & JFactory::getApplication();
-	$fc_field_render_display_microtime_total = 0;
-	$fld_times = "";
-	/*foreach ($fc_run_times['render_field'] as $field_type => $fc_field_render_display_microtime_fld) {
-		$fc_field_render_display_microtime_total += $fc_field_render_display_microtime_fld;
-		$fld_times .= "<br/> - ".$field_type."=". sprintf("%.3f s",$fc_field_render_display_microtime_fld/1000000);
-		if ( isset($fc_run_times['render_subfields'][$field_type]) )
-			$fld_times .= " subfields (retrieval+render)= ". sprintf("%.3f s",$fc_run_times['render_subfields'][$field_type]/1000000);
-	}*/
-	$msg = sprintf(
-		'FC execution is %.2f s including:<br/> [Fields Value Retrieval: %.2f s] + [Fields Rendering: %.2f s] + [content plgs: %.2f s] ',
-		$elapsed_microseconds/1000000,
-		$fc_run_times['field_value_retrieval']/1000000,
-		$fc_field_render_display_microtime_total/1000000,
-		$fc_run_times['content_plg']/1000000
-	);
-	$app->enqueueMessage( $msg.$fld_times, 'notice' );
+	$msg  = implode('<br/>', $fc_jprof->getbuffer());
+	
+	$msg .= '<code>';
+	
+	if (isset($fc_run_times['templates_parsing_cached']))
+		$msg .= sprintf('<br/>-- [FC Templates Parsing (cached): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
+	
+	if (isset($fc_run_times['templates_parsing_noncached']))
+		$msg .= sprintf('<br/>-- [FC Templates Parsing (not cached) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
+	
+	if (isset($fc_run_times['filter_creation']))
+		$msg .= sprintf('<br/>-- [FC Filter Creation: %.2f s] ', $fc_run_times['filter_creation']/1000000);
+	
+	if (isset($fc_run_times['search_query_runtime']))
+		$msg .= sprintf('<br/>-- [FC Advanced Search Plugin, Query: %.2f s] ', $fc_run_times['search_query_runtime']/1000000);
+	
+	if (isset($fc_run_times['template_render']))
+		$msg .= sprintf('<br/>-- [FC "%s" view Template Rendering: %.2f s] ', $view, $fc_run_times['template_render']/1000000);
+	
+	if (count($fields_render_times))
+		$msg .= sprintf('<br/>-- [FC Fields Value Retrieval: %.2f s] ', $fc_run_times['field_value_retrieval']/1000000);
+	
+	if (isset($fc_run_times['content_plg']))
+		$msg .= sprintf('<br/>-- [Joomla Content Plugins: %.2f s] ', $fc_run_times['content_plg']/1000000);
+	
+	if (count($fields_render_times)) {
+		$msg .= sprintf('<br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
+		$msg .= '<br/>FIELD: '.implode('<br/> FIELD: ', $fields_render_times).'';
+	}
+	$msg .= '</code>';
+	
+	$app->enqueueMessage( $msg, 'notice' );
 }
+unset ($is_fc_component);
 
 ?>

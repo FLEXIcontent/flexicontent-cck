@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		$Id: users.php 1192 2012-03-14 09:00:59Z emmanuel.danan@gmail.com $
+ * @version		$Id: users.php 1619 2013-01-09 02:50:25Z ggppdk $
  * @package		Joomla
  * @subpackage	Users
  * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.

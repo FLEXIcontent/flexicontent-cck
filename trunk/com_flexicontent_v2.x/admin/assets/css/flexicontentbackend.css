@@ -878,6 +878,7 @@ div#cpanel div.icon  a {
 
 .fc_drag_handle.fc_drag_handle_disabled {
 	background: url(../images/move3.png) 0% 0% no-repeat transparent !important;
+	cursor: auto;
 }
 .fc_drag_handle.fc_drag_handle_both {
 	background: url(../images/move2.png) 0% 0% no-repeat transparent !important;
@@ -900,6 +901,10 @@ div#cpanel div.icon  a {
 	border: 1px dashed #bbbbbb !important;
 	font-size: 12px !important;
 	padding: 6px !important;
+}
+
+.fc_small {
+	font-size: 11px;
 }
 
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/

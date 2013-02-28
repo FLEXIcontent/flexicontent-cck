@@ -6,10 +6,7 @@
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
  * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
+ * FLEXItagcloud module is a tag cloud module module for flexicontent.
  * FLEXIcontent is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -46,8 +43,9 @@ if ($params->get('combine_show_rules', 'AND')=='AND') {
 
 if ( $show_mod )
 {
-	// Logging Info variables
-	$start_microtime = microtime(true);
+	global $modfc_jprof;
+	$modfc_jprof = new JProfiler();
+	$modfc_jprof->mark('START: FLEXIcontent Tags Cloud Module');
 	
 	// load english language file for 'mod_flexitagcloud' component then override with current language file
 	JFactory::getLanguage()->load('mod_flexitagcloud', JPATH_SITE, 'en-GB', true);
@@ -57,12 +55,14 @@ if ( $show_mod )
 	require_once (dirname(__FILE__).DS.'helper.php');
 	
 	// initialize various variables
-	$document 	= & JFactory::getDocument();
-	$config 	=& JFactory::getConfig();
+	$document	= JFactory::getDocument();
+	$config 	= JFactory::getConfig();
 	$caching 	= $config->getValue('config.caching', 0);
-	$add_ccs 	= $params->get('add_ccs', 1);
+	$add_ccs 			= $params->get('add_ccs', 1);
+	$layout       = $params->get('layout', 'default');
 	
 	
+	// add module css file
 	if ($add_ccs) {
 	  if ($caching && !FLEXI_J16GE) {
 			// Work around for caching bug in J1.5
@@ -73,18 +73,20 @@ if ( $show_mod )
 	  }
 	}
 	
-	
+	// Get data, etc by calling methods from helper file and include then include template to display them
 	$list = modFlexiTagCloudHelper::getTags($params, $module);
-	require(JModuleHelper::getLayoutPath('mod_flexitagcloud'));
+	
+	// Render Layout
+	require(JModuleHelper::getLayoutPath('mod_flexitagcloud', $layout));
 	
 	$flexiparams =& JComponentHelper::getParams('com_flexicontent');
-	if ( $flexiparams->get('print_logging_info') ) {
-		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+	if ( $flexiparams->get('print_logging_info') )
+	{
 		$app = & JFactory::getApplication();
-		$app->enqueueMessage( sprintf( 'FLEXIcontent tags cloud module creation is %.2f secs', $elapsed_microseconds/1000000), 'notice' );
+		$modfc_jprof->mark('END: FLEXIcontent Tags Cloud Module');
+		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
+		$app->enqueueMessage( $msg, 'notice' );
 	}
-	?>
-
-<?php
+	
 }
 ?>

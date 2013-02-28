@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: minigallery.php 1056 2011-12-16 18:36:55Z ggppdk $
+ * @version 1.0 $Id: minigallery.php 1577 2012-12-02 15:10:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -19,6 +19,8 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsMinigallery extends JPlugin
 {
+	static $field_types = array('minigallery');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -40,7 +42,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'minigallery') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 
 		// some parameter shortcuts
 		$document		= & JFactory::getDocument();
@@ -224,7 +226,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'minigallery') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 
 		$values = $values ? $values : $field->value ;
 		
@@ -389,6 +391,11 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					}
 					$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
 					$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
+					$ext = pathinfo($img_path, PATHINFO_EXTENSION);
+					if ( in_array( $ext, array('png', 'ico', 'gif') ) ) {
+						$srcs .= '&f='. $ext;
+						$srcb .= '&f='. $ext;
+					}
 					
 					if($usecaptions===1) $captions = $filename->altname;
 					$display[] = "<a href=\"javascript:;\"><img src=\"".$srcb."\" id=\"".$htmltag_id.'_'.$n."\" alt=\"{$captions}\" border=\"0\" /></a>\n";
@@ -417,7 +424,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 	function onBeforeSaveField($field, &$post, $file)
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'minigallery') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 
 		$mainframe =& JFactory::getApplication();

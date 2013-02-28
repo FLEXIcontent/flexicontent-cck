@@ -30,7 +30,7 @@
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_IMAGE_HANDLING_LABEL" description="" level="level2" />
-			<field name="image_source" type="radio" default="0" label="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" >
+			<field name="image_source" type="list" default="0" label="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" >
 				<option value="0">FLEXI_FIELD_REUSABLE_DB_MODE</option>
 				<option value="1">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
 			</field>
@@ -74,6 +74,7 @@
 				<option value="1">FLEXI_SMALL_NOT_RECOMMENDED</option>
 				<option value="2">FLEXI_MEDIUM</option>
 				<option value="3">FLEXI_LARGE</option>
+				<option value="4">FLEXI_ORIGINAL</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAIL_CREATION" description="FLEXI_IMGFIELD_THUMBNAIL_CREATION_DESC" level="level1" />
@@ -174,6 +175,7 @@
 				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
 				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
 				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
+				<!--option value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option-->
 			</field>
 			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_IMAGE_FIELDS_IGNORED_MULTIVALUED" description="FLEXI_FIELD_GROUP_IMAGE_FIELDS_IGNORED_MULTIVALUED_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -185,11 +187,13 @@
 				<option value="1">FLEXI_SMALL</option>
 				<option value="2">FLEXI_MEDIUM</option>
 				<option value="3">FLEXI_LARGE</option>
+				<option value="4">FLEXI_ORIGINAL</option>
 			</field>
 			<field name="thumbincatview" type="list" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC">
 				<option value="1">FLEXI_SMALL</option>
 				<option value="2">FLEXI_MEDIUM</option>
 				<option value="3">FLEXI_LARGE</option>
+				<option value="4">FLEXI_ORIGINAL</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level2" />
 			<field name="showtitle" type="list" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC">
@@ -283,7 +287,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level1" />
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -296,9 +300,17 @@
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
 				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
+			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+			</field>
 			
 		</fieldset>
 	</fields>

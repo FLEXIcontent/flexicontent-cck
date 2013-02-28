@@ -24,6 +24,7 @@
 			<field name="backend_hidden" type="hidden" default="1" />
 		</fieldset>
 		<fieldset name="group-fcpagenav">
+			
 			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_CSS" description="FLEXI_FIELD_PAGENAV_CSS_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
@@ -50,6 +51,7 @@
 				<option value="1">FLEXI_SHOW</option>
 				<option value="0">FLEXI_HIDE</option>
 			</field>
+			
 		</fieldset>
 	</fields>
 	</config>

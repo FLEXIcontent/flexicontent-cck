@@ -84,7 +84,6 @@ class FlexicontentViewItem extends JViewLegacy
 		// A unique item id
 		JRequest::setVar( 'unique_tmp_itemid', $cid ? $cid : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
 		
-		$version = $row->loaded_version;
 		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
 		
 		$subscribers 	= & $this->get( 'SubscribersCount' );
@@ -102,7 +101,7 @@ class FlexicontentViewItem extends JViewLegacy
 		foreach($allversions as $v) {
 			if( $k && (($k%$versionsperpage)==0) ) 
 				$current_page++;
-			if($v->nr==$version) break;
+			if($v->nr==$row->version) break;
 			$k++;
 		}
 
@@ -123,13 +122,32 @@ class FlexicontentViewItem extends JViewLegacy
 			JToolBarHelper::title( JText::_( 'FLEXI_NEW_ITEM' ), 'itemadd' );     // Creating new item
 		}
 		
-		// Add a preview button for existing item
-		if ( $cid )  
+		// Add a preview button for LATEST version of the item
+		if ( $cid )
 		{
-			$autologin		= $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
-			$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug)) .'&preview=1' .$autologin;
-			$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
-		} 
+			$autologin   = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+			$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug)) .$autologin;
+			
+			if ( !$cparams->get('use_versioning', 1) || ($row->version == $row->current_version = $row->last_version) )
+			{
+				$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
+			} else {
+				// Add a preview button for (currently) LOADED version of the item
+				$previewlink_loaded_ver = $previewlink .'&version='.$row->version;
+				$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink_loaded_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION').' ['.$row->version.']</a>', 'preview' );
+				
+				// Add a preview button for currently ACTIVE version of the item
+				$previewlink_active_ver = $previewlink .'&version='.$row->current_version;
+				$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink_active_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$row->current_version.']</a>', 'preview' );
+				
+				// Add a preview button for currently LATEST version of the item
+				$previewlink_last_ver = $previewlink .'&preview='.$row->last_version;
+				$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink_last_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$row->last_version.']</a>', 'preview' );
+			}
+			JToolBarHelper::spacer();
+			JToolBarHelper::divider();
+			JToolBarHelper::spacer();
+		}
 		
 		// Common Buttons
 		if (FLEXI_J16GE) {
@@ -524,7 +542,6 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->assignRef('fields'				, $fields);
 		$this->assignRef('versions'			, $versions);
 		$this->assignRef('pagecount'		, $pagecount);
-		$this->assignRef('version'			, $version);
 		$this->assignRef('lastversion'	, $lastversion);
 		$this->assignRef('cparams'			, $cparams);
 		$this->assignRef('tparams'			, $tparams);

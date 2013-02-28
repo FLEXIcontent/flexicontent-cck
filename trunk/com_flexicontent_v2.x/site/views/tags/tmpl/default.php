@@ -54,8 +54,9 @@ if ($image_source) {
 // Extra fields configuration
 $use_fields = (int)$params->get('use_fields', 1);
 $fields = $params->get('fields');
-$fields = array_map( 'trim', explode(',', $params->get('fields')) );
-if ($fields[0]=='') $fields = array();
+$fields = preg_replace("/[\"'\\\]/u", "", $fields);
+$fields = array_unique(preg_split("/\s*,\s*/u", $fields));
+if ( !strlen($fields[0]) ) unset($fields[0]);
 
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';

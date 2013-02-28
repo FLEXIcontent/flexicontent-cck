@@ -250,10 +250,11 @@ class FlexicontentControllerTags extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$list		= JRequest::getVar( 'taglist', null, 'post', 'string' );
-
-		$model	= $this->getModel('tags');		
-		$logs 	= $model->importList($list);
+		$list  = JRequest::getVar( 'taglist', null, 'post', 'string' );
+		$list  = preg_replace("/[\"'\\\]/u", "", $list);
+		
+		$model = $this->getModel('tags');		
+		$logs  = $model->importList($list);
 		
 		if ($logs) {
 			if ($logs['success']) {

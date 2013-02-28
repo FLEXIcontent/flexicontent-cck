@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Group Marker</name>
+	<name>FLEXIcontent - Form Field Group Marker</name>
 	<author>ggppdk</author>
 	<creationDate>July 2012</creationDate>
 	<copyright>Copyright (C) 2012 ggppdk</copyright>
@@ -8,7 +8,7 @@
 	<authorEmail>ggppdk@...</authorEmail>
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
-	<description>Group Marker Field Plugin for FLEXIcontent. This field is used to mark the start/end of FLEXIcontent field groups in ITEM edit FORM. Group will appear inside Tabs/Fieldsets/etc. Take care to match all openings with a closing marker appropriately.</description>
+	<description>Form Field Group Marker Field Plugin for FLEXIcontent. This field is used to mark the start/end of FLEXIcontent field groups in ITEM edit FORM. Group will appear inside Tabs/Fieldsets/etc. Take care to match all openings with a closing marker appropriately.</description>
 	
 	<files>
 		<filename plugin="groupmarker">groupmarker.php</filename>

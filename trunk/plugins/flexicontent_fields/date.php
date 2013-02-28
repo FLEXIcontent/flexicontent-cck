@@ -18,6 +18,8 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsDate extends JPlugin
 {
+	static $field_types = array('date');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -38,20 +40,34 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'date') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
-		// some parameter shortcuts
-		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
-		$required 		= $field->parameters->get( 'required', 0 ) ;
-		$required 		= $required ? ' required' : '';
+		$date_source = $field->parameters->get('date_source', 0);
+		if ( $date_source ) {
+			$date_source_str = 'Automatic field (shows this content \'s %s publication date)';
+			$date_source_str = sprintf($date_source_str, ($date == 1) ? '<b>start</b>' :  '<b>end</b>');
+			$_value = ($date == 1) ? $item->publish_up : $item->publish_down;
+			$field->html =
+				 '<div style="float:left">'
+				.' <div class="fc_mini_note_box">'.$date_source_str.'</div>'
+				. $_value
+				.'</div>';
+			return;
+		}
 		
-		$config = JFactory::getConfig();
-		$user = JFactory::getUser();
-		$app      = & JFactory::getApplication();
-		$document	= & JFactory::getDocument();
+		// some parameter shortcuts
+		$size				= $field->parameters->get( 'size', 30 ) ;
+		$multiple		= $field->parameters->get( 'allow_multiple', 1 ) ;
+		$maxval			= $field->parameters->get( 'max_values', 0 ) ;
+		$required = $field->parameters->get( 'required', 0 ) ;
+		$required = $required ? ' required' : '';
+		
+		$document	= JFactory::getDocument();
+		$config 	= JFactory::getConfig();
+		$app      = JFactory::getApplication();
+		$user			= JFactory::getUser();
 		
 		$show_usage = $field->parameters->get( 'show_usage', 0 ) ;
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
@@ -94,6 +110,9 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$field->value[0] = '';
 		}
 		
+		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
+		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		
 		if ($multiple) // handle multiple records
 		{
 			//add the drag and drop sorting feature
@@ -109,9 +128,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
 			$document->addScriptDeclaration($js);
 
-			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
-			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
-			
 			$js = "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
@@ -128,7 +144,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
 					}
 					
-					thisNewField.getFirst().setProperty('value','');
+					thisNewField.getFirst().setProperty('value','');  /* First element is the value input field, second is e.g remove button */
 
 					thisNewField.injectAfter(thisField);
 
@@ -195,8 +211,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				clear: both;
 				display: block;
 				list-style: none;
+				height: 20px;
 				position: relative;
-				height:20px;
 			}
 			#sortables_'.$field->id.' li.sortabledisabled {
 				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
@@ -217,35 +233,15 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$document->addStyleDeclaration($css);
 		
-		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
-		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
-		
 		$field->html = array();
 		$n = 0;
 		$skipped_vals = array();
 		foreach ($field->value as $value)
 		{
-			@list($date, $time) = preg_split('#\s+#', $value, $limit=2);
-			$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
+			if (empty($value)) continue;
 			
-			$valid_date = true;
-			try {
-				if ( !$value) {
-					$date = '';
-				} else if (!$date_allowtime || !$time) {
-					$date = JHTML::_('date',  $date, JText::_( FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ));
-				} else {
-					$date = JHTML::_('date',  $value, JText::_( FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M' ));
-				}
-			} catch ( Exception $e ) {
-				if ($value) $skipped_vals[] = $value;
-				$date = '';
-			}
-			
-			// Create JS calendar
-			$date_formats_map = array('0'=>'%Y-%m-%d', '1'=>'%Y-%m-%d %H:%M', '2'=>'%Y-%m-%d 00:00');
-			$date_format = $date_formats_map[$date_allowtime];
-			$calendar = JHTML::_('calendar', $date, $fieldname, $elementid.'_'.$n, $date_format, 'class="'.$required.'"');			
+			$calendar = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname, $elementid.'_'.$n, $attribs_arr=array('class'=>$required), $skip_on_invalid=true);
+			if (!$calendar)  { $skipped_vals[] = $value; continue; }
 			
 			$field->html[] =
 				$calendar.'
@@ -262,7 +258,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 		} else {  // handle single values
-			$field->html = '<div>' . $field->html[0] . '</div>';
+			$field->html = '<div>'.$field->html[0].'</div>';
 		}
 		
 		$field->html =
@@ -276,6 +272,158 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	}
 	
 	
+	// Method to create field's HTML display for frontend views
+	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
+	{
+		// execute the code only if the field type match the plugin type
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
+		$field->label = JText::_($field->label);
+		
+		// Some variables
+		$config = JFactory::getConfig();
+		$user = JFactory::getUser();
+		
+		// Get field values
+		$values = $values ? $values : $field->value;
+
+		$date_source = $field->parameters->get('date_source', 0);
+		if ( $date_source ) {
+			$_value = ($date == 1) ? $item->publish_up : $item->publish_down;
+			$values = array($_value);
+		}
+		
+		// Value handling parameters
+		$multiple       = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
+		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
+		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
+		$customdate     = $field->parameters->get( 'custom_date', FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ) ;
+		$dateformat     = $field->parameters->get( 'date_format', $customdate ) ;
+		$show_no_value  = $field->parameters->get( 'show_no_value', 0) ;
+		$no_value_msg   = $field->parameters->get( 'no_value_msg', 'FLEXI_NO_VALUE') ;
+		
+		$display_tz_logged   = $field->parameters->get( 'display_tz_logged', 2) ;
+		$display_tz_guests   = $field->parameters->get( 'display_tz_guests', 2) ;
+		$display_tz_suffix   = $field->parameters->get( 'display_tz_suffix', 1) ;
+		
+		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
+		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
+		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
+		
+		switch($separatorf)
+		{
+			case 0:
+			$separatorf = '&nbsp;';
+			break;
+
+			case 1:
+			$separatorf = '<br />';
+			break;
+
+			case 2:
+			$separatorf = '&nbsp;|&nbsp;';
+			break;
+
+			case 3:
+			$separatorf = ',&nbsp;';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
+			break;
+
+			case 5:
+			$separatorf = '';
+			break;
+
+			default:
+			$separatorf = '&nbsp;';
+			break;
+		}
+		
+		// Get timezone to use for displaying the date,  this is a string for J2.5 and an (offset) number for J1.5
+		if ( !$use_editor_tz ) {
+			// Raw date output, ignore timezone (no timezone info is printed), NOTE: this is OLD BEHAVIOUR of this field
+			$tz_suffix_type = -1;
+		} else if ($user->id) {
+			$tz_suffix_type = $display_tz_logged;
+		} else {
+			$tz_suffix_type = $display_tz_guests;
+		}
+		
+		$tz_info = '';
+		switch ($tz_suffix_type)
+		{
+		default: // including value -1 for raw for output, see above
+		case 0:
+			$timezone = FLEXI_J16GE ? 'UTC' : 0;
+			//$tz_info = '';
+			break;
+		case 1:
+			$timezone = FLEXI_J16GE ? 'UTC' : 0;
+			//$tz_info = ' UTC+0';
+			break;
+		case 2:
+			$timezone = $config->get('offset');
+			//$tz_info = ' (site's timezone)';
+			break;
+		case 3: 
+			$timezone = $user->getParam('timezone' );
+			//$tz_info = ' (local time)';
+			break;
+		}
+		
+		// display timezone suffix if this is enabled
+		if ($display_tz_suffix && $tz_suffix_type > 0) {
+			if (FLEXI_J16GE) {
+				$tz = new DateTimeZone($timezone);
+				$tz_offset = $tz->getOffset(new JDate()) / 3600;
+			} else {
+				// Raw date output  // FLEXI_J16GE ? 'UTC' : 0
+				$tz_offset = $timezone;
+			}
+			$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
+		}
+		
+		// initialise property
+		$field->{$prop} = array();
+		
+		$n = 0;
+		foreach ($values as $value) {
+			if ( !strlen($value) ) continue;
+			
+			// Check if dates are allowed to have time part
+			if ($date_allowtime) $date = $value;
+			else @list($date, $time) = preg_split('#\s+#', $value, $limit=2);
+			
+			if ( empty($date) ) continue;
+			
+			try {
+				$date = JHTML::_('date', $date, JText::_($dateformat), $timezone ).$tz_info;
+			} catch ( Exception $e ) {
+				$date = '';
+			}
+			
+			$field->{$prop}[]	= $pretext.$date.$posttext;
+			
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
+		}
+		$field->{$prop} = implode($separatorf, $field->{$prop});
+		
+		if ( !$field->{$prop} && $show_no_value )
+			$field->{$prop} = JText::_($no_value_msg);
+		else
+			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+	}
+	
 	
 	
 	// **************************************************************
@@ -286,8 +434,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'date') return;
-		if(!is_array($post) && !strlen($post)) return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !is_array($post) && !strlen($post) ) return;
 		
 		$config = JFactory::getConfig();
 		$user = JFactory::getUser();
@@ -365,150 +513,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	
 	
 	
-	
-	// Method to create field's HTML display for frontend views
-	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
-	{
-		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'date') return;
-
-		$field->label = JText::_($field->label);
-		
-		$config = JFactory::getConfig();
-		$user = JFactory::getUser();
-		
-		$values = $values ? $values : $field->value;
-
-		// Value handling parameters
-		$multiple       = $field->parameters->get( 'allow_multiple', 1 ) ;
-		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
-		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
-		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
-		$customdate     = $field->parameters->get( 'custom_date', FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ) ;
-		$dateformat     = $field->parameters->get( 'date_format', $customdate ) ;
-		$show_no_value  = $field->parameters->get( 'show_no_value', 0) ;
-		$no_value_msg   = $field->parameters->get( 'no_value_msg', 'FLEXI_NO_VALUE') ;
-		
-		$display_tz_logged   = $field->parameters->get( 'display_tz_logged', 2) ;
-		$display_tz_guests   = $field->parameters->get( 'display_tz_guests', 2) ;
-		$display_tz_suffix   = $field->parameters->get( 'display_tz_suffix', 1) ;
-		
-		// Prefix - Suffix - Separator parameters
-		$pretext			= $field->parameters->get( 'pretext', '' ) ;
-		$posttext			= $field->parameters->get( 'posttext', '' ) ;
-		$separatorf		= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag			= $field->parameters->get( 'opentag', '' ) ;
-		$closetag			= $field->parameters->get( 'closetag', '' ) ;
-		$remove_space		= $field->parameters->get( 'remove_space', 0 ) ;
-		
-		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
-		
-		switch($separatorf)
-		{
-			case 0:
-			$separatorf = '&nbsp;';
-			break;
-
-			case 1:
-			$separatorf = '<br />';
-			break;
-
-			case 2:
-			$separatorf = '&nbsp;|&nbsp;';
-			break;
-
-			case 3:
-			$separatorf = ',&nbsp;';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
-		}
-		
-		// Get timezone to use for displaying the date,  this is a string for J2.5 and an (offset) number for J1.5
-		if ( !$use_editor_tz ) {
-			// Raw date output, ignore timezone (no timezone info is printed), NOTE: this is OLD BEHAVIOUR of this field
-			$tz_suffix_type = -1;
-		} else if ($user->id) {
-			$tz_suffix_type = $display_tz_logged;
-		} else {
-			$tz_suffix_type = $display_tz_guests;
-		}
-		
-		$tz_info = '';
-		switch ($tz_suffix_type)
-		{
-		default: // including value -1 for raw for output, see above
-		case 0:
-			$timezone = FLEXI_J16GE ? 'UTC' : 0;
-			//$tz_info = '';
-			break;
-		case 1:
-			$timezone = FLEXI_J16GE ? 'UTC' : 0;
-			//$tz_info = ' UTC+0';
-			break;
-		case 2:
-			$timezone = $config->get('offset');
-			//$tz_info = ' (site's timezone)';
-			break;
-		case 3: 
-			$timezone = $user->getParam('timezone' );
-			//$tz_info = ' (local time)';
-			break;
-		}
-		
-		// display timezone suffix if this is enabled
-		if ($display_tz_suffix && $tz_suffix_type > 0) {
-			if (FLEXI_J16GE) {
-				$tz = new DateTimeZone($timezone);
-				$tz_offset = $tz->getOffset(new JDate()) / 3600;
-			} else {
-				// Raw date output  // FLEXI_J16GE ? 'UTC' : 0
-				$tz_offset = $timezone;
-			}
-			$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
-		}
-		
-		// initialise property
-		$field->{$prop} = array();
-		
-		$n = 0;
-		foreach ($values as $value) {
-			if ( !strlen($value) ) continue;
-			
-			// Check if dates are allowed to have time part
-			if ($date_allowtime) $date = $value;
-			else @list($date, $time) = preg_split('#\s+#', $value, $limit=2);
-			
-			if ( empty($date) ) continue;
-			
-			try {
-				$date = JHTML::_('date', $date, JText::_($dateformat), $timezone ).$tz_info;
-			} catch ( Exception $e ) {
-				$valid_date = false;
-				$date = '';
-			}
-			
-			$field->{$prop}[]	= $pretext.$date.$posttext;
-			
-			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
-		}
-		$field->{$prop} = implode($separatorf, $field->{$prop});
-		
-		if ( !$field->{$prop} && $show_no_value )
-			$field->{$prop} = JText::_($no_value_msg);
-		else
-			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-	}
-	
-	
-	
 	// *********************************
 	// CATEGORY/SEARCH FILTERING METHODS
 	// *********************************
@@ -516,9 +520,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if($filter->field_type != 'date') return;
+		// execute the code only if the field type match the plugin type
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		plgFlexicontent_fieldsDate::onDisplayFilter($filter, $value, $formName);
+		self::onDisplayFilter($filter, $value, $formName);
 	}
 	
 	
@@ -526,29 +531,84 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		// execute the code only if the field type match the plugin type
-		if($filter->field_type != 'date') return;
-
-		// ** some parameter shortcuts
-		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
-		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('FLEXI_ALL');
-		$filter->html = '';
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
+		$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
+		if ($date_filter_group=='year') { $date_valformat='%Y'; $date_txtformat='%Y'; }
+		else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; $date_txtformat='%Y-%b'; }
+		else { $date_valformat='%Y-%m-%d'; $date_txtformat='%Y-%b-%d'; }
 		
-		// *** Retrieve values
-		// *** Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
-		$results = flexicontent_cats::getFilterValues($filter);
-		
-		
-		// *** Create the select form field used for filtering
-		$options = array();
-		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-		
-		foreach($results as $result) {
-			if ( !strlen($result->value) ) continue;
-			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
+		$date_source = $filter->parameters->get('date_source', 0);
+		if ( ! $date_source ) {
+			$valuecol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_valformat);
+			$textcol  = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_txtformat);
+		} else {
+			$_value_col = ($date == 1) ? 'i.publish_up' : 'i.publish_down';
+			$valuecol = sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_valformat);
+			$textcol  = sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_txtformat);
 		}
-		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+		
+		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
+		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
+		
+		$show_matching_items = $filter->parameters->get('show_matching_items', 1);
+		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
+		$count_column = $show_matches ? ', COUNT(*) as found ' : '';
+		
+		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
+		// partial SQL clauses
+		$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text'. $count_column;
+		$filter->filter_valuesjoin   = null;  // use default
+		$filter->filter_valueswhere  = null;  // use default
+		// full SQL clauses
+		$filter->filter_groupby = ' GROUP BY '.$valuecol;
+		$filter->filter_having  = null;  // use default
+		$filter->filter_orderby = ' ORDER BY '.$valuecol;
+		FlexicontentFields::createFilter($filter, $value, $formName);
+	}
+	
+	
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for content lists e.g. category view, and not for search view
+	function getFiltered(&$filter, $value)
+	{
+		// execute the code only if the field type match the plugin type
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
+		
+		$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
+		if ($date_filter_group=='year') { $date_valformat='%Y'; }
+		else if ($date_filter_group=='month') { $date_valformat='%Y-%m';}
+		else { $date_valformat='%Y-%m-%d'; }
+
+		$date_source = $filter->parameters->get('date_source', 0);
+		
+		if ( ! $date_source ) {
+			$filter->filter_colname    = sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat);
+		} else {
+			$_value_col = ($date == 1) ? 'c.publish_up' : 'c.publish_down';
+			$filter->filter_colname    = sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_valformat);
+		}
+		
+		$filter->filter_colname    = sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat);
+		$filter->filter_valuesjoin = null;   // use default
+		$filter->filter_valueformat = sprintf(' DATE_FORMAT("__filtervalue__", "%s") ', $date_valformat);
+		return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
+	}
+	
+	
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for search view
+	function getFilteredSearch(&$field, $value)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
+		$date_source = $field->parameters->get('date_source', 0);
+		if ( $date_source ) {
+			JFactory::getApplication()->enqueueMessage( "Field: '".$field->label."' is using start/end publication dates and cannot be used as filter in search view" , 'notice' );
+			return;
+		}
+		
+		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
 	}
 	
 	
@@ -559,10 +619,21 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item) {
-		if ($field->field_type != 'date') return;
-		if ( !$field->isadvsearch ) return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
-		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=1);
+		
+		// a. Each of the values of $values array will be added to the advanced search index as searchable text (column value)
+		// b. Each of the indexes of $values will be added to the column 'value_id',
+		//    and it is meant for fields that we want to be filterable via a drop-down select
+		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
+		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
+		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	
@@ -570,20 +641,49 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ($field->field_type != 'date') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
-		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
+		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=0);
+		
+		// a. Each of the values of $values array will be added to the basic search index (one record per item)
+		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
+		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	
-		
-	// Method to get ALL items that have matching search values for the current field id
-	function onFLEXIAdvSearch(&$field)
+	
+	// Method to prepare for indexing, either preparing SQL query (if post is null) or formating/preparing given $post data for usage bu index
+	function _prepareForSearchIndexing(&$field, &$post, $for_advsearch=0)
 	{
-		if ($field->field_type!='date') return;
+		$date_filter_group = $field->parameters->get( $for_advsearch ? 'date_filter_group_s' : 'date_filter_group', 'month');
+		if ($date_filter_group=='year') { $date_valformat='%Y'; $date_txtformat='%Y'; }
+		else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; $date_txtformat='%Y-%b'; }
+		else { $date_valformat='%Y-%m-%d'; $date_txtformat='%Y-%b-%d'; }
 		
-		FlexicontentFields::onFLEXIAdvSearch($field);
+		if ($post===null) {
+			$valuecol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_valformat);
+			$textcol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_txtformat);
+			
+			$field->field_valuesselect = ' '.$valuecol.' AS value_id, '.$textcol.' AS value';
+			$field->field_groupby = ' GROUP BY '.$valuecol;
+			$values = null;
+		} else {
+			$values = array();
+			$db = &JFactory::getDBO();
+			if ($post) foreach ($post as $v) {
+				$valuecol = sprintf(' DATE_FORMAT("%s", "%s") ', $v, $date_valformat);
+				$textcol = sprintf(' DATE_FORMAT("%s", "%s") ', $v, $date_txtformat);
+				$query = 'SELECT  '.$valuecol.' AS value_id, '.$textcol.' AS value';
+				$db->setQuery($query);
+				$value = $db->loadObjectList();
+				$values[$value[0]->value_id] = $value[0]->value;
+			}
+		}
+		return $values;
 	}
-
 }

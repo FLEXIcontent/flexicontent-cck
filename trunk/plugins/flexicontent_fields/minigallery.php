@@ -19,6 +19,8 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsMinigallery extends JPlugin
 {
+	static $field_types = array('minigallery');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -40,7 +42,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'minigallery') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 
 		// some parameter shortcuts
 		$document		= & JFactory::getDocument();
@@ -224,7 +226,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'minigallery') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 
 		$values = $values ? $values : $field->value ;
 		
@@ -396,7 +398,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 	function onBeforeSaveField($field, &$post, $file)
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'minigallery') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 
 		$mainframe =& JFactory::getApplication();
