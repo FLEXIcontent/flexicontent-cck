@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="component" version="1.7.0" method="upgrade">
 	<name>FLEXIcontent</name>
-	<creationDate>18 January 2013</creationDate>
+	<creationDate>28 February 2013</creationDate>
 	<author>Emmanuel Danan, Georgios Papadakis</author>
 	<copyright>(C) 2009-2012 Emmanuel Danan</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>2.0.0 RC9c r1628</version>
+	<version>2.0.0 r1640</version>
 	<description>A flexible content management system for Joomla! J1.5/J2.5</description>
 
 	<languages folder="site/language">
@@ -137,8 +137,8 @@
 	<plugin name="minigallery"     folder="plugins/minigallery"     instfolder="flexicontent_fields">Minigallery Field</plugin>
 	<plugin name="radio"           folder="plugins/radio"           instfolder="flexicontent_fields">Radio Field</plugin>
 	<plugin name="radioimage"      folder="plugins/radioimage"      instfolder="flexicontent_fields">Radio Image Field</plugin>
-	<plugin name="relateditems"    folder="plugins/relateditems"    instfolder="flexicontent_fields">Related Items Field</plugin>
-	<plugin name="relateditems_backlinks" folder="plugins/relateditems_backlinks" instfolder="flexicontent_fields">Related Items Backlinks Field</plugin>
+	<plugin name="relation"        folder="plugins/relation"    instfolder="flexicontent_fields">Relation Field</plugin>
+	<plugin name="relation_reverse" folder="plugins/relation_reverse" instfolder="flexicontent_fields">Relation Reverse Field</plugin>
 	<plugin name="select"          folder="plugins/select"          instfolder="flexicontent_fields">Select List Field</plugin>
 	<plugin name="selectmultiple"  folder="plugins/selectmultiple"  instfolder="flexicontent_fields">Select List Multiple Field</plugin>
 	<plugin name="text"            folder="plugins/text"            instfolder="flexicontent_fields">Text Field</plugin>

@@ -43,7 +43,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$search_index			= $mainframe->getUserStateFromRequest( $option.'.search.search_index',			'search_index', '', 'string' );
 		$search_index			= $db->getEscaped( trim(JString::strtolower( $search_index ) ) );
 		$search_itemtitle	= $mainframe->getUserStateFromRequest( $option.'.search.search_itemtitle',	'search_itemtitle', '', 'string' );
-		$search_itemid		= $mainframe->getUserStateFromRequest( $option.'.search.search_itemid',	'search_itemid', '', 'int' );
+		$search_itemid		= $mainframe->getUserStateFromRequest( $option.'.search.search_itemid',	'search_itemid', '', 'string' );
+		$search_itemid		= strlen($search_itemid) ? (int)$search_itemid : '';
 		$filter_indextype	= $mainframe->getUserStateFromRequest( $option.'.search.filter_indextype',		'filter_indextype',	'advanced',		'word' );
 		
 		$f_active['filter_fieldtype']	= (boolean)$filter_fieldtype;
@@ -52,7 +53,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		$f_active['search_index']			= strlen($search_index);
 		$f_active['search_itemtitle']	= strlen($search_itemtitle);
-		$f_active['search_itemid']		= strlen($search_itemid);
+		$f_active['search_itemid']		= (boolean)$search_itemid;
 		
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -149,6 +150,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_BASIC_CONTENT_LISTS',    'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic',     500, 210);
 		JToolBarHelper::divider();  JToolBarHelper::spacer();
 		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', 'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced',  500, 210);
+		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', 'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick',  500, 210);
 		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', FLEXI_J16GE ? 'search.purge' : 'purge', false);
 		
 		$user = &JFactory::getUser();

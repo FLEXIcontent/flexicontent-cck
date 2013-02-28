@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: file.php 1264 2012-05-04 15:55:52Z ggppdk $
+ * @version 1.0 $Id: file.php 1603 2012-12-16 07:26:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -19,6 +19,8 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsFile extends JPlugin
 {
+	static $field_types = array('file');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -40,7 +42,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	{
 		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'file') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 
 		// some parameter shortcuts
 		$document		= & JFactory::getDocument();
@@ -168,11 +170,14 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$i = 0;
 		$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
 		if($field->value) {
-			foreach($field->value as $file) {
+			$files_data = $this->getFileData( $field->value, $published=false );
+			foreach($files_data as $file_id => $file_data) {
 				$field->html .= '<li>';
-				$filedata = $this->getFileData( $file );
-				$field->html .= '  <input size="'.$size.'" style="background: #ffffff;" type="text" id="a_name'.$i.'" value="'.$filedata->filename.'" disabled="disabled" />';
-				$field->html .= '  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file.'" />';
+				$field->html .= ($file_data->published ?
+				'  <input size="'.$size.'" style="background: #ffffff;" type="text" id="a_name'.$i.'" value="'.$file_data->filename.'" disabled="disabled" />' :
+				'  <input size="'.$size.'" style="background: #ffffff; border-width:0px;" type="text" id="a_name'.$i.'" value="'.$file_data->filename.' [UNPUBLISHED]" disabled="disabled" />'
+				);
+				$field->html .= '  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file_id.'" />';
 				$field->html .= '  <input class="inputbox fcfield-button" type="button" onclick="deleteField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" />';
 				$field->html .= '  <span class="fcfield-drag">'.$move.'</span>';
 				$field->html .= '</li>';
@@ -199,21 +204,27 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'file') return;
-
-		$values = $values ? $values : $field->value ;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
+		$field->label = JText::_($field->label);
+		
+		$values = $values ? $values : $field->value;
 		
 		$mainframe = & JFactory::getApplication();
-
+		
+		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
+		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
+		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
+		
 		// some parameter shortcuts
-		$pretext			= $field->parameters->get( 'pretext', '' ) ;
-		$posttext			= $field->parameters->get( 'posttext', '' ) ;
-		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
-		$separatorf	= $field->parameters->get( 'separatorf', 3 ) ;
-		$opentag		= $field->parameters->get( 'opentag', '' ) ;
-		$closetag		= $field->parameters->get( 'closetag', '' ) ;
 		$useicon		= $field->parameters->get( 'useicon', 1 ) ;
 		$usebutton	= $field->parameters->get( 'usebutton', 0 ) ;
 		$display_filename	= $field->parameters->get( 'display_filename', 0 ) ;
@@ -235,11 +246,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		// Description as tooltip
 		if ($display_filename==2) JHTML::_('behavior.tooltip');
-
+		
 		switch($separatorf)
 		{
 			case 0:
-			$separatorf = ' ';
+			$separatorf = '&nbsp;';
 			break;
 
 			case 1:
@@ -247,11 +258,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			break;
 
 			case 2:
-			$separatorf = ' | ';
+			$separatorf = '&nbsp;|&nbsp;';
 			break;
 
 			case 3:
-			$separatorf = ', ';
+			$separatorf = ',&nbsp;';
 			break;
 
 			case 4:
@@ -259,7 +270,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			break;
 
 			default:
-			$separatorf = ' ';
+			$separatorf = '&nbsp;';
 			break;
 		}
 		
@@ -272,97 +283,98 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		else             $aid = (int) $user->get('aid');
 		
 		$n = 0;
-		foreach ($values as $value) {
+		
+		// Get All file information at once (Data maybe cached already)
+		// TODO (maybe) e.g. contentlists should could call this function ONCE for all file fields,
+		// This may be done by adding a new method to fields to prepare multiple fields with a single call
+		$files_data = $this->getFileData( $values, $published=true );   //print_r($files_data); exit;
+		
+		foreach($files_data as $file_id => $file_data) {
 			$icon = '';
-			$filedata = $this->getFileData( $value );
-			//print_r($filedata); exit;
-			if ( $filedata )
-			{
-				$authorized = true;
-				// Check user access on the file
-				if ( !empty($filedata->access) ) {
-					if (FLEXI_J16GE) {
-						$authorized = in_array($filedata->access,$aid_arr);
-					} else {
-						$authorized = $aid >= $filedata->access;
-					}
-				}
-				
-				// If no access and set not to show then continue
-				if ( !$authorized && !$noaccess_display ) continue;
-				
-				// --. Create icon according to filetype
-				if ($useicon) {
-					$filedata	= $this->addIcon( $filedata );
-					$icon		= JHTML::image($filedata->icon, $filedata->ext, 'class="icon-mime"') .'&nbsp;';
-				}
-				
-				// --. Decide whether to show filename (if we do not use button, then displaying of filename is forced)
-				$name_str   = ($display_filename || !$usebutton) ? $filedata->altname : '';
-				$name_html  = !empty($name_str) ? '&nbsp;<span class="fcfile_name">'. $name_str . '</span>' : '';
-				
-				// --. Description as tooltip or inline text ... prepare related variables
-				$alt_str = $class_str = $text_html  = '';
-				if (!empty($filedata->description)) {
-					if ( !$authorized) {
-						if ($noaccess_display != 2 ) {
-							$alt_str    = $name_str . '::' . $filedata->description;
-							$class_str  = ' hasTip';
-							$text_html  = '';
-						}
-					} else if ($display_descr==1) {   // As tooltip
-						$alt_str    = $name_str . '::' . $filedata->description;
-						$class_str  = ' hasTip';
-						$text_html  = '';
-					} else if ($display_descr==2) {  // As inline text
-						$alt_str    = '';
-						$class_str  = '';
-						$text_html  = ' <span class="fcfile_descr">'. $filedata->description . '</span>';
-					}
-				}
-				
-				// --. Create the download link or use no authorized link ...
-				if ( !$authorized ) {
-					$dl_link = $noaccess_url;
-					$str = $noaccess_msg . ($noaccess_msg ? ': ' : '') . $icon;
-					$class_str .= ' fc_file_noauth';   // Add an extra css class
+			$authorized = true;
+			// Check user access on the file
+			if ( !empty($file_data->access) ) {
+				if (FLEXI_J16GE) {
+					$authorized = in_array($file_data->access,$aid_arr);
 				} else {
-					$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $value .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
-					$str = '';
+					$authorized = $aid >= $file_data->access;
 				}
-				
-				// --. Finally create displayed html ... a download button (*) OR a download link
-				// (*) with file manager 's description of file as tooltip or as inline text
-				if (!$dl_link) {
-					// no link ... (case of current user not authorized to download file)
-					$str = $icon . '<span class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</span>' ." ". $text_html;
-				} else if ($usebutton) {
-					$class_str .= ' button';   // Add an extra css class
-					$str  = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'">';
-					$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'. $name_html ." ". $text_html;
-					// Add variables for target URL to use (case of current user not authorized to download file)
-					if ( !$authorized && $noaccess_addvars) {
-						$str .= '<input type="hidden" name="fc_file_id" value="'.$value.'"/>'."\n";
-						$str .= '<input type="hidden" name="fc_field_id" value="'.$field->id.'"/>'."\n";
-						$str .= '<input type="hidden" name="fc_item_id" value="'.$field->item_id.'"/>'."\n";
-					}
-					$str .= '</form>';
-				} else {
-					$name_html = $filedata->altname;   // no download button, force display of filename
-					// Add variables for target URL to use (case of current user not authorized to download file)
-					if ( !$authorized && $noaccess_addvars) {
-						$dl_link .= '&fc_file_id="'.$value;
-						$dl_link .= '&fc_field_id="'.$field->id;
-						$dl_link .= '&fc_item_id="'.$field->item_id;
-					}
-					$str = $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</a>' ." ". $text_html;
-				}
-				
-				// Values Prefix and Suffox Texts
-				$field->{$prop}[]	=  $pretext . $str . $posttext;
-				$n++;
 			}
 			
+			// If no access and set not to show then continue
+			if ( !$authorized && !$noaccess_display ) continue;
+			
+			// --. Create icon according to filetype
+			if ($useicon) {
+				$file_data	= $this->addIcon( $file_data );
+				$icon		= JHTML::image($file_data->icon, $file_data->ext, 'class="icon-mime"') .'&nbsp;';
+			}
+			
+			// --. Decide whether to show filename (if we do not use button, then displaying of filename is forced)
+			$name_str   = ($display_filename || !$usebutton) ? $file_data->altname : '';
+			$name_html  = !empty($name_str) ? '&nbsp;<span class="fcfile_name">'. $name_str . '</span>' : '';
+			
+			// --. Description as tooltip or inline text ... prepare related variables
+			$alt_str = $class_str = $text_html  = '';
+			if (!empty($file_data->description)) {
+				if ( !$authorized) {
+					if ($noaccess_display != 2 ) {
+						$alt_str    = $name_str . '::' . $file_data->description;
+						$class_str  = ' hasTip';
+						$text_html  = '';
+					}
+				} else if ($display_descr==1) {   // As tooltip
+					$alt_str    = $name_str . '::' . $file_data->description;
+					$class_str  = ' hasTip';
+					$text_html  = '';
+				} else if ($display_descr==2) {  // As inline text
+					$alt_str    = '';
+					$class_str  = '';
+					$text_html  = ' <span class="fcfile_descr">'. $file_data->description . '</span>';
+				}
+			}
+			
+			// --. Create the download link or use no authorized link ...
+			if ( !$authorized ) {
+				$dl_link = $noaccess_url;
+				$str = $noaccess_msg . ($noaccess_msg ? ': ' : '') . $icon;
+				$class_str .= ' fc_file_noauth';   // Add an extra css class
+			} else {
+				$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
+				$str = '';
+			}
+			
+			// --. Finally create displayed html ... a download button (*) OR a download link
+			// (*) with file manager 's description of file as tooltip or as inline text
+			if (!$dl_link) {
+				// no link ... (case of current user not authorized to download file)
+				$str = $icon . '<span class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</span>' ." ". $text_html;
+			} else if ($usebutton) {
+				$class_str .= ' button';   // Add an extra css class
+				$str  = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'">';
+				$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'. $name_html ." ". $text_html;
+				// Add variables for target URL to use (case of current user not authorized to download file)
+				if ( !$authorized && $noaccess_addvars) {
+					$str .= '<input type="hidden" name="fc_file_id" value="'.$file_id.'"/>'."\n";
+					$str .= '<input type="hidden" name="fc_field_id" value="'.$field->id.'"/>'."\n";
+					$str .= '<input type="hidden" name="fc_item_id" value="'.$field->item_id.'"/>'."\n";
+				}
+				$str .= '</form>';
+			} else {
+				$name_html = $file_data->altname;   // no download button, force display of filename
+				// Add variables for target URL to use (case of current user not authorized to download file)
+				if ( !$authorized && $noaccess_addvars) {
+					$dl_link .= '&fc_file_id="'.$file_id;
+					$dl_link .= '&fc_field_id="'.$field->id;
+					$dl_link .= '&fc_item_id="'.$field->item_id;
+				}
+				$str = $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</a>' ." ". $text_html;
+			}
+			
+			// Values Prefix and Suffox Texts
+			$field->{$prop}[]	=  $pretext . $str . $posttext;
+			$field->url[]	=  $dl_link;
+			$n++;
 		}
 		
 		// Values Separator
@@ -383,7 +395,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'file') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 
 		$mainframe =& JFactory::getApplication();
@@ -410,33 +422,118 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	
 	
 	
+	// *********************************
+	// CATEGORY/SEARCH FILTERING METHODS
+	// *********************************
+	
+	// Method to display a search filter for the advanced search view
+	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
+	{
+		if ( !in_array($filter->field_type, static::$field_types) ) return;
+		
+		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+		FlexicontentFields::createFilter($filter, $value, $formName);
+	}
+	
+	
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for search view
+	function getFilteredSearch(&$field, $value)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
+		$field->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
+	}
+	
+	
+	
+	// *************************
+	// SEARCH / INDEXING METHODS
+	// *************************
+	
+	// Method to create (insert) advanced search index DB records for the field values
+	function onIndexAdvSearch(&$field, &$post, &$item)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
+		
+		if ($post) {
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', file.id AS value_id' );
+			$values = array();
+			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
+		} else {
+			$field->field_rawvalues = 1;
+			$field->field_valuesselect = ' file.id AS value_id, file.altname, file.description, file.filename';
+			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
+			$field->field_groupby      = null;
+		}
+		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('description'), $properties_spacer=' ', $filter_func='strip_tags');
+		return true;
+	}
+	
+	
+	// Method to create basic search index (added as the property field->search)
+	function onIndexSearch(&$field, &$post, &$item)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !$field->issearch ) return;
+		
+		if ($post) {
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', file.id AS value_id' );
+			$values = array();
+			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
+		} else {
+			$field->unserialize = 0;
+			$field->field_rawvalues = 1;
+			$field->field_valuesselect = ' file.id AS value_id, file.altname, file.description, file.filename';
+			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
+			$field->field_groupby      = null;
+		}
+		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('description'), $properties_spacer=' ', $filter_func='strip_tags');
+		return true;
+	}
+	
+	
+	
 	// **********************
 	// VARIOUS HELPER METHODS
 	// **********************
 	
-	function getFileData( $value )
+	function getFileData( $value, $published=1, $extra_select='' )
 	{
-		$db =& JFactory::getDBO();
-		$session = & JFactory::getSession();
-		if (FLEXI_J16GE) {
-			jimport('joomla.database.table');
-			$sessiontable = JTable::getInstance('session');
-		} else {
-			jimport('joomla.database.table.session');
-			$sessiontable = new JTableSession( $db );
+		// Find which file data are already cached, and if no new file ids to query, then return cached only data
+		static $cached_data = array();
+		$return_data = array();
+		$new_ids = array();
+		$values = is_array($value) ? $value : array($value);
+		foreach ($values as $f) {
+			$f = (int)$f;
+			if ( isset($cached_data[$f]) )
+				$return_data[$f] = $cached_data[$f];
+			else if ( $f )
+				$new_ids[] = $f;
 		}
-		$sessiontable->load($session->getId());
 		
-		$and = (!$sessiontable->client_id) ? ' AND published = 1' : '';
-		$query = 'SELECT * ' //filename, altname, description, ext, id'
-				. ' FROM #__flexicontent_files'
-				. ' WHERE id = '. (int) $value
-				. $and
-				;
-		$db->setQuery($query);
-		$filedata = $db->loadObject();
+		if ( count($new_ids) )
+		{
+			// Only query files that are not already cached
+			$db = JFactory::getDBO();
+			$query = 'SELECT * '. $extra_select //filename, altname, description, ext, id'
+					. ' FROM #__flexicontent_files'
+					. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+					. ($published ? '  AND published = 1' : '')
+					;
+			$db->setQuery($query);
+			$new_data = $db->loadObjectList('id');
+			
+			if ($new_data) foreach($new_data as $file_id => $file_data) {
+				$return_data[$file_id] = $file_data;
+				$cached_data[$file_id] = $file_data;
+			}
+		}
 		
-		return $filedata;
+		return !is_array($value) ? @$return_data[(int)$value] : $return_data;
 	}
 	
 	

@@ -72,7 +72,7 @@ if (FLEXI_J16GE) {
 		$fields = $db->loadObjectList();
 
 		foreach ($fields as $field) {
-			$images[] = JHTMLSelect::option($field->value, $field->text); 
+			$images[] = JHTMLSelect::option($field->value, JText::_('FLEXI_FIELD') .': '. $field->text); 
 		}
 
 		return $images;

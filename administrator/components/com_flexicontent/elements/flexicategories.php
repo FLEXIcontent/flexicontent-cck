@@ -128,7 +128,7 @@ class JElementFlexicategories extends JElement
 			$text_fieldname = str_replace('[]', '', $fieldname);
 			
 			$attribs .= ' onclick="FLEXIClickCategory(this,\''.$ffname.'\');" ';
-			$html    .= "\n<input type=\"hidden\" id=\"a_id_{$ffname}\" name=\"$text_fieldname\" value=\"$values\" />";
+			$html    .= "\n<input type=\"hidden\" id=\"a_id_{$ffname}\" name=\"$text_fieldname\" value=\"".@$values[0]."\" />";
 		} else {
 			$select_fieldname = $fieldname;
 		}

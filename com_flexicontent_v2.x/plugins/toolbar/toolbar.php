@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: toolbar.php 1054 2011-12-14 06:09:07Z ggppdk $
+ * @version 1.0 $Id: toolbar.php 1543 2012-11-11 22:13:24Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -19,6 +19,8 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsToolbar extends JPlugin
 {
+	static $field_types = array('toolbar');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -38,14 +40,14 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, $item)
 	{
-		if($field->field_type != 'toolbar') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 	}
 	
 	
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		if($field->field_type != 'toolbar') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(JRequest::getCmd('print')) return;
 
 		global $mainframe, $addthis;
@@ -64,19 +66,19 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$lang		= in_array($lang, array('en','es','it','th')) ? $lang : 'en';
 		
 		// parameters shortcuts
-		$display_comments	= $field->parameters->get('display_comments', 1);
-		$display_resizer	= $field->parameters->get('display_resizer', 1);
-		$display_print 		= $field->parameters->get('display_print', 1);
-		$display_email 		= $field->parameters->get('display_email', 1);
-		$display_voice 		= $field->parameters->get('display_voice', 1);
-		$display_pdf 		= $field->parameters->get('display_pdf', 1);
-		$display_social 	= $field->parameters->get('display_social', 1);
-		$load_css 			= $field->parameters->get('load_css', 1);
-		$addthis_user		= $field->parameters->get('addthis_user', '');
-		$spacer_size		= $field->parameters->get('spacer_size', 21);
+		$display_comments	= $field->parameters->get(FLEXI_J16GE ? 'display_comments' : 'display-comments', 1);
+		$display_resizer	= $field->parameters->get(FLEXI_J16GE ? 'display_resizer' : 'display-resizer', 1);
+		$display_print 		= $field->parameters->get(FLEXI_J16GE ? 'display_print' : 'display-print', 1);
+		$display_email 		= $field->parameters->get(FLEXI_J16GE ? 'display_email' : 'display-email', 1);
+		$display_voice 		= $field->parameters->get(FLEXI_J16GE ? 'display_voice' : 'display-voice', 1);
+		$display_pdf 		= $field->parameters->get(FLEXI_J16GE ? 'display_pdf' : 'display-pdf', 1);
+		$display_social 	= $field->parameters->get(FLEXI_J16GE ? 'display_social' : 'display-social', 1);
+		$load_css 			= $field->parameters->get(FLEXI_J16GE ? 'load_css' : 'load-css', 1);
+		$addthis_user		= $field->parameters->get(FLEXI_J16GE ? 'addthis_user' : 'addthis-user', '');
+		$spacer_size		= $field->parameters->get(FLEXI_J16GE ? 'spacer_size' : 'spacer-size', 21);
 		$module_position	= $field->parameters->get('module_position', '');
-		$default_size 		= $field->parameters->get('default_size', 12);
-		$default_line 		= $field->parameters->get('default_line', 16);
+		$default_size 		= $field->parameters->get(FLEXI_J16GE ? 'default_size' : 'default-size', 12);
+		$default_line 		= $field->parameters->get(FLEXI_J16GE ? 'default_line' : 'default-line', 16);
 		$target 			= $field->parameters->get('target', 'flexicontent');
 		$voicetarget 		= $field->parameters->get('voicetarget', 'flexicontent');
 
@@ -244,7 +246,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField($field, &$post, $file)
 	{
-		if($field->field_type != 'toolbar') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 	}
 	
 	

@@ -490,15 +490,14 @@ class ParentClassItem extends JModelLegacy
 				$item->text = $item->introtext;
 				$item->text .= JString::strlen( trim($item->fulltext) ) ? '<hr id="system-readmore" />' . $item->fulltext : "";
 				
-				//echo "<br/>version: ".$version;
+				//echo "<br/>Current version (Frontend Active): " . $item->version;
+				//echo "<br/>Version to load: ".$version;
 				//echo "<br/><b> *** db title:</b> ".$item->title;
 				//echo "<br/><b> *** db text:</b> ".$item->text;
 				//echo "<pre>*** item data: "; print_r($item); echo "</pre>"; exit;
 				
 				// Set number of loaded version, IMPORTANT: zero means load unversioned data
 				JRequest::setVar( 'version', $version );
-				// Set the loaded version
-				$item->loaded_version = $version ? $version : $current_version;
 				
 				
 				// *************************************************************************************************
@@ -566,11 +565,12 @@ class ParentClassItem extends JModelLegacy
 				// *****************************************************
 				// Overwrite item fields with the requested VERSION data
 				// *****************************************************
-				$fields = array();
+				$item->current_version = $current_version; 
+				$item->last_version = $last_version; 
 				if ($use_versioning && $version) 
 				{
 					// Overcome possible group concat limitation
-					$query="SET SESSION group_concat_max_len = 1000000";
+					$query="SET SESSION group_concat_max_len = 9999999";
 					$db->setQuery($query);
 					$db->query();
 					
@@ -592,6 +592,9 @@ class ParentClassItem extends JModelLegacy
 						if ($f->field_type=='hits' || $f->field_type=='state' || $f->field_type=='voting') {
 							// skip fields that should not have been versioned: hits, state, voting
 							continue;
+						} else if ($f->field_type=='version') {
+							// set version variable to indicate the loaded version
+							$item->version = $version;
 						} else if( $fieldname=='categories'|| $fieldname=='tags' ) {
 							// categories and tags must have been serialized but some earlier versions did not do it,
 							// we will check before unserializing them, otherwise they were concatenated to a single string and use explode ...
@@ -637,7 +640,7 @@ class ParentClassItem extends JModelLegacy
 				}
 				
 				// -- Retrieve tags field value (if not using versioning)
-				if ( $version ) {
+				if ( $use_versioning && $version ) {
 					// Check version value was found
 					if ( !isset($item->tags) || !is_array($item->tags) )
 						$item->tags = array();
@@ -649,8 +652,8 @@ class ParentClassItem extends JModelLegacy
 				}
 				
 				// -- Retrieve categories field value (if not using versioning)
-				if ( $version ) {
-					// Check version value was found
+				if ( $use_versioning && $version ) {
+					// Check version value was found, and is valid (above code should have produced an array)
 					if ( !isset($item->categories) || !is_array($item->categories) )
 						$item->categories = array();
 				} else {
@@ -658,6 +661,10 @@ class ParentClassItem extends JModelLegacy
 					$db->setQuery($query);
 					$item->categories = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				}
+				
+				// Make sure catid is in categories array
+				if ( !in_array($item->catid, $item->categories) ) $item->categories[] = $item->catid;
+				
 				// 'cats' is an alias of categories
 				$item->cats = & $item->categories;
 				
@@ -1226,7 +1233,8 @@ class ParentClassItem extends JModelLegacy
 			$item->votecount    = 0;
 			$item->hits         = 0;
 			$item->version      = 0;
-			$item->loaded_version = 0;
+			$item->current_version = 0;
+			$item->last_version    = 0;
 			$item->metadesc     = null;
 			$item->metakey      = null;
 			$item->created      = $createdate->toUnix();
@@ -2002,9 +2010,9 @@ class ParentClassItem extends JModelLegacy
 		// ***************************************************************************************************************************		
 		$fields = $this->getExtrafields($force=true, $get_untraslatable_values ? $item->lang_parent_id : 0);
 		
-		$searchindex = '';
+		$searchindex = array();
 		if ($fields)
-		{	
+		{
 			// ******************************************************************************************************************
 			// Loop through Fields triggering onBeforeSaveField Event handlers, this was seperated from the rest of the process
 			// to give chance to ALL fields to check their DATA and cancel item saving process before saving any new field values
@@ -2036,7 +2044,7 @@ class ParentClassItem extends JModelLegacy
 					
 				// CORE FIELDS: if not set maintain their DB value ...
 				} else if ($field->iscore) {
-					$postdata[$field->name] = !FLEXI_J16GE  ?   @$data[$field->name]  :  @$data['jform'][$field->name];
+					$postdata[$field->name] = @$data[$field->name];
 					if ( is_array($postdata[$field->name]) && !count($postdata[$field->name])  ||  !is_array($postdata[$field->name]) && !strlen(trim($postdata[$field->name])) ) {
 						$postdata[$field->name] = $field->value;
 					}
@@ -2046,7 +2054,7 @@ class ParentClassItem extends JModelLegacy
 					$postdata[$field->name] = !FLEXI_J16GE  ?   @$data[$field->name]  :  @$data['custom'][$field->name];
 				}
 				
-				// Unserialize value , e.g. if current values used are from DB or and imported CSV file
+				// Unserialize values already serialized values, e.g. (a) if current values used are from DB or (b) are being imported from CSV file
 				$postdata[$field->name] = !is_array($postdata[$field->name]) ? array($postdata[$field->name]) : $postdata[$field->name];
 				foreach ($postdata[$field->name] as $i => $postdata_val) {
 					if ( @unserialize($postdata_val)!== false || $postdata_val === 'b:0;' ) {
@@ -2066,6 +2074,7 @@ class ParentClassItem extends JModelLegacy
 				// Get vstate property from the field object back to the data array
 				$data['vstate'] = $field->item_vstate;
 			}
+			//echo "<pre>"; print_r($postdata); echo "</pre>"; exit;
 			
 			
 			// ****************************************************************************************************************************
@@ -2073,22 +2082,41 @@ class ParentClassItem extends JModelLegacy
 			//  event, so that we will update search indexes only if the above has not canceled saving OR has not canceled version approval
 			// ****************************************************************************************************************************
 			
+			$ai_query_vals = array();
 			foreach($fields as $field)
 			{
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
 				
-				if ( $data['vstate']==2 )
+				if ( $data['vstate']==2 || $isnew)    // update (regardless of state!!) search indexes if document version is approved OR item is new
 				{
-					// Trigger plugin Event 'onIndexAdvSearch' to update item records in advanced search index
+					// Trigger plugin Event 'onIndexAdvSearch' to update field-item pair records in advanced search index
 					FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexAdvSearch', array( &$field, &$postdata[$field->name], &$item ));
+					if ( isset($field->ai_query_vals) ) foreach ($field->ai_query_vals as $query_val) $ai_query_vals[] = $query_val;
+					//echo $field->name .":".implode(",", @$field->ai_query_vals ? $field->ai_query_vals : array() )."<br/>";
+					
+					// Trigger plugin Event 'onIndexSearch' to update item 's (basic) search index record
+					FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexSearch', array( &$field, &$postdata[$field->name], &$item ));
+					if ( strlen(@$field->search[$item->id]) ) $searchindex[] = $field->search[$item->id];
+					//echo $field->name .":".@$field->search[$item->id]."<br/>";
 				}
-				
-				// Trigger plugin Event 'onIndexSearch' to update item 's (basic) search index record  (*** MAYBE we do not need to create this if item will not be saved ???)
-				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onIndexSearch', array( &$field, &$postdata[$field->name], &$item ));
-				$searchindex .= @$field->search;
-				$searchindex .= @$field->search ? ' | ' : '';
 			}
 		}
+		
+		// Remove item's old advanced search index entries
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE item_id='{$item->id}' ";
+		$this->_db->setQuery($query);
+		$this->_db->query();
+		
+		// Store item's advanced search index entries
+		if ( count($ai_query_vals) ) {
+			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES ". implode(",", $ai_query_vals);
+			$this->_db->setQuery($query);
+			$this->_db->query();
+			if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
+		}
+		
+		// Assigned created basic search index into item object
+		$item->search_index = implode(' | ', $searchindex);
 		
 		// Check if vstate was set to 1 (no approve new version) while versioning is disabled
 		if (!$use_versioning && $data['vstate']!=2) {
@@ -2221,9 +2249,6 @@ class ParentClassItem extends JModelLegacy
 				$obj->value = serialize($data['jfdata']);
 				$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			}
-			
-			// Assigned created search index into the item
-			$item->search_index = $searchindex;
 		}
 		return true;
 	}

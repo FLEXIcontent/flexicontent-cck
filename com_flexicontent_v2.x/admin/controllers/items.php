@@ -817,11 +817,16 @@ class FlexicontentControllerItems extends FlexicontentController
 			$seccats 	= JRequest::getVar( 'seccats', array(), 'post', 'array' );
 			$seccats_col = JRequest::getInt( 'seccats_col', 0 );
 			
+			$tags_col = JRequest::getInt( 'tags_col', 0 );
+			
 			$created_col = JRequest::getInt( 'created_col', 0 );
 			$created_by_col = JRequest::getInt( 'created_by_col', 0 );
 			
 			$metadesc_col = JRequest::getInt( 'metadesc_col', 0 );
 			$metakey_col = JRequest::getInt( 'metakey_col', 0 );
+			
+			$publish_up_col = JRequest::getInt( 'publish_up_col', 0 );
+			$publish_down_col = JRequest::getInt( 'publish_down_col', 0 );
 			
 			$ignore_unused_columns = JRequest::getInt( 'ignore_unused_columns', 0 );
 			
@@ -898,6 +903,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$q = "SELECT id, name FROM #__flexicontent_fields";
 			$db->setQuery($q);
 			$thefields = $db->loadObjectList('name');
+			unset($thefields['tags']); // Prevent Automated Raw insertion of tags, we will use special code
 			
 			
 			// ******************************************************************
@@ -977,6 +983,40 @@ class FlexicontentControllerItems extends FlexicontentController
 				echo "</script>";
 				jexit();
 			} else if ($metakey_col) $core_props[] = 'metakey';
+			
+			if ( $publish_up_col && !in_array('publish_up', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'publish_up\' (Start publication date)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($publish_up_col) $core_props[] = 'publish_up';
+			
+			if ( $publish_down_col && !in_array('publish_down', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'publish_down\' (End publication Date)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($publish_down_col) $core_props[] = 'publish_down';
+			
+			if ( $tags_col==1 && !in_array('tags_names', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'tags_names\' (Comma separated list of tag names)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($tags_col==1) {
+				$core_props[] = 'tags_names';
+				$tags_model	= $this->getModel('tags');
+			}
+			
+			if ( $tags_col==2 && !in_array('tags_raw', $columns) ) {
+				echo "<script>alert ('CSV file lacks column \'tags_raw\' (Comma separated list of tag ids)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ( $tags_col==2 ) {
+				$core_props[] = 'tags_raw';
+				$tags_model	= $this->getModel('tags');
+			}
 			
 			
 			// *********************************************************
@@ -1103,6 +1143,47 @@ class FlexicontentControllerItems extends FlexicontentController
 					{
 						if ($seccats_col) $data[$fieldname] = preg_split("/[\s]*,[\s]*/", $field_values);
 					}
+					else if ( $fieldname=='tags_names' )
+					{
+						if ($tags_col==1) {
+							// Get tag names from comma separated list, filtering out bad characters
+							$_tns_list = preg_replace("/[\"'\\\]/u", "", $field_values);
+							$_tns = array_unique(preg_split("/\s*,\s*/u", $_tns_list));
+							
+							$q = "SELECT id, name FROM #__flexicontent_tags WHERE name IN (". $_tns_list .")";
+							$db->setQuery($q);
+							$_tns_e = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+							
+							$_tns_m = array_diff( $_tns , $_tns_e );
+							if ( count($_tns_m) ) {
+								// Create a newline separated list of tag names and then import missing tags,
+								// thus making sure they are inserted into the tags DB table if not already present
+								$_tns_list_m = implode("\n", $_tns_m);
+								$tags_model->importList($_tns_list_m);
+							}
+							
+							// Get tag ids
+							$_tns_list = "'". implode("','", $_tns) ."'";
+							$q = "SELECT id FROM #__flexicontent_tags WHERE name IN (". $_tns_list .")";
+							$db->setQuery($q);
+							$data['tag'] = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+						}
+					}
+					else if ( $fieldname=='tags_raw' )
+					{
+						if ($tags_col==2) {
+							// Get tag ids from comma separated list, filtering out bad characters
+							$_tis_list = preg_replace("/[\"'\\\]/u", "", $field_values);
+							$_tis = array_unique(array_map('intval', $_tis));
+							$_tis = array_flip( $_tis );
+							
+							// Check to use only existing tag ids
+							$_tis_list = implode(",", array_keys($_tis));
+							$q = "SELECT id FROM #__flexicontent_tags WHERE id IN (". $_tis_list .")";
+							$db->setQuery($q);
+							$data['tag'] = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+						}
+					}
 					else if ( $fieldname=='created' )
 					{
 						if ($created_col) $data[$fieldname] = $field_values;
@@ -1118,6 +1199,14 @@ class FlexicontentControllerItems extends FlexicontentController
 					else if ( $fieldname=='metakey' )
 					{
 						if ($metakey_col) $data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='publish_up' )
+					{
+						if ($publish_up_col) $data[$fieldname] = $field_values;
+					}
+					else if ( $fieldname=='publish_down' )
+					{
+						if ($publish_down_col) $data[$fieldname] = $field_values;
 					}
 					else if ( !FLEXI_J16GE )
 					{

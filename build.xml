@@ -211,13 +211,13 @@
 			</fileset>
 		</copy>
 
-		<copy file="plugins/flexicontent_fields/relateditems.php" tofile="flexipack/plugins/relateditems/relateditems.php" />
-		<copy file="plugins/flexicontent_fields/relateditems.xml" tofile="flexipack/plugins/relateditems/relateditems.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_relateditems.ini" tofile="flexipack/plugins/relateditems/en-GB.plg_flexicontent_fields_relateditems.ini" />
+		<copy file="plugins/flexicontent_fields/relation.php" tofile="flexipack/plugins/relation/relation.php" />
+		<copy file="plugins/flexicontent_fields/relation.xml" tofile="flexipack/plugins/relation/relation.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_relation.ini" tofile="flexipack/plugins/relation/en-GB.plg_flexicontent_fields_relation.ini" />
 		
-		<copy file="plugins/flexicontent_fields/relateditems_backlinks.php" tofile="flexipack/plugins/relateditems_backlinks/relateditems_backlinks.php" />
-		<copy file="plugins/flexicontent_fields/relateditems_backlinks.xml" tofile="flexipack/plugins/relateditems_backlinks/relateditems_backlinks.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_relateditems_backlinks.ini" tofile="flexipack/plugins/relateditems_backlinks/en-GB.plg_flexicontent_fields_relateditems_backlinks.ini" />
+		<copy file="plugins/flexicontent_fields/relation_reverse.php" tofile="flexipack/plugins/relation_reverse/relation_reverse.php" />
+		<copy file="plugins/flexicontent_fields/relation_reverse.xml" tofile="flexipack/plugins/relation_reverse/relation_reverse.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_relation_reverse.ini" tofile="flexipack/plugins/relation_reverse/en-GB.plg_flexicontent_fields_relation_reverse.ini" />
 		
 		<copy file="plugins/flexicontent/flexinotify.php" tofile="flexipack/plugins/flexinotify/flexinotify.php" />
 		<copy file="plugins/flexicontent/flexinotify.xml" tofile="flexipack/plugins/flexinotify/flexinotify.xml" />

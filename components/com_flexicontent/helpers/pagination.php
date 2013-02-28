@@ -39,6 +39,7 @@ class FCPagination extends JPagination
 	 */
 	function getResultsCounter() {
 		// Initialize variables
+		$app = JFactory::getApplication();
 		$html = null;
 		$fromResult = $this->limitstart + 1;
 
@@ -51,9 +52,13 @@ class FCPagination extends JPagination
 
 		// If there are results found
 		if ($this->total > 0) {
+			// Check for maximum allowed of results
+			$fc_view_limit_max = JRequest::getWord('view')!='search'  ?  0  :  (int) $app->getUserState('fc_view_limit_max');
+			$items_total_msg = $fc_view_limit_max && ($this->total >= $fc_view_limit_max) ? 'FLEXI_ITEM_S_OR_MORE' : 'FLEXI_ITEM_S';
+			
 			$html =
 				 "<span class='item_total_label'>".JText::_( 'FLEXI_TOTAL')."</span> "
-				."<span class='item_total_value'>".$this->total." " .JText::_( 'FLEXI_ITEM_S')."</span>"
+				."<span class='item_total_value'>".$this->total." " .JText::_( $items_total_msg )."</span>"
 				."<span class='item_total_label'>".JText::_( 'FLEXI_DISPLAYING')."</span> "
 				."<span class='item_total_value'>".$fromResult ." - " .$toResult ." " .JText::_( 'FLEXI_ITEM_S')."</span>"
 				;

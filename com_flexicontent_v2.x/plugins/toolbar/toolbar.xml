@@ -64,18 +64,13 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
-			<field name="spacer_size" type="text" default="21" size="4" label="FLEXI_FIELD_TOOLBAR_SPACER" description="FLEXI_FIELD_TOOLBAR_SPACER_DESC" />
-			<!--
-			<field name="module_position" type="text" default="" size="20" 
-				label="Position du module" 
-				description="Position du module pour le cache avancé (expérimental)" /> 
-			-->
-			<!--
+			<!--field name="spacer_size" type="text" default="21" size="4" label="FLEXI_FIELD_TOOLBAR_SPACER" description="FLEXI_FIELD_TOOLBAR_SPACER_DESC" />
+			<field name="module_position" type="text" default="" size="20" label="Position du module" description="Position du module pour le cache avancé (expérimental)" />
 			<field name="required" type="radio" default="0" label="Required" description="Required">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</field>
-			-->
+			</field-->
+			
 		</fieldset>
 	</fields>
 	</config>

@@ -81,8 +81,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 		
 		//get the root category of the directory
-		$this->_rootcat = JRequest::getVar('rootcat', false);
-		if ( $this->_rootcat===false )
+		$this->_rootcat = (int) JRequest::getInt('rootcat', 0);
+		if ( !$this->_rootcat)
 			// compatibility of old saved menu items, the value is inside params instead of being URL query variable
 			$this->_rootcat = $params->get('rootcat', FLEXI_J16GE ? 1:0);
 		else
@@ -277,7 +277,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				. $join
 				. ' WHERE c.published = 1'
 				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
-				. ' AND c.parent_id = '.$this->_rootcat
+				. (!$this->_rootcat ? '' : ' AND c.parent_id = '. (int)$this->_rootcat)
 				. $and
 				. $orderby
 				;

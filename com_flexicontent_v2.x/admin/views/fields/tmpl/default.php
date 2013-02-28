@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1598 2012-12-13 12:18:49Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1627 2013-01-14 06:59:25Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,9 +18,36 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+$cparams = & JComponentHelper::getParams( 'com_flexicontent' );
 $ctrl = FLEXI_J16GE ? 'fields.' : '';
 $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 //$field_model = & JModel::getInstance('field', 'FlexicontentModel'); 
+
+$flexi_yes = JText::_( 'FLEXI_YES' );
+$flexi_no  = JText::_( 'FLEXI_NO' );
+$flexi_nosupport = JText::_( 'FLEXI_PROPERTY_NOT_SUPPORTED' );
+$flexi_rebuild   = JText::_( 'FLEXI_REBUILD_SEARCH_INDEX' );
+
+
+$ordering_draggable = $cparams->get('draggable_reordering', 1);
+if ($this->ordering) {
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_ENABLED_TIP').'" />' .' ';
+	$drag_handle_box = '<div class="fc_drag_handle%s" alt="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE').'" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE').'"></div>';
+} else {
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_DISABLED_TIP').'" />' .' ';
+	$drag_handle_box = '<div class="fc_drag_handle %s" alt="'.JText::_('FLEXI_ORDER_COLUMN_FIRST').'" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST').'" ></div>';
+	$image_saveorder    = '';
+}
+
+if ($this->filter_type == '' || $this->filter_type == 0) {
+	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_ORDER_JOOMLA').'::'.JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP').'" />';
+	$ord_col = 'ordering';
+} else {
+	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_ORDER_FLEXICONTENT').'::'.JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_FLEXICONTENT')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP').'" />';
+	$ord_col = 'typeordering';
+}
+$ord_grp = 1;
+
 ?>
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
@@ -52,7 +79,7 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 			<th rowspan="2" class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th rowspan="2" width=""><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th colspan="2" class="center" nowrap="nowrap"><?php echo JText::_( 'FLEXI_CONTENT_LISTS_S' ); ?></th>
-			<th colspan="1" class="center" nowrap="nowrap"><?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW' ); ?></th>
+			<th colspan="2" class="center" nowrap="nowrap"><?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW_S' ); ?></th>
 			<th rowspan="2" width="20"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th rowspan="2" width=""><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th rowspan="2" width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -77,8 +104,9 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 		</tr>
 		<tr>
 			<th nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE', 't.issearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_FILTER', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_ADVANCED_INDEXABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_CONTENT_LIST_FILTERABLE', 't.isfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE', 't.isadvsearch', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_ADVANCED_FILTERABLE', 't.isadvfilter', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 		</tr>
 		
 	</thead>
@@ -91,15 +119,17 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 		</tr>
 	</tfoot>
 
-	<tbody>
+	<tbody id="<?php echo $ordering_draggable && $this->permission->CanOrderFields && $this->ordering ? 'sortable_fcitems' : ''; ?>">
 		<?php
 		$k = 0;
 		$i = 0;
 		$user =& $this->user;
-		$n = count($this->rows);
-		
 		$padcount = 0;
-		foreach($this->rows as $row) {
+		
+		for ($i=0, $n=count($this->rows); $i < $n; $i++)
+		{
+			$row = & $this->rows[$i];
+			
 			$padspacer = '';
 			$row_css = '';
 			
@@ -158,13 +188,43 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 			//check which properties are supported by current field
 			$ft_support = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
 			
-			$supportsearch          = $ft_support->supportsearch;
-			$supportadvsearch       = $ft_support->supportadvsearch;
-			$supportfilter          = $ft_support->supportfilter;
+			$supportsearch    = $ft_support->supportsearch;
+			$supportfilter    = $ft_support->supportfilter;
+			$supportadvsearch = $ft_support->supportadvsearch;
+			$supportadvfilter = $ft_support->supportadvfilter;
 			
-			$issearch    = ($row->issearch && $supportsearch)       ? "tick.png" : "publish_x".(!$supportsearch ? '_f2' : '').".png";
-			$isfilter    = ($row->isfilter && $supportfilter)       ? "tick.png" : "publish_x".(!$supportfilter ? '_f2' : '').".png";
-			$isadvsearch = ($row->isadvsearch && $supportadvsearch) ? "tick.png" : "publish_x".(!$supportadvsearch ? '_f2' : '').".png";
+			if ($row->issearch==0 || $row->issearch==1 || !$supportsearch) {
+				$search_dirty = 0;
+				$issearch = ($row->issearch && $supportsearch) ? "tick.png" : "publish_x".(!$supportsearch ? '_f2' : '').".png";
+				$issearch_tip = ($row->issearch && $supportsearch) ? $flexi_yes : ($supportsearch ? $flexi_no : $flexi_nosupport);
+			} else {
+				$search_dirty = 1;
+				$issearch = $row->issearch==-1 ? "disconnect.png" : "connect.png";
+				$issearch_tip = ($row->issearch==2 ? $flexi_yes : $flexi_no) .", ". $flexi_rebuild;
+			}
+			
+			$isfilter = ($row->isfilter && $supportfilter) ? "tick.png" : "publish_x".(!$supportfilter ? '_f2' : '').".png";	
+			$isfilter_tip = ($row->isfilter && $supportfilter) ? $flexi_yes : ($supportsearch ? $flexi_no : $flexi_nosupport);
+			
+			if ($row->isadvsearch==0 || $row->isadvsearch==1 || !$supportadvsearch) {
+				$advsearch_dirty = 0;
+				$isadvsearch = ($row->isadvsearch && $supportadvsearch) ? "tick.png" : "publish_x".(!$supportadvsearch ? '_f2' : '').".png";
+				$isadvsearch_tip = ($row->isadvsearch && $supportadvsearch) ? $flexi_yes : ($supportadvsearch ? $flexi_no : $flexi_nosupport);
+			} else {
+				$advsearch_dirty = 1;
+				$isadvsearch = $row->isadvsearch==-1 ? "disconnect.png" : "connect.png";
+				$isadvsearch_tip = ($row->isadvsearch==2 ? $flexi_yes : $flexi_no) .", ". $flexi_rebuild;
+			}
+			
+			if ($row->isadvfilter==0 || $row->isadvfilter==1 || !$supportadvfilter) {
+				$advfilter_dirty = 0;
+				$isadvfilter = ($row->isadvfilter && $supportadvfilter) ? "tick.png" : "publish_x".(!$supportadvfilter ? '_f2' : '').".png";
+				$isadvfilter_tip = ($row->isadvfilter && $supportadvfilter) ? $flexi_yes : ($supportadvfilter ? $flexi_no : $flexi_nosupport);
+			} else {
+				$advfilter_dirty = 1;
+				$isadvfilter = $row->isadvfilter==-1 ? "disconnect.png" : "connect.png";
+				$isadvfilter_tip = ($row->isadvfilter==2 ? $flexi_yes : $flexi_no) .", ". $flexi_rebuild;
+			}
 			
 			if (FLEXI_J16GE) {
 				if ($canPublish) {
@@ -228,18 +288,23 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 			</td>
 			<td align="center">
 				<?php if($supportsearch) : ?> <a title="Toggle property" onclick="document.adminForm.propname.value='issearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);"> <?php endif; ?>
-					<img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->issearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" />
-				</a> <php endif; ?>
+					<img src="components/com_flexicontent/assets/images/<?php echo $issearch;?>" width="16" height="16" border="0" title="<?php echo $issearch_tip;?>" alt="<?php echo $issearch_tip;?>" />
+				</a>
 			</td>
 			<td align="center">
 				<?php if($supportfilter) : ?> <a title="Toggle property" onclick="document.adminForm.propname.value='isfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);"> <?php endif; ?>
-					<img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isfilter ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" />
-				</a> <php endif; ?>
+					<img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" border="0" title="<?php echo ( $row->isfilter ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" />
+				</a>
 			</td>
 			<td align="center">
 				<?php if($supportadvsearch) : ?> <a title="Toggle property" onclick="document.adminForm.propname.value='isadvsearch'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);"> <?php endif; ?>
-					<img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" border="0" alt="<?php echo ( $row->isadvsearch ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" />
-				</a> <php endif; ?>
+					<img src="components/com_flexicontent/assets/images/<?php echo $isadvsearch;?>" width="16" height="16" border="0" title="<?php echo $isadvsearch_tip;?>" alt="<?php echo $isadvsearch_tip;?>" />
+				</a>
+			</td>
+			<td align="center">
+				<?php if($supportadvfilter) : ?> <a title="Toggle property" onclick="document.adminForm.propname.value='isadvfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);"> <?php endif; ?>
+					<img src="components/com_flexicontent/assets/images/<?php echo $isadvfilter;?>" width="16" height="16" border="0" title="<?php echo $isadvfilter_tip;?>" alt="<?php echo $isadvfilter_tip;?>" />
+				</a>
 			</td>
 			<td align="center"><?php echo $row->nrassigned ? $row->nrassigned : $warning; ?></td>
 			<td align="center">
@@ -250,16 +315,29 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 			</td>
 			<?php if ($this->permission->CanOrderFields) : ?>
 			<td class="order">
-				<span><?php echo $this->pageNav->orderUpIcon( $i, true, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
-
-				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
-
-				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
-				<?php if ($this->filter_type == '' || $this->filter_type == 0) : ?>
-				<input type="text" name="order[]" size="5" value="<?php echo $row->ordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
-				<?php else : ?>
-				<input type="text" name="order[]" size="5" value="<?php echo $row->typeordering; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
+				<?php
+					$show_orderUp   = $i > 0;
+					$show_orderDown = $i < $n-1;
+				?>
+				<?php if ($ordering_draggable) : ?>
+					<?php
+						if (!$this->ordering) echo sprintf($drag_handle_box,' fc_drag_handle_disabled');
+						else if ($show_orderUp && $show_orderDown) echo sprintf($drag_handle_box,' fc_drag_handle_both');
+						else if ($show_orderUp) echo sprintf($drag_handle_box,' fc_drag_handle_uponly');
+						else if ($show_orderDown) echo sprintf($drag_handle_box,' fc_drag_handle_downonly');
+						else echo sprintf($drag_handle_box,'_none');
+					?>
+				<?php else: ?>
+					<span><?php echo $this->pageNav->orderUpIcon( $i, true, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
+					<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
 				<?php endif; ?>
+				
+				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
+				<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
+				
+				<input type="hidden" name="item_cb[]" style="display:none;" value="<?php echo $row->id; ?>" />
+				<input type="hidden" name="prev_order[]" style="display:none;" value="<?php echo $row->$ord_col; ?>" />
+				<input type="hidden" name="ord_grp[]" style="display:none;" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
 			</td>
 			<?php else : ?>
 			<td align="center">
@@ -274,7 +352,7 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 			<?php endif; ?>
 			<td align="center"><?php echo $row->id; ?></td>
 		</tr>
-		<?php $k = 1 - $k; $i++;} ?>
+		<?php $k = 1 - $k; } ?>
 	</tbody>
 
 	</table>

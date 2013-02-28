@@ -18,6 +18,9 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsRadio extends JPlugin
 {
+	static $field_types = array('radio');
+	static $extra_props = array();
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -38,18 +41,24 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'radio') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
-		$separator			= $field->parameters->get( 'separator' ) ;
 		$default_value	= $field->parameters->get( 'default_value', '' ) ;
 		
-		$required 	= $field->parameters->get( 'required', 0 ) ;
-		$required 	= $required ? ' required validate-radio' : '';
+		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		$pretext			= $field->parameters->get( 'pretext_form', '' ) ;
+		$posttext			= $field->parameters->get( 'posttext_form', '' ) ;
+		$separator		= $field->parameters->get( 'separator', 0 ) ;
+		$opentag			= $field->parameters->get( 'opentag_form', '' ) ;
+		$closetag			= $field->parameters->get( 'closetag_form', '' ) ;
+		
+		$required = $field->parameters->get( 'required', 0 ) ;
+		$required = $required ? ' required validate-radio' : '';
 		
 		switch($separator)
 		{
@@ -69,9 +78,9 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 			$separator = ',&nbsp;';
 			break;
 
-			//case 4:  // could cause problem in item form ?
-			//$separatorf = $closetag . $opentag;
-			//break;
+			case 4:
+			$separator = $closetag . $opentag;
+			break;
 
 			default:
 			$separator = '&nbsp;';
@@ -91,7 +100,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 		
 		// Get indexed element values
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array());
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props);
 		if ( !$elements ) {
 			if ($sql_mode)
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
@@ -103,13 +112,19 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		// Create field's HTML display for item form
 		// Display as radio buttons
 		$i = 0;
-		$options = "";
+		$options = array();
 		foreach ($elements as $element) {
 			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
-			$options .= '<label><input type="radio" id="'.$elementid.'_'.$i.'" name="'.$fieldname.'" class="'.$required.'" value="'.$element->value.'" '.$checked.' />'.JText::_($element->text).'</label>'.$separator;
+			$options[] = '<label><input type="radio" id="'.$elementid.'_'.$i.'" name="'.$fieldname.'" class="'.$required.'" value="'.$element->value.'" '.$checked.' />'.JText::_($element->text).'</label>'.$separator;
 			$i++;
 		}
-		$field->html = $options;
+		
+		// Apply values separator
+		$field->html = implode($separator, $options);
+		
+		// Apply field 's opening / closing texts
+		if ($field->html)
+			$field->html = $opentag . $field->html . $closetag;
 	}
 	
 	
@@ -117,26 +132,30 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'radio') return;
-
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
 		$field->label = JText::_($field->label);
 		
+		// Get field values
 		$values = $values ? $values : $field->value;
-
+		if ( !$values ) { $field->{$prop} = ''; return; }  // currently default values applied in item form only
+		
+		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
+		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		
+		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
+		
 		// some parameter shortcuts
-		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext			= $field->parameters->get( 'pretext', '' ) ;
-		$posttext			= $field->parameters->get( 'posttext', '' ) ;
 		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
+		$text_or_value= $field->parameters->get( 'text_or_value', 1 ) ;
 		
-		if($pretext) 	{ $pretext 	= $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext	= $remove_space ? $posttext : ' ' . $posttext; }
-		
-		if ( !$values ) { $field->{$prop}=''; return; }
 		
 		// Get indexed element values
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array());
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props);
 		if ( !$elements ) {
 			if ($sql_mode)
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
@@ -151,7 +170,9 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		if ( count($values) ) {
 			$element = @$elements[ $values[0] ];
 			if ( $element ) {
-				$display = $pretext . JText::_($element->text) . $posttext;
+				if ($text_or_value == 0) $fe_display = $element->value;
+				else $fe_display =JText::_($element->text);
+				$display = $pretext . $fe_display . $posttext;
 				$display_index = $element->value;
 			}
 		}
@@ -169,8 +190,8 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'radio') return;
-		if(!is_array($post) && !strlen($post)) return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !is_array($post) && !strlen($post) ) return;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -208,9 +229,10 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if($filter->field_type != 'radio') return;
+		// execute the code only if the field type match the plugin type
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		plgFlexicontent_fieldsRadio::onDisplayFilter($filter, $value, $formName);
+		self::onDisplayFilter($filter, $value, $formName, $elements=true);
 	}
 	
 	
@@ -218,17 +240,16 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		// execute the code only if the field type match the plugin type
-		if($filter->field_type != 'radio') return;
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 
-		// some parameter shortcuts
-		$sql_mode				= $filter->parameters->get( 'sql_mode', 0 ) ;
-		$label_filter 	= $filter->parameters->get( 'display_label_filter', 0 ) ;
-		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('FLEXI_ALL');
-		$filter->html = '';
 		
 		// Get indexed element values
-		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, $extra_props=array(), $item_pros=false);
+		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, static::$extra_props, $item_pros=false, $create_filter=true);
+		
+		// Check for error during getting indexed field elements
 		if ( !$elements ) {
+			$filter->html = '';
+			$sql_mode = $filter->parameters->get( 'sql_mode', 0 );  // must retrieve variable here, and not before retrieving elements !
 			if ($sql_mode && $item_pros > 0)
 				$filter->html = sprintf( JText::_('FLEXI_FIELD_ITEM_SPECIFIC_AS_FILTERABLE'), $filter->label );
 			else if ($sql_mode)
@@ -238,21 +259,28 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 			return;
 		}
 		
-		// Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
-		$view = JRequest::getVar('view');
-		$force_all = $view!='category';
-		$results = array_intersect_key($elements, flexicontent_cats::getFilterValues($filter, $force_all));
+		FlexicontentFields::createFilter($filter, $value, $formName, $elements);
+	}
+	
+	
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for content lists e.g. category view, and not for search view
+	function getFiltered(&$filter, $value)
+	{
+		// execute the code only if the field type match the plugin type
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		// Create the select form field used for filtering
-		$options = array();
-		$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
+		return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
+	}
+	
+	
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for search view
+	function getFilteredSearch(&$field, $value)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
-		foreach($results as $result) {
-			if ( !strlen($result->value) ) continue;
-			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
-		}
-		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-		$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
 	}
 	
 	
@@ -263,12 +291,11 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item) {
-		if ($field->field_type != 'radio') return;
-		if ( !$field->isadvsearch ) return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
-		if ($post===null) $post = & FlexicontentFields::searchIndex_getFieldValues($field,$item);
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array());
-		$values = FlexicontentFields::indexedField_getValues($field, $elements, $post, $prepost_prop='text');
+		$field->isindexed = true;
+		$field->extra_props = static::$extra_props;
 		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
@@ -277,23 +304,13 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ($field->field_type != 'radio') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
-		if ($post===null) $post = & FlexicontentFields::searchIndex_getFieldValues($field,$item);
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, $extra_props=array());
-		$values = FlexicontentFields::indexedField_getValues($field, $elements, $post, $prepost_prop='text');
+		$field->isindexed = true;
+		$field->extra_props = static::$extra_props;
 		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
 		return true;
-	}
-	
-		
-	// Method to get ALL items that have matching search values for the current field id
-	function onFLEXIAdvSearch(&$field)
-	{
-		if ($field->field_type != 'radio') return;
-		
-		FlexicontentFields::onFLEXIAdvSearch($field);
 	}
 	
 }

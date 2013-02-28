@@ -6,10 +6,7 @@
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
  * 
- * FLEXIcontent is a derivative work of the excellent QuickFAQ component
- * @copyright (C) 2008 Christoph Lukes
- * see www.schlu.net for more information
- *
+ * FLEXIcontent module is universal Content Listing Module for flexicontent.
  * FLEXIcontent is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -46,8 +43,13 @@ if ($params->get('combine_show_rules', 'AND')=='AND') {
 
 if ( $show_mod )
 {
+	global $modfc_jprof;
+	$modfc_jprof = new JProfiler();
+	$modfc_jprof->mark('START: FLEXIcontent Module');
+	global $mod_fc_run_times;
+	$mod_fc_run_times = array();
+	
 	// Logging Info variables
-	$start_microtime = microtime(true);
 	global $fc_content_plg_microtime;
 	$fc_content_plg_microtime = 0;
 	
@@ -68,7 +70,7 @@ if ( $show_mod )
 	$count 					= (int)$params->get('count', 5);
 	$featured				= (int)$params->get('count_feat', 1);
 	
-	// get module display parameters
+	// get module's basic display parameters
 	$moduleclass_sfx= $params->get('moduleclass_sfx', '');
 	$layout 				= $params->get('layout', 'default');
 	$add_ccs 				= $params->get('add_ccs', 1);
@@ -128,38 +130,29 @@ if ( $show_mod )
 	$custom4 				= $params->get('custom4');
 	$custom5 				= $params->get('custom5');
 	
-	// Calculate menu itemid for item links
-	$menus				= & JApplication::getMenu('site', array());
-	$itemid_force	= (int)$params->get('itemid_force');
-	if ($itemid_force==1) {
-		$Itemid					= JRequest::getInt('Itemid');
-		$menu						= & $menus->getItem($Itemid);
-		$component			= @$menu->query['option'] ? $menu->query['option'] : '';
-		$forced_itemid	= $component=="com_flexicontent" ? $Itemid : 0;
-	} else if ($itemid_force==2) {
-		$itemid_force_value	= (int)$params->get('itemid_force_value', 0);
-		$menu								= & $menus->getItem($itemid_force_value);
-		$component					= @$menu->query['option'] ? $menu->query['option'] : '';
-		$forced_itemid			= $component=="com_flexicontent" ? $itemid_force_value : 0;
-	} else {
-		$forced_itemid = 0;
-	}
-	$params->set('forced_itemid', $forced_itemid);
-	
-	// Disable output of comments if comments component not installed
-	if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
-		$display_comments_feat = $display_comments = 0;
-		$params->set('display_comments_feat', 0);	$params->set('display_comments', 0);
-	}
-	
 	// include the helper only once
 	require_once (dirname(__FILE__).DS.'helper.php');
 	
+	// Verify parameters (like forced menu item id and comments showing)
+	modFlexicontentHelper::verifyParams( $params );
+	
+	// Create Item List Data
 	$list_arr = modFlexicontentHelper::getList($params);
+	
+	$mod_fc_run_times['category_data_retrieval'] = $modfc_jprof->getmicrotime();
+	
+	// Get Category List Data
 	$catdata_arr = modFlexicontentHelper::getCategoryData($params);
-	if (!$catdata_arr) $catdata_arr = array (false);
+	$catdata_arr = $catdata_arr ? $catdata_arr : array (false);
 	
+	$mod_fc_run_times['category_data_retrieval'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['category_data_retrieval'];
 	
+	$mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime();
+	
+	// Add tooltips
+	if ($add_tooltips) JHTML::_('behavior.tooltip');
+	
+	// Add css
 	if ($add_ccs && $layout) {
 	  if ($caching && !FLEXI_J16GE) {
 			// Work around for caching bug in J1.5
@@ -178,33 +171,40 @@ if ( $show_mod )
 	  }
 	}
 	
-	
-	// Tooltips
-	if ($add_tooltips) JHTML::_('behavior.tooltip');
-	
-	// Render Layout
+	// Render Layout, (once per category if apply per category is enabled ...)
 	foreach ($catdata_arr as $i => $catdata) {
 		$list = & $list_arr[$i];
 		require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout));
 	}
-	?>
 	
-	<?php if ($show_more == 1) : ?>
+	// Add module Read More
+	if ($show_more == 1) : ?>
 		<span class="module_readon<?php echo $params->get('moduleclass_sfx'); ?>"<?php if ($more_css) : ?> style="<?php echo $more_css; ?>"<?php endif;?>>
 			<a class="readon" href="<?php echo JRoute::_($more_link); ?>" <?php if ($params->get('more_blank') == 1) {echo 'target="_blank"';} ?>><span><?php echo JText::_($more_title); ?></span></a>
 		</span>
-	<?php endif;?>
+	<?php endif;
 	
-	<?php
+	$mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['rendering_template'];
+	
+	$task_lbls = array(
+		'query_items'=>'DB Querying of Items: %.2f secs',
+		'empty_fields_filter'=>'Empty fields filter (skip items)): %.2f secs',
+		'item_list_creation'=>'Item list creation (with custom field rendering): %.2f secs',
+		'category_data_retrieval'=>'Category data retrieval: %.2f secs',
+		'rendering_template'=>'Adding css/js & Rendering Template with item/category/etc data: %.2f secs'
+	);
 	$flexiparams =& JComponentHelper::getParams('com_flexicontent');
-	if ( $flexiparams->get('print_logging_info') ) {
-		$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+	if ( $flexiparams->get('print_logging_info') )
+	{
 		$app = & JFactory::getApplication();
-		$msg = sprintf( 'FLEXIcontent universal module creation is %.2f secs, (including content plugins: %.2f secs)', $elapsed_microseconds/1000000, $fc_content_plg_microtime/1000000);
+		$modfc_jprof->mark('END: FLEXIcontent Module');
+		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
+		$msg .= sprintf( '<code> <b><u>including</u></b>: <br/> -- Content Plugins: %.2f secs</code><br/>', $fc_content_plg_microtime/1000000);
+		foreach ($mod_fc_run_times as $modtask => $modtime) {
+			$msg .= '<code>'.sprintf( ' -- '.$task_lbls[$modtask].'<br/>', $modtime) .'</code>';
+		}
 		$app->enqueueMessage( $msg, 'notice' );
 	}
-	?>
-
-<?php
+	
 }
 ?>

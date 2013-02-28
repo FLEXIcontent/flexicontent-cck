@@ -32,6 +32,7 @@ $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcitems fcitem'.$this->item->id;
 $page_classes .= ' fctype'.$this->item->type_id;
+$page_classes .= ' fcmaincat'.$this->item->catid;
 
 $mainAreaTag = ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title && $this->params->get('show_title', 1) ) ? 'section' : 'article';
 // SEO

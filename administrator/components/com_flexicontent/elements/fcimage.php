@@ -72,7 +72,7 @@ class JElementFcimage extends JElement
 		$fields = $db->loadObjectList();
 
 		foreach ($fields as $field) {
-			$images[] = JHTMLSelect::option($field->value, $field->text); 
+			$images[] = JHTMLSelect::option($field->value, JText::_('FLEXI_FIELD') .': '. $field->text); 
 		}
 
 		return JHTMLSelect::genericList($images, $control_name.'['.$name.']', $class='', 'value', 'text', $value, $control_name.$name);

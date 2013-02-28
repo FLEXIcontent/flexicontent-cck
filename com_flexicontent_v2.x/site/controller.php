@@ -89,6 +89,7 @@ class FlexicontentController extends JControllerLegacy
 		$task	   = JRequest::getVar('task');
 		$model   = & $this->getModel(FLEXI_ITEMVIEW);
 		$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
+		$dolog = JComponentHelper::getParams( 'com_flexicontent' )->get('print_logging_info');
 		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($app->getParams('com_flexicontent'));
@@ -455,9 +456,9 @@ class FlexicontentController extends JControllerLegacy
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='.(int) $model->_item->id .'&'. (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()) .'=1';
 			
-			// Important pass refer back to avoid making the form itself the refer
-			$refer = JRequest::getString('referer', '', 'post');
-			$return = '&return='.base64_encode( $refer );
+			// Important pass referer back to avoid making the form itself the referer
+			$referer = JRequest::getString('referer', JURI::base(), 'post');
+			$return = '&return='.base64_encode( $referer );
 			$link .= $return;
 		} else if ($task=='save_a_preview') {
 			// Save and preview the latest version
@@ -472,9 +473,15 @@ class FlexicontentController extends JControllerLegacy
 				$link = $submit_redirect_url_fe;
 				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 			} else {
-				// Return to the form 's refer (previous page) after item saving
+				// Return to the form 's referer (previous page) after item saving
 				$msg = $isnew ? JText::_( 'FLEXI_THANKS_SUBMISSION' ) : JText::_( 'FLEXI_ITEM_SAVED' );
+				
+				// Check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
 				$link = JRequest::getString('referer', JURI::base(), 'post');
+				if ( ! flexicontent_html::is_safe_url($link) ) {
+					if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$link, 'notice' );
+					$link = JURI::base();
+				}
 			}
 			
 			// Clear item from being marked as newly submitted
@@ -747,6 +754,7 @@ class FlexicontentController extends JControllerLegacy
 		// Initialize some variables
 		$user	= & JFactory::getUser();
 		$session 	=& JFactory::getSession();
+		$dolog = JComponentHelper::getParams( 'com_flexicontent' )->get('print_logging_info');
 
 		// Get an item model
 		$model = & $this->getModel(FLEXI_ITEMVIEW);
@@ -780,14 +788,20 @@ class FlexicontentController extends JControllerLegacy
 			if ($canEdit) $model->checkin();
 		}
 		
-		// If the task was edit or cancel, we go back to the form refer
+		// If the task was edit or cancel, we go back to the form referer
 		$referer = JRequest::getString('referer', JURI::base(), 'post');
+		
+		// Check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
+		if ( ! flexicontent_html::is_safe_url($referer) ) {
+			if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$referer, 'notice' );
+			$referer = JURI::base();
+		}
+		
 		$this->setRedirect($referer);
 	}
 
 	/**
-	 * Method of the voting without AJAX. Exists for compatibility reasons,
-	 * since it can be called by Joomla's content vote plugin.
+	 * Method of the voting without AJAX. Exists for compatibility reasons, since it can be called by Joomla's content vote plugin.
 	 *
 	 * @access public
 	 * @since 1.0
@@ -799,12 +813,15 @@ class FlexicontentController extends JControllerLegacy
 		$id = JRequest::getInt('id', 0);
 		$cid = JRequest::getInt('cid', 0);
 		$url = JRequest::getString('url', '');
+		$dolog = JComponentHelper::getParams( 'com_flexicontent' )->get('print_logging_info');
 		
-		// url variable is set by Joomla's content plugin
-		if (!$url) {
+		// Check that the pased URL variable is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
+		if ( ! $url || ! flexicontent_html::is_safe_url($url) ) {
+			if ( $dolog ) JFactory::getApplication()->enqueueMessage( 'refused redirection to possible unsafe URL: '.$url, 'notice' );
 			$url = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$cid.'&id='.$id);
 		}
-			// Finally store the vote
+		
+		// Finally store the vote
 		JRequest::setVar('no_ajax', 1);
 		$this->ajaxvote();
 		
@@ -866,10 +883,10 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	public function ajaxvote()
 	{
-		$app 	=& JFactory::getApplication();
-		$user 	= &JFactory::getUser();
-		$db  	= &JFactory::getDBO();
-		$session 	=& JFactory::getSession();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$db   = JFactory::getDBO();
+		$session = JFactory::getSession();
 		
 		$no_ajax			= JRequest::getInt('no_ajax');
 		$user_rating	= JRequest::getInt('user_rating');

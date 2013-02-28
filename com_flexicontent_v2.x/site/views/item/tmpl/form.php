@@ -577,7 +577,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
 				
 				// -- Tooltip for the current field label
-				$edithelp = $field->parameters->get('edithelp', 1 );
+				$edithelp = $field->edithelp ? $field->edithelp : 1;
 				$label_tooltip = ( $field->description && ($edithelp==1 || $edithelp==2) ) ?
 					' class="flexi_label hasTip '.($edithelp==2 ? ' fc_tooltip_icon_fe ' : '').'" title="'.$field->label.'::'.$field->description.'" ' :
 					' class="flexi_label" ';

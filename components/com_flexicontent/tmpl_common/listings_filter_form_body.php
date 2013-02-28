@@ -61,6 +61,7 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 			<?php endif; ?>
 			
 			<?php
+			$show_filter_labels = $this->params->get('show_filter_labels', 1);
 			foreach ($this->filters as $filt) :
 				if (empty($filt->html)) continue;
 				// Form field that have form auto submit, need to be have their onChange Event prepended with the FORM PREPARATION function call
@@ -76,23 +77,27 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 					// Filter has no onChange event and thus no autosubmit, force GO button  (in case GO button was not already inside search box)
 					$force_go = true;
 				}
-				?>
-				<span class="filter" >
 				
-					<?php if ( $this->params->get('show_filter_labels', 1)==1 ) : ?>
-						<span class="filter_label">
-							<?php echo $filt->label; ?>
-						</span>
-					<?php endif; ?>
-				
-					<span class="filter_html">
-						<?php echo $filt->html; ?>
-					</span>
-				
-				</span>
-			<?php endforeach; ?>
+				$_filter_html  = '<span class="filter" >' ."\n";
+				$_filter_html .= $show_filter_labels==1 ? ' <span class="filter_label">' .$filt->label. '</span>' ."\n"  :  '';
+				$_filter_html .= ' <span class="filter_html">' .$filt->html. '</span>' ."\n";
+				$_filter_html .= '</span>' ."\n";
+				$filters_html[] = $_filter_html;
+			endforeach;
 			
-			<?php 
+			// Sub-category prefix/suffix/separator parameters
+			$pretext = $this->params->get( 'filter_pretext', '' ); $posttext = $this->params->get( 'filter_posttext', '' );
+			$opentag = $this->params->get( 'filter_opentag', '' ); $closetag = $this->params->get( 'filter_closetag', '' );
+			
+			$separatorf = $this->params->get( 'filter_separatorf', 1 ); 
+			$separators_arr = array( 0 => '&nbsp;', 1 => '<br />', 2 => '&nbsp;|&nbsp;', 3 => ',&nbsp;', 4 => $closetag.$opentag);
+			$separatorf = isset($separators_arr[$separatorf]) ? $separators_arr[$separatorf] : '&nbsp;';
+			
+			// Create the HTML of sub-category list , add configured separator
+			$filters_html = implode($separatorf, $filters_html);
+			// Add open/close tag to the HTML
+			echo $filters_html = $opentag .$filters_html. $closetag;
+			
 			$go_added = $this->params->get('use_search') && $this->params->get('show_search_go', 1);
 			$reset_added = $this->params->get('use_search') && $this->params->get('show_search_reset', 1);
 			?>
@@ -116,7 +121,7 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 	endif;
 	?>
 
-	<?php if (count($this->items)) : ?>
+	<?php if (count($this->items) && ($this->params->get('show_item_total', 1) || $limit_selector || $orderby_selector )) : ?>
 
 	<!-- BOF items total-->
 	<div id="item_total" class="item_total group">

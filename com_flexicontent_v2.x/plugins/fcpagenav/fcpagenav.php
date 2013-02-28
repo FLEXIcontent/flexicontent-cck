@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: fcpagenav.php 1167 2012-03-09 03:25:01Z ggppdk $
+ * @version 1.0 $Id: fcpagenav.php 1607 2012-12-20 09:04:57Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -19,6 +19,8 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsFcpagenav extends JPlugin
 {
+	static $field_types = array('fcpagenav');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -39,7 +41,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'fcpagenav') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 	}
 	
 	
@@ -47,7 +49,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'fcpagenav') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 
 		$mainframe =& JFactory::getApplication();
 		$view = JRequest::getString('view', FLEXI_ITEMVIEW);

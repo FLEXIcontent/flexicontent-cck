@@ -270,18 +270,24 @@ class FlexicontentControllerFields extends FlexicontentController
 				$msg = '';
 				JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
 			} else {
-				$total = $model->toggleprop($cid, $propname);
-				if ($total === false) {
+				$unsupported = 0; $locked = 0;
+				$affected = $model->toggleprop($cid, $propname, $unsupported, $locked);
+				if ($affected === false) {
 					$msg = JText::_( 'FLEXI_OPERATION_FAILED' );
 					JError::raiseWarning( 500, $model->getError() );
 				} else {
-					if ($total && $propname=='issearch')    JError::raiseNotice( 403, JText::_( 'FLEXI_ALERT_RECALCULATE_BASIC_INDEX' ) );
-					if ($total && $propname=='isadvsearch') JError::raiseNotice( 403, JText::_( 'FLEXI_ALERT_RECALCULATE_ADVANCED_INDEX' ) );
-					$msg 	= JText::sprintf( 'FLEXI_FIELD_PROPERTY_TOGGLED', $total);
-					if ($total < count($cid)) $msg .= '<br/>'.JText::sprintf( 'FLEXI_FIELD_PROPERTY_TOGGLED_SKIPPED', count($cid) - $total);
-					$cache = &JFactory::getCache('com_flexicontent');
+					// A message about total count of affected rows , and about skipped fields (unsupported or locked)
+					$prop_map = array('issearch'=>'FLEXI_TOGGLE_TEXT_SEARCHABLE', 'isfilter'=>'FLEXI_TOGGLE_FILTERABLE',
+						'isadvsearch'=>'FLEXI_TOGGLE_ADV_TEXT_SEARCHABLE', 'isadvfilter'=>'FLEXI_TOGGLE_ADV_FILTERABLE');
+					$property_fullname = isset($prop_map[$propname]) ? "'".JText::_($prop_map[$propname])."'" : '';
+					$msg = JText::sprintf( 'FLEXI_FIELDS_TOGGLED_PROPERTY', $property_fullname, $affected);
+					if ($affected < count($cid))
+						$msg .= '<br/>'.JText::sprintf( 'FLEXI_FIELDS_TOGGLED_PROPERTY_FIELDS_SKIPPED', $unsupported + $locked, $unsupported, $locked);
+					
+					// Clean cache as needed
+					$cache = JFactory::getCache('com_flexicontent');
 					$cache->clean();
-					$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+					$itemcache = JFactory::getCache('com_flexicontent_items');
 					$itemcache->clean();
 				}
 			}
@@ -691,15 +697,11 @@ class FlexicontentControllerFields extends FlexicontentController
 		}
 		
 		// Try to copy fields
-		$ids_map = $model->copy( $auth_cid );
+		$ids_map = $model->copy( $auth_cid, $task == 'copy_wvalues');
 		if ( !$ids_map ) {
 			$msg = JText::_( 'FLEXI_FIELDS_COPY_FAILED' );
 			JError::raiseWarning( 500, $model->getError() );
 		} else {
-			if ($task == 'copy_wvalues') {
-				// Also copy field values assigned to items
-				$model->copyvalues( $ids_map );
-			}
 			$msg = '';
 			if (count($ids_map)) {
 				$msg .= JText::sprintf('FLEXI_FIELDS_COPY_SUCCESS', count($ids_map)) . ' ';

@@ -41,15 +41,20 @@ if ($params->get('combine_show_rules', 'AND')=='AND') {
 
 if ( $show_mod )
 {
+	global $modfc_jprof;
+	$modfc_jprof = new JProfiler();
+	$modfc_jprof->mark('START: FLEXIcontent Filter-Search Module');
+	
 	// load english language file for 'mod_flexifilter' module then override with current language file
 	JFactory::getLanguage()->load('mod_flexifilter', JPATH_SITE, 'en-GB', true);
 	JFactory::getLanguage()->load('mod_flexifilter', JPATH_SITE, null, true);
 	
-	// Include the syndicate functions only once
+	// include the helper only once
 	require_once (dirname(__FILE__).DS.'helper.php');
 	
-	$document 	=& JFactory::getDocument();
-	$config 	=& JFactory::getConfig();
+	// initialize various variables
+	$document	= JFactory::getDocument();
+	$config 	= JFactory::getConfig();
 	$caching 	= $config->getValue('config.caching', 0);
 	
 	// Other parameters
@@ -143,14 +148,14 @@ if ( $show_mod )
 	{
 		// 4.a Get the filter 's HTML
 		$filter_value = JRequest::getVar('filter_'.$filter->id, '');  // CURRENT value
-		$fieldname = $filter->iscore ? 'core' : $filter->field_type;
 		
 		// make sure filter HTML is cleared, and create it
 		$display_label_filter_saved = $filter->parameters->get('display_label_filter');
 		if ( $params->get('show_filter_labels',1)>0 ) $filter->parameters->set('display_label_filter', 0); // suppress labels inside filter's HTML (hide or show all labels externally)
 		// else ... filter default label behavior
 		$filter->html = '';  // make sure filter HTML display is cleared
-		FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFilter', array( &$filter, $filter_value ) );
+		$field_type = $filter->iscore ? 'core' : $filter->field_type;
+		FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFilter', array( &$filter, $filter_value, $form_name ) );
 		$filter->parameters->set('display_label_filter', $display_label_filter_saved);
 		
 		// 4.b Manipulate filter's HTML to match our filtering form
@@ -202,8 +207,15 @@ if ( $show_mod )
 		// Render Layout
 		require(JModuleHelper::getLayoutPath('mod_flexifilter', $layout));
 	}
-	?>
-
-<?php
+	
+	$flexiparams =& JComponentHelper::getParams('com_flexicontent');
+	if ( $flexiparams->get('print_logging_info') )
+	{
+		$app = & JFactory::getApplication();
+		$modfc_jprof->mark('END: FLEXIcontent Filter-Search Module');
+		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
+		$app->enqueueMessage( $msg, 'notice' );
+	}
+	
 }
 ?>

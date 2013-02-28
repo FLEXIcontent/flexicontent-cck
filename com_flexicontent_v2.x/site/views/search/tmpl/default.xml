@@ -8,114 +8,205 @@
 	<fields name="params">
 		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
-			<field name="" type="separator" level="level1" default="Search Form: Basic Search" />
-				<field name="" type="separator" level="level2" default="Text Search" />
-				<field name="show_searchphrase" type="radio" default="1" label="Word Combination" description="Allow users to select method of combining the search words, e.g. any, all, exact phrase">
-					<option value="0">FLEXI_HIDE</option>
-					<option value="1">FLEXI_SHOW</option>
-				</field>
-				<field name="default_searchphrase" type="radio" default="all" label="Default combination" description="Default (preselected) method of combining the search words">
-					<option value="all">FLEXI_ALL_WORDS</option>
-					<option value="any">FLEXI_ANY_WORDS</option>
-					<option value="exact">FLEXI_EXACT_PHRASE</option>
-				</field>
-				<field name="minchars" type="text" default="3" label="Word Min Length" description="Minimum character length that search words are allowed to have" />
-				<field name="maxchars" type="text" default="20" label="Word Max Length" description="Maximum characters length that search words are allowed to have" />
-				
-
-				<field name="" type="separator" default="Results Limit (# per page)" description=".." level="level2" />
-				<field name="limit" type="text" size="4" default="10" label="Default Limit" description="FLEXI_NUM_PER_PAGE_DESC"/>
-				<field name="limit_override" type="radio" default="1" label="Limit Selector" description="Display frontend selection to allow to override default setting">
-					<option value="0">FLEXI_HIDE</option>
-					<option value="1">FLEXI_SHOW</option>
-				</field>
-				<field name="limit_options" type="text" default="" size="52" label="Allowed Options" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" />
-				
-				<field name="" type="separator" default="Results Ordering" description="..." level="level2" />
-				<field name="orderby" type="list" default="rdate" label="Default Order" description="FLEXI_PRIMARY_ORDER_DESC">
-					<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
-					<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
-					<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
-					<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
-					<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
-					<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
-					<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
-					<option value="hits">FLEXI_ORDER_MOST_HITS</option>
-					<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
-					<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
-				</field>
-				<field name="orderby_override" type="radio" default="1" label="Ordering Selector" description="Display frontend selection to allow to override default setting">
-					<option value="0">FLEXI_HIDE</option>
-					<option value="1">FLEXI_SHOW</option>
-				</field>
-				<field name="orderby_options" type="fccheckbox" default="" display_useglobal="1"
-					checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST, FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE, FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_CONFIGURED_ORDER"
-					checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order" defaultvals=""
-					label="Allowed Options" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
 		
-				<field name="" type="separator" level="level1" default="Search Form: Advanced Search" />
-				<field name="autodisplayadvoptions" type="list" default="1" label="Advanced Search Box" description="If this is disabled. Then a clickable text will appear to allow user to toggle the advanced search box on/off.">
-					<option value="0">FLEXI_DISABLE</option>
-					<option value="1">FLEXI_YES_INITIALLY_DISABLED</option>
-					<option value="2">FLEXI_YES_INITIALLY_ENABLED</option>
-				</field>
-				
-				<field name="" type="separator" level="level2" default="Attribute Filters (Fields)" />
-				<field name="show_filtersop" type="radio" default="1" label="Filters Combination" description="Allow users to select method of combining the search filters, e.g. any filter, all filters">
-					<option value="0">FLEXI_HIDE</option>
-					<option value="1">FLEXI_SHOW</option>
-				</field>
-				<field name="default_filtersop" type="radio" default="all" label="Default combination" description="Default (preselected) method of combining the search filters">
-					<option value="OR">FLEXI_ANY</option>
-					<option value="AND">FLEXI_ALL</option>
-				</field>
-				
-				<field name="advsearch_fieldlist" type="fields" default="" label="Add Filter (below)" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvsearch="1"  onchange="f=document.getElementById('{control_name}search_fields'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
-				<field name="search_fields" type="textarea" default="" label="Field (Attribute) Filters" description="Enter Content Attibute Filters (their fieldnames) used to limit the text search result list, these will be included in the search form, and will appear inside advanced search options box. You can separate each fieldname by comma(,). NOTE that fields not marked as Search View Indexable (=Searchable) will be skipped even if you add them here" cols="40" rows="3" />
-				
-				<field name="" type="separator" level="level2" default="Optional selections" description="Optional selection parameters like content types and Other Search Areas of Site (non FC Content Data)"/>
-				<field name="" type="separator" level="level3" default="Content types" description=""/>
-				<field name="cantypes" type="radio" default="1" label="Show selection" description="Allow users to select content types they want to include in their search">
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
-				</field>
-				<field name="contenttypes" type="types" default="" label="Searchable Types" description="The content types the search will include, selecting none will include ALL. NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here" multiple="true" />
-				
-				<field name="" type="separator" level="level3" default="Search Areas (non-FC Content)" description=""/>
-				<field name="show_searchareas" type="radio" default="0" label="Show selection" description="Allow the user to select and search other areas of the website content, e.g. like weblinks, user contacts, etc">
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
-				</field>
-				<field name="searchareas" type="radio" default="" label="Search Areas" description="The site's (non-FC content) search areas, that the search will include. NOTE: if user is allowed to select Search Areas, then the selection list will be LIMITED to display ONLY the search areas selected here" multiple="true" >
-					<option value="">FLEXI_ALL</option>
-				</field>
-				<field name="show_searchordering" type="radio" default="1" label="Show ordering" description="Allow frontend users to select ordering of results of other areas of the website content. NOTE this is different ordering from the ordering used for main content results.">
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
-				</field>
-				
-				<field name="default_searchordering" type="list" default="newest" label="Default value" description="Default ordering for sorting the results of the search">
-					<option value="newest">FLEXI_ADV_NEWEST_FIRST</option>
-					<option value="oldest">FLEXI_ADV_OLDEST_FIRST</option>
-					<option value="popular">FLEXI_ADV_MOST_POP</option>
-					<option value="alpha">FLEXI_ADV_ALPHA</option>
-					<option value="category">FLEXI_ADV_SEARCH_SEC_CAT</option>
-				</field>
-				
-			<field name="" type="separator" level="level1" default="Search Results" />
-				<!--param name="show_section" type="radio" default="0" label="Show section" description="Display section for each result. Note, this usually should be disabled since all FLEXIcontent items are placed in a single section">
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
-				</param-->
-				<field name="show_text" type="radio" default="1" label="Show matching information" description="Display for each result its matching information, showing what words or filters were matched during search">
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
-				</field>
-				<field name="show_date" type="radio" default="1" label="Show creation date" description="Display for each result its creation date">
-					<option value="0">FLEXI_NO</option>
-					<option value="1">FLEXI_YES</option>
-				</field>
-				
+		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Basic Options&lt;/small&gt;" />
+			
+			<field name="" type="separator" level="level2" default="Text Search" />
+			
+			<field name="" type="separator" level="level3" default="Words of Text Search" />
+			 
+			<field name="show_searchphrase" type="radio" default="1" label="Word Combination" description="Allow users to select method of combining the search words, e.g. phrase, phrase with guessing relevant, all, any, exact phrase">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="default_searchphrase" type="list" default="all" label="Default combination" description="Default (preselected) method of combining the search words">
+				<option value="natural">FLEXI_NATURAL_PHRASE</option>
+				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_GUESS_RELEVANT</option>
+				<option value="all">FLEXI_ALL_WORDS</option>
+				<option value="any">FLEXI_ANY_WORDS</option>
+				<option value="exact">FLEXI_EXACT_PHRASE</option>
+			</field>
+			<field name="minchars" type="text" default="3" label="Word Min Length" description="Minimum character length that search words are allowed to have" />
+			<field name="maxchars" type="text" default="200" label="Word Max Length" description="Maximum characters length that search words are allowed to have" />
+			
+			<field name="" type="separator" level="level3" default="Fields of Text Search &lt;br/&gt; &lt;small&gt; (a) Either use BASIC Search Index (can not select individual fields) &lt;br/&gt; (b) OR use ADVANCED Search Index (can specify a sub-set of fields below and allow user to select too &lt;/small&gt;" description=""/>
+			
+			<field name="txtmode" type="list" default="0" label="Search Words in" description="Using the basic search index is faster and is recommended for LARGE SITES, (test to see evaluate performance difference)">
+				<option value="0">All fields of BASIC Search Index (Faster)</option>
+				<option value="1">ADVANCED Index (Below fields)</option>
+				<option value="2">ADVANCED Index (Below fields), allow user selection</option>
+			</field>
+			<field name="advsearch_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvsearch="1" onchange="f=document.getElementById('{control_name}txtflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
+			<field name="txtflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Only for Advanced Index)&lt;/small&gt; &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to be included in text searching. You can separate each fieldname by comma(,). NOTE that fields not marked as (Search View) Text Searchable will be skipped even if you add them here" cols="40" rows="3" />
+			
+			<field name="" type="separator" level="level2" default="Content types" description="The content types the search will include, selecting none will include ALL. NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here"/>
+			
+			<field name="canseltypes" type="list" default="1" label="User selection" description="Allow users to select content types they want to include in their search">
+				<option value="0">No, Use all Content Types</option>
+				<option value="1">Yes, Always</option>
+				<option value="2">Yes, as Advanced Option</option>
+			</field>
+			<field name="contenttypes" type="types" default="" label="Searchable Types &lt;br/&gt; &lt;small&gt;(Select NONE for -ALL-)&lt;/small&gt;" description="The content types the search will include, selecting none will include ALL. NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here" multiple="true" />
+			
+			
+		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Advanced Options&lt;/small&gt;" />
+		
+			<field name="autodisplayadvoptions" type="list" default="1" label="Advanced Search Box" description="If this is disabled. Then a clickable text will appear to allow user to toggle the advanced search box on/off.">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_YES_INITIALLY_DISABLED</option>
+				<option value="2">FLEXI_YES_INITIALLY_ENABLED</option>
+			</field>
+			
+			<field name="" type="separator" level="level2" default="Fields as Filters" />
+			
+			<!--field name="show_filtersop" type="radio" default="1" label="Filters Combination" description="Allow users to select method of combining the search filters, e.g. any filter, all filters">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="default_filtersop" type="radio" default="all" label="Default combination" description="Default (preselected) method of combining the search filters">
+				<option value="OR">FLEXI_ANY</option>
+				<option value="AND">FLEXI_ALL</option>
+			</field-->
+			
+			<field name="advfilter_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvfilter="1" onchange="f=document.getElementById('{control_name}filtflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
+			<field name="filtflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to be used as filters (thus limiting the text search result list), these will appear inside advanced search options box. You can separate each fieldname by comma(,). NOTE that fields not marked as (Search View) Filter will be skipped even if you add them here" cols="40" rows="3" />
+			
+			<field name="" type="separator" level="level2" default="Search Areas (non-FC Content)" description=""/>
+			
+			<field name="show_searchareas" type="radio" default="0" label="Show selection" description="Allow the user to select and search other areas of the website content, e.g. like weblinks, user contacts, etc">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="searchareas" type="radio" default="" label="Search Areas" description="The site's (non-FC content) search areas, that the search will include. NOTE: if user is allowed to select Search Areas, then the selection list will be LIMITED to display ONLY the search areas selected here" multiple="true" >
+				<option value="">FLEXI_ALL</option>
+			</field>
+			<field name="show_searchordering" type="radio" default="1" label="Show ordering" description="Allow frontend users to select ordering of results of other areas of the website content. NOTE this is different ordering from the ordering used for main content results.">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="default_searchordering" type="list" default="newest" label="Default value" description="Default ordering for sorting the results of the search">
+				<option value="newest">FLEXI_ADV_NEWEST_FIRST</option>
+				<option value="oldest">FLEXI_ADV_OLDEST_FIRST</option>
+				<option value="popular">FLEXI_ADV_MOST_POP</option>
+				<option value="alpha">FLEXI_ADV_ALPHA</option>
+				<option value="category">FLEXI_ADV_SEARCH_SEC_CAT</option>
+			</field>
+		
+		
+		<field name="" type="separator" level="level1" default="Results List" />
+			
+			<field name="" type="separator" level="level2" default="Basic Information (used by non-FC results too)" description=""/>
+			
+			<field name="show_section" type="radio" default="1" label="Show Content Section" description="Display Content Section for each result, e.g. 'weblinks', 'contacts' etc, plus category tree of it.">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_text" type="radio" default="1" label="Show matched text &lt;br/&gt; &lt;small&gt;(Always ON for non-FC results)&lt;/small&gt;" description="Display the searchable text that matched for each result, showing which words were matched during search">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="show_date" type="radio" default="1" label="Show creation date" description="Display for each result its creation date">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" hr="false" default="FLEXI_IMAGE" description="FLEXI_IMAGE_DESC" level="level2" menu="hide" />
+			
+			<field name="fcr_use_image" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="fcr_image" type="fcimage" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
+			<field name="fcr_position" type="list" default="1" label="FLEXI_IMAGE_POSITION" description="FLEXI_IMAGE_POSITION_DESC">
+				<option value="0">FLEXI_IMAGE_LEFT</option>
+				<option value="1">FLEXI_IMAGE_RIGHT</option>
+			</field>		
+			<field name="fcr_link_image" type="list" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="fcr_image_size" type="list" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC">
+				<option value="">FLEXI_USE_PARAMS</option>
+				<option value="s">FLEXI_SMALL</option>
+				<option value="m">FLEXI_MEDIUM</option>
+				<option value="l">FLEXI_LARGE</option>
+			</field>
+			<field name="fcr_width" type="text" size="4" default="180" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="fcr_height" type="text" size="4" default="180" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			<field name="fcr_method" type="list" default="0" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD">
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>
+			
+			<field name="" type="separator" level="level2" default="Display Fields (Render their HTML)" description=""/>
+			
+			<field name="use_infoflds" type="radio" default="1" label="Display Extra Fields" description="Display for each result its creation date">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="info_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" onchange="f=document.getElementById('{control_name}infoflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
+			<field name="infoflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to render their values and display them in the search results. You can separate each fieldname by comma(,)." cols="40" rows="3" />
+		
+		
+		<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level1" hr="false" menu="hide" />
+			
+			<field name="" type="separator" default="Defaults" description="" level="level3" hr="false" menu="hide" />
+			
+			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
+			<field name="orderby" type="list" default="rdate" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
+				<!--option value="drelevanceate">FLEXI_ORDER_OLDEST_FIRST</option-->
+				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+				<!--option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option /* NOT SUPPORTED !!!*/ -->
+			</field>
+			
+			<field name="" type="separator" default="Show Frontend Selectors" description="" level="level3" hr="false" menu="hide" />
+			
+			<field name="limit_override" type="radio" default="1" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" menu="hide" >
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			<field name="orderby_override" type="radio" default="1" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC" menu="hide" >
+				<option value="0">FLEXI_No</option>
+				<option value="1">FLEXI_Yes</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" hr="false" menu="hide" />
+			
+			<field name="limit_options" type="text" default="5,10,20,30,50,100,150,200" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" menu="hide" />
+			<field name="orderby_options" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
+				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST, FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE, FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_CONFIGURED_ORDER"
+				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order" defaultvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order"
+				label="FLEXI_PRIMARY_ORDER_OPTIONS" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
+		
+		
+		<field name="" type="separator" level="level1" default="FC Advanced Search plugin: &lt;small&gt;Override Configuration&lt;/small&gt;" />
+			
+			<field name="search_limit" type="text" size="5" default="" label="Search Limit" description="Limit maximum number of results the plugin can return,"/>
+			<field name="filter_lang" type="list" default="" label="Language Filter" description="Return content having current language only">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="search_archived" type="list" default="" label="Search archived" description="Also include archive items into the search">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="browsernav" type="list" default="" label="Browser Navigator" description="Browser Navigator">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="1">Open New Window</option>
+				<option value="2">Open Same Window</option>
+			</field>
+			
 		</fieldset>
 	</fields>
 </metadata>

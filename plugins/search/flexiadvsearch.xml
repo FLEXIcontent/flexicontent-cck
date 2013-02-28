@@ -18,15 +18,21 @@
 	</languages>
 
 	<params>
-			<param name="filter_lang" type="radio" default="1" label="FLEXI_FILTER_LANG" description="FLEXI_FILTER_LANG_DESC">
+			
+			<field name="search_limit" type="text" size="5" default="50" label="FLEXI_SEARCH_LIMIT" description="FLEXI_SEARCH_LIMIT_DESC"/>
+			<field name="filter_lang" type="radio" default="1" label="FLEXI_FILTER_LANG" description="FLEXI_FILTER_LANG_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="search_limit" type="text" size="5" default="50" label="FLEXI_SEARCH_LIMIT" description="FLEXI_SEARCH_LIMIT_DESC"/>
-			<param name="browsernav" type="radio" default="2" label="Browser Navigator" description="Browser Navigator">
+			</field>
+			<field name="search_archived" type="radio" default="0" label="Search archived" description="Also include archive items into the search">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="browsernav" type="radio" default="2" label="Browser Navigator" description="Browser Navigator">
 				<option value="1">Open New Window</option>
 				<option value="2">Open Same Window</option>
-			</param>
+			</field>
+			
 	</params>
 
 </install>

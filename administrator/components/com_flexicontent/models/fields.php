@@ -339,13 +339,15 @@ class FlexicontentModelFields extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function toggleprop($cid = array(), $propname=null)
+	function toggleprop($cid = array(), $propname=null, &$unsupported=0, &$locked=0)
 	{
 		if (!$propname) return false;
 		$user 	=& JFactory::getUser();
 		
+		$affected = 0;
 		if (count( $cid ))
 		{
+			// Get fields information from DB
 			$query = 'SELECT field_type, iscore, id'
 					. ' FROM #__flexicontent_fields'
 					. ' WHERE id IN ('. implode( ',', $cid ) .') '
@@ -353,27 +355,43 @@ class FlexicontentModelFields extends JModelLegacy
 			$this->_db->setQuery($query);
 			$rows = $this->_db->loadObjectList('id');
 			
+			// Calculate fields not supporting the property
 			$support_ids = array();
 			$supportprop_name = 'support'.str_replace('is','',$propname);
-			foreach ($rows as $id => $row) {
+			foreach ($rows as $id => $row)
+			{
 				$ft_support = FlexicontentFields::getPropertySupport($row->field_type, $row->iscore);
 				$supportprop = isset($ft_support->{$supportprop_name}) ? $ft_support->{$supportprop_name} : false;
 				if ($supportprop) $support_ids[] = $id;
 			}
+			$unsupported = count($cid) - count($support_ids);
+			
+			// Check that at least one field that supports the property was found
 			if ( !count($support_ids) ) return 0;
 			
+			// Some fields are marked as 'dirty'
+			$dirty_properties = array('issearch', 'isadvsearch', 'isadvfilter');
+			$set_clause = in_array($propname,$dirty_properties) ?
+				' SET '. $propname .' = CASE '. $propname .'  WHEN 2 THEN -1   WHEN -1 THEN 2   WHEN 1 THEN -1   WHEN 0 THEN 2   END' :
+				' SET '. $propname .' = 1-'. $propname;
+			
+			// Toggle the property for fields supporting the property
 			$query = 'UPDATE #__flexicontent_fields'
-				. ' SET '. $propname .' = 1-'. $propname
+				. $set_clause
 				. ' WHERE id IN ('. implode(",",$support_ids) .')'
 				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
-			;
+				;
 			$this->_db->setQuery( $query );
-			if (!$this->_db->query()) {
+			if ( !( $result = $this->_db->query() ) ) {
 				$this->setError($this->_db->getErrorMsg());
 				return false;
 			}
+			
+			// Get affected fields, non affected fields must have been locked by another user
+			$affected = $this->_db->getAffectedRows($result);
+			$locked = count($support_ids) - $affected;
 		}
-		return count($support_ids);
+		return $affected;
 	}
 		
 	
@@ -551,7 +569,7 @@ class FlexicontentModelFields extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function copy($cid = array())
+	function copy($cid = array(), $copyvalues=false)
 	{
 		if ( !count( $cid ) ) return false;
 		
@@ -561,7 +579,7 @@ class FlexicontentModelFields extends JModelLegacy
 			if ($id > 14) {
 				$field  =& $this->getTable('flexicontent_fields', '');
 				$field->load($id);
-				if ( in_array($field->field_type, array('image')) ) {
+				if ( $copyvalues && in_array($field->field_type, array('image')) ) {
 					$params = new JParameter($field->attribs);
 					if ($params->get('image_source')) {
 						JFactory::getApplication()->enqueueMessage( 'You cannot copy image field -- "'.$field->name.'" -- together with its values, since this field has data in folders too' ,'error');
@@ -578,6 +596,7 @@ class FlexicontentModelFields extends JModelLegacy
 		}
 		
 		if ( !count( $ids_map ) ) return false; 
+		if ($copyvalues) $model->copyvalues( $ids_map );  // Also copy values
 		return $ids_map;
 	}
 	
@@ -838,13 +857,15 @@ class FlexicontentModelFields extends JModelLegacy
 					.' ORDER BY ordering'
 					;
 			// on utilise la methode _getList pour s'assurer de ne charger que les résultats compris entre les limites
-			$rows = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			//$rows = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
+			$this->_db->setQuery($query);
+			$rows = $this->_db->loadObjectList('field_id');
 
 			for( $i=0; $i < count($cid); $i++ )
 			{
-				if ($rows[$i]->ordering != $order[$i])
+				if ($rows[$cid[$i]]->ordering != $order[$i])
 				{
-					$rows[$i]->ordering = $order[$i];
+					$rows[$cid[$i]]->ordering = $order[$i];
 					
 					$query = 'UPDATE #__flexicontent_fields_type_relations'
 							.' SET ordering=' . $order[$i]

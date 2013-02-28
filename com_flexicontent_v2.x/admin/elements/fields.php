@@ -70,6 +70,11 @@ class JFormFieldFields extends JFormField
 			$and .= " AND isadvsearch='{$isadvsearch}'";
 		}
 		
+		$isadvfilter = @$attributes['isadvfilter'];
+		if($isadvfilter) {
+			$and .= " AND isadvfilter='{$isadvfilter}'";
+		}
+		
 		$field_type = @$attributes['field_type'];
 		if($field_type) {
 			$field_type = explode(",", $field_type);

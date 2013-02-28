@@ -3,6 +3,8 @@ defined("_JEXEC") or die("Restricted Access");
 
 class plgFlexicontent_fieldsGroupmarker extends JPlugin
 {
+	static $field_types = array('groupmarker');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -22,7 +24,7 @@ class plgFlexicontent_fieldsGroupmarker extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, $item)
 	{
-		if ($field->field_type != 'groupmarker') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		static $tabSetCnt = -1;
 		static $tabCnt = array();

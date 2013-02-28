@@ -41,7 +41,7 @@ class FlexicontentController extends JControllerLegacy
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link);   // we do not message since this will be displayed by template of the view ...
 		}
-		$session  =& JFactory::getSession();
+		$session = JFactory::getSession();
 		
 		// GET POSTINSTALL tasks from session variable AND IF NEEDED re-evaluate it
 		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED
@@ -78,6 +78,8 @@ class FlexicontentController extends JControllerLegacy
 			$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
+		} else {
+			$this->checkDirtyFields();
 		}
 		
 		// Register Extra task
@@ -942,6 +944,35 @@ VALUES
 			echo '<span class="install-notok"></span><span class="button-add"><a id="initialpermission" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		}
 	}
+
+	function checkDirtyFields() {
+		if (JRequest::getVar('task')!='' || JRequest::getVar('format')!='' || JRequest::getVar('tmpl')!='') return;
+		$perms = FlexicontentHelperPerm::getPerm();
+		if ( !$perms->CanFields ) return;
+		
+		$db = JFactory::getDBO();
+		
+		// GET fields having dirty field properties, NOTE: a dirty field property means that search index must be updated,
+		// even if the field was unpublished, because the field values may still exists in the search index for some items
+		
+		$query = 'SELECT COUNT(*) '
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE (issearch=-1 || issearch=2)'  // Regardless publication state
+			;
+		$db->setQuery($query);
+		$dirty_basic = $db->loadResult();
+		
+		$query = 'SELECT COUNT(*) '
+			. ' FROM #__flexicontent_fields'
+			. ' WHERE (isadvsearch=-1 OR isadvsearch=2 OR isadvfilter=-1 OR isadvfilter=2)'  // Regardless publication state
+			;
+		$db->setQuery($query);
+		$dirty_advanced = $db->loadResult();
+		
+		if ($dirty_basic)    JError::raiseNotice( 403, JText::sprintf( 'FLEXI_ALERT_UPDATE_BASIC_INDEX', $dirty_basic) );
+		if ($dirty_advanced) JError::raiseNotice( 403, JText::sprintf( 'FLEXI_ALERT_UPDATE_ADVANCED_INDEX', $dirty_advanced) );
+	}
+	
 	
 	function fversioncompare() {
 		// Check for request forgeries

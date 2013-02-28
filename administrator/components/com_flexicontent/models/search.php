@@ -104,7 +104,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$where		= $this->_buildWhere();
 		$orderby	= $this->_buildOrderBy();
 		
-		$query = "SELECT SQL_CALC_FOUND_ROWS f.label, f.name, ai.*, a.title, a.id" ."\n"
+		$query = "SELECT SQL_CALC_FOUND_ROWS f.label, f.name, f.field_type, ai.*, a.title, a.id" ."\n"
 			." FROM #__flexicontent_advsearch_index as ai" ."\n"
 			." JOIN #__flexicontent_fields as f ON ai.field_id=f.id" ."\n"
 			." JOIN #__content as a ON ai.item_id=a.id" ."\n"

@@ -88,6 +88,7 @@
 				<option value="1">true</option>
 				<option value="0">false</option>
 			</field>
+			
 		</fieldset>
 	</fields>
 	</config>

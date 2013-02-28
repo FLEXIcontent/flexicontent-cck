@@ -102,57 +102,84 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						</td>
 					</tr>
 					
-					<tr<?php echo (!$this->supportsearch && !$this->supportfilter)?' style="display:none;"':'';?>>
+					<?php if ($this->supportsearch || $this->supportfilter) : ?>
+					<tr>
 						<td colspan="2" class="key tbl_group" >
 							<?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?>
 						</td>
 					</tr>
-					<tr<?php echo !$this->supportsearch?' style="display:none;"':'';?>>
+					<?php endif; ?>
+					
+					<?php if ($this->supportsearch) : ?>
+					<tr>
 						<td class="key">
 							<label for="issearch" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE').'::'.JText::_('FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE' ).':'; ?>
 							</label>
 						</td>
 						<td>
-							<?php
-							$html = JHTML::_('select.booleanlist', 'issearch', 'class="inputbox"', $this->row->issearch );
-							echo $html;
-							?>
+							<?php echo
+								in_array($this->form->getValue('issearch'),array(-1,2)) ?
+									JText::_($this->form->getValue('issearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_BASIC_INDEX_PROPERTY_DIRTY') :
+									JHTML::_('select.booleanlist', 'issearch', 'class="inputbox"', $this->row->issearch ); ?>
 						</td>
 					</tr>
-					<tr<?php echo !$this->supportfilter?' style="display:none;"':'';?>>
+					<?php endif; ?>
+					
+					<?php if ($this->supportfilter) : ?>
+					<tr>
 						<td class="key">
-							<label for="isfilter" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_CONTENT_LIST_FILTER').'::'.JText::_('FLEXI_FIELD_CONTENT_LIST_FILTER_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_CONTENT_LIST_FILTER' ).':'; ?>
+							<label for="isfilter" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_CONTENT_LIST_FILTERABLE').'::'.JText::_('FLEXI_FIELD_CONTENT_LIST_FILTERABLE_DESC');?>">
+								<?php echo JText::_( 'FLEXI_FIELD_CONTENT_LIST_FILTERABLE' ).':'; ?>
 							</label>
 						</td>
 						<td>
-							<?php
-							$html = JHTML::_('select.booleanlist', 'isfilter', 'class="inputbox"', $this->row->isfilter );
-							echo $html;
-							?>
+							<?php echo JHTML::_('select.booleanlist', 'isfilter', 'class="inputbox"', $this->row->isfilter ); ?>
 						</td>
 					</tr>
+					<?php endif; ?>
 					
-					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
+
+					<?php if ($this->supportadvsearch || $this->supportadvfilter) : ?>
+					<tr>
 						<td colspan="2" class="key tbl_group" >
 							<?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW' ); ?>
 						</td>
 					</tr>
-					<tr<?php echo !$this->supportadvsearch?' style="display:none;"':'';?>>
+					<?php endif; ?>
+					
+					<?php if ($this->supportadvsearch) : ?>
+					<tr>
 						<td class="key">
-							<label for="isadvsearch" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ADVANCED_INDEXABLE').'::'.JText::_('FLEXI_FIELD_ADVANCED_INDEXABLE_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_ADVANCED_INDEXABLE' ).':'; ?>
+							<label for="isadvsearch" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE').'::'.JText::_('FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE_DESC');?>">
+								<?php echo JText::_( 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE' ).':'; ?>
 							</label>
 						</td>
 						<td>
-							<?php
-							$html = JHTML::_('select.booleanlist', 'isadvsearch', 'class="inputbox"', $this->row->isadvsearch );
-							echo $html;
-							?>
+							<?php echo
+								in_array($this->form->getValue('isadvsearch'),array(-1,2)) ?
+									JText::_($this->form->getValue('isadvsearch')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
+									JHTML::_('select.booleanlist', 'isadvsearch', 'class="inputbox"', $this->row->isadvsearch ); ?>
 						</td>
 					</tr>
-
+					<?php endif; ?>
+					
+					<?php if ($this->supportadvfilter) : ?>
+					<tr>
+						<td class="key">
+							<label for="isadvfilter" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ADVANCED_FILTERABLE').'::'.JText::_('FLEXI_FIELD_ADVANCED_FILTERABLE_DESC');?>">
+								<?php echo JText::_( 'FLEXI_FIELD_ADVANCED_FILTERABLE' ).':'; ?>
+							</label>
+						</td>
+						<td>
+							<?php echo
+								in_array($this->form->getValue('isadvfilter'),array(-1,2)) ?
+									JText::_($this->form->getValue('isadvfilter')==-1 ? 'FLEXI_NO' : 'FLEXI_YES') .' -- '. JText::_('FLEXI_FIELD_ADVANCED_INDEX_PROPERTY_DIRTY') :
+									JHTML::_('select.booleanlist', 'isadvfilter', 'class="inputbox"', $this->row->isadvfilter ); ?>
+						</td>
+					</tr>
+					<?php endif; ?>
+					
 					<tr>
 						<td colspan="2" class="key tbl_group" >
 							<?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?>
@@ -217,7 +244,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						<td>
 							<textarea id="description" cols="30" rows="5" name="description"><?php echo $this->row->description; ?></textarea>
 						</td>
-					</tr>					
+					</tr>
 					
 					<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
 					<tr>
@@ -232,7 +259,6 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 					<?php endif; ?>
 					
-
 				</table>
 			</fieldset>
 			

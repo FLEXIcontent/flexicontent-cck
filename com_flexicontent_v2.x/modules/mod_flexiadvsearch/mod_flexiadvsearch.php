@@ -7,7 +7,7 @@
  * @license GNU/GPL v3
  * 
  * FLEXIadvsearch module is an advanced search module for flexicontent.
- * FLEXIadvsearch is distributed in the hope that it will be useful,
+ * FLEXIcontent is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -43,11 +43,22 @@ if ($params->get('combine_show_rules', 'AND')=='AND') {
 
 if ( $show_mod )
 {
+	global $modfc_jprof;
+	$modfc_jprof = new JProfiler();
+	$modfc_jprof->mark('START: FLEXIcontent Adv Search Module');
+	
 	// load english language file for 'mod_flexiadvsearch' component then override with current language file
 	JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, 'en-GB', true);
 	JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, null, true);
 	
+	// include the helper only once
+	//require_once (dirname(__FILE__).DS.'helper.php');  // currently no helper file ...
+	
 	// initialize various variables
+	//$document	= JFactory::getDocument();
+	//$config 	= JFactory::getConfig();
+	//$caching 	= $config->getValue('config.caching', 0);
+	$add_ccs 			= $params->get('add_ccs', 1);
 	$layout       = $params->get('layout', 'default');
 	$button       = $params->get('button', '');
 	$button_text  = $params->get('button_text', '');
@@ -63,24 +74,35 @@ if ( $show_mod )
 	if($linkadvsearch && !trim($linkadvsearch_txt))
 		$linkadvsearch_txt = 'Advanced Search';
 	
-	if ($imagebutton)
-	{
-		if (FLEXI_J16GE)
-			$img = JHtml::_('image','searchButton.gif', $button_text, NULL, true, true);
-		else
-			$img = JHTML::_('image.site', 'searchButton.gif', '/images/M_images/', NULL, NULL, $button_text, null, 0);
-	}
+	// add module css file
+	// currently no css file for this module
+	/*if ($add_ccs) {
+	  if ($caching && !FLEXI_J16GE) {
+			// Work around for caching bug in J1.5
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/mod_flexiadvsearch.css">';
+	  } else {
+	    // Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
+			$document->addStyleSheet(JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/mod_flexiadvsearch.css');
+	  }
+	}*/
 	
 	if ($useitemid = $params->get('useitemid', '0'))
 	{
-		$set_Itemid		 = intval($params->get('set_itemid', 0));
-		$mitemid = $set_Itemid > 0 ? $set_Itemid : JRequest::getInt('Itemid');
+		$set_itemid = intval($params->get('set_itemid', 0));
+		$mitemid = $set_itemid > 0 ? $set_itemid : JRequest::getInt('Itemid');
 	}
 	
-	// include the helper only once
+	// Render Layout
 	require(JModuleHelper::getLayoutPath('mod_flexiadvsearch', $layout));
-	?>
-
-<?php
+	
+	$flexiparams =& JComponentHelper::getParams('com_flexicontent');
+	if ( $flexiparams->get('print_logging_info') )
+	{
+		$app = & JFactory::getApplication();
+		$modfc_jprof->mark('END: FLEXIcontent Adv Search Module');
+		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
+		$app->enqueueMessage( $msg, 'notice' );
+	}
+	
 }
 ?>

@@ -10,6 +10,7 @@
 			<field name="cids" type="flexicategories" joinwith="," multiple="true" default="0" label="FLEXI_CATEGORIES" required="required" description="FLEXI_CATEGORIES_DESC" />
 		</fieldset> 
 	</fields>
+	
 	<fields name="params" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="basic">
 			<field name="item_depth" type="list" default="O" label="FLEXI_START_ADDING_PARENTS_AT_DEPTH" description="FLEXI_START_ADDING_PARENTS_AT_DEPTH_DESC" >
@@ -24,9 +25,8 @@
 			<field name="" type="separator" default="FLEXI_CONFIGURATION_CATEGORY" description="FLEXI_CONFIGURATION_CATEGORY_DESC" level="level2" />
 			<field name="persistent_filters" default="" type="textarea" rows="5" cols="40" label="Persistent Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##alue %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword" />
 			<field name="initial_filters" default="" type="textarea" rows="5" cols="40" label="Initial Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##alue %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword" />
-			
-		</fieldset>
 		
+		</fieldset>
 		
 		<fieldset name="cat_info_options" label="FLEXI_PARAMETERS_CAT_INFO_OPTIONS" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
@@ -189,7 +189,7 @@
 			</field>
 			<field name="subcat_opentag" type="text" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
 			<field name="subcat_closetag" type="text" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
-			
+		
 		</fieldset>
 		
 		<fieldset name="cat_items_list" label="FLEXI_PARAMETERS_CAT_ITEMS_LIST" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -310,7 +310,7 @@
 				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST, FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE, FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_CONFIGURED_ORDER"
 				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order" defaultvals=""
 				label="FLEXI_PRIMARY_ORDER_OPTIONS" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
-						
+		
 		</fieldset>
 		
 		<fieldset name="cat_item_filtering" label="FLEXI_PARAMETERS_CAT_ITEM_FILTERING" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -385,15 +385,26 @@
 				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
 			</field>
 			
-			<field name="limit_filter_values" type="list" default="" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC">
+			<!--field name="limit_filtervalues" type="list" default="" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_ALL_FIELD_VALUES</option>
-				<!--option value="1">FLEXI_CURRCAT_FIELD_VALUES</option-->
-				<option value="2">FLEXI_CURRFILTER_FIELD_VALUES</option>
-			</field>
+				<option value="1">FLEXI_CURRFILTER_FIELD_VALUES</option>
+			</field-->
 			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
-			<!--param name="filter_chains" type="text" size="10" default="0" label="FLEXI_CHAINED_FILTERS" description="FLEXI_CHAINED_FILTERS_DESC" /-->
-			
+
+			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" />
+			<field name="filter_pretext" type="text" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
+			<field name="filter_posttext" type="text" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
+			<field name="filter_separatorf" type="list" default="1" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+			</field>
+			<field name="filter_opentag" type="text" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
+			<field name="filter_closetag" type="text" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
+		
 		</fieldset>
 		
 		<fieldset name="cat_rss_feeds" label="FLEXI_PARAMETERS_CAT_RSS_FEEDS" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -422,13 +433,16 @@
 			</field>		
 			<field name="feed_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="feed_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
-			
+		
 		</fieldset>
 		
 		<fieldset name="layout_themes" label="FLEXI_PARAMETERS_LAYOUT_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
 			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 			<field name="clayout" type="categorylayout" skipparams="1" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
 			<field name="" type="separator" default="Template parameters ..." description="Please note you cannot set template parameters here. &lt;br&gt;&lt;br&gt; Default template parameters will be used for the choosen template. &lt;br&gt;&lt;br&gt;For fields shown, please add your fields in layout positions in template configuration management tab" level="level2"/>
+		
 		</fieldset>
+		
 	</fields>
 </metadata>

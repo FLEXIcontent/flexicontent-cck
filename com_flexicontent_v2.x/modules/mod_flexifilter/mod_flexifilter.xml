@@ -30,7 +30,7 @@
 			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
 			<field name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexifilter/tmpl"
 					default="default"  hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_" />
-			<field name="autosubmit" type="radio" default="0" label="FLEXI_AUTOSUBMIT_NON_FIELD_FILTERS" description="FLEXI_AUTOSUBMIT_NON_FIELD_FILTERS_DESC">
+			<field name="autosubmit" type="list" default="0" label="FLEXI_AUTOSUBMIT_NON_FIELD_FILTERS" description="FLEXI_AUTOSUBMIT_NON_FIELD_FILTERS_DESC">
 				<option value="0">FLEXI_NO_FORCES_GO_BUTTON</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -56,7 +56,7 @@
 				<option value="2">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED</option>
 				<option value="3">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED_SET_IN_CAT_PARAMS</option>
 			</field>
-			<field name="show_filter_labels" type="radio" default="" label="FLEXI_FORCE_FILTER_LABELS" description="FLEXI_FORCE_FILTER_LABELS_DESC">
+			<field name="show_filter_labels" type="list" default="" label="FLEXI_FORCE_FILTER_LABELS" description="FLEXI_FORCE_FILTER_LABELS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
 				<option value="1">FLEXI_FORCE_SHOW_ALL</option>

@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `label` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL default '',
   `isfilter` tinyint(1) NOT NULL default '0',
+  `isadvfilter` tinyint(1) NOT NULL default '0',
   `iscore` tinyint(1) NOT NULL default '0',
   `issearch` tinyint(1) NOT NULL default '1',
   `isadvsearch` tinyint(1) NOT NULL default '0',
@@ -170,11 +171,14 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
 CREATE TABLE IF NOT EXISTS `#__flexicontent_advsearch_index` (
   `field_id` int(11) NOT NULL,
   `item_id` int(11) NOT NULL,
-  `extratable` varchar(255) NOT NULL,
   `extraid` int(11) NOT NULL,
   `search_index` longtext NOT NULL,
   `value_id` varchar(255) NULL,
-  PRIMARY KEY (`field_id`,`item_id`,`extratable`,`extraid`)
+  PRIMARY KEY (`field_id`,`item_id`,`extratable`,`extraid`),
+  KEY `field_id` (`field_id`),
+  KEY `item_id` (`item_id`),
+  FULLTEXT `search_index` (`search_index`),
+  KEY `value_id` (`value_id`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (

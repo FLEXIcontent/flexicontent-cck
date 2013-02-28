@@ -225,7 +225,7 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 			}
 		}
 		
-		$db = &JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		// Delete orphan entries ?
 		$query="DELETE FROM `#__extensions` WHERE folder='flexicontent_fields' AND element IN ('flexisystem', 'flexiadvroute', 'flexisearch', 'flexiadvsearch', 'flexinotify')";
@@ -272,17 +272,16 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						?>
 						<span style="<?php echo $style; ?>"><?php
 						if($success) {
-							echo JText::_("Task Successful");
+							echo JText::_("Task <b>SUCCESSFULL</b>");
 						} else {
-							echo JText::_("Setting phpThumb Cache folder permissions UNSUCCESSFUL.");
+							echo JText::_("Setting phpThumb Cache folder permissions UNSUCCESSFULL.");
 						}
 						?></span>
 					</td>
 				</tr>
 
 		<?php
-		$deprecated_fields_arr = array('hidden');
-		$deprecated_fields_list = "'". implode("','", $deprecated_fields_arr) ."'";
+		$deprecated_fields = array('hidden'=>'text', 'relateditems'=>'relation', 'relateditems_backlinks'=>'relation_reverse');
 		
 		// Get DB table information
 		
@@ -298,39 +297,8 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 		$db->setQuery($query);
 		$advsearch_index_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		if ($files_tbl_exists) {
-			$query = "SHOW COLUMNS FROM #__flexicontent_files";
-			$db->setQuery($query);
-			$tbl_cols = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
-			if ($tbl_cols) {
-				$files_tbl_cols = array();
-				foreach ($tbl_cols as $tbl_col) $files_tbl_cols[$tbl_col] = 1;
-			}
-		}
-		
-		if ($fields_tbl_exists) {
-			$query = "SHOW COLUMNS FROM #__flexicontent_fields";
-			$db->setQuery($query);
-			$tbl_cols = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
-			if ($tbl_cols) {
-				$fields_tbl_cols = array();
-				foreach ($tbl_cols as $tbl_col) $fields_tbl_cols[$tbl_col] = 1;
-			}
-
-			$query = "SELECT COUNT(*) FROM `#__flexicontent_fields` WHERE field_type IN (".$deprecated_fields_list.")";
-			$db->setQuery($query);
-			$deprecated_fields_count = $db->loadResult();
-		}
-		
-		if ($advsearch_index_tbl_exists) {
-			$query = "SHOW COLUMNS FROM #__flexicontent_advsearch_index";
-			$db->setQuery($query);
-			$tbl_cols = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
-			if ($tbl_cols) {
-				$advsearch_index_tbl_cols = array();
-				foreach ($tbl_cols as $tbl_col) $advsearch_index_tbl_cols[$tbl_col] = 1;
-			}
-		}
+		$failure_style = 'display:block; width:100%; font-weight: bold; color: red;';
+		$success_style = 'font-weight: bold; color: green;';
 		?>
 		
 		<?php
@@ -339,241 +307,135 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 				<tr class="row0">
 					<td class="key">Converting deprecated fields"
 					<?php
-					$already = true;
-					$result = false;
-					if( !empty($deprecated_fields_count) ) {
-						$already = false;
-						$query = "UPDATE `#__flexicontent_fields` SET field_type=`text` WHERE field_type IN (".$deprecated_fields_list.")";
+					$msg = array();
+					if ($fields_tbl_exists) foreach ($deprecated_fields as $old_type => $new_type)
+					{
+						$query = 'UPDATE #__flexicontent_fields'
+							.' SET field_type = ' .$db->Quote($new_type)
+							.' WHERE field_type = ' .$db->Quote($old_type);
 						$db->setQuery($query);
-						$result = $db->query();
+						$result = $db->query()
+						if( !$result ) {
+							$msg[] = "<span style='$failure_style'>UPDATE TABLE failed: ". $query ."</span>";
+							continue;
+						}
+						
+						$msg[] = $db->getAffectedRows($result)." deprecated fields '".$old_type."' were converted."
+						
+						$query = 'SELECT * FROM '. ( FLEXI_J16GE ? '#__extensions' : '#__plugins' )
+							.' WHERE '. (FLEXI_J16GE ? 'type="plugin"' : '1')
+							.'  AND element='.$db->Quote( $old_type )
+							.'  AND folder='.$db->Quote( 'flexicontent_fields' );
+						$db->setQuery($query);
+						$ext = $db->loadObject();
+						
+						if ($ext && $ext['id'] > 0) {
+							$installer = new JInstaller();
+							if ( $installer->uninstall($ext['type'], $ext['id'], (int)$ext['client_id']) )
+								$msg[] = " -- Uninstalled deprecated plugin: '".$old_type."'";
+							else
+								$msg[] = "<span style='$failure_style'> -- Failed to uninstalled deprecated plugin: '".$old_type."'";
+						}
 					}
 					?>
 					</td>
-					<td>
-						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
-						<span style="<?php echo $style; ?>"><?php
-						if($already) {
-							echo JText::_("Task Successful: No deprecated fields found.");
-						} elseif($result) {
-							echo JText::_("Task Successful: Deprecated Fields converted to 'text' field type.");
-						} else {
-							echo JText::_("UPDATE TABLE command UNSUCCESSFUL.");
-						}
-						?></span>
-					</td>
+					<td> <?php echo implode("<br/>\n", $msg); ?> </td>
 				</tr>
 				
 		<?php
-		// Alter DB table flexicontent_advsearch_index: Add value_id column
+		// Upgrade DB tables: ADD new columns
 		?>
 				<tr class="row1">
-					<td class="key">Adding column `value_id` to TABLE #__flexicontent_advsearch_index"
+					<td class="key">Upgrading DB tables (adding new columns): </td>
+					<td>
 					<?php
-					$already = true;
-					$result = false;
-					if ( $advsearch_index_tbl_exists && !array_key_exists('value_id', $advsearch_index_tbl_cols)) {
-						$already = false;
-						$query = "ALTER TABLE `#__flexicontent_advsearch_index` ADD `value_id` TEXT NULL AFTER `search_index`";
-						$db->setQuery($query);
-						$result = $db->query();
+					$tbls = array();
+					if ($files_tbl_exists)           $tbls[] = "#__flexicontent_files";
+					if ($fields_tbl_exists)          $tbls[] = "#__flexicontent_fields";
+					if ($advsearch_index_tbl_exists) $tbls[] = "#__flexicontent_advsearch_index";
+					if (count($tbls))  $tbl_fields = $db->getTableFields($tbls);
+					
+					$queries = array();
+					if ( $advsearch_index_tbl_exists && array_key_exists('extratable', $tbl_fields['#__flexicontent_advsearch_index'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_advsearch_index` DROP `extratable`";
 					}
+					if ( $advsearch_index_tbl_exists && !array_key_exists('value_id', $tbl_fields['#__flexicontent_advsearch_index'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_advsearch_index` ADD `value_id` TEXT NULL AFTER `search_index`";
+					}
+					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__flexicontent_files'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL AFTER `altname`";
+					}
+					if ( $fields_tbl_exists && !array_key_exists('untranslatable', $tbl_fields['#__flexicontent_fields'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
+					}
+					if ( $fields_tbl_exists && !array_key_exists('isadvfilter', $tbl_fields['#__flexicontent_fields'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `isadvfilter` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isfilter`";
+					}
+					if ( $fields_tbl_exists && !array_key_exists('formhidden', $tbl_fields['#__flexicontent_fields'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `formhidden` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `untranslatable`";
+					}
+					if ( $fields_tbl_exists && !array_key_exists('valueseditable', $tbl_fields['#__flexicontent_fields'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `valueseditable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `formhidden`";
+					}
+					if ( $fields_tbl_exists && !array_key_exists('edithelp', $tbl_fields['#__flexicontent_fields'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `edithelp` SMALLINT(8) NOT NULL DEFAULT '2' AFTER `formhidden`";
+					}
+					if ( $fields_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_fields']) && FLEXI_J16GE) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD COLUMN `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
+					}
+					foreach ($queries as $query) {
+						$db->setQuery($query);
+						if ( !($result = $db->query()) ) { $results = false; echo "<span style='$failure_style'>ALTER TABLE failed: ". $query ."</span>"; }
+					}
+					if ( @$results !== false ) echo "<span style='$success_style'>columns added</span>";
 					?>
 					</td>
-					<td>
-						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
-						<span style="<?php echo $style; ?>"><?php
-						if($already) {
-							echo JText::_("Task Successful: Column 'value_id' already exists.");
-						} elseif($result) {
-							echo JText::_("Task Successful: Column 'value_id' added.");
-						} else {
-							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
+				</tr>
+		
+		<?php
+		// Upgrade DB tables: ADD column indexes
+		// TODO: make this a POST installation task, as it can be heavy to the SQL server !!
+		// for table #__flexicontent_advsearch_index we avoid problem by truncating the table !!!
+		?>
+				<tr class="row1">
+					<td class="key">Upgrading search index table (adding indexes): </td>
+					<?php
+					
+					if ( $fields_tbl_exists )
+				    $db->setQuery("SHOW INDEX FROM #__flexicontent_advsearch_index");
+				    $_indexes = $db->loadObjectList();
+				    foreach ($_indexes as $tbl_index) $tbl_indexes['#__flexicontent_advsearch_index'][$tbl_index->Key_name] = true;
+				    
+				    $queries = array();
+						$_add_indexes = array();
+						if ( $advsearch_index_tbl_exists && !array_key_exists('field_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
+							$_add_indexes[] = " ADD KEY ( `field_id` ) ";
 						}
-						?></span>
+						if ( $advsearch_index_tbl_exists && !array_key_exists('item_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
+							$_add_indexes[] = " ADD KEY ( `item_id` ) ";
+						}
+						if ( $advsearch_index_tbl_exists && !array_key_exists('search_index', $tbl_indexes['#__flexicontent_advsearch_index'])) {
+							$_add_indexes[] = " ADD FULLTEXT ( `search_index` ) ";
+						}
+						if ( $advsearch_index_tbl_exists && !array_key_exists('value_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
+							$_add_indexes[] = " ADD KEY ( `value_id` ) ";
+						}
+							
+						if (count($_add_indexes)) { {
+							$db->setQuery('TRUNCATE TABLE #__flexicontent_advsearch_index');
+							$db->query();   // Truncate table of search index to avoid long-delay on indexing
+							$queries[] = "ALTER TABLE `#__flexicontent_advsearch_index` ". implode(",", $_add_indexes);
+						}
+						
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) { $results = false; echo "<span style='$failure_style'>ALTER TABLE failed: ". $query ."</span>"; }
+						}
+						if ( @$results !== false ) echo "<span style='$success_style'>indexes added, table was truncated please re-index your content</span>";
+					}
+					?>
 					</td>
 				</tr>
 				
-		<?php
-		// Alter DB table flexicontent_files: Add description column
-		?>
-				<tr class="row0">
-					<td class="key">Adding column `description` to TABLE #__flexicontent_files"
-					<?php
-					$already = true;
-					$result = false;
-					if ( $files_tbl_exists && !array_key_exists('description', $files_tbl_cols)) {
-						$already = false;
-						$query = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL AFTER `altname`";
-						$db->setQuery($query);
-						$result = $db->query();
-					}
-					?>
-					</td>
-					<td>
-						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
-						<span style="<?php echo $style; ?>"><?php
-						if($already) {
-							echo JText::_("Task Successful: Column 'description' already exists.");
-						} elseif($result) {
-							echo JText::_("Task Successful: Column 'description' added.");
-						} else {
-							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
-						}
-						?></span>
-					</td>
-				</tr>
-		
-		<?php
-		// Alter DB table flexicontent_fields: Add untranslatable column
-		?>
-				<tr class="row1">
-					<td class="key">Adding column `untranslatable` to TABLE #__flexicontent_fields"
-					<?php
-					$already = true;
-					$result = false;
-					if ( $fields_tbl_exists && !array_key_exists('untranslatable', $fields_tbl_cols)) {
-						$already = false;
-						$query = "ALTER TABLE `#__flexicontent_fields` ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
-						$db->setQuery($query);
-						$result = $db->query();
-					}
-					?>
-					</td>
-					<td>
-						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
-						<span style="<?php echo $style; ?>"><?php
-						if($already) {
-							echo JText::_("Task Successful: Column 'untranslatable' already exists.");
-						} elseif($result) {
-							echo JText::_("Task Successful: Column 'untranslatable' added.");
-						} else {
-							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
-						}
-						?></span>
-					</td>
-				</tr>
-		
-		<?php
-		// Alter DB table flexicontent_fields: Add formhidden column
-		?>
-				<tr class="row0">
-					<td class="key">Adding column `formhidden` to TABLE #__flexicontent_fields"
-					<?php
-					$already = true;
-					$result = false;
-					if ( $fields_tbl_exists && !array_key_exists('formhidden', $fields_tbl_cols)) {
-						$already = false;
-						$query = "ALTER TABLE `#__flexicontent_fields` ADD `formhidden` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `untranslatable`";
-						$db->setQuery($query);
-						$result = $db->query();
-					}
-					?>
-					</td>
-					<td>
-						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
-						<span style="<?php echo $style; ?>"><?php
-						if($already) {
-							echo JText::_("Task Successful: Column 'formhidden' already exists.");
-						} elseif($result) {
-							echo JText::_("Task Successful: Column 'formhidden' added.");
-						} else {
-							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
-						}
-						?></span>
-					</td>
-				</tr>
-		
-		<?php
-		// Alter DB table flexicontent_fields: Add valueseditable column
-		?>
-				<tr class="row1">
-					<td class="key">Adding column `valueseditable` to TABLE #__flexicontent_fields"
-					<?php
-					$already = true;
-					$result = false;
-					if ( $fields_tbl_exists && !array_key_exists('valueseditable', $fields_tbl_cols)) {
-						$already = false;
-						$query = "ALTER TABLE `#__flexicontent_fields` ADD `valueseditable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `formhidden`";
-						$db->setQuery($query);
-						$result = $db->query();
-					}
-					?>
-					</td>
-					<td>
-						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
-						<span style="<?php echo $style; ?>"><?php
-						if($already) {
-							echo JText::_("Task Successful: Column 'valueseditable' already exists.");
-						} elseif($result) {
-							echo JText::_("Task Successful: Column 'valueseditable' added.");
-						} else {
-							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
-						}
-						?></span>
-					</td>
-				</tr>
-		
-		<?php
-		// Alter DB table flexicontent_fields: Add edithelp column
-		?>
-				<tr class="row0">
-					<td class="key">Adding column `edithelp` to TABLE #__flexicontent_fields"
-					<?php
-					$already = true;
-					$result = false;
-					if ( $fields_tbl_exists && !array_key_exists('edithelp', $fields_tbl_cols)) {
-						$already = false;
-						$query = "ALTER TABLE `#__flexicontent_fields` ADD `edithelp` SMALLINT(8) NOT NULL DEFAULT '2' AFTER `formhidden`";
-						$db->setQuery($query);
-						$result = $db->query();
-					}
-					?>
-					</td>
-					<td>
-						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
-						<span style="<?php echo $style; ?>"><?php
-						if($already) {
-							echo JText::_("Task Successful: Column 'edithelp' already exists.");
-						} elseif($result) {
-							echo JText::_("Task Successful: Column 'edithelp' added.");
-						} else {
-							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
-						}
-						?></span>
-					</td>
-				</tr>
-		
-		<?php
-		if (FLEXI_J16GE) :
-		// Alter table __flexicontent_fields: Add asset_id column
-		?>
-				<tr class="row0">
-					<td class="key">Adding column `asset_id` to TABLE #__flexicontent_fields"
-					<?php
-					$already = true;
-					$result = false;
-					if ( $fields_tbl_exists && !array_key_exists('asset_id', $fields_tbl_cols)) {
-						$already = false;
-						$query = "ALTER TABLE `#__flexicontent_fields` ADD COLUMN `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
-						$db->setQuery($query);
-						$result = $db->query();
-					}
-					?>
-					</td>
-					<td>
-						<?php $style = ($already||$result) ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
-						<span style="<?php echo $style; ?>"><?php
-						if($already) {
-							echo JText::_("Task Successful: Column 'asset_id' already exists.");
-						} elseif($result) {
-							echo JText::_("Task Successful: Column 'asset_id' added.");
-						} else {
-							echo JText::_("ALTER TABLE command UNSUCCESSFUL.");
-						}
-						?></span>
-					</td>
-				</tr>
-				
-		<?php endif; /* if FLEXI_J16GE */?>
 			</tbody>
 		</table>

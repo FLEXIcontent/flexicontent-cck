@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Related Items BackLinks</name>
+	<name>FLEXIcontent - Relation - Reverse</name>
 	<author>ggppdk</author>
 	<creationDate>Aug 2011</creationDate>
 	<copyright>Copyright (C) 2011 ggppdk</copyright>
@@ -8,9 +8,9 @@
 	<authorEmail>ggppdk</authorEmail>
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
-	<description>FLEXI_FIELD_RELATEDITEMS_BACKLINKS</description>
+	<description>FLEXI_FIELD_RELATION_REVERSE</description>
 	<files>
-		<filename plugin="relateditems_backlinks">relateditems_backlinks.php</filename>
+		<filename plugin="relation_reverse">relation_reverse.php</filename>
 	</files>
 	<config>
 	
@@ -21,10 +21,10 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
-		<fieldset name="group-relateditems_backlinks" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-relation_reverse" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
-			<field name="reverse_field" type="fields" field_type="relateditems" label="FLEXI_FIELD_CHOOSE_FCFIELD" description="FLEXI_FIELD_CHOOSE_FCFIELD_DESC" />
+			<field name="reverse_field" type="fields" field_type="relation" label="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE" description="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE_DESC" />
 			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -75,6 +75,7 @@
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
 				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
 			<field name="opentag_form" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag_form" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
@@ -110,7 +111,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
 			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
@@ -119,14 +120,15 @@
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
 				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			
 		</fieldset>
-		
 	</fields>
 	</config>
 	<languages>
-		<language tag="en-GB">en-GB.plg_flexicontent_fields_relateditems_backlinks.ini</language>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_relation_reverse.ini</language>
 	</languages>
 </extension>

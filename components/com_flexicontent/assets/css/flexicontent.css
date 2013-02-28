@@ -416,7 +416,7 @@
 #flexicontent .item_total .fc_item_total_data {
 	display:inline-block;
 	float:none;
-	margin-right:32px;
+	margin-right:24px;
 }
 
 #flexicontent .item_total .item_total_label {
@@ -436,6 +436,40 @@
 	float:none;
 }
 
+
+/************************************************/
+/* (e) Generic Display of Rendered Field Values */
+/************************************************/
+
+#flexicontent .fc_search_result_image {
+	display: inline-block;	
+}
+
+#flexicontent .fc_search_result_image.left { float: left; margin: 0px 0px 0px 16px; }}
+#flexicontent .fc_search_result_image.right { float: right; margin: 0px 0px 0px 16px; }
+
+#flexicontent .fc_search_result_image img { padding:1px; border:1px solid #aaaaaa; border-radius 4px; }
+
+
+
+#flexicontent .fc_field_container {
+	display: block;
+	white-space: nowrap;
+	float: left;
+}
+
+#flexicontent .fc_field_label {
+	float: left;
+	border-bottom: 1px solid silver;
+	color: #777;
+	font-size: 90%;
+	margin-right: 8px;
+	display:block;
+}
+
+#flexicontent .fc_field_value {
+	float: left;
+}
 
 
 /********************************
@@ -815,6 +849,8 @@ div.current dd {
 	background-color:#eeeeee;
 	font-size: 11px !important;
 	font-family: tahoma;
+	white-space: nowrap;
+	width: 5%;
 }
 
 /* Container of TEXT search form field */
@@ -837,7 +873,7 @@ div.current dd {
 /* CONTAINER of search (field) filters */
 fieldset.fc_search_set {
 	border: 1px outset black;
-	padding: 8px 8px 8px 16px;
+	padding: 0px;
 	margin-top:12px;
 }
 
@@ -851,14 +887,13 @@ fieldset.fc_search_set legend {
 table.fc_search_tbl {
 	border-collapse: separate !important;
 	border-spacing: 1px !important;
-	width: auto;
+	width: 100% !important;
 }
 
 /* Search (field) filters CELLs */
 table.fc_search_tbl td {
 	border-width: 0px !important;
 	border-spacing: 1px !important;
-	width: auto !important;
 }
 
 /* CONTAINER of form fields related Search View BEHAVIOR */
@@ -1238,16 +1273,20 @@ table.admintable td {
 #flexicontent ul.tabbernav li.tabberactive a,
 #flexicontent ul.tabbernav li.tabberactive a:hover
 {
-	color: black;
-	background-color: white !important;
-	border-bottom: 1px solid white;
+	color: black!important;
+	background-color: white!important;
+	border-bottom: 1px solid white!important;
 }
 
 #flexicontent ul.tabbernav {
 	border-bottom: 1px solid #777788 !important;
-	font: bold 12px Verdana,sans-serif !important;
+	font: bold 11px Verdana,sans-serif !important;
 	margin: 0 !important;
-	padding: 3px !important;
+	padding: 4px !important;
+}
+
+ul.tabbernav li {
+	line-height: 100% !important;
 }
 
 /*#flexicontent.fctypeNN*/ #fc_subtitle_tabset ul.tabbernav li a {  padding-left: 20px;  }
@@ -1277,13 +1316,14 @@ table.admintable td {
 .flexi_radiotab {
 	display: inline-block !important;
 	padding: 1px 6px !important;
-	margin: 2px 0px 2px 8px !important;
+	margin: 2px 0px 2px 4px !important;
 	border-radius:5px !important;
 	-moz-border-radius: 5px !important;
 	-webkit-border-radius: 5px !important;
-	border: 1px solid #aaaaaa !important;
+	border: 1px solid #cccccc !important;
 	text-decoration: none !important;
-	font-weight: bold;
+	font-weight: normal !important;
+	font-size: 12px !important;
 	cursor: pointer !important;
 	float: left !important;
 	white-space:nowrap !important;
@@ -1294,14 +1334,19 @@ table.admintable td {
 .flexi_radiotab.highlight {
 	background-color: lightgray !important;
 	color: darkred !important;
+	font-weight: normal !important;
 }
 
 .flexi_radiotab input {
 	float: left !important;
-	display:none !important;
+	margin: 0px 2px 0px 0px;
+	padding: 0px;
+	/*display:none !important;*/
 }
 
-
+.flexi_radiotab.fcdisabled {
+	color: #bbbbbb !important;
+}
 
 /***************************
  * Other unsorted CSS Rules

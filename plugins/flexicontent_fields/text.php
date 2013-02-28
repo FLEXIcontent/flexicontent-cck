@@ -18,6 +18,8 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsText extends JPlugin
 {
+	static $field_types = array('text', 'textselect');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -38,23 +40,22 @@ class plgFlexicontent_fieldsText extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
-		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
 		// some parameter shortcuts
-		$size				= $field->parameters->get( 'size', 30 ) ;
-		
 		$default_value_use = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value     = ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
+		$size				= $field->parameters->get( 'size', 30 ) ;
+		$multiple		= $field->parameters->get( 'allow_multiple', 1 ) ;
+		$maxval			= $field->parameters->get( 'max_values', 0 ) ;
+		$required = $field->parameters->get( 'required', 0 ) ;
+		$required = $required ? ' required' : '';
+		$extra_attribs = $field->parameters->get( 'extra_attribs', '' ) ;
+		$attribs = $extra_attribs;
 		
-		$multiple			= $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval				= $field->parameters->get( 'max_values', 0 ) ;
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		
-		$required		= $field->parameters->get( 'required', 0 ) ;
-		$required		= $required ? ' required' : '';
-		
+		$document	= JFactory::getDocument();
 		// initialise property
 		if (!$field->value) {
 			$field->value = array();
@@ -65,7 +66,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 			}
 		}
 		
-		$document	= & JFactory::getDocument();
+		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
+		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 		
 		if ($multiple) // handle multiple records
 		{
@@ -98,7 +100,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
 					}
 					
-					thisNewField.getFirst().setProperty('value','');  /* First element is the text input field, second is e.g remove button */
+					thisNewField.getFirst().setProperty('value','');  /* First element is the value input field, second is e.g remove button */
 
 					thisNewField.injectAfter(thisField);
 					";
@@ -161,6 +163,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 				height: 20px;
 				position: relative;
 			}
+			#sortables_'.$field->id.' li.sortabledisabled {
+				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
+			}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
 			#sortables_'.$field->id.' li .admintable { text-align: left; }
@@ -187,14 +192,12 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		$document->addStyleDeclaration($css);
 		
-		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
-		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
-		
 		$field->html = array();
 		$n = 0;
-		foreach ($field->value as $value) {
+		foreach ($field->value as $value)
+		{
 			$field->html[] = '
-				<input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="fcfield_textval inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$required.' />
+				<input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="fcfield_textval inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$attribs.' />
 				'.$selhtml.'
 				'.$remove_button.'
 				'.$move2.'
@@ -218,14 +221,16 @@ class plgFlexicontent_fieldsText extends JPlugin
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
-		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
+		// Some variables
+		$document = JFactory::getDocument();
+		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
+		
 		// Get field values
 		$values = $values ? $values : $field->value;
-		$values = !is_array($values) ? array($values) : $values;     // make sure values is an array
-		$isempty = !count($values) || !strlen($values[0]);           // detect empty value
 		
 		// Handle default value loading, instead of empty value
 		$default_value_use= $field->parameters->get( 'default_value_use', 0 ) ;
@@ -237,20 +242,16 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$values = array($default_value);
 		}
 		
-		// some parameter shortcuts
-		$remove_space	= $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext			= $field->parameters->get( 'pretext', '' ) ;
-		$posttext			= $field->parameters->get( 'posttext', '' ) ;
-		$separatorf		= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag			= $field->parameters->get( 'opentag', '' ) ;
-		$closetag			= $field->parameters->get( 'closetag', '' ) ;
+		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
+		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
 		
-		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
-		
-		// Some variables
-		$document	= & JFactory::getDocument();
-		$view 	= JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
+		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
 		// Get ogp configuration
 		$useogp     = $field->parameters->get('useogp', 0);
@@ -281,6 +282,10 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$separatorf = $closetag . $opentag;
 			break;
 
+			case 5:
+			$separatorf = '';
+			break;
+
 			default:
 			$separatorf = '&nbsp;';
 			break;
@@ -292,15 +297,14 @@ class plgFlexicontent_fieldsText extends JPlugin
 		foreach ($values as $value)
 		{
 			if ( !strlen($value) ) continue;
-			
 			$field->{$prop}[]	= strlen($values[$n]) ? $pretext.$values[$n].$posttext : '';
 			$n++;
 		}
 		
 		// Apply seperator and open/close tags
 		if(count($field->{$prop})) {
-			$field->{$prop}  = implode($separatorf, $field->{$prop});
-			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 		} else {
 			$field->{$prop} = '';
 		}
@@ -331,8 +335,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
-		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
-		if(!is_array($post) && !strlen($post)) return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !is_array($post) && !strlen($post) ) return;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -370,9 +374,10 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if($filter->field_type != 'text') return;
+		// execute the code only if the field type match the plugin type
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		plgFlexicontent_fieldsText::onDisplayFilter($filter, $value, $formName);
+		self::onDisplayFilter($filter, $value, $formName);
 	}
 	
 	
@@ -380,148 +385,30 @@ class plgFlexicontent_fieldsText extends JPlugin
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		// execute the code only if the field type match the plugin type
-		if($filter->field_type != 'text') return;
-
-		// ** some parameter shortcuts
-		$label_filter 		= $filter->parameters->get( 'display_label_filter', 0 ) ;
-		if ($label_filter == 2) $text_select = $filter->label; else $text_select = JText::_('FLEXI_ALL');
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		$size = $filter->parameters->get( 'size', 30 );
-		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );
-		$filter->html = '';
-		if ($label_filter == 1) $filter->html  .= $filter->label.': ';
-		
-		// *** Retrieve values
-		// *** Limit values, show only allowed values according to category configuration parameter 'limit_filter_values'
-		$force = JRequest::getVar('view')=='search' ? 'all' : 'default';
-		$results = flexicontent_cats::getFilterValues($filter, $force);
-		
-		// Make sure the current filtering values match the field filter configuration to single or multi-value
-		if ( in_array($display_filter_as, array(2,3,5)) ) {
-			if (!is_array($value)) $value = array( $value );
-		} else {
-			if (is_array($value)) $value = @ $value[0];
-		}
-		//print_r($value);		
-		
-		// *** Create the form field(s) used for filtering
-		switch ($display_filter_as) {
-		case 0: case 2:
-			$options = array();
-			$options[] = JHTML::_('select.option', '', '-'.$text_select.'-');
-			
-			foreach($results as $result) {
-				if ( !strlen($result->value) ) continue;
-				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
-			}
-			if ($display_filter_as==0) {
-				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
-			} else {
-				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id.'[1]', ' class="fc_field_filter" ', 'value', 'text', @ $value[1]);
-				$filter->html	.= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id.'[2]', ' class="fc_field_filter" ', 'value', 'text', @ $value[2]);
-			}
-			break;
-		case 1: case 3:
-			if ($display_filter_as==1) {
-				$filter->html	.='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value.'" />';
-			} else {
-				$size = (int)($size / 2);
-				$filter->html	.='<input name="filter_'.$filter->id.'[1]" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value[1].'" /> - ';
-				$filter->html	.='<input name="filter_'.$filter->id.'[2]" class="fc_field_filter" type="text" size="'.$size.'" value="'.@ $value[2].'" />'."\n";
-			}
-			break;
-		case 4: case 5:
-			$i = 0;
-			$checked = ($display_filter_as==5) ? in_array('__FC_ALL__', $value) : '__FC_ALL__'==$value;
-			$checked_attr = $checked ? 'checked=checked' : '';
-			$checked_class = $checked ? 'highlight' : '';
-			$filter->html .= '<label class="flexi_radiotab rc5 '.$checked_class.'" for="filter_'.$filter->id.'_val'.$i.'">';
-			if ($display_filter_as==4) {
-				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode.parentNode, \'highlight\', 1);" ';
-				$filter->html .= '  id="filter_'.$filter->id.'_val'.$i.'" type="radio" name="filter_'.$filter->id.'" ';
-				$filter->html .= '  value="__FC_ALL__" '.$checked_attr.' />';
-			} else {
-				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\', 1);" ';
-				$filter->html .= '  id="filter_'.$filter->id.'_val'.$i.'" type="checkbox" name="filter_'.$filter->id.'['.$i.']" ';
-				$filter->html .= '  value="__FC_ALL__" '.$checked_attr.' />';
-			}
-			$filter->html .= ' <span style="float:left; display:inline-block;" >'.JText::_('FLEXI_ALL').'</span>';
-			$filter->html .= '</label>';
-			$i++;
-			foreach($results as $result) {
-				if ( !strlen($result->value) ) continue;
-				$checked = ($display_filter_as==5) ? in_array($result->value, $value) : $result->value==$value;
-				$checked_attr = $checked ? 'checked=checked' : '';
-				$checked_class = $checked ? 'highlight' : '';
-				$filter->html .= '<label class="flexi_radiotab rc5 '.$checked_class.'" for="filter_'.$filter->id.'_val'.$i.'">';
-				if ($display_filter_as==4) {
-					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode.parentNode, \'highlight\');" ';
-					$filter->html .= '  id="filter_'.$filter->id.'_val'.$i.'" type="radio" name="filter_'.$filter->id.'" ';
-					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.' />';
-				} else {
-					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" ';
-					$filter->html .= '  id="filter_'.$filter->id.'_val'.$i.'" type="checkbox" name="filter_'.$filter->id.'['.$i.']" ';
-					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.' />';
-				}
-				$filter->html .= ' <span style="float:left; display:inline-block;" >'.JText::_($result->value).'</span>';
-				$filter->html .= '</label>';
-				$i++;
-			}
-			break;
-		}
+		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
 	
 	
-	function getFiltered($field_id, $value, & $filtered)
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for content lists e.g. category view, and not for search view
+	function getFiltered(&$filter, $value)
 	{
-		$db = & JFactory::getDBO();
-		$query  = 'SELECT attribs'
-			. ' FROM #__flexicontent_fields'
-			. ' WHERE id = ' . $field_id
-			;
-		$db->setQuery($query);
-		$attribs = $db->loadResult();
-		$params = new JParameter($attribs);
+		// execute the code only if the field type match the plugin type
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		$display_filter_as = $params->get( 'display_filter_as', 0 );
+		return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
+	}
+	
+	
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for search view
+	function getFilteredSearch(&$field, $value)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
-		// Make sure the current filtering values match the field filter configuration to single or multi-value
-		if ( in_array($display_filter_as, array(2,3,5)) ) {
-			if (!is_array($value)) $value = array( $value );
-		} else {
-			if (is_array($value)) $value = array ( @ $value[0] );
-			else $value = array ( $value );
-		}
-		
-		$and_value = '';
-		switch ($display_filter_as) {
-		// RANGE cases
-		case 2: case 3:
-			if (@ $value[1]) $and_value .= ' AND value >=' . $db->Quote($value[1]);
-			if (@ $value[2]) $and_value .= ' AND value =<' . $db->Quote($value[2]);
-			break;
-		// SINGLE TEXT select value cases
-		case 1:
-			$and_value .= ' AND value LIKE ' . $db->Quote( '%'.$value[0].'%' );
-			break;
-		// EXACT value cases
-		case 0: case 4: case 5: default:
-			$or_values = array();
-			foreach ($value as $val) {
-				$or_values[] = 'value=' . $db->Quote( $val );
-			}
-			$and_value .= ' AND ('.implode(' OR ', $or_values).' ) ';
-			break;
-		}
-		
-		$query  = 'SELECT item_id'
-			. ' FROM #__flexicontent_fields_item_relations'
-			. ' WHERE field_id = ' . $field_id
-			. $and_value
-			. ' GROUP BY item_id'
-		;
-		$db->setQuery($query);
-		$filtered = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
 	}
 	
 	
@@ -532,8 +419,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 	
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item) {
-		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
-		if ( !$field->isadvsearch ) return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
@@ -543,23 +430,15 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	
-		
-	// Method to get ALL items that have matching search values for the current field id
-	function onFLEXIAdvSearch(&$field)
-	{
-		if ($field->field_type != 'text' && $field->field_type != 'textselect') return;
-		
-		FlexicontentFields::onFLEXIAdvSearch($field);
-	}
 	
-	
+	// Method to build the options of drop-down select for field
 	function buildSelectOptions(&$field, &$item)
 	{
 		// Drop-down select elements depend on 'select_field_mode'

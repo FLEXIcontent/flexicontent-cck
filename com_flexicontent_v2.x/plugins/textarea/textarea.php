@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: textarea.php 1613 2013-01-04 00:43:58Z ggppdk $
+ * @version 1.0 $Id: textarea.php 1624 2013-01-12 04:21:10Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea
@@ -14,11 +14,12 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsTextarea extends JPlugin
 {
+	static $field_types = array('textarea', 'maintext');
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
@@ -30,76 +31,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	}
 	
 	
-	function parseTabs(&$field, &$item) {
-		$editorarea_per_tab = $field->parameters->get('editorarea_per_tab', 0);
-
-		$start_of_tabs_pattern = $field->parameters->get('start_of_tabs_pattern');
-		$end_of_tabs_pattern = $field->parameters->get('end_of_tabs_pattern');
-		
-		$start_of_tabs_default_text = $field->parameters->get('start_of_tabs_default_text');  // Currently unused
-		$default_tab_list = $field->parameters->get('default_tab_list');                      // Currently unused
-		
-		$title_tab_pattern = $field->parameters->get('title_tab_pattern');
-		$start_of_tab_pattern = $field->parameters->get('start_of_tab_pattern');
-		$end_of_tab_pattern = $field->parameters->get('end_of_tab_pattern');
-		
-		$field_value = & $field->value[0];
-		$field->tabs_detected = false;
-		
-		// MAKE MAIN TEXT FIELD OR TEXTAREAS TABBED
-		if ( $editorarea_per_tab ) {
-			
-			//echo 'tabs start: ' . preg_match_all('/'.$start_of_tabs_pattern.'/u', $field_value ,$matches) . "<br />";
-			//print_r ($matches); echo "<br />";
-			
-			//echo 'tabs end: ' . preg_match_all('/'.$end_of_tabs_pattern.'/u', $field_value ,$matches) . "<br />";
-			//print_r ($matches); echo "<br />";
-			
-			$field->tabs_detected = preg_match('/' .'(.*)('.$start_of_tabs_pattern .')(.*)(' .$end_of_tabs_pattern .')(.*)'. '/su', $field_value ,$matches);
-			
-			if ($field->tabs_detected) {
-				$field->tab_info = new stdClass();
-				$field->tab_info->beforetabs = $matches[1];
-				$field->tab_info->tabs_start = $matches[2];
-				$insidetabs = $matches[3];
-				$field->tab_info->tabs_end   = $matches[4];
-				$field->tab_info->aftertabs  = $matches[5];
-				
-				//echo 'tab start: ' . preg_match_all('/'.$start_of_tab_pattern.'/u', $insidetabs ,$matches) . "<br />";
-				//echo "<pre>"; print_r ($matches); echo "</pre><br />";									
-				
-				//echo 'tab end: ' . preg_match_all('/'.$end_of_tab_pattern.'/u', $insidetabs ,$matches) . "<br />";
-				//print_r ($matches); echo "<br />";
-				
-				$tabs_count = preg_match_all('/('.$start_of_tab_pattern .')(.*?)(' .$end_of_tab_pattern .')/su', $insidetabs ,$matches) . "<br />";
-				
-				if ($tabs_count) {
-					$tab_startings = $matches[1];
-					
-					foreach ($tab_startings as $i => $v) {
-						$title_matched = preg_match('/'.$title_tab_pattern.'/su', $tab_startings[$i] ,$title_matches) . "<br />";
-						//echo "<pre>"; print_r($title_matches); echo "</pre>";
-						$tab_titles[$i] = $title_matches[1];
-					}
-					
-					$tab_contents = $matches[2];
-					$tab_endings = $matches[3];
-					//foreach ($tab_titles as $tab_title) echo "$tab_title &nbsp; &nbsp; &nbsp;";
-				} else {
-					echo "FALIED while parsing tabs<br />";
-					$field->tabs_detected = 0;
-				}
-				
-				$field->tab_info->tab_startings = & $tab_startings;
-				$field->tab_info->tab_titles    = & $tab_titles;
-				$field->tab_info->tab_contents  = & $tab_contents;
-				$field->tab_info->tab_endings   = & $tab_endings;
-			}
-		}
-	}
-	
-	
-	
 	
 	// *******************************************
 	// DISPLAY methods, item form & frontend views
@@ -109,7 +40,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'textarea' && $field->field_type != 'maintext') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
@@ -121,11 +52,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// some parameter shortcuts
 		$default_value_use = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value     = ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		
 		$cols         = $field->parameters->get( 'cols', 75 ) ;
 		$rows         = $field->parameters->get( 'rows', 20 ) ;
-		$required		= $field->parameters->get( 'required', 0 ) ;
-		$required		= $required ? ' required' : '';
+		$required = $field->parameters->get( 'required', 0 ) ;
+		$required = $required ? ' required' : '';
 		
 		$use_html     = $field->parameters->get( 'use_html', 1 ) ;  // Default to 1 to avoid problems with rendering the maintext description field
 		$height       = $field->parameters->get( 'height', ($field->field_type == 'textarea') ? '300px' : '400px' ) ;
@@ -282,15 +212,18 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'textarea') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
 		
-		// some parameter shortcuts
-		$use_html			= $field->parameters->get( 'use_html', 0 ) ;
-		$opentag			= $field->parameters->get( 'opentag', '' ) ;
-		$closetag			= $field->parameters->get( 'closetag', '' ) ;
+		// Some variables
+		$document = JFactory::getDocument();
+		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
+		// Get field values
+		$values = $values ? $values : $field->value;
+		
+		// Handle default value loading, instead of empty value
 		$default_value_use= $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value		= ($default_value_use == 2) ? $field->parameters->get( 'default_value', '' ) : '';
 		if ( empty($values) && !strlen($default_value) ) {
@@ -300,19 +233,12 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$values = array($default_value);
 		}
 		
-		$values = $values ? $values : $field->value;
+		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
 		
-		if ($values) {
-			$field->{$prop}	 = $opentag;
-			$field->{$prop}	.= $values ? ($use_html ? $values[0] : nl2br($values[0])) : '';
-			$field->{$prop}	.= $closetag;
-		} else {
-			$field->{$prop} = '';
-		}
-
-		// Some variables
-		$document	= & JFactory::getDocument();
-		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
+		// some parameter shortcuts
+		$use_html			= $field->parameters->get( 'use_html', 0 ) ;
 		
 		// Get ogp configuration
 		$useogp     = $field->parameters->get('useogp', 0);
@@ -320,6 +246,14 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
 		$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
 		$ogpusage   = $field->parameters->get('ogpusage', 0);
+		
+		// Apply seperator and open/close tags
+		if ($values) {
+			$field->{$prop} = $use_html ? $values[0] : nl2br($values[0]);
+			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+		} else {
+			$field->{$prop} = '';
+		}
 		
 		if ($useogp && $field->{$prop}) {
 			if ( in_array($view, $ogpinview) ) {
@@ -347,13 +281,13 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'textarea') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !FLEXI_J16GE && $field->parameters->get( 'use_html', 0 ) ) {
 			$rawdata = JRequest::getVar($field->name, '', 'post', 'string', JREQUEST_ALLOWRAW);
 			if ($rawdata) $post = $rawdata;
 		}
-		if(!is_array($post) && !strlen($post)) return;
-
+		if ( !is_array($post) && !strlen($post) ) return;
+		
 		// Reconstruct value if it has splitted up e.g. to tabs
 		if (is_array($post)) {
 			$tabs_text = '';
@@ -383,14 +317,23 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if($filter->field_type != 'textarea') return;
+		// execute the code only if the field type match the plugin type
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		$filter->field_type =  'text';
-		$filter->parameters->set( 'size', $filter->parameters->get( 'adv_size', 30 ) );
-		plgFlexicontent_fieldsText::onAdvSearchDisplayFilter($filter, $value, $formName);
-		$filter->field_type =  'textarea';
+		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
 	
+	
+ 	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for search view
+	function getFilteredSearch(&$field, $value)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
+		$field->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
+		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
+	}
 	
 	
 	
@@ -400,8 +343,8 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item) {
-		if ($field->field_type != 'textarea') return;
-		if ( !$field->isadvsearch ) return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
@@ -411,7 +354,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
-		if ($field->field_type != 'textarea') return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');
@@ -419,12 +362,77 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	}
 	
 	
-	// Method to get ALL items that have matching search values for the current field id
-	function onFLEXIAdvSearch(&$field)
-	{
-		if ($field->field_type!='textarea') return;
-		
-		FlexicontentFields::onFLEXIAdvSearch($field);
-	}
 	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
+	
+	// Method to parse a given text for tabbing code
+	function parseTabs(&$field, &$item) {
+		$editorarea_per_tab = $field->parameters->get('editorarea_per_tab', 0);
+
+		$start_of_tabs_pattern = $field->parameters->get('start_of_tabs_pattern');
+		$end_of_tabs_pattern = $field->parameters->get('end_of_tabs_pattern');
+		
+		$start_of_tabs_default_text = $field->parameters->get('start_of_tabs_default_text');  // Currently unused
+		$default_tab_list = $field->parameters->get('default_tab_list');                      // Currently unused
+		
+		$title_tab_pattern = $field->parameters->get('title_tab_pattern');
+		$start_of_tab_pattern = $field->parameters->get('start_of_tab_pattern');
+		$end_of_tab_pattern = $field->parameters->get('end_of_tab_pattern');
+		
+		$field_value = & $field->value[0];
+		$field->tabs_detected = false;
+		
+		// MAKE MAIN TEXT FIELD OR TEXTAREAS TABBED
+		if ( $editorarea_per_tab ) {
+			
+			//echo 'tabs start: ' . preg_match_all('/'.$start_of_tabs_pattern.'/u', $field_value ,$matches) . "<br />";
+			//print_r ($matches); echo "<br />";
+			
+			//echo 'tabs end: ' . preg_match_all('/'.$end_of_tabs_pattern.'/u', $field_value ,$matches) . "<br />";
+			//print_r ($matches); echo "<br />";
+			
+			$field->tabs_detected = preg_match('/' .'(.*)('.$start_of_tabs_pattern .')(.*)(' .$end_of_tabs_pattern .')(.*)'. '/su', $field_value ,$matches);
+			
+			if ($field->tabs_detected) {
+				$field->tab_info = new stdClass();
+				$field->tab_info->beforetabs = $matches[1];
+				$field->tab_info->tabs_start = $matches[2];
+				$insidetabs = $matches[3];
+				$field->tab_info->tabs_end   = $matches[4];
+				$field->tab_info->aftertabs  = $matches[5];
+				
+				//echo 'tab start: ' . preg_match_all('/'.$start_of_tab_pattern.'/u', $insidetabs ,$matches) . "<br />";
+				//echo "<pre>"; print_r ($matches); echo "</pre><br />";									
+				
+				//echo 'tab end: ' . preg_match_all('/'.$end_of_tab_pattern.'/u', $insidetabs ,$matches) . "<br />";
+				//print_r ($matches); echo "<br />";
+				
+				$tabs_count = preg_match_all('/('.$start_of_tab_pattern .')(.*?)(' .$end_of_tab_pattern .')/su', $insidetabs ,$matches) . "<br />";
+				
+				if ($tabs_count) {
+					$tab_startings = $matches[1];
+					
+					foreach ($tab_startings as $i => $v) {
+						$title_matched = preg_match('/'.$title_tab_pattern.'/su', $tab_startings[$i] ,$title_matches) . "<br />";
+						//echo "<pre>"; print_r($title_matches); echo "</pre>";
+						$tab_titles[$i] = $title_matches[1];
+					}
+					
+					$tab_contents = $matches[2];
+					$tab_endings = $matches[3];
+					//foreach ($tab_titles as $tab_title) echo "$tab_title &nbsp; &nbsp; &nbsp;";
+				} else {
+					echo "FALIED while parsing tabs<br />";
+					$field->tabs_detected = 0;
+				}
+				
+				$field->tab_info->tab_startings = & $tab_startings;
+				$field->tab_info->tab_titles    = & $tab_titles;
+				$field->tab_info->tab_contents  = & $tab_contents;
+				$field->tab_info->tab_endings   = & $tab_endings;
+			}
+		}
+	}
 }

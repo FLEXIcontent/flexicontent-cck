@@ -25,6 +25,7 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
 require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_search'.DS.'helpers'.DS.'search.php');
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
 
 
 /**
@@ -53,7 +54,13 @@ class plgSearchFlexiadvsearch extends JPlugin
 		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, 'en-GB'	, true);
 		JFactory::getLanguage()->load($extension_name, JPATH_ADMINISTRATOR, null		, true);
 	}
-
+	
+	
+	// Also add J1.5 function signatures
+	function onSearchAreas() { return $this->onContentSearchAreas(); }
+	function onSearch( $text, $phrase='', $ordering='', $areas=null )  {  return $this->onContentSearch( $text, $phrase, $ordering, $areas );  }
+	
+	
 	/**
 	* @return array An array of search areas
 	*/
@@ -64,32 +71,40 @@ class plgSearchFlexiadvsearch extends JPlugin
 		return $areas;
 	}
 	
-	// Also add J1.5 function signature
-	function onSearchAreas() { return $this->onContentSearchAreas(); }
-
+	
 	/**
 	 * Search method
 	 *
-	 * The sql must return the following fields that are
-	 * used in a common display routine: href, title, section, created, text,
-	 * browsernav
+	 * The sql must return the following fields that are used in a common display routine:
+	 *
+	 *   href, title, section, created, text, browsernav
+	 *
 	 * @param string Target search string
-	 * @param string matching option, exact|any|all
+	 * @param string matching option, natural|natural_expanded|exact|any|all
 	 * @param string ordering option, newest|oldest|popular|alpha|category
 	 * @param mixed An array if restricted to areas, null if search all
 	 */
 	function onContentSearch( $text, $phrase='', $ordering='', $areas=null )
 	{
-		$app = &JFactory::getApplication();
+		// Check if not search inside this search plugin areas
+		if ( is_array($areas) && !array_intersect( $areas, array_keys($this->onContentSearchAreas()) ) )  return array();
 		
-		$db		= & JFactory::getDBO();
-		$user	= & JFactory::getUser();
-		$menus    = & JSite::getMenu();
-		$menu     = $menus->getActive();
+		// Initialize some variables
+		$app   = JFactory::getApplication();
+		$db    = JFactory::getDBO();
+		$user  = JFactory::getUser();
+		$menu  = JSite::getMenu()->getActive();
+		
+		
+		
+		// *******************************************************************************************
+		// Get Configuration parameters (Global component configuration + Menu configuration override)
+		// *******************************************************************************************
 		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($app->isSite()  ?  $app->getParams('com_flexicontent')  : JComponentHelper::getParams('com_flexicontent'));
 		
+		// Get menu parameters
 		if ($menu) {
 			$menuParams = new JParameter($menu->params);
 			// In J1.6+ the above function does not merge current menu item parameters,
@@ -97,301 +112,417 @@ class plgSearchFlexiadvsearch extends JPlugin
 			if (FLEXI_J16GE) $params->merge($menuParams);
 		}
 		
-		// ***********************************************
-		// Create WHERE and ORDER BY clauses for the query
-		// ***********************************************
+		// some parameter shortcuts
+		$show_noauth  = $params->get('show_noauth', 0);
+		$canseltypes  = $params->get('canseltypes', 1);
+		$txtmode      = $params->get('txtmode', 0);
+		$orderby_override = $params->get('orderby_override', 1);
 		
-		// Get Search Field Filters included in the Search Form
-		$search_fields = $params->get('search_fields', '');
-		$search_fields = preg_replace("/[\"'\\\]/u", "", $search_fields);
-		$search_fields = array_unique(preg_split("/\s*,\s*/u", $search_fields));
 		
-		// Get Content Types from HTTP request (if user is allowed to use them)
-		if($cantypes = $params->get('cantypes', 1)) {
-			$search_contenttypes = JRequest::getVar('contenttypes', array());
+		
+		// *****************
+		// Get Content Types
+		// *****************
+		
+		// Use HTTP request (if user is allowed to select them)
+		if ( $canseltypes ) $contenttypes = JRequest::getVar('contenttypes', array());
+		
+		// Fallback to configuration if user did not set them in HTTP request (or if user is not allowed to use them)
+		if( !$canseltypes || empty($contenttypes) )  $contenttypes = $params->get('contenttypes', array());
+		
+		// Sanitize them
+		$contenttypes = !is_array($contenttypes)  ?  array($contenttypes)  :  $contenttypes;
+		$contenttypes = array_unique(array_map('intval', $contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
+		
+		// Create a comma list of them
+		$contenttypes_list = count($contenttypes) ? "'".implode("','", $contenttypes)."'"  :  "";
+		
+		
+		
+		// *************************************
+		// Text Search Fields of the search form
+		// *************************************
+		
+		// Using Basic Search Index for Text Search
+		if ( !$txtmode ) {
+			$txtflds = array();
+			$fields_text = array();
 		}
 		
-		// Fallback to configuration Content Types if they were not set in HTTP request (or if user is not allowed to use them)
-		if(!$cantypes || (count($search_contenttypes)<=0)) {
-			// Get Content Types allowed for user selection in the Search Form
-			$search_contenttypes = $params->get('contenttypes', array());
-			$search_contenttypes = !is_array($search_contenttypes)  ?  array($search_contenttypes)  :  $search_contenttypes;
-			$search_contenttypes = array_unique($search_contenttypes);
-		}
-		
-		// define section
-		if (!defined('FLEXI_SECTION')) define('FLEXI_SECTION', $params->get('flexi_section'));
-		
-		// show unauthorized items
-		$show_noauth = $params->get('show_noauth', 0);
-		
-		if (is_array( $areas )) {
-			if (!array_intersect( $areas, array_keys( $this->onContentSearchAreas() ) )) {
-				return array();
+		// Using Advanced Search Index for Text Search
+		else {
+			// Fallback to configuration if user did not set them in HTTP request (or if user is not allowed to use them)
+			if( $txtmode==1 || empty($txtflds) ) $txtflds = $params->get('txtflds', '');
+			
+			// Use HTTP request (if user is allowed to select them)
+			if ( $txtmode==2 ) {
+				$txtflds = JRequest::getVar('txtflds', array());
+				if ( is_array($txtflds) ) $txtflds = implode(',', $txtflds);
 			}
+			
+			// Sanitize them
+			$txtflds = preg_replace("/[\"'\\\]/u", "", $txtflds);
+			$txtflds = array_unique(preg_split("/\s*,\s*/u", $txtflds));
+			if ( !strlen($txtflds[0]) ) unset($txtflds[0]);
+			
+			// Create a comma list of them
+			$txtflds_list = "'".implode("','", $txtflds)."'";
+			
+			// Retrieve field properties/parameters, verifying the support to be used as Text Search Fields
+			// This will return all supported fields if field limiting list is empty
+			$fields_text = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', $txtflds_list, $contenttypes, $load_params=true, 0, 'search');
+			if ( !count($fields_text) )  // all entries of field limiting list were invalid , get ALL
+				$fields_text = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'search');
 		}
 		
-		// load plugin params info
+		
+		// ********************************
+		// Filter Fields of the search form
+		// ********************************
+		
+		// Get them from configuration
+		$filtflds = $params->get('filtflds', '');
+		
+		// Sanitize them
+		$filtflds = preg_replace("/[\"'\\\]/u", "", $filtflds);
+		$filtflds = array_unique(preg_split("/\s*,\s*/u", $filtflds));
+		if ( !strlen($filtflds[0]) ) unset($filtflds[0]);
+		
+		// Create a comma list of them
+		$filtflds_list = "'".implode("','", $filtflds)."'";
+		
+		// Retrieve field properties/parameters, verifying the support to be used as Filter Fields
+		// This will return all supported fields if field limiting list is empty
+		if ( count($filtflds) )
+			$fields_filter = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', $filtflds_list, $contenttypes, $load_params=true, 0, 'filter');
+		else
+			$fields_filter = array();
+		//if ( !count($fields_filter) )  // all entries of field limiting list were invalid , get ALL
+		//	$fields_filter = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'filter');
+		
+		
+		
+		// **********************
+		// Load Plugin parameters
+		// **********************
+		
 		$plugin =& JPluginHelper::getPlugin('search', 'flexiadvsearch');
 		$pluginParams = new JParameter( $plugin->params );
 		
-		// shortcode of the site active language (joomfish)
-		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)
-		$urlLang  = JRequest::getWord('lang', '' );                 // Language from URL (Can be switched via Joomfish in J1.5)
-		$lang = (FLEXI_J16GE || empty($urlLang)) ? $cntLang : $urlLang;
+		// Shortcuts for plugin parameters
+		$search_limit    = $params->get( 'search_limit', $pluginParams->get( 'search_limit', 20 ) );      // Limits the returned results of this seach plugin
+		$filter_lang     = $params->get( 'filter_lang', $pluginParams->get( 'filter_lang', 1 ) );         // Language filtering enabled
+		$search_archived = $params->get( 'search_archived', $pluginParams->get( 'search_archived', 1 ) ); // Include archive items into the search
+		$browsernav      = $params->get( 'browsernav', $pluginParams->get( 'browsernav', 2 ) );           // Open search in window (for value 1)
 		
-		$limit        = $pluginParams->get( 'search_limit', 50 );
-		$limitstart   = JRequest::getVar('limitstart', 0);
-		$filter_lang 	= $pluginParams->get( 'filter_lang', 1 );
-		$browsernav 	= (int)$pluginParams->get( 'browsernav', 2 );
 		
-		// Dates for publish up & down items
+		
+		// ***************************************************************************************************************
+		// Varous other variable USED in the SQL query like (a) current frontend language and (b) -this- plugin specific ordering, (c) null / now dates, (d) etc 
+		// ***************************************************************************************************************
+		
+		// Get current frontend language (fronted user selected)
+		$lang = flexicontent_html::getUserCurrentLang();
+		
+		// NULL and CURRENT dates, 
+		// NOTE: the above current date is needs to use built-in MYSQL function, otherwise filter caching can not work because the CURRENT DATETIME is continuously different !!!
+		//   $now = FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
+		//   $_now = $db->Quote( $now );
+		$_now = 'UTC_TIMESTAMP()';
 		$nullDate = $db->getNullDate();
-		$date =& JFactory::getDate();
-		$now = $date->toMySQL();
+		
+		// Section name
+		$searchFlexicontent = JText::_( 'FLEXICONTENT' );
+		
+		// REMOVED / COMMENTED OUT this feature:
+		// Require any OR all Filters ... this can be user selectable
+		//$show_filtersop = $params->get('show_filtersop', 1);
+		//$default_filtersop = $params->get('default_filtersop', 'all');
+		//$FILTERSOP = !$show_filtersop ? $default_filtersop : JRequest::getVar('filtersop', $default_filtersop);
+		
+		
+		
+		// ****************************************
+		// Create WHERE clause part for Text Search 
+		// ****************************************
 		
 		$text = trim( $text );
-		
-		// FORCE LOGICAL 'AND' between (a) text search and (b) search filters.
-		// If no text search words are given, then force operator to be OR to ignore text search having no results
-		$SEARCH_FILTERS_OP_TEXT_SEARCH = strlen($text) ? 'AND' : 'OR';
-		
-		// Require any OR all Filters ... this can be user selectable, but just to be insane check if it is allowed to the user
-		$show_filtersop = $params->get('show_filtersop', 1);
-		$default_filtersop = $params->get('default_filtersop', 'all');
-		$FILTERSOP = !$show_filtersop ? $default_filtersop : JRequest::getVar('filtersop', $default_filtersop);
-		
-		if ( strlen($text)==0 ) {$SEARCH_FILTERS_OP_TEXT_SEARCH = 'OR';}
-		
-		$searchFlexicontent = JText::_( 'FLEXICONTENT' );
-		if($text!='') {
-			$text = $db->getEscaped($text);
+		if( strlen($text) )
+		{
+			$escaped_text = $db->getEscaped($text);
+			$quoted_text = $db->Quote( $escaped_text, false );
+			
 			switch ($phrase)
 			{
+				case 'natural':
+					$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.') ';
+					break;
+				
+				case 'natural_expanded':
+					$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
+					break;
+				
 				case 'exact':
-					$text		= $db->Quote( '"'.$db->getEscaped( $text, false ).'"', false );
-					$where	 	= ' MATCH (ie.search_index) AGAINST ('.$text.' IN BOOLEAN MODE)';
+					$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 				
 				case 'all':
 					$words = explode( ' ', $text );
-					$newtext = '+' . implode( ' +', $words );
-					$text		= $db->Quote( $db->getEscaped( $newtext, false ), false );
-					$where	 	= ' MATCH (ie.search_index) AGAINST ('.$text.' IN BOOLEAN MODE)';
+					$newtext = '+' . implode( '* +', $words ) .'*';
+					$quoted_text = $db->Quote( $db->getEscaped( $newtext ), false );
+					$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 				
 				case 'any':
 				default:
-					$text		= $db->Quote( $db->getEscaped( $text, false ), false );
-					$where	 	= ' MATCH (ie.search_index) AGAINST ('.$text.' IN BOOLEAN MODE)';
+					$words = explode( ' ', $text );
+					$newtext = implode( '* ', $words ) .'*';
+					$quoted_text = $db->Quote( $db->getEscaped( $newtext ), false );
+					$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 			}
+			
+			// Construct TEXT SEARCH limitation SUB-QUERY (contained in a AND-WHERE clause)
+			if (!$txtmode)
+				$_text_SQL = ' SELECT item_id FROM #__flexicontent_items_ext WHERE %s ';
+			else
+				$_text_SQL = ' SELECT item_id FROM #__flexicontent_advsearch_index WHERE %s AND field_id IN ('. implode(',',array_keys($fields_text)) .')';
+			
+			$text_where = ' AND i.id IN ( '. sprintf($_text_SQL, $_text_match) .')';
 		} else {
-			$where = '0';
+			$text_where = '';
 		}
 		
-		switch ( $ordering )
-		{
-			case 'oldest':
-				$order = 'a.created ASC';
-				break;
-			
-			case 'popular':
-				$order = 'a.hits DESC';
-				break;
-			
-			case 'alpha':
-				$order = 'a.title ASC';
-				break;
-			
-			case 'category':
-				$order = 'c.title ASC, a.title ASC';
-				break;
-			
-			case 'newest':
-			default:
-				$order = 'a.created DESC';
-				break;
+		
+		
+		// *******************
+		// Create ORDER clause
+		// *******************
+		
+		// First try FLEXIcontent advanced search plugin specific ordering
+		$orderby = $orderby_override  ?  JRequest::getWord( 'orderby', $params->get('orderby', '') )  :  $params->get('orderby', '');
+		if ( $orderby ) {
+				$order = flexicontent_db::buildItemOrderBy(
+					$params, $ordering, $_request_var='orderby', $_config_param='orderby',
+					$_item_tbl_alias = 'i', $_relcat_tbl_alias = 'rel',
+					$_default_order='', $_default_order_dir=''
+				);
 		}
 		
-		// Select only items user has access to if he is not allowed to show unauthorized items
+		// Second try to use general ordering of search plugins
+		else {
+			switch ( $orderby )
+			{
+				//case 'relevance': $order = ' ORDER BY score DESC, i.title ASC'; break;
+				case 'oldest':   $order = 'i.created ASC'; break;
+				case 'popular':  $order = 'i.hits DESC'; break;
+				case 'alpha':    $order = 'i.title ASC'; break;
+				case 'category': $order = 'c.title ASC, i.title ASC'; break;
+				case 'newest':   $order = 'i.created DESC'; break;
+				default:         $order = 'i.created DESC'; break;
+			}
+			$order = ' ORDER BY '. $order;
+		}
+		
+		
+		
+		// ***************************************************************************************
+		// Create JOIN clause and WHERE clause part for filtering by current access level (= view)
+		// ***************************************************************************************
 		$joinaccess	= '';
 		$andaccess	= '';
-		if (!$show_noauth) {
+		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
 				$andaccess  .= ' AND c.access IN ('.$aid_list.')';
-				$andaccess  .= ' AND a.access IN ('.$aid_list.')';
+				$andaccess  .= ' AND i.access IN ('.$aid_list.')';
 			} else if (FLEXI_ACCESS) {
 				$aid = (int) $user->get('aid');
 				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON a.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
 				$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $aid . ')';
-				$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR a.access <= '. (int) $aid . ')';
+				$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $aid . ')';
 			} else {
 				$andaccess  .= ' AND c.access <= '.$gid;
-				$andaccess  .= ' AND a.access <= '.$gid;
+				$andaccess  .= ' AND i.access <= '.$gid;
 			}
 		}
 		
-		// filter by active language
+		
+		
+		// **********************************************************************************************************************************************************
+		// Create WHERE clause part for filtering by current active language, and current selected contend types ( !! although this is possible via a filter too ...)
+		// **********************************************************************************************************************************************************
+		
 		$andlang = '';
 		if (	$app->isSite() &&
 					( FLEXI_FISH || (FLEXI_J16GE && $app->getLanguageFilter()) ) &&
-					$filter_lang
+					$filter_lang  // Language filtering enabled
 		) {
 			$andlang .= ' AND ( ie.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 		}
 		
-		// Get advanced search fields
-		$fieldnames_list = "'".implode("','", array_unique($search_fields))."'";
-		$contenttypes_list = "'".implode("','", array_unique($search_contenttypes))."'";
-		$fields = FlexicontentFields::getSearchFields($key='name', $indexer='advanced', $fieldnames_list, $contenttypes_list, $load_params=true);
-		
-		// Check if each field type supports advanced search, this will remove fields, wrongly marked as advanced searchable
-		foreach($fields as $k => $field) if ( ! FlexicontentFields::getPropertySupport($field->field_type, $field->iscore, 'supportadvsearch') )  $fields[$k];
-		
-		$CONDITION = '';
-		$items = array();
-		$field_results_arr = array();
-		if (FLEXI_J16GE) {
-			$custom = JRequest::getVar('custom', array());
-		}
+		// Filter by currently selected content types
+		$andcontenttypes = count($contenttypes) ? ' AND ie.type_id IN ('.$contenttypes_list.') ' : '';
 		
 		
-		// *************************************************************************************************
-		// Once per (advanced searchable) field TYPE we will search for ITEMs having specified field value(s)
-		// *************************************************************************************************
 		
-		//JPluginHelper::importPlugin( 'flexicontent_fields');
-		$fields_matched_arr = array();
-		foreach($fields as $field)
+		// ***********************************************************************
+		// Create the AND-WHERE clause parts for the currentl active Field Filters
+		// ***********************************************************************
+		
+		$return_sql = true;
+		$filters_where = array();
+		foreach($fields_filter as $field)
 		{
-			// Skip filters without value
-			$field_value = JRequest::getVar('filter_'.$field->id, false);
-			if ( !$field_value && !strlen($field_value) ) continue;
+			// Get value of current filter, and SKIP it if value is EMPTY
+			$filtervalue = JRequest::getVar('filter_'.$field->id, '');
+			$empty_filtervalue_array  = is_array($filtervalue)  && !strlen(trim(implode('',$filtervalue)));
+			$empty_filtervalue_string = !is_array($filtervalue) && !strlen(trim($filtervalue));
+			if ($empty_filtervalue_array || $empty_filtervalue_string) continue;
 			
-			// Call advanced search 
-			//echo "<br/>Field name:". $field->name;
-			$fieldname = $field->iscore ? 'core' : $field->field_type;
-			FLEXIUtilities::call_FC_Field_Func($fieldname, 'onFLEXIAdvSearch', array( &$field ));
+			// Call field filtering of advanced search to find items matching the field filter (an SQL SUB-QUERY is returned)
+			$field_filename = $field->iscore ? 'core' : $field->field_type;
+			$filters_where[$field->id] = FLEXIUtilities::call_FC_Field_Func($field_filename, 'getFilteredSearch', array( &$field, &$filtervalue, &$return_sql ));
 			
-			// An 'empty' results property, indicates field filter matched ZERO items
-			if( empty($field->results) ) continue;
-			//echo "<pre>"; print_r($field->results);echo "</pre>"; 
-			
-			// Add field to fields that were used in the search
-			$fields_matched_arr[$field->id] = array();
-			foreach($field->results as $r) {
-				if($r) {
-					$items[] = $r->item_id;
-					$fields_matched_arr[$field->id][] = $r->item_id;
-					$field_results_arr[$r->item_id][] = $r;
-				}
-			}
+			//echo "\n<br/>Field name:". $field->name ." : ";   print_r($filtervalue);
+			//if ($filters_where[$field->id]) echo "<br>".$filters_where[$field->id]."<br/>";
 		}
-		//echo "<pre>foundfields: "; print_r($fields_matched_arr);echo "</pre>";
-		//echo "<pre>foundfields: "; print_r($fields_matched_arr);echo "</pre>";
-		//echo "<pre>resultfields: "; print_r($field_results_arr);echo "</pre>";
+		//echo "\n<br/><br/>Filters Active: ". count($filters_where)."<br/>";
 		
-		if ( count($items) )
-		{
-			if ($FILTERSOP == 'all')
-			{
-				// Count number of time each item was matched by search filters
-				foreach($fields_matched_arr as $fieldid => $itemid_matched_arr) {
-					foreach ($itemid_matched_arr as $itemid_matched) 
-						$itemid_match_count[$itemid_matched] = !isset($itemid_match_count[$itemid_matched]) ? 1 : $itemid_match_count[$itemid_matched] + 1;
-				}
-				
-				// Only accept items that were matched by all search filters
-				$ffcount = count($fields_matched_arr);
-				$items = array();
-				foreach ($itemid_match_count as $itemid_matched => $infields_count) {
-					if ($infields_count == $ffcount) $items[] = $itemid_matched;
-				}
-			}
-			
-			if (count($items))
-			{
-				$items = array_unique($items);
-				$items = "'".implode("','", $items)."'";
-				$CONDITION = " {$SEARCH_FILTERS_OP_TEXT_SEARCH} a.id IN ({$items}) ";
-			}
-		}
 		
-		// CHECK if the (recalculated) items array matching the FILTERS is empty but filters are required ...
-		if ( !count($items) && $SEARCH_FILTERS_OP_TEXT_SEARCH=='AND' )  return array();
 		
-		$query 	= 'SELECT DISTINCT a.id,a.title AS title, a.sectionid,'
-			. ' a.created AS created,'
-			. ' ie.search_index AS text,'
-			. ' "'.$browsernav.'" AS browsernav,'
-			. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END as slug,'
-			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
-			. ' CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, a.title ) AS section'
-			. ' FROM #__content AS a'
-			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = a.id'
-			. ' LEFT JOIN #__categories AS c ON c.id = a.catid'
+		// ******************************************************
+		// Create Filters JOIN clauses and AND-WHERE clause parts
+		// ******************************************************
+		
+		// JOIN clauses ... (shared with filters)
+		$join_clauses =  ''
+			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' JOIN #__categories AS c ON c.id = i.catid'
+			. ( $txtmode ? ' JOIN #__flexicontent_fields as f ON f.id=ai.field_id' : '' )
 			. $joinaccess
-			. ' WHERE '
-			. '('
-			. '( '.$where.' )'
-			. $CONDITION
-			. ')'
-			. ' AND a.state IN (1, -5)'
-			. ' AND c.published = 1'
-			. ' AND ( a.publish_up = '.$db->Quote($nullDate).' OR a.publish_up <= '.$db->Quote($now).' )'
-			. ' AND ( a.publish_down = '.$db->Quote($nullDate).' OR a.publish_down >= '.$db->Quote($now).' )'
+			;
+		
+		// AND-WHERE sub-clauses ... (shared with filters)
+		$and_where =  ' 1=1 '
+			. ' AND i.state IN (1,-5'. ($search_archived ? (FLEXI_J16GE ? 2:-1) :'' ) .') '
+			. ' AND c.published = 1 '
+			. ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_now.' )'
+			. ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_now.' )'
 			. $andaccess
 			. $andlang
-			. (count($search_contenttypes)?" AND ie.type_id IN ({$contenttypes_list})":"")
-			. ' ORDER BY '. $order
+			. $andcontenttypes
+			;
+		
+		// AND-WHERE sub-clauses for text search ... (shared with filters)
+		$and_where_text_n_filters  = $text_where;
+		$and_where_text_n_filters .= count($filters_where) ? implode( " ", $filters_where) : '';
+		
+		// JOIN clause - USED - to limit returned 'text' to the text of TEXT-SEARCHABLE only fields ... (NOT shared with filters)
+		if ( !$txtmode )
+			$join_textsearch = '';
+		else
+			$join_textsearch = ' JOIN #__flexicontent_advsearch_index as ai ON ai.item_id = i.id AND ai.field_id IN ('. implode(',',array_keys($fields_text)) .')';
+		
+		
+		// ************************************************
+		// Set variables used by filters creation mechanism
+		// ************************************************
+		
+		global $fc_searchview;
+		$fc_searchview['join_clauses'] = $join_clauses;
+		$fc_searchview['where_conf_only'] = $and_where;    // WHERE of the view (mainly configuration dependent)
+		$fc_searchview['filters_where'] = $filters_where;  // WHERE of the filters
+		$fc_searchview['filters_where']['txtsearch'] = $text_where;      // WHERE of text search
+		$fc_searchview['params'] = $params; // view's parameters
+		
+		
+		
+		// *****************************************************************************************************
+		// Execute search query.  NOTE this is skipped it if (a) no text-search and no (b) no filters are active
+		// *****************************************************************************************************
+		
+		if ( !count($filters_where) & !strlen($text) ) return array();
+		
+		// Overcome possible group concat limitation
+		$query="SET SESSION group_concat_max_len = 9999999";
+		$db->setQuery($query);
+		$db->query();
+		
+		// Construct query's SQL
+		$query 	= 'SELECT i.id, i.title AS title, i.sectionid, i.created, i.id AS fc_item_id,'
+			. ( !$txtmode ?
+				' ie.search_index AS text,' :
+				//' GROUP_CONCAT(\'[[[b]]]\', f.label, \'[[[/b]]]: \', ai.search_index ORDER BY f.ordering ASC SEPARATOR \' [[[br/]]]\') AS text,'
+				' GROUP_CONCAT(ai.search_index ORDER BY f.ordering ASC SEPARATOR \' \') AS text,'
+				)
+			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
+			. ' CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, i.title ) AS section'
+			. ' FROM #__content AS i'
+			. $join_textsearch
+			. $join_clauses
+			. ' WHERE '
+			. $and_where
+			. $and_where_text_n_filters 
+			. ' GROUP BY i.id '
+			. $order
 		;
-		$db->setQuery( $query, $limitstart, $limit );
-		//$db->setQuery( $query );
+		
+		$print_logging_info = $params->get('print_logging_info');
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+		
+		// Execute query ... NOTE: The plugin will return a PRECONFIGURED limited number of results (more),
+		// it is the responsibility of the SEARCH VIEW to do the pagination, splicing (appropriately) the data returned by all search plugins.
+		$db->setQuery( $query, 0, $search_limit );
 		$list = $db->loadObjectList();
-		if(isset($list)) {
-			foreach($list as $key => $row) {
-				$list[$key]->fields_text = '';
+		if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
+		
+		if ( $print_logging_info ) @$fc_run_times['search_query_runtime'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		//echo "<br>".$query."<br><br>\n";
+		//echo "<pre>"; print_r($list); echo "</pre>";
+		
+		// Create item links and other variables
+		if( $list ) {
+			if ( count($list) < $search_limit ) $app->setUserState('fc_view_limit_max', 0);
+			else $app->setUserState('fc_view_limit_max', $search_limit);
+			
+			foreach($list as $key => $row)
+			{
 				if( FLEXI_J16GE || $row->sectionid==FLEXI_SECTION ) {
-					if(isset($field_results_arr[$row->id])) {
-						foreach($field_results_arr[$row->id] as $r) {
-							//$list[$key]->text .= "[br /]".$r->label.":[span=highlight]".$r->value."[/span]";
-							$list[$key]->fields_text .= "[br /]".$r->label.":[span=highlight]".$r->value."[/span]";
-						}
-					}
 					$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug));
 				} else {
 					$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($row->slug, $row->catslug, $row->sectionid));
 				}
+				$list[$key]->browsernav = $browsernav;
 			}
 		}
+		
 		return $list;
-	}
-	
-	// Also add J1.5 function signature
-	function onSearch( $text, $phrase='', $ordering='', $areas=null )
-	{
-		return $this->onContentSearch( $text, $phrase, $ordering, $areas );
 	}
 }
 
 
 
-// When not having exactly named CLASS function, but in J1.5 (only) the triggerEvent() checks if functions being registered
-// as Event Listener methods, exist outside the class, so we must define wrapper classes outside the class,
-// these can be used by triggerEvent and will only contain a call to the respective class method
+// Following code is when not having exactly named CLASS function.
+// NOTE: in J1.5 (only) the triggerEvent() checks if functions being registered as Event Listener methods also exists outside the class, so we 
+// must define wrapper classes outside the class, these can be used by triggerEvent and will only contain a call to the respective class method
 
 // A different approach is to create wrapper class methods, that have the name of the event, we did this above
 
-/*if (!function_exists('onContentSearchAreas')) {
+/*
+
+// Wrapper class for J1.5 to RETURN SEARCH AREAS supported by this search plugin
+if (!function_exists('onContentSearchAreas')) {
 	function onContentSearchAreas() {
 		//return plgSearchFlexiadvsearch::onContentSearchAreas();
 	}
 }
 
+// Wrapper class for J1.5 to RETURN SEARCH RESULTS found by this search plugin
 if (!function_exists('onContentSearch')) {
 	function onContentSearch( $text, $phrase='', $ordering='', $areas=null ) {
 		//return plgSearchFlexiadvsearch::onContentSearch( $text, $phrase, $ordering, $areas );
@@ -402,6 +533,7 @@ $app = JFactory::getApplication();
 if (!FLEXI_J16GE) {
 	$app->registerEvent( 'onSearchAreas', 'onContentSearchAreas' );
 	$app->registerEvent( 'onSearch', 'onContentSearch');
-}*/
+}
+*/
 
 ?>

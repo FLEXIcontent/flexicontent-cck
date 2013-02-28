@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItem extends JViewLegacy
+class FlexicontentViewItem  extends JViewLegacy
 {
 	var $_type = '';
 	var $_name = FLEXI_ITEMVIEW;
@@ -43,6 +43,8 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		// check for form layout
 		if($this->getLayout() == 'form' || in_array(JRequest::getVar('task'), array('add','edit')) ) {
+			// Important set layout to be form since various category view SEF links have this variable set
+			$this->setLayout('form');
 			$this->_displayForm($tpl);
 			return;
 		} else {
@@ -407,8 +409,12 @@ class FlexicontentViewItem extends JViewLegacy
 			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout);
 		}
 
+		$print_logging_info = $params->get('print_logging_info');
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+		
 		parent::display($tpl);
-
+		
+		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 	
 	/**

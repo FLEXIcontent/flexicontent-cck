@@ -30,6 +30,7 @@ class FlexicontentHelperPerm
 				$dest 			= $destpath.DS.'com_flexicontent.plugin.php';
 				$source 		= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
 				
+				jimport('joomla.filesystem.file');
 				if (!JFile::exists($dest)) {
 					if (!JFolder::exists($destpath)) { 
 						if (!JFolder::create($destpath)) { 
@@ -192,7 +193,7 @@ class FlexicontentHelperPerm
 			// *** J1.5 without FLEXIaccess or user is super admin, return all category ids ***
 			
 			if ($user->gid < 19) return array();  // Less than J1.5 Author
-			return FlexicontentHelperPerm::_returnAllCats ($check_published, $specific_catids);
+			return FlexicontentHelperPerm::returnAllCats ($check_published, $specific_catids);
 			
 		} else {
 			
@@ -231,7 +232,7 @@ class FlexicontentHelperPerm
 			// *** No limitations found, return all category ids ***
 			
 			if ($db->loadResult()) {
-				return FlexicontentHelperPerm::_returnAllCats ($check_published, $specific_catids);
+				return FlexicontentHelperPerm::returnAllCats ($check_published, $specific_catids);
 			}
 			
 			// *** Limitations found, check and return category ids with 'create' permission ***
@@ -271,7 +272,7 @@ class FlexicontentHelperPerm
 	/*
 	 * Method to return all categories ids checking if published and if in specific subset
 	 */
-	function _returnAllCats ($check_published, $specific_catids)
+	function returnAllCats ($check_published, $specific_catids)
 	{
 		global $globalcats;
 		$usercats = array();

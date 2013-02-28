@@ -32,8 +32,12 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="text_or_value" type="radio" default="1" label="FLEXI_LABEL_OR_VALUE_ETC" description="FLEXI_LABEL_OR_VALUE_ETC_DESC">
+				<option value="0">FLEXI_VALUE</option>
+				<option value="1">FLEXI_LABEL</option>
+			</field>
 			
-			<field name="" type="separator" default="FLEXI_VALUE_HANDLING_LABEL" level="level1" />
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
 			<field name="sql_mode" type="radio" default="0" label="FLEXI_FIELD_SQL_MODE" description="FLEXI_FIELD_SQL_MODE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -41,11 +45,11 @@
 			<field name="field_elements" type="textarea" default="1::Yes%% 0::No" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
 			<field name="" type="separator" default="FLEXI_ITEM_FORM" description="" level="level2" />
 			<field name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
-			<field name="firstoptiontext" type="text" default="Please Select" label="First option text" description="First option text." />
-			<field name="usefirstoption" type="radio" default="1" label="Use first option" description="Use 'Please Select' option, if you don't need to use this option you can click No.">
+			<field name="usefirstoption" type="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="firstoptiontext" type="text" default="FLEXI_SELECT" label="FLEXI_FIELD_FIRST_OPTION_TEXT" description="FLEXI_FIELD_FIRST_OPTION_TEXT_DESC" />
 			
 			<field name="" type="separator" default="NUMBER OR VALUES" description="" level="level3" />
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
@@ -56,11 +60,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level1" />
-			<field name="text_or_value" type="radio" default="1" label="FLEXI_LABEL_OR_VALUE" description="FLEXI_LABEL_OR_VALUE_DESC">
-				<option value="0">FLEXI_VALUE</option>
-				<option value="1">FLEXI_LABEL</option>
-			</field>
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -73,19 +73,72 @@
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
 				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_SEARCH_FILTER_CONF" level="level1" />
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" description="FLEXI_TEXT_SEARCH_FILTER_CONF_DESC" level="level1" />
+		
+			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_CONF" description="" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_WARNING" description="" level="level3" menu="hide" />			
+			<field name="filter_customize_options" type="list" default="0" label="FLEXI_CUSTOM_FILTER_VALUES" description="FLEXI_CUSTOM_FILTER_VALUES_DESC">
+				<option value="0">FLEXI_USE_ALL_VALUES_DEFAULT</option>
+				<option value="1">FLEXI_USE_CUSTOM_QUERY</option>
+				<option value="2">FLEXI_USE_CUSTOM_ELEMENTS</option>
+			</field>
+			<field name="filter_custom_options" type="textarea" rows="6" cols="25" label="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY" description="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY_DESC" default="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field_id}' AND value != '' GROUP BY value" />
+			<field name="filter_default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
+			<field name="filter_usefirstoption" type="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="filter_firstoptiontext" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level3" />
 			<field name="display_label_filter" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>
 			</field>
+			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
+				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+				<option value="2">FLEXI_DISPLAY_AS_DUAL_SELECT_FIELD_RANGE</option>
+				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
+				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
+				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+			</field>
+			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
+			<field name="display_label_filter_s" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_BEFORE_SELECT</option>
+				<option value="2">FLEXI_IN_SELECT</option>
+			</field>
+			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
+				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+				<option value="2">FLEXI_DISPLAY_AS_DUAL_SELECT_FIELD_RANGE</option>
+				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
+				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
+				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+			</field>
+			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 		</fieldset>
 	</fields>
 	</config>
+	
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_selectmultiple.ini</language>
 	</languages>

@@ -12,107 +12,157 @@
 	<files>
 		<filename plugin="date">date.php</filename>
 	</files>
-
+	
 		<params group="standard">
-			<param name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-
+			</field>
 		</params>
-
+		
 		<params group="group-date" addpath="/administrator/components/com_flexicontent/elements">
 			
-			<param name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
-			<param name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
+			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-			<param name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
+			</field>
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<field name="size" type="text" default="30" size="2" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="show_no_value" type="radio" default="0" label="FLEXI_FIELD_SHOW_NO_VALUE" description="FLEXI_FIELD_SHOW_NO_VALUE_DESC">
+			</field>
+			<field name="date_source" type="list" default="0" label="FLEXI_FIELD_DATE_SOURCE" description="FLEXI_FIELD_DATE_SOURCE_DESC">
+				<option value="0">FLEXI_FIELD_NORMAL_DATE_EDITABLE</option>
+				<option value="1">FLEXI_FIELD_SHOW_START_PUBLICATION</option>
+				<option value="2">FLEXI_FIELD_SHOW_END_PUBLICATION</option>
+			</field>
+			<field name="show_no_value" type="radio" default="0" label="FLEXI_FIELD_SHOW_NO_VALUE" description="FLEXI_FIELD_SHOW_NO_VALUE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="no_value_msg" type="text" default="" size="42" label="FLEXI_FIELD_NO_VALUE_MSG" description="FLEXI_FIELD_NO_VALUE_MSG_DESC" />
-			<param name="show_usage" type="radio" default="0" label="FLEXI_FIELD_SHOW_USAGE" description="FLEXI_FIELD_SHOW_USAGE_DESC">
+			</field>
+			<field name="no_value_msg" type="text" default="" size="42" label="FLEXI_FIELD_NO_VALUE_MSG" description="FLEXI_FIELD_NO_VALUE_MSG_DESC" />
+			<field name="show_usage" type="radio" default="0" label="FLEXI_FIELD_SHOW_USAGE" description="FLEXI_FIELD_SHOW_USAGE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-
-			<param name="" type="separator" default="FLEXI_VALUE_HANDLING_LABEL" level="level1" />
+			</field>
 			
-			<param name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2" />
-			<param name="date_allowtime" type="radio" default="1" label="FLEXI_DATE_ALLOWTIME" description="FLEXI_DATE_ALLOWTIME_DESC">
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2" />
+			<field name="date_allowtime" type="list" default="1" label="FLEXI_DATE_ALLOWTIME" description="FLEXI_DATE_ALLOWTIME_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_YES_FORCE_ZERO_TIME</option>
-			</param>
-			<param name="use_editor_tz" type="radio" default="0" label="FLEXI_DATE_TIMEZONE_EDITORS" description="FLEXI_DATE_TIMEZONE_EDITORS_DESC">
+			</field>
+			<field name="use_editor_tz" type="radio" default="0" label="FLEXI_DATE_TIMEZONE_EDITORS" description="FLEXI_DATE_TIMEZONE_EDITORS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
+			</field>
+			<field name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
+			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 
-			<param name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level2" />
-			<param name="" type="separator" default="FLEXI_FIELD_DATE_PART" level="level3" />
-			<param name="date_format" type="list" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC">
+			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level2" />
+			<field name="" type="separator" default="FLEXI_FIELD_DATE_PART" level="level3" />
+			<field name="date_format" type="list" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC">
 				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
 				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
 				<option value="DATE_FORMAT_LC3">DATE_FORMAT_LC3</option>
 				<option value="DATE_FORMAT_LC4">DATE_FORMAT_LC4</option>
 				<option value="">FLEXI_FIELD_CUSTOM_FORMAT</option>
-			</param>
-			<param name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
-			<param name="" type="separator" default="FLEXI_FIELD_TIMEZONE_PART" level="level3" />
-			<param name="display_tz_logged" type="radio" default="0" label="FLEXI_DATE_TIMEZONE_LOGGED" description="FLEXI_DATE_TIMEZONE_LOGGED_DESC">
+			</field>
+			<field name="custom_date" type="text" default="" label="FLEXI_FIELD_CUSTOM_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_DESC" />
+			<field name="" type="separator" default="FLEXI_FIELD_TIMEZONE_PART" level="level3" />
+			<field name="display_tz_logged" type="list" default="0" label="FLEXI_DATE_TIMEZONE_LOGGED" description="FLEXI_DATE_TIMEZONE_LOGGED_DESC">
 				<option value="0">FLEXI_DATE_IGNORE_TIMEZONE</option>
 				<option value="1">FLEXI_DATE_UTC0</option>
 				<option value="2">FLEXI_DATE_SITE_TIMEZONE</option>
 				<option value="3">FLEXI_DATE_USER_LOCALTIME</option>
-			</param>
-			<param name="display_tz_guests" type="radio" default="0" label="FLEXI_DATE_TIMEZONE_GUESTS" description="FLEXI_DATE_TIMEZONE_GUESTS_DESC">
+			</field>
+			<field name="display_tz_guests" type="list" default="0" label="FLEXI_DATE_TIMEZONE_GUESTS" description="FLEXI_DATE_TIMEZONE_GUESTS_DESC">
 				<option value="0">FLEXI_DATE_IGNORE_TIMEZONE</option>
 				<option value="1">FLEXI_DATE_UTC0</option>
 				<option value="2">FLEXI_DATE_SITE_TIMEZONE</option>
-			</param>
-			<param name="display_tz_suffix" type="radio" default="1" label="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX" description="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX_DESC">
+			</field>
+			<field name="display_tz_suffix" type="list" default="1" label="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX" description="FLEXI_DATE_APPEND_TIMEZONE_SUFFIX_DESC">
 				<option value="0">FLEXI_FIELD_NO_I_WILL_DO_MANUALLY</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
+			</field>
 
-			<param name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level1" />
-			<param name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
-			<param name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
-			<param name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
+			</field>
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
 				<option value="2">FLEXI_PIPE</option>
 				<option value="3">FLEXI_COMMA</option>
 				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
-			</param>
-			<param name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-			<param name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+			</field>
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
-			<param name="" type="separator" default="FLEXI_CATEGORY_SEARCH_FILTER_CONF" level="level1" />
-			<param name="display_label_filter" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level3" />
+			<field name="display_label_filter" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_BEFORE_SELECT</option>
 				<option value="2">FLEXI_IN_SELECT</option>
-			</param>
+			</field>
+			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
+				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+				<option value="2">FLEXI_DISPLAY_AS_DUAL_SELECT_FIELD_RANGE</option>
+				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
+				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
+				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+			</field>
+			<field name="date_filter_group" type="list" default="0" label="FLEXI_FILTER_DATE_GROUPING" description="FLEXI_FILTER_DATE_GROUPING_DESC">
+				<option value="year">FLEXI_YEAR</option>
+				<option value="month">FLEXI_MONTH</option>
+				<option value="day">FLEXI_DAY</option>
+			</field>
+			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
+			<field name="display_label_filter_s" type="list" default="0" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_BEFORE_SELECT</option>
+				<option value="2">FLEXI_IN_SELECT</option>
+			</field>
+			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
+				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+				<option value="2">FLEXI_DISPLAY_AS_DUAL_SELECT_FIELD_RANGE</option>
+				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
+				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
+				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+			</field>
+			<field name="date_filter_group_s" type="list" default="0" label="FLEXI_FILTER_DATE_GROUPING" description="FLEXI_FILTER_DATE_GROUPING_DESC">
+				<option value="year">FLEXI_YEAR</option>
+				<option value="month">FLEXI_MONTH</option>
+				<option value="day">FLEXI_DAY</option>
+			</field>
+			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
 		</params>
-
+	
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_date.ini</language>
 	</languages>

@@ -96,6 +96,7 @@ class FlexicontentViewField extends JViewLegacy
 		$supportsearch          = $ft_support->supportsearch;
 		$supportadvsearch       = $ft_support->supportadvsearch;
 		$supportfilter          = $ft_support->supportfilter;
+		$supportadvfilter       = $ft_support->supportadvfilter;
 		$supportuntranslatable  = $ft_support->supportuntranslatable;
 		$supportformhidden      = $ft_support->supportformhidden;
 		$supportedithelp        = $ft_support->supportedithelp;
@@ -148,6 +149,7 @@ class FlexicontentViewField extends JViewLegacy
 		$this->assignRef('supportsearch'           , $supportsearch);
 		$this->assignRef('supportadvsearch'        , $supportadvsearch);
 		$this->assignRef('supportfilter'           , $supportfilter);
+		$this->assignRef('supportadvfilter'        , $supportadvfilter);
 		$this->assignRef('supportuntranslatable'   , $supportuntranslatable);
 		$this->assignRef('supportvalueseditable'   , $supportvalueseditable);
 		$this->assignRef('supportformhidden'       , $supportformhidden);

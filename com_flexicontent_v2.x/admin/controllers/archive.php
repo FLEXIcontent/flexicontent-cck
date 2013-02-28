@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: archive.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: archive.php 1619 2013-01-09 02:50:25Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

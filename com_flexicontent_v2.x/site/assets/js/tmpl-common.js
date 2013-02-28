@@ -94,37 +94,37 @@
 	
 	function fc_toggleClass(ele,cls, fc_all=0) {
 		if (!fc_all) {
-		  if (jQuery(ele).hasClass(cls)) {
-		  	jQuery(ele).removeClass(cls);
-		  } else {
-		  	jQuery(ele).addClass(cls);
-		  }
-		  // Handle disabling 'select all' checkbox (if it exists)
+		  jQuery(ele).hasClass(cls) ? jQuery(ele).removeClass(cls) : jQuery(ele).addClass(cls);
+		  // Handle disabling 'select all' checkbox (if it exists), not needed but to make sure ...
 			var inputs = ele.parentNode.getElementsByTagName('input');
-			if (inputs[0].value=='__FC_ALL__') {
-				inputs[0].checked = 0;
+		  if (inputs[0].value=='') {
+		  	inputs[0].checked = 0;
 				jQuery(inputs[0].parentNode).removeClass(cls);
-			}
+		  }
 		} else {
 			var inputs = ele.parentNode.getElementsByTagName('input');
-			var check_all = inputs[0].checked;
 			for (var i = 0; i < inputs.length; ++i) {
-				if (check_all) {
-					jQuery(inputs[i].parentNode).addClass(cls);
-				} else {
-					jQuery(inputs[i].parentNode).removeClass(cls);
-				}
+				inputs[i].checked = 0;
+				jQuery(inputs[i].parentNode).removeClass(cls);
 			}
+		  // Handle highlighting (but not enabling) 'select all' checkbox
+			jQuery(inputs[0].parentNode).addClass(cls);
 		}
 	}
 	
 	function fc_toggleClassGrp(ele, cls, fc_all=0) {
 		var inputs = ele.getElementsByTagName('input');
-		for (var i = 0; i < inputs.length; ++i) {
-			if (inputs[i].checked) {
-				jQuery(inputs[i].parentNode).addClass(cls);
-			} else {
+		if (!fc_all) {
+			for (var i = 0; i < inputs.length; ++i) {
+				inputs[i].checked ? jQuery(inputs[i].parentNode).addClass(cls) : jQuery(inputs[i].parentNode).removeClass(cls);
+			}
+		} else {
+			var inputs = ele.parentNode.getElementsByTagName('input');
+			for (var i = 0; i < inputs.length; ++i) {
+				inputs[i].checked = 0;
 				jQuery(inputs[i].parentNode).removeClass(cls);
 			}
+		  // Handle highlighting (but not enabling) 'select all' radio button
+			jQuery(inputs[0].parentNode).addClass(cls);
 		}
 	}

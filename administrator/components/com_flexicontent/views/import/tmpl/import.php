@@ -134,23 +134,38 @@ function submitbutton(task) {
 						<td class="key"><label class="fcimport" for="created_col">Creation date</label></td>
 						<td>
 							<input type="radio" id="created_col0" name="created_col" value="0" checked="checked" /> <label for="created_col0">a. Current Date</label> &nbsp; &nbsp;
-							<input type="radio" id="created_col1" name="created_col" value="1" /> <label for="created_col1">b. Use 'created' column with a valid date, e.g. 17/10/2012</label>
+							<input type="radio" id="created_col1" name="created_col" value="1" /> <label for="created_col1">b. Use 'created' column with a valid date, e.g. 17/10/2012</label> &nbsp; &nbsp;
 						</td>
 					</tr>
 					<tr valign="top">
 						<td class="key"><label class="fcimport" for="created_by_col">Creator (Author)</label></td>
 						<td>
 							<input type="radio" id="created_by_col0" name="created_by_col" value="0" checked="checked" /> <label for="created_by_col0">a. Current User</label> &nbsp; &nbsp;
-							<input type="radio" id="created_by_col1" name="created_by_col" value="1" /> <label for="created_by_col1">b. Use 'created_by' column containing USER IDs, e.g. 457</label>
+							<input type="radio" id="created_by_col1" name="created_by_col" value="1" /> <label for="created_by_col1">b. Use 'created_by' column containing USER IDs, e.g. 457</label> &nbsp; &nbsp;
 						</td>
 					</tr>
 					<tr valign="top">
-						<td class="key"><label class="fcimport" for="metadesc_col">Meta Description</label></td>
-						<td><input type="checkbox" id="created_by_col" name="metadesc_col" value="1" /> &nbsp; (Use 'metadesc' column containing METADATA Description)</td>
+						<td class="key"><label class="fcimport">Meta Data</label></td>
+						<td>
+							<input type="checkbox" id="metadesc_col" name="metadesc_col" value="1" /> <label for="metadesc_col" class="fc_small"> Use 'metadesc' column (METADATA Description) </label> &nbsp; &nbsp;
+							<input type="checkbox" id="metakey_col" name="metakey_col" value="1" /> <label for="metakey_col" class="fc_small"><small> Use 'metakey' column (METADATA Keywords) </label> &nbsp; &nbsp;
+						</td>
+					<tr valign="top">
+						<td class="key"><label class="fcimport">Publication Dates</label></td>
+						<td>
+							(TAKE care to enter <b>valid dates</b> or process will fail e.g. 'YYYY-MM-DD hh:mm:ss' OR ''YYYY/MM/DD ' OR 'YY-MM-DD' )<br/>
+							<input type="checkbox" id="publish_up_col" name="publish_up_col" value="1" /> <label for="publish_up_col" class="fc_small"> Use 'publish_up' column (Start Publication) </label> &nbsp; &nbsp;
+							<input type="checkbox" id="publish_down_col" name="publish_down_col" value="1" /> <label for="publish_down_col" class="fc_small"> Use 'publish_down' column (End Publication) </label> &nbsp; &nbsp;
+						</td>
 					</tr>
 					<tr valign="top">
-						<td class="key"><label class="fcimport" for="metakey_col">Meta Keywords</label></td>
-						<td><input type="checkbox" id="created_by_col" name="metakey_col" value="1" /> &nbsp; (Use 'metakey' column containing METADATA Keywords)</td>
+						<td class="key"><label class="fcimport">Tags</label></td>
+						<td>
+							(NOTE: for 'tags_names' column, tags not already existing, will be created automatically, before they assinged to the item)<br/>
+							<input type="radio" id="tags_col0" name="tags_col" value="0" checked="checked" /> <label for="tags_col0" class="fc_small">a. Do not import tags</label> &nbsp; &nbsp;
+							<input type="radio" id="tags_col1" name="tags_col" value="1" /> <label for="tags_col1" class="fc_small">b. Use 'tags_names' column (Comma separated list of tag names)</label> &nbsp; &nbsp;
+							<input type="radio" id="tags_col2" name="tags_col" value="2" /> <label for="tags_col2" class="fc_small">c. Use 'tags_raw' column (Comma separated list of tag ids)</label> &nbsp; &nbsp;
+						</td>
 					</tr>
 				</table>
 			</fieldset>

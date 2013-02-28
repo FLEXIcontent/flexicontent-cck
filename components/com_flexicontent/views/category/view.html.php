@@ -57,7 +57,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();
-		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/rounded-corners.js' );
+		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/rounded-corners-min.js' );
 		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($mainframe->getParams('com_flexicontent'));
@@ -537,6 +537,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		// SUBCATEGORIES (some templates)
 		// ******************************
 		
+		// Remove unroutable categories from subcategories
+		$_categories = array();
+		foreach ($categories as $i => $subcat) {
+			if (in_array($subcat->id, $globalnoroute)) continue;
+			$_categories[] = $categories[$i];
+		}
+		$categories = $_categories;
+		
 		// subcategory image params
 		$show_subcat_image = $params->get('show_description_image_subcat', 1);  // we use different name for variable
 		$subcat_image_source = $params->get('subcat_image_source', 2); // 0: extract, 1: use param, 2: use both
@@ -545,6 +553,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$subcat_image_width = $params->get('subcat_image_width', 24);
 		$subcat_image_height = $params->get('subcat_image_height', 24);
 		
+		// Create subcategory image/description/etc data 
 		foreach ($categories as $subcat) {
 			if ($show_subcat_image)  {
 				if (FLEXI_J16GE && !is_object($subcat->params)) {
@@ -636,13 +645,17 @@ class FlexicontentViewCategory extends JViewLegacy
 
 			foreach ($filters as $filtre)
 			{
-				if ($category->id) {
-					$value  = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
-				} else if ($authorid) {
-					$value  = $mainframe->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+				/*if ($category->_id) {
+					$filtervalue 	= $mainframe->getUserStateFromRequest( $option.'.category'.$category->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+				} else if ($category->_authorid) {
+					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.author'.$category->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+				} else if (count($category->_ids)) {
+					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.mcats'.$category->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
 				} else {
-					$value  = JRequest::getVar('filter_'.$filtre->id, '', '');
-				}
+					$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
+				}*/
+				$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
+				
 				//$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
 				
 				// make sure filter HTML is cleared, and create it
@@ -650,10 +663,10 @@ class FlexicontentViewCategory extends JViewLegacy
 				if ( $params->get('show_filter_labels',1)>0 ) $filtre->parameters->set('display_label_filter', 0); // suppress labels inside filter's HTML (hide or show all labels externally)
 				// else ... filter default label behavior
 				$filtre->html = '';  // make sure filter HTML display is cleared
-				$fieldname = $filtre->iscore ? 'core' : $filtre->field_type;
-				FLEXIUtilities::call_FC_Field_Func($fieldname, 'onDisplayFilter', array( &$filtre, $value ) );
+				$field_type = $filtre->iscore ? 'core' : $filtre->field_type;
+				FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFilter', array( &$filtre, $filtervalue ) );
 				$filtre->parameters->set('display_label_filter', $display_label_filter_saved);
-				$lists['filter_' . $filtre->id] = $value;
+				$lists['filter_' . $filtre->id] = $filtervalue;
 			}
 		}
 
@@ -707,8 +720,12 @@ class FlexicontentViewCategory extends JViewLegacy
 			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout);
 		}
 
+		$print_logging_info = $params->get('print_logging_info');
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+		
 		parent::display($tpl);
-
+		
+		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 }
 ?>

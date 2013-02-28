@@ -37,6 +37,7 @@ $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcitems fcitem'.$this->item->id;
 $page_classes .= ' fctype'.$this->item->type_id;
+$page_classes .= ' fcmaincat'.$this->item->catid;
 ?>
 
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
