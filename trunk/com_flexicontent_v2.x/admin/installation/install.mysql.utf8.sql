@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_advsearch_index` (
   `extraid` int(11) NOT NULL,
   `search_index` longtext NOT NULL,
   `value_id` varchar(255) NULL,
-  PRIMARY KEY (`field_id`,`item_id`,`extratable`,`extraid`),
+  PRIMARY KEY (`field_id`,`item_id`,`extraid`),
   KEY `field_id` (`field_id`),
   KEY `item_id` (`item_id`),
   FULLTEXT `search_index` (`search_index`),

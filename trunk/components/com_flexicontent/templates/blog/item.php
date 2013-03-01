@@ -53,7 +53,7 @@ $page_classes .= ' fcmaincat'.$this->item->catid;
 	<!-- BOF buttons -->
 	<?php
 	$pdfbutton = flexicontent_html::pdfbutton( $this->item, $this->params );
-	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, null , $this->item->slug );
+	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $this->item->categoryslug, $this->item->slug );
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = flexicontent_html::editbutton( $this->item, $this->params );
 	$statebutton = flexicontent_html::statebutton( $this->item, $this->params );

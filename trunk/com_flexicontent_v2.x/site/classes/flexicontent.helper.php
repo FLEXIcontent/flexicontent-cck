@@ -496,41 +496,53 @@ class flexicontent_html
 	 */
 	function mailbutton($view, &$params, $slug = null, $itemslug = null )
 	{
-		if ( file_exists ( JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php' )
-				&& $params->get('show_email_icon') && !JRequest::getCmd('print') ) {
-
-			$uri    =& JURI::getInstance();
-			$base  	= $uri->toString( array('scheme', 'host', 'port'));
-			
-			//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
-			if($view == 'category') {
-				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug, false );
-			} elseif($view == FLEXI_ITEMVIEW) {
-				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug, false );
-			} elseif($view == 'tags') {
-				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug, false );
+		static $initialize = null;
+		static $uri, $base;
+		
+		if ( !$params->get('show_email_icon') || JRequest::getCmd('print') ) return;
+		
+		if ($initialize === null) {
+			if (file_exists ( JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php' )) {
+				require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
+				$uri  = JURI::getInstance();
+				$base = $uri->toString( array('scheme', 'host', 'port'));
+				$initialize = true;
 			} else {
-				$link 	= $base.JRoute::_( 'index.php?view='.$view, false );
+				$initialize = false;
 			}
-			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
-			$url 	= 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink($link);
-			
-			$status = 'width=400,height=300,menubar=yes,resizable=yes';
-
-			if ($params->get('show_icons')) 	{
-				$image = JHTML::_('image.site', 'emailButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EMAIL' ));
-			} else {
-				$image = '&nbsp;'.JText::_( 'FLEXI_EMAIL' );
-			}
-
-			$overlib = JText::_( 'FLEXI_EMAIL_TIP' );
-			$text = JText::_( 'FLEXI_EMAIL' );
-
-			$output	= '<a href="'. JRoute::_($url) .'" class="editlinktip hasTip" onclick="window.open(this.href,\'win2\',\''.$status.'\'); return false;" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
-
-			return $output;
 		}
-		return;
+		if ( $initialize === false ) return;
+		
+		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
+		if($view == 'category') {
+			$link = $base . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($slug));
+			//$link = $base . JRoute::_( 'index.php?view='.$view.'&cid='.$slug, false );
+		} elseif($view == FLEXI_ITEMVIEW) {
+			$link = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $slug));
+			//$link = $base . JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug, false );
+		} elseif($view == 'tags') {
+			$link = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id).$start);
+			//$link = $base . JRoute::_( 'index.php?view='.$view.'&id='.$slug, false );
+		} else {
+			$link 	= $base . JRoute::_( 'index.php?view='.$view, false );
+		}
+		
+		$url 	= 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink($link);
+			
+		$status = 'width=400,height=300,menubar=yes,resizable=yes';
+
+		if ($params->get('show_icons')) 	{
+			$image = JHTML::_('image.site', 'emailButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EMAIL' ));
+		} else {
+			$image = '&nbsp;'.JText::_( 'FLEXI_EMAIL' );
+		}
+
+		$overlib = JText::_( 'FLEXI_EMAIL_TIP' );
+		$text = JText::_( 'FLEXI_EMAIL' );
+
+		$output	= '<a href="'. JRoute::_($url) .'" class="editlinktip hasTip" onclick="window.open(this.href,\'win2\',\''.$status.'\'); return false;" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+
+		return $output;
 	}
 
 	/**
@@ -2988,9 +3000,9 @@ class FLEXIUtilities
 				// Create a plugin instance
 				$dispatcher = & JDispatcher::getInstance();
 				$fc_plgs[$fieldtype] =  new $className($dispatcher, array());
-				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters)
+				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters), CHECKING if parameters exist
 				$plugin_db_data = & JPluginHelper::getPlugin('flexicontent_fields',$fieldtype);
-				$fc_plgs[$fieldtype]->params = new JParameter($plugin_db_data->params);
+				if ( !empty($plugin_db_data) )    $fc_plgs[$fieldtype]->params = new JParameter( $plugin_db_data->params );
 			} else {
 				$jAp=& JFactory::getApplication();
 				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');

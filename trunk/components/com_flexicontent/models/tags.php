@@ -445,8 +445,10 @@ class FlexicontentModelTags extends JModelLegacy
 
 		$this->_db->setQuery($query);
 		$this->_tag = $this->_db->loadObject();       // Execute query to load tag properties
-		$this->_tag->parameters = & $this->_params;   // Assign tag parameters ( already load by setId() )
-        
+		if ( $this->_tag ) {
+			$this->_tag->parameters = & $this->_params;   // Assign tag parameters ( already load by setId() )
+    }
+    
 		return $this->_tag;
 	}
 	

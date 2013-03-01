@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="plugin" version="1.5" group="system" method="upgrade">
-	<name>System - FLEXIcontent advanced route</name>
+	<name>System - FLEXIcontent Advanced Routing</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>July 2010</creationDate>
 	<copyright>Copyright (C) 2010 Emmanuel Danan</copyright>
@@ -8,7 +8,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.vistamedia.fr</authorUrl>
 	<version>2.0</version>
-	<description>System plugin for advanced FLEXIcontent routing</description>
+	<description>System Plugin for FLEXIcontent Advanced Routing</description>
 	
 	<files>
 		<filename plugin="flexiadvroute">flexiadvroute.php</filename>

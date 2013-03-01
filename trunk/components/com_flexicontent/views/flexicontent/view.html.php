@@ -160,7 +160,12 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$this->assignRef('pageNav' , 				$pageNav);
 		$this->assignRef('pageclass_sfx' , 	$pageclass_sfx);
 
+		$print_logging_info = $params->get('print_logging_info');
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+		
 		parent::display($tpl);
+		
+		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 }
 ?>
