@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: install.php 1579 2012-12-03 03:37:21Z ggppdk $
+ * @version 1.5 stable $Id: install.php 1640 2013-02-28 14:45:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -305,7 +305,7 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 		// Update DB table flexicontent_fields: Convert deprecated fields types to 'text' field type
 		?>
 				<tr class="row0">
-					<td class="key">Converting deprecated fields"
+					<td class="key">Converting deprecated fields
 					<?php
 					$msg = array();
 					if ($fields_tbl_exists) foreach ($deprecated_fields as $old_type => $new_type)
@@ -314,20 +314,21 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 							.' SET field_type = ' .$db->Quote($new_type)
 							.' WHERE field_type = ' .$db->Quote($old_type);
 						$db->setQuery($query);
-						$result = $db->query()
+						$result = $db->query();
 						if( !$result ) {
 							$msg[] = "<span style='$failure_style'>UPDATE TABLE failed: ". $query ."</span>";
 							continue;
 						}
 						
-						$msg[] = $db->getAffectedRows($result)." deprecated fields '".$old_type."' were converted."
+						$msg[] = $db->getAffectedRows($result)." deprecated fields '".$old_type."' were converted.";
 						
-						$query = 'SELECT * FROM '. ( FLEXI_J16GE ? '#__extensions' : '#__plugins' )
+						$query = 'SELECT *, extension_id AS id '
+							. ' FROM '.( FLEXI_J16GE ? '#__extensions' : '#__plugins' )
 							.' WHERE '. (FLEXI_J16GE ? 'type="plugin"' : '1')
 							.'  AND element='.$db->Quote( $old_type )
 							.'  AND folder='.$db->Quote( 'flexicontent_fields' );
 						$db->setQuery($query);
-						$ext = $db->loadObject();
+						$ext = $db->loadAssoc();
 						
 						if ($ext && $ext['id'] > 0) {
 							$installer = new JInstaller();
@@ -352,16 +353,10 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 					$tbls = array();
 					if ($files_tbl_exists)           $tbls[] = "#__flexicontent_files";
 					if ($fields_tbl_exists)          $tbls[] = "#__flexicontent_fields";
-					if ($advsearch_index_tbl_exists) $tbls[] = "#__flexicontent_advsearch_index";
 					if (count($tbls))  $tbl_fields = $db->getTableFields($tbls);
 					
 					$queries = array();
-					if ( $advsearch_index_tbl_exists && array_key_exists('extratable', $tbl_fields['#__flexicontent_advsearch_index'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_advsearch_index` DROP `extratable`";
-					}
-					if ( $advsearch_index_tbl_exists && !array_key_exists('value_id', $tbl_fields['#__flexicontent_advsearch_index'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_advsearch_index` ADD `value_id` TEXT NULL AFTER `search_index`";
-					}
+					
 					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__flexicontent_files'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL AFTER `altname`";
 					}
@@ -393,20 +388,39 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 				</tr>
 		
 		<?php
-		// Upgrade DB tables: ADD column indexes
-		// TODO: make this a POST installation task, as it can be heavy to the SQL server !!
-		// for table #__flexicontent_advsearch_index we avoid problem by truncating the table !!!
+		// Upgrade ADVANCED index DB table: ADD column and indexes
+		// Because Adding indexes can be heavy to the SQL server (if not done asychronously ??) we truncate table OR drop it and recreate it
 		?>
 				<tr class="row1">
-					<td class="key">Upgrading search index table (adding indexes): </td>
+					<td class="key">Upgrading Advanced Search Index Table (adding columns/indexes): </td>
+					<td>
 					<?php
 					
-					if ( $fields_tbl_exists )
+					if ( $advsearch_index_tbl_exists) {
+						$tbl_fields = $db->getTableFields(  array( "#__flexicontent_advsearch_index" ) );
+				    $queries = array();
+				    
 				    $db->setQuery("SHOW INDEX FROM #__flexicontent_advsearch_index");
 				    $_indexes = $db->loadObjectList();
 				    foreach ($_indexes as $tbl_index) $tbl_indexes['#__flexicontent_advsearch_index'][$tbl_index->Key_name] = true;
 				    
-				    $queries = array();
+						if (
+							 array_key_exists('extratable', $tbl_fields['#__flexicontent_advsearch_index']) ||
+							!array_key_exists('value_id', $tbl_fields['#__flexicontent_advsearch_index']) ||
+							
+							!array_key_exists('field_id', $tbl_indexes['#__flexicontent_advsearch_index']) ||
+							!array_key_exists('item_id', $tbl_indexes['#__flexicontent_advsearch_index']) ||
+							!array_key_exists('search_index', $tbl_indexes['#__flexicontent_advsearch_index']) ||
+							!array_key_exists('value_id', $tbl_indexes['#__flexicontent_advsearch_index'])
+						) {
+							$queries[] = "DROP TABLE `#__flexicontent_advsearch_index`";
+							$queries[] = "CREATE TABLE `#__flexicontent_advsearch_index` (
+								`field_id` int(11) NOT NULL, `item_id` int(11) NOT NULL, `extraid` int(11) NOT NULL, `search_index` longtext NOT NULL, `value_id` varchar(255) NULL,
+								PRIMARY KEY (`field_id`,`item_id`,`extraid`), KEY `field_id` (`field_id`), KEY `item_id` (`item_id`), FULLTEXT `search_index` (`search_index`), KEY `value_id` (`value_id`)
+								) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+						}
+						
+						/*
 						$_add_indexes = array();
 						if ( $advsearch_index_tbl_exists && !array_key_exists('field_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
 							$_add_indexes[] = " ADD KEY ( `field_id` ) ";
@@ -420,18 +434,19 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						if ( $advsearch_index_tbl_exists && !array_key_exists('value_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
 							$_add_indexes[] = " ADD KEY ( `value_id` ) ";
 						}
-							
-						if (count($_add_indexes)) { {
+						
+						if (count($_add_indexes)) {
 							$db->setQuery('TRUNCATE TABLE #__flexicontent_advsearch_index');
 							$db->query();   // Truncate table of search index to avoid long-delay on indexing
 							$queries[] = "ALTER TABLE `#__flexicontent_advsearch_index` ". implode(",", $_add_indexes);
 						}
+						*/
 						
 						foreach ($queries as $query) {
 							$db->setQuery($query);
-							if ( !($result = $db->query()) ) { $results = false; echo "<span style='$failure_style'>ALTER TABLE failed: ". $query ."</span>"; }
+							if ( !($result = $db->query()) ) { $results = false; echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>"; }
 						}
-						if ( @$results !== false ) echo "<span style='$success_style'>indexes added, table was truncated please re-index your content</span>";
+						if ( @$results !== false ) echo "<span style='$success_style'>columns/indexes added, table was truncated or recreated, please re-index your content</span>";
 					}
 					?>
 					</td>

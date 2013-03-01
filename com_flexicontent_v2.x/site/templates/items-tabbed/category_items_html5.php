@@ -83,7 +83,7 @@ $items = & $this->items;
 		<!-- BOF buttons -->
 		<?php
 		$pdfbutton = flexicontent_html::pdfbutton( $item, $this->params );
-		$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, null , $item->slug );
+		$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug );
 		$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 		$editbutton = flexicontent_html::editbutton( $item, $this->params );
 		if ($pdfbutton || $mailbutton || $printbutton || $editbutton) {

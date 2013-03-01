@@ -45,10 +45,10 @@ class plgFlexicontent_fieldsGroupmarker extends JPlugin
 			case 'tab_open':
 				$field->html .= "<div class='tabbertab' style='float:left;' id='grpmarker_tabset_".$tabSetCnt."_tab_".($tabCnt[$tabSetCnt]++)."'>\n";
 				$field->html .= " <h3>".JText::_( $cont_label )."</h3>\n";   // Current TAB LABEL
-				$field->html .= $cont_cssclass? " <div class='".$cont_cssclass."'></div>\n" : " <div style='border:0px!important; margin:0px!important; padding:0px!important;'></div>\n";
+				$field->html .= $cont_cssclass? " <div class='".$cont_cssclass."'>\n" : " <div style='border:0px!important; margin:0px!important; padding:0px!important;'>\n";
 				break;
 			case 'tab_close':
-				$field->html .= " </div>\n";      // Close content's container (used to apply a css class)
+				$field->html .= " </div>\n";      // Close Tab
 				break;
 			case 'tabset_end':
 				$field->html .= "</div>\n";       // Close Tabset

@@ -34,7 +34,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="catlimit" type="text" default="200" size="4" label="FLEXI_CAT_LIST_LIMIT" description="FLEXI_CAT_LIST_LIMIT_DESC" />
+			<field name="catlimit" type="text" default="200" size="4" label="FLEXI_DIRECTORY_CAT_LIST_LIMIT" description="FLEXI_DIRECTORY_CAT_LIST_LIMIT_DESC" />
 
 			<field name="" type="separator" default="FLEXI_VIEW_CATS_CONF" level="level1" menu="hide" />
 			<field name="cat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC">

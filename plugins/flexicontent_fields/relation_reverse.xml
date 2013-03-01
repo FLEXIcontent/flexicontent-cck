@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Relation - Reverse</name>
+	<author>ggppdk</author>
+	<creationDate>Aug 2011</creationDate>
+	<copyright>Copyright (C) 2011 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>ggppdk</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>FLEXI_FIELD_RELATION_REVERSE</description>
+	<files>
+		<filename plugin="relation_reverse">relation_reverse.php</filename>
+	</files>
+	
+		<params group="standard">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+		</params>
+		<params group="group-relation_reverse" addpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
+			<field name="reverse_field" type="fields" field_type="relation" label="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE" description="FLEXI_FIELD_CHOOSE_FIELD_TO_REVERSE_DESC" />
+			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_LIST_CREATION_ITEM_FORM" level="level1" menu="hide" />
+			
+			<field name="orderby_form" type="list" default="alpha" label="FLEXI_RIFLD_ITEM_ORDERING" description="FLEXI_RIFLD_ITEM_ORDERING_DESC">
+				<option value="">FLEXI_ORDER_DEFAUKT</option>
+				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+				<option value="order">FLEXI_ORDER_ORDERING</option>
+			</field>
+			<field name="relitem_html_form" type="textarea" cols="38" rows="5" default="__display_text__" label="FLEXI_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_RELATED_DISPLAY_TEXT_COMPOSITION" level="level2" menu="hide" />
+			<field name="displayway_form" type="list" default="1" label="FLEXI_RELATED_DISPLAY_TEXT" description="FLEXI_RELATED_DISPLAY_TEXT_DESC">
+				<option value="0">FLEXI_RELATED_DISPLAY_ID</option>
+				<option value="1">FLEXI_RELATED_DISPLAY_TITLE</option>
+			</field>
+			<field name="addlink_form" type="radio" default="1" label="FLEXI_ADD_ITEM_LINK" description="FLEXI_ADD_ITEM_LINK_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="addtooltip_form" type="radio" default="1" label="FLEXI_ADD_ITEM_TOOLTIP" description="FLEXI_ADD_ITEM_TOOLTIP_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
+			<field name="pretext_form" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext_form" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="separator" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_ITEM_FORM" description="FLEXI_VALUE_SEPARATOR_ITEM_FORM_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+			</field>
+			<field name="opentag_form" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag_form" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_LIST_CREATION_FRONTEND_VIEWS" level="level1" menu="hide" />
+			
+			<field name="orderby_frontend" type="list" default="alpha" label="FLEXI_RIFLD_FE_ITEM_ORDERING" description="FLEXI_RIFLD_FE_ITEM_ORDERING_DESC">
+				<option value="">FLEXI_ORDER_DEFAUKT</option>
+				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+				<option value="order">FLEXI_ORDER_ORDERING</option>
+			</field>
+			<field name="relitem_html" type="textarea" cols="38" rows="5" default="__display_text__" label="FLEXI_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_RELATED_DISPLAY_TEXT_COMPOSITION" level="level2" menu="hide" />
+			<field name="displayway" type="list" default="1" label="FLEXI_RELATED_DISPLAY_TEXT" description="FLEXI_RELATED_DISPLAY_TEXT_DESC">
+				<option value="0">FLEXI_RELATED_DISPLAY_ID</option>
+				<option value="1">FLEXI_RELATED_DISPLAY_TITLE</option>
+			</field>
+			<field name="addlink" type="radio" default="1" label="FLEXI_ADD_ITEM_LINK" description="FLEXI_ADD_ITEM_LINK_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="addtooltip" type="radio" default="1" label="FLEXI_ADD_ITEM_TOOLTIP" description="FLEXI_ADD_ITEM_TOOLTIP_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+			</field>
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			
+		</params>
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_relateditems_backlinks.ini</language>
+	</languages>
+</install>
