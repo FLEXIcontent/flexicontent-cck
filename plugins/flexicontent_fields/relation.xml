@@ -170,6 +170,6 @@
 			
 		</params>
 	<languages>
-		<language tag="en-GB">en-GB.plg_flexicontent_fields_relateditems.ini</language>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_relation.ini</language>
 	</languages>
 </install>

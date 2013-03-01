@@ -125,6 +125,6 @@
 			
 		</params>
 	<languages>
-		<language tag="en-GB">en-GB.plg_flexicontent_fields_relateditems_backlinks.ini</language>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_relation_reverse.ini</language>
 	</languages>
 </install>

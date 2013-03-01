@@ -201,7 +201,7 @@
 				<option value="2">FLEXI_RELATED_RELITEMS_FIELD</option>
 			</field>
 			<field name="excluded_tags" type="tags" default="" multiple="true" size="6" label="FLEXI_EXCLUDED_TAGS" description="FLEXI_EXCLUDED_TAGS_DESC" />
-			<field name="relitems_fields" type="fields" default="" multiple="true" size="3" field_type="relateditems" label="FLEXI_SELECT_RELITEMS_FIELD" description="FLEXI_SELECT_RELITEMS_FIELD_DESC" />
+			<field name="relitems_fields" type="fields" default="" multiple="true" size="3" field_type="relation" label="FLEXI_SELECT_RELITEMS_FIELD" description="FLEXI_SELECT_RELITEMS_FIELD_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_TAGS_SCOPE" level="level1" menu="hide" />
 			<field name="method_tags" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC">
