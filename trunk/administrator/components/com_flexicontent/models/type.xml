@@ -3,356 +3,362 @@
 	<name>Type Edit Form</name>
 	<params addpath="/administrator/components/com_flexicontent/elements">
 			
-			<param name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" />
-			<param name="" type="separator" default="FLEXI_TYPE_CONTENT_CONF" level="level2"  />		
-			<param name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
+			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" />
+			<field name="" type="separator" default="FLEXI_TYPE_CONTENT_CONF" level="level2"  />		
+			<field name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="show_intro" type="radio" default="" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT_DESC">
+			</field>
+			<field name="show_intro" type="radio" default="" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
-			</param>
-			<param name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
+			</field>
+			<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_JCOMMENTS</option>
 				<option value="2">FLEXI_JOMCOMMENTS</option>
-			</param>
-			<param name="automatic_pathways" type="radio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" >
+			</field>
+			<field name="automatic_pathways" type="radio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
+			</field>
 			
-			<param name="" type="separator" default="FLEXI_TYPE_ICONS_CONF" level="level2"  />
-			<param name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
+			<field name="" type="separator" default="FLEXI_TYPE_ICONS_CONF" level="level2"  />
+			<field name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
-			</param>
-			<param name="show_print_icon" type="radio" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
+			</field>
+			<field name="show_print_icon" type="radio" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
-			</param>
-			<param name="show_email_icon" type="radio" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
+			</field>
+			<field name="show_email_icon" type="radio" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
-			</param>
+			</field>
 			
-			<param name="" type="separator" default="FLEXI_PDF_VIEW_CONF" level="level2"  />
-			<param name="pdf_format_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_PDF_FORMAT_FIELDS" description="FLEXI_PDF_FORMAT_FIELDS_DESC"  />
+			<field name="" type="separator" default="FLEXI_PDF_VIEW_CONF" level="level2"  />
+			<field name="pdf_format_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_PDF_FORMAT_FIELDS" description="FLEXI_PDF_FORMAT_FIELDS_DESC"  />
+			
 		
-		<param name="" type="jparamstab" description="FLEXI_TYPE_DESC_CUSTOMIZE" />
+		<field name="" type="jparamstab" description="FLEXI_TYPE_DESC_CUSTOMIZE" />
 		
-			<param name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level2"  />
-			<param name="maintext_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level2"  />
+			<field name="maintext_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="maintext_label" type="text" default="" size="90" label="FLEXI_MAINTEXT_LABEL" description="FLEXI_MAINTEXT_LABEL_DESC" />
-			<param name="maintext_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="maintext_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="maintext_label" type="text" default="" size="90" label="FLEXI_MAINTEXT_LABEL" description="FLEXI_MAINTEXT_LABEL_DESC" />
+			<field name="maintext_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="maintext_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			<!-- TODO ADD/IMPLEMENT FOR other CORE Fields -->
-			<param name="hide_maintext" type="radio" default="" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC">
+			<field name="hide_maintext" type="radio" default="" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2"  />
-			<param name="hide_html" type="radio" default="" label="FLEXI_HIDE_HTML" description="FLEXI_HIDE_HTML_DESC">
+			</field>
+			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2"  />
+			<field name="hide_html" type="radio" default="" label="FLEXI_HIDE_HTML" description="FLEXI_HIDE_HTML_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="maintext_height" type="text" default="400" size="2" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
+			</field>
+			<field name="maintext_height" type="text" default="400" size="2" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
 			
-		<param name="" type="jparamstab" description="FLEXI_TYPE_FIELDS1_CUSTOMIZE" />
 		
-			<param name="" type="separator" default="FLEXI_FIELD_TITLE" level="level2"  />
-			<param name="title_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+		<field name="" type="jparamstab" description="FLEXI_TYPE_FIELDS1_CUSTOMIZE" />
+		
+			<field name="" type="separator" default="FLEXI_FIELD_TITLE" level="level2"  />
+			<field name="title_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="title_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="title_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="title_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="title_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="title_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="title_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 					
-			<param name="" type="separator" default="FLEXI_FIELD_CREATED" level="level2"  />
-			<param name="created_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="" type="separator" default="FLEXI_FIELD_CREATED" level="level2"  />
+			<field name="created_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="created_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="created_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="created_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="created_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="created_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="created_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
-			<param name="" type="separator" default="FLEXI_FIELD_CREATED_BY" level="level2"  />
-			<param name="created_by_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="" type="separator" default="FLEXI_FIELD_CREATED_BY" level="level2"  />
+			<field name="created_by_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="created_by_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="created_by_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="created_by_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="created_by_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="created_by_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="created_by_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
-			<param name="" type="separator" default="FLEXI_FIELD_MODIFIED" level="level2"  />
-			<param name="modified_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="" type="separator" default="FLEXI_FIELD_MODIFIED" level="level2"  />
+			<field name="modified_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="modified_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="modified_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="modified_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="modified_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="modified_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="modified_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
-			<param name="" type="separator" default="FLEXI_FIELD_MODIFIED_BY" level="level2"  />
-			<param name="modified_by_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="" type="separator" default="FLEXI_FIELD_MODIFIED_BY" level="level2"  />
+			<field name="modified_by_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="modified_by_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="modified_by_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="modified_by_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="modified_by_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="modified_by_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="modified_by_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
-			<param name="" type="separator" default="FLEXI_FIELD_DOCUMENT_TYPE" level="level2"  />
-			<param name="document_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="" type="separator" default="FLEXI_FIELD_DOCUMENT_TYPE" level="level2"  />
+			<field name="document_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="document_type_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="document_type_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="document_type_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="document_type_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="document_type_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="document_type_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 				
-		<param name="" type="jparamstab" description="FLEXI_TYPE_FIELDS2_CUSTOMIZE" />
 		
-			<param name="" type="separator" default="FLEXI_FIELD_HITS" level="level2"  />
-			<param name="hits_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+		<field name="" type="jparamstab" description="FLEXI_TYPE_FIELDS2_CUSTOMIZE" />
+		
+			<field name="" type="separator" default="FLEXI_FIELD_HITS" level="level2"  />
+			<field name="hits_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="hits_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="hits_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="hits_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="hits_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="hits_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="hits_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
-			<param name="" type="separator" default="FLEXI_FIELD_VERSION" level="level2"  />
-			<param name="version_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="" type="separator" default="FLEXI_FIELD_VERSION" level="level2"  />
+			<field name="version_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="version_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="version_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="version_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="version_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="version_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="version_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
-			<param name="" type="separator" default="FLEXI_FIELD_STATE" level="level2"  />
-			<param name="state_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="" type="separator" default="FLEXI_FIELD_STATE" level="level2"  />
+			<field name="state_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="state_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="state_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="state_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="state_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="state_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="state_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
-			<param name="" type="separator" default="FLEXI_FIELD_VOTING" level="level2"  />
-			<param name="voting_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="" type="separator" default="FLEXI_FIELD_VOTING" level="level2"  />
+			<field name="voting_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="voting_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="voting_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="voting_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
-			<param name="voting_counter" type="list" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" >
+			</field>
+			<field name="voting_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="voting_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="voting_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="voting_counter" type="list" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" >
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
 				<option value="2">FLEXI_FIELD_VOTE_DISABLE_IN_EXTRA_VOTES</option>
 				<option value="3">FLEXI_FIELD_VOTE_DISABLE_IN_MAIN_VOTE</option>
-			</param>
+			</field>
 			
-			<param name="" type="separator" default="FLEXI_EXTRA_VOTES" level="level3"  />
-			<param name="voting_override_extra_votes" type="radio" default="0" label="FLEXI_OVERRIDE_VOTE_EXTRA" description="FLEXI_OVERRIDE_VOTE_EXTRA_DESC">
+			<field name="" type="separator" default="FLEXI_EXTRA_VOTES" level="level3"  />
+			<field name="voting_override_extra_votes" type="radio" default="0" label="FLEXI_OVERRIDE_VOTE_EXTRA" description="FLEXI_OVERRIDE_VOTE_EXTRA_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="voting_extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_EXTRA" description="FLEXI_FIELD_VOTE_EXTRA_DESC" />
-			<param name="voting_main_label" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
+			</field>
+			<field name="voting_extra_votes" type="textarea" default="" rows="4" cols="30" label="FLEXI_FIELD_VOTE_EXTRA" description="FLEXI_FIELD_VOTE_EXTRA_DESC" />
+			<field name="voting_main_label" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_MAIN_LABEL" description="FLEXI_FIELD_VOTE_MAIN_LABEL_DESC" />		
 			
-			<param name="" type="separator" default="FLEXI_FIELD_FAVOURITES" level="level2"  />
-			<param name="favourites_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="" type="separator" default="FLEXI_FIELD_FAVOURITES" level="level2"  />
+			<field name="favourites_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="favourites_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="favourites_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="favourites_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="favourites_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="favourites_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="favourites_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
-			<param name="" type="separator" default="FLEXI_FIELD_TAGS" level="level2"  />
-			<param name="tags_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+			<field name="" type="separator" default="FLEXI_FIELD_TAGS" level="level2"  />
+			<field name="tags_display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="tags_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<param name="tags_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<param name="tags_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			</field>
+			<field name="tags_label" type="text" default="" size="90" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
+			<field name="tags_desc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="tags_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 	
-		<param name="" type="jparamstab" description="FLEXI_SEO_CONF" />
+		
+		<field name="" type="jparamstab" description="FLEXI_SEO_CONF" />
 			
-			<param name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level2"  />
-			<param name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC">
+			<field name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level2"  />
+			<field name="override_title" type="radio" default="0" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="addcat_title" type="radio" default="1" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC">
+			</field>
+			<field name="addcat_title" type="radio" default="1" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
+			</field>
 			
-			<param name="" type="separator" default="FLEXI_TYPE_SEO_OTHER" level="level2"  />
-			<param name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
+			<field name="" type="separator" default="FLEXI_TYPE_SEO_OTHER" level="level2"  />
+			<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
+			</field>
 	
-			<!--param name="show_item_navigation" type="radio" default="1" label="Show Navigation" description="PARAMNAVIGATIONARTICLE">
+			<!--field name="show_item_navigation" type="radio" default="1" label="Show Navigation" description="PARAMNAVIGATIONARTICLE">
 				<option value="0">Hide</option>
 				<option value="1">Show</option>
-			</param-->
+			</field-->
 			
-		<param name="" type="jparamstab" description="FLEXI_FRONTEND_ITEM_FORM" />
+		
+		<field name="" type="jparamstab" description="FLEXI_FRONTEND_ITEM_FORM" />
 			
-			<param name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
+			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,save_preview,preview_latest" defaultvals=""
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" />
-			<param name="usealias_fe" type="radio" default="" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
+			<field name="usealias_fe" type="radio" default="" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="allowlangmods_fe" type="fccheckbox" default="" display_useglobal="1"
+			</field>
+			<field name="allowlangmods_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_MODIFY_ITEMLANG,FLEXI_MODIFY_ORIGINAL_CONTENT_ASSOC"
 				checkvals="mod_item_lang,mod_original_content_assoc" defaultvals=""
 				label="FLEXI_MENU_ALLOW_LANG_MODS" description="FLEXI_MENU_ALLOW_LANG_MODS_DESC" />
-			<param name="allow_subscribers_notify_fe" type="radio" default="0" label="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY" description="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY_DESC" menu="hide">
+			<field name="allow_subscribers_notify_fe" type="radio" default="0" label="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY" description="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="usetags_fe" type="radio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC">
+			</field>
+			<field name="usetags_fe" type="radio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
-			</param>
-			<param name="allowdisablingcomments_fe" type="radio" default="" label="FLEXI_ALLOW_DISABLING_COMMENTS" description="FLEXI_ALLOW_DISABLING_COMMENTS_DESC" menu="hide">
+			</field>
+			<field name="allowdisablingcomments_fe" type="radio" default="" label="FLEXI_ALLOW_DISABLING_COMMENTS" description="FLEXI_ALLOW_DISABLING_COMMENTS_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="usemetadata_fe" type="radio" default="" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC">
+			</field>
+			<field name="usemetadata_fe" type="radio" default="" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
 				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
-			</param>
-			<param name="usepublicationdetails_fe" type="radio" default="" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC">
+			</field>
+			<field name="usepublicationdetails_fe" type="radio" default="" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
 				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
-			</param>
-			<param name="useitemparams_fe" type="fccheckbox" default="" display_useglobal="1"
+			</field>
+			<field name="useitemparams_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_PARAMETERS_ITEM_BASIC,FLEXI_PARAMETERS_ITEM_ADVANCED,FLEXI_PARAMETERS_ITEM_SEOCONF" checkvals="basic,advanced,seoconf" defaultvals=""
 				label="FLEXI_MENU_USE_ITEM_PARAMETERS" description="FLEXI_MENU_USE_ITEM_PARAMETERS_DESC" />
-			<param name="selecttheme_fe" type="radio" default="" label="FLEXI_MENU_SELECT_THEME" description="FLEXI_MENU_SELECT_THEME_DESC">
+			<field name="selecttheme_fe" type="radio" default="" label="FLEXI_MENU_SELECT_THEME" description="FLEXI_MENU_SELECT_THEME_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_SELECT_THEME</option>
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_THEME</option>
-			</param>
-			<param name="submit_redirect_url_fe" type="text" default="" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" />
-			<param name="form_container_css_fe" type="text" default="max-width:800px;" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC"  />
-			<param name="form_extra_css" type="textarea" default="" rows="5" cols="52" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
+			</field>
+			<field name="submit_redirect_url_fe" type="text" default="" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" />
+			<field name="form_container_css_fe" type="text" default="max-width:800px;" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC"  />
+			<field name="form_extra_css" type="textarea" default="" rows="5" cols="52" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
 			
 		
-		<param name="" type="jparamstab" description="FLEXI_EMAIL_NOTIFICATIONS_CONF" />
+		<field name="" type="jparamstab" description="FLEXI_EMAIL_NOTIFICATIONS_CONF" />
 			
-			<param name="" type="separator" default="FLEXI_CONTENT_NOTIFICATIONS_CONF" label="" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_CONTENT_NOTIFICATIONS_CONF" label="" level="level1" menu="hide" />
 			
-			<param name="enable_notifications" type="list" default="" label="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS" description="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS_DESC" menu="hide">
+			<field name="enable_notifications" type="list" default="" label="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS" description="FLEXI_ENABLE_SUBMIT_UPDATE_NOTIFICATIONS_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="nf_send_as_bcc" type="list" default="" label="FLEXI_NF_SEND_AS_BCC" description="FLEXI_NF_SEND_AS_BCC_DESC" menu="hide">
+			</field>
+			<field name="nf_send_as_bcc" type="list" default="" label="FLEXI_NF_SEND_AS_BCC" description="FLEXI_NF_SEND_AS_BCC_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="nf_extra_properties" type="fccheckbox" default="" display_useglobal="1"
+			</field>
+			<field name="nf_extra_properties" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_NF_CREATOR,FLEXI_NF_MODIFIER,FLEXI_NF_CREATION_TIME,FLEXI_NF_MODIFICATION_TIME,FLEXI_NF_VIEW_LINK,FLEXI_NF_EDIT_LINK_FE,FLEXI_NF_EDIT_LINK_BE"
 				checkvals="creator,modifier,created,modified,viewlink,editlinkfe,editlinkbe"
 				defaultvals=""
 				label="FLEXI_NF_EXTRA_PROPERTIES" description="FLEXI_NF_EXTRA_PROPERTIES_DESC" menu="hide"/>
-			<param name="nf_add_introtext" type="list" default="" label="FLEXI_NF_ADD_INTROTEXT" description="FLEXI_NF_ADD_INTROTEXT_DESC" menu="hide">
+			<field name="nf_add_introtext" type="list" default="" label="FLEXI_NF_ADD_INTROTEXT" description="FLEXI_NF_ADD_INTROTEXT_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="nf_add_fulltext" type="list" default="" label="FLEXI_NF_ADD_FULLTEXT" description="FLEXI_NF_ADD_FULLTEXT_DESC" menu="hide">
+			</field>
+			<field name="nf_add_fulltext" type="list" default="" label="FLEXI_NF_ADD_FULLTEXT" description="FLEXI_NF_ADD_FULLTEXT_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="nf_enable_debug" type="list" default="" label="FLEXI_NF_ENABLE_DEBUG" description="FLEXI_NF_ENABLE_DEBUG_DESC" menu="hide">
+			</field>
+			<field name="nf_enable_debug" type="list" default="" label="FLEXI_NF_ENABLE_DEBUG" description="FLEXI_NF_ENABLE_DEBUG_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
+			</field>
 			
-			<param name="" type="separator" default="FLEXI_NOTIFY_UGRP_NEW_CONTENT_SUBMITTED" description="FLEXI_NOTIFY_UGRP_NEW_CONTENT_SUBMITTED_desc" label="" level="level2" menu="hide" />
-			<param name="usergrps_notify_new_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
-			<fiparameld name="states_notify_new" type="fccheckbox" default="" display_useglobal="1"
+			<field name="" type="separator" default="FLEXI_NOTIFY_UGRP_NEW_CONTENT_SUBMITTED" description="FLEXI_NOTIFY_UGRP_NEW_CONTENT_SUBMITTED_desc" label="" level="level2" menu="hide" />
+			<field name="usergrps_notify_new_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
+			<field name="states_notify_new" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_PENDING,FLEXI_TO_WRITE,FLEXI_IN_PROGRESS"
 				checkvals="1,0,-1,-3,-4,-5"
 				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" menu="hide"/>
-			<param name="usergrps_notify_new" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
-			<param name="userlist_notify_new" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
-			<param name="text_notify_new" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
+			<field name="usergrps_notify_new" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
+			<field name="userlist_notify_new" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
+			<field name="text_notify_new" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
 			
-			<param name="" type="separator" default="FLEXI_NOTIFY_UGRP_NEW_CONTENT_PENDING" description="FLEXI_NOTIFY_UGRP_NEW_CONTENT_PENDING_DESC" label="" level="level2" menu="hide" />
-			<param name="usergrps_notify_new_pending_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
-			<param name="usergrps_notify_new_pending" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
-			<param name="userlist_notify_new_pending" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
-			<param name="text_notify_new_pending" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
+			<field name="" type="separator" default="FLEXI_NOTIFY_UGRP_NEW_CONTENT_PENDING" description="FLEXI_NOTIFY_UGRP_NEW_CONTENT_PENDING_DESC" label="" level="level2" menu="hide" />
+			<field name="usergrps_notify_new_pending_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
+			<field name="usergrps_notify_new_pending" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
+			<field name="userlist_notify_new_pending" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
+			<field name="text_notify_new_pending" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
 			
-			<param name="" type="separator" default="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED" description="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED_DESC" label="" level="level2" menu="hide" />
-			<param name="states_notify_existing" type="fccheckbox" default="" display_useglobal="1"
+			<field name="" type="separator" default="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED" description="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_UPDATED_DESC" label="" level="level2" menu="hide" />
+			<field name="states_notify_existing" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_PUBLISHED,FLEXI_UNPUBLISHED,FLEXI_ARCHIVED,FLEXI_PENDING,FLEXI_TO_WRITE,FLEXI_IN_PROGRESS"
 				checkvals="1,0,-1,-3,-4,-5"
 				label="FLEXI_NF_ITEM_IN_STATES" description="FLEXI_NF_ITEM_IN_STATES_DESC" menu="hide"/>
-			<param name="usergrps_notify_existing_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
-			<param name="usergrps_notify_existing" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
-			<param name="userlist_notify_existing" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
-			<param name="text_notify_existing" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
+			<field name="usergrps_notify_existing_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
+			<field name="usergrps_notify_existing" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
+			<field name="userlist_notify_existing" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
+			<field name="text_notify_existing" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
 			
-			<param name="" type="separator" default="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_TOREVIEW" description="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_TOREVIEW_DESC" label="" level="level2" menu="hide" />
-			<param name="usergrps_notify_existing_reviewal_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
-			<param name="usergrps_notify_existing_reviewal" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
-			<param name="userlist_notify_existing_reviewal" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
-			<param name="text_notify_existing_reviewal" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
+			<field name="" type="separator" default="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_TOREVIEW" description="FLEXI_NOTIFY_UGRP_EXISTING_CONTENT_TOREVIEW_DESC" label="" level="level2" menu="hide" />
+			<field name="usergrps_notify_existing_reviewal_fa" type="flexiusergroup" fagrps="1" multiple="true" default="" label="FLEXI_USERGROUPS_FA" description="FLEXI_USERGROUPS_DESC" menu="hide" />
+			<field name="usergrps_notify_existing_reviewal" type="flexiusergroup" multiple="true" default="" label="FLEXI_USERGROUPS" description="FLEXI_USERGROUPS_DESC" menu="hide" />
+			<field name="userlist_notify_existing_reviewal" type="text" default="" label="FLEXI_USERLIST" description="FLEXI_USERLIST_DESC" menu="hide" />
+			<field name="text_notify_existing_reviewal" type="textarea" rows="2" cols="40" default="" label="FLEXI_CUSTOM_NOTIFY_TEXT" description="FLEXI_CUSTOM_NOTIFY_TEXT_DESC" menu="hide" />
 			
-		<param name="" type="jparamstab" description="FLEXI_ITEMS_MANAGER_CONF" />
 		
-			<param name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC"  />
+		<field name="" type="jparamstab" description="FLEXI_ITEMS_MANAGER_CONF" />
+			
+			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC"  />
 			
 		</params>
 		
 		<params group="themes" label="FLEXI_PARAMETERS_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<param name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
-			<param name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" />
+			<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
+			<field name="ilayout" type="itemlayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_TYPEITEMS_LAYOUT_DESC" />
 		</params>
 		
 </form>
