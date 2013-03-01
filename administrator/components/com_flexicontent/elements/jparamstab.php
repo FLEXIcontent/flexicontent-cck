@@ -47,7 +47,7 @@ class JElementJParamsTab extends JElement {
     if (!$title) $title = $description;
     
     $inline_style = 'font-size: 11px; color:gray; background-color: lightyellow; border: 1px solid lightgray; width: auto; padding: 4px 2%; margin: 1px 8px;';
-    $new_group .= JPaneSliders::startPanel( ''.JText::_($title) );
+    $new_group .= JPaneSliders::startPanel( ''.JText::_($title) , '' );
     $new_group .= '<table width="100%" class="paramlist admintable" cellspacing="1">';
     $new_group .= '<tr><td class="paramlist_description" colspan="2"><div style="'.$inline_style.'">' . JText::_($description) . '</div></td>';
     $new_group .= '<td class="paramlist_value">';

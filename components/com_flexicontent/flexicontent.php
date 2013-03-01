@@ -33,6 +33,7 @@ $fc_run_times['content_plg'] = 0; $fc_run_times['filter_creation'] = 0; $fc_run_
 $fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
 
 global $fc_jprof;
+jimport( 'joomla.error.profiler' );
 $fc_jprof = new JProfiler();
 $fc_jprof->mark('START: FLEXIcontent component');
 

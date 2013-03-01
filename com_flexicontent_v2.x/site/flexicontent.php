@@ -27,22 +27,26 @@ if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
 global $is_fc_component;
 $is_fc_component = 1;
 
-// Logging Info variables
-global $fc_run_times;
-$fc_run_times['content_plg'] = 0; $fc_run_times['filter_creation'] = 0; $fc_run_times['field_value_retrieval'] = 0;
-$fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
+// Get component parameters and add tooltips css and js code
+$cparams =& JComponentHelper::getParams('com_flexicontent');
+if ($cparams->get('add_tooltips', 1)) JHTML::_('behavior.tooltip');
 
-global $fc_jprof;
-$fc_jprof = new JProfiler();
-$fc_jprof->mark('START: FLEXIcontent component');
+if ( $cparams->get('print_logging_info') ) {
+	// Logging Info variables
+	global $fc_run_times;
+	$fc_run_times['content_plg'] = 0; $fc_run_times['filter_creation'] = 0; $fc_run_times['field_value_retrieval'] = 0;
+	$fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
+
+	global $fc_jprof;
+	jimport( 'joomla.error.profiler' );
+	$fc_jprof = new JProfiler();
+	$fc_jprof->mark('START: FLEXIcontent component');
+}
 
 // load english language file for 'com_flexicontent' component then override with current language file
 JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
 JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
-// Get component parameters and add tooltips css and js code
-$cparams =& JComponentHelper::getParams('com_flexicontent');
-if ($cparams->get('add_tooltips', 1)) JHTML::_('behavior.tooltip');
 
 //include constants file
 require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');

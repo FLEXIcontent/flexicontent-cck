@@ -58,7 +58,11 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
+			<!--field name="" type="separator" default="FLEXI_PDF_VIEW_CONF" level="level2"  />
+			<field name="pdf_format_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_PDF_FORMAT_FIELDS" description="FLEXI_PDF_FORMAT_FIELDS_DESC"  /-->
+			
 		</fieldset>
+		
 		<fieldset name="type_desc_customize" label="FLEXI_TYPE_DESC_CUSTOMIZE">
 		
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level2"  />
@@ -84,6 +88,7 @@
 			<field name="maintext_height" type="text" default="400" size="2" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
 			
 		</fieldset>
+		
 		<fieldset name="type_fields1_customize" label="FLEXI_TYPE_FIELDS1_CUSTOMIZE">
 		
 			<field name="" type="separator" default="FLEXI_FIELD_TITLE" level="level2"  />
@@ -141,6 +146,7 @@
 			<field name="document_type_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 				
 		</fieldset>
+		
 		<fieldset name="type_fields2_customize" label="FLEXI_TYPE_FIELDS2_CUSTOMIZE">
 		
 			<field name="" type="separator" default="FLEXI_FIELD_HITS" level="level2"  />
@@ -212,6 +218,7 @@
 			<field name="tags_viewdesc" type="textarea" default="" rows="2" cols="54" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 	
 		</fieldset>
+		
 		<fieldset name="seo_conf" label="FLEXI_SEO_CONF">
 			
 			<field name="" type="separator" default="FLEXI_TYPE_SEO_HTML_TITLE" level="level2"  />
@@ -237,6 +244,7 @@
 			</field-->
 			
 		</fieldset>
+		
 		<fieldset name="frontend_item_form" label="FLEXI_FRONTEND_ITEM_FORM">
 			
 			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
@@ -360,6 +368,7 @@
 		</fieldset>		
 		
 		<fieldset name="items_manager" label="FLEXI_ITEMS_MANAGER_CONF">
+			
 			<field name="items_manager_extra_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS" description="FLEXI_ITEMS_MANAGER_EXTRA_FIELDS_DESC"  />
 			
 		</fieldset>
