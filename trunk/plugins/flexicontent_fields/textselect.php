@@ -106,7 +106,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if ( !in_array($filter->field_type, static::$field_types) ) return;
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		plgFlexicontent_fieldsTextselect::onDisplayFilter($filter, $value, $formName);
 	}
@@ -116,7 +116,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		// execute the code only if the field type match the plugin type
-		if ( !in_array($filter->field_type, static::$field_types) ) return;
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		// Prepare field as IF it is a select field
 		plgFlexicontent_fieldsTextselect::_prepareField_as_SelectField($filter);
@@ -132,7 +132,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 	function getFiltered(&$filter, $value)
 	{
 		// execute the code only if the field type match the plugin type
-		if ($field_type != static::$field_type) return;
+		if ($field_type != self::$field_type) return;
 		
 		return plgFlexicontent_fieldsText::getFiltered($filter, $value, $return_sql=true);
 	}

@@ -469,7 +469,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if ( !in_array($filter->field_type, static::$field_types) ) return;
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		FlexicontentFields::createFilter($filter, $value, $formName);

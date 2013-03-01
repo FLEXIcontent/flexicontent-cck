@@ -100,7 +100,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 		
 		// Get indexed element values
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props);
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
 		if ( !$elements ) {
 			if ($sql_mode)
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
@@ -155,7 +155,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		
 		
 		// Get indexed element values
-		$elements = FlexicontentFields::indexedField_getElements($field, $item, static::$extra_props);
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
 		if ( !$elements ) {
 			if ($sql_mode)
 				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
@@ -244,7 +244,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 
 		
 		// Get indexed element values
-		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, static::$extra_props, $item_pros=false, $create_filter=true);
+		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, self::$extra_props, $item_pros=false, $create_filter=true);
 		
 		// Check for error during getting indexed field elements
 		if ( !$elements ) {
@@ -295,7 +295,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
 		$field->isindexed = true;
-		$field->extra_props = static::$extra_props;
+		$field->extra_props = self::$extra_props;
 		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
@@ -308,7 +308,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		if ( !$field->issearch ) return;
 		
 		$field->isindexed = true;
-		$field->extra_props = static::$extra_props;
+		$field->extra_props = self::$extra_props;
 		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array(), $search_properties=array('text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
