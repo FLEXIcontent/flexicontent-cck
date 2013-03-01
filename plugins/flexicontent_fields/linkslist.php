@@ -217,7 +217,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	// Method to display a search filter for the advanced search view
 	/*function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		if ( !in_array($filter->field_type, static::$field_types) ) return;
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		$size = (int)$filter->parameters->get( 'size', 30 );
 		$filter->html	='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="'.$size.'" value="'.$value.'" />';
@@ -228,7 +228,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
 		// execute the code only if the field type match the plugin type
-		if ( !in_array($filter->field_type, static::$field_types) ) return;
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 
 		// some parameter shortcuts
 		$field_elements		= $filter->parameters->get( 'field_elements' ) ;
