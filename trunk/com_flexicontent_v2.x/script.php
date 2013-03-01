@@ -165,6 +165,7 @@ class com_flexicontentInstallerScript
 		$cache->clean( 'com_flexicontent_tmpl' );
 		$cache->clean( 'com_flexicontent_cats' );
 		$cache->clean( 'com_flexicontent_items' );
+		$cache->clean( 'com_flexicontent_filters' );
 		
 		// reseting post installation session variables
 		$session  = JFactory::getSession();

@@ -397,14 +397,14 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				$cid    = JRequest::getInt('cid', '');
 				if ($option=='com_flexicontent' && $view=='category' && $cid) {   // Current view is category view limit to descendants
 					$options[] = JHTML::_('select.option', $globalcats[$cid]->id, $globalcats[$cid]->treename);
-					$cats = & $globalcats[$cid]->childrenarray;
+					$cats = $globalcats[$cid]->childrenarray;
 				} else if ( $rootcatid ) {     // If configured ... limit to subcategory tree of a specified category
 					$options[] = JHTML::_('select.option', $globalcats[$rootcatid]->id, $globalcats[$rootcatid]->treename);
-					$cats = & $globalcats[$rootcatid]->childrenarray;
+					$cats = $globalcats[$rootcatid]->childrenarray;
 				} else {
-					$cats = & $globalcats;  // All categories by default
+					$cats = $globalcats;  // All categories by default
 				}
-				foreach ($cats as $k => $list) $options[] = JHTML::_('select.option', $list->id, $list->treename);
+				if (!empty($cats) ) foreach ($cats as $k => $list) $options[] = JHTML::_('select.option', $list->id, $list->treename);
 			break;
 			
 			case 'tags':
