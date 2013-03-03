@@ -42,6 +42,7 @@ if ($params->get('combine_show_rules', 'AND')=='AND') {
 if ( $show_mod )
 {
 	global $modfc_jprof;
+	jimport( 'joomla.error.profiler' );
 	$modfc_jprof = new JProfiler();
 	$modfc_jprof->mark('START: FLEXIcontent Filter-Search Module');
 	
@@ -96,23 +97,23 @@ if ( $show_mod )
 	
 	if ($display_cat_list)
 	{
-		$class = ' class="inputbox fc_field_filter" ';
-		$size = " size='$catlistsize' ";
+		$_fld_class = ' class="inputbox fc_field_filter" ';
+		$_fld_size = " size='$catlistsize' ";
 		
 		$loader_html = '\'<p class=\\\'qf_centerimg=\\\'><img src=\\\''.JURI::base().'components/com_flexicontent/assets/images/ajax-loader.gif\\\' align=\\\'center\\\'></p>\'';
 		$url_to_load = JURI::root().'index.php?option=com_flexicontent&amp;task=getsefurl&amp;view=category&amp;tmpl=component&amp;cid=';
 		$autosubmit_msg = JText::_('FLEXI_RELOADING_PLEASE_WAIT');
 		
-		$onchange = ' onchange="'
+		$_fld_onchange = ' onchange="'
 			.' form=document.getElementById(\''.$form_name.'\'); '
 			.' cid_val=form.'.$catid_fieldname.'.value; '
 			.' getSEFurl(\'cid_loading_'.$module->id.'\',	'.$loader_html.', form,\''.$url_to_load.'\'+cid_val, \''.$autosubmit_msg.'\', '.$autosubmit.'); '
 			.' $(\'fc_filter_mod_elements_'.$module->id.'\').style.display=\'block\'; " '
 			;
-		$attribs = $class.$size.$onchange;
+		$_fld_attributes = $_fld_class.$_fld_size.$_fld_onchange;
 		
 		$allowedtree = modFlexifilterHelper::decideCats($params);
-		$cats_select_field = flexicontent_cats::buildcatselect($allowedtree, $catid_fieldname, array($catid), 3, $attribs, $check_published = true, $check_perms = false, array(), $require_all=false);
+		$cats_select_field = flexicontent_cats::buildcatselect($allowedtree, $catid_fieldname, array($catid), 3, $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false);
 	} else if ($catid) {
 		$cat_hidden_field = '<input type="hidden" name="cid" value="'.$catid.'"/>';
 	}
@@ -208,10 +209,10 @@ if ( $show_mod )
 		require(JModuleHelper::getLayoutPath('mod_flexifilter', $layout));
 	}
 	
-	$flexiparams =& JComponentHelper::getParams('com_flexicontent');
+	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
-		$app = & JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$modfc_jprof->mark('END: FLEXIcontent Filter-Search Module');
 		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
 		$app->enqueueMessage( $msg, 'notice' );

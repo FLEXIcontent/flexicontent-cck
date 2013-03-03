@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1544 2012-11-12 02:50:17Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1640 2013-02-28 14:45:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -19,9 +19,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport( 'joomla.html.parameter' );
 
-$params = & $this->params;
-$db     =& JFactory::getDBO();
-$flexiparams =& JComponentHelper::getParams('com_flexicontent');
+$params =  $this->params;
+$db     =  JFactory::getDBO();
+$flexiparams =  JComponentHelper::getParams('com_flexicontent');
 
 // Date configuration
 $use_date   = $params->get( 'show_modify_date', 1 ) ;

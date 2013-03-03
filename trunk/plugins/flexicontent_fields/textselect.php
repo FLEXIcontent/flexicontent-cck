@@ -121,9 +121,13 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		// Prepare field as IF it is a select field
 		plgFlexicontent_fieldsTextselect::_prepareField_as_SelectField($filter);
 		
+		// Create a select field object
+		$dispatcher = JDispatcher::getInstance();
+		$sel_fld_obj = new plgFlexicontent_fieldsSelect($dispatcher, array());
+		
 		// Get the FILTER's display ... by changing field type to 'select'
 		$filter->field_type = 'select';
-		plgFlexicontent_fieldsSelect::onDisplayFilter($filter, $value, $formName);
+		$sel_fld_obj->onDisplayFilter($filter, $value, $formName);
 		$filter->field_type = 'textselect';
 	}	
 	
@@ -132,9 +136,9 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 	function getFiltered(&$filter, $value)
 	{
 		// execute the code only if the field type match the plugin type
-		if ($field_type != self::$field_type) return;
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		return plgFlexicontent_fieldsText::getFiltered($filter, $value, $return_sql=true);
+		return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
 	}
 	
 		
@@ -144,12 +148,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
-		// Prepare field as IF it is a select field
-		plgFlexicontent_fieldsTextselect::_prepareField_as_SelectField($field);
-		
-		$field->field_type = 'select';
-		plgFlexicontent_fieldsText::getFilteredSearch($field);
-		$field->field_type = 'textselect';
+		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
 	}
 	
 	

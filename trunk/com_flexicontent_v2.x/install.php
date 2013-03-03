@@ -84,6 +84,7 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 		
 		// clear a cache
 		$cache = JFactory::getCache();
+		$cache->clean( '_system' );  // This might be necessary as installing-uninstalling in same session may result in wrong extension ids, etc
 		$cache->clean( 'com_flexicontent' );
 		$cache->clean( 'com_flexicontent_tmpl' );
 		$cache->clean( 'com_flexicontent_cats' );

@@ -34,7 +34,7 @@ class FlexicontentFields
 	 * @return 	string  : the HTML of the item view, also the CSS / JS file would have been loaded
 	 * @since 1.5
 	 */
-	function renderFields( $item_per_field=true, $item_ids=array(), $field_names=array(), $view=FLEXI_ITEMVIEW, $methods=array(), $cfparams=array() )
+	static function renderFields( $item_per_field=true, $item_ids=array(), $field_names=array(), $view=FLEXI_ITEMVIEW, $methods=array(), $cfparams=array() )
 	{
 		require_once (JPATH_ADMINISTRATOR.DS.'components/com_flexicontent/defineconstants.php');
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
@@ -142,7 +142,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function &getFields(&$_items, $view = FLEXI_ITEMVIEW, $params = null, $aid = 0, $use_tmpl = true)
+	static function &getFields(&$_items, $view = FLEXI_ITEMVIEW, $params = null, $aid = 0, $use_tmpl = true)
 	{
 		static $apply_cache = null;
 		static $expired_cleaned = false;
@@ -220,9 +220,7 @@ class FlexicontentFields
 				$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view, $aid);
 			//}
 		}
-		if ( $print_logging_info ) {
-			@$fc_run_times['field_value_retrieval'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		}
+		if ( $print_logging_info )  @$fc_run_times['field_value_retrieval'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		if ($params)  // NULL/empty parameters mean only retrieve field values
 		{
@@ -258,7 +256,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function getItemFields($item, $var, $view=FLEXI_ITEMVIEW, $aid=0)
+	static function getItemFields($item, $var, $view=FLEXI_ITEMVIEW, $aid=0)
 	{
 		if (!$item) return;
 		if (!FLEXI_J16GE && $item->sectionid != FLEXI_SECTION) return;
@@ -360,7 +358,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5.5
 	 */
-	function &getFieldDisplay(&$item_data, $fieldname, $values=null, $method='display', $view = FLEXI_ITEMVIEW)
+	static function &getFieldDisplay(&$item_data, $fieldname, $values=null, $method='display', $view = FLEXI_ITEMVIEW)
 	{
 		// 1. Convert to array of items if not an array already
 		if ( !is_array($item_data)  ) 
@@ -426,7 +424,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function renderField(&$item, &$field, &$values, $method='display')
+	static function renderField(&$item, &$field, &$values, $method='display')
 	{
 		static $_trigger_plgs_ft = array();
 		$flexiview = JRequest::getVar('view');
@@ -505,7 +503,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function triggerContentPlugins( &$field, &$item, $method ) 
+	static function triggerContentPlugins( &$field, &$item, $method ) 
 	{
 		$debug = false;
 		static $_plgs_loaded = array();
@@ -515,7 +513,7 @@ class FlexicontentFields
 		static $flexiview, $limitstart;
 		static $dispatcher, $fcdispatcher;
 		
-		//$flexiparams =& JComponentHelper::getParams('com_flexicontent');
+		//$flexiparams = JComponentHelper::getParams('com_flexicontent');
 		//$print_logging_info = $flexiparams->get('print_logging_info');
 		// Log content plugin and other performance information
 		//if ($print_logging_info) 	global $fc_run_times;
@@ -615,7 +613,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function &renderPositions(&$items, $view = FLEXI_ITEMVIEW, $params = null, $use_tmpl = true)
+	static function &renderPositions(&$items, $view = FLEXI_ITEMVIEW, $params = null, $use_tmpl = true)
 	{
 		if (!$items) return;
 		if (!$params) return $items;
@@ -644,15 +642,16 @@ class FlexicontentFields
 			if ($always_create_fields_display != 3) { // value 3 means never create for any view (blog template incompatible)
 				
 			  // 'description' item field is implicitly used by category layout of some templates (blog), render it
+			  $custom_values = false;
 			  if ($view == 'category') {
 			    $field = $items[$i]->fields['text'];
-			    $field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display', $view);
+			    $field 	= FlexicontentFields::renderField($items[$i], $field, $custom_values, $method='display', $view);
 			  }
 				// 'core' item fields are IMPLICITLY used by some item layout of some templates (blog), render them
 				else if ($view == FLEXI_ITEMVIEW) {
 					foreach ($items[$i]->fields as $field) {
 						if ($field->iscore) {
-							$field 	= FlexicontentFields::renderField($items[$i], $field, $values=false, $method='display', $view);
+							$field 	= FlexicontentFields::renderField($items[$i], $field, $custom_values, $method='display', $view);
 						}
 					}
 				}
@@ -700,9 +699,9 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function _getFieldsvalues($item, $fields, $version=0)
+	static function _getFieldsvalues($item, $fields, $version=0)
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = 'SELECT field_id, value'
 				.( $version ? ' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
 				.' WHERE item_id = ' . (int)$item
@@ -732,7 +731,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function _getCustomValues($items)
+	static function _getCustomValues($items)
 	{
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->created_by);
 		$version = $versioned_item ? $items[0]->version_id : 0;
@@ -740,7 +739,7 @@ class FlexicontentFields
 		$item_ids = array();
 		foreach ($items as $item) $item_ids[] = $item->id;
 		
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = 'SELECT field_id, value, item_id'
 				.( $version ? ' FROM #__flexicontent_items_versions':' FROM #__flexicontent_fields_item_relations')
 				.' WHERE item_id IN (' . implode(',', $item_ids) .')'
@@ -766,12 +765,12 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function _getTags($items)
+	static function _getTags($items)
 	{
 		// This is fix for versioned field of creator in items view when previewing
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->tags);
 		
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 
 		if ($versioned_item) {
 			if (!count($items[0]->tags)) return array();
@@ -813,12 +812,12 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function _getCategories($items)
+	static function _getCategories($items)
 	{
 		// This is fix for versioned field of creator in items view when previewing
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->categories);
 		
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		if ($versioned_item) {
 			$catids = $items[0]->categories;
@@ -855,9 +854,9 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function _getFavourites($items)
+	static function _getFavourites($items)
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }		
 
@@ -878,9 +877,9 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function _getFavoured($items)
+	static function _getFavoured($items)
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }		
 
@@ -904,12 +903,12 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function _getModifiers($items)
+	static function _getModifiers($items)
 	{
 		// This is fix for versioned field of modifier in items view when previewing
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->modified_by);
 		
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }
 		
@@ -930,12 +929,12 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function _getAuthors($items)
+	static function _getAuthors($items)
 	{
 		// This is fix for versioned field of creator in items view when previewing
 		$versioned_item = count($items)==1 && !empty($items[0]->version_id) && !empty($items[0]->created_by);
 		
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }		
 
@@ -956,9 +955,9 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function _getTypenames($items)
+	static function _getTypenames($items)
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }		
 
@@ -979,9 +978,9 @@ class FlexicontentFields
 	 * @return	object
 	 * @since	1.5
 	 */
-	function _getVotes($items)
+	static function _getVotes($items)
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$cids = array();
 		foreach ($items as $item) { array_push($cids, $item->id); }		
 
@@ -1014,8 +1013,8 @@ class FlexicontentFields
 	// ***********************************************************
 	
 	// Method to create field parameters in an optimized way, and also apply Type Customization for CORE fields
-	function loadFieldConfig(&$field, &$item, $name='', $field_type='', $label='', $desc='', $iscore=1) {
-		$db =& JFactory::getDBO();
+	static function loadFieldConfig(&$field, &$item, $name='', $field_type='', $label='', $desc='', $iscore=1) {
+		$db = JFactory::getDBO();
 		static $tparams = array();
 		static $tinfo   = array();
 		static $fdata   = array();
@@ -1103,13 +1102,13 @@ class FlexicontentFields
 	
 	
 	// Method to override PARAMETER VALUES with their Type Specific values
-	function _getTypeToCoreFieldParams ($type_id, & $tinfo, & $tparams) {
+	static function _getTypeToCoreFieldParams ($type_id, & $tinfo, & $tparams) {
 		
 		static $core_field_names = null;
 		if ( $core_field_names == null ) {
 			$query = "SELECT field_type FROM #__flexicontent_fields WHERE iscore=1";
 			//echo $query;
-			$db =& JFactory::getDBO();
+			$db = JFactory::getDBO();
 			$db->setQuery($query);
 			$core_field_names = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 			
@@ -1119,7 +1118,7 @@ class FlexicontentFields
 		}
 		
 		$query = 'SELECT t.attribs, t.name, t.alias FROM #__flexicontent_types AS t WHERE t.id = ' . $type_id;
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$db->setQuery($query);
 		$typedata = $db->loadObject();
 		if ( $typedata ) {
@@ -1167,7 +1166,7 @@ class FlexicontentFields
 	
 	
 	// Method get a language specific value from given Content Type (or other) Data
-	function _getLangSpecificValue ($type_id, $type_prop_value, $prop_name, & $fdata)
+	static function _getLangSpecificValue ($type_id, $type_prop_value, $prop_name, & $fdata)
 	{
 		//--. Get a 2 character language tag
 		static $lang = null;
@@ -1206,7 +1205,7 @@ class FlexicontentFields
 	// **************************************************************************************
 	
 	// Common method to get the allowed element values (field values with index,label,... properties) for fields that use indexed values
-	function indexedField_getElements(&$field, $item, $extra_props=array(), &$item_pros=true, $create_filter=false)
+	static function indexedField_getElements(&$field, $item, $extra_props=array(), &$item_pros=true, $create_filter=false)
 	{
 		static $_elements_cache = null;
 		if ( isset($_elements_cache[$field->id]) ) return $_elements_cache[$field->id];
@@ -1232,8 +1231,8 @@ class FlexicontentFields
 		
 		if ($sql_mode) {  // SQL mode, parameter field_elements contains an SQL query
 			
-			$db =& JFactory::getDBO();
-			$jAp=& JFactory::getApplication();
+			$db = JFactory::getDBO();
+			$jAp= JFactory::getApplication();
 			
 			// Get/verify query string, check if item properties and other replacements are allowed and replace them
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
@@ -1289,7 +1288,7 @@ class FlexicontentFields
 	
 	
 	// Common method to map element value INDEXES to value objects for fields that use indexed values
-	function indexedField_getValues(&$field, &$elements, $value_indexes, $prepost_prop='text')
+	static function indexedField_getValues(&$field, &$elements, $value_indexes, $prepost_prop='text')
 	{
 		// Check for empty values
 		if ( !is_array($value_indexes) && !strlen($value_indexes) ) return array();
@@ -1323,7 +1322,7 @@ class FlexicontentFields
 	
 	
 	// Helper method to replace item properties for the SQL value mode for various fields
-	function doQueryReplacements(&$query, &$field, &$item, &$item_pros=true, $canCache=null)
+	static function doQueryReplacements(&$query, &$field, &$item, &$item_pros=true, $canCache=null)
 	{
 		// replace item properties
 		preg_match_all("/{item->[^}]+}/", $query, $matches);
@@ -1333,7 +1332,7 @@ class FlexicontentFields
 		// If needed replace item properties, loading the item if not already loaded
 		if (count($matches[0]) && !$item) {
 			if ( !@$field->item_id ) { echo __FUNCTION__."(): field->item_id is not set"; return; }
-			$item = & JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+			$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
 			$item->load( $field->item_id );
 		}
 		foreach ($matches[0] as $replacement_tag) {
@@ -1360,7 +1359,7 @@ class FlexicontentFields
 	
 	
 	// Helper method to replace a field value inside a given named variable of a given item/field pair
-	function replaceFieldValue( &$field, &$item, $variable, $varname )
+	static function replaceFieldValue( &$field, &$item, $variable, $varname )
 	{
 		static $parsed = array();
 		static $d;
@@ -1431,9 +1430,9 @@ class FlexicontentFields
 	
 	// Method to get various - SETs - of search fields, according to given limitations
 	// Param 'search_type' : search, filter, all-search, dirty-search, dirty-nosupport, non-search
-	function getSearchFields($key='name', $indexer='advanced', $search_fields=null, $content_types=null, $load_params=true, $item_id=0, $search_type='all-search')
+	static function getSearchFields($key='name', $indexer='advanced', $search_fields=null, $content_types=null, $load_params=true, $item_id=0, $search_type='all-search')
 	{
-		$db = &JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 
 		if ($search_type=='search') {   // ALL fields that must enter values in search index (also are published)
@@ -1506,7 +1505,7 @@ class FlexicontentFields
 	
 		
 	// Method to get properties support for CORE fields
-	function getPropertySupport_BuiltIn()
+	static function getPropertySupport_BuiltIn()
 	{
 		static $info = null;
 		if ($info!==null) return $info;
@@ -1531,7 +1530,7 @@ class FlexicontentFields
 	
 	
 	// Method to get used the properties supported by given field_type
-	function getPropertySupport($field_type, $iscore, $spname=null)
+	static function getPropertySupport($field_type, $iscore, $spname=null)
 	{
 		static $fi = null;
 		if ($fi === null) $fi = FlexicontentFields::getPropertySupport_BuiltIn();
@@ -1606,22 +1605,22 @@ class FlexicontentFields
 	
 	// Common method to create (insert) advanced search index DB records for various fields,
 	// this can be called by fields or copied inside the field to allow better customization
-	function onIndexAdvSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null) {
+	static function onIndexAdvSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null) {
 		FlexicontentFields::createIndexRecords($field, $values, $item, $required_props, $search_props, $props_spacer, $filter_func, $for_advsearch=1);
 	}
 	
 	
 	// Common method to create basic text search index for various fields (added as the property field->search),
 	// this can be called by fields or copied inside the field to allow better customization
-	function onIndexSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null) {
+	static function onIndexSearch(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null) {
 		FlexicontentFields::createIndexRecords($field, $values, $item, $required_props, $search_props, $props_spacer, $filter_func, $for_advsearch=0);
 	}
 	
 	
 	// Common method to create basic/advanced search index for various fields
-	function createIndexRecords(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null, $for_advsearch=0) {
+	static function createIndexRecords(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null, $for_advsearch=0) {
 		$fi = FlexicontentFields::getPropertySupport($field->field_type, $field->iscore);
-		$db = &JFactory::getDBO();
+		$db = JFactory::getDBO();
 			
 		if ( !$for_advsearch )
 		{
@@ -1710,9 +1709,9 @@ class FlexicontentFields
 	
 	
 	// Method to retrieve field values to be used for creating search indexes 
-	function searchIndex_getFieldValues(&$field, &$item, $for_advsearch=0)
+	static function searchIndex_getFieldValues(&$field, &$item, $for_advsearch=0)
 	{
-		$db = &JFactory::getDBO();
+		$db = JFactory::getDBO();
 		static $nullDate = null;
 		if ($nullDate===null) $nullDate	= $db->getNullDate();
 		
@@ -1818,7 +1817,7 @@ class FlexicontentFields
 	// ********************************************************************************************
 	
 	// Private Method to create a generic matching of filter
-	function createFilterValueMatchSQL(&$filter, &$value, $is_full_text=0, $is_search=0)
+	static function createFilterValueMatchSQL(&$filter, &$value, $is_full_text=0, $is_search=0)
 	{
 		$db = JFactory::getDBO();
 		$display_filter_as = $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
@@ -1881,7 +1880,7 @@ class FlexicontentFields
 	
 	
 	// Method to get the active filter result for Content Lists Views (an SQL where clause part OR an array of item ids, matching field filter)
-	function getFiltered( &$filter, $value, $return_sql=false )
+	static function getFiltered( &$filter, $value, $return_sql=false )
 	{
 		$db = JFactory::getDBO();
 		
@@ -1916,9 +1915,9 @@ class FlexicontentFields
 	
 	
 	// Method to get the active filter result Search View (an SQL where clause part OR an array of item ids, matching field filter)
-	function getFilteredSearch( &$filter, $value, $return_sql=false )
+	static function getFilteredSearch( &$filter, $value, $return_sql=false )
 	{
-		$db = &JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		// Check if field type supports advanced search
 		$support = FlexicontentFields::getPropertySupport($filter->field_type, $filter->iscore);
@@ -1959,7 +1958,7 @@ class FlexicontentFields
 	// **********************************************
 	
 	// Method to create a category (content list) or search filter
-	function createFilter(&$filter, $value='', $formName='adminForm', $indexed_elements=false, $search_prop='')
+	static function createFilter(&$filter, $value='', $formName='adminForm', $indexed_elements=false, $search_prop='')
 	{
 		static $apply_cache = null;
 		$user = JFactory::getUser();
@@ -2170,7 +2169,7 @@ class FlexicontentFields
 	
 	
 	// Method to create a calendar form field according to a given configuation, e.g. called during Filter Creation of FC views
-	function createCalendarField($value, $date_allowtime, $fieldname, $elementid, $attribs='', $skip_on_invalid=false)
+	static function createCalendarField($value, $date_allowtime, $fieldname, $elementid, $attribs='', $skip_on_invalid=false)
 	{
 		@list($date, $time) = preg_split('#\s+#', $value, $limit=2);
 		$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
@@ -2197,7 +2196,7 @@ class FlexicontentFields
 	
 	
 	// Method to create filter values for a field filter to be used in content lists views (category, etc)
-	function createFilterValues($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop)
+	static function createFilterValues($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop)
 	{
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
@@ -2252,7 +2251,7 @@ class FlexicontentFields
 	
 	
 	// Method to create filter values for a field filter to be used in search view
-	function createFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop)
+	static function createFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop)
 	{
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
@@ -2277,10 +2276,10 @@ class FlexicontentFields
 	
 	
 	// Retrieves all available filter values of the given field according to the given VIEW'S FILTERING (Content Lists)
-	function getFilterValues(&$filter, &$view_join, &$view_where, &$filters_where)
+	static function getFilterValues(&$filter, &$view_join, &$view_where, &$filters_where)
 	{
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		$listing_where = $view_where;
 		foreach ($filters_where as $filter_id => $filter_where) {
@@ -2298,7 +2297,7 @@ class FlexicontentFields
 		$having  = @$filter->filter_having  ? $filter->filter_having  : '';
 		$orderby = @$filter->filter_orderby ? $filter->filter_orderby : '';
 		
-		$query = 'SELECT '. $valuesselect .', COUNT(*) as found '
+		$query = 'SELECT '. $valuesselect .', COUNT(DISTINCT i.id) as found '
 		. ' FROM #__content AS i'
 		. $valuesjoin
 		. $view_join
@@ -2307,7 +2306,7 @@ class FlexicontentFields
 		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
 		. ' LEFT JOIN #__users AS u ON ' . $usersjoinon
-		. ($listing_where ? $listing_where : ' WHERE 1=1 ')
+		. ($listing_where ? $listing_where : ' WHERE 1 ')
 		. $valueswhere
 		. $groupby
 		. $having
@@ -2330,10 +2329,10 @@ class FlexicontentFields
 	
 	
 	// Retrieves all available filter values of the given field according to the given VIEW'S FILTERING (Search view)
-	function getFilterValuesSearch(&$filter, &$view_join, &$view_where, &$filters_where)
+	static function getFilterValuesSearch(&$filter, &$view_join, &$view_where, &$filters_where)
 	{
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		$listing_where = $view_where;
 		foreach ($filters_where as $filter_id => $filter_where) {
@@ -2374,10 +2373,10 @@ class FlexicontentFields
 	
 	// Helper method to perform HTML replacements on given list of item ids (with optional catids too), the items list is either given
 	// as parameter or the list is created via the items that have as value the id of 'parentitem' for field with id 'reverse_field'
-	function getItemsList(&$params, &$_itemids_catids=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, &$return_item_list=false)
+	static function getItemsList(&$params, &$_itemids_catids=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, &$return_item_list=false)
 	{
 		// Execute query to get item list data 
-		$db = & JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = FlexicontentFields::createItemsListSQL($params, $_itemids_catids, $isform, $reverse_field, $parentfield, $parentitem);
 		$db->setQuery($query);
 		$item_list = & $db->loadObjectList('id');
@@ -2396,16 +2395,16 @@ class FlexicontentFields
 	
 	
 	// Helper method to create SQL query for retrieving items list data
-	function createItemsListSQL(&$params, &$_itemids_catids=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem)
+	static function createItemsListSQL(&$params, &$_itemids_catids=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem)
 	{
-		$db = & JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$order = $params->get( $isform ? 'orderby_form' : 'orderby', 'alpha' );
 		
 		// Get data like aliases and published state
 		$publish_where = '';
 		if ($params->get('use_publish_dates', 1 )) {
 			$nullDate	= $db->getNullDate();
-			$mainframe =& JFactory::getApplication();
+			$mainframe = JFactory::getApplication();
 			$now		= $mainframe->get('requestTime');
 			$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )'; 
 			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
@@ -2442,9 +2441,9 @@ class FlexicontentFields
 	
 	
 	// Helper method to create HTML display of an item list according to replacements
-	function createItemsListHTML(&$params, &$item_list, $isform=0, &$parentfield, &$parentitem)
+	static function createItemsListHTML(&$params, &$item_list, $isform=0, &$parentfield, &$parentitem)
 	{
-		$db = & JFactory::getDBO();
+		$db = JFactory::getDBO();
 		global $globalcats, $globalnoroute, $fc_run_times;
 		if (!is_array($globalnoroute)) $globalnoroute = array();
 		
@@ -2619,10 +2618,10 @@ class FlexicontentFields
 	// Helper methods for handling runtime statistics
 	// **********************************************
 	
-	function getFieldRenderTimes( &$fields_render_total=0)
+	static function getFieldRenderTimes( &$fields_render_total=0)
 	{
 		global $fc_run_times;
-		$app = & JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$fields_render = array();
 		
 		foreach ($fc_run_times['render_field'] as $field_type => $field_msecs)

@@ -943,7 +943,16 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if(!$last_versions) {
 			$last_versions = FLEXIUtilities::getLastVersions();
 		}
-		return diff_version($current_versions, $last_versions);
+		
+		$difference = $current_versions;
+		foreach($current_versions as $key1 => $value1) {
+			foreach($last_versions as $key2 => $value2) {
+				if( ($value1["id"]==$value2["id"]) && ($value1["version"]==$value2["version"]) ) {
+					unset($difference[$key1]);
+				}
+			}
+		}
+		return $difference;
 	}
 	
 	

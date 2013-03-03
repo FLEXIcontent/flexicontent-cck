@@ -32,11 +32,11 @@ class FlexicontentViewUsers extends JViewLegacy
 		$mainframe = & JFactory::getApplication();
 		$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
 		
-		$db				=& JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$option    = & JRequest::get('option');
-		$currentUser	=& JFactory::getUser();
-		$acl			=& JFactory::getACL();
+		$db				= JFactory::getDBO();
+		$document	= JFactory::getDocument();
+		$option   = JRequest::getCmd('option');
+		$user     = JFactory::getUser();
+		$acl      = JFactory::getACL();
 		
 		JHTML::_('behavior.tooltip');
 
@@ -192,7 +192,7 @@ class FlexicontentViewUsers extends JViewLegacy
 
 		// exclude any child group id's for this user, this applicable only in J1.5, and not for J16/J1.7/J2.5+
 		if (!FLEXI_J16GE) {
-			$pgids = $acl->get_group_children( $currentUser->get('gid'), 'ARO', 'RECURSE' );
+			$pgids = $acl->get_group_children( $user->get('gid'), 'ARO', 'RECURSE' );
 
 			if (is_array( $pgids ) && count( $pgids ) > 0)
 			{

@@ -699,7 +699,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				<strong <?php echo $label_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_REVISED' ) */ ?></strong>
 			</td>
 			<td>
-				<?php echo $this->lastversion;?> <?php echo JText::_( 'FLEXI_TIMES' ); ?>
+				<?php echo $this->row->last_version;?> <?php echo JText::_( 'FLEXI_TIMES' ); ?>
 			</td>
 		</tr>
 		<tr>

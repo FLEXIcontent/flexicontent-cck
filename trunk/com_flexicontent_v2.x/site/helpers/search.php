@@ -24,11 +24,11 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
  */
 class FLEXIadvsearchHelper
 {
-	function santiseSearchWord(&$searchword, $searchphrase, $min=2)
+	static function santiseSearchWord(&$searchword, $searchphrase, $min=2)
 	{
 		$ignored = false;
 
-		$lang =& JFactory::getLanguage();
+		$lang = JFactory::getLanguage();
 
 		$search_ignore	= array();
 		$tag			= $lang->getTag();
@@ -61,7 +61,7 @@ class FLEXIadvsearchHelper
 		return $ignored;
 	}
 
-	function limitSearchWord(&$searchword, $min=2, $max=20)
+	static function limitSearchWord(&$searchword, $min=2, $max=20)
 	{
 		$restriction = false;
 
@@ -80,20 +80,20 @@ class FLEXIadvsearchHelper
 		return $restriction;
 	}
 
-	function logSearch( $search_term )
+	static function logSearch( $search_term )
 	{
-		$mainframe =& JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 
-		$params = &JComponentHelper::getParams( 'com_search' );
+		$params = JComponentHelper::getParams( 'com_search' );
 		$enable_log_searches = $params->get('enabled');
 
 		$search_term = $db->getEscaped( trim( $search_term) );
 
 		if ( @$enable_log_searches )
 		{
-			$db =& JFactory::getDBO();
+			$db = JFactory::getDBO();
 			$query = 'SELECT hits'
 			. ' FROM #__core_log_searches'
 			. ' WHERE LOWER( search_term ) = "'.$search_term.'"'
@@ -123,7 +123,7 @@ class FLEXIadvsearchHelper
 	 * @param string The searchword to select around
 	 * @return string
 	 */
-	function prepareSearchContent( $text, $length = 200, $searchword_arr )
+	static function prepareSearchContent( $text, $length = 200, $searchword_arr )
 	{
 		// strips tags won't remove the actual jscript
 		$text = preg_replace( "'<script[^>]*>.*?</script>'si", "", $text );
@@ -167,7 +167,7 @@ class FLEXIadvsearchHelper
 	 * @param array List of object variables to check against
 	 * @returns boolean True if searchTerm is in object, false otherwise
 	 */
-	function checkNoHtml($object, $searchTerm, $fields) {
+	static function checkNoHtml($object, $searchTerm, $fields) {
 		$searchRegex = array(
 				'#<script[^>]*>.*?</script>#si',
 				'#<style[^>]*>.*?</style>#si',
@@ -199,7 +199,7 @@ class FLEXIadvsearchHelper
 	 * @param string The searchword to select around
 	 * @return string
 	 */
-	function _smartSubstr($text, $length = 200, $searchword, &$wordfound)
+	static function _smartSubstr($text, $length = 200, $searchword, &$wordfound)
 	{
 		$textlen = JString::strlen($text);
 		$lsearchword = JString::strtolower($searchword);

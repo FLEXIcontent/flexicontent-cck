@@ -58,6 +58,9 @@ class FlexicontentViewItem extends JViewLegacy
 			$pane 		= & JPane::getInstance('sliders');
 		}
 		
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();
 		
@@ -73,18 +76,18 @@ class FlexicontentViewItem extends JViewLegacy
 
 		//Get data from the model
 		$model = & $this->getModel();
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$row   = & $this->get('Item');
 		if (FLEXI_J16GE) {
 			$form  = & $this->get('Form');
 		}
+		if ( $print_logging_info ) @$fc_run_times['get_item_data'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Get item id and new flag
 		$cid = $model->getId();
 		$isnew = ! $cid;
 		// A unique item id
 		JRequest::setVar( 'unique_tmp_itemid', $cid ? $cid : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
-		
-		$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
 		
 		$subscribers 	= & $this->get( 'SubscribersCount' );
 		$types				= & $this->get( 'Typeslist' );
@@ -172,7 +175,11 @@ class FlexicontentViewItem extends JViewLegacy
 		// (a) Apply Content Type Customization to CORE fields (label, description, etc) 
 		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField' 
 		// *****************************************************************************
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$fields = & $this->get( 'Extrafields' );
+		if ( $print_logging_info ) @$fc_run_times['get_field_vals'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 		foreach ($fields as $field)
 		{
 			// a. Apply CONTENT TYPE customizations to CORE FIELDS, e.g a type specific label & description
@@ -223,6 +230,7 @@ class FlexicontentViewItem extends JViewLegacy
 				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$row) );
 			}
 		}
+		if ( $print_logging_info ) @$fc_run_times['render_field_html'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Tags used by the item
 		$usedtagsIds  = & $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($row->tags)
@@ -290,7 +298,7 @@ class FlexicontentViewItem extends JViewLegacy
 				//$canPublishOwn= 1;
 			}
 			// redundant ?? ... since already checked by the controller
-			//$has_edit = $canEdit || $canEditOwn || ($lastversion < 3);
+			//$has_edit = $canEdit || $canEditOwn;
 			//if (!$has_edit) {
 			//	$mainframe->redirect('index.php?option=com_flexicontent&view=items', JText::sprintf( 'FLEXI_NO_ACCESS_EDIT', JText::_('FLEXI_ITEM') ));
 			//}
@@ -542,7 +550,6 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->assignRef('fields'				, $fields);
 		$this->assignRef('versions'			, $versions);
 		$this->assignRef('pagecount'		, $pagecount);
-		$this->assignRef('lastversion'	, $lastversion);
 		$this->assignRef('cparams'			, $cparams);
 		$this->assignRef('tparams'			, $tparams);
 		$this->assignRef('tmpls'				, $tmpls);
@@ -550,8 +557,10 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->assignRef('CanVersion'		, $CanVersion);
 		$this->assignRef('CanUseTags'		, $CanUseTags);
 		$this->assignRef('current_page'	, $current_page);
-
+		
+		if ( $print_logging_info ) $start_microtime = microtime(true);
 		parent::display($tpl);
+		if ( $print_logging_info ) @$fc_run_times['form_rendering'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 }
 ?>

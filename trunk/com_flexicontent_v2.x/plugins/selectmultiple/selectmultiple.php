@@ -272,7 +272,8 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 
 		
 		// Get indexed element values
-		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, self::$extra_props, $item_pros=false, $create_filter=true);
+		$item_pros = false;
+		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, self::$extra_props, $item_pros, $create_filter=true);
 		
 		// Check for error during getting indexed field elements
 		if ( !$elements ) {

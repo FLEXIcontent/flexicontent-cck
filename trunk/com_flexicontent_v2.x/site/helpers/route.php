@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: route.php 1384 2012-07-15 13:10:51Z ggppdk $
+ * @version 1.5 stable $Id: route.php 1613 2013-01-04 00:43:58Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -39,7 +39,7 @@ class FlexicontentHelperRoute
 	/**
 	 * function to retrieve component menuitems only once;
 	 */
-	function _setComponentMenuitems () {
+	static function _setComponentMenuitems () {
 		// Cache the result on multiple calls
 		static $_component_menuitems = null;
 		if ($_component_menuitems) return $_component_menuitems;
@@ -50,7 +50,7 @@ class FlexicontentHelperRoute
 		// NOTE: In J1.5 the static method JSite::getMenu() will give an error,
 		// while JFactory::getApplication('site')->getMenu() will not return the frontend menus
 		$component = JComponentHelper::getComponent('com_flexicontent');
-		$menus = JApplication::getMenu('site', array());   // this will work in J1.5 backend too !!!
+		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
 		$_component_menuitems	= $menus->getItems(!FLEXI_J16GE ? 'componentid' : 'component_id', $component->id);
 		$_component_menuitems = $_component_menuitems ? $_component_menuitems : array();
 		
@@ -60,7 +60,7 @@ class FlexicontentHelperRoute
 	/**
 	 * function to discover a default item id only once
 	 */
-	function _setComponentDefaultMenuitemId () {
+	static function _setComponentDefaultMenuitemId () {
 		// Cache the result on multiple calls
 		static $_component_default_menuitem_id = null;
 		if ($_component_default_menuitem_id || $_component_default_menuitem_id===false) return $_component_default_menuitem_id;
@@ -69,7 +69,7 @@ class FlexicontentHelperRoute
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		
 		// NOTE: In J1.5 the static method JSite::getMenu() will give an error, while JFactory::getApplication('site')->getMenu() will not return the frontend menus
-		$menus = JApplication::getMenu('site', array());   // this will work in J1.5 backend too !!!
+		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
 		
 		// Get preference for default menu item
 		$params = JComponentHelper::getParams('com_flexicontent');
@@ -133,7 +133,7 @@ class FlexicontentHelperRoute
 	/**
 	 * @param	int	The route of the item
 	 */
-	function getItemRoute($id, $catid = 0, $Itemid = 0)	{
+	static function getItemRoute($id, $catid = 0, $Itemid = 0)	{
 		
 		$needles = array(
 			FLEXI_ITEMVIEW  => (int) $id,
@@ -162,7 +162,7 @@ class FlexicontentHelperRoute
 		return $link;
 	}
 
-	function getCategoryRoute($catid, $Itemid = 0, $urlvars = array()) {
+	static function getCategoryRoute($catid, $Itemid = 0, $urlvars = array()) {
 		
 		$needles = array(
 			'category' => (int) $catid
@@ -187,7 +187,7 @@ class FlexicontentHelperRoute
 		return $link;
 	}
 	
-	function getTagRoute($id, $Itemid = 0) {
+	static function getTagRoute($id, $Itemid = 0) {
 		static $_tags_default_menuitem_id = null;
 		if ($_tags_default_menuitem_id === null) {
 			$params = JComponentHelper::getParams('com_flexicontent');
@@ -216,14 +216,14 @@ class FlexicontentHelperRoute
 		return $link;
 	}
 
-	function _findItem($needles)
+	static function _findItem($needles)
 	{
 		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		$match = null;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		
 		// Get access level of the FLEXIcontent item
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$db->setQuery('SELECT access FROM #__content WHERE id='.$needles[FLEXI_ITEMVIEW]);
 		$item_acclevel = $db->loadResult();
 		
@@ -271,7 +271,7 @@ class FlexicontentHelperRoute
 		return $match;
 	}
 
-	function _findCategory($needles, $urlvars=array())
+	static function _findCategory($needles, $urlvars=array())
 	{
 		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		$match = null;
@@ -282,7 +282,7 @@ class FlexicontentHelperRoute
 		foreach($needles as $needle => $cid)  {
 
 			// Get access level of the FLEXIcontent category
-			$db =& JFactory::getDBO();
+			$db = JFactory::getDBO();
 			$db->setQuery('SELECT access FROM #__categories WHERE id='.$cid);
 			$cat_acclevel = $db->loadResult();
 
@@ -332,12 +332,12 @@ class FlexicontentHelperRoute
 		return $match;
 	}
 
-	function _findTag($needles)
+	static function _findTag($needles)
 	{
 		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		$match = null;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
-		$user = &JFactory::getUser();
+		$user = JFactory::getUser();
 		if (FLEXI_J16GE)
 			$aid_arr = $user->getAuthorisedViewLevels();
 		else

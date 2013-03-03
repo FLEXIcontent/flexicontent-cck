@@ -26,7 +26,7 @@ require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defi
  * Comment out or add permissions as you desire
  *************************************************************************/
 
-$auth =& JFactory::getACL();  // Return an authorization object in J1.5 and a JAccess Object in J2.5
+$auth = JFactory::getACL();  // Return an authorization object in J1.5 and a JAccess Object in J2.5
 
 if (!FLEXI_J16GE) {
 	//who can add an item?

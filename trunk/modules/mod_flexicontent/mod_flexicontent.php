@@ -44,6 +44,7 @@ if ($params->get('combine_show_rules', 'AND')=='AND') {
 if ( $show_mod )
 {
 	global $modfc_jprof;
+	jimport( 'joomla.error.profiler' );
 	$modfc_jprof = new JProfiler();
 	$modfc_jprof->mark('START: FLEXIcontent Module');
 	global $mod_fc_run_times;
@@ -193,10 +194,10 @@ if ( $show_mod )
 		'category_data_retrieval'=>'Category data retrieval: %.2f secs',
 		'rendering_template'=>'Adding css/js & Rendering Template with item/category/etc data: %.2f secs'
 	);
-	$flexiparams =& JComponentHelper::getParams('com_flexicontent');
+	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
-		$app = & JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$modfc_jprof->mark('END: FLEXIcontent Module');
 		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
 		$msg .= sprintf( '<code> <b><u>including</u></b>: <br/> -- Content Plugins: %.2f secs</code><br/>', $fc_content_plg_microtime/1000000);

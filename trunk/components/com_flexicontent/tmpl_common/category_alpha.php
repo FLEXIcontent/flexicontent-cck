@@ -27,7 +27,7 @@ function utf8ord($char) {
 	return $number;
 }
 
-$config =& JFactory::getConfig();
+$config  = JFactory::getConfig();
 $caching = $config->getValue( 'config.caching' );
 
 $show_alpha = $this->params->get('show_alpha',1);

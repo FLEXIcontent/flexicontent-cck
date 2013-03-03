@@ -44,6 +44,7 @@ if ($params->get('combine_show_rules', 'AND')=='AND') {
 if ( $show_mod )
 {
 	global $modfc_jprof;
+	jimport( 'joomla.error.profiler' );
 	$modfc_jprof = new JProfiler();
 	$modfc_jprof->mark('START: FLEXIcontent Adv Search Module');
 	
@@ -95,10 +96,10 @@ if ( $show_mod )
 	// Render Layout
 	require(JModuleHelper::getLayoutPath('mod_flexiadvsearch', $layout));
 	
-	$flexiparams =& JComponentHelper::getParams('com_flexicontent');
+	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
-		$app = & JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$modfc_jprof->mark('END: FLEXIcontent Adv Search Module');
 		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
 		$app->enqueueMessage( $msg, 'notice' );

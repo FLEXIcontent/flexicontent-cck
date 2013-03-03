@@ -311,9 +311,12 @@
 				<option value="2">FLEXI_USE_INTROTEXT_FALLBACK_IGNORE_DEFAULTIMG</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_STD" level="level3" menu="hide" />
-			<field name="mod_use_image" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
+			<field name="mod_use_image" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="1">FLEXI_YES_RESIZE</option>
+				<option value="small">FLEXI_YES_USE_SMALL_THUMB_FASTER</option>
+				<option value="medium">FLEXI_YES_USE_MEDIUM_THUMB_FASTER</option>
+				<option value="large">FLEXI_YES_USE_LARGE_THUMB_FASTER</option>
 			</field>
 			<field name="mod_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -326,9 +329,12 @@
 			<field name="mod_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="mod_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			<field name="" type="separator" default="FLEXI_FEAT" level="level3" menu="hide" />
-			<field name="mod_use_image_feat" type="radio" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
+			<field name="mod_use_image_feat" type="list" default="1" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="1">FLEXI_YES_RESIZE</option>
+				<option value="small">FLEXI_YES_USE_SMALL_THUMB_FASTER</option>
+				<option value="medium">FLEXI_YES_USE_MEDIUM_THUMB_FASTER</option>
+				<option value="large">FLEXI_YES_USE_LARGE_THUMB_FASTER</option>
 			</field>
 			<field name="mod_link_image_feat" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
 				<option value="0">FLEXI_NO</option>

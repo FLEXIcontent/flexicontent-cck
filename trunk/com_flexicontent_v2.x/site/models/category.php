@@ -96,7 +96,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 *
 	 * @var string
 	 */
-	var $_layout = 'category';
+	var $_layout = '';  // !! This should be empty for empty for 'category' layout
 	
 	/**
 	 * Comments information for cat's items
@@ -128,12 +128,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @since	1.5
 	 */
 	protected function populateCategoryState($ordering = null, $direction = null) {
-		$this->_layout = JRequest::getVar('layout', 'category');
+		$this->_layout = JRequest::getVar('layout', '');  // !! This should be empty for empty for 'category' layout
 		
 		if ($this->_layout=='author') {
 			$this->_authorid = JRequest::getInt('authorid', 0);
 		} else if ($this->_layout=='myitems') {
-			$user =& JFactory::getUser();
+			$user = JFactory::getUser();
 			if ($user->guest) {
 				$msg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
 				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
@@ -211,7 +211,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 			$this->_total = $this->_getListCount($query);
 			if ($this->_db->getErrorNum()) {
-				$jAp=& JFactory::getApplication();
+				$jAp= JFactory::getApplication();
 				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
 			}
 
@@ -225,7 +225,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$this->_data = $this->_getList( $query, 0, $this->getState('limit') );
 			}
 			if ($this->_db->getErrorNum()) {
-				$jAp=& JFactory::getApplication();
+				$jAp= JFactory::getApplication();
 				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
 			}
 		}
@@ -376,7 +376,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		global $globalcats;
 		$cparams = & $this->_params;
-		$user 		= &JFactory::getUser();
+		$user 		= JFactory::getUser();
 		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
 
 		// show unauthorized items
@@ -433,7 +433,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_db->setQuery($query);
 			$_data_cats[] = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 			if ( $this->_db->getErrorNum() ) {
-				$jAp=& JFactory::getApplication();
+				$jAp= JFactory::getApplication();
 				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
 			}
 		}
@@ -498,7 +498,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$show_noauth = $cparams->get('show_noauth', 0);   // Show unauthorized items
 		
 		// First thing we need to do is to select only the requested items
-		$where = ' WHERE 1=1';
+		$where = ' WHERE 1';
 		if ($this->_authorid)
 			$where .= ' AND i.created_by = ' . $this->_db->Quote($this->_authorid);
 		
@@ -557,7 +557,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 
 		// Get session
-		$session  =& JFactory::getSession();
+		$session  = JFactory::getSession();
 		
 		// Featured items, this item property exists in J1.6+ only
 		if (FLEXI_J16GE) {
@@ -755,7 +755,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _buildChildsQuery()
 	{
-		$user 		= &JFactory::getUser();
+		$user 		= JFactory::getUser();
 		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
 
 		// Get the category parameters
@@ -810,12 +810,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _getassigned($id)
 	{
 		global $globalcats;
-		$mainframe = &JFactory::getApplication();
-		$user 		= &JFactory::getUser();
+		$mainframe = JFactory::getApplication();
+		$user 		= JFactory::getUser();
 
 		// Get the category parameters
 		$cparams = & $this->_params;
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
@@ -896,7 +896,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->_db->setQuery($query);
 		$assigneditems = count(FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray());
 		if ( $this->_db->getErrorNum() ) {
-			$jAp=& JFactory::getApplication();
+			$jAp= JFactory::getApplication();
 			$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
 		}
 		
@@ -914,7 +914,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		$cparams = & $this->_params;
 		$show_noauth	= $cparams->get('show_noauth', 0);
-		$user			= &JFactory::getUser();
+		$user			= JFactory::getUser();
 
 		// Access
 		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON sc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '' ;
@@ -994,10 +994,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function getCategory()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		
 		//initialize some vars
-		$user		= & JFactory::getUser();
+		$user		= JFactory::getUser();
 		
 		if ($this->_id) {
 			//get categories
@@ -1011,7 +1011,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_db->setQuery($query);
 			$this->_category = $this->_db->loadObject();
 			if ( $this->_db->getErrorNum() ) {
-				$jAp=& JFactory::getApplication();
+				$jAp= JFactory::getApplication();
 				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
 				$jAp->enqueueMessage('ERROR URL:<br/>'.JFactory::getURI()->toString(), 'warning' );
 				$jAp->enqueueMessage('Please report to website administrator.','message');
@@ -1092,7 +1092,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		if ($this->_params === NULL) {
 			jimport("joomla.html.parameter");
-			$mainframe = &JFactory::getApplication();
+			$mainframe = JFactory::getApplication();
 			
 			// Retrieve author parameters if using displaying AUTHOR layout
 			$author_basicparams = '';
@@ -1122,7 +1122,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			
 			// Retrieve menu parameters
-			$menu = JSite::getMenu()->getActive();
+			$menu = $mainframe->getMenu()->getActive();
 			if ($menu) {
 				if (FLEXI_J16GE) {
 					$menuParams = new JRegistry;
@@ -1261,7 +1261,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		static $filters;
 		if($filters) return $filters;
 		
-		$user		= &JFactory::getUser();
+		$user		= JFactory::getUser();
 		$params = $this->_params;
 		$scope	= $params->get('filters') ? ( is_array($params->get('filters')) ? ' AND fi.id IN (' . implode(',', $params->get('filters')) . ')' : ' AND fi.id = ' . $params->get('filters') ) : null;
 		$filters	= null;
@@ -1406,7 +1406,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->_db->setQuery($query);
 		$alpha = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		if ($this->_db->getErrorNum()) {
-			$jAp=& JFactory::getApplication();
+			$jAp= JFactory::getApplication();
 			$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
 		}
 		return $alpha;
@@ -1435,7 +1435,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$item_ids = & $_item_ids;
 		}
 		
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = 'SELECT COUNT(com.object_id) AS total, com.object_id AS item_id'
 		      . ' FROM #__jcomments AS com'
 		      . ' WHERE com.object_id in (' . implode(',',$item_ids) .')'

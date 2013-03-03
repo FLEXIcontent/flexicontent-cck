@@ -93,7 +93,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
-		$menu  = JSite::getMenu()->getActive();
+		$menu  = $app->getMenu()->getActive();
 		
 		
 		
@@ -206,7 +206,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Load Plugin parameters
 		// **********************
 		
-		$plugin =& JPluginHelper::getPlugin('search', 'flexiadvsearch');
+		$plugin = JPluginHelper::getPlugin('search', 'flexiadvsearch');
 		$pluginParams = new JParameter( $plugin->params );
 		
 		// Shortcuts for plugin parameters

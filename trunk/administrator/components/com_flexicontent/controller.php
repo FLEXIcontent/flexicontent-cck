@@ -371,6 +371,10 @@ class FlexicontentController extends JControllerLegacy
 			$result = $db->query();
 		}
 		
+		// This is necessary as extension data are cached ... and just above we updated the component parameters -manually- (and (also added menu item)
+		$cache = JFactory::getCache();
+		$cache->clean( '_system' );
+		
 		if (!$result) {
 			echo '<span class="install-notok"></span><span class="button-add"><a id="existmenuitems" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		} else {
@@ -795,10 +799,10 @@ VALUES
 		$clean_database = true;
 		
 		// For all items not having the current version, add it
+		$last_versions = FLEXIUtilities::getLastVersions();
 		foreach($rows as $row)
 		{
-			$lastversion = FLEXIUtilities::getLastVersions($row->id, true);
-			$item_id = $row->id;
+			$lastversion = @$last_versions[$row->id]['version'];
 			
 			if($row->version > $lastversion)
 			{

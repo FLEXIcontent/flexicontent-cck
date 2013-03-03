@@ -57,6 +57,11 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, tru
 // Get component parameters
 $cparams =& JComponentHelper::getParams('com_flexicontent');
 
+// Logging Info variables
+if ( $cparams->get('print_logging_info') ) {
+	global $fc_run_times;
+}
+
 if (!function_exists('FLEXISubmenu'))
 {
 	function FLEXISubmenu($cando)
@@ -169,6 +174,27 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	$_layout = JRequest::getWord('layout','');
 	if ($task) $msg .= ' (TASK: '.(!FLEXI_J16GE ? $ctrlname.'.' : '').$task.')';
 	else $msg .= ' (VIEW: ' .$_view. ($_layout ? ' -- LAYOUT: '.$_layout : '') .')';
+
+	// Logging Info variables
+	
+	if (isset($fc_run_times['templates_parsing_cached']))
+		$msg .= sprintf('<br/>-- [FC Templates Parsing (cached): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
+	
+	if (isset($fc_run_times['templates_parsing_noncached']))
+		$msg .= sprintf('<br/>-- [FC Templates Parsing (not cached) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
+	
+	if (isset($fc_run_times['get_item_data']))
+		$msg .= sprintf('<br/>-- [Get/Caculate Item Properties: %.2f s] ', $fc_run_times['get_item_data']/1000000);
+	
+	if (isset($fc_run_times['get_field_vals']))
+		$msg .= sprintf('<br/>-- [Retrieve Field Values: %.2f s] ', $fc_run_times['get_field_vals']/1000000);
+	
+	if (isset($fc_run_times['render_field_html']))
+		$msg .= sprintf('<br/>-- [Field HTML Rendering: %.2f s] ', $fc_run_times['render_field_html']/1000000);
+	
+	if (isset($fc_run_times['form_rendering']))
+		$msg .= sprintf('<br/>-- [Form Template Rendering: %.2f s] ', $fc_run_times['form_rendering']/1000000);
+	
 	$app->enqueueMessage( $msg, 'notice' );
 }
 

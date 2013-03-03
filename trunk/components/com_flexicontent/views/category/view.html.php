@@ -42,17 +42,17 @@ class FlexicontentViewCategory extends JViewLegacy
 		if (!is_array($globalnoroute))	$globalnoroute	= array();
 		if (!is_array($globalcats))     $globalcats	= array();
 		
-		$mainframe = & JFactory::getApplication();
-		$session = & JFactory::getSession();
+		$mainframe = JFactory::getApplication();
+		$session = JFactory::getSession();
 		$option = JRequest::getVar('option');
 
 		//initialize variables
-		$document = & JFactory::getDocument();
-		$menus    = & JSite::getMenu();
+		$document = JFactory::getDocument();
+		$menus    = $mainframe->getMenu();
 		$menu     = $menus->getActive();
-		$uri      = & JFactory::getURI();
-		$dispatcher	= & JDispatcher::getInstance();
-		$user		= & JFactory::getUser();
+		$uri      = JFactory::getURI();
+		$dispatcher	= JDispatcher::getInstance();
+		$user		= JFactory::getUser();
 		$aid		= FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
@@ -81,18 +81,20 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		// Get category and set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
-		$category = & $this->get('Category');
+		$category = $this->get('Category');
 		$params   = & $category->parameters;
 		
 		// Get remainging data from the model, TODO use parameters to retireve these only when needed
-		$categories = & $this->get('Childs');
-		$items    = & $this->get('Data');
-		$total    = & $this->get('Total');
-		$filters  = & $this->get('Filters');
+		$categories = $this->get('Childs');
+		$items    = $this->get('Data');
+		$total    = $this->get('Total');
+		$filters  = $this->get('Filters');
 		if ($params->get('show_comments_count', 0))
-			$comments = & $this->get('CommentsInfo');
-		$alpha    = & $this->get('Alphaindex');
-		$model    = & $this->getModel();
+			$comments = $this->get('CommentsInfo');
+		else
+			$comments = null;
+		$alpha    = $this->get('Alphaindex');
+		$model    = $this->getModel();
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = JRequest::getInt('limitstart');
@@ -139,7 +141,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Bind Fields
 		if ($format != 'feed') {
-			$items 	= & FlexicontentFields::getFields($items, 'category', $params, $aid);
+			$items 	= FlexicontentFields::getFields($items, 'category', $params, $aid);
 		}
 
 		//Set layout
@@ -237,7 +239,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ********************************************************************************************
 		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
 		// ********************************************************************************************
-		$pathway 	=& $mainframe->getPathWay();
+		$pathway 	= $mainframe->getPathWay();
 		
 		// Clear pathway, if automatic pathways are enabled
 		if ( $params->get('automatic_pathways', 0) ) {
@@ -288,7 +290,12 @@ class FlexicontentViewCategory extends JViewLegacy
 				}
 				
 				if ($mainframe->getCfg('MetaAuthor') == '1') {
-					$meta_author = $meta_params->get('author') ? $meta_params->get('author') : JFactory::getUser($category->created_user_id)->name;
+					if ( $meta_params->get('author') ) {
+						$meta_author = $meta_params->get('author');
+					} else {
+						$table = JUser::getTable();
+						$meta_author = $table->load( $category->created_user_id ) ? $table->name : '';
+					}
 					$document->setMetaData('author', $meta_author);
 				}
 			} else {
@@ -309,46 +316,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($authordescr_item) {
 			$flexi_html_helper = new flexicontent_html();
 			$authordescr_item_html = $flexi_html_helper->renderItem($authordescr_itemid);
-			/*
-			//echo "<pre>"; print_r($authordescr_item);exit();
-			$ilayout = $authordescr_item->params->get('ilayout', '');
-			if ($ilayout==='') {
-				$type = & JTable::getInstance('flexicontent_types', '');
-				$type->id = $authordescr_item->type_id;
-				$type->load();
-				$type->params = new JParameter($type->attribs);
-				$ilayout = $type->params->get('ilayout', 'default');
-				//echo "<pre>"; print_r($type);exit();
-			}
-			
-			// start capturing output into a buffer
-			$this->item = & $authordescr_item; 
-			$this->params_saved = @ $this->params;
-			$this->params = & $authordescr_item->params;
-			$this->tmpl = '.item.'.$ilayout;
-			$this->print_link = JRoute::_('index.php?view=items&id='.$authordescr_item->slug.'&pop=1&tmpl=component');
-			$this->pageclass_sfx = '';
-			$this->item->event->beforeDisplayContent = '';
-			$this->item->event->afterDisplayTitle = '';
-			$this->item->event->afterDisplayContent = '';
-			$this->fields = & $this->item->fields;
-			
-			ob_start();
-			// include the requested template filename in the local scope
-			// (this will execute the view logic).
-			if ( file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout) )
-				include JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'item.php';
-			else if (file_exists(JPATH_COMPONENT.DS.'templates'.DS.$ilayout))
-				include JPATH_COMPONENT.DS.'templates'.DS.$ilayout.DS.'item.php';
-			else
-				include JPATH_COMPONENT.DS.'templates'.DS.'default'.DS.'item.php';
-			
-			// done with the requested template; get the buffer and
-			// clear it.
-			$authordescr_item_html = ob_get_contents();
-			ob_end_clean();
-			$this->params = $this->params_saved;
-			*/
 		}
 		//echo $authordescr_item_html; exit();
 		
@@ -466,7 +433,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		// Get some variables
-		$config	=& JFactory::getConfig();
+		$config	= JFactory::getConfig();
 		$joomla_image_path 	= FLEXI_J16GE ? $config->getValue('config.image_path', '') : $config->getValue('config.image_path', 'images'.DS.'stories');
 		
 		
@@ -697,7 +664,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->assignRef('pageNav' , 		$pageNav);
 		$this->assignRef('resultsCounter' ,	$resultsCounter);
 		$this->assignRef('filters' ,	 	$filters);
-		$this->assignRef('comments'	,		@$comments);
+		$this->assignRef('comments'	,		$comments);
 		$this->assignRef('lists' ,	 		$lists);
 		$this->assignRef('alpha' ,	 		$alpha);
 		$this->assignRef('tmpl' ,				$tmpl);
