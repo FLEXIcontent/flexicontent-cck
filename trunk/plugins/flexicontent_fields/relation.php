@@ -177,7 +177,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		// Item retrieving query ... CREATE ORDERBY CLAUSE
 		// ***********************************************
 		$order = $field->parameters->get( 'orderby_form', 'alpha' );
-		$orderby = $this->_buildItemOrderBy($order);
+		$orderby = flexicontent_db::buildItemOrderBy($field->parameters, $order, $request_var='', $config_param='', $item_tbl_alias = 'i', $relcat_tbl_alias = 'rel');
+		
 		
 		// *****************************************************
 		// Item retrieving query ... put together and execute it
@@ -455,72 +456,5 @@ window.addEvent( 'domready', function() {
 		}
 
 	}*/
-	
-	
-	
-	// **********************
-	// VARIOUS HELPER METHODS
-	// **********************
-	
-	//  Build the order clause
-	function _buildItemOrderBy($order)
-	{
-		$params = & $field->parameters;
-		$filter_order		= '';
-		$filter_order_dir	= '';
-		
-		if ($order) {
-			switch ($order) {
-				case 'date' :
-				$filter_order		= 'i.created';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'rdate' :
-				$filter_order		= 'i.created';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'modified' :
-				$filter_order		= 'i.modified';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'alpha' :
-				$filter_order		= 'i.title';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'ralpha' :
-				$filter_order		= 'i.title';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'author' :
-				$filter_order		= 'u.name';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'rauthor' :
-				$filter_order		= 'u.name';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'hits' :
-				$filter_order		= 'i.hits';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'rhits' :
-				$filter_order		= 'i.hits';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'order' :
-				$filter_order		= 'rel.ordering';
-				$filter_order_dir	= 'ASC';
-				break;
-			}
-			
-		}
-
-		if ($filter_order)
-			$orderby = ' ORDER BY '.$filter_order.' '.$filter_order_dir.', i.title';
-		else
-			$orderby = ' ORDER BY i.title';
-
-		return $orderby;
-	}
 	
 }
