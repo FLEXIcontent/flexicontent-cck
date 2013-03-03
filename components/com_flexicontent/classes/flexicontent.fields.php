@@ -2419,7 +2419,7 @@ class FlexicontentFields
 			$item_where = ' AND i.id IN ('. implode(",", array_keys($_itemids_catids)) .')';
 		}
 		
-		$orderby = $this->_buildItemOrderBy($order);
+		$orderby = flexicontent_db::buildItemOrderBy($params, $order, $request_var='', $config_param='', $item_tbl_alias = 'i', $relcat_tbl_alias = 'rel');
 		$query = 'SELECT i.*, ext.type_id,'
 			.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
 			.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
