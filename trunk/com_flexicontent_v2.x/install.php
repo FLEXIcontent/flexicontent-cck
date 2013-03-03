@@ -273,9 +273,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 						?>
 						<span style="<?php echo $style; ?>"><?php
 						if($success) {
-							echo JText::_("Task <b>SUCCESSFULL</b>");
+							echo JText::_("Task <b>SUCCESSFUL</b>");
 						} else {
-							echo JText::_("Setting phpThumb Cache folder permissions UNSUCCESSFULL.");
+							echo JText::_("Setting phpThumb Cache folder permissions UNSUCCESSFUL.");
 						}
 						?></span>
 					</td>

@@ -228,8 +228,8 @@
 			</field>
 			<field name="link_titles" type="list" default="" label="FLEXI_LINKED_TITLES_IN_LISTS" description="FLEXI_LINKED_TITLES_IN_LISTS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="force_full" type="list" default="" label="FLEXI_FORCE_FULLTXT" description="FLEXI_FORCE_FULLTXT_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -281,8 +281,8 @@
 			</field>
 			<field name="filtercat" type="list" default="" label="FLEXI_FILTER_ITEM_BY_LANG" description="FLEXI_FILTER_ITEM_BY_LANG_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 
 			<field name="" type="separator" default="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" level="level2" />
@@ -307,13 +307,13 @@
 			<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level2" />
 			<field name="limit_override" type="list" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="orderby_override" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" />
 			<field name="limit_options" type="text" default="" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" />
