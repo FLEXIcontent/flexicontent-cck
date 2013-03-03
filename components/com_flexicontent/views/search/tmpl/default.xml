@@ -173,12 +173,12 @@
 			<field name="" type="separator" default="Show Frontend Selectors" description="" level="level3" hr="false" menu="hide" />
 			
 			<field name="limit_override" type="radio" default="1" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" menu="hide" >
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="orderby_override" type="radio" default="1" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC" menu="hide" >
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" hr="false" menu="hide" />

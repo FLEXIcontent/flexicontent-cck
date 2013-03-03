@@ -120,25 +120,25 @@
 		<field name="" type="separator" default="FLEXI_MULTILINGUAL_CONF" label="" level="level1" menu="hide" />
 			
 			<!--field name="flexi_fish" type="radio" default="0" label="FLEXI_JOOMFISH_SUPPORT" description="FLEXI_JOOMFISH_SUPPORT_DESC"  menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field-->
 			<field name="filtercat" type="radio" default="1" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="filtertag" type="radio" default="1" label="FLEXI_FILTER_TAG_VIEWS" description="FLEXI_FILTER_TAG_VIEWS_DESC"  menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<!--field name="disable_lang_select" type="radio" default="0" label="FLEXI_DISABLE_LANG_SELECT" description="FLEXI_DISABLE_LANG_SELECT_DESC"  menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field-->
 			
 			<field name="enable_translation_groups" type="radio" default="1" label="FLEXI_ENABLE_TRANSLATION_GROUPS" description="FLEXI_ENABLE_TRANSLATION_GROUPS_DESC"  menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<!--field name="editjf_translations" type="radio" default="0" label="FLEXI_MENU_EDIT_JOOMFISH_TRANSLATIONS" description="FLEXI_MENU_EDIT_JOOMFISH_TRANSLATIONS_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
@@ -150,8 +150,8 @@
 		<field name="" type="separator" default="FLEXI_VERSIONING_CONF" label="" level="level1" menu="hide" />
 			
 			<field name="use_versioning" type="radio" default="1" label="FLEXI_ENABLE_VERSIONING" description="FLEXI_ENABLE_VERSIONING_DESC" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="nr_versions" type="radio" default="10" label="FLEXI_NR_OF_VERSIONS" description="FLEXI_NR_OF_VERSIONS_DESC" menu="hide">
 				<option value="5">FLEXI_5</option>
@@ -167,12 +167,12 @@
 				<option value="50">FLEXI_50</option>
 			</field>
 			<field name="auto_approve" type="radio" default="1" label="FLEXI_AUTO_APPROVE" description="FLEXI_AUTO_APPROVE_DESC" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="disable_diff" type="radio" default="0" label="FLEXI_DISABLE_HTML_DIFF" description="FLEXI_DISABLE_HTML_DIFF_DESC" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			
@@ -254,8 +254,8 @@
 				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="link_titles" type="radio" default="1" label="FLEXI_Linked_Titles" description="FLEXI_TIPIFYESTITLECONTENTITEMS" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="show_intro" type="radio" default="1" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT_DESC" menu="hide">
 				<option value="0">FLEXI_Hide</option>
@@ -410,8 +410,8 @@
 				<option value="1">FLEXI_Show</option>
 			</field>
 			<field name="link_titles_lists" type="radio" default="1" label="FLEXI_LINKED_TITLES_IN_LISTS" description="FLEXI_LINKED_TITLES_IN_LISTS_DESC" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="force_full" type="radio" default="0" label="FLEXI_FORCE_FULLTXT" description="FLEXI_FORCE_FULLTXT_DESC" menu="hide" >
 				<option value="0">FLEXI_NO</option>
@@ -439,8 +439,8 @@
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level2" menu="hide" />
 			<field name="show_noauth" type="radio" default="0" label="FLEXI_Show_UnAuthorized_Links" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="display_subcategories_items" type="radio" default="0" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC" menu="hide" > 
 				<option value="0">FLEXI_NO</option> 
@@ -467,12 +467,12 @@
 			
 		<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level2" hr="false" menu="hide" />
 			<field name="limit_override" type="radio" default="1" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" menu="hide" >
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="orderby_override" type="radio" default="1" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC" menu="hide" >
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" hr="false" menu="hide" />
 			<field name="limit_options" type="text" default="5,10,20,30,50,100,150,200" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" menu="hide" />
@@ -645,12 +645,12 @@
 			
 		<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR" label="" level="level2" menu="hide" />
 			<field name="copytask_allow_uneditable" type="list" default="1" label="FLEXI_COPYTASK_ALLOW_UNEDITABLE" description="FLEXI_COPYTASK_ALLOW_UNEDITABLE_DESC" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="items_session_editable" type="list" default="0" label="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF" description="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF_DESC" menu="hide">
-				<option value="0">FLEXI_No</option>
-				<option value="1">FLEXI_Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="autoflogin" type="list" default="1" label="FLEXI_AUTOLOGIN" description="FLEXI_AUTOLOGIN_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
