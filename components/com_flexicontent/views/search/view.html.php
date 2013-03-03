@@ -40,7 +40,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$app       = JFactory::getApplication();
 		$document  = JFactory::getDocument();
 		$uri       = JFactory::getURI();
-		$menu      = JSite::getMenu()->getActive();
+		$menu      = $app->getMenu()->getActive();
 		$pathway   = $app->getPathway();
 		
 		$error	= '';
@@ -48,8 +48,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$total	= 0;
 		
 		// Get some data from model / and from state
-		$areas	= & $this->get('areas');
-		$state	= & $this->get('state');
+		$areas	=  $this->get('areas');
+		$state	=  $this->get('state');
 		$searchword = $state->get('keyword');
 		
 		
@@ -144,7 +144,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if (!FLEXI_J16GE) {
 			if ($app->getCfg('MetaTitle') == '1') 	$app->addMetaTag('title', $params->get('page_title'));
 		} else {
-			if (JApplication::getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
+			if ($app->getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
 		}		
 		
 		
@@ -225,7 +225,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$checked_class = !count($form_contenttypes) ? 'highlight' : '';
 			
 			// Get all configured content Types *(or ALL if these were not set)
-			$db =& JFactory::getDBO();
+			$db =  JFactory::getDBO();
 			$query = "SELECT id AS value, name AS text"
 			. " FROM #__flexicontent_types"
 			. " WHERE published = 1"
@@ -402,9 +402,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 
 		if(!$error)
 		{
-			$results	= &$this->get('data' );
-			$total		= &$this->get('total');
-			$pagination	= &$this->get('pagination');
+			$results	= $this->get('data' );
+			$total		= $this->get('total');
+			$pagination	= $this->get('pagination');
 
 			//require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');

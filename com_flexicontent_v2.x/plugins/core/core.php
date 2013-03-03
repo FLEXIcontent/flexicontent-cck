@@ -309,15 +309,11 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	{
 		if($filter->iscore != 1) return; // performance check
 		
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$formfieldname = 'filter_'.$filter->id;
 		
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
-		
-		$show_matching_items = $filter->parameters->get('show_matching_items', 1);
-		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
-		$count_column = $show_matches ? ', COUNT(*) as found ' : '';
 		
 		// Create first prompt option of drop-down select
 		$label_filter = $filter->parameters->get( 'display_label_filter', 2 ) ;
@@ -335,7 +331,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			case 'createdby':     // Authors
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
 				// partial SQL clauses
-				$filter->filter_valuesselect = ' i.created_by AS value, u.name AS text'. $count_column;
+				$filter->filter_valuesselect = ' i.created_by AS value, u.name AS text';
 				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
 				$filter->filter_valueswhere  = ' AND i.created_by <> 0';
 				// full SQL clauses
@@ -349,7 +345,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			case 'modifiedby':   // Modifiers
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
 				// partial SQL clauses
-				$filter->filter_valuesselect = ' i.modified_by AS value, u.name AS text'. $count_column;
+				$filter->filter_valuesselect = ' i.modified_by AS value, u.name AS text';
 				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
 				$filter->filter_usersjoinon  = ' u.id = i.modified_by';
 				$filter->filter_valueswhere  = ' AND i.modified_by <> 0';
@@ -364,7 +360,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			case 'type':  // Document Type
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
 				// partial SQL clauses
-				$filter->filter_valuesselect = ' ty.id AS value, ty.name AS text'. $count_column;
+				$filter->filter_valuesselect = ' ty.id AS value, ty.name AS text';
 				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
 				$filter->filter_valueswhere  = ' ';  // ... a space, (indicates not needed and prevents using default)
 				// full SQL clauses
@@ -410,7 +406,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			case 'tags':
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (mysql) and in order by
 				// partial SQL clauses
-				$filter->filter_valuesselect = ' tags.id AS value, tags.name AS text'. $count_column;
+				$filter->filter_valuesselect = ' tags.id AS value, tags.name AS text';
 				$filter->filter_valuesjoin   =
 					 ' JOIN #__flexicontent_tags_item_relations AS tagsrel ON tagsrel.itemid = i.id '
 					.' JOIN #__flexicontent_tags AS tags ON tags.id =  tagsrel.tid ';
@@ -435,7 +431,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
 				// partial SQL clauses
-				$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text'. $count_column;
+				$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
 				$filter->filter_valuesjoin   = ' ';  // ... a space, (indicates not needed and prevents using default)
 				$filter->filter_valueswhere  = ' AND i.'.$filter->field_type.' IS NOT NULL';
 				// full SQL clauses
@@ -547,7 +543,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		static $nullDate = null;
 		
 		if ($post!==null && isset($post[0])) {
-			$db = &JFactory::getDBO();
+			$db = JFactory::getDBO();
 			$values = array();
 			if ($field->field_type=='type') {
 				$textcol = 't.name';

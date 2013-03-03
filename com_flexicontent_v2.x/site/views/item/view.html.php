@@ -75,6 +75,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$cparams = clone($mainframe->getParams('com_flexicontent'));
 		
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		
 		if ($menu) {
 			$menuParams = new JParameter($menu->params);
 			// In J1.6+ the above function does not merge current menu item parameters,
@@ -409,11 +412,8 @@ class FlexicontentViewItem  extends JViewLegacy
 			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout);
 		}
 
-		$print_logging_info = $params->get('print_logging_info');
-		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
-		
+		if ( $print_logging_info ) $start_microtime = microtime(true);
 		parent::display($tpl);
-		
 		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 	
@@ -452,7 +452,11 @@ class FlexicontentViewItem  extends JViewLegacy
 				$menuParams = new JParameter($menu->params);
 			}
 		}
-
+		
+		// Whether to Log Stats
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($mainframe->getParams('com_flexicontent'));
 		
@@ -469,12 +473,13 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// Get item and model
 		$model = & $this->getModel();
+		
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$item = & $this->get('Item');
 		if (FLEXI_J16GE) {
-			//$model->setId(0); // Clear $model->_item, to force recalculation of the item data
-			//$item = & $model->getItem($model->getId(), false);
 			$form = & $this->get('Form');
 		}
+		if ( $print_logging_info ) @$fc_run_times['get_item_data'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Load Template-Specific language file to override or add new language strings
 		if (FLEXI_FISH || FLEXI_J16GE)
@@ -576,7 +581,11 @@ class FlexicontentViewItem  extends JViewLegacy
 		// (a) Apply Content Type Customization to CORE fields (label, description, etc) 
 		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField' 
 		// *****************************************************************************
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$fields = & $this->get( 'Extrafields' );
+		if ( $print_logging_info ) @$fc_run_times['get_field_vals'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 		foreach ($fields as $field)
 		{
 			// a. Apply CONTENT TYPE customizations to CORE FIELDS, e.g a type specific label & description
@@ -627,6 +636,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
 			}
 		}
+		if ( $print_logging_info ) @$fc_run_times['render_field_html'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Tags used by the item
 		$usedtagsids  = & $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
@@ -830,10 +840,14 @@ class FlexicontentViewItem  extends JViewLegacy
 			}
 		}		
 		
-		
 		$this->assignRef('tmpls',		$tmpls);
 		
+		$print_logging_info = $params->get('print_logging_info');
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+		
 		parent::display($tpl);
+		
+		if ( $print_logging_info ) @$fc_run_times['form_rendering'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 	
 	/**

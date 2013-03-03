@@ -35,7 +35,7 @@ function FLEXIcontentBuildRoute(&$query)
 		//$menu = &$menus->getActive();
 		//$query['Itemid'] = @$menu->id;
 	} else {
-		$menu = &$menus->getItem($query['Itemid']);
+		$menu = $menus->getItem($query['Itemid']);
 	}
 	
 	$mview = (empty($menu->query['view'])) ? null : $menu->query['view'];

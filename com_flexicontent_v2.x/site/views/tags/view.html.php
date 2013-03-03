@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1308 2012-05-15 10:37:44Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1641 2013-03-01 05:03:40Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -36,13 +36,13 @@ class FlexicontentViewTags extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		$mainframe =& JFactory::getApplication();
+		$mainframe =  JFactory::getApplication();
 
 		//initialize variables
-		$document = & JFactory::getDocument();
-		$menus    = & JSite::getMenu();
+		$document =  JFactory::getDocument();
+		$menus    =  JSite::getMenu();
 		$menu     = $menus->getActive();
-		$uri      = & JFactory::getURI();
+		$uri      =  JFactory::getURI();
 		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($mainframe->getParams('com_flexicontent'));
@@ -66,8 +66,8 @@ class FlexicontentViewTags extends JViewLegacy
 		}
 		
 		// Get data from the model		
-		$items  = & $this->get('Data');
-		$tag    = & $this->get('Tag');
+		$items  =  $this->get('Data');
+		$tag    =  $this->get('Tag');
 		$total  = $this->get('Total');
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
@@ -82,7 +82,7 @@ class FlexicontentViewTags extends JViewLegacy
 		}
 		
 		// Set tag parameters as VIEW's parameters (tag parameters are merged with component/page(=menu item) and optionally with tag cloud parameters)
-		$params = & $tag->parameters;
+		$params =  $tag->parameters;
 		
 		
 		// **********************

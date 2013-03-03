@@ -451,7 +451,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$image_name = trim($value['originalname']);
 			
 			// Check and rebuild thumbnails if needed
-			$rebuild_res = $this->rebuildThumbs($field,$value);
+			$rebuild_res = plgFlexicontent_fieldsImage::rebuildThumbs($field,$value);
 			
 			// Check if rebuilding thumbnails failed (e.g. file has been deleted)  
 			if ( !$rebuild_res ) {
@@ -663,7 +663,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$checked_arr = array();
 		if ($values) foreach ($values as $index => $value) {
 			$value	= unserialize($value);
-			if ( $this->rebuildThumbs($field,$value) )  $checked_arr[] = $values[$index];
+			if ( plgFlexicontent_fieldsImage::rebuildThumbs($field,$value) )  $checked_arr[] = $values[$index];
 		}
 		$values = & $checked_arr;
 		
@@ -685,7 +685,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$value = serialize($default_image_val);
 				
 				// Create thumbnails for default image a
-				if ( $this->rebuildThumbs($field, $default_image_val) ) $values = array($value);
+				if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $default_image_val) ) $values = array($value);
 				// Also default image can (possibly) be used across multiple fields, so set flag to add field id to filenames of thumbnails
 				$multiple_image_usages = true;
 				$field->using_default_value = true;

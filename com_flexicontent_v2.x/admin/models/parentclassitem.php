@@ -292,7 +292,7 @@ class ParentClassItem extends JModelAdmin
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$allow_current_version = true;
 		$editjf_translations = $cparams->get('editjf_translations', 0);
-				
+		
 		// *********************************************************************************************************
 		// Retrieve item if not already retrieved, null indicates cleared item data, e.g. because of changed item id
 		// *********************************************************************************************************
@@ -2818,6 +2818,7 @@ class ParentClassItem extends JModelAdmin
 		} else {
 			$item = $this->getItem();  // This fuction calls the load item function for existing item and init item function in the case of new item
 		}
+		
 		switch ($field->field_type) {
 			case 'created': // created
 			$field_value = array($item->created);
@@ -2892,37 +2893,33 @@ class ParentClassItem extends JModelAdmin
 	 * @since 1.5
 	 * @todo move in a specific class and add the parameter $itemid
 	 */
-	function getExtrafieldvalue($field_id, $version, $item_id=0)
+	function getCustomFieldsValues($item_id=0, $version=0)
 	{
-		$item_id = (int)$item_id;
-		if(!$item_id)
-			$item_id = $this->_id;
-		if(!$item_id)
-			return array();
+		if (!$item_id)  $item_id = $this->_id;
+		if (!$item_id)  return array();
+		
+		static $field_values;
+		if ( isset($field_values[$item_id][$version] ) )
+			return $field_values[$item_id][$version];
 		
 		$cparams =& $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
-		$query = 'SELECT value'
+		
+		$query = 'SELECT field_id, value'
 			.( ($version<=0 || !$use_versioning) ? ' FROM #__flexicontent_fields_item_relations AS fv' : ' FROM #__flexicontent_items_versions AS fv' )
 			.' WHERE fv.item_id = ' . (int)$item_id
-			.' AND fv.field_id = ' . (int)$field_id
 			.( ($version>0 && $use_versioning) ? ' AND fv.version='.((int)$version) : '')
-			.' ORDER BY valueorder'
+			.' ORDER BY field_id, valueorder'
 			;
 		$this->_db->setQuery($query);
-		$field_value = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$rows = $this->_db->loadObjectList();
 		
-		// It is problematic to unserialize here
-		// !!! The FLEXIcontent field plugin itself will always know better how to handle the values !!!
-		/*foreach($field_value as $k=>$value) {
-			if($unserialized_value = @unserialize($value)) {
-				return $unserialized_value;
-			} else {
-				break;
-			}
-		}*/
-		
-		return $field_value;
+		// Add values to cached array
+		$field_values[$item_id][$version] = array();
+		foreach ($rows as $row) {
+			$field_values[$item_id][$version][$row->field_id][] = $row->value;
+		}
+		return $field_values[$item_id][$version];
 	}
 	
 	
@@ -2958,19 +2955,22 @@ class ParentClassItem extends JModelAdmin
 			$fields = $this->_db->loadObjectList('name');
 			if ( $this->_db->getErrorNum() )  JFactory::getApplication()->enqueueMessage(nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
 			
+			$custom_vals[$this->_id] = $this->getCustomFieldsValues($this->_id, $version);
+			if ( $lang_parent_id && !$version) {  // Language parent item is used only when loading non-versioned item
+				$custom_vals[$lang_parent_id] = $this->getCustomFieldsValues($lang_parent_id, 0);
+			}
 			foreach ($fields as $field)
 			{
 				$field->item_id		= (int)$this->_id;
 				// $version should be ZERO when versioning disabled, or when wanting to load the current version !!!
 				if ( (!$version || !$use_versioning) && $field->iscore) {
-					// load CURRENT (non-versioned) core field from item data
+					// Load CURRENT (non-versioned) core field from properties of item object
 					$field->value = $this->getCoreFieldValue($field, $version);
 				} else {
 					// Load non core field (versioned or non-versioned) OR core field (versioned only)
-					
-					// whether to use untranslatable value from original content item
-					$item_id = ($lang_parent_id && @$field->untranslatable) ? $lang_parent_id : $this->_id;
-					$field->value = $this->getExtrafieldvalue($field->id, $version, $item_id );
+					// while checking if current field is using untranslatable value from original content item
+					$item_id = ($lang_parent_id && @$field->untranslatable && !$version) ? $lang_parent_id : $this->_id;
+					$field->value = isset( $custom_vals[$item_id][$field->id] ) ? $custom_vals[$item_id][$field->id] : array();
 					if( ( $field->name=='categories') || $field->name=='tags' ) {
 						// categories and tags must have been serialized but some early versions did not do it, we will check before unserializing them
 						$field->value = ($array = @unserialize($field->value[0]) ) ? $array : $field->value;
@@ -3045,6 +3045,7 @@ class ParentClassItem extends JModelAdmin
 			else $jm_state = $fc_state;                                      // trashed & archive states
 			$fc_itemview = $app->isSite() ? FLEXI_ITEMVIEW : 'item';
 			
+			$item = new stdClass();
 		  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');		$item->state = $jm_state;
 			$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
 			JRequest::setVar('view', $fc_itemview);	  JRequest::setVar('option', 'com_flexicontent');		$item->state = $fc_state;

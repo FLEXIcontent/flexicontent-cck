@@ -551,13 +551,9 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
 		
-		$show_matching_items = $filter->parameters->get('show_matching_items', 1);
-		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
-		$count_column = $show_matches ? ', COUNT(*) as found ' : '';
-		
 		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
 		// partial SQL clauses
-		$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text'. $count_column;
+		$filter->filter_valuesselect = ' '.$valuecol.' AS value, '.$textcol.' AS text';
 		$filter->filter_valuesjoin   = null;  // use default
 		$filter->filter_valueswhere  = null;  // use default
 		// full SQL clauses

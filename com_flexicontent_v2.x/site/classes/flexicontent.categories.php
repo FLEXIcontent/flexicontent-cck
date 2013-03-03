@@ -65,7 +65,7 @@ class flexicontent_cats
 	 */
 	function getParentCats()
 	{
-		$db			=& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		global $globalnoroute;
 		$globalnoroute = !is_array($globalnoroute) ? array() : $globalnoroute;
 		
@@ -93,8 +93,8 @@ class flexicontent_cats
 	 */
 	function buildParentCats($cid)
 	{
-		$db 		=& JFactory::getDBO();
-
+		$db = JFactory::getDBO();
+		
 		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid
 			. (!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ' );
 		
@@ -132,7 +132,7 @@ class flexicontent_cats
     */
 	function getCategoriesTree( $published_only=null )
 	{
-		$db			=& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		if ($published_only) {
 			$where[] = 'published = 1';
@@ -255,7 +255,7 @@ class flexicontent_cats
 	)
 	{
 		global $globalcats;
-		$user =& JFactory::getUser();
+		$user = JFactory::getUser();
 		$cid = JRequest::getVar('cid',  0);
 		if (is_array($cid)) $cid = $cid[0];
 		

@@ -63,7 +63,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	{
 		parent::__construct();
 
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 
 		//Get configuration
 		$config = JFactory::getConfig();
@@ -133,7 +133,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$areas = $this->getAreas();
 
 			JPluginHelper::importPlugin( 'search');
-			$dispatcher =& JDispatcher::getInstance();
+			$dispatcher = JDispatcher::getInstance();
 			$results = $dispatcher->trigger( 'onSearch', array(
 				$this->getState('keyword'),
 				$this->getState('match'),
@@ -193,7 +193,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 */
 	function getAreas()
 	{
-		$mainframe =& JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 
 		// Load the Category data
 		if (empty($this->_areas['search']))
@@ -201,7 +201,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$areas = array();
 
 			JPluginHelper::importPlugin( 'search');
-			$dispatcher =& JDispatcher::getInstance();
+			$dispatcher = JDispatcher::getInstance();
 			$searchareas = $dispatcher->trigger( 'onSearchAreas' );
 
 			foreach ($searchareas as $area) {

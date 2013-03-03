@@ -526,7 +526,7 @@ class FlexicontentController extends JControllerLegacy
 	/**
 	 * Display the view
 	 */
-	function display()
+	function display($cachable = false, $urlparams = false)
 	{
 		// Debuging message
 		//JError::raiseNotice(500, 'IN display()'); // TOREMOVE
@@ -1157,7 +1157,7 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function setitemstate()
 	{
-		flexicontent_html::setitemstate();
+		flexicontent_html::setitemstate($this);
 	}
 	
 	

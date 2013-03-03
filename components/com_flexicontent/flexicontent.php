@@ -27,23 +27,25 @@ if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
 global $is_fc_component;
 $is_fc_component = 1;
 
-// Logging Info variables
-global $fc_run_times;
-$fc_run_times['content_plg'] = 0; $fc_run_times['filter_creation'] = 0; $fc_run_times['field_value_retrieval'] = 0;
-$fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
+// Get component parameters and add tooltips css and js code
+$cparams = JComponentHelper::getParams('com_flexicontent');
+if ($cparams->get('add_tooltips', 1)) JHTML::_('behavior.tooltip');
 
-global $fc_jprof;
-jimport( 'joomla.error.profiler' );
-$fc_jprof = new JProfiler();
-$fc_jprof->mark('START: FLEXIcontent component');
+if ( $cparams->get('print_logging_info') ) {
+	// Logging Info variables
+	global $fc_run_times;
+	$fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
+	
+	global $fc_jprof;
+	jimport( 'joomla.error.profiler' );
+	$fc_jprof = new JProfiler();
+	$fc_jprof->mark('START: FLEXIcontent component');
+}
 
 // load english language file for 'com_flexicontent' component then override with current language file
 JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
 JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
-// Get component parameters and add tooltips css and js code
-$cparams =& JComponentHelper::getParams('com_flexicontent');
-if ($cparams->get('add_tooltips', 1)) JHTML::_('behavior.tooltip');
 
 //include constants file
 require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
@@ -107,8 +109,7 @@ $controller->redirect();
 // TO BE MOVED TO HELPER FILE ...
 // Remove (thus prevent) the default menu item from showing in the pathway
 if ( $cparams->get('default_menuitem_nopathway',1) ) {
-	$mainframe = & JFactory::getApplication();
-	$pathway 	= & $mainframe->getPathWay();
+	$pathway =  JFactory::getApplication()->getPathWay();
 	$default_menu_itemid = $cparams->get('default_menu_itemid', 0);
 	$pathway_arr = $pathway->getPathway();
 	if ( count($pathway_arr) && preg_match("/Itemid=([0-9]+)/",$pathway_arr[0]->link, $matches) ) {
@@ -125,8 +126,8 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	$fields_render_total=0;
 	$fields_render_times = FlexicontentFields::getFieldRenderTimes($fields_render_total);
 	
-	$app = & JFactory::getApplication();
-	$msg  = implode('<br/>', $fc_jprof->getbuffer());
+	$app = JFactory::getApplication();
+	$msg = implode('<br/>', $fc_jprof->getbuffer());
 	
 	$msg .= '<code>';
 	
@@ -151,10 +152,24 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	if (isset($fc_run_times['content_plg']))
 		$msg .= sprintf('<br/>-- [Joomla Content Plugins: %.2f s] ', $fc_run_times['content_plg']/1000000);
 	
+	if (isset($fc_run_times['get_item_data']))
+		$msg .= sprintf('<br/>-- [Get/Caculate Item Properties: %.2f s] ', $fc_run_times['get_item_data']/1000000);
+		
+	if (isset($fc_run_times['get_field_vals']))
+		$msg .= sprintf('<br/>-- [Retrieve Field Values: %.2f s] ', $fc_run_times['get_field_vals']/1000000);
+		
+	if (isset($fc_run_times['render_field_html']))
+		$msg .= sprintf('<br/>-- [Field HTML Rendering: %.2f s] ', $fc_run_times['render_field_html']/1000000);
+	
+	if (isset($fc_run_times['form_rendering']))
+		$msg .= sprintf('<br/>-- [Form Template Rendering: %.2f s] ', $fc_run_times['form_rendering']/1000000);
+	
+	
 	if (count($fields_render_times)) {
 		$msg .= sprintf('<br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
 		$msg .= '<br/>FIELD: '.implode('<br/> FIELD: ', $fields_render_times).'';
 	}
+	
 	$msg .= '</code>';
 	
 	$app->enqueueMessage( $msg, 'notice' );

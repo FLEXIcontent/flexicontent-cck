@@ -23,17 +23,17 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'
 
 class modFlexiTagCloudHelper
 {
-	function getTags(&$params, &$module)
+	static function getTags(&$params, &$module)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 
 		// Initialize
-		$db				=& JFactory::getDBO();
-		$user			=& JFactory::getUser();
+		$db				= JFactory::getDBO();
+		$user			= JFactory::getUser();
 		$nullDate		= $db->getNullDate();
-		$date 			= & JFactory::getDate();
+		$date 			= JFactory::getDate();
 		$now  			= $date->toMySQL();
-		$fparams 		=& $mainframe->getParams('com_flexicontent');
+		$fparams 		= $mainframe->getParams('com_flexicontent');
 		$show_noauth 	= $fparams->get('show_noauth', 0);
 
 		// Get parameters
@@ -121,6 +121,7 @@ class modFlexiTagCloudHelper
 		$lists	= array();
 		foreach ( $rows as $row )
 		{
+			$lists[$i] = new stdClass();
 			$lists[$i]->size 			= modFlexiTagCloudHelper::sizer($min, $max, $row->no, $minsize, $maxsize);
 			$lists[$i]->name 			= $row->name;
 			$lists[$i]->screenreader	= JText::sprintf('FLEXI_NR_ITEMS_TAGGED', $row->no);
@@ -141,7 +142,7 @@ class modFlexiTagCloudHelper
 	/**
 	 * sort the tags between a range from 1 to 10 according their use
 	 */
-	function sizer($min, $max, $no, $minsize, $maxsize)
+	static function sizer($min, $max, $no, $minsize, $maxsize)
 	{		
 		$spread = $max - $min;
 		if (0 == $spread) {

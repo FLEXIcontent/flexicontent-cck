@@ -510,7 +510,7 @@ class plgSystemFlexisystem extends JPlugin
 	
 	public function onAfterRender()
 	{
-		$session 	= & JFactory::getSession();
+		$session 	= JFactory::getSession();
 		
 		// If this is reached we now that the code for setting screen cookie has been added
 		if ( $session->get('screenSizeCookieToBeAdded', 0, 'flexicontent') ) {
