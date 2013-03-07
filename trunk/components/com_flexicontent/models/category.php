@@ -128,7 +128,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @since	1.5
 	 */
 	protected function populateCategoryState($ordering = null, $direction = null) {
-		$this->_layout = JRequest::getVar('layout', '');  // !! This should be empty for empty for 'category' layout
+		$this->_layout = JRequest::getCmd('layout', '');  // !! This should be empty for empty for 'category' layout
 		
 		if ($this->_layout=='author') {
 			$this->_authorid = JRequest::getInt('authorid', 0);
@@ -140,7 +140,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 			$this->_authorid = $user->id;
 		} else if ($this->_layout=='mcats') {
-			$this->_ids = JRequest::getVar('cids',  '', '', 'string');
+			$this->_ids = preg_replace( '/[^0-9,]/i', '', (string) JRequest::getVar('cids', '') );
 			$this->_ids = explode(',', $this->_ids);
 			// make sure given data are integers ... !!
 			foreach ($this->_ids as $i => $_id) $this->_ids[$i] = (int)$_id;
@@ -156,8 +156,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$params = $this->_params;
 
 		// Set the pagination variables into state (We get them from http request OR use default category parameters)
-		$limit = JRequest::getVar('limit') ? JRequest::getVar('limit') : $params->get('limit');
-		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
+		$limit = JRequest::getInt('limit') ? JRequest::getInt('limit') : $params->get('limit');
+		$limitstart	= JRequest::getInt('limitstart', 0, '', 'int');
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
 
@@ -197,7 +197,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function getData()
 	{
-		$format	= JRequest::getVar('format', null);
+		$format	= JRequest::getCmd('format', null);
 		
 		// Allow limit zero to achieve a category view without items
 		if ($this->getState('limit') <= 0)
@@ -305,7 +305,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Add image field used as item image in RSS feed
 		$feed_image_source = 0;
-		if (JRequest::getVar("type", "") == "rss") {
+		if (JRequest::getCmd("type", "") == "rss") {
 			$feed_image_source = (int) $params->get('feed_image_source', '');
 		}
 		$feed_img_join= '';

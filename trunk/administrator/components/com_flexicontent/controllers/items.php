@@ -1432,7 +1432,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		$extdata 	= JRequest::getInt('extdata', '');		
 		$model 		= $this->getModel('items');
-		$rows 		= $model->getUnassociatedItems($extdata);
+		$rows 		= $model->getUnassociatedItems($extdata, $_ids_only=false);
 		
 		echo ($model->addFlexiData($rows));
 	}
@@ -2201,7 +2201,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function setitemstate()
 	{
-		flexicontent_html::setitemstate();
+		flexicontent_html::setitemstate($this);
 	}
 	
 }

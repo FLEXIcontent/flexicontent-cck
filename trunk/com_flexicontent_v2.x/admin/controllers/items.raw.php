@@ -233,7 +233,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function setitemstate()
 	{
-		flexicontent_html::setitemstate();
+		flexicontent_html::setitemstate($this);
 	}
 	
 }

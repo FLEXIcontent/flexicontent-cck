@@ -3418,6 +3418,50 @@ class FLEXIUtilities
 class flexicontent_db
 {
 	/**
+	 * Helper method to execute a query directly, bypassing Joomla DB Layer
+	 * 
+	 * @return object
+	 * @since 1.5
+	 */
+	static function & directQuery($query)
+	{
+		$db = JFactory::getDBO();
+		$config =& JFactory::getConfig();
+		$dbprefix = $config->getValue('config.dbprefix');
+		$dbtype = $config->getValue('config.dbtype');
+		
+		if (FLEXI_J16GE) {
+			$query = $db->replacePrefix($query);
+			$db_connection = & $db->getConnection();
+		} else {
+			$query = str_replace("#__", $dbprefix, $query);
+			$db_connection = & $db->_resource;
+		}
+		//echo "<pre>"; print_r($query); echo "\n\n";
+		
+		if ($dbtype == 'mysqli') {
+			$result = mysqli_query( $db_connection , $query );
+			if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysqli_error($db_connection));
+			while($row = mysqli_fetch_object($result)) {
+				$data[] = $row;
+			}
+			mysqli_free_result($result);
+		} else if ($dbtype == 'mysql') {
+			$result = mysql_query( $query, $db_connection  );
+			if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysql_error($db_connection));
+			while($row = mysql_fetch_object($result)) {
+				$data[] = $row;
+			}
+			mysql_free_result($result);
+		} else {
+			throw new Exception( 'unreachable code in '.__FUNCTION__.'(): direct db query, unsupported DB TYPE' );
+		}
+		
+		return $data;
+	}
+	
+	
+	/**
 	 * Build the order clause
 	 * precedence: $request_var ==> $order ==> $config_param ==> $default_order (& $default_order_dir)
 	 * @access private

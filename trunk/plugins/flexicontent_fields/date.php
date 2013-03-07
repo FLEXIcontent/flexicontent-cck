@@ -238,8 +238,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$skipped_vals = array();
 		foreach ($field->value as $value)
 		{
-			if (empty($value)) continue;
-			
 			$calendar = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname, $elementid.'_'.$n, $attribs_arr=array('class'=>$required), $skip_on_invalid=true);
 			if (!$calendar)  { $skipped_vals[] = $value; continue; }
 			

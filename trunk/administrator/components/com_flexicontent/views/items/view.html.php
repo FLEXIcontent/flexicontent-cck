@@ -257,14 +257,15 @@ class FlexicontentViewItems extends JViewLegacy {
 		// Get data from the model
 		// ***********************
 		
-		$rows     	= & $this->get( 'Data');
-		$pageNav 		= & $this->get( 'Pagination' );
-		$types			= & $this->get( 'Typeslist' );
-		$authors		= & $this->get( 'Authorslist' );
-		$unassociated	= & $this->get( 'UnassociatedItems' );
-		$status				= & $this->get( 'ExtdataStatus' );
-		$extra_fields	= & $this->get( 'ItemList_ExtraFields' );
-		$this->get( 'ItemList_ExtraFieldValues' );
+		$model = $this->getModel();
+		$unassociated	= $model->getUnassociatedItems(1000000, $_ids_only=true);
+		
+		$rows     	= $this->get( 'Data');
+		$pageNav 		= $this->get( 'Pagination' );
+		$types			= $this->get( 'Typeslist' );
+		$authors		= $this->get( 'Authorslist' );
+		$extraCols  = $this->get( 'ExtraCols' );
+		
 		
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$langs	= & FLEXIUtilities::getLanguages('code');
@@ -411,7 +412,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$this->assignRef('db'				, $db);
 		$this->assignRef('lists'		, $lists);
 		$this->assignRef('rows'			, $rows);
-		$this->assignRef('extra_fields' , $extra_fields);
+		$this->assignRef('extra_fields' , $extraCols);
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$this->assignRef('langs'    , $langs);
 		}

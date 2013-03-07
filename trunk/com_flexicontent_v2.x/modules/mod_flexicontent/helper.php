@@ -1156,7 +1156,7 @@ class modFlexicontentHelper
 		$join_rated_type = $ordering=='rated' ? ' INNER JOIN' : ' LEFT JOIN';
 		// Additional select and joins for ratings
 		$select_rated = $ordering=='rated' ? ' (cr.rating_sum / cr.rating_count) * 20 AS votes,' : '';
-		$select_rated = $add_rated ? ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,' : '';
+		$select_rated .= $add_rated ? ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,' : '';
 		$join_rated   = $add_rated ? $join_rated_type.' #__content_rating AS cr ON cr.content_id = i.id' : '' ;
 		
 		// Get ordering
