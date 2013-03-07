@@ -168,27 +168,30 @@ $r = 0;
 					</tr>
 				<?php endif; */ ?>
 				
-				<?php foreach($this->filters as $field) { ?>
+				<?php foreach($this->filters as $filt) { ?>
+					<?php if (empty($filt->html)) continue; ?>
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 						<td class='fc_search_label_cell' valign='top'>
-						<?php if ($field->description) : ?>
-							<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
-								<?php echo $field->label; ?>:
+						<?php if ($filt->description) : ?>
+							<label for="<?php echo $filt->name; ?>" class="hasTip" title="<?php echo $filt->label; ?>::<?php echo $filt->description; ?>">
+								<?php echo $filt->label; ?>:
 							</label>
 						<?php else : ?>
-							<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'); ?>::<?php echo JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $field->label ); ?>">
-								<?php echo $field->label; ?>:
+							<label for="<?php echo $filt->name; ?>" class="hasTip" title="<?php echo JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'); ?>::<?php echo JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $filt->label ); ?>">
+								<?php echo $filt->label; ?>:
 							</label>
 						<?php endif; ?>
 						</td>
 						<td colspan="3" class="fc_search_option_cell">
 							<?php
-							$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-							if(isset($field->html)) {
-								echo $field->html;
-							} else {
-								echo $noplugin;
+							// Form field that have form auto submit, need to be have their onChange Event prepended with the FORM PREPARATION function call
+							if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
+								if ( preg_match('/\.submit\(\)/', $filt->html, $matches) ) {
+									// Autosubmit detected inside onChange event, prepend the event with form preparation function call
+									$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\')); ', $filt->html);
+								}
 							}
+							echo $filt->html;
 							?>
 						</td>
 					</tr>
@@ -268,6 +271,10 @@ $r = 0;
 				<span class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></span>
 			</span>
 		<?php endif; ?>
+		
+		<span class="fc_pages_counter">
+			<small><?php echo $this->pageNav->getPagesCounter(); ?></small>
+		</span>
 	
 	</div>
 	<!-- BOF items total-->

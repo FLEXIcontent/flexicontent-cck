@@ -499,7 +499,7 @@ class plgSystemFlexisystem extends JPlugin
 			$response->username = $username;
 			$response->password = $password;
 			$response->language = '';
-			$options = array('action'=>'');
+			$options = FLEXI_J16GE ? array('action'=>'core.login.site') : $options = array('action'=>'');
 			$loginEvent = FLEXI_J16GE ? 'onUserLogin' : 'onLoginUser';
 			$result = $mainframe->triggerEvent($loginEvent, array((array)$response,$options));
 		}

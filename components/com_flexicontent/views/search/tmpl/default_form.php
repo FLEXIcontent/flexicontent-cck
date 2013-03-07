@@ -268,6 +268,10 @@ $r = 0;
 				<span class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></span>
 			</span>
 		<?php endif; ?>
+		
+		<span class="fc_pages_counter">
+			<small><?php echo $this->pageNav->getPagesCounter(); ?></small>
+		</span>
 	
 	</div>
 	<!-- BOF items total-->

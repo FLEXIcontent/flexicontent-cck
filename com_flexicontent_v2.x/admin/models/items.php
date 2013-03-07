@@ -57,7 +57,14 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @var int
 	 */
 	var $_id = null;
-
+	
+	/**
+	 * Extra field columns to display in tems listing
+	 *
+	 * @var integer
+	 */
+	var $_extra_cols = null;
+	
 	/**
 	 * Constructor
 	 *
@@ -109,7 +116,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// Set id and wipe data
 		$this->_id	 = $id;
 		$this->_data = null;
-		$this->_extra_fields = null;
+		$this->_extra_cols = null;
 	}
 
 	/**
@@ -154,8 +161,45 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 			$k = 1 - $k;
 		}
+		
+		$this->getExtraColValues();
+		//$this->getLangAssocsItems();
+		
 		return $this->_data;
 	}			
+	
+	
+	function getLangAssocsItems()
+	{
+		$this->_translations = array();
+		
+		// Make sure we item list is populased and non-empty
+		if ( empty($this->_data) )  return $this->_translations;
+		
+		// Get associated translations
+		$lang_parent_ids = array();
+		foreach ($this->_data as $_item_data) {
+			if ($_item_data->lang_parent_id) $lang_parent_ids[] = $_item_data->lang_parent_id;
+		}
+		if ( empty($lang_parent_ids) )  return $this->_translations;
+		
+		$query = 'SELECT i.id, i.title, ie.lang_parent_id, ie.language '
+			//. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug '
+			//. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug '
+		  . ' FROM #__content AS i '
+		  . ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id '
+		  . ' WHERE ie.lang_parent_id IN ('.implode(',', $lang_parent_ids).')'
+		  ;
+		$this->_db->setQuery($query);
+		$translations = $this->_db->loadObjectList();
+		
+		if( $this->_db->getErrorNum() ) { $app->enqueueMessage( $this->_db->getErrorMsg(), 'warning'); }
+		if ( empty($translations) )  return $this->_translations;
+		
+		foreach ($translations as $translation)
+			$this->_translations[$translation->lang_parent_id][] = $translation;
+		return $this->_translations;
+	}
 	
 	
 	/**
@@ -164,12 +208,14 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @access public
 	 * @return object
 	 */
-	function getItemList_ExtraFields()
+	function getExtraCols()
 	{
 		$mainframe = &JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$flexiparams = & JComponentHelper::getParams( 'com_flexicontent' );
 		$filter_type = $mainframe->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );
+		
+		if ( $this->_extra_cols !== null) return $this->_extra_cols;
 		
 		// Retrieve the custom field of the items list
 		// STEP 1: Get the field properties
@@ -210,8 +256,8 @@ class FlexicontentModelItems extends JModelLegacy
 			FlexicontentFields::loadFieldConfig($field, $item_instance);
 		}
 		
-		$this->_extra_fields = & $extra_fields;
-		return $extra_fields;
+		$this->_extra_cols = & $extra_fields;
+		return $this->_extra_cols;
 	}
 	
 	
@@ -221,19 +267,16 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @access public
 	 * @return object
 	 */
-	function getItemList_ExtraFieldValues()
+	function getExtraColValues()
 	{
-		if ( $this->_extra_fields== null)
-			$this->getItemList_ExtraFields();
-		if ( empty($this->_extra_fields) ) return;
+		if ( $this->_extra_cols== null) $this->getExtraCols();
 		
-		if ( $this->_data== null)
-			$this->getData();
+		if ( empty($this->_extra_cols) ) return;
 		if ( empty($this->_data) ) return;
 		
 		foreach($this->_data as $row)
 		{
-			foreach($this->_extra_fields as $field)
+			foreach($this->_extra_cols as $field)
 			{
 		    // STEP 2: Get the field value for the current item
 		    $query = ' SELECT v.value'
@@ -333,25 +376,39 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return object
 	 * @since 1.5
 	 */
-	function getUnassociatedItems($limit = 1000000)
+	function getUnassociatedItems($limit = 1000000, $ids_only=true)
 	{
+		static $unassociated;
+		if ( isset($unassociated[$ids_only]) ) return $unassociated[$ids_only];
+		
+		$cparams    = & JComponentHelper::getParams('com_flexicontent');
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$status = $this->getExtdataStatus();
-
+		
 		if ($status['no']) {
 			$and = ' AND c.id IN ( ' . implode(',', $status['no']) . ' )';
-			$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state'
-					. (FLEXI_J16GE ? ', c.language' : '')
-					. ' FROM #__content as c'
-					. (FLEXI_J16GE ? ' LEFT JOIN #__categories as cat ON c.catid=cat.id' : '')
-					. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE (cat.extension="'.FLEXI_CAT_EXTENSION.'" OR cat.id IS NULL)')
-					. $and
-					;
+			if ($ids_only) {
+				$query 	= 'SELECT c.id ';
+			} else {
+				$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state';
+			}
+			$query .= ''
+				. (FLEXI_J16GE ? ', c.language' : '')
+				. ' FROM #__content as c'
+				. (FLEXI_J16GE ? ' LEFT JOIN #__categories as cat ON c.catid=cat.id' : '')
+				. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE (cat.extension="'.FLEXI_CAT_EXTENSION.'" OR cat.id IS NULL)')
+				. $and
+				;
 			$this->_db->setQuery($query, 0, $limit);
 			$unassociated = $this->_db->loadObjectList();
 		} else {
-			$unassociated = '';
+			$unassociated[$ids_only] = '';
 		}
-		return $unassociated;
+		if ( $print_logging_info ) @$fc_run_times['unassoc_items_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		return $unassociated[$ids_only];
 	}
 
 	/**
@@ -686,7 +743,7 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 		// get not associated items to remove them from the displayed datas
-		$unassociated = $this->getUnassociatedItems();
+		$unassociated = $this->getUnassociatedItems(1000000, $_ids_only=true);
 		if ($unassociated) {
 			$notin = array();
 			foreach ($unassociated as $ua) {

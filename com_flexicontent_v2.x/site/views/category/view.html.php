@@ -98,7 +98,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = JRequest::getInt('limitstart');
-		$format     = JRequest::getVar('format', null);
+		$format     = JRequest::getCmd('format', null);
 		
 		
 		// ************************
@@ -110,7 +110,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$_clayout = $use_mobile ? 'clayout_mobile' : 'clayout';
 		
 		// (b) Get from category parameters, allowing URL override
-		$clayout = JRequest::getVar($_clayout, false);
+		$clayout = JRequest::getCmd($_clayout, false);
 		$clayout = $clayout ? $clayout : $params->get($_clayout, 'blog');
 		
 		// (c) Get cached template data
@@ -130,7 +130,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Get URL variables
 		$cid = JRequest::getInt('cid', 0);
 		$authorid = JRequest::getInt('authorid', 0);
-		$layout = JRequest::getVar('layout', '');
+		$layout = JRequest::getCmd('layout', '');
+		$cids = preg_replace( '/[^0-9,]/i', '', (string) JRequest::getVar('cids', '') );
 		
 		$authordescr_item = false;
 		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed') {
@@ -265,7 +266,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Add rel canonical html head link tag
 		// @TODO check that as it seems to be dirty :(
 		$base  = $uri->getScheme() . '://' . $uri->getHost();
-		$start = JRequest::getVar('start', '');
+		$start = JRequest::getInt('start', '');
 		$start = $start ? "&start=".$start : "";
 		$ucanonical 	= $base . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug).$start);
 		if ($params->get('add_canonical')) {
@@ -646,10 +647,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		$urlvars = array();
 		if ($layout)   $urlvars['layout']   = $layout;
 		if ($authorid) $urlvars['authorid'] = $authorid;
+		if ($cids) $urlvars['cids'] = $cids;
 		
 		$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, $Itemid, $urlvars), false);
-		
-		$print_link    = JRoute::_('index.php?view=category&cid='.$category->slug.($authorid?"&authorid=$authorid&layout=author":"").'&pop=1&tmpl=component');
+		$print_link    = $category_link .(strstr($category_link, '?') ? '&'  : '?'). 'pop=1&tmpl=component';
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('action',			$category_link);  // $uri->toString()
@@ -662,6 +663,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->assignRef('category' , 	$category);
 		$this->assignRef('limitstart' , $limitstart);
 		$this->assignRef('pageNav' , 		$pageNav);
+		$this->assignRef('pagination' ,	$pageNav);  // Alias for template overrides
 		$this->assignRef('resultsCounter' ,	$resultsCounter);
 		$this->assignRef('filters' ,	 	$filters);
 		$this->assignRef('comments'	,		$comments);

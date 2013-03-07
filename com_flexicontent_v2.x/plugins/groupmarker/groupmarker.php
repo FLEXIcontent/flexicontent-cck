@@ -58,7 +58,7 @@ class plgFlexicontent_fieldsGroupmarker extends JPlugin
 				$field->html .= "<div style='margin-top:24px; width:100%; float:left; clear:both;'></div>\n";
 				$field->html .= "<fieldset class='".$cont_cssclass."' style='margin:0px 1% 0px 1%; min-width:96%; float:left; clear:both;'>\n";
 				$field->html .= " <legend>".JText::_( $cont_label )."</legend>\n";
-				$field->html .= $cont_cssclass? " <div class='".$cont_cssclass."'></div>\n" : " <div style='border:0px!important; margin:0px!important; padding:0px!important;'></div>\n";
+				$field->html .= $cont_cssclass? " <div class='".$cont_cssclass."'>\n" : " <div style='border:0px!important; margin:0px!important; padding:0px!important;'>\n";
 				break;
 			case 'fieldset_close':
 				$field->html .= " </div>\n";      // Close content's container (used to apply a css class)

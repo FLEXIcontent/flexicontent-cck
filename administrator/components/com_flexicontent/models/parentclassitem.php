@@ -465,7 +465,8 @@ class ParentClassItem extends JModelLegacy
 					
 					// Try to execute query directly and load the data as an object
 					if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $config->getValue('config.dbtype') , array('mysqli','mysql') ) ) {
-						$data = & $this->directQuery($query);
+						$data = flexicontent_db::directQuery($query);
+						$data = @ $data[0];
 						//$data = $db->loadObject(null, false);   // do not, translate, this is the JoomFish overridden method of Database extended Class
 					} else {
 						$data = $db->loadObject();
@@ -539,6 +540,7 @@ class ParentClassItem extends JModelLegacy
 							// Add retrieved translated item properties
 							foreach ($translated_fields as $field_data)
 							{
+								$item_translations ->{$field_data->language_id} ->fields ->{$field_data->reference_field} = new stdClass();
 								$item_translations ->{$field_data->language_id} ->fields ->{$field_data->reference_field}->value = $field_data->value;
 								$found_languages[$field_data->language_id] = $item_translations->{$field_data->language_id}->name;
 							}
@@ -551,6 +553,7 @@ class ParentClassItem extends JModelLegacy
 							list($translation_data->name) = explode(' ', trim($translation_data->name));
 						
 							// Create text field value for all languages
+							$translation_data->fields->text = new stdClass();
 							$translation_data->fields->text->value = @ $translation_data->fields->introtext->value;
 							if ( JString::strlen( trim(@$translation_data->fields->fulltext->value) ) ) {
 								$translation_data->fields->text->value .=  '<hr id="system-readmore" />' . @ $translation_data->fields->fulltext->value;
@@ -2682,10 +2685,12 @@ class ParentClassItem extends JModelLegacy
 	 */
 	function getSubscribersCount()
 	{
-		$query = 'SELECT COUNT(*)'
-				.' FROM #__flexicontent_favourites'
-				.' WHERE itemid = ' . (int)$this->_id
-			//.' AND notify = 1'
+		$query	= 'SELECT COUNT(*)'
+				.' FROM #__flexicontent_favourites AS f'
+				.' LEFT JOIN #__users AS u'
+				.' ON u.id = f.userid'
+				.' WHERE f.itemid = ' . (int)$this->_id
+				.'  AND u.block=0 ' //.' AND f.notify = 1'
 				;
 		$this->_db->setQuery($query);
 		$subscribers = $this->_db->loadResult();
@@ -3575,46 +3580,6 @@ class ParentClassItem extends JModelLegacy
 			}
 		}
 		return $send_result;
-	}
-	
-	
-	/**
-	 * Helper method to execute a query directly, bypassing Joomla DB Layer
-	 * 
-	 * @return object
-	 * @since 1.5
-	 */
-	function & directQuery($query)
-	{
-		$db = & $this->_db;
-		$config =& JFactory::getConfig();
-		$dbprefix = $config->getValue('config.dbprefix');
-		$dbtype = $config->getValue('config.dbtype');
-		
-		if (FLEXI_J16GE) {
-			$query = $db->replacePrefix($query);
-			$db_connection = & $db->getConnection();
-		} else {
-			$query = str_replace("#__", $dbprefix, $query);
-			$db_connection = & $db->_resource;
-		}
-		//echo "<pre>"; print_r($query); echo "\n\n";
-		
-		if ($dbtype == 'mysqli') {
-			$result = mysqli_query( $db_connection , $query );
-			if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysqli_error($db_connection));
-			$data = mysqli_fetch_object($result);
-			mysqli_free_result($result);
-		} else if ($dbtype == 'mysql') {
-			$result = mysql_query( $query, $db_connection  );
-			if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysql_error($db_connection));
-			$data = mysql_fetch_object($result);
-			mysql_free_result($result);
-		} else {
-			throw new Exception( 'unreachable code in '.__FUNCTION__.'(): direct db query, unsupported DB TYPE' );
-		}
-		
-		return $data;
 	}
 	
 	

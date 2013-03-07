@@ -143,6 +143,10 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 				<span class="fc_orderby_selector"><?php echo $orderby_selector;?></span>
 			</span>
 		<?php endif; ?>
+		
+		<span class="fc_pages_counter">
+			<small><?php echo $this->pageNav->getPagesCounter(); ?></small>
+		</span>
 	
 	</div>
 	<!-- BOF items total-->

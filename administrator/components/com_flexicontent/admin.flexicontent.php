@@ -195,6 +195,15 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	if (isset($fc_run_times['form_rendering']))
 		$msg .= sprintf('<br/>-- [Form Template Rendering: %.2f s] ', $fc_run_times['form_rendering']/1000000);
 	
+	if (isset($fc_run_times['unassoc_items_query']))
+		$msg .= sprintf('<br/>-- [Execute Unassociate Items Query: %.2f s] ', $fc_run_times['unassoc_items_query']/1000000);
+	
+	if (isset($fc_run_times['execute_main_query']))
+		$msg .= sprintf('<br/>-- [Execute Main Query: %.2f s] ', $fc_run_times['execute_main_query']/1000000);
+	
+	if (isset($fc_run_times['execute_secondary_query']))
+		$msg .= sprintf('<br/>-- [Execute Secondary Query: %.2f s] ', $fc_run_times['execute_secondary_query']/1000000);
+	
 	$app->enqueueMessage( $msg, 'notice' );
 }
 

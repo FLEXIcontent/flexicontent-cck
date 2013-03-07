@@ -977,11 +977,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ( !strlen(trim(@$value['originalname'])) ) continue;
 			$i++;
 			
-			// Create thumbnails urls 
-			$lthumbpath = $thumb_folder .DS. 'l_' .$extra_prefix. $value['originalname'];
-			$size	= getimagesize($lthumbpath);
-			$hl 	= $size[1];
-			$wl 	= $size[0];
+			// Create thumbnails urls, note thumbnails have already been verified above
+			$hl = $field->parameters->get( 'h_l', 800 );
+			$wl = $field->parameters->get( 'w_l', 600 );
 			$title	= @$value['title'] ? $value['title'] : '';
 			$alt	= @$value['alt'] ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
 			$desc	= @$value['desc'] ? $value['desc'] : '';
@@ -1260,7 +1258,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if(!is_array($post) && !strlen($post)) return;
 		
 		$app = &JFactory::getApplication();
-		//$is_importcsv = JRequest::getVar('task') == 'importcsv';
+		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		
 		// New items had no item id during submission, thus we need to rename then temporary name of images upload folder
 		$image_source = $field->parameters->get('image_source', 0);
@@ -1268,18 +1266,18 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$dir = $field->parameters->get('dir');
 		
 		// Set a warning message for overriden/changed files: form.php (frontend) or default.php (backend)
-		if ( empty($unique_tmp_itemid) ) {
+		if ( !$is_importcsv && empty($unique_tmp_itemid) ) {
 			$app->enqueueMessage( 'WARNING, field: '.$field->label.' requires variable -unique_tmp_itemid- please update your '.($app->isSite() ? 'form.php':'default.php'), 'warning');
 		}
 		
 		// Rename temporary name of images upload folder to include the item_id
-		if ( $unique_tmp_itemid && $item != $unique_tmp_itemid && $image_source ) {
+		if ( $unique_tmp_itemid && $field->item_id != $unique_tmp_itemid && $image_source ) {
 			$temppath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$unique_tmp_itemid. '_field_'.$field->id .DS );
 			$destpath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$field->item_id   . '_field_'.$field->id .DS );
 			JFolder::move($temppath, $destpath);
 		}
 		
-		// Rearrange file array so that file properties are group per image number
+		// Rearrange file array so that file properties are groupped per image number
 		$files = array();
 		if ($file) foreach( $file as $key => $all ) {
 			foreach( $all as $i => $val ) {
@@ -1723,7 +1721,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	{
 		static $images_processed = array();
 		
-		$filename = trim($value['originalname']);
+		$filename = trim( @$value['originalname'] );
 		if ( !$filename ) return;  // check for empty filename
 		
 		$image_source = $field->parameters->get('image_source', 0);
@@ -1865,28 +1863,34 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Create original filenames array skipping any empty records, 
 		// NOTE: if all_media is ON the we already retrieved filenames above
-		if (!$all_media) {
-			for($n=0, $c=count($values); $n<$c; $n++) {
-				if (!$values[$n]) { unset($values[$n]); continue; }
-				$values[$n] = unserialize($values[$n]);
-				$values[$n] = $values[$n]['originalname'];
+		if ( $all_media ) {
+			$filenames = & $values;
+		} else {
+			$filenames = array();
+			foreach ( $values as $value )
+			{
+				if ( empty($value) ) continue;
+				$value = @ unserialize($value);
+				
+				if ( !isset($value['originalname']) ) continue;
+				$filenames[] = $value['originalname'];
 			}
 		}
 		
 		// Eliminate duplicate records in the array
-		sort($values);
-		$values = array_unique($values);
+		sort($filenames);
+		$filenames = array_unique($filenames);
 		
 		// Eliminate records that have no original files
 		$securepath = JPath::clean(COM_FLEXICONTENT_FILEPATH.DS);
-		$new_values = array();
-		foreach($values as $value) {
-			$filepath = $securepath . $value;
+		$existing_files = array();
+		foreach($filenames as $filename) {
+			$filepath = $securepath . $filename;
 			if (file_exists($filepath)) {
-				$new_values[] = $value;
+				$existing_files[] = $filename;
 			}
 		}
-		$values = $new_values;
+		$filenames = $existing_files;
 		
 		// Create attributes of the drop down field for selecting existing images
 		$class = ' class="existingname no_value_selected"';
@@ -1901,8 +1905,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Populate the select field options
 		$options = array(); 
 		$options[] = JHTML::_('select.option', '', JText::_('FLEXI_FIELD_PLEASE_SELECT'));
-		foreach ($values as $value) {
-			$options[] = JHTML::_('select.option', $value, $value); 
+		foreach ($filenames as $filename) {
+			$options[] = JHTML::_('select.option', $filename, $filename); 
 		}
 		
 		// Finally create the select field and return it

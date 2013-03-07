@@ -300,8 +300,9 @@ class FlexicontentHelperRoute
 				if (
 					@$menuitem->query['view'] == $needle &&
 					@$menuitem->query['cid'] == $cid &&
-					@$menuitem->query['layout'] == @$urlvars['layout'] && // match layout "author", "my items", etc, limited to the specific category
-					@$menuitem->query['authorid'] == @$urlvars['authorid'] // match "authorid"
+					@$menuitem->query['layout'] == @$urlvars['layout'] && // match layout "author", "myitems", "mcats" etc
+					@$menuitem->query['authorid'] == @$urlvars['authorid'] && // match "authorid" for user id of author
+					@$menuitem->query['cids'] == @$urlvars['cids'] // match "cids" of "mcats" (multi-category view)
 				) {
 					
 					// Try to match optional url variables, if these were specified
