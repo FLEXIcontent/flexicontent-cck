@@ -255,9 +255,13 @@ class flexicontent_cats
 	)
 	{
 		global $globalcats;
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$user = JFactory::getUser();
-		$cid = JRequest::getVar('cid',  0);
-		if (is_array($cid)) $cid = $cid[0];
+		$controller = JRequest::getVar('controller');
+		$task = JRequest::getVar('task');
+		
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
 		
 		// Privilege of (a) viewing all categories (even if disabled) and (b) viewing as a tree
 		require_once (JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'permission.php');
@@ -265,7 +269,7 @@ class flexicontent_cats
 		$viewtree			= FlexicontentHelperPerm::getPerm()->ViewTree;
 		
 		// Global parameter to force always displaying of categories as tree
-		if (JComponentHelper::getParams('com_flexicontent')->get('cats_always_astree', 1)) {
+		if ($cparams->get('cats_always_astree', 1)) {
 			$viewtree = 1;
 		}
 		
@@ -277,7 +281,17 @@ class flexicontent_cats
 				// Add already selected categories to the category list
 				$selectedcats = !is_array($selected) ? array($selected) : $selected;
 				$usercats = array_unique(array_merge($selectedcats, $usercats));
+				$usercats_indexed = array_flip($usercats);
 			}
+		}
+		
+		// Case of category edit form, when building parent category selection of the category being edited ('cid')
+		$is_cat_parent_sel = ($controller == 'categories' && $task == 'edit' && $top==1 );
+		if ($is_cat_parent_sel) {
+			$cid = JRequest::getVar('cid',  0);
+			if (is_array($cid)) $cid = $cid[0];
+			$cid_and_descendants = array_flip($globalcats[$cid]->descendantsarray);
+			$cid_and_descendants[$cid] = -1;
 		}
 		
 		// Start category list by add appropriate prompt option at top
@@ -295,10 +309,9 @@ class flexicontent_cats
 			
 			if ( !$check_published || $cat->published )
 			{	
-				// CASE 1. IN CATEGORY EDIT FORM while displaying FORM FIELD parent_id, using current category and its children should be disabled as disabled
-				if ( JRequest::getVar('controller') == 'categories' && JRequest::getVar('task') == 'edit' && $cid
-							&& $top==1 && ( $cid == $cat->id || in_array($cat->id, $globalcats[$cid]->descendantsarray ) )
-				) {
+				// CASE 1. IN CATEGORY EDIT FORM while displaying FORM FIELD parent_id, then current category and its children should be disabled
+				if ( $is_cat_parent_sel && $cid && isset($cid_and_descendants[$cat->id]) )
+				{
 					$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, 'value', 'text', true );
 				}
 				
@@ -306,7 +319,7 @@ class flexicontent_cats
 				else if ($check_perms)
 				{
 					// a. Category NOT ALLOWED
-					if (	( FLEXI_J16GE && !in_array($cat->id, $usercats) ) || ( FLEXI_ACCESS && !in_array($cat->id, $usercats) ) )
+					if (	( FLEXI_J16GE || FLEXI_ACCESS) && !isset($usercats_indexed[$cat->id]) )
 					{
 						// Add current category to the select list as disabled if user can view all categories, OTHERWISE DO NOT ADD IT
 						if ($viewallcats)
@@ -333,7 +346,10 @@ class flexicontent_cats
 		$replace_char = FLEXI_J16GE ? '_' : '';
 		$idtag = preg_replace('/(\]|\[)+/', $replace_char, $name);
 		$idtag = preg_replace('/_$/', '', $idtag);
-		return JHTML::_('select.genericlist', $catlist, $name, $class, 'value', 'text', $selected, $idtag );
+		$html = JHTML::_('select.genericlist', $catlist, $name, $class, 'value', 'text', $selected, $idtag );
+		
+		if ( $print_logging_info ) @$fc_run_times['render_categories_select'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		return $html;
 	}
 	
 	

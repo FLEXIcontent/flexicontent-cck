@@ -405,10 +405,6 @@ class FlexicontentViewCategory extends JViewLegacy
 			// Just put item's text (description field) inside property 'text' in case the events modify the given text,
 			$item->text = isset($item->fields['text']->display) ? $item->fields['text']->display : '';
 			
-			// Maybe here not to import all plugins but just those for description field ???
-			// Anyway these events are usually not very time consuming, so lets trigger all of them ???
-			JPluginHelper::importPlugin('content');
-			
 			// Set the view and option to 'category' and 'com_content'  (actually view is already called category)
 			JRequest::setVar('option', 'com_content');
 			JRequest::setVar("isflexicontent", "yes");
@@ -416,13 +412,16 @@ class FlexicontentViewCategory extends JViewLegacy
 			// These events return text that could be displayed at appropriate positions by our templates
 			$item->event = new stdClass();
 			
-			$results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
+			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterTitle', array('com_content.article', &$item, &$params, 0));
+			else              $results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
 			$item->event->afterDisplayTitle = trim(implode("\n", $results));
 	
-			$results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $params, $limitstart));
+			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.article', &$item, &$params, 0));
+			else              $results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $params, $limitstart));
 			$item->event->beforeDisplayContent = trim(implode("\n", $results));
 	
-			$results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
+			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.article', &$item, &$params, 0));
+			else              $results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
 			$item->event->afterDisplayContent = trim(implode("\n", $results));
 							
 			// Set the option back to 'com_flexicontent'

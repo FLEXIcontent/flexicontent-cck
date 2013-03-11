@@ -352,6 +352,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		static $return;
 		if ($return === NULL) {
+			// Make sure basic CORE fields are published
+			$q = 'UPDATE #__flexicontent_fields SET published=1 WHERE id > 0 AND id < 7';
+			$this->_db->setQuery( $q );
+			$this->_db->query();
+			
 			$query 	= 'SELECT COUNT( extension_id )'
 				. ' FROM #__extensions'
 				. ' WHERE `type`='.$this->_db->Quote('plugin').' AND '

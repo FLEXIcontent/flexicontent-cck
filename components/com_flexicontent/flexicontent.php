@@ -157,10 +157,10 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	
 	if (isset($fc_run_times['get_item_data']))
 		$msg .= sprintf('<br/>-- [Get/Caculate Item Properties: %.2f s] ', $fc_run_times['get_item_data']/1000000);
-		
+	
 	if (isset($fc_run_times['get_field_vals']))
 		$msg .= sprintf('<br/>-- [Retrieve Field Values: %.2f s] ', $fc_run_times['get_field_vals']/1000000);
-		
+	
 	if (isset($fc_run_times['render_field_html']))
 		$msg .= sprintf('<br/>-- [Field HTML Rendering: %.2f s] ', $fc_run_times['render_field_html']/1000000);
 	

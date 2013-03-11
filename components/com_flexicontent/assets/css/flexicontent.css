@@ -442,7 +442,7 @@
 #flexicontent .item_total .fc_pages_counter {
 	display:inline-block;
 	float:right;
-	padding:6px 4px;
+	padding:2px 4px;
 }
 
 
@@ -1289,6 +1289,8 @@ table.admintable td {
 
 ul.tabbernav li {
 	line-height: 100% !important;
+	margin: 0 !important;
+	overflow: visible !important;
 }
 
 /*#flexicontent.fctypeNN*/ #fc_subtitle_tabset ul.tabbernav li a {  padding-left: 20px;  }

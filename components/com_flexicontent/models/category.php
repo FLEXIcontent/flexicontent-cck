@@ -199,6 +199,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		$format	= JRequest::getCmd('format', null);
 		
+		$params = & $this->_params;
+		$print_logging_info = $params->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		
 		// Allow limit zero to achieve a category view without items
 		if ($this->getState('limit') <= 0)
 		{
@@ -206,6 +210,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		else if (empty($this->_data))
 		{
+			if ( $print_logging_info )  $start_microtime = microtime(true);
 			// Load the content if it doesn't already exist
 			$query = $this->_buildQuery();
 
@@ -228,6 +233,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$jAp= JFactory::getApplication();
 				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
 			}
+			if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
 
 		return $this->_data;
@@ -1173,7 +1179,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$view_ok      = @$menu->query['view']     == 'category';
 				$cid_ok       = @$menu->query['cid']      == $this->_id;
 				$layout_ok    = @$menu->query['layout']   == $this->_layout;
-				$authorid_ok  = @$menu->query['authorid'] == $this->_authorid;
+				$authorid_ok  = (@$menu->query['authorid'] == $this->_authorid) || ($this->_layout=='myitems');  // Ignore empty author_id when layout is 'myitems'
 				
 				// We will merge menu parameters last, thus overriding the default categories parameters if either
 				// (a) override is enabled in the menu or (b) category Layout is 'myitems' which has no default parameters

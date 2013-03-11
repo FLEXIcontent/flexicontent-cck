@@ -50,7 +50,7 @@ class plgSystemFlexisystem extends JPlugin
 		$option   = JRequest::getVar('option', null);
 		if ( $option=='com_flexicontent' && $fparams->get('print_logging_info')==1 )
 		{
-			$session = & JFactory::getSession();
+			$session = JFactory::getSession();
 			// Try request variable first then session variable
 			$fcdebug = JRequest::getVar('fcdebug', '');
 			$fcdebug = strlen($fcdebug) ? (int)$fcdebug : $session->get('fcdebug', 0, 'flexicontent');
@@ -71,8 +71,8 @@ class plgSystemFlexisystem extends JPlugin
 		// (b) Route PDF format to HTML format for J1.6+
 		$redirect_pdf_format = $this->params->get('redirect_pdf_format', 1);
 		if (FLEXI_J16GE && $redirect_pdf_format && JRequest::getVar('format') == 'pdf' ) {
-			$app =& JFactory::getApplication();
 			JRequest::setVar('format', 'html');
+			//$app = JFactory::getApplication();
 			//$app->enqueueMessage('flexisystem: PDF generation is no longer supported, the HTML version is displayed instead');
 		}
 		
@@ -83,12 +83,12 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		// ensure the PHP version is correct
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) return;
-		$fparams 	=& JComponentHelper::getParams('com_flexicontent');
+		$fparams = JComponentHelper::getParams('com_flexicontent');
 		
 		// Detect mobile devices, and set fc_use_mobile session flag
 		if ($fparams->get('detect_mobile')) $this->detectMobileClient($fparams);
 		
-		$app =& JFactory::getApplication();
+		$app    = JFactory::getApplication();
 		$option = JRequest::getCMD('option');
 		$view   = JRequest::getVar('view', '');
 		$layout = JRequest::getVar('layout', '');
@@ -108,7 +108,7 @@ class plgSystemFlexisystem extends JPlugin
 			global $globalcats;
 			if (FLEXI_CACHE) {
 				// add the category tree to categories cache
-				$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+				$catscache = JFactory::getCache('com_flexicontent_cats');
 				$catscache->setCaching(1); 		//force cache
 				$catscache->setLifeTime(84600); //set expiry to one day
 				$globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
@@ -125,9 +125,9 @@ class plgSystemFlexisystem extends JPlugin
 	
 	function redirectAdminComContent()
 	{
-		$app 				=& JFactory::getApplication();
-		$option 			= JRequest::getCMD('option');
-		$user 				=& JFactory::getUser();
+		$app    = JFactory::getApplication();
+		$option = JRequest::getCMD('option');
+		$user   = JFactory::getUser();
 		
 		if (FLEXI_J16GE) {
 			// NOTE: in J1.6+, a user can be assigned multiple groups, so we need to retrieve them
@@ -249,13 +249,13 @@ class plgSystemFlexisystem extends JPlugin
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 		
 		//get the section associated with flexicontent
-		$flexiparams	= & JComponentHelper::getParams('com_flexicontent');
-		$flexisection	= $flexiparams->get('flexi_section');
+		$flexiparams  = JComponentHelper::getParams('com_flexicontent');
+		$flexisection = $flexiparams->get('flexi_section');
 		
-		$app 		= & JFactory::getApplication();
-		$option	= JRequest::getCMD('option');
-		$view		= JRequest::getCMD('view');
-		$db 		= & JFactory::getDBO();
+		$app    = JFactory::getApplication();
+		$option = JRequest::getCMD('option');
+		$view   = JRequest::getCMD('view');
+		$db     = JFactory::getDBO();
 		
 		// Let's Redirect/Reroute Joomla's article view & form to FLEXIcontent item view & form respectively !!
 		// NOTE: we do not redirect/reroute Joomla's category views (blog,list,featured for J2.5 etc),
@@ -334,8 +334,9 @@ class plgSystemFlexisystem extends JPlugin
 	
 	function getCategoriesTree()
 	{
+		$start_microtime = microtime(true);
 		global $globalcats;
-		$db		=& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 : 0;
 
 		// get the category tree and append the ancestors to each node		
@@ -369,15 +370,18 @@ class plgSystemFlexisystem extends JPlugin
 		$globalcats = plgSystemFlexisystem::_getCatAncestors($ROOT_CATEGORY_ID, '', array(), $children, true, max(0, $levellimit-1));
 
 		foreach ($globalcats as $cat) {
-			$cat->ancestorsonlyarray	= $cat->ancestors;
-			$cat->ancestorsonly			= implode(',', $cat->ancestors);
-			$cat->ancestors[] 			= $cat->id;
-			$cat->ancestorsarray		= $cat->ancestors;
-			$cat->ancestors				= implode(',', $cat->ancestors);
-			$cat->descendantsarray		= plgSystemFlexisystem::_getDescendants(array($cat));
-			$cat->descendants			= implode(',', $cat->descendantsarray);
+			$cat->ancestorsonlyarray = $cat->ancestors;
+			$cat->ancestorsonly      = implode(',', $cat->ancestors);
+			$cat->ancestors[]        = $cat->id;
+			$cat->ancestorsarray     = $cat->ancestors;
+			$cat->ancestors          = implode(',', $cat->ancestors);
+			$cat->descendantsarray   = plgSystemFlexisystem::_getDescendants($cat);
+			$cat->descendants        = implode(',', $cat->descendantsarray);
 		}
 		
+		$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		$msg = sprintf('<br/>-- Create globalcats array: %.2f s', $time_passed/1000000);
+		//echo $msg;
 		return $globalcats;
 	}
 
@@ -444,15 +448,18 @@ class plgSystemFlexisystem extends JPlugin
     * @access private
     * @return array
     */
-	function _getDescendants($arr, &$descendants = array())
+	function _getDescendants($cat)
 	{
-		foreach($arr as $k => $v)
-		{
-			$descendants[] = $v->id;
+		$descendants = array();
+		$stack = array();
+		$stack[] = $cat;
 		
-			if ( !empty($v->childrenarray) ) {
-				plgSystemFlexisystem::_getDescendants($v->childrenarray, $descendants);
-			}
+		while( count($stack) ) {
+			$v = array_pop($stack);
+			$descendants[] = $v->id;
+			
+			if ( !empty($v->childrenarray) ) continue;
+			foreach( $v->childrenarray as $child ) $stack[] = $child;
 		}
 		return $descendants;
 	}
@@ -470,20 +477,20 @@ class plgSystemFlexisystem extends JPlugin
 		$task 		= JRequest::getVar('task');
 		
 		if ($option == 'com_config' && $component == 'com_flexicontent' && $task == 'save') {
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		}
 	}
 	
 	function loginUser() 
 	{
-		$mainframe =& JFactory::getApplication();
-		$username	= JRequest::getVar('fcu', null);
-		$password	= JRequest::getVar('fcp', null);
+		$mainframe = JFactory::getApplication();
+		$username  = JRequest::getVar('fcu', null);
+		$password  = JRequest::getVar('fcp', null);
 
 		jimport('joomla.user.helper');
 		
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query 	= 'SELECT id, password'
 				. ' FROM #__users'
 				. ' WHERE username = ' . $db->Quote( $username )
@@ -518,8 +525,92 @@ class plgSystemFlexisystem extends JPlugin
 			$session->set('screenSizeCookieToBeAdded', 0, 'flexicontent');
 		}
 		
+		if (0 && FLEXI_J16GE) {
+			$start_microtime = microtime(true);
+			$app = JFactory::getApplication();
+			
+			// Only execute in SITE environment
+			if ($app->getName() == 'site' ) {
+				$document = JFactory::getDocument();
+				$docType = $document->getType();
+				
+				// Only in html
+				if ($docType != 'html') return;
+				$html = JResponse::getBody();
+				
+				$regex_full = '/{flexifield:'
+						.'\s*'
+						.'([^\s]+)'  // field name or field id
+						.'\s+'
+					 .'([^}]+)'    // other properties ...
+					 .'}/i';
+				
+				$result = preg_match_all($regex_full, $html, $matches);
+				//echo "<pre>"; print_r($matches); echo "</pre>";
+				if (!$result) return true;
+				
+				foreach ($matches as $k => $match_arr) {
+					if ($k==0) continue;
+					foreach ($match_arr as $i => $match)
+						$matches[$k][$i] = trim(str_replace('&nbsp;','',$match));
+				}
+				
+				$full_texts  = $matches[0];
+				$field_names = $matches[1];
+				
+				$prop_lists  = $matches[2];
+				//echo "Fields: "; print_r($field_names); echo "<br/>";
+				
+				$item_ids  = array();
+				$methods   = array();
+	
+				$regex_properties = '/\s*'
+					.'([^\s]+)'    // property name
+					.'\s*:\s*'
+					.'([^\s}]+)\s*'  // property value
+				 	.'/i';
+				foreach ($prop_lists as $p => $property_list) {
+					preg_match_all($regex_properties, $property_list, $property_matches, PREG_SET_ORDER);
+					// echo "<pre>"; print_r($property_matches); echo "</pre>";
+					foreach ($property_matches as $pm) {
+						//echo "{$pm[1]} : {$pm[2]}\n<br>"; 
+						switch ( $pm[1] ) {
+							case 'item':
+							$item_ids[$p] = (int)$pm[2];
+							break;
+							case 'method':
+								$methods[$p] = JFilterInput::clean( htmlspecialchars_decode($pm[2]), 'CMD');
+								break;
+							default: break;
+						}
+					}
+				}
+				echo "item_ids: "; print_r($item_ids); echo "<br/>"; echo "methods: ";print_r($methods); 
+				
+				$disp = FlexicontentFields::renderFields( $item_per_field=true, $item_ids, $field_names, $view=FLEXI_ITEMVIEW, $methods, $cfparams=array() );
+				
+				foreach ($full_texts as $i => $full_text) {
+					echo $full_text ." - ";
+					if ( isset( $disp[ $item_ids[$i] ] [ $field_names[$i] ] ) )
+						$html = str_replace( $full_text, $disp[ $item_ids[$i] ] [ $field_names[$i] ] ,$html);
+					else
+						$html = str_replace( $full_text, 'not found item: '.$item_ids[$i].' '.$field_names[$i]  ,$html);
+				}
+				
+				//$html = preg_replace( "/<body/", "<body somevar='aaa' ", $html);
+				JResponse::setBody($html);
+			}
+			
+			$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			$msg = sprintf('<br/>-- Replace Field Times: %.2f s', $time_passed/1000000);
+		}
 		return true;
 	}
+	
+	
+	// J1.6+ only
+	/*public function onBeforeCompileHead() {
+	}*/
 	
 	
 	/**
@@ -534,9 +625,9 @@ class plgSystemFlexisystem extends JPlugin
 	function detectMobileClient(& $fparams)
 	{
 
-		$app      = & JFactory::getApplication();
-		$session 	= & JFactory::getSession();
-		$fparams 	= & JComponentHelper::getParams('com_flexicontent');
+		$app      = JFactory::getApplication();
+		$session  = JFactory::getSession();
+		$fparams  = JComponentHelper::getParams('com_flexicontent');
 		
 		$debug_mobile = $fparams->get('debug_mobile');
 		
@@ -650,12 +741,12 @@ class plgSystemFlexisystem extends JPlugin
 		static $screenSizeCookieAdded = false;
 		if ($screenSizeCookieAdded) return;
 		
-		$fparams = & JComponentHelper::getParams('com_flexicontent');
+		$fparams = JComponentHelper::getParams('com_flexicontent');
 		$debug_mobile = $fparams->get('debug_mobile');
 		$lowres_minwidth  = $lowres_minwidth  ?  $lowres_minwidth  :  (int) $fparams->get('lowres_minwidth' , 800);
 		$lowres_minheight = $lowres_minheight ?  $lowres_minheight :  (int) $fparams->get('lowres_minheight', 480);
 		
-		$document = & JFactory::getDocument();
+		$document = JFactory::getDocument();
 		$js = ' 
 			function fc_getScreenWidth()
 			{
@@ -727,7 +818,7 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function checkinRecords() {
 		
-		$db =& JFactory::getDBO();
+		$db  = JFactory::getDBO();
 		$app = JFactory::getApplication();
 		
 		$limit_checkout_hours   = $this->params->get('limit_checkout_hours', 1);

@@ -25,8 +25,15 @@ if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
 	ini_set('display_errors',1);
 }
 
-// Logging Info variables
-$start_microtime = microtime(true);
+// Get component parameters and add tooltips css and js code
+$cparams = JComponentHelper::getParams('com_flexicontent');
+
+if ( $cparams->get('print_logging_info') ) {
+	// Logging Info variables
+	global $fc_run_times;
+	$fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
+	$start_microtime = microtime(true);
+}
 
 //include constants file
 require_once (JPATH_COMPONENT.DS.'defineconstants.php');
@@ -175,6 +182,9 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	if ($task) $msg .= ' (TASK: '.(!FLEXI_J16GE ? $ctrlname.'.' : '').$task.')';
 	else $msg .= ' (VIEW: ' .$_view. ($_layout ? ' -- LAYOUT: '.$_layout : '') .')';
 
+	$fields_render_total=0;
+	$fields_render_times = FlexicontentFields::getFieldRenderTimes($fields_render_total);
+	
 	// Logging Info variables
 	
 	if (isset($fc_run_times['templates_parsing_cached']))
@@ -203,6 +213,26 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	
 	if (isset($fc_run_times['execute_secondary_query']))
 		$msg .= sprintf('<br/>-- [Execute Secondary Query: %.2f s] ', $fc_run_times['execute_secondary_query']/1000000);
+	
+	if (isset($fc_run_times['render_categories_select']))
+		$msg .= sprintf('<br/>-- [Render Categories Select: %.2f s] ', $fc_run_times['render_categories_select']/1000000);
+	
+	if (isset($fc_run_times['get_field_vals']))
+		$msg .= sprintf('<br/>-- [Retrieve Field Values: %.2f s] ', $fc_run_times['get_field_vals']/1000000);
+	
+	if (isset($fc_run_times['render_field_html']))
+		$msg .= sprintf('<br/>-- [Field HTML Rendering: %.2f s] ', $fc_run_times['render_field_html']/1000000);
+	
+	if (count($fields_render_times))
+		$msg .= sprintf('<br/>-- [FC Fields Value Retrieval: %.2f s] ', $fc_run_times['field_value_retrieval']/1000000);
+	
+	if (isset($fc_run_times['template_render']))
+		$msg .= sprintf('<br/>-- [FC "%s" view Template Rendering: %.2f s] ', $view, $fc_run_times['template_render']/1000000);
+	
+	if (count($fields_render_times)) {
+		$msg .= sprintf('<br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
+		$msg .= '<br/>FIELD: '.implode('<br/> FIELD: ', $fields_render_times).'';
+	}
 	
 	$app->enqueueMessage( $msg, 'notice' );
 }

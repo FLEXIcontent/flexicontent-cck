@@ -218,9 +218,9 @@ class FlexicontentControllerItems extends FlexicontentController
 	function getorphans()
 	{
 		$model 		=  $this->getModel('items');
-		$status 	=  $model->getExtdataStatus();
+		$status 	=  $model->getExtDataStatus();
 
-		echo count($status['no']);
+		echo count($status['unbounded']);
 	}
 	
 	

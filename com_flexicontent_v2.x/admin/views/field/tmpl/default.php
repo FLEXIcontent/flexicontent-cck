@@ -63,7 +63,10 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getLabel('published').':'; ?>
 						</td>
 						<td>
-							<?php echo $this->form->getInput('published'); ?>
+							<?php
+							$html = JHTML::_('select.booleanlist', 'jform[published]', 'class="inputbox"'.$disabled, $this->row->published );
+							echo $html;
+							?>
 						</td>
 					</tr>
 					

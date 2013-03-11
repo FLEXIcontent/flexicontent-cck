@@ -907,6 +907,14 @@ div#cpanel div.icon  a {
 	font-size: 11px;
 }
 
+.fc_assoc_translation {
+	display:inline-block;
+	float:left;
+	margin:1px 3px;
+	text-decoration:none;
+}
+
+
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/
 
 /*******************************/

@@ -442,6 +442,38 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 					?>
 				<?php endif; ?>
 			</div>
+			
+			<div class="flexi_formblock">
+				<label id="jform_lang_parent_id-lbl" for="jform_lang_parent_id" class="flexi_label" >
+					<?php echo JText::_( 'FLEXI_ASSOC_TRANSLATIONS' );?>
+				</label>
+				<?php
+				if ( !empty($this->lang_assocs) ) {
+					$row_modified = strtotime($this->item->modified);
+					if (!$row_modified)  $row_modified = strtotime($this->item->created);
+					
+					foreach($this->lang_assocs as $assoc_item) {
+						if ($assoc_item->id==$this->item->id) continue;
+						
+						$_link  = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='. $assoc_item->id;
+						$_title = JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ).':: ['. $assoc_item->lang .'] '. $assoc_item->title;
+						echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
+						//echo $assoc_item->id;
+						if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
+							echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
+						} else if( !empty($assoc_item->lang) ) {
+							echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
+						}
+						
+						$assoc_modified = strtotime($assoc_item->modified);
+						if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
+						if ( $assoc_modified < $row_modified ) echo "(!)";
+						echo "</a>";
+					}
+				}
+				?>
+			</div>
+			
 			<?php endif; ?>
 			
 			<?php if ( $this->params->get('allowdisablingcomments_fe') ) : ?>

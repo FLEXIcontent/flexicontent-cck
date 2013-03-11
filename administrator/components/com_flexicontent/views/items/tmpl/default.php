@@ -685,10 +685,37 @@ window.addEvent('domready', function() {
 			<?php if ( $enable_translation_groups ) : ?>
 			<td align="center">
 				<?php
-					if ($this->lists['order']=='ie.lang_parent_id') {
+					/*if ($this->lists['order']=='ie.lang_parent_id') {
 						if ($row->id==$row->lang_parent_id) echo "Main";
 						else echo "+";
-					} else echo "unsorted<sup>[3]</sup>";
+					}*/// else echo "unsorted<sup>[3]</sup>";
+
+				if ( (FLEXI_FISH || FLEXI_J16GE) && !empty($this->lang_assocs[$row->lang_parent_id]) )
+				{
+					$row_modified = strtotime($row->modified);
+					if (!$row_modified)  $row_modified = strtotime($row->created);
+					echo "<br/>";
+					
+					foreach($this->lang_assocs[$row->lang_parent_id] as $assoc_item) {
+						if ($assoc_item->id==$row->id) continue;
+						
+						$_link  = 'index.php?option=com_flexicontent&'.$items_task.'edit&cid[]='. $assoc_item->id;
+						$_title = JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ).':: ['. $assoc_item->lang .'] '. $assoc_item->title;
+						echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
+						//echo $assoc_item->id;
+						if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
+							echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
+						} else if( !empty($assoc_item->lang) ) {
+							echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
+						}
+						
+						$assoc_modified = strtotime($assoc_item->modified);
+						if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
+						if ( $assoc_modified < $row_modified ) echo "(!)";
+						echo "</a>";
+					}
+				}
+
 				?>
 			</td>
 			<?php endif ; ?>
@@ -750,7 +777,10 @@ window.addEvent('domready', function() {
 				<?php 
 				$nr = count($row->categories);
 				$ix = 0;
-				foreach ($row->categories as $key => $category) :
+				foreach ($row->categories as $key => $_item_cat) :
+					if ( !isset($this->itemCats[$_item_cat]) ) continue;
+					$category = & $this->itemCats[$_item_cat];
+					
 					$typeofcats = ((int)$category->id == (int)$row->catid) ? ' maincat' : ' secondarycat';
 					$catlink	= 'index.php?option=com_flexicontent&'.$cats_task.'edit&cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
