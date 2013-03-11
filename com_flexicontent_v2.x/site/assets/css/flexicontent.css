@@ -309,7 +309,8 @@
 /* Container of each individual field filter LABEL */
 #flexicontent .filter .filter_label {
 	display: inline-block;
-	float: none;
+	float: left;
+	clear: both;
 	font-size: 90%;
 	border-bottom:1px dashed black;
 	margin: 0px 4px 0px 0px;
@@ -320,7 +321,8 @@
 /* Container of each individual field filter HTML */
 #flexicontent .filter .filter_html {
 	display: inline-block;
-	float: none;
+	float: left;
+	clear: both;
 	font-size: 90%;
 }
 
@@ -335,6 +337,7 @@
 	border-radius:5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
+	width: auto;
 }
 
 

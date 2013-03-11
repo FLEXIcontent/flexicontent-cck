@@ -92,8 +92,8 @@
 		}
 	}
 	
-	function fc_toggleClass(ele,cls, fc_all=0) {
-		if (!fc_all) {
+	function fc_toggleClass(ele,cls, fc_all) {
+		if (typeof fc_all === "undefined" || fc_all === null || !fc_all) {
 		  jQuery(ele).hasClass(cls) ? jQuery(ele).removeClass(cls) : jQuery(ele).addClass(cls);
 		  // Handle disabling 'select all' checkbox (if it exists), not needed but to make sure ...
 			var inputs = ele.parentNode.getElementsByTagName('input');
@@ -112,9 +112,9 @@
 		}
 	}
 	
-	function fc_toggleClassGrp(ele, cls, fc_all=0) {
+	function fc_toggleClassGrp(ele, cls, fc_all) {
 		var inputs = ele.getElementsByTagName('input');
-		if (!fc_all) {
+		if (typeof fc_all === "undefined" || fc_all === null || !fc_all) {
 			for (var i = 0; i < inputs.length; ++i) {
 				inputs[i].checked ? jQuery(inputs[i].parentNode).addClass(cls) : jQuery(inputs[i].parentNode).removeClass(cls);
 			}
