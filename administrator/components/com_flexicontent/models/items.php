@@ -465,7 +465,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. $and
 				;
 			$this->_db->setQuery($query, 0, $limit);
-			$unassociated = $this->_db->loadObjectList();
+			$unassociated[$ids_only] = $this->_db->loadObjectList();
 		} else {
 			$unassociated[$ids_only] = '';
 		}
