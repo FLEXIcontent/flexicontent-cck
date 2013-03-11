@@ -650,7 +650,7 @@ class FlexicontentFields
 			  $custom_values = false;
 			  if ($view == 'category') {
 			    if (isset($items[$i]->fields['text'])) {
-			    	$field = & $items[$i]->fields['text'];
+			    	$field = $items[$i]->fields['text'];
 			    	$field = FlexicontentFields::renderField($items[$i], $field, $custom_values, $method='display', $view);
 			    }
 			  }
