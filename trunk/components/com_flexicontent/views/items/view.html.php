@@ -444,6 +444,13 @@ class FlexicontentViewItems extends JViewLegacy
 		$db					= &JFactory::getDBO();
 		$nullDate		= $db->getNullDate();
 		$menu				= JSite::getMenu()->getActive();
+		
+		// Some flags
+		$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
+		$print_logging_info = $cparams->get('print_logging_info');
+		
+		if ( $print_logging_info )  global $fc_run_times;
+		
 		if ($menu) {
 			if (FLEXI_J16GE) {
 				$menuParams = new JRegistry;
@@ -452,10 +459,6 @@ class FlexicontentViewItems extends JViewLegacy
 				$menuParams = new JParameter($menu->params);
 			}
 		}
-		
-		// Whether to Log Stats
-		$print_logging_info = $cparams->get('print_logging_info');
-		if ( $print_logging_info )  global $fc_run_times;
 		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
 		$params = clone($mainframe->getParams('com_flexicontent'));
@@ -480,6 +483,9 @@ class FlexicontentViewItems extends JViewLegacy
 			$form = & $this->get('Form');
 		}
 		if ( $print_logging_info ) @$fc_run_times['get_item_data'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
+		if (FLEXI_FISH || FLEXI_J16GE)   $langs = FLEXIUtilities::getLanguages('code');
 		
 		// Load Template-Specific language file to override or add new language strings
 		if (FLEXI_FISH || FLEXI_J16GE)
@@ -572,7 +578,6 @@ class FlexicontentViewItems extends JViewLegacy
 		}
 		
 		// Check if saving an item that translates an original content in site's default language
-		$enable_translation_groups = $cparams->get('enable_translation_groups');
 		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($item->language, 0,2);
 		$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
 		
@@ -710,6 +715,8 @@ class FlexicontentViewItems extends JViewLegacy
 		if (FLEXI_J16GE) {  // most core field are created via calling methods of the form (J2.5)
 			$this->assignRef('form',		$form);
 		}
+		if ($enable_translation_groups)  $this->assignRef('lang_assocs', $langAssocs);
+		if (FLEXI_FISH || FLEXI_J16GE)   $this->assignRef('langs', $langs);
 		$this->assignRef('params',		$params);
 		$this->assignRef('lists',			$lists);
 		$this->assignRef('subscribers', $subscribers);

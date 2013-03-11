@@ -795,12 +795,23 @@ class FlexicontentControllerItems extends FlexicontentController
 		$model  = $this->getModel('item');
 		
 		// Set some variables
-		$link  = 'index.php?option=com_flexicontent&view=items';
-		//$link  = $_SERVER['HTTP_REFERER'];
-		$task  = JRequest::getVar('task');
+		$link  = 'index.php?option=com_flexicontent&view=items';  // $_SERVER['HTTP_REFERER'];
+		$task  = JRequest::getCmd( 'task' );
 		$debug = JRequest::getInt( 'debug', 0 );
-		$mainframe = &JFactory::getApplication();
-		$db    = & JFactory::getDBO();
+		$app   = JFactory::getApplication();
+		$db    = JFactory::getDBO();
+		$user  = JFactory::getUser();
+		
+		$failure_count = $success_count = 0;
+		$log_filename = 'importcsv_'.($user->id).'.php';
+		
+		if (FLEXI_J16GE) {
+			jimport('joomla.log.log');
+			JLog::addLogger(array('text_file' => $log_filename));
+		} else {
+			jimport('joomla.error.log');
+			$log = JLog::getInstance($log_filename);
+		}
 		
 		if ($task == 'importcsv')
 		{
@@ -1074,7 +1085,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Handle each row (item) using store() method of the item model to create the items
 			// *********************************************************************************
 			$cnt = 1;
-			foreach($contents as $line)
+			foreach($contents as $lineno => $line)
 			{
 				// Trim item's data
 				$fields = flexicontent_html::arrayTrim($line);
@@ -1091,6 +1102,11 @@ class FlexicontentControllerItems extends FlexicontentController
 				// Handle each field of the item
 				foreach($fields as $col_no => $field_data)
 				{
+					if ($col_no >= count($columns)) {
+						echo "Redundadant column data at record row ".$lineno;
+						continue;
+					}
+					
 					$fieldname = $columns[$col_no];
 					if ( in_array($fieldname, $core_props) ) {
 						$field_values = $field_data;
@@ -1148,25 +1164,30 @@ class FlexicontentControllerItems extends FlexicontentController
 						if ($tags_col==1) {
 							// Get tag names from comma separated list, filtering out bad characters
 							$_tns_list = preg_replace("/[\"'\\\]/u", "", $field_values);
-							$_tns = array_unique(preg_split("/\s*,\s*/u", $_tns_list));
+							$_tns_arr = array_unique(preg_split("/\s*,\s*/u", $_tns_list));
+							$_tns = array();
+							foreach($_tns_arr as $_tindex => $_tname)  if ($_tname) $_tns[] = $_tname;
 							
-							$q = "SELECT id, name FROM #__flexicontent_tags WHERE name IN (". $_tns_list .")";
-							$db->setQuery($q);
-							$_tns_e = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
-							
-							$_tns_m = array_diff( $_tns , $_tns_e );
-							if ( count($_tns_m) ) {
-								// Create a newline separated list of tag names and then import missing tags,
-								// thus making sure they are inserted into the tags DB table if not already present
-								$_tns_list_m = implode("\n", $_tns_m);
-								$tags_model->importList($_tns_list_m);
+							if (count($_tns))
+							{
+								$_tns_list = "'". implode("','", $_tns) ."'";
+								$q = "SELECT name FROM #__flexicontent_tags WHERE name IN (". $_tns_list .")";
+								$db->setQuery($q);
+								$_tns_e = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+								
+								$_tns_m = array_diff( $_tns , $_tns_e );
+								if ( count($_tns_m) ) {
+									// Create a newline separated list of tag names and then import missing tags,
+									// thus making sure they are inserted into the tags DB table if not already present
+									$_tns_list_m = implode("\n", $_tns_m);
+									$tags_model->importList($_tns_list_m);
+								}
+								
+								// Get tag ids
+								$q = "SELECT id FROM #__flexicontent_tags WHERE name IN (". $_tns_list .")";
+								$db->setQuery($q);
+								$data['tag'] = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 							}
-							
-							// Get tag ids
-							$_tns_list = "'". implode("','", $_tns) ."'";
-							$q = "SELECT id FROM #__flexicontent_tags WHERE name IN (". $_tns_list .")";
-							$db->setQuery($q);
-							$data['tag'] = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 						}
 					}
 					else if ( $fieldname=='tags_raw' )
@@ -1235,11 +1256,13 @@ class FlexicontentControllerItems extends FlexicontentController
 					
 					// Finally try to create the item by using Item Model's store() method
 					if( !$model->store($data) ) {
-						$msg = $cnt . ". Import item with title: '" . $data['title'] . "' error" ;
-						JError::raiseWarning( 500, $msg ." " . $model->getError() );
+						$failure_count++;
+						$msg = 'Failed item no: '. $cnt . ". titled as: '" . $data['title'] . "' : ". $model->getError();
+						if (FLEXI_J16GE) JLog::add($msg); else $log->addEntry( array('comment' => $msg) );
 					} else {
-						$msg = $cnt . ". Import item with title: '" . $data['title'] . "' success" ;
-						$mainframe->enqueueMessage($msg);
+						$success_count++;
+						$msg = 'Imported item no: '. $cnt . ". titled as: '" . $data['title'] . "'" ;
+						if (FLEXI_J16GE) JLog::add($msg); else $log->addEntry( array('comment' => $msg) );
 						
 						// Try to rename entry if id column is being used
 						if ( $id_col && $c_item_id )
@@ -1301,6 +1324,12 @@ class FlexicontentControllerItems extends FlexicontentController
 			}
 		}
 		
+		// Set a total results message and redirect
+		$app->enqueueMessage(
+			'Imported items: '.$success_count.' , failed items: '.$failure_count .
+			', please review (in the logs folder) the import log file: '.$log_filename,
+			($failure_count==0 && $success_count>0) ? 'message' : 'warning'
+		);
 		$this->setRedirect($link);
 	}
 	
@@ -2186,9 +2215,9 @@ class FlexicontentControllerItems extends FlexicontentController
 	function getorphans()
 	{
 		$model 		=  $this->getModel('items');
-		$status 	=  $model->getExtdataStatus();
+		$status 	=  $model->getExtDataStatus();
 
-		echo count($status['no']);
+		echo count($status['unbounded']);
 	}
 	
 	

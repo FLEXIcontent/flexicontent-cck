@@ -22,7 +22,7 @@ $search_task = FLEXI_J16GE ? 'task=search.' : 'controller=search&task=';
 <div style="heading">Indexer Running</div>
 <script type="text/javascript">
 jQuery(document).ready(function() {
-	var items_per_call = 50;
+	var items_per_call = 20;
 	var width = 0;
 	var looper = 0;
 	var onesector = 1000;

@@ -115,6 +115,11 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// Try to parse tabs
 		$this->parseTabs($field, $item);
 		
+		// Pretend to be com_content, could this be needed ? or will it cause problems?
+	  //JRequest::setVar('view', 'article');
+	  //JRequest::setVar('option', 'com_content');
+		//JRequest::setVar("isflexicontent", "yes");
+		
 		// Create textarea(s) or editor area(s) ... multiple will be created if tabs are detected and 'editorarea per tab' is enabled
 		if ( !$editorarea_per_tab || !$field->tabs_detected )
 		{
@@ -205,6 +210,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				$ta_count++;
 			}
 		}
+		
+		// Restore HTTP Request variables
+	  //JRequest::setVar('view', FLEXI_ITEMVIEW);
+	  //JRequest::setVar('option', 'com_flexicontent');
 	}
 	
 	

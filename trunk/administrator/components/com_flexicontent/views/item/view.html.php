@@ -58,7 +58,10 @@ class FlexicontentViewItem extends JViewLegacy
 			$pane 		= & JPane::getInstance('sliders');
 		}
 		
+		// Some flags
+		$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 		$print_logging_info = $cparams->get('print_logging_info');
+		
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
@@ -82,6 +85,10 @@ class FlexicontentViewItem extends JViewLegacy
 			$form  = & $this->get('Form');
 		}
 		if ( $print_logging_info ) @$fc_run_times['get_item_data'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		// Get Associated Translations
+		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
+		if (FLEXI_FISH || FLEXI_J16GE)   $langs = FLEXIUtilities::getLanguages('code');
 		
 		// Get item id and new flag
 		$cid = $model->getId();
@@ -166,7 +173,6 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 		
 		// Check if saving an item that translates an original content in site's default language
-		$enable_translation_groups = $cparams->get('enable_translation_groups');
 		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($row->language, 0,2);
 		$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $row->lang_parent_id && $row->lang_parent_id!=$row->id;
 		
@@ -540,6 +546,8 @@ class FlexicontentViewItem extends JViewLegacy
 			$this->assignRef('pane'				, $pane);
 			$this->assignRef('formparams'	, $formparams);
 		}
+		if ($enable_translation_groups)  $this->assignRef('lang_assocs', $langAssocs);
+		if (FLEXI_FISH || FLEXI_J16GE)   $this->assignRef('langs', $langs);
 		$this->assignRef('typesselected', $typesselected);
 		$this->assignRef('canPublish'   , $canPublish);
 		$this->assignRef('canPublishOwn', $canPublishOwn);

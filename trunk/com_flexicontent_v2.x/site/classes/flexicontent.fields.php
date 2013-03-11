@@ -379,11 +379,13 @@ class FlexicontentFields
 		  if ( isset($item->onDemandFields[$fieldname]->{$method}) )  continue;
 		  
 		  // Find the field inside item
-		  foreach ($item->fields as $field)  if ($field->name==$fieldname) break;
+		  foreach ($item->fields as $field)  {
+				if ( !empty($field->name) && $field->name==$fieldname ) break;
+			}
 		  
 		  // Check for not found field, and skip it, this is either due to no access or wrong name ...
 	    $item->onDemandFields[$fieldname] = new stdClass();
-		  if ($field->name!=$fieldname) {
+		  if ( empty($field->name) || $field->name!=$fieldname) {
 			  $item->onDemandFields[$fieldname]->label = '';
 		  	$item->onDemandFields[$fieldname]->noaccess = true;
 		  	$item->onDemandFields[$fieldname]->errormsg = 'field not assigned to this type of item or current user has no access';
@@ -584,19 +586,22 @@ class FlexicontentFields
 		// Set the view and option to article and com_content
 		if ($flexiview == FLEXI_ITEMVIEW) {
 		  JRequest::setVar('view', 'article');
-		  JRequest::setVar('option', 'com_content');
+		  $trigger_area = 'com_content.article';
+		} else {
+		  $trigger_area = 'com_content.category';
 		}
+	  JRequest::setVar('option', 'com_content');
 		JRequest::setVar("isflexicontent", "yes");
 		
 		// Trigger content plugins on field's HTML display, as if they were a "joomla article"
-		if (FLEXI_J16GE) $results = $fcdispatcher->trigger('onContentPrepare', array ('com_content.article', &$field, &$item->parameters, $limitstart), $plg_arr);
-		else             $results = $fcdispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, $limitstart), false, $plg_arr);
+		if (FLEXI_J16GE) $results = $fcdispatcher->trigger('onContentPrepare', array ($trigger_area, &$field, &$item->parameters, 0), $plg_arr);
+		else             $results = $fcdispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, 0), false, $plg_arr);
 		
 		// Set the view and option back to items and com_flexicontent
 		if ($flexiview == FLEXI_ITEMVIEW) {
 		  JRequest::setVar('view', FLEXI_ITEMVIEW);
-		  JRequest::setVar('option', 'com_flexicontent');
 		}
+	  JRequest::setVar('option', 'com_flexicontent');
 		
 		$field->id = $field->fieldid;
 		$field->{$method} = $field->text;
@@ -644,8 +649,10 @@ class FlexicontentFields
 			  // 'description' item field is implicitly used by category layout of some templates (blog), render it
 			  $custom_values = false;
 			  if ($view == 'category') {
-			    $field = $items[$i]->fields['text'];
-			    $field 	= FlexicontentFields::renderField($items[$i], $field, $custom_values, $method='display', $view);
+			    if (isset($items[$i]->fields['text'])) {
+			    	$field = & $items[$i]->fields['text'];
+			    	$field = FlexicontentFields::renderField($items[$i], $field, $custom_values, $method='display', $view);
+			    }
 			  }
 				// 'core' item fields are IMPLICITLY used by some item layout of some templates (blog), render them
 				else if ($view == FLEXI_ITEMVIEW) {

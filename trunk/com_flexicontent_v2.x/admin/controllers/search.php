@@ -103,7 +103,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$indexer = JRequest::getVar('indexer','advanced');
 		$rebuildmode = JRequest::getVar('rebuildmode','');
 		
-		$items_per_call = JRequest::getVar('items_per_call', 50);  // Number of item to index per HTTP request
+		$items_per_call = JRequest::getVar('items_per_call', 20);  // Number of item to index per HTTP request
 		$itemcnt = JRequest::getVar('itemcnt', 0);                 // Counter of items indexed so far, this is given via HTTP request
 		$itemsmodel = $this->getModel('items');          // Get items model to call needed methods
 		
@@ -139,7 +139,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 			$db->query();
 		}
 		
-		$items_per_query = 50;
+		$items_per_query = 20;
 		$cnt = $itemcnt;
 		while($cnt < $itemcnt+$items_per_call)
 		{

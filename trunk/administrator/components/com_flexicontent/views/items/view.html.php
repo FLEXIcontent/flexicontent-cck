@@ -44,6 +44,10 @@ class FlexicontentViewItems extends JViewLegacy {
 		$cid      = JRequest::getVar('cid', array());
 		$extlimit = JRequest::getInt('extlimit', 500);
 		
+		// Some flags
+		$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
+		$print_logging_info = $cparams->get('print_logging_info');
+		
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		
 		if($task == 'copy') {
@@ -234,7 +238,6 @@ class FlexicontentViewItems extends JViewLegacy {
 			if ($CanCopy) {
 				$btn_task = FLEXI_J16GE ? 'items.copy' : 'copy';
 				JToolBarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
-				$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 				if ($enable_translation_groups) {
 					JToolBarHelper::custom( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
 				}
@@ -264,12 +267,12 @@ class FlexicontentViewItems extends JViewLegacy {
 		$pageNav 		= $this->get( 'Pagination' );
 		$types			= $this->get( 'Typeslist' );
 		$authors		= $this->get( 'Authorslist' );
+		// these depend on data rows and must be called after getting data
 		$extraCols  = $this->get( 'ExtraCols' );
+		$itemCats   = $this->get( 'ItemCats' );
 		
-		
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			$langs	= & FLEXIUtilities::getLanguages('code');
-		}
+		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
+		if (FLEXI_FISH || FLEXI_J16GE)   $langs = FLEXIUtilities::getLanguages('code');
 		$categories = $globalcats ? $globalcats : array();
 		
 		
@@ -356,7 +359,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		//build authors select list
 		$lists['filter_authors'] = flexicontent_html::buildauthorsselect($authors, 'filter_authors', $filter_authors, true, 'class="inputbox" size="1" onchange="submitform( );"');
 
-		$lists['default_cat'] = flexicontent_cats::buildcatselect($categories, 'default_cat', '', 2, 'class="inputbox"', false, false);
+		if ($unassociated) $lists['default_cat'] = flexicontent_cats::buildcatselect($categories, 'default_cat', '', 2, 'class="inputbox"', false, false);
 		
 		//search filter
 		$scopes = array();
@@ -412,10 +415,10 @@ class FlexicontentViewItems extends JViewLegacy {
 		$this->assignRef('db'				, $db);
 		$this->assignRef('lists'		, $lists);
 		$this->assignRef('rows'			, $rows);
-		$this->assignRef('extra_fields' , $extraCols);
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			$this->assignRef('langs'    , $langs);
-		}
+		$this->assignRef('itemCats'	, $itemCats);
+		$this->assignRef('extra_fields'	, $extraCols);
+		if ($enable_translation_groups)  $this->assignRef('lang_assocs', $langAssocs);
+		if (FLEXI_FISH || FLEXI_J16GE)   $this->assignRef('langs', $langs);
 		$this->assignRef('cid'      	, $cid);
 		$this->assignRef('pageNav' 		, $pageNav);
 		$this->assignRef('ordering'		, $ordering);
@@ -440,7 +443,12 @@ class FlexicontentViewItems extends JViewLegacy {
 		$this->assignRef('startdate'	, $startdate);
 		$this->assignRef('enddate'		, $enddate);
 
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
+		
 		parent::display($tpl);
+		
+		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 
 	function _displayCopyMove($tpl = null, $cid)

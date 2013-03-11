@@ -68,6 +68,13 @@ class ParentClassItem extends JModelLegacy
 	var $_version = null;
 	
 	/**
+	 * Associated item translations
+	 *
+	 * @var array
+	 */
+	var $_translations = null;
+	
+	/**
 	 * Constructor
 	 *
 	 * @since 1.0
@@ -3783,6 +3790,35 @@ class ParentClassItem extends JModelLegacy
 	}
 	
 	
+	function getLangAssocs()
+	{
+		if ($this->_translations!==null) return $this->_translations;
+		$this->_translations = array();
+		
+		// Make sure we item list is populased and non-empty
+		if ( empty($this->_item) )  return $this->_translations;
+		
+		// Get associated translations
+		if ( empty($this->_item->lang_parent_id) )  return $this->_translations;
+		
+		$query = 'SELECT i.id, i.title, i.created, i.modified, ie.lang_parent_id, ie.language as language, ie.language as lang '
+			//. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug '
+			//. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug '
+		  . ' FROM #__content AS i '
+		  . ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id '
+		  . ' WHERE ie.lang_parent_id IN ('.(int)$this->_item->lang_parent_id.')'
+		  ;
+		$this->_db->setQuery($query);
+		$this->_translations = $this->_db->loadObjectList();
+		
+		if ($this->_db->getErrorNum()) {
+			$jAp= JFactory::getApplication();
+			$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+		}
+		if ( empty($this->_translations) )  return $this->_translations;
+		
+		return $this->_translations;
+	}
 	
 }
 ?>

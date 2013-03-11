@@ -18,6 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
+
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
 $this->document->addScript('components/com_flexicontent/assets/js/tabber-minimized.js');
 $this->document->addStyleSheet('components/com_flexicontent/assets/css/tabber.css');
@@ -435,6 +437,39 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								</div>
 							<?php endif; ?>
 							
+							<?php if ($this->cparams->get('enable_translation_groups')) : ?>
+								<div style='clear:both;'>
+									<label id="jform_lang_parent_id-lbl" for="jform_lang_parent_id" class="flexi_label" >
+										<?php echo JText::_( 'FLEXI_ASSOC_TRANSLATIONS' );?>
+									</label>
+									<?php
+									if ( !empty($this->lang_assocs) ) {
+										$row_modified = strtotime($this->row->modified);
+										if (!$row_modified)  $row_modified = strtotime($this->row->created);
+										
+										foreach($this->lang_assocs as $assoc_item) {
+											if ($assoc_item->id==$this->row->id) continue;
+											
+											$_link  = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&cid[]='. $assoc_item->id;
+											$_title = JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ).':: ['. $assoc_item->lang .'] '. $assoc_item->title;
+											echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
+											//echo $assoc_item->id;
+											if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
+												echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
+											} else if( !empty($assoc_item->lang) ) {
+												echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
+											}
+											
+											$assoc_modified = strtotime($assoc_item->modified);
+											if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
+											if ( $assoc_modified < $row_modified ) echo "(!)";
+											echo "</a>";
+										}
+									}
+									?>
+								</div>
+							<?php endif; ?>
+							
 						</td>
 					</tr>
 				</table>
@@ -779,7 +814,6 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			else :
 			JHTML::_('behavior.modal', 'a.modal-versions');
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE') ? "d/M H:i" : $date_format;
-			$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
 			foreach ($this->versions as $version) :
 				$class = ($version->nr == $this->row->version) ? ' class="active-version"' : '';
 				if ((int)$version->nr > 0) :
@@ -790,7 +824,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
 				<td class="versions" align="center"><a href="javascript:;" class="hasTip" title="Comment::<?php echo $version->comment;?>"><?php echo $commentimage;?></a><?php
 				if((int)$version->nr==(int)$this->row->current_version) { ?>
-					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&<?php echo $ctrl_task;?>&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&<?php echo $ctrl_task;?>edit&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 				<?php }else{
 				?>
 					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().x-100, y: window.getSize().y-100}}"><?php echo $viewimage; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&task=items.edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1');" href="javascript:;" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revertimage; ?>
