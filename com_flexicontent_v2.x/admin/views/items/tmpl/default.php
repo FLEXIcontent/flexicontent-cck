@@ -67,12 +67,15 @@ $ord_grp = 1;
 
 $stategrps = array(1=>'published', 0=>'unpublished', -2=>'trashed', -3=>'unpublished', -4=>'unpublished', -5=>'published');
 
-$tz_string = JFactory::getApplication()->getCfg('offset');
+
+// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
+$site_zone = JFactory::getApplication()->getCfg('offset');
+$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
 if (FLEXI_J16GE) {
-	$tz = new DateTimeZone( $tz_string );
+	$tz = new DateTimeZone( $user_zone );
 	$tz_offset = $tz->getOffset(new JDate()) / 3600;
 } else {
-	$tz_offset = $tz_string;
+	$tz_offset = $site_zone;
 }
 ?>
 <script language="javascript" type="text/javascript">
@@ -467,14 +470,9 @@ window.addEvent('domready', function() {
 
 				<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
 				<?php
-				if (FLEXI_J16GE) {
-					$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
-					$tz_info .= ' ('.$tz_string.')';
-					echo JText::sprintf( 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE', '', $tz_info);
-				} else {
-					$tz_info =  ($tz_offset > 0) ? ' UTC +'. $tz_offset : ' UTC '. $tz_offset;
-					echo JText::sprintf( 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '', $tz_info );
-				}
+				$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
+				if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
+				echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
 				?>
 				</div>
 
@@ -692,10 +690,15 @@ window.addEvent('domready', function() {
 
 				if ( (FLEXI_FISH || FLEXI_J16GE) && !empty($this->lang_assocs[$row->lang_parent_id]) )
 				{
-					$row_modified = strtotime($row->modified);
-					if (!$row_modified)  $row_modified = strtotime($row->created);
-					echo "<br/>";
+					$row_modified = 0;
+					foreach($this->lang_assocs[$row->lang_parent_id] as $assoc_item) {
+						if ($assoc_item->id == $row->lang_parent_id) {
+							$row_modified = strtotime($assoc_item->modified);
+							if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
+						}
+					}
 					
+					echo "<br/>";
 					foreach($this->lang_assocs[$row->lang_parent_id] as $assoc_item) {
 						if ($assoc_item->id==$row->id) continue;
 						

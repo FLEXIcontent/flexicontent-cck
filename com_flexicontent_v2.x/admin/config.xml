@@ -119,10 +119,29 @@
 			
 		<field name="" type="separator" default="FLEXI_MULTILINGUAL_CONF" label="" level="level1" menu="hide" />
 			
-			<!--field name="flexi_fish" type="radio" default="0" label="FLEXI_JOOMFISH_SUPPORT" description="FLEXI_JOOMFISH_SUPPORT_DESC"  menu="hide">
+			<field name="" type="separator" default="NON native Item Translations (Translate CORE fields only) &lt;br/&gt; &lt;small&gt;A 3rd party tool (Falang) will translate my content items (articles)&lt;/small&gt;" label="" level="level2" menu="hide" />
+		
+			<field name="flexi_fish" type="radio" default="0" label="Activate Falang Support" description="Take care Falang MUST BE INSTALLED before you activate this option !!!"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="editjf_translations" type="radio" default="0" label="Edit Falang Translations" description="You can edit Falang item translations using the --item edit form--. &lt;br /&gt;&lt;br /&gt;&lt;b&gt;NOTE:&lt;/b&gt; &lt;br /&gt;(a) this will allow to edit fields: title, alias, description, metadesc, metakey (other Falang fields like: attributes and publish_up/publish_down will be forced to common values)&lt;br&gt;(b) A warning will be displayed if you disable this option but Falang Translations are detected.&lt;br&gt;&lt;br&gt;&lt;b&gt;NOTE:&lt;/b&gt; It is recommended that you use an item per translation, and then associate items together via enabling the 'Translation Groups' parameter, especially, if you need to translate all fields." menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_NO_DISABLE_WARNING</option>
+				<option value="2">FLEXI_YES</option>
+			</field>
+			
+			<!--field name="disable_lang_select" type="radio" default="0" label="FLEXI_DISABLE_LANG_SELECT" description="FLEXI_DISABLE_LANG_SELECT_DESC"  menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field-->
+			
+			<field name="" type="separator" default="Joomla/FLEXIcontent native Item Translations (Translate items fully) &lt;br/&gt; &lt;small&gt;with associations of item translations via FLEXIcontent or via J3.0 article associations&lt;/small&gt;" label="" level="level2" menu="hide" />
+		
+			<field name="enable_translation_groups" type="radio" default="1" label="FLEXI_ENABLE_TRANSLATION_GROUPS" description="FLEXI_ENABLE_TRANSLATION_GROUPS_DESC"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="filtercat" type="radio" default="1" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -131,20 +150,6 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<!--field name="disable_lang_select" type="radio" default="0" label="FLEXI_DISABLE_LANG_SELECT" description="FLEXI_DISABLE_LANG_SELECT_DESC"  menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field-->
-			
-			<field name="enable_translation_groups" type="radio" default="1" label="FLEXI_ENABLE_TRANSLATION_GROUPS" description="FLEXI_ENABLE_TRANSLATION_GROUPS_DESC"  menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<!--field name="editjf_translations" type="radio" default="0" label="FLEXI_MENU_EDIT_JOOMFISH_TRANSLATIONS" description="FLEXI_MENU_EDIT_JOOMFISH_TRANSLATIONS_DESC" menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_NO_DISABLE_WARNING</option>
-				<option value="2">FLEXI_YES</option>
-			</field-->
 			
 			
 		<field name="" type="separator" default="FLEXI_VERSIONING_CONF" label="" level="level1" menu="hide" />
@@ -542,10 +547,6 @@
 				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
 			</field>
 			
-			<!--field name="limit_filtervalues" type="list" default="1" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC" menu="hide" >
-				<option value="0">FLEXI_ALL_FIELD_VALUES</option>
-				<option value="1">FLEXI_CURRFILTER_FIELD_VALUES</option>
-			</field-->
 			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" menu="hide" />
 
 			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" menu="hide" />

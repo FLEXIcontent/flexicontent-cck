@@ -728,9 +728,10 @@ div fieldset input, div fieldset textarea, div fieldset select, div fieldset img
 	margin: 2px 2px 2px 0px !important;
 }
 
+#flexicontent .fc_form_title, #flexicontent .fc_form_alias,
 #flexicontent #alias, #flexicontent #jform_alias,
 #flexicontent #title, #flexicontent #jform_title {
-	font-size:11px!important; font-family:tahoma!important; width: 186px;
+	font-size:11px!important; font-family:tahoma!important; width:auto!important; font-weight:normal!important;
 }
 
 div.flexi_edit .flexi_label {

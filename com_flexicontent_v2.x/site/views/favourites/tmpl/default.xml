@@ -181,13 +181,9 @@
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
 				<option value="1">FLEXI_FORCE_SHOW_ALL</option>
 				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
-			</field-->
+			</field>
 			
-			<!--field name="limit_filtervalues" type="list" default="" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="1">FLEXI_CURRFILTER_FIELD_VALUES</option>
-			</field-->
-			<!--field name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" /-->
+			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" /-->
 			
 		</fieldset>
 
