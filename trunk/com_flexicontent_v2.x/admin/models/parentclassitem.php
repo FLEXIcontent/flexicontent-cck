@@ -511,6 +511,8 @@ class ParentClassItem extends JModelAdmin
 				// *************************************************************************************************
 				// -- Retrieve all active site languages, and create empty item translation objects for each of them
 				// *************************************************************************************************
+				$nn_content_tbl = FLEXI_J16GE ? 'falang_content' : 'jf_content';
+				
 				if ( FLEXI_FISH /*|| FLEXI_J16GE*/ )
 				{
 					$site_languages = FLEXIUtilities::getlanguageslist();
@@ -530,7 +532,7 @@ class ParentClassItem extends JModelAdmin
 				{
 					// -- Try to retrieve all joomfish data for the current item
 					$query = "SELECT jfc.language_id, jfc.reference_field, jfc.value, jfc.published "
-							." FROM #__jf_content as jfc "
+							." FROM #__".$nn_content_tbl." as jfc "
 							." WHERE jfc.reference_table='content' AND jfc.reference_id = {$this->_id} ";
 					$db->setQuery($query);
 					$translated_fields = $db->loadObjectList();
@@ -539,7 +541,7 @@ class ParentClassItem extends JModelAdmin
 						$app->enqueueMessage("Third party Joom!Fish translations detected for current content, but editting Joom!Fish translations is disabled in global configuration", 'message' );
 						$app->enqueueMessage("You can enable Joom!Fish translations editting or disable this warning in Global configuration",'message');
 					} else {
-						if  ( !FLEXI_J16GE && $db->getErrorNum() )  $app->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+						if  ( $db->getErrorNum() )  $app->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
 						
 						// -- Parse translation data according to their language
 						if ( $translated_fields )
@@ -2381,16 +2383,44 @@ class ParentClassItem extends JModelAdmin
 		//$user_currlang = flexicontent_html::getUserCurrentLang();                  // user's -current- language
 		//$default_sitelang = substr(flexicontent_html::getSiteDefaultLang(),0,2);   // site (frontend) -content- language
 		//$item_lang = substr($item->language ,0,2);                                 // item language
+		$nn_content_tbl = FLEXI_J16GE ? 'falang_content' : 'jf_content';
 		
-		$db = & $this->_db;
-		$config =& JFactory::getConfig();
+		$db = $this->_db;
+		$config = JFactory::getConfig();
 		$dbprefix = $config->getValue('config.dbprefix');
 		$dbtype = $config->getValue('config.dbtype');
+		
+		if ( in_array($dbtype, array('mysqli','mysql')) )
+		{
+			$query = "UPDATE #__content SET title=".$db->Quote($item->title).",  alias=".$db->Quote($item->alias).",  introtext=".$db->Quote($item->introtext)
+				.",  `fulltext`=".$db->Quote($item->fulltext).",  images=".$db->Quote($item->images).",  metadesc=".$db->Quote($item->metadesc).",  metakey=".$db->Quote($item->metakey)
+				.", publish_up=".$db->Quote($item->publish_up).",  publish_down=".$db->Quote($item->publish_down).",  attribs=".$db->Quote($item->attribs)." WHERE id=".$db->Quote($item->id);
+			//echo $query."<br/>\n";
+			if (FLEXI_J16GE) {
+				//$query = $db->replacePrefix($query);
+				$query = str_replace("#__", $dbprefix, $query);
+				$db_connection = & $db->getConnection();
+			} else {
+				$query = str_replace("#__", $dbprefix, $query);
+				$db_connection = & $db->_resource;
+			}
+			//echo "<pre>"; print_r($query); echo "\n\n";
+			
+			if ($dbtype == 'mysqli') {
+				$result = mysqli_query( $db_connection , $query );
+				if ($result===false) {echo mysqli_error($db_connection); return JError::raiseWarning( 500, "error _saveJFdata():: ".mysqli_error($db_connection));}
+			} else if ($dbtype == 'mysql') {
+				$result = mysql_query( $query, $db_connection  );
+				if ($result===false) return JError::raiseWarning( 500, "error _saveJFdata():: ".mysql_error($db_connection));
+			} else {
+				throw new Exception( 'unreachable code in _saveJFdata(): direct db query, unsupported DB TYPE' );
+			}
+		}		
 		
 		$modified = $item->modified ? $item->modified : $item->created;
 		$modified_by = $item->modified_by ? $item->modified_by : $item->created_by;
 		
-		$langs	= & FLEXIUtilities::getLanguages('shortcode');  // Get Joomfish active languages
+		$langs	= FLEXIUtilities::getLanguages('shortcode');  // Get Joomfish active languages
 		
 		foreach($jfdata_arr as $shortcode => $jfdata)
 		{
@@ -2420,49 +2450,24 @@ class ParentClassItem extends JModelAdmin
 			}
 			
 			// Delete existing Joom!Fish translation data for the current item
-			$query  = "DELETE FROM  #__jf_content WHERE language_id={$langs->$shortcode->id} AND reference_table='content' AND reference_id={$item->id}";
+			$query  = "DELETE FROM  #__".$nn_content_tbl." WHERE language_id={$langs->$shortcode->id} AND reference_table='content' AND reference_id={$item->id}";
 			$db->setQuery($query);
 			$db->query();
 			
 			// Apply new translation data
 			$translated_fields = array('title','alias','introtext','fulltext','metadesc','metakey');
 			foreach ($translated_fields as $fieldname) {
-				if ( !JString::strlen(trim(str_replace("&nbsp;", "", strip_tags(@$jfdata[$fieldname])))) ) continue;   // skip empty content
-				//echo "<br/><b>#__jf_content($fieldname) :</b><br/>";
-				$query = "INSERT INTO #__jf_content (language_id, reference_id, reference_table, reference_field, value, original_value, original_text, modified, modified_by, published) ".
-					"VALUES ( {$langs->$shortcode->id}, {$item->id}, 'content', '$fieldname', ".$db->Quote($jfdata[$fieldname]).", '".md5($item->{$fieldname})."', '', '$modified', '$modified_by', 1)";
+				if ( !strlen( @$jfdata[$fieldname] ) ) continue;
+				//if ( !JString::strlen(trim(str_replace("&nbsp;", "", strip_tags(@$jfdata[$fieldname])))) ) continue;   // skip empty content
+				//echo "<br/><b>#__".$nn_content_tbl."($fieldname) :</b><br/>";
+				$query = "INSERT INTO #__".$nn_content_tbl." (language_id, reference_id, reference_table, reference_field, value, original_value, original_text, modified, modified_by, published) ".
+					"VALUES ( {$langs->$shortcode->id}, {$item->id}, 'content', '$fieldname', ".$db->Quote(@$jfdata[$fieldname]).", '".md5($item->{$fieldname})."', ".$db->Quote($item->{$fieldname}).", '$modified', '$modified_by', 1)";
 				//echo $query."<br/>\n";
 				$db->setQuery($query);
 				$db->query();
 			}
 		}
 		
-		if ( in_array($dbtype, array('mysqli','mysql')) )
-		{
-			$query = "UPDATE #__content SET title=".$db->Quote($item->title).",  alias=".$db->Quote($item->alias).",  introtext=".$db->Quote($item->introtext)
-				.",  `fulltext`=".$db->Quote($item->fulltext).",  images=".$db->Quote($item->images).",  metadesc=".$db->Quote($item->metadesc).",  metakey=".$db->Quote($item->metakey)
-				.", publish_up=".$db->Quote($item->publish_up).",  publish_down=".$db->Quote($item->publish_down).",  attribs=".$db->Quote($item->attribs)." WHERE id=".$db->Quote($item->id);
-			//echo $query."<br/>\n";
-			if (FLEXI_J16GE) {
-				//$query = $db->replacePrefix($query);
-				$query = str_replace("#__", $dbprefix, $query);
-				$db_connection = & $db->getConnection();
-			} else {
-				$query = str_replace("#__", $dbprefix, $query);
-				$db_connection = & $db->_resource;
-			}
-			//echo "<pre>"; print_r($query); echo "\n\n";
-			
-			if ($dbtype == 'mysqli') {
-				$result = mysqli_query( $db_connection , $query );
-				if ($result===false) {echo mysqli_error($db_connection); return JError::raiseWarning( 500, "error _saveJFdata():: ".mysqli_error($db_connection));}
-			} else if ($dbtype == 'mysql') {
-				$result = mysql_query( $query, $db_connection  );
-				if ($result===false) return JError::raiseWarning( 500, "error _saveJFdata():: ".mysql_error($db_connection));
-			} else {
-				throw new Exception( 'unreachable code in _saveJFdata(): direct db query, unsupported DB TYPE' );
-			}
-		}
 		return true;
 	}
 	

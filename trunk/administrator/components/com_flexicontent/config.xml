@@ -119,24 +119,9 @@
 			
 		<param name="" type="separator" default="FLEXI_MULTILINGUAL_CONF" label="" level="level1" menu="hide" />
 			
+			<param name="" type="separator" default="NON native Item Translations (Translate CORE fields only) &lt;br/&gt; &lt;small&gt;A 3rd party tool (Joom!Fish) will translate my content items (articles)&lt;/small&gt;" label="" level="level2" menu="hide" />
+		
 			<param name="flexi_fish" type="radio" default="0" label="FLEXI_JOOMFISH_SUPPORT" description="FLEXI_JOOMFISH_SUPPORT_DESC"  menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="filtercat" type="radio" default="0" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="filtertag" type="radio" default="0" label="FLEXI_FILTER_TAG_VIEWS" description="FLEXI_FILTER_TAG_VIEWS_DESC"  menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="disable_lang_select" type="radio" default="0" label="FLEXI_DISABLE_LANG_SELECT" description="FLEXI_DISABLE_LANG_SELECT_DESC"  menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</param>
-			
-			<param name="enable_translation_groups" type="radio" default="0" label="FLEXI_ENABLE_TRANSLATION_GROUPS" description="FLEXI_ENABLE_TRANSLATION_GROUPS_DESC"  menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
@@ -144,6 +129,27 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_NO_DISABLE_WARNING</option>
 				<option value="2">FLEXI_YES</option>
+			</param>
+			
+			<param name="disable_lang_select" type="radio" default="0" label="FLEXI_DISABLE_LANG_SELECT" description="FLEXI_DISABLE_LANG_SELECT_DESC"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="" type="separator" default="Joomla/FLEXIcontent native Item Translations (Translate items fully) &lt;br/&gt; &lt;small&gt;with associations of item translations via FLEXIcontent or via J3.0 article associations&lt;/small&gt;" label="" level="level2" menu="hide" />
+		
+			<param name="enable_translation_groups" type="radio" default="0" label="FLEXI_ENABLE_TRANSLATION_GROUPS" description="FLEXI_ENABLE_TRANSLATION_GROUPS_DESC"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+		
+			<param name="filtercat" type="radio" default="0" label="FLEXI_FILTER_CAT_VIEWS" description="FLEXI_FILTER_CAT_VIEWS_DESC"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="filtertag" type="radio" default="0" label="FLEXI_FILTER_TAG_VIEWS" description="FLEXI_FILTER_TAG_VIEWS_DESC"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</param>
 			
 			
@@ -542,10 +548,6 @@
 				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
 			</param>
 			
-			<!--param name="limit_filtervalues" type="list" default="1" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC" menu="hide" >
-				<option value="0">FLEXI_ALL_FIELD_VALUES</option>
-				<option value="1">FLEXI_CURRFILTER_FIELD_VALUES</option>
-			</param-->
 			<param name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" menu="hide" />
 
 			<param name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" menu="hide" />

@@ -2676,7 +2676,14 @@ class FLEXIUtilities
 		// ******************
 		// Retrieve languages
 		// ******************
-		if (FLEXI_FISH) {   // Use joomfish languages table
+		if (FLEXI_J16GE) {   // Use J1.6+ language info
+			$query = 'SELECT DISTINCT le.*, lc.lang_id as id, lc.image as image_prefix'
+					.', CASE WHEN CHAR_LENGTH(lc.title_native) THEN lc.title_native ELSE le.name END as name'
+					.' FROM #__extensions as le'
+					.' LEFT JOIN #__languages as lc ON lc.lang_code=le.element AND lc.published=1'
+					.' WHERE le.type="language" '
+					.' GROUP BY le.element';
+		} else if (FLEXI_FISH) {   // Use joomfish languages table
 			$query = 'SELECT l.* '
 				. ( FLEXI_FISH_22GE ? ", lext.* " : "" )
 				. ( FLEXI_FISH_22GE ? ", l.lang_id as id " : ", l.id " )
@@ -2687,20 +2694,13 @@ class FLEXIUtilities
 				. ' WHERE '.    (FLEXI_FISH_22GE ? ' l.published=1 ' : ' l.active=1 ')
 				. ' ORDER BY '. (FLEXI_FISH_22GE ? ' lext.ordering ASC ' : ' l.ordering ASC ')
 					;
-		} else if (FLEXI_J16GE) {   // Use J1.6+ language info
-			$query = 'SELECT DISTINCT le.*, le.extension_id as id, lc.image as image_prefix'
-					.', CASE WHEN CHAR_LENGTH(lc.title_native) THEN lc.title_native ELSE le.name END as name'
-					.' FROM #__extensions as le'
-					.' LEFT JOIN #__languages as lc ON lc.lang_code=le.element AND lc.published=1'
-					.' WHERE le.type="language" '
-					.' GROUP BY le.element';
 		} else {
 			JError::raiseWarning(500, 'getlanguageslist(): ERROR no joomfish installed');
 			return array();
 		}
 		$db->setQuery($query);
 		$languages = $db->loadObjectList('id');
-		//echo "<pre>"; echo $query; print_r($languages); echo "</pre>"; exit;
+		//echo "<pre>"; print_r($languages); echo "</pre>"; exit;
 		if ($db->getErrorNum()) {
 			JError::raiseWarning(500, $db->getErrorMsg()."<br>Query:<br>".$query);
 			return array();
@@ -2710,19 +2710,46 @@ class FLEXIUtilities
 		// *********************
 		// Calculate image paths
 		// *********************
-		if (FLEXI_FISH) {   // Use joomfish images
-			$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
-			$mediapath	= $mainframe->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
-		} else {  // FLEXI_J16GE, use J1.6+ images
+		if (FLEXI_J16GE)  {  // FLEXI_J16GE, use J1.6+ images
 			$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
 			$mediapath	= $mainframe->isAdmin() ? '../media/mod_languages/images/' : 'media/mod_languages/images/';
+		} else {      // Use joomfish images
+			$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
+			$mediapath	= $mainframe->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
 		}
 		
 		
 		// ************************
 		// Prepare language objects
 		// ************************
-		if ( FLEXI_FISH && FLEXI_FISH_22GE )  // JoomFish v2.2+
+		if (FLEXI_J16GE)  // FLEXI_J16GE, based on J1.6+ language data and images
+		{
+			$lang_all = new stdClass();
+			$lang_all->code = '*';
+			$lang_all->name = 'All';
+			$lang_all->shortcode = '*';
+			$lang_all->id = 0;
+			$_languages = array( 0 => $lang_all);
+			
+			foreach ($languages as $lang) {
+				// Calculate/Fix languages data
+				$lang->code = $lang->element;
+				$lang->shortcode = substr($lang->code, 0, strpos($lang->code,'-'));
+				//$lang->id = $lang->extension_id;
+				$image_prefix = $lang->image_prefix ? $lang->image_prefix : $lang->shortcode;
+				// $lang->image, holds a custom image path
+				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $image_prefix . '.gif';
+				$_languages[$lang->id] = $lang;
+			}
+			$languages = $_languages;
+			
+			// Also prepend '*' (ALL) language to language array
+			//echo "<pre>"; print_r($languages); echo "</pre>"; exit;
+			
+			// Select language -ALL- if none selected
+			//$selected = $selected ? $selected : '*';    // WRONG behavior commented out
+		}
+		else if (FLEXI_FISH_22GE)  // JoomFish v2.2+
 		{
 			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
 			foreach ($languages as $lang) {
@@ -2730,35 +2757,12 @@ class FLEXIUtilities
 				$lang->imgsrc = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
 			}
 		}
-		else if ( FLEXI_FISH )                // JoomFish until v2.1
+		else      // JoomFish until v2.1
 		{
 			foreach ($languages as $lang) {
 				// $lang->image, holds a custom image path
 				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $lang->shortcode . '.gif';			
 			}
-		}
-		else
-		{                                     // FLEXI_J16GE, based on J1.6+ language data and images
-			foreach ($languages as $lang) {
-				// Calculate/Fix languages data
-				$lang->code = $lang->element;
-				$lang->shortcode = substr($lang->code, 0, strpos($lang->code,'-'));
-				$lang->id = $lang->extension_id;
-				$image_prefix = $lang->image_prefix ? $lang->image_prefix : $lang->shortcode;
-				// $lang->image, holds a custom image path
-				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $image_prefix . '.gif';
-			}
-			
-			// Also prepend '*' (ALL) language to language array
-			$lang_all = new stdClass();
-			$lang_all->code = '*';
-			$lang_all->name = 'All';
-			$lang_all->shortcode = '*';
-			$lang_all->id = 0;
-			array_unshift($languages, $lang_all);
-			
-			// Select language -ALL- if none selected
-			//$selected = $selected ? $selected : '*';    // WRONG behavior commented out
 		}
 		
 		return $languages;

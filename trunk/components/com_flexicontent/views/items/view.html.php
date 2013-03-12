@@ -96,8 +96,8 @@ class FlexicontentViewItems extends JViewLegacy
 			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
 		}
 		//special to hide the joomfish language selector on item views
-		$css = '#jflanguageselection { visibility:hidden; }'; 
-		if ($cparams->get('disable_lang_select', 1)) {
+		if ($cparams->get('disable_lang_select', 0)) {
+			$css = '#jflanguageselection { visibility:hidden; }'; 
 			$document->addStyleDeclaration($css);
 		}
 

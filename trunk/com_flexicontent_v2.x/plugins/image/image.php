@@ -448,7 +448,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				";
 			}
 			
-			$image_name = trim($value['originalname']);
+			$image_name = trim(@$value['originalname']);
 			
 			// Check and rebuild thumbnails if needed
 			$rebuild_res = plgFlexicontent_fieldsImage::rebuildThumbs($field,$value);
@@ -1955,6 +1955,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// NOTE: if all_media is ON the we already retrieved filenames above
 			if (!$all_media) {
 				$values[$n] = unserialize($values[$n]);
+				if ( !isset($values[$n]['originalname']) ) continue;
 				$values[$n] = $values[$n]['originalname'];
 			}
 			if ($values[$n] == $record) {

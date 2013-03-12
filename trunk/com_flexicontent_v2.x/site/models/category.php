@@ -383,7 +383,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		global $globalcats;
 		$cparams = & $this->_params;
 		$user 		= JFactory::getUser();
-		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
+		$ordering	= FLEXI_J16GE ? 'c.lft ASC' : 'c.ordering ASC';
 
 		// show unauthorized items
 		$show_noauth = $cparams->get('show_noauth', 0);
@@ -762,7 +762,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function _buildChildsQuery()
 	{
 		$user 		= JFactory::getUser();
-		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
+		$ordering	= FLEXI_J16GE ? 'c.lft ASC' : 'c.ordering ASC';
 
 		// Get the category parameters
 		$cparams = & $this->_params;
@@ -944,7 +944,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		
 		// Order
-		$ordering	= FLEXI_J16GE ? 'lft ASC' : 'ordering ASC';
+		$ordering	= FLEXI_J16GE ? 'sc.lft ASC' : 'sc.ordering ASC';
 		$orderby = ' ORDER BY '.$ordering;
 		
 		$query = 'SELECT DISTINCT *,'

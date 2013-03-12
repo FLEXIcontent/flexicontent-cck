@@ -280,8 +280,8 @@ class flexicontent_cats
 				$usercats 	= FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed, $require_all, $check_published);
 				// Add already selected categories to the category list
 				$selectedcats = !is_array($selected) ? array($selected) : $selected;
-				$usercats = array_unique(array_merge($selectedcats, $usercats));
 				$usercats_indexed = array_flip($usercats);
+				foreach ($selectedcats as $selectedcat) if ($selectedcat) $usercats_indexed[$selectedcat] = 1;
 			}
 		}
 		

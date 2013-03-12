@@ -244,14 +244,14 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 						<input class="inputbox required" style='margin:0px;' type="text" id="title" name="title" value="<?php echo $this->escape($this->item->title); ?>" size="65" maxlength="254" />
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
-						<?php if ($this->itemlang->shortcode!=$t->shortcode) : ?>
+						<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
 							<div class="tabbertab" style="padding: 0px;" >
 								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
 								<?php
 								$ff_id = 'jfdata_'.$t->shortcode.'_title';
 								$ff_name = 'jfdata['.$t->shortcode.'][title]';
 								?>
-								<input class="inputbox" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="65" maxlength="254" />
+								<input class="inputbox fc_form_title" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="65" maxlength="254" />
 							</div>
 						<?php endif; ?>
 					<?php endforeach; ?>
@@ -280,14 +280,14 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 						<input class="inputbox" style='margin:0px;' type="text" id="alias" name="alias" value="<?php echo $this->escape($this->item->alias); ?>" size="65" maxlength="254" />
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
-						<?php if ($this->itemlang->shortcode!=$t->shortcode) : ?>
+						<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
 							<div class="tabbertab" style="padding: 0px;" >
 								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
 								<?php
 								$ff_id = 'jfdata_'.$t->shortcode.'_alias';
 								$ff_name = 'jfdata['.$t->shortcode.'][alias]';
 								?>
-								<input class="inputbox" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="65" maxlength="254" />
+								<input class="inputbox fc_form_alias" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="65" maxlength="254" />
 							</div>
 						<?php endif; ?>
 					<?php endforeach; ?>
@@ -452,8 +452,14 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				</label>
 				<?php
 				if ( !empty($this->lang_assocs) ) {
-					$row_modified = strtotime($this->item->modified);
-					if (!$row_modified)  $row_modified = strtotime($this->item->created);
+
+					$row_modified = 0;
+					foreach($this->lang_assocs as $assoc_item) {
+						if ($assoc_item->id == $this->item->lang_parent_id) {
+							$row_modified = strtotime($assoc_item->modified);
+							if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
+						}
+					}
 					
 					foreach($this->lang_assocs as $assoc_item) {
 						if ($assoc_item->id==$this->item->id) continue;
@@ -522,7 +528,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		?>
 				<fieldset class="flexiaccess">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
-					<table id="tabacces" class="admintable" width="100%">
+					<table id="tabacces" class="admintable" width="100%" style="*position: relative;">
 						<tr>
 							<td>
 								<div id="access"><?php echo $this->lists['access']; ?></div>
@@ -652,7 +658,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 							?>
 						</div>
 						<?php foreach ($this->item->item_translations as $t): ?>
-							<?php if ($this->itemlang->shortcode!=$t->shortcode) : ?>
+							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
 								<div class="tabbertab" style="padding: 0px;" >
 									<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
 									<?php
@@ -799,7 +805,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 						<textarea id="metadescription" class="text_area" rows="3" cols="80" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
-						<?php if ($this->itemlang->shortcode!=$t->shortcode) : ?>
+						<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
 							<div class="tabbertab" style="padding: 0px;" >
 								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
 								<?php
@@ -839,7 +845,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 						<textarea id="metakeywords" class="text_area" rows="3" cols="80" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
 					</div>
 					<?php foreach ($this->item->item_translations as $t): ?>
-						<?php if ($this->itemlang->shortcode!=$t->shortcode) : ?>
+						<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
 							<div class="tabbertab" style="padding: 0px;" >
 								<h3> <?php echo $t->name; // $t->shortcode; ?> </h3>
 								<?php

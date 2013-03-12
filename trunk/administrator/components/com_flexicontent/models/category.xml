@@ -360,11 +360,6 @@
 				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
 			</param>
 			
-			<!--param name="limit_filtervalues" type="list" default="" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_ALL_FIELD_VALUES</option>
-				<option value="1">FLEXI_CURRFILTER_FIELD_VALUES</option>
-			</param-->
 			<param name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
 
 			<param name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" />
