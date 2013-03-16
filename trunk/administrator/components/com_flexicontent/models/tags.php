@@ -66,7 +66,7 @@ class FlexicontentModelTags extends JModelLegacy
 	function __construct()
 	{
 		parent::__construct();
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
@@ -106,7 +106,7 @@ class FlexicontentModelTags extends JModelLegacy
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db =& JFactory::getDBO();
+			$db = JFactory::getDBO();
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
 		}
@@ -186,7 +186,7 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function _buildContentOrderBy()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
@@ -206,7 +206,7 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function _buildContentWhere()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_state', 'filter_state', '', 'word' );
@@ -241,7 +241,7 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function _buildContentHaving()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.tags.filter_assigned', 'filter_assigned', '', 'word' );
@@ -268,7 +268,7 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user 	=& JFactory::getUser();
+		$user = JFactory::getUser();
 
 		if (count( $cid ))
 		{
@@ -348,7 +348,7 @@ class FlexicontentModelTags extends JModelLegacy
 		$tags = explode("\n", $tags);
 		
 		foreach ($tags as $tag) {
-			$row  =& $this->getTable('flexicontent_tags', '');
+			$row  = $this->getTable('flexicontent_tags', '');
 			$row->name 		= $tag;
 			$row->alias 	= JFilterOutput::stringURLSafe($tag);
 			$row->published = 1;

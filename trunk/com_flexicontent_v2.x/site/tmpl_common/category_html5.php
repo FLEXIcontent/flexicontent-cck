@@ -90,7 +90,10 @@ $page_classes .= ' fccategory fccat'.$this->category->id;
 <?php if ($this->category->id || (count($this->categories) && $this->params->get('show_subcategories'))  echo '</section>'; ?>
 
 <!-- BOF item list display -->
-	<?php echo $this->loadTemplate('items_html5'); ?>
+<?php
+	echo $this->loadTemplate('items_html5');
+	echo empty($this->items) ? '<span class="fc_return_msg">'.JText::sprintf('FLEXI_CLICK_HERE_TO_RETURN', '"JavaScript:window.history.back();"').'</span>' : "";
+?>
 <!-- BOF item list display -->
 
 <!-- BOF pagination -->

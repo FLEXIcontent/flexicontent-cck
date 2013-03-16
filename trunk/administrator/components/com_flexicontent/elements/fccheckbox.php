@@ -126,7 +126,7 @@ function toggle_options_fc_".$element_id."(element) {
 	element.setProperty('disabled', '');
 }";
 
-		$doc = & JFactory::getDocument();
+		$doc = JFactory::getDocument();
 		$doc->addScriptDeclaration($js);
 		
 		return $html;

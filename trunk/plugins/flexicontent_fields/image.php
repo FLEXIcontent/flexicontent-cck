@@ -506,7 +506,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				</tr>';
 			if ($usealt) $alt =
 				'<tr>
-					<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).': ('.JText::_('FLEXI_FIELD_IMAGE').')</td>
+					<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).')</td>
 					<td><input class="imgalt" size="40" name="'.$fieldname.'[alt]" value="'.(isset($value['alt']) ? $value['alt'] : $default_alt).'" type="text" /></td>
 				</tr>';
 			if ($usetitle) $title =
@@ -516,8 +516,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				</tr>';
 			if ($usedesc) $desc =
 				'<tr>
-					<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': ('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
-					<td><textarea class="imgdesc" name="'.$fieldname.'[desc]" rows="5" cols="30" >'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea></td>
+					<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': <br/>('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
+					<td><textarea class="imgdesc" name="'.$fieldname.'[desc]" rows="5" cols="28" >'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea></td>
 				</tr>';
 			
 			$curr_select = str_replace('__FORMFLDNAME__', $fieldname.'[existingname]', $select);
@@ -1599,12 +1599,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		$destpaths_arr[$destpath] = 1;  // Avoid trying to set folder permission multiple times
 		
+		$filepath = $destpath.$prefix.$filename;
 		if ($copy_original) {
-			return JFile::copy( $onlypath.$filename,  $destpath.$prefix.$filename );
+			$result = JFile::copy( $onlypath.$filename,  $filepath );
+			
 		} else {
 			// create the thumnails using phpthumb $filename
-			return $this->imagePhpThumb( $onlypath, $destpath, $prefix, $filename, $ext, $w, $h, $quality, $size, $crop, $usewm, $wmfile, $wmop, $wmpos );
+			$result = $this->imagePhpThumb( $onlypath, $destpath, $prefix, $filename, $ext, $w, $h, $quality, $size, $crop, $usewm, $wmfile, $wmop, $wmpos );
 		}
+		
+		// Make sure file path has correct permissions
+		if ( $result && JPath::canChmod($filepath) )  chmod($filepath, '0644');
+		
+		return $result;
 	}
 	
 	

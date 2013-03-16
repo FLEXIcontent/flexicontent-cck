@@ -54,8 +54,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	function __construct() {
 		parent::__construct();
 		$option = 'com_flexicontent';
-		$mainframe = &JFactory::getApplication();
-		$limit		= $mainframe->getUserStateFromRequest( $option.'.search.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
+		$mainframe  = JFactory::getApplication();
+		$limit      = $mainframe->getUserStateFromRequest( $option.'.search.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.search.limitstart', 'limitstart', 0, 'int' );
 
 		// In case limit has been changed, adjust limitstart accordingly
@@ -70,7 +70,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		if(empty($this->_data)) {
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db =& JFactory::getDBO();
+			$db = JFactory::getDBO();
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
 		}
@@ -126,7 +126,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 */
 	function _buildOrderBy()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.search.filter_order', 'filter_order', 'a.title', 'cmd' );
@@ -154,7 +154,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		if ( isset($where) ) return $where;
 		
 		$option = JRequest::getVar('option');
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 
 		$filter_itemstate	= $mainframe->getUserStateFromRequest( $option.'.search.filter_itemstate', 'filter_itemstate', '', 'word' );
 		$filter_itemtype	= $mainframe->getUserStateFromRequest( $option.'.search.filter_itemtype', 'filter_itemtype', '', 'int' );
@@ -262,11 +262,11 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		return $this->_pagination;
 	}
 	function getLimitStart() {
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		return $this->getState('limitstart', $mainframe->getCfg('list_limit'));
 	}
 	function purge() {
-		$db = &JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = "TRUNCATE TABLE `#__flexicontent_advsearch_index`;";
 		$db->setQuery($query);
 		$db->query();

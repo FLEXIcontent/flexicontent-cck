@@ -49,7 +49,7 @@ class plgSystemFlexiadvroute extends JPlugin
 	{
 		global $globalnopath, $globalnoroute;
 
-		$mainframe =& JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		
 		if ($mainframe->isAdmin()) {
 			return; // Dont run in admin
@@ -83,9 +83,9 @@ class plgSystemFlexiadvroute extends JPlugin
 	
 	function switchLangAssocItem( $args=null )
 	{
-		$flexiparams =& JComponentHelper::getParams('com_flexicontent');
-		$app =& JFactory::getApplication();
-		$session  =& JFactory::getSession();
+		$flexiparams = JComponentHelper::getParams('com_flexicontent');
+		$app = JFactory::getApplication();
+		$session = JFactory::getSession();
 		
 		// Execute only in frontend
 		if( $app->isAdmin() )  return;
@@ -118,7 +118,7 @@ class plgSystemFlexiadvroute extends JPlugin
 		}
 		else if (FLEXI_J16GE)
 		{
-			$menus     = JApplication::getMenu('site', array());
+			$menus = $app->getMenu('site', array());
 			$curr_menu = $menus->getActive();
 			$curr_menu_isitem = @$menu->query['option']=='com_flexicontent' && @$menu->query['view']==FLEXI_ITEMVIEW && @$menu->query['id']==(int)JRequest::getVar('id');
 			$curr_menu_iscat  = @$menu->query['option']=='com_flexicontent' && @$menu->query['view']=='category' && @$menu->query['cid']==(int)JRequest::getVar('cid');
@@ -254,7 +254,7 @@ class plgSystemFlexiadvroute extends JPlugin
 	  //if ( !empty(JRequest::getVar('task')) ) return;
 		
 	  // Get associated translating item for current language
-	  $db =& JFactory::getDBO();
+	  $db = JFactory::getDBO();
 	  $query = "SELECT i.id, CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(':', i.id, i.alias) ELSE i.id END as slug"
 	  . " FROM #__content AS i "
 	  . " LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id "
@@ -288,7 +288,7 @@ class plgSystemFlexiadvroute extends JPlugin
 			$lang = JFactory::getLanguage();
 			$isHomePage = $menu->getActive() == $menu->getDefault($lang->getTag());
 		} else {
-			$menu = & JSite::getMenu();
+			$menu = JSite::getMenu();
 			$isHomePage = $menu->getActive() == $menu->getDefault();
 		}
 		return $isHomePage;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: archive.php 1342 2012-06-07 01:48:19Z ggppdk $
+ * @version 1.5 stable $Id: archive.php 1577 2012-12-02 15:10:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -73,7 +73,7 @@ class FlexicontentModelArchive extends JModelList
 	function __construct()
 	{
 		parent::__construct();
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
@@ -114,7 +114,7 @@ class FlexicontentModelArchive extends JModelList
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db =& JFactory::getDBO();
+			$db = JFactory::getDBO();
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
 			
@@ -202,7 +202,7 @@ class FlexicontentModelArchive extends JModelList
 	 */
 	function _buildContentOrderBy()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.archive.filter_order', 		'filter_order', 	'i.ordering', 'cmd' );
@@ -222,7 +222,7 @@ class FlexicontentModelArchive extends JModelList
 	 */
 	function _buildContentWhere()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.archive.search', 'search', '', 'string' );
@@ -360,7 +360,7 @@ class FlexicontentModelArchive extends JModelList
 	 */
 	function unarchive($cid = array())
 	{
-		$user 	= & JFactory::getUser();
+		$user 	= JFactory::getUser();
 		$userid	= (int) $user->get('id');
 
 		if (count( $cid ))

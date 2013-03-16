@@ -87,7 +87,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		}
 		
 		// Parse configuration for every category
-   	foreach ($rows as $cat) $cat->config = new JParameter($cat->config);
+   	foreach ($rows as $cat)  $cat->config = FLEXI_J16GE ? new JRegistry($cat->config) : new JParameter($cat->config);
 		
 		if (FLEXI_J16GE) {
 			$this->state = $this->get('State');

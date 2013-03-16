@@ -68,7 +68,7 @@ class FlexicontentModelFields extends JModelLegacy
 		parent::__construct();
 
 		$option = JRequest::getVar('option');
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.fields.limitstart', 'limitstart', 0, 'int' );
@@ -109,9 +109,9 @@ class FlexicontentModelFields extends JModelLegacy
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db =& JFactory::getDBO();
+			$db = JFactory::getDBO();
 			if ($db->getErrorNum()) {
-				$jAp=& JFactory::getApplication();
+				$jAp= JFactory::getApplication();
 				$jAp->enqueueMessage($db->getErrorMsg(),'error');
 			}
 			$db->setQuery("SELECT FOUND_ROWS()");
@@ -200,7 +200,7 @@ class FlexicontentModelFields extends JModelLegacy
 	 */
 	function _buildContentOrderBy()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
@@ -229,7 +229,7 @@ class FlexicontentModelFields extends JModelLegacy
 		static $where;
 		if(!isset($where)) {
 			$option = JRequest::getVar('option');
-			$mainframe = &JFactory::getApplication();
+			$mainframe = JFactory::getApplication();
 	
 			$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
 			$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
@@ -284,7 +284,7 @@ class FlexicontentModelFields extends JModelLegacy
 	 */
 	function _buildContentHaving()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_assigned', 'filter_assigned', '', 'word' );
@@ -311,7 +311,7 @@ class FlexicontentModelFields extends JModelLegacy
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user 	=& JFactory::getUser();
+		$user = JFactory::getUser();
 
 		if (count( $cid ))
 		{
@@ -342,7 +342,7 @@ class FlexicontentModelFields extends JModelLegacy
 	function toggleprop($cid = array(), $propname=null, &$unsupported=0, &$locked=0)
 	{
 		if (!$propname) return false;
-		$user 	=& JFactory::getUser();
+		$user = JFactory::getUser();
 		
 		$affected = 0;
 		if (count( $cid ))
@@ -525,9 +525,9 @@ class FlexicontentModelFields extends JModelLegacy
 	 */
 	function saveaccess($id, $access)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$row =& JTable::getInstance('flexicontent_fields', '');
+		$row = JTable::getInstance('flexicontent_fields', '');
 
 		$row->load( $id );
 		$row->id = $id;
@@ -577,10 +577,10 @@ class FlexicontentModelFields extends JModelLegacy
 		foreach ($cid as $id) {
 			// only non core fields
 			if ($id > 14) {
-				$field  =& $this->getTable('flexicontent_fields', '');
+				$field = $this->getTable('flexicontent_fields', '');
 				$field->load($id);
 				if ( $copyvalues && in_array($field->field_type, array('image')) ) {
-					$params = new JParameter($field->attribs);
+					$params = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
 					if ($params->get('image_source')) {
 						JFactory::getApplication()->enqueueMessage( 'You cannot copy image field -- "'.$field->name.'" -- together with its values, since this field has data in folders too' ,'error');
 						continue;
@@ -700,14 +700,14 @@ class FlexicontentModelFields extends JModelLegacy
 	 */
 	function move($direction)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 
 		if ($filter_type == '' || $filter_type == 0)
 		{
-			$row =& JTable::getInstance('flexicontent_fields', '');
+			$row = JTable::getInstance('flexicontent_fields', '');
 
 			if (!$row->load( $this->_id ) ) {
 				$this->setError($this->_db->getErrorMsg());
@@ -817,7 +817,7 @@ class FlexicontentModelFields extends JModelLegacy
 	 */
 	function saveorder($cid = array(), $order)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
@@ -825,7 +825,7 @@ class FlexicontentModelFields extends JModelLegacy
 		if ($filter_type == '' || $filter_type == 0)
 		{
 
-			$row =& JTable::getInstance('flexicontent_fields', '');
+			$row = JTable::getInstance('flexicontent_fields', '');
 		
 			// update ordering values
 			for( $i=0; $i < count($cid); $i++ )

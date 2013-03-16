@@ -43,7 +43,7 @@ class JElementItem extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		$doc 		=& JFactory::getDocument();
+		$doc = JFactory::getDocument();
 		if (FLEXI_J16GE) {
 			$node = & $this->element;
 			$attributes = get_object_vars($node->attributes());
@@ -59,7 +59,7 @@ class JElementItem extends JElement
 		
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
-		$item =& JTable::getInstance('flexicontent_items', '');
+		$item = JTable::getInstance('flexicontent_items', '');
 		if ($value) {
 			$item->load($value);
 		} else {

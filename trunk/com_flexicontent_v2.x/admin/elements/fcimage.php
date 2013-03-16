@@ -47,7 +47,7 @@ if (FLEXI_J16GE) {
 		$images 	= array();
 		$images[] 	= JHTMLSelect::option('', JText::_( 'FLEXI_SELECT_IMAGE_FIELD' )); 
 
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		if (FLEXI_J16GE) {
 			$node = & $this->element;
 			$attributes = get_object_vars($node->attributes());

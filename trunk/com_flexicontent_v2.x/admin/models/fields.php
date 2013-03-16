@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: fields.php 1146 2012-02-22 06:52:39Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: fields.php 1640 2013-02-28 14:45:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -68,7 +68,7 @@ class FlexicontentModelFields extends JModelList
 		parent::__construct();
 
 		$option = JRequest::getVar('option');
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
 		$limitstart = $mainframe->getUserStateFromRequest( $option.'.fields.limitstart', 'limitstart', 0, 'int' );
@@ -132,7 +132,7 @@ class FlexicontentModelFields extends JModelList
 			$orderby	= trim($this->_buildContentOrderBy());
 			$having		= trim($this->_buildContentHaving());
 	
-			$db = &JFactory::getDBO();
+			$db =  JFactory::getDBO();
 			$query = $db->getQuery(true);
 			$query->select(
 				$this->getState( 'list.select',
@@ -164,7 +164,7 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function _buildContentOrderBy()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
@@ -193,7 +193,7 @@ class FlexicontentModelFields extends JModelList
 		static $where;
 		if(!isset($where)) {
 			$option = JRequest::getVar('option');
-			$mainframe = &JFactory::getApplication();
+			$mainframe = JFactory::getApplication();
 	
 			$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
 			$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
@@ -248,7 +248,7 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function _buildContentHaving()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_assigned', 'filter_assigned', '', 'word' );
@@ -275,7 +275,7 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user 	=& JFactory::getUser();
+		$user = JFactory::getUser();
 
 		if (count( $cid ))
 		{
@@ -320,7 +320,7 @@ class FlexicontentModelFields extends JModelList
 	function toggleprop($cid = array(), $propname=null, &$unsupported=0, &$locked=0)
 	{
 		if (!$propname) return false;
-		$user 	=& JFactory::getUser();
+		$user = JFactory::getUser();
 		
 		$affected = 0;
 		if (count( $cid ))
@@ -503,9 +503,9 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function saveaccess($id, $access)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$row =& JTable::getInstance('flexicontent_fields', '');
+		$row = JTable::getInstance('flexicontent_fields', '');
 
 		$row->load( $id );
 		$row->id = $id;
@@ -555,10 +555,10 @@ class FlexicontentModelFields extends JModelList
 		foreach ($cid as $id) {
 			// only non core fields
 			if ($id > 14) {
-				$field  =& $this->getTable('flexicontent_fields', '');
+				$field = $this->getTable('flexicontent_fields', '');
 				$field->load($id);
 				if ( $copyvalues && in_array($field->field_type, array('image')) ) {
-					$params = new JParameter($field->attribs);
+					$params = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
 					if ($params->get('image_source')) {
 						JFactory::getApplication()->enqueueMessage( 'You cannot copy image field -- "'.$field->name.'" -- together with its values, since this field has data in folders too' ,'error');
 						continue;
@@ -678,14 +678,14 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function move($direction)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 
 		if ($filter_type == '' || $filter_type == 0)
 		{
-			$row =& JTable::getInstance('flexicontent_fields', '');
+			$row = JTable::getInstance('flexicontent_fields', '');
 
 			if (!$row->load( $this->_id ) ) {
 				$this->setError($this->_db->getErrorMsg());
@@ -795,7 +795,7 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function saveorder($cid = array(), $order)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
@@ -803,7 +803,7 @@ class FlexicontentModelFields extends JModelList
 		if ($filter_type == '' || $filter_type == 0)
 		{
 
-			$row =& JTable::getInstance('flexicontent_fields', '');
+			$row = JTable::getInstance('flexicontent_fields', '');
 		
 			// update ordering values
 			for( $i=0; $i < count($cid); $i++ )

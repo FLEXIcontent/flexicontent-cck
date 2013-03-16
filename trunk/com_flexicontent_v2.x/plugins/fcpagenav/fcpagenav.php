@@ -104,7 +104,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$query 	= 'SELECT params FROM #__categories WHERE id = ' . ($cid ? $cid : $item->catid);
 			$db->setQuery($query);
 			$catparams = $db->loadResult();
-			$cparams = new JParameter($catparams);
+			$cparams = FLEXI_J16GE ? new JRegistry($catparams) : new JParameter($catparams);
 			
 			// filter depending on permissions
 			if (FLEXI_J16GE) {

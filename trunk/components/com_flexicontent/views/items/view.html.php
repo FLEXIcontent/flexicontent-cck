@@ -27,7 +27,7 @@ jimport( 'joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewItems extends JViewLegacy
+class FlexicontentViewItems  extends JViewLegacy
 {
 	var $_type = '';
 	var $_name = FLEXI_ITEMVIEW;
@@ -79,7 +79,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		if ($menu) {
-			$menuParams = new JParameter($menu->params);
+			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
 			// In J1.6+ the above function does not merge current menu item parameters,
 			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
 			if (FLEXI_J16GE) $cparams->merge($menuParams);
@@ -127,7 +127,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// (c) Create the type parameters
 		$tparams = & $this->get( 'Typeparams' );
-		$tparams = new JParameter($tparams);
+		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 		
 		// (d) Verify the layout is within templates, Content Type default template OR Content Type allowed templates
 		$allowed_tmpls = $tparams->get('allowed_ilayouts');
@@ -374,7 +374,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ($mainframe->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
 		
 		// Set remaining META keys
-		//$mdata = new JParameter($item->metadata);
+		//$mdata = FLEXI_J16GE ? new JRegistry($item->metadata) : new JParameter($item->metadata);
 		//$mdata = $mdata->toArray();
 		$mdata = $item->metadata->toArray();
 		foreach ($mdata as $k => $v)
@@ -452,12 +452,7 @@ class FlexicontentViewItems extends JViewLegacy
 		if ( $print_logging_info )  global $fc_run_times;
 		
 		if ($menu) {
-			if (FLEXI_J16GE) {
-				$menuParams = new JRegistry;
-				$menuParams->loadJSON($menu->params);
-			} else {
-				$menuParams = new JParameter($menu->params);
-			}
+			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
 		}
 		
 		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
@@ -567,7 +562,7 @@ class FlexicontentViewItems extends JViewLegacy
 		
 		// Create the type parameters
 		$tparams = & $this->get( 'Typeparams' );
-		$tparams = new JParameter($tparams);
+		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 		
 		// Merge item parameters, or type/menu parameters for new item
 		if ( $isnew ) {
@@ -891,7 +886,7 @@ class FlexicontentViewItems extends JViewLegacy
 		// Retrieve author configuration
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
 		if ( $authorparams = $db->loadResult() )
-			$authorparams = new JParameter($authorparams);
+			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
 		//echo "<pre>"; print_r($authorparams); exit;
 		
 		if ( $perms['canpublish'] && !$item->id ) $item->state = 1;

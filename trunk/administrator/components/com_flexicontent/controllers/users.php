@@ -47,7 +47,7 @@ class FlexicontentControllerusers extends FlexicontentController
 	/**
 	 * Displays a view
 	 */
-	function display( )
+	function display($cachable = false, $urlparams = false)
 	{
 		switch($this->getTask())
 		{
@@ -82,10 +82,10 @@ class FlexicontentControllerusers extends FlexicontentController
 		$option = JRequest::getCmd( 'option');
 
 		// Initialize some variables
-		$mainframe=& JFactory::getApplication();
-		$db				= & JFactory::getDBO();
-		$me				= & JFactory::getUser();
-		$acl			= & JFactory::getACL();
+		$mainframe= JFactory::getApplication();
+		$db				= JFactory::getDBO();
+		$me				= JFactory::getUser();
+		$acl			= JFactory::getACL();
 		$MailFrom	= $mainframe->getCfg('mailfrom');
 		$FromName	= $mainframe->getCfg('fromname');
 		$SiteName	= $mainframe->getCfg('sitename');
@@ -97,7 +97,7 @@ class FlexicontentControllerusers extends FlexicontentController
 		if (FLEXI_J16GE) {
 			$isSuperAdmin = isset($user->groups[8]);
 		} else {
-			$acl				=& JFactory::getACL();
+			$acl				= JFactory::getACL();
 			$objectID 	= $acl->get_object_id( 'users', $id, 'ARO' );
 			$groups			= $acl->get_object_groups( $objectID, 'ARO' );
 			$this_group	= strtolower( $acl->get_group_name( $groups[0], 'ARO' ) );
@@ -206,7 +206,7 @@ class FlexicontentControllerusers extends FlexicontentController
 		$author_postdata['author_catparams']	= $data['authorcatparams'];
 		//echo "<pre>"; print_r($data); exit;
 		
-		$flexiauthor_extdata = & JTable::getInstance('flexicontent_authors_ext', '');
+		$flexiauthor_extdata = JTable::getInstance('flexicontent_authors_ext', '');
 		
 		// Bind data, Check data & Store the data to the database table
 		if (!$flexiauthor_extdata->save($author_postdata))
@@ -242,8 +242,8 @@ class FlexicontentControllerusers extends FlexicontentController
 		if ( !FLEXI_J16GE && $saving_myself)
 		{
 			// Get an ACL object
-			$acl = &JFactory::getACL();
-			$mainframe =& JFactory::getApplication();
+			$acl = JFactory::getACL();
+			$mainframe = JFactory::getApplication();
 
 			// Get the user group from the ACL
 			$grp = $acl->getAroGroup($user->get('id'));
@@ -269,7 +269,7 @@ class FlexicontentControllerusers extends FlexicontentController
 				$user->set('level', $me->get('level'));
 			}
 
-			$session = &JFactory::getSession();
+			$session = JFactory::getSession();
 			$session->set('user', $user);
 		}
 		
@@ -304,9 +304,9 @@ class FlexicontentControllerusers extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$app   = & JFactory::getApplication();
-		$db    = & JFactory::getDBO();
-		$me    = & JFactory::getUser();
+		$app   = JFactory::getApplication();
+		$db    = JFactory::getDBO();
+		$me    = JFactory::getUser();
 		$curIsSuperAdmin = FLEXI_J16GE ? isset($me->groups[8]) : $me->get( 'gid' ) == 25;
 		
 		$cid = JRequest::getVar( 'cid', array(), '', 'array' );
@@ -326,7 +326,7 @@ class FlexicontentControllerusers extends FlexicontentController
 			if (FLEXI_J16GE) {
 				$isSuperAdmin = isset($user->groups[8]);
 			} else {
-				$acl				=& JFactory::getACL();
+				$acl				= JFactory::getACL();
 				$objectID 	= $acl->get_object_id( 'users', $id, 'ARO' );
 				$groups			= $acl->get_object_groups( $objectID, 'ARO' );
 				$this_group	= strtolower( $acl->get_group_name( $groups[0], 'ARO' ) );
@@ -399,9 +399,9 @@ class FlexicontentControllerusers extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$app     = & JFactory::getApplication();
-		$db      = & JFactory::getDBO();
-		$me = & JFactory::getUser();
+		$app = JFactory::getApplication();
+		$db  = JFactory::getDBO();
+		$me  = JFactory::getUser();
 		$curIsSuperAdmin = FLEXI_J16GE ? isset($me->groups[8]) : $me->get( 'gid' ) == 25;
 		
 		if (!$check_uids) {
@@ -427,7 +427,7 @@ class FlexicontentControllerusers extends FlexicontentController
 			if (FLEXI_J16GE) {
 				$isSuperAdmin = isset($user->groups[8]);
 			} else {
-				$acl				=& JFactory::getACL();
+				$acl				= JFactory::getACL();
 				$objectID 	= $acl->get_object_id( 'users', $id, 'ARO' );
 				$groups			= $acl->get_object_groups( $objectID, 'ARO' );
 				$this_group	= strtolower( $acl->get_group_name( $groups[0], 'ARO' ) );
@@ -491,8 +491,8 @@ class FlexicontentControllerusers extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$mainframe =& JFactory::getApplication();
-		$db		=& JFactory::getDBO();
+		$mainframe = JFactory::getApplication();
+		$db			= JFactory::getDBO();
 		$task 	= $this->getTask();
 		$cids 	= JRequest::getVar( 'cid', array(), '', 'array' );
 		$client = JRequest::getVar( 'client', 0, '', 'int' );

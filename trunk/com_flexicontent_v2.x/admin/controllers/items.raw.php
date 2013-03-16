@@ -57,7 +57,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$cache = FLEXIUtilities::getCache();
 			$cache->clean('com_flexicontent_items');
 		} else {
-			$cache = &JFactory::getCache('com_flexicontent_items');
+			$cache = JFactory::getCache('com_flexicontent_items');
 			$cache->clean();
 		}
 		echo 0;
@@ -80,7 +80,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$cache = FLEXIUtilities::getCache();
 			$cache->clean('com_flexicontent_items');
 		} else {
-			$cache = &JFactory::getCache('com_flexicontent_items');
+			$cache = JFactory::getCache('com_flexicontent_items');
 			$cache->clean();
 		}
 		
@@ -97,7 +97,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 
-		$user	=& JFactory::getUser();
+		$user	= JFactory::getUser();
 		
 		if (FLEXI_J16GE) {
 			$permission = FlexicontentHelperPerm::getPerm();
@@ -135,7 +135,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	 * @since 1.5
 	 */
 	function selectstate() {
-		$user	=& JFactory::getUser();
+		$user	= JFactory::getUser();
 		
 		// General permission since we do not have a specific item yet
 		if (FLEXI_J16GE) {

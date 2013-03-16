@@ -256,7 +256,7 @@ $r = 0;
 	
 		<?php if ($this->params->get('show_item_total', 1)) : ?>
 			<span class="fc_item_total_data">
-				<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pageNav->getResultsCounter(); // custom Results Counter ?>
+				<?php if (@$this->resultsCounter || @$this->pageNav) echo @$this->resultsCounter ? $this->resultsCounter : $this->pageNav->getResultsCounter(); // custom Results Counter ?>
 			</span>
 		<?php endif; ?>
 		
@@ -273,7 +273,7 @@ $r = 0;
 		<?php endif; ?>
 		
 		<span class="fc_pages_counter">
-			<small><?php echo $this->pageNav->getPagesCounter(); ?></small>
+			<small><?php if (@$this->pageNav) echo $this->pageNav->getPagesCounter(); ?></small>
 		</span>
 	
 	</div>

@@ -107,7 +107,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// Get menu parameters
 		if ($menu) {
-			$menuParams = new JParameter($menu->params);
+			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
 			// In J1.6+ the above function does not merge current menu item parameters,
 			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
 			if (FLEXI_J16GE) $params->merge($menuParams);
@@ -208,7 +208,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// **********************
 		
 		$plugin = JPluginHelper::getPlugin('search', 'flexiadvsearch');
-		$pluginParams = new JParameter( $plugin->params );
+		$pluginParams = FLEXI_J16GE ? new JRegistry($plugin->params) : new JParameter($plugin->params);
 		
 		// Shortcuts for plugin parameters
 		$search_limit    = $params->get( 'search_limit', $pluginParams->get( 'search_limit', 20 ) );      // Limits the returned results of this seach plugin
@@ -407,7 +407,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			;
 		
 		// AND-WHERE sub-clauses ... (shared with filters)
-		$and_where =  ' 1=1 '
+		$and_where =  ' 1 '
 			. ' AND i.state IN (1,-5'. ($search_archived ? (FLEXI_J16GE ? 2:-1) :'' ) .') '
 			. ' AND c.published = 1 '
 			. ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_now.' )'

@@ -192,7 +192,7 @@ class FlexicontentModelTags extends JModelLegacy
 		$params = & $this->_params;
 		
 		// image for an image field
-		$use_image    = (int)$params->get('use_image', 1);
+		/*$use_image    = (int)$params->get('use_image', 1);
 		$image_source = $params->get('image_source');
 
 		// EXTRA select and join for special fields: --image--
@@ -203,7 +203,7 @@ class FlexicontentModelTags extends JModelLegacy
 		} else {
 			$select_image	= '';
 			$join_image		= '';
-		}
+		}*/
 		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
@@ -243,7 +243,8 @@ class FlexicontentModelTags extends JModelLegacy
 			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
 		}
 
-		$query = 'SELECT i.id, i.*, ie.*, '.$select_image
+		$query = 'SELECT i.id, i.*, ie.*, '
+			//.$select_image
 			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 			. ' FROM #__content AS i'
@@ -253,7 +254,7 @@ class FlexicontentModelTags extends JModelLegacy
 			. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 			. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
 			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-			. $join_image
+			//. $join_image
 			. $field_item
 			. $joinaccess
 			. $where
@@ -371,17 +372,12 @@ class FlexicontentModelTags extends JModelLegacy
 		// Retrieve menu parameters
 		$menu = JSite::getMenu()->getActive();
 		if ($menu) {
-			if (FLEXI_J16GE) {
-				$menuParams = new JRegistry;
-				$menuParams->loadJSON($menu->params);
-			} else {
-				$menuParams = new JParameter($menu->params);
-			}
+			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
 		}
 		
 		// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively
 		$flexi = JComponentHelper::getComponent('com_flexicontent');
-		$params = new JParameter($flexi->params);
+		$params = FLEXI_J16GE ? new JRegistry($flexi->params) : new JParameter($flexi->params);
 		
 		// Merge current menu item (could be tags specific or the Globally Configured Default Tag Menu Item)
 		$params->merge($menuParams);
@@ -402,7 +398,7 @@ class FlexicontentModelTags extends JModelLegacy
 			// Higher Priority: prefer module configuration requested in URL
 			jimport( 'joomla.application.module.helper' );
 			jimport( 'joomla.html.parameter' );
-			$params = new JParameter('');
+			$params = FLEXI_J16GE ? new JRegistry() : new JParameter('');
 			
 			// load by module name, not used
 			//$module_name = JRequest::getInt('module', 0 );
@@ -414,11 +410,8 @@ class FlexicontentModelTags extends JModelLegacy
 			
 			if ( !$module->load($module_id) ) {
 				JError::raiseNotice ( 500, $module->getError() );
-			} else if (!FLEXI_J16GE) {
-				$moduleParams = new JParameter($module->params);
 			} else {
-				$moduleParams = new JRegistry();
-				$moduleParams->loadString($module->params);
+				$moduleParams = FLEXI_J16GE ? new JRegistry($module->params) : new JParameter($module->params);
 			}
 			$params->merge($moduleParams);
 		}

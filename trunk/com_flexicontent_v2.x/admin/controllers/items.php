@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1270 2012-05-08 04:28:03Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1650 2013-03-11 10:27:06Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -70,23 +70,23 @@ class FlexicontentControllerItems extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		// Initialize variables
-		$app     = & JFactory::getApplication();
-		$db      = & JFactory::getDBO();
-		$user    = & JFactory::getUser();
-		$config  = & JFactory::getConfig();
-		$session = & JFactory::getSession();
+		$app     = JFactory::getApplication();
+		$db      = JFactory::getDBO();
+		$user    = JFactory::getUser();
+		$config  = JFactory::getConfig();
+		$session = JFactory::getSession();
 		$task	   = JRequest::getVar('task');
-		$model   = & $this->getModel('item');
+		$model   = $this->getModel('item');
 		$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 		
 		// Get component parameters
-		$params  = new JParameter("");
+		$params  = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$params->merge($cparams);
 		
 		// Merge the type parameters
 		$tparams = $model->getTypeparams();
-		$tparams = new JParameter($tparams);
+		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 		$params->merge($tparams);
 		
 		
@@ -100,7 +100,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			// Validate Form data for core fields and for parameters
 			$model->setId((int) $data['id']);   // Set data id into model in case some function tries to get a property and item gets loaded
 			$form = $model->getForm();          // Do not pass any data we only want the form object in order to validate the data and not create a filled-in form
-			$post = & $model->validate($form, $data);
+			$post = $model->validate($form, $data);
 			if (!$post) JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
 			
 			// Some values need to be assigned after validation
@@ -209,7 +209,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// ********************************************************************************************************************
 		// First force reloading the item to make sure data are current, get a reference to it, and calculate publish privelege
 		// ********************************************************************************************************************
-		$item = & $model->getItem($post['id'], $check_view_access=false, $no_cache=true);
+		$item = $model->getItem($post['id'], $check_view_access=false, $no_cache=true);
 		$canPublish = $model->canEditState( $item, $check_cat_perm=true );
 		
 		
@@ -274,7 +274,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				$nConf = false;
 			} else {
 				// Get notifications configuration and select appropriate emails for current saving case
-				$nConf = & $model->getNotificationsConf($params);  //echo "<pre>"; print_r($nConf); "</pre>";
+				$nConf = $model->getNotificationsConf($params);  //echo "<pre>"; print_r($nConf); "</pre>";
 			}
 			
 			if ($nConf)
@@ -332,7 +332,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				$cache = FLEXIUtilities::getCache();
 				$cache->clean('com_flexicontent_items');
 			} else {
-				$cache = &JFactory::getCache('com_flexicontent_items');
+				$cache = JFactory::getCache('com_flexicontent_items');
 				$cache->clean();
 			}
 		}
@@ -423,7 +423,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// Get variables: model, user, item id
 		$model = $this->getModel('items');
-		$user  =& JFactory::getUser();
+		$user  = JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$ord_catid = JRequest::getVar( 'ord_catid', array(0), 'post', 'array' );
 		$prev_order = JRequest::getVar( 'prev_order', array(0), 'post', 'array' );
@@ -488,7 +488,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// Get variables: model, user, item id, new ordering
 		$model = $this->getModel('items');
-		$user  =& JFactory::getUser();
+		$user  = JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$order = JRequest::getVar( 'order', array(0), 'post', 'array' );
 		$ord_catid = JRequest::getVar( 'ord_catid', array(0), 'post', 'array' );
@@ -525,8 +525,8 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function copy()
 	{
-		$db   = & JFactory::getDBO();
-		$user = & JFactory::getUser();
+		$db   = JFactory::getDBO();
+		$user = JFactory::getUser();
 		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		
 		if (FLEXI_J16GE) {
@@ -615,22 +615,22 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$db = & JFactory::getDBO();
-		$task		= JRequest::getVar('task');
-		$model 		= $this->getModel('items');
-		$user  =& JFactory::getUser();
-		$cid 		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$method 	= JRequest::getInt( 'method', 1);
-		$keeepcats 	= JRequest::getInt( 'keeepcats', 1 );
-		$keeptags 	= JRequest::getInt( 'keeptags', 1 );
-		$prefix 	= JRequest::getVar( 'prefix', 1, 'post' );
-		$suffix 	= JRequest::getVar( 'suffix', 1, 'post' );
-		$copynr 	= JRequest::getInt( 'copynr', 1 );
-		$maincat 	= JRequest::getInt( 'maincat', '' );
-		$seccats 	= JRequest::getVar( 'seccats', array(), 'post', 'array' );
+		$db    = JFactory::getDBO();
+		$task  = JRequest::getVar('task');
+		$model = $this->getModel('items');
+		$user  = JFactory::getUser();
+		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$method   = JRequest::getInt( 'method', 1);
+		$keeepcats= JRequest::getInt( 'keeepcats', 1 );
+		$keeptags = JRequest::getInt( 'keeptags', 1 );
+		$prefix   = JRequest::getVar( 'prefix', 1, 'post' );
+		$suffix   = JRequest::getVar( 'suffix', 1, 'post' );
+		$copynr   = JRequest::getInt( 'copynr', 1 );
+		$maincat  = JRequest::getInt( 'maincat', '' );
+		$seccats  = JRequest::getVar( 'seccats', array(), 'post', 'array' );
 		$keepseccats = JRequest::getVar( 'keepseccats', 0, 'post', 'int' );
-		$lang	 	= JRequest::getVar( 'language', '', 'post' );
-		$state 		= JRequest::getInt( 'state', '');
+		$lang    = JRequest::getVar( 'language', '', 'post' );
+		$state   = JRequest::getInt( 'state', '');
 		
 		// Set $seccats to --null-- to indicate that we will maintain secondary categories
 		$seccats = $keepseccats ? null : $seccats;
@@ -718,7 +718,7 @@ class FlexicontentControllerItems extends FlexicontentController
 						$cache = FLEXIUtilities::getCache();
 						$cache->clean('com_flexicontent_items');
 					} else {
-						$cache = &JFactory::getCache('com_flexicontent_items');
+						$cache = JFactory::getCache('com_flexicontent_items');
 						$cache->clean();
 					}
 				}
@@ -747,7 +747,7 @@ class FlexicontentControllerItems extends FlexicontentController
 					$cache = FLEXIUtilities::getCache();
 					$cache->clean('com_flexicontent_items');
 				} else {
-					$cache = &JFactory::getCache('com_flexicontent_items');
+					$cache = JFactory::getCache('com_flexicontent_items');
 					$cache->clean();
 				}
 			}
@@ -761,7 +761,7 @@ class FlexicontentControllerItems extends FlexicontentController
 						$cache = FLEXIUtilities::getCache();
 						$cache->clean('com_flexicontent_items');
 					} else {
-						$cache = &JFactory::getCache('com_flexicontent_items');
+						$cache = JFactory::getCache('com_flexicontent_items');
 						$cache->clean();
 					}
 				}
@@ -1319,7 +1319,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				$cache = FLEXIUtilities::getCache();
 				$cache->clean('com_flexicontent_items');
 			} else {
-				$cache = &JFactory::getCache('com_flexicontent_items');
+				$cache = JFactory::getCache('com_flexicontent_items');
 				$cache->clean();
 			}
 		}
@@ -1351,7 +1351,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$user = JFactory::getUser();
 
 			// Get an instance of the row to checkin.
-			$table = & JTable::getInstance('flexicontent_items', '');
+			$table = JTable::getInstance('flexicontent_items', '');
 			if (!$table->load($pk))
 			{
 				$this->setError($table->getError());
@@ -1399,8 +1399,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$user	=& JFactory::getUser();
-		$model 	= $this->getModel('items');
+		$user  = JFactory::getUser();
+		$model = $this->getModel('items');
 		
 		if (FLEXI_J16GE) {
 			$permission = FlexicontentHelperPerm::getPerm();
@@ -1418,7 +1418,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		$logs = $model->import();
 		if (!FLEXI_J16GE) {
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		} else {
 			$catscache = FLEXIUtilities::getCache();
@@ -1476,8 +1476,8 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function changestate()
 	{
-		$db    = & JFactory::getDBO();
-		$user  =& JFactory::getUser();
+		$db    = JFactory::getDBO();
+		$user  = JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(), 'post', 'array' );
 		$model = $this->getModel('item');
 		$msg = '';
@@ -1559,7 +1559,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$cache = FLEXIUtilities::getCache();
 			$cache->clean('com_flexicontent_items');
 		} else {
-			$cache = &JFactory::getCache('com_flexicontent_items');
+			$cache = JFactory::getCache('com_flexicontent_items');
 			$cache->clean();
 		}
 
@@ -1601,8 +1601,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$db    = & JFactory::getDBO();
-		$user	=& JFactory::getUser();
+		$db    = JFactory::getDBO();
+		$user  = JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$model = $this->getModel('items');
 		$itemmodel = $this->getModel('item');
@@ -1665,7 +1665,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				$cache = FLEXIUtilities::getCache();
 				$cache->clean('com_flexicontent_items');
 			} else {
-				$cache = &JFactory::getCache('com_flexicontent_items');
+				$cache = JFactory::getCache('com_flexicontent_items');
 				$cache->clean();
 			}
 		}
@@ -1685,8 +1685,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$user	=& JFactory::getUser();
-		
+		$user	= JFactory::getUser();
 		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
 		$id   = (int)$cid[0];
 		$task = JRequest::getVar( 'task' );
@@ -1733,7 +1732,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$msg = '';
 		} else {
 			if (!FLEXI_J16GE) {
-				$cache = &JFactory::getCache('com_flexicontent_items');
+				$cache = JFactory::getCache('com_flexicontent_items');
 				$cache->clean();
 			} else {
 				$cache = FLEXIUtilities::getCache();
@@ -1757,10 +1756,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		// Initialize some variables
-		$user	= & JFactory::getUser();
-
-		// Get an item model
-		$model = & $this->getModel('item');
+		$user  = JFactory::getUser();
+		$model = $this->getModel('item');
 		
 		// CHECK-IN the item if user can edit
 		if ( $model->get('id') )
@@ -1770,7 +1767,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	
 			// Check if item is editable till logoff
 			if (!$canEdit) {
-				$session 	=& JFactory::getSession();
+				$session = JFactory::getSession();
 				if ($session->has('rendered_uneditable', 'flexicontent')) {
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
@@ -1804,7 +1801,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$model		= $this->getModel('item');
 
 		// First checkin the open item
-		$item = & JTable::getInstance('flexicontent_items', '');
+		$item = JTable::getInstance('flexicontent_items', '');
 		$item->bind(JRequest::get('request'));
 		$item->checkin();
 		if ($version) {
@@ -1830,17 +1827,17 @@ class FlexicontentControllerItems extends FlexicontentController
 		JRequest::setVar( 'view', 'item' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 
-		$user	=& JFactory::getUser();
+		$user  = JFactory::getUser();
 		$model = $this->getModel('item');
 		$itemid = $model->getId();
-		$isnew = !$itemid;
+		$isnew  = !$itemid;
 		
 		$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $model->getItemAccess()->get('access-create');
 		$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');
 
 		// Check if item is editable till logoff
 		if (!$canEdit) {
-			$session 	=& JFactory::getSession();
+			$session = JFactory::getSession();
 			if ($session->has('rendered_uneditable', 'flexicontent')) {
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 				$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
@@ -1885,10 +1882,10 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function gettags()
 	{
-		$id 	=  JRequest::getInt('id', 0);
-		$model 	=  $this->getModel('item');
-		$tags 	=  $model->gettags();
-		$user	=& JFactory::getUser();
+		$id    = JRequest::getInt('id', 0);
+		$model = $this->getModel('item');
+		$tags  = $model->gettags();
+		$user  = JFactory::getUser();
 		
 		$used = null;
 
@@ -2000,7 +1997,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$model->setId($id);
 		$item = $model->getItem( $id );
 		
-		$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		$versionsperpage = $cparams->get('versionsperpage', 10);
 		$currentversion = $item->version;
 		$page=JRequest::getInt('page', 0);
@@ -2010,7 +2007,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		elseif($page<1) $page = 1;
 		$limitstart = ($page-1)*$versionsperpage;
 		$versions = $model->getVersionList();
-		$versions	= & $model->getVersionList($limitstart, $versionsperpage);
+		$versions	= $model->getVersionList($limitstart, $versionsperpage);
 		
 		$jt_date_format = FLEXI_J16GE ? 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' : 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS';
 		$df_date_format = FLEXI_J16GE ? "d/M H:i" : "%d/%m %H:%M" ;

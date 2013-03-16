@@ -17,7 +17,7 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-$app = &JFactory::getApplication();
+$app = JFactory::getApplication();
 $option = JRequest::getVar('option');
 $langparent_item  = $app->getUserStateFromRequest( $option.'.itemelement.langparent_item', 'langparent_item', 0, 'int' );
 $type_id  = $app->getUserStateFromRequest( $option.'.itemelement.type_id', 'type_id', 0, 'int' );

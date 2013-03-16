@@ -67,11 +67,11 @@ class FlexicontentModelTypes extends JModelList
 	{
 		parent::__construct();
 
-		$mainframe = &JFactory::getApplication();
+		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart = $mainframe->getUserStateFromRequest( $option.'.tags.limitstart', 'limitstart', 0, 'int' );
+		$limit      = $app->getUserStateFromRequest( $option.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $app->getUserStateFromRequest( $option.'.tags.limitstart', 'limitstart', 0, 'int' );
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
@@ -87,19 +87,19 @@ class FlexicontentModelTypes extends JModelList
 	function getListQuery()
 	{
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
-		$mainframe = &JFactory::getApplication();
+		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$db = &JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = $db->getQuery(true);
 
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.types.filter_state', 'filter_state', '', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.types.search', 'search', '', 'string' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$filter_state = $app->getUserStateFromRequest( $option.'.types.filter_state', 'filter_state', '', 'word' );
+		$search  = $app->getUserStateFromRequest( $option.'.types.search', 'search', '', 'string' );
+		$search  = $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
 		
 
 
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.types.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.types.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
+		$filter_order     = $app->getUserStateFromRequest( $option.'.types.filter_order', 		'filter_order', 	't.name', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.types.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
 
 		$subquery = 'SELECT COUNT(type_id)'
 					. ' FROM #__flexicontent_items_ext'
@@ -134,7 +134,6 @@ class FlexicontentModelTypes extends JModelList
 		//echo str_replace("#__", "jos_", $query->__toString());
 
 		return $query;
-
 	}
 	
 	/**
@@ -146,10 +145,10 @@ class FlexicontentModelTypes extends JModelList
 	 */
 	function _buildContentHaving()
 	{
-		$mainframe = &JFactory::getApplication();
+		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.types.filter_assigned', 'filter_assigned', '', 'word' );
+		$filter_assigned = $app->getUserStateFromRequest( $option.'.types.filter_assigned', 'filter_assigned', '', 'word' );
 		
 		$having = '';
 		
@@ -173,7 +172,7 @@ class FlexicontentModelTypes extends JModelList
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user 	=& JFactory::getUser();
+		$user = JFactory::getUser();
 
 		if (count( $cid ))
 		{
@@ -273,7 +272,7 @@ class FlexicontentModelTypes extends JModelList
 		if (count( $cid ))
 		{
 			foreach ($cid as $id) {
-				$type  =& $this->getTable('flexicontent_types', '');
+				$type = $this->getTable('flexicontent_types', '');
 				$type->load($id);
 				$type->id = 0;
 				$type->name = $type->name . ' [copy]';
@@ -309,8 +308,7 @@ class FlexicontentModelTypes extends JModelList
 	 */
 	function saveaccess($id, $access)
 	{
-		$mainframe = &JFactory::getApplication();
-		$row =& JTable::getInstance('flexicontent_types', '');
+		$row = JTable::getInstance('flexicontent_types', '');
 
 		$row->load( $id );
 		$row->id = $id;

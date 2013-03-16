@@ -62,11 +62,16 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', 
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
 // Get component parameters
-$cparams =& JComponentHelper::getParams('com_flexicontent');
+$cparams = JComponentHelper::getParams('com_flexicontent');
 
 // Logging Info variables
 if ( $cparams->get('print_logging_info') ) {
 	global $fc_run_times;
+}
+
+if ( JRequest::getWord('format')!='raw') {
+	FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+	flexicontent_html::loadJQuery();
 }
 
 if (!function_exists('FLEXISubmenu'))
@@ -78,12 +83,12 @@ if (!function_exists('FLEXISubmenu'))
 		// Check access to current management tab
 		$not_authorized = isset($perms->$cando) && !$perms->$cando;
 		if ( $not_authorized ) {
-			$mainframe = &JFactory::getApplication();
+			$mainframe = JFactory::getApplication();
 			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
 		// Get post-installation FLAG (session variable), and current view (HTTP request variable)
-		$session  =& JFactory::getSession();
+		$session  = JFactory::getSession();
 		$dopostinstall = $session->get('flexicontent.postinstall');
 		$view = JRequest::getVar('view', 'flexicontent');
 		
@@ -175,7 +180,7 @@ $controller->execute( JRequest::getCmd('task') );
 // Do not print logging info in raw or component only views
 if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='component' && JRequest::getWord('format')!='raw') {
 	$elapsed_microseconds = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-	$app = & JFactory::getApplication();
+	$app = JFactory::getApplication();
 	$msg = sprintf( 'FLEXIcontent page creation is %.2f secs', $elapsed_microseconds/1000000);
 	$_view = JRequest::getWord('view','flexicontent');
 	$_layout = JRequest::getWord('layout','');

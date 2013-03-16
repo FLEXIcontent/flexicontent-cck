@@ -47,7 +47,8 @@ class FlexicontentModelCategory extends JModelAdmin
 		parent::__construct();
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
-		if(!@$array[0]) $array = JRequest::getVar('id',  0, '', 'array');
+		if( FLEXI_J16GE && !@$array[0] )
+			$array = JRequest::getVar('id',  0, '', 'array');
 		$this->setId((int)$array[0]);
 	}
 
@@ -166,12 +167,12 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkin()
+	function checkin($pk = NULL)
 	{
-		if ($this->_id)
-		{
+		if (!$pk) $pk = $this->_id;
+		if ($pk) {
 			$category = $this->getTable();
-			return $category->checkin($this->_id);
+			return $category->checkin($pk);
 		}
 		return false;
 	}
@@ -191,7 +192,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			// Make sure we have an item id to checkout the category with
 			if(is_null($pk)) $pk = $this->_id;
 
-			$user	=& JFactory::getUser();
+			$user	= JFactory::getUser();
 			$uid	= $user->get('id');
 			
 			// Lets get to it and checkout the thing...
@@ -340,7 +341,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		}
 		
 		$this->_id = $table->id;
-		$this->_category	= & $table;
+		$this->_category = & $table;
 
 		// Trigger the onContentAfterSave event.
 		$dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$table, $isNew));
@@ -381,11 +382,11 @@ class FlexicontentModelCategory extends JModelAdmin
 	 *
 	 * @since	1.6
 	 */
-	protected function cleanCache()
+	protected function cleanCache($group = NULL, $client_id = 0)
 	{
-		$cache 		=& JFactory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
 	}
 	
@@ -547,7 +548,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			} else {
 				$result->modified_time = null;
 			}
-			$this->_category	=& $result;
+			$this->_category = & $result;
 		}
 
 		return $result;

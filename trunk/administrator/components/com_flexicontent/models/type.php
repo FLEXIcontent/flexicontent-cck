@@ -186,8 +186,8 @@ class FlexicontentModelType extends JModelLegacy
 	{
 		if ($this->_id)
 		{
-			$instance = & JTable::getInstance('flexicontent_types', '');
-			$user = &JFactory::getUser();
+			$instance = JTable::getInstance('flexicontent_types', '');
+			$user = JFactory::getUser();
 			return $instance->checkout($user->get('id'), $this->_id);
 		}
 		return false;
@@ -207,11 +207,11 @@ class FlexicontentModelType extends JModelLegacy
 		{
 			// Make sure we have a user id to checkout the group with
 			if (is_null($uid)) {
-				$user	=& JFactory::getUser();
+				$user	= JFactory::getUser();
 				$uid	= $user->get('id');
 			}
 			// Lets get to it and checkout the thing...
-			$instance = & JTable::getInstance('flexicontent_types', '');
+			$instance = JTable::getInstance('flexicontent_types', '');
 			return $instance->checkout($uid, $this->_id);
 		}
 		return false;
@@ -255,7 +255,7 @@ class FlexicontentModelType extends JModelLegacy
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		// NOTE: 'data' is post['jform'] for J2.5 (this is done by the controller or other caller)
-		$type  =& $this->getTable('flexicontent_types', '');
+		$type = $this->getTable('flexicontent_types', '');
 		
 		// bind it to the table
 		if (!$type->bind($data)) {

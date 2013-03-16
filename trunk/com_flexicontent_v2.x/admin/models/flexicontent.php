@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1264 2012-05-04 15:55:52Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1650 2013-03-11 10:27:06Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -49,7 +49,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 */
 	function getPending()
 	{
-		$user = & JFactory::getUser();
+		$user = JFactory::getUser();
 		if (FLEXI_J16GE) {
 			$permission = FlexicontentHelperPerm::getPerm();
 			$allitems	= $permission->DisplayAllItems;
@@ -82,7 +82,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 */
 	function getRevised()
 	{
-		$user = & JFactory::getUser();
+		$user = JFactory::getUser();
 		if (FLEXI_J16GE) {
 			$permission = FlexicontentHelperPerm::getPerm();
 			$allitems	= $permission->DisplayAllItems;
@@ -118,7 +118,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 */
 	function getDraft()
 	{
-		$user = & JFactory::getUser();
+		$user = JFactory::getUser();
 		if (FLEXI_J16GE) {
 			$permission = FlexicontentHelperPerm::getPerm();
 			$allitems	= $permission->DisplayAllItems;
@@ -151,7 +151,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 */
 	function getInprogress()
 	{
-		$user = & JFactory::getUser();
+		$user = JFactory::getUser();
 		if (FLEXI_J16GE) {
 			$permission = FlexicontentHelperPerm::getPerm();
 			$allitems	= $permission->DisplayAllItems;
@@ -192,13 +192,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$app = JFactory::getApplication();
 		
 		// Get id of Flexicontent component
-		$flexi =& JComponentHelper::getComponent('com_flexicontent');
+		$flexi = JComponentHelper::getComponent('com_flexicontent');
 		$flexi_comp_id = $flexi->id;
 		
 		// Get 'default_menu_itemid' parameter
-		$params =& JComponentHelper::getParams('com_flexicontent');
+		$params = JComponentHelper::getParams('com_flexicontent');
 		if ($params) {
-			$menus	= &JApplication::getMenu('site', array());
+			$menus = $app->getMenu('site', array());
 			$_component_default_menuitem_id = $params->get('default_menu_itemid', false);
 			$menu = $menus->getItem($_component_default_menuitem_id);
 		} else {
@@ -409,7 +409,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		static $return;
 		if ($return === NULL) {
 			$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
-			$db =& JFactory::getDBO();
+			$db = JFactory::getDBO();
 			$query 	= "SELECT count(*) FROM #__flexicontent_items_ext as ie "
 				. (FLEXI_J16GE ? " LEFT JOIN #__content as i ON i.id=ie.item_id " : "")
 				. " WHERE ie.language='' "
@@ -704,16 +704,16 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 */
 	function getExistmenu()
 	{
-		$component =& JComponentHelper::getComponent('com_flexicontent');
-
+		$component = JComponentHelper::getComponent('com_flexicontent');
+		$app = JFactory::getApplication();
+		
 		if(FLEXI_J16GE) {
-			$flexi =& JComponentHelper::getComponent('com_flexicontent');
-			$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`='{$flexi->id}' ";
+			$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`='{$component->id}' ";
 			$this->_db->setQuery($query);
 			$count = $this->_db->loadResult();
 		} else {
-			$menus	= &JApplication::getMenu('site', array());
-			$items	= $menus->getItems('componentid', $component->id);
+			$menus = $app->getMenu('site', array());
+			$items = $menus->getItems('componentid', $component->id);
 			$count = count($items);
 		}
 		
@@ -733,7 +733,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		if (FLEXI_ACCESS)
 		{
-			$db = & $this->_db;
+			$db = $this->_db;
 			
 			// COMMENTED out, instead we will use field's 'submit' privilege
 			/*$query = "SELECT count(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='editvalue' AND axosection='fields'";
@@ -909,18 +909,17 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		*/
 		
 		if( $data && strstr($data, '<?xml version="1.0" encoding="utf-8"?><update>') ) {
-			$xml = & JFactory::getXMLparser('Simple');
+			$xml = JFactory::getXMLparser('Simple');
 			$xml->loadString($data);
 			
-			$version 				= & $xml->document->version[0];
-			$check['version'] 		= & $version->data();
-			$versionread 			= & $xml->document->versionread[0];
-			$check['versionread'] 	= & $versionread->data();
-			$released 				= & $xml->document->released[0];
-			$check['released'] 		= & $released->data();
+			$version              = & $xml->document->version[0];
+			$check['version']     = $version->data();
+			$versionread          = & $xml->document->versionread[0];
+			$check['versionread'] = $versionread->data();
+			$released             = & $xml->document->released[0];
+			$check['released'] 		= $released->data();
 			$check['connect'] 		= 1;
 			$check['enabled'] 		= 1;
-			
 			$check['current'] 		= version_compare( $check['version_current'], $check['version'] );
 		}
 		
@@ -974,7 +973,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$this->formatFlexiPlugins();
 		
 		// Clean categories cache
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
 		
 		// Get some basic info of all items, or of the given item
@@ -1116,7 +1115,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	
 	function formatFlexiPlugins()
 	{
-		$db 	= & $this->_db;
+		$db = $this->_db;
 		$query	= 'SELECT extension_id, name FROM #__extensions'
 				. ' WHERE folder = ' . $db->Quote('flexicontent_fields')
 				. ' AND `type`=' . $db->Quote('plugin')
@@ -1239,7 +1238,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$website 	= @$params['web'] 	? $params['web'] 	: 'http://www.flexicontent.org';
 			
 			// prepare the manifest of the language archive
-			$date =& JFactory::getDate();
+			$date = JFactory::getDate();
 		
 			$xmlfile = $targetfolder.DS.'install.xml';
 			
@@ -1304,12 +1303,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 	
 	function checkInitialPermission() {
-		$debug_initial_perms = $params =& JComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
+		$debug_initial_perms = JComponentHelper::getParams('com_flexicontent')->get('debug_initial_perms');
 		
 		static $init_required = null;
 		if ( $init_required !== null ) return $init_required;
 		
-		$db = &JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$component_name = 'com_flexicontent';
 		
 		// DELETE old namespace (flexicontent.*) permissions of v2.0beta, we do not try to rename them ... instead we will use com_content (for some of them),

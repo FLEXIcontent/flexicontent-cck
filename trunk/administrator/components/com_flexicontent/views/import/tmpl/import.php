@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 $css = 'td label.fcimport { display:inline-block; float:right; white-space:nowrap; width:auto; font-weight:bold; }';
-$document	= & JFactory::getDocument();
+$document = JFactory::getDocument();
 $document->addStyleDeclaration($css);
 
 ?>

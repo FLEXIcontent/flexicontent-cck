@@ -54,8 +54,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 		
-		$user		= & JFactory::getUser();
-		$mainframe = &JFactory::getApplication();
+		$user = JFactory::getUser();
+		$mainframe = JFactory::getApplication();
 		
 		
 		$option		= JRequest::getVar( 'option');
@@ -108,7 +108,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		if (!$upload_check) {
 			if ($format == 'json') {
 				jimport('joomla.error.log');
-				$log = &JLog::getInstance('com_flexicontent.error.php');
+				$log = JLog::getInstance('com_flexicontent.error.php');
 				$log->addEntry(array('comment' => 'Invalid: '.$filepath.': '.$err));
 				header('HTTP/1.0 415 Unsupported Media Type');
 				die('Error. Unsupported Media Type!');
@@ -129,7 +129,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		if (!JFile::upload($file['tmp_name'], $filepath)) {
 			if ($format == 'json') {
 				jimport('joomla.error.log');
-				$log = &JLog::getInstance('com_flexicontent.error.php');
+				$log = JLog::getInstance('com_flexicontent.error.php');
 				$log->addEntry(array('comment' => 'Cannot upload: '.$filepath));
 				header('HTTP/1.0 409 Conflict');
 				jexit('Error. File already exists');
@@ -151,15 +151,15 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				if ($format == 'json')
 				{
 					jimport('joomla.error.log');
-					$log = &JLog::getInstance();
+					$log = JLog::getInstance();
 					$log->addEntry(array('comment' => $filepath));
 				}
 					
-				$db 	= &JFactory::getDBO();
-				$user	= &JFactory::getUser();
-				$config = &JFactory::getConfig();
+				$db 	= JFactory::getDBO();
+				$user	= JFactory::getUser();
+				$config = JFactory::getConfig();
 
-				$date = & JFactory::getDate( 'now' );
+				$date = JFactory::getDate( 'now' );
 
 				$obj = new stdClass();
 				$obj->filename 			= $filename;
@@ -227,7 +227,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		
 		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filename	= JRequest::getVar( 'file-url-data', null, 'post' );
@@ -250,11 +250,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// we verifiy the url prefix and add http if any
 		if (!eregi("^http|^https|^ftp", $filename)) { $filename	= 'http://'.$filename; }
 		
-		$db 	= &JFactory::getDBO();
-		$user	= &JFactory::getUser();
-		$config = &JFactory::getConfig();
+		$db 	= JFactory::getDBO();
+		$user	= JFactory::getUser();
+		$config = JFactory::getConfig();
 
-		$date = & JFactory::getDate( 'now' );
+		$date = JFactory::getDate( 'now' );
 
 		$obj = new stdClass();
 		$obj->filename 			= $filename;
@@ -300,18 +300,18 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		
 		$return		=  JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filesdir	=  JRequest::getVar( 'file-dir-path', '', 'post' );
 		$regexp		=  JRequest::getVar( 'file-filter-re', '.', 'post' );
 		$secure		=  JRequest::getInt( 'secure', 1, 'post' );
-		$keep		=  JRequest::getInt( 'keep', 1, 'post' );
-		$params 	=& JComponentHelper::getParams( 'com_flexicontent' );
-		$destpath 	= $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
-		$db 		=& JFactory::getDBO();
-		$user		=& JFactory::getUser();
-		$config 	=& JFactory::getConfig();
+		$keep			=  JRequest::getInt( 'keep', 1, 'post' );
+		$params 	= JComponentHelper::getParams( 'com_flexicontent' );
+		$destpath = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
+		$db 		= JFactory::getDBO();
+		$user		= JFactory::getUser();
+		$config = JFactory::getConfig();
 		
 		$filedesc	=  JRequest::getVar( 'file-desc', '' );
 
@@ -360,7 +360,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 						// Copy the file
 						if (JFile::copy($source, $destination))
 						{
-							$date =& JFactory::getDate( 'now' );
+							$date = JFactory::getDate( 'now' );
 						
 							$obj = new stdClass();
 							$obj->filename 			= $filename;
@@ -382,7 +382,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 						// Move the file
 						if (JFile::move($source, $destination))
 						{
-							$date =& JFactory::getDate( 'now' );
+							$date = JFactory::getDate( 'now' );
 						
 							$obj = new stdClass();
 							$obj->filename 			= $filename;
@@ -428,9 +428,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 	 */
 	function edit( )
 	{	
-		$user		= & JFactory::getUser();
-		$model	= & $this->getModel('file');
-		$file		= & $model->getFile();
+		$user		= JFactory::getUser();
+		$model	= $this->getModel('file');
+		$file		= $model->getFile();
 		
 		JRequest::setVar( 'view', 'file' );
 		JRequest::setVar( 'hidemainmenu', 1 );
@@ -459,11 +459,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'models'.DS.'file.php');
 		
-		$user		= & JFactory::getUser();
-		$db =& JFactory::getDBO();
-		$model	= & $this->getModel('file');
-		$file		= & $model->getFile();
-		$app = & JFactory::getApplication();
+		$user  = JFactory::getUser();
+		$db    = JFactory::getDBO();
+		$model = $this->getModel('file');
+		$file  = $model->getFile();
+		$app   = JFactory::getApplication();
 		
 		$fieldid   = JRequest::getVar( 'fieldid', 0);
 		$itemid    = JRequest::getVar( 'itemid', 0);
@@ -474,7 +474,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			
 			$db->setQuery("SELECT * FROM #__flexicontent_fields WHERE id='".$fieldid."'");
 			$field = $db->loadObject();
-			$field->parameters = new JParameter($field->attribs);			
+			$field->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
 			$field->item_id = $itemid;
 			
 			$result = FLEXIUtilities::call_FC_Field_Func($field->field_type, 'removeOriginalFile', array( &$field, $filename ) );
@@ -505,7 +505,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			}
 			
 			$msg = count($cid).' '.JText::_( 'FLEXI_FILES_DELETED' );
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 				
@@ -524,11 +524,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$user		= & JFactory::getUser();
-		$model	= & $this->getModel('file');
+		$user		= JFactory::getUser();
+		$model	= $this->getModel('file');
 		$task		= JRequest::getVar('task');
 		$post		= JRequest::get( 'post' );
-		$file		= & $model->getFile();
+		$file		= $model->getFile();
 		
 		if ($model->store($post)) {
 
@@ -547,7 +547,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 			$model->checkin();
 			
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 
 		} else {
@@ -570,14 +570,14 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$user		= & JFactory::getUser();
-		$model	= & $this->getModel('file');
-		$file		= & $model->getFile();
+		$user		= JFactory::getUser();
+		$model	= $this->getModel('file');
+		$file		= $model->getFile();
 		$task		= JRequest::getVar('task');
 		$post = JRequest::get( 'post' );
 		
 		// Check In the file and redirect ...
-		$file = & JTable::getInstance('flexicontent_files', '');
+		$file = JTable::getInstance('flexicontent_files', '');
 		$file->bind(JRequest::get('post'));
 		$file->checkin();
 
@@ -621,9 +621,9 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$user		= & JFactory::getUser();
-		$model	= & $this->getModel('file');
-		$file		= & $model->getFile();
+		$user		= JFactory::getUser();
+		$model	= $this->getModel('file');
+		$file		= $model->getFile();
 		
 		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
 
@@ -641,7 +641,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 			$msg 	= JText::_( $state ? 'Published file' : 'Unpublished file' );
 		
-			$cache 		=& JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 		
@@ -661,12 +661,12 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$user	=& JFactory::getUser();
+		$user  = JFactory::getUser();
 		$model = $this->getModel('filemanager');
 		$task  = JRequest::getVar( 'task' );
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$file_id = (int)$cid[0];
-		$row =& JTable::getInstance('flexicontent_files', '');
+		$row = JTable::getInstance('flexicontent_files', '');
 		$row->load($file_id);
 		
 		// calculate access
@@ -707,7 +707,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			JError::raiseWarning( 500, $model->getError() );
 		} else {
 			$msg = '';
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 		

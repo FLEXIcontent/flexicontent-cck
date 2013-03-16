@@ -317,6 +317,7 @@
 				<option value="small">FLEXI_YES_USE_SMALL_THUMB_FASTER</option>
 				<option value="medium">FLEXI_YES_USE_MEDIUM_THUMB_FASTER</option>
 				<option value="large">FLEXI_YES_USE_LARGE_THUMB_FASTER</option>
+				<option value="original">FLEXI_YES_USE_ORIGINAL_THUMB</option>
 			</field>
 			<field name="mod_link_image" type="radio" default="1" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
 				<option value="0">FLEXI_NO</option>

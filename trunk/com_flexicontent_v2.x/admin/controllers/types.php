@@ -72,7 +72,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			
 			// Validate Form data for core fields and for parameters
 			$form = $model->getForm($data, false);
-			$post = & $model->validate($form, $data);
+			$post = $model->validate($form, $data);
 			if (!$post) JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
 			
 			// Some values need to be assigned after validation
@@ -100,7 +100,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			}
 			$msg = JText::_( 'FLEXI_TYPE_SAVED' );
 
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 
 		} else {
@@ -168,7 +168,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			}
 			
 			$msg = count($cid).' '.JText::_( 'FLEXI_TYPE_UNPUBLISHED' );
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 		
@@ -200,7 +200,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			}
 			
 			$msg = count($cid).' '.JText::_( 'FLEXI_TYPES_DELETED' );
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 		
@@ -219,7 +219,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$type = & JTable::getInstance('flexicontent_types', '');
+		$type = JTable::getInstance('flexicontent_types', '');
 		$type->bind(JRequest::get('post'));
 		$type->checkin();
 
@@ -238,8 +238,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 		JRequest::setVar( 'view', 'type' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 
-		$model 	= $this->getModel('type');
-		$user	=& JFactory::getUser();
+		$model = $this->getModel('type');
+		$user  = JFactory::getUser();
 
 		// Error if checkedout by another administrator
 		if ($model->isCheckedOut( $user->get('id') )) {
@@ -285,7 +285,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
 			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		} else {
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 		
@@ -313,7 +313,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 			JError::raiseWarning(500, JText::_( 'FLEXI_TYPES_COPY_FAILED' ));
 		} else {
 			$msg = JText::_('FLEXI_TYPES_COPY_SUCCESS');
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 		

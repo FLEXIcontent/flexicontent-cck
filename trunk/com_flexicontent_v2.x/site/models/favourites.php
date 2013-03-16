@@ -355,17 +355,12 @@ class FlexicontentModelFavourites extends JModelLegacy
 		// Retrieve menu parameters
 		$menu = JSite::getMenu()->getActive();
 		if ($menu) {
-			if (FLEXI_J16GE) {
-				$menuParams = new JRegistry;
-				$menuParams->loadJSON($menu->params);
-			} else {
-				$menuParams = new JParameter($menu->params);
-			}
+			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
 		}
 		
 		// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively
 		$flexi = JComponentHelper::getComponent('com_flexicontent');
-		$params = new JParameter($flexi->params);
+		$params = FLEXI_J16GE ? new JRegistry($flexi->params) : new JParameter($flexi->params);
 		
 		// Merge current menu item (could be tags specific or the Globally Configured Default Tags Menu Item)
 		$params->merge($menuParams);

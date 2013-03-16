@@ -63,7 +63,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$params = clone($mainframe->getParams('com_flexicontent'));
 		
 		if ($menu) {
-			$menuParams = new JParameter($menu->params);
+			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
 			// In J1.6+ the above function does not merge current menu item parameters,
 			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
 			if (FLEXI_J16GE) $params->merge($menuParams);
@@ -283,7 +283,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				if ($category->metadesc)  $document->setDescription( $category->metadesc );
 				if ($category->metakey)   $document->setMetadata('keywords', $category->metakey);
 				
-				$meta_params = new JParameter($category->metadata);
+				$meta_params = new JRegistry($category->metadata);
 				
 				if ($mainframe->getCfg('MetaTitle') == '1') {
 					$meta_title = $meta_params->get('page_title') ? $meta_params->get('page_title') : $category->title;
@@ -361,7 +361,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		foreach ($items as $item) 
 		{
 			$item->event 	= new stdClass();
-			$item->params 	= new JParameter($item->attribs);
+			$item->params = FLEXI_J16GE ? new JRegistry($item->attribs) : new JParameter($item->attribs);
 			
 			// !!! The triggering of the event onPrepareContent(J1.5)/onContentPrepare(J1.6+) of content plugins
 			// !!! for description field (maintext) along with all other flexicontent
@@ -524,7 +524,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		foreach ($categories as $subcat) {
 			if ($show_subcat_image)  {
 				if (FLEXI_J16GE && !is_object($subcat->params)) {
-					$subcat->params = new JParameter( $subcat->params );
+					$subcat->params = new JRegistry($subcat->params);
 				}
 				
 				$subcat->image = FLEXI_J16GE ? $params->get('image') : $subcat->image;

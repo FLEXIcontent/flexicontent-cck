@@ -56,10 +56,10 @@ class FlexicontentViewTemplate extends JViewLegacy {
 			FLEXIUtilities::loadTemplateLanguageFile( $folder );
 
 		//Get data from the model
-		$layout    	= & $this->get( 'Data');
-		$fields    	= & $this->get( 'Fields');
-		$fbypos    	= & $this->get( 'FieldsByPositions');
-		$used    	= & $this->get( 'UsedFields');
+		$layout  = $this->get( 'Data');
+		$fields  = $this->get( 'Fields');
+		$fbypos  = $this->get( 'FieldsByPositions');
+		$used    = $this->get( 'UsedFields');
 
 		if (isset($layout->positions)) {
 			$sort = array();

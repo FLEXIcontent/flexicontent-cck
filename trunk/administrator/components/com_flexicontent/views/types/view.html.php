@@ -84,7 +84,7 @@ class FlexicontentViewTypes extends JViewLegacy
 			$rows = & $this->get( 'Data');
 		}
 		foreach($rows as $type) {
-			$type->config = new JParameter($type->config);
+			$type->config = FLEXI_J16GE ? new JRegistry($type->config) : new JParameter($type->config);
 		}
 		$this->pagination = & $this->get( 'Pagination' );
 

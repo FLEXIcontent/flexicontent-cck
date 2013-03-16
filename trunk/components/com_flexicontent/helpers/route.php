@@ -252,7 +252,7 @@ class FlexicontentHelperRoute
 			) {	
 				// Do not match menu items that override category configuration parameters, these items will be selectable only
 				// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
-				//if (!isset($menuitem->jparams)) $menuitem->jparams = new JParameter($menuitem->params);
+				//if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? new JRegistry($menuitem->params) : new JParameter($menuitem->params);
 				//if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
 				
 				$matches[3] = $menuitem; // priority 3 category cid
@@ -316,7 +316,7 @@ class FlexicontentHelperRoute
 						
 						// Do not match menu items that override category configuration parameters, these items will be selectable only
 						// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
-						if (!isset($menuitem->jparams)) $menuitem->jparams = new JParameter($menuitem->params);
+						if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? new JRegistry($menuitem->params) : new JParameter($menuitem->params);
 						if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
 						if ( $menuitem->jparams->get('persistent_filters', '') ) continue;
 						if ( $menuitem->jparams->get('initial_filters', '') ) continue;

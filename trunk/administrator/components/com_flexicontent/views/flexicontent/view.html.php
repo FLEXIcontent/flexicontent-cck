@@ -37,9 +37,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		$mainframe = &JFactory::getApplication();
-		$config = & JFactory::getConfig();
-		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		$mainframe = JFactory::getApplication();
+		$config = JFactory::getConfig();
+		$params = JComponentHelper::getParams('com_flexicontent');
 		
 		// Special displaying when getting flexicontent version
 		$layout = JRequest::getVar('layout', 'default');
@@ -100,33 +100,33 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		}
 		
 		//initialise variables
-		$document	= & JFactory::getDocument();
+		$document	= JFactory::getDocument();
 		if (!FLEXI_J16GE)
-			$pane = & JPane::getInstance('sliders');
+			$pane = JPane::getInstance('sliders');
 		$template	= $mainframe->getTemplate();
-		$user		= & JFactory::getUser();		
+		$user = JFactory::getUser();		
 		// Get data from the model
-		$db =& JFactory::getDBO();
-		$draft	= & $this->get( 'Draft' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['draft'] = $db->loadResult();
-		$pending = & $this->get( 'Pending' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['pending'] = $db->loadResult();
-		$revised = & $this->get( 'Revised' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['revised'] = $db->loadResult();
-		$inprogress = & $this->get( 'Inprogress' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['inprogress'] = $db->loadResult();
+		$db = JFactory::getDBO();
+		$draft	= $this->get( 'Draft' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['draft'] = $db->loadResult();
+		$pending = $this->get( 'Pending' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['pending'] = $db->loadResult();
+		$revised = $this->get( 'Revised' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['revised'] = $db->loadResult();
+		$inprogress = $this->get( 'Inprogress' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['inprogress'] = $db->loadResult();
 		$themes		= flexicontent_tmpl::getThemes();
 		
-		$session  =& JFactory::getSession();
+		$session  = JFactory::getSession();
 		
 		// 1. CHECK REQUIRED NON-AUTOMATIC TASKs
 		//  THEY ARE TASKs THAT USER MUST COMPLETE MANUALLY
-		$existcat 	= & $this->get( 'Existcat' );
+		$existcat 	= $this->get( 'Existcat' );
 		if (!FLEXI_J16GE)
-			$existsec = & $this->get( 'Existsec' );
-		$existmenu 	= & $this->get( 'Existmenu' );
+			$existsec = $this->get( 'Existsec' );
+		$existmenu 	= $this->get( 'Existmenu' );
 		
 		// 2. OPTIONAL AUTOMATIC TASKS,
 		//  THESE ARE SEPARETELY CHECKED, AS THEY ARE NOT OBLIGATORY BUT RATHER RECOMMENDED
 		$allplgpublish = $session->get('flexicontent.allplgpublish');
 		if (($allplgpublish===NULL) || ($allplgpublish===false)) {
-			$allplgpublish = & $this->get( 'AllPluginsPublished' );
+			$allplgpublish = $this->get( 'AllPluginsPublished' );
 		}
 		$optional_tasks = !$allplgpublish; // || ..
 		
@@ -138,22 +138,22 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$model 				= $this->getModel('flexicontent');
 			$use_versioning = $params->get('use_versioning', 1);
 			
-			$existmenuitems		= & $this->get( 'ExistMenuItems' );
-			$existtype 			= & $this->get( 'ExistType' );
-			$existfields 		= & $this->get( 'ExistFields' );
+			$existmenuitems	= $this->get( 'ExistMenuItems' );
+			$existtype 			= $this->get( 'ExistType' );
+			$existfields 		= $this->get( 'ExistFields' );
 			
-			$existfplg 			= & $this->get( 'ExistFieldsPlugins' );
-			$existseplg 		= & $this->get( 'ExistSearchPlugin' );
-			$existsyplg 		= & $this->get( 'ExistSystemPlugin' );
+			$existfplg 			= $this->get( 'ExistFieldsPlugins' );
+			$existseplg 		= $this->get( 'ExistSearchPlugin' );
+			$existsyplg 		= $this->get( 'ExistSystemPlugin' );
 			
 			$existlang	 				= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
-			$existversions 			= & $this->get( 'ExistVersionsTable' );
+			$existversions 			= $this->get( 'ExistVersionsTable' );
 			$existversionsdata	= !$use_versioning || $this->get( 'ExistVersionsPopulated' );
 			
-			$existauthors			= & $this->get( 'ExistAuthorsTable' );
-			$cachethumb				= & $this->get( 'CacheThumbChmod' );
-			$oldbetafiles			= & $this->get( 'OldBetaFiles' );
-			$nooldfieldsdata	= & $this->get( 'NoOldFieldsData' );
+			$existauthors			= $this->get( 'ExistAuthorsTable' );
+			$cachethumb				= $this->get( 'CacheThumbChmod' );
+			$oldbetafiles			= $this->get( 'OldBetaFiles' );
+			$nooldfieldsdata	= $this->get( 'NoOldFieldsData' );
 			$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 			
 			$initialpermission = FLEXI_J16GE ? $model->checkInitialPermission() : true;
@@ -184,7 +184,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
 			if($perms->CanConfig)  {
-				$toolbar=&JToolBar::getInstance('toolbar');
+				$toolbar = JToolBar::getInstance('toolbar');
 				if (!FLEXI_J16GE)
 					$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
 				$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), JURI::base().'index.php?option=com_flexicontent&amp;layout=language&amp;tmpl=component', 800, 500);
@@ -202,8 +202,8 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$options 	= array();
 		$folder 	= JPATH_ADMINISTRATOR.DS.'language';
 		$langs 		= JFolder::folders($folder);
-		$activelang =& JFactory::getLanguage()->_lang;
-
+		$activelang = JComponentHelper::getParams('com_languages')->get('administrator', 'en-GB');
+		
 		foreach ($langs as $lang) {
 			$options[] = JHTML::_('select.option', $lang, $lang);		
 		}
@@ -277,7 +277,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	function quickiconButton( $link, $image, $text, $modal = 0, $modaliframe = 1 )
 	{
 		//initialise variables
-		$lang 		= & JFactory::getLanguage();
+		$lang = JFactory::getLanguage();
   		?>
 
 		<div style="float:<?php echo ($lang->isRTL()) ? 'right' : 'left'; ?>;">
@@ -308,8 +308,8 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	 * Check Flexicontent version
 	 */
 	
-	function getUpdateComponent()
-	 {
+	static function getUpdateComponent()
+	{
 		$url = 'http://www.flexicontent.org/flexicontent_update.xml';
 		$data = '';
 		$check = array();
@@ -396,17 +396,16 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		}
 						
 		if( $data && strstr($data, '<?xml version="1.0" encoding="utf-8"?><update>') ) {
-			$xml = & JFactory::getXMLparser('Simple');
+			$xml = JFactory::getXMLparser('Simple');
 			$xml->loadString($data);
 			
-			$version 				= & $xml->document->version[0];
-			$check['version'] 		= & $version->data();
-			$released 				= & $xml->document->released[0];
-			$check['released'] 		= & $released->data();
-			$check['connect'] 		= 1;
-			$check['enabled'] 		= 1;
-			
-			$check['current'] 		= version_compare( $check['current_version'], $check['version'] );
+			$version           = & $xml->document->version[0];
+			$check['version']  = $version->data();
+			$released          = & $xml->document->released[0];
+			$check['released'] = $released->data();
+			$check['connect']  = 1;
+			$check['enabled']  = 1;
+			$check['current']  = version_compare( $check['current_version'], $check['version'] );
 		}
 		
 		return $check;
@@ -415,7 +414,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	function fversion(&$tpl, &$params) {
 		//updatecheck
 		if($params->get('show_updatecheck', 1) == 1) {
-			$cache = & JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->setCaching( 1 );
 			$cache->setLifeTime( 600 );
 			$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));

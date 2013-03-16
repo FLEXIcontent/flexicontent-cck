@@ -134,7 +134,7 @@ $ord_grp = 1;
 			$row_css = '';
 			
 			if ($row->field_type=='groupmarker') {
-				$grpm_params = new JParameter($row->attribs);
+				$grpm_params = FLEXI_J16GE ? new JRegistry($row->attribs) : new JParameter($row->attribs);
 			}
 			if ( $this->filter_type ) // Create coloring and padding for groupmarker fields if filtering by specific type is enabled
 			{

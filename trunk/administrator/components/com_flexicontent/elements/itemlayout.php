@@ -92,7 +92,7 @@ class JElementItemlayout extends JElement
 			
 			// Finally get allowed templates
 			if ($typedata) {
-				$tparams = new JParameter($typedata->attribs);
+				$tparams = FLEXI_J16GE ? new JRegistry($typedata->attribs) : new JParameter($typedata->attribs);
 				$type_default_layout = $tparams->get('ilayout', 'default');
 				$type_default_layout_mobile = $tparams->get('ilayout_mobile', JText::_('FLEXI_USE_NORMAL'));
 				$allowed_tmpls = $tparams->get('allowed_ilayouts');

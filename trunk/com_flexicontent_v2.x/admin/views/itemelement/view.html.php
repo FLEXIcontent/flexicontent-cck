@@ -32,13 +32,13 @@ class FlexicontentViewItemelement extends JViewLegacy {
 	function display($tpl = null)
 	{
 		global $globalcats;
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		//initialise variables
-		$db			= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$template 	= $mainframe->getTemplate();
+		$db = JFactory::getDBO();
+		$document	= JFactory::getDocument();
+		$template = $mainframe->getTemplate();
 		
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
@@ -62,19 +62,19 @@ class FlexicontentViewItemelement extends JViewLegacy {
 		$document->addStyleSheet(JURI::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Data');
-		$types		= & $this->get( 'Typeslist' );
-		$pageNav 	= & $this->get( 'Pagination' );
+		$rows     = $this->get( 'Data');
+		$types		= $this->get( 'Typeslist' );
+		$pageNav 	= $this->get( 'Pagination' );
 
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$langs	= & FLEXIUtilities::getLanguages('code');
+			$langs = FLEXIUtilities::getLanguages('code');
 		}
 		$categories = $globalcats;
 		
 		if (FLEXI_J16GE) {
 			JLoader::import('joomla.application.component.model');
 			JLoader::import( 'qfcategoryelement', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' );
-			$cats_model = & JModelLegacy::getInstance('qfcategoryelement', 'FlexicontentModel');
+			$cats_model = JModelLegacy::getInstance('qfcategoryelement', 'FlexicontentModel');
 			$categories = $cats_model->getData();
 			//echo "<pre>"; var_dump($categories); echo "</pre>"; 
 			for ($i=0; $i<count($categories); $i++) {

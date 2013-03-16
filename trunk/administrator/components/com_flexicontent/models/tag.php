@@ -159,7 +159,7 @@ class FlexicontentModelTag extends JModelLegacy
 	{
 		if ($this->_id)
 		{
-			$tag = & JTable::getInstance('flexicontent_tags', '');
+			$tag = JTable::getInstance('flexicontent_tags', '');
 			return $tag->checkout($uid, $this->_id);
 		}
 		return false;
@@ -179,11 +179,11 @@ class FlexicontentModelTag extends JModelLegacy
 		{
 			// Make sure we have a user id to checkout the group with
 			if (is_null($uid)) {
-				$user	=& JFactory::getUser();
+				$user	= JFactory::getUser();
 				$uid	= $user->get('id');
 			}
 			// Lets get to it and checkout the thing...
-			$tag = & JTable::getInstance('flexicontent_tags', '');
+			$tag = JTable::getInstance('flexicontent_tags', '');
 			return $tag->checkout($uid, $this->_id);
 		}
 		return false;
@@ -223,7 +223,7 @@ class FlexicontentModelTag extends JModelLegacy
 	 */
 	function store($data)
 	{
-		$tag  =& $this->getTable('flexicontent_tags', '');
+		$tag = $this->getTable('flexicontent_tags', '');
 
 		// bind it to the table
 		if (!$tag->bind($data)) {

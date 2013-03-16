@@ -58,8 +58,8 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		$tparams		= & $this->get( 'Typeparams' );
 				
 		// Create the type parameters
-		$tparams = new JParameter($tparams);
-
+		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
+		
 		// Add html to field object trought plugins
 		foreach ($fields as $field)
 		{

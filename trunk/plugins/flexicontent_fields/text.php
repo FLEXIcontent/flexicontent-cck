@@ -47,13 +47,20 @@ class plgFlexicontent_fieldsText extends JPlugin
 		// some parameter shortcuts
 		$default_value_use = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value     = ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$size				= $field->parameters->get( 'size', 30 ) ;
+		$size				= (int)$field->parameters->get( 'size', 30 ) ;
+		$maxlength	= (int)$field->parameters->get( 'maxlength', 0 ) ;
 		$multiple		= $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval			= $field->parameters->get( 'max_values', 0 ) ;
-		$required = $field->parameters->get( 'required', 0 ) ;
-		$required = $required ? ' required' : '';
+		$maxval			= (int)$field->parameters->get( 'max_values', 0 ) ;
+		
+		$inputmask	= $field->parameters->get( 'inputmask', false ) ;
+		$custommask = $field->parameters->get( 'custommask', false ) ;
+		
+		$required		= $field->parameters->get( 'required', 0 ) ;
+		$required		= $required ? ' required' : '';
+		
 		$extra_attribs = $field->parameters->get( 'extra_attribs', '' ) ;
 		$attribs = $extra_attribs;
+		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
 		
 		$document	= JFactory::getDocument();
 		// initialise property
@@ -68,6 +75,34 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
 		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		
+	  // add setMask function on the document.ready event
+		static $inputmask_added = false;
+	  if ($inputmask && !$inputmask_added) {
+			$inputmask_added = true;
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/jquery.inputmask.js' );
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/jquery.inputmask.extensions.js' );
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/jquery.inputmask.date.extensions.js' );
+			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/jquery.inputmask.numeric.extensions.js' );
+			
+			$js = "";
+			/*$js .= "
+				jQuery.extend(jQuery.inputmask.defaults.definitions, {
+				    'f': {
+				        \"validator\": \"[0-9\(\)\.\+/ ]\",
+				        \"cardinality\": 1,
+				        'prevalidator': null
+				    }
+				});
+			";*/
+			$js .= "
+				jQuery(document).ready(function(){
+				    jQuery(\":input\").inputmask();
+				});
+			";
+			$document->addScriptDeclaration($js);
+		}
+		
 		
 		if ($multiple) // handle multiple records
 		{
@@ -192,12 +227,18 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		$document->addStyleDeclaration($css);
 		
+		if ($custommask && $inputmask=="__custom__") {
+			$validate_mask = " data-inputmask=\" ".$custommask." \" ";
+		} else {
+			$validate_mask = $inputmask ? " data-inputmask=\" 'alias': '".$inputmask."' \" " : "";
+		}
+		
 		$field->html = array();
 		$n = 0;
 		foreach ($field->value as $value)
 		{
 			$field->html[] = '
-				<input id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="fcfield_textval inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$attribs.' />
+				<input '. $validate_mask .' id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="fcfield_textval inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$attribs.' />
 				'.$selhtml.'
 				'.$remove_button.'
 				'.$move2.'

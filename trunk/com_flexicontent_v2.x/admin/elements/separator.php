@@ -63,7 +63,7 @@ div.current ul.config-option-list li select { margin-bottom: 0px;}
 div.current ul.config-option-list li fieldset  { margin: 0; padding: 0; }
 ";
 
-$document = & JFactory::getDocument();
+$document = JFactory::getDocument();
 $document->addStyleDeclaration($css);
 //$document->addStyleSheet('../tmpl/params.css');
 
@@ -96,7 +96,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		
 		if (!$tab_js_css_added && in_array($level, array('tblbreak','tabs_start','tab_open','tab_close','tabs_end')) ) {
 			$tab_js_css_added = true;
-			$document = & JFactory::getDocument();
+			$document = JFactory::getDocument();
 			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/tabber-minimized.js');
 			$document->addStyleSheet(JURI::root().'administrator/components/com_flexicontent/assets/css/tabber.css');
 			$document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive

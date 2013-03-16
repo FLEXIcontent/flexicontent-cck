@@ -41,20 +41,20 @@ class FlexicontentViewStats extends JViewLegacy
 		jimport('joomla.html.pane');
 
 		//initialise variables
-		$document	= & JFactory::getDocument();
-		$pane   	= & JPane::getInstance('Tabs');
-		$user 		= & JFactory::getUser();
+		$document	= JFactory::getDocument();
+		$pane   	= JPane::getInstance('Tabs');
+		$user 		= JFactory::getUser();
 		
 		// Get data from the model
-		$genstats 	= & $this->get( 'Generalstats' );
-		$popular	= & $this->get( 'Popular' );
-		$rating		= & $this->get( 'Rating' );
-		$worstrating= & $this->get( 'WorstRating' );
-		$favoured	= & $this->get( 'Favoured' );
-		$statestats	= & $this->get( 'Statestats' );
-		$votesstats	= & $this->get( 'Votesstats' );
-		$creators	= & $this->get( 'Creators' );
-		$editors	= & $this->get( 'Editors' );
+		$genstats   = $this->get( 'Generalstats' );
+		$popular    = $this->get( 'Popular' );
+		$rating     = $this->get( 'Rating' );
+		$worstrating= $this->get( 'WorstRating' );
+		$favoured   = $this->get( 'Favoured' );
+		$statestats = $this->get( 'Statestats' );
+		$votesstats	= $this->get( 'Votesstats' );
+		$creators   = $this->get( 'Creators' );
+		$editors    = $this->get( 'Editors' );
 		
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');

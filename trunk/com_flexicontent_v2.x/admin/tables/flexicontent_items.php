@@ -222,7 +222,7 @@ class flexicontent_items extends JTable{
 	 * @return boolean
 	 * @since 1.5
 	 */
-	function load( $oid=null )
+	function load( $oid=null, $reset = true )
 	{
 		$k = $this->_tbl_key;
 
@@ -237,7 +237,7 @@ class flexicontent_items extends JTable{
 		}
 		$this->reset();
 
-		$db =& $this->getDBO();
+		$db = $this->getDBO();
 
 		$query = 'SELECT *'
 		. ' FROM '.$this->_tbl
@@ -306,11 +306,11 @@ class flexicontent_items extends JTable{
 
 		// Split the object for the two tables #__content and #__flexicontent_items_ext
 		//$type     = new stdClass();
-		$type = & JTable::getInstance('content');
+		$type = JTable::getInstance('content');
 		$type->_tbl = $this->_tbl;
 		$type->_tbl_key = $this->_tbl_key;
 		//$type_ext = new stdClass();
-		$type_ext = & JTable::getInstance('flexicontent_items_ext', '');
+		$type_ext = JTable::getInstance('flexicontent_items_ext', '');
 		$type_ext->_tbl = $this->_tbl_join;
 		$type_ext->_tbl_key = $this->_frn_key;
 		
@@ -322,14 +322,14 @@ class flexicontent_items extends JTable{
 				
 				// Catch case of new J1.6+ article language column
 				if (FLEXI_J16GE && $p == "language") {
-					//$jAp=& JFactory::getApplication();
+					//$jAp= JFactory::getApplication();
 					//$jAp->enqueueMessage('setting content language to' . $v,'message');
 					$type->$p = $v;
 				}
 			
 				// Catch case of master item for (translation groups) not being set
 				if ($p == "lang_parent_id" && $v==0) {
-					//$jAp=& JFactory::getApplication();
+					//$jAp= JFactory::getApplication();
 					//$jAp->enqueueMessage('Setting default lang_parent_id to '. $type->id,'message');
 					$type_ext->$p = $type->id;
 				}
@@ -451,7 +451,7 @@ class flexicontent_items extends JTable{
 		/*
 		TODO: This filter is too rigorous,need to implement more configurable solution
 		// specific filters
-		$filter = & JFilterInput::getInstance( null, null, 1, 1 );
+		$filter = JFilterInput::getInstance( null, null, 1, 1 );
 		$this->introtext = trim( $filter->clean( $this->introtext ) );
 		$this->fulltext =  trim( $filter->clean( $this->fulltext ) );
 		*/
@@ -468,7 +468,7 @@ class flexicontent_items extends JTable{
 		$this->alias = JApplication::stringURLSafe($this->alias);
 
 		if(trim(str_replace('-','',$this->alias)) == '') {
-			$datenow =& JFactory::getDate();
+			$datenow = JFactory::getDate();
 			$this->alias = $datenow->toFormat("%Y-%m-%d-%H-%M-%S");
 		}
 
@@ -506,7 +506,7 @@ class flexicontent_items extends JTable{
 
 	function toXML( $mapKeysToText=false )
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 
 		if ($mapKeysToText) {
 			$query = 'SELECT name'

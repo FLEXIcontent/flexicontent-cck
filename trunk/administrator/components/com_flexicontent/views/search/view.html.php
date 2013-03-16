@@ -28,8 +28,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$this->indexer($tpl);
 			return;
 		}
-		$mainframe= &JFactory::getApplication();
-		$document	= & JFactory::getDocument();
+		$mainframe= JFactory::getApplication();
+		$document	= JFactory::getDocument();
 		$option   = JRequest::getCmd( 'option' );
 		$db  		  = JFactory::getDBO();
 		
@@ -67,8 +67,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Configure the toolbar.
 		$this->setToolbar();
 		
-		$types			= & $this->get( 'Typeslist' );
-		$fieldtypes	= & $this->get( 'Fieldtypes' );
+		$types			= $this->get( 'Typeslist' );
+		$fieldtypes	= $this->get( 'Fieldtypes' );
 		
 		// Build select lists
 		$lists = array();
@@ -113,9 +113,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$lists['search_itemtitle']= $search_itemtitle;
 		$lists['search_itemid']= $search_itemid;
 		
-		$pagination	= &$this->get('Pagination');
-		$data = $this->get('Data');
-		$total = $this->get('Count');
+		$pagination = $this->get('Pagination');
+		$data   = $this->get('Data');
+		$total  = $this->get('Count');
 		$limitstart = $this->get('LimitStart');
 
 		$js = "window.addEvent('domready', function(){";
@@ -127,6 +127,20 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		}		
 		$js .= "});";
 		$document->addScriptDeclaration($js);
+
+		$query = "SHOW VARIABLES LIKE '%ft_min_word_len%'";
+		$db->setQuery($query);
+		$_dbvariable = $db->loadObject();
+		$ft_min_word_len = (int) @ $_dbvariable->Value;
+		$notice_ft_min_word_len	= $mainframe->getUserStateFromRequest( $option.'.fields.notice_ft_min_word_len',	'notice_ft_min_word_len',	0, 'int' );
+		//if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
+		//{
+			if ( $notice_ft_min_word_len < 2) {
+				$mainframe->setUserState( $option.'.fields.notice_ft_min_word_len', $notice_ft_min_word_len+1 );
+				$mainframe->enqueueMessage("NOTE : Database limits minimum search word length (ft_min_word_len) to ".$ft_min_word_len, 'notice');
+				//$mainframe->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
+			}
+		//}
 		
 		$this->assignRef('lists',	$lists);
 		$this->assignRef('pagination',	$pagination);
@@ -145,7 +159,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 	 * @return	void
 	 */
 	function setToolbar() {
-		$toolbar = &JToolBar::getInstance('toolbar');
+		$toolbar = JToolBar::getInstance('toolbar');
 
 		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_BASIC_CONTENT_LISTS',    'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic',     500, 210);
 		JToolBarHelper::divider();  JToolBarHelper::spacer();
@@ -153,7 +167,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', 'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick',  500, 210);
 		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', FLEXI_J16GE ? 'search.purge' : 'purge', false);
 		
-		$user = &JFactory::getUser();
+		$user  = JFactory::getUser();
 		$perms = FlexicontentHelperPerm::getPerm();
 		if ($perms->CanConfig) {
 			JToolBarHelper::divider(); JToolBarHelper::spacer();

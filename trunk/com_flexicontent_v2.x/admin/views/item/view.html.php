@@ -117,7 +117,7 @@ class FlexicontentViewItem extends JViewLegacy
 
 		$versions  = & $model->getVersionList(($current_page-1)*$versionsperpage, $versionsperpage);
 		$tparams   = & $this->get( 'Typeparams' );
-		$tparams   = new JParameter($tparams);
+		$tparams   = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 		$categories = $globalcats;
 		
 		// ******************
@@ -138,7 +138,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$autologin   = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 			$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug)) .$autologin;
 			
-			if ( !$cparams->get('use_versioning', 1) || ($row->version == $row->current_version = $row->last_version) )
+			if ( !$cparams->get('use_versioning', 1) || ($row->version == $row->current_version && $row->version == $row->last_version) )
 			{
 				$bar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
 			} else {
@@ -244,7 +244,22 @@ class FlexicontentViewItem extends JViewLegacy
 		$usedtags = $model->getUsedtagsData($usedtagsIds);
 		
 		// Categories used by the item
-		$selectedcats	= & $this->get( 'Catsselected' );   // NOTE: This will normally return the already set versioned value of categories ($row->categories)
+		if ($cid) {
+			// NOTE: This will normally return the already set versioned value of categories ($row->categories)
+			$selectedcats	= $this->get( 'Catsselected' );
+		} else {
+			$maincat = JRequest::getInt('maincat', 0);
+			if (!$maincat) {
+				$maincat = $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
+			}
+			if ($maincat) {
+				$selectedcats = array($maincat);
+				$row->catid = $maincat;
+			} else {
+				$selectedcats = array();
+			}
+		}
+		
 		//$selectedcats 	= $isnew ? array() : $fields['categories']->value;
 		
 		//echo "<br>row->tags: "; print_r($row->tags);
@@ -373,7 +388,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// Retrieve author configuration
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
 		if ( $authorparams = $db->loadResult() )
-			$authorparams = new JParameter($authorparams);
+			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
 		
 		// Get author's maximum allowed categories per item and set js limitation
 		$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));

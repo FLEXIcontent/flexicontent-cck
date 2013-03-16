@@ -107,7 +107,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 			$msg = JText::_( 'FLEXI_CATEGORY_SAVED' );
 			
 			//Take care of access levels and state
-			$categoriesmodel = & $this->getModel('categories');
+			$categoriesmodel = $this->getModel('categories');
 			if (!FLEXI_ACCESS)
 				$categoriesmodel->saveaccess($model->get('id'), $model->get('access'));
 			
@@ -211,9 +211,9 @@ class FlexicontentControllerCategories extends FlexicontentController
 			$msg 	= $state ? JText::_( 'FLEXI_CATEGORY_PUBLISHED') : JText::_( 'FLEXI_CATEGORY_UNPUBLISHED' );
 			
 			// clean cache
-			$cache 		=& JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		}
 
@@ -239,7 +239,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 			$user = JFactory::getUser();
 
 			// Get an instance of the row to checkin.
-			$table = & JTable::getInstance('flexicontent_categories', '');
+			$table = JTable::getInstance('flexicontent_categories', '');
 			if (!$table->load($pk))
 			{
 				$this->setError($table->getError());
@@ -289,9 +289,9 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$model = $this->getModel('categories');
 		$model->move(-1);
 		
-		$cache 		=& JFactory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories');
@@ -312,9 +312,9 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$model = $this->getModel('categories');
 		$model->move(1);
 		
-		$cache 		=& JFactory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories');
@@ -346,9 +346,9 @@ class FlexicontentControllerCategories extends FlexicontentController
 		}
 		
 		// clean cache
-		$cache 		=& JFactory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
 	}
 
@@ -399,9 +399,9 @@ class FlexicontentControllerCategories extends FlexicontentController
 			}
 			
 			// clean cache
-			$cache =& JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$catscache =& JFactory::getCache('com_flexicontent_cats');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		}
 		
@@ -432,7 +432,7 @@ class FlexicontentControllerCategories extends FlexicontentController
 			$CanCats 	= 1;
 		}
 
-		$category = & JTable::getInstance('flexicontent_categories','');
+		$category = JTable::getInstance('flexicontent_categories','');
 		$category->bind(JRequest::get('post'));
 		$category->checkin();
 
@@ -493,9 +493,9 @@ class FlexicontentControllerCategories extends FlexicontentController
 		} else if(!$model->saveaccess( $id, $access )) {
 			JError::raiseWarning(500, $model->getError());
 		} else {
-			$cache 		=& JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		}
 		

@@ -65,12 +65,12 @@ class JElementCategorylayout extends JElement
 		$lays = implode("','", $lays);
 		
 		if ( @$attributes['enableparam'] ) {
-			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 			if ( !$cparams->get($attributes['enableparam']) ) return FLEXI_J16GE ? '' : JText::_('FLEXI_DISABLED');
 		}
 		
 if ( ! @$attributes['skipparams'] ) {
-		$doc 	= & JFactory::getDocument();
+		$doc 	= JFactory::getDocument();
 		$js 	= "
 var tmpl = ['".$lays."'];	
 
