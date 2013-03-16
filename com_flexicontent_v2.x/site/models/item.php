@@ -340,9 +340,7 @@ class FlexicontentModelItem extends ParentClassItem
 		// Retrieve current menu parameters (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
 		$menu = JSite::getMenu()->getActive();
 		if ($menu) {
-			// In J2.5 parameters are in JSON format, but JParameter can parse JSON, nevertheless
-			// we could also use: $menuParams = new JRegistry; $menuParams->loadJSON($menu->params);
-			$menuParams = new JParameter($menu->params);
+			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
 		}
 		
 		// Retrieve parameters of current category (NOTE: this applies when cid variable exists in the URL)
@@ -379,18 +377,18 @@ class FlexicontentModelItem extends ParentClassItem
 		}
 		
 		// b. Merge parameters from current category
-		$catParams = new JParameter($catParams);
+		$catParams = FLEXI_J16GE ? new JRegistry($catParams) : new JParameter($catParams);
 		$catParams->set('show_title', '');       // Prevent show_title from propagating ... to the item, it is meant for category view only
 		$catParams->set('title_linkable', '');   // Prevent title_linkable from propagating ... to the item, it is meant for category view only
 		$params->merge($catParams);
 		
 		// c. Merge TYPE parameters into the page configuration
-		$typeParams = new JParameter($typeParams);
+		$typeParams = FLEXI_J16GE ? new JRegistry($typeParams) : new JParameter($typeParams);
 		$params->merge($typeParams);
 
 		// d. Merge ITEM parameters into the page configuration
 		if ( is_string($this->_item->attribs) ) {
-			$itemparams = new JParameter($this->_item->attribs);
+			$itemparams = FLEXI_J16GE ? new JRegistry($this->_item->attribs) : new JParameter($this->_item->attribs);
 		} else {
 			$itemparams = & $this->_item->attribs;
 		}
@@ -404,9 +402,9 @@ class FlexicontentModelItem extends ParentClassItem
 		
 		// Covert metadata property string to parameters object
 		if ( !empty($this->_item->metadata) ) {
-			$this->_item->metadata = new JParameter($this->_item->metadata);
+			$this->_item->metadata = FLEXI_J16GE ? new JRegistry($this->_item->metadata) : new JParameter($this->_item->metadata);
 		} else {
-			$this->_item->metadata = new JParameter();
+			$this->_item->metadata = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 		}
 		
 		// *********************************************

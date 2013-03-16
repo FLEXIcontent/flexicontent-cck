@@ -31,13 +31,13 @@ class FlexicontentViewTemplates extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		//initialise variables
-		$db  		= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$user 		= & JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
 		
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
@@ -66,12 +66,12 @@ class FlexicontentViewTemplates extends JViewLegacy
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 		
-		$tmpldirectory 	= JPATH_COMPONENT_SITE . DS . 'templates' . DS;
-		$source			= JRequest::getString('source', '');
-		$dest			= $source ? flexicontent_upload::sanitizedir($tmpldirectory, $source) : '';
+		$tmpldirectory = JPATH_COMPONENT_SITE . DS . 'templates' . DS;
+		$source = JRequest::getString('source', '');
+		$dest   = $source ? flexicontent_upload::sanitizedir($tmpldirectory, $source) : '';
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Data');
+		$rows = $this->get( 'Data');
 
 		//assign data to template
 		$this->assignRef('rows'      		, $rows);

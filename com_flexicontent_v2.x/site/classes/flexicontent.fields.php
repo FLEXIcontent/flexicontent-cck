@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1640 2013-02-28 14:45:19Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1653 2013-03-11 19:49:23Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -310,7 +310,7 @@ class FlexicontentFields
 		$item->fields	= $item->fields	? $item->fields	: array();
 		
 		jimport('joomla.html.parameter');
-		$item->parameters	= isset($item->parameters) ? $item->parameters : new JParameter( $item->attribs );
+		if (!isset($item->parameters)) $item->parameters = FLEXI_J16GE ? new JRegistry($item->attribs) : new JParameter($item->attribs);
 		$item->params		= $item->parameters;
 		
 		$item->text			= $item->introtext . chr(13).chr(13) . $item->fulltext;
@@ -1026,7 +1026,7 @@ class FlexicontentFields
 		static $tinfo   = array();
 		static $fdata   = array();
 		static $no_typeparams = null;
-		if ($no_typeparams) $no_typeparams = new JParameter("");
+		if ($no_typeparams) $no_typeparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 		static $is_form;
 		$is_form = JRequest::getVar('edit')=='edit' && JRequest::getVar('option')=='com_flexicontent';
 		
@@ -1060,7 +1060,7 @@ class FlexicontentFields
 				
 				// CUSTOM field or CORE field with no type
 				$fdata[$tindex][$field->name] = new stdClass();
-				$fdata[$tindex][$field->name]->parameters = new JParameter($field->attribs);
+				$fdata[$tindex][$field->name]->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
 				
 			} else {
 				
@@ -1068,7 +1068,7 @@ class FlexicontentFields
 				
 				// Initialize an empty object, and create parameters object of the field
 				$fdata[$tindex][$field->name] = new stdClass();
-				$fdata[$tindex][$field->name]->parameters = new JParameter($field->attribs);
+				$fdata[$tindex][$field->name]->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
 				
 				// SET a type specific label, description for the current CORE  field (according to current language)
 				$field_label_type = $tparams[$type_id]->get($pn_prefix.'_label', '');
@@ -1091,7 +1091,7 @@ class FlexicontentFields
 				
 				// Finally merge custom field parameters with the type specific parameters ones
 				if ($data) {
-					$ts_params = new JParameter($data->attribs);
+					$ts_params = FLEXI_J16GE ? new JRegistry($data->attribs) : new JParameter($data->attribs);
 					$fdata[$tindex][$field->name]->parameters->merge($ts_params);
 				}
 			}
@@ -1131,7 +1131,7 @@ class FlexicontentFields
 		if ( $typedata ) {
 			$tinfo['typename']  = $typedata->name;
 			$tinfo['typealias'] = $typedata->alias;
-			$tparams = new JParameter($typedata->attribs);
+			$tparams = FLEXI_J16GE ? new JRegistry($typedata->attribs) : new JParameter($typedata->attribs);
 			
 			$_tparams = $tparams->toArray();
 			$tinfo['params'] = array();
@@ -1500,7 +1500,7 @@ class FlexicontentFields
 			}
 			$field->item_id		= $item_id;
 			$field->value     = !$item_id ? false : $this->getExtrafieldvalue($field->id, $version=0, $item_id);  // WARNING: getExtrafieldvalue() is Frontend method
-			if ($load_params) $field->parameters = new JParameter($field->attribs);
+			if ($load_params) $field->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
 			$sp_fields[$field_id] = $field;
 		}
 		

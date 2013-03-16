@@ -51,12 +51,12 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$start_microtime = microtime(true);
 		// Check for request forgeries
 		//JRequest::checkToken() or jexit( 'Invalid Token' );
-		//$params =& JComponentHelper::getParams( 'com_flexicontent' );
+		//$params = JComponentHelper::getParams( 'com_flexicontent' );
 		
 		@ob_end_clean();
 		$indexer = JRequest::getVar('indexer','advanced');
 		$rebuildmode = JRequest::getVar('rebuildmode','');
-		$session = & JFactory::getSession();
+		$session = JFactory::getSession();
 		
 		// Retrieve fields, that are assigned as (advanced/basic) searchable/filterable
 		if ($rebuildmode=='quick' && $indexer=='advanced') {
@@ -96,8 +96,8 @@ class FlexicontentControllerSearch extends FlexicontentController
 	function index()
 	{
 		$start_microtime = microtime(true);
-		$session = & JFactory::getSession();
-		$db = &JFactory::getDBO();
+		$session = JFactory::getSession();
+		$db = JFactory::getDBO();
 		
 		@ob_end_clean();
 		$indexer = JRequest::getVar('indexer','advanced');

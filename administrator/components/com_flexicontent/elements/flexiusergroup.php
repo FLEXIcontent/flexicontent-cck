@@ -102,7 +102,7 @@ class JElementFlexiusergroup extends JElement
 			$extra_options[] = $tmp;
 		}
 		
-		$db = & JFactory::getDBO();
+		$db = JFactory::getDBO();
 		if ( FLEXI_ACCESS && $faGrps ) {
 			$db->setQuery(
 				'SELECT a.id AS value, a.name AS text, 1 AS level' .
@@ -116,7 +116,7 @@ class JElementFlexiusergroup extends JElement
 				$options[$i]->text = str_replace('FLEXIACCESS_GR_PUBLIC', '** Public **', $options[$i]->text);
 			}
 		} else if (!FLEXI_J16GE) {
-			$acl = & JFactory::getACL();
+			$acl = JFactory::getACL();
 			$options = $acl->get_group_children_tree( null, 'USERS', false );
 		} else {
 			$db->setQuery(

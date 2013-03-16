@@ -63,17 +63,14 @@ class FlexicontentViewCategory extends JViewLegacy
 
 		// Retrieve default image for the image field
 		if ($feed_use_image && $feed_image_source) {
-			$query = 'SELECT attribs FROM #__flexicontent_fields WHERE id = '.(int) $feed_image_source;
+			$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $feed_image_source;
 			$db->setQuery($query);
-			$midata = new stdClass();
-			$midata->params = $db->loadResult();
-			$midata->params = new JParameter($midata->params);
+			$image_dbdata = $db->loadObject();
+			//$image_dbdata->params = FLEXI_J16GE ? new JRegistry($image_dbdata->params) : new JParameter($image_dbdata->params);
 			
-			$midata->default_image = $midata->params->get( 'default_image', '');
-			if ( $midata->default_image !== '' ) {
-				$midata->default_image_filepath = JPATH_BASE.DS.$midata->default_image;
-				$midata->default_image_filename = basename($midata->default_image);
-			}
+			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', '' => '');
+			$img_field_size = $img_size_map[ $image_size ];
+			$img_field_name = $image_dbdata->name;
 		}
 		
 		foreach ( $rows as $row )
@@ -90,49 +87,46 @@ class FlexicontentViewCategory extends JViewLegacy
 			$description	= $feed_summary ? $row->introtext.$row->fulltext : $row->introtext;
 			$description = flexicontent_html::striptagsandcut( $description, $feed_summary_cut);
 			
-	  	$itemimage = "";
 	  	if ($feed_use_image) {  // feed image is enabled
-				if ($feed_image_source=="") {  // case 1 extract from item 
-					if ($image = flexicontent_html::extractimagesrc($row)) {
-					  $src	= $image;
-		
-						$h		= '&amp;h=' . $feed_img_height;
-						$w		= '&amp;w=' . $feed_img_width;
-						$aoe	= '&amp;aoe=1';
-						$q		= '&amp;q=95';
-						$zc		= $feed_image_method ? '&amp;zc=' . $feed_image_method : '';
-						$ext = pathinfo($src, PATHINFO_EXTENSION);
-						$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-						$conf	= $w . $h . $aoe . $q . $zc . $f;
-		
+				$src = '';
+				$thumb = '';
+				if ($feed_image_source) {   // case 1 use an image field
+					FlexicontentFields::getFieldDisplay($row, $img_field_name, null, 'display', 'module');
+					$img_field = $row->fields[$img_field_name];
+					if ( !$img_field_size ) {
+						$src = str_replace(JURI::root(), '',  $img_field->thumbs_src['large'][0] );
+					} else {
+						$src = '';
+						$thumb = $img_field->thumbs_src[ $img_field_size ][0];
+					}
+	  		} else {     // case 2 extract from item
+					$src = flexicontent_html::extractimagesrc($row);
+					if ( !empty($src) ) {
 						$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-						$itemimage = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
-		  		}
-	  		} else {   // case 2 use an image field
-					$src = '';
-					if (!empty($row->image)) {
-						$image	= unserialize($row->image);
-						$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
-					} else if (!empty($midata->default_image_filepath)) {
-						$src	= $midata->default_image_filepath;
+						$src = $base_url . $src;
 					}
+				}
+				
+				$RESIZE_FLAG = !$feed_image_source || !$img_field_size;
+				if ($src && $RESIZE_FLAG) {
+					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
+					$h		= '&amp;h=' . $feed_img_height;
+					$w		= '&amp;w=' . $feed_img_width;
+					$aoe	= '&amp;aoe=1';
+					$q		= '&amp;q=95';
+					$zc		= $feed_image_method ? '&amp;zc=' . $feed_image_method : '';
+					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$conf	= $w . $h . $aoe . $q . $zc . $f;
 					
-					if ($src) {
-						$h		= '&amp;h=' . $feed_img_height;
-						$w		= '&amp;w=' . $feed_img_width;
-						$aoe	= '&amp;aoe=1';
-						$q		= '&amp;q=95';
-						$zc		= $feed_image_method ? '&amp;zc=' . $feed_image_method : '';
-						$ext = pathinfo($src, PATHINFO_EXTENSION);
-						$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-						$conf	= $w . $h . $aoe . $q . $zc . $f;
-		
-						$itemimage = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
-					}
-	  		}
+					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				} else {
+					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
+				}
 	  		
-	  		if ($itemimage) {
-	  			$description = "<a href='".$link."'><img src='".$itemimage."' alt='".$title."' title='".$title."' align='left'/></a><p>".$description."</p>";
+	  		if ($thumb) {
+	  			$description = "<a href='".$link."'><img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/></a><p>".$description."</p>";
 	  		}
   		}
 	  	

@@ -36,20 +36,20 @@ class FlexicontentViewImport extends JViewLegacy
 		$mainframe = JFactory::getApplication();
 		
 		//initialise variables
-		$user 		= & JFactory::getUser();
-		$db  		= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$option		= JRequest::getCmd( 'option' );
-		$context	= 'com_flexicontent';
-		$task		= JRequest::getVar('task', '');
-		$cid		= JRequest::getVar('cid', array());
-		$extlimit	= JRequest::getInt('extlimit', 100);
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		$option   = JRequest::getCmd( 'option' );
+		$context  = 'com_flexicontent';
+		$task     = JRequest::getVar('task', '');
+		$cid      = JRequest::getVar('cid', array());
+		$extlimit = JRequest::getInt('extlimit', 100);
 		
 		$this->setLayout('import');
 
 		//initialise variables
-		$user 		= & JFactory::getUser();
-		$document	= & JFactory::getDocument();
+		$user 		= JFactory::getUser();
+		$document	= JFactory::getDocument();
 		$context	= 'com_flexicontent';
 		
 		JHTML::_('behavior.tooltip');
@@ -77,7 +77,7 @@ class FlexicontentViewImport extends JViewLegacy
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 		
-		$db = &JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = 'SELECT id, name'
 			. ' FROM #__flexicontent_types'
 			. ' WHERE published = 1'
@@ -106,12 +106,12 @@ class FlexicontentViewImport extends JViewLegacy
 		//build languages list
 		// Retrieve author configuration
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-		if ( $authorparams = $db->loadResult() )
-			$authorparams = new JParameter($authorparams);
+		if ( $authorparams = $db->loadResult() ) {
+			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
+		}
 		
 		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
-		
 		
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
@@ -126,8 +126,8 @@ class FlexicontentViewImport extends JViewLegacy
 		$lists['states'] = flexicontent_html::buildstateslist('state', '', '', 2);
 		
 		//assign data to template
-		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('cid'      	, $cid);
+		$this->assignRef('lists'   	, $lists);
+		$this->assignRef('cid'     	, $cid);
 		$this->assignRef('user'			, $user);
 
 		parent::display($tpl);

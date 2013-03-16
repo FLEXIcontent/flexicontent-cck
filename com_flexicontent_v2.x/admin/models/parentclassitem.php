@@ -83,7 +83,7 @@ class ParentClassItem extends JModelAdmin
 	{
 		parent::__construct();
 		
-		$app = &JFactory::getApplication();
+		$app = JFactory::getApplication();
 		
 		// --. Get component parameters , merge (for frontend) with current menu item parameters
 		$this->_cparams = clone( JComponentHelper::getParams( 'com_flexicontent' ) );
@@ -208,9 +208,9 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function &getItem($pk=null, $check_view_access=true, $no_cache=false)
 	{
-		$app =& JFactory::getApplication();
-		$cparams   =& $this->_cparams;
-		$preview   = JRequest::getVar('preview');
+		$app     = JFactory::getApplication();
+		$cparams = $this->_cparams;
+		$preview = JRequest::getVar('preview');
 		
 		// View access done is meant only for FRONTEND !!! ... force it to false
 		if ( $app->isAdmin() ) $check_view_access = false;
@@ -288,14 +288,14 @@ class ParentClassItem extends JModelAdmin
 		
 		static $unapproved_version_notice;
 		
-		$db = & $this->_db;
-		$app = &JFactory::getApplication();
-		$cparams =& $this->_cparams;
+		$db   = $this->_db;
+		$app  = JFactory::getApplication();
+		$cparams = $this->_cparams;
 		$task    = JRequest::getVar('task', false);
 		$layout  = JRequest::getVar('layout', false);
 		$view    = JRequest::getVar('view', false);
 		$option  = JRequest::getVar('option', false);
-		$config =& JFactory::getConfig();
+		$config  = JFactory::getConfig();
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$allow_current_version = true;
 		$editjf_translations = $cparams->get('editjf_translations', 0);
@@ -359,7 +359,7 @@ class ParentClassItem extends JModelAdmin
 					// **********************
 					// Item Retrieval BACKEND
 					// **********************
-					$item =& $this->getTable('flexicontent_items', '');
+					$item   = $this->getTable('flexicontent_items', '');
 					$result = $item->load($this->_id);  // try loading existing item data
 					if ($result===false) return false;
 				}
@@ -440,7 +440,7 @@ class ParentClassItem extends JModelAdmin
 					}
 					else
 					{
-						$jnow		=& JFactory::getDate();
+						$jnow		= JFactory::getDate();
 						$now		= FLEXI_J16GE ? $jnow->toSql() : $jnow->toMySQL();
 						$nullDate	= $db->getNullDate();
 						// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists
@@ -769,7 +769,7 @@ class ParentClassItem extends JModelAdmin
 			$items[$this->_id] = & $this->_item;
 		}
 		
-		/*$session 	=& JFactory::getSession();
+		/*$session = JFactory::getSession();
 		$postdata = $session->get('item_edit_postdata', array(), 'flexicontent');
 		if (count($postdata)) {
 			$session->set('item_edit_postdata', null, 'flexicontent');
@@ -807,7 +807,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	public function getForm($data = array(), $loadData = true)
 	{
-		$app =& JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$this->getItem();
 		
 		// *********************************************************
@@ -816,7 +816,7 @@ class ParentClassItem extends JModelAdmin
 		// (b) Set property 'cid' (form field categories)
 		// *********************************************************
 		
-		$this->_item->itemparams = new JParameter("");
+		$this->_item->itemparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 		
 		if ($this->_id) {
 			// Convert the attribs
@@ -1077,7 +1077,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function canAdd()
 	{
-		$user	=& JFactory::getUser();
+		$user	= JFactory::getUser();
 
 		if (FLEXI_ACCESS && ($user->gid < 25))
 		{
@@ -1100,7 +1100,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function canEdit()
 	{
-		$user	=& JFactory::getUser();
+		$user	= JFactory::getUser();
 		
 		if (!$this->_loadItem() || $user->gid >= 25) {
 			return true;
@@ -1203,14 +1203,14 @@ class ParentClassItem extends JModelAdmin
 		if (empty($this->_item))
 		{
 			// Get some variables
-			$app =& JFactory::getApplication();
-			$createdate = & JFactory::getDate();
+			$app  = JFactory::getApplication();
+			$user = JFactory::getUser();
+			$createdate = JFactory::getDate();
 			$nullDate   = $this->_db->getNullDate();
-			$cparams =& $this->_cparams;
-			$user =& JFactory::getUser();
+			$cparams    = $this->_cparams;
 			
 			// Load default empty item
-			$item =& JTable::getInstance('flexicontent_items', ''); 
+			$item = JTable::getInstance('flexicontent_items', ''); 
 			
 			$public_accesslevel  = !FLEXI_J16GE ? 0 : 1;
 			$default_accesslevel = FLEXI_J16GE ? $app->getCfg( 'access', $public_accesslevel ) : $public_accesslevel;
@@ -1283,7 +1283,7 @@ class ParentClassItem extends JModelAdmin
 	 * @since	1.6
 	 */
 	protected function populateState() {
-		$app = &JFactory::getApplication();
+		$app = JFactory::getApplication();
 		
 		// Initialise variables.
 		$this->setState($this->getName().'.id', $this->_id);
@@ -1326,12 +1326,12 @@ class ParentClassItem extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkin()
+	function checkin($pk = NULL)
 	{
-		if ($this->_id)
-		{
-			$item = & JTable::getInstance('flexicontent_items', '');
-			return $item->checkin($this->_id);
+		if (!$pk) $pk = $this->_id;
+		if ($pk) {
+			$item = JTable::getInstance('flexicontent_items', '');
+			return $item->checkin($pk);
 		}
 		return false;
 	}
@@ -1351,11 +1351,11 @@ class ParentClassItem extends JModelAdmin
 		{
 			// Make sure we have a user id to checkout the item with
 			if (is_null($uid)) {
-				$user	=& JFactory::getUser();
+				$user	= JFactory::getUser();
 				$uid	= $user->get('id');
 			}
 			// Lets get to it and checkout the thing...
-			$item = & JTable::getInstance('flexicontent_items', '');
+			$item = JTable::getInstance('flexicontent_items', '');
 			return $item->checkout($uid, $this->_id);
 		}
 		return false;
@@ -1382,13 +1382,13 @@ class ParentClassItem extends JModelAdmin
 		// Initialize various variables
 		// ****************************
 		
-		$db = & $this->_db;
-		$app = &JFactory::getApplication();
-		$dispatcher = & JDispatcher::getInstance();
-		$user	=& JFactory::getUser();
-		$cparams =& $this->_cparams;
-		$nullDate	= $this->_db->getNullDate();
-		$config =& JFactory::getConfig();
+		$db   = $this->_db;
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$config     = JFactory::getConfig();
+		$dispatcher = JDispatcher::getInstance();
+		$cparams    = $this->_cparams;
+		$nullDate   = $this->_db->getNullDate();
 		$view = JRequest::getVar('view', false);
 		JRequest::setVar("isflexicontent", "yes");
 		
@@ -1408,7 +1408,7 @@ class ParentClassItem extends JModelAdmin
 		// *****************************************
 		
 		// Get an empty item model (with default values)
-		$item  	=& $this->getTable('flexicontent_items', '');
+		$item = $this->getTable('flexicontent_items', '');
 		
 		// ... existing items
 		if ( !$isnew ) {
@@ -1462,7 +1462,7 @@ class ParentClassItem extends JModelAdmin
 		// *****************************
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
 		if ( $authorparams = $db->loadResult() )
-			$authorparams = new JParameter($authorparams);
+			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
 		
 		// At least one category needs to be assigned
 		if (!is_array( $cats ) || count( $cats ) < 1) {
@@ -1550,7 +1550,7 @@ class ParentClassItem extends JModelAdmin
 		// *******************************************************
 		if ( $app->isSite() && $isnew && !empty($data['submit_conf']) ) {
 			$h = $data['submit_conf'];
-			$session 	=& JFactory::getSession();
+			$session = JFactory::getSession();
 			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 			$submit_conf = @ $item_submit_conf[$h] ;
 			
@@ -1700,7 +1700,7 @@ class ParentClassItem extends JModelAdmin
 			$item->modified    = $nullDate;
 			$item->modified_by = 0;
 		} else {
-			$datenow =& JFactory::getDate();
+			$datenow = JFactory::getDate();
 			$item->modified    = FLEXI_J16GE ? $datenow->toSql() : $datenow->toMySQL();
 			$item->modified_by = $user->get('id');
 		}
@@ -1715,10 +1715,10 @@ class ParentClassItem extends JModelAdmin
 			$item->created 	.= ' 00:00:00';
 		}
 		if (FLEXI_J16GE) {
-			$date =& JFactory::getDate($item->created);
+			$date = JFactory::getDate($item->created);
 			$date->setTimeZone( new DateTimeZone( $tz_offset ) );    // J2.5: Date from form field is in user's timezone
 		} else {
-			$date =& JFactory::getDate($item->created, $tz_offset);  // J1.5: Date from form field is in site's default timezone
+			$date = JFactory::getDate($item->created, $tz_offset);  // J1.5: Date from form field is in site's default timezone
 		}
 		$item->created = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 			
@@ -1727,10 +1727,10 @@ class ParentClassItem extends JModelAdmin
 			$item->publish_up 	.= ' 00:00:00';
 		}
 		if (FLEXI_J16GE) {
-			$date =& JFactory::getDate($item->publish_up);
+			$date = JFactory::getDate($item->publish_up);
 			$date->setTimeZone( new DateTimeZone( $tz_offset ) );       // J2.5: Date from form field is in user's timezone
 		} else {
-			$date =& JFactory::getDate($item->publish_up, $tz_offset);  // J1.5: Date from form field is in site's default timezone
+			$date = JFactory::getDate($item->publish_up, $tz_offset);  // J1.5: Date from form field is in site's default timezone
 		}
 		$item->publish_up = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 
@@ -1745,10 +1745,10 @@ class ParentClassItem extends JModelAdmin
 				$item->publish_down .= ' 00:00:00';
 			}
 			if (FLEXI_J16GE) {
-				$date =& JFactory::getDate($item->publish_down);
+				$date = JFactory::getDate($item->publish_down);
 				$date->setTimeZone( new DateTimeZone( $tz_offset ) );         // J2.5: Date from form field is in user's timezone
 			} else {
-				$date =& JFactory::getDate($item->publish_down, $tz_offset);  // J1.5: Date from form field is in site's default timezone
+				$date = JFactory::getDate($item->publish_down, $tz_offset);  // J1.5: Date from form field is in site's default timezone
 			}
 			$item->publish_down = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 		}
@@ -1875,7 +1875,7 @@ class ParentClassItem extends JModelAdmin
 			}
 			
 			// Set form to reload posted data
-			/*$session 	=& JFactory::getSession();
+			/*$session = JFactory::getSession();
 			$session->set('item_edit_postdata', $data, 'flexicontent');*/
 			
 			return false;
@@ -1902,7 +1902,7 @@ class ParentClassItem extends JModelAdmin
 			else
 				JError::raiseNotice(10, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE') );
 			
-			$datenow =& JFactory::getDate();
+			$datenow = JFactory::getDate();
 			$item->modified			= FLEXI_J16GE ? $datenow->toSql() : $datenow->toMySQL();
 			$item->modified_by	= $user->get('id');
 		}
@@ -1988,10 +1988,10 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function saveFields($isnew, &$item, &$data, &$files)
 	{
-		$app = & JFactory::getApplication();
-		$dispatcher = & JDispatcher::getInstance();
-		$cparams =& $this->_cparams;
-		$user = & JFactory::getUser();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+		$dispatcher = JDispatcher::getInstance();
+		$cparams    = $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$last_version = FLEXIUtilities::getLastVersions($item->id, true);
 
@@ -2275,9 +2275,9 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function applyCurrentVersion(&$item, &$data, $createonly=false)
 	{
-		$app = &JFactory::getApplication();
-		$cparams =& $this->_cparams;
-		$user	=& JFactory::getUser();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$cparams = $this->_cparams;
 		$editjf_translations = $cparams->get('editjf_translations', 0);
 		
 		// ******************************
@@ -2399,7 +2399,7 @@ class ParentClassItem extends JModelAdmin
 			if (FLEXI_J16GE) {
 				//$query = $db->replacePrefix($query);
 				$query = str_replace("#__", $dbprefix, $query);
-				$db_connection = & $db->getConnection();
+				$db_connection = $db->getConnection();
 			} else {
 				$query = str_replace("#__", $dbprefix, $query);
 				$db_connection = & $db->_resource;
@@ -2415,7 +2415,7 @@ class ParentClassItem extends JModelAdmin
 			} else {
 				throw new Exception( 'unreachable code in _saveJFdata(): direct db query, unsupported DB TYPE' );
 			}
-		}		
+		}
 		
 		$modified = $item->modified ? $item->modified : $item->created;
 		$modified_by = $item->modified_by ? $item->modified_by : $item->created_by;
@@ -2578,7 +2578,7 @@ class ParentClassItem extends JModelAdmin
 		$this->_db->setQuery($query);
 		$this->_db->query($query);
 		// handle the maintext not very elegant but functions properly
-		$row  =& $this->getTable('flexicontent_items', '');
+		$row = $this->getTable('flexicontent_items', '');
 		$row->load($id);
 
 		if (@$versionrecords[0]->value) {
@@ -2624,7 +2624,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function resetHits($id)
 	{
-		$row  =& $this->getTable('flexicontent_items', '');
+		$row = $this->getTable('flexicontent_items', '');
 		$row->load($id);
 		$row->hits = 0;
 		$row->store();
@@ -2919,7 +2919,7 @@ class ParentClassItem extends JModelAdmin
 		if ( isset($field_values[$item_id][$version] ) )
 			return $field_values[$item_id][$version];
 		
-		$cparams =& $this->_cparams;
+		$cparams = $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
 		
 		$query = 'SELECT field_id, value'
@@ -2995,7 +2995,7 @@ class ParentClassItem extends JModelAdmin
 				}
 				
 				//echo "Got ver($version) id {$field->id}: ". $field->name .": ";  print_r($field->value); 	echo "<br/>";
-				$field->parameters = new JParameter($field->attribs);
+				$field->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
 			}
 		}
 		return $fields;
@@ -3011,9 +3011,9 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function setitemstate($id, $state = 1)
 	{
-		$app = &JFactory::getApplication();
-		$dispatcher = & JDispatcher::getInstance();
-		$user = & JFactory::getUser();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
+		$dispatcher = JDispatcher::getInstance();
 		JRequest::setVar("isflexicontent", "yes");
 		static $event_failed_notice_added = false;
 		
@@ -3138,7 +3138,7 @@ class ParentClassItem extends JModelAdmin
 		// Build item parameters INI string
 		if (is_array($params))
 		{
-			$item->attribs = new JParameter($item->attribs);
+			$item->attribs = FLEXI_J16GE ? new JRegistry($item->attribs) : new JParameter($item->attribs);
 			foreach ($params as $k => $v) {
 				//$v = is_array($v) ? implode('|', $v) : $v;
 				$item->attribs->set($k, $v);
@@ -3174,7 +3174,7 @@ class ParentClassItem extends JModelAdmin
 		// Build item metadata INI string
 		if (is_array($metadata))
 		{
-			$item->metadata = new JParameter($item->metadata);
+			$item->metadata = FLEXI_J16GE ? new JRegistry($item->metadata) : new JParameter($item->metadata);
 			foreach ($metadata as $k => $v) {
 				if ( $k == 'description' && !FLEXI_J16GE ) {  // is jform field in J1.6+
 					$item->metadesc = $v;
@@ -3203,7 +3203,7 @@ class ParentClassItem extends JModelAdmin
 			return $nConf;
 		}
 		
-		$db    = & JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$nConf = new stdClass();
 		
 		// (b) Get Content Type specific notifications (that override global)
@@ -3230,7 +3230,7 @@ class ParentClassItem extends JModelAdmin
 			$mcats_params = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 			
 			foreach ($mcats_params as $cat_params) {
-				$cat_params = new JParameter($cat_params);
+				$cat_params = FLEXI_J16GE ? new JRegistry($cat_params) : new JParameter($cat_params);
 				if ( ! $cat_params->get('cats_enable_notifications', 0) ) continue;  // Skip this category if category-specific notifications are not enabled for this category
 				
 				$cats_userlist_notify_new            = FLEXIUtilities::paramToArray( $cat_params->get('cats_userlist_notify_new'), $regex="/[\s]*,[\s]*/", $filterfunc="intval");
@@ -3362,10 +3362,10 @@ class ParentClassItem extends JModelAdmin
 		
 		if ( !count($notify_emails) ) return true;
 		
-		$app     = & JFactory::getApplication();
-		$db      = & JFactory::getDBO();
-		$user    = & JFactory::getUser();
-		$config  = & JFactory::getConfig();
+		$app     = JFactory::getApplication();
+		$db      = JFactory::getDBO();
+		$user    = JFactory::getUser();
+		$config  = JFactory::getConfig();
 		$use_versioning = $this->_cparams->get('use_versioning', 1);
 		
 		// Get category titles of categories add / removed from the item
@@ -3462,7 +3462,7 @@ class ParentClassItem extends JModelAdmin
 		if (FLEXI_J16GE) $tz = new DateTimeZone($tz_offset);
 		if ( in_array('created',$nf_extra_properties) )
 		{
-			$date_created  =& JFactory::getDate($this->get('created'));
+			$date_created = JFactory::getDate($this->get('created'));
 			if (FLEXI_J16GE) {
 				$date_created->setTimezone($tz);
 			} else {
@@ -3473,7 +3473,7 @@ class ParentClassItem extends JModelAdmin
 		}
 		if ( in_array('modified',$nf_extra_properties) && !$isnew )
 		{
-			$date_modified =& JFactory::getDate($this->get('modified'));
+			$date_modified = JFactory::getDate($this->get('modified'));
 			if (FLEXI_J16GE) {
 				$date_modified->setTimezone($tz);
 			} else {
@@ -3607,7 +3607,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function isUserDraft($cid)
 	{
-		$user 	=& JFactory::getUser();
+		$user = JFactory::getUser();
 
 		if ($cid)
 		{
@@ -3682,12 +3682,12 @@ class ParentClassItem extends JModelAdmin
 			// J1.5 with no FLEXIaccess or J2.5+
 			
 			// Get component parameters and them merge into them the type parameters
-			$params  = new JParameter("");
+			$params  = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 			$cparams = JComponentHelper::getParams('com_flexicontent');
 			$params->merge($cparams);
 		
 			$tparams = $this->getTypeparams();
-			$tparams = new JParameter($tparams);
+			$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 			$params->merge($tparams);
 			
 			// Get notifications configuration and select appropriate emails for current saving case
@@ -3712,14 +3712,14 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function approval($cid)
 	{
-		$db = & $this->_db;
+		$db = $this->_db;
 		$approvables = $this->isUserDraft($cid);
 		
 		$submitted = 0;
 		$publishable = array();
 		foreach ($approvables as $approvable) {
 			// Get item setting it into the model, and get publish privilege
-			$item = & $this->getItem($approvable->id, $check_view_access=false, $no_cache=true);
+			$item = $this->getItem($approvable->id, $check_view_access=false, $no_cache=true);
 			$canEditState = $this->canEditState( $item, $check_cat_perm=true );
 			if ( $canEditState ) {
 				$publishable[] = $item->title;
@@ -3736,12 +3736,12 @@ class ParentClassItem extends JModelAdmin
 			}
 					
 			// Get component parameters and them merge into them the type parameters
-			$params  = new JParameter("");
+			$params  = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 			$cparams = JComponentHelper::getParams('com_flexicontent');
 			$params->merge($cparams);
 				
 			$tparams = $this->getTypeparams();
-			$tparams = new JParameter($tparams);
+			$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 			$params->merge($tparams);
 					
 			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
@@ -3787,7 +3787,7 @@ class ParentClassItem extends JModelAdmin
 			$cache = FLEXIUtilities::getCache();
 			$cache->clean('com_flexicontent_items');
 		} else {
-			$cache = &JFactory::getCache('com_flexicontent_items');
+			$cache = JFactory::getCache('com_flexicontent_items');
 			$cache->clean();
 		}
 		

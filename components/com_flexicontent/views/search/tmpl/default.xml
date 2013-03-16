@@ -34,12 +34,12 @@
 			<field name="" type="separator" level="level3" default="Fields of Text Search &lt;br/&gt; &lt;small&gt; (a) Either use BASIC Search Index (can not select individual fields) &lt;br/&gt; (b) OR use ADVANCED Search Index (can specify a sub-set of fields below and allow user to select too &lt;/small&gt;" description=""/>
 			
 			<field name="txtmode" type="list" default="0" label="Search Words in" description="Using the basic search index is faster and is recommended for LARGE SITES, (test to see evaluate performance difference)">
-				<option value="0">All fields of BASIC Search Index (Faster)</option>
-				<option value="1">ADVANCED Index (Below fields)</option>
-				<option value="2">ADVANCED Index (Below fields), allow user selection</option>
+				<option value="0">All fields of Basic Search Index (Faster)</option>
+				<option value="1">Advanced Index (Below fields)</option>
+				<option value="2">Advanced Index (Below fields) + user selection</option>
 			</field>
 			<field name="advsearch_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvsearch="1" onchange="f=document.getElementById('{control_name}txtflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
-			<field name="txtflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Only for Advanced Index)&lt;/small&gt; &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to be included in text searching. You can separate each fieldname by comma(,). NOTE that fields not marked as (Search View) Text Searchable will be skipped even if you add them here" cols="40" rows="3" />
+			<field name="txtflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Only for Advanced Index)&lt;/small&gt; &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to be included in text searching. You can separate each fieldname by comma(,). NOTE that fields not marked as (Search View) Text Searchable will be skipped even if you add them here" cols="30" rows="3" />
 			
 			<field name="" type="separator" level="level2" default="Content types" description="The content types the search will include, selecting none will include ALL. NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here"/>
 			
@@ -71,7 +71,7 @@
 			</field-->
 			
 			<field name="advfilter_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvfilter="1" onchange="f=document.getElementById('{control_name}filtflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
-			<field name="filtflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to be used as filters (thus limiting the text search result list), these will appear inside advanced search options box. You can separate each fieldname by comma(,). NOTE that fields not marked as (Search View) Filter will be skipped even if you add them here" cols="40" rows="3" />
+			<field name="filtflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to be used as filters (thus limiting the text search result list), these will appear inside advanced search options box. You can separate each fieldname by comma(,). NOTE that fields not marked as (Search View) Filter will be skipped even if you add them here" cols="30" rows="3" />
 			
 			<field name="" type="separator" level="level2" default="Search Areas (non-FC Content)" description=""/>
 			
@@ -148,7 +148,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="info_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" onchange="f=document.getElementById('{control_name}infoflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
-			<field name="infoflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to render their values and display them in the search results. You can separate each fieldname by comma(,)." cols="40" rows="3" />
+			<field name="infoflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to render their values and display them in the search results. You can separate each fieldname by comma(,)." cols="30" rows="3" />
 		
 		
 		<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level1" hr="false" menu="hide" />

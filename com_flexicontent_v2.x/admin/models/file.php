@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: file.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: file.php 1577 2012-12-02 15:10:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -135,7 +135,7 @@ class FlexicontentModelFile extends JModelAdmin
 	{
 		if ($this->_id)
 		{
-			$tag = & JTable::getInstance('flexicontent_files', '');
+			$tag = JTable::getInstance('flexicontent_files', '');
 			return $tag->checkout($uid, $this->_id);
 		}
 		return false;
@@ -159,7 +159,7 @@ class FlexicontentModelFile extends JModelAdmin
 				$uid	= $user->get('id');
 			}
 			// Lets get to it and checkout the thing...
-			$file = & JTable::getInstance('flexicontent_files', '');
+			$file = JTable::getInstance('flexicontent_files', '');
 			return $file->checkout($uid, $this->_id);
 		}
 		return false;

@@ -91,7 +91,7 @@
 			
 			<field name="" type="separator" default="Textarea Tabbing Parameters" level="level1" menu="hide" />
 			
-			<field name="" type="separator" default="FOR DEVELOPERS ONLY. &lt;br/&gt; DO NOT ENABLE AS IT MAY LEAD TO DATA LOSS.  &lt;br/&gt;&lt;br/&gt; -- The following parameters allows to make your textarea TABBED, in both ITEM DISPLAY VIEW and in ITEM EDIT FORM.&lt;br/&gt;&lt;br/&gt; -- Enabling this requires very good knowledge of regular expressions, AND knowledge of the syntax of some TAB-CREATING joomla plugins. &lt;br/&gt;&lt;br/&gt; -- Future versions may come with predefined configurations, thus allowing easy use." level="level2" menu="hide" />
+			<field name="" type="separator" default="FOR DEVELOPERS ONLY. &lt;br/&gt; -- Do not enable on fields that already have value without testing first, (as it may lead to data loss if users click save).  &lt;br/&gt;&lt;br/&gt; -- The following parameters allows to make your textarea TABBED, in both ITEM DISPLAY VIEW and in ITEM EDIT FORM.&lt;br/&gt;&lt;br/&gt; -- Enabling this requires very good knowledge of regular expressions, AND knowledge of the syntax of some TAB-CREATING joomla plugins. &lt;br/&gt;&lt;br/&gt; -- Future versions may come with predefined configurations, thus allowing easy use." level="level3" menu="hide" />
 		
 			<field name="editorarea_per_tab" type="radio" default="0" label="One editor area per tab" description="...">
 				<option value="0">FLEXI_NO</option>
@@ -118,15 +118,15 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="start_of_tabs_pattern" type="text" default="" size="80" label="Start of tabs pattern" description="..." />
-			<field name="start_of_tabs_default_text" type="textarea" default="" cols="45" rows="4" label="start of tabs default text" description="..." />
-			<field name="start_of_tab_pattern" type="text" default="" size="80" label="Start of tab pattern" description="..." />
+			<field name="start_of_tabs_pattern" type="text" default="" size="56" label="Start of tabs pattern" description="..." />
+			<field name="start_of_tabs_default_text" type="textarea" default="" cols="31" rows="4" label="start of tabs default text" description="..." />
+			<field name="start_of_tab_pattern" type="text" default="" size="56" label="Start of tab pattern" description="..." />
 			
-			<field name="title_tab_pattern" type="text" default="" size="80" label="Tab title pattern" description="..." />
-			<field name="default_tab_list" type="textarea" default="" cols="45" rows="4" label="Default tab list" description="..." />
+			<field name="title_tab_pattern" type="text" default="" size="56" label="Tab title pattern" description="..." />
+			<field name="default_tab_list" type="textarea" default="" cols="31" rows="4" label="Default tab list" description="..." />
 			
-			<field name="end_of_tab_pattern" type="text" default="" size="80" label="End of tab" description="Can be empty for some type of tabs" />
-			<field name="end_of_tabs_pattern" type="text" default="" size="80" label="End of tabs" description="..." />
+			<field name="end_of_tab_pattern" type="text" default="" size="56" label="End of tab" description="Can be empty for some type of tabs" />
+			<field name="end_of_tabs_pattern" type="text" default="" size="56" label="End of tabs" description="..." />
 			
 		</fieldset>
 	</fields>

@@ -217,8 +217,8 @@ class FlexicontentModelField extends JModelLegacy
 	{
 		if ($this->_id)
 		{
-			$field = & JTable::getInstance('flexicontent_fields', '');
-			$user = &JFactory::getUser();
+			$field = JTable::getInstance('flexicontent_fields', '');
+			$user  = JFactory::getUser();
 			return $field->checkout($user->get('id'), $this->_id);
 		}
 		return false;
@@ -238,11 +238,11 @@ class FlexicontentModelField extends JModelLegacy
 		{
 			// Make sure we have a user id to checkout the group with
 			if (is_null($uid)) {
-				$user	=& JFactory::getUser();
+				$user	= JFactory::getUser();
 				$uid	= $user->get('id');
 			}
 			// Lets get to it and checkout the thing...
-			$field = & JTable::getInstance('flexicontent_fields', '');
+			$field = JTable::getInstance('flexicontent_fields', '');
 			return $field->checkout($uid, $this->_id);
 		}
 		return false;
@@ -286,8 +286,8 @@ class FlexicontentModelField extends JModelLegacy
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		// NOTE: 'data' is post['jform'] for J2.5 (this is done by the controller or other caller)
-		$field  	=& $this->getTable('flexicontent_fields', '');
-		$types		= $data['tid'];
+		$field  = $this->getTable('flexicontent_fields', '');
+		$types  = $data['tid'];
 		
 		// Support for 'dirty' field properties
 		if ($data['id']) {

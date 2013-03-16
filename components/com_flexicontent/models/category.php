@@ -1111,7 +1111,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$author_basicparams = $author_extdata->author_basicparams;
 					$author_catparams =  $author_extdata->author_catparams;
 					
-					$authorparams = new JParameter($author_basicparams);
+					$authorparams = FLEXI_J16GE ? new JRegistry($author_basicparams) : new JParameter($author_basicparams);
 					if (!$authorparams->get('override_currcatconf',0)) {
 						$author_catparams = '';
 					}
@@ -1130,17 +1130,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// Retrieve menu parameters
 			$menu = $mainframe->getMenu()->getActive();
 			if ($menu) {
-				if (FLEXI_J16GE) {
-					$menuParams = new JRegistry;
-					$menuParams->loadJSON($menu->params);
-				} else {
-					$menuParams = new JParameter($menu->params);
-				}
+				$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
 			}
 			
 			// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively
 			$flexi = JComponentHelper::getComponent('com_flexicontent');
-			$params = new JParameter($flexi->params);
+			$params = FLEXI_J16GE ? new JRegistry($flexi->params) : new JParameter($flexi->params);
 			if ($menu) {
 				// some parameters not belonging to category overriden parameters
 				$params->set( 'item_depth', $menuParams->get('item_depth') );
@@ -1158,17 +1153,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 			*/
 			
 			// b. Merge category parameters
-			$cparams = new JParameter($catparams);
+			$cparams = FLEXI_J16GE ? new JRegistry($catparams) : new JParameter($catparams);
 			$params->merge($cparams);
 			
 			// c. Merge author basic parameters
 			if ($author_basicparams!=='') {
-				$params->merge( new JParameter($author_basicparams) );
+				$params->merge(  FLEXI_J16GE ? new JRegistry($author_basicparams) : new JParameter($author_basicparams)  );
 			}
 	
 			// d. Merge author OVERRIDDEN category parameters
 			if ($author_catparams!=='') {
-				$params->merge( new JParameter($author_catparams) );
+				$params->merge(  FLEXI_J16GE ? new JRegistry($author_catparams) : new JParameter($author_catparams)  );
 			}
 	
 			// Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
@@ -1304,7 +1299,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if (!$filters) $filters = array();
 		foreach ($filters as $filter)
 		{
-			$filter->parameters = new JParameter($filter->attribs);
+			$filter->parameters = FLEXI_J16GE ? new JRegistry($filter->attribs) : new JParameter($filter->attribs);
 		}
 		
 		return $filters;

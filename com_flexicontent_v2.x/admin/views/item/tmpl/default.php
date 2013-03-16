@@ -188,7 +188,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									<span class="flexi_label">
 										<?php
 											$field = $this->fields['title'];
-											$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+											$label_tooltip = $field->description ? 'class="hasTip" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : '';
 										?>
 										<label id="jform_title-lbl" for="jform_title" <?php echo $label_tooltip; ?> >
 											<?php echo $field->label.':'; ?>
@@ -268,7 +268,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									<span class="flexi_label">
 										<?php
 											$field = $this->fields['document_type'];
-											$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+											$label_tooltip = $field->description ? 'class="hasTip" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : '';
 										?>
 										<label id="jform_type_id-lbl" for="jform_type_id" <?php echo $label_tooltip; ?> >
 											<?php echo $field->label.':'; ?>
@@ -288,7 +288,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									<span class="flexi_label">
 										<?php
 											$field = $this->fields['state'];
-											$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+											$label_tooltip = $field->description ? 'class="hasTip" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : '';
 										?>
 										<label id="jform_state-lbl" for="jform_state" <?php echo $label_tooltip; ?> >
 											<?php echo $field->label.':'; ?>
@@ -342,7 +342,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									</span>
 										
 										<input type="checkbox" name="jform[notify]" id="jform_notify" />
-										<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_NOTES' ); ?>::<?php echo JText::_( 'FLEXI_NOTIFY_NOTES' );?>">
+										<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
 										<?php echo $infoimage; ?>
 										</span>
 										(<?php echo $this->subscribers . ' ' . (($this->subscribers > 1) ? JText::_( 'FLEXI_SUBSCRIBERS' ) : JText::_( 'FLEXI_SUBSCRIBER' )); ?>)
@@ -416,7 +416,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								<div style='clear:both;'>
 									<label id="jform_lang_parent_id-lbl" for="jform_lang_parent_id" class="flexi_label" >
 										<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
-										<span class="editlinktip hasTip" title="::<?php echo JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' );?>">
+										<span class="editlinktip hasTip" title="::<?php echo htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8');?>">
 											<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM' ) ); ?>
 										</span>
 									</label>
@@ -457,7 +457,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											if ($assoc_item->id==$this->row->id) continue;
 											
 											$_link  = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&cid[]='. $assoc_item->id;
-											$_title = JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ).':: ['. $assoc_item->lang .'] '. $assoc_item->title;
+											$_title = htmlspecialchars(JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
 											echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
 											//echo $assoc_item->id;
 											if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
@@ -548,7 +548,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 							// -- Tooltip for the current field label
 							$edithelp = $field->edithelp ? $field->edithelp : 1;
 							$label_tooltip = ( $field->description && ($edithelp==1 || $edithelp==2) ) ?
-								' class="flexi_label hasTip '.($edithelp==2 ? ' fc_tooltip_icon_bg ' : '').'" title="'.$field->label.'::'.$field->description.'" ' :
+								' class="flexi_label hasTip '.($edithelp==2 ? ' fc_tooltip_icon_bg ' : '').'" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'" ' :
 								' class="flexi_label" ';
 							$label_style = ""; //( $field->field_type == 'maintext' || $field->field_type == 'textarea' ) ? " style='clear:both; float:none;' " : "";
 							$not_in_tabs = "";
@@ -693,7 +693,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td>
 				<?php
 					$field = $this->fields['state'];
-					$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+					$label_tooltip = $field->description ? 'class="hasTip" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : '';
 				?>
 				<strong <?php echo $label_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_STATE' ) */ ?></strong>
 			</td>
@@ -705,7 +705,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td>
 				<?php
 					$field = $this->fields['hits'];
-					$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+					$label_tooltip = $field->description ? 'class="hasTip" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : '';
 				?>
 				<strong <?php echo $label_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_HITS' ) */ ?></strong>
 			</td>
@@ -720,7 +720,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td>
 				<?php
 					$field = $this->fields['voting'];
-					$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+					$label_tooltip = $field->description ? 'class="hasTip" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : '';
 				?>
 				<strong <?php echo $label_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_SCORE' ) */ ?></strong>
 			</td>
@@ -735,7 +735,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td>
 				<?php
 					$field = $this->fields['modified'];
-					$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+					$label_tooltip = $field->description ? 'class="hasTip" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : '';
 				?>
 				<strong <?php echo $label_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_REVISED' ) */ ?></strong>
 			</td>
@@ -763,7 +763,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td>
 				<?php
 					$field = $this->fields['created'];
-					$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+					$label_tooltip = $field->description ? 'class="hasTip" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : '';
 				?>
 				<strong <?php echo $label_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_CREATED' ) */ ?></strong>
 			</td>
@@ -781,7 +781,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<td>
 				<?php
 					$field = $this->fields['modified'];
-					$label_tooltip = $field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : '';
+					$label_tooltip = $field->description ? 'class="hasTip" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : '';
 				?>
 				<strong <?php echo $label_tooltip; ?>><?php echo $field->label; /* JText::_( 'FLEXI_MODIFIED' ) */ ?></strong>
 			</td>
@@ -828,7 +828,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo '#' . $version->nr; ?></span></td>
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo JHTML::_('date', (($version->nr == 1) ? $this->row->created : $version->date), $date_format ); ?></span></td>
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
-				<td class="versions" align="center"><a href="javascript:;" class="hasTip" title="Comment::<?php echo $version->comment;?>"><?php echo $commentimage;?></a><?php
+				<td class="versions" align="center"><a href="javascript:;" class="hasTip" title="Comment::<?php echo htmlspecialchars($version->comment, ENT_COMPAT, 'UTF-8');?>"><?php echo $commentimage;?></a><?php
 				if((int)$version->nr==(int)$this->row->current_version) { ?>
 					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&<?php echo $ctrl_task;?>edit&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 				<?php }else{
@@ -851,7 +851,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<tr>	
 				<th colspan="2" style="border-bottom: 1px dotted silver; padding-bottom: 5px;">
 					<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
+					<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
 					<?php echo $infoimage; ?>
 					</span>
 				</th>
@@ -932,7 +932,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<ul class="adminformlist">
 				<li>
 					<?php echo $this->form->getLabel('metadesc'); ?>
-
+			
 			<?php	if ( isset($this->row->item_translations) ) : ?>
 				
 				<!-- tabber start -->

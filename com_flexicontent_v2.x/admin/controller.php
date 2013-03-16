@@ -31,7 +31,7 @@ class FlexicontentController extends JControllerLegacy
 	function __construct()
 	{
 		parent::__construct();
-		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		$params = JComponentHelper::getParams('com_flexicontent');
 		$config_saved = !FLEXI_J16GE ? $params->get('flexi_section', 0) : $params->get('flexi_cat_extension', 0);
 		//$config_saved = $config_saved && $params->get('search_mode', 0);  // an Extra configuration check
 		
@@ -45,7 +45,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		// GET POSTINSTALL tasks from session variable AND IF NEEDED re-evaluate it
 		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED
-		$dopostinstall =& $session->get('flexicontent.postinstall');
+		$dopostinstall = $session->get('flexicontent.postinstall');
 		$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
 		if(($dopostinstall===NULL) || ($dopostinstall===false) || $recheck_aftersave) {
 			// NULL mean POSTINSTALL tasks has not been checked YET (current PHP user session),
@@ -64,13 +64,13 @@ class FlexicontentController extends JControllerLegacy
 		// GET ALLPLGPUBLISH task from session variable AND IF NEEDED re-evaluate it
 		// NOTE, we choose to have this separate from REQUIRED POSTINSTALL tasks,
 		// because WE DON'T WANT TO FORCE the user to enable all plugins but rather recommend it
-		$allplgpublish =& $session->get('flexicontent.allplgpublish');
+		$allplgpublish = $session->get('flexicontent.allplgpublish');
 		if(($allplgpublish===NULL) || ($allplgpublish===false)) {
 			// NULL means ALLPLGPUBLISH task has not been checked YET (current PHP user session),
 			// false means it has been checked during current session but has failed
 			// In both cases we must evaluate the ALLPLGPUBLISH task,  and set the session variable
-			$model 			= $this->getModel('flexicontent');
-			$allplgpublish 		= & $model->getAllPluginsPublished();
+			$model = $this->getModel('flexicontent');
+			$allplgpublish = $model->getAllPluginsPublished();
 			$session->set('flexicontent.allplgpublish', $allplgpublish);
 		}
 		
@@ -125,7 +125,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		$model 	= $this->getModel('flexicontent');		
 
-		$missing =& $model->processLanguageFiles($code, $method, $formparams);
+		$missing = $model->processLanguageFiles($code, $method, $formparams);
 		
 		if (is_array($missing) && $method != 'zip') {
 			if (@$missing['admin']) {
@@ -150,26 +150,26 @@ class FlexicontentController extends JControllerLegacy
 	}
 
 	function getPostinstallState() {
-		$model 				= $this->getModel('flexicontent');
-		$params 	= & JComponentHelper::getParams('com_flexicontent');
+		$model  = $this->getModel('flexicontent');
+		$params = JComponentHelper::getParams('com_flexicontent');
 		$use_versioning = $params->get('use_versioning', 1);
 
-		$existmenuitems	= & $model->getExistMenuItems();
-		$existtype 			= & $model->getExistType();
-		$existfields 		= & $model->getExistFields();
+		$existmenuitems	= $model->getExistMenuItems();
+		$existtype 			= $model->getExistType();
+		$existfields 		= $model->getExistFields();
 
-		$existfplg 			= & $model->getExistFieldsPlugins();
-		$existseplg 		= & $model->getExistSearchPlugin();
-		$existsyplg 		= & $model->getExistSystemPlugin();
+		$existfplg 			= $model->getExistFieldsPlugins();
+		$existseplg 		= $model->getExistSearchPlugin();
+		$existsyplg 		= $model->getExistSystemPlugin();
 		
 		$existlang				= $model->getExistLanguageColumn() && !$model->getItemsNoLang();
-		$existversions 		= & $model->getExistVersionsTable();
+		$existversions 		= $model->getExistVersionsTable();
 		$existversionsdata= !$use_versioning || $model->getExistVersionsPopulated();
 		
-		$existauthors 		= & $model->getExistAuthorsTable();
-		$cachethumb				= & $model->getCacheThumbChmod();
-		$oldbetafiles			= & $model->getOldBetaFiles();
-		$nooldfieldsdata	= & $model->getNoOldFieldsData();
+		$existauthors 		= $model->getExistAuthorsTable();
+		$cachethumb				= $model->getCacheThumbChmod();
+		$oldbetafiles			= $model->getOldBetaFiles();
+		$nooldfieldsdata	= $model->getNoOldFieldsData();
 		$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 		
 		$initialpermission = FLEXI_J16GE ? $model->checkInitialPermission() : true;
@@ -201,12 +201,12 @@ class FlexicontentController extends JControllerLegacy
 	/**
 	 * Display the view
 	 */
-	function display()
+	function display($cachable = false, $urlparams = false)
 	{
 		parent::display();
-
 	}
-
+	
+	
 	/**
 	 * Saves the acl file
 	 *
@@ -217,10 +217,10 @@ class FlexicontentController extends JControllerLegacy
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		// Initialize some variables
-		$mainframe = &JFactory::getApplication();
-		$option			= JRequest::getVar('option');
-		$filename		= JRequest::getVar('filename', '', 'post', 'cmd');
-		$filecontent	= JRequest::getVar('filecontent', '', '', '', JREQUEST_ALLOWRAW);
+		$mainframe = JFactory::getApplication();
+		$option    = JRequest::getVar('option');
+		$filename  = JRequest::getVar('filename', '', 'post', 'cmd');
+		$filecontent = JRequest::getVar('filecontent', '', '', '', JREQUEST_ALLOWRAW);
 
 		if (!$filecontent) {
 			$mainframe->redirect('index.php?option='.$option, JText::_( 'FLEXI_OPERATION_FAILED' ).': '.JText::_( 'FLEXI_CONTENT_EMPTY' ));
@@ -277,7 +277,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$db 	=& JFactory::getDBO();
+		$db = JFactory::getDBO();
 
 		$query 	=	"INSERT INTO `#__flexicontent_types` VALUES(1, 'Article', 'article', 1, 0, '0000-00-00 00:00:00', 0, 'ilayout=default\nhide_maintext=0\nhide_html=0\nmaintext_label=\nmaintext_desc=\ncomments=\ntop_cols=two\nbottom_cols=two')" ;
 		$db->setQuery($query);
@@ -321,7 +321,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$db 	=& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		if (FLEXI_J16GE) {
 			$db->setQuery("SELECT extension_id FROM #__extensions WHERE element='com_flexicontent' AND type='component' ");
 		} else {
@@ -357,11 +357,11 @@ class FlexicontentController extends JControllerLegacy
 		$result = $db->query();
 		if($result) {
 			// Save the created menu item as default_menu_itemid for the component
-			$component =& JComponentHelper::getParams('com_flexicontent');
+			$component = JComponentHelper::getParams('com_flexicontent');
 			$component->set('default_menu_itemid', $db->insertid());
 			$cparams = $component->toString();
 
-			$flexi =& JComponentHelper::getComponent('com_flexicontent');
+			$flexi = JComponentHelper::getComponent('com_flexicontent');
 
 			$query 	= 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__components')
 					. ' SET params = ' . $db->Quote($cparams)
@@ -394,7 +394,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$db 	=& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		$acclevel = FLEXI_J16GE ? 1 : 0;
 		$query 	=	"INSERT INTO #__flexicontent_fields (`id`,`field_type`,`name`,`label`,`description`,`isfilter`,`iscore`,`issearch`,`isadvsearch`,`positions`,`published`,`attribs`,`checked_out`,`checked_out_time`,`access`,`ordering`)
@@ -433,8 +433,8 @@ VALUES
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$format		= JRequest::getVar('format', '');
-		$db =& JFactory::getDBO();
+		$format = JRequest::getVar('format', '');
+		$db = JFactory::getDBO();
 		
 		$query	= 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__plugins')
 				. ' SET '. (FLEXI_J16GE ? 'enabled' : 'published') .' = 1'
@@ -504,7 +504,7 @@ VALUES
 	 */
 	function setItemsDefaultLang($lang)
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 
 		// Set default language for items that do not have their language set
 		$query 	= 'UPDATE #__flexicontent_items_ext'
@@ -548,7 +548,7 @@ VALUES
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$db 		=& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
 		
 		// Add language column
@@ -601,7 +601,7 @@ VALUES
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$db 		=& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
 
 		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_versions (
@@ -637,7 +637,7 @@ VALUES
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$db 		=& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
 
 		$query 	= " CREATE TABLE IF NOT EXISTS #__flexicontent_authors_ext (
@@ -669,7 +669,7 @@ VALUES
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$db 		=& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
 
 		$query 	= 'SELECT item_id, version FROM #__flexicontent_items_versions'
@@ -773,8 +773,8 @@ VALUES
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$db =& JFactory::getDBO();
-		$mainframe = &JFactory::getApplication();
+		$db = JFactory::getDBO();
+		$mainframe= JFactory::getApplication();
 
 		$queries 	= array();
 		// alter some table field types
@@ -913,7 +913,7 @@ VALUES
 			$db->query();
 		}
 
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
 
 		$model = $this->getModel('flexicontent');

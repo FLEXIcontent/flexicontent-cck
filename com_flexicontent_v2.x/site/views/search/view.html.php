@@ -39,6 +39,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Initialize some variables
 		$app       = JFactory::getApplication();
 		$document  = JFactory::getDocument();
+		$db        = JFactory::getDBO();
 		$uri       = JFactory::getURI();
 		$menu      = $app->getMenu()->getActive();
 		$pathway   = $app->getPathway();
@@ -61,7 +62,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		// Get menu parameters
 		if ($menu) {
-			$menuParams = new JParameter($menu->params);
+			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
 			// In J1.6+ the above function does not merge current menu item parameters,
 			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
 			if (FLEXI_J16GE) $params->merge($menuParams);
@@ -225,7 +226,6 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$checked_class = !count($form_contenttypes) ? 'highlight' : '';
 			
 			// Get all configured content Types *(or ALL if these were not set)
-			$db =  JFactory::getDBO();
 			$query = "SELECT id AS value, name AS text"
 			. " FROM #__flexicontent_types"
 			. " WHERE published = 1"
@@ -381,9 +381,15 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		FLEXIadvsearchHelper::logSearch( $searchword);
 
 		//limit searchword
-		$min = $params->get('minchars', 2);
+		$min = $params->get('minchars', 3);
 		$max = $params->get('maxchars', 200);
-		if(FLEXIadvsearchHelper::limitSearchWord($searchword, $min, $max)) {
+		
+		$query = "SHOW VARIABLES LIKE '%ft_min_word_len%'";
+		$db->setQuery($query);
+		$_dbvariable = $db->loadObject();
+		$ft_min_word_len = (int) @ $_dbvariable->Value;
+		if ( $ft_min_word_len && ($ft_min_word_len > $min) ) $min = $ft_min_word_len;
+		if (FLEXIadvsearchHelper::limitSearchWord($searchword, $min, $max)) {
 			$error = JText::sprintf( 'FLEXI_SEARCH_MESSAGE', $min, $max );
 		}
 

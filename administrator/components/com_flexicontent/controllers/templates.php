@@ -127,7 +127,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			echo JText::sprintf( 'FLEXI_TEMPLATE_FAILED_CLONE', $source );
 			return;
 		} else {
-			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
+			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');
 			$tmplcache->clean();
 			echo '<span class="copyok" style="margin-top:15px; display:block">'.JText::sprintf( 'FLEXI_TEMPLATE_CLONED', $source, $dest ).'</span>';
 		}
@@ -154,7 +154,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 			echo '</td>';
 			return;
 		} else {
-			$tmplcache =& JFactory::getCache('com_flexicontent_tmpl');
+			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');
 			$tmplcache->clean();
 
 			echo '<td colspan="5" align="center">';

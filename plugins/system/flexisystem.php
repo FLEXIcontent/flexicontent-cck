@@ -332,20 +332,29 @@ class plgSystemFlexisystem extends JPlugin
 		}
 	}
 	
-	function getCategoriesTree()
+	static function getCategoriesTree()
 	{
 		$start_microtime = microtime(true);
 		global $globalcats;
 		$db = JFactory::getDBO();
 		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 : 0;
 
-		// get the category tree and append the ancestors to each node		
-		$query	= 'SELECT id, parent_id, published, access, title,'
+		// get the category tree and append the ancestors to each node
+		if (FLEXI_J16GE) {
+			$query	= 'SELECT id, parent_id, published, access, title, level, lft, rgt,'
+				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
+				. ' FROM #__categories as c'
+				. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND lft > ' . FLEXI_LFT_CATEGORY . ' AND rgt < ' . FLEXI_RGT_CATEGORY
+				. ' ORDER BY parent_id, lft'
+				;
+		} else {
+			$query	= 'SELECT id, parent_id, published, access, title,'
 				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				. ' FROM #__categories'
 				. ' WHERE section = ' . FLEXI_SECTION
 				. ' ORDER BY parent_id, ordering'
 				;
+		}
 		$db->setQuery($query);
 		$cats = $db->loadObjectList();
 
@@ -391,7 +400,7 @@ class plgSystemFlexisystem extends JPlugin
     * @access private
     * @return array
     */
-	function _getCatAncestors( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
+	static function _getCatAncestors( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
 	{
 		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 : 0;
 		if (!$ancestors) $ancestors = array();
@@ -448,7 +457,7 @@ class plgSystemFlexisystem extends JPlugin
     * @access private
     * @return array
     */
-	function _getDescendants($cat)
+	static function _getDescendants($cat)
 	{
 		$descendants = array();
 		$stack = array();
@@ -918,7 +927,7 @@ class plgSystemFlexisystem extends JPlugin
     $admin_grp = 7;
     $super_admin_grp = 8;
     
-    $user = &JFactory::getUser();
+    $user = JFactory::getUser();
     $coreUserGroups = $user->getAuthorisedGroups();
     // $coreViewLevels = $user->getAuthorisedViewLevels();
     $aid = max ($user->getAuthorisedViewLevels());

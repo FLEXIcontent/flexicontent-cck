@@ -43,8 +43,8 @@ if ($count) :
 <div class="content group">
 
 <?php
-$leadnum		= $this->params->get('lead_num', 2);
-$leadnum		= ($leadnum >= $count) ? $count : $leadnum;
+$leadnum  = $this->params->get('lead_num', 1);
+$leadnum  = ($leadnum >= $count) ? $count : $leadnum;
 
 // ONLY FIRST PAGE has leading content items
 if ($this->limitstart != 0) $leadnum = 0;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: categories.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: categories.php 1614 2013-01-04 03:57:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -69,9 +69,9 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		parent::save();
-			$cache 		=& JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 	}
 	
@@ -150,9 +150,9 @@ class FlexicontentControllerCategories extends JControllerAdmin
 			$msg 	= $state ? JText::_( 'FLEXI_CATEGORY_PUBLISHED') : JText::_( 'FLEXI_CATEGORY_UNPUBLISHED' );
 			
 			// clean cache
-			$cache 		=& JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		}
 
@@ -178,7 +178,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 			$user = JFactory::getUser();
 
 			// Get an instance of the row to checkin.
-			$table = & JTable::getInstance('flexicontent_categories', '');
+			$table = JTable::getInstance('flexicontent_categories', '');
 			if (!$table->load($pk))
 			{
 				$this->setError($table->getError());
@@ -228,9 +228,9 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		$model = $this->getModel('categories');
 		$model->move(-1);
 		
-		$cache 		=& JFactory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories');
@@ -251,9 +251,9 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		$model = $this->getModel('categories');
 		$model->move(1);
 		
-		$cache 		=& JFactory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories');
@@ -284,9 +284,9 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		}
 		
 		// clean cache
-		$cache 		=& JFactory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
 	}
 
@@ -337,9 +337,9 @@ class FlexicontentControllerCategories extends JControllerAdmin
 			}
 			
 			// clean cache
-			$cache =& JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$catscache =& JFactory::getCache('com_flexicontent_cats');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		}
 		
@@ -370,7 +370,7 @@ class FlexicontentControllerCategories extends JControllerAdmin
 			$CanCats 	= 1;
 		}
 
-		$category = & JTable::getInstance('flexicontent_categories','');
+		$category = JTable::getInstance('flexicontent_categories','');
 		$category->bind(JRequest::get('post'));
 		$category->checkin();
 
@@ -431,9 +431,9 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		} else if(!$model->saveaccess( $id, $access )) {
 			JError::raiseWarning(500, $model->getError());
 		} else {
-			$cache 		=& JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 		}
 		

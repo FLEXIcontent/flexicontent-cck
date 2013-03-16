@@ -135,7 +135,7 @@ class FlexicontentModelFile extends JModelLegacy
 	{
 		if ($this->_id)
 		{
-			$tag = & JTable::getInstance('flexicontent_files', '');
+			$tag = JTable::getInstance('flexicontent_files', '');
 			return $tag->checkout($uid, $this->_id);
 		}
 		return false;
@@ -159,7 +159,7 @@ class FlexicontentModelFile extends JModelLegacy
 				$uid	= $user->get('id');
 			}
 			// Lets get to it and checkout the thing...
-			$file = & JTable::getInstance('flexicontent_files', '');
+			$file = JTable::getInstance('flexicontent_files', '');
 			return $file->checkout($uid, $this->_id);
 		}
 		return false;

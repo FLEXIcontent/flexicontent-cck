@@ -105,7 +105,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Merge the type parameters
 		$tparams = $model->getTypeparams();
-		$tparams = new JParameter($tparams);
+		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 		$params->merge($tparams);
 		
 		// Get needed parameters

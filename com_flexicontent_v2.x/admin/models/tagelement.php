@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tagelement.php 1341 2011-08-11 04:03:52Z ggppdk $
+ * @version 1.5 stable $Id: tagelement.php 1577 2012-12-02 15:10:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -53,7 +53,7 @@ class FlexicontentModelTagelement extends JModelLegacy
 	{
 		parent::__construct();
 
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
@@ -76,7 +76,7 @@ class FlexicontentModelTagelement extends JModelLegacy
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db =& JFactory::getDBO();
+			$db = JFactory::getDBO();
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
 		}
@@ -149,7 +149,7 @@ class FlexicontentModelTagelement extends JModelLegacy
 	 */
 	function _buildContentOrderBy()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
@@ -168,11 +168,11 @@ class FlexicontentModelTagelement extends JModelLegacy
 	 */
 	function _buildContentWhere()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.tags.search', 'search', '', 'string' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search = $mainframe->getUserStateFromRequest( $option.'.tags.search', 'search', '', 'string' );
+		$search = $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		$where = array();
 

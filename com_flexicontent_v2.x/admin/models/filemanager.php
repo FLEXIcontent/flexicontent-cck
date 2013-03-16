@@ -68,11 +68,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	{
 		parent::__construct();
 
-		$mainframe = &JFactory::getApplication();
+		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart = $mainframe->getUserStateFromRequest( $option.'.filemanager.limitstart', 'limitstart', 0, 'int' );
+		$limit      = $app->getUserStateFromRequest( $option.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $app->getUserStateFromRequest( $option.'.filemanager.limitstart', 'limitstart', 0, 'int' );
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
@@ -122,7 +122,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 			if ($this->_db->getErrorNum()) echo nl2br( "\n".$this->_db->getErrorMsg() );
 			
-			$db =& JFactory::getDBO();
+			$db = JFactory::getDBO();
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
 			
@@ -193,7 +193,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function _buildQuery( $assigned_fields=array(), $item_id=0, $ids_only=false )
 	{
-		$mainframe = & JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
@@ -203,7 +203,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		}
 		//$having = $this->_buildContentHaving();
 		
-		$filter_item = $item_id  ?  $item_id  :  $mainframe->getUserStateFromRequest( $option.'.filemanager.item_id', 'item_id', 0, 'int' );
+		$filter_item = $item_id  ?  $item_id  :  $app->getUserStateFromRequest( $option.'.filemanager.item_id', 'item_id', 0, 'int' );
 		
 		$extra_join = '';
 		$extra_where = '';
@@ -265,7 +265,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function getItemFiles($item_id=0)
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = $this->_buildQuery( $assigned_fields=array(), $ids_only=true, $item_id );
 		$db->setQuery($query);
 		$items = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
@@ -283,11 +283,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function _buildContentOrderBy()
 	{
-		$mainframe = &JFactory::getApplication();
+		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_order', 		'filter_order', 	'f.filename', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_order     = $app->getUserStateFromRequest( $option.'.filemanager.filter_order', 		'filter_order', 	'f.filename', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.filemanager.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', f.filename';
 
@@ -304,17 +304,17 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function _buildContentWhere()
 	{
-		$mainframe = &JFactory::getApplication();
+		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
 
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
-		$filter 			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter', 'filter', 1, 'int' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
-		$filter_url			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_url', 'filter_url', '', 'word' );
-		$filter_secure		= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_secure', 'filter_secure', '', 'word' );
-		$filter_ext			= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_ext', 'filter_ext', '', 'alnum' );
-		$user				= & JFactory::getUser();
+		$search 	= $app->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
+		$filter 	= $app->getUserStateFromRequest( $option.'.filemanager.filter', 'filter', 1, 'int' );
+		$search 	= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$filter_uploader= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
+		$filter_url			= $app->getUserStateFromRequest( $option.'.filemanager.filter_url', 'filter_url', '', 'word' );
+		$filter_secure	= $app->getUserStateFromRequest( $option.'.filemanager.filter_secure', 'filter_secure', '', 'word' );
+		$filter_ext			= $app->getUserStateFromRequest( $option.'.filemanager.filter_ext', 'filter_ext', '', 'alnum' );
 
 		$where = array();
 		
@@ -374,10 +374,10 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function _buildContentHaving()
 	{
-		$mainframe = &JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_assigned', 'filter_assigned', '', 'word' );
+		$filter_assigned	= $app->getUserStateFromRequest( $option.'.filemanager.filter_assigned', 'filter_assigned', '', 'word' );
 		
 		$having = '';
 		
@@ -401,11 +401,9 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 * @since 1.0
 	 */
 	function _buildQueryUsers() {
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
 		// Get the WHERE and ORDER BY clauses for the query
-		$where		= $this->_buildContentWhere();
-
+		$where = $this->_buildContentWhere();
+		
 		$query = 'SELECT u.id,u.name'
 		. ' FROM #__flexicontent_files AS f'
 		. ' LEFT JOIN #__users AS u ON u.id = f.uploaded_by'
@@ -473,11 +471,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function getItemsSingleprop( $field_types=array('file','minigallery'), $file_ids=array(), $count_items=false)
 	{
-		$mainframe = &JFactory::getApplication();
+		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
-		$user				= & JFactory::getUser();
+		$filter_uploader = $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
+		$user = JFactory::getUser();
 		
 		$field_type_list = $this->_db->Quote( implode( "','", $field_types ), $escape=false );
 		
@@ -541,11 +539,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function getItemsMultiprop( $field_props=array('image'=>'originalname'), $value_props=array('image'=>'filename') , $file_ids=array(), $count_items=false)
 	{
-		$mainframe = &JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$filter_uploader	= $mainframe->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
-		$user				= & JFactory::getUser();
+		$filter_uploader	= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
+		$user				= JFactory::getUser();
 		
 		$where = array();
 		
@@ -783,7 +781,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user 	=& JFactory::getUser();
+		$user 	= JFactory::getUser();
 
 		if (count( $cid )) {
 			$cids = implode( ',', $cid );
@@ -812,8 +810,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function saveaccess($id, $access)
 	{
-		$mainframe = &JFactory::getApplication();
-		$row =& JTable::getInstance('flexicontent_files', '');
+		$row = JTable::getInstance('flexicontent_files', '');
 		
 		$row->load( $id );
 		$row->id = $id;

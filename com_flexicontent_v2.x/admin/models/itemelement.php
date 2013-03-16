@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: itemelement.php 1317 2012-05-19 22:17:59Z ggppdk $
+ * @version 1.5 stable $Id: itemelement.php 1577 2012-12-02 15:10:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -52,11 +52,11 @@ class FlexicontentModelItemelement extends JModelLegacy
 	function __construct()
 	{
 		parent::__construct();
-		$mainframe = &JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart = $mainframe->getUserStateFromRequest( $option.'.itemelement.limitstart', 'limitstart', 0, 'int' );
+		$limit		= $app->getUserStateFromRequest( $option.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $app->getUserStateFromRequest( $option.'.itemelement.limitstart', 'limitstart', 0, 'int' );
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
@@ -78,11 +78,11 @@ class FlexicontentModelItemelement extends JModelLegacy
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db =& JFactory::getDBO();
+			$db = JFactory::getDBO();
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
 			if ( $db->getErrorNum() ) {
-				$jAp=& JFactory::getApplication();
+				$jAp= JFactory::getApplication();
 				$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
 			}
 		}
@@ -162,11 +162,11 @@ class FlexicontentModelItemelement extends JModelLegacy
 	 */
 	function _buildContentOrderBy()
 	{
-		$mainframe = &JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_order', 		'filter_order', 	'i.ordering', 	'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_order_Dir',		'filter_order_Dir',	'', 			'word' );
+		$filter_order		= $app->getUserStateFromRequest( $option.'.itemelement.filter_order', 		'filter_order', 	'i.ordering', 	'cmd' );
+		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.itemelement.filter_order_Dir',		'filter_order_Dir',	'', 			'word' );
 
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', i.ordering';
 
@@ -181,34 +181,34 @@ class FlexicontentModelItemelement extends JModelLegacy
 	 */
 	function _buildContentWhere()
 	{
-		$mainframe = &JFactory::getApplication();
+		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
-		$user = JFactory::getUser();
 		
-		$langparent_item = $mainframe->getUserStateFromRequest( $option.'.itemelement.langparent_item', 'langparent_item', 0, 'int' );
-		$type_id         = $mainframe->getUserStateFromRequest( $option.'.itemelement.type_id', 'type_id', 0, 'int' );
-		$created_by      = $mainframe->getUserStateFromRequest( $option.'.itemelement.created_by', 'created_by', 0, 'int' );
+		$langparent_item = $app->getUserStateFromRequest( $option.'.itemelement.langparent_item', 'langparent_item', 0, 'int' );
+		$type_id         = $app->getUserStateFromRequest( $option.'.itemelement.type_id', 'type_id', 0, 'int' );
+		$created_by      = $app->getUserStateFromRequest( $option.'.itemelement.created_by', 'created_by', 0, 'int' );
 		if ($langparent_item) {
 			$user_fullname = JFactory::getUser($created_by)->name;
 			$this->_db->setQuery('SELECT name FROM #__flexicontent_types WHERE id = '.$type_id);
 			$type_name = $this->_db->loadResult();
 			$msg = sprintf("Selecting ORIGINAL Content item for a translating item of &nbsp; Content Type: \"%s\" &nbsp; and &nbsp; User: \"%s\"", $type_name, $user_fullname);
-			$jAp=& JFactory::getApplication();
+			$jAp= JFactory::getApplication();
 			$jAp->enqueueMessage($msg,'message');
 		}
 		
-		$filter_state    = $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
-		$filter_cats     = $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );
-		$filter_type     = $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_type', 'filter_type', '', 'int' );
+		$filter_state    = $app->getUserStateFromRequest( $option.'.itemelement.filter_state', 'filter_state', '', 'word' );
+		$filter_cats     = $app->getUserStateFromRequest( $option.'.itemelement.filter_cats', 'filter_cats', '', 'int' );
+		$filter_type     = $app->getUserStateFromRequest( $option.'.itemelement.filter_type', 'filter_type', '', 'int' );
 		
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			if ($langparent_item)
 				$filter_lang = flexicontent_html::getSiteDefaultLang();
 			else
-				$filter_lang 	= $mainframe->getUserStateFromRequest( $option.'.itemelement.filter_lang', 	'filter_lang', '', 'cmd' );
+				$filter_lang = $app->getUserStateFromRequest( $option.'.itemelement.filter_lang', 	'filter_lang', '', 'cmd' );
 		}
 		
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.itemelement.search', 'search', '', 'string' );
+		$search 			= $app->getUserStateFromRequest( $option.'.itemelement.search', 'search', '', 'string' );
 		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		$where = array();

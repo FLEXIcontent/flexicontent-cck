@@ -90,7 +90,10 @@ $page_classes .= ' fccategory fccat'.$this->category->id;
 
 
 <!-- BOF item list display -->
-	<?php echo $this->loadTemplate('items'); ?>
+<?php
+	echo $this->loadTemplate('items');
+	echo empty($this->items) ? '<span class="fc_return_msg">'.JText::sprintf('FLEXI_CLICK_HERE_TO_RETURN', '"JavaScript:window.history.back();"').'</span>' : "";
+?>
 <!-- BOF item list display -->
 
 <!-- BOF pagination -->

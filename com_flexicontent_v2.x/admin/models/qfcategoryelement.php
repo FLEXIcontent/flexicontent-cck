@@ -93,7 +93,7 @@ class FlexicontentModelQfcategoryelement extends JModelLegacy
 	 */
 	function getData()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		
 		static $items;
 
@@ -101,10 +101,10 @@ class FlexicontentModelQfcategoryelement extends JModelLegacy
 			return $items;
 		}
 		
-		$params 			=& JComponentHelper::getParams('com_flexicontent');
+		$params 			= JComponentHelper::getParams('com_flexicontent');
 		$limit				= $mainframe->getUserStateFromRequest( 'com_flexicontent.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.limitstart', 'limitstart', 0, 'int' );
-		$filter_order		= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
+		$limitstart 	= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.limitstart', 'limitstart', 0, 'int' );
+		$filter_order			= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_state', 'filter_state', '', 'word' );
 		$search 			= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.search', 'search', '', 'string' );

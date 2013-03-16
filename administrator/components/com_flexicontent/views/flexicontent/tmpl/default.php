@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-$mainframe = &JFactory::getApplication();
+$mainframe = JFactory::getApplication();
 $option    = JRequest::getVar('option');
 $user      = JFactory::getUser();
 $template  = $mainframe->getTemplate();

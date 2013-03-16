@@ -17,7 +17,7 @@ class FlexicontentHelperPerm
 	 * @since	2.0
 	 * 
 	 */
-	function getPerm($force = false)
+	static function getPerm($force = false)
 	{
 		static $permission = null;
 		
@@ -47,7 +47,7 @@ class FlexicontentHelperPerm
 				$Comments_Enabled 	= 0;
 			}
 			
-			$user =& JFactory::getUser();
+			$user = JFactory::getUser();
 			$permission = new stdClass;
 			
 			// !!! This is the Super User Privelege of GLOBAL Configuration		(==> (for J2.5) core.admin ACTION allowed on ROOT ASSET: 'root.1')
@@ -231,10 +231,10 @@ class FlexicontentHelperPerm
 	 * @return array									The category IDs
 	 * @since	2.0
 	 */
-	function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false )
+	static function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false )
 	{
 		global $globalcats;
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$usercats = array();
 		
 		if (FLEXI_J16GE)

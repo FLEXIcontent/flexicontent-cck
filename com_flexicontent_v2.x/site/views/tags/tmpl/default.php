@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1640 2013-02-28 14:45:19Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1647 2013-03-03 20:37:50Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -35,20 +35,18 @@ $image_source = $params->get('image_source');
 $img_height   = (int)$params->get('img_height', 40);
 $img_width    = (int)$params->get('img_width', 40);
 $img_method   = (int)$params->get('img_method', 1);
+$image_size		= $params->get('image_size', '');
 
 // Retrieve default image for the image field
-if ($image_source) {
-	$query = 'SELECT attribs FROM #__flexicontent_fields WHERE id = '.(int) $image_source;
+if ($use_image && $image_source) {
+	$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $image_source;
 	$db->setQuery($query);
-	$midata = new stdClass();
-	$midata->params = $db->loadResult();
-	$midata->params = new JParameter($midata->params);
+	$image_dbdata = $db->loadObject();
+	//$image_dbdata->params = FLEXI_J16GE ? new JRegistry($image_dbdata->params) : new JParameter($image_dbdata->params);
 	
-	$midata->default_image = $midata->params->get( 'default_image', '');
-	if ( $midata->default_image !== '' ) {
-		$midata->default_image_filepath = JPATH_BASE.DS.$midata->default_image;
-		$midata->default_image_filename = basename($midata->default_image);
-	}
+	$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', '' => '');
+	$img_field_size = $img_size_map[ $image_size ];
+	$img_field_name = $image_dbdata->name;
 }
 
 // Extra fields configuration
@@ -144,59 +142,54 @@ if ($use_fields && count($fields)) {
 	</thead>
 	<tbody>	
 	<?php
-	$img_field_size = $params->get('image_size');
-	$img_field_size = $img_field_size ? $img_field_size : 'l';
 	foreach ($this->items as $item) :
-		$src = '';
-		$thumb = '';
-		if ($image_source) {
-			if (!empty($item->image)) {
-				$image	= unserialize($item->image);
-				if ( $midata->params->get('image_source') && empty($midata->value[0]['is_default_value'] ) ) {
-					$dir	 = $midata->params->get('dir') .'/'. 'item_'.$item->id.'_field_'.$image_source;
+		if ($use_image) {
+			$src = '';
+			$thumb = '';
+			if ($image_source)
+			{
+				FlexicontentFields::getFieldDisplay($item, $img_field_name, null, 'display', 'module');
+				$img_field = $item->fields[$img_field_name];
+				if ( !$img_field_size ) {
+					$src = str_replace(JURI::root(), '',  $img_field->thumbs_src['large'][0] );
 				} else {
-					$dir	 = $midata->params->get('dir');
+					$thumb = $img_field->thumbs_src[ $img_field_size ][0];
 				}
-				//$src	= JURI::base(true) . '/' . $flexiparams->get('file_path') . '/' . $image['originalname'];
-				$src	= JURI::base(true) . '/' . $dir . '/'.$img_field_size.'_' . $image['originalname'];
-			} else if (!empty($midata->default_image_filepath)) {
-				$src	= $midata->default_image_filepath;
+			} else {
+				$src = flexicontent_html::extractimagesrc($item);
+				if ( !empty($src) ) {
+					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+					$src = $base_url . $src;
+				}
 			}
-		} else {
-			$src = flexicontent_html::extractimagesrc($item);
-			if ( !empty($src) ) {
-				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-				$src = $base_url . $src;
-			}
-		}
-		
-		$RESIZE_FLAG = !$image_source || !$img_field_size;
-		if ( $src && $RESIZE_FLAG ) {
-			// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-			$h		= '&amp;h=' . $img_height;
-			$w		= '&amp;w=' . $img_width;
-			$aoe	= '&amp;aoe=1';
-			$q		= '&amp;q=95';
-			$zc		= $img_method ? '&amp;zc=' . $img_method : '';
-			$ext = pathinfo($src, PATHINFO_EXTENSION);
-			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-			$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
-			$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
-		} else {
-			// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
-			$thumb = $src;
+			$RESIZE_FLAG = !$image_source || !$img_field_size;
+			if ( $src && $RESIZE_FLAG ) {
+				// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
+				$h		= '&amp;h=' . $img_height;
+				$w		= '&amp;w=' . $img_width;
+				$aoe	= '&amp;aoe=1';
+				$q		= '&amp;q=95';
+				$zc		= $img_method ? '&amp;zc=' . $img_method : '';
+				$ext = pathinfo($src, PATHINFO_EXTENSION);
+				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+				$conf	= $w . $h . $aoe . $q . $zc . $f;
+				
+				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+				$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			} else {
+				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
+			}
 		}
-		
 		$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
 	?>
 		<tr class="sectiontableentry" >
-		<?php if ($this->params->get('use_image', 1)) : ?>
+		<?php if ($use_image) : ?>
 			<td headers="fc_image" align="center">
-				<?php if (!empty($src)) : ?>
+				<?php if (!empty($thumb)) : ?>
 				
 					<?php if ($this->params->get('link_image', 1)) { ?>
-						<a href="<?php echo $item_link; ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . $this->escape($item->title); ?>">
+						<a href="<?php echo $item_link; ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>">
 							<img src="<?php echo $thumb; ?>" />
 						</a>
 					<?php } else { ?>

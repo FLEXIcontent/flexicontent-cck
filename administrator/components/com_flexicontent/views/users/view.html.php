@@ -29,7 +29,7 @@ class FlexicontentViewUsers extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe = & JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
 		
 		$db				= JFactory::getDBO();
@@ -321,7 +321,6 @@ class FlexicontentViewUsers extends JViewLegacy
 		// search id
 		$lists['filter_id'] = $filter_id;
 
-		$this->assignRef('user',		JFactory::getUser());
 		$this->assignRef('lists',		$lists);
 		$this->assignRef('items',		$rows);
 		$this->assignRef('usergroups',	$usergroups);

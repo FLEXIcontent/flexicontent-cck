@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1608 2012-12-25 04:31:58Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1615 2013-01-04 21:51:39Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -32,9 +32,9 @@ class FlexicontentViewCategory extends JViewLegacy
 	function display($tpl = null)
 	{
 		global $globalcats;
-		$mainframe = &JFactory::getApplication();
-		$user      = & JFactory::getUser();
-		$document  = & JFactory::getDocument();
+		$mainframe = JFactory::getApplication();
+		$user      = JFactory::getUser();
+		$document  = JFactory::getDocument();
 		
 		if (FLEXI_J16GE) {
 			JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
@@ -46,19 +46,19 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ***********************************************************
 		
 		// Get data from the model
-		$model		= & $this->getModel();
+		$model		= $this->getModel();
 		if (FLEXI_J16GE) {
-			$row     	= & $this->get( 'Item' );
-			$form			= & $this->get( 'Form' );
+			$row  = $this->get( 'Item' );
+			$form = $this->get( 'Form' );
 		} else {
-			$row     	= & $this->get( 'Category' );
+			$row  = $this->get( 'Category' );
 		}
 		
-		$cid			=	$row->id;
-		$isNew		= !$cid;
+		$cid    =	$row->id;
+		$isnew  = !$cid;
 		
 		// Check category is checked out by different editor / administrator
-		if ( !$isNew && $model->isCheckedOut( $user->get('id') ) ) {
+		if ( !$isnew && $model->isCheckedOut( $user->get('id') ) ) {
 			JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 			$mainframe->redirect( 'index.php?option=com_flexicontent&view=categories' );
 		}
@@ -82,7 +82,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		// Check no privilege to create new categories (Global permission)
-		if ( $isNew && !$perms->CanAddCats ) {
+		if ( $isnew && !$perms->CanAddCats ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
 			$mainframe->redirect( 'index.php?option=com_flexicontent' );
 		}
@@ -93,7 +93,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ************************************************************************************
 				
 		// Get edit privilege for current category
-		if (!$isNew) {
+		if (!$isnew) {
 			if (FLEXI_J16GE) {
 				$isOwner = $row->get('created_by') == $user->id;
 				$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'category', $cid);
@@ -115,14 +115,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		// Creating new category: Check if user can create inside any existing category
-		if ( $isNew && !$cancreate_cat ) {
+		if ( $isnew && !$cancreate_cat ) {
 			$acc_msg = JText::_( 'FLEXI_NO_ACCESS_CREATE' ) ."<br/>". (FLEXI_J16GE ? JText::_( 'FLEXI_CANNOT_ADD_CATEGORY_REASON' ) : ""); 
 			JError::raiseWarning( 403, $acc_msg);
 			$mainframe->redirect('index.php?option=com_flexicontent&view=categories');
 		}
 		
 		// Editing existing category: Check if user can edit existing (current) category
-		if ( !$isNew && !$canedit_cat ) {
+		if ( !$isnew && !$canedit_cat ) {
 			$acc_msg = JText::_( 'FLEXI_NO_ACCESS_EDIT' ) ."<br/>". JText::_( 'FLEXI_CANNOT_EDIT_CATEGORY_REASON' );
 			JError::raiseWarning( 403, $acc_msg);
 			$mainframe->redirect( 'index.php?option=com_flexicontent&view=categories' );
@@ -152,11 +152,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Initialise variables
 		// ********************
 		
-		$editor 	= & JFactory::getEditor();
-		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
-		$bar			= & JToolBar::getInstance('toolbar');
+		$editor 	= JFactory::getEditor();
+		$cparams 	= JComponentHelper::getParams('com_flexicontent');
+		$bar			= JToolBar::getInstance('toolbar');
 		if (!FLEXI_J16GE)
-			$pane			= & JPane::getInstance('sliders');
+			$pane			= JPane::getInstance('sliders');
 		$categories = $globalcats;
 		
 		
@@ -165,7 +165,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ******************
 		
 		// Create Toolbar title and add the preview button
-		if ( !$isNew ) {
+		if ( !$isnew ) {
 			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_CATEGORY' ), 'fc_categoryedit' );
 			$autologin		= $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 			$previewlink 	= JRoute::_(JURI::root(). FlexicontentHelperRoute::getCategoryRoute($categories[$cid]->slug)) . $autologin;
@@ -191,12 +191,12 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		// Add a save as copy button, if editing an existing category (J2.5 only)
-		if (FLEXI_J16GE && !$isNew && $cancreate_cat) {
+		if (FLEXI_J16GE && !$isnew && $cancreate_cat) {
 			JToolBarHelper::save2copy('category.save2copy');
 		}
 		
 		// Add a cancel or close button
-		if ($isNew)  {
+		if ($isnew)  {
 			if (FLEXI_J16GE) JToolBarHelper::cancel('category.cancel');
 			else             JToolBarHelper::cancel();
 		} else {

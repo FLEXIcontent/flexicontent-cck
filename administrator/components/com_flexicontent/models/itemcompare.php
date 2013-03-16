@@ -166,7 +166,7 @@ class FlexicontentModelItemcompare extends JModelLegacy
 		// Lets load the item if it doesn't already exist
 		if (empty($this->_item))
 		{
-			$createdate = & JFactory::getDate();
+			$createdate = JFactory::getDate();
 			$nullDate	= $this->_db->getNullDate();
 			
 			$item = new stdClass();
@@ -292,7 +292,7 @@ class FlexicontentModelItemcompare extends JModelLegacy
 			$field->item_id 	= (int)$this->_id;
 			$field->value 		= $this->getExtrafieldvalue($field->id);
 			$field->version 	= $this->getExtrafieldVersionvalue($field->id);
-			$field->parameters 	= new JParameter($field->attribs);
+			$field->parameters= FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
 		}
 
 		return $fields;

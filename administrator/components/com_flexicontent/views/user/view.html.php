@@ -32,8 +32,8 @@ class FlexicontentViewUser extends JViewLegacy
 		global $mainframe;
 
 		//initialise variables
-		$document = & JFactory::getDocument();
-		$me       = & JFactory::getUser();
+		$document = JFactory::getDocument();
+		$me       = JFactory::getUser();
 		
 		$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
 		JArrayHelper::toInteger($cid, array(0));
@@ -41,7 +41,7 @@ class FlexicontentViewUser extends JViewLegacy
 		if (!$cid) $edit = false;
 		
 		if (FLEXI_J16GE) {
-			$form = & $this->get('Form');
+			$form = $this->get('Form');
 			$form->setValue('password',		null);
 			$form->setValue('password2',	null);
 		}
@@ -73,14 +73,10 @@ class FlexicontentViewUser extends JViewLegacy
 		JToolBarHelper::cancel( $ctrl.'cancel' );
 		JToolBarHelper::help( 'screen.users.edit' );
 
-		$db 		=& JFactory::getDBO();
-		if($edit)
-			$user 		=& JUser::getInstance( $cid[0] );
-		else
-			$user 		=& JUser::getInstance();
-
-		$myuser		=& JFactory::getUser();
-		$acl		=& JFactory::getACL();
+		$db     = JFactory::getDBO();
+		$user   = $edit  ?  JUser::getInstance($cid[0])  :  JUser::getInstance();
+		$myuser = JFactory::getUser();
+		$acl    = JFactory::getACL();
 
 		// Check for post data in the event that we are returning
 		// from a unsuccessful attempt to save data
@@ -100,10 +96,10 @@ class FlexicontentViewUser extends JViewLegacy
 		}
 		else
 		{
-			$contact 	= NULL;
+			$contact = NULL;
 			// Get the default group id for a new user
-			$config		= &JComponentHelper::getParams( 'com_users' );
-			$newGrp	= $config->get( 'new_usertype' );
+			$config = JComponentHelper::getParams( 'com_users' );
+			$newGrp = $config->get( 'new_usertype' );
 			if (!FLEXI_J16GE)
 				$user->set( 'gid', $acl->get_group_id( $newGrp, null, 'ARO' ) );
 			else
@@ -135,7 +131,7 @@ class FlexicontentViewUser extends JViewLegacy
 		
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		$author_user_id = (int) $cid[0];
-		$flexiauthor_extdata = & JTable::getInstance('flexicontent_authors_ext', '');
+		$flexiauthor_extdata = JTable::getInstance('flexicontent_authors_ext', '');
 		$flexiauthor_extdata->load( $author_user_id );
 		//echo "<pre>"; print_r($flexiauthor_extdata); echo "</pre>";
 		
@@ -148,7 +144,10 @@ class FlexicontentViewUser extends JViewLegacy
 		// in JParameter is deprecated, instead we will JForm to load XML description and thus be able to render it
 		
 		$auth_xml = JPATH_COMPONENT.DS.'models'.DS.$form_folder.'author.xml';
-		$params_authorbasic = new JParameter($flexiauthor_extdata->author_basicparams, !FLEXI_J16GE ? $auth_xml : '');
+		if (FLEXI_J16GE)
+			$params_authorbasic = new JRegistry($flexiauthor_extdata->author_basicparams);
+		else
+			$params_authorbasic = new JParameter($flexiauthor_extdata->author_basicparams, $auth_xml);
 		//echo "<pre>"; print_r($params_authorbasic); echo "</pre>";
 		
 		if (FLEXI_J16GE)
@@ -178,7 +177,10 @@ class FlexicontentViewUser extends JViewLegacy
 		// in JParameter is deprecated, instead we will JForm to load XML description and thus be able to render it
 		
 		$cat_xml = JPATH_COMPONENT.DS.'models'.DS.$form_folder.'category.xml';
-		$params_authorcat = new JParameter($flexiauthor_extdata->author_catparams, !FLEXI_J16GE ? $cat_xml : '');
+		if (FLEXI_J16GE)
+			$params_authorcat = new JRegistry($flexiauthor_extdata->author_catparams);
+		else
+			$params_authorcat = new JParameter($flexiauthor_extdata->author_catparams, $cat_xml);
 		//echo "<pre>"; print_r($params_authorcat); echo "</pre>";
 			
 		if (FLEXI_J16GE)
@@ -208,7 +210,7 @@ class FlexicontentViewUser extends JViewLegacy
 		$tmpls		= $themes->category;
 		
 		if (FLEXI_J16GE) {
-			$params_author = new JParameter($user->params, '');
+			$params_author = new JRegistry($user->params);
 		}
 		foreach ($tmpls as $tmpl) {
 			if (FLEXI_J16GE) {
@@ -226,11 +228,11 @@ class FlexicontentViewUser extends JViewLegacy
 		//$lists['imagelist'] 		= JHTML::_('list.images', 'image', $flexiauthor_extdata->image, $javascript, '/images/stories/' );
 
 		if (!FLEXI_J16GE)
-			$pane			= & JPane::getInstance('sliders');
+			$pane = JPane::getInstance('sliders');
 		
 		
 		// *** Get Component's Global Configuration ***
-		$fcconfig		= &JComponentHelper::getParams( 'com_flexicontent' );
+		$fcconfig = JComponentHelper::getParams( 'com_flexicontent' );
 		$authordetails_itemscat		= $fcconfig->get( 'authordetails_itemscat', 0 );
 		
 		if (!FLEXI_J16GE) {

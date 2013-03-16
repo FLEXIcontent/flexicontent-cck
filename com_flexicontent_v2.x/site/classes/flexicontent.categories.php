@@ -183,7 +183,7 @@ class flexicontent_cats
     * @access public
     * @return array
     */
-	function treerecurse( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null, $childs=null )
+	static function treerecurse( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null, $childs=null )
 	{
 		if (!$ancestors) $ancestors = array();
 		$ROOT_CATEGORY_ID = !FLEXI_J16GE ? 0 : 1;
@@ -248,7 +248,7 @@ class flexicontent_cats
 	 *
 	 * @return a category form field element
 	 */
-	function buildcatselect($list, $name, $selected, $top,
+	static function buildcatselect($list, $name, $selected, $top,
 		$class = 'class="inputbox"', $check_published = false, $check_perms = true,
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'),   // For item edit this should be array('core.create')
 		$require_all=true   // Require (or not) all privileges present to accept a category

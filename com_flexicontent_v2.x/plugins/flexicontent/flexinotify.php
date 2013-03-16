@@ -95,8 +95,8 @@ class plgFlexicontentFlexinotify extends JPlugin
 		if (count($subscribers) == 0) return;
 
 		// Get Plugin info
-		$plugin			=& JPluginHelper::getPlugin('flexicontent', 'flexinotify');
-		$pluginParams	= new JParameter( $plugin->params );
+		$plugin = JPluginHelper::getPlugin('flexicontent', 'flexinotify');
+		$pluginParams = FLEXI_J16GE ? new JRegistry($plugin->params) : new JParameter($plugin->params);
 		
 		foreach ($subscribers as $sub) {
 			$this->_sendEmail($item, $sub, $pluginParams);
@@ -120,10 +120,12 @@ class plgFlexicontentFlexinotify extends JPlugin
 	{
 		$db =& JFactory::getDBO();
 		
-		$query	= 'SELECT u.* FROM #__flexicontent_favourites AS f'
-				. ' LEFT JOIN #__users AS u'
-				. ' ON u.id = f.userid'
-				. ' WHERE itemid = ' . (int)$itemid
+		$query	= 'SELECT u.* '
+				.' FROM #__flexicontent_favourites AS f'
+				.' LEFT JOIN #__users AS u'
+				.' ON u.id = f.userid'
+				.' WHERE f.itemid = ' . (int)$itemid
+				.'  AND u.block=0 '
 				;
 		$db->setQuery($query);
 		$users = $db->loadObjectList();

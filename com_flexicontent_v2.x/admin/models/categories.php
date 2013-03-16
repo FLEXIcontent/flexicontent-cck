@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: categories.php 1223 2012-03-30 08:34:34Z ggppdk $
+ * @version 1.5 stable $Id: categories.php 1619 2013-01-09 02:50:25Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -73,7 +73,7 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	function getListQuery()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$db = $this->getDbo();
 		$option = JRequest::getVar('option');
 		//$filter_state= $this->getState($option.'.categories.filter_state');
@@ -135,7 +135,7 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user 	=& JFactory::getUser();
+		$user = JFactory::getUser();
 
 		if (count( $cid ))
 		{
@@ -153,7 +153,7 @@ class FlexicontentModelCategories extends JModelList
 				}
 			}
 			
-			$user	=& JFactory::getUser();
+			$user	= JFactory::getUser();
 			
 			// Get the owner of all categories
 			$query = 'SELECT id, created_user_id'
@@ -200,7 +200,7 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	function move($direction)
 	{
-		$row =& JTable::getInstance('flexicontent_categories','');
+		$row = JTable::getInstance('flexicontent_categories','');
 
 		if (!$row->load( $this->_id ) ) {
 			$this->setError($this->_db->getErrorMsg());
@@ -311,9 +311,9 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	function delete($cids)
 	{
-		$params = & JComponentHelper::getParams('com_flexicontent');
-		$table  = & $this->getTable('flexicontent_categories', '');
-		$user 	= & JFactory::getUser();
+		$params = JComponentHelper::getParams('com_flexicontent');
+		$table  = $this->getTable('flexicontent_categories', '');
+		$user 	= JFactory::getUser();
 		if (!$cids || !is_array($cids) || !count($cids)) return "No categories given for deletion";
 		
 		// Add all children to the list, since we must check if they have assigned items
@@ -427,7 +427,7 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	function saveaccess($id, $access)
 	{
-		$category  =& $this->getTable('flexicontent_categories', '');
+		$category = $this->getTable('flexicontent_categories', '');
 		
 		//handle childs
 		$cids = array();

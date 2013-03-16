@@ -80,7 +80,7 @@ class FlexicontentModelCategories extends JModelLegacy
 	 */
 	function getData()
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		static $items;
 
 		if (isset($items)) {
@@ -202,7 +202,7 @@ class FlexicontentModelCategories extends JModelLegacy
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user 	=& JFactory::getUser();
+		$user = JFactory::getUser();
 
 		if (count( $cid ))
 		{
@@ -245,7 +245,7 @@ class FlexicontentModelCategories extends JModelLegacy
 	 */
 	function move($direction)
 	{
-		$row =& JTable::getInstance('flexicontent_categories','');
+		$row = JTable::getInstance('flexicontent_categories','');
 
 		if (!$row->load( $this->_id ) ) {
 			$this->setError($this->_db->getErrorMsg());
@@ -270,7 +270,7 @@ class FlexicontentModelCategories extends JModelLegacy
 	 */
 	function saveorder($cid = array(), $order)
 	{
-		$row 	=& JTable::getInstance('flexicontent_categories','');
+		$row = JTable::getInstance('flexicontent_categories','');
 		
 		$groupings = array();
 
@@ -311,9 +311,9 @@ class FlexicontentModelCategories extends JModelLegacy
 	 */
 	function delete($cids)
 	{
-		$params = & JComponentHelper::getParams('com_flexicontent');
-		$table  = & $this->getTable('flexicontent_categories', '');
-		$user 	= & JFactory::getUser();
+		$params = JComponentHelper::getParams('com_flexicontent');
+		$table  = $this->getTable('flexicontent_categories', '');
+		$user 	= JFactory::getUser();
 		if (!$cids || !is_array($cids) || !count($cids)) return "No categories given for deletion";
 		
 		// Add all children to the list, since we must check if they have assigned items
@@ -427,7 +427,7 @@ class FlexicontentModelCategories extends JModelLegacy
 	 */
 	function saveaccess($id, $access)
 	{
-		$category  =& $this->getTable('flexicontent_categories', '');
+		$category = $this->getTable('flexicontent_categories', '');
 		
 		//handle childs
 		$cids = array();

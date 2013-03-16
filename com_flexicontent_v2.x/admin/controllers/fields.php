@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: fields.php 1223 2012-03-30 08:34:34Z ggppdk $
+ * @version 1.5 stable $Id: fields.php 1640 2013-02-28 14:45:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -63,11 +63,11 @@ class FlexicontentControllerFields extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$task		= JRequest::getVar('task');
-		$post = JRequest::get( 'post' );
+		$task  = JRequest::getVar('task');
+		$post  = JRequest::get( 'post' );
 		$model = $this->getModel('field');
-		$user	=& JFactory::getUser();
-		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$user  = JFactory::getUser();
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$field_id		= (int)$cid[0];
 
 		// calculate access
@@ -111,9 +111,9 @@ class FlexicontentControllerFields extends FlexicontentController
 			}
 			$msg = JText::_( 'FLEXI_FIELD_SAVED' );
 
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+			$itemcache = JFactory::getCache('com_flexicontent_items');
 			$itemcache->clean();
 
 		} else {
@@ -137,9 +137,9 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function publish()
 	{
-		$user	=& JFactory::getUser();
-		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$field_id		= (int)$cid[0];
+		$user	= JFactory::getUser();
+		$cid  = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id = (int)$cid[0];
 		
 		// calculate access
 		if (FLEXI_J16GE) {
@@ -171,9 +171,9 @@ class FlexicontentControllerFields extends FlexicontentController
 			} else {
 				$total = count( $cid );
 				$msg 	= $total.' '.JText::_( 'FLEXI_FIELD_PUBLISHED' );
-				$cache = &JFactory::getCache('com_flexicontent');
+				$cache = JFactory::getCache('com_flexicontent');
 				$cache->clean();
-				$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+				$itemcache = JFactory::getCache('com_flexicontent_items');
 				$itemcache->clean();
 			}
 		}
@@ -190,10 +190,10 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function unpublish()
 	{
-		$user	=& JFactory::getUser();
-		$model 		= $this->getModel('fields');
-		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$field_id		= (int)$cid[0];
+		$user   = JFactory::getUser();
+		$model  = $this->getModel('fields');
+		$cid    = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id = (int)$cid[0];
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
@@ -222,9 +222,9 @@ class FlexicontentControllerFields extends FlexicontentController
 			} else {
 				$total = count( $cid );
 				$msg 	= $total.' '.JText::_( 'FLEXI_FIELD_UNPUBLISHED' );
-				$cache = &JFactory::getCache('com_flexicontent');
+				$cache = JFactory::getCache('com_flexicontent');
 				$cache->clean();
-				$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+				$itemcache = JFactory::getCache('com_flexicontent_items');
 				$itemcache->clean();
 			}
 		}
@@ -242,11 +242,11 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function toggleprop()
 	{
-		$user	=& JFactory::getUser();
-		$model 		= $this->getModel('fields');
-		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$user   = JFactory::getUser();
+		$model  = $this->getModel('fields');
+		$cid    = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$propname = JRequest::getCmd( 'propname', null, 'default' );
-		$field_id		= (int)$cid[0];
+		$field_id = (int)$cid[0];
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
@@ -306,10 +306,10 @@ class FlexicontentControllerFields extends FlexicontentController
 	 */
 	function remove()
 	{
-		$user	=& JFactory::getUser();
-		$model 		= $this->getModel('fields');
-		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$field_id		= (int)$cid[0];
+		$user  = JFactory::getUser();
+		$model = $this->getModel('fields');
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id = (int)$cid[0];
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
@@ -337,9 +337,9 @@ class FlexicontentControllerFields extends FlexicontentController
 				JError::raiseWarning( 500, $model->getError() );
 			} else {
 				$msg = count($cid).' '.JText::_( 'FLEXI_FIELDS_DELETED' );
-				$cache = &JFactory::getCache('com_flexicontent');
+				$cache = JFactory::getCache('com_flexicontent');
 				$cache->clean();
-				$itemcache 	=& JFactory::getCache('com_flexicontent_items');
+				$itemcache = JFactory::getCache('com_flexicontent_items');
 				$itemcache->clean();
 			}
 		}
@@ -360,7 +360,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		$model = $this->getModel('field');
-		$user  = & JFactory::getUser();
+		$user  = JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$field_id = (int)$cid[0];
 		
@@ -389,7 +389,7 @@ class FlexicontentControllerFields extends FlexicontentController
 			return;
 		}
 
-		$field = & JTable::getInstance('flexicontent_fields', '');
+		$field = JTable::getInstance('flexicontent_fields', '');
 		$field->bind(JRequest::get('post'));
 		$field->checkin();
 
@@ -408,10 +408,10 @@ class FlexicontentControllerFields extends FlexicontentController
 		JRequest::setVar( 'view', 'field' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 
-		$model 	= $this->getModel('field');
-		$user	=& JFactory::getUser();
-		$cid		= JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$field_id		= (int)$cid[0];
+		$model = $this->getModel('field');
+		$user  = JFactory::getUser();
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$field_id = (int)$cid[0];
 
 		// calculate access
 		if (FLEXI_J16GE) {
@@ -467,7 +467,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		
 		// Get variables: model, user, field id, new ordering
 		$model = $this->getModel('fields');
-		$user  =& JFactory::getUser();
+		$user  = JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		
 		// calculate access
@@ -533,7 +533,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		
 		// Get variables: model, user, field id, new ordering
 		$model = $this->getModel('fields');
-		$user  =& JFactory::getUser();
+		$user  = JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$order = JRequest::getVar( 'order', array(0), 'post', 'array' );
 		
@@ -573,7 +573,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$user	=& JFactory::getUser();
+		$user  = JFactory::getUser();
 		$model = $this->getModel('fields');
 		$task  = JRequest::getVar( 'task' );
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
@@ -619,7 +619,7 @@ class FlexicontentControllerFields extends FlexicontentController
 			JError::raiseWarning( 500, $model->getError() );
 		} else {
 			$msg = '';
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 		
@@ -640,7 +640,7 @@ class FlexicontentControllerFields extends FlexicontentController
 		
 		// Get model, user, ids of copied fields
 		$model = $this->getModel('fields');
-		$user  =& JFactory::getUser();
+		$user  = JFactory::getUser();
 		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 		$task  = JRequest::getVar( 'task', 'copy' );
 		
@@ -715,7 +715,7 @@ class FlexicontentControllerFields extends FlexicontentController
 			if (count($non_auth_cid)) {
 				$msg .= JText::sprintf('FLEXI_FIELDS_UNEDITABLE_FIELDS_NOT_COPIED', count($non_auth_cid)) . ' ';
 			}
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 		

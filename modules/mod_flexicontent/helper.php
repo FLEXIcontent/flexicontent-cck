@@ -102,7 +102,7 @@ class modFlexicontentHelper
 			$midata = $db->loadObject();
 			
 			$img_fieldname = $midata->name;
-			//$img_fieldparams = new JParameter($midata->attribs);
+			//$img_fieldparams = FLEXI_J16GE ? new JRegistry($midata->attribs) : new JParameter($midata->attribs);
 		}
 		
 		// Retrieve default image for the image field
@@ -110,14 +110,14 @@ class modFlexicontentHelper
 			$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type="hits"';
 			$db->setQuery($query);
 			$hitsfield = $db->loadObject();
-			$hitsfield->parameters = new JParameter($hitsfield->attribs);
+			$hitsfield->parameters = FLEXI_J16GE ? new JRegistry($hitsfield->attribs) : new JParameter($hitsfield->attribs);
 		}
 		
 		if ($display_voting || $display_voting_feat) {
 			$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type="voting"';
 			$db->setQuery($query);
 			$votingfield = $db->loadObject();
-			$votingfield->parameters = new JParameter($votingfield->attribs);
+			$votingfield->parameters = FLEXI_J16GE ? new JRegistry($votingfield->attribs) : new JParameter($votingfield->attribs);
 		}
 		
 		// get module fields parameters
@@ -172,7 +172,7 @@ class modFlexicontentHelper
 			
 			// 0. Add ONLY skipfields to the list of fields to be rendered
 			$fields_list = implode(',', $skiponempty_fields);
-			//$skip_params = new JParameter("");
+			//$skip_params = FLEXI_J16GE ? new JRegistry() : new JParameter();
 			//$skip_params->set('fields',$fields_list);
 			
 			foreach($cat_items_arr as $cat_items)
@@ -1298,7 +1298,7 @@ class modFlexicontentHelper
 		jimport( 'joomla.html.parameter' );
 		$joomla_image_path 	= FLEXI_J16GE ? $config->getValue('config.image_path', '') : $config->getValue('config.image_path', 'images'.DS.'stories');
 		foreach( $catdata_arr as $i => $catdata ) {
-			$catdata->params = new JParameter($catdata->params);
+			$catdata->params = FLEXI_J16GE ? new JRegistry($catdata->params) : new JParameter($catdata->params);
 			
 			// Category Title
 			$catdata->title = flexicontent_html::striptagsandcut($catdata->title, $catconf->cuttitle);

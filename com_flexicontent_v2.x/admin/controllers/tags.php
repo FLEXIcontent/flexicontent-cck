@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 1342 2012-06-07 01:48:19Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 1640 2013-02-28 14:45:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -37,7 +37,7 @@ class FlexicontentControllerTags extends FlexicontentController
 	function __construct()
 	{
 		parent::__construct();
-
+		
 		// Register Extra task
 		$this->registerTask( 'add'  ,				'edit' );
 		$this->registerTask( 'apply', 			'save' );
@@ -82,7 +82,7 @@ class FlexicontentControllerTags extends FlexicontentController
 			}
 			$msg = JText::_( 'FLEXI_TAG_SAVED' );
 
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 
 		} else {
@@ -150,7 +150,7 @@ class FlexicontentControllerTags extends FlexicontentController
 
 			$total = count( $cid );
 			$msg 	= $total.' '.JText::_( 'FLEXI_TAG_UNPUBLISHED' );
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 		
@@ -180,7 +180,7 @@ class FlexicontentControllerTags extends FlexicontentController
 			}
 			
 			$msg = count($cid).' '.JText::_( 'FLEXI_TAGS_DELETED' );
-			$cache = &JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
 		}
 		
@@ -199,7 +199,7 @@ class FlexicontentControllerTags extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$tag = & JTable::getInstance('flexicontent_tags', '');
+		$tag = JTable::getInstance('flexicontent_tags', '');
 		$tag->bind(JRequest::get('post'));
 		$tag->checkin();
 
@@ -218,8 +218,8 @@ class FlexicontentControllerTags extends FlexicontentController
 		JRequest::setVar( 'view', 'tag' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 
-		$model 	= $this->getModel('tag');
-		$user	=& JFactory::getUser();
+		$model = $this->getModel('tag');
+		$user  = JFactory::getUser();
 
 		// Error if checkedout by another administrator
 		if ($model->isCheckedOut( $user->get('id') )) {

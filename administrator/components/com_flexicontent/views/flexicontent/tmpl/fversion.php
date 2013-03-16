@@ -17,7 +17,7 @@
 */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-$mainframe = &JFactory::getApplication();
+$mainframe = JFactory::getApplication();
 $template	= $mainframe->getTemplate();
 if($this->check['connect'] == 0) {
 ?>

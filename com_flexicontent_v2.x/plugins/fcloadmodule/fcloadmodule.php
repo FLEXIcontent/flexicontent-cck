@@ -131,7 +131,7 @@ echo '</xmp>';
 				list($param_label, $param_name) = preg_split("/[\s]*!![\s]*/", $mod_param);
 				$custom_mod_params[ $param_name ] = $value[$param_name];
 			}
-			$_mod_params = new JParameter($mod->params);
+			$_mod_params = FLEXI_J16GE ? new JRegistry($mod->params) : new JParameter($mod->params);
 			foreach ($custom_mod_params as $i => $v) $_mod_params->set($i,$v);
 			$mod->params = $_mod_params ->toString();
 

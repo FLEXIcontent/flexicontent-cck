@@ -317,13 +317,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// --. Description as tooltip or inline text ... prepare related variables
 			$alt_str = $class_str = $text_html  = '';
 			if (!empty($file_data->description)) {
-				if ( !$authorized) {
+				if ( !$authorized ) {
 					if ($noaccess_display != 2 ) {
 						$alt_str    = $name_str . '::' . $file_data->description;
 						$class_str  = ' hasTip';
 						$text_html  = '';
 					}
-				} else if ($display_descr==1) {   // As tooltip
+				} else if ($display_descr==1 || $prop=='namelist') {   // As tooltip
 					$alt_str    = $name_str . '::' . $file_data->description;
 					$class_str  = ' hasTip';
 					$text_html  = '';
@@ -346,7 +346,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			// --. Finally create displayed html ... a download button (*) OR a download link
 			// (*) with file manager 's description of file as tooltip or as inline text
-			if (!$dl_link) {
+			if (!$dl_link || $prop=='namelist') {
 				// no link ... (case of current user not authorized to download file)
 				$str = $icon . '<span class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</span>' ." ". $text_html;
 			} else if ($usebutton) {

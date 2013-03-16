@@ -92,7 +92,7 @@ class flexicontent_html
 			$type = JTable::getInstance('flexicontent_types', '');
 			$type->id = $item->type_id;
 			$type->load();
-			$type->params = new JParameter($type->attribs);
+			$type->params = FLEXI_J16GE ? new JRegistry($type->attribs) : new JParameter($type->attribs);
 			$ilayout = $type->params->get('ilayout', 'default');
 		}
 		
@@ -200,19 +200,25 @@ class flexicontent_html
 		static $jquery_ui_added = false;
 		static $jquery_ui_css_added = false;
 		
+		if (FLEXI_J30GE) {
+			if (!$jquery_added) JHtml::_('jquery.framework');
+			$jquery_added = 1;
+			return;
+		}
+		
 		$document = JFactory::getDocument();
-		if ( $add_jquery && !JPluginHelper::isEnabled('system', 'jquerysupport') )
+		if ( $add_jquery && !$jquery_added && !JPluginHelper::isEnabled('system', 'jquerysupport') )
 		{
 			$document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-'.FLEXI_JQUERY_VER.'.js');
 			// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
 			//$document->addCustomTag('<script>jQuery.noConflict();</script>');
 			$jquery_added = 1;
 		}
-		if ( $add_jquery_ui ) {
+		if ( $add_jquery_ui && !$jquery_ui_added ) {
 			$document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-ui-'.FLEXI_JQUERY_UI_VER.'.js');
 			$jquery_ui_added = 1;
 		}
-		if ( $add_jquery_ui_css ) {
+		if ( $add_jquery_ui_css && !$jquery_ui_css_added ) {
 			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/jquery/css/ui-lightness/jquery-ui-'.FLEXI_JQUERY_UI_CSS_VER.'.css');
 			$jquery_ui_css_added = 1;
 		}
@@ -396,7 +402,7 @@ class flexicontent_html
 		}
 		
 		// Output new state icon and terminate
-		$tmpparams = new JParameter('');
+		$tmpparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 		$tmpparams->set('stateicon_popup', 'basic');
 		$stateicon = flexicontent_html::stateicon( $state, $tmpparams );
 		echo $stateicon;
@@ -521,7 +527,7 @@ class flexicontent_html
 			$link = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $slug));
 			//$link = $base . JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug, false );
 		} elseif($view == 'tags') {
-			$link = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id).$start);
+			$link = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($itemslug));
 			//$link = $base . JRoute::_( 'index.php?view='.$view.'&id='.$slug, false );
 		} else {
 			$link 	= $base . JRoute::_( 'index.php?view='.$view, false );
@@ -637,7 +643,7 @@ class flexicontent_html
 		// Create state icon
 		$state = $item->state;
 		$state_text ='';
-		$tmpparams = new JParameter('');
+		$tmpparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 		$tmpparams->set('stateicon_popup', 'none');
 		$stateicon = flexicontent_html::stateicon( $state, $tmpparams, $state_text );
 		
@@ -3012,7 +3018,8 @@ class FLEXIUtilities
 				$fc_plgs[$fieldtype] =  new $className($dispatcher, array());
 				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters), CHECKING if parameters exist
 				$plugin_db_data = JPluginHelper::getPlugin('flexicontent_fields',$fieldtype);
-				if ( !empty($plugin_db_data) )    $fc_plgs[$fieldtype]->params = new JParameter( $plugin_db_data->params );
+				if ( !empty($plugin_db_data) )
+					$fc_plgs[$fieldtype]->params = FLEXI_J16GE ? new JRegistry($plugin_db_data->params) : new JParameter($plugin_db_data->params);
 			} else {
 				$jAp= JFactory::getApplication();
 				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
@@ -3055,7 +3062,7 @@ class FLEXIUtilities
 				$content_plgs[$plgname] =  new $className($dispatcher, array());
 				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters)
 				$plugin_db_data = JPluginHelper::getPlugin('content',$plgname);
-				$content_plgs[$plgname]->params = new JParameter($plugin_db_data->params);
+				$content_plgs[$plgname]->params = FLEXI_J16GE ? new JRegistry($plugin_db_data->params) : new JParameter($plugin_db_data->params);
 			} else {
 				$jAp= JFactory::getApplication();
 				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');

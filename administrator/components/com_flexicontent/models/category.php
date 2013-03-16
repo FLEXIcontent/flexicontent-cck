@@ -47,6 +47,8 @@ class FlexicontentModelCategory extends JModelLegacy
 		parent::__construct();
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
+		if( FLEXI_J16GE && !@$array[0] )
+			$array = JRequest::getVar('id',  0, '', 'array');
 		$this->setId((int)$array[0]);
 	}
 
@@ -165,12 +167,12 @@ class FlexicontentModelCategory extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkin()
+	function checkin($pk = NULL)
 	{
-		if ($this->_id)
-		{
+		if (!$pk) $pk = $this->_id;
+		if ($pk) {
 			$category = $this->getTable();
-			return $category->checkin($this->_id);
+			return $category->checkin($pk);
 		}
 		return false;
 	}
@@ -190,7 +192,7 @@ class FlexicontentModelCategory extends JModelLegacy
 			// Make sure we have an item id to checkout the category with
 			if(is_null($pk)) $pk = $this->_id;
 
-			$user	=& JFactory::getUser();
+			$user	= JFactory::getUser();
 			$uid	= $user->get('id');
 			
 			// Lets get to it and checkout the thing...
@@ -239,7 +241,7 @@ class FlexicontentModelCategory extends JModelLegacy
 	 */
 	function store($data)
 	{
-		$category = & JTable::getInstance('flexicontent_categories','');
+		$category = JTable::getInstance('flexicontent_categories','');
 		
 		// Bind the data.
 		if (!$category->bind($data))
@@ -291,7 +293,7 @@ class FlexicontentModelCategory extends JModelLegacy
 			FAccess::saveaccess( $category, 'category' );
 		}
 
-		$this->_category	=& $category;
+		$this->_category = & $category;
 		
 		return true;
 	}
@@ -302,11 +304,11 @@ class FlexicontentModelCategory extends JModelLegacy
 	 *
 	 * @since	1.6
 	 */
-	protected function cleanCache()
+	protected function cleanCache($group = NULL, $client_id = 0)
 	{
-		$cache 		=& JFactory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
-		$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
 	}
 	

@@ -229,7 +229,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<div class="flexi_formblock">
 				<?php
 					$field = @$this->fields['title'];
-					$label_tooltip = @$field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
+					$label_tooltip = @$field->description ? 'class="hasTip flexi_label" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
 				?>
 				<label id="title-lbl" for="title" <?php echo $label_tooltip; ?> >
 					<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_TITLE' ); ?>
@@ -325,7 +325,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<div class="flexi_formblock">
 				<label id="cid-lbl" for="cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
+					<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
 						<?php echo $infoimage; ?>
 					</span>
 				</label>
@@ -343,7 +343,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<div class="flexi_formblock">
 				<label id="cid-lbl" for="cid" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo JText::_ ( 'FLEXI_CATEGORIES_NOTES' );?>">
+					<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
 						<?php echo $infoimage; ?>
 					</span>
 				</label>
@@ -362,7 +362,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<div class="flexi_formblock">
 				<?php
 					$field = @$this->fields['state'];
-					$label_tooltip = @$field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
+					$label_tooltip = @$field->description ? 'class="hasTip flexi_label" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
 				?>
 				<label id="state-lbl" for="state" <?php echo $label_tooltip; ?> >
 					<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_STATE' ); ?>
@@ -385,7 +385,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<div class="flexi_formblock">
 				<?php
 					$field = @$this->fields['state'];
-					$label_tooltip = @$field->description ? 'class="hasTip flexi_label" title="'.$field->label.'::'.$field->description.'"' : 'class="flexi_label"';
+					$label_tooltip = @$field->description ? 'class="hasTip flexi_label" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
 				?>
 				<label id="state-lbl" for="state" <?php echo $label_tooltip; ?> >
 					<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_STATE' ); ?>
@@ -418,7 +418,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<div class="flexi_formblock">
 				<label id="lang_parent_id-lbl" for="lang_parent_id" class="flexi_label" >
 					<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
-					<span class="editlinktip hasTip" title="::<?php echo $this->escape(JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ));?>">
+					<span class="editlinktip hasTip" title="::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8');?>">
 						<?php echo JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_ ( 'FLEXI_ORIGINAL_CONTENT_ITEM' ) ); ?>
 					</span>
 				</label>
@@ -487,7 +487,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			
 			<?php if ( $this->params->get('allowdisablingcomments_fe') ) : ?>
 			<div class="flexi_formblock">
-				<label id="params_comments-title" class="flexi_label hasTip" title="<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>::<?php echo JText::_ ( 'FLEXI_ALLOW_COMMENTS_DESC' );?>" >
+				<label id="params_comments-title" class="flexi_label hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_ALLOW_COMMENTS' ), ENT_COMPAT, 'UTF-8');?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_ALLOW_COMMENTS_DESC' ), ENT_COMPAT, 'UTF-8');?>" >
 					<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
 				</label>
 				<?php echo $this->lists['disable_comments']; ?>
@@ -498,7 +498,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<div class="flexi_formblock">
 				<label id="notify-lbl" for="notify" class="flexi_label">
 					<?php echo JText::_( 'FLEXI_NOTIFY_FAVOURING_USERS' ).':'; ?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_NOTES' ); ?>::<?php echo JText::_( 'FLEXI_NOTIFY_NOTES' );?>">
+					<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
 						<?php echo $infoimage; ?>
 					</span>
 				</label>
@@ -547,7 +547,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		<fieldset class="flexi_tags" <?php echo $display_tags ?> >
 			<?php
 				$field = @$this->fields['tags'];
-				$label_tooltip = @$field->description ? 'class="hasTip" title="'.$field->label.'::'.$field->description.'"' : 'class=""';
+				$label_tooltip = @$field->description ? 'class="hasTip" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class=""';
 			?>
 			<legend <?php echo $label_tooltip; ?> ><?php echo JText::_( 'FLEXI_TAGS' ); ?></legend>
 				<div class="qf_tagbox" id="qf_tagbox">
@@ -620,7 +620,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				// -- Tooltip for the current field label
 				$edithelp = $field->edithelp ? $field->edithelp : 1;
 				$label_tooltip = ( $field->description && ($edithelp==1 || $edithelp==2) ) ?
-					' class="flexi_label hasTip '.($edithelp==2 ? ' fc_tooltip_icon_fe ' : '').'" title="'.$field->label.'::'.$field->description.'" ' :
+					' class="flexi_label hasTip '.($edithelp==2 ? ' fc_tooltip_icon_fe ' : '').'" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'" ' :
 					' class="flexi_label" ';
 				$label_style = ""; //( $field->field_type == 'maintext' || $field->field_type == 'textarea' ) ? " style='clear:both; float:none;' " : "";
 				$not_in_tabs = "";
@@ -789,7 +789,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		<tr>
 			<td class="paramlist_key" width="40%">
 				<span class="editlinktip">
-					<label id="metadescription-lbl" class="hasTip" for="metadescription" title="::<?php echo JText::_('FLEXI_METADESC'); ?>" >
+					<label id="metadescription-lbl" class="hasTip" for="metadescription" title="::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_METADESC' ), ENT_COMPAT, 'UTF-8'); ?>" >
 						<?php echo JText::_('FLEXI_Description'); ?>
 					</label>
 				</span>
@@ -829,7 +829,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		<tr>
 			<td class="paramlist_key" width="40%">
 				<span class="editlinktip">
-					<label id="metakeywords-lbl" class="hasTip" for="metakeywords" title="::<?php echo JText::_('FLEXI_METAKEYS'); ?>" >
+					<label id="metakeywords-lbl" class="hasTip" for="metakeywords" title="::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_METAKEYS' ), ENT_COMPAT, 'UTF-8'); ?>" >
 						<?php echo JText::_('FLEXI_Keywords'); ?>
 					</label>
 				</span>

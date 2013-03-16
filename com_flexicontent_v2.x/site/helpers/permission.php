@@ -17,7 +17,7 @@ class FlexicontentHelperPerm
 	 * @since	2.0
 	 * 
 	 */
-	function getPerm($force = false)
+	static function getPerm($force = false)
 	{
 		static $permission = null;
 		
@@ -47,7 +47,7 @@ class FlexicontentHelperPerm
 				$Comments_Enabled 	= 0;
 			}
 			
-			$user =& JFactory::getUser();
+			$user = JFactory::getUser();
 			$permission = new stdClass;
 			
 			// !!! This is the Super User Privelege of GLOBAL Configuration		(==> (for J2.5) core.admin ACTION allowed on ROOT ASSET: 'root.1')
@@ -154,10 +154,10 @@ class FlexicontentHelperPerm
 	 * @return array									The category IDs
 	 * @since	2.0
 	 */
-	function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false )
+	static function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false )
 	{
 		global $globalcats;
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$usercats = array();
 		
 		if (FLEXI_J16GE)
@@ -325,15 +325,15 @@ class FlexicontentHelperPerm
 		
 		if(!isset($elements[$uid][$section][$action]) || $force) {
 			// Get database and use objects
-			$db = &JFactory::getDBO();
-			$user = &JFactory::getUser($uid);
+			$db = JFactory::getDBO();
+			$user = JFactory::getUser($uid);
 			
 			// Query the assets table to retrieve the asset names for the specified section
 			$query = "SELECT name FROM #__assets WHERE name like '{$asset_partial}.%';";
 			$db->setQuery($query);
 			$names = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 			if ($db->getErrorNum()) {
-				$jAp=& JFactory::getApplication();
+				$jAp= JFactory::getApplication();
 				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
 			}
 			
@@ -367,7 +367,7 @@ class FlexicontentHelperPerm
 	 * @since	2.0
 	 * 
 	 */
-	function checkAllItemAccess($uid, $section, $id, $force=false, $recursive = false)
+	static function checkAllItemAccess($uid, $section, $id, $force=false, $recursive = false)
 	{
 		// $actions[$uid][$asset] is an array of ACTION names
 		// allowed for USER with ID {$uid} on the ASSET with name {$asset}
@@ -385,7 +385,7 @@ class FlexicontentHelperPerm
 			
 		if(!isset($actions[$uid][$asset]) || $force) {
 			// Get user object
-			$user = &JFactory::getUser($uid);
+			$user = JFactory::getUser($uid);
 			
 			// This string will be removed from action names to make them shorter e.g. will make 'core.edit.own' to be 'edit.own'
 			$action_start = ($dbsection == 'category' || $dbsection == 'article' ) ? 'core.' : 'flexicontent.';
@@ -430,8 +430,8 @@ class FlexicontentHelperPerm
 		$asset = "{$extension}.{$dbsection}.{$id}";
 		
 		if(!isset($actions[$uid][$asset]) || $force) {
-			$user = &JFactory::getUser($uid);
-			$db = &JFactory::getDBO();
+			$user = JFactory::getUser($uid);
+			$db = JFactory::getDBO();
 			
 			// Build the database query to get the rules for the asset.
 			$query	= $db->getQuery(true);
@@ -449,7 +449,7 @@ class FlexicontentHelperPerm
 			$db->setQuery($query);
 			$rules_string	= $db->loadResult(); // $db->loadColumn();
 			if ($db->getErrorNum()) {
-				$jAp=& JFactory::getApplication();
+				$jAp= JFactory::getApplication();
 				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
 			}
 			
