@@ -96,4 +96,8 @@
 		<action name="flexicontent.publishfield" title="publish field" description="This field can be publiished by members of this user group" />
 	</section>
 	
+	<section name="type">
+		<action name="core.create" title="create items" description="Allow users in the group to create new items in this type. Users not being able to create items of this type will not see this type listed, when selecting type or will receive an error message for submit links that contain this type." />
+	</section>
+	
 </access>

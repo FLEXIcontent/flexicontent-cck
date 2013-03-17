@@ -491,7 +491,7 @@ class FlexicontentModelField extends JModelAdmin
 		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
 
 		if (empty($data)) {
-			$data = $this->getItem();
+			$data = $this->getItem($this->_id);
 		}
 
 		return $data;

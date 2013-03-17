@@ -31,40 +31,20 @@ class FlexicontentViewField extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe = &JFactory::getApplication();
-		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-
 		//initialise variables
-		$document	= & JFactory::getDocument();
-		$user			= & JFactory::getUser();
-		$cid			= JRequest::getVar( 'cid' );
-
+		$app      = JFactory::getApplication();
+		$document	= JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$user     = JFactory::getUser();
+		
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		
 		//add js function to overload the joomla submitform
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		JHTML::_('behavior.tooltip');
 		$document->addScript('components/com_flexicontent/assets/js/admin.js');
 		$document->addScript('components/com_flexicontent/assets/js/validate.js');
-		
-		//create the toolbar
-		if ( $cid ) {
-			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' );
-		} else {
-			JToolBarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
-		}
-		
-		if (FLEXI_J16GE) {
-			JToolBarHelper::apply('fields.apply');
-			JToolBarHelper::save('fields.save');
-			JToolBarHelper::custom( 'fields.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-			JToolBarHelper::cancel('fields.cancel');
-		} else {
-			JToolBarHelper::apply();
-			JToolBarHelper::save();
-			JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
-			JToolBarHelper::cancel();
-		}
 		
 		//Load pane behavior
 		jimport('joomla.html.pane');
@@ -72,15 +52,27 @@ class FlexicontentViewField extends JViewLegacy
 		jimport('joomla.filesystem.file');
 
 		//Get data from the model
-		$model	= & $this->getModel();
-		$row		= & $this->get( 'Field' );
+		$model  = $this->getModel();
+		$row    = $this->get( 'Field' );
 		if (FLEXI_J16GE) {
-			$form	= $this->get('Form');
+			$form = $this->get('Form');
 		} else {
-			$types				= & $this->get( 'Typeslist' );
-			$typesselected= & $this->get( 'Typesselected' );
+			$types				= $this->get( 'Typeslist' );
+			$typesselected= $this->get( 'Typesselected' );
 		}
-		JHTML::_('behavior.tooltip');
+		
+		//create the toolbar
+		if ( $row->id ) {
+			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_FIELD' ), 'fieldedit' );
+		} else {
+			JToolBarHelper::title( JText::_( 'FLEXI_ADD_FIELD' ), 'fieldadd' );
+		}
+		
+		$ctrl = FLEXI_J16GE ? 'fields.' : '';
+		JToolBarHelper::apply( $ctrl.'apply' );
+		JToolBarHelper::save( $ctrl.'save' );
+		JToolBarHelper::custom( $ctrl.'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+		JToolBarHelper::cancel( $ctrl.'cancel' );
 		
 		// Import Joomla plugin that implements the type of current flexi field
 		JPluginHelper::importPlugin('flexicontent_fields', ($row->iscore ? 'core' : $row->field_type) );
@@ -122,14 +114,13 @@ class FlexicontentViewField extends JViewLegacy
 						});
 					});
 				");
-			
 		}
 
 		// fail if checked out not by 'me'
 		if ($row->id) {
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-				$mainframe->redirect( 'index.php?option=com_flexicontent&view=fields' );
+				$app->redirect( 'index.php?option=com_flexicontent&view=fields' );
 			}
 		}
 		
@@ -138,8 +129,8 @@ class FlexicontentViewField extends JViewLegacy
 		
 		// assign permissions for J2.5
 		if (FLEXI_J16GE) {
-			$permission = &FlexicontentHelperPerm::getPerm();
-			$this->assignRef('permission'   , $permission);
+			$permission = FlexicontentHelperPerm::getPerm();
+			$this->assignRef('permission'  , $permission);
 		}
 		//assign data to template
 		$this->assignRef('document'   , $document);
@@ -154,7 +145,7 @@ class FlexicontentViewField extends JViewLegacy
 		$this->assignRef('supportvalueseditable'   , $supportvalueseditable);
 		$this->assignRef('supportformhidden'       , $supportformhidden);
 		$this->assignRef('supportedithelp'         , $supportedithelp);
-
+		
 		parent::display($tpl);
 	}
 }
