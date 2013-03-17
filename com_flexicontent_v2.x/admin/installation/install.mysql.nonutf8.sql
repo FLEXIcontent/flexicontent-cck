@@ -139,6 +139,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_tags_item_relations` (
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `id` int(11) NOT NULL auto_increment,
+  `asset_id` int(11) unsigned NOT NULL,
   `name` varchar(255) NOT NULL,
   `alias` varchar(255) NOT NULL,
   `published` tinyint(1) NOT NULL,

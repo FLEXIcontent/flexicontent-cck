@@ -18,6 +18,10 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+if (FLEXI_J16GE) {
+	jimport('joomla.database.tableasset');
+	jimport('joomla.access.accessrules');
+}
 /**
  * FLEXIcontent table class
  *

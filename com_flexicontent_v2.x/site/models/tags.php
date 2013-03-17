@@ -367,24 +367,16 @@ class FlexicontentModelTags extends JModelLegacy
 	{
 		if (!empty($this->_params)) return;
 		
-		$mainframe =& JFactory::getApplication();
-
-		// Retrieve menu parameters
-		$menu = JSite::getMenu()->getActive();
-		if ($menu) {
-			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
-		}
+		$app  = JFactory::getApplication();
+		$menu = JSite::getMenu()->getActive();     // Retrieve active menu
 		
-		// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively
-		$flexi = JComponentHelper::getComponent('com_flexicontent');
-		$params = FLEXI_J16GE ? new JRegistry($flexi->params) : new JParameter($flexi->params);
-		
-		// Merge current menu item (could be tags specific or the Globally Configured Default Tag Menu Item)
-		$params->merge($menuParams);
+		// a. Get the COMPONENT only parameters and merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) $params->merge($menu->params);
 		
 		/*
 		// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($mainframe->getParams('com_flexicontent'));
+		$params = clone($app->getParams('com_flexicontent'));
 		
 		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
 		if (FLEXI_J16GE && $menu) {
@@ -416,7 +408,7 @@ class FlexicontentModelTags extends JModelLegacy
 			$params->merge($moduleParams);
 		}
 		
-		$this->_params = & $params;
+		$this->_params = $params;
 	}
 	
 	

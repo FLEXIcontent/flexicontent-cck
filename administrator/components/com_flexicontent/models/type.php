@@ -152,6 +152,24 @@ class FlexicontentModelType extends JModelLegacy
 	}
 
 	/**
+	 * Method to get the last id
+	 *
+	 * @access	private
+	 * @return	int
+	 * @since	1.0
+	 */
+	function _getLastId()
+	{
+		$query  = 'SELECT MAX(id)'
+				. ' FROM #__flexicontent_types'
+				;
+		$this->_db->setQuery($query);
+		$lastid = $this->_db->loadResult();
+		
+		return (int)$lastid;
+	}
+
+	/**
 	 * Method to initialise the type data
 	 *
 	 * @access	private
@@ -169,6 +187,7 @@ class FlexicontentModelType extends JModelLegacy
 			$type->alias			= null;
 			$type->published	= 1;
 			$type->attribs		= null;
+			$type->access			= 0;
 			$this->_type			= $type;
 			return (boolean) $this->_type;
 		}
@@ -186,9 +205,9 @@ class FlexicontentModelType extends JModelLegacy
 	{
 		if ($this->_id)
 		{
-			$instance = JTable::getInstance('flexicontent_types', '');
-			$user = JFactory::getUser();
-			return $instance->checkout($user->get('id'), $this->_id);
+			$type  = JTable::getInstance('flexicontent_types', '');
+			$user  = JFactory::getUser();
+			return $type->checkout($user->get('id'), $this->_id);
 		}
 		return false;
 	}
@@ -211,8 +230,8 @@ class FlexicontentModelType extends JModelLegacy
 				$uid	= $user->get('id');
 			}
 			// Lets get to it and checkout the thing...
-			$instance = JTable::getInstance('flexicontent_types', '');
-			return $instance->checkout($uid, $this->_id);
+			$type = JTable::getInstance('flexicontent_types', '');
+			return $type->checkout($uid, $this->_id);
 		}
 		return false;
 	}
@@ -279,6 +298,11 @@ class FlexicontentModelType extends JModelLegacy
 			$type->attribs = implode("\n", $txt);
 		}
 
+		// Put the new types in last position, currently this column is missing
+		/*if (!$type->id) {
+			$type->ordering = $type->getNextOrder();
+		}*/
+
 		// Make sure the data is valid
 		if (!$type->check()) {
 			$this->setError($type->getError() );
@@ -289,6 +313,12 @@ class FlexicontentModelType extends JModelLegacy
 		if (!$type->store()) {
 			$this->setError( $this->_db->getErrorMsg() );
 			return false;
+		}
+		
+		if (FLEXI_ACCESS) {
+			FAccess::saveaccess( $type, 'type' );
+		} else if (FLEXI_J16GE) {
+			// saving asset in J2.5 is handled by the types table class
 		}
 		
 		$this->_type = & $type;

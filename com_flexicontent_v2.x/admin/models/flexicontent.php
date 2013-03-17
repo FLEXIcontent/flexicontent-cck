@@ -1373,10 +1373,20 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
 		if (count($result) && $debug_initial_perms) { echo "bad assets for fields: "; print_r($result); echo "<br>"; }
 		$field_section = count($result) == 0 ? 1 : 0;
+
+		// CHECK if some types don't have permissions set, !!! WARNING this query must be same like the one USED in function initialPermission()
+		$query = $db->getQuery(true)
+			->select('se.id')
+			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_types AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.type.",ff.id)')
+			->where('se.id is NULL');
+		$db->setQuery($query);
+		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+		if (count($result) && $debug_initial_perms) { echo "bad assets for types: "; print_r($result); echo "<br>"; }
+		$type_section = count($result) == 0 ? 1 : 0;
 		
-		if ($debug_initial_perms) { echo "PASSED comp_section:$comp_section && category_section:$category_section && article_section:$article_section && field_section:$field_section <br>"; }
+		if ($debug_initial_perms) { echo "PASSED comp_section:$comp_section && category_section:$category_section && article_section:$article_section && field_section:$field_section && type_section:$type_section <br>"; }
 		
-		$init_required = $comp_section && $category_section && $article_section && $field_section;
+		$init_required = $comp_section && $category_section && $article_section && $field_section && $type_section;
 		return $init_required;
 	}
 	
@@ -1679,6 +1689,70 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			}
 		}
 
+
+		/*** FLEXIcontent TYPES assets ***/
+		
+		// Get a list flexicontent types that do not have assets
+		$query = $db->getQuery(true)
+			->select('ff.id, ff.name, ff.asset_id')
+			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_types AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.type.",ff.id)')
+			->where('se.id is NULL');
+		$db->setQuery($query);
+		$results = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+		
+		// Add an asset to every type that doesnot have one
+		if(count($results)>0) {
+			foreach($results as $type) {
+				$name = "com_flexicontent.type.{$type->id}";
+				
+				// Test if an asset for the current TYPE ID already exists and load it instead of creating a new asset
+				if ( ! $asset->loadByName($name) ) {
+					if ($type->asset_id) {
+						// asset name not found but type has an asset id set ?, we could delete it here
+						// but it maybe dangerous to do so ... it might be a legitimate asset_id for something else
+					}
+
+					// Initialize type asset
+					$asset->id = null;
+					$asset->name		= $name;
+					$asset->title		= $type->name;
+					$asset->setLocation($component_asset->id, 'last-child');     // Permissions of types are directly inheritted by component
+					
+					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
+					$asset->rules = new JRules();
+					/*
+					$actions	= JAccess::getActions($component_name, 'type');
+					$rules 		= json_decode($component_asset->rules);		
+					foreach ($actions as $action) {
+						$typerules[$action->name] = $rules->{$action->name};
+					}
+					$rules = new JRules(json_encode($typerules));
+					$asset->rules = $rules->__toString();
+					*/
+					
+					// Save the asset
+					if (!$asset->check() || !$asset->store(false)) {
+						echo $asset->getError();
+						$this->setError($asset->getError());
+						return false;
+					}
+				}
+				
+				// Assign the asset to the type
+				$query = $db->getQuery(true)
+					->update('#__flexicontent_types')
+					->set('asset_id = ' . (int)$asset->id)
+					->where('id = ' . (int)$type->id);
+				$db->setQuery($query);
+				
+				if (!$db->query()) {
+					echo JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg());
+					$this->setError(JText::sprintf('JLIB_DATABASE_ERROR_STORE_FAILED', get_class($this), $db->getErrorMsg()));
+					return false;
+				}
+			}
+		}
+		
 		return true;
 	}
 	

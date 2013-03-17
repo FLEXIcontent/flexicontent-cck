@@ -301,9 +301,11 @@
 /* Container of each individual field filter (both label and html) */
 #flexicontent .filter {
 	display: inline-block;
-	float: none;
+	float: left;
 	margin: 0px 10px 6px 0px;
 	white-space: nowrap;
+	border: 0px dashed gray;
+	min-height: 4em;
 }
 
 /* Container of each individual field filter LABEL */

@@ -47,7 +47,59 @@ defined('_JEXEC') or die('Restricted access');
 							?>
 						</td>
 					</tr>
+					<tr>
+						<td class="key">
+							<label for="name">
+								<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
+							</label>
+						</td>
+						<td>
+							<input id="name" name="alias" class="required" value="<?php echo $this->row->alias; ?>" size="50" maxlength="100" />
+						</td>
+					</tr>
+					<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
+					<tr>
+						<td class="key">
+							<label for="access" class="hasTip" title="<?php echo JText::_('FLEXI_ACCESS_LEVEL').'::'.JText::_('FLEXI_FIELD_ACCESSLEVEL_DESC');?>">
+								<?php echo JText::_( 'FLEXI_ACCESS_LEVEL' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo $this->lists['access']; ?>
+						</td>
+					</tr>
+					<?php endif; ?>
 				</table>
+				
+			<?php
+			if (FLEXI_ACCESS) :
+				$this->document->addScriptDeclaration("
+					window.addEvent('domready', function() {
+						var slideaccess = new Fx.Slide('tabacces');
+						var slidenoaccess = new Fx.Slide('notabacces');
+						slideaccess.hide();
+						$$('fieldset.flexiaccess legend').addEvent('click', function(ev) {
+							slideaccess.toggle();
+							slidenoaccess.toggle();
+						});
+					});
+				");
+			?>
+			<fieldset class="flexiaccess">
+				<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
+				<table id="tabacces" class="admintable" width="100%">
+					<tr>
+						<td>
+							<div id="access"><?php echo $this->lists['access']; ?></div>
+						</td>
+					</tr>
+				</table>
+				<div id="notabacces">
+					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
+				</div>
+			</fieldset>
+		<?php endif; ?>				
+				
 			</td>
 			<td valign="top" width="600" style="padding: 7px 0 0 5px" align="left" valign="top">
 				<?php

@@ -295,6 +295,10 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 		$db->setQuery($query);
 		$fields_tbl_exists = (boolean) count($db->loadObjectList());
 		
+		$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'flexicontent_types"';
+		$db->setQuery($query);
+		$types_tbl_exists = (boolean) count($db->loadObjectList());
+		
 		$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'flexicontent_advsearch_index"';
 		$db->setQuery($query);
 		$advsearch_index_tbl_exists = (boolean) count($db->loadObjectList());
@@ -353,8 +357,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 					<td>
 					<?php
 					$tbls = array();
-					if ($files_tbl_exists)           $tbls[] = "#__flexicontent_files";
-					if ($fields_tbl_exists)          $tbls[] = "#__flexicontent_fields";
+					if ($files_tbl_exists)   $tbls[] = "#__flexicontent_files";
+					if ($fields_tbl_exists)  $tbls[] = "#__flexicontent_fields";
+					if ($types_tbl_exists)   $tbls[] = "#__flexicontent_types";
 					if (count($tbls))  $tbl_fields = $db->getTableFields($tbls);
 					
 					$queries = array();
@@ -379,6 +384,9 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 					}
 					if ( $fields_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_fields']) && FLEXI_J16GE) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD COLUMN `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
+					}
+					if ( $types_tbl_exists && !array_key_exists('asset_id', $tbl_types['#__flexicontent_types']) && FLEXI_J16GE) {
+						$queries[] = "ALTER TABLE `#__flexicontent_types` ADD COLUMN `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
 					foreach ($queries as $query) {
 						$db->setQuery($query);

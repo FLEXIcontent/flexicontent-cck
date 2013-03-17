@@ -152,7 +152,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('cids', $this->_ids);
 
 		// We need to merge parameters here to get the correct page limit value, we must call this after populating layput and author variables
-		$this->_params = $this->_loadCategoryParams($this->_id);
+		$this->_loadCategoryParams($this->_id);
 		$params = $this->_params;
 
 		// Set the pagination variables into state (We get them from http request OR use default category parameters)
@@ -1093,124 +1093,116 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _loadCategoryParams($id)
 	{
-		global $fc_catviev;
-		if ( !empty($fc_catviev['params']) ) return $fc_catviev['params'];
+		if ( $this->_params !== NULL ) return;
 		
-		if ($this->_params === NULL) {
-			jimport("joomla.html.parameter");
-			$mainframe = JFactory::getApplication();
-			
-			// Retrieve author parameters if using displaying AUTHOR layout
-			$author_basicparams = '';
-			$author_catparams = '';
-			if ($this->_authorid!=0) {
-				$query = 'SELECT author_basicparams, author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $this->_authorid;
-				$this->_db->setQuery($query);
-				$author_extdata = $this->_db->loadObject();
-				if ($author_extdata) {
-					$author_basicparams = $author_extdata->author_basicparams;
-					$author_catparams =  $author_extdata->author_catparams;
-					
-					$authorparams = FLEXI_J16GE ? new JRegistry($author_basicparams) : new JParameter($author_basicparams);
-					if (!$authorparams->get('override_currcatconf',0)) {
-						$author_catparams = '';
-					}
-				}
-			}
-			
-			// Retrieve category parameters
-			$catparams = "";
-			if ($id) {
-				$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
-				$this->_db->setQuery($query);
-				$catparams = $this->_db->loadResult();
-			}
-			
-			
-			// Retrieve menu parameters
-			$menu = $mainframe->getMenu()->getActive();
-			if ($menu) {
-				$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
-			}
-			
-			// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively
-			$flexi = JComponentHelper::getComponent('com_flexicontent');
-			$params = FLEXI_J16GE ? new JRegistry($flexi->params) : new JParameter($flexi->params);
-			if ($menu) {
-				// some parameters not belonging to category overriden parameters
-				$params->set( 'item_depth', $menuParams->get('item_depth') );
-			}
-			$params->set('show_title', $params->get('show_title_lists'));          // Parameter meant for lists
-			$params->set('title_linkable', $params->get('title_linkable_lists'));  // Parameter meant for lists			
-			/*
-			// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-			$params = clone($mainframe->getParams('com_flexicontent'));
-			
-			// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-			if (FLEXI_J16GE && $menu) {
-				$params->merge($menuParams);
-			}
-			*/
-			
-			// b. Merge category parameters
-			$cparams = FLEXI_J16GE ? new JRegistry($catparams) : new JParameter($catparams);
-			$params->merge($cparams);
-			
-			// c. Merge author basic parameters
-			if ($author_basicparams!=='') {
-				$params->merge(  FLEXI_J16GE ? new JRegistry($author_basicparams) : new JParameter($author_basicparams)  );
-			}
-	
-			// d. Merge author OVERRIDDEN category parameters
-			if ($author_catparams!=='') {
-				$params->merge(  FLEXI_J16GE ? new JRegistry($author_catparams) : new JParameter($author_catparams)  );
-			}
-	
-			// Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
-			if ( !empty($menu) )
-			{
-				$this->_menu_itemid = $menu->id;
+		$app  = JFactory::getApplication();
+		$menu = JSite::getMenu()->getActive();     // Retrieve active menu
+		
+		// Retrieve author parameters if using displaying AUTHOR layout
+		$author_basicparams = '';
+		$author_catparams = '';
+		if ($this->_authorid!=0) {
+			$query = 'SELECT author_basicparams, author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $this->_authorid;
+			$this->_db->setQuery($query);
+			$author_extdata = $this->_db->loadObject();
+			if ($author_extdata) {
+				$author_basicparams = $author_extdata->author_basicparams;
+				$author_catparams =  $author_extdata->author_catparams;
 				
-				$view_ok      = @$menu->query['view']     == 'category';
-				$cid_ok       = @$menu->query['cid']      == $this->_id;
-				$layout_ok    = @$menu->query['layout']   == $this->_layout;
-				$authorid_ok  = (@$menu->query['authorid'] == $this->_authorid) || ($this->_layout=='myitems');  // Ignore empty author_id when layout is 'myitems'
-				
-				// We will merge menu parameters last, thus overriding the default categories parameters if either
-				// (a) override is enabled in the menu or (b) category Layout is 'myitems' which has no default parameters
-				$overrideconf = $menuParams->get('override_defaultconf',0) || $this->_layout=='myitems' || $this->_layout=='mcats';
-				$menu_matches = $view_ok && $cid_ok & $layout_ok && $authorid_ok;
-				
-				if ( $menu_matches && $overrideconf ) {
-					// Add - all - menu parameters related or not related to category parameters override
-					$params->merge($menuParams);
-				} else if ($menu_matches) {
-					// Add menu parameters - not - related to category parameters override
-					$partial_param_arr = array('item_depth', 'persistent_filters', 'initial_filters');
-					foreach ($partial_param_arr as $partial_param) {
-						$params->set( $partial_param, $menuParams->get($partial_param));
-					}
-				}
-			}
-			
-			// Set filters via menu parameters
-			$this->_setFilters( $params, 'persistent_filters', $is_persistent=1);
-			$this->_setFilters( $params, 'initial_filters'   , $is_persistent=0);
-			
-			// Bugs of v2.0 RC2
-			if (FLEXI_J16GE) {
-				if ( is_array($orderbycustomfieldid = $params->get('orderbycustomfieldid', 0)) ) {
-					JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, had a bug, please open category and resave it, you can use 'copy parameters' to quickly update many categories");
-					$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
-				}
-				if ( preg_match("/option=com_user&/", $params->get('login_page', '')) ) {
-					JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, set the login url wrongly in the global configuration.<br /> Please replace: <u>option=com_user</u> with <u>option=com_users</u>");
-					$cparams->set( 'login_page', str_replace("com_user&", "com_users&", $params->get('login_page', '')) );
+				$authorparams = FLEXI_J16GE ? new JRegistry($author_basicparams) : new JParameter($author_basicparams);
+				if (!$authorparams->get('override_currcatconf',0)) {
+					$author_catparams = '';
 				}
 			}
 		}
 		
-		return $fc_catviev['params'] = $params;
+		// Retrieve category parameters
+		$catparams = "";
+		if ($id) {
+			$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
+			$this->_db->setQuery($query);
+			$catparams = $this->_db->loadResult();
+		}
+		
+		// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) {
+			// Add some parameters that do not belonging to category overriden parameters
+			$params->set( 'item_depth', $menu->params->get('item_depth') );
+		}
+		$params->set('show_title', $params->get('show_title_lists'));          // Parameter meant for lists
+		$params->set('title_linkable', $params->get('title_linkable_lists'));  // Parameter meant for lists
+		
+		/*
+		// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
+		$params = clone($app->getParams('com_flexicontent'));
+		
+		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
+		if (FLEXI_J16GE && $menu) $params->merge($menu->params);
+		*/
+		
+		// b. Merge category parameters
+		$cparams = FLEXI_J16GE ? new JRegistry($catparams) : new JParameter($catparams);
+		$params->merge($cparams);
+		
+		// c. Merge author basic parameters
+		if ($author_basicparams!=='') {
+			$params->merge(  FLEXI_J16GE ? new JRegistry($author_basicparams) : new JParameter($author_basicparams)  );
+		}
+
+		// d. Merge author OVERRIDDEN category parameters
+		if ($author_catparams!=='') {
+			$params->merge(  FLEXI_J16GE ? new JRegistry($author_catparams) : new JParameter($author_catparams)  );
+		}
+
+		// Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
+		if ( !empty($menu) )
+		{
+			$this->_menu_itemid = $menu->id;
+			
+			$view_ok      = @$menu->query['view']     == 'category';
+			$cid_ok       = @$menu->query['cid']      == $this->_id;
+			$layout_ok    = @$menu->query['layout']   == $this->_layout;
+			$authorid_ok  = (@$menu->query['authorid'] == $this->_authorid) || ($this->_layout=='myitems');  // Ignore empty author_id when layout is 'myitems'
+			
+			// We will merge menu parameters last, thus overriding the default categories parameters if either
+			// (a) override is enabled in the menu or (b) category Layout is 'myitems' which has no default parameters
+			$overrideconf = $menu->params->get('override_defaultconf',0) || $this->_layout=='myitems' || $this->_layout=='mcats';
+			$menu_matches = $view_ok && $cid_ok & $layout_ok && $authorid_ok;
+			
+			if ( $menu_matches && $overrideconf ) {
+				// Add - all - menu parameters related or not related to category parameters override
+				$params->merge($menu->params);
+			} else if ($menu_matches) {
+				// Add menu parameters - not - related to category parameters override
+				$partial_param_arr = array('item_depth', 'persistent_filters', 'initial_filters');
+				foreach ($partial_param_arr as $partial_param) {
+					$params->set( $partial_param, $menu->params->get($partial_param));
+				}
+			}
+		}
+		
+		// Set filters via menu parameters
+		$this->_setFilters( $params, 'persistent_filters', $is_persistent=1);
+		$this->_setFilters( $params, 'initial_filters'   , $is_persistent=0);
+		
+		// Bugs of v2.0 RC2
+		if (FLEXI_J16GE) {
+			if ( is_array($orderbycustomfieldid = $params->get('orderbycustomfieldid', 0)) ) {
+				JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, had a bug, please open category and resave it, you can use 'copy parameters' to quickly update many categories");
+				$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
+			}
+			if ( preg_match("/option=com_user&/", $params->get('login_page', '')) ) {
+				JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, set the login url wrongly in the global configuration.<br /> Please replace: <u>option=com_user</u> with <u>option=com_users</u>");
+				$cparams->set( 'login_page', str_replace("com_user&", "com_users&", $params->get('login_page', '')) );
+			}
+		}
+		
+		$this->_params = $params;
+		
+		// Also set into a global variable
+		global $fc_catviev;
+		$fc_catviev['params'] = $params;
 	}
 	
 	

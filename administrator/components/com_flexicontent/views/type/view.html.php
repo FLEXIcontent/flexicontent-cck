@@ -27,48 +27,44 @@ jimport('joomla.application.component.view');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class FlexicontentViewType extends JViewLegacy {
-
+class FlexicontentViewType extends JViewLegacy
+{
 	function display($tpl = null)
 	{
+		//initialise variables
 		$mainframe = &JFactory::getApplication();
-
+		$document	= JFactory::getDocument();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$user     = JFactory::getUser();
+		
+		//add css to document
+		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		
+		//add js function to overload the joomla submitform
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		JHTML::_('behavior.tooltip');
+		$document->addScript('components/com_flexicontent/assets/js/admin.js');
+		$document->addScript('components/com_flexicontent/assets/js/validate.js');
+		
 		//Load pane behavior
 		jimport('joomla.html.pane');
 
-		//initialise variables
-		$document	= & JFactory::getDocument();
-		$cparams    = & JComponentHelper::getParams('com_flexicontent');
-		$user 		= & JFactory::getUser();
-		if (!FLEXI_J16GE)
-			$pane 		= & JPane::getInstance('sliders');
-
-		JHTML::_('behavior.tooltip');
-
-		//add css to document
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
-		//add js function to overload the joomla submitform
-		$document->addScript('components/com_flexicontent/assets/js/admin.js');
-		$document->addScript('components/com_flexicontent/assets/js/validate.js');
-
 		//Get data from the model
-		$model		= & $this->getModel();
+		$model  = $this->getModel();
+		$row		= $this->get( FLEXI_J16GE ? 'Item' : 'Type' );
 		if (FLEXI_J16GE) {
-			$row		= & $this->get( 'Item' );
-			$form		= & $this->get('Form');
-		} else {
-			$row     = & $this->get( 'Type' );
+			$form = $this->get('Form');
 		}
-		$cid			=	$row->id;
 		$themes		= flexicontent_tmpl::getTemplates();
 		$tmpls		= $themes->items;
 		
 		//create the toolbar
-		if ( $cid ) {
+		if ( $row->id ) {
 			JToolBarHelper::title( JText::_( 'FLEXI_EDIT_TYPE' ), 'typeedit' );
 		} else {
 			JToolBarHelper::title( JText::_( 'FLEXI_ADD_TYPE' ), 'typeadd' );
 		}
+		
 		$ctrl = FLEXI_J16GE ? 'types.' : '';
 		JToolBarHelper::apply( $ctrl.'apply' );
 		JToolBarHelper::save( $ctrl.'save' );
@@ -76,10 +72,21 @@ class FlexicontentViewType extends JViewLegacy {
 		JToolBarHelper::cancel( $ctrl.'cancel' );
 		
 		// fail if checked out not by 'me'
-		if ($cid) {
+		if ($row->id) {
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 				$mainframe->redirect( 'index.php?option=com_flexicontent&view=types' );
+			}
+		}
+		
+		//build access level list
+		if (!FLEXI_J16GE) {
+			if (FLEXI_ACCESS) {
+				$lang = & JFactory::getLanguage();
+				$lang->_strings['FLEXIACCESS_PADD'] = 'Create Items';
+				$lists['access']	= FAccess::TabGmaccess( $row, 'type', 1, 1, 0, 0, 0, 0, 0, 0, 0 );
+			} else {
+				$lists['access'] 	= JHTML::_('list.accesslevel', $row );
 			}
 		}
 		
@@ -113,11 +120,20 @@ class FlexicontentViewType extends JViewLegacy {
 		}		
 		
 		//assign data to template
-		$this->assignRef('row'			, $row);
-		$this->assignRef('form'			, $form);
-		$this->assignRef('tmpls'		, $tmpls);
-		if (!FLEXI_J16GE)
-			$this->assignRef('pane'		, $pane);
+		// assign permissions for J2.5
+		if (FLEXI_J16GE) {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$this->assignRef('permission'  , $permission);
+		}
+		$this->assignRef('document'   , $document);
+		$this->assignRef('row'        , $row);
+		$this->assignRef('form'       , $form);
+		$this->assignRef('tmpls'      , $tmpls);
+		if (!FLEXI_J16GE) {
+			$pane = JPane::getInstance('sliders');
+			$this->assignRef('pane'     , $pane);
+			$this->assignRef('lists'    , $lists);
+		}
 		
 		parent::display($tpl);
 	}
