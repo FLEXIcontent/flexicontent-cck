@@ -31,13 +31,12 @@ class FlexicontentViewTemplates extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe = JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
 		//initialise variables
-		$db       = JFactory::getDBO();
-		$document = JFactory::getDocument();
-		$user     = JFactory::getUser();
+		$mainframe = JFactory::getApplication();
+		$option    = JRequest::getVar('option');
+		$document  = JFactory::getDocument();
+		$user      = JFactory::getUser();
+		$db        = JFactory::getDBO();
 		
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');

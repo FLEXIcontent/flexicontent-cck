@@ -66,7 +66,10 @@ function delFilter(name)
 }
 
 function delAllFilters() {
-	delFilter('search'); delFilter('filter_itemscount'); delFilter('filter_type'); delFilter('filter_logged'); delFilter('startdate'); delFilter('enddate'); delFilter('filter_id');
+	delFilter('search'); delFilter('filter_itemscount');
+	delFilter('filter_logged'); delFilter('filter_type');
+	delFilter('startdate'); delFilter('enddate');
+	delFilter('filter_id');
 }
 
 window.addEvent('domready', function(){
@@ -141,13 +144,18 @@ window.addEvent('domready', function(){
 					<?php endif; ?>
 				</th>
 				<th width="5%" class="title" >
-					<?php echo JHTML::_('grid.sort',   'Items', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+					<?php echo JHTML::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+					<?php if ($this->filter_itemscount) : ?>
+					<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
+						<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_itemscount');document.adminForm.submit();" />
+					</span>
+					<?php endif; ?>
 				</th>
 				<th width="15%" class="title" >
 					<?php echo JHTML::_('grid.sort',   'Username', 'a.username', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
 				<th width="5%" class="title" nowrap="nowrap">
-					<?php echo JText::_( 'Logged In' ); ?>
+					<?php echo JHTML::_('grid.sort',   'Logged In', 'loggedin', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 					<?php if ($this->filter_logged) : ?>
 					<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
 						<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_logged');document.adminForm.submit();" />
@@ -158,7 +166,7 @@ window.addEvent('domready', function(){
 					<?php echo JHTML::_('grid.sort',   'Enabled', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
 				<th width="15%" class="title">
-					<?php echo JHTML::_('grid.sort',   'Group', 'groupname', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
+					<?php echo FLEXI_J16GE ? JText::_( 'FLEXI_USERGROUPS' ) : JHTML::_('grid.sort',   'Group', 'groupname', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 					<?php if ($this->filter_type) : ?>
 					<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
 						<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_type');document.adminForm.submit();" />
@@ -211,7 +219,7 @@ window.addEvent('domready', function(){
 				<?php echo JText::_( 'Filter' ); ?>:
 				<input type="text" name="search" id="search" value="<?php echo htmlspecialchars($this->lists['search']);?>" class="text_area" style='width:140px;' onchange="document.adminForm.submit();" />
 			</td>
-			<td class="left" class="col_itemscount">
+			<td class="left col_itemscount">
 				<?php echo $this->lists['filter_itemscount']; ?>
 			</td>
 			<td class="left"></td>
@@ -324,7 +332,7 @@ window.addEvent('domready', function(){
 						<?php echo $row->name; ?></a>
 				</td>
 				<td align="center" class="col_itemscount">
-						<?php echo $itemscount; ?>
+					<?php echo $itemscount; ?>
 				</td>
 				<td>
 					<!-- <a class="modal" rel="{handler: 'iframe', size: {x: 800, y: 500}, onClose: function() {alert('hello');} }" href="<?php echo $link; ?>"> -->

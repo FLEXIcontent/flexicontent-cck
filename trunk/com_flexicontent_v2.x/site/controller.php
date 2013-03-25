@@ -56,7 +56,7 @@ class FlexicontentController extends JControllerLegacy
 		if ($view=='category') {
 			$cid = (int) JRequest::getVar('cid');
 			if ($cid) {
-				$db = & JFactory::getDBO();
+				$db = JFactory::getDBO();
 				$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 					.' FROM #__categories AS c WHERE c.id = '.$cid;
 				$db->setQuery( $query );
@@ -81,26 +81,22 @@ class FlexicontentController extends JControllerLegacy
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		// Initialize variables
-		$app     = & JFactory::getApplication();
-		$db      = & JFactory::getDBO();
-		$user    = & JFactory::getUser();
-		$config  = & JFactory::getConfig();
-		$session = & JFactory::getSession();
+		$app     = JFactory::getApplication();
+		$db      = JFactory::getDBO();
+		$user    = JFactory::getUser();
+		$menu    = JSite::getMenu()->getActive();
+		$config  = JFactory::getConfig();
+		$session = JFactory::getSession();
 		$task	   = JRequest::getVar('task');
-		$model   = & $this->getModel(FLEXI_ITEMVIEW);
+		$model   = $this->getModel(FLEXI_ITEMVIEW);
 		$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 		$dolog = JComponentHelper::getParams( 'com_flexicontent' )->get('print_logging_info');
 		
-		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($app->getParams('com_flexicontent'));
-		
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE) {
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams = new JRegistry;
-				$menuParams->loadJSON($menu->params);
-				$params->merge($menuParams);
-			}
+		// Get the COMPONENT only parameters and merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
 		}
 		
 		// Merge the type parameters
@@ -122,7 +118,7 @@ class FlexicontentController extends JControllerLegacy
 			// Validate Form data for core fields and for parameters
 			$model->setId((int) $data['id']);   // Set data id into model in case some function tries to get a property and item gets loaded
 			$form = $model->getForm();          // Do not pass any data we only want the form object in order to validate the data and not create a filled-in form
-			$post = & $model->validate($form, $data);
+			$post = $model->validate($form, $data);
 			if (!$post) JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
 			
 			// Some values need to be assigned after validation
@@ -271,7 +267,7 @@ class FlexicontentController extends JControllerLegacy
 		// ********************************************************************************************************************
 		// First force reloading the item to make sure data are current, get a reference to it, and calculate publish privelege
 		// ********************************************************************************************************************
-		$item = & $model->getItem($post['id'], $check_view_access=false, $no_cache=true);
+		$item = $model->getItem($post['id'], $check_view_access=false, $no_cache=true);
 		$canPublish = $model->canEditState( $item, $check_cat_perm=true );
 		
 		
@@ -336,7 +332,7 @@ class FlexicontentController extends JControllerLegacy
 				$nConf = false;
 			} else {
 				// Get notifications configuration and select appropriate emails for current saving case
-				$nConf = & $model->getNotificationsConf($params);  //echo "<pre>"; print_r($nConf); "</pre>";
+				$nConf = $model->getNotificationsConf($params);  //echo "<pre>"; print_r($nConf); "</pre>";
 			}
 			
 			if ($nConf)
@@ -386,17 +382,17 @@ class FlexicontentController extends JControllerLegacy
 		}
 		
 		
-		// ******************************************************************************************
-		// If the item is not new, then we need to CLEAN THE CACHE so that our changes appear realtime
-		// ******************************************************************************************
-		if ( !$isnew ) {
-			if (FLEXI_J16GE) {
-				$cache = FLEXIUtilities::getCache();
-				$cache->clean('com_flexicontent_items');
-			} else {
-				$cache = &JFactory::getCache('com_flexicontent_items');
-				$cache->clean();
-			}
+		// ***************************************************
+		// CLEAN THE CACHE so that our changes appear realtime
+		// ***************************************************
+		if (FLEXI_J16GE) {
+			$cache = FLEXIUtilities::getCache();
+			$cache->clean('com_flexicontent_items');
+		} else {
+			$itemcache = JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
+			$filtercache = JFactory::getCache('com_flexicontent_filters');
+			$filtercache->clean();
 		}
 		
 		
@@ -515,8 +511,8 @@ class FlexicontentController extends JControllerLegacy
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 			
-			$itemmodel = $this->getModel( FLEXI_ITEMVIEW );
-			$msg = $itemmodel->approval( array($cid) );
+			$model = $this->getModel( FLEXI_ITEMVIEW );
+			$msg = $model->approval( array($cid) );
 		}
 		
 		$this->setRedirect( $_SERVER['HTTP_REFERER'], $msg );
@@ -559,95 +555,11 @@ class FlexicontentController extends JControllerLegacy
 	*/
 	function edit()
 	{
-		// Debuging message
-		//JError::raiseNotice(500, 'IN edit()'); // TOREMOVE
+		//JError::raiseNotice(500, 'IN edit()');   // Debuging message
 		
-		$session 	=& JFactory::getSession();
-		$mainframe = &JFactory::getApplication();
-		$cparams = clone($mainframe->getParams('com_flexicontent'));
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE) {
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams = new JRegistry;
-				$menuParams->loadJSON($menu->params);
-				$cparams->merge($menuParams);
-			}
-		}
+		$view  = $this->getView(FLEXI_ITEMVIEW, 'html');   // Get/Create the view
+		$model = $this->getModel(FLEXI_ITEMVIEW);   // Get/Create the model
 		
-		$unauthorized_page= $cparams->get('unauthorized_page', '');   //  unauthorized page via global configuration
-		
-		// Retrieve current logged user info
-		$user	=& JFactory::getUser();
-		// Create the view
-		$view = & $this->getView(FLEXI_ITEMVIEW, 'html');
-		// Get/Create the model
-		$model = & $this->getModel(FLEXI_ITEMVIEW);
-
-		// first verify it's an edit action
-		if ( $model->get('id') )
-		{
-			if (FLEXI_J16GE) {
-				$asset = 'com_content.article.' . $model->get('id');
-				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
-				// ALTERNATIVE 1
-				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
-				// ALTERNATIVE 2
-				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
-				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
-			} else if ($user->gid >= 25) {
-				$canEdit = true;
-			} else if (FLEXI_ACCESS) {
-				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
-				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
-			} else {
-				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
-				//$canEdit = ($user->gid >= 20);  // At least J1.5 Editor
-			}
-			
-			// Check if item is editable till logoff
-			if ($session->has('rendered_uneditable', 'flexicontent')) {
-				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-				$canEdit = isset($rendered_uneditable[$model->get('id')]);
-			}
-			
-			if (!$canEdit) {
-				if ($user->guest) {
-					$uri		= JFactory::getURI();
-					$return		= $uri->toString();
-					$fcreturn = serialize( array('id'=>@$this->_item->id, 'cid'=>$cid) );     // a special url parameter, used by some SEF code
-					$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
-					$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
-					$url .= '&return='.base64_encode($return);
-					$url .= '&fcreturn='.base64_encode($fcreturn);
-			
-					JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
-					$mainframe->redirect( $url );
-				} else if ($unauthorized_page) {
-					//  unauthorized page via global configuration
-					JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-					$mainframe->redirect($unauthorized_page);				
-				} else {
-					// user isn't authorize to edit this content
-					$msg = JText::_( 'FLEXI_ALERTNOTAUTH_TASK' );
-					if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
-				}
-			}
-		} else {
-			$msg = JText::_( 'Can not edit item, because item id is not set' );
-			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
-		}
-
-		//checked out?
-		if ($model->isCheckedOut($user->get('id')))
-		{
-			$msg = JText::sprintf('FLEXI_DESCBEINGEDITTED', $model->get('title'));
-			$this->setRedirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), $msg);
-			return;
-		}
-
-		//Checkout the item
-		$model->checkout();
-
 		// Push the model into the view (as default)
 		$view->setModel($model, true);
 
@@ -667,74 +579,17 @@ class FlexicontentController extends JControllerLegacy
 	*/
 	function add()
 	{
-		// Debuging message
-		//JError::raiseNotice(500, 'IN ADD()'); // TOREMOVE
+		//JError::raiseNotice(500, 'IN ADD()');   // Debuging message
 		
-		$mainframe = &JFactory::getApplication();
-		$cparams = clone($mainframe->getParams('com_flexicontent'));
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE) {
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams = new JRegistry;
-				$menuParams->loadJSON($menu->params);
-				$cparams->merge($menuParams);
-			}
-		}
+		$view  =  $this->getView(FLEXI_ITEMVIEW, 'html');   // Get/Create the view
+		$model = $this->getModel(FLEXI_ITEMVIEW);    // Get/Create the model
 		
-		$allowunauthorize	= $cparams->get('allowunauthorize', 0);
-		$notauthurl				= $cparams->get('notauthurl', '');          //  custom unauthorized page via menu item
-		$unauthorized_page= $cparams->get('unauthorized_page', '');   //  unauthorized page via global configuration
-		
-		// Retrieve current logged user info
-		$user	=& JFactory::getUser();
-		// Create the view
-		$view = & $this->getView(FLEXI_ITEMVIEW, 'html');
-		// Get/Create the model
-		$model = & $this->getModel(FLEXI_ITEMVIEW);
-		
-		//$user_cats_count = count( FlexicontentHelperPerm::getAllowedCats($user, array('core.create')) );
-		
-		//general access check
-		if (FLEXI_J16GE) {
-			$canAdd	= $user->authorize('core.create', 'com_flexicontent');
-			// ALTERNATIVE 1
-			//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
-			$not_authorised = !$canAdd;
-		} else if ($user->gid >= 25) {
-			$not_authorised = 0;
-		} else if (FLEXI_ACCESS) {
-			$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
-			$not_authorised = ! ( @$canAdd['content'] || @$canAdd['category'] );
-		} else {
-			$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
-			//$canAdd = ($user->gid >= 19);  // At least J1.5 Author
-			$not_authorised = ! $canAdd;
-		}
-		
-		// Allow item submission by unauthorized users, ... even guests ...
-		if ($allowunauthorize == 2) $allowunauthorize = ! $user->guest;
-		
-		if ($not_authorised && !$allowunauthorize) {
-			if ($notauthurl) {
-				//  custom unauthorized page via menu item
-				$mainframe->redirect(JRoute::_("index.php?Itemid=".$notauthurl));
-			} else if ($unauthorized_page) {
-				//  unauthorized page via global configuration
-				JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
-				$mainframe->redirect($unauthorized_page);				
-			} else {
-				// user isn't authorize to add ANY content
-				$msg = JText::_( 'FLEXI_ALERTNOTAUTH_TASK' );
-				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
-			}
-		}
-
 		// Push the model into the view (as default)
 		$view->setModel($model, true);
-
+		
 		// Set the layout
 		$view->setLayout( JRequest::getVar('layout','form') );
-
+		
 		// Display the view
 		$view->display();
 	}
@@ -752,12 +607,12 @@ class FlexicontentController extends JControllerLegacy
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );		
 		
 		// Initialize some variables
-		$user	= & JFactory::getUser();
-		$session 	=& JFactory::getSession();
+		$user    = JFactory::getUser();
+		$session = JFactory::getSession();
 		$dolog = JComponentHelper::getParams( 'com_flexicontent' )->get('print_logging_info');
 
 		// Get an item model
-		$model = & $this->getModel(FLEXI_ITEMVIEW);
+		$model = $this->getModel(FLEXI_ITEMVIEW);
 		
 		// CHECK-IN the item if user can edit
 		if ($model->get('id') > 1)
@@ -808,8 +663,6 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function vote()
 	{
-		$mainframe =& JFactory::getApplication();
-
 		$id = JRequest::getInt('id', 0);
 		$cid = JRequest::getInt('cid', 0);
 		$url = JRequest::getString('url', '');
@@ -837,12 +690,11 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function ajaxfav()
 	{
-		$mainframe =& JFactory::getApplication();
-		$user 	=& JFactory::getUser();
-		$id 	=  JRequest::getInt('id', 0);
-		$db  	=& JFactory::getDBO();
-		$model 	=  $this->getModel(FLEXI_ITEMVIEW);
-
+		$user  = JFactory::getUser();
+		$db    = JFactory::getDBO();
+		$model = $this->getModel(FLEXI_ITEMVIEW);
+		$id    = JRequest::getInt('id', 0);
+		
 		if (!$user->get('id'))
 		{
 			echo 'login';
@@ -1112,7 +964,7 @@ class FlexicontentController extends JControllerLegacy
 			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 		
-		$cache = &JFactory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
 
 		$this->setRedirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$cid.'&id='. $id, false), $msg );
@@ -1138,7 +990,7 @@ class FlexicontentController extends JControllerLegacy
 			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
 		
-		$cache = &JFactory::getCache('com_flexicontent');
+		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
 		
 		if ($cid) {
@@ -1168,17 +1020,16 @@ class FlexicontentController extends JControllerLegacy
 	 * @since 1.0
 	 */
 	function download()
-	{
-		$mainframe = &JFactory::getApplication();
-		
+	{		
 		jimport('joomla.filesystem.file');
-
-		$id 		= JRequest::getInt( 'id', 0 );
-		$fieldid 	= JRequest::getInt( 'fid', 0 );
-		$contentid 	= JRequest::getInt( 'cid', 0 );
-		$db			= &JFactory::getDBO();
-		$user		= & JFactory::getUser();
-
+		$app = JFactory::getApplication();
+		$db    = JFactory::getDBO();
+		$user  = JFactory::getUser();
+		
+		$id        = JRequest::getInt( 'id', 0 );
+		$fieldid   = JRequest::getInt( 'fid', 0 );
+		$contentid = JRequest::getInt( 'cid', 0 );
+		
 		$joinaccess = $andaccess = $joinaccess2 = $andaccess2 = '';
 		if (FLEXI_J16GE) {
 			$aid_arr = $user->getAuthorisedViewLevels();
@@ -1219,12 +1070,12 @@ class FlexicontentController extends JControllerLegacy
 
 		if ($file->url) {
 			//update hitcount
-			$filetable = & JTable::getInstance('flexicontent_files', '');
+			$filetable = JTable::getInstance('flexicontent_files', '');
 			$filetable->hit($id);
 			
 			// redirect to the file download link
 			@header("Location: ".$file->filename."");
-			$mainframe->close();
+			$app->close();
 		}
 		
 		$basePath = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
@@ -1243,7 +1094,7 @@ class FlexicontentController extends JControllerLegacy
 		$ext 	= strtolower(JFile::getExt($file->filename));
 		
 		//update hitcount
-		$filetable = & JTable::getInstance('flexicontent_files', '');
+		$filetable = JTable::getInstance('flexicontent_files', '');
 		$filetable->hit($id);
 
 		// required for IE, otherwise Content-disposition is ignored
@@ -1312,7 +1163,7 @@ class FlexicontentController extends JControllerLegacy
 		header("Content-Length: ".$size);
 
 		readfile($abspath);
-		$mainframe->close();
+		$app->close();
 	}
 
 	/**
@@ -1323,15 +1174,14 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function weblink()
 	{
-		$mainframe =& JFactory::getApplication();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+		$db    = JFactory::getDBO();
 		
-		$user		= & JFactory::getUser();
-		$db			= &JFactory::getDBO();
-
-		$fieldid 	= JRequest::getInt( 'fid', 0 );
-		$contentid 	= JRequest::getInt( 'cid', 0 );
-		$order 		= JRequest::getInt( 'ord', 0 );
-
+		$fieldid   = JRequest::getInt( 'fid', 0 );
+		$contentid = JRequest::getInt( 'cid', 0 );
+		$order     = JRequest::getInt( 'ord', 0 );
+		
 		$joinaccess = $andaccess = $joinaccess2 = $andaccess2 = '';
 		if (FLEXI_J16GE) {
 			$aid_arr = $user->getAuthorisedViewLevels();
@@ -1399,7 +1249,7 @@ class FlexicontentController extends JControllerLegacy
 		}
 		
 		@header("Location: ".$url."","target=blank");
-		$mainframe->close();
+		$app->close();
 	}
 
 	/**
@@ -1411,7 +1261,7 @@ class FlexicontentController extends JControllerLegacy
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 
-		$user	=& JFactory::getUser();
+		$user = JFactory::getUser();
 		if (FLEXI_J16GE) {
 			$CanUseTags = FlexicontentHelperPerm::getPerm()->CanUseTags;
 		} else if (FLEXI_ACCESS) {
@@ -1455,17 +1305,17 @@ class FlexicontentController extends JControllerLegacy
 		
 		// If no current menu itemid, then set it using the first menu item that points to the search view
 		if (!JRequest::getVar('Itemid', 0)) {
-			$menus = &JSite::getMenu();
-			$items	= $menus->getItems('link', 'index.php?option=com_flexicontent&view=search');
+			$menus = JSite::getMenu();
+			$items = $menus->getItems('link', 'index.php?option=com_flexicontent&view=search');
 	
 			if(isset($items[0])) {
 				JRequest::setVar('Itemid', $items[0]->id);
 			}
 		}
 		
-		$itemmodel = &$this->getModel(FLEXI_ITEMVIEW);
-		$view  = &$this->getView('search', 'html');
-		$view->setModel($itemmodel);
+		$model = $this->getModel(FLEXI_ITEMVIEW);
+		$view  = $this->getView('search', 'html');
+		$view->setModel($model);
 		
 		JRequest::setVar('view', 'search');
 		parent::display(true);

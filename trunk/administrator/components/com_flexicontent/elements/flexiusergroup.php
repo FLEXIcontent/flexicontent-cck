@@ -127,10 +127,10 @@ class JElementFlexiusergroup extends JElement
 				' ORDER BY a.lft ASC'
 			);
 			$options = $db->loadObjectList();
-	
-			// Check for a database error.
-			if ($db->getErrorNum()) { JError::raiseNotice(500, $db->getErrorMsg()); return null; }
-	
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			
+			if ( !$options )  return null;
+			
 			for ($i = 0, $n = count($options); $i < $n; $i++)
 			{
 				$options[$i]->text = str_repeat('- ', $options[$i]->level) . $options[$i]->text;

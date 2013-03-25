@@ -155,16 +155,17 @@ class FlexicontentModelTag extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkin()
+	function checkin($pk = NULL)
 	{
-		if ($this->_id)
-		{
-			$tag = JTable::getInstance('flexicontent_tags', '');
-			return $tag->checkout($uid, $this->_id);
+		if (!$pk) $pk = $this->_id;
+		if ($pk) {
+			$item = JTable::getInstance('flexicontent_tags', '');
+			return $item->checkin($pk);
 		}
 		return false;
 	}
-
+	
+	
 	/**
 	 * Method to checkout/lock the tag
 	 *
@@ -173,22 +174,26 @@ class FlexicontentModelTag extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($uid = null)
+	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
 	{
-		if ($this->_id)
-		{
-			// Make sure we have a user id to checkout the group with
-			if (is_null($uid)) {
-				$user	= JFactory::getUser();
-				$uid	= $user->get('id');
-			}
-			// Lets get to it and checkout the thing...
-			$tag = JTable::getInstance('flexicontent_tags', '');
-			return $tag->checkout($uid, $this->_id);
-		}
+		// Make sure we have a record id to checkout the record with
+		if ( !$pk ) $pk = $this->_id;
+		if ( !$pk ) return true;
+		
+		// Get current user
+		$user	= JFactory::getUser();
+		$uid	= $user->get('id');
+		
+		// Lets get table record and checkout the it
+		$tbl = JTable::getInstance('flexicontent_tags', '');
+		if ( $tbl->checkout($uid, $this->_id) ) return true;
+		
+		// Reaching this points means checkout failed
+		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
 		return false;
 	}
-
+	
+	
 	/**
 	 * Tests if the tag is checked out
 	 *

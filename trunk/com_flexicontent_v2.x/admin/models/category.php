@@ -176,7 +176,8 @@ class FlexicontentModelCategory extends JModelAdmin
 		}
 		return false;
 	}
-
+	
+	
 	/**
 	 * Method to checkout/lock the category
 	 *
@@ -185,29 +186,26 @@ class FlexicontentModelCategory extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($pk = null)
+	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
 	{
-		if ($this->_id)
-		{
-			// Make sure we have an item id to checkout the category with
-			if(is_null($pk)) $pk = $this->_id;
-
-			$user	= JFactory::getUser();
-			$uid	= $user->get('id');
-			
-			// Lets get to it and checkout the thing...
-			$category = $this->getTable();
-			if(!$category->checkout($uid, $pk))
-			{
-				$this->setError( $this->_db->getErrorMsg() );
-				return false;
-			}
-
-			return true;
-		}
+		// Make sure we have a record id to checkout the record with
+		if ( !$pk ) $pk = $this->_id;
+		if ( !$pk ) return true;
+		
+		// Get current user
+		$user	= JFactory::getUser();
+		$uid	= $user->get('id');
+		
+		// Lets get table record and checkout the it
+		$tbl = $this->getTable();
+		if ( $tbl->checkout($uid, $this->_id) ) return true;
+		
+		// Reaching this points means checkout failed
+		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
 		return false;
 	}
-
+	
+	
 	/**
 	 * Tests if the category is checked out
 	 *
@@ -341,7 +339,7 @@ class FlexicontentModelCategory extends JModelAdmin
 		}
 		
 		$this->_id = $table->id;
-		$this->_category = & $table;
+		$this->_category = & $table;  // variable reference instead of assigning object id, this will work even if $table is reassigned a different object
 
 		// Trigger the onContentAfterSave event.
 		$dispatcher->trigger($this->event_after_save, array($this->option . '.' . $this->name, &$table, $isNew));
@@ -548,7 +546,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			} else {
 				$result->modified_time = null;
 			}
-			$this->_category = & $result;
+			$this->_category = $result;
 		}
 
 		return $result;

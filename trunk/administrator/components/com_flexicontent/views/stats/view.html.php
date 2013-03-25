@@ -37,13 +37,9 @@ class FlexicontentViewStats extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		//Load pane behavior
-		jimport('joomla.html.pane');
-
 		//initialise variables
-		$document	= JFactory::getDocument();
-		$pane   	= JPane::getInstance('Tabs');
-		$user 		= JFactory::getUser();
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
 		
 		// Get data from the model
 		$genstats   = $this->get( 'Generalstats' );
@@ -62,10 +58,11 @@ class FlexicontentViewStats extends JViewLegacy
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
 		
-		// Create Submenu and check access
+		// **************************
+		// Create Submenu and toolbar
+		// **************************
 		FLEXISubmenu('CanStats');
-
-		//create the toolbar
+		
 		JToolBarHelper::title( JText::_( 'FLEXI_STATISTICS' ), 'stats' );
 		//JToolBarHelper::Back();
 		if ($perms->CanConfig) {
@@ -73,7 +70,12 @@ class FlexicontentViewStats extends JViewLegacy
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 		
-		$this->assignRef('pane'				, $pane);
+		//Load pane behavior
+		if (!FLEXI_J16GE) {
+			jimport('joomla.html.pane');
+			$pane = JPane::getInstance('Tabs');
+			$this->assignRef('pane'       , $pane);
+		}
 		$this->assignRef('genstats'		, $genstats);
 		$this->assignRef('popular'		, $popular);
 		$this->assignRef('rating'			, $rating);
@@ -83,7 +85,7 @@ class FlexicontentViewStats extends JViewLegacy
 		$this->assignRef('votesstats'	, $votesstats);
 		$this->assignRef('creators'		, $creators);
 		$this->assignRef('editors'		, $editors);
-
+		
 		parent::display($tpl);
 	}
 }

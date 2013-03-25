@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-$uri = & JURI::getInstance();
+$uri = JURI::getInstance();
 $current_uri = $uri->toString();
 $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;task=';
 $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
@@ -28,9 +28,11 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 	<tr>
 		<td>
 			<?php
-			echo $this->pane->startPane( 'stat-pane' );
+			echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
 			if ($this->CanUpload) :
-			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
+				echo FLEXI_J16GE ?
+					JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
+					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
 			?>
 			
 			<!-- File Upload Form -->
@@ -91,11 +93,11 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode); ?>" />
 			</form>
 			<?php
-			echo $this->pane->endPanel();
+			echo FLEXI_J16GE ? '' : $this->pane->endPanel();
 			endif;
 			?>
 			<!-- File URL Form -->
-			<?php echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ); ?>
+			<?php echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) : $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) ; ?>
 			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="urlForm" id="urlForm" method="post">
 				<fieldset>
 					<legend><?php echo JText::_( 'FLEXI_ADD_FILE_BY_URL' ); ?></legend>
@@ -137,8 +139,8 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 				</fieldset>
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&field='.$this->fieldid.'&tmpl=component'); ?>" />
 			</form>
-			<?php echo $this->pane->endPanel(); ?>
-			<?php echo $this->pane->endPane(); ?>
+			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
+			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 		</td>
 	</tr>
 </table>
@@ -204,6 +206,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 
 	<tbody>
 		<?php
+		
 		$imageexts = array('jpg','gif','png','bmp');
 		$index = JRequest::getInt('index', 0);
 		$k = 0;

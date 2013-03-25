@@ -342,9 +342,9 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		//buid types selectlist
 		if (FLEXI_J16GE) {
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'jform[type_id]', $typesselected->id, 1, 'class="required"', true );
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'jform[type_id]', $typesselected->id, 1, 'class="required"', 'jform_type_id' );
 		} else {
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected->id, 1, 'class="required"', true );
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected->id, 1, 'class="required"', 'type_id' );
 		}
 		
 		// *** BOF: J1.5 SPECIFIC SELECT LISTS

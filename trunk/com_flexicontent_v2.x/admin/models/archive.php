@@ -73,11 +73,11 @@ class FlexicontentModelArchive extends JModelList
 	function __construct()
 	{
 		parent::__construct();
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart = $mainframe->getUserStateFromRequest( $option.'.limitstart', 'limitstart', 0, 'int' );
+		$limit		= $app->getUserStateFromRequest( $option.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $app->getUserStateFromRequest( $option.'.limitstart', 'limitstart', 0, 'int' );
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
@@ -202,11 +202,11 @@ class FlexicontentModelArchive extends JModelList
 	 */
 	function _buildContentOrderBy()
 	{
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.archive.filter_order', 		'filter_order', 	'i.ordering', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.archive.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_order		= $app->getUserStateFromRequest( $option.'.archive.filter_order', 		'filter_order', 	'i.ordering', 'cmd' );
+		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.archive.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', i.ordering';
 
@@ -222,11 +222,10 @@ class FlexicontentModelArchive extends JModelList
 	 */
 	function _buildContentWhere()
 	{
-		$mainframe = JFactory::getApplication();
+		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.archive.search', 'search', '', 'string' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search = $app->getUserStateFromRequest( $option.'.archive.search', 'search', '', 'string' );
+		$search = trim( JString::strtolower( $search ) );
 
 		$where = array();
 		
@@ -234,7 +233,7 @@ class FlexicontentModelArchive extends JModelList
 		$where[] = FLEXI_J16GE ? ' c.extension="'.FLEXI_CAT_EXTENSION.'"' : ' i.sectionid = '.FLEXI_SECTION;
 		
 		if ($search) {
-			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
+			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false );
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );

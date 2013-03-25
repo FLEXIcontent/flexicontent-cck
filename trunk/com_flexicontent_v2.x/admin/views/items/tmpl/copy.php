@@ -38,12 +38,11 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 					</thead>
 					<tbody>
 						<?php
-						//dump($this->cid,'cid');
 						foreach ($this->rows as $row) :
 							if (in_array($row->id, $this->cid)) :
-								foreach ($row->categories as $cat) :
-									if ($cat->id == $row->catid) :
-										$maincat = $cat->title;
+								foreach ($row->categories as $catid) :
+									if ($catid == $row->catid) :
+										$maincat = $this->itemCats[$catid]->title;
 						?>
 						<tr>
 							<td><?php echo $row->title; ?></td>

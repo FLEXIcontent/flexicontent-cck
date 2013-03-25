@@ -39,33 +39,32 @@ class FlexicontentControllerTags extends FlexicontentController
 		parent::__construct();
 		
 		// Register Extra task
-		$this->registerTask( 'add'  ,				'edit' );
-		$this->registerTask( 'apply', 			'save' );
-		$this->registerTask( 'saveandnew',	'save' );
+		$this->registerTask( 'add',          'edit' );
+		$this->registerTask( 'apply',        'save' );
+		$this->registerTask( 'saveandnew',   'save' );
 		$this->registerTask( 'import', 			'import' );
 	}
 
 	/**
-	 * Logic to save a tag
+	 * Logic to save a record
 	 *
 	 * @access public
 	 * @return void
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function save()
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$task		= JRequest::getVar('task');
-
-		//Sanitize
-		$post = JRequest::get( 'post' );
-
+		$task  = JRequest::getVar('task');
 		$model = $this->getModel('tag');
 
-		if ( $model->store($post) ) {
-
+		// Get posted data
+		$post = JRequest::get( 'post' );
+		
+		if ( $model->store($post) )
+		{
 			switch ($task)
 			{
 				case 'apply' :
@@ -84,95 +83,118 @@ class FlexicontentControllerTags extends FlexicontentController
 
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
+			$itemcache = JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
+			$filtercache = JFactory::getCache('com_flexicontent_filters');
+			$filtercache->clean();
 
 		} else {
 
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_TAG' );
-			//JError::raiseWarning( 500, $model->getError() );
+			JError::raiseWarning( 500, $model->getError() );
 			$link 	= 'index.php?option=com_flexicontent&view=tag';
 		}
 
 		$model->checkin();
-
 		$this->setRedirect($link, $msg);
 	}
-
+	
+	
 	/**
-	 * Logic to publish categories
+	 * Check in a record
+	 *
+	 * @since	1.5
+	 */
+	function checkin()
+	{
+		$tbl = 'flexicontent_tags';
+		$redirect_url = 'index.php?option=com_flexicontent&view=tags';
+		flexicontent_db::checkin($tbl, $redirect_url, $this);
+		return;// true;
+	}
+	
+	
+	/**
+	 * Logic to publish records
 	 *
 	 * @access public
 	 * @return void
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function publish()
 	{
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$model = $this->getModel('tags');
+		
 		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_PUBLISH' ) );
-		} else {
-			$model = $this->getModel('tags');
-
-			if(!$model->publish($cid, 1)) {
-				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
-				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
-			}
-
-			$total = count( $cid );
-			$msg 	= $total.' '.JText::_( 'FLEXI_TAG_PUBLISHED' );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', '');
+			return;
 		}
+		$msg = '';
+		if(!$model->publish($cid, 1)) {
+			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
+		}
+		
+		$total = count( $cid );
+		$msg 	= $total.' '.JText::_( 'FLEXI_TAG_PUBLISHED' );
+		$cache = JFactory::getCache('com_flexicontent');
+		$cache->clean();
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', $msg );
 	}
-
+	
+	
 	/**
-	 * Logic to unpublish categories
+	 * Logic to unpublish records
 	 *
 	 * @access public
 	 * @return void
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function unpublish()
 	{
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$model = $this->getModel('tags');
+		
 		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_UNPUBLISH' ) );
-		} else {
-			$model = $this->getModel('tags');
-
-			if(!$model->publish($cid, 0)) {
-				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
-				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
-			}
-
-			$total = count( $cid );
-			$msg 	= $total.' '.JText::_( 'FLEXI_TAG_UNPUBLISHED' );
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', '');
+			return;
 		}
+		
+		
+		$msg = '';
+		if (!$model->publish($cid, 0)) {
+			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
+			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
+		}
+		$total = count( $cid );
+		$msg 	= $total.' '.JText::_( 'FLEXI_TAG_UNPUBLISHED' );
+		$cache = JFactory::getCache('com_flexicontent');
+		$cache->clean();
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', $msg );
 	}
 
+	
 	/**
-	 * Logic to delete categories
+	 * Logic to delete records
 	 *
 	 * @access public
 	 * @return void
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function remove()
 	{
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$model = $this->getModel('tags');
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_DELETE' ) );
 		} else {
-			$model = $this->getModel('tags');
 
 			if (!$model->delete($cid)) {
 				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
@@ -192,7 +214,7 @@ class FlexicontentControllerTags extends FlexicontentController
 	 *
 	 * @access public
 	 * @return void
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function cancel()
 	{
@@ -207,27 +229,34 @@ class FlexicontentControllerTags extends FlexicontentController
 	}
 
 	/**
-	 * Logic to create the view for the edit categoryscreen
+	 * Logic to create the view for the record editing
 	 *
 	 * @access public
 	 * @return void
-	 * @since 1.0
+	 * @since 1.5
 	 */
-	function edit( )
+	function edit()
 	{
 		JRequest::setVar( 'view', 'tag' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 
 		$model = $this->getModel('tag');
 		$user  = JFactory::getUser();
-
-		// Error if checkedout by another administrator
-		if ($model->isCheckedOut( $user->get('id') )) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
+		
+		// Check if record is checked out by other editor
+		if ( $model->isCheckedOut( $user->get('id') ) ) {
+			JError::raiseNotice( 500, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', '');
+			return;
 		}
-
-		$model->checkout( $user->get('id') );
-
+		
+		// Checkout the record and proceed to edit form
+		if ( !$model->checkout() ) {
+			JError::raiseWarning( 500, $model->getError() );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', '');
+			return;
+		}
+		
 		parent::display();
 	}
 

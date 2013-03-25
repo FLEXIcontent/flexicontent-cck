@@ -7,12 +7,6 @@
 		<param name="" type="separator" default="FLEXI_GENERAL_CONF" label="" level="level1" menu="hide" />
 			
 			<param name="flexi_section" type="section" size="30" default="" label="FLEXI_SELECT_A_SECTION" description="FLEXI_SELECT_A_SECTION_DESC"  menu="hide" />
-			<!--param name="search_mode" type="list" default="" label="FLEXI_SELECT_SEARCH_MODE" description="FLEXI_SELECT_SEARCH_MODE_DESC"  menu="hide">
-				<option value="0">FLEXI_PLEASE_SELECT</option>
-				<option value="1">FLEXI_JOOMLA_CONTENT_SEARCH</option>
-				<option value="2">FLEXI_STANDARD_FLEXI_SEARCH</option>
-				<option value="3">FLEXI_ADVANCED_FLEXI_SEARCH</option>
-			</param-->
 			
 			<param name="support_url" type="text" size="50" default="" label="FLEXI_HELP" description="FLEXI_HELP_DESC" menu="hide" />
 			<param name="add_tooltips" type="radio" default="1" label="FLEXI_LOAD_TOOLTIPS" description="FLEXI_LOAD_TOOLTIPS_DESC" menu="hide">
@@ -97,7 +91,7 @@
 
 		<param name="" type="separator" default="FLEXI_SEF_URL_OPTIONS" label="" level="level1" menu="hide" />
 			
-			<param name="default_menu_itemid" type="text" default="" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
+			<param name="default_menu_itemid" type="menuitem" default="" label="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS" description="FLEXI_DEFAULT_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
 			<param name="default_menuitem_preference" type="list" default="2" label="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS" description="FLEXI_ADD_DEFAULT_MENU_ITEM_TO_URLS_DESC" menu="hide">
 				<option value="2">FLEXI_DMI_ID_YES</option>
 				<option value="1">FLEXI_DMI_ID_YES_CURRENT</option>
@@ -156,8 +150,8 @@
 		<param name="" type="separator" default="FLEXI_REDIRECTIONS_CONF" label="" level="level1" menu="hide" />
 			
 			<param name="login_page" type="text" size="50" default="index.php?option=com_user&amp;view=login" label="FLEXI_LOGIN_PAGE" description="FLEXI_LOGIN_PAGE_DESC" menu="hide" />
-			<param name="unauthorized_page" type="text" size="50" default="" label="FLEXI_UNAUTHORIZED_PAGE" description="FLEXI_UNAUTHORIZED_PAGE_DESC" menu="hide" />
-			
+			<param name="unauthorized_page" type="text" size="50" default="" label="FLEXI_UNAUTHORIZED_URL" description="FLEXI_UNAUTHORIZED_URL_DESC" menu="hide" />
+			<param name="notauthurl" type="menuitem" default="" disable="separator" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" menu="hide" />
 			
 		<param name="" type="separator" default="FLEXI_FILES_CONF" label="" level="level1" menu="hide" />
 			
@@ -256,7 +250,7 @@
 			
 			
 		<param name="" type="separator" default="FLEXI_TAGS_VIEW_CONF" label="" level="level1" menu="hide" />
-			<param name="tags_view_default_menu_itemid" type="text" default="" label="FLEXI_TAGS_DEFAULT_MENU_ITEMID" description="FLEXI_TAGS_DEFAULT_MENU_ITEMID_DESC" menu="hide" />
+			<param name="tags_view_default_menu_itemid" type="menuitem" default="" label="FLEXI_TAGS_DEFAULT_MENU_ITEMID" description="FLEXI_TAGS_DEFAULT_MENU_ITEMID_DESC" menu="hide" />
 		
 		<param name="" type="separator" default="FLEXI_CATEGORY_VIEW_CONF" label="" level="level1" menu="hide" />
 			
@@ -411,6 +405,8 @@
 				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
 				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
 				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+				<option value="id">FLEXI_ORDER_HIGHEST_ITEM_ID</option>
+				<option value="rid">FLEXI_ORDER_LOWEST_ITEM_ID</option>
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</param>
 			
@@ -454,8 +450,9 @@
 			<param name="" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" hr="false" menu="hide" />
 			<param name="limit_options" type="text" default="5,10,20,30,50,100,150,200" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" menu="hide" />
 			<param name="orderby_options" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
-				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST, FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE, FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_CONFIGURED_ORDER"
-				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order" defaultvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order"
+				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_CONFIGURED_ORDER"
+				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,id,rid,order"
+				defaultvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,id,rid,order"
 				label="FLEXI_PRIMARY_ORDER_OPTIONS" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_ITEM_FILTERING_CONF" description="" level="level1" hr="false" menu="hide" />

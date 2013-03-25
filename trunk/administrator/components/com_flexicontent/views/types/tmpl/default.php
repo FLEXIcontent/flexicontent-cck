@@ -16,7 +16,11 @@
  * GNU General Public License for more details.
  */
 
-defined('_JEXEC') or die('Restricted access'); ?>
+defined('_JEXEC') or die('Restricted access');
+
+$user      = JFactory::getUser();
+
+?>
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
@@ -64,7 +68,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		$k = 0;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
-			$row = $this->rows[$i];
+			$row = & $this->rows[$i];
 			if (FLEXI_J16GE) {
 				$link 		= 'index.php?option=com_flexicontent&amp;task=types.edit&amp;cid[]='. $row->id;
 				$published 	= JHTML::_('jgrid.published', $row->published, $i, 'types.' );
@@ -74,17 +78,45 @@ defined('_JEXEC') or die('Restricted access'); ?>
 				$published 	= JHTML::_('grid.published', $row, $i );
 				$access 	= JHTML::_('grid.access', $row, $i );
 			}
-			$checked 	= JHTML::_('grid.checkedout', $row, $i );
+			
+			$checked	= JHTML::_('grid.checkedout', $row, $i );
 			$fields		= 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_type='. $row->id;
+			$canEdit    = 1;
+			$canEditOwn = 1;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
 			<td align="left">
 				<?php
-				if ( $row->checked_out && ( $row->checked_out != $this->user->get('id') ) ) {
+				
+				// Display an icon with checkin link, if current user has checked out current item
+				if ($row->checked_out) {
+					if (FLEXI_J16GE) {
+						$canCheckin = $user->authorise('core.admin', 'checkin');
+					} else if (FLEXI_ACCESS) {
+						$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
+					} else {
+						$canCheckin = $user->gid >= 24;
+					}
+					if ($canCheckin) {
+						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
+						$task_str = FLEXI_J16GE ? 'types.checkin' : 'checkin';
+						if ($row->checked_out == $user->id) {
+							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						} else {
+							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none;">';
+							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						}
+					}
+				}
+				
+				// Display title with no edit link ... if row checked out by different user -OR- is uneditable
+				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit ) ) {
 					echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8');
+				
+				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->name; ?>">

@@ -170,7 +170,7 @@ class FlexicontentHelperPerm
 				. ($specific_catids ? '  AND c.id IN ('.implode(",", $specific_catids).')' : '')
 				;
 			$db->setQuery($query);
-			$allcats = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			$allcats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			
 			foreach ($allcats as $category_id)
 			{
@@ -249,7 +249,7 @@ class FlexicontentHelperPerm
 					. ($specific_catids ? '  AND axo IN ('.implode(",", $specific_catids).')' : '')
 					;
 			$db->setQuery($query);
-			$allowedcats = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			$allowedcats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			
 			$allowedcats = $allowedcats ? $allowedcats : array();
 			// we add all descendent to the array
@@ -331,11 +331,8 @@ class FlexicontentHelperPerm
 			// Query the assets table to retrieve the asset names for the specified section
 			$query = "SELECT name FROM #__assets WHERE name like '{$asset_partial}.%';";
 			$db->setQuery($query);
-			$names = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
-			if ($db->getErrorNum()) {
-				$jAp= JFactory::getApplication();
-				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-			}
+			$names = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			
 			// Create an empty array that will contain the sections on which the user can perform the given action
 			$elements[$uid][$section][$action] = array();
@@ -448,10 +445,7 @@ class FlexicontentHelperPerm
 			// Execute the query and load the rules from the result.
 			$db->setQuery($query);
 			$rules_string	= $db->loadResult(); // $db->loadColumn();
-			if ($db->getErrorNum()) {
-				$jAp= JFactory::getApplication();
-				$jAp->enqueueMessage('SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-			}
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			
 			// Instantiate a JRules object for the asset rules
 			$rules = new JRules($rules_string);       //SAME AS: $rules = new JRules(); $rules->merge($rules_string);

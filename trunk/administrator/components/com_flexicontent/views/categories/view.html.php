@@ -51,7 +51,7 @@ class FlexicontentViewCategories extends JViewLegacy
 			$filter_language	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_language', 'filter_language', '*', 'cmd' );
 		}
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.categories.search', 			'search', 			'', 'string' );
-		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search 			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -91,14 +91,12 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		if (FLEXI_J16GE) {
 			$this->state = $this->get('State');
-			$this->pagination	= $this->get('Pagination');
 			// Preprocess the list of items to find ordering divisions.
 			foreach ($rows as &$item) {
 				$this->ordering[$item->parent_id][] = $item->id;
 			}
-		} else {
-			$pageNav 	= & $this->get( 'Pagination' );
 		}
+		$pagination 	= $this->get( 'Pagination' );
 		
 		$categories = & $globalcats;
 		if (FLEXI_J16GE) {
@@ -141,9 +139,9 @@ class FlexicontentViewCategories extends JViewLegacy
 			$this->assignRef('orderingx'	, $ordering);
 		} else {
 			$this->assignRef('CanRights'	, $CanRights);
-			$this->assignRef('pageNav'		, $pageNav);
 			$this->assignRef('ordering'		, $ordering);
 		}
+		$this->assignRef('pagination'		, $pagination);
 		$this->assignRef('user'				, $user);
 
 		parent::display($tpl);

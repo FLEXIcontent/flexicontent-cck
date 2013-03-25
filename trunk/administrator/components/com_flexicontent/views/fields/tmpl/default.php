@@ -18,7 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$cparams = & JComponentHelper::getParams( 'com_flexicontent' );
+$user    = JFactory::getUser();
+$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $ctrl = FLEXI_J16GE ? 'fields.' : '';
 $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
 //$field_model = & JModel::getInstance('field', 'FlexicontentModel'); 
@@ -114,7 +115,7 @@ $ord_grp = 1;
 	<tfoot>
 		<tr>
 			<td colspan="14">
-				<?php echo $this->pageNav->getListFooter(); ?>
+				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
 	</tfoot>
@@ -123,7 +124,6 @@ $ord_grp = 1;
 		<?php
 		$k = 0;
 		$i = 0;
-		$user =& $this->user;
 		$padcount = 0;
 		
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
@@ -242,16 +242,38 @@ $ord_grp = 1;
 			$warning	= '<span class="hasTip" title="'. JText::_ ( 'FLEXI_WARNING' ) .'::'. JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/error.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
    		?>
 		<tr class="<?php echo "row$k"; ?>" style="<?php echo $row_css; ?>">
-			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
 			<td align="left">
 				<?php
 				echo $padspacer;
-				if (
-					( $row->checked_out && ( $row->checked_out != $this->user->get('id') ) )
-					|| !$canEdit
-				 ) {
+				
+				// Display an icon with checkin link, if current user has checked out current item
+				if ($row->checked_out) {
+					if (FLEXI_J16GE) {
+						$canCheckin = $user->authorise('core.admin', 'checkin');
+					} else if (FLEXI_ACCESS) {
+						$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
+					} else {
+						$canCheckin = $user->gid >= 24;
+					}
+					if ($canCheckin) {
+						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
+						$task_str = FLEXI_J16GE ? 'types.checkin' : 'checkin';
+						if ($row->checked_out == $user->id) {
+							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						} else {
+							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none;">';
+							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						}
+					}
+				}
+				
+				// Display title with no edit link ... if row checked out by different user -OR- is uneditable
+				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit ) ) {
 					echo htmlspecialchars($row->label, ENT_QUOTES, 'UTF-8');
+				
+				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_FIELD' );?>::<?php echo $row->label; ?>">
@@ -328,8 +350,8 @@ $ord_grp = 1;
 						else echo sprintf($drag_handle_box,'_none');
 					?>
 				<?php else: ?>
-					<span><?php echo $this->pageNav->orderUpIcon( $i, true, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
-					<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
+					<span><?php echo $this->pagination->orderUpIcon( $i, true, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
+					<span><?php echo $this->pagination->orderDownIcon( $i, $n, true, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
 				<?php endif; ?>
 				
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>

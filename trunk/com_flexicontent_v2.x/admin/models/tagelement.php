@@ -53,11 +53,11 @@ class FlexicontentModelTagelement extends JModelLegacy
 	{
 		parent::__construct();
 
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart = $mainframe->getUserStateFromRequest( $option.'.tagelement.limitstart', 'limitstart', 0, 'int' );
+		$limit		= $app->getUserStateFromRequest( $option.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $app->getUserStateFromRequest( $option.'.tagelement.limitstart', 'limitstart', 0, 'int' );
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
@@ -149,11 +149,11 @@ class FlexicontentModelTagelement extends JModelLegacy
 	 */
 	function _buildContentOrderBy()
 	{
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_order		= $app->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
+		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.tags.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
 
@@ -168,18 +168,18 @@ class FlexicontentModelTagelement extends JModelLegacy
 	 */
 	function _buildContentWhere()
 	{
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$search = $mainframe->getUserStateFromRequest( $option.'.tags.search', 'search', '', 'string' );
-		$search = $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search = $app->getUserStateFromRequest( $option.'.tags.search', 'search', '', 'string' );
+		$search = trim( JString::strtolower( $search ) );
 
 		$where = array();
 
 		$where[] = 't.published = 1';
 
 		if ($search) {
-			$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
+			$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false );
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );

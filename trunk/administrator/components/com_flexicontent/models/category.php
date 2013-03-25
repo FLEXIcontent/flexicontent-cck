@@ -176,7 +176,8 @@ class FlexicontentModelCategory extends JModelLegacy
 		}
 		return false;
 	}
-
+	
+	
 	/**
 	 * Method to checkout/lock the category
 	 *
@@ -185,29 +186,26 @@ class FlexicontentModelCategory extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($pk = null)
+	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
 	{
-		if ($this->_id)
-		{
-			// Make sure we have an item id to checkout the category with
-			if(is_null($pk)) $pk = $this->_id;
-
-			$user	= JFactory::getUser();
-			$uid	= $user->get('id');
-			
-			// Lets get to it and checkout the thing...
-			$category = $this->getTable();
-			if(!$category->checkout($uid, $pk))
-			{
-				$this->setError( $this->_db->getErrorMsg() );
-				return false;
-			}
-
-			return true;
-		}
+		// Make sure we have a record id to checkout the record with
+		if ( !$pk ) $pk = $this->_id;
+		if ( !$pk ) return true;
+		
+		// Get current user
+		$user	= JFactory::getUser();
+		$uid	= $user->get('id');
+		
+		// Lets get table record and checkout the it
+		$tbl = $this->getTable();
+		if ( $tbl->checkout($uid, $this->_id) ) return true;
+		
+		// Reaching this points means checkout failed
+		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
 		return false;
 	}
-
+	
+	
 	/**
 	 * Tests if the category is checked out
 	 *
@@ -293,7 +291,7 @@ class FlexicontentModelCategory extends JModelLegacy
 			FAccess::saveaccess( $category, 'category' );
 		}
 
-		$this->_category = & $category;
+		$this->_category = $category;
 		
 		return true;
 	}

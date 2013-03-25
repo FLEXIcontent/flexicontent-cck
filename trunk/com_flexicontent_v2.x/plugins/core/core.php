@@ -582,7 +582,9 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			
 			if (!empty($query)) {
 				$db->setQuery($query);
-				$values = $db->loadAssocList('value_id', 'value');
+				$_values = $db->loadAssocList();
+				$values = array();
+				foreach ($_values as $v)  $values[$v['value_id']] = $v['value'];
 			}
 		} else {
 			$values = null;

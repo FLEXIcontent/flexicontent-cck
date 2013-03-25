@@ -58,10 +58,16 @@ class plgSystemFlexisystem extends JPlugin
 			$session->set('fcdebug', $fcdebug, 'flexicontent');
 			$fparams->set('print_logging_info', $fcdebug);
 		}
-
+		
+		$print_logging_info = $fparams->get('print_logging_info');
+		
+		// Log content plugin and other performance information
+		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
 		
 		// (a) Check-in DB table records according to time limits set
 		$this->checkinRecords();
+		
+		if ($print_logging_info) $fc_run_times['auto_checkin'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// (b) Autologin for frontend preview
 		if (!empty($username) && !empty($password) && $fparams->get('autoflogin', 0)) {

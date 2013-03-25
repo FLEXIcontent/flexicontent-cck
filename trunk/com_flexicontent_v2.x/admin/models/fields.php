@@ -68,10 +68,10 @@ class FlexicontentModelFields extends JModelList
 		parent::__construct();
 
 		$option = JRequest::getVar('option');
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 
-		$limit		= $mainframe->getUserStateFromRequest( $option.'.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart = $mainframe->getUserStateFromRequest( $option.'.fields.limitstart', 'limitstart', 0, 'int' );
+		$limit		= $app->getUserStateFromRequest( $option.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $app->getUserStateFromRequest( $option.'.fields.limitstart', 'limitstart', 0, 'int' );
 
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
@@ -164,17 +164,17 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function _buildContentOrderBy()
 	{
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order', 		'filter_order', 	't.ordering', 'cmd' );
+		$filter_type 		= $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+		$filter_order		= $app->getUserStateFromRequest( $option.'.fields.filter_order', 		'filter_order', 	't.ordering', 'cmd' );
 		if ($filter_type && $filter_order == 't.ordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.fields.filter_order', 'typeordering' );
+			$filter_order	= $app->setUserState( $option.'.fields.filter_order', 'typeordering' );
 		} else if (!$filter_type && $filter_order == 'typeordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.fields.filter_order', 't.ordering' );
+			$filter_order	= $app->setUserState( $option.'.fields.filter_order', 't.ordering' );
 		}
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
+		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.fields.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
 
 		$orderby 	= ' '.$filter_order.' '.$filter_order_Dir;
 
@@ -193,13 +193,13 @@ class FlexicontentModelFields extends JModelList
 		static $where;
 		if(!isset($where)) {
 			$option = JRequest::getVar('option');
-			$mainframe = JFactory::getApplication();
+			$app = JFactory::getApplication();
 	
-			$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
-			$filter_type 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
-			$filter_fieldtype = $mainframe->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 'filter_fieldtype', '', 'word' );
-			$search 			= $mainframe->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
-			$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+			$filter_state     = $app->getUserStateFromRequest( $option.'.fields.filter_state', 'filter_state', '', 'word' );
+			$filter_type      = $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+			$filter_fieldtype = $app->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 'filter_fieldtype', '', 'word' );
+			$search = $app->getUserStateFromRequest( $option.'.fields.search', 'search', '', 'string' );
+			$search = trim( JString::strtolower( $search ) );
 	
 			$where = array();
 	
@@ -228,7 +228,7 @@ class FlexicontentModelFields extends JModelList
 				}
 	
 			if ($search) {
-				$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
+				$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false );
 			}
 			
 			$where[] = ' (plg.extension_id IS NULL OR plg.folder="flexicontent_fields") ';
@@ -248,10 +248,10 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function _buildContentHaving()
 	{
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_assigned', 'filter_assigned', '', 'word' );
+		$filter_assigned	= $app->getUserStateFromRequest( $option.'.fields.filter_assigned', 'filter_assigned', '', 'word' );
 		
 		$having = '';
 		
@@ -503,7 +503,6 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function saveaccess($id, $access)
 	{
-		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$row = JTable::getInstance('flexicontent_fields', '');
 
@@ -574,7 +573,7 @@ class FlexicontentModelFields extends JModelList
 		}
 		
 		if ( !count( $ids_map ) ) return false; 
-		if ($copyvalues) $model->copyvalues( $ids_map );  // Also copy values
+		if ($copyvalues) $this->copyvalues( $ids_map );  // Also copy values
 		return $ids_map;
 	}
 	
@@ -590,22 +589,29 @@ class FlexicontentModelFields extends JModelList
 	{
 		if ( !count( $ids_map ) ) return false;
 		
+		$db = JFactory::getDBO();
 		foreach ($ids_map as $source_id => $target_id) {
 			// Copy field - content type assignments
 			$query = 'INSERT INTO #__flexicontent_fields_type_relations (field_id, type_id, ordering)'
 				.' SELECT '.$target_id.', type_id, ordering FROM #__flexicontent_fields_type_relations as rel'
 				.' WHERE rel.field_id='.$source_id;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+			$db->setQuery($query);
+			$db->query();
+			if ( $db->getErrorNum() ) {
+				$this->setError($this->_db->getErrorMsg());
+				return false;
+			}
 			
 			// Copy field values assigned to items
 			$query = 'INSERT INTO #__flexicontent_fields_item_relations (field_id, item_id, valueorder, value)'
 				.' SELECT '.$target_id.',item_id, valueorder, value FROM #__flexicontent_fields_item_relations as rel'
 				.' WHERE rel.field_id='.$source_id;
-			$this->_db->setQuery($query);
-			$this->_db->query();
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+			$db->setQuery($query);
+			$db->query();
+			if ( $db->getErrorNum() ) {
+				$this->setError($this->_db->getErrorMsg());
+				return false;
+			}
 		}
 		return true;
 	}
@@ -678,10 +684,10 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function move($direction)
 	{
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+		$filter_type = $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 
 		if ($filter_type == '' || $filter_type == 0)
 		{
@@ -795,10 +801,10 @@ class FlexicontentModelFields extends JModelList
 	 */
 	function saveorder($cid = array(), $order)
 	{
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$filter_type = $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
+		$filter_type = $app->getUserStateFromRequest( $option.'.fields.filter_type', 'filter_type', '', 'int' );
 
 		if ($filter_type == '' || $filter_type == 0)
 		{

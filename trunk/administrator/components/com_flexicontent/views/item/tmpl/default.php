@@ -200,7 +200,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<div class="fctabber" style=''>
 											<div class="tabbertab" style="padding: 0px;" >
 												<h3> <?php echo '-'.$itemlang.'-'; // $t->name; ?> </h3>
-												<input id="title" name="title" class="inputbox required" value="<?php echo $this->row->title; ?>" size="42" maxlength="254" />
+												<input id="title" name="title" class="inputbox required" value="<?php echo $this->row->title; ?>" size="40" maxlength="254" />
 											</div>
 											<?php foreach ($this->row->item_translations as $t): ?>
 												<?php if ($itemlang!=$t->shortcode && $t->shortcode!='*') : ?>
@@ -210,7 +210,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 														$ff_id = 'jfdata_'.$t->shortcode.'_title';
 														$ff_name = 'jfdata['.$t->shortcode.'][title]';
 														?>
-														<input class="inputbox fc_form_title" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="42" maxlength="254" />
+														<input class="inputbox fc_form_title" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->title->value; ?>" size="40" maxlength="254" />
 													</div>
 												<?php endif; ?>
 											<?php endforeach; ?>
@@ -218,7 +218,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<!-- tabber end -->
 										
 									<?php else : ?>
-										<input id="title" name="title" class="inputbox required" value="<?php echo $this->row->title; ?>" size="42" maxlength="254" />
+										<input id="title" name="title" class="inputbox required" value="<?php echo $this->row->title; ?>" size="40" maxlength="254" />
 									<?php endif; ?>
 									
 									</td>
@@ -236,7 +236,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<div class="fctabber" style=''>
 											<div class="tabbertab" style="padding: 0px;" >
 												<h3> <?php echo '-'.$itemlang.'-'; // $t->name; ?> </h3>
-												<input id="alias" name="alias" class="inputbox" value="<?php echo $this->row->alias; ?>" size="42" maxlength="254" />
+												<input id="alias" name="alias" class="inputbox" value="<?php echo $this->row->alias; ?>" size="40" maxlength="254" />
 											</div>
 											<?php foreach ($this->row->item_translations as $t): ?>
 												<?php if ($itemlang!=$t->shortcode && $t->shortcode!='*') : ?>
@@ -246,7 +246,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 														$ff_id = 'jfdata_'.$t->shortcode.'_alias';
 														$ff_name = 'jfdata['.$t->shortcode.'][alias]';
 														?>
-														<input class="inputbox fc_form_alias" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="42" maxlength="254" />
+														<input class="inputbox fc_form_alias" style='margin:0px;' type="text" id="<?php echo $ff_id; ?>" name="<?php echo $ff_name; ?>" value="<?php echo @$t->fields->alias->value; ?>" size="40" maxlength="254" />
 													</div>
 												<?php endif; ?>
 											<?php endforeach; ?>
@@ -254,7 +254,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<!-- tabber end -->
 										
 									<?php else : ?>
-										<input id="alias" name="alias" class="inputbox" value="<?php echo $this->row->alias; ?>" size="42" maxlength="254" />
+										<input id="alias" name="alias" class="inputbox" value="<?php echo $this->row->alias; ?>" size="40" maxlength="254" />
 									<?php endif; ?>
 									
 									</td>

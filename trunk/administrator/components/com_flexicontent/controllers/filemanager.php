@@ -435,14 +435,20 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		JRequest::setVar( 'view', 'file' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 		
-		// Error if checkedout by another administrator
-		if ($model->isCheckedOut( $user->get('id') )) {
-			$edit_task = FLEXI_J16GE ? "task=filemanager.edit" : "controller=filemanager&task=edit";
-			$this->setRedirect( 'index.php?option=com_flexicontent&'.$edit_task, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
+		// Check if record is checked out by other editor
+		if ( $model->isCheckedOut( $user->get('id') ) ) {
+			JError::raiseNotice( 500, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER'] : 'index.php?option=com_flexicontent&view=filemanager', '');
+			return;
 		}
-
-		$model->checkout( $user->get('id') );
-
+		
+		// Checkout the record and proceed to edit form
+		if ( !$model->checkout() ) {
+			JError::raiseWarning( 500, $model->getError() );
+			$this->setRedirect( $_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER'] : 'index.php?option=com_flexicontent&view=filemanager', '');
+			return;
+		}
+		
 		parent::display();
 	}
 	
@@ -583,6 +589,21 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager' );
 	}
+	
+	
+	/**
+	 * Check in a record
+	 *
+	 * @since	1.5
+	 */
+	function checkin()
+	{
+		$tbl = 'flexicontent_files';
+		$redirect_url = $_SERVER['HTTP_REFERER'] ? $_SERVER['HTTP_REFERER'] : 'index.php?option=com_flexicontent&view=filemanager';
+		flexicontent_db::checkin($tbl, $redirect_url, $this);
+		return;// true;
+	}
+	
 	
 	/**
 	 * Logic to publish a file

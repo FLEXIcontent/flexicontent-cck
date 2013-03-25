@@ -31,51 +31,49 @@ if (FLEXI_J16GE) {
  */
 class flexicontent_fields extends JTable
 {
-	/**
-	 * Primary Key
-	 * @var int
-	 */
-	var $id 				= null;
 	/** @var int */
-	var $field_type			= null;
+	var $id 					= null;
+	/** @var int */
+	/** @var int */
+	var $field_type		= null;
 	/** @var string */
-	var $name				= '';
+	var $name					= '';
 	/** @var string */
 	var $label				= '';
 	/** @var string */
-	var $description		= '';
-	/** @var int */
-	var $isfilter			= 0;
+	var $description	= '';
 	/** @var int */
 	var $iscore				= 0;
 	/** @var int */
 	var $issearch			= 1;
 	/** @var int */
-	var $isadvsearch		= 0;
+	var $isadvsearch	= 0;
 	/** @var int */
-	var $isadvfilter		= 0;
+	var $isfilter			= 0;
+	/** @var int */
+	var $isadvfilter	= 0;
 	/** @var int */
 	var $untranslatable	= 0;
 	/** @var int */
-	var $formhidden	= 0;
+	var $formhidden			= 0;
 	/** @var int */
 	var $valueseditable	= 0;
 	/** @var int */
-	var $edithelp	= 2;
+	var $edithelp			= 2;
 	/** @var string */
-	var $positions			= '';
+	var $positions		= '';
 	/** @var string */
 	var $attribs	 		= null;
 	/** @var int */
 	var $published			= null;
 	/** @var int */
-	var $checked_out 		= 0;
+	var $checked_out		= 0;
 	/** @var date */
 	var $checked_out_time	= '';
 	/** @var int */
 	var $access 			= 0;
 	/** @var int */
-	var $ordering 			= null;
+	var $ordering 		= null;
 
 	function flexicontent_fields(& $db) {
 		parent::__construct('#__flexicontent_fields', 'id', $db);
@@ -90,7 +88,7 @@ class flexicontent_fields extends JTable
 			JError::raiseWarning('SOME_ERROR_CODE', $this->_error );
 			return false;
 		}
-				
+		
 		//$newname = str_replace('-', '', JFilterOutput::stringURLSafe($this->label));
 
 		$pattern = '/^[a-z_]+[a-z_0-9]+$/i';
@@ -102,7 +100,7 @@ class flexicontent_fields extends JTable
 			$msg = JText::sprintf('FLEXI_WARN_FIELD_NAME_CORRECTED', $name, $this->name);
 			JError::raiseWarning(100, $msg);
 		}
-
+		
 		/** check for existing name */
 		$query = 'SELECT id'
 				.' FROM #__flexicontent_fields'

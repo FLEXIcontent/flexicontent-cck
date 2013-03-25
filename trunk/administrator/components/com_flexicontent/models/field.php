@@ -213,17 +213,17 @@ class FlexicontentModelField extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkin()
+	function checkin($pk = NULL)
 	{
-		if ($this->_id)
-		{
-			$field = JTable::getInstance('flexicontent_fields', '');
-			$user  = JFactory::getUser();
-			return $field->checkout($user->get('id'), $this->_id);
+		if (!$pk) $pk = $this->_id;
+		if ($pk) {
+			$item = JTable::getInstance('flexicontent_fields', '');
+			return $item->checkin($pk);
 		}
 		return false;
 	}
-
+	
+	
 	/**
 	 * Method to checkout/lock the field
 	 *
@@ -232,22 +232,26 @@ class FlexicontentModelField extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($uid = null)
+	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
 	{
-		if ($this->_id)
-		{
-			// Make sure we have a user id to checkout the group with
-			if (is_null($uid)) {
-				$user	= JFactory::getUser();
-				$uid	= $user->get('id');
-			}
-			// Lets get to it and checkout the thing...
-			$field = JTable::getInstance('flexicontent_fields', '');
-			return $field->checkout($uid, $this->_id);
-		}
+		// Make sure we have a record id to checkout the record with
+		if ( !$pk ) $pk = $this->_id;
+		if ( !$pk ) return true;
+		
+		// Get current user
+		$user	= JFactory::getUser();
+		$uid	= $user->get('id');
+		
+		// Lets get table record and checkout the it
+		$tbl = JTable::getInstance('flexicontent_fields', '');
+		if ( $tbl->checkout($uid, $this->_id) ) return true;
+		
+		// Reaching this points means checkout failed
+		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
 		return false;
 	}
-
+	
+	
 	/**
 	 * Tests if the field is checked out
 	 *
@@ -287,7 +291,7 @@ class FlexicontentModelField extends JModelLegacy
 
 		// NOTE: 'data' is post['jform'] for J2.5 (this is done by the controller or other caller)
 		$field  = $this->getTable('flexicontent_fields', '');
-		$types  = $data['tid'];
+		$types  = isset($data['tid']) ? $data['tid'] : array(); // types to which the field is being assigned
 		
 		// Support for 'dirty' field properties
 		if ($data['id']) {
@@ -306,7 +310,7 @@ class FlexicontentModelField extends JModelLegacy
 			else if ($data['isadvfilter']==1 && $field->isadvfilter==0) $data['isadvfilter']=2;  // Becomes dirty ON
 			
 			// FORCE dirty OFF, if field is being unpublished -and- is not already normal OFF
-			if ($data['published']==0 && $field->published==1) {
+			if ( isset($data['published']) && $data['published']==0 && $field->published==1 ) {
 				if ($field->issearch!=0) $data['issearch'] = -1;
 				if ($field->isadvsearch!=0) $data['isadvsearch'] = -1;
 				if ($field->isadvfilter!=0) $data['isadvfilter'] = -1;
@@ -385,14 +389,14 @@ class FlexicontentModelField extends JModelLegacy
 				. ' FROM #__flexicontent_types'
 				;
 			$this->_db->setQuery($query);
-			$types = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+			$types = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		}
 		
 		// Store field to types relations
 		// delete relations which type is not part of the types array anymore
 		$query 	= 'DELETE FROM #__flexicontent_fields_type_relations'
 			. ' WHERE field_id = '.$field->id
-			. ($types ? ' AND type_id NOT IN (' . implode(', ', $types) . ')' : '')
+			. (!empty($types) ? ' AND type_id NOT IN (' . implode(', ', $types) . ')' : '')
 			;
 		$this->_db->setQuery($query);
 		$this->_db->query();
@@ -403,7 +407,7 @@ class FlexicontentModelField extends JModelLegacy
 			. ' WHERE field_id = '.$field->id
 			;
 		$this->_db->setQuery($query);
-		$used = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$used = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		
 		foreach($types as $type)
 		{
@@ -454,7 +458,7 @@ class FlexicontentModelField extends JModelLegacy
 	{
 		$query = 'SELECT DISTINCT type_id FROM #__flexicontent_fields_type_relations WHERE field_id = ' . (int)$this->_id;
 		$this->_db->setQuery($query);
-		$used = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$used = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		return $used;
 	}
 	

@@ -462,10 +462,12 @@ class com_flexicontentInstallerScript
 					if ($files_tbl_exists)   $tbls[] = "#__flexicontent_files";
 					if ($fields_tbl_exists)  $tbls[] = "#__flexicontent_fields";
 					if ($types_tbl_exists)   $tbls[] = "#__flexicontent_types";
-					if (count($tbls))  $tbl_fields = $db->getTableFields($tbls);
+					if ( $advsearch_index_tbl_exists)
+						$tbls[] = "#__flexicontent_advsearch_index";
+					if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
+					else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
 					
 					$queries = array();
-					
 					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__flexicontent_files'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL AFTER `altname`";
 					}
@@ -487,7 +489,7 @@ class com_flexicontentInstallerScript
 					if ( $fields_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_fields']) && FLEXI_J16GE) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD COLUMN `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
-					if ( $types_tbl_exists && !array_key_exists('asset_id', $tbl_types['#__flexicontent_types']) && FLEXI_J16GE) {
+					if ( $types_tbl_exists && !array_key_exists('asset_id', $tbl_fields['#__flexicontent_types']) && FLEXI_J16GE) {
 						$queries[] = "ALTER TABLE `#__flexicontent_types` ADD COLUMN `asset_id` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `id`";
 					}
 					foreach ($queries as $query) {
@@ -509,7 +511,6 @@ class com_flexicontentInstallerScript
 					<?php
 					
 					if ( $advsearch_index_tbl_exists) {
-						$tbl_fields = $db->getTableFields(  array( "#__flexicontent_advsearch_index" ) );
 				    $queries = array();
 				    
 				    $db->setQuery("SHOW INDEX FROM #__flexicontent_advsearch_index");

@@ -30,9 +30,11 @@ table#filemanager-zone label {
 	<tr>
 		<td>
 			<?php
-			echo $this->pane->startPane( 'stat-pane' );
+			echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
 			if ($this->CanUpload) :
-			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
+				echo FLEXI_J16GE ?
+					JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
+					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
 			?>
 		    <?php if ($this->require_ftp): ?>
             <form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>ftpValidate" name="ftpForm" id="ftpForm" method="post">
@@ -116,11 +118,11 @@ table#filemanager-zone label {
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 			</form>
 			<?php
-			echo $this->pane->endPanel();
+			echo FLEXI_J16GE ? '' : $this->pane->endPanel();
 			endif;
 			?>
 			<!-- File URL Form -->
-			<?php echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ); ?>
+			<?php echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) : $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) ; ?>
 			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="urlForm" id="urlForm" method="post">
 				<fieldset>
 					<legend><?php echo JText::_( 'FLEXI_ADD_FILE_BY_URL' ); ?></legend>
@@ -172,10 +174,10 @@ table#filemanager-zone label {
 				</fieldset>
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 			</form>
-			<?php echo $this->pane->endPanel(); ?>
+			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 			<?php
 			if ($this->CanUpload) :
-			echo $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' );
+				echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' ) : $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' ) ;
 			?>
 			<!-- File from server Form -->
 			<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="urlForm" id="urlForm" method="post">
@@ -257,10 +259,10 @@ table#filemanager-zone label {
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 			</form>
 			<?php
-			echo $this->pane->endPanel();
+			echo FLEXI_J16GE ? '' : $this->pane->endPanel();
 			endif;
 			?>
-			<?php echo $this->pane->endPane(); ?>
+			<?php echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane();?>
 		</td>
 	</tr>
 </table>

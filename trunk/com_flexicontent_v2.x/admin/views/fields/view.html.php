@@ -36,40 +36,39 @@ class FlexicontentViewFields extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		$mainframe = JFactory::getApplication();
-		$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
-
 		//initialise variables
-		$db  		  = JFactory::getDBO();
-		$document	= JFactory::getDocument();
-		$user     = JFactory::getUser();
-		$option   = JRequest::getVar('option');
+		$app       = JFactory::getApplication();
+		$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
+		$user      = JFactory::getUser();
+		$db        = JFactory::getDBO();
+		$document  = JFactory::getDocument();
+		$option    = JRequest::getVar('option');
 		
 		flexicontent_html::loadJQuery();
 		JHTML::_('behavior.tooltip');
 		
 		//get vars
-		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_assigned', 	'filter_assigned', 	'', 'word' );
-		$filter_fieldtype		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_state', 		'filter_state', 	'', 'word' );
-		$filter_type		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_type', 		'filter_type', 		'', 'int' );
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order', 		'filter_order', 	't.ordering', 'cmd' );
+		$filter_assigned  = $app->getUserStateFromRequest( $option.'.fields.filter_assigned', 	'filter_assigned', 	'', 'word' );
+		$filter_fieldtype = $app->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.fields.filter_state', 		'filter_state', 	'', 'word' );
+		$filter_type      = $app->getUserStateFromRequest( $option.'.fields.filter_type', 		'filter_type', 		'', 'int' );
+		$filter_order     = $app->getUserStateFromRequest( $option.'.fields.filter_order', 		'filter_order', 	't.ordering', 'cmd' );
 		if ($filter_type && $filter_order == 't.ordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.fields.filter_order', 'typeordering' );
+			$filter_order	= $app->setUserState( $option.'.fields.filter_order', 'typeordering' );
 		} else if (!$filter_type && $filter_order == 'typeordering') {
-			$filter_order	= $mainframe->setUserState( $option.'.fields.filter_order', 't.ordering' );
+			$filter_order	= $app->setUserState( $option.'.fields.filter_order', 't.ordering' );
 		}
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.fields.search', 			'search', 			'', 'string' );
-		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.fields.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
+		$search 			= $app->getUserStateFromRequest( $option.'.fields.search', 			'search', 			'', 'string' );
+		$search 			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
 		
 		if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
 		{
-			$notice_content_type_order	= $mainframe->getUserStateFromRequest( $option.'.fields.notice_content_type_order',	'notice_content_type_order',	0, 'int' );
+			$notice_content_type_order = $app->getUserStateFromRequest( $option.'.fields.notice_content_type_order',	'notice_content_type_order',	0, 'int' );
 			if (!$notice_content_type_order) {
-				$mainframe->setUserState( $option.'.fields.notice_content_type_order', 1 );
-				$mainframe->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_BY_TYPE'), 'notice');
-				$mainframe->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
+				$app->setUserState( $option.'.fields.notice_content_type_order', 1 );
+				$app->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_BY_TYPE'), 'notice');
+				$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
 			}
 		}
 		
@@ -135,10 +134,10 @@ class FlexicontentViewFields extends JViewLegacy
 		}
 		
 		//Get data from the model
-		$rows      	= & $this->get( FLEXI_J16GE ? 'Items' : 'Data' );
-		$pageNav 	= & $this->get( 'Pagination' );
-		$types		= & $this->get( 'Typeslist' );
-		$fieldtypes = & $this->get( 'Fieldtypes' );
+		$rows       = $this->get( FLEXI_J16GE ? 'Items' : 'Data' );
+		$pagination = $this->get( 'Pagination' );
+		$types      = $this->get( 'Typeslist' );
+		$fieldtypes = $this->get( 'Fieldtypes' );
 
 		$lists = array();
 		
@@ -188,9 +187,8 @@ class FlexicontentViewFields extends JViewLegacy
 		$this->assignRef('filter_type'  , $filter_type);
 		$this->assignRef('lists'      	, $lists);
 		$this->assignRef('rows'      	, $rows);
-		$this->assignRef('user'      	, $user);
 		$this->assignRef('ordering'		, $ordering);
-		$this->assignRef('pageNav' 		, $pageNav);
+		$this->assignRef('pagination'	, $pagination);
 
 		parent::display($tpl);
 	}

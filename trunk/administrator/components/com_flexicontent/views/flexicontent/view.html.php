@@ -37,9 +37,13 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		$mainframe = JFactory::getApplication();
-		$config = JFactory::getConfig();
-		$params = JComponentHelper::getParams('com_flexicontent');
+		$app      = JFactory::getApplication();
+		$config   = JFactory::getConfig();
+		$params   = JComponentHelper::getParams('com_flexicontent');
+		$document	= JFactory::getDocument();
+		$session  = JFactory::getSession();
+		$user     = JFactory::getUser();		
+		$db       = JFactory::getDBO();
 		
 		// Special displaying when getting flexicontent version
 		$layout = JRequest::getVar('layout', 'default');
@@ -49,7 +53,8 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		}
 		
 		//Load pane behavior
-		jimport('joomla.html.pane');
+		if (!FLEXI_J16GE)
+			jimport('joomla.html.pane');
 		// load the file system librairies
 		jimport('joomla.filesystem.folder');
 		jimport('joomla.filesystem.file');	
@@ -72,7 +77,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 				if (!JFile::copy($source, $dest)) {
 					JError::raiseWarning(100, JText::_('FLEXIcontent: Unable to copy jComments plugin'));
 				} else {
-					$mainframe->enqueueMessage(JText::_('Copied FLEXIcontent jComments plugin'));
+					$app->enqueueMessage(JText::_('Copied FLEXIcontent jComments plugin'));
 				}
 			}
 		} else {
@@ -99,21 +104,18 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			}
 		}
 		
-		//initialise variables
-		$document	= JFactory::getDocument();
+		// initialise template related variables
 		if (!FLEXI_J16GE)
 			$pane = JPane::getInstance('sliders');
-		$template	= $mainframe->getTemplate();
-		$user = JFactory::getUser();		
-		// Get data from the model
-		$db = JFactory::getDBO();
-		$draft	= $this->get( 'Draft' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['draft'] = $db->loadResult();
-		$pending = $this->get( 'Pending' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['pending'] = $db->loadResult();
-		$revised = $this->get( 'Revised' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['revised'] = $db->loadResult();
-		$inprogress = $this->get( 'Inprogress' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['inprogress'] = $db->loadResult();
+		$template	= $app->getTemplate();
 		$themes		= flexicontent_tmpl::getThemes();
 		
-		$session  = JFactory::getSession();
+		// Get data from the model
+		$draft      = $this->get( 'Draft' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['draft'] = $db->loadResult();
+		$pending    = $this->get( 'Pending' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['pending'] = $db->loadResult();
+		$revised    = $this->get( 'Revised' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['revised'] = $db->loadResult();
+		$inprogress = $this->get( 'Inprogress' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['inprogress'] = $db->loadResult();
+		
 		
 		// 1. CHECK REQUIRED NON-AUTOMATIC TASKs
 		//  THEY ARE TASKs THAT USER MUST COMPLETE MANUALLY
@@ -214,9 +216,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$lists['missing_lang'] = $model->processlanguagefiles();
 
 		// Get the default copyright values to populate the form automatically
-		$mailfrom = $mainframe->getCfg('mailfrom');
-		$fromname = $mainframe->getCfg('fromname');
-		$website 	= $mainframe->getCfg('live_site');
+		$mailfrom = $app->getCfg('mailfrom');
+		$fromname = $app->getCfg('fromname');
+		$website 	= $app->getCfg('live_site');
 
 				
 		if (!FLEXI_J16GE)
@@ -295,7 +297,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 				<?php
 				}
 
-					echo JHTML::_('image', 'administrator/components/com_flexicontent/assets/images/'.$image, $text );
+					echo FLEXI_J16GE ?
+						JHTML::image('administrator/components/com_flexicontent/assets/images/'.$image, $text) :
+						JHTML::_('image.site', $image, '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, $text) ;
 				?>
 					<span><?php echo $text; ?></span>
 				</a>

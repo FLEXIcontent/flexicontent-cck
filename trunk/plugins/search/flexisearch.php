@@ -186,7 +186,8 @@ class plgSearchFlexisearch extends JPlugin
 		$wheres = array();
 		switch ($phrase) {
 			case 'exact':
-				$text		= $db->Quote('%'.$db->getEscaped($text, true).'%', false);
+				$text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
+				$text = $db->Quote('%'.$text.'%', false);
 				$wheres2	= array();
 				if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'a.title LIKE '.$text;}
 				if (in_array('FlexisearchDesc', $searchAreas))		{$wheres2[]	= 'a.introtext LIKE '.$text;	$wheres2[]	= 'a.fulltext LIKE '.$text;}
@@ -201,7 +202,8 @@ class plgSearchFlexisearch extends JPlugin
 				$words = explode(' ', $text);
 				$wheres = array();
 				foreach ($words as $word) {
-					$word		= $db->Quote('%'.$db->getEscaped($word, true).'%', false);
+					$word = FLEXI_J16GE ? $db->escape($word, true) : $db->getEscaped($word, true);
+					$word = $db->Quote('%'.$word.'%', false);
 					$wheres2	= array();
 					if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'a.title LIKE '.$word;}
 					if (in_array('FlexisearchDesc', $searchAreas))		{$wheres2[]	= 'a.introtext LIKE '.$word;	$wheres2[]	= 'a.fulltext LIKE '.$word;}

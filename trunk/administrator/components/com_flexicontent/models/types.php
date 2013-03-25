@@ -88,9 +88,9 @@ class FlexicontentModelTypes extends JModelLegacy
 		// Lets load the types if it doesn't already exist
 		if (empty($this->_data))
 		{
+			$db = JFactory::getDBO();
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db = JFactory::getDBO();
 			$db->setQuery("SELECT FOUND_ROWS()");
 			$this->_total = $db->loadResult();
 		}
@@ -202,7 +202,7 @@ class FlexicontentModelTypes extends JModelLegacy
 		
 		$filter_state = $app->getUserStateFromRequest( $option.'.types.filter_state', 'filter_state', '', 'word' );
 		$search  = $app->getUserStateFromRequest( $option.'.types.search', 'search', '', 'string' );
-		$search = $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search = trim( JString::strtolower( $search ) );
 
 		$where = array();
 

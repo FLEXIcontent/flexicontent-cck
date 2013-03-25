@@ -51,10 +51,8 @@ class JFormFieldAuthor extends JFormField
 			; 
 		$db->setQuery($query);
 		$users = $db->loadObjectList();
-		if ( $db->getErrorNum() ) {
-			$jAp=& JFactory::getApplication();
-			$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-		}
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		
 		$attribs = "";
 		return JHTML::_('select.genericlist', $users, $this->name, $attribs, 'value', 'text', $this->value);
 		//return JHTML::_('list.users', $this->name, $this->value);

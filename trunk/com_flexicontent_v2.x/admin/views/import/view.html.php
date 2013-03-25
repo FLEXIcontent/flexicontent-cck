@@ -77,7 +77,6 @@ class FlexicontentViewImport extends JViewLegacy
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 		
-		$db = JFactory::getDBO();
 		$query = 'SELECT id, name'
 			. ' FROM #__flexicontent_types'
 			. ' WHERE published = 1'
@@ -106,9 +105,8 @@ class FlexicontentViewImport extends JViewLegacy
 		//build languages list
 		// Retrieve author configuration
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-		if ( $authorparams = $db->loadResult() ) {
+		if ( $authorparams = $db->loadResult() )
 			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
-		}
 		
 		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);

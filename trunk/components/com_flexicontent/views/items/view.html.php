@@ -56,7 +56,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		if (!is_array($globalnopath))     $globalnopath	= array();
 		
 		// Initialize variables
-		$mainframe  = &JFactory::getApplication();
+		$app  = &JFactory::getApplication();
 		$session    = & JFactory::getSession();
 		$dispatcher = & JDispatcher::getInstance();
 		$document   = & JFactory::getDocument();
@@ -72,31 +72,28 @@ class FlexicontentViewItems  extends JViewLegacy
 		
 		$Itemid		= JRequest::getInt('Itemid', 0);
 		
-		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$cparams = clone($mainframe->getParams('com_flexicontent'));
-		
-		$print_logging_info = $cparams->get('print_logging_info');
-		if ( $print_logging_info )  global $fc_run_times;
-		
+		// Get the COMPONENT only parameters and merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
 		if ($menu) {
-			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
-			// In J1.6+ the above function does not merge current menu item parameters,
-			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
-			if (FLEXI_J16GE) $cparams->merge($menuParams);
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
 		}
 		
+		$print_logging_info = $params->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		
 		//add css file
-		if (!$cparams->get('disablecss', '')) {
+		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
 		
 		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
 		//special to hide the joomfish language selector on item views
-		if ($cparams->get('disable_lang_select', 0)) {
+		if ($params->get('disable_lang_select', 0)) {
 			$css = '#jflanguageselection { visibility:hidden; }'; 
 			$document->addStyleDeclaration($css);
 		}
@@ -108,10 +105,11 @@ class FlexicontentViewItems  extends JViewLegacy
 		
 		// Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
 		// indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
-		$item = & $model->getItem(null, $check_view_access=2);
+		$item = $model->getItem(null, $check_view_access=2);
 		
 		// Set item parameters as VIEW's parameters (item parameters are merged with component/page/type/current category/access parameters already)
-		$params = & $item->parameters;
+		$params = $item->parameters;
+		
 		
 		// ********************
 		// ITEM LAYOUT handling
@@ -137,7 +135,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		
 		// (e) Verify the item layout is within templates: Content Type default template OR Content Type allowed templates
 		if ( $ilayout!=$type_default_layout && count($allowed_tmpls) && !in_array($ilayout,$allowed_tmpls) ) {
-			$mainframe->enqueueMessage("<small>Current Item Layout Template is '$ilayout':<br>- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Content Type Default Template Layout: '$type_default_layout'</small>", 'notice');
+			$app->enqueueMessage("<small>Current Item Layout Template is '$ilayout':<br>- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Content Type Default Template Layout: '$type_default_layout'</small>", 'notice');
 			$ilayout = $type_default_layout;
 		}
 		
@@ -147,7 +145,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		// (g) Verify the item layout exists
 		if ( !isset($themes->items->{$ilayout}) ) {
 			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : 'default';
-			$mainframe->enqueueMessage("<small>Current Item Layout Template is '$ilayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_ilayout'</small>", 'notice');
+			$app->enqueueMessage("<small>Current Item Layout Template is '$ilayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_ilayout'</small>", 'notice');
 			$ilayout = $fixed_ilayout;
 			if (FLEXI_FISH || FLEXI_J16GE) FLEXIUtilities::loadTemplateLanguageFile( $ilayout ); // Manually load Template-Specific language file of back fall ilayout
 		}
@@ -228,11 +226,11 @@ class FlexicontentViewItems  extends JViewLegacy
 		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
-			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = $mainframe->getCfg('sitename') ." - ". $doc_title ;
+			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
+				$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
 			}
-			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = $doc_title ." - ". $mainframe->getCfg('sitename') ;
+			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
+				$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
 			}
 		}
 		
@@ -336,7 +334,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		// ********************************************************************************************
 		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
 		// ********************************************************************************************
-		$pathway 	=& $mainframe->getPathWay();
+		$pathway = $app->getPathWay();
 		
 		// Clear pathway, if automatic pathways are enabled
 		if ( $params->get('automatic_pathways', 0) ) {
@@ -370,12 +368,10 @@ class FlexicontentViewItems  extends JViewLegacy
 		// Set item's META data: desc, keyword, title, author
 		if ($item->metadesc)		$document->setDescription( $item->metadesc );
 		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
-		if ($mainframe->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
-		if ($mainframe->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
+		if ($app->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
+		if ($app->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
 		
 		// Set remaining META keys
-		//$mdata = FLEXI_J16GE ? new JRegistry($item->metadata) : new JParameter($item->metadata);
-		//$mdata = $mdata->toArray();
 		$mdata = $item->metadata->toArray();
 		foreach ($mdata as $k => $v)
 		{
@@ -404,12 +400,12 @@ class FlexicontentViewItems  extends JViewLegacy
 		 * Designed and developed by the JoomlaWorks team
 		 */
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates');
-		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates');
+		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates');
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.'default');
-		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.'default');
+		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.'default');
 		if ($ilayout) {
 			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$ilayout);
-			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout);
+			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout);
 		}
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
@@ -435,56 +431,59 @@ class FlexicontentViewItems  extends JViewLegacy
 		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
 		// Initialize variables
-		$mainframe	= & JFactory::getApplication();
-		$cparams    = & JComponentHelper::getParams('com_flexicontent');
-		$dispatcher	= & JDispatcher::getInstance();
-		$document		= & JFactory::getDocument();
-		$user				= & JFactory::getUser();
-		$uri				= & JFactory::getURI();
-		$db					= &JFactory::getDBO();
+		$app	= JFactory::getApplication();
+		$dispatcher	= JDispatcher::getInstance();
+		$document		= JFactory::getDocument();
+		$session    = JFactory::getSession();
+		$user				= JFactory::getUser();
+		$uri				= JFactory::getURI();
+		$db					= JFactory::getDBO();
 		$nullDate		= $db->getNullDate();
 		$menu				= JSite::getMenu()->getActive();
 		
-		// Some flags
-		$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
-		$print_logging_info = $cparams->get('print_logging_info');
+		// Get the COMPONENT only parameters and merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
+		}
 		
+		// Some flags
+		$enable_translation_groups = $params->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
+		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		
-		if ($menu) {
-			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
-		}
-		
-		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($mainframe->getParams('com_flexicontent'));
-		
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE && $menu) {
-			$params->merge($menuParams);
-		}
-		
-		// Initialiaze JRequest variables
-		JRequest::setVar('loadcurrent', false);  // we are in edit() task, so we load the last item version by default
-		if ( isset($menu->query['typeid']) )
-			JRequest::setVar('typeid', $menu->query['typeid']);  // This also forces zero if value not set
+		// We rely on typeid Request variable to decide type for new items so make sure this is set, ZERO means allow user to select type
+		if ( $menu && isset($menu->query['typeid']) )
+			JRequest::setVar('typeid', (int)$menu->query['typeid']);  // This also forces zero if value not set
 		$typeid = JRequest::getVar('typeid', 0);
 		
-		// Get item and model
-		$model = & $this->getModel();
+		
+		// ******************************************************
+		// Get item, model and create form (that loads item data)
+		// ******************************************************
 		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$item = & $this->get('Item');
+		
+		$model = $this->getModel();
+		$item = $this->get('Item');
 		if (FLEXI_J16GE) {
-			$form = & $this->get('Form');
+			$form = $this->get('Form');
 		}
+		
 		if ( $print_logging_info ) @$fc_run_times['get_item_data'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
+		
+		// *********************************************************************************************************
+		// Get language stuff, and also load Template-Specific language file to override or add new language strings
+		// *********************************************************************************************************
 		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
 		if (FLEXI_FISH || FLEXI_J16GE)   $langs = FLEXIUtilities::getLanguages('code');
 		
-		// Load Template-Specific language file to override or add new language strings
 		if (FLEXI_FISH || FLEXI_J16GE)
 			FLEXIUtilities::loadTemplateLanguageFile( $item->parameters->get('ilayout', 'default') );
+		
+		
 		
 		// ****************************************************************************************
 		// CHECK EDIT / CREATE PERMISSIONS (this is duplicate since it also done at the controller)
@@ -496,80 +495,150 @@ class FlexicontentViewItems  extends JViewLegacy
 		// A unique item id
 		JRequest::setVar( 'unique_tmp_itemid', $item->id ? $item->id : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
 		
-		if (!$isnew) {
+		// Component / Menu Item parameters
+		$allowunauthorize   = $params->get('allowunauthorize', 0);     // allow unauthorised user to submit new content
+		$unauthorized_page  = $params->get('unauthorized_page', '');   // page URL for unauthorized users (via global configuration)
+		$notauth_itemid     = $params->get('notauthurl', '');          // menu itemid (to redirect) when user is not authorized to create content
+		
+		// User Group / Author parameters
+		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
+		$authorparams = $db->loadResult();
+		$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
+		$max_auth_limit = $authorparams->get('max_auth_limit', 0);  // maximum number of content items the user can create
+		
+		if (!$isnew)
+		{
 			// EDIT action
+			
+			// Finally check if item is currently being checked-out (currently being edited)
+			if ($model->isCheckedOut($user->get('id')))
+			{
+				$msg = JText::sprintf('FLEXI_DESCBEINGEDITTED', $model->get('title'));
+				$this->setRedirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), $msg);
+				return;
+			}
+			
+			//Checkout the item
+			$model->checkout();
+			
 			if (FLEXI_J16GE) {
-				$asset = 'com_content.article.' . $item->id;
-				$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+				$asset = 'com_content.article.' . $model->get('id');
+				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
 				// ALTERNATIVE 1
-				//$has_edit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 				// ALTERNATIVE 2
-				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
-				//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $isOwner) ;
+				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
+				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else if ($user->gid >= 25) {
-				$has_edit = true;
+				$canEdit = true;
 			} else if (FLEXI_ACCESS) {
-				$rights		= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-				$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $isOwner);
+				$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $model->get('id'), $model->get('catid'));
+				$canEdit = in_array('edit', $rights) || (in_array('editown', $rights) && $model->get('created_by') == $user->get('id')) ;
 			} else {
-				$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $isOwner);
-			}
-
-			if (!$has_edit) {
-				// user isn't authorize to edit THIS item
-				$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
-				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
-			}
-		} else {
-			// CREATE action
-			if (FLEXI_J16GE) {
-				$can_create = $model->getItemAccess()->get('access-create');
-				// ALTERNATIVE 1
-				//$allowed_cats = FlexicontentHelperPerm::checkUserElementsAccess($user->get('id'), 'core.create', 'category');
-				//$can_create = count($allowed_cats) > 1;
-			} else if ($user->gid >= 25) {
-				$can_create = 1;
-			} else if (FLEXI_ACCESS) {
-				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
-				$can_create = @$canAdd['content'] || @$canAdd['category'];
-			} else {
-				$can_create	= $user->authorize('com_content', 'add', 'content', 'all');
+				$canEdit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $model->get('created_by') == $user->get('id'));
+				//$canEdit = ($user->gid >= 20);  // At least J1.5 Editor
 			}
 			
-			$allowunauthorize = $params->get('allowunauthorize', 0); // MENU ITEM PARAMETER TO OVERRIDE CREATE PERMISSION !!! 
+			// Check if item is editable till logoff
+			if ($session->has('rendered_uneditable', 'flexicontent')) {
+				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+				$canEdit = isset($rendered_uneditable[$model->get('id')]);
+			}
 			
-			if(!$can_create && !$allowunauthorize) {
-				// user isn't authorize to create NEW item
-				
-				$notauth_itemid = $params->get('notauthurl');
-				if (!$notauth_itemid) {
-					// no custom unauthorized page is set in menu item parameters
-					$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
-					if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
+			if (!$canEdit) {
+				if ($user->guest) {
+					$uri		= JFactory::getURI();
+					$return		= $uri->toString();
+					$fcreturn = serialize( array('id'=>@$this->_item->id, 'cid'=>$cid) );     // a special url parameter, used by some SEF code
+					$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
+					$url  = $params->get('login_page', 'index.php?option='.$com_users.'&view=login');
+					$url .= '&return='.base64_encode($return);
+					$url .= '&fcreturn='.base64_encode($fcreturn);
+			
+					JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
+					$app->redirect( $url );
+				} else if ($unauthorized_page) {
+					//  unauthorized page via global configuration
+					JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH_TASK' ) );
+					$app->redirect($unauthorized_page);				
 				} else {
-					// custom unauthorized page is set in menu item parameters, retrieve url and redirect
-					$notauth_menu = JSite::getMenu()->getItem($notauth_itemid);
-					$internal_link_vars = $notauth_menu->component ? '&Itemid='.$notauth_itemid.'&option='.$notauth_menu->component : '';
-					$notauthurl = JRoute::_($notauth_menu->link.$internal_link_vars, false);
-					$mainframe->redirect($notauthurl, JText::_( 'FLEXI_ALERTNOTAUTH' ));
+					// user isn't authorize to edit this content
+					$msg = JText::_( 'FLEXI_ALERTNOTAUTH_TASK' );
+					if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 				}
 			}
+			
+		} else {
+			// CREATE action
+			
+			if (FLEXI_J16GE) {
+				$canAdd	= $user->authorize('core.create', 'com_flexicontent');
+				// ALTERNATIVE 1
+				//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
+				// ALTERNATIVE 2
+				//$allowed_cats = count( FlexicontentHelperPerm::getAllowedCats($user, array('core.create')) );
+				//$allowed_cats = FlexicontentHelperPerm::checkUserElementsAccess($user->get('id'), 'core.create', 'category');
+				//$canAdd = count($allowed_cats) > 1;
+				$not_authorised = !$canAdd;
+			} else if ($user->gid >= 25) {
+				$not_authorised = 0;
+			} else if (FLEXI_ACCESS) {
+				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
+				$not_authorised = ! ( @$canAdd['content'] || @$canAdd['category'] );
+			} else {
+				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
+				//$canAdd = ($user->gid >= 19);  // At least J1.5 Author
+				$not_authorised = ! $canAdd;
+			}
+			
+			// Allow item submission by unauthorized users, ... even guests ...
+			if ($allowunauthorize == 2) $allowunauthorize = ! $user->guest;
+			
+			if ($not_authorised && !$allowunauthorize)
+			{
+				$msg = JText::_( 'FLEXI_ALERTNOTAUTH_CREATE' );
+			} else if ($max_auth_limit) {
+				$db->setQuery('SELECT COUNT(id) FROM #__content WHERE created_by = ' . $user->id);
+				$authored_count = $db->loadResult();
+				$content_is_limited = $authored_count >= $max_auth_limit;
+				$msg = $content_is_limited ? JText::sprintf( 'FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit ) : '';
+			}
+			
+			if ( ($not_authorised && !$allowunauthorize) || @ $content_is_limited ) {
+				// User isn't authorize to add ANY content
+				if ( $notauth_menu = JSite::getMenu()->getItem($notauth_itemid) ) {
+					// a. custom unauthorized submission page via menu item
+					$internal_link_vars = @ $notauth_menu->component ? '&Itemid='.$notauth_itemid.'&option='.$notauth_menu->component : '';
+					$notauthurl = JRoute::_($notauth_menu->link.$internal_link_vars, false);
+					JError::raiseNotice( 403, $msg );
+					$app->redirect($notauthurl);
+				} else if ($unauthorized_page) {
+					// b. General unauthorized page via global configuration
+					JError::raiseNotice( 403, $msg );
+					$app->redirect($unauthorized_page);				
+				} else {
+					// c. Finally fallback to raising a 403 Exception/Error that will redirect to site's default 403 unauthorized page
+					if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
+				}
+			}
+			
 		}
+		
 		
 		// *********************************************
 		// Get more variables to push into the FORM view
 		// *********************************************
 		
 		// Create the type parameters
-		$tparams = & $this->get( 'Typeparams' );
+		$tparams = $this->get( 'Typeparams' );
 		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 		
 		// Merge item parameters, or type/menu parameters for new item
 		if ( $isnew ) {
-			if ( $typeid ) $params->merge($tparams);     // Apply type configuration if it type is set
-			if ( $menu )   $params->merge($menuParams);  // Apply menu configuration if it menu is set, to override type configuration
+			if ( $typeid ) $params->merge($tparams);       // Apply type configuration if it type is set
+			if ( $menu )   $params->merge($menu_params);  // Apply menu configuration if it menu is set, to override type configuration
 		} else {
-			$params->merge($item->parameters);
+			$params = $item->parameters;
 		}
 		
 		// Check if saving an item that translates an original content in site's default language
@@ -655,7 +724,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		$perms = $this->_getItemPerms($item);
 
 		// Get the edit lists
-		$lists = $this->_buildEditLists($perms, $params);
+		$lists = $this->_buildEditLists($perms, $params, $authorparams);
 		
 		// Get number of subscribers
 		$subscribers 	= & $this->get( 'SubscribersCount' );
@@ -695,7 +764,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		$document->setTitle($title);
 		
 		// Add title to pathway
-		$pathway =& $mainframe->getPathWay();
+		$pathway =& $app->getPathWay();
 		$pathway->addItem($title, '');
 		
 		// Get pageclass suffix
@@ -773,7 +842,7 @@ class FlexicontentViewItems  extends JViewLegacy
 			
 			//echo "<pre>"; print_r($formparams->_xml['themes']->_children[0]);  echo "<pre>"; print_r($formparams->_xml['themes']->param[0]); exit;
 			foreach($formparams->_xml['themes']->_children as $i => $child) {
-				if ( isset($child->_attributes['enableparam']) && !$cparams->get($child->_attributes['enableparam']) ) {
+				if ( isset($child->_attributes['enableparam']) && !$params->get($child->_attributes['enableparam']) ) {
 					unset($formparams->_xml['themes']->_children[$i]);
 					unset($formparams->_xml['themes']->param[$i]);
 				}
@@ -857,7 +926,7 @@ class FlexicontentViewItems  extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function _buildEditLists(& $perms, & $params)
+	function _buildEditLists(&$perms, &$params, &$authorparams)
 	{
 		global $globalcats;
 		$lists = array();
@@ -882,12 +951,6 @@ class FlexicontentViewItems  extends JViewLegacy
 				$item->catid = $maincat;
 			}
 		}
-		
-		// Retrieve author configuration
-		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
-		if ( $authorparams = $db->loadResult() )
-			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
-		//echo "<pre>"; print_r($authorparams); exit;
 		
 		if ( $perms['canpublish'] && !$item->id ) $item->state = 1;
 		
@@ -914,9 +977,9 @@ class FlexicontentViewItems  extends JViewLegacy
 		
 		//buid types selectlist
 		if (FLEXI_J16GE) {
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'jform[type_id]', $typesselected, 1, 'class="required"', true );
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'jform[type_id]', $typesselected, 1, 'class="required"', 'jform_type_id' );
 		} else {
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected, 1, 'class="required"', true );
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected, 1, 'class="required"', 'type_id' );
 		}
 		
 		// Main category form field

@@ -31,23 +31,22 @@ class FlexicontentViewTags extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
 		//initialise variables
-		$db  		= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$user 		= & JFactory::getUser();
+		$app      = JFactory::getApplication();
+		$option   = JRequest::getVar('option');
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
 		
 		JHTML::_('behavior.tooltip');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.tags.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.tags.filter_state', 		'filter_state', 	'*', 'word' );
-		$filter_assigned	= $mainframe->getUserStateFromRequest( $option.'.tags.filter_assigned', 	'filter_assigned', '*', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.tags.search', 				'search', 			'', 'string' );
-		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$filter_order     = $app->getUserStateFromRequest( $option.'.tags.filter_order', 		'filter_order', 	't.name', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.tags.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.tags.filter_state', 		'filter_state', 	'*', 'word' );
+		$filter_assigned = $app->getUserStateFromRequest( $option.'.tags.filter_assigned', 	'filter_assigned', '*', 'word' );
+		$search 			= $app->getUserStateFromRequest( $option.'.tags.search', 				'search', 			'', 'string' );
+		$search 			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -60,7 +59,7 @@ class FlexicontentViewTags extends JViewLegacy
 
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_TAGS' ), 'tags' );
-		$toolbar =&JToolBar::getInstance('toolbar');
+		$toolbar = JToolBar::getInstance('toolbar');
 		if ($perms->CanConfig) {
 			$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), JURI::base().'index.php?option=com_flexicontent&amp;view=tags&amp;layout=import&amp;tmpl=component', 430, 500);
 			JToolBarHelper::divider();  JToolBarHelper::spacer();
@@ -84,8 +83,8 @@ class FlexicontentViewTags extends JViewLegacy
 		}
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Data');
-		$pageNav 	= & $this->get( 'Pagination' );
+		$rows       = $this->get( 'Data');
+		$pagination = $this->get( 'Pagination' );
 
 		$lists = array();
 		
@@ -108,10 +107,9 @@ class FlexicontentViewTags extends JViewLegacy
 		$lists['order'] = $filter_order;
 
 		//assign data to template
-		$this->assignRef('lists'      	, $lists);
+		$this->assignRef('lists'      , $lists);
 		$this->assignRef('rows'      	, $rows);
-		$this->assignRef('user'      	, $user);
-		$this->assignRef('pageNav' 		, $pageNav);
+		$this->assignRef('pagination'	, $pagination);
 
 		parent::display($tpl);
 	}

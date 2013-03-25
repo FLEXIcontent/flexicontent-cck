@@ -28,24 +28,24 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$this->indexer($tpl);
 			return;
 		}
-		$mainframe= JFactory::getApplication();
-		$document	= JFactory::getDocument();
+		$app      = JFactory::getApplication();
+		$document = JFactory::getDocument();
 		$option   = JRequest::getCmd( 'option' );
-		$db  		  = JFactory::getDBO();
+		$db       = JFactory::getDBO();
 		
-		$filter_order			= $mainframe->getUserStateFromRequest( $option.'.search.filter_order', 			'filter_order', 'a.title', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.search.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
+		$filter_order			= $app->getUserStateFromRequest( $option.'.search.filter_order', 			'filter_order', 'a.title', 'cmd' );
+		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.search.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
 		
-		$filter_fieldtype	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
-		$filter_itemtype	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_itemtype', 	'filter_itemtype', 		'', 'int' );
-		$filter_itemstate	= $mainframe->getUserStateFromRequest( $option.'.fields.filter_itemstate', 'filter_itemstate', 	'', 'word' );
+		$filter_fieldtype	= $app->getUserStateFromRequest( $option.'.fields.filter_fieldtype', 	'filter_fieldtype', 	'', 'word' );
+		$filter_itemtype	= $app->getUserStateFromRequest( $option.'.fields.filter_itemtype', 	'filter_itemtype', 		'', 'int' );
+		$filter_itemstate	= $app->getUserStateFromRequest( $option.'.fields.filter_itemstate', 'filter_itemstate', 	'', 'word' );
 		
-		$search_index			= $mainframe->getUserStateFromRequest( $option.'.search.search_index',			'search_index', '', 'string' );
-		$search_index			= $db->getEscaped( trim(JString::strtolower( $search_index ) ) );
-		$search_itemtitle	= $mainframe->getUserStateFromRequest( $option.'.search.search_itemtitle',	'search_itemtitle', '', 'string' );
-		$search_itemid		= $mainframe->getUserStateFromRequest( $option.'.search.search_itemid',	'search_itemid', '', 'string' );
+		$search_index			= $app->getUserStateFromRequest( $option.'.search.search_index',			'search_index', '', 'string' );
+		$search_index			= $db->escape( trim(JString::strtolower( $search_index ) ) );
+		$search_itemtitle	= $app->getUserStateFromRequest( $option.'.search.search_itemtitle',	'search_itemtitle', '', 'string' );
+		$search_itemid		= $app->getUserStateFromRequest( $option.'.search.search_itemid',	'search_itemid', '', 'string' );
 		$search_itemid		= strlen($search_itemid) ? (int)$search_itemid : '';
-		$filter_indextype	= $mainframe->getUserStateFromRequest( $option.'.search.filter_indextype',		'filter_indextype',	'advanced',		'word' );
+		$filter_indextype	= $app->getUserStateFromRequest( $option.'.search.filter_indextype',		'filter_indextype',	'advanced',		'word' );
 		
 		$f_active['filter_fieldtype']	= (boolean)$filter_fieldtype;
 		$f_active['filter_itemtype']	= (boolean)$filter_itemtype;
@@ -132,13 +132,13 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$db->setQuery($query);
 		$_dbvariable = $db->loadObject();
 		$ft_min_word_len = (int) @ $_dbvariable->Value;
-		$notice_ft_min_word_len	= $mainframe->getUserStateFromRequest( $option.'.fields.notice_ft_min_word_len',	'notice_ft_min_word_len',	0, 'int' );
+		$notice_ft_min_word_len	= $app->getUserStateFromRequest( $option.'.fields.notice_ft_min_word_len',	'notice_ft_min_word_len',	0, 'int' );
 		//if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
 		//{
 			if ( $notice_ft_min_word_len < 2) {
-				$mainframe->setUserState( $option.'.fields.notice_ft_min_word_len', $notice_ft_min_word_len+1 );
-				$mainframe->enqueueMessage("NOTE : Database limits minimum search word length (ft_min_word_len) to ".$ft_min_word_len, 'notice');
-				//$mainframe->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
+				$app->setUserState( $option.'.fields.notice_ft_min_word_len', $notice_ft_min_word_len+1 );
+				$app->enqueueMessage("NOTE : Database limits minimum search word length (ft_min_word_len) to ".$ft_min_word_len, 'notice');
+				//$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
 			}
 		//}
 		

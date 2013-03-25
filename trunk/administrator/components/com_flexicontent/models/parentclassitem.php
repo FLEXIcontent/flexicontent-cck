@@ -86,14 +86,12 @@ class ParentClassItem extends JModelLegacy
 		$app = JFactory::getApplication();
 		
 		// --. Get component parameters , merge (for frontend) with current menu item parameters
-		$this->_cparams = clone( JComponentHelper::getParams( 'com_flexicontent' ) );
-		// In J1.6+ the above function does not merge current menu item parameters,
-		// it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if ( FLEXI_J16GE && !$app->isAdmin() ) {
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams = new JRegistry;
-				$menuParams->loadJSON($menu->params);
-				$this->_cparams->merge($menuParams);
+		$this->_cparams = clone( JComponentHelper::getParams('com_flexicontent') );
+		if (!$app->isAdmin()) {
+			$menu = JSite::getMenu()->getActive();
+			if ($menu) {
+				$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+				$this->_cparams->merge($menu_params);
 			}
 		}
 		
@@ -101,8 +99,10 @@ class ParentClassItem extends JModelLegacy
 		if (!$app->isAdmin()) {
 			// FRONTEND, use "id" from request
 			$pk = JRequest::getVar('id', 0, 'default', 'int');
-			$curcatid = JRequest::getVar('cid', 0, $hash='default', 'int');
-			
+			if ( !JRequest::getVar('task') )
+				$curcatid = JRequest::getVar('cid', 0, $hash='default', 'int');
+			else
+				$curcatid = 0;
 		}
 		else
 		{
@@ -541,7 +541,7 @@ class ParentClassItem extends JModelLegacy
 						$app->enqueueMessage("Third party Joom!Fish translations detected for current content, but editting Joom!Fish translations is disabled in global configuration", 'message' );
 						$app->enqueueMessage("You can enable Joom!Fish translations editting or disable this warning in Global configuration",'message');
 					} else {
-						if  ( $db->getErrorNum() )  $app->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+						if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
 						
 						// -- Parse translation data according to their language
 						if ( $translated_fields )
@@ -622,10 +622,12 @@ class ParentClassItem extends JModelLegacy
 								foreach ($jfdata[$translation_data->shortcode] as $fieldname => $fieldvalue)
 								{
 									//echo "<br/>".$translation_data->shortcode.": $fieldname => $fieldvalue";
-									if ($translation_data->shortcode != $item_lang)
+									if ($translation_data->shortcode != $item_lang) {
+										$translation_data->fields->$fieldname = new stdClass();
 										$translation_data->fields->$fieldname->value = $fieldvalue;
-									else
+									} else {
 										$item->$fieldname = $fieldvalue;
+									}
 								}
 							}
 						} else if ($f->field_id==-2) {
@@ -660,7 +662,7 @@ class ParentClassItem extends JModelLegacy
 					// Retrieve unversioned value
 					$query = 'SELECT DISTINCT tid FROM #__flexicontent_tags_item_relations WHERE itemid = ' . (int)$this->_id;
 					$db->setQuery($query);
-					$item->tags = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+					$item->tags = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				}
 				
 				// -- Retrieve categories field value (if not using versioning)
@@ -671,7 +673,7 @@ class ParentClassItem extends JModelLegacy
 				} else {
 					$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
 					$db->setQuery($query);
-					$item->categories = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+					$item->categories = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				}
 				
 				// Make sure catid is in categories array
@@ -715,7 +717,7 @@ class ParentClassItem extends JModelLegacy
 				// Retrieve Creator NAME and email (used to display the gravatar)
 				$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->created_by;
 				$db->setQuery($query);
-				$creator_data = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$creator_data = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				$creator_found = count($creator_data);
 				$item->creator = $creator_found ? $creator_data[0] : '';
 				$item->creatoremail = $creator_found ? $creator_data[0] : '';
@@ -1002,7 +1004,6 @@ class ParentClassItem extends JModelLegacy
 		}
 		else {
 			// If no access filter is set, the layout takes some responsibility for display of limited information.
-			$user = JFactory::getUser();
 			$groups = $user->getAuthorisedViewLevels();
 			
 			// If no category info available, then use only item access level
@@ -1345,19 +1346,22 @@ class ParentClassItem extends JModelLegacy
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($uid = null)
+	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
 	{
-		if ($this->_id)
-		{
-			// Make sure we have a user id to checkout the item with
-			if (is_null($uid)) {
-				$user	= JFactory::getUser();
-				$uid	= $user->get('id');
-			}
-			// Lets get to it and checkout the thing...
-			$item = JTable::getInstance('flexicontent_items', '');
-			return $item->checkout($uid, $this->_id);
-		}
+		// Make sure we have a record id to checkout the record with
+		if ( !$pk ) $pk = $this->_id;
+		if ( !$pk ) return true;
+		
+		// Get current user
+		$user	= JFactory::getUser();
+		$uid	= $user->get('id');
+		
+		// Lets get table record and checkout the it
+		$tbl = JTable::getInstance('flexicontent_items', '');
+		if ( $tbl->checkout($uid, $this->_id) ) return true;
+		
+		// Reaching this points means checkout failed
+		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
 		return false;
 	}
 	
@@ -1418,7 +1422,7 @@ class ParentClassItem extends JModelLegacy
 			// Get item's assigned categories
 			$query = 'SELECT DISTINCT catid FROM #__flexicontent_cats_item_relations WHERE itemid = ' . (int)$this->_id;
 			$db->setQuery($query);
-			$item->categories = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			$item->categories = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			
 			// We need to fake joomla's states ... when triggering the before save content event
 			$fc_state = $item->state;
@@ -1667,7 +1671,7 @@ class ParentClassItem extends JModelLegacy
 		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
-		if ( $allowed_langs && !in_array($data['language'], $allowed_langs) ) {
+		if ( $allowed_langs && isset($data['language']) && !in_array($data['language'], $allowed_langs) ) {
 			$app->enqueueMessage('You are not allowed to assign language: '.$data['language'].' to Content Items', 'warning');
 			unset($data['language']);
 			if ($isnew) return false;
@@ -2012,7 +2016,7 @@ class ParentClassItem extends JModelLegacy
 				.' FROM #__flexicontent_items_ext as ie'
 				.' WHERE ie.lang_parent_id = ' . (int)$this->_id;
 			$this->_db->setQuery($query);
-			$translation_ids = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+			$translation_ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		}
 		if (empty($translation_ids)) $translation_ids = array();
 		
@@ -2124,7 +2128,7 @@ class ParentClassItem extends JModelLegacy
 			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES ". implode(",", $ai_query_vals);
 			$this->_db->setQuery($query);
 			$this->_db->query();
-			if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		}
 		
 		// Assigned created basic search index into item object
@@ -2354,7 +2358,7 @@ class ParentClassItem extends JModelLegacy
 			. ' WHERE itemid = '.$item->id
 			;
 		$this->_db->setQuery($query);
-		$used = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$used = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 
 		foreach($cats as $cat) {
 			// insert only the new records
@@ -2493,7 +2497,7 @@ class ParentClassItem extends JModelLegacy
 			// Not current item, or current item's tags are not set
 			$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid ='".$item_id."'";
 			$this->_db->setQuery($query);
-			$tags = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+			$tags = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 			if ($this->_id == $item_id) {
 				// Retrieved tags of current item, set them
 				$this->_item->tags = $tags;
@@ -2764,7 +2768,7 @@ class ParentClassItem extends JModelLegacy
 			// Not current item, or current item's categories are not set
 			$query = "SELECT tid FROM #__flexicontent_cats_item_relations WHERE itemid ='".$item_id."'";
 			$this->_db->setQuery($query);
-			$categories = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+			$categories = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 			if ($this->_id == $item_id) {
 				// Retrieved categories of current item, set them
 				$this->_item->categories = & $categories;
@@ -2970,7 +2974,7 @@ class ParentClassItem extends JModelLegacy
 					;
 			$this->_db->setQuery($query);
 			$fields = $this->_db->loadObjectList('name');
-			if ( $this->_db->getErrorNum() )  JFactory::getApplication()->enqueueMessage(nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
 			$custom_vals[$this->_id] = $this->getCustomFieldsValues($this->_id, $version);
 			if ( $lang_parent_id && !$version) {  // Language parent item is used only when loading non-versioned item
@@ -3227,7 +3231,7 @@ class ParentClassItem extends JModelLegacy
 			$cats = $this->get('categories');
 			$query = "SELECT params FROM #__categories WHERE id IN (".implode(',',$cats).")";
 			$db->setQuery( $query );
-			$mcats_params = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			$mcats_params = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			
 			foreach ($mcats_params as $cat_params) {
 				$cat_params = FLEXI_J16GE ? new JRegistry($cat_params) : new JParameter($cat_params);
@@ -3284,7 +3288,7 @@ class ParentClassItem extends JModelLegacy
 			{
 				$query = "SELECT DISTINCT email FROM #__users WHERE id IN (".implode(",",$nConf->{$ulist[$ntype]}).")";
 				$db->setQuery( $query );
-				$user_emails_ulist = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$user_emails_ulist = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { echo "<pre>"; print_r($user_emails_ulist); exit; }
 			}
 			
@@ -3299,7 +3303,7 @@ class ParentClassItem extends JModelLegacy
 						." JOIN #__user_usergroup_map ugm ON u.id=ugm.user_id AND ugm.group_id IN (".implode(",",$nConf->{$ugrps[$ntype]}).")";
 				}
 				$db->setQuery( $query );
-				$user_emails_ugrps = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$user_emails_ugrps = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { print_r($user_emails_ugrps); exit; }
 			}
 			
@@ -3317,7 +3321,7 @@ class ParentClassItem extends JModelLegacy
 				$query = "SELECT DISTINCT email FROM #__users as u"
 					." JOIN #__flexiaccess_groups ugm ON u.username=ugm.name AND ugm.type=2 AND ugm.id IN (".implode(",",$final_groups).")";
 				$db->setQuery( $query );
-				$user_emails_ugrps_fa_individual = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$user_emails_ugrps_fa_individual = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();
 				
 				
@@ -3325,7 +3329,7 @@ class ParentClassItem extends JModelLegacy
 				$query = "SELECT DISTINCT email FROM #__users as u"
 					." JOIN #__flexiaccess_members ugm ON u.id=ugm.member_id AND ugm.group_id IN (".implode(",",$final_groups).")";
 				$db->setQuery( $query );
-				$user_emails_ugrps_fa_collective = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$user_emails_ugrps_fa_collective = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();
 				
 				$user_emails_ugrps_fa = array_unique( array_merge ($user_emails_ugrps_fa_individual, $user_emails_ugrps_fa_collective) );
@@ -3658,7 +3662,7 @@ class ParentClassItem extends JModelLegacy
 					. ' OR 	( axosection = ' . $this->_db->Quote('item') . ' AND axo = ' . $id . ' ) )'
 					;
 			$this->_db->setQuery($query);
-			$publishers = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+			$publishers = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		
 			// find all nested groups
 			if ($publishers) {
@@ -3676,7 +3680,7 @@ class ParentClassItem extends JModelLegacy
 					. ' AND u.sendEmail = 1'
 					;		
 			$this->_db->setQuery($query);
-			$validators->notify_emails = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+			$validators->notify_emails = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 			$validators->notify_text = '';
 		} else {*/
 			// J1.5 with no FLEXIaccess or J2.5+
@@ -3782,13 +3786,16 @@ class ParentClassItem extends JModelLegacy
 			$msg .= '<div>'.JText::sprintf('FLEXI_APPROVAL_PUBLISHABLE_EXCLUDED', $publishable_str).'</div>';
 		}
 		
-		
+		// This may not be needed since the item was already in unpublished stated ??
 		if (FLEXI_J16GE) {
 			$cache = FLEXIUtilities::getCache();
 			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
 		} else {
-			$cache = JFactory::getCache('com_flexicontent_items');
-			$cache->clean();
+			$itemcache = JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
+			$filtercache = JFactory::getCache('com_flexicontent_filters');
+			$filtercache->clean();
 		}
 		
 		return $msg;
@@ -3815,11 +3822,8 @@ class ParentClassItem extends JModelLegacy
 		  ;
 		$this->_db->setQuery($query);
 		$this->_translations = $this->_db->loadObjectList();
+		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
-		if ($this->_db->getErrorNum()) {
-			$jAp= JFactory::getApplication();
-			$jAp->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
-		}
 		if ( empty($this->_translations) )  return $this->_translations;
 		
 		return $this->_translations;

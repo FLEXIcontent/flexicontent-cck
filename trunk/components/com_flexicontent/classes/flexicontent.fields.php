@@ -64,7 +64,7 @@ class FlexicontentFields
 			. ' GROUP BY i.id';
 		$db->setQuery($query);
 		$items = $db->loadObjectList();
-		if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		if (!$items) return false;
 		foreach ($items as $i => $item) $_item_id_map[$item->id] = & $items[$i];
 		
@@ -110,7 +110,7 @@ class FlexicontentFields
 		foreach ($field_names as $i => $field_name)
 		{
 			$method = isset( $methods[$i] ) ? $methods[$i] : 'display';
-			if ( 0 && $item_per_field)
+			if ( $item_per_field )
 			{
 				if ( !isset( $_item_id_map[ $item_ids[$i] ] ) )  { echo "not found item: ".$item_ids[$i] ." <br/>"; continue;}
 				
@@ -179,8 +179,16 @@ class FlexicontentFields
 			$itemcache = JFactory::getCache('com_flexicontent_items');  // Get Joomla Cache of '...items' Caching Group
 			$itemcache->setCaching(1); 		              // Force cache ON
 			$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expiration to default e.g. one hour
-			if (FLEXI_GC && !$expired_cleaned) {        // Auto-clean expired item cache, only done here once
-				$itemcache->gc(); $expired_cleaned = true;
+			
+			$filtercache = JFactory::getCache('com_flexicontent_filters');  // Get Joomla Cache of '...filters' Caching Group
+			$filtercache->setCaching(1); 		              // Force cache ON
+			$filtercache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expiration to default e.g. one hour
+			
+			// Auto-clean expired item & filters cache, only done here once
+			if (FLEXI_GC && !$expired_cleaned) {
+				$itemcache->gc();
+				$filtercache->gc();
+				$expired_cleaned = true;
 			}
 		}
 		
@@ -196,7 +204,7 @@ class FlexicontentFields
 		$vars['votes']      = FlexicontentFields::_getVotes($items);
 		$vars['custom']     = FlexicontentFields::_getCustomValues($items);
 		
-		for ($i=0; $i < sizeof($items); $i++)
+		foreach ($items as $i => $item)
 		{
 			$var = array();
 			$item_id = $items[$i]->id;
@@ -226,7 +234,7 @@ class FlexicontentFields
 		{
 			// CHECK if 'always_create_fields_display' enabled and create the display for all item's fields
 			// *** This should be normally set to ZERO (never), to avoid a serious performance penalty !!!
-			for ($i=0; $i < sizeof($items); $i++)
+			foreach ($items as $i => $item)
 			{
 				$always_create_fields_display = $cparams->get('always_create_fields_display',0);
 				$flexiview = JRequest::getVar('view', false);
@@ -358,13 +366,13 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5.5
 	 */
-	static function &getFieldDisplay(&$item_data, $fieldname, $values=null, $method='display', $view = FLEXI_ITEMVIEW)
+	static function &getFieldDisplay(&$item_arr, $fieldname, $single_item_vals=null, $method='display', $view = FLEXI_ITEMVIEW)
 	{
 		// 1. Convert to array of items if not an array already
-		if ( !is_array($item_data)  ) 
-			$items = array( &$item_data);
+		if ( !is_array($item_arr) ) 
+			$items = array( & $item_arr );
 		else
-			$items = &$item_data;
+			$items = & $item_arr;
 		
   	// 2. Make sure that fields have been created for all given items
 		$_items = array();
@@ -394,7 +402,10 @@ class FlexicontentFields
 		  }
 		  
 		  // Get field's values if they were custom values were not given
-		  if ($values===null) {
+		  if ( $single_item_vals!==null && count($items) == 1 ) {
+				// $values is used only if rendering a single item
+		  	$values = $single_item_vals;
+		  } else {
 		  	$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
 		  }
 		  
@@ -403,8 +414,6 @@ class FlexicontentFields
 		  $item->onDemandFields[$fieldname]->noaccess = false;
 		  $item->onDemandFields[$fieldname]->field = & $field;
 		  
-		  
-		  
 		  // Render the (display) method of the field
 		  if (!isset($field->{$method})) $field = FlexicontentFields::renderField($item, $field, $values, $method, $view);
 		  if (!isset($field->{$method})) $field->{$method} = '';
@@ -412,10 +421,10 @@ class FlexicontentFields
 		  $_method_html[$item->id] = & $field->{$method};
 		}
 		
-		
-		
 		// Return field(s) HTML (in case of multiple items this will be an array indexable by item ids
-		if ( !is_array($item_data) )  $_method_html = & $_method_html[$item_data->id];
+		if ( !is_array($item_arr) ) {
+			$_method_html = @ $_method_html[$item_arr->id];   // Suppress field name not found ...
+		}
   	return $_method_html;
 	}
 	
@@ -1100,6 +1109,7 @@ class FlexicontentFields
 		// Set custom label, description or maintain default
 		$field->label       =  isset($fdata[$tindex][$field->name]->label)        ?  $fdata[$tindex][$field->name]->label        :  $field->label;
 		$field->description =  isset($fdata[$tindex][$field->name]->description)  ?  $fdata[$tindex][$field->name]->description  :  $field->description;
+		$field->label = JText::_($field->label);
 		
 		// Finally set field's parameters, but to clone ... or not to clone, better clone to allow customizations for individual item fields ...
 		$field->parameters = clone($fdata[$tindex][$field->name]->parameters);
@@ -1117,7 +1127,7 @@ class FlexicontentFields
 			//echo $query;
 			$db = JFactory::getDBO();
 			$db->setQuery($query);
-			$core_field_names = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			$core_field_names = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			
 			$core_field_names[] = 'maintext';
 			$core_field_names = array_flip($core_field_names);
@@ -1239,7 +1249,6 @@ class FlexicontentFields
 		if ($sql_mode) {  // SQL mode, parameter field_elements contains an SQL query
 			
 			$db = JFactory::getDBO();
-			$jAp= JFactory::getApplication();
 			
 			// Get/verify query string, check if item properties and other replacements are allowed and replace them
 			$query = preg_match('#^select#i', $field_elements) ? $field_elements : '';
@@ -1476,7 +1485,7 @@ class FlexicontentFields
 		;
 		$db->setQuery($query);
 		$fields = $db->loadObjectList($key);
-		if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
 		$sp_fields = array();
 		$nsp_fields = array();
@@ -1912,8 +1921,8 @@ class FlexicontentFields
 		if ( !$return_sql ) {
 			//echo "<br>FlexicontentFields::getFiltered() ".$filter->name." appying  query :<br>". $query."<br>\n";
 			$db->setQuery($query);
-			$filtered = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
-			if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
+			$filtered = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			return $filtered;
 		} else {
 			return ' AND i.id IN ('. $query .')';
@@ -1948,8 +1957,8 @@ class FlexicontentFields
 		if ( !$return_sql ) {
 			//echo "<br>FlexicontentFields::getFiltered() ".$filter->name." appying  query :<br>". $query."<br>\n";
 			$db->setQuery($query);
-			$filtered = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
-			if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
+			$filtered = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			return $filtered;
 		} else {
 			return ' AND i.id IN ('. $query .')';
@@ -2326,7 +2335,7 @@ class FlexicontentFields
 		$db->setQuery($query);
 		$results = $db->loadObjectList('value');
 		if ($db->getErrorNum()) {
-			JError::raiseWarning($db->getErrorNum(), $db->getErrorMsg(). "<br /><br />" .$query);
+			JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			$filter->html	 = "Filter for : {$filter->label} cannot be displayed, error during db query<br />";
 			return array();
 		}
@@ -2362,7 +2371,7 @@ class FlexicontentFields
 		$results = $db->loadObjectList('text');
 		
 		if ($db->getErrorNum()) {
-			echo $db->getErrorMsg();
+			JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			$filter->html	 = "Filter for : {$filter->label} cannot be displayed, error during db query<br />";
 			return array();
 		}
@@ -2387,13 +2396,13 @@ class FlexicontentFields
 		$query = FlexicontentFields::createItemsListSQL($params, $_itemids_catids, $isform, $reverse_field, $parentfield, $parentitem);
 		$db->setQuery($query);
 		$item_list = & $db->loadObjectList('id');
-		if ($return_item_list) $return_item_list = & $item_list;
-		//echo "<pre>"; print_r($item_list); echo "</pre>";
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
-		if ($db->getErrorNum())  return 'SQL query error: '.$db->getErrorMsg();
+		// Item list must be returned too ...
+		if ($return_item_list)  $return_item_list = & $item_list;
 		
 		// No published related items or SQL query failed, return
-		if ( !$item_list ) { $html = ''; return $html; }
+		if ( !$item_list ) return '';
 		
 		if ($_itemids_catids) foreach($item_list as $_item)   // if it exists ... add prefered catid to items list data
 			$_item->rel_catid = @ $_itemids_catids[$_item->id]->catid;
@@ -2460,7 +2469,7 @@ class FlexicontentFields
 		if ($disallowed_fieldnames===null) {
 			$query = "SELECT name FROM #__flexicontent_fields WHERE field_type IN ('". implode("','", $disallowed_fields) ."')";
 			$db->setQuery($query);
-			$field_name_col = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			$field_name_col = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			$disallowed_fieldnames = !$field_name_col ? array() : array_flip($field_name_col);
 		}
 		
@@ -2565,6 +2574,7 @@ class FlexicontentFields
 		foreach($custom_field_names as $i => $custom_field_name)
 		{
 			if ( isset($disallowed_fieldnames[$custom_field_name]) ) continue;
+			if ( $custom_field_methods[$i] == 'label' ) continue;
 			
 			if ($i_slave) $start_microtime = microtime(true);
 			
@@ -2601,7 +2611,7 @@ class FlexicontentFields
 			$err_mssg = 'Cannot replace field: "%s" because it is of not allowed field type: "%s", which can cause loop or other problem';
 			foreach($custom_field_names as $i => $custom_field_name) {
 				$_field = @ $result->fields[$custom_field_name];
-				$custom_field_display = $_field ? '<b class="flexi label">'.$_field->label .'</b> : ' : '';
+				$custom_field_display = '';
 				if ($is_disallowed_field = isset($disallowed_fieldnames[$custom_field_name])) {
 					$custom_field_display .= sprintf($err_mssg, $custom_field_name, @ $_field->field_type);
 				} else {
@@ -2628,7 +2638,6 @@ class FlexicontentFields
 	static function getFieldRenderTimes( &$fields_render_total=0)
 	{
 		global $fc_run_times;
-		$app = JFactory::getApplication();
 		$fields_render = array();
 		
 		foreach ($fc_run_times['render_field'] as $field_type => $field_msecs)

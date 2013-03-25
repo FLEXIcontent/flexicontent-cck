@@ -31,11 +31,10 @@ class FlexicontentViewFile extends JViewLegacy {
 
 	function display($tpl = null)
 	{
-		$mainframe = &JFactory::getApplication();
-
 		//initialise variables
-		$document	= & JFactory::getDocument();
-		$user 		= & JFactory::getUser();
+		$app      = JFactory::getApplication();
+		$document = JFactory::getDocument();
+		$user     = JFactory::getUser();
 
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -53,15 +52,15 @@ class FlexicontentViewFile extends JViewLegacy {
 			JToolBarHelper::cancel();
 		}
 		//Get data from the model
-		$model		= & $this->getModel();
-		if (FLEXI_J16GE) $form = & $this->get('Form');
-		$row     	= & $this->get( 'File' );
+		$model		= $this->getModel();
+		if (FLEXI_J16GE) $form = $this->get('Form');
+		$row     	= $this->get( 'File' );
 		
 		// fail if checked out not by 'me'
 		if ($row->id) {
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-				$mainframe->redirect( 'index.php?option=com_flexicontent&view=filemanager' );
+				$app->redirect( 'index.php?option=com_flexicontent&view=filemanager' );
 			}
 		}
 		
@@ -71,8 +70,7 @@ class FlexicontentViewFile extends JViewLegacy {
 		} else {
 			$lists['access'] 	= JHTML::_('list.accesslevel', $row );
 		}
-		$document	= & JFactory::getDocument();
-
+		
 		//clean data
 		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
 

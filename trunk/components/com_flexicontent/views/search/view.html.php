@@ -53,20 +53,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$state	=  $this->get('state');
 		$searchword = $state->get('keyword');
 		
-		
-		// *******************************************************************************************
-		// Get Configuration parameters (Global component configuration + Menu configuration override)
-		// *******************************************************************************************
-		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($app->isSite()  ?  $app->getParams('com_flexicontent')  : JComponentHelper::getParams('com_flexicontent'));
-		
-		// Get menu parameters
-		if ($menu) {
-			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
-			// In J1.6+ the above function does not merge current menu item parameters,
-			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
-			if (FLEXI_J16GE) $params->merge($menuParams);
-		}
+		// Get the COMPONENT only parameters and merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) $params->merge($menu->params);
 		
 		// some parameter shortcuts
 		$canseltypes  = $params->get('canseltypes', 1);

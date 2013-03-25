@@ -25,10 +25,10 @@ $ctrl = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 $cats_task = FLEXI_J16GE ? 'task=category.' : 'controller=categories&task=';
 
-$db 			= & JFactory::getDBO();
-$config		= & JFactory::getConfig();
+$db 			= JFactory::getDBO();
+$config		= JFactory::getConfig();
 $nullDate	= $db->getNullDate();
-$user 		= & $this->user;
+$user 		= JFactory::getUser();
 
 $enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 $autologin = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
@@ -605,10 +605,15 @@ window.addEvent('domready', function() {
 					} else {
 						$canCheckin = $user->gid >= 24;
 					}
-					if ($canCheckin && $row->checked_out == $user->id) {
-						//echo if (FLEXI_J16GE) JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'items.', $canCheckin);
+					if ($canCheckin) {
+						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'items.', $canCheckin);
 						$task_str = FLEXI_J16GE ? 'items.checkin' : 'checkin';
-						echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						if ($row->checked_out == $user->id) {
+							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						} else {
+							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none;">';
+							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						}
 					}
 				}
 				
@@ -616,7 +621,7 @@ window.addEvent('domready', function() {
 				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit && !$canEditOwn ) ) {
 					echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
 				
-				// Display title with edit link ... (item editable and not checked out)
+				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">

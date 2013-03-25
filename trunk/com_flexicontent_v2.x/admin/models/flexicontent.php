@@ -59,9 +59,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$allitems 	= 1;
 		}
 		
-		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier'
 				. ' FROM #__content as c'
 				. ' LEFT JOIN #__categories as cat ON c.catid=cat.id'
+				. ' LEFT JOIN #__users AS cr ON cr.id = c.created_by'
+				. ' LEFT JOIN #__users AS mr ON mr.id = c.modified_by'
 				. ' WHERE state = -3'
 				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" ' //AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
@@ -92,16 +94,18 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$allitems 	= 1;
 		}
 		
-		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by, c.version, MAX(fv.version_id) '
+		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.version, MAX(fv.version_id) '
 				. ' FROM #__content AS c'
 				. ' LEFT JOIN #__flexicontent_versions AS fv ON c.id=fv.item_id'
 				. ' LEFT JOIN #__categories as cat ON c.catid=cat.id'
+				. ' LEFT JOIN #__users AS cr ON cr.id = c.created_by'
+				. ' LEFT JOIN #__users AS mr ON mr.id = c.modified_by'
 				. ' WHERE c.state = -5 OR c.state = 1'
 				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" ' //AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' GROUP BY fv.item_id '
 				. ' HAVING c.version<>MAX(fv.version_id) '
-				. ' ORDER BY c.created DESC'
+				. ' ORDER BY c.modified DESC'
 				;
 
 		$this->_db->SetQuery($query, 0, 5);
@@ -128,10 +132,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$allitems 	= 1;
 		}
 
-		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier'
 				. ' FROM #__content as c'
 				. ' LEFT JOIN #__categories as cat ON c.catid=cat.id'
-				. ' WHERE c.state = -4'
+				. ' LEFT JOIN #__users AS cr ON cr.id = c.created_by'
+				. ' LEFT JOIN #__users AS mr ON mr.id = c.modified_by'
+				. ' WHERE state = -4'
 				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" ' //AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
@@ -161,9 +167,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$allitems 	= 1;
 		}
 
-		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created_by'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier'
 				. ' FROM #__content as c'
 				. ' LEFT JOIN #__categories as cat ON c.catid=cat.id'
+				. ' LEFT JOIN #__users AS cr ON cr.id = c.created_by'
+				. ' LEFT JOIN #__users AS mr ON mr.id = c.modified_by'
 				. ' WHERE c.state = -5'
 				. ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'" ' //AND cat.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND cat.rgt <= '. $this->_db->Quote(FLEXI_RGT_CATEGORY)
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
@@ -383,7 +391,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		static $return;
 		if ($return === NULL) {
-			if (FLEXI_J30GE) {
+			if (FLEXI_J16GE) {
 				$columns = $this->_db->getTableColumns('#__flexicontent_items_ext');
 				$result_lang_col = array_key_exists('language', $columns) ? true : false;
 				$result_tgrp_col = array_key_exists('lang_parent_id', $columns) ? true : false;
@@ -593,7 +601,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 									. ' AND position = ' . $this->_db->Quote($group)
 									;
 							$this->_db->setQuery( $query );
-							$fieldstopos = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+							$fieldstopos = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 							
 							if ($fieldstopos) {
 								$field = implode(',', $fieldstopos);
@@ -931,7 +939,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		// check if the category was chosen to avoid adding data on static contents
 		if (!FLEXI_CAT_EXTENSION) return array();
-
+		
 		if(!$current_versions) {
 			$current_versions = FLEXIUtilities::getCurrentVersions();
 		}
@@ -1049,7 +1057,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				// Add the 'categories' field to the fields array for adding to versioning table
 				$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
-				$categories = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$categories = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if(!$categories || !count($categories)) {
 					$categories = array($catid = $row->catid);
 					$query = "INSERT INTO #__flexicontent_cats_item_relations VALUES('$catid','".$row->id."', '0');";
@@ -1067,7 +1075,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				// Add the 'tags' field to the fields array for adding to versioning table
 				$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
-				$tags = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$tags = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				$f = new stdClass();
 				$f->id 					= 14;
 				$f->iscore			= 1;

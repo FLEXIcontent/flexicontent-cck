@@ -10,6 +10,7 @@
 		<description>STANDARD SEARCH LAYOUT DESC</description>
 		<params addpath="/administrator/components/com_flexicontent/elements">
 		
+		<field name="" type="separator" level="level3" default="Please note these reasons for some results not being included:&lt;small&gt; &lt;br/&gt;- word is less than 4 characters (default for MySql DBs)&lt;br/&gt;- word is too common e.g. appears in about half of the articles&lt;br/&gt;- wrong language or article not publish or article has expired&lt;/small&gt;" />
 		
 		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Basic Options&lt;/small&gt;" />
 			

@@ -45,14 +45,11 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$menu     = $menus->getActive();
 		$uri      = & JFactory::getURI();
 		
-		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($mainframe->getParams('com_flexicontent'));
-		
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE && $menu) {
-			$menuParams = new JRegistry;
-			$menuParams->loadJSON($menu->params);
-			$params->merge($menuParams);
+		// Get the COMPONENT only parameters and merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
 		}
 		
 		//add css file

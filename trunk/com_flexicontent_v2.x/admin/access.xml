@@ -56,7 +56,7 @@
 		<action name="flexicontent.deletefield" title="&lt;b&gt;Fields:&lt;/b&gt; delete" description="Allow users in the group to delete fields" />
 		
 		<!-- FILEs: management tab -->
-		<action name="flexicontent.managefile" title="&lt;b&gt;Files: -- manage --&lt;/b&gt;" description="-- manage -- files" />
+		<action name="flexicontent.managefiles" title="&lt;b&gt;Files: -- manage --&lt;/b&gt;" description="-- manage -- files" />
 		<action name="flexicontent.uploadfiles" title="&lt;b&gt;Files (&lt;span style&#61;&#34;color:darkred&#34;&gt;Upload Box&lt;/span&gt;):&lt;/b&gt; Upload New files" description="Allow users in the group to upload New Files" />
 		<action name="flexicontent.viewallfiles" title="&lt;b&gt;Files (&lt;span style&#61;&#34;color:darkred&#34;&gt;File List&lt;/span&gt;):&lt;/b&gt; View All files" description="Allow users in the group to view all existing files" />
 		

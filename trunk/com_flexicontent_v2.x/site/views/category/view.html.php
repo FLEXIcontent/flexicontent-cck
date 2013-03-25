@@ -55,36 +55,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		$user		= JFactory::getUser();
 		$aid		= FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
-		flexicontent_html::loadJQuery();
-		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/rounded-corners-min.js' );
-		
-		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($mainframe->getParams('com_flexicontent'));
-		
-		if ($menu) {
-			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
-			// In J1.6+ the above function does not merge current menu item parameters,
-			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
-			if (FLEXI_J16GE) $params->merge($menuParams);
-		}
-		
-		//add css file
-		if (!$params->get('disablecss', '')) {
-			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
-			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
-		}
-		
-		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
-		}
-		
 		// Get category and set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
 		$category = $this->get('Category');
-		$params   = & $category->parameters;
+		$params   = $category->parameters;
 		
-		// Get remainging data from the model, TODO use parameters to retireve these only when needed
+		// Get remainging data from the model
 		$categories = $this->get('Childs');
 		$items    = $this->get('Data');
 		$total    = $this->get('Total');
@@ -99,6 +74,26 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = JRequest::getInt('limitstart');
 		$format     = JRequest::getCmd('format', null);
+		
+		
+		// ********************************
+		// Load needed JS libs & CSS styles
+		// ********************************
+		
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		flexicontent_html::loadJQuery();
+		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/rounded-corners-min.js' );
+		
+		//add css file
+		if (!$params->get('disablecss', '')) {
+			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
+			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
+		}
+		
+		//allow css override
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
+		}
 		
 		
 		// ************************

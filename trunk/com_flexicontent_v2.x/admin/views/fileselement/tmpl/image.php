@@ -18,7 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-$uri = & JURI::getInstance();
+$uri = JURI::getInstance();
 $current_uri = $uri->toString();
 $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;task=';
 $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
@@ -28,9 +28,11 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 	<tr>
 		<td>
 			<?php
-			echo $this->pane->startPane( 'stat-pane' );
+			echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
 			if ($this->CanUpload) :
-			echo $this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' );
+				echo FLEXI_J16GE ?
+					JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
+					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
 			?>
 			
 			<!-- File Upload Form -->
@@ -78,10 +80,10 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&field='.$this->fieldid.'&tmpl=component&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
 			</form>
 			<?php
-			echo $this->pane->endPanel();
+			echo FLEXI_J16GE ? '' : $this->pane->endPanel();
 			endif;
 			?>
-			<?php echo $this->pane->endPane(); ?>
+			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 		</td>
 	</tr>
 </table>

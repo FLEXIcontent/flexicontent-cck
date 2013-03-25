@@ -93,8 +93,8 @@ class FlexicontentModelTypes extends JModelList
 		$query = $db->getQuery(true);
 
 		$filter_state = $app->getUserStateFromRequest( $option.'.types.filter_state', 'filter_state', '', 'word' );
-		$search  = $app->getUserStateFromRequest( $option.'.types.search', 'search', '', 'string' );
-		$search  = $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search = $app->getUserStateFromRequest( $option.'.types.search', 'search', '', 'string' );
+		$search = trim( JString::strtolower( $search ) );
 		
 
 
@@ -128,7 +128,7 @@ class FlexicontentModelTypes extends JModelList
 		}
 
 		if ($search) {
-			$query->where('LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false ));
+			$query->where('LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false ));
 		}
 		$query->order($filter_order.' '.$filter_order_Dir);
 		//echo str_replace("#__", "jos_", $query->__toString());

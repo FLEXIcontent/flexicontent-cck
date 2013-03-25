@@ -153,10 +153,7 @@ class FlexicontentModelTags extends JModelLegacy
 		{		
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
-			if ( $this->_db->getErrorNum() ) {
-				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
-			}
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		}
 		
 		return $this->_data;
@@ -296,14 +293,14 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function _buildItemWhere( )
 	{
-		$mainframe =& JFactory::getApplication();
-		$params = & $this->_params;
-		$user		= & JFactory::getUser();
-		$db =& JFactory::getDBO();
+		$app    = JFactory::getApplication();
+		$params = $this->_params;
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDBO();
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$now		= $mainframe->get('requestTime');
+		//$now		= $app->get('requestTime');
 		$now			= FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
 		$nullDate	= $db->getNullDate();
 
@@ -347,9 +344,9 @@ class FlexicontentModelTags extends JModelLegacy
 		{
 			$filter 		= JRequest::getString('filter', '', 'request');
 
-			if ($filter)
-			{
-				$where .= ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $this->_db->getEscaped( $filter, true ), false ).' IN BOOLEAN MODE)';
+			if ($filter) {
+				$search_term = FLEXI_J16GE ? $this->_db->escape( $filter, true ) : $this->_db->getEscaped( $filter, true );
+				$where .= ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $search_term, false ).' IN BOOLEAN MODE)';
 			}
 		}
 		return $where;
@@ -372,40 +369,30 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		// a. Get the COMPONENT only parameters and merge current menu item parameters
 		$params = clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) $params->merge($menu->params);
-		
-		/*
-		// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($app->getParams('com_flexicontent'));
-		
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE && $menu) {
-			$params->merge($menuParams);
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
 		}
-		*/
 		
-		// IF module id is in the HTTP request then get this (tags cloud) module configuration and override current configuration
+		// b. Merge module parameters overriding current configuration
+		//   (this done when module id is present in the HTTP request) (tags cloud module include tags view configuration)
 		if ( JRequest::getInt('module', 0 ) )
 		{
-			// Higher Priority: prefer module configuration requested in URL
-			jimport( 'joomla.application.module.helper' );
-			jimport( 'joomla.html.parameter' );
-			$params = FLEXI_J16GE ? new JRegistry() : new JParameter('');
-			
 			// load by module name, not used
+			//jimport( 'joomla.application.module.helper' );
 			//$module_name = JRequest::getInt('module', 0 );
 			//$module = & JModuleHelper::getModule('mymodulename');
 			
 			// load by module id
 			$module_id = JRequest::getInt('module', 0 );
-			$module = & JTable::getInstance ( 'Module', 'JTable' );
+			$module = JTable::getInstance ( 'Module', 'JTable' );
 			
-			if ( !$module->load($module_id) ) {
-				JError::raiseNotice ( 500, $module->getError() );
-			} else {
+			if ( $module->load($module_id) ) {
 				$moduleParams = FLEXI_J16GE ? new JRegistry($module->params) : new JParameter($module->params);
+				$params->merge($moduleParams);
+			} else {
+				JError::raiseNotice ( 500, $module->getError() );
 			}
-			$params->merge($moduleParams);
 		}
 		
 		$this->_params = $params;

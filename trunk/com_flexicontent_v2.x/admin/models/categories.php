@@ -73,16 +73,16 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	function getListQuery()
 	{
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$db = $this->getDbo();
 		$option = JRequest::getVar('option');
-		//$filter_state= $this->getState($option.'.categories.filter_state');
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_state', 		'filter_state', 	'*', 'word' );
-		$filter_language 		= $mainframe->getUserStateFromRequest( $option.'.categories.filter_language', 'filter_language', 	'*', 'cmd' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.categories.search', 			'search', 			'', 'string' );
-		//$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		
+		$filter_order     = $app->getUserStateFromRequest( $option.'.categories.filter_order',     'filter_order',     'c.lft', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.categories.filter_order_Dir', 'filter_order_Dir', '', 'word' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.categories.filter_state',     'filter_state',     '', 'word' );
+		$filter_language  = $app->getUserStateFromRequest( $option.'.categories.filter_language', 'filter_language', 	'*', 'cmd' );
+		$search           = $app->getUserStateFromRequest( $option.'.categories.search', 'search', '', 'string' );
+		$search           = trim( JString::strtolower( $search ) );
 
 		// Create a new query object.
 		$query = $db->getQuery(true);
@@ -113,14 +113,13 @@ class FlexicontentModelCategories extends JModelList
 		}
 		$query->where(' (c.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')');
 		// Filter by search in title
-		//$search = $this->getState('com_flexicontent.categories.search');
 		if (!empty($search)) {			
-			$search = $db->Quote('%'.$db->getEscaped(trim($search), true).'%');
-			$query->where('(c.title LIKE '.$search.' OR c.alias LIKE '.JString::strtolower($search).' OR c.note LIKE '.$search.')');
+			$search = $db->Quote('%'.$db->escape($search, true).'%');
+			$query->where('(c.title LIKE '.$search.' OR c.alias LIKE '.$search.' OR c.note LIKE '.$search.')');
 		}
 		$query->group('c.id');
 		// Add the list ordering clause.
-		$query->order($db->getEscaped($filter_order.' '.$filter_order_Dir));
+		$query->order($db->escape($filter_order.' '.$filter_order_Dir));
 		//echo nl2br(str_replace('#__','jos_',$query));
 		//echo str_replace('#__', 'jos_', $query->__toString());
 		return $query;
@@ -135,25 +134,14 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user = JFactory::getUser();
-
 		if (count( $cid ))
 		{
-			if (!$publish) {
-				// Add all children to the list
-				foreach ($cid as $id)
-				{
-					$this->_addCategories($id, $cid);
-				}
-			} else {
-				// Add all parents to the list
-				foreach ($cid as $id)
-				{
-					$this->_addCategories($id, $cid, 'parents');
-				}
-			}
+			$user = JFactory::getUser();
 			
-			$user	= JFactory::getUser();
+			// Add all children to the list
+			if (!$publish)  foreach ($cid as $id)  $this->_addCategories($id, $cid);
+			// Add all parents to the list
+			else            foreach ($cid as $id)  $this->_addCategories($id, $cid, 'parents');
 			
 			// Get the owner of all categories
 			$query = 'SELECT id, created_user_id'

@@ -74,11 +74,9 @@ class JElementFcmodules extends JElement
 		
 		$db->setQuery($query);
 		$mods = $db->loadObjectList();
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
-		if ($db->getErrorNum()) {
-			echo $db->getErrorMsg();
-			return array();
-		}
+		if ( !$mods )  return array();
 		
 		// Put a select module option at top of list
 		$first_option = new stdClass();
