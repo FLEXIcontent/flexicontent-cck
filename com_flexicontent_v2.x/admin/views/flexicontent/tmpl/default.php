@@ -18,10 +18,10 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-$mainframe = JFactory::getApplication();
+$app       = JFactory::getApplication();
 $option    = JRequest::getVar('option');
 $user      = JFactory::getUser();
-$template  = $mainframe->getTemplate();
+$template  = $app->getTemplate();
 
 // ensures the PHP version is correct
 if (version_compare(PHP_VERSION, '5.0.0', '<'))
@@ -48,14 +48,30 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					<td>
 						<div id="cpanel">
 						<?php
-						if (!$this->dopostinstall)  {
+						$config_not_saved =
+							(!FLEXI_J16GE && !$this->params->get('flexi_section')) ||
+							(FLEXI_J16GE && !$this->params->get('flexi_cat_extension'));
+						if (!$this->dopostinstall)
+						{
 							echo '<div class="fc-error">';
 							echo JText::_( 'FLEXI_DO_POSTINSTALL' );
 							echo '</div>';
-						}else if (!$this->existmenu || !$this->existcat || !$this->params->get('flexi_cat_extension') /*|| !$this->params->get('search_mode')*/) {
+						}
+						else if ( !$this->existmenu || !$this->existcat || $config_not_saved )
+						{
 							echo '<div class="fc-error">';
-							if (!$this->params->get('flexi_cat_extension') || $this->params->get('flexi_cat_extension') == '')	echo JText::sprintf( 'FLEXI_CONFIGURATION_NOT_SAVED', "<a class='modal' rel=\"{handler: 'iframe', size: {x: 850, y: 550}, onClose: function() {}}\" href='index.php?option=com_config&view=component&component=com_flexicontent&path=&tmpl=component' style='color: red;'>".JText::_("FLEXI_CONFIG")."</a>" ) . '<br />';
-							//else if (!$this->params->get('search_mode'))	echo str_replace('"_QQ_"', '"', JText::_( 'FLEXI_NO_SEARCH_MODE_CONFIGURED' )) . '<br />';
+							if ( $config_not_saved )
+							{
+								if ( FLEXI_J16GE ) {
+									$conf_link = 'index.php?option=com_config&view=component&component=com_flexicontent&path=';
+									$conf_link = FLEXI_J30GE ? "<a href='".$conf_link."' style='color: red;'>" :
+										"<a class='modal' rel=\"{handler: 'iframe', size: {x: 850, y: 550}, onClose: function() {}}\" href='".$conf_link."&tmpl=component' style='color: red;'>" ;
+									$msg = JText::sprintf( 'FLEXI_CONFIGURATION_NOT_SAVED', $conf_link.JText::_("FLEXI_CONFIG")."</a>" );
+								} else {
+									$msg = str_replace('"_QQ_"', '"', JText::_( 'FLEXI_NO_SECTION_CHOOSEN' ));
+								}
+								echo $msg . '<br />';
+							}
 							else if (!$this->existcat)	echo JText::_( 'FLEXI_NO_CATEGORIES_CREATED' );
 							else if (!$this->existmenu)	echo JText::_( 'FLEXI_NO_MENU_CREATED' );
 							echo '</div>';
@@ -190,22 +206,30 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			</td>
 			<td valign="top" width="420px" style="padding: 7px 0 0 5px">
 			<?php
-			echo JHtml::_('sliders.start');
+			echo FLEXI_J16GE ? JHtml::_('sliders.start') : $this->pane->startPane( 'stat-pane' );
 			if (!$this->dopostinstall || !$this->allplgpublish) {
 				$title = JText::_( 'FLEXI_POST_INSTALL' );
-				echo JHtml::_('sliders.panel', $title, 'postinstall' );
+				echo FLEXI_J16GE ?
+					JHtml::_('sliders.panel', $title, 'postinstall' ) :
+					$this->pane->startPanel( $title, 'postinstall' );
 				echo $this->loadTemplate('postinstall');
+				echo FLEXI_J16GE ? '' : $this->pane->endPanel();
 			}
 			?>
 			
 			
 			<?php
 			$title = JText::_( 'FLEXI_PENDING_SLIDER' )." (".count($this->pending)."/".$this->totalrows['pending'].")";
-			echo JHtml::_('sliders.panel', $title, 'pending' );
+			echo FLEXI_J16GE ? JHtml::_('sliders.panel', $title, 'pending' ) : $this->pane->startPanel( $title, 'pending' );
 			$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=PE';
 			echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 			?>
 				<table class="adminlist">
+					<tr style="background-color:gray;">
+						<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
+						<td><?php echo JText::_('FLEXI_CREATED'); ?></td>
+						<td><?php echo JText::_('FLEXI_AUTHOR'); ?></td>
+					<tr>
 			<?php
 					$k = 0;
 					$n = count($this->pending);
@@ -242,19 +266,27 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						}
 						?>
 						</td>
+						<td><?php echo JHTML::_('date',  $row->created); ?></td>
+						<td><?php echo $row->creator; ?></td>
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
+				<?php echo  FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 				
 				
 				<?php
 				$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' )." (".count($this->revised)."/".$this->totalrows['revised'].")";
-				echo JHtml::_('sliders.panel', $title, 'revised' );
+				echo FLEXI_J16GE ? JHtml::_('sliders.panel', $title, 'revised' ) : $this->pane->startPanel( $title, 'revised' );
 				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=RV';
 				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
 				<table class="adminlist">
-				<?php
+					<tr style="background-color:gray;">
+						<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
+						<td><?php echo JText::_('FLEXI_MODIFIED'); ?></td>
+						<td><?php echo JText::_('FLEXI_NF_MODIFIER'); ?></td>
+					<tr>
+			<?php
 					$k = 0;
 					$n = count($this->revised);
 					for ($i=0, $n; $i < $n; $i++) {
@@ -290,19 +322,29 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						}
 						?>
 						</td>
+						<td><?php echo JHTML::_('date',  $row->modified); ?></td>
+						<td><?php echo $row->modifier; ?></td>
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
+				<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 				
 				
 				<?php
 				$title = JText::_( 'FLEXI_IN_PROGRESS_SLIDER' )." (".count($this->inprogress)."/".$this->totalrows['inprogress'].")";
-				echo JHtml::_('sliders.panel', $title, 'inprogress' );
+				echo FLEXI_J16GE ?
+					JHtml::_('sliders.panel', $title, 'inprogress' ) :
+					$this->pane->startPanel( $title, 'inprogress' );
 				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=IP';
 				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
 				<table class="adminlist">
-				<?php
+					<tr style="background-color:gray;">
+						<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
+						<td><?php echo JText::_('FLEXI_CREATED'); ?></td>
+						<td><?php echo JText::_('FLEXI_AUTHOR'); ?></td>
+					<tr>
+			<?php
 					$k = 0;
 					$n = count($this->inprogress);
 					for ($i=0, $n; $i < $n; $i++) {
@@ -338,19 +380,29 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						}
 						?>
 						</td>
+						<td><?php echo JHTML::_('date',  $row->created); ?></td>
+						<td><?php echo $row->creator; ?></td>
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>
+				<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 				
 				
 				<?php
 				$title = JText::_( 'FLEXI_DRAFT_SLIDER' )." (".count($this->draft)."/".$this->totalrows['draft'].")";
-				echo JHtml::_('sliders.panel', $title, 'draft' );
+				echo FLEXI_J16GE ?
+					JHtml::_('sliders.panel', $title, 'draft' ) : 
+					$this->pane->startPanel( $title, 'draft' );
 				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=OQ';
 				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
 				<table class="adminlist">
-				<?php
+					<tr style="background-color:gray;">
+						<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
+						<td><?php echo JText::_('FLEXI_CREATED'); ?></td>
+						<td><?php echo JText::_('FLEXI_AUTHOR'); ?></td>
+					<tr>
+			<?php
 					$k = 0;
 					$n = count($this->draft);
 					for ($i=0, $n; $i < $n; $i++) {
@@ -386,9 +438,12 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						}
 						?>
 						</td>
+						<td><?php echo JHTML::_('date',  $row->created); ?></td>
+						<td><?php echo $row->creator; ?></td>
 					</tr>
 					<?php $k = 1 - $k; } ?>
 				</table>		
+				<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 				
 				
 			<?php
@@ -418,14 +473,21 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					});
 				});
 				");
-				echo JHtml::_('sliders.panel', JText::_( 'FLEXI_VERSION_CHECKING' ), 'updatecomponent' );
+				echo FLEXI_J16GE ?
+					JHtml::_('sliders.panel', JText::_( 'FLEXI_VERSION_CHECKING' ), 'updatecomponent' ) :
+					$this->pane->startPanel( JText::_( 'FLEXI_VERSION_CHECKING' ), 'updatecomponent' ); 
 				echo "<div id=\"displayfversion\" style='min-height:20px;'></div>";
+				echo FLEXI_J16GE ? '' : $this->pane->endPanel();
 			}
 			?>
 				
-				<?php echo JHtml::_('sliders.end'); ?>
+				<?php echo FLEXI_J16GE ? JHtml::_('sliders.end') : $this->pane->endPane();?>
 				<div class="credits">
-					<?php echo JHTML::_('image', 'administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent' ); ?>
+					<?php
+						echo FLEXI_J16GE ?
+							JHTML::image('administrator/components/com_flexicontent/assets/images/logo.png', 'FLEXIcontent') :
+							JHTML::_('image.site', 'logo.png', '../administrator/components/com_flexicontent/assets/images/', NULL, NULL, 'FLEXIcontent') ;
+					?>
 					<p><a href="http://www.flexicontent.org" target="_blank">FLEXIcontent</a> version <?php echo FLEXI_VERSION . ' ' . FLEXI_RELEASE; ?><br />released under the GNU/GPL licence</p>
 					<p>Copyright &copy; 2009-2012
 					<br />

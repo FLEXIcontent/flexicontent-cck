@@ -36,23 +36,36 @@ class FlexicontentViewTags extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		$mainframe =  JFactory::getApplication();
-
 		//initialize variables
-		$document =  JFactory::getDocument();
-		$menus    =  JSite::getMenu();
+		$app      = JFactory::getApplication();
+		$document = JFactory::getDocument();
+		$menus    = JSite::getMenu();
 		$menu     = $menus->getActive();
-		$uri      =  JFactory::getURI();
+		$uri      = JFactory::getURI();
 		
-		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($mainframe->getParams('com_flexicontent'));
+		// Set tag parameters as VIEW's parameters (tag parameters are merged with component/page(=menu item) and optionally with tag cloud parameters)
+		$tag    = $this->get('Tag');
+		$params = @ $tag->parameters;
 		
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE && $menu) {
-			$menuParams = new JRegistry;
-			$menuParams->loadJSON($menu->params);
-			$params->merge($menuParams);
+		// Raise a 404 error, if tag doesn't exist or access isn't permitted
+		if ( empty($tag) ) {
+			$tid = JRequest::getInt('id', 0);
+			$msg = JText::sprintf( $tid ? 'Tag id was not set (is 0)' : 'Tag #%d not found', $tid );
+			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 		}
+		
+		// Get remainging data from the model
+		$items  = $this->get('Data');
+		$total  = $this->get('Total');
+		
+		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
+		$limitstart = JRequest::getInt('limitstart');
+		$limit      = $app->getUserStateFromRequest('com_flexicontent.tags.limit', 'limit', $params->def('limit', 0), 'int');
+		
+		
+		// ********************************
+		// Load needed JS libs & CSS styles
+		// ********************************
 		
 		//add css file
 		if (!$params->get('disablecss', '')) {
@@ -61,28 +74,9 @@ class FlexicontentViewTags extends JViewLegacy
 		}
 		
 		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
-		
-		// Get data from the model		
-		$items  =  $this->get('Data');
-		$tag    =  $this->get('Tag');
-		$total  = $this->get('Total');
-		
-		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
-		$limitstart = JRequest::getInt('limitstart');
-		$limit      = $mainframe->getUserStateFromRequest('com_flexicontent.tags.limit', 'limit', $params->def('limit', 0), 'int');
-		
-		// set 404 if tag doesn't exist or access isn't permitted
-		if ( empty($tag) ) {
-			$tid = JRequest::getInt('id', 0);
-			$msg = JText::sprintf( $tid ? 'Tag id was not set (is 0)' : 'Tag #%d not found', $tid );
-			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
-		}
-		
-		// Set tag parameters as VIEW's parameters (tag parameters are merged with component/page(=menu item) and optionally with tag cloud parameters)
-		$params =  $tag->parameters;
 		
 		
 		// **********************
@@ -127,11 +121,11 @@ class FlexicontentViewTags extends JViewLegacy
 		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
-			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = $mainframe->getCfg('sitename') ." - ". $doc_title ;
+			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
+				$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
 			}
-			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = $doc_title ." - ". $mainframe->getCfg('sitename') ;
+			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
+				$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
 			}
 		}
 		
@@ -145,7 +139,7 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		// ** writting both old and new way as an example
 		if (!FLEXI_J16GE) {
-			if ($mainframe->getCfg('MetaTitle') == '1') 	$mainframe->addMetaTag('title', $params->get('page_title'));
+			if ($app->getCfg('MetaTitle') == '1') 	$app->addMetaTag('title', $params->get('page_title'));
 		} else {
 			if (JApplication::getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
 		}		

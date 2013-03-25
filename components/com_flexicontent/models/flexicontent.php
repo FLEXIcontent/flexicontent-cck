@@ -66,18 +66,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function __construct()
 	{
 		parent::__construct();
-		$mainframe =& JFactory::getApplication();
-
-		// Get the PAGE/COMPONENT parameters
-		$params = clone( $mainframe->getParams('com_flexicontent') );
+		$menu = JSite::getMenu()->getActive();
 		
-		// In J1.6+ does not merge current menu item parameters, the above code behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE) {
-			$menuParams = new JRegistry;
-			if ($menu = JSite::getMenu()->getActive()) {
-				$menuParams->loadJSON($menu->params);
-			}
-			$params->merge($menuParams);
+		// Get the COMPONENT only parameters and merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
 		}
 		
 		//get the root category of the directory
@@ -136,68 +131,20 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access private
 	 * @return string
 	 */
-	function _buildItemOrderBy($prefix)
+	function _buildCatOrderBy($prefix)
 	{
-		$params = $this->_params;
+		$request_var = '';
+		$config_param = $prefix.'orderby';
+		$default_order = $this->getState('filter_order', 'c.title');
+		$default_order_dir = $this->getState('filter_order_dir', 'ASC');
 		
-		$filter_order     = $this->getState('filter_order');
-		$filter_order_dir = $this->getState('filter_order_dir');
-		
-		$filter_order     = $filter_order     ? $filter_order      :  'c.title';
-		$filter_order_dir = $filter_order_dir ? $filter_order_dir  :  'ASC';
-
-		if ($params->get($prefix.'orderby')) {
-			$order = $params->get($prefix.'orderby');
-			
-			switch ($order) {
-				case 'date' :                  // *** J2.5 only ***
-				$filter_order		= 'c.created_time';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'rdate' :                 // *** J2.5 only ***
-				$filter_order		= 'c.created_time';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'modified' :              // *** J2.5 only ***
-				$filter_order		= 'c.modified_time';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'alpha' :
-				$filter_order		= 'c.title';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'ralpha' :
-				$filter_order		= 'c.title';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'author' :                // *** J2.5 only ***
-				$filter_order		= 'u.name';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'rauthor' :               // *** J2.5 only ***
-				$filter_order		= 'u.name';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'hits' :                  // *** J2.5 only ***
-				$filter_order		= 'c.hits';
-				$filter_order_dir	= 'ASC';
-				break;
-				case 'rhits' :                 // *** J2.5 only ***
-				$filter_order		= 'c.hits';
-				$filter_order_dir	= 'DESC';
-				break;
-				case 'order' :
-				$filter_order		= !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
-				$filter_order_dir	= 'ASC';
-				break;
-			}
-			
-		}
-		
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir;
-		$orderby .= $filter_order!='c.title' ? ', c.title' : '';   // Order by title after default ordering
-
-		return $orderby;
+		// Precedence: $request_var ==> $order ==> $config_param ==> $default_order
+		return flexicontent_db::buildCatOrderBy(
+			$this->_params,
+			$order='', $request_var, $config_param,
+			$cat_tbl_alias = 'c', $user_tbl_alias = 'u',
+			$default_order, $default_order_dir
+		);
 	}
 	
 	
@@ -213,7 +160,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$params = $this->_params;
 
 		$user = & JFactory::getUser();
-		$orderby = $this->_buildItemOrderBy('cat_');
+		$orderby = $this->_buildCatOrderBy('cat_');
 
 		// Get a 2 character language tag
 		$lang = flexicontent_html::getUserCurrentLang();
@@ -359,7 +306,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$params = $this->_params;
 
 		$user = & JFactory::getUser();
-		$orderby = $this->_buildItemOrderBy('subcat_');
+		$orderby = $this->_buildCatOrderBy('subcat_');
 		
 		// Get a 2 character language tag
 		$lang = flexicontent_html::getUserCurrentLang();

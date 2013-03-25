@@ -78,13 +78,10 @@ class FlexicontentModelItemelement extends JModelLegacy
 		{
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db = JFactory::getDBO();
-			$db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $db->loadResult();
-			if ( $db->getErrorNum() ) {
-				$jAp= JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-			}
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+			
+			$this->_db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $this->_db->loadResult();
 		}
 		return $this->_data;
 	}
@@ -208,8 +205,8 @@ class FlexicontentModelItemelement extends JModelLegacy
 				$filter_lang = $app->getUserStateFromRequest( $option.'.itemelement.filter_lang', 	'filter_lang', '', 'cmd' );
 		}
 		
-		$search 			= $app->getUserStateFromRequest( $option.'.itemelement.search', 'search', '', 'string' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search = $app->getUserStateFromRequest( $option.'.itemelement.search', 'search', '', 'string' );
+		$search = trim( JString::strtolower( $search ) );
 
 		$where = array();
 		$where[] = ' i.state != -1';
@@ -247,7 +244,8 @@ class FlexicontentModelItemelement extends JModelLegacy
 		}
 
 		if ( $search ) {
-			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
+			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
+			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
 		}
 		
 		/*if (FLEXI_J16GE) {

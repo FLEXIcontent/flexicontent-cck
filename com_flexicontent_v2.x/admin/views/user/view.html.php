@@ -33,6 +33,7 @@ class FlexicontentViewUser extends JViewLegacy
 
 		//initialise variables
 		$document = JFactory::getDocument();
+		$db       = JFactory::getDBO();
 		$me       = JFactory::getUser();
 		
 		$cid = JRequest::getVar( 'cid', array(0), '', 'array' );
@@ -73,7 +74,6 @@ class FlexicontentViewUser extends JViewLegacy
 		JToolBarHelper::cancel( $ctrl.'cancel' );
 		JToolBarHelper::help( 'screen.users.edit' );
 
-		$db     = JFactory::getDBO();
 		$user   = $edit  ?  JUser::getInstance($cid[0])  :  JUser::getInstance();
 		$myuser = JFactory::getUser();
 		$acl    = JFactory::getACL();
@@ -293,7 +293,7 @@ class FlexicontentViewUser extends JViewLegacy
 				. ' WHERE member_id = '.(int) $cid[0]
 				;
 				$db->setQuery( $query );
-				$usergroups = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$usergroups = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			}
 			else
 			{
@@ -332,7 +332,7 @@ class FlexicontentViewUser extends JViewLegacy
 				$ugrps_qtmpl = 'SELECT group_id FROM #__user_usergroup_map AS ug WHERE ug.user_id = %d';
 				$query = sprintf( $ugrps_qtmpl, intval( $user->get('id') ) );
 				$db->setQuery( $query );
-				$usergroups = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$usergroups = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if ($db->getErrorMsg())	echo $db->getErrorMsg();
 			}
 		}

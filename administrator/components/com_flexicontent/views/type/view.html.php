@@ -32,7 +32,7 @@ class FlexicontentViewType extends JViewLegacy
 	function display($tpl = null)
 	{
 		//initialise variables
-		$mainframe = &JFactory::getApplication();
+		$app      = JFactory::getApplication();
 		$document	= JFactory::getDocument();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$user     = JFactory::getUser();
@@ -75,7 +75,7 @@ class FlexicontentViewType extends JViewLegacy
 		if ($row->id) {
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-				$mainframe->redirect( 'index.php?option=com_flexicontent&view=types' );
+				$app->redirect( 'index.php?option=com_flexicontent&view=types' );
 			}
 		}
 		

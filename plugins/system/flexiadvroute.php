@@ -84,7 +84,7 @@ class plgSystemFlexiadvroute extends JPlugin
 	function switchLangAssocItem( $args=null )
 	{
 		$flexiparams = JComponentHelper::getParams('com_flexicontent');
-		$app = JFactory::getApplication();
+		$app     = JFactory::getApplication();
 		$session = JFactory::getSession();
 		
 		// Execute only in frontend

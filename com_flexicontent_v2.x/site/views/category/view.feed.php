@@ -101,10 +101,6 @@ class FlexicontentViewCategory extends JViewLegacy
 					}
 	  		} else {     // case 2 extract from item
 					$src = flexicontent_html::extractimagesrc($row);
-					if ( !empty($src) ) {
-						$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-						$src = $base_url . $src;
-					}
 				}
 				
 				$RESIZE_FLAG = !$feed_image_source || !$img_field_size;

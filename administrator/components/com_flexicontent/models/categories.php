@@ -80,20 +80,17 @@ class FlexicontentModelCategories extends JModelLegacy
 	 */
 	function getData()
 	{
-		$mainframe = JFactory::getApplication();
-		static $items;
-
-		if (isset($items)) {
-			return $items;
-		}
+		$app = JFactory::getApplication();
+		$db = $this->getDbo();
+		$option = JRequest::getVar('option');
 		
-		$limit				= $mainframe->getUserStateFromRequest( 'com_flexicontent.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.limitstart', 'limitstart', 0, 'int' );
-		$filter_order		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_order', 		'filter_order', 	'c.ordering', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.filter_state', 'filter_state', '', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( 'com_flexicontent.categories.search', 'search', '', 'string' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );		
+		$filter_order     = $app->getUserStateFromRequest( $option.'.categories.filter_order',     'filter_order',     'c.ordering', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.categories.filter_order_Dir', 'filter_order_Dir', '', 'word' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.categories.filter_state',     'filter_state',     '', 'word' );
+		$search           = $app->getUserStateFromRequest( $option.'.categories.search', 'search', '', 'string' );
+		$search           = trim( JString::strtolower( $search ) );
+		$limit          = $app->getUserStateFromRequest( $option.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart     = $app->getUserStateFromRequest( $option.'.categories.limitstart', 'limitstart', 0, 'int' );
 		
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', c.ordering';
 		
@@ -113,12 +110,12 @@ class FlexicontentModelCategories extends JModelLegacy
 		if ($search) {			
 			$query = 'SELECT c.id'
 					. ' FROM #__categories AS c'
-					. ' WHERE LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false )
+					. ' WHERE LOWER(c.title) LIKE '.$db->Quote( '%'.$db->getEscaped( $search, true ).'%', false )
 					. ' AND c.section = ' . FLEXI_SECTION
 					. $where
 					;
-			$this->_db->setQuery( $query );
-			$search_rows = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();					
+			$db->setQuery( $query );
+			$search_rows = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();					
 		}
 		
 		$query = 'SELECT c.*, u.name AS editor, g.name AS groupname, COUNT(rel.catid) AS nrassigned, c.params as config '
@@ -128,13 +125,13 @@ class FlexicontentModelCategories extends JModelLegacy
 					. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
 					. ' LEFT JOIN #__sections AS sec ON sec.id = c.section'
 					. ' WHERE c.section = ' . FLEXI_SECTION
-					. ' AND sec.scope = ' . $this->_db->Quote('content')
+					. ' AND sec.scope = ' . $db->Quote('content')
 					. $where
 					. ' GROUP BY c.id'
 					. $orderby
 					;
-		$this->_db->setQuery( $query );
-		$rows = $this->_db->loadObjectList();
+		$db->setQuery( $query );
+		$rows = $db->loadObjectList();
 		//establish the hierarchy of the categories
 		$children = array();
 		
@@ -202,23 +199,14 @@ class FlexicontentModelCategories extends JModelLegacy
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user = JFactory::getUser();
-
 		if (count( $cid ))
 		{
-			if (!$publish) {
-				// Add all children to the list
-				foreach ($cid as $id)
-				{
-					$this->_addCategories($id, $cid);
-				}
-			} else {
-				// Add all parents to the list
-				foreach ($cid as $id)
-				{
-					$this->_addCategories($id, $cid, 'parents');
-				}
-			}
+			$user = JFactory::getUser();
+			
+			// Add all children to the list
+			if (!$publish)  foreach ($cid as $id)  $this->_addCategories($id, $cid);
+			// Add all parents to the list
+			else            foreach ($cid as $id)  $this->_addCategories($id, $cid, 'parents');
 			
 			$cids = implode( ',', $cid );
 

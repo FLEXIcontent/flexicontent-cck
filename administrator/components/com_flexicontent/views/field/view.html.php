@@ -191,7 +191,7 @@ class FlexicontentViewField extends JViewLegacy
 		// assign permissions for J2.5
 		if (FLEXI_J16GE) {
 			$permission = FlexicontentHelperPerm::getPerm();
-			$this->assignRef('permission'   , $permission);
+			$this->assignRef('permission' , $permission);
 		}
 		//assign data to template
 		$this->assignRef('document'   , $document);

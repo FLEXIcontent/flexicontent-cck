@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_favourites` (
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `id` int(11) unsigned NOT NULL auto_increment,
-  `asset_id` int(11) unsigned NOT NULL,
+  `asset_id` int(11) unsigned NOT NULL default '0',
   `field_type` varchar(50) NOT NULL default '',
   `name` varchar(255) NOT NULL default '',
   `label` varchar(255) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
   `access` int(11) unsigned NOT NULL default '1',
-  `ordering` int(11) NOT NULL default '1',
+  `ordering` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `uploaded_by` int(11) unsigned NOT NULL default '0',
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
-  `access` int(11) unsigned NOT NULL,
+  `access` int(11) unsigned NOT NULL default '1',
   `attribs` text NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
@@ -139,13 +139,13 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_tags_item_relations` (
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `id` int(11) NOT NULL auto_increment,
-  `asset_id` int(11) unsigned NOT NULL,
+  `asset_id` int(11) unsigned NOT NULL default '0',
   `name` varchar(255) NOT NULL,
   `alias` varchar(255) NOT NULL,
   `published` tinyint(1) NOT NULL,
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
-  `access` int(11) unsigned NOT NULL default '0',
+  `access` int(11) unsigned NOT NULL default '1',
   `attribs` text NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;

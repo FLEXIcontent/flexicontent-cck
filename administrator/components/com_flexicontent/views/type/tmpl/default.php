@@ -54,7 +54,7 @@ defined('_JEXEC') or die('Restricted access');
 							</label>
 						</td>
 						<td>
-							<input id="name" name="alias" class="required" value="<?php echo $this->row->alias; ?>" size="50" maxlength="100" />
+							<input id="name" name="alias" value="<?php echo $this->row->alias; ?>" size="50" maxlength="100" />
 						</td>
 					</tr>
 					<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>

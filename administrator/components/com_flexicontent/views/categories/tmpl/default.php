@@ -17,9 +17,10 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-$user       = &JFactory::getUser();
-$cparams = & JComponentHelper::getParams( 'com_flexicontent' );
-$autologin= $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+
+$user      = JFactory::getUser();
+$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
+$autologin = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 
 
 $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
@@ -38,7 +39,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 			</td>
 			<td nowrap="nowrap">
-			  <?php echo $this->lists['state']; ?>
+				<?php echo $this->lists['state']; ?>
 			</td>
 		</tr>
 	</table>
@@ -66,7 +67,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 	<tfoot>
 		<tr>
 			<td colspan="11">
-				<?php echo $this->pageNav->getListFooter(); ?>
+				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
 	</tfoot>
@@ -91,11 +92,11 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			}
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
-			$canEdit		= 1;
-			$canEditOwn	= 1;
+			$canEdit    = 1;
+			$canEditOwn = 1;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td width="7"><?php echo $checked; ?></td>
 			<td width="1%" >
 				<?php
@@ -103,7 +104,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
 				?>
 			</td>
-			<td align="left">
+			<td align="left" class="col_title">
 				<?php
 				if (FLEXI_J16GE) {
 					if ($row->level>1) echo str_repeat('.&nbsp;&nbsp;&nbsp;', $row->level-1)."<sup>|_</sup>";
@@ -120,10 +121,15 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					} else {
 						$canCheckin = $user->gid >= 24;
 					}
-					if ($canCheckin && $row->checked_out == $user->id) {
-						//echo if (FLEXI_J16GE) JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'categories.', $canCheckin);
+					if ($canCheckin) {
+						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'categories.', $canCheckin);
 						$task_str = FLEXI_J16GE ? 'categories.checkin' : 'checkin';
-						echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						if ($row->checked_out == $user->id) {
+							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						} else {
+							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none;">';
+							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						}
 					}
 				}
 				
@@ -131,7 +137,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit && !$canEditOwn ) ) {
 					echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
 				
-				// Display title with edit link ... (item editable and not checked out)
+				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $row->alias; ?>">
@@ -167,9 +173,9 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				<?php echo $access; ?>
 			</td>
 			<td class="order">
-				<span><?php echo $this->pageNav->orderUpIcon( $i, true, 'orderup', 'Move Up', $this->ordering ); ?></span>
+				<span><?php echo $this->pagination->orderUpIcon( $i, true, 'orderup', 'Move Up', $this->ordering ); ?></span>
 
-				<span><?php echo $this->pageNav->orderDownIcon( $i, $n, true, 'orderdown', 'Move Down', $this->ordering );?></span>
+				<span><?php echo $this->pagination->orderDownIcon( $i, $n, true, 'orderdown', 'Move Down', $this->ordering );?></span>
 
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
 

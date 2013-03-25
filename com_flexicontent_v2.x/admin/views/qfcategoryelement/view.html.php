@@ -47,7 +47,7 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy {
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.menucategories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
 		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.menucategories.filter_state', 		'filter_state', 	'*', 'word' );
 		$search 			= $mainframe->getUserStateFromRequest( $option.'.menucategories.search', 			'search', 			'', 'string' );
-		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search 			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//prepare the document
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
@@ -68,11 +68,10 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy {
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 
-		$ordering = ($lists['order'] == 'c.ordering');
-
+		$ordering = ($lists['order'] == 'c.lft');
 
 		//assign data to template
-		$this->assignRef('lists'      	, $lists);
+		$this->assignRef('lists'     	, $lists);
 		$this->assignRef('rows'      	, $rows);
 		$this->assignRef('pageNav' 		, $pageNav);
 		$this->assignRef('ordering'		, $ordering);

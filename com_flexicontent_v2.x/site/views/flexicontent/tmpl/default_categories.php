@@ -95,7 +95,7 @@ switch ($cols)
 <?php foreach ($this->categories as $cat) : ?>
 
   <?php
-	if (FLEXI_J16GE) $cat->params = new JRegistry($cat->params);
+	if (FLEXI_J16GE && !is_object($cat->params) ) $cat->params = new JRegistry($cat->params);
   if ($this->params->get('hide_empty_cats')) {
     $subcats_are_empty = 1;
     if (!$cat->assigneditems) foreach($cat->subcats as $subcat) {
@@ -188,7 +188,7 @@ switch ($cols)
 		
 		<?php foreach ($cat->subcats as $subcat) : ?>
 			<?php
-			if (FLEXI_J16GE) $subcat->params = new JRegistry($subcat->params);
+			if (FLEXI_J16GE && !is_object($subcat->params) ) $subcat->params = new JRegistry($subcat->params);
 			$oddeven = $oddeven=='even' ? 'odd' : 'even';
 			
 			if ($hide_empty_subcats) {

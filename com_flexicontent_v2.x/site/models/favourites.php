@@ -146,10 +146,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		{		
 			$query = $this->_buildQuery();
 			$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
-			if ( $this->_db->getErrorNum() ) {
-				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
-			}
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		}
 		
 		return $this->_data;
@@ -185,7 +182,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		$params = & $this->_params;
 		
 		// image for an image field
-		$use_image    = (int)$params->get('use_image', 1);
+		/*$use_image    = (int)$params->get('use_image', 1);
 		$image_source = $params->get('image_source');
 
 		// EXTRA select and join for special fields: --image--
@@ -196,7 +193,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		} else {
 			$select_image	= '';
 			$join_image		= '';
-		}
+		}*/
 		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
@@ -236,7 +233,8 @@ class FlexicontentModelFavourites extends JModelLegacy
 			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
 		}
 
-		$query = 'SELECT i.id, i.*, ie.*, '.$select_image
+		$query = 'SELECT i.id, i.*, ie.*, '
+			//.$select_image
 			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 			. ' FROM #__content AS i'
@@ -246,7 +244,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 			. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
 			. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
 			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-			. $join_image
+			//. $join_image
 			. $field_item
 			. $joinaccess
 			. $where
@@ -288,14 +286,14 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 */
 	function _buildItemWhere( )
 	{
-		$mainframe =& JFactory::getApplication();
-		$params = & $this->_params;
-		$user		= & JFactory::getUser();
-		$db =& JFactory::getDBO();
+		$app    = JFactory::getApplication();
+		$params = $this->_params;
+		$user   = JFactory::getUser();
+		$db     = JFactory::getDBO();
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$now		= $mainframe->get('requestTime');
+		//$now		= $app->get('requestTime');
 		$now			= FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
 		$nullDate	= $db->getNullDate();
 
@@ -330,9 +328,9 @@ class FlexicontentModelFavourites extends JModelLegacy
 		{
 			$filter 		= JRequest::getString('filter', '', 'request');
 
-			if ($filter)
-			{
-				$where .= ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $this->_db->getEscaped( $filter, true ), false ).' IN BOOLEAN MODE)';
+			if ($filter) {
+				$search_term = FLEXI_J16GE ? $this->_db->escape( $filter, true ) : $this->_db->getEscaped( $filter, true );
+				$where .= ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $search_term, false ).' IN BOOLEAN MODE)';
 			}
 		}
 		return $where;
@@ -355,17 +353,10 @@ class FlexicontentModelFavourites extends JModelLegacy
 		
 		// a. Get the COMPONENT only parameters and merge current menu item parameters
 		$params = clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) $params->merge($menu->params);
-		
-		/*
-		// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($app->getParams('com_flexicontent'));
-		
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE && $menu) {
-			$params->merge($menu->params);
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
 		}
-		*/
 		
 		$this->_params = $params;
 	}

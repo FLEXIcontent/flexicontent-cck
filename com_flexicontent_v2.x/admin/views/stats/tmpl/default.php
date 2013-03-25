@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1189 2012-03-14 06:43:38Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1614 2013-01-04 03:57:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -21,8 +21,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $ctrl_items = FLEXI_J16GE ? "task=items." : "controller=items&amp;task=";
 $ctrl_users = FLEXI_J16GE ? "task=users." : "controller=users&amp;task=";
 
-echo $this->pane->startPane( 'stat-pane' );
-echo $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' );
+echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
+echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_GENERAL_STATS' ), 'general' ) : $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' ) ;
 ?>
 <table border="0">
 <tr>
@@ -169,8 +169,8 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' );
 </tr>
 </table>
 <?php
-echo $this->pane->endPanel();
-echo $this->pane->startPanel( JText::_( 'FLEXI_RATING_STATS' ), 'ratings' );
+echo FLEXI_J16GE ? '' : $this->pane->endPanel();
+echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_RATING_STATS' ), 'ratings' ) : $this->pane->startPanel( JText::_( 'FLEXI_RATING_STATS' ), 'ratings' ) ;
 ?>
 <table border="0">
 <tr>
@@ -263,8 +263,8 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_RATING_STATS' ), 'ratings' );
 </tr>
 </table>
 <?php
-echo $this->pane->endPanel();
-echo $this->pane->startPanel( JText::_( 'FLEXI_USER_STATS' ), 'users' );
+echo FLEXI_J16GE ? '' : $this->pane->endPanel();
+echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_USER_STATS' ), 'users' ) : $this->pane->startPanel( JText::_( 'FLEXI_USER_STATS' ), 'users' ) ;
 ?>
 <table border="0">
 <tr>
@@ -345,6 +345,6 @@ echo $this->pane->startPanel( JText::_( 'FLEXI_USER_STATS' ), 'users' );
 </tr>
 </table>
 <?php
-echo $this->pane->endPanel();
-echo $this->pane->endPane();
+echo FLEXI_J16GE ? '' : $this->pane->endPanel();
+echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane();
 ?>

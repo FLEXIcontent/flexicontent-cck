@@ -25,7 +25,7 @@ if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
 	ini_set('display_errors',1);
 }
 
-// Get component parameters and add tooltips css and js code
+// Get component parameters
 $cparams = JComponentHelper::getParams('com_flexicontent');
 
 if ( $cparams->get('print_logging_info') ) {
@@ -61,14 +61,6 @@ JFactory::getLanguage()->load('com_content', JPATH_ADMINISTRATOR, null, true);
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
-// Get component parameters
-$cparams = JComponentHelper::getParams('com_flexicontent');
-
-// Logging Info variables
-if ( $cparams->get('print_logging_info') ) {
-	global $fc_run_times;
-}
-
 if ( JRequest::getWord('format')!='raw') {
 	FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 	flexicontent_html::loadJQuery();
@@ -78,17 +70,17 @@ if (!function_exists('FLEXISubmenu'))
 {
 	function FLEXISubmenu($cando)
 	{
-		$perms = FlexicontentHelperPerm::getPerm();
+		$perms   = FlexicontentHelperPerm::getPerm();
+		$app     = JFactory::getApplication();
+		$session = JFactory::getSession();
 		
 		// Check access to current management tab
 		$not_authorized = isset($perms->$cando) && !$perms->$cando;
 		if ( $not_authorized ) {
-			$mainframe = JFactory::getApplication();
-			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+			$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
 		// Get post-installation FLAG (session variable), and current view (HTTP request variable)
-		$session  = JFactory::getSession();
 		$dopostinstall = $session->get('flexicontent.postinstall');
 		$view = JRequest::getVar('view', 'flexicontent');
 		
@@ -228,6 +220,9 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	if (isset($fc_run_times['render_field_html']))
 		$msg .= sprintf('<br/>-- [Field HTML Rendering: %.2f s] ', $fc_run_times['render_field_html']/1000000);
 	
+	if (isset($fc_run_times['auto_checkin']))
+		$msg .= sprintf('<br/>-- [Auto Checkin: %.2f s] ', $fc_run_times['render_field_html']/1000000);
+		
 	if (count($fields_render_times))
 		$msg .= sprintf('<br/>-- [FC Fields Value Retrieval: %.2f s] ', $fc_run_times['field_value_retrieval']/1000000);
 	

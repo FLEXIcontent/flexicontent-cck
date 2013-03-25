@@ -59,6 +59,8 @@ if ( !strlen($fields[0]) ) unset($fields[0]);
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcfavourites';
+$menu = JSite::getMenu()->getActive();
+if ($menu) $page_classes .= ' menuitem'.$menu->id; 
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 ?>
@@ -152,10 +154,6 @@ if ($use_fields && count($fields)) {
 				}
 			} else {
 				$src = flexicontent_html::extractimagesrc($item);
-				if ( !empty($src) ) {
-					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-					$src = $base_url . $src;
-				}
 			}
 			
 			$RESIZE_FLAG = !$image_source || !$img_field_size;

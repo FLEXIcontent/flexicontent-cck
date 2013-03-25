@@ -31,19 +31,16 @@ if (FLEXI_J16GE) {
  */
 class flexicontent_types extends JTable
 {
-	/**
-	 * Primary Key
-	 * @var int
-	 */
-	var $id 				= null;
+	/** @var int */
+	var $id 					= null;
 	/** @var string */
-	var $name				= '';
+	var $name					= '';
 	/** @var string */
 	var $alias				= '';
 	/** @var int */
 	var $published			= null;
 	/** @var int */
-	var $checked_out 		= 0;
+	var $checked_out		= 0;
 	/** @var date */
 	var $checked_out_time	= '';
 	/** @var int */

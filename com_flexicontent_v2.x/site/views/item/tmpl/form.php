@@ -305,7 +305,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	<?php if ($typeid==0) : ?>
 	
 		<div class="flexi_formblock">
-			<label id="type_id-lbl" for="type_id" class="flexi_label" >
+			<label id="type_id-lbl" for="jform_type_id" class="flexi_label" >
 				<?php echo JText::_( 'FLEXI_TYPE' ); ?>
 			</label>
 		<?php echo $this->lists['type']; ?>
@@ -429,11 +429,11 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				<?php else : ?>
 					<?php
 					if ( in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew || $this->item->id==$this->item->lang_parent_id) {
-						$jAp=& JFactory::getApplication();
+						$app = JFactory::getApplication();
 						$option = JRequest::getVar('option');
-						$jAp->setUserState( $option.'.itemelement.langparent_item', 1 );
-						$jAp->setUserState( $option.'.itemelement.type_id', $this->item->type_id);
-						$jAp->setUserState( $option.'.itemelement.created_by', $this->item->created_by);
+						$app->setUserState( $option.'.itemelement.langparent_item', 1 );
+						$app->setUserState( $option.'.itemelement.type_id', $this->item->type_id);
+						$app->setUserState( $option.'.itemelement.created_by', $this->item->created_by);
 						echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br>';
 						echo $this->form->getInput('lang_parent_id');
 					} else {

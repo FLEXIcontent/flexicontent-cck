@@ -80,9 +80,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 		
 		// Get component parameters
-		$params  = FLEXI_J16GE ? new JRegistry() : new JParameter("");
-		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$params->merge($cparams);
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
 		
 		// Merge the type parameters
 		$tparams = $model->getTypeparams();
@@ -324,17 +322,18 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		
-		// ******************************************************************************************
-		// If the item is not new, then we need to CLEAN THE CACHE so that our changes appear realtime
-		// ******************************************************************************************
-		if ( !$isnew ) {
-			if (FLEXI_J16GE) {
-				$cache = FLEXIUtilities::getCache();
-				$cache->clean('com_flexicontent_items');
-			} else {
-				$cache = JFactory::getCache('com_flexicontent_items');
-				$cache->clean();
-			}
+		// ***************************************************
+		// CLEAN THE CACHE so that our changes appear realtime
+		// ***************************************************
+		if (FLEXI_J16GE) {
+			$cache = FLEXIUtilities::getCache();
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+		} else {
+			$itemcache = JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
+			$filtercache = JFactory::getCache('com_flexicontent_filters');
+			$filtercache->clean();
 		}
 		
 		
@@ -704,6 +703,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		// Set only authenticated item ids for the copyitems() method
 		$auth_cid = $cid;
+		$clean_cache_flag = false;
 		
 		// Try to copy/move items
 		if ($task == 'copymove')
@@ -713,14 +713,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				if ( $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state) )
 				{
 					$msg = JText::sprintf( 'FLEXI_ITEMS_COPY_SUCCESS', count($auth_cid) );
-
-					if (FLEXI_J16GE) {
-						$cache = FLEXIUtilities::getCache();
-						$cache->clean('com_flexicontent_items');
-					} else {
-						$cache = JFactory::getCache('com_flexicontent_items');
-						$cache->clean();
-					}
+					$clean_cache_flag = true;
 				}
 				else
 				{
@@ -743,27 +736,14 @@ class FlexicontentControllerItems extends FlexicontentController
 					}
 				}
 				
-				if (FLEXI_J16GE) {
-					$cache = FLEXIUtilities::getCache();
-					$cache->clean('com_flexicontent_items');
-				} else {
-					$cache = JFactory::getCache('com_flexicontent_items');
-					$cache->clean();
-				}
+				$clean_cache_flag = true;
 			}
 			else // copy and move
 			{
 				if ( $model->copyitems($auth_cid, $keeptags, $prefix, $suffix, $copynr, $lang, $state, $method, $maincat, $seccats) )
 				{
 					$msg = JText::sprintf( 'FLEXI_ITEMS_COPYMOVE_SUCCESS', count($auth_cid) );
-
-					if (FLEXI_J16GE) {
-						$cache = FLEXIUtilities::getCache();
-						$cache->clean('com_flexicontent_items');
-					} else {
-						$cache = JFactory::getCache('com_flexicontent_items');
-						$cache->clean();
-					}
+					$clean_cache_flag = true;
 				}
 				else
 				{
@@ -773,6 +753,20 @@ class FlexicontentControllerItems extends FlexicontentController
 				}
 			}
 			$link 	= 'index.php?option=com_flexicontent&view=items';
+		}
+		
+		// CLEAN THE CACHE so that our changes appear realtime
+		if ($clean_cache_flag) {
+			if (FLEXI_J16GE) {
+				$cache = FLEXIUtilities::getCache();
+				$cache->clean('com_flexicontent_items');
+				$cache->clean('com_flexicontent_filters');
+			} else {
+				$itemcache = JFactory::getCache('com_flexicontent_items');
+				$itemcache->clean();
+				$filtercache = JFactory::getCache('com_flexicontent_filters');
+				$filtercache->clean();
+			}
 		}
 		
 		$this->setRedirect($link, $msg);
@@ -1072,7 +1066,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				// Cross check them if they already exist in the DB
 				$q = "SELECT id FROM #__content WHERE id IN (".$custom_id_list.")";
 				$db->setQuery($q);
-				$existing_ids = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$existing_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $existing_ids && count($existing_ids) ) {
 					echo "<script>alert ('File has ".count($existing_ids)." item IDs that already exist: \'".implode("\' , \'",$existing_ids)."\', please fix or set to ignore \'id\' column');";
 					echo "window.history.back();";
@@ -1173,7 +1167,7 @@ class FlexicontentControllerItems extends FlexicontentController
 								$_tns_list = "'". implode("','", $_tns) ."'";
 								$q = "SELECT name FROM #__flexicontent_tags WHERE name IN (". $_tns_list .")";
 								$db->setQuery($q);
-								$_tns_e = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+								$_tns_e = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 								
 								$_tns_m = array_diff( $_tns , $_tns_e );
 								if ( count($_tns_m) ) {
@@ -1186,7 +1180,7 @@ class FlexicontentControllerItems extends FlexicontentController
 								// Get tag ids
 								$q = "SELECT id FROM #__flexicontent_tags WHERE name IN (". $_tns_list .")";
 								$db->setQuery($q);
-								$data['tag'] = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+								$data['tag'] = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 							}
 						}
 					}
@@ -1202,7 +1196,7 @@ class FlexicontentControllerItems extends FlexicontentController
 							$_tis_list = implode(",", array_keys($_tis));
 							$q = "SELECT id FROM #__flexicontent_tags WHERE id IN (". $_tis_list .")";
 							$db->setQuery($q);
-							$data['tag'] = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+							$data['tag'] = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 						}
 					}
 					else if ( $fieldname=='created' )
@@ -1318,9 +1312,12 @@ class FlexicontentControllerItems extends FlexicontentController
 			if (FLEXI_J16GE) {
 				$cache = FLEXIUtilities::getCache();
 				$cache->clean('com_flexicontent_items');
+				$cache->clean('com_flexicontent_filters');
 			} else {
-				$cache = JFactory::getCache('com_flexicontent_items');
-				$cache->clean();
+				$itemcache = JFactory::getCache('com_flexicontent_items');
+				$itemcache->clean();
+				$filtercache = JFactory::getCache('com_flexicontent_filters');
+				$filtercache->clean();
 			}
 		}
 		
@@ -1341,48 +1338,9 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function checkin()
 	{
-		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$pk       = (int)$cid[0];
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '' );
-		
-		// Only attempt to check the row in if it exists.
-		if ($pk)
-		{
-			$user = JFactory::getUser();
-
-			// Get an instance of the row to checkin.
-			$table = JTable::getInstance('flexicontent_items', '');
-			if (!$table->load($pk))
-			{
-				$this->setError($table->getError());
-				return;// false;
-			}
-
-			// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (a) record checked out by current user
-			if ($table->checked_out) {
-				if (FLEXI_J16GE) {
-					$canCheckin = $user->authorise('core.admin', 'checkin');
-				} else if (FLEXI_ACCESS) {
-					$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
-				} else {
-					// Only admin or super admin can check-in
-					$canCheckin = $user->gid >= 24;
-				}
-				if ( !$canCheckin && $table->checked_out != $user->id) {
-					$this->setError(JText::_( 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER'));
-					return;// false;
-				}
-			}
-
-			// Attempt to check the row in.
-			if (!$table->checkin($pk))
-			{
-				$this->setError($table->getError());
-				return;// false;
-			}
-		}
-		
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', JText::sprintf('FLEXI_RECORD_CHECKED_IN_SUCCESSFULLY', 1) );
+		$tbl = 'flexicontent_items';
+		$redirect_url = 'index.php?option=com_flexicontent&view=items';
+		flexicontent_db::checkin($tbl, $redirect_url, $this);
 		return;// true;
 	}
 	
@@ -1558,9 +1516,12 @@ class FlexicontentControllerItems extends FlexicontentController
 		if (FLEXI_J16GE) {
 			$cache = FLEXIUtilities::getCache();
 			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
 		} else {
-			$cache = JFactory::getCache('com_flexicontent_items');
-			$cache->clean();
+			$itemcache = JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
+			$filtercache = JFactory::getCache('com_flexicontent_filters');
+			$filtercache->clean();
 		}
 
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=items', $msg );
@@ -1664,9 +1625,12 @@ class FlexicontentControllerItems extends FlexicontentController
 			if (FLEXI_J16GE) {
 				$cache = FLEXIUtilities::getCache();
 				$cache->clean('com_flexicontent_items');
+				$cache->clean('com_flexicontent_filters');
 			} else {
-				$cache = JFactory::getCache('com_flexicontent_items');
-				$cache->clean();
+				$itemcache = JFactory::getCache('com_flexicontent_items');
+				$itemcache->clean();
+				$filtercache = JFactory::getCache('com_flexicontent_filters');
+				$filtercache->clean();
 			}
 		}
 		
@@ -1731,12 +1695,15 @@ class FlexicontentControllerItems extends FlexicontentController
 			JError::raiseWarning( 500, $msg ." " . $model->getError() );
 			$msg = '';
 		} else {
-			if (!FLEXI_J16GE) {
-				$cache = JFactory::getCache('com_flexicontent_items');
-				$cache->clean();
-			} else {
+			if (FLEXI_J16GE) {
 				$cache = FLEXIUtilities::getCache();
 				$cache->clean('com_flexicontent_items');
+				$cache->clean('com_flexicontent_filters');
+			} else {
+				$itemcache = JFactory::getCache('com_flexicontent_items');
+				$itemcache->clean();				
+				$filtercache = JFactory::getCache('com_flexicontent_filters');
+				$filtercache->clean();				
 			}
 		}
 		
@@ -1849,29 +1816,55 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		// New item: check if user can create in at least one category
-		if ($isnew && !$canAdd) {
-			JError::raiseNotice( 500, JText::_( 'FLEXI_NO_ACCESS_CREATE' ));
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
-			return;
+		if ($isnew) {
+			
+			if( !$canAdd ) {
+				JError::raiseNotice( 500, JText::_( 'FLEXI_NO_ACCESS_CREATE' ));
+				$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
+				return;
+			}
+			
+			// User Group / Author parameters
+			$db = JFactory::getDBO();
+			$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
+			$authorparams = $db->loadResult();
+			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
+			$max_auth_limit = $authorparams->get('max_auth_limit', 0);  // maximum number of content items the user can create
+			
+			if ($max_auth_limit) {
+				$db->setQuery('SELECT COUNT(id) FROM #__content WHERE created_by = ' . $user->id);
+				$authored_count = $db->loadResult();
+				if ($authored_count >= $max_auth_limit) {
+					JError::raiseNotice( 500, JText::sprintf( 'FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit ) );
+					$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '' );
+					return;
+				}
+			}
 		}
-
+		
 		// Existing item: Check if user can edit current item
-		if (!$isnew && !$canEdit) {
-			JError::raiseNotice( 500, JText::_( 'FLEXI_NO_ACCESS_EDIT' ));
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
-			return;
+		else {
+			if ( !$canEdit ) {
+				JError::raiseNotice( 500, JText::_( 'FLEXI_NO_ACCESS_EDIT' ));
+				$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
+				return;
+			}
 		}
-
-		// Check if item is checked out by other editor
-		if ($model->isCheckedOut( $user->get('id') )) {
+		
+		// Check if record is checked out by other editor
+		if ( $model->isCheckedOut( $user->get('id') ) ) {
 			JError::raiseNotice( 500, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
 			return;
 		}
 		
-		// Checkout the item and proceed to edit form
-		$model->checkout( $user->get('id') );
-
+		// Checkout the record and proceed to edit form
+		if ( !$model->checkout() ) {
+			JError::raiseWarning( 500, $model->getError() );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '');
+			return;
+		}
+		
 		parent::display();
 	}
 
@@ -2051,8 +2044,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			$cache = FLEXIUtilities::getCache();
 			$cache->clean('com_flexicontent_items');
 		} else {
-			$cache = JFactory::getCache('com_flexicontent_items');
-			$cache->clean();
+			$itemcache = JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
 		}
 		echo 0;
 	}
@@ -2074,8 +2067,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			$cache = FLEXIUtilities::getCache();
 			$cache->clean('com_flexicontent_items');
 		} else {
-			$cache = JFactory::getCache('com_flexicontent_items');
-			$cache->clean();
+			$itemcache = JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
 		}
 		
 		echo JText::_( 'FLEXI_NOT_RATED_YET' );

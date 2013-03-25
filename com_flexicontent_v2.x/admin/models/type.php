@@ -201,17 +201,17 @@ class FlexicontentModelType extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkin()
+	function checkin($pk = NULL)
 	{
-		if ($this->_id)
-		{
-			$type  = JTable::getInstance('flexicontent_types', '');
-			$user  = JFactory::getUser();
-			return $type->checkout($user->get('id'), $this->_id);
+		if (!$pk) $pk = $this->_id;
+		if ($pk) {
+			$item = JTable::getInstance('flexicontent_types', '');
+			return $item->checkin($pk);
 		}
 		return false;
 	}
-
+	
+	
 	/**
 	 * Method to checkout/lock the type
 	 *
@@ -220,22 +220,26 @@ class FlexicontentModelType extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function checkout($uid = null)
+	function checkout($pk = null)   // UPDATED to match function signature of J1.6+ models
 	{
-		if ($this->_id)
-		{
-			// Make sure we have a user id to checkout the group with
-			if (is_null($uid)) {
-				$user	= JFactory::getUser();
-				$uid	= $user->get('id');
-			}
-			// Lets get to it and checkout the thing...
-			$type = JTable::getInstance('flexicontent_types', '');
-			return $type->checkout($uid, $this->_id);
-		}
+		// Make sure we have a record id to checkout the record with
+		if ( !$pk ) $pk = $this->_id;
+		if ( !$pk ) return true;
+		
+		// Get current user
+		$user	= JFactory::getUser();
+		$uid	= $user->get('id');
+		
+		// Lets get table record and checkout the it
+		$tbl = JTable::getInstance('flexicontent_types', '');
+		if ( $tbl->checkout($uid, $this->_id) ) return true;
+		
+		// Reaching this points means checkout failed
+		$this->setError( FLEXI_J16GE ? $tbl->getError() : JText::_("FLEXI_ALERT_CHECKOUT_FAILED") );
 		return false;
 	}
-
+	
+	
 	/**
 	 * Tests if the type is checked out
 	 *
@@ -276,6 +280,10 @@ class FlexicontentModelType extends JModelAdmin
 		// NOTE: 'data' is post['jform'] for J2.5 (this is done by the controller or other caller)
 		$type = $this->getTable('flexicontent_types', '');
 		
+		// Load existing data and set new record flag
+		$isnew = ! (boolean) $data['id'];
+		if ($data['id'])  $type->load($data['id']);
+		
 		// bind it to the table
 		if (!$type->bind($data)) {
 			$this->setError( $this->_db->getErrorMsg() );
@@ -284,7 +292,7 @@ class FlexicontentModelType extends JModelAdmin
 		
 		// Get field attibutes, for J1.5 is params for J2.5 is attribs
 		$attibutes = !FLEXI_J16GE ? $data['params'] : $data['attribs'];
-
+		
 		// Build attibutes INI string
 		if (is_array($attibutes))
 		{
@@ -325,7 +333,7 @@ class FlexicontentModelType extends JModelAdmin
 		$this->_id   = $type->id;
 		
 		// Only insert default relations if the type is new
-		if ( $insertid = (int)$this->_db->insertid() )
+		if ( $isnew )
 			$this->_addCoreFieldRelations();
 		
 		return true;
@@ -372,7 +380,7 @@ class FlexicontentModelType extends JModelAdmin
 				. ' WHERE iscore = 1'
 				;
 		$this->_db->setQuery($query);
-		$corefields = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		$corefields = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		
 		return $corefields;
 	}

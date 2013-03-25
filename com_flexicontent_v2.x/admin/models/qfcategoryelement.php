@@ -93,23 +93,17 @@ class FlexicontentModelQfcategoryelement extends JModelLegacy
 	 */
 	function getData()
 	{
-		$mainframe = JFactory::getApplication();
+		$app    = JFactory::getApplication();
+		$params = JComponentHelper::getParams('com_flexicontent');
 		
-		static $items;
-
-		if (isset($items)) {
-			return $items;
-		}
+		$filter_order			= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
+		$filter_order_Dir	= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_state 		= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_state', 'filter_state', '', 'word' );
+		$search 			= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.search', 'search', '', 'string' );
+		$search 			= trim( JString::strtolower( $search ) );
+		$limit				= $app->getUserStateFromRequest( 'com_flexicontent.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart 	= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.limitstart', 'limitstart', 0, 'int' );
 		
-		$params 			= JComponentHelper::getParams('com_flexicontent');
-		$limit				= $mainframe->getUserStateFromRequest( 'com_flexicontent.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart 	= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.limitstart', 'limitstart', 0, 'int' );
-		$filter_order			= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_state', 'filter_state', '', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( 'com_flexicontent.menucategories.search', 'search', '', 'string' );
-		$search 			= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
-
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', c.lft';
 		
 		$where = array();
@@ -128,12 +122,12 @@ class FlexicontentModelQfcategoryelement extends JModelLegacy
 		if ($search) {			
 			$query = 'SELECT c.id'
 					. ' FROM #__categories AS c'
-					. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false )
+					. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false )
 					. ' AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
 					. $where
 					;
 			$this->_db->setQuery( $query );
-			$search_rows = FLEXI_J30GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();					
+			$search_rows = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();					
 		}
 		
 		$query = 'SELECT c.*, u.name AS editor, g.title AS groupname, COUNT(rel.catid) AS nrassigned'

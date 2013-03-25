@@ -970,6 +970,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$field->thumbs_src['small'] = array();
 		$field->thumbs_src['medium'] = array();
 		$field->thumbs_src['large'] = array();
+		$field->thumbs_src['original'] = array();
 		foreach ($values as $val)
 		{
 			// Unserialize value's properties and check for empty original name property
@@ -1595,7 +1596,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// make sure folder is writtable by phpthumb
 		if ( !isset($destpaths_arr[$destpath]) && JPath::canChmod($destpath)) 
 		{
-			chmod($destpath, '0755'); //JPath::setPermissions($destpath, '0644', '0755');  // *** VERY SLOW does chmod on all folder / subfolder files
+			chmod($destpath, 0755);
+			//JPath::setPermissions($destpath, '0644', '0755');  // *** VERY SLOW does chmod on all folder / subfolder files
 		}
 		$destpaths_arr[$destpath] = 1;  // Avoid trying to set folder permission multiple times
 		
@@ -1609,7 +1611,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// Make sure file path has correct permissions
-		if ( $result && JPath::canChmod($filepath) )  chmod($filepath, '0644');
+		if ( $result && JPath::canChmod($filepath) )  chmod($filepath, 0644);
 		
 		return $result;
 	}

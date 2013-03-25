@@ -57,8 +57,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			$cache = FLEXIUtilities::getCache();
 			$cache->clean('com_flexicontent_items');
 		} else {
-			$cache = JFactory::getCache('com_flexicontent_items');
-			$cache->clean();
+			$itemcache = JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
 		}
 		echo 0;
 	}
@@ -80,8 +80,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			$cache = FLEXIUtilities::getCache();
 			$cache->clean('com_flexicontent_items');
 		} else {
-			$cache = JFactory::getCache('com_flexicontent_items');
-			$cache->clean();
+			$itemcache = JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
 		}
 		
 		echo JText::_( 'FLEXI_NOT_RATED_YET' );

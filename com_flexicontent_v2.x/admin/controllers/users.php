@@ -356,7 +356,7 @@ class FlexicontentControllerusers extends FlexicontentController
 					;
 					$db->setQuery( $query );
 					$count = $db->loadResult();
-					if ($db->getErrorMsg())	echo $db->getErrorMsg();
+					if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 				}
 
 				if ( $isSuperAdmin && $count <= 1 )
@@ -457,7 +457,7 @@ class FlexicontentControllerusers extends FlexicontentController
 					;
 					$db->setQuery( $query );
 					$count = $db->loadResult();
-					if ($db->getErrorMsg())	echo $db->getErrorMsg();
+					if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 				}
 
 				if ( $block && $isSuperAdmin && $count <= 1 )

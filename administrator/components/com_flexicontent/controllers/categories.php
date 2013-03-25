@@ -36,13 +36,12 @@ class FlexicontentControllerCategories extends FlexicontentController
 	 */
 	function __construct()
 	{
-		if (FLEXI_J16GE) {
+		if (FLEXI_J16GE)
 			$this->text_prefix = 'com_content';
-		}
 		parent::__construct();
 
 		// Register Extra task
-		$this->registerTask( 'add'  ,        'edit' );
+		$this->registerTask( 'add',         'edit' );
 		$this->registerTask( 'apply',        'save' );
 		$this->registerTask( 'saveandnew',   'save' );
 		if (!FLEXI_J16GE) {
@@ -119,9 +118,9 @@ class FlexicontentControllerCategories extends FlexicontentController
 				$categoriesmodel->publish($pubid, 0);
 			}
 			
-			$cache 		=& JFactory::getCache('com_flexicontent');
+			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-			$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
 			$catscache->clean();
 
 		} else {
@@ -134,6 +133,20 @@ class FlexicontentControllerCategories extends FlexicontentController
 		$model->checkin();
 		
 		$this->setRedirect($link, $msg);
+	}
+	
+	
+	/**
+	 * Check in a record
+	 *
+	 * @since	1.5
+	 */
+	function checkin()
+	{
+		$tbl = 'flexicontent_categories';
+		$redirect_url = 'index.php?option=com_flexicontent&view=categories';
+		flexicontent_db::checkin($tbl, $redirect_url, $this);
+		return;// true;
 	}
 	
 	
@@ -219,58 +232,6 @@ class FlexicontentControllerCategories extends FlexicontentController
 
 		// redirect to categories management tab
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
-	}
-	
-	
-	/**
-	 * Check in a record
-	 *
-	 * @since	1.5
-	 */
-	function checkin()
-	{
-		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$pk       = (int)$cid[0];
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', '' );
-		
-		// Only attempt to check the row in if it exists.
-		if ($pk)
-		{
-			$user = JFactory::getUser();
-
-			// Get an instance of the row to checkin.
-			$table = JTable::getInstance('flexicontent_categories', '');
-			if (!$table->load($pk))
-			{
-				$this->setError($table->getError());
-				return;// false;
-			}
-
-			// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (a) record checked out by current user
-			if ($table->checked_out) {
-				if (FLEXI_J16GE) {
-					$canCheckin = $user->authorise('core.admin', 'checkin');
-				} else if (FLEXI_ACCESS) {
-					$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
-				} else {
-					$canCheckin = $user->gid >= 24;
-				}
-				if ( !$canCheckin && $table->checked_out != $user->id) {
-					$this->setError(JText::_( 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER'));
-					return;// false;
-				}
-			}
-
-			// Attempt to check the row in.
-			if (!$table->checkin($pk))
-			{
-				$this->setError($table->getError());
-				return;// false;
-			}
-		}
-		
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', JText::sprintf('FLEXI_RECORD_CHECKED_IN_SUCCESSFULLY', 1) );
-		return;// true;
 	}
 	
 	
@@ -455,19 +416,17 @@ class FlexicontentControllerCategories extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$user = JFactory::getUser();
+		$user  = JFactory::getUser();
+		$task  = JRequest::getVar( 'task' );
 		$model = $this->getModel('categories');
-		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id       = (int)$cid[0];
+		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$id    = (int)$cid[0];
 		
 		// Get new category access
 		if (FLEXI_J16GE) {
 			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
 			$access = $accesses[$id];
-		}
-		else
-		{
-			$task		= JRequest::getVar( 'task' );
+		} else {
 			if ($task == 'accesspublic') {
 				$access = 0;
 			} elseif ($task == 'accessregistered') {
@@ -518,15 +477,22 @@ class FlexicontentControllerCategories extends FlexicontentController
 		JRequest::setVar( 'view', 'category' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 
-		$model 	= $this->getModel('category');
-		$user	=& JFactory::getUser();
-
-		// Error if checkedout by another administrator
-		if ($model->isCheckedOut( $user->get('id') )) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
+		$model = $this->getModel('category');
+		$user  = JFactory::getUser();
+		
+		// Check if record is checked out by other editor
+		if ( $model->isCheckedOut( $user->get('id') ) ) {
+			JError::raiseNotice( 500, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', '');
+			return;
 		}
-
-		$model->checkout( $user->get('id') );
+		
+		// Checkout the record and proceed to edit form
+		if ( !$model->checkout() ) {
+			JError::raiseWarning( 500, $model->getError() );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', '');
+			return;
+		}
 		
 		parent::display();
 	}

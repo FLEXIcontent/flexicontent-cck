@@ -52,6 +52,7 @@ class FlexicontentController extends JControllerLegacy
 			// false means it has been checked during current session, but has failed one or more tasks
 			// In both cases we must evaluate the POSTINSTALL tasks,  and set the session variable
 			$session->set('flexicontent.postinstall', $dopostinstall = $this->getPostinstallState());
+			$session->set('unbounded_count', false, 'flexicontent');  // indicate to item manager to recheck unbound items
 		}
 		
 		// SET recheck_aftersave FLAG to indicate rechecking of postinstall tasks after configuration save or article importing
@@ -74,7 +75,7 @@ class FlexicontentController extends JControllerLegacy
 			$session->set('flexicontent.allplgpublish', $allplgpublish);
 		}
 		
-		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search')) && !$dopostinstall) {
+		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search', 'import')) && !$dopostinstall) {
 			$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
@@ -217,13 +218,13 @@ class FlexicontentController extends JControllerLegacy
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
 		// Initialize some variables
-		$mainframe = JFactory::getApplication();
-		$option    = JRequest::getVar('option');
-		$filename  = JRequest::getVar('filename', '', 'post', 'cmd');
+		$app     = JFactory::getApplication();
+		$option  = JRequest::getVar('option');
+		$filename    = JRequest::getVar('filename', '', 'post', 'cmd');
 		$filecontent = JRequest::getVar('filecontent', '', '', '', JREQUEST_ALLOWRAW);
 
 		if (!$filecontent) {
-			$mainframe->redirect('index.php?option='.$option, JText::_( 'FLEXI_OPERATION_FAILED' ).': '.JText::_( 'FLEXI_CONTENT_EMPTY' ));
+			$app->redirect('index.php?option='.$option, JText::_( 'FLEXI_OPERATION_FAILED' ).': '.JText::_( 'FLEXI_CONTENT_EMPTY' ));
 		}
 
 		// Set FTP credentials, if given
@@ -252,16 +253,16 @@ class FlexicontentController extends JControllerLegacy
 			switch($task)
 			{
 				case 'applyacl' :
-					$mainframe->redirect('index.php?option='.$option.'&view=editacl', JText::_( 'FLEXI_ACL_FILE_SUCCESSFULLY_ALTERED' ));
+					$app->redirect('index.php?option='.$option.'&view=editacl', JText::_( 'FLEXI_ACL_FILE_SUCCESSFULLY_ALTERED' ));
 					break;
 
 				case 'saveacl'  :
 				default         :
-					$mainframe->redirect('index.php?option='.$option, JText::_( 'FLEXI_ACL_FILE_SUCCESSFULLY_ALTERED' ) );
+					$app->redirect('index.php?option='.$option, JText::_( 'FLEXI_ACL_FILE_SUCCESSFULLY_ALTERED' ) );
 					break;
 			}
 		} else {
-			$mainframe->redirect('index.php?option='.$option, JText::_( 'FLEXI_OPERATION_FAILED' ).': '.JText::sprintf('FLEXI_FAILED_TO_OPEN_FILE_FOR_WRITING', $file));
+			$app->redirect('index.php?option='.$option, JText::_( 'FLEXI_OPERATION_FAILED' ).': '.JText::sprintf('FLEXI_FAILED_TO_OPEN_FILE_FOR_WRITING', $file));
 		}
 	}
 	
@@ -279,9 +280,13 @@ class FlexicontentController extends JControllerLegacy
 
 		$db = JFactory::getDBO();
 
-		$query 	=	"INSERT INTO `#__flexicontent_types` VALUES(1, 'Article', 'article', 1, 0, '0000-00-00 00:00:00', 0, 'ilayout=default\nhide_maintext=0\nhide_html=0\nmaintext_label=\nmaintext_desc=\ncomments=\ntop_cols=two\nbottom_cols=two')" ;
+		$query 	=	"INSERT INTO `#__flexicontent_types` "
+			." (id, ".(FLEXI_J16GE ? "asset_id, " : "")."name, alias, published, checked_out, checked_out_time, access, attribs) "
+			." VALUES(1, ".(FLEXI_J16GE ? "0, " : "")."'Article', 'article', 1, 0, '0000-00-00 00:00:00', ".(FLEXI_J16GE ? 1 : 0).", 'ilayout=default\nhide_maintext=0\nhide_html=0\nmaintext_label=\nmaintext_desc=\ncomments=\ntop_cols=two\nbottom_cols=two')"
+			;
 		$db->setQuery($query);
 		if (!$db->query()) {
+			if ($db->getErrorNum()) echo $db->getErrorMsg();
 			echo '<span class="install-notok"></span><span class="button-add"><a id="existtype" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		} else {
 			$query 	=	"INSERT INTO `#__flexicontent_fields_type_relations` (`field_id`,`type_id`,`ordering`)
@@ -302,6 +307,7 @@ class FlexicontentController extends JControllerLegacy
 							(14,1,14)" ;
 			$db->setQuery($query);
 			if (!$db->query()) {
+				if ($db->getErrorNum()) echo $db->getErrorMsg();
 				echo '<span class="install-notok"></span><span class="button-add"><a id="existtype" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 			} else {
 				echo '<span class="install-ok"></span>';
@@ -552,17 +558,22 @@ VALUES
 		$nullDate	= $db->getNullDate();
 		
 		// Add language column
-		$fields = $db->getTableFields('#__flexicontent_items_ext');
-		$language_col = (array_key_exists('language', $fields['#__flexicontent_items_ext'])) ? true : false;
+		if (!FLEXI_J16GE) {
+			$fields = $db->getTableFields(array('#__flexicontent_items_ext'));
+			$columns = $fields['#__flexicontent_items_ext'];
+		} else {
+			$columns = $db->getTableColumns('#__flexicontent_items_ext');
+		}
+		$language_col = array_key_exists('language', $columns) ? true : false;
 		if(!$language_col) {
 			$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `language` VARCHAR( 11 ) NOT NULL DEFAULT '' AFTER `type_id`" ;
 			$db->setQuery($query);
 			$result_lang_col = $db->query();
 			if (!$result_lang_col) echo "Cannot add language column<br>";
 		} else $result_lang_col = true;
-
+		
 		// Add translation group column
-		$lang_parent_id_col = (array_key_exists('lang_parent_id', $fields['#__flexicontent_items_ext'])) ? true : false;
+		$lang_parent_id_col = array_key_exists('lang_parent_id', $columns) ? true : false;
 		if(!$lang_parent_id_col) {
 			$query 	=	"ALTER TABLE #__flexicontent_items_ext ADD `lang_parent_id` INT NOT NULL DEFAULT 0 AFTER `language`" ;
 			$db->setQuery($query);
@@ -773,8 +784,8 @@ VALUES
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 
-		$db = JFactory::getDBO();
-		$mainframe= JFactory::getApplication();
+		$db  = JFactory::getDBO();
+		$app = JFactory::getApplication();
 
 		$queries 	= array();
 		// alter some table field types
@@ -840,7 +851,7 @@ VALUES
 				// Add the 'categories' field to the fields array for adding to versioning table
 				$query = "SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
-				$categories = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$categories = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if(!$categories || !count($categories)) {
 					$categories = array($catid = $row->catid);
 					$query = "INSERT INTO #__flexicontent_cats_item_relations VALUES('$catid','".$row->id."', '0');";
@@ -858,7 +869,7 @@ VALUES
 				// Add the 'tags' field to the fields array for adding to versioning table
 				$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
-				$tags = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$tags = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				$f = new stdClass();
 				$f->id					= 14;
 				$f->iscore			= 1;

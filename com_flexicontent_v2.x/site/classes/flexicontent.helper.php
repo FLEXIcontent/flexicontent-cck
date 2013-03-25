@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1654 2013-03-12 07:05:34Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1655 2013-03-16 17:55:25Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -75,15 +75,12 @@ class flexicontent_html
 		//require_once("components/com_flexicontent/classes/flexicontent.helper.php");
 		require_once("components/com_flexicontent/models/".FLEXI_ITEMVIEW.".php");
 		 
-		$mainframe = JFactory::getApplication();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
 		
-		if (FLEXI_J16GE)
-			$itemmodel = new FlexicontentModelItems();
-		else
-			$itemmodel = new FlexicontentModelItem();
+		$itemmodel = FLEXI_J16GE ? new FlexicontentModelItem() : new FlexicontentModelItems();
 		$item = $itemmodel->getItem($item_id, $check_view_access=false);
 		
-		$user = JFactory::getUser();
 		$aid = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
 		list($item) = FlexicontentFields::getFields($item, $view, $item->parameters, $aid);
 		
@@ -110,8 +107,8 @@ class flexicontent_html
 		// start capturing output into a buffer
 		ob_start();
 		// Include the requested template filename in the local scope (this will execute the view logic).
-		if ( file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout) )
-			include JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'item.php';
+		if ( file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout) )
+			include JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'item.php';
 		else if (file_exists(JPATH_COMPONENT.DS.'templates'.DS.$ilayout))
 			include JPATH_COMPONENT.DS.'templates'.DS.$ilayout.DS.'item.php';
 		else
@@ -130,9 +127,9 @@ class flexicontent_html
 	{
 		if ( !$params->get('limit_override') ) return '';
 		
-		$mainframe	= JFactory::getApplication();
-		//$orderby = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-		$limit = $mainframe->getUserStateFromRequest( 'limit', 'limit', $params->get('limit'), 'string' );
+		$app	= JFactory::getApplication();
+		//$orderby = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
+		$limit = $app->getUserStateFromRequest( 'limit', 'limit', $params->get('limit'), 'string' );
 		
 		$class    = ' class="inputbox fc_field_filter" ';
 		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(document.getElementById(\''.$formname.'\')); document.getElementById(\''.$formname.'\').submit();" ';
@@ -154,21 +151,25 @@ class flexicontent_html
 	{
 		if ( !$params->get('orderby_override') ) return '';
 		
-		$mainframe	= JFactory::getApplication();
-		//$orderby = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-		$orderby = $mainframe->getUserStateFromRequest( 'orderby', 'orderby', $params->get('orderby'), 'string' );
+		$app	= JFactory::getApplication();
+		//$orderby = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
+		$orderby = $app->getUserStateFromRequest( 'orderby', 'orderby', $params->get('orderby'), 'string' );
 		
 		$class    = ' class="inputbox fc_field_filter" ';
 		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(document.getElementById(\''.$formname.'\')); document.getElementById(\''.$formname.'\').submit();" ';
 		$attribs  = $class . $onchange;
 		
-		$orderby_options = $params->get('orderby_options', array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','order'));
+		$orderby_options = $params->get('orderby_options', array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','id','rid','order'));
 		$orderby_options = FLEXIUtilities::paramToArray($orderby_options);
 		
-		$orderby_names =array('_preconfigured_'=>'FLEXI_ORDER_DEFAULT_INITIAL','date'=>'FLEXI_ORDER_OLDEST_FIRST','rdate'=>'FLEXI_ORDER_MOST_RECENT_FIRST',
-		'modified'=>'FLEXI_ORDER_LAST_MODIFIED_FIRST','alpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL','ralpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE',
+		$orderby_names =array('_preconfigured_'=>'FLEXI_ORDER_DEFAULT_INITIAL',
+		'date'=>'FLEXI_ORDER_OLDEST_FIRST','rdate'=>'FLEXI_ORDER_MOST_RECENT_FIRST',
+		'modified'=>'FLEXI_ORDER_LAST_MODIFIED_FIRST',
+		'alpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL','ralpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE',
 		'author'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL','rauthor'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE',
-		'hits'=>'FLEXI_ORDER_MOST_HITS','rhits'=>'FLEXI_ORDER_LEAST_HITS','order'=>'FLEXI_ORDER_CONFIGURED_ORDER');
+		'hits'=>'FLEXI_ORDER_MOST_HITS','rhits'=>'FLEXI_ORDER_LEAST_HITS',
+		'id'=>'FLEXI_ORDER_HIGHEST_ITEM_ID','rid'=>'FLEXI_ORDER_LOWEST_ITEM_ID',
+		'order'=>'FLEXI_ORDER_CONFIGURED_ORDER');
 		
 		$ordering = array();
 		foreach ($extra_order_types as $value => $text) {
@@ -396,9 +397,12 @@ class flexicontent_html
 		if (FLEXI_J16GE) {
 			$cache = FLEXIUtilities::getCache();
 			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
 		} else {
-			$cache = JFactory::getCache('com_flexicontent_items');
-			$cache->clean();
+			$itemcache = JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
+			$filtercache = JFactory::getCache('com_flexicontent_filters');
+			$filtercache->clean();
 		}
 		
 		// Output new state icon and terminate
@@ -442,7 +446,9 @@ class flexicontent_html
 			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
 
 			if ($params->get('show_icons')) 	{
-				$image = JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_FEED' ));
+				$image = FLEXI_J16GE ?
+					JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' )) :
+					JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_FEED' )) ;
 			} else {
 				$image = '&nbsp;'.JText::_( 'FLEXI_FEED' );
 			}
@@ -472,7 +478,9 @@ class flexicontent_html
 
 			// checks template image directory for image, if non found default are loaded
 			if ( $params->get( 'show_icons' ) ) {
-				$image = JHTML::_('image.site', 'printButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_PRINT' ));
+				$image = FLEXI_J16GE ?
+					JHTML::image( FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' )) :
+					JHTML::_('image.site', 'printButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_PRINT' )) ;
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_PRINT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
@@ -538,7 +546,9 @@ class flexicontent_html
 		$status = 'width=400,height=300,menubar=yes,resizable=yes';
 
 		if ($params->get('show_icons')) 	{
-			$image = JHTML::_('image.site', 'emailButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EMAIL' ));
+			$image = FLEXI_J16GE ?
+				JHTML::image( FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' )) : 
+				JHTML::_('image.site', 'emailButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EMAIL' )) ;
 		} else {
 			$image = '&nbsp;'.JText::_( 'FLEXI_EMAIL' );
 		}
@@ -563,7 +573,9 @@ class flexicontent_html
 		if ( !FLEXI_J16GE && $params->get('show_pdf_icon') && !JRequest::getCmd('print') ) {
 
 			if ( $params->get('show_icons') ) {
-				$image = JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
+				$image = FLEXI_J16GE ?
+					JHTML::image( FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' )) :
+					JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_CREATE_PDF' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
@@ -781,7 +793,10 @@ class flexicontent_html
 		// Create the approval button if user cannot edit the item (**note check at top of this method)
 		if ( !$has_edit_state ) {
 			if ( $params->get('show_icons') ) {
-				$image = JHTML::_('image.site', 'person2_f2.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_APPROVAL_REQUEST' ), ' style="margin:4px;" width="16" align="top" ');
+				$attribs = ' style="margin:4px;" width="16" align="top" ';
+				$image = FLEXI_J16GE ?
+					JHTML::image( 'components/com_flexicontent/assets/images/'.'person2_f2.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) :
+					JHTML::_('image.site', 'person2_f2.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) ;
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
@@ -830,7 +845,9 @@ class flexicontent_html
 		// Create the edit button and return it
 		if ($has_edit) {
 			if ( $params->get('show_icons') ) {
-				$image = JHTML::_('image.site', 'edit.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EDIT' ));
+				$image = FLEXI_J16GE ?
+					JHTML::image( FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' )) :
+					JHTML::_('image.site', 'edit.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EDIT' )) ;
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 			}
@@ -881,7 +898,9 @@ class flexicontent_html
 		
 		// Create the button
 		if ( $params->get('show_icons') ) {
-			$image = JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_ADD_NEW_CONTENT' ), ' style="margin-right:4px;" width="16" align="top" ');
+			$image = FLEXI_J16GE ?
+				JHTML::image( 'components/com_flexicontent/assets/images/'.'add.png', JText::_( 'FLEXI_ADD_NEW_CONTENT' ), ' style="margin-right:4px;" width="16" align="top" ') :
+				JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_ADD_NEW_CONTENT' ), ' style="margin-right:4px;" width="16" align="top" ') ;
 		} else {
 			$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_ADD_NEW_CONTENT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 		}
@@ -950,9 +969,11 @@ class flexicontent_html
 		
 		// Create state icon image
 		$app = JFactory::getApplication();
-		$path = ($app->isAdmin() ? '../' : '').'components/com_flexicontent/assets/images/';  // no need to prefix this with JURI::root(), it will be done below 
+		$path = (!FLEXI_J16GE && $app->isAdmin() ? '../' : '').'components/com_flexicontent/assets/images/';  // no need to prefix this with JURI::root(), it will be done below 
 		if ( $params->get('show_icons', 1) ) {
-			$icon = JHTML::_('image.site', $img, $path, NULL, NULL, $alt, $attribs);
+			$icon = FLEXI_J16GE ?
+				JHTML::image( $path.$img, $alt, $attribs) :
+				JHTML::_('image.site', $img, $path, NULL, NULL, $alt, $attribs) ;
 		} else {
 			$icon = $descr;
 		}
@@ -994,8 +1015,12 @@ class flexicontent_html
 	static function voteicons($item, &$params)
 	{
 		if ( $params->get('show_icons') ) {
-			$voteup = JHTML::_('image.site', 'thumb_up.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_GOOD' ) );
-			$votedown = JHTML::_('image.site', 'thumb_down.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_BAD' ) );
+			$voteup = FLEXI_J16GE ?
+				JHTML::image( 'components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ) ) :
+				JHTML::_('image.site', 'thumb_up.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_GOOD' ) ) ;
+			$votedown = FLEXI_J16GE ?
+				JHTML::image( 'components/com_flexicontent/assets/images/'.'thumb_down.png', JText::_( 'FLEXI_BAD' ) ) :
+				JHTML::_('image.site', 'thumb_down.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_BAD' ) ) ;
 		} else {
 			$voteup = JText::_( 'FLEXI_GOOD' ). '&nbsp;';
 			$votedown = '&nbsp;'.JText::_( 'FLEXI_BAD' );
@@ -1210,7 +1235,7 @@ class flexicontent_html
 			." LEFT JOIN #__users AS u ON u.id=ff.userid "
 			." WHERE ff.itemid=" . $item->id;
 		$db->setQuery($query);
-		$favusers = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+		$favusers = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 		if (!is_array($favusers) || !count($favusers)) return $favuserlist ? $favuserlist.']' : '';
 		
 		$seperator = ': ';
@@ -1265,7 +1290,9 @@ class flexicontent_html
 		
 		if ($user->id && $favoured)
 		{
-			$image 		= JHTML::_('image.site', 'heart_delete.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_REMOVE_FAVOURITE' ));
+			$image = FLEXI_J16GE ?
+				JHTML::image( 'heart_delete.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_REMOVE_FAVOURITE' )) :
+				HTML::_('image.site', 'heart_delete.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_REMOVE_FAVOURITE' )) ;
 			$text 		= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
 			$overlib 	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
 			$onclick 	= 'javascript:FCFav('.$field->item_id.');';
@@ -1281,7 +1308,9 @@ class flexicontent_html
 		}
 		elseif($user->id)
 		{
-			$image 		= JHTML::_('image.site', 'heart_add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_FAVOURE' ));
+			$image = FLEXI_J16GE ?
+				JHTML::image( 'heart_add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_FAVOURE' )) :
+				JHTML::_('image.site', 'heart_add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_FAVOURE' )) ;
 			$text 		= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
 			$overlib 	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
 			$onclick 	= 'javascript:FCFav('.$field->item_id.');';
@@ -1298,7 +1327,9 @@ class flexicontent_html
 		{
 			$overlib 	= JText::_( 'FLEXI_FAVOURE_LOGIN_TIP' );
 			$text 		= JText::_( 'FLEXI_FAVOURE' );
-			$image 		= JHTML::_('image.site', 'heart_login.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $text, 'class="editlinktip hasTip" title="'.$text.'::'.$overlib.'"' );
+			$image = FLEXI_J16GE ?
+				JHTML::image( 'heart_login.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $text, 'class="editlinktip hasTip" title="'.$text.'::'.$overlib.'"' ) :
+				JHTML::_('image.site', 'heart_login.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $text, 'class="editlinktip hasTip" title="'.$text.'::'.$overlib.'"' ) ;
 
 			$output		= $image;
 		}
@@ -1313,7 +1344,7 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildtypesselect($list, $name, $selected, $top, $class = 'class="inputbox"')
+	static function buildtypesselect($list, $name, $selected, $top, $class = 'class="inputbox"', $tagid='')
 	{
 		$typelist 	= array();
 		
@@ -1324,7 +1355,7 @@ class flexicontent_html
 		foreach ($list as $item) {
 			$typelist[] = JHTML::_( 'select.option', $item->id, $item->name);
 		}
-		return JHTML::_('select.genericlist', $typelist, $name, $class, 'value', 'text', $selected );
+		return JHTML::_('select.genericlist', $typelist, $name, $class, 'value', 'text', $selected, $tagid );
 	}
 
 
@@ -1399,7 +1430,7 @@ class flexicontent_html
 		. ' ORDER BY ext ASC'
 		;		
 		$db->setQuery($query);
-		$exts = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+		$exts = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 		
 		$options[] = JHTML::_( 'select.option', '', '- '.JText::_( 'FLEXI_ALL_EXT' ).' -');
 		
@@ -1450,7 +1481,6 @@ class flexicontent_html
 	 */
 	static function buildlanguageslist($name, $class, $selected, $type = 1, $allowed_langs = null)
 	{
-		$mainframe = JFactory::getApplication();
 		$db = JFactory::getDBO();
 		
 		$selected_found = false;
@@ -1944,12 +1974,10 @@ class flexicontent_html
 			// Get the options.
 			$db->setQuery($query);
 			$options = $db->loadObjectList();
-
+			
 			// Check for a database error.
-			if ($db->getErrorNum()) {
-				JError::raiseWarning(500, $db->getErrorMsg());
-				return null;
-			}
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			if ( !$options ) return null;
 			
 			if (!$createlist) {
 				return $options[0]->text;  // return ACCESS LEVEL NAME
@@ -2674,7 +2702,7 @@ class FLEXIUtilities
 	 */
 	static function getlanguageslist()
 	{
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$db = JFactory::getDBO();
 		static $languages = null;
 		if ($languages) return $languages;
@@ -2707,21 +2735,19 @@ class FLEXIUtilities
 		$db->setQuery($query);
 		$languages = $db->loadObjectList('id');
 		//echo "<pre>"; print_r($languages); echo "</pre>"; exit;
-		if ($db->getErrorNum()) {
-			JError::raiseWarning(500, $db->getErrorMsg()."<br>Query:<br>".$query);
-			return array();
-		}
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		if ( !$languages )  return array();
 		
 		
 		// *********************
 		// Calculate image paths
 		// *********************
 		if (FLEXI_J16GE)  {  // FLEXI_J16GE, use J1.6+ images
-			$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
-			$mediapath	= $mainframe->isAdmin() ? '../media/mod_languages/images/' : 'media/mod_languages/images/';
+			$imgpath	= $app->isAdmin() ? '../images/':'images/';
+			$mediapath	= $app->isAdmin() ? '../media/mod_languages/images/' : 'media/mod_languages/images/';
 		} else {      // Use joomfish images
-			$imgpath	= $mainframe->isAdmin() ? '../images/':'images/';
-			$mediapath	= $mainframe->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
+			$imgpath	= $app->isAdmin() ? '../images/':'images/';
+			$mediapath	= $app->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
 		}
 		
 		
@@ -2903,11 +2929,9 @@ class FLEXIUtilities
 				." LIMIT 0,1";
 			$db->setQuery($query);
 			$rows = $db->loadObjectList("id");
-			if ($db->getErrorNum()) {
-				$jAp= JFactory::getApplication();
-				$jAp->enqueueMessage($db->getErrorMsg(),'error');
-			}
-			$rows = is_array($rows)?$rows:array();
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			
+			$rows = is_array($rows) ? $rows : array();
 			$status = false;
 			if(count($rows)>0) {
 				$status = true;
@@ -3003,8 +3027,7 @@ class FLEXIUtilities
 			$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.$plgfolder.DS.strtolower($fieldtype).'.php';
 			if(file_exists($path)) require_once($path);
 			else {
-				$jAp= JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br("While calling field method: $func(): cann find field type: $fieldtype. This is internal error or wrong field name"),'error');
+				JFactory::getApplication()->enqueueMessage(nl2br("While calling field method: $func(): cann find field type: $fieldtype. This is internal error or wrong field name"),'error');
 				return;
 			}
 			
@@ -3018,11 +3041,9 @@ class FLEXIUtilities
 				$fc_plgs[$fieldtype] =  new $className($dispatcher, array());
 				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters), CHECKING if parameters exist
 				$plugin_db_data = JPluginHelper::getPlugin('flexicontent_fields',$fieldtype);
-				if ( !empty($plugin_db_data) )
-					$fc_plgs[$fieldtype]->params = FLEXI_J16GE ? new JRegistry($plugin_db_data->params) : new JParameter($plugin_db_data->params);
+				$fc_plgs[$fieldtype]->params = FLEXI_J16GE ? new JRegistry( @$plugin_db_data->params ) : new JParameter( @$plugin_db_data->params );
 			} else {
-				$jAp= JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
+				JFactory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
 				return;
 			}
 		}
@@ -3047,8 +3068,7 @@ class FLEXIUtilities
 			$path = JPATH_ROOT.DS.'plugins'.DS.'content'.$plgfolder.DS.strtolower($plgname).'.php';
 			if(file_exists($path)) require_once($path);
 			else {
-				$jAp= JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $plgname\n Plugin may have been uninistalled"),'error');
+				JFactory::getApplication()->enqueueMessage(nl2br("Cannot load CONTENT Plugin: $plgname\n Plugin may have been uninistalled"),'error');
 				return;
 			}
 			
@@ -3062,10 +3082,9 @@ class FLEXIUtilities
 				$content_plgs[$plgname] =  new $className($dispatcher, array());
 				// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters)
 				$plugin_db_data = JPluginHelper::getPlugin('content',$plgname);
-				$content_plgs[$plgname]->params = FLEXI_J16GE ? new JRegistry($plugin_db_data->params) : new JParameter($plugin_db_data->params);
+				$content_plgs[$plgname]->params = FLEXI_J16GE ? new JRegistry( @$plugin_db_data->params ) : new JParameter( @$plugin_db_data->params );
 			} else {
-				$jAp= JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
+				JFactory::getApplication()->enqueueMessage(nl2br("Could not find class: $className in file: $path\n Please correct field name"),'error');
 				return;
 			}
 		}
@@ -3179,16 +3198,14 @@ class FLEXIUtilities
 	
 	static function count_new_hit(&$item) // If needed to modify params then clone them !! ??
 	{
-		$mainframe = JFactory::getApplication();
-		$params = $mainframe->getParams('com_flexicontent');
+		$params = JComponentHelper::getParams( 'com_flexicontent' );
 		if (!$params->get('hits_count_unique', 0)) return 1; // Counting unique hits not enabled
 		
 		$db = JFactory::getDBO();
 		$visitorip = $_SERVER['REMOTE_ADDR'];  // Visitor IP
 		$current_secs = time();  // Current time as seconds since Unix epoch
 		if ($item->id==0) {
-			$jAp= JFactory::getApplication();
-			$jAp->enqueueMessage(nl2br("Invalid item id or item id is not set in http request"),'error');
+			JFactory::getApplication()->enqueueMessage(nl2br("Invalid item id or item id is not set in http request"),'error');
 			return 1; // Invalid item id ?? (do not try to decrement hits in content table)
 		}
 		
@@ -3253,14 +3270,10 @@ class FLEXIUtilities
 			$db->setQuery($query);
 			$result = $db->query();
 			if ($db->getErrorNum()) {
-				$select_error_msg = $db->getErrorMsg();
 				$query_create = "CREATE TABLE #__flexicontent_hits_log (item_id INT PRIMARY KEY, timestamp INT NOT NULL, ip VARCHAR(16) NOT NULL DEFAULT '0.0.0.0')";
 				$db->setQuery($query_create);
 				$result = $db->query();
-				if ($db->getErrorNum()) {
-					$jAp= JFactory::getApplication();
-					$jAp->enqueueMessage(nl2br($query."\n".$select_error_msg."\n"),'error');
-				}
+				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 				return 1; // on select error e.g. table created, count a new hit
 			}
 			$count = $db->loadResult();
@@ -3273,10 +3286,7 @@ class FLEXIUtilities
 						." ON DUPLICATE KEY UPDATE timestamp=".$db->quote($current_secs).", ip=".$db->quote($visitorip);
 				$db->setQuery($query);
 				$result = $db->query();
-				if ($db->getErrorNum()) {
-					$jAp= JFactory::getApplication();
-					$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-				}
+				if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 				return 1;  // last visit not found or is beyond time limit, count a new hit
 			}
 		}
@@ -3473,7 +3483,7 @@ class flexicontent_db
 	
 	
 	/**
-	 * Build the order clause
+	 * Build the order clause of item listings
 	 * precedence: $request_var ==> $order ==> $config_param ==> $default_order (& $default_order_dir)
 	 * @access private
 	 * @return string
@@ -3489,7 +3499,7 @@ class flexicontent_db
 		}
 		
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$order = $request_var ? JRequest::getVar($request_var, $order) : $order;
+		$order = $request_var && ($request_order = JRequest::getVar($request_var)) ? $request_order : $order;
 		
 		// 'order' contains a symbolic order name to indicate using the category / global ordering setting
 		switch ($order) {
@@ -3554,6 +3564,14 @@ class flexicontent_db
 				$filter_order = 'votes';
 				$filter_order_dir	= 'DESC';
 				break;
+			case 'id':
+				$filter_order = $i_as.'.id';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'rid':
+				$filter_order = $i_as.'.id';
+				$filter_order_dir	= 'ASC';
+				break;
 			
 			case 'default':
 			default:
@@ -3567,6 +3585,137 @@ class flexicontent_db
 		
 		return $orderby;
 	}
+	
+	
+	/**
+	 * Build the order clause of category listings
+	 *
+	 * @access private
+	 * @return string
+	 */
+	static function buildCatOrderBy(&$params, $order='', $request_var='', $config_param='cat_orderby', $c_as='c', $u_as='u', $default_order='', $default_order_dir='')
+	{
+		// Use global params ordering if parameters were not given
+		if (!$params) $params = JComponentHelper::getParams( 'com_flexicontent' );
+		
+		// 1. If forced ordering not given, then use ordering parameters from configuration
+		if (!$order) {
+			$order = $params->get($config_param, 'default');
+		}
+		
+		// 2. If allowing user ordering override, then get ordering from HTTP request variable
+		$order = $request_var && ($request_order = JRequest::getVar($request_var)) ? $request_order : $order;
+		
+		switch ($order) {
+			case 'date' :                  // *** J2.5 only ***
+				$filter_order		= $c_as.'.created_time';
+				$filter_order_dir	= 'ASC';
+				break;
+			case 'rdate' :                 // *** J2.5 only ***
+				$filter_order		= $c_as.'.created_time';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'modified' :              // *** J2.5 only ***
+				$filter_order		= $c_as.'.modified_time';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'alpha' :
+				$filter_order		= $c_as.'.title';
+				$filter_order_dir	= 'ASC';
+				break;
+			case 'ralpha' :
+				$filter_order		= $c_as.'.title';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'author' :                // *** J2.5 only ***
+				$filter_order		= $u_as.'.name';
+				$filter_order_dir	= 'ASC';
+				break;
+			case 'rauthor' :               // *** J2.5 only ***
+				$filter_order		= $u_as.'.name';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'hits' :                  // *** J2.5 only ***
+				$filter_order		= $c_as.'.hits';
+				$filter_order_dir	= 'ASC';
+				break;
+			case 'rhits' :                 // *** J2.5 only ***
+				$filter_order		= $c_as.'.hits';
+				$filter_order_dir	= 'DESC';
+				break;
+			case 'order' :
+				$filter_order		= !FLEXI_J16GE ? $c_as.'.ordering' : $c_as.'.lft';
+				$filter_order_dir	= 'ASC';
+				break;
+			case 'default' :
+			default:
+				$filter_order     = $default_order ? $default_order : $i_as.'.title';
+				$filter_order_dir = $default_order_dir ? $default_order_dir : 'ASC';
+				break;
+		}
+		
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir;
+		$orderby .= $filter_order!=$c_as.'.title' ? ', '.$c_as.'.title' : '';   // Order by title after default ordering
+
+		return $orderby;
+	}
+	
+	
+	/**
+	 * Check in a record
+	 *
+	 * @since	1.5
+	 */
+	static function checkin($tbl, $redirect_url, & $controller)
+	{
+		$cid  = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$pk   = (int)$cid[0];
+		$user = JFactory::getUser();
+		$controller->setRedirect( $redirect_url, '' );
+		
+		static $canCheckin = null;
+		if ($canCheckin === null) {
+			if (FLEXI_J16GE) {
+				$canCheckin = $user->authorise('core.admin', 'checkin');
+			} else if (FLEXI_ACCESS) {
+				$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
+			} else {
+				// Only admin or super admin can check-in
+				$canCheckin = $user->gid >= 24;
+			}
+		}
+		
+		// Only attempt to check the row in if it exists.
+		if ($pk)
+		{
+			// Get an instance of the row to checkin.
+			$table = JTable::getInstance($tbl, '');
+			if (!$table->load($pk))
+			{
+				$controller->setError($table->getError());
+				return;// false;
+			}
+
+			// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (a) record checked out by current user
+			if ($table->checked_out) {
+				if ( !$canCheckin && $table->checked_out != $user->id) {
+					$controller->setError(JText::_( 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER'));
+					return;// false;
+				}
+			}
+
+			// Attempt to check the row in.
+			if (!$table->checkin($pk))
+			{
+				$controller->setError($table->getError());
+				return;// false;
+			}
+		}
+		
+		$controller->setRedirect( $redirect_url, JText::sprintf('FLEXI_RECORD_CHECKED_IN_SUCCESSFULLY', 1) );
+		return;// true;
+	}
+	
 }
 
 ?>

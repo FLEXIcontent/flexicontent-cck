@@ -17,8 +17,8 @@
 */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-$mainframe = JFactory::getApplication();
-$template	= $mainframe->getTemplate();
+$app = JFactory::getApplication();
+$template	= $app->getTemplate();
 if($this->check['connect'] == 0) {
 ?>
 	<table class="adminlist">
@@ -56,11 +56,17 @@ if($this->check['connect'] == 0) {
 	<td width="33%">
 	<?php
 		if ($this->check['current'] == 0 ) {		  				
-			echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-checkin.png', NULL, 'width=32');
+			echo FLEXI_J16GE ?
+				JHTML::image('administrator/templates/'. $template .'/images/header/icon-48-checkin.png', NULL, 'width=32') :
+				JHTML::_('image.site', 'icon-48-checkin.png', '../administrator/templates/'. $template .'/images/header/', NULL, NULL, NULL, 'width=32') ;
 		} elseif( $this->check['current'] == -1 ) {
-			echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-info.png', NULL, 'width=32');
+			echo FLEXI_J16GE ?
+				JHTML::image('administrator/templates/'. $template .'/images/header/icon-48-info.png', NULL, 'width=32') :
+				JHTML::_('image.site', 'icon-48-info.png', '../administrator/templates/'. $template .'/images/header/', NULL, NULL, NULL, 'width=32') ;
 		} else {
-			echo JHTML::_('image', 'administrator/templates/'. $template .'/images/header/icon-48-info.png', NULL, 'width=32');
+			echo FLEXI_J16GE ?
+				JHTML::image('administrator/templates/'. $template .'/images/header/icon-48-info.png', NULL, 'width=32') :
+				JHTML::_('image.site', 'icon-48-info.png', '../administrator/templates/'. $template .'/images/header/', NULL, NULL, NULL, 'width=32') ;
 		}
 	?>
 	</td>

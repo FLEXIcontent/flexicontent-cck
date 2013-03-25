@@ -54,13 +54,13 @@ class FlexicontentModelItems extends ParentClassItem
 	function _check_viewing_access()
 	{
 		global $globalcats;
-		$app =& JFactory::getApplication();
-		$user	= & JFactory::getUser();
+		$app  = JFactory::getApplication();
+		$user	= JFactory::getUser();
 		$aid	= (int) $user->get('aid');
 		$gid	= (int) $user->get('gid');
 		$cid	= $this->_cid;
-		$params = & $this->_item->parameters;
-		$cparams = & $this->_cparams;
+		$params = $this->_item->parameters;
+		$cparams = $this->_cparams;
 		
 		$fcreturn = serialize( array('id'=>@$this->_item->id, 'cid'=>$cid) );     // a special url parameter, used by some SEF code
 		$referer = @$_SERVER['HTTP_REFERER'];                                      // the previously viewed page (refer)
@@ -292,12 +292,10 @@ class FlexicontentModelItems extends ParentClassItem
 	 */
 	function _buildItemWhere()
 	{
-		$mainframe =& JFactory::getApplication();
-
-		$user		=& JFactory::getUser();
+		$user		= JFactory::getUser();
 		$aid		= !FLEXI_J16GE ? (int) $user->get('aid', 0) : max ($user->getAuthorisedViewLevels()) ;
 
-		$jnow		=& JFactory::getDate();
+		$jnow		= JFactory::getDate();
 		$now		= FLEXI_J16GE ? $jnow->toSql() : $jnow->toMySQL();
 		$nullDate	= $this->_db->getNullDate();
 
@@ -329,19 +327,14 @@ class FlexicontentModelItems extends ParentClassItem
 	{
 		if (!empty($this->_item->parameters)) return;
 		
-		$mainframe = & JFactory::getApplication();
+		$app = JFactory::getApplication();
+		$menu = JSite::getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
 		jimport('joomla.html.parameter');
 		
 		
 		// **********************************************************************
 		// Retrieve RELATED parameters that will be merged into item's parameters
 		// **********************************************************************
-		
-		// Retrieve current menu parameters (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
-		$menu = JSite::getMenu()->getActive();
-		if ($menu) {
-			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
-		}
 		
 		// Retrieve parameters of current category (NOTE: this applies when cid variable exists in the URL)
 		$catParams = "";
@@ -368,12 +361,11 @@ class FlexicontentModelItems extends ParentClassItem
 		// Merge parameters in order: component, menu, (item 's) current category, (item's) content type, item
 		// ***************************************************************************************************
 		
-		// a. Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($mainframe->getParams('com_flexicontent'));
-		
-		// In J1.6+ the above function does not merge current menu item parameters, it behaves like JComponentHelper::getParams('com_flexicontent') was called
-		if (FLEXI_J16GE && $menu) {
-			$params->merge($menuParams);
+		// a. Get the COMPONENT only parameters and merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
 		}
 		
 		// b. Merge parameters from current category
@@ -390,7 +382,7 @@ class FlexicontentModelItems extends ParentClassItem
 		if ( is_string($this->_item->attribs) ) {
 			$itemparams = FLEXI_J16GE ? new JRegistry($this->_item->attribs) : new JParameter($this->_item->attribs);
 		} else {
-			$itemparams = & $this->_item->attribs;
+			$itemparams = $this->_item->attribs;
 		}
 		$params->merge($itemparams);
 
@@ -411,7 +403,7 @@ class FlexicontentModelItems extends ParentClassItem
 		// Finally set 'parameters' property of the item
 		// *********************************************
 		
-		$this->_item->parameters = & $params;
+		$this->_item->parameters = $params;
 	}
 	
 
@@ -425,7 +417,7 @@ class FlexicontentModelItems extends ParentClassItem
 	function hit() {
 		if ( $this->_id )
 		{
-			$item = & JTable::getInstance('flexicontent_items', '');
+			$item = JTable::getInstance('flexicontent_items', '');
 			$item->hit($this->_id);
 			return true;
 		}

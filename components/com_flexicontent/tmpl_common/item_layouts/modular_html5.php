@@ -26,6 +26,8 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcitems fcitem'.$this->item->id;
 $page_classes .= ' fctype'.$this->item->type_id;
 $page_classes .= ' fcmaincat'.$this->item->catid;
+$menu = JSite::getMenu()->getActive();
+if ($menu) $page_classes .= ' menuitem'.$menu->id; 
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');

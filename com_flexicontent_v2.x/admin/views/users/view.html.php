@@ -29,9 +29,8 @@ class FlexicontentViewUsers extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe = JFactory::getApplication();
-		$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
-		
+		$app      = JFactory::getApplication();
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$db				= JFactory::getDBO();
 		$document	= JFactory::getDocument();
 		$option   = JRequest::getCmd('option');
@@ -41,20 +40,22 @@ class FlexicontentViewUsers extends JViewLegacy
 		JHTML::_('behavior.tooltip');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( "$option.authors.filter_order",		'filter_order',		'a.name',	'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( "$option.authors.filter_order_Dir",	'filter_order_Dir',	'',			'word' );
+		$filter_order      = $app->getUserStateFromRequest( "$option.authors.filter_order",		'filter_order',		'a.name',	'cmd' );
+		$filter_order_Dir  = $app->getUserStateFromRequest( "$option.authors.filter_order_Dir",	'filter_order_Dir',	'',			'word' );
 		
-		$filter_itemscount		= $mainframe->getUserStateFromRequest( "$option.authors.filter_itemscount",		'filter_itemscount', 		'',			'int' );
+		$filter_itemscount = $app->getUserStateFromRequest( "$option.authors.filter_itemscount",		'filter_itemscount', 		'',			'int' );
 		
-		$filter_type		= $mainframe->getUserStateFromRequest( "$option.authors.filter_type",		'filter_type', 		'',			'string' );
-		$filter_logged		= $mainframe->getUserStateFromRequest( "$option.authors.filter_logged",		'filter_logged', 	'',			'int' );
-		$date	 			= $mainframe->getUserStateFromRequest( "$option.authors.date", 				'date', 			1, 				'int' );
-		$startdate	 		= $mainframe->getUserStateFromRequest( "$option.authors.startdate", 		'startdate', 		'', 			'cmd' );
-		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $mainframe->setUserState( "$option.authors.startdate", '' ); }
-		$enddate	 		= $mainframe->getUserStateFromRequest( "$option.authors.enddate", 			'enddate', 			'', 			'cmd' );
-		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $mainframe->setUserState( "$option.authors.enddate", '' ); }
-		$filter_id 			= $mainframe->getUserStateFromRequest( "$option.authors.filter_id", 		'filter_id', 		'', 			'int' );
-		$search				= $mainframe->getUserStateFromRequest( "$option.authors.search",			'search', 			'',			'string' );
+		$filter_type    = $app->getUserStateFromRequest( "$option.authors.filter_type",		'filter_type', 		'',			'string' );
+		$filter_logged  = $app->getUserStateFromRequest( "$option.authors.filter_logged",		'filter_logged', 	'',			'int' );
+		
+		$date       = $app->getUserStateFromRequest( "$option.authors.date", 				'date', 			1, 				'int' );
+		$startdate  = $app->getUserStateFromRequest( "$option.authors.startdate", 		'startdate', 		'', 			'cmd' );
+		$enddate    = $app->getUserStateFromRequest( "$option.authors.enddate", 			'enddate', 			'', 			'cmd' );
+		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $app->setUserState( "$option.authors.startdate", '' ); }
+		if ($enddate   == JText::_('FLEXI_TO'))   { $enddate	= $app->setUserState( "$option.authors.enddate", '' ); }
+		
+		$filter_id  = $app->getUserStateFromRequest( "$option.authors.filter_id", 		'filter_id', 		'', 			'int' );
+		$search     = $app->getUserStateFromRequest( "$option.authors.search",			'search', 			'',			'string' );
 		if (strpos($search, '"') !== false) {
 			$search = str_replace(array('=', '<'), '', $search);
 		}
@@ -62,11 +63,11 @@ class FlexicontentViewUsers extends JViewLegacy
 		
 		if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
 		{
-			$notice_author_with_items_only	= $mainframe->getUserStateFromRequest( $option.'.users.notice_author_with_items_only',	'notice_author_with_items_only',	0, 'int' );
+			$notice_author_with_items_only	= $app->getUserStateFromRequest( $option.'.users.notice_author_with_items_only',	'notice_author_with_items_only',	0, 'int' );
 			if (!$notice_author_with_items_only) {
-				$mainframe->setUserState( $option.'.users.notice_author_with_items_only', 1 );
-				$mainframe->enqueueMessage(JText::_('FLEXI_BY_DEFAULT_ONLY_AUTHORS_WITH_ITEMS_SHOWN'), 'notice');
-				$mainframe->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
+				$app->setUserState( $option.'.users.notice_author_with_items_only', 1 );
+				$app->enqueueMessage(JText::_('FLEXI_BY_DEFAULT_ONLY_AUTHORS_WITH_ITEMS_SHOWN'), 'notice');
+				$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
 			}
 		}
 
@@ -91,10 +92,15 @@ class FlexicontentViewUsers extends JViewLegacy
 				$js .= "$$('.col_visited').each(function(el){ el.addClass('yellow'); });";
 			}
 		}
-		if ($search || $filter_itemscount) {
+		if ($filter_itemscount) {
 			$js .= "$$('.col_itemscount').each(function(el){ el.addClass('yellow'); });";
 		} else {
 			$js .= "$$('.col_itemscount').each(function(el){ el.removeClass('yellow'); });";
+		}
+		if ($search) {
+			$js .= "$$('.col_title').each(function(el){ el.addClass('yellow'); });";
+		} else {
+			$js .= "$$('.col_title').each(function(el){ el.removeClass('yellow'); });";
 		}
 		$js .= "});";
 		$document->addScriptDeclaration($js);
@@ -122,13 +128,14 @@ class FlexicontentViewUsers extends JViewLegacy
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 
-		$limit		= $mainframe->getUserStateFromRequest( 'global.list.limit', 'limit', $mainframe->getCfg('list_limit'), 'int' );
-		$limitstart = $mainframe->getUserStateFromRequest( $option.'.limitstart', 'limitstart', 0, 'int' );
+		$limit		= $app->getUserStateFromRequest( 'global.list.limit', 'limit', $app->getCfg('list_limit'), 'int' );
+		$limitstart = $app->getUserStateFromRequest( $option.'.limitstart', 'limitstart', 0, 'int' );
 
 		$where = array(); $having = array(); $extra_joins = array();
 		if (isset( $search ) && $search!= '')
 		{
-			$searchEscaped = $db->Quote( '%'.$db->getEscaped( $search, true ).'%', false );
+			$searchEscaped = FLEXI_J16GE ? $db->escape( $search, true ) : $db->getEscaped( $search, true );
+			$searchEscaped = $db->Quote( '%'.$searchEscaped.'%', false );
 			$where[] = 'a.username LIKE '.$searchEscaped.' OR a.email LIKE '.$searchEscaped.' OR a.name LIKE '.$searchEscaped;
 		}
 
@@ -175,7 +182,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		}
 		if ( $filter_logged == 1 )
 		{
-			$where[] = 's.userid = a.id';
+			$where[] = 's.userid IS NOT NULL';
 		}
 		else if ($filter_logged == 2)
 		{
@@ -200,28 +207,25 @@ class FlexicontentViewUsers extends JViewLegacy
 				$where[] = 'a.gid NOT IN (' . implode( ',', $pgids ) . ')';
 			}
 		}
-		$filter = '';
-		if ($filter_logged == 1 || $filter_logged == 2)
-		{
-			$filter = ' INNER JOIN #__session AS s ON s.userid = a.id';
-		}
-
+		
 		// ensure filter_order has a valid value.
-		if (!in_array($filter_order, array('a.name', 'a.username', 'a.block', 'groupname', 'a.email', 'a.lastvisitDate', 'a.id'))) {
+		$allowed_order_cols = array('a.name', 'itemscount', 'a.username', 'loggedin',
+			'a.block', 'groupname','a.email', 'a.lastvisitDate', 'a.lastvisitDate', 'a.id');
+		if (!in_array($filter_order, $allowed_order_cols)) {
 			$filter_order = 'a.name';
 		}
-
+		
 		if (!in_array(strtoupper($filter_order_Dir), array('ASC', 'DESC'))) {
 			$filter_order_Dir = '';
 		}
-
+		
 		$orderby = ' ORDER BY '. $filter_order .' '. $filter_order_Dir;
 		$where = ( count( $where ) ? ' WHERE (' . implode( ') AND (', $where ) . ')' : '' );
 		$having = ( count( $having ) ? ' HAVING (' . implode( ') AND (', $having ) . ')' : '' );
 		$extra_joins = ( count( $extra_joins ) ? implode( ' ', $extra_joins ) : '' );
 		
 		// Do main query to get the authors
-		$query = 'SELECT SQL_CALC_FOUND_ROWS a.*, COUNT(i.id) as itemscount'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS a.*, COUNT(i.id) as itemscount, s.userid IS NOT NULL AS loggedin'
 			. (!FLEXI_J16GE ? ', g.name AS groupname' : '')
 			. ' FROM #__users AS a'
 			. (!FLEXI_J16GE ? ' INNER JOIN #__core_acl_aro AS aro ON aro.value = a.id' : '')
@@ -229,8 +233,8 @@ class FlexicontentViewUsers extends JViewLegacy
 			. (!FLEXI_J16GE ? ' INNER JOIN #__core_acl_aro_groups AS g ON g.id = gm.group_id' : '')
 			. ' LEFT JOIN #__flexicontent_authors_ext AS ue ON a.id = ue.user_id'
 			. ' LEFT JOIN #__content AS i ON i.created_by = a.id '
+			. ' LEFT JOIN #__session AS s ON s.userid = a.id'
 			. $extra_joins
-			. $filter
 			. $where
 			. ' GROUP BY a.id'
 			. $having
@@ -248,35 +252,21 @@ class FlexicontentViewUsers extends JViewLegacy
 		jimport('joomla.html.pagination');
 		$pagination = new JPagination( $total, $limitstart, $limit );
 		
-		// Query string to get loggedin property for all authors
-		$login_qtmpl = 'SELECT COUNT(s.userid) FROM #__session AS s WHERE s.userid = %d';
-		
-		// Query string (J2.5 only) to get -mulitple- user groups for all authors,
-		//this is needed because user-To-Usergoup mapping are stored in separate table
+		// DB Query (J2.5 only) to get -mulitple- user group ids for all authors,
+		// this is needed because user-To-usergoup mapping are stored in separate table
 		if (FLEXI_J16GE) {
-			$ugrps_qtmpl = 'SELECT group_id FROM #__user_usergroup_map AS ug WHERE ug.user_id = %d';
+			$user_ids = array();
+			foreach ($rows as $row) {
+				$row->usergroups = array();
+				$user_ids[] = $row->id;
+			}
+			$query = 'SELECT user_id, group_id FROM #__user_usergroup_map WHERE user_id IN ('.implode(',',$user_ids).')';
+			$db->setQuery( $query );
+			$ugdata_arr = $db->loadObjectList();
+			foreach ($ugdata_arr as $ugdata) $usergroups[$ugdata->user_id][] = $ugdata->group_id;
+			foreach ($rows as $row) $row->usergroups = $usergroups[$row->id];
 		}
 		
-		$n = count( $rows );
-		for ($i = 0; $i < $n; $i++)
-		{
-			$row = &$rows[$i];
-			
-			// Get Author's loggedin property
-			$query = sprintf( $login_qtmpl, intval( $row->id ) );
-			$db->setQuery( $query );
-			$row->loggedin = $db->loadResult();
-			if ($db->getErrorMsg())	echo $db->getErrorMsg();
-			
-			// Get Author's Usergroups (needed for J2.5)
-			if (FLEXI_J16GE) {
-				$query = sprintf( $ugrps_qtmpl, intval( $row->id ) );
-				$db->setQuery( $query );
-				$row->usergroups = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
-				if ($db->getErrorMsg())	echo $db->getErrorMsg();
-			}
-		}
-
 		// get list of Groups for dropdown filter
 		if (FLEXI_J16GE) {
 			$query = 'SELECT *, id AS value, title AS text FROM #__usergroups';
@@ -301,6 +291,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		// get list of Log Status for dropdown filter
 		$logged[] = JHTML::_('select.option',  '', '- '. JText::_( 'Select Log Status' ) .' -');
 		$logged[] = JHTML::_('select.option',  1, JText::_( 'Logged In' ) );
+		$logged[] = JHTML::_('select.option',  2, JText::_( 'Logged Out' ) );
 		$lists['filter_logged'] = JHTML::_('select.genericlist',   $logged, 'filter_logged', 'class="inputbox" size="1" onchange="document.adminForm.submit( );"', 'value', 'text', "$filter_logged" );
 
 		// table ordering

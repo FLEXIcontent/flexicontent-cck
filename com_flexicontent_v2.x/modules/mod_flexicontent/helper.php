@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1330 2012-05-29 20:26:57Z ggppdk $
+ * @version 1.2 $Id: helper.php 1649 2013-03-07 05:40:37Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -98,11 +98,9 @@ class modFlexicontentHelper
 		if ($mod_image) {
 			$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $mod_image;
 			$db->setQuery($query);
-			$midata = new stdClass();
-			$midata = $db->loadObject();
-			
-			$img_fieldname = $midata->name;
-			//$img_fieldparams = FLEXI_J16GE ? new JRegistry($midata->attribs) : new JParameter($midata->attribs);
+			$mod_image_dbdata = $db->loadObject();
+			$mod_image_name = $mod_image_dbdata->name;
+			//$img_fieldparams = FLEXI_J16GE ? new JRegistry($mod_image_dbdata->attribs) : new JParameter($mod_image_dbdata->attribs);
 		}
 		
 		// Retrieve default image for the image field
@@ -172,7 +170,7 @@ class modFlexicontentHelper
 			
 			// 0. Add ONLY skipfields to the list of fields to be rendered
 			$fields_list = implode(',', $skiponempty_fields);
-			//$skip_params = FLEXI_J16GE ? new JRegistry() : new JParameter();
+			//$skip_params = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 			//$skip_params->set('fields',$fields_list);
 			
 			foreach($cat_items_arr as $cat_items)
@@ -313,8 +311,8 @@ class modFlexicontentHelper
 						}
 						else if ($mod_image)
 						{
-							FlexicontentFields::getFieldDisplay($row, $img_fieldname, null, 'display', 'module');
-							$img_field = & $row->fields[$img_fieldname];
+							FlexicontentFields::getFieldDisplay($row, $mod_image_name, null, 'display', 'module');
+							$img_field = & $row->fields[$mod_image_name];
 							if ($mod_use_image_feat==1) {
 								$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0] );
 							} else {
@@ -433,8 +431,8 @@ class modFlexicontentHelper
 						}
 						else if ($mod_image)
 						{
-							FlexicontentFields::getFieldDisplay($row, $img_fieldname, null, 'display', 'module');
-							$img_field = & $row->fields[$img_fieldname];
+							FlexicontentFields::getFieldDisplay($row, $mod_image_name, null, 'display', 'module');
+							$img_field = & $row->fields[$mod_image_name];
 							
 							if ($mod_use_image==1) {
 								$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0] );
@@ -909,12 +907,12 @@ class modFlexicontentHelper
 					$where2 = (count($relitems_fields) > 1) ? ' AND field_id IN ('.implode(',', $relitems_fields).')' : ' AND field_id = '.$relitems_fields[0];
 					
 					// select the item ids that have the common tags
-					$query3 = 'SELECT DISTINCT value' .
+					$query2 = 'SELECT DISTINCT value' .
 							' FROM #__flexicontent_fields_item_relations' .
 							' WHERE item_id = '.(int) $id .
 							$where2
 							;
-					$db->setQuery($query3);
+					$db->setQuery($query2);
 					$related = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 					$related = is_array($related) ? array_map( 'intval', $related ) : $related;
 				}
@@ -942,12 +940,12 @@ class modFlexicontentHelper
 					$where2 = (count($tags) > 1) ? ' AND tid IN ('.implode(',', $tags).')' : ' AND tid = '.$tags[0];
 					
 					// select the item ids that have the common tags
-					$query3 = 'SELECT DISTINCT itemid' .
+					$query2 = 'SELECT DISTINCT itemid' .
 							' FROM #__flexicontent_tags_item_relations' .
 							' WHERE itemid <> '.(int) $id .
 							$where2
 							;
-					$db->setQuery($query3);
+					$db->setQuery($query2);
 					$related = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 				}
 								
@@ -970,12 +968,12 @@ class modFlexicontentHelper
 				$where2 = (count($tag_ids) > 1) ? ' AND tid IN ('.implode(',', $tag_ids).')' : ' AND tid = '.$tag_ids[0];
 				
 				// retieve item ids using the providen tags
-				$query3 = 'SELECT DISTINCT itemid' .
+				$query2 = 'SELECT DISTINCT itemid' .
 						' FROM #__flexicontent_tags_item_relations' .
 						' WHERE 1=1 ' .
 						$where2
 						;
-				$db->setQuery($query3);
+				$db->setQuery($query2);
 				$tagged = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
 			}
 			
@@ -1171,8 +1169,8 @@ class modFlexicontentHelper
 			$orderby = '';
 		}
 		
-		if ( empty($query) ) {  // If a custom query has not been set above then use the default one ...
-			$query 	= 'SELECT i.*, ie.*, ty.name AS typename,'
+		if ( empty($items_query) ) {  // If a custom query has not been set above then use the default one ...
+			$items_query 	= 'SELECT i.*, ie.*, ty.name AS typename,'
 					//. $select_image
 					. $select_comments
 					. $select_rated
@@ -1198,12 +1196,12 @@ class modFlexicontentHelper
 		
 		if (!isset($multiquery_cats)) $multiquery_cats = array("");
 		foreach($multiquery_cats as $cat_where) {
-			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $query);
+			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
 			$db->setQuery($per_cat_query, 0, $count);
 			$rows = $db->loadObjectList();
 			if ( $db->getErrorNum() ) {
 				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
+				$jAp->enqueueMessage(nl2br($items_query."\n".$db->getErrorMsg()."\n"),'error');
 			}
 			$cat_items_arr[] = $rows;
 		}
@@ -1228,6 +1226,7 @@ class modFlexicontentHelper
 			$cid  = JRequest::getInt('cid', 0);  // current category id of current item
 			
 			$catconf = new stdClass();
+			$catconf->orderby = '';
 			$catconf->fallback_maincat  = $params->get('currcat_fallback_maincat', 0);
 			$catconf->showtitle  = $params->get('currcat_showtitle', 0);
 			$catconf->showdescr  = $params->get('currcat_showdescr', 0);
@@ -1262,6 +1261,7 @@ class modFlexicontentHelper
 			$cids = $dynamic_cids ? unserialize($dynamic_cids) : $static_cids;
 			$cids = (!is_array($cids)) ? array($cids) : $cids;
 			
+			$catconf->orderby    = $params->get('cats_orderby', 'alpha');
 			$catconf->showtitle  = $params->get('cats_showtitle', 0);
 			$catconf->showdescr  = $params->get('cats_showdescr', 0);
 			$catconf->cuttitle   = (int)$params->get('cats_cuttitle', 40);
@@ -1281,11 +1281,18 @@ class modFlexicontentHelper
 		if (empty($cids) || !count($cids)) return false;
 		
 		// initialize variables
+		$orderby = '';
+		if ($catconf->orderby) $orderby = flexicontent_db::buildCatOrderBy(
+			$params, $catconf->orderby, $request_var='', $config_param='',
+			$cat_tbl_alias = 'c', $user_tbl_alias = 'u', $default_order = '', $default_order_dir = ''
+		);
 		$query = 'SELECT c.id, c.title, c.description, c.params '
 					. ( FLEXI_J16GE ? '' : ', c.image ' )  // NO image column in J1.6 and higher, image is in parameters
 					. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 					. ' FROM #__categories AS c'
-					. ' WHERE c.id IN (' . implode(',', $cids) . ')';
+					. (FLEXI_J16GE ? ' LEFT JOIN #__users AS u ON u.id = c.created_user_id' : '')
+					. ' WHERE c.id IN (' . implode(',', $cids) . ')'
+					. $orderby
 					;
 		$db->setQuery($query);
 		$catdata_arr = $db->loadObjectList();

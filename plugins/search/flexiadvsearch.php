@@ -96,22 +96,9 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$user  = JFactory::getUser();
 		$menu  = $app->getMenu()->getActive();
 		
-		
-		
-		// *******************************************************************************************
-		// Get Configuration parameters (Global component configuration + Menu configuration override)
-		// *******************************************************************************************
-		
-		// Get the PAGE/COMPONENT parameters (WARNING: merges current menu item parameters in J1.5 but not in J1.6+)
-		$params = clone($app->isSite()  ?  $app->getParams('com_flexicontent')  : JComponentHelper::getParams('com_flexicontent'));
-		
-		// Get menu parameters
-		if ($menu) {
-			$menuParams = FLEXI_J16GE ? new JRegistry($menu->params) : new JParameter($menu->params);
-			// In J1.6+ the above function does not merge current menu item parameters,
-			// it behaves like JComponentHelper::getParams('com_flexicontent') was called
-			if (FLEXI_J16GE) $params->merge($menuParams);
-		}
+		// Get the COMPONENT only parameters and merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) $params->merge($menu->params);
 		
 		// some parameter shortcuts
 		$show_noauth  = $params->get('show_noauth', 0);
@@ -250,8 +237,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$text = trim( $text );
 		if( strlen($text) )
 		{
-			$escaped_text = $db->getEscaped($text);
-			$quoted_text = $db->Quote( $escaped_text, false );
+			$quoted_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
+			$quoted_text = $db->Quote( $quoted_text, false );
 			
 			switch ($phrase)
 			{
@@ -270,7 +257,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 				case 'all':
 					$words = explode( ' ', $text );
 					$newtext = '+' . implode( '* +', $words ) .'*';
-					$quoted_text = $db->Quote( $db->getEscaped( $newtext ), false );
+					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+					$quoted_text = $db->Quote( $quoted_text, false );
 					$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 				
@@ -278,7 +266,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 				default:
 					$words = explode( ' ', $text );
 					$newtext = implode( '* ', $words ) .'*';
-					$quoted_text = $db->Quote( $db->getEscaped( $newtext ), false );
+					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+					$quoted_text = $db->Quote( $quoted_text, false );
 					$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 			}

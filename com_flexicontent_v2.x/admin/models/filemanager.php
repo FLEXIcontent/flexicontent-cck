@@ -120,7 +120,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$query = $s_assigned_via_main  ?  $this->_buildQuery($s_assigned_fields)  :  $this->_buildQuery();
 			
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			if ($this->_db->getErrorNum()) echo nl2br( "\n".$this->_db->getErrorMsg() );
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
 			$db = JFactory::getDBO();
 			$db->setQuery("SELECT FOUND_ROWS()");
@@ -193,7 +193,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function _buildQuery( $assigned_fields=array(), $item_id=0, $ids_only=false )
 	{
-		$app = JFactory::getApplication();
+		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		// Get the WHERE, HAVING and ORDER BY clauses for the query
@@ -268,7 +268,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$db = JFactory::getDBO();
 		$query = $this->_buildQuery( $assigned_fields=array(), $ids_only=true, $item_id );
 		$db->setQuery($query);
-		$items = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+		$items = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 		$items = $items?$items:array();
 		return $items;
 	}
@@ -308,9 +308,9 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
 
-		$search 	= $app->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
 		$filter 	= $app->getUserStateFromRequest( $option.'.filemanager.filter', 'filter', 1, 'int' );
-		$search 	= $this->_db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$search 	= $app->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
+		$search 	= trim( JString::strtolower( $search ) );
 		$filter_uploader= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
 		$filter_url			= $app->getUserStateFromRequest( $option.'.filemanager.filter_url', 'filter_url', '', 'word' );
 		$filter_secure	= $app->getUserStateFromRequest( $option.'.filemanager.filter_secure', 'filter_secure', '', 'word' );
@@ -350,13 +350,15 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		if ( $filter_ext ) {
 			$where[] = ' ext = ' . $this->_db->Quote( $filter_ext );
 		}
-
+		
 		if ($search && $filter == 1) {
-			$where[] = ' LOWER(f.filename) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
+			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
+			$where[] = ' LOWER(f.filename) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
 		}
 
 		if ($search && $filter == 2) {
-			$where[] = ' LOWER(f.altname) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
+			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
+			$where[] = ' LOWER(f.altname) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
@@ -374,7 +376,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function _buildContentHaving()
 	{
-		$app = JFactory::getApplication();
+		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
 		$filter_assigned	= $app->getUserStateFromRequest( $option.'.filemanager.filter_assigned', 'filter_assigned', '', 'word' );
@@ -450,7 +452,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			case 'image':
 				$query = "SELECT id FROM #__flexicontent_fields WHERE field_type='image' AND attribs NOT LIKE '%image_source=1%'";
 				$this->_db->setQuery($query);
-				$field_ids = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$field_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if ($field_ids) {
 					$field_ids_list = " AND fi.id IN ('". implode("','", $field_ids) ."')";
 				}
@@ -472,10 +474,10 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	function getItemsSingleprop( $field_types=array('file','minigallery'), $file_ids=array(), $count_items=false)
 	{
 		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
 		
-		$filter_uploader = $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
-		$user = JFactory::getUser();
+		$filter_uploader	= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
 		
 		$field_type_list = $this->_db->Quote( implode( "','", $field_types ), $escape=false );
 		
@@ -515,7 +517,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		//echo nl2br( "\n".$query."\n");
 		$this->_db->setQuery( $query );
 		$_item_data = $this->_db->loadObjectList($count_items ? 'file_id' : 'id');
-		if ($this->_db->getErrorNum()) echo nl2br( "\n".$this->_db->getErrorMsg() );
+		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		$items = array();
 		if ($_item_data) foreach ($_item_data as $item) {
@@ -539,11 +541,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function getItemsMultiprop( $field_props=array('image'=>'originalname'), $value_props=array('image'=>'filename') , $file_ids=array(), $count_items=false)
 	{
-		$app = JFactory::getApplication();
+		$app    = JFactory::getApplication();
+		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
 		
 		$filter_uploader	= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
-		$user				= JFactory::getUser();
 		
 		$where = array();
 		
@@ -580,7 +582,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			
 			// Create a matching condition for the value depending on given configuration (property name of the field, and value property of file: either id or filename or ...)
 			$value_prop = $value_props[$field_type];
-			$like_str = sprintf( $format_str, $field_prop, $this->_db->getEscaped( 'f.'.$value_prop, false ) );
+			$like_str = FLEXI_J16GE ? $this->_db->escape( 'f.'.$value_prop, false ) : $this->_db->getEscaped( 'f.'.$value_prop, false );
+			$like_str = sprintf( $format_str, $field_prop, $like_str );
 			
 			// File field relation sub query
 			$query = 'SELECT '. ($count_items  ?  'f.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
@@ -596,7 +599,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			//echo nl2br( "\n".$query."\n");
 			$this->_db->setQuery( $query );
 			$_item_data = $this->_db->loadObjectList($count_items ? 'file_id' : 'id');
-			if ($this->_db->getErrorNum()) echo nl2br( "\n".$this->_db->getErrorMsg() );
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
 			if ($_item_data) foreach ($_item_data as $item) {
 				if ($count_items) {
@@ -707,8 +710,6 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$field_ids = $this->getFieldsUsingDBmode($field_type);
 		$field_ids_list = !$field_ids  ?  ""  :  " AND fi.id IN ('". implode("','", $field_ids) ."')";
 		
-		$db = JFactory::getDBO();
-		
 		$format_str = 'CONCAT("%%","\"%s\";s:%%:%%\"",%s,"\"%%")';
 		$items = array();
 		
@@ -719,19 +720,21 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$format_str = 'CONCAT("%%","\"%s\";s:%%:%%\"",%s,"\"%%")';
 		
 		// Create a matching condition for the value depending on given configuration (property name of the field, and value property of file: either id or filename or ...)
-		$like_str = sprintf( $format_str, $field_prop, $db->getEscaped( 'f.'.$value_prop, false ) );
+		$like_str = FLEXI_J16GE ? $this->_db->escape( 'f.'.$value_prop, false ) : $this->_db->getEscaped( 'f.'.$value_prop, false );
+		$like_str = sprintf( $format_str, $field_prop, $like_str );
 		
 		$query	= 'SELECT f.id as id, COUNT(rel.item_id) as count'
 				. ' FROM #__flexicontent_fields_item_relations AS rel'
-				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $db->Quote($field_type) . $field_ids_list
+				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type = ' . $this->_db->Quote($field_type) . $field_ids_list
 				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE '. $like_str
 				. ' WHERE f.id IN('. $file_id_list .')'
 				. ' GROUP BY f.id'
 				;
-		$db->setQuery($query);
-		$assigned_data = $db->loadObjectList('id');
+		$this->_db->setQuery($query);
+		$assigned_data = $this->_db->loadObjectList('id');
+		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+		
 		//echo "<pre>"; print_r($assigned_data); exit;
-		if ($db->getErrorNum()) echo nl2br( "\n".$db->getErrorMsg() );
 		
 		foreach($rows as $row) {
 			$row->{'assigned_'.$field_type} = (int) @ $assigned_data[$row->id]->count;
@@ -764,7 +767,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$this->_db->setQuery($query);
 		
 		$assigned_arr = $this->_db->loadObjectList('file_id');
-		if ($this->_db->getErrorNum()) echo nl2br( "\n".$this->_db->getErrorMsg() );
+		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		foreach ($rows as $row) {
 			$row->{'assigned_'.$field_type} = (int) @ $assigned_arr[$row->id]->count;
@@ -781,7 +784,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function publish($cid = array(), $publish = 1)
 	{
-		$user 	= JFactory::getUser();
+		$user = JFactory::getUser();
 
 		if (count( $cid )) {
 			$cids = implode( ',', $cid );

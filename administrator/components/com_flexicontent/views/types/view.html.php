@@ -36,22 +36,21 @@ class FlexicontentViewTypes extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
 		//initialise variables
-		$db  		= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$user 		= & JFactory::getUser();
+		$app = JFactory::getApplication();
+		$option    = JRequest::getVar('option');
+		$user 		= JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document	= JFactory::getDocument();
 		
 		JHTML::_('behavior.tooltip');
 		
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.types.filter_order', 		'filter_order', 	't.name', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.types.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $mainframe->getUserStateFromRequest( $option.'.types.filter_state', 		'filter_state', 	'*', 'word' );
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.types.search', 			'search', 			'', 'string' );
-		$search 			= $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$filter_order		  = $app->getUserStateFromRequest( $option.'.types.filter_order', 		'filter_order', 	't.name', 'cmd' );
+		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.types.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_state 		= $app->getUserStateFromRequest( $option.'.types.filter_state', 		'filter_state', 	'*', 'word' );
+		$search 			= $app->getUserStateFromRequest( $option.'.types.search', 			'search', 			'', 'string' );
+		$search 			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		//add css and submenu to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -79,14 +78,14 @@ class FlexicontentViewTypes extends JViewLegacy
 		
 		//Get data from the model
 		if (FLEXI_J16GE) {
-			$rows = & $this->get( 'Items');
+			$rows = $this->get( 'Items');
 		} else {
-			$rows = & $this->get( 'Data');
+			$rows = $this->get( 'Data');
 		}
 		foreach($rows as $type) {
 			$type->config = FLEXI_J16GE ? new JRegistry($type->config) : new JParameter($type->config);
 		}
-		$this->pagination = & $this->get( 'Pagination' );
+		$pagination = $this->get( 'Pagination' );
 
 		$lists = array();
 		
@@ -101,10 +100,10 @@ class FlexicontentViewTypes extends JViewLegacy
 		$lists['order'] = $filter_order;
 
 		//assign data to template
-		$this->assignRef('lists'      	, $lists);
+		$this->assignRef('lists'      , $lists);
 		$this->assignRef('rows'      	, $rows);
-		$this->assignRef('user'      	, $user);
-
+		$this->assignRef('pagination'	, $pagination);
+		
 		parent::display($tpl);
 	}
 }

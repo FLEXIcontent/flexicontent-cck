@@ -21,9 +21,9 @@ $listOrder  = $this->lists['order'];
 $listDirn   = $this->lists['order_Dir'];
 $saveOrder  = ($listOrder == 'c.lft' && $listDirn == 'asc');
 
-$user       = &JFactory::getUser();
-$cparams = & JComponentHelper::getParams( 'com_flexicontent' );
-$autologin= $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+$user      = JFactory::getUser();
+$cparams   = JComponentHelper::getParams( 'com_flexicontent' );
+$autologin = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 
 
 $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
@@ -44,7 +44,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			<td nowrap="nowrap">
 				<div class="filter-select fltrt">
 				  <?php echo $this->lists['language']; ?>
-				  <?php echo $this->lists['state']; ?>
+					<?php echo $this->lists['state']; ?>
 				</div>
 			</td>
 		</tr>
@@ -132,10 +132,15 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					} else {
 						$canCheckin = $user->gid >= 24;
 					}
-					if ($canCheckin && $row->checked_out == $user->id) {
-						//echo if (FLEXI_J16GE) JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'categories.', $canCheckin);
+					if ($canCheckin) {
+						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'categories.', $canCheckin);
 						$task_str = FLEXI_J16GE ? 'categories.checkin' : 'checkin';
-						echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						if ($row->checked_out == $user->id) {
+							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						} else {
+							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none;">';
+							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
+						}
 					}
 				}
 				
@@ -143,7 +148,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit && !$canEditOwn ) ) {
 					echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
 				
-				// Display title with edit link ... (item editable and not checked out)
+				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $row->alias; ?>">

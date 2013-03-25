@@ -37,21 +37,21 @@ class FlexicontentControllerTypes extends FlexicontentController
 	function __construct()
 	{
 		parent::__construct();
-
+		
 		// Register Extra task
-		$this->registerTask( 'add'  ,		 	'edit' );
-		$this->registerTask( 'apply', 			'save' );
-		$this->registerTask( 'saveandnew', 		'save' );
+		$this->registerTask( 'add',          'edit' );
+		$this->registerTask( 'apply',        'save' );
+		$this->registerTask( 'saveandnew',   'save' );
 		if (!FLEXI_J16GE) {
-			$this->registerTask( 'accesspublic', 	'access' );
-			$this->registerTask( 'accessregistered','access' );
-			$this->registerTask( 'accessspecial', 	'access' );
+			$this->registerTask( 'accesspublic',     'access' );
+			$this->registerTask( 'accessregistered', 'access' );
+			$this->registerTask( 'accessspecial',    'access' );
 		}
-		$this->registerTask( 'copy', 			'copy' );
+		$this->registerTask( 'copy',         'copy' );
 	}
 
 	/**
-	 * Logic to save a type
+	 * Logic to save a record
 	 *
 	 * @access public
 	 * @return void
@@ -62,7 +62,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 
-		$task		= JRequest::getVar('task');
+		$task  = JRequest::getVar('task');
 		$model = $this->getModel('type');
 		
 		// Get data from request and validate them
@@ -102,20 +102,39 @@ class FlexicontentControllerTypes extends FlexicontentController
 
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
+			$itemcache = JFactory::getCache('com_flexicontent_items');
+			$itemcache->clean();
+			$filtercache = JFactory::getCache('com_flexicontent_filters');
+			$filtercache->clean();
 
 		} else {
 
 			$msg = JText::_( 'FLEXI_ERROR_SAVING_TYPE' );
-			//JError::raiseWarning( 500, $model->getError() );
+			JError::raiseWarning( 500, $model->getError() );
 			$link 	= 'index.php?option=com_flexicontent&view=type';
 		}
 
 		$model->checkin();
 		$this->setRedirect($link, $msg);
 	}
-
+	
+	
 	/**
-	 * Logic to publish types
+	 * Check in a record
+	 *
+	 * @since	1.5
+	 */
+	function checkin()
+	{
+		$tbl = 'flexicontent_types';
+		$redirect_url = 'index.php?option=com_flexicontent&view=types';
+		flexicontent_db::checkin($tbl, $redirect_url, $this);
+		return;// true;
+	}
+	
+	
+	/**
+	 * Logic to publish records
 	 *
 	 * @access public
 	 * @return void
@@ -123,10 +142,10 @@ class FlexicontentControllerTypes extends FlexicontentController
 	 */
 	function publish()
 	{
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$cid  = JRequest::getVar( 'cid', array(0), 'default', 'array' );
 
+		$msg = '';
 		if (!is_array( $cid ) || count( $cid ) < 1) {
-			$msg = '';
 			JError::raiseWarning(500, JText::_( 'FLEXI_SELECT_ITEM_PUBLISH' ) );
 		} else {
 			$model = $this->getModel('types');
@@ -135,16 +154,16 @@ class FlexicontentControllerTypes extends FlexicontentController
 				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
 				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 			}
-
 			$total = count( $cid );
 			$msg 	= $total.' '.JText::_( 'FLEXI_TYPE_PUBLISHED' );
 		}
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=types', $msg );
 	}
-
+	
+	
 	/**
-	 * Logic to unpublish types
+	 * Logic to unpublish records
 	 *
 	 * @access public
 	 * @return void
@@ -152,8 +171,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 	 */
 	function unpublish()
 	{
-		$cid 	= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$model 	= $this->getModel('types');
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$model = $this->getModel('types');
 
 		$msg = '';
 		if (!is_array( $cid ) || count( $cid ) < 1) {
@@ -175,8 +194,9 @@ class FlexicontentControllerTypes extends FlexicontentController
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=types', $msg );
 	}
 
+	
 	/**
-	 * Logic to delete types
+	 * Logic to delete records
 	 *
 	 * @access public
 	 * @return void
@@ -184,8 +204,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 	 */
 	function remove()
 	{
-		$cid		= JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$model 		= $this->getModel('types');
+		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
+		$model = $this->getModel('types');
 
 		if (!is_array( $cid ) || count( $cid ) < 1) {
 			$msg = '';
@@ -193,7 +213,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 		} else if (!$model->candelete($cid)) {
 			JError::raiseWarning(500, JText::_( 'FLEXI_YOU_CANNOT_REMOVE_THIS_TYPE_THERE_ARE_STILL_ITEMS_ASSOCIATED' ));
 		} else {
-
+			
 			if (!$model->delete($cid)) {
 				$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
 				if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
@@ -227,27 +247,34 @@ class FlexicontentControllerTypes extends FlexicontentController
 	}
 
 	/**
-	 * Logic to create the view for the edit categoryscreen
+	 * Logic to create the view for the record editing
 	 *
 	 * @access public
 	 * @return void
 	 * @since 1.5
 	 */
-	function edit( )
+	function edit()
 	{
 		JRequest::setVar( 'view', 'type' );
 		JRequest::setVar( 'hidemainmenu', 1 );
 
 		$model = $this->getModel('type');
 		$user  = JFactory::getUser();
-
-		// Error if checkedout by another administrator
-		if ($model->isCheckedOut( $user->get('id') )) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=types', JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ) );
+		
+		// Check if record is checked out by other editor
+		if ( $model->isCheckedOut( $user->get('id') ) ) {
+			JError::raiseNotice( 500, JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=types', '');
+			return;
 		}
-
-		$model->checkout( $user->get('id') );
-
+		
+		// Checkout the record and proceed to edit form
+		if ( !$model->checkout() ) {
+			JError::raiseWarning( 500, $model->getError() );
+			$this->setRedirect( 'index.php?option=com_flexicontent&view=types', '');
+			return;
+		}
+		
 		parent::display();
 	}
 	
@@ -258,18 +285,19 @@ class FlexicontentControllerTypes extends FlexicontentController
 	 * @return void
 	 * @since 1.5
 	 */
-	function access( )
+	function access()
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$cid      = JRequest::getVar( 'cid', array(0), 'post', 'array' );
-		$id       = (int)$cid[0];
+		$task  = JRequest::getVar( 'task' );
+		$model = $this->getModel('types');
+		$cid   = JRequest::getVar( 'cid', array(0), 'post', 'array' );
+		$id    = (int)$cid[0];
 		if (FLEXI_J16GE) {
 			$accesses	= JRequest::getVar( 'access', array(0), 'post', 'array' );
 			$access = $accesses[$id];
 		} else {
-			$task		= JRequest::getVar( 'task' );
 			if ($task == 'accesspublic') {
 				$access = 0;
 			} elseif ($task == 'accessregistered') {
@@ -279,7 +307,6 @@ class FlexicontentControllerTypes extends FlexicontentController
 			}
 		}
 
-		$model = $this->getModel('types');
 		
 		if(!$model->saveaccess( $id, $access )) {
 			$msg = JText::_( 'FLEXI_OPERATION_FAILED' ).' : '.$model->getError();
@@ -287,11 +314,14 @@ class FlexicontentControllerTypes extends FlexicontentController
 		} else {
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
+			$filtercache = JFactory::getCache('com_flexicontent_filters');
+			$filtercache->clean();
 		}
 		
 		$this->setRedirect('index.php?option=com_flexicontent&view=types' );
 	}
-
+	
+	
 	/**
 	 * Logic to set the access level of the Types
 	 *
@@ -299,7 +329,7 @@ class FlexicontentControllerTypes extends FlexicontentController
 	 * @return void
 	 * @since 1.5
 	 */
-	function copy( )
+	function copy()
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );

@@ -87,12 +87,14 @@ if(count($tasks)>=2) {
 }
 
 // Require specific controller if requested
-if($controller) {
+if ($controller) {
 	$path = JPATH_COMPONENT.DS.'controllers'.DS.$controller.'.php';
-	if (file_exists($path)) {
+	
+	// Views allowed to have a controller
+	if ( file_exists($path) ) {
 		require_once $path;
 	} else {
-		$controller = '';
+		JRequest::setVar('controller', $controller = '');
 	}
 }
 

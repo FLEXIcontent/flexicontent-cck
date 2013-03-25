@@ -247,7 +247,7 @@ class FlexicontentHelperPerm
 				. ($specific_catids ? '  AND c.id IN ('.implode(",", $specific_catids).')' : '')
 				;
 			$db->setQuery($query);
-			$allcats = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			$allcats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			
 			foreach ($allcats as $category_id)
 			{
@@ -326,7 +326,7 @@ class FlexicontentHelperPerm
 					. ($specific_catids ? '  AND axo IN ('.implode(",", $specific_catids).')' : '')
 					;
 			$db->setQuery($query);
-			$allowedcats = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			$allowedcats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			
 			$allowedcats = $allowedcats ? $allowedcats : array();
 			// we add all descendent to the array

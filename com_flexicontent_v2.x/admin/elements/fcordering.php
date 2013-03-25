@@ -61,6 +61,8 @@ class JFormFieldFcordering extends JFormFieldList
 		$ordering[] = JHTML::_('select.option',  'updated', 	JText::_( 'FLEXI_RECENTLY_UPDATED' ) );
 		$ordering[] = JHTML::_('select.option',  'alpha', 		JText::_( 'FLEXI_ALPHABETICAL' ) );
 		$ordering[] = JHTML::_('select.option',  'alpharev', 	JText::_( 'FLEXI_ALPHABETICAL_REVERSE' ) );
+		$ordering[] = JHTML::_('select.option',  'id', 				JText::_( 'FLEXI_HIGHEST_ITEM_ID' ) );
+		$ordering[] = JHTML::_('select.option',  'rid', 			JText::_( 'FLEXI_LOWEST_ITEM_ID' ) );
 		$ordering[] = JHTML::_('select.option',  'catorder', 	JText::_( 'FLEXI_CAT_ORDER' ) );
 		$ordering[] = JHTML::_('select.option',  'random', 		JText::_( 'FLEXI_RANDOM' ) );
 		$ordering[] = JHTML::_('select.option',  'field', 		JText::_( 'FLEXI_CUSTOM_FIELD' ) );

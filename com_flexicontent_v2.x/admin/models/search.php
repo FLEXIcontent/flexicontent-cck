@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		$Id: search.php 14401 2010-01-26 14:10:00Z louis $
+ * @version		$Id: search.php 1655 2013-03-16 17:55:25Z ggppdk $
  * @package		Joomla
  * @subpackage	Search
  * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
@@ -54,9 +54,9 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	function __construct() {
 		parent::__construct();
 		$option = 'com_flexicontent';
-		$mainframe  = JFactory::getApplication();
-		$limit      = $mainframe->getUserStateFromRequest( $option.'.search.limit', 'limit', $mainframe->getCfg('list_limit'), 'int');
-		$limitstart = $mainframe->getUserStateFromRequest( $option.'.search.limitstart', 'limitstart', 0, 'int' );
+		$app  = JFactory::getApplication();
+		$limit      = $app->getUserStateFromRequest( $option.'.search.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $app->getUserStateFromRequest( $option.'.search.limitstart', 'limitstart', 0, 'int' );
 
 		// In case limit has been changed, adjust limitstart accordingly
 		$limitstart = ( $limit != 0 ? (floor($limitstart / $limit) * $limit) : 0 );
@@ -126,11 +126,11 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 */
 	function _buildOrderBy()
 	{
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		
-		$filter_order		= $mainframe->getUserStateFromRequest( $option.'.search.filter_order', 'filter_order', 'a.title', 'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $option.'.search.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
+		$filter_order		= $app->getUserStateFromRequest( $option.'.search.filter_order', 'filter_order', 'a.title', 'cmd' );
+		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.search.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
 		
 		$orderby = $filter_order.' '.$filter_order_Dir;
 		$orderby = trim($orderby) ? $orderby : 'a.title ASC';
@@ -154,15 +154,15 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		if ( isset($where) ) return $where;
 		
 		$option = JRequest::getVar('option');
-		$mainframe = JFactory::getApplication();
+		$app = JFactory::getApplication();
 
-		$filter_itemstate	= $mainframe->getUserStateFromRequest( $option.'.search.filter_itemstate', 'filter_itemstate', '', 'word' );
-		$filter_itemtype	= $mainframe->getUserStateFromRequest( $option.'.search.filter_itemtype', 'filter_itemtype', '', 'int' );
-		$filter_fieldtype = $mainframe->getUserStateFromRequest( $option.'.search.filter_fieldtype', 'filter_fieldtype', '', 'word' );
-		$search_index 		= $mainframe->getUserStateFromRequest( $option.'.search.search_index', 'search_index', '', 'string' );
-		$search_index 		= $this->_db->getEscaped( trim(JString::strtolower( $search_index ) ) );
-		$search_itemtitle	= $mainframe->getUserStateFromRequest( $option.'.search.search_itemtitle', 'search_itemtitle', '', 'string' );
-		$search_itemid		= $mainframe->getUserStateFromRequest( $option.'.search.search_itemid', 'search_itemid', '', 'int' );
+		$filter_itemstate	= $app->getUserStateFromRequest( $option.'.search.filter_itemstate', 'filter_itemstate', '', 'word' );
+		$filter_itemtype	= $app->getUserStateFromRequest( $option.'.search.filter_itemtype', 'filter_itemtype', '', 'int' );
+		$filter_fieldtype = $app->getUserStateFromRequest( $option.'.search.filter_fieldtype', 'filter_fieldtype', '', 'word' );
+		$search_index 		= $app->getUserStateFromRequest( $option.'.search.search_index', 'search_index', '', 'string' );
+		$search_index 		= trim( JString::strtolower( $search_index ) );
+		$search_itemtitle	= $app->getUserStateFromRequest( $option.'.search.search_itemtitle', 'search_itemtitle', '', 'string' );
+		$search_itemid		= $app->getUserStateFromRequest( $option.'.search.search_itemid', 'search_itemid', '', 'int' );
 
 		$where = array();
 
@@ -189,11 +189,11 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		}
 
 		if ($search_index) {
-			$where[] = ' LOWER(ai.search_index) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search_index, true ).'%', false );
+			$where[] = ' LOWER(ai.search_index) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search_index, true ).'%', false );
 		}
 		
 		if ($search_itemtitle) {
-			$where[] = ' LOWER(a.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search_itemtitle, true ).'%', false );
+			$where[] = ' LOWER(a.title) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search_itemtitle, true ).'%', false );
 		}
 		
 		if ($search_itemid) {
@@ -262,8 +262,8 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		return $this->_pagination;
 	}
 	function getLimitStart() {
-		$mainframe = JFactory::getApplication();
-		return $this->getState('limitstart', $mainframe->getCfg('list_limit'));
+		$app = JFactory::getApplication();
+		return $this->getState('limitstart', $app->getCfg('list_limit'));
 	}
 	function purge() {
 		$db = JFactory::getDBO();
