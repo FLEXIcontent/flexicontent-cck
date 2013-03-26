@@ -33,6 +33,10 @@
 				<option value="0">FLEXI_VALUE</option>
 				<option value="1">FLEXI_LABEL</option>
 			</field>
+			<field name="display_all" type="radio" default="0" label="FLEXI_DISPLAY_NONSELECTED_VALUES" description="FLEXI_DISPLAY_NONSELECTED_VALUES_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
 			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
@@ -48,7 +52,21 @@
 			</field>
 			<field name="pretext" type="text" default="" label="FLEXI_FIELD_SINGLE_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_SINGLE_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SINGLE_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_SINGLE_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+			</field>
+			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
+			<field name="" type="separator" default="FLEXI_NONSELECTED_VALUES" description="" level="level3" />
+			<field name="ns_pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT_NONSELECTED" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_NONSELECTED_DESC" />
+			<field name="ns_posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT_NONSELECTED" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_NONSELECTED_DESC" />
+
 			<field name="" type="separator" default="FLEXI_ITEM_FORM" description="" level="level1" />
 			
 			<field name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
@@ -70,7 +88,6 @@
 			</field>
 			<field name="opentag_form" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag_form" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
-			
 			
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" description="FLEXI_TEXT_SEARCH_FILTER_CONF_DESC" level="level1" />
 		

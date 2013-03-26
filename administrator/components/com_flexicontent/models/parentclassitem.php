@@ -375,12 +375,12 @@ class ParentClassItem extends JModelLegacy
 						$limit_to_cid = $this->_cid ? ' AND rel.catid = '. (int) $this->_cid : ' AND rel.catid = a.catid';
 
 						$query->select($this->getState(
-							'item.select', 'a.id, a.asset_id, a.title, a.alias, a.title_alias, a.introtext, a.fulltext, ' .
+							'item.select', 'a.id, a.asset_id, a.title, a.alias, a.introtext, a.fulltext, ' .
 							// If badcats.id is not null, this means that the item is inside in an unpublished ancestor category
 							'a.state, CASE WHEN badcats.id is null THEN 1 ELSE 0 END AS ancestor_cats_published, ' .
-							'a.mask, a.catid, a.created, a.created_by, a.created_by_alias, ' .
+							'a.catid, a.created, a.created_by, a.created_by_alias, ' .
 							'a.modified, a.modified_by, a.checked_out, a.checked_out_time, a.publish_up, a.publish_down, ' .
-							'a.images, a.urls, a.attribs, a.version, a.parentid, a.ordering, ' .
+							'a.images, a.urls, a.attribs, a.version, a.ordering, ' .
 							'a.metakey, a.metadesc, a.access, a.hits, a.metadata, a.featured, a.language, a.xreference'.($version ? ',ver.version_id' : '')
 							)
 						);
@@ -1233,7 +1233,7 @@ class ParentClassItem extends JModelLegacy
 			$item->catid        = null;
 			$item->title        = null;
 			$item->alias        = null;
-			$item->title_alias  = null;
+			$item->title_alias  = null;  // deprecated do not use
 			$item->introtext    = null;
 			$item->fulltext     = null;
 			$item->author       = null;
@@ -1263,7 +1263,7 @@ class ParentClassItem extends JModelLegacy
 			$item->metadata     = null;
 			$item->access       = $default_accesslevel;
 			$item->state        = $default_state;
-			$item->mask         = null;
+			$item->mask         = null;  // deprecated do not use
 			$item->images       = null;
 			$item->urls         = null;
 			$item->language     = FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang();

@@ -1388,3 +1388,12 @@ div.fancybox-wrap a { background: none!important;}
 	height: 16px;
 	margin: 2px 4px;
 }
+
+.fc_field_unsused_val {
+ text-decoration: line-through;
+}
+
+.fc_field_unsused_val img {
+ opacity:0.4;
+ filter:alpha(opacity=40); /* For IE8 and earlier */
+}

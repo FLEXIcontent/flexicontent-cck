@@ -99,12 +99,17 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
-		if ( !$values ) { $field->{$prop} = ''; return; }  // currently default values applied in item form only
+		// Check for no values and not displaying ALL elements
+    $display_all = $field->parameters->get( 'display_all', 0 ) ;
+		if ( !$values && !$display_all ) { $field->{$prop} = ''; $field->display_index = ''; return; }
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
 		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
@@ -114,31 +119,100 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
 		$text_or_value= $field->parameters->get( 'text_or_value', 1 ) ;
 		
+		switch($separatorf)
+		{
+			case 0:
+			$separatorf = '&nbsp;';
+			break;
+
+			case 1:
+			$separatorf = '<br />';
+			break;
+
+			case 2:
+			$separatorf = '&nbsp;|&nbsp;';
+			break;
+
+			case 3:
+			$separatorf = ',&nbsp;';
+			break;
+
+			case 4:
+			$separatorf = $closetag . $opentag;
+			break;
+
+			case 5:
+			$separatorf = '';
+			break;
+
+			default:
+			$separatorf = '&nbsp;';
+			break;
+		}
+		
 		
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
 		if ( !$elements ) {
 			if ($sql_mode)
-				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+				$field->{$prop} = JText::_('FLEXI_FIELD_INVALID_QUERY');
 			else
-				$field->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+				$field->{$prop} = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
 			return;
 		}
+		// Check for no elements found
+		if ( empty($elements) )  { $field->{$prop} = ''; $field->display_index = ''; return; }
 		
 		// Create display of field
-		$display = '';
-		$display_index = '';
-		if ( count($values) ) {
-			$element = @$elements[ $values[0] ];
-			if ( $element ) {
-				if ($text_or_value == 0) $fe_display = $element->value;
-				else $fe_display =JText::_($element->text);
-				$display = $pretext . $fe_display . $posttext;
-				$display_index = $element->value;
-			}
+		$display = array();
+		$display_index = array();
+		
+		// Prepare for looping
+		if ( !$values ) $values = array();
+		if ( $display_all ) {
+			$index = $values[0];
+			
+			// non-selected value shortcuts
+	    $ns_pretext			= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_pretext', '' ), 'ns_pretext' );
+  	  $ns_posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_posttext', '' ), 'ns_posttext' );
+  	  $ns_pretext  = $ns_pretext . '<span class="fc_field_unsused_val">';
+  	  $ns_posttext = '</span>' . $ns_posttext;
+    	$ns_pretext  = $remove_space ? $ns_pretext : $ns_pretext . ' ';
+	    $ns_posttext = $remove_space ? $ns_posttext : ' ' . $ns_posttext;
 		}
-		$field->{$prop}	= $display;
-		$field->display_index = $display_index;
+		
+		// CASE a. Display ALL elements (selected and NON-selected)
+		if ( $display_all ) foreach ($elements as $val => $element)
+		{
+			if ($text_or_value == 0) $disp = $element->value;
+			else if ($text_or_value == 1) $disp =JText::_($element->text);
+			
+			$is_selected = $index == $val;
+			
+			$display[] = $is_selected ?  $pretext.$disp.$posttext : $ns_pretext.$disp.$ns_posttext;
+			if ( $is_selected ) $display_index[] = $element->value;
+		}
+		
+		// CASE b. Display only selected elements
+		else if ( count($values) )
+		{
+			$element = @$elements[ $values[0] ];
+			if ( !$element ) continue;
+			
+			if ($text_or_value == 0) $disp = $element->value;
+			else if ($text_or_value == 1) $disp =JText::_($element->text);
+			
+			$display[] = $pretext.$disp.$posttext;
+			$display_index[] = $element->value;
+		}
+		
+		// Apply values separator
+		$field->{$prop} = implode($separatorf, $display);
+		$field->display_index = implode($separatorf, $display_index);
+		
+		// Apply field 's opening / closing texts
+		if ($field->{$prop})
+			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 	}
 	
 	

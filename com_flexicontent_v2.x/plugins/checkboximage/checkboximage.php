@@ -185,7 +185,9 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
-		if ( !$values ) { $field->{$prop} = ''; return; }  // currently default values applied in item form only
+		// Check for no values and not displaying ALL elements
+    $display_all = $field->parameters->get( 'display_all', 0 ) ;
+		if ( !$values && !$display_all ) { $field->{$prop} = ''; $field->display_index = ''; return; }
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -244,24 +246,57 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
 		if ( !$elements ) {
 			if ($sql_mode)
-				$field->html = JText::_('FLEXI_FIELD_INVALID_QUERY');
+				$field->{$prop} = JText::_('FLEXI_FIELD_INVALID_QUERY');
 			else
-				$field->html = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
+				$field->{$prop} = JText::_('FLEXI_FIELD_INVALID_ELEMENTS');
 			return;
 		}
+		// Check for no elements found
+		if ( empty($elements) )  { $field->{$prop} = ''; $field->display_index = ''; return; }
 		
 		// Create display of field
 		$display = array();
 		$display_index = array();
-		for($n=0, $c=count($values); $n<$c; $n++) {
-			$element = @$elements[ $values[$n] ];
-			if ( $element ) {
-				if ($text_or_value == 0) $fe_display = $element->value;
-				else if ($text_or_value == 1) $fe_display =JText::_($element->text);
-				else $fe_display = '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.JText::_($element->text).'" />';
-				$display[] = $pretext . $fe_display . $posttext;
-				$display_index[] = $element->value;
-			}
+		
+		// Prepare for looping
+		if ( !$values ) $values = array();
+		if ( $display_all ) {
+			$indexes = array_flip($values);
+			
+			// non-selected value shortcuts
+	    $ns_pretext			= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_pretext', '' ), 'ns_pretext' );
+  	  $ns_posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_posttext', '' ), 'ns_posttext' );
+  	  $ns_pretext  = $ns_pretext . '<span class="fc_field_unsused_val">';
+  	  $ns_posttext = '</span>' . $ns_posttext;
+    	$ns_pretext  = $remove_space ? $ns_pretext : $ns_pretext . ' ';
+	    $ns_posttext = $remove_space ? $ns_posttext : ' ' . $ns_posttext;
+		}
+		
+		// CASE a. Display ALL elements (selected and NON-selected)
+		if ( $display_all ) foreach ($elements as $val => $element)
+		{
+			if ($text_or_value == 0) $disp = $element->value;
+			else if ($text_or_value == 1) $disp =JText::_($element->text);
+			else $disp = '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.JText::_($element->text).'" />';
+			
+			$is_selected = isset($indexes[$val]);
+			
+			$display[] = $is_selected ?  $pretext.$disp.$posttext : $ns_pretext.$disp.$ns_posttext;
+			if ( $is_selected ) $display_index[] = $element->value;
+		}
+		
+		// CASE b. Display only selected elements
+		else foreach ($values as $n => $val)
+		{
+			$element = @$elements[ $val ];
+			if ( !$element ) continue;
+			
+			if ($text_or_value == 0) $disp = $element->value;
+			else if ($text_or_value == 1) $disp =JText::_($element->text);
+			else $disp = '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.JText::_($element->text).'" />';
+			
+			$display[] = $pretext.$disp.$posttext;
+			$display_index[] = $element->value;
 		}
 		
 		// Apply values separator

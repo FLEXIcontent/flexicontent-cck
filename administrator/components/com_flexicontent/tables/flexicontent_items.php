@@ -34,23 +34,23 @@ class flexicontent_items extends JTable{
 	/** @var string */
 	var $alias				= null;
 	/** @var string */
-	var $title_alias		= null;
+	var $title_alias	= null;  // deprecated do not use
 	/** @var string */
-	var $introtext			= null;
+	var $introtext		= null;
 	/** @var string */
 	var $fulltext			= null;
 	/** @var int */
 	var $state				= null;
 	/** @var int The id of the category section*/
-	var $sectionid			= null;
+	var $sectionid		= null;
 	/** @var int DEPRECATED */
-	var $mask				= null;
+	var $mask					= null;  // deprecated do not use
 	/** @var int */
 	var $catid				= null;
 	/** @var datetime */
 	var $created			= null;
 	/** @var int User id*/
-	var $created_by			= null;
+	var $created_by		= null;
 	/** @var string An alias for the author*/
 	var $created_by_alias	= null;
 	/** @var datetime */
@@ -78,7 +78,7 @@ class flexicontent_items extends JTable{
 	/** @var int */
 	var $version			= null;
 	/** @var int */
-	var $parentid			= null;
+	var $parentid			= null;  // deprecated do not use
 	/** @var int */
 	var $ordering			= null;
 	/** @var string */

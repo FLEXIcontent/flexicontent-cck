@@ -56,17 +56,17 @@ class FlexicontentViewItems  extends JViewLegacy
 		if (!is_array($globalnopath))     $globalnopath	= array();
 		
 		// Initialize variables
-		$app  = &JFactory::getApplication();
-		$session    = & JFactory::getSession();
-		$dispatcher = & JDispatcher::getInstance();
-		$document   = & JFactory::getDocument();
-		$user       = & JFactory::getUser();
-		$db         = & JFactory::getDBO();
+		$app  = JFactory::getApplication();
+		$session    = JFactory::getSession();
+		$dispatcher = JDispatcher::getInstance();
+		$document   = JFactory::getDocument();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDBO();
 		$nullDate   = $db->getNullDate();
 		
 		$menu			= JSite::getMenu()->getActive();
 		$aid			= !FLEXI_J16GE ? (int) $user->get('aid') : $user->getAuthorisedViewLevels();
-		$model		= & $this->getModel();
+		$model		= $this->getModel();
 		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
 		$cid			= $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id, verifying it really belongs to current item
 		
@@ -124,7 +124,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		$ilayout = $ilayout ? $ilayout : $params->get($_ilayout, 'default');
 		
 		// (c) Create the type parameters
-		$tparams = & $this->get( 'Typeparams' );
+		$tparams = $this->get( 'Typeparams' );
 		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 		
 		// (d) Verify the layout is within templates, Content Type default template OR Content Type allowed templates
@@ -158,13 +158,13 @@ class FlexicontentViewItems  extends JViewLegacy
 		FlexicontentFields::getFields($_items, FLEXI_ITEMVIEW, $params, $aid);
 		
 		// Note : This parameter doesn't exist yet but it will be used by the future gallery template
-		if ($params->get('use_panes', 1)) {
+		/*if ($params->get('use_panes', 1)) {
 			jimport('joomla.html.pane');
-			$pane = & JPane::getInstance('Tabs');
+			$pane = JPane::getInstance('Tabs');
 			$this->assignRef('pane', $pane);
-		}
+		}*/
 		
-		$fields		=& $item->fields;
+		$fields = $item->fields;
 
 		// Pathway need to be improved
 		$cats		= new flexicontent_cats($cid);
@@ -240,9 +240,9 @@ class FlexicontentViewItems  extends JViewLegacy
 		
 		
 		// @TODO check that as it seems to be dirty :(
-		$uri  			=& JFactory::getURI();
-		$base 			= $uri->getScheme() . '://' . $uri->getHost();
-		$ucanonical 	= $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+		$uri   = JFactory::getURI();
+		$base  = $uri->getScheme() . '://' . $uri->getHost();
+		$ucanonical = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
 		if ($params->get('add_canonical')) {
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
@@ -651,7 +651,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField' 
 		// *****************************************************************************
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$fields = & $this->get( 'Extrafields' );
+		$fields = $this->get( 'Extrafields' );
 		if ( $print_logging_info ) @$fc_run_times['get_field_vals'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
@@ -708,7 +708,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		if ( $print_logging_info ) @$fc_run_times['render_field_html'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Tags used by the item
-		$usedtagsids  = & $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
+		$usedtagsids  = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
 		//$usedtagsIds 	= $isnew ? array() : $fields['tags']->value;
 		$usedtagsdata = $model->getUsedtagsData($usedtagsids);
 		//echo "<br>usedtagsIds: "; print_r($usedtagsids);
@@ -716,8 +716,8 @@ class FlexicontentViewItems  extends JViewLegacy
 		
 		// Compatibility for old overriden templates ...
 		if (!FLEXI_J16GE) {
-			$tags			= & $this->get('Alltags');
-			$usedtags	= & $this->get('UsedtagsIds');
+			$tags			= $this->get('Alltags');
+			$usedtags	= $this->get('UsedtagsIds');
 		}
 		
 		// Load permissions (used by form template)
@@ -727,7 +727,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		$lists = $this->_buildEditLists($perms, $params, $authorparams);
 		
 		// Get number of subscribers
-		$subscribers 	= & $this->get( 'SubscribersCount' );
+		$subscribers = $this->get( 'SubscribersCount' );
 		
 		// Get menu overridden categories/main category fields
 		$menuCats = $this->_getMenuCats($item, $perms, $params);
@@ -745,7 +745,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		}
 		
 		//Load the JEditor object
-		$editor =& JFactory::getEditor();
+		$editor = JFactory::getEditor();
 		
 		// Add the js files to the document <head> section
 		//JHTML::_('behavior.formvalidation'); // Commented out, custom overloaded validator class loaded inside form template file
@@ -764,7 +764,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		$document->setTitle($title);
 		
 		// Add title to pathway
-		$pathway =& $app->getPathWay();
+		$pathway = $app->getPathWay();
 		$pathway->addItem($title, '');
 		
 		// Get pageclass suffix
@@ -858,7 +858,7 @@ class FlexicontentViewItems  extends JViewLegacy
 			// Now create the sliders object,
 			// And also push the Form Parameters object into the template (Template Parameters object is seperate)
 			jimport('joomla.html.pane');
-			$pane = & JPane::getInstance('sliders');
+			$pane = JPane::getInstance('sliders');
 			$this->assignRef('pane'				, $pane);
 			$this->assignRef('formparams'	, $formparams);
 		} else {
@@ -931,15 +931,15 @@ class FlexicontentViewItems  extends JViewLegacy
 		global $globalcats;
 		$lists = array();
 		
-		$db       = & JFactory::getDBO();
-		$user     = & JFactory::getUser();	// get current user
-		$item     = & $this->get('Item');		// get the item from the model
-		$document = & JFactory::getDocument();
+		$db       = JFactory::getDBO();
+		$user     = JFactory::getUser();	// get current user
+		$item     = $this->get('Item');		// get the item from the model
+		$document = JFactory::getDocument();
 		
 		$categories = $globalcats;			// get the categories tree
-		$selectedcats = & $this->get( 'Catsselected' );		// get category ids, NOTE: This will normally return the already set versioned value of categories ($item->categories)
+		$selectedcats = $this->get( 'Catsselected' );		// get category ids, NOTE: This will normally return the already set versioned value of categories ($item->categories)
 		$actions_allowed = array('core.create');					// user actions allowed for categories
-		$types = & $this->get( 'Typeslist' );
+		$types = $this->get( 'Typeslist' );
 		$typesselected = '';
 		$isnew = !$item->id;
 		
@@ -1068,7 +1068,7 @@ class FlexicontentViewItems  extends JViewLegacy
 	 */
 	function _getItemPerms( &$item)
 	{
-		$user = & JFactory::getUser();	// get current user\
+		$user = JFactory::getUser();	// get current user\
 		$isOwner = ( $item->created_by == $user->get('id') );
 		
 		$perms 	= array();
@@ -1242,7 +1242,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		);
 		$submit_conf_hash = md5(serialize($submit_conf));
 		
-		$session 	=& JFactory::getSession();
+		$session = JFactory::getSession();
 		$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 		$item_submit_conf[$submit_conf_hash] = $submit_conf;
 		$session->set('item_submit_conf', $item_submit_conf, 'flexicontent');

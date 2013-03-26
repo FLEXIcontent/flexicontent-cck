@@ -208,7 +208,8 @@ class FlexicontentControllerTags extends FlexicontentController
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=tags', $msg );
 	}
-
+	
+	
 	/**
 	 * logic for cancel an action
 	 *
@@ -220,14 +221,14 @@ class FlexicontentControllerTags extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-
-		$tag = JTable::getInstance('flexicontent_tags', '');
-		$tag->bind(JRequest::get('post'));
-		$tag->checkin();
-
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=tags' );
+		
+		$post = JRequest::get('post');
+		//$post = FLEXI_J16GE ? $post['jform'] : $post;  //JForm currently not used for tags
+		JRequest::setVar('cid', $post['id']);
+		$this->checkin();
 	}
-
+	
+	
 	/**
 	 * Logic to create the view for the record editing
 	 *
