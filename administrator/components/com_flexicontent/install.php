@@ -33,7 +33,11 @@ if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE')) {
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
 
-		
+if (FLEXI_J16GE) {
+	echo "Wrong Joomla version, this FLEXIcontent package is for J1.5";
+	exit();
+}
+
 		// Try to increment some limits
 		
 		@set_time_limit( 240 );    // execution time 5 minutes
@@ -360,8 +364,8 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 					if ($files_tbl_exists)   $tbls[] = "#__flexicontent_files";
 					if ($fields_tbl_exists)  $tbls[] = "#__flexicontent_fields";
 					if ($types_tbl_exists)   $tbls[] = "#__flexicontent_types";
-					if ( $advsearch_index_tbl_exists)
-						$tbls = "#__flexicontent_advsearch_index";
+					if ($advsearch_index_tbl_exists)
+						$tbls[] = "#__flexicontent_advsearch_index";
 					if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
 					else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
 					
