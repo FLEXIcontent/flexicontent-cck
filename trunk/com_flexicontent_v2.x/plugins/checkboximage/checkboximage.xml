@@ -37,6 +37,10 @@
 				<option value="1">FLEXI_LABEL</option>
 				<option value="2">FLEXI_IMAGE</option>
 			</field>
+			<field name="display_all" type="radio" default="0" label="FLEXI_DISPLAY_NONSELECTED_VALUES" description="FLEXI_DISPLAY_NONSELECTED_VALUES_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
 			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
@@ -63,6 +67,10 @@
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
+			<field name="" type="separator" default="FLEXI_NONSELECTED_VALUES" description="" level="level3" />
+			<field name="ns_pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT_NONSELECTED" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_NONSELECTED_DESC" />
+			<field name="ns_posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT_NONSELECTED" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_NONSELECTED_DESC" />
+
 			<field name="" type="separator" default="FLEXI_ITEM_FORM" description="" level="level1" />
 			
 			<field name="default_values" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUES" description="FLEXI_FIELD_DEFAULT_VALUES_DESC" />
@@ -89,10 +97,6 @@
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 			<field name="min_values" type="text" default="0" size="2" label="FLEXI_FIELD_MIN_VALUES" description="FLEXI_FIELD_MIN_VALUES_DESC" />
 			<field name="exact_values" type="text" default="0" size="2" label="FLEXI_FIELD_EXACT_VALUES" description="FLEXI_FIELD_EXACT_VALUES_DESC" />
-			<!--field name="js_popup_err" type="radio" default="0" label="FLEXI_FIELD_JS_POPUP_ERROR" description="FLEXI_FIELD_JS_POPUP_ERROR_DESC" >
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field-->
 			
 			<field name="" type="separator" default="FLEXI_FIELD_ALTERNATIVE_DISPLAY" description="" level="level2" />
 			<field name="display_as_select" type="radio" default="0" label="FLEXI_FIELD_CONVERT_TO_MULTIPLE_SELECT" description="FLEXI_FIELD_CONVERT_TO_MULTIPLE_SELECT_DESC">

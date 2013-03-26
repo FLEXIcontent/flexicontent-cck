@@ -226,7 +226,8 @@ class FlexicontentControllerTypes extends FlexicontentController
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=types', $msg );
 	}
-
+	
+	
 	/**
 	 * logic for cancel an action
 	 *
@@ -238,14 +239,14 @@ class FlexicontentControllerTypes extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-
-		$type = JTable::getInstance('flexicontent_types', '');
-		$type->bind(JRequest::get('post'));
-		$type->checkin();
-
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=types' );
+		
+		$post = JRequest::get('post');
+		$post = FLEXI_J16GE ? $post['jform'] : $post;
+		JRequest::setVar('cid', $post['id']);
+		$this->checkin();
 	}
-
+	
+	
 	/**
 	 * Logic to create the view for the record editing
 	 *

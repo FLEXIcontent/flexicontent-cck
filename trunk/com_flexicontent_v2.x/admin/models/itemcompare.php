@@ -170,17 +170,17 @@ class FlexicontentModelItemcompare extends JModelLegacy
 			$nullDate	= $this->_db->getNullDate();
 			
 			$item = new stdClass();
-			$item->id					= 0;
+			$item->id						= 0;
 			$item->cid[]				= 0;
 			$item->title				= null;
 			$item->alias				= null;
-			$item->title_alias			= null;
+			$item->title_alias	= null;  // deprecated do not use
 			$item->text					= null;
 			if (!FLEXI_J16GE)
 				$item->sectionid	= FLEXI_SECTION;
 			$item->catid				= null;
 			$item->score				= 0;
-			$item->votecount			= 0;
+			$item->votecount		= 0;
 			$item->hits					= 0;
 			$item->version				= 0;
 			$item->metadesc				= null;
@@ -189,14 +189,15 @@ class FlexicontentModelItemcompare extends JModelLegacy
 			$item->created_by			= null;
 			$item->created_by_alias		= '';
 			$item->modified				= $nullDate;
-			$item->modified_by			= null;
-			$item->publish_up 			= $createdate->toUnix();
-			$item->publish_down 		= JText::_( 'FLEXI_NEVER' );
+			$item->modified_by		= null;
+			$item->publish_up 		= $createdate->toUnix();
+			$item->publish_down 	= JText::_( 'FLEXI_NEVER' );
 			$item->attribs				= null;
-			$item->access				= 0;
+			$item->access					= 0;
 			$item->metadata				= null;
 			$item->state				= 1;
-			$item->mask					= null;
+			$item->mask					= null;  // deprecated do not use
+			$item->parentid			= null;  // deprecated do not use
 			$item->images				= null;
 			$item->urls					= null;
 			$this->_item				= $item;

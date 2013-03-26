@@ -307,7 +307,8 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		// redirect to categories management tab
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=categories', $msg );
 	}
-
+	
+	
 	/**
 	 * logic for cancel an action
 	 *
@@ -320,28 +321,13 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		// define the rights for correct redirecting the save task
-		$user = JFactory::getUser();
-		if (FLEXI_J16GE) {
-			$perms = FlexicontentHelperPerm::getPerm();
-			$CanCats = $perms->CanCats;
-		} else if (FLEXI_ACCESS) {
-			$CanCats	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1;
-		} else {
-			$CanCats 	= 1;
-		}
-
-		$category = JTable::getInstance('flexicontent_categories','');
-		$category->bind(JRequest::get('post'));
-		$category->checkin();
-
-		if ($CanCats) {
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=categories' );
-		} else {
-			$this->setRedirect( 'index.php?option=com_flexicontent' );
-		}
+		$post = JRequest::get('post');
+		$post = FLEXI_J16GE ? $post['jform'] : $post;
+		JRequest::setVar('cid', $post['id']);
+		$this->checkin();
 	}
-
+	
+	
 	/**
 	 * Logic to set the category access level
 	 *

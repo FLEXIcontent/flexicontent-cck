@@ -372,7 +372,8 @@ class FlexicontentControllerFields extends FlexicontentController
 		
 		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', $msg );
 	}
-
+	
+	
 	/**
 	 * logic for cancel an action
 	 *
@@ -385,43 +386,13 @@ class FlexicontentControllerFields extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$model = $this->getModel('field');
-		$user  = JFactory::getUser();
-		$cid   = JRequest::getVar( 'cid', array(0), 'default', 'array' );
-		$field_id = (int)$cid[0];
-		
-		// calculate access
-		if (FLEXI_J16GE) {
-			$asset = 'com_flexicontent.field.' . $field_id;
-			$is_authorised = $user->authorise('flexicontent.editfield', $asset);
-		} else if (FLEXI_ACCESS && $user->gid < 25) {
-			$is_authorised = FAccess::checkAllContentAccess('com_content','edit','users', $user->gmid, 'field', $field_id);
-		} else {
-			// Only admin or super admin can check-in
-			$is_authorised = $user->gid >= 24;
-		}
-		
-		// check access
-		if ( !$is_authorised ) {
-			JError::raiseWarning( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', '');
-			return;
-		}
-		
-		// Error if checkedout by another administrator
-		if ($model->isCheckedOut( $user->get('id') )) {
-			$msg = JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' );
-			$this->setRedirect( 'index.php?option=com_flexicontent&view=fields', $msg);
-			return;
-		}
-
-		$field = JTable::getInstance('flexicontent_fields', '');
-		$field->bind(JRequest::get('post'));
-		$field->checkin();
-
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=fields' );
+		$post = JRequest::get('post');
+		$post = FLEXI_J16GE ? $post['jform'] : $post;
+		JRequest::setVar('cid', $post['id']);
+		$this->checkin();
 	}
-
+	
+	
 	/**
 	 * Logic to create the view for the edit field screen
 	 *

@@ -1721,34 +1721,11 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
-
-		// Initialize some variables
-		$user  = JFactory::getUser();
-		$model = $this->getModel('item');
 		
-		// CHECK-IN the item if user can edit
-		if ( $model->get('id') )
-		{
-			$canAdd  = !FLEXI_J16GE ? $model->canAdd()  : $model->getItemAccess()->get('access-create');
-			$canEdit = !FLEXI_J16GE ? $model->canEdit() : $model->getItemAccess()->get('access-edit');
-	
-			// Check if item is editable till logoff
-			if (!$canEdit) {
-				$session = JFactory::getSession();
-				if ($session->has('rendered_uneditable', 'flexicontent')) {
-					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
-					if ($canEdit) {
-						// Set notice for existing item being editable till logoff 
-						JError::raiseNotice( 403, JText::_( 'FLEXI_CANNOT_EDIT_AFTER_LOGOFF' ) );
-					}
-				}
-			}
-			
-			if ($canEdit) $model->checkin();
-		}
-
-		$this->setRedirect( 'index.php?option=com_flexicontent&view=items' );
+		$post = JRequest::get('post');
+		$post = FLEXI_J16GE ? $post['jform'] : $post;
+		JRequest::setVar('cid', $post['id']);
+		$this->checkin();
 	}
 
 	/**

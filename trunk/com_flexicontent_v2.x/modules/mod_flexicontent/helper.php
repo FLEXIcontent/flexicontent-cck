@@ -418,15 +418,17 @@ class modFlexicontentHelper
 					{
 						if ($mod_image_custom_display)
 						{
-							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_display);
+							@list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_display);
 							$fieldname = trim($fieldname); $varname = trim($varname);
+							$varname = $varname ? $varname : 'display';
 							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname, 'module');
 							$src = '';  // Clear src no rendering needed
 						}
 						else if ($mod_image_custom_url)
 						{
-							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_url);
+							@list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_url);
 							$fieldname = trim($fieldname); $varname = trim($varname);
+							$varname = $varname ? $varname : 'display';
 							$src =  FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname, 'module');
 						}
 						else if ($mod_image)
@@ -913,7 +915,7 @@ class modFlexicontentHelper
 							$where2
 							;
 					$db->setQuery($query2);
-					$related = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+					$related = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 					$related = is_array($related) ? array_map( 'intval', $related ) : $related;
 				}
 								
@@ -932,7 +934,7 @@ class modFlexicontentHelper
 						' FROM #__flexicontent_tags_item_relations' .
 						' WHERE itemid = '.(int) $id;
 				$db->setQuery($query2);
-				$tags = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$tags = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				$tags = array_diff($tags,$excluded_tags);
 				
 				unset($related);
@@ -946,7 +948,7 @@ class modFlexicontentHelper
 							$where2
 							;
 					$db->setQuery($query2);
-					$related = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+					$related = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				}
 								
 				if (isset($related) && count($related)) {
@@ -974,7 +976,7 @@ class modFlexicontentHelper
 						$where2
 						;
 				$db->setQuery($query2);
-				$tagged = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+				$tagged = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			}
 			
 			if ( isset($tagged) && count($tagged) ) {
@@ -1400,7 +1402,16 @@ class modFlexicontentHelper
 			}
 			$all_cats = array_merge($all_cats, $cats);
 		}
-		return array_unique($all_cats);
+		
+		// Filter categories (check that are published, etc)
+		$db = JFactory::getDBO();
+		$query = 'SELECT c.id '
+			.' FROM #__categories AS c'
+			.' WHERE c.id IN ('.implode(',', $all_cats).') AND c.published = 1';
+		$db->setQuery($query);
+		$published_cats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+		
+		return array_unique($published_cats);
 	}
 	
 	
