@@ -37,7 +37,7 @@
 		<field name="bottom_tab5_label" type="text" default="TAB05" label="Label for Tab 5" description="The text for this label is filter via JText (you can add to your ini language files)" />
 		<field name="bottom_tab6_label" type="text" default="TAB06" label="Label for Tab 6" description="The text for this label is filter via JText (you can add to your ini language files)" />
 		
-		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPALTE_HTML_MODE" level="level2" menu="hide" />
+		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
 		<field name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
 			<option value="0">FLEXI_XHTML</option>
 			<option value="1">FLEXI_HTML5</option>
