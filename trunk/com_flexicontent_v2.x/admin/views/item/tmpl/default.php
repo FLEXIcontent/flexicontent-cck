@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -29,7 +29,7 @@ if ($this->CanUseTags || $this->CanVersion) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
 	$this->document->addScript('components/com_flexicontent/assets/js/jquery.pager.js');
-	
+
 	$this->document->addStyleSheet('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addStyleSheet('components/com_flexicontent/assets/css/Pager.css');
 	$this->document->addScriptDeclaration("
@@ -81,7 +81,7 @@ if ($this->CanUseTags || $this->CanVersion) {
 			jQuery.ajax({ url: \"index.php?option=com_flexicontent&task=items.getversionlist&id=".$this->row->id."&active=".$this->row->version."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1&tmpl=component&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
 				jQuery(this).html(\"<table width='100%' class='versionlist' cellpadding='0' cellspacing='0'>\\
 				<tr>\\
-					<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY' )."</th>\\
+					<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY',true )."</th>\\
 				</tr>\\
 				\"+str+\"\\
 				</table>\");
@@ -110,7 +110,7 @@ window.addEvent( "domready", function() {
 });
 function addToList(id, name) {
 	obj = $('ultagbox');
-	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='jform[tag][]' value='"+id+"' /><a href=\"javascript:;\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG' ); ?>\"></a></li>";
+	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='jform[tag][]' value='"+id+"' /><a href=\"javascript:;\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG',true ); ?>\"></a></li>";
 }
 function addtag(id, tagname) {
 	if(id==null) {
@@ -120,24 +120,24 @@ function addtag(id, tagname) {
 		alert('<?php echo JText::_( 'FLEXI_ENTER_TAG', true); ?>' );
 		return;
 	}
-	
+
 	var tag = new itemscreen();
 	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&task=tags.addtag&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1');
 }
 
 function reseter(task, id, div){
 	var form = document.adminForm;
-	
+
 	if (task == 'items.resethits') {
 		form.jform_hits.value = 0;
 	} else {
 	}
-		
+
 	var res = new itemscreen();
 	res.reseter( task, id, div, 'index.php?option=com_flexicontent' );
 }
 function clickRestore(link) {
-	if(confirm("<?php echo JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE' ); ?>")) {
+	if(confirm("<?php echo JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE',true ); ?>")) {
 		location.href=link;
 	}
 	return false;
@@ -184,7 +184,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 							<table cellspacing="0" cellpadding="0" border="0" width="100%">
 								<tr>
 									<td>
-									
+
 									<span class="flexi_label">
 										<?php
 											$field = $this->fields['title'];
@@ -196,9 +196,9 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										</label>
 										<?php /*echo $this->form->getLabel('title');*/ ?>
 									</span>
-									
+
 									<?php	if ( isset($this->row->item_translations) ) :?>
-									
+
 										<!-- tabber start -->
 										<div class="fctabber" style=''>
 											<div class="tabbertab" style="padding: 0px;" >
@@ -219,22 +219,22 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											<?php endforeach; ?>
 										</div>
 										<!-- tabber end -->
-										
+
 									<?php else : ?>
 										<?php echo $this->form->getInput('title');?>
 									<?php endif; ?>
-									
+
 									</td>
 								</tr>
 								<tr>
 									<td>
-										
+
 										<span class="flexi_label">
 											<?php echo $this->form->getLabel('alias');?>
 										</span>
 
 									<?php	if ( isset($this->row->item_translations) ) :?>
-									
+
 										<!-- tabber start -->
 										<div class="fctabber" style=''>
 											<div class="tabbertab" style="padding: 0px;" >
@@ -255,16 +255,16 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											<?php endforeach; ?>
 										</div>
 										<!-- tabber end -->
-										
+
 									<?php else : ?>
 										<?php echo $this->form->getInput('alias');?>
 									<?php endif; ?>
-									
+
 									</td>
 								</tr>
 								<tr>
 									<td>
-									
+
 									<span class="flexi_label">
 										<?php
 											$field = $this->fields['document_type'];
@@ -276,15 +276,15 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										</label>
 										<?php /*echo $this->form->getLabel('type_id');*/ ?>
 									</span>
-										
+
 									<?php echo $this->lists['type']; ?>
 									<?php //echo $this->form->getInput('type_id'); ?>
-									
+
 									</td>
 								</tr>
 								<tr>
 									<td>
-										
+
 									<span class="flexi_label">
 										<?php
 											$field = $this->fields['state'];
@@ -296,11 +296,11 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										</label>
 										<?php /*echo $this->form->getLabel('state');*/ ?>
 									</span>
-										
+
 									<?php
 									if ( $this->canPublish || $this->canPublishOwn ) :
 										echo $this->form->getInput('state') . '&nbsp;';
-										
+
 										if (!$this->cparams->get('auto_approve', 1)) :
 											echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
 										else :
@@ -319,7 +319,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											endif;
 									endif;
 									?>
-										
+
 									</td>
 								</tr>
 
@@ -331,7 +331,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<?php echo $this->form->getInput('featured');?>
 									</td>
 								</tr>
-															
+
 								<?php if ($this->subscribers) : ?>
 								<tr>
 									<td>
@@ -340,17 +340,17 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											<?php echo JText::_( 'FLEXI_NOTIFY_FAVOURING_USERS' ).':'; ?>
 										</label>
 									</span>
-										
+
 										<input type="checkbox" name="jform[notify]" id="jform_notify" />
 										<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
 										<?php echo $infoimage; ?>
 										</span>
 										(<?php echo $this->subscribers . ' ' . (($this->subscribers > 1) ? JText::_( 'FLEXI_SUBSCRIBERS' ) : JText::_( 'FLEXI_SUBSCRIBER' )); ?>)
-										
+
 									</td>
 								</tr>
 								<?php endif; ?>
-								
+
 								<?php if ($this->cparams->get('enable_notifications', 1) && JPluginHelper::isEnabled('content', 'notifyarticlesubmit')) : ?>
 								<tr>
 									<td>
@@ -365,7 +365,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									</td>
 								</tr>
 								<?php endif; ?>
-								
+
 							</table>
 						</td>
 						<td valign="top" align="left" style="text-align:left;">
@@ -386,28 +386,28 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									?>
 								</ul>
 							</div>
-							
+
 							<?php if ($this->CanUseTags) : ?>
 							<div id="tags">
-							
+
 							<span class="flexi_label">
 								<label for="input-tags">
 									<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 								</label>
 							</span>
 								<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' /><span id='input_new_tag'></span>
-							
+
 							</div>
 							<?php endif; ?>
-								
+
 							<div style='clear:both; margin-bottom:12px;'></div>
-							
+
 							<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 							<div style='clear:both;'>
 								<span class="flexi_label">
 									<?php echo $this->form->getLabel('language').':'; ?>
 								</span>
-								
+
 								<?php echo $this->lists['languages']; ?>
 							</div>
 							<?php endif; ?>
@@ -436,7 +436,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									<?php endif; ?>
 								</div>
 							<?php endif; ?>
-							
+
 							<?php if ($this->cparams->get('enable_translation_groups')) : ?>
 								<div style='clear:both;'>
 									<label id="jform_lang_parent_id-lbl" for="jform_lang_parent_id" class="flexi_label" >
@@ -444,7 +444,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									</label>
 									<?php
 									if ( !empty($this->lang_assocs) ) {
-										
+
 										$row_modified = 0;
 										foreach($this->lang_assocs as $assoc_item) {
 											if ($assoc_item->id == $this->row->lang_parent_id) {
@@ -452,10 +452,10 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 												if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
 											}
 										}
-										
+
 										foreach($this->lang_assocs as $assoc_item) {
 											if ($assoc_item->id==$this->row->id) continue;
-											
+
 											$_link  = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&cid[]='. $assoc_item->id;
 											$_title = htmlspecialchars(JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
 											echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
@@ -465,7 +465,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 											} else if( !empty($assoc_item->lang) ) {
 												echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
 											}
-											
+
 											$assoc_modified = strtotime($assoc_item->modified);
 											if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
 											if ( $assoc_modified < $row_modified ) echo "(!)";
@@ -475,7 +475,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 									?>
 								</div>
 							<?php endif; ?>
-							
+
 						</td>
 					</tr>
 				</table>
@@ -522,18 +522,18 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				?>
 
 				<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
-				
+
 				<fieldset>
 					<legend>
 						<?php echo $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->typesselected->name : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 					</legend>
-					
+
 					<!--table class="admintable" width="100%"-->
 						<?php
 						$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
-						
+
 						foreach ($this->fields as $field) {
-							
+
 							// SKIP backend hidden fields from this listing
 							if (
 								($field->iscore && $field->field_type!='maintext')  ||
@@ -541,10 +541,10 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								(in_array($field->field_type, $hidden) && empty($field->html)) ||
 								in_array($field->formhidden, array(2,3))
 							) continue;
-							
+
 							// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
 							if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
-							
+
 							// -- Tooltip for the current field label
 							$edithelp = $field->edithelp ? $field->edithelp : 1;
 							$label_tooltip = ( $field->description && ($edithelp==1 || $edithelp==2) ) ?
@@ -552,28 +552,28 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								' class="flexi_label" ';
 							$label_style = ""; //( $field->field_type == 'maintext' || $field->field_type == 'textarea' ) ? " style='clear:both; float:none;' " : "";
 							$not_in_tabs = "";
-							
+
 							if ($field->field_type=='groupmarker') :
 								echo $field->html;
 								continue;
 							endif;
-							
+
 							$width = $field->parameters->get('container_width', '' );
 							if ($width)  $width = 'width:' .$width. ($width != (int)$width ? 'px' : '');
 						?>
 							<!--tr-->
 								<!--td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'-->
 									<div class='clear' style='display:block; float:left; clear:both!important'></div>
-									
+
 									<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
 										<?php echo $field->label; ?>
 									</label>
-										
+
 									<div style="float:left!important; padding:0px!important; margin:0px!important; <?php echo $width; ?>;">
 										<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>
-										
+
 								<?php	if ($field->field_type=='maintext' && isset($this->row->item_translations) ) : ?>
-										
+
 									<!-- tabber start -->
 									<div class="fctabber" style=''>
 										<div class="tabbertab" style="padding: 0px;" >
@@ -598,15 +598,15 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 										<?php endforeach; ?>
 									</div>
 									<!-- tabber end -->
-									
+
 								<?php else : ?>
-								
+
 									<?php	if ( !is_array($field->html) ) : ?>
-										
+
 										<?php echo isset($field->html) ? $field->html : $noplugin; ?>
-										
+
 									<?php else : ?>
-										
+
 										<!-- tabber start -->
 										<div class="fctabber">
 										<?php foreach ($field->html as $i => $fldhtml): ?>
@@ -615,7 +615,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 												$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
 												if (!isset($field->tab_labels[$i]))	continue;
 											?>
-												
+
 											<div class="tabbertab">
 												<h3> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
 												<?php
@@ -624,21 +624,21 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 													echo $field->html[$i];  // Current TAB CONTENTS
 												?>
 											</div>
-												
+
 										<?php endforeach; ?>
 										</div>
 										<!-- tabber end -->
 										<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
-											
+
 									<?php endif; ?>
-										
+
 								<?php endif; ?>
-									
+
 									</div>
-										
+
 								<!--/td-->
 							<!--/tr-->
-								
+
 						<?php
 						}
 						?>
@@ -658,7 +658,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				?>
 			</td>
 			<td valign="top" width="380px" style="padding: 7px 0 0 5px">
-			
+
 		<?php
 		// used to hide "Reset Hits" when hits = 0
 		if ( !$this->row->hits ) {
@@ -666,7 +666,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 		} else {
 			$visibility = '';
 		}
-		
+
 		if ( !$this->row->score ) {
 			$visibility2 = 'style="display: none; visibility: hidden;"';
 		} else {
@@ -796,7 +796,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			</td>
 		</tr>
 		</table>
-		
+
 		<?php if ($this->cparams->get('use_versioning', 1)) : ?>
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 			<tr>
@@ -846,9 +846,9 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 		<div class="clear"></div>
 		<?php endif; ?>
 		<?php endif; ?>
-		
+
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
-			<tr>	
+			<tr>
 				<th colspan="2" style="border-bottom: 1px dotted silver; padding-bottom: 5px;">
 					<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
 					<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
@@ -922,7 +922,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<?php
 
 			echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION'), "metadata-page");
-			
+
 			//echo $this->form->getLabel('metadesc');
 			//echo $this->form->getInput('metadesc');
 			//echo $this->form->getLabel('metakey');
@@ -932,9 +932,9 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<ul class="adminformlist">
 				<li>
 					<?php echo $this->form->getLabel('metadesc'); ?>
-			
+
 			<?php	if ( isset($this->row->item_translations) ) : ?>
-				
+
 				<!-- tabber start -->
 				<div class="fctabber" style='display:inline-block;'>
 					<div class="tabbertab" style="padding: 0px;" >
@@ -955,16 +955,16 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					<?php endforeach; ?>
 				</div>
 				<!-- tabber end -->
-			
+
 			<?php else : ?>
 				<?php echo $this->form->getInput('metadesc'); ?>
 			<?php endif; ?>
-			
+
 				</li>
 				<li>
 					<?php echo $this->form->getLabel('metakey'); ?>
 			<?php	if ( isset($this->row->item_translations) ) :?>
-			
+
 				<!-- tabber start -->
 				<div class="fctabber" style='display:inline-block;'>
 					<div class="tabbertab" style="padding: 0px;" >
@@ -985,13 +985,13 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					<?php endforeach; ?>
 				</div>
 				<!-- tabber end -->
-			
+
 			<?php else : ?>
 				<?php echo $this->form->getInput('metakey'); ?>
 			<?php endif; ?>
 
 				</li>
-				
+
 			<?php foreach($this->form->getGroup('metadata') as $field): ?>
 				<?php if ($field->hidden): ?>
 					<?php echo $field->input; ?>
@@ -1018,30 +1018,30 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					?>
 				</fieldset>
 		<?php endforeach; ?>
-		
+
 		<?php	echo JHtml::_('sliders.end'); ?>
-		
-		<?php	
+
+		<?php
 			$type_default_layout = $this->tparams->get('ilayout');
 			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
-			
+
 			foreach ($this->form->getFieldset('themes') as $field) :
 				if ($field->hidden) echo $field->input;
 				else echo $field->label . $field->input;
 				?><div class="clear"></div><?php
 			endforeach;
 		?>
-		
+
 		<blockquote id='__content_type_default_layout__'>
 			<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
 			<?php echo "<br><br>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
 		</blockquote>
-		
+
 		<?php echo JHtml::_('sliders.start','template-sliders-'.$this->row->id, array('useCookie'=>1)); ?>
 		<?php
 			foreach ($this->tmpls as $tmpl) {
 				$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-				
+
 				echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
 				?>
 				<fieldset class="panelform">

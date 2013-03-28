@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -90,7 +90,7 @@ function fetchcounter()
 			update: $('count'),
 			onSuccess:function(responseTree, responseElements, responseHTML, responseJavaScript) {
 				if(responseHTML==0)
-					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM' ); ?>"))
+					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>"))
 						location.href = 'index.php?option=com_flexicontent&view=items';
 			}
 		}).send();
@@ -100,7 +100,7 @@ function fetchcounter()
 			update: $('count'),
 			onComplete:function(v) {
 				if(v==0)
-					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM' ); ?>"))
+					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>"))
 						location.href = 'index.php?option=com_flexicontent&view=items';
 			}
 		});
@@ -114,13 +114,13 @@ function submitform(pressbutton)
 	form = document.adminForm;
 	// If formvalidator activated
 	/*if( pressbutton == 'remove' ) {
-		var answer = confirm('<?php echo addslashes(JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM__' )); ?>')
+		var answer = confirm('<?php echo addslashes(JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM__',true )); ?>')
 		if (!answer){
 			new Event(e).stop();
 			return;
 		}
 	}*/
-	
+
 	// Store the button task into the form
 	if (pressbutton) {
 		form.task.value=pressbutton;
@@ -152,11 +152,11 @@ function delAllFilters() {
 }
 
 <?php if ($this->ordering) : ?>
-var move_within_ordering_groups_limits = <?php echo '"'.JText::_('FLEXI_MOVE_WITHIN_ORDERING_GROUPS_LIMITS').'"'; ?>
+var move_within_ordering_groups_limits = <?php echo '"'.JText::_('FLEXI_MOVE_WITHIN_ORDERING_GROUPS_LIMITS',true).'"'; ?>
 <?php endif; ?>
 
 window.addEvent('domready', function(){
-	
+
 	var startdate	= $('startdate');
 	var enddate 	= $('enddate');
 	if(MooTools.version>="1.2.4") {
@@ -167,30 +167,30 @@ window.addEvent('domready', function(){
 		var edate = enddate.getValue();
 	}
 	if (sdate == '') {
-		startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM' ); ?>');
+		startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM',true ); ?>');
 	}
 	if (edate == '') {
-		enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO' ); ?>');
+		enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO',true ); ?>');
 	}
 	$('startdate').addEvent('focus', function() {
-		if (sdate == '<?php echo JText::_( 'FLEXI_FROM' ); ?>') {
+		if (sdate == '<?php echo JText::_( 'FLEXI_FROM',true ); ?>') {
 			startdate.setProperty('value', '');
-		}		
+		}
 	});
 	$('enddate').addEvent('focus', function() {
-		if (edate == '<?php echo JText::_( 'FLEXI_TO' ); ?>') {
+		if (edate == '<?php echo JText::_( 'FLEXI_TO',true ); ?>') {
 			enddate.setProperty('value', '');
 		}
 	});
 	$('startdate').addEvent('blur', function() {
 		if (sdate == '') {
-			startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM' ); ?>');
-		}		
+			startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM',true ); ?>');
+		}
 	});
 	$('enddate').addEvent('blur', function() {
 		if (edate == '') {
-			enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO' ); ?>');
-		}		
+			enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO',true ); ?>');
+		}
 	});
 
 <?php /*
@@ -237,7 +237,7 @@ window.addEvent('domready', function() {
 			});
 		}
 	});
-}); 
+});
 </script>
 <?php endif; ?>
 <div class="flexicontent">
@@ -295,7 +295,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			
+
     <?php foreach($this->extra_fields as $field) :?>
 			<th class="center"><?php echo $field->label; ?></td>
 		<?php endforeach; ?>
@@ -337,13 +337,13 @@ window.addEvent('domready', function() {
 			<th width="<?php echo $this->CanOrder ? '' : ''; ?>" class="center">
 				<?php
 				echo $this->CanOrder ? $image_ordering_tip : '';
-				
+
 				if (!$this->filter_order_type) :
 					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'i.ordering', $this->lists['order_Dir'], $this->lists['order'] );
 				else :
 					echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'catsordering', $this->lists['order_Dir'], $this->lists['order'] );
 				endif;
-				
+
 				if ($this->CanOrder && $this->ordering) :
 					echo JHTML::_('grid.order', $this->rows, 'filesave.png', $ctrl.'saveorder' );
 				endif;
@@ -480,7 +480,7 @@ window.addEvent('domready', function() {
 				<span style="float:right;">
 					<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-					
+
 					<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
 					<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
 				</span>
@@ -504,7 +504,7 @@ window.addEvent('domready', function() {
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE') ? "d/m/y H:i" : $date_format;
 		else
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS') ? "%d/%m/%y %H:%M" : $date_format;
-		
+
 		$unpublishableFound = false;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
@@ -512,7 +512,7 @@ window.addEvent('domready', function() {
 
 			if (FLEXI_J16GE) {
 				$rights = FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-				
+
 				$canEdit 			 = in_array('edit', $rights);
 				$canEditOwn		 = in_array('edit.own', $rights) && $row->created_by == $user->id;
 				$canPublish 	 = in_array('edit.state', $rights);
@@ -521,7 +521,7 @@ window.addEvent('domready', function() {
 				$canEdit = $canEditOwn = $canPublish = $canPublishOwn = 1;
 			} else if (FLEXI_ACCESS) {
 				$rights 			= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-				
+
 				$canEdit 			= /*$canEditAll ||*/ in_array('edit', $rights);
 				$canEditOwn			= (in_array('editown', $rights) /*|| $canEditOwnAll)*/) && $row->created_by == $user->id;
 				$canPublish 		= /*$canPublishAll ||*/ in_array('publish', $rights);
@@ -535,7 +535,7 @@ window.addEvent('domready', function() {
 			}
 			$canPublishCurrent = $canPublish || $canPublishOwn;
 			$unpublishableFound = $unpublishableFound || !$canPublishCurrent;
-			
+
 
 			$publish_up =& JFactory::getDate($row->publish_up);
 			$publish_down =& JFactory::getDate($row->publish_down);
@@ -566,11 +566,11 @@ window.addEvent('domready', function() {
 			}
 
 			$cid_checkbox = JHTML::_('grid.checkedout', $row, $i );
-			
+
 			// Check publication START/FINISH dates (publication Scheduled / Expired)
 			$is_published = in_array( $row->state, array(1, -5, (FLEXI_J16GE ? 2:-1) ) );
 			$extra_img = $extra_alt = '';
-			
+
 			if ( $row->publication_scheduled && $is_published ) {
 				$extra_img = 'pushished_scheduled.png';
 				$extra_alt = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION' );
@@ -579,7 +579,7 @@ window.addEvent('domready', function() {
 				$extra_img = 'pushished_expired.png';
 				$extra_alt = JText::_( 'FLEXI_PUBLICATION_EXPIRED' );
 			}
-			
+
 			// Set a row language, even if empty to avoid errors
 			$lang_default = !FLEXI_J16GE ? '' : '*';
 			$row->lang = @$row->lang ? $row->lang : $lang_default;
@@ -595,7 +595,7 @@ window.addEvent('domready', function() {
 			</td>
 			<td align="left" class="col_title">
 				<?php
-				
+
 				// Display an icon with checkin link, if current user has checked out current item
 				if ($row->checked_out) {
 					if (FLEXI_J16GE) {
@@ -616,11 +616,11 @@ window.addEvent('domready', function() {
 						}
 					}
 				}
-				
+
 				// Display title with no edit link ... if row checked out by different user -OR- is uneditable
 				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit && !$canEditOwn ) ) {
 					echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8');
-				
+
 				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
@@ -636,44 +636,44 @@ window.addEvent('domready', function() {
 				<?php
 				}
 				?>
-				
+
 			</td>
 
     <?php foreach($this->extra_fields as $field) :?>
-    
+
 			<td align="center">
 		    <?php
 		    // Clear display HTML just in case
 		    if (isset($field->{$field->methodname}))
 		    	unset( $field->{$field->methodname} );
-		    
+
 		    // Field value for current item
 		    $field_value = & $row->extra_field_value[$field->name];
-		    
+
 		    if ( !empty($field_value) )
 		    {
 					// Create field's display HTML, via calling FlexicontentFields::renderField() for the given method name
 					FlexicontentFields::renderField($row, $field, $field_value, $method=$field->methodname);
-					
+
 					// Output the field's display HTML
 					echo @$field->{$field->methodname};
 				}
 		    ?>
 			</td>
 		<?php endforeach; ?>
-			
+
 		<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
-				
+
 				<?php if ( !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
 					<img src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
 				<?php elseif( !empty($row->lang) ) : ?>
 					<?php echo $row->lang=='*' ? JText::_("All") : $row->lang;?>
 				<?php endif; ?>
-				
+
 			</td>
 		<?php endif; ?>
-		
+
 			<td align="center" class="col_type">
 				<?php echo $row->type_name; ?>
 			</td>
@@ -681,7 +681,7 @@ window.addEvent('domready', function() {
 			<?php echo flexicontent_html::statebutton( $row, $row->params, $addToggler = ($limit <= $this->inline_ss_max) ); ?>
 			<?php if ($extra_img) : ?><img style='float:right;' src="components/com_flexicontent/assets/images/<?php echo $extra_img;?>" width="16" height="16" border="0" class="hasTip" alt="<?php echo $extra_alt; ?>" title="<?php echo $extra_alt; ?>" /><?php endif; ?>
 			</td>
-			
+
 			<td align="center">
 				<?php echo ($row->config->get("ilayout","") ? $row->config->get("ilayout") : $row->tconfig->get("ilayout")."<sup>[1]</sup>") ?>
 			</td>
@@ -702,11 +702,11 @@ window.addEvent('domready', function() {
 							if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
 						}
 					}
-					
+
 					echo "<br/>";
 					foreach($this->lang_assocs[$row->lang_parent_id] as $assoc_item) {
 						if ($assoc_item->id==$row->id) continue;
-						
+
 						$_link  = 'index.php?option=com_flexicontent&'.$items_task.'edit&cid[]='. $assoc_item->id;
 						$_title = JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ).':: ['. $assoc_item->lang .'] '. $assoc_item->title;
 						echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
@@ -716,7 +716,7 @@ window.addEvent('domready', function() {
 						} else if( !empty($assoc_item->lang) ) {
 							echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
 						}
-						
+
 						$assoc_modified = strtotime($assoc_item->modified);
 						if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
 						if ( $assoc_modified < $row_modified ) echo "(!)";
@@ -727,14 +727,14 @@ window.addEvent('domready', function() {
 				?>
 			</td>
 			<?php endif ; ?>
-			
+
 			<?php if ($this->CanOrder) : ?>
 			<td class="order ">
 				<?php
 					$row_stategrp_prev = @ $stategrps[@$this->rows[$i-1]->state];
 					$row_stategrp = @ $stategrps[$this->rows[$i]->state];
 					$row_stategrp_next = @ $stategrps[@$this->rows[$i+1]->state];
-					
+
 					$show_orderUp   = @$this->rows[$i-1]->$ord_catid == $this->rows[$i]->$ord_catid && $row_stategrp_prev == $row_stategrp;
 					$show_orderDown = $this->rows[$i]->$ord_catid == @$this->rows[$i+1]->$ord_catid && $row_stategrp == $row_stategrp_next;
 					if (
@@ -757,15 +757,15 @@ window.addEvent('domready', function() {
 					<span><?php echo $this->pageNav->orderUpIcon( $i, $show_orderUp, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
 					<span><?php echo $this->pageNav->orderDownIcon( $i, $n, $show_orderDown, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
 				<?php endif; ?>
-				
+
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
 				<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
-				
+
 				<input type="hidden" name="item_cb[]" style="display:none;" value="<?php echo $row->id; ?>" />
 				<input type="hidden" name="ord_catid[]" style="display:none;" value="<?php echo $row->$ord_catid; ?>" />
 				<input type="hidden" name="prev_order[]" style="display:none;" value="<?php echo $row->$ord_col; ?>" />
 				<input type="hidden" name="ord_grp[]" style="display:none;" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
-				
+
 			</td>
 			<?php else : ?>
 			<td align="center">
@@ -782,13 +782,13 @@ window.addEvent('domready', function() {
 				<?php echo $access; ?>
 			</td>
 			<td class="col_cats">
-				<?php 
+				<?php
 				$nr = count($row->categories);
 				$ix = 0;
 				foreach ($row->categories as $key => $_item_cat) :
 					if ( !isset($this->itemCats[$_item_cat]) ) continue;
 					$category = & $this->itemCats[$_item_cat];
-					
+
 					$typeofcats = ((int)$category->id == (int)$row->catid) ? ' maincat' : ' secondarycat';
 					$catlink	= 'index.php?option=com_flexicontent&'.$cats_task.'edit&cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
@@ -796,7 +796,7 @@ window.addEvent('domready', function() {
 				?>
 					<span class="editlinktip hasTip<?php echo $typeofcats; ?>" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $title; ?>">
 					<a href="<?php echo $catlink; ?>">
-						<?php 
+						<?php
 						if (JString::strlen($title) > 20) {
 							echo JString::substr( $title , 0 , 20).'...';
 						} else {
@@ -854,7 +854,7 @@ window.addEvent('domready', function() {
 	</tbody>
 
 	</table>
-	
+
 	<table cellspacing="0" cellpadding="4" border="0" align="center">
 		<tr>
 			<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" /></td>
@@ -875,14 +875,14 @@ window.addEvent('domready', function() {
 			<td><?php echo JText::_( 'FLEXI_TRASHED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 		</tr>
 	</table>
-	
+
 	<sup>[1]</sup> <?php echo JText::_('FLEXI_TMPL_NOT_SET_USING_TYPE_DEFAULT'); ?><br />
 	<sup>[2]</sup> <?php echo JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $this->inline_ss_max); ?><br />
 	<?php if ( $enable_translation_groups )	: ?>
 		<sup>[3]</sup> <?php echo JText::_('FLEXI_SORT_TO_GROUP_TRANSLATION'); ?><br />
 	<?php endif; ?>
 	<sup>[4]</sup> <?php echo JText::_('FLEXI_MULTIPLE_ITEM_ORDERINGS'); ?></><br />
-		
+
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="items" />

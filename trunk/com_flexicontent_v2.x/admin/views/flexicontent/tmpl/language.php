@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009-2012 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -27,20 +27,20 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	window.addEvent('domready', function(){
 		$('lang').addEvent('change', function(e) {
 			if(MooTools.version>="1.2.4") {
-			
-				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING' ); ?></span></p>');
+
+				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING',true ); ?></span></p>');
 				e = e.stop();
-				
+
 				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&code=" + lang.value;
 				new Request.HTML({
 					url: url,
 					method: 'get',
 					update: $('log'),
 				}).send();
-				
+
 			} else {
-			
-				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING' ); ?></span></p>');
+
+				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CHECKING',true ); ?></span></p>');
 				e = new Event(e).stop();
 
 				var url = "index.php?option=com_flexicontent&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&code=" + lang.value;
@@ -49,26 +49,26 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('log')
 				});
 				ajax.request.delay(1000, ajax);
-				
+
  			}
 		});
 
 		$('missing').addEvent('click', function(e) {
 
 			if(MooTools.version>="1.2.4") {
-				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING' ); ?></span></p>');
+				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING',true ); ?></span></p>');
 				e = e.stop();
-				
+
 				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=create&code=" + lang.value;
 				new Request.HTML({
 					url: url,
 					method: 'get',
 					update: $('log'),
 				}).send();
-				
+
 			} else {
-			
-				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING' ); ?></span></p>');
+
+				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_MISSING',true ); ?></span></p>');
 				e = new Event(e).stop();
 
 				var url = "index.php?option=com_flexicontent&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=create&code=" + lang.value;
@@ -77,7 +77,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('log')
 				});
 				ajax.request.delay(1000, ajax);
-				
+
 			}
 		});
 
@@ -89,28 +89,28 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			var email 	= encodeURIComponent($('myemail').value);
 			var web 	= encodeURIComponent($('website').value);
 			var message = encodeURIComponent($('message').value);
-			
+
 			// Préparation des paramètres d'URL
 			var params 	 = '&code='+ code;
 			params 		+= '&name='+ name;
 			params 		+= '&email='+ email;
 			params 		+= '&web=' + web;
 			params 		+= '&message=' + message;
-			
+
 			if(MooTools.version>="1.2.4") {
-				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE' ); ?></span></p>');
+				$('log').set('html', '<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE',true ); ?></span></p>');
 				e = e.stop();
-				
+
 				var url = "index.php?option=com_flexicontent&tmpl=component&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=zip" + params;
 				new Request.HTML({
 					url: url,
 					method: 'get',
 					update: $('log'),
 				}).send();
-				
+
 			} else {
-			
-				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE' ); ?></span></p>');
+
+				$('log').setHTML('<p class="spinner"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"><span><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE',true ); ?></span></p>');
 				e = new Event(e).stop();
 
 				var url = "index.php?option=com_flexicontent&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&task=langfiles&method=zip" + params;
@@ -119,10 +119,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 					update: $('log')
 				});
 				ajax.request.delay(1000, ajax);
-				
+
 			}
 		});
-	}); 
+	});
 </script>
 
 <form action="" method="get" name="adminForm" id="adminForm" class="lang_submit">

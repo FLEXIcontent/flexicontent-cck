@@ -20,23 +20,23 @@ jimport('joomla.event.plugin');
 class plgFlexicontent_fieldsMinigallery extends JPlugin
 {
 	static $field_types = array('minigallery');
-	
+
 	// ***********
 	// CONSTRUCTOR
 	// ***********
-	
+
 	function plgFlexicontent_fieldsMinigallery( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_minigallery', JPATH_ADMINISTRATOR);
 	}
-	
-	
-	
+
+
+
 	// *******************************************
 	// DISPLAY methods, item form & frontend views
 	// *******************************************
-	
+
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
@@ -47,7 +47,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		// some parameter shortcuts
 		$document		= & JFactory::getDocument();
 		$size				= $field->parameters->get( 'size', 30 ) ;
-		
+
 		$flexiparams=& JComponentHelper::getParams('com_flexicontent');
 		$mediapath	= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
 		$app				= & JFactory::getApplication();
@@ -55,9 +55,9 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$clientpref	= $app->isAdmin() ? '' : 'administrator/';
 		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
-		
+
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
-		
+
 		$js = "
 		function randomString() {
 			var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
@@ -69,70 +69,70 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			}
 			return randomstring;
 		}
-		
+
 		var value_counter=".count($field->value).";
 
 		function qfSelectFile".$field->id."(id, file) {
 		  value_counter++;
-		  
+
 		  var valcounter = $('".$field->name."');
 			valcounter.value = value_counter;
-		  
+
 			var name 	= 'a_name'+id;
-			var ixid 	= randomString();			
+			var ixid 	= randomString();
 			var li 		= document.createElement('li');
 			var thumb	= document.createElement('img');
 			var hid		= document.createElement('input');
 			var span	= document.createElement('span');
 			var img		= document.createElement('img');
-			
+
 			var filelist = document.getElementById('sortables_".$field->id."');
 			if(file.substring(0,7)!='http://')
 				file = '".str_replace('\\','/', JPATH_ROOT)."/".$mediapath."/'+file;
 			$(li).addClass('minigallery');
 			$(thumb).addClass('thumbs');
 			$(span).addClass('fcfield-drag');
-			
+
 			var button = document.createElement('input');
 			button.type = 'button';
 			button.name = 'removebutton_'+id;
 			button.id = 'removebutton_'+id;
 			$(button).addClass('fcfield-button');
 			$(button).addEvent('click', function() { deleteField".$field->id."(this) });
-			button.value = '".JText::_( 'FLEXI_REMOVE_FILE' )."';
-			
+			button.value = '".JText::_( 'FLEXI_REMOVE_FILE',true )."';
+
 			thumb.src = '".JURI::root()."components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
-			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
-			
+			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
+
 			hid.type = 'hidden';
 			hid.name = '".$fieldname."';
 			hid.value = id;
 			hid.id = ixid;
-			
+
 			img.src = '".JURI::root()."administrator/components/com_flexicontent/assets/images/move3.png';
-			img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG' )."';
-			
+			img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
+
 			filelist.appendChild(li);
 			li.appendChild(thumb);
 			li.appendChild(button);
 			li.appendChild(hid);
 			li.appendChild(span);
 			span.appendChild(img);
-			
+
 			new Sortables($('sortables_".$field->id."'), {
 				'constrain': true,
 				'clone': true,
 				'handle': '.fcfield-drag'
 			});
 		}
-		
+
 		function deleteField".$field->id."(el) {
 		  value_counter--;
-		  
+
 		  var valcounter = $('".$field->name."');
 			if ( value_counter > 0 ) valcounter.value = value_counter;
 			else valcounter.value = '';
-			
+
 			var field	= $(el);
 			var row		= field.getParent();
 			if (MooTools.version>='1.2.4') {
@@ -140,10 +140,10 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			} else {
 				var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
 			}
-			
+
 			fx.start({
 				'height': 0,
-				'opacity': 0			
+				'opacity': 0
 			}).chain(function(){
 				(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
 			});
@@ -158,7 +158,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					'constrain': true,
 					'clone': true,
 					'handle': '.fcfield-drag'
-					});			
+					});
 				});
 			";
 			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
@@ -184,9 +184,9 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$document->addStyleDeclaration($css);
 
 			$move 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
-				
+
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
-		
+
 		$i = 0;
 		$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
 		if($field->value) {
@@ -206,7 +206,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$i++;
 			}
 		}
-		
+
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
 		$linkfsel = JURI::base().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;autoselect='.$autoselect.'&amp;field='.$field->id.'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
@@ -219,8 +219,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		";
 		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($i ? $i : '').'">';
 	}
-	
-	
+
+
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
@@ -229,9 +229,9 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 
 		$values = $values ? $values : $field->value ;
-		
+
 		$mainframe = & JFactory::getApplication();
-		
+
 		$document		= & JFactory::getDocument();
 		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
 		$mediapath		= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
@@ -244,7 +244,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$h_l				= $field->parameters->get( 'h_l', 300 ) ;
 		$w_s				= $field->parameters->get( 'w_s', 100 ) ;
 		$h_s				= $field->parameters->get( 'h_s', 66 ) ;
-		
+
 		switch ($thumbposition) {
 			case 1: // top
 			$marginpos = 'top';
@@ -266,7 +266,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		static $item_field_arr = null;
 		static $js_and_css_added = false;
-		
+
 		if ($values)
 		{
 			if (!$js_and_css_added) {
@@ -296,20 +296,20 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$slidethumb = "slideshowThumbnail_".$field->name."_".$item->id;
 			$thumbbox_id = "slideshowThumbbox_".$field->name."_".$item->id;
 			$mingalobj = "mingalshow_".$field->name."_".$item->id;
-			
+
 			if ( !isset($item_field_arr[$item->id][$field->id]) )
 			{
 				$item_field_arr[$item->id][$field->id] = 1;
-				
+
 			  $js = "
 			  	var ".$mingalobj.";
 			  	window.addEvent('domready',function(){
 						var obj = {
-							wait: ".$field->parameters->get( 'wait', 4000 ).", 
+							wait: ".$field->parameters->get( 'wait', 4000 ).",
 							effect: '".$field->parameters->get( 'effect', 'fade' )."',
 							direction: '".$field->parameters->get( 'direction', 'right' )."',
-							duration: ".$field->parameters->get( 'duration', 1000 ).", 
-							loop: ".$field->parameters->get( 'loop', 'true' ).", 
+							duration: ".$field->parameters->get( 'duration', 1000 ).",
+							loop: ".$field->parameters->get( 'loop', 'true' ).",
 							thumbnails: true,
 							backgroundSlider: true
 						}
@@ -319,7 +319,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					});
 				";
 				$document->addScriptDeclaration($js);
-				
+
 				$css = "
 				#$htmltag_id {
 					width: ".$w_l."px;
@@ -332,18 +332,18 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					".( ($thumbposition != 3) ? "margin-top:".(4) : "" )."px;
 				}
 				";
-				
+
 				if ($thumbposition == 1 || $thumbposition == 3) {
 					$css .= "#thumbnails { width: ".$w_l."px; }";
 				}
 				if ($thumbposition == 2 || $thumbposition == 4) {
 					$css .= ".$htmltag_id { float: left; } #thumbnails { float: left; width: ".($w_s + 10)."px; }";
 				}
-	
+
 				$document->addStyleDeclaration($css);
-				
+
 			}
-			
+
 			$display = array();
 
 			if ($controller) {
@@ -355,7 +355,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$controls_html .= '<a href="javascript:;" onclick="'.$mingalobj.'.next();" class="mingalbutton">'.sprintf($icontag,'skip_forward.png').'</a>';
 				$controls_html .= '</div>';
 			}
-			
+
 			$field->{$prop} = '';
 			if ($thumbposition > 2) {
 				$field->{$prop} .= '<div id="'.$htmltag_id.'" class="'.$htmltag_id.'"></div>';
@@ -373,12 +373,12 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					}
 					$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
 					$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
-					
+
 					$display[]	= '<a href="'.$srcb.'" class="'.$slidethumb.' slideshowThumbnail"><img src="'.$srcs.'" border="0" /></a>';
 					$n++;
 				}
 			}
-			
+
 			$field->{$prop} .= implode(' ', $display);
 			$field->{$prop} .= '</div>';
 			if ($thumbposition < 3) {
@@ -387,13 +387,13 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$field->{$prop} .= ($controller && $thumbposition != 3) ? $controls_html : '';
 		}
 	}
-	
-	
-	
+
+
+
 	// **************************************************************
 	// METHODS HANDLING before & after saving / deleting field events
 	// **************************************************************
-	
+
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField($field, &$post, $file)
 	{
@@ -402,26 +402,26 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		if(!is_array($post) && !strlen($post)) return;
 
 		$mainframe =& JFactory::getApplication();
-		
+
 		$post = array_unique($post);
 	}
-	
-	
+
+
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
-	
-	
+
+
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
-	
-	
-	
+
+
+
 	// **********************
 	// VARIOUS HELPER METHODS
 	// **********************
-	
+
 	function getFileName( $value )
 	{
 		$db =& JFactory::getDBO();
@@ -435,7 +435,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		return $filename;
 	}
-	
+
 
 	function addIcon( &$file )
 	{

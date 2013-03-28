@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -29,7 +29,7 @@ function submitbutton(pressbutton) {
 
 	// do field validation
 	if (form.altname.value == ""){
-		alert( "<?php echo JText::_( 'FLEXI_ADD_NAME_TAG' ); ?>" );
+		alert( "<?php echo JText::_( 'FLEXI_ADD_NAME_TAG',true ); ?>" );
 	} else {
 		submitform( pressbutton );
 	}
