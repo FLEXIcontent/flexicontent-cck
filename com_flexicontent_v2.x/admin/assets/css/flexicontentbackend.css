@@ -100,17 +100,17 @@ div .button2-left {	margin:-2px 4px 2px 0px; }
 .centerimg {
 	display: block;
 	text-align: center;
-    margin-top: 20px;
-    margin-bottom: 0px;
-    padding: 0px;
-    height: 30px;
+	margin-top: 20px;
+	margin-bottom: 0px;
+	padding: 0px;
+	height: 30px;
 }
 .spinner {
 	display: block;
-    margin-top: 20px;
-    margin-bottom: 0px;
-    padding: 0px;
-    height: 30px;
+	margin-top: 20px;
+	margin-bottom: 0px;
+	padding: 0px;
+	height: 30px;
 }
 .lang-success {
 	color: green;
@@ -381,6 +381,9 @@ div.credits {
 	margin-top: 15px;
 	text-align: center;
 }
+div.credits img {
+	margin: 15px 0;
+}
 /* Filemanager */
 .filemanager img {
 	vertical-align: middle;
@@ -602,10 +605,10 @@ div#tags #input_new_tag {
 .qf_tagbox {
 	display: block !important;
 	max-height: 170px !important;
-  	overflow: auto !important;
-  	border: 1px dashed silver !important;
-  	background: #fff !important;
-  	margin: 0px 4px 4px 0px !important;
+	overflow: auto !important;
+	border: 1px dashed silver !important;
+	background: #fff !important;
+	margin: 0px 4px 4px 0px !important;
 }
 
 .qf_tagidbox {
@@ -621,9 +624,9 @@ div#tags #input_new_tag {
 
 .qf_centerimg {
 	text-align: center !important;
-    margin-top: 0px !important;
-    margin-bottom: 0px !important;
-    padding: 0px !important;
+	margin-top: 0px !important;
+	margin-bottom: 0px !important;
+	padding: 0px !important;
 }
 
 .flexicontent .clear,
@@ -982,8 +985,8 @@ div.fieldset_value {
 }
 
 div.width-20 fieldset, div.width-30 fieldset, div.width-35 fieldset, div.width-40 fieldset, div.width-45 fieldset, div.width-50 fieldset, div.width-55 fieldset, div.width-60 fieldset, div.width-65 fieldset, div.width-70 fieldset, div.width-80 fieldset, div.width-100 fieldset {
-    background-color: #FFFFFF !important;
-    padding: 5px 8px 8px 5px !important;
+	background-color: #FFFFFF !important;
+	padding: 5px 8px 8px 5px !important;
 }
 
 div fieldset.panelform textarea {
@@ -1079,15 +1082,15 @@ div div#element-box div.m {
 }
 
 fieldset.adminform fieldset.radio, fieldset.panelform fieldset.radio, fieldset.adminform-legacy fieldset.radio {
-    border: 0 none;
-    float: left;
-    margin: 0 !important;
-    padding: 0 !important;
+	border: 0 none;
+	float: left;
+	margin: 0 !important;
+	padding: 0 !important;
 }
 
 table.admintable fieldset {
-    border: 0 none;
-    float: left;
-    margin: 0 !important;
-    padding: 0 !important;
+	border: 0 none;
+	float: left;
+	margin: 0 !important;
+	padding: 0 !important;
 }
