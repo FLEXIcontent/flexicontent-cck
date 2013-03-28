@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -61,24 +61,24 @@ class JElementQfcategory extends JElement
 				$$('#toolbar-apply a.toolbar').setProperty('onclick',
 					\" if ( $('a_id').getProperty('value') != '' ) submitbutton('apply'); else alert('".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."'); \"
 				);
-				
+
 				$$('#toolbar-save a.toolbar').setProperty('onclick',
 					\" if ( $('a_id').getProperty('value') != '' ) submitbutton('save'); else alert('".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."'); \"
 				);
 			";
 		} else $required="";
-		
+
 		$js = "
 		window.addEvent( 'domready', function()
 		{
 			$('remove').addEvent('click', function(){
-				$('a_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."');
+				$('a_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ONE_CATEGORY',true )."');
 				$('a_id').setProperty('value', '');
 			});
-			
-		".$required."	
+
+		".$required."
 		});
-		
+
 		function qfSelectCategory(cid, title) {
 			document.getElementById('a_id').value = cid;
 			document.getElementById('a_name').value = title;

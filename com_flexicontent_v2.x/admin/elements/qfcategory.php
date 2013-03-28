@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -60,11 +60,11 @@ class JFormFieldQfcategory extends JFormField
 		window.addEvent( 'domready', function()
 		{
 			$('remove').addEvent('click', function(){
-				$('a_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."');
+				$('a_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ONE_CATEGORY',true )."');
 				$('jform_request_".$node["name"]."').setProperty('value', '');
 			});
 		});
-		
+
 		function qfSelectCategory(cid, title) {
 			document.getElementById('jform_request_".$node["name"]."').value = cid;
 			document.getElementById('a_name').value = title;

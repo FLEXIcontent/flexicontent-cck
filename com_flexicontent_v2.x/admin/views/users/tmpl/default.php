@@ -10,7 +10,7 @@ function fetchcounter()
 		update: $('count'),
 		onComplete:function(v) {
 			if(v==0)
-				if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM' ); ?>"))
+				if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>"))
 					location.href = 'index.php?option=com_flexicontent&view=items';
 		}
 	});
@@ -23,7 +23,7 @@ function submitform(pressbutton)
 	form = document.adminForm;
 	// If formvalidator activated
 	if( pressbutton == 'remove' ) {
-		var answer = confirm('<?php echo JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM' ); ?>')
+		var answer = confirm('<?php echo JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM',true ); ?>')
 		if (!answer){
 			new Event(e).stop();
 			return;
@@ -32,7 +32,7 @@ function submitform(pressbutton)
 			if (pressbutton) {
 				form.task.value=pressbutton;
 			}
-	
+
 			// Execute onsubmit
 			if (typeof form.onsubmit == "function") {
 				form.onsubmit();
@@ -83,30 +83,30 @@ window.addEvent('domready', function(){
 		var edate = enddate.getValue();
 	}
 	if (sdate == '') {
-		startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM' ); ?>');
+		startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM',true ); ?>');
 	}
 	if (edate == '') {
-		enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO' ); ?>');
+		enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO',true ); ?>');
 	}
 	$('startdate').addEvent('focus', function() {
-		if (sdate == '<?php echo JText::_( 'FLEXI_FROM' ); ?>') {
+		if (sdate == '<?php echo JText::_( 'FLEXI_FROM',true ); ?>') {
 			startdate.setProperty('value', '');
-		}		
+		}
 	});
 	$('enddate').addEvent('focus', function() {
-		if (edate == '<?php echo JText::_( 'FLEXI_TO' ); ?>') {
+		if (edate == '<?php echo JText::_( 'FLEXI_TO',true ); ?>') {
 			enddate.setProperty('value', '');
-		}		
+		}
 	});
 	$('startdate').addEvent('blur', function() {
 		if (sdate == '') {
-			startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM' ); ?>');
-		}		
+			startdate.setProperty('value', '<?php echo JText::_( 'FLEXI_FROM',true ); ?>');
+		}
 	});
 	$('enddate').addEvent('blur', function() {
 		if (edate == '') {
-			enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO' ); ?>');
-		}		
+			enddate.setProperty('value', '<?php echo JText::_( 'FLEXI_TO',true ); ?>');
+		}
 	});
 
 /*
@@ -267,7 +267,7 @@ window.addEvent('domready', function(){
 				<span style="float:right;">
 					<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-					
+
 					<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
 					<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
 				</span>
@@ -297,7 +297,7 @@ window.addEvent('domready', function(){
 					}
 					$row->groupname = implode(', ', $row->groupname);
 				}
-				
+
 				$img_path  = '../components/com_flexicontent/assets/images/';
 				$tick_img  = $img_path . 'tick.png';
 				$block_img = $img_path . ($row->block ? 'publish_x.png' : 'tick.png');
@@ -312,7 +312,7 @@ window.addEvent('domready', function(){
 					$lvisit	= JHTML::_('date', $row->lastvisitDate, FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S');
 				}
 				$registered	= JHTML::_('date', $row->registerDate, FLEXI_J16GE ? 'Y-m-d H:i:s' : '%Y-%m-%d %H:%M:%S');
-				
+
 				if ($row->itemscount) {
 					$itemslink 	= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_authors='. $row->id;
 					$itemscount = '[<a onclick="delAllFilters();"  href="'.$itemslink.'">'.$row->itemscount.'</a>]';

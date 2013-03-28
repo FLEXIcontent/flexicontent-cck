@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -51,12 +51,12 @@ class JFormFieldItem extends JFormField
 		} else {
 			$attributes = & $node->_attributes;
 		}
-				
+
 		$value = FLEXI_J16GE ? $this->value : $value;
-		
+
 		$fieldname	= FLEXI_J16GE ? $this->name : ($control_name ? $control_name.'['.$name.']' : $name);
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
-		
+
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 		$item = JTable::getInstance('flexicontent_items', '');
@@ -70,18 +70,18 @@ class JFormFieldItem extends JFormField
 		window.addEvent( 'domready', function()
 		{
 			$('remove').addEvent('click', function(){
-				$('".$element_id."_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ITEM' )."');
+				$('".$element_id."_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ITEM',true )."');
 				$('".$element_id."_id').setProperty('value', '0');
 			});
 		});
-		
+
 		function qfSelectItem(id, cid, title) {
 			document.getElementById('".$element_id."_id').value = id;
-			
+
 			var cid_field =	document.getElementById('jform_request_cid');
 			if (cid_field) cid_field.value = cid;
 			/*else document.getElementById('".$element_id."_id').value += ':'+cid; */
-			
+
 			document.getElementById('".$element_id."_name').value = title;
 			$('sbox-btn-close').fireEvent('click');
 		}";

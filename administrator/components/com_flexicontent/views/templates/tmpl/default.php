@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -54,7 +54,7 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 			window.addEvent('domready', function(){
 				$('<?php echo 'del-'.$row->name ?>').addEvent('click', function(e) {
 
-					var answer = confirm('<?php echo JText::_( 'FLEXI_TEMPLATE_DELETE_CONFIRM' ); ?>')
+					var answer = confirm('<?php echo JText::_( 'FLEXI_TEMPLATE_DELETE_CONFIRM',true ); ?>')
 					if (!answer){
 						new Event(e).stop();
 						return;
@@ -62,7 +62,7 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 
 					e = new Event(e).stop();
 					var url = "index.php?option=com_flexicontent&<?php echo $ctrl_task;?>remove&format=raw&dir=<?php echo $row->name ?>&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1";
-					
+
 					if (MooTools.version>="1.2.4") {
 						$('<?php echo 'up-'.$row->name ?>').set('html','<td colspan="5" align="center"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></td>');
 						var ajax = new Request.HTML({
