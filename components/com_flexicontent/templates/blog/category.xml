@@ -84,7 +84,7 @@
 			<option value="1">FLEXI_CROP</option>
 		</param>
 		
-		<param name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPALTE_HTML_MODE" level="level2" menu="hide" />
+		<param name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
 		<param name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
 			<option value="0">FLEXI_XHTML</option>
 			<option value="1">FLEXI_HTML5</option>
