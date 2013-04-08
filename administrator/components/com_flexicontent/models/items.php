@@ -162,7 +162,7 @@ class FlexicontentModelItems extends JModelLegacy
 				$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
 				$rows = $this->_db->loadObjectList();
 				if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 				
 				// 2, get current items total for pagination
 				$this->_db->setQuery("SELECT FOUND_ROWS()");
@@ -184,7 +184,7 @@ class FlexicontentModelItems extends JModelLegacy
 				$_data = $this->_db->loadObjectList('item_id');
 			}
 			if ( $print_logging_info ) @$fc_run_times['execute_secondary_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
 			// 4, reorder items and get cat ids
 			$this->_data = array();
@@ -246,7 +246,7 @@ class FlexicontentModelItems extends JModelLegacy
 		  ;
 		$this->_db->setQuery($query);
 		$translations = $this->_db->loadObjectList();
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		if ( empty($translations) )  return $this->_translations;
 		
@@ -277,7 +277,7 @@ class FlexicontentModelItems extends JModelLegacy
 			$query = 'SELECT t.attribs FROM #__flexicontent_types AS t WHERE t.id = ' . $filter_type;
 			$this->_db->setQuery($query);
 			$type_attribs = $this->_db->loadResult();
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
 			$tparams = FLEXI_J16GE ? new JRegistry($type_attribs) : new JParameter($type_attribs);
 			$im_extra_fields = $tparams->get("items_manager_extra_fields");
@@ -299,7 +299,7 @@ class FlexicontentModelItems extends JModelLegacy
 		   .' ORDER BY FIELD(fi.name, "'. implode('","',array_keys($methodnames)) . '" )';
 		$this->_db->setQuery($query);
 		$extra_fields = $this->_db->loadObjectList();
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		foreach($extra_fields as $field) {
 			$field->methodname = $methodnames[$field->name];
@@ -337,7 +337,7 @@ class FlexicontentModelItems extends JModelLegacy
 		       .' ORDER BY v.valueorder';
 		    $this->_db->setQuery($query);
 		    $values = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-				//if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($query."\n".$this->_db->getErrorMsg()."\n"),'error');
+				//if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 				
 				$row->extra_field_value[$field->name] = $values;
 			}
@@ -602,6 +602,8 @@ class FlexicontentModelItems extends JModelLegacy
 		$lang  = (FLEXI_FISH || FLEXI_J16GE) ? 'ie.language AS lang, ie.lang_parent_id, ' : '';
 		$lang .= (FLEXI_FISH || FLEXI_J16GE) ? 'CASE WHEN ie.lang_parent_id=0 THEN i.id ELSE ie.lang_parent_id END AS lang_parent_id, ' : '';
 		
+		$filter_cats      = $app->getUserStateFromRequest( $option.'.items.filter_cats',	'filter_cats', '', 'int' );
+		$filter_subcats   = $app->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
 		$filter_state     = $app->getUserStateFromRequest( $option.'.items.filter_state',			'filter_state',			'',		'word' );
 		$filter_order     = $app->getUserStateFromRequest( $option.'.items.filter_order',			'filter_order',			'',		'cmd' );
 		$filter_stategrp  = $app->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp',	'',		'word' );
@@ -645,6 +647,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. (($filter_state=='RV') ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				.    ($filter_cats && !$filter_subcats ? ' AND rel.catid='.$filter_cats : '')
 				. ' JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
 				. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
 				. $ver_specific_joins

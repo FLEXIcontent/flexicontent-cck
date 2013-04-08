@@ -1020,85 +1020,123 @@ class FlexicontentController extends JControllerLegacy
 	 * @since 1.0
 	 */
 	function download()
-	{		
+	{
+		// Import and Initialize some joomla API variables
 		jimport('joomla.filesystem.file');
-		$app = JFactory::getApplication();
+		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
 		
-		$id        = JRequest::getInt( 'id', 0 );
+		// Get HTTP REQUEST variables
 		$fieldid   = JRequest::getInt( 'fid', 0 );
 		$contentid = JRequest::getInt( 'cid', 0 );
+		$fileid    = JRequest::getInt( 'id', 0 );
 		
+		
+		// **************************************************
+		// Create and Execute SQL query to retrieve file info
+		// **************************************************
+		
+		// Create JOIN + AND clauses for checking Access
 		$joinaccess = $andaccess = $joinaccess2 = $andaccess2 = '';
+		$this->_createFieldItemAccessClause( $joinaccess, $andaccess, $joinaccess2, $andaccess2);
+		
+		// Extra access CLAUSEs for given file (this is conmbined with the above CLAUSEs for field and item access)
 		if (FLEXI_J16GE) {
 			$aid_arr = $user->getAuthorisedViewLevels();
 			$aid_list = implode(",", $aid_arr);
-			$andaccess	= ' AND fi.access IN ('.$aid_list.')';
-			$andaccess2 = ' AND c.access IN ('.$aid_list.')';
+			$andaccess  .= ' AND (f.access=0 OR f.access IS NULL OR f.access IN ('.$aid_list.'))';
 		} else {
 			$aid = (int) $user->get('aid');
 			if (FLEXI_ACCESS) {
-				// is the field available
-				$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"';
-				$andaccess   = ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')';
-				// is the item available
-				$joinaccess2 = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "item"';
-				$andaccess2  = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
+				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gf ON f.id = gf.axo AND gf.aco = "read" AND gf.axosection = "file"';
+				$andaccess  .= ' AND (f.access IS NULL OR gf.aro IN ( '.$user->gmid.' ) OR f.access <= '. $aid . ')';
 			} else {
-				$andaccess  = ' AND fi.access <= '.$aid ;
-				$andaccess2 = ' AND c.access <= '.$aid ;
+				$andaccess  .= ' AND (f.access IS NULL OR f.access <= '.$aid .')';
 			}
 		}
-
+		
 		$query  = 'SELECT f.id, f.filename, f.secure, f.url'
 				.' FROM #__flexicontent_fields_item_relations AS rel'
 				.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
 				.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
-				.' LEFT JOIN #__content AS c ON c.id = rel.item_id'
+				.' LEFT JOIN #__content AS i ON i.id = rel.item_id'
+				.' LEFT JOIN #__categories AS c ON c.id = i.catid'
+				.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				.' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 				. $joinaccess
 				. $joinaccess2
 				.' WHERE rel.item_id = ' . (int)$contentid
 				.' AND rel.field_id = ' . (int)$fieldid
-				.' AND f.id = ' . (int)$id
+				.' AND f.id = ' . (int)$fileid
 				.' AND f.published= 1'
 				. $andaccess
 				. $andaccess2
 				;
 		$db->setQuery($query);
 		$file = $db->loadObject();
-
+		if ($db->getErrorNum())  {
+			JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			exit;
+		}
+		
+		
+		// ************************************************************************
+		// Check for user not having the required Access Level (empty query result)
+		// ************************************************************************
+		
+		if ( empty($file) ) {
+			$msg = !$db->getErrorNum() ? JText::_( 'FLEXI_ALERTNOTAUTH' ) : __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()) ;
+			$app->enqueueMessage($msg,'error');
+			$this->setRedirect('index.php', '');
+			return;
+		}
+		
+		// ****************************************************
+		// (for non-URL) Create file path and check file exists
+		// ****************************************************
+		
+		if ( !$file->url ) {
+			$basePath = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+			$abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file->filename));
+			if ( !JFile::exists($abspath) ) {
+				$msg = JText::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
+				$link = 'index.php';
+				$this->setRedirect($link, $msg);
+				return;
+			}
+		}
+		
+		
+		// **********************
+		// Increment hits counter
+		// **********************
+		
+		$filetable = JTable::getInstance('flexicontent_files', '');
+		$filetable->hit($fileid);
+		
+		
+		// **************************
+		// Special case file is a URL
+		// **************************
+		
 		if ($file->url) {
-			//update hitcount
-			$filetable = JTable::getInstance('flexicontent_files', '');
-			$filetable->hit($id);
-			
 			// redirect to the file download link
 			@header("Location: ".$file->filename."");
 			$app->close();
 		}
 		
-		$basePath = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-
-		$abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file->filename));
 		
-		if (!JFile::exists($abspath)) {
-			$msg 	= JText::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
-			$link 	= 'index.php';
-			$this->setRedirect($link, $msg);
-			return;
-		}
+		// *****************************************
+		// Output an appropriate Content-Type header
+		// *****************************************
 		
-		//get filesize and extension
-		$size 	= filesize($abspath);
-		$ext 	= strtolower(JFile::getExt($file->filename));
+		// Get filesize and extension
+		$size = filesize($abspath);
+		$ext  = strtolower(JFile::getExt($file->filename));
 		
-		//update hitcount
-		$filetable = JTable::getInstance('flexicontent_files', '');
-		$filetable->hit($id);
-
-		// required for IE, otherwise Content-disposition is ignored
-		if(ini_get('zlib.output_compression')) {
+		// * Required for IE, otherwise Content-disposition is ignored
+		if (ini_get('zlib.output_compression')) {
 			ini_set('zlib.output_compression', 'Off');
 		}
 
@@ -1161,11 +1199,17 @@ class FlexicontentController extends JControllerLegacy
 		header("Content-Disposition: attachment; filename=\"".$file->filename."\";" );
 		header("Content-Transfer-Encoding: binary");
 		header("Content-Length: ".$size);
-
+		
+		
+		// *******************************
+		// Finally read file and output it
+		// *******************************
+		
 		readfile($abspath);
 		$app->close();
 	}
-
+	
+	
 	/**
 	 * External link logic
 	 *
@@ -1174,39 +1218,32 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function weblink()
 	{
+		// Import and Initialize some joomla API variables
 		$app   = JFactory::getApplication();
-		$user  = JFactory::getUser();
 		$db    = JFactory::getDBO();
+		$user  = JFactory::getUser();
 		
+		// Get HTTP REQUEST variables
 		$fieldid   = JRequest::getInt( 'fid', 0 );
 		$contentid = JRequest::getInt( 'cid', 0 );
 		$order     = JRequest::getInt( 'ord', 0 );
 		
+		
+		// **************************************************
+		// Create and Execute SQL query to retrieve file info
+		// **************************************************
+		
+		// Create JOIN + AND clauses for checking Access
 		$joinaccess = $andaccess = $joinaccess2 = $andaccess2 = '';
-		if (FLEXI_J16GE) {
-			$aid_arr = $user->getAuthorisedViewLevels();
-			$aid_list = implode(",", $aid_arr);
-			$andaccess	= ' AND fi.access IN ('.$aid_list.')';
-			$andaccess2 = ' AND c.access IN ('.$aid_list.')';
-		} else {
-			$aid = (int) $user->get('aid');
-			if (FLEXI_ACCESS) {
-				// is the field available
-				$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"';
-				$andaccess   = ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')';
-				// is the item available
-				$joinaccess2 = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "item"';
-				$andaccess2  = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
-			} else {
-				$andaccess  = ' AND fi.access <= '.$aid ;
-				$andaccess2 = ' AND c.access <= '.$aid ;
-			}
-		}
-
+		$this->_createFieldItemAccessClause( $joinaccess, $andaccess, $joinaccess2, $andaccess2);
+		
 		$query  = 'SELECT value'
 				.' FROM #__flexicontent_fields_item_relations AS rel'
 				.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
-				.' LEFT JOIN #__content AS c ON c.id = rel.item_id'
+				.' LEFT JOIN #__content AS i ON i.id = rel.item_id'
+				.' LEFT JOIN #__categories AS c ON c.id = i.catid'
+				.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				.' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 				. $joinaccess
 				. $joinaccess2
 				.' WHERE rel.item_id = ' . (int)$contentid
@@ -1217,15 +1254,24 @@ class FlexicontentController extends JControllerLegacy
 				;
 		$db->setQuery($query);
 		$link = $db->loadResult();
-
-		// if the query result is empty it means that the user doesn't have the required access level
-		if (empty($link)) {
-			$msg 	= JText::_( 'FLEXI_ALERTNOTAUTH' );
-			$link 	= 'index.php';
-			$this->setRedirect($link, $msg);
+		
+		
+		// ************************************************************************
+		// Check for user not having the required Access Level (empty query result)
+		// ************************************************************************
+		
+		if ( empty($link) ) {
+			$msg = !$db->getErrorNum() ? JText::_( 'FLEXI_ALERTNOTAUTH' ) : __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()) ;
+			$app->enqueueMessage($msg,'error');
+			$this->setRedirect('index.php', '');
 			return;
 		}
-
+		
+		
+		// **********************
+		// Increment hits counter
+		// **********************
+		
 		// recover the link array (url|title|hits)
 		$link = unserialize($link);
 		
@@ -1248,10 +1294,55 @@ class FlexicontentController extends JControllerLegacy
 			return JError::raiseWarning( 500, $db->getError() );
 		}
 		
+		
+		// ***************************
+		// Finally redirect to the URL
+		// ***************************
+		
 		@header("Location: ".$url."","target=blank");
 		$app->close();
 	}
-
+	
+	
+	// Private common method to create join + and-where SQL CLAUSEs, for checking access of field - item pair(s), IN FUTURE maybe moved
+	function _createFieldItemAccessClause( &$joinaccess='', &$andaccess='', &$joinaccess2='', &$andaccess2='')
+	{
+		$user  = JFactory::getUser();
+		if (FLEXI_J16GE) {
+			$aid_arr = $user->getAuthorisedViewLevels();
+			$aid_list = implode(",", $aid_arr);
+			// is the field available
+			$andaccess  .= ' AND fi.access IN ('.$aid_list.')';
+			// is the item available
+			$andaccess2 .= ' AND ty.access IN ('.$aid_list.')';
+			$andaccess2 .= ' AND  c.access IN ('.$aid_list.')';
+			$andaccess2 .= ' AND  i.access IN ('.$aid_list.')';
+		} else {
+			$aid = (int) $user->get('aid');
+			if (FLEXI_ACCESS) {
+				// is the field available
+				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gfi ON fi.id = gfi.axo AND gfi.aco = "read" AND gfi.axosection = "field"';
+				$andaccess  .= ' AND (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')';
+				// is the item available
+				$joinaccess2 .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
+				$joinaccess2 .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+				$joinaccess2 .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+				$andaccess2  .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+				$andaccess2  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
+				$andaccess2  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
+			} else {
+				// is the field available
+				$andaccess  .= ' AND fi.access <= '.$aid ;
+				// is the item available
+				$andaccess2 .= ' AND ty.access <= '.$aid ;
+				$andaccess2 .= ' AND  c.access <= '.$aid ;
+				$andaccess2 .= ' AND  i.access <= '.$aid ;
+			}
+		}
+		return;
+	}
+	
+	
 	/**
 	 * Method to fetch the tags form
 	 * 

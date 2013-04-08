@@ -16,9 +16,10 @@
  * GNU General Public License for more details.
  */
 
+// no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * HTML View class for the Favourites View
@@ -30,36 +31,45 @@ jimport( 'joomla.application.component.view');
 class FlexicontentViewFavourites extends JViewLegacy
 {
 	/**
-	 * Creates the item page
+	 * Creates the page's display
 	 *
 	 * @since 1.0
 	 */
 	function display( $tpl = null )
 	{
-		$mainframe =& JFactory::getApplication();
-
 		//initialize variables
-		$document 	= & JFactory::getDocument();
-		$menus		= & JSite::getMenu();
-		$menu    	= $menus->getActive();
-		$params 	= & $mainframe->getParams('com_flexicontent');
-		$uri 		= & JFactory::getURI();
-
-		$limitstart		= JRequest::getInt('limitstart');
-		$limit			= $mainframe->getUserStateFromRequest('com_flexicontent.favourites.limit', 'limit', $params->def('limit', 0), 'int');
-
+		$app      = JFactory::getApplication();
+		$document = JFactory::getDocument();
+		$menus    = $app->getMenu();
+		$menu     = $menus->getActive();
+		$uri      = JFactory::getURI();
+		
+		// No parameters via model, get the COMPONENT only parameters and then merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
+		}
+		
+		// Get various data from the model
+		$items   = $this->get('Data');
+		$total   = $this->get('Total');
+		
+		
+		// ********************************
+		// Load needed JS libs & CSS styles
+		// ********************************
+		
 		//add css file
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
+		
 		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.JApplication::getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.JApplication::getTemplate().'/css/flexicontent.css');
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
-
-		$items 	= & $this->get('Data');
-		$total 	= & $this->get('Total');
 		
 		
 		// **********************
@@ -92,7 +102,7 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// ... the page heading text
 		$params->def('page_heading', $params->get('page_title'));    // J1.5: parameter name was show_page_title instead of show_page_heading
 		$params->def('page_title', $params->get('page_heading'));    // J2.5: to offer compatibility with old custom templates or template overrides
-				
+		
 		
 		// ************************************************************
 		// Create the document title, by from page title and other data
@@ -103,30 +113,30 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
-			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = $mainframe->getCfg('sitename') ." - ". $doc_title ;
+			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
+				$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
 			}
-			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = $doc_title ." - ". $mainframe->getCfg('sitename') ;
+			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
+				$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
 			}
 		}
 		
 		// Finally, set document title
 		$document->setTitle($doc_title);
 		
-
+		
 		// ************************
 		// Set document's META tags
 		// ************************
 		
 		// ** writting both old and new way as an example
 		if (!FLEXI_J16GE) {
-			if ($mainframe->getCfg('MetaTitle') == '1') 	$mainframe->addMetaTag('title', $params->get('page_title'));
+			if ($app->getCfg('MetaTitle') == '1') 	$app->addMetaTag('title', $params->get('page_title'));
 		} else {
-			if (JApplication::getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
+			if ($app->getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
 		}
 		
-        
+		
 		//ordering
 		$filter_order		= JRequest::getCmd('filter_order', 'i.title');
 		$filter_order_Dir	= JRequest::getCmd('filter_order_Dir', 'ASC');
@@ -136,24 +146,23 @@ class FlexicontentViewFavourites extends JViewLegacy
 		$lists['filter_order']		= $filter_order;
 		$lists['filter_order_Dir'] 	= $filter_order_Dir;
 		$lists['filter']			= $filter;
-						
-		// Create the pagination object
-		jimport('joomla.html.pagination');
 		
-		$pageNav 	= new JPagination($total, $limitstart, $limit);
-		
+		// Create links
 		$fav_link    = JRoute::_( JRequest::getInt('Itemid') ? 'index.php?Itemid='.JRequest::getInt('Itemid') : 'index.php?view=favourites', false );
 		$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
+		
+		// Create the pagination object
+		$pageNav = $this->get('pagination');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('action', 			$fav_link);  // $uri->toString()
-		$this->assignRef('print_link' ,	$print_link);
-		$this->assignRef('pageclass_sfx' ,	$pageclass_sfx);
-		$this->assignRef('items' , 			$items);
-		$this->assignRef('params' , 		$params);
-		$this->assignRef('pageNav' , 		$pageNav);
-		$this->assignRef('lists' ,	 		$lists);
-
+		$this->assignRef('action',    $fav_link);  // $uri->toString()
+		$this->assignRef('print_link',$print_link);
+		$this->assignRef('items',     $items);
+		$this->assignRef('lists',     $lists);
+		$this->assignRef('params',    $params);
+		$this->assignRef('pageNav',   $pageNav);
+		$this->assignRef('pageclass_sfx', $pageclass_sfx);
+		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
 		

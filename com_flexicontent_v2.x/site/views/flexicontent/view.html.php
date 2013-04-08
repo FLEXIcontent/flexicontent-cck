@@ -19,7 +19,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
  * HTML View class for the FLEXIcontent View
@@ -31,26 +31,35 @@ jimport( 'joomla.application.component.view');
 class FlexicontentViewFlexicontent extends JViewLegacy
 {
 	/**
-	 * Creates the Forms for the View
+	 * Creates the page's display
 	 *
 	 * @since 1.0
 	 */
 	function display( $tpl = null )
 	{
-		$mainframe =& JFactory::getApplication();
-
 		//initialize variables
-		$document = & JFactory::getDocument();
-		$menus    = & JSite::getMenu();
+		$app      = JFactory::getApplication();
+		$document = JFactory::getDocument();
+		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
-		$uri      = & JFactory::getURI();
+		$uri      = JFactory::getURI();
 		
-		// Get the COMPONENT only parameters and merge current menu item parameters
+		// No parameters via model, get the COMPONENT only parameters and then merge current menu item parameters
 		$params = clone( JComponentHelper::getParams('com_flexicontent') );
 		if ($menu) {
 			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
 			$params->merge($menu_params);
 		}
+		
+		// Get various data from the model
+		$categories = $this->get('Data');
+		$categories = !is_array($categories)?array():$categories;
+		$total   = $this->get('Total');
+		
+		
+		// ********************************
+		// Load needed JS libs & CSS styles
+		// ********************************
 		
 		//add css file
 		if (!$params->get('disablecss', '')) {
@@ -59,25 +68,16 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		}
 		
 		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
-		
-		// Get data from the model		
-		$categories = & $this->get('Data');
-		$categories = !is_array($categories)?array():$categories;
-		$total  = $this->get('Total');
-		
-		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
-		$limitstart = JRequest::getInt('limitstart');
-		$limit      = $params->def('catlimit', 0);
 		
 		
 		// **********************
 		// Calculate a page title
 		// **********************
 		
-		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+		// Verify menu item points to current FLEXIcontent object, IF NOT then clear page title and page class suffix
 		if ( $menu && $menu->query['view'] != 'flexicontent' ) {
 			$params->set('page_title',	'');
 			$params->set('pageclass_sfx',	'');
@@ -114,30 +114,30 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
-			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = $mainframe->getCfg('sitename') ." - ". $doc_title ;
+			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
+				$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
 			}
-			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = $doc_title ." - ". $mainframe->getCfg('sitename') ;
+			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
+				$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
 			}
 		}
 		
 		// Finally, set document title
 		$document->setTitle($doc_title);
 		
-
+		
 		// ************************
 		// Set document's META tags
 		// ************************
 		
 		// ** writting both old and new way as an example
 		if (!FLEXI_J16GE) {
-			if ($mainframe->getCfg('MetaTitle') == '1') 	$mainframe->addMetaTag('title', $params->get('page_title'));
+			if ($app->getCfg('MetaTitle') == '1') 	$app->addMetaTag('title', $params->get('page_title'));
 		} else {
-			if (JApplication::getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
+			if ($app->getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
 		}
 		
-		// Add alternate feed link
+		// Add feed link
 		if ($params->get('show_feed_link', 1) == 1) {
 			$link	= '&format=feed';
 			$attribs = array('type' => 'application/rss+xml', 'title' => 'RSS 2.0');
@@ -147,16 +147,14 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		}
 		
 		// Create the pagination object
-		jimport('joomla.html.pagination');
-		
-		$pageNav 	= new JPagination($total, $limitstart, $limit);
+		$pageNav = $this->get('pagination');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('params' , 				$params);
-		$this->assignRef('categories' , 		$categories);
-		$this->assignRef('pageNav' , 				$pageNav);
-		$this->assignRef('pageclass_sfx' , 	$pageclass_sfx);
-
+		$this->assignRef('categories',$categories);
+		$this->assignRef('params',    $params);
+		$this->assignRef('pageNav',   $pageNav);
+		$this->assignRef('pageclass_sfx', $pageclass_sfx);
+		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
 		

@@ -41,7 +41,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$filter_itemstate	= $app->getUserStateFromRequest( $option.'.fields.filter_itemstate', 'filter_itemstate', 	'', 'word' );
 		
 		$search_index			= $app->getUserStateFromRequest( $option.'.search.search_index',			'search_index', '', 'string' );
-		$search_index			= $db->getEscaped( trim(JString::strtolower( $search_index ) ) );
+		$search_index			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search_index ) ) ) : $db->getEscaped( trim(JString::strtolower( $search_index ) ) );
 		$search_itemtitle	= $app->getUserStateFromRequest( $option.'.search.search_itemtitle',	'search_itemtitle', '', 'string' );
 		$search_itemid		= $app->getUserStateFromRequest( $option.'.search.search_itemid',	'search_itemid', '', 'string' );
 		$search_itemid		= strlen($search_itemid) ? (int)$search_itemid : '';
@@ -84,7 +84,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$lists['filter_fieldtype'] = JHTML::_('select.genericlist', $fftypes, 'filter_fieldtype', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
 		
 		//build type select list
-		$lists['filter_itemtype'] = flexicontent_html::buildtypesselect($types, 'filter_itemtype', $filter_itemtype, true, 'class="inputbox" size="1" onchange="submitform( );"');
+		$lists['filter_itemtype'] = flexicontent_html::buildtypesselect($types, 'filter_itemtype', $filter_itemtype, true, 'class="inputbox" size="1" onchange="submitform( );"', 'filter_itemtype');
 		
 		//publish unpublished filter
 		$ffstate = array();

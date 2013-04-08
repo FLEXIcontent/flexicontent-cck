@@ -44,6 +44,13 @@
 			</field>
 			<!--field name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="3" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" menu="hide" /-->
 			
+		<field name="" type="separator" default="FLEXI_BROWSER_FRAMEWORKS" label="" level="level1" menu="hide" />
+			<field name="load_frameworks" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
+				checkoptions="jQuery,(jQuery) image-picker,(jQuery) masonry,(jQuery) select2,(jQuery) inputmask,(jQuery) fancybox"
+				checkvals="jQuery,image-picker,masonry,select2,inputmask,fancybox"
+				defaultvals="jQuery,image-picker,masonry,select2,inputmask,fancybox"
+				label="FLEXI_LOAD_BROWSER_FRAMEWORKS" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" />
+				
 		<field name="" type="separator" default="FLEXI_PERFORMANCE_CONF" label="" level="level1" menu="hide" />
 			
 			<field name="always_create_fields_display" type="list" default="2" label="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY" description="FLEXI_ALWAYS_CREATE_FIELDS_DISPLAY_DESC" menu="hide">
@@ -491,6 +498,10 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="compact_search_with_filters" type="radio" default="0" label="FLEXI_COMPACT_SEARCH_FILTERS_AREA" description="FLEXI_COMPACT_SEARCH_FILTERS_AREA_DESC" menu="hide" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="disable_filter_autosubmit" type="radio" default="0" label="FLEXI_DISABLE_FILTER_AUTO_SUBMIT" description="FLEXI_DISABLE_FILTER_AUTO_SUBMIT_DESC" menu="hide" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

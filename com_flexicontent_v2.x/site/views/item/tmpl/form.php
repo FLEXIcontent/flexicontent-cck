@@ -601,8 +601,9 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
 			
 			$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-			foreach ($this->fields as $field) {
-				
+			$row_k = 0;
+			foreach ($this->fields as $field)
+			{
 				// SKIP frontend hidden fields from this listing
 				if (
 					($field->iscore && $field->field_type!='maintext')  ||
@@ -627,6 +628,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 					continue;
 				endif;
 				
+				$row_k = 1 - $row_k;
 				$width = $field->parameters->get('container_width', '' );
 				if ($width)  $width = 'width:' .$width. ($width != (int)$width ? 'px' : '');
 			?>
@@ -639,7 +641,10 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 						<?php echo $field->label; ?>
 					</label>
 					
-					<div style="float:left!important; padding:0px!important; margin:0px!important; <?php echo $width; ?>;">
+					<div style="float:left!important; padding:0px!important; margin:0px!important; <?php echo $width; ?>;"
+						class="fcfield_row<?php echo $row_k;?> container_fcfield
+						container_fcfield_id_<?php echo $field->id;?> container_fcfield_name_<?php echo $field->name;?>"						
+					>
 						<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>
 					
 				<?php	if ($field->field_type=='maintext' && isset($this->item->item_translations) ) : ?>

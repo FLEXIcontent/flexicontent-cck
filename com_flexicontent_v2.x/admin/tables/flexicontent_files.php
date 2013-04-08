@@ -60,12 +60,13 @@ class flexicontent_files extends JTable
 	/** @var date */
 	var $checked_out_time	= '';
 	/** @var int */
-	var $access 			= 0;
+	var $access 			= null;
 	/** @var string */
 	var $attribs	 		= null;
 
 	function flexicontent_files(& $db) {
 		parent::__construct('#__flexicontent_files', 'id', $db);
+		$this->access = FLEXI_J16GE ? 1 : 0;    // Public access is 1 for J2.5 and 0 for J1.5
 	}
 	
 	// overloaded check function

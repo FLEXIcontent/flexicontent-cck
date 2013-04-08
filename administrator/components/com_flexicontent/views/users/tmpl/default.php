@@ -23,7 +23,6 @@ function submitform(pressbutton)
 	form = document.adminForm;
 	// If formvalidator activated
 	if( pressbutton == 'remove' ) {
-
 		var answer = confirm('<?php echo JText::_( 'FLEXI_ITEMS_DELETE_CONFIRM',true ); ?>')
 		if (!answer){
 			new Event(e).stop();

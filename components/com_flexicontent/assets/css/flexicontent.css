@@ -1387,6 +1387,11 @@ div.fancybox-wrap a { background: none!important;}
 	padding-left: 20px;
 	height: 16px;
 	margin: 2px 4px;
+	float:left;
+}
+
+.fc_edit_link {
+	float:left;
 }
 
 .fc_field_unsused_val {

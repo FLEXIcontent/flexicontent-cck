@@ -92,7 +92,7 @@ class FlexicontentViewItemelement extends JViewLegacy {
 		$ordering = ($lists['order'] == 'i.ordering');
 
 		//build type select list
-		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="inputbox" size="1" onchange="submitform( );"');
+		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="inputbox" size="1" onchange="submitform( );"', 'filter_type');
 
 		// search filter
 		$lists['search']= $search;

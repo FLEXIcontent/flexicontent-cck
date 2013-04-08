@@ -80,27 +80,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		static $inputmask_added = false;
 	  if ($inputmask && !$inputmask_added) {
 			$inputmask_added = true;
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/jquery.inputmask.js' );
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/jquery.inputmask.extensions.js' );
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/jquery.inputmask.date.extensions.js' );
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/jquery.inputmask.numeric.extensions.js' );
-			
-			$js = "";
-			/*$js .= "
-				jQuery.extend(jQuery.inputmask.defaults.definitions, {
-				    'f': {
-				        \"validator\": \"[0-9\(\)\.\+/ ]\",
-				        \"cardinality\": 1,
-				        'prevalidator': null
-				    }
-				});
-			";*/
-			$js .= "
-				jQuery(document).ready(function(){
-				    jQuery(\":input\").inputmask();
-				});
-			";
-			$document->addScriptDeclaration($js);
+			flexicontent_html::loadFramework('inputmask');
 		}
 		
 		

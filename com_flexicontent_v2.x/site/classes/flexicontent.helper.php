@@ -185,8 +185,8 @@ class flexicontent_html
 
 		return JHTML::_('select.genericlist', $ordering, 'orderby', $attribs, 'value', 'text', $orderby );
 	}
-
-
+	
+	
 	/**
 	 * Utility function to add JQuery to current Document
 	 *
@@ -224,8 +224,125 @@ class flexicontent_html
 			$jquery_ui_css_added = 1;
 		}
 	}
-
-
+	
+	
+	/**
+	 * Utility function to add JQuery to current Document
+	 *
+	 * @param 	string 		$text
+	 * @param 	int 		$nb
+	 * @return 	string
+	 * @since 1.5
+	 */
+	static function loadFramework( $framework )
+	{
+		// Detect already loaded framework
+		static $_loaded = array();
+		if ( isset($_loaded[$framework]) ) return;
+		$_loaded[$framework] = 1;
+		
+		static $load_frameworks = null;
+		if ($load_frameworks === null) {
+			$flexiparams = JComponentHelper::getParams('com_flexicontent');
+			$load_frameworks = $flexiparams->get('load_frameworks', array('jQuery','image-picker','masonry','select2','inputmask','fancybox'));
+			$load_frameworks = FLEXIUtilities::paramToArray($load_frameworks);
+			$load_frameworks = array_flip($load_frameworks);
+		}
+		if ( !isset($load_frameworks[$framework]) ) return;
+		
+		// Load Framework
+		$document = JFactory::getDocument();
+		$js = "";
+		$css = "";
+		switch ( $framework )
+		{
+			case 'image-picker':
+				flexicontent_html::loadJQuery();
+				$document->addScript( JURI::root().'components/com_flexicontent/librairies/image-picker/image-picker.min.js' );
+				$document->addScript( JURI::root().'components/com_flexicontent/librairies/masonry/jquery.masonry.min.js' );
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/image-picker/image-picker.css');
+				break;
+			
+			case 'masonry':
+				flexicontent_html::loadJQuery();
+				$document->addScript( JURI::root().'components/com_flexicontent/librairies/masonry/jquery.masonry.min.js' );
+				break;
+			
+			case 'select2':
+				flexicontent_html::loadJQuery();
+				$document->addScript( JURI::root().'components/com_flexicontent/librairies/select2/select2.js' );
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/select2/select2.css');
+				
+				// Attach select2 to specific to select elements having specific CSS class
+				$js .= "
+					jQuery(document).ready(function() {
+						jQuery('select.use_select2_lib').select2();
+					});
+				";
+				break;
+			
+			case 'inputmask':
+				flexicontent_html::loadJQuery();
+				// Load Library and also 3 files with built-in sets of masks
+				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.js' );
+				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.extensions.js' );
+				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.date.extensions.js' );
+				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.numeric.extensions.js' );
+				
+				// Extra inputmask declarations definitions, e.g. ...
+				/*$js .= "
+					jQuery.extend(jQuery.inputmask.defaults.definitions, {
+					    'f': {
+					        \"validator\": \"[0-9\(\)\.\+/ ]\",
+					        \"cardinality\": 1,
+					        'prevalidator': null
+					    }
+					});
+				";*/
+				
+				// Attach inputmask to all input fields that have appropriate tag parameters
+				$js .= "
+					jQuery(document).ready(function(){
+					    jQuery(\":input\").inputmask();
+					});
+				";
+				break;
+			
+			case 'fancybox':
+				flexicontent_html::loadJQuery();
+				// Add mousewheel plugin (this is optional)
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/lib/jquery.mousewheel-3.0.6.pack.js');
+				
+				// Add fancyBox CSS / JS
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/fancybox/source/jquery.fancybox.css?v=2.1.1');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/jquery.fancybox.pack.js?v=2.1.1');
+				
+				// Optionally add helpers - button, thumbnail and/or media
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-buttons.css?v=1.0.4');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-buttons.js?v=1.0.4');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-media.js?v=1.0.4');
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-thumbs.css?v=1.0.7');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-thumbs.js?v=1.0.7');
+				
+				// Attach fancybox to all elements having a specific CSS class
+				$js .= "
+					jQuery(document).ready(function(){
+						jQuery('.fancybox').fancybox();
+					});
+				";
+				break;
+			
+			default:
+				JFactory::getApplication()->enqueueMessage(__FUNCTION__.' Cannot load unknown Framework: '.$framework, 'error');
+				break;
+		}
+		
+		// Add custom JS & CSS code
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
+	}
+	
+	
 	/**
 	 * Escape a string so that it can be used directly by JS source code
 	 *
@@ -1291,8 +1408,8 @@ class flexicontent_html
 		if ($user->id && $favoured)
 		{
 			$image = FLEXI_J16GE ?
-				JHTML::image( 'heart_delete.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_REMOVE_FAVOURITE' )) :
-				HTML::_('image.site', 'heart_delete.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_REMOVE_FAVOURITE' )) ;
+				JHTML::image( 'components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_( 'FLEXI_REMOVE_FAVOURITE' )) :
+				JHTML::_('image.site', 'heart_delete.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_REMOVE_FAVOURITE' )) ;
 			$text 		= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
 			$overlib 	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
 			$onclick 	= 'javascript:FCFav('.$field->item_id.');';
@@ -1309,7 +1426,7 @@ class flexicontent_html
 		elseif($user->id)
 		{
 			$image = FLEXI_J16GE ?
-				JHTML::image( 'heart_add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_FAVOURE' )) :
+				JHTML::image( 'components/com_flexicontent/assets/images/'.'heart_add.png', JText::_( 'FLEXI_FAVOURE' )) :
 				JHTML::_('image.site', 'heart_add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_FAVOURE' )) ;
 			$text 		= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
 			$overlib 	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
@@ -1328,7 +1445,7 @@ class flexicontent_html
 			$overlib 	= JText::_( 'FLEXI_FAVOURE_LOGIN_TIP' );
 			$text 		= JText::_( 'FLEXI_FAVOURE' );
 			$image = FLEXI_J16GE ?
-				JHTML::image( 'heart_login.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $text, 'class="editlinktip hasTip" title="'.$text.'::'.$overlib.'"' ) :
+				JHTML::image( 'components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' )) :
 				JHTML::_('image.site', 'heart_login.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $text, 'class="editlinktip hasTip" title="'.$text.'::'.$overlib.'"' ) ;
 
 			$output		= $image;
@@ -3446,20 +3563,20 @@ class flexicontent_db
 	 */
 	static function & directQuery($query)
 	{
-		$db = JFactory::getDBO();
-		$config =& JFactory::getConfig();
+		$db     = JFactory::getDBO();
+		$config = JFactory::getConfig();
 		$dbprefix = $config->getValue('config.dbprefix');
-		$dbtype = $config->getValue('config.dbtype');
+		$dbtype   = $config->getValue('config.dbtype');
 
 		if (FLEXI_J16GE) {
 			$query = $db->replacePrefix($query);
-			$db_connection = & $db->getConnection();
+			$db_connection = $db->getConnection();
 		} else {
 			$query = str_replace("#__", $dbprefix, $query);
-			$db_connection = & $db->_resource;
+			$db_connection = $db->_resource;
 		}
 		//echo "<pre>"; print_r($query); echo "\n\n";
-
+		
 		if ($dbtype == 'mysqli') {
 			$result = mysqli_query( $db_connection , $query );
 			if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysqli_error($db_connection));

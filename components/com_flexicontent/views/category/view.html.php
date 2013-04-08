@@ -19,10 +19,11 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
+jimport('joomla.filesystem.file');
 
 /**
- * HTML View class for the FLEXIcontent View
+ * HTML View class for the Category View
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -31,7 +32,7 @@ jimport( 'joomla.application.component.view');
 class FlexicontentViewCategory extends JViewLegacy
 {
 	/**
-	 * Creates the Forms for the View
+	 * Creates the page's display
 	 *
 	 * @since 1.0
 	 */
@@ -42,34 +43,32 @@ class FlexicontentViewCategory extends JViewLegacy
 		if (!is_array($globalnoroute))	$globalnoroute	= array();
 		if (!is_array($globalcats))     $globalcats	= array();
 		
-		$mainframe = JFactory::getApplication();
-		$session = JFactory::getSession();
-		$option = JRequest::getVar('option');
-
 		//initialize variables
+		$dispatcher = JDispatcher::getInstance();
+		$app      = JFactory::getApplication();
+		$session  = JFactory::getSession();
+		$option   = JRequest::getVar('option');
 		$document = JFactory::getDocument();
-		$menus    = $mainframe->getMenu();
+		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
 		$uri      = JFactory::getURI();
-		$dispatcher	= JDispatcher::getInstance();
-		$user		= JFactory::getUser();
-		$aid		= FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
+		$user     = JFactory::getUser();
+		$aid      = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
 		
 		// Get category and set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
 		$category = $this->get('Category');
 		$params   = $category->parameters;
 		
-		// Get remainging data from the model
+		// Get various data from the model
 		$categories = $this->get('Childs');
-		$items    = $this->get('Data');
-		$total    = $this->get('Total');
+		$items   = $this->get('Data');
+		$total   = $this->get('Total');
 		$filters  = $this->get('Filters');
 		if ($params->get('show_comments_count', 0))
 			$comments = $this->get('CommentsInfo');
 		else
 			$comments = null;
-		$alpha    = $this->get('Alphaindex');
-		$model    = $this->getModel();
+		$alpha   = $this->get('Alphaindex');
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = JRequest::getInt('limitstart');
@@ -91,8 +90,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		//allow css override
-		if (file_exists(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'css'.DS.'flexicontent.css')) {
-			$document->addStyleSheet($this->baseurl.'/templates/'.$mainframe->getTemplate().'/css/flexicontent.css');
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
 		
 		
@@ -114,7 +113,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// (d) Verify the category layout exists
 		if ( !isset($themes->category->{$clayout}) ) {
 			$fixed_clayout = 'blog';
-			$mainframe->enqueueMessage("<small>Current Category Layout Template is '$clayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
+			$app->enqueueMessage("<small>Current Category Layout Template is '$clayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_clayout'</small>", 'notice');
 			$clayout = $fixed_clayout;
 			if (FLEXI_FISH || FLEXI_J16GE) FLEXIUtilities::loadTemplateLanguageFile( $clayout );  // Manually load Template-Specific language file of back fall clayout
 		}
@@ -143,7 +142,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		//Set layout
 		$this->setLayout('category');
 
-		$limit		= $mainframe->getUserStateFromRequest('com_flexicontent'.$category->id.'.category.limit', 'limit', $params->def('limit', 0), 'int');
+		$limit		= $app->getUserStateFromRequest('com_flexicontent'.$category->id.'.category.limit', 'limit', $params->def('limit', 0), 'int');
 
 		$cats		= new flexicontent_cats((int)$category->id);
 		$parents	= $cats->getParentlist();
@@ -220,11 +219,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
-			if ($mainframe->getCfg('sitename_pagetitles', 0) == 1) {
-				$doc_title = $mainframe->getCfg('sitename') ." - ". $doc_title ;
+			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
+				$doc_title = $app->getCfg('sitename') ." - ". $doc_title ;
 			}
-			elseif ($mainframe->getCfg('sitename_pagetitles', 0) == 2) {
-				$doc_title = $doc_title ." - ". $mainframe->getCfg('sitename') ;
+			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
+				$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
 			}
 		}
 		
@@ -235,7 +234,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ********************************************************************************************
 		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
 		// ********************************************************************************************
-		$pathway 	= $mainframe->getPathWay();
+		$pathway 	= $app->getPathWay();
 		
 		// Clear pathway, if automatic pathways are enabled
 		if ( $params->get('automatic_pathways', 0) ) {
@@ -280,12 +279,12 @@ class FlexicontentViewCategory extends JViewLegacy
 				
 				$meta_params = new JRegistry($category->metadata);
 				
-				if ($mainframe->getCfg('MetaTitle') == '1') {
+				if ($app->getCfg('MetaTitle') == '1') {
 					$meta_title = $meta_params->get('page_title') ? $meta_params->get('page_title') : $category->title;
 					$document->setMetaData('title', $meta_title);
 				}
 				
-				if ($mainframe->getCfg('MetaAuthor') == '1') {
+				if ($app->getCfg('MetaAuthor') == '1') {
 					if ( $meta_params->get('author') ) {
 						$meta_author = $meta_params->get('author');
 					} else {
@@ -295,7 +294,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$document->setMetaData('author', $meta_author);
 				}
 			} else {
-				if ($mainframe->getCfg('MetaTitle') == '1')   $document->setMetaData('title', $category->title);
+				if ($app->getCfg('MetaTitle') == '1')   $document->setMetaData('title', $category->title);
 			}
 		}
 		
@@ -585,13 +584,13 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		//ordering
 		if ($category->id) {
-			$lists['filter_order']     = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-			$lists['filter_order_Dir'] = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order_Dir', 'ASC', 'string' );
-			$lists['filter']           = $mainframe->getUserStateFromRequest( $option.'.category'.$category->id.'.filter', 'filter', '', 'string' );
+			$lists['filter_order']     = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
+			$lists['filter_order_Dir'] = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order_Dir', 'ASC', 'string' );
+			$lists['filter']           = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter', 'filter', '', 'string' );
 		} else if ($authorid) {
-			$lists['filter_order']     = $mainframe->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-			$lists['filter_order_Dir'] = $mainframe->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_order_Dir', 'filter_order_Dir', 'ASC', 'string' );
-			$lists['filter']           = $mainframe->getUserStateFromRequest( $option.'.author'.$authorid.'.filter', 'filter', '', 'string' );
+			$lists['filter_order']     = $app->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
+			$lists['filter_order_Dir'] = $app->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_order_Dir', 'filter_order_Dir', 'ASC', 'string' );
+			$lists['filter']           = $app->getUserStateFromRequest( $option.'.author'.$authorid.'.filter', 'filter', '', 'string' );
 		} else {
 			$lists['filter_order']     = JRequest::getCmd('filter_order', 'i.title', 'default');
 			$lists['filter_order_Dir'] = JRequest::getCmd('filter_order_Dir', 'ASC', 'default');
@@ -608,11 +607,11 @@ class FlexicontentViewCategory extends JViewLegacy
 			foreach ($filters as $filtre)
 			{
 				/*if ($category->_id) {
-					$filtervalue 	= $mainframe->getUserStateFromRequest( $option.'.category'.$category->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+					$filtervalue 	= $app->getUserStateFromRequest( $option.'.category'.$category->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
 				} else if ($category->_authorid) {
-					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.author'.$category->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+					$filtervalue  = $app->getUserStateFromRequest( $option.'.author'.$category->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
 				} else if (count($category->_ids)) {
-					$filtervalue  = $mainframe->getUserStateFromRequest( $option.'.mcats'.$category->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+					$filtervalue  = $app->getUserStateFromRequest( $option.'.mcats'.$category->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
 				} else {
 					$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
 				}*/
@@ -631,39 +630,41 @@ class FlexicontentViewCategory extends JViewLegacy
 				$lists['filter_' . $filtre->id] = $filtervalue;
 			}
 		}
-
+		
 		// Create the pagination object
-		$pageNav = $model->getPagination();
-		$resultsCounter = $pageNav->getResultsCounter();
+		$pageNav = $this->get('pagination');
+		$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
 		
 		// Create category link
 		$Itemid = $menu ? $menu->id : 0;
 		$urlvars = array();
 		if ($layout)   $urlvars['layout']   = $layout;
 		if ($authorid) $urlvars['authorid'] = $authorid;
-		if ($cids) $urlvars['cids'] = $cids;
+		if ($cids)     $urlvars['cids'] = $cids;
 		
 		$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, $Itemid, $urlvars), false);
 		$print_link    = $category_link .(strstr($category_link, '?') ? '&'  : '?'). 'pop=1&tmpl=component';
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('action',			$category_link);  // $uri->toString()
-		$this->assignRef('print_link' ,	$print_link);
-		$this->assignRef('pageclass_sfx' , $pageclass_sfx);
-		$this->assignRef('params' , 		$params);
-		$this->assignRef('categories' , $categories);
-		$this->assignRef('items' , 			$items);
-		$this->assignRef('authordescr_item_html' , $authordescr_item_html);
-		$this->assignRef('category' , 	$category);
-		$this->assignRef('limitstart' , $limitstart);
-		$this->assignRef('pageNav' , 		$pageNav);
-		$this->assignRef('pagination' ,	$pageNav);  // Alias for template overrides
-		$this->assignRef('resultsCounter' ,	$resultsCounter);
-		$this->assignRef('filters' ,	 	$filters);
-		$this->assignRef('comments'	,		$comments);
-		$this->assignRef('lists' ,	 		$lists);
-		$this->assignRef('alpha' ,	 		$alpha);
-		$this->assignRef('tmpl' ,				$tmpl);
+		$this->assignRef('action',    $category_link);  // $uri->toString()
+		$this->assignRef('print_link',$print_link);
+		$this->assignRef('category',  $category);
+		$this->assignRef('categories',$categories);
+		$this->assignRef('items',     $items);
+		$this->assignRef('authordescr_item_html', $authordescr_item_html);
+		$this->assignRef('lists',     $lists);
+		$this->assignRef('params',    $params);
+		$this->assignRef('pageNav',   $pageNav);
+		$this->assignRef('pageclass_sfx', $pageclass_sfx);
+		
+		$this->assignRef('pagination',    $pageNav);  // compatibility Alias for old templates
+		$this->assignRef('resultsCounter',$resultsCounter);  // for overriding model's result counter
+		$this->assignRef('limitstart',    $limitstart); // compatibility shortcut
+		
+		$this->assignRef('filters',   $filters);
+		$this->assignRef('comments',  $comments);
+		$this->assignRef('alpha',     $alpha);
+		$this->assignRef('tmpl',      $tmpl);
 
 		/*
 		 * Set template paths : this procedure is issued from K2 component
@@ -675,12 +676,12 @@ class FlexicontentViewCategory extends JViewLegacy
 		 * Designed and developed by the JoomlaWorks team
 		 */
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates');
-		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates');
+		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates');
 		$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.'default');
-		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.'default');
+		$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.'default');
 		if ($clayout) {
 			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$clayout);
-			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$mainframe->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout);
+			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout);
 		}
 
 		$print_logging_info = $params->get('print_logging_info');
