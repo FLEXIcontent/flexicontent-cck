@@ -132,11 +132,11 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-author-add.png', JText::_( 'FLEXI_ADD_AUTHOR' ) );
 						}
 
-						if ($this->dopostinstall && $this->perms->CanArchives)
+						/*if ($this->dopostinstall && $this->perms->CanArchives)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=archive';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-archive.png', JText::_( 'FLEXI_ARCHIVE' ) );
-						}
+						}*/
 
 						if ($this->dopostinstall && $this->perms->CanFiles)
 						{

@@ -44,7 +44,9 @@ class FlexicontentViewFields extends JViewLegacy
 		$document  = JFactory::getDocument();
 		$option    = JRequest::getVar('option');
 		
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();
+		
 		JHTML::_('behavior.tooltip');
 		
 		//get vars
@@ -162,7 +164,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$lists['assigned'] = JHTML::_('select.genericlist', $assigned, 'filter_assigned', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_assigned );
 
 		//build type select list
-		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="inputbox" size="1" onchange="submitform( );"');
+		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="inputbox" size="1" onchange="submitform( );"', 'filter_type');
 		
 		//publish unpublished filter
 		$lists['state']	= JHTML::_('grid.state', $filter_state );

@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- *
+ * 
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -40,7 +40,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		parent::__construct();
 	}
-
+	
 	/**
 	 * Method to get items in pending state, waiting for publication approval
 	 *
@@ -58,7 +58,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		} else {
 			$allitems 	= 1;
 		}
-
+		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier'
 				. ' FROM #__content as c'
 				. ' LEFT JOIN #__users AS cr ON cr.id = c.created_by'
@@ -71,10 +71,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		$this->_db->SetQuery($query, 0, 5);
 		$genstats = $this->_db->loadObjectList();
-
+		
 		return $genstats;
 	}
-
+	
 	/**
 	 * Method to get items revised, having unapproved version, waiting to be reviewed and approved
 	 *
@@ -92,7 +92,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		} else {
 			$allitems 	= 1;
 		}
-
+		
 		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.version, MAX(fv.version_id) '
 				. ' FROM #__content AS c'
 				. ' LEFT JOIN #__flexicontent_versions AS fv ON c.id=fv.item_id'
@@ -108,10 +108,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		$this->_db->SetQuery($query, 0, 5);
 		$genstats = $this->_db->loadObjectList();
-
+		
 		return $genstats;
 	}
-
+	
 	/**
 	 * Method to get items in draft state, waiting to be written (and published)
 	 *
@@ -142,7 +142,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		$this->_db->SetQuery($query, 0, 5);
 		$genstats = $this->_db->loadObjectList();
-
+		
 		return $genstats;
 	}
 
@@ -176,11 +176,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		$this->_db->SetQuery($query, 0, 5);
 		$genstats = $this->_db->loadObjectList();
-
+		
 		return $genstats;
 	}
-
-
+	
+	
 	/**
 	 * Method to check if default Flexi Menu Items exist
 	 *
@@ -191,10 +191,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		static $return;
 		if ($return !== null) return $return;
-
+		
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		$app = JFactory::getApplication();
-
+		
 		// Get 'default_menu_itemid' parameter
 		$params = JComponentHelper::getParams('com_flexicontent');
 		if ($params) {
@@ -205,9 +205,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$_component_default_menuitem_id = '';
 			return $return = false;
 		}
-
+		
 		$prompt  = '<br>'.JText::_('FLEXI_DEFAULT_MENU_ITEM_PROMPT');
-
+		
 		// Check menu item exists
 		$config_saved = (bool) $params->get('flexi_section');
 		if ( !$menu ) {
@@ -226,11 +226,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_ISNON_PUBLIC').$prompt, 'notice' );
 			return $return = false;
 		}
-
+		
 		// All checks passed
 		return $return = true;
 	}
-
+	
 	/**
 	 * Method to check if there is at least one type created
 	 *
@@ -269,7 +269,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			;
 			$this->_db->setQuery( $query );
 			$count = $this->_db->loadResult();
-
+			
 			if ($count > 13) {
 				$return = true;
 			}
@@ -294,7 +294,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				;
 			$this->_db->setQuery( $query );
 			$count = $this->_db->loadResult();
-
+			
 			if ($count > 13) {
 				$return = true;
 			}
@@ -356,7 +356,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$q = 'UPDATE #__flexicontent_fields SET published=1 WHERE id > 0 AND id < 7';
 			$this->_db->setQuery( $q );
 			$this->_db->query();
-
+			
 			$query 	= 'SELECT COUNT( id )'
 				. ' FROM #__plugins'
 				. ' WHERE '
@@ -399,7 +399,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 	/**
 	 * Method to get if language of items is initialized properly
-	 *
+	 * 
 	 * @access	public
 	 * @return	boolean	True on success
 	 * @since 1.5
@@ -419,10 +419,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$db->setQuery($query);
 			$return = $db->loadResult();
 		}
-
+		
 		return $return;
 	}
-
+	
 	/**
 	 * Method to check if the versions table is created
 	 *
@@ -509,7 +509,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getOldBetaFiles() {
 		static $return;
 		if ($return!==null) return $return;
-
+		
 		jimport('joomla.filesystem.folder');
 		$files 	= array (
 			'author.xml',
@@ -525,13 +525,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'form.xml'
 			);
 		$catdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'category'.DS.'tmpl');
-		$cattmpl 	= JFolder::files($catdir);
+		$cattmpl 	= JFolder::files($catdir);		
 		$ctmpl 		= array_diff($cattmpl,$files);
-
+		
 		$itemdir 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.FLEXI_ITEMVIEW.DS.'tmpl');
-		$itemtmpl 	= JFolder::files($itemdir);
+		$itemtmpl 	= JFolder::files($itemdir);		
 		$itmpl 		= array_diff($itemtmpl,$files);
-
+		
 		$return = ($ctmpl || $itmpl) ? false : true;
 		return $return;
 	}
@@ -551,7 +551,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				;
 		$this->_db->setQuery( $query );
 		$fields = $this->_db->loadObjectList();
-
+		
 		if ($fields) {
 			// create a temporary table to store the positions
 			$this->_db->setQuery( "DROP TABLE IF EXISTS #__flexicontent_positions_tmp" );
@@ -567,8 +567,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$this->_db->setQuery( $query );
 			$this->_db->query();
 
-			foreach ($fields as $field) {
-				$field->positions = explode("\n", $field->positions);
+			foreach ($fields as $field) {			
+				$field->positions = explode("\n", $field->positions);	
 				foreach ($field->positions as $pos) {
 					$pos = explode('.', $pos);
 					$query = 'INSERT INTO #__flexicontent_positions_tmp (`field`, `view`, `folder`, `position`) VALUES(' . $this->_db->Quote($field->name) . ',' . $this->_db->Quote($pos[1]) . ',' . $this->_db->Quote($pos[2]) . ',' . $this->_db->Quote($pos[0]) . ')';
@@ -580,7 +580,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$templates	= flexicontent_tmpl::getTemplates();
 			$folders 	= flexicontent_tmpl::getThemes();
 			$views		= array('items', 'category');
-
+			
 			foreach ($folders as $folder) {
 				foreach ($views as $view) {
 					$groups = @$templates->{$view}->{$folder}->positions;
@@ -594,7 +594,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 									;
 							$this->_db->setQuery( $query );
 							$fieldstopos = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-
+							
 							if ($fieldstopos) {
 								$field = implode(',', $fieldstopos);
 
@@ -604,19 +604,19 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 							}
 						}
 					}
-				}
+				}				
 			}
-
+			
 			// delete the temporary table
 			$query = 'DROP TABLE #__flexicontent_positions_tmp';
 			$this->_db->setQuery( $query );
 			$this->_db->query();
-
+			
 			// delete the old positions
 			$query 	= "UPDATE #__flexicontent_fields SET positions = ''";
 			$this->_db->setQuery( $query );
 			$this->_db->query();
-
+			
 			// alter ordering field for releases prior to beta5
 			$query 	= "ALTER TABLE #__flexicontent_cats_item_relations MODIFY `ordering` int(11) NOT NULL default '0'";
 			$this->_db->setQuery( $query );
@@ -649,7 +649,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		return $return;
 	}
 
-
+	
 	/**
 	 * Method to check if there is at least one category created
 	 *
@@ -664,7 +664,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				;
 		$this->_db->setQuery( $query );
 		$count = $this->_db->loadResult();
-
+			
 		if ($count > 0) {
 			return true;
 		}
@@ -686,7 +686,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			;
 			$this->_db->setQuery( $query );
 			$count = $this->_db->loadResult();
-
+				
 			if ($count > 0) {
 				return true;
 			} else {
@@ -694,9 +694,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$params = JComponentHelper::getParams('com_flexicontent');
 				$params->set('flexi_section', '');
 				$cparams = $component->toString();
-
+	
 				$flexi = JComponentHelper::getComponent('com_flexicontent');
-
+				
 				$query 	= 'UPDATE #__components'
 						. ' SET params = ' . $this->_db->Quote($cparams)
 						. ' WHERE id = ' . $flexi->id;
@@ -719,7 +719,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		$component = JComponentHelper::getComponent('com_flexicontent');
 		$app = JFactory::getApplication();
-
+		
 		if(FLEXI_J16GE) {
 			$query 	=	"SELECT COUNT(*) FROM #__menu WHERE `type`='component' AND `published`=1 AND `component_id`='{$component->id}' ";
 			$this->_db->setQuery($query);
@@ -729,7 +729,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$items = $menus->getItems('componentid', $component->id);
 			$count = count($items);
 		}
-
+		
 		if ($count > 0) {
 			return true;
 		}
@@ -747,12 +747,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if (FLEXI_ACCESS)
 		{
 			$db = $this->_db;
-
+			
 			// COMMENTED out, instead we will use field's 'submit' privilege
 			/*$query = "SELECT count(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='editvalue' AND axosection='fields'";
 			$db->setQuery($query);
 			$editvalue_rule = $db->loadResult();
-
+			
 			if (!$editvalue_rule)
 			{
 				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
@@ -761,17 +761,17 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$db->query();
 				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_EDIT_FIELD_VALUE'), 'message' );
 			}*/
-
+			
 			// Delete wrong rule names
 			$query = "DELETE FROM #__flexiaccess_rules WHERE acosection='com_flexicontent' AND aco='associateanyitem'";
 			$db->setQuery($query);
 			$db->query();
-
+			
 			// Check for assocanytrans : Allow users to associate translations (items) authored by any user
 			$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='assocanytrans'";
 			$db->setQuery($query);
 			$assocanytrans_rule = $db->loadResult();
-
+			
 			if (!$assocanytrans_rule)
 			{
 				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
@@ -780,12 +780,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$db->query();
 				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_ASSOCIATE_ANY_TRANSLATION'), 'message' );
 			}
-
+			
 			// Check for editcreationdate : Allow users to edit creation date of an item
 			/*$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='editcreationdate'";
 			$db->setQuery($query);
 			$editcreationdate_rule = $db->loadResult();
-
+			
 			if (!$editcreationdate_rule)
 			{
 				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
@@ -794,12 +794,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$db->query();
 				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_EDIT_CREATION_DATE'), 'message' );
 			}*/
-
+			
 			// Check for ignoreviewstate : Allow users to view unpublished, archived, trashed, scheduled, expired items in frontend content lists e.g. category view
 			$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='ignoreviewstate'";
 			$db->setQuery($query);
 			$ignoreviewstate_rule = $db->loadResult();
-
+			
 			if (!$ignoreviewstate_rule)
 			{
 				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
@@ -808,12 +808,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$db->query();
 				JFactory::getApplication()->enqueueMessage( 'Added ACL Rule: '. JText::_('FLEXI_IGNORE_VIEW_STATE'), 'message' );
 			}
-
+			
 			// Check for import : Allow management of (Content) Import
 			$query = "SELECT COUNT(*) FROM `#__flexiaccess_rules` WHERE acosection='com_flexicontent' AND aco='import'";
 			$db->setQuery($query);
 			$import_rule = $db->loadResult();
-
+			
 			if (!$import_rule)
 			{
 				$query = "INSERT INTO #__flexiaccess_rules (`acosection`, `variable`, `aco`, `axosection`, `axo`, `label`, `source`, `ordering`)"
@@ -824,8 +824,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			}
 		}
 	}
-
-
+	
+	
 	/**
 	 * Fetch the version from the flexicontent.org server
 	 * TODO: Cleanup
@@ -842,7 +842,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		//try to connect via cURL
 		if(function_exists('curl_init') && function_exists('curl_exec')) {
 			$ch = @curl_init();
-
+			
 			@curl_setopt($ch, CURLOPT_URL, $url);
 			@curl_setopt($ch, CURLOPT_HEADER, 0);
 			//http code is greater than or equal to 300 ->fail
@@ -850,9 +850,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			@curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			//timeout of 5s just in case
 			@curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-
+						
 			$data = @curl_exec($ch);
-
+						
 			@curl_close($ch);
 		}
 
@@ -864,7 +864,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 			//timeout handling: 5s for the socket and 5s for the stream = 10s
 			$fsock = @fsockopen("update.flexicontent.org", 80, $errno, $errstr, 5);
-
+		
 			if ($fsock) {
 				@fputs($fsock, "GET /flexicontent_update.xml HTTP/1.1\r\n");
 				@fputs($fsock, "HOST: update.flexicontent.org\r\n");
@@ -873,7 +873,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				//force stream timeout...bah so dirty
 				@stream_set_blocking($fsock, 1);
 				@stream_set_timeout($fsock, 5);
-
+				 
 				$get_info = false;
 				while (!@feof($fsock))
 				{
@@ -890,7 +890,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					}
 				}
 				@fclose($fsock);
-
+				
 				//need to check data cause http error codes aren't supported here
 				if(!strstr($data, '<?xml version="1.0" encoding="utf-8"?><update>')) {
 					$data = '';
@@ -900,31 +900,31 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		//try to connect via fopen
 		if (function_exists('fopen') && ini_get('allow_url_fopen') && $data == '') {
-
+		
 			//set socket timeout
 			ini_set('default_socket_timeout', 5);
-
+			
 			$handle = @fopen ($url, 'r');
-
+			
 			//set stream timeout
 			@stream_set_blocking($handle, 1);
 			@stream_set_timeout($handle, 5);
-
+			
 			$data	= @fread($handle, 1000);
-
+			
 			@fclose($handle);
 		}
-
+						
 		/* try to connect via file_get_contents..k..a bit stupid
 		if(function_exists('file_get_contents') && ini_get('allow_url_fopen') && $data == '') {
 			$data = @file_get_contents($url);
 		}
 		*/
-
+		
 		if( $data && strstr($data, '<?xml version="1.0" encoding="utf-8"?><update>') ) {
 			$xml = JFactory::getXMLparser('Simple');
 			$xml->loadString($data);
-
+			
 			$version              = & $xml->document->version[0];
 			$check['version']     = $version->data();
 			$versionread          = & $xml->document->versionread[0];
@@ -935,23 +935,23 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$check['enabled'] 		= 1;
 			$check['current'] 		= version_compare( $check['version_current'], $check['version'] );
 		}
-
+		
 		return $check;
 	}
-
-
+	
+	
 	function getDiffVersions($current_versions=array(), $last_versions=array())
 	{
 		// check if the section was chosen to avoid adding data on static contents
 		if (!FLEXI_SECTION) return array();
-
+		
 		if(!$current_versions) {
 			$current_versions = FLEXIUtilities::getCurrentVersions();
 		}
 		if(!$last_versions) {
 			$last_versions = FLEXIUtilities::getLastVersions();
 		}
-
+		
 		$difference = $current_versions;
 		foreach($current_versions as $key1 => $value1) {
 			foreach($last_versions as $key2 => $value2) {
@@ -962,8 +962,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 		return $difference;
 	}
-
-
+	
+	
 	function checkCurrentVersionData() {
 		// verify that every current version is in the versions table and it's data in the flexicontent_items_versions table
 		//$and = "";
@@ -972,23 +972,23 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if (!FLEXI_SECTION) return false;
 		return FLEXIUtilities::currentMissing();
 	}
-
-
+	
+	
 	function addCurrentVersionData($item_id = null, $clean_database = false)
 	{
 		// check if the section was chosen to avoid adding data on static contents
 		if (!FLEXI_SECTION) return true;
-
+		
 		$db 		= &$this->_db;
 		$nullDate	= $db->getNullDate();
 
 		// @TODO: move somewhere else
 		$this->formatFlexiPlugins();
-
+		
 		// Clean categories cache
 		$catscache = JFactory::getCache('com_flexicontent_cats');
 		$catscache->clean();
-
+		
 		// Get some basic info of all items, or of the given item
 		$query = "SELECT c.id,c.catid,c.version,c.created,c.modified,c.created_by,c.introtext,c.`fulltext`"
 			." FROM #__content as c"
@@ -998,7 +998,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		$db->setQuery($query);
 		$rows = $db->loadObjectList('id');
-
+		
 		if (!$item_id) {
 			// Get current version ids of ALL ITEMS not having current versions
 			$diff_arrays = $this->getDiffVersions();
@@ -1006,11 +1006,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			// Get current version id of a SPECIFIC ITEM
 			$diff_arrays = array( FLEXIUtilities::getCurrentVersions($item_id) );
 		}
-
+		
 		$jcorefields = flexicontent_html::getJCoreFields();
 		$add_cats = true;
 		$add_tags = true;
-
+		
 		// For all items not having the current version, add it
 		foreach($diff_arrays as $item)
 		{
@@ -1018,7 +1018,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			if( isset( $rows[$item_id] ) )
 			{
 				$row = & $rows[$item_id];
-
+				
 				// Get field values of the current item version
 				$query = "SELECT f.id,fir.value,f.field_type,f.name,fir.valueorder,f.iscore "
 						." FROM #__flexicontent_fields_item_relations as fir"
@@ -1027,21 +1027,21 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 						." WHERE fir.item_id=".$row->id." AND f.iscore=0";  // old versions stored categories & tags into __flexicontent_fields_item_relations
 				$db->setQuery($query);
 				$fieldsvals = $db->loadObjectList();
-
+				
 				// Delete existing unversioned (current version) field values ONLY if we are asked to 'clean' the database
 				if ($clean_database && $fieldsvals) {
 					$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$row->id;
 					$db->setQuery($query);
 					$db->query();
 				}
-
+				
 				// Delete any existing versioned field values to avoid conflicts, this maybe redudant, since they should not exist,
 				// but we do it anyway because someone may have truncated or delete records only in table 'flexicontent_versions' ...
 				// NOTE: we do not delete data with field_id negative as these exist only in the versioning table
 				$query = 'DELETE FROM #__flexicontent_items_versions WHERE item_id = '.$row->id .' AND version= '.$row->version.' AND field_id > 0';
 				$db->setQuery($query);
 				$db->query();
-
+				
 				// Add the 'maintext' field to the fields array for adding to versioning table
 				$f = new stdClass();
 				$f->id					= 1;
@@ -1075,7 +1075,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				$f->version		= (int)$row->version;
 				$f->value		= serialize($categories);
 				if ($add_cats) $fieldsvals[] = $f;
-
+				
 				// Add the 'tags' field to the fields array for adding to versioning table
 				$query = "SELECT tid FROM #__flexicontent_tags_item_relations WHERE itemid='".$row->id."';";
 				$db->setQuery($query);
@@ -1090,7 +1090,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 				// Add field values to field value versioning table
 				foreach($fieldsvals as $fieldval) {
-					// add the new values to the database
+					// add the new values to the database 
 					$obj = new stdClass();
 					$obj->field_id   = $fieldval->id;
 					$obj->item_id    = $row->id;
@@ -1107,7 +1107,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					}
 					//$searchindex 	.= @$fieldval->search;
 				}
-
+				
 				// **********************************************************************************
 				// Add basic METADATA of current item version (kept in table #__flexicontent_versions)
 				// **********************************************************************************
@@ -1123,8 +1123,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 		return true;
 	}
-
-
+	
+	
 	function formatFlexiPlugins()
 	{
 		$db = $this->_db;
@@ -1133,7 +1133,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				;
 		$db->setQuery($query);
 		$flexiplugins = $db->loadObjectList();
-
+		
 		foreach ($flexiplugins as $fp) {
 			if (substr($fp->name, 0, 15) != 'FLEXIcontent - ') {
 				$query = 'UPDATE #__plugins SET name = ' . $db->Quote('FLEXIcontent - '.$fp->name) . ' WHERE id = ' . (int)$fp->id;
@@ -1148,7 +1148,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.archive');
-
+		
 		$prefix 	= $code . '.';
 		$suffix 	= '.ini';
 		$missing 	= array();
@@ -1209,19 +1209,19 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'mod_flexifilter'
 		);
 		$targetfolder = JPATH_SITE.DS.'tmp'.DS.$code."_".time();
-
+		
 		if ($method == 'zip') {
 			if (count($adminfiles))
 				JFolder::create($targetfolder.DS.'admin', 0775);
 			if (count($sitefiles))
 				JFolder::create($targetfolder.DS.'site', 0775);
 		}
-
+		
 		foreach ($adminfiles as $file) {
 			if (!JFile::exists($adminpath.$prefix.$file.$suffix)) {
 				$missing['admin'][] = $file;
-				if ($method == 'create')
-					JFile::copy($refadminpath.'en-GB.'.$file.$suffix, $adminpath.$prefix.$file.$suffix);
+				if ($method == 'create') 
+					JFile::copy($refadminpath.'en-GB.'.$file.$suffix, $adminpath.$prefix.$file.$suffix); 
 			} else {
 				if ($method == 'zip') {
 					JFile::copy($adminpath.$prefix.$file.$suffix, $targetfolder.DS.'admin'.DS.$prefix.$file.$suffix);
@@ -1232,7 +1232,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		foreach ($sitefiles as $file) {
 			if (!JFile::exists($sitepath.$prefix.$file.$suffix)) {
 				$missing['site'][] = $file;
-				if ($method == 'create')
+				if ($method == 'create') 
 					JFile::copy($refsitepath.'en-GB.'.$file.$suffix, $sitepath.$prefix.$file.$suffix);
 			} else {
 				if ($method == 'zip') {
@@ -1241,18 +1241,18 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				}
 			}
 		}
-
-		if ($method == 'zip')
+		
+		if ($method == 'zip') 
 		{
 			$mailfrom 	= @$params['email']	? $params['email']	: 'emmanuel.danan@gmail.com';
 			$fromname 	= @$params['name'] 	? $params['name'] 	: 'Emmanuel Danan';
 			$website 	= @$params['web'] 	? $params['web'] 	: 'http://www.flexicontent.org';
-
+			
 			// prepare the manifest of the language archive
 			$date = JFactory::getDate();
-
+		
 			$xmlfile = $targetfolder.DS.'install.xml';
-
+			
 			$xml = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 			<install type="language" version="1.5" client="both" method="upgrade">
 			    <name>FLEXIcontent '.$code.'</name>
@@ -1276,11 +1276,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			   ;
 			// save xml manifest
 			JFile::write($xmlfile, $xml);
-
-
+			
+			
 			$fileslist  = JFolder::files($targetfolder, '.', true, true, array('.svn', 'CVS', '.DS_Store'));
 			$archivename = $targetfolder.'.com_flexicontent'. (FLEXI_J16GE ? '.zip' : '.tar.gz');
-
+			
 			echo JText::_('FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE')."<br>";
 			if (!FLEXI_J16GE) {
 				JArchive::create($archivename, $fileslist, 'gz', '', $targetfolder);
@@ -1293,7 +1293,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					$files[$i]['data'] = implode('', file($filename));   // READ contents into string, here we use full path
 					$files[$i]['time'] = time();
 				}
-
+				
 				$packager = JArchive::getAdapter('zip');
 				if (!$packager->create($archivename, $files)) {
 					echo JText::_('FLEXI_OPERATION_FAILED');
@@ -1304,7 +1304,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				}
 			}
 		}
-
+		
 		// messages
 		if ($method == 'zip') {
 			return '<h3 class="lang-success">' . JText::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE_SUCCESS' ) . '</span>';

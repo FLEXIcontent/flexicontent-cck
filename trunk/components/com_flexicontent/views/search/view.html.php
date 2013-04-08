@@ -16,46 +16,52 @@
  * GNU General Public License for more details.
  */
 
-// Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die( 'Restricted access' );
+// no direct access
+defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
+require_once(JPATH_COMPONENT.DS.'helpers'.DS.'search.php' );
 
 /**
- * HTML View class for the FLEXIcontent component
+ * HTML View class for the Search View
  *
- * @static
- * @package		Joomla
- * @subpackage	Weblinks
+ * @package Joomla
+ * @subpackage FLEXIcontent
  * @since 1.0
  */
 class FLEXIcontentViewSearch extends JViewLegacy
 {
-	function display($tpl = null)
+	/**
+	 * Creates the page's display
+	 *
+	 * @since 1.0
+	 */
+	function display( $tpl = null )
 	{
-		jimport( 'joomla.html.parameter' );
-		require_once(JPATH_COMPONENT.DS.'helpers'.DS.'search.php' );
-
-		// Initialize some variables
-		$app       = JFactory::getApplication();
-		$document  = JFactory::getDocument();
-		$db        = JFactory::getDBO();
-		$uri       = JFactory::getURI();
-		$menu      = $app->getMenu()->getActive();
-		$pathway   = $app->getPathway();
+		//initialize variables
+		$app      = JFactory::getApplication();
+		$document = JFactory::getDocument();
+		$db       = JFactory::getDBO();
+		$menus    = $app->getMenu();
+		$menu     = $menus->getActive();
+		$uri      = JFactory::getURI();
+		$pathway  = $app->getPathway();
 		
 		$error	= '';
 		$rows	= null;
 		$total	= 0;
 		
-		// Get some data from model / and from state
+		// Get the COMPONENT only parameters and merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
+		}
+		
+		// Get various data from the model
 		$areas	=  $this->get('areas');
 		$state	=  $this->get('state');
 		$searchword = $state->get('keyword');
-		
-		// Get the COMPONENT only parameters and merge current menu item parameters
-		$params = clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) $params->merge($menu->params);
 		
 		// some parameter shortcuts
 		$canseltypes  = $params->get('canseltypes', 1);
@@ -69,9 +75,16 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		flexicontent_html::loadJQuery();
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/rounded-corners-min.js' );
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js' );
+		
+		//add css file
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
+		}
+		
+		//allow css override
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
 		}
 		
 		
@@ -79,7 +92,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Calculate a page title
 		// **********************
 		
-		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
+		// Verify menu item points to current FLEXIcontent object, IF NOT then clear page title and page class suffix
 		if ( $menu && $menu->query['view'] != 'search' ) {
 			$params->set('page_title',	'');
 			$params->set('pageclass_sfx',	'');
@@ -110,6 +123,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// ************************************************************
 		// Create the document title, by from page title and other data
 		// ************************************************************
+		
 		$doc_title = $params->get( 'page_title' );
 		
 		// Check and prepend or append site name
@@ -130,12 +144,13 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// ************************
 		// Set document's META tags
 		// ************************
+		
 		// ** writting both old and new way as an example
 		if (!FLEXI_J16GE) {
 			if ($app->getCfg('MetaTitle') == '1') 	$app->addMetaTag('title', $params->get('page_title'));
 		} else {
 			if ($app->getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
-		}		
+		}
 		
 		
 		// ***************************************************************
@@ -399,7 +414,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		{
 			$results	= $this->get('data' );
 			$total		= $this->get('total');
-			$pagination	= $this->get('pagination');
+			$pageNav  = $this->get('pagination');
 
 			//require_once (JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
@@ -482,22 +497,22 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		}
 		
 		
-		$print_link = JRoute::_('&pop=1&tmpl=component&print=1');
+		$print_link = JRoute::_('index.php?view=search&pop=1&tmpl=component&print=1');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('print_link',    $print_link);
-		$this->assignRef('pageclass_sfx', $pageclass_sfx);
-		$this->assignRef('pageNav',   $pagination);
+		$this->assignRef('print_link',$print_link);
 		$this->assignRef('filters',   $fields_filter);
 		$this->assignRef('results',   $results);
 		$this->assignRef('lists',     $lists);
 		$this->assignRef('params',    $params);
+		$this->assignRef('pageNav',   $pageNav);
+		$this->assignRef('pageclass_sfx', $pageclass_sfx);
 
 		$this->assign('ordering',     $state->get('ordering'));
 		$this->assign('searchword',   $searchword);
 		$this->assign('searchphrase', $state->get('match'));
 		$this->assign('searchareas',  $areas);
-
+		
 		$this->assign('total',  $total);
 		$this->assign('error',  $error);
 		$this->assign('action', $uri->toString());
@@ -511,3 +526,4 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 }
+?>

@@ -71,13 +71,13 @@ if ($leadnum) :
 			<?php if ($this->params->get('show_editbutton', 0)) : ?>
 				<?php $editbutton = flexicontent_html::editbutton( $items[$i], $this->params ); ?>
 				<?php if ($editbutton) : ?>
-					<div style="float:left;"><?php echo $editbutton;?></div>
+					<div class="fc_edit_link"><?php echo $editbutton;?></div>
 				<?php endif; ?>
 			<?php endif; ?>
 					
 			<?php if ($this->params->get('show_comments_count')) : ?>
 				<?php if ( isset($this->comments[ $items[$i]->id ]->total) ) : ?>
-					<div style="float:left;" class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
+					<div class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
 						<?php echo $this->comments[ $items[$i]->id ]->total; ?>
 					</div>
 				<?php endif; ?>

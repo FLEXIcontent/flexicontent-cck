@@ -181,53 +181,61 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
 		
-		// Select only items user has access to if he is not allowed to show unauthorized items
+		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		$subjoin = $suband = $join = $and = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$suband	= ' AND i.access IN ('.$aid_list.') AND cc.access IN ('.$aid_list.')';
-				$and		= ' AND c.access IN ('.$aid_list.')';
+				$suband .= ' AND ty.access IN ('.$aid_list.')';
+				$suband .= ' AND cc.access IN ('.$aid_list.')';
+				$suband .= ' AND i.access IN ('.$aid_list.')';
+				$and    .= ' AND c.access IN ('.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
-					$subjoin  = ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
+					$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgt ON ty.id = sgt.axo AND sgt.aco = "read" AND sgt.axosection = "type"';
+					$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
 					$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgi ON i.id = sgi.axo AND sgi.aco = "read" AND sgi.axosection = "item"';
-					$suband   = ' AND (sgc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. $aid . ')';
+					$suband  .= ' AND (sgt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+					$suband  .= ' AND (sgc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. $aid . ')';
 					$suband  .= ' AND (sgi.aro IN ( '.$user->gmid.' ) OR i.access <= '. $aid . ')';
-					$join     = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$and      = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
+					$join    .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$and     .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
 				} else {
-					$suband   = ' AND cc.access <= '.$aid.' AND i.access <= '.$aid;
-					$and      = ' AND c.access <= '.$aid;
+					$suband  .= ' AND ty.access <= '.$aid;
+					$suband  .= ' AND cc.access <= '.$aid;
+					$suband  .= ' AND i.access <= '.$aid;
+					$and     .= ' AND c.access <= '.$aid;
 				}
 			}
 		}
 		$join .= (FLEXI_J16GE ? ' LEFT JOIN #__users AS u ON u.id = c.created_user_id' : '');
 
 		$query = 'SELECT c.*,'
-				. (FLEXI_J16GE ? ' u.name as author,' : '')
-				. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug,'
-					. ' ('
-					. ' SELECT COUNT( DISTINCT i.id )'
-					. ' FROM #__content AS i'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-					. ' LEFT JOIN #__categories AS cc ON cc.id = rel.catid'
-					. $subjoin
-					. $where
-					. $suband
-					. ')' 
-					. ' AS assigneditems'
-				. ' FROM #__categories AS c'
-				. $join
-				. ' WHERE c.published = 1'
-				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
-				. (!$this->_rootcat ? '' : ' AND c.parent_id = '. (int)$this->_rootcat)
-				. $and
-				. $orderby
-				;
+			. (FLEXI_J16GE ? ' u.name as author,' : '')
+			. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug,'
+			
+			. ' ('
+			. ' SELECT COUNT( DISTINCT i.id )'
+			. ' FROM #__content AS i'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			. ' JOIN #__categories AS cc ON cc.id = rel.catid'
+			. $subjoin
+			. $where
+			. $suband
+			. ') AS assigneditems'
+			
+			. ' FROM #__categories AS c'
+			. $join
+			. ' WHERE c.published = 1'
+			. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
+			. (!$this->_rootcat ? ' AND c.parent_id = '.(FLEXI_J16GE ? 1 : 0) : ' AND c.parent_id = '. (int)$this->_rootcat)
+			. $and
+			. $orderby
+			;
 		return $query;
 	}
 
@@ -270,7 +278,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				. $join
 				. ' WHERE c.published = 1'
 				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
-				. ' AND c.parent_id = ' . $this->_rootcat
+				. (!$this->_rootcat ? ' AND c.parent_id = '.(FLEXI_J16GE ? 1 : 0) : ' AND c.parent_id = '. (int)$this->_rootcat)
 				. $and
 				;
 
@@ -294,6 +302,24 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 		return $this->_total;
 	}
+	
+	
+	/**
+	 * Method to get a pagination object
+	 *
+	 * @access public
+	 * @return integer
+	 */
+	public function getPagination() {
+		// Load the content if it doesn't already exist
+		if (empty($this->_pagination)) {
+			//jimport('joomla.html.pagination');
+			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
+			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+		}
+		return $this->_pagination;
+	}
+	
 	
 	/**
 	 * Method to fetch the subcategories
@@ -327,60 +353,67 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
 		
-		// Select only items user has access to if he is not allowed to show unauthorized items
+		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		$subjoin = $suband = $join = $and = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$suband	= ' AND i.access IN ('.$aid_list.') AND cc.access IN ('.$aid_list.')';
-				$and		= ' AND c.access IN ('.$aid_list.')';
+				$suband .= ' AND ty.access IN ('.$aid_list.')';
+				$suband .= ' AND cc.access IN ('.$aid_list.')';
+				$suband .= ' AND i.access IN ('.$aid_list.')';
+				$and    .= ' AND c.access IN ('.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
-					$subjoin  = ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
+					$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgt ON ty.id = sgt.axo AND sgt.aco = "read" AND sgt.axosection = "type"';
+					$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgc ON cc.id = sgc.axo AND sgc.aco = "read" AND sgc.axosection = "category"';
 					$subjoin .= ' LEFT JOIN #__flexiaccess_acl AS sgi ON i.id = sgi.axo AND sgi.aco = "read" AND sgi.axosection = "item"';
-					$suband	  = ' AND (sgc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. $aid . ')';
+					$suband  .= ' AND (sgt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+					$suband  .= ' AND (sgc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. $aid . ')';
 					$suband  .= ' AND (sgi.aro IN ( '.$user->gmid.' ) OR i.access <= '. $aid . ')';
-					$join  	  = ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$and	  = ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
+					$join    .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$and     .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
 				} else {
-					$suband   = ' AND cc.access <= '.$aid;
+					$suband  .= ' AND ty.access <= '.$aid;
+					$suband  .= ' AND cc.access <= '.$aid;
 					$suband  .= ' AND i.access <= '.$aid;
-					$and   	  = ' AND c.access <= '.$aid;
+					$and     .= ' AND c.access <= '.$aid;
 				}
 			}
 		}
 
 		$query = 'SELECT c.*,'
-				. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug,'
-					. ' ('
-					. ' SELECT COUNT( DISTINCT i.id )'
-					. ' FROM #__content AS i'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-					. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-					. ' LEFT JOIN #__categories AS cc ON cc.id = rel.catid'
-					. $subjoin
-					. $where
-					. $suband
-					. ')' 
-					. ' AS assignedsubitems,'
-					. ' ('
-					. ' SELECT COUNT( sc.id )'
-					. ' FROM #__categories AS sc'
-					. ' WHERE c.id = sc.parent_id'
-					. ' AND sc.published = 1'
-					. ')' 
-					. ' AS assignedcats'
-				. ' FROM #__categories AS c'
-				. $join
-				. ' WHERE c.published = 1'
-				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
-				. ' AND c.parent_id = '.(int)$id
-				. $and
-				. $orderby
-				;
-
+			. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug,'
+			
+			. ' ('
+			. ' SELECT COUNT( DISTINCT i.id )'
+			. ' FROM #__content AS i'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			. ' JOIN #__categories AS cc ON cc.id = rel.catid'
+			. $subjoin
+			. $where
+			. $suband
+			. ' ) AS assignedsubitems,'
+			
+			. ' ('
+			. ' SELECT COUNT( sc.id )'
+			. ' FROM #__categories AS sc'
+			. ' WHERE c.id = sc.parent_id'
+			. ' AND sc.published = 1'
+			. ' ) AS assignedcats'
+			
+			. ' FROM #__categories AS c'
+			. $join
+			. ' WHERE c.published = 1'
+			. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
+			. ' AND c.parent_id = '.(int)$id
+			. $and
+			. $orderby
+			;
+		
 		$this->_db->setQuery($query);
 		$this->_subs = $this->_db->loadObjectList();
 

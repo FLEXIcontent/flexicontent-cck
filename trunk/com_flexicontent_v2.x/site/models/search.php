@@ -170,7 +170,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	
 	
 	/**
-	 * Method to get a pagination object of the weblink items for the category
+	 * Method to get a pagination object
 	 *
 	 * @access public
 	 * @return integer

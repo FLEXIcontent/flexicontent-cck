@@ -257,7 +257,7 @@ window.addEvent('domready', function() {
 				<?php echo $this->lists['extdata']; ?>
 				<?php
 					$types = & $this->get( 'Typeslist' );
-					echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"');
+					echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"', 'typeid');
 				?>
 				<br/>
 				<?php echo JText::_( 'FLEXI_DEFAULT_CAT_FOR_NO_CAT_ITEMS' ).': '.$this->lists['default_cat']; ?>

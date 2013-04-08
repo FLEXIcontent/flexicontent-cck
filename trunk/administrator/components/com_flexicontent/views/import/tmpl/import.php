@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -23,7 +23,7 @@ $document = JFactory::getDocument();
 $document->addStyleDeclaration($css);
 
 ?>
-<script>
+<script type="text/javascript">
 <?php if (FLEXI_J16GE) echo "Joomla.submitform = "; ?>
 
 function submitbutton(task) {
@@ -36,7 +36,7 @@ function submitbutton(task) {
 		$("type_id").focus();
 		return;
 	}
-	
+
 	radio_ischecked = 0;
 	for (i = 0; i < document.getElementsByName('language').length; i++) {
 		if (document.getElementsByName('language')[i].checked) {
@@ -58,7 +58,7 @@ function submitbutton(task) {
 		alert("Please select item state.");
 		return;
 	}
-	
+
 	if( $("maincat").value.length<=0 && !$("maincat_col").checked ) {
 		alert("Please select a primary category or select to use 'catid' column");
 		$("maincat").focus();
@@ -100,7 +100,7 @@ function submitbutton(task) {
 						<td class="key"><label class="fcimport" for="ignore_unused_columns">Ignore unused columns</label></td>
 						<td><input type="checkbox" id="ignore_unused_columns" name="ignore_unused_columns" value="1" /> &nbsp; (Enable this if you have redudant columns. <b>NORMALLY:</b> columns must be (a) <b>item properties</b> or (b) <b>field names</b></td>
 					</tr>
-					
+
 					<tr valign="top">
 						<td class="key"> &nbsp; </td>
 						<td>-------------------------------</td>
@@ -113,7 +113,7 @@ function submitbutton(task) {
 						<td class="key"> &nbsp; </td>
 						<td>-------------------------------</td>
 					</tr>
-					
+
 					<tr valign="top">
 						<td class="key"><label class="fcimport" for="id_col">Custom ITEM 'id'</label></td>
 						<td><input type="checkbox" id="id_col" name="id_col" value="1" /> &nbsp; (ID of newly created items will be updated to match the 'id' column. ALL item ids of the column are checked if they already exist, before first item creation is done</td>

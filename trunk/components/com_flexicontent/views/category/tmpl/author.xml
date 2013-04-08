@@ -61,7 +61,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level2" />
 			<field name="show_icons" type="list" default="" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_TEXT</option>
@@ -96,7 +96,7 @@
 			</field>
 			<field name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" />
 			<field name="show_description_image" type="list" default="" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
@@ -121,7 +121,7 @@
 			<field name="cat_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="cat_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
-			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" />
 			<field name="show_description" type="list" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
@@ -139,7 +139,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_label_subcats" type="list" default="" label="FLEXI_SHOW_SUBCATS_LABEL" description="FLEXI_SHOW_SUBCATS_LABEL_DESC" menu="hide" >
+			<field name="show_label_subcats" type="list" default="" label="FLEXI_SHOW_SUBCATS_LABEL" description="FLEXI_SHOW_SUBCATS_LABEL_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -156,7 +156,7 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER_CAT</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" />
 			<field name="show_description_image_subcat" type="list" default="" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
@@ -181,7 +181,7 @@
 			<field name="subcat_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<field name="subcat_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
-			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" />
 			<field name="show_description_subcat" type="list" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
@@ -207,7 +207,7 @@
 		<field name="" type="jparamstab" description="FLEXI_PARAMETERS_CAT_ITEMS_LIST_OVERRIDE" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_LIST" description="FLEXI_ITEMS_LIST_DESC" level="level2" />
-			<!--field name="show_addbutton" type="list" default="" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_LIST_BUTTON_DESC" menu="hide" >
+			<!--field name="show_addbutton" type="list" default="" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_LIST_BUTTON_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
@@ -368,6 +368,11 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="compact_search_with_filters" type="list" default="" label="FLEXI_COMPACT_SEARCH_FILTERS_AREA" description="FLEXI_COMPACT_SEARCH_FILTERS_AREA_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="disable_filter_autosubmit" type="radio" default="" label="FLEXI_DISABLE_FILTER_AUTO_SUBMIT" description="FLEXI_DISABLE_FILTER_AUTO_SUBMIT_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

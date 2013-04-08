@@ -252,18 +252,22 @@ class plgSearchFlexisearch extends JPlugin
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$andaccess .= 'AND a.access IN ('.$aid_list.') ';
-				$andaccess .= 'AND c.access IN ('.$aid_list.') ';
+				$andaccess .= 'AND ty.access IN ('.$aid_list.') ';
+				$andaccess .= 'AND  c.access IN ('.$aid_list.') ';
+				$andaccess .= 'AND  a.access IN ('.$aid_list.') ';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON a.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $aid . ')';
-					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR a.access <= '. (int) $aid . ')';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  a.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+					$andaccess	.= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ')';
+					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ')';
+					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  a.access <= '. (int) $aid . ')';
 				} else {
-					$andaccess  .= ' AND c.access <= '.$aid;
-					$andaccess  .= ' AND a.access <= '.$aid;
+					$andaccess  .= ' AND ty.access <= '.$aid;
+					$andaccess  .= ' AND  c.access <= '.$aid;
+					$andaccess  .= ' AND  a.access <= '.$aid;
 				}
 			}
 		}
@@ -295,11 +299,14 @@ class plgSearchFlexisearch extends JPlugin
 				.' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS catslug,'
 				.' "2" AS browsernav'
 				.' FROM #__content AS a'
-				.' LEFT JOIN #__flexicontent_items_ext AS ie ON a.id = ie.item_id'
+				.' JOIN #__categories AS c ON a.catid = c.id'
+				.' JOIN #__flexicontent_items_ext AS ie ON a.id = ie.item_id'
+				.' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+				// searching into text-like fields
 				.' LEFT JOIN #__flexicontent_fields_item_relations AS fir ON a.id = fir.item_id'
-				.' LEFT JOIN #__categories AS c ON a.catid = c.id'
-				.' LEFT JOIN #__flexicontent_tags_item_relations AS tir ON a.id = tir.itemid'
 				.' LEFT JOIN #__flexicontent_fields AS f ON fir.field_id = f.id'
+				// searching into 'tags' field
+				.' LEFT JOIN #__flexicontent_tags_item_relations AS tir ON a.id = tir.itemid'
 				.' LEFT JOIN #__flexicontent_tags AS t ON tir.tid = t.id	'
 				. $joinaccess
 				.' WHERE ( '.$where.' ) '

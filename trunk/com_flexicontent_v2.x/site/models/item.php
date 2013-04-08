@@ -105,7 +105,11 @@ class FlexicontentModelItem extends ParentClassItem
 			} else if ($user->gid >= 25) {
 				$canviewitem = true;
 			} else {
-				$canviewitem = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;
+				//$has_item_access = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'item', $this->_item->id) : $this->_item->access <= $aid;
+				//$has_mcat_access = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_item->catid) : $this->_item->category_access <= $aid;
+				//$has_type_access = ... must do SQL query, because No FLEXIaccess support via checkAllItemReadAccess() function
+				//$canviewitem = $has_item_access && $has_type_access && $has_mcat_access;
+				$canviewitem = $item->has_item_access && (!$item->catid || $item->has_mcat_access) && (!$item->type_id || $item->has_type_access);
 			}
 			
 			
@@ -120,7 +124,7 @@ class FlexicontentModelItem extends ParentClassItem
 			{
 				// cid is set, check state of current item category only
 				// NOTE:  J1.6+ all ancestor categories from current one to the root, for J1.5 only the current one ($cid)
-				$cats_are_published = FLEXI_J16GE ? $this->_item->ancestor_cats_published : $globalcats[$cid]->published;
+				$cats_are_published = FLEXI_J16GE ? $this->_item->ancestor_cats_published : $this->_item->catpublished;
 				$cats_np_err_mssg = JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_CURRCAT_UNPUBLISHED', $cid);
 			}
 			else
@@ -264,13 +268,15 @@ class FlexicontentModelItem extends ParentClassItem
 					JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
 					$app->redirect( $url );
 				} else {
+					$msg  = JText::_( 'FLEXI_ALERTNOTAUTH_VIEW');
+					$msg .= $item->type_id && !$item->has_type_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_TYPE") : '';
+					$msg .= $item->catid   && !$item->has_mcat_access ? "<br/>".JText::_("FLEXI_ALERTNOTAUTH_VIEW_MCAT") : '';
 					if ($cparams->get('unauthorized_page', '')) {
 						// (d) redirect unauthorized logged user to the unauthorized page (if this is set)
-						JError::raiseNotice( 403, JText::_("FLEXI_ALERTNOTAUTH_VIEW"));
+						JError::raiseNotice( 403, $msg);
 						$app->redirect($cparams->get('unauthorized_page'));				
 					} else {
 						// (e) finally raise a 403 forbidden Server Error if user is unauthorized to access item
-						$msg = JText::_( 'FLEXI_ALERTNOTAUTH_VIEW');
 						if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 					}
 				}

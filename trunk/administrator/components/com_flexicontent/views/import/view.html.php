@@ -85,7 +85,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$db->setQuery($query);
 		$types = $db->loadObjectList();
 		
-		$lists['type_id'] = flexicontent_html::buildtypesselect($types, 'type_id', '', true, 'class="inputbox" size="1"');
+		$lists['type_id'] = flexicontent_html::buildtypesselect($types, 'type_id', '', true, 'class="inputbox" size="1"', 'type_id');
 
 		$categories = $globalcats;
 		

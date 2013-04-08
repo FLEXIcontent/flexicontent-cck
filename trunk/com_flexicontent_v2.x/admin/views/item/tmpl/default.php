@@ -531,9 +531,10 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 					<!--table class="admintable" width="100%"-->
 						<?php
 						$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
-
-						foreach ($this->fields as $field) {
-
+						
+						$row_k = 0;
+						foreach ($this->fields as $field)
+						{
 							// SKIP backend hidden fields from this listing
 							if (
 								($field->iscore && $field->field_type!='maintext')  ||
@@ -557,19 +558,23 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 								echo $field->html;
 								continue;
 							endif;
-
+							
+							$row_k = 1 - $row_k;
 							$width = $field->parameters->get('container_width', '' );
 							if ($width)  $width = 'width:' .$width. ($width != (int)$width ? 'px' : '');
 						?>
 							<!--tr-->
 								<!--td class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'-->
-									<div class='clear' style='display:block; float:left; clear:both!important'></div>
+									<div class='fcclear'></div>
 
 									<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
 										<?php echo $field->label; ?>
 									</label>
 
-									<div style="float:left!important; padding:0px!important; margin:0px!important; <?php echo $width; ?>;">
+									<div style="<?php echo $width; ?>;" class="fcfield_row<?php echo $row_k;?> container_fcfield
+										container_fcfield_id_<?php echo $field->id;?> container_fcfield_name_<?php echo $field->name;?>"
+									>
+									
 										<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>
 
 								<?php	if ($field->field_type=='maintext' && isset($this->row->item_translations) ) : ?>

@@ -100,17 +100,17 @@ div .button2-left {	margin:-2px 4px 2px 0px; }
 .centerimg {
 	display: block;
 	text-align: center;
-    margin-top: 20px;
-    margin-bottom: 0px;
-    padding: 0px;
-    height: 30px;
+	margin-top: 20px;
+	margin-bottom: 0px;
+	padding: 0px;
+	height: 30px;
 }
 .spinner {
 	display: block;
-    margin-top: 20px;
-    margin-bottom: 0px;
-    padding: 0px;
-    height: 30px;
+	margin-top: 20px;
+	margin-bottom: 0px;
+	padding: 0px;
+	height: 30px;
 }
 .lang-success {
 	color: green;
@@ -602,10 +602,10 @@ div#tags #input_new_tag {
 .qf_tagbox {
 	display: block !important;
 	max-height: 170px !important;
-  	overflow: auto !important;
-  	border: 1px dashed silver !important;
-  	background: #fff !important;
-  	margin: 0px 4px 4px 0px !important;
+	overflow: auto !important;
+	border: 1px dashed silver !important;
+	background: #fff !important;
+	margin: 0px 4px 4px 0px !important;
 }
 
 .qf_tagidbox {
@@ -621,9 +621,9 @@ div#tags #input_new_tag {
 
 .qf_centerimg {
 	text-align: center !important;
-    margin-top: 0px !important;
-    margin-bottom: 0px !important;
-    padding: 0px !important;
+	margin-top: 0px !important;
+	margin-bottom: 0px !important;
+	padding: 0px !important;
 }
 
 .flexicontent .clear,
@@ -721,6 +721,7 @@ div label.lang_box {
 	text-decoration:none!important; border:1px solid darkred;
 }
 #flexicontent .fcfield-button { margin-left:6px!important; }
+#flexicontent .fcfield-drag {	float:none; margin:0px; padding:0px; }
 #flexicontent .fcfield-drag img { margin:2px 4px -3px 6px !important; cursor: move!important; float: none!important; display: inline!important; }
 #flexicontent .fcfield-row img.calendar { margin:0px 0px 0px 2px !important; }
 
@@ -837,7 +838,8 @@ div.flexi_box_right {
 .fc_mini_note_box {
 	font-size: 11px;
 	background-color: lightyellow;
-	border: 1px dashed gray;
+	border: 1px solid lightgray;
+	border-radius: 6px;
 	width: auto;
 	padding: 2px 2%;
 	margin: 1px 8px;
@@ -915,5 +917,37 @@ div#cpanel div.icon  a {
 	text-decoration:none;
 }
 
+
+ul.thumbnails.image_picker_selector { clear: both; overflow:auto; margin:8px 0px 2px 0px!important; }
+ul.thumbnails.image_picker_selector li {
+	float:left !important; clear:none !important; margin:0px 4px 4px 0px !important;
+}
+ul.thumbnails.image_picker_selector li div.thumbnail {  float:left;  }
+ul.thumbnails.image_picker_selector li div.thumbnail img {
+	float: left; border:1px solid lightgray;
+	padding:0px!important; margin:4px!important; 
+}
+ul.thumbnails.image_picker_selector li div.thumbnail p {
+	float: left; clear:both;
+	padding:0px!important; margin:0px!important;
+}
+
+.fckey_high { color:darkred !important; }
+.container_fcfield { float:left!important;  padding:0px!important;  margin:0px!important; }
+.container_fcfield.fcfield_row0 {}
+.container_fcfield.fcfield_row1 {}
+
+#flexicontent .fcclear,
+#flexicontent .clear {
+	border: 0;
+	clear: both;
+	float: none;
+	font-size: 1px;
+	height: 0;
+	line-height: 1px;
+	margin: 0;
+	padding: 0;
+	visibility: hidden;
+}
 
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/

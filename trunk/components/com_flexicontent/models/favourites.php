@@ -170,6 +170,24 @@ class FlexicontentModelFavourites extends JModelLegacy
 		return $this->_total;
 	}
 	
+	
+	/**
+	 * Method to get the pagination object
+	 *
+	 * @access	public
+	 * @return	string
+	 */
+	public function getPagination() {
+		// Load the content if it doesn't already exist
+		if (empty($this->_pagination)) {
+			//jimport('joomla.html.pagination');
+			require_once (JPATH_COMPONENT.DS.'helpers'.DS.'pagination.php');
+			$this->_pagination = new FCPagination($this->getTotal(), $this->getState('limitstart'), $this->getState('limit') );
+		}
+		return $this->_pagination;
+	}
+	
+	
 	/**
 	 * Method to build the query
 	 *
@@ -198,29 +216,31 @@ class FlexicontentModelFavourites extends JModelLegacy
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 		
-		// Select only items user has access to if he is not allowed to show unauthorized items
+		// Select only items that user has view access, if listing of unauthorized content is not enabled
+		$joinaccess	 = '';
+		$andaccess   = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$andaccess = ' AND i.access IN ('.$aid_list.') AND mc.access IN ('.$aid_list.')';
-				$joinaccess	= '';
+				$andaccess .= ' AND ty.access IN ('.$aid_list.')';
+				$andaccess .= ' AND  c.access IN ('.$aid_list.')';
+				$andaccess .= ' AND  i.access IN ('.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
-					$joinaccess  = ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
 					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$andaccess	 = ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
-					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. $aid . ')';
+					$andaccess	.= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
+					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
 				} else {
-					$joinaccess	 = '';
-					$andaccess   = ' AND mc.access <= '.$aid;
-					$andaccess  .= ' AND i.access <= '.$aid;
+					$andaccess  .= ' AND ty.access <= '.$aid;
+					$andaccess  .= ' AND  c.access <= '.$aid;
+					$andaccess  .= ' AND  i.access <= '.$aid;
 				}
 			}
-		} else {
-			$joinaccess	 = '';
-			$andaccess   = '';
 		}
 
 		// Get the WHERE and ORDER BY clauses for the query
@@ -238,11 +258,10 @@ class FlexicontentModelFavourites extends JModelLegacy
 			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 			. ' FROM #__content AS i'
-			. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-			. ' INNER JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id'
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-			. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-			. ' LEFT JOIN #__categories AS mc ON mc.id = i.catid'
+			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id'
+			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			. ' JOIN #__categories AS c ON c.id = i.catid'
 			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			//. $join_image
 			. $field_item

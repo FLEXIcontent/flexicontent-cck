@@ -212,12 +212,30 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			if ( $print_logging_info )  $start_microtime = microtime(true);
 			// Load the content if it doesn't already exist
-			$query = $this->_buildQuery();
-
-			$this->_total = $this->_getListCount($query);
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
-			if ((int)$this->getState('limitstart') < (int)$this->_total) {
+			// 1, get filtered, limited, ordered items
+			$query = $this->_buildQuery();
+			//print_r($query); 
+			$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
+			$rows = $this->_db->loadObjectList();
+			
+			// 2, get current items total for pagination
+			// *** CANNOT USE FOUND_ROWS() because Joom!Fish or Falang will interfer bye 
+			//$this->_db->setQuery("SELECT FOUND_ROWS()");
+			//$this->_total = $this->_db->loadResult();
+			if (!$this->_total)  // Retry in case something interfered
+				$this->_total = $this->_getListCount($query);
+			
+			// 3, get item ids
+			$query_ids = array();
+			foreach ($rows as $row) {
+				$query_ids[] = $row->id;
+			}
+
+			//$this->_total = $this->_getListCount($query);
+			//if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+			
+			/*if ((int)$this->getState('limitstart') < (int)$this->_total) {
 				$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
 			} else {
 				$this->setState('limitstart',0);
@@ -225,7 +243,22 @@ class FlexicontentModelCategory extends JModelLegacy {
 				JRequest::setVar('start',0);
 				JRequest::setVar('limitstart',0);
 				$this->_data = $this->_getList( $query, 0, $this->getState('limit') );
+			}*/
+			
+			// 4, get item data
+			if (count($query_ids)) $query = $this->_buildQuery($query_ids);
+			$_data = array();
+			if (count($query_ids)) {
+				$this->_db->setQuery($query);
+				$_data = $this->_db->loadObjectList('id');
 			}
+			
+			// 5, reorder items
+			$this->_data = array();
+			foreach($query_ids as $item_id) {
+				$this->_data[] = $_data[$item_id];
+			}
+			
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
 			if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -254,7 +287,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	
 	
 	/**
-	 * Method to get the category pagination
+	 * Method to get the pagination object
 	 *
 	 * @access	public
 	 * @return	string
@@ -288,53 +321,65 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access public
 	 * @return string
 	 */
-	function _buildQuery()
+	function _buildQuery( $query_ids=false )
 	{
-		static $query = null;
-		if ( $query!==null ) return $query;
+		//static $query = null;
+		//if ( $query!==null ) return $query;
+		$cparams  = $this->_params;
 		
 		// Get the WHERE and ORDER BY clauses for the query
-		$where   = $this->_buildItemWhere();
-		$orderby = $this->_buildItemOrderBy();
-		$cparams  = $this->_params;
-
-		// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
-		$order_field_join = '';
-		if ($cparams->get('orderbycustomfieldid', 0) != 0) {
-			$order_field_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$cparams->get('orderbycustomfieldid', 0);
+		$fromjoin = $this->_buildItemFromJoin();
+		
+		if ( !$query_ids ) {
+			// Create where and orderby
+			$where   = $this->_buildItemWhere();
+			$orderby = $this->_buildItemOrderBy();
+			
+			// Create JOIN (and select column) of image field used as item image in RSS feed
+			$feed_image_source = JRequest::getCmd("type", "") == "rss"  ?  (int) $cparams->get('feed_image_source', 0)  :  0;
+			if ($feed_image_source) {
+				$feed_img_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS img ON img.item_id = i.id AND img.field_id='.$feed_image_source;
+				$feed_img_col = ', img.value as image';
+			}
+			
+			// Create JOIN for ordering items by a custom field
+			$orderbycustomfieldid = $cparams->get('orderbycustomfieldid', 0);
+			if ($orderbycustomfieldid) {
+				$order_field_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$cparams->get('orderbycustomfieldid', 0);
+			}
 		}
 		
-		// Add image field used as item image in RSS feed
-		$feed_image_source = 0;
-		if (JRequest::getCmd("type", "") == "rss") {
-			$feed_image_source = (int) $cparams->get('feed_image_source', '');
-		}
-		$feed_img_join= '';
-		$feed_img_col = '';
-		if ($feed_image_source) {
-			$feed_img_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS img ON img.item_id = i.id AND img.field_id='.$feed_image_source;
-			$feed_img_col = ' img.value as image,';
+		if ( !$query_ids ) {
+			$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id ';
+		} else {
+			$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
+				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+				. @$feed_img_col      // optional
+				;
 		}
 		
-		$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename,'.$feed_img_col 
-		. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-		. ' FROM #__content AS i'
-		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-		. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		. $feed_img_join
-		. $order_field_join
-		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
-		. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-		. $where
-		. ' GROUP BY i.id '
-		. $orderby
-		;
+		$query .= $fromjoin;
+		
+		if ( $query_ids ) {
+			$query .= ""
+				. @$feed_img_join      // optional
+				. @$order_field_join   // optional
+				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
+				//. ' GROUP BY i.id'
+				;
+		} else {
+			$query .= ""
+			. $where
+			//. ' GROUP BY i.id '
+			. $orderby
+			;
+		}
 		
 		return $query;
 	}
-
+	
+	
 	/**
 	 * Retrieve author item
 	 *
@@ -347,16 +392,16 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if (!$authordescr_itemid) return false;
 		
 		$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
-		. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-		. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-		. ' FROM #__content AS i'
-		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-		. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
-		. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-		.  ' WHERE i.id='. $authordescr_itemid
-		;
+			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+			. ' FROM #__content AS i'
+			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			//. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' JOIN #__categories AS c ON c.id = i.catid'
+			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+			. ' WHERE i.id='. $authordescr_itemid
+			;
 		
 		$this->_db->setQuery($query);
 		$authorItem = $this->_db->loadObject();
@@ -383,27 +428,27 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$show_noauth = $cparams->get('show_noauth', 0);   // show unauthorized items
 		$display_subcats = $cparams->get('display_subcategories_items', 0);   // include subcategory items
 		
-		// filter by permissions
+		// Select only categories that user has view access, if listing of unauthorized content is not enabled
+		$joinaccess = '';
+		$andaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$andaccess = ' AND c.access IN ('.$aid_list.')';
+				$andaccess .= ' AND c.access IN ('.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
-					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-					if (isset($readperms['category']) && count($readperms['category']) ) {
-						$andaccess = ' AND ( c.access <= '.$aid.' OR c.id IN ('.implode(",", $readperms['category']).') )';
-					} else {
-						$andaccess = ' AND c.access <= '.$aid;
-					}
+					//$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+					//$andaccess .= ( isset($readperms['category']) && count($readperms['category']) ) ?
+					//	' AND ( c.access <= '.$aid.' OR c.id IN ('.implode(",", $readperms['category']).') )' :
+					//	' AND c.access <= '.$aid ;
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$andaccess  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
 				} else {
-					$andaccess = ' AND c.access <= '.$aid;
+					$andaccess  .= ' AND c.access <= '.$aid;
 				}
 			}
-		} else {
-			$andaccess = '';
 		}
 		
 		// Calculate categories to use for retrieving items
@@ -433,6 +478,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// NOTE: this query is not just needed to get 1st level subcats, but it always needed TO ALSO CHECK the ACCESS LEVEL
 		$query = 'SELECT c.id'
 			. ' FROM #__categories AS c'
+			. $joinaccess
 			. ' WHERE c.published = 1'
 			. $andaccess
 			. $anddepth
@@ -489,6 +535,29 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$cat_tbl_alias = 'c', $user_tbl_alias = 'u',
 			$default_order, $default_order_dir
 		);
+	}
+	
+	
+	/**
+	 * Method to build the WHERE clause
+	 *
+	 * @access private
+	 * @return array
+	 */
+	function _buildItemFromJoin()
+	{
+		$fromjoin = ''
+			. ' FROM #__content AS i'
+			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' JOIN #__categories AS c ON c.id = i.catid'
+			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"' : '')
+			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '')
+			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '')
+			;
+		return $fromjoin;
 	}
 	
 	
@@ -559,39 +628,42 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
 
-		// Select only items user has access view, if showing unauthorized items is not enabled
+		// Select only items that user has view access, if listing of unauthorized content is not enabled
+		// Checking item, category, content type access levels
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				// item access and content type access
-				$where .= ' AND i.access IN ('.$aid_list.')';
 				$where .= ' AND ty.access IN ('.$aid_list.')';
+				$where .= ' AND  c.access IN ('.$aid_list.')';
+				$where .= ' AND  i.access IN ('.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
+				$where   .= ' AND ( i.created_by = '.$user->id.' OR ( 1 ';
+				//$where .= ' AND ( i.created_by = '.$user->id.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) OR ( 1 ';
 				if (FLEXI_ACCESS) {
-					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-					// item access
-					if ( isset($readperms['item']) && count($readperms['item']) ) {
-						$where .= ' AND ( i.access <= '.$aid.' OR i.id IN ('.implode(",", $readperms['item']).') OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-					} else {
-						$where .= ' AND ( i.access <= '.$aid.' OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-					}
-					// content type access
-					if ( isset($readperms['type']) && count($readperms['type']) ) {
-						$where .= ' AND ( ty.access <= '.$aid.' OR ty.id IN ('.implode(",", $readperms['type']).') )';
-					} else {
-						$where .= ' AND ( ty.access <= '.$aid.' )';
-					}
-					
+					//$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+					//$where .= ( isset($readperms['type']) && count($readperms['type']) ) ?
+					//	' AND ( ty.access <= '.$aid.' OR ty.id IN ('.implode(",", $readperms['type']).') )';
+					//	' AND ty.access <= '.$aid;
+					//$where .= ( isset($readperms['category']) && count($readperms['category']) ) ?
+					//	' AND (  c.access <= '.$aid.' OR  c.id IN ('.implode(",", $readperms['category']).') )';
+					//	' AND  c.access <= '.$aid;
+					//$where .= ( isset($readperms['item']) && count($readperms['item']) ) ?
+					//	' AND ( i.access <= '.$aid.' OR i.id IN ('.implode(",", $readperms['item']).') )' :
+					//	' AND i.access <= '.$aid ;
+					$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
+					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
 				} else {
-					// item access and content type access
-					$where .= ' AND ( i.access <= '.$aid.' OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-					$where .= ' AND ( ty.access <= '.$aid.' )';
+					$where .= ' AND ty.access <= '.$aid;
+					$where .= ' AND  c.access <= '.$aid;
+					$where .= ' AND  i.access <= '.$aid;
 				}
+				$where .= ') )';
 			}
 		}
-
+		
 		// Get session
 		$session  = JFactory::getSession();
 		
@@ -793,27 +865,27 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$cparams = $this->_params;
 		$show_noauth = $cparams->get('show_noauth', 0);
 		
-		// AND-WHERE clause : filter by permissions
+		// Select only categories that user has view access, if listing of unauthorized content is not enabled
+		$joinaccess = '';
+		$andaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$andaccess = ' AND c.access IN ('.$aid_list.')';
+				$andaccess .= ' AND c.access IN ('.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
-					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-					if (isset($readperms['category']) && count($readperms['category']) ) {
-						$andaccess = ' AND ( c.access <= '.$aid.' OR c.id IN ('.implode(",", $readperms['category']).') )';
-					} else {
-						$andaccess = ' AND c.access <= '.$aid;
-					}
+					//$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+					//$andaccess .= ( isset($readperms['category']) && count($readperms['category']) ) ?
+					//	' AND ( c.access <= '.$aid.' OR c.id IN ('.implode(",", $readperms['category']).') )' :
+					//	' AND c.access <= '.$aid ;
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$andaccess  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
 				} else {
-					$andaccess = ' AND c.access <= '.$aid;
+					$andaccess  .= ' AND c.access <= '.$aid;
 				}
 			}
-		} else {
-			$andaccess = '';
 		}
 		
 		// AND-WHERE clause : filter by parent category (-ies)
@@ -830,6 +902,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$query = 'SELECT c.*,'
 			. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug'
 			. ' FROM #__categories AS c'
+			. $joinaccess
 			. $creator_join
 			. ' WHERE c.published = 1'
 			. $andparent
@@ -872,11 +945,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$filtercat  = $cparams->get('filtercat', 0);       // Filter items using currently selected language
 		$show_noauth = $cparams->get('show_noauth', 0);    // Show unauthorized items
 		
-		// Limit by access
-		$joinaccess   = FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON cc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '' ;
-		$joinaccess2  = FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '' ;
-		$where        = ' WHERE cc.published = 1';
-
+		$where = ' WHERE 1 ';
+		
 		// Filter the category view with the current user language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
 			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
@@ -904,33 +974,43 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
 		$where .= ' AND rel.catid IN ('.$catlist.')';
 		
-		// Select only items user has access to if he is not allowed to show unauthorized items
+		// Select only items that user has view access, if listing of unauthorized content is not enabled
+		// Checking item, category, content type access level
+		$joinaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$where .= ' AND i.access IN ('.$aid_list.') AND cc.access IN ('.$aid_list.')';
+				$where .= ' AND ty.access IN ('.$aid_list.')';
+				$where .= ' AND mc.access IN ('.$aid_list.')';
+				$where .= ' AND  i.access IN ('.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
-					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. (int) $aid . ')';
-					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR i.access <= '. (int) $aid . ')';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+					$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
+					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
 				} else {
-					$where .= ' AND cc.access <= '.$aid;
-					$where .= ' AND i.access <= '.$aid;
+					$where .= ' AND ty.access <= '.$aid;
+					$where .= ' AND mc.access <= '.$aid;
+					$where .= ' AND  i.access <= '.$aid;
 				}
 			}
 		}
 		
-		$query 	= 'SELECT DISTINCT itemid'
-				. ' FROM #__flexicontent_cats_item_relations AS rel'
-				. ' LEFT JOIN #__content AS i ON rel.itemid = i.id'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id'
-				. ' LEFT JOIN #__categories AS cc ON cc.id = rel.catid'
-				. $joinaccess
-				. $joinaccess2
-				. $where
-				;
+		$query 	= 'SELECT DISTINCT rel.itemid'
+			. ' FROM #__flexicontent_cats_item_relations AS rel'
+			. ' JOIN #__content AS i ON rel.itemid = i.id'
+			. ' JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id'
+			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			. ' JOIN #__categories AS mc ON mc.id =   i.catid AND mc.published = 1'
+			. ' JOIN #__categories AS cc ON cc.id = rel.catid AND cc.published = 1'
+			. $joinaccess
+			. $where
+			;
 		
 		$this->_db->setQuery($query);
 		$assigneditems = count(FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray());
@@ -951,41 +1031,45 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$cparams = $this->_params;
 		$show_noauth	= $cparams->get('show_noauth', 0);
 		$user			= JFactory::getUser();
-
-		// Access
-		$joinaccess		= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '' ;
 		
 		// Where
 		$where = ' WHERE c.published = 1';
 		$where .= ' AND c.parent_id = '. (int)$id;
+		
+		// Select only categories that user has view access, if listing of unauthorized content is not enabled
+		$joinaccess = '';
+		$andaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
-				$aid_arr	= $user->getAuthorisedViewLevels();
+				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$where .= ' AND c.access IN ( '.$aid_list.' )';
+				$andaccess .= ' AND c.access IN ('.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
-					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. (int) $aid . ')';
+					//$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+					//$andaccess .= ( isset($readperms['category']) && count($readperms['category']) ) ?
+					//	' AND ( c.access <= '.$aid.' OR c.id IN ('.implode(",", $readperms['category']).') )' :
+					//	' AND c.access <= '.$aid ;
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$andaccess  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
 				} else {
-					$where .= ' AND c.access <= '.$aid;
+					$andaccess  .= ' AND c.access <= '.$aid;
 				}
 			}
 		}
 		
 		// *** Removed : (a) Retrieving all category columns and (b) ordering categories,
 		// since this is currently only used for counting subcategories ... so only category ids are retrieved
-		$creator_join = ''; $orderby = '';
-		if (0) {
-			$creator_join = FLEXI_J16GE ? ' LEFT JOIN #__users AS u ON u.id = c.created_user_id' : '';
-			$orderby = $this->_buildCatOrderBy();
-		}
+		$creator_join = FLEXI_J16GE ? ' LEFT JOIN #__users AS u ON u.id = c.created_user_id' : '';
+		$orderby = $this->_buildCatOrderBy();
 		
 		$query = 'SELECT DISTINCT c.id '
 			. ' FROM #__categories as c'
 			. $joinaccess
 			. $creator_join 
 			. $where
+			. $andaccess
 			. $orderby
 			;
 		
@@ -1006,6 +1090,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		if ( !$this->_id && !count($this->_ids)) return array();
 		
+		$cparams = $this->_params;
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		
 		$query = $this->_buildChildsQuery();
 		$this->_childs = $this->_getList($query);
 		$id = $this->_id;  // save id in case we need to change it
@@ -1022,6 +1111,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$k = 1 - $k;
 		}
 		$this->_id = $id;  // restore id in case it has been changed
+		
+		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
 		return $this->_childs;
 	}
 	
@@ -1157,8 +1249,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$params = clone( JComponentHelper::getParams('com_flexicontent') );
 		if ($menu) {
 			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			
 			// Add some parameters that do not belonging to category overriden parameters
+			// WE NEED TO AUTOMATE THIS !!!
 			$params->set( 'item_depth', $menu_params->get('item_depth') );
+			$params->set( 'page_title', $menu_params->get('page_title') );
+			$params->set( 'show_page_heading', $menu_params->get('show_page_heading') );
+			$params->set( 'page_heading', $menu_params->get('page_heading') );
+			$params->set( 'pageclass_sfx', $menu_params->get('pageclass_sfx') );
 		}
 		$params->set('show_title', $params->get('show_title_lists'));          // Parameter meant for lists
 		$params->set('title_linkable', $params->get('title_linkable_lists'));  // Parameter meant for lists
@@ -1169,12 +1267,16 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// c. Merge author basic parameters
 		if ($author_basicparams!=='') {
-			$params->merge(  FLEXI_J16GE ? new JRegistry($author_basicparams) : new JParameter($author_basicparams)  );
+			// DO NOT move directly below or the following call fails in PHP <=5.3 (with reference error)
+			$_author_basicreg = FLEXI_J16GE ? new JRegistry($author_basicparams) : new JParameter($author_basicparams);
+			$params->merge( $_author_basicreg );
 		}
 
 		// d. Merge author OVERRIDDEN category parameters
 		if ($author_catparams!=='') {
-			$params->merge(  FLEXI_J16GE ? new JRegistry($author_catparams) : new JParameter($author_catparams)  );
+			// DO NOT move directly below or the following call fails in PHP <=5.3 (with reference error)
+			$_author_catreg = FLEXI_J16GE ? new JRegistry($author_catparams) : new JParameter($author_catparams);
+			$params->merge( $_author_catreg );
 		}
 
 		// Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
@@ -1405,19 +1507,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
  	function getAlphaindex()
 	{
-		$where = $this->_buildItemWhere('where_no_alpha');
+		$fromjoin = $this->_buildItemFromJoin();
+		$where    = $this->_buildItemWhere('where_no_alpha');
 		
-		$query	= 'SELECT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
-				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-				. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-				. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
-				. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-				. $where
-				. ' GROUP BY alpha'
-				. ' ORDER BY alpha ASC'
-				;
+		$query	= 'SELECT DISTINCT LOWER(SUBSTRING(i.title FROM 1 FOR 1)) AS alpha'
+			. $fromjoin
+			. $where
+			//. ' GROUP BY alpha'
+			. ' ORDER BY alpha ASC'
+			;
 		$this->_db->setQuery($query);
 		$alpha = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
@@ -1430,7 +1528,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		// handle jcomments integration
 		if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
-			return array();
+			$this->_comments = array();
+			return $this->_comments;
 		}
 		
 		// Normal case, item ids not given, we will retrieve comments information of cat/sub items

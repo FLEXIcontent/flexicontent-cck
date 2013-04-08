@@ -292,8 +292,8 @@ class FlexicontentFields
 			$andaccess 	= ' AND fi.access IN ('.$aid_list.')' ;
 			$joinaccess = '';
 		} else {
-			//$aid = $aid ? $aid : (int) $user->get('aid');
-			$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $aid . ')' : ' AND fi.access <= '.$aid ;
+			$aid = (int) $aid;
+			$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')' : ' AND fi.access <= '.$aid ;
 			$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
 		}
 		
@@ -1353,7 +1353,7 @@ class FlexicontentFields
 		}
 		foreach ($matches[0] as $replacement_tag) {
 			$replacement_value = '$'.substr($replacement_tag, 1, -1);
-			eval ("\$replacement_value = \" $replacement_value\";");
+			eval ("\$replacement_value = \"$replacement_value\";");
 			$query = str_replace($replacement_tag, $replacement_value, $query);
 		}
 		
@@ -1887,7 +1887,7 @@ class FlexicontentFields
 			foreach ($value as $val) {
 				$or_values[] = '_v_=' . $db->Quote( $val );
 			}
-			$valueswhere .= ' AND ('.implode(' OR ', $or_values).' ) ';
+			$valueswhere .= ' AND ('.implode(' OR ', $or_values).') ';
 			break;
 		}
 		
@@ -1911,13 +1911,22 @@ class FlexicontentFields
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
 		$valuesjoin  = @$filter->filter_valuesjoin   ? $filter->filter_valuesjoin   : ' JOIN #__flexicontent_fields_item_relations rel ON rel.item_id=c.id AND rel.field_id = ' . $filter->id;
 		
-		$query  = 'SELECT id'
-			.' FROM #__content c'
-			. $valuesjoin
-			.' WHERE 1'
-			. $valueswhere
-			. ' GROUP BY c.id'
-		;
+		if ( @$filter->filter_valuesjoin ) {
+			$query  = 'SELECT DISTINCT id'
+				.' FROM #__content c'
+				.$filter->filter_valuesjoin
+				.' WHERE 1'
+				. $valueswhere
+				;
+		} else {
+			$query  = 'SELECT DISTINCT item_id'
+				.' FROM #__flexicontent_fields_item_relations as rel'
+				.' WHERE rel.field_id = ' . $filter->id
+				. $valueswhere
+				;
+		}
+		//$query .= ' GROUP BY c.id';   // VERY VERY BAD PERFORMANCE
+		
 		if ( !$return_sql ) {
 			//echo "<br>FlexicontentFields::getFiltered() ".$filter->name." appying  query :<br>". $query."<br>\n";
 			$db->setQuery($query);
@@ -2018,7 +2027,7 @@ class FlexicontentFields
 		
 		// Make sure the current filtering values match the field filter configuration to single or multi-value
 		if ( in_array($display_filter_as, array(2,3,5)) ) {
-			if (!is_array($value)) $value = array( $value );
+			if (!is_array($value)) $value = strlen($value) ? array($value) : array();
 		} else {
 			if (is_array($value)) $value = @ $value[0];
 		}
@@ -2317,11 +2326,14 @@ class FlexicontentFields
 		. ' FROM #__content AS i'
 		. $valuesjoin
 		. $view_join
-		. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-		. ' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-		. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
+		. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+		. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+		. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+		. ' JOIN #__categories AS c ON c.id = i.catid'
 		. ' LEFT JOIN #__users AS u ON ' . $usersjoinon
+		. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"' : '')
+		. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '')
+		. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '')
 		. ($listing_where ? $listing_where : ' WHERE 1 ')
 		. $valueswhere
 		. $groupby

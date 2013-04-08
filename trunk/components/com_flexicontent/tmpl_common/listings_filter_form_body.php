@@ -68,7 +68,13 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 				if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
 					if ( preg_match('/\.submit\(\)/', $filt->html, $matches) ) {
 						// Autosubmit detected inside onChange event, prepend the event with form preparation function call
-						$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\')); ', $filt->html);
+						if ( $this->params->get('disable_filter_autosubmit', 0) ) {
+							$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', '', $filt->html);
+							// The onChange Event, has his autosubmit removed, force GO button (in case GO button was not already inside search box)
+							$force_go = true;
+						} else {
+							$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\')); ', $filt->html);
+						}
 					} else {
 						// The onChange Event, has no autosubmit, force GO button (in case GO button was not already inside search box)
 						$force_go = true;
@@ -98,14 +104,14 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 			// Add open/close tag to the HTML
 			echo $filters_html = $opentag .$filters_html. $closetag;
 			
-			$go_added = $this->params->get('use_search') && $this->params->get('show_search_go', 1);
-			$reset_added = $this->params->get('use_search') && $this->params->get('show_search_reset', 1);
+			$go_added_already = $this->params->get('use_search') && $this->params->get('show_search_go', 1);
+			$reset_added_already = $this->params->get('use_search') && $this->params->get('show_search_reset', 1);
 			?>
 			
-			<?php if (!empty($force_go) && !$go_added) : ?>
+			<?php if (!empty($force_go) && !$go_added_already) : ?>
 			<span class="fc_text_filter_buttons">
 				<button class="fc_button button_go" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
-				<?php if (!$reset_added) : ?>
+				<?php if (!$reset_added_already) : ?>
 				<button class="fc_button button_reset" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_RESET' ); ?></span></button>
 				<?php endif; ?>
 			</span>

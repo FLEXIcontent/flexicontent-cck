@@ -16,12 +16,13 @@
  * GNU General Public License for more details.
  */
 
+// no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
- * HTML View class for the Items View
+ * HTML View class for the Tags View
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -30,7 +31,7 @@ jimport( 'joomla.application.component.view');
 class FlexicontentViewTags extends JViewLegacy
 {
 	/**
-	 * Creates the item page
+	 * Creates the page's display
 	 *
 	 * @since 1.0
 	 */
@@ -39,28 +40,23 @@ class FlexicontentViewTags extends JViewLegacy
 		//initialize variables
 		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
-		$menus    = JSite::getMenu();
+		$menus    = $app->getMenu();
 		$menu     = $menus->getActive();
 		$uri      = JFactory::getURI();
 		
-		// Set tag parameters as VIEW's parameters (tag parameters are merged with component/page(=menu item) and optionally with tag cloud parameters)
-		$tag    = $this->get('Tag');
-		$params = @ $tag->parameters;
-		
-		// Raise a 404 error, if tag doesn't exist or access isn't permitted
+		// Get tag and set tag parameters as VIEW's parameters (tag parameters are merged with component/page(=menu item) and optionally with tag cloud parameters)
+		$tag = $this->get('Tag');
 		if ( empty($tag) ) {
+			// Raise a 404 error, if tag doesn't exist or access isn't permitted, maybe move this into model ??
 			$tid = JRequest::getInt('id', 0);
 			$msg = JText::sprintf( $tid ? 'Tag id was not set (is 0)' : 'Tag #%d not found', $tid );
 			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 		}
+		$params  = $tag->parameters;
 		
-		// Get remainging data from the model
-		$items  = $this->get('Data');
-		$total  = $this->get('Total');
-		
-		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
-		$limitstart = JRequest::getInt('limitstart');
-		$limit      = $app->getUserStateFromRequest('com_flexicontent.tags.limit', 'limit', $params->def('limit', 0), 'int');
+		// Get various data from the model
+		$items   = $this->get('Data');
+		$total   = $this->get('Total');
 		
 		
 		// ********************************
@@ -132,7 +128,7 @@ class FlexicontentViewTags extends JViewLegacy
 		// Finally, set document title
 		$document->setTitle($doc_title);
 		
-
+		
 		// ************************
 		// Set document's META tags
 		// ************************
@@ -141,11 +137,9 @@ class FlexicontentViewTags extends JViewLegacy
 		if (!FLEXI_J16GE) {
 			if ($app->getCfg('MetaTitle') == '1') 	$app->addMetaTag('title', $params->get('page_title'));
 		} else {
-			if (JApplication::getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
-		}		
+			if ($app->getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
+		}
 		
-
-
 		// Add rel canonical html head link tag
 		// @TODO check that as it seems to be dirty :(
 		$base  = $uri->getScheme() . '://' . $uri->getHost();
@@ -155,8 +149,6 @@ class FlexicontentViewTags extends JViewLegacy
 		if ($params->get('add_canonical')) {
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
-		
-
 		
 		//ordering
 		$filter_order		= JRequest::getCmd('filter_order', 'i.title');
@@ -168,24 +160,23 @@ class FlexicontentViewTags extends JViewLegacy
 		$lists['filter_order_Dir'] 	= $filter_order_Dir;
 		$lists['filter']			= $filter;
 		
+		// Create links
+		$tag_link   = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug), false);
+		$print_link = JRoute::_('index.php?view=tags&id='.$tag->slug.'&pop=1&tmpl=component');
+		
 		// Create the pagination object
-		jimport('joomla.html.pagination');
-		
-		$pageNav 	= new JPagination($total, $limitstart, $limit);
-		
-		$tag_link   = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id), false);
-		$print_link = JRoute::_('index.php?view=tags&id='.$tag->id.'&pop=1&tmpl=component');
+		$pageNav = $this->get('pagination');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('tag' , 				$tag);
-		$this->assignRef('action', 			$tag_link);  // $uri->toString()
-		$this->assignRef('print_link' ,	$print_link);
-		$this->assignRef('pageclass_sfx' ,	$pageclass_sfx);
-		$this->assignRef('items' , 			$items);
-		$this->assignRef('params' , 		$params);
-		$this->assignRef('pageNav' , 		$pageNav);
-		$this->assignRef('lists' ,	 		$lists);
-
+		$this->assignRef('action',    $tag_link);  // $uri->toString()
+		$this->assignRef('print_link',$print_link);
+		$this->assignRef('tag',       $tag);
+		$this->assignRef('items',     $items);
+		$this->assignRef('lists',     $lists);
+		$this->assignRef('params',    $params);
+		$this->assignRef('pageNav',   $pageNav);
+		$this->assignRef('pageclass_sfx', $pageclass_sfx);
+		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
 		

@@ -407,7 +407,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		if(!is_array($post) && !strlen($post)) return;
 		
 		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
-		//$is_importcsv = JRequest::getVar('task') == 'importcsv';
+		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -418,13 +418,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		foreach ($post as $n => $v)
 		{
 			// support for basic CSV import / export,  TO BE REMOVED added to the 'store' function of the model
-			/*if ( $is_importcsv && !is_array($post[$n]) ) {
+			if ( $is_importcsv && !is_array($post[$n]) ) {
 				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
 					$post[$n] = unserialize($post[$n]);
 				} else {
 					$post[$n] = array('link' => $post[$n], 'title' => '', 'id' => '', 'class' => '', 'linktext' => '', 'hits'=>0);
 				}
-			}*/
+			}
 			
 			if ($post[$n]['link'] !== '')
 			{

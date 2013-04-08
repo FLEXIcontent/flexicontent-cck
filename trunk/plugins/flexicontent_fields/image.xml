@@ -32,6 +32,7 @@
 				<option value="0">FLEXI_FIELD_REUSABLE_DB_MODE</option>
 				<option value="1">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
 			</field>
+			<field name="imagepickerlimit" type="text" default="200" label="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMIT" description="FLEXI_FIELD_IMAGE_GRAPHICAL_PICKER_LIMIT_DESC" />
 			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

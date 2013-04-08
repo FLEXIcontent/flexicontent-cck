@@ -16,12 +16,13 @@
  * GNU General Public License for more details.
  */
 
+// no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-jimport( 'joomla.application.component.view');
+jimport('joomla.application.component.view');
 
 /**
- * HTML View class for the Items View
+ * HTML View class for the Item View
  *
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -33,14 +34,12 @@ class FlexicontentViewItems  extends JViewLegacy
 	var $_name = FLEXI_ITEMVIEW;
 
 	/**
-	 * Creates the item page
+	 * Creates the page's display
 	 *
 	 * @since 1.0
 	 */
 	function display( $tpl = null )
 	{
-		jimport( 'joomla.html.parameter' );
-
 		// check for form layout
 		if($this->getLayout() == 'form' || in_array(JRequest::getVar('task'), array('add','edit')) ) {
 			// Important set layout to be form since various category view SEF links have this variable set
@@ -54,23 +53,23 @@ class FlexicontentViewItems  extends JViewLegacy
 		// Get Content Types with no category links in item view pathways
 		global $globalnopath;
 		if (!is_array($globalnopath))     $globalnopath	= array();
-
-		// Initialize variables
-		$app  = JFactory::getApplication();
-		$session    = JFactory::getSession();
+		
+		//initialize variables
 		$dispatcher = JDispatcher::getInstance();
-		$document   = JFactory::getDocument();
-		$user       = JFactory::getUser();
-		$db         = JFactory::getDBO();
-		$nullDate   = $db->getNullDate();
-
-		$menu			= JSite::getMenu()->getActive();
-		$aid			= !FLEXI_J16GE ? (int) $user->get('aid') : $user->getAuthorisedViewLevels();
-		$model		= $this->getModel();
-		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
-		$cid			= $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id, verifying it really belongs to current item
-
-		$Itemid		= JRequest::getInt('Itemid', 0);
+		$app      = JFactory::getApplication();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
+		$menus    = $app->getMenu();
+		$menu     = $menus->getActive();
+		$user     = JFactory::getUser();
+		$aid      = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
+		$db       = JFactory::getDBO();
+		$nullDate = $db->getNullDate();
+		
+		// Get various data from the model
+		$model  = $this->getModel();
+		$cid    = $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id
+		
 
 		// Get the COMPONENT only parameters and merge current menu item parameters
 		$params = clone( JComponentHelper::getParams('com_flexicontent') );
@@ -78,16 +77,21 @@ class FlexicontentViewItems  extends JViewLegacy
 			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
 			$params->merge($menu_params);
 		}
-
+		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-
+		
+		
+		// ********************************
+		// Load needed JS libs & CSS styles
+		// ********************************
+		
 		//add css file
 		if (!$params->get('disablecss', '')) {
 			$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
 			$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext {zoom:1;}</style><![endif]-->');
 		}
-
+		
 		//allow css override
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
@@ -191,26 +195,26 @@ class FlexicontentViewItems  extends JViewLegacy
 				$params->set('page_title',	$item->title);
 			}
 		}
-
-
+		
+		
 		// *******************
 		// Create page heading
 		// *******************
-
+		
 		if ( !FLEXI_J16GE )
 			$params->def('show_page_heading', $params->get('show_page_title'));  // J1.5: parameter name was show_page_title instead of show_page_heading
 		else
 			$params->def('show_page_title', $params->get('show_page_heading'));  // J2.5: to offer compatibility with old custom templates or template overrides
-
+		
 		// if above did not set the parameter, then default to NOT showing page heading (title)
 		$params->def('show_page_heading', 0);
 		$params->def('show_page_title', 0);
-
+		
 		// ... the page heading text
 		$params->def('page_heading', $params->get('page_title'));    // J1.5: parameter name was show_page_title instead of show_page_heading
 		$params->def('page_title', $params->get('page_heading'));    // J2.5: to offer compatibility with old custom templates or template overrides
-
-
+		
+		
 		// ************************************************************
 		// Create the document title, by from page title and other data
 		// ************************************************************
@@ -247,10 +251,8 @@ class FlexicontentViewItems  extends JViewLegacy
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
 
-		$limitstart	= JRequest::getVar('limitstart', 0, '', 'int');
-
 		// increment the hit counter
-		if ( $limitstart == 0 && FLEXIUtilities::count_new_hit($item) ) {
+		if (FLEXIUtilities::count_new_hit($item) ) {
 			$model->hit();
 		}
 
@@ -291,6 +293,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		JRequest::setVar('view', 'article');
 		JRequest::setVar('option', 'com_content');
 		JRequest::setVar("isflexicontent", "yes");
+		$limitstart = JRequest::getVar('limitstart', 0, '', 'int');
 
 		// These events return text that could be displayed at appropriate positions by our templates
 		$item->event = new stdClass();
@@ -752,13 +755,18 @@ class FlexicontentViewItems  extends JViewLegacy
 		JHTML::_('behavior.tooltip');
 		JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
 
-		// Add css files to the document <head> section
+		// Add css files to the document <head> section (also load CSS joomla template override)
 		$document->addStyleSheet($this->baseurl.'/components/com_flexicontent/assets/css/flexicontent.css');
+		
+		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+			$document->addStyleSheet($this->baseurl.'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+		}
+		
 		if (!FLEXI_J16GE) {
 			$document->addStyleSheet($this->baseurl.'/administrator/templates/khepri/css/general.css');
 		}
 		$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext{zoom:1;}, * html #flexicontent dd { height: 1%; }</style><![endif]-->');
-
+		
 		// Set page title
 		$title = !$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' );
 		$document->setTitle($title);
