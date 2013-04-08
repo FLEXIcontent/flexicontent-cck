@@ -136,6 +136,9 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	if (isset($fc_run_times['execute_main_query']))
 		$msg .= sprintf('<br/>-- [Execute Main Query: %.2f s] ', $fc_run_times['execute_main_query']/1000000);
 	
+	if (isset($fc_run_times['execute_sec_queries']))
+		$msg .= sprintf('<br/>-- [Execute Secondary Queries: %.2f s] ', $fc_run_times['execute_sec_queries']/1000000);
+	
 	if (isset($fc_run_times['templates_parsing_cached']))
 		$msg .= sprintf('<br/>-- [FC Templates Parsing (cached): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
 	

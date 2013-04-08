@@ -364,12 +364,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( $query_ids ) {
 			$query .= ""
 				. @$feed_img_join      // optional
-				. @$order_field_join   // optional
 				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
 				//. ' GROUP BY i.id'
 				;
 		} else {
 			$query .= ""
+			. @$order_field_join   // optional
 			. $where
 			//. ' GROUP BY i.id '
 			. $orderby
