@@ -604,38 +604,39 @@ class modFlexicontentHelper
 		$method_states = (int)$params->get('method_states', 0);
 		$item_states   = $params->get('item_states');
 		
+		$show_nocontent_msg = (int)$params->get('show_nocontent_msg', 1);
+		
 		// *** METHODS that their 'ALL' value is 1, that also have behaviour variable (most of them)
 		
 		// categories scope parameters
 		$method_cat 		= (int)$params->get('method_cat', 1);
-		$catids 			= $params->get('catids', array());
-		$behaviour_cat 		= $params->get('behaviour_cat', 0);
+		$catids 				= $params->get('catids', array());
+		$behaviour_cat 	= $params->get('behaviour_cat', 0);
 		$treeinclude 		= $params->get('treeinclude');
 
 		// types scope parameters
-		$method_types 		= (int)$params->get('method_types', 1);
-		$types 				= $params->get('types');
-		$behaviour_types 	= $params->get('behaviour_types', 0);
+		$method_types 	= (int)$params->get('method_types', 1);
+		$types 					= $params->get('types');
+		$behaviour_types= $params->get('behaviour_types', 0);
 
 		// authors scope parameters
 		$method_auth 		= (int)$params->get('method_auth', 1);
-		$authors 			= trim($params->get('authors'));
-		$behaviour_auth 	= $params->get('behaviour_auth');
+		$authors 				= trim($params->get('authors'));
+		$behaviour_auth	= $params->get('behaviour_auth');
 		
 		// items scope parameters
 		$method_items 		= (int)$params->get('method_items', 1);
-		$items	 			= trim($params->get('items'));
+		$items	 					= trim($params->get('items'));
 		$behaviour_items 	= $params->get('behaviour_items', 0);
-		$excluded_tags = $params->get('excluded_tags', array());
-		$excluded_tags = (!is_array($excluded_tags)) ? array($excluded_tags) : $excluded_tags;
-		$relitems_fields = $params->get('relitems_fields', array());
-		$relitems_fields = (!is_array($relitems_fields)) ? array($relitems_fields) : $relitems_fields;
+		$excluded_tags		= $params->get('excluded_tags', array());
+		$excluded_tags		= (!is_array($excluded_tags)) ? array($excluded_tags) : $excluded_tags;
+		$relitems_fields	= $params->get('relitems_fields', array());
+		$relitems_fields	= (!is_array($relitems_fields)) ? array($relitems_fields) : $relitems_fields;
 		
 		// tags scope parameters
-		$method_tags = (int)$params->get('method_tags', 1);
-		$tag_ids = $params->get('tag_ids', array());
-		$tag_ids = (!is_array($tag_ids)) ? array($tag_ids) : $tag_ids ;
-
+		$method_tags	= (int)$params->get('method_tags', 1);
+		$tag_ids			= $params->get('tag_ids', array());
+		
 		// date scope parameters
 		$date_type	= (int)$params->get('date_type', 0);
 		$bdate 			= $params->get('bdate', '');
@@ -669,13 +670,21 @@ class modFlexicontentHelper
 		// get module display parameters
 		$mod_image 			= $params->get('mod_image');
 		
-
+		
+		// ************************************************************************************
+		// filter by publication state, (except for item state which is a special scope, below)
+		// ************************************************************************************
+		
 		$where  = ' WHERE c.published = 1';
 		$where .= FLEXI_J16GE ? '' : ' AND i.sectionid = ' . FLEXI_SECTION;
 		$where .= ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )';
 		$where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
-
+		
+		
+		// *********************
 		// filter by permissions
+		// *********************
+		
 		if (!$show_noauth) {
 			if (FLEXI_ACCESS && class_exists('FAccess')) {
 				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
@@ -689,40 +698,50 @@ class modFlexicontentHelper
 			}
 		}
 		
+		
+		// *******************************************************
+		// NON-STATIC behaviors that need current item information
+		// *******************************************************
+		
 		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW);
 		
-		// *** NON-STATIC behavior, get current item information ***
-		if ( ($behaviour_cat || $behaviour_auth || $behaviour_items || $behaviour_types || $date_compare) && $isflexi_itemview ) {
+		if ( ($behaviour_cat || $behaviour_types || $behaviour_auth || $behaviour_items || $date_compare) && $isflexi_itemview ) {
 			// initialize variables
 			$cid 		= JRequest::getInt('cid');
 			$id			= JRequest::getInt('id');
 			$Itemid		= JRequest::getInt('Itemid');
-			if (!$id) return;  // new item nothing to retrieve
-			
-			$query = 'SELECT c.*, ie.*, GROUP_CONCAT(ci.catid SEPARATOR ",") as itemcats FROM #__content as c'
-						. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = c.id'
-						. ' LEFT JOIN #__flexicontent_cats_item_relations AS ci on ci.itemid = c.id'
-						. ' WHERE c.id = ' . $id
-						. ' GROUP BY ci.itemid'
-						;
-			$db->setQuery($query);
-			$curitem	= $db->loadObject();
-
-			// Get item dates
-			if ($date_type == 1) {
-				$idate = $curitem->modified;
-			} elseif ($date_type == 2) {
-				$idate = $curitem->publish_up;
-			} else {
-				$idate = $curitem->created;			
+			// Check for new item nothing to retrieve,
+			// NOTE: aborting execution if current view is not item view, but item view is required
+			// and also proper usage of current item, both of these will be handled by SCOPEs
+			if ( $id ) {
+				$query = 'SELECT c.*, ie.*, GROUP_CONCAT(ci.catid SEPARATOR ",") as itemcats FROM #__content as c'
+							. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = c.id'
+							. ' LEFT JOIN #__flexicontent_cats_item_relations AS ci on ci.itemid = c.id'
+							. ' WHERE c.id = ' . $id
+							. ' GROUP BY ci.itemid'
+							;
+				$db->setQuery($query);
+				$curitem	= $db->loadObject();
+	
+				// Get item dates
+				if ($date_type == 1) {
+					$idate = $curitem->modified;
+				} elseif ($date_type == 2) {
+					$idate = $curitem->publish_up;
+				} else {
+					$idate = $curitem->created;			
+				}
+				$idate 	= explode(' ', $idate);
+				$cdate 	= $idate[0] . ' 00:00:00';
+				$curritemcats = explode(',', $curitem->itemcats);
 			}
-			$idate 	= explode(' ', $idate);
-			$cdate 	= $idate[0] . ' 00:00:00';
-			$curritemcats = explode(',', $curitem->itemcats);
 		}
-
-
+		
+		
+		// ******************
 		// current item scope
+		// ******************
+		
 		$currid			= JRequest::getInt('id');
   	if ($method_curitem == 1) { // exclude method  ---  exclude current item
 		  $where .=  ' AND i.id <> ' . $currid;
@@ -731,8 +750,12 @@ class modFlexicontentHelper
 		} else {
 		  // All Items including current
 		}
-
+		
+		
+		// **********************
 		// current language scope
+		// **********************
+		
 		$lang = flexicontent_html::getUserCurrentLang();
 		if ($method_curlang == 1) { // exclude method  ---  exclude items of current language
 			$where .= ' AND ie.language NOT LIKE ' . $db->Quote( $lang .'%' );
@@ -742,7 +765,11 @@ class modFlexicontentHelper
 		  // Items of any language
 		}
 		
+		
+		// *****************************
 		// current user favourites scope
+		// *****************************
+		
 		$curruserid = (int)$user->get('id');
   	if ($method_curuserfavs == 1) { // exclude method  ---  exclude currently logged user favourites
 			$join_favs  = ' LEFT OUTER JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id AND fav.userid = '.$curruserid;
@@ -755,7 +782,11 @@ class modFlexicontentHelper
 		  $join_favs = '';
 		}
 		
-		// featured items scope
+		
+		// ******************************
+		// joomla featured property scope
+		// ******************************
+		
 		if (FLEXI_J16GE) {
 	  	if ($method_featured == 1) { // exclude method  ---  exclude currently logged user favourites
 				$where .= ' AND i.featured=0';
@@ -766,7 +797,11 @@ class modFlexicontentHelper
 			}
 		}
 		
+		
+		// *****************
 		// item states scope
+		// *****************
+		
 		$item_states = is_array($item_states) ? implode(',', $item_states) : $item_states;
 		if ($method_states==0) {
 		  // method normal: Published item states
@@ -786,17 +821,36 @@ class modFlexicontentHelper
 			}
 		}
 		
+		
+		// ****************
 		// categories scope
-		if (!$behaviour_cat) {
+		// ****************
+		
+		// ZERO 'behaviour' means statically selected records, but METHOD 1 is ALL records ... so NOTHING to do
+		if ( !$behaviour_cat && $method_cat == 1 )
+		{
+		}
+		
+		// ZERO 'behaviour' means statically decided records, and METHOD is either 2 (INCLUDE), or 3 (EXCLUDE)
+		else if (!$behaviour_cat)
+		{
+			// Check for empty statically selected records, and abort with error message
+			if ( empty($catids) ) {
+				echo "<b>WARNING:</b> Misconfigured category scope, select at least one category or set category scope to ALL<br/>";
+				return;
+			}
+			
+			// Make sure categories is an array
 			$catids = is_array($catids) ? $catids : array($catids);
-
-			// retrieve extra categories, such children or parent categories
+			// Retrieve extra categories, such children or parent categories
 			$catids_arr = modFlexicontentHelper::getExtraCats($catids, $treeinclude, array());
 			
-			if (!$catids && $method_cat > 1) {
-				// empty ignore and issue a warning
-				echo "<b>WARNING:</b> Misconfigured category scope, select at least one category or set category scope to ALL<br/>";
-			} else if ($method_cat == 2) { // exclude method
+			if (empty($catids_arr)) {
+				if ($show_nocontent_msg) echo JText::_("No viewable content in Current View for your Access Level");
+				return;
+			}
+			
+			if ($method_cat == 2) { // exclude method
 				if ($apply_config_per_category) {
 					echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item<br/>";
 					return;
@@ -812,290 +866,377 @@ class modFlexicontentHelper
 					$params->set('dynamic_catids', serialize($catids_arr));  // Set dynamic catids to be used by the getCategoryData
 				}
 			}
-		} else {
+		}
+		
+		// non-ZERO 'behaviour' means dynamically decided records
+		else
+		{
 			if ( !$isflexi_itemview ) {
+				return;  // current view is not item view ... , nothing to display
+			}
+			
+			if ($behaviour_cat == 2 && $apply_config_per_category) {
+				echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item<br/>";
 				return;
-			} else {	
-				
-				if ($behaviour_cat == 2 && $apply_config_per_category) {
-					echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item<br/>";
-					return;
-				}
-				
-				// if $cid is not set then use the main category id of the (current) item
-				$cid = $cid ? $cid : $curitem->catid;
-				
-				// retrieve extra categories, such children or parent categories
-				$catids_arr = modFlexicontentHelper::getExtraCats(array($cid), $treeinclude, $curritemcats);
-				
-				if ($behaviour_cat == 1) {
-					if (!$apply_config_per_category) {
-						$where .= ' AND c.id IN (' . implode(',', $catids_arr) . ')';
-					} else {
-						// *** Applying configuration per category ***
-						foreach($catids_arr as $catid)                // The items retrieval query will be executed ... once per EVERY category
-							$multiquery_cats[] = ' AND c.id = '.$catid;
-						$params->set('dynamic_catids', serialize($catids_arr));  // Set dynamic catids to be used by the getCategoryData
-					}
+			}
+			
+			// IF $cid is not set then use the main category id of the (current) item
+			$cid = $cid ? $cid : $curitem->catid;
+			
+			// Retrieve extra categories, such children or parent categories
+			$catids_arr = modFlexicontentHelper::getExtraCats(array($cid), $treeinclude, $curritemcats);
+			if (empty($catids_arr)) {
+				if ($show_nocontent_msg) echo JText::_("No viewable content in Current View for your Access Level");
+				return;
+			}
+			
+			if ($behaviour_cat == 1) {
+				if (!$apply_config_per_category) {
+					$where .= ' AND c.id IN (' . implode(',', $catids_arr) . ')';
 				} else {
-					$where .= ' AND c.id NOT IN (' . implode(',', $catids_arr) . ')';
+					// *** Applying configuration per category ***
+					foreach($catids_arr as $catid)                // The items retrieval query will be executed ... once per EVERY category
+						$multiquery_cats[] = ' AND c.id = '.$catid;
+					$params->set('dynamic_catids', serialize($catids_arr));  // Set dynamic catids to be used by the getCategoryData
 				}
+			} else {
+				$where .= ' AND c.id NOT IN (' . implode(',', $catids_arr) . ')';
 			}
 		}
+		
 		// Now check if no items need to be retrieved
 		if ($count==0) return;
-
+		
+		
+		// ***********
 		// types scope
-		if (!$behaviour_types) {
-			$types		= is_array($types) ? implode(',', $types) : $types;
-			if (!$types && $method_types > 1) {
-				// empty ignore and issue a warning
+		// ***********
+		
+		// ZERO 'behaviour' means statically selected records, but METHOD 1 is ALL records ... so NOTHING to do
+		if ( !$behaviour_types && $method_types == 1 )
+		{
+		}
+		
+		// ZERO 'behaviour' means statically decided records, and METHOD is either 2 (INCLUDE), or 3 (EXCLUDE)
+		else if (!$behaviour_types)
+		{
+			// Check for empty statically selected records, and abort with error message
+			if ( empty($types) ) {
 				echo "<b>WARNING:</b> Misconfigured types scope, select at least one item type or set types scope to ALL<br/>";
-			} else if ($method_types == 2) { // exclude method
+				return;
+			}
+			
+			// Make types a comma separated string of ids
+			$types = is_array($types) ? implode(',', $types) : $types;
+			
+			if ($method_types == 2) { // exclude method
 				$where .= ' AND ie.type_id NOT IN (' . $types . ')';		
 			} else if ($method_types == 3) { // include method
 				$where .= ' AND ie.type_id IN (' . $types . ')';		
 			}
-		} else {
+		}
+		
+		// non-ZERO 'behaviour' means dynamically decided records
+		else
+		{
 			if ( !$isflexi_itemview ) {
-				return;
+				return;  // current view is not item view ... , nothing to display
+			}
+			
+			if ($behaviour_types == 1) {
+				$where .= ' AND ie.type_id = ' . (int)$curitem->type_id;		
 			} else {
-				if ($behaviour_types == 1) {
-					$where .= ' AND ie.type_id = ' . (int)$curitem->type_id;		
-				} else {
-					$where .= ' AND ie.type_id <> ' . (int)$curitem->type_id;		
-				}
+				$where .= ' AND ie.type_id <> ' . (int)$curitem->type_id;		
 			}
 		}
-
+		
+		
+		// ************
 		// author scope
-		if (!$behaviour_auth) {
-			if (!$authors && $method_auth > 1) {
-				// empty ignore and issue a warning
+		// ************
+		
+		// ZERO 'behaviour' means statically selected records, but METHOD 1 is ALL records ... so NOTHING to do
+		if ( !$behaviour_auth && $method_auth == 1 )
+		{
+		}
+		
+		// ZERO 'behaviour' means statically decided records, and METHOD is either 2 (INCLUDE), or 3 (EXCLUDE)
+		else if (!$behaviour_auth)
+		{
+			// Check for empty statically selected records, and abort with error message
+			if ( empty($authors) ) {
 				echo "<b>WARNING:</b> Misconfigured author scope, select at least one author or set author scope to ALL<br/>";
-			} else if ($method_auth == 2) { // exclude method
+				return;
+			}
+			
+			if ($method_auth == 2) { // exclude method
 				$where .= ' AND i.created_by NOT IN (' . $authors . ')';		
 			} else if ($method_auth == 3) { // include method
 				$where .= ' AND i.created_by IN (' . $authors . ')';		
 			}
-		} else {
-			if ( !$isflexi_itemview ) {
-				return;
-			} else {			
-				if ($behaviour_auth == 1) {
-					$where .= ' AND i.created_by = ' . (int)$curitem->created_by;		
-				} else if ($behaviour_auth == 2) {
-					$where .= ' AND i.created_by <> ' . (int)$curitem->created_by;		
-				}  else {  // $behaviour_auth == 3
-					$where .= ' AND i.created_by = ' . (int)$user->id;
-				}
+		}
+		
+		// non-ZERO 'behaviour' means dynamically decided records
+		else
+		{
+			if ( !$isflexi_itemview && $behaviour_auth < 3) {  // Behaviour 3 is current user thus not related to current item
+				return;  // current view is not item view ... , nothing to display
+			}
+			
+			if ($behaviour_auth == 1) {
+				$where .= ' AND i.created_by = ' . (int)$curitem->created_by;		
+			} else if ($behaviour_auth == 2) {
+				$where .= ' AND i.created_by <> ' . (int)$curitem->created_by;		
+			}  else {  // $behaviour_auth == 3
+				$where .= ' AND i.created_by = ' . (int)$user->id;
 			}
 		}
-
+		
+		
+		// ***********
 		// items scope
-		if (!$behaviour_items) {
-			if (!$items && $method_items > 1) {
-				// empty ignore and issue a warning
+		// ***********
+		
+		// ZERO 'behaviour' means statically selected records, but METHOD 1 is ALL records ... so NOTHING to do
+		if ( !$behaviour_items && $method_items == 1 )
+		{
+		}
+		
+		// ZERO 'behaviour' means statically decided records, and METHOD is either 2 (INCLUDE), or 3 (EXCLUDE)
+		else if (!$behaviour_items)
+		{
+			// Check for empty statically selected records, and abort with error message
+			if ( empty($items) ) {
 				echo "<b>WARNING:</b> Misconfigured items scope, select at least one item or set items scope to ALL<br/>";
-			} else if ($method_items == 2) { // exclude method
+				return;
+			}
+			
+			if ($method_items == 2) { // exclude method
 				$where .= ' AND i.id NOT IN (' . $items . ')';		
 			} else if ($method_items == 3) { // include method
 				$where .= ' AND i.id IN (' . $items . ')';		
 			}
-		} else if ($behaviour_items==2) {
-			if ( $isflexi_itemview ) {
-				unset($related);
-				if (count($relitems_fields)) {
-					$where2 = (count($relitems_fields) > 1) ? ' AND field_id IN ('.implode(',', $relitems_fields).')' : ' AND field_id = '.$relitems_fields[0];
-					
-					// select the item ids that have the common tags
-					$query2 = 'SELECT DISTINCT value' .
-							' FROM #__flexicontent_fields_item_relations' .
-							' WHERE item_id = '.(int) $id .
-							$where2
-							;
-					$db->setQuery($query2);
-					$related = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-					$related = is_array($related) ? array_map( 'intval', $related ) : $related;
-				}
-								
-				if (isset($related) && count($related)) {
-					$where .= (count($related) > 1) ? ' AND i.id IN ('.implode(',', $related).')' : ' AND i.id = '.$related[0];
-				} else {
-					return;
-				}
-			} else {
-				return;
-			}
-		} else if ($behaviour_items==1) {
-			if ( $isflexi_itemview ) {
-				// select the tags associated to the item
-				$query2 = 'SELECT tid' .
-						' FROM #__flexicontent_tags_item_relations' .
-						' WHERE itemid = '.(int) $id;
-				$db->setQuery($query2);
-				$tags = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-				$tags = array_diff($tags,$excluded_tags);
-				
-				unset($related);
-				if ($tags) {
-					$where2 = (count($tags) > 1) ? ' AND tid IN ('.implode(',', $tags).')' : ' AND tid = '.$tags[0];
-					
-					// select the item ids that have the common tags
-					$query2 = 'SELECT DISTINCT itemid' .
-							' FROM #__flexicontent_tags_item_relations' .
-							' WHERE itemid <> '.(int) $id .
-							$where2
-							;
-					$db->setQuery($query2);
-					$related = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-				}
-								
-				if (isset($related) && count($related)) {
-					$where .= (count($related) > 1) ? ' AND i.id IN ('.implode(',', $related).')' : ' AND i.id = '.$related[0];
-				} else {
-					return;
-				}
-			} else {			
-				return;
-			}
 		}
 		
-		// tags scope
-		if ($method_tags > 1) {
-			if (!count($tag_ids)) {
-				// empty ignore and issue a warning
-				echo "<b>WARNING:</b> Misconfigured tags scope, select at least one tag or set tags scope to ALL<br/>";
-			} else {
-				$where2 = (count($tag_ids) > 1) ? ' AND tid IN ('.implode(',', $tag_ids).')' : ' AND tid = '.$tag_ids[0];
+		// 'behaviour' 2 means records that are related to current item via the relation Field
+		else if ($behaviour_items==2)
+		{
+			if ( !$isflexi_itemview ) {
+				return;  // current view is not item view ... , nothing to display
+			}
+			
+			unset($related);  // make sure this is no set ...
+			if (count($relitems_fields))
+			{
+				$where2 = (count($relitems_fields) > 1) ? ' AND field_id IN ('.implode(',', $relitems_fields).')' : ' AND field_id = '.$relitems_fields[0];
 				
-				// retieve item ids using the providen tags
-				$query2 = 'SELECT DISTINCT itemid' .
-						' FROM #__flexicontent_tags_item_relations' .
-						' WHERE 1=1 ' .
+				// select the item ids related to current item via the relation fields
+				$query2 = 'SELECT DISTINCT value' .
+						' FROM #__flexicontent_fields_item_relations' .
+						' WHERE item_id = '.(int) $id .
 						$where2
 						;
 				$db->setQuery($query2);
-				$tagged = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$related = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$related = is_array($related) ? array_map( 'intval', $related ) : $related;
 			}
 			
-			if ( isset($tagged) && count($tagged) ) {
-				if ($method_tags == 2) { // exclude method
-					$where .= (count($tagged) > 1) ? ' AND i.id NOT IN ('.implode(',', $tagged).')' : ' AND i.id <> '.$tagged[0];
-				} else if ($method_tags == 3) { // include method
-					$where .= (count($tagged) > 1) ? ' AND i.id IN ('.implode(',', $tagged).')' : ' AND i.id = '.$tagged[0];
-				}
-			} else if ( isset($tagged) ) {
-				// No tagged items found abort if method is 'include' (but continue for 'exclude' method
-				if ($method_tags == 3) return;
+			if (isset($related) && count($related)) {
+				$where .= (count($related) > 1) ? ' AND i.id IN ('.implode(',', $related).')' : ' AND i.id = '.$related[0];
+			} else {
+				// No related items were found
+				return;
 			}
 		}
 		
-		// date scope
-		if (!$behaviour_dates) {
+		// 'behaviour' 1 means records that are related to current item via common TAGS
+		else if ($behaviour_items==1)
+		{
+			if ( !$isflexi_itemview ) {
+				return;  // current view is not item view ... , nothing to display
+			}
 			
+			// select the tags associated to the item
+			$query2 = 'SELECT tid' .
+					' FROM #__flexicontent_tags_item_relations' .
+					' WHERE itemid = '.(int) $id;
+			$db->setQuery($query2);
+			$tags = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$tags = array_diff($tags,$excluded_tags);
+			
+			unset($related);
+			if ($tags)
+			{
+				$where2 = (count($tags) > 1) ? ' AND tid IN ('.implode(',', $tags).')' : ' AND tid = '.$tags[0];
+				
+				// select the item ids related to current item via common tags
+				$query2 = 'SELECT DISTINCT itemid' .
+						' FROM #__flexicontent_tags_item_relations' .
+						' WHERE itemid <> '.(int) $id .
+						$where2
+						;
+				$db->setQuery($query2);
+				$related = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			}
+			
+			if (isset($related) && count($related)) {
+				$where .= (count($related) > 1) ? ' AND i.id IN ('.implode(',', $related).')' : ' AND i.id = '.$related[0];
+			} else {
+				// No related items were found
+				return;
+			}
+		}
+		
+		
+		// **********
+		// tags scope
+		// **********
+		
+		if ($method_tags > 1)
+		{
+			// Check for empty statically selected records, and abort with error message
+			if ( empty($tag_ids) ) {
+				echo "<b>WARNING:</b> Misconfigured tags scope, select at least one tag or set tags scope to ALL<br/>";
+				return;
+			}
+			
+			// Make sure tag_ids is an array
+			$tag_ids = !is_array($tag_ids) ? array($tag_ids) : $tag_ids ;
+			
+			// Create query to match item ids using the selected tags
+			$query2 = 'SELECT DISTINCT itemid'
+				. ' FROM #__flexicontent_tags_item_relations'
+				. ' WHERE tid IN ('.implode(',', $tag_ids).')'
+				;
+			
+			if ($method_tags == 2) { // exclude method
+				$where .= ' AND i.id NOT IN ('.$query2.')';
+			} else if ($method_tags == 3) { // include method
+				$where .= ' AND i.id IN ('.$query2.')';
+			}
+		}
+		
+		
+		// **********
+		// date scope
+		// **********
+		
+		// ZERO 'behaviour' means statically selected date limits
+		if (!$behaviour_dates)
+		{
 			if (!$raw_edate && $edate && !FLEXIUtilities::isSqlValidDate($edate)) {
 				echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior) and enter custom offset e.g. five days ago (be careful with space character): -5 d<br/>";
-				$edate = '';
+				//$edate = '';
+				return;
 			} else if ($edate) {
 				$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' <= '.(!$raw_edate ? $db->Quote($edate) : $edate).' )';
 			}
 			
 			if (!$raw_bdate && $bdate && !FLEXIUtilities::isSqlValidDate($bdate)) {
 				echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior) and enter custom offset e.g. five days ago (be careful with space character): -5 d<br/>";
-				$bdate = '';
+				//$bdate = '';
+				return;
 			} else if ($bdate) {
 				$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.(!$raw_bdate ? $db->Quote($bdate) : $bdate).' )';
 			}
-			
-		} else {
-			
-			if ( !$isflexi_itemview && ($date_compare == 1) )
-			{
-				return;  // date_compare == 1 means compare to current item, but current view is not an item view so we terminate
-			}
-			else
-			{
-				// FOR date_compare==0, $cdate is SERVER DATE
-				// FOR date_compare==1, $cdate is CURRENT ITEM DATE of type created or modified or publish_up
-				switch ($behaviour_dates) 
-				{
-					case '1' : // custom offset
-						if ($edate) {
-							$edate = explode(' ', $edate);
-							if (count($edate)!=2)
-								echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d<br/>";
-							else
-								$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, $edate[0], $edate[1])).' )';
-						}
-						if ($bdate) {
-							$bdate = explode(' ', $bdate);
-							if (count($bdate)!=2)
-								echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date:Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d<br/>";
-							else
-								$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, $bdate[0], $bdate[1])).' )';
-						}
-					break;
-
-					case '2' : // same month
-						$cdate = explode(' ', $cdate);
-						$cdate = explode('-', $cdate[0]);
-						$cdate = $cdate[0].'-'.$cdate[1].'-01 00:00:00';
-
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'm')).' )';
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote($cdate).' )';
-					break;
-
-					case '3' : // same year
-						$cdate = explode(' ', $cdate);
-						$cdate = explode('-', $cdate[0]);
-						$cdate = $cdate[0].'-01-01 00:00:00';
-
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'Y')).' )';
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote($cdate).' )';
-					break;
-
-					case '4' : // previous month
-						$cdate = explode(' ', $cdate);
-						$cdate = explode('-', $cdate[0]);
-						$cdate = $cdate[0].'-'.$cdate[1].'-01 00:00:00';
-
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote($cdate).' )';
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'm')).' )';
-					break;
-
-					case '5' : // previous year
-						$cdate = explode(' ', $cdate);
-						$cdate = explode('-', $cdate[0]);
-						$cdate = $cdate[0].'-01-01 00:00:00';
-
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote($cdate).' )';
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'Y')).' )';
-					break;
-
-					case '6' : // next month
-						$cdate = explode(' ', $cdate);
-						$cdate = explode('-', $cdate[0]);
-						$cdate = $cdate[0].'-'.$cdate[1].'-01 00:00:00';
-
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'm')).' )';
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'm')).' )';
-					break;
-
-					case '7' : // next year
-						$cdate = explode(' ', $cdate);
-						$cdate = explode('-', $cdate[0]);
-						$cdate = $cdate[0].'-01-01 00:00:00';
-
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'Y')).' )';
-						$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'Y')).' )';
-					break;
-				}
-			}
-			
 		}
 		
-		// EXTRA join when comparing to custom date field
+		// non-ZERO 'behaviour' means dynamically decided date limits
+		else
+		{
+			if ( !$isflexi_itemview && ($date_compare == 1) ) {
+				return;  // date_compare == 1 means compare to current item, but current view is not an item view so we terminate
+			}
+			
+			// FOR date_compare==0, $cdate is SERVER DATE
+			// FOR date_compare==1, $cdate is CURRENT ITEM DATE of type created or modified or publish_up
+			switch ($behaviour_dates) 
+			{
+				case '1' : // custom offset
+					if ($edate) {
+						$edate = explode(' ', $edate);
+						if (count($edate)!=2) {
+							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d<br/>";
+							return;
+						} else {
+							$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, $edate[0], $edate[1])).' )';
+						}
+					}
+					if ($bdate) {
+						$bdate = explode(' ', $bdate);
+						if (count($bdate)!=2) {
+							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date:Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d<br/>";
+							return;
+						} else {
+							$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, $bdate[0], $bdate[1])).' )';
+						}
+					}
+				break;
+
+				case '2' : // same month
+					$cdate = explode(' ', $cdate);
+					$cdate = explode('-', $cdate[0]);
+					$cdate = $cdate[0].'-'.$cdate[1].'-01 00:00:00';
+
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'm')).' )';
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote($cdate).' )';
+				break;
+
+				case '3' : // same year
+					$cdate = explode(' ', $cdate);
+					$cdate = explode('-', $cdate[0]);
+					$cdate = $cdate[0].'-01-01 00:00:00';
+
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'Y')).' )';
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote($cdate).' )';
+				break;
+
+				case '4' : // previous month
+					$cdate = explode(' ', $cdate);
+					$cdate = explode('-', $cdate[0]);
+					$cdate = $cdate[0].'-'.$cdate[1].'-01 00:00:00';
+
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote($cdate).' )';
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'm')).' )';
+				break;
+
+				case '5' : // previous year
+					$cdate = explode(' ', $cdate);
+					$cdate = explode('-', $cdate[0]);
+					$cdate = $cdate[0].'-01-01 00:00:00';
+
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote($cdate).' )';
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'Y')).' )';
+				break;
+
+				case '6' : // next month
+					$cdate = explode(' ', $cdate);
+					$cdate = explode('-', $cdate[0]);
+					$cdate = $cdate[0].'-'.$cdate[1].'-01 00:00:00';
+
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'm')).' )';
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'm')).' )';
+				break;
+
+				case '7' : // next year
+					$cdate = explode(' ', $cdate);
+					$cdate = explode('-', $cdate[0]);
+					$cdate = $cdate[0].'-01-01 00:00:00';
+
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'Y')).' )';
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'Y')).' )';
+				break;
+			}
+		}
+		
+		
+		
+		// *****************************
+		// EXTRA joins for special cases
+		// *****************************
+		
+		// EXTRA joins when comparing to custom date field
+		$join_date = '';
 		if ( ($bdate || $edate || $behaviour_dates) && $date_type == 3) {
 			if ($datecomp_field) {
 				$join_date =
@@ -1103,34 +1244,24 @@ class modFlexicontentHelper
 					. '   ON ( i.id = dfrel.item_id AND dfrel.valueorder = 1 AND dfrel.field_id = '.$datecomp_field.' )';
 			} else {
 				echo "<b>WARNING:</b> Misconfigured date scope, you have set DATE TYPE as CUSTOM DATE Field, but have not select any specific DATE Field to be used<br/>";
-				$join_date = '';
+				//$join_date = '';
+				return;
 			}
-		} else {
-			$join_date = '';
 		}
-		
-		// EXTRA select and join for special fields: --image--
-		/*if ($mod_image) {
-			$select_image 	= ' firel.value AS image,';
-			$join_image 	= '	LEFT JOIN #__flexicontent_fields_item_relations AS firel'
-							. '	ON ( i.id = firel.item_id AND firel.valueorder = 1 AND firel.field_id = '.$mod_image.' )';
-		} else {
-			$select_image	= '';
-			$join_image		= '';
-		}*/
 		
 		// EXTRA join of field used in custom ordering
+		$join_field = '';
 		if ($ordering=='field' && $params->get('orderbycustomfieldid') ) {
 			$join_field = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
-		} else {
-			$join_field = '';
 		}
 		
-		// some parameter aliases
+		
+		// *****************************************************
+		// Decide Select Sub-Clause and Join-Clause for comments
+		// *****************************************************
+		
 		$display_comments	= $params->get('display_comments');
 		$display_comments_feat = $params->get('display_comments_feat');
-		$display_voting	= $params->get('display_voting');
-		$display_voting_feat = $params->get('display_voting_feat');
 		
 		// Check (when needed) if jcomments are installed, and also clear 'commented' ordering if they jcomments is missing
 		if ($display_comments_feat || $display_comments || $ordering=='commented') {
@@ -1146,20 +1277,35 @@ class modFlexicontentHelper
 		
 		// Decide to JOIN (or not) with comments TABLE, needed when displaying comments and/or when ordering by comments
 		$add_comments = ($display_comments_feat || $display_comments || $ordering=='commented') && $jcomments_exist;
-		$join_comments_type = $ordering=='commented' ? ' INNER JOIN' : ' LEFT JOIN';
+		
 		// Additional select and joins for comments
-		$select_comments = $add_comments ? ' count(com.object_id) AS comments_total,' : '';
-		$join_comments   = $add_comments ? $join_comments_type.' #__jcomments AS com ON com.object_id = i.id' : '' ;
+		$select_comments     = $add_comments ? ' count(com.object_id) AS comments_total,' : '';
+		$join_comments_type  = $ordering=='commented' ? ' INNER JOIN' : ' LEFT JOIN';
+		$join_comments       = $add_comments ? $join_comments_type.' #__jcomments AS com ON com.object_id = i.id' : '' ;
+		
+		
+		// **********************************************************
+		// Decide Select Sub-Clause and Join-Clause for voting/rating
+		// **********************************************************
+		
+		$display_voting	= $params->get('display_voting');
+		$display_voting_feat = $params->get('display_voting_feat');
 		
 		// Decide to JOIN (or not) with rating TABLE, needed when displaying ratings and/or when ordering by ratings
 		$add_rated = $display_voting_feat || $display_voting || $ordering=='rated';
-		$join_rated_type = $ordering=='rated' ? ' INNER JOIN' : ' LEFT JOIN';
-		// Additional select and joins for ratings
-		$select_rated = $ordering=='rated' ? ' (cr.rating_sum / cr.rating_count) * 20 AS votes,' : '';
-		$select_rated .= $add_rated ? ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,' : '';
-		$join_rated   = $add_rated ? $join_rated_type.' #__content_rating AS cr ON cr.content_id = i.id' : '' ;
 		
+		// Additional select and joins for ratings
+		$select_rated     = $ordering=='rated' ? ' (cr.rating_sum / cr.rating_count) * 20 AS votes,' : '';
+		$select_rated    .= $add_rated ? ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,' : '';
+		$join_rated_type  = $ordering=='rated' ? ' INNER JOIN' : ' LEFT JOIN';
+		$join_rated       = $add_rated ? $join_rated_type.' #__content_rating AS cr ON cr.content_id = i.id' : '' ;
+		
+		
+		// ************
 		// Get ordering
+		// ************
+		
+		$orderby = '';
 		if ($ordering) {
 			$orderby = flexicontent_db::buildItemOrderBy(
 				$params,
@@ -1167,50 +1313,58 @@ class modFlexicontentHelper
 				$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
 				$default_order = '', $default_order_dir = ''
 			);
-		} else {
-			$orderby = '';
 		}
+		
+		
+		// ***********************************************************
+		// Finally put together the query to retrieve the listed items
+		// ***********************************************************
 		
 		if ( empty($items_query) ) {  // If a custom query has not been set above then use the default one ...
 			$items_query 	= 'SELECT i.*, ie.*, ty.name AS typename,'
-					//. $select_image
-					. $select_comments
-					. $select_rated
-					. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
-						. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
-					. ' FROM #__content AS i'
-					. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
-					. ' LEFT JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-					. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-					. $join_favs
-					//. $join_image
-					. $join_date
-					. $join_comments
-					. $join_rated
-					. $join_field
-					. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
-					. ' GROUP BY i.id'
-					. $orderby
-					;
+				. $select_comments
+				. $select_rated
+				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
+				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
+					. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
+				. ' FROM #__content AS i'
+				. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
+				. ' LEFT JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+				. $join_favs
+				. $join_date
+				. $join_comments
+				. $join_rated
+				. $join_field
+				. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
+				. ' GROUP BY i.id'
+				. $orderby
+				;
 		}
+		
+		
+		// **********************************
+		// Execute query once OR per category
+		// **********************************
 		
 		if (!isset($multiquery_cats)) $multiquery_cats = array("");
 		foreach($multiquery_cats as $cat_where) {
 			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
 			$db->setQuery($per_cat_query, 0, $count);
 			$rows = $db->loadObjectList();
-			if ( $db->getErrorNum() ) {
-				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br($items_query."\n".$db->getErrorMsg()."\n"),'error');
-			}
+			if ( $db->getErrorNum() )  JFactory::getApplication()->enqueueMessage(nl2br($items_query."\n".$db->getErrorMsg()."\n"),'error');
 			$cat_items_arr[] = $rows;
 		}
 		
+		
+		// ************************************************************************************************
+		// Return items indexed per category id OR via empty string if not apply configuration per category
+		// ************************************************************************************************
 		return $cat_items_arr;
 	}
-
+	
+	
 	function getCategoryData(&$params)
 	{
 		if (!$params->get('apply_config_per_category', 0)) return false;
@@ -1377,6 +1531,10 @@ class modFlexicontentHelper
 	function getExtraCats($cids, $treeinclude, $curritemcats)
 	{
 		global $globalcats;
+		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
+		$fparams = $app->getParams('com_flexicontent');
+		$show_noauth = $fparams->get('show_noauth', 0);
 		
 		$all_cats = $cids;
 		foreach ($cids as $cid)
@@ -1403,13 +1561,36 @@ class modFlexicontentHelper
 			$all_cats = array_merge($all_cats, $cats);
 		}
 		
-		// Filter categories (check that are published, etc)
+		// Select only categories that user has view access, if listing of unauthorized content is not enabled
+		$joinaccess = '';
+		$andaccess = '';
+		if (!$show_noauth) {
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$andaccess .= ' AND c.access IN ('.$aid_list.')';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$andaccess  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
+				} else {
+					$andaccess  .= ' AND c.access <= '.$aid;
+				}
+			}
+		}
+		
+		// Filter categories (check that are published and that have ACCESS Level that is assinged to current user)
 		$db = JFactory::getDBO();
-		$query = 'SELECT c.id '
+		$query = 'SELECT DISTINCT c.id'
 			.' FROM #__categories AS c'
-			.' WHERE c.id IN ('.implode(',', $all_cats).') AND c.published = 1';
+			.$joinaccess
+			.' WHERE c.id IN ('.implode(',', $all_cats).') AND c.published = 1'
+			.$andaccess
+			;
 		$db->setQuery($query);
 		$published_cats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
 		return array_unique($published_cats);
 	}
