@@ -21,7 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $uri = JURI::getInstance();
 $current_uri = $uri->toString();
 $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;task=';
-$del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
+$del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 ?>
 
 <table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;">

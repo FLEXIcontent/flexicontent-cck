@@ -172,7 +172,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					foreach ($categories as $category) {
 						if (!in_array($category->id, @$globalnoroute)) :
 							$cat_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
-							$display = '<a class="fc_categories link_' . $field->name . '" href="' . $cat_link . '">' . $category->title . '</a>';
+							$display = '<a class="fc_categories fc_category_' .$category->id. ' link_' .$field->name. '" href="' . $cat_link . '">' . $category->title . '</a>';
 							$field->display[] = $pretext. $display .$posttext;
 							$field->value[] = $category->title;
 						endif;
@@ -189,7 +189,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$field->display = array();
 					foreach ($tags as $tag) :
 						$tag_link = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug));
-						$display = '<a class="fc_tags link_' . $field->name . '" href="' . $tag_link . '">' . $tag->name . '</a>';
+						$display = '<a class="fc_tags fc_tag_' .$tag->id. ' link_' .$field->name. '" href="' . $tag_link . '">' . $tag->name . '</a>';
 						$field->display[] = $pretext. $display .$posttext;
 						$field->value[] = $tag->name; 
 					endforeach;

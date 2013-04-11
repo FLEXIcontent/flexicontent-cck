@@ -86,7 +86,15 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			return;
 		}
 		
-		$class = '';//$required;
+		static $select2_added = false;
+	  if ( !$select2_added )
+	  {
+			$select2_added = true;
+			flexicontent_html::loadFramework('select2');
+		}
+		
+		$classes  = ' use_select2_lib ';
+		//$classes .= $required;  // this was commented out since we added a min max limitation
 		$attribs = 'multiple="multiple" '.$size;
 		if ($exact_values)  {
 			$attribs .= ' exact_values="'.$exact_values.'" ';
@@ -95,8 +103,8 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			if ($min_values)    $attribs .= ' min_values="'.$min_values.'" ';
 		}
 		if ($js_popup_err)  $attribs .= ' js_popup_err="'.$js_popup_err.'" ';
-		if ($max_values || $min_values || $exact_values)  $class .= ' validate-sellimitations ';
-		if ($class)  $attribs .= ' class="'.$class.'" ';
+		if ($max_values || $min_values || $exact_values)  $classes .= ' validate-sellimitations ';
+		if ($classes)  $attribs .= ' class="'.$classes.'" ';
 		
 		// Create field's HTML display for item form
 		// Display as drop-down (multiple) select

@@ -530,6 +530,14 @@ div.flexi_edit .flexi_buttons {
 button.fc_button {}
 
 
+/********************
+ * Other CSS for Form
+ ********************/
+
+div.flexi_edit .flexi_label.fc_tooltip_icon_fe {
+	background: url(../images/icon-16-hint.png) 100% 0% no-repeat #F6F6F6;
+}
+
 
 /****************
  * Access related

@@ -97,7 +97,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			hid.value = id;
 			hid.id = ixid;
 
-			img.src = '".$prefix."components/com_flexicontent/assets/images/move3.png';
+			img.src = '".$prefix."components/com_flexicontent/assets/images/move2.png';
 			img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
 
 			filelist.appendChild(li);
@@ -139,31 +139,31 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		";
 		$document->addScriptDeclaration($js);
 
-			// Add the drag and drop sorting feature
-			$js = "
-			window.addEvent('domready', function(){
-				new Sortables($('sortables_".$field->id."'), {
-					'constrain': true,
-					'clone': true,
-					'handle': '.fcfield-drag'
-					});
+		// Add the drag and drop sorting feature
+		$js = "
+		window.addEvent('domready', function(){
+			new Sortables($('sortables_".$field->id."'), {
+				'constrain': true,
+				'clone': true,
+				'handle': '.fcfield-drag'
 				});
-			";
-			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
-			$document->addScriptDeclaration($js);
+			});
+		";
+		if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+		$document->addScriptDeclaration($js);
 
-			$css = '
-			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
-			#sortables_'.$field->id.' li {
-				clear:both;
-				list-style: none;
-				height: 20px;
-				}
-			#sortables_'.$field->id.' li input { cursor: text;}
-			';
-			$document->addStyleDeclaration($css);
+		$css = '
+		#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+		#sortables_'.$field->id.' li {
+			clear:both;
+			list-style: none;
+			height: 20px;
+			}
+		#sortables_'.$field->id.' li input { cursor: text;}
+		';
+		$document->addStyleDeclaration($css);
 
-			$move 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
+		$move 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
 
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 

@@ -221,7 +221,7 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 		$msg .= sprintf('<br/>-- [Field HTML Rendering: %.2f s] ', $fc_run_times['render_field_html']/1000000);
 	
 	if (isset($fc_run_times['auto_checkin']))
-		$msg .= sprintf('<br/>-- [Auto Checkin: %.2f s] ', $fc_run_times['render_field_html']/1000000);
+		$msg .= sprintf('<br/>-- [Auto Checkin: %.2f s] ', $fc_run_times['auto_checkin']/1000000);
 		
 	if (count($fields_render_times))
 		$msg .= sprintf('<br/>-- [FC Fields Value Retrieval: %.2f s] ', $fc_run_times['field_value_retrieval']/1000000);

@@ -32,7 +32,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-			<field name="container_width" type="text" default="100%" size="6" label="FLEXI_FIELD_CONTAINER_WIDTH" description="FLEXI_FIELD_CONTAINER_WIDTH_DESC" />
+			<field name="container_width" type="text" default="" size="6" label="FLEXI_FIELD_CONTAINER_WIDTH" description="FLEXI_FIELD_CONTAINER_WIDTH_DESC" />
 			<field name="filter_size" type="text" default="30" size="2" label="Filter Size" description="Size of text field filter" />
 			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -66,7 +66,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="ogpinview" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE" checkvals="item,category,module" defaultvals="item,category,module"
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE" checkvals="item,category,module" defaultvals=""
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
 			<field name="ogpusage" type="radio" default="1" label="FLEXI_SOCIAL_USAGE_IN_LISTING" description="FLEXI_SOCIAL_USAGE_IN_LISTING_DESC">
 				<option value="1">FLEXI_TITLE</option>

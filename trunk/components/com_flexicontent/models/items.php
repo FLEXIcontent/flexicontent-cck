@@ -109,7 +109,8 @@ class FlexicontentModelItems extends ParentClassItem
 				//$has_mcat_access = FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_item->catid) : $this->_item->category_access <= $aid;
 				//$has_type_access = ... must do SQL query, because No FLEXIaccess support via checkAllItemReadAccess() function
 				//$canviewitem = $has_item_access && $has_type_access && $has_mcat_access;
-				$canviewitem = $item->has_item_access && (!$item->catid || $item->has_mcat_access) && (!$item->type_id || $item->has_type_access);
+				$canviewitem = $this->_item->has_item_access &&
+					(!$this->_item->catid || $this->_item->has_mcat_access) && (!$this->_item->type_id || $this->_item->has_type_access);
 			}
 			
 			

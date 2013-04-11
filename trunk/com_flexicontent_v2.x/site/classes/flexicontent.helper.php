@@ -241,6 +241,8 @@ class flexicontent_html
 		if ( isset($_loaded[$framework]) ) return;
 		$_loaded[$framework] = 1;
 		
+		// Get frameworks that are configured to be loaded manually in frontend (e.g. via the Joomla template)
+		$app = JFactory::getApplication();
 		static $load_frameworks = null;
 		if ($load_frameworks === null) {
 			$flexiparams = JComponentHelper::getParams('com_flexicontent');
@@ -248,7 +250,7 @@ class flexicontent_html
 			$load_frameworks = FLEXIUtilities::paramToArray($load_frameworks);
 			$load_frameworks = array_flip($load_frameworks);
 		}
-		if ( !isset($load_frameworks[$framework]) ) return;
+		if ( !isset($load_frameworks[$framework]) && $app->isSite() ) return;
 		
 		// Load Framework
 		$document = JFactory::getDocument();

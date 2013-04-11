@@ -791,7 +791,7 @@ class FlexicontentFields
 		if ($versioned_item) {
 			if (!count($items[0]->tags)) return array();
 			$tids = $items[0]->tags;
-			$query 	= 'SELECT DISTINCT t.name, ' . $items[0]->id .' as itemid, '
+			$query 	= 'SELECT DISTINCT t.id, t.name, ' . $items[0]->id .' as itemid, '
 				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 				. ' FROM #__flexicontent_tags AS t'
 				. " WHERE t.id IN ('" . implode("','", $tids) . "')"
@@ -801,7 +801,7 @@ class FlexicontentFields
 		} else {
 			$cids = array();
 			foreach ($items as $item) { array_push($cids, $item->id); }
-			$query 	= 'SELECT DISTINCT t.name, i.itemid,'
+			$query 	= 'SELECT DISTINCT t.id, t.name, i.itemid,'
 				. ' CASE WHEN CHAR_LENGTH(t.alias) THEN CONCAT_WS(\':\', t.id, t.alias) ELSE t.id END as slug'
 				. ' FROM #__flexicontent_tags AS t'
 				. ' JOIN #__flexicontent_tags_item_relations AS i ON i.tid = t.id'
@@ -1236,7 +1236,7 @@ class FlexicontentFields
 			$filter_custom_options    = $field->parameters->get('filter_custom_options', '');
 			if ( $filter_customize_options && $filter_custom_options) {
 				// Custom query for value retrieval
-				$sql_mode =  $filter_customize_options==2;
+				$sql_mode =  $filter_customize_options==1;
 				$field_elements = $filter_custom_options;
 			} else if ( !$field_elements ) {
 				$field_elements = "SELECT value, value as text FROM #__flexicontent_fields_item_relations as fir WHERE field_id='{field_id}' AND value != '' GROUP BY value";
