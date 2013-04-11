@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.php 1627 2013-01-14 06:59:25Z ggppdk $
+ * @version 1.0 $Id: image.php 1665 2013-04-08 02:26:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.image
@@ -95,7 +95,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				
 				function imgfld_fileelement_url (target, fieldid, itemid, thumb_w, thumb_h) {
-					targetid = target.getParent().getParent().getParent().getElement('.existingname').id;
+					targetid = target.getParent().getParent().getElement('.existingname').id;
 					linkfsel = '".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JUtility::getToken().'=1'."';
 					linkfsel = linkfsel + '&field='+fieldid+'&itemid='+itemid+'&targetid='+targetid+'&thumb_w='+thumb_w+'&thumb_h='+thumb_h+'&autoassign=".$autoassign."';
 					return linkfsel;
@@ -323,7 +323,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -486,13 +486,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			if ( $image_source ) {
 				$select = "
-				<input class='existingname' id='".$elementid."_existingname' name='".$fieldname."[existingname]' value='".$image_name."' readonly='readonly' style='float:left;' /><br/>
-				<div class=\"fcfield-button-add\" style='margin: 0px;'>
-					<div class=\"blank\">
-						<a class=\"addfile_".$field->id."\" id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_SELECT_IMAGE' )."\"
-							href=\"#\" style=\"margin: 0px;\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",'".$u_item_id."',".$thumb_w_s.",".$thumb_h_s.")\"
-							rel=\"{handler: 'iframe', size: {x: (MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT_IMAGE' )."</a>
-					</div>
+				<input class='existingname fcfield_textval' id='".$elementid."_existingname' name='".$fieldname."[existingname]' value='".$image_name."' readonly='readonly' style='float:none;' />
+				<div class=\"fcfield-button-add\" style='margin: 0px;display:inline-block;'>
+					<a class=\"addfile_".$field->id."\" id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_SELECT_IMAGE' )."\"
+						href=\"#\" style=\"margin: 0px;\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",'".$u_item_id."',".$thumb_w_s.",".$thumb_h_s.")\"
+						rel=\"{handler: 'iframe', size: {x: (MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT_IMAGE' )."</a>
 				</div>
 				";
 			}
@@ -517,12 +515,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				
 				if ( !$image_source ) {
-					$change  = '<div class="imgchange">';
 					$change .= !$multiple ?
 						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" style="display:inline;" />' :
 						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this)" value="1" style="display:inline;" />' ;
 					$change .= ' <label class="fcfield-button" style="display:inline;" for="'.$elementid.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>';
-					$change .= '</div>';
 				}
 				
 				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
@@ -563,16 +559,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$curr_select = str_replace('__FORMFLDID__', $elementid.'_existingname', $curr_select);
 			
 			$field->html[] = '
+			'.($image_source ? $curr_select : $change).'
+			'.$move2.'
+			'.$remove_button.'
 			<div style="float:left; clear:none; margin-right: 5px;">
 				'.$imgpreview.'
 				'.$originalname.'
 				<div style="float:left; clear:both;" class="imgactions_box">
 					'.($remove ? $remove.'<br/>' : '').'
 					'.($delete ? $delete.'<br/>' : '').'
-					'.($image_source ? $curr_select : $change).'
 				</div>
 			</div>
-			'.$remove_button.'
 			<div style="float:left; clear:none;" class="img_value_props">
 				<table class="admintable"><tbody>
 					'.@$urllink.'
@@ -599,7 +596,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					.'
 				</tbody></table>
 			</div>
-			'.$move2.'
 			';
 			
 			$n++;
@@ -1948,15 +1944,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 	  // Add Select2 script on the document.ready event
 		static $select2_added = false;
-		$use_select2 = 1;
-		if ( $use_select2 )
-		{
-			$classes .= ' use_select2_lib ';
-		  if ( !$select2_added )
-		  {
-				$select2_added = true;
-				flexicontent_html::loadFramework('select2');
-			}
+		$classes .= ' use_select2_lib ';
+	  if ( !$select2_added )
+	  {
+			$select2_added = true;
+			flexicontent_html::loadFramework('select2');
 		}
 		
 		// Add custom Javascript Code

@@ -190,7 +190,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -235,8 +235,8 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				'.$link.'
 				'.@$title.'
 				'.$hits.'
-				'.$remove_button.'
 				'.$move2.'
+				'.$remove_button.'
 				';
 			
 			$n++;

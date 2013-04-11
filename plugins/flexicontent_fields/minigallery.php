@@ -109,7 +109,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			hid.value = id;
 			hid.id = ixid;
 
-			img.src = '".JURI::root()."administrator/components/com_flexicontent/assets/images/move3.png';
+			img.src = '".JURI::root()."administrator/components/com_flexicontent/assets/images/move2.png';
 			img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
 
 			filelist.appendChild(li);
@@ -150,43 +150,43 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		}
 		";
 		$document->addScriptDeclaration($js);
-
-			// Add the drag and drop sorting feature
-			$js = "
-			window.addEvent('domready', function(){
-				new Sortables($('sortables_".$field->id."'), {
-					'constrain': true,
-					'clone': true,
-					'handle': '.fcfield-drag'
-					});
+		
+		// Add the drag and drop sorting feature
+		$js = "
+		window.addEvent('domready', function(){
+			new Sortables($('sortables_".$field->id."'), {
+				'constrain': true,
+				'clone': true,
+				'handle': '.fcfield-drag'
 				});
-			";
-			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
-			$document->addScriptDeclaration($js);
+			});
+		";
+		if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+		$document->addScriptDeclaration($js);
 
-			$css = '
-			#sortables_'.$field->id.' { float:left; margin: 0 0 10px 0; padding: 0px; list-style: none; white-space: nowrap; }
-			#sortables_'.$field->id.' li {
-				list-style: none;
-				height: 130px;
-				width: 100px;
-				margin: 8px 0px 0px 12px !important;
-				float:left;
+		$css = '
+		#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+		#sortables_'.$field->id.' li {
+			list-style: none;
+			height: 130px;
+			width: 100px;
+			margin: 8px 0px 0px 12px !important;
+			float:left;
+		}
+		#sortables_'.$field->id.' li img.thumbs {
+			border: 1px solid silver;
+			padding: 0;  margin: 0px 0px 6px 0px;
+			float: left; clear:both;
 			}
-			#sortables_'.$field->id.' li img.thumbs {
-				border: 1px solid silver;
-				padding: 0;  margin: 0px 0px 6px 0px;
-				float: left; clear:both;
-				}
-			#sortables_'.$field->id.' li input { float:left; }
-			#sortables_'.$field->id.' li span.fcfield-drag img { float:left!important; margin:2px 0px 0px 0px!important; }
-			';
-			$document->addStyleDeclaration($css);
-
-			$move 	= JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) );
-
+		#sortables_'.$field->id.' li input.fcfield-button { float:left!important; }
+		#sortables_'.$field->id.' li span.fcfield-drag img { float:left!important; margin:2px 0px 0px 0px!important; }
+		';
+		$document->addStyleDeclaration($css);
+		
+		$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+		
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
-
+		
 		$i = 0;
 		$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
 		if($field->value) {
@@ -200,8 +200,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 				$field->html .= ' <img class="thumbs" src="'.$src.'"/>';
 				$field->html .= '  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file.'" />';
+				$field->html .= $move2;
 				$field->html .= '  <input class="inputbox fcfield-button" type="button" onclick="deleteField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" />';
-				$field->html .= '  <span class="fcfield-drag">'.$move.'</span>';
 				$field->html .= '</li>';
 				$i++;
 			}

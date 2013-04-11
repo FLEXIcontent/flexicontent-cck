@@ -55,8 +55,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$inputmask	= $field->parameters->get( 'inputmask', false ) ;
 		$custommask = $field->parameters->get( 'custommask', false ) ;
 		
-		$required		= $field->parameters->get( 'required', 0 ) ;
-		$required		= $required ? ' required' : '';
+		$required = $field->parameters->get( 'required', 0 ) ;
+		$required = $required ? ' required' : '';
 		
 		$extra_attribs = $field->parameters->get( 'extra_attribs', '' ) ;
 		$attribs = $extra_attribs;
@@ -117,6 +117,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 					
 					thisNewField.getFirst().setProperty('value','');  /* First element is the value input field, second is e.g remove button */
 
+					var has_inputmask = jQuery(thisNewField).find('input.has_inputmask') != 0;
+					if (has_inputmask)  jQuery(thisNewField).find('input.has_inputmask').inputmask();
+					
 					thisNewField.injectAfter(thisField);
 					";
 			
@@ -188,7 +191,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move3.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -197,10 +200,20 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		// Drop-Down select for textselect field type
 		if ($field->field_type=='textselect') {
+			static $select2_added = false;
+		  if ( !$select2_added )
+		  {
+				$select2_added = true;
+				flexicontent_html::loadFramework('select2');
+			}
+		
+			$sel_classes  = ' fcfield_textselval use_select2_lib ';
+		  $sel_onchange = "this.getParent().getElement('input.fcfield_textval').setProperty('value', this.getProperty('value')); this.setProperty('value', ''); ";
+			$sel_attribs  = ' class="'.$sel_classes.'" onchange="'.$sel_onchange.'"';
+			
 			$fieldname_sel = FLEXI_J16GE ? 'custom['.$field->name.'_sel][]' : $field->name.'_sel[]';
-		  $selonchange = "this.getParent().getElement('input.fcfield_textval').setProperty('value', this.getProperty('value')); this.setProperty('value', ''); ";
-			$selops = plgFlexicontent_fieldsText::buildSelectOptions($field, $item);
-			$selhtml = JHTML::_('select.genericlist', $selops, $fieldname_sel, ' class="fcfield_textselval" onchange="'.$selonchange.'"', 'value', 'text', array());
+			$sel_ops = plgFlexicontent_fieldsText::buildSelectOptions($field, $item);
+			$selhtml = JHTML::_('select.genericlist', $sel_ops, $fieldname_sel, $sel_attribs, 'value', 'text', array());
 		} else {
 			$selhtml='';
 		}
@@ -213,15 +226,17 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$validate_mask = $inputmask ? " data-inputmask=\" 'alias': '".$inputmask."' \" " : "";
 		}
 		
+		$classes = 'fcfield_textval inputbox'.$required.($inputmask ? ' has_inputmask' : '');
+		
 		$field->html = array();
 		$n = 0;
 		foreach ($field->value as $value)
 		{
 			$field->html[] = '
-				<input '. $validate_mask .' id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="fcfield_textval inputbox'.$required.'" type="text" size="'.$size.'" value="'.$value.'"'.$attribs.' />
+				<input '. $validate_mask .' id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="'.$classes.'" type="text" size="'.$size.'" value="'.$value.'"'.$attribs.' />
 				'.$selhtml.'
-				'.$remove_button.'
 				'.$move2.'
+				'.$remove_button.'
 				';
 			
 			$n++;

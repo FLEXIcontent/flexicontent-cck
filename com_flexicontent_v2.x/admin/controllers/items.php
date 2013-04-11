@@ -1093,13 +1093,15 @@ class FlexicontentControllerItems extends FlexicontentController
 				$data['vstate']  = 2;
 				$data['state']   = $state;
 				
+				if (count($fields) > count($columns)) {
+					$msg = "Redundadant columns at record row ".$lineno.", Found # columns: ". count($fields) . " > expected: ". count($columns);
+					if (FLEXI_J16GE) JLog::add($msg); else $log->addEntry( array('comment' => $msg) );
+				}
+				
 				// Handle each field of the item
 				foreach($fields as $col_no => $field_data)
 				{
-					if ($col_no >= count($columns)) {
-						echo "Redundadant column data at record row ".$lineno;
-						continue;
-					}
+					if ($col_no >= count($columns)) break;
 					
 					$fieldname = $columns[$col_no];
 					if ( in_array($fieldname, $core_props) ) {

@@ -78,6 +78,17 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			return;
 		}
 		
+		static $select2_added = false;
+	  if ( !$select2_added )
+	  {
+			$select2_added = true;
+			flexicontent_html::loadFramework('select2');
+		}
+		
+		$classes  = ' use_select2_lib ';
+		$classes .= $required;
+		$attribs = ' class="'.$classes.'"';
+		
 		// Create field's HTML display for item form
 		// Display as drop-down select
 		$options = array();
@@ -85,7 +96,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		foreach ($elements as $element) {
 			$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
 		}
-		$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'class="'.$required.'"', 'value', 'text', $field->value, $elementid);
+		$field->html	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $field->value, $elementid);
 	}
 	
 	

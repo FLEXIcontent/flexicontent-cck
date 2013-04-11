@@ -63,7 +63,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="ogpinview" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE" checkvals="items,category,module" defaultvals="items,category,module"
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE" checkvals="items,category,module" defaultvals=""
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
 			<field name="ogpusage" type="radio" default="1" label="FLEXI_SOCIAL_USAGE_IN_LISTING" description="FLEXI_SOCIAL_USAGE_IN_LISTING_DESC">
 				<option value="1">FLEXI_TITLE</option>
