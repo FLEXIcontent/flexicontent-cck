@@ -166,7 +166,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				clear: both;
 				display: block;
 				list-style: none;
-				height: 20px;
+				height: auto;
 				position: relative;
 			}
 			#sortables_'.$field->id.' li.sortabledisabled {

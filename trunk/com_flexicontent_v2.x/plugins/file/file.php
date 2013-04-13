@@ -20,199 +20,219 @@ jimport('joomla.event.plugin');
 class plgFlexicontent_fieldsFile extends JPlugin
 {
 	static $field_types = array('file');
-
+	
 	// ***********
 	// CONSTRUCTOR
 	// ***********
-
+	
 	function plgFlexicontent_fieldsFile( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_file', JPATH_ADMINISTRATOR);
 	}
-
-
-
+	
+	
+	
 	// *******************************************
 	// DISPLAY methods, item form & frontend views
 	// *******************************************
-
+	
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-
+		
+		$field->label = JText::_($field->label);
+		
 		// some parameter shortcuts
-		$document		= & JFactory::getDocument();
-		$size				= $field->parameters->get( 'size', 30 ) ;
+		$document  = JFactory::getDocument();
+		$size      = $field->parameters->get( 'size', 30 ) ;
+		$multiple  = 1; //$field->parameters->get( 'allow_multiple', 1 ) ;  // cannot be disable file adding function would need updating
 
 		$app				= & JFactory::getApplication();
 		$prefix			= $app->isSite() ? 'administrator/' : '';
-		$required 	= $field->parameters->get( 'required', 0 ) ;
-		$required 	= $required ? ' required' : '';
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
 
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
-
-		$js = "
-
-		var value_counter=".count($field->value).";
-
-		function qfSelectFile".$field->id."(id, file) {
-		  value_counter++;
-
-		  var valcounter = $('".$field->name."');
-			valcounter.value = value_counter;
-
-			var name 	= 'a_name'+id;
-			var ixid 	= 'a_id'+id;
-			var li 		= document.createElement('li');
-			var txt		= document.createElement('input');
-			var hid		= document.createElement('input');
-			var span	= document.createElement('span');
-			var img		= document.createElement('img');
-
-			var filelist = document.getElementById('sortables_".$field->id."');
-
-			$(li).addClass('sortabledisabled');
-			$(span).addClass('fcfield-drag');
-
-			var button = document.createElement('input');
-			button.type = 'button';
-			button.name = 'removebutton_'+id;
-			button.id = 'removebutton_'+id;
-			$(button).addClass('fcfield-button');
-			$(button).addEvent('click', function() { deleteField".$field->id."(this) });
-			button.value = '".JText::_( 'FLEXI_REMOVE_FILE',true )."';
-
-			txt.type = 'text';
-			txt.size = '".$size."';
-			txt.disabled = 'disabled';
-			txt.id	= name;
-			txt.value	= file;
-
-			hid.type = 'hidden';
-			hid.name = '".$fieldname."';
-			hid.value = id;
-			hid.id = ixid;
-
-			img.src = '".$prefix."components/com_flexicontent/assets/images/move2.png';
-			img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
-
-			filelist.appendChild(li);
-			li.appendChild(txt);
-			li.appendChild(button);
-			li.appendChild(hid);
-			li.appendChild(span);
-			span.appendChild(img);
-
-			new Sortables($('sortables_".$field->id."'), {
-				'constrain': true,
-				'clone': true,
-				'handle': '.fcfield-drag'
-			});
-		}
-
-		function deleteField".$field->id."(el) {
-		  value_counter--;
-
-		  var valcounter = $('".$field->name."');
-			if ( value_counter > 0 ) valcounter.value = value_counter;
-			else valcounter.value = '';
-
-			var field	= $(el);
-			var row		= field.getParent();
-			if (MooTools.version>='1.2.4') {
-				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
-			} else {
-				var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
-			}
-
-			fx.start({
-				'height': 0,
-				'opacity': 0
-			}).chain(function(){
-				(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
-			});
-		}
-		";
-		$document->addScriptDeclaration($js);
 		
-		// Add the drag and drop sorting feature
-		$js = "
-		window.addEvent('domready', function(){
-			new Sortables($('sortables_".$field->id."'), {
-				'constrain': true,
-				'clone': true,
-				'handle': '.fcfield-drag'
+			$js = "
+			var value_counter=".count($field->value).";
+			
+			function qfSelectFile".$field->id."(id, file) {
+			  value_counter++;
+				
+			  var valcounter = $('".$field->name."');
+				valcounter.value = value_counter;
+				
+				var name 	= 'a_name'+id;
+				var ixid 	= 'a_id'+id;
+				var li 		= document.createElement('li');
+				var txt		= document.createElement('input');
+				var hid		= document.createElement('input');
+				var span	= document.createElement('span');
+				var img		= document.createElement('img');
+				
+				var filelist = document.getElementById('sortables_".$field->id."');
+				
+				$(li).addClass('sortabledisabled');
+				$(span).addClass('fcfield-drag');
+				
+				var button = document.createElement('input');
+				button.type = 'button';
+				button.name = 'removebutton_'+id;
+				button.id = 'removebutton_'+id;
+				$(button).addClass('fcfield-button');
+				$(button).addEvent('click', function() { deleteField".$field->id."(this) });
+				button.value = '".JText::_( 'FLEXI_REMOVE_FILE',true )."';
+				
+				txt.type = 'text';
+				txt.size = '".$size."';
+				txt.disabled = 'disabled';
+				txt.id	= name;
+				txt.value	= file;
+				
+				hid.type = 'hidden';
+				hid.name = '".$fieldname."';
+				hid.value = id;
+				hid.id = ixid;
+				
+				img.src = '".$prefix."components/com_flexicontent/assets/images/move2.png';
+				img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
+				
+				filelist.appendChild(li);
+				li.appendChild(txt);
+				li.appendChild(span);
+				span.appendChild(img);
+				li.appendChild(button);
+				li.appendChild(hid);
+				
+				new Sortables($('sortables_".$field->id."'), {
+					'constrain': true,
+					'clone': true,
+					'handle': '.fcfield-drag'
 				});
-			});
-		";
-		if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
-		$document->addScriptDeclaration($js);
-
-		$css = '
-		#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
-		#sortables_'.$field->id.' li {
-			clear:both;
-			list-style: none;
-			height: 20px;
 			}
-		#sortables_'.$field->id.' li input { cursor: text;}
-		';
-		$document->addStyleDeclaration($css);
+			";
 		
-		$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+		if ($multiple) // handle multiple records
+		{
+			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			
+			// Add the drag and drop sorting feature
+			$js .= "
+			window.addEvent('domready', function(){
+				new Sortables($('sortables_".$field->id."'), {
+					'constrain': true,
+					'clone': true,
+					'handle': '.fcfield-drag'
+					});
+				});
+			";
+			
+			$js .= "					
+			function deleteField".$field->id."(el)
+			{
+			  value_counter--;
+				
+			  var valcounter = $('".$field->name."');
+				if ( value_counter > 0 ) valcounter.value = value_counter;
+				else valcounter.value = '';
+				
+				var field	= $(el);
+				var row		= field.getParent();
+				if (MooTools.version>='1.2.4') {
+					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+				} else {
+					var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
+				}
+				
+				fx.start({
+					'height': 0,
+					'opacity': 0
+				}).chain(function(){
+					(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
+				});
+			}
+			";
+			
+			$css = '
+			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+			#sortables_'.$field->id.' li {
+				clear: both;
+				display: block;
+				list-style: none;
+				height: auto;
+				position: relative;
+			}
+			#sortables_'.$field->id.' li.sortabledisabled {
+				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
+			}
+			#sortables_'.$field->id.' li input { cursor: text;}
+			';
+			
+			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" onclick="deleteField'.$field->id.'(this);" />';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+		} else {
+			$remove_button = '';
+			$move2 = '';
+			$js = '';
+			$css = '';
+		}
 		
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		
+		$files_data = !empty($field->value) ? $this->getFileData( $field->value, $published=false ) : array();
+		$field->html = array();
 		$i = 0;
-		$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
-		if($field->value) {
-			$files_data = $this->getFileData( $field->value, $published=false );
-			foreach($files_data as $file_id => $file_data) {
-				$field->html .= '<li>';
-				$field->html .= ($file_data->published ?
-				'  <input size="'.$size.'" style="background: #ffffff;" type="text" id="a_name'.$i.'" value="'.$file_data->filename.'" disabled="disabled" />' :
-				'  <input size="'.$size.'" style="background: #ffffff; border-width:0px;" type="text" id="a_name'.$i.'" value="'.$file_data->filename.' [UNPUBLISHED]" disabled="disabled" />'
-				);
-				$field->html .= '  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file_id.'" />';
-				$field->html .= $move2;
-				$field->html .= '  <input class="inputbox fcfield-button" type="button" onclick="deleteField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" />';
-				$field->html .= '</li>';
-				$i++;
-			}
+		foreach($files_data as $file_id => $file_data) {
+			$field->html[] = ($file_data->published ?
+			'  <input size="'.$size.'" style="background: #ffffff;" type="text" id="a_name'.$i.'" value="'.$file_data->filename.'" disabled="disabled" />' :
+			'  <input size="'.$size.'" style="background: #ffffff; border-width:0px;" type="text" id="a_name'.$i.'" value="'.$file_data->filename.' [UNPUBLISHED]" disabled="disabled" />'
+			)
+			.'  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file_id.'" />'
+			.$move2
+			.$remove_button
+			;
+			$i++;
 		}
-
-		$files = implode(":", $field->value);
-		$user = & JFactory::getUser();
+		
+		if ($multiple) { // handle multiple records (FORCED ON , partially implemented, variable is always true)
+			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+		} else {  // handle single values
+			$field->html = '<div>'.$field->html[0].'</div>';
+		}
+		
+		$user = JFactory::getUser();
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
 		$linkfsel = JURI::base().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;autoselect='.$autoselect.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.JUtility::getToken().'=1';
 		$field->html .= "
-		</ul>
 		<div class=\"fcfield-button-add\">
 			<div class=\"blank\">
 				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
 			</div>
 		</div>
 		";
+		
 		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($i ? $i : '').'">';
 	}
-
-
+	
+	
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-
+		
 		$field->label = JText::_($field->label);
-
+		
 		$values = $values ? $values : $field->value;
-
-		$mainframe = & JFactory::getApplication();
-
+		if ( empty($values) ) { $field->{$prop} = ''; return; }
+		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
@@ -220,10 +240,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
 		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
 		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
-
+		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-
+		
 		// some parameter shortcuts
 		$useicon		= $field->parameters->get( 'useicon', 1 ) ;
 		$usebutton	= $field->parameters->get( 'usebutton', 0 ) ;
@@ -269,11 +289,15 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$separatorf = $closetag . $opentag;
 			break;
 
+			case 5:
+			$separatorf = '';
+			break;
+
 			default:
 			$separatorf = '&nbsp;';
 			break;
 		}
-
+		
 		// initialise property
 		$field->{$prop} = array();
 
@@ -370,36 +394,33 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				}
 				$str = $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</a>' ." ". $text_html;
 			}
-
+			
 			// Values Prefix and Suffox Texts
 			$field->{$prop}[]	=  $pretext . $str . $posttext;
 			$field->url[]	=  $dl_link;
 			$n++;
 		}
-
-		// Values Separator
-		$field->{$prop} = implode($separatorf, $field->{$prop});
-
-		// Field opening / closing texts
-		if ($field->{$prop})
-			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+		
+		// Apply seperator and open/close tags
+		if(count($field->{$prop})) {
+			$field->{$prop}  = implode($separatorf, $field->{$prop});
+			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+		} else {
+			$field->{$prop} = '';
+		}
 	}
-
-
-
+	
+	
 	// **************************************************************
 	// METHODS HANDLING before & after saving / deleting field events
 	// **************************************************************
-
+	
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
-
-		$mainframe =& JFactory::getApplication();
-
 		$newpost = array();
 
 		for ($n=0, $c=count($post); $n<$c; $n++)
@@ -409,55 +430,55 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 		$post = array_unique($newpost);
 	}
-
-
+	
+	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
-
-
+	
+	
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
-
-
-
+	
+	
+	
 	// *********************************
 	// CATEGORY/SEARCH FILTERING METHODS
 	// *********************************
-
+	
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
-
+		
 		$filter->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		FlexicontentFields::createFilter($filter, $value, $formName);
 	}
-
-
+	
+	
  	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
 	// This is for search view
 	function getFilteredSearch(&$field, $value)
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-
+		
 		$field->parameters->set( 'display_filter_as_s', 1 );  // Only supports a basic filter of single text search input
 		return FlexicontentFields::getFilteredSearch($field, $value, $return_sql=true);
 	}
-
-
-
+	
+	
+	
 	// *************************
 	// SEARCH / INDEXING METHODS
 	// *************************
-
+	
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
-
+		
 		if ($post) {
 			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', file.id AS value_id' );
 			$values = array();
@@ -471,14 +492,14 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('description'), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
-
-
+	
+	
 	// Method to create basic search index (added as the property field->search)
 	function onIndexSearch(&$field, &$post, &$item)
 	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
-
+		
 		if ($post) {
 			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', file.id AS value_id' );
 			$values = array();
@@ -493,13 +514,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('description'), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
-
-
-
+	
+	
+	
 	// **********************
 	// VARIOUS HELPER METHODS
 	// **********************
-
+	
 	function getFileData( $value, $published=1, $extra_select='' )
 	{
 		// Find which file data are already cached, and if no new file ids to query, then return cached only data
@@ -564,4 +585,5 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		}
 		return $file;
 	}
+	
 }

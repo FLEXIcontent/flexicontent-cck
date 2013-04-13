@@ -18,6 +18,19 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+// Do nothing if site is offline
+if ( JFactory::getApplication()->getCfg('offline') ) {
+	$user = JFactory::getUser();
+	if (!$user->id) {
+		return;
+	} else {
+		jimport( 'joomla.version' );  $jversion = new JVersion;
+		define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
+		$isAdmin = FLEXI_J16GE ? JAccess::check($user->id, 'core.admin', 'root.1') : $user->gid >= 24;
+		if (!$isAdmin) return;
+	}
+}
+
 $lhlist = array('localhost', '127.0.0.1');
 if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
 	error_reporting(E_ALL & ~E_STRICT);

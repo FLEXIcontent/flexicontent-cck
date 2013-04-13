@@ -126,7 +126,7 @@ dump($this->row);
 						<td>
 							<?php
 								// parameters : areaname, content, hidden field, width, height, rows, cols
-								echo $this->editor->display( 'description',  $this->row->description, '100%;', '350', '75', '20', array('pagebreak', 'readmore') ) ;
+								echo $this->editor->display( 'description',  $this->row->description, '100%', '350px', '75', '20', array('pagebreak', 'readmore') ) ;
 							?>
 						</td>
 					</tr>

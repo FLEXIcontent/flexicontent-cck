@@ -155,7 +155,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		foreach ($elements as $element) {
 			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
 			$img = '<img src="'.$imgpath . $element->image .'"  alt="'.JText::_($element->text).'" />';
-			$options[] = '<label class="hasTip" title="'.$field->label.'::'.JText::_($element->text).'"><input type="checkbox" id="'.$elementid.'_'.$i.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.' />'.$img.'</label>'.$separator;
+			$options[] = '<label class="hasTip" style="white-space:nowrap;" title="'.$field->label.'::'.JText::_($element->text).'"><input type="checkbox" id="'.$elementid.'_'.$i.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.' />'.$img.'</label>'.' '.$separator.' ';
 			$i++;
 		}
 		

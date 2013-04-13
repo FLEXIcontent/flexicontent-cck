@@ -46,9 +46,10 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// some parameter shortcuts
-		$size			= $field->parameters->get( 'size', 30 ) ;
-		$multiple	= $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval		= $field->parameters->get( 'max_values', 0 ) ;
+		$document  = JFactory::getDocument();
+		$size      = $field->parameters->get( 'size', 30 ) ;
+		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$maxval    = $field->parameters->get( 'max_values', 0 ) ;
 		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
 		
 		$default_link_usage = $field->parameters->get( 'default_link_usage', 0 ) ;
@@ -69,37 +70,37 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$useclass  = $field->parameters->get( 'use_class', 0 ) ;
 		$useid     = $field->parameters->get( 'use_id', 0 ) ;
 		
-		$required		= $field->parameters->get( 'required', 0 ) ;
-		$required		= $required ? ' required' : '';
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
-			$field->value[0]['link'] = JText::_($default_link);
+			$field->value[0]['link']  = JText::_($default_link);
 			$field->value[0] = serialize($field->value[0]);
 		}
 		
-		$document	= & JFactory::getDocument();
+		$js = "";
 		
 		if ($multiple) // handle multiple records
 		{
-			//add the drag and drop sorting feature
-			$js = "
+			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			
+			// Add the drag and drop sorting feature
+			$js .= "
 			window.addEvent('domready', function(){
 				new Sortables($('sortables_".$field->id."'), {
 					'constrain': true,
 					'clone': true,
 					'handle': '.fcfield-drag'
-					});			
+					});
 				});
 			";
-			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
-			$document->addScriptDeclaration($js);
-
+			
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
 			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 			
-			$js = "
+			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxVal".$field->id."		= ".$maxval.";
@@ -175,27 +176,24 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 
 			function deleteField".$field->id."(el)
 			{
-				if(rowCount".$field->id." > 1)
-				{
-					var field	= $(el);
-					var row		= field.getParent();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
-					} else {
-						var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
-					}
-					
-					fx.start({
-						'height': 0,
-						'opacity': 0
-						}).chain(function(){
-							(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
-						});
-					rowCount".$field->id."--;
+				if(rowCount".$field->id." <= 1) return;
+				var field	= $(el);
+				var row		= field.getParent();
+				if (MooTools.version>='1.2.4') {
+					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+				} else {
+					var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
 				}
+				
+				fx.start({
+					'height': 0,
+					'opacity': 0
+				}).chain(function(){
+					(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
+				});
+				rowCount".$field->id."--;
 			}
 			";
-			$document->addScriptDeclaration($js);
 			
 			$css = '
 			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
@@ -204,6 +202,9 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				display: block;
 				list-style: none;
 				position: relative;
+			}
+			#sortables_'.$field->id.' li.sortabledisabled {
+				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
 			}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
@@ -216,10 +217,12 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		} else {
 			$remove_button = '';
 			$move2 = '';
+			$js = '';
 			$css = '';
 		}
 		
-		$document->addStyleDeclaration($css);
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
 		
 		$field->html = array();
 		$n = 0;
@@ -292,7 +295,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		$values = $values ? $values : $field->value;
-		if ( !$values ) {	$field->{$prop} = '';	return;	}
+		if ( empty($values) ) { $field->{$prop} = ''; return; }
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -347,11 +350,16 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$separatorf = $closetag . $opentag;
 			break;
 
+			case 5:
+			$separatorf = '';
+			break;
+
 			default:
 			$separatorf = '&nbsp;';
 			break;
 		}
 		
+		// initialise property
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)
@@ -433,12 +441,12 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				} else {
 					$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
 				}
-				$newpost[$new]['link']		= $http_prefix.$post[$n]['link'];
-				$newpost[$new]['title']		= strip_tags(@$post[$n]['title']);
-				$newpost[$new]['id']			= strip_tags(@$post[$n]['id']);
-				$newpost[$new]['class']		= strip_tags(@$post[$n]['class']);
+				$newpost[$new]['link']    = $http_prefix.$post[$n]['link'];
+				$newpost[$new]['title']   = strip_tags(@$post[$n]['title']);
+				$newpost[$new]['id']      = strip_tags(@$post[$n]['id']);
+				$newpost[$new]['class']   = strip_tags(@$post[$n]['class']);
 				$newpost[$new]['linktext']= strip_tags(@$post[$n]['linktext']);
-				$newpost[$new]['hits']		= (int) $post[$n]['hits'];
+				$newpost[$new]['hits']    = (int) $post[$n]['hits'];
 				$new++;
 			}
 		}
@@ -525,4 +533,5 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$cleanurl = str_replace($prefix, "", $url);
 		return $cleanurl;
 	}
+	
 }

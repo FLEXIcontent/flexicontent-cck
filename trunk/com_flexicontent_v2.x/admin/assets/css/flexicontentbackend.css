@@ -674,6 +674,15 @@ div label.lang_box {
 	width:auto; float:left; margin: 0px 0px 6px 0px; padding: 0px; border-width:0px;
 }
 
+#flexicontent .customfields_set .tabberlive {
+	padding:0px!important;
+	width:100%!important;
+}
+#flexicontent .customfields_set .tabbertab {
+	padding:0px!important;
+	width:100%!important;
+}
+
 #flexicontent .fctabber {
 	overflow:visible; width:5000px;
 }
@@ -701,26 +710,41 @@ div label.lang_box {
 	padding: 3px 0px 0px 0px !important;
 }
 
+#flexicontent .customfields_set ul.tabbernav {
+	padding: 3px 2px 0px 0px !important;
+	width: 100% !important;
+}
+
 #flexicontent ul.tabbernav li {	padding: 3px !important;	margin: 0px !important; line-height: 14px !important; }
-	
-#flexicontent .fcfield-row .flexi_label { margin:0px 8px 0px 2px; border:1px dashed lightgray!important; text-align:right; float:left:!important}
-#flexicontent .fcfield-clear { width:100%!important; padding:0px!important; margin:8px 0px 8px 0px!important; float:left; clear:both!important; border-top:1px dashed gray!important; }
+
 #flexicontent .fcfield-sortables { margin:0px!important; padding:0px!important; }
 #flexicontent .fcfield-sortables li { margin:0px 0px 4px 0px; padding:0px;  }
 
-#flexicontent .fcfield-button-add {	float:none!important; margin:2px 0px 0px 0px; padding:0px; }
-#flexicontent .fcfield-addvalue, .fcfield-button { margin:2px 2px 0px 6px !important; }
-#flexicontent .fcfield-addvalue, .fcfield-button,
-#flexicontent .fcfield-button-add a {
-	display: inline-block; padding:1px 8px; margin:2px 2px 0px 0px;
-	background-color: white!important; color:gray!important; font-size:11px; font-weight:bold;
-	border-radius:4px; border:1px solid lightgray; text-decoration:none!important;
+/* buttons in forms, special class for add button */
+#flexicontent input.fcfield-button,
+#flexicontent input.fcfield-addvalue { padding:1px 8px; margin:2px 2px 0px 6px !important; }
+
+/* special classes for button-like add-link */
+#flexicontent div.fcfield-button-add {	float:none!important; margin:0px; padding:0px; }
+#flexicontent div.fcfield-button-add a { padding:2px 8px !important; margin:2px 2px 0px 6px !important; }
+
+#flexicontent input.fcfield-addvalue,
+#flexicontent input.fcfield-button,
+#flexicontent div.fcfield-button-add a {
+	display: inline-block;
+	font-family: tahoma; font-size:11px;
+	font-weight:bold!important; text-decoration:none!important;
+	background-color: white!important; color:gray!important;
+	border-radius:4px; border:1px solid lightgray;
 }
-#flexicontent .fcfield-addvalue:hover, .fcfield-button:hover,
-#flexicontent .fcfield-button-add a:hover {
+
+#flexicontent input.fcfield-addvalue:hover,
+#flexicontent input.fcfield-button:hover,
+#flexicontent div.fcfield-button-add a:hover {
 	background-color:darkred!important; color:white!important;
 	text-decoration:none!important; border:1px solid darkred;
 }
+
 #flexicontent .fcfield-button { margin-left:6px!important; float:none!important; }
 #flexicontent .fcfield-drag {	float:none; margin:0px; padding:0px; }
 #flexicontent .fcfield-drag img { margin:2px 4px -3px 6px !important; cursor: move!important; float: none!important; display: inline!important; }
@@ -736,6 +760,11 @@ div fieldset input, div fieldset textarea, div fieldset select, div fieldset img
 	font-size:11px!important; font-family:tahoma!important; width:auto!important; font-weight:normal!important;
 }
 
+
+table.adminform .flexi_label {
+	width: 120px !important;
+}
+
 div.flexi_edit .flexi_label {
 	display: block;
 	float: left!important;
@@ -744,13 +773,15 @@ div.flexi_edit .flexi_label {
   border-right: 1px solid #E9E9E9;
   font-weight: bold;
   text-align: right;
-  width: 15%;
-  margin:2px;
-  padding:3px 16px 3px 3px;
+  width: 16%;
+  margin: 3px 0% 3px 0%;
+  padding:3px 1% 3px 1%;
 }
 
 div.flexi_edit .flexi_label.fc_tooltip_icon_bg {
-	background: url(../images/lightbulb.png) 100% 0% no-repeat #F6F6F6;
+  padding:3px 3% 3px 1%;
+  width: 14%;
+	background: url(../images/lightbulb.png) 100% 2px no-repeat #F6F6F6;
 }
 
 div.flexi_edit .flexi_label.invalid {
@@ -760,10 +791,10 @@ div.flexi_edit .flexi_formblock {
 	clear: both;
 }
 
-div.flexi_edit fieldset {
+div.flexi_edit fieldset.customfields_set {
 	border: 1px solid #dddddd;
 	margin-bottom: 1em;
-	padding: 4px;
+	padding: 4px 8px 4px 8px;
 }
 
 div.flexi_edit form input,
@@ -834,7 +865,7 @@ div.flexi_box_right {
 	border-radius: 6px;
 	width: auto;
 	padding: 2px 2%;
-	margin: 1px 8px;
+	margin: 2px 8px;
 }
 
 .fieldgrprow_cell {
@@ -925,9 +956,12 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 
 .fckey_high { color:darkred !important; }
-.container_fcfield { float:left!important;  padding:0px!important;  margin:2px 0px 2px 0px!important; width: 81%; }
+.container_fcfield { float:left!important; padding:0px!important;  margin: 3px 0% 3px 1%!important; width: 79%; }
 .container_fcfield.fcfield_row0 {}
 .container_fcfield.fcfield_row1 {}
+.container_fcfield .fc_mini_note_box,
+.customfields_set .fc_mini_note_box {margin-left: 0px !important;}
+
 
 #flexicontent .fcclear,
 #flexicontent .clear {
@@ -942,11 +976,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	visibility: hidden;
 }
 
-.use_select2_lib {
-	min-width: 100px!important;
-	width: auto!important;
-}
-
+/* Styling for textinput fields*/
 #flexicontent .fcfield_textval {
 	-moz-user-select: none !important;
 	background-clip: padding-box !important;
@@ -960,13 +990,44 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	line-height: 26px !important;
 	overflow: hidden !important;
 	padding: 0 0 0px 8px !important;
-	margin: 0 6px 0 0 !important;
+	margin: 0 6px 1px 0 !important;
 	position: relative !important;
 	text-decoration: none !important;
 	white-space: nowrap !important;
 }
 
-#flexicontent .select2-choice {
+/* FORCE some CSS about select2 lib */
+.use_select2_lib {
+	min-width: 100px!important;
+	width: auto!important;
+}
+
+.select2-results .select2-result-label {
+	-moz-user-select: none !important;
+	cursor: pointer !important;
+	margin: 0 !important;
+	min-height: 1em !important;
+	padding: 3px 7px 4px !important;
+	font-size: 11px !important;
+}
+
+.select2-container-multi .select2-choices .select2-search-choice {
+	-moz-user-select: none !important;
+	background-clip: padding-box !important;
+	background-color: #E4E4E4 !important;
+	background-image: -moz-linear-gradient(center top , #F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEEEEE 100%) !important;
+	border: 1px solid #AAAAAA !important;
+	border-radius: 3px 3px 3px 3px !important;
+	box-shadow: 0 0 2px #FFFFFF inset, 0 1px 0 rgba(0, 0, 0, 0.05) !important;
+	color: #333333 !important;
+	cursor: default !important;
+	line-height: 13px !important;
+	margin: 3px 0 3px 5px !important;
+	padding: 3px 5px 3px 18px !important;
+	position: relative !important;
+}
+
+.select2-choice {
 	margin: 0 6px 0 0 !important;
 }
 

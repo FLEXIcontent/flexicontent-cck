@@ -63,8 +63,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
 		
 		$document	= JFactory::getDocument();
-		// initialise property
-		if (!$field->value) {
+		// Initialise property with default value
+		if ( !$field->value ) {
 			$field->value = array();
 			$field->value[0] = JText::_($default_value);
 		} else {
@@ -83,11 +83,14 @@ class plgFlexicontent_fieldsText extends JPlugin
 			flexicontent_html::loadFramework('inputmask');
 		}
 		
+		$js = "";
 		
 		if ($multiple) // handle multiple records
 		{
+			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			
 			//add the drag and drop sorting feature
-			$js = "
+			$js .= "
 			window.addEvent('domready', function(){
 				new Sortables($('sortables_".$field->id."'), {
 					'constrain': true,
@@ -96,10 +99,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 					});			
 				});
 			";
-			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
-			$document->addScriptDeclaration($js);
-
-			$js = "
+			
+			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxVal".$field->id."		= ".$maxval.";
@@ -119,6 +120,12 @@ class plgFlexicontent_fieldsText extends JPlugin
 
 					var has_inputmask = jQuery(thisNewField).find('input.has_inputmask') != 0;
 					if (has_inputmask)  jQuery(thisNewField).find('input.has_inputmask').inputmask();
+					
+					var has_select2 = jQuery(thisNewField).find('div.select2-container') != 0;
+					if (has_select2) {
+						jQuery(thisNewField).find('div.select2-container').remove();
+						jQuery(thisNewField).find('select.use_select2_lib').select2();
+					}
 					
 					thisNewField.injectAfter(thisField);
 					";
@@ -150,27 +157,24 @@ class plgFlexicontent_fieldsText extends JPlugin
 
 			function deleteField".$field->id."(el)
 			{
-				if(rowCount".$field->id." > 1)
-				{
-					var field	= $(el);
-					var row		= field.getParent();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
-					} else {
-						var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
-					}
-					
-					fx.start({
-						'height': 0,
-						'opacity': 0
-						}).chain(function(){
-							(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
-						});
-					rowCount".$field->id."--;
+				if(rowCount".$field->id." <= 1) return;
+				var field	= $(el);
+				var row		= field.getParent();
+				if (MooTools.version>='1.2.4') {
+					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+				} else {
+					var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
 				}
+				
+				fx.start({
+					'height': 0,
+					'opacity': 0
+				}).chain(function(){
+					(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
+				});
+				rowCount".$field->id."--;
 			}
 			";
-			$document->addScriptDeclaration($js);
 			
 			$css = '
 			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
@@ -178,7 +182,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 				clear: both;
 				display: block;
 				list-style: none;
-				height: 20px;
+				height: auto;
 				position: relative;
 			}
 			#sortables_'.$field->id.' li.sortabledisabled {
@@ -195,6 +199,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		} else {
 			$remove_button = '';
 			$move2 = '';
+			$js = '';
 			$css = '';
 		}
 		
@@ -218,7 +223,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$selhtml='';
 		}
 		
-		$document->addStyleDeclaration($css);
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
 		
 		if ($custommask && $inputmask=="__custom__") {
 			$validate_mask = " data-inputmask=\" ".$custommask." \" ";
@@ -248,7 +254,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 		} else {  // handle single values
-			$field->html = '<div>'.$field->html[0].'</div>';
+			$field->html = $field->html[0];
 		}
 	}
 	
@@ -380,7 +386,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		// Reformat the posted data
 		$newpost = array();
 		$new = 0;
-		foreach ($post as $n=>$v)
+		foreach ($post as $n => $v)
 		{
 			if ($post[$n] !== '')
 			{
@@ -454,7 +460,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// *************************
 	
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item) {
+	function onIndexAdvSearch(&$field, &$post, &$item)
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
