@@ -46,6 +46,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// some parameter shortcuts
+		$document  = JFactory::getDocument();
 		$size      = $field->parameters->get( 'size', 30 ) ;
 		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
 		$maxval    = $field->parameters->get( 'max_values', 0 ) ;
@@ -56,11 +57,11 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($item->version == 0 || $title_usage > 0)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
 		
-		$required		= $field->parameters->get( 'required', 0 ) ;
-		$required		= $required ? ' required' : '';
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
 		
-		// initialise property
-		if (!$field->value) {
+		// Initialise property with default value
+		if ( !$field->value ) {
 			$field->value = array();
 			$field->value[0]['link']  = JText::_($default_link);
 			$field->value[0]['title'] = JText::_($default_title);
@@ -68,27 +69,27 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$field->value[0] = serialize($field->value[0]);
 		}
 		
-		$document	= & JFactory::getDocument();
+		$js = "";
 		
 		if ($multiple) // handle multiple records
 		{
-			//add the drag and drop sorting feature
-			$js = "
+			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			
+			// Add the drag and drop sorting feature
+			$js .= "
 			window.addEvent('domready', function(){
 				new Sortables($('sortables_".$field->id."'), {
 					'constrain': true,
 					'clone': true,
 					'handle': '.fcfield-drag'
-					});			
+					});
 				});
 			";
-			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
-			$document->addScriptDeclaration($js);
-
+			
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
 			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 			
-			$js = "
+			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxVal".$field->id."		= ".$maxval.";
@@ -149,27 +150,24 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 
 			function deleteField".$field->id."(el)
 			{
-				if(rowCount".$field->id." > 1)
-				{
-					var field	= $(el);
-					var row		= field.getParent();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
-					} else {
-						var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
-					}
-					
-					fx.start({
-						'height': 0,
-						'opacity': 0
-						}).chain(function(){
-							(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
-						});
-					rowCount".$field->id."--;
+				if(rowCount".$field->id." <= 1) return;
+				var field	= $(el);
+				var row		= field.getParent();
+				if (MooTools.version>='1.2.4') {
+					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+				} else {
+					var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
 				}
+				
+				fx.start({
+					'height': 0,
+					'opacity': 0
+				}).chain(function(){
+					(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
+				});
+				rowCount".$field->id."--;
 			}
 			";
-			$document->addScriptDeclaration($js);
 			
 			$css = '
 			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
@@ -177,7 +175,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				clear: both;
 				display: block;
 				list-style: none;
-				height: 20px;
+				height: auto;
 				position: relative;
 			}
 			#sortables_'.$field->id.' li.sortabledisabled {
@@ -187,6 +185,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
 			#sortables_'.$field->id.' li .admintable { text-align: left; }
 			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
+			#sortables_'.$field->id.' label.legende, #sortables_'.$field->id.' input.urllink, #sortables_'.$field->id.' input.urltitle, #sortables_'.$field->id.' input.fcfield-button {
+				float: none!important;
+				display: inline-block!important;
+			}
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
@@ -194,16 +196,12 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		} else {
 			$remove_button = '';
 			$move2 = '';
+			$js = '';
 			$css = '';
 		}
 		
-		$css .='
-			#sortables_'.$field->id.' label.legende, #sortables_'.$field->id.' input.urllink, #sortables_'.$field->id.' input.urltitle, #sortables_'.$field->id.' input.fcfield-button {
-				float: none!important;
-				display: inline-block!important;
-			}
-		';
-		$document->addStyleDeclaration($css);
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
 		
 		$field->html = array();
 		$n = 0;
@@ -246,9 +244,9 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		if ($multiple) { // handle multiple records
 			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+			$field->html .= '<input type="button" class="fcfield-addvalue" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 		} else {  // handle single values
-			$field->html = '<div>'.$field->html[0].'</div>';
+			$field->html = $field->html[0];
 		}
 	}
 	
@@ -262,7 +260,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		$values = $values ? $values : $field->value;
-		if ( !$values ) { $field->{$prop} = ''; return; }
+		if ( empty($values) ) { $field->{$prop} = ''; return; }
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -350,12 +348,13 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		// Apply seperator and open/close tags
 		if(count($field->{$prop})) {
-			$field->{$prop}  = implode($separatorf, $field->{$prop});
-			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 		} else {
 			$field->{$prop} = '';
 		}
-	}	
+	}
+	
 	
 	
 	// **************************************************************
@@ -367,7 +366,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-		if(!is_array($post) && !strlen($post)) return;
+		if ( !is_array($post) && !strlen($post) ) return;
 		
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		
@@ -377,7 +376,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		// Reformat the posted data
 		$newpost = array();
 		$new = 0;
-		foreach ($post as $n=>$v)
+		foreach ($post as $n => $v)
 		{
 			// support for basic CSV import / export,  TO BE REMOVED added to the 'store' function of the model
 			if ( $is_importcsv && !is_array($post[$n]) ) {
@@ -392,9 +391,9 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			{
 				$newpost[$new] = $post[$n];
 				$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
-				$newpost[$new]['link']  = $http_prefix.$post[$n]['link'];
-				$newpost[$new]['title'] = strip_tags(@$post[$n]['title']);
-				$newpost[$new]['hits']  = (int) $post[$n]['hits'];
+				$newpost[$new]['link']    = $http_prefix.$post[$n]['link'];
+				$newpost[$new]['title']   = strip_tags(@$post[$n]['title']);
+				$newpost[$new]['hits']    = (int) $post[$n]['hits'];
 				$new++;
 			}
 		}

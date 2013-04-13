@@ -32,9 +32,9 @@ class FlexicontentViewCategory extends JViewLegacy
 	function display($tpl = null)
 	{
 		global $globalcats;
-		$mainframe = JFactory::getApplication();
-		$user      = JFactory::getUser();
-		$document  = JFactory::getDocument();
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
+		$document = JFactory::getDocument();
 		
 		if (FLEXI_J16GE) {
 			JFactory::getLanguage()->load('com_categories', JPATH_ADMINISTRATOR, 'en-GB', true);
@@ -60,7 +60,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Check category is checked out by different editor / administrator
 		if ( !$isnew && $model->isCheckedOut( $user->get('id') ) ) {
 			JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-			$mainframe->redirect( 'index.php?option=com_flexicontent&view=categories' );
+			$app->redirect( 'index.php?option=com_flexicontent&view=categories' );
 		}
 		
 		
@@ -78,13 +78,13 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Check no access to categories management (Global permission)
 		if ( !$perms->CanCats ) {
-			$mainframe->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+			$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
 		}
 		
 		// Check no privilege to create new categories (Global permission)
 		if ( $isnew && !$perms->CanAddCats ) {
 			JError::raiseWarning( 403, JText::_( 'FLEXI_NO_ACCESS_CREATE' ) );
-			$mainframe->redirect( 'index.php?option=com_flexicontent' );
+			$app->redirect( 'index.php?option=com_flexicontent' );
 		}
 		
 		
@@ -118,14 +118,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ( $isnew && !$cancreate_cat ) {
 			$acc_msg = JText::_( 'FLEXI_NO_ACCESS_CREATE' ) ."<br/>". (FLEXI_J16GE ? JText::_( 'FLEXI_CANNOT_ADD_CATEGORY_REASON' ) : ""); 
 			JError::raiseWarning( 403, $acc_msg);
-			$mainframe->redirect('index.php?option=com_flexicontent&view=categories');
+			$app->redirect('index.php?option=com_flexicontent&view=categories');
 		}
 		
 		// Editing existing category: Check if user can edit existing (current) category
 		if ( !$isnew && !$canedit_cat ) {
 			$acc_msg = JText::_( 'FLEXI_NO_ACCESS_EDIT' ) ."<br/>". JText::_( 'FLEXI_CANNOT_EDIT_CATEGORY_REASON' );
 			JError::raiseWarning( 403, $acc_msg);
-			$mainframe->redirect( 'index.php?option=com_flexicontent&view=categories' );
+			$app->redirect( 'index.php?option=com_flexicontent&view=categories' );
 		}
 		
 		
@@ -152,9 +152,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Initialise variables
 		// ********************
 		
-		$editor 	= JFactory::getEditor();
-		$cparams 	= JComponentHelper::getParams('com_flexicontent');
-		$bar			= JToolBar::getInstance('toolbar');
+		$editorname = $user->getParam('editor', $app->getCfg('editor'));
+		$editor 	  = JFactory::getEditor($editor_name);
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$bar     = JToolBar::getInstance('toolbar');
 		if (!FLEXI_J16GE)
 			$pane			= JPane::getInstance('sliders');
 		$categories = $globalcats;

@@ -3,8 +3,8 @@
 	<fieldset>
 		<field name="id"  type="hidden" class="readonly" label="JGLOBAL_FIELD_ID_LABEL" description ="JGLOBAL_FIELD_ID_DESC" size="10" default="0" readonly="true" />
 		<field name="asset_id" type="hidden" filter="unset" />
-		<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="inputbox" maxlength="254" size="42" required="true" />
-		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" maxlength="254" size="42" />
+		<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="inputbox" maxlength="254" size="36" required="true" />
+		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" maxlength="254" size="36" />
 		<field name="type_id" type="fieldtypes" label="FLEXI_TYPE" description="" class="inputbox" />
 		<field name="text" type="editor" class="inputbox" label="COM_CONTENT_FIELD_ARTICLETEXT_LABEL" description="COM_CONTENT_FIELD_ARTICLETEXT_DESC" filter="raw" buttons="true" />
 		<field name="state" type="list" label="FLEXI_STATE" description="JFIELD_PUBLISHED_DESC" class="inputbox" filter="intval" size="1" default="-4">

@@ -591,7 +591,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 
 	<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 	
-	<fieldset>
+	<fieldset class="customfields_set">
 		<legend>
 			<?php
 			$types = flexicontent_html::getTypesList();
@@ -599,7 +599,6 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			echo $typename ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $typename : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
 		</legend>
 		
-		<!--table class="admintable" width="100%" style="border-width:0px!important;" -->
 			<?php
 			$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
 			
@@ -636,8 +635,6 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				if ($width)  $width = 'width:' .$width. ($width != (int)$width ? 'px' : '');
 			?>
 				
-			<!--tr-->
-				<!--td id="fcfield-row_<?php echo $field->id; ?> class="fcfield-row" style='padding:0px 2px 0px 2px; border: 0px solid lightgray;'-->
 					<div class='clear' style='display:block; float:left; clear:both!important'></div>
 					
 					<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
@@ -713,14 +710,10 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				<?php endif; ?>
 				
 					</div>
-			
-				<!--/td-->
-			<!--/tr-->
 				
 			<?php
 			}
 			?>
-		<!--/table-->
 	</fieldset>
 
 <?php elseif ( $isnew ) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
