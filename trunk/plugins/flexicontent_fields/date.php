@@ -238,7 +238,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$skipped_vals = array();
 		foreach ($field->value as $value)
 		{
-			$calendar = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname, $elementid.'_'.$n, $attribs_arr=array('class'=>$required), $skip_on_invalid=true);
+			$calendar = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname, $elementid.'_'.$n, $attribs_arr=array('class'=>$required), $skip_on_invalid=true, $timezone);
 			if (!$calendar)  { $skipped_vals[] = $value; continue; }
 			
 			$field->html[] =
@@ -444,16 +444,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		if ($use_editor_tz == 0) {
 			// Raw date input, ignore timezone, NOTE: this is OLD BEHAVIOUR of this field
-			$tz_offset = 0;
+			$timezone = FLEXI_J16GE ? 'UTC' : 0;
 		} else {
 			// For logged users the date values are in user's time zone, (unlogged users will submit in site default timezone)
-			$timezone = $user->getParam('timezone', $config->get('offset'));
-			if (FLEXI_J16GE) {
-				$tz = new DateTimeZone($timezone);
-				$tz_offset = $tz->getOffset(new JDate()) / 3600;
-			} else {
-				$tz_offset = $timezone;
-			}
+			$timezone = $user->getParam('timezone', $config->get('offset'));  // this is numeric offset in J1.5 and timezone STRING in J2.5
 		}
 		
 		// Make sure posted data is an array 
@@ -490,7 +484,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				else
 				{
 					// Dates are in user's timezone, convert to UTC+0
-					$date = new JDate($post[$n], $tz_offset);
+					$date = new JDate($post[$n], $timezone);
 					$newpost[$new] = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 				}
 				$new++;

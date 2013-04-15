@@ -231,6 +231,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
+		// DO NOT terminate yet if value is empty since a default value on empty may have been defined
 		
 		// Handle default value loading, instead of empty value
 		$default_value_use= $field->parameters->get( 'default_value_use', 0 ) ;
