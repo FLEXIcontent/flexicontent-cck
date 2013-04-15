@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields` (
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
   `access` int(11) unsigned NOT NULL default '1',
-  `ordering` int(11) NOT NULL default '1',
+  `ordering` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM;
 
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `uploaded_by` int(11) unsigned NOT NULL default '0',
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
-  `access` int(11) unsigned NOT NULL,
+  `access` int(11) unsigned NOT NULL default '1',
   `attribs` text NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM;
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `published` tinyint(1) NOT NULL,
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
-  `access` int(11) unsigned NOT NULL default '0',
+  `access` int(11) unsigned NOT NULL default '1',
   `attribs` text NOT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM;

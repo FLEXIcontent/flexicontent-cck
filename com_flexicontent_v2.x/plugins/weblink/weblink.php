@@ -259,6 +259,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
+		// Get field values
 		$values = $values ? $values : $field->value;
 		if ( empty($values) ) { $field->{$prop} = ''; return; }
 		

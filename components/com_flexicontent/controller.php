@@ -1045,7 +1045,7 @@ class FlexicontentController extends JControllerLegacy
 		if (FLEXI_J16GE) {
 			$aid_arr = $user->getAuthorisedViewLevels();
 			$aid_list = implode(",", $aid_arr);
-			$andaccess  .= ' AND (f.access=0 OR f.access IS NULL OR f.access IN ('.$aid_list.'))';
+			$andaccess  .= ' AND f.access IN (0,'.$aid_list.')';
 		} else {
 			$aid = (int) $user->get('aid');
 			if (FLEXI_ACCESS) {
@@ -1312,11 +1312,11 @@ class FlexicontentController extends JControllerLegacy
 			$aid_arr = $user->getAuthorisedViewLevels();
 			$aid_list = implode(",", $aid_arr);
 			// is the field available
-			$andaccess  .= ' AND fi.access IN ('.$aid_list.')';
+			$andaccess  .= ' AND fi.access IN (0,'.$aid_list.')';
 			// is the item available
-			$andaccess2 .= ' AND ty.access IN ('.$aid_list.')';
-			$andaccess2 .= ' AND  c.access IN ('.$aid_list.')';
-			$andaccess2 .= ' AND  i.access IN ('.$aid_list.')';
+			$andaccess2 .= ' AND ty.access IN (0,'.$aid_list.')';
+			$andaccess2 .= ' AND  c.access IN (0,'.$aid_list.')';
+			$andaccess2 .= ' AND  i.access IN (0,'.$aid_list.')';
 		} else {
 			$aid = (int) $user->get('aid');
 			if (FLEXI_ACCESS) {

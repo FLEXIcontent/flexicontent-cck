@@ -218,6 +218,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			//print_r($query); 
 			$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
 			$rows = $this->_db->loadObjectList();
+			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
 			// 2, get current items total for pagination
 			// *** CANNOT USE FOUND_ROWS() because Joom!Fish or Falang will interfer bye 
@@ -435,7 +436,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND c.access IN ('.$aid_list.')';
+				$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
@@ -634,9 +635,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$where .= ' AND ty.access IN ('.$aid_list.')';
-				$where .= ' AND  c.access IN ('.$aid_list.')';
-				$where .= ' AND  i.access IN ('.$aid_list.')';
+				$where .= ' AND ty.access IN (0,'.$aid_list.')';
+				$where .= ' AND  c.access IN (0,'.$aid_list.')';
+				$where .= ' AND  i.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				$where   .= ' AND ( i.created_by = '.$user->id.' OR ( 1 ';
@@ -872,7 +873,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND c.access IN ('.$aid_list.')';
+				$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
@@ -981,9 +982,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$where .= ' AND ty.access IN ('.$aid_list.')';
-				$where .= ' AND mc.access IN ('.$aid_list.')';
-				$where .= ' AND  i.access IN ('.$aid_list.')';
+				$where .= ' AND ty.access IN (0,'.$aid_list.')';
+				$where .= ' AND mc.access IN (0,'.$aid_list.')';
+				$where .= ' AND  i.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
@@ -1043,7 +1044,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND c.access IN ('.$aid_list.')';
+				$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
@@ -1386,7 +1387,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if (FLEXI_J16GE) {
 			$aid_arr = $user->getAuthorisedViewLevels();
 			$aid_list = implode(",", $aid_arr);
-			$where = ' AND fi.access IN ('.$aid_list.') ';
+			$where = ' AND fi.access IN (0,'.$aid_list.') ';
 		} else {
 			$aid = (int) $user->get('aid');
 			

@@ -187,10 +187,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$suband .= ' AND ty.access IN ('.$aid_list.')';
-				$suband .= ' AND cc.access IN ('.$aid_list.')';
-				$suband .= ' AND i.access IN ('.$aid_list.')';
-				$and    .= ' AND c.access IN ('.$aid_list.')';
+				$suband .= ' AND ty.access IN (0,'.$aid_list.')';
+				$suband .= ' AND cc.access IN (0,'.$aid_list.')';
+				$suband .= ' AND i.access IN (0,'.$aid_list.')';
+				$and    .= ' AND c.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
@@ -261,7 +261,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$and		= ' AND c.access IN ('.$aid_list.')';
+				$and		= ' AND c.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
@@ -359,10 +359,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$suband .= ' AND ty.access IN ('.$aid_list.')';
-				$suband .= ' AND cc.access IN ('.$aid_list.')';
-				$suband .= ' AND i.access IN ('.$aid_list.')';
-				$and    .= ' AND c.access IN ('.$aid_list.')';
+				$suband .= ' AND ty.access IN (0,'.$aid_list.')';
+				$suband .= ' AND cc.access IN (0,'.$aid_list.')';
+				$suband .= ' AND i.access IN (0,'.$aid_list.')';
+				$and    .= ' AND c.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
@@ -448,7 +448,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if (FLEXI_J16GE) {
 			$aid_arr  = $user->getAuthorisedViewLevels();
 			$aid_list = implode(",", $aid_arr);
-			$andaccess  = ' AND c.access IN ('.$aid_list.')';
+			$andaccess  = ' AND c.access IN (0,'.$aid_list.')';
 		} else {
 			$aid = (int) $user->get('aid');
 			$andaccess  = ' AND c.access <= '.$aid;

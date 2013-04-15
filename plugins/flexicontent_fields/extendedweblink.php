@@ -294,6 +294,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
+		// Get field values
 		$values = $values ? $values : $field->value;
 		if ( empty($values) ) { $field->{$prop} = ''; return; }
 		
@@ -394,8 +395,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		
 		// Apply seperator and open/close tags
 		if(count($field->{$prop})) {
-			$field->{$prop}  = implode($separatorf, $field->{$prop});
-			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 		} else {
 			$field->{$prop} = '';
 		}
@@ -412,7 +413,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-		if(!is_array($post) && !strlen($post)) return;
+		if ( !is_array($post) && !strlen($post) ) return;
 		
 		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';

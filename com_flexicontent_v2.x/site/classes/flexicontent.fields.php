@@ -289,7 +289,7 @@ class FlexicontentFields
 		if (FLEXI_J16GE) {
 			// $aid = ($aid && is_array($aid)) ? $aid : $user->getAuthorisedViewLevels();
 			$aid_list = implode(",", $aid);
-			$andaccess 	= ' AND fi.access IN ('.$aid_list.')' ;
+			$andaccess 	= ' AND fi.access IN (0,'.$aid_list.')' ;
 			$joinaccess = '';
 		} else {
 			$aid = (int) $aid;
@@ -1379,6 +1379,7 @@ class FlexicontentFields
 	{
 		static $parsed = array();
 		static $d;
+		static $c;
 		
 		// Parse field variable if not already parsed
 		if ( !isset($parsed[$field->id][$varname]) )
@@ -1393,6 +1394,14 @@ class FlexicontentFields
 				$d[$field->id][$varname]['propname']  = $field_matches[5];
 			} else {
 				$d[$field->id][$varname]['fulltxt']   = array();
+			}
+			
+			$result = preg_match_all("/\{\{(item->)([a-zA-Z_0-9]+)\}\}/", $variable, $field_matches);
+			if ($result) {
+				$c[$field->id][$varname]['fulltxt']   = $field_matches[0];
+				$c[$field->id][$varname]['propname']  = $field_matches[2];
+			} else {
+				$c[$field->id][$varname]['fulltxt']   = array();
 			}
 		}
 		
@@ -1432,6 +1441,23 @@ class FlexicontentFields
 			$variable = str_replace($fulltxt, $value, $variable);
 			//echo "<pre>"; print_r($item->fieldvalues[$fieldid]); echo "</pre>"; echo "Replaced $fulltxt with ITEM field VALUE: $value <br>";
 		}
+		
+		// Replace variable
+		foreach($c[$field->id][$varname]['fulltxt'] as $i => $fulltxt)
+		{
+			$propname = $c[$field->id][$varname]['propname'][$i];
+			
+			if ( !isset($item->{$propname}) ) {
+				$value = 'Item property with name: '.$propname.' not found';
+				$variable = str_replace($fulltxt, $value, $variable);
+				continue;
+			}
+			$value = $item->{$propname};
+			
+			$variable = str_replace($fulltxt, $value, $variable);
+			//echo "<pre>"; echo "</pre>"; echo "Replaced $fulltxt with ITEM property VALUE: $value <br>";
+		}
+		
 		// Return variable after all replacements
 		return $variable;
 	}
@@ -2194,7 +2220,7 @@ class FlexicontentFields
 	
 	
 	// Method to create a calendar form field according to a given configuation, e.g. called during Filter Creation of FC views
-	static function createCalendarField($value, $date_allowtime, $fieldname, $elementid, $attribs='', $skip_on_invalid=false)
+	static function createCalendarField($value, $date_allowtime, $fieldname, $elementid, $attribs='', $skip_on_invalid=false, $timezone='')
 	{
 		@list($date, $time) = preg_split('#\s+#', $value, $limit=2);
 		$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
@@ -2203,9 +2229,9 @@ class FlexicontentFields
 			if ( !$value ) {
 				$date = '';
 			} else if (!$date_allowtime || !$time) {
-				$date = JHTML::_('date',  $date, JText::_( FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ));
+				$date = JHTML::_('date',  $date, JText::_( FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ), $timezone);
 			} else {
-				$date = JHTML::_('date',  $value, JText::_( FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M' ));
+				$date = JHTML::_('date',  $value, JText::_( FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M' ), $timezone);
 			}
 		} catch ( Exception $e ) {
 			if (!$skip_on_invalid) return '';

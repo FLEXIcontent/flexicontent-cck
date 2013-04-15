@@ -230,9 +230,9 @@ class FlexicontentModelTags extends JModelLegacy
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND ty.access IN ('.$aid_list.')';
-				$andaccess .= ' AND  c.access IN ('.$aid_list.')';
-				$andaccess .= ' AND  i.access IN ('.$aid_list.')';
+				$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
+				$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
+				$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {

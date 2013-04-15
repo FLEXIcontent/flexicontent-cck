@@ -138,6 +138,8 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
+		if ( empty($values) ) { $field->{$prop} = ''; return; }
+		
 		// Check for no values and not displaying ALL elements
     $display_all = $field->parameters->get( 'display_all', 0 ) ;
 		if ( !$values && !$display_all ) { $field->{$prop} = ''; $field->display_index = ''; return; }
@@ -207,7 +209,6 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		$display_index = array();
 		
 		// Prepare for looping
-		if ( !$values ) $values = array();
 		if ( $display_all ) {
 			$index = $values[0];
 			
