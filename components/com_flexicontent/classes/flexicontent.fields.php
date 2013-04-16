@@ -2220,7 +2220,7 @@ class FlexicontentFields
 	
 	
 	// Method to create a calendar form field according to a given configuation, e.g. called during Filter Creation of FC views
-	static function createCalendarField($value, $date_allowtime, $fieldname, $elementid, $attribs='', $skip_on_invalid=false)
+	static function createCalendarField($value, $date_allowtime, $fieldname, $elementid, $attribs='', $skip_on_invalid=false, $timezone='')
 	{
 		@list($date, $time) = preg_split('#\s+#', $value, $limit=2);
 		$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
@@ -2229,9 +2229,9 @@ class FlexicontentFields
 			if ( !$value ) {
 				$date = '';
 			} else if (!$date_allowtime || !$time) {
-				$date = JHTML::_('date',  $date, JText::_( FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ));
+				$date = JHTML::_('date',  $date, JText::_( FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ), $timezone);
 			} else {
-				$date = JHTML::_('date',  $value, JText::_( FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M' ));
+				$date = JHTML::_('date',  $value, JText::_( FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M' ), $timezone);
 			}
 		} catch ( Exception $e ) {
 			if (!$skip_on_invalid) return '';

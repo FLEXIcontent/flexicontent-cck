@@ -170,6 +170,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
 			}
 			#sortables_'.$field->id.' li input { cursor: text;}
+			#sortables_'.$field->id.' li input.inline_style_published   { font-family:tahoma!important; font-style:italic!important; color:#444!important; font-style:tahona; }
+			#sortables_'.$field->id.' li input.inline_style_unpublished { background: #ffffff; color:gray; border-width:0px; text-decoration:line-through; }
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" onclick="deleteField'.$field->id.'(this);" />';
@@ -190,8 +192,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$i = 0;
 		foreach($files_data as $file_id => $file_data) {
 			$field->html[] = ($file_data->published ?
-			'  <input size="'.$size.'" style="background: #ffffff;" type="text" id="a_name'.$i.'" value="'.$file_data->filename.'" disabled="disabled" />' :
-			'  <input size="'.$size.'" style="background: #ffffff; border-width:0px;" type="text" id="a_name'.$i.'" value="'.$file_data->filename.' [UNPUBLISHED]" disabled="disabled" />'
+			'  <input class="fcfield_textval inputbox inline_style_published" size="'.$size.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.'" disabled="disabled" />' :
+			'  <input class="fcfield_textval inputbox inline_style_unpublished" size="'.$size.'" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.' [UNPUBLISHED]" disabled="disabled" />'
 			)
 			.'  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file_id.'" />'
 			.$move2
