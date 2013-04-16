@@ -351,7 +351,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		
 		if ( !$query_ids ) {
-			$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id ';
+			//$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id ';  // Will cause problems with 3rd-party extensions that modify the query
+			$query = 'SELECT DISTINCT i.id ';
 		} else {
 			$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'

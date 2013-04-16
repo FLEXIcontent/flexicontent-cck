@@ -58,8 +58,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$required = $field->parameters->get( 'required', 0 ) ;
 		$required = $required ? ' required' : '';
 		
-		$extra_attribs = $field->parameters->get( 'extra_attribs', '' ) ;
-		$attribs = $extra_attribs;
+		// Initialize extra HTML TAG parameters
+		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
 		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
 		
 		$document	= JFactory::getDocument();
@@ -239,7 +239,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		foreach ($field->value as $value)
 		{
 			$field->html[] = '
-				<input '. $validate_mask .' id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="'.$classes.'" type="text" size="'.$size.'" value="'.$value.'"'.$attribs.' />
+				<input '. $validate_mask .' id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="'.$classes.'" type="text" size="'.$size.'" value="'.$value.'" '.$attribs.' />
 				'.$selhtml.'
 				'.$move2.'
 				'.$remove_button.'

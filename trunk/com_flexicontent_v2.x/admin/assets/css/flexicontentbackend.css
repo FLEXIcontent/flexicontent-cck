@@ -721,16 +721,16 @@ div label.lang_box {
 #flexicontent .fcfield-sortables li { margin:0px 0px 4px 0px; padding:0px;  }
 
 /* buttons in forms, special class for add button */
-#flexicontent input.fcfield-button,
-#flexicontent input.fcfield-addvalue { padding:1px 8px; margin:2px 2px 0px 6px !important; }
+#flexicontent .fcfield-button,
+#flexicontent .fcfield-addvalue { padding:1px 8px; margin:2px 2px 0px 6px !important; }
 
 /* special classes for button-like add-link */
-#flexicontent div.fcfield-button-add {	float:none!important; margin:0px; padding:0px; }
-#flexicontent div.fcfield-button-add a { padding:2px 8px !important; margin:2px 2px 0px 6px !important; }
+#flexicontent .fcfield-button-add {	float:none!important; margin:0px; padding:0px; }
+#flexicontent .fcfield-button-add a { padding:2px 8px !important; margin:2px 2px 0px 6px !important; }
 
-#flexicontent input.fcfield-addvalue,
-#flexicontent input.fcfield-button,
-#flexicontent div.fcfield-button-add a {
+#flexicontent .fcfield-addvalue,
+#flexicontent .fcfield-button,
+#flexicontent .fcfield-button-add a {
 	display: inline-block;
 	font-family: tahoma; font-size:11px;
 	font-weight:bold!important; text-decoration:none!important;
@@ -738,9 +738,9 @@ div label.lang_box {
 	border-radius:4px; border:1px solid lightgray;
 }
 
-#flexicontent input.fcfield-addvalue:hover,
-#flexicontent input.fcfield-button:hover,
-#flexicontent div.fcfield-button-add a:hover {
+#flexicontent .fcfield-addvalue:hover,
+#flexicontent .fcfield-button:hover,
+#flexicontent .fcfield-button-add a:hover {
 	background-color:darkred!important; color:white!important;
 	text-decoration:none!important; border:1px solid darkred;
 }
@@ -977,6 +977,9 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 
 /* Styling for textinput fields*/
+#flexicontent .fcfield_textareval
+#flexicontent .fcfield_selectval,
+#flexicontent .fcfield_selectmulval,
 #flexicontent .fcfield_textval {
 	-moz-user-select: none !important;
 	background-clip: padding-box !important;
@@ -986,9 +989,6 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	border-radius: 4px 4px 4px 4px !important;
 	color: #444444 !important;
 	display: inline-block !important;
-	height: 26px !important;
-	line-height: 26px !important;
-	overflow: hidden !important;
 	padding: 0 0 0px 8px !important;
 	margin: 0 6px 1px 0 !important;
 	position: relative !important;
@@ -996,10 +996,33 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	white-space: nowrap !important;
 }
 
+#flexicontent .fcfield_selectval,
+#flexicontent .fcfield_textval {
+	height: 26px !important;
+	line-height: 26px !important;
+	overflow: hidden !important;
+}
+
+#flexicontent .fcfield_selectmulval,
+#flexicontent .fcfield_textareaval {
+	height: auto !important;
+	line-height: 1em !important;
+	overflow: scroll !important;
+}
+
+
+
 /* FORCE some CSS about select2 lib */
 .use_select2_lib {
 	min-width: 100px!important;
 	width: auto!important;
+}
+
+.select2-results .select2-result .select2-result-label {
+	margin: 0 !important;
+	min-height: auto !important;
+	line-height: auto !important;
+	padding: 0px 2px !important;
 }
 
 .select2-results .select2-result-label {
