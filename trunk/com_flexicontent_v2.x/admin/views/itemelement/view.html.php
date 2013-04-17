@@ -83,7 +83,7 @@ class FlexicontentViewItemelement extends JViewLegacy {
 		}
 		
 		// build the categories select list for filter
-		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', false, false);
+		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', $actions_allowed=array('core.create'), true);
 
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1652 2013-03-11 12:12:57Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1665 2013-04-08 02:26:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -635,10 +635,10 @@ class FlexicontentModelItems extends JModelLegacy
 				.' GROUP_CONCAT(rel.catid SEPARATOR  ",") AS relcats, '
 				. (FLEXI_J16GE ? 'level.title as access_level, g.title AS groupname, ' : 'g.name AS groupname, ')
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
-					'CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN ('.(FLEXI_J16GE ? 2:-1).') THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order,' : ''
+					'CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN ('.(FLEXI_J16GE ? 2:-1).') THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order, ' : ''
 					)
-				. 'CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled,'
-				. 'CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired,'
+				. 'CASE WHEN i.publish_up = '.$nullDate.' OR i.publish_up <= '.$nowDate.' THEN 0 ELSE 1 END as publication_scheduled, '
+				. 'CASE WHEN i.publish_down = '.$nullDate.' OR i.publish_down >= '.$nowDate.' THEN 0 ELSE 1 END as publication_expired, '
 				. 't.name AS type_name, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
 				;
 		}
@@ -649,19 +649,21 @@ class FlexicontentModelItems extends JModelLegacy
 				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 				.    ($filter_cats && !$filter_subcats ? ' AND rel.catid='.$filter_cats : '')
 				. ' JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
+				. ' JOIN #__categories AS c ON c.id = i.catid'
 				. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
 				. $ver_specific_joins
 				;
-		if ( $query_ids ) {
-			$query .= ''
-				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
-				. ' GROUP BY i.id';
-		} else {
+		if ( !$query_ids ) {
 			$query .= ""
 				. $where
 				. ' GROUP BY i.id'
 				. (($filter_state=='RV') ? ' HAVING i.version<>MAX(fv.version_id)' : '')
 				. $orderby
+				;
+		} else {
+			$query .= ''
+				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
+				. ' GROUP BY i.id'
 				;
 		}
 		return $query;
@@ -789,7 +791,9 @@ class FlexicontentModelItems extends JModelLegacy
 				if (count($where_edit)) {
 					$where[] = ' ('.implode(' OR', $where_edit).')';
 				}*/
-				$where[] = ' i.access IN ('.$aid_list.')';
+				$where[] = ' t.access IN (0,'.$aid_list.')';
+				$where[] = ' c.access IN (0,'.$aid_list.')';
+				$where[] = ' i.access IN (0,'.$aid_list.')';
 			}
 		} else if (FLEXI_ACCESS) {
 			if (!@$allitems) {				

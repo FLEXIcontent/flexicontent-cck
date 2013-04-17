@@ -2833,7 +2833,7 @@ class FLEXIUtilities
 			$query = 'SELECT DISTINCT le.*, lc.lang_id as id, lc.image as image_prefix'
 					.', CASE WHEN CHAR_LENGTH(lc.title_native) THEN lc.title_native ELSE le.name END as name'
 					.' FROM #__extensions as le'
-					.' LEFT JOIN #__languages as lc ON lc.lang_code=le.element AND lc.published=1'
+					.' JOIN #__languages as lc ON lc.lang_code=le.element AND lc.published=1'  // INNER Join to get only languages having content entries
 					.' WHERE le.type="language" '
 					.' GROUP BY le.element';
 		} else if (FLEXI_FISH) {   // Use joomfish languages table
