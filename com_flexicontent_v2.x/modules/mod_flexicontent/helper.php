@@ -34,10 +34,10 @@ class modFlexicontentHelper
 		global $modfc_jprof, $mod_fc_run_times;
 		
 		$forced_itemid = $params->get('forced_itemid');
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		// get the component parameters
-		$flexiparams =& JComponentHelper::getParams('com_flexicontent');
+		$flexiparams = JComponentHelper::getParams('com_flexicontent');
 		
 		// get module ordering parameters
 		$ordering 				= $params->get('ordering');
@@ -265,7 +265,7 @@ class modFlexicontentHelper
 		foreach($filtered_rows_arr as $filtered_rows)
 		{	
 			if ( ($use_fields && count($fields)) || ($use_fields_feat && count($fields_feat)) ) {
-				$rows = & FlexicontentFields::getFields($filtered_rows, 'module', $params);
+				$rows = FlexicontentFields::getFields($filtered_rows, 'module', $params);
 			} else {
 				$rows = & $filtered_rows;
 			}
@@ -550,7 +550,7 @@ class modFlexicontentHelper
 	function getItems(&$params, $ordering)
 	{
 		global $dump, $globalcats;
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		JPluginHelper::importPlugin('system', 'flexisystem');
 
 		// For specific cache issues
@@ -558,7 +558,7 @@ class modFlexicontentHelper
 			if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
 				if (FLEXI_CACHE) {
 					// add the category tree to categories cache
-					$catscache 	=& JFactory::getCache('com_flexicontent_cats');
+					$catscache 	= JFactory::getCache('com_flexicontent_cats');
 					$catscache->setCaching(1); 		//force cache
 					$catscache->setLifeTime(84600); //set expiry to one day
 			    $globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
@@ -569,12 +569,12 @@ class modFlexicontentHelper
 		}
 
 		// Initialize variables
-		$db				=& JFactory::getDBO();
-		$user			=& JFactory::getUser();
+		$db				= JFactory::getDBO();
+		$user			= JFactory::getUser();
 		$gid			= !FLEXI_J16GE ? (int)$user->get('aid')  :  max($user->getAuthorisedViewLevels());
 		$view			= JRequest::getVar('view');
 		$option		= JRequest::getVar('option');
-		$fparams 	=& $mainframe->getParams('com_flexicontent');
+		$fparams 	= $mainframe->getParams('com_flexicontent');
 		$show_noauth 	= $fparams->get('show_noauth', 0);
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
@@ -686,15 +686,23 @@ class modFlexicontentHelper
 		// *********************
 		
 		if (!$show_noauth) {
-			if (FLEXI_ACCESS && class_exists('FAccess')) {
-				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-				if (isset($readperms['item']) && count($readperms['item']) ) {
-					$where .= ' AND ( i.access <= '.$gid.' OR i.id IN ('.implode(",", $readperms['item']).') )';
-				} else {
-					$where .= ' AND i.access <= '.$gid;
-				}
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$where .= ' AND ty.access IN (0,'.$aid_list.')';
+				$where .= ' AND mc.access IN (0,'.$aid_list.')';
+				$where .= ' AND  i.access IN (0,'.$aid_list.')';
 			} else {
-				$where .= ' AND i.access <= '.$gid;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
+					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
+				} else {
+					$where .= ' AND ty.access <= '.$aid;
+					$where .= ' AND mc.access <= '.$aid;
+					$where .= ' AND  i.access <= '.$aid;
+				}
 			}
 		}
 		
@@ -1328,10 +1336,11 @@ class modFlexicontentHelper
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
 					. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
 				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
-				. ' LEFT JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
+				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
+				. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
+				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' JOIN #__categories AS  c ON  c.id = rel.catid'
+				. ' JOIN #__categories AS mc ON mc.id = i.catid'
 				. $join_favs
 				. $join_date
 				. $join_comments
@@ -1353,7 +1362,7 @@ class modFlexicontentHelper
 			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
 			$db->setQuery($per_cat_query, 0, $count);
 			$rows = $db->loadObjectList();
-			if ( $db->getErrorNum() )  JFactory::getApplication()->enqueueMessage(nl2br($items_query."\n".$db->getErrorMsg()."\n"),'error');
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			$cat_items_arr[] = $rows;
 		}
 		
@@ -1369,8 +1378,8 @@ class modFlexicontentHelper
 	{
 		if (!$params->get('apply_config_per_category', 0)) return false;
 		
-		$db     = & JFactory::getDBO();
-		$config = & JFactory::getConfig();
+		$db     = JFactory::getDBO();
+		$config = JFactory::getConfig();
 		$view   = JRequest::getVar('view');
 		$option = JRequest::getVar('option');
 		
@@ -1452,11 +1461,8 @@ class modFlexicontentHelper
 					;
 		$db->setQuery($query);
 		$catdata_arr = $db->loadObjectList();
-		if ( $db->getErrorNum() ) {
-			$jAp=& JFactory::getApplication();
-			$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-			return false;
-		}
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		if (!$catdata_arr)  return false;
 		
 		jimport( 'joomla.html.parameter' );
 		$joomla_image_path 	= FLEXI_J16GE ? $config->getValue('config.image_path', '') : $config->getValue('config.image_path', 'images'.DS.'stories');
@@ -1600,16 +1606,16 @@ class modFlexicontentHelper
 	function verifyParams( &$params )
 	{
 		// Calculate menu itemid for item links
-		$menus				= & JApplication::getMenu('site', array());
+		$menus = JApplication::getMenu('site', array());
 		$itemid_force	= (int)$params->get('itemid_force');
 		if ($itemid_force==1) {
 			$Itemid					= JRequest::getInt('Itemid');
-			$menu						= & $menus->getItem($Itemid);
+			$menu						= $menus->getItem($Itemid);
 			$component			= @$menu->query['option'] ? $menu->query['option'] : '';
 			$forced_itemid	= $component=="com_flexicontent" ? $Itemid : 0;
 		} else if ($itemid_force==2) {
 			$itemid_force_value	= (int)$params->get('itemid_force_value', 0);
-			$menu								= & $menus->getItem($itemid_force_value);
+			$menu								= $menus->getItem($itemid_force_value);
 			$component					= @$menu->query['option'] ? $menu->query['option'] : '';
 			$forced_itemid			= $component=="com_flexicontent" ? $itemid_force_value : 0;
 		} else {

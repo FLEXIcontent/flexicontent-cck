@@ -152,8 +152,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Initialise variables
 		// ********************
 		
-		$editorname = $user->getParam('editor', $app->getCfg('editor'));
-		$editor 	  = JFactory::getEditor($editor_name);
+		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
+		$editor 	   = JFactory::getEditor($editor_name);
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$bar     = JToolBar::getInstance('toolbar');
 		if (!FLEXI_J16GE)
