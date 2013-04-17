@@ -83,6 +83,7 @@ function submitbutton(task) {
 }
 </script>
 <div class="flexicontent">
+<?php echo $this->fleximport; ?>
 <form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm">
 	<table cellspacing="10" cellpadding="0" border="0" width="100%">
 		<tr>

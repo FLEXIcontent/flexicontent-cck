@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- * 
+ *
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.view');
+jimport('joomla.application.component.helper' );
 
 /**
  * View class for the FLEXIcontent categories screen
@@ -34,7 +35,7 @@ class FlexicontentViewImport extends JViewLegacy
 	{
 		global $globalcats;
 		$mainframe = JFactory::getApplication();
-		
+
 		//initialise variables
 		$user     = JFactory::getUser();
 		$db       = JFactory::getDBO();
@@ -44,14 +45,14 @@ class FlexicontentViewImport extends JViewLegacy
 		$task     = JRequest::getVar('task', '');
 		$cid      = JRequest::getVar('cid', array());
 		$extlimit = JRequest::getInt('extlimit', 100);
-		
+
 		$this->setLayout('import');
 
 		//initialise variables
 		$user 		= JFactory::getUser();
 		$document	= JFactory::getDocument();
 		$context	= 'com_flexicontent';
-		
+
 		JHTML::_('behavior.tooltip');
 
 		//add css to document
@@ -63,7 +64,7 @@ class FlexicontentViewImport extends JViewLegacy
 
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
-		
+
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanImport');
 
@@ -76,7 +77,7 @@ class FlexicontentViewImport extends JViewLegacy
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
-		
+
 		$query = 'SELECT id, name'
 			. ' FROM #__flexicontent_types'
 			. ' WHERE published = 1'
@@ -84,11 +85,11 @@ class FlexicontentViewImport extends JViewLegacy
 			;
 		$db->setQuery($query);
 		$types = $db->loadObjectList();
-		
+
 		$lists['type_id'] = flexicontent_html::buildtypesselect($types, 'type_id', '', true, 'class="inputbox" size="1"', 'type_id');
 
 		$categories = $globalcats;
-		
+
 		if (FLEXI_J16GE) {
 			// build the main category select list
 			$actions_allowed = array('core.create');
@@ -101,16 +102,16 @@ class FlexicontentViewImport extends JViewLegacy
 			// build the secondary categories select list
 			$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false, false);
 		}
-		
+
 		//build languages list
 		// Retrieve author configuration
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
 		if ( $authorparams = $db->loadResult() )
 			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
-		
+
 		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
-		
+
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
 		if (FLEXI_FISH || FLEXI_J16GE) {
@@ -120,9 +121,16 @@ class FlexicontentViewImport extends JViewLegacy
 			$languages[] = JHTML::_('select.option', $default_lang, JText::_( 'Default' ).' ('.flexicontent_html::getSiteDefaultLang().')' );
 			$lists['languages'] = JHTML::_('select.radiolist', $languages, 'language', $class='', 'value', 'text', $default_lang );
 		}
-		
+
 		$lists['states'] = flexicontent_html::buildstateslist('state', '', '', 2);
-		
+
+		if (JComponentHelper::isEnabled('com_fleximport',true)) {
+			$fleximport = JText::sprintf('FLEXI_FLEXIMPORT_INSTALLED',JText::_('FLEXI_FLEXIMPORT_INFOS'));
+		}else{
+			$fleximport = JText::sprintf('FLEXI_FLEXIMPORT_NOT_INSTALLED',JText::_('FLEXI_FLEXIMPORT_INFOS'));
+		}
+
+		$this->assignRef('fleximport'   	, $fleximport);
 		//assign data to template
 		$this->assignRef('lists'   	, $lists);
 		$this->assignRef('cid'     	, $cid);
