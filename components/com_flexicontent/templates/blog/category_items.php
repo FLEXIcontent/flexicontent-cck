@@ -51,7 +51,7 @@ if ($leadnum) :
 	<ul class="leadingblock">
 		<?php
 		if ($this->params->get('lead_use_image', 1) && $this->params->get('lead_image')) {
-			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small');
+			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', 'o'=>'original');
 			$img_field_size = $img_size_map[ $this->params->get('lead_image_size' , 'l') ];
 			$img_field_name = $this->params->get('lead_image');
 		}
@@ -316,7 +316,7 @@ if ($leadnum) :
 	<ul class="introblock <?php echo $classnum; ?>">	
 		<?php
 		if ($this->params->get('intro_use_image', 1) && $this->params->get('intro_image')) {
-			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small');
+			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', 'o'=>'original');
 			$img_field_size = $img_size_map[ $this->params->get('intro_image_size' , 'l') ];
 			$img_field_name = $this->params->get('intro_image');
 		}

@@ -22,6 +22,13 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $isnew = !$this->item->id;
 $typeid = !$isnew ? $this->item->type_id : JRequest::getInt('typeid') ;
 
+$secondary_displayed =
+  ($isnew && $this->menuCats && $this->menuCats->cid) ||      // New and overridding, check if secondary are used
+  ((!$isnew || !$this->menuCats) && $this->perms['multicat']) // Not new or new but not overriding, check if secondary are allowed
+;
+$colmain_class = $secondary_displayed ? 'fc_edit_corefields_left' : 'fc_edit_corefields_full';
+$colsec_class  = $secondary_displayed ? 'fc_edit_corefields_right' : '';
+
 // Create info images
 $infoimage = JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_( 'FLEXI_NOTES' ) );
 
@@ -224,8 +231,9 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			if ( !$this->perms['canpublish'] && $this->params->get('use_versioning', 1) )  echo '<div style="text-align:right; width:100%; padding:0px; clear:both;">(*) '.$approval_msg.'</div>';
 		?>
 		
-		<fieldset class="flexi_general">
-			<legend><?php echo JText::_( 'FLEXI_GENERAL' ); ?></legend>
+	<fieldset class="flexi_general customfields_set">
+		<legend><?php echo JText::_( 'FLEXI_GENERAL' ); ?></legend>
+		<div class="<?php echo $colmain_class; ?>">
 			<div class="flexi_formblock">
 				<?php
 					$field = @$this->fields['title'];
@@ -321,17 +329,6 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				</label>
 				<?php echo $this->menuCats->catid; ?>
 			</div>
-		<?php if ( $this->menuCats->cid ) : /* Check if multiple-categories field was created (it is not when submiting to single category) */ ?>
-			<div class="flexi_formblock">
-				<label id="jform_cid-lbl" for="jform_cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
-					<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
-						<?php echo $infoimage; ?>
-					</span>
-				</label>
-				<?php echo $this->menuCats->cid; ?>
-			</div>
-		<?php endif; ?>
 	<?php else : ?>
 			<div class="flexi_formblock">
 				<label id="jform_catid-lbl" for="jform_catid" class="flexi_label">
@@ -339,17 +336,6 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				</label>
 				<?php echo $this->lists['catid']; ?>
 			</div>
-		<?php if ($this->perms['multicat']) : ?>
-			<div class="flexi_formblock">
-				<label id="jform_cid-lbl" for="jform_cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
-					<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
-						<?php echo $infoimage; ?>
-					</span>
-				</label>
-				<?php echo $this->lists['cid']; ?>
-			</div>
-		<?php endif; ?>
 	<?php endif; ?>
 
 	<?php if ( $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new item via menu override ?>
@@ -506,7 +492,41 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			<?php endif; ?>
 			
 		<?php endif; ?>
-		</fieldset>
+		
+		</div>
+		
+	<?php if ($secondary_displayed) : ?>
+	
+		<div class="<?php echo $colsec_class; ?>">
+		<?php if ($isnew && $this->menuCats) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
+			<?php if ( $this->menuCats->cid ) : /* Check if multiple-categories field was created (it is not when submiting to single category) */ ?>
+				<div class="flexi_formblock">
+					<label id="jform_cid-lbl" for="jform_cid" class="flexi_label" style="text-align:left; width:100% !important">
+						<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
+						<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
+							<?php echo $infoimage; ?>
+						</span>
+					</label>
+					<?php echo $this->menuCats->cid; ?>
+				</div>
+			<?php endif; ?>
+		<?php else : ?>
+			<?php if ($this->perms['multicat']) : ?>
+				<div class="flexi_formblock">
+					<label id="jform_cid-lbl" for="jform_cid" class="flexi_label" style="text-align:left; width:100% !important">
+						<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
+						<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
+							<?php echo $infoimage; ?>
+						</span>
+					</label>
+					<?php echo $this->lists['cid']; ?>
+				</div>
+			<?php endif; ?>
+		<?php endif; ?>
+		</div>
+		
+	<?php endif; ?>
+	</fieldset>
 		
 		<?php
 		if ($this->perms['canright']) :
@@ -523,7 +543,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			");
 
 		?>
-				<fieldset class="flexiaccess">
+				<fieldset class="flexiaccess customfields_set">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%" style="*position: relative;">
 						<tr>
@@ -541,7 +561,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	<?php if ($typeid && ($this->perms['cantags'] || count(@$this->usedtagsdata)) ) : ?>
 		<?php $display_tags = $this->params->get('usetags_fe', 1)==0 ? 'style="display:none;"' : ''; ?>
 		
-		<fieldset class="flexi_tags" <?php echo $display_tags ?> >
+		<fieldset class="flexi_tags customfields_set" <?php echo $display_tags ?> >
 			<?php
 				$field = @$this->fields['tags'];
 				$label_tooltip = @$field->description ? 'class="hasTip" title="'.htmlspecialchars($field->label, ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class=""';
@@ -638,8 +658,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 						<?php echo $field->label; ?>
 					</label>
 					
-					<div style="<?php echo $width; ?>;"
-						class="fcfield_row<?php echo $row_k;?> container_fcfield
+					<div style="<?php echo $width; ?>;" class="fcfield_row<?php echo $row_k;?> container_fcfield
 						container_fcfield_id_<?php echo $field->id;?> container_fcfield_name_<?php echo $field->name;?>"						
 					>
 						<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>

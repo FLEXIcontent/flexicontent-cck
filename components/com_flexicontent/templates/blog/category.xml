@@ -43,6 +43,7 @@
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
 				<option value="l">FLEXI_LARGE</option>
+				<option value="o">FLEXI_ORIGINAL</option>
 			</param>
 			<param name="lead_width" type="text" size="4" default="180" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<param name="lead_height" type="text" size="4" default="180" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
@@ -78,6 +79,7 @@
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
 				<option value="l">FLEXI_LARGE</option>
+				<option value="o">FLEXI_ORIGINAL</option>
 			</param>
 			<param name="intro_width" type="text" size="4" default="90" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
 			<param name="intro_height" type="text" size="4" default="90" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
