@@ -455,6 +455,16 @@
 /* (e) Generic Display of Rendered Field Values */
 /************************************************/
 
+#flexicontent .fc_edit_corefields_left  {
+	float:left !important; width:60%  !important; margin:0px !important; padding:0px !important;
+}
+#flexicontent .fc_edit_corefields_right {
+	float:left !important; width:39%  !important; margin:0px !important; padding:0px 0px 0px 1% !important;
+}
+#flexicontent .fc_edit_corefields_full {
+	float:left !important; width:100% !important; margin:0px !important; padding:0px !important;
+}
+
 #flexicontent .fc_field_container {
 	display: block;
 	white-space: nowrap;
@@ -535,6 +545,8 @@ button.fc_button {}
  ********************/
 
 div.flexi_edit .flexi_label.fc_tooltip_icon_fe {
+  padding:3px 3% 3px 1%;
+  width: 14%;
 	background: url(../images/icon-16-hint.png) 100% 0% no-repeat #F6F6F6;
 }
 

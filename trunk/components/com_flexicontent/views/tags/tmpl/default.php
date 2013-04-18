@@ -32,9 +32,9 @@ $dateformat = ($dateformat != "DATE_FORMAT_CUSTOM") ? $dateformat : $customdate;
 // Image configuration
 $use_image    = (int)$params->get('use_image', 1);
 $image_source = $params->get('image_source');
-$img_height   = (int)$params->get('img_height', 40);
-$img_width    = (int)$params->get('img_width', 40);
-$img_method   = (int)$params->get('img_method', 1);
+$image_height = (int)$params->get('image_height', 40);
+$image_width  = (int)$params->get('image_width', 40);
+$image_method = (int)$params->get('image_method', 1);
 $image_size		= $params->get('image_size', '');
 
 // Retrieve default image for the image field
@@ -164,11 +164,11 @@ if ($use_fields && count($fields)) {
 			$RESIZE_FLAG = !$image_source || !$img_field_size;
 			if ( $src && $RESIZE_FLAG ) {
 				// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-				$h		= '&amp;h=' . $img_height;
-				$w		= '&amp;w=' . $img_width;
+				$h		= '&amp;h=' . $image_height;
+				$w		= '&amp;w=' . $image_width;
 				$aoe	= '&amp;aoe=1';
 				$q		= '&amp;q=95';
-				$zc		= $img_method ? '&amp;zc=' . $img_method : '';
+				$zc		= $image_method ? '&amp;zc=' . $image_method : '';
 				$ext = pathinfo($src, PATHINFO_EXTENSION);
 				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 				$conf	= $w . $h . $aoe . $q . $zc . $f;

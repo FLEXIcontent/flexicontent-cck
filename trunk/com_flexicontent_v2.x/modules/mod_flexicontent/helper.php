@@ -371,7 +371,9 @@ class modFlexicontentHelper
 					if ($display_hits_feat) {
 						FlexicontentFields::loadFieldConfig($hitsfield, $row);
 						$lists[$ord]['featured'][$i]->hits_rendered = $params->get('hits_label_feat') ? '<span class="hits_label_feat">'.JText::_($hitsfield->label).':</span> ' : '';
-						$lists[$ord]['featured'][$i]->hits_rendered .= JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ));
+						$lists[$ord]['featured'][$i]->hits_rendered .= FLEXI_J16GE ?
+							JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS_L' )) :
+							JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
 						$lists[$ord]['featured'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label_feat') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
 					if ($display_voting_feat) {
@@ -382,7 +384,9 @@ class modFlexicontentHelper
 					if ($display_comments_feat) {
 						$lists[$ord]['featured'][$i]->comments = $row->comments_total;
 						$lists[$ord]['featured'][$i]->comments_rendered = $params->get('comments_label_feat') ? '<span class="comments_label_feat">'.JText::_('FLEXI_COMMENTS').':</span> ' : '';
-						$lists[$ord]['featured'][$i]->comments_rendered .= JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS' ));
+						$lists[$ord]['featured'][$i]->comments_rendered .= FLEXI_J16GE ?
+							JHTML::image('components/com_flexicontent/assets/images/'.'comments.png', JText::_( 'FLEXI_COMMENTS_L' )) :
+							JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
 						$lists[$ord]['featured'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label_feat') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
 					$lists[$ord]['featured'][$i]->catid = $row->catid; 
@@ -497,7 +501,9 @@ class modFlexicontentHelper
 					if ($display_hits) {
 						FlexicontentFields::loadFieldConfig($hitsfield, $row);
 						$lists[$ord]['standard'][$i]->hits_rendered = $params->get('hits_label') ? '<span class="hits_label">'.JText::_($hitsfield->label).':</span> ' : '';
-						$lists[$ord]['standard'][$i]->hits_rendered .= JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
+						$lists[$ord]['standard'][$i]->hits_rendered .= FLEXI_J16GE ?
+							JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS_L' )) :
+							JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
 						$lists[$ord]['standard'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
 					if ($display_voting) {
@@ -508,7 +514,9 @@ class modFlexicontentHelper
 					if ($display_comments) {
 						$lists[$ord]['standard'][$i]->comments = $row->comments_total;
 						$lists[$ord]['standard'][$i]->comments_rendered = $params->get('comments_label') ? '<span class="comments_label">'.JText::_('FLEXI_COMMENTS').':</span> ' : '';
-						$lists[$ord]['standard'][$i]->comments_rendered .= JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
+						$lists[$ord]['standard'][$i]->comments_rendered .= FLEXI_J16GE ?
+							JHTML::image('components/com_flexicontent/assets/images/'.'comments.png', JText::_( 'FLEXI_COMMENTS_L' )) :
+							JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
 						$lists[$ord]['standard'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
 					$lists[$ord]['standard'][$i]->catid = $row->catid;
@@ -685,6 +693,7 @@ class modFlexicontentHelper
 		// filter by permissions
 		// *********************
 		
+		$joinaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
@@ -695,6 +704,9 @@ class modFlexicontentHelper
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
 					$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
 					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
 					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
@@ -1341,6 +1353,7 @@ class modFlexicontentHelper
 				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 				. ' JOIN #__categories AS  c ON  c.id = rel.catid'
 				. ' JOIN #__categories AS mc ON mc.id = i.catid'
+				. $joinaccess
 				. $join_favs
 				. $join_date
 				. $join_comments

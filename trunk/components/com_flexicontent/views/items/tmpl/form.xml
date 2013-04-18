@@ -21,7 +21,7 @@
 				<option value="0">FLEXI_MENU_AUTOPUBLISH_NO_LET_USER_CHOOSE</option>
 				<option value="1">FLEXI_MENU_AUTOPUBLISH_YES_HIDE_STATE</option>
 			</field>
-			<field name="allowunauthorize" type="radio" default="0" label="FLEXI_MENU_ALLOW_UNAUTHORIZED_USERS" description="FLEXI_MENU_ALLOW_UNAUTHORIZED_USERS_DESC">
+			<field name="allowunauthorize" type="list" default="0" label="FLEXI_MENU_ALLOW_UNAUTHORIZED_USERS" description="FLEXI_MENU_ALLOW_UNAUTHORIZED_USERS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_YES_EXCLUDE_GUESTS</option>
@@ -35,7 +35,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="cid" type="flexicategories" multiple="true" size="12" required="false" default="" label="FLEXI_MENU_DISPLAYED_CATS" description="FLEXI_MENU_DISPLAYED_CATS_DESC" />
-			<field name="postcats" type="radio" default="2" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC">
+			<field name="postcats" type="list" default="2" label="FLEXI_MENU_CHOOSE_CATS" description="FLEXI_MENU_CHOOSE_CATS_DESC">
 				<option value="0">SUBMIT_IN_ALL_ABOVE_CATS</option>
 				<option value="1">SUBMIT_IN_ONE_CAT</option>
 				<option value="2">SUBMIT_IN_MULTIPLE_CATS</option>
@@ -47,24 +47,24 @@
 			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST" checkvals="apply,save_preview,preview_latest" defaultvals=""
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" />
-			<field name="usealias_fe" type="radio" default="" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
+			<field name="usealias_fe" type="list" default="" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usetags_fe" type="radio" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC">
+			<field name="usetags_fe" type="list" default="1" label="FLEXI_MENU_USE_TAGS" description="FLEXI_MENU_USE_TAGS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
 			</field>
-			<field name="usemetadata_fe" type="radio" default="" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC">
+			<field name="usemetadata_fe" type="list" default="" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
 				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
 			</field>
-			<field name="usepublicationdetails_fe" type="radio" default="" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC">
+			<field name="usepublicationdetails_fe" type="list" default="" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
@@ -73,7 +73,7 @@
 			<field name="useitemparams_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_PARAMETERS_ITEM_BASIC,FLEXI_PARAMETERS_ITEM_ADVANCED,FLEXI_PARAMETERS_ITEM_SEOCONF" checkvals="basic,advanced,seoconf" defaultvals=""
 				label="FLEXI_MENU_USE_ITEM_PARAMETERS" description="FLEXI_MENU_USE_ITEM_PARAMETERS_DESC" />
-			<field name="selecttheme_fe" type="radio" default="" label="FLEXI_MENU_SELECT_THEME" description="FLEXI_MENU_SELECT_THEME_DESC">
+			<field name="selecttheme_fe" type="list" default="" label="FLEXI_MENU_SELECT_THEME" description="FLEXI_MENU_SELECT_THEME_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_SELECT_THEME</option>

@@ -52,6 +52,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		
 		$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
 		$usefirstoption  = $field->parameters->get( 'usefirstoption', 1 ) ;
+		$useselect2 = 1;
 		
 		$required = $field->parameters->get( 'required', 0 ) ;
 		//$required = $required ? ' required' : '';
@@ -109,11 +110,12 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		// Create field's HTML display for item form
 		// Display as drop-down (multiple) select
 		$options = array();
-		if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
+		if ($usefirstoption && !$useselect2) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 		foreach ($elements as $element) {
 			$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
 		}
-		$field->html	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $field->value, $elementid);
+		$field->html  = ($usefirstoption && $useselect2) ? JText::_($firstoptiontext).': ' : '';
+		$field->html .= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $field->value, $elementid);
 		
 		// Add message box about allowed # values
 		if ($exact_values) {

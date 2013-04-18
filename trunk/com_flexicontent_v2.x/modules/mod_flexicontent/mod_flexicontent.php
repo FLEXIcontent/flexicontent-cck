@@ -60,9 +60,15 @@ if ( $show_mod )
 	
 	// initialize various variables
 	global $globalcats;
-	$document 	=& JFactory::getDocument();
-	$config 	=& JFactory::getConfig();
-	$caching 	= $config->getValue('config.caching', 0);
+	$document = JFactory::getDocument();
+	$config   = JFactory::getConfig();
+	$caching  = $config->getValue('config.caching', 0);
+	
+	// include the helper only once
+	require_once (dirname(__FILE__).DS.'helper.php');
+	
+	// Verify parameters (like forced menu item id and comments showing)
+	modFlexicontentHelper::verifyParams( $params );
 	
 	// get module ordering & count parameters
 	$ordering 				= $params->get('ordering');
@@ -130,12 +136,6 @@ if ( $show_mod )
 	$custom3 				= $params->get('custom3');
 	$custom4 				= $params->get('custom4');
 	$custom5 				= $params->get('custom5');
-	
-	// include the helper only once
-	require_once (dirname(__FILE__).DS.'helper.php');
-	
-	// Verify parameters (like forced menu item id and comments showing)
-	modFlexicontentHelper::verifyParams( $params );
 	
 	// Create Item List Data
 	$list_arr = modFlexicontentHelper::getList($params);

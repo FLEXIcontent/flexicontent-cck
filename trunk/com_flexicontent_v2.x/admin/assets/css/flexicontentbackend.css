@@ -632,7 +632,7 @@ div#tags #input_new_tag {
 { border: 0; clear: both; float: none; font-size: 1px; height: 0; line-height: 1px; margin: 0; padding: 0; visibility: hidden;}
 
 .mcat, .scat { width: 235px; }
-.mcat { min-height: 400px; }
+.mcat { min-height: 320px; }
 
 div#result table.versionlist {
 	border: 1px dashed silver;
@@ -676,11 +676,11 @@ div label.lang_box {
 
 #flexicontent .customfields_set .tabberlive {
 	padding:0px!important;
-	width:100%!important;
+	width:99%!important;
 }
 #flexicontent .customfields_set .tabbertab {
 	padding:0px!important;
-	width:100%!important;
+	width:99%!important;
 }
 
 #flexicontent .fctabber {
@@ -712,7 +712,7 @@ div label.lang_box {
 
 #flexicontent .customfields_set ul.tabbernav {
 	padding: 3px 2px 0px 0px !important;
-	width: 100% !important;
+	width: 99% !important;
 }
 
 #flexicontent ul.tabbernav li {	padding: 3px !important;	margin: 0px !important; line-height: 14px !important; }
@@ -768,13 +768,17 @@ table.adminform .flexi_label {
 div.flexi_edit .flexi_label {
 	display: block;
 	float: left!important;
-  background-color: #F6F6F6;
-  border-bottom: 1px solid #E9E9E9;
-  border-right: 1px solid #E9E9E9;
-  font-weight: bold;
+	color: #606060;
+  background-color: #F2F2F2;
+  border-bottom: 1px solid #D0D0D0;
+  border-right: 1px solid #D0D0D0;
+  font-style: italic;
+  font-size: 12px;
+  font-family: arial;
+  font-weight: normal;
   text-align: right;
   width: 16%;
-  margin: 3px 0% 3px 0%;
+  margin: 2px 1% 3px 0%;
   padding:3px 1% 3px 1%;
 }
 
@@ -956,7 +960,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 
 .fckey_high { color:darkred !important; }
-.container_fcfield { float:left!important; padding:0px!important;  margin: 3px 0% 3px 1%!important; width: 79%; }
+.container_fcfield { float:left!important; padding:0px!important;  margin: 3px 0% 3px 0%!important; width: 79%; }
 .container_fcfield.fcfield_row0 {}
 .container_fcfield.fcfield_row1 {}
 .container_fcfield .fc_mini_note_box,
@@ -1014,7 +1018,10 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 
 /* FORCE some CSS about select2 lib */
 .use_select2_lib {
-	min-width: 100px!important;
+	width: auto!important;
+}
+.select2-container-multi, .select2-drop {
+	min-width: 140px!important;
 	width: auto!important;
 }
 
@@ -1100,9 +1107,9 @@ div fieldset.panelform label.hasTip, #jform_attribs_ilayout-lbl, .fc_fieldset la
 	clear: both;
 	padding: 3px 3px 3px 3px;
 	margin:3px 0px 0px 0px;
-	background-color: #F6F6F6;
-	border-bottom: 1px solid #E9E9E9;
-	border-right: 1px solid #E9E9E9;
+	background-color: #F2F2F2;
+	border-bottom: 1px solid #D0D0D0;
+	border-right: 1px solid #D0D0D0;
 	color: #666666;
 	font-weight: normal;
 	text-align: right;
@@ -1206,11 +1213,12 @@ div table.admintable td {
 	padding: 2px 4px 2px 8px;
 }
 div table.admintable td.key, div table.admintable td.paramlist_key {
-	background-color: #F6F6F6;
-	border-bottom: 1px solid #E9E9E9;
-	border-right: 1px solid #E9E9E9;
+	background-color: #F2F2F2;
+	border-bottom: 1px solid #D0D0D0;
+	border-right: 1px solid #D0D0D0;
 	color: #666666;
-	font-weight: bold;
+	font-family: arial;
+	font-weight: normal;
 	font-size: 11px;
 	text-align: right;
 	width: 140px;

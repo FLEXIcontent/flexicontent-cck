@@ -155,7 +155,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					
 				".( $image_source ? "" :"
 					var has_imagepicker = jQuery(thisNewField).find('ul.image_picker_selector').length != 0;
-					var has_select2     = jQuery(thisNewField).find('div.select2-container') != 0;
+					var has_select2     = jQuery(thisNewField).find('div.select2-container').length != 0;
 					if (has_imagepicker) jQuery(thisNewField).find('ul.image_picker_selector').remove();
 					if (has_select2)     jQuery(thisNewField).find('div.select2-container').remove();
 					").
@@ -279,11 +279,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					addField".$field->id."(field.getParent().getParent().getParent().getElement('input.fcfield-addvalue'));
 				}
 				
-				var fp = field.getParent();
-				if ( fp.getElements('input.originalname').getProperty('value')!='' || fp.getElements('.existingname').getProperty('value')!='' ) {
+				var originalfftag = 'input.originalname';
+				var existingfftag = '".($image_source ? "input" :"select")."' + '.existingname';
+				
+				var originalname = jQuery(field).parent().find( originalfftag ).val();
+				var existingname = jQuery(field).parent().find( existingfftag ).val();
+				
+				if ( originalname != '' || existingname != '' ) {
 					var valcounter = $('".$field->name."');
 					if ( !valcounter.value || valcounter.value=='1' ) valcounter.value = '';
 					else valcounter.value = parseInt(valcounter.value) - 1;
+					//alert(valcounter.value);
 				}
 				
 				if(rowCount".$field->id." > 0)
@@ -396,7 +402,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				//alert(valcounter.value);
 				
-				var existing_obj = $( elementid + '_existingname' ).getParent().getParent().getParent().getElement('.existingname');
+				var existing_obj = $( elementid + '_existingname' );
 				var original_obj = $( elementid + '_originalname' );
 				
 				var prv_obj = $(  elementid + '_preview_image' );
@@ -577,26 +583,25 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					'.@$title.'
 					'.@$desc.'
 				</tbody></table>
-			</div>
+			</div>'.
+			
+			( !$image_source ? '
 			<div style="float:left; clear:left;">
-				<table class="admintable fcfield'.$field->id.' img_upload_select" id="'.$field->name.'_upload_select_tbl_'.$n.'" style="border:1px dashed gray; float:left; margin-bottom:16px;'.($image_name ? "display:none;" : "").'" ><tbody>'.
-				
-				( !$image_source ? '
-					<tr>
+				<table class="admintable fcfield'.$field->id.' img_upload_select" id="'.$field->name.'_upload_select_tbl_'.$n.'" style="border:1px dashed gray; float:left; margin-bottom:16px;'.($image_name ? "display:none;" : "").'" ><tbody>
+					<tr class="img_newfile_row">
 						<td class="key fckey_high">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
 						<td style="white-space: normal;">'.
 							'<input name="'.$field->name.'['.$n.']" id="'.$elementid.'_newfile"  class="newfile no_value_selected" '.$onchange.' type="file" /><br/><br/>' .
 							'<b>'.JText::_( 'FLEXI_FIELD_MAXSIZE' ).'</b>: '.($field->parameters->get('upload_maxsize') / 1000000).' MBs &nbsp; - &nbsp; <br/>' .
 							'<b>'.JText::_( 'FLEXI_FIELD_ALLOWEDEXT' ).'</b>: '.str_replace(",", ", ", $field->parameters->get('upload_extensions')) .'
 						</td>
-					<tr>
+					<tr class="img_existingfile_row">
 						<td class="key fckey_high">'.JText::_( !$image_source ? 'FLEXI_FIELD_EXISTINGFILE' : 'FLEXI_SELECT' ).':</td>
 						<td>'.$curr_select.'</td>
-					</tr>'  :  '')
-					.'
+					</tr>
 				</tbody></table>
-			</div>
-			';
+			</div>'  :  '')
+			;
 			
 			$n++;
 			$image_added = true;
@@ -969,7 +974,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		} else {
 			$thumb_folder  = JPATH_SITE .DS. JPath::clean($dir) .DS. 'item_'.$item->id . '_field_'.$field->id;
 			$thumb_urlpath = $dir_url . '/item_'.$item->id . '_field_'.$field->id;
-			$orig_urlpath  = $dir_url . '/original';
+			$orig_urlpath  = $thumb_urlpath . '/original';
 		}
 		
 		$i = -1;
