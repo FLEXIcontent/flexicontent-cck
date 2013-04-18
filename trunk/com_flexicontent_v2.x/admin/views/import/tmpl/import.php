@@ -83,11 +83,14 @@ function submitbutton(task) {
 }
 </script>
 <div class="flexicontent">
-<?php echo $this->fleximport; ?>
+
 <form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm">
 	<table cellspacing="10" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td value="top" colspan="2">
+			<div style="width:95%; text-align:right; clear:both; float:right;">
+				<a href="#tools_3rd_party" ><?php echo JText::_( 'FLEXI_3RD_PARTY_DEV_IMPORT_EXPORT_TOOLS' ); ?></a>
+			</div>
 			<fieldset>
 				<legend><?php echo JText::_( 'FLEXI_IMPORT_TYPE_AND_CORE_PROPS' ); ?></legend>
 				<table>
@@ -173,30 +176,34 @@ function submitbutton(task) {
 			</td>
 		</tr>
 		<tr>
-			<td valign="top" width="50%">
-			<fieldset>
-				<legend><?php echo JText::_( 'FLEXI_IMPORT_CATS' ); ?></legend>
-				<table>
-					<tr valign="top">
-						<td class="key"><label class="fcimport" for="maincat"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label></td>
-						<td><?php echo $this->lists['maincat']; ?></td>
-						<td>&nbsp;</td>
-						<td class="key"><label class="fcimport" for="seccats"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label></td>
-						<td><?php echo $this->lists['seccats']; ?></td>
-					</tr>
-					<tr valign="top">
-						<td class="key"><label class="fcimport" for="maincat_col">File override <?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label><br />(Use 'catid' column, e.g. 54)</label></td>
-						<td><input type="checkbox" id="maincat_col" name="maincat_col" value="1" /></td>
-						<td>&nbsp;</td>
-						<td class="key"><label class="fcimport" for="seccats_col">File override <?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label><br />(Use 'cid' column, e.g. 54,14,51)</td>
-						<td><input type="checkbox" id="seccats_col" name="seccats_col" value="1" /></td>
-					</tr>
-				</table>
-			</fieldset>
+			<td valign="top" colspan="2">
+				<fieldset style="min-height:220px;">
+					<legend><?php echo JText::_( 'FLEXI_IMPORT_CATS' ); ?></legend>
+					<table>
+						<tr valign="top">
+							<td class="key"><label class="fcimport" for="maincat"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label></td>
+							<td><?php echo $this->lists['maincat']; ?></td>
+							<td>&nbsp;</td>
+							<td class="key"><label class="fcimport" for="seccats"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label></td>
+							<td><?php echo $this->lists['seccats']; ?></td>
+						</tr>
+						<tr valign="top">
+							<td class="key" colspan="2" align="left">
+								<label class="fcimport" for="maincat_col" style="float:left">File override <?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label><br />(Use 'catid' column, e.g. 54)</label>
+								<input type="checkbox" id="maincat_col" name="maincat_col" value="1" />
+							</td>
+							<td>&nbsp;</td>
+							<td class="key" colspan="2" align="left">
+								<label class="fcimport" for="seccats_col" style="float:left">File override <?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label><br />(Use 'cid' column, e.g. 54,14,51)
+								<input type="checkbox" id="seccats_col" name="seccats_col" value="1" />
+							</td>
+						</tr>
+					</table>
+				</fieldset>
 			</td>
 		</tr>
 		<tr>
-			<td valign="top">
+			<td valign="top" colspan="2" >
 			<fieldset>
 				<legend><?php // echo JText::_( 'FLEXI_IMPORT_FILE' ); ?><?php echo JText::_( 'FLEXI_IMPORT_CSV' ); ?></legend>
 				<table>
@@ -254,7 +261,7 @@ function submitbutton(task) {
 		</tr>
 
 		<tr>
-			<td valign="top">
+			<td valign="top" colspan="2">
 			<fieldset>
 				<legend style='color: darkgreen;'><?php echo JText::_( 'FLEXI_CSV_IMPORT_FILE_FORMAT' ); ?></legend>
 <b>1. First line</b> of the CSV file: &nbsp; &nbsp; must contain the <b>field names</b> <u>(and not the field labels!)</u><br/><br/>
@@ -266,21 +273,29 @@ function submitbutton(task) {
 -- c. <b>multi-value</b> fields: selectmultiple, selectmultple, checkbox, checkboximage, email, weblink, <b>separate multiple values with %%</b>, <br/><br/>
 -- d. <b>multi-property per value</b> fields, e.g. email fields & weblink fields: write email/weblink property only e.g. <b>usera@somedomain.com</b>, OR write multple properties like <b>[-propertyname-]=propertyvalue</b>, and <b>separate mutliple properties with !!</b></><br/>
 <br/>
-CSV example Format:
-<?php echo "<pre style='font-size:11px;'>"; ?>
-title ~~ text ~~ textfield3 ~~ emailfield6 ~~ weblinkfld8 ~~ single_value_field22 ~~ multi_value_field24
-~~ title 1 ~~ description 1 ~~ textfield3 value ~~ [-addr-]=usera@somedomain.com!![-text-]=usera ~~ www.somedomaina.com ~~ f22_valuea ~~ f24_value01%%f24_value02%%f24_value03
-~~ title 2 ~~ description 2 ~~ textfield3 value ~~ [-addr-]=userb@somedomain.com!![-text-]=userb ~~ www.somedomainb.com ~~ f22_valuea ~~ f24_value04%%f24_value05%%f24_value06
-~~ title 3 ~~ description 3 ~~ textfield3 value ~~ [-addr-]=userc@somedomain.com!![-text-]=userc ~~ www.somedomainc.com ~~ f22_valuea ~~ f24_value07%%f24_value08%%f24_value09
-~~ title 4 ~~ description 4 ~~ textfield3 value ~~ userd@somedomain.com ~~ [-link-]=www.somedomaind.com!![-title-]=somedomainD ~~ f22_valuea ~~ f24_value10%%f24_value11%%f24_value12
-~~ title 5 ~~ description 5 ~~ textfield3 value ~~ usere@somedomain.com ~~ [-link-]=www.somedomaine.com!![-title-]=somedomainE ~~ f22_valuea ~~ f24_value13%%f24_value14%%f24_value15
-<?php echo "</pre>"; ?>
+<u>CSV example Format:</u> <br/>
+<small style='font-size:10px; font-familiy:tahoma;'>
+title ~~ text ~~ textfield3 ~~ emailfield6 ~~ weblinkfld8 ~~ single_value_field22 ~~ multi_value_field24 <br/>
+~~ title 1 ~~ description 1 ~~ textfield3 value ~~ [-addr-]=usera@somedomain.com!![-text-]=usera ~~ www.somedomaina.com ~~ f22_valuea ~~ f24_value01%%f24_value02%%f24_value03 <br/>
+~~ title 2 ~~ description 2 ~~ textfield3 value ~~ [-addr-]=userb@somedomain.com!![-text-]=userb ~~ www.somedomainb.com ~~ f22_valuea ~~ f24_value04%%f24_value05%%f24_value06 <br/>
+~~ title 3 ~~ description 3 ~~ textfield3 value ~~ [-addr-]=userc@somedomain.com!![-text-]=userc ~~ www.somedomainc.com ~~ f22_valuea ~~ f24_value07%%f24_value08%%f24_value09 <br/>
+~~ title 4 ~~ description 4 ~~ textfield3 value ~~ userd@somedomain.com ~~ [-link-]=www.somedomaind.com!![-title-]=somedomainD ~~ f22_valuea ~~ f24_value10%%f24_value11%%f24_value12 <br/>
+~~ title 5 ~~ description 5 ~~ textfield3 value ~~ usere@somedomain.com ~~ [-link-]=www.somedomaine.com!![-title-]=somedomainE ~~ f22_valuea ~~ f24_value13%%f24_value14%%f24_value15 <br/>
+</small>
 <br/>
 			</fieldset>
 			</td>
 		</tr>
-
-
+		<tr>
+			<td value="top" width="">
+				<fieldset style="min-height:220px; background-color:#FFFFCF;">
+					<legend style="color:darkred; background-color:white;" ><?php echo JText::_( 'FLEXI_3RD_PARTY_DEV_IMPORT_EXPORT_TOOLS' ); ?></legend>
+					<a id="tools_3rd_party"></a>
+					<?php echo $this->fleximport; ?>
+				</fieldset>
+			</td>
+		</tr>
+		
 	</table>
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="items" />
@@ -289,3 +304,14 @@ title ~~ text ~~ textfield3 ~~ emailfield6 ~~ weblinkfld8 ~~ single_value_field2
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
 </div>
+<style>
+#adminForm table ul {
+	padding: 0px 0px 0px 24px;
+	margin: 12px 0px 12px 0px;
+}
+#adminForm table li {
+	list-style: disc inside none !important;
+	margin: 0 !important;
+	padding: 1px 0 0 8px !important;
+}
+</style>

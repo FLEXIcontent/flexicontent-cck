@@ -19,6 +19,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.view');
+jimport('joomla.application.component.helper' );
 
 /**
  * View class for the FLEXIcontent categories screen
@@ -122,10 +123,20 @@ class FlexicontentViewImport extends JViewLegacy
 		}
 
 		$lists['states'] = flexicontent_html::buildstateslist('state', '', '', 2);
-
-		if (JComponentHelper::isEnabled('com_fleximport',true)) {
+		
+		
+		// Ignore warnings because component may not be installed
+		$warnHandlers = JERROR::getErrorHandling( E_WARNING );
+		JERROR::setErrorHandling( E_WARNING, 'ignore' );
+		
+		$fleximport_comp = JComponentHelper::getComponent('com_fleximport', true);
+		
+		// Reset the warning handler(s)
+		foreach( $warnHandlers as $mode )  JERROR::setErrorHandling( E_WARNING, $mode );
+		
+		if ($fleximport_comp && $fleximport_comp->enabled) {
 			$fleximport = JText::sprintf('FLEXI_FLEXIMPORT_INSTALLED',JText::_('FLEXI_FLEXIMPORT_INFOS'));
-		}else{
+		} else {
 			$fleximport = JText::sprintf('FLEXI_FLEXIMPORT_NOT_INSTALLED',JText::_('FLEXI_FLEXIMPORT_INFOS'));
 		}
 
@@ -133,6 +144,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$this->assignRef('lists'   	, $lists);
 		$this->assignRef('cid'     	, $cid);
 		$this->assignRef('user'			, $user);
+		$this->assignRef('fleximport', $fleximport);
 
 		parent::display($tpl);
 	}
