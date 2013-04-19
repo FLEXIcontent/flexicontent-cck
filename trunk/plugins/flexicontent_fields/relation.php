@@ -241,9 +241,11 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$css = '.'.$ri_field_name.'_fccats { min-width:500px !important; }';
 		if ($css) $document->addStyleDeclaration($css);
 		
-		$field->html .= "<div style='float:none;margin-bottom:12px;'>Select Category:<br>\n";
+		$field->html .= "<div style='float:none;margin-bottom:12px;'>";
 		$field->html .= flexicontent_cats::buildcatselect(
-			$allowedtree, $ri_field_name.'_fccats', $catvals="", false, ' class="use_select2_lib inputbox '.$ri_field_name.'_fccats" ',
+			$allowedtree, $ri_field_name.'_fccats', $catvals="",
+			$top=2, // (adds first option "please select") Important otherwise single entry in select can initiate onchange event
+			' class="use_select2_lib inputbox '.$ri_field_name.'_fccats" ',
 			$check_published = true, $check_perms = true,
 			$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false
 		);

@@ -64,8 +64,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$autoassign = $field->parameters->get('autoassign', 0);
 		$always_allow_removal = $field->parameters->get('always_allow_removal', 0);
 		
-		$thumb_w_s = $field->parameters->get( 'w_small', 120 );
-		$thumb_h_s = $field->parameters->get( 'h_small', 90 );
+		$thumb_w_s = $field->parameters->get( 'w_s', 120 );
+		$thumb_h_s = $field->parameters->get( 'h_s', 90 );
 		
 		// optional properies configuration
 		$linkto_url = $field->parameters->get('linkto_url',0);
@@ -81,6 +81,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$usetitle  = $field->parameters->get( 'use_title', 1 ) ;
 		$usedesc   = $field->parameters->get( 'use_desc', 1 ) ;
 		
+		$none_props = !$linkto_url && !$usealt && !$usetitle && !$usedesc;
+		
 		if ( !$common_js_css_added ) {
 			$js = "
 				function fx_toggle_upload_select_tbl (obj_changed, obj_disp_toggle) {
@@ -92,13 +94,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						obj_disp_toggle.css('display', 'table');
 					else
 						obj_disp_toggle.css('display', 'none');
-				}
-				
-				function imgfld_fileelement_url (target, fieldid, itemid, thumb_w, thumb_h) {
-					targetid = target.getParent().getParent().getElement('.existingname').id;
-					linkfsel = '".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JUtility::getToken().'=1'."';
-					linkfsel = linkfsel + '&field='+fieldid+'&itemid='+itemid+'&targetid='+targetid+'&thumb_w='+thumb_w+'&thumb_h='+thumb_h+'&autoassign=".$autoassign."';
-					return linkfsel;
 				}
 				";
 			$document->addScriptDeclaration($js);
@@ -180,6 +175,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					").
 				"
 					thisNewField.getElements('a.addfile_".$field->id."').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
+					thisNewField.getElements('a.addfile_".$field->id."').setProperty('href','".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JUtility::getToken().'=1&field='.$field->id.'&itemid='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$thumb_w_s.'&thumb_h='.$thumb_h_s.'&autoassign='.$autoassign."');
 					
 					// COPYING an existing value
 					if (thisNewField.getElement('img.preview_image')) {
@@ -314,17 +310,23 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			";
 			
 			$css = '
-			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
-			#sortables_'.$field->id.' li {
-				clear: both;
-				display: block;
-				list-style: none;
-				position: relative;
+			#sortables_'.$field->id.' {
+				float:left!important; margin:0px!important; padding:0px!important;
+				list-style:none!important; white-space:normal!important;
 			}
-			#sortables_'.$field->id.' li input { cursor: text;}
-			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
-			#sortables_'.$field->id.' li .admintable { text-align: left; }
+			#sortables_'.$field->id.' li {
+				'.($none_props ?
+					'float:left!important; clear:none!important; white-space:normal!important;' :
+					'clear:both!important;').'
+				display: block!important;
+				list-style: none!important;
+				position: relative;  .'/* do not make important */.'
+			}
+			#sortables_'.$field->id.' li input { cursor:text; }
+			#add'.$field->name.' { margin-top:5px; clear:both; display:block; }
+			#sortables_'.$field->id.' li .admintable { text-align:left; }
 			#sortables_'.$field->id.' li:only-child span.fcfield-drag { display:none; }
+			#sortables_'.$field->id.' li .fcimg_preview_box { min-width:'.($thumb_w_s+6).'px; min-height:'.($thumb_h_s+8).'px;float:left; clear:none; margin-right:5px; }
 			/*#sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }*/
 			';
 			
@@ -434,6 +436,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 		";
 		$css .='
+			table.fcfield'.$field->id.'.img_upload_select { float:left; clear:left; }
 			table.fcfield'.$field->id.'.img_upload_select li { min-height:'.($thumb_h_s+56).'px; }
 			table.fcfield'.$field->id.'.img_upload_select ul { height:'.($thumb_h_s+96).'px; }
 			table.fcfield'.$field->id.'.img_upload_select ul { width:'.(2*($thumb_w_s+64)).'px; }
@@ -493,9 +496,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ( $image_source ) {
 				$select = "
 				<input class='existingname fcfield_textval' id='".$elementid."_existingname' name='".$fieldname."[existingname]' value='".$image_name."' readonly='readonly' style='float:none;' />
+				".($none_props ? '<br/>' : '')."
 				<div class=\"fcfield-button-add\" style='margin: 0px;display:inline-block;'>
 					<a class=\"addfile_".$field->id."\" id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_SELECT_IMAGE' )."\"
-						href=\"#\" style=\"margin: 0px;\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",'".$u_item_id."',".$thumb_w_s.",".$thumb_h_s.")\"
+						".//href=\"#\" style=\"margin: 0px;\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",'".$u_item_id."',".$thumb_w_s.",".$thumb_h_s.")\"
+						"href=\"".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JUtility::getToken().'=1&field='.$field->id.'&itemid='.$u_item_id.'&targetid='.$elementid."_existingname&thumb_w='.$thumb_w_s.'&thumb_h='.$thumb_h_s.'&autoassign=".$autoassign."\"
 						rel=\"{handler: 'iframe', size: {x: (MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT_IMAGE' )."</a>
 				</div>
 				";
@@ -522,9 +527,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				if ( !$image_source ) {
 					$change .= !$multiple ?
-						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" style="display:inline;" />' :
-						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this)" value="1" style="display:inline;" />' ;
-					$change .= ' <label class="fcfield-button" style="display:inline;" for="'.$elementid.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>';
+						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" />' :
+						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this)" value="1" />' ;
+					$change .= ' <label class="fcfield-button" for="'.$elementid.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>';
 				}
 				
 				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
@@ -565,10 +570,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$curr_select = str_replace('__FORMFLDID__', $elementid.'_existingname', $curr_select);
 			
 			$field->html[] = '
-			'.($image_source ? $curr_select : $change).'
+			'.($image_source ? $curr_select : $change).($none_props ? '<br/>' : '').'
 			'.$move2.'
-			'.$remove_button.'
-			<div style="float:left; clear:none; margin-right: 5px;">
+			'.$remove_button.'<br/>
+			<div class="fcimg_preview_box">
 				'.$imgpreview.'
 				'.$originalname.'
 				<div style="float:left; clear:both;" class="imgactions_box">
@@ -586,7 +591,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			</div>'.
 			
 			( !$image_source ? '
-			<div style="float:left; clear:left;">
 				<table class="admintable fcfield'.$field->id.' img_upload_select" id="'.$field->name.'_upload_select_tbl_'.$n.'" style="border:1px dashed gray; float:left; margin-bottom:16px;'.($image_name ? "display:none;" : "").'" ><tbody>
 					<tr class="img_newfile_row">
 						<td class="key fckey_high">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
@@ -600,7 +604,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						<td>'.$curr_select.'</td>
 					</tr>
 				</tbody></table>
-			</div>'  :  '')
+			'  :  '')
 			;
 			
 			$n++;
