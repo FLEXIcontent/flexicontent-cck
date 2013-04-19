@@ -23,7 +23,15 @@ $cparams   = JComponentHelper::getParams( 'com_flexicontent' );
 $autologin = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 
 
-$image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
+$attribs_preview = ' style="float:right;" class="hasTip" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this category in a new browser window" ';
+$attribs_rsslist = ' style="float:right;" class="hasTip" title="'.JText::_('FLEXI_FEED')   .':: Click to display the frontend RSS listing of this category in a new browser window" ';
+
+$image_preview = FLEXI_J16GE ?
+	JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview) :
+	JHTML::_('image.site', 'monitor_go.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_('FLEXI_PREVIEW'), $attribs_preview) ;
+$image_rsslist = FLEXI_J16GE ?
+	JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), $attribs_rsslist ) :
+	JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_('FLEXI_FEED'), $attribs_rsslist ) ;
 
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
 $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) );
@@ -50,6 +58,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
 			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
 			<th width="1%" nowrap="nowrap">&nbsp;</th>
+			<th width="1%" nowrap="nowrap">&nbsp;</th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'c.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width=""><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
@@ -66,7 +75,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 
 	<tfoot>
 		<tr>
-			<td colspan="11">
+			<td colspan="13">
 				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
@@ -100,8 +109,16 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			<td width="7"><?php echo $checked; ?></td>
 			<td width="1%" >
 				<?php
-				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getCategoryRoute($row->id)) . $autologin;
-				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
+				$cat_link    = FlexicontentHelperRoute::getCategoryRoute($row->id);
+				$previewlink = JRoute::_(JURI::root().$cat_link). $autologin;
+				$rsslink     = JRoute::_(JURI::root().$cat_link.'&format=feed&type=rss');
+				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
+				?>
+			</td>
+			<td width="1%" >
+				<?php
+				$rsslink     = JRoute::_(JURI::root().$cat_link.'&format=feed&type=rss');
+				echo '<a class="preview" href="'.$rsslink.'" target="_blank">'.$image_rsslist.'</a>';
 				?>
 			</td>
 			<td align="left" class="col_title">

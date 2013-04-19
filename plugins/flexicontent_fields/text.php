@@ -118,10 +118,10 @@ class plgFlexicontent_fieldsText extends JPlugin
 					
 					thisNewField.getFirst().setProperty('value','');  /* First element is the value input field, second is e.g remove button */
 
-					var has_inputmask = jQuery(thisNewField).find('input.has_inputmask') != 0;
+					var has_inputmask = jQuery(thisNewField).find('input.has_inputmask').length != 0;
 					if (has_inputmask)  jQuery(thisNewField).find('input.has_inputmask').inputmask();
 					
-					var has_select2 = jQuery(thisNewField).find('div.select2-container') != 0;
+					var has_select2 = jQuery(thisNewField).find('div.select2-container').length != 0;
 					if (has_select2) {
 						jQuery(thisNewField).find('div.select2-container').remove();
 						jQuery(thisNewField).find('select.use_select2_lib').select2();
