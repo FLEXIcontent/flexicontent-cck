@@ -125,8 +125,16 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			return;
 		}
 		
-		$class = '';//$required;
-		$attribs = '';
+		static $prettycheckable_added = false;
+	  if ( !$prettycheckable_added )
+	  {
+			$prettycheckable_added = true;
+			flexicontent_html::loadFramework('prettyCheckable');
+		}
+		
+		$attribs  = '';
+		$classes  = ($prettycheckable_added ? ' use_prettycheckable ' : '');
+		//$classes .= $required;
 		if ($exact_values)  {
 			$attribs .= ' exact_values="'.$exact_values.'" ';
 		} else {
@@ -134,8 +142,8 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			if ($min_values)    $attribs .= ' min_values="'.$min_values.'" ';
 		}
 		if ($js_popup_err)  $attribs .= ' js_popup_err="'.$js_popup_err.'" ';
-		if ($max_values || $min_values || $exact_values)  $class .= ' validate-cboxlimitations ';
-		if ($class)  $attribs .= ' class="'.$class.'" ';
+		if ($max_values || $min_values || $exact_values)  $classes .= ' validate-cboxlimitations ';
+		if ($classes)  $attribs .= ' class="'.$classes.'" ';
 		
 		// Create field's HTML display for item form
 		// Display as drop-down (multiple) select
@@ -154,8 +162,14 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$options = array();
 		foreach ($elements as $element) {
 			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
-			$img = '<img src="'.$imgpath . $element->image .'"  alt="'.JText::_($element->text).'" />';
-			$options[] = '<label class="hasTip" style="white-space:nowrap;" title="'.$field->label.'::'.JText::_($element->text).'"><input type="checkbox" id="'.$elementid.'_'.$i.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.' />'.$img.'</label>'.' '.$separator.' ';
+			$elementid_no = $elementid.'_'.$i;
+			$extra_params = $prettycheckable_added ? ' data-customClass="fcradiocheckimage"' : '';
+			$options[] = ''
+				.' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />'
+				.'<label for="'.$elementid_no.'" class="hasTip" title="'.$field->label.'::'.JText::_($element->text).'" >'
+				.' <img src="'.$imgpath . $element->image .'"  alt="'.JText::_($element->text).'" />'
+				.'</label>'
+				;
 			$i++;
 		}
 		
@@ -261,6 +275,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$display_index = array();
 		
 		// Prepare for looping
+		if ( !$values ) $values = array();
 		if ( $display_all ) {
 			$indexes = array_flip($values);
 			

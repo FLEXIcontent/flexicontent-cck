@@ -114,8 +114,16 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			return;
 		}
 		
-		$class = '';//$required;
-		$attribs = '';
+		static $prettycheckable_added = false;
+	  if ( !$prettycheckable_added )
+	  {
+			$prettycheckable_added = true;
+			flexicontent_html::loadFramework('prettyCheckable');
+		}
+		
+		$attribs  = '';
+		$classes  = ($prettycheckable_added ? ' use_prettycheckable ' : '');
+		//$classes .= $required;
 		if ($exact_values)  {
 			$attribs .= ' exact_values="'.$exact_values.'" ';
 		} else {
@@ -123,8 +131,8 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			if ($min_values)    $attribs .= ' min_values="'.$min_values.'" ';
 		}
 		if ($js_popup_err)  $attribs .= ' js_popup_err="'.$js_popup_err.'" ';
-		if ($max_values || $min_values || $exact_values)  $class .= ' validate-cboxlimitations ';
-		if ($class)  $attribs .= ' class="'.$class.'" ';
+		if ($max_values || $min_values || $exact_values)  $classes .= ' validate-cboxlimitations ';
+		if ($classes)  $attribs .= ' class="'.$classes.'" ';
 		
 		// Create field's HTML display for item form
 		// Display as checkboxes
@@ -132,7 +140,13 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		$options = array();
 		foreach ($elements as $element) {
 			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
-			$options[] = '<label><input type="checkbox" id="'.$elementid.'_'.$i.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.' />'.JText::_($element->text).'</label>';
+			$elementid_no = $elementid.'_'.$i;
+			$extra_params = $prettycheckable_added ? ' data-label="'.JText::_($element->text).'" data-labelPosition="right" data-customClass="fcradiocheck"' : '';
+			$options[] = ''
+				.(!$prettycheckable_added ? '<label>' : '')
+				.' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />'
+				.(!$prettycheckable_added ? JText::_($element->text).'</label>' : '')
+				;
 			$i++;
 		}
 		
@@ -233,6 +247,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		$display_index = array();
 		
 		// Prepare for looping
+		if ( !$values ) $values = array();
 		if ( $display_all ) {
 			$indexes = array_flip($values);
 			

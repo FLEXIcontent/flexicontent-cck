@@ -246,7 +246,7 @@ class flexicontent_html
 		static $load_frameworks = null;
 		if ($load_frameworks === null) {
 			$flexiparams = JComponentHelper::getParams('com_flexicontent');
-			$load_frameworks = $flexiparams->get('load_frameworks', array('jQuery','image-picker','masonry','select2','inputmask','fancybox'));
+			$load_frameworks = $flexiparams->get('load_frameworks', array('jQuery','image-picker','masonry','select2','inputmask','prettyCheckable','fancybox'));
 			$load_frameworks = FLEXIUtilities::paramToArray($load_frameworks);
 			$load_frameworks = array_flip($load_frameworks);
 		}
@@ -261,7 +261,6 @@ class flexicontent_html
 			case 'image-picker':
 				flexicontent_html::loadJQuery();
 				$document->addScript( JURI::root().'components/com_flexicontent/librairies/image-picker/image-picker.min.js' );
-				$document->addScript( JURI::root().'components/com_flexicontent/librairies/masonry/jquery.masonry.min.js' );
 				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/image-picker/image-picker.css');
 				break;
 			
@@ -306,6 +305,22 @@ class flexicontent_html
 				$js .= "
 					jQuery(document).ready(function(){
 					    jQuery(\":input\").inputmask();
+					});
+				";
+				break;
+			
+			case 'prettyCheckable':
+				flexicontent_html::loadJQuery();
+				$document->addScript( JURI::root().'components/com_flexicontent/librairies/prettyCheckable/prettyCheckable.js' );
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/prettyCheckable/prettyCheckable.css');
+				$js .= "
+					jQuery(document).ready(function(){
+						jQuery('input.use_prettycheckable').prettyCheckable();
+						jQuery('div.fcradiocheckimage').each(
+							function() {
+								jQuery(this).find('label').append(jQuery(this).next('label').html());
+								jQuery(this).next('label').remove();
+							});
 					});
 				";
 				break;

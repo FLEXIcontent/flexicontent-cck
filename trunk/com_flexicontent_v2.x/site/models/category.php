@@ -144,6 +144,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_ids = explode(',', $this->_ids);
 			// make sure given data are integers ... !!
 			foreach ($this->_ids as $i => $_id) $this->_ids[$i] = (int)$_id;
+		} else if (!$this->_id) {
+			$msg = JText::sprintf( 'Requested page could not be found' );
+			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(444, $msg);
 		}
 		
 		// Set layout and authorid variables into state
@@ -1301,7 +1304,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$params->merge($menu_params);
 			} else if ($menu_matches) {
 				// Add menu parameters - not - related to category parameters override
-				$partial_param_arr = array('item_depth', 'persistent_filters', 'initial_filters');
+				$partial_param_arr = array('persistent_filters', 'initial_filters');
 				foreach ($partial_param_arr as $partial_param) {
 					$params->set( $partial_param, $menu_params->get($partial_param));
 				}

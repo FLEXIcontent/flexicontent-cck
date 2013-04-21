@@ -398,7 +398,7 @@ table#filemanager-zone label {
 			</td>
 			<td align="center">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' ); ?>::<?php echo $row->filename; ?>">
-				<a style="cursor:pointer" onclick="<?php echo $img_assign_link; ?>">
+				<a style="cursor:pointer">
 				<?php echo $thumb_or_icon; ?>
 				</a>
 				</span>

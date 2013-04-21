@@ -208,7 +208,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		else if ( count($values) )
 		{
 			$element = @$elements[ $values[0] ];
-			if ( !$element ) continue;
+			if ( !$element ) return '';
 			
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp =JText::_($element->text);
