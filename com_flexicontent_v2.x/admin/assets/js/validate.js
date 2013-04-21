@@ -387,9 +387,10 @@ var JFormValidator = new Class({
 		
 		// Find the label object for the given field if it exists
 		var el_id = (MooTools.version>="1.2.4") ? el.get('id') : el.getProperty('id');
-		if ( !(el.labelref) && el_id )
+		var el_grpid = (MooTools.version>="1.2.4") ? el.get('element_group_id') : el.getProperty('element_group_id');
+		if ( !(el.labelref) && (el_id || el_grpid) )
 		{
-			var lblfor = el_id;
+			var lblfor = el_grpid ? el_grpid : el_id;
 			if ( !el.labelref )  el.labelref = fcflabels[   lblfor   ];
 			if ( !el.labelref )  el.labelref = fcflabels[   lblfor = lblfor.replace(/_[0-9]+$/, '')   ];
 			if (flexi_j16ge) {

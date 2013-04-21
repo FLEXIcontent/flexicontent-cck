@@ -109,13 +109,31 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 			return;
 		}
 		
+		static $prettycheckable_added = false;
+	  if ( !$prettycheckable_added )
+	  {
+			$prettycheckable_added = true;
+			flexicontent_html::loadFramework('prettyCheckable');
+		}
+		
+		$attribs  = '';
+		$classes  = ($prettycheckable_added ? ' use_prettycheckable ' : '');
+		$classes .= $required;
+		if ($classes)  $attribs .= ' class="'.$classes.'" ';
+		
 		// Create field's HTML display for item form
 		// Display as radio buttons
 		$i = 0;
 		$options = array();
 		foreach ($elements as $element) {
 			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
-			$options[] = '<label><input type="radio" id="'.$elementid.'_'.$i.'" name="'.$fieldname.'" class="'.$required.'" value="'.$element->value.'" '.$checked.' />'.JText::_($element->text).'</label>'.$separator;
+			$elementid_no = $elementid.'_'.$i;
+			$extra_params = $prettycheckable_added ? ' data-label="'.JText::_($element->text).'" data-labelPosition="right" data-customClass="fcradiocheck"' : '';
+			$options[] = ''
+				.(!$prettycheckable_added ? '<label>' : '')
+				.' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />'
+				.(!$prettycheckable_added ? JText::_($element->text).'</label>' : '')
+				;
 			$i++;
 		}
 		
@@ -209,6 +227,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		$display_index = array();
 		
 		// Prepare for looping
+		if ( !$values ) $values = array();
 		if ( $display_all ) {
 			$index = $values[0];
 			
@@ -237,7 +256,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		else if ( count($values) )
 		{
 			$element = @$elements[ $values[0] ];
-			if ( !$element ) continue;
+			if ( !$element ) return '';
 			
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp =JText::_($element->text);

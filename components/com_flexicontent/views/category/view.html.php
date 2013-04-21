@@ -171,7 +171,10 @@ class FlexicontentViewCategory extends JViewLegacy
 			
 			if ( !$view_ok || !$cid_ok || !$layout_ok && !$authorid_ok ) {
 				$params->set('page_title', '');
-				$params->set('pageclass_sfx',	'');
+				$params->set('page_heading', '');
+				// These are behavior, so do not clear ?
+				//$params->set('show_page_heading', '');
+				//$params->set('pageclass_sfx',	'');
 			}
 		}
 		
@@ -274,8 +277,18 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		if ($category->id) {   // possibly not set for author items OR my items
 			if (FLEXI_J16GE) {
-				if ($category->metadesc)  $document->setDescription( $category->metadesc );
-				if ($category->metakey)   $document->setMetadata('keywords', $category->metakey);
+				if ($category->metadesc)
+					$document->setDescription( $category->metadesc );
+				elseif ($menu && ($_mp=$menu->params->get('menu-meta_description')))
+					$document->setDescription( $_mp );
+					
+				if ($category->metakey)
+					$document->setMetadata('keywords', $category->metakey);
+				elseif ($menu && ($_mp=$menu->params->get('menu-meta_keywords')))
+					$document->setMetadata('keywords', $_mp);
+				
+				if ($menu && ($_mp=$menu->params->get('robots')))
+					$document->setMetadata('robots', $_mp);
 				
 				$meta_params = new JRegistry($category->metadata);
 				

@@ -58,9 +58,7 @@ if ($this->items) :
 	foreach ($this->items as $item) :
 		if (isset($item->positions['aftertitle'])) :
 			foreach ($fbypos['aftertitle']->fields as $f) :
-				if (!in_array($f, $columns['aftertitle'])) :
-					$columns['aftertitle'][$f] = @$item->fields[$f]->label;
-				endif;
+				$columns['aftertitle'][$f] = @$item->fields[$f]->label;
 			endforeach;
 		endif;
 	endforeach;
@@ -181,14 +179,9 @@ foreach ($cat_items as $catid => $items) :
 				<!-- BOF item title -->
 						  
 				<!-- BOF item fields block aftertitle -->
-				<?php
-				foreach ($columns['aftertitle'] as $name => $label) :
-					$label_str = '';
-					if ($item->fields[$name]->parameters->get('display_label', 0)) :
-						$label_str = $label.': ';
-					endif; ?>
+				<?php foreach ($columns['aftertitle'] as $name => $label) : ?>
 					<li class="flexi-field">
-					<?php echo $label_str.( isset($item->positions['aftertitle']->{$name}->display) ? $item->positions['aftertitle']->{$name}->display : ''); ?>
+					<?php echo $label .($label ? ': ' : ''). @$item->positions['aftertitle']->{$name}->display; ?>
 					</li>
 				<?php endforeach; ?>
 				</ul>

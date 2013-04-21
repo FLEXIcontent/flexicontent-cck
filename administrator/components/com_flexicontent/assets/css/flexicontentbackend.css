@@ -782,6 +782,10 @@ div.flexi_edit .flexi_label {
   padding:3px 1% 3px 1%;
 }
 
+div.flexi_edit .flexi_label.invalid {
+	color:red !important;
+}
+
 div.flexi_edit .flexi_label.fc_tooltip_icon_bg {
   padding:3px 3% 3px 1%;
   width: 14%;
@@ -969,15 +973,15 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 
 #flexicontent .fcclear,
 #flexicontent .clear {
-	border: 0;
-	clear: both;
-	float: none;
-	font-size: 1px;
-	height: 0;
-	line-height: 1px;
-	margin: 0;
-	padding: 0;
-	visibility: hidden;
+	border: 0 !important;
+	clear: both !important;
+	float: none !important;
+	font-size: 1px !important;
+	height: 0 !important;
+	line-height: 1px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	visibility: hidden !important;
 }
 
 /* Styling for textinput fields*/
@@ -1016,7 +1020,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 
 
 
-/* FORCE some CSS about select2 lib */
+/* FORCE some CSS about select2, prettyCheckable, etc libs */
 .use_select2_lib {
 	width: auto!important;
 }
@@ -1056,9 +1060,22 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	padding: 3px 5px 3px 18px !important;
 	position: relative !important;
 }
-
 .select2-choice {
 	margin: 0 6px 0 0 !important;
+}
+.prettycheckbox.fcradiocheck label, .prettyradio.fcradiocheck label {
+	margin: 7px 0px 0px 1px !important;
+}
+.prettycheckbox.fcradiocheckimage label, .prettyradio.fcradiocheckimage label {
+	margin: 2px 0px 0px 1px !important;
+}
+.prettycheckbox.fcradiocheckimage, .prettyradio.fcradiocheckimage,
+.prettycheckbox.fcradiocheck, .prettyradio.fcradiocheck {
+	float:left !important; display:block !important;
+	margin: 0px 8px 0px -16px !important;
+}
+.prettyradio input, .prettycheckbox input {
+	display:inline-block !important; visibility:hidden !important; float:left !important;
 }
 
 

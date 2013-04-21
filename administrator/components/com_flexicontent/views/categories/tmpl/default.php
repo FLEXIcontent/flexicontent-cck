@@ -31,7 +31,7 @@ $image_preview = FLEXI_J16GE ?
 	JHTML::_('image.site', 'monitor_go.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_('FLEXI_PREVIEW'), $attribs_preview) ;
 $image_rsslist = FLEXI_J16GE ?
 	JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_('FLEXI_FEED'), $attribs_rsslist ) :
-	JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_('FLEXI_FEED'), $attribs_rsslist ) ;
+	JHTML::_('image.site', 'livemarks.png', '../images/M_images/', NULL, NULL, JText::_('FLEXI_FEED'), $attribs_rsslist ) ;
 
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
 $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) );
