@@ -2180,7 +2180,9 @@ class ParentClassItem extends JModelLegacy
 		
 		// Store item's advanced search index entries
 		if ( count($ai_query_vals) ) {
-			$query = "INSERT INTO #__flexicontent_advsearch_index VALUES ". implode(",", $ai_query_vals);
+			$query = "INSERT INTO #__flexicontent_advsearch_index "
+				." (field_id,item_id,extraid,search_index,value_id) VALUES "
+				.implode(",", $ai_query_vals);
 			$this->_db->setQuery($query);
 			$this->_db->query();
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
