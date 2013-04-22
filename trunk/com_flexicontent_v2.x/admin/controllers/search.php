@@ -200,8 +200,8 @@ class FlexicontentControllerSearch extends FlexicontentController
 				$query .= " WHERE item_id IN (". implode(',', array_keys($searchindex)) .")";
 			} else if (count($ai_query_vals)) {
 				$query = "INSERT INTO #__flexicontent_advsearch_index "
-					." (field_id,item_id,extraid,search_index,value_id) VALUES ".
-					implode(",", $ai_query_vals);
+					." (field_id,item_id,extraid,search_index,value_id) VALUES "
+					.implode(",", $ai_query_vals);
 			}
 			if ( !empty($query) ) {
 				$db->setQuery($query);
