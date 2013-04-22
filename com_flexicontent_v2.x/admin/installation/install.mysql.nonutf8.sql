@@ -171,12 +171,14 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_templates` (
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_advsearch_index` (
+  `sid` int(11) NOT NULL auto_increment,
   `field_id` int(11) NOT NULL,
   `item_id` int(11) NOT NULL,
   `extraid` int(11) NOT NULL,
   `search_index` longtext NOT NULL,
   `value_id` varchar(255) NULL,
   PRIMARY KEY (`field_id`,`item_id`,`extraid`),
+  KEY `sid` (`sid`),
   KEY `field_id` (`field_id`),
   KEY `item_id` (`item_id`),
   FULLTEXT `search_index` (`search_index`),
