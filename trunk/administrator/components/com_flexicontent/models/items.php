@@ -156,7 +156,7 @@ class FlexicontentModelItems extends JModelLegacy
 				$query_ids = $cid;
 			} else {
 				// 1, get filtered, limited, ordered items
-				$query = $this->_buildQuery("");
+				$query = $this->_buildQuery();
 				
 				if ( $print_logging_info )  $start_microtime = microtime(true);
 				$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
@@ -186,7 +186,7 @@ class FlexicontentModelItems extends JModelLegacy
 			if ( $print_logging_info ) @$fc_run_times['execute_secondary_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
-			// 4, reorder items and get cat ids
+			// 5, reorder items and get cat ids
 			$this->_data = array();
 			$this->_catids = array();
 			foreach($query_ids as $item_id) {
@@ -200,7 +200,7 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 			$this->_catids = array_keys($this->_catids);
 			
-			// 5, get other item data
+			// 6, get other item data
 			$k = 0;
 			foreach ($this->_data as $item)
 			{

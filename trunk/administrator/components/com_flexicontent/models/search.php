@@ -67,13 +67,48 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	
 	
 	function getData() {
-		if(empty($this->_data)) {
-			$query = $this->_buildQuery();
-			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
-			$db = JFactory::getDBO();
-			$db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $db->loadResult();
+		if (!empty($this->_data)) return $this->_data;
+		
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		
+		// 1, get filtered, limited, ordered items
+		$query = $this->_buildQuery();
+		
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
+		$rows = $this->_db->loadObjectList();
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+		
+		// 2, get current items total for pagination
+		$this->_db->setQuery("SELECT FOUND_ROWS()");
+		$this->_total = $this->_db->loadResult();
+		
+		// 3, get item ids
+		$query_ids = array();
+		foreach ($rows as $row) {
+			$query_ids[] = $row->sid;
 		}
+		
+		// 4, get item data
+		if (count($query_ids)) $query = $this->_buildQuery($query_ids);
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$_data = array();
+		if (count($query_ids)) {
+			$this->_db->setQuery($query);
+			$_data = $this->_db->loadObjectList('sid');
+		}
+		if ( $print_logging_info ) @$fc_run_times['execute_secondary_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+		
+		// 5, reorder items and get cat ids
+		$this->_data = array();
+		foreach($query_ids as $sid) {
+			$this->_data[] = $_data[$sid];
+		}
+		
 		return $this->_data;
 	}
 	
@@ -100,19 +135,27 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildQuery() {
-		$where		= $this->_buildWhere();
-		$orderby	= $this->_buildOrderBy();
+	function _buildQuery( $query_ids=false )
+	{
+		if ( !$query_ids ) {
+			$where		= $this->_buildWhere();
+			$orderby	= $this->_buildOrderBy();
+		}
 		
-		$query = "SELECT SQL_CALC_FOUND_ROWS f.label, f.name, f.field_type, ai.*, a.title, a.id" ."\n"
-			." FROM #__flexicontent_advsearch_index as ai" ."\n"
-			." JOIN #__flexicontent_fields as f ON ai.field_id=f.id" ."\n"
-			." JOIN #__content as a ON ai.item_id=a.id" ."\n"
-			." JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id" ."\n"
-			." JOIN #__flexicontent_fields_type_relations as rel ON (rel.field_id=ai.field_id AND rel.type_id=ext.type_id)" ."\n"
-			.$where ."\n"
-			.$orderby
-		;
+		$query = !$query_ids ?
+			'SELECT SQL_CALC_FOUND_ROWS ai.sid ' :
+			'SELECT f.label, f.name, f.field_type, ai.*, a.title, a.id ';
+		$query .= ''
+			.' FROM #__flexicontent_advsearch_index as ai'
+			.' JOIN #__content as a ON ai.item_id=a.id'
+			.' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'
+			.' JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=ai.field_id AND rel.type_id=ext.type_id'
+			.' JOIN #__flexicontent_fields as f ON ai.field_id=f.id'
+			;
+		$query .= !$query_ids ?
+			$where.$orderby :
+			' WHERE ai.sid IN ('. implode(',', $query_ids) .')';
+			
 		//echo "<pre>"; die($query);
 		return $query;
 	}
@@ -189,11 +232,13 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		}
 
 		if ($search_index) {
-			$where[] = ' LOWER(ai.search_index) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search_index, true ).'%', false );
+			$search_index_escaped = FLEXI_J16GE ? $this->_db->escape( $search_index, true ) : $this->_db->getEscaped( $search_index, true );
+			$where[] = ' LOWER(ai.search_index) LIKE '.$this->_db->Quote( '%'.$search_index_escaped.'%', false );
 		}
 		
 		if ($search_itemtitle) {
-			$where[] = ' LOWER(a.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search_itemtitle, true ).'%', false );
+			$search_itemtitle_escaped = FLEXI_J16GE ? $this->_db->escape( $search_index, true ) : $this->_db->getEscaped( $search_index, true );
+			$where[] = ' LOWER(a.title) LIKE '.$this->_db->Quote( '%'.$search_itemtitle_escaped.'%', false );
 		}
 		
 		if ($search_itemid) {

@@ -516,19 +516,18 @@ class com_flexicontentInstallerScript
 				    $_indexes = $db->loadObjectList();
 				    foreach ($_indexes as $tbl_index) $tbl_indexes['#__flexicontent_advsearch_index'][$tbl_index->Key_name] = true;
 				    
-						if (
-							 array_key_exists('extratable', $tbl_fields['#__flexicontent_advsearch_index']) ||
-							!array_key_exists('value_id', $tbl_fields['#__flexicontent_advsearch_index']) ||
-							
-							!array_key_exists('field_id', $tbl_indexes['#__flexicontent_advsearch_index']) ||
-							!array_key_exists('item_id', $tbl_indexes['#__flexicontent_advsearch_index']) ||
-							!array_key_exists('search_index', $tbl_indexes['#__flexicontent_advsearch_index']) ||
-							!array_key_exists('value_id', $tbl_indexes['#__flexicontent_advsearch_index'])
-						) {
+						if ( !array_key_exists('sid', $tbl_fields['#__flexicontent_advsearch_index']) ) {
 							$queries[] = "DROP TABLE `#__flexicontent_advsearch_index`";
 							$queries[] = "CREATE TABLE `#__flexicontent_advsearch_index` (
-								`field_id` int(11) NOT NULL, `item_id` int(11) NOT NULL, `extraid` int(11) NOT NULL, `search_index` longtext NOT NULL, `value_id` varchar(255) NULL,
-								PRIMARY KEY (`field_id`,`item_id`,`extraid`), KEY `field_id` (`field_id`), KEY `item_id` (`item_id`), FULLTEXT `search_index` (`search_index`), KEY `value_id` (`value_id`)
+								`sid` int(11) NOT NULL auto_increment,
+								`field_id` int(11) NOT NULL, `item_id` int(11) NOT NULL, `extraid` int(11) NOT NULL,
+								`search_index` longtext NOT NULL, `value_id` varchar(255) NULL,
+								PRIMARY KEY (`field_id`,`item_id`,`extraid`),
+								KEY `sid` (`sid`),
+								KEY `field_id` (`field_id`),
+								KEY `item_id` (`item_id`),
+								FULLTEXT `search_index` (`search_index`),
+								KEY `value_id` (`value_id`)
 								) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 						}
 						

@@ -214,12 +214,6 @@ if ( $cparams->get('print_logging_info') && JRequest::getWord('tmpl')!='componen
 	if (isset($fc_run_times['render_categories_select']))
 		$msg .= sprintf('<br/>-- [Render Categories Select: %.2f s] ', $fc_run_times['render_categories_select']/1000000);
 	
-	if (isset($fc_run_times['get_field_vals']))
-		$msg .= sprintf('<br/>-- [Retrieve Field Values: %.2f s] ', $fc_run_times['get_field_vals']/1000000);
-	
-	if (isset($fc_run_times['render_field_html']))
-		$msg .= sprintf('<br/>-- [Field HTML Rendering: %.2f s] ', $fc_run_times['render_field_html']/1000000);
-	
 	if (isset($fc_run_times['auto_checkin']))
 		$msg .= sprintf('<br/>-- [Auto Checkin: %.2f s] ', $fc_run_times['auto_checkin']/1000000);
 		
