@@ -130,23 +130,24 @@ class FlexicontentModelCategory extends JModelLegacy {
 	protected function populateCategoryState($ordering = null, $direction = null) {
 		$this->_layout = JRequest::getCmd('layout', '');  // !! This should be empty for empty for 'category' layout
 		
+		$load_category_params = true;
 		if ($this->_layout=='author') {
 			$this->_authorid = JRequest::getInt('authorid', 0);
-		} else if ($this->_layout=='myitems') {
+			if (!$this->_authorid) $load_category_params = false;
+		}
+		else if ($this->_layout=='myitems') {
 			$user = JFactory::getUser();
-			if ($user->guest) {
-				$msg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
-				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
-			}
 			$this->_authorid = $user->id;
-		} else if ($this->_layout=='mcats') {
+			if (!$this->_authorid) $load_category_params = false;
+		}
+		else if ($this->_layout=='mcats') {
 			$this->_ids = preg_replace( '/[^0-9,]/i', '', (string) JRequest::getVar('cids', '') );
 			$this->_ids = explode(',', $this->_ids);
 			// make sure given data are integers ... !!
 			foreach ($this->_ids as $i => $_id) $this->_ids[$i] = (int)$_id;
-		} else if (!$this->_id) {
-			$msg = JText::sprintf( 'Requested page could not be found' );
-			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(444, $msg);
+		}
+		else if (!$this->_id) {
+			$load_category_params = false;
 		}
 		
 		// Set layout and authorid variables into state
@@ -155,7 +156,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('cids', $this->_ids);
 
 		// We need to merge parameters here to get the correct page limit value, we must call this after populating layput and author variables
-		$this->_loadCategoryParams($this->_id);
+		if ($load_category_params)
+			$this->_loadCategoryParams($this->_id);
+		else
+			$this->_params = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 		$cparams = $this->_params;
 
 		// Set the pagination variables into state (We get them from http request OR use default category parameters)
@@ -355,9 +359,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		if ( !$query_ids ) {
 			//$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id ';  // Will cause problems with 3rd-party extensions that modify the query
-			$query = 'SELECT DISTINCT i.id ';
+			//$query = 'SELECT DISTINCT i.id ';
+			$query = 'SELECT i.id ';
 		} else {
-			$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
+			//$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
+			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename,'
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 				. @$feed_img_col      // optional
@@ -370,13 +376,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$query .= ""
 				. @$feed_img_join      // optional
 				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
-				//. ' GROUP BY i.id'
+				. ' GROUP BY i.id'
 				;
 		} else {
 			$query .= ""
 			. @$order_field_join   // optional
 			. $where
-			//. ' GROUP BY i.id '
+			. ' GROUP BY i.id '
 			. $orderby
 			;
 		}
@@ -1129,11 +1135,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access public
 	 * @return array
 	 */
-	function getCategory()
+	function getCategory($pk=null, $raiseErrors=true, $checkAccess=true)
 	{
 		//initialize some vars
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+		if ($pk) $this->_id = $pk;  // Set a specific id
 		
 		// get category data
 		if ($this->_id) {
@@ -1155,18 +1162,30 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_category->title = '';
 			$this->_category->description = '';
 			$this->_category->slug = '';
+			$this->_category->ids = $this->_ids; // non-empty for multi-cats
 		}
 		else {
 			$this->_category = false;
 		}
-		// non-empty for multi-cats
-		$this->_category->ids = $this->_ids;
 		
-		//Make sure the category is published
-		if (!$this->_category)
-		{
-			$msg = JText::sprintf( 'Content category with id: %d, was not found or is not published', $this->_id );
-			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+		//Make sure the category was found and is published
+		if (!$this->_category) {
+			if (!$raiseErrors) return false;
+			
+			if ( $this->_layout=='myitems' && !$this->_authorid ) {
+				$msg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
+				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
+			}
+			else if ($this->_id) {
+				$msg = JText::sprintf( 'Content category with id: %d, was not found or is not published', $this->_id );
+				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+
+			}
+			else { // !$this->_id || ( $this->_layout=='author' && !$this->_authorid )
+				// This is not category view instead a category menu item is being used for a non-existent page
+				$msg = JText::sprintf( 'Requested page could not be found' );
+				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+			}
 		}
 		
 		// Set category parameters, these have already been loaded
@@ -1184,6 +1203,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$canread 	= FLEXI_ACCESS ? FAccess::checkAllItemReadAccess('com_content', 'read', 'users', $user->gmid, 'category', $this->_category->id) : $this->_category->access <= $aid;
 			}
 		}
+		
+		// Skip checking Access
+		if (!$checkAccess) return $this->_category;
 		
 		if (!$canread && $this->_id!=0)
 		{

@@ -72,7 +72,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// Load needed JS libs & CSS styles
 		// ********************************
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
-		flexicontent_html::loadJQuery();
+		flexicontent_html::loadFramework('jQuery');
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/rounded-corners-min.js' );
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js' );
 		

@@ -41,7 +41,7 @@ if ($return) {
 }
 
 FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
-flexicontent_html::loadJQuery();
+flexicontent_html::loadFramework('jQuery');
 
 // add extra css for the edit form
 if ($this->params->get('form_extra_css')) {
