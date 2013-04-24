@@ -125,11 +125,10 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			return;
 		}
 		
-		static $prettycheckable_added = false;
-	  if ( !$prettycheckable_added )
+		static $prettycheckable_added = null;
+	  if ( $prettycheckable_added === null )
 	  {
-			$prettycheckable_added = true;
-			flexicontent_html::loadFramework('prettyCheckable');
+			$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		}
 		
 		$attribs  = '';
@@ -164,9 +163,11 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
 			$elementid_no = $elementid.'_'.$i;
 			$extra_params = $prettycheckable_added ? ' data-customClass="fcradiocheckimage"' : '';
+			$input_fld = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />';
 			$options[] = ''
-				.' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />'
-				.'<label for="'.$elementid_no.'" class="hasTip" title="'.$field->label.'::'.JText::_($element->text).'" >'
+				.($prettycheckable_added ? $input_fld : '')
+				.'<label for="'.$elementid_no.'" class="hasTip fccheckradio_lbl" title="'.$field->label.'::'.JText::_($element->text).'" >'
+				. (!$prettycheckable_added ? $input_fld : '')
 				.' <img src="'.$imgpath . $element->image .'"  alt="'.JText::_($element->text).'" />'
 				.'</label>'
 				;

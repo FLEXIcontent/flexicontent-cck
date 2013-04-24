@@ -46,9 +46,9 @@
 			
 		<param name="" type="separator" default="FLEXI_BROWSER_FRAMEWORKS" label="" level="level1" menu="hide" />
 			<param name="load_frameworks" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
-				checkoptions="jQuery,(jQuery) image-picker,(jQuery) masonry,(jQuery) select2,(jQuery) inputmask, prettyCheckacble (jQuery),(jQuery) fancybox"
-				checkvals="jQuery,image-picker,masonry,select2,inputmask,prettyCheckacble,fancybox"
-				defaultvals="jQuery,image-picker,masonry,select2,inputmask,prettyCheckacble,fancybox"
+				checkoptions="jQuery,(jQuery) image-picker,(jQuery) masonry,(jQuery) select2,(jQuery) inputmask,(jQuery) prettyCheckable,(jQuery) fancybox"
+				checkvals="jQuery,image-picker,masonry,select2,inputmask,prettyCheckable,fancybox"
+				defaultvals="jQuery,image-picker,masonry,select2,inputmask,prettyCheckable,fancybox"
 				label="FLEXI_LOAD_BROWSER_FRAMEWORKS" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" />
 				
 		<param name="" type="separator" default="FLEXI_PERFORMANCE_CONF" label="" level="level1" menu="hide" />

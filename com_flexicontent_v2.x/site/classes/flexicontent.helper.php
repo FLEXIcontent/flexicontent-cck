@@ -238,19 +238,21 @@ class flexicontent_html
 	{
 		// Detect already loaded framework
 		static $_loaded = array();
-		if ( isset($_loaded[$framework]) ) return;
-		$_loaded[$framework] = 1;
+		if ( isset($_loaded[$framework]) ) return $_loaded[$framework];
+		$_loaded[$framework] = false;
 		
 		// Get frameworks that are configured to be loaded manually in frontend (e.g. via the Joomla template)
 		$app = JFactory::getApplication();
 		static $load_frameworks = null;
+		static $load_jquery = null;
 		if ($load_frameworks === null) {
 			$flexiparams = JComponentHelper::getParams('com_flexicontent');
 			$load_frameworks = $flexiparams->get('load_frameworks', array('jQuery','image-picker','masonry','select2','inputmask','prettyCheckable','fancybox'));
 			$load_frameworks = FLEXIUtilities::paramToArray($load_frameworks);
 			$load_frameworks = array_flip($load_frameworks);
+			$load_jquery = isset($load_frameworks['jQuery']) || !$app->isSite();
 		}
-		if ( !isset($load_frameworks[$framework]) && $app->isSite() ) return;
+		if ( !isset($load_frameworks[$framework]) && $app->isSite() ) return $_loaded[$framework];
 		
 		// Load Framework
 		$document = JFactory::getDocument();
@@ -258,19 +260,22 @@ class flexicontent_html
 		$css = "";
 		switch ( $framework )
 		{
+			case 'jQuery':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				break;
 			case 'image-picker':
-				flexicontent_html::loadJQuery();
+				if ($load_jquery) flexicontent_html::loadJQuery();
 				$document->addScript( JURI::root().'components/com_flexicontent/librairies/image-picker/image-picker.min.js' );
 				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/image-picker/image-picker.css');
 				break;
 			
 			case 'masonry':
-				flexicontent_html::loadJQuery();
+				if ($load_jquery) flexicontent_html::loadJQuery();
 				$document->addScript( JURI::root().'components/com_flexicontent/librairies/masonry/jquery.masonry.min.js' );
 				break;
 			
 			case 'select2':
-				flexicontent_html::loadJQuery();
+				if ($load_jquery) flexicontent_html::loadJQuery();
 				$document->addScript( JURI::root().'components/com_flexicontent/librairies/select2/select2.js' );
 				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/select2/select2.css');
 				
@@ -283,7 +288,7 @@ class flexicontent_html
 				break;
 			
 			case 'inputmask':
-				flexicontent_html::loadJQuery();
+				if ($load_jquery) flexicontent_html::loadJQuery();
 				// Load Library and also 3 files with built-in sets of masks
 				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.js' );
 				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.extensions.js' );
@@ -310,7 +315,7 @@ class flexicontent_html
 				break;
 			
 			case 'prettyCheckable':
-				flexicontent_html::loadJQuery();
+				if ($load_jquery) flexicontent_html::loadJQuery();
 				$document->addScript( JURI::root().'components/com_flexicontent/librairies/prettyCheckable/prettyCheckable.js' );
 				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/prettyCheckable/prettyCheckable.css');
 				$js .= "
@@ -326,7 +331,7 @@ class flexicontent_html
 				break;
 			
 			case 'fancybox':
-				flexicontent_html::loadJQuery();
+				if ($load_jquery) flexicontent_html::loadJQuery();
 				// Add mousewheel plugin (this is optional)
 				$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/lib/jquery.mousewheel-3.0.6.pack.js');
 				
@@ -357,6 +362,8 @@ class flexicontent_html
 		// Add custom JS & CSS code
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
+		$_loaded[$framework] = true;
+		return $_loaded[$framework];
 	}
 	
 	

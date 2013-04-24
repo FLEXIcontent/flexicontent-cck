@@ -1072,12 +1072,14 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 .prettycheckbox.fcradiocheckimage, .prettyradio.fcradiocheckimage,
 .prettycheckbox.fcradiocheck, .prettyradio.fcradiocheck {
 	float:left !important; display:block !important;
-	margin: 0px 8px 0px -16px !important;
+	margin: -6px 12px 0px -16px !important;
 }
 .prettyradio input, .prettycheckbox input {
 	display:inline-block !important; visibility:hidden !important; float:left !important;
 }
-
+label.fccheckradio_lbl {
+	display:inline-block; white-space:nowrap;
+}
 
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/
 
