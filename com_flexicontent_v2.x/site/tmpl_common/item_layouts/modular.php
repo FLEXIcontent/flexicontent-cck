@@ -155,7 +155,7 @@ if (@$createtabs) :
 
 		<div id="<?php echo $tab_id; ?>" class="tabbertab"><!-- tab start -->
 
-			<h3><?php echo $tabpos_label; ?></h3><!-- tab title -->
+			<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
 
 			<div class="flexi lineinfo">
 				<?php foreach ($this->item->positions[$tabpos_name] as $field) : ?>
@@ -254,7 +254,7 @@ if (@$createtabs) :
 
 		<div id="<?php echo $tab_id; ?>" class="tabbertab"><!-- tab start -->
 			
-			<h3><?php echo $tabpos_label; ?></h3><!-- tab title -->
+			<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
 			
 			<div class="flexi lineinfo">
 				<?php foreach ($this->item->positions[$tabpos_name] as $field) : ?>

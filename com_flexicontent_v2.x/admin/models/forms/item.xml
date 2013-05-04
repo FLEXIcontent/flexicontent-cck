@@ -3,11 +3,11 @@
 	<fieldset>
 		<field name="id"  type="hidden" class="readonly" label="JGLOBAL_FIELD_ID_LABEL" description ="JGLOBAL_FIELD_ID_DESC" size="10" default="0" readonly="true" />
 		<field name="asset_id" type="hidden" filter="unset" />
-		<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="inputbox" maxlength="254" size="36" required="true" />
-		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" maxlength="254" size="36" />
-		<field name="type_id" type="fieldtypes" label="FLEXI_TYPE" description="" class="inputbox" />
+		<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="inputbox fcfield_textval" maxlength="254" size="40" required="true" />
+		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox fcfield_textval" maxlength="254" size="40" />
+		<field name="type_id" type="fieldtypes" label="FLEXI_TYPE" description="FLEXI_TYPE_DESC" class="inputbox" />
 		<field name="text" type="editor" class="inputbox" label="COM_CONTENT_FIELD_ARTICLETEXT_LABEL" description="COM_CONTENT_FIELD_ARTICLETEXT_DESC" filter="raw" buttons="true" />
-		<field name="state" type="list" label="FLEXI_STATE" description="JFIELD_PUBLISHED_DESC" class="inputbox" filter="intval" size="1" default="-4">
+		<field name="state" type="list" label="FLEXI_STATE" description="FLEXI_STATE_DESC" class="inputbox use_select2_lib" filter="intval" size="1" default="-4">
 			<option value="-4">FLEXI_TO_WRITE</option>
 			<option value="-3">FLEXI_PENDING</option>
 			<option value="-5">FLEXI_IN_PROGRESS</option>
@@ -19,13 +19,17 @@
 			<option value="1">JNO</option>
 			<option value="2">JYES</option>
 		</field>
+		<field name="notify" type="list" label="FLEXI_NOTIFY_SUBSCRIBERS" description="FLEXI_NOTIFY_FAVOURING_USERS" default="0">
+			<option value="">JNO</option> <!-- must be empty we will output a checkbox with value 1 -->
+			<option value="1">JYES</option>
+		</field>
 		<field name="tag" type="hidden" label="FLEXI_TAGS" description="JFIELD_TAGS_DESC" class="" required="false" multiple="true" />
-		<field name="cid" type="categorytree" size="40" label="FLEXI_CATEGORIES" description="JFIELD_CATEGORY_DESC" class="mcat" multiple="true" />
-		<field name="catid" type="categorytree" label="FLEXI_CATEGORIES_MAIN" description="JFIELD_CATEGORY_DESC" class="scat" required="true" top="2" />
+		<field name="cid" type="categorytree" size="40" label="FLEXI_CATEGORIES" description="JFIELD_CATEGORY_DESC" class="mcat fcfield_selectmulval" multiple="true" />
+		<field name="catid" type="categorytree" label="FLEXI_CATEGORIES_MAIN" description="JFIELD_CATEGORY_DESC" class="scat fcfield_selectval" required="true" top="2" />
 		<field name="buttonspacer" description="JGLOBAL_ACTION_PERMISSIONS_DESCRIPTION" type="spacer" />
 		<field name="created" type="calendar" label="COM_CONTENT_FIELD_CREATED_LABEL" description="COM_CONTENT_FIELD_CREATED_DESC" class="inputbox" size="22" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
 		<field name="created_by" type="user" label="FLEXI_FIELD_CREATED_BY_LABEL" description="FLEXI_FIELD_CREATED_BY_DESC" />
-		<field name="created_by_alias" type="text" label="FLEXI_FIELD_CREATED_BY_ALIAS_LABEL" description="FLEXI_FIELD_CREATED_BY_ALIAS_DESC" class="inputbox" size="30" />
+		<field name="created_by_alias" type="text" label="FLEXI_FIELD_CREATED_BY_ALIAS_LABEL" description="FLEXI_FIELD_CREATED_BY_ALIAS_DESC" class="inputbox" size="20" />
 		<field name="modified" type="calendar" class="readonly" label="COM_CONTENT_FIELD_MODIFIED_LABEL" description="COM_CONTENT_FIELD_MODIFIED_DESC" size="22" readonly="true" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
 		<field name="modified_by" type="hidden" filter="unset" />
 		<field name="checked_out" type="hidden" filter="unset" />
@@ -47,7 +51,7 @@
 		<field name="submit_conf" type="hidden" />
 		<field name="type_id_not_set" type="hidden" />
 
-		<field name="featured" type="list" label="JFEATURED" description="COM_CONTENT_FIELD_FEATURED_DESC" default="0">
+		<field name="featured" type="radio" label="JFEATURED" description="COM_CONTENT_FIELD_FEATURED_DESC" default="0">
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>
@@ -124,8 +128,8 @@
 	</fieldset>
 	
 	<fieldset name="themes" label="FLEXI_PARAMETERS_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
-		<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
-		<field name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" onchange="activatePanel(this.value);" />
+		<field name="ilayout_mobile" type="itemlayout" class="use_select2_lib" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
+		<field name="ilayout" type="itemlayout" class="use_select2_lib" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" onchange="activatePanel(this.value);" />
 	</fieldset>
 	
 	</fields>

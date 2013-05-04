@@ -201,9 +201,11 @@ window.addEvent('domready', function() {
 			$attribs .= ' multiple="true" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-		} else {
-			$attribs .= 'class="inputbox"';
 		}
+		if (@$attributes['class']) {
+			$attribs .= 'class="'.$attributes['class'].'"';
+		}
+		
 		if ( ! @$attributes['skipparams'] )
 		{
 			$attribs .= ' onchange="activatePanel(this.value);"';

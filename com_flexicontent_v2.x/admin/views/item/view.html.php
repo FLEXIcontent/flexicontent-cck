@@ -268,62 +268,21 @@ class FlexicontentViewItem extends JViewLegacy
 
 		//echo "<br>row->categories: "; print_r($row->categories);
 		//echo "<br>selectedcats: "; print_r($selectedcats);
-
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$CanParams  = $permission->CanParams;
-			$CanVersion = $permission->CanVersion;
-			$CanUseTags = $permission->CanUseTags;
-		} else if (FLEXI_ACCESS) {
-			$CanParams	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
-			$CanVersion	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'versioning', 'users', $user->gmid) : 1;
-			$CanUseTags	 = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
-		} else {
-			$CanParams	= 1;
-			$CanVersion	= 1;
-			$CanUseTags = 1;
-		}
-		if (!$CanParams) 	$document->addStyleDeclaration('#det-pane {display:none;}');
-
-		// set default values
-		$canPublish 		= 1;
-		$canPublishOwn	= 1;
-		$canRight 			= 1;
-
+		
+		$perms = $this->_getItemPerms($row);
 		$is_edit = (boolean) $row->id;
-
-		if ($is_edit) {
+		
+		if (!$perms['canparams']) {
+			$document->addStyleDeclaration( (FLEXI_J16GE ? '#details-options' : '#det-pane') .'{display:none;}');
+		}
+		if ( $is_edit ) {
 			// First, check that user can edit the item
-			if (FLEXI_J16GE) {
-				$rights				= FlexicontentHelperPerm::checkAllItemAccess($user->id, 'item', $row->id);
-				$canEdit			= in_array('edit', $rights);
-				$canEditOwn		= in_array('edit.own', $rights) && $row->created_by == $user->id;
-				$canPublish		= in_array('edit.state', $rights);
-				$canPublishOwn= in_array('edit.state.own', $rights) && $row->created_by == $user->id;
-				$canRight			= $permission->CanConfig;
-			} else if ($user->gid >= 25) {
-				$canEdit = $canEditOwn = $canPublish = $canPublishOwn	= $canRight = true;
-			} else if (FLEXI_ACCESS) {
-				$rights				= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $row->id, $row->catid);
-				$canEdit			= in_array('edit', $rights);
-				$canEditOwn		= in_array('editown', $rights) && $row->created_by == $user->id;
-				$canPublish		= in_array('publish', $rights);
-				$canPublishOwn= in_array('publishown', $rights) && $row->created_by == $user->id;
-				$canRight			= in_array('right', $rights);
-			} else {
-				$canEdit = $canEditOwn = $canPublish = $canPublishOwn = ($user->id!=0);
-				// Redudant check, all backend users have these permissions (managers, admininstrators, super administrators)
-				//$canEdit			= $user->authorize('com_content', 'edit', 'content', 'all');
-				//$canEditOwn		= $user->authorize('com_content', 'edit', 'content', 'own') && $row->created_by == $user->id;
-				//$canPublish		= $user->authorize('com_content', 'publish', 'content', 'all');
-				//$canPublishOwn= 1;
-			}
 			// redundant ?? ... since already checked by the controller
 			//$has_edit = $canEdit || $canEditOwn;
-			//if (!$has_edit) {
+			//if (!$perms['canedit']) {
 			//	$mainframe->redirect('index.php?option=com_flexicontent&view=items', JText::sprintf( 'FLEXI_NO_ACCESS_EDIT', JText::_('FLEXI_ITEM') ));
 			//}
-
+			
 			// Second, check if item is already edited by a user and check it out (this fails if edit by any user other than the current user)
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->title.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
@@ -338,53 +297,138 @@ class FlexicontentViewItem extends JViewLegacy
 		// Build select lists for the form field. Only few of them are used in J1.6+, since we will use:
 		// (a) form XML file to declare them and then (b) getInput() method form field to create them
 		// *********************************************************************************************
+		flexicontent_html::loadFramework('select2');
+		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		$lists = array();
 
 		//buid types selectlist
+		$class = 'required use_select2_lib';
+		$attribs = 'class="'.$class.'"';
 		if (FLEXI_J16GE) {
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'jform[type_id]', $typesselected->id, 1, 'class="required"', 'jform_type_id' );
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'jform[type_id]', $typesselected->id, 1, $attribs, 'jform_type_id' );
 		} else {
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected->id, 1, 'class="required"', 'type_id' );
+			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected->id, 1, $attribs, 'type_id' );
+		}
+		
+		// build granular access list
+		if (FLEXI_ACCESS) {
+			if (isset($user->level)) {
+			$lists['access'] = FAccess::TabGmaccess( $row, 'item', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
+			} else {
+				$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
+			}
 		}
 
-		// *** BOF: J1.5 SPECIFIC SELECT LISTS
-		if (!FLEXI_J16GE) {
-
-			// build granular access list
-			if (FLEXI_ACCESS) {
-				if (isset($user->level)) {
-				$lists['access'] = FAccess::TabGmaccess( $row, 'item', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
-				} else {
-					$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
+		// build state list
+		$_arc_ = FLEXI_J16GE ? 2:-1;
+		$non_publishers_stategrp    = $perms['isSuperAdmin'] || $row->state==-3 || $row->state==-4 ;
+		$special_privelege_stategrp = ($row->state==$_arc_ || $perms['canarchive']) || ($row->state==-2 || $perms['candelete']) ;
+		
+		$state = array();
+		if ($non_publishers_stategrp || $special_privelege_stategrp)
+			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_PUBLISHERS_WORKFLOW_STATES' ) );
+		$state[] = JHTML::_('select.option',  1,  JText::_( 'FLEXI_PUBLISHED' ) );
+		$state[] = JHTML::_('select.option',  0,  JText::_( 'FLEXI_UNPUBLISHED' ) );
+		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
+		
+		// States reserved for workflow
+		if ( $non_publishers_stategrp ) {
+			$state[] = JHTML::_('select.optgroup', '' );
+			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_NON_PUBLISHERS_WORKFLOW_STATES' ) );
+		}
+		if ($row->state==-3 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
+		if ($row->state==-4 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
+		
+		// Special access states
+		if ( $special_privelege_stategrp ) {
+			$state[] = JHTML::_('select.optgroup', '' );
+			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_SPECIAL_ACTION_STATES' ) );
+		}
+		if ($row->state==$_arc_ || $perms['canarchive']) $state[] = JHTML::_('select.option',  $_arc_, JText::_( 'FLEXI_ARCHIVED' ) );
+		if ($row->state==-2     || $perms['candelete'])  $state[] = JHTML::_('select.option',  -2,     JText::_( 'FLEXI_TRASHED' ) );
+		
+		if( !$perms['canpublish'] )  $row->state = $row->state ? $row->state : -4;
+		$fieldname = FLEXI_J16GE ? 'jform[state]' : 'state';
+		$elementid = FLEXI_J16GE ? 'jform_state'  : 'state';
+		$class = 'inputbox use_select2_lib';
+		$attribs = 'class="'.$class.'"';
+		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $row->state, $elementid );
+		
+		// *** BOF: J2.5 SPECIFIC SELECT LISTS
+		if (FLEXI_J16GE)
+		{
+			// build featured flag
+			$fieldname = 'jform[featured]';
+			$elementid = 'jform_featured';
+			if (!$prettycheckable_added) {
+				$featured = array();
+				$featured[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
+				$featured[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_YES' ) );
+				$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+				$lists['featured'] = JHTML::_('select.radiolist', $featured, $fieldname, $attribs, 'value', 'text', $row->featured, $elementid);
+			}
+			else {
+				$classes = ' use_prettycheckable ';
+				$attribs = ' class="'.$classes.'" ';
+				$i = 0;
+				$options = array(0=>JText::_( 'FLEXI_NO' ), 1=>JText::_( 'FLEXI_YES' ) );
+				$lists['featured'] = '';
+				foreach ($options as $option_id => $option_label) {
+					$checked = $option_id==$row->featured ? ' checked="checked"' : '';
+					$elementid_no = $elementid.'_'.$i;
+					$extra_params = ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+					$lists['featured'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
+						.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+					$i++;
 				}
 			}
-
-			// build state list
-			$state[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_PUBLISHED' ) );
-			$state[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_UNPUBLISHED' ) );
-			$state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
-			$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
-			$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
-			$state[] = JHTML::_('select.option',  FLEXI_J16GE ? 2:-1, JText::_( 'FLEXI_ARCHIVED' ) );
-
-			if(!$canPublish && !$canPublishOwn)
-				$row->state = $row->state ? $row->state : -4;
-			$state_fieldname = FLEXI_J16GE ? 'jform[state]' : 'state';
-			$lists['state'] = JHTML::_('select.genericlist',   $state, $state_fieldname, '', 'value', 'text', $row->state );
-
-			// build version approval list
-			$vstate = array();
-			$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
-			$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
-
-			$fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
-			$elementid = FLEXI_J16GE ? 'jform_vstate' : 'vstate';
-			$attribs = FLEXI_J16GE ? ' style ="float:left!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-			$lists['vstate'] = JHTML::_('select.radiolist', $vstate, $fieldname, $attribs, 'value', 'text', 2, $elementid);
 		}
 		// *** EOF: J1.5 SPECIFIC SELECT LISTS
-
-
+		
+		// build version approval list
+		$fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
+		$elementid = FLEXI_J16GE ? 'jform_vstate' : 'vstate';
+		if (!$prettycheckable_added) {
+			$options = array();
+			$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+			$options[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
+			$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+			$lists['vstate'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
+		}
+		else {
+			$classes = ' use_prettycheckable ';
+			$attribs = ' class="'.$classes.'" ';
+			$i = 1;
+			$options = array(1=>JText::_( 'FLEXI_NO' ), 2=>JText::_( 'FLEXI_YES' ) );
+			$lists['vstate'] = '';
+			foreach ($options as $option_id => $option_label) {
+				$checked = $option_id==2 ? ' checked="checked"' : '';
+				$elementid_no = $elementid.'_'.$i;
+				$extra_params = ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$lists['vstate'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+				$i++;
+			}
+		}
+		
+		if ($subscribers) {
+			// build favs notify field
+			$fieldname = FLEXI_J16GE ? 'jform[notify]' : 'notify';
+			$elementid = FLEXI_J16GE ? 'jform_notify' : 'notify';
+			if (!$prettycheckable_added) {
+				$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+				$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
+			}
+			else {
+				$classes = ' use_prettycheckable ';
+				$attribs = ' class="'.$classes.'" ';
+				$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
+				$extra_params = ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$lists['notify'] = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' />';
+			}
+		}
+		
 		// Retrieve author configuration
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
 		if ( $authorparams = $db->loadResult() )
@@ -400,7 +444,8 @@ class FlexicontentViewItem extends JViewLegacy
 
 		$actions_allowed = array('core.create');
 		// Multi-category form field, for user allowed to use multiple categories
-		$class = $max_cat_assign ? " validate-fccats mcat" : "mcat";
+		$class  = "mcat fcfield_selectmulval";
+		$class .= $max_cat_assign ? " validate-fccats" : "";
 		$attribs = 'multiple="multiple" size="20" class="'.$class.'"';
 
 		if (FLEXI_J16GE) {
@@ -410,7 +455,7 @@ class FlexicontentViewItem extends JViewLegacy
 		}
 
 		// Main category form field
-		$attribs = 'class="scat validate-catid"';
+		$attribs = 'class="scat validate-catid use_select2_lib"';
 		if (FLEXI_J16GE) {
 			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'jform[catid]', $row->catid, 2, $attribs, true, true, $actions_allowed);
 		} else {
@@ -555,7 +600,6 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->assignRef('row'      		, $row);
 		if (FLEXI_J16GE) {
 			$this->assignRef('form'				, $form);
-			$this->assignRef('permission'		, $permission);
 		} else {
 			$this->assignRef('editor'			, $editor);
 			$this->assignRef('pane'				, $pane);
@@ -564,9 +608,6 @@ class FlexicontentViewItem extends JViewLegacy
 		if ($enable_translation_groups)  $this->assignRef('lang_assocs', $langAssocs);
 		if (FLEXI_FISH || FLEXI_J16GE)   $this->assignRef('langs', $langs);
 		$this->assignRef('typesselected', $typesselected);
-		$this->assignRef('canPublish'   , $canPublish);
-		$this->assignRef('canPublishOwn', $canPublishOwn);
-		$this->assignRef('canRight'			, $canRight);
 		$this->assignRef('published'		, $published);
 		$this->assignRef('nullDate'			, $nullDate);
 		$this->assignRef('subscribers'	, $subscribers);
@@ -577,13 +618,71 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->assignRef('tparams'			, $tparams);
 		$this->assignRef('tmpls'				, $tmpls);
 		$this->assignRef('usedtags'			, $usedtags);
-		$this->assignRef('CanVersion'		, $CanVersion);
-		$this->assignRef('CanUseTags'		, $CanUseTags);
+		$this->assignRef('perms'				, $perms);
 		$this->assignRef('current_page'	, $current_page);
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		parent::display($tpl);
 		if ( $print_logging_info ) @$fc_run_times['form_rendering'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
+	
+	
+	/**
+	 * Calculates the user permission on the given item
+	 *
+	 * @since 1.0
+	 */
+	function _getItemPerms( &$item )
+	{
+		$user = JFactory::getUser();	// get current user\
+		$isOwner = ( $item->created_by == $user->get('id') );
+
+		$perms 	= array();
+
+		$permission = FlexicontentHelperPerm::getPerm();
+		$perms['isSuperAdmin'] = $permission->SuperAdmin;
+		$perms['multicat']     = $permission->MultiCat;
+		$perms['cantags']      = $permission->CanUseTags;
+		$perms['canparams']    = $permission->CanParams;
+		$perms['cantemplates'] = $permission->CanTemplates;
+		$perms['canarchive']   = $permission->CanArchives;
+		$perms['canright']     = $permission->CanRights;
+		$perms['canversion']   = $permission->CanVersion;
+		
+		// J2.5+ specific
+		if (FLEXI_J16GE) $perms['editcreationdate'] = $permission->EditCreationDate;
+		//else if (FLEXI_ACCESS) $perms['editcreationdate'] = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'editcreationdate', 'users', $user->gmid) : 1;
+		//else $perms['editcreationdate'] = ($user->gid >= 25);
+		
+		// Get general edit/publish/delete permissions (we will override these for existing items)
+		$perms['canedit']    = $permission->CanEdit    || $permission->CanEditOwn;
+		$perms['canpublish'] = $permission->CanPublish || $permission->CanPublishOwn;
+		$perms['candelete']  = $permission->CanDelete  || $permission->CanDeleteOwn;
+		
+		// OVERRIDE global with existing item's atomic settings
+		if ( $item->id )
+		{
+			if (FLEXI_J16GE) {
+				$asset = 'com_content.article.' . $item->id;
+				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
+				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
+				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
+			}
+			else if (FLEXI_ACCESS) {
+				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
+				$perms['canedit']			= ($user->gid < 25) ? ( (in_array('editown', $rights) && $isOwner) || (in_array('edit', $rights)) ) : 1;
+				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
+				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $isOwner) || (in_array('delete', $rights)) ) : 1;
+				// Only FLEXI_ACCESS has per item rights permission
+				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
+			}
+			else {
+				// J1.5 permissions with no FLEXIaccess are only general, no item specific permissions
+			}
+		}
+		
+		return $perms;
+	}
+	
 }
 ?>

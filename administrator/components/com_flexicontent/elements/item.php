@@ -96,12 +96,23 @@ class JElementItem extends JElement
 		$doc->addScriptDeclaration($js);
 
 		JHTML::_('behavior.modal', 'a.modal');
-
-		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"".$element_id."_name\" value=\"{$item->title}\" disabled=\"disabled\" /></div>";
-		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x:((window.getSize().size.x<1100)?window.getSize().size.x-100:1000), y: window.getSize().size.y-100}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
-		$html .= "\n<input type=\"hidden\" id=\"".$element_id."_id\" name=\"$fieldname\" value=\"$value\" />";
-		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a id=\"remove\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\"  href=\"#\"\">".JText::_( 'FLEXI_REMOVE_VALUE' )."</a></div></div>\n";
-
+		
+		$app = JFactory::getApplication();
+		$rel = "{handler: \"iframe\", size: {x:((window.getSize().size.x<1100)?window.getSize().size.x-100:1000), y: window.getSize().size.y-100}}";
+		$html  = "
+		<input class='fcfield_textval' type='text' id='".$element_id."_name' value='{$item->title}' disabled='disabled' class='inputbox fcfield_textval'/>
+		<div class='button2-left' style='margin-top:2px;'><div class='blank'>
+			<a class='modal' style='margin:0px !important;' title='".JText::_( 'FLEXI_SELECT' )."'  href='".$link."' rel='".$rel."'>
+				".JText::_( 'FLEXI_SELECT' )."
+			</a>
+		</div></div>
+		<div class='button2-left' style='margin-top:2px;'><div class='blank'>
+			<a id='remove' style='margin:0px !important;' title='".JText::_( 'FLEXI_REMOVE_VALUE' )."'  href='#'>
+				".JText::_( 'FLEXI_REMOVE_VALUE' )."
+			</a>
+		</div></div>
+		<input type='hidden' id='".$element_id."_id' name='".$fieldname."' value='".$value."' />
+		";
 		return $html;
 	}
 }

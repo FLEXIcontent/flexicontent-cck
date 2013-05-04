@@ -1036,8 +1036,8 @@ class FlexicontentFields
 		static $fdata   = array();
 		static $no_typeparams = null;
 		if ($no_typeparams) $no_typeparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
-		static $is_form;
-		$is_form = JRequest::getVar('edit')=='edit' && JRequest::getVar('option')=='com_flexicontent';
+		static $is_form=null;
+		if ($is_form===null) $is_form = JRequest::getVar('task')=='edit' && JRequest::getVar('option')=='com_flexicontent';
 		
 		// Create basic field data if no field given
 		if (!empty($name)) {

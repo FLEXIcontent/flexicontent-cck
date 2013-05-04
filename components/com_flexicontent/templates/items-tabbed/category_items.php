@@ -66,7 +66,7 @@ $items = & $this->items;
 	<?php foreach ($items as $item) : ?>
 					
 	<div class="tabbertab"><!-- tab start -->
-			<h3><?php echo mb_substr ($item->title, 0, 20, 'utf-8'); ?></h3><!-- tab title -->
+		<h3 class="tabberheading"><?php echo mb_substr ($item->title, 0, 20, 'utf-8'); ?></h3><!-- tab title -->
 	  <!-- BOF beforeDisplayContent -->
 	  <?php if ($item->event->beforeDisplayContent) : ?>
 			<div class="fc_beforeDisplayContent group">

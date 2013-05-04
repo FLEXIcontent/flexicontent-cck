@@ -93,7 +93,7 @@ class JElementSeparator extends JElement
 			</table>
 			<div class="fctabber">
 				<div class="tabbertab">
-					<h3>'.str_replace('&', ' - ', JText::_($value)).'</h3>
+					<h3 class="tabberheading">'.str_replace('&', ' - ', JText::_($value)).'</h3>
 					<table width="100%" cellspacing="1" class="paramlist admintable flexi">
 					<tr><td>
 			';
@@ -103,7 +103,7 @@ class JElementSeparator extends JElement
 					</table>
 				</div>
 				<div class="tabbertab">
-					<h3>'.str_replace('&', ' - ', JText::_($value)).'</h3>
+					<h3 class="tabberheading">'.str_replace('&', ' - ', JText::_($value)).'</h3>
 					<table width="100%" cellspacing="1" class="paramlist admintable flexi">
 					<tr><td>
 				';

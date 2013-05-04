@@ -194,11 +194,9 @@ if (@$createtabs) :
 ?>
 	
 		<!-- BOF subtitle_tabN block -->
-		<section class="tabbertab"><!-- tab start -->
+		<div class="tabbertab"><!-- tab start -->
 		
-			<header>
-			<h3><?php echo $tabpos_label; ?></h3><!-- tab title -->
-			</header>
+			<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
 			
 			<div class="flexi lineinfo <?php echo $tabpos_label; ?>">
 				<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
@@ -211,7 +209,7 @@ if (@$createtabs) :
 				<?php endforeach; ?>
 			</div>
 			
-		</section><!-- tab end -->
+		</div><!-- tab end -->
 		 
 		<?php endif; ?>
 		<!-- EOF subtitle_tabN block -->	
@@ -305,11 +303,9 @@ if (@$createtabs) :
 ?>
 	
 		<!-- BOF bottom_tabN block -->
-		<section class="tabbertab"><!-- tab start -->
+		<div class="tabbertab"><!-- tab start -->
 		
-			<header>
-			<h3><?php echo $tabpos_label; ?></h3><!-- tab title -->
-			</header>
+			<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
 			
 			<div class="flexi lineinfo <?php echo $tabpos_label; ?>">
 				<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
@@ -322,7 +318,7 @@ if (@$createtabs) :
 				<?php endforeach; ?>
 			</div>
 			
-		</section><!-- tab end -->
+		</div><!-- tab end -->
 		 
 		<?php endif; ?>
 		<!-- EOF bottom_tabN block -->	

@@ -1669,9 +1669,9 @@ class flexicontent_html
 					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'" >';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
 					if($lang->shortcode=="*") {
-						$list 	.= JText::_("All");  // Can appear in J1.6+ only
+						$list 	.= '<span class="lang_lbl">'.JText::_("All").'</span>';  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
-						$list 	.= '<img src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
+						$list 	.= '<img class="lang_lbl" src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
 					} else {
 						$list 	.= $lang->name;
 					}
@@ -2142,9 +2142,10 @@ class flexicontent_html
 			)
 		);
 	}
-
+	
+	
 	/*
-	 * Method to confirm if a given string is a valid MySQL date
+	 * Method to create a Tabset for given label-html arrays
 	 * param  string			$date
 	 * return boolean			true if valid date, false otherwise
 	 */
@@ -2161,7 +2162,7 @@ class flexicontent_html
 			if ( $no_label ) continue;
 
 			$output .= "	<div class='tabbertab'>"."\n";
-			$output .= "		<h3>".$field_tab_labels[$i]."</h3>"."\n";   // Current TAB LABEL
+			$output .= "		<h3 class='tabberheading'>".$field_tab_labels[$i]."</h3>"."\n";   // Current TAB LABEL
 			$output .= "		".$not_in_tabs."\n";                        // Output hidden fields (no tab created), by placing them inside the next appearing tab
 			$output .= "		".$field_html[$i]."\n";                     // Current TAB CONTENTS
 			$output .= "	</div>"."\n";
@@ -2334,7 +2335,15 @@ class flexicontent_upload
 			}
 		}
 		$xss_check =  JFile::read($file['tmp_name'],false,256);
-		$html_tags = array('abbr','acronym','address','applet','area','audioscope','base','basefont','bdo','bgsound','big','blackface','blink','blockquote','body','bq','br','button','caption','center','cite','code','col','colgroup','comment','custom','dd','del','dfn','dir','div','dl','dt','em','embed','fieldset','fn','font','form','frame','frameset','h1','h2','h3','h4','h5','h6','head','hr','html','iframe','ilayer','img','input','ins','isindex','keygen','kbd','label','layer','legend','li','limittext','link','listing','map','marquee','menu','meta','multicol','nobr','noembed','noframes','noscript','nosmartquotes','object','ol','optgroup','option','param','plaintext','pre','rt','ruby','s','samp','script','select','server','shadow','sidebar','small','spacer','span','strike','strong','style','sub','sup','table','tbody','td','textarea','tfoot','th','thead','title','tr','tt','ul','var','wbr','xml','xmp','!DOCTYPE', '!--');
+		$html_tags = array('abbr','acronym','address','applet','area','audioscope','base','basefont',
+			'bdo','bgsound','big','blackface','blink','blockquote','body','bq','br','button','caption',
+			'center','cite','code','col','colgroup','comment','custom','dd','del','dfn','dir','div','dl','dt',
+			'em','embed','fieldset','fn','font','form','frame','frameset','h1','h2','h3','h4','h5','h6','head',
+			'hr','html','iframe','ilayer','img','input','ins','isindex','keygen','kbd','label','layer','legend',
+			'li','limittext','link','listing','map','marquee','menu','meta','multicol','nobr','noembed','noframes',
+			'noscript','nosmartquotes','object','ol','optgroup','option','param','plaintext','pre','rt','ruby','s','samp',
+			'script','select','server','shadow','sidebar','small','spacer','span','strike','strong','style','sub','sup','table',
+			'tbody','td','textarea','tfoot','th','thead','title','tr','tt','ul','var','wbr','xml','xmp','!DOCTYPE', '!--');
 		foreach($html_tags as $tag) {
 			// A tag is '<tagname ', so we need to add < and a space or '<tagname>'
 			if(stristr($xss_check, '<'.$tag.' ') || stristr($xss_check, '<'.$tag.'>')) {
@@ -2824,6 +2833,7 @@ class FLEXIUtilities
 		// Current language, we decided to use LL-CC (language-country) format mapping SEF shortcode, e.g. 'en' to 'en-GB'
 		$user_lang = flexicontent_html::getUserCurrentLang();
 		$languages = FLEXIUtilities::getLanguages($hash='shortcode');
+		if ( !isset($languages->$user_lang->code) ) return;  // Language has been disabled
 		$language_tag = $languages->$user_lang->code;
 
 		// We will use template folder as BASE of language files instead of joomla's language folder
@@ -2831,7 +2841,7 @@ class FLEXIUtilities
 		$base_dir = JPATH_COMPONENT_SITE.DS.'templates'.DS.$tmplname;
 
 		// Final use joomla's API to load our template's language files -- (load english template language file then override with current language file)
-		JFactory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);           // Fallback to english language template file
+		JFactory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file
 		JFactory::getLanguage()->load($extension, $base_dir, $language_tag, $reload=true);  // User's current language template file
 	}
 

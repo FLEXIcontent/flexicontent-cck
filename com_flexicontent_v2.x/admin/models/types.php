@@ -70,8 +70,8 @@ class FlexicontentModelTypes extends JModelList
 		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$limit      = $app->getUserStateFromRequest( $option.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $app->getUserStateFromRequest( $option.'.tags.limitstart', 'limitstart', 0, 'int' );
+		$limit      = $app->getUserStateFromRequest( $option.'.types.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart = $app->getUserStateFromRequest( $option.'.types.limitstart', 'limitstart', 0, 'int' );
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
