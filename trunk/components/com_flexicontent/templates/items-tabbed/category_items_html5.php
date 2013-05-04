@@ -68,10 +68,8 @@ $items = & $this->items;
 	
 	<?php foreach ($items as $item) : ?>
 					
-	<section class="tabbertab"><!-- tab start -->
-		<header>
-			<h3><?php echo mb_substr ($item->title, 0, 20, 'utf-8'); ?></h3><!-- tab title -->
-		</header>
+	<div class="tabbertab"><!-- tab start -->
+		<h3 class="tabberheading"><?php echo mb_substr ($item->title, 0, 20, 'utf-8'); ?></h3><!-- tab title -->
 	  <!-- BOF beforeDisplayContent -->
 	  <?php if ($item->event->beforeDisplayContent) : ?>
 			<div class="fc_beforeDisplayContent group">
@@ -312,7 +310,7 @@ $items = & $this->items;
 			<?php endif; ?>
 	    <!-- EOF afterDisplayContent -->
 			
-	</section><!-- tab end -->
+	</div><!-- tab end -->
 
 	<?php endforeach; ?>
 		

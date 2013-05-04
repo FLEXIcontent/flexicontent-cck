@@ -517,8 +517,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			if ($model->isCheckedOut($user->get('id')))
 			{
 				$msg = JText::sprintf('FLEXI_DESCBEINGEDITTED', $model->get('title'));
-				$this->setRedirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), $msg);
-				return;
+				$app->redirect(JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$model->get('catid').'&id='.$model->get('id'), false), $msg);
 			}
 
 			//Checkout the item
@@ -866,8 +865,10 @@ class FlexicontentViewItem  extends JViewLegacy
 			// Now create the sliders object,
 			// And also push the Form Parameters object into the template (Template Parameters object is seperate)
 			jimport('joomla.html.pane');
-			$pane = JPane::getInstance('sliders');
+			$pane = JPane::getInstance('Sliders');
+			//$tabs_pane = JPane::getInstance('Tabs');
 			$this->assignRef('pane'				, $pane);
+			//$this->assignRef('tabs_pane'	, $tabs_pane);
 			$this->assignRef('formparams'	, $formparams);
 		} else {
 			if ( JHTML::_('date', $item->publish_down , 'Y') <= 1969 || $item->publish_down == $nullDate ) {
@@ -936,18 +937,17 @@ class FlexicontentViewItem  extends JViewLegacy
 	 */
 	function _buildEditLists(&$perms, &$params, &$authorparams)
 	{
-		global $globalcats;
-		$lists = array();
-
 		$db       = JFactory::getDBO();
 		$user     = JFactory::getUser();	// get current user
 		$item     = $this->get('Item');		// get the item from the model
 		$document = JFactory::getDocument();
 
+		global $globalcats;
 		$categories = $globalcats;			// get the categories tree
 		$selectedcats = $this->get( 'Catsselected' );		// get category ids, NOTE: This will normally return the already set versioned value of categories ($item->categories)
 		$actions_allowed = array('core.create');					// user actions allowed for categories
 		$types = $this->get( 'Typeslist' );
+		$subscribers = $this->get( 'SubscribersCount' );
 		$typesselected = '';
 		$isnew = !$item->id;
 
@@ -959,9 +959,18 @@ class FlexicontentViewItem  extends JViewLegacy
 				$item->catid = $maincat;
 			}
 		}
-
+		// Default state
 		if ( $perms['canpublish'] && !$item->id ) $item->state = 1;
-
+		
+		
+		// *********************************************************************************************
+		// Build select lists for the form field. Only few of them are used in J1.6+, since we will use:
+		// (a) form XML file to declare them and then (b) getInput() method form field to create them
+		// *********************************************************************************************
+		flexicontent_html::loadFramework('select2');
+		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
+		$lists = array();
+		
 		// Multi-category form field, for user allowed to use multiple categories
 		$lists['cid'] = '';
 		if ($perms['multicat'])
@@ -973,74 +982,152 @@ class FlexicontentViewItem  extends JViewLegacy
 				existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
 				max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES',true).'";
 			');
-
-			$class = $max_cat_assign ? "mcat validate-fccats" : "validate mcat";
+			
+			$class  = "mcat fcfield_selectmulval";
+			$class .= $max_cat_assign ? " validate-fccats" : " validate";
 			$attribs = 'class="'.$class.'" multiple="multiple" size="8"';
-			if (FLEXI_J16GE) {
-				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', $selectedcats, false, $attribs, true, true,	$actions_allowed);
+			$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
+			$lists['cid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $selectedcats, false, $attribs, true, true,	$actions_allowed);
+		}
+		else {
+			if ( count($selectedcats)>1 ) {
+				foreach ($selectedcats as $catid) {
+					$cat_titles[$catid] = $globalcats[$catid]->title;
+				}
+				$lists['cid'] .= implode(', ', $cat_titles);
 			} else {
-				$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, $attribs, true, true,	$actions_allowed);
+				$lists['cid'] = false;
 			}
 		}
 
 		//buid types selectlist
-		if (FLEXI_J16GE) {
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'jform[type_id]', $typesselected, 1, 'class="required"', 'jform_type_id' );
-		} else {
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected, 1, 'class="required"', 'type_id' );
-		}
-
+		$class = 'required use_select2_lib';
+		$attribs = 'class="'.$class.'"';
+		$fieldname = FLEXI_J16GE ? 'jform[type_id]' : 'type_id';
+		$elementid = FLEXI_J16GE ? 'jform_type_id'  : 'type_id';
+		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected, 1, $attribs, $elementid );
+		
 		// Main category form field
-		$class = 'scat';
+		$class = 'scat use_select2_lib';
 		if ($perms['multicat']) {
 			$class .= ' validate-catid';
 		} else {
 			$class .= ' required';
 		}
 		$attribs = 'class="'.$class.'"';
-		if (FLEXI_J16GE) {
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories,'jform[catid]', $item->catid, 2, $attribs, true, true, $actions_allowed);
-		} else {
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories,'catid', $item->catid, 2, $attribs, true, true, $actions_allowed);
+		$fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
+		$lists['catid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed);
+		
+		// build state list
+		$_arc_ = FLEXI_J16GE ? 2:-1;
+		$non_publishers_stategrp    = $perms['isSuperAdmin'] || $item->state==-3 || $item->state==-4 ;
+		$special_privelege_stategrp = ($item->state==$_arc_ || $perms['canarchive']) || ($item->state==-2 || $perms['candelete']) ;
+		
+		$state = array();
+		if ($non_publishers_stategrp || $special_privelege_stategrp)
+			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_PUBLISHERS_WORKFLOW_STATES' ) );
+		$state[] = JHTML::_('select.option',  1,  JText::_( 'FLEXI_PUBLISHED' ) );
+		$state[] = JHTML::_('select.option',  0,  JText::_( 'FLEXI_UNPUBLISHED' ) );
+		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
+		
+		// States reserved for workflow
+		if ( $non_publishers_stategrp ) {
+			$state[] = JHTML::_('select.optgroup', '' );
+			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_NON_PUBLISHERS_WORKFLOW_STATES' ) );
 		}
-
-		if (!FLEXI_J16GE) {
-			// build state list
-			$state = array();
-			$state[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_PUBLISHED' ) );
-			$state[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_UNPUBLISHED' ) );
-			$state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
-			$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
-			$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
-			$state[] = JHTML::_('select.option',  FLEXI_J16GE ? 2:-1, JText::_( 'FLEXI_ARCHIVED' ) );
-			$lists['state'] = JHTML::_('select.genericlist', $state, 'state', '', 'value', 'text', $item->state );
-
-			// build version approval list
-			$vstate = array();
-			$vstate[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
-			$vstate[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
-
-			$fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
-			$elementid = FLEXI_J16GE ? 'jform_vstate' : 'vstate';
-			$attribs = ' style ="float:left!important;" ';
-			$lists['vstate'] = JHTML::_('select.radiolist', $vstate, $fieldname, $attribs, 'value', 'text', 2, $elementid);
+		if ($item->state==-3 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
+		if ($item->state==-4 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
+		
+		// Special access states
+		if ( $special_privelege_stategrp ) {
+			$state[] = JHTML::_('select.optgroup', '' );
+			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_SPECIAL_ACTION_STATES' ) );
 		}
-
-		$disable_comments = array();
-		$disable_comments[] = JHTML::_('select.option', '', JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ) );
-		$disable_comments[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_DISABLE' ) );
-
+		if ($item->state==$_arc_ || $perms['canarchive']) $state[] = JHTML::_('select.option',  $_arc_, JText::_( 'FLEXI_ARCHIVED' ) );
+		if ($item->state==-2     || $perms['candelete'])  $state[] = JHTML::_('select.option',  -2,     JText::_( 'FLEXI_TRASHED' ) );
+		
+		$fieldname = FLEXI_J16GE ? 'jform[state]' : 'state';
+		$elementid = FLEXI_J16GE ? 'jform_state'  : 'state';
+		$class = 'inputbox use_select2_lib';
+		$attribs = 'class="'.$class.'"';
+		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
+		
+		// build version approval list
+		$fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
+		$elementid = FLEXI_J16GE ? 'jform_vstate' : 'vstate';
+		if (!$prettycheckable_added) {
+			$options = array();
+			$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+			$options[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
+			$attribs = FLEXI_J16GE ? ' style ="float:left!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+			$lists['vstate'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
+		}
+		else {
+			$classes = ' use_prettycheckable ';
+			$attribs = ' class="'.$classes.'" ';
+			$i = 1;
+			$options = array(1=>JText::_( 'FLEXI_NO' ), 2=>JText::_( 'FLEXI_YES' ) );
+			$lists['vstate'] = '';
+			foreach ($options as $option_id => $option_label) {
+				$checked = $option_id==2 ? ' checked="checked"' : '';
+				$elementid_no = $elementid.'_'.$i;
+				$extra_params = ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$lists['vstate'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+				$i++;
+			}
+		}
+		
+		if ($subscribers) {
+			// build favs notify field
+			$fieldname = FLEXI_J16GE ? 'jform[notify]' : 'notify';
+			$elementid = FLEXI_J16GE ? 'jform_notify' : 'notify';
+			if (!$prettycheckable_added) {
+				$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+				$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
+			}
+			else {
+				$classes = ' use_prettycheckable ';
+				$attribs = ' class="'.$classes.'" ';
+				$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
+				$extra_params = ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$lists['notify'] = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' />';
+			}
+		}
+		
+		// build version approval list
 		if ( $params->get('allowdisablingcomments_fe') )
 		{
 			// Set to zero if disabled or to "" (aka use default) for any other value.  THIS WILL FORCE comment field use default Global/Category/Content Type setting or disable it,
 			// thus a per item commenting system cannot be selected. This is OK because it makes sense to have a different commenting system per CONTENT TYPE by not per Content Item
 			$isdisabled = !$params->get('comments') && strlen($params->get('comments'));
-			$fieldvalue = $isdisabled ? "0" : "";
+			$fieldvalue = $isdisabled ? 0 : "";
 
 			$fieldname = FLEXI_J16GE ? 'jform[attribs][comments]' : 'params[comments]';
 			$elementid = FLEXI_J16GE ? 'jform_attribs_comments' : 'params_comments';
-			$attribs = FLEXI_J16GE ? ' style ="float:left!important;" ' : '';
-			$lists['disable_comments'] = JHTML::_('select.radiolist', $disable_comments, $fieldname, $attribs, 'value', 'text', $fieldvalue, $elementid);
+			if (!$prettycheckable_added) {
+				$options = array();
+				$options[] = JHTML::_('select.option', "",  JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ) );
+				$options[] = JHTML::_('select.option', 0, JText::_( 'FLEXI_DISABLE' ) );
+				$attribs = FLEXI_J16GE ? ' style ="float:left!important;" ' : '';
+				$lists['disable_comments'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $fieldvalue, $elementid);
+			}
+			else {
+				$classes = ' use_prettycheckable ';
+				$attribs = ' class="'.$classes.'" ';
+				$i = 1;
+				$options = array(""=>JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ), 0=>JText::_( 'FLEXI_DISABLE' ) );
+				$lists['disable_comments'] = '';
+				foreach ($options as $option_id => $option_label) {
+					$checked = $option_id===$fieldvalue ? ' checked="checked"' : '';
+					$elementid_no = $elementid.'_'.$i;
+					$extra_params = ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+					$lists['disable_comments'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
+						.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+					$i++;
+				}
+			}
 		}
 
 		// build granular access list
@@ -1074,75 +1161,55 @@ class FlexicontentViewItem  extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function _getItemPerms( &$item)
+	function _getItemPerms( &$item )
 	{
 		$user = JFactory::getUser();	// get current user\
 		$isOwner = ( $item->created_by == $user->get('id') );
 
 		$perms 	= array();
-		if (FLEXI_J16GE) {
-			$perms['isSuperAdmin']= $user->authorise('core.admin', 'root.1');
-			$permission = FlexicontentHelperPerm::getPerm();
-			$perms['multicat'] = $permission->MultiCat;
-			$perms['cantags'] = $permission->CanUseTags;
-			$perms['canparams'] = $permission->CanParams;
-			$perms['cantemplates']= $permission->CanTemplates;
 
-			//item specific permissions
-			if ( $item->id ) {
+		$permission = FlexicontentHelperPerm::getPerm();
+		$perms['isSuperAdmin'] = $permission->SuperAdmin;
+		$perms['multicat']     = $permission->MultiCat;
+		$perms['cantags']      = $permission->CanUseTags;
+		$perms['canparams']    = $permission->CanParams;
+		$perms['cantemplates'] = $permission->CanTemplates;
+		$perms['canarchive']   = $permission->CanArchives;
+		$perms['canright']     = $permission->CanRights;
+		$perms['canversion']   = $permission->CanVersion;
+		
+		// J2.5+ specific
+		if (FLEXI_J16GE) $perms['editcreationdate'] = $permission->EditCreationDate;
+		//else if (FLEXI_ACCESS) $perms['editcreationdate'] = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'editcreationdate', 'users', $user->gmid) : 1;
+		//else $perms['editcreationdate'] = ($user->gid >= 25);
+		
+		// Get general edit/publish/delete permissions (we will override these for existing items)
+		$perms['canedit']    = $permission->CanEdit    || $permission->CanEditOwn;
+		$perms['canpublish'] = $permission->CanPublish || $permission->CanPublishOwn;
+		$perms['candelete']  = $permission->CanDelete  || $permission->CanDeleteOwn;
+		
+		// OVERRIDE global with existing item's atomic settings
+		if ( $item->id )
+		{
+			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $item->id;
 				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
 				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
-			} else {
-				// *** New item *** get general edit/publish/delete permissions
-				$perms['canedit']			= $user->authorise('core.edit', 'com_flexicontent') || $user->authorise('core.edit.own', 'com_flexicontent');
-				$perms['canpublish']	= $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
-				$perms['candelete']		= $user->authorise('core.delete', 'com_flexicontent') || $user->authorise('core.delete.own', 'com_flexicontent');
 			}
-			$perms['editcreationdate'] = $user->authorise('flexicontent.editcreationdate', 'com_flexicontent');
-			$perms['canright']		= $permission->CanConfig;
-		} else if (FLEXI_ACCESS) {
-			$perms['isSuperAdmin']= $user->gid >= 25;
-			$perms['multicat'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'multicat', 'users', $user->gmid) : 1;
-			$perms['cantags'] 		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usetags', 'users', $user->gmid) : 1;
-			$perms['canparams'] 	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'paramsitems', 'users', $user->gmid) : 1;
-			$perms['cantemplates']= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'templates', 'users', $user->gmid) : 1;
-
-			if ($item->id) {
+			else if (FLEXI_ACCESS) {
 				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 				$perms['canedit']			= ($user->gid < 25) ? ( (in_array('editown', $rights) && $isOwner) || (in_array('edit', $rights)) ) : 1;
 				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
 				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $isOwner) || (in_array('delete', $rights)) ) : 1;
+				// Only FLEXI_ACCESS has per item rights permission
 				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
-			} else {
-				// *** New item *** get general edit/publish/delete permissions
-				$canEditAll 			= FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all');
-				$canEditOwnAll		= FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all');
-				$perms['canedit']			= ($user->gid < 25) ? $canEditAll || $canEditOwnAll : 1;
-				$canPublishAll 		= FAccess::checkAllContentAccess('com_content','publish','users',$user->gmid,'content','all');
-				$canPublishOwnAll	= FAccess::checkAllContentAccess('com_content','publishown','users',$user->gmid,'content','all');
-				$perms['canpublish']	= ($user->gid < 25) ? $canPublishAll || $canPublishOwnAll : 1;
-				$canDeletehAll 		= FAccess::checkAllContentAccess('com_content','delete','users',$user->gmid,'content','all');
-				$canDeleteOwnAll	= FAccess::checkAllContentAccess('com_content','deleteown','users',$user->gmid,'content','all');
-				$perms['candelete']		= ($user->gid < 25) ? $canDeletehAll || $canDeleteOwnAll : 1;
-				$perms['canright']		= ($user->gid < 25) ? 0 : 1;
 			}
-			//$perms['editcreationdate'] = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'editcreationdate', 'users', $user->gmid) : 1;
-		} else {
-			// J1.5 permissions with no FLEXIaccess are only general, no item specific permissions
-			$perms['isSuperAdmin']= $user->gid >= 25;
-			$perms['multicat']		= 1;
-			$perms['cantags'] 		= 1;
-			$perms['canparams'] 	= 1;
-			$perms['cantemplates']= $user->gid >= 25;
-			$perms['canedit']			= ($user->gid >= 20);
-			$perms['canpublish']	= ($user->gid >= 21);
-			$perms['candelete']		= ($user->gid >= 21);
-			$perms['canright']		= ($user->gid >= 21);
-			//$perms['editcreationdate'] = ($user->gid >= 25);
+			else {
+				// J1.5 permissions with no FLEXIaccess are only general, no item specific permissions
+			}
 		}
-
+		
 		return $perms;
 	}
 
@@ -1205,20 +1272,24 @@ class FlexicontentViewItem  extends JViewLegacy
 
 				$mo_maincat = $globalcats[$maincatid]->title;
 				$mo_maincat .= '<input type="hidden" name="'.$catid_form_fieldname.'" value="'.$maincatid.'" />';
+				$mo_cancid  = false;
 				break;
 			case 1:  // submit to a single category, selecting from a MENU SPECIFIED categories subset
-				$mo_cats = false;
+				$mo_cats    = false;
 				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="required" ', $check_published=true, $check_perms=false);
+				$mo_cancid  = false;
 				break;
 			case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
 				$attribs = 'class="validate" multiple="multiple" size="8"';
-				$mo_cats = flexicontent_cats::buildcatselect($categories, $cid_form_fieldname, array(), false, $attribs, $check_published=true, $check_perms=false);
+				$mo_cats    = flexicontent_cats::buildcatselect($categories, $cid_form_fieldname, array(), false, $attribs, $check_published=true, $check_perms=false);
 				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="validate-catid" ', $check_published=true, $check_perms=false);
+				$mo_cancid  = true;
 				break;
 		}
 		$menuCats = new stdClass();
-		$menuCats->cid   = $mo_cats;
-		$menuCats->catid = $mo_maincat;
+		$menuCats->cid    = $mo_cats;
+		$menuCats->catid  = $mo_maincat;
+		$menuCats->cancid = $mo_cancid;
 
 		return $menuCats;
 	}

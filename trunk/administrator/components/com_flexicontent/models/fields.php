@@ -70,7 +70,7 @@ class FlexicontentModelFields extends JModelLegacy
 		$option = JRequest::getVar('option');
 		$app = JFactory::getApplication();
 
-		$limit		= $app->getUserStateFromRequest( $option.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limit		= $app->getUserStateFromRequest( $option.'.fields.limit', 'limit', $app->getCfg('list_limit'), 'int');
 		$limitstart = $app->getUserStateFromRequest( $option.'.fields.limitstart', 'limitstart', 0, 'int' );
 
 		// In case limit has been changed, adjust limitstart accordingly

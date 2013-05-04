@@ -739,30 +739,15 @@ class ParentClassItem extends JModelLegacy
 					$item->category_access = $db->loadResult();
 				}
 				
-				// Retrieve type info, and also retrieve ratings (votes) which are not versioned,
-				// then calculate item's score so far (percentage), e.g. we have 5 votes max
-				if ( !isset($item->type_access) || !isset($item->typename) || !isset($item->typealias) || !isset($item->rating_count) || !isset($item->score) ) {
-					$query = "SELECT t.access as type_access, t.name as typename, t.alias as typealias,"
-							."	, cr.rating_count, ((cr.rating_sum / cr.rating_count)*20) as score"
-							." FROM #__flexicontent_items_ext as ie "
-							." JOIN #__flexicontent_types AS t ON t.id = ie.type_id"
-							." LEFT JOIN #__content_rating AS cr ON cr.content_id = ie.item_id"
-							." WHERE ie.item_id=".(int)$this->_id;
-					$db->setQuery($query);
-					if ( $type_and_rating = $db->loadObject() ) {
-						$item->type_access  = $type_and_rating->type_access;
-						$item->typename			= $type_and_rating->typename;
-						$item->typealias		= $type_and_rating->typealias;
-						$item->rating_count	= $type_and_rating->rating_count;
-						$item->score				= $type_and_rating->score;
-					} else {
-						$item->type_access = $public_acclevel = !FLEXI_J16GE ? 0 : 1;
-						$item->typename = "";
-						$item->typealias = "";
-						$item->rating_count = 0;
-						$item->score = 0;
-					}
+				// Typecast some properties in case LEFT JOIN returned nulls
+				if ( !isset($item->type_access) ) {
+					$public_acclevel = !FLEXI_J16GE ? 0 : 1;
+					$item->type_access = $public_acclevel;
 				}
+				$item->typename     = (string) @ $item->typename;
+				$item->typealias    = (string) @ $item->typealias;
+				$item->rating_count = (int) @ $item->rating_count;
+				$item->score        = (int) @ $item->score;
 				
 				// Retrieve Creator NAME and email (used to display the gravatar)
 				$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->created_by;
@@ -2759,6 +2744,9 @@ class ParentClassItem extends JModelLegacy
 	 */
 	function getSubscribersCount()
 	{
+		static $subscribers = array();
+		if ( isset($subscribers[$this->_id]) ) return $subscribers[$this->_id];
+		
 		$query	= 'SELECT COUNT(*)'
 				.' FROM #__flexicontent_favourites AS f'
 				.' LEFT JOIN #__users AS u'
@@ -2767,8 +2755,8 @@ class ParentClassItem extends JModelLegacy
 				.'  AND u.block=0 ' //.' AND f.notify = 1'
 				;
 		$this->_db->setQuery($query);
-		$subscribers = $this->_db->loadResult();
-		return $subscribers;
+		$subscribers[$this->_id] = $this->_db->loadResult();
+		return $subscribers[$this->_id];
 	}
 	
 	

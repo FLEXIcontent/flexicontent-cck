@@ -203,9 +203,11 @@ window.addEvent('domready', function() {
 			$attribs .= ' multiple="true" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-		} else {
-			$attribs .= 'class="inputbox"';
 		}
+		if (@$attributes['class']) {
+			$attribs .= 'class="'.$attributes['class'].'"';
+		}
+		
 		if ( ! @$attributes['skipparams'] )
 		{
 			$attribs .= ' onchange="activatePanel(this.value);"';
@@ -231,9 +233,9 @@ window.addEvent('domready', function() {
 		}
 		
 		$label = $this->element['label'];
-		$class = "hasTip"; $title = "";
+		$class = "hasTip flex_label"; $title = "";
 		if ($this->element['description']) {
-			$class = "hasTip";
+			$class = "hasTip flexi_label";
 			$title = JText::_($label)."::".JText::_($this->element['description']);
 		}
 		return '<label style=""  class="'.$class.'" title="'.$title.'" >'.JText::_($label).'</label> &nbsp; ';

@@ -455,14 +455,8 @@
 /* (e) Generic Display of Rendered Field Values */
 /************************************************/
 
-#flexicontent .fc_edit_corefields_left  {
-	float:left !important; width:60%  !important; margin:0px !important; padding:0px !important;
-}
-#flexicontent .fc_edit_corefields_right {
-	float:left !important; width:39%  !important; margin:0px !important; padding:0px 0px 0px 1% !important;
-}
 #flexicontent .fc_edit_corefields_full {
-	float:left !important; width:100% !important; margin:0px !important; padding:0px !important;
+	float:none !important; width:100% !important; margin:0px !important; padding:0px !important; display:inline-block !important;
 }
 
 #flexicontent .fc_field_container {
@@ -517,6 +511,7 @@ div.flexi_edit .flexi_buttons {
 	padding:1px 4px 1px 2px;
 	font-weight:bold;
 	font-size:11px;
+	white-space:nowrap !important;
 }
 
 #flexicontent button:hover, div.flexi_edit .flexi_buttons button:hover {
@@ -545,9 +540,10 @@ button.fc_button {}
  ********************/
 
 div.flexi_edit .flexi_label.fc_tooltip_icon_fe {
-  padding:3px 3% 3px 1%;
+  padding:6px 3% 6px 1% !important;
   width: 14%;
-	background: url(../images/icon-16-hint.png) 100% 0% no-repeat #F6F6F6;
+  max-width:126px;
+	background: url(../images/icon-16-hint.png) 99% 5px no-repeat #F6F6F6;
 }
 
 
@@ -956,9 +952,9 @@ div.flexicontent.fcsearch  .fc_search_result_title {
 div.flexicontent.fcsearch  .fc_search_result_text {
 }
 div.flexicontent.fcsearch  .fc_search_result_image { display: inline-block; }
-div.flexicontent.fcsearch  .fc_search_result_image.fcleft { float: left; margin: 0px 16px 0px 8px; }}
+div.flexicontent.fcsearch  .fc_search_result_image.fcleft { float: left; margin: 0px 16px 0px 8px; }
 div.flexicontent.fcsearch  .fc_search_result_image.fcright { float: right; margin: 0px 8px 0px 16px; }
-div.flexicontent.fcsearch  .fc_search_result_image img { padding:1px; border:1px solid #aaaaaa; border-radius 4px; }
+div.flexicontent.fcsearch  .fc_search_result_image img { padding:1px; border:1px solid #aaaaaa; border-radius: 4px; }
 div.flexicontent.fcsearch  .fc_search_result_filters {
 }
 div.flexicontent.fcsearch  .fc_search_result_fields {
@@ -1280,43 +1276,84 @@ table.admintable td {
 /******************************************************
  * Frontend Templates Rules for frontend basic tabbing
  ******************************************************/
-
+ 
 #flexicontent .tabberlive {
-	margin: 0px 0px 6px 0px; padding: 0px; border-width:0px;
+	margin: 0px 0px 6px 0px !important;
+	padding: 0px !important;
+	width: 100% !important;
+	float: left;
+	border-width: 0px;
 }
 
-#flexicontent .fctabber {
-	overflow:visible; width:5000px;
+#flexicontent .tabbertab {
+	margin: 0px !important;
+	padding: 5px 3px 3px 5px !important;
+	width: 99% !important;
+	float: left;
 }
 
-#flexicontent .fieldvaltabber {
-	width:auto;
-	float:left;
-	margin: -12px 0px 6px 1px;
-	padding: 0px;
-	border-width:0px;
+#flexicontent .fctabber { overflow:visible; width:5000px; }
+
+#flexicontent ul.tabbernav {
+	line-height: 100% !important;
+	border-bottom: 1px solid #808080 !important;
+	font: bold 11px Verdana,sans-serif !important;
+	margin: 0 !important;
+	padding: 0px 6px 0px 4px !important;
+	width: 99% !important;
+	display: inline-block !important;
+}
+
+#flexicontent ul.tabbernav li {
+	line-height: 100% !important;
+	padding: 0px !important;
+	margin: 0px 0px -1px 8px !important;
+	overflow: visible !important;
+	display: inline-block !important;
+	float: left;
+}
+
+#flexicontent ul.tabbernav li a {
+	line-height: 100% !important;
+	font-size: 11px !important;
+	margin: 0px !important;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 4px !important;
+	padding-bottom: 5px !important;
+	display: inline-block !important;
+	border-radius: 8px 8px 0px 0px !important;
+	/*box-shadow: 0px -1px 1px lightgray;*/
+	border-left: 1px solid #D0D0D0;
+	border-top: 1px solid #B0B0B0;
+	border-right: 1px solid #808080;
+}
+
+#flexicontent ul.tabbernav li a {
+	background: none repeat scroll 0 0 #AAAAEE;
+	/*border-color: #222277;*/
+	color: #000000;
+}
+
+#flexicontent ul.tabbernav li:hover a {
+	background: none repeat scroll 0 0 #aa0000;
+	border-left: 1px solid #aa5555;
+	border-top: 1px solid #995555;
+	border-right: 1px solid #775555;
+	color: white;
 }
 
 #flexicontent ul.tabbernav li.tabberactive a,
 #flexicontent ul.tabbernav li.tabberactive a:hover
 {
-	color: black!important;
-	background-color: white!important;
-	border-bottom: 1px solid white!important;
+	color: black !important;
+	background-color: white !important;
+	border-bottom: 1px solid white !important;
+	border-left: 1px solid #D0D0D0;
+	border-top: 1px solid #B0B0B0;
+	border-right: 1px solid #808080;
 }
 
-#flexicontent ul.tabbernav {
-	border-bottom: 1px solid #777788 !important;
-	font: bold 11px Verdana,sans-serif !important;
-	margin: 0 !important;
-	padding: 4px !important;
-}
-
-ul.tabbernav li {
-	line-height: 100% !important;
-	margin: 0 !important;
-	overflow: visible !important;
-}
 
 /*#flexicontent.fctypeNN*/ #fc_subtitle_tabset ul.tabbernav li a {  padding-left: 20px;  }
 /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_1, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_2, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_3,

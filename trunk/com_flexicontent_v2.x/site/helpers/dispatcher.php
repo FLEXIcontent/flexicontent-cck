@@ -90,6 +90,7 @@ class FCDispatcher extends JDispatcher
 		if ($this->debug) echo $plugin->name;
 		
 		$path	= JPATH_PLUGINS.DS.$plugin->type.DS.$plugin->name.DS.$plugin->name.'.php';
+		if (!file_exists($path)) return false;
 		$plugin_code = file_get_contents($path);
 		$fname_pattern='[\s]*[\'"]([^\'"]+)[\'"][\s]*';
 		

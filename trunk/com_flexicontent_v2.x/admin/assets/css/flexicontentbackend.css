@@ -403,7 +403,7 @@ span.secondarycat a {
 /* Category view */
 h3.themes-title {
 	color: #666666;
-	background: url(../images/layout_content.png) no-repeat 0% 50%;
+	background: url(../images/layout_content.png) no-repeat 0% 0%;
 	padding: 0px 0px 0px 20px;
 	font-family: Helvetica;
 }
@@ -662,6 +662,10 @@ div label.lang_box {
 	margin: 0px 2px 0px 0px !important;
 	padding: 0px!important;
 }
+div label.lang_box input,
+div label.lang_box .lang_lbl {
+	display:inline-block; float:left;
+}
 
 /* Import view */
 .fcimport {
@@ -670,52 +674,97 @@ div label.lang_box {
 	float: left;
 }
 
+#permissions-sliders .pane-toggler-down span.level, #permissions-sliders .pane-toggler span.level {
+	background-image:none; padding:0;
+}
+
+#flexicontent .fields_tabset,
+#flexicontent .params_tabset {
+	width:100% !important;
+}
+
+/*************************
+ * Rules for basic tabbing
+ *************************/
+ 
 #flexicontent .tabberlive {
-	width:auto; float:left; margin: 0px 0px 6px 0px; padding: 0px; border-width:0px;
+	margin: 0px 0px 6px 0px !important;
+	padding: 0px !important;
+	width: 100% !important;
+	float: left;
+	border-width: 0px;
 }
 
-#flexicontent .customfields_set .tabberlive {
-	padding:0px!important;
-	width:99%!important;
-}
-#flexicontent .customfields_set .tabbertab {
-	padding:0px!important;
-	width:99%!important;
+#flexicontent .tabbertab {
+	margin: 0px !important;
+	padding: 5px 3px 3px 5px !important;
+	width: 99% !important;
+	float: left;
 }
 
-#flexicontent .fctabber {
-	overflow:visible; width:5000px;
+#flexicontent .fctabber { overflow:visible; width:5000px; }
+
+#flexicontent ul.tabbernav {
+	line-height: 100% !important;
+	border-bottom: 1px solid #808080 !important;
+	font: bold 11px Verdana,sans-serif !important;
+	margin: 0 !important;
+	padding: 0px 6px 0px 4px !important;
+	width: 99% !important;
+	display: inline-block !important;
 }
 
-#flexicontent .fieldvaltabber {
-	width:auto;
+#flexicontent ul.tabbernav li {
+	line-height: 100% !important;
+	padding: 0px !important;
+	margin: 0px 0px -1px 8px !important;
+	overflow: visible !important;
+	display: inline-block !important;
 	float:left;
-	margin: -12px 0px 6px 1px;
-	padding: 0px;
-	border-width:0px;
+}
+
+#flexicontent ul.tabbernav li a {
+	line-height: 100% !important;
+	font-size: 11px !important;
+	margin: 0px !important;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 4px !important;
+	padding-bottom: 5px !important;
+	display: inline-block !important;
+	border-radius: 8px 8px 0px 0px !important;
+	/*box-shadow: 0px -1px 1px lightgray;*/
+	border-left: 1px solid #D0D0D0;
+	border-top: 1px solid #B0B0B0;
+	border-right: 1px solid #808080;
+}
+
+#flexicontent ul.tabbernav li a {
+	background: none repeat scroll 0 0 #AAAAEE;
+	/*border-color: #222277;*/
+	color: #000000;
+}
+
+#flexicontent ul.tabbernav li:hover a {
+	background: none repeat scroll 0 0 #aa0000;
+	border-left: 1px solid #aa5555;
+	border-top: 1px solid #995555;
+	border-right: 1px solid #775555;
+	color: white;
 }
 
 #flexicontent ul.tabbernav li.tabberactive a,
 #flexicontent ul.tabbernav li.tabberactive a:hover
 {
-	color: black;
+	color: black !important;
 	background-color: white !important;
-	border-bottom: 1px solid white;
+	border-bottom: 1px solid white !important;
+	border-left: 1px solid #D0D0D0;
+	border-top: 1px solid #B0B0B0;
+	border-right: 1px solid #808080;
 }
 
-#flexicontent ul.tabbernav {
-	border-bottom: 1px solid #777788 !important;
-	font: bold 12px Verdana,sans-serif !important;
-	margin: 0 !important;
-	padding: 3px 0px 0px 0px !important;
-}
 
-#flexicontent .customfields_set ul.tabbernav {
-	padding: 3px 2px 0px 0px !important;
-	width: 99% !important;
-}
-
-#flexicontent ul.tabbernav li {	padding: 3px !important;	margin: 0px !important; line-height: 14px !important; }
 
 #flexicontent .fcfield-sortables { margin:0px!important; padding:0px!important; }
 #flexicontent .fcfield-sortables li { margin:0px 0px 4px 0px; padding:0px;  }
@@ -754,20 +803,31 @@ div fieldset input, div fieldset textarea, div fieldset select, div fieldset img
 	margin: 2px 2px 2px 0px !important;
 }
 
-#flexicontent .fc_form_title, #flexicontent .fc_form_alias,
+#flexicontent .fc_form_title,
+#flexicontent .fc_form_alias,
 #flexicontent #alias, #flexicontent #jform_alias,
-#flexicontent #title, #flexicontent #jform_title {
-	font-size:11px!important; font-family:tahoma!important; width:auto!important; font-weight:normal!important;
+#flexicontent #title, #flexicontent #jform_title,
+#flexicontent #jform_lang_parent_id_name, #flexicontent #lang_parent_id_name
+{
+	font-size:11px!important;
+	font-family:tahoma!important;
+	font-weight:normal!important;
+	width:97%;
+	max-width:600px;
 }
 
+dl.tabs dt { font-size:10px !important; font-family:tahoma !important; font-weight:normal !important; }
 
-table.adminform .flexi_label {
-	width: 120px !important;
-}
+div.flexi_edit table.adminform td { padding: 0px 2px 0px 2px; }
+div.flexi_edit table.adminform { margin: 0px; }
 
+div.flexi_edit span.flexi_label label { float:right; margin:0px; padding:0px; }
+div.flexi_edit span.flexi_label label label { float:right; margin:auto; padding:auto; }
+
+div.flexi_edit .flexi_label.fcdualline { width:32%; padding: 6px 2% 6px 2% !important; }
 div.flexi_edit .flexi_label {
 	display: block;
-	float: left!important;
+	float: left !important;
 	color: #606060;
   background-color: #F2F2F2;
   border-bottom: 1px solid #D0D0D0;
@@ -776,10 +836,12 @@ div.flexi_edit .flexi_label {
   font-size: 12px;
   font-family: arial;
   font-weight: normal;
-  text-align: right;
+  text-align: right !important;
   width: 16%;
+  max-width:150px;
   margin: 2px 1% 3px 0%;
-  padding:3px 1% 3px 1%;
+  padding: 6px 1% 6px 1% !important;
+  border-radius:6px;
 }
 
 div.flexi_edit .flexi_label.invalid {
@@ -787,22 +849,27 @@ div.flexi_edit .flexi_label.invalid {
 }
 
 div.flexi_edit .flexi_label.fc_tooltip_icon_bg {
-  padding:3px 3% 3px 1%;
+  padding: 6px 3% 6px 1% !important;
   width: 14%;
-	background: url(../images/lightbulb.png) 100% 2px no-repeat #F6F6F6;
+  max-width:126px;
+	background: url(../images/lightbulb.png) 98% 5px no-repeat #F2F2F2;
 }
 
 div.flexi_edit .flexi_label.invalid {
 	font-weight: bold;
 }
 div.flexi_edit .flexi_formblock {
-	clear: both;
+	clear: both; width:100%; padding:0; margin:0;
 }
 
+div.flexi_edit { margin:0px!important; }
+div.flexi_edit fieldset.basicfields_set,
+div.flexi_edit fieldset.flexiaccess,
 div.flexi_edit fieldset.customfields_set {
 	border: 1px solid #dddddd;
-	margin-bottom: 1em;
+	margin: 0px 0px 1em 0px;
 	padding: 4px 8px 4px 8px;
+	margin-top:0px; margin-bottom:32px;
 }
 
 div.flexi_edit form input,
@@ -968,12 +1035,23 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 .container_fcfield.fcfield_row0 {}
 .container_fcfield.fcfield_row1 {}
 .container_fcfield .fc_mini_note_box,
-.customfields_set .fc_mini_note_box {margin-left: 0px !important;}
+.customfields_set .fc_mini_note_box {margin: 0px 0px 6px 0px !important;}
+.container_fcfield.fcdualline { width:auto !important; }
+.container_fcfield_name_language { margin-top:8px !important; }
+.container_fcfield .editlinktip img { margin:4px 0px -4px 0px !important; padding:0px !important; }
 
+
+#flexicontent .fcclear.fcseparator {
+	border-top: 1px dashed gray!important;
+	visibility: visible !important;
+	margin:12px 0px !important;
+	float: left !important;
+	width: 100% !important;
+}
 
 #flexicontent .fcclear,
 #flexicontent .clear {
-	border: 0 !important;
+	border: 0px solid red !important;
 	clear: both !important;
 	float: none !important;
 	font-size: 1px !important;
@@ -989,7 +1067,6 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent .fcfield_selectval,
 #flexicontent .fcfield_selectmulval,
 #flexicontent .fcfield_textval {
-	-moz-user-select: none !important;
 	background-clip: padding-box !important;
 	background-color: #FFFFFF !important;
 	background-image: -moz-linear-gradient(center bottom , #EEEEEE 0%, white 50%) !important;
@@ -998,7 +1075,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	color: #444444 !important;
 	display: inline-block !important;
 	padding: 0 0 0px 8px !important;
-	margin: 0 6px 1px 0 !important;
+	margin: 0px 6px 2px 0 !important;
 	position: relative !important;
 	text-decoration: none !important;
 	white-space: nowrap !important;
@@ -1023,10 +1100,17 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 /* FORCE some CSS about select2, prettyCheckable, etc libs */
 .use_select2_lib {
 	width: auto!important;
+	margin-top:0px!important;
+	margin-bottom:2px!important;
 }
+
 .select2-container-multi, .select2-drop {
 	min-width: 140px!important;
 	width: auto!important;
+}
+
+.select2-results {
+	text-align: left!important;
 }
 
 .select2-results .select2-result .select2-result-label {
@@ -1034,6 +1118,13 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	min-height: auto !important;
 	line-height: auto !important;
 	padding: 0px 2px !important;
+}
+
+.select2-results ul.select2-result-sub > li .select2-result-label {
+    padding-left: 10px !important;
+}
+.select2-results ul.select2-result-sub {
+    margin-bottom: 4px !important;
 }
 
 .select2-results .select2-result-label {
@@ -1060,23 +1151,32 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	padding: 3px 5px 3px 18px !important;
 	position: relative !important;
 }
+
 .select2-choice {
 	margin: 0 6px 0 0 !important;
+	font-weight: normal !important;
 }
+
 .prettycheckbox.fcradiocheck label, .prettyradio.fcradiocheck label {
 	margin: 7px 0px 0px 1px !important;
 }
+
 .prettycheckbox.fcradiocheckimage label, .prettyradio.fcradiocheckimage label {
 	margin: 2px 0px 0px 1px !important;
 }
+
 .prettycheckbox.fcradiocheckimage, .prettyradio.fcradiocheckimage,
 .prettycheckbox.fcradiocheck, .prettyradio.fcradiocheck {
-	float:left !important; display:block !important;
-	margin: -6px 12px 0px -16px !important;
+	float:left !important;
+	display:block !important;
+	clear:none !important;
+	margin:-6px 12px 0px -16px !important;
 }
+
 .prettyradio input, .prettycheckbox input {
 	display:inline-block !important; visibility:hidden !important; float:left !important;
 }
+
 label.fccheckradio_lbl {
 	display:inline-block; white-space:nowrap;
 }
@@ -1119,7 +1219,7 @@ div fieldset.panelform fieldset.radio label {
 div fieldset.panelform {
 	padding:0px;
 	margin: 0px 4px 0px 4px;
-	border-bottom:1px solid black;
+	/*border-bottom:1px solid black;*/
 }
 
 div fieldset.panelform label.hasTip, #jform_attribs_ilayout-lbl, .fc_fieldset label.hasTip {
@@ -1260,4 +1360,11 @@ table.admintable fieldset {
 	float: left;
 	margin: 0 !important;
 	padding: 0 !important;
+}
+
+ul.adminformlist {
+	list-style-position:outside !important;
+	list-style-type:none !important;
+	margin:0px !important;
+	padding:0px !important;
 }

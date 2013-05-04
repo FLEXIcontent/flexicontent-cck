@@ -57,7 +57,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
 		
-			$js = "
+		$js = "
 			var value_counter=".count($field->value).";
 			
 			function qfSelectFile".$field->id."(id, file) {
@@ -423,14 +423,14 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
+		
+		$new=0;
 		$newpost = array();
-
-		for ($n=0, $c=count($post); $n<$c; $n++)
-		{
-			if ($post[$n] != '') $newpost[] = $post[$n];
-		}
-
-		$post = array_unique($newpost);
+    foreach ($post as $n => $v)
+    {
+			if ($post[$n] != '') $newpost[$v] = $new++;
+    }
+    $post = array_flip($newpost);
 	}
 	
 	
@@ -530,14 +530,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$return_data = array();
 		$new_ids = array();
 		$values = is_array($value) ? $value : array($value);
-		foreach ($values as $f) {
-			$f = (int)$f;
-			if ( isset($cached_data[$f]) )
-				$return_data[$f] = $cached_data[$f];
-			else if ( $f )
+		foreach ($values as $file_id) {
+			$f = (int)$file_id;
+			if ( !isset($cached_data[$f]) && $f)
 				$new_ids[] = $f;
 		}
-
+		
+		// Get file data not retrieved already
 		if ( count($new_ids) )
 		{
 			// Only query files that are not already cached
@@ -551,9 +550,15 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$new_data = $db->loadObjectList('id');
 
 			if ($new_data) foreach($new_data as $file_id => $file_data) {
-				$return_data[$file_id] = $file_data;
 				$cached_data[$file_id] = $file_data;
 			}
+		}
+		
+		// Finally get file data in correct order
+		foreach($values as $file_id) {
+			$f = (int)$file_id;
+			if ( isset($cached_data[$f]) && $f)
+				$return_data[$file_id] = $cached_data[$f];
 		}
 
 		return !is_array($value) ? @$return_data[(int)$value] : $return_data;

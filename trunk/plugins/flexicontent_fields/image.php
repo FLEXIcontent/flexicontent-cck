@@ -500,7 +500,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				<div class=\"fcfield-button-add\" style='margin: 0px;display:inline-block;'>
 					<a class=\"addfile_".$field->id."\" id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_SELECT_IMAGE' )."\"
 						".//href=\"#\" style=\"margin: 0px;\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",'".$u_item_id."',".$thumb_w_s.",".$thumb_h_s.")\"
-						"href=\"".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JUtility::getToken().'=1&field='.$field->id.'&itemid='.$u_item_id.'&targetid='.$elementid."_existingname&thumb_w='.$thumb_w_s.'&thumb_h='.$thumb_h_s.'&autoassign=".$autoassign."\"
+						"href=\"".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JUtility::getToken().'=1&field='.$field->id.'&itemid='.$u_item_id.'&targetid='.$elementid."_existingname&thumb_w=$thumb_w_s&thumb_h=$thumb_h_s&autoassign=".$autoassign."\"
 						rel=\"{handler: 'iframe', size: {x: (MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT_IMAGE' )."</a>
 				</div>
 				";
@@ -692,6 +692,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 			case 4:
 			$separatorf = $closetag . $opentag;
+			break;
+
+			case 5:
+			$separatorf = '';
 			break;
 
 			default:

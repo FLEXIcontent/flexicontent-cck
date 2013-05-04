@@ -118,7 +118,7 @@ class FlexicontentModelItem extends ParentClassItem
 			// STEP B: Calculate SOME ITEM PUBLICATION STATE FLAGS, used to decide if current item is active
 			// FLAGS: item_is_published, item_is_scheduled, item_is_expired, cats_are_published
 			// *********************************************************************************
-			$item_is_published = $this->_item->state == 1 || $this->_item->state == -5 || $this->_item->state == -1;
+			$item_is_published = $this->_item->state == 1 || $this->_item->state == -5 || $this->_item->state == (FLEXI_J16GE ? 2:-1);
 			$item_is_scheduled = $this->_item->publication_scheduled;
 			$item_is_expired   = $this->_item->publication_expired;
 			if ( $cid )

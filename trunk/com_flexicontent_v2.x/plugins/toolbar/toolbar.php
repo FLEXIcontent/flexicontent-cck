@@ -66,7 +66,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$lang		= in_array($lang, array('en','es','it','th')) ? $lang : 'en';
 		
 		// parameters shortcuts
-		$display_comments	= $field->parameters->get(FLEXI_J16GE ? 'display_comments' : 'display-comments', 1);
+		$display_comments	= $field->parameters->get(FLEXI_J16GE ? 'display_comments' : 'display-comments', 1) && $item->parameters->get('comments',0);
 		$display_resizer	= $field->parameters->get(FLEXI_J16GE ? 'display_resizer' : 'display-resizer', 1);
 		$display_print 		= $field->parameters->get(FLEXI_J16GE ? 'display_print' : 'display-print', 1);
 		$display_email 		= $field->parameters->get(FLEXI_J16GE ? 'display_email' : 'display-email', 1);
