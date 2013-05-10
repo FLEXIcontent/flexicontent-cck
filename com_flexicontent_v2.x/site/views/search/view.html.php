@@ -152,11 +152,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// ************************
 		
 		// ** writting both old and new way as an example
-		if (!FLEXI_J16GE) {
+		// Deprecated <title> tag is used instead by search engines
+		/*if (!FLEXI_J16GE) {
 			if ($app->getCfg('MetaTitle') == '1') 	$app->addMetaTag('title', $params->get('page_title'));
 		} else {
 			if ($app->getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
-		}
+		}*/
 		
 		
 		// ***************************************************************

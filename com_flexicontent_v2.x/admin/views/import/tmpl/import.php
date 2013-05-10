@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: import.php 1561 2012-11-26 05:23:51Z ggppdk $
+ * @version 1.5 stable $Id: import.php 1675 2013-04-18 05:43:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,11 +17,6 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-
-$css = 'td label.fcimport { display:inline-block; float:right; white-space:nowrap; width:auto; font-weight:bold; }';
-$document = JFactory::getDocument();
-$document->addStyleDeclaration($css);
-
 ?>
 <script type="text/javascript">
 <?php if (FLEXI_J16GE) echo "Joomla.submitform = "; ?>
@@ -82,7 +77,7 @@ function submitbutton(task) {
 	submitform(task);
 }
 </script>
-<div class="flexicontent">
+<div class="flexicontent" id="flexicontent">
 
 <form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm">
 	<table cellspacing="10" cellpadding="0" border="0" width="100%">
@@ -95,80 +90,87 @@ function submitbutton(task) {
 				<legend><?php echo JText::_( 'FLEXI_IMPORT_TYPE_AND_CORE_PROPS' ); ?></legend>
 				<table>
 					<tr valign="top">
-						<td class="key"><label class="fcimport" for="type_id"><?php echo JText::_("FLEXI_ITEM_TYPE");?><span style="color:red;"> *</span></label></td>
-						<td>
+						<td class="key"><label class="fckey" for="type_id"><?php echo JText::_("FLEXI_ITEM_TYPE");?><span style="color:red;"> *</span></label></td>
+						<td class="fcimportdata">
 							<?php echo $this->lists['type_id'];?>
 						</td>
 					</tr>
 					<tr valign="top">
-						<td class="key"><label class="fcimport" for="ignore_unused_columns">Ignore unused columns</label></td>
-						<td><input type="checkbox" id="ignore_unused_columns" name="ignore_unused_columns" value="1" /> &nbsp; (Enable this if you have redudant columns. <b>NORMALLY:</b> columns must be (a) <b>item properties</b> or (b) <b>field names</b></td>
+						<td class="key"><label class="fckey" for="ignore_unused_columns">Ignore unused columns</label></td>
+						<td class="fcimportdata">
+							<input type="checkbox" id="ignore_unused_columns" name="ignore_unused_columns" value="1" />
+							&nbsp; (Enable this if you have redudant columns.
+							<b>NORMALLY:</b> columns must be (a) <b>item properties</b> or (b) <b>field names</b>
+						</td>
 					</tr>
 
 					<tr valign="top">
 						<td class="key"> &nbsp; </td>
-						<td>-------------------------------</td>
+						<td class="fcimportdata">-------------------------------</td>
 					</tr>
 					<tr valign="top">
 						<td class="key"> &nbsp; </td>
-						<td><span style="color:darkgreen; font-weight:bold;">CUSTOM COLUMNS</span></td>
+						<td class="fcimportdata"><span style="color:darkgreen; font-weight:bold;">CUSTOM COLUMNS</span></td>
 					</tr>
 					<tr valign="top">
 						<td class="key"> &nbsp; </td>
-						<td>-------------------------------</td>
+						<td class="fcimportdata">-------------------------------</td>
 					</tr>
 
 					<tr valign="top">
-						<td class="key"><label class="fcimport" for="id_col">Custom ITEM 'id'</label></td>
-						<td><input type="checkbox" id="id_col" name="id_col" value="1" /> &nbsp; (ID of newly created items will be updated to match the 'id' column. ALL item ids of the column are checked if they already exist, before first item creation is done</td>
+						<td class="key"><label class="fckey" for="id_col">Custom ITEM 'id'</label></td>
+						<td class="fcimportdata">
+							(NOTE: Before any items are created, all item ids are checked if they already exist) <br/>
+							<input type="checkbox" id="id_col" name="id_col" value="1" /> Use 'id' column
+						</td>
 					</tr>
 					<tr valign="top">
-						<td class="key"><label class="fcimport" for="language"><?php echo JText::_("FLEXI_LANGUAGE");?><span style="color:red;"> *</span></label></td>
-						<td>
+						<td class="key"><label class="fckey" for="language"><?php echo JText::_("FLEXI_LANGUAGE");?><span style="color:red;"> *</span></label></td>
+						<td class="fcimportdata">
 							<?php echo str_replace('<br />', '', $this->lists['languages']); ?>
 						</td>
 					</tr>
 					<tr valign="top">
-						<td class="key"><label class="fcimport" for="created_col">State</label></td>
-						<td>
+						<td class="key"><label class="fckey" for="created_col">State</label></td>
+						<td class="fcimportdata">
 							<?php echo str_replace('<br />', '', $this->lists['states']); ?>
 						</td>
 					</tr>
 					<tr valign="top">
-						<td class="key"><label class="fcimport" for="created_col">Creation date</label></td>
-						<td>
-							<input type="radio" id="created_col0" name="created_col" value="0" checked="checked" /> <label for="created_col0">a. Current Date</label> &nbsp; &nbsp;
-							<input type="radio" id="created_col1" name="created_col" value="1" /> <label for="created_col1">b. Use 'created' column with a valid date, e.g. 17/10/2012</label> &nbsp; &nbsp;
+						<td class="key"><label class="fckey" for="created_col">Creation date</label></td>
+						<td class="fcimportdata">
+							<label for="created_col0" class="fcdata"><input type="radio" id="created_col0" name="created_col" value="0" checked="checked" /> a. Current Date</label> &nbsp; &nbsp;
+							<label for="created_col1" class="fcdata"><input type="radio" id="created_col1" name="created_col" value="1" /> b. Use 'created' column with a valid date, e.g. 17/10/2012</label> &nbsp; &nbsp;
 						</td>
 					</tr>
 					<tr valign="top">
-						<td class="key"><label class="fcimport" for="created_by_col">Creator (Author)</label></td>
-						<td>
-							<input type="radio" id="created_by_col0" name="created_by_col" value="0" checked="checked" /> <label for="created_by_col0">a. Current User</label> &nbsp; &nbsp;
-							<input type="radio" id="created_by_col1" name="created_by_col" value="1" /> <label for="created_by_col1">b. Use 'created_by' column containing USER IDs, e.g. 457</label> &nbsp; &nbsp;
+						<td class="key"><label class="fckey" for="created_by_col">Creator (Author)</label></td>
+						<td class="fcimportdata">
+							<label for="created_by_col0" class="fcdata"><input type="radio" id="created_by_col0" name="created_by_col" value="0" checked="checked" /> a. Current User</label> &nbsp; &nbsp;
+							<label for="created_by_col1" class="fcdata"><input type="radio" id="created_by_col1" name="created_by_col" value="1" /> b. Use 'created_by' column containing USER IDs, e.g. 457</label> &nbsp; &nbsp;
 						</td>
 					</tr>
 					<tr valign="top">
-						<td class="key"><label class="fcimport">Meta Data</label></td>
-						<td>
-							<input type="checkbox" id="metadesc_col" name="metadesc_col" value="1" /> <label for="metadesc_col" class="fc_small"> Use 'metadesc' column (METADATA Description) </label> &nbsp; &nbsp;
-							<input type="checkbox" id="metakey_col" name="metakey_col" value="1" /> <label for="metakey_col" class="fc_small"><small> Use 'metakey' column (METADATA Keywords) </label> &nbsp; &nbsp;
+						<td class="key"><label class="fckey">Meta Data</label></td>
+						<td class="fcimportdata">
+							<label for="metadesc_col" class="fcdata"><input type="checkbox" id="metadesc_col" name="metadesc_col" value="1" /> Use 'metadesc' column (METADATA Description) </label> &nbsp; &nbsp;
+							<label for="metakey_col" class="fcdata"><input type="checkbox" id="metakey_col" name="metakey_col" value="1" /> Use 'metakey' column (METADATA Keywords) </label> &nbsp; &nbsp;
 						</td>
 					<tr valign="top">
-						<td class="key"><label class="fcimport">Publication Dates</label></td>
-						<td>
+						<td class="key"><label class="fckey">Publication Dates</label></td>
+						<td class="fcimportdata">
 							(TAKE care to enter <b>valid dates</b> or process will fail e.g. 'YYYY-MM-DD hh:mm:ss' OR ''YYYY/MM/DD ' OR 'YY-MM-DD' )<br/>
-							<input type="checkbox" id="publish_up_col" name="publish_up_col" value="1" /> <label for="publish_up_col" class="fc_small"> Use 'publish_up' column (Start Publication) </label> &nbsp; &nbsp;
-							<input type="checkbox" id="publish_down_col" name="publish_down_col" value="1" /> <label for="publish_down_col" class="fc_small"> Use 'publish_down' column (End Publication) </label> &nbsp; &nbsp;
+							<label for="publish_up_col" class="fcdata"><input type="checkbox" id="publish_up_col" name="publish_up_col" value="1" /> Use 'publish_up' column (Start Publication) </label> &nbsp; &nbsp;
+							<label for="publish_down_col" class="fcdata"><input type="checkbox" id="publish_down_col" name="publish_down_col" value="1" /> Use 'publish_down' column (End Publication) </label> &nbsp; &nbsp;
 						</td>
 					</tr>
 					<tr valign="top">
-						<td class="key"><label class="fcimport">Tags</label></td>
-						<td>
-							(NOTE: for 'tags_names' column, tags not already existing, will be created automatically, before they assinged to the item)<br/>
-							<input type="radio" id="tags_col0" name="tags_col" value="0" checked="checked" /> <label for="tags_col0" class="fc_small">a. Do not import tags</label> &nbsp; &nbsp;
-							<input type="radio" id="tags_col1" name="tags_col" value="1" /> <label for="tags_col1" class="fc_small">b. Use 'tags_names' column (Comma separated list of tag names)</label> &nbsp; &nbsp;
-							<input type="radio" id="tags_col2" name="tags_col" value="2" /> <label for="tags_col2" class="fc_small">c. Use 'tags_raw' column (Comma separated list of tag ids)</label> &nbsp; &nbsp;
+						<td class="key"><label class="fckey">Tags</label></td>
+						<td class="fcimportdata">
+							(NOTE: for 'tags_names' column, tags not already existing, will be created automatically, before they assinged to the item) <br/>
+							<label for="tags_col0" class="fcdata"><input type="radio" id="tags_col0" name="tags_col" value="0" checked="checked" /> a. Do not import tags</label> &nbsp; &nbsp;
+							<label for="tags_col1" class="fcdata"><input type="radio" id="tags_col1" name="tags_col" value="1" /> b. Use 'tags_names'  (Comma separated list of tag names)</label> &nbsp; &nbsp;
+							<label for="tags_col2" class="fcdata"><input type="radio" id="tags_col2" name="tags_col" value="2" /> c. Use 'tags_raw' column (Comma separated list of tag ids)</label> &nbsp; &nbsp;
 						</td>
 					</tr>
 				</table>
@@ -181,21 +183,26 @@ function submitbutton(task) {
 					<legend><?php echo JText::_( 'FLEXI_IMPORT_CATS' ); ?></legend>
 					<table>
 						<tr valign="top">
-							<td class="key"><label class="fcimport" for="maincat"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label></td>
-							<td><?php echo $this->lists['maincat']; ?></td>
-							<td>&nbsp;</td>
-							<td class="key"><label class="fcimport" for="seccats"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label></td>
-							<td><?php echo $this->lists['seccats']; ?></td>
+							<td class="key"><label class="fckey" for="maincat"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label></td>
+							<td class="fcimportdata"><?php echo $this->lists['maincat']; ?></td>
+							<td class="fcimportdata">&nbsp;</td>
+							<td class="key"><label class="fckey" for="seccats"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label></td>
+							<td class="fcimportdata"><?php echo $this->lists['seccats']; ?></td>
 						</tr>
 						<tr valign="top">
-							<td class="key" colspan="2" align="left">
-								<label class="fcimport" for="maincat_col" style="float:left">File override <?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label><br />(Use 'catid' column, e.g. 54)</label>
-								<input type="checkbox" id="maincat_col" name="maincat_col" value="1" />
+							<td class="key" align="left">
+								<label class="fckey" for="maincat_col" style="clear:both;">File override <?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label>
 							</td>
-							<td>&nbsp;</td>
-							<td class="key" colspan="2" align="left">
-								<label class="fcimport" for="seccats_col" style="float:left">File override <?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label><br />(Use 'cid' column, e.g. 54,14,51)
-								<input type="checkbox" id="seccats_col" name="seccats_col" value="1" />
+							<td class="fcimportdata">
+								<input type="checkbox" id="maincat_col" name="maincat_col" value="1" /> (Use 'catid' column, e.g. 54)
+							</td>
+							<td class="fcimportdata">&nbsp;</td>
+							<td class="key" align="left">
+								<label class="fckey" for="seccats_col" style="clear:both;">File override <?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label>
+							</td>
+							</td>
+							<td class="fcimportdata">
+								<input type="checkbox" id="seccats_col" name="seccats_col" value="1" /> (Use 'cid' column, e.g. 54,14,51)
 							</td>
 						</tr>
 					</table>
@@ -209,50 +216,54 @@ function submitbutton(task) {
 				<table>
 					<tr>
 						<td class="key">
-							<label class="fcimport" for="field_separator"><?php echo JText::_( 'FLEXI_CSV_FIELD_SEPARATOR' ); ?>
+							<label class="fckey" for="field_separator"><?php echo JText::_( 'FLEXI_CSV_FIELD_SEPARATOR' ); ?>
 							<span style="color:red;"> *</span>
 							</label>
 						</td>
-						<td>
-							<input type="text" name="field_separator" id="field_separator" value="~~" /> &nbsp; <span style='font-weight:bold; color:green'>MULTIPLE characters recommended e.g : ~~ &nbsp; for tab enter: \t</span>
+						<td class="fcimportdata">
+							<input type="text" name="field_separator" id="field_separator" value="~~" class="fcfield_textval" /> &nbsp;
+							<span style='font-weight:bold; color:green'>MULTIPLE characters recommended e.g : ~~ &nbsp; for tab enter: \t</span>
 						</td>
 					</tr>
 					<tr>
 						<td class="key">
-							<label class="fcimport" for="enclosure_char"><?php echo JText::_( 'FLEXI_CSV_FIELD_ENCLOSURER_CHAR' ); ?>
+							<label class="fckey" for="enclosure_char"><?php echo JText::_( 'FLEXI_CSV_FIELD_ENCLOSURER_CHAR' ); ?>
 							</label>
 						</td>
-						<td>
-							<input type="text" name="enclosure_char" id="enclosure_char" value='' /> &nbsp; <span style='font-weight:bold; color:green'>Use <u>ONLY IF</u> your data have one, e.g for double quote enter: "</span>
+						<td class="fcimportdata">
+							<input type="text" name="enclosure_char" id="enclosure_char" value='' class="fcfield_textval" /> &nbsp;
+							<span style='font-weight:bold; color:green'>Use <u>ONLY IF</u> your data have one, e.g for double quote enter: "</span>
 						</td>
 					</tr>
 					<tr>
 						<td class="key">
-							<label class="fcimport" for="record_separator"><?php echo JText::_( 'FLEXI_CSV_ITEM_SEPARATOR' ); ?>
+							<label class="fckey" for="record_separator"><?php echo JText::_( 'FLEXI_CSV_ITEM_SEPARATOR' ); ?>
 							<span style="color:red;"> *</span>
 							</label>
 						</td>
-						<td>
-							<input type="text" name="record_separator" id="record_separator" value="\n~~" /> &nbsp; <span style='font-weight:bold; color:green'>MULTIPLE characters recommended e.g : \n~~ &nbsp; For new line enter: \n </span>
+						<td class="fcimportdata">
+							<input type="text" name="record_separator" id="record_separator" value="\n~~" class="fcfield_textval" /> &nbsp;
+							<span style='font-weight:bold; color:green'>MULTIPLE characters recommended e.g : \n~~ &nbsp; For new line enter: \n </span>
 						</td>
 					</tr>
 					<tr>
 						<td class="key">
-							<label class="fcimport" for="csvfile"><?php echo JText::_( 'FLEXI_CSVFILE' ); ?>
+							<label class="fckey" for="csvfile"><span style="color:red;">Debug first records</span>
+							</label>
+						</td>
+						<td class="fcimportdata">
+							<input type="text" name="debug" id="debug" value="0" class="fcfield_textval" /> &nbsp;
+							<span style='font-weight:bold; color:green'> Leave zero for no debugging, print the first nn records (items), without trying to insert any data </span>
+						</td>
+					</tr>
+					<tr>
+						<td class="key">
+							<label class="fckey" for="csvfile"><?php echo JText::_( 'FLEXI_CSVFILE' ); ?>
 							<span style="color:red;"> *</span>
 							</label>
 						</td>
-						<td>
-							<input type="file" name="csvfile" id="csvfile" value="" />
-						</td>
-					</tr>
-					<tr>
-						<td class="key">
-							<label class="fcimport" for="csvfile"><span style="color:red;">Debug first records</span>
-							</label>
-						</td>
-						<td>
-							<input type="text" name="debug" id="debug" value="0" /> &nbsp; <span style='font-weight:bold; color:green'> Leave zero for no debugging, print the first nn records (items), without trying to insert any data </span>
+						<td class="fcimportdata">
+							<input type="file" name="csvfile" id="csvfile" value="" class="fcfield_textval" />
 						</td>
 					</tr>
 				</table>

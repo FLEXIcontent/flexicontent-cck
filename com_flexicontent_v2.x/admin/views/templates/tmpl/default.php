@@ -25,6 +25,7 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminlist" cellspacing="1">
+	
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>

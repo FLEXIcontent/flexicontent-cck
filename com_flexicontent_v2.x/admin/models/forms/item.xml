@@ -86,7 +86,6 @@
 			<option value="1">FLEXI_SHOW</option>
 		</field>
 		<field name="readmore" type="text" size="30" default="" label="Alternative Read more text" description="PARAMALTREADMORE" />
-		
 	</fieldset>
 	
 	<fieldset name="params-advanced" label="FLEXI_PARAMETERS_ITEM_ADVANCED">
@@ -103,7 +102,6 @@
 		</field>
 		<!--field name="language" type="language" client="site" label="Content Language (for Browser)" description="Indication to the the browser for the language used to write this content" /-->
 		<!--field name="keyref" type="text" size="30" default="" label="Key Reference" description="A Unique Key which can be used to undentify the item in the URL, like &amp;key=keyref, note this is currently unusued" /-->
-		
 	</fieldset>
 	
 	<fieldset name="params-seoconf" label="FLEXI_PARAMETERS_ITEM_SEOCONF" addfieldpath="/administrator/components/com_flexicontent/elements">

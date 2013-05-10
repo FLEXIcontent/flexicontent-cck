@@ -45,11 +45,41 @@
 			<!--field name="filter_types" type="textarea" default="createdby,modifiedby,type,state,tags,checkbox,checkboximage,radio,radioimage,select,selectmultiple" rows="3" cols="60" label="FLEXI_FILTER_TYPES" description="FLEXI_FILTER_TYPES_DESC" menu="hide" /-->
 			
 		<param name="" type="separator" default="FLEXI_BROWSER_FRAMEWORKS" label="" level="level1" menu="hide" />
-			<param name="load_frameworks" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
+			<param name="" type="separator" default="FLEXI_USE_BROWSER_FRAMEWORKS" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" level="level3" menu="hide" />
+			<!--field name="load_frameworks" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
 				checkoptions="jQuery,(jQuery) image-picker,(jQuery) masonry,(jQuery) select2,(jQuery) inputmask,(jQuery) prettyCheckable,(jQuery) fancybox"
 				checkvals="jQuery,image-picker,masonry,select2,inputmask,prettyCheckable,fancybox"
 				defaultvals="jQuery,image-picker,masonry,select2,inputmask,prettyCheckable,fancybox"
-				label="FLEXI_LOAD_BROWSER_FRAMEWORKS" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" />
+				label="FLEXI_LOAD_BROWSER_FRAMEWORKS" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" /-->
+			<param name="loadfw_jquery" type="radio" default="1" label="jQuery" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" menu="hide" > 
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</param>
+			<param name="loadfw_image_picker" type="radio" default="1" label="image-picker" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" menu="hide" > 
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</param>
+			<param name="loadfw_masonry" type="radio" default="1" label="masonry" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" menu="hide" > 
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</param>
+			<param name="loadfw_select2" type="radio" default="1" label="select2" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" menu="hide" > 
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</param>
+			<param name="loadfw_inputmask" type="radio" default="1" label="inputmask" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" menu="hide" > 
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</param>
+			<param name="loadfw_prettycheckable" type="radio" default="1" label="prettyCheckable" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" menu="hide" > 
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+				<option value="0">FLEXI_NO</option>
+			</param>
+			<param name="loadfw_fancybox" type="radio" default="1" label="fancybox" description="FLEXI_LOAD_BROWSER_FRAMEWORKS_DESC" menu="hide" > 
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</param>
 				
 		<param name="" type="separator" default="FLEXI_PERFORMANCE_CONF" label="" level="level1" menu="hide" />
 			

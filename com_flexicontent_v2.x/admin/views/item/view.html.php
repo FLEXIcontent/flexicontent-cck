@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1319 2012-05-26 19:27:51Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1681 2013-05-04 23:51:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -360,27 +360,27 @@ class FlexicontentViewItem extends JViewLegacy
 			// build featured flag
 			$fieldname = 'jform[featured]';
 			$elementid = 'jform_featured';
-			if (!$prettycheckable_added) {
-				$featured = array();
-				$featured[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
-				$featured[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_YES' ) );
-				$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-				$lists['featured'] = JHTML::_('select.radiolist', $featured, $fieldname, $attribs, 'value', 'text', $row->featured, $elementid);
-			}
-			else {
-				$classes = ' use_prettycheckable ';
-				$attribs = ' class="'.$classes.'" ';
-				$i = 0;
-				$options = array(0=>JText::_( 'FLEXI_NO' ), 1=>JText::_( 'FLEXI_YES' ) );
-				$lists['featured'] = '';
-				foreach ($options as $option_id => $option_label) {
-					$checked = $option_id==$row->featured ? ' checked="checked"' : '';
-					$elementid_no = $elementid.'_'.$i;
-					$extra_params = ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
-					$lists['featured'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
-						.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
-					$i++;
-				}
+			/*
+			$options = array();
+			$options[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
+			$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_YES' ) );
+			$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+			$lists['featured'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $row->featured, $elementid);
+			*/
+			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+			$attribs = ' class="'.$classes.'" ';
+			$i = 1;
+			$options = array(0=>JText::_( 'FLEXI_NO' ), 1=>JText::_( 'FLEXI_YES' ) );
+			$lists['featured'] = '';
+			foreach ($options as $option_id => $option_label) {
+				$checked = $option_id==$row->featured ? ' checked="checked"' : '';
+				$elementid_no = $elementid.'_'.$i;
+				if (!$prettycheckable_added) $lists['featured'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
+				$extra_params = !$prettycheckable_added ? '' : ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$lists['featured'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+				if (!$prettycheckable_added) $lists['featured'] .= '&nbsp;'.JText::_($option_label).'</label>';
+				$i++;
 			}
 		}
 		// *** EOF: J1.5 SPECIFIC SELECT LISTS
@@ -388,45 +388,45 @@ class FlexicontentViewItem extends JViewLegacy
 		// build version approval list
 		$fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
 		$elementid = FLEXI_J16GE ? 'jform_vstate' : 'vstate';
-		if (!$prettycheckable_added) {
-			$options = array();
-			$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
-			$options[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
-			$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-			$lists['vstate'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
-		}
-		else {
-			$classes = ' use_prettycheckable ';
-			$attribs = ' class="'.$classes.'" ';
-			$i = 1;
-			$options = array(1=>JText::_( 'FLEXI_NO' ), 2=>JText::_( 'FLEXI_YES' ) );
-			$lists['vstate'] = '';
-			foreach ($options as $option_id => $option_label) {
-				$checked = $option_id==2 ? ' checked="checked"' : '';
-				$elementid_no = $elementid.'_'.$i;
-				$extra_params = ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
-				$lists['vstate'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
-					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
-				$i++;
-			}
+		/*
+		$options = array();
+		$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+		$options[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
+		$attribs = FLEXI_J16GE ? ' style ="float:left!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+		$lists['vstate'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
+		*/
+		$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+		$attribs = ' class="'.$classes.'" ';
+		$i = 1;
+		$options = array(1=>JText::_( 'FLEXI_NO' ), 2=>JText::_( 'FLEXI_YES' ) );
+		$lists['vstate'] = '';
+		foreach ($options as $option_id => $option_label) {
+			$checked = $option_id==2 ? ' checked="checked"' : '';
+			$elementid_no = $elementid.'_'.$i;
+			if (!$prettycheckable_added) $lists['vstate'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
+			$extra_params = !$prettycheckable_added ? '' : ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+			$lists['vstate'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
+				.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+			if (!$prettycheckable_added) $lists['vstate'] .= '&nbsp;'.JText::_($option_label).'</label>';
+			$i++;
 		}
 		
 		if ($subscribers) {
 			// build favs notify field
 			$fieldname = FLEXI_J16GE ? 'jform[notify]' : 'notify';
 			$elementid = FLEXI_J16GE ? 'jform_notify' : 'notify';
-			if (!$prettycheckable_added) {
-				$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-				$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
-			}
-			else {
-				$classes = ' use_prettycheckable ';
-				$attribs = ' class="'.$classes.'" ';
-				$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
-				$extra_params = ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
-				$lists['notify'] = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid
-					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' />';
-			}
+			/*
+			$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+			$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
+			*/
+			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+			$attribs = ' class="'.$classes.'" ';
+			$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
+			if (!$prettycheckable_added) $lists['notify'] .= '<label class="fccheckradio_lbl" for="'.$elementid.'">';
+			$extra_params = !$prettycheckable_added ? '' : ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
+			$lists['notify'] = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid
+				.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' />';
+			if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
 		}
 		
 		// Retrieve author configuration

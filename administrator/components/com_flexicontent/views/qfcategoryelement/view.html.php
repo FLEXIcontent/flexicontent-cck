@@ -68,7 +68,7 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy {
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 
-		$ordering = ($lists['order'] == 'c.ordering');
+		$ordering = ($lists['order'] == (FLEXI_J16GE ? 'c.lft' : 'c.ordering') );
 
 		//assign data to template
 		$this->assignRef('lists'     	, $lists);

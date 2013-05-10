@@ -18,6 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
+
 <!-- CSS fixes for J2.5.x -->
 <style>
 	form.lang_submit select#lang {  float:none;	margin:0px;  }

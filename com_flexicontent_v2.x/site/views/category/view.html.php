@@ -292,10 +292,11 @@ class FlexicontentViewCategory extends JViewLegacy
 				
 				$meta_params = new JRegistry($category->metadata);
 				
-				if ($app->getCfg('MetaTitle') == '1') {
+				// Deprecated <title> tag is used instead by search engines
+				/*if ($app->getCfg('MetaTitle') == '1') {
 					$meta_title = $meta_params->get('page_title') ? $meta_params->get('page_title') : $category->title;
 					$document->setMetaData('title', $meta_title);
-				}
+				}*/
 				
 				if ($app->getCfg('MetaAuthor') == '1') {
 					if ( $meta_params->get('author') ) {
@@ -307,7 +308,8 @@ class FlexicontentViewCategory extends JViewLegacy
 					$document->setMetaData('author', $meta_author);
 				}
 			} else {
-				if ($app->getCfg('MetaTitle') == '1')   $document->setMetaData('title', $category->title);
+				// Deprecated <title> tag is used instead by search engines
+				/*if ($app->getCfg('MetaTitle') == '1')   $document->setMetaData('title', $category->title);*/
 			}
 		}
 		

@@ -371,7 +371,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Set item's META data: desc, keyword, title, author
 		if ($item->metadesc)		$document->setDescription( $item->metadesc );
 		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
-		if ($app->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
+		// Deprecated <title> tag is used instead by search engines
+		//if ($app->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
 		if ($app->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
 
 		// Set remaining META keys
@@ -1055,45 +1056,45 @@ class FlexicontentViewItem  extends JViewLegacy
 		// build version approval list
 		$fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
 		$elementid = FLEXI_J16GE ? 'jform_vstate' : 'vstate';
-		if (!$prettycheckable_added) {
-			$options = array();
-			$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
-			$options[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
-			$attribs = FLEXI_J16GE ? ' style ="float:left!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-			$lists['vstate'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
-		}
-		else {
-			$classes = ' use_prettycheckable ';
-			$attribs = ' class="'.$classes.'" ';
-			$i = 1;
-			$options = array(1=>JText::_( 'FLEXI_NO' ), 2=>JText::_( 'FLEXI_YES' ) );
-			$lists['vstate'] = '';
-			foreach ($options as $option_id => $option_label) {
-				$checked = $option_id==2 ? ' checked="checked"' : '';
-				$elementid_no = $elementid.'_'.$i;
-				$extra_params = ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
-				$lists['vstate'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
-					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
-				$i++;
-			}
+		/*
+		$options = array();
+		$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_NO' ) );
+		$options[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_YES' ) );
+		$attribs = FLEXI_J16GE ? ' style ="float:left!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+		$lists['vstate'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', 2, $elementid);
+		*/
+		$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+		$attribs = ' class="'.$classes.'" ';
+		$i = 1;
+		$options = array(1=>JText::_( 'FLEXI_NO' ), 2=>JText::_( 'FLEXI_YES' ) );
+		$lists['vstate'] = '';
+		foreach ($options as $option_id => $option_label) {
+			$checked = $option_id==2 ? ' checked="checked"' : '';
+			$elementid_no = $elementid.'_'.$i;
+			if (!$prettycheckable_added) $lists['vstate'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
+			$extra_params = !$prettycheckable_added ? '' : ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+			$lists['vstate'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
+				.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+			if (!$prettycheckable_added) $lists['vstate'] .= '&nbsp;'.JText::_($option_label).'</label>';
+			$i++;
 		}
 		
 		if ($subscribers) {
 			// build favs notify field
 			$fieldname = FLEXI_J16GE ? 'jform[notify]' : 'notify';
 			$elementid = FLEXI_J16GE ? 'jform_notify' : 'notify';
-			if (!$prettycheckable_added) {
-				$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-				$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
-			}
-			else {
-				$classes = ' use_prettycheckable ';
-				$attribs = ' class="'.$classes.'" ';
-				$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
-				$extra_params = ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
-				$lists['notify'] = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid
-					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' />';
-			}
+			/*
+			$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+			$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
+			*/
+			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+			$attribs = ' class="'.$classes.'" ';
+			$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
+			if (!$prettycheckable_added) $lists['notify'] .= '<label class="fccheckradio_lbl" for="'.$elementid.'">';
+			$extra_params = !$prettycheckable_added ? '' : ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
+			$lists['notify'] = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid
+				.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' />';
+			if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
 		}
 		
 		// build version approval list
@@ -1106,27 +1107,27 @@ class FlexicontentViewItem  extends JViewLegacy
 
 			$fieldname = FLEXI_J16GE ? 'jform[attribs][comments]' : 'params[comments]';
 			$elementid = FLEXI_J16GE ? 'jform_attribs_comments' : 'params_comments';
-			if (!$prettycheckable_added) {
-				$options = array();
-				$options[] = JHTML::_('select.option', "",  JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ) );
-				$options[] = JHTML::_('select.option', 0, JText::_( 'FLEXI_DISABLE' ) );
-				$attribs = FLEXI_J16GE ? ' style ="float:left!important;" ' : '';
-				$lists['disable_comments'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $fieldvalue, $elementid);
-			}
-			else {
-				$classes = ' use_prettycheckable ';
-				$attribs = ' class="'.$classes.'" ';
-				$i = 1;
-				$options = array(""=>JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ), 0=>JText::_( 'FLEXI_DISABLE' ) );
-				$lists['disable_comments'] = '';
-				foreach ($options as $option_id => $option_label) {
-					$checked = $option_id===$fieldvalue ? ' checked="checked"' : '';
-					$elementid_no = $elementid.'_'.$i;
-					$extra_params = ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
-					$lists['disable_comments'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
-						.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
-					$i++;
-				}
+			/*
+			$options = array();
+			$options[] = JHTML::_('select.option', "",  JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ) );
+			$options[] = JHTML::_('select.option', 0, JText::_( 'FLEXI_DISABLE' ) );
+			$attribs = FLEXI_J16GE ? ' style ="float:none!important;" ' : '';
+			$lists['disable_comments'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $fieldvalue, $elementid);
+			*/
+			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+			$attribs = ' class="'.$classes.'" ';
+			$i = 1;
+			$options = array(""=>JText::_( 'FLEXI_DEFAULT_BEHAVIOR' ), 0=>JText::_( 'FLEXI_DISABLE' ) );
+			$lists['disable_comments'] = '';
+			foreach ($options as $option_id => $option_label) {
+				$checked = $option_id===$fieldvalue ? ' checked="checked"' : '';
+				$elementid_no = $elementid.'_'.$i;
+				if (!$prettycheckable_added) $lists['disable_comments'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
+				$extra_params = !$prettycheckable_added ? '' : ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$lists['disable_comments'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
+				if (!$prettycheckable_added) $lists['disable_comments'] .= '&nbsp;'.JText::_($option_label).'</label>';
+				$i++;
 			}
 		}
 

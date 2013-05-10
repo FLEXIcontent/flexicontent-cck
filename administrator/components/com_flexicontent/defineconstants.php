@@ -158,5 +158,5 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/
 
 // Version constants
 define('FLEXI_VERSION',	FLEXI_J16GE ? '2.0.3 beta' : '2.0.3 beta');
-define('FLEXI_RELEASE',	'r1681');
+define('FLEXI_RELEASE',	'r1682');
 ?>

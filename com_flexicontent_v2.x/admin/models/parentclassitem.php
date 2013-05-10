@@ -170,7 +170,7 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function get($property, $default=null)
 	{
-		if ($this->_loadItem()) {
+		if ($this->_item || $this->_loadItem()) {
 			if(isset($this->_item->$property)) {
 				return $this->_item->$property;
 			}
@@ -206,7 +206,7 @@ class ParentClassItem extends JModelAdmin
 	 * @return	array
 	 * @since	1.0
 	 */
-	function &getItem($pk=null, $check_view_access=true, $no_cache=false)
+	function &getItem($pk=null, $check_view_access=true, $no_cache=false, $force_version=false)
 	{
 		$app     = JFactory::getApplication();
 		$cparams = $this->_cparams;
@@ -227,7 +227,7 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		// --. Try to load existing item
-		if ( $pk && $this->_loadItem($no_cache) )
+		if ( $pk && $this->_loadItem($no_cache, $force_version) )
 		{
 			// Successfully loaded existing item, do some extra manipulation of the loaded item ...
 			// Extra Steps for Frontend
@@ -269,7 +269,7 @@ class ParentClassItem extends JModelAdmin
 	 * @return	boolean	True on success
 	 * @since	1.0
 	 */
-	function _loadItem( $no_cache=false )
+	function _loadItem( $no_cache=false, $force_version=false )
 	{
 		if(!$this->_id) return false;  // Only try to load existing item
 		
@@ -281,7 +281,8 @@ class ParentClassItem extends JModelAdmin
 		if ( $no_cache ) {
 			// Clear item to make sure it is reloaded
 			$this->_item = null;
-		} else if ( isset($items[$this->_id]) ) {
+		}
+		else if ( isset($items[$this->_id]) ) {
 			$this->_item = & $items[$this->_id];
 			return (boolean) $this->_item;
 		}
@@ -316,13 +317,15 @@ class ParentClassItem extends JModelAdmin
 			$version = JRequest::getVar('version', 0, 'request', 'int' );          // the item version to load
 		
 			// -- Decide the version to load: (a) the one specified by request or (b) the current one or (c) the latest one
-			$current_version = FLEXIUtilities::getCurrentVersions($this->_id, true); // Get current item version
-			$last_version    = FLEXIUtilities::getLastVersions($this->_id, true);    // Get last version (=latest one saved, highest version id),
+			$current_version = FLEXIUtilities::getCurrentVersions($this->_id, true, $force=true); // Get current item version
+			$last_version    = FLEXIUtilities::getLastVersions($this->_id, true, $force=true);    // Get last version (=latest one saved, highest version id),
 		
 			// NOTE: Setting version to zero indicates to load the current version from the normal tables and not the versioning table
 			if ( !$use_versioning ) {
 				// Force version to zero (load current version), when not using versioning mode
 				$version = 0;
+			} else if ($force_version !== false) {
+				$version = $force_version==-1 ? $last_version : $force_version;
 			} else if ($version == 0) {
 				// version request variable was NOT SET ... We need to decide to load current (version zero) or latest
 				
@@ -752,18 +755,19 @@ class ParentClassItem extends JModelAdmin
 				// Retrieve Creator NAME and email (used to display the gravatar)
 				$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->created_by;
 				$db->setQuery($query);
-				$creator_data = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-				$creator_found = count($creator_data);
-				$item->creator = $creator_found ? $creator_data[0] : '';
-				$item->creatoremail = $creator_found ? $creator_data[0] : '';
+				$creator_data = $db->loadObject();
+				$item->creator = $creator_data ? $creator_data->name : '';
+				$item->creatoremail = $creator_data ? $creator_data->email : '';
 				
 				// Retrieve Modifier NAME
 				if ($item->created_by == $item->modified_by) {
 					$item->modifier = $item->creator;
 				} else {
-					$query = 'SELECT name FROM #__users WHERE id = '. (int) $item->modified_by;
+					$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->modified_by;
 					$db->setQuery($query);
-					$item->modifier = $db->loadResult();
+					$modifier_data = $db->loadObject();
+					$item->modifier = $modifier_data ? $modifier_data->name : '';
+					$item->modifieremail = $modifier_data ? $modifier_data->email : '';
 				}
 				
 				// Clear modified Date, if it is an invalid "null" date
@@ -1435,6 +1439,7 @@ class ParentClassItem extends JModelAdmin
 		$nullDate   = $this->_db->getNullDate();
 		$view = JRequest::getVar('view', false);
 		JRequest::setVar("isflexicontent", "yes");
+		$use_versioning = $cparams->get('use_versioning', 1);
 		
 		// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
 		$site_zone = $app->getCfg('offset');
@@ -1646,8 +1651,19 @@ class ParentClassItem extends JModelAdmin
 		// *****************************************************************
 		// SECURITY concern: Check form tampering of state related variables
 		// *****************************************************************
-		if ($isnew) $item->catid = $data['catid'];  // Needed for checking edit state permission of new items
+		
+		// Save old main category & creator (owner)
+		$old_created_by = $item->created_by;
+		$old_catid      = $item->catid;
+		
+		// New or Existing item must use the current user + new main category to calculate 'Edit State' privelege
+		$item->created_by = $user->get('id');
+		$item->catid      = $data['catid'];
 		$canEditState = $this->canEditState( $item, $check_cat_perm=true );
+		
+		// Restore old main category & creator (owner) (in case following code chooses to keep them)
+		$item->created_by = $old_created_by;
+		$item->catid      = $old_catid;
 		
 		// If cannot edit state prevent user from changing state related parameters
 		if ( !$canEditState )
@@ -1669,13 +1685,19 @@ class ParentClassItem extends JModelAdmin
 			
 			if (!$isnew) {
 				// Prevent changing state of existing items by users that cannot publish
-				$data['state'] = $item->state;
-				
-			} else if ($autopublished) {
+				$catid_changed = $old_catid != $data['catid'];
+				if ($catid_changed && !$use_versioning) {
+					$data['state'] = $pending_approval_state;
+					$app->enqueueMessage('You have changed category for this content item to be a category in which you cannot publish, you content item is now in "Pending Approval" State, you will have to wait for it to be re-approved', 'warning');
+				} else {
+					$data['state'] = $item->state;
+				}
+			}
+			else if ($autopublished) {
 				// Autopublishing new item via menu configuration
 				$data['state'] = $pubished_state;
-				
-			} else {
+			}
+			else {
 				// The preselected forced state of -NEW- items for users that CANNOT publish, and autopublish via menu item is disabled
 				if ( $app->isAdmin() ) {
 					$data['state'] = $cparams->get('non_publishers_item_state', $draft_state);     // Use the configured setting for backend items
@@ -1824,7 +1846,6 @@ class ParentClassItem extends JModelAdmin
 		// ****************************************************************************************************************
 		$last_version = FLEXIUtilities::getLastVersions($item->id, true);
 		$current_version = FLEXIUtilities::getCurrentVersions($item->id, true);
-		$use_versioning = $cparams->get('use_versioning', 1);
 		
 		// (a) Force item approval when versioning disabled
 		$data['vstate'] = ( !$use_versioning ) ? 2 : $data['vstate'];
@@ -1885,7 +1906,7 @@ class ParentClassItem extends JModelAdmin
 			$this->applyCurrentVersion($item, $data, $createonly=true);
 		} else {
 			// Make sure the data of the model are correct,
-			// e.g. a getFrom() used to validate input data may have set an empty item and empty id
+			// e.g. a getForm() used to validate input data may have set an empty item and empty id
 			// e.g. type_id of item may have been altered by authorized users
 			$this->_id   = $item->id;
 			$this->_item = & $item;
@@ -3408,7 +3429,7 @@ class ParentClassItem extends JModelAdmin
 		$notify_text   = $notify_vars->notify_text;
 		$before_cats   = $notify_vars->before_cats;
 		$after_cats    = $notify_vars->after_cats;
-		$before_state  = $notify_vars->before_state;
+		$oitem         = $notify_vars->original_item;
 		
 		if ( !count($notify_emails) ) return true;
 		
@@ -3482,15 +3503,21 @@ class ParentClassItem extends JModelAdmin
 		
 		// ADD INFO for item title
 		$body  = '<u>'.JText::_( 'FLEXI_NF_CONTENT_TITLE' ) . "</u>: ";
+		if ( !$isnew ) {
+			$_changed = $oitem->title != $this->get('title');
+			$body .= " [ ". JText::_($_changed ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
+			$body .= !$_changed ? "" : $oitem->title . " &nbsp; ==> &nbsp; ";
+		}
 		$body .= $this->get('title'). "<br/>\r\n<br/>\r\n";
 		
 		// ADD INFO about state
 		$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
 		
 		$body .= '<u>'.JText::_( 'FLEXI_NF_CONTENT_STATE' ) . "</u>: ";
-		if ( !$isnew )
-		{
-			$body .= JText::_( $state_names[$before_state] ) . " &nbsp; ==> &nbsp; ";
+		if ( !$isnew ) {
+			$_changed = $oitem->state != $this->get('state');
+			$body .= " [ ". JText::_( $_changed ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
+			$body .= !$_changed ? "" : JText::_( $state_names[$oitem->state] ) . " &nbsp; ==> &nbsp; ";
 		}
 		$body .= JText::_( $state_names[$this->get('state')] ) ."<br/><br/>\r\n";
 		
@@ -3498,6 +3525,11 @@ class ParentClassItem extends JModelAdmin
 		if ( in_array('creator',$nf_extra_properties) )
 		{
 			$body .= '<u>'.JText::_( 'FLEXI_NF_CREATOR_LONG' ) . "</u>: ";
+			if ( !$isnew ) {
+				$_changed = $oitem->created_by != $this->get('created_by');
+				$body .= " [ ". JText::_($_changed ? 'FLEXI_NF_MODIFIED' : 'FLEXI_NF_UNCHANGED') . " ] : <br/>\r\n";
+				$body .= !$_changed ? "" : $oitem->creator . " &nbsp; ==> &nbsp; ";
+			}
 			$body .= $this->get('creator'). "<br/>\r\n";
 		}
 		if ( in_array('modifier',$nf_extra_properties) && !$isnew )
@@ -3808,7 +3840,6 @@ class ParentClassItem extends JModelAdmin
 			$notify_vars->notify_text   = $validators->notify_text;
 			$notify_vars->before_cats   = array();
 			$notify_vars->after_cats    = $after_cats;
-			$notify_vars->before_state  = null;
 					
 			$this->sendNotificationEmails($notify_vars, $params, $manual_approval_request=1);
 			$submitted++;

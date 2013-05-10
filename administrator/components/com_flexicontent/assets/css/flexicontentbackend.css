@@ -655,115 +655,55 @@ div#result table.versionlist th {
 	background-color:#dddddd;
 }
 
+div label.state_box,
 div label.lang_box {
 	white-space:nowrap;
 	display:inline-block!important;
-	float:none!important;
-	margin: 0px 2px 0px 0px !important;
+	float:left!important;
+	margin: 0px 8px 0px 0px !important;
 	padding: 0px!important;
 }
+div label.state_box input,
+div label.state_box .lang_lbl,
 div label.lang_box input,
 div label.lang_box .lang_lbl {
 	display:inline-block; float:left;
 }
 
 /* Import view */
-.fcimport {
-	width: 120px;
-	display: block;
-	float: left;
+#flexicontent table label.fckey {
+	display:inline-block;
+	float:none !important;
+	width:82%;
+	padding:6px 6% !important;
+	margin:1px 6% 0px 1px;
+}
+.fcimportdata {
+	padding-top:6px;
+	font-size:12px;
+}
+.fcimportdata label.fcdata {
+ margin-right:12px !important;
+ display: inline !important;
+ clear:both;
 }
 
-#permissions-sliders .pane-toggler-down span.level, #permissions-sliders .pane-toggler span.level {
-	background-image:none; padding:0;
-}
-
-#flexicontent .fields_tabset,
-#flexicontent .params_tabset {
-	width:100% !important;
-}
-
-/*************************
- * Rules for basic tabbing
- *************************/
- 
-#flexicontent .tabberlive {
-	margin: 0px 0px 6px 0px !important;
-	padding: 0px !important;
+#flexicontent div.fields_tabset,
+#flexicontent div.params_tabset {
 	width: 100% !important;
-	float: left;
-	border-width: 0px;
+	padding: 0%;
 }
 
-#flexicontent .tabbertab {
-	margin: 0px !important;
-	padding: 5px 3px 3px 5px !important;
-	width: 99% !important;
-	float: left;
+#flexicontent div div.params_tabset,
+	margin-top: 24px !important;
 }
 
-#flexicontent .fctabber { overflow:visible; width:5000px; }
-
-#flexicontent ul.tabbernav {
-	line-height: 100% !important;
-	border-bottom: 1px solid #808080 !important;
-	font: bold 11px Verdana,sans-serif !important;
-	margin: 0 !important;
-	padding: 0px 6px 0px 4px !important;
-	width: 99% !important;
-	display: inline-block !important;
+#flexicontent .panel h3 a { padding:0px 0px 4px 0px; }
+#flexicontent .pane-sliders .panel .pane-slider { padding: 0px !important; }
+#flexicontent .pane-sliders .panel .pane-slider fieldset.panelform {
+	margin: 4px !important;
+	border: 1px solid lightgray !important;
 }
-
-#flexicontent ul.tabbernav li {
-	line-height: 100% !important;
-	padding: 0px !important;
-	margin: 0px 0px -1px 8px !important;
-	overflow: visible !important;
-	display: inline-block !important;
-	float:left;
-}
-
-#flexicontent ul.tabbernav li a {
-	line-height: 100% !important;
-	font-size: 11px !important;
-	margin: 0px !important;
-	padding-left: 5px;
-	padding-right: 5px;
-	padding-top: 4px !important;
-	padding-bottom: 5px !important;
-	display: inline-block !important;
-	border-radius: 8px 8px 0px 0px !important;
-	/*box-shadow: 0px -1px 1px lightgray;*/
-	border-left: 1px solid #D0D0D0;
-	border-top: 1px solid #B0B0B0;
-	border-right: 1px solid #808080;
-}
-
-#flexicontent ul.tabbernav li a {
-	background: none repeat scroll 0 0 #AAAAEE;
-	/*border-color: #222277;*/
-	color: #000000;
-}
-
-#flexicontent ul.tabbernav li:hover a {
-	background: none repeat scroll 0 0 #aa0000;
-	border-left: 1px solid #aa5555;
-	border-top: 1px solid #995555;
-	border-right: 1px solid #775555;
-	color: white;
-}
-
-#flexicontent ul.tabbernav li.tabberactive a,
-#flexicontent ul.tabbernav li.tabberactive a:hover
-{
-	color: black !important;
-	background-color: white !important;
-	border-bottom: 1px solid white !important;
-	border-left: 1px solid #D0D0D0;
-	border-top: 1px solid #B0B0B0;
-	border-right: 1px solid #808080;
-}
-
 
 
 #flexicontent .fcfield-sortables { margin:0px!important; padding:0px!important; }
@@ -818,14 +758,15 @@ div fieldset input, div fieldset textarea, div fieldset select, div fieldset img
 
 dl.tabs dt { font-size:10px !important; font-family:tahoma !important; font-weight:normal !important; }
 
-div.flexi_edit table.adminform td { padding: 0px 2px 0px 2px; }
-div.flexi_edit table.adminform { margin: 0px; }
+#flexicontent table.adminform td { padding: 0px 2px 0px 2px; }
+#flexicontent table.adminform { margin: 0px; }
 
-div.flexi_edit span.flexi_label label { float:right; margin:0px; padding:0px; }
-div.flexi_edit span.flexi_label label label { float:right; margin:auto; padding:auto; }
+#flexicontent span.flexi_label label { float:right; margin:0px; padding:0px; }
+#flexicontent span.flexi_label label label { float:right; margin:auto; padding:auto; }
 
-div.flexi_edit .flexi_label.fcdualline { width:32%; padding: 6px 2% 6px 2% !important; }
-div.flexi_edit .flexi_label {
+#flexicontent .flexi_label.fcdualline { width:32%; padding: 6px 2% 6px 2% !important; }
+#flexicontent label.fckey,
+#flexicontent .flexi_label {
 	display: block;
 	float: left !important;
 	color: #606060;
@@ -844,38 +785,38 @@ div.flexi_edit .flexi_label {
   border-radius:6px;
 }
 
-div.flexi_edit .flexi_label.invalid {
+#flexicontent .flexi_label.invalid {
 	color:red !important;
 }
 
-div.flexi_edit .flexi_label.fc_tooltip_icon_bg {
+#flexicontent .flexi_label.fc_tooltip_icon_bg {
   padding: 6px 3% 6px 1% !important;
   width: 14%;
   max-width:126px;
 	background: url(../images/lightbulb.png) 98% 5px no-repeat #F2F2F2;
 }
 
-div.flexi_edit .flexi_label.invalid {
+#flexicontent .flexi_label.invalid {
 	font-weight: bold;
 }
-div.flexi_edit .flexi_formblock {
+#flexicontent .flexi_formblock {
 	clear: both; width:100%; padding:0; margin:0;
 }
 
-div.flexi_edit { margin:0px!important; }
-div.flexi_edit fieldset.basicfields_set,
-div.flexi_edit fieldset.flexiaccess,
-div.flexi_edit fieldset.customfields_set {
+#flexicontent { margin:0px!important; }
+#flexicontent fieldset.basicfields_set,
+#flexicontent fieldset.flexiaccess,
+#flexicontent fieldset.customfields_set {
 	border: 1px solid #dddddd;
-	margin: 0px 0px 1em 0px;
-	padding: 4px 8px 4px 8px;
-	margin-top:0px; margin-bottom:32px;
+	margin: 1em 0px 0px 0px !important;
+	padding: 4px 8px 4px 8px !important;
 }
+#flexicontent fieldset.flexiaccess { margin-bottom: 1em !important; }
 
-div.flexi_edit form input,
-div.flexi_edit form button,
-div.flexi_edit form select,
-div.flexi_edit form textarea {
+#flexicontent form input,
+#flexicontent form button,
+#flexicontent form select,
+#flexicontent form textarea {
 	background-color: #ffffff;
 	border: 1px solid #dddddd;
 	cursor: pointer;
@@ -883,8 +824,8 @@ div.flexi_edit form textarea {
 	padding: 0.1em 0.4em 0.1em 0.2em;
 }
 
-div.flexi_edit form input.invalid,
-div.flexi_edit form select.invalid {
+#flexicontent form input.invalid,
+#flexicontent form select.invalid {
 	border: 1px dotted #ff0000;
 }
 
@@ -1177,8 +1118,14 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	display:inline-block !important; visibility:hidden !important; float:left !important;
 }
 
-label.fccheckradio_lbl {
-	display:inline-block; white-space:nowrap;
+label.fccheckradio_lbl, span.fcselect_lbl {
+	display:inline-block;
+	white-space:nowrap;
+	padding-right: 8px;
+	min-width:0px;
+	margin: 0px 0px 0px 2px;
+	float: left;
+	clear: none;
 }
 
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/

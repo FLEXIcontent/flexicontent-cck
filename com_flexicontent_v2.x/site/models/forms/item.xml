@@ -60,6 +60,7 @@
 	</fieldset>
 	<fields name="attribs">
 	<fieldset name="params-basic" label="FLEXI_PARAMETERS_ITEM_BASIC" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" description="..." level="level2" />
 		<!--field name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
@@ -75,6 +76,7 @@
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
+		<field name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" description="..." level="level2" />
 		<field name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
@@ -86,10 +88,10 @@
 			<option value="1">FLEXI_SHOW</option>
 		</field>
 		<field name="readmore" type="text" size="30" default="" label="Alternative Read more text" description="PARAMALTREADMORE" />
-		
 	</fieldset>
 	
 	<fieldset name="params-advanced" label="FLEXI_PARAMETERS_ITEM_ADVANCED">
+		<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR" description="..." level="level2" />
 		<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
@@ -103,10 +105,9 @@
 		</field>
 		<!--field name="language" type="language" client="site" label="Content Language (for Browser)" description="Indication to the the browser for the language used to write this content" /-->
 		<!--field name="keyref" type="text" size="30" default="" label="Key Reference" description="A Unique Key which can be used to undentify the item in the URL, like &amp;key=keyref, note this is currently unusued" /-->
-		
 	</fieldset>
 	
-	<fieldset name="params-seoconf" label="FLEXI_PARAMETERS_ITEM_SEOCONF" addfieldpath="/administrator/components/com_flexicontent/elements">
+	<fieldset name="params-seoconf" label="FLEXI_PARAMETERS_ITEM_SEO" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
 		<field name="override_title" type="list" default="" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
@@ -128,6 +129,7 @@
 	</fieldset>
 	
 	<fieldset name="themes" label="FLEXI_PARAMETERS_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<field name="" type="separator" default="FLEXI_PARAMETERS_APPEARANCE" description="..." level="level2" />
 		<field name="ilayout_mobile" type="itemlayout" class="use_select2_lib" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 		<field name="ilayout" type="itemlayout" class="use_select2_lib" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" onchange="activatePanel(this.value);" />
 	</fieldset>

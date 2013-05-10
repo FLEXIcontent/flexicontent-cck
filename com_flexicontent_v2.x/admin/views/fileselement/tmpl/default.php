@@ -88,7 +88,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 				</fieldset>
 				<?php echo JHTML::_( 'form.token' ); ?>
 				<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
-				<input type="hidden" name="itemid" value="<?php echo $this->itemid; ?>" />
+				<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 				<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode); ?>" />
 			</form>
@@ -330,7 +330,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
-	<input type="hidden" name="itemid" value="<?php echo $this->itemid; ?>" />
+	<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 	<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 	<input type="hidden" name="filename" value="" />
 </form>

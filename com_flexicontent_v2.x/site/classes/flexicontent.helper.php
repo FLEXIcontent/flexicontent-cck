@@ -245,14 +245,21 @@ class flexicontent_html
 		$app = JFactory::getApplication();
 		static $load_frameworks = null;
 		static $load_jquery = null;
-		if ($load_frameworks === null) {
+		if ( !isset($load_frameworks[$framework]) ) {
 			$flexiparams = JComponentHelper::getParams('com_flexicontent');
-			$load_frameworks = $flexiparams->get('load_frameworks', array('jQuery','image-picker','masonry','select2','inputmask','prettyCheckable','fancybox'));
-			$load_frameworks = FLEXIUtilities::paramToArray($load_frameworks);
-			$load_frameworks = array_flip($load_frameworks);
-			$load_jquery = isset($load_frameworks['jQuery']) || !$app->isSite();
+			//$load_frameworks = $flexiparams->get('load_frameworks', array('jQuery','image-picker','masonry','select2','inputmask','prettyCheckable','fancybox'));
+			//$load_frameworks = FLEXIUtilities::paramToArray($load_frameworks);
+			//$load_frameworks = array_flip($load_frameworks);
+			//$load_jquery = isset($load_frameworks['jQuery']) || !$app->isSite();
+			if ( $load_jquery===null ) $load_jquery = $flexiparams->get('loadfw_jquery', 1)==1  ||  !$app->isSite();
+			$load_framework = $flexiparams->get( 'loadfw_'.strtolower(str_replace('-','_',$framework)), 1 );
+			$load_frameworks[$framework] = $load_framework==1  ||  ($load_framework==2 && !$app->isSite());
 		}
-		if ( !isset($load_frameworks[$framework]) && $app->isSite() ) return $_loaded[$framework];
+		
+		// Set loaded flag
+		$_loaded[$framework] = $load_frameworks[$framework];
+		// Do not progress further if it is disabled
+		if ( !$load_frameworks[$framework] ) return false;
 		
 		// Load Framework
 		$document = JFactory::getDocument();
@@ -362,7 +369,6 @@ class flexicontent_html
 		// Add custom JS & CSS code
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-		$_loaded[$framework] = true;
 		return $_loaded[$framework];
 	}
 	
