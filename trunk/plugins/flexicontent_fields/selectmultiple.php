@@ -114,7 +114,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		foreach ($elements as $element) {
 			$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
 		}
-		$field->html  = ($usefirstoption && $useselect2) ? JText::_($firstoptiontext).': ' : '';
+		$field->html  = ($usefirstoption && $useselect2) ? '<span class="fcselect_lbl">'.JText::_($firstoptiontext).':</span> ' : '';
 		$field->html .= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $field->value, $elementid);
 		
 		// Add message box about allowed # values

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 beta 5 $Id: separator.php 567 2011-04-13 11:06:52Z emmanuel.danan@gmail.com $
+ * @version 1.5 stable $Id: separator.php 1681 2013-05-04 23:51:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -53,8 +53,11 @@ form#item-form div.pane-sliders ul.adminformlist li label.hasTip {
 	display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:160px; font-weight: bold;
 	background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
 }
+div.current fieldset.radio label {
+	min-width:10px!important; padding: 0px 16px 0px 0px!important; margin: 2px 0px 0px 1px!important;
+}
 div fieldset.adminform fieldset.radio label, div fieldset.panelform fieldset.radio label {
-	min-width:10px; padding: 0px 10px 0px 0px; margin: 5px 0px 0px 0px;
+	min-width:10px!important; padding: 0px 10px 0px 0px!important; margin: 4px 0px 0px 1px!important;
 }
 div fieldset input, div fieldset textarea, div fieldset img, div fieldset button { margin:5px 2px 2px 0px; }
 div fieldset select { margin:0px; }

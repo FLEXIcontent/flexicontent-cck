@@ -326,16 +326,22 @@ class plgSearchFlexiadvsearch extends JPlugin
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
 				$andaccess  .= ' AND  c.access IN ('.$aid_list.')';
+				$andaccess  .= ' AND ty.access IN ('.$aid_list.')';
 				$andaccess  .= ' AND  i.access IN ('.$aid_list.')';
-			} else if (FLEXI_ACCESS) {
-				$aid = (int) $user->get('aid');
-				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-				$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ')';
-				$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ')';
 			} else {
-				$andaccess  .= ' AND  c.access <= '.$gid;
-				$andaccess  .= ' AND  i.access <= '.$gid;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ')';
+					$andaccess	.= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ')';
+					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ')';
+				} else {
+					$andaccess  .= ' AND  c.access <= '.$aid;
+					$andaccess  .= ' AND ty.access <= '.$aid;
+					$andaccess  .= ' AND  i.access <= '.$aid;
+				}
 			}
 		}
 		
@@ -391,6 +397,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$join_clauses =  ''
 			. ' JOIN #__categories AS c ON c.id = i.catid'
 			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 			. ( $txtmode ? ' JOIN #__flexicontent_fields as f ON f.id=ai.field_id' : '' )
 			. $joinaccess
 			;

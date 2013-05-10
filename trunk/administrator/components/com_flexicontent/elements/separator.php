@@ -26,6 +26,22 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
+$css="
+div table td.paramlist_value {
+	padding-left:12px;
+}
+div .paramlist_value label {
+	min-width:10px!important; padding: 0px 10px 0px 0px!important; margin: 4px 0px 0px 1px!important;
+}
+div .paramlist_value input, div .paramlist_value textarea, div .paramlist_value img, div .paramlist_value button { margin:5px 0px 2px 0px; }
+div .paramlist_value select { margin:0px; }
+			
+";
+
+$document = JFactory::getDocument();
+$document->addStyleDeclaration($css);
+//$document->addStyleSheet('../tmpl/params.css');
+
 class JElementSeparator extends JElement
 {
 	/**

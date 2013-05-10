@@ -157,7 +157,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		
-		// Get "BEFORE SAVE" categories for information mail
+		// Get "BEFORE SAVE" variables for information mail like title, state, categories ...
 		$before_cats = array();
 		if ( !$isnew )
 		{
@@ -167,8 +167,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			$db->setQuery( $query );
 			$before_cats = $db->loadObjectList('id');
 			$before_maincat = $model->get('catid');
+			$original_item = $model->getItem($post['id'], $check_view_access=false, $no_cache=true, $version=0);
 		}
-		$before_state = $model->get('state');
 		
 		
 		// ****************************************
@@ -204,10 +204,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		$post['id'] = $isnew ? (int) $model->get('id') : $post['id'];
 		
 		
-		// ********************************************************************************************************************
-		// First force reloading the item to make sure data are current, get a reference to it, and calculate publish privelege
-		// ********************************************************************************************************************
-		$item = $model->getItem($post['id'], $check_view_access=false, $no_cache=true);
+		// ***********************************************************************************************************
+		// Get newly saved -latest- version (store task gets latest) of the item, and also calculate publish privelege
+		// ***********************************************************************************************************
+		$item = $model->getItem($post['id'], $check_view_access=false, $no_cache=true, $force_version=-1);
 		$canPublish = $model->canEditState( $item, $check_cat_perm=true );
 		
 		
@@ -316,7 +316,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$notify_vars->notify_text   = $notify_text;
 			$notify_vars->before_cats   = $before_cats;
 			$notify_vars->after_cats    = $after_cats;
-			$notify_vars->before_state  = $before_state;
+			$notify_vars->original_item = @ $original_item;
 			
 			$model->sendNotificationEmails($notify_vars, $params, $manual_approval_request=0);
 		}

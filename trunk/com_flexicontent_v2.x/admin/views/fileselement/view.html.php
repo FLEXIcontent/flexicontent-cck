@@ -65,7 +65,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$filter_ext       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_ext',       'filter_ext',       '',          'alnum' );
 		$search           = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.search',           'search',           '',          'string' );
 		$filter_item      = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.item_id',          'item_id',          0,           'int' );
-		$itemid 	      	= $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.itemid',           'itemid',           0,           'string' );
+		$u_item_id 	      = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.u_item_id',        'u_item_id',        0,           'string' );
 		$autoselect       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.autoselect',       'autoselect',       0, 				  'int' );
 		$autoassign       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.autoassign',       'autoassign',       0, 				  'int' );
 		
@@ -113,12 +113,12 @@ class FlexicontentViewFileselement extends JViewLegacy
 			$rows  = $this->get('Data');
 			$img_folder = '';
 		} else {
-			$rows = $model->getFilesFromPath($itemid, $fieldid, $append_item, $append_field, $folder_param);
-			$img_folder = $model->getFieldFolderPath($itemid, $fieldid, $append_item, $append_field, $folder_param);
+			$rows = $model->getFilesFromPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param);
+			$img_folder = $model->getFieldFolderPath($u_item_id, $fieldid, $append_item, $append_field, $folder_param);
 			$img_path = str_replace('\\', '/', $img_folder . DS . $newfilename);
 			$thumb = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$thumb_w.'&h='.$thumb_h;
 		}
-		$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$itemid;
+		$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$u_item_id;
 		$app->setUserState( $upload_path_var, $img_folder );
 		//echo $upload_path_var . "<br>";
 		//echo $app->getUserState( $upload_path_var, 'noset' );
@@ -135,7 +135,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		ksort($items);
 		
 		$fname = $model->getFieldName($fieldid);
-		$files_selected = $model->getItemFiles($itemid);
+		$files_selected = $model->getItemFiles($u_item_id);
 		$formfieldname = FLEXI_J16GE ? 'custom['.$fname.'][]' : $fname.'[]';
 		
 		//add js to document
@@ -313,7 +313,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$this->assignRef('pageNav'    , $pageNav);
 		$this->assignRef('files' 			, $files);
 		$this->assignRef('fieldid' 		, $fieldid);
-		$this->assignRef('itemid' 		, $itemid);
+		$this->assignRef('u_item_id' 	, $u_item_id);
 		$this->assignRef('targetid' 	, $targetid);
 		$this->assignRef('CanFiles'        , $perms->CanFiles);
 		$this->assignRef('CanUpload'       , $perms->CanUpload);

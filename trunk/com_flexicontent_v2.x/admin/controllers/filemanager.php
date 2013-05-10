@@ -75,7 +75,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filedesc	= JRequest::getVar( 'file-desc', '');
 		$fieldid	= JRequest::getVar( 'fieldid', 0);
-		$itemid		= JRequest::getVar( 'itemid', 0);
+		$u_item_id= JRequest::getVar( 'u_item_id', 0);
 		$file_mode= JRequest::getVar( 'folder_mode', 0) ? 'folder_mode' : 'db_mode';
 		$err		= null;
 		
@@ -91,7 +91,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 		
 		if ($file_mode == 'folder_mode') {
-			$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$itemid;
+			$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$u_item_id;
 			$path = $mainframe->getUserState( $upload_path_var, '' ).DS;
 			$mainframe->setUserState( $upload_path_var, '');
 		} else {
@@ -494,7 +494,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$app   = JFactory::getApplication();
 		
 		$fieldid   = JRequest::getVar( 'fieldid', 0);
-		$itemid    = JRequest::getVar( 'itemid', 0);
+		$u_item_id = JRequest::getVar( 'u_item_id', 0);
 		$file_mode = JRequest::getVar( 'folder_mode', 0) ? 'folder_mode' : 'db_mode';
 		
 		if ($file_mode == 'folder_mode') {
@@ -503,7 +503,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 			$db->setQuery("SELECT * FROM #__flexicontent_fields WHERE id='".$fieldid."'");
 			$field = $db->loadObject();
 			$field->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
-			$field->item_id = $itemid;
+			$field->item_id = $u_item_id;
 			
 			$result = FLEXIUtilities::call_FC_Field_Func($field->field_type, 'removeOriginalFile', array( &$field, $filename ) );
 			

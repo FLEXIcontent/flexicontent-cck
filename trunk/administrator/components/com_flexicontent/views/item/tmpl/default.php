@@ -280,6 +280,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_TYPE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8');?>">
 					<?php echo $infoimage; ?>
 				</span>
+				<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 			</div>
 
 			<div class="fcclear"></div>
@@ -523,15 +524,16 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 				<?php
 				if ($this->fields && $this->row->type_id) {
 					$this->document->addScriptDeclaration("
-					window.addEvent('domready', function() {
-						$$('#type_id').addEvent('change', function(ev) {
-							$('fc-change-error').setStyle('display', 'block');
+						jQuery(document).ready(function() {
+							jQuery('#type_id').change(function() {
+								if (jQuery('#type_id').val() != '".$this->row->type_id."')
+									jQuery('#fc-change-error').css('display', 'block');
+								else
+									jQuery('#fc-change-error').css('display', 'none');
 							});
 						});
 					");
 				?>
-
-				<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 
 				<fieldset class="customfields_set">
 					<legend>
@@ -540,7 +542,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 
 						<?php
 						$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
-						
+						$noplugin = '<div class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
 						$row_k = 0;
 						foreach ($this->fields as $field)
 						{
@@ -575,7 +577,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 						
 								<div class='fcclear'></div>
 
-								<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
+								<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name; ?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
 									<?php echo $field->label; ?>
 								</label>
 

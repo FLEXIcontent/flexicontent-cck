@@ -379,7 +379,8 @@ var JFormValidator = new Class({
 			fcflabels = new Object;
 			labels = $$('label');
 			labels.each( function(g) {
-				label_for = (MooTools.version>="1.2.4") ? g.get('for') : g.getProperty('for');
+				label_for = (MooTools.version>="1.2.4") ? g.get('for_bck') : g.getProperty('for_bck');
+				if ( !label_for ) label_for = (MooTools.version>="1.2.4") ? g.get('for') : g.getProperty('for');
 				if ( label_for )  fcflabels[ label_for ] = g;
 			} );
 			//var fcflabels_size = Object.size(fcflabels);  alert(fcflabels_size);

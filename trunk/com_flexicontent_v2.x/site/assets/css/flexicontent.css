@@ -495,12 +495,12 @@ html button {
 	*width:auto !important;
 }
 
-div.flexi_edit .flexi_buttons {
+#flexicontent .flexi_buttons {
 	float: right;
 	margin: 2px 2px 8px;
 }
 
-#flexicontent button, div.flexi_edit .flexi_buttons button {
+#flexicontent button, #flexicontent .flexi_buttons button {
 	border-radius:5px !important;
 	-moz-border-radius: 5px !important;
 	-webkit-border-radius: 5px !important;
@@ -514,7 +514,7 @@ div.flexi_edit .flexi_buttons {
 	white-space:nowrap !important;
 }
 
-#flexicontent button:hover, div.flexi_edit .flexi_buttons button:hover {
+#flexicontent button:hover, #flexicontent .flexi_buttons button:hover {
 	background: #cccccc !important;
 	border: 1px solid gray !important;
 }
@@ -539,7 +539,7 @@ button.fc_button {}
  * Other CSS for Form
  ********************/
 
-div.flexi_edit .flexi_label.fc_tooltip_icon_fe {
+#flexicontent .flexi_label.fc_tooltip_icon_fe {
   padding:6px 3% 6px 1% !important;
   width: 14%;
   max-width:126px;
@@ -1159,17 +1159,6 @@ table.admintable td {
  ********************************/
 
 /* PANELs */
-#flexicontent .pane-slider ul.adminformlist,
-#flexicontent ul#rules, #flexicontent ul#rules ul {
-	list-style-type: none !important;
-	margin: 0px !important;
-	padding: 2px !important;
-}
-
-#flexicontent .pane-sliders .panel {
-	margin-top: 8px;
-}
-
 #flexicontent .pane-sliders .pane-toggler span {
     background: url("../../../../administrator/templates/bluestork/images/j_arrow.png") no-repeat scroll 5px 50% transparent;
     padding-left: 20px;
@@ -1179,18 +1168,6 @@ table.admintable td {
     padding-left: 20px;
 }
 
-#flexicontent .pane-sliders .panel .pane-slider {
-	padding: 0px !important;
-}
-
-#flexicontent .pane-sliders .panel .pane-slider fieldset.panelform {
-	margin: 4px !important;
-	border: 1px solid lightgray !important;
-}
-
-#flexicontent .panel h3 a {
-	padding:0px 0px 4px 0px;
-}
 
 /* FIELDs */
 #flexicontent fieldset.adminform fieldset.radio,
@@ -1272,89 +1249,9 @@ table.admintable td {
 }
 
 
-
-/******************************************************
- * Frontend Templates Rules for frontend basic tabbing
- ******************************************************/
- 
-#flexicontent .tabberlive {
-	margin: 0px 0px 6px 0px !important;
-	padding: 0px !important;
-	width: 100% !important;
-	float: left;
-	border-width: 0px;
-}
-
-#flexicontent .tabbertab {
-	margin: 0px !important;
-	padding: 5px 3px 3px 5px !important;
-	width: 99% !important;
-	float: left;
-}
-
-#flexicontent .fctabber { overflow:visible; width:5000px; }
-
-#flexicontent ul.tabbernav {
-	line-height: 100% !important;
-	border-bottom: 1px solid #808080 !important;
-	font: bold 11px Verdana,sans-serif !important;
-	margin: 0 !important;
-	padding: 0px 6px 0px 4px !important;
-	width: 99% !important;
-	display: inline-block !important;
-}
-
-#flexicontent ul.tabbernav li {
-	line-height: 100% !important;
-	padding: 0px !important;
-	margin: 0px 0px -1px 8px !important;
-	overflow: visible !important;
-	display: inline-block !important;
-	float: left;
-}
-
-#flexicontent ul.tabbernav li a {
-	line-height: 100% !important;
-	font-size: 11px !important;
-	margin: 0px !important;
-	padding-left: 5px;
-	padding-right: 5px;
-	padding-top: 4px !important;
-	padding-bottom: 5px !important;
-	display: inline-block !important;
-	border-radius: 8px 8px 0px 0px !important;
-	/*box-shadow: 0px -1px 1px lightgray;*/
-	border-left: 1px solid #D0D0D0;
-	border-top: 1px solid #B0B0B0;
-	border-right: 1px solid #808080;
-}
-
-#flexicontent ul.tabbernav li a {
-	background: none repeat scroll 0 0 #AAAAEE;
-	/*border-color: #222277;*/
-	color: #000000;
-}
-
-#flexicontent ul.tabbernav li:hover a {
-	background: none repeat scroll 0 0 #aa0000;
-	border-left: 1px solid #aa5555;
-	border-top: 1px solid #995555;
-	border-right: 1px solid #775555;
-	color: white;
-}
-
-#flexicontent ul.tabbernav li.tabberactive a,
-#flexicontent ul.tabbernav li.tabberactive a:hover
-{
-	color: black !important;
-	background-color: white !important;
-	border-bottom: 1px solid white !important;
-	border-left: 1px solid #D0D0D0;
-	border-top: 1px solid #B0B0B0;
-	border-right: 1px solid #808080;
-}
-
-
+/************************************************
+ * TAB appearance customizations per content Type
+ ************************************************/
 /*#flexicontent.fctypeNN*/ #fc_subtitle_tabset ul.tabbernav li a {  padding-left: 20px;  }
 /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_1, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_2, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_3,
 /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_4, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_5, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_6,

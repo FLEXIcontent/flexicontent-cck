@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1577 2012-12-02 15:10:44Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1657 2013-03-25 11:31:45Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -68,7 +68,7 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy {
 		$lists['order_Dir'] = $filter_order_Dir;
 		$lists['order'] = $filter_order;
 
-		$ordering = ($lists['order'] == 'c.lft');
+		$ordering = ($lists['order'] == (FLEXI_J16GE ? 'c.lft' : 'c.ordering') );
 
 		//assign data to template
 		$this->assignRef('lists'     	, $lists);
