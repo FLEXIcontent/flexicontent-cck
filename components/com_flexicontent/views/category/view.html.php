@@ -536,7 +536,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$subcat->params = new JRegistry($subcat->params);
 				}
 				
-				$subcat->image = FLEXI_J16GE ? $params->get('image') : $subcat->image;
+				$subcat->image = FLEXI_J16GE ? $subcat->params->get('image') : $subcat->image;
 				$image = "";
 				$subcat->introtext = & $subcat->description;
 				$subcat->fulltext = "";

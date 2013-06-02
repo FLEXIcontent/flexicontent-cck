@@ -688,14 +688,27 @@ div label.lang_box .lang_lbl {
  clear:both;
 }
 
+
+/* Edit form */
+#flexicontent .fc_edit_container_full {
+	float:none !important;
+	width:98% !important;
+	margin:1em 1% 0 1% !important;
+	padding:0px !important;
+	display:inline-block !important;
+	border: 0 none;
+}
+
 #flexicontent div.fields_tabset,
 #flexicontent div.params_tabset {
 	width: 100% !important;
-	padding: 0%;
+	margin: 0 !important;
+	padding: 0 !important;
 }
 
-#flexicontent div div.params_tabset,
-	margin-top: 24px !important;
+#flexicontent div.fields_tabset .tabbertab,
+#flexicontent div.params_tabset .tabbertab {
+	padding-bottom: 1.4em !important;
 }
 
 #flexicontent .panel h3 a { padding:0px 0px 4px 0px; }
@@ -761,10 +774,16 @@ dl.tabs dt { font-size:10px !important; font-family:tahoma !important; font-weig
 #flexicontent table.adminform td { padding: 0px 2px 0px 2px; }
 #flexicontent table.adminform { margin: 0px; }
 
-#flexicontent span.flexi_label label { float:right; margin:0px; padding:0px; }
+#flexicontent span.flexi_label label {
+	float:right; margin:0px; padding:0px;
+	color:auto; font-size: 12px;
+	font-style: italic; font-family: arial;
+}
 #flexicontent span.flexi_label label label { float:right; margin:auto; padding:auto; }
 
 #flexicontent .flexi_label.fcdualline { width:32%; padding: 6px 2% 6px 2% !important; }
+#flexicontent .params_set label.hasTip,
+#flexicontent .flexi_params label.hasTip,
 #flexicontent label.fckey,
 #flexicontent .flexi_label {
 	display: block;
@@ -780,9 +799,32 @@ dl.tabs dt { font-size:10px !important; font-family:tahoma !important; font-weig
   text-align: right !important;
   width: 16%;
   max-width:150px;
-  margin: 2px 1% 3px 0%;
+  min-width:auto !important;
+  margin: 2px 1% 3px 0% !important;
   padding: 6px 1% 6px 1% !important;
   border-radius:6px;
+}
+
+#flexicontent .flexi_params td.paramlist_key { vertical-align: top; }
+#flexicontent .flexi_params td.paramlist_key label.hasTip,
+#flexicontent .params_set td.paramlist_key label.hasTip {
+	width: 84% !important;
+  margin: 2px 0 !important;
+  padding: 6px 5% !important;
+}
+td.paramlist_key label#params-lbl.hasTip { display:none; }
+.flexi_params {
+	margin:0 !important;
+	padding:0 !important;
+	width:100% !important;
+	border: 0px !important;
+}
+.flexi_params table.admintable,
+.flexi_params table.admintable td {
+	margin:0 !important;
+	padding:0 !important;
+	border:0 none !important;
+	background: none !important;
 }
 
 #flexicontent .flexi_label.invalid {
@@ -806,9 +848,10 @@ dl.tabs dt { font-size:10px !important; font-family:tahoma !important; font-weig
 #flexicontent { margin:0px!important; }
 #flexicontent fieldset.basicfields_set,
 #flexicontent fieldset.flexiaccess,
-#flexicontent fieldset.customfields_set {
+#flexicontent fieldset.customfields_set,
+#flexicontent fieldset.params_set {
 	border: 1px solid #dddddd;
-	margin: 1em 0px 0px 0px !important;
+	margin: 1em 1% 0px 1% !important;
 	padding: 4px 8px 4px 8px !important;
 }
 #flexicontent fieldset.flexiaccess { margin-bottom: 1em !important; }
@@ -1004,7 +1047,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 
 /* Styling for textinput fields*/
-#flexicontent .fcfield_textareval
+#flexicontent .fcfield_textareaval,
 #flexicontent .fcfield_selectval,
 #flexicontent .fcfield_selectmulval,
 #flexicontent .fcfield_textval {
@@ -1020,20 +1063,21 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	position: relative !important;
 	text-decoration: none !important;
 	white-space: nowrap !important;
+	font-size: 12px;
 }
 
-#flexicontent .fcfield_selectval,
-#flexicontent .fcfield_textval {
+#flexicontent select.fcfield_selectval,
+#flexicontent input.fcfield_textval {
 	height: 26px !important;
 	line-height: 26px !important;
 	overflow: hidden !important;
+	min-width:24%;
 }
 
-#flexicontent .fcfield_selectmulval,
-#flexicontent .fcfield_textareaval {
-	height: auto !important;
+#flexicontent select.fcfield_selectmulval,
+#flexicontent textarea.fcfield_textareaval {
 	line-height: 1em !important;
-	overflow: scroll !important;
+	overflow: auto !important;
 }
 
 
@@ -1198,8 +1242,8 @@ div fieldset.panelform {
 
 div fieldset.panelform label.hasTip, #jform_attribs_ilayout-lbl, .fc_fieldset label.hasTip {
 	clear: both;
-	padding: 3px 3px 3px 3px;
-	margin:3px 0px 0px 0px;
+	padding: 4px 3px !important;
+	margin: 2px 0px 0px 0px !important;
 	background-color: #F2F2F2;
 	border-bottom: 1px solid #D0D0D0;
 	border-right: 1px solid #D0D0D0;

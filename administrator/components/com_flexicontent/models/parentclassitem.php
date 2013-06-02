@@ -660,21 +660,21 @@ class ParentClassItem extends JModelLegacy
 							// we will check before unserializing them, otherwise they were concatenated to a single string and use explode ...
 							$item->$fieldname = ($array = @unserialize($f->value)) ? $array : explode(",", $f->value);
 						} else if ($f->field_id==-1) {
-							// Other fields (maybe serialized or not but we do not unserialized them, this is responsibility of the field itself)
-							$jfdata = unserialize($f->value);
-							$item_lang = substr($item->language ,0,2);
-							foreach ($item_translations as $lang_id => $translation_data)
-							{
-								//echo "<br/>Adding values for: ".$translation_data->shortcode;
-								if ( empty($jfdata[$translation_data->shortcode]) ) continue;
-								foreach ($jfdata[$translation_data->shortcode] as $fieldname => $fieldvalue)
-								{
-									//echo "<br/>".$translation_data->shortcode.": $fieldname => $fieldvalue";
-									if ($translation_data->shortcode != $item_lang) {
-										$translation_data->fields->$fieldname = new stdClass();
-										$translation_data->fields->$fieldname->value = $fieldvalue;
-									} else {
-										$item->$fieldname = $fieldvalue;
+							if ( FLEXI_FISH ) {
+								$jfdata = unserialize($f->value);
+								$item_lang = substr($item->language ,0,2);
+								foreach ($item_translations as $lang_id => $translation_data) {
+									//echo "<br/>Adding values for: ".$translation_data->shortcode;
+									if ( empty($jfdata[$translation_data->shortcode]) ) continue;
+									foreach ($jfdata[$translation_data->shortcode] as $fieldname => $fieldvalue)
+									{
+										//echo "<br/>".$translation_data->shortcode.": $fieldname => $fieldvalue";
+										if ($translation_data->shortcode != $item_lang) {
+											$translation_data->fields->$fieldname = new stdClass();
+											$translation_data->fields->$fieldname->value = $fieldvalue;
+										} else {
+											$item->$fieldname = $fieldvalue;
+										}
 									}
 								}
 							}

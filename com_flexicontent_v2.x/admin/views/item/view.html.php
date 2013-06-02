@@ -44,18 +44,19 @@ class FlexicontentViewItem extends JViewLegacy
 		jimport('joomla.html.pane');
 
 		// Initialize variables
-		$mainframe  = &JFactory::getApplication();
-		$dispatcher = & JDispatcher::getInstance();
-		$document   = & JFactory::getDocument();
-		$cparams    = & JComponentHelper::getParams('com_flexicontent');
+		$mainframe  = JFactory::getApplication();
+		$dispatcher = JDispatcher::getInstance();
+		$document   = JFactory::getDocument();
+		$session    = JFactory::getSession();
+		$cparams    = JComponentHelper::getParams('com_flexicontent');
 		$option     = JRequest::getVar('option');
-		$user       = & JFactory::getUser();
-		$db         = & JFactory::getDBO();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDBO();
 		$nullDate   = $db->getNullDate();
-		$bar    = & JToolBar::getInstance('toolbar');
+		$bar    = JToolBar::getInstance('toolbar');
 		if (!FLEXI_J16GE) {
-			$editor 	= & JFactory::getEditor();
-			$pane 		= & JPane::getInstance('sliders');
+			$editor 	= JFactory::getEditor();
+			$pane 		= JPane::getInstance('sliders');
 		}
 
 		// Some flags
@@ -78,11 +79,11 @@ class FlexicontentViewItem extends JViewLegacy
 		$document->addScript('components/com_flexicontent/assets/js/validate.js');
 
 		//Get data from the model
-		$model = & $this->getModel();
+		$model = $this->getModel();
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$row   = & $this->get('Item');
+		$row   = $this->get('Item');
 		if (FLEXI_J16GE) {
-			$form  = & $this->get('Form');
+			$form  = $this->get('Form');
 		}
 		if ( $print_logging_info ) @$fc_run_times['get_item_data'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
@@ -96,16 +97,16 @@ class FlexicontentViewItem extends JViewLegacy
 		// A unique item id
 		JRequest::setVar( 'unique_tmp_itemid', $cid ? $cid : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
 
-		$subscribers 	= & $this->get( 'SubscribersCount' );
-		$types				= & $this->get( 'Typeslist' );
+		$subscribers 	= $this->get( 'SubscribersCount' );
+		$types				= $this->get( 'Typeslist' );
 		if (!FLEXI_J16GE) {
-			$languages = & $this->get( 'Languages' );
+			$languages = $this->get( 'Languages' );
 		}
-		$typesselected	= & $this->get( 'Typesselected' );
-		$versioncount	= & $this->get( 'VersionCount' );
+		$typesselected = $this->get( 'Typesselected' );
+		$versioncount  = $this->get( 'VersionCount' );
 		$versionsperpage = $cparams->get('versionsperpage', 10);
-		$pagecount	= (int)ceil($versioncount/$versionsperpage);
-		$allversions		= & $model->getVersionList();//get all versions.
+		$pagecount    = (int)ceil($versioncount/$versionsperpage);
+		$allversions  = $model->getVersionList();//get all versions.
 		$current_page = 1;
 		$k=1;
 		foreach($allversions as $v) {
@@ -115,9 +116,9 @@ class FlexicontentViewItem extends JViewLegacy
 			$k++;
 		}
 
-		$versions  = & $model->getVersionList(($current_page-1)*$versionsperpage, $versionsperpage);
-		$tparams   = & $this->get( 'Typeparams' );
-		$tparams   = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
+		$versions   = $model->getVersionList(($current_page-1)*$versionsperpage, $versionsperpage);
+		$tparams    = $this->get( 'Typeparams' );
+		$tparams    = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 		$categories = $globalcats;
 
 		// ******************
@@ -182,7 +183,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
 		// *****************************************************************************
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$fields = & $this->get( 'Extrafields' );
+		$fields = $this->get( 'Extrafields' );
 		if ( $print_logging_info ) @$fc_run_times['get_field_vals'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
@@ -239,8 +240,8 @@ class FlexicontentViewItem extends JViewLegacy
 		if ( $print_logging_info ) @$fc_run_times['render_field_html'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		// Tags used by the item
-		$usedtagsIds  = & $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($row->tags)
-		//$usedtagsIds 	= $isnew ? array() : $fields['tags']->value;
+		$usedtagsIds = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($row->tags)
+		//$usedtagsIds = $isnew ? array() : $fields['tags']->value;
 		$usedtags = $model->getUsedtagsData($usedtagsIds);
 
 		// Categories used by the item
@@ -411,22 +412,31 @@ class FlexicontentViewItem extends JViewLegacy
 			$i++;
 		}
 		
-		if ($subscribers) {
-			// build favs notify field
-			$fieldname = FLEXI_J16GE ? 'jform[notify]' : 'notify';
-			$elementid = FLEXI_J16GE ? 'jform_notify' : 'notify';
-			/*
-			$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-			$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
-			*/
-			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
-			$attribs = ' class="'.$classes.'" ';
-			$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
-			if (!$prettycheckable_added) $lists['notify'] .= '<label class="fccheckradio_lbl" for="'.$elementid.'">';
-			$extra_params = !$prettycheckable_added ? '' : ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
-			$lists['notify'] = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid
-				.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' />';
-			if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
+		if ( !$subscribers )
+		{
+			$lists['notify'] = !$isnew ? JText::_('FLEXI_NO_SUBSCRIBERS_EXIST') : '';
+		} else {
+			// b. Check if notification emails to subscribers , were already sent during current session
+			$subscribers_notified = $session->get('subscribers_notified', array(),'flexicontent');
+			if ( !empty($subscribers_notified[$row->id]) ) {
+				$lists['notify'] = JText::_('FLEXI_SUBSCRIBERS_ALREADY_NOTIFIED');
+			} else {
+				// build favs notify field
+				$fieldname = FLEXI_J16GE ? 'jform[notify]' : 'notify';
+				$elementid = FLEXI_J16GE ? 'jform_notify' : 'notify';
+				/*
+				$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+				$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
+				*/
+				$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+				$attribs = ' class="'.$classes.'" ';
+				$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
+				if (!$prettycheckable_added) $lists['notify'] .= '<label class="fccheckradio_lbl" for="'.$elementid.'">';
+				$extra_params = !$prettycheckable_added ? '' : ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$lists['notify'] = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' />';
+				if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
+			}
 		}
 		
 		// Retrieve author configuration

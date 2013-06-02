@@ -3645,7 +3645,7 @@ class flexicontent_db
 	 * @access private
 	 * @return string
 	 */
-	static function buildItemOrderBy(&$params=null, $order='', $request_var='orderby', $config_param='orderby', $i_as='i', $rel_as='rel', $default_order='', $default_order_dir='')
+	static function buildItemOrderBy(&$params=null, &$order='', $request_var='orderby', $config_param='orderby', $i_as='i', $rel_as='rel', $default_order='', $default_order_dir='')
 	{
 		// Use global params ordering if parameters were not given
 		if (!$params) $params = JComponentHelper::getParams( 'com_flexicontent' );
@@ -3658,6 +3658,13 @@ class flexicontent_db
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
 		$order = $request_var && ($request_order = JRequest::getVar($request_var)) ? $request_order : $order;
 
+		if ($order=='commented') {
+			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
+				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br>\n";
+				$order='';
+			} 
+		}
+		
 		// 'order' contains a symbolic order name to indicate using the category / global ordering setting
 		switch ($order) {
 			case 'date': case 'addedrev': /* 2nd is for module */

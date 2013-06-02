@@ -1631,6 +1631,7 @@ class FlexicontentFields
 		$support_ft[$field_type]->supportadvsearch = $supportadvsearch;
 		$support_ft[$field_type]->supportadvfilter = $supportadvfilter;
 		$support_ft[$field_type]->supportuntranslatable = $supportuntranslatable;
+		$support_ft[$field_type]->supportvalueseditable = $supportvalueseditable;
 		$support_ft[$field_type]->supportformhidden = $supportformhidden;
 		$support_ft[$field_type]->supportedithelp = $supportedithelp;
 		

@@ -35,10 +35,11 @@ if (FLEXI_J16GE) {
 class JFormFieldFields extends JFormField
 {
 	/**
-	 * Element name
-	 * @access	protected
-	 * @var		string
-	 */
+	* Element name
+	*
+	* @access       protected
+	* @var          string
+	*/
 	var	$type = 'Fields';
 
 	function getInput()
@@ -110,7 +111,7 @@ class JFormFieldFields extends JFormField
 		$attribs = ' style="float:left;" ';
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="true" ';
-			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
+			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
@@ -118,6 +119,9 @@ class JFormFieldFields extends JFormField
 			$attribs .= 'class="inputbox"';
 			$maximize_link = '';
 		}
+		
+		
+		// HTML Tag parameters
 		if ($onchange = @$attributes['onchange']) {
 			$onchange = str_replace('{control_name}', $control_name, $onchange);
 			$attribs .= ' onchange="'.$onchange.'"';

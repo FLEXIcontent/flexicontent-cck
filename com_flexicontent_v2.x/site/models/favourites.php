@@ -244,16 +244,26 @@ class FlexicontentModelFavourites extends JModelLegacy
 		}
 
 		// Get the WHERE and ORDER BY clauses for the query
+		$order = '';
 		$where		= $this->_buildItemWhere();
-		$orderby	= $this->_buildItemOrderBy();
+		$orderby	= $this->_buildItemOrderBy($order);
 		
 		// Add sort items by custom field.
-		$field_item = '';
 		if ($params->get('orderbycustomfieldid', 0) != 0) {
-			$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
+			$field_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
 		}
-
+		
+		// Create JOIN for ordering items by a special ordering
+		if ($order=='commented') {
+			$select_comments = ' count(com.object_id) AS comments_total,';
+			$join_comments   = ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
+		} else if ($order=='rated') {
+			$select_comments = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
+			$join_comments   = ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
+		}
+		
 		$query = 'SELECT i.id, i.*, ie.*, '
+			. @ $select_comments
 			//.$select_image
 			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -264,7 +274,8 @@ class FlexicontentModelFavourites extends JModelLegacy
 			. ' JOIN #__categories AS c ON c.id = i.catid'
 			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			//. $join_image
-			. $field_item
+			. @ $field_join
+			. @ $join_comments
 			. $joinaccess
 			. $where
 			. $andaccess
@@ -281,7 +292,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 * @access private
 	 * @return string
 	 */
-	function _buildItemOrderBy()
+	function _buildItemOrderBy($order='')
 	{
 		$request_var = $this->_params->get('orderby_override') ? 'orderby' : '';
 		$default_order = $this->getState('filter_order');
@@ -290,7 +301,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		// Precedence: $request_var ==> $order ==> $config_param ==> $default_order
 		return flexicontent_db::buildItemOrderBy(
 			$this->_params,
-			$order='', $request_var, $config_param='orderby',
+			$order, $request_var, $config_param='orderby',
 			$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
 			$default_order, $default_order_dir
 		);

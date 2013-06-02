@@ -33,7 +33,7 @@ ul.tabbernav
 ul.tabbernav li
 {
  list-style: none;
- margin: 10px 0px 0px 0px;
+ margin: 10px 2px 0px 2px;
  display: inline-block;
  white-space: nowrap;
 }
@@ -46,6 +46,7 @@ ul.tabbernav li a
  border-bottom: none;
  background: #DDE;
  text-decoration: none;
+ font-size: 11px;
 }
 
 ul.tabbernav li a:link { color: #448; }
@@ -151,7 +152,7 @@ ul.tabbernav li.tabberactive a:hover
 }
 
 #flexicontent ul.tabbernav li a {
-	line-height: 100% !important;
+	line-height: 160% !important;
 	font-size: 11px !important;
 	margin: 0px !important;
 	padding-left: 5px;

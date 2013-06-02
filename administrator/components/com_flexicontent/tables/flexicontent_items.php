@@ -271,6 +271,16 @@ class flexicontent_items extends JTable{
 				$type_ext->$frn_key = $this->id;
 				$ret = $this->_db->insertObject( $this->_tbl_join, $type_ext, $this->_frn_key );
 			}
+			
+			// Check for unique Alias
+			$query 	= 'SELECT COUNT(*) FROM #__content WHERE alias='.$this->_db->Quote($this->alias).' AND id <> '.(int)$this->id;
+			$this->_db->setQuery($query);
+			$duplicate_aliases = (boolean) $this->_db->loadResult();
+			if ($duplicate_aliases) {
+				$query 	= 'UPDATE #__content SET alias='.$this->_db->Quote($this->alias.'_'.$this->id).' WHERE id='.(int)$this->id;
+				$this->_db->setQuery($query);
+				$this->_db->query();
+			}
 			return true;
 		}
 	}
