@@ -455,10 +455,6 @@
 /* (e) Generic Display of Rendered Field Values */
 /************************************************/
 
-#flexicontent .fc_edit_corefields_full {
-	float:none !important; width:100% !important; margin:0px !important; padding:0px !important; display:inline-block !important;
-}
-
 #flexicontent .fc_field_container {
 	display: block;
 	white-space: nowrap;
@@ -508,7 +504,7 @@ html button {
 	background: #eeeeee !important;
 	color: black !important;	
 	margin: 2px 6px 2px 0px;
-	padding:1px 4px 1px 2px;
+	padding: 7px 6px 6px 2px;
 	font-weight:bold;
 	font-size:11px;
 	white-space:nowrap !important;
@@ -1260,6 +1256,7 @@ table.admintable td {
 	background-image: url(../images/information.png) !important;
 	background-position: 1px 2px !important;
 	background-repeat: no-repeat !important;
+	padding-left: 20px !important;
 }
 
 /*#flexicontent.fctypeNN*/ #fc_bottom_tabset ul.tabbernav li a {  padding-left: 20px;  }
@@ -1270,6 +1267,7 @@ table.admintable td {
 	background-image: url(../images/information.png) !important;
 	background-position: 1px 2px !important;
 	background-repeat: no-repeat !important;
+	padding-left: 20px !important;
 }
 
 

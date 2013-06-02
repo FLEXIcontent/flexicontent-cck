@@ -110,7 +110,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		if ($level == 'tblbreak') {
 			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #ffffff; color: darkred; font-size: 16px!important; font-weight: bold; margin: 24px 0% 2px 0%; width:auto; display: block; float: left; border: 1px solid lightgray; font-family:tahoma; font-size:12px;';
 		} else if ($level == 'level2') {
-			$style = 'padding: 2px 0% 2px 4%; display: block; background-color: #ccc; color: #000; font-weight: bold; margin: 0px 2% 2px 6%; width:84%; display: block; float: left; text-align: center; border: 1px outset #E9E9E9;';
+			$style = 'padding: 2px 0% 2px 4%; display: block; background-color: #ccc; color: #000; font-weight: bold; margin: 0px 2% 2px 17%; width:78%; display: block; float: left; text-align: center; border: 1px outset #E9E9E9;';
 		} else if ($level == 'level3') {
 			$pad_left = FLEXI_J16GE ? 'left:20%;' : 'left:0%;';
 			$width_val = FLEXI_J16GE ? 'width:64%;' : 'width:auto;';

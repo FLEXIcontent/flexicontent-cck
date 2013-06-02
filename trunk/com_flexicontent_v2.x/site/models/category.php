@@ -340,8 +340,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		if ( !$query_ids ) {
 			// Create where and orderby
+			$order = '';
 			$where   = $this->_buildItemWhere();
-			$orderby = $this->_buildItemOrderBy();
+			$orderby = $this->_buildItemOrderBy($order);
 			
 			// Create JOIN (and select column) of image field used as item image in RSS feed
 			$feed_image_source = JRequest::getCmd("type", "") == "rss"  ?  (int) $cparams->get('feed_image_source', 0)  :  0;
@@ -355,12 +356,23 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ($orderbycustomfieldid) {
 				$order_field_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$cparams->get('orderbycustomfieldid', 0);
 			}
+			
+			// Create JOIN for ordering items by a special ordering
+			if ($order=='commented') {
+				$select_comments = ', count(com.object_id) AS comments_total';
+				$join_comments   = ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
+			} else if ($order=='rated') {
+				$select_comments = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
+				$join_comments   = ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
+			}
 		}
 		
 		if ( !$query_ids ) {
 			//$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id ';  // Will cause problems with 3rd-party extensions that modify the query
 			//$query = 'SELECT DISTINCT i.id ';
-			$query = 'SELECT i.id ';
+			$query = 'SELECT i.id '
+				. @ $select_comments
+				;
 		} else {
 			//$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
 			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename,'
@@ -374,13 +386,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		if ( $query_ids ) {
 			$query .= ""
-				. @$feed_img_join      // optional
+				. @ $feed_img_join    // optional
 				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
 				. ' GROUP BY i.id'
 				;
 		} else {
 			$query .= ""
-			. @$order_field_join   // optional
+			. @ $order_field_join  // optional
+			. @ $join_comments     // optional
 			. $where
 			. ' GROUP BY i.id '
 			. $orderby
@@ -510,7 +523,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access private
 	 * @return string
 	 */
-	function _buildItemOrderBy()
+	function _buildItemOrderBy(& $order='')
 	{
 		$request_var = $this->_params->get('orderby_override') ? 'orderby' : '';
 		$default_order = $this->getState('filter_order');
@@ -519,7 +532,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Precedence: $request_var ==> $order ==> $config_param ==> $default_order
 		return flexicontent_db::buildItemOrderBy(
 			$this->_params,
-			$order='', $request_var, $config_param='orderby',
+			$order, $request_var, $config_param='orderby',
 			$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
 			$default_order, $default_order_dir
 		);

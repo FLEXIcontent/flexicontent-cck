@@ -942,6 +942,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		$user     = JFactory::getUser();	// get current user
 		$item     = $this->get('Item');		// get the item from the model
 		$document = JFactory::getDocument();
+		$session  = JFactory::getSession();
 
 		global $globalcats;
 		$categories = $globalcats;			// get the categories tree
@@ -1079,22 +1080,31 @@ class FlexicontentViewItems  extends JViewLegacy
 			$i++;
 		}
 		
-		if ($subscribers) {
-			// build favs notify field
-			$fieldname = FLEXI_J16GE ? 'jform[notify]' : 'notify';
-			$elementid = FLEXI_J16GE ? 'jform_notify' : 'notify';
-			/*
-			$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-			$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
-			*/
-			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
-			$attribs = ' class="'.$classes.'" ';
-			$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
-			if (!$prettycheckable_added) $lists['notify'] .= '<label class="fccheckradio_lbl" for="'.$elementid.'">';
-			$extra_params = !$prettycheckable_added ? '' : ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
-			$lists['notify'] = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid
-				.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' />';
-			if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
+		if ( !$subscribers )
+		{
+			$lists['notify'] = !$isnew ? JText::_('FLEXI_NO_SUBSCRIBERS_EXIST') : '';
+		} else {
+			// b. Check if notification emails to subscribers , were already sent during current session
+			$subscribers_notified = $session->get('subscribers_notified', array(),'flexicontent');
+			if ( !empty($subscribers_notified[$item->id]) ) {
+				$lists['notify'] = JText::_('FLEXI_SUBSCRIBERS_ALREADY_NOTIFIED');
+			} else {
+				// build favs notify field
+				$fieldname = FLEXI_J16GE ? 'jform[notify]' : 'notify';
+				$elementid = FLEXI_J16GE ? 'jform_notify' : 'notify';
+				/*
+				$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
+				$lists['notify'] = '<input type="checkbox" name="jform[notify]" id="jform_notify" '.$attribs.' /> '. $lbltxt;
+				*/
+				$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
+				$attribs = ' class="'.$classes.'" ';
+				$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
+				if (!$prettycheckable_added) $lists['notify'] .= '<label class="fccheckradio_lbl" for="'.$elementid.'">';
+				$extra_params = !$prettycheckable_added ? '' : ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$lists['notify'] = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' />';
+				if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
+			}
 		}
 		
 		// build version approval list

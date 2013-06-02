@@ -84,20 +84,33 @@ class plgFlexicontentFlexinotify extends JPlugin
 	 */
 	function onAfterSaveItem( &$item, &$post )
 	{
-		global $mainframe;
-		$notify	= isset($post['notify']) ? true : false;
+		//****************************************
+		// Checks to decide whether to send emails
+		//****************************************
 		
-		// Performance check
-		if (!$notify) return;
-
+		// a. Check if notifcation flag was set
+		if ( !empty($post['notify']) ) return;
+		$session = JFactory::getSession();
+		
+		// b. Check if notification emails to subscribers , were already sent during current session
+		$subscribers_notified = $session->get('subscribers_notified', array(),'flexicontent');
+		if ( !empty($subscribers_notified[$item->id]) ) return;
+		
+		// c. Check if current item has subscribers
 		$subscribers = $this->_getSubscribers($item->id);
-		// Don't do anything if there are no subscribers
 		if (count($subscribers) == 0) return;
-
-		// Get Plugin info
+		
+		// Set flag to avoid resending notifications
+		$subscribers_notified[$item->id]  = 1;
+		$session->set('subscribers_notified', $subscribers_notified, 'flexicontent');
+		
+		
+		//*********************************************
+		// Get Plugin parameters and send notifications
+		//*********************************************
+		
 		$plugin = JPluginHelper::getPlugin('flexicontent', 'flexinotify');
 		$pluginParams = FLEXI_J16GE ? new JRegistry($plugin->params) : new JParameter($plugin->params);
-		
 		foreach ($subscribers as $sub) {
 			$this->_sendEmail($item, $sub, $pluginParams);
 		}

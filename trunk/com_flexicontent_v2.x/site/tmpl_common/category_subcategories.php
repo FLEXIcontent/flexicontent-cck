@@ -28,7 +28,7 @@ $pretext = $this->params->get( 'subcat_pretext', '' ); $posttext = $this->params
 $opentag = $this->params->get( 'subcat_opentag', '' ); $closetag = $this->params->get( 'subcat_closetag', '' );
 
 $separatorf = $this->params->get( 'subcat_separatorf' ); 
-$separators_arr = array( 0 => '&nbsp;', 1 => '<br />', 2 => '&nbsp;|&nbsp;', 3 => ',&nbsp;', 4 => $closetag.$opentag);
+$separators_arr = array( 0 => '&nbsp;', 1 => '<br />', 2 => '&nbsp;|&nbsp;', 3 => ',&nbsp;', 4 => $closetag.$opentag, 5 => '' );
 $separatorf = isset($separators_arr[$separatorf]) ? $separators_arr[$separatorf] : '&nbsp;';
 
 $cats_label = JText::_( $this->category->id ? 'FLEXI_SUBCATEGORIES' : 'FLEXI_CATEGORIES' );

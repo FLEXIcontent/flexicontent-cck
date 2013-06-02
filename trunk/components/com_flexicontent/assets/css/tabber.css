@@ -33,7 +33,7 @@ ul.tabbernav
 ul.tabbernav li
 {
  list-style: none;
- margin: 10px 0px 0px 0px;
+ margin: 10px 2px 0px 2px;
  display: inline-block;
  white-space: nowrap;
 }
@@ -46,6 +46,7 @@ ul.tabbernav li a
  border-bottom: none;
  background: #DDE;
  text-decoration: none;
+ font-size: 11px;
 }
 
 ul.tabbernav li a:link { color: #448; }
@@ -107,4 +108,87 @@ ul.tabbernav li.tabberactive a:hover
 .tabberlive#tab2 .tabbertab {
  height:200px;
  overflow:auto;
+}
+
+
+/***********************************************
+ * Rules for basic tabbing in flexicontent views
+ ***********************************************/
+ 
+#flexicontent .tabberlive {
+	margin: 0px 0px 6px 0px !important;
+	padding: 0px !important;
+	width: 100% !important;
+	float: left;
+	border-width: 0px;
+}
+
+#flexicontent .tabbertab {
+	margin: 0px !important;
+	padding: 5px 3px 3px 5px !important;
+	width: 99% !important;
+	float: left;
+}
+
+#flexicontent .fctabber { overflow:visible; width:5000px; }
+
+#flexicontent ul.tabbernav {
+	line-height: 100% !important;
+	border-bottom: 1px solid #808080 !important;
+	font: bold 11px Verdana,sans-serif !important;
+	margin: 0 !important;
+	padding: 0px 6px 0px 4px !important;
+	width: 99% !important;
+	display: inline-block !important;
+}
+
+#flexicontent ul.tabbernav li {
+	line-height: 100% !important;
+	padding: 0px !important;
+	margin: 4px 0px -1px 8px !important;
+	overflow: visible !important;
+	display: inline-block !important;
+	float:left;
+}
+
+#flexicontent ul.tabbernav li a {
+	line-height: 160% !important;
+	font-size: 11px !important;
+	margin: 0px !important;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 4px !important;
+	padding-bottom: 5px !important;
+	display: inline-block !important;
+	border-radius: 8px 8px 0px 0px !important;
+	/*box-shadow: 0px -1px 1px lightgray;*/
+	border-left: 1px solid #D0D0D0;
+	border-top: 1px solid #B0B0B0;
+	border-right: 1px solid #808080;
+	border-bottom: 1px solid #808080;
+}
+
+#flexicontent ul.tabbernav li a {
+	background: none repeat scroll 0 0 #AAAAEE;
+	/*border-color: #222277;*/
+	color: #000000;
+}
+
+#flexicontent ul.tabbernav li:hover a {
+	background: none repeat scroll 0 0 #aa0000;
+	border-left: 1px solid #aa5555;
+	border-top: 1px solid #995555;
+	border-right: 1px solid #775555;
+	color: white;
+}
+
+#flexicontent ul.tabbernav li.tabberactive a,
+#flexicontent ul.tabbernav li.tabberactive a:hover
+{
+	color: black !important;
+	background-color: white !important;
+	border-bottom: 1px solid white !important;
+	border-left: 1px solid #D0D0D0;
+	border-top: 1px solid #B0B0B0;
+	border-right: 1px solid #808080;
 }

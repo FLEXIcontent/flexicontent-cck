@@ -327,18 +327,23 @@ class FlexicontentModelField extends JModelLegacy
 		$attibutes = !FLEXI_J16GE ? $data['params'] : $data['attribs'];
 
 		// Build attibutes INI string
-		if (is_array($attibutes))
-		{
-			$txt = array ();
-			foreach ($attibutes as $k => $v) {
-				if (is_array($v)) {
-					$v = implode('|', $v);
+		if (FLEXI_J16GE) {
+			// JSON encoding allows to use new lines etc
+			$attibutes = json_encode($attibutes);
+		} else {
+			if (is_array($attibutes))
+			{
+				$txt = array ();
+				foreach ($attibutes as $k => $v) {
+					if (is_array($v)) {
+						$v = implode('|', $v);
+					}
+					$txt[] = "$k=$v";
 				}
-				$txt[] = "$k=$v";
+				$field->attribs = implode("\n", $txt);
 			}
-			$field->attribs = implode("\n", $txt);
 		}
-
+		
 		// Put the new fields in last position
 		if (!$field->id) {
 			$field->ordering = $field->getNextOrder();

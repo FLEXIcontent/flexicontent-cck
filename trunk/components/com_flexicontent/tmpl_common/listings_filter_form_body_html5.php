@@ -96,7 +96,7 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 			$opentag = $this->params->get( 'filter_opentag', '' ); $closetag = $this->params->get( 'filter_closetag', '' );
 			
 			$separatorf = $this->params->get( 'filter_separatorf', 1 ); 
-			$separators_arr = array( 0 => '&nbsp;', 1 => '<br />', 2 => '&nbsp;|&nbsp;', 3 => ',&nbsp;', 4 => $closetag.$opentag);
+			$separators_arr = array( 0 => '&nbsp;', 1 => '<br />', 2 => '&nbsp;|&nbsp;', 3 => ',&nbsp;', 4 => $closetag.$opentag, 5 => '' );
 			$separatorf = isset($separators_arr[$separatorf]) ? $separators_arr[$separatorf] : '&nbsp;';
 			
 			// Create the HTML of sub-category list , add configured separator

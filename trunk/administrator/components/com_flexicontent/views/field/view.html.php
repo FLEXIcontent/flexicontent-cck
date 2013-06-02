@@ -90,6 +90,7 @@ class FlexicontentViewField extends JViewLegacy
 		$supportfilter          = $ft_support->supportfilter;
 		$supportadvfilter       = $ft_support->supportadvfilter;
 		$supportuntranslatable  = $ft_support->supportuntranslatable;
+		$supportvalueseditable  = $ft_support->supportvalueseditable;
 		$supportformhidden      = $ft_support->supportformhidden;
 		$supportedithelp        = $ft_support->supportedithelp;
 		
