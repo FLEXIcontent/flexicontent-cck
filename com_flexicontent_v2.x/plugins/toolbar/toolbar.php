@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: toolbar.php 1543 2012-11-11 22:13:24Z ggppdk $
+ * @version 1.0 $Id: toolbar.php 1681 2013-05-04 23:51:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -72,9 +72,12 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$display_email 		= $field->parameters->get(FLEXI_J16GE ? 'display_email' : 'display-email', 1);
 		$display_voice 		= $field->parameters->get(FLEXI_J16GE ? 'display_voice' : 'display-voice', 1);
 		$display_pdf 		= $field->parameters->get(FLEXI_J16GE ? 'display_pdf' : 'display-pdf', 1);
-		$display_social 	= $field->parameters->get(FLEXI_J16GE ? 'display_social' : 'display-social', 1);
 		$load_css 			= $field->parameters->get(FLEXI_J16GE ? 'load_css' : 'load-css', 1);
+		
+		$display_social 	= $field->parameters->get(FLEXI_J16GE ? 'display_social' : 'display-social', 1);
 		$addthis_user		= $field->parameters->get(FLEXI_J16GE ? 'addthis_user' : 'addthis-user', '');
+		$addthis_pubid	= $field->parameters->get('addthis_pubid', $addthis_user);
+		
 		$spacer_size		= $field->parameters->get(FLEXI_J16GE ? 'spacer_size' : 'spacer-size', 21);
 		$module_position	= $field->parameters->get('module_position', '');
 		$default_size 		= $field->parameters->get(FLEXI_J16GE ? 'default_size' : 'default-size', 12);
@@ -141,7 +144,8 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// email button
 		if ($display_email)
 		{
-			$link		 = JURI::root().JRoute::_( 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug, false );
+			$link = JURI::root().JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+			//$link = JURI::root().JRoute::_( 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug, false );
 			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 			$url		 = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $link );
 			$estatus	 = 'width=400,height=400,menubar=yes,resizable=yes';
@@ -207,20 +211,113 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// AddThis button
 		if ($display_social)
 		{
-			$display 	.= '
-			<div class="flexi-socials toolbar-element">
-				<div class="addthis_toolbox addthis_default_style">
-				<a href="http://www.addthis.com/bookmark.php?v=250&username='.$addthis_user.'" class="addthis_button_compact">'.JText::_('FLEXI_FIELD_TOOLBAR_SHARE').'</a>
-				<span class="addthis_separator">|</span>
-				<a class="addthis_button_facebook" title="'.JText::_('FLEXI_FIELD_TOOLBAR_FACEBOOK').'"></a>
-				<a class="addthis_button_myspace" title="'.JText::_('FLEXI_FIELD_TOOLBAR_MYSPACE').'"></a>
-				<a class="addthis_button_google" title="'.JText::_('FLEXI_FIELD_TOOLBAR_GOOGLE').'"></a>
-				<a class="addthis_button_twitter" title="'.JText::_('FLEXI_FIELD_TOOLBAR_TWITTER').'"></a>
-			</div>
-			';
+			$addthis_outside_toolbar  = $field->parameters->get('addthis_outside_toolbar', 0);
+			$addthis_custom_code       = $field->parameters->get('addthis_custom_code', false);
+			$addthis_custom_predefined = $field->parameters->get('addthis_custom_predefined', false);
+			
+			$addthis_code = '';
+			if ($addthis_custom_code) {
+				$addthis_code .= $addthis_custom_code;
+			}
+			else {
+				switch ($addthis_custom_predefined) {
+					case 1:
+						$addthis_code .= '
+						<!-- AddThis Button BEGIN -->
+						<div class="addthis_toolbox addthis_default_style addthis_counter_style">
+						<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+						<a class="addthis_button_tweet"></a>
+						<a class="addthis_button_pinterest_pinit"></a>
+						<a class="addthis_counter addthis_pill_style"></a>
+						</div>
+						<!-- AddThis Button END -->
+						';
+						break;
+					case 2:
+						$addthis_code .= '
+						<!-- AddThis Button BEGIN -->
+						<div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+						<a class="addthis_button_preferred_1"></a>
+						<a class="addthis_button_preferred_2"></a>
+						<a class="addthis_button_preferred_3"></a>
+						<a class="addthis_button_preferred_4"></a>
+						<a class="addthis_button_compact"></a>
+						<a class="addthis_counter addthis_bubble_style"></a>
+						</div>
+						<!-- AddThis Button END -->
+						';
+						break;
+					default:
+					case 3:
+						$addthis_code .= '
+						<!-- AddThis Button BEGIN -->
+						<div class="addthis_toolbox addthis_default_style addthis_16x16_style">
+						<a class="addthis_button_preferred_1"></a>
+						<a class="addthis_button_preferred_2"></a>
+						<a class="addthis_button_preferred_3"></a>
+						<a class="addthis_button_preferred_4"></a>
+						<a class="addthis_button_compact"></a>
+						<a class="addthis_counter addthis_bubble_style"></a>
+						</div>
+						<!-- AddThis Button END -->
+						';
+						break;
+					case 4:
+						$addthis_code .= '
+						<!-- AddThis Button BEGIN -->
+						<a class="addthis_button" href="http://www.addthis.com/bookmark.php?v=300&pubid='.$addthis_pubid.'"><img src="http://s7.addthis.com/static/btn/v2/lg-share-en.gif" width="125" height="16" alt="'.JText::_('FLEXI_FIELD_TOOLBAR_SHARE').'" style="border:0"/></a>
+						<!-- AddThis Button END -->
+						';
+						break;
+					case 5:
+						$addthis_code .= '
+						<!-- AddThis Button BEGIN -->
+						<div class="addthis_toolbox addthis_floating_style addthis_counter_style" style="left:50px;top:50px;">
+						<a class="addthis_button_facebook_like" fb:like:layout="box_count"></a>
+						<a class="addthis_button_tweet" tw:count="vertical"></a>
+						<a class="addthis_button_google_plusone" g:plusone:size="tall"></a>
+						<a class="addthis_counter"></a>
+						</div>
+						<!-- AddThis Button END -->
+						';
+						break;
+					case 6:
+						$addthis_code .= '
+						<!-- AddThis Button BEGIN -->
+						<div class="addthis_toolbox addthis_floating_style addthis_32x32_style" style="left:50px;top:50px;">
+						<a class="addthis_button_preferred_1"></a>
+						<a class="addthis_button_preferred_2"></a>
+						<a class="addthis_button_preferred_3"></a>
+						<a class="addthis_button_preferred_4"></a>
+						<a class="addthis_button_compact"></a>
+						</div>
+						<!-- AddThis Button END -->
+						';
+						break;
+					case 7:
+						$addthis_code .= '
+						<!-- AddThis Button BEGIN -->
+						<div class="addthis_toolbox addthis_floating_style addthis_16x16_style" style="left:50px;top:50px;">
+						<a class="addthis_button_preferred_1"></a>
+						<a class="addthis_button_preferred_2"></a>
+						<a class="addthis_button_preferred_3"></a>
+						<a class="addthis_button_preferred_4"></a>
+						<a class="addthis_button_compact"></a>
+						</div>
+						<!-- AddThis Button END -->
+						';
+						break;
+				}
+			}
+			if ($addthis_outside_toolbar)
+				$display .= '<div class="flexi-socials-outside">'.$addthis_code.'</div>';
+			else 
+				$display .= '<div class="flexi-socials toolbar-element">' .$addthis_code. '</div>';
+			
+			
 			if (!$addthis) {
 				$document->addCustomTag('	
-					<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username='.$addthis_user.'"></script>
+					<script type="text/javascript" src="http://s7.addthis.com/js/300/addthis_widget.js#pubid='.$addthis_pubid.'"></script>
 					<script type="text/javascript">
 					var addthis_config = {
 					     services_exclude: "print,email"
@@ -229,7 +326,6 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 				');
 				$addthis = 1;
 			}
-			$display	.= '</div>';
 		}
 		
 		$display	.= '</div>'; // end of the toolbar container

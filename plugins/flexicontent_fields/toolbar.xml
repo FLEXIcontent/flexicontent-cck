@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
 	<name>FLEXIcontent - Toolbar</name>
-	<author>Emmanuel Danan</author>
+	<author>Emmanuel Danan, George Papadakis</author>
 	<creationDate>March 2011</creationDate>
 	<copyright>Copyright (C) 2009-2012 Emmanuel Danan</copyright>
 	<license>GNU/GPL v2</license>
@@ -24,6 +24,10 @@
 			<field name="backend_hidden" type="hidden" default="1" />
 		</params>
 		<params group="group-toolbar" addpath="/administrator/components/com_flexicontent/elements">
+
+			<field name="" type="separator" default="Basic Configuration" level="level1" />
+
+			<field name="" type="separator" default="Various Controls" level="level2" />
 			<field name="display-comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
@@ -36,20 +40,19 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
+			<field name="display-pdf" type="radio" default="0" label="FLEXI_FIELD_TOOLBAR_PDF" description="FLEXI_FIELD_TOOLBAR_PDF_DESC">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			
+			<field name="" type="separator" default="Voice Controls" level="level2" />
 			<field name="display-voice" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_VOICE" description="FLEXI_FIELD_TOOLBAR_VOICE_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="voicetarget" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_VOICE_TARGET" description="FLEXI_FIELD_TOOLBAR_VOICE_TARGET_DESC" />
-			<field name="display-pdf" type="radio" default="0" label="FLEXI_FIELD_TOOLBAR_PDF" description="FLEXI_FIELD_TOOLBAR_PDF_DESC">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
-			</field>
-			<field name="display-social" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_ADDTHIS" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_DESC">
-				<option value="1">FLEXI_YES</option>
-				<option value="0">FLEXI_NO</option>
-			</field>
-			<field name="addthis-user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USER" description="FLEXI_FIELD_TOOLBAR_USER_DESC" />
+			
+			<field name="" type="separator" default="Resize Controls" level="level2" />
 			<field name="display-resizer" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_RESIZER" description="FLEXI_FIELD_TOOLBAR_RESIZER_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
@@ -57,11 +60,41 @@
 			<field name="default-size" type="text" size="4" default="12" label="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE" description="FLEXI_FIELD_TOOLBAR_DEFAULT_SIZE_DESC" />
 			<field name="default-line" type="text" size="4" default="16" label="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE" description="FLEXI_FIELD_TOOLBAR_DEFAULT_LINE_DESC" />
 			<field name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
-			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_DISPLAY" level="level1" menu="hide" />
+			
+			
+			<field name="" type="separator" default="Social Buttons (via AddThis) " level="level1" />
+			
+			<field name="display-social" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS" description="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS_DESC">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			<field name="addthis-user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USERNAME" description="FLEXI_FIELD_TOOLBAR_USERNAME_DESC" />
+			<field name="addthis_pubid" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_PUBID" description="FLEXI_FIELD_TOOLBAR_PUBID_DESC" />
+			<field name="addthis_outside_toolbar" type="radio" default="1" label="Place outside toolbar" description="Place AddThis social buttons inside toolbar. Note: This effects online inline buttons and not the floating buttons">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO</option>
+			</field>
+			
+			<field name="" type="separator" default="CASE A: Predefined HTML Code" description="" level="level2" />
+			<field name="addthis_custom_predefined" type="list" default="3" label="(Addthis) HTML Code" description="A list of predefined styles">
+				<option value="1">Horizontal (inline) Common Counters</option>
+				<option value="2">Horizontal (inline) Popular Buttons 32</option>
+				<option value="3">Horizontal (inline) Popular Buttons 16</option>
+				<option value="4">Horizontal (inline) Single Share Button</option>
+				<option value="5">Vertical (floating) Common Counters</option>
+				<option value="6">Vertical (floating) Popular Buttons 32</option>
+				<option value="7">Vertical (floating) Popular Buttons 16</option>
+			</field>
+			
+			<field name="" type="separator" default="CASE B: Custom HTML code (overrides above)" description="" level="level2" />
+			<field name="addthis_custom_code" type="textarea" default="" label="(Addthis) HTML Code" description="Enter custom -AddThis- HTML code. First, please read AddThis online documentation, and make sure not to enter broken HTML code" rows="20" cols="38"  filter="raw" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_DISPLAY" level="level1" />
 			<field name="load-css" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_CSS" description="FLEXI_FIELD_TOOLBAR_CSS_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
+			
 			<!--field name="spacer-size" type="text" default="21" size="4" label="FLEXI_FIELD_TOOLBAR_SPACER" description="FLEXI_FIELD_TOOLBAR_SPACER_DESC" />
 			<field name="module_position" type="text" default="" size="20" label="Position du module" description="Position du module pour le cache avancé (expérimental)" />
 			<field name="required" type="radio" default="0" label="Required" description="Required">

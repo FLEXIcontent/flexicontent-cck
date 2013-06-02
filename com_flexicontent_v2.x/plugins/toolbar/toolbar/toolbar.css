@@ -77,6 +77,12 @@
 .flexi-socials {
 	padding-top: 9px;
 }
+/* Share */
+.flexi-socials-outside {
+	clear: both;
+	padding-top: 9px;
+	display:block;
+}
 
 .addthis_toolbox {font-size: 12px;}
 .addthis_toolbox a {font-size: 12px; text-decoration: none; color: #00568F;}
