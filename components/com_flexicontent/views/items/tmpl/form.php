@@ -252,11 +252,9 @@ $tabCnt[$tabSetCnt] = 0;
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_GENERAL' ); ?> </h3>
 		
-		<div class="fc_edit_corefields_full">
-		<?php /* <fieldset class="basicfields_set">
-			<legend>
-				<?php echo JText::_( 'FLEXI_BASIC_PROPERTIES' ); ?>
-			</legend>*/ ?>
+		<div class="fc_edit_container_full">
+		<?php /*<fieldset class="basicfields_set">
+			<legend><?php echo JText::_( 'FLEXI_BASIC' ); ?></legend>*/ ?>
 			
 			<?php
 				$field = $this->fields['title'];
@@ -369,8 +367,8 @@ $tabCnt[$tabSetCnt] = 0;
 
 		<?php if (!$secondary_displayed && !$tags_displayed) : /* if secondary categories are displayed then place this in the relevant tab !! */ ?>
 	
+			<div class="fcclear"></div>
 			<?php if ($this->menuCats) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
-				<div class="fcclear"></div>
 				<label id="catid-lbl" for="catid" class="flexi_label">
 					<?php echo JText::_( !$this->menuCats->cid ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
 				</label>
@@ -378,7 +376,6 @@ $tabCnt[$tabSetCnt] = 0;
 					<?php echo $this->menuCats->catid; ?>
 				</div>
 			<?php else : ?>
-				<div class="fcclear"></div>
 				<label id="catid-lbl" for="catid" class="flexi_label">
 					<?php echo JText::_( (!$this->lists['cid']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
 				</label>
@@ -476,6 +473,7 @@ $tabCnt[$tabSetCnt] = 0;
 		<?php endif; ?>
 
 		<?php /*</fieldset>*/ ?>
+		</div>
 
 
 		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
@@ -483,7 +481,7 @@ $tabCnt[$tabSetCnt] = 0;
 			<div class="fcclear"></div>
 			<fieldset class="basicfields_set" style="margin:8px 0px 16px 0px;">
 				<legend>
-					<?php echo JText::_( 'FLEXI_LANGUAGE_PROPERTIES' ); ?>
+					<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 				</legend>
 			
 				<label id="language" for="language" class="flexi_label">
@@ -580,7 +578,6 @@ $tabCnt[$tabSetCnt] = 0;
 			
 		<?php endif; ?>
 		
-		</div>
 		
 	<?php if (FLEXI_ACCESS && $this->perms['canright'] && $this->item->id) : ?>
 		<?php
@@ -617,9 +614,10 @@ $tabCnt[$tabSetCnt] = 0;
 
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_( $tab_lbl ); ?> </h3>
-		<div class="fc_edit_corefields_full">
-
-		<?php /*<fieldset class="flexi_cats customfields_set"><legend><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></legend>*/ ?>
+		
+		<div class="fc_edit_container_full">
+		<?php /*<fieldset class="flexi_cats customfields_set">
+			<legend><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></legend>*/ ?>
 		
 		<div class="fcclear"></div>
 		<label id="catid-lbl" for="catid" class="flexi_label">
@@ -659,7 +657,7 @@ $tabCnt[$tabSetCnt] = 0;
 		
 			<?php /*<fieldset class="flexi_tags customfields_set" >
 				<legend>
-					<?php echo JText::_( 'FLEXI_TAGS_PROPERTIES' ); ?>
+					<?php echo JText::_( 'FLEXI_TAGGING' ); ?>
 				</legend>*/ ?>
 			
 				<?php
@@ -687,8 +685,8 @@ $tabCnt[$tabSetCnt] = 0;
 							}
 						?>
 						</ul>
-						<br class="clear" />
 					</div>
+					
 					<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
 					<div class="fcclear"></div>
 					<div id="tags">
@@ -737,8 +735,9 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 			");
 		?>
 		
-		<fieldset class="customfields_set">
-			<legend><?php echo $type_lbl; ?></legend>
+		<div class="fc_edit_container_full">
+		<?php /*<fieldset class="customfields_set>
+			<legend><?php echo $type_lbl; ?></legend>*/ ?>
 			
 			<?php
 			$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
@@ -848,11 +847,12 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 			<?php
 			}
 			?>
-		</fieldset>
+		<?php /*</fieldset>*/ ?>
+		</div>
 
 	</div> <!-- end tab -->
 	
-<?php else : ?>
+<?php else : /* NO TYPE SELECTED */ ?>
 
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo $type_lbl; ?> </h3>
@@ -872,6 +872,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 	
 <?php if ($typeid) : // hide items parameters (standard, extended, template) if content type is not selected ?>
 
+	
 	<?php /*$tabSetCnt++; $tabCnt[$tabSetCnt] = 0;*/ ?>
 	<!-- tabber start -->
 	<?php /*<div class='fctabber params_tabset' id='fcform_tabset_<?php echo $tabSetCnt; ?>' >*/ ?>
@@ -903,6 +904,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 			<h3 class="tabberheading"> <?php echo $title; ?> </h3>
 			
+			<fieldset class="panelform fc_edit_container_full">
 				<div class='fc_mini_note_box'>
 				<?php
 					// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
@@ -919,205 +921,248 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 					echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '<br>', $tz_info );
 				?>
 				</div>
+				
+				<div class="fcclear"></div>
+				<div class="flexi_params">
+					<?php echo $this->formparams->render('details'); ?>
+				</div>
+				
+				<?php /*echo $this->tabs_pane->endPanel();*/ ?>
+			</fieldset>
 			
-		<?php
-			echo $this->formparams->render('details');
-			//echo $this->tabs_pane->endPanel();
-		?>
 		</div> <!-- end tab -->
 
 	<?php endif; ?>
 	
 	
-	<?php if ( $this->params->get('usemetadata_fe', 1) ) { ?>
-	<?php
-		$title = JText::_( 'FLEXI_METADATA_INFORMATION' );
-		//echo $this->tabs_pane->startPanel( $title, 'metadata' );	
-	?>
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-		<h3 class="tabberheading"> <?php echo $title; ?> </h3>
-
-	<table class="paramlist admintable" width="100%" cellspacing="1" style="height:">
-		<tbody>
-		<tr>
-			<td class="paramlist_key" width="40%">
-				<span class="editlinktip">
-					<label id="metadescription-lbl" class="hasTip" for="metadescription" title="::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_METADESC' ), ENT_COMPAT, 'UTF-8'); ?>" >
-						<?php echo JText::_('FLEXI_DESCRIPTION'); ?>
-					</label>
-				</span>
-			</td>
-			<td class="paramlist_value">
-			
-				<?php	if ( isset($this->item->item_translations) ) :?>
-				
-					<!-- tabber start -->
-					<div class="fctabber" style='display:inline-block;'>
-						<div class="tabbertab" style="padding: 0px;" >
-							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
-							<textarea id="metadescription" class="text_area" rows="3" cols="80" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
-						</div>
-						<?php foreach ($this->item->item_translations as $t): ?>
-							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
-								<div class="tabbertab" style="padding: 0px;" >
-									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
-									<?php
-									$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
-									$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
-									?>
-									<textarea id="<?php echo $ff_id; ?>" class="text_area" rows="3" cols="80" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
-								</div>
-							<?php endif; ?>
-						<?php endforeach; ?>
-					</div>
-					<!-- tabber end -->
-			
-				<?php else : ?>
-					<textarea id="metadescription" class="text_area" rows="3" cols="80" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
-				<?php endif; ?>
-			
-			</td>
-		</tr>
-			
-		<tr>
-			<td class="paramlist_key" width="40%">
-				<span class="editlinktip">
-					<label id="metakeywords-lbl" class="hasTip" for="metakeywords" title="::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_METAKEYS' ), ENT_COMPAT, 'UTF-8'); ?>" >
-						<?php echo JText::_('FLEXI_Keywords'); ?>
-					</label>
-				</span>
-			</td>
-			<td class="paramlist_value">
-			
-				<?php	if ( isset($this->item->item_translations) ) :?>
-			
-					<!-- tabber start -->
-					<div class="fctabber" style='display:inline-block;'>
-						<div class="tabbertab" style="padding: 0px;" >
-							<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
-							<textarea id="metakeywords" class="text_area" rows="3" cols="80" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
-						</div>
-						<?php foreach ($this->item->item_translations as $t): ?>
-							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
-								<div class="tabbertab" style="padding: 0px;" >
-									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
-									<?php
-									$ff_id = 'jfdata_'.$t->shortcode.'_metakey';
-									$ff_name = 'jfdata['.$t->shortcode.'][metakey]';
-									?>
-									<textarea id="<?php echo $ff_id; ?>" class="text_area" rows="3" cols="80" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
-								</div>
-							<?php endif; ?>
-						<?php endforeach; ?>
-					</div>
-					<!-- tabber end -->
-			
-				<?php else : ?>
-					<textarea id="metakeywords" class="text_area" rows="3" cols="80" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
-				<?php endif; ?>
-			
-				</td>
-			</tr>
-		</table>
+	<?php if ( $this->params->get('usedisplaydetails_fe') ) : ?>
+		<?php $title=JText::_('FLEXI_DISPLAYING'); ?>
 		
-		<?php
-		if ( $this->params->get('usemetadata_fe', 1) == 2 ) :
-			echo $this->formparams->render('meta', 'metadata');
-		endif;
-		if ( $this->params->get('usemetadata_fe', 1) ) :
-			//echo $this->tabs_pane->endPanel();
-			?></div><?php
-		endif;
-		?>
-
-	<?php } ?>
-	
-	
-	<?php
-		$useitemparams_fe = $this->params->get('useitemparams_fe');
-		if ( empty($useitemparams_fe) ) {
-			$useitemparams_fe = array();
-		} else if ( !is_array($useitemparams_fe) ) {
-			$useitemparams_fe = explode("|", $useitemparams_fe);
-		}
-		
-		if ( in_array('basic', $useitemparams_fe) ) {
-			$title = /*JText::_('FLEXI_PARAMETERS') .": ".*/ JText::_( 'FLEXI_PARAMETERS_ITEM_BASIC' );
-			//echo $this->tabs_pane->startPanel( $title, "params-basic" );
-		?>
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-		<h3 class="tabberheading"> <?php echo $title; ?> </h3>
-		<?php
-			echo $this->formparams->render('params', 'basic');
-			//echo $this->tabs_pane->endPanel();
-			?></div><?php
-		}
-		
-		if ( in_array('advanced', $useitemparams_fe) ) {
-			$title = /*JText::_('FLEXI_PARAMETERS') .": ".*/ JText::_( 'FLEXI_PARAMETERS_ITEM_ADVANCED' );
-			//echo $this->tabs_pane->startPanel( $title, "params-advanced" );
-		?>
 		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 			<h3 class="tabberheading"> <?php echo $title; ?> </h3>
 			
 			<?php
-				echo $this->formparams->render('params', 'advanced');
-				//echo $this->tabs_pane->endPanel();
-				?></div> <!-- end tab --><?php
-		}
-
-		if ( in_array('seoconf', $useitemparams_fe) ) {
-			$title = /*JText::_('FLEXI_PARAMETERS') .": ".*/ JText::_( 'FLEXI_PARAMETERS_ITEM_SEO' );
-			//echo $this->tabs_pane->startPanel( $title, "params-seoconf" );
+				/*
+				echo $this->pane->startPane( 'det-pane' );
+				
+				if ( $this->params->get('usedisplaydetails_fe') >= 1 ) {
+					$title = JText::_('FLEXI_PARAMETERS_ITEM_BASIC' );
+					echo $this->pane->startPanel( $title, "params-basic" );
+					echo $this->formparams->render('params', 'basic');
+					echo $this->pane->endPanel();
+				}
+				
+				if ( $this->params->get('usedisplaydetails_fe') >= 2 ) {
+					$title = JText::_('FLEXI_PARAMETERS_ITEM_ADVANCED' );
+					echo $this->pane->startPanel( $title, "params-advanced" );
+					echo $this->formparams->render('params', 'advanced');
+					echo $this->pane->endPanel();
+				}
+				
+				if ($this->params->get('usemetadata_fe', 1) == 2 ) {
+					$title = JText::_('FLEXI_METADATA_INFORMATION' );
+					echo $this->pane->startPanel( $title, "params-metadata" );
+					echo $this->formparams->render('meta', 'metadata');
+					echo $this->pane->endPanel();
+				}
+				
+				if ( $this->params->get('useseoconf_fe', 0) ) {
+					$title = JText::_('FLEXI_PARAMETERS_ITEM_SEO' );
+					echo $this->pane->startPanel( $title, "params-seoconf" );
+					echo $this->formparams->render('params', 'seoconf');
+					echo $this->pane->endPanel();
+				}
+				
+				echo $this->pane->endPane();
+				*/
 			?>
-			<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-				<h3 class="tabberheading"> <?php echo $title; ?> </h3>
-			<?php
-			echo $this->formparams->render('params', 'seoconf');
-			//echo $this->tabs_pane->endPanel();
-			?></div><?php
-		}
-	?>
+			
+			<?php if ( $this->params->get('usedisplaydetails_fe') >= 1 ) : ?>
+				<div class="flexi_params">
+					<?php echo $this->formparams->render('params', 'basic'); ?>
+				</div>
+			<?php endif; ?>
+			
+			<?php if ( $this->params->get('usedisplaydetails_fe') >= 2 ) : ?>
+				<div class="flexi_params">
+					<?php echo $this->formparams->render('params', 'advanced'); ?>
+				</div>
+			<?php endif; ?>
+			
+		</div> <!-- end tab -->
+		
+	<?php endif; ?>
 	
-	<?php
-		// we need to close sliders to place some parameters outside sliders
-		//echo $this->tabs_pane->endPane();
-	?>
+	
+	<?php if ( $this->params->get('usemetadata_fe', 1) || $this->params->get('useseoconf_fe', 0)  ) : ?>
+		<?php
+		if ( $this->params->get('usemetadata_fe', 1) && $this->params->get('useseoconf_fe', 0) )
+			$title = JText::_( 'FLEXI_META_SEO' );
+		else
+			$title = JText::_( $this->params->get('useseoconf_fe', 0) ? 'FLEXI_SEO' : 'FLEXI_META' );
+		//echo $this->tabs_pane->startPanel( $title, 'metadata' );	
+		?>
+		
+		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+			<h3 class="tabberheading"> <?php echo $title; ?> </h3>
+	
+			<fieldset class="params_set">
+				<legend>
+					<?php echo JText::_( 'FLEXI_META' ); ?>
+				</legend>
+				
+				<?php if ($this->params->get('usemetadata_fe', 1)) : ?>
+					<div class="flexi_params">
+					<table width="100%" cellspacing="1" class="paramlist admintable"><tbody>
+						<tr>
+							<td width="40%" class="paramlist_key"><span class="editlinktip">
+							<label id="metadescription-lbl" class="hasTip" for="metadescription" title="::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_METADESC' ), ENT_COMPAT, 'UTF-8'); ?>" >
+								<?php echo JText::_('FLEXI_DESCRIPTION'); ?>
+							</label>
+							</span></td>
+							
+							<td class="paramlist_value">
+								<?php	if ( isset($this->item->item_translations) ) :?>
+									
+									<!-- tabber start -->
+									<div class="fctabber" style='display:inline-block;'>
+										<div class="tabbertab" style="padding: 0px;" >
+											<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
+											<textarea id="metadescription" class="text_area" rows="3" cols="80" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
+										</div>
+										<?php foreach ($this->item->item_translations as $t): ?>
+											<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
+												<div class="tabbertab" style="padding: 0px;" >
+													<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+													<?php
+													$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
+													$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
+													?>
+													<textarea id="<?php echo $ff_id; ?>" class="text_area" rows="3" cols="80" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
+												</div>
+											<?php endif; ?>
+										<?php endforeach; ?>
+									</div>
+									<!-- tabber end -->
+									
+								<?php else : ?>
+									<textarea id="metadescription" class="text_area" rows="3" cols="80" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
+								<?php endif; ?>
+							</td>
+						</tr>
+						
+						<tr>
+							<td width="40%" class="paramlist_key"><span class="editlinktip">
+								<label id="metakeywords-lbl" class="hasTip" for="metakeywords" title="::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_METAKEYS' ), ENT_COMPAT, 'UTF-8'); ?>" >
+									<?php echo JText::_('FLEXI_Keywords'); ?>
+								</label>
+							</span></td>
+							
+							<td class="paramlist_value">
+								<?php	if ( isset($this->item->item_translations) ) :?>
+									
+									<!-- tabber start -->
+									<div class="fctabber" style='display:inline-block;'>
+										<div class="tabbertab" style="padding: 0px;" >
+											<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
+											<textarea id="metakeywords" class="text_area" rows="3" cols="80" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
+										</div>
+										<?php foreach ($this->item->item_translations as $t): ?>
+											<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
+												<div class="tabbertab" style="padding: 0px;" >
+													<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+													<?php
+													$ff_id = 'jfdata_'.$t->shortcode.'_metakey';
+													$ff_name = 'jfdata['.$t->shortcode.'][metakey]';
+													?>
+													<textarea id="<?php echo $ff_id; ?>" class="text_area" rows="3" cols="80" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
+												</div>
+											<?php endif; ?>
+										<?php endforeach; ?>
+									</div>
+									<!-- tabber end -->
+									
+								<?php else : ?>
+									<textarea id="metakeywords" class="text_area" rows="3" cols="80" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
+								<?php endif; ?>
+							</td>
+						</tr>
+						
+					</tbody></table>
+					</div>
+					
+				<?php endif; ?>
+				
+				<?php if ($this->params->get('usemetadata_fe', 1) == 2 ) : ?>
+					<div class="fcclear"></div>
+					<div class="flexi_params">
+						<?php echo $this->formparams->render('meta', 'metadata'); ?>
+					</div>
+				<?php endif; ?>
+				
+			</fieldset>
+	
+			<?php if ( $this->params->get('useseoconf_fe', 0) ) :?>
+			<fieldset class="params_set">
+				<legend>
+					<?php echo JText::_( 'FLEXI_SEO' ); ?>
+				</legend>
+				
+				<div class="fcclear"></div>
+				<div class="flexi_params">
+					<?php echo $this->formparams->render('params', 'seoconf'); ?>
+				</div>
+				
+			</fieldset>
+			<?php endif; ?>
+		
+		</div> <!-- end tab -->
+	<?php endif; ?>
 	
 	
 	<?php if ($this->perms['cantemplates'] && $this->params->get('selecttheme_fe')) : ?>
-	<?php $title=JText::_('FLEXI_TEMPLATE'); ?>
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-		<h3 class="tabberheading"> <?php echo $title; ?> </h3>
-		<div class="fcclear"></div>
-		
-		<?php
-			$type_default_layout = $this->tparams->get('ilayout');
-			echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
 
-			echo $this->formparams->render('params', 'themes');
-		?>
-	
-		<blockquote id='__content_type_default_layout__'>
-			<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
-		</blockquote>
-	
-		<?php
-			if ( $this->params->get('selecttheme_fe') == 2 ) :
-				echo $this->pane->startPane( 'template-sliders' );
-				foreach ($this->tmpls as $tmpl) :
-					$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-					echo $this->pane->startPanel( $title, "params-".$tmpl->name );
-					echo $tmpl->params->render();
-					echo $this->pane->endPanel();
-				endforeach;
-				echo $this->pane->endPane();
-			endif;
-		?>
+		<?php $title=JText::_('FLEXI_TEMPLATE'); ?>
 		
-	</div> <!-- end tab -->
+		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+			<h3 class="tabberheading"> <?php echo $title; ?> </h3>
+			
+			<fieldset class="flexi_params fc_edit_container_full">
+				
+				<?php $type_default_layout = $this->tparams->get('ilayout'); ?>
+				<?php echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>'; ?>
+				
+				<?php	$type_default_layout = $this->tparams->get('ilayout'); ?>
+				<?php /*echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';*/ ?>
+				
+				<div class="fcclear"></div>
+				<div class="flexi_params">
+					<?php echo $this->formparams->render('params', 'themes'); ?>
+				</div>
+		
+				<blockquote id='__content_type_default_layout__'>
+					<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
+				</blockquote>
+			
+				<?php
+					if ( $this->params->get('selecttheme_fe') == 2 ) :
+						echo $this->pane->startPane( 'template-sliders' );
+						foreach ($this->tmpls as $tmpl) :
+							$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
+							echo $this->pane->startPanel( $title, "params-".$tmpl->name );
+							echo $tmpl->params->render();
+							echo $this->pane->endPanel();
+						endforeach;
+						echo $this->pane->endPane();
+					endif;
+				?>
+				
+			</fieldset>
+				
+		</div> <!-- end tab -->
+			
 	<?php endif; // end cantemplate and selecttheme_fe ?>
-
+		
 <?php	endif; // end of existing item ?>
 
 

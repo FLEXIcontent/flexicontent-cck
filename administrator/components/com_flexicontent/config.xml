@@ -444,6 +444,8 @@
 				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
 				<option value="id">FLEXI_ORDER_HIGHEST_ITEM_ID</option>
 				<option value="rid">FLEXI_ORDER_LOWEST_ITEM_ID</option>
+				<option value="commented">FLEXI_ORDER_MOST_COMMENTED</option>
+				<option value="rated">FLEXI_ORDER_BEST_RATED</option>
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</param>
 			
@@ -487,9 +489,9 @@
 			<param name="" type="separator" default="FLEXI_AVAILABLE_OPTIONS" description="" level="level3" hr="false" menu="hide" />
 			<param name="limit_options" type="text" default="5,10,20,30,50,100,150,200" size="52" label="FLEXI_NUM_PER_PAGE_OPTIONS" description="FLEXI_NUM_PER_PAGE_OPTIONS_DESC" menu="hide" />
 			<param name="orderby_options" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
-				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_CONFIGURED_ORDER"
-				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,id,rid,order"
-				defaultvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,id,rid,order"
+				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST,FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE,FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_HIGHEST_ITEM_ID,FLEXI_ORDER_LOWEST_ITEM_ID,FLEXI_ORDER_MOST_COMMENTED,FLEXI_ORDER_BEST_RATED,FLEXI_ORDER_CONFIGURED_ORDER"
+				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order"
+				defaultvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order"
 				label="FLEXI_PRIMARY_ORDER_OPTIONS" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
 		
 		<param name="" type="separator" default="FLEXI_ITEM_FILTERING_CONF" description="" level="level1" hr="false" menu="hide" />
@@ -606,15 +608,11 @@
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,save_preview,preview_latest" defaultvals="apply,save_preview,preview_latest"
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC"  menu="hide"/>
+			<param name="submit_redirect_url_fe" type="text" default="" size="106" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" menu="hide" />
+			
+			<param name="" type="separator" default="FLEXI_BASIC_EDITING" label="" level="level2" menu="hide" />
+			
 			<param name="usealias_fe" type="radio" default="1" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC" menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="allowlangmods_fe" type="fccheckbox" default=""
-				checkoptions="FLEXI_MODIFY_ITEMLANG,FLEXI_MODIFY_ORIGINAL_CONTENT_ASSOC"
-				checkvals="mod_item_lang,mod_original_content_assoc" defaultvals="mod_item_lang"
-				label="FLEXI_MENU_ALLOW_LANG_MODS" description="FLEXI_MENU_ALLOW_LANG_MODS_DESC" menu="hide"/>
-			<param name="allow_subscribers_notify_fe" type="radio" default="0" label="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY" description="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
@@ -623,29 +621,51 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
 			</param>
+			
+			<param name="allowlangmods_fe" type="fccheckbox" default=""
+				checkoptions="FLEXI_MODIFY_ITEMLANG,FLEXI_MODIFY_ORIGINAL_CONTENT_ASSOC"
+				checkvals="mod_item_lang,mod_original_content_assoc" defaultvals="mod_item_lang"
+				label="FLEXI_MENU_ALLOW_LANG_MODS" description="FLEXI_MENU_ALLOW_LANG_MODS_DESC" menu="hide"/>
+			<param name="allow_subscribers_notify_fe" type="radio" default="0" label="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY" description="FLEXI_ALLOW_SUBSCIRBERS_NOTIFY_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES_ONCE_PER_SESSION</option>
+			</param>
 			<param name="allowdisablingcomments_fe" type="radio" default="0" label="FLEXI_ALLOW_DISABLING_COMMENTS" description="FLEXI_ALLOW_DISABLING_COMMENTS_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="usemetadata_fe" type="radio" default="1" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC" menu="hide">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
-				<option value="2">FLEXI_MENU_YES_ALL</option>
-			</param>
+			
+			<param name="" type="separator" default="FLEXI_ADVANCED_EDITING" label="" level="level2" menu="hide" />
+			
 			<param name="usepublicationdetails_fe" type="radio" default="1" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
 				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
 			</param>
-			<param name="useitemparams_fe" type="fccheckbox" default=""
-				checkoptions="FLEXI_PARAMETERS_ITEM_BASIC,FLEXI_PARAMETERS_ITEM_ADVANCED,FLEXI_PARAMETERS_ITEM_SEOCONF" checkvals="basic,advanced,seoconf" defaultvals=""
-				label="FLEXI_MENU_USE_ITEM_PARAMETERS" description="FLEXI_MENU_USE_ITEM_PARAMETERS_DESC" menu="hide"/>
-			<param name="selecttheme_fe" type="radio" default="0" label="FLEXI_MENU_SELECT_THEME" description="FLEXI_MENU_SELECT_THEME_DESC" menu="hide">
+			
+			<param name="usemetadata_fe" type="radio" default="1" label="FLEXI_MENU_USE_METADATA" description="FLEXI_MENU_USE_METADATA_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_MENU_YES_BASIC_RECOMMENDED</option>
+				<option value="2">FLEXI_MENU_YES_ALL_STAR</option>
+			</param>
+			<param name="useseoconf_fe" type="radio" default="0" label="FLEXI_MENU_USE_SEO_CONF" description="FLEXI_MENU_USE_SEO_CONF_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			
+			<param name="usedisplaydetails_fe" type="radio" default="0" label="FLEXI_MENU_USE_DISPLAY_DETAILS" description="FLEXI_MENU_USE_DISPLAY_DETAILS_DESC" menu="hide">
+				<option value="0">FLEXI_NO_RECOMMENDED</option>
+				<option value="1">FLEXI_PARAMETERS_ITEM_BASIC</option>
+				<option value="2">FLEXI_PARAMETERS_ITEM_ADVANCED</option>
+			</param>
+			<param name="selecttheme_fe" type="radio" default="0" label="FLEXI_MENU_THEME_SELECTION" description="FLEXI_MENU_THEME_SELECTION_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_MENU_YES_SELECT_THEME</option>
 				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_THEME</option>
 			</param>
-			<param name="submit_redirect_url_fe" type="text" default="" size="106" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" menu="hide" />
+			
+			<param name="" type="separator" default="FLEXI_STYLING" label="" level="level2" menu="hide" />
+			
 			<param name="form_container_css_fe" type="text" default="max-width:800px;" size="106" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" menu="hide" />
 			<param name="form_extra_css" type="textarea" default="" rows="5" cols="60" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" menu="hide" />
 		
