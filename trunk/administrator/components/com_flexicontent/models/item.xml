@@ -13,7 +13,10 @@
 		<param name="publish_up" type="calendar" default="" label="Start Publishing" description="FLEXI_DETAILSTART" />
 		<param name="publish_down" type="calendar" default="" label="Finish Publishing" description="FLEXI_DETAILFINISH" />
 	</params>
+	
 	<params group="basic">
+		
+		<param name="" type="separator" default="FLEXI_PARAMETERS_ICONS" description="..." level="level2" />
 		<param name="show_pdf_icon" type="list" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
@@ -29,6 +32,8 @@
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
+		
+		<param name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" description="..." level="level2" />
 		<param name="show_title" type="list" default="" label="Show Title" description="Enables disable the appearance of the title">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
@@ -43,6 +48,8 @@
 	</params>
 	
 	<params group="advanced">
+		
+		<param name="" type="separator" default="FLEXI_ADVANCED" description="..." level="level2" />
 		<param name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
@@ -56,6 +63,7 @@
 		</param>
 		<!--param name="language" type="languages" size="30" client="site" label="Content Language (for Browser)" description="Indication to the the browser for the language used to write this content" /-->
 		<!--param name="keyref" type="text" size="30" default="" label="Key Reference" description="A Unique Key which can be used to undentify the item in the URL, like &amp;key=keyref, note this is currently unusued" /-->
+		
 	</params>
 	
 	<params group="seoconf">
@@ -80,6 +88,8 @@
 	<params group="metadata">
 		<!--param name="description" type="textarea" rows="5" cols="27" default="" label="FLEXI_Description" description="FLEXI_METADESC" /-->
 		<!--param name="keywords" type="textarea" rows="5" cols="27" default="" label="FLEXI_Keywords" description="FLEXI_METAKEYS" /-->
+		
+		<field name="" type="separator" default="FLEXI_ADVANCED" description="" level="level2" />
 		<param name="robots" type="text" size="34" default="" label="FLEXI_Robots" description="FLEXI_METAROBOTS" />
 		<param name="author" type="text" size="34" default="" label="FLEXI_Author" description="FLEXI_METAAUTHOR" />
 	</params>

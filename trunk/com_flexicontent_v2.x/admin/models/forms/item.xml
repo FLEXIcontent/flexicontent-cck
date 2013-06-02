@@ -3,8 +3,8 @@
 	<fieldset>
 		<field name="id"  type="hidden" class="readonly" label="JGLOBAL_FIELD_ID_LABEL" description ="JGLOBAL_FIELD_ID_DESC" size="10" default="0" readonly="true" />
 		<field name="asset_id" type="hidden" filter="unset" />
-		<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="inputbox fcfield_textval" maxlength="254" size="40" required="true" />
-		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox fcfield_textval" maxlength="254" size="40" />
+		<field name="title" type="text" label="FLEXI_TITLE" description="JFIELD_TITLE_DESC" class="fcfield_textval" maxlength="254" size="40" required="true" />
+		<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="fcfield_textval" maxlength="254" size="40" />
 		<field name="type_id" type="fieldtypes" label="FLEXI_TYPE" description="FLEXI_TYPE_DESC" class="inputbox" />
 		<field name="text" type="editor" class="inputbox" label="COM_CONTENT_FIELD_ARTICLETEXT_LABEL" description="COM_CONTENT_FIELD_ARTICLETEXT_DESC" filter="raw" buttons="true" />
 		<field name="state" type="list" label="FLEXI_STATE" description="FLEXI_STATE_DESC" class="inputbox use_select2_lib" filter="intval" size="1" default="-4">
@@ -39,8 +39,8 @@
 		<field name="version" type="text" class="readonly" label="COM_CONTENT_FIELD_VERSION_LABEL" size="6" description="COM_CONTENT_FIELD_VERSION_DESC" readonly="true" filter="unset" />
 		<field name="versioncomment" type="textarea" label="FLEXI_VERSION_COMMENT" description="FLEXI_VERSION_COMMENT_DESC" class="inputbox" rows="3" cols="30" />
 		<field name="ordering" type="text" label="JFIELD_ORDERING_LABEL" description="JFIELD_ORDERING_DESC" class="inputbox" size="6" default="0" />
-		<field name="metakey" type="textarea" label="JFIELD_META_KEYWORDS_LABEL" description="JFIELD_META_KEYWORDS_DESC" class="inputbox" rows="3" cols="26" />
-		<field name="metadesc" type="textarea" label="JFIELD_META_DESCRIPTION_LABEL" description="JFIELD_META_DESCRIPTION_DESC" class="inputbox" rows="3" cols="26" />
+		<field name="metadesc" type="textarea" label="JFIELD_META_DESCRIPTION_LABEL" description="JFIELD_META_DESCRIPTION_DESC" class="fcfield_textareaval" rows="3" cols="26" />
+		<field name="metakey" type="textarea" label="JFIELD_META_KEYWORDS_LABEL" description="JFIELD_META_KEYWORDS_DESC" class="fcfield_textareaval" rows="3" cols="26" />
 		<field name="access" type="accesslevel" label="JFIELD_ACCESS_LABEL" description="JFIELD_ACCESS_DESC" class="inputbox" size="1" />
 		<field name="hits" type="hidden" label="JGLOBAL_HITS" description="COM_CONTENT_FIELD_HITS_DESC" class="readonly" size="6" readonly="true" filter="unset" />
 		<field name="score" type="hidden" label="FLEXI_SCORE" description="FLEXI_SCORE_DESC" class="readonly" size="6" readonly="true" filter="unset" />
@@ -58,8 +58,12 @@
 		<field name="rules" type="rules" label="COM_CONTENT_FIELD_RULES_LABEL" description="COM_CONTENT_FIELD_RULES_DESC" class="inputbox" filter="rules" component="com_flexicontent" section="article" />
 
 	</fieldset>
-	<fields name="attribs">
+
+<fields name="attribs">
+
 	<fieldset name="params-basic" label="FLEXI_PARAMETERS_ITEM_BASIC" addfieldpath="/administrator/components/com_flexicontent/elements">
+		
+		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" description="..." level="level2" />
 		<!--field name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
@@ -75,6 +79,8 @@
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
+		
+		<field name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" description="..." level="level2" />
 		<field name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
@@ -85,10 +91,11 @@
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="readmore" type="text" size="30" default="" label="Alternative Read more text" description="PARAMALTREADMORE" />
+		<field name="readmore" type="text" size="30" default="" label="Alternative Read more text" description="PARAMALTREADMORE" class="fcfield_textval" />
 	</fieldset>
 	
 	<fieldset name="params-advanced" label="FLEXI_PARAMETERS_ITEM_ADVANCED">
+		<field name="" type="separator" default="FLEXI_ADVANCED" description="..." level="level2" />
 		<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
@@ -104,20 +111,20 @@
 		<!--field name="keyref" type="text" size="30" default="" label="Key Reference" description="A Unique Key which can be used to undentify the item in the URL, like &amp;key=keyref, note this is currently unusued" /-->
 	</fieldset>
 	
-	<fieldset name="params-seoconf" label="FLEXI_PARAMETERS_ITEM_SEOCONF" addfieldpath="/administrator/components/com_flexicontent/elements">
+	<fieldset name="params-seoconf" label="FLEXI_PARAMETERS_ITEM_SEO" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
-		<field name="override_title" type="list" default="" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC">
+		<field name="override_title" type="list" default="" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC" class="fcfield_selectval" >
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="custom_ititle" type="text" size="30" default="" label="FLEXI_CUSTOM_TITLE" description="FLEXI_CUSTOM_TITLE_DESC" />
-		<field name="addcat_title" type="list" default="" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC">
+		<field name="custom_ititle" type="text" size="30" default="" label="FLEXI_CUSTOM_TITLE" description="FLEXI_CUSTOM_TITLE_DESC" class="fcfield_textval" />
+		<field name="addcat_title" type="list" default="" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC" class="fcfield_selectval" >
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="add_canonical" type="list" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
+		<field name="add_canonical" type="list" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="fcfield_selectval" >
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -125,26 +132,27 @@
 
 	</fieldset>
 	
-	<fieldset name="themes" label="FLEXI_PARAMETERS_THEMES" addfieldpath="/administrator/components/com_flexicontent/elements">
+	<fieldset name="themes" label="FLEXI_TEMPLATE" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<field name="ilayout_mobile" type="itemlayout" class="use_select2_lib" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 		<field name="ilayout" type="itemlayout" class="use_select2_lib" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" onchange="activatePanel(this.value);" />
 	</fieldset>
 	
-	</fields>
+</fields>
 	
-	<fields name="metadata">
+<fields name="metadata">
 	
-		<field name="robots" type="list" label="FLEXI_METADATA_ROBOTS_LABEL" description="FLEXI_METADATA_ROBOTS_DESC">
-			<option value="">JGLOBAL_USE_GLOBAL</option>
-			<option value="index, follow">JGLOBAL_INDEX_FOLLOW</option>
-			<option value="noindex, follow">JGLOBAL_NOINDEX_FOLLOW</option>
-			<option value="index, nofollow">JGLOBAL_INDEX_NOFOLLOW</option>
-			<option value="noindex, nofollow">JGLOBAL_NOINDEX_NOFOLLOW</option>
+		<field name="" type="separator" default="FLEXI_ADVANCED" description="" level="level2" />
+		<field name="robots" type="list" label="FLEXI_METADATA_ROBOTS_LABEL" description="FLEXI_METADATA_ROBOTS_DESC" class="fcfield_selectval">
+			<option value="">FLEXI_USE_GLOBAL</option>
+			<option value="index, follow">FLEXI_INDEX_FOLLOW</option>
+			<option value="noindex, follow">FLEXI_NOINDEX_FOLLOW</option>
+			<option value="index, nofollow">FLEXI_INDEX_NOFOLLOW</option>
+			<option value="noindex, nofollow">FLEXI_NOINDEX_NOFOLLOW</option>
 		</field>
-		<field name="author" type="text" label="JAUTHOR" description="FLEXI_METADATA_AUTHOR_DESC" size="40" />
-		<field name="rights" type="textarea" label="FLEXI_META_RIGHTS_LABEL" description="FLEXI_META_RIGHTS_DESC" filter="string" cols="26" rows="2" />
-		<field name="xreference" type="text" label="FLEXI_FIELD_XREFERENCE_LABEL" description="FLEXI_FIELD_XREFERENCE_DESC" class="inputbox" size="40" />
+		<field name="xreference" type="text" label="FLEXI_FIELD_XREFERENCE_LABEL" description="FLEXI_FIELD_XREFERENCE_DESC" class="fcfield_textval" size="30" />
+		<field name="author" type="text" label="JAUTHOR" description="FLEXI_METADATA_AUTHOR_DESC" size="30" class="fcfield_textval" />
+		<field name="rights" type="textarea" label="FLEXI_META_RIGHTS_LABEL" description="FLEXI_META_RIGHTS_DESC" filter="string" class="fcfield_textareaval" cols="26" rows="3" />
 		
-	</fields>
+</fields>
 
 </form>
