@@ -89,6 +89,7 @@
 				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="date_filter_group" type="list" default="0" label="FLEXI_FILTER_DATE_GROUPING" description="FLEXI_FILTER_DATE_GROUPING_DESC">
 				<option value="year">FLEXI_YEAR</option>
@@ -113,6 +114,7 @@
 				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="date_filter_group_s" type="list" default="0" label="FLEXI_FILTER_DATE_GROUPING" description="FLEXI_FILTER_DATE_GROUPING_DESC">
 				<option value="year">FLEXI_YEAR</option>
@@ -154,6 +156,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -170,6 +173,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -213,6 +217,7 @@
 				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="date_filter_group" type="list" default="0" label="FLEXI_FILTER_DATE_GROUPING" description="FLEXI_FILTER_DATE_GROUPING_DESC">
 				<option value="year">FLEXI_YEAR</option>
@@ -237,6 +242,7 @@
 				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="date_filter_group_s" type="list" default="0" label="FLEXI_FILTER_DATE_GROUPING" description="FLEXI_FILTER_DATE_GROUPING_DESC">
 				<option value="year">FLEXI_YEAR</option>
@@ -278,6 +284,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -294,6 +301,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -330,6 +338,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -346,6 +355,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -388,6 +398,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -404,6 +415,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -508,6 +520,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -525,6 +538,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -565,6 +579,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -581,6 +596,7 @@
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>

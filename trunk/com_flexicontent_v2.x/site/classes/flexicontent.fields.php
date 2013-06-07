@@ -558,13 +558,10 @@ class FlexicontentFields
 			}
 			else
 			{
-				if (FLEXI_J16GE) {
-					$_plgs = explode('|',$field->parameters->get('plugins'));
-				} else if ( !is_array($field->parameters->get('plugins')) ) {
-					$_plgs = array($field->parameters->get('plugins'));
-				} else {
-					$_plgs = $field->parameters->get('plugins');
-				}
+				$_plgs = $field->parameters->get('plugins');
+				$_plgs = $_plgs ? $_plgs : array();
+				$_plgs = is_array($_plgs) ? $_plgs : explode('|', $_plgs);  // compatibility because old versions did not JSON encode the parameters
+				
 				if (!@$_plgs_loaded['__ALL__'])  foreach ($_plgs as $_plg)  if (!@$_plgs_loaded[$_plg]) {
 					JPluginHelper::importPlugin('content', $_plg, $autocreate = true, $dispatcher);
 					$_plgs_loaded[$_plg] = 1;
@@ -1867,7 +1864,7 @@ class FlexicontentFields
 		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
 		
 		// Make sure the current filtering values match the field filter configuration to be single or multi-value
-		if ( in_array($display_filter_as, array(2,3,5)) ) {
+		if ( in_array($display_filter_as, array(2,3,5,6)) ) {
 			if (!is_array($value)) $value = array( $value );
 		} else {
 			if (is_array($value)) $value = array ( @ $value[0] );
@@ -2053,7 +2050,7 @@ class FlexicontentFields
 		$filter_ffid   = $formName.'_'.$filter->id.'_val';
 		
 		// Make sure the current filtering values match the field filter configuration to single or multi-value
-		if ( in_array($display_filter_as, array(2,3,5)) ) {
+		if ( in_array($display_filter_as, array(2,3,5,6)) ) {
 			if (!is_array($value)) $value = strlen($value) ? array($value) : array();
 		} else {
 			if (is_array($value)) $value = @ $value[0];
@@ -2067,7 +2064,7 @@ class FlexicontentFields
 		}
 		
 		// Get filtering values, this can be cached if not filtering according to current category filters
-		if ( in_array($display_filter_as, array(0,2,4,5)) )
+		if ( in_array($display_filter_as, array(0,2,4,5,6)) )
 		{
 			$view_join = '';
 			$view_where = '';
@@ -2132,18 +2129,19 @@ class FlexicontentFields
 		
 		// *** Create the form field(s) used for filtering
 		switch ($display_filter_as) {
-		case 0: case 2:
+		case 0: case 2: case 6:
 			$options = array();
 			$first_option_txt = '-'. ($label_filter==2  ?  $filter->label  :  JText::_('FLEXI_ALL')) .'-';
 			$options[] = JHTML::_('select.option', '', '-'.$first_option_txt.'-');
 			$attribs_str = ' class="fc_field_filter" ';
+			if ($display_filter_as==6) $attribs_str .= ' multiple="multiple" size="5" ';
 			
 			foreach($results as $result) {
 				if ( !strlen($result->value) ) continue;
 				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text), 'value', 'text', $disabled = !$result->found);
 			}
-			if ($display_filter_as==0) {
-				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname, $attribs_str.' onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value, $filter_ffid);
+			if ($display_filter_as==0 || $display_filter_as==6) {
+				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str.' onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value, $filter_ffid);
 			} else {
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[1]', $attribs_str, 'value', 'text', @ $value[1], $filter_ffid.'1');
 				$filter->html	.= '&nbsp;--&nbsp;';

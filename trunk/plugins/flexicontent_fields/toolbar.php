@@ -62,7 +62,6 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		}
 		$lang = $lang?$lang:'en-GB';
 		$lang   	= substr($lang, 0, 2);
-		
 		$lang		= in_array($lang, array('en','es','it','th')) ? $lang : 'en';
 		
 		// parameters shortcuts
@@ -71,7 +70,8 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$display_print 		= $field->parameters->get(FLEXI_J16GE ? 'display_print' : 'display-print', 1);
 		$display_email 		= $field->parameters->get(FLEXI_J16GE ? 'display_email' : 'display-email', 1);
 		$display_voice 		= $field->parameters->get(FLEXI_J16GE ? 'display_voice' : 'display-voice', 1);
-		$display_pdf 		= $field->parameters->get(FLEXI_J16GE ? 'display_pdf' : 'display-pdf', 1);
+		//$display_pdf 		= $field->parameters->get(FLEXI_J16GE ? 'display_pdf' : 'display-pdf', 1);
+		$display_pdf 		= FLEXI_J16GE ? 0 : $field->parameters->get('display-pdf', 1);
 		$load_css 			= $field->parameters->get(FLEXI_J16GE ? 'load_css' : 'load-css', 1);
 		
 		$display_social 	= $field->parameters->get(FLEXI_J16GE ? 'display_social' : 'display-social', 1);
@@ -144,7 +144,8 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// email button
 		if ($display_email)
 		{
-			$link		 = JURI::root().JRoute::_( 'index.php?view=items&cid='.$item->categoryslug.'&id='.$item->slug, false );
+			$link = JURI::root().JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+			//$link = JURI::root().JRoute::_( 'index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug, false );
 			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 			$url		 = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $link );
 			$estatus	 = 'width=400,height=400,menubar=yes,resizable=yes';
