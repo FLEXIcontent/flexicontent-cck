@@ -638,11 +638,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		if (!$ignoreState) {
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( i.state IN (1, -5) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-		
+			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$_now.' ) OR i.created_by = '.$user->id.' )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$_now.' ) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$_now.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$_now.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		}
 		
 		// Filter the category view with the active language
@@ -949,8 +949,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$app   = JFactory::getApplication();
 		$user  = JFactory::getUser();
 
-		// Get the category parameters
-		$cparams = $this->_params;
+		// Get the view's parameters
+		$params = $this->_params;
 		$db = JFactory::getDBO();
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
@@ -961,13 +961,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$nullDate	= $db->getNullDate();
 		
 		// Show assigned items, this should not cause problems, category parameters says not to display itemcount for subcategories
-		if ( !$cparams->get('show_itemcount', 0) ) return null;
+		if ( !$params->get('show_itemcount', 0) ) return null;
 		
 		// Get some parameters and other info
-		$catlang = $cparams->get('language', '');          // category language (currently UNUSED), this is property in J2.5 instead of as parameter in FC J1.5
+		$catlang = $params->get('language', '');          // category language (currently UNUSED), this is property in J2.5 instead of as parameter in FC J1.5
 		$lang = flexicontent_html::getUserCurrentLang();   // Get user current language
-		$filtercat  = $cparams->get('filtercat', 0);       // Filter items using currently selected language
-		$show_noauth = $cparams->get('show_noauth', 0);    // Show unauthorized items
+		$filtercat  = $params->get('filtercat', 0);       // Filter items using currently selected language
+		$show_noauth = $params->get('show_noauth', 0);    // Show unauthorized items
 		
 		$where = ' WHERE 1 ';
 		
@@ -987,11 +987,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		if (!$ignoreState) {
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( i.state IN (1, -5) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 			
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$_now.' ) OR i.created_by = '.$user->id.' )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$_now.' ) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$_now.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$_now.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		}
 		
 		// Count items according to full depth level !!!

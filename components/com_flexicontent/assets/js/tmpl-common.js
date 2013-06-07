@@ -72,8 +72,16 @@
 			if (!matches || element.value == '') continue;
 			if ((element.type=='radio' || element.type=='checkbox') && !element.checked) continue;
 			
-			extra_action += var_sep + element.name + '=' + element.value;
-			var_sep = '&';
+			if ( element.type=='select-multiple' ) {
+				for (var p=0; p < element.length; p++) {
+					if ( ! element.options[p].selected ) continue;
+					extra_action += var_sep + element.name.replace("[]","") + '[' + p + ']=' + element.options[p].value;
+					var_sep = '&';
+				}
+			} else {
+				extra_action += var_sep + element.name + '=' + element.value;
+				var_sep = '&';
+			}
 		}
 		form.action += extra_action;   //alert(extra_action);
 	}

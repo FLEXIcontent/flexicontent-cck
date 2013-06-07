@@ -125,6 +125,7 @@
 				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -144,6 +145,7 @@
 				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
 				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
 				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
+				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>

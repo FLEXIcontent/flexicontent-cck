@@ -631,6 +631,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
 				}*/
 				$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
+				//print_r($filtervalue);
 				
 				//$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
 				

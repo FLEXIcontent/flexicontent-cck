@@ -322,15 +322,18 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function _buildItemWhere( )
 	{
-		$app    = JFactory::getApplication();
+		$app   = JFactory::getApplication();
+		$user  = JFactory::getUser();
+
+		// Get the view's parameters
 		$params = $this->_params;
-		$user   = JFactory::getUser();
-		$db     = JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$now		= $app->get('requestTime');
-		$now			= FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
+		//$now = $app->get('requestTime');  // NOT correct behavior it should be UTC (below)
+		//$now = FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
+		$_now = 'UTC_TIMESTAMP()'; //$this->_db->Quote($now);
 		$nullDate	= $db->getNullDate();
 
 		// First thing we need to do is to select only the requested TAGGED items
@@ -356,11 +359,11 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		if (!$ignoreState) {
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( i.state IN (1, -5) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 			
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' ) OR i.created_by = '.$user->id.' )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$_now.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$_now.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		}
 		
 		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';

@@ -497,11 +497,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		{
 			$filter->value = JRequest::getVar('filter_'.$filter->id, false);
 			//$fieldsearch = $app->getUserStateFromRequest( 'flexicontent.search.'.'filter_'.$filter->id, 'filter_'.$filter->id, array(), 'array' );
-			//echo "FIELD value: "; print_r($filter->value);
+			//echo "Field name: ".$filter->name; echo ":: ". 'filter_'.$filter->id ." :: value: "; print_r($filter->value); echo "<br/>\n";
 			
 			$field_filename = $filter->iscore ? 'core' : $filter->field_type;
 			FLEXIUtilities::call_FC_Field_Func($field_filename, 'onAdvSearchDisplayFilter', array( &$filter, $filter->value, 'searchForm'));
 		}
+		//echo "<pre>"; print_r($_GET); exit;
 		
 		
 		$print_link = JRoute::_('index.php?view=search&pop=1&tmpl=component&print=1');

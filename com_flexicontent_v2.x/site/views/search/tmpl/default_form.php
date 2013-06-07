@@ -188,7 +188,7 @@ $r = 0;
 							if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
 								if ( preg_match('/\.submit\(\)/', $filt->html, $matches) ) {
 									// Autosubmit detected inside onChange event, prepend the event with form preparation function call
-									$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'adminForm\')); ', $filt->html);
+									$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'searchForm\')); ', $filt->html);
 								}
 							}
 							echo $filt->html;
