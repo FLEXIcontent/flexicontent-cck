@@ -529,7 +529,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$change .= !$multiple ?
 						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" />' :
 						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this)" value="1" />' ;
-					$change .= ' <label class="fcfield-button" for="'.$elementid.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>';
+					$change .= ' <span></span><label class="fcfield-button" for="'.$elementid.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>';
 				}
 				
 				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
@@ -970,6 +970,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 		}
 		
+		
 		// *** Check if images are used in more than one fields ***
 		// And add field id prefix to the image filenames
 		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
@@ -1215,6 +1216,18 @@ class plgFlexicontent_fieldsImage extends JPlugin
 								'.'<b>'.$title.'</b><br/>'.$desc.'
 							</div>
 						</li>
+						';
+				} else if ($usepopup && $popuptype == 6) {  // (Widgetkit) SPOTlight image popup
+					$group_str = $group_name ? 'data-spotlight-group="'.$group_name.'"' : '';
+					$field->{$prop}[] = '
+						<a href="'.$srcl.'" data-lightbox="on" title="'.$alt.'">'.$img_legend.'</a>';
+					$field->{$prop}[] = '
+						<a href="'.$srcl.'" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title.' | '.($desc ? $desc : $title).'">
+							'.$img_nolegend.'
+							<div class="overlay">
+								'.'<b>'.$title.'</b>: '.$desc.'
+							</div>
+						</a>
 						';
 				}
 				

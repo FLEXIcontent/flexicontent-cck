@@ -369,14 +369,14 @@ $tabCnt[$tabSetCnt] = 0;
 	
 			<div class="fcclear"></div>
 			<?php if ($this->menuCats) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
-				<label id="catid-lbl" for="catid" class="flexi_label">
+				<label id="catid-lbl" for="catid" for_bck="catid" class="flexi_label">
 					<?php echo JText::_( !$this->menuCats->cid ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
 				</label>
 				<div class="container_fcfield container_fcfield_name_catid">
 					<?php echo $this->menuCats->catid; ?>
 				</div>
 			<?php else : ?>
-				<label id="catid-lbl" for="catid" class="flexi_label">
+				<label id="catid-lbl" for="catid" for_bck="catid" class="flexi_label">
 					<?php echo JText::_( (!$this->lists['cid']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
 				</label>
 				<div class="container_fcfield container_fcfield_name_catid">
@@ -620,7 +620,7 @@ $tabCnt[$tabSetCnt] = 0;
 			<legend><?php echo JText::_( 'FLEXI_CATEGORIES' ); ?></legend>*/ ?>
 		
 		<div class="fcclear"></div>
-		<label id="catid-lbl" for="catid" class="flexi_label">
+		<label id="catid-lbl" for="catid" for_bck="catid" class="flexi_label">
 			<?php echo JText::_( !$secondary_displayed ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' ); ?>
 		</label>
 		<div class="container_fcfield container_fcfield_name_catid">
@@ -640,7 +640,7 @@ $tabCnt[$tabSetCnt] = 0;
 		<?php if ($secondary_displayed) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 
 			<div class="fcclear"></div>
-			<label id="cid-lbl" for="cid" class="flexi_label">
+			<label id="cid-lbl" for="cid" for_bck="cid" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
 			</label>
 			<div class="container_fcfield container_fcfield_name_cid">
@@ -1028,7 +1028,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 									<div class="fctabber" style='display:inline-block;'>
 										<div class="tabbertab" style="padding: 0px;" >
 											<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
-											<textarea id="metadescription" class="text_area" rows="3" cols="80" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
+											<textarea id="metadescription" class="fcfield_textareaval" rows="3" cols="80" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
 										</div>
 										<?php foreach ($this->item->item_translations as $t): ?>
 											<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
@@ -1038,7 +1038,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 													$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
 													$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
 													?>
-													<textarea id="<?php echo $ff_id; ?>" class="text_area" rows="3" cols="80" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
+													<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="80" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
 												</div>
 											<?php endif; ?>
 										<?php endforeach; ?>
@@ -1046,7 +1046,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 									<!-- tabber end -->
 									
 								<?php else : ?>
-									<textarea id="metadescription" class="text_area" rows="3" cols="80" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
+									<textarea id="metadescription" class="fcfield_textareaval" rows="3" cols="80" name="meta[description]"><?php echo $this->formparams->get('description'); ?></textarea>
 								<?php endif; ?>
 							</td>
 						</tr>
@@ -1065,7 +1065,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 									<div class="fctabber" style='display:inline-block;'>
 										<div class="tabbertab" style="padding: 0px;" >
 											<h3 class="tabberheading"> <?php echo '-'.$this->itemlang->name.'-'; // $t->name; ?> </h3>
-											<textarea id="metakeywords" class="text_area" rows="3" cols="80" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
+											<textarea id="metakeywords" class="fcfield_textareaval" rows="3" cols="80" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
 										</div>
 										<?php foreach ($this->item->item_translations as $t): ?>
 											<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
@@ -1075,7 +1075,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 													$ff_id = 'jfdata_'.$t->shortcode.'_metakey';
 													$ff_name = 'jfdata['.$t->shortcode.'][metakey]';
 													?>
-													<textarea id="<?php echo $ff_id; ?>" class="text_area" rows="3" cols="80" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
+													<textarea id="<?php echo $ff_id; ?>" class="fcfield_textareaval" rows="3" cols="80" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
 												</div>
 											<?php endif; ?>
 										<?php endforeach; ?>
@@ -1083,7 +1083,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 									<!-- tabber end -->
 									
 								<?php else : ?>
-									<textarea id="metakeywords" class="text_area" rows="3" cols="80" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
+									<textarea id="metakeywords" class="fcfield_textareaval" rows="3" cols="80" name="meta[keywords]"><?php echo $this->formparams->get('keywords'); ?></textarea>
 								<?php endif; ?>
 							</td>
 						</tr>

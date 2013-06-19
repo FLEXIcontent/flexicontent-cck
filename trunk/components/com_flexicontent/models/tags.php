@@ -265,12 +265,15 @@ class FlexicontentModelTags extends JModelLegacy
 			$select_comments = ' count(com.object_id) AS comments_total,';
 			$join_comments   = ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
 		} else if ($order=='rated') {
-			$select_comments = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
-			$join_comments   = ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
+			$select_rated = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
+			$join_rated    = ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
+		} else if ($order=='order') {
+			$join_relcats   = ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id AND rel.catid = i.catid';
 		}
 		
 		$query = 'SELECT i.id, i.*, ie.*, '
-			//.$select_image
+			//. @ $select_image
+			. @ $select_comments . @ $select_rated
 			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 			. ' FROM #__content AS i'
@@ -281,7 +284,7 @@ class FlexicontentModelTags extends JModelLegacy
 			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			//. $join_image
 			. @ $field_join
-			. @ $join_comments
+			. @ $join_comments . @ $join_rated . @ $join_relcats
 			. $joinaccess
 			. $where
 			. $andaccess

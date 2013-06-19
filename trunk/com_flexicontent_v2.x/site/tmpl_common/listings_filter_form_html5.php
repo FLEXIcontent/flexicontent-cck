@@ -1,4 +1,4 @@
-	<form action="<?php echo $this->action; ?>" method="POST" id="adminForm" onsubmit="" class="group well">
+<form action="<?php echo $this->action; ?>" method="POST" id="adminForm" onsubmit="" class="group well">
 
 	<?php if ( JRequest::getVar('clayout') == $this->params->get('clayout', 'blog') ) :?>
 		<input type="hidden" name="clayout" value="<?php echo JRequest::getVar('clayout'); ?>" />

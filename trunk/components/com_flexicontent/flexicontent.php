@@ -59,7 +59,6 @@ if ( $cparams->get('print_logging_info') ) {
 JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, 'en-GB', true);
 JFactory::getLanguage()->load('com_flexicontent', JPATH_SITE, null, true);
 
-
 //include constants file
 require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
 //include the route helper
@@ -114,6 +113,11 @@ if ($controller) {
 // Create the controller
 $classname	= 'FlexicontentController'.ucfirst($controller);
 $controller = new $classname( );
+
+// load template language overrides, just before executing the component
+$templateDir = JURI::base() . 'templates/' . JFactory::getApplication()->getTemplate();
+JFactory::getLanguage()->load('com_flexicontent', $templateDir, 'en-GB', true);
+JFactory::getLanguage()->load('com_flexicontent', $templateDir, null, true);
 
 // Perform the Request task
 $controller->execute($task);

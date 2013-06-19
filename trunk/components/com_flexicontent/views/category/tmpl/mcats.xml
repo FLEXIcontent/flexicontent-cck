@@ -369,7 +369,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="disable_filter_autosubmit" type="radio" default="" label="FLEXI_DISABLE_FILTER_AUTO_SUBMIT" description="FLEXI_DISABLE_FILTER_AUTO_SUBMIT_DESC" >
+			<field name="disable_filter_autosubmit" type="list" default="" label="FLEXI_DISABLE_FILTER_AUTO_SUBMIT" description="FLEXI_DISABLE_FILTER_AUTO_SUBMIT_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

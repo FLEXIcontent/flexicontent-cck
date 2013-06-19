@@ -215,7 +215,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			$this->_data = array();
 		}
-		else if (empty($this->_data))
+		else if ( $this->_data===null )
 		{
 			if ( $print_logging_info )  $start_microtime = microtime(true);
 			// Load the content if it doesn't already exist
@@ -259,15 +259,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if (count($query_ids)) {
 				$this->_db->setQuery($query);
 				$_data = $this->_db->loadObjectList('id');
+				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			}
 			
 			// 5, reorder items
 			$this->_data = array();
-			foreach($query_ids as $item_id) {
+			if ($_data) foreach($query_ids as $item_id) {
 				$this->_data[] = $_data[$item_id];
 			}
-			
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
 			if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
@@ -284,10 +283,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 	function getTotal()
 	{
 		// Lets load the total nr if it doesn't already exist
-		if (empty($this->_total))
+		if ( $this->_total===null )
 		{
 			$query = $this->_buildQuery();
-			$this->_total = $this->_getListCount($query);
+			$this->_total = (int) $this->_getListCount($query);
 		}
 
 		return $this->_total;
@@ -378,7 +377,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename,'
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-				. @$feed_img_col      // optional
+				. @ $feed_img_col      // optional
 				;
 		}
 		
@@ -392,12 +391,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 				;
 		} else {
 			$query .= ""
-			. @ $order_field_join  // optional
-			. @ $join_comments     // optional
-			. $where
-			. ' GROUP BY i.id '
-			. $orderby
-			;
+				. @ $order_field_join  // optional
+				. @ $join_comments     // optional
+				. $where
+				. ' GROUP BY i.id '
+				. $orderby
+				;
 		}
 		
 		return $query;
@@ -758,7 +757,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		//if ( $cparams->get('use_filters',1) )  // Commented out to allow using persistent filters via menu
 		if ( 1 )
 		{
-			$filters = $this->getFilters();
+			$filters = $this->getFilters( $include_hidden=true );
 			if ($filters) foreach ($filters as $filtre)
 			{
 				// Get filter values, setting into appropriate session variables
@@ -1389,11 +1388,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			// Split elements into their properties: filter_id, filter_value
 			$filter_vals = array();
-			$results = array();
+			$filter_ids = array();
 			$n = 0;
 			foreach ($mfilter_arr as $mfilter) {
 				$_data  = preg_split("/[\s]*##[\s]*/", $mfilter);
 				$filter_id = (int) $_data[0];  $filter_value = @$_data[1];
+				$filter_ids[] = $filter_id;
+				
 				if ( $filter_id ) {
 					$filter_vals[$filter_id] = $filter_value;
 					if ($is_persistent || JRequest::getVar('filter_'.$filter_id, false) === false ) {
@@ -1402,6 +1403,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 					}
 				}
 			}
+			// Set variable of filters, so that they will be allowed
+			$cparams->set($mfilter_name, count($filter_ids) ? $filter_ids : null);
 		}
 	}
 	
@@ -1413,14 +1416,26 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @return object
 	 * @since 1.5
 	 */
-	function & getFilters()
+	function & getFilters($include_hidden=false)
 	{
 		static $filters;
 		if($filters) return $filters;
 		
 		$user		= JFactory::getUser();
 		$params = $this->_params;
-		$scope	= $params->get('filters') ? ( is_array($params->get('filters')) ? ' AND fi.id IN (' . implode(',', $params->get('filters')) . ')' : ' AND fi.id = ' . $params->get('filters') ) : null;
+		
+		$all_filters = array();  // avoid array_merge()
+		$shown_filters      = $params->get('filters', array());
+		foreach ($shown_filters as $filter_id)  $all_filters[] = $filter_id;
+		
+		if ( $include_hidden ) {
+			$persistent_filters = $params->get('persistent_filters', array());
+			$initial_filters    = $params->get('initial_filters', array());
+			foreach ($persistent_filters as $filter_id) $all_filters[] = $filter_id;
+			foreach ($initial_filters as $filter_id)    $all_filters[] = $filter_id;
+		}
+		
+		$scope	= count($all_filters) ? ' AND fi.id IN (' . implode(',', $all_filters) . ')' : null;
 		$filters	= null;
 		
 		if (FLEXI_J16GE) {

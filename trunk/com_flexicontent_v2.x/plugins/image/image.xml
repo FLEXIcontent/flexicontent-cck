@@ -177,6 +177,7 @@
 				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
 				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
 				<!--option value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option-->
+				<option value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
 			</field>
 			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_IMAGE_FIELDS_IGNORED_MULTIVALUED" description="FLEXI_FIELD_GROUP_IMAGE_FIELDS_IGNORED_MULTIVALUED_DESC">
 				<option value="0">FLEXI_NO</option>

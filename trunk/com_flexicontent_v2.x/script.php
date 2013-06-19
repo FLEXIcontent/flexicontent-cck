@@ -509,56 +509,55 @@ class com_flexicontentInstallerScript
 					<td>
 					<?php
 					
-					if ( $advsearch_index_tbl_exists) {
+					if ( $advsearch_index_tbl_exists ) {
 				    $queries = array();
-				    
 				    $db->setQuery("SHOW INDEX FROM #__flexicontent_advsearch_index");
 				    $_indexes = $db->loadObjectList();
 				    foreach ($_indexes as $tbl_index) $tbl_indexes['#__flexicontent_advsearch_index'][$tbl_index->Key_name] = true;
-				    
-						if ( !array_key_exists('sid', $tbl_fields['#__flexicontent_advsearch_index']) ) {
-							$queries[] = "DROP TABLE `#__flexicontent_advsearch_index`";
-							$queries[] = "CREATE TABLE `#__flexicontent_advsearch_index` (
-								`sid` int(11) NOT NULL auto_increment,
-								`field_id` int(11) NOT NULL, `item_id` int(11) NOT NULL, `extraid` int(11) NOT NULL,
-								`search_index` longtext NOT NULL, `value_id` varchar(255) NULL,
-								PRIMARY KEY (`field_id`,`item_id`,`extraid`),
-								KEY `sid` (`sid`),
-								KEY `field_id` (`field_id`),
-								KEY `item_id` (`item_id`),
-								FULLTEXT `search_index` (`search_index`),
-								KEY `value_id` (`value_id`)
-								) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
-						}
-						
-						/*
-						$_add_indexes = array();
-						if ( $advsearch_index_tbl_exists && !array_key_exists('field_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
-							$_add_indexes[] = " ADD KEY ( `field_id` ) ";
-						}
-						if ( $advsearch_index_tbl_exists && !array_key_exists('item_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
-							$_add_indexes[] = " ADD KEY ( `item_id` ) ";
-						}
-						if ( $advsearch_index_tbl_exists && !array_key_exists('search_index', $tbl_indexes['#__flexicontent_advsearch_index'])) {
-							$_add_indexes[] = " ADD FULLTEXT ( `search_index` ) ";
-						}
-						if ( $advsearch_index_tbl_exists && !array_key_exists('value_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
-							$_add_indexes[] = " ADD KEY ( `value_id` ) ";
-						}
-						
-						if (count($_add_indexes)) {
-							$db->setQuery('TRUNCATE TABLE #__flexicontent_advsearch_index');
-							$db->query();   // Truncate table of search index to avoid long-delay on indexing
-							$queries[] = "ALTER TABLE `#__flexicontent_advsearch_index` ". implode(",", $_add_indexes);
-						}
-						*/
-						
-						foreach ($queries as $query) {
-							$db->setQuery($query);
-							if ( !($result = $db->query()) ) { $results = false; echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>"; }
-						}
-						if ( @$results !== false ) echo "<span style='$success_style'>columns/indexes added, table was truncated or recreated, please re-index your content</span>";
+				  }
+				  
+					if ( !$advsearch_index_tbl_exists || !array_key_exists('sid', $tbl_fields['#__flexicontent_advsearch_index']) ) {
+						if ( $advsearch_index_tbl_exists) $queries[] = "DROP TABLE `#__flexicontent_advsearch_index`";
+						$queries[] = "CREATE TABLE `#__flexicontent_advsearch_index` (
+							`sid` int(11) NOT NULL auto_increment,
+							`field_id` int(11) NOT NULL, `item_id` int(11) NOT NULL, `extraid` int(11) NOT NULL,
+							`search_index` longtext NOT NULL, `value_id` varchar(255) NULL,
+							PRIMARY KEY (`field_id`,`item_id`,`extraid`),
+							KEY `sid` (`sid`),
+							KEY `field_id` (`field_id`),
+							KEY `item_id` (`item_id`),
+							FULLTEXT `search_index` (`search_index`),
+							KEY `value_id` (`value_id`)
+							) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
+					
+					/*
+					$_add_indexes = array();
+					if ( $advsearch_index_tbl_exists && !array_key_exists('field_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
+						$_add_indexes[] = " ADD KEY ( `field_id` ) ";
+					}
+					if ( $advsearch_index_tbl_exists && !array_key_exists('item_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
+						$_add_indexes[] = " ADD KEY ( `item_id` ) ";
+					}
+					if ( $advsearch_index_tbl_exists && !array_key_exists('search_index', $tbl_indexes['#__flexicontent_advsearch_index'])) {
+						$_add_indexes[] = " ADD FULLTEXT ( `search_index` ) ";
+					}
+					if ( $advsearch_index_tbl_exists && !array_key_exists('value_id', $tbl_indexes['#__flexicontent_advsearch_index'])) {
+						$_add_indexes[] = " ADD KEY ( `value_id` ) ";
+					}
+					
+					if (count($_add_indexes)) {
+						$db->setQuery('TRUNCATE TABLE #__flexicontent_advsearch_index');
+						$db->query();   // Truncate table of search index to avoid long-delay on indexing
+						$queries[] = "ALTER TABLE `#__flexicontent_advsearch_index` ". implode(",", $_add_indexes);
+					}
+					*/
+					
+					foreach ($queries as $query) {
+						$db->setQuery($query);
+						if ( !($result = $db->query()) ) { $results = false; echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>"; }
+					}
+					if ( @$results !== false ) echo "<span style='$success_style'>columns/indexes added, table was truncated or recreated, please re-index your content</span>";
 					?>
 					</td>
 				</tr>

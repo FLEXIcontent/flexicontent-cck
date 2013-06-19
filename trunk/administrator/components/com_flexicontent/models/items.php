@@ -625,6 +625,7 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( !$query_ids ) {
 			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id '
 				. ', t.name AS type_name, rel.ordering as catsordering '
+				. (($filter_state=='RV') ? ', i.version' : '')
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
 					', CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN ('.(FLEXI_J16GE ? 2:-1).') THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order ' : ''
 					)
@@ -632,7 +633,7 @@ class FlexicontentModelItems extends JModelLegacy
 		} else {
 			$query =
 				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, '. $lang .' u.name AS editor, rel.catid as rel_catid, '
-				.' GROUP_CONCAT(rel.catid SEPARATOR  ",") AS relcats, '
+				.' GROUP_CONCAT(DISTINCT rel.catid SEPARATOR  ",") AS relcats, '
 				. (FLEXI_J16GE ? 'level.title as access_level, g.title AS groupname, ' : 'g.name AS groupname, ')
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
 					'CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN ('.(FLEXI_J16GE ? 2:-1).') THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order, ' : ''

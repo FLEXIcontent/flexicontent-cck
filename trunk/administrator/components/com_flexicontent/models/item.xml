@@ -2,101 +2,101 @@
 <form>
 	<name>Article Edit Form</name>
 	<params addpath="/administrator/components/com_flexicontent/elements">
-		<param name="access" type="list" size="20" default="0" label="FLEXI_Access_Level" description="FLEXI_DETAILACCESS">
+		<field name="access" type="list" size="20" default="0" label="FLEXI_Access_Level" description="FLEXI_DETAILACCESS">
 			<option value="0">Public</option>
 			<option value="1">Registered</option>
 			<option value="2">Special</option>
-		</param>
-		<param name="created_by" type="author" default="" label="Author" description="FLEXI_DETAILAUTHOR" />
-		<param name="created_by_alias" type="text" size="20" default="" label="Author Alias" description="FLEXI_DETAILAUTHORALIAS" />
-		<param name="created" type="calendar" default="" label="Created Date" description="FLEXI_DETAILCREATED" />
-		<param name="publish_up" type="calendar" default="" label="Start Publishing" description="FLEXI_DETAILSTART" />
-		<param name="publish_down" type="calendar" default="" label="Finish Publishing" description="FLEXI_DETAILFINISH" />
+		</field>
+		<field name="created_by" type="author" default="" label="Author" description="FLEXI_DETAILAUTHOR" />
+		<field name="created_by_alias" type="text" size="20" default="" label="Author Alias" description="FLEXI_DETAILAUTHORALIAS" />
+		<field name="created" type="calendar" default="" label="Created Date" description="FLEXI_DETAILCREATED" />
+		<field name="publish_up" type="calendar" default="" label="Start Publishing" description="FLEXI_DETAILSTART" />
+		<field name="publish_down" type="calendar" default="" label="Finish Publishing" description="FLEXI_DETAILFINISH" />
 	</params>
 	
 	<params group="basic">
 		
-		<param name="" type="separator" default="FLEXI_PARAMETERS_ICONS" description="..." level="level2" />
-		<param name="show_pdf_icon" type="list" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
+		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" description="..." level="level2" />
+		<field name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
-		</param>
-		<param name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
+		</field>
+		<field name="show_print_icon" type="radio" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
-		</param>
-		<param name="show_email_icon" type="list" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
+		</field>
+		<field name="show_email_icon" type="radio" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
-		</param>
+		</field>
 		
-		<param name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" description="..." level="level2" />
-		<param name="show_title" type="list" default="" label="Show Title" description="Enables disable the appearance of the title">
+		<field name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" description="..." level="level2" />
+		<field name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
-		</param>
-		<param name="show_intro" type="list" default="" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT_DESC">
+		</field>
+		<field name="show_intro" type="radio" default="" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
-		</param>
-		<param name="readmore" type="text" size="25" default="" label="Alternative Read more text" description="PARAMALTREADMORE" />
+		</field>
+		<field name="readmore" type="text" size="30" default="" label="Alternative Read more text" description="PARAMALTREADMORE" class="fcfield_textval" />
 	</params>
 	
 	<params group="advanced">
 		
-		<param name="" type="separator" default="FLEXI_ADVANCED" description="..." level="level2" />
-		<param name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
+		<field name="" type="separator" default="FLEXI_ADVANCED" description="..." level="level2" />
+		<field name="comments" type="radio" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_JCOMMENTS</option>
 			<option value="2">FLEXI_JOMCOMMENTS</option>
-		</param>
-		<param name="automatic_pathways" type="radio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
+		</field>
+		<field name="automatic_pathways" type="radio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
-		</param>
-		<!--param name="language" type="languages" size="30" client="site" label="Content Language (for Browser)" description="Indication to the the browser for the language used to write this content" /-->
-		<!--param name="keyref" type="text" size="30" default="" label="Key Reference" description="A Unique Key which can be used to undentify the item in the URL, like &amp;key=keyref, note this is currently unusued" /-->
+		</field>
+		<!--field name="language" type="languages" client="site" label="Content Language (for Browser)" description="Indication to the the browser for the language used to write this content" /-->
+		<!--field name="keyref" type="text" default="" label="Key Reference" description="A Unique Key which can be used to undentify the item in the URL, like &amp;key=keyref, note this is currently unusued" size="30" /-->
 		
 	</params>
 	
 	<params group="seoconf">
-		<param name="override_title" type="list" default="" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC">
+		
+		<field name="override_title" type="radio" default="" label="FLEXI_OVERRIDE_PAGETTITLE" description="FLEXI_OVERRIDE_PAGETTITLE_DESC" >
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="custom_ititle" type="text" size="33" default="" label="FLEXI_CUSTOM_TITLE" description="FLEXI_CUSTOM_TITLE_DESC" />
-		<param name="addcat_title" type="list" default="" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC">
+		</field>
+		<field name="custom_ititle" type="text" default="" size="30" label="FLEXI_CUSTOM_TITLE" description="FLEXI_CUSTOM_TITLE_DESC" class="fcfield_textval" />
+		<field name="addcat_title" type="radio" default="" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC" >
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
-		</param>
-		<param name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
+		</field>
+		<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
-		</param>
+		</field>
+		
+	</params>
+	
+	
+	<params group="themes">
+		<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" />
+		<field name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" class="use_select2_lib" />
 	</params>
 	
 	<params group="metadata">
-		<!--param name="description" type="textarea" rows="5" cols="27" default="" label="FLEXI_Description" description="FLEXI_METADESC" /-->
-		<!--param name="keywords" type="textarea" rows="5" cols="27" default="" label="FLEXI_Keywords" description="FLEXI_METAKEYS" /-->
-		
 		<field name="" type="separator" default="FLEXI_ADVANCED" description="" level="level2" />
-		<param name="robots" type="text" size="34" default="" label="FLEXI_Robots" description="FLEXI_METAROBOTS" />
-		<param name="author" type="text" size="34" default="" label="FLEXI_Author" description="FLEXI_METAAUTHOR" />
+		<field name="robots" type="text" default="" size="30" label="FLEXI_Robots" description="FLEXI_METAROBOTS" class="fcfield_textval" />
+		<field name="author" type="text" default="" size="30" label="FLEXI_AUTHOR" description="FLEXI_METADATA_AUTHOR_DESC" class="fcfield_textval" />
 	</params>
-	
-	<params group="themes">
-		<param name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
-		<param name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" />
-	</params>
-	
+
 </form>

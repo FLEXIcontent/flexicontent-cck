@@ -758,7 +758,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		//if ( $cparams->get('use_filters',1) )  // Commented out to allow using persistent filters via menu
 		if ( 1 )
 		{
-			$filters = $this->getFilters();
+			$filters = $this->getFilters( $include_hidden=true );
 			if ($filters) foreach ($filters as $filtre)
 			{
 				// Get filter values, setting into appropriate session variables
@@ -1389,11 +1389,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			// Split elements into their properties: filter_id, filter_value
 			$filter_vals = array();
-			$results = array();
+			$filter_ids = array();
 			$n = 0;
 			foreach ($mfilter_arr as $mfilter) {
 				$_data  = preg_split("/[\s]*##[\s]*/", $mfilter);
 				$filter_id = (int) $_data[0];  $filter_value = @$_data[1];
+				$filter_ids[] = $filter_id;
+				
 				if ( $filter_id ) {
 					$filter_vals[$filter_id] = $filter_value;
 					if ($is_persistent || JRequest::getVar('filter_'.$filter_id, false) === false ) {
@@ -1402,6 +1404,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 					}
 				}
 			}
+			// Set variable of filters, so that they will be allowed
+			$cparams->set($mfilter_name, count($filter_ids) ? $filter_ids : null);
 		}
 	}
 	
@@ -1413,14 +1417,26 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @return object
 	 * @since 1.5
 	 */
-	function & getFilters()
+	function & getFilters($include_hidden=false)
 	{
 		static $filters;
 		if($filters) return $filters;
 		
 		$user		= JFactory::getUser();
 		$params = $this->_params;
-		$scope	= $params->get('filters') ? ( is_array($params->get('filters')) ? ' AND fi.id IN (' . implode(',', $params->get('filters')) . ')' : ' AND fi.id = ' . $params->get('filters') ) : null;
+		
+		$all_filters = array();  // avoid array_merge()
+		$shown_filters      = $params->get('filters', array());
+		foreach ($shown_filters as $filter_id)  $all_filters[] = $filter_id;
+		
+		if ( $include_hidden ) {
+			$persistent_filters = $params->get('persistent_filters', array());
+			$initial_filters    = $params->get('initial_filters', array());
+			foreach ($persistent_filters as $filter_id) $all_filters[] = $filter_id;
+			foreach ($initial_filters as $filter_id)    $all_filters[] = $filter_id;
+		}
+		
+		$scope	= count($all_filters) ? ' AND fi.id IN (' . implode(',', $all_filters) . ')' : null;
 		$filters	= null;
 		
 		if (FLEXI_J16GE) {
