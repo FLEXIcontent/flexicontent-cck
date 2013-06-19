@@ -1344,6 +1344,7 @@ div.fancybox-wrap a { background: none!important;}
 
 .fc_edit_link {
 	float:left;
+	margin:5px 5px 0px 0px;
 }
 
 .fc_field_unsused_val {

@@ -345,7 +345,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="disable_filter_autosubmit" type="radio" default="" label="FLEXI_DISABLE_FILTER_AUTO_SUBMIT" description="FLEXI_DISABLE_FILTER_AUTO_SUBMIT_DESC" >
+			<field name="disable_filter_autosubmit" type="list" default="" label="FLEXI_DISABLE_FILTER_AUTO_SUBMIT" description="FLEXI_DISABLE_FILTER_AUTO_SUBMIT_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -381,7 +381,7 @@
 			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" />
 			<field name="filter_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
 			<field name="filter_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
-			<field name="filter_separatorf" type="list" default="1" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
+			<field name="filter_separatorf" type="list" default="" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>

@@ -157,6 +157,6 @@ if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'	, FLEXI_J16GE ? 'item' 
 if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/system/images/' : 'images/M_images/' );
 
 // Version constants
-define('FLEXI_VERSION',	FLEXI_J16GE ? '2.0.3 beta2' : '2.0.3 beta2');
-define('FLEXI_RELEASE',	'r1686');
+define('FLEXI_VERSION',	FLEXI_J16GE ? '2.0.3 beta3' : '2.0.3 beta3');
+define('FLEXI_RELEASE',	'r1687');
 ?>

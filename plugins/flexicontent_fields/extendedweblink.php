@@ -70,6 +70,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$useclass  = $field->parameters->get( 'use_class', 0 ) ;
 		$useid     = $field->parameters->get( 'use_id', 0 ) ;
 		
+		$class_choices = $field->parameters->get( 'class_choices', '') ;
+		
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
@@ -132,8 +134,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					";
 					
 			if ($useclass) $js .= "
-					thisNewField.getElements('input.urlclass').setProperty('value','".$default_class."');
-					thisNewField.getElements('input.urlclass').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
+					thisNewField.getElements('.urlclass').setProperty('value','".$default_class."');
+					thisNewField.getElements('.urlclass').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
 					";
 					
 			if ($useid) $js .= "
@@ -224,6 +226,44 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 		
+		
+		
+		// **************************************************************************
+		// Create once the options for field properties that have drop down-selection
+		// **************************************************************************
+		if ($useclass==2) {
+			// Parse the elements used by field unsetting last element if empty
+			$choices = preg_split("/[\s]*%%[\s]*/", $class_choices);
+			if ( empty($choices[count($choices)-1]) )	unset($choices[count($choices)-1]);
+			
+			// Split elements into their properties: value, label, extra_prop1, extra_prop2
+			$elements = array();
+			$k = 0;
+			foreach ($choices as $choice) {
+				$choice_props  = preg_split("/[\s]*::[\s]*/", $choice);
+				if (count($choice_props) < 2) {
+					echo "Error in field: ".$field->label.
+						" while splitting class element: ".$choice.
+						" properties needed: ".$props_needed.
+						" properties found: ".count($choice_props);
+					continue;
+				}
+				$class_elements[$k] = new stdClass();
+				$class_elements[$k]->value = $choice_props[0];
+				$class_elements[$k]->text  = $choice_props[1];
+				$k++;
+			}
+			
+			// Create the options for select drop down
+			$class_options = array();
+			$class_options[] = JHTML::_('select.option', '', '-');
+			foreach ($class_elements as $element) {
+				$class_options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
+			}
+		}
+		
+		
+		
 		$field->html = array();
 		$n = 0;
 		foreach ($field->value as $value) {
@@ -239,8 +279,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			
 			if ($allow_relative_addrs==2) $autoprefix =
 				'<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_AUTOPREFIX' ).  ':</td><td>
-					<label class="legende" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_NO').'</label><input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="0" '.( !$has_prefix ? 'checked="checked"' : '' ).'/>
-					<label class="legende" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_YES').'</label><input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="1" '.( $has_prefix ? 'checked="checked"' : '' ).'/>
+					<input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="0" '.( !$has_prefix ? 'checked="checked"' : '' ).'/><label class="legende" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_NO').'</label>
+					<input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="1" '.( $has_prefix ? 'checked="checked"' : '' ).'/><label class="legende" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_YES').'</label>
 				</td></tr>';
 			
 			if ($usetitle) $title =
@@ -249,9 +289,19 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			if ($usetext) $linktext =
 				'<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_URLLINK_TEXT' ).':</td><td><input class="urllinktext" name="'.$fieldname.'[linktext]" type="text" size="'.$size.'" value="'.(@$value['linktext'] ? $value['linktext'] : $default_text).'" /></td></tr>';
 			
-			if ($useclass) $class =
+			if ($useclass==1) $class =
 				'<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_URLCLASS' ).    ':</td><td><input class="urlclass" name="'.$fieldname.'[class]" type="text" size="'.$size.'" value="'.(@$value['class'] ? $value['class'] : $default_class).'" /></td></tr>';
-			
+			else if ($useclass==2) {
+				$class_value = (@ $value['class'] ? $value['class'] : $default_class);
+				$class_attribs = ' class="urlclass" ';
+				$class =
+					'<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_URLCLASS' ).    ':</td><td>'.
+					JHTML::_('select.genericlist', $class_options, $fieldname.'[class]', $class_attribs, 'value', 'text', $class_value, $class_elementid = '').
+					'</td></tr>';
+				//'<input class="urlclass" name="'.$fieldname.'[class]" type="text" size="'.$size.'" value="'.(@ $value['class'] ? $value['class'] : $default_class).'" />
+			}
+			//class_choices
+
 			if ($useid) $id =
 				'<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_URLID' ).       ':</td><td><input class="urlid" name="'.$fieldname.'[id]" type="text" size="'.$size.'" value="'.(@$value['id'] ? $value['id'] : $default_id).'" /></td></tr>';
 			

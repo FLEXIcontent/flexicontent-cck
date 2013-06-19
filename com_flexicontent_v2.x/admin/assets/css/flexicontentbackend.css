@@ -1172,6 +1172,49 @@ label.fccheckradio_lbl, span.fcselect_lbl {
 	clear: none;
 }
 
+/* shape input checkbox,radio and hide them */
+#flexicontent input[type=checkbox]:not(old),
+#flexicontent input[type=radio   ]:not(old){
+	width: 24px !important;
+	/*width: 19px !important;*/
+	margin: 0 !important;
+	padding: 0 !important;
+	opacity: 0 !important;
+	display:none;
+}
+
+/* style the label to also include the nice checkbox, radio */
+#flexicontent input[type=checkbox]:not(old) + label,
+#flexicontent input[type=radio   ]:not(old) + label{
+	display: inline-block !important;
+	margin-left: 0px !important;
+	padding-left: 24px !important;
+	line-height: 24px !important;
+	height: 24px !important;
+	/*margin-left: -19px !important;
+	padding-left: 19px !important;
+	line-height: 19px !important;
+	height: 19px !important;*/
+}
+#flexicontent input[type=checkbox]:not(old) + label{
+	background: url(../images/checks.png) no-repeat 0 0 !important;
+	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
+}
+#flexicontent input[type=radio]:not(old) + label{
+	background: url(../images/checks.png) no-repeat 0 0 !important;
+	/*background: url(../images/checks2.png) no-repeat 0 -38px !important;*/
+}
+
+/* the checked versions of checkbox,radio */
+#flexicontent input[type=checkbox]:not(old):checked + label{
+	background-position: 0 -24px !important;
+	/*background-position: 0 -19px !important;*/
+}
+#flexicontent input[type=radio]:not(old):checked + label{
+	background-position: 0 -48px !important;
+	/*background-position: 0 -57px !important;*/
+}
+
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/
 
 /* permissions slider */
@@ -1367,8 +1410,8 @@ div div#element-box div.m {
 }
 
 fieldset.adminform fieldset.radio, fieldset.panelform fieldset.radio, fieldset.adminform-legacy fieldset.radio {
-	border: 0 none;
-	float: left;
+	border: 0 none !important;
+	float: left !important;
 	margin: 0 !important;
 	padding: 0 !important;
 }

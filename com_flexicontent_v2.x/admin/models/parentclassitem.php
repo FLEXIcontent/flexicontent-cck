@@ -376,30 +376,30 @@ class ParentClassItem extends JModelAdmin
 					// Tables needed to be joined for calculating access
 					$joinaccess = '';
 					// Extra access columns for main category and content type (item access will be added as 'access')
-					$access_sel = 'mc.access as category_access, ty.access as type_access';
+					$select_access = 'mc.access as category_access, ty.access as type_access';
 					
 					// Access Flags for: content type, main category, item
 					if (FLEXI_J16GE) {
 						$aid_arr = $user->getAuthorisedViewLevels();
 						$aid_list = implode(",", $aid_arr);
-						$access_sel .= ', CASE WHEN ty.access IN ('.$aid_list.') THEN 1 ELSE 0 END AS has_type_access';
-						$access_sel .= ', CASE WHEN mc.access IN ('.$aid_list.') THEN 1 ELSE 0 END AS has_mcat_access';
-						$access_sel .= ', CASE WHEN  i.access IN ('.$aid_list.') THEN 1 ELSE 0 END AS has_item_access';
+						$select_access .= ', CASE WHEN ty.access IN ('.$aid_list.') THEN 1 ELSE 0 END AS has_type_access';
+						$select_access .= ', CASE WHEN mc.access IN ('.$aid_list.') THEN 1 ELSE 0 END AS has_mcat_access';
+						$select_access .= ', CASE WHEN  i.access IN ('.$aid_list.') THEN 1 ELSE 0 END AS has_item_access';
 					} else {
 						$aid = (int) $user->get('aid');
 						if (FLEXI_ACCESS) {
 							$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
 							$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
 							$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-							$access_sel .= ', CASE WHEN (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_type_access';
-							$access_sel .= ', CASE WHEN (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_mcat_access';
-							$access_sel .= ', CASE WHEN (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_item_access';
+							$select_access .= ', CASE WHEN (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_type_access';
+							$select_access .= ', CASE WHEN (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_mcat_access';
+							$select_access .= ', CASE WHEN (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_item_access';
 						} else {
-							$access_sel .= ', CASE WHEN (ty.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_type_access';
-							$access_sel .= ', CASE WHEN (mc.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_mcat_access';
-							$access_sel .= ', CASE WHEN ( i.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_item_access';
+							$select_access .= ', CASE WHEN (ty.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_type_access';
+							$select_access .= ', CASE WHEN (mc.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_mcat_access';
+							$select_access .= ', CASE WHEN ( i.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_item_access';
 						}
-						$access_sel .= ', ';
+						$select_access .= ', ';
 					}
 					
 					// SQL date strings, current date and null date
@@ -415,7 +415,7 @@ class ParentClassItem extends JModelAdmin
 						$query = $db->getQuery(true);
 						
 						$query->select('i.*, ie.*');                              // Item basic and extended data
-						$query->select($access_sel);                              // Access Columns and Access Flags for: content type, main category, item
+						$query->select($select_access);                              // Access Columns and Access Flags for: content type, main category, item
 						if ($version) $query->select('ver.version_id');           // Versioned item viewing
 						$query->select('c.id AS catid, i.catid as maincatid');    // Current category id and Main category id
 						$query->select(
@@ -483,7 +483,7 @@ class ParentClassItem extends JModelAdmin
 						$where	= $this->_buildItemWhere();
 						
 						$query = 'SELECT i.*, ie.*, '                                   // Item basic and extended data
-						. $access_sel                                                   // Access Columns and Access Flags for: content type, main category, item
+						. $select_access                                                // Access Columns and Access Flags for: content type, main category, item
 						. ($version ? 'ver.version_id,'  : '')                          // Versioned item viewing
 						. ' c.id AS catid, i.catid as maincatid,'                       // Current category id and Main category id
 						. ' c.published AS catpublished,'                               // Current category published (in J1.6+ this includes all ancestor categories)

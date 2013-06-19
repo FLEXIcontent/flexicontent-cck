@@ -103,7 +103,9 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		{
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
 			$checked  = in_array($id, $field->value) ? ' checked="checked"' : null;
-			$options[] = '<label><input type="checkbox" class="'.$required.'" name="'.$fieldname.'" value="'.$id.'" id="'.$field->name.'_'.$id.'"'.$checked.' />'.$id.'</label>';
+			$options[] =
+				'<input type="checkbox" class="'.$required.'" name="'.$fieldname.'" value="'.$id.'" id="'.$field->name.'_'.$id.'"'.$checked.' />'.
+				'<label for="'.$field->name.'_'.$id.'">'.$id.'</label>';
 		}			
 			
 		$field->html = implode($separator, $options);

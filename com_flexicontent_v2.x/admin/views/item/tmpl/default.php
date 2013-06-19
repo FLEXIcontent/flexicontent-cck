@@ -506,7 +506,7 @@ $tabCnt[$tabSetCnt] = 0;
 		
 		<div class="fc_edit_container_full">
 			
-			<label id="jform_catid-lbl" for="jform_catid" class="flexi_label" >
+			<label id="jform_catid-lbl" for="jform_catid" for_bck="jform_catid" class="flexi_label" >
 				<?php echo JText::_( 'FLEXI_CATEGORIES_MAIN' ); ?>
 			</label>
 			<div class="container_fcfield container_fcfield_name_catid">
@@ -517,7 +517,7 @@ $tabCnt[$tabSetCnt] = 0;
 			</div>
 			
 			<div class="fcclear"></div>
-			<label id="jform_cid-lbl" for="jform_cid" class="flexi_label" >
+			<label id="jform_cid-lbl" for="jform_cid" for_bck="jform_cid" class="flexi_label" >
 				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
 			</label>
 			<div class="container_fcfield container_fcfield_name_catid">
@@ -814,12 +814,13 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
 				?>
 				<fieldset class="flexi_params panelform">
-					<?php
-						foreach ($this->form->getFieldset($name) as $field) :
-							echo $field->label;
-							echo $field->input;
-						endforeach;
-					?>
+					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+						<div class="fclear"></div>
+						<?php echo $field->label; ?>
+						<div class="container_fcfield">
+							<?php echo $field->input; ?>
+						</div>
+					<?php endforeach; ?>
 				</fieldset>
 		<?php endforeach; ?>
 
@@ -864,7 +865,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 									$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
 									$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
 									?>
-									<textarea id="<?php echo $ff_id; ?>" class="inputbox" rows="3" cols="26" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
+									<textarea id="<?php echo $ff_id; ?>" class="inputbox" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metadesc->value; ?></textarea>
 								</div>
 							<?php endif; ?>
 						<?php endforeach; ?>
@@ -898,7 +899,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 									$ff_id = 'jfdata_'.$t->shortcode.'_metakey';
 									$ff_name = 'jfdata['.$t->shortcode.'][metakey]';
 									?>
-									<textarea id="<?php echo $ff_id; ?>" class="inputbox" rows="3" cols="26" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
+									<textarea id="<?php echo $ff_id; ?>" class="inputbox" rows="3" cols="46" name="<?php echo $ff_name; ?>"><?php echo @$t->fields->metakey->value; ?></textarea>
 								</div>
 							<?php endif; ?>
 						<?php endforeach; ?>
@@ -914,7 +915,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			<?php foreach($this->form->getGroup('metadata') as $field): ?>
 				<div class="fcclear"></div>
 				<?php if ($field->hidden): ?>
-					<span style="display:none !important;">
+					<span style="visibility:hidden !important;">
 						<?php echo $field->input; ?>
 					</span>
 				<?php else: ?>
@@ -951,14 +952,22 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			<?php
 				$type_default_layout = $this->tparams->get('ilayout');
 				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
-	
-				foreach ($this->form->getFieldset('themes') as $field) :
-					if ($field->hidden) echo $field->input;
-					else echo $field->label . $field->input;
-					?><div class="clear"></div><?php
-				endforeach;
 			?>
-	
+			
+			<?php foreach($this->form->getFieldset('themes') as $field): ?>
+				<div class="fcclear"></div>
+				<?php if ($field->hidden): ?>
+					<span style="visibility:hidden !important;">
+						<?php echo $field->input; ?>
+					</span>
+				<?php else: ?>
+					<?php echo $field->label; ?>
+					<div class="container_fcfield">
+						<?php echo $field->input;?>
+					</div>
+				<?php endif; ?>
+			<?php endforeach; ?>
+
 			<blockquote id='__content_type_default_layout__'>
 				<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
 				<?php echo "<br><br>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
@@ -973,8 +982,17 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 					?>
 					<fieldset class="panelform">
 						<?php foreach ($tmpl->params->getGroup('attribs') as $field) : ?>
-							<?php echo $field->label; ?>
-							<?php echo $field->input; ?>
+							<div class="fcclear"></div>
+							<?php if ($field->hidden): ?>
+								<span style="visibility:hidden !important;">
+									<?php echo $field->input; ?>
+								</span>
+							<?php else: ?>
+								<?php echo $field->label; ?>
+								<div class="container_fcfield">
+									<?php echo $field->input;?>
+								</div>
+							<?php endif; ?>
 						<?php endforeach; ?>
 					</fieldset>
 					<?php

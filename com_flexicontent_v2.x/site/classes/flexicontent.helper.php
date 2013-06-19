@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1655 2013-03-16 17:55:25Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1683 2013-06-02 07:51:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1672,8 +1672,8 @@ class flexicontent_html
 					if ($lang->code == $selected) {
 						$checked = ' checked="checked"';
 					}
-					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'" >';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
+					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'" >';
 					if($lang->shortcode=="*") {
 						$list 	.= '<span class="lang_lbl">'.JText::_("All").'</span>';  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -1686,14 +1686,14 @@ class flexicontent_html
 				}
 				break;
 			case 4:
-				$list 	 = '<label class="lang_box" for="lang9999" title="'.JText::_( 'FLEXI_NOCHANGE_LANGUAGE_DESC' ).'" >';
 				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="lang" value="" checked="checked" />';
+				$list 	 = '<label class="lang_box" for="lang9999" title="'.JText::_( 'FLEXI_NOCHANGE_LANGUAGE_DESC' ).'" >';
 				$list 	.= JText::_( 'FLEXI_NOCHANGE_LANGUAGE' );
-				$list 	.= '</label><br />';
+				$list 	.= '</label><div class="clear"></div>';
 
 				foreach ($user_langs as $lang) {
-					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_("All");  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -1701,15 +1701,15 @@ class flexicontent_html
 					} else {
 						$list 	.= $lang->name;
 					}
-					$list 	.= '&nbsp;</label><br />';
+					$list 	.= '&nbsp;</label><div class="clear"></div>';
 				}
 				break;
 			case 5:
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					if ($lang->code==$selected) continue;
-					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_("All");  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -1717,14 +1717,14 @@ class flexicontent_html
 					} else {
 						$list 	.= $lang->name;
 					}
-					$list 	.= '</label><br />';
+					$list 	.= '</label><div class="clear"></div>';
 				}
 				break;
 			case 6:
 				$list		= '';
 				foreach ($user_langs as $lang) {
-					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_("All");  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -1732,12 +1732,12 @@ class flexicontent_html
 					} else {
 						$list 	.= $lang->name;
 					}
-					$list 	.= '&nbsp;</label><br />';
+					$list 	.= '&nbsp;</label><div class="clear"></div>';
 				}
-				$list 	.= '<label class="lang_box hasTip" for="lang9999" title="'.JText::_('FLEXI_USE_LANGUAGE_COLUMN').'::'.JText::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'">';
 				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="lang" value="" />';
+				$list 	.= '<label class="lang_box hasTip" for="lang9999" title="'.JText::_('FLEXI_USE_LANGUAGE_COLUMN').'::'.JText::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'">';
 				$list 	.= JText::_( 'FLEXI_USE_LANGUAGE_COLUMN' );
-				$list 	.= '</label><br />';
+				$list 	.= '</label><div class="clear"></div>';
 				break;
 		}
 		return $list;
@@ -1775,13 +1775,13 @@ class flexicontent_html
 
 			$list = '';
 			foreach ($state_ids as $i => $state_id) {
-				$list 	.= '<label class="state_box" for="state'.$state_id.'" title="'.JText::_( $state_names[$state_id] ).'" >';
 				$list 	.= '<input id="state'.$state_id.'" type="radio" name="state" class="state" value="'.$state_id.'" />';
+				$list 	.= '<label class="state_box" for="state'.$state_id.'" title="'.JText::_( $state_names[$state_id] ).'" >';
 				$list 	.= '<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" border="0" alt="'.JText::_( $state_names[$state_id] ).'" />';
 				$list 	.= '</label>';
 			}
-			$list 	.= '<label class="state_box hasTip" for="state9999" title="'.JText::_('FLEXI_USE_STATE_COLUMN').'::'.JText::_('FLEXI_USE_STATE_COLUMN_TIP').'">';
 			$list 	.= '<input id="state9999" type="radio" name="state" class="state" value="" />';
+			$list 	.= '<label class="state_box hasTip" for="state9999" title="'.JText::_('FLEXI_USE_STATE_COLUMN').'::'.JText::_('FLEXI_USE_STATE_COLUMN_TIP').'">';
 			$list 	.= JText::_( 'FLEXI_USE_STATE_COLUMN' );
 			$list 	.= '</label>';
 		} else {

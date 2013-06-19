@@ -188,7 +188,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($layout && $cid) { // Special views limitted to a specific category
 			$default_title .= ' '.JText::_('FLEXI_IN').' '.$category->title;
 		}
-		$params->def('page_title',	$category->title);
+		$params->def('page_title',	$default_title);  // set title ONLY if not already set
 		
 		
 		// *******************
@@ -208,7 +208,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$params->def('show_page_heading', 0);
 		$params->def('show_page_title', 0);
 		
-		// ... the page heading text
+		// ... the page heading text, set it only if not already set
 		$params->def('page_heading', $params->get('page_title'));    // J1.5: parameter name was show_page_title instead of show_page_heading
 		$params->def('page_title', $params->get('page_heading'));    // J2.5: to offer compatibility with old custom templates or template overrides
 		

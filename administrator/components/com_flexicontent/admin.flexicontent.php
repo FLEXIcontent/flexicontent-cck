@@ -166,6 +166,11 @@ if (FLEXI_J16GE) {
 	$controller = new $classname();
 }
 
+// load template language overrides, just before executing the component
+$templateDir = JURI::base() . 'templates/' . JFactory::getApplication()->getTemplate();
+JFactory::getLanguage()->load('com_flexicontent', $templateDir, 'en-GB', true);
+JFactory::getLanguage()->load('com_flexicontent', $templateDir, null, true);
+
 // Perform the requested task
 $controller->execute( JRequest::getCmd('task') );
 

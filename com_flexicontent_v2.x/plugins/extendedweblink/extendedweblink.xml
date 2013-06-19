@@ -84,6 +84,7 @@
 			<field name="use_class" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_AS_SELECT</option>
 			</field>
 			<field name="default_class" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="class_usage" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
@@ -91,6 +92,7 @@
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
+			<field name="class_choices" type="textarea" default="" label="FLEXI_PROPERTY_SELECT_CHOICES" description="FLEXI_PROPERTY_SELECT_CHOICES_DESC" rows="5" cols="25" />
 
 			<field name="" type="separator" default="FLEXI_EXTWL_URLID" level="level2" menu="hide" />
 			<field name="use_id" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">

@@ -84,22 +84,25 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 							<input type="hidden" name="initial_behaviour" value="copymove" /> <!-- a hidden field to give info to JS initialization code -->
 						</td>
 						<td>
+							<input id="method-duplicateoriginal" type="radio" name="translate_method" value="1" onclick="copymove();" checked="checked" />
 							<label for="method-duplicateoriginal">
-								<input id="method-duplicateoriginal" type="radio" name="translate_method" value="1" onclick="copymove();" checked="checked" />
 								<?php echo JText::_( 'FLEXI_DUPLICATEORIGINAL' ); ?>
-							</label><br />
+							</label><div class="clear"></div>
+							
+							<input id="method-usejoomfish" type="radio" name="translate_method" value="2" onclick="copymove();" />
 							<label for="method-usejoomfish">
-								<input id="method-usejoomfish" type="radio" name="translate_method" value="2" onclick="copymove();" />
 								<?php echo JText::_( 'FLEXI_USE_JF_DATA' ); ?>
-							</label><br />
+							</label><div class="clear"></div>
+							
 						<?php if ( JFile::exists(JPATH_COMPONENT_SITE.DS.'helpers'.DS.'translator.php') ) : ?>
+							<input id="method-autotranslation" type="radio" name="translate_method" value="3" onclick="copymove();" />
 							<label for="method-autotranslation">
-								<input id="method-autotranslation" type="radio" name="translate_method" value="3" onclick="copymove();" />
 								<?php echo JText::_( 'FLEXI_AUTO_TRANSLATION' ); ?>
-							</label><br />
+							</label><div class="clear"></div>
 						<?php endif; ?>
+						
+							<!--input id="method-firstjf-thenauto" type="radio" name="translate_method" value="4" onclick="copyonly();" /-->
 							<label for="method-firstjf-thenauto">
-								<!--input id="method-firstjf-thenauto" type="radio" name="translate_method" value="4" onclick="copyonly();" /-->
 								<?php echo " &nbsp;--&nbsp; <span style='color:gray;'>".JText::_( 'FLEXI_FIRST_JF_THEN_AUTO' )."</span>"; ?>
 							</label>
 						</td>
@@ -110,16 +113,18 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 							<input type="hidden" name="initial_behaviour" value="copyonly" /> <!-- a hidden field to give info to JS initialization code -->
 						</td>
 						<td>
+							<input id="menus-copy" type="radio" name="method" value="1" onclick="copyonly();" checked="checked" />
 							<label for="menus-copy" class="lang_box" >
-								<input id="menus-copy" type="radio" name="method" value="1" onclick="copyonly();" checked="checked" />
 								<?php echo JText::_( 'FLEXI_COPYONLY' ); ?>
-							</label><br />
+							</label><div class="clear"></div>
+								
+							<input id="method-move" type="radio" name="method" value="2" onclick="moveonly();" />
 							<label for="method-move" class="lang_box"  >
-								<input id="method-move" type="radio" name="method" value="2" onclick="moveonly();" />
 								<?php echo JText::_( 'FLEXI_MOVEONLY' ); ?>
-							</label><br />
+							</label><div class="clear"></div>
+							
+							<input id="method-copymove" type="radio" name="method" value="3" onclick="copymove();" />
 							<label for="method-copymove" class="lang_box" >
-								<input id="method-copymove" type="radio" name="method" value="3" onclick="copymove();" />
 								<?php echo JText::_( 'FLEXI_COPYMOVE' ); ?>
 							</label>
 						</td>
@@ -134,12 +139,13 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 					<tr>
 						<td class="key"><?php echo JText::_( 'FLEXI_KEEP_SEC_CATS' ); ?></td>
 						<td>
+							<input id="keepseccats0" type="radio" name="keepseccats" value="0" onclick="secmove();" />
 							<label for="keepseccats0">
-								<input id="keepseccats0" type="radio" name="keepseccats" value="0" onclick="secmove();" />
 								<?php echo JText::_( 'No' ); ?>
 							</label>
+							
+							<input id="keepseccats1" type="radio" name="keepseccats" value="1" onclick="secnomove();" checked="checked" />
 							<label for="keepseccats1">
-								<input id="keepseccats1" type="radio" name="keepseccats" value="1" onclick="secnomove();" checked="checked" />
 								<?php echo JText::_( 'Yes' ); ?>
 							</label>
 						</td>						
