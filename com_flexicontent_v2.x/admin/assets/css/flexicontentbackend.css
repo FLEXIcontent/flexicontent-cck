@@ -669,6 +669,11 @@ div label.lang_box input,
 div label.lang_box .lang_lbl {
 	display:inline-block; float:left;
 }
+div label.state_box img.lang_lbl,
+div label.lang_box img.lang_lbl {
+	margin: 6px 2px 2px 2px !important;
+	border: 1px solid lightgray;
+}
 
 /* Import view */
 #flexicontent table label.fckey {
