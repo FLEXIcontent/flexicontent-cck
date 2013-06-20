@@ -1220,8 +1220,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				} else if ($usepopup && $popuptype == 6) {  // (Widgetkit) SPOTlight image popup
 					$group_str = $group_name ? 'data-spotlight-group="'.$group_name.'"' : '';
 					$field->{$prop}[] = '
-						<a href="'.$srcl.'" data-lightbox="on" title="'.$alt.'">'.$img_legend.'</a>';
-					$field->{$prop}[] = '
 						<a href="'.$srcl.'" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title.' | '.($desc ? $desc : $title).'">
 							'.$img_nolegend.'
 							<div class="overlay">

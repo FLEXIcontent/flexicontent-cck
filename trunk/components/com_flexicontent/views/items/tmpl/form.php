@@ -60,7 +60,8 @@ $this->document->addScript( JURI::base().'administrator/components/com_flexicont
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/validate.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/tabber-minimized.js');
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/tabber.css');
-$this->document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
+//$this->document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
+//$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 
 if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');

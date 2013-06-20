@@ -2037,7 +2037,7 @@ class FlexicontentFields
 		$default_size = $isdate ? 15 : 30;
 		
 		// Some parameter shortcuts
-		$label_filter = $filter->parameters->get( $isSearchView ? 'display_label_filter_s' : 'display_label_filter_', 0 ) ;   // How to show filter label
+		$label_filter = $filter->parameters->get( $isSearchView ? 'display_label_filter_s' : 'display_label_filter', 0 ) ;   // How to show filter label
 		$size         = $filter->parameters->get( 'text_filter_size', $default_size );        // Size of filter
 		
 		$display_filter_as = $filter->parameters->get( $isSearchView ? 'display_filter_as_s' : 'display_filter_as', 0 );  // Filter Type of Display

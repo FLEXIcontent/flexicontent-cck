@@ -29,7 +29,9 @@ $tags_displayed = $this->row->type_id && ( $this->perms['cantags'] || count(@$th
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
 $this->document->addScript('components/com_flexicontent/assets/js/tabber-minimized.js');
 $this->document->addStyleSheet('components/com_flexicontent/assets/css/tabber.css');
-$this->document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
+//$this->document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
+//$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
+
 if ($this->perms['cantags'] || $this->perms['canversion']) {
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
 	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
