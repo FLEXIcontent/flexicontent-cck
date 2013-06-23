@@ -144,7 +144,7 @@ if ($use_fields && count($fields)) {
 	</thead>
 	<tbody>	
 	<?php
-	foreach ($this->items as $item) :
+	foreach ($this->items as $i => $item) :
 		if ($use_image) {
 			$src = '';
 			$thumb = '';
@@ -180,8 +180,14 @@ if ($use_fields && count($fields)) {
 			}
 		}
 		$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+		
+		$fc_item_classes = 'sectiontableentry';
+		foreach ($item->categories as $item_cat) {
+			$fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
+		}
+		$fc_item_classes .= $item->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
 	?>
-		<tr class="sectiontableentry" >
+		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
 		<?php if ($use_image) : ?>
 			<td headers="fc_image" align="center">
 				<?php if (!empty($thumb)) : ?>

@@ -189,9 +189,9 @@ class plgSearchFlexisearch extends JPlugin
 				$text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
 				$text = $db->Quote('%'.$text.'%', false);
 				$wheres2	= array();
-				if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'a.title LIKE '.$text;}
-				if (in_array('FlexisearchDesc', $searchAreas))		{$wheres2[]	= 'a.introtext LIKE '.$text;	$wheres2[]	= 'a.fulltext LIKE '.$text;}
-				if (in_array('FlexisearchMeta', $searchAreas))		{$wheres2[]	= 'a.metakey LIKE '.$text;		$wheres2[]	= 'a.metadesc LIKE '.$text;}
+				if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'i.title LIKE '.$text;}
+				if (in_array('FlexisearchDesc', $searchAreas))		{$wheres2[]	= 'i.introtext LIKE '.$text;	$wheres2[]	= 'i.fulltext LIKE '.$text;}
+				if (in_array('FlexisearchMeta', $searchAreas))		{$wheres2[]	= 'i.metakey LIKE '.$text;		$wheres2[]	= 'i.metadesc LIKE '.$text;}
 				if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type IN ('text','textselect') AND f.issearch=1 AND fir.value LIKE ".$text;}
 				if (in_array('FlexisearchTags', $searchAreas))		{$wheres2[]	= 't.name LIKE '.$text;}
 				if (count($wheres2)) $where		= '(' . implode(') OR (', $wheres2) . ')';
@@ -205,9 +205,9 @@ class plgSearchFlexisearch extends JPlugin
 					$word = FLEXI_J16GE ? $db->escape($word, true) : $db->getEscaped($word, true);
 					$word = $db->Quote('%'.$word.'%', false);
 					$wheres2	= array();
-					if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'a.title LIKE '.$word;}
-					if (in_array('FlexisearchDesc', $searchAreas))		{$wheres2[]	= 'a.introtext LIKE '.$word;	$wheres2[]	= 'a.fulltext LIKE '.$word;}
-					if (in_array('FlexisearchMeta', $searchAreas))		{$wheres2[]	= 'a.metakey LIKE '.$word;		$wheres2[]	= 'a.metadesc LIKE '.$word;}
+					if (in_array('FlexisearchTitle', $searchAreas))		{$wheres2[]	= 'i.title LIKE '.$word;}
+					if (in_array('FlexisearchDesc', $searchAreas))		{$wheres2[]	= 'i.introtext LIKE '.$word;	$wheres2[]	= 'i.fulltext LIKE '.$word;}
+					if (in_array('FlexisearchMeta', $searchAreas))		{$wheres2[]	= 'i.metakey LIKE '.$word;		$wheres2[]	= 'i.metadesc LIKE '.$word;}
 					if (in_array('FlexisearchFields', $searchAreas))	{$wheres2[]	= "f.field_type IN ('text','textselect') AND f.issearch=1 AND fir.value LIKE ".$word;}
 					if (in_array('FlexisearchTags', $searchAreas))		{$wheres2[]	= 't.name LIKE '.$word;}
 					if (count($wheres2)) $wheres[]	= '(' . implode(') OR (', $wheres2) . ')';
@@ -224,54 +224,90 @@ class plgSearchFlexisearch extends JPlugin
 		
 		switch ($ordering) {
 			case 'oldest':
-				$order = 'a.created ASC';
+				$order = 'i.created ASC';
 				break;
 
 			case 'popular':
-				$order = 'a.hits DESC';
+				$order = 'i.hits DESC';
 				break;
 
 			case 'alpha':
-				$order = 'a.title ASC';
+				$order = 'i.title ASC';
 				break;
 
 			case 'category':
-				$order = 'c.title ASC, a.title ASC';
+				$order = 'c.title ASC, i.title ASC';
 				break;
 
 			case 'newest':
 			default:
-				$order = 'a.created DESC';
+				$order = 'i.created DESC';
 				break;
 		}
 
 		// Select only items user has access to if he is not allowed to show unauthorized items
 		$joinaccess	= '';
 		$andaccess	= '';
-		if (!$show_noauth) {
+		$select_access = '';
+		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$andaccess .= 'AND ty.access IN ('.$aid_list.') ';
-				$andaccess .= 'AND  c.access IN ('.$aid_list.') ';
-				$andaccess .= 'AND  a.access IN ('.$aid_list.') ';
+				$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
+				$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
+				$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
 					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
 					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  a.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$andaccess	.= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ')';
-					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ')';
-					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  a.access <= '. (int) $aid . ')';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+					$andaccess	.= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
+					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
 				} else {
 					$andaccess  .= ' AND ty.access <= '.$aid;
 					$andaccess  .= ' AND  c.access <= '.$aid;
-					$andaccess  .= ' AND  a.access <= '.$aid;
+					$andaccess  .= ' AND  i.access <= '.$aid;
+				}
+			}
+			$select_access .= ', 1 AS has_access';
+		}
+		else {
+			// Extra access columns for main category and content type (item access will be added as 'access')
+			$select_access .= ',  c.access as category_access, ty.access as type_access';
+			
+			// Access Flags for: content type, main category, item
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$select_access .= ', '
+					.' CASE WHEN '
+					.'  ty.access IN ('.$aid_list.') AND '
+					.'   c.access IN ('.$aid_list.') AND '
+					.'   i.access IN ('.$aid_list.') '
+					.' THEN 1 ELSE 0 END AS has_access';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$select_access .= ', '
+						.' CASE WHEN '
+						.'  (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') AND '
+						.'  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ') AND '
+						.'  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') '
+						.' THEN 1 ELSE 0 END AS has_access';
+				} else {
+					$select_access .= ', '
+						.' CASE WHEN '
+						.'  (ty.access <= '. (int) $aid . ') AND '
+						.'  ( c.access <= '. (int) $aid . ') AND '
+						.'  ( i.access <= '. (int) $aid . ') '
+						.' THEN 1 ELSE 0 END AS has_access';
 				}
 			}
 		}
-	
+		
+		
 		// filter by active language
 		$andlang = '';
 		if (	$app->isSite() &&
@@ -285,38 +321,39 @@ class plgSearchFlexisearch extends JPlugin
 		$results = array();
 		if ( $limit > 0)
 		{
-			$query 	= 'SELECT a.sectionid,'
-				.' a.id as id,'
-				.' a.title AS title,'
-				.' a.metakey AS metakey,'
-				.' a.metadesc AS metadesc,'
-				.' a.modified AS created,'     // TODO ADD a PARAMETER FOR CONTROLING the use of modified by or created by date as "created"
+			$query 	= 'SELECT i.sectionid,'
+				.' i.id as id,'
+				.' i.title AS title,'
+				.' i.metakey AS metakey,'
+				.' i.metadesc AS metadesc,'
+				.' i.modified AS created,'     // TODO ADD a PARAMETER FOR CONTROLING the use of modified by or created by date as "created"
 				.' t.name AS tagname,'
 				.' fir.value as field,'
-				.' CONCAT(a.introtext, a.fulltext) AS text,'
-				.' CONCAT_WS( " / ", '. $db->Quote( JText::_( 'FLEXICONTENT' ) ) .', c.title, a.title ) AS section,'
-				.' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', a.id, a.alias) ELSE a.id END AS slug,'
+				.' CONCAT(a.introtext, i.fulltext) AS text,'
+				.' CONCAT_WS( " / ", '. $db->Quote( JText::_( 'FLEXICONTENT' ) ) .', c.title, i.title ) AS section,'
+				.' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END AS slug,'
 				.' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS catslug,'
 				.' "2" AS browsernav'
-				.' FROM #__content AS a'
-				.' JOIN #__categories AS c ON a.catid = c.id'
-				.' JOIN #__flexicontent_items_ext AS ie ON a.id = ie.item_id'
+				. $select_access
+				.' FROM #__content AS i'
+				.' JOIN #__categories AS c ON i.catid = c.id'
+				.' JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id'
 				.' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 				// searching into text-like fields
-				.' LEFT JOIN #__flexicontent_fields_item_relations AS fir ON a.id = fir.item_id'
+				.' LEFT JOIN #__flexicontent_fields_item_relations AS fir ON i.id = fir.item_id'
 				.' LEFT JOIN #__flexicontent_fields AS f ON fir.field_id = f.id'
 				// searching into 'tags' field
-				.' LEFT JOIN #__flexicontent_tags_item_relations AS tir ON a.id = tir.itemid'
+				.' LEFT JOIN #__flexicontent_tags_item_relations AS tir ON i.id = tir.itemid'
 				.' LEFT JOIN #__flexicontent_tags AS t ON tir.tid = t.id	'
 				. $joinaccess
 				.' WHERE ( '.$where.' ) '
 				.' AND ie.type_id IN('.$types.') '
-				.' AND a.state IN (1, -5) AND c.published = 1 '
-				.' AND (a.publish_up = '.$db->Quote($nullDate).' OR a.publish_up <= '.$db->Quote($now).') '
-				.' AND (a.publish_down = '.$db->Quote($nullDate).' OR a.publish_down >= '.$db->Quote($now).') '
+				.' AND i.state IN (1, -5) AND c.published = 1 '
+				.' AND (a.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).') '
+				.' AND (a.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).') '
 				. $andaccess // Filter by user access
 				. $andlang   // Filter by current language
-				. ' GROUP BY a.id '
+				. ' GROUP BY i.id '
 				. ' ORDER BY '. $order
 				;
 			//echo "<pre style='white-space:normal!important;'>".$query."</pre>";
@@ -327,15 +364,18 @@ class plgSearchFlexisearch extends JPlugin
 				$jAp=& JFactory::getApplication();
 				$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
 			}
-			if (isset($list))
+			if ( $list )
 			{
+				$item_cats = FlexicontentFields::_getCategories($list);
 				foreach($list as $key => $item)
 				{
 					// echo $item->title." ".$item->tagname."<br/>"; // Before checking for noHTML
-					if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION )
+					if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION ) {
+						$item->categories = $item_cats[$item->id];
 						$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug));
-					else
+					} else {
 						$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
+					}
 					if (searchHelper::checkNoHTML($item, $searchText, array('title', 'metadesc', 'metakey', 'tagname', 'field', 'text' ))) {
 						$results[$item->id] = $item;
 					}

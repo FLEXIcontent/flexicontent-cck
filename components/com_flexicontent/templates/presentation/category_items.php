@@ -19,221 +19,364 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
-$user =& JFactory::getUser();
+$user = JFactory::getUser();
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');
 ?>
 
+<div class="group">
 <?php
 	// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
 	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
 	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form.php');
 ?>
+</div>
 
-<div class="clear"></div>
+<div class="fcclear"></div>
 
 <?php
-if ($this->items) :
-	// routine to determine all used columns for this table
-	$layout = $this->params->get('clayout', 'default');
-	$fbypos		= flexicontent_tmpl::getFieldsByPositions($layout, 'category');
-	$columns = array();
-	foreach ($this->items as $item) :
-		if (isset($item->positions['table'])) :
-			foreach ($fbypos['table']->fields as $f) :
-				if (!in_array($f, $columns)) :
-					$columns[$f] = @$item->fields[$f]->label;
-				endif;
-			endforeach;
-		endif;
-	endforeach;
-endif;
+if (!$this->items) {
+	// No items exist
+	if ($this->getModel()->getState('limit')) {
+		// Not creating a category view without items
+		echo '<div class="noitems group">' . JText::_( 'FLEXI_NO_ITEMS_CAT' ) . '</div>';
+	}
+	return;
+}
 
 $items = & $this->items;
+
+
+// ***********
+// DECIDE TAGS 
+// ***********
+// Main container
+$mainAreaTag = 'div';
+
+// SEO, header level of title tag
+$itemTitleHeaderLevel = '2';
+	
+// SEO, header level of tab title tag
+$tabsHeaderLevel = $itemTitleHeaderLevel == '2'  ?  '3' : '2';  	
+
+foreach ($items as $i => $item) :
+	
+	$fc_item_classes = 'catalogitem';
+	foreach ($items[$i]->categories as $item_cat)  $fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
+	$fc_item_classes .= $items[$i]->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
 ?>
 
-<?php
-	if (!$this->params->get('show_title', 1) && $this->params->get('limit', 0) && !count($columns)) :
-		echo '<span style="font-weight:bold; color:red;">'.JText::_('FLEXI_TPL_NO_COLUMNS_SELECT_FORCING_DISPLAY_ITEM_TITLE').'</span>';
-		$this->params->set('show_title', 1);
-	endif;
-?>
-
-<?php if ($this->params->get('show_title', 1) || count($columns)) : ?>
-		
-	<?php foreach ($items as $item) : ?>
-					
-  <!-- BOF beforeDisplayContent -->
+<?php echo '<'.$mainAreaTag; ?> id="cataloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group">
+	
+	
   <?php if ($item->event->beforeDisplayContent) : ?>
+	  <!-- BOF beforeDisplayContent -->
 		<div class="fc_beforeDisplayContent group">
 			<?php echo $item->event->beforeDisplayContent; ?>
 		</div>
+		<!-- EOF beforeDisplayContent -->
 	<?php endif; ?>
-  <!-- EOF beforeDisplayContent -->
 	
-	<!-- BOF buttons -->
 	<?php
+	$show_editbutton = $this->params->get('show_editbutton', 1);
 	$pdfbutton = flexicontent_html::pdfbutton( $item, $this->params );
 	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug );
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
-	$editbutton = flexicontent_html::editbutton( $item, $this->params );
-	$statebutton = flexicontent_html::statebutton( $item, $this->params );
+	$editbutton = $show_editbutton ? flexicontent_html::editbutton( $item, $this->params ) : '';
+	$statebutton = $show_editbutton ? flexicontent_html::statebutton( $item, $this->params ) : '';
 	$approvalbutton = flexicontent_html::approvalbutton( $item, $this->params );
-	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) {
 	?>
-	<p class="buttons">
-		<?php echo $pdfbutton; ?>
-		<?php echo $mailbutton; ?>
-		<?php echo $printbutton; ?>
-		<?php echo $editbutton; ?>
-		<?php echo $statebutton; ?>
-		<?php echo $approvalbutton; ?>
-	</p>
-	<?php } ?>
-	<!-- EOF buttons -->
-
+	
+	<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) : ?>
+		<!-- BOF buttons -->
+		<p class="buttons">
+			<?php echo $pdfbutton; ?>
+			<?php echo $mailbutton; ?>
+			<?php echo $printbutton; ?>
+			<?php echo $editbutton; ?>
+			<?php echo $statebutton; ?>
+			<?php echo $approvalbutton; ?>
+		</p>
+		<!-- EOF buttons -->
+	<?php endif; ?>
+	
+	
+	
+	
+	<?php
+		$header_shown =
+			$this->params->get('show_comments_count', 1) ||
+			$this->params->get('show_title', 1) || $item->event->afterDisplayTitle ||
+			isset($item->positions['subtitle1']) || isset($item->positions['subtitle2']) || isset($item->positions['subtitle3']);
+	?>
+	
 	
 	<?php if ($this->params->get('show_comments_count')) : ?>
 		<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
-			<div style="float:left;" class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
+			<div class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
 				<?php echo $this->comments[ $item->id ]->total; ?>
 			</div>
 		<?php endif; ?>
 	<?php endif; ?>
 	
-	<!-- BOF item title -->
-	<?php if ($this->params->get('show_title', 1)) : ?>
-	<h2 class="contentheading"><span class="fc_item_title">
-		<?php
-		if ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
-			echo mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...';
-		else :
-			echo $item->title;
-		endif;
-		?>
-	</span></h2>
-	<?php endif; ?>
-	<!-- EOF item title -->
 	
-  <!-- BOF afterDisplayTitle -->
+	<?php if ($this->params->get('show_title', 1)) : ?>
+		<!-- BOF item title -->
+		<?php echo '<h'.$itemTitleHeaderLevel; ?> class="contentheading"><span class="fc_item_title">
+			<?php
+				echo ( mb_strlen($item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) ?
+					mb_substr ($item->title, 0, $this->params->get('title_cut_text',200), 'utf-8') . ' ...'  :  $item->title;
+			?>
+		</span><?php echo '</h'.$itemTitleHeaderLevel; ?>>
+		<!-- EOF item title -->
+	<?php endif; ?>
+	
+	
   <?php if ($item->event->afterDisplayTitle) : ?>
+	  <!-- BOF afterDisplayTitle -->
 		<div class="fc_afterDisplayTitle group">
 			<?php echo $item->event->afterDisplayTitle; ?>
 		</div>
+	  <!-- EOF afterDisplayTitle -->
 	<?php endif; ?>
-  <!-- EOF afterDisplayTitle -->
 	
-	<!-- BOF subtitle1 block -->
+	
 	<?php if (isset($item->positions['subtitle1'])) : ?>
-	<div class="flexi lineinfo subtitle1 group">
-		<?php foreach ($item->positions['subtitle1'] as $field) : ?>
-		<div class="flexi element">
-			<?php if ($field->label) : ?>
-			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-			<?php endif; ?>
-			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+		<!-- BOF subtitle1 block -->
+		<div class="flexi lineinfo subtitle1 group">
+			<?php foreach ($item->positions['subtitle1'] as $field) : ?>
+			<div class="flexi element">
+				<?php if ($field->label) : ?>
+				<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+				<?php endif; ?>
+				<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			</div>
+			<?php endforeach; ?>
 		</div>
-		<?php endforeach; ?>
-	</div>
+		<!-- EOF subtitle1 block -->
 	<?php endif; ?>
-	<!-- EOF subtitle1 block -->
 	
-	<!-- BOF subtitle2 block -->
+	
 	<?php if (isset($item->positions['subtitle2'])) : ?>
-	<div class="flexi lineinfo subtitle2 group">
-		<?php foreach ($item->positions['subtitle2'] as $field) : ?>
-		<div class="flexi element">
-			<?php if ($field->label) : ?>
-			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-			<?php endif; ?>
-			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+		<!-- BOF subtitle2 block -->
+		<div class="flexi lineinfo subtitle2 group">
+			<?php foreach ($item->positions['subtitle2'] as $field) : ?>
+			<div class="flexi element">
+				<?php if ($field->label) : ?>
+				<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+				<?php endif; ?>
+				<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			</div>
+			<?php endforeach; ?>
 		</div>
-		<?php endforeach; ?>
-	</div>
+		<!-- EOF subtitle2 block -->
 	<?php endif; ?>
-	<!-- EOF subtitle2 block -->
 	
-	<!-- BOF subtitle3 block -->
+	
 	<?php if (isset($item->positions['subtitle3'])) : ?>
-	<div class="flexi lineinfo subtitle3 group">
-		<?php foreach ($item->positions['subtitle3'] as $field) : ?>
-		<div class="flexi element">
-			<?php if ($field->label) : ?>
-			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-			<?php endif; ?>
-			<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+		<!-- BOF subtitle3 block -->
+		<div class="flexi lineinfo subtitle3 group">
+			<?php foreach ($item->positions['subtitle3'] as $field) : ?>
+			<div class="flexi element">
+				<?php if ($field->label) : ?>
+				<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+				<?php endif; ?>
+				<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			</div>
+			<?php endforeach; ?>
 		</div>
-		<?php endforeach; ?>
-	</div>
+		<!-- EOF subtitle3 block -->
 	<?php endif; ?>
-	<!-- EOF subtitle3 block -->
-
-
-<?php
-$tabcount = 6;
-
-// Find if at least one tabbed position is used
-for ($tc=1; $tc<=$tabcount; $tc++) $createtabs = @$createtabs ||  isset($item->positions['subtitle_tab'.$tc]);
-
-if (@$createtabs) :
-	echo '	<div class="fctabber group"><!-- tabber start -->'."\n";
 	
-	for ($tc=1; $tc<=$tabcount; $tc++) :
-		$tabpos_name  = 'subtitle_tab'.$tc;
-		$tabpos_label = JText::_($this->params->get('subtitle_tab'.$tc.'_label', $tabpos_name));
-		if (isset($item->positions[$tabpos_name])):
-?>
 	
-		<!-- BOF subtitle_tabN block -->
-		<div class='tabbertab'><!-- tab start -->
+	
+	<div class="fcclear"></div>
+	
+	<?php
+		// Find if at least one tabbed position is used
+		$tabcount = 6; $createtabs = false;
+		for ($tc=1; $tc<=$tabcount; $tc++) {
+			$createtabs = @$createtabs ||  isset($item->positions['subtitle_tab'.$tc]);
+		}
+	?>
+	
+	<?php if ($createtabs) :?>
+		<!-- tabber start -->
+		<div id="fc_subtitle_tabset" class="fctabber group">
 		
-			<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
+		<?php for ($tc=1; $tc<=$tabcount; $tc++) : ?>
+			<?php
+			$tabpos_name  = 'subtitle_tab'.$tc;
+			$tabpos_label = JText::_($this->params->get('subtitle_tab'.$tc.'_label', $tabpos_name));
+			$tab_id = 'fc_'.$tabpos_name;
+			?>
 			
-			<div class="flexi lineinfo <?php echo $tabpos_label; ?>">
-				<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
-				<div class="flexi element">
-					<?php if ($field->label) : ?>
-					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-					<?php endif; ?>
-					<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			<?php if (isset($item->positions[$tabpos_name])): ?>
+			<!-- tab start -->
+			<div id="<?php echo $tab_id; ?>" class="tabbertab">
+				<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
+				<div class="flexi lineinfo">
+					<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
+					<div class="flexi element">
+						<?php if ($field->label) : ?>
+						<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+						<?php endif; ?>
+						<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+					</div>
+					<?php endforeach; ?>
+				</div>
+			</div>
+			<!-- tab end -->
+		 	
+			<?php endif; ?>
+			
+		<?php endfor; ?>
+		
+		</div>
+		<!-- tabber end -->
+	<?php endif; ?>
+	
+	
+	<div class="fcclear"></div>
+	
+	
+	<?php if ((isset($item->positions['image'])) || (isset($item->positions['top']))) : ?>
+		<!-- BOF image/top row -->
+		<div class="flexi topblock group">  <!-- NOTE: image block is inside top block ... -->
+			
+			<?php if (isset($item->positions['image'])) : ?>
+				<!-- BOF image block -->
+				<?php foreach ($item->positions['image'] as $field) : ?>
+				<div class="flexi image field_<?php echo $field->name; ?>">
+					<?php echo $field->display; ?>
+					<div class="fcclear"></div>
 				</div>
 				<?php endforeach; ?>
-			</div>
+				<!-- EOF image block -->
+			<?php endif; ?>
 			
-		</div><!-- tab end -->
-		 
-		<?php endif; ?>
-		<!-- EOF subtitle_tabN block -->	
-	
-	<?php endfor; ?>
-		
-<?php
-	echo '</div><!-- tabber end -->'."\n";
-endif;
-?>
-
-
-	<?php if ((isset($item->positions['image'])) || (isset($item->positions['top']))) : ?>
-	<div class="flexi topblock group row">  <!-- NOTE: image block is inside top block ... -->
-	
-	<!-- BOF image block -->
-		<?php if (isset($item->positions['image'])) : ?>
-			<?php foreach ($item->positions['image'] as $field) : ?>
-		<div class="flexi image field_<?php echo $field->name; ?>">
-			<?php echo $field->display; ?>
-			<div class="clear"></div>
+			<?php if (isset($item->positions['top'])) : ?>
+				<!-- BOF top block -->
+				<?php
+					$top_cols = $this->params->get('top_cols', 'two');
+					$span_class = $top_cols == 'one' ? 'span12' : 'span6'; // bootstrap span
+				?>
+				<div class="flexi infoblock <?php echo $top_cols; ?>cols group">
+					<ul class="flexi">
+						<?php foreach ($item->positions['top'] as $field) : ?>
+						<li class="flexi">
+							<div>
+								<?php if ($field->label) : ?>
+								<div class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
+								<?php endif; ?>
+								<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+							</div>
+						</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
+				<!-- EOF top block -->
+			<?php endif; ?>
+			
 		</div>
-			<?php endforeach; ?>
-		<?php endif; ?>
-	<!-- EOF image block -->
+		<!-- EOF image/top row -->
+	<?php endif; ?>
 	
-	<!-- BOF top block -->
-		<?php if (isset($item->positions['top'])) : ?>
-		<div class="flexi infoblock <?php echo $this->params->get('top_cols', 'two'); ?>cols">
-			<ul class="flexi row">
-				<?php foreach ($item->positions['top'] as $field) : ?>
+	
+	<div class="fcclear"></div>
+	
+	
+	<?php if (isset($item->toc)) : ?>
+		<!-- BOF TOC -->
+		<?php echo $item->toc; ?>
+		<!-- EOF TOC -->
+	<?php endif; ?>
+	
+	
+	<?php if (isset($item->positions['description'])) : ?>
+		<!-- BOF description -->
+		<div class="description group">
+			<?php foreach ($item->positions['description'] as $field) : ?>
+				<?php if ($field->label) : ?>
+			<div class="desc-title"><?php echo $field->label; ?></div>
+				<?php endif; ?>
+			<div class="desc-content"><?php echo $field->display; ?></div>
+			<?php endforeach; ?>
+		</div>
+		<!-- EOF description -->
+	<?php endif; ?>
+	
+	
+	<div class="fcclear"></div>
+	
+	
+	<?php
+		// Find if at least one tabbed position is used
+		$tabcount = 6; $createtabs = false;
+		for ($tc=1; $tc<=$tabcount; $tc++) {
+			$createtabs = @$createtabs ||  isset($item->positions['bottom_tab'.$tc]);
+		}
+	?>
+	
+	<?php if ($createtabs) :?>
+		<!-- tabber start -->
+		<div id="fc_bottom_tabset" class="fctabber group">
+	
+		<?php for ($tc=1; $tc<=$tabcount; $tc++) : ?>
+			<?php
+			$tabpos_name  = 'bottom_tab'.$tc;
+			$tabpos_label = JText::_($this->params->get('bottom_tab'.$tc.'_label', $tabpos_name));
+			$tab_id = 'fc_'.$tabpos_name;
+			?>
+		
+			<?php if (isset($item->positions[$tabpos_name])): ?>
+			<!-- tab start -->
+			<div id="<?php echo $tab_id; ?>" class="tabbertab">
+				<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
+				<div class="flexi lineinfo">
+					<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
+					<div class="flexi element">
+						<?php if ($field->label) : ?>
+						<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+						<?php endif; ?>
+						<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+					</div>
+					<?php endforeach; ?>
+				</div>
+			</div>
+			<!-- tab end -->
+			<?php endif; ?>
+			
+		<?php endfor; ?>
+		
+		</div>
+		<!-- tabber end -->
+	<?php endif; ?>
+	
+	
+	<div class="fcclear"></div>
+	
+	
+	<?php
+		$readmore_forced = $this->params->get('lead_strip_html', 1) == 1 ;  // option 2 strip-cuts without forcing read more
+		$readmore_shown  = $this->params->get('show_readmore', 1) && strlen(trim($item->fulltext)) >= 1;
+		$readmore_shown  = $readmore_shown || $readmore_forced;
+		$footer_shown = $readmore_shown ||
+			isset($item->positions['bottom']) || $item->event->afterDisplayContent;
+	?>
+	
+	
+	<?php if (isset($item->positions['bottom'])) : ?>
+		<!-- BOF bottom block -->
+		<?php
+			$bottom_cols = $this->params->get('bottom_cols', 'two');
+			$span_class = $bottom_cols == 'one' ? 'span12' : 'span6'; // bootstrap span
+		?>
+		<div class="flexi infoblock <?php echo $bottom_cols; ?>cols group">
+			<ul class="flexi">
+				<?php foreach ($item->positions['bottom'] as $field) : ?>
 				<li class="flexi">
 					<div>
 						<?php if ($field->label) : ?>
@@ -245,125 +388,55 @@ endif;
 				<?php endforeach; ?>
 			</ul>
 		</div>
-		<?php endif; ?>
-	<!-- EOF top block -->
-	
-	</div>
+		<!-- EOF bottom block -->
 	<?php endif; ?>
 	
-	<div class="clear"></div>
 	
-	<!-- BOF TOC -->
-	<?php if (isset($item->toc)) : ?>
-		<?php echo $item->toc; ?>
+	<?php if ( $readmore_shown ) : ?>
+	<span class="readmore group">
+		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>" class="readon">
+			<?php echo ' ' . ($item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title)); ?>
+		</a>
+	</span>
 	<?php endif; ?>
-	<!-- EOF TOC -->
 	
-	<!-- BOF description -->
-	<?php if (isset($item->positions['description'])) : ?>
-	<div class="description group">
-		<?php foreach ($item->positions['description'] as $field) : ?>
-			<?php if ($field->label) : ?>
-		<div class="desc-title"><?php echo $field->label; ?></div>
-			<?php endif; ?>
-		<div class="desc-content"><?php echo $field->display; ?></div>
-		<?php endforeach; ?>
-	</div>
+	
+	<?php if ($item->event->afterDisplayContent) : ?>
+		<!-- BOF afterDisplayContent -->
+		<div class="fc_afterDisplayContent group">
+			<?php echo $item->event->afterDisplayContent; ?>
+		</div>
+		<!-- EOF afterDisplayContent -->
 	<?php endif; ?>
-	<!-- EOF description -->
 	
-
-<?php
-$tabcount = 6;
-
-// Find if at least one tabbed position is used
-for ($tc=1; $tc<=$tabcount; $tc++) $createtabs = @$createtabs ||  isset($item->positions['bottom_tab'.$tc]);
-
-if (@$createtabs) :
-	echo '	<div class="fctabber group"><!-- tabber start -->'."\n";
 	
-	for ($tc=1; $tc<=$tabcount; $tc++) :
-		$tabpos_name  = 'bottom_tab'.$tc;
-		$tabpos_label = JText::_($this->params->get('bottom_tab'.$tc.'_label', $tabpos_name));
-		if (isset($item->positions[$tabpos_name])):
-?>
+	<?php echo $mainAreaTag == 'section' ? '</article>' : ''; ?>
 	
-		<!-- BOF bottom_tabN block -->
-		<div class="tabbertab"><!-- tab start -->
-		
-			<h3 class="tabberheading"><?php echo $tabpos_label; ?></h3><!-- tab title -->
-			
-			<div class="flexi lineinfo <?php echo $tabpos_label; ?>">
-				<?php foreach ($item->positions[$tabpos_name] as $field) : ?>
-				<div class="flexi element">
-					<?php if ($field->label) : ?>
-					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
-					<?php endif; ?>
-					<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
-				</div>
-				<?php endforeach; ?>
-			</div>
-			
-		</div><!-- tab end -->
-		 
-		<?php endif; ?>
-		<!-- EOF bottom_tabN block -->	
-	
-	<?php endfor; ?>
-		
-<?php
-	echo '</div><!-- tabber end -->'."\n";
-endif;
-?>
-	<!-- BOF bottom block -->
-	<?php if (isset($item->positions['bottom'])) : ?>
-	<div class="flexi infoblock <?php echo $this->params->get('bottom_cols', 'two'); ?>cols group">
-		<ul class="flexi row">
-			<?php foreach ($item->positions['bottom'] as $field) : ?>
-			<li class="flexi">
-				<div>
-					<?php if ($field->label) : ?>
-					<div class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
-					<?php endif; ?>
-					<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
-				</div>
-			</li>
-			<?php endforeach; ?>
-		</ul>
-	</div>
-	<?php endif; ?>
-	<!-- EOF bottom block -->
-
-
-		<?php if (
-			( $this->params->get('show_readmore', 1) && strlen(trim($item->fulltext)) >= 1 )
-			||  $this->params->get('lead_strip_html', 1) == 1 /* option 2, strip-cuts and option 1 also forces read more  */
-		) : ?>
-		<span class="readmore group">
-			<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>" class="readon">
-			<?php
-			if ($item->params->get('readmore')) :
-				echo ' ' . $item->params->get('readmore');
-			else :
-				echo ' ' . JText::sprintf('FLEXI_READ_MORE', $item->title);
+	<?php if ($this->params->get('show_comments_incat') && !JRequest::getVar('print')) : /* PARAMETER MISSING */?>
+		<!-- BOF comments -->
+		<section class="comments group">
+		<?php
+			if ($this->params->get('comments') == 1) :
+				if (file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) :
+					require_once(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php');
+					echo JComments::showComments($item->id, 'com_flexicontent', $this->escape($item->title));
+				endif;
 			endif;
-			?>
-			</a>
-		</span>
-		<?php endif; ?>
-
-	  <!-- BOF afterDisplayContent -->
-	  <?php if ($item->event->afterDisplayContent) : ?>
-			<div class="fc_afterDisplayContent group">
-				<?php echo $item->event->afterDisplayContent; ?>
-			</div>
-		<?php endif; ?>
-	  <!-- EOF afterDisplayContent -->
-
-		<div class="fc_item_seperator"></div>
 	
-	<?php endforeach; ?>
+			if ($this->params->get('comments') == 2) :
+				if (file_exists(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php')) :
+		  			require_once(JPATH_SITE.DS.'plugins'.DS.'content'.DS.'jom_comment_bot.php');
+		  			echo jomcomment($item->id, 'com_flexicontent');
+					endif;
+				endif;
+		?>
+		</section>
+		<!-- BOF comments -->
+	<?php endif; ?>
 
-<?php elseif ($this->getModel()->getState('limit')) : // Check case of creating a category view without items ?>
-	<div class="noitems group"><?php echo JText::_( 'FLEXI_NO_ITEMS_CAT' ); ?></div>
-<?php endif; ?>
+<?php echo '</'.$mainAreaTag.'>'; ?>
+
+<div class="fc_item_seperator"></div>
+
+<?php endforeach; /* item loop */ ?>
+

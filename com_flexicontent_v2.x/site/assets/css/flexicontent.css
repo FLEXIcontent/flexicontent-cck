@@ -3,8 +3,7 @@
 /******************************************
  * Flexicontent General Utility CSS Classes
  ******************************************/
-#flexicontent {
-}
+#flexicontent {}
 
 #flexicontent .fcclear,
 #flexicontent .clear {
@@ -32,14 +31,21 @@
 	margin: 0 0 0.5em; /* safari */
 }
 
-#flexicontent .label {
-	font-weight: bold;
+#flexicontent .fcright { float:right; margin-left:8px; }
+#flexicontent .fcleft { float:left; margin-right:8px; }
+#flexicontent .fceven { background-color:#dddddd; }
+#flexicontent .fcodd { background-color:#eeeeee; }
+
+.fc_mini_note_box {
+	font-size: 11px;
+	background-color: lightyellow;
+	border: 1px solid lightgray;
+	border-radius: 6px;
+	width: auto;
+	padding: 2px 2%;
+	margin: 2px 8px;
 }
 
-.fcright { float:right; margin-left:8px; }
-.fcleft { float:left; margin-right:8px; }
-.fceven { background-color:#dddddd; }
-.fcodd { background-color:#eeeeee; }
 
 /**********************************************************************
  * FLEXIcontent buttons for links: print, pdf, email, rss, approval etc
@@ -76,17 +82,54 @@
 	text-decoration: none;
 }
 
+.fc_comments_count {
+	background: url(../images/comments.png) no-repeat !important; color: green;
+	padding-left: 20px;
+	height: 16px;
+	margin: 5px 5px 0px 0px;
+	float:left;
+}
+.fc_comments_count_nopad {
+	background: url(../images/comments.png) no-repeat !important; color: green;
+	padding-left: 20px;
+	height: 16px;
+	margin: 0px 5px 0px 0px;
+	float:left;
+}
+
+.fc_edit_link {
+	float:left;
+	margin:5px 5px 0px 0px;
+}
+.fc_edit_link_nopad {
+	float:left;
+	margin: 0px 5px 0px 0px;
+}
+
+.fc_state_toggle_link {
+	float:left;
+	/*margin:5px 5px 0px 0px;*/
+}
+.fc_state_toggle_link_nopad {
+	float:left;
+	/*margin:5px 5px 0px 0px;*/
+}
 
 
-/************************
- * FLEXIcontent headlines
- ************************/
+
+/**********************************
+ * FLEXIcontent headlines and title
+ **********************************/
 #flexicontent h2 {
 	margin: 0 0 0.5em;
 }
 
 #flexicontent h2 img {
 	border: none;
+}
+
+#flexicontent .fc_item_title {
+	text-decoration: none;
 }
 
 
@@ -217,22 +260,22 @@
  * Frontend templates, FORM CSS for: SEARCH/FILTER/ALPHA-INDEX/SELECTORS(e.g. per page, orderby) FORM CSS
  ********************************************************************************************************/
 
-/* some helper or compatibility classes */
-#flexicontent .fc_fleft  { display: inline-block; float: left; }
-#flexicontent .fc_fright { display: inline-block; float: right; }
-
-/*
- * Container of form elements for listings, including:
- * (a) text search, (b) field filters, but also of (c) alpha-index,
- * (d) pagination totals, per page limit selector and order selector
-*/
-#flexicontent #fc_filter {
+/* Outer container of (a) text search, (b) field filters */
+#flexicontent #fc_filter_box {
 	display: block;
 	clear: both;
-	border: solid 1px #dddddd;
-	margin: 0 0 1em 0;
-	padding: 0.5em;
+	border: solid 0px #dddddd;
+	margin: 0;
+	padding: 0;
 }
+
+/* Used for inner containers of (a) text search, (b) field filters */
+fieldset.fc_filter_set {
+	border: 1px solid #cccccc;
+	padding: 4px;
+	margin-top: 0px;
+}
+
 
 
 /*******************/
@@ -247,37 +290,25 @@
 }
 
 /* The label of text search form element */
-#flexicontent .fc_text_filter_label {
-	display:inline-block;
-	float:none;
-	font-weight:bold;
-	margin: 0px 4px 1px 1px;
+#flexicontent .fc_text_filter_label .fcleft {
+	margin: 0px 2px 0px 2px;
 }
 
 /* The text search form element */
 #flexicontent .fc_text_filter {
-	display:inline-block;
-	float:none;
+	display: inline-block;
+	float: left;
 	border: 1px solid gray;
-	margin: 1px 4px 1px 1px;
+	margin: 2px 4px 1px 1px;
+	padding: 4px;
 }
 
 /* Container of submit / reset buttons */
 #flexicontent .fc_text_filter_buttons {
 	display:inline-block;
-	float:none;
+	float: left;
 }
 
-/* The splitter line between search text and field filters (frontend FC templates) */
-#flexicontent .fc_text_filter_splitter  {
-	width:100%;
-	display:inline-block;
-	clear:both;
-	float:none;
-	padding:0px;
-	margin: 16px 0px 16px 0px;
-	border-bottom:1px dashed lightgray!important;
-}
 
 
 /*********************/
@@ -285,11 +316,8 @@
 /*********************/
 
 /* The LABEL of field filters LIST CONTAINER */
-#flexicontent .fc_field_filters_list_label {
-	display: inline-block;
-	float: none;
-	font-weight:bold;
-	margin: 0px 8px 0px 0px;
+#flexicontent .fc_field_filters_list_label .fcleft {
+	margin: 0px 2px 0px 2px;
 }
 
 /* Container of tooltip icon for filters list */
@@ -299,34 +327,47 @@
 }
 
 /* Container of each individual field filter (both label and html) */
-#flexicontent .filter {
+#flexicontent .filter,
+#flexicontent .filter_line {
 	display: inline-block;
 	float: left;
-	margin: 0px 10px 6px 0px;
 	white-space: nowrap;
 	border: 0px dashed gray;
-	min-height: 4em;
 }
+#flexicontent .filter { clear: none; min-height: 4em; margin: 0px 10px 6px 0px; }
+#flexicontent .filter_line { clear: both; width: 99%; margin: 0px 0px 2px 0px;}
 
 /* Container of each individual field filter LABEL */
-#flexicontent .filter .filter_label {
-	display: inline-block;
-	float: left;
-	clear: both;
-	font-size: 90%;
-	border-bottom:1px dashed black;
-	margin: 0px 4px 0px 0px;
-	*margin: 0px 4px 6px 0px;
-	/*font-style: italic;*/
+#flexicontent .filter .filter_label,
+#flexicontent .filter_line .filter_label {
+	float: left !important;
+	display: inline-block !important;
+	color: #606060 !important;
+  background-color: #F2F2F2 !important;
+  border-bottom: 1px solid #D0D0D0 !important;
+  border-right: 1px solid #D0D0D0 !important;
+  font-style: italic !important;
+  font-size: 12px !important;
+  font-family: arial !important;
+  font-weight: normal !important;
+  text-align: left !important;
+  margin: 2px 1% 3px 0px !important;
+  border-radius: 6px !important;
 }
+#flexicontent .filter .filter_label {  clear: both;   max-width: 150px !important;  min-width: 100px !important; padding: 6px !important; }
+#flexicontent .filter_line .filter_label {  clear: none; width: 14% !important; padding: 6px 1% 6px 1% !important; }
 
 /* Container of each individual field filter HTML */
-#flexicontent .filter .filter_html {
+#flexicontent .filter .filter_html,
+#flexicontent .filter_line .filter_html {
 	display: inline-block;
 	float: left;
-	clear: both;
 	font-size: 90%;
+  padding: 0px 0% 0px 0% !important;
+  margin: 0px 0% 0px 0% !important;
 }
+#flexicontent .filter .filter_html {  clear: both;  }
+#flexicontent .filter_line .filter_html {  clear: none; width: 76% !important; }
 
 /* The form element(s) of each field filter inside filter's HTML */
 #flexicontent .fc_field_filter {
@@ -334,13 +375,15 @@
 	color: black;
 	font-size: 11px;
 	font-weight: normal;
-	padding: 2px 4px;
-	margin: 4px 2px;
+	padding: 4px 4px;
+	margin: 2px 2px;
 	border-radius:5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	width: auto;
 }
+#flexicontent select.fc_field_filter { margin: 2px 2px; }
+#flexicontent input.fc_field_filter { margin: 3px 2px; }
 
 
 /*******************/
@@ -451,9 +494,9 @@
 }
 
 
-/************************************************/
-/* (e) Generic Display of Rendered Field Values */
-/************************************************/
+/*****************************************************************************/
+/* (e) Generic Display of Rendered Field Values, used e.g. by search results */
+/*****************************************************************************/
 
 #flexicontent .fc_field_container {
 	display: block;
@@ -504,7 +547,7 @@ html button {
 	background: #eeeeee !important;
 	color: black !important;	
 	margin: 2px 6px 2px 0px;
-	padding: 7px 6px 6px 2px;
+	padding: 5px 6px 4px 2px;
 	font-weight:bold;
 	font-size:11px;
 	white-space:nowrap !important;
@@ -525,8 +568,8 @@ html button {
 .fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important;  color: blue !important; }
 .fcbutton_preview { background: url(../images/monitor.png) no-repeat !important; color: blue !important; }
 .fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important;  color: red !important; }
-.fcbutton_go { background: url(../images/accept.png) no-repeat !important; color: green !important; }
-.fcbutton_reset { background: url(../images/arrow_rotate_clockwise.png) no-repeat !important;  color: darkorange !important; }
+.fcbutton_go { background: url(../images/accept.png) no-repeat !important; color: darkgreen !important; }
+.fcbutton_reset { background: url(../images/cancel.png) no-repeat !important;  color: darkred !important; }
 
 button.fc_button {}
 
@@ -557,55 +600,6 @@ fieldset.flexiaccess legend {
 fieldset.flexiaccess {
 	margin: 4px 0px 4px 0px!important;
 	padding: 5px!important;
-}
-
-
-
-/*******************
- * FLEXIcontent Tags
- *******************/
-
-#flexicontent .taglist {
-	margin: 5px 0 10px;
-	padding: 0 5px;
-}
-
-#flexicontent div#tags {
-	margin: 3px;
-}
-
-.flexi_tagbox {
-	background: #fff; 
-/* 	border: 1px dashed silver; */
-	display: block;
-	max-height: 170px;
-	overflow: auto;
-}
-
-.flexi_tagbox ul {
-	margin: 3px;
-	padding: 0px;
-}
-.flexi_tagbox ul li {
-	_display: inline;
-	_height: 20px;
-	display: -moz-inline-stack;
-	display: inline-block;
-	margin: 2px;
-	min-height: 20px;
-	vertical-align: top;
-	width: 130px;
-	zoom: 1;
-}
-
-.flexi_tagbox ul li div {
-	padding-top: 3px;
-}
-.flexi_tagbox input {
-	display: block;
-	float: left;
-	margin-top: -4px;
-	width: 20px;
 }
 
 
@@ -734,11 +728,9 @@ div.comments {
 
 
 
-/***********
- * Tabs CSS
- ***********
- * taken from the general.css in the backend
- */
+/*****************
+ * Joomla Tabs CSS
+ *****************/
 dl.tabs {
 	float: left;
 	margin: 10px 0 -1px 0;
@@ -778,8 +770,6 @@ div.current dd {
 	margin: 0 auto;
 	width: 373px;
 }
-
-
 
 
 
@@ -939,7 +929,6 @@ div.flexicontent.fcsearch  fieldset.fc_search_result.fceven {
 }
 
 div.flexicontent.fcsearch  fieldset.fc_search_result:hover {
-	background-color: #e0e0e0 !important;
 	border: 1px dashed gray;
 }
 
@@ -1248,6 +1237,7 @@ table.admintable td {
 /************************************************
  * TAB appearance customizations per content Type
  ************************************************/
+ 
 /*#flexicontent.fctypeNN*/ #fc_subtitle_tabset ul.tabbernav li a {  padding-left: 20px;  }
 /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_1, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_2, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_3,
 /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_4, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_5, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_6,
@@ -1274,9 +1264,10 @@ table.admintable td {
 /*************************************
  * FLEXIcontent radio/checkbox buttons
  *************************************/
+
 .flexi_radiotab {
 	display: inline-block !important;
-	padding: 1px 6px !important;
+	padding: 4px 6px !important;
 	margin: 2px 0px 2px 4px !important;
 	border-radius:5px !important;
 	-moz-border-radius: 5px !important;
@@ -1315,16 +1306,16 @@ table.admintable td {
 
 div.fancybox-wrap a { background: none!important;}
 
-#flexicontent .contentttt {
+#flexicontent .content {
 	float:none;
 	clear:both;
 }
 
 /* field container inside a tabbed position */
 .tabbertab  .flexi.element {
- display: block;
+ /*display: block;
  float: left;
- clear:both;
+ clear: both;*/
 }
 
 
@@ -1334,18 +1325,6 @@ div.fancybox-wrap a { background: none!important;}
 	-webkit-border-radius: 5px !important;
 }
 
-.fc_comments_count {
-	background: url(../images/comments.png) no-repeat !important; color: green;
-	padding-left: 20px;
-	height: 16px;
-	margin: 2px 4px;
-	float:left;
-}
-
-.fc_edit_link {
-	float:left;
-	margin:5px 5px 0px 0px;
-}
 
 .fc_field_unsused_val {
  text-decoration: line-through;
@@ -1354,4 +1333,41 @@ div.fancybox-wrap a { background: none!important;}
 .fc_field_unsused_val img {
  opacity:0.4;
  filter:alpha(opacity=40); /* For IE8 and earlier */
+}
+
+
+
+/**********************************************************
+ * Common styling (all templates) of field labels and value
+ **********************************************************/
+
+#flexicontent .label {
+	font-weight: bold;
+}
+
+#flexicontent .flexi.label {
+	/*float: left !important;*/
+  /*width: 16% !important;*/
+	display: block !important;
+	color: #606060 !important;
+  background-color: #F2F2F2 !important;
+  border-bottom: 1px solid #D0D0D0 !important;
+  border-right: 1px solid #D0D0D0 !important;
+  font-style: italic !important;
+  font-size: 12px !important;
+  font-family: arial !important;
+  font-weight: normal !important;
+  text-align: right !important;
+  max-width: 120px !important;
+  min-width: auto !important;
+  margin: 2px 3px 3px 2px !important;
+  padding: 2px 3px 2px 3px !important;
+  border-radius: 6px !important;
+}
+
+#flexicontent .flexi.value {
+	/*float: left !important;*/
+	/*width: 79%;*/
+	padding: 0px !important;
+	margin: 3px 0% 3px 0% !important;
 }

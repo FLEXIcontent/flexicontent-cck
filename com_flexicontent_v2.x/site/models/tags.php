@@ -226,7 +226,9 @@ class FlexicontentModelTags extends JModelLegacy
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess	 = '';
 		$andaccess   = '';
-		if (!$show_noauth) {
+		$select_access  = '';
+		
+		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
@@ -248,6 +250,40 @@ class FlexicontentModelTags extends JModelLegacy
 					$andaccess  .= ' AND  i.access <= '.$aid;
 				}
 			}
+			$select_access .= ', 1 AS has_access';
+		}
+		else {
+			// Extra access columns for main category and content type (item access will be added as 'access')
+			$select_access .= ', c.access as category_access, ty.access as type_access';
+			
+			// Access Flags for: content type, main category, item
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$select_access .= ', '
+					.' CASE WHEN '
+					.'  ty.access IN ('.$aid_list.') AND '
+					.'   c.access IN ('.$aid_list.') AND '
+					.'   i.access IN ('.$aid_list.') '
+					.' THEN 1 ELSE 0 END AS has_access';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$select_access .= ', '
+						.' CASE WHEN '
+						.'  (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') AND '
+						.'  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ') AND '
+						.'  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') '
+						.' THEN 1 ELSE 0 END AS has_access';
+				} else {
+					$select_access .= ', '
+						.' CASE WHEN '
+						.'  (ty.access <= '. (int) $aid . ') AND '
+						.'  ( c.access <= '. (int) $aid . ') AND '
+						.'  ( i.access <= '. (int) $aid . ') '
+						.' THEN 1 ELSE 0 END AS has_access';
+				}
+			}
 		}
 
 		// Get the WHERE and ORDER BY clauses for the query
@@ -262,7 +298,7 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		// Create JOIN for ordering items by a special ordering
 		if ($order=='commented') {
-			$select_comments = ' count(com.object_id) AS comments_total,';
+			$select_comments = ', count(com.object_id) AS comments_total';
 			$join_comments   = ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
 		} else if ($order=='rated') {
 			$select_rated = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
@@ -271,11 +307,12 @@ class FlexicontentModelTags extends JModelLegacy
 			$join_relcats   = ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id AND rel.catid = i.catid';
 		}
 		
-		$query = 'SELECT i.id, i.*, ie.*, '
+		$query = 'SELECT i.id, i.*, ie.* '
 			//. @ $select_image
 			. @ $select_comments . @ $select_rated
-			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+			. $select_access
+			. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
+			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 			. ' FROM #__content AS i'
 			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' JOIN #__flexicontent_tags_item_relations AS tag ON tag.itemid = i.id'
