@@ -364,6 +364,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$select_comments = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
 				$join_comments   = ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
 			}
+		} else {
+			$select_access = $this->_buildAccessSelect();
 		}
 		
 		if ( !$query_ids ) {
@@ -378,6 +380,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 				. @ $feed_img_col      // optional
+				. $select_access
 				;
 		}
 		
@@ -513,6 +516,61 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		return $this->_data_cats;
+	}
+	
+	
+	
+	/**
+	 * Method to build the part of SELECT clause that calculates item access
+	 *
+	 * @access private
+	 * @return string
+	 */
+	function _buildAccessSelect()
+	{
+		$user    = JFactory::getUser();
+		$cparams = $this->_params;
+		$show_noauth = $cparams->get('show_noauth', 0);
+		
+		$select_access = '';
+		
+		if ($show_noauth) {
+			// Extra access columns for main category and content type (item access will be added as 'access')
+			$select_access .= ', c.access as category_access, ty.access as type_access';
+			
+			// Access Flags for: content type, main category, item
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$select_access .= ', '
+					.' CASE WHEN '
+					.'  ty.access IN ('.$aid_list.') AND '
+					.'   c.access IN ('.$aid_list.') AND '
+					.'   i.access IN ('.$aid_list.') '
+					.' THEN 1 ELSE 0 END AS has_access';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$select_access .= ', '
+						.' CASE WHEN '
+						.'  (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') AND '
+						.'  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ') AND '
+						.'  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') '
+						.' THEN 1 ELSE 0 END AS has_access';
+				} else {
+					$select_access .= ', '
+						.' CASE WHEN '
+						.'  (ty.access <= '. (int) $aid . ') AND '
+						.'  ( c.access <= '. (int) $aid . ') AND '
+						.'  ( i.access <= '. (int) $aid . ') '
+						.' THEN 1 ELSE 0 END AS has_access';
+				}
+			}
+		} else {
+			$select_access .= ', 1 AS has_access';
+		}
+		
+		return $select_access;
 	}
 	
 	

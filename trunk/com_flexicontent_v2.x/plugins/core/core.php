@@ -320,7 +320,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$first_option_txt = $label_filter==2 ? $filter->label : JText::_('FLEXI_ALL');
 		
 		// Prepend Field's Label to filter HTML
-		$filter->html = $label_filter==1 ? $filter->label.': ' : '';
+		//$filter->html = $label_filter==1 ? $filter->label.': ' : '';
+		$filter->html = '';
 		
 		switch ($filter->field_type)
 		{
@@ -457,7 +458,6 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		
 		// b. If field filter has defined drop-down select options the create the drop-down select form field
 		if ( !empty($options) ) {
-			if ($label_filter == 1) $filter->html  .= $filter->label.': ';	
 			$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname,
 				' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
 		}

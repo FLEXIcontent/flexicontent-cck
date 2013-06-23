@@ -87,7 +87,7 @@ function tabberObj(argsObj)
   this.removeTitle = true;
 
   /* If you want to add an id to each link set this to true */
-  this.addLinkId = false;
+  this.addLinkId = true;
 
   /* If addIds==true, then you can set a format for the ids.
      <tabberid> will be replaced with the id of the main tabber div.
@@ -98,7 +98,7 @@ function tabberObj(argsObj)
      <tabtitle> will be replaced by the tab title
        (with all non-alphanumeric characters removed)
    */
-  this.linkIdFormat = '<tabberid>nav<tabnumberone>';
+  this.linkIdFormat = '<tabberid>_nav_<tabnumberone>';
 
   /* You can override the defaults listed above by passing in an object:
      var mytab = new tabber({property:value,property:value});
@@ -483,25 +483,35 @@ function tabberAutomatic(tabberArgs)
 function tabberAutomaticOnLoad(tabberArgs)
 {
   /* This function adds tabberAutomatic to the window.onload event,
-     so it will run after the document has finished loading.
-  */
-  var oldOnLoad;
-
+     so it will run after the document has finished loading,
+     but because some badly written JS code might overwrite our onLoad code,
+     we check if jQuery or MooTools were loaded and we call tabberAutomatic via them */
   if (!tabberArgs) { tabberArgs = {}; }
 
-  /* Taken from: http://simon.incutio.com/archive/2004/05/26/addLoadEvent */
-
-  oldOnLoad = window.onload;
-  if (typeof window.onload != 'function') {
-    window.onload = function() {
-      tabberAutomatic(tabberArgs);
-    };
-  } else {
-    window.onload = function() {
-      oldOnLoad();
-      tabberAutomatic(tabberArgs);
-    };
-  }
+	if(window.jQuery) {
+		jQuery(document).ready(function () {
+			tabberAutomatic(tabberArgs);
+		});
+	} else if(window.MooTools) {
+		window.addEvent('domready', function(){
+			tabberAutomatic(tabberArgs);
+		});
+	} else {
+		/* Taken from: http://simon.incutio.com/archive/2004/05/26/addLoadEvent */
+		var oldOnLoad = window.onload;
+		if (typeof window.onload != 'function') {
+			window.onload = function() {
+				tabberAutomatic(tabberArgs);
+			};
+		} else {
+			window.onload = function() {
+				if (oldOnLoad) {
+					oldOnLoad();
+				}
+				tabberAutomatic(tabberArgs);
+			};
+		}
+	}
 }
 
 

@@ -41,12 +41,18 @@ if ( $use_infoflds && count($infoflds) ) {
 
 <?php $count = -1; ?>
 <?php foreach($this->results as $i => $result) : ?>
-	<?php $count++; ?>
-	
-	<fieldset class="fc_search_result <?php echo $count%2 ? 'fcodd' : 'fceven'; ?>">
+	<?php
+		$count++;
+		$fc_item_classes = 'fc_search_result '.($count%2 ? 'fcodd' : 'fceven');
+		if ( @ $result->fc_item_id ) { // FLEXIcontent specific result
+			foreach ($result->categories as $item_cat) {
+				$fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
+			}
+			$fc_item_classes .= $result->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
+		}
+	?>
+	<fieldset id="searchlist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
 	 <div class="search-results<?php echo $this->pageclass_sfx; ?>">
-	 	
-	 	
 	 	
 		<div class="fc_search_result_title">
 			<?php echo $this->pageNav->limitstart + $result->count.'. ';?>

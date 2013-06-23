@@ -18,7 +18,7 @@ if ($catid) {
 	$form_target = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
 }
 $form_id = $form_name;
-$form_method = 'POST';   // DO NOT CHANGE THIS
+$form_method = 'post';   // DO NOT CHANGE THIS
 
 // 4. Create (print) the form
 ?>

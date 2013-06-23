@@ -618,7 +618,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			// Make the filter compatible with Joomla standard cache
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->clean();
-
+			
+			$display_label_filter_override = (int) $params->get('show_filter_labels', 0);
 			foreach ($filters as $filtre)
 			{
 				/*if ($category->_id) {
@@ -637,7 +638,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				
 				// make sure filter HTML is cleared, and create it
 				$display_label_filter_saved = $filtre->parameters->get('display_label_filter');
-				if ( $params->get('show_filter_labels',1)>0 ) $filtre->parameters->set('display_label_filter', 0); // suppress labels inside filter's HTML (hide or show all labels externally)
+				if ( $display_label_filter_override ) $filtre->parameters->set('display_label_filter', $display_label_filter_override); // suppress labels inside filter's HTML (hide or show all labels externally)
 				// else ... filter default label behavior
 				$filtre->html = '';  // make sure filter HTML display is cleared
 				$field_type = $filtre->iscore ? 'core' : $filtre->field_type;
@@ -659,7 +660,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($cids)     $urlvars['cids'] = $cids;
 		
 		$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, $Itemid, $urlvars), false);
-		$print_link    = $category_link .(strstr($category_link, '?') ? '&'  : '?'). 'pop=1&tmpl=component';
+		$print_link    = $category_link .(strstr($category_link, '?') ? '&amp;'  : '?'). 'pop=1&amp;tmpl=component';
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('action',    $category_link);  // $uri->toString()

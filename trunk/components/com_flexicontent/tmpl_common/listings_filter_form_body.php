@@ -3,65 +3,81 @@
 // Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
 // **************************************************************************************************************
 
-$infoimage = JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', '' );
+$infoimage = JHTML::image ( 'components/com_flexicontent/assets/images/information.png', '' );
 $limit_selector = flexicontent_html::limit_selector( $this->params );
 $orderby_selector = flexicontent_html::ordery_selector( $this->params );
 
-$search_tip_class = $this->params->get('show_search_tip') ? ' hasTip ' : '';
-$search_tip_title = $this->params->get('show_search_tip') ? ' title="'.JText::_('FLEXI_SEARCH').'::'.JText::_('FLEXI_TEXT_SEARCH_INFO').'" ' : '';
-$filters_list_tip_class = $this->params->get('show_filters_list_tip') ? ' hasTip ' : '';
-$filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title="'.JText::_('FLEXI_FIELD_FILTERS').'::'.JText::_('FLEXI_FIELD_FILTERS_INFO').'" ' : '';
+$search_shown  = $this->params->get('use_search', 0);
+$filters_shown = $this->params->get('use_filters', 0) && $this->filters;
+$compact_search_with_filters = $this->params->get('compact_search_with_filters', 1);
+$doing_compact = $search_shown && $filters_shown && $compact_search_with_filters;
+
+$show_search_tip       = $search_shown && $this->params->get('show_search_tip');
+$show_filters_list_tip = $filters_shown && $this->params->get('show_filters_list_tip');
+
+$legend_class  = 'fc_text_filter_label fcleft';
+$legend_class .= ($show_search_tip || $show_filters_list_tip) ? ' hasTip' : '';
+$legend_tip  = ($show_search_tip || $show_filters_list_tip) ? '::' : '';
+$legend_tip .= $show_search_tip ? '&lt;b&gt;'.JText::_('FLEXI_TEXT_SEARCH').'&lt;/b&gt;&lt;br/&gt;'.JText::_('FLEXI_TEXT_SEARCH_INFO') : '';
+$legend_tip .= ($show_search_tip || $show_filters_list_tip) ? '&lt;br/&gt;&lt;br/&gt;' : '';
+$legend_tip .= $show_filters_list_tip ? '&lt;b&gt;'.JText::_('FLEXI_FIELD_FILTERS').'&lt;/b&gt;&lt;br/&gt;'.JText::_('FLEXI_FIELD_FILTERS_INFO') : '';
+
+$show_filter_labels = $this->params->get('show_filter_labels', 1);
+$filter_perrow = $this->params->get( 'filter_perrow', 0 );
+
+$filter_container_class = $filter_perrow ? 'filter_line' : 'filter';
 ?>
 
-	<?php if ((($this->params->get('use_filters', 0)) && $this->filters) || ($this->params->get('use_search'))) : /* BOF filter ans search block */ ?>
+	<?php if ( $search_shown || $filters_shown ) : /* BOF search and filters block */ ?>
 	
-	<div id="fc_filter" class="floattext">
+	<div id="fc_filter_box" class="floattext">
 		
-		<?php if ($this->params->get('use_search', 0)) : /* BOF search */ ?>
-		<div class="fc_text_filter_box">
+		<fieldset class="fc_filter_set">
 			
-			<?php if ($this->params->get('show_search_label', 1)) : ?>
-				<span class="fc_text_filter_label <?php echo $search_tip_class;?>" <?php echo $search_tip_title;?> ><?php echo JText::_('FLEXI_SEARCH'); ?>:</span>
-				<?php echo $this->params->get('compact_search_with_filters', 1) ? '<br/>' : ''; ?>
-			<?php elseif ( $this->params->get('show_search_tip') ): ?>
-				<span class="hasTip" <?php echo $search_tip_title;?> ><?php echo $infoimage; ?></span>
-			<?php endif; ?>
+		<?php if ( $search_shown ) : /* BOF search */ ?>
 			
-			<input class="fc_text_filter rc5" type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" />
-			<?php echo $this->params->get('compact_search_with_filters', 1) ? '<br/>' : ''; ?>
-			
-			<?php if ($this->params->get('show_search_go', 1) || $this->params->get('show_search_reset', 1)) : ?>
-				<span class="fc_text_filter_buttons">
-					
-					<?php if ($this->params->get('show_search_go', 1)) : ?>
-						<button class="fc_button button_go" onclick="var form=document.getElementById('adminForm');                                     adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
-					<?php endif; ?>
-					
-					<?php if ($this->params->get('show_search_reset', 1)) : ?>
-						<button class="fc_button button_reset" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_RESET' ); ?></span></button>
-					<?php endif; ?>
-					
+			<?php if ($legend_tip) :?>
+			<legend>
+				<span class="<?php echo $legend_class; ?>" title="<?php echo $legend_tip; ?>">
+					<!--span class="fcleft"><?php echo $infoimage; ?></span-->
+					<span class="fcleft"><?php echo JText::_('FLEXI_SEARCH_FILTERING'); ?></span>
 				</span>
-			<?php endif; ?>	
-			
-		</div>
-		<?php endif; /* EOF search */ ?>
-
-		<?php if ( !$this->params->get('compact_search_with_filters', 1) && $this->params->get('use_search') && ($this->params->get('use_filters', 0) && $this->filters) ) : ?>
-			<div class="fc_text_filter_splitter"></div>
-		<?php endif; ?>
-
-		<?php if ($this->params->get('use_filters', 0) && $this->filters) : /* BOF filter */ ?>
-		
-			<?php if ($this->params->get('show_filters_list_label', 1)) : ?>
-				<span class="fc_field_filters_list_label hasTip" title="<?php echo JText::_('FLEXI_FIELD_FILTERS'); ?>::<?php echo JText::_('FLEXI_FIELD_FILTERS_INFO'); ?>"><?php echo JText::_('FLEXI_FIELD_FILTERS'); ?>:</span>
-				<?php echo $this->params->get('compact_search_with_filters', 1) ? '<br/>' : ''; ?>
-			<?php elseif ( $this->params->get('show_filters_list_tip') ): ?>
-				<span class="fc_field_filters_list_tipicon hasTip" <?php echo $filters_list_tip_title;?> ><?php echo $infoimage; ?></span>
+			</legend>
 			<?php endif; ?>
+			
+			<span class="<?php echo $doing_compact ? 'filter' : 'filter_line'; ?>">
+				<?php echo $this->params->get('show_search_label', 1) ? '<span class="filter_label">'.JText::_('FLEXI_TEXT_SEARCH').'</span>' : ''; ?>
+				<span class="filter_html">
+					<input class="fc_text_filter rc5" type="text" name="filter" id="filter" value="<?php echo $this->lists['filter'];?>" />
+				
+					<?php if ( !$doing_compact && ($this->params->get('show_search_go', 1) || $this->params->get('show_search_reset', 1)) ) : ?>
+					<span class="fc_text_filter_buttons">
+						
+						<?php if ($this->params->get('show_search_go', 1)) : ?>
+						<button class="fc_button button_go" onclick="var form=document.getElementById('adminForm'); adminFormPrepare(form);">
+							<span class="fcbutton_go"><?php echo JText::_( $filters_shown ? 'FLEXI_APPLY_FILTERING' : 'FLEXI_GO' ); ?></span>
+						</button>
+						<?php endif; ?>
+						
+						<?php if ($this->params->get('show_search_reset', 1)) : ?>
+						<button class="fc_button button_reset" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form); adminFormPrepare(form);">
+							<span class="fcbutton_reset"><?php echo JText::_( $filters_shown ? 'FLEXI_REMOVE_FILTERING' : 'FLEXI_RESET' ); ?></span>
+						</button>
+						<?php endif; ?>
+						
+					</span>
+					<?php endif; ?>
+				
+				</span>
+				
+			</span>
+			
+		<?php endif; /* EOF search */ ?>
+		
+		
+		<?php if ($filters_shown): /* BOF filter */ ?>
 			
 			<?php
-			$show_filter_labels = $this->params->get('show_filter_labels', 1);
 			foreach ($this->filters as $filt) :
 				if (empty($filt->html)) continue;
 				// Form field that have form auto submit, need to be have their onChange Event prepended with the FORM PREPARATION function call
@@ -69,7 +85,7 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 					if ( preg_match('/\.submit\(\)/', $filt->html, $matches) ) {
 						// Autosubmit detected inside onChange event, prepend the event with form preparation function call
 						if ( $this->params->get('disable_filter_autosubmit', 0) ) {
-							$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', '', $filt->html);
+							$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange="document.getElementById(\'submitWarn\').style.display = \'block\';" onchange_removed=${1}', $filt->html);
 							// The onChange Event, has his autosubmit removed, force GO button (in case GO button was not already inside search box)
 							$force_go = true;
 						} else {
@@ -84,8 +100,8 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 					$force_go = true;
 				}
 				
-				$_filter_html  = '<span class="filter" >' ."\n";
-				$_filter_html .= $show_filter_labels==1 ? ' <span class="filter_label">' .$filt->label. '</span>' ."\n"  :  '';
+				$_filter_html  = '<span class="'.$filter_container_class.'" >' ."\n";
+				$_filter_html .= ($show_filter_labels==1 || ($show_filter_labels==0 && $filt->parameters->get('display_label_filter')==1)) ? ' <span class="filter_label">' .$filt->label. '</span>' ."\n"  :  '';
 				$_filter_html .= ' <span class="filter_html">' .$filt->html. '</span>' ."\n";
 				$_filter_html .= '</span>' ."\n";
 				$filters_html[] = $_filter_html;
@@ -104,23 +120,34 @@ $filters_list_tip_title = $this->params->get('show_filters_list_tip') ? ' title=
 			// Add open/close tag to the HTML
 			echo $filters_html = $opentag .$filters_html. $closetag;
 			
-			$go_added_already = $this->params->get('use_search') && $this->params->get('show_search_go', 1);
-			$reset_added_already = $this->params->get('use_search') && $this->params->get('show_search_reset', 1);
+			$go_added_already = !$doing_compact && $this->params->get('use_search') && $this->params->get('show_search_go', 1);
+			$reset_added_already = !$doing_compact && $this->params->get('use_search') && $this->params->get('show_search_reset', 1);
 			?>
 			
 			<?php if (!empty($force_go) && !$go_added_already) : ?>
 			<span class="fc_text_filter_buttons">
-				<button class="fc_button button_go" onclick="var form=document.getElementById('adminForm');                               adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
+				<span id="submitWarn" class="fc_mini_note_box" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
+				<button class="fc_button button_go" onclick="var form=document.getElementById('adminForm'); adminFormPrepare(form);">
+					<span class="fcbutton_go"><?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?></span>
+				</button>
+				
 				<?php if (!$reset_added_already) : ?>
-				<button class="fc_button button_reset" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_RESET' ); ?></span></button>
+				<button class="fc_button button_reset" onclick="var form=document.getElementById('adminForm'); adminFormClearFilters(form);  adminFormPrepare(form);">
+					<span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?></span>
+				</button>
 				<?php endif; ?>
+				
 			</span>
 			<?php endif; ?>
-		
+			
 		<?php endif; /* EOF filter */ ?>
 		
+		</fieldset>
+		
 	</div>
-	<?php endif; /* EOF filter and search block */ ?>
+	<?php endif; /* EOF search and filter block */ ?>
+	
+	
 	<?php
 	if ($this->params->get('show_alpha', 1)) :
 		echo $this->loadTemplate('alpha');

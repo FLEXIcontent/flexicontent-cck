@@ -20,7 +20,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
-$user =& JFactory::getUser();
+$user = JFactory::getUser();
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 ?>
@@ -36,47 +36,71 @@ JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/as
 <div class="clear"></div>
 
 <?php
-if ($this->items) :
-	$currcatid = $this->category->id;
-	$cat_items[$currcatid] = array();
-	$sub_cats[$currcatid] = & $this->category;
-	foreach ($this->categories as $subindex => $sub) :
-		$cat_items[$sub->id] = array();
-		$sub_cats[$sub->id] = & $this->categories[$subindex];
+$items = & $this->items;
+
+// -- Check matching items found
+if (!$items) {
+	// No items exist
+	if ($this->getModel()->getState('limit')) {
+		// Not creating a category view without items
+		echo '<div class="noitems group">' . JText::_( 'FLEXI_NO_ITEMS_CAT' ) . '</div>';
+	}
+	return;
+}
+
+
+// -- Decide whether to show the item edit options
+if ( $user->id ) :
+	
+	$show_editbutton = $this->params->get('show_editbutton', 1);
+	foreach ($items as $item) :
+	
+		if ( $show_editbutton ) :
+			if ($item->editbutton = flexicontent_html::editbutton( $item, $this->params )) :
+				$item->editbutton = '<div class="fc_edit_link_nopad">'.$item->editbutton.'</div>';
+			endif;
+			if ($item->statebutton = flexicontent_html::statebutton( $item, $this->params )) :
+				$item->statebutton = '<div class="fc_state_toggle_link_nopad">'.$item->statebutton.'</div>';
+			endif;
+		endif;
+		
+		if ($item->approvalbutton = flexicontent_html::approvalbutton( $item, $this->params )) :
+			$item->approvalbutton = '<div class="fc_approval_request_link_nopad">'.$item->approvalbutton.'</div>';
+		endif;
+		
 	endforeach;
 	
-	$items = & $this->items;
-	for ($i=0; $i<count($items); $i++) :
-		foreach ($items[$i]->cats as $cat) :
-			if (isset($cat_items[$cat->id])) :
-				$cat_items[$cat->id][] = & $items[$i];
-			endif;
-		endforeach;
-	endfor;
-	
-	// routine to determine all used columns for this table
-	$layout = $this->params->get('clayout', 'default');
-	$fbypos		= flexicontent_tmpl::getFieldsByPositions($layout, 'category');
-	$columns['aftertitle'] = array();
-	foreach ($this->items as $item) :
-		if (isset($item->positions['aftertitle'])) :
-			foreach ($fbypos['aftertitle']->fields as $f) :
-				$columns['aftertitle'][$f] = @$item->fields[$f]->label;
-			endforeach;
+endif;
+
+// -- Find all categories used by items
+$currcatid = $this->category->id;
+$cat_items[$currcatid] = array();
+$sub_cats[$currcatid] = & $this->category;
+foreach ($this->categories as $subindex => $sub) :
+	$cat_items[$sub->id] = array();
+	$sub_cats[$sub->id] = & $this->categories[$subindex];
+endforeach;
+
+// -- Group items into categories
+for ($i=0; $i<count($items); $i++) :
+	foreach ($items[$i]->cats as $cat) :
+		if (isset($cat_items[$cat->id])) :
+			$cat_items[$cat->id][] = & $items[$i];
 		endif;
 	endforeach;
-	
-	//added to intercept more columns (see also css changes)
-	$tmpl_cols = $this->params->get('tmpl_cols', 2);
-	$tmpl_cols_classes = array(1=>'one',2=>'two',3=>'three',4=>'four');
-	$classnum = $tmpl_cols_classes[$tmpl_cols];
-	
-	// bootstrap span
-	$tmpl_cols_spanclasses = array(1=>'span12',2=>'span6',3=>'span4',4=>'span3');
-	$classspan = $tmpl_cols_spanclasses[$tmpl_cols];
+endfor;
+
+
+// -- Decide CSS classes
+$tmpl_cols = $this->params->get('tmpl_cols', 2);
+$tmpl_cols_classes = array(1=>'one',2=>'two',3=>'three',4=>'four');
+$classnum = $tmpl_cols_classes[$tmpl_cols];
+// bootstrap span
+$tmpl_cols_spanclasses = array(1=>'span12',2=>'span6',3=>'span4',4=>'span3');
+$classspan = $tmpl_cols_spanclasses[$tmpl_cols];
 ?>
 
-<ul class="faqblock <?php echo $classnum; ?> row group">	
+<ul class="faqblock <?php echo $classnum; ?> group row">	
 
 <?php
 global $globalcats;
@@ -92,131 +116,205 @@ foreach ($cat_items as $catid => $items) :
 	<section class="group">	
 		
 		<header class="flexi-cat group">
-			
-			<!-- BOF subcategory image -->
-			<?php if (!empty($sub->image) && $this->params->get(($catid!=$currcatid? 'show_description_image_subcat' : 'show_description_image'), 1)) : ?>
-			<figure class="catimg">
-				<?php echo $sub->image; ?>
-			</figure>
-			<?php endif; ?>
-			<!-- EOF subcategory image -->
-			
-			<!-- BOF subcategory title -->
-			<?php if ($catid!=$currcatid) { ?> <a class='fc_cat_title' href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>"> <?php } else { echo "<span class='fc_cat_title'>"; } ?>
-				<?php echo $sub->title; ?>
-			<?php if ($catid!=$currcatid) { ?> </a> <?php } else { echo "</span>"; } ?>
-			<!-- EOF subcategory title -->
-			
-			<!-- BOF subcategory assigned/subcats_count  -->
-			<?php
-				if ($catid!=$currcatid) {
-					$subsubcount = count($sub->subcats);
-					if ($this->params->get('show_itemcount', 1)) echo ' (' . ($sub->assigneditems != null ? $sub->assigneditems.'/'.$subsubcount : '0/'.$subsubcount) . ')';
-				}
-			?>
-			<!-- EOF subcategory assigned/subcats_count -->
 
-			<!-- BOF subcategory description  -->
-			<?php if ($this->params->get(($catid!=$currcatid? 'show_description_subcat' : 'show_description'), 1)) : ?>
-			<div class="catdescription group">
-				<?php	echo flexicontent_html::striptagsandcut( $sub->description, $this->params->get(($catid!=$currcatid? 'description_cut_text_subcat' : 'description_cut_text'), 120) ); ?>
-			</div>
+			<?php if (!empty($sub->image) && $this->params->get(($catid!=$currcatid? 'show_description_image_subcat' : 'show_description_image'), 1)) : ?>
+				<!-- BOF subcategory image -->
+				<figure class="catimg">
+					<?php echo $sub->image; ?>
+				</figure>
+				<!-- EOF subcategory image -->
 			<?php endif; ?>
-			<!-- EOF subcategory description -->
+
+			<?php if ($catid!=$currcatid) { ?> <a class='fc_cat_title' href="<?php echo JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) ); ?>"> <?php } else { echo "<span class='fc_cat_title'>"; } ?>
+				<!-- BOF subcategory title -->
+				<?php echo $sub->title; ?>
+				<!-- EOF subcategory title -->
+			<?php if ($catid!=$currcatid) { ?> </a> <?php } else { echo "</span>"; } ?>
+
+			<?php if ($catid!=$currcatid) : ?>
+				<!-- BOF subcategory assigned/subcats_count  -->
+				<?php
+				if ($this->params->get('show_itemcount', 1)) {
+					$subsubcount = count($sub->subcats);
+					echo ' (' . ($sub->assigneditems != null ? $sub->assigneditems.'/'.$subsubcount : '0/'.$subsubcount) . ')';
+				}
+				?>
+				<!-- EOF subcategory assigned/subcats_count -->
+			<?php endif; ?>
+
+			<?php if ($this->params->get(($catid!=$currcatid? 'show_description_subcat' : 'show_description'), 1)) : ?>
+				<!-- BOF subcategory description  -->
+				<div class="catdescription group">
+					<?php	echo flexicontent_html::striptagsandcut( $sub->description, $this->params->get(($catid!=$currcatid? 'description_cut_text_subcat' : 'description_cut_text'), 120) ); ?>
+				</div>
+				<!-- EOF subcategory description -->
+			<?php endif; ?>
 			
 		</header>
 
-<!-- BOF subcategory items -->
+
+		<?php if ( $items ) : ?>
+			<!-- BOF subcategory items -->
+			<div class="group">
+				<ul class="flexi-itemlist">
 			
-<?php
-	if (!$this->params->get('show_title', 1) && $this->params->get('limit', 0) && !count($columns['aftertitle'])) :
-		echo '<span style="font-weight:bold; color:red;">'.JText::_('FLEXI_TPL_NO_COLUMNS_SELECT_FORCING_DISPLAY_ITEM_TITLE').'</span>';
-		$this->params->set('show_title', 1);
-	endif;
-?>
-
-		<?php if ( $this->params->get('show_title', 1) || count($columns['aftertitle']) ) : ?>
-		<div class="group">
-			<ul class="flexi-itemlist">
-			<?php foreach ($items as $item) : ?>
-				<li class="flexi-item">
+				<?php foreach ($items as $i => $item) : ?>
+					<?php
+					$fc_item_classes = 'flexi-item';
+					foreach ($items[$i]->categories as $item_cat) {
+						$fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
+					}
+					$fc_item_classes .= $items[$i]->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
+					?>
+					<li id="faqlist_cat_<?php echo $catid; ?>item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
 					
-				  <!-- BOF beforeDisplayContent -->
-				  <?php if ($item->event->beforeDisplayContent) : ?>
-						<span class="fc_beforeDisplayContent group">
+					  <?php if ($item->event->beforeDisplayContent) : ?>
+					  <!-- BOF beforeDisplayContent -->
+						<aside class="fc_beforeDisplayContent group">
 							<?php echo $item->event->beforeDisplayContent; ?>
-						</span>
-					<?php endif; ?>
-				  <!-- EOF beforeDisplayContent -->
+						</aside>
+					  <!-- EOF beforeDisplayContent -->
+						<?php endif; ?>
 
-				<?php if ($this->params->get('show_editbutton', 0)) : ?>
-					<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
-					<?php if ($editbutton) : ?>
-						<div style="float:left;"><?php echo $editbutton;?></div>
-					<?php endif; ?>
-				<?php endif; ?>
-
-				<?php if ($this->params->get('show_comments_count')) : ?>
-					<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
-						<div style="float:left;" class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
-							<?php echo $this->comments[ $item->id ]->total; ?>
-						</div>
-					<?php endif; ?>
-				<?php endif; ?>
 					
-				<!-- BOF item title -->
-				<ul class="flexi-fieldlist">
-				<?php if ($this->params->get('show_title', 1)) : ?>
-		   		<li class="flexi-field flexi-title"><i class="icon-arrow-right"></i>
-						<?php if ($this->params->get('link_titles', 0)) : ?>
-		   			<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
-		   			<?php else : ?>
-							<?php echo $item->title; ?>
+						<ul class="flexi-fieldlist">
+				   		<li class="flexi-field flexi-title">
+								<i class="icon-arrow-right"></i>
+
+				   			<?php echo @ $item->editbutton; ?>
+				   			<?php echo @ $item->statebutton; ?>
+				   			<?php echo @ $item->approvalbutton; ?>
+								
+								<?php if ($this->params->get('show_comments_count')) : ?>
+									<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
+									<div class="fc_comments_count_nopad hasTip" alt="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
+										<?php echo $this->comments[ $item->id ]->total; ?>
+									</div>
+									<?php endif; ?>
+								<?php endif; ?>
+						
+								<?php if ($this->params->get('show_title', 1)) : ?>
+									<!-- BOF item title -->
+									<?php if ($this->params->get('link_titles', 0)) : ?>
+						   			<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>">
+											<?php echo $item->title; ?>
+										</a>
+					   			<?php else : ?>
+										<?php echo $item->title; ?>
+									<?php endif; ?>
+									<!-- BOF item title -->
+								<?php endif; ?>
+						
+						
+								<?php if ($item->event->afterDisplayTitle) : ?>
+									<!-- BOF afterDisplayTitle -->
+									<div class="fc_afterDisplayTitle group">
+										<?php echo $item->event->afterDisplayTitle; ?>
+									</div>
+									<!-- EOF afterDisplayTitle -->
+								<?php endif; ?>
+						
+							</li>
+							
+							
+							<?php if (isset($item->positions['aftertitle'])) : ?>
+								<!-- BOF aftertitle block -->
+								<?php foreach ($item->positions['aftertitle'] as $field) : ?>
+								<li class="flexi-field">
+									<?php if ($field->label) : ?>
+									<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+									<?php endif; ?>
+									<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+								</li>
+								<?php endforeach; ?>
+								<!-- EOF aftertitle block -->
+							<?php endif; ?>
+							
+							
+							<?php if (isset($item->positions['aftertitle_nolabel'])) : ?>
+								<!-- BOF aftertitle_nolabel block -->
+								<?php foreach ($item->positions['aftertitle_nolabel'] as $field) : ?>
+								<li class="flexi-field">
+									<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+								</li>
+								<?php endforeach; ?>
+								<!-- EOF aftertitle_nolabel block -->
+							<?php endif; ?>
+							
+							
+							<?php if (isset($item->positions['aftertitle2'])) : ?>
+								<!-- BOF aftertitle block -->
+								<?php foreach ($item->positions['aftertitle2'] as $field) : ?>
+								<li class="flexi-field">
+									<?php if ($field->label) : ?>
+									<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+									<?php endif; ?>
+									<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+								</li>
+								<?php endforeach; ?>
+								<!-- EOF aftertitle block -->
+							<?php endif; ?>
+							
+							
+							<?php if (isset($item->positions['aftertitle_nolabel2'])) : ?>
+								<!-- BOF aftertitle_nolabel block -->
+								<?php foreach ($item->positions['aftertitle_nolabel2'] as $field) : ?>
+								<li class="flexi-field">
+									<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+								</li>
+								<?php endforeach; ?>
+								<!-- EOF aftertitle_nolabel block -->
+							<?php endif; ?>
+							
+							
+							<?php if (isset($item->positions['aftertitle3'])) : ?>
+								<!-- BOF aftertitle block -->
+								<?php foreach ($item->positions['aftertitle3'] as $field) : ?>
+								<li class="flexi-field">
+									<?php if ($field->label) : ?>
+									<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+									<?php endif; ?>
+									<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+								</li>
+								<?php endforeach; ?>
+								<!-- EOF aftertitle block -->
+							<?php endif; ?>
+							
+							
+							<?php if (isset($item->positions['aftertitle_nolabel3'])) : ?>
+								<!-- BOF aftertitle_nolabel block -->
+								<?php foreach ($item->positions['aftertitle_nolabel3'] as $field) : ?>
+								<li class="flexi-field">
+									<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+								</li>
+								<?php endforeach; ?>
+								<!-- EOF aftertitle_nolabel block -->
+							<?php endif; ?>
+							
+						</ul>
+
+
+						<?php if ($item->event->afterDisplayContent) : ?>
+							<!-- BOF afterDisplayContent -->
+							<aside class="fc_afterDisplayContent group">
+								<?php echo $item->event->afterDisplayContent; ?>
+							</aside>
+							<!-- EOF afterDisplayContent -->
 						<?php endif; ?>
 
-						<!-- BOF afterDisplayTitle -->
-						<?php if ($item->event->afterDisplayTitle) : ?>
-							<div class="fc_afterDisplayTitle group">
-								<?php echo $item->event->afterDisplayTitle; ?>
-							</div>
-						<?php endif; ?>
-						<!-- EOF afterDisplayTitle -->
-					</li>
-				<?php endif; ?>
-				<!-- BOF item title -->
-						  
-				<!-- BOF item fields block aftertitle -->
-				<?php foreach ($columns['aftertitle'] as $name => $label) : ?>
-					<li class="flexi-field">
-					<?php echo $label .($label ? ': ' : ''). @$item->positions['aftertitle']->{$name}->display; ?>
 					</li>
 				<?php endforeach; ?>
+
 				</ul>
-				<!-- EOF item fields block aftertitle -->
-			    
-				<!-- BOF afterDisplayContent -->
-				<?php if ($item->event->afterDisplayContent) : ?>
-					<div class="fc_afterDisplayContent group">
-						<?php echo $item->event->afterDisplayContent; ?>
-					</div>
-				<?php endif; ?>
-				<!-- EOF afterDisplayContent -->
-				
-				</li>
-			<?php endforeach; ?>
-			</ul>
-		</div>
-			
+			</div>
+			<!-- EOF subcategory items -->
 		<?php endif; ?>
 
 	</section>
 </li>
-<!-- EOF subcategory items -->
+
 		
 <?php endforeach; ?>
 
 </ul>
 
-<?php elseif ($this->getModel()->getState('limit')) : // Check case of creating a category view without items ?>
-	<div class="noitems"><?php echo JText::_( 'FLEXI_NO_ITEMS_CAT' ); ?></div>
-<?php endif; ?>

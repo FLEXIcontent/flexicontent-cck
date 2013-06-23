@@ -321,26 +321,61 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// ***************************************************************************************
 		$joinaccess	= '';
 		$andaccess	= '';
+		$select_access = '';
 		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				$andaccess  .= ' AND  c.access IN ('.$aid_list.')';
-				$andaccess  .= ' AND ty.access IN ('.$aid_list.')';
-				$andaccess  .= ' AND  i.access IN ('.$aid_list.')';
+				$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
+				$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
+				$andaccess .= ' AND  i.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
 					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "category"';
 					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ')';
-					$andaccess	.= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ')';
-					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ')';
+					$andaccess	.= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+					$andaccess	.= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
+					$andaccess  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
 				} else {
-					$andaccess  .= ' AND  c.access <= '.$aid;
 					$andaccess  .= ' AND ty.access <= '.$aid;
+					$andaccess  .= ' AND  c.access <= '.$aid;
 					$andaccess  .= ' AND  i.access <= '.$aid;
+				}
+			}
+			$select_access .= ', 1 AS has_access';
+		}
+		else {
+			// Extra access columns for main category and content type (item access will be added as 'access')
+			$select_access .= ',  c.access as category_access, ty.access as type_access';
+			
+			// Access Flags for: content type, main category, item
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$select_access .= ', '
+					.' CASE WHEN '
+					.'  ty.access IN ('.$aid_list.') AND '
+					.'   c.access IN ('.$aid_list.') AND '
+					.'   i.access IN ('.$aid_list.') '
+					.' THEN 1 ELSE 0 END AS has_access';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$select_access .= ', '
+						.' CASE WHEN '
+						.'  (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') AND '
+						.'  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. (int) $aid . ') AND '
+						.'  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. (int) $aid . ') '
+						.' THEN 1 ELSE 0 END AS has_access';
+				} else {
+					$select_access .= ', '
+						.' CASE WHEN '
+						.'  (ty.access <= '. (int) $aid . ') AND '
+						.'  ( c.access <= '. (int) $aid . ') AND '
+						.'  ( i.access <= '. (int) $aid . ') '
+						.' THEN 1 ELSE 0 END AS has_access';
 				}
 			}
 		}
@@ -458,6 +493,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
 			. ' CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, i.title ) AS section'
+			. $select_access
 			. ' FROM #__content AS i'
 			. $join_textsearch
 			. $join_clauses
@@ -487,12 +523,14 @@ class plgSearchFlexiadvsearch extends JPlugin
 			if ( count($list) < $search_limit ) $app->setUserState('fc_view_limit_max', 0);
 			else $app->setUserState('fc_view_limit_max', $search_limit);
 			
-			foreach($list as $key => $row)
+			$item_cats = FlexicontentFields::_getCategories($list);
+			foreach($list as $key => $item)
 			{
-				if( FLEXI_J16GE || $row->sectionid==FLEXI_SECTION ) {
-					$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug));
+				if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION ) {
+					$item->categories = $item_cats[$item->id];
+					$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
 				} else {
-					$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($row->slug, $row->catslug, $row->sectionid));
+					$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
 				}
 				$list[$key]->browsernav = $browsernav;
 			}

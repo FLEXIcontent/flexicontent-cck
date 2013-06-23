@@ -2125,7 +2125,9 @@ class FlexicontentFields
 		}
 		
 		// Prepend Field's Label to filter HTML
-		$filter->html = $label_filter==1 ? $filter->label.': ' : '';
+		// Commented out because it was moved in to form template file
+		//$filter->html = $label_filter==1 ? $filter->label.': ' : '';
+		$filter->html = '';
 		
 		// *** Create the form field(s) used for filtering
 		switch ($display_filter_as) {
@@ -2184,7 +2186,10 @@ class FlexicontentFields
 				$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'['.$i.']" ';
 				$filter->html .= '  value="" '.$checked_attr.' style="display:none;" />';
 			}
-			$filter->html .= ' <span style="float:left; display:inline-block;" >-'.JText::_('FLEXI_ALL').'-</span>';
+			$filter->html .= ' <span style="float:left; display:inline-block;" >'.
+				($label_filter==2  ?  $filter->label.': ' : '').
+				'-'.JText::_('FLEXI_ALL').'-'.
+				'</span>';
 			$filter->html .= '</label>';
 			$i++;
 			foreach($results as $result) {
