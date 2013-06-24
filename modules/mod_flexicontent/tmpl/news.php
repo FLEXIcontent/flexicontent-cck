@@ -48,6 +48,7 @@
 
 // no direct access
 defined('_JEXEC') or die('Restricted access');
+
 $mod_width_feat 	= (int)$params->get('mod_width', 110);
 $mod_height_feat 	= (int)$params->get('mod_height', 110);
 $mod_width 				= (int)$params->get('mod_width', 80);
@@ -107,16 +108,15 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 		<div class='order_group_title'><?php echo $ord_titles[$ord]; ?></div>
 		<?php endif; ?>
 		
+		<?php if (isset($list[$ord]['featured'])) : ?>
 		<!-- BOF featured items -->
-		<?php if (isset($list[$ord]['featured'])) :	?>
-
 		<div class="mod_flexicontent_featured" id="mod_fcitems_box_featured<?php echo $module->id ?>">
 			
 			<?php foreach ($list[$ord]['featured'] as $item) : ?>
 			<?php $rowtoggler = !$rowtoggler; ?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler)? 'odd' : 'even'; ?>">
+			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler) ? 'odd' : 'even'; ?>">
 				
 				<!-- BOF current item's title -->	
 				<?php if ($display_title_feat) : ?>
@@ -235,23 +235,23 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 				</div> <!-- EOF current item's content -->
 				<?php endif; ?>
 				
-			</div> <!-- EOF current item -->
+			</div>
+			<!-- EOF current item -->
 			<?php endforeach; ?>
 			
-		</div><!-- EOF featured items -->
-		
+		</div>
+		<!-- EOF featured items -->
 		<?php endif; ?>
 		
 		
+		<?php if (isset($list[$ord]['standard'])) : ?>
 		<!-- BOF standard items -->
-		<?php	if (isset($list[$ord]['standard'])) : ?>
 		<?php	$rowcount = 0; ?>
 		
 		<div class="mod_flexicontent_standard" id="mod_fcitems_box_standard<?php echo $module->id ?>">
 			
-			<?php
-			$oe_class = $rowtoggler ? 'odd' : 'even';
-			foreach ($list[$ord]['standard'] as $item) : ?>
+			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; ?>
+			<?php foreach ($list[$ord]['standard'] as $item) : ?>
 			<?php
 				if ($rowcount%$item_columns==0) {
 					$oe_class = $oe_class=='odd' ? 'even' : 'odd';
@@ -379,13 +379,15 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 				</div> <!-- EOF current item's content -->
 				<?php endif; ?>
 				
-			</div> <!-- EOF current item -->
+			</div>
+			<!-- EOF current item -->
 			<?php echo !($rowcount%2) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
 			
-		</div><!-- EOF standard items -->
+		</div>
+		<!-- EOF standard items -->
 		<?php endif; ?>
-				
+		
 		<div class="modclear"></div>
 
 	</div>

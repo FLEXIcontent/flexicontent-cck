@@ -527,6 +527,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="skip_category_if_noitems" type="radio" default="0" label="FLEXI_MOD_SKIP_CATEGORY_IF_NOITEMS" description="FLEXI_MOD_SKIP_CATEGORY_IF_NOITEMS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="cats_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>

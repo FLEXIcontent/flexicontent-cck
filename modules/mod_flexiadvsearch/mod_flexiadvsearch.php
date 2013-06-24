@@ -27,18 +27,14 @@ else
 
 $show_in_views = $params->get('show_in_views', array());
 $show_in_views = !is_array($show_in_views) ? array($show_in_views) : $show_in_views;
-
 $views_show_mod =!count($show_in_views) || in_array($_view,$show_in_views);
 
-if ($params->get('enable_php_rule', 0))
+if ($params->get('enable_php_rule', 0)) {
 	$php_show_mod = eval($params->get('php_rule'));
-else
-	$php_show_mod = true;
-
-if ($params->get('combine_show_rules', 'AND')=='AND') {
-	$show_mod = $views_show_mod && $php_show_mod;
+	$show_mod = $params->get('combine_show_rules', 'AND')=='AND'
+		? ($views_show_mod && $php_show_mod)  :  ($views_show_mod || $php_show_mod);
 } else {
-	$show_mod = $views_show_mod || $php_show_mod;
+	$show_mod = $views_show_mod;
 }
 
 if ( $show_mod )
@@ -48,7 +44,7 @@ if ( $show_mod )
 	$modfc_jprof = new JProfiler();
 	$modfc_jprof->mark('START: FLEXIcontent Adv Search Module');
 	
-	// load english language file for 'mod_flexiadvsearch' component then override with current language file
+	// load english language file for 'mod_flexiadvsearch' module then override with current language file
 	JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, 'en-GB', true);
 	JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, null, true);
 	

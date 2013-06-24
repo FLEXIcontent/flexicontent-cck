@@ -1,5 +1,10 @@
-<?php if ($catdata) : ?>
-
+<?php if ( $catdata ) : ?>
+	<?php
+	$show_cat_image = $catdata->conf->show_image && ($catdata->image || $catdata->conf->show_default_image );
+	$show_cat_data = $catdata->conf->showtitle || $show_cat_image || !empty($catdata->description);
+	if ( !$show_cat_data  ) return;
+	?>
+	
 	<div class='catdata'>
 		
 		<?php if ($catdata->conf->showtitle) : ?>
@@ -14,7 +19,7 @@
 		</span>
 		<?php endif; ?>
 		
-		<?php if ($catdata->conf->show_image && ($catdata->image || $catdata->conf->show_default_image ) ) : ?>
+		<?php if ( $show_cat_image ) : ?>
 			<span class='catimage'>
 				<?php
 				if ($catdata->image) {
@@ -31,7 +36,7 @@
 			</span>
 		<?php endif; ?>
 		
-		<?php if (isset($catdata->description)) : ?>
+		<?php if ( !empty($catdata->description) ) : ?>
 			<span class='catdescr'><?php echo $catdata->description; ?></span>
 		<?php endif; ?>
 		

@@ -69,14 +69,14 @@ if ($this->limitstart != 0) $leadnum = 0;
 		}
 		for ($i=0; $i<$leadnum; $i++) :
 			$item = $items[$i];
-			$fc_item_classes = 'bloglist_item';
+			$fc_item_classes = 'fc_bloglist_item';
 			$fc_item_classes .= ' span12';
 			foreach ($items[$i]->categories as $item_cat) {
 				$fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
 			}
 			$fc_item_classes .= $items[$i]->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
 		?>
-		<li id="bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
+		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<article class="group">
 			<?php endif; ?>	
@@ -381,9 +381,9 @@ if ($count > $leadnum) :
 		}
 		for ($i=$leadnum; $i<$count; $i++) :
 			$item = $items[$i];
-			$fc_item_classes  = ($i-$leadnum)%2 ? 'even' : 'odd';
-			$fc_item_classes .= ' col'.($i%$intro_cols + 1);
-			$fc_item_classes .= ' bloglist_item';
+			$fc_item_classes  = ($i-$leadnum)%2 ? 'fceven' : 'fcodd';
+			$fc_item_classes .= ' fccol'.($i%$intro_cols + 1);
+			$fc_item_classes .= ' fc_bloglist_item';
 			$fc_item_classes .= ' '.$classspan;
 			foreach ($items[$i]->categories as $item_cat) {
 				$fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
@@ -392,7 +392,7 @@ if ($count > $leadnum) :
 		?>
 		
 		
-		<li id="bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
+		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
 			
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<article class="group">
