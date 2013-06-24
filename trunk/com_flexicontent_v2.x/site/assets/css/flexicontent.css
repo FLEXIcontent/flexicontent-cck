@@ -33,8 +33,8 @@
 
 #flexicontent .fcright { float:right; margin-left:8px; }
 #flexicontent .fcleft { float:left; margin-right:8px; }
-#flexicontent .fceven { background-color:#dddddd; }
-#flexicontent .fcodd { background-color:#eeeeee; }
+#flexicontent .fceven { background-color:#e7e7e7; }
+#flexicontent .fcodd { background-color:#f2f2f2; }
 
 .fc_mini_note_box {
 	font-size: 11px;
@@ -1360,8 +1360,8 @@ div.fancybox-wrap a { background: none!important;}
   text-align: right !important;
   max-width: 120px !important;
   min-width: auto !important;
-  margin: 2px 3px 3px 2px !important;
-  padding: 2px 3px 2px 3px !important;
+  margin: 2px 6px 2px 2px !important;
+  padding: 3px 3px 3px 3px !important;
   border-radius: 6px !important;
 }
 

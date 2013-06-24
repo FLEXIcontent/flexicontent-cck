@@ -31,9 +31,9 @@
 	margin-bottom: 10px;
 }
 .topblock .flexi.image {
-	border: 2px solid silver;
+	border: 0px solid silver;
 	float: left;
-	margin-right: 10px;
+	margin-right: 6px;
 	line-height: 0px;
 }
 .topblock .flexi.image a {
@@ -54,8 +54,8 @@
 	padding: 10px;
 }
 .infoblock ul.flexi {
-	margin: 0;
-	padding: 0;
+	margin: 0 !important;
+	padding: 0 !important;
 }
 .infoblock ul li.flexi {
 	padding: 0;

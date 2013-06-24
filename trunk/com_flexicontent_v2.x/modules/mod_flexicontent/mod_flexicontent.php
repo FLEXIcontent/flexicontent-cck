@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: mod_flexicontent.php 1150 2012-02-24 03:26:18Z ggppdk $
+ * @version 1.2 $Id: mod_flexicontent.php 1674 2013-04-18 03:41:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -27,18 +27,14 @@ else
 
 $show_in_views = $params->get('show_in_views', array());
 $show_in_views = !is_array($show_in_views) ? array($show_in_views) : $show_in_views;
-
 $views_show_mod =!count($show_in_views) || in_array($_view,$show_in_views);
 
-if ($params->get('enable_php_rule', 0))
+if ($params->get('enable_php_rule', 0)) {
 	$php_show_mod = eval($params->get('php_rule'));
-else
-	$php_show_mod = true;
-
-if ($params->get('combine_show_rules', 'AND')=='AND') {
-	$show_mod = $views_show_mod && $php_show_mod;
+	$show_mod = $params->get('combine_show_rules', 'AND')=='AND'
+		? ($views_show_mod && $php_show_mod)  :  ($views_show_mod || $php_show_mod);
 } else {
-	$show_mod = $views_show_mod || $php_show_mod;
+	$show_mod = $views_show_mod;
 }
 
 if ( $show_mod )
@@ -175,6 +171,21 @@ if ( $show_mod )
 	// Render Layout, (once per category if apply per category is enabled ...)
 	foreach ($catdata_arr as $i => $catdata) {
 		$list = & $list_arr[$i];
+		
+		// Check items exist
+		$items_exist = false;
+		foreach ($ordering as $ord)
+		{
+			if ( !empty($list[$ord]['featured']) || !empty($list[$ord]['standard']) ) {
+				$items_exist = true;
+				break;
+			}
+		}
+		
+		// Decide whether to skip rendering of the layout
+		$can_skip_category = !$catdata || $params->get('skip_category_if_noitems', 0);
+		if ( !$items_exist && $can_skip_category && !$params->get('display_favlist', 0) ) continue;
+		
 		require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout));
 	}
 	

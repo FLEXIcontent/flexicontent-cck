@@ -257,7 +257,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 						<li class="flexi">
 							<div>
 								<?php if ($field->label) : ?>
-								<div class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
+								<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 								<?php endif; ?>
 								<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
 							</div>
@@ -365,7 +365,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 				<li class="flexi">
 					<div>
 						<?php if ($field->label) : ?>
-						<div class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
+						<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 						<?php endif; ?>
 						<div class="flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
 					</div>

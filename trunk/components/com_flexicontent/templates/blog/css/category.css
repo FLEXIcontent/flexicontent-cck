@@ -203,19 +203,19 @@ div.comments {
 #flexicontent ul.introblock.two li {
 	width: 48%;
 }
-#flexicontent ul.introblock.two li.even {
+#flexicontent ul.introblock.two li.fceven {
 	margin-left: 3%
 }
 #flexicontent ul.introblock.three li {
    width: 30%;
 }
-#flexicontent ul.introblock.three li.even {
+#flexicontent ul.introblock.three li.fceven {
    margin-left: 1%
 }
 #flexicontent ul.introblock.four li {
    width: 23%;
 }
-#flexicontent ul.introblock.four li.even {
+#flexicontent ul.introblock.four li.fceven {
    margin-left: 1%
 }
 
