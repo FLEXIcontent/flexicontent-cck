@@ -25,8 +25,10 @@ require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defin
 
 require_once(JPATH_SITE.DS.'components'.DS.'com_content'.DS.'helpers'.DS.'route.php');
 require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
-
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_search'.DS.'helpers'.DS.'search.php');
+
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.fields.php');
+require_once(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 /**
  * Content Search plugin
@@ -329,9 +331,9 @@ class plgSearchFlexisearch extends JPlugin
 				.' i.modified AS created,'     // TODO ADD a PARAMETER FOR CONTROLING the use of modified by or created by date as "created"
 				.' t.name AS tagname,'
 				.' fir.value as field,'
-				.' CONCAT(a.introtext, i.fulltext) AS text,'
+				.' CONCAT(i.introtext, i.fulltext) AS text,'
 				.' CONCAT_WS( " / ", '. $db->Quote( JText::_( 'FLEXICONTENT' ) ) .', c.title, i.title ) AS section,'
-				.' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END AS slug,'
+				.' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END AS slug,'
 				.' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END AS catslug,'
 				.' "2" AS browsernav'
 				. $select_access
@@ -349,8 +351,8 @@ class plgSearchFlexisearch extends JPlugin
 				.' WHERE ( '.$where.' ) '
 				.' AND ie.type_id IN('.$types.') '
 				.' AND i.state IN (1, -5) AND c.published = 1 '
-				.' AND (a.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).') '
-				.' AND (a.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).') '
+				.' AND (i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).') '
+				.' AND (i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).') '
 				. $andaccess // Filter by user access
 				. $andlang   // Filter by current language
 				. ' GROUP BY i.id '

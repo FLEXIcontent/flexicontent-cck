@@ -1476,8 +1476,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function & getFilters($include_hidden=false)
 	{
-		static $filters;
-		if($filters) return $filters;
+		static $filters_cached=array();
+		if ( isset($filters_cached[$include_hidden]) ) return $filters_cached[$include_hidden];
 		
 		$user		= JFactory::getUser();
 		$params = $this->_params;
@@ -1531,6 +1531,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$filter->parameters = FLEXI_J16GE ? new JRegistry($filter->attribs) : new JParameter($filter->attribs);
 		}
 		
+		$filters_cached[$include_hidden] = $filters;
 		return $filters;
 	}
 

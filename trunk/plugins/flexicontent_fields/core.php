@@ -374,7 +374,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			
 			case 'state':
 				$options = array(); 
-				$options[] = JHTML::_('select.option', '', '-'.$first_option_txt.'-');
+				$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
 				$options[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
 				$options[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
 				$options[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
@@ -388,7 +388,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				global $globalcats;
 				$rootcatid = $filter->parameters->get( 'rootcatid', '' ) ;
 				$options = array(); 
-				$options[] = JHTML::_('select.option', '', '-'.$first_option_txt.'-');
+				$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
 				$option = JRequest::getVar('option', '');
 				$view   = JRequest::getVar('view', '');
 				$cid    = JRequest::getInt('cid', '');
@@ -452,7 +452,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			$db->setQuery($query);
 			$lists = $db->loadObjectList();
 			$options = array();
-			$options[] = JHTML::_('select.option', '', '-'.$first_option_txt.'-');
+			$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
 			foreach ($lists as $list) $options[] = JHTML::_('select.option', $list->value, $list->text . ($count_column ? ' ('.$list->found.')' : '') );
 		}
 		
