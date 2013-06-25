@@ -3539,9 +3539,14 @@ class ParentClassItem extends JModelAdmin
 		}
 		$body .= "<br/>\r\n";
 		
-		// ADD INFO about creation / modification times. Use site's timezone !!
+		// ADD INFO about creation / modification times. Use site's timezone !! we must
+		// (a) set timezone to be site's timezone then
+		// (b) call $date_OBJECT->format()  with s local flag parameter set to true
 		$tz_offset = JFactory::getApplication()->getCfg('offset');
 		if (FLEXI_J16GE) $tz = new DateTimeZone($tz_offset);
+		$tz_offset_str = FLEXI_J16GE ? ($tz->getOffset(new JDate()) / 3600)  :  $tz_offset;
+		$tz_offset_str = ' &nbsp; (UTC+'.$tz_offset_str.') ';
+		
 		if ( in_array('created',$nf_extra_properties) )
 		{
 			$date_created = JFactory::getDate($this->get('created'));
@@ -3551,7 +3556,10 @@ class ParentClassItem extends JModelAdmin
 				$date_created->setOffset($tz_offset);
 			}
 			$body .= '<u>'.JText::_( 'FLEXI_NF_CREATION_TIME' ) . "</u>: ";
-			$body .= $date_created->toFormat(). "<br/>\r\n";
+			$body .= FLEXI_J16GE ?
+				$date_created->format($format = 'D, d M Y H:i:s', $local = true) :
+				$date_created->toFormat($format = '%Y-%m-%d %H:%M:%S');
+			$body .= $tz_offset_str. "<br/>\r\n";
 		}
 		if ( in_array('modified',$nf_extra_properties) && !$isnew )
 		{
@@ -3562,7 +3570,10 @@ class ParentClassItem extends JModelAdmin
 				$date_modified->setOffset($tz_offset);
 			}
 			$body .= '<u>'.JText::_( 'FLEXI_NF_MODIFICATION_TIME' ) . "</u>: ";
-			$body .= $date_modified->toFormat(). "<br/>\r\n";
+			$body .= FLEXI_J16GE ?
+				$date_modified->format($format = 'D, d M Y H:i:s', $local = true) :
+				$date_modified->toFormat($format = '%Y-%m-%d %H:%M:%S');
+			$body .= $tz_offset_str. "<br/>\r\n";
 		}
 		$body .= "<br/>\r\n";
 		

@@ -2133,8 +2133,8 @@ class FlexicontentFields
 		switch ($display_filter_as) {
 		case 0: case 2: case 6:
 			$options = array();
-			$first_option_txt = '-'. ($label_filter==2  ?  $filter->label  :  JText::_('FLEXI_ALL')) .'-';
-			$options[] = JHTML::_('select.option', '', '-'.$first_option_txt.'-');
+			$first_option_txt = $label_filter==2  ?  $filter->label  :  JText::_('FLEXI_ALL');
+			$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
 			$attribs_str = ' class="fc_field_filter" ';
 			if ($display_filter_as==6) $attribs_str .= ' multiple="multiple" size="5" ';
 			
@@ -2146,7 +2146,7 @@ class FlexicontentFields
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str.' onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value, $filter_ffid);
 			} else {
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[1]', $attribs_str, 'value', 'text', @ $value[1], $filter_ffid.'1');
-				$filter->html	.= '&nbsp;--&nbsp;';
+				$filter->html	.= '<span class="fc_range"></span>';
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[2]', $attribs_str, 'value', 'text', @ $value[2], $filter_ffid.'2');
 			}
 			break;
@@ -2160,13 +2160,13 @@ class FlexicontentFields
 					$filter->html	.= '<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value.'" />';
 			} else {
 				if ($isdate) {
-					$filter->html	.= FlexicontentFields::createCalendarField(@ $value[1], $allowtime=0, $filter_ffname, $filter_ffid.'1', $attribs_arr) .'&nbsp;-&nbsp;';
-					$filter->html	.= '&nbsp;--&nbsp;';
+					$filter->html	.= FlexicontentFields::createCalendarField(@ $value[1], $allowtime=0, $filter_ffname, $filter_ffid.'1', $attribs_arr);
+					$filter->html	.= '<span class="fc_range"></span>';
 					$filter->html	.= FlexicontentFields::createCalendarField(@ $value[2], $allowtime=0, $filter_ffname, $filter_ffid.'2', $attribs_arr);
 				} else {
 					$size = (int)($size / 2);
 					$filter->html	.= '<input name="'.$filter_ffname.'[1]" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value[1].'" /> - ';
-					$filter->html	.= '&nbsp;--&nbsp;';
+					$filter->html	.= '<span class="fc_range"></span>';
 					$filter->html	.= '<input name="'.$filter_ffname.'[2]" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value[2].'" />'."\n";
 				}
 			}
@@ -2188,7 +2188,7 @@ class FlexicontentFields
 			}
 			$filter->html .= ' <span style="float:left; display:inline-block;" >'.
 				($label_filter==2  ?  $filter->label.': ' : '').
-				'-'.JText::_('FLEXI_ALL').'-'.
+				'- '.JText::_('FLEXI_ALL').' -'.
 				'</span>';
 			$filter->html .= '</label>';
 			$i++;
