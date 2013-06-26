@@ -182,6 +182,14 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 								FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-comments.png', JText::_( 'FLEXI_COMMENTS' ), 1 );
 							}
 						}
+						if ( FLEXI_J16GE && $this->dopostinstall && ($this->params->get('comments') == 1) )
+						{
+							if ($this->perms->CanEdit)
+							{
+								$link = 'index.php?option=com_content&amp;view=featured&amp;fog=com_flexicontent&amp;tmpl=component';
+								FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-featured.png', JText::_( 'FLEXI_FEATURED' ), 1 );
+							}
+						}
 						
 						if ($this->dopostinstall && FLEXI_ACCESS)
 						{

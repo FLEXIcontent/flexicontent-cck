@@ -58,10 +58,16 @@ class plgSystemFlexisystem extends JPlugin
 			$session->set('fcdebug', $fcdebug, 'flexicontent');
 			$fparams->set('print_logging_info', $fcdebug);
 		}
-
+		
+		$print_logging_info = $fparams->get('print_logging_info');
+		
+		// Log content plugin and other performance information
+		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
 		
 		// (a) Check-in DB table records according to time limits set
 		$this->checkinRecords();
+		
+		if ($print_logging_info) $fc_run_times['auto_checkin'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// (b) Autologin for frontend preview
 		if (!empty($username) && !empty($password) && $fparams->get('autoflogin', 0)) {
@@ -180,6 +186,7 @@ class plgSystemFlexisystem extends JPlugin
 				$task = JRequest::getCMD('task');
 				$layout = JRequest::getCMD('layout');      // Currently used for J2.5 only
 				$function = JRequest::getCMD('function');  // Currently used for J2.5 only
+				$view = JRequest::getCMD('view');  // Currently used for J2.5 only
 				
 				// *** Specific Redirect Exclusions ***
 				
@@ -189,6 +196,10 @@ class plgSystemFlexisystem extends JPlugin
 				//--. JA jatypo (editor-xtd plugin button for text style selecting)
 				if (JRequest::getCMD('jatypo')!="" && $layout=="edit") return false;
 
+				//--. Allow listing featured backend management
+				if (FLEXI_J16GE && $view=="featured") return false;
+				//return false;  // for testing
+				
 				if ($task == 'edit') {
 					$cid = JRequest::getVar('id');
 					$cid = $cid ? $cid : JRequest::getVar('cid');

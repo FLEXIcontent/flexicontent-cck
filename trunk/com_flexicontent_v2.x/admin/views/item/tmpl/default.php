@@ -362,6 +362,7 @@ $tabCnt[$tabSetCnt] = 0;
 		<div class="fcclear"></div>
 		<span class="flexi_label">
 			<?php echo $this->form->getLabel('featured'); ?>
+			<br/><small><?php echo JText::_( 'FLEXI_JOOMLA_FEATURED_VIEW' ); ?></small>
 		</span>
 		<div class="container_fcfield container_fcfield_name_featured">
 			<?php echo $this->lists['featured']; ?>
