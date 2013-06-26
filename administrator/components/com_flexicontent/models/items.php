@@ -1000,6 +1000,8 @@ class FlexicontentModelItems extends JModelLegacy
 				// (d) Start altering the properties of the cloned item
 				$row->title 		= ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
 				$row->hits 			= 0;
+				if (FLEXI_J16GE)  // cleared featured flag
+					$row->featured  = 0;
 				$row->version 	= 1;
 				$datenow 				= JFactory::getDate();
 				$row->created 		= FLEXI_J16GE ? $datenow->toSql() : $datenow->toMySQL();

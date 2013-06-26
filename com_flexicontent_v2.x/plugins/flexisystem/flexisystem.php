@@ -186,6 +186,7 @@ class plgSystemFlexisystem extends JPlugin
 				$task = JRequest::getCMD('task');
 				$layout = JRequest::getCMD('layout');      // Currently used for J2.5 only
 				$function = JRequest::getCMD('function');  // Currently used for J2.5 only
+				$view = JRequest::getCMD('view');  // Currently used for J2.5 only
 				
 				// *** Specific Redirect Exclusions ***
 				
@@ -195,6 +196,10 @@ class plgSystemFlexisystem extends JPlugin
 				//--. JA jatypo (editor-xtd plugin button for text style selecting)
 				if (JRequest::getCMD('jatypo')!="" && $layout=="edit") return false;
 
+				//--. Allow listing featured backend management
+				if (FLEXI_J16GE && $view=="featured") return false;
+				//return false;  // for testing
+				
 				if ($task == 'edit') {
 					$cid = JRequest::getVar('id');
 					$cid = $cid ? $cid : JRequest::getVar('cid');
