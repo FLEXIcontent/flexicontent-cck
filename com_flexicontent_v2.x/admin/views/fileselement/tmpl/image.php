@@ -52,6 +52,17 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 									<input type="file" id="file-upload" name="Filedata" />
 								</td>
 							</tr>
+<?php if (!$this->folder_mode) { ?>
+							<tr>
+								<td class="key">
+									<label for="file-title">
+									<?php echo JText::_( 'FLEXI_DISPLAY_TITLE' ); ?>
+									</label>
+								</td>
+								<td>
+									<input type="text" id="file-title" size="40" class="required" name="file-title" />
+								<td>
+							</tr>
 							<tr>
 								<td class="key">
 									<label for="file-desc">
@@ -63,6 +74,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 								</td>
 							</tr>
 						</table>
+<?php } ?>
 						<input type="submit" id="file-upload-submit" style="margin: 5px 0 0 150px;" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
 						<span id="upload-clear"></span>
 						
@@ -77,13 +89,11 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 				<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
 				<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 				<input type="hidden" name="secure" value="0" />
-				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&field='.$this->fieldid.'&tmpl=component&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
+				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
 			</form>
-			<?php
-			echo FLEXI_J16GE ? '' : $this->pane->endPanel();
-			endif;
-			?>
 			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
+			<?php endif; ?>
+			<?php echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane(); ?>
 		</td>
 	</tr>
 </table>
@@ -118,7 +128,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 <?php } ?>
 			<th width="5"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_NAME', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="10%"><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
 			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOAD_TIME', 'f.uploaded', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>

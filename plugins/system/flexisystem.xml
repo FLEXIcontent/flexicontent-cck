@@ -56,5 +56,15 @@
 			</param>
 			<param name="max_checkout_hours" type="text" label="Max checked out hours" description="Maximum allowed time an record (item,category,etc) should be checked out before automatically checking it in" default="24" />
 
+			<!--param name="" type="separator" default="Auto-Archiving (EXPERIMENTAL, for developments sites only)" hr="false" level="level2" menu="hide" />
+			<param name="archive_on_publish_down" type="radio" default="0" label="Archive items with expired dates" description="Enable this to automatically archive items that their publish_down date is reached">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+			<param name="clear_publish_down_date" type="radio" default="1" label="Clear publish down date" description="When auto-archiving clear the publish-down date, this will make the auto-archived items visible in the archived view. It is recommended that you set this to YES">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Yes, Recommeneded</option>
+			</param-->
+			
 	</params>
 </install>

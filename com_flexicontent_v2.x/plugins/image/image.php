@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.php 1665 2013-04-08 02:26:21Z ggppdk $
+ * @version 1.0 $Id: image.php 1688 2013-06-20 02:55:33Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.image
@@ -50,10 +50,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		static $common_js_css_added = false;
 		
 		// some parameter shortcuts
-		$multiple   = $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval     = $field->parameters->get( 'max_values', 0 ) ;
-		$image_source= $field->parameters->get( 'image_source', 0 ) ;
-		$imagepicker= $field->parameters->get( 'imagepicker', 1 ) ;
+		$multiple     = $field->parameters->get('allow_multiple', 1) ;
+		$maxval       = $field->parameters->get('max_values', 0) ;
+		$image_source = $field->parameters->get('image_source', 0) ;
+		$imagepicker  = $field->parameters->get('imagepicker', 1) ;
+		$all_media    = $field->parameters->get('list_all_media_files', 0);
+		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
+		
+		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
+		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
 		
 		// Get a unique id to use as item id if current item is new
 		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
@@ -326,12 +331,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			#add'.$field->name.' { margin-top:5px; clear:both; display:block; }
 			#sortables_'.$field->id.' li .admintable { text-align:left; }
 			#sortables_'.$field->id.' li:only-child span.fcfield-drag { display:none; }
-			#sortables_'.$field->id.' li .fcimg_preview_box { min-width:'.($thumb_w_s+6).'px; min-height:'.($thumb_h_s+8).'px;float:left; clear:none; margin-right:5px; }
+			#sortables_'.$field->id.' li .fcimg_preview_box { min-width:'.($thumb_w_s+6).'px; min-height:'.($thumb_h_s+8).'px; }
 			/*#sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }*/
 			';
 			
-			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$remove_button = '<input class="fcfield-button" style="margin: 0px 0px 4px 8px !important;" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
+			$move2 	= ($none_props ? '<br/>' : ''). '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -407,12 +412,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var existing_obj = $( elementid + '_existingname' );
 				var original_obj = $( elementid + '_originalname' );
 				
-				var prv_obj = $(  elementid + '_preview_image' );
+				var prv_obj = $( elementid + '_preview_image' );
 				
-				if (file != '') {
-					existing_obj.setProperty('value', file);
-				}
+				// Folder-Mode
+				if (file != '')  existing_obj.setProperty('value', file);
 				original_obj.setProperty('value', '');
+				// DB-Mode
+				if (file == '') jQuery( '#' + elementid + '_imgdelete' ).remove();
 				
 				if (prv_obj) {
 					if (file || !$( elementid + '_existingname' ).hasClass('no_value_selected') ) {
@@ -497,7 +503,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$select = "
 				<input class='existingname fcfield_textval' id='".$elementid."_existingname' name='".$fieldname."[existingname]' value='".$image_name."' readonly='readonly' style='float:none;' />
 				".($none_props ? '<br/>' : '')."
-				<div class=\"fcfield-button-add\" style='margin: 0px;display:inline-block;'>
+				<div class=\"fcfield-button-add\" style='margin: 0px 0px 4px -4px; display:inline-block;'>
 					<a class=\"addfile_".$field->id."\" id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_SELECT_IMAGE' )."\"
 						".//href=\"#\" style=\"margin: 0px;\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",'".$u_item_id."',".$thumb_w_s.",".$thumb_h_s.")\"
 						"href=\"".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JUtility::getToken().'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_existingname&thumb_w=$thumb_w_s&thumb_h=$thumb_h_s&autoassign=".$autoassign."\"
@@ -508,19 +514,23 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			// Add current image or add an empty image container
 			$delete = $remove = $change = '';
-			if ( $image_name ) {
-				
-				if ( !$multiple) {
-					if ( !$image_source ) {
-						$delete_disabled = $this->canDeleteImage( $field, $image_name ) ? '' : ' disabled="disabled"';
-						$delete  = '<div class="imgdelete">';
-						$delete .= ' <input class="imgdelete" type="checkbox" name="'.$fieldname.'[delete]" id="'.$elementid.'_delete" value="1"'.$delete_disabled.' style="display:inline;" />';
-						$delete .= ' <label style="display:inline;" for="'.$elementid.'_delete">'.JText::_( 'FLEXI_FIELD_DELETE_FILE' ).'</label>';
+			if ( $image_name )
+			{
+				if ( !$multiple)
+				{
+					$remove_disabled = '';
+					if ( !$image_source )
+					{
+						$canDeleteImage = $this->canDeleteImage( $field, $image_name, $item );
+						$delete_disabled = $canDeleteImage ? '' : ' disabled="disabled"';
+						$delete  = '<div id="'.$elementid.'_imgdelete" class="imgdelete">';
+						$delete .= ' <input class="imgdelete" type="checkbox" name="'.$fieldname.'[delete]" id="'.$elementid.'_delete" value="1"'.$delete_disabled.' />';
+						$delete .= ' <label for="'.$elementid.'_delete">'.JText::_( 'FLEXI_FIELD_DELETE_FILE' ).'</label>';
 						$delete .= '</div>';
+						$remove_disabled = $always_allow_removal ? '' : $canDeleteImage ? ' disabled="disabled"' : '';
 					}
-					$remove_disabled = $always_allow_removal ? '' : $this->canDeleteImage( $field, $image_name ) ? ' disabled="disabled"' : '';
-					$remove  = '<div class="imgremove">';
-					$remove .= ' <input class="imgremove" type="checkbox" name="'.$fieldname.'[remove]" id="'.$elementid.'_remove" value="1"'.$remove_disabled.' style="display:inline;" />';
+					$remove  = '<div id="'.$elementid.'_imgremove" class="imgremove">';
+					$remove .= ' <input class="imgremove" type="checkbox" name="'.$fieldname.'[remove]" id="'.$elementid.'_remove" value="1"'.$remove_disabled.' />';
 					$remove .= ' <label style="display:inline;" for="'.$elementid.'_remove">'.JText::_( 'FLEXI_FIELD_REMOVE_VALUE' ).'</label>';
 					$remove .= '</div>';
 				}
@@ -529,14 +539,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$change .= !$multiple ?
 						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" />' :
 						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this)" value="1" />' ;
-					$change .= ' <span></span><label class="fcfield-button" for="'.$elementid.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>';
+					$change .= ' <span></span><label class="fcfield-button" style="margin: 0px 0px 4px 0px !important;" for="'.$elementid.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>';
 				}
 				
 				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
 				
 				$img_link  = JURI::root().$field->parameters->get('dir');
 				$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : "");
-				$img_link .= '/s_'.$value['originalname'];
+				$img_link .= '/s_' .$extra_prefix. $value['originalname'];
 				$imgpreview = '<img class="preview_image" id="'.$elementid.'_preview_image" src="'.$img_link.'" style="border: 1px solid silver; float:left;" />';
 				
 			} else {
@@ -570,15 +580,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$curr_select = str_replace('__FORMFLDID__', $elementid.'_existingname', $curr_select);
 			
 			$field->html[] = '
-			'.($image_source ? $curr_select : $change).($none_props ? '<br/>' : '').'
+			'.($image_source ? $curr_select : $change).'
 			'.$move2.'
 			'.$remove_button.'<br/>
-			<div class="fcimg_preview_box">
+			<div class="fcimg_preview_box" style="float:left!important; clear:none!important; margin-right:5px!important;">
 				'.$imgpreview.'
 				'.$originalname.'
 				<div style="float:left; clear:both;" class="imgactions_box">
-					'.($remove ? $remove.'<br/>' : '').'
-					'.($delete ? $delete.'<br/>' : '').'
+					'.($remove ? $remove : '').'
+					'.($delete ? $delete : '').'
 				</div>
 			</div>
 			<div style="float:left; clear:none;" class="img_value_props">
@@ -640,14 +650,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$values = $values ? $values : $field->value;
 		
-		$multiple     = $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple     = $field->parameters->get('allow_multiple', 0 ) ;
 		$image_source = $field->parameters->get('image_source', 0);
-		$all_media    = $field->parameters->get('list_all_media_files');
+		$all_media    = $field->parameters->get('list_all_media_files', 0);
+		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$dir          = $field->parameters->get('dir');
 		$dir_url      = str_replace('\\','/', $dir);
 		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = !$image_source && $all_media;
+		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
 		
 		$usealt      = $field->parameters->get( 'use_alt', 1 ) ;
 		$alt_usage   = $field->parameters->get( 'alt_usage', 0 ) ;
@@ -750,6 +761,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$option    = JRequest::getVar('option');
 		jimport('joomla.filesystem');
 		
+		$isFeedView = JRequest::getCmd('format', null) == 'feed';
 		$isItemsManager = $app->isAdmin() && $view=='items' && $option=='com_flexicontent';
 		$isSite = $app->isSite();
 		
@@ -797,10 +809,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// load the tooltip library if redquired
 		if ($uselegend) JHTML::_('behavior.tooltip');
 		
-		// MultiBox maybe added in extra cases besides popup ((a) in Item manager, (b) When linking to URL in popup target
-		if ( ($isSite || $isItemsManager)
-			&& ( $isLinkToPopup  ||  ($usepopup && $popuptype == 1) )
-		) {
+		// MultiBox maybe added in extra cases besides popup
+		// (a) in Item manager, (b) When linking to URL in popup target
+		$view_allows_mb  = $isItemsManager || ($isSite && !$isFeedView);
+		$config_needs_mb = $isLinkToPopup  || ($usepopup && $popuptype == 1);
+		if ( $view_allows_mb && $config_needs_mb )
+		{
 			if (!$multiboxadded) {
 				//echo $field->name.": multiboxadded";
 				FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
@@ -885,7 +899,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// Regardless if above has added multibox , we will add a different JS gallery if so configured because it maybe needed
-		if ( $isSite &&	$usepopup && $popuptype == 4 )
+		if ( !$isSite || $isFeedView ) {
+			// Is backend OR it is a feed view, do not add any JS library
+		}
+		
+		else if ( $usepopup && $popuptype == 4 )
 		{
 			if (!$fancyboxadded) {
 				$fancyboxadded = true;
@@ -893,7 +911,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 		}
 		
-		else if ( $isSite && $usepopup && $popuptype == 5 )
+		else if ( $usepopup && $popuptype == 5 )
 		{
 			$thumb_link_css  = 'display:block; border:1px solid gray; ';
 			$thumb_link_css .= 'width:'.$thumb_w_s.'px; height: '.$thumb_h_s.'px;';
@@ -1073,7 +1091,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$field->thumbs_path['original'][] = JPATH_SITE.DS.$srco;
 			
 			// Suggest image for external use, e.g. for Facebook etc
-			if (!$isItemsManager && $useogp) {
+			if ( ($isSite && !$isFeedView) && $useogp) {
 				if ( in_array($view, $ogpinview) ) {
 					switch ($ogpthumbsize)
 					{
@@ -1482,8 +1500,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		jimport('joomla.filesystem.file');
 		$file['name'] = JFile::makeSafe($file['name']);
 
-		$all_media = $field->parameters->get('list_all_media_files');
-		$extra_prefix = $all_media  ?  'fld'.$field->id.'_'  :  '';
+		$all_media    = $field->parameters->get('list_all_media_files', 0);
+		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
+		$image_source = $field->parameters->get('image_source', 0);  // This should be always ZERO inside this function
+		
+		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
+		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
 		
 		if ( isset($file['name']) && $file['name'] != '' )
 		{
@@ -1767,10 +1789,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$image_source = $field->parameters->get('image_source', 0);
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
+		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$dir = $field->parameters->get('dir');
 		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
-		$multiple_image_usages = !$image_source && $all_media;
+		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
 		$multiple_image_usages = $multiple_image_usages || @$value['is_default_value'];
 		
 		// ******************************
@@ -1825,10 +1848,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$default_heights = array('l'=>600,'m'=>300,'s'=>90,'b'=>30);
 		
 		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
-		$boolres = true;
+		if ($extra_prefix) $sizes[] = '_s';  // always create an unprefixed small thumb, it is needed when assigning preview (and by imagepicker lib)
+		$thumbres = true;
 		foreach ($sizes as $size)
 		{
-			$thumbname = $size . '_' . $extra_prefix . $filename;
+			$check_small = $size=='_s';
+			$size = $check_small ? 's' : $size;
+			$thumbname = $size . '_' . ($check_small ? '' : $extra_prefix) . $filename;
 			$path	= JPath::clean( $thumbpath .DS. $thumbname);
 			
 			$thumbnail_exists = false;
@@ -1838,6 +1864,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$filesize_h = $filesize[1];
 				$thumbnail_exists = true;
 			}
+			if ($thumbnail_exists && $check_small) continue;
 			
 			$param_w = $field->parameters->get( 'w_'.$size, $default_widths[$size] );
 			$param_h = $field->parameters->get( 'h_'.$size, $default_heights[$size] );
@@ -1862,11 +1889,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				 )
 			 {
 				//echo "FILENAME: ".$thumbname.", ".($crop ? "CROP" : "SCALE").", ".($thumbnail_exists ? "OLDSIZE(w,h): $filesize_w,$filesize_h" : "")."  NEWSIZE(w,h): $param_w,$param_h <br />";
-				$boolres &= $this->create_thumb( $field, $filename, $size, $onlypath, $destpath, $copy_original, $extra_prefix );
+				$was_thumbed = $this->create_thumb( $field, $filename, $size, $onlypath, $destpath, $copy_original, ($check_small ? '' : $extra_prefix) );
+				$thumbres = $thumbres && $was_thumbed;
 			}
 		}
 		
-		return ($images_processed[$pindex][$filepath] = $boolres);
+		return ($images_processed[$pindex][$filepath] = $thumbres);
 	}
 	
 	
@@ -1886,6 +1914,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$autoupload        = $field->parameters->get('autoupload', 1);
 		$imagepickerlimit  = $field->parameters->get('imagepickerlimit', 200);
 		$all_media         = $field->parameters->get('list_all_media_files', 0);
+		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$limit_by_uploader = $field->parameters->get('limit_by_uploader', 0);  // USED ONLY WHEN all_media is ENABLED
 		$image_folder = JURI::root().$field->parameters->get('dir');
 		
@@ -2009,48 +2038,24 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// Returns an array of images that can be deleted
 	// e.g. of a specific field, or a specific uploader
 	// ************************************************
-	function canDeleteImage( $field, $record )
+	function canDeleteImage( &$field, $record, &$item )
 	{
-		$db   = JFactory::getDBO();
-		$app  = JFactory::getApplication();
-		$user = JFactory::getUser();
-		
-		// Get configuration parameters
-		$all_media = $field->parameters->get('list_all_media_files', 0);
-		$limit_by_uploader = $field->parameters->get('limit_by_uploader', 0);  // USED ONLY WHEN all_media is ENABLED
-		
 		// Retrieve available (and appropriate) images from the DB
-		if ($all_media) {
-			$query = 'SELECT filename'
-				. ' FROM #__flexicontent_files'
-				. ' WHERE secure=1 AND ext IN ("jpg","gif","png","jpeg") '
-				.( $limit_by_uploader ? " AND uploaded_by = ". $user->id : "")
-				;
-		} else {
-			$query = 'SELECT value'
-				. ' FROM #__flexicontent_fields_item_relations'
-				. ' WHERE field_id = '. (int) $field->id
-				;
-		}
+		$db   = JFactory::getDBO();
+		$query = 'SELECT id'
+			. ' FROM #__flexicontent_files'
+			. ' WHERE filename='. $db->Quote($record)
+			;
 		$db->setQuery($query);
-		$values = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+		$file_id = $db->loadResult();
+		if (!$file_id)  return true;
 		
-		$i = 0;
-		for($n=0, $c=count($values); $n<$c; $n++)
-		{
-			// Create original filenames array skipping any empty records, 
-			// NOTE: if all_media is ON the we already retrieved filenames above
-			if (!$all_media) {
-				$values[$n] = unserialize($values[$n]);
-				if ( !isset($values[$n]['originalname']) ) continue;
-				$values[$n] = $values[$n]['originalname'];
-			}
-			if ($values[$n] == $record) {
-				if (++$i > 1) return false;  // More than one usages found return false (can not delete)
-			}
-		}
+		if ( !$field->untranslatable ) $ignored['item_id'] = $item->id;
+		else $ignored['lang_parent_id'] = $item->lang_parent_id;
 		
-		return true;
+		require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'filemanager.php');
+		$fm = new FlexicontentModelFilemanager();
+		return $fm->candelete( array($file_id), $ignored );
 	}
 	
 	

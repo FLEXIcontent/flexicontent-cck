@@ -43,6 +43,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$task     = JRequest::getVar('task', '');
 		$cid      = JRequest::getVar('cid', array());
 		$extlimit = JRequest::getInt('extlimit', 500);
+		$filter_fileid = JRequest::getInt('filter_fileid', 0);
 		
 		// Some flags
 		$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
@@ -410,6 +411,9 @@ class FlexicontentViewItems extends JViewLegacy {
 		//build languages filter
 			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
 		}
+		
+		// filter by item usage a specific file
+		$lists['filter_fileid'] = $filter_fileid;		
 		
 		//assign data to template
 		$this->assignRef('db'				, $db);

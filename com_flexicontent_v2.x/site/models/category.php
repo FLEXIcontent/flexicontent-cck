@@ -141,10 +141,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if (!$this->_authorid) $load_category_params = false;
 		}
 		else if ($this->_layout=='mcats') {
-			$this->_ids = preg_replace( '/[^0-9,]/i', '', (string) JRequest::getVar('cids', '') );
-			$this->_ids = explode(',', $this->_ids);
+			$mcats_list = JRequest::getVar('cids', '');
+			if ( !is_array($mcats_list) ) {
+				$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
+				$mcats_list = explode(',', $mcats_list);
+			}
 			// make sure given data are integers ... !!
-			foreach ($this->_ids as $i => $_id) $this->_ids[$i] = (int)$_id;
+			foreach ($mcats_list as $i => $_id) $this->_ids[] = (int)$_id;
 		}
 		else if (!$this->_id) {
 			$load_category_params = false;

@@ -720,6 +720,21 @@ class FlexicontentModelItems extends JModelLegacy
 	{
 		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
+		$session = JFactory::getSession();
+		
+		// Check for SPECIAL item listing CASES, in which the item ids are alredy calculated
+		$filter_fileid = JRequest::getInt('filter_fileid', 0);
+		if ($filter_fileid)
+		{
+			$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
+			$itemids =  $fileid_to_itemids[$filter_fileid];
+			if ( empty($itemids) ) {
+				return ' WHERE 0 ';
+			} else {
+				return ' WHERE i.id IN ('. implode(',', $itemids) .') ';
+			}
+		}
+		
 		$nullDate = $this->_db->getNullDate();
 
 		$filter_type 		= $app->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );

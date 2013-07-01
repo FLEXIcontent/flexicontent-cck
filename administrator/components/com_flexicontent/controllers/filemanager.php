@@ -63,6 +63,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
 		$secure		= JRequest::getVar( 'secure', 1, '', 'int');
 		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
+		$filetitle= JRequest::getVar( 'file-title', '');
 		$filedesc	= JRequest::getVar( 'file-desc', '');
 		$fieldid	= JRequest::getVar( 'fieldid', 0);
 		$u_item_id= JRequest::getVar( 'u_item_id', 0);
@@ -162,11 +163,11 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$date = JFactory::getDate( 'now' );
 
 				$obj = new stdClass();
-				$obj->filename 			= $filename;
-				$obj->altname 			= $file['altname'];
-				$obj->url			= 0;
-				$obj->secure			= $secure;
-				$obj->ext			= $ext;
+				$obj->filename	= $filename;
+				$obj->altname		= $filetitle ? $filetitle : $filename;
+				$obj->url				= 0;
+				$obj->secure		= $secure;
+				$obj->ext				= $ext;
 				$obj->hits			= 0;
 				$obj->description		= $filedesc;
 				$obj->uploaded			= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
@@ -231,8 +232,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filename	= JRequest::getVar( 'file-url-data', null, 'post' );
-		$altname	= JRequest::getVar( 'file-url-display', null, 'post', 'string' );
-		$ext		= JRequest::getVar( 'file-url-ext', null, 'post', 'alnum' );
+		$altname	= JRequest::getVar( 'file-url-title', null, 'post', 'string' );
+		$ext			= JRequest::getVar( 'file-url-ext', null, 'post', 'alnum' );
 		$filedesc	= JRequest::getVar( 'file-url-desc', '');
 
 		jimport('joomla.utilities.date');
@@ -363,15 +364,15 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 							$date = JFactory::getDate( 'now' );
 						
 							$obj = new stdClass();
-							$obj->filename 			= $filename;
-							$obj->altname 			= $filename;
-							$obj->url			= 0;
+							$obj->filename		= $filename;
+							$obj->altname			= $filename;
+							$obj->url					= 0;
 							$obj->secure			= $secure;
-							$obj->ext			= $ext;
-							$obj->description		= $filedesc;
-							$obj->hits			= 0;
-							$obj->uploaded			= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
-							$obj->uploaded_by		= $user->get('id');
+							$obj->ext					= $ext;
+							$obj->description	= $filedesc;
+							$obj->hits				= 0;
+							$obj->uploaded		= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+							$obj->uploaded_by	= $user->get('id');
 
 							// Add the record to the DB
 							$db->insertObject('#__flexicontent_files', $obj);

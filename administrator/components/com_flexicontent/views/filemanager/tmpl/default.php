@@ -96,6 +96,16 @@ table#filemanager-zone label {
 							</tr>
 							<tr>
 								<td class="key">
+									<label for="file-title">
+									<?php echo JText::_( 'FLEXI_DISPLAY_TITLE' ); ?>
+									</label>
+								</td>
+								<td>
+									<input type="text" id="file-title" size="40" class="required" name="file-title" />
+								<td>
+							</tr>
+							<tr>
+								<td class="key">
 									<label for="file-desc">
 									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 									</label>
@@ -130,16 +140,6 @@ table#filemanager-zone label {
 						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 							<tr>
 								<td class="key">
-									<label for="file-url-display">
-									<?php echo JText::_( 'FLEXI_DISPLAY_NAME' ); ?>
-									</label>
-								</td>
-								<td>
-									<input type="text" id="file-url-display" size="40" class="required" name="file-url-display" />
-								</td>
-							</tr>
-							<tr>
-								<td class="key">
 									<label for="file-url-data">
 									<?php echo JText::_( 'FLEXI_FILE_URL' ); ?>
 									</label>
@@ -156,6 +156,16 @@ table#filemanager-zone label {
 								</td>
 								<td>
 									<input type="text" id="file-url-ext" size="5" class="required" name="file-url-ext" />
+								</td>
+							</tr>
+							<tr>
+								<td class="key">
+									<label for="file-url-title">
+									<?php echo JText::_( 'FLEXI_DISPLAY_TITLE' ); ?>
+									</label>
+								</td>
+								<td>
+									<input type="text" id="file-url-title" size="40" class="required" name="file-url-title" />
 								</td>
 							</tr>
 							<tr>
@@ -258,11 +268,9 @@ table#filemanager-zone label {
 				</fieldset>
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 			</form>
-			<?php
-			echo FLEXI_J16GE ? '' : $this->pane->endPanel();
-			endif;
-			?>
-			<?php echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane();?>
+			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
+			<?php endif; ?>
+			<?php echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane(); ?>
 		</td>
 	</tr>
 </table>
@@ -300,7 +308,7 @@ table#filemanager-zone label {
 			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
 			<th width="5"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_NAME', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width=""><?php echo JText::_( 'FLEXI_ACCESS' ); ?></th>
 			<th width=""><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
@@ -390,6 +398,8 @@ table#filemanager-zone label {
 			} else {
 				$row->assigned = JText::_( 'FLEXI_NOT_ASSIGNED' );
 			}
+			// link to items using the field
+			$items_list = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_fileid='. $row->id;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
@@ -443,7 +453,15 @@ table#filemanager-zone label {
 			
 			<td align="center"><?php echo $row->size; ?></td>
 			<td align="center"><?php echo $row->hits; ?></td>
-			<td align="center"><?php echo $row->assigned; ?></td>
+			<td align="center">
+				<?php echo $row->assigned; ?>
+				<?php if ($row->count_assigned) : ?>
+					<br/><br/>
+					<?php echo count($row->itemids); ?>
+					<a href="<?php echo $items_list; ?>">
+					[<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>]
+				<?php endif; ?>
+			</td>
 			<td align="center">
 <?php if ($permissions->CanAuthors) { ?>
 				<a target="_blank" href="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task_authors; ?>edit&amp;hidemainmenu=1&amp;cid[]=<?php echo $row->uploaded_by; ?>">

@@ -64,8 +64,11 @@ class plgSystemFlexisystem extends JPlugin
 		// Log content plugin and other performance information
 		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
 		
-		// (a) Check-in DB table records according to time limits set
+		// (a.1) (Auto) Check-in DB table records according to time limits set
 		$this->checkinRecords();
+		
+		// (a.2) (Auto) Archive expired items (publish_down date exceeded)
+		//$this->archiveItems();
 		
 		if ($print_logging_info) $fc_run_times['auto_checkin'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
@@ -919,6 +922,59 @@ class plgSystemFlexisystem extends JPlugin
 				$db->query();
 			}
 		}
+	}
+	
+	
+	
+	/**
+	 * Utility function to check DB table records when some conditions (e.g. time) are applicable
+	 *
+	 * @return 	void
+	 * @since 1.5
+	 */
+	function archiveItems() {
+		
+		$db  = JFactory::getDBO();
+		$app = JFactory::getApplication();
+		
+		$archive_on_publish_down = $this->params->get('archive_on_publish_down', 0);
+		$clear_publish_down_date = $this->params->get('clear_publish_down_date', 1);
+		$auto_archive_minute_interval = $this->params->get('auto_archive_minute_interval', 1);
+		
+		if (!$archive_on_publish_down) return true;
+		
+		// Get current seconds
+		$date = JFactory::getDate('now');
+		if (FLEXI_J16GE) {
+			$tz	= new DateTimeZone($app->getCfg('offset'));
+			$date->setTimezone($tz);
+		} else {
+			$date->setOffset($app->getCfg('offset'));
+		}
+		$current_time_secs = $date->toUnix();
+		//echo $date->toFormat()." <br>";
+		
+		// Check if auto archive interval passed
+		$session = JFactory::getSession();
+		$last_autoarchive_secs = $session->get('last_autoarchive_secs', 0, 'flexicontent');
+		$last_autoarchive_secs = $session->set('last_autoarchive_secs', $current_time_secs, 'flexicontent');
+		if ($current_time_secs - $last_autoarchive_secs < $auto_archive_minute_interval*60) return;
+		
+		$archive_state = (FLEXI_J16GE ? 2:-1);
+		$_now = 'UTC_TIMESTAMP()';
+		$nullDate	= $db->getNullDate();
+		
+		if ($clear_publish_down_date) {
+			$query = 'UPDATE #__content '.
+				' SET state = '.$archive_state.', publish_down = '.$db->Quote($nullDate).
+				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_now;
+		} else {
+			$query = 'UPDATE #__content SET state = '.$archive_state.
+				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_now;
+		}
+		//echo $query;
+		$db->setQuery($query);
+		$db->query();
 	}
 	
 	
