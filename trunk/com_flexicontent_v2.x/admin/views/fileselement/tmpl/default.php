@@ -21,7 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $uri = JURI::getInstance();
 $current_uri = $uri->toString();
 $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;task=';
-$del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
+$del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 ?>
 
 <table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;">
@@ -65,7 +65,16 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 									?>
 								</td>
 							</tr>
-<?php } ?>
+							<tr>
+								<td class="key">
+									<label for="file-title">
+									<?php echo JText::_( 'FLEXI_DISPLAY_TITLE' ); ?>
+									</label>
+								</td>
+								<td>
+									<input type="text" id="file-title" size="40" class="required" name="file-title" />
+								<td>
+							</tr>
 							<tr>
 								<td class="key">
 									<label for="file-desc">
@@ -77,6 +86,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 								</td>
 							</tr>
 						</table>
+<?php } ?>
 						<input type="submit" id="file-upload-submit" style="margin: 5px 0 0 150px;" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
 						<span id="upload-clear"></span>
 						
@@ -92,10 +102,8 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 				<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode); ?>" />
 			</form>
-			<?php
-			echo FLEXI_J16GE ? '' : $this->pane->endPanel();
-			endif;
-			?>
+			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
+			<?php endif; ?>
 			<!-- File URL Form -->
 			<?php echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) : $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) ; ?>
 			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="urlForm" id="urlForm" method="post">
@@ -103,16 +111,6 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 					<legend><?php echo JText::_( 'FLEXI_ADD_FILE_BY_URL' ); ?></legend>
 					<fieldset class="actions">
 						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
-							<tr>
-								<td class="key">
-									<label for="file-url-display">
-									<?php echo JText::_( 'FLEXI_DISPLAY_NAME' ); ?>
-									</label>
-								</td>
-								<td>
-									<input type="text" id="file-url-display" size="40" class="required" name="file-url-display" />
-								</td>
-							</tr>
 							<tr>
 								<td class="key">
 									<label for="file-url-data">
@@ -133,6 +131,26 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 									<input type="text" id="file-url-ext" size="5" class="required" name="file-url-ext" />
 								</td>
 							</tr>
+							<tr>
+								<td class="key">
+									<label for="file-url-title">
+									<?php echo JText::_( 'FLEXI_DISPLAY_TITLE' ); ?>
+									</label>
+								</td>
+								<td>
+									<input type="text" id="file-url-title" size="40" class="required" name="file-url-title" />
+								</td>
+							</tr>
+							<tr>
+								<td class="key">
+									<label for="file-url-desc">
+									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+									</label>
+								</td>
+								<td>
+									<textarea name="file-url-desc" cols="23" rows="5" id="file-url-desc"></textarea>
+								</td>
+							</tr>
 						</table>
 						<input type="submit" id="file-url-submit" style="margin: 5px 0 0 150px;" class="validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>"/>
 					</fieldset>
@@ -140,7 +158,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&field='.$this->fieldid.'&tmpl=component'); ?>" />
 			</form>
 			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
-			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
+			<?php echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane(); ?>
 		</td>
 	</tr>
 </table>
@@ -183,7 +201,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 <?php } ?>
 			<th width="5"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_NAME', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_DISPLAY_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width=""><?php echo JText::_( 'FLEXI_ACCESS' ); ?></th>
 			<th width=""><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
@@ -206,7 +224,6 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove.'  :  'remove';
 
 	<tbody>
 		<?php
-		
 		$imageexts = array('jpg','gif','png','bmp');
 		$index = JRequest::getInt('index', 0);
 		$k = 0;
