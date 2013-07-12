@@ -305,11 +305,9 @@ class FlexicontentViewItem extends JViewLegacy
 		//buid types selectlist
 		$class = 'required use_select2_lib';
 		$attribs = 'class="'.$class.'"';
-		if (FLEXI_J16GE) {
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'jform[type_id]', $typesselected->id, 1, $attribs, 'jform_type_id' );
-		} else {
-			$lists['type'] = flexicontent_html::buildtypesselect($types, 'type_id', $typesselected->id, 1, $attribs, 'type_id' );
-		}
+		$fieldname = FLEXI_J16GE ? 'jform[type_id]' : 'type_id';
+		$elementid = FLEXI_J16GE ? 'jform_type_id'  : 'type_id';
+		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected->id, 1, $attribs, $elementid, $check_perms=true );
 		
 		// build granular access list
 		if (FLEXI_ACCESS) {

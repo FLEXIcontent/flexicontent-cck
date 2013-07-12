@@ -18,6 +18,9 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+$app   = JFactory::getApplication();
+$user  = JFactory::getUser();
+
 // Create some variables
 $isnew = !$this->item->id;
 $typeid = $isnew ? JRequest::getInt('typeid') : $this->item->type_id;
@@ -34,7 +37,7 @@ $secondary_displayed =
   ($this->menuCats  && $this->menuCats->cid) ||   // New Content  -with-  Menu Override, check if secondary categories were enabled in menu
   (!$this->menuCats && $this->lists['cid']);      // New Content but  -without-  Menu override ... OR Existing Content, check if secondary are permitted  OR already set
 $cats_canselect =
-	($this->menuCats && $this->menuCats->cansel) ||
+	($this->menuCats && $this->menuCats->cancid) ||
 	(!$this->menuCats && $this->perms['multicat']) ;
 $tags_displayed = $typeid && ( $this->perms['cantags'] || count(@$this->usedtagsdata) ) ;
 
@@ -198,7 +201,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 
 		<div class="flexi_buttons" style="font-size:90%;">
 			
-			<?php if ( $this->perms['canedit'] || in_array( 'apply', $allowbuttons_fe) ) : ?>
+			<?php if ( $this->perms['canedit'] || in_array( 'apply', $allowbuttons_fe) || !$typeid ) : ?>
 				<button class="fc_button" type="button" onclick="return Joomla.submitbutton('apply');">
 					<span class="fcbutton_apply"><?php echo JText::_( !$isnew ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
 				</button>
@@ -239,9 +242,38 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
     
 		<br class="clear" />
 		<?php
-			$approval_msg = JText::_( $isnew ? 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' : 'FLEXI_REQUIRES_VERSION_REVIEWAL') ;
-			if ( !$this->perms['canpublish'] && $this->params->get('use_versioning', 1) )  echo '<div style="text-align:right; width:100%; padding:0px; clear:both;">(*) '.$approval_msg.'</div>';
+			if ( $isnew && $this->params->get('submit_message') ) {
+				$submit_msg = '<span class="fc-note">'.JText::_( $this->params->get('submit_message') ).'</span>';
+			}
+			
+			if ( !$this->perms['canpublish'] && ($isnew || $this->params->get('use_versioning', 1)) )
+			{
+				// Can not publish and ( is new OR versioning is enabled, aka changes to existing items can go through approval process
+				if ( $isnew && $this->params->get('autopublished') && $this->params->get('autopublished_message') ) {
+					// Autopublishing new item, use a menu item specific message
+					$approval_msg = $this->params->get('autopublished_message');
+					$approval_msg = str_replace('_PUBLISH_UP_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
+					$approval_msg = str_replace('_PUBLISH_DOWN_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
+				} else {
+					$approval_msg = JText::_( $isnew ? 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' : 'FLEXI_REQUIRES_VERSION_REVIEWAL') ;
+				}
+				$approval_msg = '<span class="fc-note">'.$approval_msg.'</span>';
+			}
+			echo @ $submit_msg . @ $approval_msg;
 		?>
+
+<?php if ( $this->captcha_errmsg ) : ?>
+
+	<div class="fc-error"><?php echo $this->captcha_errmsg; ?></div>
+
+<?php elseif ( $this->captcha_field ) : ?>
+	
+	<fieldset class="flexi_params fc_edit_container_full">
+	<?php echo $this->captcha_field; ?>
+	</fieldset>
+
+<?php endif; ?>
+
 
 <?php
 // *****************
@@ -355,7 +387,7 @@ $tabCnt[$tabSetCnt] = 0;
 					JText::_(FLEXI_J16GE ? $this->form->getField('type_id')->__get('description') : 'FLEXI_TYPE_DESC');
 				$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
 			?>
-			<label id="jform_type_id-lbl" for="jform_type_id" <?php echo $label_tooltip; ?> >
+			<label id="jform_type_id-lbl" for="jform_type_id" for_bck="jform_type_id" <?php echo $label_tooltip; ?> >
 				<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_TYPE' ); ?>
 			</label>
 			<div class="container_fcfield container_fcfield_id_8 container_fcfield_name_type">
@@ -391,7 +423,7 @@ $tabCnt[$tabSetCnt] = 0;
 		<?php endif; ?>
 
 
-		<?php if ( $isnew && $this->params->get('autopublished', 0) ) :  // Auto publish new item via menu override ?>
+		<?php if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item via menu override ?>
 	
 			<input type="hidden" id="jform_state" name="jform[state]" value="1" />
 			<input type="hidden" id="jform_vstate" name="jform[vstate]" value="2" />
@@ -611,7 +643,7 @@ $tabCnt[$tabSetCnt] = 0;
 	
 
 <?php if ($secondary_displayed || $tags_displayed) : ?>
-	<?php $tab_lbl = $tags_displayed ? 'FLEXI_CATEGORIES_TAGS' : 'FLEXI_TAGS';?>
+	<?php $tab_lbl = $tags_displayed ? 'FLEXI_CATEGORIES_TAGS' : 'FLEXI_CATEGORIES';?>
 
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_( $tab_lbl ); ?> </h3>
@@ -1190,7 +1222,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 		<?php echo $this->form->getInput('id');?>
 		
 		<?php if (!$this->perms['canright']) : ?>
-			<input type="hidden" id="jformrules" name="jform[rules][]" value="" />
+			<input type="hidden" id="jformrules" name="jform[rules]" value="0" />
 		<?php endif; ?>
 		<?php if ( $isnew ) echo $this->submitConf; ?>
 		

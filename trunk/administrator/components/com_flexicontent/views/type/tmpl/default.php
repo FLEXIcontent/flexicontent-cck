@@ -57,6 +57,20 @@ defined('_JEXEC') or die('Restricted access');
 							<input id="name" name="alias" value="<?php echo $this->row->alias; ?>" size="50" maxlength="100" />
 						</td>
 					</tr>
+					
+					<?php if (FLEXI_ACCESS || FLEXI_J16GE) : ?>
+					<tr>
+						<td class="key">
+							<label for="access" class="hasTip" title="<?php echo JText::_('FLEXI_PERMIT_SUBMISSION').'::'.JText::_('FLEXI_PERMIT_SUBMISSION_DESC');?>">
+								<?php echo JText::_( 'FLEXI_PERMIT_SUBMISSION' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo $this->lists['itemscreatable']; ?>
+						</td>
+					</tr>
+					<?php endif; ?>
+					
 					<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
 					<tr>
 						<td class="key">
@@ -98,8 +112,8 @@ defined('_JEXEC') or die('Restricted access');
 					<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
 				</div>
 			</fieldset>
-		<?php endif; ?>				
-				
+		<?php endif; ?>
+			
 			</td>
 			<td valign="top" width="600" style="padding: 7px 0 0 5px" align="left" valign="top">
 				<?php

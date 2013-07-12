@@ -24,7 +24,7 @@ class FlexicontentHelperPerm
 		if(!$permission || $force)
 		{
 			// handle jcomments integration
-			if (JPluginHelper::isEnabled('system', 'jcomments.system') || JPluginHelper::isEnabled('system', 'jcomments')) {
+			if (JPluginHelper::isEnabled('system', 'jcomments')) {
 				$Comments_Enabled 	= 1;
 				$destpath		= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
 				$dest 			= $destpath.DS.'com_flexicontent.plugin.php';
@@ -256,10 +256,10 @@ class FlexicontentHelperPerm
 				
 				// Check all actions with Logical OR or Logical AND
 				// We start with FALSE for OR and TRUE for AND
-				$has_access = $require_all ? false : true;
+				$has_access = $require_all ? true : false;
 				foreach ($actions_allowed as $action_name)
 				{
-					$has_access = $require_all ? ($has_access | $user->authorise($action_name, $asset)) : ($has_access & $user->authorise($action_name, $asset));
+					$has_access = $require_all ? ($has_access && $user->authorise($action_name, $asset)) : ($has_access || $user->authorise($action_name, $asset));
 				}
 				if ($has_access) $usercats[] = $category_id;
 			}

@@ -104,7 +104,7 @@ class FlexicontentFields
 		// Get Field values at once to minimized performance impact, null 'params' mean only retrieve values 
 		/*if ($item_per_field && count($items)>1)
 			// we have at least 2 item and item is per field, this will retrieve all values with single SQL query
-			FlexicontentFields::getFields($items, $view, $params = null, $aid = 0);*/
+			FlexicontentFields::getFields($items, $view, $params = null, $aid = false);*/
 		
 		$return = array();
 		foreach ($field_names as $i => $field_name)
@@ -142,7 +142,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function &getFields(&$_items, $view = FLEXI_ITEMVIEW, $params = null, $aid = 0, $use_tmpl = true)
+	static function &getFields(&$_items, $view = FLEXI_ITEMVIEW, $params = null, $aid = false, $use_tmpl = true)
 	{
 		static $apply_cache = null;
 		static $expired_cleaned = false;
@@ -160,9 +160,11 @@ class FlexicontentFields
 			$start_microtime = microtime(true);
 		}
 		
-		// Calculate access, since we needed it - here - , to decide to use or not caching for field / field-values retrieval
-		if ($aid==0 || (FLEXI_J16GE && !is_array($aid)) ) {
-			$aid = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
+		// Calculate access if it was not providden
+		if (FLEXI_J16GE) {
+			$aid = is_array($aid) ? $aid : $user->getAuthorisedViewLevels();
+		} else {
+			$aid = $aid!==false ? (int) $aid : (int) $user->get('aid');
 		}
 		
 		// Apply cache to public (unlogged) users only 
@@ -264,7 +266,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function getItemFields($item, $var, $view=FLEXI_ITEMVIEW, $aid=0)
+	static function getItemFields($item, $var, $view=FLEXI_ITEMVIEW, $aid=false)
 	{
 		if (!$item) return;
 		if (!FLEXI_J16GE && $item->sectionid != FLEXI_SECTION) return;
@@ -285,14 +287,13 @@ class FlexicontentFields
 		$typename	= $var['typenames'];
 		$vote			= $var['votes'];
 		
-		// NOTE: 'aid' should be calculated here as it will give caching the wrong results
 		if (FLEXI_J16GE) {
-			// $aid = ($aid && is_array($aid)) ? $aid : $user->getAuthorisedViewLevels();
+			$aid_arr = is_array($aid) ? $aid : $user->getAuthorisedViewLevels();
 			$aid_list = implode(",", $aid);
 			$andaccess 	= ' AND fi.access IN (0,'.$aid_list.')' ;
 			$joinaccess = '';
 		} else {
-			$aid = (int) $aid;
+			$aid = $aid!==false ? (int) $aid : (int) $user->get('aid');
 			$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')' : ' AND fi.access <= '.$aid ;
 			$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
 		}

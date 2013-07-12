@@ -109,15 +109,18 @@ class ParentClassItem extends JModelLegacy
 			// BACKEND, use "cid" array from request, but check first for a POST 'id' variable
 			// this is a correction for problematic name of categories AS cid in item edit form ...
 			$data = JRequest::get( 'post' );
-			$pk = FLEXI_J16GE ? @$data['jform']['id'] : @$data['id'];   
-			if(!$pk) {
+			
+			// Must check if id is SET and if it is non-ZERO !
+			if ( FLEXI_J16GE ? isset($data['jform']['id']) : isset($data['id']) ) {
+				$pk = FLEXI_J16GE ? $data['jform']['id'] : $data['id'];
+			} else {
 				$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
 				JArrayHelper::toInteger($cid, array(0));
 				$pk = $cid[0];
 			}
 			$curcatid = 0;
 		}
-		$this->setId($pk, $curcatid);  // NOTE: when setting $pk to a new value the $this->_item is cleared		
+		$this->setId($pk, $curcatid);  // NOTE: when setting $pk to a new value the $this->_item is cleared
 		
 		$this->populateState();
 	}
@@ -1172,6 +1175,40 @@ class ParentClassItem extends JModelLegacy
 // EOF of J1.5
 //*************
 	
+	
+	/**
+	 * Method to check if the user can create items of the given type
+	 *
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since	1.5
+	 */
+	function canCreateType($type_ids=false, $any = true, & $types = null)
+	{
+		$types = $this->getTypeslist ( $type_ids );
+		if ( empty($types) ) return false;
+		
+		$user	= JFactory::getUser();
+		$canCreate = $any ? false : true;
+		
+		foreach ($types as $type)
+		{
+			if (FLEXI_J16GE)
+				$type->allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
+			else if (FLEXI_ACCESS && $user->gid < 25)
+				$type->allowed = ! $type->itemscreatable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'type', $type->id);
+			else
+				$type->allowed = 1;
+			
+			// Require ANY or ALL
+			$canCreate = $any  ?  ($canCreate || $type->allowed)  :  ($canCreate && $type->allowed);
+			if ($canCreate && $any) return true;
+		}
+		
+		return $canCreate;
+	}
+	
+	
 	/**
 	 * Method to check if the user can edit the STATE of the item
 	 *
@@ -1562,9 +1599,9 @@ class ParentClassItem extends JModelLegacy
 		// The text field is stored in the db as to seperate fields: introtext & fulltext
 		// So we search for the {readmore} tag and split up the text field accordingly.
 		$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
-		$tagPos	= preg_match($pattern, $data['text']);
+		$tagPos	= preg_match($pattern, @ $data['text']);
 		if ($tagPos == 0)	{
-			$data['introtext'] = $data['text'];
+			$data['introtext'] = @ $data['text'];
 			$data['fulltext']  = '';
 		} else 	{
 			list($data['introtext'], $data['fulltext']) = preg_split($pattern, $data['text'], 2);
@@ -1603,8 +1640,33 @@ class ParentClassItem extends JModelLegacy
 			$item_submit_conf = $session->get('item_submit_conf', array(),'flexicontent');
 			$submit_conf = @ $item_submit_conf[$h] ;
 			
-			$autopublished    = isset($submit_conf['autopublished']) && $submit_conf['autopublished'];
-			$overridecatperms = isset($submit_conf['overridecatperms']) && $submit_conf['overridecatperms'];
+			$autopublished    = @ $submit_conf['autopublished'];
+			$overridecatperms = @ $submit_conf['overridecatperms'];
+			if ( $autopublished) {
+				// Dates forced during autopublishing
+				if ( @ $submit_conf['autopublished_up_interval'] ) {
+					if (FLEXI_J16GE) {
+						$publish_up_date = JFactory::getDate(); // Gives editor's timezone by default
+						$publish_up_date->modify('+ '.$submit_conf['autopublished_up_interval'].' minutes');
+						$publish_up_forced = $publish_up_date->toSql();
+					} else {
+						$publish_up_date = new DateTime(JHTML::_('date', JFactory::getDate()->toFormat(), '%Y-%m-%d %H:%M:%S'));
+						$publish_up_date->modify('+ '.$submit_conf['autopublished_up_interval'].' minutes');
+						$publish_up_forced = $publish_up_date->format('Y-m-d H:i:s');
+					}
+				}
+				if ( @ $submit_conf['autopublished_down_interval'] ) {
+					if (FLEXI_J16GE) {
+						$publish_down_date = JFactory::getDate(); // Gives editor's timezone by default
+						$publish_down_date->modify('+ '.$submit_conf['autopublished_down_interval'].' minutes');
+						$publish_down_forced = $publish_down_date->toSql();
+					} else {
+						$publish_down_date = new DateTime(JHTML::_('date', JFactory::getDate()->toFormat(), '%Y-%m-%d %H:%M:%S'));
+						$publish_down_date->modify('+ '.$submit_conf['autopublished_down_interval'].' minutes');
+						$publish_down_forced = $publish_down_date->format('Y-m-d H:i:s');
+					}
+				}
+			}
 		} else {
 			$autopublished    = 0;
 			$overridecatperms = 0;
@@ -1680,6 +1742,10 @@ class ParentClassItem extends JModelLegacy
 				unset( $data['publish_down'] );
 				unset( $data['ordering'] );
 			}
+			
+			// Check for publish up/down dates forced during auto-publishing
+			if ( @ $publish_up_forced )   $data['publish_up']   = $publish_up_forced;
+			if ( @ $publish_down_forced ) $data['publish_down'] = $publish_down_forced;
 			
 			$pubished_state = 1;  $draft_state = -4;  $pending_approval_state = -3;
 			
@@ -2877,20 +2943,25 @@ class ParentClassItem extends JModelLegacy
 	
 	
 	/**
-	 * Method to get types list when performing an edit action
+	 * Method to get types list when performing an edit action or e.g. checking 'create' ACCESS for the types
 	 * 
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeslist ()
+	function getTypeslist ( $type_ids=false )
 	{
-		$query = 'SELECT id, name'
+		if ( !empty($type_ids) && is_array($type_ids) ) {
+			foreach ($type_ids as $i => $type_id)
+				$type_ids[$i] = (int) $type_id;
+			$type_ids_list = implode(',', $type_ids);
+		}
+		$query = 'SELECT * '
 				. ' FROM #__flexicontent_types'
-				. ' WHERE published = 1'
+				. ' WHERE published = 1 '. ( @ $type_ids_list ? ' AND id IN ('. $type_ids_list .' ) ' : '' )
 				. ' ORDER BY name ASC'
 				;
 		$this->_db->setQuery($query);
-		$types = $this->_db->loadObjectList();
+		$types = $this->_db->loadObjectList('id');
 		return $types;
 	}
 	

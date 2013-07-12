@@ -535,13 +535,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$remove .= '</div>';
 				}
 				
-				if ( !$image_source ) {
-					$change .= !$multiple ?
-						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" />' :
-						' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this)" value="1" />' ;
-					$change .= ' <span></span><label class="fcfield-button" style="margin: 0px 0px 4px 0px !important;" for="'.$elementid.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>';
-				}
-				
 				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
 				
 				$img_link  = JURI::root().$field->parameters->get('dir');
@@ -553,6 +546,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="" />';
 				$imgpreview = '<div class="empty_image" id="'.$elementid.'_preview_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>';
+			}
+			
+			if ( !$image_source ) {
+				$change .= !$multiple ?
+					' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" '.($image_name ? '' : ' checked="checked" ').'/>' :
+					' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this)" value="1" '.($image_name ? '' : ' checked="checked" ').' />' ;
+				$change .= ' <span></span><label class="fcfield-button" style="margin: 0px 0px 4px 0px !important;" for="'.$elementid.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>';
 			}
 			
 			if ($linkto_url) $urllink =

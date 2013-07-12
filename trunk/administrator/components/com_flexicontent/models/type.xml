@@ -251,14 +251,34 @@
 		
 		<field name="" type="jparamstab" description="FLEXI_FRONTEND_ITEM_FORM" />
 			
+			<field name="" label="" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" level="level2" />
+			
 			<field name="allowbuttons_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,save_preview,preview_latest" defaultvals=""
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" />
+			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level3" />
+			<field name="submit_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" />
 			<field name="submit_redirect_url_fe" type="text" default="" size="36" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" />
+			<field name="notauthurl" type="menuitem" default="" disable="separator" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" />
+			
+			<!--field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level3" /-->
+			
+			<!--field name="use_captcha" type="radio" default="" label="FLEXI_USER_TYPE" description="FLEXI_USER_TYPE_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NEVER</option>
+				<option value="1">FLEXI_GUESTS_RECOMMENEDED</option>
+				<option value="2">FLEXI_ANY_USER</option>
+			</field-->
+			<!--field name="captcha_formop" type="radio" default="" label="FLEXI_OPERATION_TYPE" description="FLEXI_OPERATION_TYPE_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_SUBMIT_RECOMMENDED</option>
+				<option value="1">FLEXI_SUBMIT_EDIT</option>
+			</field-->
 			
 			<field name="" type="separator" default="FLEXI_BASIC_EDITING" label="" level="level2" />
 			
+			<field name="" type="separator" default="FLEXI_NEW_EXISTING_ITEMS" label="" level="level3" />
 			<field name="usealias_fe" type="radio" default="" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -270,7 +290,13 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
 			</field>
+			<field name="allowdisablingcomments_fe" type="radio" default="" label="FLEXI_ALLOW_DISABLING_COMMENTS" description="FLEXI_ALLOW_DISABLING_COMMENTS_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
+			<field name="" type="separator" default="FLEXI_EXISTING_ITEMS" label="" level="level3" />
 			<field name="allowlangmods_fe" type="fccheckbox" default="" display_useglobal="1"
 				checkoptions="FLEXI_MODIFY_ITEMLANG,FLEXI_MODIFY_ORIGINAL_CONTENT_ASSOC"
 				checkvals="mod_item_lang,mod_original_content_assoc" defaultvals=""
@@ -279,11 +305,6 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_ONCE_PER_SESSION</option>
-			</field>
-			<field name="allowdisablingcomments_fe" type="radio" default="" label="FLEXI_ALLOW_DISABLING_COMMENTS" description="FLEXI_ALLOW_DISABLING_COMMENTS_DESC" >
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_EDITING" label="" level="level2" />
@@ -323,7 +344,7 @@
 			<field name="" type="separator" default="FLEXI_STYLING" label="" level="level2" />
 			
 			<field name="form_container_css_fe" type="text" default="max-width:800px;" size="36" label="FLEXI_FORM_CONTAINER_CSS" description="FLEXI_FORM_CONTAINER_CSS_DESC" />
-			<field name="form_extra_css" type="textarea" default="" rows="6" cols="36" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
+			<field name="form_extra_css" type="textarea" default="" rows="5" cols="36" label="FLEXI_EDIT_FORM_CSS" description="FLEXI_EDIT_FORM_CSS_DESC" />
 			
 		
 		<field name="" type="jparamstab" description="FLEXI_EMAIL_NOTIFICATIONS_CONF" />

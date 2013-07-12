@@ -48,6 +48,10 @@
 				<option value="_self">open in the same frame</option>
 				<option value="_top">open in the full body of the window</option>
 			</field>
+	    <field name="use_direct_link" type="list" default="0" label="FLEXI_FIELD_USE_DIRECT_LINKS" description="FLEXI_FIELD_USE_DIRECT_LINKS_DESC">
+	       <option value="0">No, </option>
+	       <option value="1">Yes, (disable hits counting)</option>
+	    </field>
 			<field name="default_link" type="text" default="" label="FLEXI_EXTWL_DEFAULT_LINK" description="FLEXI_EXTWL_DEFAULT_LINK_DESC" />
 			<field name="default_link_usage" type="list" default="0" label="FLEXI_EXTWL_DEFAULT_LINK_USAGE" description="FLEXI_EXTWL_DEFAULT_LINK_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
