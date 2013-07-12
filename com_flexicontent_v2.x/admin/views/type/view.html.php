@@ -79,6 +79,13 @@ class FlexicontentViewType extends JViewLegacy
 			}
 		}
 		
+		if (FLEXI_ACCESS) {
+			$itemscreatable[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_ANY_AUTHOR' ) );
+			$itemscreatable[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_USE_ACL_PERMISSION' ) );
+			$itemscreatable_fieldname = FLEXI_J16GE ? 'jform[itemscreatable]' : 'itemscreatable';
+			$lists['itemscreatable'] = JHTML::_('select.radiolist',   $itemscreatable, $itemscreatable_fieldname, '', 'value', 'text', $row->itemscreatable );
+		}
+		
 		//build access level list
 		if (!FLEXI_J16GE) {
 			if (FLEXI_ACCESS) {

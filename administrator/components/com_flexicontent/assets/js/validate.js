@@ -498,7 +498,28 @@ var JFormValidator = new Class({
 				valid = false;
 			}
 		});
-
+		
+		var recaptcha = jQuery('#recaptcha_response_field');
+		var recaptcha_lbl = jQuery('#recaptcha_response_field-lbl');
+		if ( recaptcha.length ) {
+			if ( recaptcha.val() == '' ) {
+				recaptcha.addClass('invalid');
+				if (flexi_j16ge) recaptcha.attr('aria-invalid', 'true');
+				if (recaptcha_lbl.length) {
+					recaptcha_lbl.addClass('invalid');
+					if (flexi_j16ge) recaptcha_lbl.attr('aria-invalid', 'true');
+				}
+				valid = false;
+			} else {
+				recaptcha.removeClass('invalid');
+				if (flexi_j16ge) recaptcha.attr('aria-invalid', 'false');
+				if (recaptcha_lbl.length) {
+					recaptcha_lbl.removeClass('invalid');
+					if (flexi_j16ge) recaptcha_lbl.attr('aria-invalid', 'false');
+				}
+			}
+		}
+		
 		return valid;
 	},
 

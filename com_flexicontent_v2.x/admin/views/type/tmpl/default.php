@@ -56,6 +56,16 @@ defined('_JEXEC') or die('Restricted access');
 							<?php echo $this->form->getInput('alias'); ?>
 						</td>
 					</tr>
+					<?php if (FLEXI_ACCESS || FLEXI_J16GE) : ?>
+					<tr>
+						<td class="key">
+							<?php echo $this->form->getLabel('itemscreatable'); ?>
+						</td>
+						<td>
+							<?php echo $this->form->getInput('itemscreatable'); ?>
+						</td>
+					</tr>
+					<?php endif; ?>
 				</table>
 				
 			<?php
@@ -86,7 +96,7 @@ defined('_JEXEC') or die('Restricted access');
 				</div>
 			</fieldset>
 		<?php endif; ?>
-
+			
 			</td>
 			<td valign="top" width="600" style="padding: 7px 0 0 5px" align="left" valign="top">
 				<?php

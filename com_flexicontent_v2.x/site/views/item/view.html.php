@@ -451,7 +451,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
 			$params->merge($menu_params);
 		}
-
+		
 		// Some flags
 		$enable_translation_groups = $params->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 		$print_logging_info = $params->get('print_logging_info');
@@ -460,7 +460,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// We rely on typeid Request variable to decide type for new items so make sure this is set, ZERO means allow user to select type
 		if ( $menu && isset($menu->query['typeid']) )
 			JRequest::setVar('typeid', (int)$menu->query['typeid']);  // This also forces zero if value not set
-		$typeid = JRequest::getVar('typeid', 0);
+		$typeid = JRequest::getVar('typeid', 0, '', 'int');
 
 
 		// ******************************************************
@@ -498,12 +498,51 @@ class FlexicontentViewItem  extends JViewLegacy
 		$isOwner = ( $item->created_by == $user->get('id') );
 		// A unique item id
 		JRequest::setVar( 'unique_tmp_itemid', $item->id ? $item->id : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
-
+		
 		// Component / Menu Item parameters
 		$allowunauthorize   = $params->get('allowunauthorize', 0);     // allow unauthorised user to submit new content
 		$unauthorized_page  = $params->get('unauthorized_page', '');   // page URL for unauthorized users (via global configuration)
 		$notauth_itemid     = $params->get('notauthurl', '');          // menu itemid (to redirect) when user is not authorized to create content
-
+		
+		// Create captcha field or messages
+		if (FLEXI_J16GE) {
+			$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
+			$captcha_formop = $params->get('captcha_formop', 0);  // 0 for submit, 1 for submit/edit (aka always)
+			$display_captcha = $use_captcha >= 2 || ( $use_captcha == 1 &&  $user->guest );
+			$display_captcha = $display_captcha && ($isnew || $captcha_formop);
+			
+			// Force using recaptcha
+			if ($display_captcha) {
+				// Try to force the use of recaptcha plugin
+				JFactory::getConfig()->setValue('captcha', 'recaptcha');
+				
+				if ( !$app->getCfg('captcha') ) {
+					$captcha_errmsg  = '-- Please select <b>CAPTCHA Type</b> at global Joomla parameters';
+				} else if ($app->getCfg('captcha') != 'recaptcha') {
+					$captcha_errmsg  = '-- Captcha Type: <b>'.$app->getCfg('captcha').'</b> not supported';
+				} else if ( ! JPluginHelper::isEnabled('captcha', 'recaptcha') ) {
+					$captcha_errmsg  = '-- Please enable & configure the Joomla <b>ReCaptcha Plugin</b>';
+				} else {
+					$captcha_errmsg  = '';
+					
+					JPluginHelper::importPlugin('captcha');
+					$dispatcher->trigger('onInit','dynamic_recaptcha_1');
+					
+					$field_description = JText::_( 'FLEXI_CAPTCHA_ENTER_CODE_DESC' );
+					$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
+					
+					$captcha_field = '
+						<label id="recaptcha_response_field-lbl" for="recaptcha_response_field" '.$label_tooltip.' >
+						'. JText::_( 'FLEXI_CAPTCHA_ENTER_CODE' ).'
+						</label>
+						<div class="container_fcfield container_fcfield_name_captcha">
+							<div id="dynamic_recaptcha_1"></div>
+						</div>
+						';
+				}
+			}
+		}
+		
 		// User Group / Author parameters
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);
 		$authorparams = $db->loadResult();
@@ -542,12 +581,14 @@ class FlexicontentViewItem  extends JViewLegacy
 				//$canEdit = ($user->gid >= 20);  // At least J1.5 Editor
 			}
 
-			// Check if item is editable till logoff
-			if ($session->has('rendered_uneditable', 'flexicontent')) {
-				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
-				$canEdit = isset($rendered_uneditable[$model->get('id')]);
+			if ( !$canEdit ) {
+				// No edit privilege, check if item is editable till logoff
+				if ($session->has('rendered_uneditable', 'flexicontent')) {
+					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+					$canEdit = isset($rendered_uneditable[$model->get('id')]) && $rendered_uneditable[$model->get('id')];
+				}
 			}
-
+			
 			if (!$canEdit) {
 				if ($user->guest) {
 					$uri		= JFactory::getURI();
@@ -593,20 +634,33 @@ class FlexicontentViewItem  extends JViewLegacy
 				//$canAdd = ($user->gid >= 19);  // At least J1.5 Author
 				$not_authorised = ! $canAdd;
 			}
-
+			
+			// Check if Content Type can be created by current user
+			if ($typeid) {
+				$canCreateType = $model->canCreateType( array($typeid) );  // Can create given Content Type
+			} else {
+				$canCreateType = $model->canCreateType( );  // Can create at least one Content Type
+			}
+			$not_authorised = $not_authorised || !$canCreateType;
+			
 			// Allow item submission by unauthorized users, ... even guests ...
 			if ($allowunauthorize == 2) $allowunauthorize = ! $user->guest;
 
 			if ($not_authorised && !$allowunauthorize)
 			{
-				$msg = JText::_( 'FLEXI_ALERTNOTAUTH_CREATE' );
+				if ( !$canCreateType ) {
+					$type_name = isset($types[$typeid]) ? '"'.JText::_($types[$typeid]->name).'"' : JText::_('FLEXI_ANY');
+					$msg = JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name );
+				} else {
+					$msg = JText::_( 'FLEXI_ALERTNOTAUTH_CREATE' );
+				}
 			} else if ($max_auth_limit) {
 				$db->setQuery('SELECT COUNT(id) FROM #__content WHERE created_by = ' . $user->id);
 				$authored_count = $db->loadResult();
 				$content_is_limited = $authored_count >= $max_auth_limit;
 				$msg = $content_is_limited ? JText::sprintf( 'FLEXI_ALERTNOTAUTH_CREATE_MORE', $max_auth_limit ) : '';
 			}
-
+			
 			if ( ($not_authorised && !$allowunauthorize) || @ $content_is_limited ) {
 				// User isn't authorize to add ANY content
 				if ( $notauth_menu = JSite::getMenu()->getItem($notauth_itemid) ) {
@@ -808,6 +862,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		$this->assignRef('submitConf', $submitConf);
 		$this->assignRef('itemlang',   $itemlang);
 		$this->assignRef('pageclass_sfx', $pageclass_sfx);
+		$this->assign('captcha_errmsg', @ $captcha_errmsg);
+		$this->assign('captcha_field',  @ $captcha_field);
 
 		// **************************************************************************************
 		// Load a different template file for parameters depending on whether we use FLEXI_ACCESS
@@ -1007,7 +1063,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$attribs = 'class="'.$class.'"';
 		$fieldname = FLEXI_J16GE ? 'jform[type_id]' : 'type_id';
 		$elementid = FLEXI_J16GE ? 'jform_type_id'  : 'type_id';
-		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected, 1, $attribs, $elementid );
+		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected, 1, $attribs, $elementid, $check_perms=true );
 		
 		// Main category form field
 		$class = 'scat use_select2_lib';
@@ -1287,13 +1343,13 @@ class FlexicontentViewItem  extends JViewLegacy
 				break;
 			case 1:  // submit to a single category, selecting from a MENU SPECIFIED categories subset
 				$mo_cats    = false;
-				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="required" ', $check_published=true, $check_perms=false);
+				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="scat use_select2_lib required" ', $check_published=true, $check_perms=false);
 				$mo_cancid  = false;
 				break;
 			case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
-				$attribs = 'class="validate" multiple="multiple" size="8"';
+				$attribs = 'class="validate fcfield_selectmulval" multiple="multiple" size="8"';
 				$mo_cats    = flexicontent_cats::buildcatselect($categories, $cid_form_fieldname, array(), false, $attribs, $check_published=true, $check_perms=false);
-				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="validate-catid" ', $check_published=true, $check_perms=false);
+				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="scat use_select2_lib validate-catid" ', $check_published=true, $check_perms=false);
 				$mo_cancid  = true;
 				break;
 		}
@@ -1328,7 +1384,9 @@ class FlexicontentViewItem  extends JViewLegacy
 			'maincatid'       => $params->get("maincatid"),        // Default main category out of the overriden categories
 			'postcats'        => $postcats,
 			'overridecatperms'=> $overridecatperms,
-			'autopublished'   => $params->get('autopublished', 0)  // Publish the item
+			'autopublished'   => $params->get('autopublished', 0),  // Publish the item
+			'autopublished_up_interval'   => $params->get('autopublished_up_interval', 0),
+			'autopublished_down_interval' => $params->get('autopublished_down_interval', 0)
 		);
 		$submit_conf_hash = md5(serialize($submit_conf));
 

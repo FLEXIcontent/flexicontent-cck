@@ -40,6 +40,8 @@ class flexicontent_types extends JTable
 	/** @var int */
 	var $published			= null;
 	/** @var int */
+	var $itemscreatable	= 0;
+	/** @var int */
 	var $checked_out		= 0;
 	/** @var date */
 	var $checked_out_time	= '';

@@ -290,7 +290,7 @@ $tabCnt[$tabSetCnt] = 0;
 					JText::_(FLEXI_J16GE ? $this->form->getField('type_id')->__get('description') : 'FLEXI_TYPE_DESC');
 				$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
 			?>
-			<label id="jform_type_id-lbl" for="jform_type_id" <?php echo $label_tooltip; ?> >
+			<label id="jform_type_id-lbl" for="jform_type_id" for_bck="jform_type_id" <?php echo $label_tooltip; ?> >
 				<?php echo $field->label; ?>
 				<?php /*echo JText::_( 'FLEXI_TYPE' );*/ ?>
 			</label>
@@ -502,7 +502,7 @@ $tabCnt[$tabSetCnt] = 0;
 	</div> <!-- end tab -->
 
 
-	<?php $tab_lbl = $tags_displayed ? 'FLEXI_CATEGORIES_TAGS' : 'FLEXI_TAGS';?>
+	<?php $tab_lbl = $tags_displayed ? 'FLEXI_CATEGORIES_TAGS' : 'FLEXI_CATEGORIES';?>
 
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_( $tab_lbl ); ?> </h3>

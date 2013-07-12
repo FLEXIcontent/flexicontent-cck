@@ -56,6 +56,7 @@ class FlexicontentModelItems extends ParentClassItem
 		global $globalcats;
 		$app  = JFactory::getApplication();
 		$user	= JFactory::getUser();
+		$session = JFactory::getSession();
 		$aid	= (int) $user->get('aid');
 		$gid	= (int) $user->get('gid');
 		$cid	= $this->_cid;
@@ -97,6 +98,14 @@ class FlexicontentModelItems extends ParentClassItem
 			} else {
 				$canedititem = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $isOwner);
 				$caneditstate = $user->authorize('com_content', 'publish', 'content', 'all');
+			}
+			
+			if (!$caneditstate) {
+				// Item not editable, check if item is editable till logoff
+				if ( $session->has('rendered_uneditable', 'flexicontent') ) {
+					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
+					$canedititem = isset($rendered_uneditable[$model->get('id')]);
+				}
 			}
 			
 			// (c) Calculate read access ... 
@@ -235,7 +244,7 @@ class FlexicontentModelItems extends ParentClassItem
 			
 			// SPECIAL cases for inactive item
 			if ( !$item_n_cat_active ) {
-				if ( !$caneditstate && ($item_state_pending || item_state_draft) && $isOwner )
+				if ( !$caneditstate && ($item_state_pending || $item_state_draft) && $isOwner )
 				{
 					// no redirect, SET message to owners, to wait for approval or to request approval of their content
 					$app->enqueueMessage(JText::_( $item_state_pending ? 'FLEXI_ALERT_VIEW_OWN_PENDING_STATE' : 'FLEXI_ALERT_VIEW_OWN_DRAFT_STATE' ), 'notice');

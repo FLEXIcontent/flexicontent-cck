@@ -127,7 +127,7 @@
 			
 			<field name="" type="separator" default="FLEXI_LIST_CREATION_FRONTEND_VIEWS" level="level1" menu="hide" />
 			
-			<field name="orderby_frontend" type="list" default="alpha" label="FLEXI_RIFLD_FE_ITEM_ORDERING" description="FLEXI_RIFLD_FE_ITEM_ORDERING_DESC">
+			<field name="orderby" type="list" default="alpha" label="FLEXI_RIFLD_FE_ITEM_ORDERING" description="FLEXI_RIFLD_FE_ITEM_ORDERING_DESC">
 				<option value="">FLEXI_ORDER_DEFAUKT</option>
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>

@@ -1641,27 +1641,25 @@ class FlexicontentModelCategory extends JModelLegacy {
 	}
 	
 	
-	function &getCommentsInfo ( $_item_ids = false)
+	function &getCommentsInfo ( $item_ids = false)
 	{
-		// handle jcomments integration
-		if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
-			$this->_comments = array();
-			return $this->_comments;
-		}
+		// Return existing data and initialize array
+		if ($this->_comments!==null) return $this->_comments;
+		$this->_comments = array();
+		
+		// Check jcomments plugin is installed and enabled
+		if ( !JPluginHelper::isEnabled('system', 'jcomments') )  return $this->_comments;
 		
 		// Normal case, item ids not given, we will retrieve comments information of cat/sub items
-		if ( empty($_item_ids) ) {
-			// Return existing data
-			if ($this->_comments!==null) return $this->_comments;
-			
-			// Make sure item data have been retrieved
+		if ( empty($item_ids) )
+		{
+			// First make sure item data have been retrieved
 			$this->getData();
+			if ( empty($this->_data) )  return $this->_comments;
 			
-			// Get item ids
+			// Then get item ids
 			$item_ids = array();
 			foreach ($this->_data as $item) $item_ids[] = $item->id;
-		} else {
-			$item_ids = $_item_ids;
 		}
 		
 		$db = JFactory::getDBO();
@@ -1675,7 +1673,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$db->setQuery($query);
 		$comments = $db->loadObjectList('item_id');
 		
-		if ( !$_item_ids ) $this->_comments = $comments;
+		if ( $comments ) $this->_comments = $comments;
 		
 		return $comments;
 	}

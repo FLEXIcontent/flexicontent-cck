@@ -417,8 +417,16 @@ class flexicontent_html
 	 */
 	static function striptagsandcut( $text, $chars=null )
 	{
-		// first strip html tags
-		$text = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8'); // Convert entiies to characters so that they will not be removed ... by strip_tags
+		// Convert entiies to characters so that they will not be removed ... by strip_tags
+		$text = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8');
+		
+		// Strip SCRIPT tags AND their containing code
+		$text = preg_replace( '#<script\b[^>]*>(.*?)<\/script>#is', '', $text );
+		
+		// Add whitespaces at start/end of tags so that words will not be joined
+		$text = preg_replace('/(<\/[^>]+>)|(<[^>\/][^>]*>)/', ' $1', $text);
+		
+		// Strip html tags
 		$cleantext = strip_tags($text);
 
 		// clean additionnal plugin tags
@@ -426,11 +434,15 @@ class flexicontent_html
 		$patterns[] = '#\[(.*?)\]#';
 		$patterns[] = '#{(.*?)}#';
 		$patterns[] = '#&(.*?);#';
-
+		
 		foreach ($patterns as $pattern) {
 			$cleantext = preg_replace( $pattern, '', $cleantext );
 		}
-
+		
+		// Replace multiple spaces, tabs, newlines, etc with a SINGLE whitespace so that text length will be calculated correctly
+		$cleantext = preg_replace('/[\p{Z}\s]{2,}/u', ' ', $cleantext);  // Unicode safe whitespace replacing
+		
+		// Calculate length according to UTF-8 encoding
 		$length = JString::strlen(htmlspecialchars( $cleantext ));
 
 		// cut the text if required
@@ -1491,21 +1503,38 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildtypesselect($list, $name, $selected, $top, $class = 'class="inputbox"', $tagid='')
+	static function buildtypesselect($types, $name, $selected, $top, $class = 'class="inputbox"', $tagid='', $check_perms=false)
 	{
-		$typelist 	= array();
-
-		if($top) {
-			$typelist[] 	= JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_TYPE' ) );
+		$user = JFactory::getUser();
+		
+		$typelist = array();
+		if($top)  $typelist[] = JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_TYPE' ) );
+		
+		foreach ($types as $type)
+		{
+			$allowed = 1;
+			if ($check_perms)
+			{
+				if (FLEXI_J16GE)
+					$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
+				else if (FLEXI_ACCESS && $user->gid < 25)
+					$allowed = ! $type->itemscreatable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'type', $type->id);
+				else
+					$allowed = 1;
+			}
+			
+			if ( !$allowed && $type->itemscreatable == 1 ) continue;
+			
+			if ( !$allowed && $type->itemscreatable == 2 )
+				$typelist[] = JHTML::_( 'select.option', $type->id, $type->name, 'value', 'text', $disabled = true );
+			else
+				$typelist[] = JHTML::_( 'select.option', $type->id, $type->name);
 		}
-
-		foreach ($list as $item) {
-			$typelist[] = JHTML::_( 'select.option', $item->id, $item->name);
-		}
+		
 		return JHTML::_('select.genericlist', $typelist, $name, $class, 'value', 'text', $selected, $tagid );
 	}
-
-
+	
+	
 	/**
 	 * Method to build the list of the autors
 	 *

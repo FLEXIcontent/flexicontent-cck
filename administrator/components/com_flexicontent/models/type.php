@@ -186,6 +186,7 @@ class FlexicontentModelType extends JModelLegacy
 			$type->name				= null;
 			$type->alias			= null;
 			$type->published	= 1;
+			$type->itemscreatable= 0;
 			$type->attribs		= null;
 			$type->access			= 0;
 			$this->_type			= $type;
