@@ -149,7 +149,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		if ( !$canCreateType ) {
 			$msg = isset($types[$type_id]) ?
-				JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', JText::_($types[$type_id]->name) )
+				JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', JText::_($types[$type_id]->name) ) :
 				' Content Type '.$type_id.' was not found OR is not published';
 			JError::raiseWarning( 403, $msg );
 			$this->setRedirect( 'index.php?option=com_flexicontent&view=items', '' );
