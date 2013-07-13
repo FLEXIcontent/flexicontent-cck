@@ -811,7 +811,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		<?php
 			$fieldSets = $this->form->getFieldsets('attribs');
 			foreach ($fieldSets as $name => $fieldSet) :
-				if ( $name=='themes' || $name=='params-seoconf' ) continue;
+				if ( $name=='themes' || $name=='params-seoconf'  || $name=='images' ||  $name=='urls' ) continue;
 
 				//$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
 				//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
@@ -948,6 +948,40 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	</div> <!-- end tab -->
 	
 	
+	<?php if ($this->com_content_conf->get('show_urls_images_backend', 0) ) : ?>
+	
+	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+		<h3 class="tabberheading"> <?php echo JText::_('Compatibility'); ?> </h3>
+		
+		<?php
+		$fieldSets_compatibility = array('images'=>1, 'urls'=>1);
+		foreach ($fieldSets_compatibility as $name => $fieldSet) :
+		?>
+		
+		<fieldset class="flexi_params fc_edit_container_full">
+			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+				<div class="fcclear"></div>
+				<?php if ($field->hidden): ?>
+					<span style="visibility:hidden !important;">
+						<?php echo $field->input; ?>
+					</span>
+				<?php else: ?>
+					<?php echo $field->label; ?>
+					<div class="container_fcfield">
+						<?php echo $field->input;?>
+					</div>
+				<?php endif; ?>
+			<?php endforeach; ?>
+		</fieldset>
+		
+		<?php endforeach; ?>
+		
+	</div> <!-- end tab -->
+	
+	<?php endif; ?>
+
+
+
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 		

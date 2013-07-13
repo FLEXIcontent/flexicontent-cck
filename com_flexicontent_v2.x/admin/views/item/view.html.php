@@ -49,6 +49,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$document   = JFactory::getDocument();
 		$session    = JFactory::getSession();
 		$cparams    = JComponentHelper::getParams('com_flexicontent');
+		$com_content_conf = JComponentHelper::getParams('com_content');
 		$option     = JRequest::getVar('option');
 		$user       = JFactory::getUser();
 		$db         = JFactory::getDBO();
@@ -628,7 +629,8 @@ class FlexicontentViewItem extends JViewLegacy
 		$this->assignRef('usedtags'			, $usedtags);
 		$this->assignRef('perms'				, $perms);
 		$this->assignRef('current_page'	, $current_page);
-
+		$this->assignRef('com_content_conf'	, $com_content_conf);
+		
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		parent::display($tpl);
 		if ( $print_logging_info ) @$fc_run_times['form_rendering'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;

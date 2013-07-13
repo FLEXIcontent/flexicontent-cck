@@ -60,7 +60,36 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$fields  = $this->get( 'Fields');
 		$fbypos  = $this->get( 'FieldsByPositions');
 		$used    = $this->get( 'UsedFields');
-
+		
+		$contentTypes = $this->get( 'ContentTypesList' );
+		$fieldTypes   = $this->get( 'FieldTypesList' );
+		
+		
+		// Create CONTENT TYPE SELECTOR
+		foreach ($fields as $field) {
+			$field->type_ids = !empty($field->reltypes)  ?  explode("," , $field->reltypes)  :  array();
+		}
+		$options = array();
+		$options[] = JHTML::_('select.option',  '',  JText::_( 'FLEXI_ALL' ) );
+		foreach ($contentTypes as $contentType) {
+			$options[] = JHTML::_('select.option', $contentType->id, JText::_( $contentType->name ) );
+		}
+		$fieldname =  $elementid = 'content_type';
+		$attribs = ' onchange="filterFieldList(\'sortableuserfields\');" class="fcfield_selectval" ';
+		$content_type_select = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
+		
+		
+		// Create FIELD TYPE SELECTOR
+		$options = array();
+		$options[] = JHTML::_('select.option',  '',  JText::_( 'FLEXI_ALL' ) );
+		foreach ($fieldTypes as $fieldType) {
+			$options[] = JHTML::_('select.option', $fieldType->type_name, $fieldType->field_name );
+		}
+		$fieldname =  $elementid = 'field_type';
+		$attribs = ' onchange="filterFieldList(\'sortableuserfields\');" class="fcfield_selectval" ';
+		$field_type_select = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
+		
+		
 		if (isset($layout->positions)) {
 			$sort = array();
 			$jssort = array();
@@ -147,6 +176,29 @@ class FlexicontentViewTemplate extends JViewLegacy {
 				}
 				";
 			}
+			
+			$js .= '
+			var fieldListFilters = new Array( "content_type", "field_type" );
+			function filterFieldList (listID)
+			{
+				var needed_classes = "";
+				for (i=0; i<fieldListFilters.length; i++)
+				{
+					filter_name = fieldListFilters[i];
+					
+					var filter_val = jQuery("#"+filter_name).val();
+					if (filter_val) {
+						needed_classes += "."+filter_name+"_"+filter_val;
+					}
+				}
+				if (needed_classes) {
+					jQuery("#"+listID).find("li").show().filter(":not("+needed_classes+")").hide();
+				} else
+					jQuery("#"+listID).find("li").show();
+			}
+			
+			';
+			
 			$document->addScriptDeclaration( $js );
 		}
 		
@@ -188,7 +240,9 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$this->assignRef('used'				, $used);
 		$this->assignRef('fbypos'			, $fbypos);
 		$this->assignRef('use_jquery_sortable' , $use_jquery_sortable);
-
+		$this->assignRef('content_type_select' , $content_type_select );
+		$this->assignRef('field_type_select' , $field_type_select );
+		
 		parent::display($tpl);
 	}
 }

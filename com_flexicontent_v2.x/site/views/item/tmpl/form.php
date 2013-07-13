@@ -1137,6 +1137,41 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 	<?php endif; ?>
 	
 	
+	
+	<?php if ($this->com_content_conf->get('show_urls_images_frontend', 0) ) : ?>
+	
+	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+		<h3 class="tabberheading"> <?php echo JText::_('Compatibility'); ?> </h3>
+		
+		<?php
+		$fieldSets_compatibility = array('images'=>1, 'urls'=>1);
+		foreach ($fieldSets_compatibility as $name => $fieldSet) :
+		?>
+		
+		<fieldset class="flexi_params fc_edit_container_full">
+			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+				<div class="fcclear"></div>
+				<?php if ($field->hidden): ?>
+					<span style="visibility:hidden !important;">
+						<?php echo $field->input; ?>
+					</span>
+				<?php else: ?>
+					<?php echo $field->label; ?>
+					<div class="container_fcfield">
+						<?php echo $field->input;?>
+					</div>
+				<?php endif; ?>
+			<?php endforeach; ?>
+		</fieldset>
+		
+		<?php endforeach; ?>
+		
+	</div> <!-- end tab -->
+	
+	<?php endif; ?>
+	
+	
+	
 	<?php if ( $this->perms['cantemplates'] && $this->params->get('selecttheme_fe') ) : ?>
 		<?php $title=JText::_('FLEXI_TEMPLATE'); ?>
 		
