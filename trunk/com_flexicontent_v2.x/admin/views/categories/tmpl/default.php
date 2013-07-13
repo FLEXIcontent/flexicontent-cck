@@ -51,8 +51,10 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			</td>
 			<td nowrap="nowrap">
 				<div class="filter-select fltrt">
-				  <?php echo $this->lists['language']; ?>
+					<?php echo $this->lists['level']; ?>
 					<?php echo $this->lists['state']; ?>
+					<?php echo $this->lists['access']; ?>
+				  <?php echo $this->lists['language']; ?>
 				</div>
 			</td>
 		</tr>

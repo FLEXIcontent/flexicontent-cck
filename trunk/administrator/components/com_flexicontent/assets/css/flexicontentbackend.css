@@ -476,8 +476,13 @@ span.editlinktip.hasTip.tags img {
 	background-color: #f0f0f0;
 	border: 1px dashed silver;
 	overflow: hidden;
-	width: 100%
+	width: 100%;
 }
+div .positions_readonly {
+	padding: 2px 1%;
+	width: 98%;
+}
+
 .fields {
 	display: block;
 	border: 1px solid silver;

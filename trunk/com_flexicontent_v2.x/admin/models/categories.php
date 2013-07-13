@@ -75,12 +75,15 @@ class FlexicontentModelCategories extends JModelList
 	{
 		$app = JFactory::getApplication();
 		$db = $this->getDbo();
+		$user = JFactory::getUser();
 		$option = JRequest::getVar('option');
 		
 		$filter_order     = $app->getUserStateFromRequest( $option.'.categories.filter_order',     'filter_order',     'c.lft', 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.categories.filter_order_Dir', 'filter_order_Dir', '', 'word' );
-		$filter_state     = $app->getUserStateFromRequest( $option.'.categories.filter_state',     'filter_state',     '', 'word' );
-		$filter_language  = $app->getUserStateFromRequest( $option.'.categories.filter_language', 'filter_language', 	'*', 'cmd' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.categories.filter_state',     'filter_state',     '', 'string' );
+		$filter_access    = $app->getUserStateFromRequest( $option.'.categories.filter_access',    'filter_access',    '', 'string' );
+		$filter_level     = $app->getUserStateFromRequest( $option.'.categories.filter_level',     'filter_level',     '', 'string' );
+		$filter_language  = $app->getUserStateFromRequest( $option.'.categories.filter_language', 'filter_language',   '', 'cmd' );
 		$search           = $app->getUserStateFromRequest( $option.'.categories.search', 'search', '', 'string' );
 		$search           = trim( JString::strtolower( $search ) );
 
@@ -90,7 +93,7 @@ class FlexicontentModelCategories extends JModelList
 		$query->select(
 			$this->getState(
 				'list.select',
-				'c.*, u.name AS editor, g.title AS groupname, COUNT(rel.catid) AS nrassigned, c.params as config '
+				'c.*, u.name AS editor, g.title AS groupname, COUNT(rel.catid) AS nrassigned, c.params as config, ag.title AS access_level '
 			)
 		);
 		$query->from('#__categories AS c');
@@ -99,27 +102,63 @@ class FlexicontentModelCategories extends JModelList
 		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.catid = c.id');
 		$query->join('LEFT', '#__usergroups AS g ON g.id = c.access');
 		$query->join('LEFT', '#__users AS u ON u.id = c.checked_out');
+		$query->join('LEFT', '#__viewlevels AS ag ON ag.id = c.access');
 		$query->where("c.extension = '".FLEXI_CAT_EXTENSION."' ");
-		if ( $filter_state ) {
-			if ( $filter_state == 'P' ) {
-				$query->where("c.published = 1");
-			} else if ($filter_state == 'U' ) {
-				$query->where("c.published = 0");
-			}
+		
+		
+		// Filter by published state
+		if (is_numeric($filter_state)) {
+			$query->where('c.published = ' . (int) $filter_state);
 		}
-		if ( $filter_language && $filter_language != '*' ) {
-			echo $filter_language;
+		elseif ($filter_state === '') {
+			$query->where('(c.published IN (0, 1))');
+		}
+		
+		// Filter by access level
+		if ( strlen($filter_access) ) {
+			$query->where('c.access = ' . (int) $filter_access);
+		}
+		
+		// Filter by language
+		if ( $filter_language ) {
 			$query->where("l.lang_code = '".$filter_language."'");
 		}
-		$query->where(' (c.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')');
-		// Filter by search in title
-		if (!empty($search)) {			
-			$search = $db->Quote('%'.$db->escape($search, true).'%');
-			$query->where('(c.title LIKE '.$search.' OR c.alias LIKE '.$search.' OR c.note LIKE '.$search.')');
+		
+		// Filter on the level.
+		if ( $filter_level ) {
+			$query->where('c.level <= '.(int) $filter_level);
 		}
+		
+		// Implement View Level Access
+		if (!$user->authorise('core.admin'))
+		{
+			$groups	= implode(',', $user->getAuthorisedViewLevels());
+			$query->where('c.access IN ('.$groups.')');
+		}
+		
+		// Limit category list to those containing CONTENT (joomla articles)
+		$query->where(' (c.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')');
+		
+		
+		// Filter by search word (can be also be  id:NN  OR author:AAAAA)
+		if (!empty($search)) {
+			if (stripos($search, 'id:') === 0) {
+				$query->where('c.id = '.(int) substr($search, 3));
+			}
+			elseif (stripos($search, 'author:') === 0) {
+				$search = $db->Quote('%'.$db->escape(substr($search, 7), true).'%');
+				$query->where('(u.name LIKE '.$search.' OR u.username LIKE '.$search.')');
+			}
+			else {
+				$search = $db->Quote('%'.$db->escape($search, true).'%');
+				$query->where('(c.title LIKE '.$search.' OR c.alias LIKE '.$search.' OR c.note LIKE '.$search.')');
+			}
+		}
+		
 		$query->group('c.id');
 		// Add the list ordering clause.
 		$query->order($db->escape($filter_order.' '.$filter_order_Dir));
+		
 		//echo nl2br(str_replace('#__','jos_',$query));
 		//echo str_replace('#__', 'jos_', $query->__toString());
 		return $query;
@@ -139,9 +178,9 @@ class FlexicontentModelCategories extends JModelList
 			$user = JFactory::getUser();
 			
 			// Add all children to the list
-			if (!$publish)  foreach ($cid as $id)  $this->_addCategories($id, $cid);
+			if ($publish!=1)  foreach ($cid as $id)  $this->_addCategories($id, $cid);
 			// Add all parents to the list
-			else            foreach ($cid as $id)  $this->_addCategories($id, $cid, 'parents');
+			if ($publish==1)  foreach ($cid as $id)  $this->_addCategories($id, $cid, 'parents');
 			
 			// Get the owner of all categories
 			$query = 'SELECT id, created_user_id'

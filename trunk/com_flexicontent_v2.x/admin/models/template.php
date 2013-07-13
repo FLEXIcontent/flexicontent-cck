@@ -108,18 +108,73 @@ class FlexicontentModelTemplate extends JModelLegacy
 	 */
 	function getFields()
 	{
-		$query  = 'SELECT *'
-				. ' FROM #__flexicontent_fields'
-				. ' WHERE published = 1'
-				. ' AND field_type <> "groupmarker" '
-				. ' ORDER BY label ASC'
-				;
+		$query  = 'SELECT f.*, GROUP_CONCAT(rel.type_id SEPARATOR ",") AS reltypes '
+			. ' FROM #__flexicontent_fields as f '
+			. ' LEFT JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=f.id '
+			. ' WHERE f.published = 1 '
+			. ' AND f.field_type <> "groupmarker" '
+			. ' GROUP BY f.id '
+			. ' ORDER BY f.label ASC'
+			;
 		$this->_db->setQuery($query);
 		$fields = $this->_db->loadObjectList('name');
 		
 		return $fields;
 	}
-
+	
+	
+	/**
+	 * Method to get types list when performing an edit action
+	 * 
+	 * @return array
+	 * @since 1.5
+	 */
+	function getContentTypesList()
+	{
+		$query = 'SELECT id, name'
+			. ' FROM #__flexicontent_types'
+			. ' WHERE published = 1'
+			. ' ORDER BY name ASC'
+			;
+		$this->_db->setQuery($query);
+		$types = $this->_db->loadObjectList();
+		return $types;	
+	}
+	
+	
+	/**
+	 * Method to get types list when performing an edit action
+	 * 
+	 * @return array
+	 * @since 1.5
+	 */
+	function getFieldTypesList()
+	{
+		$db = JFactory::getDBO();
+		
+		$query = 'SELECT element AS type_name, REPLACE(name, "FLEXIcontent - ", "") AS field_name '
+		. ' FROM '.(FLEXI_J16GE ? '#__extensions' : '#__plugins')
+		. ' WHERE '.(FLEXI_J16GE ? 'enabled = 1' : 'published = 1')
+		. (FLEXI_J16GE ? ' AND `type`=' . $db->Quote('plugin') : '')
+		. ' AND folder = ' . $db->Quote('flexicontent_fields')
+		. ' AND element <> ' . $db->Quote('core')
+		. ' ORDER BY field_name ASC'
+		;
+		
+		$db->setQuery($query);
+		$field_types = $db->loadObjectList();
+		
+		// This should not be neccessary as, it was already done in DB query above
+		foreach($field_types as $field_type) {
+			$field_type->field_name = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->field_name);
+			$field_arr[$field_type->field_name] = $field_type;
+		}
+		ksort( $field_arr, SORT_STRING );
+		
+		return $field_arr;
+	}
+	
+	
 	/**
 	 * Method to get all available fields
 	 *

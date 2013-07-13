@@ -444,6 +444,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$db					= JFactory::getDBO();
 		$nullDate		= $db->getNullDate();
 		$menu				= JSite::getMenu()->getActive();
+		$com_content_conf = JComponentHelper::getParams('com_content');
 
 		// Get the COMPONENT only parameters and merge current menu item parameters
 		$params = clone( JComponentHelper::getParams('com_flexicontent') );
@@ -864,7 +865,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		$this->assignRef('pageclass_sfx', $pageclass_sfx);
 		$this->assign('captcha_errmsg', @ $captcha_errmsg);
 		$this->assign('captcha_field',  @ $captcha_field);
-
+		$this->assignRef('com_content_conf'	, $com_content_conf);
+		
+		
 		// **************************************************************************************
 		// Load a different template file for parameters depending on whether we use FLEXI_ACCESS
 		// **************************************************************************************

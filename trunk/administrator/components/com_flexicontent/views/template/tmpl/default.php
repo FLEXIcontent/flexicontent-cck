@@ -24,6 +24,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 	}
 </script>
 
+<div id="flexicontent" class="flexicontent">
+
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table cellpadding="0" cellspacing="0" width="100%">
@@ -153,13 +155,29 @@ defined('_JEXEC') or die('Restricted access'); ?>
 					endforeach;
 					?>
 					</ul>
+					
+					<div style="float:left; clear:both; width:100%; margin:12px 0px 12px 24px;">
+						<div style="float:left; margin-right:32px;">
+							<div style="float:left;" class="postitle" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
+							<div style="float:left; clear:both;"><?php echo $this->content_type_select; ?></div>
+						</div>
+						<div style="float:left;">
+							<div style="float:left;" class="postitle" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
+							<div style="float:left; clear:both;"><?php echo $this->field_type_select; ?></div>
+						</div>
+					</div>
+					
 					<div class="postitle"><?php echo JText::_('FLEXI_NON_CORE_FIELDS'); ?></div>
 					<ul id="sortableuserfields" class="positions">
 					<?php
 					foreach ($this->fields as $field) :
 						if (!$field->iscore && (!in_array($field->name, $this->used))) :
+							
+							$class_list  = "fields user";
+							$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
+							$class_list .= " field_type_".$field->field_type;
 					?>
-					<li class="fields user" id="field_<?php echo $field->name; ?>"><?php echo $field->label.' #'.$field->id; ?></li>
+					<li class="<?php echo $class_list; ?>" id="field_<?php echo $field->name; ?>"><?php echo $field->label.' #'.$field->id; ?></li>
 					<?php
 						endif;
 					endforeach;
@@ -200,7 +218,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 								case 'category': $msg='in each individual <b>Category</b>'; break;
 								default: $msg='in each <b>'.$this->layout->view.'</b>'; break;
 							}
-							echo "<div class='positions_readonly' style='padding:1px 1px 1px 16px;'>NON-editable position.<br> To customize edit TEMPLATE parameters ".$msg."</div>";
+							echo "<div class='positions_readonly'>NON-editable position.<br> To customize edit TEMPLATE parameters ".$msg."</div>";
 							continue;
 						}
 						?>
@@ -209,8 +227,13 @@ defined('_JEXEC') or die('Restricted access'); ?>
 						if (isset($this->fbypos[$pos])) :
 							foreach ($this->fbypos[$pos]->fields as $f) :
 								if (isset($this->fields[$f])) : // this check is in case a field was deleted
+									
+									$class_list  = "fields ". ($this->fields[$f]->iscore ? 'core' : 'user');
+									$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
+									$class_list .= " field_type_".$field->field_type;
+
 						?>
-							<li class="fields <?php echo $this->fields[$f]->iscore ? 'core' : 'user'; ?>" id="field_<?php echo $this->fields[$f]->name; ?>">
+							<li class="<?php echo $class_list; ?>" id="field_<?php echo $this->fields[$f]->name; ?>">
 							<?php echo $this->fields[$f]->label . ($this->fields[$f]->iscore ? '' : ' #'.$this->fields[$f]->id); ?>
 							</li>
 						<?php
@@ -243,3 +266,5 @@ defined('_JEXEC') or die('Restricted access'); ?>
 	<input type="hidden" name="task" value="" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
+
+</div>

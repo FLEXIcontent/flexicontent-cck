@@ -41,7 +41,7 @@ class JFormFieldFieldtypes extends JFormFieldList{
 
 	protected function getOptions() {
 		global $global_field_types;
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		$query = 'SELECT element AS value, REPLACE(name, "FLEXIcontent - ", "") AS text'
 		. ' FROM '.(FLEXI_J16GE ? '#__extensions' : '#__plugins')
