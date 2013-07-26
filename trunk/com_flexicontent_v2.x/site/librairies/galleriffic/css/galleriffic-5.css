@@ -48,7 +48,7 @@ div#gf_container div.slideshow-container {
 	position: relative;
 	clear: both;
 	float: left;
-	height: 532px;
+	height: 562px;
 }
 
 div#gf_container div.loader {
@@ -62,11 +62,12 @@ div#gf_container div.loader {
 div#gf_container div.slideshow span.image-wrapper {
 	display: block;
 	position: absolute;
-	top: 30px;
 	left: 0;
 }
 div#gf_container div.slideshow a.advance-link {
 	display: block;
+	/* TODO check line-height */
+	line-height: 502px; /* This should be set to be at least the height of the largest image in the slideshow with padding */
 	text-align: center;
 }
 
@@ -195,6 +196,7 @@ div#gf_container div.gallery-gutter {
 	padding-bottom: 20px;
 }
 
+/* TODO check this */
 div#gf_container div.slideshow a.advance-link img {
 	max-width: 500px;
 	max-height: 500px;

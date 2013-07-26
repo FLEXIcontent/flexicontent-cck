@@ -296,11 +296,7 @@ class flexicontent_html
 			
 			case 'inputmask':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				// Load Library and also 3 files with built-in sets of masks
-				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.js' );
-				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.extensions.js' );
-				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.date.extensions.js' );
-				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.numeric.extensions.js' );
+				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.bundle.min.js' );
 				
 				// Extra inputmask declarations definitions, e.g. ...
 				/*$js .= "

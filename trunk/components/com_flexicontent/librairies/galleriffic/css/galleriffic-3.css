@@ -51,6 +51,8 @@ div#gf_container div.slideshow span.image-wrapper {
 div#gf_container div.slideshow a.advance-link {
 	display: block;
 	width: 550px;
+	height: 502px; /* This should be set to be at least the height of the largest image in the slideshow */
+	line-height: 502px; /* This should be set to be at least the height of the largest image in the slideshow */
 	text-align: center;
 }
 div#gf_container div.slideshow a.advance-link:hover, div#gf_container div.slideshow a.advance-link:active, div#gf_container div.slideshow a.advance-link:visited {
@@ -147,6 +149,7 @@ div#gf_container div.pagination span.ellipsis {
 	padding: 5px 0 3px 2px;
 }
 
+/* TODO check this */
 div#gf_container div.slideshow a.advance-link img {
 	max-width: 500px;
 	max-height: 500px;

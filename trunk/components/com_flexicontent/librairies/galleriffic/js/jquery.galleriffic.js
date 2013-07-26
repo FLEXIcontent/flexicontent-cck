@@ -6,6 +6,8 @@
  *   http://www.opensource.org/licenses/mit-license.php
  *
  * Much thanks to primary contributer Ponticlaro (http://www.ponticlaro.com)
+ *
+ * Modifed by Jay Hayes (http://iamvery.com)
  */
 ;(function($) {
 	// Globally keep track of all images by their unique hash.  Each item is an image data object.
@@ -14,7 +16,7 @@
 
 	// Galleriffic static class
 	$.galleriffic = {
-		version: '2.0.1',
+		version: '2.1.0',
 
 		// Strips invalid characters and any leading # characters
 		normalizeHash: function(hash) {
@@ -72,10 +74,9 @@
 		maxPagesToShow:            7,
 		imageContainerSel:         '',
 		captionContainerSel:       '',
-		controlsContainerSel:      '',
+		ssControlsContainerSel:    '',
+		navControlsContainerSel:   '',
 		loadingContainerSel:       '',
-		renderSSControls:          true,
-		renderNavControls:         true,
 		playLinkText:              'Play',
 		pauseLinkText:             'Pause',
 		prevLinkText:              'Previous',
@@ -83,6 +84,8 @@
 		nextPageLinkText:          'Next &rsaquo;',
 		prevPageLinkText:          '&lsaquo; Prev',
 		enableHistory:             false,
+		enableFancybox:            false,
+		fancyOptions:              {}, 
 		enableKeyboardNavigation:  true,
 		autoStart:                 false,
 		syncTransitions:           false,
@@ -145,6 +148,7 @@
 				var slideUrl = $aThumb.attr('href');
 				var title = $aThumb.attr('title');
 				var $caption = $li.find('.caption').remove();
+				var $fancy = $li.find('a.fancy').remove();
 				var hash = $aThumb.attr('name');
 
 				// Increment the image counter
@@ -163,6 +167,7 @@
 					title:title,
 					slideUrl:slideUrl,
 					caption:$caption,
+					fancy:$fancy,
 					hash:hash,
 					gallery:this,
 					index:position
@@ -382,8 +387,8 @@
 					this.slideshowTimeout = undefined;
 				}
 
-				if (this.$controlsContainer) {
-					this.$controlsContainer
+				if (this.$ssControlsContainer) {
+					this.$ssControlsContainer
 						.find('div.ss-controls a').removeClass().addClass('play')
 						.attr('title', this.playLinkText)
 						.attr('href', '#play')
@@ -397,8 +402,8 @@
 			play: function() {
 				this.isSlideshowRunning = true;
 
-				if (this.$controlsContainer) {
-					this.$controlsContainer
+				if (this.$ssControlsContainer) {
+					this.$ssControlsContainer
 						.find('div.ss-controls a').removeClass().addClass('pause')
 						.attr('title', this.pauseLinkText)
 						.attr('href', '#pause')
@@ -492,7 +497,7 @@
 				var imageData = this.data[index];
 				
 				if (!bypassHistory && this.enableHistory)
-					$.historyLoad(String(imageData.hash));  // At the moment, historyLoad only accepts string arguments
+					$.history.load(String(imageData.hash));  // At the moment, history.load only accepts string arguments
 				else
 					this.gotoImage(imageData);
 
@@ -504,7 +509,11 @@
 			gotoImage: function(imageData) {
 				var index = imageData.index;
 
-				if (this.onSlideChange)
+				// Prevent reloading same image
+				if (this.currentImage && this.currentImage.index == index)
+					return this;
+
+				if (this.onSlideChange && this.currentImage)
 					this.onSlideChange(this.currentImage.index, index);
 				
 				this.currentImage = imageData;
@@ -533,8 +542,8 @@
 				var index = imageData.index;
 
 				// Update Controls
-				if (this.$controlsContainer) {
-					this.$controlsContainer
+				if (this.$navControlsContainer) {
+					this.$navControlsContainer
 						.find('div.nav-controls a.prev').attr('href', '#'+this.data[this.getPrevIndex(index)].hash).end()
 						.find('div.nav-controls a.next').attr('href', '#'+this.data[this.getNextIndex(index)].hash);
 				}
@@ -627,14 +636,21 @@
 
 				// Construct new hidden span for the image
 				var newSlide = this.$imageContainer
-					.append('<span class="image-wrapper current"><a class="advance-link" rel="history" href="#'+this.data[nextIndex].hash+'" title="'+imageData.title+'">&nbsp;</a></span>')
+					.append('<span class="image-wrapper current"></span>')
 					.find('span.current').css('opacity', '0');
-				
-				newSlide.find('a')
-					.append(imageData.image)
-					.click(function(e) {
+
+				if (this.enableFancybox && imageData.fancy.attr('href')) {
+					newSlide.append('<a class="fancy-link" href="' + imageData.fancy.attr('href') + '" title="' + imageData.title + '">&nbsp;</a>');
+					newSlide.find('a').fancybox(this.fancyOptions);
+				} else {
+					newSlide.append('<a class="advance-link" rel="history" href="#'+this.data[nextIndex].hash+'" title="'+imageData.title+'">&nbsp;</a>');
+					newSlide.find('a').click(function(e) {
 						gallery.clickHandler(e, this);
 					});
+				}
+
+				newSlide.find('a')
+					.append(imageData.image);
 				
 				var newCaption = 0;
 				if (this.$captionContainer) {
@@ -865,8 +881,12 @@
 		$.extend(this, defaults, settings);
 		
 		// Verify the history plugin is available
-		if (this.enableHistory && !$.historyInit)
+		if (this.enableHistory && !$.history)
 			this.enableHistory = false;
+		
+		// Verify the fancybox plugin is available
+		if (this.enableFancybox && !$.fancybox)
+			this.enableFancybox = false;
 		
 		// Select containers
 		if (this.imageContainerSel) this.$imageContainer = $(this.imageContainerSel);
@@ -880,7 +900,6 @@
 			this.maxPagesToShow = 3;
 
 		this.displayedPage = -1;
-		this.currentImage = this.data[0];
 		var gallery = this;
 
 		// Hide the loadingContainer
@@ -888,34 +907,32 @@
 			this.$loadingContainer.hide();
 
 		// Setup controls
-		if (this.controlsContainerSel) {
-			this.$controlsContainer = $(this.controlsContainerSel).empty();
-			
-			if (this.renderSSControls) {
-				if (this.autoStart) {
-					this.$controlsContainer
-						.append('<div class="ss-controls"><a href="#pause" class="pause" title="'+this.pauseLinkText+'">'+this.pauseLinkText+'</a></div>');
-				} else {
-					this.$controlsContainer
-						.append('<div class="ss-controls"><a href="#play" class="play" title="'+this.playLinkText+'">'+this.playLinkText+'</a></div>');
-				}
-
-				this.$controlsContainer.find('div.ss-controls a')
-					.click(function(e) {
-						gallery.toggleSlideshow();
-						e.preventDefault();
-						return false;
-					});
+		if (this.ssControlsContainerSel) {
+			this.$ssControlsContainer = $(this.ssControlsContainerSel).empty();
+			if (this.autoStart) {
+				this.$ssControlsContainer
+					.append('<div class="ss-controls"><a href="#pause" class="pause" title="'+this.pauseLinkText+'">'+this.pauseLinkText+'</a></div>');
+			} else {
+				this.$ssControlsContainer
+					.append('<div class="ss-controls"><a href="#play" class="play" title="'+this.playLinkText+'">'+this.playLinkText+'</a></div>');
 			}
+        
+			this.$ssControlsContainer.find('div.ss-controls a')
+				.click(function(e) {
+					gallery.toggleSlideshow();
+					e.preventDefault();
+					return false;
+				});
+		}
 		
-			if (this.renderNavControls) {
-				this.$controlsContainer
-					.append('<div class="nav-controls"><a class="prev" rel="history" title="'+this.prevLinkText+'">'+this.prevLinkText+'</a><a class="next" rel="history" title="'+this.nextLinkText+'">'+this.nextLinkText+'</a></div>')
-					.find('div.nav-controls a')
-					.click(function(e) {
-						gallery.clickHandler(e, this);
-					});
-			}
+		if (this.navControlsContainerSel) {
+			this.$navControlsContainer = $(this.navControlsContainerSel).empty();
+			this.$navControlsContainer
+				.append('<div class="nav-controls"><a class="prev" rel="history" title="'+this.prevLinkText+'">'+this.prevLinkText+'</a><a class="next" rel="history" title="'+this.nextLinkText+'">'+this.nextLinkText+'</a></div>')
+				.find('div.nav-controls a')
+				.click(function(e) {
+					gallery.clickHandler(e, this);
+				});
 		}
 
 		var initFirstImage = !this.enableHistory || !location.hash;
