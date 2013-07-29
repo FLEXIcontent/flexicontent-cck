@@ -699,7 +699,8 @@ class modFlexicontentHelper
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
 				$where .= ' AND ty.access IN (0,'.$aid_list.')';
-				$where .= ' AND mc.access IN (0,'.$aid_list.')';
+				//$where .= ' AND mc.access IN (0,'.$aid_list.')';
+				$where .= ' AND c.access IN (0,'.$aid_list.')';
 				$where .= ' AND  i.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
@@ -708,11 +709,13 @@ class modFlexicontentHelper
 					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
 					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
 					$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
+					//$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
+					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
 					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
 				} else {
 					$where .= ' AND ty.access <= '.$aid;
-					$where .= ' AND mc.access <= '.$aid;
+					//$where .= ' AND mc.access <= '.$aid;
+					$where .= ' AND c.access <= '.$aid;
 					$where .= ' AND  i.access <= '.$aid;
 				}
 			}
@@ -1352,7 +1355,7 @@ class modFlexicontentHelper
 				. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
 				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 				. ' JOIN #__categories AS  c ON  c.id = rel.catid'
-				. ' JOIN #__categories AS mc ON mc.id = i.catid'
+				//. ' JOIN #__categories AS mc ON mc.id = i.catid'
 				. $joinaccess
 				. $join_favs
 				. $join_date
