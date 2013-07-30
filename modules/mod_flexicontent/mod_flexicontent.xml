@@ -451,6 +451,7 @@
 			<field name="vote_stars_feat" type="radio" default="1" label="FLEXI_VOTING_NUMOF_STARS" description="FLEXI_VOTING_NUMOF_STARS_DESC" >
 				<option value="1">FLEXI_VOTING_ONE_STAR_RECOMMENDED</option>
 				<option value="5">FLEXI_VOTING_FIVE_STAR</option>
+				<option value="0">FLEXI_VOTING_DEFAULT_STARS</option>
 			</field>
 			<field name="allow_vote_feat" type="radio" default="0" label="FLEXI_VOTING_ALLOW" description="FLEXI_VOTING_ALLOW_DESC" >
 				<option value="0">FLEXI_NO_RECOMMENDED</option>

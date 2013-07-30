@@ -38,11 +38,12 @@ class FlexicontentViewFavourites extends JViewLegacy
 	function display( $tpl = null )
 	{
 		//initialize variables
-		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
-		$menus    = $app->getMenu();
-		$menu     = $menus->getActive();
-		$uri      = JFactory::getURI();
+		$app   = JFactory::getApplication();
+		$menus = $app->getMenu();
+		$menu  = $menus->getActive();
+		$uri   = JFactory::getURI();
+		$view  = JRequest::getCmd('view');
 		
 		// No parameters via model, get the COMPONENT only parameters and then merge current menu item parameters
 		$params = clone( JComponentHelper::getParams('com_flexicontent') );
@@ -54,6 +55,9 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// Get various data from the model
 		$items   = $this->get('Data');
 		$total   = $this->get('Total');
+		
+		// Make sure field values were retrieved e.g. we need 'item->categories' for template classes
+		$items 	= FlexicontentFields::getFields($items, $view, $params);
 		
 		
 		// ********************************
@@ -77,7 +81,7 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// **********************
 		
 		// Verify menu item points to current FLEXIcontent object, IF NOT then clear page title and page class suffix
-		if ( $menu && $menu->query['view'] != 'favourites' ) {
+		if ( $menu && $menu->query['view'] != $view ) {
 			$params->set('page_title',	'');
 			$params->set('pageclass_sfx',	'');
 		}
@@ -155,14 +159,14 @@ class FlexicontentViewFavourites extends JViewLegacy
 		$lists['filter']			= $filter;
 		
 		// Create links
-		$fav_link    = JRoute::_( JRequest::getInt('Itemid') ? 'index.php?Itemid='.JRequest::getInt('Itemid') : 'index.php?view=favourites', false );
+		$link = JRoute::_( JRequest::getInt('Itemid') ? 'index.php?Itemid='.JRequest::getInt('Itemid') : 'index.php?view=favourites', false );
 		$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
 		
 		// Create the pagination object
 		$pageNav = $this->get('pagination');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
-		$this->assignRef('action',    $fav_link);  // $uri->toString()
+		$this->assignRef('action',    $link);  // $uri->toString()
 		$this->assignRef('print_link',$print_link);
 		$this->assignRef('items',     $items);
 		$this->assignRef('lists',     $lists);

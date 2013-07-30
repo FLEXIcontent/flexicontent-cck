@@ -109,13 +109,13 @@ class FlexicontentModelTypes extends JModelList
 		$query->select(
 			$this->getState(
 				'list.select',
-				't.*, u.name AS editor, g.title AS groupname, COUNT(rel.type_id) AS fassigned, ('.$subquery.') AS iassigned, t.attribs AS config'
+				't.*, u.name AS editor, level.title AS access_level, COUNT(rel.type_id) AS fassigned, ('.$subquery.') AS iassigned, t.attribs AS config'
 			)
 		);
 		
 		$query->from('#__flexicontent_types AS t');
 		$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON t.id = rel.type_id');
-		$query->join('LEFT', '#__usergroups AS g ON g.id = t.access');
+		$query->join('LEFT', '#__viewlevels AS level ON level.id=t.access');
 		$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
 		$query->group('t.id');
 		

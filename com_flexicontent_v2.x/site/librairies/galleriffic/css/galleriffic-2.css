@@ -104,9 +104,11 @@ div#gf_container ul.thumbs li {
 	list-style: none;
 }
 div#gf_container a.thumb {
-	padding: 2px;
+	/*padding: 2px;*/
+	/*border: 1px solid #ccc;*/
+	padding: 0px;
+	border: 0px solid;
 	display: block;
-	border: 1px solid #ccc;
 }
 div#gf_container ul.thumbs li.selected a.thumb {
 	background: #000;

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="2.5" type="plugin" group="finder" method="upgrade">
+	<name>plg_finder_flexicontent</name>
+	<author>FLEXIcontent Project</author>
+	<creationDate>July 2013</creationDate>
+	<copyright>(C) 2013 FLEXIcontent Project. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see	LICENSE.txt</license>
+	<authorEmail>ggppdk@...</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>2.5.0</version>
+	<description>PLG_FINDER_FLEXICONTENT_XML_DESCRIPTION</description>
+	<scriptfile>script.php</scriptfile>
+	<files>
+		<file plugin="flexicontent">flexicontent.php</file>
+    	<filename>index.html</filename>
+	</files>
+	<languages>
+		<language tag="en-GB">en-GB.plg_finder_flexicontent.ini</language>
+		<language tag="en-GB">en-GB.plg_finder_flexicontent.sys.ini</language>
+	</languages>
+</extension>

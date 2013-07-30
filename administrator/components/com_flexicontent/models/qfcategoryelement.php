@@ -86,70 +86,112 @@ class FlexicontentModelQfcategoryelement extends JModelLegacy
 	}
 
 	/**
-	 * Method to get categories item data
+	 * Method to get categories data
 	 *
 	 * @access public
 	 * @return array
+	 * @since	1.0
 	 */
 	function getData()
 	{
-		$app    = JFactory::getApplication();
-		$params = JComponentHelper::getParams('com_flexicontent');
+		$app  = JFactory::getApplication();
+		$db   = JFactory::getDBO();
+		$user = JFactory::getUser();
+		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		global $globalcats;
 		
-		$filter_order     = $app->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order', 		'filter_order', 	'c.ordering', 'cmd' );
-		$filter_order_Dir	= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_state', 'filter_state', '', 'word' );
-		$search 			= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.search', 'search', '', 'string' );
-		$search 			= trim( JString::strtolower( $search ) );
-		$limit				= $app->getUserStateFromRequest( 'com_flexicontent.limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart 	= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.limitstart', 'limitstart', 0, 'int' );
+		$order_property = !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     $order_property, 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', '', 'word' );
+		$filter_cats      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',			 'filter_cats',			 '', 'int' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',     'filter_state',     '', 'string' );
+		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
+		$filter_level     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_level',     'filter_level',     '', 'string' );
+		if (FLEXI_J16GE) {
+			$filter_language  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_language',  'filter_language',  '', 'string' );
+		}
+		$search           = $app->getUserStateFromRequest( $option.'.'.$view.'.search',           'search',           '', 'string' );
+		$search           = trim( JString::strtolower( $search ) );
+		$limit            = $app->getUserStateFromRequest( $option.'.'.$view.'.limit', 'limit', $app->getCfg('list_limit'), 'int');
+		$limitstart       = $app->getUserStateFromRequest( $option.'.'.$view.'.limitstart', 'limitstart', 0, 'int' );
 		
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', c.ordering';
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', '. $order_property;
 		
 		$where = array();
-		if ( $filter_state ) {
+		
+		// Filter by publication state, ... breaks tree construction, commented out and done below
+		/*if ( $filter_state ) {
 			if ( $filter_state == 'P' ) {
 				$where[] = 'c.published = 1';
 			} else if ($filter_state == 'U' ) {
 				$where[] = 'c.published = 0';
 			}
+		}*/
+		
+		// Filter by access level, ... breaks tree construction, commented out and done below
+		/*if ( $filter_access ) {
+			$where[] = 'c.access = '.(int) $filter_access;
+		}*/
+		
+		if ( $filter_cats && isset($globalcats[$filter_cats]) )  {
+			// Limit category list to those contain in the subtree of the choosen category
+			$where[] = 'c.id IN (' . $globalcats[$filter_cats]->descendants . ')';
+		}
+		
+		// Filter on the level.
+		if ( $filter_level ) {
+			$cats = array();
+			$filter_level = (int) $filter_level;
+			foreach($globalcats as $cat) {
+				if ( @$cat->level <= $filter_level) $cats[] = $cat->id;
+			}
+			if ( !empty($cats) ) {
+				$where[] = 'c.id IN (' . implode(",", $cats) . ')';
+			}
 		}
 		
 		$where 		= ( count( $where ) ? ' AND ' . implode( ' AND ', $where ) : '' );
 		
-		//select the records
-		//note, since this is a tree we have to do the limits code-side
+		// Note, since this is a tree we have to do the WORD SEARCH separately.
 		if ($search) {			
 			$query = 'SELECT c.id'
 					. ' FROM #__categories AS c'
-					. ' WHERE LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false )
+					. ' WHERE LOWER(c.title) LIKE '.$db->Quote( '%'.$db->getEscaped( $search, true ).'%', false )
 					. ' AND c.section = ' . FLEXI_SECTION
 					. $where
 					;
-			$this->_db->setQuery( $query );
-			$search_rows = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();					
+			$db->setQuery( $query );
+			$search_rows = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();					
 		}
 		
-		$query = 'SELECT c.*, u.name AS editor, g.name AS groupname, COUNT(rel.catid) AS nrassigned'
+		$query = 'SELECT c.*, u.name AS editor, COUNT(rel.catid) AS nrassigned, c.params as config, '
+					. (FLEXI_J16GE ? 'level.title AS access_level' : 'g.name AS groupname')
 					. ' FROM #__categories AS c'
 					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-					. ' LEFT JOIN #__groups AS g ON g.id = c.access'
+					. (FLEXI_J16GE ?
+					  ' LEFT JOIN #__viewlevels AS level ON level.id=c.access' :
+					  ' LEFT JOIN #__groups AS g ON g.id = c.access'
+						)
 					. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
-					. ' LEFT JOIN #__sections AS sec ON sec.id = c.section'
-					. ' WHERE c.section = ' . FLEXI_SECTION
-					. ' AND sec.scope = ' . $this->_db->Quote('content')
+					. (FLEXI_J16GE ? '' : ' LEFT JOIN #__sections AS sec ON sec.id = c.section')
+					. (FLEXI_J16GE ? 
+					  ' WHERE c.extension = '.$db->Quote(FLEXI_CAT_EXTENSION).' AND c.lft >= ' . $db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$db->Quote(FLEXI_RGT_CATEGORY) :
+					  ' WHERE c.section = '.FLEXI_SECTION
+					)
+					. (FLEXI_J16GE ? '' : ' AND sec.scope = ' . $db->Quote('content'))
 					. $where
 					. ' GROUP BY c.id'
 					. $orderby
 					;
-		$this->_db->setQuery( $query );
-		$rows = $this->_db->loadObjectList();
+		$db->setQuery( $query );
+		$rows = $db->loadObjectList();
 		
 		//establish the hierarchy of the categories
 		$children = array();
 		
-		//set depth limit
-		$levellimit = 10;
+		// Set depth limit
+		$levellimit = 30;
 		
 		foreach ($rows as $child) {
 			$parent = $child->parent_id;
@@ -157,34 +199,54 @@ class FlexicontentModelQfcategoryelement extends JModelLegacy
 			array_push($list, $child);
 			$children[$parent] = $list;
 		}
-    	
-    	//get list of the items
-    	$list = flexicontent_cats::treerecurse(0, '', array(), $children, false, max(0, $levellimit-1));
-
-    	//eventually only pick out the searched items.
+    
+		// Put found items into a tree, in the case of displaying the subree of top level category use the parent id of the category
+		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 :0;
+		$root_cat = !$filter_cats ? $ROOT_CATEGORY_ID : $globalcats[$filter_cats]->parent_id;
+		$list = flexicontent_cats::treerecurse($root_cat, '', array(), $children, false, max(0, $levellimit-1));
+		
+		// Eventually only pick out the searched items.
 		if ($search)
 		{
-			$list1 = array();
-
-			foreach ($search_rows as $sid )
+			$srows = array();
+			foreach ($search_rows as $sid) $srows[$sid] = 1;
+			
+			$list_search = array();
+			foreach ($list as $item)
 			{
-				foreach ($list as $item)
-				{
-					if ($item->id == $sid) {
-						$list1[] = $item;
-					}
-				}
+				if ( @ $srows[$item->id] )  $list_search[] = $item;
 			}
-			// replace full list with found items
-			$list = $list1;
+			$list = $list_search;
 		}
 		
+		// Filter by access level
+		if ( $filter_access ) {
+			$_access = (int) $filter_access;
+			
+			$list_search = array();
+			foreach ($list as $item) {
+				if ( $item->access == $_access)  $list_search[] = $item;
+			}
+			$list = $list_search;
+		}
+		
+		// Filter by publication state
+		if ( $filter_state == 'P' || $filter_state == 'U' ) {
+			$_state = $filter_state == 'P' ? 1 : 0;
+			
+			$list_search = array();
+			foreach ($list as $item) {
+				if ( $item->published == $_state)  $list_search[] = $item;
+			}
+			$list = $list_search;
+		}
+		
+		// Create pagination object
 		$total = count( $list );
-
 		jimport('joomla.html.pagination');
 		$this->_pagination = new JPagination( $total, $limitstart, $limit );
 
-		// slice out elements based on limits
+		// Slice out elements based on limits
 		$list = array_slice( $list, $this->_pagination->limitstart, $this->_pagination->limit );
 		
 		return $list;

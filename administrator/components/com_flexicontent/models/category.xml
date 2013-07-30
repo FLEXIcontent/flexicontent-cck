@@ -297,6 +297,26 @@
 				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order" defaultvals=""
 				label="FLEXI_PRIMARY_ORDER_OPTIONS" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
 			
+			<field name="" type="separator" default="FLEXI_ITEMS_LIST_MARKUPS" level="level2" />
+			<field name="" type="separator" default="FLEXI_ADD_CSS_MARKUPS" level="level3" />
+			<field name="add_item_cats_mu" type="list" default="" label="FLEXI_CATEGORY_MARKUPS" description="FLEXI_CATEGORY_MARKUPS_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="add_view_access_mu" type="list" default="" label="FLEXI_VIEW_ACCESS_MARKUPS" description="FLEXI_VIEW_ACCESS_MARKUPS_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="add_recently_added_mu" type="list" default="" label="FLEXI_RECENTLY_ADDED_MARKUPS" description="FLEXI_RECENTLY_ADDED_MARKUPS_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_CSS_MARKUPS_CONFIGURATION" level="level3" />
+			<field name="recently_added_timeframes" type="text" size="40" default="" label="FLEXI_RECENTLY_ADDED_TIMEFRAMES" description="FLEXI_RECENTLY_ADDED_TIMEFRAMES_DESC" />
+			
 		</params>
 		
 		<params group="cat_item_filtering" addpath="/administrator/components/com_flexicontent/elements">
@@ -306,7 +326,7 @@
 			<field name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="4" cols="30" />
 			<field name="alphagrpcssclasses" type="textarea" default="letters!!numbers" label="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES" description="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES_DESC" rows="2" cols="30" />
 			<field name="alphacharseparator" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR" description="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR_DESC" />
-			<field name="alphaaliases" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES" description="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES_DESC" />
+			<field name="alphaaliases" type="text" default="" label="FLEXI_CUSTOM_ALPHA_ALIASES" description="FLEXI_CUSTOM_ALPHA_ALIASES_DESC" />
 			<field name="alphaskipempty" type="list" default="" label="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY" description="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -387,7 +407,7 @@
 			</field>
 			<field name="filter_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
 			<field name="filter_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
-			<field name="filter_perrow" type="radio" default="" label="FLEXI_RECORD_PER_ROW" description="FLEXI_RECORD_PER_ROW_DESC" menu="hide" >
+			<field name="filter_perrow" type="list" default="" label="FLEXI_RECORD_PER_ROW" description="FLEXI_RECORD_PER_ROW_DESC" menu="hide" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -463,9 +483,9 @@
 	
 	
 	<params group="templates" addpath="/administrator/components/com_flexicontent/elements">	
-		<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 		<!-- Please do not change default category layout 'blog', as currently, it is hard coded in (a) the frontend category's view.html.php and (b) in the backend category manager listing -->
 		<field name="clayout" type="categorylayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
+		<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 	</params> 
 	
 </form>

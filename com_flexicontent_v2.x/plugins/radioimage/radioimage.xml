@@ -123,6 +123,12 @@
 			
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
 			
+			<field name="filter_compare_type" type="list" default="0" label="FLEXI_FILTER_VALUE_COMPARISON" description="FLEXI_FILTER_VALUE_COMPARISON_DESC">
+				<option value="0">FLEXI_ALPHANUMERIC</option>
+				<option value="1">FLEXI_INTEGER</option>
+				<option value="2">FLEXI_FLOAT</option>
+			</field>
+			
 			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level3" />
 			<field name="display_label_filter" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>

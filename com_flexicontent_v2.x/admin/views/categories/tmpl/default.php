@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 720 2011-07-30 02:59:27Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1677 2013-04-21 21:53:05Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -51,10 +51,11 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			</td>
 			<td nowrap="nowrap">
 				<div class="filter-select fltrt">
+					<?php echo $this->lists['cats']; ?>
 					<?php echo $this->lists['level']; ?>
 					<?php echo $this->lists['state']; ?>
 					<?php echo $this->lists['access']; ?>
-				  <?php echo $this->lists['language']; ?>
+				  <?php if (FLEXI_J16GE) echo $this->lists['language']; ?>
 				</div>
 			</td>
 		</tr>
@@ -77,9 +78,9 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				<?php echo JHTML::_('grid.sort', 'FLEXI_REORDER', 'c.lft', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php echo $this->orderingx ? JHTML::_('grid.order', $this->rows, 'filesave.png', 'categories.saveorder' ) : ''; ?>
 			</th>
-				<th width="5%" class="nowrap">
-					<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
-				</th>
+			<th width="5%" class="nowrap">
+				<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+			</th>
 			<th width="1%" nowrap="nowrap">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'c.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
@@ -99,23 +100,47 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 		$k = 0;
 		$i = 0;
 		$n = count($this->rows);
-		$canCats	= $this->permission->CanCats;
 		$originalOrders = array();
-		foreach ($this->rows as $row) {
-			$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
-			$link 		= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
-			$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'categories.access\')"');
+		$extension	= 'com_content';
+		
+		if (FLEXI_J16GE) {
+			$canCheckinRecords = $user->authorise('core.admin', 'checkin');
+		} else if (FLEXI_ACCESS) {
+			$canCheckinRecords = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
+		} else {
+			$canCheckinRecords = $user->gid >= 24;
+		}
+		foreach ($this->rows as $row)
+		{
+			if (FLEXI_J16GE) {
+				$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
+				$link	= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
+			} else {
+				$link	= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $row->id;
+			}
+			if (FLEXI_J16GE) {
+				$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'categories.access\')"');
+			} else if (FLEXI_ACCESS) {
+				$access 	= $this->CanRights ? FAccess::accessswitch('category', $row, $i)  :  FAccess::accessswitch('category', $row, $i, 'content', 1);
+			} else {
+				$access 	= JHTML::_('grid.access', $row, $i );
+			}
 			$checked 	= JHTML::_('grid.checkedout', $row, $i );
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
 			
-			$extension	= 'com_content';
-			$canEdit		= $user->authorise('core.edit', $extension.'.category.'.$row->id);
-			$canEditOwn	= $user->authorise('core.edit.own', $extension.'.category.'.$row->id) && $row->created_user_id == $user->get('id');
-			$canEditState			= $user->authorise('core.edit.state', $extension.'.category.'.$row->id);
-			$canEditStateOwn	= $user->authorise('core.edit.state.own', $extension.'.category.'.$row->id) && $row->created_user_id==$user->get('id');
-			$canCheckin		= $user->authorise('core.admin', 'checkin') && $row->checked_out == $user->id;
-			$canChange		= ($canEditState || $canEditStateOwn ) && ($canCheckin || !$row->checked_out);
-			$published		= JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange );
+			if (FLEXI_J16GE) {
+				$canEdit		= $user->authorise('core.edit', $extension.'.category.'.$row->id);
+				$canEditOwn	= $user->authorise('core.edit.own', $extension.'.category.'.$row->id) && $row->created_user_id == $user->get('id');
+				$canEditState			= $user->authorise('core.edit.state', $extension.'.category.'.$row->id);
+				$canEditStateOwn	= $user->authorise('core.edit.state.own', $extension.'.category.'.$row->id) && $row->created_user_id==$user->get('id');
+				$recordAvailable	= ($canCheckinRecords && $row->checked_out == $user->id) || !$row->checked_out;
+				$canChange		= ($canEditState || $canEditStateOwn ) && $recordAvailable;
+				$published		= JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange );
+			} else {
+				$canEdit		= 1;
+				$canEditOwn	= 1;
+				$published 	= JHTML::_('grid.published', $row, $i );
+			}
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
@@ -144,13 +169,8 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				
 				// Display an icon with checkin link, if current user has checked out current item
 				if ($row->checked_out) {
-					if (FLEXI_J16GE) {
-						$canCheckin = $user->authorise('core.admin', 'checkin');
-					} else if (FLEXI_ACCESS) {
-						$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
-					} else {
-						$canCheckin = $user->gid >= 24;
-					}
+					// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (a) record checked out by current user
+					$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
 					if ($canCheckin) {
 						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'categories.', $canCheckin);
 						$task_str = FLEXI_J16GE ? 'categories.checkin' : 'checkin';
@@ -224,17 +244,18 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				<?php echo $orderkey + 1;?>
 			<?php endif; ?>
 			</td>
-					<td class="center nowrap">
-					<?php if ($row->language=='*'):?>
-						<?php echo JText::alt('JALL','language'); ?>
-					<?php else:?>
-						<?php echo $row->language_title ? $this->escape($row->language_title) : JText::_('JUNDEFINED'); ?>
-					<?php endif;?>
-					</td>
-					<td class="center">
-						<span title="<?php echo sprintf('%d-%d', $row->lft, $row->rgt);?>">
-							<?php echo (int) $row->id; ?></span>
-					</td>
+			<td class="center nowrap">
+			<?php if ($row->language=='*'):?>
+				<?php echo JText::alt('JALL','language'); ?>
+			<?php else:?>
+				<?php echo $row->language_title ? $this->escape($row->language_title) : JText::_('JUNDEFINED'); ?>
+			<?php endif;?>
+			</td>
+			<td align="center">
+				<span title="<?php echo sprintf('%d-%d', $row->lft, $row->rgt);?>">
+				<?php echo $row->id; ?>
+				</span>
+			</td>
 		</tr>
 		<?php 
 			$k = 1 - $k;

@@ -1,5 +1,14 @@
 /* Faq Theme : category template CSS file */
 
+#flexicontent .flexi.label,
+#flexicontent .flexi.value
+{
+	display:block;
+	float:left;
+	max-width: 100% !important;  /* Allow responsive width while floating */
+	padding: 0% !important;  /* Allow responsive width while floating */
+}
+
 #flexicontent ul.faqblock {
 	margin: 0;
 	padding: 0;

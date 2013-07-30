@@ -219,25 +219,34 @@
 		<copy file="plugins/flexicontent_fields/relation_reverse.xml" tofile="flexipack/plugins/relation_reverse/relation_reverse.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_relation_reverse.ini" tofile="flexipack/plugins/relation_reverse/en-GB.plg_flexicontent_fields_relation_reverse.ini" />
 		
-		<copy file="plugins/flexicontent/flexinotify.php" tofile="flexipack/plugins/flexinotify/flexinotify.php" />
-		<copy file="plugins/flexicontent/flexinotify.xml" tofile="flexipack/plugins/flexinotify/flexinotify.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_flexinotify.ini" tofile="flexipack/plugins/flexinotify/en-GB.plg_flexicontent_flexinotify.ini" />
+		<copy file="plugins/flexicontent/flexinotify.php" tofile="flexipack/plugins/flexicontent/flexinotify.php" />
+		<copy file="plugins/flexicontent/flexinotify.xml" tofile="flexipack/plugins/flexicontent/flexinotify.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_flexinotify.ini" tofile="flexipack/plugins/flexicontent/en-GB.plg_flexicontent_flexinotify.ini" />
 
-		<copy file="plugins/search/flexiadvsearch.php" tofile="flexipack/plugins/advsearch/flexiadvsearch.php" />
-		<copy file="plugins/search/flexiadvsearch.xml" tofile="flexipack/plugins/advsearch/flexiadvsearch.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_search_flexiadvsearch.ini" tofile="flexipack/plugins/advsearch/en-GB.plg_search_flexiadvsearch.ini" />
+		<copy file="plugins/search/flexiadvsearch.php" tofile="flexipack/plugins/flexiadvsearch/flexiadvsearch.php" />
+		<copy file="plugins/search/flexiadvsearch.xml" tofile="flexipack/plugins/flexiadvsearch/flexiadvsearch.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_search_flexiadvsearch.ini" tofile="flexipack/plugins/flexiadvsearch/en-GB.plg_search_flexiadvsearch.ini" />
 		
-		<copy file="plugins/search/flexisearch.php" tofile="flexipack/plugins/search/flexisearch.php" />
-		<copy file="plugins/search/flexisearch.xml" tofile="flexipack/plugins/search/flexisearch.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_search_flexisearch.ini" tofile="flexipack/plugins/search/en-GB.plg_search_flexisearch.ini" />
+		<copy file="plugins/search/flexisearch.php" tofile="flexipack/plugins/flexisearch/flexisearch.php" />
+		<copy file="plugins/search/flexisearch.xml" tofile="flexipack/plugins/flexisearch/flexisearch.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_search_flexisearch.ini" tofile="flexipack/plugins/flexisearch/en-GB.plg_search_flexisearch.ini" />
 
-		<copy file="plugins/system/flexisystem.php" tofile="flexipack/plugins/system/flexisystem.php" />
-		<copy file="plugins/system/flexisystem.xml" tofile="flexipack/plugins/system/flexisystem.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_system_flexisystem.ini" tofile="flexipack/plugins/system/en-GB.plg_system_flexisystem.ini" />
+		<copy file="plugins/system/flexisystem.php" tofile="flexipack/plugins/flexisystem/flexisystem.php" />
+		<copy file="plugins/system/flexisystem.xml" tofile="flexipack/plugins/flexisystem/flexisystem.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_system_flexisystem.ini" tofile="flexipack/plugins/flexisystem/en-GB.plg_system_flexisystem.ini" />
 
-		<copy file="plugins/system/flexiadvroute.php" tofile="flexipack/plugins/advroute/flexiadvroute.php" />
-		<copy file="plugins/system/flexiadvroute.xml" tofile="flexipack/plugins/advroute/flexiadvroute.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_system_flexiadvroute.ini" tofile="flexipack/plugins/advroute/en-GB.plg_system_flexiadvroute.ini" />
+		<copy file="plugins/system/flexiadvroute.php" tofile="flexipack/plugins/flexiadvroute/flexiadvroute.php" />
+		<copy file="plugins/system/flexiadvroute.xml" tofile="flexipack/plugins/flexiadvroute/flexiadvroute.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_system_flexiadvroute.ini" tofile="flexipack/plugins/flexiadvroute/en-GB.plg_system_flexiadvroute.ini" />
+		
+		<copy file="plugins/content/flexibreak.php" tofile="flexipack/plugins/flexibreak/flexibreak.php" />
+		<copy file="plugins/content/flexibreak.xml" tofile="flexipack/plugins/flexibreak/flexibreak.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_content_flexibreak.ini" tofile="flexipack/plugins/flexibreak/en-GB.plg_content_flexibreak.ini" />
+		<copy todir="flexipack/plugins/flexibreak/flexibreak" >
+			<fileset dir="plugins/content/flexibreak">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
 		
 		<move file="flexipack/admin/install.php" tofile="flexipack/install.php" />
 		<move file="flexipack/admin/manifest.xml" tofile="flexipack/manifest.xml" />

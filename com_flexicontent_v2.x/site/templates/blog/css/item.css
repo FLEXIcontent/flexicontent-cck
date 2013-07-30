@@ -87,6 +87,7 @@
 
 /* Default rule for elements: Use auto columns, via min-width we can have full row automaticaly for larger elements (pseudo colspan=2 via css) */
 .customblock .element {
+	max-width: 98%!important;
 	min-width: 48%!important;
 	padding: 0% 2% 0% 0%!important;
 	margin: 0%!important;

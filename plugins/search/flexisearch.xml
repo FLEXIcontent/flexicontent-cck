@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="plugin" version="1.5" group="search" method="upgrade">
 	<name>PLG_SEARCH_FLEXISEARCH</name>
-	<author>Emmanuel Danan, Aazam</author>
+	<author>Emmanuel Danan, Aazam, ggppdk</author>
 	<creationDate>oct 2011</creationDate>
 	<copyright>Copyright (C) 2011 Aazam, Emmanuel Danan</copyright>
 	<license>GNU/GPL v2</license>

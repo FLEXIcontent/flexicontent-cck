@@ -137,19 +137,11 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			global $globalcats;
 			$_catids = array();
 			foreach ($catids as $catid) {
-				$subcats = array_map('trim',explode(",",$globalcats[$catid]->descendants));
-				foreach ($subcats as $subcat) $_catids[(int)$subcat] = 1;
+				$subcats = $globalcats[$catid]->descendantsarray;
+				foreach ($subcats as $subcat)  $_catids[(int)$subcat] = 1;
 			}
 			$catids = array_keys($_catids);
 		}
-		
-		if ( $method_cat == 3 )      $allowed_cats = ($viewallcats) ? $catids : array_intersect($usercats, $catids);  // include method
-		else if ( $method_cat == 2 ) $disallowed_cats = ($viewallcats) ? $catids : array_diff($usercats, $catids);    // exclude method
-		else if (!$viewallcats)      $allowed_cats = $usercats;
-		
-		if ( $allowed_cats && ( !count($allowed_cats) || empty($allowed_cats[0]) ) ) $allowed_cats = false;
-		if ( $disallowed_cats && ( !count($disallowed_cats) || empty($disallowed_cats[0]) ) ) $disallowed_cats = false;
-		
 		
 		// ... TODO: retrieve items via AJAX
 		
@@ -158,9 +150,42 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		// *********************************************
 		$where = array();
 		
+		
+		// **************
 		// CATEGORY SCOPE
-		if ( $allowed_cats )    $where[] = " rel.catid IN (".implode(',',$allowed_cats ).") ";
-		if ( $disallowed_cats ) $where[] = " rel.catid NOT IN (".implode(',',$disallowed_cats ).") ";
+		// **************
+		
+		// Include method
+		if ( $method_cat == 3 ) {
+			
+			$allowed_cats = ($viewallcats) ? $catids : array_intersect($usercats, $catids);
+			if ( !empty($allowed_cats) ) {
+				$where[] = " rel.catid IN (".implode(',',$allowed_cats ).") ";
+			} else {
+				$field->html = JText::_('FLEXI_CANNOT_EDIT_FIELD') .': <br/> '. JText::_('FLEXI_NO_ACCESS_TO_USE_CONFIGURED_CATEGORIES');
+				return;
+			}
+		}
+		
+		// Exclude method
+		else if ( $method_cat == 2 ) {
+			$disallowed_cats = ($viewallcats) ? $catids : array_diff($usercats, $catids);
+			if ( !empty($disallowed_cats) ) {
+				$where[] = " rel.catid NOT IN (".implode(',',$disallowed_cats ).") ";
+			}
+		}
+		
+		// ALL user allowed categories
+		else if (!$viewallcats) {
+			$allowed_cats = $usercats;
+			if ( !empty($allowed_cats) ) {
+				$where[] = " rel.catid IN (".implode(',',$allowed_cats ).") ";
+			} else {
+				$field->html = JText::_('FLEXI_CANNOT_EDIT_FIELD') .': <br/> '. JText::_('FLEXI_NO_ACCESS_TO_USE_ANY_CATEGORIES');
+				return;
+			}
+		}
+		
 		
 		// TYPE SCOPE
 		if ( ($method_types == 2 || $method_types == 3) && ( !count($types) || empty($types[0]) ) ) {

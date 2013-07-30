@@ -108,7 +108,7 @@
 
 .fc_state_toggle_link {
 	float:left;
-	/*margin:5px 5px 0px 0px;*/
+	margin:5px 5px 0px 5px;
 }
 .fc_state_toggle_link_nopad {
 	float:left;
@@ -1206,23 +1206,23 @@ table.admintable td {
  * State Toggler
  ****************/
 
-.statetoggler {
+ul.statetoggler {
 	float: right !important;
 	display: inline-block !important;
 	list-style: none !important;
-	margin: 0 !important;
+	margin: 0px 0px 0px 10px !important;
 	padding: 0 !important;
 	width: auto !important;
 }
 
-.statetoggler .options {
+ul.statetoggler > li.topLevel > .options {
 	padding: 0 !important;
 	margin: 0 !important;
 	background: white !important;
 	position: relative !important;
 }
 
-.statetoggler .options ul {
+ul.statetoggler > li.topLevel > .options ul {
 	padding: 0 !important;
 	margin: 0 !important;
 	background: white !important;
@@ -1230,23 +1230,28 @@ table.admintable td {
 	width: auto !important;
 }
 
-.statetoggler li.topLevel, .statetoggler li ul li {
+ul.statetoggler > li.topLevel, .statetoggler > li.topLevel ul > li {
 	background: none repeat scroll 0 0 white !important;
 	overflow: visible !important;
-	width: 20px !important;
+	width: 22px !important;
 	min-height: 20px !important;
 	display: -moz-inline-stack !important;
 	display: inline-block !important;
 	vertical-align: top !important;
-	margin: 1px !important;
+	margin: 0px !important;
 	zoom: 1 !important;
 	*display: inline !important;
 	_height: 20px !important;
 }
 
-.statetoggler li ul li img {
+ul.statetoggler > li.topLevel ul > li img {
 	padding: 2px !important;
 	margin: 0px !important;
+}
+
+ul.statetoggler > li.topLevel > a.opener {
+	margin: 0px !important;
+	padding: 0px !important;
 }
 
 
@@ -1386,4 +1391,80 @@ div.fancybox-wrap a { background: none!important;}
 	/*width: 79%;*/
 	padding: 0px !important;
 	margin: 3px 0% 3px 0% !important;
+}
+
+#flexicontent .fc_mublock {
+	display:block;
+	float:left;
+	clear:both;
+	margin-bottom:6px;
+}
+
+#flexicontent .fc_markup {
+	float: right !important;
+	display: block !important;
+  background-color: #F2F2F2 !important;
+  border-width: 0px!important;
+  font-style: normal !important;
+  font-size: 11px !important;
+  font-family: arial !important;
+  font-weight: bold !important;
+  text-align: right !important;
+  max-width: 120px !important;
+  min-width: auto !important;
+  margin: 0px !important;
+  padding: 0px !important;
+  border-radius: 6px !important;
+}
+
+#flexicontent .fc_markup.mu_has_text {
+  border-bottom: 1px solid #D0D0D0 !important;
+  border-right: 1px solid #D0D0D0 !important;
+  margin: 2px 2px 2px 12px !important;
+  padding: 5px 3px 5px 3px !important;
+}
+
+#flexicontent .fc_markup.mu_featured_cat.mu_has_text {
+	padding-left: 24px !important;
+	background: url(../images/star.png) 4px 50% no-repeat transparent;
+	color: #333333 !important;
+}
+
+#flexicontent .fc_markup.mu_normal_cat.mu_has_text {
+	padding-left: 24px !important;
+	background: url(../images/star-empty.png) 4px 50% no-repeat transparent;
+	color: #777777 !important;
+}
+
+#flexicontent .fc_markup.mu_item_no_access.mu_has_text {
+	padding-left: 24px !important;
+	background: url(../images/eye-half.png) 4px 50% no-repeat transparent;
+	background-color: #FFD700 !important;
+	color: white !important;
+}
+
+#flexicontent .fc_markup.mu_item_free_access.mu_has_text {
+	padding-left: 24px !important;
+	background: url(../images/eye.png) 4px 50% no-repeat transparent;
+	color: darkorange !important;
+}
+
+#flexicontent .fc_markup.mu_needed_acclvl.mu_has_text {
+	padding-left: 24px !important;
+	background: url(../images/lock.png) 4px 50% no-repeat transparent !important; !important;
+	background-color: darkred !important;
+	color: white !important;
+}
+
+#flexicontent .fc_markup.mu_obtained_acclvl.mu_has_text {
+	padding-left: 24px !important;
+	background: url(../images/lock-unlock.png) 4px 50% no-repeat transparent !important;
+	background-color: darkgreen !important;
+	color: white !important;
+}
+
+#flexicontent .fc_markup.mu_ra_timeframe.mu_has_text {
+	padding-left: 24px !important;
+	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat transparent;
+	color: darkorange !important;
 }

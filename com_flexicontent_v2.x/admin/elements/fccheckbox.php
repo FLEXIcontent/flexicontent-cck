@@ -81,10 +81,9 @@ class JFormFieldFccheckbox extends JFormField
 		if (!FLEXI_J16GE || !$is_multiple)
 			$fieldname .= '[]';
 		
-		$html = '<fieldset id="'.$element_id.'" class="radio" style="border-width:0px">';
+		$html = '<fieldset id="'.$element_id.'" class="radio" style="border-width:0px;'.(FLEXI_J16GE ? "width:68%; " : "").'">';
 		
-		$inline_style  = "float:left; white-space:nowrap; margin-right:12px; ";
-		$inline_style .= FLEXI_J16GE ? "clear:both; " : "";
+		$inline_style  = "float:left; white-space:nowrap; ".(!FLEXI_J16GE ? "margin-right:12px; " : "");
 		$disable_all = '';
 		if ( @$attributes['display_useglobal'] ) {
 			$check_global='';

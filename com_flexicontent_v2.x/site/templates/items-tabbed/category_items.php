@@ -68,8 +68,19 @@ $tabsHeaderLevel = $itemTitleHeaderLevel == '2'  ?  '3' : '2';
 foreach ($items as $i => $item) :
 	
 	$fc_item_classes = 'tabbertab';
-	foreach ($items[$i]->categories as $item_cat)  $fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
-	$fc_item_classes .= $items[$i]->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
+	
+	$markup_tags = '<span class="fc_mublock">';
+	foreach($item->css_markups as $grp => $css_markups) {
+		if ( empty($css_markups) )  continue;
+		$fc_item_classes .= ' fc'.implode(' fc', $css_markups);
+		
+		$ecss_markups  = $item->ecss_markups[$grp];
+		$title_markups = $item->title_markups[$grp];
+		foreach($css_markups as $mui => $css_markup) {
+			$markup_tags .= '<span class="fc_markup mu' . $css_markups[$mui] . $ecss_markups[$mui] .'">' .$title_markups[$mui]. '</span>';
+		}
+	}
+	$markup_tags .= '</span>';
 ?>
 
 <!-- tab start -->
@@ -120,7 +131,7 @@ foreach ($items as $i => $item) :
 	
 	<?php if ($this->params->get('show_comments_count')) : ?>
 		<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
-			<div class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
+			<div class="fc_comments_count hasTip" alt="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
 				<?php echo $this->comments[ $item->id ]->total; ?>
 			</div>
 		<?php endif; ?>
@@ -138,6 +149,7 @@ foreach ($items as $i => $item) :
 		<!-- EOF item title -->
 	<?php endif; ?>
 	
+	<?php echo $markup_tags; ?>
 	
   <?php if ($item->event->afterDisplayTitle) : ?>
 	  <!-- BOF afterDisplayTitle -->

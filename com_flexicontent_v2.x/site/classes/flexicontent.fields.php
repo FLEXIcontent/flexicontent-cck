@@ -593,16 +593,16 @@ class FlexicontentFields
 		// Set the view and option to article and com_content
 		if ($flexiview == FLEXI_ITEMVIEW) {
 		  JRequest::setVar('view', 'article');
-		  $trigger_area = 'com_content.article';
+		  $context = 'com_content.article';
 		} else {
-		  $trigger_area = 'com_content.category';
+		  $context = 'com_content.category';
 		}
 	  JRequest::setVar('option', 'com_content');
 		JRequest::setVar("isflexicontent", "yes");
 		
 		// Trigger content plugins on field's HTML display, as if they were a "joomla article"
-		if (FLEXI_J16GE) $results = $fcdispatcher->trigger('onContentPrepare', array ($trigger_area, &$field, &$item->parameters, 0), $plg_arr);
-		else             $results = $fcdispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, 0), false, $plg_arr);
+		if (FLEXI_J16GE) $results = $fcdispatcher->trigger('onContentPrepare', array ($context, &$field, &$item->parameters, $limitstart), $plg_arr);
+		else             $results = $fcdispatcher->trigger('onPrepareContent', array (&$field, &$item->parameters, $limitstart), false, $plg_arr);
 		
 		// Set the view and option back to items and com_flexicontent
 		if ($flexiview == FLEXI_ITEMVIEW) {
@@ -1862,6 +1862,7 @@ class FlexicontentFields
 	{
 		$db = JFactory::getDBO();
 		$display_filter_as = $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
+		$filter_compare_type = $filter->parameters->get( 'filter_compare_type', 0 );
 		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
 		
 		// Make sure the current filtering values match the field filter configuration to be single or multi-value
@@ -1883,7 +1884,11 @@ class FlexicontentFields
 		// For text input format the strings, if this was requested by the filter
 		$istext_input = $display_filter_as==1 || $display_filter_as==3;
 		if ($istext_input && isset($filter->filter_valueformat)) {
-			foreach($value as $i => $val) $value[$i] = str_replace('__filtervalue__', $db->Quote($value[$i]), $filter->filter_valueformat);
+			foreach($value as $i => $val) {
+				if ( !$filter_compare_type ) $typecasted_val = $db->Quote($value[$i]);
+				else $typecasted_val = $filter_compare_type==1 ? intval($value[$i]) : floatval($value[$i]);
+				$value[$i] = str_replace('__filtervalue__', $typecasted_val, $filter->filter_valueformat);
+			}
 			$quoted=true;
 		}
 		
@@ -1891,7 +1896,10 @@ class FlexicontentFields
 		switch ($display_filter_as) {
 		// RANGE cases
 		case 2: case 3:
-			if (empty($quoted)) foreach($value as $i => $v) $value[$i] = $db->Quote($v);
+			if ( ! @ $quoted ) foreach($value as $i => $v) {
+				if ( !$filter_compare_type ) $value[$i] = $db->Quote($v);
+				else $value[$i] = $filter_compare_type==1 ? intval($v) : floatval($v);
+			}
 			$value_empty = !strlen(@$value[1]) && strlen(@$value[2]) ? ' OR _v_="" OR _v_ IS NULL' : '';
 			if ( strlen(@$value[1]) ) $valueswhere .= ' AND (_v_ >=' . $value[1] . ')';
 			if ( strlen(@$value[2]) ) $valueswhere .= ' AND (_v_ <=' . $value[2] . $value_empty . ')';
@@ -1916,6 +1924,7 @@ class FlexicontentFields
 			break;
 		}
 		
+		//echo $valueswhere . "<br>";
 		return $valueswhere;
 	}
 	

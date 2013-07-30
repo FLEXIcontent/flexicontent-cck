@@ -183,7 +183,7 @@ class FlexicontentModelItems extends JModelLegacy
 				$this->_db->setQuery($query);
 				$_data = $this->_db->loadObjectList('item_id');
 			}
-			if ( $print_logging_info ) @$fc_run_times['execute_secondary_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
 			// 5, reorder items and get cat ids
@@ -613,8 +613,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$ver_specific_joins = '';
 		if (FLEXI_J16GE) {
-			$ver_specific_joins .= ' LEFT JOIN #__viewlevels as level ON level.id=i.access';
-			$ver_specific_joins .= ' LEFT JOIN #__usergroups AS g ON g.id = i.access';
+			$ver_specific_joins .= ' LEFT JOIN #__viewlevels AS level ON level.id=i.access';
 			$ver_specific_joins .= ' LEFT JOIN #__categories AS cat ON i.catid=cat.id AND cat.extension='.$this->_db->Quote(FLEXI_CAT_EXTENSION);
 		} else {
 			$ver_specific_joins .= ' LEFT JOIN #__groups AS g ON g.id = i.access';
@@ -634,7 +633,7 @@ class FlexicontentModelItems extends JModelLegacy
 			$query =
 				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, '. $lang .' u.name AS editor, rel.catid as rel_catid, '
 				.' GROUP_CONCAT(DISTINCT rel.catid SEPARATOR  ",") AS relcats, '
-				. (FLEXI_J16GE ? 'level.title as access_level, g.title AS groupname, ' : 'g.name AS groupname, ')
+				. (FLEXI_J16GE ? 'level.title AS access_level, ' : 'g.name AS groupname, ')
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 
 					'CASE WHEN i.state IN (1,-5) THEN 0 ELSE (CASE WHEN i.state IN (0,-3,-4) THEN 1 ELSE (CASE WHEN i.state IN ('.(FLEXI_J16GE ? 2:-1).') THEN 2 ELSE (CASE WHEN i.state IN (-2) THEN 3 ELSE 4 END) END) END) END as state_order, ' : ''
 					)

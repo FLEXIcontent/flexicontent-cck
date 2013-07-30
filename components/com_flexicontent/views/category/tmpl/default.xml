@@ -26,12 +26,12 @@
 			
 			<field name="" type="separator" default="FLEXI_CONFIGURATION_CATEGORY" description="FLEXI_CONFIGURATION_CATEGORY_DESC" level="level2" />
 			<field name="" type="separator" default="FLEXI_MENU_ITEM_SELECTABLE_VIA_DIRECT_CLICK_ONLY" description="" level="level3" />
-			<field name="override_defaultconf" default="0" type="radio" label="FLEXI_ENABLE_OVERRIDE_CATEGORY" description="FLEXI_ENABLE_OVERRIDE_CATEGORY_DESC" >
+			<field name="override_defaultconf" default="0" type="list" label="FLEXI_ENABLE_OVERRIDE_CATEGORY" description="FLEXI_ENABLE_OVERRIDE_CATEGORY_DESC" >
 				<option value="0">FLEXI_OVERRIDE_CONF_NO</option>
 				<option value="1">FLEXI_OVERRIDE_CONF_YES</option>
 			</field>
-			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="Persistent Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##alue %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword" />
-			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="Initial Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##alue %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword" />
+			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="Persistent Filters (experimental)" description="Filters that can NOT be overriden by category filters. Enter like: field_id##value %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword for ranges use field_id##value1---value2 for multiple values use field_id##value1+++value2+++value3 NOTE: your field must be configured to be range filter or multi-value filter or the values will not be used as expected" />
+			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="Initial Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##value %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword for ranges use field_id##value1---value2 for multiple values use field_id##value1+++value2+++value3 NOTE: your field must be configured to be range filter or multi-value filter or the values will not be used as expected" />
 		
 		
 		<field name="" type="jparamstab" description="FLEXI_PARAMETERS_CAT_INFO_OPTIONS_OVERRIDE" />
@@ -148,7 +148,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="subcat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC">
+			<field name="subcat_orderby" type="list" default="" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
 				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
@@ -327,6 +327,26 @@
 				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order" defaultvals=""
 				label="FLEXI_PRIMARY_ORDER_OPTIONS" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
 			
+			<field name="" type="separator" default="FLEXI_ITEMS_LIST_MARKUPS" level="level2" />
+			<field name="" type="separator" default="FLEXI_ADD_CSS_MARKUPS" level="level3" />
+			<field name="add_item_cats_mu" type="list" default="" label="FLEXI_CATEGORY_MARKUPS" description="FLEXI_CATEGORY_MARKUPS_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="add_view_access_mu" type="list" default="" label="FLEXI_VIEW_ACCESS_MARKUPS" description="FLEXI_VIEW_ACCESS_MARKUPS_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="add_recently_added_mu" type="list" default="" label="FLEXI_RECENTLY_ADDED_MARKUPS" description="FLEXI_RECENTLY_ADDED_MARKUPS_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_CSS_MARKUPS_CONFIGURATION" level="level3" />
+			<field name="recently_added_timeframes" type="text" size="40" default="" label="FLEXI_RECENTLY_ADDED_TIMEFRAMES" description="FLEXI_RECENTLY_ADDED_TIMEFRAMES_DESC" />
+			
 		
 		<field name="" type="jparamstab" description="FLEXI_PARAMETERS_CAT_ITEM_FILTERING_OVERRIDE" />
 			
@@ -335,7 +355,7 @@
 			<field name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="4" cols="30" />
 			<field name="alphagrpcssclasses" type="textarea" default="letters!!numbers" label="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES" description="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES_DESC" rows="2" cols="30" />
 			<field name="alphacharseparator" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR" description="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR_DESC" />
-			<field name="alphaaliases" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES" description="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES_DESC" />
+			<field name="alphaaliases" type="text" default="" label="FLEXI_CUSTOM_ALPHA_ALIASES" description="FLEXI_CUSTOM_ALPHA_ALIASES_DESC" />
 			<field name="alphaskipempty" type="list" default="" label="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY" description="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -416,7 +436,7 @@
 			</field>
 			<field name="filter_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
 			<field name="filter_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
-			<field name="filter_perrow" type="radio" default="" label="FLEXI_RECORD_PER_ROW" description="FLEXI_RECORD_PER_ROW_DESC" menu="hide" >
+			<field name="filter_perrow" type="list" default="" label="FLEXI_RECORD_PER_ROW" description="FLEXI_RECORD_PER_ROW_DESC" menu="hide" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -459,8 +479,8 @@
 		
 		<field name="" type="jparamstab" description="FLEXI_PARAMETERS_LAYOUT_THEMES_OVERRIDE" />
 			
-			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 			<field name="clayout" type="categorylayout" skipparams="1" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
+			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 			<field name="" type="separator" default="Template parameters ..." description="Please note you cannot set template parameters here. &lt;br&gt;&lt;br&gt; Template parameters for the choosen template will be retrieved from the category configuration. &lt;br&gt;&lt;br&gt;For fields shown, please add your fields in layout positions in template configuration management tab" level="level2"/>
 			
 		</params>

@@ -118,7 +118,7 @@
 			<field name="alphacharacters" type="textarea" default="[default]=a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,y,z!!0,1,2,3,4,5,6,7,8,9" label="FLEXI_CUSTOM_ALPHA_INDEX_CHARS" description="FLEXI_CUSTOM_ALPHA_INDEX_CHARS_DESC" rows="4" cols="30" />
 			<field name="alphagrpcssclasses" type="textarea" default="letters!!numbers" label="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES" description="FLEXI_CUSTOM_ALPHA_INDEX_GRPCSSCLASSES_DESC" rows="2" cols="30" />
 			<field name="alphacharseparator" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR" description="FLEXI_CUSTOM_ALPHA_INDEX_SEPARATOR_DESC" />
-			<field name="alphaaliases" type="text" default="" label="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES" description="FLEXI_CUSTOM_ALPHA_INDEX_ALIASES_DESC" />
+			<field name="alphaaliases" type="text" default="" label="FLEXI_CUSTOM_ALPHA_ALIASES" description="FLEXI_CUSTOM_ALPHA_ALIASES_DESC" />
 			<field name="alphaskipempty" type="radio" default="0" label="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY" description="FLEXI_CUSTOM_ALPHA_SKIP_EMPTY_DESC" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

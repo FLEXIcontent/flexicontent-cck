@@ -325,17 +325,16 @@ class FlexicontentModelFileselement extends JModelLegacy
 		
 		if ( !$ids_only ) {
 			if (FLEXI_J16GE) {
-				$extra_join .= ' LEFT JOIN #__viewlevels as level ON level.id=f.access';
-				$extra_join .= ' LEFT JOIN #__usergroups AS g ON g.id = f.access';
+				$extra_join .= ' LEFT JOIN #__viewlevels AS level ON level.id=f.access';
 			} else {
 				$extra_join .= ' LEFT JOIN #__groups AS g ON g.id = f.access';
 			}
 		}
 		
 		if ( $ids_only ) {
-			$columns = ' f.id ';
+			$columns[] = 'f.id';
 		} else {
-			$columns = ' SQL_CALC_FOUND_ROWS f.*, u.name AS uploader, ';
+			$columns[] = 'SQL_CALC_FOUND_ROWS f.*, u.name AS uploader';
 			if ( $assigned_fields && count($assigned_fields) ) {
 				foreach ($assigned_fields as $field_type) {
 					// Field relation sub query for counting file assignment to this field type
@@ -345,13 +344,13 @@ class FlexicontentModelFileselement extends JModelLegacy
 						. ' WHERE fi.field_type = ' . $this->_db->Quote($field_type)
 						. ' AND value = f.id'
 						;
-					$columns .= '('.$assigned_query.') AS assigned_'.$field_type.', ';
+					$columns[] = '('.$assigned_query.') AS assigned_'.$field_type;
 				}
 			}
-			$columns .= (FLEXI_J16GE ? 'level.title as access_level, g.title AS groupname ' : 'g.name AS groupname ');
+			$columns[] = (FLEXI_J16GE ? 'level.title AS access_level' : 'g.name AS groupname');
 		}
 		
-		$query = 'SELECT '. $columns
+		$query = 'SELECT '. implode(', ', $columns)
 			. ' FROM #__flexicontent_files AS f'
 			. ' JOIN #__users AS u ON u.id = f.uploaded_by'
 			. $extra_join

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension version="2.5" type="plugin" group="content" method="upgrade" >
+	<name>PLG_CONTENT_FLEXIBREAK</name>
+	<author>Peter Szalatnay, ggppdk</author>
+	<creationDate>2013 July</creationDate>
+	<copyright>Copyright (C) 2009 - 2013 Peter Szalatnay, ggppdk. All rights reserved.</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>2.0</version>
+	<description>PLG_CONTENT_FLEXIBREAK_XML_DESCRIPTION</description>
+	<files>
+		<filename plugin="flexibreak">flexibreak.php</filename>
+		<filename plugin="flexibreak">flexibreak/flexibreak.css</filename>
+		<filename plugin="flexibreak">flexibreak/flexibreak.js</filename>
+		<folder plugin="flexibreak">flexibreak/tmpl</folder>
+		<folder plugin="flexibreak">flexibreak/icons</folder>
+	</files>
+	<languages>
+		<language tag="en-GB">en-GB.plg_content_flexibreak.ini</language>
+	</languages>
+	<images>
+	</images>
+	<config>
+		<fields name="params">
+			<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+				<field name="" type="separator" default="Basic" level="level1" />
+				<field name="multipage_toc" type="radio" default="1" label="Show Table of Contents" description="You may select to hide the Table of Contents, (you can still show the Page Navigation)">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="pagination" type="list" default="3" label="Show Page Navigation" description="Defines where navigation controls are displayed">
+					<option value="0">No</option>
+					<option value="1">Yes, below TOC</option>
+					<option value="2">Yes, at article's start</option>
+					<option value="3">Yes, at artclie's end</option>
+				</field>
+				<field name="show_prevnext_count" type="radio" default="1" label="Show Page Count" description="Show current page number out of total page number">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				
+				<field name="display_method" type="list" default="1" label="Display method" description="It is recommended to use the instant navigation to show the selected page. Other options include: (a) showing all pages and scrolling to the desired one, (b) Show current page only and navigate via reloading">
+					<option value="0">All Pages :: Scroll</option>
+					<option value="1">Active page :: Instantly (recommended)</option>
+					<option value="2">Active page :: Reload</option>
+				</field>
+				
+				<field name="" type="separator" default="Table of contents configuration" level="level2" />
+				<field name="allpages_link" type="radio" default="1" label="Show all pages link" description="Display a link to allow user to display all content pages at once">
+					<option value="0">No</option>
+					<option value="1">Yes</option>
+				</field>
+				<field name="custom_introtext" type="text" size="50" default="" label="Intro Text" description="A custom language string as title of 'Intro Text' link" />
+				<field name="custom_allpages" type="text" size="50" default="" label="All Pages Text" description="A custom language string as title of 'All Pages' link" />
+				
+			</fieldset>
+		</fields>
+	</config>
+</extension>

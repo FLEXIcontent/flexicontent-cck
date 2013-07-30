@@ -161,13 +161,22 @@ foreach ($cat_items as $catid => $items) :
 				<?php foreach ($items as $i => $item) : ?>
 					<?php
 					$fc_item_classes = 'flexi-item';
-					foreach ($items[$i]->categories as $item_cat) {
-						$fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
+					
+					$markup_tags = '<span class="fc_mublock">';
+					foreach($item->css_markups as $grp => $css_markups) {
+						if ( empty($css_markups) )  continue;
+						$fc_item_classes .= ' fc'.implode(' fc', $css_markups);
+						
+						$ecss_markups  = $item->ecss_markups[$grp];
+						$title_markups = $item->title_markups[$grp];
+						foreach($css_markups as $mui => $css_markup) {
+							$markup_tags .= '<span class="fc_markup mu' . $css_markups[$mui] . $ecss_markups[$mui] .'">' .$title_markups[$mui]. '</span>';
+						}
 					}
-					$fc_item_classes .= $items[$i]->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
+					$markup_tags .= '</span>';
 					?>
 					<li id="faqlist_cat_<?php echo $catid; ?>item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
-					
+						
 					  <?php if ($item->event->beforeDisplayContent) : ?>
 					  <!-- BOF beforeDisplayContent -->
 						<aside class="fc_beforeDisplayContent group">
@@ -204,7 +213,9 @@ foreach ($cat_items as $catid => $items) :
 									<?php endif; ?>
 									<!-- BOF item title -->
 								<?php endif; ?>
-						
+								
+								<div class="clear"></div>
+								<?php echo $markup_tags; ?>
 						
 								<?php if ($item->event->afterDisplayTitle) : ?>
 									<!-- BOF afterDisplayTitle -->
@@ -213,9 +224,8 @@ foreach ($cat_items as $catid => $items) :
 									</div>
 									<!-- EOF afterDisplayTitle -->
 								<?php endif; ?>
-						
+								
 							</li>
-							
 							
 							<?php if (isset($item->positions['aftertitle'])) : ?>
 								<!-- BOF aftertitle block -->

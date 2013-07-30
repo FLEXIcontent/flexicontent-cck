@@ -302,7 +302,7 @@ window.addEvent('domready', function() {
 
 			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<th width="" nowrap="nowrap" class="center">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_FLAG', 'ie.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'ie.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
 					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_lang');document.adminForm.submit();" />
