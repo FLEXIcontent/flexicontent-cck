@@ -239,7 +239,7 @@ class flexicontent_html
 		static $mobileDetector = null;
 		
 		if ( $mobileDetector===null ) {
-			require_once (JPATH_COMPONENT_SITE.DS.'librairies'.DS.'mobiledetect'.DS.'Mobile_Detect.php');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'mobiledetect'.DS.'Mobile_Detect.php');
 			$mobileDetector = new Mobile_Detect_FC();
 		}
 		
