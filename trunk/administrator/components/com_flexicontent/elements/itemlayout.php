@@ -56,7 +56,7 @@ class JElementItemlayout extends JElement
 		$controller	= JRequest::getVar('controller');
 		$app = &JFactory::getApplication();
 		$db =& JFactory::getDBO();
-		$cparams = & JComponentHelper::getParams('com_flexicontent');
+		$cparams = JComponentHelper::getParams('com_flexicontent');
 		
 		// GET LIMITING to specific templates according to item's type, or according to type of new item
 		$allowed_tmpls = array();
@@ -100,7 +100,9 @@ class JElementItemlayout extends JElement
 				else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);
 				$all_tmpl_allowed = count($allowed_tmpls) == 0;
 				if ( !in_array( $type_default_layout, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout;
-				if ($cparams->get('detect_mobile') && $type_default_layout_mobile)
+				
+				$use_mobile_layouts = $cparams->get('use_mobile_layouts', 0 );
+				if ($use_mobile_layouts && $type_default_layout_mobile)
 					if ( !in_array( $type_default_layout_mobile, $allowed_tmpls ) ) $allowed_tmpls[] = $type_default_layout_mobile;
 				//echo "Allowed Templates: "; print_r($allowed_tmpls); echo "<br>\n";
 			}

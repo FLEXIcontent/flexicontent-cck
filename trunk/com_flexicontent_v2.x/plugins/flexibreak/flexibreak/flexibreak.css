@@ -1,0 +1,114 @@
+div#articleTOC ul.tocList {
+	padding: 4px;
+	margin: 6px;
+	list-style-type: none;
+	list-style-position: inside;
+	padding: 6px 2px 6px 6px;
+	margin: 0;
+}
+
+div#articleTOC ul.tocList a.tocLink,
+div#articleTOC ul.tocList a.tocAll {
+	display: block;
+	text-decoration: none;
+	color: blue;
+}
+
+div#articleTOC ul.tocList a.active {
+	color: black;
+	font-weight: bold;
+}
+
+div.articlePage {
+	display: none;
+}
+
+div.articlePage.active {
+	display: block;	
+}
+
+div#articleTOC {
+	margin: 0 0 10px 10px;
+	padding: 0px;
+	width: 20%;
+	float: right;
+	border: 1px solid #dddddd;
+	border-radius: 12px 12px 2px 2px;
+	background-color: #f7f7f7;
+}
+
+div#articleTOC p.tocHeader {
+	font-weight: bold;
+	margin: 0;
+	padding: 2px 2px 2px 6px;
+	text-indent:5px;
+	border-bottom: 1px solid #ccc;
+	display: block;
+	border-radius: 12px 12px 0px 0px;
+	background-color: lightgray;
+}
+
+
+
+
+
+.tocNav {
+	text-align: center;
+	display: block;
+	border: 0px solid;
+	display: block;
+	width: 100%;
+}
+
+.tocNav .tocNext,
+.tocNav .tocPrevNextCnt,
+.tocNav .tocPrev {
+	margin-right: 20px;
+	display: inline-block;
+}
+.tocNav .tocPrev {
+	padding-left: 20px !important;
+	background: url(icons/resultset_previous.png) no-repeat 0 center !important;
+}
+.tocNav .tocNext {
+	padding-right: 20px !important;
+	background: url(icons/resultset_next.png) no-repeat 99% center !important;
+}
+
+.tocNav .tocPrevNextCnt {
+	font-weight: bold;
+}
+
+.tocNav span.tocNoPrevNext {
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	user-select:none;
+	text-decoration: none !important;
+	display: inline-block;
+	border: 1px solid gray;
+  border-radius: 6px;
+  background: white;
+  color: gray;
+  padding: 3px 6px;
+	font-weight: bold;
+}
+
+.tocNav a {
+	text-decoration: none !important;
+	display: inline-block;
+	border: 1px solid gray;
+  border-radius: 6px;
+  background: none;
+  color: darkblue !important;
+  padding: 3px 6px;
+	font-weight: bold;
+}
+
+.tocNav a:hover {
+  background-color: #dddddd !important;
+  color: darkred !important;
+}
+
+.tocNav {
+	color: black;
+}

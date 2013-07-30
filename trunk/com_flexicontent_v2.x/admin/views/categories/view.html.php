@@ -31,30 +31,32 @@ class FlexicontentViewCategories extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		global $globalcats;
-		$mainframe = &JFactory::getApplication();
-		$option = JRequest::getVar('option');
-
 		//initialise variables
-		$user 		= & JFactory::getUser();
-		$db  		= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
+		global $globalcats;
+		$app    = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		$user = JFactory::getUser();
+		$db   = JFactory::getDBO();
+		$document	= JFactory::getDocument();
 		
 		JHTML::_('behavior.tooltip');
 
 		//get vars
 		$order_property = !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
-		$filter_order     = $mainframe->getUserStateFromRequest( $option.'.categories.filter_order',     'filter_order',     $order_property, 'cmd' );
-		$filter_order_Dir = $mainframe->getUserStateFromRequest( $option.'.categories.filter_order_Dir', 'filter_order_Dir', '', 'word' );
-		$filter_level     = $mainframe->getUserStateFromRequest( $option.'.categories.filter_level',     'filter_level',     '', 'string' );
-		$filter_state     = $mainframe->getUserStateFromRequest( $option.'.categories.filter_state',     'filter_state',     '', 'string' );
-		$filter_access    = $mainframe->getUserStateFromRequest( $option.'.categories.filter_access',    'filter_access',    '', 'string' );
-		$filter_language	= $mainframe->getUserStateFromRequest( $option.'.categories.filter_language',  'filter_language',  '', 'cmd' );
-		
-		$search 			= $mainframe->getUserStateFromRequest( $option.'.categories.search', 			'search', 			'', 'string' );
-		$search 			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     $order_property, 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', '', 'word' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',     'filter_state',     '', 'string' );
+		$filter_cats      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',      'filter_cats',			 '', 'int' );
+		$filter_level     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_level',     'filter_level',     '', 'string' );
+		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
+		if (FLEXI_J16GE) {
+			$filter_language	= $app->getUserStateFromRequest( $option.'.'.$view.'.filter_language',  'filter_language',  '', 'string' );
+		}
+		$search  = $app->getUserStateFromRequest( $option.'.'.$view.'.search', 			'search', 			'', 'string' );
+		$search  = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
-		//add css and submenu to document
+		// Prepare the document: add css files, etc
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		
 		// Get User's Global Permissions
@@ -64,62 +66,68 @@ class FlexicontentViewCategories extends JViewLegacy
 		FLEXISubmenu('CanCats');
 		
 		
+		// ******************
 		// Create the toolbar
+		// ******************
+		
 		$contrl = FLEXI_J16GE ? "categories." : "";
 		$contrl_singular = FLEXI_J16GE ? "category." : "";
 		JToolBarHelper::title( JText::_( 'FLEXI_CATEGORIES' ), 'fc_categories' );
 		$toolbar = JToolBar::getInstance('toolbar');
 		
-		
-		$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=params&amp;tmpl=component', 400, 440);
+		// Copy Parameters
+		$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=params&amp;tmpl=component', 600, 440);
+		//if (FLEXI_J16GE)
+		//	$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_COPY_MOVE'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
 		JToolBarHelper::divider();
 		
-		
 		$add_divider = false;
-		if ( $user->authorise('core.create', 'com_flexicontent') || (count($user->getAuthorisedCategories('com_content', 'core.create'))) > 0 ) {
+		if ( !FLEXI_J16GE || ( $user->authorise('core.create', 'com_flexicontent') || (count($user->getAuthorisedCategories('com_content', 'core.create'))) > 0 ) ) {
 			JToolBarHelper::addNew($contrl_singular.'add');
 			$add_divider = true;
 		}
-		if ( $user->authorise('core.edit', 'com_flexicontent') || $user->authorise('core.edit.own', 'com_flexicontent') ) {
+		if ( !FLEXI_J16GE || ( $user->authorise('core.edit', 'com_flexicontent') || $user->authorise('core.edit.own', 'com_flexicontent') ) ) {
 			JToolBarHelper::editList($contrl_singular.'edit');
 			$add_divider = true;
 		}
-		if ($add_divider) {
-			JToolBarHelper::divider();
+		
+		if ( FLEXI_J16GE && $user->authorise('core.admin', 'checkin') )
+		{
+			JToolBarHelper::checkin($contrl.'checkin');
+			$add_divider = true;
 		}
+		if ($add_divider) JToolBarHelper::divider();
 		
-		
-		if ( $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent') ) {
+		$add_divider = false;
+		if ( !FLEXI_J16GE || ( $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent') ) ) {
 			JToolBarHelper::publishList($contrl.'publish');
 			JToolBarHelper::unpublishList($contrl.'unpublish');
 			JToolBarHelper::divider();
-			JToolBarHelper::archiveList($contrl.'archive');
+			if (FLEXI_J16GE) JToolBarHelper::archiveList($contrl.'archive');
 		}
 		
-		if ( $user->authorise('core.admin') ) {
-			JToolBarHelper::checkin('categories.checkin');
-		}
-		
-		if ( $filter_state == -2 && $user->authorise('core.delete', 'com_flexicontent') ) {
+		$add_divider = false;
+		if ( !FLEXI_J16GE || ( $filter_state == -2 && $user->authorise('core.delete', 'com_flexicontent') ) ) {
 			JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
 			//JToolBarHelper::deleteList('', $contrl.'delete', 'JTOOLBAR_EMPTY_TRASH');
+			$add_divider = true;
 		}
 		elseif ( $user->authorise('core.edit.state', 'com_flexicontent') ) {
 			JToolBarHelper::trash($contrl.'trash');
+			$add_divider = true;
 		}
-		
+		if ($add_divider) JToolBarHelper::divider();
 		
 		if ($perms->CanConfig) {
-			JToolBarHelper::divider();
 			//JToolBarHelper::custom($contrl.'rebuild', 'refresh.png', 'refresh_f2.png', 'JTOOLBAR_REBUILD', false);
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 
 		//Get data from the model
 		if (FLEXI_J16GE) {
-			$rows = & $this->get( 'Items');
+			$rows = $this->get( 'Items');
 		} else {
-			$rows = & $this->get( 'Data');
+			$rows = $this->get( 'Data');
 		}
 		
 		// Parse configuration for every category
@@ -156,35 +164,55 @@ class FlexicontentViewCategories extends JViewLegacy
 		// Create Form Filters
 		// *******************
 		
-		// filter publication state
-		$options = JHtml::_('jgrid.publishedOptions');
-		array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_SELECT_PUBLISHED')) );
-		$fieldname =  $elementid = 'filter_state';
-		$attribs = ' class="inputbox" onchange="Joomla.submitform()" ';
-		$lists['state']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
-		
-		// filter access level
-		$options = JHtml::_('access.assetgroups');
-		array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_SELECT_ACCESS')) );
-		$fieldname =  $elementid = 'filter_access';
-		$attribs = ' class="inputbox" onchange="Joomla.submitform()" ';
-		$lists['access']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
-		
-		// filter language
-		$lists['language'] = flexicontent_html::buildlanguageslist('filter_language', 'class="inputbox" onchange="submitform();"', $filter_language, 2);
+		// filter by a category (it's subtree will be displayed)
+		$categories = $globalcats;
+		$lists['cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="this.form.submit();"', $check_published=true, $check_perms=false);
 		
 		// filter depth level
 		$options	= array();
-		$options[]	= JHtml::_('select.option', '', JText::_('JOPTION_SELECT_MAX_LEVELS'));
-		for($i=1; $i<=10; $i++) $options[]	= JHtml::_('select.option', $i, JText::_('J'.$i));
+		$options[]	= JHtml::_('select.option', '', JText::_( 'FLEXI_SELECT_MAX_DEPTH' ));
+		for($i=1; $i<=10; $i++) $options[]	= JHtml::_('select.option', $i, $i);
 		$fieldname =  $elementid = 'filter_level';
-		$attribs = ' class="inputbox" onchange="Joomla.submitform()" ';
+		$attribs = ' class="inputbox" onchange="this.form.submit();" ';
 		$lists['level']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid, $translate=true );
+		
+		// filter publication state
+		if (FLEXI_J16GE)
+		{
+			$options = JHtml::_('jgrid.publishedOptions');
+			array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_SELECT_PUBLISHED')) );
+			$fieldname =  $elementid = 'filter_state';
+			$attribs = ' class="inputbox" onchange="Joomla.submitform()" ';
+			$lists['state']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
+		} else {
+			$lists['state']	= JHTML::_('grid.state', $filter_state );
+		}
+		
+		if (FLEXI_J16GE)
+		{
+			// filter access level
+			$options = JHtml::_('access.assetgroups');
+			array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_SELECT_ACCESS')) );
+			$fieldname =  $elementid = 'filter_access';
+			$attribs = ' class="inputbox" onchange="Joomla.submitform()" ';
+			$lists['access']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
+			
+			// filter language
+			$lists['language'] = flexicontent_html::buildlanguageslist('filter_language', 'class="inputbox" onchange="submitform();"', $filter_language, 2);
+		} else {
+			// filter access level
+			$options = array();
+			$options[] = JHtml::_('select.option', '', JText::_('FLEXI_SELECT_ACCESS_LEVEL'));
+			$options[] = JHtml::_('select.option', '0', JText::_('Public'));
+			$options[] = JHtml::_('select.option', '1', JText::_('Registered'));
+			$options[] = JHtml::_('select.option', '2', JText::_('SPECIAL'));
+			$fieldname =  $elementid = 'filter_access';
+			$attribs = ' class="inputbox" onchange="this.form.submit()" ';
+			$lists['access']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
+		}
 		
 		// filter search word
 		$lists['search']= $search;
-		
-		
 		
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;

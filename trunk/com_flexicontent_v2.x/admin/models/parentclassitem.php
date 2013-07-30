@@ -1350,7 +1350,7 @@ class ParentClassItem extends JModelAdmin
 			$item->language     = FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang();
 			$item->lang_parent_id = 0;
 			$item->search_index = null;
-			$item->parameters   = clone ($cparams);   // Assign compenent parameters, merge with menu item (for frontend)
+			$item->parameters   = clone ($cparams);   // Assign component parameters, merge with menu item (for frontend)
 			
 			$this->_item				= $item;
 		}
@@ -1477,6 +1477,12 @@ class ParentClassItem extends JModelAdmin
 		$view = JRequest::getVar('view', false);
 		JRequest::setVar("isflexicontent", "yes");
 		$use_versioning = $cparams->get('use_versioning', 1);
+		$print_logging_info = $cparams->get('print_logging_info');
+		
+		if ( $print_logging_info ) {
+			global $fc_run_times;
+			$start_microtime = microtime(true);
+		}
 		
 		// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
 		$site_zone = $app->getCfg('offset');
@@ -1931,6 +1937,8 @@ class ParentClassItem extends JModelAdmin
 		// *** thus next item form load will load default values of custom fields
 		$item->version = ($isnew && !empty($data['type_id_not_set']) ) ? 0 : $item->version;
 		
+		if ( $print_logging_info ) @$fc_run_times['item_store_prepare'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
 		
 		// *********************************************************************************************
 		// Make sure we import flexicontent AND content plugins since we will be triggering their events
@@ -1942,8 +1950,10 @@ class ParentClassItem extends JModelAdmin
 		// **************************************************************************************************
 		// Trigger Event 'onBeforeSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
 		// **************************************************************************************************
+		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$result = $dispatcher->trigger('onBeforeSaveItem', array(&$item, $isnew));
 		if((count($result)>0) && in_array(false, $result, true)) return false;   // cancel item save
+		if ( $print_logging_info ) $fc_run_times['onBeforeSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		
 		// ******************************************************************************************************
@@ -1954,8 +1964,10 @@ class ParentClassItem extends JModelAdmin
 		if (!$isnew) { $db->setQuery( 'UPDATE #__content SET state = '. $jm_state .' WHERE id = '.$item->id );  $db->query(); }
 	  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
 		
+		if ( $print_logging_info ) $start_microtime = microtime(true);
 		if (FLEXI_J16GE) $result = $dispatcher->trigger($this->event_before_save, array('com_content.article', &$item, $isnew));
 		else             $result = $dispatcher->trigger('onBeforeContentSave', array(&$item, $isnew));
+		if ( $print_logging_info ) $fc_run_times['onContentBeforeSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Reverse compatibility steps
 		if (!$isnew) { $db->setQuery( 'UPDATE #__content SET state = '. $fc_state .' WHERE id = '.$item->id );  $db->query(); }
@@ -1964,9 +1976,11 @@ class ParentClassItem extends JModelAdmin
 		if (in_array(false, $result, true))	{ $this->setError($item->getError()); return false; }    // cancel item save
 		
 		
+		
 		// ************************************************************************************************************
 		// IF new item, create it before saving the fields (and constructing the search_index out of searchable fields)
 		// ************************************************************************************************************
+		if ( $print_logging_info ) $start_microtime = microtime(true);
 		if( $isnew )
 		{
 			$this->applyCurrentVersion($item, $data, $createonly=true);
@@ -1977,6 +1991,7 @@ class ParentClassItem extends JModelAdmin
 			$this->_id   = $item->id;
 			$this->_item = & $item;
 		}
+		if ( $print_logging_info ) $fc_run_times['item_store_core'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		
 		// ****************************************************************************
@@ -2016,6 +2031,7 @@ class ParentClassItem extends JModelAdmin
 		// **********************************************************************
 		// new item Or item version is approved ... save item to #__content table
 		// **********************************************************************
+		if ( $print_logging_info ) $start_microtime = microtime(true);
 		if( $isnew || $data['vstate']==2 )
 		{
 			if( !$this->applyCurrentVersion($item, $data) ) return false;
@@ -2040,28 +2056,41 @@ class ParentClassItem extends JModelAdmin
 			$item->modified_by	= $user->get('id');
 		}
 		
+		if ( $print_logging_info ) @$fc_run_times['item_store_core'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		
 		// *************************************************************************************************
 		// Trigger Event 'onAfterSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
 		// *************************************************************************************************
+		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$results = $dispatcher->trigger('onAfterSaveItem', array( &$item, &$data ));
+		if ( $print_logging_info ) @$fc_run_times['onAfterSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		
 		// *****************************************************************************************************
 		// Trigger Event 'onAfterContentSave' (J1.5) OR 'onContentAfterSave' (J2.5 ) of Joomla's Content plugins
 		// *****************************************************************************************************
+		if ( $print_logging_info ) $start_microtime = microtime(true);
+		
 		// Some compatibility steps
-	  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
+	  JRequest::setVar('view', 'article');
+		JRequest::setVar('option', 'com_content');
 	  
 		if (FLEXI_J16GE) $dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isnew));
 		else             $dispatcher->trigger('onAfterContentSave', array(&$item, $isnew));
 		
 		// Reverse compatibility steps
-		JRequest::setVar('view', $view);	  JRequest::setVar('option', 'com_flexicontent');
+		JRequest::setVar('view', $view);
+		JRequest::setVar('option', 'com_flexicontent');
+		
+		if ( $print_logging_info ) @$fc_run_times['onContentAfterSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
 		
 		
 		// *********************************************
 		// Create and store version METADATA information 
 		// *********************************************
+		if ( $print_logging_info ) $start_microtime = microtime(true);
 		if ($use_versioning) {
 			$v = new stdClass();
 			$v->item_id			= (int)$item->id;
@@ -2103,11 +2132,16 @@ class ParentClassItem extends JModelAdmin
 			$this->_db->setQuery($query);
 			$this->_db->query();
 		}
+		if ( $print_logging_info ) @$fc_run_times['ver_cleanup_ver_metadata'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
 		
 		// ****************************************************************************************************
 		// Trigger Event 'onCompleteSaveItem' of FLEXIcontent plugins (such plugin is the 'flexinotify' plugin)
 		// ****************************************************************************************************
+		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$results = $dispatcher->trigger('onCompleteSaveItem', array( &$item, &$fields ));
+		if ( $print_logging_info ) @$fc_run_times['onCompleteSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
 		return true;
 	}
 	
@@ -2126,8 +2160,14 @@ class ParentClassItem extends JModelAdmin
 		$dispatcher = JDispatcher::getInstance();
 		$cparams    = $this->_cparams;
 		$use_versioning = $cparams->get('use_versioning', 1);
+		$print_logging_info = $cparams->get('print_logging_info');
 		$last_version = FLEXIUtilities::getLastVersions($item->id, true);
-
+		$mval_query = true;
+		
+		if ( $print_logging_info ) global $fc_run_times;
+		if ( $print_logging_info ) $start_microtime = microtime(true);
+		
+		
 		//*********************************
 		// Checks for untranslatable fields
 		//*********************************
@@ -2143,11 +2183,12 @@ class ParentClassItem extends JModelAdmin
 		if ($is_content_default_lang && $this->_id) {
 			$query = 'SELECT ie.item_id'
 				.' FROM #__flexicontent_items_ext as ie'
-				.' WHERE ie.lang_parent_id = ' . (int)$this->_id;
+				.' WHERE ie.lang_parent_id = ' . (int)$this->_id
+				.'  AND ie.item_id <> '.(int)$this->_id; // DO NOT include the item itself in associated translations !!
 			$this->_db->setQuery($query);
-			$translation_ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+			$assoc_item_ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 		}
-		if (empty($translation_ids)) $translation_ids = array();
+		if (empty($assoc_item_ids)) $assoc_item_ids = array();
 		
 		
 		// ***************************************************************************************************************************
@@ -2155,14 +2196,14 @@ class ParentClassItem extends JModelAdmin
 		// ***************************************************************************************************************************		
 		$fields = $this->getExtrafields($force=true, $get_untraslatable_values ? $item->lang_parent_id : 0);
 		
+		
+		// ******************************************************************************************************************
+		// Loop through Fields triggering onBeforeSaveField Event handlers, this was seperated from the rest of the process
+		// to give chance to ALL fields to check their DATA and cancel item saving process before saving any new field values
+		// ******************************************************************************************************************
 		$searchindex = array();
 		if ($fields)
 		{
-			// ******************************************************************************************************************
-			// Loop through Fields triggering onBeforeSaveField Event handlers, this was seperated from the rest of the process
-			// to give chance to ALL fields to check their DATA and cancel item saving process before saving any new field values
-			// ******************************************************************************************************************
-			
 			foreach($fields as $field)
 			{
 				// Set vstate property into the field object to allow this to be changed be the before saving  field event handler
@@ -2221,11 +2262,17 @@ class ParentClassItem extends JModelAdmin
 			}
 			//echo "<pre>"; print_r($postdata); echo "</pre>"; exit;
 			
-			
-			// ****************************************************************************************************************************
-			// Loop through Fields triggering onIndexAdvSearch, onIndexSearch Event handlers, this was seperated from the before save field
-			//  event, so that we will update search indexes only if the above has not canceled saving OR has not canceled version approval
-			// ****************************************************************************************************************************
+		}
+		if ( $print_logging_info ) @$fc_run_times['fields_value_preparation'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		
+		// ****************************************************************************************************************************
+		// Loop through Fields triggering onIndexAdvSearch, onIndexSearch Event handlers, this was seperated from the before save field
+		//  event, so that we will update search indexes only if the above has not canceled saving OR has not canceled version approval
+		// ****************************************************************************************************************************
+		if ( $print_logging_info ) $start_microtime = microtime(true);
+		if ($fields) 
+		{
 			
 			$ai_query_vals = array();
 			foreach($fields as $field)
@@ -2248,12 +2295,12 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		// Remove item's old advanced search index entries
-		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE item_id='{$item->id}' ";
+		$query = "DELETE FROM #__flexicontent_advsearch_index WHERE item_id=". $item->id;
 		$this->_db->setQuery($query);
 		$this->_db->query();
 		
 		// Store item's advanced search index entries
-		if ( count($ai_query_vals) ) {
+		if ( !empty($ai_query_vals) ) {
 			$query = "INSERT INTO #__flexicontent_advsearch_index "
 				." (field_id,item_id,extraid,search_index,value_id) VALUES "
 				.implode(",", $ai_query_vals);
@@ -2271,47 +2318,68 @@ class ParentClassItem extends JModelAdmin
 			$app->enqueueMessage('vstate cannot be set to 1 (=no approve new version) when versioning is disabled', 'notice' );
 		}
 		
+		if ( $print_logging_info ) @$fc_run_times['fields_value_indexing'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		
+		if ( $print_logging_info ) $start_microtime = microtime(true);
 		
 		// **************************************************************************
 		// IF new version is approved, remove old version values from the field table
 		// **************************************************************************
-		if($data['vstate']==2) {
+		if($data['vstate']==2)
+		{
+			//echo "delete __flexicontent_fields_item_relations, item_id: " .$item->id;
 			$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id = '.$item->id;
 			$this->_db->setQuery($query);
 			$this->_db->query();
+			$query = 'DELETE FROM #__flexicontent_items_versions WHERE item_id='.$item->id.' AND version='.((int)$last_version+1);
+			$this->_db->setQuery($query);
+			$this->_db->query();
+			
+			$untranslatable_fields = array();
+			if ($fields) foreach($fields as $field)
+			{
+				if(	$field->iscore ) continue;
+				if (count($assoc_item_ids) && $field->untranslatable)
+				{
+					// Delete field values in all translating items, if current field is untranslatable and current item version is approved
+					// NOTE: item itself is not include in associated translations, no need to check for it and skip itit 
+					if (! $mval_query) {
+						$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id IN ('.implode(',',$assoc_item_ids).') AND field_id='.$field->id;
+						$this->_db->setQuery($query);
+						$this->_db->query();
+					} else {
+						$untranslatable_fields[] = $field->id;
+					}
+				}
+			}
+			if ( count($untranslatable_fields) ) {
+				$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id IN ('.implode(',',$assoc_item_ids).') AND field_id IN ('.implode(',',$untranslatable_fields) .')';
+				$this->_db->setQuery($query);
+				$this->_db->query();
+			}
 		}
 		
 		
-		// *******************************************************************************************
-		// Loop through Fields saving the field values and triggering onAfterSaveField Event handlers,
-		// and save Joomfish Data (if they exist), this is for J1.5 only (stored in Joomfish DB table)
-		// *******************************************************************************************
+		// *******************************************
+		// Loop through Fields saving the field values
+		// *******************************************
 		if ($fields)
 		{
 			// Do not save if versioning disabled or item has no type (version 0)
 			$record_versioned_data = $use_versioning && $item->version;
 			
+			$ver_query_vals = array();
+			$rel_query_vals = array();
+			
 			foreach($fields as $field)
 			{
-				// Delete field values in all translating items, if current field is untranslatable and current item version is approved
-				if(	( $isnew || $data['vstate']==2 ) && !$field->iscore ) {
-					if (count($translation_ids) && $field->untranslatable) {
-						foreach($translation_ids as $t_item_id) {
-							$query = 'DELETE FROM #__flexicontent_fields_item_relations WHERE item_id='.$t_item_id.' AND field_id='.$field->id;
-							$this->_db->setQuery($query);
-							$this->_db->query();
-						}
-					}
-				}
-				
-				// Skip fields not having value
-				if (!$postdata[$field->name]) continue;
-				
 				// -- Add the new values to the database 
 				$postvalues = $this->formatToArray( $postdata[$field->name] );
 				$i = 1;
-				foreach ($postvalues as $postvalue) {
-					
+				
+				foreach ($postvalues as $postvalue)
+				{
 					// Create field obj for DB insertion
 					$obj = new stdClass();
 					$obj->field_id 		= $field->id;
@@ -2323,38 +2391,69 @@ class ParentClassItem extends JModelAdmin
 					$obj->value = is_array($postvalue) ? serialize($postvalue) : $postvalue;
 					
 					// -- a. Add versioning values, but do not version the 'hits' or 'state' or 'voting' fields
-					if ($record_versioned_data && 
-						$field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting' ) {
-						if ( isset($obj->value) && JString::strlen(trim($obj->value)) ) {
-							$this->_db->insertObject('#__flexicontent_items_versions', $obj);
+					if ($record_versioned_data && $field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting') {
+						// Insert only if value non-empty
+						if ( isset($obj->value) && JString::strlen(trim($obj->value)) )
+						{
+							if (! $mval_query) $this->_db->insertObject('#__flexicontent_items_versions', $obj);
+							else $ver_query_vals[] = "(".$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->version."," .$this->_db->Quote($obj->value).")";
 						}
 					}
 					//echo $field->field_type." - ".$field->name." - ".JString::strlen(trim($obj->value))." ".$field->iscore."<br/>";
 					
 					// -- b. If item is new OR version is approved, AND field is not core (aka stored in the content table or in special table), then add field value to field values table
-					if(	( $isnew || $data['vstate']==2 ) && !$field->iscore ) {
+					if(	( $isnew || $data['vstate']==2 ) && !$field->iscore )
+					{
+						// UNSET version it it used only verion data table, and insert only if value non-empty
 						unset($obj->version);
-						if ( isset($obj->value) && JString::strlen(trim($obj->value)) ) {
-							$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+						if ( isset($obj->value) && JString::strlen(trim($obj->value)) )
+						{
+							if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+							else $rel_query_vals[] = "(".$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$this->_db->Quote($obj->value).")";
 							
 							// Save field value in all translating items, if current field is untranslatable
-							if (count($translation_ids) && $field->untranslatable) {
-								foreach($translation_ids as $t_item_id) {
+							// NOTE: item itself is not include in associated translations, no need to check for it and skip it
+							if (count($assoc_item_ids) && $field->untranslatable) {
+								foreach($assoc_item_ids as $t_item_id) {
 									$obj->item_id = $t_item_id;
-									$this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+									if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
+									else $rel_query_vals[] = "(".$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$this->_db->Quote($obj->value).")";
 								}
 							}
-							
 						}
 					}
 					$i++;
 				}
-				
-				// Trigger onAfterSaveField Event
-				$fieldname = $field->iscore ? 'core' : $field->field_type;
-				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item ));
-				// *** $result is ignored
 			}
+			
+			
+			// *********************************************
+			// Insert values in item fields versioning table
+			// *********************************************
+			
+			if ( count($ver_query_vals) ) {
+				$query = "INSERT INTO #__flexicontent_items_versions "
+					." (field_id,item_id,valueorder,version,value) VALUES "
+					."\n".implode(",\n", $ver_query_vals);
+				$this->_db->setQuery($query);
+				$this->_db->query();
+				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+			}
+			
+			
+			// *******************************************
+			// Insert values in item fields relation table
+			// *******************************************
+			
+			if ( count($rel_query_vals) ) {
+				$query = "INSERT INTO #__flexicontent_fields_item_relations "
+					." (field_id,item_id,valueorder,value) VALUES "
+					."\n".implode(",\n", $rel_query_vals);
+				$this->_db->setQuery($query);
+				$this->_db->query();
+				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+			}
+			
 			
 			// **************************************************************
 			// Save other versioned item data into the field versioning table
@@ -2397,6 +2496,26 @@ class ParentClassItem extends JModelAdmin
 				$this->_db->insertObject('#__flexicontent_items_versions', $obj);
 			}
 		}
+		
+		if ( $print_logging_info ) @$fc_run_times['fields_value_saving'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		
+		// ******************************
+		// Trigger onAfterSaveField Event
+		// ******************************
+		if ( $fields )
+		{
+			if ( $print_logging_info ) $start_microtime = microtime(true);
+			foreach($fields as $field)
+			{
+				$fieldname = $field->iscore ? 'core' : $field->field_type;
+				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onAfterSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item ));
+				// *** $result is ignored
+			}
+			if ( $print_logging_info ) @$fc_run_times['onAfterSaveField_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		}
+
+		
 		return true;
 	}
 	
@@ -2928,17 +3047,17 @@ class ParentClassItem extends JModelAdmin
 		$query	= 'SELECT t.attribs'
 				. ' FROM #__flexicontent_types AS t';
 
-		if ($this->_id == null) {
+		if ( !$this->_id ) {
 			$type_id = JRequest::getInt('typeid', 0);
 			$query .= ' WHERE t.id = ' . (int)$type_id;
 		} else {
-			$query .= ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
-					. ' WHERE ie.item_id = ' . (int)$this->_id
-					;
+			$query .= ' JOIN #__flexicontent_items_ext AS ie ON ie.type_id = t.id'
+				. ' WHERE ie.item_id = ' . (int)$this->_id
+				;
 		}
 		$this->_db->setQuery($query);
 		$tparams = $this->_db->loadResult();
-		return $tparams;
+		return $tparams ? $tparams : '';
 	}
 	
 	
@@ -3207,9 +3326,19 @@ class ParentClassItem extends JModelAdmin
 			$fc_itemview = $app->isSite() ? FLEXI_ITEMVIEW : 'item';
 			
 			$item = new stdClass();
-		  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');		$item->state = $jm_state;
+			
+			// Compatibility steps (including Joomla compatible state),
+			// so that 3rd party plugins using the change state event work properly
+		  JRequest::setVar('view', 'article');	  JRequest::setVar('option', 'com_content');
+			$item->state = $jm_state;
+			
 			$result = $dispatcher->trigger($this->event_change_state, array('com_content.article', (array) $id, $jm_state));
-			JRequest::setVar('view', $fc_itemview);	  JRequest::setVar('option', 'com_flexicontent');		$item->state = $fc_state;
+			
+			// Revert compatibilty steps ... the $item->state is not used further regardless if it was changed,
+			// besides the event_change_state using plugin should have updated DB state value anyway
+			JRequest::setVar('view', $fc_itemview);	  JRequest::setVar('option', 'com_flexicontent');
+			if ($item->state == $jm_state) $item->state = $fc_state;  // this check is redundant, item->state is not used further ...
+			
 			if (in_array(false, $result, true) && !$event_failed_notice_added) {
 				JError::raiseNotice(10, JText::_('One of plugin event handler for onContentChangeState failed') );
 				$event_failed_notice_added = true;
@@ -3747,13 +3876,13 @@ class ParentClassItem extends JModelAdmin
 		if ($send_result) {
 			// OK
 			if ($params->get('nf_enable_debug',0)) {
-				$app->enqueueMessage("Sending notification emails success", 'message' );
+				$app->enqueueMessage("Sending WORKFLOW notification emails SUCCESS", 'message' );
 				$app->enqueueMessage($debug_str, 'message' );
 			}
 		} else {
 			// NOT OK
 			if ($params->get('nf_enable_debug',0)) {
-				$app->enqueueMessage("Sending notification emails success", 'warning' );
+				$app->enqueueMessage("Sending WORKFLOW notification emails FAILED", 'warning' );
 				$app->enqueueMessage($debug_str, 'message' );
 			}
 		}

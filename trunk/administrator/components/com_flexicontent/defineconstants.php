@@ -19,10 +19,39 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-$lhlist = array('localhost', '127.0.0.1');
-if( in_array($_SERVER['HTTP_HOST'], $lhlist) ) {
-	error_reporting(E_ALL & ~E_STRICT);
-	ini_set('display_errors',1);
+// Make sure that Joomla error reporting is used (some plugin may have turned it OFF)
+// Also make some changes e.g. disable E_STRICT for maximum and leave it on only for development
+$config = new JConfig();
+switch ($config->error_reporting)
+{
+	case 'default':
+	case '-1':
+		break;
+	
+	case 'none':
+	case '0':
+		error_reporting(0);
+		break;
+	
+	case 'simple':
+		error_reporting(E_ERROR | E_WARNING | E_PARSE);
+		ini_set('display_errors',1);
+		break;
+	
+	case 'maximum':
+		error_reporting(E_ALL & ~E_STRICT);
+		ini_set('display_errors',1);
+		break;
+	
+	case 'development':
+		error_reporting(-1);
+		ini_set('display_errors',1);
+		break;
+	
+	default:
+		error_reporting($config->error_reporting);
+		ini_set('display_errors', 1);
+		break;
 }
 
 // Joomla version variables
@@ -157,6 +186,6 @@ if (!defined('FLEXI_ITEMVIEW'))		define('FLEXI_ITEMVIEW'	, FLEXI_J16GE ? 'item' 
 if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/system/images/' : 'images/M_images/' );
 
 // Version constants
-define('FLEXI_VERSION',	FLEXI_J16GE ? '2.0.3 beta4' : '2.0.3 beta4');
-define('FLEXI_RELEASE',	'r1696');
+define('FLEXI_VERSION',	FLEXI_J16GE ? '2.1.0 beta1' : '2.1.0 beta1');
+define('FLEXI_RELEASE',	'r1699');
 ?>

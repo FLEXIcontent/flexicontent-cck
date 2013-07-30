@@ -172,9 +172,10 @@ div.comments {
 	margin: 0;
 	padding: 0;
 }
-#flexicontent ul.leadingblock li {
+#flexicontent ul.leadingblock > li {
 	margin: 0px 0px 12px 0px;
-	padding: 0;
+	padding: 12px 0px 0px 0px;
+	border-top: 1px dashed darkgray;
 	background: none;
 	width: 100%;
 	min-height: 10px;
@@ -186,9 +187,10 @@ div.comments {
 	_height: 10px;
 	line-height: inherit;
 }
-#flexicontent ul.introblock li {
+#flexicontent ul.introblock > li {
 	margin: 0px 0px 12px 0px;
-	padding: 0;
+	padding: 12px 0px 0px 0px;
+	border-top: 1px dashed darkgray;
 	background: none;
 	width: 100%;
 	min-height: 10px;
@@ -200,22 +202,22 @@ div.comments {
 	_height: 10px;
 	line-height: inherit;
 }
-#flexicontent ul.introblock.two li {
+#flexicontent ul.introblock.two > li {
 	width: 48%;
 }
-#flexicontent ul.introblock.two li.fceven {
+#flexicontent ul.introblock.two > li.fceven {
 	margin-left: 3%
 }
-#flexicontent ul.introblock.three li {
+#flexicontent ul.introblock.three > li {
    width: 30%;
 }
-#flexicontent ul.introblock.three li.fceven {
+#flexicontent ul.introblock.three > li.fceven {
    margin-left: 1%
 }
-#flexicontent ul.introblock.four li {
+#flexicontent ul.introblock.four > li {
    width: 23%;
 }
-#flexicontent ul.introblock.four li.fceven {
+#flexicontent ul.introblock.four > li.fceven {
    margin-left: 1%
 }
 

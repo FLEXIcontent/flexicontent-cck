@@ -31,6 +31,11 @@ if ($html5) {  /* BOF html5  */
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');
 
+// Prepend toc (Table of contents) before item's description (toc will usually float right)
+// By prepend toc to description we make sure that it get's displayed at an appropriate place
+if (isset($item->toc)) {
+	$item->fields['text']->display = $item->toc . $item->fields['text']->display;
+}
 
 // ***********
 // DECIDE TAGS 
@@ -64,7 +69,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	  <!-- BOF beforeDisplayContent -->
 		<div class="fc_beforeDisplayContent group">
 			<?php echo $item->event->beforeDisplayContent; ?>
-		<div>
+		</div>
 		<!-- EOF beforeDisplayContent -->
 	<?php endif; ?>
 	
@@ -273,13 +278,6 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	
 	
 	<div class="fcclear"></div>
-	
-	
-	<?php if (isset($item->toc)) : ?>
-		<!-- BOF TOC -->
-		<?php echo $item->toc; ?>
-		<!-- EOF TOC -->
-	<?php endif; ?>
 	
 	
 	<?php if (isset($item->positions['description'])) : ?>

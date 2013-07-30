@@ -70,16 +70,26 @@ if ($this->limitstart != 0) $leadnum = 0;
 		for ($i=0; $i<$leadnum; $i++) :
 			$item = $items[$i];
 			$fc_item_classes = 'fc_bloglist_item';
-			$fc_item_classes .= ' span12';
-			foreach ($items[$i]->categories as $item_cat) {
-				$fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
+			
+			$markup_tags = '<span class="fc_mublock">';
+			foreach($item->css_markups as $grp => $css_markups) {
+				if ( empty($css_markups) )  continue;
+				$fc_item_classes .= ' fc'.implode(' fc', $css_markups);
+				
+				$ecss_markups  = $item->ecss_markups[$grp];
+				$title_markups = $item->title_markups[$grp];
+				foreach($css_markups as $mui => $css_markup) {
+					$markup_tags .= '<span class="fc_markup mu' . $css_markups[$mui] . $ecss_markups[$mui] .'">' .$title_markups[$mui]. '</span>';
+				}
 			}
-			$fc_item_classes .= $items[$i]->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
+			$markup_tags .= '</span>';
 		?>
+		
 		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
+			
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<article class="group">
-			<?php endif; ?>	
+			<?php endif; ?>
 			
 			<!-- BOF beforeDisplayContent -->
 			<?php if ($items[$i]->event->beforeDisplayContent) : ?>
@@ -144,6 +154,8 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<?php endif; ?>
 			<!-- EOF afterDisplayTitle -->
 
+			<?php echo $markup_tags; ?>
+			
 			<?php if ( $header_shown ) : ?>
 			</header>
 			<?php endif; ?>
@@ -169,7 +181,7 @@ if ($this->limitstart != 0) $leadnum = 0;
 						$ext = pathinfo($src, PATHINFO_EXTENSION);
 						$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 						$conf	= $w . $h . $aoe . $q . $zc . $f;
-							
+						
 						$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 						$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 					} else {
@@ -379,18 +391,27 @@ if ($count > $leadnum) :
 			$img_field_size = $img_size_map[ $this->params->get('intro_image_size' , 'l') ];
 			$img_field_name = $this->params->get('intro_image');
 		}
+		
 		for ($i=$leadnum; $i<$count; $i++) :
 			$item = $items[$i];
-			$fc_item_classes  = ($i-$leadnum)%2 ? 'fceven' : 'fcodd';
-			$fc_item_classes .= ' fccol'.($i%$intro_cols + 1);
-			$fc_item_classes .= ' fc_bloglist_item';
+			$fc_item_classes = 'fc_bloglist_item';
 			$fc_item_classes .= ' '.$classspan;
-			foreach ($items[$i]->categories as $item_cat) {
-				$fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
+			$fc_item_classes .= ($i-$leadnum)%2 ? ' fceven' : ' fcodd';
+			$fc_item_classes .= ' fccol'.($i%$intro_cols + 1);
+			
+			$markup_tags = '<span class="fc_mublock">';
+			foreach($item->css_markups as $grp => $css_markups) {
+				if ( empty($css_markups) )  continue;
+				$fc_item_classes .= ' fc'.implode(' fc', $css_markups);
+				
+				$ecss_markups  = $item->ecss_markups[$grp];
+				$title_markups = $item->title_markups[$grp];
+				foreach($css_markups as $mui => $css_markup) {
+					$markup_tags .= '<span class="fc_markup mu' . $css_markups[$mui] . $ecss_markups[$mui] .'">' .$title_markups[$mui]. '</span>';
+				}
 			}
-			$fc_item_classes .= $items[$i]->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
+			$markup_tags .= '</span>';
 		?>
-		
 		
 		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
 			
@@ -465,6 +486,8 @@ if ($count > $leadnum) :
 			<?php endif; ?>
 			<!-- EOF afterDisplayTitle -->
 			
+			<?php echo $markup_tags; ?>
+			
 			<?php if ( $header_shown ) : ?>
 			<header class="group">
 			<?php endif; ?>
@@ -491,7 +514,7 @@ if ($count > $leadnum) :
 					$ext = pathinfo($src, PATHINFO_EXTENSION);
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
-						
+					
 					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 					$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 				} else {

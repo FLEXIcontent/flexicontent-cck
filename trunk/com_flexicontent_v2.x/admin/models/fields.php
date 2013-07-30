@@ -136,14 +136,13 @@ class FlexicontentModelFields extends JModelList
 			$query = $db->getQuery(true);
 			$query->select(
 				$this->getState( 'list.select',
-					't.*, level.title as access_level, u.name AS editor, COUNT(rel.type_id) AS nrassigned, g.title AS groupname, rel.ordering as typeordering, t.field_type as type, plg.name as field_friendlyname'
+					't.*, u.name AS editor, COUNT(rel.type_id) AS nrassigned, level.title AS access_level, rel.ordering as typeordering, t.field_type as type, plg.name as field_friendlyname'
 				)
 			);
 			$query->from('#__flexicontent_fields AS t');
-			$query->join('LEFT', '#__viewlevels as level ON level.id=t.access');
 			$query->join('LEFT', '#__extensions AS plg ON (plg.element = t.field_type AND plg.`type`=\'plugin\' AND plg.folder=\'flexicontent_fields\')');
 			$query->join('LEFT', '#__flexicontent_fields_type_relations AS rel ON rel.field_id = t.id');
-			$query->join('LEFT', '#__usergroups AS g ON g.id = t.access');
+			$query->join('LEFT', '#__viewlevels AS level ON level.id=t.access');
 			$query->join('LEFT', '#__users AS u ON u.id = t.checked_out');
 			if ($where) $query->where($where);
 			$query->group('t.id');

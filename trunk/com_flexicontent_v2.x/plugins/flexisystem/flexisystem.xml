@@ -29,21 +29,20 @@
 			<field name="exclude_redirect_cats" type="flexiusergroup" default="" multiple="true" size="6" label="Exclude from category redirection&lt;br&gt; (BACKEND Only)" description="Exclude from category redirection ..." />
 			<field name="exclude_redirect_articles" type="flexiusergroup" default="" multiple="true" size="6" label="Exclude from article redirection&lt;br&gt; (BACKEND Only)" description="Exclude from article redirection ..." />
 			<field name="excluded_redirect_urls" type="textarea" rows="6" cols="36" label="Exclude urls from redirection (enter a part) (BACKEND Only)" description="if you have trouble with some URLs unwantingly redirecting to FLEXIcontent URLs, you can enter here a sub-string of them, in order to exclude them from redirection. Seperate urls with %% DO NOT add new line characters" />
-			<!--field name="excluded_cats" type="flexicategories" default="" multiple="true" size="16" label="Exclude specific categories&lt;br&gt; *(please read description)" description="The choosen categories will not be redirected in (a) the category view or (b) in item view when acting as CURRENT category (URL) of the item" /-->
-			<!--field name="excluded_items" type="textarea" default="" rows="3" cols="36" label="Exclude specific items" description="Enter a comma seperated list of item ids that will not be redirected" /-->
 
 			<field name="" type="separator" default="Auto-Checkins" hr="false" level="level2" menu="hide" />
 			<field name="checkin_on_session_end" type="radio" default="1" label="Check-in on user logout / session expiration" description="Check-out records (items,categories,etc) will be checked-in on user logout or session expiration">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="limit_checkout_hours" type="radio" default="1" label="Time-Limit check-outs" description="Impose a maximum time for checked-out records. Records exceeding this limit whill be  checked">
+			<field name="limit_checkout_hours" type="radio" default="1" label="Time-Limit check-outs" description="Impose a maximum time for checked-out records. Records exceeding this limit whill be automatically checked-in">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="max_checkout_hours" type="text" label="Max checked out hours" description="Maximum allowed time an record (item,category,etc) should be checked out before automatically checking it in" default="24" />
 
-			<!--field name="" type="separator" default="Auto-Archiving (EXPERIMENTAL, for developments sites only)" hr="false" level="level2" menu="hide" />
+			<field name="" type="separator" default="Auto-Archiving" hr="false" level="level2" />
+			<field name="" type="separator" default="NOTE: There powerful Joomla extensions that allow more options and flexibility than this basic Feature" hr="false" level="level3" />
 			<field name="archive_on_publish_down" type="radio" default="0" label="Archive items with expired dates" description="Enable this to automatically archive items that their publish_down date is reached">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -51,11 +50,12 @@
 			<field name="clear_publish_down_date" type="radio" default="1" label="Clear publish down date" description="When auto-archiving clear the publish-down date, this will make the auto-archived items visible in the archived view. It is recommended that you set this to YES">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Yes, Recommeneded</option>
-			</field-->
+			</field>
 			
 			<field name="redirect_pdf_format" type="radio" default="1" label="Redirect pdf format" description="Joomla 2.5 does not support PDF natively, this provides a solution for J1.5 upgraded sites that used it, by redirecting to HTML version">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+				<option value="2">Yes, Display Notice</option>
 			</field>
 
 		</fieldset>

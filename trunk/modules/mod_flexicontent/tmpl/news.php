@@ -176,7 +176,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					</div>
 					<?php endif; ?>
 					
-					<?php if ($display_hits_feat) : ?>
+					<?php if ($display_hits_feat && @ $item->hits_rendered) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_hits">
 							<?php echo $item->hits_rendered; ?>
@@ -184,7 +184,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					</div>
 					<?php endif; ?>
 					
-					<?php if ($display_voting_feat) : ?>
+					<?php if ($display_voting_feat && @ $item->voting) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_voting">
 							<?php echo $item->voting;?>
@@ -320,7 +320,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					</div>
 					<?php endif; ?>
 					
-					<?php if ($display_hits) : ?>
+					<?php if ($display_hits && @ $item->hits_rendered) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_hits">
 							<?php echo $item->hits_rendered; ?>
@@ -328,7 +328,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 					</div>
 					<?php endif; ?>
 					
-					<?php if ($display_voting) : ?>
+					<?php if ($display_voting && @ $item->voting) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_voting">
 							<?php echo $item->voting;?>

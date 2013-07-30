@@ -76,7 +76,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				
 				var filelist = document.getElementById('sortables_".$field->id."');
 				
-				$(li).addClass('sortabledisabled');
 				$(span).addClass('fcfield-drag');
 				
 				var button = document.createElement('input');
@@ -92,6 +91,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				txt.disabled = 'disabled';
 				txt.id	= name;
 				txt.value	= file;
+				txt.addClass('fcfield_textval inputbox inline_style_published');
 				
 				hid.type = 'hidden';
 				hid.name = '".$fieldname."';
@@ -165,9 +165,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				list-style: none;
 				height: auto;
 				position: relative;
-			}
-			#sortables_'.$field->id.' li.sortabledisabled {
-				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
 			}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#sortables_'.$field->id.' li input.inline_style_published   { font-family:tahoma!important; font-style:italic!important; color:#444!important; font-style:tahona; }
@@ -482,7 +479,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
 		if ($post) {
-			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', file.id AS value_id' );
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		} else {
@@ -503,7 +500,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if ( !$field->issearch ) return;
 		
 		if ($post) {
-			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', file.id AS value_id' );
+			$_files_data = $this->getFileData( $post, $published=true, $extra_select =', id AS value_id' );
 			$values = array();
 			if ($_files_data) foreach($_files_data as $_file_id => $_file_data) $values[$_file_id] = (array)$_file_data;
 		} else {

@@ -47,8 +47,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$date_source = $field->parameters->get('date_source', 0);
 		if ( $date_source ) {
 			$date_source_str = 'Automatic field (shows this content \'s %s publication date)';
-			$date_source_str = sprintf($date_source_str, ($date == 1) ? '<b>start</b>' :  '<b>end</b>');
-			$_value = ($date == 1) ? $item->publish_up : $item->publish_down;
+			$date_source_str = sprintf($date_source_str, ($date_source == 1) ? '<b>start</b>' :  '<b>end</b>');
+			$_value = ($date_source == 1) ? $item->publish_up : $item->publish_down;
 			$field->html =
 				 '<div style="float:left">'
 				.' <div class="fc_mini_note_box">'.$date_source_str.'</div>'
@@ -287,7 +287,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 
 		$date_source = $field->parameters->get('date_source', 0);
 		if ( $date_source ) {
-			$_value = ($date == 1) ? $item->publish_up : $item->publish_down;
+			$_value = ($date_source == 1) ? $item->publish_up : $item->publish_down;
 			$values = array($_value);
 		}
 		
@@ -535,7 +535,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$valuecol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_valformat);
 			$textcol  = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_txtformat);
 		} else {
-			$_value_col = ($date == 1) ? 'i.publish_up' : 'i.publish_down';
+			$_value_col = ($date_source == 1) ? 'i.publish_up' : 'i.publish_down';
 			$valuecol = sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_valformat);
 			$textcol  = sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_txtformat);
 		}
@@ -573,7 +573,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		if ( ! $date_source ) {
 			$filter->filter_colname    = sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat);
 		} else {
-			$_value_col = ($date == 1) ? 'c.publish_up' : 'c.publish_down';
+			$_value_col = ($date_source == 1) ? 'c.publish_up' : 'c.publish_down';
 			$filter->filter_colname    = sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_valformat);
 		}
 		

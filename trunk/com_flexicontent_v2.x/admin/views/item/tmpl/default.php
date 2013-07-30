@@ -26,6 +26,12 @@ $tabCnt = array();
 
 $tags_displayed = $this->row->type_id && ( $this->perms['cantags'] || count(@$this->usedtags) ) ;
 
+// add extra css/js for the edit form
+if ($this->params->get('form_extra_css'))    $this->document->addStyleDeclaration($this->params->get('form_extra_css'));
+if ($this->params->get('form_extra_css_be')) $this->document->addStyleDeclaration($this->params->get('form_extra_css_be'));
+if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclaration($this->params->get('form_extra_js'));
+if ($this->params->get('form_extra_js_be'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_be'));
+
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
 $this->document->addScript('components/com_flexicontent/assets/js/tabber-minimized.js');
 $this->document->addStyleSheet('components/com_flexicontent/assets/css/tabber.css');
@@ -333,7 +339,7 @@ $tabCnt[$tabSetCnt] = 0;
 			?>
 
 		<?php if ( $this->perms['canpublish'] ) : ?>
-			<?php if (!$this->cparams->get('auto_approve', 1)) : ?>
+			<?php if (!$this->params->get('auto_approve', 1)) : ?>
 				<?php
 					//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
 					$label_tooltip = 'class="hasTip flexi_label fcdualline" title="'.htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC' ), ENT_COMPAT, 'UTF-8').'"';
@@ -349,10 +355,10 @@ $tabCnt[$tabSetCnt] = 0;
 			<?php else :
 				echo '<input type="hidden" name="jform[vstate]" id="jform_vstate" value="2" />';
 			endif;
-		elseif (!$this->cparams->get('auto_approve', 1)) :
+		elseif (!$this->params->get('auto_approve', 1)) :
 			// Enable approval if versioning disabled, this make sense,
 			// since if use can edit item THEN item should be updated !!!
-			$item_vstate = $this->cparams->get('use_versioning', 1) ? 1 : 2;
+			$item_vstate = $this->params->get('use_versioning', 1) ? 1 : 2;
 			echo '<input type="hidden" name="jform[vstate]" id="jform_vstate" value="'.$item_vstate.'" />';
 		else :
 			echo '<input type="hidden" name="jform[vstate]" id="jform_vstate" value="2" />';
@@ -400,7 +406,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<?php echo $this->lists['languages']; ?>
 			</div>
 
-			<?php if ($this->cparams->get('enable_translation_groups')) : ?>
+			<?php if ($this->params->get('enable_translation_groups')) : ?>
 
 				<div class="fcclear"></div>
 				<?php
@@ -948,7 +954,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	</div> <!-- end tab -->
 	
 	
-	<?php if ($this->com_content_conf->get('show_urls_images_backend', 0) ) : ?>
+	<?php if (0 && JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 0) ) : ?>
 	
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('Compatibility'); ?> </h3>
@@ -1190,7 +1196,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		</tr>
 		</table>
 
-		<?php if ($this->cparams->get('use_versioning', 1)) : ?>
+		<?php if ($this->params->get('use_versioning', 1)) : ?>
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 			<tr>
 				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></th>

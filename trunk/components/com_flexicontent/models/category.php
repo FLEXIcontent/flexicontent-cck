@@ -537,9 +537,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$select_access = '';
 		
+		// Extra access columns for main category and content type (item access will be added as 'access')
+		$select_access .= ', c.access as category_access, ty.access as type_access';
+		
 		if ($show_noauth) {
-			// Extra access columns for main category and content type (item access will be added as 'access')
-			$select_access .= ', c.access as category_access, ty.access as type_access';
 			
 			// Access Flags for: content type, main category, item
 			if (FLEXI_J16GE) {
@@ -1453,13 +1454,24 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$n = 0;
 			foreach ($mfilter_arr as $mfilter) {
 				$_data  = preg_split("/[\s]*##[\s]*/", $mfilter);
+				//print_r($_data);
 				$filter_id = (int) $_data[0];  $filter_value = @$_data[1];
 				$filter_ids[] = $filter_id;
 				
 				if ( $filter_id ) {
 					$filter_vals[$filter_id] = $filter_value;
 					if ($is_persistent || JRequest::getVar('filter_'.$filter_id, false) === false ) {
-						//echo "filter_.$filter_id, $filter_value <br/>";
+						//echo "filter_".$filter_id.": "; print_r( $filter_value ); echo "<br/>";
+						if (strpos($filter_value, '---') !== false) {
+							// Range value:  value01---value02
+							$filter_value = explode('---', $filter_value);
+							$filter_value[2] = $filter_value[1];
+							$filter_value[1] = $filter_value[0];
+							unset($filter_value[0]);
+						} else if (strpos($filter_value, '+++') !== false) {
+							// Multiple values:  value01+++value02+++value03+++value04
+							$filter_value = explode('+++', $filter_value);
+						}
 						JRequest::setVar('filter_'.$filter_id, $filter_value);
 					}
 				}

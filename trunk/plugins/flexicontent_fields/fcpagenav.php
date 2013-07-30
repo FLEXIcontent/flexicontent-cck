@@ -69,13 +69,13 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		$use_tooltip		= $field->parameters->get('use_tooltip', 1);
 		$use_title			= $field->parameters->get('use_title', 0);
 		$use_category_link	= $field->parameters->get('use_category_link', 0);
-		$show_prevnext_count = $field->parameters->get('show_prevnext_count', 1);
+		$show_prevnext_count= $field->parameters->get('show_prevnext_count', 1);
 		$tooltip_title_next	= $field->parameters->get('tooltip_title_next', JText::_('FLEXI_FIELDS_PAGENAV_GOTONEXT'));
 		$tooltip_title_prev	= $field->parameters->get('tooltip_title_prev', JText::_('FLEXI_FIELDS_PAGENAV_GOTOPREV'));
 		$types_to_exclude	= $field->parameters->get('type_to_exclude', '');
-		$prev_label			= $field->parameters->get('prev_label', JText::_('Prev'));
-		$next_label			= $field->parameters->get('next_label', JText::_('Next'));
-		$category_label		= $field->parameters->get('category_label', JText::_('FLEXI_FIELDS_PAGENAV_CATEGORY'));
+		$prev_label			= $field->parameters->get('prev_label', JText::_('FLEXI_FIELDS_PAGENAV_GOTONEXT'));
+		$next_label			= $field->parameters->get('next_label', JText::_('FLEXI_FIELDS_PAGENAV_GOTOPREV'));
+		$category_label	= $field->parameters->get('category_label', JText::_('FLEXI_FIELDS_PAGENAV_CATEGORY'));
 
 		$view		= JRequest::getCmd('view');
 		$option		= JRequest::getCmd('option');

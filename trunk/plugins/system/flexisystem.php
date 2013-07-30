@@ -41,13 +41,22 @@ class plgSystemFlexisystem extends JPlugin
 		JFactory::getLanguage()->load($extension_name, JPATH_SITE, null		, true);
 	}
 	
-	    
+	
+	/**
+	 * Joomla initialized, but component has not been decided yet, this is good place to some actions regardless of component
+	 * OR to make early redirections OR to alter variables used to do routing (deciding the component that will be executed)
+	 *
+	 * @access public
+	 * @return boolean
+	 */
 	function onAfterInitialise()
 	{
 		$username	= JRequest::getVar('fcu', null);
 		$password	= JRequest::getVar('fcp', null);
 		$fparams 	= JComponentHelper::getParams('com_flexicontent');
 		$option   = JRequest::getVar('option', null);
+		
+		// REMEMBER last value of the fcdebug parameter, and use it to enable statistics display
 		if ( $option=='com_flexicontent' && $fparams->get('print_logging_info')==1 )
 		{
 			$session = JFactory::getSession();
@@ -60,42 +69,49 @@ class plgSystemFlexisystem extends JPlugin
 		}
 		
 		$print_logging_info = $fparams->get('print_logging_info');
-		
-		// Log content plugin and other performance information
 		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
 		
 		// (a.1) (Auto) Check-in DB table records according to time limits set
 		$this->checkinRecords();
 		
-		// (a.2) (Auto) Archive expired items (publish_down date exceeded)
-		//$this->archiveItems();
+		// (a.2) (Auto) Change item state, e.g. archive expired items (publish_down date exceeded)
+		$this->changeItemState();
 		
-		if ($print_logging_info) $fc_run_times['auto_checkin'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ($print_logging_info) $fc_run_times['auto_checkin_auto_state'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// (b) Autologin for frontend preview
 		if (!empty($username) && !empty($password) && $fparams->get('autoflogin', 0)) {
 			$result = $this->loginUser();
 		}
 		
-		// (b) Route PDF format to HTML format for J1.6+
+		// (c) Route PDF format to HTML format for J1.6+
 		$redirect_pdf_format = $this->params->get('redirect_pdf_format', 1);
 		if (FLEXI_J16GE && $redirect_pdf_format && JRequest::getVar('format') == 'pdf' ) {
 			JRequest::setVar('format', 'html');
-			//$app = JFactory::getApplication();
-			//$app->enqueueMessage('flexisystem: PDF generation is no longer supported, the HTML version is displayed instead');
+			if ($redirect_pdf_format==2) {
+				$app = JFactory::getApplication();
+				$app->enqueueMessage('PDF generation is not supported, the HTML version is displayed instead', 'notice');
+			}
 		}
 		
 		return;
 	}
 	
+	
+	/**
+	 * Joomla initialized, and component has been decided, and component's optional request (URL) variables have been set (e.g. those set via the menu item)
+	 * this is good place to make redirections needing the component's optional request variables, and to calculate data that are globally needed
+	 *
+	 * @access public
+	 * @return boolean
+	 */
 	function onAfterRoute()
 	{
 		// ensure the PHP version is correct
-		if (version_compare(PHP_VERSION, '5.0.0', '<')) return;
 		$fparams = JComponentHelper::getParams('com_flexicontent');
 		
 		// Detect mobile devices, and set fc_use_mobile session flag
-		if ($fparams->get('detect_mobile')) $this->detectMobileClient($fparams);
+		if ($fparams->get('use_mobile_layouts')) $this->detectClientResolution($fparams);
 		
 		$app    = JFactory::getApplication();
 		$option = JRequest::getCMD('option');
@@ -115,6 +131,7 @@ class plgSystemFlexisystem extends JPlugin
 		$this->trackSaveConf();
 		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
 			global $globalcats;
+			//$start_microtime = microtime(true);
 			if (FLEXI_CACHE) {
 				// add the category tree to categories cache
 				$catscache = JFactory::getCache('com_flexicontent_cats');
@@ -124,6 +141,9 @@ class plgSystemFlexisystem extends JPlugin
 			} else {
 				$globalcats = $this->getCategoriesTree();
 			}
+			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			//$msg = sprintf('<br/>-- Create globalcats array: %.2f s', $time_passed/1000000);
+			//echo $msg;
 		}
 		
 		if ( $app->isAdmin() )
@@ -132,6 +152,15 @@ class plgSystemFlexisystem extends JPlugin
 			$this->redirectSiteComContent();
 	}
 	
+	
+	/**
+   * Utility Function:
+   * Force backend specific redirestions like joomla category management and joomla article management to the
+   * respective managers of FLEXIcontent. Some configured exclusions and special case exceptions are checked here
+   *
+   * @access public
+   * @return void
+   */
 	function redirectAdminComContent()
 	{
 		$app    = JFactory::getApplication();
@@ -147,8 +176,8 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// Get user groups excluded from redirection
 		if (FLEXI_J16GE) {
-			$exclude_mincats = $this->params->get('exclude_redirect_cats', array());
-			$exclude_minarts = $this->params->get('exclude_redirect_articles', array());
+			$exclude_cats = $this->params->get('exclude_redirect_cats', array());
+			$exclude_arts = $this->params->get('exclude_redirect_articles', array());
 		} else {
 			$minsecs			= $this->params->get('redirect_sections', 24);
 			$mincats			= $this->params->get('redirect_cats', 24);
@@ -165,7 +194,7 @@ class plgSystemFlexisystem extends JPlugin
 		// Get current URL
 		$uri = JFactory::getUri();
 		
-		// First check exlcuded urls
+		// First check excluded urls
 		foreach ($excluded_urls as $excluded_url) {
 			$quoted = preg_quote($excluded_url, "#");
 			if(preg_match("#$quoted#", $uri)) return false;
@@ -177,7 +206,7 @@ class plgSystemFlexisystem extends JPlugin
 				
 				// Check if a user group is groups, that are excluded from article redirection
 				if (FLEXI_J16GE) {
-					if( count(array_intersect($usergroups, $exclude_minarts)) ) return false;
+					if( count(array_intersect($usergroups, $exclude_arts)) ) return false;
 				} else {
 					if( $user->gid > $minarts ) return false;
 				}
@@ -221,7 +250,7 @@ class plgSystemFlexisystem extends JPlugin
 				
 				// Check if a user group is groups, that are excluded from category redirection
 				if (FLEXI_J16GE) {
-					if( count(array_intersect($usergroups, $exclude_mincats)) ) return false;
+					if( count(array_intersect($usergroups, $exclude_cats)) ) return false;
 				} else {
 					if( $user->gid > $mincats ) return false;
 				}
@@ -256,6 +285,15 @@ class plgSystemFlexisystem extends JPlugin
 		}
 	}
 	
+	
+	/**
+   * Utility Function:
+   * Force frontend specific redirestions most notably redirecting the joomla ARTICLE VIEW to the FLEXIcontent ITEM VIEW
+   * Some special cases are handled e.g. redirecting the joomla article form to FLEXIcontent item form
+   *
+   * @access public
+   * @return void
+   */
 	function redirectSiteComContent()
 	{
 		//include the route helper files
@@ -346,9 +384,16 @@ class plgSystemFlexisystem extends JPlugin
 		}
 	}
 	
+	
+	/**
+	 * Utility Function:
+	 * Create the globalcats category tree, the result of this function is cached
+	 *
+	 * @access private
+	 * @return array
+	 */
 	static function getCategoriesTree()
 	{
-		$start_microtime = microtime(true);
 		global $globalcats;
 		$db = JFactory::getDBO();
 		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 : 0;
@@ -377,7 +422,7 @@ class plgSystemFlexisystem extends JPlugin
 		$parents = array();
 		
 		//set depth limit
-   	$levellimit = 10;
+   	$levellimit = 30;
 		
 		foreach ($cats as $child) {
 			$parent = $child->parent_id;
@@ -402,19 +447,18 @@ class plgSystemFlexisystem extends JPlugin
 			$cat->descendants        = implode(',', $cat->descendantsarray);
 		}
 		
-		$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		$msg = sprintf('<br/>-- Create globalcats array: %.2f s', $time_passed/1000000);
-		//echo $msg;
 		return $globalcats;
 	}
-
+	
+	
 	/**
-    * Get the ancestors of each category node
-    *
-    * @access private
-    * @return array
-    */
-	static function _getCatAncestors( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
+	 * Utility Function:
+	 * Get the ancestors of each category node
+	 *
+	 * @access private
+	 * @return array
+	 */
+	static private function _getCatAncestors( $id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null )
 	{
 		$ROOT_CATEGORY_ID = FLEXI_J16GE ? 1 : 0;
 		if (!$ancestors) $ancestors = array();
@@ -451,13 +495,13 @@ class plgSystemFlexisystem extends JPlugin
 
 				$pt = $v->parent_id;
 				$list[$id] = $v;
-				$list[$id]->treename 		= "$indent$txt";
-				$list[$id]->title 			= $v->title;
+				$list[$id]->treename 	= "$indent$txt";
+				$list[$id]->title 		= $v->title;
 				$list[$id]->slug 			= $v->slug;
-				$list[$id]->ancestors 		= $ancestors;
-				$list[$id]->childrenarray 	= @$children[$id];
-
-				$list[$id]->children 		= count( @$children[$id] );
+				$list[$id]->ancestors = $ancestors;
+				$list[$id]->childrenarray = @$children[$id];
+				$list[$id]->children 	= count( @$children[$id] );
+				$list[$id]->level 		= $level+1;
 
 				$list = plgSystemFlexisystem::_getCatAncestors( $id, $indent.$spacer, $list, $children, $title, $maxlevel, $level+1, $type, $ancestors );
 			}
@@ -465,13 +509,15 @@ class plgSystemFlexisystem extends JPlugin
 		return $list;
 	}
 	
+	
 	/**
-    * Get the descendants of each category node
-    *
-    * @access private
-    * @return array
-    */
-	static function _getDescendants($cat)
+	 * Utility Function:
+	 * Get the descendants of each category node
+	 *
+	 * @access private
+	 * @return array
+	 */
+	static private function _getDescendants($cat)
 	{
 		$descendants = array();
 		$stack = array();
@@ -487,12 +533,16 @@ class plgSystemFlexisystem extends JPlugin
 		return $descendants;
 	}
 	
+	
 	/**
-    * Detect if the config was altered to clean the category cache
-    *
-    * @access public
-    * @return void
-    */
+   * Utility Function:
+   * to detect if configuration of flexicontent component was saved
+   * and perform some needed operations like cleaning cached data,
+   * this is useful for non-FLEXIcontent views where such code can be directly executed
+   *
+   * @access public
+   * @return void
+   */
 	function trackSaveConf() 
 	{
 		$option 	= JRequest::getVar('option');
@@ -505,6 +555,15 @@ class plgSystemFlexisystem extends JPlugin
 		}
 	}
 	
+	
+	/**
+	 * Utility Function:
+	 * to allow automatic logins, e.g. previewing during editing
+	 * or when previewing links sent via notification emails
+	 *
+	 * @access public
+	 * @return void
+	 */
 	function loginUser() 
 	{
 		$mainframe = JFactory::getApplication();
@@ -538,8 +597,15 @@ class plgSystemFlexisystem extends JPlugin
 	}
 	
 	
+	/**
+	 * After component has created its output, this is good place to make global replacements
+	 *
+	 * @access public
+	 * @return boolean
+	 */
 	public function onAfterRender()
 	{
+		$fparams = JComponentHelper::getParams('com_flexicontent');
 		$session 	= JFactory::getSession();
 		
 		// If this is reached we now that the code for setting screen cookie has been added
@@ -548,86 +614,100 @@ class plgSystemFlexisystem extends JPlugin
 			$session->set('screenSizeCookieToBeAdded', 0, 'flexicontent');
 		}
 		
-		if (0 && FLEXI_J16GE) {
-			$start_microtime = microtime(true);
-			$app = JFactory::getApplication();
-			
-			// Only execute in SITE environment
-			if ($app->getName() == 'site' ) {
-				$document = JFactory::getDocument();
-				$docType = $document->getType();
-				
-				// Only in html
-				if ($docType != 'html') return;
-				$html = JResponse::getBody();
-				
-				$regex_full = '/{flexifield:'
-						.'\s*'
-						.'([^\s]+)'  // field name or field id
-						.'\s+'
-					 .'([^}]+)'    // other properties ...
-					 .'}/i';
-				
-				$result = preg_match_all($regex_full, $html, $matches);
-				//echo "<pre>"; print_r($matches); echo "</pre>";
-				if (!$result) return true;
-				
-				foreach ($matches as $k => $match_arr) {
-					if ($k==0) continue;
-					foreach ($match_arr as $i => $match)
-						$matches[$k][$i] = trim(str_replace('&nbsp;','',$match));
-				}
-				
-				$full_texts  = $matches[0];
-				$field_names = $matches[1];
-				
-				$prop_lists  = $matches[2];
-				//echo "Fields: "; print_r($field_names); echo "<br/>";
-				
-				$item_ids  = array();
-				$methods   = array();
+		$print_logging_info = $fparams->get('print_logging_info');
+		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
+		
+		$this->replaceFieldsInResponse();
+		
+		if ($print_logging_info) $fc_run_times['global_field_replacements'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		return true;
+	}
 	
-				$regex_properties = '/\s*'
-					.'([^\s]+)'    // property name
-					.'\s*:\s*'
-					.'([^\s}]+)\s*'  // property value
-				 	.'/i';
-				foreach ($prop_lists as $p => $property_list) {
-					preg_match_all($regex_properties, $property_list, $property_matches, PREG_SET_ORDER);
-					// echo "<pre>"; print_r($property_matches); echo "</pre>";
-					foreach ($property_matches as $pm) {
-						//echo "{$pm[1]} : {$pm[2]}\n<br>"; 
-						switch ( $pm[1] ) {
-							case 'item':
-							$item_ids[$p] = (int)$pm[2];
-							break;
-							case 'method':
-								$methods[$p] = JFilterInput::clean( htmlspecialchars_decode($pm[2]), 'CMD');
-								break;
-							default: break;
-						}
-					}
-				}
-				echo "item_ids: "; print_r($item_ids); echo "<br/>"; echo "methods: ";print_r($methods); 
-				
-				$disp = FlexicontentFields::renderFields( $item_per_field=true, $item_ids, $field_names, $view=FLEXI_ITEMVIEW, $methods, $cfparams=array() );
-				
-				foreach ($full_texts as $i => $full_text) {
-					echo $full_text ." - ";
-					if ( isset( $disp[ $item_ids[$i] ] [ $field_names[$i] ] ) )
-						$html = str_replace( $full_text, $disp[ $item_ids[$i] ] [ $field_names[$i] ] ,$html);
-					else
-						$html = str_replace( $full_text, 'not found item: '.$item_ids[$i].' '.$field_names[$i]  ,$html);
-				}
-				
-				//$html = preg_replace( "/<body/", "<body somevar='aaa' ", $html);
-				JResponse::setBody($html);
+	
+	/**
+    * Utility Function: Implements field replacements, allowing 'rendered display' of any field(s) to be placed anywhere inside the joomla response HTML, formats are:
+    * {flexifield: %fieldname% item:%itemid% method:%methodname%} e.g. {flexifield:field29 item:117 method:display}
+    * {flexifield: %fieldid%   item:%itemid% method:%methodname%} e.g. {flexifield:29      item:117 method:display}
+    *
+    * @access public
+    * @return void
+    */
+	function replaceFieldsInResponse()
+	{
+		$app = JFactory::getApplication();
+		
+		// Only execute in SITE environment
+		if ($app->getName() == 'site' ) {
+			$document = JFactory::getDocument();
+			$docType = $document->getType();
+			
+			// Only in html
+			if ($docType != 'html') return;
+			$html = JResponse::getBody();
+			
+			$regex_full = '/{flexifield:'
+					.'\s*'
+					.'([^\s]+)'  // field name or field id
+					.'\s+'
+				 .'([^}]+)'    // other properties ...
+				 .'}/i';
+			
+			$result = preg_match_all($regex_full, $html, $matches);
+			//echo "<pre>"; print_r($matches); echo "</pre>";
+			if (!$result) return true;
+			
+			foreach ($matches as $k => $match_arr) {
+				if ($k==0) continue;
+				foreach ($match_arr as $i => $match)
+					$matches[$k][$i] = trim(str_replace('&nbsp;','',$match));
 			}
 			
-			$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			$msg = sprintf('<br/>-- Replace Field Times: %.2f s', $time_passed/1000000);
+			$full_texts  = $matches[0];
+			$field_names = $matches[1];
+			
+			$prop_lists  = $matches[2];
+			//echo "Fields: "; print_r($field_names); echo "<br/>";
+			
+			$item_ids  = array();
+			$methods   = array();
+
+			$regex_properties = '/\s*'
+				.'([^\s]+)'    // property name
+				.'\s*:\s*'
+				.'([^\s}]+)\s*'  // property value
+			 	.'/i';
+			foreach ($prop_lists as $p => $property_list) {
+				preg_match_all($regex_properties, $property_list, $property_matches, PREG_SET_ORDER);
+				// echo "<pre>"; print_r($property_matches); echo "</pre>";
+				foreach ($property_matches as $pm) {
+					//echo "{$pm[1]} : {$pm[2]}\n<br>"; 
+					switch ( $pm[1] ) {
+						case 'item':
+						$item_ids[$p] = (int)$pm[2];
+						break;
+						case 'method':
+							$methods[$p] = JFilterInput::clean( htmlspecialchars_decode($pm[2]), 'CMD');
+							break;
+						default: break;
+					}
+				}
+			}
+			echo "item_ids: "; print_r($item_ids); echo "<br/>"; echo "methods: ";print_r($methods); 
+			
+			$disp = FlexicontentFields::renderFields( $item_per_field=true, $item_ids, $field_names, $view=FLEXI_ITEMVIEW, $methods, $cfparams=array() );
+			
+			foreach ($full_texts as $i => $full_text) {
+				echo $full_text ." - ";
+				if ( isset( $disp[ $item_ids[$i] ] [ $field_names[$i] ] ) )
+					$html = str_replace( $full_text, $disp[ $item_ids[$i] ] [ $field_names[$i] ] ,$html);
+				else
+					$html = str_replace( $full_text, 'not found item: '.$item_ids[$i].' '.$field_names[$i]  ,$html);
+			}
+			
+			//$html = preg_replace( "/<body/", "<body somevar='aaa' ", $html);
+			JResponse::setBody($html);
 		}
-		return true;
 	}
 	
 	
@@ -637,137 +717,75 @@ class plgSystemFlexisystem extends JPlugin
 	
 	
 	/**
-	 * Utility function to detect mobile browser and / or low resolution
+	 * Utility function to detect client's screen resolution, and set it into the session
 	 *
-	 * @param 	boolean 	$_is_lowres
-	 * @param 	boolean 	$_is_mobile
-	 * @param 	boolean 	$force_check_lowres
 	 * @return 	void
 	 * @since 1.5
 	 */
-	function detectMobileClient(& $fparams)
+	function detectClientResolution()
 	{
-
 		$app      = JFactory::getApplication();
 		$session  = JFactory::getSession();
 		$fparams  = JComponentHelper::getParams('com_flexicontent');
-		
 		$debug_mobile = $fparams->get('debug_mobile');
 		
 		// Get session variables
-		$use_mobile = $session->get('fc_use_mobile', null, 'flexicontent');
-		$is_mobile  = $session->get('fc_is_mobile', null, 'flexicontent');
-		$is_lowres  = $session->get('fc_is_lowres', null, 'flexicontent');
+		$fc_screen_resolution  = $session->get('fc_screen_resolution', null, 'flexicontent');
+		if ( $fc_screen_resolution!==null) return;
 		
-		// Decide conditions to require
-		$mobile_conditions = $fparams->get('mobile_conditions');
-		if ( empty($mobile_conditions) )						$mobile_conditions = array();
-		else if ( ! is_array($mobile_conditions) )	$mobile_conditions = !FLEXI_J16GE ? array($mobile_conditions) : explode("|", $mobile_conditions);
 		
-		$require_mobile = in_array('mobile_browser', $mobile_conditions)  ||  (in_array('low_resolution', $mobile_conditions) && $fparams->get('check_lowres')==0);
-		$require_lowres = in_array('low_resolution', $mobile_conditions);
+		// Screen resolution is known after second reload or when user revisits our website
 		
-		// Screen resolution is known after second reload
-		if ( $is_lowres===null && isset($_COOKIE["fc_is_lowres"]) ) {
-			$is_lowres = $_COOKIE["fc_is_lowres"];
-			$session->set('fc_is_lowres', $is_lowres, 'flexicontent');
-			
-			// Set use mobile according to calculated data
-			$use_mobile = true;
-			if ($require_mobile) $use_mobile = $use_mobile && $is_mobile;
-			if ($require_lowres) $use_mobile = $use_mobile && $is_lowres;
-			$session->set('fc_use_mobile', $use_mobile, 'flexicontent');
-		}
-		
-		// Decide if detection is finished
-		if ( $use_mobile !== null && (!$require_mobile || $is_mobile!==null) && (!$require_lowres || $is_lowres!==null) ) {
+		if ( isset($_COOKIE["fc_screen_resolution"]) ) {
+			$fc_screen_resolution = $_COOKIE["fc_screen_resolution"];
+			list($fc_screen_width,$fc_screen_height) = explode("x", $fc_screen_resolution);
+			$session->set('fc_screen_resolution', $fc_screen_resolution, 'flexicontent');
+			$session->set('fc_screen_width', $fc_screen_width, 'flexicontent');
+			$session->set('fc_screen_height', $fc_screen_height, 'flexicontent');
 			if ($debug_mobile) {
-				$app->enqueueMessage( "FC DEBUG_MOBILE: (cached) use Mobile FLAG: ". (int)$use_mobile, 'message');
-				if ($require_mobile) $app->enqueueMessage( "FC DEBUG_MOBILE: (cached) Mobile BROWSER FLAG: ". (int)$is_mobile, 'message');
-				else $app->enqueueMessage( "FC DEBUG_MOBILE: (cached) Mobile BROWSER FLAG: not required" );
-				if ($require_lowres) $app->enqueueMessage( "FC DEBUG_MOBILE: (cached) Low resolution FLAG: ". $is_lowres, 'message');
-				else $app->enqueueMessage( "FC DEBUG_MOBILE: (cached) Low resolution FLAG: not required" );
-				if ($require_lowres && isset($_COOKIE["fc_screen_resolution"]))
-					$app->enqueueMessage( "FC DEBUG_MOBILE: (cached) Screen Resolution: ".$_COOKIE["fc_screen_resolution"], 'message');
+				$msg = "FC DEBUG_MOBILE: Detected resolution: " .$fc_screen_width."x".$fc_screen_height;
+				$app->enqueueMessage( $msg, 'message');
 			}
 			return;
-		} else {
-			if ($debug_mobile) $app->enqueueMessage( "FC DEBUG_MOBILE: Trying to detect Browser/Screen Information", 'message');
-		}
-		
-		// Calculate "mobile browser" if needed
-		if ($require_mobile && $is_mobile === null)
-		{
-			$useragent = $_SERVER['HTTP_USER_AGENT'];
-			
-			// Detect mobile browser
-			$is_mobile =
-				preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i',$useragent, $matches_a)
-				||
-				preg_match('/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',substr($useragent,0,4), $matches_b)
-			;
-			$session->set('fc_is_mobile', $is_mobile, 'flexicontent');
-			
-			if ($debug_mobile) {
-				if (!$is_mobile) {
-					$app->enqueueMessage( "FC DEBUG_MOBILE: Detected desktop browser", 'message');
-				} else {
-					$app->enqueueMessage( "FC DEBUG_MOBILE: Detected mobile browser: ".$matches_a[0]." - ".$matches_b[0], 'message');
-				}
-			}
 		}
 		
 		// Calculate "low screen resolution" if needed
-		if ($require_lowres && $is_lowres === null)
-		{
-			if ( isset($_COOKIE["fc_is_lowres"]) ) {
-				$is_lowres = $_COOKIE["fc_is_lowres"];
-				$session->set('fc_is_lowres', $is_lowres, 'flexicontent');
-				if ($debug_mobile) {
-					$msg = "FC DEBUG_MOBILE: Detected resolution: ".$_COOKIE["fc_screen_resolution"]. ", Low resolution FLAG: ". (int)$_COOKIE["fc_is_lowres"];
-					$app->enqueueMessage( $msg, 'message');
-				}
-			} else if ( $session->has('screenSizeCookieTried', 'flexicontent') ) {
-				$is_lowres = (boolean) $is_mobile;    // (failed to check) , permanently set to is_mobile FLAG, (we set session too, and thus avoid rechecking)
-				$session->set('fc_is_lowres', $is_lowres, 'flexicontent');
-				if ($debug_mobile) {
-					$app->enqueueMessage( "FC DEBUG_MOBILE: Detecting resolution failed, setting lowres to false", 'message');
-				}
-			} else {
-				// Add JS code to detect Screen Size if not within limits (this will be known to us on next reload)
-				if ($debug_mobile) {
-					$app->enqueueMessage( "FC DEBUG_MOBILE: Added JS code to detect and set resolution cookie", 'message');
-				}
-				$this->setScreenSizeCookie();
-				$session->set('screenSizeCookieToBeAdded', 1, 'flexicontent');
-				// (decided on next reload) , temporarily set to is_mobile FLAG, (we do not set session too, and thus we will recheck)
-				$is_lowres = (boolean) $is_mobile;
+		
+		else if ( $session->has('screenSizeCookieTried', 'flexicontent') ) {
+			$session->set('fc_screen_resolution', false, 'flexicontent');
+			$session->set('fc_screen_width', 0, 'flexicontent');
+			$session->set('fc_screen_height', 0, 'flexicontent');
+			if ($debug_mobile) {
+				$app->enqueueMessage( "FC DEBUG_MOBILE: Detecting resolution failed, session variable 'fc_screen_resolution' was set to false", 'message');
 			}
 		}
 		
-		// Set use mobile according to calculated or estimated data
-		$use_mobile = true;
-		if ($require_mobile) $use_mobile = $use_mobile && $is_mobile;
-		if ($require_lowres) $use_mobile = $use_mobile && $is_lowres;
-		$session->set('fc_use_mobile', $use_mobile, 'flexicontent');
+		// Add JS code to detect Screen Size if not within limits (this will be known to us on next reload)
+		
+		else {
+			if ($debug_mobile) {
+				$app->enqueueMessage( "FC DEBUG_MOBILE: Added JS code to detect and set screen resolution cookie", 'message');
+			}
+			$this->setScreenSizeCookie();
+			$session->set('screenSizeCookieToBeAdded', 1, 'flexicontent');
+		}
 	}
 	
 	
 	/**
-	 * Utility function to add JS code for detect screen resolution and setting appropriate Browser Cookies
+	 * Utility function:
+	 * Adds JS code for detecting screen resolution and setting appropriate browser cookie
 	 *
 	 * @return 	void
 	 * @since 1.5
 	 */
-	function setScreenSizeCookie( $lowres_minwidth=0, $lowres_minheight=0 )
+	function setScreenSizeCookie()
 	{
 		static $screenSizeCookieAdded = false;
 		if ($screenSizeCookieAdded) return;
 		
 		$fparams = JComponentHelper::getParams('com_flexicontent');
 		$debug_mobile = $fparams->get('debug_mobile');
-		$lowres_minwidth  = $lowres_minwidth  ?  $lowres_minwidth  :  (int) $fparams->get('lowres_minwidth' , 800);
-		$lowres_minheight = $lowres_minheight ?  $lowres_minheight :  (int) $fparams->get('lowres_minheight', 480);
 		
 		$document = JFactory::getDocument();
 		$js = ' 
@@ -818,15 +836,8 @@ class plgSystemFlexisystem extends JPlugin
 			var fc_screen_resolution = "" + fc_screen_width + "x" + fc_screen_height;
 			fc_setCookie("fc_screen_resolution", fc_screen_resolution, 0);
 			
-			// Set the screen resolution cookie and low resolution flag
-			if (fc_screen_width<'.$lowres_minwidth.' || fc_screen_height<'.$lowres_minheight.') {
-				fc_setCookie("fc_is_lowres", 1, 0);
-				' . /*($debug_mobile ? 'alert("detected low res: " + fc_screen_resolution + " this info will be used on next load");' : '') .*/ '
-				' . /*'window.location="'.$_SERVER["REQUEST_URI"].'"; ' .*/ '
-			} else {
-				fc_setCookie("fc_is_lowres", 0, 0);
-				' . /*($debug_mobile ? 'alert("detected normal res: " + fc_screen_resolution + " this info will be used on next load");' : '') .*/ '
-			}
+			' . /*($debug_mobile ? 'alert("Detected screen resolution: " + fc_screen_resolution + " this info will be used on next load");' : '') .*/ '
+			' . /*'window.location="'.$_SERVER["REQUEST_URI"].'"; ' .*/ '
 		';
 		$document->addScriptDeclaration($js);
 		$screenSizeCookieAdded = true;
@@ -834,7 +845,8 @@ class plgSystemFlexisystem extends JPlugin
 	
 	
 	/**
-	 * Utility function to check DB table records when some conditions (e.g. time) are applicable
+	 * Utility function:
+	 * Checks-IN DB table records when some conditions (e.g. time) are applicable
 	 *
 	 * @return 	void
 	 * @since 1.5
@@ -925,14 +937,14 @@ class plgSystemFlexisystem extends JPlugin
 	}
 	
 	
-	
 	/**
-	 * Utility function to check DB table records when some conditions (e.g. time) are applicable
+	 * Utility function:
+	 * Changes state of items, e.g archives content items when some conditions (e.g. time) are applicable
 	 *
 	 * @return 	void
 	 * @since 1.5
 	 */
-	function archiveItems() {
+	function changeItemState() {
 		
 		$db  = JFactory::getDBO();
 		$app = JFactory::getApplication();

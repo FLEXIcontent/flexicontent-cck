@@ -18,8 +18,10 @@
 .subtitle1 .flexi.element,
 .subtitle2 .flexi.element,
 .subtitle3 .flexi.element {
-	display:block;
+	display: block;
 	float: left;
+	max-width: 100% !important;  /* Allow responsive width while floating */
+	padding: 0% !important;  /* Allow responsive width while floating */
 	margin: 0px 24px 12px 0px;
 }
 
@@ -31,10 +33,13 @@
 	margin-bottom: 10px;
 }
 .topblock .flexi.image {
-	border: 0px solid silver;
+	display: block;
 	float: left;
+	max-width: 100% !important;  /* Allow responsive width while floating */
+	padding: 0% !important;  /* Allow responsive width while floating */
 	margin-right: 6px;
 	line-height: 0px;
+	border: 0px solid silver;
 }
 .topblock .flexi.image a {
 	outline: none;
@@ -73,15 +78,18 @@
 
 /* Field label & values styling */
 span.flexi.label, .flexi.label {
+	display: block;
 	float: left;
 	border-bottom: 1px solid silver;
 	color: #777;
 	font-size: 90%;
 	margin-right: 8px;
-	display:block;
 }
 span.flexi.value, .flexi.value {
+	display: block;
 	float: left;
+	max-width: 100% !important;  /* Allow responsive width while floating */
+	padding: 0% !important;  /* Allow responsive width while floating */
 }
 
 

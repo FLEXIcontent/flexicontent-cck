@@ -66,7 +66,10 @@ class JFormFieldFlexicategories extends JFormField
 		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
 		$ffname = @$attributes['name'];
 		
-		$tree = flexicontent_cats::getCategoriesTree();
+		$published_only = (boolean) @$attributes['published_only'];
+		$parent_id   = (int) @$attributes['parent_id'];
+		$depth_limit = (int) @$attributes['depth_limit'];
+		$tree = flexicontent_cats::getCategoriesTree($published_only, $parent_id, $depth_limit);
 		
 		$attribs = '';
 		

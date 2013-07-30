@@ -567,15 +567,15 @@ class FlexicontentController extends JControllerLegacy
 		// REDIRECT CASES FOR SAVING
 		else {
 			
-			// REDIRECT CASE: Save and preview the latest version
-			if ($task=='save_a_preview') {
-				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
-				$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
-			}
 			// REDIRECT CASE: Return to a custom page after creating a new item (e.g. a thanks page)
-			else if ( $newly_submitted_item && $submit_redirect_url_fe ) {
+			if ( $newly_submitted_item && $submit_redirect_url_fe ) {
 				$link = $submit_redirect_url_fe;
 				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
+			}
+			// REDIRECT CASE: Save and preview the latest version
+			else if ($task=='save_a_preview') {
+				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
+				$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
 			}
 			// REDIRECT CASE: Return to the form 's referer (previous page) after item saving
 			else {
@@ -843,101 +843,92 @@ class FlexicontentController extends JControllerLegacy
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
 		$session = JFactory::getSession();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
 		$no_ajax			= JRequest::getInt('no_ajax');
 		$user_rating	= JRequest::getInt('user_rating');
 		$cid 			= JRequest::getInt('cid');
 		$xid 			= JRequest::getVar('xid');
 		
+		// Compatibility in case the voting originates from joomla's voting plugin
 		if ($no_ajax) {
 			// Joomla 's content plugin uses 'id' HTTP request variable
 			$cid = JRequest::getInt('id');
 		}
 		
-		$result	= new JObject;
-
-		if (($user_rating >= 1) and ($user_rating <= 5))
+		
+		// ******************************
+		// Get voting field configuration
+		// ******************************
+		
+		$db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
+		$field = $db->loadObject();
+		$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+		$item->load( $cid );
+		FlexicontentFields::loadFieldConfig($field, $item);
+		
+		$rating_resolution = (int)$field->parameters->get('rating_resolution', 5);
+		$rating_resolution = $rating_resolution >= 5   ?  $rating_resolution  :  5;
+		$rating_resolution = $rating_resolution <= 100  ?  $rating_resolution  :  100;
+		
+		$min_rating = 1;
+		$max_rating = $rating_resolution;
+		
+		
+		// *****************************************************
+		// Find if user has the ACCESS level required for voting
+		// *****************************************************
+		
+		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
+		else $aid_arr = $user->getAuthorisedViewLevels();
+		$acclvl = (int) $field->parameters->get('submit_acclvl', FLEXI_J16GE ? 1 : 0);
+		$has_acclvl = FLEXI_J16GE ? in_array($acclvl, $aid_arr) : $acclvl <= $aid;
+		
+		
+		// *********************************
+		// Create no access Redirect Message
+		// *********************************
+		
+		if ( !$has_acclvl )
 		{
-			// Check: item id exists in our voting logging SESSION (array) variable 
-			$votestamp = $session->get('votestamp', array(),'flexicontent');
-			if ( !isset($votestamp[$cid]) || !is_array($votestamp[$cid]) )
+			$logged_no_acc_msg = $field->parameters->get('logged_no_acc_msg', '');
+			$guest_no_acc_msg  = $field->parameters->get('guest_no_acc_msg', '');
+			$no_acc_msg = $user->id ? $logged_no_acc_msg : $guest_no_acc_msg;
+			$no_acc_msg = $no_acc_msg ? JText::_($no_acc_msg) : '';
+			
+			// Message not set create a Default Message
+			if ( !$no_acc_msg )
 			{
-				$votestamp[$cid] = array();
-			}
-			$votecheck = isset($votestamp[$cid][$xid]);
-			
-			// Set: the current item id, in our voting logging SESSION (array) variable  
-			$votestamp[$cid][$xid] = 1;
-			$session->set('votestamp', $votestamp, 'flexicontent');
-			
-			// Setup variables used in the db queries
-			$currip = ( phpversion() <= '4.2.1' ? @getenv( 'REMOTE_ADDR' ) : $_SERVER['REMOTE_ADDR'] );
-			$currip_quoted = $db->Quote( $currip );
-			$dbtbl = !(int)$xid ? '#__content_rating' : '#__flexicontent_items_extravote';  // Choose db table to store vote (normal or extra)
-			$and_extra_id = (int)$xid ? ' AND field_id = '.(int)$xid : '';     // second part is for defining the vote type in case of extra vote
-			
-			// Retreive last vote for the given item
-			$query = ' SELECT *'
-				. ' FROM '.$dbtbl.' AS a '
-				. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
-			
-			$db->setQuery( $query );
-			$votesdb = $db->loadObject();
-			
-			if ( !$votesdb )
-			{
-				// Voting record does not exist for this item, accept user's vote and insert new voting record in the db
-				$query = ' INSERT '.$dbtbl
-					. ' SET content_id = '.(int)$cid.', '
-					. '  lastip = '.$currip_quoted.', '
-					. '  rating_sum = '.(int)$user_rating.', '
-					. '  rating_count = 1 '
-					. ( (int)$xid ? ', field_id = '.(int)$xid : '' );
-					
-				$db->setQuery( $query );
-				$db->query() or die( $db->stderr() );
-				$result->ratingcount = 1;
-				$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTE' ) . ')';
-			}
-			else
-			{
-				// Voting record exists for this item, check if user has already voted
-				
-				// NOTE: it is not so good way to check using ip, since 2 users may have same IP,
-				// but for compatibility with standard joomla and for stronger security we will do it
-				if ( !$votecheck && $currip!=$votesdb->lastip ) 
-				{
-					// vote accepted update DB
-					$query = " UPDATE ".$dbtbl
-					. ' SET rating_count = rating_count + 1, '
-					. '  rating_sum = rating_sum + '.(int)$user_rating.', '
-					. '  lastip = '.$currip_quoted
-					. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
-					
-					$db->setQuery( $query );
-					$db->query() or die( $db->stderr() );
-					$result->ratingcount = $votesdb->rating_count + 1;
-					$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTES' ) . ')';
-				} 
-				else 
-				{
-					// vote rejected
-					// avoid setting percentage ... since it may confuse the user because someone from same ip may have voted and
-					// despite telling user that she/he has voted already, user will see a change in the percentage of highlighted stars
-					//$result->percentage = ( $votesdb->rating_sum / $votesdb->rating_count ) * 20;
-					$result->htmlrating = '(' . $votesdb->rating_count .' '. JText::_( 'FLEXI_VOTES' ) . ')';
-					$result->html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );
-					if ($no_ajax) {
-						$app->enqueueMessage( $result->html, 'notice' );
-						return;
-					} else {
-						echo json_encode($result);
-						exit();
+				// Find name of required Access Level
+				if (FLEXI_J16GE) {
+					$acclvl_name = '';
+					if ($acclvl) {
+						$db->setQuery('SELECT title FROM #__viewlevels as level WHERE level.id='.$acclvl);
+						$acclvl_name = $db->loadResult();
+						if ( !$acclvl_name ) $acclvl_name = "Access Level: ".$acclvl." not found/was deleted";
 					}
+				} else {
+					$acclvl_names = array(0=>'Public', 1=>'Registered', 2=>'Special');
+					$acclvl_name = $acclvl_names[$acclvl];
 				}
+				$no_acc_msg = JText::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
 			}
-			$result->percentage = ( ((isset($votesdb->rating_sum) ? $votesdb->rating_sum : 0) + (int)$user_rating) / $result->ratingcount ) * 20;
-			$result->html = JText::_( 'FLEXI_THANK_YOU_FOR_VOTING' );
+		}
+		
+		
+		// ****************************************************
+		// NO voting Access OR rating is NOT within valid range
+		// ****************************************************
+		
+		if ( !$has_acclvl  ||  ($user_rating < $min_rating && $user_rating > $max_rating) )
+		{
+			// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
+			$result	= new stdClass();
+			$result->percentage = '';
+			$result->htmlrating = '';
+			$result->html = !$has_acclvl ? $no_acc_msg : JText::sprintf( 'FLEXI_VOTING_OUT_OF_RANGE', $min_rating, $max_rating);
+			
+			// Set responce
 			if ($no_ajax) {
 				$app->enqueueMessage( $result->html, 'notice' );
 				return;
@@ -945,6 +936,111 @@ class FlexicontentController extends JControllerLegacy
 				echo json_encode($result);
 				exit();
 			}
+		}
+		
+		
+		// *************************************
+		// Retreive last vote for the given item
+		// *************************************
+		
+		$currip = ( phpversion() <= '4.2.1' ? @getenv( 'REMOTE_ADDR' ) : $_SERVER['REMOTE_ADDR'] );
+		$currip_quoted = $db->Quote( $currip );
+		$dbtbl = !(int)$xid ? '#__content_rating' : '#__flexicontent_items_extravote';  // Choose db table to store vote (normal or extra)
+		$and_extra_id = (int)$xid ? ' AND field_id = '.(int)$xid : '';     // second part is for defining the vote type in case of extra vote
+			
+		$query = ' SELECT *'
+			. ' FROM '.$dbtbl.' AS a '
+			. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
+			
+		$db->setQuery( $query );
+		$votesdb = $db->loadObject();
+		
+		
+		// ********************************************************************************************
+		// Check: item id exists in our voting logging SESSION (array) variable, to avoid double voting
+		// ********************************************************************************************
+		
+		$votestamp = $session->get('votestamp', array(),'flexicontent');
+		if ( !isset($votestamp[$cid]) || !is_array($votestamp[$cid]) )
+		{
+			$votestamp[$cid] = array();
+		}
+		$votecheck = isset($votestamp[$cid][$xid]);
+			
+		
+		// ***********************************************************
+		// Voting access allowed and valid, but we will need to make
+		// some more checks (IF voting record exists AND double voting)
+		// ***********************************************************
+		$result	= new stdClass();
+		
+		// Voting record does not exist for this item, accept user's vote and insert new voting record in the db
+		if ( !$votesdb ) {
+			$query = ' INSERT '.$dbtbl
+				. ' SET content_id = '.(int)$cid.', '
+				. '  lastip = '.$currip_quoted.', '
+				. '  rating_sum = '.(int)$user_rating.', '
+				. '  rating_count = 1 '
+				. ( (int)$xid ? ', field_id = '.(int)$xid : '' );
+				
+			$db->setQuery( $query );
+			$db->query() or die( $db->stderr() );
+			$result->ratingcount = 1;
+			$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTE' ) . ')';
+		}
+		
+		// Voting record exists for this item, check if user has already voted
+		else {
+			
+			// NOTE: it is not so good way to check using ip, since 2 users may have same IP,
+			// but for compatibility with standard joomla and for stronger security we will do it
+			if ( !$votecheck && $currip!=$votesdb->lastip ) 
+			{
+				// vote accepted update DB
+				$query = " UPDATE ".$dbtbl
+				. ' SET rating_count = rating_count + 1, '
+				. '  rating_sum = rating_sum + '.(int)$user_rating.', '
+				. '  lastip = '.$currip_quoted
+				. ' WHERE content_id = '.(int)$cid.' '.$and_extra_id;
+				
+				$db->setQuery( $query );
+				$db->query() or die( $db->stderr() );
+				$result->ratingcount = $votesdb->rating_count + 1;
+				$result->htmlrating = '(' . $result->ratingcount .' '. JText::_( 'FLEXI_VOTES' ) . ')';
+			} 
+			else 
+			{
+				// Voting REJECTED, avoid setting BAR percentage and HTML rating text ... someone else may have voted for the item ...
+				
+				//$result->percentage = ( $votesdb->rating_sum / $votesdb->rating_count ) * (100/$rating_resolution);
+				//$result->htmlrating = '(' . $votesdb->rating_count .' '. JText::_( 'FLEXI_VOTES' ) . ')';
+				$result->html = JText::_( 'FLEXI_YOU_HAVE_ALREADY_VOTED' );
+				if ($no_ajax) {
+					$app->enqueueMessage( $result->html, 'notice' );
+					return;
+				} else {
+					echo json_encode($result);
+					exit();
+				}
+			}
+		}
+		
+		// Set the current item id, in our voting logging SESSION (array) variable, to avoid future double voting
+		$votestamp[$cid][$xid] = 1;
+		$session->set('votestamp', $votestamp, 'flexicontent');
+		
+		// Prepare responce
+		$rating_sum = (@ $votesdb ? $votesdb->rating_sum : 0) + (int) $user_rating;
+		$result->percentage = ($rating_sum / $result->ratingcount) * (100 / $rating_resolution);
+		$result->html = JText::_( 'FLEXI_THANK_YOU_FOR_VOTING' );
+		
+		// Finally set responce
+		if ($no_ajax) {
+			$app->enqueueMessage( $result->html, 'notice' );
+			return;
+		} else {
+			echo json_encode($result);
+			exit();
 		}
 	}
 

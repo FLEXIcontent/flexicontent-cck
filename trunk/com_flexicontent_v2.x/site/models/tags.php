@@ -228,6 +228,9 @@ class FlexicontentModelTags extends JModelLegacy
 		$andaccess   = '';
 		$select_access  = '';
 		
+		// Extra access columns for main category and content type (item access will be added as 'access')
+		$select_access .= ', c.access as category_access, ty.access as type_access';
+		
 		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
@@ -253,9 +256,6 @@ class FlexicontentModelTags extends JModelLegacy
 			$select_access .= ', 1 AS has_access';
 		}
 		else {
-			// Extra access columns for main category and content type (item access will be added as 'access')
-			$select_access .= ', c.access as category_access, ty.access as type_access';
-			
 			// Access Flags for: content type, main category, item
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();

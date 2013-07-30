@@ -143,6 +143,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_types` (
   `name` varchar(255) NOT NULL,
   `alias` varchar(255) NOT NULL,
   `published` tinyint(1) NOT NULL,
+  `itemscreatable` SMALLINT(8) NOT NULL default '0',
   `checked_out` int(11) unsigned NOT NULL default '0',
   `checked_out_time` datetime NOT NULL default '0000-00-00 00:00:00',
   `access` int(11) unsigned NOT NULL default '1',

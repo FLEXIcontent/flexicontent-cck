@@ -64,6 +64,10 @@ div fieldset select { margin:0px; }
 			
 div.current ul.config-option-list li select { margin-bottom: 0px;}
 div.current ul.config-option-list li fieldset  { margin: 0; padding: 0; }
+
+.tip { min-width: 480px !important; }
+.tip-title { }
+
 ";
 
 $document = JFactory::getDocument();

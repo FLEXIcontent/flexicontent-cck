@@ -31,7 +31,7 @@ jimport('joomla.application.component.modellist');
 class FlexicontentModelCategories extends JModelList
 {
 	/**
-	 * Categorie id
+	 * Category id
 	 *
 	 * @var int
 	 */
@@ -73,18 +73,24 @@ class FlexicontentModelCategories extends JModelList
 	 */
 	function getListQuery()
 	{
-		$app = JFactory::getApplication();
-		$db = $this->getDbo();
+		$app  = JFactory::getApplication();
+		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
 		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		global $globalcats;
 		
-		$filter_order     = $app->getUserStateFromRequest( $option.'.categories.filter_order',     'filter_order',     'c.lft', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.categories.filter_order_Dir', 'filter_order_Dir', '', 'word' );
-		$filter_state     = $app->getUserStateFromRequest( $option.'.categories.filter_state',     'filter_state',     '', 'string' );
-		$filter_access    = $app->getUserStateFromRequest( $option.'.categories.filter_access',    'filter_access',    '', 'string' );
-		$filter_level     = $app->getUserStateFromRequest( $option.'.categories.filter_level',     'filter_level',     '', 'string' );
-		$filter_language  = $app->getUserStateFromRequest( $option.'.categories.filter_language', 'filter_language',   '', 'cmd' );
-		$search           = $app->getUserStateFromRequest( $option.'.categories.search', 'search', '', 'string' );
+		$order_property = !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     $order_property, 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', '', 'word' );
+		$filter_cats      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',			 'filter_cats',			 '', 'int' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',     'filter_state',     '', 'string' );
+		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
+		$filter_level     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_level',     'filter_level',     '', 'string' );
+		if (FLEXI_J16GE) {
+			$filter_language  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_language',  'filter_language',  '', 'string' );
+		}
+		$search           = $app->getUserStateFromRequest( $option.'.'.$view.'.search',           'search',           '', 'string' );
 		$search           = trim( JString::strtolower( $search ) );
 
 		// Create a new query object.
@@ -93,40 +99,48 @@ class FlexicontentModelCategories extends JModelList
 		$query->select(
 			$this->getState(
 				'list.select',
-				'c.*, u.name AS editor, g.title AS groupname, COUNT(rel.catid) AS nrassigned, c.params as config, ag.title AS access_level '
+				'c.*, u.name AS editor, level.title AS access_level, COUNT(rel.catid) AS nrassigned, c.params as config, ag.title AS access_level '
 			)
 		);
 		$query->from('#__categories AS c');
 		$query->select('l.title AS language_title');
-		$query->join('LEFT', '`#__languages` AS l ON l.lang_code = c.language');
+		$query->join('LEFT', '#__languages AS l ON l.lang_code = c.language');
 		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.catid = c.id');
-		$query->join('LEFT', '#__usergroups AS g ON g.id = c.access');
+		$query->join('LEFT', '#__viewlevels as level ON level.id=c.access');
 		$query->join('LEFT', '#__users AS u ON u.id = c.checked_out');
 		$query->join('LEFT', '#__viewlevels AS ag ON ag.id = c.access');
 		$query->where("c.extension = '".FLEXI_CAT_EXTENSION."' ");
 		
 		
-		// Filter by published state
+		// Filter by publicationd state
 		if (is_numeric($filter_state)) {
 			$query->where('c.published = ' . (int) $filter_state);
 		}
-		elseif ($filter_state === '') {
-			$query->where('(c.published IN (0, 1))');
+		elseif ( $filter_state === '') {
+			$query->where('c.published IN (0, 1)');
 		}
 		
 		// Filter by access level
-		if ( strlen($filter_access) ) {
-			$query->where('c.access = ' . (int) $filter_access);
+		if ( $filter_access ) {
+			$query->where('c.access = '.(int) $filter_access);
 		}
 		
-		// Filter by language
-		if ( $filter_language ) {
-			$query->where("l.lang_code = '".$filter_language."'");
+		if ( $filter_cats ) {
+			// Limit category list to those contain in the subtree of the choosen category
+			$query->where(' c.id IN (SELECT cat.id FROM #__categories AS cat JOIN #__categories AS parent ON cat.lft BETWEEN parent.lft AND parent.rgt WHERE parent.id='. (int) $filter_cats.')' );
+		} else {
+			// Limit category list to those containing CONTENT (joomla articles)
+			$query->where(' (c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')');
 		}
 		
 		// Filter on the level.
 		if ( $filter_level ) {
 			$query->where('c.level <= '.(int) $filter_level);
+		}
+		
+		// Filter by language
+		if ( $filter_language ) {
+			$query->where('l.lang_code = '.$db->Quote( $filter_language ) );
 		}
 		
 		// Implement View Level Access
@@ -135,10 +149,6 @@ class FlexicontentModelCategories extends JModelList
 			$groups	= implode(',', $user->getAuthorisedViewLevels());
 			$query->where('c.access IN ('.$groups.')');
 		}
-		
-		// Limit category list to those containing CONTENT (joomla articles)
-		$query->where(' (c.lft > ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt < ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')');
-		
 		
 		// Filter by search word (can be also be  id:NN  OR author:AAAAA)
 		if (!empty($search)) {
@@ -163,7 +173,8 @@ class FlexicontentModelCategories extends JModelList
 		//echo str_replace('#__', 'jos_', $query->__toString());
 		return $query;
 	}
-
+	
+	
 	/**
 	 * Method to (un)publish a category
 	 *

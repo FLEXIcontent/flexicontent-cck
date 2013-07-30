@@ -227,7 +227,28 @@ class flexicontent_html
 	
 	
 	/**
-	 * Utility function to add JQuery to current Document
+	 * Utility function to get the Mobile Detector Object
+	 *
+	 * @param 	string 		$text
+	 * @param 	int 		$nb
+	 * @return 	string
+	 * @since 1.5
+	 */
+	static function getMobileDetector()
+	{
+		static $mobileDetector = null;
+		
+		if ( $mobileDetector===null ) {
+			require_once (JPATH_COMPONENT_SITE.DS.'librairies'.DS.'mobiledetect'.DS.'Mobile_Detect.php');
+			$mobileDetector = new Mobile_Detect_FC();
+		}
+		
+		return $mobileDetector;
+	}
+	
+	
+	/**
+	 * Utility function to load each JS Frameworks once
 	 *
 	 * @param 	string 		$text
 	 * @param 	int 		$nb
@@ -354,6 +375,101 @@ class flexicontent_html
 					jQuery(document).ready(function(){
 						jQuery('.fancybox').fancybox();
 					});
+				";
+				break;
+			
+			case 'galleriffic':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				
+				// Add galleriffic CSS / JS
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/galleriffic/css/basic.css');
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/galleriffic/css/galleriffic-3.css');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/galleriffic/js/jquery.galleriffic.js');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/galleriffic/js/jquery.opacityrollover.js');
+				
+				//$view_width = 500;
+				$js = "
+				//document.write('<style>.noscript { display: none; }</style>');
+				jQuery(document).ready(function() {
+					// We only want these styles applied when javascript is enabled
+					jQuery('div.navigation').css({'width' : '150px', 'float' : 'left'});
+					jQuery('div.content').css({'display' : 'inline-block', 'float' : 'none'});
+	
+					// Initially set opacity on thumbs and add
+					// additional styling for hover effect on thumbs
+					var onMouseOutOpacity = 0.67;
+					jQuery('#gf_thumbs ul.thumbs li').opacityrollover({
+						mouseOutOpacity:   onMouseOutOpacity,
+						mouseOverOpacity:  1.0,
+						fadeSpeed:         'fast',
+						exemptionSelector: '.selected'
+					});
+					
+					// Initialize Advanced Galleriffic Gallery
+					var gallery = jQuery('#gf_thumbs').galleriffic({
+						delay:                     2500,
+						numThumbs:                 4,
+						preloadAhead:              10,
+						enableTopPager:            true,
+						enableBottomPager:         true,
+						maxPagesToShow:            20,
+						imageContainerSel:         '#gf_slideshow',
+						controlsContainerSel:      '#gf_controls',
+						captionContainerSel:       '#gf_caption',
+						loadingContainerSel:       '#gf_loading',
+						renderSSControls:          true,
+						renderNavControls:         true,
+						playLinkText:              'Play Slideshow',
+						pauseLinkText:             'Pause Slideshow',
+						prevLinkText:              '&lsaquo; Previous Photo',
+						nextLinkText:              'Next Photo &rsaquo;',
+						nextPageLinkText:          'Next &rsaquo;',
+						prevPageLinkText:          '&lsaquo; Prev',
+						enableHistory:             false,
+						autoStart:                 false,
+						syncTransitions:           true,
+						defaultTransitionDuration: 900,
+						onSlideChange:             function(prevIndex, nextIndex) {
+							// 'this' refers to the gallery, which is an extension of jQuery('#gf_thumbs')
+							this.find('ul.thumbs').children()
+								.eq(prevIndex).fadeTo('fast', onMouseOutOpacity).end()
+								.eq(nextIndex).fadeTo('fast', 1.0);
+						},
+						onPageTransitionOut:       function(callback) {
+							this.fadeTo('fast', 0.0, callback);
+						},
+						onPageTransitionIn:        function() {
+							this.fadeTo('fast', 1.0);
+						}
+					});
+				});
+				";
+				break;
+			
+			case 'elastislide':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/elastislide/css/demo.css');
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/elastislide/css/style.css');
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/elastislide/css/elastislide.css');
+				
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/elastislide/js/jquery.tmpl.min.js');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/elastislide/js/jquery.easing.1.3.js');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/elastislide/js/jquery.elastislide.js');
+				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/elastislide/js/gallery.js'); // replace with field specific: gallery_tmpl.js
+				break;
+			
+			case 'photoswipe':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				
+				// Add swipe CSS / JS
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/photoswipe/photoswipe.css');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/photoswipe/lib/klass.min.js');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/photoswipe/code.photoswipe.jquery-3.0.5.min.js');
+				$js = "
+				jQuery(document).ready(function() {
+					var myPhotoSwipe = jQuery('.photoswipe_fccontainer a').photoSwipe({ enableMouseWheel: false , enableKeyboard: false }); 
+				}); 
 				";
 				break;
 			
@@ -869,7 +985,7 @@ class flexicontent_html
 			$state_descrs = array(1=>'FLEXI_PUBLISH_THIS_ITEM', -5=>'FLEXI_SET_ITEM_IN_PROGRESS', 0=>'FLEXI_UNPUBLISH_THIS_ITEM', -3=>'FLEXI_SET_ITEM_PENDING', -4=>'FLEXI_SET_ITEM_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVE_THIS_ITEM', -2=>'FLEXI_TRASH_THIS_ITEM');
 			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png');
 
-			$box_css = $app->isSite() ? 'width:182px; left:-100px;' : '';
+			$box_css = ''; //$app->isSite() ? 'width:182px; left:-100px;' : '';
 			$publish_info .= '<br><br>'.JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
 			$output ='
 			<ul class="statetoggler">
@@ -1281,18 +1397,93 @@ class flexicontent_html
 	 * @param int or string 	$xid
 	 * @since 1.0
 	 */
- 	static function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $label='', $vote_stars=5, $allow_vote=true, $vote_counter='default', $show_counter_label=true )
+ 	static function ItemVoteDisplay( &$field, $id, $rating_sum, $rating_count, $xid, $label='', $stars_override=0, $allow_vote=true, $vote_counter='default', $show_counter_label=true )
 	{
+		static $acclvl_names  = null;
+		static $star_tooltips = null;
+		static $star_classes  = null;
+		$user = JFactory::getUser();
+		$db   = JFactory::getDBO();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		
+		
+		// *****************************************************
+		// Find if user has the ACCESS level required for voting
+		// *****************************************************
+		
+		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
+		else $aid_arr = $user->getAuthorisedViewLevels();
+		$acclvl = (int) $field->parameters->get('submit_acclvl', FLEXI_J16GE ? 1 : 0);
+		$has_acclvl = FLEXI_J16GE ? in_array($acclvl, $aid_arr) : $acclvl <= $aid;
+		
+		
+		// *********************************************************
+		// Calculate NO access actions, (case that user cannot vote)
+		// *********************************************************
+		
+		if ( !$has_acclvl )
+		{
+			if ($user->id) {
+				$no_acc_msg = $field->parameters->get('logged_no_acc_msg', '');
+				$no_acc_url = $field->parameters->get('logged_no_acc_url', '');
+				$no_acc_doredirect  = $field->parameters->get('logged_no_acc_doredirect', 0);
+				$no_acc_askredirect = $field->parameters->get('logged_no_acc_askredirect', 1);
+			} else {
+				$no_acc_msg  = $field->parameters->get('guest_no_acc_msg', '');
+				$no_acc_url  = $field->parameters->get('guest_no_acc_url', '');
+				$no_acc_doredirect  = $field->parameters->get('guest_no_acc_doredirect', 2);
+				$no_acc_askredirect = $field->parameters->get('guest_no_acc_askredirect', 1);
+			}
+			
+			// Decide no access Redirect URLs
+			if ($no_acc_doredirect == 2) {
+				$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
+				$no_acc_url = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
+			} else if ($no_acc_doredirect == 0) {
+				$no_acc_url = '';
+			} // else unchanged
+			
+			
+			// Decide no access Redirect Message
+			$no_acc_msg = $no_acc_msg ? JText::_($no_acc_msg) : '';
+			if ( !$no_acc_msg )
+			{
+				// Find name of required Access Level
+				if (FLEXI_J16GE) {
+					$acclvl_name = '';
+					if ($acclvl && empty($acclvl_names)) {  // Retrieve this ONCE (static var)
+						$db->setQuery('SELECT title,id FROM #__viewlevels as level');
+						$_lvls = $db->loadObjectList();
+						$acclvl_names = array();
+						if (!empty($_lvls)) foreach ($_lvls as $_lvl) $acclvl_names[$_lvl->id] = $_lvl->title;
+					}
+				} else {
+					$acclvl_names = array(0=>'Public', 1=>'Registered', 2=>'Special');
+					$acclvl_name = $acclvl_names[$acclvl];
+				}
+				$acclvl_name =  !empty($acclvl_names[$acclvl]) ? $acclvl_names[$acclvl] : "Access Level: ".$acclvl." not found/was deleted";
+				$no_acc_msg = JText::sprintf( 'FLEXI_NO_ACCESS_TO_VOTE' , $acclvl_name);
+			}
+			$no_acc_msg_redirect = JText::_($no_acc_doredirect==2 ? 'FLEXI_CONFIM_REDIRECT_TO_LOGIN_REGISTER' : 'FLEXI_CONFIM_REDIRECT');
+		}
+		
 		$counter 	= $field->parameters->get( 'counter', 1 );   // 0: disable showing vote counter, 1: enable for main and for extra votes
 		if ($vote_counter != 'default' ) $counter = $vote_counter ? 1 : 0;
 		$unrated 	= $field->parameters->get( 'unrated', 1 );
 		$dim			= $field->parameters->get( 'dimension', 16 );
-		$image		= $field->parameters->get( 'image', 'components/com_flexicontent/assets/images/star.gif' );
+		$image		= $field->parameters->get( 'image', 'components/com_flexicontent/assets/images/star-small.png' );
 		$class 		= $field->name;
 		$img_path	= JURI::base(true) .'/'. $image;
-
-		$percent = 0;
-
+		
+		// Get number of displayed stars, configuration
+		$rating_resolution = (int)$field->parameters->get('rating_resolution', 5);
+		$rating_resolution = $rating_resolution >= 5   ?  $rating_resolution  :  5;
+		$rating_resolution = $rating_resolution <= 100  ?  $rating_resolution  :  100;
+		
+		// Get number of displayed stars, configuration
+		$rating_stars = (int) ($stars_override ? $stars_override : $field->parameters->get('rating_stars', 5));
+		$rating_stars = $rating_stars > $rating_resolution ? $rating_resolution  :  $rating_stars;  // Limit stars to resolution
+		
 		static $js_and_css_added = false;
 
 	 	if (!$js_and_css_added)
@@ -1313,13 +1504,30 @@ class flexicontent_html
 			.'.$class.' .fcvote ul, .'.$class.' .fcvote ul li a:hover, .'.$class.' .fcvote ul li.current-rating {background-image:url('.$img_path.')!important;}
 			.'.$class.' .fcvote ul li a, .'.$class.' .fcvote ul li.current-rating {height:'.$dim.'px;line-height:'.$dim.'px;}
 			';
+			
+			$star_tooltips = array();
+			$star_classes  = array();
+			for ($i=1; $i<=$rating_resolution; $i++) {
+				$star_zindex  = $rating_resolution - $i + 2;
+				$star_percent = (int) round(100 * ($i / $rating_resolution));
+				$css .= '.fcvote li a.star'.$i.' { width: '.$star_percent.'%; z-index: '.$star_zindex.'; }' ."\n";
+				$star_classes[$i] = 'star'.$i;
+				if ($star_percent < 20)       $star_tooltips[$i] = JText::_( 'FLEXI_VERY_POOR' );
+				else if ($star_percent < 40)  $star_tooltips[$i] = JText::_( 'FLEXI_POOR' );
+				else if ($star_percent < 60)  $star_tooltips[$i] = JText::_( 'FLEXI_REGULAR' );
+				else if ($star_percent < 80)  $star_tooltips[$i] = JText::_( 'FLEXI_GOOD' );
+				else                          $star_tooltips[$i] = JText::_( 'FLEXI_VERY_GOOD' );
+				$star_tooltips[$i] .= ' '.$i.'/'.$rating_resolution;
+			}
+			
 			$document->addStyleDeclaration($css);
-
 			$js_and_css_added = true;
 	 	}
-
+	 	
+	 	$percent = 0;
+	 	$factor = (int) round(100/$rating_resolution);
 		if ($rating_count != 0) {
-			$percent = number_format((intval($rating_sum) / intval( $rating_count ))*20,2);
+			$percent = number_format((intval($rating_sum) / intval( $rating_count ))*$factor,2);
 		} elseif ($unrated == 0) {
 			$counter = -1;
 		}
@@ -1332,22 +1540,50 @@ class flexicontent_html
 			if ( $counter == 3 ) $counter = 0;
 		}
 		$nocursor = !$allow_vote ? 'cursor:auto;' : '';
-
-		$html_vote_links = $allow_vote ? '
-			<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_POOR' ).'" class="one" rel="'.$id.'_'.$xid.'">1</a></li>
-			<li><a href="javascript:;" title="'.JText::_( 'FLEXI_POOR' ).'" class="two" rel="'.$id.'_'.$xid.'">2</a></li>
-			<li><a href="javascript:;" title="'.JText::_( 'FLEXI_REGULAR' ).'" class="three" rel="'.$id.'_'.$xid.'">3</a></li>
-			<li><a href="javascript:;" title="'.JText::_( 'FLEXI_GOOD' ).'" class="four" rel="'.$id.'_'.$xid.'">4</a></li>
-			<li><a href="javascript:;" title="'.JText::_( 'FLEXI_VERY_GOOD' ).'" class="five" rel="'.$id.'_'.$xid.'">5</a></li>
-		' : '';
-
+		
+		if ($allow_vote)
+		{
+			// HAS Voting ACCESS
+			if ( $has_acclvl ) {
+				$href = 'javascript:;';
+				$onclick = '';
+			}
+			// NO Voting ACCESS
+			else {
+				// WITHOUT Redirection
+				if ( !$no_acc_url ) {
+					$href = 'javascript:;';
+					$popup_msg = addcslashes($no_acc_msg, "'");
+					$onclick = 'alert(\''.$popup_msg.'\');';
+				}
+				// WITH Redirection
+				else {
+					$href = $no_acc_url;
+					$popup_msg = addcslashes($no_acc_msg . ' ... ' . $no_acc_msg_redirect, "'");
+					
+					if ($no_acc_askredirect==2)       $onclick = 'return confirm(\''.$popup_msg.'\');';
+					else if ($no_acc_askredirect==1)  $onclick = 'alert(\''.$popup_msg.'\'); return true;';
+					else                              $onclick = 'return true;';
+				}
+			}
+			
+			$dovote_class = $has_acclvl ? 'fc_dovote' : '';
+			$html_vote_links = '';
+			for ($i=1; $i<=$rating_resolution; $i++) {
+				$html_vote_links .= '
+					<li><a onclick="'.$onclick.'" href="'.$href.'" title="'.$star_tooltips[$i].'" class="'.$dovote_class.' '.$star_classes[$i].'" rel="'.$id.'_'.$xid.'">'.$i.'</a></li>';
+			}
+		}
+		
+		$element_width = $rating_resolution * $dim;
+		if ($rating_stars) $element_width = (int) $element_width * ($rating_stars / $rating_resolution);
 	 	$html='
 		<div class="'.$class.'">
 			<div class="fcvote">'
 	  		.($label ? '<div id="fcvote_lbl'.$id.'_'.$xid.'" class="fcvote-label xid-'.$xid.'">'.$label.'</div>' : '')
-				.'<ul style="width:'.($vote_stars * $dim).'px;">
+				.'<ul style="width:'.$element_width.'px;">
     				<li id="rating_'.$id.'_'.$xid.'" class="current-rating" style="width:'.(int)$percent.'%;'.$nocursor.'"></li>'
-    		.$html_vote_links
+    		.@ $html_vote_links
 				.'
 				</ul>
 	  		<div id="fcvote_cnt_'.$id.'_'.$xid.'" class="fcvote-count">';
@@ -2238,6 +2474,229 @@ class flexicontent_html
 
 		$toolbar->appendButton('Custom', $button_html, 'archive');
 	}
+	
+	
+	// ************************************************************************
+	// Calculate CSS classes needed to add special styling markups to the items
+	// ************************************************************************
+	static function	calculateItemMarkups($items, $params)
+	{
+		global $globalcats;
+		global $globalnoroute;
+		$globalnoroute = !is_array($globalnoroute) ? array() : $globalnoroute;
+		
+		$db   = JFactory::getDBO();
+		$user = JFactory::getUser();
+		$aids = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : array((int) $user->get('aid'));
+		
+		
+		// **************************************
+		// Get configuration about markups to add
+		// **************************************
+		
+		// Get addcss parameters
+		$mu_addcss_cats = $params->get('mu_addcss_cats', array('featured'));
+		$mu_addcss_cats = FLEXIUtilities::paramToArray($mu_addcss_cats);
+		$mu_addcss_acclvl = $params->get('mu_addcss_acclvl', array('needed_acc', 'obtained_acc'));
+		$mu_addcss_acclvl = FLEXIUtilities::paramToArray($mu_addcss_acclvl);
+		$mu_addcss_radded = $params->get('mu_addcss_radded', 0);
+		
+		// Calculate addcss flags
+		$add_featured_cats = in_array('featured', $mu_addcss_cats);
+		$add_other_cats    = in_array('other', $mu_addcss_cats);
+		$add_no_acc        = in_array('no_acc', $mu_addcss_acclvl);
+		$add_free_acc      = in_array('free_acc', $mu_addcss_acclvl);
+		$add_needed_acc    = in_array('needed_acc', $mu_addcss_acclvl);
+		$add_obtained_acc  = in_array('obtained_acc', $mu_addcss_acclvl);
+		
+		// Get addtext parameters
+		$mu_addtext_cats   = $params->get('mu_addtext_cats', 1);
+		$mu_addtext_acclvl = $params->get('mu_addtext_acclvl', array('no_acc', 'free_acc', 'needed_acc', 'obtained_acc'));
+		$mu_addtext_acclvl = FLEXIUtilities::paramToArray($mu_addtext_acclvl);
+		$mu_addtext_radded = $params->get('mu_addtext_radded', 1);
+		
+		// Calculate addtext flags
+		$add_txt_no_acc       = in_array('no_acc', $mu_addtext_acclvl);
+		$add_txt_free_acc     = in_array('free_acc', $mu_addtext_acclvl);
+		$add_txt_needed_acc   = in_array('needed_acc', $mu_addtext_acclvl);
+		$add_txt_obtained_acc = in_array('obtained_acc', $mu_addtext_acclvl);
+		
+		$mu_add_condition_obtainded_acc = $params->get('mu_add_condition_obtainded_acc', 1);
+		
+		$mu_no_acc_text   = JText::_( $params->get('mu_no_acc_text',   'FLEXI_MU_NO_ACC') );
+		$mu_free_acc_text = JText::_( $params->get('mu_free_acc_text', 'FLEXI_MU_NO_ACC') );
+		
+		
+		// *******************************
+		// Prepare data needed for markups
+		// *******************************
+		
+		// a. Get Featured categories and language filter their titles
+		$featured_cats_parent = $params->get('featured_cats_parent', 0);
+		$featured_cats = array();
+		if ( $add_featured_cats && $featured_cats_parent )
+		{
+			$where[] = isset($globalcats[$featured_cats_parent])  ?
+				'id IN (' . $globalcats[$featured_cats_parent]->descendants . ')' :
+				'parent_id = '. $featured_cats_parent
+				;
+			$query = 'SELECT c.id'
+				. ' FROM #__categories AS c'
+				. (count($where) ? ' WHERE ' . implode( ' AND ', $where ) : '')
+				;
+			$db->setQuery($query);
+			
+			$featured_cats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$featured_cats = $featured_cats ? array_flip($featured_cats) : array();
+			
+			foreach ($featured_cats as $featured_cat => $i)
+			{
+				$featured_cats_titles[$featured_cat] = JText::_($globalcats[$featured_cat]->title);
+			}
+		}
+		
+		
+		// b. Get Access Level names (language filter them)
+		if ( $add_needed_acc || $add_obtained_acc )
+		{
+			if (FLEXI_J16GE) {
+				$db->setQuery('SELECT id, title FROM #__viewlevels');
+				$_arr = $db->loadObjectList();
+				$access_names = array();
+				foreach ($_arr as $o) $access_names[$o->id] = JText::_($o->title);
+			} else {
+				$access_names = array(0=>'Public', 1=>'Registered', 2=>'Special');
+			}
+		}
+		
+		
+		// c. Calculate creation time intervals
+		if ( $mu_addcss_radded )
+		{
+		  $nowdate_secs = time();
+			$ra_timeframes = $params->get('mu_ra_timeframe_intervals', '24h,2d,7d,1m,3m,1y,3y');
+			$ra_timeframes = preg_split("/\s*,\s*/u", $ra_timeframes);
+			
+			$ra_names = $params->get('mu_ra_timeframe_names', '24h,2d,7d,1m,3m,1y,3y');
+			$ra_names = preg_split("/\s*,\s*/u", $ra_names);
+			
+			$unit_hour_map = array('h'=>1, 'd'=>24, 'm'=>24*30, 'y'=>24*365);
+			$unit_word_map = array('h'=>'hours', 'd'=>'days', 'm'=>'months', 'y'=>'years');
+			$unit_text_map = array(
+				'h'=>'FLEXI_MU_HOURS', 'd'=>'FLEXI_MU_DAYS', 'm'=>'FLEXI_MU_MONTHS', 'y'=>'FLEXI_MU_YEARS'
+			);
+			foreach($ra_timeframes as $i => $timeframe) {
+				$unit = substr($timeframe, -1);
+				if ( !isset($unit_hour_map[$unit]) ) {
+					echo "Improper timeframe ': ".$timeframe."' for recently added content, please fix in configuration";
+					continue;
+				}
+				$timeframe  = (int) $timeframe;
+				$ra_css_classes[$i] = '_item_added_within_' . $timeframe . $unit_word_map[$unit];
+				$ra_timeframe_secs[$i] = $timeframe * $unit_hour_map[$unit] * 3600;
+				$ra_timeframe_text[$i] = @ $ra_names[$i] ? JText::_($ra_names[$i]) : JText::sprintf($unit_text_map[$unit], $timeframe);
+			}
+		}
+		
+		
+		// **********************************
+		// Create CSS markup classes per item
+		// **********************************
+		$public_acclvl = FLEXI_J16GE ? 1 : 0;
+		foreach ($items as $item) 
+		{
+			$item->css_markups = array();
+			
+			
+			// Category markups
+			if ( $add_featured_cats || $add_other_cats ) foreach ($item->categories as $item_cat) {
+				$is_featured_cat = isset( $featured_cats[$item_cat->id] );
+				
+				if ( $is_featured_cat && !$add_featured_cats  ) continue;   // not adding featured cats
+				if ( !$is_featured_cat && !$add_other_cats  )   continue;   // not adding other cats
+				if ( in_array($item_cat->id, $globalnoroute) )	continue;   // non-linkable/routable 'special' category
+				
+				$item->css_markups['itemcats'][] = '_itemcat_'.$item_cat->id;
+				$item->ecss_markups['itemcats'][] = ($is_featured_cat ? ' mu_featured_cat' : ' mu_normal_cat') . ($mu_addtext_cats ? ' mu_has_text' : '');
+				$item->title_markups['itemcats'][] = $mu_addtext_cats  ?  ($is_featured_cat ? $featured_cats_titles[$item_cat->id] : $globalcats[$item_cat->id]->title)  :  '';
+			}
+			
+			
+			// Timeframe markups
+			if ($mu_addcss_radded) {
+				$item_timeframe_secs = $nowdate_secs - strtotime($item->created);
+				$mr = -1;
+				
+				foreach($ra_timeframe_secs as $i => $timeframe_secs) {
+					// Check if item creation time has surpassed this time frame
+					if ( $item_timeframe_secs > $timeframe_secs) continue;
+					
+					// Check if this time frame is more recent than the best one found so far
+					if ($mr != -1 && $timeframe_secs > $ra_timeframe_secs[$mr]) continue;
+					
+					// Use current time frame
+					$mr = $i;
+			  }
+				if ($mr >= 0) {
+					$item->css_markups['timeframe'][] = $ra_css_classes[$mr];
+					$item->ecss_markups['timeframe'][] = ' mu_ra_timeframe' . ($mu_addtext_radded ? ' mu_has_text' : '');
+					$item->title_markups['timeframe'][] = $mu_addtext_radded ? $ra_timeframe_text[$mr] : '';
+				}
+			}
+			
+			
+			// Get item's access levels if this is needed
+			if ($add_free_acc || $add_needed_acc || $add_obtained_acc) {
+				$all_acc_lvls = array();
+				$all_acc_lvls[] = $item->access;
+				$all_acc_lvls[] = $item->category_access;
+				$all_acc_lvls[] = $item->type_access;
+				$all_acc_lvls = array_unique($all_acc_lvls);
+			}
+			
+			
+			// No access markup
+			if ($add_no_acc && !$item->has_access) {
+				$item->css_markups['access'][]   = '_item_no_access';
+				$item->ecss_markups['access'][] =  ($add_txt_no_acc ? ' mu_has_text' : '');
+				$item->title_markups['access'][] = $add_txt_no_acc ? $mu_no_acc_text : '';
+			}
+			
+			
+			// Free access markup, Add ONLY if item has a single access level the public one ...
+			if ( $add_free_acc && $item->has_access && count($all_acc_lvls)==1 && $public_acclvl == reset($all_acc_lvls) )
+			{
+				$item->css_markups['access'][]   = '_item_free_access';
+				$item->ecss_markups['access'][]  = $add_txt_free_acc ? ' mu_has_text' : '';
+				$item->title_markups['access'][] = $add_txt_free_acc ? $mu_free_acc_text : '';
+			}
+			
+			
+			// Needed / Obtained access levels markups
+			if ($add_needed_acc || $add_obtained_acc)
+			{
+				foreach($all_acc_lvls as $all_acc_lvl)
+				{
+					if ($public_acclvl == $all_acc_lvl) continue;  // handled separately above
+					
+					$has_acclvl = FLEXI_J16GE ? in_array($all_acc_lvl, $aids) : $all_acc_lvl <= $aids;
+					if (!$has_acclvl) {
+						if (!$add_needed_acc) continue;   // not adding needed levels
+						$item->css_markups['access'][] = '_acclvl_'.$all_acc_lvl;
+						$item->ecss_markups['access'][] = ' mu_needed_acclvl' . ($add_txt_needed_acc ? ' mu_has_text' : '');
+						$item->title_markups['access'][] = $add_txt_needed_acc ? $access_names[$all_acc_lvl] : '';
+					} else {
+						if (!$add_obtained_acc) continue; // not adding obtained levels
+						if ($mu_add_condition_obtainded_acc==0 && !$item->has_access) continue;  // do not add obtained level markups if item is inaccessible
+						$item->css_markups['access'][] = '_acclvl_'.$all_acc_lvl;
+						$item->ecss_markups['access'][] = ' mu_obtained_acclvl' . ($add_txt_obtained_acc ? ' mu_has_text' : '');
+						$item->title_markups['access'][] = $add_txt_obtained_acc ? $access_names[$all_acc_lvl] : '';
+					}
+				}
+			}
+		}
+	}
+	
 }
 
 class flexicontent_upload
@@ -3055,11 +3514,16 @@ class FLEXIUtilities
 		{
 			$db = JFactory::getDBO();
 			if (!FLEXI_J16GE) {
-				$query = "SELECT id, version FROM #__content WHERE sectionid='".FLEXI_SECTION."';";
+				$query = "SELECT i.id, i.version FROM #__content AS i"
+					." WHERE i.sectionid=".FLEXI_SECTION
+					. ($id ? " AND i.id=".(int)$id : "")
+					;
 			} else {
-				$query = "SELECT c.id, c.version FROM #__content as c"
-						. " JOIN #__categories as cat ON c.catid=cat.id"
-						. " WHERE cat.extension='".FLEXI_CAT_EXTENSION."'";
+				$query = "SELECT i.id, i.version FROM #__content as i"
+						. " JOIN #__categories AS c ON i.catid=c.id"
+						. " WHERE c.extension='".FLEXI_CAT_EXTENSION."'"
+						. ($id ? " AND i.id=".(int)$id : "")
+						;
 			}
 			$db->setQuery($query);
 			$rows = $db->loadAssocList();
@@ -3735,8 +4199,7 @@ class flexicontent_db
 
 			// SPECIAL case custom field
 			case 'field':
-				if ($params->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
-				$filter_order		= 'f.value'.$int;
+				$filter_order = $params->get('orderbycustomfieldint', 0) ? 'CAST(f.value AS UNSIGNED)' : 'f.value';
 				$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
 				break;
 
@@ -3905,6 +4368,42 @@ class flexicontent_db
 		return;// true;
 	}
 
+}
+
+
+function FLEXISubmenu($cando)
+{
+	$perms   = FlexicontentHelperPerm::getPerm();
+	$app     = JFactory::getApplication();
+	$session = JFactory::getSession();
+	
+	// Check access to current management tab
+	$not_authorized = isset($perms->$cando) && !$perms->$cando;
+	if ( $not_authorized ) {
+		$app->redirect('index.php?option=com_flexicontent', JText::_( 'FLEXI_NO_ACCESS' ));
+	}
+	
+	// Get post-installation FLAG (session variable), and current view (HTTP request variable)
+	$dopostinstall = $session->get('flexicontent.postinstall');
+	$view = JRequest::getVar('view', 'flexicontent');
+	
+	// Create Submenu, Dashboard (HOME is always added, other will appear only if post-installation tasks are done)
+	JSubMenuHelper::addEntry( JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
+	if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>'))
+	{
+		JSubMenuHelper::addEntry( JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items');
+		if ($perms->CanTypes)			JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
+		if ($perms->CanCats) 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
+		if ($perms->CanFields) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
+		if ($perms->CanTags) 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
+		if ($perms->CanAuthors)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_AUTHORS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
+	//if ($perms->CanArchives)	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
+		if ($perms->CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
+		if ($perms->CanIndex)			JSubMenuHelper::addEntry( JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
+		if ($perms->CanTemplates)	JSubMenuHelper::addEntry( JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
+		if ($perms->CanImport)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
+		if ($perms->CanStats)			JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
+	}
 }
 
 ?>

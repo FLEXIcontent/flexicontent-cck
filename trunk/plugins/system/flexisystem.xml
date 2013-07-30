@@ -19,52 +19,53 @@
 	
 	<params addpath="/administrator/components/com_flexicontent/elements">
 
-			<!--param name="redirect_method_fe" type="list" default="1" label="&lt;span style='color:darkgreen'&gt; Frontend Redirect Method&lt;/span&gt;" description="Select method of redirecting com_content menu &amp; links to com_flexicontent. &lt;br&gt;&lt;br&gt;&lt;b&gt;NOTE&lt;/b&gt;: The Redirect URL method, will make existing module assignment not to work and also may cause redirect loops when using third party SEF extensions">
+			<!--field name="redirect_method_fe" type="list" default="1" label="&lt;span style='color:darkgreen'&gt; Frontend Redirect Method&lt;/span&gt;" description="Select method of redirecting com_content menu &amp; links to com_flexicontent. &lt;br&gt;&lt;br&gt;&lt;b&gt;NOTE&lt;/b&gt;: The Redirect URL method, will make existing module assignment not to work and also may cause redirect loops when using third party SEF extensions">
 				<option value="0">Redirect to FLEXIcontent URL</option>
 				<option value="1">Set Request Variables (Recommeneded)</option>
-			</param-->
+			</field-->
 
-			<param name="" type="separator" default="URL redirections" hr="false" level="level2" menu="hide" />
-			<param name="redirect_sections" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_SECTION" description="FLEXI_SYSTEM_REDIRECT_SECTION_DESC">
+			<field name="" type="separator" default="URL redirections" hr="false" level="level2" menu="hide" />
+			<field name="redirect_sections" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_SECTION" description="FLEXI_SYSTEM_REDIRECT_SECTION_DESC">
 				<option value="23">FLEXI_SYSTEM_NO_REDIRECT</option>
 				<option value="23">MANAGER</option>
 				<option value="24">ADMINISTRATOR</option>
 				<option value="25">SUPER ADMINISTRATOR</option>
-			</param>
-			<param name="redirect_cats" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_CATS" description="FLEXI_SYSTEM_REDIRECT_CATS_DESC">
+			</field>
+			<field name="redirect_cats" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_CATS" description="FLEXI_SYSTEM_REDIRECT_CATS_DESC">
 				<option value="23">FLEXI_SYSTEM_NO_REDIRECT</option>
 				<option value="23">MANAGER</option>
 				<option value="24">ADMINISTRATOR</option>
 				<option value="25">SUPER ADMINISTRATOR</option>
-			</param>
-			<param name="redirect_articles" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_ARTICLES" description="FLEXI_SYSTEM_REDIRECT_ARTICLES_DESC">
+			</field>
+			<field name="redirect_articles" type="list" default="24" label="FLEXI_SYSTEM_REDIRECT_ARTICLES" description="FLEXI_SYSTEM_REDIRECT_ARTICLES_DESC">
 				<option value="23">FLEXI_SYSTEM_NO_REDIRECT</option>
 				<option value="23">MANAGER</option>
 				<option value="24">ADMINISTRATOR</option>
 				<option value="25">SUPER ADMINISTRATOR</option>
-			</param>
-			<param name="excluded_redirect_urls" type="textarea" rows="6" cols="36" label="Exclude urls from redirection (enter a part)" description="if you have trouble with some URLs unwantingly redirecting to FLEXIcontent URLs, you can enter here a sub-string of them, in order to exclude them from redirection. Seperate urls with %% DO NOT add new line characters" />
+			</field>
+			<field name="excluded_redirect_urls" type="textarea" rows="6" cols="36" label="Exclude urls from redirection (enter a part) (BACKEND Only)" description="if you have trouble with some URLs unwantingly redirecting to FLEXIcontent URLs, you can enter here a sub-string of them, in order to exclude them from redirection. Seperate urls with %% DO NOT add new line characters" />
 
-			<param name="" type="separator" default="Auto-Checkins" hr="false" level="level2" menu="hide" />
-			<param name="checkin_on_session_end" type="radio" default="1" label="Check-in on user logout" description="Check-out records (items,categories,etc) will be checked-in on user logout or session expiration">
+			<field name="" type="separator" default="Auto-Checkins" hr="false" level="level2" menu="hide" />
+			<field name="checkin_on_session_end" type="radio" default="1" label="Check-in on user logout / session expiration" description="Check-out records (items,categories,etc) will be checked-in on user logout or session expiration">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="limit_checkout_hours" type="radio" default="1" label="Time-Limit check-outs" description="Impose a maximum time for checked-out records. Records exceeding this limit whill be automatically checked-in">
+			</field>
+			<field name="limit_checkout_hours" type="radio" default="1" label="Time-Limit check-outs" description="Impose a maximum time for checked-out records. Records exceeding this limit whill be automatically checked-in">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="max_checkout_hours" type="text" label="Max checked out hours" description="Maximum allowed time an record (item,category,etc) should be checked out before automatically checking it in" default="24" />
+			</field>
+			<field name="max_checkout_hours" type="text" label="Max checked out hours" description="Maximum allowed time an record (item,category,etc) should be checked out before automatically checking it in" default="24" />
 
-			<!--param name="" type="separator" default="Auto-Archiving (EXPERIMENTAL, for developments sites only)" hr="false" level="level2" menu="hide" />
-			<param name="archive_on_publish_down" type="radio" default="0" label="Archive items with expired dates" description="Enable this to automatically archive items that their publish_down date is reached">
+			<field name="" type="separator" default="Auto-Archiving" hr="false" level="level2" />
+			<field name="" type="separator" default="NOTE: There powerful Joomla extensions that allow more options and flexibility than this basic Feature" hr="false" level="level3" />
+			<field name="archive_on_publish_down" type="radio" default="0" label="Archive items with expired dates" description="Enable this to automatically archive items that their publish_down date is reached">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="clear_publish_down_date" type="radio" default="1" label="Clear publish down date" description="When auto-archiving clear the publish-down date, this will make the auto-archived items visible in the archived view. It is recommended that you set this to YES">
+			</field>
+			<field name="clear_publish_down_date" type="radio" default="1" label="Clear publish down date" description="When auto-archiving clear the publish-down date, this will make the auto-archived items visible in the archived view. It is recommended that you set this to YES">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Yes, Recommeneded</option>
-			</param-->
+			</field>
 			
 	</params>
 </install>

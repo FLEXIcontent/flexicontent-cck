@@ -109,7 +109,9 @@ class FlexicontentViewItems  extends JViewLegacy
 
 		// Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
 		// indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$item = $model->getItem(null, $check_view_access=2);
+		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		// Set item parameters as VIEW's parameters (item parameters are merged with component/page/type/current category/access parameters already)
 		$params = $item->parameters;
@@ -120,8 +122,13 @@ class FlexicontentViewItems  extends JViewLegacy
 		// ********************
 
 		// (a) Decide to use mobile or normal item template layout
-		$use_mobile = $params->get('detect_mobile') && $session->get('fc_use_mobile', false, 'flexicontent');
-		$_ilayout = $use_mobile ? 'ilayout_mobile' : 'ilayout';
+		$use_mobile_layouts = $params->get('use_mobile_layouts', 0 );
+		$force_desktop_layout = $params->get('force_desktop_layout', 0 );
+		$mobileDetector = flexicontent_html::getMobileDetector();
+		$isMobile = $mobileDetector->isMobile();
+		$isTablet = $mobileDetector->isTablet();
+		$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+		$_ilayout = $useMobile ? 'ilayout_mobile' : 'ilayout';
 
 		// (b) Get from item parameters, allowing URL override
 		$ilayout = JRequest::getVar($_ilayout, false);
@@ -414,7 +421,7 @@ class FlexicontentViewItems  extends JViewLegacy
 
 		if ( $print_logging_info ) $start_microtime = microtime(true);
 		parent::display($tpl);
-		if ( $print_logging_info ) @$fc_run_times['template_render'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ( $print_logging_info ) $fc_run_times['template_render'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 
 	/**
@@ -444,7 +451,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		$db					= JFactory::getDBO();
 		$nullDate		= $db->getNullDate();
 		$menu				= JSite::getMenu()->getActive();
-
+		
 		// Get the COMPONENT only parameters and merge current menu item parameters
 		$params = clone( JComponentHelper::getParams('com_flexicontent') );
 		if ($menu) {
@@ -475,7 +482,7 @@ class FlexicontentViewItems  extends JViewLegacy
 			$form = $this->get('Form');
 		}
 
-		if ( $print_logging_info ) @$fc_run_times['get_item_data'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
 		// *********************************************************************************************************
@@ -496,7 +503,8 @@ class FlexicontentViewItems  extends JViewLegacy
 		// new item and ownership variables
 		$isnew = !$item->id;
 		$isOwner = ( $item->created_by == $user->get('id') );
-		// A unique item id
+		
+		// create and set (into HTTP request) a unique item id for plugins that needed it
 		JRequest::setVar( 'unique_tmp_itemid', $item->id ? $item->id : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
 		
 		// Component / Menu Item parameters
@@ -709,7 +717,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		// *****************************************************************************
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$fields = $this->get( 'Extrafields' );
-		if ( $print_logging_info ) @$fc_run_times['get_field_vals'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		foreach ($fields as $field)
@@ -762,7 +770,7 @@ class FlexicontentViewItems  extends JViewLegacy
 				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
 			}
 		}
-		if ( $print_logging_info ) @$fc_run_times['render_field_html'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ( $print_logging_info ) $fc_run_times['render_field_html'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 		// Tags used by the item
 		$usedtagsids  = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
@@ -864,7 +872,8 @@ class FlexicontentViewItems  extends JViewLegacy
 		$this->assignRef('pageclass_sfx', $pageclass_sfx);
 		$this->assign('captcha_errmsg', @ $captcha_errmsg);
 		$this->assign('captcha_field',  @ $captcha_field);
-
+		
+		
 		// **************************************************************************************
 		// Load a different template file for parameters depending on whether we use FLEXI_ACCESS
 		// **************************************************************************************
@@ -978,13 +987,12 @@ class FlexicontentViewItems  extends JViewLegacy
 		}
 
 		$this->assignRef('tmpls',		$tmpls);
-
-		$print_logging_info = $params->get('print_logging_info');
-		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
-
+		
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		
 		parent::display($tpl);
-
-		if ( $print_logging_info ) @$fc_run_times['form_rendering'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		if ( $print_logging_info ) $fc_run_times['form_rendering'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 
 	/**
@@ -1157,8 +1165,8 @@ class FlexicontentViewItems  extends JViewLegacy
 				$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
 				if (!$prettycheckable_added) $lists['notify'] .= '<label class="fccheckradio_lbl" for="'.$elementid.'">';
 				$extra_params = !$prettycheckable_added ? '' : ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
-				$lists['notify'] = ' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid
-					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' />';
+				$lists['notify'] = ' <input type="checkbox" id="'.$elementid.'" element_group_id="'.$elementid
+					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' checked="checked" />';
 				if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
 			}
 		}

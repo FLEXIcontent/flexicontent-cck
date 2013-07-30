@@ -436,15 +436,57 @@
 		
 		<params group="group-voting" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- voting -->
 			
+			<field name="" type="separator" default="FLEXI_FIELD_VOTE_SUBMISSION" description="FLEXI_FIELD_VOTE_SUBMISSION_DESC" level="level1" />
+			<field name="submit_acclvl" type="list" default="0" size="1" label="FLEXI_FIELD_VOTE_SUBMIT_ACCESS" description="FLEXI_FIELD_VOTE_SUBMIT_ACCESS_DESC" >
+				<option value="0">Public</option>
+				<option value="1">Registered</option>
+				<option value="2">Special</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_NO_ACCESS_HANDLING" description="FLEXI_NO_ACCESS_HANDLING_DESC" level="level2" />
+			
+			<field name="" type="separator" default="FLEXI_LOGGED_USERS_CONFIGURATION" description="FLEXI_LOGGED_USERS_CONFIGURATION_DESC" level="level3" />
+			<field name="logged_no_acc_msg" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_NO_ACCESS_MSG" description="FLEXI_FIELD_VOTE_NO_ACCESS_MSG_DESC" />
+			<field name="logged_no_acc_doredirect" type="radio" default="0" size="1" label="FLEXI_NO_ACCESS_DO_REDIRECT" description="FLEXI_NO_ACCESS_DO_REDIRECT_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_NO_ACCESS_REDIRECT_URL</option>
+			</field>
+			<field name="logged_no_acc_askredirect" type="radio" default="1" size="1" label="FLEXI_NO_ACCESS_ASK_REDIRECT" description="FLEXI_NO_ACCESS_ASK_REDIRECT_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_NO_INFORM_ONLY</option>
+				<option value="2">FLEXI_YES_ASK_USER</option>
+			</field>
+			<field name="logged_no_acc_url" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_NO_ACCESS_URL" description="FLEXI_FIELD_VOTE_NO_ACCESS_URL_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_GUEST_USERS_CONFIGURATION" description="FLEXI_GUEST_USERS_CONFIGURATION_DESC" level="level3" />
+			<field name="guest_no_acc_msg" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_NO_ACCESS_MSG" description="FLEXI_FIELD_VOTE_NO_ACCESS_MSG_DESC" />
+			<field name="guest_no_acc_doredirect" type="radio" default="2" size="1" label="FLEXI_NO_ACCESS_DO_REDIRECT" description="FLEXI_NO_ACCESS_DO_REDIRECT_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_NO_ACCESS_REDIRECT_URL</option>
+				<option value="2">FLEXI_NO_ACCESS_LOGIN_REGISTER</option>
+			</field>
+			<field name="guest_no_acc_askredirect" type="radio" default="1" size="1" label="FLEXI_NO_ACCESS_ASK_REDIRECT" description="FLEXI_NO_ACCESS_ASK_REDIRECT_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_NO_INFORM_ONLY</option>
+				<option value="2">FLEXI_YES_ASK_USER</option>
+			</field>
+			<field name="guest_no_acc_url" type="text" default="" size="30" label="FLEXI_FIELD_VOTE_NO_ACCESS_URL" description="FLEXI_FIELD_VOTE_NO_ACCESS_URL_DESC" />
+			
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1"  />
-			<field name="dimension" type="text" default="25" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
-			<field name="image" type="text" default="components/com_flexicontent/assets/images/star.gif" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_BASIC" description="" level="level2" />
+			<field name="rating_resolution" type="text" default="5" size="10" label="FLEXI_FIELD_VOTE_RATING_RESOLUTION" description="FLEXI_FIELD_VOTE_RATING_RESOLUTION_DESC" />
+			<field name="rating_stars" type="text" default="5" size="10" label="FLEXI_FIELD_VOTE_RATING_STARS" description="FLEXI_FIELD_VOTE_RATING_STARS_DESC" />
 			<field name="counter" type="list" default="1" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" >
 				<option value="0">FLEXI_DISABLE</option>
 				<option value="1">FLEXI_ENABLE</option>
 				<option value="2">FLEXI_FIELD_VOTE_DISABLE_IN_EXTRA_VOTES</option>
 				<option value="3">FLEXI_FIELD_VOTE_DISABLE_IN_MAIN_VOTE</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_VOTE_STAR_IMAGE" description="FLEXI_VOTE_STAR_IMAGE_DESC" level="level2" />
+			<field name="image" type="text" default="components/com_flexicontent/assets/images/star-small.png" size="30" label="FLEXI_FIELD_VOTE_IMAGE" description="FLEXI_FIELD_VOTE_IMAGE_DESC" />
+			<field name="dimension" type="text" default="16" size="3" label="FLEXI_FIELD_VOTE_DIMENSION" description="FLEXI_FIELD_VOTE_DIMENSION_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_EXTRA_VOTES" level="level2" menu="hide" />
 			<field name="enable_extra_votes" type="radio" default="0" label="FLEXI_ENABLE_VOTE_EXTRA" description="FLEXI_ENABLE_VOTE_EXTRA_DESC">

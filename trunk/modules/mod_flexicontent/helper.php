@@ -34,7 +34,11 @@ class modFlexicontentHelper
 		global $modfc_jprof, $mod_fc_run_times;
 		
 		$forced_itemid = $params->get('forced_itemid');
-		$db = JFactory::getDBO();
+		$db   = JFactory::getDBO();
+		$user = JFactory::getUser();
+		// Get IDs of user's access view levels
+		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
+		else $aid_arr = $user->getAuthorisedViewLevels();
 		
 		// get the component parameters
 		$flexiparams = JComponentHelper::getParams('com_flexicontent');
@@ -109,6 +113,7 @@ class modFlexicontentHelper
 			$db->setQuery($query);
 			$hitsfield = $db->loadObject();
 			$hitsfield->parameters = FLEXI_J16GE ? new JRegistry($hitsfield->attribs) : new JParameter($hitsfield->attribs);
+			$has_access_hits = FLEXI_J16GE ? in_array($hitsfield->access, $aid_arr) : $hitsfield->access <= $aid;
 		}
 		
 		if ($display_voting || $display_voting_feat) {
@@ -116,6 +121,7 @@ class modFlexicontentHelper
 			$db->setQuery($query);
 			$votingfield = $db->loadObject();
 			$votingfield->parameters = FLEXI_J16GE ? new JRegistry($votingfield->attribs) : new JParameter($votingfield->attribs);
+			$has_access_voting = FLEXI_J16GE ? in_array($votingfield->access, $aid_arr) : $votingfield->access <= $aid;
 		}
 		
 		// get module fields parameters
@@ -368,17 +374,19 @@ class modFlexicontentHelper
 					$lists[$ord]['featured'][$i]->image_rendered 	= $thumb_rendered;
 					$lists[$ord]['featured'][$i]->image = $thumb;
 					$lists[$ord]['featured'][$i]->hits	= $row->hits;
-					if ($display_hits_feat) {
+					$lists[$ord]['featured'][$i]->hits_rendered = '';
+					if ($display_hits_feat && $has_access_hits) {
 						FlexicontentFields::loadFieldConfig($hitsfield, $row);
-						$lists[$ord]['featured'][$i]->hits_rendered = $params->get('hits_label_feat') ? '<span class="hits_label_feat">'.JText::_($hitsfield->label).':</span> ' : '';
+						$lists[$ord]['featured'][$i]->hits_rendered .= $params->get('hits_label_feat') ? '<span class="hits_label_feat">'.JText::_($hitsfield->label).':</span> ' : '';
 						$lists[$ord]['featured'][$i]->hits_rendered .= FLEXI_J16GE ?
 							JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS_L' )) :
 							JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
 						$lists[$ord]['featured'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label_feat') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
-					if ($display_voting_feat) {
+					$lists[$ord]['featured'][$i]->voting = '';
+					if ($display_voting_feat && $has_access_voting) {
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
-						$lists[$ord]['featured'][$i]->voting = $params->get('voting_label_feat') ? '<span class="voting_label_feat">'.JText::_($votingfield->label).':</span> ' : '';
+						$lists[$ord]['featured'][$i]->voting .= $params->get('voting_label_feat') ? '<span class="voting_label_feat">'.JText::_($votingfield->label).':</span> ' : '';
 						$lists[$ord]['featured'][$i]->voting .= '<span class="voting_value_feat">' . flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars_feat',1), $params->get('allow_vote_feat',0), $params->get('vote_counter_feat',1), !$params->get('voting_label_feat') ) .'</span>';
 					}
 					if ($display_comments_feat) {
@@ -498,17 +506,19 @@ class modFlexicontentHelper
 					$lists[$ord]['standard'][$i]->image_rendered 	= $thumb_rendered;
 					$lists[$ord]['standard'][$i]->image	= $thumb;
 					$lists[$ord]['standard'][$i]->hits	= $row->hits;
-					if ($display_hits) {
+					$lists[$ord]['standard'][$i]->hits_rendered = '';
+					if ($display_hits && $has_access_hits) {
 						FlexicontentFields::loadFieldConfig($hitsfield, $row);
-						$lists[$ord]['standard'][$i]->hits_rendered = $params->get('hits_label') ? '<span class="hits_label">'.JText::_($hitsfield->label).':</span> ' : '';
+						$lists[$ord]['standard'][$i]->hits_rendered .= $params->get('hits_label') ? '<span class="hits_label">'.JText::_($hitsfield->label).':</span> ' : '';
 						$lists[$ord]['standard'][$i]->hits_rendered .= FLEXI_J16GE ?
 							JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS_L' )) :
 							JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
 						$lists[$ord]['standard'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
-					if ($display_voting) {
+					$lists[$ord]['standard'][$i]->voting = '';
+					if ($display_voting && $has_access_voting) {
 						FlexicontentFields::loadFieldConfig($votingfield, $row);
-						$lists[$ord]['standard'][$i]->voting = $params->get('voting_label') ? '<span class="voting_label">'.JText::_($votingfield->label).':</span> ' : '';
+						$lists[$ord]['standard'][$i]->voting .= $params->get('voting_label') ? '<span class="voting_label">'.JText::_($votingfield->label).':</span> ' : '';
 						$lists[$ord]['standard'][$i]->voting .= '<span class="voting_value">' . flexicontent_html::ItemVoteDisplay( $votingfield, $row->id, $row->rating_sum, $row->rating_count, 'main', '', $params->get('vote_stars',1), $params->get('allow_vote',0), $params->get('vote_counter',1), !$params->get('voting_label')) .'</span>';
 					}
 					if ($display_comments) {
@@ -699,8 +709,7 @@ class modFlexicontentHelper
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
 				$where .= ' AND ty.access IN (0,'.$aid_list.')';
-				//$where .= ' AND mc.access IN (0,'.$aid_list.')';
-				$where .= ' AND c.access IN (0,'.$aid_list.')';
+				$where .= ' AND mc.access IN (0,'.$aid_list.')';
 				$where .= ' AND  i.access IN (0,'.$aid_list.')';
 			} else {
 				$aid = (int) $user->get('aid');
@@ -709,13 +718,11 @@ class modFlexicontentHelper
 					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
 					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
 					$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					//$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
-					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
+					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
 					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
 				} else {
 					$where .= ' AND ty.access <= '.$aid;
-					//$where .= ' AND mc.access <= '.$aid;
-					$where .= ' AND c.access <= '.$aid;
+					$where .= ' AND mc.access <= '.$aid;
 					$where .= ' AND  i.access <= '.$aid;
 				}
 			}
@@ -1355,7 +1362,7 @@ class modFlexicontentHelper
 				. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
 				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 				. ' JOIN #__categories AS  c ON  c.id = rel.catid'
-				//. ' JOIN #__categories AS mc ON mc.id = i.catid'
+				. ' JOIN #__categories AS mc ON mc.id = i.catid'
 				. $joinaccess
 				. $join_favs
 				. $join_date
@@ -1648,3 +1655,4 @@ class modFlexicontentHelper
 	
 }
 
+?>

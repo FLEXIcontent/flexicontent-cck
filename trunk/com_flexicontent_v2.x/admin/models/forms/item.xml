@@ -203,8 +203,8 @@
 	
 	
 	<fieldset name="themes" label="FLEXI_TEMPLATE" addfieldpath="/administrator/components/com_flexicontent/elements">
-		<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="detect_mobile" firstoption="FLEXI_USE_NORMAL" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" />
 		<field name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" class="use_select2_lib" onchange="activatePanel(this.value);" />
+		<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" />
 	</fieldset>
 	
 </fields>

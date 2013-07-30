@@ -1,6 +1,6 @@
 window.addEvent('domready', function() {
 	if($$('.fcvote').length > 0) {
-		$$('.fcvote a').addEvent('click', function(e) {
+		$$('.fcvote a.fc_dovote').addEvent('click', function(e) {
 			e = new Event(e).stop();
 			
 			var data_arr = this.getProperty('rel').split("_");
@@ -12,6 +12,7 @@ window.addEvent('domready', function() {
 				var xid = "main";  // default to ... 'main' voting
 			}
 			
+			var _htmlrating = $('fcvote_cnt_' + itemID + '_' + xid).innerHTML;
 			var log = $('fcvote_cnt_' + itemID + '_' + xid).empty().addClass('ajax-loader');
 			
 			if(MooTools.version>="1.2.4") {
@@ -23,9 +24,14 @@ window.addEvent('domready', function() {
 					onSuccess: function(data){
 						if (typeof(data.percentage)!="undefined" && data.percentage)
 							$('rating_' + itemID + '_' + xid).setStyle('width', data.percentage + "%");
+						
+						if (typeof(data.htmlrating)!="undefined" && data.htmlrating) {
+							_htmlrating = data.htmlrating;
+						}
+
 						$('fcvote_cnt_' + itemID + '_' + xid).set('html', data.html).removeClass('ajax-loader');
 						setTimeout(function() {
-							$('fcvote_cnt_' + itemID + '_' + xid).set('html', data.htmlrating);
+							$('fcvote_cnt_' + itemID + '_' + xid).set('html', _htmlrating);
 						}, 2000);
 					}
 				}).send();
@@ -40,6 +46,11 @@ window.addEvent('domready', function() {
 						if (typeof(data.percentage)!="undefined" && data.percentage)
 							$('rating_' + itemID + '_' + xid).setStyle('width', data.percentage + "%");
 						$('fcvote_cnt_' + itemID + '_' + xid).removeClass('ajax-loader');
+						
+						if (typeof(data.htmlrating)!="undefined" && data.htmlrating) {
+							_htmlrating = data.htmlrating;
+						}
+						
 						$('fcvote_cnt_' + itemID + '_' + xid).innerHTML=data.html;
 						setTimeout(function() {
 							$('fcvote_cnt_' + itemID + '_' + xid).innerHTML=data.htmlrating;

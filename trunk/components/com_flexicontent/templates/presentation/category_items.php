@@ -64,10 +64,22 @@ $tabsHeaderLevel = $itemTitleHeaderLevel == '2'  ?  '3' : '2';
 foreach ($items as $i => $item) :
 	
 	$fc_item_classes  = 'catalogitem';
-	$fc_item_classes .= $i%2 ? ' catalog_odd' : ' catalog_even';
-	foreach ($items[$i]->categories as $item_cat)  $fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
-	$fc_item_classes .= $items[$i]->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
+	
+	$markup_tags = '<span class="fc_mublock">';
+	foreach($item->css_markups as $grp => $css_markups) {
+		if ( empty($css_markups) )  continue;
+		$fc_item_classes .= ' fc'.implode(' fc', $css_markups);
+		
+		$ecss_markups  = $item->ecss_markups[$grp];
+		$title_markups = $item->title_markups[$grp];
+		foreach($css_markups as $mui => $css_markup) {
+			$markup_tags .= '<span class="fc_markup mu' . $css_markups[$mui] . $ecss_markups[$mui] .'">' .$title_markups[$mui]. '</span>';
+		}
+	}
+	$markup_tags .= '</span>';
 ?>
+
+<div class="fc_item_separator"></div>
 
 <?php echo '<'.$mainAreaTag; ?> id="cataloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?> group">
 	
@@ -92,18 +104,16 @@ foreach ($items as $i => $item) :
 	
 	<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) : ?>
 		<!-- BOF buttons -->
-		<p class="buttons">
+		<div class="buttons">
 			<?php echo $pdfbutton; ?>
 			<?php echo $mailbutton; ?>
 			<?php echo $printbutton; ?>
 			<?php echo $editbutton; ?>
 			<?php echo $statebutton; ?>
 			<?php echo $approvalbutton; ?>
-		</p>
+		</div>
 		<!-- EOF buttons -->
 	<?php endif; ?>
-	
-	
 	
 	
 	<?php
@@ -116,7 +126,7 @@ foreach ($items as $i => $item) :
 	
 	<?php if ($this->params->get('show_comments_count')) : ?>
 		<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
-			<div class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
+			<div class="fc_comments_count hasTip" alt="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
 				<?php echo $this->comments[ $item->id ]->total; ?>
 			</div>
 		<?php endif; ?>
@@ -134,6 +144,7 @@ foreach ($items as $i => $item) :
 		<!-- EOF item title -->
 	<?php endif; ?>
 	
+	<?php echo $markup_tags; ?>
 	
   <?php if ($item->event->afterDisplayTitle) : ?>
 	  <!-- BOF afterDisplayTitle -->
@@ -436,8 +447,6 @@ foreach ($items as $i => $item) :
 	<?php endif; ?>
 
 <?php echo '</'.$mainAreaTag.'>'; ?>
-
-<div class="fc_item_seperator"></div>
 
 <?php endforeach; /* item loop */ ?>
 

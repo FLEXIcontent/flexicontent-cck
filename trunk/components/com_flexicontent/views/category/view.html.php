@@ -100,8 +100,13 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ************************
 		
 		// (a) Decide to use mobile or normal category template layout
-		$use_mobile = $params->get('detect_mobile') && $session->get('fc_use_mobile', false, 'flexicontent');
-		$_clayout = $use_mobile ? 'clayout_mobile' : 'clayout';
+		$use_mobile_layouts = $params->get('use_mobile_layouts', 0 );
+		$force_desktop_layout = $params->get('force_desktop_layout', 0 );
+		$mobileDetector = flexicontent_html::getMobileDetector();
+		$isMobile = $mobileDetector->isMobile();
+		$isTablet = $mobileDetector->isTablet();
+		$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+		$_clayout = $useMobile ? 'clayout_mobile' : 'clayout';
 		
 		// (b) Get from category parameters, allowing URL override
 		$clayout = JRequest::getCmd($_clayout, false);
@@ -440,6 +445,9 @@ class FlexicontentViewCategory extends JViewLegacy
 			$item->fields['text']->display = & $item->text;
 			
 		}
+		
+		// Calculate CSS classes needed to add special styling markups to the items
+		flexicontent_html::calculateItemMarkups($items, $params);
 		
 		// Get some variables
 		$config	= JFactory::getConfig();

@@ -46,3 +46,33 @@
     /* non-JS fallback */
     *zoom: 1;
 }
+
+/* Title ROW above the table of fields, contains various buttons and some of the custom fields */
+.fc_title_row {
+	display:block;
+	clear:both;
+}
+
+.fc_item_title {
+	display: inline-block;
+	float: left;
+	font-size: 14px;
+	font-weight:bold;
+	margin-left: 16px;
+}
+
+
+.fc_title_row_box {
+	display:inline-block;
+	float:left;
+	max-width: 100%;
+	padding: 0%;
+	margin-left: 16px;
+}
+
+.fc_item_separator_row {
+	display:block;
+	clear:both;
+	height: 40px;
+	border: 0px solid;
+}

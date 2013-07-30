@@ -37,7 +37,7 @@ if (!FLEXI_J16GE) {
 	echo "Wrong Joomla version, this FLEXIcontent package is for J2.5+";
 	exit();
 }
-
+		
 		// Try to increment some limits
 		
 		@set_time_limit( 240 );    // execution time 5 minutes
@@ -307,6 +307,10 @@ if (!FLEXI_J16GE) {
 		$db->setQuery($query);
 		$advsearch_index_tbl_exists = (boolean) count($db->loadObjectList());
 		
+		$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'flexicontent_authors_ext"';
+		$db->setQuery($query);
+		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
+		
 		$failure_style = 'display:block; width:100%; font-weight: bold; color: red;';
 		$success_style = 'font-weight: bold; color: green;';
 		?>
@@ -397,26 +401,35 @@ if (!FLEXI_J16GE) {
 					if ( $types_tbl_exists && !array_key_exists('itemscreatable', $tbl_fields['#__flexicontent_types'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_types` ADD `itemscreatable` SMALLINT(8) NOT NULL DEFAULT '0' AFTER `published`";
 					}
-					foreach ($queries as $query) {
-						$db->setQuery($query);
-						if ( !($result = $db->query()) ) { $results = false; echo "<span style='$failure_style'>ALTER TABLE failed: ". $query ."</span>"; }
+					
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) {
+								$result = false;
+								echo "<span style='$failure_style'>ALTER TABLE failed: ". $query ."</span>";
+							}
+						}
+						if ( $result !== false ) {
+							echo "<span style='$success_style'>columns added</span>";
+						}
 					}
-					if ( @$results !== false ) echo "<span style='$success_style'>columns added</span>";
+					else echo "<span style='$success_style'>nothing to do</span>";
 					?>
 					</td>
 				</tr>
 		
 		<?php
-		// Upgrade ADVANCED index DB table: ADD column and indexes
+		// Create/Upgrade ADVANCED index DB table: ADD column and indexes
 		// Because Adding indexes can be heavy to the SQL server (if not done asychronously ??) we truncate table OR drop it and recreate it
 		?>
-				<tr class="row1">
-					<td class="key">Upgrading Advanced Search Index Table (adding columns/indexes): </td>
+				<tr class="row0">
+					<td class="key">Create/Upgrade advanced search index table: </td>
 					<td>
 					<?php
 					
+			    $queries = array();
 					if ( $advsearch_index_tbl_exists ) {
-				    $queries = array();
 				    $db->setQuery("SHOW INDEX FROM #__flexicontent_advsearch_index");
 				    $_indexes = $db->loadObjectList();
 				    foreach ($_indexes as $tbl_index) $tbl_indexes['#__flexicontent_advsearch_index'][$tbl_index->Key_name] = true;
@@ -459,11 +472,54 @@ if (!FLEXI_J16GE) {
 					}
 					*/
 					
-					foreach ($queries as $query) {
-						$db->setQuery($query);
-						if ( !($result = $db->query()) ) { $results = false; echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>"; }
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) {
+								$result = false;
+								echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>";
+							}
+						}
+						if ( $result !== false ) {
+							echo "<span style='$success_style'>columns/indexes added, table was truncated or recreated, please re-index your content</span>";
+						}
 					}
-					if ( @$results !== false ) echo "<span style='$success_style'>columns/indexes added, table was truncated or recreated, please re-index your content</span>";
+					else echo "<span style='$success_style'>nothing to do</span>";
+					?>
+					</td>
+				</tr>
+
+		<?php
+		// Create authors_ext table if it does not exist
+		?>
+				<tr class="row1">
+					<td class="key">Create/Upgrade authors extended data table: </td>
+					<td>
+					<?php
+					
+			    $queries = array();
+					if ( !$authors_ext_tbl_exists ) {
+						$queries[] = "CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
+						  `user_id` int(11) unsigned NOT NULL,
+						  `author_basicparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+						  `author_catparams` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
+						  PRIMARY KEY  (`user_id`)
+						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					}
+					
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) {
+								$result = false;
+								echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>";
+							}
+						}
+						if ( $result !== false ) {
+							echo "<span style='$success_style'>table created</span>";
+						}
+					}
+					else echo "<span style='$success_style'>nothing to do</span>";
 					?>
 					</td>
 				</tr>

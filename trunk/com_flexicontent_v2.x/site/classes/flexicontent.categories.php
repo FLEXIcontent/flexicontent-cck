@@ -130,16 +130,20 @@ class flexicontent_cats
     *
     * @return array
     */
-	function getCategoriesTree( $published_only=null )
+	function getCategoriesTree( $published_only = false, $parent_id = 0, $depth_limit=0 )
 	{
 		$db = JFactory::getDBO();
 		
 		if ($published_only) {
 			$where[] = 'published = 1';
 		}
-		$where[] = (!FLEXI_J16GE ? 'section = '.FLEXI_SECTION : 'extension="'.FLEXI_CAT_EXTENSION.'"' );
-
-		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
+		if ( $parent_id && isset($globalcats[(int)$parent_id]) ) {
+			// Limit category list to those contain in the subtree of the choosen category
+			$where[] = 'id IN (' . $globalcats[(int)$parent_id]->descendants . ')';
+		}
+		$where[] = !FLEXI_J16GE ? 'section = '.FLEXI_SECTION : 'extension='.$db->Quote(FLEXI_CAT_EXTENSION);
+		
+		$where = count($where) ? ' WHERE ' . implode( ' AND ', $where ) : '';
 		
 		$query = 'SELECT *, id AS value, title AS text'
 				.' FROM #__categories'
@@ -154,7 +158,7 @@ class flexicontent_cats
 		$rows = is_array($rows)?$rows:array();
 		
 		//set depth limit, no detect loop ?
-		$levellimit = 99;
+		$level_limit = $depth_limit ? $depth_limit : 99;
 		
 		//get children
 		$children = array();
@@ -167,7 +171,7 @@ class flexicontent_cats
 		
 		//get list of the items
 		$ROOT_CATEGORY_ID = !FLEXI_J16GE ? 0 : 1;
-		$list = flexicontent_cats::treerecurse($ROOT_CATEGORY_ID, '', array(), $children, true, max(0, $levellimit-1));
+		$list = flexicontent_cats::treerecurse($ROOT_CATEGORY_ID, '', array(), $children, true, max(0, $level_limit-1));
 
 		return $list;
 	}

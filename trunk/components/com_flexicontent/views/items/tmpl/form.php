@@ -20,11 +20,17 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $app   = JFactory::getApplication();
 $user  = JFactory::getUser();
+$session = JFactory::getSession();
 
 // Create some variables
 $isnew = !$this->item->id;
 $typeid = $isnew ? JRequest::getInt('typeid') : $this->item->type_id;
 $this->menuCats = $isnew ? $this->menuCats : false;  // just make sure ...
+
+$newly_submitted = $session->get('newly_submitted', array(), 'flexicontent');
+$newly_submitted_item = @ $newly_submitted[$this->item->id];
+$submit_redirect_url_fe = $this->params->get('submit_redirect_url_fe');
+$isredirected_after_submit = $newly_submitted_item && $submit_redirect_url_fe;
 
 // For tabsets/tabs ids (focusing, etc)
 $tabSetCnt = -1;
@@ -53,10 +59,12 @@ FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 flexicontent_html::loadFramework('jQuery');
 flexicontent_html::loadFramework('select2');
 
-// add extra css for the edit form
-if ($this->params->get('form_extra_css')) {
-	$this->document->addStyleDeclaration($this->params->get('form_extra_css'));
-}
+// add extra css/js for the edit form
+if ($this->params->get('form_extra_css'))    $this->document->addStyleDeclaration($this->params->get('form_extra_css'));
+if ($this->params->get('form_extra_css_fe')) $this->document->addStyleDeclaration($this->params->get('form_extra_css_fe'));
+if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclaration($this->params->get('form_extra_js'));
+if ($this->params->get('form_extra_js_fe'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_fe'));
+
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/admin.js' );
@@ -210,7 +218,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 					<span class="fcbutton_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
 				</button>
 			
-				<?php if (in_array( 'save_preview', $allowbuttons_fe) ) : ?>
+				<?php if ( in_array( 'save_preview', $allowbuttons_fe) && !$isredirected_after_submit ) : ?>
 					<button class="fc_button" type="button" onclick="return submitbutton('save_a_preview');">
 						<span class="fcbutton_preview_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
 					</button>
@@ -221,12 +229,10 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 					$link   = JRoute::_(FlexicontentHelperRoute::getItemRoute($this->item->id.':'.$this->item->alias, $this->item->catid).'&preview=1');
 				?>
 			
-				<?php if (in_array( 'preview_latest', $allowbuttons_fe) ) : ?>
-					<?php if ( !$isnew ) : ?>
+				<?php if ( in_array( 'preview_latest', $allowbuttons_fe) && !$isredirected_after_submit && !$isnew ) : ?>
 					<button class="fc_button" type="button" onclick="window.open('<?php echo $link; ?>','preview2','<?php echo $params; ?>'); return false;">
 						<span class="fcbutton_preview"><?php echo JText::_( $this->params->get('use_versioning', 1) ? 'FLEXI_PREVIEW_LATEST' :'FLEXI_PREVIEW' ) ?></span>
 					</button>
-					<?php endif; ?>
 				<?php endif; ?>
 			
 			<?php endif; ?>
@@ -239,23 +245,41 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
     
 		<br class="clear" />
 		<?php
+			// A message about submitting new Content via configuration parameter
 			if ( $isnew && $this->params->get('submit_message') ) {
 				$submit_msg = '<span class="fc-note">'.JText::_( $this->params->get('submit_message') ).'</span>';
 			}
 			
-			if ( !$this->perms['canpublish'] && ($isnew || $this->params->get('use_versioning', 1)) )
-			{
-				// Can not publish and ( is new OR versioning is enabled, aka changes to existing items can go through approval process
-				if ( $isnew && $this->params->get('autopublished') && $this->params->get('autopublished_message') ) {
-					// Autopublishing new item, use a menu item specific message
-					$approval_msg = $this->params->get('autopublished_message');
-					$approval_msg = str_replace('_PUBLISH_UP_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
-					$approval_msg = str_replace('_PUBLISH_DOWN_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
-				} else {
-					$approval_msg = JText::_( $isnew ? 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' : 'FLEXI_REQUIRES_VERSION_REVIEWAL') ;
-				}
-				$approval_msg = '<span class="fc-note">'.$approval_msg.'</span>';
+			// Autopublishing new item regardless of publish privilege, use a menu item specific
+			// message if this is set, or notify user of autopublishing with a default message
+			if ( $isnew && $this->params->get('autopublished') ) {
+				$approval_msg = $this->params->get('autopublished_message') ? $this->params->get('autopublished_message') :  JText::_( 'FLEXI_CONTENT_WILL_BE_AUTOPUBLISHED' ) ;
+				$approval_msg = str_replace('_PUBLISH_UP_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
+				$approval_msg = str_replace('_PUBLISH_DOWN_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
 			}
+			else {
+				
+				// Current user does not have general publish privilege, aka new/existing items will surely go through approval/reviewal process
+				if ( !$this->perms['canpublish'] ) {
+					if ($isnew)
+						$approval_msg = JText::_( 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' ) ;
+					else if ( $this->params->get('use_versioning', 1) )
+						$approval_msg = JText::_( 'FLEXI_REQUIRES_VERSION_REVIEWAL' ) ;
+					else
+						$approval_msg = JText::_( 'FLEXI_CHANGES_APPLIED_IMMEDIATELY' ) ;
+				}
+				
+				// Have general publish privilege but may not have privilege if item is assigned to specific category or is of a specific type
+				else {
+					if ($isnew)
+						$approval_msg = JText::_( 'FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL' ) ;
+					else if ( $this->params->get('use_versioning', 1) )
+						$approval_msg = JText::_( 'FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL' ) ;
+					else
+						$approval_msg = JText::_( 'FLEXI_CHANGES_APPLIED_IMMEDIATELY' ) ;
+				}
+			}
+			$approval_msg = '<span class="fc-note">'.$approval_msg.'</span>';
 			echo @ $submit_msg . @ $approval_msg;
 		?>
 
@@ -447,7 +471,7 @@ $tabCnt[$tabSetCnt] = 0;
 					</span>
 				</div>
 		
-				<?php	if ( $this->params->get('use_versioning', 1) && $this->params->get('allow_unapproved_latest_version', 0) ) : ?>
+				<?php	if ( $this->params->get('use_versioning', 1) && $this->params->get('allow_unapproved_latest_version', 0) ) : /* PARAMETER MISSING currently disabled */ ?>
 					<div style="float:left; width:50%;">
 						<?php
 							//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
@@ -464,11 +488,11 @@ $tabCnt[$tabSetCnt] = 0;
 					<input type="hidden" id="vstate" name="vstate" value="2" />
 				<?php	endif; ?>
 		
-			<?php else :  // Display message to user that he/she can not publish ?>
+			<?php else :  // Display message to user that he/she can not publish or that changes are applied immediately for existing published item ?>
 
 				<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state">
 		  		<?php 
-		  			echo JText::_( 'FLEXI_NEEDS_APPROVAL' );
+		  			echo JText::_( ($isnew || $this->params->get('use_versioning', 1)) ? 'FLEXI_NEEDS_APPROVAL' : 'FLEXI_WITHOUT_APPROVAL' );
 						// Enable approval if versioning disabled, this make sense since if use can edit item THEN item should be updated !!!
 						$item_vstate = $this->params->get('use_versioning', 1) ? 1 : 2;
 		  		?>

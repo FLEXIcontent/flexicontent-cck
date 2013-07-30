@@ -65,40 +65,17 @@
 	z-index: 0;
 }
 
-.fcvote li a.one{
-	margin: 0;
-	padding: 0;
-	width: 20%;
-	z-index: 6;
+.fcvote li a {
+	margin: 0 !important;
+	padding: 0 !important;
 }
-
-.fcvote li a.two{
-	margin: 0;
-	padding: 0;
-	width: 40%;
-	z-index: 5;
-}
-
-.fcvote li a.three{
-	margin: 0;
-	padding: 0;
-	width: 60%;
-	z-index: 4;
-}
-
-.fcvote li a.four{
-	margin: 0;
-	padding: 0;
-	width: 80%;
-	z-index: 3;
-}
-
-.fcvote li a.five{
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	z-index: 2;
-}
+/*
+.fcvote li a.one   { width: 20%;  z-index: 6; }
+.fcvote li a.two   { width: 40%;  z-index: 5; }
+.fcvote li a.three { width: 60%;  z-index: 4; }
+.fcvote li a.four  { width: 80%;  z-index: 3; }
+.fcvote li a.five  { width: 100%; z-index: 2; }
+*/
 
 .fcvote-label {
 	float: left;

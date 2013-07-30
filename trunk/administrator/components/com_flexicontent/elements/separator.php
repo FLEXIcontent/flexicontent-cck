@@ -35,7 +35,10 @@ div .paramlist_value label {
 }
 div .paramlist_value input, div .paramlist_value textarea, div .paramlist_value img, div .paramlist_value button { margin:5px 0px 2px 0px; }
 div .paramlist_value select { margin:0px; }
-			
+
+.tool-tip { min-width: 480px !important; }
+.tool-title { }
+
 ";
 
 $document = JFactory::getDocument();

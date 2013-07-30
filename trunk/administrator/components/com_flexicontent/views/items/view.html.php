@@ -226,6 +226,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		}
 		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
 		
+		$add_divider = false;
 		if ($CanAdd) {
 			//$btn_task = FLEXI_J16GE ? 'items.add' : 'add';
 			//$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
@@ -235,22 +236,27 @@ class FlexicontentViewItems extends JViewLegacy {
 			//JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
 			
 			$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), JURI::base().'index.php?option=com_flexicontent&view=types&format=raw', 600, 240);
-			
-			if ($CanCopy) {
-				$btn_task = FLEXI_J16GE ? 'items.copy' : 'copy';
-				JToolBarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
-				if ($enable_translation_groups) {
-					JToolBarHelper::custom( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
-				}
-			}
+			$add_divider = true;
 		}
 		if ($CanEdit || $CanEditOwn) {
 			$btn_task = FLEXI_J16GE ? 'items.edit' : 'edit';
 			JToolBarHelper::editList($btn_task);
+			$add_divider = true;
+		}
+		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
+		
+		$add_divider = false;
+		if ($CanAdd && $CanCopy) {
+			$btn_task = FLEXI_J16GE ? 'items.copy' : 'copy';
+			JToolBarHelper::custom( $btn_task, 'copy.png', 'copy_f2.png', 'FLEXI_COPY_MOVE' );
+			if ($enable_translation_groups) {
+				JToolBarHelper::custom( 'translate', 'translate', 'translate', 'FLEXI_TRANSLATE' );
+			}
+			$add_divider = true;
 		}
 		
+		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
 		if ($perms->CanConfig) {
-			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
 		

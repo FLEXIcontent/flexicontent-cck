@@ -19,7 +19,7 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
-jimport('joomla.application.component.model');
+jimport('joomla.application.component.modellist');
 
 /**
  * Flexicontent Component Categoryelement Model
@@ -28,7 +28,7 @@ jimport('joomla.application.component.model');
  * @subpackage FLEXIcontent
  * @since		1.0
  */
-class FlexicontentModelQfcategoryelement extends JModelLegacy
+class FlexicontentModelQfcategoryelement extends JModelList
 {
 	/**
 	 * Category data
@@ -86,122 +86,114 @@ class FlexicontentModelQfcategoryelement extends JModelLegacy
 	}
 
 	/**
-	 * Method to get categories item data
+	 * Method to get the query used to retrieve categories data
 	 *
 	 * @access public
-	 * @return array
+	 * @return	string
+	 * @since	1.6
 	 */
-	function getData()
+	function getListQuery()
 	{
-		$app    = JFactory::getApplication();
-		$params = JComponentHelper::getParams('com_flexicontent');
+		$app  = JFactory::getApplication();
+		$db   = JFactory::getDBO();
+		$user = JFactory::getUser();
+		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		global $globalcats;
 		
-		$filter_order			= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order', 		'filter_order', 	'c.lft', 'cmd' );
-		$filter_order_Dir	= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
-		$filter_state 		= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.filter_state', 'filter_state', '', 'word' );
-		$search 			= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.search', 'search', '', 'string' );
-		$search 			= trim( JString::strtolower( $search ) );
-		$limit				= $app->getUserStateFromRequest( 'com_flexicontent.limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart 	= $app->getUserStateFromRequest( 'com_flexicontent.menucategories.limitstart', 'limitstart', 0, 'int' );
-		
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', c.lft';
-		
-		$where = array();
-		if ( $filter_state ) {
-			if ( $filter_state == 'P' ) {
-				$where[] = 'c.published = 1';
-			} else if ($filter_state == 'U' ) {
-				$where[] = 'c.published = 0';
-			}
+		$order_property = !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
+		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     $order_property, 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order_Dir', 'filter_order_Dir', '', 'word' );
+		$filter_cats      = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_cats',			 'filter_cats',			 '', 'int' );
+		$filter_state     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_state',     'filter_state',     '', 'string' );
+		$filter_access    = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_access',    'filter_access',    '', 'string' );
+		$filter_level     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_level',     'filter_level',     '', 'string' );
+		if (FLEXI_J16GE) {
+			$filter_language  = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_language',  'filter_language',  '', 'string' );
 		}
-		
-		$where 		= ( count( $where ) ? ' AND ' . implode( ' AND ', $where ) : '' );
-		
-		//select the records
-		//note, since this is a tree we have to do the limits code-side
-		if ($search) {			
-			$query = 'SELECT c.id'
-					. ' FROM #__categories AS c'
-					. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND LOWER(c.title) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false )
-					. ' AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
-					. $where
-					;
-			$this->_db->setQuery( $query );
-			$search_rows = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();					
-		}
-		
-		$query = 'SELECT c.*, u.name AS editor, g.title AS groupname, COUNT(rel.catid) AS nrassigned'
-					. ' FROM #__categories AS c'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
-					. ' LEFT JOIN #__usergroups AS g ON g.id = c.access'
-					. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
-					//. ' LEFT JOIN #__sections AS sec ON sec.id = c.section'
-					. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$this->_db->Quote(FLEXI_RGT_CATEGORY)
-					//. ' AND sec.scope = ' . $this->_db->Quote('content')
-					. $where
-					. ' GROUP BY c.id'
-					//. $orderby
-					;
-		$this->_db->setQuery( $query );
-		$rows = $this->_db->loadObjectList();
-		
-		//establish the hierarchy of the categories
-		$children = array();
-		
-		//set depth limit
-		$levellimit = 10;
-		
-		foreach ($rows as $child) {
-			$parent = $child->parent_id;
-			$list 	= @$children[$parent] ? $children[$parent] : array();
-			array_push($list, $child);
-			$children[$parent] = $list;
-		}
-    	
-    	//get list of the items
-    	$list = flexicontent_cats::treerecurse($ROOT_CATEGORY_ID=1, '', array(), $children, false, max(0, $levellimit-1));
+		$search           = $app->getUserStateFromRequest( $option.'.'.$view.'.search',           'search',           '', 'string' );
+		$search           = trim( JString::strtolower( $search ) );
 
-    	//eventually only pick out the searched items.
-		if ($search)
+		// Create a new query object.
+		$query = $db->getQuery(true);
+		// Select the required fields from the table.
+		$query->select(
+			$this->getState(
+				'list.select',
+				'c.*, u.name AS editor, level.title AS access_level, COUNT(rel.catid) AS nrassigned, c.params as config, ag.title AS access_level '
+			)
+		);
+		$query->from('#__categories AS c');
+		$query->select('l.title AS language_title');
+		$query->join('LEFT', '#__languages AS l ON l.lang_code = c.language');
+		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.catid = c.id');
+		$query->join('LEFT', '#__viewlevels as level ON level.id=c.access');
+		$query->join('LEFT', '#__users AS u ON u.id = c.checked_out');
+		$query->join('LEFT', '#__viewlevels AS ag ON ag.id = c.access');
+		$query->where("c.extension = '".FLEXI_CAT_EXTENSION."' ");
+		
+		
+		// Filter by publicationd state
+		if (is_numeric($filter_state)) {
+			$query->where('c.published = ' . (int) $filter_state);
+		}
+		elseif ( $filter_state === '') {
+			$query->where('c.published IN (0, 1)');
+		}
+		
+		// Filter by access level
+		if ( $filter_access ) {
+			$query->where('c.access = '.(int) $filter_access);
+		}
+		
+		if ( $filter_cats ) {
+			// Limit category list to those contain in the subtree of the choosen category
+			$query->where(' c.id IN (SELECT cat.id FROM #__categories AS cat JOIN #__categories AS parent ON cat.lft BETWEEN parent.lft AND parent.rgt WHERE parent.id='. (int) $filter_cats.')' );
+		} else {
+			// Limit category list to those containing CONTENT (joomla articles)
+			$query->where(' (c.lft >= ' . $this->_db->Quote(FLEXI_LFT_CATEGORY) . ' AND c.rgt <= ' . $this->_db->Quote(FLEXI_RGT_CATEGORY) . ')');
+		}
+		
+		// Filter on the level.
+		if ( $filter_level ) {
+			$query->where('c.level <= '.(int) $filter_level);
+		}
+		
+		// Filter by language
+		if ( $filter_language ) {
+			$query->where('l.lang_code = '.$db->Quote( $filter_language ) );
+		}
+		
+		// Implement View Level Access
+		if (!$user->authorise('core.admin'))
 		{
-			$list1 = array();
-
-			foreach ($search_rows as $sid )
-			{
-				foreach ($list as $item)
-				{
-					if ($item->id == $sid) {
-						$list1[] = $item;
-					}
-				}
+			$groups	= implode(',', $user->getAuthorisedViewLevels());
+			$query->where('c.access IN ('.$groups.')');
+		}
+		
+		// Filter by search word (can be also be  id:NN  OR author:AAAAA)
+		if (!empty($search)) {
+			if (stripos($search, 'id:') === 0) {
+				$query->where('c.id = '.(int) substr($search, 3));
 			}
-			// replace full list with found items
-			$list = $list1;
+			elseif (stripos($search, 'author:') === 0) {
+				$search = $db->Quote('%'.$db->escape(substr($search, 7), true).'%');
+				$query->where('(u.name LIKE '.$search.' OR u.username LIKE '.$search.')');
+			}
+			else {
+				$search = $db->Quote('%'.$db->escape($search, true).'%');
+				$query->where('(c.title LIKE '.$search.' OR c.alias LIKE '.$search.' OR c.note LIKE '.$search.')');
+			}
 		}
 		
-		$total = count( $list );
-
-		jimport('joomla.html.pagination');
-		$this->_pagination = new JPagination( $total, $limitstart, $limit );
-
-		// slice out elements based on limits
-		$list = array_slice( $list, $this->_pagination->limitstart, $this->_pagination->limit );
+		$query->group('c.id');
+		// Add the list ordering clause.
+		$query->order($db->escape($filter_order.' '.$filter_order_Dir));
 		
-		return $list;
+		//echo nl2br(str_replace('#__','jos_',$query));
+		//echo str_replace('#__', 'jos_', $query->__toString());
+		return $query;
 	}
-
-	/**
-	 * Method to get a pagination object for the categories
-	 *
-	 * @access public
-	 * @return object
-	 */
-	function getPagination()
-	{
-		if ($this->_pagination == null) {
-			$this->getData();
-		}
-		return $this->_pagination;
-	}
+	
 }
 ?>
