@@ -465,12 +465,25 @@ class flexicontent_html
 				// Add swipe CSS / JS
 				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/photoswipe/photoswipe.css');
 				$document->addScript(JURI::root().'components/com_flexicontent/librairies/photoswipe/lib/klass.min.js');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/photoswipe/code.photoswipe.jquery-3.0.5.min.js');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/photoswipe/code.photoswipe.jq.min.js');
 				$js = "
 				jQuery(document).ready(function() {
 					var myPhotoSwipe = jQuery('.photoswipe_fccontainer a').photoSwipe({ enableMouseWheel: false , enableKeyboard: false }); 
 				}); 
 				";
+				break;
+			
+			case 'noobSlide':
+				// Make sure mootools are loaded
+				FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+				
+				// Add swipe CSS / JS
+				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/noobSlide/_class.noobSlide.js');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/noobSlide/_class.noobSlide.packed.js');
+				//$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/noobSlide/_web.css');
+				//$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/noobSlide/style.css');
+				
+				//$js = "";
 				break;
 			
 			default:
@@ -1500,7 +1513,8 @@ class flexicontent_html
 
 			$css = '
 			.'.$class.' .fcvote {line-height:'.$dim.'px;}
-			.'.$class.' .fcvote ul {height:'.$dim.'px;}
+			.'.$class.' .fcvote-label {margin-right: 6px;}
+			.'.$class.' .fcvote ul {height:'.$dim.'px; position:relative !important; left:0px; !important;}
 			.'.$class.' .fcvote ul, .'.$class.' .fcvote ul li a:hover, .'.$class.' .fcvote ul li.current-rating {background-image:url('.$img_path.')!important;}
 			.'.$class.' .fcvote ul li a, .'.$class.' .fcvote ul li.current-rating {height:'.$dim.'px;line-height:'.$dim.'px;}
 			';
@@ -3328,7 +3342,7 @@ class FLEXIUtilities
 
 		// We will use template folder as BASE of language files instead of joomla's language folder
 		// Since FLEXIcontent templates are meant to be user-editable it makes sense to place language files inside them
-		$base_dir = JPATH_COMPONENT_SITE.DS.'templates'.DS.$tmplname;
+		$base_dir = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$tmplname;
 
 		// Final use joomla's API to load our template's language files -- (load english template language file then override with current language file)
 		JFactory::getLanguage()->load($extension, $base_dir, 'en-GB', $reload=true);        // Fallback to english language template file

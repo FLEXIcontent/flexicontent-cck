@@ -163,9 +163,9 @@
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" level="level2" />
-			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAIL_LIST_TYPE" description="FLEXI_FIELD_IMAGE_THUBMNAIL_LIST_TYPE_DESC">
-				<option value="0">FLEXI_FIELD_IMAGE_PLAIN_THUMB_LIST</option>
-				<option value="1">FLEXI_FIELD_IMAGE_GALLERY_THUMB_LIST</option>
+			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="popupinview" type="fccheckbox" default=""
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
@@ -191,7 +191,7 @@
 				<option value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
 				<option value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
 			</field>
-			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_IMAGE_FIELDS_IGNORED_MULTIVALUED" description="FLEXI_FIELD_GROUP_IMAGE_FIELDS_IGNORED_MULTIVALUED_DESC">
+			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_WITH_OTHER_IMAGE_FIELDS" description="FLEXI_FIELD_GROUP_WITH_OTHER_IMAGE_FIELDS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_FIELD_GROUP_PER_ITEM</option>
 				<option value="2">FLEXI_FIELD_GROUP_PER_VIEW</option>

@@ -148,7 +148,7 @@ class modFlexicontentHelper
 		$fields_feat = array_map( 'trim', explode(',', $params->get('fields_feat')) );
 		if ($fields_feat[0]=='') $fields_feat = array();
 
-		$mod_fc_run_times['query_items']= $modfc_jprof->getmicrotime();
+		//$mod_fc_run_times['query_items']= $modfc_jprof->getmicrotime();
 		
 		$cat_items_arr = array();
 		if (!is_array($ordering)) { $ordering = explode(',', $ordering); }
@@ -163,7 +163,7 @@ class modFlexicontentHelper
 				}
 			}
 		}
-		$mod_fc_run_times['query_items'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['query_items'];
+		//$mod_fc_run_times['query_items'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['query_items'];
 		
 		// Impementation of Empty Field Filter.
 		// The cost of the following code is minimal.
@@ -568,12 +568,13 @@ class modFlexicontentHelper
 	function getItems(&$params, $ordering)
 	{
 		global $dump, $globalcats;
-		$mainframe = JFactory::getApplication();
-		JPluginHelper::importPlugin('system', 'flexisystem');
-
+		global $modfc_jprof, $mod_fc_run_times;
+		$app = JFactory::getApplication();
+		
 		// For specific cache issues
 		if (empty($globalcats)) {
 			if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
+				JPluginHelper::importPlugin('system', 'flexisystem');
 				if (FLEXI_CACHE) {
 					// add the category tree to categories cache
 					$catscache 	= JFactory::getCache('com_flexicontent_cats');
@@ -592,12 +593,12 @@ class modFlexicontentHelper
 		$gid			= !FLEXI_J16GE ? (int)$user->get('aid')  :  max($user->getAuthorisedViewLevels());
 		$view			= JRequest::getVar('view');
 		$option		= JRequest::getVar('option');
-		$fparams 	= $mainframe->getParams('com_flexicontent');
+		$fparams 	= $app->getParams('com_flexicontent');
 		$show_noauth 	= $fparams->get('show_noauth', 0);
 		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$now		= $mainframe->get('requestTime');
+		//$now		= $app->get('requestTime');
 		$now			= JFactory::getDate()->toMySQL();
 		$nullDate	= $db->getNullDate();
 		
@@ -1309,7 +1310,7 @@ class modFlexicontentHelper
 		$add_comments = ($display_comments_feat || $display_comments || $ordering=='commented') && $jcomments_exist;
 		
 		// Additional select and joins for comments
-		$select_comments     = $add_comments ? ' count(com.object_id) AS comments_total,' : '';
+		$select_comments     = $add_comments ? ' count(com.object_id) AS comments_total' : '';
 		$join_comments_type  = $ordering=='commented' ? ' INNER JOIN' : ' LEFT JOIN';
 		$join_comments       = $add_comments ? $join_comments_type.' #__jcomments AS com ON com.object_id = i.id' : '' ;
 		
@@ -1325,8 +1326,8 @@ class modFlexicontentHelper
 		$add_rated = $display_voting_feat || $display_voting || $ordering=='rated';
 		
 		// Additional select and joins for ratings
-		$select_rated     = $ordering=='rated' ? ' (cr.rating_sum / cr.rating_count) * 20 AS votes,' : '';
-		$select_rated    .= $add_rated ? ' cr.rating_sum as rating_sum, cr.rating_count as rating_count,' : '';
+		$select_rated     = $ordering=='rated' ? ' (cr.rating_sum / cr.rating_count) * 20 AS votes' : '';
+		$select_rated    .= $add_rated ? ($select_rated ? ',' :'').' cr.rating_sum as rating_sum, cr.rating_count as rating_count' : '';
 		$join_rated_type  = $ordering=='rated' ? ' INNER JOIN' : ' LEFT JOIN';
 		$join_rated       = $add_rated ? $join_rated_type.' #__content_rating AS cr ON cr.content_id = i.id' : '' ;
 		
@@ -1351,12 +1352,34 @@ class modFlexicontentHelper
 		// ***********************************************************
 		
 		if ( empty($items_query) ) {  // If a custom query has not been set above then use the default one ...
-			$items_query 	= 'SELECT i.*, ie.*, ty.name AS typename,'
-				. $select_comments
-				. $select_rated
+			$items_query 	= 'SELECT '
+				.' i.id '
+				. ($ordering=='commented' ? ','.$select_comments : '')
+				. ($ordering=='rated'? ','.$select_rated : '')
+				. ' FROM #__content AS i'
+				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
+				. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
+				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' JOIN #__categories AS  c ON  c.id = rel.catid'
+				. ' JOIN #__categories AS mc ON mc.id = i.catid'
+				. $joinaccess
+				. $join_favs
+				. $join_date
+				.($ordering=='commented' ? $join_comments : '')
+				.($ordering=='rated' ? $join_rated : '')
+				. $join_field
+				. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
+				. ' GROUP BY i.id'
+				. $orderby
+				;
+			
+			$items_query_data 	= 'SELECT '
+				.' i.*, ie.*, ty.name AS typename,'
+				. ($select_comments ? $select_comments.',' : '')
+				. ($select_rated ? $select_rated.',' : '')
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
-					. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
+				. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
 				. ' FROM #__content AS i'
 				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 				. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
@@ -1369,9 +1392,8 @@ class modFlexicontentHelper
 				. $join_comments
 				. $join_rated
 				. $join_field
-				. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
+				. ' WHERE i.id IN (__content__)'
 				. ' GROUP BY i.id'
-				. $orderby
 				;
 		}
 		
@@ -1381,11 +1403,33 @@ class modFlexicontentHelper
 		// **********************************
 		
 		if (!isset($multiquery_cats)) $multiquery_cats = array("");
-		foreach($multiquery_cats as $cat_where) {
+		foreach($multiquery_cats as $cat_where)
+		{
+			$_microtime = $modfc_jprof->getmicrotime();
+			// Get content list per given category
 			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
 			$db->setQuery($per_cat_query, 0, $count);
-			$rows = $db->loadObjectList();
+			$content = $db->loadResultArray(0);
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			@ $mod_fc_run_times['query_items'] += $modfc_jprof->getmicrotime() - $_microtime;
+			
+			// Check for no content found for given category
+			if ( empty($content) ) {
+				$cat_items_arr[] = array();
+				continue;
+			}
+			
+			$_microtime = $modfc_jprof->getmicrotime();
+			// Get content list data per given category
+			$per_cat_query = str_replace('__content__', implode(',',$content), $items_query_data);
+			$db->setQuery($per_cat_query, 0, $count);
+			$_rows = $db->loadObjectList('item_id');
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+			@ $mod_fc_run_times['query_items_sec'] += $modfc_jprof->getmicrotime() - $_microtime;
+			
+			// Secondary content list ordering and assign content list per category
+			$rows = array();
+			foreach($content as $_id) $rows[] = $_rows[$_id];
 			$cat_items_arr[] = $rows;
 		}
 		

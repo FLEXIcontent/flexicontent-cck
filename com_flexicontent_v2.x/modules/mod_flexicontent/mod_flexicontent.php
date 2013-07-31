@@ -199,7 +199,8 @@ if ( $show_mod )
 	$mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['rendering_template'];
 	
 	$task_lbls = array(
-		'query_items'=>'DB Querying of Items: %.2f secs',
+		'query_items'=>'Main DB Querying of Items ('.count($catdata_arr).' queries): %.2f secs',
+		'query_items_sec'=>'Sec SQL Querying of Items ('.count($catdata_arr).' queries): %.2f secs',
 		'empty_fields_filter'=>'Empty fields filter (skip items)): %.2f secs',
 		'item_list_creation'=>'Item list creation (with custom field rendering): %.2f secs',
 		'category_data_retrieval'=>'Category data retrieval: %.2f secs',
