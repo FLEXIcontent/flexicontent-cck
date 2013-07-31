@@ -68,7 +68,6 @@ if ($this->params->get('form_extra_css_fe')) $this->document->addStyleDeclaratio
 if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclaration($this->params->get('form_extra_js'));
 if ($this->params->get('form_extra_js_fe'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_fe'));
 
-flexicontent_html::loadJQuery(1, 0, 0);
 $this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/admin.js' );

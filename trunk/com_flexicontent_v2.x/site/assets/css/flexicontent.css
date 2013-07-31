@@ -51,17 +51,17 @@
  * FLEXIcontent buttons for links: print, pdf, email, rss, approval etc
  **********************************************************************/
 #flexicontent .buttons {
-	display: block;
-	float: right;
-	margin: 0px;
-	padding: 0px;
+	display: block !important;
+	float: right !important;
+	margin: 0px !important;
+	padding: 0px !important;
 }
 
-#flexicontent .buttons img {
+#flexicontent .buttons > a >img {
 	border: none;
 }
 
-#flexicontent .buttons a {
+#flexicontent .buttons > a {
 	height: 16px;
 	line-height: 16px;
 	padding: 0 0 0 5px;
@@ -1210,7 +1210,7 @@ ul.statetoggler {
 	float: right !important;
 	display: inline-block !important;
 	list-style: none !important;
-	margin: 0px 0px 0px 10px !important;
+	margin: 2px 0px 0px 10px !important;
 	padding: 0 !important;
 	width: auto !important;
 }
@@ -1238,10 +1238,16 @@ ul.statetoggler > li.topLevel, .statetoggler > li.topLevel ul > li {
 	display: -moz-inline-stack !important;
 	display: inline-block !important;
 	vertical-align: top !important;
-	margin: 0px !important;
+	padding: 0 !important;
+	margin: 0 !important;
 	zoom: 1 !important;
 	*display: inline !important;
 	_height: 20px !important;
+}
+
+ul.statetoggler > li.topLevel, .statetoggler > li.topLevel ul > li a {
+	padding: 0 !important;
+	margin: 0 !important;
 }
 
 ul.statetoggler > li.topLevel ul > li img {
@@ -1250,8 +1256,8 @@ ul.statetoggler > li.topLevel ul > li img {
 }
 
 ul.statetoggler > li.topLevel > a.opener {
-	margin: 0px !important;
-	padding: 0px !important;
+	padding: 0 !important;
+	margin: 0 !important;
 }
 
 
