@@ -3337,7 +3337,7 @@ class FLEXIUtilities
 		// Current language, we decided to use LL-CC (language-country) format mapping SEF shortcode, e.g. 'en' to 'en-GB'
 		$user_lang = flexicontent_html::getUserCurrentLang();
 		$languages = FLEXIUtilities::getLanguages($hash='shortcode');
-		if ( !isset($languages->$user_lang->code) ) return;  // Language has been disabled
+		if ( !$user_lang || !isset($languages->$user_lang->code) ) return;  // Language has been disabled
 		$language_tag = $languages->$user_lang->code;
 
 		// We will use template folder as BASE of language files instead of joomla's language folder
