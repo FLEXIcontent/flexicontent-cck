@@ -132,6 +132,7 @@ class flexicontent_cats
     */
 	function getCategoriesTree( $published_only = false, $parent_id = 0, $depth_limit=0 )
 	{
+		global $globalcats;
 		$db = JFactory::getDBO();
 		
 		if ($published_only) {
@@ -253,11 +254,16 @@ class flexicontent_cats
 	 * @return a category form field element
 	 */
 	static function buildcatselect($list, $name, $selected, $top,
-		$class = 'class="inputbox"', $check_published = false, $check_perms = true,
+		$attribs = 'class="inputbox"', $check_published = false, $check_perms = true,
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'),   // For item edit this should be array('core.create')
-		$require_all=true   // Require (or not) all privileges present to accept a category
-	)
-	{
+		$require_all=true,   // Require (or not) all privileges present to accept a category
+		$skip_subtrees=array(), $disable_subtrees=array()
+	) {
+		
+		// ***************************
+		// Initialize needed variables
+		// ***************************
+		
 		global $globalcats;
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$user = JFactory::getUser();
@@ -273,51 +279,86 @@ class flexicontent_cats
 		$viewtree			= FlexicontentHelperPerm::getPerm()->ViewTree;
 		
 		// Global parameter to force always displaying of categories as tree
-		if ($cparams->get('cats_always_astree', 1)) {
-			$viewtree = 1;
-		}
+		if ($cparams->get('cats_always_astree', 1)) $viewtree = 1;
 		
-		// Filter categories by user permissions
+		
+		// **************************************************************
+		// Find user allowed categories to be used during Filtering below
+		// **************************************************************
+		
 		if ($check_perms) {
 			if (FLEXI_J16GE || FLEXI_ACCESS) {
 				// Get user allowed categories, NOTE: if user (a) (J2.5) has 'core.admin' or (b) (J1.5) user is super admin (gid==25) then all cats are allowed
 				$usercats 	= FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed, $require_all, $check_published);
-				// Add already selected categories to the category list
+				// NOTE: already selected categories will be allowed to the user, add them to the category list
 				$selectedcats = !is_array($selected) ? array($selected) : $selected;
 				$usercats_indexed = array_flip($usercats);
 				foreach ($selectedcats as $selectedcat) if ($selectedcat) $usercats_indexed[$selectedcat] = 1;
 			}
 		}
 		
-		// Case of category edit form, when building parent category selection of the category being edited ('cid')
-		$is_cat_parent_sel = ($controller == 'categories' && $task == 'edit' && $top==1 );
-		if ($is_cat_parent_sel) {
-			$cid = JRequest::getVar('cid',  0);
-			if (is_array($cid)) $cid = $cid[0];
-			$cid_and_descendants = array_flip($globalcats[$cid]->descendantsarray);
-			$cid_and_descendants[$cid] = -1;
+		
+		// *********************************************************************************
+		// Excluded subtrees e.g. featured categories subtree in item form
+		// Disabled subtrees e.g. existing children subtree when selecting category's parent
+		// *********************************************************************************
+		
+		$skip_cats_arr = array();
+		if ( !empty($skip_subtrees) ) {
+			foreach ($skip_subtrees as $subtree_rootid) {
+				if ( $subtree_rootid && isset($globalcats[$subtree_rootid]->descendantsarray) ) {
+					foreach($globalcats[$subtree_rootid]->descendantsarray as $_excluded)  $skip_cats_arr[$_excluded] = 1;
+				}
+			}
 		}
 		
-		// Start category list by add appropriate prompt option at top
+		$disable_cats_arr = array();
+		if ( !empty($disable_subtrees) ) {
+			foreach ($disable_subtrees as $subtree_rootid) {
+				if ( $subtree_rootid && isset($globalcats[$subtree_rootid]->descendantsarray) ) {
+					foreach($globalcats[$subtree_rootid]->descendantsarray as $_excluded)  $disable_cats_arr[$_excluded] = 1;
+				}
+			}
+		}
+		
+		
+		// **************************************************************************
+		// TOP parameter: defines the APPROPRIATE PROMPT option at top of select list
+		// **************************************************************************
+		
 		$catlist 	= array();
-		if($top == 1) {
+		// A tree to select: e.g. a parent category
+		if ($top == 1) {
 			$catlist[] 	= JHTML::_( 'select.option', FLEXI_J16GE ? 1 : 0, JText::_( 'FLEXI_TOPLEVEL' ));
-		} else if($top == 2) {
+		}
+		
+		// A tree to select a category
+		else if($top == 2) {
 			$catlist[] 	= JHTML::_( 'select.option', '', JText::_( 'FLEXI_SELECT_CAT' ));
 		}
 		
+		// A sub-tree where root category of the sub-tree should be excluded, in place of it a disabled prompt is added ... NOTE that:
+		// a subtree should be given or else the first category out of top level category will be removed, which is of little sense
+		else if($top == 3) {
+			$first_item = reset($list); //$first_key = key($list);
+			$_first_item_treename = $first_item->treename; $_first_item_title = $first_item->title; $_first_item_id = $first_item->id;
+			$first_item->treename = $first_item->title = JText::_( 'FLEXI_SELECT_CAT' );
+			$first_item->id = "";
+		}
+		
+		
+		// ********************************************************************************************************
 		// Loop through categories to create the select option using user allowed categories (if filtering enabled)
+		// ********************************************************************************************************
+		
 		foreach ($list as $cat) {
 			$cat->treename = str_replace("&nbsp;", " ", strip_tags($cat->treename));
 			$cat_title = $viewtree ? $cat->treename : $cat->title;
 			
 			if ( !$check_published || $cat->published )
 			{	
-				// CASE 1. IN CATEGORY EDIT FORM while displaying FORM FIELD parent_id, then current category and its children should be disabled
-				if ( $is_cat_parent_sel && $cid && isset($cid_and_descendants[$cat->id]) )
-				{
-					$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, 'value', 'text', true );
-				}
+				// CASE 1: SKIPPED categories e.g. featured categories subtree in item form
+				if ( isset($skip_cats_arr[$cat->id]) ) ;
 				
 				// CASE 2: ADD only if user has permissions
 				else if ($check_perms)
@@ -330,14 +371,18 @@ class flexicontent_cats
 							$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, 'value', 'text', $disabled = true );
 					}
 										
-					// b. Category ALLOWED
+					// b. Category ALLOWED, but check if adding as disabled
 					else
 					{
-						$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title );
+						// CASE: DISABLED categories e.g. existing children subtree when selecting category's parent
+						if ( isset($disable_cats_arr[$cat->id]) )
+							$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title, 'value', 'text', $disabled = true );
+						else
+							$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title );
 					}
 				}
 				
-				// CASE 3: ADD REGARDLESS of user permissions
+				// CASE 4: ADD REGARDLESS of user permissions
 				else
 				{
 					$catlist[] = JHTML::_( 'select.option', $cat->id, $cat_title );
@@ -346,11 +391,20 @@ class flexicontent_cats
 			}
 		}
 		
+		
+		// ************************************
 		// Finally create the HTML form element
+		// ************************************
+		
 		$replace_char = FLEXI_J16GE ? '_' : '';
 		$idtag = preg_replace('/(\]|\[)+/', $replace_char, $name);
 		$idtag = preg_replace('/_$/', '', $idtag);
-		$html = JHTML::_('select.genericlist', $catlist, $name, $class, 'value', 'text', $selected, $idtag );
+		$html = JHTML::_('select.genericlist', $catlist, $name, $attribs, 'value', 'text', $selected, $idtag );
+		
+		if ($top == 3) { // Restore first category element
+			$first_item = reset($list); 
+			$first_item->treename = $_first_item_treename; $first_item->title = $_first_item_title; $first_item->id = $_first_item_id ;
+		}
 		
 		if ( $print_logging_info ) @$fc_run_times['render_categories_select'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		return $html;

@@ -144,11 +144,11 @@ class FlexicontentViewField extends JViewLegacy
 							$('fieldspecificproperties').setHTML('<p class=\"centerimg\"><img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\"></p>');
 							var ajaxoptions ={
 								method: 'get',
+								update: $('fieldspecificproperties'),
 								onComplete:function(response) {
 									var JTooltips = new Tips($$('.hasTip'), { maxTitleChars: 50, fixed: false});									
 									$('field_typename').innerHTML = $('field_type').value;
-								},
-								update:$('fieldspecificproperties')
+								}
 							};
 							var ajaxobj = new Ajax(
 								'index.php?option=com_flexicontent&controller=fields&task=getfieldspecificproperties&cid=".$row->id."&field_type='+this.value+'&format=raw',

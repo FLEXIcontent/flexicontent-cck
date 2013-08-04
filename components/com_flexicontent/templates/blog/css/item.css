@@ -61,8 +61,8 @@
 	display: block;
 }
 
-.fclabel { font-weight:bold; }
-.fcvalue { font-weight:normal; }
+.flexi.label { font-weight:bold; }
+.flexi.value { font-weight:normal; }
 
 
 
@@ -76,7 +76,7 @@
 /* Rule for customblock used to display fields via template positions */
 .customblock {
 	width: 98%!important;
-	padding: 1%!important;
+	padding: 3px 1%!important;
 	margin: 8px 0px!important;
 	
 	display:block;
@@ -87,9 +87,9 @@
 
 /* Default rule for elements: Use auto columns, via min-width we can have full row automaticaly for larger elements (pseudo colspan=2 via css) */
 .customblock .element {
-	max-width: 98%!important;
-	min-width: 48%!important;
-	padding: 0% 2% 0% 0%!important;
+	max-width: 100%!important;
+	min-width: 50%!important;
+	padding: 3px 0% 3px 0%!important;
 	margin: 0%!important;
 	
 	display:block;
@@ -111,39 +111,15 @@
 
 
 /* Field label inside the custom blocks */
-.customblock .fclabel {
-	width: 30%!important;
-	margin: 0% 3% 0% 0%!important;
-	padding: 0%!important;
-	
-	display:block;
-	float:left;
-	border-width: 0%;
-	
-	font-weight:bold;
-	min-height:25px;
-	vertical-align:middle;
-	text-align: right;
+.customblock .flexi.label {
 }
 
 /* Field value inside the custom blocks */
-.customblock .fcvalue {
-	width: 66%!important;
-	margin: 0%!important;
-	padding: 0%!important;
-	
-	display:block;
-	float:left;
-	border-width: 0%;
-	
-	font-weight:normal;
-	min-height:25px;
-	vertical-align:middle;
-	text-align: left;
+.customblock .flexi.value {
 }
 
 /* Field value when having no label */
-.customblock .fcvalue.nolabel {
+.customblock .flexi.value.nolabel {
 	width: 100%!important;
 }
 

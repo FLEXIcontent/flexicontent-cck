@@ -103,18 +103,18 @@ defined('_JEXEC') or die('Restricted access');
 				echo JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS');
 				echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				$fieldSets = $this->form->getFieldsets('attribs');
-				foreach ($fieldSets as $name => $fieldSet) :
-					if ( $name=='themes' ) continue;
+				foreach ($fieldSets as $fsname => $fieldSet) :
+					if ( $fsname=='themes' ) continue;
 					
-					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($name).'_FIELDSET_LABEL';
-					echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
+					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.strtoupper($fsname).'_FIELDSET_LABEL';
+					echo JHtml::_('sliders.panel',JText::_($label), $fsname.'-options');
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
 						echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
 					endif;
 					?>
 					<fieldset class="panelform">
 						<?php
-						foreach ($this->form->getFieldset($name) as $field) :
+						foreach ($this->form->getFieldset($fsname) as $field) :
 							echo $field->label;
 							echo $field->input;
 						endforeach;
@@ -132,22 +132,23 @@ defined('_JEXEC') or die('Restricted access');
 				endforeach;
 				
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
-				foreach ($this->tmpls as $tmplname=>$tmpl) :
-					$fieldSets = $tmpl->params->getFieldsets('attribs');
-					foreach ($fieldSets as $name => $fieldSet) :
+				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
+				foreach ($this->tmpls as $tmplname => $tmpl) :
+					$fieldSets = $tmpl->params->getFieldsets($groupname);
+					foreach ($fieldSets as $fsname => $fieldSet) :
 						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$name.'-options');
+						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$fsname.'-options');
 						if (isset($fieldSet->description) && trim($fieldSet->description)) :
 							echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
 						endif;
 				?>
 						<fieldset class="panelform">
 							<?php 
-							foreach ($tmpl->params->getFieldset($name) as $field) :
+							foreach ($tmpl->params->getFieldset($fsname) as $field) :
 								$fieldname =  $field->__get('fieldname');
-								$value = $tmpl->params->getValue($fieldname, $name, @$this->row->attribs[$fieldname]);
-								echo $tmpl->params->getLabel($fieldname, $name);
-								echo $tmpl->params->getInput($fieldname, $name, $value);
+								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->attribs[$fieldname]);
+								echo $tmpl->params->getLabel($fieldname, $groupname);
+								echo $tmpl->params->getInput($fieldname, $groupname, $value);
 							endforeach;
 							?>
 						</fieldset>

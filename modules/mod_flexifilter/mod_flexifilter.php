@@ -62,9 +62,12 @@ if ( $show_mod )
 	$autosubmit  	  = $params->get('autosubmit', 0);
 	
 	// current & default category IDs
+	$catid_fieldname = 'cid'; //'filter_catid_'.$module->id;
 	$isflexicat = JRequest::getVar('option')=="com_flexicontent" && JRequest::getVar('view')=="category";
-	$cid = $isflexicat ? JRequest::getInt('cid', 0) : 0;
-	$default_cid = $params->get('catid', $cid);     // Fallback to current category id
+	
+	$current_cid = $isflexicat ? JRequest::getInt($catid_fieldname, 0) : 0;
+	$default_cid = $params->get('catid', 0);
+	$catid = !$isflexicat ? $default_cid : $current_cid;  // id of category view or default value
 	
 	// CATEGORY SELECTION
 	$display_cat_list = $params->get('display_cat_list', 0);
@@ -76,11 +79,6 @@ if ( $show_mod )
 	$filterids            = $params->get('filterids', array());
 	$limit_filters_to_cat = $display_filter_list==1 || $display_filter_list==3;
 	
-	// Decide category to preselect
-	//$catid_fieldname = 'filter_catid_'.$module->id;
-	$catid_fieldname = 'cid';
-	$catid = JRequest::getInt( $catid_fieldname, $default_cid );  // CURRENTLY selected category or 
-	
 	$form_name = 'moduleFCform_'.$module->id;
 	
 	/*if (!$catid && !$display_cat_list) :
@@ -91,9 +89,11 @@ if ( $show_mod )
 	
 	//print_r($filterids);
 	
+	//flexicontent_html::loadFramework('jQuery');
+	//flexicontent_html::loadFramework('select2');
 	if ($display_cat_list)
 	{
-		$_fld_class = ' class="inputbox fc_field_filter" ';
+		$_fld_class = '';//' class="use_select2_lib"';
 		$_fld_size = " size='$catlistsize' ";
 		
 		$loader_html = '\'<p class=\\\'qf_centerimg=\\\'><img src=\\\''.JURI::base().'components/com_flexicontent/assets/images/ajax-loader.gif\\\' align=\\\'center\\\'></p>\'';
@@ -109,7 +109,8 @@ if ( $show_mod )
 		$_fld_attributes = $_fld_class.$_fld_size.$_fld_onchange;
 		
 		$allowedtree = modFlexifilterHelper::decideCats($params);
-		$cats_select_field = flexicontent_cats::buildcatselect($allowedtree, $catid_fieldname, array($catid), 3, $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false);
+		$selected_cats = $catid ? array($catid) : false;
+		$cats_select_field = flexicontent_cats::buildcatselect($allowedtree, $catid_fieldname, $selected_cats, 2, $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false);
 	} else if ($catid) {
 		$cat_hidden_field = '<input type="hidden" name="cid" value="'.$catid.'"/>';
 	}

@@ -1533,19 +1533,26 @@ class ParentClassItem extends JModelLegacy
 		// tags and cats will need some manipulation so we retieve them
 		$tags = $this->formatToArray( @ $data['tag'] );
 		$cats = $this->formatToArray( @ $data['cid'] );
-		unset($data['tag']);  unset($data['cid']);
+		$featured_cats = $this->formatToArray( @ $data['featured_cid'] );
+		unset($data['tag']);  unset($data['cid']);  unset($data['featured_cid']);
 		
 		// Make tags unique
 		$tags = array_unique($tags);
 		
-		// Auto-assign the main category if none selected
+		// Auto-assign a not set main category, to be the first out of secondary categories, 
 		if ( empty($data['catid']) && !empty($cats[0]) ) {
 			$data['catid'] = $cats[0];
 		}
 		
+		$cats_indexed = array_flip($cats);
 		// Add the primary cat to the array if it's not already in
-		if ( @$data['catid'] && !in_array($data['catid'], $cats) ) {
-			$cats[] =  $data['catid'];
+		if ( @ $data['catid'] && !isset($cats_indexed[$data['catid']]) ) {
+			$cats[] = $data['catid'];
+		}
+		
+		// Add the primary cat to the array if it's not already in
+		if ( !empty($featured_cats) ) foreach ( $featured_cats as $featured_cat ) {
+			if (@ $featured_cat && !isset($cats_indexed[$featured_cat]) )  $cats[] = $featured_cat;
 		}
 		
 		

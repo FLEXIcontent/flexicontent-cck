@@ -102,13 +102,13 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
   	  continue;
   	}
 	?>
-	<div id="<?php echo ( ($ord) ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent <?php echo ($twocols) ? 'twocol' : ''; ?>">
+	<div id="<?php echo 'order_'.( $ord ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent <?php echo ($twocols) ? 'twocol' : ''; ?>">
 		
 		<?php	if ($ordering_addtitle && $ord) : ?>
 		<div class='order_group_title'><?php echo $ord_titles[$ord]; ?></div>
 		<?php endif; ?>
 		
-		<?php if (isset($list[$ord]['featured'])) : ?>
+	<?php if (isset($list[$ord]['featured'])) : ?>
 		<!-- BOF featured items -->
 		<div class="mod_flexicontent_featured" id="mod_fcitems_box_featured<?php echo $module->id ?>">
 			
@@ -241,12 +241,13 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 			
 		</div>
 		<!-- EOF featured items -->
-		<?php endif; ?>
+	<?php endif; ?>
 		
-		
-		<?php if (isset($list[$ord]['standard'])) : ?>
+	
+	<?php if (isset($list[$ord]['standard'])) : ?>
 		<!-- BOF standard items -->
 		<?php	$rowcount = 0; ?>
+		
 		
 		<div class="mod_flexicontent_standard" id="mod_fcitems_box_standard<?php echo $module->id ?>">
 			
@@ -265,17 +266,17 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 				onmouseout=""
 			>
 
-					<?php if ($display_title) : ?>
-					<div class="fc_block" >
-						<div class="fc_inline_block fcitem_title">
-							<?php if ($link_title) : ?>
-							<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
-							<?php else : ?>	
-							<?php echo $item->title; ?>
-							<?php endif; ?>
-						</div>
+				<?php if ($display_title) : ?>
+				<div class="fc_block" >
+					<div class="fc_inline_block fcitem_title">
+						<?php if ($link_title) : ?>
+						<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+						<?php else : ?>	
+						<?php echo $item->title; ?>
+						<?php endif; ?>
 					</div>
-					<?php endif; ?>
+				</div>
+				<?php endif; ?>
 				
 				<!-- BOF current item's image -->	
 				<?php if ($mod_use_image && $item->image_rendered) : ?>
@@ -386,10 +387,11 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 			
 		</div>
 		<!-- EOF standard items -->
-		<?php endif; ?>
+	
+	<?php endif; ?>
 		
-		<div class="modclear"></div>
-
+	<div class="modclear"></div>
+	
 	</div>
 	<?php endforeach; ?>
 	

@@ -1037,6 +1037,21 @@ class FlexicontentViewItems  extends JViewLegacy
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		$lists = array();
 		
+		// Featured categories form field
+		$featured_cats_parent = $params->get('featured_cats_parent', 0);
+		$featured_cats = array();
+		if ( $featured_cats_parent )
+		{
+			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
+			$featured_sel = array();
+			foreach($selectedcats as $featured_cat) if (isset($featured_tree[$featured_cat])) $featured_sel[] = $featured_cat;
+			
+			$class  = "use_select2_lib";
+			$attribs = 'class="'.$class.'" multiple="multiple" size="8"';
+			$fieldname = FLEXI_J16GE ? 'jform[featured_cid][]' : 'featured_cid[]';
+			$lists['featured_cid'] = flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed);
+		}
+		
 		// Multi-category form field, for user allowed to use multiple categories
 		$lists['cid'] = '';
 		if ($perms['multicat'])
@@ -1053,7 +1068,9 @@ class FlexicontentViewItems  extends JViewLegacy
 			$class .= $max_cat_assign ? " validate-fccats" : " validate";
 			$attribs = 'class="'.$class.'" multiple="multiple" size="8"';
 			$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
-			$lists['cid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $selectedcats, false, $attribs, true, true,	$actions_allowed);
+			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
+			$lists['cid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $selectedcats, false, $attribs, true, true,
+				$actions_allowed, $require_all=true, $skip_subtrees, $disable_subtrees=array());
 		}
 		else {
 			if ( count($selectedcats)>1 ) {

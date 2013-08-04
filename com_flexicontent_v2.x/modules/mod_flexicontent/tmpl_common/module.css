@@ -2,9 +2,12 @@
 /* MODULE STYLING EXTERNAL CONTAINER */
 .mod_flexicontent_wrapper {
 	overflow: hidden;
+	position: relative;
+	top: 0;
+	left: 0;
 }
 
-/* ITEM (AND OTHER DATA) SEPERATOR */
+/* ITEM (AND OTHER DATA) SEPARATOR */
 .mod_flexicontent_wrapper .modclear {
 	display:block;  float:none;  clear:both;
 	width:100%;  overflow:hidden;  height:4px;  line-height:0px;

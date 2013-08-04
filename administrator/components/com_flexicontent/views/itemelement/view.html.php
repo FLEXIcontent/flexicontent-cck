@@ -75,7 +75,7 @@ class FlexicontentViewItemelement extends JViewLegacy {
 			JLoader::import('joomla.application.component.model');
 			JLoader::import( 'qfcategoryelement', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' );
 			$cats_model = JModelLegacy::getInstance('qfcategoryelement', 'FlexicontentModel');
-			$categories = $cats_model->getData();
+			$categories = $cats_model->getItems();
 			//echo "<pre>"; var_dump($categories); echo "</pre>"; 
 			for ($i=0; $i<count($categories); $i++) {
 				$categories[$i]->treename .= $categories[$i]->title;

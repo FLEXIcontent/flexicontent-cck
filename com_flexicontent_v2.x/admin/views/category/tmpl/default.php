@@ -231,22 +231,23 @@ dump($this->row);
 				
 				<?php
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 				foreach ($this->tmpls as $tmpl) {
-					$fieldSets = $tmpl->params->getFieldsets('attribs');
-					foreach ($fieldSets as $name => $fieldSet) :
+					$fieldSets = $tmpl->params->getFieldsets($groupname);
+					foreach ($fieldSets as $fsname => $fieldSet) :
 						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$name.'-options');
+						echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$fsname.'-options');
 						if (isset($fieldSet->description) && trim($fieldSet->description)) :
 							echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
 						endif;
 				?>
 						<fieldset class="panelform">
-							<?php foreach ($tmpl->params->getFieldset($name) as $field) :
+							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
 								$fieldname =  $field->__get('fieldname');
-								$value = $tmpl->params->getValue($fieldname, $name, @$this->row->params[$fieldname]);
+								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->params[$fieldname]);
 							?>
-								<?php echo $tmpl->params->getLabel($fieldname, $name); ?>
-								<?php echo $tmpl->params->getInput($fieldname, $name, $value); ?>
+								<?php echo $tmpl->params->getLabel($fieldname, $groupname); ?>
+								<?php echo $tmpl->params->getInput($fieldname, $groupname, $value); ?>
 							<?php endforeach; ?>
 						</fieldset>
 				<?php

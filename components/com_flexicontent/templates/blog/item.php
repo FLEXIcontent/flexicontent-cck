@@ -26,6 +26,12 @@ if ($html5) {  /* BOF html5  */
 	echo $this->loadTemplate('html5');
 } else {
 
+// Prepend toc (Table of contents) before item's description (toc will usually float right)
+// By prepend toc to description we make sure that it get's displayed at an appropriate place
+if (isset($this->item->toc)) {
+	$this->item->fields['text']->display = $this->item->toc . $this->item->fields['text']->display;
+}
+
 // Set the class for controlling number of columns in custom field blocks
 switch ($this->params->get( 'columnmode', 2 )) {
 	case 0: $columnmode = 'singlecol'; break;
@@ -42,15 +48,15 @@ $page_classes .= ' fcmaincat'.$this->item->catid;
 
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
-  <!-- BOF beforeDisplayContent -->
+	
   <?php if ($this->item->event->beforeDisplayContent) : ?>
+		<!-- BOF beforeDisplayContent -->
 		<div class="fc_beforeDisplayContent group">
 			<?php echo $this->item->event->beforeDisplayContent; ?>
 		</div>
+		<!-- EOF beforeDisplayContent -->
 	<?php endif; ?>
-  <!-- EOF beforeDisplayContent -->
 	
-	<!-- BOF buttons -->
 	<?php
 	$pdfbutton = flexicontent_html::pdfbutton( $this->item, $this->params );
 	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $this->item->categoryslug, $this->item->slug );
@@ -60,27 +66,29 @@ $page_classes .= ' fcmaincat'.$this->item->catid;
 	$approvalbutton = flexicontent_html::approvalbutton( $this->item, $this->params );
 	if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) {
 	?>
-	<p class="buttons">
+	
+	<!-- BOF buttons -->
+	<div class="buttons">
 		<?php echo $pdfbutton; ?>
 		<?php echo $mailbutton; ?>
 		<?php echo $printbutton; ?>
 		<?php echo $editbutton; ?>
 		<?php echo $statebutton; ?>
 		<?php echo $approvalbutton; ?>
-	</p>
-	<?php } ?>
+	</div>
 	<!-- EOF buttons -->
+	<?php } ?>
 
-	<!-- BOF page title -->
 	<?php if ( $this->params->get( 'show_page_heading', 1 ) && $this->params->get('page_heading') != $this->item->title ) : ?>
+	<!-- BOF page title -->
 	<h1 class="componentheading">
 		<?php echo $this->params->get('page_heading'); ?>
 	</h1>
-	<?php endif; ?>
 	<!-- EOF page title -->
+	<?php endif; ?>
 
-	<!-- BOF item title -->
 	<?php if ($this->params->get('show_title', 1)) : ?>
+	<!-- BOF item title -->
 	<h2 class="contentheading"><span class="fc_item_title">
 		<?php
 		if ( mb_strlen($this->item->title, 'utf-8') > $this->params->get('title_cut_text',200) ) :
@@ -90,20 +98,20 @@ $page_classes .= ' fcmaincat'.$this->item->catid;
 		endif;
 		?>
 	</span></h2>
-	<?php endif; ?>
 	<!-- EOF item title -->
+	<?php endif; ?>
 	
-  <!-- BOF afterDisplayTitle -->
   <?php if ($this->item->event->afterDisplayTitle) : ?>
+		<!-- BOF afterDisplayTitle -->
 		<div class="fc_afterDisplayTitle group">
 			<?php echo $this->item->event->afterDisplayTitle; ?>
 		</div>
+		<!-- EOF afterDisplayTitle -->
 	<?php endif; ?>
-  <!-- EOF afterDisplayTitle -->
 
-	<!-- BOF item informations -->
 	<?php if ((intval($this->item->modified) !=0 && $this->params->get('show_modify_date')) || ($this->params->get('show_author') && ($this->item->creator != "")) || ($this->params->get('show_create_date')) || (($this->params->get('show_modifier')) && (intval($this->item->modified) !=0))) : ?>
-	<p class="iteminfo  group">
+	<!-- BOF item basic/core info -->
+	<div class="iteminfo group">
 		
 		<?php if (($this->params->get('show_author')) && ($this->item->creator != "")) : ?>
 		<span class="createdline">
@@ -144,14 +152,13 @@ $page_classes .= ' fcmaincat'.$this->item->catid;
 				</span>
 			<?php endif; ?>
 		</span>
-	</p>
+	</div>
+	<!-- EOF item basic/core info -->
 	<?php endif; ?>
-	<!-- EOF item informations -->
 
-	<!-- BOF item rating, favourites -->
 	<?php if (($this->params->get('show_vote', 1)) || ($this->params->get('show_favs', 1)))  : ?>
+	<!-- BOF item rating, favourites -->
 	<div class="itemactions  group">
-		
 		<?php if ($this->params->get('show_vote', 1)) : ?>
 		<span class="voting">
 		<?php FlexicontentFields::getFieldDisplay($this->item, 'voting', $values=null, $method='display'); ?>
@@ -166,77 +173,71 @@ $page_classes .= ' fcmaincat'.$this->item->catid;
 		</span>
 		<?php endif; ?>
 	</div>
-	<?php endif; ?>
 	<!-- EOF item rating, favourites -->
-	
-	<!-- BOF TOC -->
-	<?php if (isset($this->item->toc)) : ?>
-		<?php echo $this->item->toc; ?>
 	<?php endif; ?>
-	<!-- EOF TOC -->
-
-	<!-- BOF beforedescription block -->
+	
+	
 	<?php if (isset($this->item->positions['beforedescription'])) : ?>
-	<div class="customblock beforedescription  group">
+	<!-- BOF beforedescription block -->
+	<div class="customblock beforedescription group">
 		<?php foreach ($this->item->positions['beforedescription'] as $field) : ?>
 		<span class="element <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
-			<span class="fclabel field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<span class="fcvalue field_<?php echo $field->name; ?><?php echo !$field->label ? ' nolabel ' : ''; ?>"><?php echo $field->display; ?></span>
+			<span class="flexi value field_<?php echo $field->name; ?><?php echo !$field->label ? ' nolabel ' : ''; ?>"><?php echo $field->display; ?></span>
 		</span>
 		<?php endforeach; ?>
 	</div>
-	<?php endif; ?>
 	<!-- EOF beforedescription block -->
+	<?php endif; ?>
 
 	<!-- BOF description block -->
-	<div class="description  group">
+	<div class="description group">
 	<?php FlexicontentFields::getFieldDisplay($this->item, 'text', $values=null, $method='display'); ?>
 	<?php echo JFilterOutput::ampReplace($this->fields['text']->display); ?>
 	</div>
 	<!-- EOF description block -->
 
-	<!-- BOF afterdescription block -->
 	<?php if (isset($this->item->positions['afterdescription'])) : ?>
-	<div class="customblock afterdescription  group">
+	<!-- BOF afterdescription block -->
+	<div class="customblock afterdescription group">
 		<?php foreach ($this->item->positions['afterdescription'] as $field) : ?>
 		<span class="element <?php echo $columnmode; ?>">
 			<?php if ($field->label) : ?>
-			<span class="fclabel field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+			<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 			<?php endif; ?>
-			<span class="fcvalue field_<?php echo $field->name; ?><?php echo !$field->label ? ' nolabel ' : ''; ?>"><?php echo $field->display; ?></span>
+			<span class="flexi value field_<?php echo $field->name; ?><?php echo !$field->label ? ' nolabel ' : ''; ?>"><?php echo $field->display; ?></span>
 		</span>
 		<?php endforeach; ?>
 	</div>
-	<?php endif; ?>
-
 	<!-- EOF afterdescription block -->
+	<?php endif; ?>
 	
-	<!-- BOF item categories, tags -->
 	<?php if (($this->params->get('show_tags', 1)) || ($this->params->get('show_category', 1)))  : ?>
+	<!-- BOF item categories, tags -->
 	<div class="itemadditionnal group">
 		<?php if ($this->params->get('show_category', 1)) : ?>
 		<span class="categories">
 			<?php FlexicontentFields::getFieldDisplay($this->item, 'categories', $values=null, $method='display'); ?>
-			<span class="fclabel"><?php echo $this->fields['categories']->label; ?></span>
-			<span class="fcvalue"><?php echo $this->fields['categories']->display; ?></span>
+			<span class="flexi label"><?php echo $this->fields['categories']->label; ?></span>
+			<span class="flexi value"><?php echo $this->fields['categories']->display; ?></span>
 		</span>
 		<?php endif; ?>
 
 		<?php FlexicontentFields::getFieldDisplay($this->item, 'tags', $values=null, $method='display'); ?>
 		<?php if ($this->params->get('show_tags', 1) && $this->fields['tags']->display) : ?>
 		<span class="tags">
-			<span class="fclabel"><?php echo $this->fields['tags']->label; ?></span>
-			<span class="fcvalue"><?php echo $this->fields['tags']->display; ?></span>
+			<span class="flexi label"><?php echo $this->fields['tags']->label; ?></span>
+			<span class="flexi value"><?php echo $this->fields['tags']->display; ?></span>
 		</span>
 		<?php endif; ?>
 	</div>
-	<?php endif; ?>
 	<!-- EOF item categories, tags  -->
+	<?php endif; ?>
 
-	<!-- BOF comments -->
 	<?php if ($this->params->get('comments') && !JRequest::getVar('print')) : ?>
+	<!-- BOF comments -->
 	<div class="comments group">
 	<?php
 		if ($this->params->get('comments') == 1) :
@@ -254,16 +255,16 @@ $page_classes .= ' fcmaincat'.$this->item->catid;
   		endif;
 	?>
 	</div>
-	<?php endif; ?>
 	<!-- EOF comments -->
-
-  <!-- BOF afterDisplayContent -->
-  <?php if ($this->item->event->afterDisplayContent) : ?>
-		<div class="fc_afterDisplayContent group">
-			<?php echo $this->item->event->afterDisplayContent; ?>
-		</div>
 	<?php endif; ?>
-  <!-- EOF afterDisplayContent -->
+
+	<?php if ($this->item->event->afterDisplayContent) : ?>
+	<!-- BOF afterDisplayContent -->
+	<div class="fc_afterDisplayContent group">
+		<?php echo $this->item->event->afterDisplayContent; ?>
+	</div>
+	<!-- EOF afterDisplayContent -->
+	<?php endif; ?>
 	
 </div>
 

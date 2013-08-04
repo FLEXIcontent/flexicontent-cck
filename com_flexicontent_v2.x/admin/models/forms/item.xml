@@ -24,8 +24,9 @@
 			<option value="1">JYES</option>
 		</field>
 		<field name="tag" type="hidden" label="FLEXI_TAGS" description="JFIELD_TAGS_DESC" class="" required="false" multiple="true" />
-		<field name="cid" type="categorytree" size="40" label="FLEXI_CATEGORIES" description="JFIELD_CATEGORY_DESC" class="mcat fcfield_selectmulval" multiple="true" />
-		<field name="catid" type="categorytree" label="FLEXI_CATEGORIES_MAIN" description="JFIELD_CATEGORY_DESC" class="scat fcfield_selectval" required="true" top="2" />
+		<field name="cid" type="categorytree" size="40" label="FLEXI_SECONDARY_CATEGORIES" description="FLEXI_CATEGORIES_NOTES" class="mcat fcfield_selectmulval" multiple="true" />
+		<field name="featured_cid" type="categorytree" size="10" label="FLEXI_FEATURED_CATEGORIES" description="FLEXI_FEATURED_CATEGORIES_DESC" class="use_select2_lib" multiple="true" top="3" />
+		<field name="catid" type="categorytree" label="FLEXI_PRIMARY_CATEGORY" description="FLEXI_CATEGORIES_NOTES" class="scat use_select2_lib" required="true" top="2" />
 		<field name="buttonspacer" description="JGLOBAL_ACTION_PERMISSIONS_DESCRIPTION" type="spacer" />
 		<field name="created" type="calendar" label="COM_CONTENT_FIELD_CREATED_LABEL" description="COM_CONTENT_FIELD_CREATED_DESC" class="inputbox" size="22" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
 		<field name="created_by" type="user" label="FLEXI_FIELD_CREATED_BY_LABEL" description="FLEXI_FIELD_CREATED_BY_DESC" />

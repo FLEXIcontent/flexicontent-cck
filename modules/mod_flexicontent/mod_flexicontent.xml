@@ -26,11 +26,11 @@
 	
 	<params addpath="/modules/mod_flexicontent/elements">
 			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" description="" level="level1" />
-			<field name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" 
-						description="FLEXI_CHOOSE_TMPL_DESC" 
-						directory="/modules/mod_flexicontent/tmpl" 
-						default="news" hide_default="1" hide_none="1" 
-						stripext="1" filter="\.php$" exclude="^_" />
+			<field  name="layout"  type="fclayout"  default="news"  label="FLEXI_CHOOSE_TMPL"
+						description="FLEXI_CHOOSE_TMPL_DESC"  directory="/modules/mod_flexicontent/tmpl"
+						hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_"
+						tmpl_container="mod_tmpl_layout" params_source="inline"
+						/> <!-- params_source="file" -->
 			
 			<field name="" type="separator" default="FLEXI_MENU_ITEM" level="level1" menu="hide" />
 			<field name="itemid_force" type="radio" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC">
@@ -40,6 +40,58 @@
 			</field>
 			<field name="itemid_force_value" type="text" default="" label="FLEXI_MOD_SPECIFIC_MENU_ITEMID" description="FLEXI_MOD_SPECIFIC_MENU_ITEMID_DESC" />
 			
+		
+		<field type="jparamstab" grpid="mod_tmpl_layout" title="FLEXI_MOD_TMPL_LAYOUT_OPTIONS" description="FLEXI_MOD_TMPL_LAYOUT_OPTIONS_DESC" />
+		
+		<field type="jparamstab" grpid="mod_tmpl_layout_carousel" title="Layout: &lt;small&gt; Carousel &lt;/small&gt;" description="FLEXI_MOD_TMPL_LAYOUT_OPTIONS_DESC" />
+			<field name="" type="separator" level="level3" default="NOTE: &lt;small&gt; &lt;br/&gt; -- ONLY standard items are placed inside the carousel. &lt;br/&gt; -- the featured items are display statically above the carousel. Set featured items to zero to only show items inside carousel &lt;/small&gt;" />
+			
+			<field name="" type="separator" default="Layout" level="level2" />
+			<field name="carousel_mode" type="radio" default="horizontal" label="Direction" description="Description of scrolling">
+				<option value="vertical">Vertical</option>
+				<option value="horizontal">Horizontal</option>
+			</field>
+			<field name="carousel_padding_top_bottom" type="text" default="8" label="Padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="carousel_padding_left_right" type="text" default="12" label="Padding left/right" description="This is the padding applied at left and right of the items" />
+			
+			<field name="" type="separator" default="Layout Horizontal" level="level3" />
+			<field name="carousel_hdir_item_width" type="text" default="250" label="item width" description="Width of items when scrolling horizontally" />
+			<field name="carousel_hdir_margin_right" type="text" default="12" label="Padding right" description="This is the margin applied at right of items in a horizontal carousel" />
+			
+			<field name="" type="separator" default="Layout Vertical" level="level3" />
+			<field name="carousel_vdir_items" type="text" default="2" label="# items" description="Number of items that will be displayed when scrolling vertically" />
+			<field name="carousel_vdir_margin_bottom" type="text" default="6" label="Margin bottom" description="This is the margin applied at bottom of items in a vertical carousel" />
+			
+			<field name="" type="separator" default="Thumbnails Buttons" level="level3" />
+			<field name="carousel_show_handles" type="radio" default="1" label="Enable" description="Display One Thumbnail will be created per content item, and content will be accessible via click or mouseover">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="carousel_handle_width" type="text" default="24" label="Width" description="This is the width of thumbnail image of each item" />
+			<field name="carousel_handle_height" type="text" default="24" label="Height" description="This is the height of thumbnail image of each item" />
+			<field name="carousel_handle_event" type="radio" default="mouseover" label="Activation Event" description="How the content item buttons get activated">
+				<option value="mouseover">Mouse Over</option>
+				<option value="click">Click</option>
+			</field>
+			
+			<field name="" type="separator" default="Behaviour" level="level2" />
+			<field name="carousel_autoplay" type="radio" default="1" label="Autoplay" description="Carousel will start playing after page loads">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="carousel_duration" type="text" default="500" label="Change duration (ms)" description="Milliseconds that a carousel change will last" />
+			<field name="carousel_interval" type="text" default="5000" label="Autoplay Interval (ms)" description="Milliseconds between autoplay steps" />
+			
+			<field name="" type="separator" default="Miscellaneous" level="level2" />
+			<field name="carousel_show_controls" type="radio" default="0" label="Playback Controls" description="Carousel will display stop, previous, next, etc controls">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Intergrated (Horizontal Only)</option>
+				<option value="2">Detached controls</option>
+			</field>
+			<field name="carousel_show_curritem_info" type="radio" default="0" label="Mini Information &lt;br/&gt;&lt;small&gt;(current item)&lt;/small&gt;" description="Carousel will one button per content item">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 		
 		<field type="jparamstab" title="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC" />
 			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC">
@@ -356,7 +408,7 @@
 					checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="created,modified" defaultvals="created,modified"
 					label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
 			/>
-			<field name="date_format" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" description="..." >
+			<field name="date_format" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
 				<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
 				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
@@ -379,7 +431,7 @@
 					checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="created,modified" defaultvals="created,modified"
 					label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
 			/>
-			<field name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" description="..." >
+			<field name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
 				<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
 				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>

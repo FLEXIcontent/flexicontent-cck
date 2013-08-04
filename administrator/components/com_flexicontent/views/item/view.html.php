@@ -479,27 +479,39 @@ class FlexicontentViewItem extends JViewLegacy
 			existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
 			max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES',true).'";
 		');
-
+		
+		// Creating categorories tree for item assignment, we use the 'create' privelege
 		$actions_allowed = array('core.create');
+
+		// Featured categories form field
+		$featured_cats_parent = $params->get('featured_cats_parent', 0);
+		$featured_cats = array();
+		if ( $featured_cats_parent )
+		{
+			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
+			$featured_sel = array();
+			foreach($selectedcats as $featured_cat) if (isset($featured_tree[$featured_cat])) $featured_sel[] = $featured_cat;
+			
+			$class  = "use_select2_lib";
+			$attribs = 'class="'.$class.'" multiple="multiple" size="8"';
+			$fieldname = FLEXI_J16GE ? 'jform[featured_cid][]' : 'featured_cid[]';
+			$lists['featured_cid'] = flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed);
+		}
+		
 		// Multi-category form field, for user allowed to use multiple categories
 		$class  = "mcat fcfield_selectmulval";
 		$class .= $max_cat_assign ? " validate-fccats" : "";
 		$attribs = 'multiple="multiple" size="20" class="'.$class.'"';
-
-		if (FLEXI_J16GE) {
-			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'jform[cid][]', $selectedcats, false, $attribs, true, true,	$actions_allowed);
-		} else {
-			$lists['cid'] = flexicontent_cats::buildcatselect($categories, 'cid[]', $selectedcats, false, $attribs, true, true,	$actions_allowed);
-		}
+		$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
+		$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
+		$lists['cid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $selectedcats, false, $attribs, true, true,
+			$actions_allowed, $require_all=true, $skip_subtrees, $disable_subtrees=array());
 
 		// Main category form field
 		$attribs = 'class="scat validate-catid use_select2_lib"';
-		if (FLEXI_J16GE) {
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'jform[catid]', $row->catid, 2, $attribs, true, true, $actions_allowed);
-		} else {
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories, 'catid', $row->catid, 2, $attribs, true, true, $actions_allowed);
-		}
-
+		$fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
+		$lists['catid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $row->catid, 2, $attribs, true, true, $actions_allowed);
+		
 		//build languages list
 		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);

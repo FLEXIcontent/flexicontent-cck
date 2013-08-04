@@ -339,25 +339,51 @@
 				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,id,rid,commented,rated,order" defaultvals=""
 				label="FLEXI_PRIMARY_ORDER_OPTIONS" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_ITEMS_LIST_MARKUPS" level="level2" />
-			<field name="" type="separator" default="FLEXI_ADD_CSS_MARKUPS" level="level3" />
-			<field name="add_item_cats_mu" type="list" default="" label="FLEXI_CATEGORY_MARKUPS" description="FLEXI_CATEGORY_MARKUPS_DESC" >
+		</fieldset>
+		
+		<fieldset name="cat_item_markups" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_MU_CATEGORY" description="FLEXI_MU_CATEGORY_DESC" level="level2" />
+			<field name="mu_addcss_cats" type="fccheckbox" default="" display_useglobal="1" label="FLEXI_MU_ADD_MARKUP" description="FLEXI_MU_ADD_MARKUP_DESC"
+				checkoptions="FLEXI_MU_FEATURED_CATS,FLEXI_MU_OTHER_CATS" checkvals="featured,other" defaultvals="" />
+				
+			<field name="mu_addtext_cats" type="list" default="" label="FLEXI_MU_ADD_TXT_CAT_TITLE" description="FLEXI_MU_ADD_TXT_CAT_TITLE_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="add_view_access_mu" type="list" default="" label="FLEXI_VIEW_ACCESS_MARKUPS" description="FLEXI_VIEW_ACCESS_MARKUPS_DESC" >
+			
+			<field name="" type="separator" default="FLEXI_MU_ACCLVL" description="FLEXI_MU_ACCLVL_DESC" level="level2" />
+			
+			<field name="mu_addcss_acclvl" type="fccheckbox" default="" display_useglobal="1" label="FLEXI_MU_ADD_MARKUP" description="FLEXI_MU_ADD_MARKUP_DESC"
+				checkoptions="FLEXI_MU_NO_ACC,FLEXI_MU_FREE_ACC,FLEXI_MU_NEEDED_ACCLVL,FLEXI_MU_OBTAINED_ACCLVL" checkvals="no_acc,free_acc,needed_acc,obtained_acc" defaultvals="" />
+				
+			<field name="mu_add_condition_obtainded_acc" type="list" default="" label="FLEXI_MU_ADD_CONDITION_OBTAINDED_ACCLVL" description="FLEXI_MU_ADD_CONDITION_OBTAINDED_ACCLVL_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_MU_ONLY_IF_VIEWABLE</option>
+				<option value="1">FLEXI_MU_ALWAYS</option>
+			</field>
+			
+			<field name="mu_addtext_acclvl" type="fccheckbox" default="" display_useglobal="0" label="FLEXI_MU_ADD_TXT_ACC" description="FLEXI_MU_ADD_TXT_ACC_DESC"
+				checkoptions="FLEXI_MU_NO_ACC,FLEXI_MU_FREE_ACC,FLEXI_MU_NEEDED_ACCLVL,FLEXI_MU_OBTAINED_ACCLVL" checkvals="no_acc,free_acc,needed_acc,obtained_acc" defaultvals="no_acc,free_acc,needed_acc,obtained_acc" />
+			
+			<field name="mu_no_acc_text" type="text" size="60" default="" label="FLEXI_MU_NO_ACC_TEXT" description="FLEXI_MU_NO_ACC_TEXT_DESC" />
+			<field name="mu_free_acc_text" type="text" size="60" default="" label="FLEXI_MU_FREE_ACC_TEXT" description="FLEXI_MU_FREE_ACC_TEXT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_MU_RADDED" description="FLEXI_MU_RADDED_DESC" level="level2" />
+			<field name="mu_addcss_radded" type="list" default="" label="FLEXI_MU_ADD_MARKUP" description="FLEXI_MU_ADD_MARKUP_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="add_recently_added_mu" type="list" default="" label="FLEXI_RECENTLY_ADDED_MARKUPS" description="FLEXI_RECENTLY_ADDED_MARKUPS_DESC" >
+			<field name="mu_addtext_radded" type="list" default="" label="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME" description="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="" type="separator" default="FLEXI_CSS_MARKUPS_CONFIGURATION" level="level3" />
-			<field name="recently_added_timeframes" type="text" size="40" default="" label="FLEXI_RECENTLY_ADDED_TIMEFRAMES" description="FLEXI_RECENTLY_ADDED_TIMEFRAMES_DESC" />
+			<field name="" type="separator" default="FLEXI_MU_RADDED_TIMEFRAMES_CONF" description="FLEXI_MU_RADDED_TIMEFRAMES_CONF_DESC" level="level3" />
+			<field name="mu_ra_timeframe_intervals" type="text" size="60" default="" label="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS" description="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS_DESC" />
+			<field name="mu_ra_timeframe_names" type="textarea" rows="4" cols="60" default="" label="FLEXI_MU_RADDED_TIMEFRAME_NAMES" description="FLEXI_MU_RADDED_TIMEFRAME_NAMES_DESC" />
 			
 		</fieldset>
 		
@@ -449,7 +475,7 @@
 			</field>
 			<field name="filter_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
 			<field name="filter_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
-			<field name="filter_perrow" type="list" default="" label="FLEXI_RECORD_PER_ROW" description="FLEXI_RECORD_PER_ROW_DESC" menu="hide" >
+			<field name="filter_perrow" type="list" default="" label="FLEXI_RECORD_PER_ROW" description="FLEXI_RECORD_PER_ROW_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

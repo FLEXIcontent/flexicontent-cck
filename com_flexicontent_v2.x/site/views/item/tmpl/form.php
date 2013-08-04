@@ -444,6 +444,16 @@ $tabCnt[$tabSetCnt] = 0;
 				</div>
 			<?php endif; ?>
 
+			<?php if ( !empty($this->lists['featured_cid']) ) : ?>
+				<div class="fcclear"></div>
+				<label id="jform_featured_cid-lbl" for="jform_featured_cid" for_bck="jform_featured_cid" class="flexi_label">
+					<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
+				</label>
+				<div class="container_fcfield container_fcfield_name_featured_cid">
+					<?php echo $this->lists['featured_cid']; ?>
+				</div>
+			<?php endif; ?>
+
 		<?php endif; ?>
 
 
@@ -694,6 +704,16 @@ $tabCnt[$tabSetCnt] = 0;
 			?>
 		</div>
 
+		<?php if ( !empty($this->lists['featured_cid']) ) : ?>
+			<div class="fcclear"></div>
+			<label id="jform_featured_cid-lbl" for="jform_featured_cid" for_bck="jform_featured_cid" class="flexi_label">
+				<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
+			</label>
+			<div class="container_fcfield container_fcfield_name_featured_cid">
+				<?php echo $this->lists['featured_cid']; ?>
+			</div>
+		<?php endif; ?>
+		
 		<?php if ($secondary_displayed) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 
 			<div class="fcclear"></div>
