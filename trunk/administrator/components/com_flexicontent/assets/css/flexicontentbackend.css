@@ -1187,9 +1187,34 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	position: relative !important;
 }
 
+.select2-choices {
+	padding: 0px !important;
+	margin: 0px !important;
+}
 .select2-choice {
 	margin: 0 6px 0 0 !important;
 	font-weight: normal !important;
+}
+
+.select2-search-field {
+	background: url(../images/plus-button.png) no-repeat  50% 50% !important;
+}
+.select2-search-field:first-child {
+	background-position: 96% 50% !important;
+}
+div.select2-dropdown-open .select2-search-field input {
+	display: none;
+}
+
+.select2-search-field input {
+	min-width: 32px;
+	min-height: 2em;
+	background: transparent !important;
+}
+.select2-search-field:first-child input {
+	min-width: 140px;
+	min-height: 2em;
+	background: transparent !important;
 }
 
 .prettycheckbox.fcradiocheck label, .prettyradio.fcradiocheck label {

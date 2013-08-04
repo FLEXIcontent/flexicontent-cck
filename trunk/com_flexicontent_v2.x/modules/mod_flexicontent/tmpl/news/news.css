@@ -44,6 +44,8 @@
 	width:100%;
 	margin:0px!important;
 	padding:0px!important;
+	float:left;
+	clear:both;
 }
 
 
@@ -90,18 +92,22 @@
 /* INTERNAL ITEM CONTAINER (ONE COLUMN MODE) */
 .news.mod_flexicontent_wrapper .mod_flexicontent_featured,
 .news.mod_flexicontent_wrapper .mod_flexicontent_standard {
-	margin-top:2px;
-	margin-bottom:0px;
+	margin-top:0px!important;
+	margin-bottom:0px!important;
 	margin-left: 0%!important;
 	margin-right: 0%!important;
 	
-	padding-top:2px;
-	padding-bottom:0px;
+	padding-top:0px!important;
+	padding-bottom:0px!important;
 	padding-left: 0%!important;
 	padding-right: 0%!important;
 	
 	float:left;
 	width:100%;
+	display:block;
+	position:relative;
+	top:0px;
+	left:0px;
 }
 
 /* INTERNAL ITEM CONTAINER (TWO COLUMN MODE for standard items) */

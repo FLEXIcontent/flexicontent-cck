@@ -224,30 +224,22 @@ class plgSearchFlexisearch extends JPlugin
 		
 		//if ( empty($where) ) $where = '1';
 		
-		switch ($ordering) {
-			case 'oldest':
-				$order = 'i.created ASC';
-				break;
-
-			case 'popular':
-				$order = 'i.hits DESC';
-				break;
-
-			case 'alpha':
-				$order = 'i.title ASC';
-				break;
-
-			case 'category':
-				$order = 'c.title ASC, i.title ASC';
-				break;
-
-			case 'newest':
-			default:
-				$order = 'i.created DESC';
-				break;
+		switch ($ordering)
+		{
+				//case 'relevance': $order = ' ORDER BY score DESC, i.title ASC'; break;
+				case 'oldest':   $order = 'i.created ASC'; break;
+				case 'popular':  $order = 'i.hits DESC'; break;
+				case 'alpha':    $order = 'i.title ASC'; break;
+				case 'category': $order = 'c.title ASC, i.title ASC'; break;
+				case 'newest':   $order = 'i.created DESC'; break;
+				default:         $order = 'i.created DESC'; break;
 		}
-
-		// Select only items user has access to if he is not allowed to show unauthorized items
+		
+		
+		
+		// ****************************************************************************************
+		// Create JOIN clause and WHERE clause part for filtering by current (viewing) access level
+		// ****************************************************************************************
 		$joinaccess	= '';
 		$andaccess	= '';
 		$select_access = '';
@@ -311,15 +303,19 @@ class plgSearchFlexisearch extends JPlugin
 		}
 		
 		
-		// filter by active language
+		
+		// **********************************************************************************************************************************************************
+		// Create WHERE clause part for filtering by current active language, and current selected contend types ( !! although this is possible via a filter too ...)
+		// **********************************************************************************************************************************************************
+		
 		$andlang = '';
 		if (	$app->isSite() &&
 					( FLEXI_FISH || (FLEXI_J16GE && $app->getLanguageFilter()) ) &&
-					$filter_lang
+					$filter_lang  // Language filtering enabled
 		) {
 			$andlang .= ' AND ie.language LIKE ' . $db->Quote( $lang .'%' );
 		}
-	
+		
 		// search articles
 		$results = array();
 		if ( $limit > 0)

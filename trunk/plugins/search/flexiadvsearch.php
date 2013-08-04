@@ -318,9 +318,9 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		
 		
-		// ***************************************************************************************
-		// Create JOIN clause and WHERE clause part for filtering by current access level (= view)
-		// ***************************************************************************************
+		// ****************************************************************************************
+		// Create JOIN clause and WHERE clause part for filtering by current (viewing) access level
+		// ****************************************************************************************
 		$joinaccess	= '';
 		$andaccess	= '';
 		$select_access = '';
@@ -442,7 +442,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// AND-WHERE sub-clauses ... (shared with filters)
 		$and_where =  ' 1 '
-			. ' AND i.state IN (1,-5,'. ($search_archived ? (FLEXI_J16GE ? 2:-1) :'' ) .') '
+			. ' AND i.state IN (1,-5'. ($search_archived ? ','.(FLEXI_J16GE ? 2:-1) :'' ) .') '
 			. ' AND c.published = 1 '
 			. ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_now.' )'
 			. ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_now.' )'

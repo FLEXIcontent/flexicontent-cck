@@ -228,6 +228,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 			foreach ($subscribers as $subscriber)
 			{
 				$to = JMailHelper::cleanAddress($subscriber->email);
+				$to_arr[] = $to;
 				$_message = $message;
 				if ($include_fullname) $_message = str_replace('__SUBSCRIBER_NAME__', $subscriber->name, $_message);
 				if ($user_autologin) {

@@ -18,9 +18,10 @@
 .subtitle1 .flexi.element,
 .subtitle2 .flexi.element,
 .subtitle3 .flexi.element {
+	clear: both;
 	display: block;
 	float: left;
-	max-width: 100% !important;  /* Allow responsive width while floating */
+	width: 100% !important;  /* Allow responsive width while floating */
 	padding: 0% !important;  /* Allow responsive width while floating */
 	margin: 0px 24px 12px 0px;
 }

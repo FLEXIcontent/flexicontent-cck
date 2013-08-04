@@ -261,7 +261,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.create');
 		$fieldname = FLEXI_J16GE ? 'jform[parent_id]' : 'parent_id';
-		$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, $fieldname, $row->parent_id, $top=1, 'class="inputbox"', $check_published, $check_perms, $actions_allowed);
+		$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, $fieldname, $row->parent_id, $top=1, 'class="inputbox"',
+			$check_published, $check_perms, $actions_allowed, $require_all=true, $skip_subtrees=array(), $disable_subtrees=array($row->id));
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
 		$fieldname = FLEXI_J16GE ? 'jform[copycid]' : 'copycid';

@@ -118,10 +118,10 @@ class plgFlexicontentFlexinotify extends JPlugin
 		}
 		
 		// d. Check if notification flag was set
-		/*if ( empty($post['notify']) ) {
+		if ( empty($post['notify']) ) {
 			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("FAVOURITES NOTIFICATION PLUGIN: &nbsp; Current editor did not request to notify subscribers", 'message' );
 			return;
-		}*/
+		}
 		
 		// Send notifications (optinally these will be personalized)
 		$this->sendNotifications($item, $subscribers, $params);
@@ -228,6 +228,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 			foreach ($subscribers as $subscriber)
 			{
 				$to = JMailHelper::cleanAddress($subscriber->email);
+				$to_arr[] = $to;
 				$_message = $message;
 				if ($include_fullname) $_message = str_replace('__SUBSCRIBER_NAME__', $subscriber->name, $_message);
 				if ($user_autologin) {

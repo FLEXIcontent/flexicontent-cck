@@ -99,20 +99,20 @@
 
 .fc_edit_link {
 	float:left;
-	margin:5px 5px 0px 0px;
+	margin:5px 0px 0px 0px;
 }
 .fc_edit_link_nopad {
 	float:left;
-	margin: 0px 5px 0px 0px;
+	margin: 0px 0px 0px 0px;
 }
 
 .fc_state_toggle_link {
 	float:left;
-	margin:5px 5px 0px 5px;
+	margin:5px 0px 0px 5px;
 }
 .fc_state_toggle_link_nopad {
 	float:left;
-	/*margin:5px 5px 0px 0px;*/
+	/*margin:5px 0px 0px 0px;*/
 }
 
 
@@ -223,6 +223,7 @@
 	border-right: 1px solid #e5e5e5;
 	color: #000000;
 	font-weight: bold;
+	font-size: 11px;
 	padding: 0.4em;
 	text-align: left;
 }
@@ -265,7 +266,7 @@
 	display: block;
 	clear: both;
 	border: solid 0px #dddddd;
-	margin: 0;
+	margin: 0px 0px 12px 0px;
 	padding: 0;
 }
 
@@ -273,7 +274,7 @@
 fieldset.fc_filter_set {
 	border: 1px solid #cccccc;
 	padding: 4px;
-	margin-top: 0px;
+	margin: 0px 0px 0px 0px;
 }
 
 .fc_range {
@@ -475,7 +476,7 @@ fieldset.fc_filter_set {
 
 #flexicontent .item_total {
 	border: 1px solid lightgray;
-	margin: 0px 0px 16px 0px;
+	margin: 0px 0px 12px 0px;
 	padding: 1px 4px;
 	clear: both;
 }
@@ -559,7 +560,10 @@ html button {
 	border-radius:5px !important;
 	-moz-border-radius: 5px !important;
 	-webkit-border-radius: 5px !important;
-	border: 1px solid #cccccc !important;
+	border-top: 0px solid #D0D0D0;
+	border-left: 0px solid #D0D0D0;
+	border-bottom: 1px solid #D0D0D0;
+	border-right: 1px solid #D0D0D0;
 	background: #eeeeee !important;
 	color: black !important;	
 	margin: 2px 6px 2px 0px;
@@ -570,8 +574,10 @@ html button {
 }
 
 #flexicontent button:hover, #flexicontent .flexi_buttons button:hover {
-	background: #cccccc !important;
-	border: 1px solid gray !important;
+	background: #dddddd !important;
+}
+#flexicontent button:hover span, #flexicontent .flexi_buttons button:hover {
+	color: red !important;
 }
 
 .fcbutton_apply, .fcbutton_save, .fcbutton_cancel, .fcbutton_preview, .fcbutton_preview_save, .fcbutton_go, .fcbutton_reset {
@@ -579,13 +585,13 @@ html button {
 	display: inline-block !important;
 	min-height: 16px !important;
 }
-.fcbutton_apply { background: url(../images/accept.png) no-repeat !important; color: green !important; }
-.fcbutton_save { background: url(../images/accept.png) no-repeat !important; color: green !important; }
-.fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important;  color: blue !important; }
-.fcbutton_preview { background: url(../images/monitor.png) no-repeat !important; color: blue !important; }
-.fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important;  color: red !important; }
-.fcbutton_go { background: url(../images/accept.png) no-repeat !important; color: darkgreen !important; }
-.fcbutton_reset { background: url(../images/cancel.png) no-repeat !important;  color: darkred !important; }
+.fcbutton_apply { background: url(../images/accept.png) no-repeat !important; color: #333 !important; }
+.fcbutton_save { background: url(../images/accept.png) no-repeat !important; color: #333 !important; }
+.fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important;  color: #333 !important; }
+.fcbutton_preview { background: url(../images/monitor.png) no-repeat !important; color: #333 !important; }
+.fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important;  color: #333 !important; }
+.fcbutton_go { background: url(../images/accept.png) no-repeat !important; color: #333 !important; }
+.fcbutton_reset { background: url(../images/cancel.png) no-repeat !important;  color: #333 !important; }
 
 button.fc_button {}
 
@@ -1373,7 +1379,7 @@ div.fancybox-wrap a { background: none!important;}
 }
 
 #flexicontent .flexi.label {
-	/*float: left !important;*/
+	float: left !important;
   /*width: 16% !important;*/
 	display: block !important;
 	color: #606060 !important;

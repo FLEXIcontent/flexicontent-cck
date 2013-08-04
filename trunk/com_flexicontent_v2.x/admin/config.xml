@@ -609,7 +609,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_FEATURED_CATS_TIP" level="level3" menu="hide" />
-			<field name="featured_cats_parent" type="flexicategories"
+			<field name="featured_cats_parent" type="flexicategories" top="2"
 				published_only="1" parent_id=""	depth_limit="1" multiple="false"
 				default="" label="FLEXI_FEATURED_CATS_PARENT" description="FLEXI_FEATURED_CATS_PARENT_DESC" />
 			

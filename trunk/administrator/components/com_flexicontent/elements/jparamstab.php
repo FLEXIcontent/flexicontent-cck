@@ -44,10 +44,12 @@ class JElementJParamsTab extends JElement {
     // Start New Group of parameters
     $title = @$xmlNode->_attributes['title'];
     $description = @$xmlNode->_attributes['description'];
+    $grpid = @$xmlNode->_attributes['grpid'];
+    $slider_id = $grpid ? $grpid.'-page' : '';
     if (!$title) $title = $description;
     
     $inline_style = 'font-size: 11px; color:gray; background-color: lightyellow; border: 1px solid lightgray; width: auto; padding: 4px 2%; margin: 1px 8px;';
-    $new_group .= JPaneSliders::startPanel( ''.JText::_($title) , '' );
+    $new_group .= JPaneSliders::startPanel( ''.JText::_($title) , $slider_id );
     $new_group .= '<table width="100%" class="paramlist admintable" cellspacing="1">';
     $new_group .= '<tr><td class="paramlist_description" colspan="2"><div style="'.$inline_style.'">' . JText::_($description) . '</div></td>';
     $new_group .= '<td class="paramlist_value">';
