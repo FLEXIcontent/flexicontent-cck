@@ -1350,6 +1350,27 @@ class modFlexicontentHelper
 		// Finally put together the query to retrieve the listed items
 		// ***********************************************************
 		
+		// Set filters via menu parameters
+		self::_setFilters( $params, 'persistent_filters', $is_persistent=1);
+		$persistent_a = self::_setFilters( $params, 'initial_filters'   , $is_persistent=0); //does not use this variable now, waiting for Georgios do this ;)
+		
+		$valueswhere = '';
+		$join_field_x = '';
+		foreach($persistent_a as $filter_id=>$filter_values) {
+			if(is_array($filter_values)) {
+				if(isset($filter_values[0])) {
+					$valueswhere .= ' AND rel'.$filter_id.' IN ('.implode(',', $filter_values[0]).') ';
+				}else{
+					$value_empty = !strlen(@$filter_values[1]) && strlen(@$filter_values[2]) ? ' OR rel'.$filter_id.'="" OR rel'.$filter_id.' IS NULL ' : '';
+					if ( strlen(@$filter_values[1]) ) $valueswhere .= ' AND (rel'.$filter_id.' >=' . $filter_values[1] . ') ';
+					if ( strlen(@$filter_values[2]) ) $valueswhere .= ' AND (rel'.$filter_id.' <=' . $filter_values[2] . $value_empty . ') ';
+				}
+			}else{
+				$valueswhere .= ' AND rel'.$filter_id.'.value = '.$db->Quote($filter_values);
+			}
+			$join_field_x .= ' JOIN #__flexicontent_fields_item_relations rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;
+		}
+
 		if ( empty($items_query) ) {  // If a custom query has not been set above then use the default one ...
 			$items_query 	= 'SELECT '
 				.' i.id '
@@ -1367,15 +1388,13 @@ class modFlexicontentHelper
 				.($ordering=='commented' ? $join_comments : '')
 				.($ordering=='rated' ? $join_rated : '')
 				. $join_field
+				. $join_field_x
 				. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
+				. $valueswhere
 				. ' GROUP BY i.id'
 				. $orderby
 				;
 
-			// Set filters via menu parameters
-			self::_setFilters( $params, 'persistent_filters', $is_persistent=1);
-			$persistent_a = self::_setFilters( $params, 'initial_filters'   , $is_persistent=0); //does not use this variable now, waiting for Georgios do this ;)
-			
 			$items_query_data 	= 'SELECT '
 				.' i.*, ie.*, ty.name AS typename,'
 				. ($select_comments ? $select_comments.',' : '')
@@ -1395,7 +1414,9 @@ class modFlexicontentHelper
 				. $join_comments
 				. $join_rated
 				. $join_field
+				. $join_field_x
 				. ' WHERE i.id IN (__content__)'
+				. $valueswhere
 				. ' GROUP BY i.id'
 				;
 		}
