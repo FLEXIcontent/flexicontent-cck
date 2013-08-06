@@ -1373,6 +1373,10 @@ class modFlexicontentHelper
 				. $orderby
 				;
 			
+			// Set filters via menu parameters
+			self::_setFilters( $params, 'persistent_filters', $is_persistent=1);
+			$persistent_a = self::_setFilters( $params, 'initial_filters'   , $is_persistent=0); //does not use this variable now, waiting for Georgios do this ;)
+			
 			$items_query_data 	= 'SELECT '
 				.' i.*, ie.*, ty.name AS typename,'
 				. ($select_comments ? $select_comments.',' : '')
@@ -1697,6 +1701,60 @@ class modFlexicontentHelper
 		}
 	}
 	
+	/**
+	 * Method to set MENU Item filters as HTTP Request variables thus filtering the category view
+	 * 
+	 * @access public
+	 * @return object
+	 * @since 1.5
+	 */
+	function _setFilters( &$cparams, $mfilter_name='persistent_filters', $is_persistent=1 )
+	{
+		static $persistent_a = array();
+		$mfilter_data = $cparams->get($mfilter_name, '');
+		$filter_value = array();
+		if ($mfilter_data) {
+			// Parse filter values
+			$mfilter_arr = preg_split("/[\s]*%%[\s]*/", $mfilter_data);
+			if ( empty($mfilter_arr[count($mfilter_arr)-1]) ) {
+				unset($mfilter_arr[count($mfilter_arr)-1]);
+			}
+			
+			// Split elements into their properties: filter_id, filter_value
+			$filter_vals = array();
+			$filter_ids = array();
+			$n = 0;
+			foreach ($mfilter_arr as $mfilter) {
+				$_data  = preg_split("/[\s]*##[\s]*/", $mfilter);
+				//print_r($_data);
+				$filter_id = (int) $_data[0];  $filter_value = @$_data[1];
+				$filter_ids[] = $filter_id;
+				
+				if ( $filter_id ) {
+					$filter_vals[$filter_id] = $filter_value;
+					//if ($is_persistent || JRequest::getVar('filter_'.$filter_id, false) === false ) {
+					if ($is_persistent || !in_array($filter_id, array_keys($persistent_a))) {
+						//echo "filter_".$filter_id.": "; print_r( $filter_value ); echo "<br/>";
+						if (strpos($filter_value, '---') !== false) {
+							// Range value:  value01---value02
+							$filter_value = explode('---', $filter_value);
+							$filter_value[2] = $filter_value[1];
+							$filter_value[1] = $filter_value[0];
+							unset($filter_value[0]);
+						} else if (strpos($filter_value, '+++') !== false) {
+							// Multiple values:  value01+++value02+++value03+++value04
+							$filter_value = explode('+++', $filter_value);
+						}
+						//JRequest::setVar('filter_'.$filter_id, $filter_value);
+						$persistent_a[$filter_id] = $filter_value;
+					}
+				}
+			}
+			// Set variable of filters, so that they will be allowed
+			$cparams->set($mfilter_name, count($filter_ids) ? $filter_ids : null);
+		}
+		return $persistent_a;
+	}
 }
 
 ?>
