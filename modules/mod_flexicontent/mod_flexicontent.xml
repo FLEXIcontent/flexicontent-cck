@@ -291,6 +291,10 @@
 				<option value="1">FLEXI_CURRENT_ITEM_DATE_ABOVE</option>
 			</field>
 			<field name="datecomp_field" type="fields" fieldnameastext="true" default="" multiple="false" field_type="date" label="FLEXI_SELECT_DATECOMP_FIELD" description="FLEXI_SELECT_DATECOMP_FIELD_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_CUSTOM_FILTERS" level="level1" menu="hide" />
+			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="Persistent Filters (experimental)" description="Filters that can NOT be overriden by category filters. Enter like: field_id##value %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword for ranges use field_id##value1---value2 for multiple values use field_id##value1+++value2+++value3 NOTE: your field must be configured to be range filter or multi-value filter or the values will not be used as expected" />
+			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="Initial Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##value %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword for ranges use field_id##value1---value2 for multiple values use field_id##value1+++value2+++value3 NOTE: your field must be configured to be range filter or multi-value filter or the values will not be used as expected" />
 		
 	  <field name="" type="jparamstab" title="FLEXI_ITEM_LIST_FIELD_SELECTION" description="FLEXI_ITEM_LIST_FIELD_SELECTION_DESC" />
 			<field name="" type="separator" default="FLEXI_TITLE" level="level1" menu="hide" />
