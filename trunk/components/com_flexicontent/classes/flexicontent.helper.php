@@ -486,6 +486,19 @@ class flexicontent_html
 				//$js = "";
 				break;
 			
+			case 'zTree':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				
+				// Add swipe CSS / JS
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/zTree/css/flexi_ztree.css');
+				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/zTree/css/zTreeStyle/zTreeStyle.css');
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/zTree/js/jquery.ztree.all-3.5.min.js');
+				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/zTree/js/jquery.ztree.core-3.5.js');
+				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/zTree/js/jquery.ztree.excheck-3.5.js');
+				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/zTree/js/jquery.ztree.exedit-3.5.js');
+				$js = "";
+				break;
+			
 			default:
 				JFactory::getApplication()->enqueueMessage(__FUNCTION__.' Cannot load unknown Framework: '.$framework, 'error');
 				break;

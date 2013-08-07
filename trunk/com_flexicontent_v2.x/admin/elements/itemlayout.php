@@ -96,7 +96,7 @@ class JFormFieldItemlayout extends JFormFieldList
 			if ($typedata) {
 				$tparams = FLEXI_J16GE ? new JRegistry($typedata->attribs) : new JParameter($typedata->attribs);
 				$type_default_layout = $tparams->get('ilayout', 'default');
-				$type_default_layout_mobile = $tparams->get('ilayout_mobile', JText::_('FLEXI_USE_NORMAL'));
+				$type_default_layout_mobile = $tparams->get('ilayout_mobile', JText::_('FLEXI_USE_DESKTOP'));
 				$allowed_tmpls = $tparams->get('allowed_ilayouts');
 				if ( empty($allowed_tmpls) )							$allowed_tmpls = array();
 				else if ( ! is_array($allowed_tmpls) )		$allowed_tmpls = !FLEXI_J16GE ? array($allowed_tmpls) : explode("|", $allowed_tmpls);

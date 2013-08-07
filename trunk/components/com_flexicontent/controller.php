@@ -41,6 +41,7 @@ class FlexicontentController extends JControllerLegacy
 		// Register Extra task
 		$this->registerTask( 'save_a_preview', 'save');
 		$this->registerTask( 'apply', 'save');
+		$this->registerTask( 'download_tree', 'download');
 	}
 	
 	
@@ -1214,6 +1215,73 @@ class FlexicontentController extends JControllerLegacy
 	
 	
 	/**
+	 * Traverse Tree to create folder structure and get/prepare file objects
+	 *
+	 * @access public
+	 * @since 1.0
+	 */
+	function _traverseFileTree($nodes, $targetpath)
+	{
+		jimport('joomla.filesystem.file');
+		jimport('joomla.filesystem.archive');
+		$all_files = array();
+		
+		foreach ($nodes as $node)
+		{
+			// Folder (Parent node)
+			if ( $node->isParent ) {
+				$targetpath_node = JPath::clean($targetpath.DS.$node->name);
+				JFolder::create($targetpath_node, 0755);
+				
+				// Folder has sub-contents
+				if ( !empty($node->children) ) {
+					$node_files = $this->_traverseFileTree($node->children, $targetpath_node);
+					foreach ($node_files as $nodeID => $file)  $all_files[$nodeID] = $file;
+				}
+			}
+			
+			// File (Leaf node)
+			else {
+				$file = new stdClass();
+				$nodeID = $node->id;
+				$file->fieldid    = (int) $node->fieldid;  // sql security ...
+				$file->contentid  = (int) $node->contentid; // sql security ...
+				$file->fileid     = (int) $node->fileid; // sql security ...
+				$file->filename   = $node->name;
+				// (of course) for each file the target path includes the filename,
+				// which can be different than original filename (user may have renamed it)
+				$file->targetpath = $targetpath.DS.$file->filename;
+				$all_files[$nodeID] = $file;
+			}
+		}
+		return $all_files;
+	}
+	
+		
+	/**
+	 * Set file/folder tree into user's session
+	 *
+	 * @access public
+	 * @since 1.0
+	 */
+	function setfilestree()
+	{
+		$tree_var = JRequest::getVar( 'tree_var', "" );
+		$tree_json = JRequest::getVar( $tree_var, "" );
+		
+		// Some validation check
+		$nodes = json_decode($tree_json);
+		if ( !is_array($nodes) ) { echo "tree data invalid"; jexit(); }
+		
+		// Set tree data into session
+		$session = JFactory::getSession();
+		$session->set($tree_var, $tree_json, 'flexicontent');
+		echo "tree data stored";
+		jexit();
+	}
+	
+	
+	/**
 	 * Download logic
 	 *
 	 * @access public
@@ -1226,12 +1294,48 @@ class FlexicontentController extends JControllerLegacy
 		$app   = JFactory::getApplication();
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
+		$task  = JRequest::getVar( 'task', 'download' );
+		$session = JFactory::getSession();
 		
-		// Get HTTP REQUEST variables
-		$fieldid   = JRequest::getInt( 'fid', 0 );
-		$contentid = JRequest::getInt( 'cid', 0 );
-		$fileid    = JRequest::getInt( 'id', 0 );
 		
+		// ***************************************************************************************************
+		// Single file download (via HTTP request) or multi-file downloaded (via a folder structure in COOKIE)
+		// ***************************************************************************************************
+		
+		if ($task == 'download_tree')
+		{
+			// Get zTree data and parse JSON string
+			if ($session->has('ztree_nodes_json', 'flexicontent')) {
+				$ztree_nodes_json = $session->get('ztree_nodes_json', false,'flexicontent');
+			}
+			$nodes = json_decode($ztree_nodes_json);
+			
+			// Some validation check
+			if ( !is_array($nodes) ) {
+				$app->enqueueMessage("Tree structure is empty or invalid", 'notice');
+				$this->setRedirect('index.php', '');
+				return;
+			}
+			
+			$app = JFactory::getApplication();
+			$app->getCfg('tmp_path');
+			$targetpath = JPath::clean($app->getCfg('tmp_path').DS.time());
+			
+			$tree_files = $this->_traverseFileTree($nodes, $targetpath);
+			//echo "<pre>"; print_r($tree_files); exit;
+			
+			if ( empty($tree_files) ) {
+				$app->enqueueMessage("No files selected for download", 'notice');
+				$this->setRedirect('index.php', '');
+				return;
+			}
+		} else {
+			$file_node = new stdClass();
+			$file_node->fieldid   = JRequest::getInt( 'fid', 0 );
+			$file_node->contentid = JRequest::getInt( 'cid', 0 );
+			$file_node->fileid    = JRequest::getInt( 'id', 0 );
+			$tree_files = array($file_node);
+		}
 		
 		// **************************************************
 		// Create and Execute SQL query to retrieve file info
@@ -1241,7 +1345,7 @@ class FlexicontentController extends JControllerLegacy
 		$joinaccess = $andaccess = $joinaccess2 = $andaccess2 = '';
 		$this->_createFieldItemAccessClause( $joinaccess, $andaccess, $joinaccess2, $andaccess2);
 		
-		// Extra access CLAUSEs for given file (this is conmbined with the above CLAUSEs for field and item access)
+		// Extra access CLAUSEs for given file (this is combined with the above CLAUSEs for field and item access)
 		if (FLEXI_J16GE) {
 			$aid_arr = $user->getAuthorisedViewLevels();
 			$aid_list = implode(",", $aid_arr);
@@ -1256,156 +1360,214 @@ class FlexicontentController extends JControllerLegacy
 			}
 		}
 		
-		$query  = 'SELECT f.id, f.filename, f.secure, f.url'
-				.' FROM #__flexicontent_fields_item_relations AS rel'
-				.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
-				.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
-				.' LEFT JOIN #__content AS i ON i.id = rel.item_id'
-				.' LEFT JOIN #__categories AS c ON c.id = i.catid'
-				.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-				.' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-				. $joinaccess
-				. $joinaccess2
-				.' WHERE rel.item_id = ' . (int)$contentid
-				.' AND rel.field_id = ' . (int)$fieldid
-				.' AND f.id = ' . (int)$fileid
-				.' AND f.published= 1'
-				. $andaccess
-				. $andaccess2
-				;
-		$db->setQuery($query);
-		$file = $db->loadObject();
-		if ($db->getErrorNum())  {
-			JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-			exit;
-		}
 		
+		// ***************************
+		// Get file data for all files
+		// ***************************
 		
-		// ************************************************************************
-		// Check for user not having the required Access Level (empty query result)
-		// ************************************************************************
-		
-		if ( empty($file) ) {
-			$msg = !$db->getErrorNum() ? JText::_( 'FLEXI_ALERTNOTAUTH' ) : __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()) ;
-			$app->enqueueMessage($msg,'error');
-			$this->setRedirect('index.php', '');
-			return;
-		}
-		
-		// ****************************************************
-		// (for non-URL) Create file path and check file exists
-		// ****************************************************
-		
-		if ( !$file->url ) {
-			$basePath = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-			$abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file->filename));
-			if ( !JFile::exists($abspath) ) {
-				$msg = JText::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
-				$link = 'index.php';
-				$this->setRedirect($link, $msg);
-				return;
+		$valid_files = array();
+		foreach ($tree_files as $file_node)
+		{
+			// Get file variable shortcuts (reforce being int)
+			$fieldid   = (int) $file_node->fieldid;
+			$contentid = (int) $file_node->contentid;
+			$fileid    = (int) $file_node->fileid;
+			
+			$query  = 'SELECT f.id, f.filename, f.secure, f.url'
+					.' FROM #__flexicontent_fields_item_relations AS rel'
+					.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
+					.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+					.' LEFT JOIN #__content AS i ON i.id = rel.item_id'
+					.' LEFT JOIN #__categories AS c ON c.id = i.catid'
+					.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+					.' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+					. $joinaccess
+					. $joinaccess2
+					.' WHERE rel.item_id = ' . $contentid
+					.' AND rel.field_id = ' . $fieldid
+					.' AND f.id = ' . $fileid
+					.' AND f.published= 1'
+					. $andaccess
+					. $andaccess2
+					;
+			$db->setQuery($query);
+			$file = $db->loadObject();
+			if ($db->getErrorNum())  {
+				JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+				exit;
 			}
+			
+			
+			// ************************************************************************
+			// Check for user not having the required Access Level (empty query result)
+			// ************************************************************************
+			
+			if ( empty($file) )
+			{
+				$msg = JText::_( 'FLEXI_ALERTNOTAUTH' ). "No access for file #: ". $fileid ." of content #: ". $contentid ." in field #: ".$fieldid;
+				$app->enqueueMessage($msg,'notice');
+				
+				// Only abort for single file download
+				if ($task != 'download_tree') { $this->setRedirect('index.php', ''); return; }
+			}
+			
+			
+			// ****************************************************
+			// (for non-URL) Create file path and check file exists
+			// ****************************************************
+			
+			if ( !$file->url )
+			{
+				$basePath = $file->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+				$file->abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file->filename));
+				
+				if ( !JFile::exists($file->abspath) )
+				{
+					$msg = JText::_( 'FLEXI_REQUESTED_FILE_DOES_NOT_EXIST_ANYMORE' );
+					$app->enqueueMessage($msg, 'notice');
+					
+					// Only abort for single file download
+					if ($task != 'download_tree') { $this->setRedirect('index.php', ''); return; }
+				}
+			}
+			
+			
+			// **********************
+			// Increment hits counter
+			// **********************
+			
+			$filetable = JTable::getInstance('flexicontent_files', '');
+			$filetable->hit($fileid);
+			
+			
+			// **************************
+			// Special case file is a URL
+			// **************************
+			
+			if ($file->url)
+			{
+				// skip url-based file if downloading multiple files
+				if ($task=='download_tree') {
+					$msg = "Skipped URL based file: ".$file->url;
+					$app->enqueueMessage($msg, 'notice');
+					continue;
+				}
+				
+				// redirect to the file download link
+				@header("Location: ".$file->filename."");
+				$app->close();
+			}
+			
+			
+			// *********************************************************************
+			// Set file (tree) node and assign file into valid files for downloading
+			// *********************************************************************
+			
+			$file->node = $file_node;
+			$valid_files[$fileid] = $file;
 		}
-		
-		
-		// **********************
-		// Increment hits counter
-		// **********************
-		
-		$filetable = JTable::getInstance('flexicontent_files', '');
-		$filetable->hit($fileid);
-		
-		
-		// **************************
-		// Special case file is a URL
-		// **************************
-		
-		if ($file->url) {
-			// redirect to the file download link
-			@header("Location: ".$file->filename."");
-			$app->close();
-		}
-		
-		
-		// *****************************************
-		// Output an appropriate Content-Type header
-		// *****************************************
-		
-		// Get filesize and extension
-		$size = filesize($abspath);
-		$ext  = strtolower(JFile::getExt($file->filename));
+		//echo "<pre>"; print_r($valid_files); exit;
 		
 		// * Required for IE, otherwise Content-disposition is ignored
 		if (ini_get('zlib.output_compression')) {
 			ini_set('zlib.output_compression', 'Off');
 		}
-
-		switch( $ext )
-		{
-			case "pdf":
-				$ctype = "application/pdf";
-				break;
-			case "exe":
-				$ctype="application/octet-stream";
-				break;
-			case "rar":
-			case "zip":
-				$ctype = "application/zip";
-				break;
-			case "txt":
-				$ctype = "text/plain";
-				break;
-			case "doc":
-				$ctype = "application/msword";
-				break;
-			case "xls":
-				$ctype = "application/vnd.ms-excel";
-				break;
-			case "ppt":
-				$ctype = "application/vnd.ms-powerpoint";
-				break;
-			case "gif":
-				$ctype = "image/gif";
-				break;
-			case "png":
-				$ctype = "image/png";
-				break;
-			case "jpeg":
-			case "jpg":
-				$ctype = "image/jpg";
-				break;
-			case "mp3":
-				$ctype = "audio/mpeg";
-				break;
-			default:
-				$ctype = "application/force-download";
+		
+		if ($task=='download_tree') {
+			// Copy Files
+			foreach ($valid_files as $file) JFile::copy($file->abspath, $file->node->targetpath);
+			
+			// Get file list recursively, and calculate archive filename
+			$fileslist   = JFolder::files($targetpath, '.', $recurse=true, $fullpath=true);
+			$archivename = $user->id."_".time().(FLEXI_J16GE ? '.zip' : '.tar.gz');
+			$archivepath = JPath::clean( $app->getCfg('tmp_path').DS.$archivename );
+			//echo "Compressing folder: ". $targetpath ." into archive: ". $archivepath ."<br>\n";
+			
+			// Create the archive
+			if (!FLEXI_J16GE) {
+				JArchive::create($archivepath, $fileslist, 'gz', '', $targetpath);
+			} else {
+				$app = JFactory::getApplication('administrator');
+				$files = array();
+				foreach ($fileslist as $i => $filename) {
+					$files[$i]=array();
+					$files[$i]['name'] = preg_replace("%^(\\\|/)%", "", str_replace($targetpath, "", $filename) );  // STRIP PATH for filename inside zip
+					$files[$i]['data'] = implode('', file($filename));   // READ contents into string, here we use full path
+					$files[$i]['time'] = time();
+				}
+				
+				$packager = JArchive::getAdapter('zip');
+				if (!$packager->create($archivepath, $files)) {
+					$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
+					$app->enqueueMessage($msg, 'notice');
+					$this->setRedirect('index.php', '');
+					return;
+				}
+			}
+			
+			// Remove temporary folder structure
+			if (!JFolder::delete(($targetpath)) ) {
+				$msg = "Temporary folder ". $targetpath ." could not be deleted";
+				$app->enqueueMessage($msg, 'notice');
+			}
+			
+			$dlfile = new stdClass();
+			$dlfile->filename = $archivename;
+			$dlfile->abspath  = $archivepath;
+		} else {
+			$dlfile = reset($valid_files);
 		}
-/*		
+		
+		// Get file filesize and extension
+		$dlfile->size = filesize($dlfile->abspath);
+		$dlfile->ext  = strtolower(JFile::getExt($dlfile->filename));
+		
+		// Set content type of file (that is an archive for multi-download)
+		$ctypes = array(
+			"pdf" => "application/pdf", "exe" => "application/octet-stream", "rar" => "application/zip", "zip" => "application/zip",
+			"txt" => "text/plain", "doc" => "application/msword", "xls" => "application/vnd.ms-excel", "ppt" => "application/vnd.ms-powerpoint",
+			"gif" => "image/gif", "png" => "image/png", "jpeg" => "image/jpg", "jpg" => "image/jpg", "mp3" => "audio/mpeg"
+		);
+		$dlfile->ctype = isset($ctypes[$dlfile->ext]) ? $ctypes[$dlfile->ext] : "application/force-download";
+		
+		
+		// *****************************************
+		// Output an appropriate Content-Type header
+		// *****************************************
+		//echo "<pre>"; print_r($dlfile); exit;
+		/*
 		JResponse::setHeader('Pragma', 'public');
 		JResponse::setHeader('Expires', 0);
 		JResponse::setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
 		JResponse::setHeader('Cache-Control', 'private', false);
-		JResponse::setHeader('Content-Type', $ctype);
-		JResponse::setHeader('Content-Disposition', 'attachment; filename="'.$file.'";');
+		JResponse::setHeader('Content-Type', $dlfile->ctype);
+		JResponse::setHeader('Content-Disposition', 'attachment; filename="'.$dlfile->filename.'";');
 		JResponse::setHeader('Content-Transfer-Encoding', 'binary');
-		JResponse::setHeader('Content-Length', $size);
-*/
+		JResponse::setHeader('Content-Length', $dlfile->size);
+		*/
 		header("Pragma: public"); // required
 		header("Expires: 0");
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-		header("Cache-Control: private",false); // required for certain browsers
-		header("Content-Type: $ctype");
+		header("Cache-Control: private", false); // required for certain browsers
+		header("Content-Type: ".$dlfile->ctype);
 		//quotes to allow spaces in filenames
-		header("Content-Disposition: attachment; filename=\"".$file->filename."\";" );
+		header("Content-Disposition: attachment; filename=\"".$dlfile->filename."\";" );
 		header("Content-Transfer-Encoding: binary");
-		header("Content-Length: ".$size);
+		header("Content-Length: ".$dlfile->size);
 		
 		
 		// *******************************
 		// Finally read file and output it
 		// *******************************
 		
-		readfile($abspath);
+		readfile($dlfile->abspath);
+		
+		// ****************************************************
+		// In case of multi-download clear the session variable
+		// ****************************************************
+		if ($task=='download_tree') $ztree_nodes_json = $session->set('ztree_nodes_json', false,'flexicontent');
+		
+		// Done ... terminate execution
 		$app->close();
 	}
 	
@@ -1446,9 +1608,9 @@ class FlexicontentController extends JControllerLegacy
 				.' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 				. $joinaccess
 				. $joinaccess2
-				.' WHERE rel.item_id = ' . (int)$contentid
-				.' AND rel.field_id = ' . (int)$fieldid
-				.' AND rel.valueorder = ' . (int)$order
+				.' WHERE rel.item_id = ' . $contentid
+				.' AND rel.field_id = ' . $fieldid
+				.' AND rel.valueorder = ' . $order
 				. $andaccess
 				. $andaccess2
 				;
@@ -1485,9 +1647,9 @@ class FlexicontentController extends JControllerLegacy
 		// update the array in the DB
 		$query 	= 'UPDATE #__flexicontent_fields_item_relations'
 				.' SET value = ' . $db->Quote($value)
-				.' WHERE item_id = ' . (int)$contentid
-				.' AND field_id = ' . (int)$fieldid
-				.' AND valueorder = ' . (int)$order
+				.' WHERE item_id = ' . $contentid
+				.' AND field_id = ' . $fieldid
+				.' AND valueorder = ' . $order
 				;
 		$db->setQuery($query);
 		if (!$db->query()) {

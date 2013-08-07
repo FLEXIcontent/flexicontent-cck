@@ -21,16 +21,19 @@
 				<option value="vertical">Vertical</option>
 				<option value="horizontal">Horizontal</option>
 			</field>
-			<field name="carousel_padding_top_bottom" type="text" default="8" label="Padding top/bottom" description="This is the padding applied at top and bottom of the items" />
-			<field name="carousel_padding_left_right" type="text" default="12" label="Padding left/right" description="This is the padding applied at left and right of the items" />
 			
-			<field name="" type="separator" default="Layout Horizontal" level="level3" />
-			<field name="carousel_hdir_item_width" type="text" default="250" label="item width" description="Width of items when scrolling horizontally" />
-			<field name="carousel_hdir_margin_right" type="text" default="12" label="Padding right" description="This is the margin applied at right of items in a horizontal carousel" />
+			<field name="" type="separator" default="Item dimensions (px)" level="level3" />
+			<field name="carousel_padding_top_bottom" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="carousel_padding_left_right" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
+			<field name="carousel_border_width" type="text" default="1" label="border width" description="This is the border width applied around the items" />
 			
-			<field name="" type="separator" default="Layout Vertical" level="level3" />
+			<field name="" type="separator" default="Horizontal Layout" level="level3" />
+			<field name="carousel_hdir_item_width" type="text" default="250" label="item width (px)" description="Width of items when scrolling horizontally" />
+			<field name="carousel_hdir_margin_right" type="text" default="12" label="item padding right (px)" description="This is the margin applied at right of items in a horizontal carousel" />
+			
+			<field name="" type="separator" default="Vertical Layout" level="level3" />
 			<field name="carousel_vdir_items" type="text" default="2" label="# items" description="Number of items that will be displayed when scrolling vertically" />
-			<field name="carousel_vdir_margin_bottom" type="text" default="6" label="Margin bottom" description="This is the margin applied at bottom of items in a vertical carousel" />
+			<field name="carousel_vdir_margin_bottom" type="text" default="6" label="item margin bottom (px)" description="This is the margin applied at bottom of items in a vertical carousel" />
 			
 			<field name="" type="separator" default="Thumbnails Buttons" level="level3" />
 			<field name="carousel_show_handles" type="radio" default="1" label="Enable" description="Display One Thumbnail will be created per content item, and content will be accessible via click or mouseover">

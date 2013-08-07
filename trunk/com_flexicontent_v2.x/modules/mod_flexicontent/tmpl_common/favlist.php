@@ -11,6 +11,7 @@
 	$fav_tip_title	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
 	$fav_tip_hover	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
 	$fav_show_item	= JText::_( 'READ MORE...' );
+	$forced_itemid = $params->get('forced_itemid');
 	$js = '
     var fl_currentURL   = window.location;
     var fl_base_folder  = "'.JURI::base(true).'";

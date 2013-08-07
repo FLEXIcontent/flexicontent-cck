@@ -57,16 +57,16 @@
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMS_LABEL" level="level2" menu="hide" />
 			<field name="useicon" type="radio" default="1" label="FLEXI_FIELD_MIME_ICON" description="FLEXI_FIELD_MIME_ICON_DESC">
-				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="usebutton" type="radio" default="0" label="FLEXI_FIELD_DOWNLOAD_BUTTON" description="FLEXI_FIELD_DOWNLOAD_BUTTON_DESC">
-				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="display_filename" type="radio" default="0" label="FLEXI_FIELD_FILE_SHOW_FILENAME" description="FLEXI_FIELD_FILE_SHOW_FILENAME_DESC">
-				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="display_descr" type="list" default="1" label="FLEXI_FIELD_FILE_SHOW_DESCR" description="FLEXI_FIELD_FILE_SHOW_DESCR_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -98,6 +98,12 @@
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
 				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+			</field>
+			
+			<field name="" type="separator" default="Support of 3rd-party software" level="level1" />
+			<field name="use_downloads_manager" type="radio" default="0" label="Use downloads manager module" description="Please do not enable this. This feature allows managing your downloads via the downloads manager module, e.g. allow user arranging his/her downloads into folders, downloading all files via a single compressed archive, etc ...">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 		</fieldset>
