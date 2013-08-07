@@ -1,0 +1,57 @@
+.ztree div, .ztree span, .ztree applet, .ztree object, .ztree iframe,
+.ztree h1, .ztree h2, .ztree h3, .ztree h4, .ztree h5, .ztree h6,
+.ztree p, .ztree blockquote, .ztree pre, .ztree a, .ztree abbr,
+.ztree acronym, .ztree address, .ztree big, .ztree cite, .ztree code,
+.ztree del, .ztree dfn, .ztree em, .ztree font, .ztree img, .ztree ins, .ztree kbd,
+.ztree q, .ztree s, .ztree samp, .ztree small, .ztree strike, .ztree strong, .ztree sub, .ztree sup,
+.ztree tt, .ztree var, .ztree dl, .ztree dt, .ztree dd, .ztree ol, .ztree ul, .ztree li,
+.ztree fieldset, .ztree form, .ztree label, .ztree legend, .ztree table, .ztree caption,
+.ztree tbody, .ztree tfoot, .ztree thead, .ztree tr, .ztree th, .ztree td
+{
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-weight: inherit;
+	font-style: inherit;
+	font-size: 100%;
+	font-family: inherit;
+	vertical-align: baseline;
+}
+.zTreeBackground {
+	color: #2f332a;
+	font: 15px/21px Arial, Helvetica, simsun, sans-serif;
+	background: #f0f6e4;
+	text-align:left;
+}
+
+.ztree {
+	margin-top: 10px;
+	border: 1px solid #617775;
+	background: #f0f6e4;
+	height:360px;
+	overflow-y:scroll;
+	overflow-x:auto;
+	font-size: 11px;
+	font-family: arial;
+}
+
+.ztree h1, .ztree h2, .ztree h3,
+.ztree h4, .ztree h5, .ztree h6 {color: #2f332a; font-weight: bold; font-family: Helvetica, Arial, sans-serif; padding-bottom: 5px;}
+.ztree h1 {font-size: 24px; line-height: 34px; text-align: center;}
+.ztree h2 {font-size: 14px; line-height: 24px; padding-top: 5px;}
+.ztree h6 {font-weight: normal; font-size: 12px; letter-spacing: 1px; line-height: 24px; text-align: center;}
+.ztree a {color: black !important; text-decoration: none !important;}
+.ztree a:hover {background-color: gray !important; color:white !important;}
+.ztree input.radio {margin: 0 2px 0 8px;}
+.ztree input.radio.first {margin-left:0;}
+.ztree input.empty {color: lightgray;}
+.ztree code {color: #2f332a;}
+.ztree .highlight_red {color:#A60000;}
+.ztree .highlight_green {color:#A7F43D;}
+
+.zTreeBackground ul.log {border: 1px solid #617775;background: #f0f6e4;width:300px;height:170px;overflow: hidden;}
+.zTreeBackground ul.log.small {height:45px;}
+.zTreeBackground ul.log li {color: #666666;list-style: none;padding-left: 10px;}
+.zTreeBackground ul.log li.dark {background-color: #E3E3E3;}
+

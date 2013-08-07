@@ -27,8 +27,7 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'
 require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'datetime.php');
 
 class modFlexicontentHelper
-{
-	
+{	
 	function getList(&$params)
 	{
 		global $modfc_jprof, $mod_fc_run_times;
@@ -1351,27 +1350,47 @@ class modFlexicontentHelper
 		// Finally put together the query to retrieve the listed items
 		// ***********************************************************
 		
-		// Set filters via menu parameters
-		self::_setFilters( $params, 'persistent_filters', $is_persistent=1);
-		$persistent_a = self::_setFilters( $params, 'initial_filters'   , $is_persistent=0); //does not use this variable now, waiting for Georgios do this ;)
+		// ******************
+		// Custom FIELD scope
+		// ******************
 		
-		$valueswhere = '';
-		$join_field_x = '';
-		foreach($persistent_a as $filter_id=>$filter_values) {
-			if(is_array($filter_values)) {
-				if(isset($filter_values[0])) {
-					$valueswhere .= ' AND rel'.$filter_id.' IN ('.implode(',', $filter_values[0]).') ';
-				}else{
-					$value_empty = !strlen(@$filter_values[1]) && strlen(@$filter_values[2]) ? ' OR rel'.$filter_id.'="" OR rel'.$filter_id.' IS NULL ' : '';
-					if ( strlen(@$filter_values[1]) ) $valueswhere .= ' AND (rel'.$filter_id.' >=' . $filter_values[1] . ') ';
-					if ( strlen(@$filter_values[2]) ) $valueswhere .= ' AND (rel'.$filter_id.' <=' . $filter_values[2] . $value_empty . ') ';
-				}
-			}else{
-				$valueswhere .= ' AND rel'.$filter_id.'.value = '.$db->Quote($filter_values);
+		// ******* TODO: (a) add dynamic behaviour, (b) add method (ALL, include, exclude) ******* 
+		
+		// Static Field Filters (These are a string that MAPs filter ID TO filter VALUES)
+		// These field filters apply a STATIC filtering, regardless of current item being displayed.
+		$static_filters = self::_setFilters( $params, 'static_filters', $is_persistent=1, $set_method="array");
+		
+		// Dynamic Field Filters (THIS is filter IDs list)
+		// These field filters apply a DYNAMIC filtering, that depend on current item being displayed. The items that have same value as currently displayed item will be included in the list.
+		//$dynamic_filters = self::_setFilters( $params, 'dynamic_filters', $is_persistent=0);
+		
+		$where_field_filters = '';
+		$join_field_filters = '';
+		foreach ($static_filters as $filter_id => $filter_values)
+		{
+			// Hanlde single-valued filter as multi-valued
+			if ( !is_array($filter_values) ) $filter_values[0] = array($filter_values);
+			
+			// Single or Multi valued filter
+			if ( isset($filter_values[0]) )
+			{
+				$in_values = array();
+				foreach ($filter_values as $val) $in_values[] = $db->Quote( $val );   // Quote in case they are strings !!
+				$where_field_filters .= ' AND rel'.$filter_id.' IN ('.implode(',', $in_values).') ';
 			}
-			$join_field_x .= ' JOIN #__flexicontent_fields_item_relations rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;
+			
+			// Range value filter
+			else {
+				// Special case only one part of range provided ... must MATCH/INCLUDE empty values or NULL values ...
+				$value_empty = !strlen(@$filter_values[1]) && strlen(@$filter_values[2]) ? ' OR rel'.$filter_id.'="" OR rel'.$filter_id.' IS NULL ' : '';
+				
+				if ( strlen(@$filter_values[1]) ) $where_field_filters .= ' AND (rel'.$filter_id.' >=' . $filter_values[1] . ') ';
+				if ( strlen(@$filter_values[2]) ) $where_field_filters .= ' AND (rel'.$filter_id.' <=' . $filter_values[2] . $value_empty . ') ';
+			}
+			
+			$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;
 		}
-		
+
 		if ( empty($items_query) ) {  // If a custom query has not been set above then use the default one ...
 			$items_query 	= 'SELECT '
 				.' i.id '
@@ -1389,17 +1408,13 @@ class modFlexicontentHelper
 				.($ordering=='commented' ? $join_comments : '')
 				.($ordering=='rated' ? $join_rated : '')
 				. $join_field
-				. $join_field_x
+				. $join_field_filters
 				. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
+				. $where_field_filters
 				. ' GROUP BY i.id'
-				. $valueswhere
 				. $orderby
 				;
-			
-			// Set filters via menu parameters
-			self::_setFilters( $params, 'persistent_filters', $is_persistent=1);
-			$persistent_a = self::_setFilters( $params, 'initial_filters'   , $is_persistent=0); //does not use this variable now, waiting for Georgios do this ;)
-			
+
 			$items_query_data 	= 'SELECT '
 				.' i.*, ie.*, ty.name AS typename,'
 				. ($select_comments ? $select_comments.',' : '')
@@ -1419,9 +1434,7 @@ class modFlexicontentHelper
 				. $join_comments
 				. $join_rated
 				. $join_field
-				. $join_field_x
 				. ' WHERE i.id IN (__content__)'
-				. $valueswhere
 				. ' GROUP BY i.id'
 				;
 		}
@@ -1726,59 +1739,91 @@ class modFlexicontentHelper
 		}
 	}
 	
+	
 	/**
-	 * Method to set MENU Item filters as HTTP Request variables thus filtering the category view
+	 * Method to set custom field filters VIA configuration
+	 * -- in case of content lists these are set via the menu item (category, search etc)
+	 *    and set as HTTP Request variables to be used by the filtering mechanism of the category model
+	 * -- in case of module these are via module parameters
+	 *    and are returned as an array to be used directly into the SQL quuery
 	 * 
 	 * @access public
 	 * @return object
 	 * @since 1.5
 	 */
-	function _setFilters( &$cparams, $mfilter_name='persistent_filters', $is_persistent=1 )
+	function _setFilters( &$cparams, $mfilter_name='persistent_filters', $is_persistent=1, $set_method="request" )
 	{
-		static $persistent_a = array();
+		$field_filters = array();   // Used when set_method is 'array' instead of 'request'
+		$is_persistent =            // Non-request method does not have initial filters
+			$set_method!="request" ? 1 : $is_persistent;
+			
+		// Get configuration parameter holding the custom field filtering and abort if empty
 		$mfilter_data = $cparams->get($mfilter_name, '');
-		$filter_value = array();
-		if ($mfilter_data) {
-			// Parse filter values
-			$mfilter_arr = preg_split("/[\s]*%%[\s]*/", $mfilter_data);
-			if ( empty($mfilter_arr[count($mfilter_arr)-1]) ) {
-				unset($mfilter_arr[count($mfilter_arr)-1]);
+		if (!$mfilter_data) {
+			$cparams->set($mfilter_name, array());
+			return array();
+		}
+		
+		// Parse configuration parameter into individual fields
+		$mfilter_arr = preg_split("/[\s]*%%[\s]*/", $mfilter_data);
+		if ( empty($mfilter_arr[count($mfilter_arr)-1]) ) {
+			unset($mfilter_arr[count($mfilter_arr)-1]);
+		}
+		
+		// This array contains the field (filter) ID that were parsed without errors
+		$filter_ids = array();
+		
+		foreach ($mfilter_arr as $mfilter)
+		{
+			// a. Split elements into their properties: filter_id, filter_value
+			$_data  = preg_split("/[\s]*##[\s]*/", $mfilter);  //print_r($_data);
+			$filter_id = (int) $_data[0];
+			$filter_value = @$_data[1];
+			//echo "filter_".$filter_id.": "; print_r( $filter_value ); echo "<br/>";
+			
+			// b. Basic parsing error check: a non numeric field id
+			if ( !$filter_id ) continue;
+			
+			// c. Add field (filter) ID into those that are valid
+			$filter_ids[] = $filter_id;
+			
+			// d. Skip field filter, if it is not persistent and user user has overriden it
+			if ( !$is_persistent && JRequest::getVar('filter_'.$filter_id, false) !== false ) continue;
+			
+			// CASE: range values:  value01---value02
+			if (strpos($filter_value, '---') !== false) {
+				$filter_value = explode('---', $filter_value);
+				$filter_value[2] = $filter_value[1];
+				$filter_value[1] = $filter_value[0];
+				unset($filter_value[0]);
 			}
 			
-			// Split elements into their properties: filter_id, filter_value
-			$filter_vals = array();
-			$filter_ids = array();
-			$n = 0;
-			foreach ($mfilter_arr as $mfilter) {
-				$_data  = preg_split("/[\s]*##[\s]*/", $mfilter);
-				//print_r($_data);
-				$filter_id = (int) $_data[0];  $filter_value = @$_data[1];
-				$filter_ids[] = $filter_id;
-				
-				if ( $filter_id ) {
-					$filter_vals[$filter_id] = $filter_value;
-					//if ($is_persistent || JRequest::getVar('filter_'.$filter_id, false) === false ) {
-					if ($is_persistent || !in_array($filter_id, array_keys($persistent_a))) {
-						//echo "filter_".$filter_id.": "; print_r( $filter_value ); echo "<br/>";
-						if (strpos($filter_value, '---') !== false) {
-							// Range value:  value01---value02
-							$filter_value = explode('---', $filter_value);
-							$filter_value[2] = $filter_value[1];
-							$filter_value[1] = $filter_value[0];
-							unset($filter_value[0]);
-						} else if (strpos($filter_value, '+++') !== false) {
-							// Multiple values:  value01+++value02+++value03+++value04
-							$filter_value = explode('+++', $filter_value);
-						}
-						//JRequest::setVar('filter_'.$filter_id, $filter_value);
-						$persistent_a[$filter_id] = $filter_value;
-					}
-				}
+			// CASE: multiple values:  value01+++value02+++value03+++value04
+			else if (strpos($filter_value, '+++') !== false) {
+				$filter_value = explode('+++', $filter_value);
 			}
-			// Set variable of filters, so that they will be allowed
-			$cparams->set($mfilter_name, count($filter_ids) ? $filter_ids : null);
+			
+			// CASE: specific value:  value01
+			else {}
+			
+			// INDIRECT method of using field filter (via HTTP request)
+			if ($set_method=='request')
+				JRequest::setVar('filter_'.$filter_id, $filter_value);
+			
+			// DIRECT method of using field filter (via a returned array)
+			else
+				$field_filters[$filter_id] = $filter_value;
 		}
-		return $persistent_a;
+		
+		// INDIRECT method of using field filter (via HTTP request),
+		// NOTE: we overwrite the above configuration parameter of custom field filters with an ARRAY OF VALID FILTER IDS, to 
+		// indicate to category/search model security not to skip these if they are not IN category/search configured filters list
+		if ($set_method=='request')
+			$cparams->set($mfilter_name, count($filter_ids) ? $filter_ids : array());
+		
+		// DIRECT method filter values, return an array of filter values (for direct usage into an SQL query)
+		else
+			return $field_filters;
 	}
 }
 ?>

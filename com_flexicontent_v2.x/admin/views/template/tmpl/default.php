@@ -141,38 +141,46 @@ defined('_JEXEC') or die('Restricted access'); ?>
 						<?php echo JText::_( 'FLEXI_CLICK_PROPERTIES' ); ?>
 					</div>
 				</fieldset>
-				<fieldset>
+				
+				<fieldset id="available_fields_container">
 					<legend><?php echo JText::_('FLEXI_AVAILABLE_FIELDS') ?></legend>
+					
+					<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 24px;">
+						<div style="float:left; margin-right:32px;">
+							<div style="float:left;" class="postitle" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
+							<div style="float:left; clear:both;">
+								<?php echo sprintf(str_replace('__au__', '_available', $this->content_type_select), 'available_fields_container', 'hide', 'available'); ?>
+							</div>
+						</div>
+						<div style="float:left;">
+							<div style="float:left;" class="postitle" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
+							<div style="float:left; clear:both;">
+								<?php echo sprintf(str_replace('__au__', '_available', $this->field_type_select), 'available_fields_container', 'hide', 'available'); ?>
+							</div>
+						</div>
+					</div>
+					
 					<div class="postitle"><?php echo JText::_('FLEXI_CORE_FIELDS'); ?></div>
 					<ul id="sortablecorefields" class="positions">
 					<?php
 					foreach ($this->fields as $field) :
 						if ($field->iscore && (!in_array($field->name, $this->used))) :
+							$class_list  = "fields core";
+							$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
+							$class_list .= " field_type_".$field->field_type;
 					?>
-					<li class="fields core" id="field_<?php echo $field->name; ?>"><?php echo $field->label; ?></li>
+					<li class="<?php echo $class_list; ?>" id="field_<?php echo $field->name; ?>"><?php echo $field->label; ?></li>
 					<?php
 						endif;
 					endforeach;
 					?>
 					</ul>
 					
-					<div style="float:left; clear:both; width:100%; margin:12px 0px 12px 24px;">
-						<div style="float:left; margin-right:32px;">
-							<div style="float:left;" class="postitle" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
-							<div style="float:left; clear:both;"><?php echo $this->content_type_select; ?></div>
-						</div>
-						<div style="float:left;">
-							<div style="float:left;" class="postitle" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
-							<div style="float:left; clear:both;"><?php echo $this->field_type_select; ?></div>
-						</div>
-					</div>
-					
 					<div class="postitle"><?php echo JText::_('FLEXI_NON_CORE_FIELDS'); ?></div>
 					<ul id="sortableuserfields" class="positions">
 					<?php
 					foreach ($this->fields as $field) :
 						if (!$field->iscore && (!in_array($field->name, $this->used))) :
-							
 							$class_list  = "fields user";
 							$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
 							$class_list .= " field_type_".$field->field_type;
@@ -187,8 +195,25 @@ defined('_JEXEC') or die('Restricted access'); ?>
 			</td>
 
 			<td width="50%" valign="top">
-				<fieldset>
+				<fieldset id="layout_positions_container">
 					<legend><?php echo JText::_('FLEXI_AVAILABLE_POS') ?></legend>
+					
+					<div style="float:left; clear:both; width:100%; margin:0px 0px 12px 24px;">
+						<div style="float:left; margin-right:32px;">
+							<div style="float:left;" class="postitle" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_TYPE'); ?></div>
+							<div style="float:left; clear:both;">
+								<?php echo sprintf(str_replace('__au__', '_used',$this->content_type_select), 'layout_positions_container', 'highlight', 'used'); ?>
+							</div>
+						</div>
+						<div style="float:left;">
+							<div style="float:left;" class="postitle" ><?php echo JText::_('FLEXI_FILTER').' '.JText::_('FLEXI_FIELD_TYPE'); ?></div>
+							<div style="float:left; clear:both;">
+								<?php echo sprintf(str_replace('__au__', '_used',$this->field_type_select), 'layout_positions_container', 'highlight', 'used'); ?>
+							</div>
+						</div>
+					</div>
+					
+					
 					<?php
 					if (isset($this->layout->positions)) :
 						$count=-1;
@@ -227,11 +252,10 @@ defined('_JEXEC') or die('Restricted access'); ?>
 						if (isset($this->fbypos[$pos])) :
 							foreach ($this->fbypos[$pos]->fields as $f) :
 								if (isset($this->fields[$f])) : // this check is in case a field was deleted
-									
+									$field = $this->fields[$f];
 									$class_list  = "fields ". ($this->fields[$f]->iscore ? 'core' : 'user');
 									$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
 									$class_list .= " field_type_".$field->field_type;
-
 						?>
 							<li class="<?php echo $class_list; ?>" id="field_<?php echo $this->fields[$f]->name; ?>">
 							<?php echo $this->fields[$f]->label . ($this->fields[$f]->iscore ? '' : ' #'.$this->fields[$f]->id); ?>

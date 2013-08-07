@@ -74,8 +74,8 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		foreach ($contentTypes as $contentType) {
 			$options[] = JHTML::_('select.option', $contentType->id, JText::_( $contentType->name ) );
 		}
-		$fieldname =  $elementid = 'content_type';
-		$attribs = ' onchange="filterFieldList(\'sortableuserfields\');" class="fcfield_selectval" ';
+		$fieldname =  $elementid = 'content_type__au__';
+		$attribs = ' onchange="filterFieldList(\'%s\', \'%s\', \'%s\');" class="fcfield_selectval" ';
 		$content_type_select = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
 		
 		
@@ -85,8 +85,8 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		foreach ($fieldTypes as $fieldType) {
 			$options[] = JHTML::_('select.option', $fieldType->type_name, $fieldType->field_name );
 		}
-		$fieldname =  $elementid = 'field_type';
-		$attribs = ' onchange="filterFieldList(\'sortableuserfields\');" class="fcfield_selectval" ';
+		$fieldname =  $elementid = 'field_type__au__';
+		$attribs = ' onchange="filterFieldList(\'%s\', \'%s\', \'%s\');" class="fcfield_selectval" ';
 		$field_type_select = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', '', $elementid );
 		
 		
@@ -179,22 +179,28 @@ class FlexicontentViewTemplate extends JViewLegacy {
 			
 			$js .= '
 			var fieldListFilters = new Array( "content_type", "field_type" );
-			function filterFieldList (listID)
+			function filterFieldList (containerID, method, group)
 			{
 				var needed_classes = "";
 				for (i=0; i<fieldListFilters.length; i++)
 				{
 					filter_name = fieldListFilters[i];
 					
-					var filter_val = jQuery("#"+filter_name).val();
+					var filter_val = jQuery("#" + filter_name + "_" + group).val();
 					if (filter_val) {
 						needed_classes += "."+filter_name+"_"+filter_val;
 					}
 				}
+				
 				if (needed_classes) {
-					jQuery("#"+listID).find("li").show().filter(":not("+needed_classes+")").hide();
-				} else
-					jQuery("#"+listID).find("li").show();
+					(method=="hide") ?
+						jQuery("#"+containerID).find("li").show().filter(":not("+needed_classes+")").hide() :
+						jQuery("#"+containerID).find("li").css({"color":"red"}).filter(":not("+needed_classes+")").css({"color":"black"});
+				} else {
+					(method=="hide") ?
+						jQuery("#"+containerID).find("li").show() :
+						jQuery("#"+containerID).find("li").css({"color":"black"});
+				}
 			}
 			
 			';

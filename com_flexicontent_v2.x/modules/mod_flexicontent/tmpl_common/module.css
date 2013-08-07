@@ -137,6 +137,35 @@
 	text-align: center;
 }
 
+.mod_flexicontent_wrapper ul#mod_fc_favlist {
+	left: 0;
+	list-style: none outside none !important;
+	position: relative !important;
+	text-align: left !important;
+}
+
+.mod_flexicontent_wrapper ul#mod_fc_favlist > li {
+	padding: 0 !important;
+	margin: 0px 0px 0px 8px !important;
+}
+
+.mod_flexicontent_wrapper #mod_fc_favlist a {
+	background: none !important;
+	color: blue !important;
+	text-decoration: none !important;
+	text-transform: none !important;
+	padding: 0 !important;
+	margin: 0px 2px !important;
+	font-weight: bold !important;
+}
+
+.mod_flexicontent_wrapper #mod_fc_favlist a:hover {
+	background: none !important;
+	color: darkred !important;
+	text-decoration: none !important;
+	font-weight: bold !important;
+}
+
 
 /*******************/
 /* CSS HACKS START */
