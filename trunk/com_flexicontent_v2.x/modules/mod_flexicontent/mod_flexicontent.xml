@@ -304,7 +304,6 @@
 			
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_SCOPE" level="level1" menu="hide" />
 			<field name="static_filters" default="" type="textarea" rows="5" cols="32" label="Static Field Filters &lt;br/&gt; &lt;small&gt; (applied regardless of current item) &lt;/small&gt;" description="These field filters apply a STATIC filtering, regardless of current item being displayed. Enter like: field_id##value %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword for ranges use field_id##value1---value2 for multiple values use field_id##value1+++value2+++value3" />
-			<!--field name="dynamic_filters" default="" type="textarea" rows="5" cols="32" label="Dynamic Field Filters &lt;br/&gt; &lt;small&gt; (will list items having same value as currently displayed item)&lt;/small&gt; description="These field filters apply a DYNAMIC filtering, that depend on current item being displayed. The items that have same value as currently displayed item will be included in the list. Enter like: field_id##value %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword for ranges use field_id##value1---value2 for multiple values use field_id##value1+++value2+++value3 NOTE: your field must be configured to be range filter or multi-value filter or the values will not be used as expected" /-->
 		</fieldset>
 		
 		<fieldset name="FLEXI_ITEM_LIST_FIELD_SELECTION" label="FLEXI_ITEM_LIST_FIELD_SELECTION" description="FLEXI_ITEM_LIST_FIELD_SELECTION_DESC">
