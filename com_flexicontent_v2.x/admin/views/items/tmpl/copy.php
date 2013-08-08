@@ -21,7 +21,7 @@ defined('_JEXEC') or die('Restricted access');
 $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 ?>
 
-<div class="flexicontent">
+<div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post"  name="adminForm" id="adminForm">
 
 	<table cellspacing="10" cellpadding="0" border="0" width="100%">
@@ -29,10 +29,10 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 			<td valign="top" width="33%">
 			<fieldset>
 			<legend><?php echo JText::_( 'FLEXI_CONTENTS_LIST' ); ?></legend>
-				<table>
+				<table cellpadding="5">
 					<thead>
 						<tr>
-							<th><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
+							<th style="background-color:#eee;"><?php echo JText::_( 'FLEXI_TITLE' ); ?></th>
 							<th><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></th>
 						</tr>
 					</thead>
@@ -45,7 +45,7 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 										$maincat = $this->itemCats[$catid]->title;
 						?>
 						<tr>
-							<td><?php echo $row->title; ?></td>
+							<td style="background-color:#eee;"><?php echo $row->title; ?></td>
 							<td><?php echo $maincat; ?><input type="hidden" name="cid[]" value="<?php echo $row->id; ?>" /></td>
 						</tr>
 						<?php
@@ -75,11 +75,13 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 		<?php endif; ?>
 		
 				<table>
-					<tr>
+					<tr valign="top">
 					
 					<?php if ($copy_behaviour == 'translate') : ?>
 						<td class="key">
-							<?php echo JText::_( 'FLEXI_METHOD' ); ?>
+							<label class="fckey">
+								<?php echo JText::_( 'FLEXI_METHOD' ); ?>
+							</label>
 							<input type="hidden" name="method" value="99" /> <!-- METHOD number for traslate -->
 							<input type="hidden" name="initial_behaviour" value="copymove" /> <!-- a hidden field to give info to JS initialization code -->
 						</td>
@@ -91,25 +93,32 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 							
 							<input id="method-usejoomfish" type="radio" name="translate_method" value="2" onclick="copymove();" />
 							<label for="method-usejoomfish">
-								<?php echo JText::_( 'FLEXI_USE_JF_DATA' ); ?>
-							</label><div class="clear"></div>
+								<?php echo JText::_( 'FLEXI_USE_JF_FL_DATA' ); ?>
+							</label>
+							<div class="clear"></div>
+							<?php echo JText::_( 'FLEXI_USE_JF_FL_DATA_INFO' ); ?>
 							
-						<?php if ( JFile::exists(JPATH_COMPONENT_SITE.DS.'helpers'.DS.'translator.php') ) : ?>
+						<?php if ( JFile::exists(JPATH_COMPONENT_SITE.DS.'helpers'.DS.'translator.php') ) : /* if automatic translator installed ... */ ?>
+						
 							<input id="method-autotranslation" type="radio" name="translate_method" value="3" onclick="copymove();" />
 							<label for="method-autotranslation">
 								<?php echo JText::_( 'FLEXI_AUTO_TRANSLATION' ); ?>
 							</label><div class="clear"></div>
+							
+							<input id="method-firstjf-thenauto" type="radio" name="translate_method" value="4" onclick="copyonly();" />
+							<label for="method-firstjf-thenauto">
+								<?php echo JText::_( 'FLEXI_FIRST_JF_FL_THEN_AUTO' ); ?>
+							</label>
+							
 						<?php endif; ?>
 						
-							<!--input id="method-firstjf-thenauto" type="radio" name="translate_method" value="4" onclick="copyonly();" /-->
-							<label for="method-firstjf-thenauto">
-								<?php echo " &nbsp;--&nbsp; <span style='color:gray;'>".JText::_( 'FLEXI_FIRST_JF_THEN_AUTO' )."</span>"; ?>
-							</label>
 						</td>
 					<?php else : ?>
 					
 						<td class="key">
-							<?php echo JText::_( 'FLEXI_METHOD' ); ?>
+							<label class="fckey">
+								<?php echo JText::_( 'FLEXI_METHOD' ); ?>
+							</label>
 							<input type="hidden" name="initial_behaviour" value="copyonly" /> <!-- a hidden field to give info to JS initialization code -->
 						</td>
 						<td>
@@ -136,8 +145,8 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 						<td></td>
 						<td></td>
 					</tr>
-					<tr>
-						<td class="key"><?php echo JText::_( 'FLEXI_KEEP_SEC_CATS' ); ?></td>
+					<tr valign="top">
+						<td class="key"><label class="fckey"><?php echo JText::_( 'FLEXI_KEEP_SEC_CATS' ); ?></label></td>
 						<td>
 							<input id="keepseccats0" type="radio" name="keepseccats" value="0" onclick="secmove();" />
 							<label for="keepseccats0">
@@ -150,14 +159,14 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 							</label>
 						</td>						
 					</tr>
-					<tr>
-						<td class="key"><?php echo JText::_( 'FLEXI_KEEP_TAGS' ); ?></td>
+					<tr valign="top">
+						<td class="key"><label class="fckey"><?php echo JText::_( 'FLEXI_KEEP_TAGS' ); ?></label></td>
 						<td>
 							<?php echo JHTML::_('select.booleanlist', 'keeptags', 'class="inputbox"', 1 ); ?>
 						</td>						
 					</tr>
-					<tr>
-						<td class="key"><?php echo JText::_( 'FLEXI_ADD_PREFIX' ); ?></td>
+					<tr valign="top">
+						<td class="key"><label class="fckey"><?php echo JText::_( 'FLEXI_ADD_PREFIX' ); ?></label></td>
 						<td>
 							<?php
 							if ($copy_behaviour == 'translate') $defprefix = JText::_( 'FLEXI_DEFAULT_TRANSLATE_PREFIX' );
@@ -166,28 +175,28 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 							<input type="text" id="prefix" name="prefix" value="<?php echo $defprefix; ?>" size="15" />
 						</td>
 					</tr>
-					<tr>
-						<td class="key"><?php echo JText::_( 'FLEXI_ADD_SUFFIX' ); ?></td>
+					<tr valign="top">
+						<td class="key"><label class="fckey"><?php echo JText::_( 'FLEXI_ADD_SUFFIX' ); ?></label></td>
 						<td>
 							<input type="text" id="suffix" name="suffix" value="" size="15" />
 						</td>
 					</tr>
-					<tr>
-						<td class="key"><?php echo JText::_( 'FLEXI_COPIES_NR' ); ?></td>
+					<tr valign="top">
+						<td class="key"><label class="fckey"><?php echo JText::_( 'FLEXI_COPIES_NR' ); ?></label></td>
 						<td>
 							<input type="text" id="copynr" name="copynr" value="1" size="3" />
 						</td>
 					</tr>
 					<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
-					<tr>
-						<td class="key"><?php echo JText::_( 'NEW' )." ".JText::_( 'FLEXI_LANGUAGE' ); ?></td>
+					<tr valign="top">
+						<td class="key"><label class="fckey"><?php echo JText::_( 'NEW' )." ".JText::_( 'FLEXI_LANGUAGE' ); ?></label></td>
 						<td>
 							<?php echo flexicontent_html::buildlanguageslist('language', '', $this->rows[0]->lang, $type = 5); ?>
 						</td>
 					</tr>
 					<?php endif; ?>
-					<tr>
-						<td class="key"><?php echo JText::_( 'FLEXI_STATE' ); ?></td>
+					<tr valign="top">
+						<td class="key"><label class="fckey"><?php echo JText::_( 'FLEXI_STATE' ); ?></label></td>
 						<td>
 							<?php echo flexicontent_html::buildstateslist('state', '', ''); ?>
 						</td>
@@ -199,14 +208,14 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 			<fieldset>
 			<legend><?php echo JText::_( 'FLEXI_COPY_MOVE_DESTINATION' ); ?></legend>
 				<table>
-					<tr>
-						<td class="key"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></td>
+					<tr valign="top">
+						<td class="key"><label class="fckey"><?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label></td>
 						<td>
 							<?php echo $this->lists['maincat']; ?>
 						</td>
 					</tr>
-					<tr>
-						<td class="key"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></td>
+					<tr valign="top">
+						<td class="key"><label class="fckey"><?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label></td>
 						<td><?php echo $this->lists['seccats']; ?></td>
 					</tr>
 				</table>

@@ -973,6 +973,39 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function copyitems($cid, $keeptags = 1, $prefix, $suffix, $copynr = 1, $lang = null, $state = null, $method = 1, $maincat = null, $seccats = null)
 	{
+		$config = JFactory::getConfig();
+		$dbprefix = $config->getValue('config.dbprefix');
+		
+		// Try to find falang
+		$_FALANG = false;
+		if (FLEXI_J16GE) {
+			$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'falang_content"');
+			$_FALANG = (boolean) count($this->_db->loadObjectList());
+		}
+		
+		// Try to find old joomfish tables (with current DB prefix)
+		$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jf_content"');
+		$_FISH = (boolean) count($this->_db->loadObjectList());
+	
+		// Try to find old joomfish tables (with J1.5 jos prefix)
+		if (!$_FISH) {
+			$this->_db->setQuery('SHOW TABLES LIKE "jos_jf_content"');
+			if ( count($this->_db->loadObjectList()) ) {
+				$_FISH = true;
+				$dbprefix = 'jos_';
+			}
+		}
+		
+		// Detect version of joomfish tables
+		$_FISH22GE = false;
+		if ($_FISH) {
+			$this->_db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jf_languages_ext"');
+			$_FISH22GE = (boolean) count($this->_db->loadObjectList());
+		}
+		
+		$_NEW_LANG_TBL = FLEXI_J16GE || _FISH22GE;
+		
+		
 		// Get if translation is to be performed, 1: FLEXI_DUPLICATEORIGINAL,  2: FLEXI_USE_JF_DATA,  3: FLEXI_AUTO_TRANSLATION,  4: FLEXI_FIRST_JF_THEN_AUTO
 		if ($method == 99) {   // 
 			$translate_method = JRequest::getVar('translate_method',1);
@@ -1028,12 +1061,24 @@ class FlexicontentModelItems extends JModelLegacy
 				
 				$doauto['title'] = $doauto['introtext'] = $doauto['fulltext'] = $doauto['metakey'] = $doauto['metadesc'] = true;    // In case JF data is missing
 				if ($translate_method == 2 || $translate_method == 4) {
-					// a. Try to get joomfish translation from the item
-					$query = "SELECT c.* FROM `#__jf_content` AS c "
-					." LEFT JOIN #__languages AS lg ON c.language_id=lg.id "
-					."WHERE c.reference_table = 'content' AND lg.code='".$row->language."' AND c.reference_id = ". $sourceid;
-					$this->_db->setQuery($query);
-					$jfitemfields = $this->_db->loadObjectList();
+					// a. Try to get joomfish/falang translation from the item
+					$jfitemfields = false;
+					
+					if ($_FALANG) {
+						$query = "SELECT c.* FROM `#__falang_content` AS c "
+							." LEFT JOIN #__languages AS lg ON c.language_id=lg.lang_id"
+							." WHERE c.reference_table = 'content' AND lg.lang_code='".$row->language."' AND c.reference_id = ". $sourceid;
+						$this->_db->setQuery($query);
+						$jfitemfields = $this->_db->loadObjectList();
+					}
+					
+					if ( !$jfitemfields && $_FISH) {
+						$query = "SELECT c.* FROM `".$dbprefix."jf_content` AS c "
+							." LEFT JOIN #__languages AS lg ON c.language_id=".($_NEW_LANG_TBL ? "lg.lang_id" : "lg.id")
+							." WHERE c.reference_table = 'content' AND ".($_NEW_LANG_TBL ? "lg.lang_code" : "lg.code")."='".$row->language."' AND c.reference_id = ". $sourceid;
+						$this->_db->setQuery($query);
+						$jfitemfields = $this->_db->loadObjectList();
+					}
 					
 					// b. if joomfish translation found set for the new item
 					if($jfitemfields) {
@@ -1042,32 +1087,31 @@ class FlexicontentModelItems extends JModelLegacy
 							$jfitemdata->{$jfitemfield->reference_field} = $jfitemfield->value;
 						}
 						
-						if (isset($jfitemdata->title) && mb_strlen($jfitemdata->title)>2){
+						if (isset($jfitemdata->title) && mb_strlen($jfitemdata->title)>0){
 							$row->title = $jfitemdata->title;
-							$row->title = ($prefix ? $prefix . ' ' : '') . $item->title . ($suffix ? ' ' . $suffix : '');
 							$doauto['title'] = false;
 						}
 						
-						if (isset($jfitemdata->alias) && $jfitemdata->alias) {
+						if (isset($jfitemdata->alias) && mb_strlen($jfitemdata->alias)>0) {
 							$row->alias = $jfitemdata->alias;
 						}
 						
-						if (isset($jfitemdata->introtext) && mb_strlen(strip_tags($jfitemdata->introtext))>2) {
+						if (isset($jfitemdata->introtext) && mb_strlen(strip_tags($jfitemdata->introtext))>0) {
 							$row->introtext = $jfitemdata->introtext;
 							$doauto['introtext'] = false;
 						}
 						
-						if (isset($jfitemdata->fulltext) && mb_strlen(strip_tags($jfitemdata->fulltext))>2) {
+						if (isset($jfitemdata->fulltext) && mb_strlen(strip_tags($jfitemdata->fulltext))>0) {
 							$row->fulltext = $jfitemdata->fulltext;
 							$doauto['fulltext'] = false;
 						}
 						
-						if (isset($jfitemdata->metakey) && mb_strlen($jfitemdata->metakey)>2) {
+						if (isset($jfitemdata->metakey) && mb_strlen($jfitemdata->metakey)>0) {
 							$row->metakey = $jfitemdata->metakey;
 							$doauto['metakey'] = false;
 						}
 						
-						if (isset($jfitemdata->metadesc) && mb_strlen($jfitemdata->metadesc)>2) {
+						if (isset($jfitemdata->metadesc) && mb_strlen($jfitemdata->metadesc)>0) {
 							$row->metadesc = $jfitemdata->metadesc;
 							$doauto['metadesc'] = false;
 						}
