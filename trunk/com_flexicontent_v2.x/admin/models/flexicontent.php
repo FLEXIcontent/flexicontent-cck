@@ -1180,6 +1180,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'plg_flexicontent_fields_textselect',
 			'plg_flexicontent_fields_toolbar',
 			'plg_flexicontent_fields_weblink',
+		// plugin files  --  finder
+			'plg_finder_flexicontent',
+			'plg_finder_flexicontent.sys',
+		// plugin files  --  content
+			'plg_content_flexibreak',
 		// plugin files  --  flexicontent
 			'plg_flexicontent_flexinotify',
 		// plugin files  --  search
@@ -1205,9 +1210,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		if ($method == 'zip') {
 			if (count($adminfiles))
-				JFolder::create($targetfolder.DS.'admin', 0775);
+				JFolder::create($targetfolder.DS.'admin', 0755);
 			if (count($sitefiles))
-				JFolder::create($targetfolder.DS.'site', 0775);
+				JFolder::create($targetfolder.DS.'site', 0755);
 		}
 		
 		foreach ($adminfiles as $file) {
@@ -1274,6 +1279,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$fileslist  = JFolder::files($targetfolder, '.', true, true, array('.svn', 'CVS', '.DS_Store'));
 			$archivename = $targetfolder.'.com_flexicontent'. (FLEXI_J16GE ? '.zip' : '.tar.gz');
 			
+			// Create the archive
 			echo JText::_('FLEXI_SEND_LANGUAGE_CREATING_ARCHIVE')."<br>";
 			if (!FLEXI_J16GE) {
 				JArchive::create($archivename, $fileslist, 'gz', '', $targetfolder);
@@ -1292,9 +1298,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					echo JText::_('FLEXI_OPERATION_FAILED');
 					return false;
 				}
-				if (!JFolder::delete(($targetfolder)) ) {
-					echo JText::_('FLEXI_SEND_DELETE_TMP_FOLDER_FAILED');
-				}
+			}
+			
+			// Remove temporary folder structure
+			if (!JFolder::delete(($targetfolder)) ) {
+				echo JText::_('FLEXI_SEND_DELETE_TMP_FOLDER_FAILED');
 			}
 		}
 		
