@@ -833,7 +833,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
 				}*/
 
-				//Trigger onBeforeFilter function
+				/*//Trigger onBeforeFilter function
 				$field_type = $filtre->field_type;
 				$field_type_file = $filtre->iscore ? 'core' : $field_type;
 				$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($field_type_file).(FLEXI_J16GE ? DS.strtolower($field_type_file) : "").'.php';
@@ -843,13 +843,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 						$filtervalue = NULL;
 						FLEXIUtilities::call_FC_Field_Func($field_type_file, 'onBeforeFilter', array( &$filtre, &$filtervalue ));
 					}
-				}
+				}*/
 				$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
 				
 				// Skip filters without value
 				$empty_filtervalue_array  = is_array($filtervalue)  && !strlen(trim(implode('',$filtervalue)));
 				$empty_filtervalue_string = !is_array($filtervalue) && !strlen(trim($filtervalue));
-				if ($empty_filtervalue_array || $empty_filtervalue_string) continue;
+				$allow_filtering_empty = $filter->parameters->get('allow_filtering_empty', 0);
+				if ( !$allow_filtering_empty && ($empty_filtervalue_array || $empty_filtervalue_string) ) continue;
 				
 				//echo "category model found filters: "; print_r($filtervalue);
 				$filters_where[ $filtre->id ] = $this->_getFiltered($filtre, $filtervalue);
