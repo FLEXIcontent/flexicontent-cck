@@ -849,7 +849,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				// Skip filters without value
 				$empty_filtervalue_array  = is_array($filtervalue)  && !strlen(trim(implode('',$filtervalue)));
 				$empty_filtervalue_string = !is_array($filtervalue) && !strlen(trim($filtervalue));
-				$allow_filtering_empty = $filter->parameters->get('allow_filtering_empty', 0);
+				$allow_filtering_empty = $filtre->parameters->get('allow_filtering_empty', 0);
 				if ( !$allow_filtering_empty && ($empty_filtervalue_array || $empty_filtervalue_string) ) continue;
 				
 				//echo "category model found filters: "; print_r($filtervalue);
