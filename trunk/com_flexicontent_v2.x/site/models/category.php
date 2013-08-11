@@ -832,6 +832,18 @@ class FlexicontentModelCategory extends JModelLegacy {
 				} else {
 					$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
 				}*/
+
+				//Trigger onBeforeFilter function
+				$field_type = $filtre->field_type;
+				$field_type_file = $filtre->iscore ? 'core' : $field_type;
+				$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($field_type_file).(FLEXI_J16GE ? DS.strtolower($field_type_file) : "").'.php';
+				if ( file_exists($path) ) {
+					require_once($path);
+					if($method_exists = method_exists("plgFlexicontent_fields{$field_type_file}", "onBeforeFilter")) {
+						$filtervalue = NULL;
+						FLEXIUtilities::call_FC_Field_Func($field_type_file, 'onBeforeFilter', array( &$filtre, &$filtervalue ));
+					}
+				}
 				$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
 				
 				// Skip filters without value
