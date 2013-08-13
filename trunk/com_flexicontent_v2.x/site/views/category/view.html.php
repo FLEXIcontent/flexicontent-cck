@@ -426,15 +426,15 @@ class FlexicontentViewCategory extends JViewLegacy
 			// These events return text that could be displayed at appropriate positions by our templates
 			$item->event = new stdClass();
 			
-			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterTitle', array('com_content.article', &$item, &$params, 0));
+			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterTitle', array('com_content.category', &$item, &$params, 0));
 			else              $results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
 			$item->event->afterDisplayTitle = trim(implode("\n", $results));
 	
-			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.article', &$item, &$params, 0));
+			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.category', &$item, &$params, 0));
 			else              $results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $params, $limitstart));
 			$item->event->beforeDisplayContent = trim(implode("\n", $results));
 	
-			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.article', &$item, &$params, 0));
+			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.category', &$item, &$params, 0));
 			else              $results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
 			$item->event->afterDisplayContent = trim(implode("\n", $results));
 							

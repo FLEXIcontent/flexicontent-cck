@@ -63,6 +63,7 @@
 		for(i=0; i<form.elements.length; i++) {
 			
 			var element = form.elements[i];
+			if (typeof element.name === "undefined" || element.name === null || !element.name) continue;
 			
 			// No need to add the default values for ordering, to the URL
 			if (element.name=='filter_order' && element.value=='i.title') continue;
@@ -84,6 +85,9 @@
 			}
 		}
 		form.action += extra_action;   //alert(extra_action);
+		
+		var fc_filter_form_blocker = jQuery("#fc_filter_form_blocker");
+		if (fc_filter_form_blocker) fc_filter_form_blocker.css("display", "block");
 	}
 	
 	function adminFormClearFilters (form) {
@@ -101,38 +105,71 @@
 	}
 	
 	function fc_toggleClass(ele,cls, fc_all) {
-		if (typeof fc_all === "undefined" || fc_all === null || !fc_all) {
-		  jQuery(ele).hasClass(cls) ? jQuery(ele).removeClass(cls) : jQuery(ele).addClass(cls);
+		var inputs = ele.parentNode.parentNode.getElementsByTagName('input');
+		if (typeof fc_all === "undefined" || fc_all === null || !fc_all)
+		{
+		  jQuery(ele).next().hasClass(cls) ? jQuery(ele).next().removeClass(cls) : jQuery(ele).next().addClass(cls);
 		  // Handle disabling 'select all' checkbox (if it exists), not needed but to make sure ...
-			var inputs = ele.parentNode.getElementsByTagName('input');
 		  if (inputs[0].value=='') {
 		  	inputs[0].checked = 0;
-				jQuery(inputs[0].parentNode).removeClass(cls);
+				jQuery(inputs[0]).next().removeClass(cls);
 		  }
-		} else {
-			var inputs = ele.parentNode.getElementsByTagName('input');
-			for (var i = 0; i < inputs.length; ++i) {
+		}
+		else
+		{
+			for (var i = 1; i < inputs.length; ++i) {
 				inputs[i].checked = 0;
-				jQuery(inputs[i].parentNode).removeClass(cls);
+				jQuery(inputs[i]).next().removeClass(cls);
 			}
 		  // Handle highlighting (but not enabling) 'select all' checkbox
-			jQuery(inputs[0].parentNode).addClass(cls);
+			jQuery(inputs[0]).next().addClass(cls);
 		}
 	}
 	
 	function fc_toggleClassGrp(ele, cls, fc_all) {
-		var inputs = ele.getElementsByTagName('input');
-		if (typeof fc_all === "undefined" || fc_all === null || !fc_all) {
+		var inputs = ele.parentNode.parentNode.getElementsByTagName('input');
+		if (typeof fc_all === "undefined" || fc_all === null || !fc_all)
+		{
 			for (var i = 0; i < inputs.length; ++i) {
-				inputs[i].checked ? jQuery(inputs[i].parentNode).addClass(cls) : jQuery(inputs[i].parentNode).removeClass(cls);
+				inputs[i].checked ? jQuery(inputs[i]).next().addClass(cls) : jQuery(inputs[i]).next().removeClass(cls);
 			}
-		} else {
-			var inputs = ele.parentNode.getElementsByTagName('input');
-			for (var i = 0; i < inputs.length; ++i) {
+		}
+		else
+		{
+			for (var i = 1; i < inputs.length; ++i) {
 				inputs[i].checked = 0;
-				jQuery(inputs[i].parentNode).removeClass(cls);
+				jQuery(inputs[i]).next().removeClass(cls);
 			}
 		  // Handle highlighting (but not enabling) 'select all' radio button
-			jQuery(inputs[0].parentNode).addClass(cls);
+			jQuery(inputs[0]).next().addClass(cls);
 		}
 	}
+	
+
+jQuery(document).ready(function() {
+	// Initialize internal labels
+	jQuery('input.fc_label_internal').each(function() {
+		var el = jQuery(this);
+		var fc_label_text = el.attr('fc_label_text');
+		if (!fc_label_text) return;
+		var _label = (fc_label_text.length >= 27) ? fc_label_text.substring(0, 25) + '...' : fc_label_text;
+		
+		el.before(jQuery('<span/>', {
+			'class': 'fc_has_inner_label fc_has_inner_label_input',
+			'text': _label
+		}));
+	});
+	
+	jQuery('input.fc_label_internal').bind('focus', function() {
+		var el = jQuery(this);
+		var fc_label_text = el.attr('fc_label_text');
+		if (!fc_label_text) return;
+		el.prev().hide();
+	}).bind('blur', function() {
+		var el = jQuery(this);
+		var fc_label_text = el.attr('fc_label_text');
+		if (!fc_label_text) return;
+		el.prev().show();
+	});
+
+});

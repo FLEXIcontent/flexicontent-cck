@@ -267,16 +267,99 @@
 	clear: both;
 	border: solid 0px #dddddd;
 	margin: 0px 0px 12px 0px;
-	padding: 0;
+	padding: 0%;
+	width: 100%;
 }
 
 /* Used for inner containers of (a) text search, (b) field filters */
 fieldset.fc_filter_set {
 	border: 1px solid #cccccc;
-	padding: 4px;
-	margin: 0px 0px 0px 0px;
+	margin: 0px;
+	padding: 1%;
+	width: 98%;
+	min-width: inherit !important; /* workaround for chrome fieldset width bug */
+	display: block;
 }
 
+/* Blocking overlay during form being applied and page reloading */
+#fc_filter_form_blocker {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1000;
+	display: none;
+}
+#fc_filter_form_blocker div.fc_blocker_opacity {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0.3;
+	filter:alpha(opacity=30); /* For IE8 and earlier */
+	background-color: #000;
+	z-index: 1000;
+}
+#fc_filter_form_blocker div.fc_blocker_content {
+	font-size: 12px;
+	background: white url(../images/ajax-loader.gif) 60px 50% no-repeat;
+	opacity:1;
+	filter:alpha(opacity=100); /* For IE8 and earlier */
+	position: absolute;
+	top: 200px;
+	left: 33%;
+	width: auto;
+	height: 18px;
+	padding: 60px 60px 60px 84px;
+	margin: 0px;
+	color: black;
+	font-weight: bold;
+	border: 1px dashed black;
+	border: 1px solid lightgray;
+	border-radius: 8px;
+	z-index: 1001;
+}
+
+
+/*******************/
+/* (a) TEXT SEARCH */
+/*******************/
+
+/* Container of text search (label,form element,buttons) */
+.fc_filter_text_box.fc_filter {
+	clear: none !important;
+	float: left !important;
+	margin: 0px 4px 4px 0% !important;
+	padding: 4px 0% !important;
+}
+.fc_filter_text_box.fc_filter_line {
+	clear: both !important;
+	float: left !important;
+	margin: 0px 0% 4px 0% !important;
+	padding: 4px 0% !important;
+	width: 100% !important;
+}
+
+/* The text search form element */
+#flexicontent .fc_text_filter {
+	float: left !important !important;
+}
+
+/* Container of submit / reset buttons */
+.fc_text_filter_buttons {
+	display:inline-block !important;
+	float: left !important;
+}
+
+
+
+/*********************/
+/* (b) FIELD FILTERs */
+/*********************/
+
+/* displayed between ranges */
 .fc_range {
 	background: url("../images/arrow_double.png") no-repeat scroll 0 3px transparent !important;
 	width: 16px !important;
@@ -287,120 +370,131 @@ fieldset.fc_filter_set {
 	display: inline-block !important;
 }
 
-
-/*******************/
-/* (a) TEXT SEARCH */
-/*******************/
-
-/* Container of text search (label,form element,buttons) */
-#flexicontent .fc_text_filter_box {
-	display: block;
-	float: left;
-	margin: 0px 24px 0px 0px;
-}
-
-/* The label of text search form element */
-#flexicontent .fc_text_filter_label .fcleft {
-	margin: 0px 2px 0px 2px;
-}
-
-/* The text search form element */
-#flexicontent .fc_text_filter {
-	display: inline-block;
-	float: left;
-	border: 1px solid gray;
-	margin: 2px 4px 1px 1px;
-	padding: 4px;
-}
-
-/* Container of submit / reset buttons */
-#flexicontent .fc_text_filter_buttons {
-	display:inline-block;
-	float: left;
-}
-
-
-
-/*********************/
-/* (b) FIELD FILTERs */
-/*********************/
-
-/* The LABEL of field filters LIST CONTAINER */
-#flexicontent .fc_field_filters_list_label .fcleft {
-	margin: 0px 2px 0px 2px;
-}
-
-/* Container of tooltip icon for filters list */
-#flexicontent .fc_field_filters_list_tipicon {
-	display:inline-block;
-	*margin-bottom:10px;
-}
-
 /* Container of each individual field filter (both label and html) */
-#flexicontent .filter,
-#flexicontent .filter_line {
+.fc_filter,
+.fc_filter_line {
 	display: inline-block;
 	float: left;
-	white-space: nowrap;
+	white-space: normal;
 	border: 0px dashed gray;
 }
-#flexicontent .filter {
+.fc_filter {
 	clear: none;
-	margin: 0px 10px 6px 0px;
+	margin: 0px 6px 6px 0px;
+	padding: 4px 0% 2px 0%;
+	width: auto;
 }
-#flexicontent .filter_line {
+.fc_filter_line {
 	clear: both;
-	margin: 0px 0px 2px 0px;
-	width: 99%;
+	margin: 0px 0% 2px 0%;
+	padding: 4px 1%;
+	width: 98%;
 }
 
 /* Container of each individual field filter LABEL */
-#flexicontent .filter .filter_label,
-#flexicontent .filter_line .filter_label {
+.fc_filter .fc_filter_label,
+.fc_filter_line .fc_filter_label {
 	float: left !important;
 	display: inline-block !important;
-	color: #606060 !important;
-  background-color: #F2F2F2 !important;
+	color: white !important;
+  background-color: darkorange !important;
   border-bottom: 1px solid #D0D0D0 !important;
   border-right: 1px solid #D0D0D0 !important;
-  font-style: italic !important;
+  font-weight: normal !important;
   font-size: 12px !important;
   font-family: arial !important;
-  font-weight: normal !important;
-  text-align: left !important;
-  margin: 2px 1% 3px 0px !important;
+  text-align: right !important;
   border-radius: 6px !important;
 }
-#flexicontent .filter .filter_label {  clear: both;   max-width: 150px !important;  min-width: 100px !important; padding: 6px !important; }
-#flexicontent .filter_line .filter_label {  clear: none; width: 14% !important; padding: 6px 1% 6px 1% !important; }
+
+.fc_filter .fc_filter_label {
+	clear: both;
+	width: auto !important;
+	max-width: 150px !important;
+	padding: 6px !important;
+  margin: 2px 8px 3px 8px !important;
+}
+.fc_filter_line .fc_filter_label {
+	clear: none;
+	width: 15% !important;
+	max-width: 200px !important;
+	padding: 6px 1% !important;
+	margin: 0 1% !important;
+	text-align:left !important;
+}
+
+.fc_filter.fc_even,
+.fc_filter_line.fc_even { background: #E0E0E0 !important; display:block !important; }
+.fc_filter.fc_odd,
+.fc_filter_line.fc_odd { background: #EEEEEE !important; !important; display:block !important; }
 
 /* Container of each individual field filter HTML */
-#flexicontent .filter .filter_html,
-#flexicontent .filter_line .filter_html {
+.fc_filter .fc_filter_html,
+.fc_filter_line .fc_filter_html {
 	display: inline-block;
 	float: left;
 	font-size: 90%;
   padding: 0px 0% 0px 0% !important;
   margin: 0px 0% 0px 0% !important;
 }
-#flexicontent .filter .filter_html {  clear: both;  }
-#flexicontent .filter_line .filter_html {  clear: none; width: 76% !important; }
+.fc_filter .fc_filter_html {  clear: both; position: relative !important;  }
+.fc_filter_line .fc_filter_html {  clear: none; width: 80% !important; position: relative !important; }
 
 /* The form element(s) of each field filter inside filter's HTML */
-#flexicontent .fc_field_filter {
-	border: 1px solid gray;
-	color: black;
-	font-size: 11px;
-	font-weight: normal;
-	padding: 4px 4px;
-	margin: 2px 2px;
-	border-radius:5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	width: auto;
+.fc_text_filter,
+.fc_field_filter {
+	color: black !important;
+	font-size: 11px !important;
+	font-weight: normal !important;
+	display: inline-block;
+	padding: 2px 0px 2px 4px !important;
+	margin: 2px 0px 2px 4px !important;
+	border-radius: 5px !important;
+	-moz-border-radius: 5px !important;
+	-webkit-border-radius: 5px !important;
+	width: auto !important;
 }
-#flexicontent select.fc_field_filter { margin: 2px 2px; }
-#flexicontent input.fc_field_filter { margin: 3px 2px; }
+input.fc_text_filter,  input.fc_text_filter:focus,
+input.fc_field_filter, input.fc_field_filter:focus {
+	height: 14px !important;
+	padding: 5px 4px 7px 4px !important;
+	position: relative;
+	/* background: transparent; ... does not work properly with ie8/9, it causes: */
+	/* any element with less z-index to be placed above this element, */
+	/* e.g. the span element for showing an inner is placed above, thus preventing focusing of the input !! */
+	border: 1px solid black !important;
+	background: url(../images/magnifier-left.png) 96% 4px no-repeat white;
+	opacity: 0.5; filter:alpha(opacity=50);
+}
+select.fc_field_filter { margin: 2px 2px 2px 2px !important; }
+input.fc_text_filter { margin: 2px 12px 4px 8px !important; }
+input.fc_field_filter { margin: 2px 8px 4px 8px !important; }
+span.fc_field_filter { border-width: 0px !important; }
+.fc_field_filter.fc_checkradio_group {
+	margin: 2px 0px 2px 2px !important;
+	padding: 3px 4px 3px 2px !important
+}
+.fc_field_filter.fc_checkradio_group label {
+	margin: 6px 6px 4px 0px !important;
+	display: inline-block;
+}
+
+/* Inner Labels */
+.fc_has_inner_label {
+	color: gray !important;
+	position: absolute;
+	display: block;
+}
+.fc_has_inner_label.fc_has_inner_label_input { left:14px !important; top:8px !important; color: black !important; }
+.fc_has_inner_label.fc_has_inner_label_select2 { left:4px !important; top:8px !important; }
+
+/* Highlighting selected choices */
+.fc_filter_html .select2-search-choice div,
+.select2-container .select2-choice.fc_highlight span,
+.fc_highlight {
+	color: darkorange !important;
+	font-weight: bold !important;
+}
 
 
 /*******************/
@@ -551,50 +645,60 @@ html button {
 	*width:auto !important;
 }
 
-#flexicontent .flexi_buttons {
-	float: right;
-	margin: 2px 2px 8px;
+#flexicontent .flexi_buttons { float: right; margin: 2px 2px 8px; }
+
+#flexicontent button,
+.fc_buttons button,
+.flexi_buttons button {
+	border:1px solid #7d99ca !important;
+	-webkit-border-radius: 6px !important;
+	-moz-border-radius: 6px !important;
+	border-radius: 6px !important;
+	font-size:12px !important;
+	font-family:arial, helvetica, sans-serif !important;
+	padding: 6px 10px 6px 10px !important;
+	text-decoration:none !important;
+	display:inline-block !important;
+	text-shadow: -1px -1px 0 rgba(0,0,0,0.3) !important;
+	font-weight:bold; color: #FFFFFF !important;
+	background-color: #a5b8da !important;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#a5b8da), to(#7089b3)) !important;
+	background-image: -webkit-linear-gradient(top, #a5b8da, #7089b3) !important;
+	background-image: -moz-linear-gradient(top, #a5b8da, #7089b3) !important;
+	background-image: -ms-linear-gradient(top, #a5b8da, #7089b3) !important;
+	background-image: -o-linear-gradient(top, #a5b8da, #7089b3) !important;
+	background-image: linear-gradient(to bottom, #a5b8da, #7089b3) !important;
+	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#a5b8da, endColorstr=#7089b3) !important;
 }
 
-#flexicontent button, #flexicontent .flexi_buttons button {
-	border-radius:5px !important;
-	-moz-border-radius: 5px !important;
-	-webkit-border-radius: 5px !important;
-	border-top: 0px solid #D0D0D0;
-	border-left: 0px solid #D0D0D0;
-	border-bottom: 1px solid #D0D0D0;
-	border-right: 1px solid #D0D0D0;
-	background: #eeeeee !important;
-	color: black !important;	
-	margin: 2px 6px 2px 0px;
-	padding: 5px 6px 4px 2px;
-	font-weight:bold;
-	font-size:11px;
-	white-space:nowrap !important;
+#flexicontent button:hover,
+.fc_buttons button:hover,
+.flexi_buttons button:hover {
+	border:1px solid #5d7fbc !important;
+	background-color: #819bcb !important;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#819bcb), to(#536f9d)) !important;
+	background-image: -webkit-linear-gradient(top, #819bcb, #536f9d) !important;
+	background-image: -moz-linear-gradient(top, #819bcb, #536f9d) !important;
+	background-image: -ms-linear-gradient(top, #819bcb, #536f9d) !important;
+	background-image: -o-linear-gradient(top, #819bcb, #536f9d) !important;
+	background-image: linear-gradient(to bottom, #819bcb, #536f9d) !important;
+	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#819bcb, endColorstr=#536f9d) !important;
 }
 
-#flexicontent button:hover, #flexicontent .flexi_buttons button:hover {
-	background: #dddddd !important;
-}
-#flexicontent button:hover span, #flexicontent .flexi_buttons button:hover {
-	color: red !important;
-}
-
-.fcbutton_apply, .fcbutton_save, .fcbutton_cancel, .fcbutton_preview, .fcbutton_preview_save, .fcbutton_go, .fcbutton_reset {
-	padding-left: 18px!important;
-	display: inline-block !important;
-	min-height: 16px !important;
-}
-.fcbutton_apply { background: url(../images/accept.png) no-repeat !important; color: #333 !important; }
-.fcbutton_save { background: url(../images/accept.png) no-repeat !important; color: #333 !important; }
-.fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important;  color: #333 !important; }
-.fcbutton_preview { background: url(../images/monitor.png) no-repeat !important; color: #333 !important; }
-.fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important;  color: #333 !important; }
-.fcbutton_go { background: url(../images/accept.png) no-repeat !important; color: #333 !important; }
-.fcbutton_reset { background: url(../images/cancel.png) no-repeat !important;  color: #333 !important; }
+/*
+.fcbutton_apply, .fcbutton_save, .fcbutton_cancel,
+.fcbutton_preview, .fcbutton_preview_save,
+.fcbutton_go, .fcbutton_reset {}
+.fcbutton_apply { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_save { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important; }
+.fcbutton_preview { background: url(../images/monitor.png) no-repeat !important; }
+.fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important; }
+.fcbutton_go { background: url(../images/accept.png) no-repeat !important; }
+.fcbutton_reset { background: url(../images/cancel.png) no-repeat !important; }
 
 button.fc_button {}
-
+*/
 
 /********************
  * Other CSS for Form
@@ -899,9 +1003,12 @@ div.current dd {
 
 /* CONTAINER of search (field) filters */
 fieldset.fc_search_set {
-	border: 1px outset black;
-	padding: 0px;
-	margin-top:12px;
+	border: 1px solid #cccccc;
+	margin: 12px 0px 0px 0px;
+	padding: 1%;
+	width: 98%;
+	min-width: inherit !important; /* workaround for chrome fieldset width bug */
+	display: block;
 }
 
 /* TITLE of CONTAINER of search (field) filters */
@@ -971,8 +1078,8 @@ div.flexicontent.fcsearch  .highlight {
 	border-radius:5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
-	color: #3D3D3D;
-	font-weight: bold;
+	color: darkred;
+	font-weight: normal;
 	padding: 3px 5px;
 }
 
@@ -1237,7 +1344,7 @@ ul.statetoggler > li.topLevel > .options ul {
 }
 
 ul.statetoggler > li.topLevel, .statetoggler > li.topLevel ul > li {
-	background: none repeat scroll 0 0 white !important;
+	background: none repeat scroll 0 0 transparent !important;
 	overflow: visible !important;
 	width: 22px !important;
 	min-height: 20px !important;
@@ -1316,10 +1423,10 @@ ul.statetoggler > li.topLevel > a.opener {
 	color: black !important;
 }
 
+/* Highlighting selected choice(s) */
 .flexi_radiotab.highlight {
-	background-color: lightgray !important;
-	color: darkred !important;
-	font-weight: normal !important;
+	color: darkorange !important;
+	font-weight: bold !important;
 }
 
 .flexi_radiotab input {
@@ -1405,6 +1512,11 @@ div.fancybox-wrap a { background: none!important;}
 	margin: 3px 0% 3px 0% !important;
 }
 
+
+/********************************
+ * Content / Content List Markups
+ ********************************/
+
 #flexicontent .fc_mublock {
 	display:block;
 	float:left;
@@ -1479,4 +1591,81 @@ div.fancybox-wrap a { background: none!important;}
 	padding-left: 24px !important;
 	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat transparent;
 	color: darkorange !important;
+}
+
+
+
+/*****************************************
+ * Checkbox / Radio styling (and hide them)
+ *****************************************/
+
+/* negation selector :not(...) is that in browsers (ie8) that do not support these CSS rules, we will have a good fallback appearance */
+
+input[type=checkbox].fc_checkradio:not(old),
+input[type=radio   ].fc_checkradio:not(old){
+	width: 24px !important;
+	/*width: 19px !important;*/
+	margin: 0 !important;
+	padding: 0 !important;
+	opacity: 0 !important;
+	display:none;
+}
+
+/* style the label to also include the nice checkbox, radio */
+input[type=checkbox].fc_checkradio:not(old) + label,
+input[type=radio   ].fc_checkradio:not(old) + label{
+	display: inline-block !important;
+	margin: 0px !important;
+	padding: 0px 4px 0px 24px !important;
+	line-height: 24px !important;
+	height: 24px !important;
+	/*margin-left: -19px !important;
+	padding-left: 19px !important;
+	line-height: 19px !important;
+	height: 19px !important;*/
+}
+input[type=checkbox].fc_checkradio:not(old):disabled + label,
+input[type=radio].fc_checkradio:not(old):disabled + label {
+	background-position: 0 -72px !important;
+	font-style:italic;
+	color:gray;
+	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
+}
+input[type=checkbox].fc_checkradio:not(old) + label{
+	background: url(../images/checks.png) no-repeat 0 0 !important;
+	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
+}
+input[type=radio].fc_checkradio:not(old) + label{
+	background: url(../images/checks.png) no-repeat 0 0 !important;
+	/*background: url(../images/checks2.png) no-repeat 0 -38px !important;*/
+}
+
+/* the checked versions of checkbox,radio */
+input[type=checkbox].fc_checkradio:not(old):checked + label{
+	background-position: 0 -24px !important;
+	/*background-position: 0 -19px !important;*/
+}
+input[type=radio].fc_checkradio:not(old):checked + label{
+	background-position: 0 -48px !important;
+	/*background-position: 0 -57px !important;*/
+}
+
+input[type=checkbox].fc_checkradio, input[type=checkbox].fc_checkradio:focus,
+input[type=radio].fc_checkradio, input[type=radio].fc_checkradio:focus {
+	border: 0px !important;
+}
+
+/* ie8,ie9 */
+input.fc_checkradio {
+	margin: 0px 4px 3px 4px !important;
+	padding: 0px !important;
+	vertical-align: bottom;
+	position: relative;
+	top: -1px;
+}
+.fc_checkradio_group .fc_checkradio_option {
+	white-space: nowrap !important;
+	padding: 0px !important;
+	margin: 0px !important;
+	display: inline-block !important;
 }
