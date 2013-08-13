@@ -94,12 +94,18 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$debug_notifications = $params->get('debug_notifications', 0);
 		if ( !$debug_notifications && empty($post['notify']) ) return;  // * Fast skip of uneeded code
 		
-		// a. Check if debug_notifications is for super admin only
+		// *. Check if debug_notifications is for super admin only
 		if ($debug_notifications==2) {
 			$perms= FlexicontentHelperPerm::getPerm();
 			if (!$perms->SuperAdmin) $debug_notifications = 0;
 			if ( !$debug_notifications && empty($post['notify']) ) return;
 			$params->set('debug_notifications', $debug_notifications);  // Set this for later usage ... not to recalculate
+		}
+		
+		// a. Check if new document version was approved
+		if ( $post['vstate']!=2 ) {
+			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("FAVOURITES NOTIFICATION PLUGIN: &nbsp; Not sending notifications, because new document version did not become active (needs approval by a publisher/administrator)", 'message' );
+			return;
 		}
 		
 		// b. Check if current item has subscribers

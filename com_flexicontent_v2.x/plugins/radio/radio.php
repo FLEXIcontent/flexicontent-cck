@@ -155,11 +155,10 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
-		if ( empty($values) ) { $field->{$prop} = ''; return; }
 		
 		// Check for no values and not displaying ALL elements
     $display_all = $field->parameters->get( 'display_all', 0 ) ;
-		if ( !$values && !$display_all ) { $field->{$prop} = ''; $field->display_index = ''; return; }
+		if ( empty($values) && !$display_all ) { $field->{$prop} = ''; $field->display_index = ''; return; }
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
