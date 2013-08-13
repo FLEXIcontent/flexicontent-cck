@@ -24,13 +24,12 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_CONFIGURATION_CATEGORY" description="FLEXI_CONFIGURATION_CATEGORY_DESC" level="level2" />
+			
 			<field name="" type="separator" default="FLEXI_MENU_ITEM_SELECTABLE_VIA_DIRECT_CLICK_ONLY" description="" level="level3" />
 			<field name="override_defaultconf" default="0" type="list" label="FLEXI_ENABLE_OVERRIDE_CATEGORY" description="FLEXI_ENABLE_OVERRIDE_CATEGORY_DESC" >
 				<option value="0">FLEXI_OVERRIDE_CONF_NO</option>
 				<option value="1">FLEXI_OVERRIDE_CONF_YES</option>
 			</field>
-			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="Persistent Filters (experimental)" description="Filters that can NOT be overriden by category filters. Enter like: field_id##value %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword for ranges use field_id##value1---value2 for multiple values use field_id##value1+++value2+++value3 NOTE: your field must be configured to be range filter or multi-value filter or the values will not be used as expected" />
-			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="Initial Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##value %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword for ranges use field_id##value1---value2 for multiple values use field_id##value1+++value2+++value3 NOTE: your field must be configured to be range filter or multi-value filter or the values will not be used as expected" />
 		
 		</fieldset>
 		
@@ -337,7 +336,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="cat_item_markups" label="FLEXI_PARAMETERS_CAT_ITEM_MARKUP_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="cat_item_markups" label="FLEXI_PARAMETERS_CAT_ITEM_MARKUPS_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_MU_CATEGORY" description="FLEXI_MU_CATEGORY_DESC" level="level2" />
 			<field name="mu_addcss_cats" type="fccheckbox" default="" display_useglobal="1" label="FLEXI_MU_ADD_MARKUP" description="FLEXI_MU_ADD_MARKUP_DESC"
@@ -447,19 +446,24 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			
 			<field name="show_filter_labels" type="list" default="" label="FLEXI_FORCE_FILTER_LABELS" description="FLEXI_FORCE_FILTER_LABELS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
 				<option value="1">FLEXI_FORCE_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_FORCE_INSIDE_FILTER</option>
 			</field>
-			
 			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
 
 			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" />
 			<field name="filter_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
 			<field name="filter_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
+			<field name="filter_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
+			<field name="filter_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
+			<field name="filter_placement" type="list" default="" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
+			</field>
 			<field name="filter_separatorf" type="list" default="" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SPACE</option>
@@ -469,13 +473,10 @@
 				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="filter_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
-			<field name="filter_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
-			<field name="filter_perrow" type="list" default="" label="FLEXI_RECORD_PER_ROW" description="FLEXI_RECORD_PER_ROW_DESC" >
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
+
+			<field name="" type="separator" default="FLEXI_LOCKED_INITIAL_FILTER_VALUES" description="FLEXI_LOCKED_INITIAL_FILTER_VALUES_DESC" level="level3" />
+			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_PERSISTENT_FILTERS" description="FLEXI_PERSISTENT_FILTERS_DESC" />
+			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTERS" description="FLEXI_INITIAL_FILTERS_DESC" />
 			
 		</fieldset>
 		

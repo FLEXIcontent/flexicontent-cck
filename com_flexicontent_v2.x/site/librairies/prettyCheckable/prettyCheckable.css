@@ -1,72 +1,97 @@
 .clearfix:before, .clearfix:after {
-  content: "";
-  display: table;
+  content: "" !important;
+  display: table !important;
 }
 
-.clearfix:after {clear: both;}
+.clearfix:after {clear: both !important;}
 
-.clearfix {*zoom: 1;}
+.clearfix {*zoom: 1 !important;}
 
 .prettycheckbox,
 .prettyradio {
-    display: inline-block;
-    padding:0;
-    margin:0;
+    display: inline-block !important;
+    padding:0 !important;
+    margin:0 !important;
 }
 
 .prettycheckbox a,
 .prettyradio a{
-    width: 30px;
-    height: 30px;
-    background: url(prettyCheckable-blue.png) top left no-repeat;
-    display: block;
-    float: left;
-    cursor: pointer;
-    margin:0;
+    width: 30px !important;
+    height: 30px !important;
+    background: url(prettyCheckable-blue.png) top left no-repeat !important;
+    display: block !important;
+    float: left !important;
+    cursor: pointer !important;
+    margin:0 !important;
 }
 
 .prettycheckbox.green a,
-.prettyradio.green a{ background-image: url(prettyCheckable-green.png);}
+.prettyradio.green a{ background-image: url(prettyCheckable-green.png) !important;}
 
 .prettycheckbox.red a,
-.prettyradio.red a{ background-image: url(prettyCheckable-red.png);}
+.prettyradio.red a{ background-image: url(prettyCheckable-red.png) !important;}
 
 .prettycheckbox.yellow a,
-.prettyradio.yellow a{ background-image: url(prettyCheckable-yellow.png);}
+.prettyradio.yellow a{ background-image: url(prettyCheckable-yellow.png) !important;}
 
-.prettyradio a {background-position: 0 -120px;}
+.prettyradio a {background-position: 0 -120px !important;}
 
 .prettycheckbox a:focus,
-.prettyradio a:focus {outline: 0 none;}
+.prettyradio a:focus {outline: 0 none !important;}
 
-.prettycheckbox a:focus{background-position: 0 -30px;}
-.prettyradio a:focus{background-position: 0 -150px;}
+.prettycheckbox a:focus{background-position: 0 -30px !important;}
+.prettyradio a:focus{background-position: 0 -150px !important;}
 
-.prettycheckbox a.checked{ background-position: 0 -60px; }
-.prettyradio a.checked { background-position: 0 -180px; }
+.prettycheckbox a.checked{ background-position: 0 -60px !important; }
+.prettyradio a.checked { background-position: 0 -180px !important; }
 
-.prettycheckbox a.checked:focus{ background-position: 0 -90px; }
-.prettyradio a.checked:focus { background-position: 0 -210px; }
+.prettycheckbox a.checked:focus{ background-position: 0 -90px !important; }
+.prettyradio a.checked:focus { background-position: 0 -210px !important; }
 
 .prettycheckbox label,
 .prettyradio label {
-  display: block;
-  float: left;
-  margin: 6px 5px;
-  cursor: pointer;
+  display: block !important;
+  float: left !important;
+  margin: 6px 5px !important;
+  cursor: pointer !important;
 }
 
 .prettycheckbox.disabled a,
 .prettyradio.disabled a,
 .prettycheckbox.disabled label,
 .prettyradio.disabled label{
-  cursor:not-allowed;
+  cursor:not-allowed !important;
 }
 
 .prettycheckbox.disabled a {
-  background-position: 0 -240px;
+  background-position: 0 -240px !important;
 }
 
 .prettyradio.disabled a {
-  background-position: 0 -270px;
+  background-position: 0 -270px !important;
+}
+
+
+/*************************
+ * FLEXIcontent forced CSS
+ *************************/
+
+.prettycheckbox.fcradiocheck label, .prettyradio.fcradiocheck label {
+	margin: 7px 0px 0px 1px !important;
+}
+
+.prettycheckbox.fcradiocheckimage label, .prettyradio.fcradiocheckimage label {
+	margin: 2px 0px 0px 1px !important;
+}
+
+.prettycheckbox.fcradiocheckimage, .prettyradio.fcradiocheckimage,
+.prettycheckbox.fcradiocheck, .prettyradio.fcradiocheck {
+	float:left !important;
+	display:block !important;
+	clear:none !important;
+	margin:-6px 12px 0px -16px !important;
+}
+
+.prettyradio input, .prettycheckbox input {
+	display:inline-block !important; visibility:hidden !important; float:left !important;
 }
