@@ -68,7 +68,7 @@ div .button2-left {	margin:-2px 4px 2px 0px; }
 	margin: 5px 15px;
 }
 .copywarn {
-	background: url(../images/error.png) 0% 50% no-repeat transparent;
+	background: url(../images/warning.png) 0% 50% no-repeat transparent;
 	padding: 1px 0 1px 20px;
 	margin: 5px 15px;
 }
@@ -315,6 +315,15 @@ textarea.invalid {
 	display:block;
 	margin:0 0 5px 0 !important;
 	padding:8px 10px 8px 36px !important;
+}
+.fc-warning {
+	background: #A8CDE3 url(../images/warning.png) no-repeat 10px 50%;
+	border:1px solid #6ABCE2 !important;
+	color:#1C6B8B !important;
+	display:block;
+	margin:0 0 5px 0 !important;
+	padding:8px 10px 8px 36px !important;
+	border-radius: 6px !important;
 }
 .fc-info {
 	background: #A8CDE3 url(../images/information.png) no-repeat 10px 50%;
@@ -666,9 +675,6 @@ div#tags #input_new_tag {
 .clear
 { border: 0; clear: both; float: none; font-size: 1px; height: 0; line-height: 1px; margin: 0; padding: 0; visibility: hidden;}
 
-.mcat, .scat { width: 235px; }
-.mcat { min-height: 320px; }
-
 div#result table.versionlist {
 	border: 1px dashed silver;
 	padding: 5px;
@@ -738,7 +744,7 @@ div label.lang_box img.lang_lbl {
 #flexicontent .fc_edit_container_full {
 	float:none !important;
 	width:98% !important;
-	margin:1em 1% 0 1% !important;
+	margin:1em 1% 1em 1% !important;
 	padding:0px !important;
 	display:inline-block !important;
 	border: 0 none;
@@ -898,6 +904,9 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
 	border: 1px solid #dddddd;
 	margin: 1em 1% 0px 1% !important;
 	padding: 4px 1% 4px 1% !important;
+	width: 96%;
+	min-width: inherit !important; /* workaround for chrome fieldset width bug */
+	display: block;
 }
 #flexicontent fieldset.flexiaccess { margin-bottom: 1em !important; }
 
@@ -1127,117 +1136,14 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 
 
 
-/* FORCE some CSS about select2, prettyCheckable, etc libs */
-.use_select2_lib {
-	width: auto!important;
-	margin-top:0px!important;
-	margin-bottom:2px!important;
-}
+/*****************************************
+ * Checkbox / Radio styling (and hide them)
+ *****************************************/
 
-.select2-container-multi, .select2-drop {
-	min-width: 140px!important;
-	width: auto!important;
-}
+/* negation selector :not(...) is that in browsers (ie8) that do not support these CSS rules, we will have a good fallback appearance */
 
-.select2-results .select2-disabled {
-	color: gray !important;
-	font-style: italic !important;
-}
-
-.select2-results {
-	text-align: left!important;
-}
-
-.select2-results .select2-result .select2-result-label {
-	margin: 0 !important;
-	min-height: auto !important;
-	line-height: auto !important;
-	padding: 0px 2px !important;
-}
-
-.select2-results ul.select2-result-sub > li .select2-result-label {
-    padding-left: 10px !important;
-}
-.select2-results ul.select2-result-sub {
-    margin-bottom: 4px !important;
-}
-
-.select2-results .select2-result-label {
-	-moz-user-select: none !important;
-	cursor: pointer !important;
-	margin: 0 !important;
-	min-height: 1em !important;
-	padding: 3px 7px 4px !important;
-	font-size: 11px !important;
-}
-
-.select2-container-multi .select2-choices .select2-search-choice {
-	-moz-user-select: none !important;
-	background-clip: padding-box !important;
-	background-color: #E4E4E4 !important;
-	background-image: -moz-linear-gradient(center top , #F4F4F4 20%, #F0F0F0 50%, #E8E8E8 52%, #EEEEEE 100%) !important;
-	border: 1px solid #AAAAAA !important;
-	border-radius: 3px 3px 3px 3px !important;
-	box-shadow: 0 0 2px #FFFFFF inset, 0 1px 0 rgba(0, 0, 0, 0.05) !important;
-	color: #333333 !important;
-	cursor: default !important;
-	line-height: 13px !important;
-	margin: 3px 0 3px 5px !important;
-	padding: 3px 5px 3px 18px !important;
-	position: relative !important;
-}
-
-.select2-choices {
-	padding: 0px !important;
-	margin: 0px !important;
-}
-.select2-choice {
-	margin: 0 6px 0 0 !important;
-	font-weight: normal !important;
-}
-
-.select2-search-field {
-	background: url(../images/plus-button.png) no-repeat  50% 50% !important;
-}
-.select2-search-field:first-child {
-	background-position: 96% 50% !important;
-}
-div.select2-dropdown-open .select2-search-field input {
-	display: none;
-}
-
-.select2-search-field input {
-	min-width: 32px;
-	min-height: 2em;
-	background: transparent !important;
-}
-.select2-search-field:first-child input {
-	min-width: 140px;
-	min-height: 2em;
-	background: transparent !important;
-}
-
-.prettycheckbox.fcradiocheck label, .prettyradio.fcradiocheck label {
-	margin: 7px 0px 0px 1px !important;
-}
-
-.prettycheckbox.fcradiocheckimage label, .prettyradio.fcradiocheckimage label {
-	margin: 2px 0px 0px 1px !important;
-}
-
-.prettycheckbox.fcradiocheckimage, .prettyradio.fcradiocheckimage,
-.prettycheckbox.fcradiocheck, .prettyradio.fcradiocheck {
-	float:left !important;
-	display:block !important;
-	clear:none !important;
-	margin:-6px 12px 0px -16px !important;
-}
-
-.prettyradio input, .prettycheckbox input {
-	display:inline-block !important; visibility:hidden !important; float:left !important;
-}
-
-label.fccheckradio_lbl, span.fcselect_lbl {
+#flexicontent label.fccheckradio_lbl,
+#flexicontent span.fcselect_lbl {
 	display:inline-block;
 	white-space:nowrap;
 	padding-right: 8px;
@@ -1247,7 +1153,6 @@ label.fccheckradio_lbl, span.fcselect_lbl {
 	clear: none;
 }
 
-/* shape input checkbox,radio and hide them */
 #flexicontent input[type=checkbox]:not(old),
 #flexicontent input[type=radio   ]:not(old){
 	width: 24px !important;
@@ -1296,6 +1201,13 @@ label.fccheckradio_lbl, span.fcselect_lbl {
 	background-position: 0 -48px !important;
 	/*background-position: 0 -57px !important;*/
 }
+
+#flexicontent input[type=checkbox], #flexicontent input[type=checkbox]:focus,
+#flexicontent input[type=radio], #flexicontent input[type=radio]:focus {
+	border: 0px !important;
+}
+
+
 
 /******* END OF COMMON J1.5 / J2.5 CSS ***********/
 

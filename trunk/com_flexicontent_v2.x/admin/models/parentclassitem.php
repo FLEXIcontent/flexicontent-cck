@@ -2007,6 +2007,7 @@ class ParentClassItem extends JModelAdmin
 		// ****************************************************************************
 		$files  = JRequest::get( 'files', JREQUEST_ALLOWRAW );
 		$result = $this->saveFields($isnew, $item, $data, $files);
+		$version_approved = $isnew || $data['vstate']==2;
 		if( $result==='abort' ) {
 			if ($isnew) {
 				if (FLEXI_J16GE) {
@@ -2035,35 +2036,44 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		
-		// **********************************************************************
-		// new item Or item version is approved ... save item to #__content table
-		// **********************************************************************
-		if ( $print_logging_info ) $start_microtime = microtime(true);
-		if( $isnew || $data['vstate']==2 )
+		// ***************************************************************
+		// ITEM DATA SAVED:  EITHER new, OR approving current item version
+		// ***************************************************************
+		if ( $version_approved )
 		{
+			// *****************************
+			// Save item to #__content table
+			// *****************************
+			if ( $print_logging_info ) $start_microtime = microtime(true);
 			if( !$this->applyCurrentVersion($item, $data) ) return false;
+			if ( $print_logging_info ) @$fc_run_times['item_store_core'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			//echo "<pre>"; var_dump($data); exit();
 			
-			if (FLEXI_J16GE) $this->featured(array($item->id), $item->featured);
-		}
-		
-		
-		// *********************************************************************************************
-		// not new and not approving version, set modifier and modification time as if it has been saved
-		// *********************************************************************************************
-		if( !$isnew && $data['vstate']!=2 )
-		{
-			if ( $canEditState )
-				JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE') );
-			else
-				JError::raiseNotice(10, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE') );
 			
-			$datenow = JFactory::getDate();
-			$item->modified			= FLEXI_J16GE ? $datenow->toSql() : $datenow->toMySQL();
-			$item->modified_by	= $user->get('id');
+			// ***************************
+			// Update Joomla Featured FLAG
+			// ***************************
+			if (FLEXI_J16GE) $this->featured(array($item->id), $item->featured);
+			
+			
+			// *****************************************************************************************************
+			// Trigger Event 'onAfterContentSave' (J1.5) OR 'onContentAfterSave' (J2.5 ) of Joomla's Content plugins
+			// *****************************************************************************************************
+			if ( $print_logging_info ) $start_microtime = microtime(true);
+			
+			// Some compatibility steps
+		  JRequest::setVar('view', 'article');
+			JRequest::setVar('option', 'com_content');
+		  
+			if (FLEXI_J16GE) $dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isnew));
+			else             $dispatcher->trigger('onAfterContentSave', array(&$item, $isnew));
+			
+			// Reverse compatibility steps
+			JRequest::setVar('view', $view);
+			JRequest::setVar('option', 'com_flexicontent');
+			
+			if ( $print_logging_info ) @$fc_run_times['onContentAfterSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
-		
-		if ( $print_logging_info ) @$fc_run_times['item_store_core'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		
 		// *************************************************************************************************
@@ -2074,24 +2084,21 @@ class ParentClassItem extends JModelAdmin
 		if ( $print_logging_info ) @$fc_run_times['onAfterSaveItem_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		
-		// *****************************************************************************************************
-		// Trigger Event 'onAfterContentSave' (J1.5) OR 'onContentAfterSave' (J2.5 ) of Joomla's Content plugins
-		// *****************************************************************************************************
-		if ( $print_logging_info ) $start_microtime = microtime(true);
-		
-		// Some compatibility steps
-	  JRequest::setVar('view', 'article');
-		JRequest::setVar('option', 'com_content');
-	  
-		if (FLEXI_J16GE) $dispatcher->trigger($this->event_after_save, array('com_content.article', &$item, $isnew));
-		else             $dispatcher->trigger('onAfterContentSave', array(&$item, $isnew));
-		
-		// Reverse compatibility steps
-		JRequest::setVar('view', $view);
-		JRequest::setVar('option', 'com_flexicontent');
-		
-		if ( $print_logging_info ) @$fc_run_times['onContentAfterSave_event'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
+		// *********************************************************************
+		// ITEM DATA NOT SAVED:  NEITHER new, NOR approving current item version
+		// *********************************************************************
+		if ( !$version_approved ) {
+			// Warn editor that his/her changes will need approval to before becoming visible
+			if ( $canEditState )
+				JError::raiseNotice(11, JText::_('FLEXI_SAVED_VERSION_WAS_NOT_APPROVED_NOTICE') );
+			else
+				JError::raiseNotice(10, JText::_('FLEXI_SAVED_VERSION_MUST_BE_APPROVED_NOTICE') );
+			
+			// Set modifier and modification time (as if item has been saved), so that we can use this information for updating the versioning tables
+			$datenow = JFactory::getDate();
+			$item->modified			= FLEXI_J16GE ? $datenow->toSql() : $datenow->toMySQL();
+			$item->modified_by	= $user->get('id');
+		}
 		
 		
 		// *********************************************
@@ -2112,6 +2119,7 @@ class ParentClassItem extends JModelAdmin
 			$v->comment		= isset($data['versioncomment']) ? htmlspecialchars($data['versioncomment'], ENT_QUOTES) : '';
 			$this->_db->insertObject('#__flexicontent_versions', $v);
 		}
+		
 		
 		// *************************************************************
 		// Delete old versions that are above the limit of kept versions
