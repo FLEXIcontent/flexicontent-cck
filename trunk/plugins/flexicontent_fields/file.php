@@ -261,9 +261,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$noaccess_msg = JFactory::getUser()->guest ? $noaccess_msg_unlogged : $noaccess_msg_logged;
 		
 		// Downloads manager feature
-		$use_downloads_manager = $field->parameters->get( 'use_downloads_manager', 1);
+		$use_downloads_manager = $field->parameters->get( 'use_downloads_manager', 0);
 		static $mod_is_enabled = null;
-		if ($mod_is_enabled === null) {
+		if ($use_downloads_manager && $mod_is_enabled === null) {
 			$db = JFactory::getDBO();
 			$query = "SELECT published FROM #__modules WHERE module = 'mod_flexidownloads'";
 			$db->setQuery($query);
@@ -273,8 +273,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				$app->enqueueMessage("FILE FIELD: please disable parameter \"Use Downloads Manager Module\", the module is not install or not published", 'message' );
 			}
 		}
-		if ($use_downloads_manager) $use_downloads_manager = $mod_is_enabled;
-		
+		$use_downloads_manager = $use_downloads_manager ? $mod_is_enabled : 0;
 		
 		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }

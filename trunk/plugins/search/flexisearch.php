@@ -59,9 +59,9 @@ class plgSearchFlexisearch extends JPlugin
 		if ($this->params->get('search_meta',		1)) {$areas['FlexisearchMeta'] = JText::_('FLEXI_STDSEARCH_META');}
 		if ($this->params->get('search_tags',		1)) {$areas['FlexisearchTags'] = JText::_('FLEXI_STDSEARCH_TAGS');}
 		
-		// Goto last element of array and add to it 2 line breaks
-		end($areas);
-		$areas[key($areas)]=current($areas).'<br><br>';
+		// Goto last element of array and add to it 2 line breaks, this layout hack is not appropriate e.g. the areas maybe inside a list ...
+		//end($areas);
+		//$areas[key($areas)]=current($areas).'<br><br>';
 		
 		return $areas;
 	}
@@ -97,9 +97,9 @@ class plgSearchFlexisearch extends JPlugin
 			}
 		}
 		
-		// Goto last element of array and add to it one more line breaks
-		end($ContentType);
-		$ContentType[key($ContentType)]=current($ContentType).'<br>';
+		// Goto last element of array and add to it one more line breaks, this layout hack is not appropriate e.g. the areas maybe inside a list ...
+		//end($ContentType);
+		//$ContentType[key($ContentType)]=current($ContentType).'<br>';
 		
 		return $ContentType;
 	
