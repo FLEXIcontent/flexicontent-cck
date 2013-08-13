@@ -1413,10 +1413,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$params->merge($menu_params);
 			} else if ($menu_matches) {
 				// Add menu parameters - not - related to category parameters override
-				$partial_param_arr = array('persistent_filters', 'initial_filters');
+				/*$partial_param_arr = array('some_parameter_nameA', 'some_parameter_nameB');
 				foreach ($partial_param_arr as $partial_param) {
 					$params->set( $partial_param, $menu_params->get($partial_param));
-				}
+				}*/
 			}
 		}
 		
