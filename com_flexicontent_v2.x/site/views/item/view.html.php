@@ -1046,7 +1046,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			$featured_sel = array();
 			foreach($selectedcats as $featured_cat) if (isset($featured_tree[$featured_cat])) $featured_sel[] = $featured_cat;
 			
-			$class  = "use_select2_lib";
+			$class  = "use_select2_lib select2_list_selected";
 			$attribs = 'class="'.$class.'" multiple="multiple" size="8"';
 			$fieldname = FLEXI_J16GE ? 'jform[featured_cid][]' : 'featured_cid[]';
 			$lists['featured_cid'] = flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed);
@@ -1064,7 +1064,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES',true).'";
 			');
 			
-			$class  = "mcat fcfield_selectmulval";
+			$class  = "mcat use_select2_lib select2_list_selected";
 			$class .= $max_cat_assign ? " validate-fccats" : " validate";
 			$attribs = 'class="'.$class.'" multiple="multiple" size="8"';
 			$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
@@ -1372,7 +1372,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				$mo_cancid  = false;
 				break;
 			case 2:  // submit to multiple categories, selecting from a MENU SPECIFIED categories subset
-				$attribs = 'class="validate fcfield_selectmulval" multiple="multiple" size="8"';
+				$attribs = 'class="validate use_select2_lib select2_list_selected" multiple="multiple" size="8"';
 				$mo_cats    = flexicontent_cats::buildcatselect($categories, $cid_form_fieldname, array(), false, $attribs, $check_published=true, $check_perms=false);
 				$mo_maincat = flexicontent_cats::buildcatselect($categories, $catid_form_fieldname, $maincatid, 2, ' class="scat use_select2_lib validate-catid" ', $check_published=true, $check_perms=false);
 				$mo_cancid  = true;
