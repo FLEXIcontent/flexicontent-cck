@@ -149,6 +149,9 @@ if ( $show_mod )
 	// Add tooltips
 	if ($add_tooltips) JHTML::_('behavior.tooltip');
 	
+	// Add common js
+	$document->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
+	
 	// Add css
 	if ($add_ccs && $layout) {
 	  if ($caching && !FLEXI_J16GE) {
@@ -158,6 +161,7 @@ if ( $show_mod )
 	      echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css">';
 	    }
 	    echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css">';
+		  echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
 	  } else {
 	    // Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
 	    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
@@ -165,6 +169,7 @@ if ( $show_mod )
 	      $document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css');
 	    }
 	    $document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css');
+		  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
 	  }
 	}
 	

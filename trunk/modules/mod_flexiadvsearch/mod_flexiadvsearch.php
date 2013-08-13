@@ -49,7 +49,7 @@ if ( $show_mod )
 	JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, null, true);
 	
 	// include the helper only once
-	//require_once (dirname(__FILE__).DS.'helper.php');  // currently no helper file ...
+	//require_once (dirname(__FILE__).DS.'helper.php');  // currently helper class is empty ...
 	
 	// initialize various variables
 	//$document	= JFactory::getDocument();
@@ -71,17 +71,35 @@ if ( $show_mod )
 	if($linkadvsearch && !trim($linkadvsearch_txt))
 		$linkadvsearch_txt = 'Advanced Search';
 	
-	// add module css file
-	// currently no css file for this module
-	/*if ($add_ccs) {
+	// Currently no JS/CSS needed
+	/*
+	// Add tooltips
+	if ($add_tooltips) JHTML::_('behavior.tooltip');
+	
+	// Add common js
+	$document->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
+	
+	// Add css
+	if ($add_ccs && $layout) {
 	  if ($caching && !FLEXI_J16GE) {
 			// Work around for caching bug in J1.5
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/mod_flexiadvsearch.css">';
+	    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+	      // active layout css
+	      echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/'.$layout.'/'.$layout.'.css">';
+	    }
+	    echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexiadvsearch/tmpl_common/module.css">';
+		  echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
 	  } else {
 	    // Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
-			$document->addStyleSheet(JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/mod_flexiadvsearch.css');
+	    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+	      // active layout css
+	      $document->addStyleSheet(JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/'.$layout.'/'.$layout.'.css');
+	    }
+	    $document->addStyleSheet(JURI::base(true).'/modules/mod_flexiadvsearch/tmpl_common/module.css');
+		  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
 	  }
-	}*/
+	}
+	*/
 	
 	if ($useitemid = $params->get('useitemid', '0'))
 	{

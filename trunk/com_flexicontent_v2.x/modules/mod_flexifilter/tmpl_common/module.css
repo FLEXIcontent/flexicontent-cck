@@ -1,65 +1,24 @@
-.mod_flexifilter_wrapper .fc_field_filter {
-	border: 1px solid gray;
-	color: black;
-	font-size: 11px;
-	font-weight: normal;
-	padding: 2px 4px;
-	margin: 4px 2px;
-	-moz-border-radius: 4px;
-	-webkit-border-radius: 4px;
-	border-radius: 4px;
-	/*box-shadow: 2px 2px 2px 2px #330033;*/
-}
-
+.mod_flexifilter_wrapper .fc_field_filter {}
 
 .mod_flexifilter_wrapper .fcbutton_go,
-.mod_flexifilter_wrapper .fcbutton_reset {
-	padding-left: 18px!important;
-	display: inline-block !important;
-	min-height: 16px !important;
-}
-.mod_flexifilter_wrapper .fcbutton_go { background: url(../../../components/com_flexicontent/assets/images/accept.png) no-repeat !important; color: green !important; }
-.mod_flexifilter_wrapper .fcbutton_reset { background: url(../../../components/com_flexicontent/assets/images/arrow_rotate_clockwise.png) no-repeat !important;  color: darkorange !important; }
+.mod_flexifilter_wrapper .fcbutton_reset {}
 
-.mod_flexifilter_wrapper button {
-	border-radius: 8px !important;
-	border: 1px solid #cccccc !important;
-	background: #eeeeee !important;
-	color: white !important;	
-	margin: 2px 6px 2px 0px;
-	padding:1px 4px 1px 2px;
-	font-weight:bold;
-	font-size:11px;
-}
+.mod_flexifilter_wrapper .fcbutton_go {}
+.mod_flexifilter_wrapper .fcbutton_reset {}
 
-.mod_flexifilter_wrapper button:hover {
-	background: #cccccc !important;
-}
+.mod_flexifilter_wrapper button {}
+
+.mod_flexifilter_wrapper button:hover {}
 
 .mod_flexifilter_wrapper .fc_cid_label,
 .mod_flexifilter_wrapper .fc_filter_label,
 .mod_flexifilter_wrapper .fc_limit_label,
-.mod_flexifilter_wrapper .fc_orderby_label
-{
-	display: inline-block;
-	float:left;
-	margin: 4px 4px 4px 4px;
-	border-bottom: 1px dashed gray;
-}
-
-.mod_flexifilter_wrapper .fc_cid_selector,
-.mod_flexifilter_wrapper .fc_filter_selector,
-.mod_flexifilter_wrapper .fc_limit_selector,
-.mod_flexifilter_wrapper .fc_orderby_selector
-{
-	float:left;
-}
+.mod_flexifilter_wrapper .fc_orderby_label {}
 
 .mod_flexifilter_wrapper .fc_cid_clear,
 .mod_flexifilter_wrapper .fc_filter_clear,
 .mod_flexifilter_wrapper .fc_limit_clear,
-.mod_flexifilter_wrapper .fc_orderby_clear
-{
+.mod_flexifilter_wrapper .fc_orderby_clear {
 	display:block;
 	float:none;
 	clear:both;
