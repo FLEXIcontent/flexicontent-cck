@@ -36,6 +36,7 @@
 			<field name="target" type="componentlayout" label="FLEXI_OVERRIDE_TMPL_LAYOUT" description="FLEXI_OVERRIDE_TMPL_LAYOUT_DESC" view="categories" />
 			<field name="image" type="media" label="FLEXI_IMAGE" description="FLEXI_CHOOSE_IMAGE_FOR_CATEGORY" />
 			<field name="note" type="text" label="JFIELD_NOTE_LABEL" description="JFIELD_NOTE_DESC" class="inputbox" size="40"/>
+			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="Initial Filters (experimental)" description="Filters that can be overriden by category filters. Enter like: field_id##value %% field_id##value %% e.g. 22##14 %% 47##some field value %% 19##someword for ranges use field_id##value1---value2 for multiple values use field_id##value1+++value2+++value3 NOTE: your field must be configured to be range filter or multi-value filter or the values will not be used as expected" />
 		</fieldset>
 		
 		<fieldset name="cat_info_options" addfieldpath="/administrator/components/com_flexicontent/elements">
