@@ -1699,7 +1699,7 @@ class FlexicontentFields
 				$field->item_id = $itemid;   // in case it needs to be loaded to replace item properties in a SQL query
 				$elements = FlexicontentFields::indexedField_getElements($field, $item, $field->extra_props, $item_pros=false, $createFilter=true);
 				// Map index field vlaues to their real properties
-				$item_values = FlexicontentFields::indexedField_getValues($field, $elements, array_keys($item_values), $prepost_prop='');
+				$item_values = FlexicontentFields::indexedField_getValues($field, $elements, $item_values, $prepost_prop='');
 			}
 				
 			$searchindex = array();
@@ -2141,12 +2141,23 @@ class FlexicontentFields
 		
 		// *** Create the form field(s) used for filtering
 		switch ($display_filter_as) {
-		case 0: case 2: case 6:
+		case 0: case 2: case 6:  // 0: Select (single value selectable), 2: Dual select (value range), 6: Multi Select (multiple values selectable)
 			$options = array();
-			$first_option_txt = $label_filter==2  ?  $filter->label  :  JText::_('FLEXI_ALL');
-			$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
-			$attribs_str = ' class="fc_field_filter" ';
-			if ($display_filter_as==6) $attribs_str .= ' multiple="multiple" size="5" ';
+			// MULTI-select does not has an internal label label via JS
+			if ($display_filter_as != 6) {
+				$first_option_txt = $label_filter==2  ?  $filter->label  :  JText::_('FLEXI_ALL');
+				$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
+			}
+			
+			// Make use of select2 lib
+			flexicontent_html::loadFramework('select2');
+			$classes  = " use_select2_lib";
+			// MULTI-select does not has an internal label via JS
+			$classes .= ($label_filter==2 && $display_filter_as==6) ? ' fc_label_internal' : '';
+			$extra_param = ($label_filter==2 && $display_filter_as==6) ? ' fc_label_text="'.flexicontent_html::escapeJsText($filter->label).'"' : '';
+			// Create HTML tag attributes
+			$attribs_str  = ' class="fc_field_filter'.$classes.'" '.$extra_param;
+			$attribs_str .= $display_filter_as==6 ? ' multiple="multiple" size="20" ' : '';
 			
 			foreach($results as $result) {
 				if ( !strlen($result->value) ) continue;
@@ -2160,9 +2171,15 @@ class FlexicontentFields
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[2]', $attribs_str, 'value', 'text', @ $value[2], $filter_ffid.'2');
 			}
 			break;
-		case 1: case 3:
-			$attribs_str = ' class="fc_field_filter" ';
-			$attribs_arr = array('class'=>'fc_field_filter') ;
+		case 1: case 3:  // 1: Text input (TODO: autocomplete), 3: Dual text input (value range), both of these can be JS date calendars
+			if ($display_filter_as==1 && $label_filter==2) {
+				$attribs_str = ' class="fc_field_filter fc_label_internal" fc_label_text="'.flexicontent_html::escapeJsText($filter->label).'"';
+				$attribs_arr = array('class'=>'fc_field_filter fc_label_internal', 'fc_label_text' => flexicontent_html::escapeJsText($filter->label) );
+			} else {
+				$attribs_str = ' class="fc_field_filter" ';
+				$attribs_arr = array('class'=>'fc_field_filter') ;
+			}
+			
 			if ($display_filter_as==1) {
 				if ($isdate)
 					$filter->html	.= FlexicontentFields::createCalendarField($value, $allowtime, $fieldname, $$filter_ffid, $attribs_arr);
@@ -2181,48 +2198,51 @@ class FlexicontentFields
 				}
 			}
 			break;
-		case 4: case 5:
+		case 4: case 5:  // 4: radio (single value selectable), 5: checkbox (multiple values selectable)
 			$i = 0;
-			$checked = ($display_filter_as==5) ? !count($value) : !strlen($value);
-			$checked_attr = '';
-			$checked_class = $checked ? 'highlight' : '';
-			$filter->html .= '<label class="flexi_radiotab rc5 '.$checked_class.'" for="'.$filter_ffid.$i.'">';
+			$checked = ($display_filter_as==5) ? !count($value) || empty($value[0]) : !strlen($value);
+			$checked_attr = $checked ? 'checked="checked"' : '';
+			$checked_class = $checked ? 'fc_highlight' : '';
+			$filter->html .= '<span class="fc_field_filter fc_checkradio_group">';
+			$filter->html .= '<span class="fc_checkradio_option">';
 			if ($display_filter_as==4) {
-				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode.parentNode, \'highlight\', 1);" ';
+				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode, \'fc_highlight\', 1);" ';
 				$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
-				$filter->html .= '  value="" '.$checked_attr.' style="display:none;" />';
+				$filter->html .= '  value="" '.$checked_attr.' class="fc_checkradio" />';
 			} else {
-				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\', 1);" ';
+				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClass(this, \'fc_highlight\', 1);" ';
 				$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'['.$i.']" ';
-				$filter->html .= '  value="" '.$checked_attr.' style="display:none;" />';
+				$filter->html .= '  value="" '.$checked_attr.' class="fc_checkradio" />';
 			}
-			$filter->html .= ' <span style="float:left; display:inline-block;" >'.
+			$filter->html .= '<label class="'.$checked_class.'" for="'.$filter_ffid.$i.'">'.
 				($label_filter==2  ?  $filter->label.': ' : '').
-				'- '.JText::_('FLEXI_ALL').' -'.
-				'</span>';
-			$filter->html .= '</label>';
+				'- '.JText::_('FLEXI_ALL').' -';
+			$filter->html .= '</label></span>';
 			$i++;
 			foreach($results as $result) {
 				if ( !strlen($result->value) ) continue;
 				$checked = ($display_filter_as==5) ? in_array($result->value, $value) : $result->value==$value;
 				$checked_attr = $checked ? ' checked=checked ' : '';
 				$disable_attr = !$result->found ? ' disabled=disabled ' : '';
-				$checked_class = $checked ? 'highlight' : '';
+				$checked_class = $checked ? 'fc_highlight' : '';
 				$checked_class .= !$result->found ? ' fcdisabled ' : '';
-				$filter->html .= '<label class="flexi_radiotab rc5 '.$checked_class.'" for="'.$filter_ffid.$i.'">';
+				$filter->html .= '<span class="fc_checkradio_option">';
 				if ($display_filter_as==4) {
-					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode.parentNode, \'highlight\');" ';
+					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode, \'fc_highlight\');" ';
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
-					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' />';
+					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 				} else {
-					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" ';
+					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClass(this, \'fc_highlight\');" ';
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'['.$i.']" ';
-					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' />';
+					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 				}
-				$filter->html .= ' <span style="float:left; display:inline-block;" >'.JText::_($result->text).'</span>';
+				$filter->html .= '<label class="'.$checked_class.'" for="'.$filter_ffid.$i.'">';
+				$filter->html .= JText::_($result->text);
 				$filter->html .= '</label>';
+				$filter->html .= '</span>';
 				$i++;
 			}
+			$filter->html .= '</span>';
 			break;
 		}
 		if ( $print_logging_info ) $current_filter_creation = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
