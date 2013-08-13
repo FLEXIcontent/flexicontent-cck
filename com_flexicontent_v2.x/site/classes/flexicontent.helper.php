@@ -131,10 +131,11 @@ class flexicontent_html
 		//$orderby = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
 		$limit = $app->getUserStateFromRequest( 'limit', 'limit', $params->get('limit'), 'string' );
 
-		$class    = ' class="inputbox fc_field_filter" ';
+		flexicontent_html::loadFramework('select2');
+		$classes  = "fc_field_filter use_select2_lib";
 		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(document.getElementById(\''.$formname.'\')); document.getElementById(\''.$formname.'\').submit();" ';
-		$attribs  = $class . $onchange;
-
+		$attribs  = ' class="'.$classes.'" ' . $onchange;
+		
 		$limit_options = $params->get('limit_options', '5,10,20,30,50,100,150,200');
 		$limit_options = preg_split("/[\s]*,[\s]*/", $limit_options);
 
@@ -155,10 +156,12 @@ class flexicontent_html
 		//$orderby = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
 		$orderby = $app->getUserStateFromRequest( 'orderby', 'orderby', $params->get('orderby'), 'string' );
 
-		$class    = ' class="inputbox fc_field_filter" ';
+		flexicontent_html::loadFramework('select2');
+		$classes  = "fc_field_filter use_select2_lib";
 		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(document.getElementById(\''.$formname.'\')); document.getElementById(\''.$formname.'\').submit();" ';
-		$attribs  = $class . $onchange;
-
+		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(document.getElementById(\''.$formname.'\')); document.getElementById(\''.$formname.'\').submit();" ';
+		$attribs  = ' class="'.$classes.'" ' . $onchange;
+		
 		$orderby_options = $params->get('orderby_options', array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','id','rid','order'));
 		$orderby_options = FLEXIUtilities::paramToArray($orderby_options);
 
@@ -307,10 +310,76 @@ class flexicontent_html
 				$document->addScript( JURI::root().'components/com_flexicontent/librairies/select2/select2.js' );
 				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/select2/select2.css');
 				
-				// Attach select2 to specific to select elements having specific CSS class
 				$js .= "
 					jQuery(document).ready(function() {
+						
+						"/* Attach select2 to specific to select elements having specific CSS class */."
 						jQuery('select.use_select2_lib').select2();
+						
+						jQuery('div.use_select2_lib').each(function() {
+							var el_container = jQuery(this);
+							var el_select = el_container.next('select');
+							
+							"/* MULTI-SELECT2: Initialize internal labels, placing the label so that it overlaps the text filter box */."
+							var fc_label_text = el_select.attr('fc_label_text');
+							if (!fc_label_text) return;
+							var _label = (fc_label_text.length >= 30) ? fc_label_text.substring(0, 28) + '...' : fc_label_text;
+							
+							jQuery('<span/>', {
+								'class': 'fc_has_inner_label fc_has_inner_label_select2',
+								'text': _label
+							}).prependTo(el_container.find('.select2-search-field'));
+							
+							"/* SINGLE-SELECT2: Highlight selects with an active value */."
+							if ( ! el_select.attr('multiple') ) {
+								var el = el_container.find('.select2-choice');
+								if (el_select.val().length) {
+									el.addClass('fc_highlight');
+								} else {
+									el.removeClass('fc_highlight');
+								}
+							}
+							
+						});
+						
+						"/* MULTI-SELECT2: */."
+						jQuery('select.use_select2_lib').on('open', function() {
+							"/* Add events to handle focusing the text filter box (hide inner label) */."
+							var el_container = jQuery(this).parent();
+							var el = jQuery(this).parent().find('.select2-input');
+							el.prev().hide();
+							
+							"/* Allow listing already selected options WHEN having class 'select2_list_selected' */."
+							if (jQuery(this).hasClass('select2_list_selected')) {
+								var els = jQuery('.select2-selected');
+								els.addClass('select2-selected-highlight').addClass('select2-disabled').removeClass('select2-selected').removeClass('select2-result-selectable');
+							}
+						}).on('close', function() {
+							"/* Add events to handle bluring the text filter box (show inner label) */."
+							var el_container = jQuery(this).parent();
+							var el = jQuery(this).parent().find('.select2-input');
+							el.prev().show();
+							
+							"/* Restore already selected options state */."
+							if (jQuery(this).hasClass('select2_list_selected')) {
+								var els = jQuery('.select2-selected-highlight');
+								els.removeClass('select2-selected-highlight').removeClass('select2-disabled').addClass('select2-result-selectable');
+							}
+						}).on
+						
+						"/* SINGLE-SELECT2: Add events to handle highlighting selected value */."
+						('change', function() {
+							var el_select = jQuery(this);
+							if ( ! el_select.attr('multiple') ) {
+								var el = jQuery(this).prev('div').find('.select2-choice');
+								if (el_select.val().length) {
+									el.addClass('fc_highlight');
+								} else {
+									el.removeClass('fc_highlight');
+								}
+							}
+						});
+						
 					});
 				";
 				break;
