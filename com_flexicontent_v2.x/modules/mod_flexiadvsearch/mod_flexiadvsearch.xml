@@ -13,7 +13,10 @@
 	<files>
 		<filename module="mod_flexiadvsearch">mod_flexiadvsearch.php</filename>
 		<filename>index.html</filename>
+		<filename>helper.php</filename>
+		<folder>elements</folder>
 		<folder>tmpl</folder>
+		<folder>tmpl_common</folder>
 	</files>
 	
 	<languages>

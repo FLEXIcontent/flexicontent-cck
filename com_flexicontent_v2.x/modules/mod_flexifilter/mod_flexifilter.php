@@ -93,7 +93,7 @@ if ( $show_mod )
 	//flexicontent_html::loadFramework('select2');
 	if ($display_cat_list)
 	{
-		$_fld_class = '';//' class="use_select2_lib"';
+		$_fld_class = ' class="fc_field_filter use_select2_lib"';
 		$_fld_size = " size='$catlistsize' ";
 		
 		$loader_html = '\'<p class=\\\'qf_centerimg=\\\'><img src=\\\''.JURI::base().'components/com_flexicontent/assets/images/ajax-loader.gif\\\' align=\\\'center\\\'></p>\'';
@@ -141,6 +141,7 @@ if ( $show_mod )
 	}
 	
 	// 4. Create/shape HTML of filters
+	$display_label_filter_override = (int) $params->get('show_filter_labels', 0);
 	$filter_html = array();
 	foreach ($filters as $filter_name => $filter)
 	{
@@ -149,7 +150,8 @@ if ( $show_mod )
 		
 		// make sure filter HTML is cleared, and create it
 		$display_label_filter_saved = $filter->parameters->get('display_label_filter');
-		if ( $params->get('show_filter_labels',1)>0 ) $filter->parameters->set('display_label_filter', 0); // suppress labels inside filter's HTML (hide or show all labels externally)
+		if ( $display_label_filter_override ) $filter->parameters->set('display_label_filter', $display_label_filter_override); // suppress labels inside filter's HTML (hide or show all labels externally)
+		
 		// else ... filter default label behavior
 		$filter->html = '';  // make sure filter HTML display is cleared
 		$field_type = $filter->iscore ? 'core' : $filter->field_type;
@@ -180,7 +182,13 @@ if ( $show_mod )
 	
 	if ( !empty($cats_select_field) || !empty($cat_hidden_field ) )
 	{
+		// Add tooltips
+		if ($add_tooltips) JHTML::_('behavior.tooltip');
+		
+		// Add js
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
+		
+		// Add css
 		if ($add_ccs && $layout) {
 		  if ($caching && !FLEXI_J16GE) {
 				// Work around for caching bug in J1.5
@@ -189,6 +197,7 @@ if ( $show_mod )
 		      echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexifilter/tmpl/'.$layout.'/'.$layout.'.css">';
 		    }
 		    echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css">';
+		    echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
 		  } else {
 		    // Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
 		    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
@@ -196,11 +205,9 @@ if ( $show_mod )
 		      $document->addStyleSheet(JURI::base(true).'/modules/mod_flexifilter/tmpl/'.$layout.'/'.$layout.'.css');
 		    }
 		    $document->addStyleSheet(JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css');
+		    $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
 		  }
 		}
-		
-		// Tooltips
-		if ($add_tooltips) JHTML::_('behavior.tooltip');
 		
 		// Render Layout
 		require(JModuleHelper::getLayoutPath('mod_flexifilter', $layout));

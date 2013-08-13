@@ -59,10 +59,28 @@
 			<field name="show_filter_labels" type="list" default="" label="FLEXI_FORCE_FILTER_LABELS" description="FLEXI_FORCE_FILTER_LABELS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
-				<option value="1">FLEXI_FORCE_SHOW_ALL</option>
-				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
+				<option value="1">FLEXI_FORCE_OUTSIDE_FILTER</option>
+				<option value="2">FLEXI_FORCE_INSIDE_FILTER</option>
 			</field>
 			<field name="filterids" type="filters" multiple="true" label="FLEXI_FILTERS" description="FLEXI_FILTERS_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" menu="hide" />
+			<field name="filter_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" menu="hide" />
+			<field name="filter_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" menu="hide" />
+			<field name="filter_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" menu="hide" />
+			<field name="filter_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" menu="hide" />
+			<field name="filter_placement" type="radio" default="1" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" menu="hide" >
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
+			</field>
+			<field name="filter_separatorf" type="list" default="0" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC" menu="hide" >
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_EXTRA_FORM_FIELDS" level="level1" menu="hide" />
 			<field name="orderby_override" type="radio" default="1" label="FLEXI_SHOW_ORDERBY" description="FLEXI_SHOW_ORDERBY_DESC">

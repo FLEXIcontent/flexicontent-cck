@@ -243,7 +243,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 		<!-- EOF featured items -->
 	<?php endif; ?>
 		
-		
+	
 	<?php if (isset($list[$ord]['standard'])) : ?>
 		<!-- BOF standard items -->
 		<?php	$rowcount = 0; ?>
@@ -391,7 +391,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 	<?php endif; ?>
 		
 	<div class="modclear"></div>
-
+	
 	</div>
 	<?php endforeach; ?>
 	

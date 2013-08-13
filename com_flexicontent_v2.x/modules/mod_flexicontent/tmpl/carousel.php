@@ -548,7 +548,7 @@ $js ='
 				maxHeight = Math.max(maxHeight, element.clientHeight - '.(2*$padding_top_bottom).');
 			});
 			mod_fc_carousel'.$module->id.'.items.each(function(element) {
-				element.style.height = maxHeight + "px";
+				element.style.minHeight = maxHeight + "px";
 			});
 		
 		'.($mode!="vertical" ? '':'

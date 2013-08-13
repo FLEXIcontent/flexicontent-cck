@@ -25,84 +25,102 @@
 	
 	<params addpath="/modules/mod_flexifilter/elements">
 		
-			<param name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
-			<param name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexifilter/tmpl"
+			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
+			<field name="layout" type="filelist" label="FLEXI_CHOOSE_TMPL" description="FLEXI_CHOOSE_TMPL_DESC" directory="/modules/mod_flexifilter/tmpl"
 					default="default"  hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_" />
-			<param name="autosubmit" type="list" default="0" label="FLEXI_AUTOSUBMIT_NON_FIELD_FILTERS" description="FLEXI_AUTOSUBMIT_NON_FIELD_FILTERS_DESC">
+			<field name="autosubmit" type="list" default="0" label="FLEXI_AUTOSUBMIT_NON_FIELD_FILTERS" description="FLEXI_AUTOSUBMIT_NON_FIELD_FILTERS_DESC">
 				<option value="0">FLEXI_NO_FORCES_GO_BUTTON</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
+			</field>
 			
-			<param name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" menu="hide" />
-			<param name="catid" type="qfcategory" label="FLEXI_FILTER_SINGLE_OR_DEFAULT_CATEGORY" description="FLEXI_FILTER_SINGLE_CATEGORY_DESC" />
-			<param name="display_cat_list" type="list" default="0" label="FLEXI_FILTER_DISPLAY_CATEGORY_LIST" description="FLEXI_FILTER_DISPLAY_CATEGORY_LIST_DESC" >
+			<field name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" menu="hide" />
+			<field name="catid" type="qfcategory" label="FLEXI_FILTER_SINGLE_OR_DEFAULT_CATEGORY" description="FLEXI_FILTER_SINGLE_CATEGORY_DESC" />
+			<field name="display_cat_list" type="list" default="0" label="FLEXI_FILTER_DISPLAY_CATEGORY_LIST" description="FLEXI_FILTER_DISPLAY_CATEGORY_LIST_DESC" >
 				<option value="0">FLEXI_FILTER_NO_USE_SINGLE_CAT_OR_CURR_CAT</option>
 				<option value="1">FLEXI_FILTER_YES_INCLUDE_SELECTED_CATEGORIES</option>
 				<option value="2">FLEXI_FILTER_YES_EXCLUDE_SELECTED_CATEGORIES</option>
-			</param>
-			<param name="catlistsize" type="text" required="false" size="10" label="FLEXI_FILTER_LINES_CATEGORY_BOX" description="FLEXI_FILTER_LINES_CATEGORY_BOX_DESC" />
-			<param name="catids" type="flexicategories" multiple="true" required="false" size="10" label="FLEXI_FILTER_DISPLAYED_CATS" description="FLEXI_FILTER_DISPLAYED_CATS_DESC" />
-			<param name="usesubcats" type="radio" default="0" label="FLEXI_FILTER_INCLUDE_SUBCATS" description="FLEXI_FILTER_INCLUDE_SUBCATS_DESC">
+			</field>
+			<field name="catlistsize" type="text" required="false" size="10" label="FLEXI_FILTER_LINES_CATEGORY_BOX" description="FLEXI_FILTER_LINES_CATEGORY_BOX_DESC" />
+			<field name="catids" type="flexicategories" multiple="true" required="false" size="10" label="FLEXI_FILTER_DISPLAYED_CATS" description="FLEXI_FILTER_DISPLAYED_CATS_DESC" />
+			<field name="usesubcats" type="radio" default="0" label="FLEXI_FILTER_INCLUDE_SUBCATS" description="FLEXI_FILTER_INCLUDE_SUBCATS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
+			</field>
 			
-			<param name="" type="separator" default="FLEXI_FILTER_FIELD_FILTERS" level="level1" menu="hide" />
-			<param name="display_filter_list" type="list" default="0" label="FLEXI_FILTER_DISPLAYED_FILTERS" description="FLEXI_FILTER_DISPLAYED_FILTERS_DESC" >
+			<field name="" type="separator" default="FLEXI_FILTER_FIELD_FILTERS" level="level1" menu="hide" />
+			<field name="display_filter_list" type="list" default="0" label="FLEXI_FILTER_DISPLAYED_FILTERS" description="FLEXI_FILTER_DISPLAYED_FILTERS_DESC" >
 				<option value="0">FLEXI_FILTER_DISPLAYED_FILTERS_ALL</option>
 				<option value="1">FLEXI_FILTER_DISPLAYED_FILTERS_SET_IN_CAT_PARAMS</option>
 				<option value="2">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED</option>
 				<option value="3">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED_SET_IN_CAT_PARAMS</option>
-			</param>
-			<param name="show_filter_labels" type="list" default="" label="FLEXI_FORCE_FILTER_LABELS" description="FLEXI_FORCE_FILTER_LABELS_DESC">
+			</field>
+			<field name="show_filter_labels" type="list" default="" label="FLEXI_FORCE_FILTER_LABELS" description="FLEXI_FORCE_FILTER_LABELS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
-				<option value="1">FLEXI_FORCE_SHOW_ALL</option>
-				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
-			</param>
-			<param name="filterids" type="filters" multiple="true" label="FLEXI_FILTERS" description="FLEXI_FILTERS_DESC" />
+				<option value="1">FLEXI_FORCE_OUTSIDE_FILTER</option>
+				<option value="2">FLEXI_FORCE_INSIDE_FILTER</option>
+			</field>
+			<field name="filterids" type="filters" multiple="true" label="FLEXI_FILTERS" description="FLEXI_FILTERS_DESC" />
 			
-			<param name="" type="separator" default="FLEXI_EXTRA_FORM_FIELDS" level="level1" menu="hide" />
-			<param name="orderby_override" type="radio" default="1" label="FLEXI_SHOW_ORDERBY" description="FLEXI_SHOW_ORDERBY_DESC">
+			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" menu="hide" />
+			<field name="filter_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" menu="hide" />
+			<field name="filter_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" menu="hide" />
+			<field name="filter_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" menu="hide" />
+			<field name="filter_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" menu="hide" />
+			<field name="filter_placement" type="radio" default="1" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" menu="hide" >
+				<option value="1">FLEXI_YES</option>
+				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
+			</field>
+			<field name="filter_separatorf" type="list" default="0" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC" menu="hide" >
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_EXTRA_FORM_FIELDS" level="level1" menu="hide" />
+			<field name="orderby_override" type="radio" default="1" label="FLEXI_SHOW_ORDERBY" description="FLEXI_SHOW_ORDERBY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="limit_override" type="radio" default="1" label="FLEXI_SHOW_LIMIT" description="FLEXI_SHOW_LIMIT_DESC">
+			</field>
+			<field name="limit_override" type="radio" default="1" label="FLEXI_SHOW_LIMIT" description="FLEXI_SHOW_LIMIT_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
+			</field>
 		
-		<param type="jparamstab" title="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC" />
-			<param name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC">
+		<field type="jparamstab" title="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC" />
+			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC">
 				<option value="OR">FLEXI_OR</option>
 				<option value="AND">FLEXI_AND</option>
-			</param>
+			</field>
 
-			<param name="" type="separator" default="FLEXI_FLEXI_VIEW_RULES" level="level2" menu="hide" />
-			<param name="show_in_views" type="fccheckbox" default=""
+			<field name="" type="separator" default="FLEXI_FLEXI_VIEW_RULES" level="level2" menu="hide" />
+			<field name="show_in_views" type="fccheckbox" default=""
 					checkoptions="FLEXI_CATEGORY_V,FLEXI_ITEM_V,FLEXI_FAVOURITES_V,FLEXI_TAGS_V,FLEXI_SEARCH_V,FLEXI_OTHERS_V" checkvals="category,item,favourites,tags,search,others"
 					defaultvals="category,item,favourites,tags,search,others"
 					label="FLEXI_SHOW_IN_VIEWS" description="FLEXI_SHOW_IN_VIEWS_DESC"
 			/>
 			
-			<param name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level2" menu="hide" />
-			<param name="enable_php_rule" type="radio" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC">
+			<field name="" type="separator" default="FLEXI_PHP_EXPRESSION_RULE" level="level2" menu="hide" />
+			<field name="enable_php_rule" type="radio" default="0" label="FLEXI_ENABLE_RULE" description="FLEXI_ENABLE_RULE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" />
+			</field>
+			<field name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" />
 		
-		<param name="" type="jparamstab" title="FLEXI_MOD_ADVANCED" />
-			<param name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
-			<param name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
-			<param name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC">
+		<field name="" type="jparamstab" title="FLEXI_MOD_ADVANCED" />
+			<field name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
+			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
+			<field name="add_ccs" type="radio" default="1" label="FLEXI_ADD_DEFAULT_CSS" description="FLEXI_ADD_DEFAULT_CSS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
-			<param name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS" description="FLEXI_ADD_TOOLTIPS_DESC">
+			</field>
+			<field name="add_tooltips" type="radio" default="1" label="FLEXI_ADD_TOOLTIPS" description="FLEXI_ADD_TOOLTIPS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
-			</param>
+			</field>
 			
 	</params>
 </install>
