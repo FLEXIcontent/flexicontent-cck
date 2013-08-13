@@ -234,7 +234,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$form_contenttypes = array(); //array('__FC_ALL__'); //$contenttypes;
 			}
 			$checked_attr = '';
-			$checked_class = !count($form_contenttypes) ? 'highlight' : '';
+			$checked_class = !count($form_contenttypes) ? ' fc_highlight' : '';
 			
 			// Get all configured content Types *(or ALL if these were not set)
 			$query = "SELECT id AS value, name AS text"
@@ -247,20 +247,26 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$types = $db->loadObjectList();
 			
 			//$lists['contenttypes'] = JHTML::_('select.genericlist', $types, 'contenttypes[]', 'multiple="true" size="5" style="min-width:186px;" ', 'value', 'text', $form_contenttypes, 'contenttypes');
-			$lists['contenttypes']  = '<label class="flexi_radiotab rc5 '.$checked_class.'" for="_contenttypes_0">';
-			$lists['contenttypes'] .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\', 1);" style="display:none;"';
-			$lists['contenttypes'] .= '  id="_contenttypes_0" type="checkbox" name="contenttypes[0]" value="" '.$checked_attr.' />';
-			$lists['contenttypes'] .= ' <span style="float:left; display:inline-block;" >-'.JText::_('FLEXI_ALL').'-</span>';
-			$lists['contenttypes'] .= '</label>';
+			$lists['contenttypes']  = '<span class="fc_field_filter fc_checkradio_group">';
+			$lists['contenttypes'] .= ' <span class="fc_checkradio_option">';
+			$lists['contenttypes'] .= '  <input href="javascript:;" onclick="fc_toggleClass(this, \'fc_highlight\', 1);"';
+			$lists['contenttypes'] .= '    id="_contenttypes_0" type="checkbox" name="contenttypes[0]" value="" '.$checked_attr.' />';
+			$lists['contenttypes'] .= '  <label class="fc_checkradio'.$checked_class.'" for="_contenttypes_0">';
+			$lists['contenttypes'] .= '   -'.JText::_('FLEXI_ALL').'-';
+			$lists['contenttypes'] .= '  </label>';
+			$lists['contenttypes'] .= ' </span>';
 			foreach($types as $type) {
 				$checked = in_array($type->value, $form_contenttypes);
 				$checked_attr = $checked ? 'checked=checked' : '';
-				$checked_class = $checked ? 'highlight' : '';
-				$lists['contenttypes'] .= '<label class="flexi_radiotab rc5 '.$checked_class.'" style="display:inline-block; white-space:nowrap;" for="_contenttypes_'.$type->value.'">';
-				$lists['contenttypes'] .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" id="_contenttypes_'.$type->value.'" type="checkbox" name="contenttypes[]" value="'.$type->value.'" '.$checked_attr.' />';
-				$lists['contenttypes'] .= '<span style="float:left; display:inline-block;" >'.JText::_($type->text).'</span>';
-				$lists['contenttypes'] .= '</label>';
+				$checked_class = $checked ? ' fc_highlight' : '';
+				$lists['contenttypes'] .= ' <span class="fc_checkradio_option">';
+				$lists['contenttypes'] .= '  <input href="javascript:;" onclick="fc_toggleClass(this, \'fc_highlight\');" id="_contenttypes_'.$type->value.'" type="checkbox" name="contenttypes[]" value="'.$type->value.'" '.$checked_attr.' />';
+				$lists['contenttypes'] .= '  <label class="fc_checkradio'.$checked_class.'" for="_contenttypes_'.$type->value.'">';
+				$lists['contenttypes'] .= '   '.JText::_($type->text);
+				$lists['contenttypes'] .= '  </label>';
+				$lists['contenttypes'] .= ' </span>';
 			}
+			$lists['contenttypes'] .= '</span>';
 		}
 		
 		
@@ -273,24 +279,30 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$form_txtflds = array(); //array('__FC_ALL__'); //array_keys($fields_text);
 			}
 			$checked_attr = '';
-			$checked_class = !count($form_txtflds) ? 'highlight' : '';
+			$checked_class = !count($form_txtflds) ? ' fc_highlight' : '';
 			
 			//$lists['contenttypes'] = JHTML::_('select.genericlist', $advsearch, 'contenttypes[]', 'multiple="true" size="5" style="min-width:186px;" ', 'value', 'text', $form_txtflds, 'contenttypes');
 			
-			$lists['txtflds']  = '<label class="flexi_radiotab rc5 '.$checked_class.'" for="_txtflds_0">';
-			$lists['txtflds'] .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\', 1);" style="display:none;"';
-			$lists['txtflds'] .= '  id="_txtflds_0" type="checkbox" name="txtflds[0]" value="" '.$checked_attr.' />';
-			$lists['txtflds'] .= ' <span style="float:left; display:inline-block;" >-'.JText::_('FLEXI_ALL').'-</span>';
-			$lists['txtflds'] .= '</label>';
+			$lists['txtflds']  = '<span class="fc_field_filter fc_checkradio_group">';
+			$lists['txtflds'] .= ' <span class="fc_checkradio_option">';
+			$lists['txtflds'] .= '  <input href="javascript:;" onclick="fc_toggleClass(this, \'fc_highlight\', 1);"';
+			$lists['txtflds'] .= '   id="_txtflds_0" type="checkbox" name="txtflds[0]" value="" '.$checked_attr.' />';
+			$lists['txtflds'] .= '  <label class="class="fc_checkradio"'.$checked_class.'" for="_txtflds_0">';
+			$lists['txtflds'] .= '   -'.JText::_('FLEXI_ALL').'-';
+			$lists['txtflds'] .= '  </label>';
+			$lists['txtflds'] .= ' </span>';
 			foreach($fields_text as $field) {
 				$checked = in_array($field->name, $form_txtflds);
 				$checked_attr = $checked ? 'checked=checked' : '';
-				$checked_class = $checked ? 'highlight' : '';
-				$lists['txtflds'] .= '<label class="flexi_radiotab rc5 '.$checked_class.'" style="display:inline-block; white-space:nowrap;" for="_txtflds_'.$field->id.'">';
-				$lists['txtflds'] .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" id="_txtflds_'.$field->id.'" type="checkbox" name="txtflds[]" value="'.$field->name.'" '.$checked_attr.' />';
-				$lists['txtflds'] .= '<span style="float:left; display:inline-block;" >'.JText::_($field->label).'</span>';
-				$lists['txtflds'] .= '</label>';
+				$checked_class = $checked ? ' fc_highlight' : '';
+				$lists['txtflds'] .= ' <span class="fc_checkradio_option">';
+				$lists['txtflds'] .= '  <input href="javascript:;" onclick="fc_toggleClass(this, \'fc_highlight\');" id="_txtflds_'.$field->id.'" type="checkbox" name="txtflds[]" value="'.$field->name.'" '.$checked_attr.' />';
+				$lists['txtflds'] .= '  <label class="class="fc_checkradio"'.$checked_class.'" for="_txtflds_'.$field->id.'">';
+				$lists['txtflds'] .= '   '.JText::_($field->label);
+				$lists['txtflds'] .= '  </label>';
+				$lists['txtflds'] .= ' </span>';
 			}
+			$lists['txtflds'] .= '</span>';
 		}
 		
 		
@@ -377,15 +389,27 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			unset($this->searchareas['search']['content']);
 			unset($this->searchareas['search']['flexisearch']);
 			
+				$lists['contenttypes'] .= ' <span class="fc_checkradio_option">';
+				$lists['contenttypes'] .= '  <input href="javascript:;" onclick="fc_toggleClass(this, \'fc_highlight\');" id="_contenttypes_'.$type->value.'" type="checkbox" name="contenttypes[]" value="'.$type->value.'" '.$checked_attr.' />';
+				$lists['contenttypes'] .= '  <label class="fc_checkradio'.$checked_class.'" for="_contenttypes_'.$type->value.'">';
+				$lists['contenttypes'] .= '   '.JText::_($type->text);
+				$lists['contenttypes'] .= '  </label>';
+				$lists['contenttypes'] .= ' </span>';
+
+			
+			$lists['areas']  = '<span class="fc_field_filter fc_checkradio_group">';
 			foreach($areas['search'] as $area_name => $area_label) {
 				$checked = in_array($area_name, $form_areas);
 				$checked_attr = $checked ? 'checked=checked' : '';
-				$checked_class = $checked ? 'highlight' : '';
-				$lists['areas'] .= '<label class="flexi_radiotab rc5 '.$checked_class.'" style="display:inline-block; white-space:nowrap;" for="area_'.$area_name.'">';
-				$lists['areas'] .= ' <input href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" id="area_'.$area_name.'" type="checkbox" name="areas[]" value="'.$area_name.'" '.$checked_attr.' />';
-				$lists['areas'] .= '<span style="float:left; display:inline-block;" >'.JText::_($area_label).'</span>';
-				$lists['areas'] .= '</label>';
+				$checked_class = $checked ? ' fc_highlight' : '';
+				$lists['areas'] .= ' <span class="fc_checkradio_option">';
+				$lists['areas'] .= '  <input href="javascript:;" onclick="fc_toggleClass(this, \'fc_highlight\');" id="area_'.$area_name.'" type="checkbox" name="areas[]" value="'.$area_name.'" '.$checked_attr.' />';
+				$lists['areas'] .= '  <label class="fc_checkradio'.$checked_class.'" for="area_'.$area_name.'">';
+				$lists['areas'] .= '  '.JText::_($area_label);
+				$lists['areas'] .= '  </label>';
+				$lists['areas'] .= ' </span>';
 			}
+			$lists['areas'] .= '</span>';
 		}
 		
 		// log the search
