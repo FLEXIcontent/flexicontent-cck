@@ -1557,7 +1557,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			foreach ($initial_filters as $filter_id)    $all_filters[] = $filter_id;
 		}
 		
-		$scope	= count($all_filters) ? ' AND fi.id IN (' . implode(',', $all_filters) . ')' : null;
+		//$scope	= count($all_filters) ? ' AND fi.id IN (' . implode(',', $all_filters) . ')' : null; // I don't understand why we got the filters in the some categories that I don't want the filters
+		$scope	= ' AND fi.id IN (' . implode(',', $all_filters) . ')';// By Enjoyman
 		$filters	= null;
 		
 		if (FLEXI_J16GE) {
