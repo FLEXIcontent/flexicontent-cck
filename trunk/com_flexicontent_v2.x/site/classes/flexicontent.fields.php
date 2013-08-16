@@ -2254,7 +2254,7 @@ class FlexicontentFields
 	
 	
 	// Method to create a calendar form field according to a given configuation, e.g. called during Filter Creation of FC views
-	static function createCalendarField($value, $date_allowtime, $fieldname, $elementid, $attribs='', $skip_on_invalid=false, $timezone='')
+	static function createCalendarField($value, $date_allowtime, $fieldname, $elementid, $attribs='', $skip_on_invalid=false, $timezone=false)
 	{
 		@list($date, $time) = preg_split('#\s+#', $value, $limit=2);
 		$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
