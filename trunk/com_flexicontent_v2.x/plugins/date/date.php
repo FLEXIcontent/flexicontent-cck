@@ -579,7 +579,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$filter->filter_colname    = sprintf(' DATE_FORMAT(rel.value, "%s") ', $date_valformat);
 		$filter->filter_valuesjoin = null;   // use default
-		$filter->filter_valueformat = sprintf(' DATE_FORMAT("__filtervalue__", "%s") ', $date_valformat);
+		$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
 	}
 	
