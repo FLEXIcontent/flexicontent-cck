@@ -5,7 +5,8 @@
  ******************************************/
 #flexicontent {}
 
-#flexicontent .fcclear,
+.fcclear, .clear,
+#flexicontent .fcclear, 
 #flexicontent .clear {
 	border: 0;
 	clear: both;
@@ -283,76 +284,100 @@ fieldset.fc_filter_set {
 
 /* Blocking overlay during form being applied and page reloading */
 #fc_filter_form_blocker {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 1000;
 	display: none;
-}
-#fc_filter_form_blocker div.fc_blocker_opacity {
+	z-index: 1000;
+	
 	position: absolute;
 	top: 0;
 	left: 0;
+	
 	width: 100%;
 	height: 100%;
+}
+#fc_filter_form_blocker .fc_blocker_opacity {
+	display: block;
+	z-index: 1000;
+	
+	position: absolute;
+	top: 0;
+	left: 0;
+	
 	opacity: 0.3;
 	filter:alpha(opacity=30); /* For IE8 and earlier */
 	background-color: #000;
-	z-index: 1000;
+	
+	width: 100%;
+	height: 100%;
 }
-#fc_filter_form_blocker div.fc_blocker_content {
-	font-size: 12px;
-	background: white url(../images/ajax-loader.gif) 60px 50% no-repeat;
+#fc_filter_form_blocker .fc_blocker_content {
+	display: block;
+	z-index: 1001;
+	position: fixed;
+	top: 200px;
+	left: 40%;
+	
+	color: black;
+	background: white url(../images/ajax-loader.gif) 30px 40px no-repeat;
 	opacity:1;
 	filter:alpha(opacity=100); /* For IE8 and earlier */
-	position: absolute;
-	top: 200px;
-	left: 33%;
+	
 	width: auto;
-	height: 18px;
-	padding: 60px 60px 60px 84px;
+	padding: 40px 0px 46px 60px;
 	margin: 0px;
-	color: black;
+	
+	font-size: 12px;
 	font-weight: bold;
-	border: 1px dashed black;
 	border: 1px solid lightgray;
 	border-radius: 8px;
-	z-index: 1001;
+	text-align: left;
 }
+
+#fc_filter_form_blocker .fc_blocker_bar {
+	display: block;
+	width: 200px;
+	height: 22px;
+	border: 1px solid #111;
+	background-color: #292929;
+	position: relative;
+	left: -30px;
+	top:6px;
+}
+
+#fc_filter_form_blocker .fc_blocker_bar div {
+	display: block;
+	height: 100%;
+	color: #fff;
+	text-align: right;
+	line-height: 22px; /* same as #progressBar height if we want text middle aligned */
+	width: 0;
+	background-color: #0099ff;
+}
+
+.fc_filter_set legend .fc_legend_text {
+	background: transparent;
+	border:1px solid lightgray !important;
+	color:gray !important;
+	display:block;
+	margin:0 0 5px 0 !important;
+	padding:8px 10px 8px 10px !important;
+	border-radius: 6px !important;
+}
+.fc_filter_set legend .fc_legend_text.hasTip {
+	background: lightyellow url(../images/note.gif) no-repeat 10px 50%;
+	border:1px solid lightgray !important;
+	color:gray !important;
+	display:block;
+	margin:0 0 5px 0 !important;
+	padding:8px 10px 8px 36px !important;
+	border-radius: 6px !important;
+}
+.fc_filter_set .fc-mssg.fc-info { margin: 4px 16px 16px 16px !important; font-size: 12px; }
 
 
 /*******************/
 /* (a) TEXT SEARCH */
 /*******************/
-
-/* Container of text search (label,form element,buttons) */
-.fc_filter_text_box.fc_filter {
-	clear: none !important;
-	float: left !important;
-	margin: 0px 4px 4px 0% !important;
-	padding: 4px 0% !important;
-}
-.fc_filter_text_box.fc_filter_line {
-	clear: both !important;
-	float: left !important;
-	margin: 0px 0% 4px 0% !important;
-	padding: 4px 0% !important;
-	width: 100% !important;
-}
-
-/* The text search form element */
-#flexicontent .fc_text_filter {
-	float: left !important !important;
-}
-
-/* Container of submit / reset buttons */
-.fc_text_filter_buttons {
-	display:inline-block !important;
-	float: left !important;
-}
-
+.fc_filter_text_search {}
 
 
 /*********************/
@@ -361,13 +386,14 @@ fieldset.fc_filter_set {
 
 /* displayed between ranges */
 .fc_range {
-	background: url("../images/arrow_double.png") no-repeat scroll 0 3px transparent !important;
+	background: url("../images/arrow_double.png") no-repeat scroll 0px 0px transparent !important;
 	width: 16px !important;
 	height: 16px !important;
 	border: 0px solid !important;
 	padding: 0px !important;
-	margin: 0px !important;
+	margin: 0px 0px 10px 0px !important;
 	display: inline-block !important;
+	vertical-align: bottom !important;
 }
 
 /* Container of each individual field filter (both label and html) */
@@ -376,12 +402,13 @@ fieldset.fc_filter_set {
 	display: inline-block;
 	float: left;
 	white-space: normal;
-	border: 0px dashed gray;
+	border: 1px solid lightgray;
+	border-radius: 2px;
 }
 .fc_filter {
 	clear: none;
 	margin: 0px 6px 6px 0px;
-	padding: 4px 0% 2px 0%;
+	padding: 4px 0% 4px 0%;
 	width: auto;
 }
 .fc_filter_line {
@@ -419,7 +446,7 @@ fieldset.fc_filter_set {
 	width: 15% !important;
 	max-width: 200px !important;
 	padding: 6px 1% !important;
-	margin: 0 1% !important;
+	margin: 2px 1% !important;
 	text-align:left !important;
 }
 
@@ -428,7 +455,7 @@ fieldset.fc_filter_set {
 .fc_filter.fc_odd,
 .fc_filter_line.fc_odd { background: #EEEEEE !important; !important; display:block !important; }
 
-/* Container of each individual field filter HTML */
+/* Container of each individual field filter HTML, either compact view (floating with separator element) or per line */
 .fc_filter .fc_filter_html,
 .fc_filter_line .fc_filter_html {
 	display: inline-block;
@@ -437,8 +464,16 @@ fieldset.fc_filter_set {
   padding: 0px 0% 0px 0% !important;
   margin: 0px 0% 0px 0% !important;
 }
-.fc_filter .fc_filter_html {  clear: both; position: relative !important;  }
-.fc_filter_line .fc_filter_html {  clear: none; width: 80% !important; position: relative !important; }
+.fc_filter_html {  position: relative !important;  }
+.fc_filter .fc_filter_html {  clear: both;  }
+.fc_filter_line .fc_filter_html {  clear: none; width: 80% !important;  }
+
+/* Highlight date calendar inside FC filters */
+.fc_filter_html .calendar { vertical-align: bottom; margin: 0px 6px 9px -4px; cursor: pointer; }
+.fc_filter_html .calendar:hover { border: 1px solid darkred; }
+
+/* Mulitple form field elements inside a filter area */
+.fc_filter_html .fc_filter_element { display:inline-block; white-space: nowrap; position: relative; }
 
 /* The form element(s) of each field filter inside filter's HTML */
 .fc_text_filter,
@@ -467,8 +502,8 @@ input.fc_field_filter, input.fc_field_filter:focus {
 	opacity: 0.5; filter:alpha(opacity=50);
 }
 select.fc_field_filter { margin: 2px 2px 2px 2px !important; }
-input.fc_text_filter { margin: 2px 12px 4px 8px !important; }
-input.fc_field_filter { margin: 2px 8px 4px 8px !important; }
+input.fc_text_filter { margin: 2px 12px 4px 8px !important; vertical-align: top;}
+input.fc_field_filter { margin: 2px 8px 4px 8px !important; vertical-align: top;}
 span.fc_field_filter { border-width: 0px !important; }
 .fc_field_filter.fc_checkradio_group {
 	margin: 2px 0px 2px 2px !important;
@@ -480,13 +515,25 @@ span.fc_field_filter { border-width: 0px !important; }
 }
 
 /* Inner Labels */
-.fc_has_inner_label {
+.fc_has_inner_label, .fc_has_inner_prompt {
 	color: gray !important;
-	position: absolute;
+	position: absolute !important;
 	display: block;
+	*line-height: 1.5em !important;  /* ie6/ie7 */
+	*height: 1.5em !important;  /* ie6/ie7 */
+	padding-left:4px;
+	font-size:12px;
 }
-.fc_has_inner_label.fc_has_inner_label_input { left:14px !important; top:8px !important; color: black !important; }
-.fc_has_inner_label.fc_has_inner_label_select2 { left:4px !important; top:8px !important; }
+
+.fc_has_inner_label.fc_has_inner_label_input,
+.fc_has_inner_prompt.fc_has_inner_prompt_input {
+	left:14px !important; top:8px !important; color: black !important;
+}
+.fc_has_inner_label.fc_has_inner_label_select2,
+.fc_has_inner_prompt.fc_has_inner_prompt_select2 {
+	left:4px !important; top:8px !important;
+	*top:4px !important; 
+}
 
 /* Highlighting selected choices */
 .fc_filter_html .select2-search-choice div,
@@ -494,6 +541,14 @@ span.fc_field_filter { border-width: 0px !important; }
 .fc_highlight {
 	color: darkorange !important;
 	font-weight: bold !important;
+}
+
+.select2-container .select2-choice.fc_highlight_disabled span,
+.fc_highlight_disabled {
+	color: gray !important;
+	font-weight: normal !important;
+	text-decoration: line-through !important;
+	font-style: italic !important;
 }
 
 
@@ -577,17 +632,21 @@ span.fc_field_filter { border-width: 0px !important; }
 
 #flexicontent .item_total .fc_item_total_data {
 	display:inline-block;
-	float:none;
+	float:left;
+	padding: 8px 0px;
 	margin-right:24px;
 }
 
 #flexicontent .item_total .item_total_label {
 	display: inline-block;
+	float:left;
+	margin-right: 6px;
 	font-weight: bold;
 }
 
 #flexicontent .item_total .item_total_value {
 	display: inline-block;
+	float:left;
 	margin-right: 24px;
 }
 
@@ -595,13 +654,13 @@ span.fc_field_filter { border-width: 0px !important; }
 #flexicontent .item_total .fc_limit_label,
 #flexicontent .item_total .fc_orderby_label {
 	display:inline-block;
-	float:none;
+	float:left;
 }
 
 #flexicontent .item_total .fc_pages_counter {
 	display:inline-block;
 	float:right;
-	padding:2px 4px;
+	padding:8px 4px;
 }
 
 
@@ -645,9 +704,10 @@ html button {
 	*width:auto !important;
 }
 
-#flexicontent .flexi_buttons { float: right; margin: 2px 2px 8px; }
+.flexi_buttons, .fc_buttons { margin: 0px; padding:0px 2px 0px 2px; display: inline-block; }
 
 #flexicontent button,
+.fc_button,
 .fc_buttons button,
 .flexi_buttons button {
 	border:1px solid #7d99ca !important;
@@ -656,7 +716,8 @@ html button {
 	border-radius: 6px !important;
 	font-size:12px !important;
 	font-family:arial, helvetica, sans-serif !important;
-	padding: 6px 10px 6px 10px !important;
+	padding: 5px 10px 5px 10px !important;
+	margin: 2px 2px 2px 2px !important;
 	text-decoration:none !important;
 	display:inline-block !important;
 	text-shadow: -1px -1px 0 rgba(0,0,0,0.3) !important;
@@ -672,6 +733,7 @@ html button {
 }
 
 #flexicontent button:hover,
+.fc_button:hover,
 .fc_buttons button:hover,
 .flexi_buttons button:hover {
 	border:1px solid #5d7fbc !important;
@@ -688,7 +750,7 @@ html button {
 /*
 .fcbutton_apply, .fcbutton_save, .fcbutton_cancel,
 .fcbutton_preview, .fcbutton_preview_save,
-.fcbutton_go, .fcbutton_reset {}
+.fcbutton_go, .fcbutton_reset { padding-left: 20px !important }
 .fcbutton_apply { background: url(../images/accept.png) no-repeat !important; }
 .fcbutton_save { background: url(../images/accept.png) no-repeat !important; }
 .fcbutton_preview_save { background: url(../images/monitor_go.png) no-repeat !important; }
@@ -696,9 +758,8 @@ html button {
 .fcbutton_cancel { background: url(../images/cancel.png) no-repeat !important; }
 .fcbutton_go { background: url(../images/accept.png) no-repeat !important; }
 .fcbutton_reset { background: url(../images/cancel.png) no-repeat !important; }
-
-button.fc_button {}
 */
+
 
 /********************
  * Other CSS for Form
@@ -1475,6 +1536,9 @@ div.fancybox-wrap a { background: none!important;}
  filter:alpha(opacity=40); /* For IE8 and earlier */
 }
 
+.readon, .readon a {
+  *white-space: nowrap !important; /* ie6/ie7 */
+}
 
 
 /**********************************************************
@@ -1534,7 +1598,7 @@ div.fancybox-wrap a { background: none!important;}
   font-family: arial !important;
   font-weight: bold !important;
   text-align: right !important;
-  max-width: 120px !important;
+  max-width: 150px !important;
   min-width: auto !important;
   margin: 0px !important;
   padding: 0px !important;
@@ -1668,4 +1732,41 @@ input.fc_checkradio {
 	padding: 0px !important;
 	margin: 0px !important;
 	display: inline-block !important;
+}
+
+
+/***********************
+ * Flexicontent messages
+ ***********************/
+.fc-mssg {
+	border: 1px solid !important;
+	display: block;
+	margin: 0 0 5px 0 !important;
+	padding: 8px 10px 8px 36px !important;
+	border-radius: 6px !important;
+}
+.fc-error {
+	background: #FFBABA url(../images/error.png) no-repeat 10px 50%;
+  color: #D8000C !important;
+	border-color: #D8000C !important;
+}
+.fc-warning {
+	background: #FEEFB3 url(../images/warning.png) no-repeat 10px 50%;
+	color:#9F6000 !important;
+	border-color: #9F6000 !important;
+}
+.fc-success {
+	background: #DFF2BF url(../images/accept.png) no-repeat 10px 50%;
+	color: #4F8A10 !important;
+	border-color: #4F8A10 !important;
+}
+.fc-info {
+	background: #BDE5F8 url(../images/information.png) no-repeat 10px 50%;
+	color:#00529B !important;
+	border-color:#00529B !important;
+}
+.fc-note {
+	background: #FEEFB3 url(../images/note.gif) no-repeat 10px 50%;
+	color:#9F6000 !important;
+	border-color: #9F6000 !important;
 }

@@ -198,6 +198,7 @@ Version: 3.3.2 Timestamp: Mon Mar 25 12:14:18 PDT 2013
 .select2-search {
     display: inline-block;
     width: 100%;
+    *width: auto; /* IE6/IE7 */
     min-height: 26px;
     margin: 0;
     padding-left: 4px;
@@ -217,6 +218,7 @@ Version: 3.3.2 Timestamp: Mon Mar 25 12:14:18 PDT 2013
 
 .select2-search input {
     width: 100%;
+    *width: auto; /* IE6/IE7 */
     height: auto !important;
     min-height: 26px;
     padding: 4px 20px 4px 5px;
@@ -303,7 +305,7 @@ Version: 3.3.2 Timestamp: Mon Mar 25 12:14:18 PDT 2013
 
 /* results */
 .select2-results {
-    max-height: 200px;
+    max-height: 240px;
     padding: 0 0 0 4px;
     margin: 4px 4px 4px 0;
     position: relative;
@@ -649,6 +651,7 @@ disabled look for disabled choices in the results dropdown
 	min-height: 1em !important;
 	padding: 2px !important;
 	font-size: 11px !important;
+	white-space: normal !important;
 }
 .select2-results ul.select2-result-sub > li .select2-result-label {
 	padding-left: 10px !important;

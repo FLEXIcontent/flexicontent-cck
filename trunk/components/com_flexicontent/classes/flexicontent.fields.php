@@ -2143,53 +2143,64 @@ class FlexicontentFields
 		switch ($display_filter_as) {
 		case 0: case 2: case 6:  // 0: Select (single value selectable), 2: Dual select (value range), 6: Multi Select (multiple values selectable)
 			$options = array();
-			// MULTI-select does not has an internal label label via JS
+			// MULTI-select does not has an internal label a drop-down list option
 			if ($display_filter_as != 6) {
-				$first_option_txt = $label_filter==2  ?  $filter->label  :  JText::_('FLEXI_ALL');
+				$first_option_txt = $label_filter==2  ?  $filter->label  :  JText::_('FLEXI_ANY');
 				$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
 			}
 			
 			// Make use of select2 lib
 			flexicontent_html::loadFramework('select2');
 			$classes  = " use_select2_lib";
-			// MULTI-select does not has an internal label via JS
-			$classes .= ($label_filter==2 && $display_filter_as==6) ? ' fc_label_internal' : '';
-			$extra_param = ($label_filter==2 && $display_filter_as==6) ? ' fc_label_text="'.flexicontent_html::escapeJsText($filter->label).'"' : '';
+			$extra_param = '';
+			
+			// MULTI-select: special label and prompts
+			if ($display_filter_as == 6) {
+				$classes .= ' fc_label_internal fc_prompt_internal';
+				// Add field's LABEL internally or click to select PROMPT (via js)
+				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
+				// Add type to filter PROMPT (via js)
+				$extra_param  = ' fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb).'"';
+				$extra_param .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER')).'"';
+			}
+			
 			// Create HTML tag attributes
 			$attribs_str  = ' class="fc_field_filter'.$classes.'" '.$extra_param;
 			$attribs_str .= $display_filter_as==6 ? ' multiple="multiple" size="20" ' : '';
+			//$attribs_str .= ($display_filter_as==0 || $display_filter_as==6) ? ' onchange="document.getElementById(\''.$formName.'\').submit();"' : '';
 			
 			foreach($results as $result) {
 				if ( !strlen($result->value) ) continue;
 				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text), 'value', 'text', $disabled = !$result->found);
 			}
 			if ($display_filter_as==0 || $display_filter_as==6) {
-				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str.' onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value, $filter_ffid);
+				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
 			} else {
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[1]', $attribs_str, 'value', 'text', @ $value[1], $filter_ffid.'1');
 				$filter->html	.= '<span class="fc_range"></span>';
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[2]', $attribs_str, 'value', 'text', @ $value[2], $filter_ffid.'2');
 			}
 			break;
-		case 1: case 3:  // 1: Text input (TODO: autocomplete), 3: Dual text input (value range), both of these can be JS date calendars
-			if ($display_filter_as==1 && $label_filter==2) {
-				$attribs_str = ' class="fc_field_filter fc_label_internal" fc_label_text="'.flexicontent_html::escapeJsText($filter->label).'"';
-				$attribs_arr = array('class'=>'fc_field_filter fc_label_internal', 'fc_label_text' => flexicontent_html::escapeJsText($filter->label) );
-			} else {
-				$attribs_str = ' class="fc_field_filter" ';
-				$attribs_arr = array('class'=>'fc_field_filter') ;
-			}
+		case 1: case 3:  // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars
+			$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isdate ? 'FLEXI_CLICK_CALENDAR' : 'FLEXI_TYPE_TO_LIST');
+			$_inner_lb = flexicontent_html::escapeJsText($_inner_lb);
+			$attribs_str = ' class="fc_field_filter fc_label_internal" fc_label_text="'.$_inner_lb.'"';
+			$attribs_arr = array('class'=>'fc_field_filter fc_label_internal', 'fc_label_text' => $_inner_lb );
 			
 			if ($display_filter_as==1) {
-				if ($isdate)
-					$filter->html	.= FlexicontentFields::createCalendarField($value, $allowtime, $fieldname, $$filter_ffid, $attribs_arr);
-				else
+				if ($isdate) {
+					$filter->html	.= FlexicontentFields::createCalendarField($value, $allowtime, $fieldname, $filter_ffid, $attribs_arr);
+				} else
 					$filter->html	.= '<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value.'" />';
 			} else {
 				if ($isdate) {
+					$filter->html	.= '<span class="fc_filter_element">';
 					$filter->html	.= FlexicontentFields::createCalendarField(@ $value[1], $allowtime=0, $filter_ffname.'[1]', $filter_ffid.'1', $attribs_arr);
+					$filter->html	.= '</span>';
 					$filter->html	.= '<span class="fc_range"></span>';
+					$filter->html	.= '<span class="fc_filter_element">';
 					$filter->html	.= FlexicontentFields::createCalendarField(@ $value[2], $allowtime=0, $filter_ffname.'[2]', $filter_ffid.'2', $attribs_arr);
+					$filter->html	.= '</span>';
 				} else {
 					$size = (int)($size / 2);
 					$filter->html	.= '<input name="'.$filter_ffname.'[1]" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value[1].'" /> - ';
@@ -2200,7 +2211,7 @@ class FlexicontentFields
 			break;
 		case 4: case 5:  // 4: radio (single value selectable), 5: checkbox (multiple values selectable)
 			$i = 0;
-			$checked = ($display_filter_as==5) ? !count($value) || empty($value[0]) : !strlen($value);
+			$checked = ($display_filter_as==5) ? !count($value) ||  !strlen($value[0]) : !strlen($value);
 			$checked_attr = $checked ? 'checked="checked"' : '';
 			$checked_class = $checked ? 'fc_highlight' : '';
 			$filter->html .= '<span class="fc_field_filter fc_checkradio_group">';
@@ -2216,7 +2227,7 @@ class FlexicontentFields
 			}
 			$filter->html .= '<label class="'.$checked_class.'" for="'.$filter_ffid.$i.'">'.
 				($label_filter==2  ?  $filter->label.': ' : '').
-				'- '.JText::_('FLEXI_ALL').' -';
+				'- '.JText::_('FLEXI_ANY').' -';
 			$filter->html .= '</label></span>';
 			$i++;
 			foreach($results as $result) {
@@ -2256,6 +2267,10 @@ class FlexicontentFields
 	// Method to create a calendar form field according to a given configuation, e.g. called during Filter Creation of FC views
 	static function createCalendarField($value, $date_allowtime, $fieldname, $elementid, $attribs='', $skip_on_invalid=false, $timezone=false)
 	{
+		// 'false' timezone means ==> use server setting (=joomla site configured TIMEZONE),
+		// in J1.5 this must be null for using server setting (=joomla site configured OFFSET)
+		$timezone = ($timezone === false && !FLEXI_J16GE) ? null : $timezone;
+		
 		@list($date, $time) = preg_split('#\s+#', $value, $limit=2);
 		$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
 		

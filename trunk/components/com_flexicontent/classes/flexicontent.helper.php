@@ -129,11 +129,11 @@ class flexicontent_html
 
 		$app	= JFactory::getApplication();
 		//$orderby = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-		$limit = $app->getUserStateFromRequest( 'limit', 'limit', $params->get('limit'), 'string' );
+		$limit = $app->getUserStateFromRequest( 'limit', 'limit', ''/*$params->get('limit')*/, 'string' );
 
 		flexicontent_html::loadFramework('select2');
 		$classes  = "fc_field_filter use_select2_lib";
-		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(document.getElementById(\''.$formname.'\')); document.getElementById(\''.$formname.'\').submit();" ';
+		$onchange = !$autosubmit ? '' : ' onchange="document.getElementById(\''.$formname.'\').submit();" ';
 		$attribs  = ' class="'.$classes.'" ' . $onchange;
 		
 		$limit_options = $params->get('limit_options', '5,10,20,30,50,100,150,200');
@@ -154,12 +154,11 @@ class flexicontent_html
 
 		$app	= JFactory::getApplication();
 		//$orderby = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-		$orderby = $app->getUserStateFromRequest( 'orderby', 'orderby', $params->get('orderby'), 'string' );
+		$orderby = $app->getUserStateFromRequest( 'orderby', 'orderby', ''/*$params->get('orderby')*/, 'string' );
 
 		flexicontent_html::loadFramework('select2');
 		$classes  = "fc_field_filter use_select2_lib";
-		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(document.getElementById(\''.$formname.'\')); document.getElementById(\''.$formname.'\').submit();" ';
-		$onchange = !$autosubmit ? '' : ' onchange="adminFormPrepare(document.getElementById(\''.$formname.'\')); document.getElementById(\''.$formname.'\').submit();" ';
+		$onchange = !$autosubmit ? '' : ' onchange="document.getElementById(\''.$formname.'\').submit();" ';
 		$attribs  = ' class="'.$classes.'" ' . $onchange;
 		
 		$orderby_options = $params->get('orderby_options', array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','id','rid','order'));
@@ -172,6 +171,7 @@ class flexicontent_html
 		'author'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL','rauthor'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE',
 		'hits'=>'FLEXI_ORDER_MOST_HITS','rhits'=>'FLEXI_ORDER_LEAST_HITS',
 		'id'=>'FLEXI_ORDER_HIGHEST_ITEM_ID','rid'=>'FLEXI_ORDER_LOWEST_ITEM_ID',
+		'commented'=>'FLEXI_ORDER_MOST_COMMENTED', 'rated'=>'FLEXI_ORDER_BEST_RATED',
 		'order'=>'FLEXI_ORDER_CONFIGURED_ORDER');
 
 		$ordering = array();
@@ -322,24 +322,38 @@ class flexicontent_html
 							
 							"/* MULTI-SELECT2: Initialize internal labels, placing the label so that it overlaps the text filter box */."
 							var fc_label_text = el_select.attr('fc_label_text');
-							if (!fc_label_text) return;
-							var _label = (fc_label_text.length >= 30) ? fc_label_text.substring(0, 28) + '...' : fc_label_text;
+							if (fc_label_text) {
+								var _label = (fc_label_text.length >= 30) ? fc_label_text.substring(0, 28) + '...' : fc_label_text;
+								
+								jQuery('<span/>', {
+									'class': 'fc_has_inner_label fc_has_inner_label_select2',
+									'text': _label
+								}).prependTo(el_container.find('.select2-search-field'));
+							}
 							
-							jQuery('<span/>', {
-								'class': 'fc_has_inner_label fc_has_inner_label_select2',
-								'text': _label
-							}).prependTo(el_container.find('.select2-search-field'));
+							"/* MULTI-SELECT2: Initialize internal prompts, placing the prompt so that it overlaps the text filter box */."
+							var fc_prompt_text = el_select.attr('fc_prompt_text');
+							if (fc_prompt_text) {
+								var _prompt = (fc_prompt_text.length >= 30) ? fc_prompt_text.substring(0, 28) + '...' : fc_prompt_text;
+								
+								jQuery('<span/>', {
+									'class': 'fc_has_inner_prompt fc_has_inner_prompt_select2',
+									'text': _prompt
+								}).prependTo(el_container.find('.select2-search-field')).hide();
+							}
 							
 							"/* SINGLE-SELECT2: Highlight selects with an active value */."
 							if ( ! el_select.attr('multiple') ) {
 								var el = el_container.find('.select2-choice');
-								if (el_select.val().length) {
+								var val = el_select.val();
+								if (val === null) {
+									el.addClass('fc_highlight_disabled');
+								} else if (val.length) {
 									el.addClass('fc_highlight');
 								} else {
 									el.removeClass('fc_highlight');
 								}
 							}
-							
 						});
 						
 						"/* MULTI-SELECT2: */."
@@ -347,22 +361,28 @@ class flexicontent_html
 							"/* Add events to handle focusing the text filter box (hide inner label) */."
 							var el_container = jQuery(this).parent();
 							var el = jQuery(this).parent().find('.select2-input');
-							el.prev().hide();
+							var el_label = el.prevAll('.fc_has_inner_label');
+							if (el_label) el_label.hide();
+							var el_prompt = el.prevAll('.fc_has_inner_prompt');
+							if (el_prompt) el_prompt.show();
 							
 							"/* Allow listing already selected options WHEN having class 'select2_list_selected' */."
 							if (jQuery(this).hasClass('select2_list_selected')) {
-								var els = jQuery('.select2-selected');
+								var els = jQuery(this).find('.select2-selected');
 								els.addClass('select2-selected-highlight').addClass('select2-disabled').removeClass('select2-selected').removeClass('select2-result-selectable');
 							}
 						}).on('close', function() {
 							"/* Add events to handle bluring the text filter box (show inner label) */."
 							var el_container = jQuery(this).parent();
 							var el = jQuery(this).parent().find('.select2-input');
-							el.prev().show();
+							var el_label = el.prevAll('.fc_has_inner_label');
+							if (el_label) el_label.show();
+							var el_prompt = el.prevAll('.fc_has_inner_prompt');
+							if (el_prompt) el_prompt.hide();
 							
 							"/* Restore already selected options state */."
 							if (jQuery(this).hasClass('select2_list_selected')) {
-								var els = jQuery('.select2-selected-highlight');
+								var els = jQuery(this).find('.select2-selected-highlight');
 								els.removeClass('select2-selected-highlight').removeClass('select2-disabled').addClass('select2-result-selectable');
 							}
 						}).on
@@ -372,12 +392,35 @@ class flexicontent_html
 							var el_select = jQuery(this);
 							if ( ! el_select.attr('multiple') ) {
 								var el = jQuery(this).prev('div').find('.select2-choice');
-								if (el_select.val().length) {
+								var val = el_select.val();
+								if (val.length) {
 									el.addClass('fc_highlight');
 								} else {
 									el.removeClass('fc_highlight');
 								}
 							}
+						});
+						
+						"/* SINGLE-SELECT2: Add events to handle highlighting selected value */."
+						jQuery('div.use_select2_lib.select2-container-multi input').on('keydown', function() {
+							var el = jQuery(this);
+							setTimeout(function() {
+								if (el.val().length) {
+									var el_prompt = el.prevAll('.fc_has_inner_prompt');
+									if (el_prompt) el_prompt.hide();
+								} else {
+									var el_prompt = el.prevAll('.fc_has_inner_prompt');
+									if (el_prompt) el_prompt.show();
+								}
+							}, 0);
+						});
+						
+						"/* SELECT2: scrollbar wrap problem */."
+						jQuery('select.use_select2_lib').on('loaded open', function() {
+							var ul = jQuery('#select2-drop ul.select2-results');
+							var needsScroll= ul.prop('scrollHeight') > ul.prop('clientHeight');
+							if (needsScroll) ul.css('overflow-y', 'scroll');
+							else  ul.css('overflow-y', 'auto');
 						});
 						
 					});
@@ -566,6 +609,14 @@ class flexicontent_html
 				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/zTree/js/jquery.ztree.excheck-3.5.js');
 				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/zTree/js/jquery.ztree.exedit-3.5.js');
 				$js = "";
+				break;
+			
+			case 'flexi_tmpl_common':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				$document->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js' );
+				FLEXI_J16GE ? JText::script("FLEXI_APPLYING_FILTERING") : fcjsJText::script("FLEXI_APPLYING_FILTERING");
+				$js = 'var fc_base_url="'.JURI::base().'"';
+				//$document->addCustomTag('<!--[if lt IE 7]><script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script><![endif]-->');
 				break;
 			
 			default:
@@ -4500,6 +4551,98 @@ function FLEXISubmenu($cando)
 		if ($perms->CanImport)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
 		if ($perms->CanStats)			JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
 	}
+}
+
+
+/*	
+*	fcjsJText Helper for Joomla 1.5
+*
+*	original Author: 	Robert Gerald Porter <rob@weeverapps.com>
+*	License: 	GPL v3.0
+*
+*/
+class fcjsJText extends JText
+{
+	protected static $strings=array();
+
+	/**
+	 * Translate a string into the current language and stores it in the JavaScript language store.
+	 *
+	 * @param	string	The JText key.
+	 * @since	1.6
+	 * 
+	 * Backport for Joomla 1.5
+	 * Example use: 
+	 *
+	 * //use this method call for each string you will be needing in javascript
+	 * fcjsJText::script("MY_FIRST_COMPONENT_STRING_NEEDED_IN_JS");
+	 * fcjsJText::script("MY_NTH_COMPONENT_STRING_NEEDED_IN_JS");  
+	 * // and so on…
+	 * // you must then call load(), as below:
+	 * fcjsJText::load();
+	 *
+	 * in the JS files, load localization via:
+	 *
+	 * //String is loaded in javascript via Joomla.JText._() method
+	 * alert( Joomla.JText._('MY_FIRST_COMPONENT_STRING_NEEDED_IN_JS') );
+	 * 				
+	 */
+	public static function script($string = null, $jsSafe = true)
+	{
+		static $language = null;
+		if ($language===null) $language = JFactory::getLanguage();
+		
+		// Add the string to the array if not null.
+		if ($string !== null) {
+			// Normalize the key and translate the string.
+			self::$strings[strtoupper($string)] = $language->_($string, $jsSafe);
+		} else {
+			return self::$strings;
+		}
+	}
+	
+	
+	/**
+	 * Load strings translated for Javascript into JS environment. To be called after all fcjsJText::script() calls have been made.
+	 */
+	public static function load($after_render=true)
+	{
+		$js = '
+			<script type="text/javascript">
+			
+			if (typeof(Joomla) === "undefined")
+			{
+				var Joomla = {};
+				if (typeof(Joomla.JText) === "undefined") {
+					Joomla.JText = {
+						strings: {},
+						"_": function(key, def) {
+							return typeof this.strings[key.toUpperCase()] !== "undefined" ? this.strings[key.toUpperCase()] : def;
+						},
+						load: function(object) {
+							for (var key in object) {
+								this.strings[key.toUpperCase()] = object[key];
+							}
+							return this;
+						}
+					};
+				}
+			}
+			var strings = '.json_encode(self::$strings).';
+			Joomla.JText.load(strings);
+			</script>
+		';
+		
+		if ($after_render) {
+			// Add to header, after rendering has completed ...
+			$buffer = JResponse::getBody();
+			$buffer = str_replace ("</head>", "\n\n".$js."\n\n</head>", $buffer);
+			JResponse::setBody($buffer);
+		} else {
+			JFactory::getDocument()->addCustomTag ($js);
+		}
+	}
+
 }
 
 ?>

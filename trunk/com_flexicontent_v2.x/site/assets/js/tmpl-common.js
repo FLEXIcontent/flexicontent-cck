@@ -7,8 +7,7 @@
 		
 		var form = document.getElementById("adminForm");
 		
-		adminFormPrepare(form);
-		form.submit( task );
+		adminFormPrepare(form, 2, task);
 	}
 
 	function getSEFurl(loader_el, loader_html, form, url_to_load, autosubmit_msg, autosubmit) {
@@ -20,8 +19,7 @@
 			 	form.action=responseText;
 			 	if (autosubmit) {
 			 		$(loader_el).innerHTML += autosubmit_msg;
-					adminFormPrepare(form);
-					form.submit();
+					adminFormPrepare(form, 2);
 				} else {
 					$(loader_el).innerHTML = '';
 				}
@@ -41,8 +39,7 @@
 				 	form.action=responseText;
 				 	if (autosubmit) {
 				 		$(loader_el).innerHTML += autosubmit_msg;
-						adminFormPrepare(form);
-						form.submit();
+						adminFormPrepare(form, 2);
 					} else {
 						$(loader_el).innerHTML = '';
 					}
@@ -56,9 +53,17 @@
 	}
 	
 	
-	function adminFormPrepare(form) {
+	function adminFormPrepare(form, postprep, task) {
 		var extra_action = '';
-		var var_sep = form.action.match(/\?/) ? '&' : '?';
+		var fcform = jQuery(form);
+		
+		var fcform_action = fcform.attr('data-fcform_action');
+		if ( typeof fcform_action === "undefined" || fcform_action === null ) {
+			fcform_action = fcform.attr('action');
+			fcform.attr('data-fcform_action', fcform_action);
+		}
+		
+		var var_sep = fcform_action.match(/\?/) ? '&' : '?';
 		
 		for(i=0; i<form.elements.length; i++) {
 			
@@ -84,10 +89,21 @@
 				var_sep = '&';
 			}
 		}
-		form.action += extra_action;   //alert(extra_action);
+		form.action = fcform_action + extra_action;  //alert(form.action);
 		
-		var fc_filter_form_blocker = jQuery("#fc_filter_form_blocker");
-		if (fc_filter_form_blocker) fc_filter_form_blocker.css("display", "block");
+		if (typeof postprep !== "undefined" && postprep !== null && postprep!=0) {
+			if (postprep==2) {
+				var fc_filter_form_blocker = jQuery("#fc_filter_form_blocker");
+				form.submit( task );
+				if (fc_filter_form_blocker) {
+					fc_filter_form_blocker.css("display", "block");
+					fc_progress(95, jQuery('#fc_filter_form_blocker .fc_blocker_bar'));
+				}
+			} else if (postprep==1) {
+				var form_id = jQuery(form).attr('id');
+				jQuery('#'+form_id+'_submitWarn').css("display", "inline-block");
+			}
+		}
 	}
 	
 	function adminFormClearFilters (form) {
@@ -144,7 +160,13 @@
 			jQuery(inputs[0]).next().addClass(cls);
 		}
 	}
-	
+
+
+	function fc_progress(percent, element) {
+		var progressBarWidth = percent * element.width() / 100;
+		element.find('div').animate({ width: progressBarWidth }, 5000).html("");
+	}
+
 
 jQuery(document).ready(function() {
 	// Initialize internal labels
@@ -158,18 +180,50 @@ jQuery(document).ready(function() {
 			'class': 'fc_has_inner_label fc_has_inner_label_input',
 			'text': _label
 		}));
+		if (el.val().length > 0) el.prev().hide();
 	});
+	
 	
 	jQuery('input.fc_label_internal').bind('focus', function() {
 		var el = jQuery(this);
 		var fc_label_text = el.attr('fc_label_text');
 		if (!fc_label_text) return;
 		el.prev().hide();
-	}).bind('blur', function() {
+		el.css("opacity", "1");
+	}).bind('change blur', function(event) {
 		var el = jQuery(this);
 		var fc_label_text = el.attr('fc_label_text');
 		if (!fc_label_text) return;
-		el.prev().show();
+		
+		if (event.type=='blur') {
+			var previous_value = el.attr('data-previous_value');
+			if ( typeof previous_value !== "undefined" && previous_value != el.val())  el.trigger('change');
+		}
+		
+		if ( el.val().length ) {
+			el.prev().hide();
+			el.css("opacity", "1");
+		} else {
+			el.prev().show();
+			el.css("opacity", "0.5");
+		}
 	});
+	
+	jQuery('img.calendar').bind('click', function() {
+		var el = jQuery(this).prev();
+		el.prev().hide();
+		el.attr('data-previous_value', el.val());
+		el.css("opacity", "1");
+		el.focus();
+	});
+	
+	jQuery('body').prepend(
+	 	"<span id='fc_filter_form_blocker'>" +
+	    "<span class='fc_blocker_opacity'></span>" +
+	    "<span class='fc_blocker_content'>" +
+	    	Joomla.JText._('FLEXI_APPLYING_FILTERING') +
+	    	"<div class='fc_blocker_bar'><div></div></div>" +
+	    "</span>" +
+	  "</span>");
 
 });
