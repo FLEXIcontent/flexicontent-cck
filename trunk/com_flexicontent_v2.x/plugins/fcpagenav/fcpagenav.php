@@ -285,8 +285,8 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 					;
 				} else {
 					$html .= '
-					<span class="btn pagenav_prev">
-						<span class="noprevnext">'.htmlspecialchars($prev_label, ENT_NOQUOTES).'</span>
+					<span class="btn pagenav_next">
+						<span class="noprevnext">'.htmlspecialchars($next_label, ENT_NOQUOTES).'</span>
 					</span>'
 					;
 				}

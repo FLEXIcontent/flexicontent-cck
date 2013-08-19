@@ -70,6 +70,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		// other limits of scope parameters
 		$samelangonly  = $field->parameters->get( 'samelangonly', 1 );
 		$onlypublished = $field->parameters->get( 'onlypublished', 1 );
+		$ownedbyuser   = $field->parameters->get( 'ownedbyuser', 0 );
 		
 		
 		// ******************
@@ -198,6 +199,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		// OTHER SCOPE LIMITS
 		if ($samelangonly)  $where[] = $item->language=='*' ? " ie.language='*' " : " (ie.language='{$item->language}' OR ie.language='*') ";
 		if ($onlypublished) $where[] = " i.state IN (1, -5) ";
+		if ($ownedbyuser==1) $where[] = " i.created_by = ". $user->id;
+		else if ($ownedbyuser==2) $where[] = " i.created_by = ". $item->created_by;
 		
 		$where = !count($where) ? "" : " WHERE " . implode(" AND ", $where);
 		
@@ -225,7 +228,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		
 		if($db->getErrorNum()) {
 			echo $db->getErrorMsg();
-			$filter->html = '';
+			$field->html = '';
 			return false;
 		}
 		
@@ -461,42 +464,4 @@ jQuery(document).ready(function() {
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
-	
-	
-	
-	// *********************************
-	// CATEGORY/SEARCH FILTERING METHODS
-	// *********************************
-	
-	// Method to display a category filter for the category view
-	/*function onDisplayFilter(&$filter, $value='', $formName='adminForm')
-	{
-		// execute the code only if the field type match the plugin type
-		if ( !in_array($field->field_type, self::$field_types) ) return;
-		// some parameter shortcuts
-		
-		$field_id = $filter->id;
-		
-		$db = JFactory::getDBO();
-		$field_elements= 'SELECT DISTINCT fir.item_id as value, i.title as text'
-						 .' FROM #__content as i'
-						 .' LEFT JOIN #__flexicontent_fields_item_relations as fir ON i.id=fir.item_id AND fir.field_id='.$field_id
-						 ;
-		$db->setQuery($query);
-		$results = $db->loadObjectList();
-		echo $db->getErrorMsg();
-		
-		if (!$results) {
-			$filter->html = '';
-		} else {
-			$options = array();
-			$options[] = JHTML::_('select.option', '', '-'.JText::_('All').'-');
-			foreach($results as $result) {
-				$options[] = JHTML::_('select.option', $result->value, $result->text);
-			}
-			$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
-		}
-
-	}*/
-	
 }

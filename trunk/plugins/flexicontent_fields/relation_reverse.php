@@ -115,45 +115,4 @@ class plgFlexicontent_fieldsRelation_reverse extends JPlugin
 	function onBeforeDeleteField(&$field, &$item) {
 	}
 	
-	
-	
-	// *********************************
-	// CATEGORY/SEARCH FILTERING METHODS
-	// *********************************
-	
-	// Method to display a category filter for the category view
-	/*function onDisplayFilter(&$filter, $value='', $formName='adminForm')
-	{
-		// execute the code only if the field type match the plugin type
-		if ( !in_array($field->field_type, self::$field_types) ) return;
-		// some parameter shortcuts
-		
-		$field_id = $filter->parameters->get( 'reverse_field', 0 ) ;
-		if (!$field_id) {
-			$field->html = 'Filter Field [id:'.$filter->id.'] : '.JText::_('FLEXI_FIELD_NO_FIELD_SELECTED');
-			return;
-		}
-		
-		$db =& JFactory::getDBO();
-		$field_elements= 'SELECT DISTINCT fir.item_id as value, i.title as text'
-						 .' FROM #__content as i'
-						 .' LEFT JOIN #__flexicontent_fields_item_relations as fir ON i.id=fir.item_id AND fir.field_id='.$field_id
-						 ;
-		$db->setQuery($query);
-		$results = $db->loadObjectList();
-		echo $db->getErrorMsg();
-		
-		if (!$results) {
-			$filter->html = '';
-		} else {
-			$options = array();
-			$options[] = JHTML::_('select.option', '', '-'.JText::_('All').'-');
-			foreach($results as $result) {
-				$options[] = JHTML::_('select.option', $result->value, $result->text);
-			}
-			$filter->html	= JHTML::_('select.genericlist', $options, 'filter_'.$filter->id, ' class="fc_field_filter" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
-		}
-
-	}*/
-	
 }
