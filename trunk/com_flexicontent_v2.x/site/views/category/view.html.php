@@ -110,7 +110,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// (b) Get from category parameters, allowing URL override
 		$clayout = JRequest::getCmd($_clayout, false);
-		$clayout = $clayout ? $clayout : $params->get($_clayout, 'blog');
+		if (!$clayout) {
+			$desktop_clayout = $params->get('clayout', 'blog');
+			$clayout = !$useMobile ? $desktop_clayout : $params->get('clayout_mobile', $desktop_clayout);
+		}
 		
 		// (c) Get cached template data
 		$themes = flexicontent_tmpl::getTemplates( $lang_files = array($clayout) );
