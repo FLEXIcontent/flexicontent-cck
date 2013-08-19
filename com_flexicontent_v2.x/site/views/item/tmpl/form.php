@@ -250,7 +250,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		<?php
 			// A message about submitting new Content via configuration parameter
 			if ( $isnew && $this->params->get('submit_message') ) {
-				$submit_msg = '<span class="fc-note">'.JText::_( $this->params->get('submit_message') ).'</span>';
+				$submit_msg = '<span class="fc-mssg fc-note">'.JText::_( $this->params->get('submit_message') ).'</span>';
 			}
 			
 			// Autopublishing new item regardless of publish privilege, use a menu item specific
@@ -264,31 +264,38 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				
 				// Current user does not have general publish privilege, aka new/existing items will surely go through approval/reviewal process
 				if ( !$this->perms['canpublish'] ) {
-					if ($isnew)
+					if ($isnew) {
 						$approval_msg = JText::_( 'FLEXI_REQUIRES_DOCUMENT_APPROVAL' ) ;
-					else if ( $this->params->get('use_versioning', 1) )
+						$approval_msg = '<span class="fc-mssg fc-note">'.$approval_msg.'</span>';
+					} else if ( $this->params->get('use_versioning', 1) ) {
 						$approval_msg = JText::_( 'FLEXI_REQUIRES_VERSION_REVIEWAL' ) ;
-					else
+						$approval_msg = '<span class="fc-mssg fc-note">'.$approval_msg.'</span>';
+					} else {
 						$approval_msg = JText::_( 'FLEXI_CHANGES_APPLIED_IMMEDIATELY' ) ;
+						$approval_msg = '<span class="fc-mssg fc-info">'.$approval_msg.'</span>';
+					}
 				}
 				
 				// Have general publish privilege but may not have privilege if item is assigned to specific category or is of a specific type
 				else {
-					if ($isnew)
+					if ($isnew) {
 						$approval_msg = JText::_( 'FLEXI_MIGHT_REQUIRE_DOCUMENT_APPROVAL' ) ;
-					else if ( $this->params->get('use_versioning', 1) )
+						$approval_msg = '<span class="fc-mssg fc-note">'.$approval_msg.'</span>';
+					} else if ( $this->params->get('use_versioning', 1) ) {
 						$approval_msg = JText::_( 'FLEXI_MIGHT_REQUIRE_VERSION_REVIEWAL' ) ;
-					else
+						$approval_msg = '<span class="fc-mssg fc-note">'.$approval_msg.'</span>';
+					} else {
 						$approval_msg = JText::_( 'FLEXI_CHANGES_APPLIED_IMMEDIATELY' ) ;
+						$approval_msg = '<span class="fc-mssg fc-info">'.$approval_msg.'</span>';
+					}
 				}
 			}
-			$approval_msg = '<span class="fc-note">'.$approval_msg.'</span>';
 			echo @ $submit_msg . @ $approval_msg;
 		?>
 
 <?php if ( $this->captcha_errmsg ) : ?>
 
-	<div class="fc-error"><?php echo $this->captcha_errmsg; ?></div>
+	<div class="fc-mssg fc-error"><?php echo $this->captcha_errmsg; ?></div>
 
 <?php elseif ( $this->captcha_field ) : ?>
 	
@@ -413,7 +420,7 @@ $tabCnt[$tabSetCnt] = 0;
 			<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_TYPE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8');?>">
 				<?php echo $infoimage; ?>
 			</span>
-			<div id="fc-change-error" class="fc-error" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
+			<div id="fc-change-warning" class="fc-mssg fc-warning" style="display:none;"><?php echo JText::_( 'FLEXI_TAKE_CARE_CHANGING_FIELD_TYPE' ); ?></div>
 		</div>
 
 	<?php endif; ?>
@@ -789,9 +796,9 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 				jQuery(document).ready(function() {
 					jQuery('#jform_type_id').change(function() {
 						if (jQuery('#jform_type_id').val() != '".$this->item->type_id."')
-							jQuery('#fc-change-error').css('display', 'block');
+							jQuery('#fc-change-warning').css('display', 'block');
 						else
-							jQuery('#fc-change-error').css('display', 'none');
+							jQuery('#fc-change-warning').css('display', 'none');
 					});
 				});
 			");
@@ -801,7 +808,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 			
 			<?php
 			$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
-			$noplugin = '<div class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+			$noplugin = '<div class="fc-mssg fc-warning">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
 			$row_k = 0;
 			foreach ($this->fields as $field)
 			{
@@ -919,9 +926,9 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 
 	<?php if ( $isnew ) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
 		<input name="jform[type_id_not_set]" value="1" type="hidden" />
-		<div class="fc-info"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
+		<div class="fc-mssg fc-note"><?php echo JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ); ?></div>
 	<?php else : // existing item that has no custom fields, warn the user ?>
-		<div class="fc-error"><?php echo JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ); ?></div>
+		<div class="fc-mssg fc-warning"><?php echo JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ); ?></div>
 	<?php	endif; ?>
 		
 	</div> <!-- end tab -->

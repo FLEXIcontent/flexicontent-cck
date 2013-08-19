@@ -26,7 +26,7 @@ $template  = $app->getTemplate();
 // ensures the PHP version is correct
 if (version_compare(PHP_VERSION, '5.0.0', '<'))
 {
-	echo '<div class="fc-error">';
+	echo '<div class="fc-mssg fc-error">';
 	echo JText::_( 'FLEXI_UPGRADE_PHP' ) . '<br />';
 	echo '</div>';
 	return false;
@@ -53,13 +53,13 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							(FLEXI_J16GE && !$this->params->get('flexi_cat_extension'));
 						if (!$this->dopostinstall)
 						{
-							echo '<div class="fc-error">';
+							echo '<div class="fc-mssg fc-warning">';
 							echo JText::_( 'FLEXI_DO_POSTINSTALL' );
 							echo '</div>';
 						}
 						else if ( !$this->existmenu || !$this->existcat || $config_not_saved )
 						{
-							echo '<div class="fc-error">';
+							echo '<div class="fc-mssg fc-warning">';
 							if ( $config_not_saved )
 							{
 								if ( FLEXI_J16GE ) {
