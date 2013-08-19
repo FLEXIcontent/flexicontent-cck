@@ -244,7 +244,7 @@ window.addEvent('domready', function() {
 
 <?php if ($this->unassociated) : ?>
 <form action="index.php?option=com_flexicontent&<?php echo $items_task; ?>bindextdata&tmpl=component" method="post" name="bindForm" id="bindForm">
-	<div class="fc-error">
+	<div class="fc-mssg fc-warning">
 	<table>
 		<tr>
 			<td>

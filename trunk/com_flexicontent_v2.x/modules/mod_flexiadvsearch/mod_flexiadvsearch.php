@@ -73,11 +73,13 @@ if ( $show_mod )
 	
 	// Currently no JS/CSS needed
 	/*
+	// Load needed JS libs & CSS styles
+	FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+	flexicontent_html::loadFramework('jQuery');
+	flexicontent_html::loadFramework('flexi_tmpl_common');
+	
 	// Add tooltips
 	if ($add_tooltips) JHTML::_('behavior.tooltip');
-	
-	// Add common js
-	$document->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 	
 	// Add css
 	if ($add_ccs && $layout) {

@@ -56,7 +56,7 @@ table#itemcompare s{
 									$field->display			= $field->value ? flexicontent_html::nl2space($field->value[0]) : JText::_( 'FLEXI_NO_VALUE' );									
 									$field->displayversion	= $field->version ? flexicontent_html::nl2space($field->version[0]) : JText::_( 'FLEXI_NO_VALUE' );
 								}
-								$noplugin = '<div id="fc-change-error" class="fc-error">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+								$noplugin = '<div class="fc-mssg fc-warning">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
 								$html = flexicontent_html::flexiHtmlDiff($field->displayversion, $field->display, $this->codemode);
 						?>
 						<tr>
