@@ -143,7 +143,7 @@
 			
 			<field name="show_search_go" type="radio" default="" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_HIDE</option>
+				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="show_search_reset" type="radio" default="" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC">
@@ -151,39 +151,6 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="compact_search_with_filters" type="hidden" default="0" label="FLEXI_COMPACT_SEARCH_FILTERS_AREA" description="FLEXI_COMPACT_SEARCH_FILTERS_AREA_DESC" />
-			<!--field name="compact_search_with_filters" type="radio" default="" label="FLEXI_COMPACT_SEARCH_FILTERS_AREA" description="FLEXI_COMPACT_SEARCH_FILTERS_AREA_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-
-			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level2" />
-			<field name="use_filters" type="radio" default="" label="FLEXI_SHOW_FILTERS" description="FLEXI_SHOW_FILTERS_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="show_filters_list_label" type="radio" default="" label="FLEXI_SHOW_FILTERS_LIST_LABEL" description="FLEXI_SHOW_FILTERS_LIST_LABEL_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			<field name="show_filters_list_tip" type="radio" default="" label="FLEXI_FILTERS_LIST_TIP" description="FLEXI_FILTERS_LIST_TIP_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			
-			<field name="show_filter_labels" type="radio" default="" label="FLEXI_FORCE_FILTER_LABELS" description="FLEXI_FORCE_FILTER_LABELS_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
-				<option value="1">FLEXI_FORCE_SHOW_ALL</option>
-				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
-			</field>
-			
-			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" /-->
 			
 		</params>
 

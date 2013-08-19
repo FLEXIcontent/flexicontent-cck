@@ -93,6 +93,7 @@ $n=0;
 ?>
 	
 <?php if (!empty($force_go) || !$autosubmit) :?>
+<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 <span class="fc_buttons">
 	<button class="fc_button button_go hasTip" title="<?php echo JText::_( 'FLEXI_FILTER_GO' ); ?>::<?php echo JText::_( 'FLEXI_FILTER_GO_INFO' ); ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>');                                     adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_FILTER_GO' ); ?></span></button>
 	<button class="fc_button button_reset hasTip" title="<?php echo JText::_( 'FLEXI_FILTER_RESET' ); ?>::<?php echo JText::_( 'FLEXI_FILTER_RESET_INFO' ); ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form);  adminFormPrepare(form);"><span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_FILTER_RESET' ); ?></span></button>

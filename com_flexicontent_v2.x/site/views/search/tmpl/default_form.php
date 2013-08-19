@@ -66,7 +66,7 @@ $other_search_areas_title_tip = ' title="'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN
 $r = 0;
 ?>
 
-<form id="searchForm" action="<?php echo JRoute::_('index.php?option=com_flexicontent&task=search&Itemid='.(JRequest::getVar('Itemid')));?>" method="POST" name="searchForm">
+<form action="<?php echo $this->action; ?>" method="POST" id="searchForm" name="searchForm" onsubmit="">
 	
 	<fieldset id='fc_textsearch_set' class='fc_search_set'>
 		<legend><span class="hasTip" <?php echo $text_search_title_tip;?> ><?php echo $infoimage; ?></span><?php echo JText::_('FLEXI_TEXT_SEARCH'); ?></legend>
@@ -106,7 +106,9 @@ $r = 0;
 					</label>
 				</td>
 				<td colspan="3" class="fc_search_option_cell">
-					<?php echo $this->lists['searchphrase']; ?>
+					<span class="fc_filter_html">
+						<?php echo $this->lists['searchphrase']; ?>
+					</span>
 				</td>
 			</tr>
 			<?php endif;*/ ?>
@@ -120,7 +122,9 @@ $r = 0;
 						</label>
 					</td>
 					<td colspan="3" class="fc_search_option_cell">
-						<?php echo $this->lists['txtflds'];?>
+						<span class="fc_filter_html">
+							<?php echo $this->lists['txtflds'];?>
+						</span>
 					</td>
 				</tr>
 				
@@ -135,7 +139,9 @@ $r = 0;
 						</label>
 					</td>
 					<td colspan="3" class="fc_search_option_cell">
-						<?php echo $this->lists['contenttypes'];?>
+						<span class="fc_filter_html">
+							<?php echo $this->lists['contenttypes'];?>
+						</span>
 					</td>
 				</tr>
 				
@@ -163,7 +169,9 @@ $r = 0;
 							<label for="operator" class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_FILTERS_REQUIRED'); ?>::<?php echo JText::_('FLEXI_SEARCH_FILTERS_REQUIRED_TIP'); ?>'>
 								<?php echo JText::_("FLEXI_SEARCH_FILTERS_REQUIRED"); ?>:
 							</label>
-							<?php echo $this->lists['filtersop']; ?>:
+							<span class="fc_filter_html">
+								<?php echo $this->lists['filtersop']; ?>:
+							</span>
 						</td>
 					</tr>
 				<?php endif; */ ?>
@@ -191,8 +199,10 @@ $r = 0;
 									$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'searchForm\')); ', $filt->html);
 								}
 							}
-							echo $filt->html;
 							?>
+							<span class="fc_filter_html">
+								<?php echo $filt->html; ?>
+							</span>
 						</td>
 					</tr>
 					
@@ -220,7 +230,9 @@ $r = 0;
 							</label>
 						</td>
 						<td colspan="3" class="fc_search_option_cell">
-							<?php echo $this->lists['areas']; ?>
+							<span class="fc_filter_html">
+								<?php echo $this->lists['areas']; ?>
+							</span>
 						</td>
 					</tr>	
 					
@@ -233,7 +245,9 @@ $r = 0;
 							</label>
 						</td>
 						<td colspan="3" class="fc_search_option_cell">
-							<?php echo $this->lists['ordering'];?>
+							<span class="fc_filter_html">
+								<?php echo $this->lists['ordering'];?>
+							</span>
 						</td>
 					</tr>
 					
