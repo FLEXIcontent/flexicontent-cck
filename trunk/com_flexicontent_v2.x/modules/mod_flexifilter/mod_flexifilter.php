@@ -103,6 +103,7 @@ if ( $show_mod )
 		$_fld_onchange = ' onchange="'
 			.' form=document.getElementById(\''.$form_name.'\'); '
 			.' cid_val=form.'.$catid_fieldname.'.value; '
+			.' if ( cid_val.length == 0 ) return;'
 			.' getSEFurl(\'cid_loading_'.$module->id.'\',	'.$loader_html.', form,\''.$url_to_load.'\'+cid_val, \''.$autosubmit_msg.'\', '.$autosubmit.'); '
 			.' $(\'fc_filter_mod_elements_'.$module->id.'\').style.display=\'block\'; " '
 			;
@@ -182,11 +183,13 @@ if ( $show_mod )
 	
 	if ( !empty($cats_select_field) || !empty($cat_hidden_field ) )
 	{
+		// Load needed JS libs & CSS styles
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		flexicontent_html::loadFramework('jQuery');
+		flexicontent_html::loadFramework('flexi_tmpl_common');
+		
 		// Add tooltips
 		if ($add_tooltips) JHTML::_('behavior.tooltip');
-		
-		// Add js
-		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 		
 		// Add css
 		if ($add_ccs && $layout) {

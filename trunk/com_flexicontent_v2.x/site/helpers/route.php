@@ -57,6 +57,7 @@ class FlexicontentHelperRoute
 		return $_component_menuitems;
 	}
 	
+	
 	/**
 	 * function to discover a default item id only once
 	 */
@@ -130,8 +131,9 @@ class FlexicontentHelperRoute
 		return $_component_default_menuitem_id;*/
 	}
 	
+	
 	/**
-	 * @param	int	The route of the item
+	 * Get routed links for content items
 	 */
 	static function getItemRoute($id, $catid = 0, $Itemid = 0)	{
 		
@@ -161,7 +163,11 @@ class FlexicontentHelperRoute
 		
 		return $link;
 	}
-
+	
+	
+	/**
+	 * Get routed links for categories
+	 */
 	static function getCategoryRoute($catid, $Itemid = 0, $urlvars = array()) {
 		
 		$needles = array(
@@ -187,6 +193,64 @@ class FlexicontentHelperRoute
 		return $link;
 	}
 	
+	
+	/**
+	 * Get routed link for search view
+	 */
+	static function getSearchRoute($reserved=0, $Itemid = 0) {
+		static $_search_default_menuitem_id = null;
+		if ($_search_default_menuitem_id === null) {
+			$params = JComponentHelper::getParams('com_flexicontent');
+			$_search_default_menuitem_id = $params->get('search_view_default_menu_itemid', false);
+		}
+		
+		//Create the link
+		$link = 'index.php?option=com_flexicontent&view=search';
+
+		if($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
+			$link .= '&Itemid='.$Itemid;
+		} else if ($_search_default_menuitem_id) {
+			$link .= '&Itemid='.$_search_default_menuitem_id;
+		} else {
+			$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
+			if($component_default_menuitem_id)
+				$link .= '&Itemid='.$component_default_menuitem_id;
+		}
+		
+		return $link;
+	}
+	
+	
+	/**
+	 * Get routed link for favourites view
+	 */
+	static function getFavsRoute($reserved=0, $Itemid = 0) {
+		static $_favs_default_menuitem_id = null;
+		if ($_favs_default_menuitem_id === null) {
+			$params = JComponentHelper::getParams('com_flexicontent');
+			$_favs_default_menuitem_id = $params->get('favs_view_default_menu_itemid', false);
+		}
+		
+		//Create the link
+		$link = 'index.php?option=com_flexicontent&view=favourites';
+
+		if($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
+			$link .= '&Itemid='.$Itemid;
+		} else if ($_favs_default_menuitem_id) {
+			$link .= '&Itemid='.$_favs_default_menuitem_id;
+		} else {
+			$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
+			if($component_default_menuitem_id)
+				$link .= '&Itemid='.$component_default_menuitem_id;
+		}
+		
+		return $link;
+	}
+	
+	
+	/**
+	 * Get routed links for tags
+	 */
 	static function getTagRoute($id, $Itemid = 0) {
 		static $_tags_default_menuitem_id = null;
 		if ($_tags_default_menuitem_id === null) {
@@ -215,7 +279,8 @@ class FlexicontentHelperRoute
 		
 		return $link;
 	}
-
+	
+	
 	static function _findItem($needles)
 	{
 		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
@@ -270,7 +335,8 @@ class FlexicontentHelperRoute
 
 		return $match;
 	}
-
+	
+	
 	static function _findCategory($needles, $urlvars=array())
 	{
 		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
@@ -332,7 +398,8 @@ class FlexicontentHelperRoute
 
 		return $match;
 	}
-
+	
+	
 	static function _findTag($needles)
 	{
 		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();

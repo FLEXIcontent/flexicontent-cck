@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 1548 2012-11-13 02:24:26Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 1699 2013-07-30 04:29:37Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -26,7 +26,7 @@ jimport('joomla.application.component.model');
  *
  * @package Joomla
  * @subpackage FLEXIcontent
- * @since		1.0
+ * @since		1.5
  */
 class FlexicontentModelTags extends JModelLegacy
 {
@@ -40,7 +40,7 @@ class FlexicontentModelTags extends JModelLegacy
 	/**
 	 * Item list data
 	 *
-	 * @var mixed
+	 * @var array
 	 */
 	var $_data = null;
 	
@@ -52,6 +52,13 @@ class FlexicontentModelTags extends JModelLegacy
 	var $_total = null;
 	
 	/**
+	 * Pagination object
+	 *
+	 * @var object
+	 */
+	var $_pagination = null;
+	
+	/**
 	 * Tags view parameters via menu item or via tag cloud module or ... via global configuration selected menu item
 	 *
 	 * @var object
@@ -61,7 +68,7 @@ class FlexicontentModelTags extends JModelLegacy
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function __construct()
 	{
@@ -70,7 +77,6 @@ class FlexicontentModelTags extends JModelLegacy
 		// Set id and load parameters
 		$id = JRequest::getInt('id', 0);		
 		$this->setId((int)$id);
-		
 		$params = & $this->_params;
 		
 		// Set the pagination variables into state (We get them from http request OR use default tags view parameters)
@@ -85,11 +91,12 @@ class FlexicontentModelTags extends JModelLegacy
 		$this->setState('filter_order_dir', 'ASC');
 	}
 	
+	
 	/**
-	 * Method to set the tag id
+	 * Method to set initialize data, setting an element id for the view
 	 *
 	 * @access	public
-	 * @param	int	tag ID number
+	 * @param	int
 	 */
 	function setId($id)
 	{
@@ -98,10 +105,12 @@ class FlexicontentModelTags extends JModelLegacy
 		$this->_tag     = null;
 		$this->_data    = null;
 		$this->_total   = null;
+		$this->_pagination = null;
 		$this->_params  = null;
 		$this->_loadParams();
 	}
-
+	
+	
 	/**
 	 * Overridden get method to get properties from the tag
 	 *
@@ -159,8 +168,9 @@ class FlexicontentModelTags extends JModelLegacy
 		return $this->_data;
 	}
 	
+	
 	/**
-	 * Total nr of Items
+	 * Method to get the total number of items
 	 *
 	 * @access public
 	 * @return integer
@@ -182,7 +192,7 @@ class FlexicontentModelTags extends JModelLegacy
 	 * Method to get the pagination object
 	 *
 	 * @access	public
-	 * @return	string
+	 * @return	object
 	 */
 	public function getPagination() {
 		// Load the content if it doesn't already exist
@@ -434,7 +444,7 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function _loadParams()
 	{
-		if (!empty($this->_params)) return;
+		if ( $this->_params !== NULL ) return;
 		
 		$app  = JFactory::getApplication();
 		$menu = JSite::getMenu()->getActive();     // Retrieve active menu
@@ -472,6 +482,18 @@ class FlexicontentModelTags extends JModelLegacy
 	
 	
 	/**
+	 * Method to get view's parameters
+	 *
+	 * @access public
+	 * @return object
+	 */
+	function &getParams()
+	{
+		return $this->_params;
+	}
+	
+	
+	/**
 	 * Method to load the Tag data
 	 *
 	 * @access public
@@ -486,7 +508,7 @@ class FlexicontentModelTags extends JModelLegacy
 				. ' WHERE t.id = '.(int)$this->_id
 				. ' AND t.published = 1'
 				;
-
+		
 		$this->_db->setQuery($query);
 		$this->_tag = $this->_db->loadObject();       // Execute query to load tag properties
 		if ( $this->_tag ) {
@@ -496,7 +518,7 @@ class FlexicontentModelTags extends JModelLegacy
 		return $this->_tag;
 	}
 	
-		
+	
 	/**
 	 * Method to store the tag
 	 *
@@ -507,19 +529,19 @@ class FlexicontentModelTags extends JModelLegacy
 	function storetag($data)
 	{
 		$row  =& $this->getTable('flexicontent_tags', '');
-
+		
 		// bind it to the table
 		if (!$row->bind($data)) {
 			$msg = $this->_db->getErrorMsg();
 			if (FLEXI_J16GE) throw new Exception($msg, 500); else JError::raiseError(500, $msg);
 		}
-
+		
 		// Make sure the data is valid
 		if (!$row->check()) {
 			$this->setError($row->getError());
 			return false;
 		}
-
+		
 		// Store it in the db
 		if (!$row->store()) {
 			$msg = $this->_db->getErrorMsg();
@@ -528,6 +550,7 @@ class FlexicontentModelTags extends JModelLegacy
 		$this->_tag = &$row;
 		return $row->id;
 	}
+	
 	
 	/**
 	 * Method to add a tag
@@ -540,7 +563,7 @@ class FlexicontentModelTags extends JModelLegacy
 		$obj = new stdClass();
 		$obj->name	 	= $name;
 		$obj->published	= 1;
-
+		
 		if($this->storetag($obj)) {
 			return true;
 		}
