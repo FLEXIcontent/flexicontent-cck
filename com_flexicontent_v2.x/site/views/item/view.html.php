@@ -132,8 +132,11 @@ class FlexicontentViewItem  extends JViewLegacy
 
 		// (b) Get from item parameters, allowing URL override
 		$ilayout = JRequest::getVar($_ilayout, false);
-		$ilayout = $ilayout ? $ilayout : $params->get($_ilayout, 'default');
-
+		if (!$ilayout) {
+			$desktop_ilayout = $params->get('ilayout', 'default');
+			$ilayout = !$useMobile ? $desktop_ilayout : $params->get('ilayout_mobile', $desktop_ilayout);
+		}
+		
 		// (c) Create the type parameters
 		$tparams = $this->get( 'Typeparams' );
 		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
