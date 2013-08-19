@@ -81,7 +81,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		flexicontent_html::loadFramework('jQuery');
-		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/rounded-corners-min.js' );
+		flexicontent_html::loadFramework('flexi_tmpl_common');
 		
 		//add css file
 		if (!$params->get('disablecss', '')) {
@@ -174,10 +174,11 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ( $menu ) {
 			$view_ok     = @$menu->query['view']     == 'category';
 			$cid_ok      = @$menu->query['cid']      == $cid;
-			$layout_ok   = @$menu->query['layout']   == $layout;
-			$authorid_ok = @$menu->query['authorid'] == $authorid;
+			$layout_ok   = @$menu->query['layout']   == $layout;   // null is equal to empty string
+			$authorid_ok = @$menu->query['authorid'] == $authorid; // null is equal to zero
+			$menu_matches = $view_ok && $cid_ok && $layout_ok && $authorid_ok;
 			
-			if ( !$view_ok || !$cid_ok || !$layout_ok && !$authorid_ok ) {
+			if ( !$menu_matches ) {
 				$params->set('page_title', '');
 				$params->set('page_heading', '');
 				// These are behavior, so do not clear ?

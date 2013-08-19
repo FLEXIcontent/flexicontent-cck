@@ -22,7 +22,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
 
-JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');
 ?>
