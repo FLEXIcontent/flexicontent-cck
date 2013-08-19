@@ -1464,7 +1464,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Get configuration parameter holding the custom field filtering and abort if empty
 		$mfilter_data = $cparams->get($mfilter_name, '');
 		if (!$mfilter_data) {
-			$cparams->set($mfilter_name, array());
+			$cparams->set($mfilter_name, '');
 			return array();
 		}
 		
@@ -1522,8 +1522,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// INDIRECT method of using field filter (via HTTP request),
 		// NOTE: we overwrite the above configuration parameter of custom field filters with an ARRAY OF VALID FILTER IDS, to 
 		// indicate to category/search model security not to skip these if they are not IN category/search configured filters list
-		if ($set_method=='request')
-			$cparams->set($mfilter_name, count($filter_ids) ? $filter_ids : array());
+		if ($set_method=='request') 
+			$cparams->set($mfilter_name, count($filter_ids) ? (FLEXI_J16GE ? $filter_ids : implode( '|', $filter_ids)) : '');
 		
 		// DIRECT method filter values, return an array of filter values (for direct usage into an SQL query)
 		else
@@ -1553,12 +1553,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( $include_hidden ) {
 			$persistent_filters = $params->get('persistent_filters', array());
 			$initial_filters    = $params->get('initial_filters', array());
-			foreach ($persistent_filters as $filter_id) $all_filters[] = $filter_id;
-			foreach ($initial_filters as $filter_id)    $all_filters[] = $filter_id;
+			if ($persistent_filters) foreach ($persistent_filters as $filter_id) $all_filters[] = $filter_id;
+			if ($initial_filters)    foreach ($initial_filters as $filter_id)    $all_filters[] = $filter_id;
 		}
 		
-		//$scope	= count($all_filters) ? ' AND fi.id IN (' . implode(',', $all_filters) . ')' : null; // I don't understand why we got the filters in the some categories that I don't want the filters
-		$scope	= ' AND fi.id IN (' . implode(',', $all_filters) . ')';// By Enjoyman
+		$scope	= count($all_filters) ? ' AND fi.id IN (' . implode(',', $all_filters) . ')' : null; // I don't understand why we got the filters in the some categories that I don't want the filters
+		//$scope	= ' AND fi.id IN (' . implode(',', $all_filters) . ')';// By Enjoyman
 		$filters	= null;
 		
 		if (FLEXI_J16GE) {

@@ -61,8 +61,6 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcfavourites';
 $menu = JSite::getMenu()->getActive();
 if ($menu) $page_classes .= ' menuitem'.$menu->id; 
-
-JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js');
 ?>
 
 <!--script type="text/javascript">
@@ -100,7 +98,7 @@ if ($use_fields && count($fields)) {
 }
 ?>
 
-<form action="<?php echo $this->action; ?>" method="POST" id="adminForm" onsubmit="">
+<form action="<?php echo $this->action; ?>" method="POST" id="adminForm" name="adminForm" onsubmit="">
 
 <?php
 	$this->params->set('use_filters',0);  // Currently not supported by the view, disable it

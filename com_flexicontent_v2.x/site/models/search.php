@@ -1,40 +1,44 @@
 <?php
 /**
- * @version		$Id: search.php 14401 2010-01-26 14:10:00Z louis $
- * @package		Joomla
- * @subpackage	Search
- * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
- * @license		GNU/GPL, see LICENSE.php
- * Joomla! is free software. This version may have been modified pursuant to the
- * GNU General Public License, and as distributed it includes or is derivative
- * of works licensed under the GNU General Public License or other free or open
- * source software licenses. See COPYRIGHT.php for copyright notices and
- * details.
+ * @version 1.5 stable $Id: favourites.php 1548 2012-11-13 02:24:26Z ggppdk $
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
+ *
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
-// Check to ensure this file is included in Joomla!
+// no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.model');
 
 /**
- * Search Component Search Model
+ * FLEXIcontent Component Model
  *
- * @package		Joomla
- * @subpackage	Search
- * @since 1.5
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @since		1.5
  */
 class FLEXIcontentModelSearch extends JModelLegacy
 {
 	/**
-	 * Sezrch data array
+	 * Item list data
 	 *
 	 * @var array
 	 */
 	var $_data = null;
-
+	
 	/**
-	 * Search total
+	 * Items list total
 	 *
 	 * @var integer
 	 */
@@ -46,14 +50,21 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 * @var integer
 	 */
 	var $_areas = null;
-
+	
 	/**
 	 * Pagination object
 	 *
 	 * @var object
 	 */
 	var $_pagination = null;
-
+	
+	/**
+	 * Search view parameters via menu item or via search module or ... via global configuration selected menu item
+	 *
+	 * @var object
+	 */
+	var $_params = null;
+	
 	/**
 	 * Constructor
 	 *
@@ -62,16 +73,19 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	function __construct()
 	{
 		parent::__construct();
+		
+		// Set id and load parameters
+		$id = 0;  // no id used by this view
+		$this->setId((int)$id);
+		$params = & $this->_params;
+		
+		// Set the pagination variables into state (We get them from http request OR use default tags view parameters)
+		$limit = JRequest::getVar('limit') ? JRequest::getVar('limit') : $params->get('limit');
+		$limitstart = JRequest::getInt('limitstart');
 
-		$mainframe = JFactory::getApplication();
-
-		//Get configuration
-		$config = JFactory::getConfig();
-
-		// Get the pagination request variables
-		$this->setState('limit', $mainframe->getUserStateFromRequest('com_flexicontent.limit', 'limit', $config->getValue('config.list_limit'), 'int'));
-		$this->setState('limitstart', JRequest::getVar('limitstart', 0, '', 'int'));
-
+		$this->setState('limit', $limit);
+		$this->setState('limitstart', $limitstart);
+		
 		// Set the search parameters
 		$keyword		= urldecode(JRequest::getString('searchword'));
 		$match			= JRequest::getWord('searchphrase', 'all');
@@ -82,7 +96,26 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$areas = JRequest::getVar('areas');
 		$this->setAreas($areas);
 	}
-
+	
+	
+	/**
+	 * Method to set initialize data, setting an element id for the view
+	 *
+	 * @access	public
+	 * @param	int
+	 */
+	function setId($id)
+	{
+		// Set new category ID, wipe member variables and load parameters
+		//$this->_id      = $id;  // not used by current view
+		$this->_data    = null;
+		$this->_total   = null;
+		$this->_pagination = null;
+		$this->_params  = null;
+		$this->_loadParams();
+	}
+	
+	
 	/**
 	 * Method to set the search parameters
 	 *
@@ -134,7 +167,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 
 			JPluginHelper::importPlugin( 'search');
 			$dispatcher = JDispatcher::getInstance();
-			$results = $dispatcher->trigger( 'onSearch', array(
+			$results = $dispatcher->trigger( FLEXI_J16GE ? 'onContentSearch' : 'onSearch', array(
 				$this->getState('keyword'),
 				$this->getState('match'),
 				$this->getState('ordering'),
@@ -153,12 +186,13 @@ class FLEXIcontentModelSearch extends JModelLegacy
 				$this->_data = $rows;
 			}
 		}
-
+		
 		return $this->_data;
 	}
-
+	
+	
 	/**
-	 * Method to get the total number of weblink items for the category
+	 * Method to get the total number of items
 	 *
 	 * @access public
 	 * @return integer
@@ -170,10 +204,10 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	
 	
 	/**
-	 * Method to get a pagination object
+	 * Method to get the pagination object
 	 *
-	 * @access public
-	 * @return integer
+	 * @access	public
+	 * @return	object
 	 */
 	public function getPagination() {
 		// Load the content if it doesn't already exist
@@ -193,24 +227,100 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 */
 	function getAreas()
 	{
-		$mainframe = JFactory::getApplication();
-
-		// Load the Category data
-		if (empty($this->_areas['search']))
-		{
-			$areas = array();
-
-			JPluginHelper::importPlugin( 'search');
-			$dispatcher = JDispatcher::getInstance();
-			$searchareas = $dispatcher->trigger( 'onSearchAreas' );
-
-			foreach ($searchareas as $area) {
-				$areas = array_merge( $areas, $area );
-			}
-
-			$this->_areas['search'] = $areas;
+		// Return already calculated search areas
+		if ( !empty($this->_areas['search']) ) {
+			return $this->_areas;
 		}
-
+		
+		// Return (only) the area of advanced search plugin, when search areas selector is not shown
+		$params = & $this->_params;
+		if( !$params->get('show_searchareas', 0) ) {
+			$this->_areas['search'] = array('flexicontent');
+			return $this->_areas;
+		}
+		
+		// Using other search areas, get all search
+		JPluginHelper::importPlugin( 'search');
+		$dispatcher = JDispatcher::getInstance();
+		$searchareas = $dispatcher->trigger( FLEXI_J16GE ? 'onContentSearchAreas' : 'onSearchAreas' );
+		$areas = array();
+		foreach ($searchareas as $area) {
+			$areas = array_merge( $areas, $area );
+		}
+		
+		// DISABLE search area 'content' of Joomla articles search plugin
+		unset($areas['content']);
+		
+		// DISABLE -FIELD- search areas of standard flexisearch plugin
+		$unset_areas = array('FlexisearchTitle', 'FlexisearchDesc', 'FlexisearchFields', 'FlexisearchMeta', 'FlexisearchTags');
+		foreach($unset_areas as $_unset_area) unset($areas[$_unset_area]);
+		
+		// DISABLE -CONTENT TYPES- search areas of standard flexisearch plugin
+		foreach($areas as $_sindex => $_slabel) {
+			if (strpos($_sindex, 'FlexisearchType') !== false)  unset($areas[$_sindex]);
+		}
+		
+		// Cache search areas and return them
+		$this->_areas['search'] = $areas;
 		return $this->_areas;
 	}
+	
+	
+	/**
+	 * Method to load parameters
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function _loadParams()
+	{
+		if ( $this->_params !== NULL ) return;
+		
+		$app  = JFactory::getApplication();
+		$menu = JSite::getMenu()->getActive();     // Retrieve active menu
+		
+		// a. Get the COMPONENT only parameters and merge current menu item parameters
+		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
+		}
+		
+		// b. Merge module parameters overriding current configuration
+		//   (this done when module id is present in the HTTP request) (search module include search view configuration)
+		if ( JRequest::getInt('module', 0 ) )
+		{
+			// load by module name, not used
+			//jimport( 'joomla.application.module.helper' );
+			//$module_name = JRequest::getInt('module', 0 );
+			//$module = & JModuleHelper::getModule('mymodulename');
+			
+			// load by module id
+			$module_id = JRequest::getInt('module', 0 );
+			$module = JTable::getInstance ( 'Module', 'JTable' );
+			
+			if ( $module->load($module_id) ) {
+				$moduleParams = FLEXI_J16GE ? new JRegistry($module->params) : new JParameter($module->params);
+				$params->merge($moduleParams);
+			} else {
+				JError::raiseNotice ( 500, $module->getError() );
+			}
+		}
+		
+		$this->_params = $params;
+	}
+	
+	
+	/**
+	 * Method to get view's parameters
+	 *
+	 * @access public
+	 * @return object
+	 */
+	function &getParams()
+	{
+		return $this->_params;
+	}
+
 }
