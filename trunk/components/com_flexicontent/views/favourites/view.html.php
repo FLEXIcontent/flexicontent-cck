@@ -45,12 +45,11 @@ class FlexicontentViewFavourites extends JViewLegacy
 		$uri   = JFactory::getURI();
 		$view  = JRequest::getCmd('view');
 		
-		// No parameters via model, get the COMPONENT only parameters and then merge current menu item parameters
-		$params = clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) {
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
-			$params->merge($menu_params);
-		}
+		// Get view's Model
+		$model = $this->getModel();
+		
+		// Get parameters via model
+		$params  = $model->getParams();
 		
 		// Get various data from the model
 		$items   = $this->get('Data');
@@ -63,6 +62,9 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// ********************************
 		// Load needed JS libs & CSS styles
 		// ********************************
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		flexicontent_html::loadFramework('jQuery');
+		flexicontent_html::loadFramework('flexi_tmpl_common');
 		
 		//add css file
 		if (!$params->get('disablecss', '')) {
@@ -81,9 +83,17 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// **********************
 		
 		// Verify menu item points to current FLEXIcontent object, IF NOT then clear page title and page class suffix
-		if ( $menu && $menu->query['view'] != $view ) {
-			$params->set('page_title',	'');
-			$params->set('pageclass_sfx',	'');
+		if ( $menu ) {
+			$view_ok     = @$menu->query['view']     == 'favourites';
+			$menu_matches = $view_ok;
+			
+			if ( !$menu_matches ) {
+				$params->set('page_title', '');
+				$params->set('page_heading', '');
+				// These are behavior, so do not clear ?
+				//$params->set('show_page_heading', '');
+				//$params->set('pageclass_sfx',	'');
+			}
 		}
 		
 		// Set a page title if one was not already set
@@ -158,12 +168,13 @@ class FlexicontentViewFavourites extends JViewLegacy
 		$lists['filter_order_Dir'] 	= $filter_order_Dir;
 		$lists['filter']			= $filter;
 		
-		// Create links
-		$link = JRoute::_( JRequest::getInt('Itemid') ? 'index.php?Itemid='.JRequest::getInt('Itemid') : 'index.php?view=favourites', false );
-		$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
-		
 		// Create the pagination object
 		$pageNav = $this->get('pagination');
+		
+		// Create links
+		$link = JRoute::_(FlexicontentHelperRoute::getFavsRoute(), false);
+		$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
+		
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('action',    $link);  // $uri->toString()

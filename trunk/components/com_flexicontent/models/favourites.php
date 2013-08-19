@@ -26,15 +26,14 @@ jimport('joomla.application.component.model');
  *
  * @package Joomla
  * @subpackage FLEXIcontent
- * @since		1.0
+ * @since		1.5
  */
 class FlexicontentModelFavourites extends JModelLegacy
 {
-	
 	/**
 	 * Item list data
 	 *
-	 * @var mixed
+	 * @var array
 	 */
 	var $_data = null;
 	
@@ -46,6 +45,13 @@ class FlexicontentModelFavourites extends JModelLegacy
 	var $_total = null;
 	
 	/**
+	 * Pagination object
+	 *
+	 * @var object
+	 */
+	var $_pagination = null;
+	
+	/**
 	 * Favourites view parameters via menu item
 	 *
 	 * @var object
@@ -55,16 +61,15 @@ class FlexicontentModelFavourites extends JModelLegacy
 	/**
 	 * Constructor
 	 *
-	 * @since 1.0
+	 * @since 1.5
 	 */
 	function __construct()
 	{
 		parent::__construct();
 		
 		// Set id and load parameters
-		$id = JRequest::getInt('id', 0);		
+		$id = 0;  // no id used by this view
 		$this->setId((int)$id);
-		
 		$params = & $this->_params;
 		
 		// Set the pagination variables into state (We get them from http request OR use default tags view parameters)
@@ -79,22 +84,25 @@ class FlexicontentModelFavourites extends JModelLegacy
 		$this->setState('filter_order_dir', 'DESC');
 	}
 	
+	
 	/**
-	 * Method to set the tag id
+	 * Method to set initialize data, setting an element id for the view
 	 *
 	 * @access	public
-	 * @param	int	tag ID number
+	 * @param	int
 	 */
 	function setId($id)
 	{
 		// Set new category ID, wipe member variables and load parameters
-		$this->_id      = $id;
+		//$this->_id      = $id;  // not used by current view
 		$this->_data    = null;
 		$this->_total   = null;
+		$this->_pagination = null;
 		$this->_params  = null;
 		$this->_loadParams();
 	}
-
+	
+	
 	/**
 	 * Overridden get method to get properties from the tag
 	 *
@@ -152,8 +160,9 @@ class FlexicontentModelFavourites extends JModelLegacy
 		return $this->_data;
 	}
 	
+	
 	/**
-	 * Total nr of Items
+	 * Method to get the total number of items
 	 *
 	 * @access public
 	 * @return integer
@@ -175,7 +184,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 * Method to get the pagination object
 	 *
 	 * @access	public
-	 * @return	string
+	 * @return	object
 	 */
 	public function getPagination() {
 		// Load the content if it doesn't already exist
@@ -418,7 +427,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 */
 	function _loadParams()
 	{
-		if (!empty($this->_params)) return;
+		if ( $this->_params !== NULL ) return;
 		
 		$app  = JFactory::getApplication();
 		$menu = JSite::getMenu()->getActive();     // Retrieve active menu
@@ -431,6 +440,18 @@ class FlexicontentModelFavourites extends JModelLegacy
 		}
 		
 		$this->_params = $params;
+	}
+	
+	
+	/**
+	 * Method to get view's parameters
+	 *
+	 * @access public
+	 * @return object
+	 */
+	function &getParams()
+	{
+		return $this->_params;
 	}
 }
 ?>

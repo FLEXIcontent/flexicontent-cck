@@ -1760,7 +1760,7 @@ class modFlexicontentHelper
 		// Get configuration parameter holding the custom field filtering and abort if empty
 		$mfilter_data = $cparams->get($mfilter_name, '');
 		if (!$mfilter_data) {
-			$cparams->set($mfilter_name, array());
+			$cparams->set($mfilter_name, '');
 			return array();
 		}
 		
@@ -1819,7 +1819,7 @@ class modFlexicontentHelper
 		// NOTE: we overwrite the above configuration parameter of custom field filters with an ARRAY OF VALID FILTER IDS, to 
 		// indicate to category/search model security not to skip these if they are not IN category/search configured filters list
 		if ($set_method=='request')
-			$cparams->set($mfilter_name, count($filter_ids) ? $filter_ids : array());
+			$cparams->set($mfilter_name, count($filter_ids) ? (FLEXI_J16GE ? $filter_ids : implode( '|', $filter_ids)) : '');
 		
 		// DIRECT method filter values, return an array of filter values (for direct usage into an SQL query)
 		else

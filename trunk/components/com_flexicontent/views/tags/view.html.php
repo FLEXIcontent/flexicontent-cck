@@ -45,15 +45,20 @@ class FlexicontentViewTags extends JViewLegacy
 		$uri   = JFactory::getURI();
 		$view  = JRequest::getCmd('view');
 		
+		// Get view's Model
+		$model = $this->getModel();
+		
 		// Get tag and set tag parameters as VIEW's parameters (tag parameters are merged with component/page(=menu item) and optionally with tag cloud parameters)
-		$tag = $this->get('Tag');
+		$tag = $model->getTag();
 		if ( empty($tag) ) {
 			// Raise a 404 error, if tag doesn't exist or access isn't permitted, maybe move this into model ??
 			$tid = JRequest::getInt('id', 0);
 			$msg = JText::sprintf( $tid ? 'Tag id was not set (is 0)' : 'Tag #%d not found', $tid );
 			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 		}
-		$params  = $tag->parameters;
+		
+		// Get parameters via model
+		$params  = $model->getParams();
 		
 		// Get various data from the model
 		$items   = $this->get('Data');
@@ -66,6 +71,9 @@ class FlexicontentViewTags extends JViewLegacy
 		// ********************************
 		// Load needed JS libs & CSS styles
 		// ********************************
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		flexicontent_html::loadFramework('jQuery');
+		flexicontent_html::loadFramework('flexi_tmpl_common');
 		
 		//add css file
 		if (!$params->get('disablecss', '')) {
@@ -82,12 +90,20 @@ class FlexicontentViewTags extends JViewLegacy
 		// **********************
 		// Calculate a page title
 		// **********************
-		$m_id = (int) @$menu->query['id'] ;
 		
 		// Verify menu item points to current FLEXIcontent object, IF NOT then clear page title and page class suffix
-		if ( $menu && ($menu->query['view'] != $view || $m_id != JRequest::getInt('id') ) ) {
-			$params->set('page_title',	'');
-			$params->set('pageclass_sfx',	'');
+		if ( $menu ) {
+			$view_ok     = @$menu->query['view']     == 'tags';
+			$tid_ok      = @$menu->query['id']       == $tag->id;
+			$menu_matches = $view_ok && $tid_ok;
+			
+			if ( !$menu_matches ) {
+				$params->set('page_title', '');
+				$params->set('page_heading', '');
+				// These are behavior, so do not clear ?
+				//$params->set('show_page_heading', '');
+				//$params->set('pageclass_sfx',	'');
+			}
 		}
 		
 		// Set a page title if one was not already set
@@ -171,12 +187,13 @@ class FlexicontentViewTags extends JViewLegacy
 		$lists['filter_order_Dir'] 	= $filter_order_Dir;
 		$lists['filter']			= $filter;
 		
+		// Create the pagination object
+		$pageNav = $this->get('pagination');
+		
 		// Create links
 		$link = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug), false);
 		$print_link = JRoute::_('index.php?view=tags&id='.$tag->slug.'&pop=1&tmpl=component');
 		
-		// Create the pagination object
-		$pageNav = $this->get('pagination');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('action',    $link);  // $uri->toString()
