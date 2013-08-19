@@ -458,9 +458,10 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		
 		// b. If field filter has defined drop-down select options the create the drop-down select form field
 		if ( !empty($options) ) {
+			$attribs_str  = ' class="fc_field_filter use_select2_lib"';
+			//$attribs_str .= ' onchange="document.getElementById(\''.$formName.'\').submit();"';
 			flexicontent_html::loadFramework('select2');
-			$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname,
-				' class="fc_field_filter use_select2_lib" onchange="document.getElementById(\''.$formName.'\').submit();"', 'value', 'text', $value);
+			$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, $attribs_str, 'value', 'text', $value);
 		}
 		
 		// Special CASE 'categories' filter, replace some tags in filter HTML ...

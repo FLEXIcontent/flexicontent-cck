@@ -350,7 +350,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 			// --. Decide whether to show filename (if we do not use button, then displaying of filename is forced)
 			$_filename  = $file_data->altname ? $file_data->altname : $file_data->filename;
-			$_filename  = mb_strtolower( $_filename, "UTF-8");
+			//$_filename  = mb_strtolower( $_filename, "UTF-8");
 			$name_str   = ($display_filename || !$usebutton || $prop=='namelist') ? $_filename : '';
 			$name_html  = !empty($name_str) ? '&nbsp;<span class="fcfile_name">'. $name_str . '</span>' : '';
 

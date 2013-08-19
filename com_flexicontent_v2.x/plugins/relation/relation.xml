@@ -64,6 +64,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC">
+				<option value="0">FLEXI_RIFLD_ANY_USER</option>
+				<option value="1">FLEXI_RIFLD_EDITOR</option>
+				<option value="2">FLEXI_RIFLD_ITEM_OWNER</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_EDIT_OPTIONS" level="level1" menu="hide" />
 			
