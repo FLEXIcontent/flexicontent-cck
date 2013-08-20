@@ -811,13 +811,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$filter  = JRequest::getVar('filter', NULL, 'default');
 			}*/
 			$text   = JRequest::getVar('filter', NULL, 'default');
-			$phrase = JRequest::getVar('filterphrase', 'exact', 'default');
+			$phrase = JRequest::getVar('searchphrase', 'exact', 'default');
 			
 			$text = trim( $text );
 			if( strlen($text) )
 			{
-				$quoted_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
-				$quoted_text = $db->Quote( $quoted_text, false );
+				$quoted_text = FLEXI_J16GE ? $this->_db->escape($text, true) : $this->_db->getEscaped($text, true);
+				$quoted_text = $this->_db->Quote( $quoted_text, false );
 				
 				switch ($phrase)
 				{
@@ -836,8 +836,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 					case 'all':
 						$words = explode( ' ', $text );
 						$newtext = '+' . implode( '* +', $words ) .'*';
-						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
-						$quoted_text = $db->Quote( $quoted_text, false );
+						$quoted_text = FLEXI_J16GE ? $this->_db->escape($newtext, true) : $this->_db->getEscaped($newtext, true);
+						$quoted_text = $this->_db->Quote( $quoted_text, false );
 						$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 						break;
 					
@@ -845,8 +845,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 					default:
 						$words = explode( ' ', $text );
 						$newtext = implode( '* ', $words ) .'*';
-						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
-						$quoted_text = $db->Quote( $quoted_text, false );
+						$quoted_text = FLEXI_J16GE ? $this->_db->escape($newtext, true) : $this->_db->getEscaped($newtext, true);
+						$quoted_text = $this->_db->Quote( $quoted_text, false );
 						$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 						break;
 				}

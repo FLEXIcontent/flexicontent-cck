@@ -41,6 +41,10 @@ if ($filter_instructions == 1) {
 
 <?php if ( $use_search || $use_filters ) : /* BOF search and filters block */ ?>
 
+	<?php
+	$searchphrase_selector = flexicontent_html::searchphrase_selector($params, $form_name);
+	?>
+
 <div id="<?php echo $form_id; ?>_filter_box" class="fc_filter_box floattext">
 	
 	<fieldset class="fc_filter_set">
@@ -69,7 +73,8 @@ if ($filter_instructions == 1) {
 				<?php endif; ?>
 				<span class="fc_filter_html">
 					<input class="<?php echo $text_search_class; ?>" fc_label_text="<?php echo $text_search_label; ?>" size="34" type="text" name="filter" id="<?php echo $form_id; ?>_filter" value="<?php echo $text_search_val;?>" />
-				
+					<?php echo $searchphrase_selector; ?>
+					
 					<?php if ( $filter_placement && ($show_search_go || $show_search_reset) ) : ?>
 					<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 					<span class="fc_buttons">

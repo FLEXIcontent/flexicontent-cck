@@ -456,13 +456,13 @@
 				<option value="rated">FLEXI_ORDER_BEST_RATED</option>
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
-			<field name="" type="separator" default="FLEXI_CUSTOM_ORDER" description="" level="level3" />
-			<field name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
-			<field name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR_DESC" >
+			<field name="" type="separator" default="FLEXI_CUSTOM_ORDER" description="" level="level3" menu="hide" />
+			<field name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" menu="hide" />
+			<field name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR_DESC" menu="hide" >
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>
 			</field>
-			<field name="orderbycustomfieldint" type="list" default="0" label="FLEXI_PRIMARY_ORDERING_METHOD" description="FLEXI_PRIMARY_ORDERING_METHOD_DESC" >
+			<field name="orderbycustomfieldint" type="list" default="0" label="FLEXI_PRIMARY_ORDERING_METHOD" description="FLEXI_PRIMARY_ORDERING_METHOD_DESC" menu="hide" >
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_NUMERIC</option>
 			</field>
@@ -561,6 +561,17 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_OUTSIDE_INPUT</option>
 				<option value="2">FLEXI_INSIDE_INPUT</option>
+			</field>
+			<field name="show_searchphrase" type="radio" default="1" label="FLEXI_SEARCHWORD_COMBINATION" description="FLEXI_SEARCHWORD_COMBINATION_DESC" menu="hide" >
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="default_searchphrase" type="list" default="all" label="FLEXI_SEARCHWORD_DEFAULT_COMBINATION" description="FLEXI_SEARCHWORD_DEFAULT_COMBINATION_DESC" menu="hide" >
+				<option value="natural">FLEXI_NATURAL_PHRASE</option>
+				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_GUESS_RELEVANT</option>
+				<option value="all">FLEXI_ALL_WORDS</option>
+				<option value="any">FLEXI_ANY_WORDS</option>
+				<option value="exact">FLEXI_EXACT_PHRASE</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level2" hr="false" menu="hide" />
@@ -678,19 +689,16 @@
 		<field name="" type="separator" default="FLEXI_FRONTEND_ITEM_FORM" label="" level="level1" menu="hide" />
 			
 			<field name="" label="" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" level="level2" menu="hide" />
-			
 			<field name="allowbuttons_fe" type="fccheckbox" default=""
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,save_preview,preview_latest" defaultvals="apply,save_preview,preview_latest"
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC"  menu="hide"/>
-			
 			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level3" menu="hide" />
 			<field name="submit_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" />
 			<field name="submit_redirect_url_fe" type="text" default="" size="106" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" menu="hide" />
 			<field name="notauthurl" type="menuitem" default="" disable="separator" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level3" menu="hide" />
-			
 			<field name="use_captcha" type="radio" default="1" label="FLEXI_USER_TYPE" description="FLEXI_USER_TYPE_DESC" menu="hide">
 				<option value="0">FLEXI_NEVER</option>
 				<option value="1">FLEXI_GUESTS_RECOMMENEDED</option>
