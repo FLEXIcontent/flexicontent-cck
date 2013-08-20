@@ -287,7 +287,7 @@ fieldset.fc_filter_set {
 	display: none;
 	z-index: 1000;
 	
-	position: absolute;
+	position: fixed;
 	top: 0;
 	left: 0;
 	
