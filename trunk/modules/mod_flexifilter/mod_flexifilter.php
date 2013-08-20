@@ -234,7 +234,7 @@ if ( $show_mod )
 if (!$display_cat_list || !empty($selected_cats)) {
 	$js = '
 		jQuery(document).ready(function() {
-			jQuery("'.$form_name.'_filter_box").style.display="block";
+			jQuery("#'.$form_name.'_filter_box").css("display", "block");
 		});
 	';
 }
