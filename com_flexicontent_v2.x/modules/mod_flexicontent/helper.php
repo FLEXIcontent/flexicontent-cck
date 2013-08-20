@@ -1358,11 +1358,11 @@ class modFlexicontentHelper
 		
 		// Static Field Filters (These are a string that MAPs filter ID TO filter VALUES)
 		// These field filters apply a STATIC filtering, regardless of current item being displayed.
-		$static_filters = self::_setFilters( $params, 'static_filters', $is_persistent=1, $set_method="array");
+		$static_filters = FlexicontentFields::setFilterValues( $params, 'static_filters', $is_persistent=1, $set_method="array");
 		
 		// Dynamic Field Filters (THIS is filter IDs list)
 		// These field filters apply a DYNAMIC filtering, that depend on current item being displayed. The items that have same value as currently displayed item will be included in the list.
-		//$dynamic_filters = self::_setFilters( $params, 'dynamic_filters', $is_persistent=0);
+		//$dynamic_filters = FlexicontentFields::setFilterValues( $params, 'dynamic_filters', $is_persistent=0);
 		
 		$where_field_filters = '';
 		$join_field_filters = '';
@@ -1737,93 +1737,6 @@ class modFlexicontentHelper
 			$params->set('display_comments', 0);
 			$params->set('display_comments_feat', 0);
 		}
-	}
-	
-	
-	/**
-	 * Method to set custom field filters VIA configuration
-	 * -- in case of content lists these are set via the menu item (category, search etc)
-	 *    and set as HTTP Request variables to be used by the filtering mechanism of the category model
-	 * -- in case of module these are via module parameters
-	 *    and are returned as an array to be used directly into the SQL quuery
-	 * 
-	 * @access public
-	 * @return object
-	 * @since 1.5
-	 */
-	function _setFilters( &$cparams, $mfilter_name='persistent_filters', $is_persistent=1, $set_method="request" )
-	{
-		$field_filters = array();   // Used when set_method is 'array' instead of 'request'
-		$is_persistent =            // Non-request method does not have initial filters
-			$set_method!="request" ? 1 : $is_persistent;
-			
-		// Get configuration parameter holding the custom field filtering and abort if empty
-		$mfilter_data = $cparams->get($mfilter_name, '');
-		if (!$mfilter_data) {
-			$cparams->set($mfilter_name, '');
-			return array();
-		}
-		
-		// Parse configuration parameter into individual fields
-		$mfilter_arr = preg_split("/[\s]*%%[\s]*/", $mfilter_data);
-		if ( empty($mfilter_arr[count($mfilter_arr)-1]) ) {
-			unset($mfilter_arr[count($mfilter_arr)-1]);
-		}
-		
-		// This array contains the field (filter) ID that were parsed without errors
-		$filter_ids = array();
-		
-		foreach ($mfilter_arr as $mfilter)
-		{
-			// a. Split elements into their properties: filter_id, filter_value
-			$_data  = preg_split("/[\s]*##[\s]*/", $mfilter);  //print_r($_data);
-			$filter_id = (int) $_data[0];
-			$filter_value = @$_data[1];
-			//echo "filter_".$filter_id.": "; print_r( $filter_value ); echo "<br/>";
-			
-			// b. Basic parsing error check: a non numeric field id
-			if ( !$filter_id ) continue;
-			
-			// c. Add field (filter) ID into those that are valid
-			$filter_ids[] = $filter_id;
-			
-			// d. Skip field filter, if it is not persistent and user user has overriden it
-			if ( !$is_persistent && JRequest::getVar('filter_'.$filter_id, false) !== false ) continue;
-			
-			// CASE: range values:  value01---value02
-			if (strpos($filter_value, '---') !== false) {
-				$filter_value = explode('---', $filter_value);
-				$filter_value[2] = $filter_value[1];
-				$filter_value[1] = $filter_value[0];
-				unset($filter_value[0]);
-			}
-			
-			// CASE: multiple values:  value01+++value02+++value03+++value04
-			else if (strpos($filter_value, '+++') !== false) {
-				$filter_value = explode('+++', $filter_value);
-			}
-			
-			// CASE: specific value:  value01
-			else {}
-			
-			// INDIRECT method of using field filter (via HTTP request)
-			if ($set_method=='request')
-				JRequest::setVar('filter_'.$filter_id, $filter_value);
-			
-			// DIRECT method of using field filter (via a returned array)
-			else
-				$field_filters[$filter_id] = $filter_value;
-		}
-		
-		// INDIRECT method of using field filter (via HTTP request),
-		// NOTE: we overwrite the above configuration parameter of custom field filters with an ARRAY OF VALID FILTER IDS, to 
-		// indicate to category/search model security not to skip these if they are not IN category/search configured filters list
-		if ($set_method=='request')
-			$cparams->set($mfilter_name, count($filter_ids) ? (FLEXI_J16GE ? $filter_ids : implode( '|', $filter_ids)) : '');
-		
-		// DIRECT method filter values, return an array of filter values (for direct usage into an SQL query)
-		else
-			return $field_filters;
 	}
 }
 ?>

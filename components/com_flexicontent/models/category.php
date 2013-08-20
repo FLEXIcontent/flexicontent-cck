@@ -795,66 +795,99 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$filters_where = array();
 		
-		//if ( $cparams->get('use_search',1) )  // Commented out to allow using persistent filters via menu
-		if ( 1 )
+		if ( $cparams->get('use_search',1) )
 		{
 			// Get value of search text ('filter') , setting into appropriate session variables
+			// *** Commented out to get variable only by HTTP GET or POST thus supporting FULL PAGE CACHING (e.g. Joomla's system plugin 'Cache')
 			/*if ($this->_id) {
 				$filter  = $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter', 'filter', '', 'string' );
-			} else if ($this->_authorid) {
+			} else if ($this->_layout=='author') {
 				$filter  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter', 'filter', '', 'string' );
-			} else if (count($this->_ids)) {
+			} else if ($this->_layout=='mcats') {
 				$filter  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
+			} else if ($this->_layout=='myitems') {
+				$filter  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
 			} else {
 				$filter  = JRequest::getVar('filter', NULL, 'default');
 			}*/
-			$filter  = JRequest::getVar('filter', NULL, 'default');
+			$text   = JRequest::getVar('filter', NULL, 'default');
+			$phrase = JRequest::getVar('filterphrase', 'exact', 'default');
 			
-			if ($filter) {
-				$search_term = FLEXI_J16GE ? $this->_db->escape( $filter, true ) : $this->_db->getEscaped( $filter, true );
-				$filters_where[ 'search' ] = ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $search_term, false ).' IN BOOLEAN MODE)';
+			$text = trim( $text );
+			if( strlen($text) )
+			{
+				$quoted_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
+				$quoted_text = $db->Quote( $quoted_text, false );
+				
+				switch ($phrase)
+				{
+					case 'natural':
+						$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.') ';
+						break;
+					
+					case 'natural_expanded':
+						$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
+						break;
+					
+					case 'exact':
+						$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+						break;
+					
+					case 'all':
+						$words = explode( ' ', $text );
+						$newtext = '+' . implode( '* +', $words ) .'*';
+						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+						$quoted_text = $db->Quote( $quoted_text, false );
+						$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+						break;
+					
+					case 'any':
+					default:
+						$words = explode( ' ', $text );
+						$newtext = implode( '* ', $words ) .'*';
+						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+						$quoted_text = $db->Quote( $quoted_text, false );
+						$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+						break;
+				}
+				
+				$filters_where[ 'search' ] = ' AND '. $_text_match;
 			}
 		}
 		
-		//if ( $cparams->get('use_filters',1) )  // Commented out to allow using persistent filters via menu
-		if ( 1 )
+		// Get filters these are EITHER (a) Shown filters OR (b) Locked filters
+		$shown_filters  = $this->getFilters( 'filters', 'use_filters', $check_access=true );
+		$locked_filters = $this->getFilters( 'persistent_filters', 'use_persistent_filters', $check_access=false );
+		$filters = array();
+		if ($shown_filters)  foreach($shown_filters  as $_filter) $filters[] = $_filter;
+		if ($locked_filters) foreach($locked_filters as $_filter) $filters[] = $_filter;
+		
+		// Get SQL clause for filtering via each field
+		if ($filters) foreach ($filters as $filtre)
 		{
-			$filters = $this->getFilters( $include_hidden=true );
-			if ($filters) foreach ($filters as $filtre)
-			{
-				// Get filter values, setting into appropriate session variables
-				/*if ($this->_id) {
-					$filtervalue 	= $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
-				} else if ($this->_authorid) {
-					$filtervalue  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
-				} else if (count($this->_ids)) {
-					$filtervalue  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
-				} else {
-					$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
-				}*/
-
-				/*//Trigger onBeforeFilter function
-				$field_type = $filtre->field_type;
-				$field_type_file = $filtre->iscore ? 'core' : $field_type;
-				$path = JPATH_ROOT.DS.'plugins'.DS.'flexicontent_fields'.DS.strtolower($field_type_file).(FLEXI_J16GE ? DS.strtolower($field_type_file) : "").'.php';
-				if ( file_exists($path) ) {
-					require_once($path);
-					if($method_exists = method_exists("plgFlexicontent_fields{$field_type_file}", "onBeforeFilter")) {
-						$filtervalue = NULL;
-						FLEXIUtilities::call_FC_Field_Func($field_type_file, 'onBeforeFilter', array( &$filtre, &$filtervalue ));
-					}
-				}*/
+			// Get filter values, setting into appropriate session variables
+			// *** Commented out to get variable only by HTTP GET or POST thus supporting FULL PAGE CACHING (e.g. Joomla's system plugin 'Cache')
+			/*if ($this->_id) {
+				$filtervalue 	= $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+			} else if ($this->_layout=='author') {
+				$filtervalue  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+			} else if ($this->_layout=='mcats') {
+				$filtervalue  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+			} else if ($this->_layout=='myitems') {
+				$filtervalue  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+			} else {
 				$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
-				
-				// Skip filters without value
-				$empty_filtervalue_array  = is_array($filtervalue)  && !strlen(trim(implode('',$filtervalue)));
-				$empty_filtervalue_string = !is_array($filtervalue) && !strlen(trim($filtervalue));
-				$allow_filtering_empty = $filtre->parameters->get('allow_filtering_empty', 0);
-				if ( !$allow_filtering_empty && ($empty_filtervalue_array || $empty_filtervalue_string) ) continue;
-				
-				//echo "category model found filters: "; print_r($filtervalue);
-				$filters_where[ $filtre->id ] = $this->_getFiltered($filtre, $filtervalue);
-			}
+			}*/
+			$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
+			
+			// Skip filters without value
+			$empty_filtervalue_array  = is_array($filtervalue)  && !strlen(trim(implode('',$filtervalue)));
+			$empty_filtervalue_string = !is_array($filtervalue) && !strlen(trim($filtervalue));
+			$allow_filtering_empty = $filtre->parameters->get('allow_filtering_empty', 0);
+			if ( !$allow_filtering_empty && ($empty_filtervalue_array || $empty_filtervalue_string) ) continue;
+			
+			//echo "category model found filters: "; print_r($filtervalue);
+			$filters_where[ $filtre->id ] = $this->_getFiltered($filtre, $filtervalue);
 		}
 		
 		return $filters_where;
@@ -1318,7 +1351,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		return $this->_category;
 	}
-
+	
+	
 	/**
 	 * Method to load content article parameters
 	 *
@@ -1421,8 +1455,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		
 		// Set filters via menu parameters
-		$this->_setFilters( $params, 'persistent_filters', $is_persistent=1);
-		$this->_setFilters( $params, 'initial_filters'   , $is_persistent=0);
+		FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
+		FlexicontentFields::setFilterValues( $params, 'initial_filters'   , $is_persistent=0);
 		
 		// Bugs of v2.0 RC2
 		if (FLEXI_J16GE) {
@@ -1445,158 +1479,73 @@ class FlexicontentModelCategory extends JModelLegacy {
 	
 	
 	/**
-	 * Method to set custom field filters VIA configuration
-	 * -- in case of content lists these are set via the menu item (category, search etc)
-	 *    and set as HTTP Request variables to be used by the filtering mechanism of the category model
-	 * -- in case of module these are via module parameters
-	 *    and are returned as an array to be used directly into the SQL quuery
-	 * 
-	 * @access public
-	 * @return object
-	 * @since 1.5
-	 */
-	function _setFilters( &$cparams, $mfilter_name='persistent_filters', $is_persistent=1, $set_method="request" )
-	{
-		$field_filters = array();   // Used when set_method is 'array' instead of 'request'
-		$is_persistent =            // Non-request method does not have initial filters
-			$set_method!="request" ? 1 : $is_persistent;
-			
-		// Get configuration parameter holding the custom field filtering and abort if empty
-		$mfilter_data = $cparams->get($mfilter_name, '');
-		if (!$mfilter_data) {
-			$cparams->set($mfilter_name, '');
-			return array();
-		}
-		
-		// Parse configuration parameter into individual fields
-		$mfilter_arr = preg_split("/[\s]*%%[\s]*/", $mfilter_data);
-		if ( empty($mfilter_arr[count($mfilter_arr)-1]) ) {
-			unset($mfilter_arr[count($mfilter_arr)-1]);
-		}
-		
-		// This array contains the field (filter) ID that were parsed without errors
-		$filter_ids = array();
-		
-		foreach ($mfilter_arr as $mfilter)
-		{
-			// a. Split elements into their properties: filter_id, filter_value
-			$_data  = preg_split("/[\s]*##[\s]*/", $mfilter);  //print_r($_data);
-			$filter_id = (int) $_data[0];
-			$filter_value = @$_data[1];
-			//echo "filter_".$filter_id.": "; print_r( $filter_value ); echo "<br/>";
-			
-			// b. Basic parsing error check: a non numeric field id
-			if ( !$filter_id ) continue;
-			
-			// c. Add field (filter) ID into those that are valid
-			$filter_ids[] = $filter_id;
-			
-			// d. Skip field filter, if it is not persistent and user user has overriden it
-			if ( !$is_persistent && JRequest::getVar('filter_'.$filter_id, false) !== false ) continue;
-			
-			// CASE: range values:  value01---value02
-			if (strpos($filter_value, '---') !== false) {
-				$filter_value = explode('---', $filter_value);
-				$filter_value[2] = $filter_value[1];
-				$filter_value[1] = $filter_value[0];
-				unset($filter_value[0]);
-			}
-			
-			// CASE: multiple values:  value01+++value02+++value03+++value04
-			else if (strpos($filter_value, '+++') !== false) {
-				$filter_value = explode('+++', $filter_value);
-			}
-			
-			// CASE: specific value:  value01
-			else {}
-			
-			// INDIRECT method of using field filter (via HTTP request)
-			if ($set_method=='request')
-				JRequest::setVar('filter_'.$filter_id, $filter_value);
-			
-			// DIRECT method of using field filter (via a returned array)
-			else
-				$field_filters[$filter_id] = $filter_value;
-		}
-		
-		// INDIRECT method of using field filter (via HTTP request),
-		// NOTE: we overwrite the above configuration parameter of custom field filters with an ARRAY OF VALID FILTER IDS, to 
-		// indicate to category/search model security not to skip these if they are not IN category/search configured filters list
-		if ($set_method=='request') 
-			$cparams->set($mfilter_name, count($filter_ids) ? (FLEXI_J16GE ? $filter_ids : implode( '|', $filter_ids)) : '');
-		
-		// DIRECT method filter values, return an array of filter values (for direct usage into an SQL query)
-		else
-			return $field_filters;
-	}
-	
-	
-	/**
 	 * Method to get the filter
 	 * 
 	 * @access public
 	 * @return object
 	 * @since 1.5
 	 */
-	function & getFilters($include_hidden=false)
+	function & getFilters($filt_param='filters', $usage_param='use_filters', $check_access=true)
 	{
-		static $filters_cached=array();
-		if ( isset($filters_cached[$include_hidden]) ) return $filters_cached[$include_hidden];
-		
 		$user		= JFactory::getUser();
 		$params = $this->_params;
+		$filters = array();
 		
-		$all_filters = array();  // avoid array_merge()
-		$shown_filters      = $params->get('filters', array());
-		foreach ($shown_filters as $filter_id)  $all_filters[] = $filter_id;
+		// Parameter that controls using these filters
+		if ( !$params->get($usage_param,0) ) return $filters;
 		
-		if ( $include_hidden ) {
-			$persistent_filters = $params->get('persistent_filters', array());
-			$initial_filters    = $params->get('initial_filters', array());
-			if ($persistent_filters) foreach ($persistent_filters as $filter_id) $all_filters[] = $filter_id;
-			if ($initial_filters)    foreach ($initial_filters as $filter_id)    $all_filters[] = $filter_id;
-		}
+		// Get Filter IDs, false means do retrieve any filter
+		$filter_ids = $params->get($filt_param, array());
+		if ($filter_ids === false) return $filters;
 		
-		$scope	= count($all_filters) ? ' AND fi.id IN (' . implode(',', $all_filters) . ')' : null; // I don't understand why we got the filters in the some categories that I don't want the filters
-		//$scope	= ' AND fi.id IN (' . implode(',', $all_filters) . ')';// By Enjoyman
-		$filters	= null;
+		// None selected filters means ALL
+		$and_scope = count($filter_ids) ? ' AND fi.id IN (' . implode(',', $filter_ids) . ')' : '';
 		
-		if (FLEXI_J16GE) {
-			$aid_arr = $user->getAuthorisedViewLevels();
-			$aid_list = implode(",", $aid_arr);
-			$where = ' AND fi.access IN (0,'.$aid_list.') ';
-		} else {
-			$aid = (int) $user->get('aid');
-			
-			if (FLEXI_ACCESS) {
-				$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
-				if (isset($readperms['field']) && count($readperms['field']) ) {
-					$where = ' AND ( fi.access <= '.$aid.' OR fi.id IN ('.implode(",", $readperms['field']).') )';
-				} else {
-					$where = ' AND fi.access <= '.$aid;
-				}
+		// Use ACCESS Level, usually this is only for shown filters
+		$and_access = '';
+		if ($check_access) {
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$and_access = ' AND fi.access IN (0,'.$aid_list.') ';
 			} else {
-				$where = ' AND fi.access <= '.$aid;
+				$aid = (int) $user->get('aid');
+				
+				if (FLEXI_ACCESS) {
+					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+					if (isset($readperms['field']) && count($readperms['field']) ) {
+						$and_access = ' AND ( fi.access <= '.$aid.' OR fi.id IN ('.implode(",", $readperms['field']).') )';
+					} else {
+						$and_access = ' AND fi.access <= '.$aid;
+					}
+				} else {
+					$and_access = ' AND fi.access <= '.$aid;
+				}
 			}
 		}
 		
+		// Create and execute SQL query for retrieving filters
 		$query  = 'SELECT fi.*'
 			. ' FROM #__flexicontent_fields AS fi'
 			. ' WHERE fi.published = 1'
 			. ' AND fi.isfilter = 1'
-			. $where
-			. $scope
+			. $and_access
+			. $and_scope
 			. ' ORDER BY fi.ordering, fi.name'
 		;
 		$this->_db->setQuery($query);
 		$filters = $this->_db->loadObjectList('name');
-		if (!$filters) $filters = array();
-		foreach ($filters as $filter)
-		{
+		if ( !$filters ) {
+			$filters = array(); // need to do this because we return reference, but false here will also mean an error
+			return $filters;
+		}
+		
+		// Create filter parameters
+		foreach ($filters as $filter) {
 			$filter->parameters = FLEXI_J16GE ? new JRegistry($filter->attribs) : new JParameter($filter->attribs);
 		}
 		
-		$filters_cached[$include_hidden] = $filters;
+		// Return found filters
 		return $filters;
 	}
 

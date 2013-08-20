@@ -41,6 +41,7 @@
 				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="force_itemid" type="text" default="" label="FLEXI_FORCE_ITEMID" description="FLEXI_FORCE_ITEMID_DESC" />
+			
 		</fieldset>
 		
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
@@ -216,46 +217,6 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="compact_search_with_filters" type="hidden" default="0" label="FLEXI_COMPACT_SEARCH_FILTERS_AREA" description="FLEXI_COMPACT_SEARCH_FILTERS_AREA_DESC" />
-			<!--field name="compact_search_with_filters" type="radio" default="" label="FLEXI_COMPACT_SEARCH_FILTERS_AREA" description="FLEXI_COMPACT_SEARCH_FILTERS_AREA_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-
-			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level2" />
-			<field name="use_filters" type="radio" default="" label="FLEXI_SHOW_FILTERS" description="FLEXI_SHOW_FILTERS_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="show_filters_list_label" type="radio" default="" label="FLEXI_SHOW_FILTERS_LIST_LABEL" description="FLEXI_SHOW_FILTERS_LIST_LABEL_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			<field name="show_filters_list_tip" type="radio" default="" label="FLEXI_FILTERS_LIST_TIP" description="FLEXI_FILTERS_LIST_TIP_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			
-			<field name="show_filter_labels" type="radio" default="" label="FLEXI_FORCE_FILTER_LABELS" description="FLEXI_FORCE_FILTER_LABELS_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
-				<option value="1">FLEXI_FORCE_SHOW_ALL</option>
-				<option value="2">FLEXI_FORCE_HIDE_ALL</option>
-			</field>
-			
-			<field name="limit_filter_values" type="list" default="" label="FLEXI_LIMIT_FILTER_VALUES" description="FLEXI_LIMIT_FILTER_VALUES_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_ALL_FIELD_VALUES</option>
-				<option value="1">FLEXI_CURRCAT_FIELD_VALUES</option>
-				<option value="2">FLEXI_CURRFILTER_FIELD_VALUES</option>
-			</field>
-			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" /-->
-			<!--field name="filter_chains" type="text" size="10" default="0" label="FLEXI_CHAINED_FILTERS" description="FLEXI_CHAINED_FILTERS_DESC" /-->
 			
 		</fieldset>
 		

@@ -103,9 +103,9 @@ if ( $show_mod )
 		$_fld_onchange = ' onchange="'
 			.' form=document.getElementById(\''.$form_name.'\'); '
 			.' cid_val=form.'.$catid_fieldname.'.value; '
-			.' if ( cid_val.length == 0 ) return;'
+			.' if ( cid_val.length == 0 ) { jQuery(\'#'.$form_name.'_filter_box\').css(\'display\', \'none\'); return; } '
 			.' getSEFurl(\'cid_loading_'.$module->id.'\',	'.$loader_html.', form,\''.$url_to_load.'\'+cid_val, \''.$autosubmit_msg.'\', '.$autosubmit.'); '
-			.' $(\'fc_filter_mod_elements_'.$module->id.'\').style.display=\'block\'; " '
+			.' jQuery(\'#'.$form_name.'_filter_box\').css(\'display\', \'block\'); " '
 			;
 		$_fld_attributes = $_fld_class.$_fld_size.$_fld_onchange;
 		
@@ -134,8 +134,9 @@ if ( $show_mod )
 	} else {
 		// Intersection of selected filters and of category assigned filters
 		$filters = array();
+		$filterids_indexed = array_keys($filterids);
 		foreach ($cat_filters as $filter_name => $filter) {
-			if ( in_array($filter->id, $filterids) ) {
+			if ( isset($filterids_indexed[$filter->id]) ) {
 				$filters[] = $filter;
 			}
 		}
@@ -226,4 +227,17 @@ if ( $show_mod )
 	}
 	
 }
+?>
+
+<?php
+
+if (!$display_cat_list || !empty($selected_cats)) {
+	$js = '
+		jQuery(document).ready(function() {
+			jQuery("'.$form_name.'_filter_box").style.display="block";
+		});
+	';
+}
+$document = JFactory::getDocument();
+$document->addScriptDeclaration($js);
 ?>

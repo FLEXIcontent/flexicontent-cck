@@ -28,3 +28,11 @@
 	color:darkred;
 	font-weight:bold;
 }
+
+.mod_flexifilter_wrapper .fc_filter_set {
+	border-width: 0px; 
+}
+
+.mod_flexifilter_wrapper .fc_filter_box {
+	display:none;
+}

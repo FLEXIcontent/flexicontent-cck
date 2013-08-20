@@ -47,11 +47,6 @@
     *zoom: 1;
 }
 
-/* Title ROW above the table of fields, contains various buttons and some of the custom fields */
-.fc_title_row {
-	display:block;
-	clear:both;
-}
 
 .fc_item_title {
 	display: inline-block;

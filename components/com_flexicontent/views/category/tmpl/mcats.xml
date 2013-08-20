@@ -254,11 +254,13 @@
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_ORDER" description="" level="level3" />
 			<field name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
-			<field name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR_DESC" >
+			<field name="orderbycustomfielddir" type="list" default="" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>
 			</field>
-			<field name="orderbycustomfieldint" type="list" default="0" label="FLEXI_PRIMARY_ORDERING_METHOD" description="FLEXI_PRIMARY_ORDERING_METHOD_DESC" >
+			<field name="orderbycustomfieldint" type="list" default="" label="FLEXI_PRIMARY_ORDERING_METHOD" description="FLEXI_PRIMARY_ORDERING_METHOD_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_NUMERIC</option>
 			</field>
@@ -366,40 +368,40 @@
 		
 		<field name="" type="jparamstab" description="FLEXI_PARAMETERS_CAT_ITEM_FILTERING" />
 			
-			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level2" hr="false" menu="hide" />
-			<field name="show_search_go" type="list" default="" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" menu="hide" >
+			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level2" hr="false" />
+			<field name="show_search_go" type="list" default="" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_search_reset" type="list" default="" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" menu="hide" >
+			<field name="show_search_reset" type="list" default="" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="filter_autosubmit" type="list" default="" label="FLEXI_FILTER_FORM_AUTO_SUBMIT" description="FLEXI_FILTER_FORM_AUTO_SUBMIT_DESC" menu="hide" >
+			<field name="filter_autosubmit" type="list" default="" label="FLEXI_FILTER_FORM_AUTO_SUBMIT" description="FLEXI_FILTER_FORM_AUTO_SUBMIT_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="filter_instructions" type="list" default="" label="FLEXI_SEARCH_FILTER_INSTRUCTIONS" description="FLEXI_SEARCH_FILTER_INSTRUCTIONS_DESC" menu="hide" >
+			<field name="filter_instructions" type="list" default="" label="FLEXI_SEARCH_FILTER_INSTRUCTIONS" description="FLEXI_SEARCH_FILTER_INSTRUCTIONS_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
-			<field name="filter_placement" type="list" default="" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" menu="hide" >
+			<field name="filter_placement" type="list" default="" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" menu="hide" />
-			<field name="filter_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" menu="hide" />
-			<field name="filter_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" menu="hide" />
-			<field name="filter_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" menu="hide" />
-			<field name="filter_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" menu="hide" />
-			<field name="filter_separatorf" type="list" default="" label="FLEXI_RECORD_SEPARATOR_IGNORED" description="FLEXI_RECORD_SEPARATOR_IGNORED_DESC" menu="hide" >
+			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" />
+			<field name="filter_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
+			<field name="filter_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
+			<field name="filter_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
+			<field name="filter_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
+			<field name="filter_separatorf" type="list" default="" label="FLEXI_RECORD_SEPARATOR_IGNORED" description="FLEXI_RECORD_SEPARATOR_IGNORED_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
@@ -409,40 +411,41 @@
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" level="level2" hr="false" menu="hide" />
-			<field name="use_search" type="list" default="" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC" menu="hide" >
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH" description="FLEXI_TEXT_SEARCH_DESC" level="level2" hr="false" />
+			<field name="use_search" type="list" default="" label="FLEXI_SHOW_SEARCH" description="FLEXI_SHOW_SEARCH_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_search_label" type="list" default="" label="FLEXI_TEXT_SEARCH_LABEL" description="FLEXI_TEXT_SEARCH_LABEL_DESC" menu="hide" >
+			<field name="show_search_label" type="list" default="" label="FLEXI_TEXT_SEARCH_LABEL" description="FLEXI_TEXT_SEARCH_LABEL_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_OUTSIDE_INPUT</option>
 				<option value="2">FLEXI_INSIDE_INPUT</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level2" hr="false" menu="hide" />
-			<field name="use_filters" type="list" default="" label="FLEXI_DISPLAY_FILTERS" description="FLEXI_DISPLAY_FILTERS_DESC" menu="hide" >
+			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level2" hr="false" />
+			<field name="use_filters" type="list" default="" label="FLEXI_DISPLAY_FILTERS" description="FLEXI_DISPLAY_FILTERS_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" menu="hide" />
-			<field name="show_filter_labels" type="list" default="" label="FLEXI_FILTER_LABELS" description="FLEXI_FILTER_LABELS_DESC" menu="hide" >
+			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
+			<field name="show_filter_labels" type="list" default="" label="FLEXI_FILTER_LABELS" description="FLEXI_FILTER_LABELS_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
-			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" menu="hide" />
+			<field name="initial_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_INITIAL_FILTER_VALUES" description="FLEXI_INITIAL_FILTER_VALUES_DESC" />
 
-			<field name="" type="separator" default="FLEXI_LOCKED_FILTERS" description="" level="level3" menu="hide" />
-			<field name="use_persistent_filters" type="list" default="" label="FLEXI_USE_LOCKED_FILTERS" description="FLEXI_USE_LOCKED_FILTERS_DESC" menu="hide" >
+			<field name="" type="separator" default="FLEXI_LOCKED_FILTERS" description="" level="level3" />
+			<field name="use_persistent_filters" type="list" default="" label="FLEXI_USE_LOCKED_FILTERS" description="FLEXI_USE_LOCKED_FILTERS_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_LOCKED_FILTER_VALUES" description="FLEXI_LOCKED_FILTER_VALUES_DESC" menu="hide" />
+			<field name="persistent_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_LOCKED_FILTER_VALUES" description="FLEXI_LOCKED_FILTER_VALUES_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_ALPHA_INDEX" description="FLEXI_ALPHA_INDEX_DESC" level="level2" />
 			<field name="show_alpha" type="alphaindex" default="" use_global="1" label="FLEXI_SHOW_ALPHA" description="FLEXI_SHOW_ALPHA_DESC" />
