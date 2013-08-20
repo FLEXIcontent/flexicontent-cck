@@ -74,7 +74,7 @@
 			if (element.name=='filter_order' && element.value=='i.title') continue;
 			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
 			
-			var matches = element.name.match(/(filter[.]*|letter|clayout|limit|orderby|searchword|areas|contenttypes|txtflds|ordering)/);
+			var matches = element.name.match(/(filter[.]*|letter|clayout|limit|orderby|searchword|searchphrase|areas|contenttypes|txtflds|ordering)/);
 			if (!matches || element.value == '') continue;
 			if ((element.type=='radio' || element.type=='checkbox') && !element.checked) continue;
 			

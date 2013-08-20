@@ -190,6 +190,28 @@ class flexicontent_html
 	}
 	
 	
+	static function searchphrase_selector(&$params, $formname='adminForm') {
+		$searchphrase = '';
+		if($show_searchphrase = $params->get('show_searchphrase', 1)) {
+			$default_searchphrase = $params->get('default_searchphrase', 'all');
+			$searchphrase = JRequest::getVar('searchphrase', $default_searchphrase);
+			$searchphrase_names = array('natural'=>'FLEXI_NATURAL_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT', 
+				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'exact'=>'FLEXI_EXACT_PHRASE');
+		
+			$searchphrases = array();
+			foreach ($searchphrase_names as $searchphrase_value => $searchphrase_name) {
+				$_obj = new stdClass();
+				$_obj->value = $searchphrase_value;
+				$_obj->text  = $searchphrase_name;
+				$searchphrases[] = $_obj;
+			}
+			$searchphrase = JHTML::_('select.genericlist', $searchphrases, 'searchphrase',
+				'class="fc_field_filter use_select2_lib"', 'value', 'text', $searchphrase, 'searchphrase', $_translate=true);
+		}
+		return $searchphrase;
+	}
+	
+	
 	/**
 	 * Utility function to add JQuery to current Document
 	 *

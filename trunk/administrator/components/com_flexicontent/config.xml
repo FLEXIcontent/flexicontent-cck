@@ -553,6 +553,17 @@
 				<option value="1">FLEXI_OUTSIDE_INPUT</option>
 				<option value="2">FLEXI_INSIDE_INPUT</option>
 			</param>
+			<param name="show_searchphrase" type="radio" default="1" label="FLEXI_SEARCHWORD_COMBINATION" description="FLEXI_SEARCHWORD_COMBINATION_DESC" menu="hide" >
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</param>
+			<param name="default_searchphrase" type="list" default="all" label="FLEXI_SEARCHWORD_DEFAULT_COMBINATION" description="FLEXI_SEARCHWORD_DEFAULT_COMBINATION_DESC" menu="hide" >
+				<option value="natural">FLEXI_NATURAL_PHRASE</option>
+				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_GUESS_RELEVANT</option>
+				<option value="all">FLEXI_ALL_WORDS</option>
+				<option value="any">FLEXI_ANY_WORDS</option>
+				<option value="exact">FLEXI_EXACT_PHRASE</option>
+			</param>
 			
 			<param name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level2" hr="false" menu="hide" />
 			<param name="use_filters" type="radio" default="0" label="FLEXI_DISPLAY_FILTERS" description="FLEXI_DISPLAY_FILTERS_DESC" menu="hide" >
@@ -667,12 +678,10 @@
 		<param name="" type="separator" default="FLEXI_FRONTEND_ITEM_FORM" label="" level="level1" menu="hide" />
 			
 			<param name="" label="" type="separator" default="FLEXI_GENERAL_FORM_BEHAVIOR" level="level2" menu="hide" />
-			
 			<param name="allowbuttons_fe" type="fccheckbox" default=""
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,save_preview,preview_latest" defaultvals="apply,save_preview,preview_latest"
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC"  menu="hide"/>
-			
 			<param name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level3" menu="hide" />
 			<param name="submit_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" />
 			<param name="submit_redirect_url_fe" type="text" default="" size="106" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" menu="hide" />

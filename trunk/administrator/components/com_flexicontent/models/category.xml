@@ -404,6 +404,19 @@
 				<option value="1">FLEXI_OUTSIDE_INPUT</option>
 				<option value="2">FLEXI_INSIDE_INPUT</option>
 			</field>
+			<field name="show_searchphrase" type="radio" default="" label="FLEXI_SEARCHWORD_COMBINATION" description=FLEXI_SEARCHWORD_COMBINATION_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="default_searchphrase" type="list" default="" label="FLEXI_SEARCHWORD_DEFAULT_COMBINATION" description="FLEXI_SEARCHWORD_DEFAULT_COMBINATION_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="natural">FLEXI_NATURAL_PHRASE</option>
+				<option value="natural_expanded">FLEXI_NATURAL_PHRASE_GUESS_RELEVANT</option>
+				<option value="all">FLEXI_ALL_WORDS</option>
+				<option value="any">FLEXI_ANY_WORDS</option>
+				<option value="exact">FLEXI_EXACT_PHRASE</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level2" hr="false" />
 			<field name="use_filters" type="list" default="" label="FLEXI_DISPLAY_FILTERS" description="FLEXI_DISPLAY_FILTERS_DESC" >

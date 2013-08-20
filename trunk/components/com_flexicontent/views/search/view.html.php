@@ -358,7 +358,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		// *** Selector for usage of Search Text
 		if($show_searchphrase = $params->get('show_searchphrase', 1)) {
-			$default_searchphrase = $params->get('default_searchphrase', 'natural');
+			$default_searchphrase = $params->get('default_searchphrase', 'all');
 			$searchphrase = JRequest::getVar('searchphrase', $default_searchphrase);
 			$searchphrase_names = array('natural'=>'FLEXI_NATURAL_PHRASE', 'natural_expanded'=>'FLEXI_NATURAL_PHRASE_GUESS_RELEVANT', 
 				'all'=>'FLEXI_ALL_WORDS', 'any'=>'FLEXI_ANY_WORDS', 'exact'=>'FLEXI_EXACT_PHRASE');
