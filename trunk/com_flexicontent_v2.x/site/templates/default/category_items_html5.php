@@ -50,16 +50,11 @@ $link_titles = $this->params->get('link_titles', 0);
 $layout = $this->params->get('clayout', 'default');
 $fbypos = flexicontent_tmpl::getFieldsByPositions($layout, 'category');
 $columns = array();
-$display_extra = array();
 foreach ($this->items as $item) :
 	if (isset($item->positions['table'])) :
 		foreach ($fbypos['table']->fields as $f) :
-			if ( ! @ $columns[$f]  && ! @ $display_extra[$f] ) :
-				if ($f=='hits' || $f=='favourites') {
-					$display_extra[$f] = @ $item->fields[$f]->label;
-				} else {
-					$columns[$f] = @ $item->fields[$f]->label;
-				}
+			if ( ! @ $columns[$f] ) :
+				$columns[$f] = @ $item->fields[$f]->label;
 			endif;
 		endforeach;
 	endif;
@@ -112,8 +107,30 @@ endif;
 
 <span class="fc_item_separator_row"></span>
 	
-<?php foreach ($items as $i => $item) : ?>
-	<?php
+
+<table id="flexitable" class="flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo @$this->category->name; ?>">
+	<?php if ($this->params->get('show_field_labels_row', 1)) : ?>
+	<thead>
+		<tr>
+			<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
+				<th id="flexi_title" scope="col">
+					<?php echo $show_title ? JText::_( 'FLEXI_ITEMS' ) : ''; ?>
+				</th>
+			<?php endif; ?>
+			
+			<?php foreach ($columns as $name => $label) : ?>
+				<th id="field_<?php echo $name; ?>" scope="col"><?php echo $label; ?></th>
+			<?php endforeach; ?>
+		</tr>
+	</thead>
+	<?php endif; ?>
+	
+	<tbody>
+
+	<?php foreach ($items as $i => $item) : ?>
+		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
+		
+		<?php
 		$fc_item_classes = 'sectiontableentry';
 		
 		$markup_tags = '<span class="fc_mublock">';
@@ -128,10 +145,10 @@ endif;
 			}
 		}
 		$markup_tags .= '</span>';
-	?>
+		?>
 
-	<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
-		<div scope="row" class="fc_title_row">
+		<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
+			<td class="fc_title_col">
 			
 			<?php echo @ $item->editbutton; ?>
 			<?php echo @ $item->statebutton; ?>
@@ -146,54 +163,30 @@ endif;
 			<?php endif; ?>
 			
 			<!-- BOF item title -->
-			
 			<?php if ($show_title) : ?>
-   			<?php if ($link_titles) : ?>
-   			<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
-   			<?php else : echo $item->title; endif; ?>
- 			<?php endif; ?>
+				<?php if ($link_titles) : ?>
+					<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
+				<?php else : echo $item->title; endif; ?>
+			<?php endif; ?>
+			<!-- EOF item title -->
 			
-			<!-- BOF item title -->
-			
-			<?php if ( count($display_extra) ) foreach ($display_extra as $name => $label ) {
-				if ( isset($item->positions['table']->{$name}->display) ) echo '<span class="fc_title_row_box">'. $item->positions['table']->{$name}->display .'</span>';
-			} ?>
 			<?php echo $markup_tags; ?>
 			
-		</div>
-	<?php endif; ?>
-	
-	
-	<table id="flexitable" class="table table-striped flexitable" width="100%" border="0" cellspacing="0" cellpadding="0" summary="<?php echo @$this->category->name; ?>">
-		<?php if ($this->params->get('show_field_labels_row', 1)) : ?>
-		<thead>
-			<tr>
-	   		<?php /*if ($buttons_exists || $comments_non_zero || $show_title) : ?>
-				<th id="flexi_title" scope="col">
-					<?php echo $show_title ? JText::_( 'FLEXI_ITEMS' ) : ''; ?>
-				</th>
-				<?php endif;*/ ?>
-				
-				<?php foreach ($columns as $name => $label) : ?>
-				<th id="field_<?php echo $name; ?>" scope="col"><?php echo $label; ?></th>
-				<?php endforeach; ?>
-			</tr>
-		</thead>
+			</td>
 		<?php endif; ?>
+	
+	
+		<!-- BOF item fields -->
+		<?php foreach ($columns as $name => $label) : ?>
+			<td><?php echo isset($item->positions['table']->{$name}->display) ? $item->positions['table']->{$name}->display : ''; ?></td>
+		<?php endforeach; ?>
+		<!-- EOF item fields -->
 				
-		<tbody>
-			<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
-			
-			<!-- BOF item fields -->
-			<?php foreach ($columns as $name => $label) : ?>
-				<td><?php echo isset($item->positions['table']->{$name}->display) ? $item->positions['table']->{$name}->display : ''; ?></td>
-			<?php endforeach; ?>
-			<!-- EOF item fields -->
-						
-			</tr>
-		</tbody>
-	</table>
+		</tr>
 
-	<span class="fc_item_separator_row"></span>
-<?php endforeach; ?>
+	<?php endforeach; ?>
 			
+	</tbody>
+</table>
+
+<span class="fc_item_separator_row"></span>

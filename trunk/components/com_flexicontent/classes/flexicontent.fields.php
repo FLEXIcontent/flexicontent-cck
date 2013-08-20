@@ -2467,6 +2467,96 @@ class FlexicontentFields
 	}
 	
 	
+	/**
+	 * Method to set custom filters values VIA configuration parameters
+	 * -- CASE 1: CONTENT LISTS (component / category / menu items / filtering module)
+	 *    these are set as HTTP Request variables to be used by the filtering mechanism of the category model (content lists)
+	 * -- CASE 2: Custom Fields SCOPE of Universal Content MODULE
+	 *    these are returned as an array to be used directly into the SQL query
+	 * 
+	 * @access public
+	 * @return object
+	 * @since 1.5
+	 */
+	function setFilterValues( &$cparams, $mfilter_name='persistent_filters', $is_persistent=1, $set_method="httpReq" )
+	{
+		$field_filters = array();   // Used when set_method is 'array' instead of 'httpReq'
+		$is_persistent =            // Non-httpReq method does not have initial filters
+			$set_method!="httpReq" ? 1 : $is_persistent;
+			
+		// Get configuration parameter holding the custom field filtering and abort if empty
+		$mfilter_data = $cparams->get($mfilter_name, '');
+		if (!$mfilter_data) {
+			$cparams->set($mfilter_name, '');  // Set to empty string for J1.5 compatibility, otherwise this could be empty array too
+			return array();
+		}
+		
+		// Parse configuration parameter into individual fields
+		$mfilter_arr = preg_split("/[\s]*%%[\s]*/", $mfilter_data);
+		if ( empty($mfilter_arr[count($mfilter_arr)-1]) ) {
+			unset($mfilter_arr[count($mfilter_arr)-1]);
+		}
+		
+		// This array contains the field (filter) ID that were parsed without errors
+		$filter_ids = array();
+		
+		foreach ($mfilter_arr as $mfilter)
+		{
+			// a. Split elements into their properties: filter_id, filter_value
+			$_data  = preg_split("/[\s]*##[\s]*/", $mfilter);  //print_r($_data);
+			$filter_id = (int) $_data[0];
+			$filter_value = @$_data[1];
+			//echo "filter_".$filter_id.": "; print_r( $filter_value ); echo "<br/>";
+			
+			// b. Basic parsing error check: a non numeric field id
+			if ( !$filter_id ) continue;
+			
+			// c. Add field (filter) ID into those that are valid
+			$filter_ids[] = $filter_id;
+			
+			// d. Skip field filter, if it is not persistent and user user has overriden it
+			if ( !$is_persistent && JRequest::getVar('filter_'.$filter_id, false) !== false ) continue;
+			
+			// CASE: range values:  value01---value02
+			if (strpos($filter_value, '---') !== false) {
+				$filter_value = explode('---', $filter_value);
+				$filter_value[2] = $filter_value[1];
+				$filter_value[1] = $filter_value[0];
+				unset($filter_value[0]);
+			}
+			
+			// CASE: multiple values:  value01+++value02+++value03+++value04
+			else if (strpos($filter_value, '+++') !== false) {
+				$filter_value = explode('+++', $filter_value);
+			}
+			
+			// CASE: specific value:  value01
+			else {}
+			
+			// INDIRECT method of using field filter (via HTTP request)
+			if ($set_method=='httpReq')
+				JRequest::setVar('filter_'.$filter_id, $filter_value);
+			
+			// DIRECT method of using field filter (via a returned array)
+			else
+				$field_filters[$filter_id] = $filter_value;
+		}
+		
+		// INDIRECT method of using field filter (via HTTP request),
+		// NOTE: we overwrite the above configuration parameter of custom field filters with an ARRAY OF VALID FILTER IDS, to 
+		// indicate to category/search model security not to skip these if they are not IN category/search configured filters list
+		if ($set_method=='httpReq') {
+			count($filter_ids) ?
+				$cparams->set($mfilter_name, FLEXI_J16GE ? $filter_ids : implode( '|', $filter_ids) ) :
+				$cparams->set($mfilter_name, false );  // FALSE means do not retrieve ALL
+		}
+		
+		// DIRECT method filter values, return an array of filter values (for direct usage into an SQL query)
+		else {
+			return $field_filters;
+		}
+	}	
+	
 	
 	
 	

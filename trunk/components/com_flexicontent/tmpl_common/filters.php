@@ -41,7 +41,7 @@ if ($filter_instructions == 1) {
 
 <?php if ( $use_search || $use_filters ) : /* BOF search and filters block */ ?>
 
-<div id="<?php echo $form_id; ?>_filter_box" class="floattext">
+<div id="<?php echo $form_id; ?>_filter_box" class="fc_filter_box floattext">
 	
 	<fieldset class="fc_filter_set">
 		
@@ -80,7 +80,7 @@ if ($filter_instructions == 1) {
 						<?php endif; ?>
 						
 						<?php if ($show_search_reset) : ?>
-						<button class="fc_button button_reset" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;">
+						<button class="fc_button button_reset" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 1); return false;">
 							<span class="fcbutton_reset"><?php echo JText::_( $use_filters ? 'FLEXI_REMOVE_FILTERING' : 'FLEXI_RESET' ); ?></span>
 						</button>
 						<?php endif; ?>
@@ -155,7 +155,7 @@ if ($filter_instructions == 1) {
 					</button>
 					
 					<?php if ($show_search_reset && !$buttons_added_already) : ?>
-					<button class="fc_button button_reset" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 2); return false;">
+					<button class="fc_button button_reset" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 1); return false;">
 						<span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?></span>
 					</button>
 					<?php endif; ?>
@@ -172,6 +172,7 @@ if ($filter_instructions == 1) {
 <?php endif; /* EOF search and filter block */ ?>
 <?php
 
+// Automatic submission
 if ($filter_autosubmit) {
 	$js = '
 		jQuery(document).ready(function() {
@@ -191,6 +192,15 @@ if ($filter_autosubmit) {
 		});
 	';
 }
+
+// Notify select2 fields to clear their values when reseting the form
+$js .= '
+		jQuery(document).ready(function() {
+			jQuery("#'.$form_id.' .fc_button.button_reset").on("click", function() {
+				jQuery("#'.$form_id.'_filter_box .use_select2_lib").select2("val", "");
+			});
+		});
+	';
 $document = JFactory::getDocument();
 $document->addScriptDeclaration($js);
 ?>
