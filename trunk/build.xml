@@ -87,12 +87,23 @@
 			</fileset>
 		</copy>
 
+		<copy file="modules/mod_flexiadvsearch/helper.php" tofile="flexipack/modules/mod_flexiadvsearch/helper.php" />
 		<copy file="modules/mod_flexiadvsearch/index.html" tofile="flexipack/modules/mod_flexiadvsearch/index.html" />
 		<copy file="modules/mod_flexiadvsearch/mod_flexiadvsearch.php" tofile="flexipack/modules/mod_flexiadvsearch/mod_flexiadvsearch.php" />
 		<copy file="modules/mod_flexiadvsearch/mod_flexiadvsearch.xml" tofile="flexipack/modules/mod_flexiadvsearch/mod_flexiadvsearch.xml" />
 		<copy file="language/en-GB/en-GB.mod_flexiadvsearch.ini" tofile="flexipack/modules/mod_flexiadvsearch/languages/en-GB.mod_flexiadvsearch.ini" />
+		<copy todir="flexipack/modules/mod_flexiadvsearch/elements" >
+			<fileset dir="modules/mod_flexiadvsearch/elements">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
 		<copy todir="flexipack/modules/mod_flexiadvsearch/tmpl" >
 			<fileset dir="modules/mod_flexiadvsearch/tmpl">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
+		<copy todir="flexipack/modules/mod_flexiadvsearch/tmpl_common" >
+			<fileset dir="modules/mod_flexiadvsearch/tmpl_common">
 				<exclude name=".**" />
 			</fileset>
 		</copy>

@@ -492,14 +492,14 @@ class FlexicontentViewItem extends JViewLegacy
 			$featured_sel = array();
 			foreach($selectedcats as $featured_cat) if (isset($featured_tree[$featured_cat])) $featured_sel[] = $featured_cat;
 			
-			$class  = "use_select2_lib";
+			$class  = "use_select2_lib select2_list_selected";
 			$attribs = 'class="'.$class.'" multiple="multiple" size="8"';
 			$fieldname = FLEXI_J16GE ? 'jform[featured_cid][]' : 'featured_cid[]';
 			$lists['featured_cid'] = flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed);
 		}
 		
 		// Multi-category form field, for user allowed to use multiple categories
-		$class  = "mcat fcfield_selectmulval";
+		$class  = "mcat use_select2_lib select2_list_selected";
 		$class .= $max_cat_assign ? " validate-fccats" : "";
 		$attribs = 'multiple="multiple" size="20" class="'.$class.'"';
 		$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';

@@ -17,4 +17,5 @@
 	<input type="hidden" name="letter" value="<?php echo JRequest::getVar('letter');?>" id="alpha_index" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="cid" value="<?php echo $this->category->id; ?>" />
+	<input type="hidden" name="layout" value="<?php echo JRequest::getCmd('layout',''); ?>" />
 </form>

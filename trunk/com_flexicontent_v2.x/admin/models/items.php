@@ -743,7 +743,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$filter_stategrp= $app->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp', '', 'word' );
 		$filter_id	 		= $app->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', '', 'int' );
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$filter_lang 	= $app->getUserStateFromRequest( $option.'.items.filter_lang', 	'filter_lang', '', 'cmd' );
+			$filter_lang 	= $app->getUserStateFromRequest( $option.'.items.filter_lang', 	'filter_lang', '', 'string' );
 		}
 		$filter_authors = $app->getUserStateFromRequest( $option.'.items.filter_authors', 'filter_authors', '', 'int' );
 		$scope     = $app->getUserStateFromRequest( $option.'.items.scope', 			'scope', '', 'int' );

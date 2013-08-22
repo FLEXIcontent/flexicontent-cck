@@ -30,14 +30,21 @@
 					default="default"  hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" menu="hide" />
-			<field name="catid" type="qfcategory" label="FLEXI_FILTER_SINGLE_OR_DEFAULT_CATEGORY" description="FLEXI_FILTER_SINGLE_OR_DEFAULT_CATEGORY_DESC" />
-			<field name="display_cat_list" type="list" default="0" label="FLEXI_FILTER_DISPLAY_CATEGORY_LIST" description="FLEXI_FILTER_DISPLAY_CATEGORY_LIST_DESC" >
+			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_PARAM_EXPLANATION" level="level3" menu="hide" />
+			<field name="catid" type="qfcategory" label="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY" description="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_SELECTOR" level="level2" menu="hide" />
+			<field name="mcats_selection" type="radio" default="0" label="FLEXI_FILTER_CAT_SELECTION_LIMIT" description="FLEXI_FILTER_CAT_SELECTION_LIMIT_DESC" >
+				<option value="0">FLEXI_FILTER_SINGLE_CATEGORY</option>
+				<option value="1">FLEXI_FILTER_MULTIPLE_CATEGORIES</option>
+			</field>
+			<field name="display_cat_list" type="list" default="0" label="FLEXI_FILTER_SHOW_CAT_SELECTOR" description="FLEXI_FILTER_SHOW_CAT_SELECTOR_DESC" >
 				<option value="0">FLEXI_FILTER_NO_USE_SINGLE_CAT_OR_CURR_CAT</option>
 				<option value="1">FLEXI_FILTER_YES_INCLUDE_SELECTED_CATEGORIES</option>
 				<option value="2">FLEXI_FILTER_YES_EXCLUDE_SELECTED_CATEGORIES</option>
 			</field>
-			<field name="catlistsize" type="text" required="false" size="10" label="FLEXI_FILTER_LINES_CATEGORY_BOX" description="FLEXI_FILTER_LINES_CATEGORY_BOX_DESC" />
-			<field name="catids" type="flexicategories" multiple="true" required="false" size="10" label="FLEXI_FILTER_DISPLAYED_CATS" description="FLEXI_FILTER_DISPLAYED_CATS_DESC" />
+			<!--field name="catlistsize" type="text" required="false" size="10" label="FLEXI_FILTER_LINES_CATEGORY_BOX" description="FLEXI_FILTER_LINES_CATEGORY_BOX_DESC" /-->
+			<field name="catids" type="flexicategories" multiple="true" required="false" size="10" label="FLEXI_FILTER_SELECTOR_CATS" description="FLEXI_FILTER_SELECTOR_CATS_DESC" />
 			<field name="usesubcats" type="radio" default="0" label="FLEXI_FILTER_INCLUDE_SUBCATS" description="FLEXI_FILTER_INCLUDE_SUBCATS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -62,6 +69,7 @@
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
 			<field name="filter_placement" type="radio" default="1" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" menu="hide" >
+				<option value="2">FLEXI_YES_BUT_FILTER_BELOW_LABEL</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
 			</field>
@@ -89,6 +97,11 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_OUTSIDE_INPUT</option>
 				<option value="2">FLEXI_INSIDE_INPUT</option>
+			</field>
+			<field name="search_autocomplete" type="radio" default="2" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" menu="hide" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_AUTOCOMPLETE_SIMPLE</option>
+				<option value="2">FLEXI_AUTOCOMPLETE_TAG_LIKE</option>
 			</field>
 			<field name="show_searchphrase" type="radio" default="1" label="FLEXI_SEARCHWORD_COMBINATION" description="FLEXI_SEARCHWORD_COMBINATION_DESC" >
 				<option value="0">FLEXI_HIDE</option>

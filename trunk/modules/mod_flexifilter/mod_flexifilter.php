@@ -1,14 +1,19 @@
 <?php
 /**
- * Main File
+ * @version 1.2 $Id: mod_flexifilter.php 1536 2012-11-03 09:08:46Z ggppdk $
+ * @package Joomla
+ * @subpackage FLEXIcontent Filter Module
+ * @copyright (C) 2012 ggppdk - www.flexicontent.org
+ * @license GNU/GPL v2
+ * 
+ * FLEXIcontent is a derivative work of the excellent QuickFAQ component
+ * @copyright (C) 2008 Christoph Lukes
+ * see www.schlu.net for more information
  *
- * @package     FLEXIcontent Category Filter-Search Form
- * @version     1.0
- *
- * @author      ggppdk
- * @link
- * @copyright   Copyright © 2011 ggppdk All Rights Reserved
- * @license     http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL
+ * FLEXIcontent is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 // no direct access
@@ -66,13 +71,14 @@ if ( $show_mod )
 	$isflexicat = JRequest::getVar('option')=="com_flexicontent" && JRequest::getVar('view')=="category";
 	
 	$current_cid = $isflexicat ? JRequest::getInt($catid_fieldname, 0) : 0;
-	$default_cid = $params->get('catid', 0);
+	$default_cid = (int)$params->get('catid', 0);
 	$catid = !$isflexicat ? $default_cid : $current_cid;  // id of category view or default value
 	
 	// CATEGORY SELECTION
+	$mcats_selection  = $params->get('mcats_selection', 0);
 	$display_cat_list = $params->get('display_cat_list', 0);
 	$catids           = $params->get('catids', array());
-	$catlistsize      = $params->get('catlistsize', 4);
+	$catlistsize      = $params->get('catlistsize', 6);
 	
 	// FIELD FILTERS
 	$display_filter_list  = $params->get('display_filter_list', 0);
@@ -89,29 +95,38 @@ if ( $show_mod )
 	
 	//print_r($filterids);
 	
-	//flexicontent_html::loadFramework('jQuery');
-	//flexicontent_html::loadFramework('select2');
 	if ($display_cat_list)
 	{
-		$_fld_class = ' class="fc_field_filter use_select2_lib"';
-		$_fld_size = " size='$catlistsize' ";
+		$_fld_class = ' class="fc_field_filter use_select2_lib select2_list_selected"';
 		
 		$loader_html = '\'<p class=\\\'qf_centerimg=\\\'><img src=\\\''.JURI::base().'components/com_flexicontent/assets/images/ajax-loader.gif\\\' align=\\\'center\\\'></p>\'';
 		$url_to_load = JURI::root().'index.php?option=com_flexicontent&amp;task=getsefurl&amp;view=category&amp;tmpl=component&amp;cid=';
 		$autosubmit_msg = JText::_('FLEXI_RELOADING_PLEASE_WAIT');
 		
-		$_fld_onchange = ' onchange="'
-			.' form=document.getElementById(\''.$form_name.'\'); '
-			.' cid_val=form.'.$catid_fieldname.'.value; '
-			.' if ( cid_val.length == 0 ) { jQuery(\'#'.$form_name.'_filter_box\').css(\'display\', \'none\'); return; } '
-			.' getSEFurl(\'cid_loading_'.$module->id.'\',	'.$loader_html.', form,\''.$url_to_load.'\'+cid_val, \''.$autosubmit_msg.'\', '.$autosubmit.'); '
-			.' jQuery(\'#'.$form_name.'_filter_box\').css(\'display\', \'block\'); " '
-			;
-		$_fld_attributes = $_fld_class.$_fld_size.$_fld_onchange;
+		$_fld_onchange = $_fld_multiple = '';
+		if ($mcats_selection) {
+			$_fld_size = " size='$catlistsize' ";
+			$_fld_multiple = ' multiple="multiple" ';
+			$_fld_name = 'cids[]';
+			$mcats_list = JRequest::getVar('cids', '');
+			if ( !is_array($mcats_list) ) {
+				$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
+				$mcats_list = explode(',', $mcats_list);
+			}
+			// make sure given data are integers ... !!
+			$cids = array();
+			foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+		} else {
+			$_fld_size = "";
+			$_fld_onchange = ' onchange="update_'.$form_name.'();" ';
+			$_fld_name = $catid_fieldname;
+		}
+		$_fld_attributes = $_fld_class.$_fld_size.$_fld_onchange.$_fld_multiple;
 		
 		$allowedtree = modFlexifilterHelper::decideCats($params);
-		$selected_cats = $catid ? array($catid) : false;
-		$cats_select_field = flexicontent_cats::buildcatselect($allowedtree, $catid_fieldname, $selected_cats, 2, $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false);
+		$selected_cats = $mcats_selection ? $cids : ($catid ? $catid : "") ;
+		$top = $mcats_selection ? false : 2;
+		$cats_select_field = flexicontent_cats::buildcatselect($allowedtree, $_fld_name, $selected_cats, $top, $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false);
 	} else if ($catid) {
 		$cat_hidden_field = '<input type="hidden" name="cid" value="'.$catid.'"/>';
 	}
@@ -142,80 +157,47 @@ if ( $show_mod )
 		}
 	}
 	
-	// 4. Create/shape HTML of filters
-	$display_label_filter_override = (int) $params->get('show_filter_labels', 0);
-	$filter_html = array();
-	foreach ($filters as $filter_name => $filter)
-	{
-		// 4.a Get the filter 's HTML
-		$filter_value = JRequest::getVar('filter_'.$filter->id, '');  // CURRENT value
-		
-		// make sure filter HTML is cleared, and create it
-		$display_label_filter_saved = $filter->parameters->get('display_label_filter');
-		if ( $display_label_filter_override ) $filter->parameters->set('display_label_filter', $display_label_filter_override); // suppress labels inside filter's HTML (hide or show all labels externally)
-		
-		// else ... filter default label behavior
-		$filter->html = '';  // make sure filter HTML display is cleared
-		$field_type = $filter->iscore ? 'core' : $filter->field_type;
-		FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFilter', array( &$filter, $filter_value, $form_name ) );
-		$filter->parameters->set('display_label_filter', $display_label_filter_saved);
-		
-		// 4.b Manipulate filter's HTML to match our filtering form
-		if ( !empty($filter->html) ) {
-			// First replace any 'adminForm' string present in the filter's HTML with the name of our form
-			$filter_html[$filter->id] = preg_replace('/([\'"])adminForm([\'"])/', '${1}'.$form_name.'${2}', $filter->html);
-			
-			// Form field that have form auto submit, need to be have their onChange Event prepended with the FORM PREPARATION function call
-			if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filter_html[$filter->id], $matches) ) {
-				if ( preg_match('/\.submit\(\)/', $filter_html[$filter->id], $matches) && !preg_match('/adminFormPrepare/', $filter_html[$filter->id], $matches2) ) {
-					// Autosubmit detected inside onChange event, prepend the event with form preparation function call
-					$filter_html[$filter->id] = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\''.$form_name.'\')); ', $filter_html[$filter->id]);
-				} else {
-					// The onChange Event, has no autosubmit, force GO button (in case GO button was not already inside search box)
-					$force_go = true;
-				}
-			} else {
-				// Filter has no onChange event and thus no autosubmit, force GO button  (in case GO button was not already inside search box)
-				$force_go = true;
-			}
-			
-		}
+	// Set filter values (initial or locked) via configuration parameters
+	FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
+	FlexicontentFields::setFilterValues( $params, 'initial_filters'   , $is_persistent=0);
+	
+	// 4. Add html to filter objects
+	if ($filters) {
+		FlexicontentFields::renderFilters( $params, $filters, $form_name );
 	}
 	
-	if ( !empty($cats_select_field) || !empty($cat_hidden_field ) )
-	{
-		// Load needed JS libs & CSS styles
-		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
-		flexicontent_html::loadFramework('jQuery');
-		flexicontent_html::loadFramework('flexi_tmpl_common');
-		
-		// Add tooltips
-		if ($add_tooltips) JHTML::_('behavior.tooltip');
-		
-		// Add css
-		if ($add_ccs && $layout) {
-		  if ($caching && !FLEXI_J16GE) {
-				// Work around for caching bug in J1.5
-		    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
-		      // active layout css
-		      echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexifilter/tmpl/'.$layout.'/'.$layout.'.css">';
-		    }
-		    echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css">';
-		    echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
-		  } else {
-		    // Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
-		    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
-		      // active layout css
-		      $document->addStyleSheet(JURI::base(true).'/modules/mod_flexifilter/tmpl/'.$layout.'/'.$layout.'.css');
-		    }
-		    $document->addStyleSheet(JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css');
-		    $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
-		  }
-		}
-		
-		// Render Layout
-		require(JModuleHelper::getLayoutPath('mod_flexifilter', $layout));
+	// Load needed JS libs & CSS styles
+	FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+	flexicontent_html::loadFramework('jQuery');
+	flexicontent_html::loadFramework('flexi_tmpl_common');
+	
+	// Add tooltips
+	if ($add_tooltips) JHTML::_('behavior.tooltip');
+	
+	// Add css
+	if ($add_ccs && $layout) {
+	  if ($caching && !FLEXI_J16GE) {
+			// Work around for caching bug in J1.5
+	    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+	      // active layout css
+	      echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexifilter/tmpl/'.$layout.'/'.$layout.'.css">';
+	    }
+	    echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css">';
+	    echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
+	  } else {
+	    // Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
+	    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+	      // active layout css
+	      $document->addStyleSheet(JURI::base(true).'/modules/mod_flexifilter/tmpl/'.$layout.'/'.$layout.'.css');
+	    }
+	    $document->addStyleSheet(JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css');
+	    $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
+	  }
 	}
+	
+	// Render Layout
+	require(JModuleHelper::getLayoutPath('mod_flexifilter', $layout));
+	
 	
 	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
@@ -231,13 +213,34 @@ if ( $show_mod )
 
 <?php
 
-if (!$display_cat_list || !empty($selected_cats)) {
-	$js = '
+$js = "";
+/*if (!$display_cat_list || !empty($selected_cats)) {
+	$js .= '
 		jQuery(document).ready(function() {
 			jQuery("#'.$form_name.'_filter_box").css("display", "block");
 		});
 	';
 }
 $document = JFactory::getDocument();
-$document->addScriptDeclaration($js);
+$document->addScriptDeclaration($js);*/
+
+if ($display_cat_list && !$mcats_selection) {
+	$js .= '
+		function update_'.$form_name.'() {
+			form=document.getElementById("'.$form_name.'");
+			cid_val=form.'.$catid_fieldname.'.value;
+			/*if ( cid_val.length == 0 ) { jQuery("#'.$form_name.'_filter_box").css("display", "none"); return; } */
+			if ( cid_val.length == 0 ) {
+				var fcform = jQuery(form);
+				var _action = fcform.attr("data-fcform_default_action"); 
+				form.action = _action;
+				fcform.attr("data-fcform_action", _action ); 
+				return;
+			}
+			getSEFurl("cid_loading_'.$module->id.'",	'.$loader_html.', form,"'.$url_to_load.'"+cid_val, "'.$autosubmit_msg.'", '.$autosubmit.');
+			/*jQuery("#'.$form_name.'_filter_box").css("display", "block");*/
+		}
+	';
+}
+if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 ?>

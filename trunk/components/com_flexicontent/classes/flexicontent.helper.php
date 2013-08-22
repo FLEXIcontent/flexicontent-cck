@@ -245,7 +245,8 @@ class flexicontent_html
 			$jquery_ui_added = 1;
 		}
 		if ( $add_jquery_ui_css && !$jquery_ui_css_added ) {
-			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/jquery/css/ui-lightness/jquery-ui-'.FLEXI_JQUERY_UI_CSS_VER.'.css');
+			$ui_style = 'smoothness'; // lightness
+			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/jquery/css/ui-'.$ui_style.'/jquery-ui-'.FLEXI_JQUERY_UI_CSS_VER.'.css');
 			$jquery_ui_css_added = 1;
 		}
 	}
@@ -390,7 +391,7 @@ class flexicontent_html
 							
 							"/* Allow listing already selected options WHEN having class 'select2_list_selected' */."
 							if (jQuery(this).hasClass('select2_list_selected')) {
-								var els = jQuery(this).find('.select2-selected');
+								var els = jQuery('#select2-drop').find('.select2-selected');
 								els.addClass('select2-selected-highlight').addClass('select2-disabled').removeClass('select2-selected').removeClass('select2-result-selectable');
 							}
 						}).on('close', function() {
@@ -404,7 +405,7 @@ class flexicontent_html
 							
 							"/* Restore already selected options state */."
 							if (jQuery(this).hasClass('select2_list_selected')) {
-								var els = jQuery(this).find('.select2-selected-highlight');
+								var els = jQuery('#select2-drop').find('.select2-selected-highlight');
 								els.removeClass('select2-selected-highlight').removeClass('select2-disabled').addClass('select2-result-selectable');
 							}
 						}).on
@@ -635,10 +636,11 @@ class flexicontent_html
 			
 			case 'flexi_tmpl_common':
 				if ($load_jquery) flexicontent_html::loadJQuery();
+				flexicontent_html::loadFramework('select2');  // make sure select2 is loaded
 				$document->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js' );
 				FLEXI_J16GE ? JText::script("FLEXI_APPLYING_FILTERING") : fcjsJText::script("FLEXI_APPLYING_FILTERING");
+				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_LIST") : fcjsJText::script("FLEXI_TYPE_TO_LIST");
 				$js = 'var fc_base_url="'.JURI::base().'"';
-				//$document->addCustomTag('<!--[if lt IE 7]><script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE7.js"></script><![endif]-->');
 				break;
 			
 			default:

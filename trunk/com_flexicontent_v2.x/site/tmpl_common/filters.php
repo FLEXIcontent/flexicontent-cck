@@ -7,9 +7,13 @@ $filter_autosubmit = $params->get('filter_autosubmit', 0);
 $filter_instructions = $params->get('filter_instructions', 1);
 $filter_placement = $params->get( 'filter_placement', 1 );
 
+$filter_container_class  = $filter_placement ? 'fc_filter_line' : 'fc_filter';
+$filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
+
 // Text Search configuration
 $use_search  = $params->get('use_search', 1);
 $show_search_label = $params->get('show_search_label', 1);
+$search_autocomplete = $params->get( 'search_autocomplete', 2 );
 
 // Filters configuration
 $use_filters = $params->get('use_filters', 0) && $filters;
@@ -62,17 +66,33 @@ if ($filter_instructions == 1) {
 		<?php endif; ?>
 		
 		<?php if ( $use_search ) : /* BOF search */ ?>
+			<?php
+			$ignoredwords = JRequest::getVar('ignoredwords');
+			$shortwords = JRequest::getVar('shortwords');
+			$min_word_len = JFactory::getApplication()->getUserState( JRequest::getVar('option').'.min_word_len', 0 );
+			$msg = '';
+			$msg .= $ignoredwords ? JText::_('FLEXI_WORDS_IGNORED_MISSING_COMMON').': <b>'.$ignoredwords.'</b>' : '';
+			$msg .= $ignoredwords && $shortwords ? ' <br/> ' : '';
+			$msg .= $shortwords ? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len.'):<b>'.$shortwords.'</b>' : '';
+			?>
 			
-			<span class="<?php echo !$filter_placement ? 'fc_filter' : 'fc_filter_line'; ?> fc_filter_text_search fc_odd">
+			<span class="<?php echo $filter_container_class; ?> fc_filter_text_search fc_odd">
 				<?php
-				$text_search_class = 'fc_text_filter fc_label_internal';
+				$text_search_class = 'fc_text_filter';
+				$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_basicindex_complete_tlike' : ' fc_basicindex_complete_simple fc_label_internal') : ' fc_label_internal';
 				$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
 				?>
+				
 				<?php if ($show_search_label==1) : ?>
 					<span class="fc_filter_label"><?php echo JText::_('FLEXI_TEXT_SEARCH'); ?></span>
 				<?php endif; ?>
+				
 				<span class="fc_filter_html">
-					<input class="<?php echo $text_search_class; ?>" fc_label_text="<?php echo $text_search_label; ?>" size="34" type="text" name="filter" id="<?php echo $form_id; ?>_filter" value="<?php echo $text_search_val;?>" />
+					<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>
+					
+					<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
+						fc_label_text="<?php echo $text_search_label; ?>" size="34" name="filter"
+						id="<?php echo $form_id; ?>_filter" value="<?php echo $text_search_val;?>" />
 					<?php echo $searchphrase_selector; ?>
 					
 					<?php if ( $filter_placement && ($show_search_go || $show_search_reset) ) : ?>
@@ -112,20 +132,24 @@ if ($filter_instructions == 1) {
 			?>
 			
 			<?php
-			
-			$filter_container_class = $filter_placement ? 'fc_filter_line' : 'fc_filter';
 			$n=0;
-			
 			//$prepend_onchange = ' adminFormPrepare(document.getElementById(\''.$form_id.'\', 2); ';
 			foreach ($filters as $filt) :
 				if (empty($filt->html)) continue;
 				
-				// Support for old 3rd party filters, that include an auto-submit statement, this must be removed
-				// these need to be have their onChange Event prepended with the FORM PREPARATION function call,
+				// Support for old 3rd party filters, that include an auto-submit statement or include a fixed form name
+				// These CUSTOM fields should be updated to have this auto-submit code removed fixed form name changed too
+				
+				// Compatibility HACK 1
+				// These fields need to be have their onChange Event prepended with the FORM PREPARATION function call,
 				// ... but if these filters change value after we 'prepare' form then we have an issue ...
-				/*if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) && preg_match('/\.submit\(\)/', $filt->html, $matches) ) {
+				if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) && preg_match('/\.submit\(\)/', $filt->html, $matches) ) {
 					$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}'.$prepend_onchange, $filt->html);
-				}*/
+				}
+				
+				// Compatibility HACK 2
+				// These fields also need to have any 'adminForm' string present in their filter's HTML replaced with the name of our form
+				$filter_html[$filt->id] = preg_replace('/([\'"])adminForm([\'"])/', '${1}'.$form_name.'${2}', $filt->html);
 				
 				$_filter_html  = $pretext;
 				$_filter_html .= '<span class="'.$filter_container_class.(($n++)%2 ? ' fc_even': ' fc_odd').'" >' ."\n";

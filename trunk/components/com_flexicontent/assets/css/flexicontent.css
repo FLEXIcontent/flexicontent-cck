@@ -371,7 +371,14 @@ fieldset.fc_filter_set {
 	padding:8px 10px 8px 36px !important;
 	border-radius: 6px !important;
 }
-.fc_filter_set .fc-mssg.fc-info { margin: 4px 16px 16px 16px !important; font-size: 12px; }
+
+.fc_filter_set .fc-mssg.fc-info {
+	margin: 4px 16px 16px 16px !important; font-size: 12px;
+}
+.ui-autocomplete-loading {
+	background: #eee url('../images/ajax-loader.gif') no-repeat 96% center !important;
+}
+
 
 
 /*******************/
@@ -416,6 +423,10 @@ fieldset.fc_filter_set {
 	margin: 0px 0% 2px 0%;
 	padding: 4px 1%;
 	width: 98%;
+}
+form > .fc_filter_line {  /* filters placed directly inside form aka outside the filter_box */
+	margin: 0px 1% 0px 1%;
+	width: 96%;
 }
 
 /* Container of each individual field filter LABEL */
@@ -467,6 +478,10 @@ fieldset.fc_filter_set {
 .fc_filter_html {  position: relative !important;  }
 .fc_filter .fc_filter_html {  clear: both;  }
 .fc_filter_line .fc_filter_html {  clear: none; width: 80% !important;  }
+
+/* Clear filter label from filter html*/
+.fc_filter_line.fc_clear_label .fc_filter_label {  width: auto !important; }
+.fc_filter_line.fc_clear_label .fc_filter_html {  clear: both; width: 100% !important;  }
 
 /* Highlight date calendar inside FC filters */
 .fc_filter_html .calendar { vertical-align: bottom; margin: 0px 6px 9px -4px; cursor: pointer; }
@@ -626,8 +641,10 @@ span.fc_field_filter { border-width: 0px !important; }
 #flexicontent .item_total {
 	border: 1px solid lightgray;
 	margin: 0px 0px 12px 0px;
-	padding: 1px 4px;
+	padding: 1px 1%;
+	width: 98%;
 	clear: both;
+	float: left;
 }
 
 #flexicontent .item_total .fc_item_total_data {
@@ -1065,7 +1082,7 @@ div.current dd {
 /* CONTAINER of search (field) filters */
 fieldset.fc_search_set {
 	border: 1px solid #cccccc;
-	margin: 12px 0px 0px 0px;
+	margin: 0px 0px 12px 0px;
 	padding: 1%;
 	width: 98%;
 	min-width: inherit !important; /* workaround for chrome fieldset width bug */

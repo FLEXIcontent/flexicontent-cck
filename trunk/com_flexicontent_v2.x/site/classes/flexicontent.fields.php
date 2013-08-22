@@ -2558,6 +2558,39 @@ class FlexicontentFields
 	}	
 	
 	
+	/**
+	 * Method to creat the HTML of filters
+	 * 
+	 * @access public
+	 * @return object
+	 * @since 1.5
+	 */
+	function renderFilters( &$params, &$filters, $form_name )
+	{
+		// Make the filter compatible with Joomla standard cache
+		$cache = JFactory::getCache('com_flexicontent');
+		$cache->clean();
+		
+		$display_label_filter_override = (int) $params->get('show_filter_labels', 0);
+		foreach ($filters as $filter_name => $filter)
+		{
+			$filtervalue = JRequest::getVar('filter_'.$filter->id, '', 'default');
+			//print_r($filtervalue);
+			
+			// make sure filter HTML is cleared, and create it
+			$display_label_filter_saved = $filter->parameters->get('display_label_filter');
+			if ( $display_label_filter_override ) $filter->parameters->set('display_label_filter', $display_label_filter_override); // suppress labels inside filter's HTML (hide or show all labels externally)
+			
+			// else ... filter default label behavior
+			$filter->html = '';  // make sure filter HTML display is cleared
+			$field_type = $filter->iscore ? 'core' : $filter->field_type;
+			//$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filter, $filtervalue ));
+			FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFilter', array( &$filter, $filtervalue, $form_name ) );
+			$filter->parameters->set('display_label_filter', $display_label_filter_saved);
+			$lists['filter_' . $filter->id] = $filtervalue;
+		}
+	}	
+
 	
 	
 	// **********************************************************************************************************
