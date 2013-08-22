@@ -392,6 +392,7 @@
 			</field>
 			<field name="filter_placement" type="list" default="" label="FLEXI_ONE_RECORD_PER_ROW" description="FLEXI_ONE_RECORD_PER_ROW_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="2">FLEXI_YES_BUT_FILTER_BELOW_LABEL</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
 			</field>
@@ -435,6 +436,12 @@
 				<option value="all">FLEXI_ALL_WORDS</option>
 				<option value="any">FLEXI_ANY_WORDS</option>
 				<option value="exact">FLEXI_EXACT_PHRASE</option>
+			</field>
+			<field name="search_autocomplete" type="list" default="" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" menu="hide" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_AUTOCOMPLETE_SIMPLE</option>
+				<option value="2">FLEXI_AUTOCOMPLETE_TAG_LIKE</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_FILTERING" description="FLEXI_FIELD_FILTERING_DESC" level="level2" hr="false" />

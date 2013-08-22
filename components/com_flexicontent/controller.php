@@ -70,6 +70,112 @@ class FlexicontentController extends JControllerLegacy
 	
 	
 	/**
+	 * Logic to create SEF urls via AJAX requests
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.0
+	 */
+	function txtautocomplete() {
+		$app    = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
+		
+		// Get request variables
+		$type = JRequest::getVar('type');
+		$text = JRequest::getVar('text');
+		$pageSize = JRequest::getInt('pageSize', 20);
+		$pageNum  = JRequest::getInt('pageNum', 1);
+		//$lang = flexicontent_html::getUserCurrentLang();
+		
+		// Nothing to do
+		if ( $type!='basic_index' && $type!='adv_index' ) exit;
+		if ( !strlen($text) ) exit;
+		
+		// All starting words are exact words but last word is a ... word prefix
+		$words = preg_split('/\s\s*/u', $text);
+		$newtext = '+' . implode( ' +', $words ) .'*';
+		
+		// Query CLAUSE for match the given text
+		$db = JFactory::getDBO();
+		$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+		$quoted_text = $db->Quote( $quoted_text, false );
+		$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+		
+		// Query retieval limits
+		$limitstart = $pageSize * ($pageNum - 1);
+		$limit      = $pageSize;
+		
+		// Do query ...
+		$tbl = $type=='basic_index' ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
+		$query 	= 'SELECT ie.item_id, ie.search_index'    //.', '. $_text_match. ' AS score'  // THIS MAYBE SLOW
+			.' FROM #__' . $tbl . ' AS ie'
+			.' JOIN #__content AS i ON i.id = ie.item_id'
+			//.' JOIN #__flexicontent_items_ext AS ext ON i.id = ext.item_id '
+			.' WHERE '. $_text_match
+			.'   AND i.state IN (1,-5) '   //(FLEXI_J16GE ? 2:-1)
+			//.'   AND ( ext.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ext.language="*" ' : '') . ' ) '
+			//.' ORDER BY score DESC'  // THIS MAYBE SLOW
+			.' LIMIT '.$limitstart.', '.$limit
+			;
+		$db->setQuery( $query  );
+		$data = $db->loadAssocList();
+		
+		// Get last word (this is a word prefix) and remove it from words array
+		$word_prefix = array_pop($words);
+		
+		// Reconstruct search text with complete words (not including last)
+		$complete_words = implode(' ', $words);
+		
+		// Find out the words that matched
+		$words_found = array();
+		$regex = '/(\b)('.$word_prefix.'\w+)(\b)/iu';
+		
+		foreach ($data as $_d) {
+			//echo $_d['item_id'] . ' ';
+			if (preg_match_all($regex, $_d['search_index'], $matches) ) {
+				foreach ($matches[2] as $_m)
+					$words_found[$_m] = 1;
+			}
+		}
+		
+		// Pagination not appropriate when using autocomplete ...
+		$options = array();
+		$options['Total'] = count($words_found);
+		
+		// Create responce and JSON encode it
+		$options['Matches'] = array();
+		$n = 0;
+		foreach ($words_found as $_w => $i) {
+			if ( mb_strlen($_w) < $min_word_len ) continue;  // word too short
+			if ( $this->isStopWord($_w, $tbl) ) continue;  // stopword or too common
+			
+			$options['Matches'][] = array(
+				'text' => $complete_words.' '.$_w,
+				'id' => $complete_words.' '.$_w
+			);
+			$n++;
+			if ($n >= $pageSize) break;
+		}
+		echo json_encode($options);
+		exit;
+	}
+	
+	
+	function isStopWord($word, $tbl='flexicontent_items_ext', $col='search_index') {
+		$db = JFactory::getDBO();
+		$quoted_word = FLEXI_J16GE ? $db->escape($word, true) : $db->getEscaped($word, true);
+		$query = 'SELECT '.$col
+			.' FROM #__'.$tbl
+			.' WHERE MATCH ('.$col.') AGAINST ("+'.$quoted_word.'")'
+			.' LIMIT 1';
+		$db->setQuery($query);
+		$result = $db->loadAssocList();
+		return !empty($return) ? true : false;
+	}
+	
+	
+	/**
 	 * Logic to save an item
 	 *
 	 * @access public

@@ -17,6 +17,8 @@
 			evalScripts: false,
 			onSuccess: function(responseText) {
 			 	form.action=responseText;
+			 	var fcform = jQuery(form);
+			 	fcform.attr('data-fcform_action', responseText);
 			 	if (autosubmit) {
 			 		$(loader_el).innerHTML += autosubmit_msg;
 					adminFormPrepare(form, 2);
@@ -37,6 +39,8 @@
 				evalScripts: false,
 				onSuccess: function(responseText) {
 				 	form.action=responseText;
+				 	var fcform = jQuery(form);
+				 	fcform.attr('data-fcform_action', responseText);
 				 	if (autosubmit) {
 				 		$(loader_el).innerHTML += autosubmit_msg;
 						adminFormPrepare(form, 2);
@@ -74,7 +78,7 @@
 			if (element.name=='filter_order' && element.value=='i.title') continue;
 			if (element.name=='filter_order_Dir' && element.value=='ASC') continue;
 			
-			var matches = element.name.match(/(filter[.]*|letter|clayout|limit|orderby|searchword|searchphrase|areas|contenttypes|txtflds|ordering)/);
+			var matches = element.name.match(/(filter[.]*|cids|letter|clayout|limit|orderby|searchword|searchphrase|areas|contenttypes|txtflds|ordering)/);
 			if (!matches || element.value == '') continue;
 			if ((element.type=='radio' || element.type=='checkbox') && !element.checked) continue;
 			
@@ -217,6 +221,96 @@ jQuery(document).ready(function() {
 		el.focus();
 	});
 	
+	var fc_select_pageSize = 10;
+	
+	// Simple text search autocomplete
+	jQuery( "input.fc_basicindex_complete_simple" ).autocomplete({
+		source: function( request, response ) {
+			jQuery.ajax({
+				url: "index.php?option=com_flexicontent&tmpl=component",
+				dataType: "json",
+				data: {
+					type: "basic_index",
+					task: "txtautocomplete",
+					pageSize: fc_select_pageSize,
+					text: request.term
+				},
+				success: function( data ) {
+					response( jQuery.map( data.Matches, function( item ) {
+						return {
+							/*label: item.item_id +': '+ item.text,*/
+							label: item.text,
+							value: item.text
+						}
+					}));
+				}
+			});
+		},
+		delay: 200,
+		minLength: 2,
+		select: function( event, ui ) {
+			/*log( ui.item  ?  "Selected: " + ui.item.label  :  "Nothing selected, input was " + this.value);*/
+			var ele = event.target;
+			jQuery(ele).trigger('change');
+		},
+		open: function() {
+			jQuery( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+			jQuery(this).removeClass('working');
+		},
+		close: function() {
+			jQuery( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+		},
+		search: function() {
+			jQuery(this).addClass('working');
+		}
+	});
+
+
+
+	// Tag-Like text search autocomplete
+	jQuery('input.fc_basicindex_complete_tlike').select2(
+	{
+		placeholder: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
+		multiple: true,
+		minimumInputLength: 1,
+		separator: " ",
+		allowClear: true,
+	
+		initSelection : function (element, callback) {
+			var data = [];
+			jQuery(element.val().split(" ")).each(function () {
+				data.push({id: this, text: this});
+			});
+			callback(data);
+		},
+	
+		ajax: {
+			quietMillis: 200,
+			url: "index.php?option=com_flexicontent&tmpl=component",
+			dataType: 'json',
+			//Our search term and what page we are on
+			data: function (term, page) {
+				return {
+					type: "basic_index",
+					task: "txtautocomplete",
+					text: term,
+					pageSize: fc_select_pageSize,
+					pageNum: page
+				};
+			},
+			results: function (data, page) {
+				//Used to determine whether or not there are more results available,
+				//and if requests for more data should be sent in the infinite scrolling
+				var more = (page * fc_select_pageSize) < data.Total;
+				return { results: data.Matches, more: more };
+			}
+		}
+	})/*.on('change', function(){
+		alert(jQuery(this).val());
+	})*/;
+
+
+
 	jQuery('body').prepend(
 	 	"<span id='fc_filter_form_blocker'>" +
 	    "<span class='fc_blocker_opacity'></span>" +

@@ -75,7 +75,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$filter_stategrp	= $app->getUserStateFromRequest( $option.'.items.filter_stategrp',		'filter_stategrp',	'',		'word' );
 		
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$filter_lang	 = $app->getUserStateFromRequest( $option.'.items.filter_lang', 		'filter_lang', 		'', 			'cmd' );
+			$filter_lang	 = $app->getUserStateFromRequest( $option.'.items.filter_lang', 		'filter_lang', 		'', 			'string' );
 		}
 		
 		$scope	 			= $app->getUserStateFromRequest( $option.'.items.scope', 			'scope', 			1, 			'int' );

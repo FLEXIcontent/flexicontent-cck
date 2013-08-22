@@ -78,10 +78,10 @@ $vdir_items = (int)$params->get('carousel_vdir_items', 2);
 $vdir_margin_bottom = (int)$params->get('carousel_vdir_margin_bottom', 6);
 
 // Thumbnail Buttons (= carousel handles)
-$show_handles = (int)$params->get('carousel_show_handles', 1);
-$handle_width = (int)$params->get('carousel_handle_width', 24);
-$handle_heigh = (int)$params->get('carousel_handle_height', 24);
-$handle_event = $params->get('carousel_handle_event', 'mouseover');
+$show_handles  = (int)$params->get('carousel_show_handles', 1);
+$handle_width  = (int)$params->get('carousel_handle_width', 24);
+$handle_height = (int)$params->get('carousel_handle_height', 24);
+$handle_event  = $params->get('carousel_handle_event', 'mouseover');
 
 // Autoplay, autoplay interval, and affect duration
 $autoplay = $params->get('carousel_autoplay', 1);
@@ -472,7 +472,7 @@ $_ns_fxOptions    = "{duration:".$duration."}";
 				<?php $count=1; $img_path = JURI::base(true) .'/'; ?>
 				<?php foreach ($list[$ord]['standard'] as $item) : ?>
 				<span>
-					<img width="32" height="32" src="<?php echo @ $item->image ? $item->image : $img_path.'components/com_flexicontent/assets/images/image.png'/*.($count++).".".$item->title*/; ?>" />
+					<img width="<?php echo $handle_width; ?>" height="<?php echo $handle_height; ?>" src="<?php echo @ $item->image ? $item->image : $img_path.'components/com_flexicontent/assets/images/image.png'/*.($count++).".".$item->title*/; ?>" />
 				</span>
 				<?php endforeach; ?>
 				

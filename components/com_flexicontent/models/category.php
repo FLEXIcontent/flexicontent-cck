@@ -147,7 +147,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$mcats_list = explode(',', $mcats_list);
 			}
 			// make sure given data are integers ... !!
-			foreach ($mcats_list as $i => $_id) $this->_ids[] = (int)$_id;
+			foreach ($mcats_list as $i => $_id)  if ((int)$_id) $this->_ids[] = (int)$_id;
 		}
 		else if (!$this->_id) {
 			$load_category_params = false;
@@ -158,13 +158,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('authorid', $this->_authorid);
 		$this->setState('cids', $this->_ids);
 
-		// We need to merge parameters here to get the correct page limit value, we must call this after populating layput and author variables
-		if ($load_category_params)
-			$this->_loadCategoryParams($this->_id);
-		else
-			$this->_params = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+		// We need to merge parameters here to get the correct page limit value, we must call this after populating layout and author variables
+		$this->_loadCategoryParams($this->_id);
 		$cparams = $this->_params;
-
+		
 		// Set the pagination variables into state (We get them from http request OR use default category parameters)
 		$limit = JRequest::getInt('limit') ? JRequest::getInt('limit') : $cparams->get('limit');
 		$limitstart	= JRequest::getInt('limitstart', 0, '', 'int');
@@ -174,9 +171,20 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Set filter order variables into state
 		$this->setState('filter_order', 'i.title');
 		$this->setState('filter_order_dir', 'ASC');
+		
+		// Get minimum word search length
+		$app = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {
+			$db = JFactory::getDBO();
+			$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
+			$_dbvariable = $db->loadObject();
+			$min_word_len = (int) @ $_dbvariable->Value;
+			$app->setUserState($option.'.min_word_len', $min_word_len);
+		}
 	}
-
-
+	
+	
 	/**
 	 * Method to set the category id
 	 *
@@ -686,7 +694,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_getDataCats($id_arr);
 			$_data_cats = "'".implode("','", $this->_data_cats)."'";
 			$where .= ' AND rel.catid IN ('.$_data_cats.')';
-		} 
+		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
 		// NOTE:  ACL view level is checked at a different place
@@ -780,6 +788,32 @@ class FlexicontentModelCategory extends JModelLegacy {
 	}
 	
 	
+	function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index') {
+		$db = JFactory::getDBO();
+		$option = JRequest::getVar('option');
+		$min_word_len = JFactory::getApplication()->getUserState( $option.'.min_word_len', 0 );
+		
+		$query = 'SELECT '.$col
+			.' FROM #__'.$tbl
+			.' WHERE MATCH ('.$col.') AGAINST ("+%s")'
+			.' LIMIT 1';
+		$_words = array();
+		foreach ($words as $word) {
+			if ( mb_strlen($word) < $min_word_len ) {
+				$shortwords[] = $word;
+				continue;
+			}
+			$quoted_word = FLEXI_J16GE ? $db->escape($word, true) : $db->getEscaped($word, true);
+			$q = sprintf($query, $quoted_word);
+			$db->setQuery($q);
+			$result = $db->loadAssocList();
+			if ( empty($result) ) $stopwords[] = $word;
+			else $_words[] = $word;
+		}
+		return $_words;
+	}
+	
+	
 	/**
 	 * Method to build the part of WHERE clause related to Alpha Index
 	 *
@@ -822,11 +856,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 				switch ($phrase)
 				{
 					case 'natural':
-						$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.') ';
+						$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.') ';
 						break;
 					
 					case 'natural_expanded':
-						$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
+						$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
 						break;
 					
 					case 'exact':
@@ -834,20 +868,32 @@ class FlexicontentModelCategory extends JModelLegacy {
 						break;
 					
 					case 'all':
-						$words = explode( ' ', $text );
-						$newtext = '+' . implode( '* +', $words ) .'*';
+						$words = preg_split('/\s\s*/u', $text);
+						$stopwords = array();
+						$shortwords = array();
+						$words = $this->removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
+						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+						JRequest::setVar('shortwords', implode(' ', $shortwords));
+						
+						$newtext = '+' . implode( ' +', $words );
 						$quoted_text = FLEXI_J16GE ? $this->_db->escape($newtext, true) : $this->_db->getEscaped($newtext, true);
 						$quoted_text = $this->_db->Quote( $quoted_text, false );
-						$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+						$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 						break;
 					
 					case 'any':
 					default:
-						$words = explode( ' ', $text );
-						$newtext = implode( '* ', $words ) .'*';
+						$words = preg_split('/\s\s*/u', $text);
+						$stopwords = array();
+						$shortwords = array();
+						$words = $this->removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
+						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+						JRequest::setVar('shortwords', implode(' ', $shortwords));
+						
+						$newtext = implode( ' ', $words );
 						$quoted_text = FLEXI_J16GE ? $this->_db->escape($newtext, true) : $this->_db->getEscaped($newtext, true);
 						$quoted_text = $this->_db->Quote( $quoted_text, false );
-						$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+						$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 						break;
 				}
 				
@@ -1275,14 +1321,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_category = $this->_db->loadObject();
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		}
-		else if ($this->_authorid || count($this->_ids)) {
+		else if ($this->_layout) {
 			$this->_category = new stdClass;
 			$this->_category->published = 1;
 			$this->_category->id = $this->_id;   // can be zero for author/myitems/etc layouts
 			$this->_category->title = '';
 			$this->_category->description = '';
 			$this->_category->slug = '';
-			$this->_category->ids = $this->_ids; // non-empty for multi-cats
+			$this->_category->ids = $this->_ids; // mcats layout but it can be empty, to allow all categories
 		}
 		else {
 			$this->_category = false;
@@ -1454,7 +1500,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 		}
 		
-		// Set filters via menu parameters
+		// Set filter values (initial or locked) via configuration parameters
 		FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
 		FlexicontentFields::setFilterValues( $params, 'initial_filters'   , $is_persistent=0);
 		

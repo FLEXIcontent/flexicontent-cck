@@ -133,7 +133,16 @@ class FlexicontentViewCategory extends JViewLegacy
 		$cid = JRequest::getInt('cid', 0);
 		$authorid = JRequest::getInt('authorid', 0);
 		$layout = JRequest::getCmd('layout', '');
-		$cids = preg_replace( '/[^0-9,]/i', '', (string) JRequest::getVar('cids', '') );
+		
+		$mcats_list = JRequest::getVar('cids', '');
+		if ( !is_array($mcats_list) ) {
+			$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
+			$mcats_list = explode(',', $mcats_list);
+		}
+		// make sure given data are integers ... !!
+		$cids = array();
+		foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+		$cids = implode(',' , $cids);
 		
 		$authordescr_item = false;
 		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed') {
@@ -610,54 +619,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		$lists = array();
 		
 		//ordering
-		if ($category->id) {
-			$lists['filter_order']     = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-			$lists['filter_order_Dir'] = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order_Dir', 'ASC', 'string' );
-			$lists['filter']           = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter', 'filter', '', 'string' );
-		} else if ($authorid) {
-			$lists['filter_order']     = $app->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-			$lists['filter_order_Dir'] = $app->getUserStateFromRequest( $option.'.author'.$authorid.'.filter_order_Dir', 'filter_order_Dir', 'ASC', 'string' );
-			$lists['filter']           = $app->getUserStateFromRequest( $option.'.author'.$authorid.'.filter', 'filter', '', 'string' );
-		} else {
-			$lists['filter_order']     = JRequest::getCmd('filter_order', 'i.title', 'default');
-			$lists['filter_order_Dir'] = JRequest::getCmd('filter_order_Dir', 'ASC', 'default');
-			$lists['filter']           = JRequest::getString('filter', '', 'default');
-		}
+		$lists['filter_order']     = JRequest::getCmd('filter_order', 'i.title', 'default');
+		$lists['filter_order_Dir'] = JRequest::getCmd('filter_order_Dir', 'ASC', 'default');
+		$lists['filter']           = JRequest::getString('filter', '', 'default');
 		
-		// Add html to filter object
-		if ($filters)
-		{
-			// Make the filter compatible with Joomla standard cache
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
-			
-			$display_label_filter_override = (int) $params->get('show_filter_labels', 0);
-			foreach ($filters as $filtre)
-			{
-				/*if ($category->_id) {
-					$filtervalue 	= $app->getUserStateFromRequest( $option.'.category'.$category->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
-				} else if ($category->_authorid) {
-					$filtervalue  = $app->getUserStateFromRequest( $option.'.author'.$category->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
-				} else if (count($category->_ids)) {
-					$filtervalue  = $app->getUserStateFromRequest( $option.'.mcats'.$category->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
-				} else {
-					$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
-				}*/
-				$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
-				//print_r($filtervalue);
-				
-				//$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filtre, $value ));
-				
-				// make sure filter HTML is cleared, and create it
-				$display_label_filter_saved = $filtre->parameters->get('display_label_filter');
-				if ( $display_label_filter_override ) $filtre->parameters->set('display_label_filter', $display_label_filter_override); // suppress labels inside filter's HTML (hide or show all labels externally)
-				// else ... filter default label behavior
-				$filtre->html = '';  // make sure filter HTML display is cleared
-				$field_type = $filtre->iscore ? 'core' : $filtre->field_type;
-				FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFilter', array( &$filtre, $filtervalue ) );
-				$filtre->parameters->set('display_label_filter', $display_label_filter_saved);
-				$lists['filter_' . $filtre->id] = $filtervalue;
-			}
+		// Add html to filter objects
+		$form_name = 'adminForm';
+		if ($filters) {
+			FlexicontentFields::renderFilters( $params, $filters, $form_name );
 		}
 		
 		// Create the pagination object

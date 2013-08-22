@@ -9,8 +9,16 @@ defined('_JEXEC') or die('Restricted access');
 <?php
 // 3. Prepare remaining form parameters
 $form_target = '';
-if ($catid) {
-	$db = & JFactory::getDBO();
+$default_target = JRoute::_('index.php', false) . '?option=com_flexicontent&view=category&layout=mcats';
+
+// !! target MCATS layout of category view when selecting multiple categories OR selecting single category but not category selected
+if ($mcats_selection || !$catid) {
+	$form_target = $default_target;
+}
+
+// !! target (single) category view when selecting single category a category is currently selected
+else if ($catid) {
+	$db = JFactory::getDBO();
 	$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
 		.' FROM #__categories AS c WHERE c.id = '.$catid;
 	$db->setQuery( $query );
@@ -22,17 +30,17 @@ $form_method = 'post';   // DO NOT CHANGE THIS
 
 $show_filter_labels = $params->get('show_filter_labels', 1);
 $filter_placement = $params->get( 'filter_placement', 1 );
-$filter_container_class = $filter_placement ? 'fc_filter_line' : 'fc_filter';
+$filter_container_class  = $filter_placement ? 'fc_filter_line' : 'fc_filter';
+$filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
 $text_search_val = JRequest::getString('filter', '', 'default');
 
 // 4. Create (print) the form
-$n=0;
 ?>
-<form id='<?php echo $form_id; ?>' action='<?php echo $form_target; ?>' method='<?php echo $form_method; ?>' >
+<form id='<?php echo $form_id; ?>' action='<?php echo $form_target; ?>' data-fcform_default_action='<?php echo $default_target; ?>' method='<?php echo $form_method; ?>' >
 
 <?php if ( !empty($cats_select_field) ) : ?>
-<span class="fc_filter <?php echo ($n++)%2 ? ' fc_even': ' fc_odd'; ?>">
-	<span class="fc_filter_label fc_cid_label"><?php echo JText::_('FLEXI_FILTER_CATEGORY'); ?> : </span>
+<span class="<?php echo $filter_container_class. ' fc_odd'; ?>">
+	<span class="fc_filter_label fc_cid_label"><?php echo JText::_($mcats_selection ? 'FLEXI_FILTER_CATEGORIES' : 'FLEXI_FILTER_CATEGORY'); ?> : </span>
 	<span class="fc_filter_html fc_cid_selector"><span class="cid_loading" id="cid_loading_<?php echo $module->id; ?>"></span><?php echo $cats_select_field; ?></span>
 <?php elseif ( !empty($cat_hidden_field) ): ?>
 	<?php echo $cat_hidden_field; ?>

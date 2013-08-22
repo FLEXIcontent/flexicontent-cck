@@ -1,6 +1,4 @@
 .mod_flexifilter_wrapper .fc_field_filter {}
-.mod_flexifilter_wrapper .fc_filter_line .fc_filter_label { width: auto !important;}
-.mod_flexifilter_wrapper .fc_filter_line .fc_filter_html { width: 100% !important;}
 
 .mod_flexifilter_wrapper .fcbutton_go,
 .mod_flexifilter_wrapper .fcbutton_reset {}
@@ -35,6 +33,4 @@
 	border-width: 0px; 
 }
 
-.mod_flexifilter_wrapper .fc_filter_box {
-	display:none;
-}
+.mod_flexifilter_wrapper .fc_filter_box {}
