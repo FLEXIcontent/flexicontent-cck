@@ -73,7 +73,7 @@ if ($filter_instructions == 1) {
 			$msg = '';
 			$msg .= $ignoredwords ? JText::_('FLEXI_WORDS_IGNORED_MISSING_COMMON').': <b>'.$ignoredwords.'</b>' : '';
 			$msg .= $ignoredwords && $shortwords ? ' <br/> ' : '';
-			$msg .= $shortwords ? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len.'):<b>'.$shortwords.'</b>' : '';
+			$msg .= $shortwords ? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) .': <b>'.$shortwords.'</b>' : '';
 			?>
 			
 			<span class="<?php echo $filter_container_class; ?> fc_filter_text_search fc_odd">
