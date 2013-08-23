@@ -1026,6 +1026,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$hl = $field->parameters->get( 'h_l', 600 );
 			$title	= @$value['title'] ? $value['title'] : '';
 			$alt	= @$value['alt'] ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
+			$alt	= flexicontent_html::escapeJsText($alt);
 			$desc	= @$value['desc'] ? $value['desc'] : '';
 
 			$srcb	= $thumb_urlpath . '/b_' .$extra_prefix. $value['originalname'];  // backend
@@ -1039,8 +1040,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
 			
 			// Create a popup tooltip (legend)
-			$tip     = $title . '::' . $desc;
-			$legend  = ($uselegend && (!empty($title) || !empty($desc) ) )? ' class="hasTip" title="'.$tip.'"' : '' ;
+			$tip = $title . '::' . $desc;
+			$tip = flexicontent_html::escapeJsText($tip);
+			$legend = ($uselegend && (!empty($title) || !empty($desc) ) )? ' class="hasTip" title="'.$tip.'"' : '' ;
 			
 			// Create a unique id for the link tags, and a class name for image tags
 			$uniqueid = $field->item_id . '_' . $field->id . '_' . $i;
@@ -1209,25 +1211,28 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						';
 					break;
 				case 2:   // Rokbox image popup
+					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title);
 					$group_str = '';   // no support for image grouping
 					$field->{$prop}[] = '
-						<a href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.($desc ? $desc : $title).'">
+						<a href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.$title_attr.'">
 							'.$img_nolegend.'
 						</a>
 						';
 					break;
 				case 3:   // JCE popup image popup
+					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title);
 					$group_str = $group_name ? 'rel="group['.$group_name.']"' : '';
 					$field->{$prop}[] = '
-						<a href="'.$srcl.'" class="jcepopup" '.$group_str.' title="'.($desc ? $desc : $title).'">
+						<a href="'.$srcl.'" class="jcepopup" '.$group_str.' title="'.$title_attr.'">
 							'.$img_nolegend.'
 						</a>
 						';
 					break;
 				case 4:   // Fancybox image popup
+					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title);
 					$group_str = $group_name ? 'data-fancybox-group="'.$group_name.'"' : '';
 					$field->{$prop}[] = '
-						<a href="'.$srcl.'" class="fancybox" '.$group_str.' title="'.($desc ? $desc : $title).'">
+						<a href="'.$srcl.'" class="fancybox" '.$group_str.' title="'.$title_attr.'">
 							'.$img_nolegend.'
 						</a>
 						';
@@ -1245,8 +1250,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					break;
 				case 6:   // (Widgetkit) SPOTlight image popup
 					$group_str = $group_name ? 'data-spotlight-group="'.$group_name.'"' : '';
+					$title_attr = $title .' | '. ($desc ? $desc : $title);
+					$title_attr = flexicontent_html::escapeJsText($title_attr);
 					$field->{$prop}[] = '
-						<a href="'.$srcl.'" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title.' | '.($desc ? $desc : $title).'">
+						<a href="'.$srcl.'" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title_attr.'">
 							'.$img_nolegend.'
 							<div class="overlay">
 								'.'<b>'.$title.'</b>: '.$desc.'
@@ -1256,9 +1263,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					break;
 				case 7:   // Elastislide inline carousel gallery (Responsive image gallery with togglable thumbnail-strip, plus previewer and description)
 					// *** NEEDS: thumbnail list must be created with large size thubmnails, these will be then thumbnailed by the JS gallery code
+					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title);
 					$img_legend_custom ='
 						 <img src="'.JURI::root().$_src.'" alt ="'.$alt.'"'.$legend.' class="'.$class_img_field.'"
-						 	data-large="' . JURI::root().$srcl . '" data-description="'.($desc ? $desc : $title).'"/>
+						 	data-large="' . JURI::root().$srcl . '" data-description="'.$title_attr.'"/>
 					';
 					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 					$field->{$prop}[] = '
@@ -1270,7 +1278,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				case 8:   // PhotoSwipe popup carousel gallery
 					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 					$field->{$prop}[] = '
-						<a href="'.$srcl.'" id="mb'.$uniqueid.'" class="mb" '.$group_str.' >
+						<a href="'.$srcl.'" '.$group_str.' >
 							'.$img_legend.'
 						</a>
 						';

@@ -507,7 +507,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 input.fc_text_filter,  input.fc_text_filter:focus,
 input.fc_field_filter, input.fc_field_filter:focus {
 	height: 14px !important;
-	padding: 5px 4px 7px 4px !important;
+	padding: 5px 26px 7px 4px !important;
 	position: relative;
 	/* background: transparent; ... does not work properly with ie8/9, it causes: */
 	/* any element with less z-index to be placed above this element, */
@@ -515,10 +515,17 @@ input.fc_field_filter, input.fc_field_filter:focus {
 	border: 1px solid black !important;
 	background: url(../images/magnifier-left.png) 96% 4px no-repeat white;
 	opacity: 0.5; filter:alpha(opacity=50);
+	min-width: 120px !important;
 }
+/* enlarge field in views ... (non-module) */
+#flexicontent input.fc_text_filter,  #flexicontent input.fc_text_filter:focus,
+#flexicontent input.fc_field_filter, #flexicontent input.fc_field_filter:focus {
+	min-width: 180px !important;
+}
+
 select.fc_field_filter { margin: 2px 2px 2px 2px !important; }
-input.fc_text_filter { margin: 2px 12px 4px 8px !important; vertical-align: top;}
-input.fc_field_filter { margin: 2px 8px 4px 8px !important; vertical-align: top;}
+input.fc_text_filter { margin: 2px 2px 4px 8px !important; vertical-align: top; }
+input.fc_field_filter { margin: 2px 8px 4px 8px !important; vertical-align: top; }
 span.fc_field_filter { border-width: 0px !important; }
 .fc_field_filter.fc_checkradio_group {
 	margin: 2px 0px 2px 2px !important;

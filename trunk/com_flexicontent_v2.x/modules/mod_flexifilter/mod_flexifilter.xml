@@ -33,7 +33,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FILTER_TARGET_CAT" level="level1" menu="hide" />
 			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_PARAM_EXPLANATION" level="level3" menu="hide" />
-			<field name="catid" type="qfcategory" label="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY" description="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY_DESC" />
+			<field name="catid" type="qfcategory" paramset="params" label="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY" description="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_SELECTOR" level="level2" menu="hide" />
 			<field name="mcats_selection" type="radio" default="0" label="FLEXI_FILTER_CAT_SELECTION_LIMIT" description="FLEXI_FILTER_CAT_SELECTION_LIMIT_DESC" >

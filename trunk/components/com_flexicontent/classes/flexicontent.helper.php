@@ -1120,7 +1120,7 @@ class flexicontent_html
 			$publish_down->setOffset($tz_offset);
 		}
 
-		$img_path = JURI::root()."/components/com_flexicontent/assets/images/";
+		$img_path = JURI::root()."components/com_flexicontent/assets/images/";
 
 
 		// Create publish information
@@ -2203,7 +2203,7 @@ class flexicontent_html
 			$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
 			$state_descrs = array(1=>'FLEXI_PUBLISH_THIS_ITEM', -5=>'FLEXI_SET_ITEM_IN_PROGRESS', 0=>'FLEXI_UNPUBLISH_THIS_ITEM', -3=>'FLEXI_SET_ITEM_PENDING', -4=>'FLEXI_SET_ITEM_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVE_THIS_ITEM', -2=>'FLEXI_TRASH_THIS_ITEM');
 			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png');
-			$img_path = JURI::root()."/components/com_flexicontent/assets/images/";
+			$img_path = JURI::root()."components/com_flexicontent/assets/images/";
 
 			$list = '';
 			foreach ($state_ids as $i => $state_id) {

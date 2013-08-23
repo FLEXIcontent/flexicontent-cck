@@ -91,7 +91,7 @@ if ($filter_instructions == 1) {
 					<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>
 					
 					<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
-						fc_label_text="<?php echo $text_search_label; ?>" size="34" name="filter"
+						fc_label_text="<?php echo $text_search_label; ?>" name="filter"
 						id="<?php echo $form_id; ?>_filter" value="<?php echo $text_search_val;?>" />
 					<?php echo $searchphrase_selector; ?>
 					

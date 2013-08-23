@@ -425,6 +425,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				else {
 					
 					// NO ACCESS: add file info via form field elements, in case the URL target needs to use them
+					$file_data_fields = "";
 					if ( !$authorized && $noaccess_addvars) {
 						$file_data_fields =
 							'<input type="hidden" name="fc_field_id" value="'.$field->id.'"/>'."\n".
