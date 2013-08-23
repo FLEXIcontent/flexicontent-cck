@@ -296,7 +296,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		
 		$indexed_elements = in_array($filter->field_type, array('tags', 'createdby', 'modifiedby', 'created', 'modified', 'type'));
 		
-		if ($filter->field_type == 'categories') {
+		if ($filter->field_type == 'categories' || $filter->field_type == 'title') {
 			plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName);
 		} else {
 			FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
@@ -326,7 +326,14 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		switch ($filter->field_type)
 		{
 			case 'title':
-				$filter->html	.='<input name="filter_'.$filter->id.'" class="fc_field_filter" type="text" size="20" value="'.$value.'" />';
+				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_TYPE_TO_LIST');
+				$_inner_lb = flexicontent_html::escapeJsText($_inner_lb);
+				$attribs_str = ' class="fc_field_filter fc_label_internal" fc_label_text="'.$_inner_lb.'"';
+				
+				$filter_ffname = 'filter_'.$filter->id;
+				$filter_ffid   = $formName.'_'.$filter->id.'_val';
+				
+				$filter->html	.= '<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="20" value="'.$value.'" />';
 			break;
 			
 			case 'createdby':     // Authors
@@ -385,10 +392,18 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			break;
 			
 			case 'categories':
+				// Initialize options
+				$options = array();
+				
+				// MULTI-select does not has an internal label a drop-down list option
+				if ($display_filter_as != 6) {
+					$first_option_txt = $label_filter==2  ?  $filter->label  :  JText::_('FLEXI_ANY');
+					$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
+				}
+				
+				// Get categories
 				global $globalcats;
 				$rootcatid = $filter->parameters->get( 'rootcatid', '' ) ;
-				$options = array(); 
-				$options[] = JHTML::_('select.option', '', '- '.$first_option_txt.' -');
 				$option = JRequest::getVar('option', '');
 				$view   = JRequest::getVar('view', '');
 				$cid    = JRequest::getInt('cid', '');
@@ -402,6 +417,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					$cats = $globalcats;  // All categories by default
 				}
 				if (!empty($cats) ) foreach ($cats as $k => $list) $options[] = JHTML::_('select.option', $list->id, $list->treename);
+				
+				$extra_classes = ' select2_list_selected';
 			break;
 			
 			case 'tags':
@@ -458,10 +475,32 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		
 		// b. If field filter has defined drop-down select options the create the drop-down select form field
 		if ( !empty($options) ) {
-			$attribs_str  = ' class="fc_field_filter use_select2_lib"';
-			//$attribs_str .= ' onchange="document.getElementById(\''.$formName.'\').submit();"';
+			// Make use of select2 lib
 			flexicontent_html::loadFramework('select2');
-			$filter->html	.= JHTML::_('select.genericlist', $options, $formfieldname, $attribs_str, 'value', 'text', $value);
+			$classes  = " use_select2_lib". @ $extra_classes;
+			$extra_param = '';
+			
+			// MULTI-select: special label and prompts
+			if ($display_filter_as == 6) {
+				$classes .= ' fc_label_internal fc_prompt_internal';
+				// Add field's LABEL internally or click to select PROMPT (via js)
+				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
+				// Add type to filter PROMPT (via js)
+				$extra_param  = ' fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb).'"';
+				$extra_param .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER')).'"';
+			}
+			
+			// Create HTML tag attributes
+			$attribs_str  = ' class="fc_field_filter'.$classes.'" '.$extra_param;
+			$attribs_str .= $display_filter_as==6 ? ' multiple="multiple" size="20" ' : '';
+			//$attribs_str .= ($display_filter_as==0 || $display_filter_as==6) ? ' onchange="document.getElementById(\''.$formName.'\').submit();"' : '';
+			
+			// Filter name and id
+			$filter_ffname = 'filter_'.$filter->id;
+			$filter_ffid   = $formName.'_'.$filter->id.'_val';
+			
+			// Create filter
+			$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
 		}
 		
 		// Special CASE 'categories' filter, replace some tags in filter HTML ...

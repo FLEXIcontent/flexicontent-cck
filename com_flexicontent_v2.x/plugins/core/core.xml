@@ -47,7 +47,22 @@
 			
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
 			
+			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level3" />
+			<field name="display_label_filter" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_OUTSIDE_FILTER</option>
+				<option value="2">FLEXI_INSIDE_FILTER</option>
+			</field>
+			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+			</field>
+			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
+			<field name="display_label_filter_s" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_OUTSIDE_FILTER</option>
+				<option value="2">FLEXI_INSIDE_FILTER</option>
+			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
 				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
 			</field>
@@ -556,8 +571,6 @@
 			</field>
 			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
 				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
@@ -574,8 +587,6 @@
 			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
 				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
 				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">

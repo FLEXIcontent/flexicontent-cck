@@ -72,7 +72,7 @@ if ( $show_mod )
 	
 	$current_cid = $isflexicat ? JRequest::getInt($catid_fieldname, 0) : 0;
 	$default_cid = (int)$params->get('catid', 0);
-	$catid = !$isflexicat ? $default_cid : $current_cid;  // id of category view or default value
+	$catid = !$isflexicat || !$current_cid ? $default_cid : $current_cid;  // id of category view or default value
 	
 	// CATEGORY SELECTION
 	$mcats_selection  = $params->get('mcats_selection', 0);
@@ -82,7 +82,7 @@ if ( $show_mod )
 	
 	// FIELD FILTERS
 	$display_filter_list  = $params->get('display_filter_list', 0);
-	$filterids            = $params->get('filterids', array());
+	$filterids            = $params->get('filters', array());
 	$limit_filters_to_cat = $display_filter_list==1 || $display_filter_list==3;
 	
 	$form_name = 'moduleFCform_'.$module->id;
@@ -136,26 +136,42 @@ if ( $show_mod )
 	
 	// 2. Get category, this is needed so that we get only the allowed filters of the category
 	// allowed filters are set in the category options (configuration)
-	$saved_cid = JRequest::getVar('cid', '');     // save cid ...
-	JRequest::setVar('cid', $limit_filters_to_cat ? $catid : 0);
-	$catmodel = new FlexicontentModelCategory();
-	$cat_filters = $catmodel->getFilters();
-	JRequest::setVar('cid', $saved_cid);          // restore cid
 	
-	// 3. Decide filters to use
-	if ($display_filter_list == 0 || $display_filter_list == 1) {
-		// ALL filters or category assigned filters
-		$filters = & $cat_filters;
-	} else {
+	$saved_cid = JRequest::getVar('cid', '');   // save cid ...
+	$saved_layout = JRequest::getVar('layout'); // save layout ...
+	JRequest::setVar('layout', $mcats_selection || !$catid ? 'mcats' : '');
+	JRequest::setVar('cid', $limit_filters_to_cat ? $catid : 0);
+	
+	$catmodel = new FlexicontentModelCategory();
+	//$_params = $catmodel->getParams();
+	// ALL filters
+	if ($display_filter_list==0) {
+		$filters = $catmodel->getFilters('filters', '__ALL_FILTERS__');
+	}
+	// Filter selected in category configuration
+	else if ($display_filter_list==1) {
+		$filters = $catmodel->getFilters('filters', 'use_filters');
+	}
+	// Filters selected in module
+	else if ($display_filter_list==2) {
+		$filters = $catmodel->getFilters('filters', 'use_filters', $params);
+	}
+	// Filters selected in module
+	else if ($display_filter_list) {  // ==3
+		$cat_filters = $catmodel->getFilters('filters', 'use_filters', $params);
+		
 		// Intersection of selected filters and of category assigned filters
 		$filters = array();
-		$filterids_indexed = array_keys($filterids);
+		$filterids_indexed = array_flip($filterids);
 		foreach ($cat_filters as $filter_name => $filter) {
 			if ( isset($filterids_indexed[$filter->id]) ) {
 				$filters[] = $filter;
 			}
 		}
 	}
+	
+	JRequest::setVar('cid', $saved_cid); // restore cid
+	JRequest::setVar('layout', $saved_layout); // restore layout
 	
 	// Set filter values (initial or locked) via configuration parameters
 	FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
@@ -176,23 +192,40 @@ if ( $show_mod )
 	
 	// Add css
 	if ($add_ccs && $layout) {
-	  if ($caching && !FLEXI_J16GE) {
+		if ($caching && !FLEXI_J16GE) {
 			// Work around for caching bug in J1.5
-	    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
-	      // active layout css
-	      echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexifilter/tmpl/'.$layout.'/'.$layout.'.css">';
-	    }
-	    echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css">';
-	    echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
-	  } else {
-	    // Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
-	    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
-	      // active layout css
-	      $document->addStyleSheet(JURI::base(true).'/modules/mod_flexifilter/tmpl/'.$layout.'/'.$layout.'.css');
-	    }
-	    $document->addStyleSheet(JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css');
-	    $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
-	  }
+			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+				// active layout css
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexifilter/tmpl/'.$layout.'/'.$layout.'.css">';
+			}
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css">';
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
+		} else {
+			// Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
+			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+				// active layout css
+				$document->addStyleSheet(JURI::base(true).'/modules/mod_flexifilter/tmpl/'.$layout.'/'.$layout.'.css');
+			}
+			$document->addStyleSheet(JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css');
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
+		}
+	}
+	
+	$form_target = '';
+	$default_target = JRoute::_('index.php?option=com_flexicontent&view=category', false) . '&layout=mcats';
+	// !! target MCATS layout of category view when selecting multiple categories OR selecting single category but no default category set (or no current category)
+	if (($display_cat_list && $mcats_selection) || !$catid) {
+		$form_target = $default_target;
+	}
+	
+	// !! target (single) category view when selecting single category a category is currently selected
+	else if ($catid) {
+		$db = JFactory::getDBO();
+		$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+			.' FROM #__categories AS c WHERE c.id = '.$catid;
+		$db->setQuery( $query );
+		$categoryslug = $db->loadResult();
+		$form_target = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
 	}
 	
 	// Render Layout
@@ -204,10 +237,9 @@ if ( $show_mod )
 	{
 		$app = JFactory::getApplication();
 		$modfc_jprof->mark('END: FLEXIcontent Filter-Search Module');
-		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
+		$msg = implode('<br/>', $modfc_jprof->getbuffer());
 		$app->enqueueMessage( $msg, 'notice' );
 	}
-	
 }
 ?>
 

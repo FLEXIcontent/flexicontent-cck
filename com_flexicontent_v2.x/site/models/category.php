@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1729 2013-08-19 18:20:54Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1734 2013-08-22 22:23:23Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -829,81 +829,83 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$filters_where = array();
 		
-		if ( $cparams->get('use_search',1) )
+		// NOT USING to ALLOW filtering VIA MODULE $cparams->get('use_search',1) 
+		
+		// Get value of search text ('filter') , setting into appropriate session variables
+		// *** Commented out to get variable only by HTTP GET or POST thus supporting FULL PAGE CACHING (e.g. Joomla's system plugin 'Cache')
+		/*if ($this->_id) {
+			$filter  = $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter', 'filter', '', 'string' );
+		} else if ($this->_layout=='author') {
+			$filter  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter', 'filter', '', 'string' );
+		} else if ($this->_layout=='mcats') {
+			$filter  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
+		} else if ($this->_layout=='myitems') {
+			$filter  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
+		} else {
+			$filter  = JRequest::getVar('filter', NULL, 'default');
+		}*/
+		$text   = JRequest::getVar('filter', NULL, 'default');
+		$phrase = JRequest::getVar('searchphrase', 'exact', 'default');
+		
+		$text = trim( $text );
+		if( strlen($text) )
 		{
-			// Get value of search text ('filter') , setting into appropriate session variables
-			// *** Commented out to get variable only by HTTP GET or POST thus supporting FULL PAGE CACHING (e.g. Joomla's system plugin 'Cache')
-			/*if ($this->_id) {
-				$filter  = $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter', 'filter', '', 'string' );
-			} else if ($this->_layout=='author') {
-				$filter  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter', 'filter', '', 'string' );
-			} else if ($this->_layout=='mcats') {
-				$filter  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
-			} else if ($this->_layout=='myitems') {
-				$filter  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
-			} else {
-				$filter  = JRequest::getVar('filter', NULL, 'default');
-			}*/
-			$text   = JRequest::getVar('filter', NULL, 'default');
-			$phrase = JRequest::getVar('searchphrase', 'exact', 'default');
+			$quoted_text = FLEXI_J16GE ? $this->_db->escape($text, true) : $this->_db->getEscaped($text, true);
+			$quoted_text = $this->_db->Quote( $quoted_text, false );
 			
-			$text = trim( $text );
-			if( strlen($text) )
+			switch ($phrase)
 			{
-				$quoted_text = FLEXI_J16GE ? $this->_db->escape($text, true) : $this->_db->getEscaped($text, true);
-				$quoted_text = $this->_db->Quote( $quoted_text, false );
+				case 'natural':
+					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.') ';
+					break;
 				
-				switch ($phrase)
-				{
-					case 'natural':
-						$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.') ';
-						break;
-					
-					case 'natural_expanded':
-						$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
-						break;
-					
-					case 'exact':
-						$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
-						break;
-					
-					case 'all':
-						$words = preg_split('/\s\s*/u', $text);
-						$stopwords = array();
-						$shortwords = array();
-						$words = $this->removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
-						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
-						JRequest::setVar('shortwords', implode(' ', $shortwords));
-						
-						$newtext = '+' . implode( ' +', $words );
-						$quoted_text = FLEXI_J16GE ? $this->_db->escape($newtext, true) : $this->_db->getEscaped($newtext, true);
-						$quoted_text = $this->_db->Quote( $quoted_text, false );
-						$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
-						break;
-					
-					case 'any':
-					default:
-						$words = preg_split('/\s\s*/u', $text);
-						$stopwords = array();
-						$shortwords = array();
-						$words = $this->removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
-						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
-						JRequest::setVar('shortwords', implode(' ', $shortwords));
-						
-						$newtext = implode( ' ', $words );
-						$quoted_text = FLEXI_J16GE ? $this->_db->escape($newtext, true) : $this->_db->getEscaped($newtext, true);
-						$quoted_text = $this->_db->Quote( $quoted_text, false );
-						$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
-						break;
-				}
+				case 'natural_expanded':
+					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
+					break;
 				
-				$filters_where[ 'search' ] = ' AND '. $_text_match;
+				case 'exact':
+					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					break;
+				
+				case 'all':
+					$words = preg_split('/\s\s*/u', $text);
+					$stopwords = array();
+					$shortwords = array();
+					$words = $this->removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
+					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+					JRequest::setVar('shortwords', implode(' ', $shortwords));
+					
+					$newtext = '+' . implode( ' +', $words );
+					$quoted_text = FLEXI_J16GE ? $this->_db->escape($newtext, true) : $this->_db->getEscaped($newtext, true);
+					$quoted_text = $this->_db->Quote( $quoted_text, false );
+					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					break;
+				
+				case 'any':
+				default:
+					$words = preg_split('/\s\s*/u', $text);
+					$stopwords = array();
+					$shortwords = array();
+					$words = $this->removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
+					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+					JRequest::setVar('shortwords', implode(' ', $shortwords));
+					
+					$newtext = implode( ' ', $words );
+					$quoted_text = FLEXI_J16GE ? $this->_db->escape($newtext, true) : $this->_db->getEscaped($newtext, true);
+					$quoted_text = $this->_db->Quote( $quoted_text, false );
+					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					break;
 			}
+			
+			$filters_where[ 'search' ] = ' AND '. $_text_match;
 		}
 		
-		// Get filters these are EITHER (a) Shown filters OR (b) Locked filters
-		$shown_filters  = $this->getFilters( 'filters', 'use_filters', $check_access=true );
-		$locked_filters = $this->getFilters( 'persistent_filters', 'use_persistent_filters', $check_access=false );
+		
+		// Get filters these are EITHER (a) all filters (to do active only) OR (b) Locked filters
+		// USING all filters here to allow filtering via module
+		//$shown_filters  = $this->getFilters( 'filters', 'use_filters', $cparams, $check_access=true );
+		$shown_filters  = $this->getFilters( 'filters', '__ALL_FILTERS__', $cparams, $check_access=true );
+		$locked_filters = $this->getFilters( 'persistent_filters', 'use_persistent_filters', $cparams, $check_access=false );
 		$filters = array();
 		if ($shown_filters)  foreach($shown_filters  as $_filter) $filters[] = $_filter;
 		if ($locked_filters) foreach($locked_filters as $_filter) $filters[] = $_filter;
@@ -1531,21 +1533,21 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @return object
 	 * @since 1.5
 	 */
-	function & getFilters($filt_param='filters', $usage_param='use_filters', $check_access=true)
+	function & getFilters($filt_param='filters', $usage_param='use_filters', & $params = null, $check_access=true)
 	{
-		$user		= JFactory::getUser();
-		$params = $this->_params;
+		$user    = JFactory::getUser();
 		$filters = array();
-		
+		if ($params === null) $params = $this->_params;
+
 		// Parameter that controls using these filters
-		if ( !$params->get($usage_param,0) ) return $filters;
+		if ( $usage_param!='__ALL_FILTERS__' && !$params->get($usage_param,0) ) return $filters;
 		
 		// Get Filter IDs, false means do retrieve any filter
 		$filter_ids = $params->get($filt_param, array());
 		if ($filter_ids === false) return $filters;
 		
 		// None selected filters means ALL
-		$and_scope = count($filter_ids) ? ' AND fi.id IN (' . implode(',', $filter_ids) . ')' : '';
+		$and_scope = $usage_param!='__ALL_FILTERS__' && count($filter_ids) ? ' AND fi.id IN (' . implode(',', $filter_ids) . ')' : '';
 		
 		// Use ACCESS Level, usually this is only for shown filters
 		$and_access = '';

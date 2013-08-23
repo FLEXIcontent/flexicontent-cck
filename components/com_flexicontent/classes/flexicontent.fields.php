@@ -2211,7 +2211,7 @@ class FlexicontentFields
 			break;
 		case 4: case 5:  // 4: radio (single value selectable), 5: checkbox (multiple values selectable)
 			$i = 0;
-			$checked = ($display_filter_as==5) ? !count($value) ||  !strlen($value[0]) : !strlen($value);
+			$checked = ($display_filter_as==5) ? !count($value) || !strlen(reset($value)) : !strlen($value);
 			$checked_attr = $checked ? 'checked="checked"' : '';
 			$checked_class = $checked ? 'fc_highlight' : '';
 			$filter->html .= '<span class="fc_field_filter fc_checkradio_group">';

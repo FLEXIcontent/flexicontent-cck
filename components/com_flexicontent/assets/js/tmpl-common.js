@@ -247,7 +247,7 @@ jQuery(document).ready(function() {
 			});
 		},
 		delay: 200,
-		minLength: 2,
+		minLength: 1,
 		select: function( event, ui ) {
 			/*log( ui.item  ?  "Selected: " + ui.item.label  :  "Nothing selected, input was " + this.value);*/
 			var ele = event.target;

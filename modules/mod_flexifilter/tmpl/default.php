@@ -7,24 +7,7 @@ defined('_JEXEC') or die('Restricted access');
 <div class="mod_flexifilter_wrapper mod_flexifilter_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexifilter_default<?php echo $module->id ?>">
 
 <?php
-// 3. Prepare remaining form parameters
-$form_target = '';
-$default_target = JRoute::_('index.php', false) . '?option=com_flexicontent&view=category&layout=mcats';
-
-// !! target MCATS layout of category view when selecting multiple categories OR selecting single category but not category selected
-if ($mcats_selection || !$catid) {
-	$form_target = $default_target;
-}
-
-// !! target (single) category view when selecting single category a category is currently selected
-else if ($catid) {
-	$db = JFactory::getDBO();
-	$query 	= 'SELECT CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-		.' FROM #__categories AS c WHERE c.id = '.$catid;
-	$db->setQuery( $query );
-	$categoryslug = $db->loadResult();
-	$form_target = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
-}
+// Prepare remaining form parameters
 $form_id = $form_name;
 $form_method = 'post';   // DO NOT CHANGE THIS
 

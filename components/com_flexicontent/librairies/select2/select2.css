@@ -716,7 +716,8 @@ disabled look for disabled choices in the results dropdown
 /* Make search (filtering) field always visible, forcing the search icon too  */
 .select2-container-multi .select2-choices .select2-search-field input.select2-input,
 .select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input {
-	width: 180px !important;
+	width: auto !important;
+	min-width: 124px !important;
 	min-height: 16px !important;
 	padding: 3px !important;
 	border: 1px solid lightgray !important;
@@ -733,8 +734,9 @@ disabled look for disabled choices in the results dropdown
 /* Enlarge above when focused */
 .select2-container-multi .select2-choices > li:first-child input.select2-input,
 .select2-container-multi.select2-dropdown-open .select2-choices > li:first-child input.select2-input,
-.select2-container-multi.select2-dropdown-open  .select2-choices .select2-search-field input.select2-input.select2-focused {
-	width: 180px !important;
+.select2-container-multi.select2-dropdown-open .select2-choices .select2-search-field input.select2-input.select2-focused {
+	width: auto !important;
+	min-width: 124px !important;
 }
 
 /* Make sure above is has clickable appearance (cursor pointer) */
