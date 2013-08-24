@@ -251,8 +251,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$types = $db->loadObjectList();
 			
 			$attribs  = 'multiple="true" size="5" class="fc_field_filter use_select2_lib fc_label_internal fc_prompt_internal"';
-			$attribs .= ' fc_label_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_CLICK_TO_LIST')).'"';
-			$attribs .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER')).'"';
+			$attribs .= ' fc_label_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_CLICK_TO_LIST'),'s').'"';
+			$attribs .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
 			$lists['contenttypes'] = JHTML::_('select.genericlist', $types, 'contenttypes[]', $attribs, 'value', 'text', $form_contenttypes, 'contenttypes');
 			
 			/*$checked = !count($form_contenttypes) || !strlen($form_contenttypes[0]);
@@ -295,8 +295,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			}
 			
 			$attribs  = 'multiple="true" size="5" class="fc_field_filter use_select2_lib fc_label_internal fc_prompt_internal"';
-			$attribs .= ' fc_label_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_CLICK_TO_LIST')).'"';
-			$attribs .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER')).'"';
+			$attribs .= ' fc_label_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_CLICK_TO_LIST'),'s').'"';
+			$attribs .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
 			$lists['txtflds'] = JHTML::_('select.genericlist', $fields_text, 'txtflds[]', $attribs, 'name', 'label', $form_txtflds, 'txtflds');
 			
 			/*$checked = !count($form_txtflds) || !strlen($form_txtflds[0]);
@@ -419,8 +419,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$options[] = $_area;
 			}
 			$attribs  = 'multiple="true" size="5" class="fc_field_filter use_select2_lib fc_label_internal fc_prompt_internal"';
-			$attribs .= ' fc_label_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_CLICK_TO_LIST')).'"';
-			$attribs .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER')).'"';
+			$attribs .= ' fc_label_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_CLICK_TO_LIST'),'s').'"';
+			$attribs .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
 			$lists['areas'] = JHTML::_('select.genericlist', $options, 'areas[]', $attribs, 'value', 'text', $form_areas, 'areas', $do_jtext=true);
 			/*$lists['areas']  = '<span class="fc_field_filter fc_checkradio_group">';
 			$lists['areas'] .= ' <span class="fc_checkradio_option">';

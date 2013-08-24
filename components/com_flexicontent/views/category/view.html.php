@@ -197,14 +197,16 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		// Set a page title if one was not already set
+		if ($layout=='author')
+			$author_user = JFactory::getUser($authorid);
 		switch($layout) {
 			case ''        :  $default_title = $category->title;                  break;
 			case 'myitems' :  $default_title = JText::_('FLEXICONTENT_MYITEMS');  break;
-			case 'author'  :  $default_title = JText::_('FLEXICONTENT_AUTHOR');   break;
+			case 'author'  :  $default_title = JText::_('FLEXICONTENT_AUTHOR')  .': '. $author_user->get('name');  break;
 			default        :  $default_title = JText::_('FLEXICONTENT_CATEGORY');
 		}
-		if ($layout && $cid) { // Special views limitted to a specific category
-			$default_title .= ' '.JText::_('FLEXI_IN').' '.$category->title;
+		if ($layout && $cid) { // Special views limited to a specific category
+			$default_title .= ', '.JText::_('FLEXI_IN_CATEGORY').': '.$category->title;
 		}
 		$params->def('page_title',	$default_title);  // set title ONLY if not already set
 		

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.php 1694 2013-07-12 09:42:03Z ggppdk $
+ * @version 1.0 $Id: image.php 1736 2013-08-23 18:11:28Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.image
@@ -1026,7 +1026,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$hl = $field->parameters->get( 'h_l', 600 );
 			$title	= @$value['title'] ? $value['title'] : '';
 			$alt	= @$value['alt'] ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
-			$alt	= flexicontent_html::escapeJsText($alt);
+			$alt	= flexicontent_html::escapeJsText($alt,'s');
 			$desc	= @$value['desc'] ? $value['desc'] : '';
 
 			$srcb	= $thumb_urlpath . '/b_' .$extra_prefix. $value['originalname'];  // backend
@@ -1041,7 +1041,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			// Create a popup tooltip (legend)
 			$tip = $title . '::' . $desc;
-			$tip = flexicontent_html::escapeJsText($tip);
+			$tip = flexicontent_html::escapeJsText($tip,'s');
 			$legend = ($uselegend && (!empty($title) || !empty($desc) ) )? ' class="hasTip" title="'.$tip.'"' : '' ;
 			
 			// Create a unique id for the link tags, and a class name for image tags
@@ -1211,7 +1211,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						';
 					break;
 				case 2:   // Rokbox image popup
-					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title);
+					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title,'s');
 					$group_str = '';   // no support for image grouping
 					$field->{$prop}[] = '
 						<a href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.$title_attr.'">
@@ -1220,7 +1220,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						';
 					break;
 				case 3:   // JCE popup image popup
-					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title);
+					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title,'s');
 					$group_str = $group_name ? 'rel="group['.$group_name.']"' : '';
 					$field->{$prop}[] = '
 						<a href="'.$srcl.'" class="jcepopup" '.$group_str.' title="'.$title_attr.'">
@@ -1229,7 +1229,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						';
 					break;
 				case 4:   // Fancybox image popup
-					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title);
+					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title,'s');
 					$group_str = $group_name ? 'data-fancybox-group="'.$group_name.'"' : '';
 					$field->{$prop}[] = '
 						<a href="'.$srcl.'" class="fancybox" '.$group_str.' title="'.$title_attr.'">
@@ -1251,7 +1251,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				case 6:   // (Widgetkit) SPOTlight image popup
 					$group_str = $group_name ? 'data-spotlight-group="'.$group_name.'"' : '';
 					$title_attr = $title .' | '. ($desc ? $desc : $title);
-					$title_attr = flexicontent_html::escapeJsText($title_attr);
+					$title_attr = flexicontent_html::escapeJsText($title_attr,'s');
 					$field->{$prop}[] = '
 						<a href="'.$srcl.'" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title_attr.'">
 							'.$img_nolegend.'
@@ -1263,7 +1263,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					break;
 				case 7:   // Elastislide inline carousel gallery (Responsive image gallery with togglable thumbnail-strip, plus previewer and description)
 					// *** NEEDS: thumbnail list must be created with large size thubmnails, these will be then thumbnailed by the JS gallery code
-					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title);
+					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title,'s');
 					$img_legend_custom ='
 						 <img src="'.JURI::root().$_src.'" alt ="'.$alt.'"'.$legend.' class="'.$class_img_field.'"
 						 	data-large="' . JURI::root().$srcl . '" data-description="'.$title_attr.'"/>

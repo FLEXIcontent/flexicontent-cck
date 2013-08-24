@@ -204,7 +204,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
 
-		<div class="flexi_buttons" style="font-size:100%;">
+		<div class="flexi_buttons" style="font-size:11px;">
 			
 			<?php if ( $this->perms['canedit'] || in_array( 'apply', $allowbuttons_fe) || !$typeid ) : ?>
 				<button class="fc_button" type="button" onclick="return submitbutton('apply');">
@@ -243,8 +243,8 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			
 		</div>
     
-		<br class="clear" />
 		<?php
+			$submit_msg = $approval_msg = '';
 			// A message about submitting new Content via configuration parameter
 			if ( $isnew && $this->params->get('submit_message') ) {
 				$submit_msg = '<span class="fc-mssg fc-note">'.JText::_( $this->params->get('submit_message') ).'</span>';
@@ -256,6 +256,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 				$approval_msg = $this->params->get('autopublished_message') ? $this->params->get('autopublished_message') :  JText::_( 'FLEXI_CONTENT_WILL_BE_AUTOPUBLISHED' ) ;
 				$approval_msg = str_replace('_PUBLISH_UP_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
 				$approval_msg = str_replace('_PUBLISH_DOWN_DAYS_INTERVAL_', $this->params->get('autopublished_up_interval') / (24*60), $approval_msg);
+				$approval_msg = '<span class="fc-mssg fc-info">'.$approval_msg.'</span>';
 			}
 			else {
 				
@@ -287,8 +288,14 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 					}
 				}
 			}
-			echo @ $submit_msg . @ $approval_msg;
-		?>
+			?>
+
+<?php if ($submit_msg || $approval_msg) : ?>
+	<div class="fcclear" style="height:12px!important;"></div>
+	<?php echo $submit_msg . $approval_msg; ?>
+<?php else : ?>
+	<div class="fcclear"></div>
+<?php endif; ?>
 
 <?php if ( $this->captcha_errmsg ) : ?>
 
@@ -303,17 +310,8 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 <?php endif; ?>
 
 
-<?php
-// *****************
-// MAIN TABSET START
-// *****************
-$tabSetCnt++;
-$tabCnt[$tabSetCnt] = 0;
-?>
-
-
 <div class="fc_edit_container_full">
-
+		
 		<?php
 			$field = $this->fields['title'];
 			$field_description = $field->description ? $field->description :
@@ -484,38 +482,6 @@ $tabCnt[$tabSetCnt] = 0;
 	<?php endif; ?>
 
 
-	<?php if (!$secondary_displayed && !$tags_displayed) : /* if secondary categories are displayed then place this in the relevant tab !! */ ?>
-		
-		<div class="fcclear"></div>
-		<?php if ($this->menuCats) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
-			<label id="catid-lbl" for="catid" for_bck="catid" class="flexi_label">
-				<?php echo JText::_( !$this->menuCats->cid ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* when submitting to single category, call this field just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
-			</label>
-			<div class="container_fcfield container_fcfield_name_catid">
-				<?php echo $this->menuCats->catid; ?>
-			</div>
-		<?php else : ?>
-			<label id="catid-lbl" for="catid" for_bck="catid" class="flexi_label">
-				<?php echo JText::_( (!$this->lists['cid']) ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' );  /* if no multi category allowed for user, then call it just 'CATEGORY' instead of 'PRIMARY CATEGORY' */ ?>
-			</label>
-			<div class="container_fcfield container_fcfield_name_catid">
-				<?php echo $this->lists['catid']; ?>
-			</div>
-		<?php endif; ?>
-
-		<?php if ( !empty($this->lists['featured_cid']) ) : ?>
-			<div class="fcclear"></div>
-			<label id="featured_cid-lbl" for="featured_cid" for_bck="featured_cid" class="flexi_label">
-				<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
-			</label>
-			<div class="container_fcfield container_fcfield_name_featured_cid">
-				<?php echo $this->lists['featured_cid']; ?>
-			</div>
-		<?php endif; ?>
-
-	<?php endif; ?>
-
-
 	<?php if ( $this->params->get('allowdisablingcomments_fe') ) : ?>
 		<div class="fcclear"></div>
 		<label id="params_comments-title" class="flexi_label hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_ALLOW_COMMENTS' ), ENT_COMPAT, 'UTF-8');?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_ALLOW_COMMENTS_DESC' ), ENT_COMPAT, 'UTF-8');?>" >
@@ -543,107 +509,112 @@ $tabCnt[$tabSetCnt] = 0;
 </div>
 
 
+<?php
+// *****************
+// MAIN TABSET START
+// *****************
+$tabSetCnt++;
+$tabCnt[$tabSetCnt] = 0;
+?>
 
 <!-- tabber start -->
 <div class='fctabber fields_tabset' id='fcform_tabset_<?php echo $tabSetCnt; ?>' >
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_GENERAL' ); ?> </h3>
+		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
 		
-		<?php if ($secondary_displayed || $tags_displayed) : ?>
-			<?php $fset_lbl = $tags_displayed ? 'FLEXI_CATEGORIES_TAGS' : 'FLEXI_CATEGORIES';?>
+		<?php $fset_lbl = $tags_displayed ? 'FLEXI_CATEGORIES_TAGS' : 'FLEXI_CATEGORIES';?>
+		
+		<div class="fcclear"></div>
+		<fieldset class="basicfields_set">
+			<legend>
+				<?php echo JText::_( $fset_lbl ); ?>
+			</legend>
 			
-			<div class="fcclear"></div>
-			<fieldset class="basicfields_set">
-				<legend>
-					<?php echo JText::_( $fset_lbl ); ?>
-				</legend>
-				
-				<label id="catid-lbl" for="catid" for_bck="catid" class="flexi_label">
-					<?php echo JText::_( !$secondary_displayed ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' ); ?>
+			<label id="catid-lbl" for="catid" for_bck="catid" class="flexi_label">
+				<?php echo JText::_( !$secondary_displayed ? 'FLEXICONTENT_CATEGORY' : 'FLEXI_PRIMARY_CATEGORY' ); ?>
+			</label>
+			<div class="container_fcfield container_fcfield_name_catid">
+				<?php /* MENU SPECIFIED main category (new item) or main category according to perms */ ?>
+				<?php echo $this->menuCats ? $this->menuCats->catid : $this->lists['catid']; ?>
+				<?php
+					if ($cats_canselect) {
+						// display secondary categories if permitted
+						$mcats_tooltip = 'class="editlinktip hasTip" style="display:inline-block;" title="'
+							.htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'
+							.htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8').'" ';
+						echo '<span '.$mcats_tooltip.'>'.$infoimage.'</span>';
+					}
+				?>
+			</div>
+			
+			<?php if ( !empty($this->lists['featured_cid']) ) : ?>
+				<div class="fcclear"></div>
+				<label id="featured_cid-lbl" for="featured_cid" for_bck="featured_cid" class="flexi_label">
+					<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
 				</label>
-				<div class="container_fcfield container_fcfield_name_catid">
-					<?php /* MENU SPECIFIED main category (new item) or main category according to perms */ ?>
-					<?php echo $this->menuCats ? $this->menuCats->catid : $this->lists['catid']; ?>
-					<?php
-						if ($cats_canselect) {
-							// display secondary categories if permitted
-							$mcats_tooltip = 'class="editlinktip hasTip" style="display:inline-block;" title="'
-								.htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'
-								.htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8').'" ';
-							echo '<span '.$mcats_tooltip.'>'.$infoimage.'</span>';
-						}
-					?>
+				<div class="container_fcfield container_fcfield_name_featured_cid">
+					<?php echo $this->lists['featured_cid']; ?>
+				</div>
+			<?php endif; ?>
+			
+			<?php if ($secondary_displayed) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
+				
+				<div class="fcclear"></div>
+				<label id="cid-lbl" for="cid" for_bck="cid" class="flexi_label">
+					<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
+				</label>
+				<div class="container_fcfield container_fcfield_name_cid">
+					<?php /* MENU SPECIFIED secondary categories (new item) or categories according to perms */ ?>
+					<?php echo @$this->menuCats->cid ? $this->menuCats->cid : $this->lists['cid']; ?>
 				</div>
 				
-				<?php if ( !empty($this->lists['featured_cid']) ) : ?>
-					<div class="fcclear"></div>
-					<label id="featured_cid-lbl" for="featured_cid" for_bck="featured_cid" class="flexi_label">
-						<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
-					</label>
-					<div class="container_fcfield container_fcfield_name_featured_cid">
-						<?php echo $this->lists['featured_cid']; ?>
-					</div>
-				<?php endif; ?>
-				
-				<?php if ($secondary_displayed) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
-					
-					<div class="fcclear"></div>
-					<label id="cid-lbl" for="cid" for_bck="cid" class="flexi_label">
-						<?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' );?>
-					</label>
-					<div class="container_fcfield container_fcfield_name_cid">
-						<?php /* MENU SPECIFIED secondary categories (new item) or categories according to perms */ ?>
-						<?php echo @$this->menuCats->cid ? $this->menuCats->cid : $this->lists['cid']; ?>
-					</div>
-					
-				<?php endif; ?>
-
-
-				<?php if ($tags_displayed) : ?>
-					<?php
-						$field = $this->fields['tags'];
-						$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
-					?>
-					<div class="fcclear"></div>
-					<label id="tag-lbl" for="tag" <?php echo $label_tooltip; ?> >
-						<?php echo $field->label; ?>
-						<?php /*echo JText::_( 'FLEXI_TAGS' );*/ ?>
-					</label>
-					<div class="container_fcfield container_fcfield_name_tags">
-						
-						<div class="qf_tagbox" id="qf_tagbox">
-							<ul id="ultagbox">
-							<?php
-								foreach($this->usedtagsdata as $tag) {
-									if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
-										echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-										echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
-									} else {
-										echo '<li class="tagitem plain"><span>'.$tag->name.'</span>';
-										echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /></li>';
-									}
-								}
-							?>
-							</ul>
-						</div>
-						
-						<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
-						<div class="fcclear"></div>
-						<div id="tags">
-							<label for="input-tags">
-								<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
-							</label>
-							<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
-							<span id='input_new_tag' ></span>
-							<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_TAG_EDDITING_FULL' ), ENT_COMPAT, 'UTF-8');?>">
-								<?php echo $infoimage; ?>
-							</span>
-						</div>
-						<?php endif; ?>
-					</div>
 			<?php endif; ?>
-			</fieldset>
-		<?php endif; // display_categories || display_tags ?>
+
+
+			<?php if ($tags_displayed) : ?>
+				<?php
+					$field = $this->fields['tags'];
+					$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
+				?>
+				<div class="fcclear"></div>
+				<label id="tag-lbl" for="tag" <?php echo $label_tooltip; ?> >
+					<?php echo $field->label; ?>
+					<?php /*echo JText::_( 'FLEXI_TAGS' );*/ ?>
+				</label>
+				<div class="container_fcfield container_fcfield_name_tags">
+					
+					<div class="qf_tagbox" id="qf_tagbox">
+						<ul id="ultagbox">
+						<?php
+							foreach($this->usedtagsdata as $tag) {
+								if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
+									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+									echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /><a href="javascript:;" onclick="javascript:deleteTag(this);" class="deletetag" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+								} else {
+									echo '<li class="tagitem plain"><span>'.$tag->name.'</span>';
+									echo '<input type="hidden" name="tag[]" value="'.$tag->id.'" /></li>';
+								}
+							}
+						?>
+						</ul>
+					</div>
+					
+					<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
+					<div class="fcclear"></div>
+					<div id="tags">
+						<label for="input-tags">
+							<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
+						</label>
+						<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
+						<span id='input_new_tag' ></span>
+						<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_TAG_EDDITING_FULL' ), ENT_COMPAT, 'UTF-8');?>">
+							<?php echo $infoimage; ?>
+						</span>
+					</div>
+					<?php endif; ?>
+				</div>
+		<?php endif; ?>
+		</fieldset>
 
 
 		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>

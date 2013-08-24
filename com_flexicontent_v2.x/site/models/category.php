@@ -122,7 +122,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	}
 	
 	/**
-	 * Method to populate the categry model state.
+	 * Method to populate the category model state.
 	 *
 	 * return	void
 	 * @since	1.5
@@ -1324,19 +1324,26 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		}
 		else if ($this->_layout) {
-			$this->_category = new stdClass;
-			$this->_category->published = 1;
-			$this->_category->id = $this->_id;   // can be zero for author/myitems/etc layouts
-			$this->_category->title = '';
-			$this->_category->description = '';
-			$this->_category->slug = '';
-			$this->_category->ids = $this->_ids; // mcats layout but it can be empty, to allow all categories
+			if ( !in_array($this->_layout, array('mcats','myitems','author')) ||
+				( $this->_layout=='myitems' && !$this->_authorid ) ||
+				( $this->_layout=='author' && !$this->_authorid )
+			) {
+				$this->_category = false;
+			} else {
+				$this->_category = new stdClass;
+				$this->_category->published = 1;
+				$this->_category->id = $this->_id;   // can be zero for author/myitems/etc layouts
+				$this->_category->title = '';
+				$this->_category->description = '';
+				$this->_category->slug = '';
+				$this->_category->ids = $this->_ids; // mcats layout but it can be empty, to allow all categories
+			}
 		}
 		else {
 			$this->_category = false;
 		}
 		
-		//Make sure the category was found and is published
+		// Make sure the category was found and is published
 		if (!$this->_category) {
 			if (!$raiseErrors) return false;
 			
@@ -1344,14 +1351,22 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$msg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
 				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 			}
-			else if ($this->_id) {
-				$msg = JText::sprintf( 'Content category with id: %d, was not found or is not published', $this->_id );
-				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
-
+			else if ( $this->_layout=='author' && !$this->_authorid ) {
+				$msg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_AUTHORID_NOT_SET');
+				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 			}
-			else { // !$this->_id || ( $this->_layout=='author' && !$this->_authorid )
+			else if ( $this->_layout ) {
+				echo $this->_authorid; exit;
+				$msg = JText::sprintf( 'FLEXI_CONTENT_LIST_LAYOUT_IS_NOT_SUPPORTED', $this->_layout );
+				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+			}
+			else if ($this->_id) {
+				$msg = JText::sprintf( 'FLEXI_CONTENT_CATEGORY_NOT_FOUND_OR_NOT_PUBLISHED', $this->_id );
+				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+			}
+			else { // !$this->_id
 				// This is not category view instead a category menu item is being used for a non-existent page
-				$msg = JText::sprintf( 'Requested page could not be found' );
+				$msg = JText::_( 'FLEXI_REQUESTED_PAGE_COULD_NOT_BE_FOUND' );
 				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 			}
 		}
@@ -1441,8 +1456,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$catparams = $this->_db->loadResult();
 		}
 		
-		// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively
-		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively. We avoid parameter via Component Helper function
+		// because in J1.5 it has menu parameters already merged and in J2.5 we avoid case that some extension (e.g. plugin) merged menu parameters
+		$params = new JParameter( JComponentHelper::getComponent('com_flexicontent')->params ); // clone( JComponentHelper::getParams('com_flexicontent') );
 		if ($menu) {
 			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
 			

@@ -663,13 +663,14 @@ class flexicontent_html
 	 * @return 	string
 	 * @since 1.5
 	 */
-	static function escapeJsText($string)
+	static function escapeJsText($string, $skipquote='')
 	{
 		$string = (string)$string;
 		$string = str_replace("\r", '', $string);
 		$string = addcslashes($string, "\0..\37'\\");
-		$string = str_replace('"', '\"', $string);
-		$string = str_replace("'", "\'", $string);
+		// Whether to skip single or double quotes
+		if ( $skipquote!='d' )  $string = str_replace('"', '\"', $string);
+		if ( $skipquote!='s' )  $string = str_replace("'", "\'", $string);
 		$string = str_replace("\n", ' ', $string);
 		return $string;
 	}
