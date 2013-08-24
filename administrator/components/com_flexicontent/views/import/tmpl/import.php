@@ -139,38 +139,38 @@ function submitbutton(task) {
 					<tr valign="top">
 						<td class="key"><label class="fckey" for="created_col">Creation date</label></td>
 						<td class="fcimportdata">
-							<label for="created_col0" class="fcdata"><input type="radio" id="created_col0" name="created_col" value="0" checked="checked" /> a. Current Date</label> &nbsp; &nbsp;
-							<label for="created_col1" class="fcdata"><input type="radio" id="created_col1" name="created_col" value="1" /> b. Use 'created' column with a valid date, e.g. 17/10/2012</label> &nbsp; &nbsp;
+							<input type="radio" id="created_col0" name="created_col" value="0" checked="checked" /> <label for="created_col0" class="fcdata">a. Current Date</label> &nbsp; &nbsp;
+							<input type="radio" id="created_col1" name="created_col" value="1" /> <label for="created_col1" class="fcdata">b. Use 'created' column with a valid date, e.g. 17/10/2012</label> &nbsp; &nbsp;
 						</td>
 					</tr>
 					<tr valign="top">
 						<td class="key"><label class="fckey" for="created_by_col">Creator (Author)</label></td>
 						<td class="fcimportdata">
-							<label for="created_by_col0" class="fcdata"><input type="radio" id="created_by_col0" name="created_by_col" value="0" checked="checked" /> a. Current User</label> &nbsp; &nbsp;
-							<label for="created_by_col1" class="fcdata"><input type="radio" id="created_by_col1" name="created_by_col" value="1" /> b. Use 'created_by' column containing USER IDs, e.g. 457</label> &nbsp; &nbsp;
+							<input type="radio" id="created_by_col0" name="created_by_col" value="0" checked="checked" /> <label for="created_by_col0" class="fcdata">a. Current User</label> &nbsp; &nbsp;
+							<input type="radio" id="created_by_col1" name="created_by_col" value="1" /> <label for="created_by_col1" class="fcdata">b. Use 'created_by' column containing USER IDs, e.g. 457</label> &nbsp; &nbsp;
 						</td>
 					</tr>
 					<tr valign="top">
 						<td class="key"><label class="fckey">Meta Data</label></td>
 						<td class="fcimportdata">
-							<label for="metadesc_col" class="fcdata"><input type="checkbox" id="metadesc_col" name="metadesc_col" value="1" /> Use 'metadesc' column (METADATA Description) </label> &nbsp; &nbsp;
-							<label for="metakey_col" class="fcdata"><input type="checkbox" id="metakey_col" name="metakey_col" value="1" /> Use 'metakey' column (METADATA Keywords) </label> &nbsp; &nbsp;
+							<input type="checkbox" id="metadesc_col" name="metadesc_col" value="1" /> <label for="metadesc_col" class="fcdata">Use 'metadesc' column (METADATA Description) </label> &nbsp; &nbsp;
+							<input type="checkbox" id="metakey_col" name="metakey_col" value="1" /> <label for="metakey_col" class="fcdata">Use 'metakey' column (METADATA Keywords) </label> &nbsp; &nbsp;
 						</td>
 					<tr valign="top">
 						<td class="key"><label class="fckey">Publication Dates</label></td>
 						<td class="fcimportdata">
 							(TAKE care to enter <b>valid dates</b> or process will fail e.g. 'YYYY-MM-DD hh:mm:ss' OR ''YYYY/MM/DD ' OR 'YY-MM-DD' )<br/>
-							<label for="publish_up_col" class="fcdata"><input type="checkbox" id="publish_up_col" name="publish_up_col" value="1" /> Use 'publish_up' column (Start Publication) </label> &nbsp; &nbsp;
-							<label for="publish_down_col" class="fcdata"><input type="checkbox" id="publish_down_col" name="publish_down_col" value="1" /> Use 'publish_down' column (End Publication) </label> &nbsp; &nbsp;
+							<input type="checkbox" id="publish_up_col" name="publish_up_col" value="1" /> <label for="publish_up_col" class="fcdata">Use 'publish_up' column (Start Publication) </label> &nbsp; &nbsp;
+							<input type="checkbox" id="publish_down_col" name="publish_down_col" value="1" /> <label for="publish_down_col" class="fcdata">Use 'publish_down' column (End Publication) </label> &nbsp; &nbsp;
 						</td>
 					</tr>
 					<tr valign="top">
 						<td class="key"><label class="fckey">Tags</label></td>
 						<td class="fcimportdata">
 							(NOTE: for 'tags_names' column, tags not already existing, will be created automatically, before they assinged to the item) <br/>
-							<label for="tags_col0" class="fcdata"><input type="radio" id="tags_col0" name="tags_col" value="0" checked="checked" /> a. Do not import tags</label> &nbsp; &nbsp;
-							<label for="tags_col1" class="fcdata"><input type="radio" id="tags_col1" name="tags_col" value="1" /> b. Use 'tags_names'  (Comma separated list of tag names)</label> &nbsp; &nbsp;
-							<label for="tags_col2" class="fcdata"><input type="radio" id="tags_col2" name="tags_col" value="2" /> c. Use 'tags_raw' column (Comma separated list of tag ids)</label> &nbsp; &nbsp;
+							<input type="radio" id="tags_col0" name="tags_col" value="0" checked="checked" /> <label for="tags_col0" class="fcdata">a. Do not import tags</label> &nbsp; &nbsp;
+							<input type="radio" id="tags_col1" name="tags_col" value="1" /> <label for="tags_col1" class="fcdata">b. Use 'tags_names'  (Comma separated list of tag names)</label> &nbsp; &nbsp;
+							<input type="radio" id="tags_col2" name="tags_col" value="2" /> <label for="tags_col2" class="fcdata">c. Use 'tags_raw' column (Comma separated list of tag ids)</label> &nbsp; &nbsp;
 						</td>
 					</tr>
 				</table>
@@ -194,7 +194,7 @@ function submitbutton(task) {
 								<label class="fckey" for="maincat_col" style="clear:both;">File override <?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label>
 							</td>
 							<td class="fcimportdata">
-								<input type="checkbox" id="maincat_col" name="maincat_col" value="1" /> (Use 'catid' column, e.g. 54)
+								<input type="checkbox" id="maincat_col" name="maincat_col" value="1" /> <label for="maincat_col" class="fcdata">(Use 'catid' column, e.g. 54)</label>
 							</td>
 							<td class="fcimportdata">&nbsp;</td>
 							<td class="key" align="left">
@@ -202,7 +202,7 @@ function submitbutton(task) {
 							</td>
 							</td>
 							<td class="fcimportdata">
-								<input type="checkbox" id="seccats_col" name="seccats_col" value="1" /> (Use 'cid' column, e.g. 54,14,51)
+								<input type="checkbox" id="seccats_col" name="seccats_col" value="1" /> <label for="seccats_col" class="fcdata">(Use 'cid' column, e.g. 54,14,51)</label>
 							</td>
 						</tr>
 					</table>
@@ -263,7 +263,7 @@ function submitbutton(task) {
 							</label>
 						</td>
 						<td class="fcimportdata">
-							<input type="file" name="csvfile" id="csvfile" value="" class="fcfield_textval" />
+							<input type="file" name="csvfile" id="csvfile" value="" class="" />
 						</td>
 					</tr>
 				</table>
@@ -299,7 +299,7 @@ title ~~ text ~~ textfield3 ~~ emailfield6 ~~ weblinkfld8 ~~ single_value_field2
 		</tr>
 		<tr>
 			<td value="top" width="">
-				<fieldset style="min-height:220px; background-color:#FFFFCF;">
+				<fieldset class="fleximport" style="min-height:220px; background-color:#FFFFCF;">
 					<legend style="color:darkred; background-color:white;" ><?php echo JText::_( 'FLEXI_3RD_PARTY_DEV_IMPORT_EXPORT_TOOLS' ); ?></legend>
 					<a id="tools_3rd_party"></a>
 					<?php echo $this->fleximport; ?>
@@ -316,11 +316,11 @@ title ~~ text ~~ textfield3 ~~ emailfield6 ~~ weblinkfld8 ~~ single_value_field2
 </form>
 </div>
 <style>
-#adminForm table ul {
+#adminForm table fieldset.fleximport ul {
 	padding: 0px 0px 0px 24px;
 	margin: 12px 0px 12px 0px;
 }
-#adminForm table li {
+#adminForm table fieldset.fleximport li {
 	list-style: disc inside none !important;
 	margin: 0 !important;
 	padding: 1px 0 0 8px !important;

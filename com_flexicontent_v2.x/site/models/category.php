@@ -1456,22 +1456,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$catparams = $this->_db->loadResult();
 		}
 		
-		// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively. We avoid parameter via Component Helper function
-		// because in J1.5 it has menu parameters already merged and in J2.5 we avoid case that some extension (e.g. plugin) merged menu parameters
-		$params = new JParameter( JComponentHelper::getComponent('com_flexicontent')->params ); // clone( JComponentHelper::getParams('com_flexicontent') );
+		// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively.
+		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
+		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
 		if ($menu) {
 			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
-			
-			// Add some parameters that do not belonging to category overriden parameters
-			// WE NEED TO AUTOMATE THIS !!!
-			$params->set( 'item_depth', $menu_params->get('item_depth') );
-			$params->set( 'page_title', $menu_params->get('page_title') );
-			$params->set( 'show_page_heading', $menu_params->get('show_page_heading') );
-			$params->set( 'page_heading', $menu_params->get('page_heading') );
-			$params->set( 'pageclass_sfx', $menu_params->get('pageclass_sfx') );
 		}
-		$params->set('show_title', $params->get('show_title_lists'));          // Parameter meant for lists
-		$params->set('title_linkable', $params->get('title_linkable_lists'));  // Parameter meant for lists
 		
 		// b. Merge category parameters
 		$cparams = FLEXI_J16GE ? new JRegistry($catparams) : new JParameter($catparams);
@@ -1511,12 +1501,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$params->merge($menu_params);
 			} else if ($menu_matches) {
 				// Add menu parameters - not - related to category parameters override
-				/*$partial_param_arr = array('some_parameter_nameA', 'some_parameter_nameB');
-				foreach ($partial_param_arr as $partial_param) {
-					$params->set( $partial_param, $menu_params->get($partial_param));
-				}*/
+				$params->set( 'item_depth', $menu_params->get('item_depth') );
+				$params->set( 'page_title', $menu_params->get('page_title') );
+				$params->set( 'show_page_heading', $menu_params->get('show_page_heading') );
+				$params->set( 'page_heading', $menu_params->get('page_heading') );
+				$params->set( 'pageclass_sfx', $menu_params->get('pageclass_sfx') );
 			}
 		}
+		
+		// Parameters meant for lists
+		$params->set('show_title', $params->get('show_title_lists'));          // Parameter meant for lists
+		$params->set('title_linkable', $params->get('title_linkable_lists'));  // Parameter meant for lists
 		
 		// Set filter values (initial or locked) via configuration parameters
 		FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);

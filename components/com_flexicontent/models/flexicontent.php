@@ -50,6 +50,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @var int
 	 */
 	var $_total = null;
+	
+	/**
+	 * Pagination object
+	 *
+	 * @var object
+	 */
+	var $_pagination = null;
 
 	/**
 	 * parameters
@@ -66,14 +73,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function __construct()
 	{
 		parent::__construct();
-		$menu = JSite::getMenu()->getActive();
 		
-		// Get the COMPONENT only parameters and merge current menu item parameters
-		$params = clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) {
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
-			$params->merge($menu_params);
-		}
+		// Set id and load parameters
+		$id = 0;  // no id used by this view
+		$this->setId((int)$id);
+		$params = & $this->_params;
 		
 		//get the root category of the directory
 		$this->_rootcat = (int) JRequest::getInt('rootcat', 0);
@@ -83,17 +87,32 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		else
 			$params->set('rootcat', $this->_rootcat);
 		
-		//set directory parameters
-		$this->_params = & $params;
-		
 		//set limits
 		$limit 			= $params->def('catlimit', 5);
-		$limitstart		= JRequest::getInt('limitstart');
+		$limitstart	= JRequest::getInt('limitstart');
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
-
 	}
+	
+	
+	/**
+	 * Method to set initialize data, setting an element id for the view
+	 *
+	 * @access	public
+	 * @param	int
+	 */
+	function setId($id)
+	{
+		//$this->_id      = $id;  // not used by current view
+		$this->_rootcat = null;
+		$this->_data    = null;
+		$this->_total   = null;
+		$this->_pagination = null;
+		$this->_params  = null;
+		$this->_loadParams();
+	}
+	
 	
 	/**
 	 * Method to get Data
@@ -473,6 +492,44 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$feed = $this->_db->loadObjectList();
 
 		return $feed;
+	}
+	
+	
+	/**
+	 * Method to load parameters
+	 *
+	 * @access	private
+	 * @return	void
+	 * @since	1.5
+	 */
+	function _loadParams()
+	{
+		if ( $this->_params !== NULL ) return;
+		
+		$app  = JFactory::getApplication();
+		$menu = JSite::getMenu()->getActive();     // Retrieve active menu
+		
+		// Get the COMPONENT only parameters, then merge the menu parameters
+		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
+		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
+		}
+				
+		$this->_params = $params;
+	}
+	
+	
+	/**
+	 * Method to get view's parameters
+	 *
+	 * @access public
+	 * @return object
+	 */
+	function &getParams()
+	{
+		return $this->_params;
 	}
 }
 ?>

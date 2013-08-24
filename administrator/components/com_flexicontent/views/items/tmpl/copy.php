@@ -191,7 +191,7 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 					<tr valign="top">
 						<td class="key"><label class="fckey"><?php echo JText::_( 'NEW' )." ".JText::_( 'FLEXI_LANGUAGE' ); ?></label></td>
 						<td>
-							<?php echo flexicontent_html::buildlanguageslist('language', '', $this->rows[0]->lang, $type = 5); ?>
+							<?php echo flexicontent_html::buildlanguageslist('language', '', $this->rows[0]->lang, $type = ($copy_behaviour != 'translate' ? 5 : 4) ); ?>
 						</td>
 					</tr>
 					<?php endif; ?>

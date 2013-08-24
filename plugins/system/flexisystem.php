@@ -880,7 +880,7 @@ class plgSystemFlexisystem extends JPlugin
 		if ($checkin_on_session_end) {
 			$query = 'SELECT DISTINCT userid FROM #__session WHERE guest=0';
 			$db->setQuery($query);
-			$logged = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+			$logged = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 			$logged = array_flip($logged);
 		}
 		// echo "Logged users:<br>"; print_r($logged); echo "<br><br>";

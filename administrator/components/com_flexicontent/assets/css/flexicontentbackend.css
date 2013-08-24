@@ -686,20 +686,20 @@ div label.state_box,
 div label.lang_box {
 	white-space:nowrap;
 	display:inline-block!important;
-	float:left!important;
+	float: none!important;
 	margin: 0px 8px 0px 0px !important;
 	padding: 0px!important;
 }
 div label.state_box input,
-div label.state_box .lang_lbl,
-div label.lang_box input,
-div label.lang_box .lang_lbl {
-	display:inline-block; float:left;
+div label.lang_box input {
+	display:inline-block; float:none;
 }
-div label.state_box img.lang_lbl,
-div label.lang_box img.lang_lbl {
-	margin: 4px 2px 2px 2px !important;
-	border: 1px solid lightgray;
+div label.state_box img,
+div label.lang_box img {
+	margin: 0px !important;
+	padding: 0px !important;
+	float: none !important;
+	vertical-align: middle !important;
 }
 
 /* Import view */

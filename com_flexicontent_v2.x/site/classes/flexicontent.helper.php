@@ -2084,20 +2084,20 @@ class flexicontent_html
 		$langs = array();
 		switch ($type)
 		{
-			case 1:
+			case 1:  // Drop-down SELECT of ALL languages , WITHOUT empty prompt to select language
 				foreach ($user_langs as $lang) {
 					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
 				}
 				$list = JHTML::_('select.genericlist', $langs, $name, $class, 'value', 'text', $selected );
 				break;
-			case 2:
+			case 2:  // Drop-down SELECT of ALL languages , WITH empty prompt to select language, e.g. used in items/category manager
 				$langs[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_LANGUAGE' ));
 				foreach ($user_langs as $lang) {
 					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
 				}
 				$list = JHTML::_('select.genericlist', $langs, $name, $class, 'value', 'text', $selected );
 				break;
-			case 3:
+			case 3:   // CHECK-BOX selection of ALL languages , e.g. item form
 				$checked	= '';
 				$list		= '';
 
@@ -2118,11 +2118,11 @@ class flexicontent_html
 					$checked	= '';
 				}
 				break;
-			case 4:
-				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="lang" value="" checked="checked" />';
-				$list 	 = '<label class="lang_box" for="lang9999" title="'.JText::_( 'FLEXI_NOCHANGE_LANGUAGE_DESC' ).'" >';
-				$list 	.= JText::_( 'FLEXI_NOCHANGE_LANGUAGE' );
-				$list 	.= '</label><div class="clear"></div>';
+			case 4:   // CHECK-BOX selection of ALL languages, with empty default option "Keep original language", e.g. when copying/moving items
+				$list  = '<input id="lang9999" type="radio" name="'.$name.'" class="lang" value="" checked="checked" />';
+				$list .= '<label class="lang_box" for="lang9999" title="'.JText::_( 'FLEXI_NOCHANGE_LANGUAGE_DESC' ).'" >';
+				$list .= JText::_( 'FLEXI_NOCHANGE_LANGUAGE' );
+				$list .= '</label><div class="clear"></div>';
 
 				foreach ($user_langs as $lang) {
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
@@ -2137,7 +2137,7 @@ class flexicontent_html
 					$list 	.= '&nbsp;</label><div class="clear"></div>';
 				}
 				break;
-			case 5:
+			case 5:   // CHECK-BOX selection of ALL languages, EXCLUDE selected language, e.g. when translating items into another language
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					if ($lang->code==$selected) continue;
@@ -2153,7 +2153,7 @@ class flexicontent_html
 					$list 	.= '</label><div class="clear"></div>';
 				}
 				break;
-			case 6:
+			case 6:   // CHECK-BOX selection of ALL languages, with empty option "Use language column", e.g. used in CSV import view
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
@@ -2165,12 +2165,12 @@ class flexicontent_html
 					} else {
 						$list 	.= $lang->name;
 					}
-					$list 	.= '&nbsp;</label><div class="clear"></div>';
+					$list 	.= '&nbsp;</label>';
 				}
 				$list 	.= '<input id="lang9999" type="radio" name="'.$name.'" class="lang" value="" />';
 				$list 	.= '<label class="lang_box hasTip" for="lang9999" title="'.JText::_('FLEXI_USE_LANGUAGE_COLUMN').'::'.JText::_('FLEXI_USE_LANGUAGE_COLUMN_TIP').'">';
 				$list 	.= JText::_( 'FLEXI_USE_LANGUAGE_COLUMN' );
-				$list 	.= '</label><div class="clear"></div>';
+				$list 	.= '</label>';
 				break;
 		}
 		return $list;
