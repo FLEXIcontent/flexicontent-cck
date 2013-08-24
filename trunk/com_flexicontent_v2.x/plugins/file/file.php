@@ -359,12 +359,12 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			if (!empty($file_data->description)) {
 				if ( !$authorized ) {
 					if ($noaccess_display != 2 ) {
-						$alt_str    = flexicontent_html::escapeJsText($name_str . '::' . $file_data->description);
+						$alt_str    = flexicontent_html::escapeJsText($name_str . '::' . $file_data->description,'s');
 						$class_str  = ' hasTip';
 						$text_html  = '';
 					}
 				} else if ($display_descr==1 || $prop=='namelist') {   // As tooltip
-					$alt_str    = flexicontent_html::escapeJsText($name_str . '::' . $file_data->description);
+					$alt_str    = flexicontent_html::escapeJsText($name_str . '::' . $file_data->description,'s');
 					$class_str  = ' hasTip';
 					$text_html  = '';
 				} else if ($display_descr==2) {  // As inline text
@@ -414,7 +414,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					
 					$attribs  = ' class="'. $class_str .'"';
 					$attribs .= ' title="'. $alt_str .'"';
-					$attribs .= ' filename="'. flexicontent_html::escapeJsText( $_filename , "UTF-8" ) .'"';
+					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filename,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';
 					$attribs .= ' contentid="'. $field->item_id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';
@@ -455,7 +455,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					
 					$attribs  = ' class="'. $class_str .'"';
 					$attribs .= ' title="'. $alt_str .'"';
-					$attribs .= ' filename="'. flexicontent_html::escapeJsText( $_filename , "UTF-8" ) .'"';
+					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filename,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';
 					$attribs .= ' contentid="'. $field->item_id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';

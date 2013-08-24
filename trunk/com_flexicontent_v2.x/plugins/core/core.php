@@ -327,7 +327,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		{
 			case 'title':
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_TYPE_TO_LIST');
-				$_inner_lb = flexicontent_html::escapeJsText($_inner_lb);
+				$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
 				$attribs_str = ' class="fc_field_filter fc_label_internal" fc_label_text="'.$_inner_lb.'"';
 				
 				$filter_ffname = 'filter_'.$filter->id;
@@ -486,8 +486,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// Add field's LABEL internally or click to select PROMPT (via js)
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
 				// Add type to filter PROMPT (via js)
-				$extra_param  = ' fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb).'"';
-				$extra_param .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER')).'"';
+				$extra_param  = ' fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
+				$extra_param .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
 			}
 			
 			// Create HTML tag attributes

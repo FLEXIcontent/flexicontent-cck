@@ -622,7 +622,7 @@ class plgSystemFlexisystem extends JPlugin
 		if ($print_logging_info) $fc_run_times['global_field_replacements'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		// Load language string for javascript usage in J1.5
-		if ( !FLEXI_J16GE && class_exists('fcjsText') )  fcjsJText::load();
+		if ( !FLEXI_J16GE && class_exists('fcjsJText') )  fcjsJText::load();
 		
 		return true;
 	}

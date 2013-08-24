@@ -2160,8 +2160,8 @@ class FlexicontentFields
 				// Add field's LABEL internally or click to select PROMPT (via js)
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
 				// Add type to filter PROMPT (via js)
-				$extra_param  = ' fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb).'"';
-				$extra_param .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER')).'"';
+				$extra_param  = ' fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
+				$extra_param .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
 			}
 			
 			// Create HTML tag attributes
@@ -2183,7 +2183,7 @@ class FlexicontentFields
 			break;
 		case 1: case 3:  // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars
 			$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isdate ? 'FLEXI_CLICK_CALENDAR' : 'FLEXI_TYPE_TO_LIST');
-			$_inner_lb = flexicontent_html::escapeJsText($_inner_lb);
+			$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
 			$attribs_str = ' class="fc_field_filter fc_label_internal" fc_label_text="'.$_inner_lb.'"';
 			$attribs_arr = array('class'=>'fc_field_filter fc_label_internal', 'fc_label_text' => $_inner_lb );
 			

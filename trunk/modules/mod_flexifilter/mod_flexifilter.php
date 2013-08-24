@@ -240,39 +240,36 @@ if ( $show_mod )
 		$msg = implode('<br/>', $modfc_jprof->getbuffer());
 		$app->enqueueMessage( $msg, 'notice' );
 	}
-}
-?>
-
-<?php
-
-$js = "";
-/*if (!$display_cat_list || !empty($selected_cats)) {
-	$js .= '
-		jQuery(document).ready(function() {
-			jQuery("#'.$form_name.'_filter_box").css("display", "block");
-		});
-	';
-}
-$document = JFactory::getDocument();
-$document->addScriptDeclaration($js);*/
-
-if ($display_cat_list && !$mcats_selection) {
-	$js .= '
-		function update_'.$form_name.'() {
-			form=document.getElementById("'.$form_name.'");
-			cid_val=form.'.$catid_fieldname.'.value;
-			/*if ( cid_val.length == 0 ) { jQuery("#'.$form_name.'_filter_box").css("display", "none"); return; } */
-			if ( cid_val.length == 0 ) {
-				var fcform = jQuery(form);
-				var _action = fcform.attr("data-fcform_default_action"); 
-				form.action = _action;
-				fcform.attr("data-fcform_action", _action ); 
-				return;
+	
+	$js = "";
+	/*if (!$display_cat_list || !empty($selected_cats)) {
+		$js .= '
+			jQuery(document).ready(function() {
+				jQuery("#'.$form_name.'_filter_box").css("display", "block");
+			});
+		';
+	}
+	$document = JFactory::getDocument();
+	$document->addScriptDeclaration($js);*/
+	
+	if ($display_cat_list && !$mcats_selection) {
+		$js .= '
+			function update_'.$form_name.'() {
+				form=document.getElementById("'.$form_name.'");
+				cid_val=form.'.$catid_fieldname.'.value;
+				/*if ( cid_val.length == 0 ) { jQuery("#'.$form_name.'_filter_box").css("display", "none"); return; } */
+				if ( cid_val.length == 0 ) {
+					var fcform = jQuery(form);
+					var _action = fcform.attr("data-fcform_default_action"); 
+					form.action = _action;
+					fcform.attr("data-fcform_action", _action ); 
+					return;
+				}
+				getSEFurl("cid_loading_'.$module->id.'",	'.$loader_html.', form,"'.$url_to_load.'"+cid_val, "'.$autosubmit_msg.'", '.$autosubmit.');
+				/*jQuery("#'.$form_name.'_filter_box").css("display", "block");*/
 			}
-			getSEFurl("cid_loading_'.$module->id.'",	'.$loader_html.', form,"'.$url_to_load.'"+cid_val, "'.$autosubmit_msg.'", '.$autosubmit.');
-			/*jQuery("#'.$form_name.'_filter_box").css("display", "block");*/
-		}
-	';
+		';
+	}
+	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 }
-if ($js) JFactory::getDocument()->addScriptDeclaration($js);
 ?>

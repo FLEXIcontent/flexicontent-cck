@@ -190,26 +190,13 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 <div id="flexicontent" class="flexi_edit" >
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data" >
 <table width="100%"><tr>
-	<td valign="top" style="width:auto; padding: 7px 0 0 0px">
+	<td valign="top" style="width:auto; padding: 0px">
 
-<?php
-// *****************
-// MAIN TABSET START
-// *****************
-$tabSetCnt++;
-$tabCnt[$tabSetCnt] = 0;
-?>
-
-<!-- tabber start -->
-<div class='fctabber fields_tabset' id='fcform_tabset_<?php echo $tabSetCnt; ?>' >
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_GENERAL' ); ?> </h3>
-
-		<div class="fc_edit_container_full">
-		<?php /*<fieldset class="basicfields_set">
-			<legend>
-				<?php echo JText::_( 'FLEXI_BASIC' ); ?>
-			</legend>*/ ?>
+	<div class="fc_edit_container_full" style="margin:0px 0px 10px 0px !important;">
+	<?php /*<fieldset class="basicfields_set">
+		<legend>
+			<?php echo JText::_( 'FLEXI_BASIC' ); ?>
+		</legend>*/ ?>
 
 			<?php
 				$field = $this->fields['title'];
@@ -378,10 +365,109 @@ $tabCnt[$tabSetCnt] = 0;
 			</div>
 		<?php endif; ?>
 		
-		<?php /*</fieldset>*/ ?>
-		</div>
+	<?php /*</fieldset>*/ ?>
+	</div>
+
+
+<?php
+// *****************
+// MAIN TABSET START
+// *****************
+$tabSetCnt++;
+$tabCnt[$tabSetCnt] = 0;
+?>
+
+<!-- tabber start -->
+<div class='fctabber fields_tabset' id='fcform_tabset_<?php echo $tabSetCnt; ?>' >
+	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
+
+		<?php $fset_lbl = $tags_displayed ? 'FLEXI_CATEGORIES_TAGS' : 'FLEXI_CATEGORIES';?>
+		<fieldset class="basicfields_set">
+			<legend>
+				<?php echo JText::_( $fset_lbl ); ?>
+			</legend>
+			
+			<label id="catid-lbl" for="catid" for_bck="catid" class="flexi_label" >
+				<?php echo JText::_( 'FLEXI_CATEGORIES_MAIN' ); ?>
+			</label>
+			<div class="container_fcfield container_fcfield_name_catid">
+				<?php echo $this->lists['catid']; ?>
+				<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
+				<?php echo $infoimage; ?>
+				</span>
+			</div>
+
+			<?php if ( !empty($this->lists['featured_cid']) ) : ?>
+				<div class="fcclear"></div>
+				<label id="featured_cid-lbl" for="featured_cid" for_bck="featured_cid" class="flexi_label">
+					<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
+				</label>
+				<div class="container_fcfield container_fcfield_name_featured_cid">
+					<?php echo $this->lists['featured_cid']; ?>
+				</div>
+			<?php endif; ?>
+			
+			<div class="fcclear"></div>
+			<label id="cid-lbl" for="cid" for_bck="cid" class="flexi_label" >
+				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
+			</label>
+			<div class="container_fcfield container_fcfield_name_cid">
+				<?php echo $this->lists['cid']; ?>
+			</div>
 		
-		
+		<?php /*<fieldset class="basicfields_set">
+			<legend>
+				<?php echo JText::_( 'FLEXI_TAGGING' ); ?>
+			</legend>*/ ?>
+			
+			<div class="fcclear"></div>
+			<div id="tags">
+				<?php
+					$field = $this->fields['tags'];
+					$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
+				?>
+				<label id="tag-lbl" for="tag" <?php echo $label_tooltip; ?> >
+					<?php echo $field->label; ?>
+					<?php /*echo JText::_( 'FLEXI_TAGS' );*/ ?>
+				</label>
+				<div class="container_fcfield container_fcfield_name_tags">
+
+					<div class="qf_tagbox" id="qf_tagbox">
+						<ul id="ultagbox">
+						<?php
+							$nused = count($this->usedtags);
+							for( $i = 0, $nused; $i < $nused; $i++ ) {
+								$tag = $this->usedtags[$i];
+								if ( $this->perms['cantags'] ) {
+									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
+									echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /><a href="#" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
+								} else {
+									echo '<li class="tagitem plain"><span>'.$tag->name.'</span>';
+									echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /></li>';
+								}
+							}
+							?>
+						</ul>
+					</div>
+
+					<?php if ( $this->perms['cantags'] ) : ?>
+						<div class="fcclear"></div>
+						<label for="input-tags">
+							<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
+						</label>
+						<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
+						<span id='input_new_tag' ></span>
+						<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_TAG_EDDITING_FULL' ), ENT_COMPAT, 'UTF-8');?>">
+							<?php echo $infoimage; ?>
+						</span>
+					<?php endif; ?>
+				</div>
+			</div>
+
+		</fieldset>
+
+
 		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 		<fieldset class="basicfields_set">
 			<legend>
@@ -500,95 +586,6 @@ $tabCnt[$tabSetCnt] = 0;
 
 	</div> <!-- end tab -->
 
-
-	<?php $tab_lbl = $tags_displayed ? 'FLEXI_CATEGORIES_TAGS' : 'FLEXI_CATEGORIES';?>
-
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-		<h3 class="tabberheading"> <?php echo JText::_( $tab_lbl ); ?> </h3>
-		
-		<div class="fc_edit_container_full">
-			
-			<label id="catid-lbl" for="catid" for_bck="catid" class="flexi_label" >
-				<?php echo JText::_( 'FLEXI_CATEGORIES_MAIN' ); ?>
-			</label>
-			<div class="container_fcfield container_fcfield_name_catid">
-				<?php echo $this->lists['catid']; ?>
-				<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
-				<?php echo $infoimage; ?>
-				</span>
-			</div>
-
-			<?php if ( !empty($this->lists['featured_cid']) ) : ?>
-				<div class="fcclear"></div>
-				<label id="featured_cid-lbl" for="featured_cid" for_bck="featured_cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
-				</label>
-				<div class="container_fcfield container_fcfield_name_featured_cid">
-					<?php echo $this->lists['featured_cid']; ?>
-				</div>
-			<?php endif; ?>
-			
-			<div class="fcclear"></div>
-			<label id="cid-lbl" for="cid" for_bck="cid" class="flexi_label" >
-				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
-			</label>
-			<div class="container_fcfield container_fcfield_name_cid">
-				<?php echo $this->lists['cid']; ?>
-			</div>
-		
-		<?php /*<fieldset class="basicfields_set">
-			<legend>
-				<?php echo JText::_( 'FLEXI_TAGGING' ); ?>
-			</legend>*/ ?>
-			
-			<div class="fcclear"></div>
-			<div id="tags">
-				<?php
-					$field = $this->fields['tags'];
-					$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
-				?>
-				<label id="tag-lbl" for="tag" <?php echo $label_tooltip; ?> >
-					<?php echo $field->label; ?>
-					<?php /*echo JText::_( 'FLEXI_TAGS' );*/ ?>
-				</label>
-				<div class="container_fcfield container_fcfield_name_tags">
-
-					<div class="qf_tagbox" id="qf_tagbox">
-						<ul id="ultagbox">
-						<?php
-							$nused = count($this->usedtags);
-							for( $i = 0, $nused; $i < $nused; $i++ ) {
-								$tag = $this->usedtags[$i];
-								if ( $this->perms['cantags'] ) {
-									echo '<li class="tagitem"><span>'.$tag->name.'</span>';
-									echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /><a href="#" class="deletetag" onclick="javascript:deleteTag(this);" align="right" title="'.JText::_('FLEXI_DELETE_TAG').'"></a></li>';
-								} else {
-									echo '<li class="tagitem plain"><span>'.$tag->name.'</span>';
-									echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /></li>';
-								}
-							}
-							?>
-						</ul>
-					</div>
-
-					<?php if ( $this->perms['cantags'] ) : ?>
-						<div class="fcclear"></div>
-						<label for="input-tags">
-							<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
-						</label>
-						<input type="text" id="input-tags" name="tagname" tagid='0' tagname='' />
-						<span id='input_new_tag' ></span>
-						<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_TAG_EDDITING_FULL' ), ENT_COMPAT, 'UTF-8');?>">
-							<?php echo $infoimage; ?>
-						</span>
-					<?php endif; ?>
-				</div>
-			</div>
-
-		<?php /*</fieldset>*/ ?>
-		</div>
-	
-	</div> <!-- end tab -->
 
 
 <?php
