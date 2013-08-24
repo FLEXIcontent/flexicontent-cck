@@ -93,7 +93,6 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 */
 	function setId($id)
 	{
-		// Set new category ID, wipe member variables and load parameters
 		//$this->_id      = $id;  // not used by current view
 		$this->_data    = null;
 		$this->_total   = null;
@@ -432,8 +431,9 @@ class FlexicontentModelFavourites extends JModelLegacy
 		$app  = JFactory::getApplication();
 		$menu = JSite::getMenu()->getActive();     // Retrieve active menu
 		
-		// a. Get the COMPONENT only parameters and merge current menu item parameters
-		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		// Get the COMPONENT only parameters, then merge the menu parameters
+		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
+		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
 		if ($menu) {
 			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
 			$params->merge($menu_params);

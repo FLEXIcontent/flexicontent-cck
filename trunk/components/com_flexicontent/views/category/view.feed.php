@@ -37,18 +37,16 @@ class FlexicontentViewCategory extends JViewLegacy
 	 */
 	function display()
 	{
-		$mainframe =& JFactory::getApplication();
-		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
-		$db =& JFactory::getDBO();
+		$db  = JFactory::getDBO();
+		$doc = JFactory::getDocument();
 		
-		$doc 		= & JFactory::getDocument();
 		$doc->link 	= JRoute::_(FlexicontentHelperRoute::getCategoryRoute(JRequest::getVar('cid',null, '', 'int')));
 		//$doc->link 	= JRoute::_('index.php?option=com_flexicontent&view=category&cid='.JRequest::getVar('cid',null, '', 'int'));
 		
-		$category 	= & $this->get('Category');
-		$params 	= & $this->get('Params');
+		$category = $this->get('Category');
+		$params   = $this->get('Params');
 		JRequest::setVar('limit', $params->get('feed_limit'));   // Force a specific limit, this will be moved to the model
-		$rows 		= & $this->get('Data');
+		$rows    = $this->get('Data');
 		
 		$feed_summary = $params->get('feed_summary', 0);
 		$feed_summary_cut = $params->get('feed_summary_cut', 200);

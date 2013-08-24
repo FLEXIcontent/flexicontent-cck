@@ -86,23 +86,30 @@ class FlexicontentViewImport extends JViewLegacy
 		$db->setQuery($query);
 		$types = $db->loadObjectList();
 
-		$lists['type_id'] = flexicontent_html::buildtypesselect($types, 'type_id', '', true, 'class="inputbox" size="1"', 'type_id');
-
+		$lists['type_id'] = flexicontent_html::buildtypesselect($types, 'type_id', '', true, 'class="fcfield_selectval" size="1"', 'type_id');
+		
 		$categories = $globalcats;
-
-		if (FLEXI_J16GE) {
-			// build the main category select list
-			$actions_allowed = array('core.create');
-			$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false, true, $actions_allowed);
-			// build the secondary categories select list
-			$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false, true, $actions_allowed);
-		} else {
+		$actions_allowed = array('core.create');  // Creating categorories tree for item assignment, we use the 'create' privelege
+		
+		// build the secondary categories select list
+		$class  = "fcfield_selectmulval";
+		$attribs = 'multiple="multiple" size="20" class="'.$class.'"';
+		$fieldname = FLEXI_J16GE ? 'seccats[]' : 'seccats[]';
+		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, $fieldname, '', false, $attribs, false, true,
+			$actions_allowed, $require_all=true);
+		
+		// build the main category select list
+		$attribs = 'class="fcfield_selectval"';
+		$fieldname = FLEXI_J16GE ? 'maincat' : 'maincat';
+		$lists['maincat'] = flexicontent_cats::buildcatselect($categories, $fieldname, '', 2, $attribs, false, true, $actions_allowed);
+		
+		/*
 			// build the main category select list
 			$lists['maincat'] = flexicontent_cats::buildcatselect($categories, 'maincat', '', 0, 'class="inputbox" size="10"', false, false);
 			// build the secondary categories select list
 			$lists['seccats'] = flexicontent_cats::buildcatselect($categories, 'seccats[]', '', 0, 'class="inputbox" multiple="multiple" size="10"', false, false);
-		}
-
+		*/
+		
 		//build languages list
 		// Retrieve author configuration
 		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user->id);

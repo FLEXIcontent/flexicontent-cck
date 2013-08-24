@@ -2024,7 +2024,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				;
 		}
 		$db->setQuery($query);
-		$values = FLEXI_J30GE ? $db->loadColumn() : $db->loadResultArray();
+		$values = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 		
 		// Create original filenames array skipping any empty records, 
 		// NOTE: if all_media is ON the we already retrieved filenames above

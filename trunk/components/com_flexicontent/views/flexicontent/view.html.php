@@ -44,14 +44,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$menu     = $menus->getActive();
 		$uri      = JFactory::getURI();
 		
-		// No parameters via model, get the COMPONENT only parameters and then merge current menu item parameters
-		$params = clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) {
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
-			$params->merge($menu_params);
-		}
-		
 		// Get various data from the model
+		$model  = $this->getModel();
+		$params = $model->getParams();
 		$categories = $this->get('Data');
 		$categories = !is_array($categories)?array():$categories;
 		$total   = $this->get('Total');

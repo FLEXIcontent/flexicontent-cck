@@ -272,7 +272,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			if (!$js_and_css_added) {
 				if (FLEXI_J16GE) {
 					$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/minigallery/css/minigallery.css');
-				  FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+				  FLEXI_J16GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 				  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/js/slideshow.js');
 				  if($slideshowtype!='slideshow') {
 				  	$document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
@@ -280,7 +280,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				  }
 				} else {
 					$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/minigallery/minigallery.css');
-				  FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+				  FLEXI_J16GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 				  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/backgroundslider.js');
 				  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/slideshow.js');
 				}

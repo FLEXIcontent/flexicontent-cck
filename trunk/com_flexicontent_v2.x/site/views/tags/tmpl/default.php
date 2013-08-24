@@ -21,7 +21,6 @@ jimport( 'joomla.html.parameter' );
 
 $params =  $this->params;
 $db     =  JFactory::getDBO();
-$flexiparams =  JComponentHelper::getParams('com_flexicontent');
 
 // Date configuration
 $use_date   = $params->get( 'show_modify_date', 1 ) ;

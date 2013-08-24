@@ -30,69 +30,65 @@ jimport('joomla.application.component.model');
  */
 class FlexicontentModelStats extends JModelLegacy
 {
-
 	/**
-	 * Constructor
+	 * Rating resolution
 	 *
-	 * @since 1.0
+	 * @var object
 	 */
+	var $_rating_resolution = null;
+	
+	/**
+	* Constructor
+	*
+	* @since 1.0
+	*/
 	function __construct()
 	{
 		parent::__construct();
+		$this->getRatingResolution();
 	}
 
 	/**
-	 * Method to get general stats
-	 *
-	 * @access public
-	 * @return array
-	 */
+	* Method to get general stats
+	*
+	* @access public
+	* @return array
+	*/
 	function getGeneralstats()
 	{
 		$_items = array();
-
-		/*
-		* Get total nr of items
-		*/
+		
+		
+		// Get total nr of items
 		$query = 'SELECT count(i.id)'
 			. ' FROM #__content as i'
 			. ' WHERE sectionid = ' . FLEXI_SECTION
 			;
-
 		$this->_db->SetQuery($query);
-  		$_items[] = $this->_db->loadResult();
-  		
-  		/*
-		* Get nr of all categories
-		*/
+		$_items[] = $this->_db->loadResult();
+		
+		
+		// Get nr of all categories
 		$query = 'SELECT count(id)'
 			. ' FROM #__categories'
 			. ' WHERE section = ' . FLEXI_SECTION
 			;
-
 		$this->_db->SetQuery($query);
-  		$_items[] = $this->_db->loadResult();
-  		
-  		/*
-		* Get nr of all tags
-		*/
-		$query = 'SELECT count(id)'
-			. ' FROM #__flexicontent_tags'
-			;
-
+		$_items[] = $this->_db->loadResult();
+		
+		
+		// Get nr of all tags
+		$query = 'SELECT count(id) FROM #__flexicontent_tags';
 		$this->_db->SetQuery($query);
-  		$_items[] = $this->_db->loadResult();
-
-  		/*
-		* Get nr of all files
-		*/
-		$query = 'SELECT count(id)'
-			. ' FROM #__flexicontent_files'
-			;
-
+		$_items[] = $this->_db->loadResult();
+		
+		
+		// Get nr of all files
+		$query = 'SELECT count(id) FROM #__flexicontent_files';
 		$this->_db->SetQuery($query);
-  		$_items[] = $this->_db->loadResult();
-  		
+		$_items[] = $this->_db->loadResult();
+		
+		
 		return $_items;
 	}
 
@@ -105,7 +101,8 @@ class FlexicontentModelStats extends JModelLegacy
 	 */
 	function getPopular()
 	{
-		$query = 'SELECT (cr.rating_sum / cr.rating_count ) * 20 AS votes, i.title, i.id, i.hits'
+		$_df = 100 / $this->_rating_resolution;
+		$query = 'SELECT (cr.rating_sum / cr.rating_count ) * '.$_df.' AS votes, i.title, i.id, i.hits'
 			. ' FROM #__content AS i'
 			. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id'
 			. ' WHERE i.sectionid = ' . FLEXI_SECTION
@@ -114,11 +111,11 @@ class FlexicontentModelStats extends JModelLegacy
 			;
 
 		$this->_db->SetQuery($query);
-  		$hits = $this->_db->loadObjectList();
-  		
-  		return $hits;
+		$hits = $this->_db->loadObjectList();
+
+		return $hits;
 	}
-	
+
 	/**
 	 * Method to get rating data
 	 *
@@ -127,7 +124,8 @@ class FlexicontentModelStats extends JModelLegacy
 	 */
 	function getRating()
 	{
-		$query = 'SELECT (cr.rating_sum / cr.rating_count ) * 20 AS votes, i.title, i.id'
+		$_df = 100 / $this->_rating_resolution;
+		$query = 'SELECT (cr.rating_sum / cr.rating_count ) * '.$_df.' AS votes, i.title, i.id'
 			. ' FROM #__content AS i'
 			. ' INNER JOIN #__content_rating AS cr ON cr.content_id = i.id'
 			. ' WHERE i.sectionid = ' . FLEXI_SECTION
@@ -136,11 +134,11 @@ class FlexicontentModelStats extends JModelLegacy
 			;
 
 		$this->_db->SetQuery($query);
-  		$votes = $this->_db->loadObjectList();
+		$votes = $this->_db->loadObjectList();
 
-  		return $votes;
+		return $votes;
 	}
-	
+
 	/**
 	 * Method to get rating data
 	 *
@@ -149,7 +147,8 @@ class FlexicontentModelStats extends JModelLegacy
 	 */
 	function getWorstRating()
 	{
-		$query = 'SELECT (cr.rating_sum / cr.rating_count ) * 20 AS votes, i.title, i.id'
+		$_df = 100 / $this->_rating_resolution;
+		$query = 'SELECT (cr.rating_sum / cr.rating_count ) * '.$_df.' AS votes, i.title, i.id'
 			. ' FROM #__content AS i'
 			. ' INNER JOIN #__content_rating AS cr ON cr.content_id = i.id'
 			. ' WHERE i.sectionid = ' . FLEXI_SECTION
@@ -158,11 +157,11 @@ class FlexicontentModelStats extends JModelLegacy
 			;
 
 		$this->_db->SetQuery($query);
-  		$worstvotes = $this->_db->loadObjectList();
-  		
-  		return $worstvotes;
+		$worstvotes = $this->_db->loadObjectList();
+
+		return $worstvotes;
 	}
-	
+
 	/**
 	 * Method to get creators data
 	 *
@@ -181,11 +180,11 @@ class FlexicontentModelStats extends JModelLegacy
 			;
 
 		$this->_db->SetQuery($query);
-  		$usercreate = $this->_db->loadObjectList();
-  		
-  		return $usercreate;
+		$usercreate = $this->_db->loadObjectList();
+
+		return $usercreate;
 	}
-	
+
 	/**
 	 * Method to get editors data
 	 *
@@ -205,11 +204,11 @@ class FlexicontentModelStats extends JModelLegacy
 			;
 
 		$this->_db->SetQuery($query);
-  		$usereditor = $this->_db->loadObjectList();
-  		
-  		return $usereditor;
+		$usereditor = $this->_db->loadObjectList();
+
+		return $usereditor;
 	}
-	
+
 	/**
 	 * Method to get favourites data
 	 *
@@ -228,11 +227,11 @@ class FlexicontentModelStats extends JModelLegacy
 			;
 
 		$this->_db->SetQuery($query);
-  		$favnr = $this->_db->loadObjectList();
-  		
-  		return $favnr;
+		$favnr = $this->_db->loadObjectList();
+
+		return $favnr;
 	}
-	
+
 	/**
 	 * Method to get favourites data
 	 * TODO: Clean up this mess
@@ -241,57 +240,57 @@ class FlexicontentModelStats extends JModelLegacy
 	 * @return array
 	 */
 	function getStatestats()
-	{  		
-  		//get states
+	{
+		//get states
 		$query = 'SELECT state'
 			. ' FROM #__content AS i'
 			. ' WHERE sectionid = ' . FLEXI_SECTION
 			;
 
 		$this->_db->SetQuery($query);
-  		$states = $this->_db->loadObjectList();
-  		
-  		$total = count($states);
-  		
-  		//initialize vars
-  		$collect = array();
-  		$collect['published'] = 0;
-  		$collect['unpublished'] = 0;
-  		$collect['archived'] = 0;
-  		$collect['pending'] = 0;
-  		$collect['open'] = 0;
-  		$collect['progress'] = 0;
-  		
-  		//count each states
-  		foreach ($states AS $state) {
-  			if ($state->state == 1) {
-  				$collect['published']++;
-  			} elseif($state->state == 0) {
-  				$collect['unpublished']++;
-  			} elseif($state->state == -1) {
-  				$collect['archived']++;
-  			} elseif($state->state == -3) {
-  				$collect['pending']++;
-  			} elseif($state->state == -4) {
-  				$collect['open']++;
-  			} elseif($state->state == -5) {
-  				$collect['progress']++;
-  			}
-  		}
-  		
-  		//get percentage and label
-  		$val = array();
-  		$lab = array();
-  		$i = 0;
-  		foreach ($collect as $key => $proz) {
-  			
-  			if ($proz == 0) {
-  				unset($collect[$key]);
-  				continue;
-  			}
-  			$val[] = round($proz / $total * 100);
-  			
-  			if ( $key == 'published' ) {
+		$states = $this->_db->loadObjectList();
+
+		$total = count($states);
+
+		//initialize vars
+		$collect = array();
+		$collect['published'] = 0;
+		$collect['unpublished'] = 0;
+		$collect['archived'] = 0;
+		$collect['pending'] = 0;
+		$collect['open'] = 0;
+		$collect['progress'] = 0;
+
+		//count each states
+		foreach ($states AS $state) {
+			if ($state->state == 1) {
+				$collect['published']++;
+			} elseif($state->state == 0) {
+				$collect['unpublished']++;
+			} elseif($state->state == -1) {
+				$collect['archived']++;
+			} elseif($state->state == -3) {
+				$collect['pending']++;
+			} elseif($state->state == -4) {
+				$collect['open']++;
+			} elseif($state->state == -5) {
+				$collect['progress']++;
+			}
+		}
+
+		//get percentage and label
+		$val = array();
+		$lab = array();
+		$i = 0;
+		foreach ($collect as $key => $proz) {
+
+			if ($proz == 0) {
+				unset($collect[$key]);
+				continue;
+			}
+			$val[] = round($proz / $total * 100);
+
+			if ( $key == 'published' ) {
 				$lab[] = JText::_( 'FLEXI_PUBLISHED' ).' '.$val[$i].' %';
 			} else if ( $key == 'unpublished' ) {
 				$lab[] = JText::_( 'FLEXI_UNPUBLISHED' ).' '.$val[$i].' %';
@@ -305,14 +304,14 @@ class FlexicontentModelStats extends JModelLegacy
 				$lab[] = JText::_( 'FLEXI_IN_PROGRESS' ).' '.$val[$i].' %';
 			}
 			$i++;
-  		}
-  		
-  		$collect['values'] = implode( ',', $val );
-  		$collect['labels'] = implode('|', $lab);
-  		  		
-  		return $collect;
+		}
+
+		$collect['values'] = implode( ',', $val );
+		$collect['labels'] = implode('|', $lab);
+
+		return $collect;
 	}
-	
+
 	/**
 	 * Method to get votes data
 	 *
@@ -321,68 +320,66 @@ class FlexicontentModelStats extends JModelLegacy
 	 */
 	function getVotesstats()
 	{
-  		/*
-		* Get all votes
-		*
-		*/
-  		$query = 'SELECT cr.rating_sum, cr.rating_count, c.id'
-				. ' FROM #__content AS c'
-				. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = c.id'
-				. ' WHERE c.sectionid = ' . FLEXI_SECTION
-				;
+		// Get all votes
+		$query = 'SELECT cr.rating_sum, cr.rating_count, c.id'
+			. ' FROM #__content AS c'
+			. ' LEFT JOIN #__content_rating AS cr ON cr.content_id = c.id'
+			. ' WHERE c.sectionid = ' . FLEXI_SECTION
+			;
 
 		$this->_db->SetQuery($query);
-  		$votes = $this->_db->loadObjectList();
-  		
-  		$total = count($votes);
-  		
+		$votes = $this->_db->loadObjectList();
+
+		$total = count($votes);
+
 		//initialize vars
-  		$collect = array();
-  		$collect['020'] = 0;
-  		$collect['040'] = 0;
-  		$collect['060'] = 0;
-  		$collect['080'] = 0;
-  		$collect['100'] = 0;
-  		$collect['novotes'] = 0;
-  		$collect['negative'] = 0;
-  		
-  		//count
-  		foreach ($votes AS $vote) {
-  			
-  			if(!$vote->rating_sum) {
-  				$collect['novotes']++;
-  				continue;
-  			}
-  			
-  			$percentage = round(($vote->rating_sum / $vote->rating_count) * 20);
-  			
-  			if ($percentage > 0 && $percentage < 20) {
-  				$collect['020']++;
-  			} elseif($percentage >= 20 && $percentage < 40) {
-  				$collect['040']++;
-  			} elseif($percentage >= 40 && $percentage < 60) {
-  				$collect['060']++;
-  			} elseif($percentage >= 60 && $percentage < 80) {
-  				$collect['080']++;
-  			} elseif($percentage >= 80 && $percentage <= 100) {
-  				$collect['100']++;
-  			}
-  		}
-  		
-  		//get votes and label
-  		$val = array();
-  		$lab = array();
-  		$i = 0;
-  		foreach ($collect as $key => $value) {
-  			
-  			if ($value == 0) {
-  				unset($collect[$key]);
-  				continue;
-  			}
-  			$val[]	= $value;
-  			$proz	= round($value / $total * 100);
-  			
-  			if ( $key == '020' ) {
+		$collect = array();
+		$collect['020'] = 0;
+		$collect['040'] = 0;
+		$collect['060'] = 0;
+		$collect['080'] = 0;
+		$collect['100'] = 0;
+		$collect['novotes'] = 0;
+		$collect['negative'] = 0;
+
+		//count
+		foreach ($votes as $vote) {
+
+			if(!$vote->rating_sum) {
+				$collect['novotes']++;
+				continue;
+			}
+
+			//$percentage = round(($vote->rating_sum / $vote->rating_count) * 20);
+			$percentage	= round((($vote->rating_sum / $vote->rating_count) * (100 / $this->_rating_resolution)), 2);
+			
+			if ($percentage > 0 && $percentage < 20) {
+				$collect['020']++;
+			} elseif($percentage >= 20 && $percentage < 40) {
+				$collect['040']++;
+			} elseif($percentage >= 40 && $percentage < 60) {
+				$collect['060']++;
+			} elseif($percentage >= 60 && $percentage < 80) {
+				$collect['080']++;
+			} elseif($percentage >= 80 && $percentage <= 100) {
+				$collect['100']++;
+			}
+		}
+
+		//get votes and label
+		$val = array();
+		$lab = array();
+		$i = 0;
+		foreach ($collect as $key => $value) {
+
+			if ($value == 0) {
+				unset($collect[$key]);
+				continue;
+			}
+			$val[]	= $value;
+			$proz	= round($value / $total * 100);
+
+			if ( $key == '020' ) {
 				$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_020' ).' '.$proz.' % ('.$val[$i].')';
 			} else if ( $key == '040' ) {
 				$lab[] = JText::_( 'FLEXI_VOTES_BEETWEEN_040' ).' '.$proz.' % ('.$val[$i].')';
@@ -395,14 +392,31 @@ class FlexicontentModelStats extends JModelLegacy
 			} else if ( $key == 'novotes' ) {
 				$lab[] = JText::_( 'FLEXI_NOVOTES' ).' '.$proz.' % ('.$val[$i].')';
 			}
-			
+
 			$i++;
-  		}
-  		
-  		$collect['values'] = implode( ',', $val );
-  		$collect['labels'] = implode( '|', $lab );
-  		  		
-  		return $collect;
+		}
+
+		$collect['values'] = implode( ',', $val );
+		$collect['labels'] = implode( '|', $lab );
+
+		return $collect;
 	}
+
+	function getRatingResolution()
+	{
+		if ($this->_rating_resolution) return $this->_rating_resolution;
+		
+		$this->_db->setQuery('SELECT * FROM #__flexicontent_fields WHERE field_type="voting"');
+		$field = $this->_db->loadObject();
+		$item = JTable::getInstance( $type = 'flexicontent_items', $prefix = '', $config = array() );
+		//$item->load( $id );
+		FlexicontentFields::loadFieldConfig($field, $item);
+
+		$rating_resolution = (int)$field->parameters->get('rating_resolution', 5);
+		$rating_resolution = $rating_resolution >= 5   ?  $rating_resolution  :  5;
+		$rating_resolution = $rating_resolution <= 100  ?  $rating_resolution  :  100;
+		$this->_rating_resolution = $rating_resolution;
+	}
+
 }
 ?>

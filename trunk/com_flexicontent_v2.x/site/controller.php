@@ -202,17 +202,20 @@ class FlexicontentController extends JControllerLegacy
 		$fc_params  = JComponentHelper::getParams( 'com_flexicontent' );
 		$dolog      = $fc_params->get('print_logging_info');
 		
-		// Get the COMPONENT only parameters and merge current menu item parameters
-		$params = clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) {
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
-			$params->merge($menu_params);
-		}
+		// Get the COMPONENT only parameters
+		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
+		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
 		
 		// Merge the type parameters
 		$tparams = $model->getTypeparams();
 		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 		$params->merge($tparams);
+		
+		// Merge the menu parameters
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
+		}
 		
 		// Get needed parameters
 		$submit_redirect_url_fe = $params->get('submit_redirect_url_fe', '');

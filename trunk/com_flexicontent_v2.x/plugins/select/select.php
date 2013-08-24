@@ -182,7 +182,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		// Prepare for looping
 		if ( !$values ) $values = array();
 		if ( $display_all ) {
-			$index = $values[0];
+			$index = reset($values);
 			
 			// non-selected value shortcuts
 	    $ns_pretext			= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_pretext', '' ), 'ns_pretext' );
@@ -208,7 +208,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		// CASE b. Display only selected elements
 		else if ( count($values) )
 		{
-			$element = @$elements[ $values[0] ];
+			$element = @$elements[ reset($values) ];
 			if ( !$element ) return '';
 			
 			if ($text_or_value == 0) $disp = $element->value;

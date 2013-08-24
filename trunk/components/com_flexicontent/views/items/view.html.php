@@ -66,20 +66,32 @@ class FlexicontentViewItems  extends JViewLegacy
 		$db       = JFactory::getDBO();
 		$nullDate = $db->getNullDate();
 		
+		
+		// ******************************************************
+		// Get item, model and create form (that loads item data)
+		// ******************************************************
+		
 		// Get various data from the model
 		$model  = $this->getModel();
 		$cid    = $model->_cid ? $model->_cid : $model->get('catid');  // Get current category id
 		
-
-		// Get the COMPONENT only parameters and merge current menu item parameters
-		$params = clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) {
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
-			$params->merge($menu_params);
-		}
+		// we are in display() task, so we will load the current item version by default
+		// 'preview' request variable will force last, and finally 'version' request variable will force specific
+		// NOTE: preview and version variables cannot be used by users that cannot edit the item
+		JRequest::setVar('loadcurrent', true);
+		
+		// Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
+		// indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
+		$start_microtime = microtime(true);
+		$item = $model->getItem(null, $check_view_access=2);
+		$_run_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		// Set item parameters as VIEW's parameters (item parameters are merged with component/page/type/current category/access parameters already)
+		$params = $item->parameters;
 		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
+		if ( $print_logging_info ) $fc_run_times['get_item_data'] = $_run_time;
 		
 		
 		// ********************************
@@ -101,22 +113,8 @@ class FlexicontentViewItems  extends JViewLegacy
 			$css = '#jflanguageselection { visibility:hidden; }';
 			$document->addStyleDeclaration($css);
 		}
-
-		// we are in display() task, so we will load the current item version by default
-		// 'preview' request variable will force last, and finally 'version' request variable will force specific
-		// NOTE: preview and version variables cannot be used by users that cannot edit the item
-		JRequest::setVar('loadcurrent', true);
-
-		// Try to load existing item, an 404 error will be raised if item is not found. Also value 2 for check_view_access
-		// indicates to raise 404 error for ZERO primary key too, instead of creating and returning a new item object
-		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$item = $model->getItem(null, $check_view_access=2);
-		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
-		// Set item parameters as VIEW's parameters (item parameters are merged with component/page/type/current category/access parameters already)
-		$params = $item->parameters;
-
-
+		
+		
 		// ********************
 		// ITEM LAYOUT handling
 		// ********************
@@ -455,8 +453,9 @@ class FlexicontentViewItems  extends JViewLegacy
 		$nullDate		= $db->getNullDate();
 		$menu				= JSite::getMenu()->getActive();
 		
-		// Get the COMPONENT only parameters and merge current menu item parameters
-		$params = clone( JComponentHelper::getParams('com_flexicontent') );
+		// Get the COMPONENT only parameters, then merge the menu parameters
+		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
+		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
 		if ($menu) {
 			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
 			$params->merge($menu_params);
