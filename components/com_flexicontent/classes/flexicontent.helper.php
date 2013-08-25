@@ -2215,7 +2215,7 @@ class flexicontent_html
 			}
 			$list 	.= '<input id="state9999" type="radio" name="state" class="state" value="" />';
 			$list 	.= '<label class="state_box hasTip" for="state9999" title="'.JText::_('FLEXI_USE_STATE_COLUMN').'::'.JText::_('FLEXI_USE_STATE_COLUMN_TIP').'">';
-			$list 	.= JText::_( 'FLEXI_USE_STATE_COLUMN' );
+			$list 	.= '<span class="state_lbl">'.JText::_( 'FLEXI_USE_STATE_COLUMN' ).'</span>';
 			$list 	.= '</label>';
 		} else {
 			$list = 'Bad type in buildstateslist()';

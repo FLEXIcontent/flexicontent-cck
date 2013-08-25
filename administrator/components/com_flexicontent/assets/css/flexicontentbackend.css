@@ -684,23 +684,30 @@ span.fc_select_button:hover {
 
 div label.state_box,
 div label.lang_box {
-	white-space:nowrap;
-	display:inline-block!important;
-	float: none!important;
+	white-space:nowrap !important;
+	display:inline-block !important;
+	float: none !important;
 	margin: 0px 8px 0px 0px !important;
 	padding: 0px!important;
+	font-size: 12px !important;
 }
 div label.state_box input,
-div label.lang_box input {
-	display:inline-block; float:none;
-}
 div label.state_box img,
-div label.lang_box img {
-	margin: 0px !important;
+div label.state_box .state_lbl,
+div label.lang_box input,
+div label.lang_box img,
+div label.lang_box .lang_lbl {
+	display:inline-block !important;
+	margin: 5px 5px 0px 0px !important;
 	padding: 0px !important;
 	float: none !important;
-	vertical-align: middle !important;
+	vertical-align: top !important;
+	line-height: 1em !important;
+	font-size: 12px !important;
 }
+div label.lang_box img, .fc_assoc_translation img {	border: 1px solid lightgray !important; }
+.fc_assoc_translation img  { margin-right: 5px !important; }
+
 
 /* Import view */
 #flexicontent table label.fckey {

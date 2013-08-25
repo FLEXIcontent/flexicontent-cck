@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="component" version="2.5.0" method="upgrade">
 	<name>FLEXIcontent</name>
-	<creationDate>24 August 2013</creationDate>
+	<creationDate>25 August 2013</creationDate>
 	<author>Emmanuel Danan, Georgios Papadakis</author>
 	<copyright>(C) 2009-2013 Emmanuel Danan</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>2.1.0 r1737</version>
+	<version>2.1.0 r1739</version>
 	<description>A flexible content management system for Joomla! J1.5/J2.5</description>
 
 	<languages folder="site/language">
@@ -23,6 +23,8 @@
 		<filename>CHANGELOG.php</filename>
 		<filename>TODO.php</filename>
 		<filename>README.php</filename>
+		<filename>medias/.htaccess</filename>
+		<filename>uploads/.htaccess</filename>
 		<folder>assets</folder>
 		<folder>classes</folder>
 		<folder>controllers</folder>
