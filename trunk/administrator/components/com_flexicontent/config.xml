@@ -804,6 +804,13 @@
 				<option value="DESC">FLEXI_ITEMS_MANAGER_ORDER_DIR_REVERSE</option>
 			</param>
 			
+		<param name="" type="separator" default="FLEXI_IMPORT_MANAGER_CONF" label="" level="level1" menu="hide" />
+			<param name="" type="separator" default="FLEXI_IMPORT_CSV_FILE_FORMAT" label="" level="level2" menu="hide" />
+			<param name="csv_field_sep" type="text" size="12" default="~~" label="FLEXI_CSV_FIELD_SEPARATOR" description="FLEXI_CSV_FIELD_SEPARATOR_DESC" menu="hide"/>
+			<param name="csv_field_enclose_char" type="text" size="12" default="" label="FLEXI_CSV_FIELD_ENCLOSE_CHAR" description="FLEXI_CSV_FIELD_ENCLOSE_CHAR_DESC" menu="hide"/>
+			<param name="csv_item_record_sep" type="text" default="\n~~" size="12" label="FLEXI_CSV_ITEM_SEPARATOR" description="FLEXI_CSV_ITEM_SEPARATOR_DESC" menu="hide"/>
+			<param name="csv_debug_records" type="text" default="2" size="12" label="FLEXI_CSV_DEBUG_FIRST_RECORDS" description="FLEXI_CSV_DEBUG_FIRST_RECORDS_DESC" menu="hide"/>
+			
 	<param name="" type="separator" default="FLEXI_WORKFLOW_AND_NOTIFICATIONS_CONF" label="" level="tab_close_open" description="" menu="hide" />
 	
 		<param name="" type="separator" default="FLEXI_WORKFLOW_BASIC_CONF" label="" level="level1" menu="hide" />

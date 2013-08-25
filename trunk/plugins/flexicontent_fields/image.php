@@ -1901,15 +1901,48 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$thumbpath = JPath::clean( JPATH_SITE .DS. $dir .DS );
 			}
 			
-			$filepath    = JPath::clean( $onlypath . $filename );
+			$filepath = JPath::clean( $onlypath . $filename );
 			$destpath = JPath::clean( JPATH_SITE .DS. $dir . ($image_source ?  DS. 'item_'.$field->item_id . '_field_'.$field->id  :  "") .DS );
 			
 		} else {
 			$onlypath  = JPath::clean( JPATH_BASE .DS. dirname($value['default_image']) .DS );
 			$thumbpath = JPath::clean( JPATH_SITE .DS. $dir .DS );
 			
-			$filepath  = JPath::clean( JPATH_BASE .DS. $value['default_image'] );
+			$filepath = JPath::clean( JPATH_BASE .DS. $value['default_image'] );
 			$destpath = JPath::clean( JPATH_SITE .DS. $dir .DS );
+		}
+		
+		// ******************************************
+		// Enforce protection of original image files
+		// ******************************************
+		if ($image_source) {
+			$protect_original = $field->parameters->get('protect_original', 1);
+			$htaccess_file = JPath::clean( $onlypath . '.htaccess' );
+			if ($protect_original) {
+				$file_contents =
+					'# do not allow direct access and also deny scripts'."\n".
+					'<FilesMatch ".*">'."\n".
+					'  Order Allow,Deny'."\n".
+					'  Deny from all'."\n".
+					'</FilesMatch>'."\n".
+					'OPTIONS -Indexes -ExecCGI'."\n";
+			} else {
+				$file_contents =
+					'# allow direct access but deny script'."\n".
+					'<FilesMatch ".*">'."\n".
+					'  Order Allow,Deny'."\n".
+					'  Allow from all'."\n".
+					'</FilesMatch>'."\n".
+					'OPTIONS -Indexes -ExecCGI'."\n";
+			}
+			// write .htaccess file
+			$fh = fopen($htaccess_file, 'w');
+			if (!$fh) {
+				JFactory::getApplication()->enqueueMessage( 'Cannot create/write file:'.$htaccess_file, 'notice' );
+			} else {
+				fwrite($fh, $file_contents);
+				fclose($fh);
+			}
 		}
 		
 		// ** PERFORMANCE CONSIDERATION : Try to avoid rechecking/recreating image thumbnails multiple times
@@ -1940,7 +1973,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$default_heights = array('l'=>600,'m'=>300,'s'=>90,'b'=>30);
 		
 		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
-		if ($extra_prefix) $sizes[] = '_s';  // always create an unprefixed small thumb, it is needed when assigning preview (and by imagepicker lib)
+		if ($extra_prefix) $sizes[] = '_s';  // always create an unprefixed small thumb, it is needed when assigning preview (and by imagepicker JS lib)
 		$thumbres = true;
 		foreach ($sizes as $size)
 		{

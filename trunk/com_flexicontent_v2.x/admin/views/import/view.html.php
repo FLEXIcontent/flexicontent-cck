@@ -45,7 +45,8 @@ class FlexicontentViewImport extends JViewLegacy
 		$task     = JRequest::getVar('task', '');
 		$cid      = JRequest::getVar('cid', array());
 		$extlimit = JRequest::getInt('extlimit', 100);
-
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		
 		$this->setLayout('import');
 
 		//initialise variables
@@ -152,6 +153,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$this->assignRef('cid'     	, $cid);
 		$this->assignRef('user'			, $user);
 		$this->assignRef('fleximport', $fleximport);
+		$this->assignRef('cparams', $cparams);
 
 		parent::display($tpl);
 	}

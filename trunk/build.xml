@@ -15,11 +15,10 @@
 		
 		<copy todir="flexipack/site" >
 			<fileset dir="components/com_flexicontent">
-				<exclude name=".**" />
-				<exclude name="medias" />
-				<exclude name="medias/**" />
-				<exclude name="uploads" />
-				<exclude name="uploads/**" />
+				<exclude name="medias/?*.*" />
+				<exclude name="medias/*/**/*" />  
+				<exclude name="uploads/?*.*" />
+				<exclude name="uploads/*/**/*" />  
 			</fileset>
 		</copy>
 
