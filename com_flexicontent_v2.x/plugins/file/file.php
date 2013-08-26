@@ -540,7 +540,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					JRequest::setVar( 'secure', 1, 'post' );
 					JRequest::setVar( 'keep', 1, 'post' );
 					$file_ids = $fman->addlocal();
-					$v = reset($file_ids); // Get fist element   //$file_ids[$filename];
+					$v = reset($file_ids); // Get fist element
+					//$_filename = key($file_ids);  this is the cleaned up filename, currently not needed
 				}
 			}
     	

@@ -1409,6 +1409,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$is_importcsv      = JRequest::getVar('task') == 'importcsv';
 		$import_media_folder  = JRequest::getVar('import_media_folder');
 		$image_source = $field->parameters->get('image_source', 0);
+		$unique_tmp_itemid = JRequest::getVar( 'unique_tmp_itemid', '' );
 		
 		// Set a warning message for overriden/changed files: form.php (frontend) or default.php (backend)
 		if ( !$is_importcsv && empty($unique_tmp_itemid) ) {
@@ -1473,14 +1474,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
     foreach ($post as $n => $v)
     {
 			// support for basic CSV import / export
-			if ( $is_importcsv && !is_array($post[$n]) ) {
-				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
-					$v = $post[$n] = unserialize($post[$n]);
+			if ( $is_importcsv && !is_array($v) ) {
+				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)
+					$v = unserialize($v);
 				} else {
-					$v = $post[$n] = array('originalname' => $post[$n]);
+					$v = array('originalname' => $v);
 				}
-			} else {
-				$v = $post[$n] = array('originalname' => $post[$n]);
 			}
 			
 			// (a) Handle uploading a new original file
@@ -1505,7 +1504,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					JRequest::setVar( 'file-filter-re', preg_quote($filename), 'post' );
 					JRequest::setVar( 'secure', 1, 'post' );
 					JRequest::setVar( 'keep', 1, 'post' );
-					$fman->addlocal();
+					$file_ids = $fman->addlocal();
+					reset($file_ids);  // Reset array to point to first element
+					$v = array('originalname' => key($file_ids));    // The keys of file_ids array is the cleaned up filenames
 				}
 			}
 			
