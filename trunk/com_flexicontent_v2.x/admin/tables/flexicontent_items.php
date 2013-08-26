@@ -439,9 +439,9 @@ class flexicontent_items extends JTable{
 			$this->asset_id = (int) $asset->id;
 
 			$query = $this->_db->getQuery(true);
-			$query->update( FLEXI_J16GE ? $this->_db->quoteName( $this->_tbl ) : $this->_db->nameQuote( $this->_tbl ) );
+			$query->update( $this->_db->quoteName( $this->_tbl ) );
 			$query->set('asset_id = '.(int) $this->asset_id);
-			$query->where( (FLEXI_J16GE ? $this->_db->quoteName( $this->_tbl ) : $this->_db->nameQuote( $k )) .' = '.(int) $this->$k);
+			$query->where( $this->_db->quoteName( $k ) .' = '.(int) $this->$k);
 			$this->_db->setQuery($query);
 
 			if (!$this->_db->query()) {

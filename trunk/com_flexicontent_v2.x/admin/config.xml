@@ -828,11 +828,66 @@
 			</field>
 			
 		<field name="" type="separator" default="FLEXI_IMPORT_MANAGER_CONF" label="" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_IMPORT_CORE_CONF" label="" level="level2" menu="hide" />
+			<field name="import_ignore_unused_cols" type="radio" default="0" label="FLEXI_IMPORT_IGNORE_UNUSED_COLUMNS" description="FLEXI_IMPORT_IGNORE_REDUDANT_COLS" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="import_id_col" type="radio" default="0" label="FLEXI_IMPORT_CUSTOM_ITEM_ID" description="FLEXI_IMPORT_ALL_IDS_CHECKED_BEFORE_IMPORT" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_IMPORT_USE_ID_COL</option>
+			</field>
+			<field name="import_lang" type="text" default="*" label="FLEXI_LANGUAGE" description="Enter * OR en-GB or fr-FR or de-DE ..." menu="hide" />
+			<field name="import_state" type="list" default="1" label="FLEXI_STATE" description="..." menu="hide">
+				<option value="1">FLEXI_PUBLISHED</option>
+				<option value="-5">FLEXI_IN_PROGRESS</option>
+				<option value="0">FLEXI_UNPUBLISHED</option>
+				<option value="-3">FLEXI_PENDING</option>
+				<option value="-4">FLEXI_TO_WRITE</option>
+				<option value="2">FLEXI_ARCHIVED</option>
+				<option value="-2">FLEXI_TRASHED</option>
+				<option value="">FLEXI_USE_STATE_COLUMN</option>
+			</field>
+			
+			<field name="import_created_col" type="radio" default="0" label="FLEXI_CREATION_DATE" description="..." menu="hide">
+				<option value="0">FLEXI_IMPORT_CREATION_CURR_DATE</option>
+				<option value="1">FLEXI_IMPORT_CREATION_USE_COL</option>
+			</field>
+			<field name="import_created_by_col" type="radio" default="0" label="FLEXI_CREATOR_AUTHOR" description="..." menu="hide">
+				<option value="0">FLEXI_IMPORT_CREATOR_CURR_USER</option>
+				<option value="1">FLEXI_IMPORT_CREATOR_USE_COL</option>
+			</field>
+			<field name="import_metadesc_col" type="radio" default="0" label="FLEXI_IMPORT_USE_METADESC_COL" description="..." menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="import_metakey_col" type="radio" default="0" label="FLEXI_IMPORT_USE_METAKEY_COL" description="..." menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="import_publish_up_col" type="radio" default="0" label="FLEXI_IMPORT_USE_PUBLISH_UP_COL" description="..." menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="import_publish_down_col" type="radio" default="0" label="FLEXI_IMPORT_USE_PUBLISH_DOWN_COL" description="..." menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="import_tags_col" type="list" default="0" label="FLEXI_TAGS" description="..." menu="hide">
+				<option value="0">FLEXI_IMPORT_DO_NOT_IMPORT_TAGS</option>
+				<option value="1">FLEXI_IMPORT_USE_TAG_NAMES_COL</option>
+				<option value="2">FLEXI_IMPORT_USE_TAG_IDS_COL</option>
+			</field>
+			
 			<field name="" type="separator" default="FLEXI_IMPORT_CSV_FILE_FORMAT" label="" level="level2" menu="hide" />
 			<field name="csv_field_sep" type="text" size="12" default="~~" label="FLEXI_CSV_FIELD_SEPARATOR" description="FLEXI_CSV_FIELD_SEPARATOR_DESC" menu="hide"/>
 			<field name="csv_field_enclose_char" type="text" size="12" default="" label="FLEXI_CSV_FIELD_ENCLOSE_CHAR" description="FLEXI_CSV_FIELD_ENCLOSE_CHAR_DESC" menu="hide"/>
 			<field name="csv_item_record_sep" type="text" default="\n~~" size="12" label="FLEXI_CSV_ITEM_SEPARATOR" description="FLEXI_CSV_ITEM_SEPARATOR_DESC" menu="hide"/>
 			<field name="csv_debug_records" type="text" default="2" size="12" label="FLEXI_CSV_DEBUG_FIRST_RECORDS" description="FLEXI_CSV_DEBUG_FIRST_RECORDS_DESC" menu="hide"/>
+			
+			<field name="" type="separator" default="FLEXI_IMPORT_FOLDERS" label="" level="level2" menu="hide" />
+			<field name="import_media_folder" type="text" default="tmp/fcimport_media" size="60" label="FLEXI_IMPORT_MEDIA_FOLDER" description="FLEXI_IMPORT_FOLDER_DESC" menu="hide"/>
+			<field name="import_docs_folder" type="text" default="tmp/fcimport_docs" size="60" label="FLEXI_IMPORT_DOCUMENTS_FOLDER" description="FLEXI_IMPORT_FOLDER_DESC" menu="hide"/>
 			
 	</fieldset>
 	<fieldset name="workflow_n_notifications_conf" label="FLEXI_WORKFLOW_AND_NOTIFICATIONS_CONF" description="" >

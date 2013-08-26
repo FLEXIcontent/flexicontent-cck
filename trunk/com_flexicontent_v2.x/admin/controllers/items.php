@@ -906,7 +906,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$publish_up_col = JRequest::getInt( 'publish_up_col', 0 );
 			$publish_down_col = JRequest::getInt( 'publish_down_col', 0 );
 			
-			$ignore_unused_columns = JRequest::getInt( 'ignore_unused_columns', 0 );
+			$ignore_unused_cols = JRequest::getInt( 'ignore_unused_cols', 0 );
 			
 			
 			// ********************************************************************************************
@@ -1107,7 +1107,7 @@ class FlexicontentControllerItems extends FlexicontentController
 					JError::raiseNotice( 500, "Column '".$colname."' : &nbsp; field name NOT FOUND, column will be ignored<br>" );
 				}
 			}
-			if ( count($unused_columns) && !$ignore_unused_columns) {
+			if ( count($unused_columns) && !$ignore_unused_cols) {
 				echo "<script>alert ('File has unused ".count($unused_columns)." columns \'".implode("\' , \'",$unused_columns)."\', please enable: Ignoring of unused columns');";
 				echo "window.history.back();";
 				echo "</script>";
@@ -1316,6 +1316,7 @@ class FlexicontentControllerItems extends FlexicontentController
 						echo 'Parsing result of the first '.$debug.' records (<b>please click</b> <a href="JavaScript:window.history.back();">here</a> to return previous page): <br/><br/>';
 						echo "\n\nCOLUMNS: ". implode(', ', $columns) ."<br />\n";
 					}
+					$data['text'] = mb_substr(strip_tags($data['text']), 0, 80, 'UTF-8') . ' ... ';
 					echo "<pre>\n\n\n\nRECORD no $cnt:\n"; print_r($data); echo "</pre>";
 					if ($cnt==$debug) break;
 				} else {

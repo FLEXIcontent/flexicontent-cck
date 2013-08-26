@@ -503,12 +503,47 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-		if(!is_array($post) && !strlen($post)) return;
+		
+		// Check if field has posted data
+		if ( empty($post) ) return;
+		
+		// Make sure posted data is an array 
+		$post = !is_array($post) ? array($post) : $post;   //echo "<pre>"; print_r($post);
+		
+		// Get configuration
+		$is_importcsv      = JRequest::getVar('task') == 'importcsv';
+		$import_docs_folder  = JRequest::getVar('import_docs_folder');
+		
+		// Execute once
+		static $initialized = null;
+		static $srcpath_original = '';
+		if ( $is_importcsv && !$initialized ) {
+			$initialized = 1;
+			jimport('joomla.filesystem.folder');
+			jimport('joomla.filesystem.jpath');
+			$srcpath_original  = JPath::clean( JPATH_SITE .DS. $import_docs_folder .DS );
+			require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');
+		}
 		
 		$new=0;
 		$newpost = array();
     foreach ($post as $n => $v)
     {
+			// support for basic CSV import / export
+			if ( $is_importcsv ) {
+				if ( !is_integer($post[$n]) ) {
+					$filename = $post[$n];
+					$fman = new FlexicontentControllerFilemanager();
+					JRequest::setVar( 'return-url', null, 'post' );
+					JRequest::setVar( 'file-dir-path', DS. $import_docs_folder, 'post' );
+					JRequest::setVar( 'file-filter-re', preg_quote($filename), 'post' );
+					JRequest::setVar( 'secure', 1, 'post' );
+					JRequest::setVar( 'keep', 1, 'post' );
+					$file_ids = $fman->addlocal();
+					$v = reset($file_ids); // Get fist element   //$file_ids[$filename];
+				}
+			}
+    	
 			if ($post[$n] != '') $newpost[$v] = $new++;
     }
     $post = array_flip($newpost);
