@@ -1762,13 +1762,22 @@ input.fc_checkradio {
 /***********************
  * Flexicontent messages
  ***********************/
-.fc-mssg {
+.fc-mssg-inline, .fc-mssg {
 	border: 1px solid !important;
 	display: block;
 	margin: 0 0 5px 0 !important;
 	padding: 8px 10px 8px 36px !important;
 	border-radius: 6px !important;
+	font-family: tahoma;
+	font-size:11px;
+	white-space: normal;
 }
+.fc-mssg-inline {
+	display: inline-block;
+	margin: 0 0 0 12px !important;
+	width: 62%;
+}
+
 .fc-error {
 	background: #FFBABA url(../images/error.png) no-repeat 10px 50%;
   color: #D8000C !important;

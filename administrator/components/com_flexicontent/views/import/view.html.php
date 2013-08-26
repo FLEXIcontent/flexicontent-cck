@@ -94,7 +94,7 @@ class FlexicontentViewImport extends JViewLegacy
 		
 		// build the secondary categories select list
 		$class  = "fcfield_selectmulval";
-		$attribs = 'multiple="multiple" size="20" class="'.$class.'"';
+		$attribs = 'multiple="multiple" size="10" class="'.$class.'"';
 		$fieldname = FLEXI_J16GE ? 'seccats[]' : 'seccats[]';
 		$lists['seccats'] = flexicontent_cats::buildcatselect($categories, $fieldname, '', false, $attribs, false, true,
 			$actions_allowed, $require_all=true);
@@ -123,14 +123,16 @@ class FlexicontentViewImport extends JViewLegacy
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', flexicontent_html::getSiteDefaultLang(), 6, $allowed_langs);
+			$default_lang = $cparams->get('import_lang', '*');
+			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $default_lang, 6, $allowed_langs, $default_lang);
 		} else {
 			$default_lang = flexicontent_html::getSiteDefaultLang();
 			$languages[] = JHTML::_('select.option', $default_lang, JText::_( 'Default' ).' ('.flexicontent_html::getSiteDefaultLang().')' );
 			$lists['languages'] = JHTML::_('select.radiolist', $languages, 'language', $class='', 'value', 'text', $default_lang );
 		}
 
-		$lists['states'] = flexicontent_html::buildstateslist('state', '', '', 2);
+		$default_state= $cparams->get('import_state', 1);
+		$lists['states'] = flexicontent_html::buildstateslist('state', '', $default_state, 2);
 		
 		
 		// Ignore warnings because component may not be installed

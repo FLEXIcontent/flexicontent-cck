@@ -307,16 +307,27 @@ textarea.invalid {
 .hasTip {
 	cursor: help;
 }
+
+
 /***********************
  * Flexicontent messages
  ***********************/
-.fc-mssg {
+.fc-mssg-inline, .fc-mssg {
 	border: 1px solid !important;
 	display: block;
 	margin: 0 0 5px 0 !important;
 	padding: 8px 10px 8px 36px !important;
 	border-radius: 6px !important;
+	font-family: tahoma;
+	font-size:11px;
+	white-space: normal;
 }
+.fc-mssg-inline {
+	display: inline-block;
+	margin: 0 0 0 12px !important;
+	width: 62%;
+}
+
 .fc-error {
 	background: #FFBABA url(../images/error.png) no-repeat 10px 50%;
   color: #D8000C !important;
@@ -717,6 +728,7 @@ div label.lang_box img, .fc_assoc_translation img {	border: 1px solid lightgray 
 	padding:6px 6% !important;
 	margin:1px 6% 0px 1px;
 }
+.fcimporttbl {}
 .fcimportdata {
 	padding-top:6px;
 	font-size:12px;
@@ -725,6 +737,13 @@ div label.lang_box img, .fc_assoc_translation img {	border: 1px solid lightgray 
  margin-right:12px !important;
  display: inline !important;
  clear:both;
+}
+.fcimport_sampleline {
+	font-size:12px;
+	font-familiy:tahoma;
+	line-height:1.6em;
+	display:block;
+	margin-top: 12px;
 }
 
 
@@ -831,9 +850,8 @@ dl.tabs dt { font-size:10px !important; font-family:tahoma !important; font-weig
   background-color: #F2F2F2;
   border-bottom: 1px solid #D0D0D0;
   border-right: 1px solid #D0D0D0;
-  font-style: italic;
   font-size: 12px;
-  font-family: arial;
+  font-family: tahoma;
   font-weight: normal;
   text-align: right !important;
   width: 16%;
