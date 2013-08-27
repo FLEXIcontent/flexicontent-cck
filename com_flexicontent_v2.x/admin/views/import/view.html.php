@@ -149,13 +149,25 @@ class FlexicontentViewImport extends JViewLegacy
 		} else {
 			$fleximport = JText::sprintf('FLEXI_FLEXIMPORT_NOT_INSTALLED',JText::_('FLEXI_FLEXIMPORT_INFOS'));
 		}
-
+		
+		
+		// ********************************************************************************
+		// Get field names (from the header line (row 0), and remove it form the data array
+		// ********************************************************************************
+		$file_field_types_list = '"image","file"';
+		$q = 'SELECT id, name, label, field_type FROM #__flexicontent_fields AS fi'
+			//.' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id='.$type_id;
+			.' WHERE fi.field_type IN ('. $file_field_types_list .')';
+		$db->setQuery($q);
+		$file_fields = $db->loadObjectList('name');
+		
 		//assign data to template
 		$this->assignRef('lists'   	, $lists);
 		$this->assignRef('cid'     	, $cid);
 		$this->assignRef('user'			, $user);
 		$this->assignRef('fleximport', $fleximport);
 		$this->assignRef('cparams', $cparams);
+		$this->assignRef('file_fields', $file_fields);
 
 		parent::display($tpl);
 	}
