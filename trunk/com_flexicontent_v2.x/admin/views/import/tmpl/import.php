@@ -321,6 +321,12 @@ function submitbutton(task) {
 							<input type="file" name="csvfile" id="csvfile" value="" class="" />
 						</td>
 					</tr>
+					
+					<tr valign="top">
+						<td colspan="2">
+							<span class="fc-mssg-inline fc-success"> <?php echo JText::_( 'FLEXI_IMPORT_ABOUT_NEW_FILES' ); ?> </span>
+						</td>
+					</tr>
 					<tr valign="top">
 						<td class="key">
 							<label class="fckey" for="import_media_folder"><?php echo JText::_( 'FLEXI_IMPORT_MEDIA_FOLDER' ); ?>
@@ -341,6 +347,20 @@ function submitbutton(task) {
 							<span class="fc-mssg-inline fc-info"><?php echo JText::_( 'FLEXI_IMPORT_FOLDER_DESC' ); ?></span>
 						</td>
 					</tr>
+					<tr valign="top">
+						<td class="key">
+							<label class="fckey" for="import_docs_folder"><?php echo JText::_( 'FLEXI_IMPORT_SKIP_FILE_CHECK' ); ?>
+							</label>
+						</td>
+						<td class="fcimportdata" nowrap="nowrap">
+							<?php foreach ($this->file_fields as $i=> $file_fieid) : ?>
+								<input type="checkbox" id="skip_file_field_<?php echo $i; ?>" name="skip_file_field[]" value="<?php echo $file_fieid->name; ?>" />
+								<label for="skip_file_field_<?php echo $i; ?>" class=""><?php echo $file_fieid->label; ?></label>
+							<?php endforeach; ?>
+							<span class="fc-mssg-inline fc-note"><?php echo JText::_( 'FLEXI_IMPORT_SKIP_FILE_CHECK_DESC' ); ?></span>
+						</td>
+					</tr>
+					
 				</table>
 			</fieldset>
 			</td>
@@ -373,7 +393,7 @@ function submitbutton(task) {
 <br/> <b>NOTE:</b> NEW files must be placed inside media folder,
 <br/> <b>NOTE:</b> It can be the name of an existing image name (if image field is in DB-mode)
 <br/> <b>NOTE:</b> since image field is multi-property / multi-value it can use format of these fields too,
-<br/> properties are: newfile OR existingname, alt, title, desc, urllink <br/><br/>
+<br/> properties are: originalname, alt, title, desc, urllink <br/><br/>
 
 -- f. <b>file</b> field, must contain the file name (<b>new file</b>), OR it can be the id of an existing document (filemanager 's file ID)
 <br/> <b>NOTE:</b> NEW files must be placed inside the document folder<br/><br/>

@@ -1400,7 +1400,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// Check if field has posted data
-		if ( empty($post) || empty($post[0]) ) return;
+		if ( empty($post) ) return;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;   //echo "<pre>"; print_r($post);
@@ -1473,6 +1473,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$new = 0;
     foreach ($post as $n => $v)
     {
+    	if (empty($v)) continue;
+    	
 			// support for basic CSV import / export
 			if ( $is_importcsv && !is_array($v) ) {
 				if ( @unserialize($v)!== false || $v === 'b:0;' ) {  // support for exported serialized data)

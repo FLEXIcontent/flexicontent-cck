@@ -858,6 +858,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
+		$fc_css = JURI::base(true) .'/components/com_flexicontent/assets/css/flexicontentbackend.css';
+		echo '<link rel="stylesheet" href="'.$fc_css.'">';
+		
 		// Get item model
 		$model  = $this->getModel('item');
 		
@@ -978,7 +981,8 @@ class FlexicontentControllerItems extends FlexicontentController
 			// ********************************************************************************
 			$columns = flexicontent_html::arrayTrim($contents[0]);
 			unset($contents[0]);
-			$q = "SELECT id, name FROM #__flexicontent_fields";
+			$q = 'SELECT id, name, field_type FROM #__flexicontent_fields AS fi'
+				.' JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id='.$type_id;
 			$db->setQuery($q);
 			$thefields = $db->loadObjectList('name');
 			unset($thefields['tags']); // Prevent Automated Raw insertion of tags, we will use special code
@@ -1108,7 +1112,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				}
 			}
 			if ( count($unused_columns) && !$ignore_unused_cols) {
-				echo "<script>alert ('File has unused ".count($unused_columns)." columns \'".implode("\' , \'",$unused_columns)."\', please enable: Ignoring of unused columns');";
+				echo "<script>alert ('File has unused ".count($unused_columns)." columns \'".implode("\' , \'",$unused_columns)."\' (these field names are not assigned to choose CONTENT TYPE), please enable: Ignoring of unused columns');";
 				echo "window.history.back();";
 				echo "</script>";
 				jexit();
@@ -1147,7 +1151,122 @@ class FlexicontentControllerItems extends FlexicontentController
 					jexit();
 				}
 			}
-
+			
+			
+			// ***************************************************************
+			// Verify that imported files exist in the media/documents folders
+			// ***************************************************************
+			
+			// Get fields that use files
+			$import_media_folder  = JRequest::getVar('import_media_folder');
+			$import_docs_folder  = JRequest::getVar('import_docs_folder');
+			
+			$mfolder  = JPath::clean( JPATH_SITE .DS. $import_media_folder .DS );
+			$dfolder  = JPath::clean( JPATH_SITE .DS. $import_docs_folder .DS );
+			
+			$ff_types_to_props = array('image'=>'originalname', 'file'=>'_value_');
+			$ff_types_to_paths = array('image' => $mfolder, 'file'=> $dfolder);
+			$ff_names_to_types = array();
+			foreach ($thefields as $_fld) {
+				if ( isset($ff_types_to_props[$_fld->field_type]) )  $ff_names_to_types[$_fld->name] = $_fld->field_type;
+			}
+			
+			// Fields that should be skipped from file checking
+			$skip_file_field = JRequest::getVar('skip_file_field', array());
+			
+			// Get file field present in the header
+			$ff_fields = array();
+			foreach($columns as $col_no => $column) {
+				$fld_name = $columns[$col_no];
+				if ( isset($ff_names_to_types[$fld_name]) )  $ff_fields[$col_no] = $fld_name;
+			}
+			
+			// Get filenames from file columns
+			$filedata_arr = array();
+			foreach($contents as $lineno => $fields)
+			{
+				foreach($ff_fields as $col_no => $fld_name) {
+					$filedata_arr[$fld_name][$lineno] = $fields[$col_no];
+				}
+			}
+			
+			//echo "<pre>"; print_r($filedata_arr); exit;
+			if ( count($filedata_arr) )
+			{
+				$filenames_missing = array();
+				
+				foreach($filedata_arr as $fld_name => $filedata_arr) {
+					if ( in_array($fld_name, $skip_file_field) ) continue;
+					
+					$field_type = $ff_names_to_types[$fld_name];
+					$prop_name = $ff_types_to_props[$field_type];
+					$srcpath_original = $ff_types_to_paths[$field_type];
+					
+					foreach($filedata_arr as $lineno => $field_data) {
+						// Split multi-value field
+						$vals = $field_data ? preg_split("/[\s]*%%[\s]*/", $field_data) : array();
+						$vals = flexicontent_html::arrayTrim($vals);
+						unset($field_values);
+						
+						// Handle each value of the field
+						$field_values = array();
+						foreach ($vals as $i => $val)
+						{
+							// Split multiple property fields
+							$props = $val ? preg_split("/[\s]*!![\s]*/", $val) : array();
+							$props = flexicontent_html::arrayTrim($props);
+							unset($prop_arr);
+							
+							// Handle each property of the value
+							foreach ($props as $j => $prop) {
+								if ( preg_match( '/\[-(.*)-\]=(.*)/', $prop, $matches) ) {
+									$prop_arr[$matches[1]] = $matches[2];
+								}
+							}
+							
+							$filename = '';
+							if ( !isset($prop_arr) ) {
+								$filename = $val;
+							} else {
+								$filename = $prop_arr[$prop_name];
+							}
+							
+							if ( $filename ) {
+								//echo "<pre>"; print_r(JPath::clean( $srcpath_original  . $filename)); exit;
+								$srcfilepath  = JPath::clean( $srcpath_original  . $filename );
+								if ( !JFile::exists($srcfilepath) ) {
+									$filenames_missing[$fld_name][] = "LINE ".$lineno.": ". flexicontent_html::escapeJsText($filename, $skipquote='');
+								}
+							}
+						}
+					}
+				}
+				
+				
+				$skip_file_field = JRequest::getVar('skip_file_field', array());
+				
+				// Cross check them if they already exist in the DB
+				if ( count($filenames_missing) ) {
+					if (!$debug) {
+						echo '<span class="fc-mssg fc-note">(DEBUG was auto enabled for first 2 records)</span>'."\n";
+						$debug = 2; //jexit();
+					}
+					echo '<span class="fc-mssg fc-warning"> CSV File has FILE references to missing media / document files, <br/>please fix or set EACH field to be skipped from checking </span>'."\n";
+					foreach ($filenames_missing as $fld_name => $fld_files_missing) {
+						$field_type = $ff_names_to_types[$fld_name];
+						$srcpath_original = $ff_types_to_paths[$field_type];
+						?>
+						<span class="fc-mssg fc-note">
+						FIELD: <b> <?php echo $fld_name; ?> </b> has <?php echo count($fld_files_missing); ?> missing filename(s) <br/>
+						-- Not found in folder: <b> <?php echo $srcpath_original; ?> </b><br/>
+						-- Missing filenames list: <br/> <?php echo implode('<br/>', $fld_files_missing); ?> <br/>
+						</span>
+						<?php
+					}
+				}
+			}
+			
+			
 			// *********************************************************************************
 			// Handle each row (item) using store() method of the item model to create the items
 			// *********************************************************************************
@@ -1186,6 +1305,7 @@ class FlexicontentControllerItems extends FlexicontentController
 						unset($field_values);
 						
 						// Handle each value of the field
+						$field_values = array();
 						foreach ($vals as $i => $val)
 						{
 							// Split multiple property fields
