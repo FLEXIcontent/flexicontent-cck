@@ -4266,7 +4266,7 @@ class flexicontent_db
 	 * @return object
 	 * @since 1.5
 	 */
-	static function & directQuery($query)
+	static function &directQuery($query)
 	{
 		$db     = JFactory::getDBO();
 		$config = JFactory::getConfig();
@@ -4310,14 +4310,14 @@ class flexicontent_db
 	 * @access private
 	 * @return string
 	 */
-	static function buildItemOrderBy(&$params=null, &$order='', $request_var='orderby', $config_param='orderby', $i_as='i', $rel_as='rel', $default_order='', $default_order_dir='')
+	static function buildItemOrderBy(&$params=null, &$order='', $request_var='orderby', $config_param='orderby', $i_as='i', $rel_as='rel', $default_order='', $default_order_dir='', $sfx='')
 	{
 		// Use global params ordering if parameters were not given
 		if (!$params) $params = JComponentHelper::getParams( 'com_flexicontent' );
 
 		// 1. If forced ordering not given, then use ordering parameters from configuration
 		if (!$order) {
-			$order = $params->get('orderbycustomfieldid', 0) ? 'field' : $params->get($config_param, 'default');
+			$order = $params->get('orderbycustomfieldid'.$sfx, 0) ? 'field' : $params->get($config_param.$sfx, 'default');
 		}
 
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
@@ -4375,8 +4375,8 @@ class flexicontent_db
 
 			// SPECIAL case custom field
 			case 'field':
-				$filter_order = $params->get('orderbycustomfieldint', 0) ? 'CAST(f.value AS UNSIGNED)' : 'f.value';
-				$filter_order_dir	= $params->get('orderbycustomfielddir', 'ASC');
+				$filter_order = $params->get('orderbycustomfieldint'.$sfx, 0) ? 'CAST(f.value AS UNSIGNED)' : 'f.value';
+				$filter_order_dir	= $params->get('orderbycustomfielddir'.$sfx, 'ASC');
 				break;
 
 			// NEW ADDED

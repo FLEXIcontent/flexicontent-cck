@@ -2631,7 +2631,7 @@ class FlexicontentFields
 	static function createItemsListSQL(&$params, &$_itemids_catids=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem)
 	{
 		$db = JFactory::getDBO();
-		$order = $params->get( $isform ? 'orderby_form' : 'orderby', 'alpha' );
+		$sfx = $isform ? '_form' : '';
 		
 		// Get data like aliases and published state
 		$publish_where = '';
@@ -2643,27 +2643,52 @@ class FlexicontentFields
 			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
 		}
 		
-		$extra_join = '';
-		$item_where = '';
+		// item IDs via reversing a relation field
 		if ($reverse_field) {
-			$extra_join .= ' JOIN #__flexicontent_fields_item_relations AS fi_rel'
+			$item_join  = ' JOIN #__flexicontent_fields_item_relations AS fi_rel'
 				.'  ON i.id=fi_rel.item_id AND fi_rel.field_id=' .$reverse_field .' AND CAST(fi_rel.value AS UNSIGNED)=' .$parentitem->id;
-		} else {
+		}
+		// item IDs via a given list (relation field and ... maybe other cases too)
+		else {
 			$item_where = ' AND i.id IN ('. implode(",", array_keys($_itemids_catids)) .')';
 		}
 		
-		$orderby = flexicontent_db::buildItemOrderBy($params, $order, $request_var='', $config_param='', $item_tbl_alias = 'i', $relcat_tbl_alias = 'rel');
+		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
+		$order = $params->get( 'orderby'.$sfx, 'alpha' );
+		$orderby = flexicontent_db::buildItemOrderBy($params, $order, $request_var='', $config_param='', $item_tbl_alias = 'i', $relcat_tbl_alias = 'rel', '', '', $sfx);
+		
+		// Create JOIN for ordering items by a custom field
+		$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid'.$sfx, 0);
+		if ($orderbycustomfieldid) {
+			$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
+		}
+		
+		// Create JOIN for ordering items by a most commented
+		else if ($order=='commented') {
+			$orderby_col  = ', count(com.object_id) AS comments_total';
+			$orderby_join = ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
+		}
+		
+		// Create JOIN for ordering items by a most rated
+		else if ($order=='rated') {
+			$orderby_col  = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
+			$orderby_join = ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
+		}
+		
+		// Because query includes a limited number of related field it should be fast
 		$query = 'SELECT i.*, ext.type_id,'
 			.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
 			.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
+			. @ $orderby_col
 			.' FROM #__content AS i '
 			.' LEFT JOIN #__flexicontent_items_ext AS ext ON i.id=ext.item_id '
-			. $extra_join
+			. @ $item_join
+			. @ $orderby_join
 			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id=rel.itemid '
 			.' LEFT JOIN #__categories AS c ON c.id=rel.catid '
 			.' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			.' WHERE 1 '
-			. $item_where
+			. @ $item_where
 			. $publish_where
 			.' GROUP BY i.id '
 			. $orderby

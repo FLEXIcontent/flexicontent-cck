@@ -341,39 +341,43 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _buildQuery( $query_ids=false )
 	{
-		//static $query = null;
-		//if ( $query!==null ) return $query;
-		$cparams  = $this->_params;
+		$params  = $this->_params;
 		
-		// Get the WHERE and ORDER BY clauses for the query
+		// Get FROM and JOIN SQL CLAUSES
 		$fromjoin = $this->_buildItemFromJoin();
 		
 		if ( !$query_ids ) {
-			// Create where and orderby
-			$order = '';
-			$where   = $this->_buildItemWhere();
-			$orderby = $this->_buildItemOrderBy($order);
 			
 			// Create JOIN (and select column) of image field used as item image in RSS feed
-			$feed_image_source = JRequest::getCmd("type", "") == "rss"  ?  (int) $cparams->get('feed_image_source', 0)  :  0;
+			$feed_image_source = JRequest::getCmd("type", "") == "rss"  ?  (int) $params->get('feed_image_source', 0)  :  0;
 			if ($feed_image_source) {
 				$feed_img_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS img ON img.item_id = i.id AND img.field_id='.$feed_image_source;
 				$feed_img_col = ', img.value as image';
 			}
 			
+			// Create sql WHERE clause
+			$where   = $this->_buildItemWhere();
+			
+			// Create sql ORDERBY clause -and- set 'order' variable (passed by reference), that is, if frontend user ordering override is allowed
+			$order = '';
+			$orderby = $this->_buildItemOrderBy($order);
+			
 			// Create JOIN for ordering items by a custom field
-			$orderbycustomfieldid = $cparams->get('orderbycustomfieldid', 0);
+			$orderbycustomfieldid = $params->get('orderbycustomfieldid', 0);
 			if ($orderbycustomfieldid) {
-				$order_field_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$cparams->get('orderbycustomfieldid', 0);
+				$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
 			}
 			
-			// Create JOIN for ordering items by a special ordering
-			if ($order=='commented') {
-				$select_comments = ', count(com.object_id) AS comments_total';
-				$join_comments   = ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
-			} else if ($order=='rated') {
-				$select_comments = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
-				$join_comments   = ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
+			// Create JOIN for ordering items by a most commented
+			else if ($order=='commented') {
+				$orderby_col = ', count(com.object_id) AS comments_total';
+				$orderby_join   = ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
+			}
+			
+			// Create JOIN for ordering items by a most rated
+			else if ($order=='rated') {
+				$orderby_col = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
+				$orderby_join   = ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
 			}
 		} else {
 			$select_access = $this->_buildAccessSelect();
@@ -383,7 +387,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			//$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id ';  // Will cause problems with 3rd-party extensions that modify the query
 			//$query = 'SELECT DISTINCT i.id ';
 			$query = 'SELECT i.id '
-				. @ $select_comments
+				. @ $orderby_col
 				;
 		} else {
 			//$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
@@ -405,8 +409,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				;
 		} else {
 			$query .= ""
-				. @ $order_field_join  // optional
-				. @ $join_comments     // optional
+				. @ $orderby_join  // optional
 				. $where
 				. ' GROUP BY i.id '
 				. $orderby
@@ -1510,8 +1513,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		
 		// Parameters meant for lists
-		$params->set('show_title', $params->get('show_title_lists'));          // Parameter meant for lists
-		$params->set('title_linkable', $params->get('title_linkable_lists'));  // Parameter meant for lists
+		$params->set('show_title', $params->get('show_title_lists'));    // Parameter meant for lists
+		$params->set('link_titles', $params->get('link_titles_lists'));  // Parameter meant for lists
 		
 		// Set filter values (initial or locked) via configuration parameters
 		FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
