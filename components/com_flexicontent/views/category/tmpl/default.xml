@@ -221,12 +221,12 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_title" type="list" default="" label="FLEXI_SHOWTITLE_IN_LISTS" description="FLEXI_SHOWTITLE_IN_LISTS_DESC">
+			<field name="show_title_lists" type="list" default="" label="FLEXI_SHOWTITLE_IN_LISTS" description="FLEXI_SHOWTITLE_IN_LISTS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
 			</field>
-			<field name="link_titles" type="list" default="" label="FLEXI_LINKED_TITLES_IN_LISTS" description="FLEXI_LINKED_TITLES_IN_LISTS_DESC">
+			<field name="link_titles_lists" type="list" default="" label="FLEXI_LINKED_TITLES_IN_LISTS" description="FLEXI_LINKED_TITLES_IN_LISTS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

@@ -1427,8 +1427,8 @@ class FlexicontentController extends JControllerLegacy
 			}
 			
 			$app = JFactory::getApplication();
-			$app->getCfg('tmp_path');
-			$targetpath = JPath::clean($app->getCfg('tmp_path').DS.time());
+			$tmp_ffname = 'fcmd_uid_'.$user->id.'_'.date('Y-m-d__H-i-s');
+			$targetpath = JPath::clean($app->getCfg('tmp_path') .DS. $tmp_ffname);
 			
 			$tree_files = $this->_traverseFileTree($nodes, $targetpath);
 			//echo "<pre>"; print_r($tree_files); exit;
@@ -1583,14 +1583,15 @@ class FlexicontentController extends JControllerLegacy
 		}
 		
 		if ($task=='download_tree') {
+			// Create target (top level) folder
+			JFolder::create($targetpath, 0755);
 			// Copy Files
 			foreach ($valid_files as $file) JFile::copy($file->abspath, $file->node->targetpath);
 			
 			// Get file list recursively, and calculate archive filename
 			$fileslist   = JFolder::files($targetpath, '.', $recurse=true, $fullpath=true);
-			$archivename = $user->id."_".time().(FLEXI_J16GE ? '.zip' : '.tar.gz');
+			$archivename = $tmp_ffname . (FLEXI_J16GE ? '.zip' : '.tar.gz');
 			$archivepath = JPath::clean( $app->getCfg('tmp_path').DS.$archivename );
-			//echo "Compressing folder: ". $targetpath ." into archive: ". $archivepath ."<br>\n";
 			
 			// Create the archive
 			if (!FLEXI_J16GE) {
@@ -1620,8 +1621,23 @@ class FlexicontentController extends JControllerLegacy
 				$app->enqueueMessage($msg, 'notice');
 			}
 			
+			// Delete old files (they can not be deleted during download time ...)
+			$tmp_path = JPath::clean($app->getCfg('tmp_path'));
+			$matched_files = JFolder::files($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
+			foreach ($matched_files as $archive_file) {
+				//echo "Seconds passed:". (time() - filemtime($tmp_folder)) ."<br>". "$filename was last modified: " . date ("F d Y H:i:s.", filemtime($tmp_folder)) . "<br>";
+				if (time() - filemtime($archive_file) > 3600) JFile::delete($archive_file);
+			}
+			
+			// Delete old tmp folder (in case that the some archiving procedures were interrupted thus their tmp folder were not deleted)
+			$matched_folders = JFolder::folders($tmp_path, 'fcmd_uid_.*', $recurse=false, $fullpath=true);
+			foreach ($matched_folders as $tmp_folder) {
+				//echo "Seconds passed:". (time() - filemtime($tmp_folder)) ."<br>". "$filename was last modified: " . date ("F d Y H:i:s.", filemtime($tmp_folder)) . "<br>";
+				JFolder::delete($tmp_folder);
+			}
+			
 			$dlfile = new stdClass();
-			$dlfile->filename = $archivename;
+			$dlfile->filename = 'cart_files_'.date('m-d-Y_H-i-s').(FLEXI_J16GE ? '.zip' : '.tar.gz');   // a friendly name instead of  $archivename
 			$dlfile->abspath  = $archivepath;
 		} else {
 			$dlfile = reset($valid_files);
@@ -1674,7 +1690,7 @@ class FlexicontentController extends JControllerLegacy
 		// ****************************************************
 		// In case of multi-download clear the session variable
 		// ****************************************************
-		if ($task=='download_tree') $ztree_nodes_json = $session->set('ztree_nodes_json', false,'flexicontent');
+		//if ($task=='download_tree') $ztree_nodes_json = $session->set('ztree_nodes_json', false,'flexicontent');
 		
 		// Done ... terminate execution
 		$app->close();
