@@ -45,7 +45,7 @@
 	margin: 0 1%;
 }
 
-.carousel.mod_flexicontent_wrapper a.mod_fc_nav {
+.carousel.mod_flexicontent_wrapper span.mod_fc_nav {
 	background: url("images/nav.png") no-repeat scroll -20% 50% #000000 !important;
 	border-radius: 10px 0 0 10px !important;
 	cursor: pointer !important;
@@ -59,7 +59,7 @@
 	top: 0;
 	width: 28px;
 }
-.carousel.mod_flexicontent_wrapper a.mod_fc_nav.fc_next {
+.carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_next {
 	background-position: 115% 50% !important;
 	border-radius: 0 10px 10px 0 !important;
 	left: auto !important;

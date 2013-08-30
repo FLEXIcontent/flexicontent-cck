@@ -21,6 +21,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //include constants file
 require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
+if (!function_exists('json_encode')) { // PHP < 5.2 lack support for json
+	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'json'.DS.'jsonwrapper_inner.php');
+} 
+
 class flexicontent_html
 {
 	static function escape($str) {
@@ -2741,7 +2745,7 @@ class flexicontent_html
 				$access_names = array();
 				foreach ($_arr as $o) $access_names[$o->id] = JText::_($o->title);
 			} else {
-				$access_names = array(0=>'Public', 1=>'Registered', 2=>'Special');
+				$access_names = array(0=>'Public', 1=>'Registered', 2=>'Special', 3=>'Privileged');
 			}
 		}
 		
@@ -4260,6 +4264,29 @@ class FLEXIUtilities
  */
 class flexicontent_db
 {
+	/**
+	 * Helper method to execute an SQL file containing multiple queries
+	 *
+	 * @return object
+	 * @since 1.5
+	 */
+	function execute_sql_file($sql_file)
+	{
+		$queries = file_get_contents( $sql_file );
+		$queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $queries);
+		
+		$db = JFactory::getDBO();
+		foreach ($queries as $query) {
+			$query = trim($query);
+			if (!$query) continue;
+			
+			$db->setQuery($query);
+			$result = $db->query();
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		}
+	}
+	
+	
 	/**
 	 * Helper method to execute a query directly, bypassing Joomla DB Layer
 	 *
