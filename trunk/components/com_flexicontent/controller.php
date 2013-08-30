@@ -65,7 +65,7 @@ class FlexicontentController extends JControllerLegacy
 				echo JRoute::_(FlexicontentHelperRoute::getCategoryRoute($categoryslug), false);
 			}
 		}
-		exit;
+		jexit();
 	}
 	
 	
@@ -89,8 +89,8 @@ class FlexicontentController extends JControllerLegacy
 		//$lang = flexicontent_html::getUserCurrentLang();
 		
 		// Nothing to do
-		if ( $type!='basic_index' && $type!='adv_index' ) exit;
-		if ( !strlen($text) ) exit;
+		if ( $type!='basic_index' && $type!='adv_index' ) jexit();
+		if ( !strlen($text) ) jexit();
 		
 		// All starting words are exact words but last word is a ... word prefix
 		$words = preg_split('/\s\s*/u', $text);
@@ -158,7 +158,7 @@ class FlexicontentController extends JControllerLegacy
 			if ($n >= $pageSize) break;
 		}
 		echo json_encode($options);
-		exit;
+		jexit();
 	}
 	
 	
@@ -279,7 +279,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		// USEFULL FOR DEBUGING for J2.5 (do not remove commented code)
 		//$diff_arr = array_diff_assoc ( $data, $post);
-		//echo "<pre>"; print_r($diff_arr); exit();
+		//echo "<pre>"; print_r($diff_arr); jexit();
 		
 		
 		// ********************************************************************************
@@ -531,7 +531,7 @@ class FlexicontentController extends JControllerLegacy
 				else if ($isnew)                   $notify_text = $params->get('text_notify_new');
 				else if ($needs_version_reviewal)  $notify_text = $params->get('text_notify_existing_reviewal');
 				else if (!$isnew)                  $notify_text = $params->get('text_notify_existing');
-				//print_r($notify_emails); exit;
+				//print_r($notify_emails); jexit();
 			}
 		}
 		
@@ -1044,7 +1044,7 @@ class FlexicontentController extends JControllerLegacy
 				return;
 			} else {
 				echo json_encode($result);
-				exit();
+				jexit();
 			}
 		}
 		
@@ -1130,7 +1130,7 @@ class FlexicontentController extends JControllerLegacy
 					return;
 				} else {
 					echo json_encode($result);
-					exit();
+					jexit();
 				}
 			}
 		}
@@ -1150,7 +1150,7 @@ class FlexicontentController extends JControllerLegacy
 			return;
 		} else {
 			echo json_encode($result);
-			exit();
+			jexit();
 		}
 	}
 
@@ -1251,7 +1251,7 @@ class FlexicontentController extends JControllerLegacy
 			$name = $model->get('name');
 			echo $id."|".$name;
 		}
-		exit;
+		jexit();
 	}
 
 	/**
@@ -1366,27 +1366,33 @@ class FlexicontentController extends JControllerLegacy
 		return $all_files;
 	}
 	
+	
+	function call_extfunc() {
+		$exttype = JRequest::getVar( 'exttype', 'modules' );
+		$extname = JRequest::getVar( 'extname', '' );
+		$extfunc = JRequest::getVar( 'extfunc', '' );
 		
-	/**
-	 * Set file/folder tree into user's session
-	 *
-	 * @access public
-	 * @since 1.0
-	 */
-	function setfilestree()
-	{
-		$tree_var = JRequest::getVar( 'tree_var', "" );
-		$tree_json = JRequest::getVar( $tree_var, "" );
+		if ($exttype!='modules') jexit();  // currently supporting only plugins
+		if (!$extname || !$extfunc) jexit();  // require variable not set
 		
-		// Some validation check
-		$nodes = json_decode($tree_json);
-		if ( !is_array($nodes) ) { echo "tree data invalid"; jexit(); }
+		// Import helper file
+		$helper_path = JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php';
+		if ( !file_exists($helper_path) ) { echo "no helper file found at expected path"; jexit(); }
+		require_once ($helper_path);
 		
-		// Set tree data into session
-		$session = JFactory::getSession();
-		$session->set($tree_var, $tree_json, 'flexicontent');
-		echo "tree data stored";
-		jexit();
+		// Create object
+		$classname = 'mod'.ucwords($extname).'Helper';
+		if ( !class_exists($classname) ) { echo "no correctly named class inside helper file"; jexit(); }
+		$obj = new $classname();
+		
+		// Security concern, only methods 'confirmed' methods will be callable
+		if ( !in_array($extfunc, $obj->task_callable) ) { echo "non-allowed method called"; jexit(); }
+		
+		// Method actually exists
+		if ( !method_exists($obj, $extfunc) ) { echo "non-existing method called "; jexit(); }
+		
+		// Final call the method
+		$obj->$extfunc();
 	}
 	
 	
@@ -1414,8 +1420,9 @@ class FlexicontentController extends JControllerLegacy
 		if ($task == 'download_tree')
 		{
 			// Get zTree data and parse JSON string
-			if ($session->has('ztree_nodes_json', 'flexicontent')) {
-				$ztree_nodes_json = $session->get('ztree_nodes_json', false,'flexicontent');
+			$tree_var = JRequest::getVar( 'tree_var', "" );
+			if ($session->has($tree_var, 'flexicontent')) {
+				$ztree_nodes_json = $session->get($tree_var, false,'flexicontent');
 			}
 			$nodes = json_decode($ztree_nodes_json);
 			
@@ -1431,7 +1438,7 @@ class FlexicontentController extends JControllerLegacy
 			$targetpath = JPath::clean($app->getCfg('tmp_path') .DS. $tmp_ffname);
 			
 			$tree_files = $this->_traverseFileTree($nodes, $targetpath);
-			//echo "<pre>"; print_r($tree_files); exit;
+			//echo "<pre>"; print_r($tree_files); jexit();
 			
 			if ( empty($tree_files) ) {
 				$app->enqueueMessage("No files selected for download", 'notice');
@@ -1503,7 +1510,7 @@ class FlexicontentController extends JControllerLegacy
 			$file = $db->loadObject();
 			if ($db->getErrorNum())  {
 				JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-				exit;
+				jexit();
 			}
 			
 			
@@ -1575,7 +1582,7 @@ class FlexicontentController extends JControllerLegacy
 			$file->node = $file_node;
 			$valid_files[$fileid] = $file;
 		}
-		//echo "<pre>"; print_r($valid_files); exit;
+		//echo "<pre>"; print_r($valid_files); jexit();
 		
 		// * Required for IE, otherwise Content-disposition is ignored
 		if (ini_get('zlib.output_compression')) {
@@ -1659,7 +1666,7 @@ class FlexicontentController extends JControllerLegacy
 		// *****************************************
 		// Output an appropriate Content-Type header
 		// *****************************************
-		//echo "<pre>"; print_r($dlfile); exit;
+		//echo "<pre>"; print_r($dlfile); jexit();
 		/*
 		JResponse::setHeader('Pragma', 'public');
 		JResponse::setHeader('Expires', 0);
@@ -1690,7 +1697,7 @@ class FlexicontentController extends JControllerLegacy
 		// ****************************************************
 		// In case of multi-download clear the session variable
 		// ****************************************************
-		//if ($task=='download_tree') $ztree_nodes_json = $session->set('ztree_nodes_json', false,'flexicontent');
+		//if ($task=='download_tree') $session->set($tree_var, false,'flexicontent');
 		
 		// Done ... terminate execution
 		$app->close();
@@ -1864,7 +1871,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			echo implode(",", $array);
 			echo "]";
-			exit;
+			jexit();
 		}
 	}
 	

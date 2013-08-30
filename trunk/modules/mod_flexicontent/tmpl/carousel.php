@@ -301,8 +301,8 @@ $_ns_fxOptions    = "{duration:".$duration."}";
 <div class="mod_fc_carousel">
 	
 	<?php if ($show_controls==1) : ?>
-	<a id="previous_fcmod_<?php echo $module->id; ?>" class="mod_fc_nav fc_prev" href="#"></a>
-	<a id="next_fcmod_<?php echo $module->id; ?>"     class="mod_fc_nav fc_next" href="#"></a>
+	<span id="previous_fcmod_<?php echo $module->id; ?>" class="mod_fc_nav fc_prev" ></span>
+	<span id="next_fcmod_<?php echo $module->id; ?>"     class="mod_fc_nav fc_next" ></span>
 	<?php endif; ?>
 	
 	<div id="mod_fc_carousel_mask<?php echo $module->id ?>" class="mod_fc_carousel_mask <?php echo $show_controls==1 ? 'fc_has_nav' : ''; ?>">

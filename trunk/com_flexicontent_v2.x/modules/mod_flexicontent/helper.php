@@ -1331,9 +1331,9 @@ class modFlexicontentHelper
 		$join_rated       = $add_rated ? $join_rated_type.' #__content_rating AS cr ON cr.content_id = i.id' : '' ;
 		
 		
-		// ************
-		// Get ordering
-		// ************
+		// *****************************************************************************************************************************
+		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
+		// *****************************************************************************************************************************
 		
 		$orderby = '';
 		if ($ordering) {
