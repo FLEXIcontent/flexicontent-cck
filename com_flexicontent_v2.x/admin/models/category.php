@@ -47,8 +47,12 @@ class FlexicontentModelCategory extends JModelAdmin
 		parent::__construct();
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
-		if( FLEXI_J16GE && !@$array[0] )
+		if ( !@$array[0] ) {
+			// Try id variable too (needed by J3.0+)
 			$array = JRequest::getVar('id',  0, '', 'array');
+		}
+		// Make sure id variable is set (needed by J3.0+ controller)
+		JRequest::setVar('id', (int)$array[0]);
 		$this->setId((int)$array[0]);
 	}
 
@@ -519,8 +523,7 @@ class FlexicontentModelCategory extends JModelAdmin
 			}
 
 			// Convert the metadata field to an array.
-			$registry = new JRegistry();
-			$registry->loadJSON($result->metadata);
+			$registry = new JRegistry($result->metadata);
 			$result->metadata = $registry->toArray();
 
 			// Convert the created and modified dates to local user time for display in the form.

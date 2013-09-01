@@ -1,0 +1,263 @@
+
+/* Toolbar icons */
+.icon-32-person2			{ background-image: url(../images/person2_f2.png); }
+.icon-32-savenew			{ background-image: url(../images/savenew.png); }
+.icon-32-go						{ background-image: url(../../../../images/go_f2.png); }
+.icon-32-download			{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-export.png); }
+.icon-32-language			{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-html.png); }
+.icon-32-params				{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-copy.png); }
+.icon-32-import				{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-upload.png); }
+.icon-32-duplicate		{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-copy.png); }
+.icon-32-preview			{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-preview.png); }
+.icon-32-translate		{ background-image: url(../images/icon-32-country-flags.png); }
+.icon-32-basicindex		{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-refresh.png); }
+.icon-32-advindex			{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-refresh.png); }
+.icon-32-advindexdirty	{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-refresh.png); }
+.icon-32-advindexpurge	{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-purge.png); }
+
+
+/* small labels */
+.label, .badge {
+	background-color: #999999;
+	color: #FFFFFF;
+	display: inline-block;
+	font-size: 10.998px;
+	font-weight: bold;
+	line-height: 14px;
+	padding: 2px 4px;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	vertical-align: baseline;
+	white-space: nowrap;
+	border-radius: 4px;
+}
+
+
+/* Permissions slider */
+
+#permissions-sliders .pane-toggler-down span.level,
+#permissions-sliders .pane-toggler span.level {
+	background-image:none; padding:0;
+}
+#flexicontent ul#rules ul .panel {
+	margin: 2px 0px !important;
+	padding: 0px !important;
+}
+#flexicontent .pane-slider ul.adminformlist,
+#flexicontent ul#rules,
+#flexicontent ul#rules ul {
+	list-style-type: none !important;
+	margin: 0px !important;
+	padding: 0px !important;
+}
+#permissions-sliders ul#rules table.group-rules th,
+#permissions-sliders ul#rules table.group-rules td {
+	padding: 0px 4px 0px 8px !important;
+	text-align: left;
+}
+#permissions-sliders ul#rules table.group-rules { border-collapse: collapse; width: 100%; }
+#permissions-sliders .mypanel table.group-rules { margin: 5px; }
+#permissions-sliders ul#rules table.group-rules td { margin: 0px 4px 0px 12px; }
+
+div.credits img {
+	margin: 15px 0;
+}
+
+
+
+/* Other */
+
+ul.adminformlist {
+	list-style-position:outside !important;
+	list-style-type:none !important;
+	margin:0px !important;
+	padding:0px !important;
+}
+
+div.col {
+	float:left;
+}
+
+div div#element-box div.m {
+	background-color: #FFFFFF;
+}
+
+
+
+/* Fieldsets layout */
+fieldset.adminform ul.checklist li label {
+	clear: both; /* e.g. usergroups */
+}
+
+fieldset.adminform fieldset.radio,
+fieldset.panelform fieldset.radio,
+fieldset.adminform-legacy fieldset.radio {
+	border: 0 none !important;
+	float: left !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+div fieldset label.radiobtn {
+	display:inline-block;
+	white-space:nowrap;
+	padding-right: 8px;
+	min-width:0px;
+	margin: 0px 0px 0px 2px;
+	float: left;
+	clear:none;
+}
+
+div fieldset.adminform fieldset.radio label,
+div fieldset.panelform fieldset.radio label {
+	float:left;
+	min-width:0px;
+	margin-top:4px;
+	width:auto!important;
+}
+
+div fieldset.panelform {
+	padding:0px;
+	margin: 0px 12px 0px 8px;
+}
+
+#jform_tid-lbl, #jform_attribs_ilayout-lbl,
+div fieldset.panelform label.hasTip, div fieldset.panelform label.hasTooltip,
+.fc_fieldset label.hasTip, .fc_fieldset label.hasTooltip
+ {
+	clear: both;
+	padding: 4px 3px !important;
+	margin: 2px 4px 0px 4px !important;
+	background-color: #F2F2F2;
+	border-bottom: 1px solid #D0D0D0;
+	border-right: 1px solid #D0D0D0;
+	color: #666666;
+	font-weight: normal;
+	text-align: right;
+	width: 132px;
+	overflow:hidden;
+	display: inline-block;
+}
+
+div fieldset label {
+	margin: 2px 8px 2px 2px;
+	clear: none;
+}
+
+div.fieldset_value,
+div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
+div.panel fieldset img, div.panel fieldset button,
+fieldset.panelform label,
+fieldset.panelform input, fieldset.panelform textarea, fieldset.panelform select,
+fieldset.panelform img, fieldset.panelform button {
+	float: left !important;
+	margin:4px 8px 0px 12px!important;
+	padding:2px !important;
+	display:inline-block;
+	font-size:12px;
+	font-family: arial;
+}
+
+div.width-20 fieldset, div.width-30 fieldset, div.width-35 fieldset, div.width-40 fieldset, div.width-45 fieldset, div.width-50 fieldset, div.width-55 fieldset, div.width-60 fieldset, div.width-65 fieldset, div.width-70 fieldset, div.width-80 fieldset, div.width-100 fieldset {
+	background-color: #FFFFFF !important;
+	padding: 5px 8px 8px 5px !important;
+}
+
+div fieldset.panelform textarea {
+	margin:2px 4px 4px 12px !important;
+	width:auto !important;
+}
+
+div fieldset.panelform label {
+	min-width:132px;
+	text-align: right;
+}
+
+div fieldset.panelform td {
+	border:1px solid #e0e0e0;
+	background-color: #efefef;
+}
+
+div fieldset.panelform table {
+	width:100%;
+}
+
+div #jform_params_target { width: 170px; }
+
+div #jform_params_image { width: 60px; }
+
+div #jform_params_show_print_icon,
+div #jform_params_show_email_icon {	width:140px; }
+
+div #jformtid {	scroll: visible;	height:60px;	width:60%;  }
+
+div #jform_params_filters { display:block; width:50%; float:left; }
+
+#jform_attribs_separator1-lbl, #jform_attribs_separator2-lbl, #jform_attribs_separator3-lbl, #jform_attribs_separator4-lbl, #jform_attribs_separator5-lbl,
+#jform_attribs_separator6-lbl, #jform_attribs_separator7-lbl, #jform_attribs_separator8-lbl, #jform_attribs_separator9-lbl, #jform_attribs_separator10-lbl, 
+#jform_attribs_separator11-lbl, #jform_attribs_separator12-lbl { font-weight:bold;}
+.panel .panelform .spacer {border-top:1px dashed gray; border-bottom:1px dashed lightgray; display:block; margin:6px; float:left; clear:both; width:94%; height:0px;}
+
+
+
+/* Tables layout */
+
+td.key label {
+	float:none;
+	display:inline;
+}
+
+div table.adminform {
+	background-color: #F4F4F4;
+	font-size:11px;
+}
+
+div table.admintable {
+	font-size:11px;
+	border-collapse: separate;
+	border-spacing: 2px !important;
+}
+
+#flexicontent table.adminform {
+	background-color: #FCFCFC;
+	font-size:11px;
+}
+
+#titleblock input, #aliasblock input {
+	font-size:10px !important; 
+}
+
+div table.adminform td {
+	font-size:11px;
+	padding:2px 2px;
+	text-align:left;
+}
+
+div table.adminform input { font-size:11px !important; padding:2px; }
+div table.adminform select { font-size:10px; }
+
+div table.admintable td {
+	/*background-color:#F9F9F9;*/
+	border: 0px solid #F0F0F0;
+	font-weight: normal;
+	text-align: left;
+	padding: 2px 4px 2px 8px;
+}
+div table.admintable td.key, div table.admintable td.paramlist_key {
+	background-color: #F2F2F2;
+	border-bottom: 1px solid #D0D0D0;
+	border-right: 1px solid #D0D0D0;
+	color: #666666;
+	font-family: arial;
+	font-weight: normal;
+	font-size: 11px;
+	text-align: right;
+	width: 140px;
+	padding: 2px 4px 2px 4px;
+}
+
+table.admintable fieldset {
+	border: 0 none;
+	float: left;
+	margin: 0 !important;
+	padding: 0 !important;
+}

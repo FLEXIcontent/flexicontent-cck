@@ -283,8 +283,8 @@ table#filemanager-zone label {
 			  	<?php echo JText::_( 'FLEXI_SEARCH' ); ?>
 			  	<?php echo $this->lists['filter']; ?>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
-				<button onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-				<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+				<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
+				<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 			</td>
 			<td nowrap="nowrap">
 				<?php echo $this->lists['url']; ?>

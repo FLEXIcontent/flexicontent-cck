@@ -831,11 +831,13 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				?>
 				<fieldset class="flexi_params panelform">
 					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-						<div class="fclear"></div>
+						<div class="fcclear"></div>
 						<?php echo $field->label; ?>
-						<div class="container_fcfield">
-							<?php echo $field->input; ?>
-						</div>
+						<?php if (strlen(trim($field->input))) :?>
+							<div class="container_fcfield">
+								<?php echo $field->input; ?>
+							</div>
+						<?php endif; ?>
 					<?php endforeach; ?>
 				</fieldset>
 		<?php endforeach; ?>

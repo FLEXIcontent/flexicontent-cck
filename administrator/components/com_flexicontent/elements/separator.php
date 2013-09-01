@@ -35,6 +35,7 @@ div .paramlist_value label {
 }
 div .paramlist_value input, div .paramlist_value textarea, div .paramlist_value img, div .paramlist_value button { margin:5px 0px 2px 0px; }
 div .paramlist_value select { margin:0px; }
+fieldset.radio  { margin: 0; padding: 0; }
 
 .tool-tip { min-width: 480px !important; }
 .tool-title { }
@@ -43,7 +44,11 @@ div .paramlist_value select { margin:0px; }
 
 $document = JFactory::getDocument();
 $document->addStyleDeclaration($css);
-//$document->addStyleSheet('../tmpl/params.css');
+$option = JRequest::getVar('option');
+if ($option=='com_config') {
+	$document->addStyleSheet('components/com_flexicontent/assets/css/flexi_form.css');
+	if (FLEXI_J30GE)  $document->addStyleSheet('components/com_flexicontent/assets/css/j3x.css');
+}
 
 class JElementSeparator extends JElement
 {
@@ -97,7 +102,7 @@ class JElementSeparator extends JElement
 		
 		$class = ""; $title = "";
 		if ($description) {
-			$class = "hasTip";
+			$class = FLEXI_J30GE ? "hasTooltip" : "hasTip";
 			$title = JText::_($value)."::".JText::_($description);
 		}
 		

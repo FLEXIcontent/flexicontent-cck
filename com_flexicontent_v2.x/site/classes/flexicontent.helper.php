@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1717 2013-08-13 14:52:21Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1745 2013-08-30 20:28:18Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -229,14 +229,18 @@ class flexicontent_html
 		static $jquery_added = false;
 		static $jquery_ui_added = false;
 		static $jquery_ui_css_added = false;
+		$document = JFactory::getDocument();
 
 		if (FLEXI_J30GE) {
-			if (!$jquery_added) JHtml::_('jquery.framework');
+			if (!$jquery_added) {
+				JHtml::_('jquery.framework');
+				JHtml::_('jquery.ui', array('core', 'sortable')); 
+				$document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
+			}
 			$jquery_added = 1;
 			return;
 		}
 
-		$document = JFactory::getDocument();
 		if ( $add_jquery && !$jquery_added && !JPluginHelper::isEnabled('system', 'jquerysupport') )
 		{
 			$document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-'.FLEXI_JQUERY_VER.'.js');
@@ -2652,7 +2656,7 @@ class flexicontent_html
 		$button_html	.= "$text\n";
 		$button_html	.= "</a>\n";
 
-		$toolbar->appendButton('Custom', $button_html, 'archive');
+		$toolbar->appendButton('Custom', $button_html, $name);
 	}
 	
 	
@@ -3175,8 +3179,11 @@ class flexicontent_tmpl
 					$pos    = & $groups->group;
 					if ($pos) {
 						for ($n=0; $n<count($pos); $n++) {
-							$themes->items->{$tmpl}->attributes[$n] = $pos[$n]->attributes();
-							$themes->items->{$tmpl}->positions[$n] = $pos[$n]->getName();
+							$themes->items->{$tmpl}->attributes[$n] = array();
+							foreach ($pos[$n]->attributes() as $_attr_name => $_attr_val) {
+								$themes->items->{$tmpl}->attributes[$n][(string)$_attr_name] = (string)$_attr_val;
+							}
+							$themes->items->{$tmpl}->positions[$n] = (string)$pos[$n];
 						}
 					}
 
@@ -3185,7 +3192,7 @@ class flexicontent_tmpl
 					if ($cssfile) {
 						for ($n=0; $n<count($cssfile); $n++) {
 							$themes->items->{$tmpl}->css = new stdClass();
-							$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->getName();
+							$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$cssfile[$n];
 						}
 					}
 					$js 		= & $document->jsitem;
@@ -3193,7 +3200,7 @@ class flexicontent_tmpl
 					if ($jsfile) {
 						for ($n=0; $n<count($jsfile); $n++) {
 							$themes->items->{$tmpl}->js = new stdClass();
-							$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->getName();
+							$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$jsfile[$n];
 						}
 					}
 
@@ -3278,8 +3285,11 @@ class flexicontent_tmpl
 					$pos    = & $groups->group;
 					if ($pos) {
 						for ($n=0; $n<count($pos); $n++) {
-							$themes->category->{$tmpl}->attributes[$n] = $pos[$n]->attributes;
-							$themes->category->{$tmpl}->positions[$n] = $pos[$n]->getName();
+							$themes->category->{$tmpl}->attributes[$n] = array();
+							foreach ($pos[$n]->attributes() as $_attr_name => $_attr_val) {
+								$themes->category->{$tmpl}->attributes[$n][(string)$_attr_name] = (string)$_attr_val;
+							}
+							$themes->category->{$tmpl}->positions[$n] = (string)$pos[$n];
 						}
 					}
 					$css     = & $document->csscategory;
@@ -3287,7 +3297,7 @@ class flexicontent_tmpl
 					if ($cssfile) {
 						for ($n=0; $n<count($cssfile); $n++) {
 							$themes->category->{$tmpl}->css = new stdClass();
-							$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->getName();
+							$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$cssfile[$n];
 						}
 					}
 					$js     = & $document->jscategory;
@@ -3295,7 +3305,7 @@ class flexicontent_tmpl
 					if ($jsfile) {
 						for ($n=0; $n<count($jsfile); $n++) {
 							$themes->category->{$tmpl}->js = new stdClass();
-							$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->getName();
+							$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$jsfile[$n];
 						}
 					}
 				} else {

@@ -55,7 +55,9 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 	}
 </script>
 <form action="index.php?controller=users" method="post" name="adminForm" autocomplete="off">
-	<div class="col width-45">
+
+	<div class="row-fluid">
+	<div class="col <?php echo FLEXI_J30GE ? 'span5' : 'width-45';?>">
 		
 	 <fieldset class="adminform">			
 	 <legend style='color:darkred;'><?php echo JText::_( 'FLEXI_AUTHOR_JOOMLA_USER_DATA' ); ?></legend>
@@ -67,7 +69,7 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 			<table class="admintable" cellspacing="1">
 				<?php foreach($this->form->getFieldset('user_details') as $field) :?>
 					<tr>
-						<td width="150" class="key"><small><?php echo $field->label; ?></small></td>
+						<td width="150" class="key"><?php echo $field->label; ?></td>
 						<td><?php echo $field->input; ?></td>
 					</tr>
 				<?php endforeach; ?>
@@ -81,7 +83,7 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 		</fieldset>
 		
 		
-	<div style='margin:0px 10px;' >
+	<div style='margin:0px 6px;' >
 		<?php
 		echo JHtml::_('sliders.start');
 		foreach ($this->form->getFieldsets() as $fieldset) :
@@ -179,7 +181,7 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 						<?php echo $this->lists['gid']; ?>
 					</td>
 				</tr>
-				<?php if ($this->me->authorize( 'com_users', 'block user' )) { ?>
+				<?php if (FLEXI_J16GE ? $this->me->authorise( 'com_users', 'block user' ) : $this->me->authorize( 'com_users', 'block user' )) { ?>
 				<tr>
 					<td class="key">
 						<?php echo JText::_( 'Block User' ); ?>
@@ -188,7 +190,7 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 						<?php echo $this->lists['block']; ?>
 					</td>
 				</tr>
-				<?php } if ($this->me->authorize( 'com_users', 'email_events' )) { ?>
+				<?php } if (FLEXI_J16GE ? $this->me->authorise( 'com_users', 'email_events' ) : $this->me->authorize( 'com_users', 'email_events' )) { ?>
 				<tr>
 					<td class="key">
 						<?php echo JText::_( 'Receive System Emails' ); ?>
@@ -241,13 +243,11 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 			<table class="admintable" style="width:100%">
 				<tr>
 					<td>
-						<br />
-						<span class="note" style="padding:16px; border:1px solid lightgray;">
+						<span class="fc-mssg fc-note" style="padding:16px; border:1px solid lightgray;">
 							<b><?php echo JText::_( 'FLEXI_NO_CONTACT_INFORMATION' ); ?>:</b>
 							<br /><br />
 							<?php echo JText::_( 'FLEXI_MANAGE_IN_CONTACT_COMPONENT' ); ?>.
 						</span>
-						<br /><br />
 					</td>
 				</tr>
 			</table>
@@ -334,7 +334,7 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 	 </fieldset>
 	 
 	</div>
-	<div class="col width-55">
+	<div class="col <?php echo FLEXI_J30GE ? 'span7' : 'width-55';?>">
 		
 		<fieldset class="adminform">			
 		<legend style='color:darkred;'><?php echo JText::_( 'FLEXI_AUTHOR_EXTENDED_DATA' ); ?></legend>
@@ -533,6 +533,8 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 		</fieldset>
 		
 	</div>
+	</div>
+	
 	<div class="clr"></div>
 
 	<input type="hidden" name="id" value="<?php echo $this->user->get('id'); ?>" />
@@ -542,7 +544,7 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="contact_id" value="" />
-	<?php if (!$this->me->authorize( 'com_users', 'email_events' )) { ?>
+	<?php if (FLEXI_J16GE ? !$this->me->authorise( 'com_users', 'email_events' ) : !$this->me->authorize( 'com_users', 'email_events' )) { ?>
 	<input type="hidden" name="sendEmail" value="0" />
 	<?php } ?>
 	<?php echo JHTML::_( 'form.token' ); ?>

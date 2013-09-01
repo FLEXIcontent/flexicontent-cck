@@ -98,8 +98,6 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$itn['advanced'] = JText::_( 'FLEXI_INDEX_ADVANCED' );
 		$indextypes = array();
 		foreach ($itn as $i => $v) {
-			if ($filter_indextype == $i) $v = "<span class='flexi_radiotab highlight'>".$v."</span>";
-			else                        $v = "<span class='flexi_radiotab downlight'>".$v."</span>";
 			$indextypes[] = JHTML::_('select.option', $i, $v);
 		}
 		$lists['filter_indextype'] = JHTML::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_indextype );
@@ -159,12 +157,57 @@ class FLEXIcontentViewSearch extends JViewLegacy
 	 * @return	void
 	 */
 	function setToolbar() {
+		$document = JFactory::getDocument();
+		$js = "window.addEvent('domready', function(){";
 		$toolbar = JToolBar::getInstance('toolbar');
 
-		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_BASIC_CONTENT_LISTS',    'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic',     500, 210);
+		$btn_task = '';
+		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic';
+		if (FLEXI_J16GE) {
+			$js .= "
+				$$('li#toolbar-basicindex a.toolbar')
+					.set('onclick', 'javascript:;')
+					.set('href', '".$popup_load_url."')
+					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 210}, onClose: function() {}}');
+			";
+			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', false );
+			JHtml::_('behavior.modal', 'li#toolbar-basicindex a.toolbar');
+		} else {
+			$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', $popup_load_url, 500, 210);
+		}
+		
 		JToolBarHelper::divider();  JToolBarHelper::spacer();
-		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', 'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced',  500, 210);
-		$toolbar->appendButton('Popup', 'archive', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', 'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick',  500, 210);
+		
+		$btn_task = '';
+		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced';
+		if (FLEXI_J16GE) {
+			$js .= "
+				$$('li#toolbar-advindex a.toolbar')
+					.set('onclick', 'javascript:;')
+					.set('href', '".$popup_load_url."')
+					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 210}, onClose: function() {}}');
+			";
+			JToolBarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', false );
+			JHtml::_('behavior.modal', 'li#toolbar-advindex a.toolbar');
+		} else {
+			$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', $popup_load_url, 500, 210);
+		}
+		
+		$btn_task = '';
+		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick';
+		if (FLEXI_J16GE) {
+			$js .= "
+				$$('li#toolbar-advindexdirty a.toolbar')
+					.set('onclick', 'javascript:;')
+					.set('href', '".$popup_load_url."')
+					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 210}, onClose: function() {}}');
+			";
+			JToolBarHelper::custom( $btn_task, 'advindexdirty.png', 'advindexdirty_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', false );
+			JHtml::_('behavior.modal', 'li#toolbar-advindexdirty a.toolbar');
+		} else {
+			$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', $popup_load_url, 500, 210);
+		}
+		
 		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', FLEXI_J16GE ? 'search.purge' : 'purge', false);
 		
 		$user  = JFactory::getUser();
@@ -173,6 +216,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
+		
+		$js .= "});";
+		$document->addScriptDeclaration($js);
 	}
 	
 	function indexer($tpl) {

@@ -17,7 +17,7 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-$infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) );
+$infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ), ' style="vertical-align:top; margin-top:6px;" ' );
 ?>
 
 <form action="index.php" method="post" class="form-validate" name="adminForm" id="adminForm">
@@ -262,7 +262,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 				<tr>
 					<td width="40%">
-						<strong><?php echo $this->form->getLabel('tid'); ?>: *</strong>
+						<strong><?php echo $this->form->getLabel('tid'); ?></strong>
 						<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_NOTES' ); ?>::<?php echo JText::_( 'FLEXI_TYPES_NOTES' );?>">
 							<?php echo $infoimage; ?>
 						</span>

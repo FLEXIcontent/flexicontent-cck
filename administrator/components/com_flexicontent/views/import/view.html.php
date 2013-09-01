@@ -44,7 +44,6 @@ class FlexicontentViewImport extends JViewLegacy
 		$context  = 'com_flexicontent';
 		$task     = JRequest::getVar('task', '');
 		$cid      = JRequest::getVar('cid', array());
-		$extlimit = JRequest::getInt('extlimit', 100);
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		
 		$this->setLayout('import');
@@ -139,12 +138,18 @@ class FlexicontentViewImport extends JViewLegacy
 		$warnHandlers = JERROR::getErrorHandling( E_WARNING );
 		JERROR::setErrorHandling( E_WARNING, 'ignore' );
 		
-		$fleximport_comp = JComponentHelper::getComponent('com_fleximport', true);
+		if (FLEXI_J30GE) {
+			// J3.0+ adds an warning about component not installed, commented out ... till time ...
+			$fleximport_comp_enabled = false; //JComponentHelper::isEnabled('com_fleximport');
+		} else {
+			$fleximport_comp = JComponentHelper::getComponent('com_fleximport', true);
+			$fleximport_comp_enabled = $fleximport_comp && $fleximport_comp->enabled;
+		}
 		
 		// Reset the warning handler(s)
 		foreach( $warnHandlers as $mode )  JERROR::setErrorHandling( E_WARNING, $mode );
 		
-		if ($fleximport_comp && $fleximport_comp->enabled) {
+		if ($fleximport_comp_enabled) {
 			$fleximport = JText::sprintf('FLEXI_FLEXIMPORT_INSTALLED',JText::_('FLEXI_FLEXIMPORT_INFOS'));
 		} else {
 			$fleximport = JText::sprintf('FLEXI_FLEXIMPORT_NOT_INSTALLED',JText::_('FLEXI_FLEXIMPORT_INFOS'));

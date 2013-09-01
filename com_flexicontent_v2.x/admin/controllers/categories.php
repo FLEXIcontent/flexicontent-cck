@@ -68,10 +68,10 @@ class FlexicontentControllerCategories extends JControllerAdmin
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
 		parent::save();
-			$cache = JFactory::getCache('com_flexicontent');
-			$cache->clean();
-			$catscache = JFactory::getCache('com_flexicontent_cats');
-			$catscache->clean();
+		$cache = JFactory::getCache('com_flexicontent');
+		$cache->clean();
+		$catscache = JFactory::getCache('com_flexicontent_cats');
+		$catscache->clean();
 	}
 	
 	

@@ -1,0 +1,106 @@
+/***********************
+ * Flexicontent messages
+ ***********************/
+ 
+.fc-mssg-inline, .fc-mssg {
+	border: 1px solid !important;
+	display: block;
+	margin: 0 0 5px 0 !important;
+	padding: 8px 10px 8px 36px !important;
+	border-radius: 6px !important;
+	font-family: tahoma;
+	font-size:11px;
+	white-space: normal;
+}
+.fc-mssg-inline {
+	display: inline-block;
+	margin: 0 0 0 12px !important;
+	width: 62%;
+}
+
+.fc-error {
+	background: #FFBABA url(../images/error.png) no-repeat 10px 50%;
+  color: #D8000C !important;
+	border-color: #D8000C !important;
+}
+.fc-warning {
+	background: #FEEFB3 url(../images/warning.png) no-repeat 10px 50%;
+	color:#9F6000 !important;
+	border-color: #9F6000 !important;
+}
+.fc-success {
+	background: #DFF2BF url(../images/accept.png) no-repeat 10px 50%;
+	color: #4F8A10 !important;
+	border-color: #4F8A10 !important;
+}
+.fc-info {
+	background: #BDE5F8 url(../images/information.png) no-repeat 10px 50%;
+	color:#00529B !important;
+	border-color:#00529B !important;
+}
+.fc-note {
+	background: #FEEFB3 url(../images/note.gif) no-repeat 10px 50%;
+	color:#9F6000 !important;
+	border-color: #9F6000 !important;
+}
+
+
+
+
+/****************
+ * State Toggler
+ ****************/
+
+ul.statetoggler {
+	float: right !important;
+	display: inline-block !important;
+	list-style: none !important;
+	margin: 2px 0px 0px 10px !important;
+	padding: 0 !important;
+	width: auto !important;
+}
+
+ul.statetoggler > li.topLevel > .options {
+	padding: 0 !important;
+	margin: 0 !important;
+	background: white !important;
+	position: relative !important;
+}
+
+ul.statetoggler > li.topLevel > .options ul {
+	padding: 0 !important;
+	margin: 0 !important;
+	background: white !important;
+	border: 1px solid silver !important;
+	width: auto !important;
+}
+
+ul.statetoggler > li.topLevel, .statetoggler > li.topLevel ul > li {
+	background: none repeat scroll 0 0 transparent !important;
+	overflow: visible !important;
+	width: 22px !important;
+	min-height: 20px !important;
+	display: -moz-inline-stack !important;
+	display: inline-block !important;
+	vertical-align: top !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	zoom: 1 !important;
+	*display: inline !important;
+	_height: 20px !important;
+}
+
+ul.statetoggler > li.topLevel, .statetoggler > li.topLevel ul > li a {
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+ul.statetoggler > li.topLevel ul > li img {
+	padding: 2px !important;
+	margin: 0px !important;
+}
+
+ul.statetoggler > li.topLevel > a.opener {
+	padding: 0 !important;
+	margin: 0 !important;
+}

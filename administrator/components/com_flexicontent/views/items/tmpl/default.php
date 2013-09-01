@@ -318,7 +318,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th width="" nowrap="nowrap" class="center">
+			<th width="1%" nowrap="nowrap" class="center">
 				<?php echo JText::_( 'FLEXI_STATE' ); ?>
 				<?php if ($this->filter_state) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
@@ -412,7 +412,8 @@ window.addEvent('domready', function() {
 
 		<tr id="filterline">
 			<td class="left col_title" colspan="4">
-			  	<span class="radio"><?php echo $this->lists['scope']; ?></span>
+				<span class="radio"><?php echo $this->lists['scope']; ?></span>
+				<div class="clear"></div>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 			</td>
 
@@ -436,13 +437,14 @@ window.addEvent('domready', function() {
 			<td class="left"></td>
 		<?php endif; ?>
 			<td class="left" colspan="2">
-				<?php echo $ordering_type_tip . JText::_('FLEXI_ORDER_TYPE'); ?>:
+				<?php echo $ordering_type_tip; ?>
+				<label class="label" for="filter_subcats"> <?php echo JText::_('FLEXI_ORDER_TYPE'); ?> </label>
 				<div style="float:none; width:20px; clear:both;"></div>
 				<?php echo $this->lists['filter_order_type']; ?>
 			</td>
 			<!--td class="left"></td-->
 			<td class="left col_cats">
-				<label for="filter_subcats"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
+				<label class="label" for="filter_subcats"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
 				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
 				<?php echo $this->lists['filter_cats']; ?>
 			</td>
@@ -450,20 +452,21 @@ window.addEvent('domready', function() {
 				<?php echo $this->lists['filter_authors']; ?>
 			</td>
 			<td class="left col_created col_revised" colspan="2">
-				<span class="radio"><?php echo $this->lists['date']; ?></span>
-				<?php echo $this->lists['startdate']; ?>&nbsp;<?php echo $this->lists['enddate']; ?>
+				<span class="radio"><?php echo $this->lists['date']; ?></span>  <div class="clear"></div>
+				<?php echo $this->lists['startdate']; ?>  <div class="clear"></div>
+				<?php echo $this->lists['enddate']; ?>
 			</td>
 			<td class="left"></td>
 			<td class="left col_id">
-				<input type="text" name="filter_id" id="filter_id" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
+				<input type="text" name="filter_id" id="filter_id" size="4" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
 			</td>
 		</tr>
 
 
 		<tr>
 			<td colspan="<?php echo $items_list_cols; ?>" class="filterbuttons">
-				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-				<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+				<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				<?php if (isset($this->lists['filter_stategrp'])) : ?>
 					<span class="radio flexi_tabbox" style="margin-left:16px;"><?php echo $this->lists['filter_stategrp']; ?></span>
 				<?php endif; ?>
@@ -586,8 +589,8 @@ window.addEvent('domready', function() {
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td class="sort_handle"><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
-			<td width="7"><?php echo $cid_checkbox; ?></td>
-			<td width="1%">
+			<td><?php echo $cid_checkbox; ?></td>
+			<td>
 				<?php
 				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug)) .'&preview=1' .$autologin;
 				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
@@ -855,7 +858,9 @@ window.addEvent('domready', function() {
 
 	</table>
 
-	<table cellspacing="0" cellpadding="4" border="0" align="center">
+	<div class="clear"></div>
+	
+	<table class="admintable" style="margin: 0 auto !important;">
 		<tr>
 			<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>

@@ -77,11 +77,13 @@
  *************************/
 
 .prettycheckbox.fcradiocheck label, .prettyradio.fcradiocheck label {
-	margin: 7px 0px 0px 1px !important;
+	margin: 7px 0px 0px 0px !important;
+	clear: none !important;
 }
 
 .prettycheckbox.fcradiocheckimage label, .prettyradio.fcradiocheckimage label {
-	margin: 2px 0px 0px 1px !important;
+	margin: 2px 0px 0px 0px !important;
+	clear: none !important;
 }
 
 .prettycheckbox.fcradiocheckimage, .prettyradio.fcradiocheckimage,
@@ -89,7 +91,7 @@
 	float:left !important;
 	display:block !important;
 	clear:none !important;
-	margin:-6px 12px 0px -16px !important;
+	margin:-2px 12px 0px 0px !important;
 }
 
 .prettyradio input, .prettycheckbox input {

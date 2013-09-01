@@ -1,3 +1,7 @@
+@import url('../../../../../components/com_flexicontent/assets/css/flexi_form.css');
+@import url('../../../../../components/com_flexicontent/assets/css/flexi_containers.css');
+@import url('j15.css');
+
 /** header icons **/
 .icon-48-flexicontent	{ background-image: url(../images/icon-48-dashboard.png); }
 .icon-48-items				{ background-image: url(../images/icon-48-items.png); }
@@ -28,17 +32,6 @@
 .icon-48-import				{ background-image: url(../images/icon-48-import.png); }
 .icon-48-searchindex	{ background-image: url(../images/icon-48-searchindex.png); }
 
-/* Toolbar icons */
-.icon-32-person2			{ background-image: url(../images/person2_f2.png); }
-.icon-32-savenew			{ background-image: url(../images/savenew.png); }
-.icon-32-go						{ background-image: url(../../../../images/go_f2.png); }
-.icon-32-download			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-export.png); }
-.icon-32-language			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-html.png); }
-.icon-32-params				{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
-.icon-32-import				{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-upload.png); }
-.icon-32-duplicate		{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
-.icon-32-preview			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-preview.png); }
-.icon-32-translate		{ background-image: url(../images/icon-32-country-flags.png); }
 
 /* Buttons */
 .button-add a {
@@ -84,13 +77,23 @@ div .button2-left {	margin:-2px 4px 2px 0px; }
 /* Import screen */
 #import-log {
 	margin: 10px 10px 15px 10px;
-	font-size: 120%;
-	line-height: 130%;
+	font-size: 12px;
+	line-height: 140%;
+	font-family: tahoma;
+	white-space: normal;
 }
 .alert-modalbox {
-	background: url(../../../../templates/khepri/images/notice-alert.png) 0% 50% no-repeat transparent;
-	padding-left: 45px;
-	margin-bottom: 15px;
+	display: block;
+	border-color: #D8000C !important;
+	margin: 0 0 15px 0 !important;
+	padding: 8px 10px 8px 36px !important;
+	
+	border: 1px solid !important;
+	border-radius: 6px !important;
+	border-color: #D8000C !important;
+	
+	background: #f0f0f0 url(../images/error.png) no-repeat 10px 50%;
+  color: black !important;
 }
 .alert-modalbox-title {
 	display: block;
@@ -142,43 +145,10 @@ ul.import-failed li {
 	padding: 1px 0 1px 20px;
 }
 
-.col_state {
-	width:40px;
-}
-/** state toggler */
-.statetoggler {
-	list-style:none;
-	margin: 0;
-	padding: 0;
-	width: 26px;
-	float:left;
-}
-
-.statetoggler .options {
-	position: relative;
-}
-
-.statetoggler .options ul {
-	padding: 0;
-	margin: 0;
-	background: white;
-	border: 1px solid silver;
-}
-
-.statetoggler li ul li {
-	width: 20px;
-	min-height: 20px;
-	display: -moz-inline-stack;
-	display: inline-block;
-	vertical-align: top;
-	margin: 1px;
-	zoom: 1;
-	*display: inline;
-	_height: 20px;
-}
-
-.statetoggler li ul li img {
-	/*padding: 2px;*//* this effects with some admin template.*/
+/** state toggler (backend specific CSS) **/
+ul.statetoggler {
+	float: none !important;
+	margin: 0 !important;
 }
 
 /** rating bar **/
@@ -307,54 +277,6 @@ textarea.invalid {
 .hasTip {
 	cursor: help;
 }
-
-
-/***********************
- * Flexicontent messages
- ***********************/
-.fc-mssg-inline, .fc-mssg {
-	border: 1px solid !important;
-	display: block;
-	margin: 0 0 5px 0 !important;
-	padding: 8px 10px 8px 36px !important;
-	border-radius: 6px !important;
-	font-family: tahoma;
-	font-size:11px;
-	white-space: normal;
-}
-.fc-mssg-inline {
-	display: inline-block;
-	margin: 0 0 0 12px !important;
-	width: 62%;
-}
-
-.fc-error {
-	background: #FFBABA url(../images/error.png) no-repeat 10px 50%;
-  color: #D8000C !important;
-	border-color: #D8000C !important;
-}
-.fc-warning {
-	background: #FEEFB3 url(../images/warning.png) no-repeat 10px 50%;
-	color:#9F6000 !important;
-	border-color: #9F6000 !important;
-}
-.fc-success {
-	background: #DFF2BF url(../images/accept.png) no-repeat 10px 50%;
-	color: #4F8A10 !important;
-	border-color: #4F8A10 !important;
-}
-.fc-info {
-	background: #BDE5F8 url(../images/information.png) no-repeat 10px 50%;
-	color:#00529B !important;
-	border-color:#00529B !important;
-}
-.fc-note {
-	background: #FEEFB3 url(../images/note.gif) no-repeat 10px 50%;
-	color:#9F6000 !important;
-	border-color: #9F6000 !important;
-}
-
-
 /**/
 div.fieldgroups {
 	float: left;
@@ -542,11 +464,14 @@ table.adminlist thead td.filterbuttons {
 	background-color: #f0f0f0;
 	border-bottom: 1px solid #999;
 }
-table.adminlist thead td.filterbuttons input {
+table.adminlist thead td.filterbuttons input[type="text"] {
 	background-color: #fff;
 	border-radius: 2px;
 	font-weight: bold;
 	margin-left: 4px;
+}
+table.adminlist thead td.filterbuttons input {
+	background-color: transparent;
 }
 table.adminlist thead td.filterbuttons input:hover {
 	background-color: lightgray;
@@ -557,17 +482,18 @@ table.adminlist tbody tr td.yellow,
 table.adminlist tbody tr.row1 td.yellow {
 	background-color: #FFFFDD;
 }
+table.adminlist thead select {
+	font-size: 11px !important;
+	padding: 6px 2px;
+	border-radius: 4px;
+}
 table.adminlist thead #filter_lang,
 table.adminlist thead #filter_state,
-table.adminlist thead #filter_type {
-	width: 50px;
-}
-table.adminlist thead #filter_authors {
-	width: 100px;
-}
-table.adminlist thead #filter_cats {
-	width: 160px;
-}
+table.adminlist thead #filter_type { width: 50px !important; }
+table.adminlist thead #filter_authors { width: 120px !important; }
+table.adminlist thead #filter_cats { width: 120px !important; }
+table.adminlist thead #startdate,
+table.adminlist thead #enddate { width: 100px !important; }
 
 table.adminlist td.order {
 	width: auto !important;
@@ -697,9 +623,9 @@ div label.state_box,
 div label.lang_box {
 	white-space:nowrap !important;
 	display:inline-block !important;
-	float: none !important;
 	margin: 0px 8px 0px 0px !important;
 	padding: 0px!important;
+	vertical-align: top !important;
 	font-size: 12px !important;
 }
 div label.state_box input,
@@ -709,9 +635,8 @@ div label.lang_box input,
 div label.lang_box img,
 div label.lang_box .lang_lbl {
 	display:inline-block !important;
-	margin: 5px 5px 0px 0px !important;
+	margin: 4px 5px 0px 0px !important;
 	padding: 0px !important;
-	float: none !important;
 	vertical-align: top !important;
 	line-height: 1em !important;
 	font-size: 12px !important;
@@ -734,9 +659,7 @@ div label.lang_box img, .fc_assoc_translation img {	border: 1px solid lightgray 
 	font-size:12px;
 }
 .fcimportdata label.fcdata {
- margin-right:12px !important;
- display: inline !important;
- clear:both;
+	font-weight: normal;
 }
 .fcimport_sampleline {
 	font-size:12px;
@@ -831,6 +754,7 @@ dl.tabs dt { font-size:10px !important; font-family:tahoma !important; font-weig
 
 #flexicontent table.adminform td { padding: 0px 2px 0px 2px; }
 #flexicontent table.adminform { margin: 0px; }
+table.adminform td #search { margin-bottom: 0px; }
 
 #flexicontent span.flexi_label label {
 	float:right; margin:0px; padding:0px;
@@ -840,8 +764,8 @@ dl.tabs dt { font-size:10px !important; font-family:tahoma !important; font-weig
 #flexicontent span.flexi_label label label { float:right; margin:auto; padding:auto; }
 
 #flexicontent .flexi_label.fcdualline { width:32%; padding: 6px 2% 6px 2% !important; }
-#flexicontent .params_set label.hasTip,
-#flexicontent .flexi_params label.hasTip,
+#flexicontent .params_set label.hasTip, #flexicontent .params_set label.hasTooltip,
+#flexicontent .flexi_params label.hasTip, #flexicontent .flexi_params label.hasTooltip,
 #flexicontent label.fckey,
 #flexicontent .flexi_label {
 	display: block;
@@ -904,7 +828,7 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
 
 #flexicontent { margin:0px!important; }
 #flexicontent fieldset.basicfields_set,
-#flexicontent fieldset.flexiaccess,
+fieldset.flexiaccess, fieldset.adminform,
 #flexicontent fieldset.customfields_set,
 #flexicontent fieldset.params_set {
 	border: 1px solid #dddddd;
@@ -914,7 +838,8 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
 	min-width: inherit !important; /* workaround for chrome fieldset width bug */
 	display: block;
 }
-#flexicontent fieldset.flexiaccess { margin-bottom: 1em !important; }
+fieldset.flexiaccess, fieldset.adminform { margin-bottom: 1em !important; }
+fieldset.flexiaccess legend, fieldset.adminform legend { font-weight:bold; font-size: 14px; }
 
 #flexicontent form input,
 #flexicontent form button,
@@ -964,13 +889,12 @@ div.flexi_box_right {
 	cursor: pointer !important;
 }
 
-.flexi_tabbox  input {
-	display:none !important;
-}
-
 .flexi_tabbox_label {
 	font-weight: bold;
 	color: #444444;
+	margin-right:12px;
+	display:inline-block;
+	margin-right:12px;
 }
 
 #adminForm a.mb, #adminForm a.mb:link, #adminForm a.mb:visited, #adminForm a.mb:hover, #adminForm a.mb:active {
@@ -995,13 +919,15 @@ div.flexi_box_right {
 	padding-right: 0px;
 }
 
-div#cpanel div.icon {
-	margin: 7px;
-}
-
+div#cpanel div.icon { margin: 7px; text-align: center; }
+div#cpanel span, div.cpanel span { display: block; text-align: center; }
+div#cpanel img, div.cpanel img { margin: 0 auto; padding: 10px 0; }
 div#cpanel div.icon  a {
 	border: 1px solid lightgray;
 	border-radius: 8px;
+	display: block;
+	width: 108px;
+	height: 97px;
 }
 
 .fc_drag_handle_none, .fc_drag_handle {
@@ -1140,79 +1066,3 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	overflow: auto !important;
 }
 
-
-
-/*****************************************
- * Checkbox / Radio styling (and hide them)
- *****************************************/
-
-/* negation selector :not(...) is that in browsers (ie8) that do not support these CSS rules, we will have a good fallback appearance */
-
-#flexicontent label.fccheckradio_lbl,
-#flexicontent span.fcselect_lbl {
-	display:inline-block;
-	white-space:nowrap;
-	padding-right: 8px;
-	min-width:0px;
-	margin: 0px 0px 0px 2px;
-	float: left;
-	clear: none;
-}
-
-#flexicontent input[type=checkbox]:not(old),
-#flexicontent input[type=radio   ]:not(old){
-	width: 24px !important;
-	/*width: 19px !important;*/
-	margin: 0 !important;
-	padding: 0 !important;
-	opacity: 0 !important;
-	display:none;
-}
-
-/* style the label to also include the nice checkbox, radio */
-#flexicontent input[type=checkbox]:not(old) + label,
-#flexicontent input[type=radio   ]:not(old) + label{
-	display: inline-block !important;
-	margin-left: 0px !important;
-	padding-left: 24px !important;
-	line-height: 24px !important;
-	height: 24px !important;
-	/*margin-left: -19px !important;
-	padding-left: 19px !important;
-	line-height: 19px !important;
-	height: 19px !important;*/
-}
-#flexicontent input[type=checkbox]:not(old):disabled + label,
-#flexicontent input[type=radio]:not(old):disabled + label {
-	background-position: 0 -72px !important;
-	font-style:italic;
-	color:gray;
-	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
-}
-#flexicontent input[type=checkbox]:not(old) + label{
-	background: url(../images/checks.png) no-repeat 0 0 !important;
-	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
-}
-#flexicontent input[type=radio]:not(old) + label{
-	background: url(../images/checks.png) no-repeat 0 0 !important;
-	/*background: url(../images/checks2.png) no-repeat 0 -38px !important;*/
-}
-
-/* the checked versions of checkbox,radio */
-#flexicontent input[type=checkbox]:not(old):checked + label{
-	background-position: 0 -24px !important;
-	/*background-position: 0 -19px !important;*/
-}
-#flexicontent input[type=radio]:not(old):checked + label{
-	background-position: 0 -48px !important;
-	/*background-position: 0 -57px !important;*/
-}
-
-#flexicontent input[type=checkbox], #flexicontent input[type=checkbox]:focus,
-#flexicontent input[type=radio], #flexicontent input[type=radio]:focus {
-	border: 0px !important;
-}
-
-
-
-/******* END OF COMMON J1.5 / J2.5 CSS ***********/

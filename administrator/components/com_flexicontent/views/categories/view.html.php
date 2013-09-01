@@ -69,6 +69,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		// ******************
 		// Create the toolbar
 		// ******************
+		$js = "window.addEvent('domready', function(){";
 		
 		$contrl = FLEXI_J16GE ? "categories." : "";
 		$contrl_singular = FLEXI_J16GE ? "category." : "";
@@ -76,7 +77,20 @@ class FlexicontentViewCategories extends JViewLegacy
 		$toolbar = JToolBar::getInstance('toolbar');
 		
 		// Copy Parameters
-		$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=params&amp;tmpl=component', 600, 440);
+		$btn_task = '';
+		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=categories&layout=params&tmpl=component';
+		if (FLEXI_J16GE) {
+			$js .= "
+				$$('li#toolbar-params a.toolbar')
+					.set('onclick', 'javascript:;')
+					.set('href', '".$popup_load_url."')
+					.set('rel', '{handler: \'iframe\', size: {x: 800, y: 500}, onClose: function() {}}');
+			";
+			JToolBarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
+			JHtml::_('behavior.modal', 'li#toolbar-params a.toolbar');
+		} else {
+			$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), $popup_load_url, 600, 440);
+		}
 		//if (FLEXI_J16GE)
 		//	$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_COPY_MOVE'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
 		JToolBarHelper::divider();
@@ -122,7 +136,12 @@ class FlexicontentViewCategories extends JViewLegacy
 			//JToolBarHelper::custom($contrl.'rebuild', 'refresh.png', 'refresh_f2.png', 'JTOOLBAR_REBUILD', false);
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
-
+		
+		
+		$js .= "});";
+		$document->addScriptDeclaration($js);
+		
+		
 		//Get data from the model
 		if (FLEXI_J16GE) {
 			$rows = $this->get( 'Items');

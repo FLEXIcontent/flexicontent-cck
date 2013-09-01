@@ -47,8 +47,12 @@ class FlexicontentModelCategory extends JModelLegacy
 		parent::__construct();
 
 		$array = JRequest::getVar('cid',  0, '', 'array');
-		if( FLEXI_J16GE && !@$array[0] )
+		if ( !@$array[0] ) {
+			// Try id variable too (needed by J3.0+)
 			$array = JRequest::getVar('id',  0, '', 'array');
+		}
+		// Make sure id variable is set (needed by J3.0+ controller)
+		JRequest::setVar('id', (int)$array[0]);
 		$this->setId((int)$array[0]);
 	}
 

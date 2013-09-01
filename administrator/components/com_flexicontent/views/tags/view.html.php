@@ -58,10 +58,25 @@ class FlexicontentViewTags extends JViewLegacy
 		FLEXISubmenu('CanTags');
 
 		//create the toolbar
+		$js = "window.addEvent('domready', function(){";
+		
 		JToolBarHelper::title( JText::_( 'FLEXI_TAGS' ), 'tags' );
 		$toolbar = JToolBar::getInstance('toolbar');
 		if ($perms->CanConfig) {
-			$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), JURI::base().'index.php?option=com_flexicontent&amp;view=tags&amp;layout=import&amp;tmpl=component', 430, 500);
+			$btn_task = '';
+			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=tags&layout=import&tmpl=component';
+			if (FLEXI_J16GE) {
+				$js .= "
+					$$('li#toolbar-import a.toolbar')
+						.set('onclick', 'javascript:;')
+						.set('href', '".$popup_load_url."')
+						.set('rel', '{handler: \'iframe\', size: {x: 430, y: 500}, onClose: function() {}}');
+				";
+				JToolBarHelper::custom( $btn_task, 'import.png', 'import_f2.png', 'FLEXI_IMPORT', false );
+				JHtml::_('behavior.modal', 'li#toolbar-import a.toolbar');
+			} else {
+				$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), $popup_load_url, 430, 500);
+			}
 			JToolBarHelper::divider();  JToolBarHelper::spacer();
 		}
 		if (FLEXI_J16GE) {
@@ -81,7 +96,11 @@ class FlexicontentViewTags extends JViewLegacy
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
-
+		
+		$js .= "});";
+		$document->addScriptDeclaration($js);
+		
+		
 		//Get data from the model
 		$rows       = $this->get( 'Data');
 		$pagination = $this->get( 'Pagination' );
