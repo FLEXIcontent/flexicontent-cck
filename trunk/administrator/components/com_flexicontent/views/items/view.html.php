@@ -181,12 +181,24 @@ class FlexicontentViewItems extends JViewLegacy {
 		}
 		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
 		
+		// Implementation of multiple-item state selector
 		$add_divider = false;
 		if ( $CanPublish || $CanPublishOwn ) {
-			// Implementation of multiple-item state selector
 			$btn_task = FLEXI_J16GE ? '&task=items.selectstate' : '&controller=items&task=selectstate';
-			$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), JURI::base().'index.php?option=com_flexicontent'.$btn_task.'&format=raw', 840, 200);
-			//function fetchButton( $type='Popup', $name = '', $text = '', $url = '', $width=640, $height=480, $top=0, $left=0 )
+			$popup_load_url = JURI::base().'index.php?option=com_flexicontent'.$btn_task.'&format=raw';
+			if (FLEXI_J30GE) {  // Layout of Popup button broken in J3.1, add manually
+				$js .= "
+					$$('li#toolbar-publish a.toolbar')
+						.set('onclick', 'javascript:;')
+						.set('href', '".$popup_load_url."')
+						.set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');
+				";
+				//JToolBarHelper::publishList( $btn_task );
+				JToolBarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', false );
+				JHtml::_('behavior.modal', 'li#toolbar-publish a.toolbar');
+			} else {
+				$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), $popup_load_url, 840, 200);
+			}
 			$add_divider = true;
 		}
 		if ($CanDelete || $CanDeleteOwn) {
@@ -228,14 +240,21 @@ class FlexicontentViewItems extends JViewLegacy {
 		
 		$add_divider = false;
 		if ($CanAdd) {
-			//$btn_task = FLEXI_J16GE ? 'items.add' : 'add';
-			//$js .="\n$$('li#toolbar-new a.toolbar').set('onclick', 'javascript:;');\n";
-			//$js .="$$('li#toolbar-new a.toolbar').set('href', 'index.php?option=com_flexicontent&view=types&format=raw');\n";
-			//$js .="$$('li#toolbar-new a.toolbar').set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');\n";
-			//JToolBarHelper::addNew($btn_task);
-			//JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
-			
-			$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), JURI::base().'index.php?option=com_flexicontent&view=types&format=raw', 600, 240);
+			$btn_task = FLEXI_J16GE ? 'items.add' : 'add';
+			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=types&format=raw';
+			if (FLEXI_J30GE) {  // Layout of Popup button broken in J3.1, add manually
+				$js .= "
+					$$('li#toolbar-new a.toolbar')
+						.set('onclick', 'javascript:;')
+						.set('href', '".$popup_load_url."')
+						.set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');
+				";
+				//JToolBarHelper::addNew( $btn_task );
+				JToolBarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
+				JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
+			} else {
+				$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), $popup_load_url, 600, 240);
+			}
 			$add_divider = true;
 		}
 		if ($CanEdit || $CanEditOwn) {
@@ -339,13 +358,20 @@ class FlexicontentViewItems extends JViewLegacy {
 			$sgn['orphan']      = JText::_( 'FLEXI_GRP_ORPHAN' );
 			$sgn['all']      = JText::_( 'FLEXI_GRP_ALL' );
 			
-			$stategroups = array();
+			/*$stategroups = array();
 			foreach ($sgn as $i => $v) {
 				if ($filter_stategrp == $i) $v = "<span class='flexi_radiotab highlight'>".$v."</span>";
 				else                        $v = "<span class='flexi_radiotab downlight'>".$v."</span>";
 				$stategroups[] = JHTML::_('select.option', $i, $v);
 			}
-			$lists['filter_stategrp'] = JHTML::_('select.radiolist', $stategroups, 'filter_stategrp', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_stategrp );
+			$lists['filter_stategrp'] = JHTML::_('select.radiolist', $stategroups, 'filter_stategrp', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_stategrp );*/
+			
+			$lists['filter_stategrp'] = '';
+			foreach ($sgn as $i => $v) {
+				$checked = $filter_stategrp == $i ? ' checked="checked" ' : '';
+				$lists['filter_stategrp'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_stategrp'.$i.'" name="filter_stategrp">';
+				$lists['filter_stategrp'] .= '<label class="" id="filter_stategrp'.$i.'-lbl" for="filter_stategrp'.$i.'">'.$v.'</label>';
+			}
 		}
 		
 		// build the include subcats boolean list
@@ -415,7 +441,7 @@ class FlexicontentViewItems extends JViewLegacy {
 
 		if (FLEXI_FISH || FLEXI_J16GE) {
 		//build languages filter
-			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();"', $filter_lang, 2);
+			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();" size="1" ', $filter_lang, 2);
 		}
 		
 		// filter by item usage a specific file

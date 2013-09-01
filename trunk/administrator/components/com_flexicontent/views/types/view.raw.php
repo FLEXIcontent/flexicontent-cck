@@ -41,6 +41,9 @@ class FlexicontentViewTypes extends JViewLegacy{
 		echo "<b>". JText::_( 'FLEXI_SELECT_TYPE' ).":</b><br /><br />";
 
 		$ctrl_task = FLEXI_J16GE ? 'items.add' : 'add';
+		$css  = "width:auto; margin:0px 1% 12px 1%; padding:1%; ";
+		$icon = "components/com_flexicontent/assets/images/layout_add.png";
+		
 		foreach($types as $type)
 		{
 			if (FLEXI_J16GE)
@@ -52,9 +55,7 @@ class FlexicontentViewTypes extends JViewLegacy{
 			
 			if ( !$allowed && $type->itemscreatable == 1 ) continue;
 			
-			$css = "width:auto; margin:0px 1% 12px 1%; padding:1%; ";
-			$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
-			$icon = "components/com_flexicontent/assets/images/layout_add.png";
+			$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;typeid=".$type->id."&amp;".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
 			
 			if ( !$allowed && $type->itemscreatable == 2 ) {
 				?>
@@ -72,6 +73,16 @@ class FlexicontentViewTypes extends JViewLegacy{
 			<?php
 			}
 		}
+		
+		$link = "index.php?option=com_flexicontent&amp;controller=items&amp;task=".$ctrl_task."&amp;".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
+		$_name = JText::_("FLEXI_ANY") .' ... '. JText::_("FLEXI_TYPE");
+		?>
+		<div> &nbsp; </div><br/><br/>
+		<a style="<?php echo $css; ?>" class="fc_select_button" href="<?php echo $link; ?>" target="_parent">
+			<img style="margin-bottom:-3px;" src="<?php echo $icon; ?>" width="16" height="16" border="0" alt="<?php echo $_name; ?>" />&nbsp;
+			<?php echo $_name; ?>
+		</a>
+		<?php
 	}
 }
 ?>

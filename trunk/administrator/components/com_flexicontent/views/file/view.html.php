@@ -65,7 +65,9 @@ class FlexicontentViewFile extends JViewLegacy {
 		}
 		
 		//build access level list
-		if (FLEXI_ACCESS) {
+		if (FLEXI_J16GE) {
+			$lists['access'] 	= JHTML::_('access.assetgrouplist', 'access', $row->access);
+		} else if (FLEXI_ACCESS) {
 			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 0, 0, 0, 0, 0, 0, 0, 0 );
 		} else {
 			$lists['access'] 	= JHTML::_('list.accesslevel', $row );

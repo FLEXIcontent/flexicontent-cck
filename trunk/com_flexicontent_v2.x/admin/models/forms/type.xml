@@ -78,8 +78,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="maintext_label" type="text" default="" size="60" label="FLEXI_MAINTEXT_LABEL" description="FLEXI_MAINTEXT_LABEL_DESC" />
-			<field name="maintext_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="maintext_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="maintext_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="maintext_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			<!-- TODO ADD/IMPLEMENT FOR other CORE Fields -->
 			<field name="hide_maintext" type="radio" default="" label="FLEXI_HIDE_MAINTEXT" description="FLEXI_HIDE_MAINTEXT_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -105,8 +105,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="title_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="title_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="title_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="title_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="title_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_CATEGORIES" level="level2"  />
 			<field name="categories_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
@@ -115,8 +115,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="categories_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="categories_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="categories_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="categories_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="categories_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CREATED" level="level2"  />
 			<field name="created_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
@@ -125,8 +125,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="created_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="created_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="created_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="created_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="created_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_CREATED_BY" level="level2"  />
 			<field name="created_by_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
@@ -135,8 +135,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="created_by_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="created_by_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="created_by_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="created_by_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="created_by_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_MODIFIED" level="level2"  />
 			<field name="modified_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
@@ -145,8 +145,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="modified_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="modified_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="modified_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="modified_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="modified_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_MODIFIED_BY" level="level2"  />
 			<field name="modified_by_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
@@ -155,8 +155,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="modified_by_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="modified_by_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="modified_by_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="modified_by_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="modified_by_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_DOCUMENT_TYPE" level="level2"  />
 			<field name="document_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
@@ -165,8 +165,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="document_type_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="document_type_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="document_type_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="document_type_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="document_type_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 				
 		</fieldset>
 		
@@ -179,8 +179,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="hits_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="hits_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="hits_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="hits_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="hits_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VERSION" level="level2"  />
 			<field name="version_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
@@ -189,8 +189,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="version_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="version_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="version_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="version_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="version_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_STATE" level="level2"  />
 			<field name="state_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
@@ -199,8 +199,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="state_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="state_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="state_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="state_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="state_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VOTING" level="level2"  />
 			<field name="voting_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
@@ -209,8 +209,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="voting_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="voting_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="voting_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="voting_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="voting_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			<field name="voting_counter" type="list" default="" label="FLEXI_FIELD_VOTE_SHOW_COUNTER" description="FLEXI_FIELD_VOTE_SHOW_COUNTER_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_DISABLE</option>
@@ -235,8 +235,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="favourites_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="favourites_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="favourites_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="favourites_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="favourites_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TAGS" level="level2"  />
 			<field name="tags_display_label" type="radio" default="" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
@@ -245,8 +245,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="tags_label" type="text" default="" size="60" label="FLEXI_FIELD_LABEL" description="FLEXI_FIELD_LABEL_DESC" />
-			<field name="tags_desc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
-			<field name="tags_viewdesc" type="textarea" default="" rows="2" cols="41" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
+			<field name="tags_desc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_DESC" description="FLEXI_FIELD_DESC_DESC" />
+			<field name="tags_viewdesc" type="textarea" default="" rows="2" cols="57" label="FLEXI_FIELD_VIEWDESC" description="FLEXI_FIELD_VIEWDESC_DESC" />
 	
 		</fieldset>
 		

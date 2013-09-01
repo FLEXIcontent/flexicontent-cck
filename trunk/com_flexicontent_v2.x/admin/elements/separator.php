@@ -53,12 +53,14 @@ form#item-form div.pane-sliders ul.adminformlist li label.hasTip {
 	display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:160px; font-weight: bold;
 	background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
 }
-div.current fieldset.radio label {
+
+/*div.current fieldset.radio label {
 	min-width:10px!important; padding: 0px 16px 0px 0px!important; margin: 2px 0px 0px 1px!important;
 }
 div fieldset.adminform fieldset.radio label, div fieldset.panelform fieldset.radio label {
 	min-width:10px!important; padding: 0px 10px 0px 0px!important; margin: 4px 0px 0px 1px!important;
-}
+}*/
+
 div fieldset input, div fieldset textarea, div fieldset img, div fieldset button { margin:5px 2px 2px 0px; }
 div fieldset select { margin:0px; }
 			
@@ -72,7 +74,11 @@ div.current ul.config-option-list li fieldset  { margin: 0; padding: 0; }
 
 $document = JFactory::getDocument();
 $document->addStyleDeclaration($css);
-//$document->addStyleSheet('../tmpl/params.css');
+$option = JRequest::getVar('option');
+if ($option=='com_config') {
+	$document->addStyleSheet('components/com_flexicontent/assets/css/flexi_form.css');
+	if (FLEXI_J30GE)  $document->addStyleSheet('components/com_flexicontent/assets/css/j3x.css');
+}
 
 class JFormFieldSeparator extends JFormFieldSpacer
 {
@@ -127,7 +133,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		
 		$class = ""; $title = "";
 		if ($description) {
-			$class = "hasTip";
+			$class = FLEXI_J30GE ? "hasTooltip" : "hasTip";
 			$title = JText::_($value)."::".JText::_($description);
 		}
 		

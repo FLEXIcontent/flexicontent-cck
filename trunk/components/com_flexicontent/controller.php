@@ -333,7 +333,7 @@ class FlexicontentController extends JControllerLegacy
 		} else {
 			
 			if (FLEXI_J16GE) {
-				$canAdd	= $user->authorize('core.create', 'com_flexicontent') && count( FlexicontentHelperPerm::getAllowedCats($user, array('core.create')) );
+				$canAdd	= $user->authorise('core.create', 'com_flexicontent') && count( FlexicontentHelperPerm::getAllowedCats($user, array('core.create')) );
 				// ALTERNATIVE 1
 				//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
 				$not_authorised = !$canAdd;
@@ -1165,11 +1165,10 @@ class FlexicontentController extends JControllerLegacy
 	function getajaxtags()
 	{
 		$user = JFactory::getUser();
+		$authorized = FLEXI_J16GE ? $user->authorise('com_flexicontent', 'newtags') : $user->authorize('com_flexicontent', 'newtags');
 
-		if (!$user->authorize('com_flexicontent', 'newtags')) {
-			return;
-		}
-
+		if (!$authorized) return;
+		
 		$id 	= JRequest::getInt('id', 0);
 		$model 	= $this->getModel(FLEXI_ITEMVIEW);
 		$tags 	= $model->getAlltags();
@@ -1217,15 +1216,15 @@ class FlexicontentController extends JControllerLegacy
 	{
 
 		$user = JFactory::getUser();
+		$name = JRequest::getString('name', '');
+		$authorized = FLEXI_J16GE ? $user->authorise('com_flexicontent', 'newtags') : $user->authorize('com_flexicontent', 'newtags');
 
-		$name 	= JRequest::getString('name', '');
-
-		if ($user->authorize('com_flexicontent', 'newtags')) {
-			$model 	= $this->getModel(FLEXI_ITEMVIEW);
-			$model->addtag($name);
-		}
-		return;
+		if (!$authorized) return;
+		
+		$model 	= $this->getModel(FLEXI_ITEMVIEW);
+		$model->addtag($name);
 	}
+	
 	
 	/**
 	 *  Add new Tag from item screen

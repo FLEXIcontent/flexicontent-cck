@@ -288,26 +288,27 @@ if (!FLEXI_J16GE) {
 
 		<?php
 		$deprecated_fields = array('hidden'=>'text', 'relateditems'=>'relation', 'relateditems_backlinks'=>'relation_reverse');
+		$app = JFactory::getApplication();
 		
 		// Get DB table information
 		
-		$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'flexicontent_files"';
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_files"';
 		$db->setQuery($query);
 		$files_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'flexicontent_fields"';
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_fields"';
 		$db->setQuery($query);
 		$fields_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'flexicontent_types"';
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_types"';
 		$db->setQuery($query);
 		$types_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'flexicontent_advsearch_index"';
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_advsearch_index"';
 		$db->setQuery($query);
 		$advsearch_index_tbl_exists = (boolean) count($db->loadObjectList());
 		
-		$query = 'SHOW TABLES LIKE "' . JFactory::getApplication()->getCfg('dbprefix') . 'flexicontent_authors_ext"';
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_authors_ext"';
 		$db->setQuery($query);
 		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
 		

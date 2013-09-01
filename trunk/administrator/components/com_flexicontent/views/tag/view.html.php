@@ -45,8 +45,8 @@ class FlexicontentViewTag extends JViewLegacy
 		//add css to document
 		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
 		//add js function to overload the joomla submitform
-		$document->addScript('components/com_flexicontent/assets/js/admin.js');
-		$document->addScript('components/com_flexicontent/assets/js/validate.js');
+		//$document->addScript('components/com_flexicontent/assets/js/admin.js');
+		//$document->addScript('components/com_flexicontent/assets/js/validate.js');
 
 		//Get data from the model
 		$model		= & $this->getModel();

@@ -152,15 +152,12 @@ class FlexicontentViewUser extends JViewLegacy
 		
 		if (FLEXI_J16GE)
 		{
-			// Parse XML file
-			$xml = JFactory::getXMLParser('Simple');
-			//$xml->loadFile($auth_xml);
-			$xml->loadString(str_replace('name="params"', 'name="authorbasicparams"', file_get_contents($auth_xml)));
-			$xml_string = $xml->document->toString();
+			// Read XML file
+			$xml_string = str_replace('name="params"', 'name="authorbasicparams"', file_get_contents($auth_xml));
 			
 			// Load the form description from the XML string
 			$jform_authorbasic = new JForm('com_flexicontent.author', array('control' => 'jform', 'load_data' => true));
-			$jform_authorbasic->load($xml_string);
+			$jform_authorbasic->load($xml_string, $isFile=false);
 			
 			// Set DB parameter values into the JForm object
 			foreach ($jform_authorbasic->getFieldset() as $field) {
@@ -185,15 +182,12 @@ class FlexicontentViewUser extends JViewLegacy
 			
 		if (FLEXI_J16GE)
 		{
-			// Parse XML file
-			$xml = JFactory::getXMLParser('Simple');
-			//$xml->loadFile($cat_xml);
-			$xml->loadString(str_replace('name="params"', 'name="authorcatparams"', file_get_contents($cat_xml)));
-			$xml_string = $xml->document->toString();
+			// Read XML file
+			$xml_string = str_replace('name="params"', 'name="authorcatparams"', file_get_contents($cat_xml));
 			
 			// Load the form description from the XML string
 			$jform_authorcat = new JForm('com_flexicontent.category', array('control' => 'jform', 'load_data' => true));
-			$jform_authorcat->load($xml_string);
+			$jform_authorcat->load($xml_string, $isFile=false);
 			
 			// Set DB parameter values into the JForm object
 			foreach ($jform_authorcat->getFieldset() as $field) {

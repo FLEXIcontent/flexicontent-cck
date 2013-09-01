@@ -100,8 +100,10 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 	</tbody>
 
 	</table>
-	<br />
-	<table cellspacing="0" cellpadding="4" border="0" align="center">
+	
+	<div class="clear"></div>
+	
+	<table class="admintable" style="margin: 0 auto !important;">
 		<tr>
 			<td>
 			<?php echo $copytmpl; ?>

@@ -185,15 +185,37 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$perms = FlexicontentHelperPerm::getPerm();
 
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
+			$js = "window.addEvent('domready', function(){";
+			
 			if($perms->CanConfig)  {
 				$toolbar = JToolBar::getInstance('toolbar');
-				if (!FLEXI_J16GE)
+				
+				if (!FLEXI_J16GE) {
 					$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
-				$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), JURI::base().'index.php?option=com_flexicontent&amp;layout=language&amp;tmpl=component', 800, 500);
+				}
+				
+				$btn_task = '';
+				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=language&tmpl=component';
+				if (FLEXI_J16GE) {
+					$js .= "
+						$$('li#toolbar-language a.toolbar')
+							.set('onclick', 'javascript:;')
+							.set('href', '".$popup_load_url."')
+							.set('rel', '{handler: \'iframe\', size: {x: 800, y: 500}, onClose: function() {}}');
+					";
+					JToolBarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
+					JHtml::_('behavior.modal', 'li#toolbar-language a.toolbar');
+				} else {
+					$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), $popup_load_url, 800, 500);
+				}
+				
 				JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 			}
 			
+			$js .= "});";
+			$document->addScriptDeclaration($js);
 		}
+		
 		
 		//Create Submenu
 		FLEXISubmenu('notvariable');
@@ -308,22 +330,25 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		<?php
 	}
 	
-	/**
-	 * Check Flexicontent version
-	 */
 	
+	/**
+	 * Fetch the version from the flexicontent.org server
+	 */
 	static function getUpdateComponent()
 	{
+		// Read installation file
+		$manifest_path = JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml';
+		$com_xml = JApplicationHelper::parseXMLInstallFile( $manifest_path );
+		
+		// Version checking URL
 		$url = 'http://www.flexicontent.org/flexicontent_update.xml';
 		$data = '';
 		$check = array();
 		$check['connect'] = 0;
-		
-		$com_xml 		= JApplicationHelper::parseXMLInstallFile( JPATH_ADMINISTRATOR .DS. 'components' .DS. 'com_flexicontent' .DS. 'manifest.xml' );
 		$check['current_version'] = $com_xml['version'];
 
 		//try to connect via cURL
-		if(function_exists('curl_init') && function_exists('curl_exec')) {		
+		if (function_exists('curl_init') && function_exists('curl_exec')) {
 			$ch = @curl_init();
 			
 			@curl_setopt($ch, CURLOPT_URL, $url);
@@ -346,14 +371,14 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$errstr = '';
 
 			//timeout handling: 5s for the socket and 5s for the stream = 10s
-			//$fsock = @fsockopen("www.flexicontent.org", 80, $errno, $errstr, 5);
-			$fsock = @fsockopen("flexicontent.googlecode.com", 80, $errno, $errstr, 5);
+			$fsock = @fsockopen("www.flexicontent.org", 80, $errno, $errstr, 5);
+			//$fsock = @fsockopen("flexicontent.googlecode.com", 80, $errno, $errstr, 5);
 		
 			if ($fsock) {
 				@fputs($fsock, "GET /flexicontent_update.xml HTTP/1.1\r\n");
 				@fputs($fsock, "HOST: www.flexicontent.org\r\n");
 				@fputs($fsock, "Connection: close\r\n\r\n");
-        
+				
 				//force stream timeout...
 				@stream_set_blocking($fsock, 1);
 				@stream_set_timeout($fsock, 5);
@@ -372,7 +397,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 							$get_info = true;
 						}
 					}
-				}        	
+				}
 				@fclose($fsock);
 				
 				//need to check data cause http error codes aren't supported here
@@ -382,9 +407,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			}
 		}
 
-	 	//try to connect via fopen
+		//try to connect via fopen
 		if (function_exists('fopen') && ini_get('allow_url_fopen') && $data == '') {
-
+			
 			//set socket timeout
 			ini_set('default_socket_timeout', 5);
 			
@@ -398,26 +423,35 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			
 			@fclose($handle);
 		}
-						
+		
 		if( $data && strstr($data, '<?xml version="1.0" encoding="utf-8"?><update>') ) {
-			$xml = JFactory::getXMLparser('Simple');
-			$xml->loadString($data);
-			
-			$version           = & $xml->document->version[0];
-			$check['version']  = $version->data();
-			$released          = & $xml->document->released[0];
-			$check['released'] = $released->data();
-			$check['connect']  = 1;
-			$check['enabled']  = 1;
-			$check['current']  = version_compare( $check['current_version'], $check['version'] );
+			if (!FLEXI_J16GE) {
+				$xml = JFactory::getXMLparser('Simple');
+				$xml->loadString($data);
+				$version           = & $xml->document->version[0];
+				$check['version']  = $version->data();
+				$released          = & $xml->document->released[0];
+				$check['released'] = $released->data();
+				$check['connect']  = 1;
+				$check['enabled']  = 1;
+				$check['current']  = version_compare( $check['current_version'], $check['version'] );
+			} else {
+				$xml = JFactory::getXML($data, $isFile=false);
+				$check['version']  = (string)$xml->version;
+				$check['released'] = (string)$xml->released;
+				$check['connect']  = 1;
+				$check['enabled']  = 1;
+				$check['current']  = version_compare( $check['current_version'], $check['version'] );
+			}
 		}
 		
 		return $check;
 	}
 	
+	
 	function fversion(&$tpl, &$params) {
 		//updatecheck
-		if($params->get('show_updatecheck', 1) == 1) {
+		if( $params->get('show_updatecheck', 1) == 1) {
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->setCaching( 1 );
 			$cache->setLifeTime( 600 );

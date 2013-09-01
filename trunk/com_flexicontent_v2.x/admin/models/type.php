@@ -477,8 +477,7 @@ class FlexicontentModelType extends JModelAdmin
 			$item = JArrayHelper::toObject($table->getProperties(1), 'JObject');
 
 			if (property_exists($item, 'attribs')) {
-				$registry = new JRegistry;
-				$registry->loadJSON($item->attribs);
+				$registry = new JRegistry($item->attribs);
 				$item->attribs = $registry->toArray();
 			}
 		}
