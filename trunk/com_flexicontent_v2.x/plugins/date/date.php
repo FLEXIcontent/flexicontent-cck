@@ -144,19 +144,19 @@ class plgFlexicontent_fieldsDate extends JPlugin
 						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
 					}
 					
-					thisNewField.getFirst().setProperty('value','');  /* First element is the value input field, second is e.g remove button */
+					jQuery(thisNewField).find('input').first().val('');  /* First element is the value input field, second is e.g remove button */
+					jQuery(thisNewField).insertAfter( jQuery(thisField) );
 
-					thisNewField.injectAfter(thisField);
-
-					var input = thisNewField.getFirst();
-					input.id = '".$elementid."_'+uniqueRowNum".$field->id.";
-					var img = input.getNext();
-					img.id = '".$elementid."_' +uniqueRowNum".$field->id." +'_img';
-
+					var input = jQuery(thisNewField).find('input').first();
+					input.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
+					var img = input.next();
+					img.attr('id', '".$elementid."_' +uniqueRowNum".$field->id." +'_img');
+					
+					
 					Calendar.setup({
-        				inputField:	input.id,
+        				inputField:	input.attr('id'),
         				ifFormat:		'%Y-%m-%d',
-        				button:			img.id,
+        				button:			img.attr('id'),
         				align:			'Tl',
         				singleClick:	true
 					});
