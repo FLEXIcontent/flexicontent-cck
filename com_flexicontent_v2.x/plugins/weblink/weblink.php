@@ -126,7 +126,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 						thisNewField.getElements('span span').setHTML('0');
 					}
 
-					thisNewField.injectAfter(thisField);
+					jQuery(thisNewField).insertAfter( jQuery(thisField) );
 		
 					new Sortables($('sortables_".$field->id."'), {
 						'constrain': true,

@@ -127,7 +127,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 						jQuery(thisNewField).find('select.use_select2_lib').select2();
 					}
 					
-					thisNewField.injectAfter(thisField);
+					jQuery(thisNewField).insertAfter( jQuery(thisField) );
 					";
 			
 			if ($field->field_type=='textselect') $js .= "

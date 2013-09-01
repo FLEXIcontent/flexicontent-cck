@@ -114,7 +114,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 					";
 					
 			$js .= "
-					thisNewField.injectAfter(thisField);
+					jQuery(thisNewField).insertAfter( jQuery(thisField) );
 		
 					new Sortables($('sortables_".$field->id."'), {
 						'constrain': true,

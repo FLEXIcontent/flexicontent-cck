@@ -179,24 +179,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					").
 				"
 					thisNewField.getElements('a.addfile_".$field->id."').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
-					thisNewField.getElements('a.addfile_".$field->id."').setProperty('href','".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JUtility::getToken().'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$thumb_w_s.'&thumb_h='.$thumb_h_s.'&autoassign='.$autoassign."');
+					thisNewField.getElements('a.addfile_".$field->id."').setProperty('href','".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$thumb_w_s.'&thumb_h='.$thumb_h_s.'&autoassign='.$autoassign."');
 					
 					// COPYING an existing value
 					if (thisNewField.getElement('img.preview_image')) {
-						if (MooTools.version>='1.2.4') {
-							var tmpDiv = new Element('div',{html:'<div class=\"empty_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>'});
-							tmpDiv.getFirst().setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
-							tmpDiv.getFirst().replaces( thisNewField.getElement('img.preview_image') );
-						} else {
-							var tmpDiv = new Element('div', {}).setHTML('<div class=\"empty_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>');
-							tmpDiv.getFirst().setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
-							tmpDiv.getFirst().injectAfter(thisNewField.getElement('img.preview_image'));
-							thisNewField.getElement('img.preview_image').remove();
-						}
+						var tmpDiv = jQuery('<div class=\"empty_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>');
+						tmpDiv.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
+						tmpDiv.insertAfter( jQuery(thisNewField).find('img.preview_image') );
+						jQuery(thisNewField).find('img.preview_image').remove();
+					}
 					
 					// COPYING an empty value
-					} else if (thisNewField.getElement('div.empty_image')) {
-						thisNewField.getElement('div.empty_image').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
+					else if (thisNewField.getElement('div.empty_image')) {
+						jQuery(thisNewField).find('div.empty_image').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
 					}
 					
 					var imgchange_toggler = jQuery(thisNewField).find('input.imgchange');
@@ -232,7 +227,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					";
 					
 			$js .= "
-					thisNewField.injectAfter(thisField);
+					jQuery(thisNewField).insertAfter( jQuery(thisField) );
 					".// We need to re-execute setting of modal popup since when this run the current element did not exist
 					"
 					
@@ -427,15 +422,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						if ( replacestr == '_newfile' && newfilename!='' ) preview_container = preview_container + '<br/>&nbsp; File selected<br/>&nbsp; for uploading';
 						preview_container = preview_container + '</div>';
 					}
-
-					if (MooTools.version>='1.2.4') {
-						var tmpDiv = new Element('div',{html:preview_container});
-						tmpDiv.getFirst().replaces( prv_obj );
-					} else {
-						var tmpDiv = new Element('div', {}).setHTML(preview_container);
-						tmpDiv.getFirst().injectAfter( prv_obj );
-						prv_obj.remove();
-					}
+					
+					var tmpDiv = jQuery(preview_container);
+					tmpDiv.insertAfter( jQuery(prv_obj) );
+					jQuery(prv_obj).remove();
 				}
 				(MooTools.version>='1.2.4') ?  window.SqueezeBox.close()  :  window.document.getElementById('sbox-window').close();
 			}
@@ -505,7 +495,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				<div class=\"fcfield-button-add\" style='margin: 0px 0px 4px -4px; display:inline-block;'>
 					<a class=\"addfile_".$field->id."\" id='".$elementid."_addfile' title=\"".JText::_( 'FLEXI_SELECT_IMAGE' )."\"
 						".//href=\"#\" style=\"margin: 0px;\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",'".$u_item_id."',".$thumb_w_s.",".$thumb_h_s.")\"
-						"href=\"".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.JUtility::getToken().'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_existingname&thumb_w=$thumb_w_s&thumb_h=$thumb_h_s&autoassign=".$autoassign."\"
+						"href=\"".JURI::base().'index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_existingname&thumb_w=$thumb_w_s&thumb_h=$thumb_h_s&autoassign=".$autoassign."\"
 						rel=\"{handler: 'iframe', size: {x: (MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT_IMAGE' )."</a>
 				</div>
 				";
