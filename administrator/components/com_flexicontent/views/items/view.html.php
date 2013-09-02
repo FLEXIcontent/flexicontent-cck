@@ -93,7 +93,10 @@ class FlexicontentViewItems extends JViewLegacy {
 		
 		
 		// Add custom css and js to document
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
+		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/stateselector.js' );
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/flexi-lib.js' );
 
@@ -191,13 +194,13 @@ class FlexicontentViewItems extends JViewLegacy {
 					$$('li#toolbar-publish a.toolbar')
 						.set('onclick', 'javascript:;')
 						.set('href', '".$popup_load_url."')
-						.set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');
+						.set('rel', '{handler: \'iframe\', size: {x: 600, y: 240}, onClose: function() {}}');
 				";
 				//JToolBarHelper::publishList( $btn_task );
 				JToolBarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', false );
 				JHtml::_('behavior.modal', 'li#toolbar-publish a.toolbar');
 			} else {
-				$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), $popup_load_url, 840, 200);
+				$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), $popup_load_url, 600, 240);
 			}
 			$add_divider = true;
 		}
@@ -247,7 +250,7 @@ class FlexicontentViewItems extends JViewLegacy {
 					$$('li#toolbar-new a.toolbar')
 						.set('onclick', 'javascript:;')
 						.set('href', '".$popup_load_url."')
-						.set('rel', '{handler: \'iframe\', size: {x: 400, y: 400}, onClose: function() {}}');
+						.set('rel', '{handler: \'iframe\', size: {x: 600, y: 240}, onClose: function() {}}');
 				";
 				//JToolBarHelper::addNew( $btn_task );
 				JToolBarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
@@ -499,7 +502,10 @@ class FlexicontentViewItems extends JViewLegacy {
 		JHTML::_('behavior.tooltip');
 
 		//add css to document
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
+		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 
 		//add js functions
 		$document->addScript('components/com_flexicontent/assets/js/copymove.js');

@@ -46,7 +46,7 @@ $document = JFactory::getDocument();
 $document->addStyleDeclaration($css);
 $option = JRequest::getVar('option');
 if ($option=='com_config') {
-	$document->addStyleSheet('components/com_flexicontent/assets/css/flexi_form.css');
+	$document->addStyleSheet('../components/com_flexicontent/assets/css/flexi_form.css');
 	if (FLEXI_J30GE)  $document->addStyleSheet('components/com_flexicontent/assets/css/j3x.css');
 }
 

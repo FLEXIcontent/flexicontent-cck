@@ -83,8 +83,12 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$delfilename	= base64_decode(JRequest::getVar('delfilename', ''));
 		
 		//add css and submenu to document
-		$document->addStyleSheet( ($app->isSite() ? 'administrator/' : '' ) . 'components/com_flexicontent/assets/css/flexicontentbackend.css');
-		$document->addStyleSheet( ($app->isSite() ? 'administrator/' : '' ) . 'templates/system/css/system.css');
+		$urlroot = JURI::root() . ($app->isSite() ? 'administrator/' : '' );
+		$document->addStyleSheet( $urlroot . 'components/com_flexicontent/assets/css/flexicontentbackend.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet( $urlroot . 'components/com_flexicontent/assets/css/j3x.css');
+		else if (FLEXI_J16GE) $document->addStyleSheet( $urlroot . 'components/com_flexicontent/assets/css/j25.css');
+		else                  $document->addStyleSheet( $urlroot . 'components/com_flexicontent/assets/css/j15.css');
+		$document->addStyleSheet( $urlroot . 'templates/system/css/system.css');
 		// include khepri stylesheet only if we are in frontend
 		if ($app->isSite()) {
 			$document->addStyleSheet('administrator/templates/khepri/css/general.css');

@@ -57,7 +57,10 @@ class FlexicontentViewCategories extends JViewLegacy
 		$search  = FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
 
 		// Prepare the document: add css files, etc
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
+		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 		
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
@@ -84,7 +87,7 @@ class FlexicontentViewCategories extends JViewLegacy
 				$$('li#toolbar-params a.toolbar')
 					.set('onclick', 'javascript:;')
 					.set('href', '".$popup_load_url."')
-					.set('rel', '{handler: \'iframe\', size: {x: 800, y: 500}, onClose: function() {}}');
+					.set('rel', '{handler: \'iframe\', size: {x: 600, y: 440}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
 			JHtml::_('behavior.modal', 'li#toolbar-params a.toolbar');
