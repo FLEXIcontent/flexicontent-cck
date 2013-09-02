@@ -65,22 +65,26 @@ if ($this->params->get('form_extra_css_fe')) $this->document->addStyleDeclaratio
 if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclaration($this->params->get('form_extra_js'));
 if ($this->params->get('form_extra_js_fe'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_fe'));
 
-$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
+$this->document->addStyleSheet(JURI::base().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
+if      (FLEXI_J30GE) $this->document->addStyleSheet(JURI::base().'administrator/components/com_flexicontent/assets/css/j3x.css');
+else if (FLEXI_J16GE) $this->document->addStyleSheet(JURI::base().'administrator/components/com_flexicontent/assets/css/j25.css');
+else                  $this->document->addStyleSheet(JURI::base().'administrator/components/com_flexicontent/assets/css/j15.css');
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/admin.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/validate.js' );
 $this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/tabber-minimized.js');
-$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/tabber.css');
+$this->document->addStyleSheet(JURI::base().'administrator/components/com_flexicontent/assets/css/tabber.css');
 //$this->document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 
 if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
-	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
-	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
-	$this->document->addScript('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
-	$this->document->addScript('administrator/components/com_flexicontent/assets/js/jquery.pager.js');
+	$this->document->addScript(JURI::base().'administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
+	$this->document->addScript(JURI::base().'administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
+	$this->document->addScript(JURI::base().'administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
+	//if (!FLEXI_J30GE) $this->document->addScript(JURI::base().'components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.autocomplete.min.js');
+	$this->document->addScript(JURI::base().'administrator/components/com_flexicontent/assets/js/jquery.pager.js');
 	
-	$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
+	//$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/css/Pager.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {

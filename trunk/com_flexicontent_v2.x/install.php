@@ -70,9 +70,11 @@ if (!FLEXI_J16GE) {
 		// first check if PHP5 is running
 		if (version_compare(PHP_VERSION, '5.0.0', '<')) {
 			// we add the component stylesheet to the installer
-			$css = JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css'; 
 			$document = JFactory::getDocument(); 
-			$document->addStyleSheet($css);	
+			$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
+			if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
+			else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
+			else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 			
 			// load english language file for 'com_flexicontent' component then override with current language file
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);

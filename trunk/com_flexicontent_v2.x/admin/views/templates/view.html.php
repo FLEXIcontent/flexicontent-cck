@@ -42,7 +42,10 @@ class FlexicontentViewTemplates extends JViewLegacy
 		JHTML::_('behavior.modal');
 
 		//add css and submenu to document
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
+		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/silveripe.js' );
 
 		$permission = FlexicontentHelperPerm::getPerm();

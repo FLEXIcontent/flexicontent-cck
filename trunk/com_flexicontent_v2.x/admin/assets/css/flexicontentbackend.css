@@ -1,6 +1,5 @@
 @import url('../../../../../components/com_flexicontent/assets/css/flexi_form.css');
 @import url('../../../../../components/com_flexicontent/assets/css/flexi_containers.css');
-@import url('j25.css');
 
 /** header icons **/
 .icon-48-flexicontent	{ background-image: url(../images/icon-48-dashboard.png); }
@@ -702,6 +701,8 @@ div label.lang_box img, .fc_assoc_translation img {	border: 1px solid lightgray 
 
 #flexicontent .fcfield-sortables { margin:0px!important; padding:0px!important; }
 #flexicontent .fcfield-sortables li { margin:0px 0px 4px 0px; padding:0px;  }
+#flexicontent .fcfield-sortables li .input-append,
+#flexicontent .fcfield-sortables li .input-prepend { float:left; }
 
 /* buttons in forms, special class for add button */
 #flexicontent .fcfield-button,

@@ -38,7 +38,10 @@ class FlexicontentViewType extends JViewLegacy
 		$user     = JFactory::getUser();
 		
 		//add css to document
-		$document->addStyleSheet('components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
+		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 		
 		//add js function to overload the joomla submitform
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
@@ -81,9 +84,10 @@ class FlexicontentViewType extends JViewLegacy
 		
 		if (FLEXI_ACCESS) {
 			$itemscreatable[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_ANY_AUTHOR' ) );
-			$itemscreatable[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_USE_ACL_PERMISSION' ) );
+			$itemscreatable[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_USE_ACL_TO_HIDE' ) );
+			$itemscreatable[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_USE_ACL_TO_DISABLE' ) );
 			$itemscreatable_fieldname = FLEXI_J16GE ? 'jform[itemscreatable]' : 'itemscreatable';
-			$lists['itemscreatable'] = JHTML::_('select.radiolist',   $itemscreatable, $itemscreatable_fieldname, '', 'value', 'text', $row->itemscreatable );
+			$lists['itemscreatable'] = JHTML::_('select.genericlist',   $itemscreatable, $itemscreatable_fieldname, '', 'value', 'text', $row->itemscreatable );
 		}
 		
 		//build access level list

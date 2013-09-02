@@ -858,8 +858,11 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
 		
-		$fc_css = JURI::base(true) .'/components/com_flexicontent/assets/css/flexicontentbackend.css';
-		echo '<link rel="stylesheet" href="'.$fc_css.'">';
+		echo '<link rel="stylesheet" href="'.JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css" />';
+		if      (FLEXI_J30GE) $fc_css = JURI::base().'components/com_flexicontent/assets/css/j3x.css';
+		else if (FLEXI_J16GE) $fc_css = JURI::base().'components/com_flexicontent/assets/css/j25.css';
+		else                  $fc_css = JURI::base().'components/com_flexicontent/assets/css/j15.css';
+		echo '<link rel="stylesheet" href="'.$fc_css.'" />';
 		
 		// Get item model
 		$model  = $this->getModel('item');
