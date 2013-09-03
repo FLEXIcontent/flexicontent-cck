@@ -2,7 +2,7 @@
  * Checkbox / Radio styling (and hide them)
  *****************************************/
 
-/* Labels */
+/* Labels with these classes must have input/select placed inside them */
 
 label.fccheckradio_lbl,
 span.fcselect_lbl {
@@ -18,12 +18,13 @@ span.fcselect_lbl {
 
 /* J3.x styles for radio button sets */
 
-span.radio {
+.flexicontent span.radio {
 	white-space: normal !important;
 	display: inline-block !important;
+	padding: 0px !important;
 }
 
-span.radio label.radio {
+.flexicontent label.radio {
 	white-space: nowrap !important;
 	width: auto !important;
 	display: inline-block !important;
@@ -36,8 +37,12 @@ span.radio label.radio {
 
 /* Hide input field, but exclude input inside labels (Graceful fallback) */
 
-input[type=checkbox]:not(old),
-input[type=radio   ]:not(old) {
+input[type=checkbox]:not(old).fc_checkradio,
+input[type=radio   ]:not(old).fc_checkradio,
+[name="adminForm"]  input[type=checkbox]:not(old),
+[name="adminForm"]  input[type=radio   ]:not(old),
+.flexicontent input[type=checkbox]:not(old),
+.flexicontent input[type=radio   ]:not(old) {
 	width: 24px !important;
 	/*width: 19px !important;*/
 	margin: 0 !important;
@@ -45,8 +50,14 @@ input[type=radio   ]:not(old) {
 	opacity: 0 !important;
 	display: none !important;
 }
-label input[type=checkbox]:not(old),
-label input[type=radio   ]:not(old) {
+div input[type=checkbox][name^="cid"],
+div input[type=checkbox]:only-child,
+label input[type=checkbox].fc_checkradio:not(old),
+label input[type=radio   ].fc_checkradio:not(old),
+[name="adminForm"]  label input[type=checkbox]:not(old),
+[name="adminForm"]  label input[type=radio   ]:not(old),
+.flexicontent label input[type=checkbox]:not(old),
+.flexicontent label input[type=radio   ]:not(old) {
 	width: auto !important;
 	margin: 3px 3px 0px 0px !important;
 	padding: auto !important;
@@ -58,8 +69,12 @@ label input[type=radio   ]:not(old) {
 
 /* Style the label to also include the nice checkbox, radio */
 
-input[type=checkbox]:not(old) + label,
-input[type=radio   ]:not(old) + label {
+input[type=checkbox].fc_checkradio:not(old) + label,
+input[type=radio   ].fc_checkradio:not(old) + label,
+[name="adminForm"]  input[type=checkbox]:not(old) + label,
+[name="adminForm"]  input[type=radio   ]:not(old) + label,
+.flexicontent input[type=checkbox]:not(old) + label,
+.flexicontent input[type=radio   ]:not(old) + label {
 	display: inline-block !important;
 	margin: 0px 12px 0px 0px !important;
 	padding: 0px 0px 0px 24px !important;
@@ -74,19 +89,27 @@ input[type=radio   ]:not(old) + label {
 	line-height: 19px !important;
 	height: 19px !important;*/
 }
-input[type=checkbox]:not(old):disabled + label,
-input[type=radio]:not(old):disabled + label {
+input[type=checkbox].fc_checkradio:not(old):disabled + label,
+input[type=radio].fc_checkradio:not(old):disabled + label,
+[name="adminForm"]  input[type=checkbox]:not(old):disabled + label,
+[name="adminForm"]  input[type=radio]:not(old):disabled + label,
+.flexicontent input[type=checkbox]:not(old):disabled + label,
+.flexicontent input[type=radio]:not(old):disabled + label {
 	background-position: 0 -72px !important;
 	font-style: italic !important;
 	color: gray !important;
 	cursor: normal !important;
 	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
 }
-input[type=checkbox]:not(old) + label{
+input[type=checkbox].fc_checkradio:not(old) + label,
+[name="adminForm"]  input[type=checkbox]:not(old) + label,
+.flexicontent input[type=checkbox]:not(old) + label {
 	background: url(../images/checks.png) no-repeat 0 0 !important;
 	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
 }
-input[type=radio]:not(old) + label{
+input[type=radio].fc_checkradio:not(old) + label,
+[name="adminForm"]  input[type=radio]:not(old) + label,
+.flexicontent input[type=radio]:not(old) + label {
 	background: url(../images/checks.png) no-repeat 0 0 !important;
 	/*background: url(../images/checks2.png) no-repeat 0 -38px !important;*/
 }
@@ -94,22 +117,27 @@ input[type=radio]:not(old) + label{
 
 /* Style the checked versions of checkbox,radio */
 
-input[type=checkbox]:not(old):checked + label {
+input[type=checkbox]:not(old):checked + label,
+[name="adminForm"]  input[type=checkbox]:not(old):checked + label,
+.flexicontent input[type=checkbox]:not(old):checked + label {
 	background-position: 0 -24px !important;
 	/*background-position: 0 -19px !important;*/
 }
-input[type=radio]:not(old):checked + label {
+input[type=radio]:not(old):checked + label,
+[name="adminForm"]  input[type=radio]:not(old):checked + label,
+.flexicontent input[type=radio]:not(old):checked + label {
 	background-position: 0 -48px !important;
 	/*background-position: 0 -57px !important;*/
 }
 
-input[type=checkbox], input[type=checkbox]:focus,
-input[type=radio], input[type=radio]:focus {
+input[type=checkbox].fc_checkradio,  input[type=checkbox].fc_checkradio:focus,  input[type=radio].fc_checkradio,  input[type=radio].fc_checkradio:focus,
+[name="adminForm"]  input[type=checkbox],  [name="adminForm"]  input[type=checkbox]:focus,  [name="adminForm"]  input[type=radio],  [name="adminForm"]  input[type=radio]:focus,
+.flexicontent input[type=checkbox],  .flexicontent input[type=checkbox]:focus,  .flexicontent input[type=radio],  .flexicontent input[type=radio]:focus {
 	border: 0px !important;
 }
 
 
-/* SETs of radio/checkboxes (including fixes for ie8,ie9) */
+/* Styling for radio/checkboxes , for browser not supporting above,  e.g. ie8,ie9) */
 
 input.fc_checkradio {
 	margin: 0px 4px 3px 4px !important;
@@ -128,9 +156,9 @@ input.fc_checkradio {
 
 
 
-/************************************************************/
- * ALTERNATIVE displat like a bar (use 'fc_checkradio_bar') *
-/************************************************************/
+/**********************************************************
+ * ALTERNATIVE display like a bar (use 'fc_checkradio_bar')
+/**********************************************************/
 
 /* Style the label to also include the nice checkbox, radio */
 
@@ -199,7 +227,7 @@ html button {
 
 .flexi_buttons, .fc_buttons { margin: 0px; padding:0px 2px 0px 2px; display: inline-block; }
 
-#flexicontent button,
+.flexicontent button,
 .fc_button,
 .fc_buttons button,
 .flexi_buttons button {
@@ -236,7 +264,7 @@ html button {
 	background-image: -ms-linear-gradient(top, #444, black) !important;
 	background-image: -o-linear-gradient(top, #444, black) !important;
 	background-image: linear-gradient(to bottom, #444, black) !important;
-	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#444, endColorstr=black) !important;
+	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#444444, endColorstr=black) !important;
 	border:1px solid black !important;
 }
 
@@ -253,7 +281,7 @@ html button {
 	border:1px solid #770000 !important;
 }
 
-#flexicontent button:hover,
+.flexicontent button:hover,
 .fc_button:hover,
 .fc_buttons button:hover,
 .flexi_buttons button:hover {
@@ -280,3 +308,27 @@ html button {
 .fcbutton_go { background: url(../images/accept.png) no-repeat !important; }
 .fcbutton_reset { background: url(../images/cancel.png) no-repeat !important; }
 */
+
+/*div table.adminform select,  .flexicontenttable.adminlist select*/
+
+.flexicontent label {
+	display: inline-block !important;
+	float: none !important;
+	margin-right: 12px !important;
+}
+.flexicontent input {
+	font-size:11px !important;
+	display: inline-block !important;
+	float: none !important;
+	margin: 2px 2px 2px 2px !important;
+	padding: 6px 2px !important;
+	border-radius: 4px !important;
+}
+.flexicontent select {
+	font-size: 11px !important;
+	display: inline-block !important;
+	float: none !important;
+	margin: 2px 2px 2px 2px !important;
+	padding: 6px 2px !important;
+	border-radius: 4px !important;
+}

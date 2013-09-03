@@ -26,3 +26,6 @@
 	white-space: nowrap;
 	border-radius: 4px;
 }
+.label.highlight, .badge.highlight {
+	color: darkred;
+}

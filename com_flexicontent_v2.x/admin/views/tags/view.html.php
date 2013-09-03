@@ -70,13 +70,13 @@ class FlexicontentViewTags extends JViewLegacy
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=tags&layout=import&tmpl=component';
 			if (FLEXI_J16GE) {
 				$js .= "
-					$$('li#toolbar-import a.toolbar')
+					$$('li#toolbar-import a.toolbar, #toolbar-import button')
 						.set('onclick', 'javascript:;')
 						.set('href', '".$popup_load_url."')
 						.set('rel', '{handler: \'iframe\', size: {x: 430, y: 500}, onClose: function() {}}');
 				";
 				JToolBarHelper::custom( $btn_task, 'import.png', 'import_f2.png', 'FLEXI_IMPORT', false );
-				JHtml::_('behavior.modal', 'li#toolbar-import a.toolbar');
+				JHtml::_('behavior.modal', 'li#toolbar-import a.toolbar, #toolbar-import button');
 			} else {
 				$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), $popup_load_url, 430, 500);
 			}

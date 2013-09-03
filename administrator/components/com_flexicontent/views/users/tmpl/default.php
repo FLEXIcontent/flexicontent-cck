@@ -67,7 +67,7 @@ function delFilter(name)
 
 function delAllFilters() {
 	delFilter('search'); delFilter('filter_itemscount');
-	delFilter('filter_logged'); delFilter('filter_type');
+	delFilter('filter_logged'); delFilter('filter_usergrp');
 	delFilter('startdate'); delFilter('enddate');
 	delFilter('filter_id');
 }
@@ -167,9 +167,9 @@ window.addEvent('domready', function(){
 				</th>
 				<th width="15%" class="title">
 					<?php echo FLEXI_J16GE ? JText::_( 'FLEXI_USERGROUPS' ) : JHTML::_('grid.sort',   'Group', 'groupname', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
-					<?php if ($this->filter_type) : ?>
+					<?php if ($this->filter_usergrp) : ?>
 					<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
-						<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_type');document.adminForm.submit();" />
+						<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_usergrp');document.adminForm.submit();" />
 					</span>
 					<?php endif; ?>
 				</th>
@@ -216,7 +216,7 @@ window.addEvent('domready', function(){
 
 		<tr id="filterline">
 			<td class="left col_title" colspan="3">
-				<?php echo JText::_( 'Filter' ); ?>:
+				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
 				<input type="text" name="search" id="search" value="<?php echo htmlspecialchars($this->lists['search']);?>" class="text_area" style='width:140px;' onchange="document.adminForm.submit();" />
 			</td>
 			<td class="left col_itemscount">
@@ -227,8 +227,8 @@ window.addEvent('domready', function(){
 				<?php echo $this->lists['filter_logged']; ?>
 			</td>
 			<td class="left"></td>
-			<td class="left col_type">
-				<?php echo $this->lists['filter_type']; ?>
+			<td class="left col_usergrp">
+				<?php echo $this->lists['filter_usergrp']; ?>
 			</td>
 			<td class="left"></td>
 			<td class="left col_registered col_visited" colspan="2">
@@ -243,8 +243,8 @@ window.addEvent('domready', function(){
 
 		<tr>
 			<td colspan="<?php echo '12'; ?>" class="filterbuttons">
-				<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-				<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+				<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 
 				<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
 				<?php
@@ -346,7 +346,7 @@ window.addEvent('domready', function(){
 					<a href="javascript:void(0);" onclick="return listItemTask('cb<?php echo $i;?>','<?php echo $task_block;?>')">
 						<img src="images/<?php echo $block_img;?>" width="16" height="16" border="0" alt="<?php echo $alt; ?>" /></a>
 				</td>
-				<td align="center" class="col_type">
+				<td align="center" class="col_usergrp">
 					<?php echo JText::_( $row->groupname ); ?>
 				</td>
 				<td>

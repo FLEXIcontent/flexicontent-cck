@@ -1601,7 +1601,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$msg .= JText::_( 'FLEXI_IMPORT_NO_ERROR' );		
 		}
     
-		$msg .= '<p class="button-close"><input type="button" class="button" onclick="window.parent.document.adminForm.submit();" value="'.JText::_( 'FLEXI_CLOSE' ).'" /><p>';
+		$msg .= '<p class="button-close"><input type="button" class="fc_button" onclick="window.parent.document.adminForm.submit();" value="'.JText::_( 'FLEXI_CLOSE' ).'" /><p>';
 
 		echo $msg;
 	}
@@ -2113,7 +2113,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$rsp .= '<div class="qf_addtag">';
 			$rsp .= '<label for="addtags">'.JText::_( 'FLEXI_ADD_TAG' ).'</label>';
 			$rsp .= '<input type="text" id="tagname" class="inputbox" size="30" />';
-			$rsp .=	'<input type="button" class="button" value="'.JText::_( 'FLEXI_ADD' ).'" onclick="addtag()" />';
+			$rsp .=	'<input type="button" class="fc_button" value="'.JText::_( 'FLEXI_ADD' ).'" onclick="addtag()" />';
 			$rsp .= '</div>';
 		}
 		echo $rsp;

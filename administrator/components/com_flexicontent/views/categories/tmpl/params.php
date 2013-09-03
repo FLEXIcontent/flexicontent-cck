@@ -44,10 +44,10 @@ window.addEvent('domready', function(){
 	<table width="100%" align="center">
 		<tr>
 			<td width="50%" align="right">
-			<input id="copy" type="submit" class="button" value="<?php echo JText::_( 'FLEXI_COPY_PARAMETERS_BUTTON' ); ?>" />
+			<input id="copy" type="submit" class="fc_button" value="<?php echo JText::_( 'FLEXI_COPY_PARAMETERS_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="button" onclick="window.parent.document.getElementById('sbox-window').close();" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>" />			
+			<input type="button" class="fc_button" onclick="window.parent.document.getElementById('sbox-window').close();" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>" />			
 			</td>
 		</tr>
 	</table>

@@ -99,25 +99,25 @@ function delAllFilters() {
 				<td class="left"></td>
 				<td class="left"></td>
 				<td class="left" colspan="3">
-					<?php echo '<b class="'.($this->f_active['search_itemtitle'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_TITLE').':</b> '; ?> &nbsp;
+					<?php echo '<label class="label'.($this->f_active['search_itemtitle'] ? " highlight":"").'">'.JText::_('FLEXI_TITLE').'</label> '; ?> &nbsp;
 					<input type="text" name="search_itemtitle" id="search_itemtitle" value="<?php echo $this->lists['search_itemtitle']; ?>" class="text_area" onChange="document.adminForm.submit();" size="30"/>
-					<?php echo '<b class="'.($this->f_active['search_itemid'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_ID').':</b> '; ?> &nbsp;
+					<?php echo '<label class="label'.($this->f_active['search_itemid'] ? " highlight":"").'">'.JText::_('FLEXI_ID').'</label> '; ?> &nbsp;
 					<input type="text" name="search_itemid" id="search_itemid" value="<?php echo $this->lists['search_itemid']; ?>" class="text_area" onChange="document.adminForm.submit();" size="6" />
 					<br/>
-					<?php echo '<b class="'.($this->f_active['filter_itemtype'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_TYPE_NAME').':</b> '; ?> &nbsp;
+					<?php echo '<label class="label'.($this->f_active['filter_itemtype'] ? " highlight":"").'">'.JText::_('FLEXI_TYPE_NAME').'</label> '; ?> &nbsp;
 					<?php echo $this->lists['filter_itemtype']; ?>
-					<?php echo '<b class="'.($this->f_active['filter_itemstate'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_STATE').':</b> '; ?> &nbsp;
+					<?php echo '<label class="label'.($this->f_active['filter_itemstate'] ? " highlight":"").'">'.JText::_('FLEXI_STATE').'</label> '; ?> &nbsp;
 					<?php echo $this->lists['filter_itemstate']; ?>
 				</td>
 				
 				<td class="left col_fieldtype" >
-					<?php echo '<b class="'.($this->f_active['filter_fieldtype'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_FILTER').':</b> '; ?> &nbsp; <br/>
+					<?php echo '<label class="label'.($this->f_active['filter_fieldtype'] ? " highlight":"").'">'.JText::_('FLEXI_FILTER').'</label> '; ?> &nbsp; <br/>
 					<?php echo $this->lists['filter_fieldtype']; ?>
 				</td>
 				
 				<td class="left"></td>
 				<td class="left col_search_index">
-					<?php echo '<b class="'.($this->f_active['search_index'] ? "flexi_radiotab highlight":"").'">'.JText::_('FLEXI_FILTER').':</b> '; ?> &nbsp; <br/>
+					<?php echo '<label class="label'.($this->f_active['search_index'] ? " highlight":"").'">'.JText::_('FLEXI_FILTER').'</label> '; ?> &nbsp; <br/>
 					<input type="text" name="search_index" id="search_index" value="<?php echo $this->lists['search_index']; ?>" class="text_area" onChange="document.adminForm.submit();" />
 				</td>
 				<td class="left"></td>
@@ -125,8 +125,8 @@ function delAllFilters() {
 
 			<tr>
 				<td colspan="9" class="filterbuttons">
-					<input type="submit" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-					<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+					<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+					<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 					<?php if (isset($this->lists['filter_stategrp'])) : ?>
 						<span class="radio flexi_tabbox" style="margin-left:60px;"><?php echo '<span class="flexi_tabbox_label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_stategrp']; ?></span>
 					<?php endif; ?>

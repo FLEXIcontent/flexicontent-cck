@@ -466,19 +466,31 @@ class FlexicontentViewItem  extends JViewLegacy
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 
-		// We rely on typeid Request variable to decide type for new items so make sure this is set, ZERO means allow user to select type
-		if ( $menu && isset($menu->query['typeid']) )
-			JRequest::setVar('typeid', (int)$menu->query['typeid']);  // This also forces zero if value not set
-		$typeid = JRequest::getVar('typeid', 0, '', 'int');
 
-
-		// ******************************************************
-		// Get item, model and create form (that loads item data)
-		// ******************************************************
+		// ***********************************************
+		// Get item and create form (that loads item data)
+		// ***********************************************
 
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 
 		$model = $this->getModel();
+		
+		// ** WE NEED TO get OR decide the Content Type, before we call the getItem
+		// ** We rely on typeid Request variable to decide type for new items so make sure this is set,
+		// ZERO means allow user to select type, but if user is only allowed a single type, then autoselect it!
+		if ( $menu && isset($menu->query['typeid']) )
+		{
+			JRequest::setVar('typeid', (int)$menu->query['typeid']);  // This also forces zero if value not set
+		}
+		$typeid = JRequest::getVar('typeid', 0, '', 'int');
+		if ( !$typeid )
+		{
+			$types = $model->getTypeslist(false, true);
+			if ( $types && count($types)==1 ) $typeid = $types[0]->id;
+			JRequest::setVar('typeid', $typeid);
+			$canCreateType = true;
+		}
+		
 		$item = $this->get('Item');
 		if (FLEXI_J16GE) {
 			$form = $this->get('Form');
@@ -626,7 +638,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			// CREATE action
 
 			if (FLEXI_J16GE) {
-				$canAdd	= $user->authorize('core.create', 'com_flexicontent');
+				$canAdd	= $user->authorise('core.create', 'com_flexicontent');
 				// ALTERNATIVE 1
 				//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
 				// ALTERNATIVE 2
@@ -646,10 +658,12 @@ class FlexicontentViewItem  extends JViewLegacy
 			}
 			
 			// Check if Content Type can be created by current user
-			if ($typeid) {
-				$canCreateType = $model->canCreateType( array($typeid) );  // Can create given Content Type
-			} else {
-				$canCreateType = $model->canCreateType( );  // Can create at least one Content Type
+			if ( empty($canCreateType) ) {
+				if ($typeid) {
+					$canCreateType = $model->canCreateType( array($typeid) );  // Can create given Content Type
+				} else {
+					$canCreateType = $model->canCreateType( );  // Can create at least one Content Type
+				}
 			}
 			$not_authorised = $not_authorised || !$canCreateType;
 			

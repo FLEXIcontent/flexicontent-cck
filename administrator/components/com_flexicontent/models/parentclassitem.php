@@ -3082,7 +3082,7 @@ class ParentClassItem extends JModelLegacy
 	 * @return array
 	 * @since 1.5
 	 */
-	function getTypeslist ( $type_ids=false )
+	function getTypeslist ( $type_ids=false, $check_perms = false )
 	{
 		if ( !empty($type_ids) && is_array($type_ids) ) {
 			foreach ($type_ids as $i => $type_id)
@@ -3096,6 +3096,22 @@ class ParentClassItem extends JModelLegacy
 				;
 		$this->_db->setQuery($query);
 		$types = $this->_db->loadObjectList('id');
+		if ($check_perms)
+		{
+			$user = JFactory::getUser();
+			$_types = array();
+			foreach ($types as $type) {
+				if (FLEXI_J16GE)
+					$allowed = ! $type->itemscreatable || $user->authorise('core.create', 'com_flexicontent.type.' . $type->id);
+				else if (FLEXI_ACCESS && $user->gid < 25)
+					$allowed = ! $type->itemscreatable || FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'type', $type->id);
+				else
+					$allowed = 1;
+				if ( $allowed ) $_types[] = $type;
+			}
+			$types = $_types;
+		}
+		
 		return $types;
 	}
 	

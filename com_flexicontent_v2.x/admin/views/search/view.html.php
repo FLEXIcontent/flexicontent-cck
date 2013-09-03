@@ -100,10 +100,14 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		//$itn['basic'] = JText::_( 'FLEXI_INDEX_BASIC' );
 		$itn['advanced'] = JText::_( 'FLEXI_INDEX_ADVANCED' );
 		$indextypes = array();
+		//foreach ($itn as $i => $v) $indextypes[] = JHTML::_('select.option', $i, $v);
+		//$lists['filter_indextype'] = JHTML::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_indextype );
+		$lists['filter_indextype'] = '';
 		foreach ($itn as $i => $v) {
-			$indextypes[] = JHTML::_('select.option', $i, $v);
+			$checked = $filter_indextype == $i ? ' checked="checked" ' : '';
+			$lists['filter_indextype'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_indextype'.$i.'" name="filter_indextype">';
+			$lists['filter_indextype'] .= '<label class="" id="filter_indextype'.$i.'-lbl" for="filter_indextype'.$i.'">'.$v.'</label>';
 		}
-		$lists['filter_indextype'] = JHTML::_('select.radiolist', $indextypes, 'filter_indextype', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_indextype );
 		
 		// table ordering
 		$lists['order_Dir'] = $filter_order_Dir;
@@ -168,13 +172,13 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic';
 		if (FLEXI_J16GE) {
 			$js .= "
-				$$('li#toolbar-basicindex a.toolbar')
+				$$('li#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
 					.set('onclick', 'javascript:;')
 					.set('href', '".$popup_load_url."')
 					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 210}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', false );
-			JHtml::_('behavior.modal', 'li#toolbar-basicindex a.toolbar');
+			JHtml::_('behavior.modal', 'li#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
 		} else {
 			$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', $popup_load_url, 500, 210);
 		}
@@ -185,13 +189,13 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced';
 		if (FLEXI_J16GE) {
 			$js .= "
-				$$('li#toolbar-advindex a.toolbar')
+				$$('li#toolbar-advindex a.toolbar, #toolbar-advindex button')
 					.set('onclick', 'javascript:;')
 					.set('href', '".$popup_load_url."')
 					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 210}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', false );
-			JHtml::_('behavior.modal', 'li#toolbar-advindex a.toolbar');
+			JHtml::_('behavior.modal', 'li#toolbar-advindex a.toolbar, #toolbar-advindex button');
 		} else {
 			$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', $popup_load_url, 500, 210);
 		}
@@ -200,13 +204,13 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick';
 		if (FLEXI_J16GE) {
 			$js .= "
-				$$('li#toolbar-advindexdirty a.toolbar')
+				$$('li#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button')
 					.set('onclick', 'javascript:;')
 					.set('href', '".$popup_load_url."')
 					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 210}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'advindexdirty.png', 'advindexdirty_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', false );
-			JHtml::_('behavior.modal', 'li#toolbar-advindexdirty a.toolbar');
+			JHtml::_('behavior.modal', 'li#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button');
 		} else {
 			$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', $popup_load_url, 500, 210);
 		}

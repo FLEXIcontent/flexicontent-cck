@@ -201,13 +201,13 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=language&tmpl=component';
 				if (FLEXI_J16GE) {
 					$js .= "
-						$$('li#toolbar-language a.toolbar')
+						$$('li#toolbar-language a.toolbar, #toolbar-language button')
 							.set('onclick', 'javascript:;')
 							.set('href', '".$popup_load_url."')
 							.set('rel', '{handler: \'iframe\', size: {x: 800, y: 500}, onClose: function() {}}');
 					";
 					JToolBarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
-					JHtml::_('behavior.modal', 'li#toolbar-language a.toolbar');
+					JHtml::_('behavior.modal', 'li#toolbar-language a.toolbar, #toolbar-language button');
 				} else {
 					$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), $popup_load_url, 800, 500);
 				}

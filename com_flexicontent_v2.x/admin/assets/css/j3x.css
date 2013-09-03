@@ -19,6 +19,11 @@
 .icon-32-advindexpurge	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-purge.png); }
 
 
+/* small labels */
+.label.highlight, .badge.highlight {
+	color: darkred;
+}
+
 /* other */
 
 #sidebar {
@@ -344,8 +349,7 @@ div table.adminform td {
 	text-align:left;
 }
 
-div table.adminform input { font-size:11px !important; padding:2px; }
-div table.adminform select { font-size:10px; }
+
 
 div table.admintable td {
 	/*background-color:#F9F9F9;*/

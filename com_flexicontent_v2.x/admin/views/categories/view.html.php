@@ -84,13 +84,13 @@ class FlexicontentViewCategories extends JViewLegacy
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=categories&layout=params&tmpl=component';
 		if (FLEXI_J16GE) {
 			$js .= "
-				$$('li#toolbar-params a.toolbar')
+				$$('li#toolbar-params a.toolbar, #toolbar-params button')
 					.set('onclick', 'javascript:;')
 					.set('href', '".$popup_load_url."')
 					.set('rel', '{handler: \'iframe\', size: {x: 600, y: 440}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
-			JHtml::_('behavior.modal', 'li#toolbar-params a.toolbar');
+			JHtml::_('behavior.modal', 'li#toolbar-params a.toolbar, #toolbar-params button');
 		} else {
 			$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), $popup_load_url, 600, 440);
 		}
@@ -195,7 +195,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$options[]	= JHtml::_('select.option', '', JText::_( 'FLEXI_SELECT_MAX_DEPTH' ));
 		for($i=1; $i<=10; $i++) $options[]	= JHtml::_('select.option', $i, $i);
 		$fieldname =  $elementid = 'filter_level';
-		$attribs = ' class="inputbox" onchange="this.form.submit();" ';
+		$attribs = ' size="1" class="inputbox" onchange="this.form.submit();" ';
 		$lists['level']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_level, $elementid, $translate=true );
 		
 		// filter publication state
@@ -204,7 +204,7 @@ class FlexicontentViewCategories extends JViewLegacy
 			$options = JHtml::_('jgrid.publishedOptions');
 			array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_SELECT_PUBLISHED')) );
 			$fieldname =  $elementid = 'filter_state';
-			$attribs = ' class="inputbox" onchange="Joomla.submitform()" ';
+			$attribs = ' size="1" class="inputbox" onchange="Joomla.submitform()" ';
 			$lists['state']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_state, $elementid, $translate=true );
 		} else {
 			$lists['state']	= JHTML::_('grid.state', $filter_state );
@@ -216,11 +216,11 @@ class FlexicontentViewCategories extends JViewLegacy
 			$options = JHtml::_('access.assetgroups');
 			array_unshift($options, JHtml::_('select.option', '', JText::_('JOPTION_SELECT_ACCESS')) );
 			$fieldname =  $elementid = 'filter_access';
-			$attribs = ' class="inputbox" onchange="Joomla.submitform()" ';
+			$attribs = ' size="1" class="inputbox" onchange="Joomla.submitform()" ';
 			$lists['access']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
 			
 			// filter language
-			$lists['language'] = flexicontent_html::buildlanguageslist('filter_language', 'class="inputbox" onchange="submitform();"', $filter_language, 2);
+			$lists['language'] = flexicontent_html::buildlanguageslist('filter_language', 'size="1" class="inputbox" onchange="submitform();"', $filter_language, 2);
 		} else {
 			// filter access level
 			$options = array();
@@ -229,7 +229,7 @@ class FlexicontentViewCategories extends JViewLegacy
 			$options[] = JHtml::_('select.option', '1', JText::_('Registered'));
 			$options[] = JHtml::_('select.option', '2', JText::_('SPECIAL'));
 			$fieldname =  $elementid = 'filter_access';
-			$attribs = ' class="inputbox" onchange="this.form.submit()" ';
+			$attribs = ' size="1" class="inputbox" onchange="this.form.submit()" ';
 			$lists['access']	= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $filter_access, $elementid, $translate=true );
 		}
 		

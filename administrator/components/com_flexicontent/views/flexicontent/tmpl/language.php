@@ -126,13 +126,18 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	});
 </script>
 
+<div id="flexicontent">
 <form action="" method="get" name="adminForm" id="adminForm" class="lang_submit">
 	<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">
 				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 					<tr>
-						<th colspan="2" style="text-align:left;"><h2><?php echo JText::_( 'FLEXI_SEND_LANGUAGE_TITLE' ); ?></h2></th>
+						<th colspan="2" style="text-align:left;">
+							<label class="flexi_label" style="width: auto !important; max-width: 400px !important;">
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_TITLE' ); ?>
+							</label>
+						</th>
 					</tr>
 					<tr>
 						<td class="key">
@@ -204,20 +209,38 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 						<td>&nbsp;</td>
 					</tr>
 					<tr>
-						<td align="right"><input id="archive" type="button" class="button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE' ); ?>" /></td>
-						<td align="left"><input id="send" type="button" class="button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_SEND' ); ?>" onclick="alert('NOT ALLOWED. Next revision will allow public usage or limit to authorized translators only')" /></td>
+						<td align="right"><input id="archive" type="button" class="fc_button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE' ); ?>" /></td>
+						<td align="left"><input id="send" type="button" class="fc_button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_SEND' ); ?>" onclick="alert('NOT ALLOWED. Next revision will allow public usage or limit to authorized translators only')" /></td>
 					</tr>
 				</table>
 			</td>
 			<td valign="top">
 				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 					<tr>
-						<th style="text-align:left;"><h2>&nbsp;<?php // echo JText::_( 'FLEXI_SEND_LANGUAGE_MISSING_FILES_TITLE' ); ?></h2></th>
+						<th style="text-align:left;" colspan="2">
+							<label class="flexi_label" style="width: auto !important; max-width: 400px !important;">
+								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_MISSING_FILES_TITLE' ); ?>
+							</label>
+						</th>
 					</tr>
 					<tr>
 						<td>
-							<div id="log" style="width:330px; display:block;"><?php echo $this->lists['missing_lang']; ?></div>
-							<input id="missing" type="button" class="button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ADD_MISSING' ); ?>" />
+							<div id="log" style="width:330px; display:block;">
+								<?php if ( !is_array($this->lists['missing_lang']) ) : ?>
+									<div id="log" style="width:330px; display:block;"><?php echo $this->lists['missing_lang']; ?>
+								<?php else : ?>
+									<?php
+									$missing = & $this->lists['missing_lang'];
+									$missing_str = '';
+									if (@$missing['site']) $missing_str .= '<label class="label">Missing files (Frontend)</label> <br/>'. implode('<br/>', $missing['site']);
+									if (@$missing['site'] && @$missing['admin']) $missing_str .= '<br/>';
+									if (@$missing['admin']) $missing_str .= '<label class="label">Missing files (Backend)</label> <br/>'. implode('<br/>', $missing['admin']);
+									echo $missing_str;
+									?>
+									<div class="clear"></div>
+									<input id="missing" type="button" class="fc_button" value="<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_ADD_MISSING' ); ?>" />
+								<?php endif; ?>
+							</div>
 						</td>
 					</tr>
 				</table>
@@ -227,6 +250,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <input type="hidden" name="option" value="com_flexicontent" />
 <input type="hidden" name="view" value="flexicontent" />
 </form>
+</div>
 
 <?php
 //keep session alive while editing
