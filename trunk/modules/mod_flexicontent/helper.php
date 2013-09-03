@@ -1368,15 +1368,15 @@ class modFlexicontentHelper
 		$join_field_filters = '';
 		foreach ($static_filters as $filter_id => $filter_values)
 		{
-			// Hanlde single-valued filter as multi-valued
-			if ( !is_array($filter_values) ) $filter_values[0] = array($filter_values);
+			// Handle single-valued filter as multi-valued
+			if ( !is_array($filter_values) ) $filter_values = array(0 => $filter_values);
 			
 			// Single or Multi valued filter
 			if ( isset($filter_values[0]) )
 			{
 				$in_values = array();
 				foreach ($filter_values as $val) $in_values[] = $db->Quote( $val );   // Quote in case they are strings !!
-				$where_field_filters .= ' AND rel'.$filter_id.' IN ('.implode(',', $in_values).') ';
+				$where_field_filters .= ' AND rel'.$filter_id.'.value IN ('.implode(',', $in_values).') ';
 			}
 			
 			// Range value filter
@@ -1388,7 +1388,7 @@ class modFlexicontentHelper
 				if ( strlen(@$filter_values[2]) ) $where_field_filters .= ' AND (rel'.$filter_id.' <=' . $filter_values[2] . $value_empty . ') ';
 			}
 			
-			$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;
+			$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;
 		}
 
 		if ( empty($items_query) ) {  // If a custom query has not been set above then use the default one ...

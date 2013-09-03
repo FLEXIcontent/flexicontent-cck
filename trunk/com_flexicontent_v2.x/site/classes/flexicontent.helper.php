@@ -1330,10 +1330,9 @@ class flexicontent_html
 		if ( $view!='category' || !in_array($layout, array('default','mcats','myitems')) ) return '';
 
 		// Check if user can ADD to current category or to any category
-		if ($maincat && $layout == 'default') {
+		if ($maincat->id && $layout == 'default') {
 			$add_label = JText::_('FLEXI_ADD_NEW_CONTENT_TO_CURR_CAT');
-			$permission = FlexicontentHelperPerm::getPerm();
-			$canAdd = $permission->CanAdd;
+			$canAdd = $user->authorise('core.create', 'com_content.category.' . $maincat->id);
 		} else  {
 			$add_label = JText::_('FLEXI_ADD_NEW_CONTENT_TO_LIST');
 			$specific_catids = $maincat->id ? array( $maincat->id ) : $maincat->ids;
@@ -2650,7 +2649,7 @@ class flexicontent_html
 		}
 		$full_js = "javascript: $full_js";
 
-		$button_html	= "<a href=\"#\" onclick=\"$full_js\" class=\"toolbar\">\n";
+		$button_html	= "<a href=\"#\" onclick=\"$full_js\" class=\"toolbar btn btn-small\">\n";
 		$button_html .= "<span class=\"$class\" title=\"$text\">\n";
 		$button_html .= "</span>\n";
 		$button_html	.= "$text\n";

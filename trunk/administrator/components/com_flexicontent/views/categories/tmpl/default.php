@@ -41,7 +41,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 	<table class="adminform">
 		<tr>
 			<td width="100%">
-			  	<?php echo JText::_( 'FLEXI_SEARCH' ); ?>
+				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
 				<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
 				<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>

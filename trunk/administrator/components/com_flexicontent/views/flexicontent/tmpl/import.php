@@ -51,10 +51,10 @@ $close_popup_js = FLEXI_J16GE ? "window.parent.SqueezeBox.close();" : "window.pa
 	<table width="100%">
 		<tr>
 			<td width="50%" align="right">
-			<input id="import" type="button" class="button" value="<?php echo JText::_( 'FLEXI_IMPORT_BUTTON' ); ?>" />
+			<input id="import" type="button" class="fc_button" value="<?php echo JText::_( 'FLEXI_IMPORT_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="button" onclick="<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>" />			
+			<input type="button" class="fc_button" onclick="<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CANCEL' ); ?>" />			
 			</td>
 		</tr>
 	</table>

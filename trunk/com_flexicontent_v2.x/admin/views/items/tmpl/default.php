@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1592 2012-12-11 20:30:52Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1746 2013-09-01 21:44:12Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -46,20 +46,20 @@ $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_ENABLED_TIP').'" />' .' ';
-	$drag_handle_box = '<div class="fc_drag_handle%s" alt="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE').'" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE').'"></div>';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_ENABLED_TIP', true).'" />' .' ';
+	$drag_handle_box = '<div class="fc_drag_handle%s" alt="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE').'" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 } else {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_DISABLED_TIP').'" />' .' ';
-	$drag_handle_box = '<div class="fc_drag_handle %s" alt="'.JText::_('FLEXI_ORDER_COLUMN_FIRST').'" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST').'" ></div>';
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_DISABLED_TIP', true).'" />' .' ';
+	$drag_handle_box = '<div class="fc_drag_handle %s" alt="'.JText::_('FLEXI_ORDER_COLUMN_FIRST').'" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
 	$image_saveorder    = '';
 }
 
 if ( !$this->filter_order_type ) {
-	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_ORDER_JOOMLA').'::'.JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP').'" />';
+	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_ORDER_JOOMLA', true).'::'.JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA', true)).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP', true).'" />';
 	$ord_catid = 'catid';
 	$ord_col = 'ordering';
 } else {
-	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_ORDER_FLEXICONTENT').'::'.JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_FLEXICONTENT')).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP').'" />';
+	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_ORDER_FLEXICONTENT', true).'::'.JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_FLEXICONTENT', true)).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP', true).'" />';
 	$ord_catid = 'rel_catid';
 	$ord_col = 'catsordering';
 }
@@ -290,8 +290,8 @@ window.addEvent('domready', function() {
 			<th class="left">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->search) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('search');document.adminForm.submit();" />
+				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
+					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('search');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -304,8 +304,8 @@ window.addEvent('domready', function() {
 			<th width="" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'ie.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_lang');document.adminForm.submit();" />
+				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
+					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_lang');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -313,16 +313,16 @@ window.addEvent('domready', function() {
 			<th width="" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_type');document.adminForm.submit();" />
+				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
+					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_type');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
 			<th width="1%" nowrap="nowrap" class="center">
-				<?php echo JText::_( 'FLEXI_STATE' ); ?>
+				<?php echo JText::_( 'FLEXI_STATE', true ); ?>
 				<?php if ($this->filter_state) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_state');document.adminForm.submit();" />
+				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
+					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_state');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -355,16 +355,16 @@ window.addEvent('domready', function() {
 			<th width="10%" class="left">
 				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->filter_cats) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_cats');document.adminForm.submit();" />
+				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
+					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_cats');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
 			<th width="" class="center">
 				<?php echo JText::_( 'FLEXI_AUTHOR' ); ?>
 				<?php if ($this->filter_authors) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_authors');document.adminForm.submit();" />
+				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
+					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_authors');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 			</th>
@@ -374,8 +374,8 @@ window.addEvent('domready', function() {
 				if ($this->date == '1') :
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
+				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
+					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
 				</span>
 				<?php
 					endif;
@@ -388,8 +388,8 @@ window.addEvent('domready', function() {
 				if ($this->date == '2') :
 					if (($this->startdate && ($this->startdate != JText::_('FLEXI_FROM'))) || ($this->enddate && ($this->startdate != JText::_('FLEXI_TO')))) :
 				?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
+				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
+					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('startdate');delFilter('enddate');document.adminForm.submit();" />
 				</span>
 				<?php
 					endif;
@@ -402,8 +402,8 @@ window.addEvent('domready', function() {
 			<th width="2%" nowrap="nowrap" class="center">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_id) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER') ?>" onclick="delFilter('filter_id');document.adminForm.submit();" />
+				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
+					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_id');document.adminForm.submit();" />
 				</span>
 				<?php endif; ?>
 
@@ -412,6 +412,7 @@ window.addEvent('domready', function() {
 
 		<tr id="filterline">
 			<td class="left col_title" colspan="4">
+				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
 				<span class="radio"><?php echo $this->lists['scope']; ?></span>
 				<div class="clear"></div>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
@@ -576,11 +577,11 @@ window.addEvent('domready', function() {
 
 			if ( $row->publication_scheduled && $is_published ) {
 				$extra_img = 'pushished_scheduled.png';
-				$extra_alt = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION' );
+				$extra_alt = JText::_( 'FLEXI_SCHEDULED_FOR_PUBLICATION', true );
 			}
 			if ( $row->publication_expired && $is_published ) {
 				$extra_img = 'pushished_expired.png';
-				$extra_alt = JText::_( 'FLEXI_PUBLICATION_EXPIRED' );
+				$extra_alt = JText::_( 'FLEXI_PUBLICATION_EXPIRED', true );
 			}
 
 			// Set a row language, even if empty to avoid errors
@@ -627,7 +628,7 @@ window.addEvent('domready', function() {
 				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
+					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM', true );?>::<?php echo $row->title; ?>">
 					<?php
 					if ( $enable_translation_groups ) :
 						if ($this->lists['order']=='ie.lang_parent_id'&& $row->id!=$row->lang_parent_id) echo "<sup>|</sup>--";
@@ -666,12 +667,12 @@ window.addEvent('domready', function() {
 		<?php endforeach; ?>
 
 		<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>
-			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE' ).'::'.($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
+			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE', true ).'::'.($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
 
 				<?php if ( !empty($row->lang) && !empty($this->langs->{$row->lang}->imgsrc) ) : ?>
 					<img src="<?php echo $this->langs->{$row->lang}->imgsrc; ?>" alt="<?php echo $row->lang; ?>" />
 				<?php elseif( !empty($row->lang) ) : ?>
-					<?php echo $row->lang=='*' ? JText::_("All") : $row->lang;?>
+					<?php echo $row->lang=='*' ? JText::_("FLEXI_ALL") : $row->lang;?>
 				<?php endif; ?>
 
 			</td>
@@ -711,13 +712,13 @@ window.addEvent('domready', function() {
 						if ($assoc_item->id==$row->id) continue;
 
 						$_link  = 'index.php?option=com_flexicontent&'.$items_task.'edit&cid[]='. $assoc_item->id;
-						$_title = JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ).':: ['. $assoc_item->lang .'] '. $assoc_item->title;
+						$_title = JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION', true ).':: ['. $assoc_item->lang .'] '. $assoc_item->title;
 						echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
 						//echo $assoc_item->id;
 						if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
 							echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
 						} else if( !empty($assoc_item->lang) ) {
-							echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
+							echo $assoc_item->lang=='*' ? JText::_("FLEXI_ALL") : $assoc_item->lang;
 						}
 
 						$assoc_modified = strtotime($assoc_item->modified);
@@ -797,7 +798,7 @@ window.addEvent('domready', function() {
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 					if ($this->CanCats) :
 				?>
-					<span class="editlinktip hasTip<?php echo $typeofcats; ?>" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $title; ?>">
+					<span class="editlinktip hasTip<?php echo $typeofcats; ?>" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY', true );?>::<?php echo $title; ?>">
 					<a href="<?php echo $catlink; ?>">
 						<?php
 						if (JString::strlen($title) > 20) {
@@ -862,21 +863,21 @@ window.addEvent('domready', function() {
 	
 	<table class="admintable" style="margin: 0 auto !important;">
 		<tr>
-			<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED', true ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
-			<td><img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS', true ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
 		</tr><tr>
-			<td><img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED', true ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></td>
-			<td><img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING', true ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-			<td><img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE', true ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 		</tr><tr>
-			<td><img src="../components/com_flexicontent/assets/images/archive.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/archive.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED', true ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_ARCHIVED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-			<td><img src="../components/com_flexicontent/assets/images/trash.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TRASHED' ); ?>" /></td>
+			<td><img src="../components/com_flexicontent/assets/images/trash.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TRASHED', true ); ?>" /></td>
 			<td><?php echo JText::_( 'FLEXI_TRASHED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
 		</tr>
 	</table>

@@ -318,7 +318,7 @@ if ($this->user->get('lastvisitDate') == "0000-00-00 00:00:00") {
 					<td>
 						<div style='display:none;'>
 							<br />
-							<input class="button" type="button" value="<?php echo JText::_( 'change Contact Details' ); ?>" onclick="gotocontact( '<?php echo $this->contact[0]->id; ?>' )" />
+							<input type="button" class="fc_button" value="<?php echo JText::_( 'change Contact Details' ); ?>" onclick="gotocontact( '<?php echo $this->contact[0]->id; ?>' )" />
 							<i>
 								<br /><br />
 								'<?php echo JText::_( 'Components -> Contact -> Manage Contacts' ); ?>'

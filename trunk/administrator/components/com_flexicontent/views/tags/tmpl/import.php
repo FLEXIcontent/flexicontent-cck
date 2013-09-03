@@ -59,10 +59,10 @@ window.addEvent('domready', function(){
 	<table width="100%" align="center">
 		<tr>
 			<td width="50%" align="right">
-			<input id="import" type="submit" class="button" value="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_BUTTON' ); ?>" />
+			<input id="import" type="submit" class="fc_button" value="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_BUTTON' ); ?>" />
 			</td>
 			<td width="50%" align="left">
-			<input type="button" class="button" onclick="window.parent.document.adminForm.submit();<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
+			<input type="button" class="fc_button" onclick="window.parent.document.adminForm.submit();<?php echo $close_popup_js;?>" value="<?php echo JText::_( 'FLEXI_CLOSE_IMPORT_TAGS' ); ?>" />			
 			</td>
 		</tr>
 	</table>

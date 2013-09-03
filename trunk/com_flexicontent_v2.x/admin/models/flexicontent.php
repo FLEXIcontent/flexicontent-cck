@@ -1040,7 +1040,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$adminfiles = array(
 		// component files
 			'com_flexicontent',
-			'com_flexicontent.sys',
+			(FLEXI_J16GE ? 'com_flexicontent.sys' : ''),
 		// plugin files  --  flexicontent_fields
 			'plg_flexicontent_fields_checkbox',
 			'plg_flexicontent_fields_checkboximage',
@@ -1067,8 +1067,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			'plg_flexicontent_fields_toolbar',
 			'plg_flexicontent_fields_weblink',
 		// plugin files  --  finder
-			'plg_finder_flexicontent',
-			'plg_finder_flexicontent.sys',
+			(FLEXI_J16GE ? 'plg_finder_flexicontent' : ''),
+			(FLEXI_J16GE ? 'plg_finder_flexicontent.sys' : ''),
 		// plugin files  --  content
 			'plg_content_flexibreak',
 		// plugin files  --  flexicontent
@@ -1102,6 +1102,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 		
 		foreach ($adminfiles as $file) {
+			if (!$file) continue;
 			if (!JFile::exists($adminpath.$prefix.$file.$suffix)) {
 				$missing['admin'][] = $file;
 				if ($method == 'create') 
@@ -1114,6 +1115,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			}
 		}
 		foreach ($sitefiles as $file) {
+			if (!$file) continue;
 			if (!JFile::exists($sitepath.$prefix.$file.$suffix)) {
 				$missing['site'][] = $file;
 				if ($method == 'create') 
@@ -1196,7 +1198,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($method == 'zip') {
 			return '<h3 class="lang-success">' . JText::_( 'FLEXI_SEND_LANGUAGE_ARCHIVE_SUCCESS' ) . '</span>';
 		}
-		return (count($missing) > 0) ? $missing : '<h3 class="lang-success">'. JText::sprintf( 'FLEXI_SEND_LANGUAGE_NO_MISSING', $code ) .'</h3>';
+		return (count($missing) > 0) ? $missing : '<span class="fc-mssg fc-success">'. JText::sprintf( 'FLEXI_SEND_LANGUAGE_NO_MISSING', $code ) .'</span>';
 	}
 
 	

@@ -340,7 +340,7 @@ class FlexicontentHelperPerm
 			// Find all section ids (e.g. item ids) that user can perform the given action
 			foreach($names as $name) {
 				$id = str_replace("{$extension}.{$dbsection}.",  "", $name);
-				if($user->authorize($action, $name)) {
+				if($user->authorise($action, $name)) {
 					$elements[$uid][$section][$action][] = $id;
 				}
 			}

@@ -46,8 +46,16 @@ $document = JFactory::getDocument();
 $document->addStyleDeclaration($css);
 $option = JRequest::getVar('option');
 if ($option=='com_config') {
-	$document->addStyleSheet('../components/com_flexicontent/assets/css/flexi_form.css');
-	if (FLEXI_J30GE)  $document->addStyleSheet('components/com_flexicontent/assets/css/j3x.css');
+	$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_form.css');
+	if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
+}
+
+if (FLEXI_J16GE) {
+	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+	FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+	flexicontent_html::loadJQuery();
+	$document->addScript(JURI::root().'administrator/components/com_flexicontent/assets/js/admin.js');
+	$document->addScript(JURI::root().'administrator/components/com_flexicontent/assets/js/validate.js');
 }
 
 class JElementSeparator extends JElement

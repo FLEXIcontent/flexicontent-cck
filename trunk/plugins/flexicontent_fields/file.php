@@ -533,7 +533,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			// support for basic CSV import / export
 			if ( $is_importcsv ) {
-				if ( !is_integer($v) ) {
+				if ( !is_numeric($v) ) {
 					$filename = $v;
 					$fman = new FlexicontentControllerFilemanager();
 					JRequest::setVar( 'return-url', null, 'post' );
@@ -546,8 +546,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					//$_filename = key($file_ids);  this is the cleaned up filename, currently not needed
 				}
 			}
-    	
-			if ( !empty ($v) && is_integer($v) ) $newpost[$v] = $new++;
+			if ( !empty ($v) && is_numeric($v) ) $newpost[$v] = $new++;
     }
     $post = array_flip($newpost);
 	}

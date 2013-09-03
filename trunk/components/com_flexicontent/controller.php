@@ -1371,8 +1371,8 @@ class FlexicontentController extends JControllerLegacy
 		$extname = JRequest::getVar( 'extname', '' );
 		$extfunc = JRequest::getVar( 'extfunc', '' );
 		
-		if ($exttype!='modules') jexit();  // currently supporting only plugins
-		if (!$extname || !$extfunc) jexit();  // require variable not set
+		if ($exttype!='modules') { echo 'only modules are supported'; jexit(); }  // currently supporting only plugins
+		if (!$extname || !$extfunc) { echo 'function or extension name not set'; jexit(); }  // require variable not set
 		
 		// Import helper file
 		$helper_path = JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php';
@@ -1390,7 +1390,12 @@ class FlexicontentController extends JControllerLegacy
 		// Method actually exists
 		if ( !method_exists($obj, $extfunc) ) { echo "non-existing method called "; jexit(); }
 		
-		// Final call the method
+		// Load extension's english language file then override with current language file
+		$extension_name = 'mod_'.strtolower($extname);
+		JFactory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB', true);
+		JFactory::getLanguage()->load($extension_name, JPATH_SITE, null, true);
+		
+		// Call the method
 		$obj->$extfunc();
 	}
 	

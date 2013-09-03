@@ -191,16 +191,16 @@ class FlexicontentViewItems extends JViewLegacy {
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent'.$btn_task.'&format=raw';
 			if (FLEXI_J30GE) {  // Layout of Popup button broken in J3.1, add manually
 				$js .= "
-					$$('li#toolbar-publish a.toolbar')
+					$$('li#toolbar-publish a.toolbar, #toolbar-publish button')
 						.set('onclick', 'javascript:;')
 						.set('href', '".$popup_load_url."')
-						.set('rel', '{handler: \'iframe\', size: {x: 600, y: 240}, onClose: function() {}}');
+						.set('rel', '{handler: \'iframe\', size: {x: 800, y: 240}, onClose: function() {}}');
 				";
 				//JToolBarHelper::publishList( $btn_task );
 				JToolBarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', false );
-				JHtml::_('behavior.modal', 'li#toolbar-publish a.toolbar');
+				JHtml::_('behavior.modal', 'li#toolbar-publish a.toolbar, #toolbar-publish button');
 			} else {
-				$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), $popup_load_url, 600, 240);
+				$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), $popup_load_url, 800, 240);
 			}
 			$add_divider = true;
 		}
@@ -247,16 +247,16 @@ class FlexicontentViewItems extends JViewLegacy {
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=types&format=raw';
 			if (FLEXI_J30GE) {  // Layout of Popup button broken in J3.1, add manually
 				$js .= "
-					$$('li#toolbar-new a.toolbar')
+					$$('li#toolbar-new a.toolbar, #toolbar-new button')
 						.set('onclick', 'javascript:;')
 						.set('href', '".$popup_load_url."')
-						.set('rel', '{handler: \'iframe\', size: {x: 600, y: 240}, onClose: function() {}}');
+						.set('rel', '{handler: \'iframe\', size: {x: 800, y: 240}, onClose: function() {}}');
 				";
 				//JToolBarHelper::addNew( $btn_task );
 				JToolBarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
-				JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar');
+				JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar, #toolbar-new button');
 			} else {
-				$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), $popup_load_url, 600, 240);
+				$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), $popup_load_url, 800, 240);
 			}
 			$add_divider = true;
 		}

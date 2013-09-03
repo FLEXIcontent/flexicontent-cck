@@ -726,6 +726,10 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function countFieldRelationsMultiProp(&$rows, $value_prop, $field_prop, $field_type)
 	{
+		// TEMPORARILY DISABLE this till we can implement a different way to do count file usage by multiproperty fields
+		foreach ($rows as $row)  $row->{'assigned_'.$field_type} = 0;
+		return;
+		
 		if (!$rows || !count($rows)) return array();  // No file records to check
 		
 		// Some fields may not be using DB, create a limitation for them

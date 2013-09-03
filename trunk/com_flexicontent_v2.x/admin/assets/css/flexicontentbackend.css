@@ -446,11 +446,11 @@ table.adminlist thead td {
 	color: #666;
 /* 	border-bottom: 1px solid #999; */
 	border-left: 1px solid #fff;
-	vertical-align: bottom;
+	vertical-align: middle;
 }
 table.adminlist thead td.left #search,
 table.adminlist thead td.left #filter_id {
-	width: 100%;
+	width: 92%;
 }
 table.adminlist thead td.left .radio {
 	display: block;
@@ -481,11 +481,7 @@ table.adminlist tbody tr td.yellow,
 table.adminlist tbody tr.row1 td.yellow {
 	background-color: #FFFFDD;
 }
-table.adminlist thead select {
-	font-size: 11px !important;
-	padding: 6px 2px;
-	border-radius: 4px;
-}
+
 table.adminlist thead #filter_lang,
 table.adminlist thead #filter_state,
 table.adminlist thead #filter_type { width: 50px !important; }
@@ -605,7 +601,7 @@ div#result table.versionlist th {
 .fc_select_button {
 	display:block;  float:left;  padding:6px;  margin: 12px; 
 	background-color:#eeeeee;  border:1px solid #dddddd;  border-radius:6px;
-	font-weight:bold;  font-size:12px;  font-family:tahoma;
+	font-weight:bold;  font-size:11px;  font-family:tahoma;
 	text-align:left;  text-decoration:none;
 }
 .fc_select_button:hover {

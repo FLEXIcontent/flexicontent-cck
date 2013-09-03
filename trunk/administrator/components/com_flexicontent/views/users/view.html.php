@@ -45,7 +45,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		
 		$filter_itemscount = $app->getUserStateFromRequest( "$option.authors.filter_itemscount",		'filter_itemscount', 		'',			'int' );
 		
-		$filter_type    = $app->getUserStateFromRequest( "$option.authors.filter_type",		'filter_type', 		'',			'string' );
+		$filter_usergrp    = $app->getUserStateFromRequest( "$option.authors.filter_usergrp",		'filter_usergrp', 		'',			'string' );
 		$filter_logged  = $app->getUserStateFromRequest( "$option.authors.filter_logged",		'filter_logged', 	'',			'int' );
 		
 		$date       = $app->getUserStateFromRequest( "$option.authors.date", 				'date', 			1, 				'int' );
@@ -79,8 +79,8 @@ class FlexicontentViewUsers extends JViewLegacy
 
 
 		$js = "window.addEvent('domready', function(){";
-		if ($filter_type) {
-			$js .= "$$('.col_type').each(function(el){ el.addClass('yellow'); });";
+		if ($filter_usergrp) {
+			$js .= "$$('.col_usergrp').each(function(el){ el.addClass('yellow'); });";
 		}
 		if ($filter_logged) {
 			$js .= "$$('.col_logged').each(function(el){ el.addClass('yellow'); });";
@@ -172,15 +172,15 @@ class FlexicontentViewUsers extends JViewLegacy
 			$where[] = 'a.id = '.$filter_id;
 		}
 		
-		if ( $filter_type )
+		if ( $filter_usergrp )
 		{
 			if ( !FLEXI_J16GE ) {
-				if ( $filter_type == 'Public Frontend' )     $where[] = ' a.usertype = \'Registered\' OR a.usertype = \'Author\' OR a.usertype = \'Editor\' OR a.usertype = \'Publisher\' ';
-				else if ( $filter_type == 'Public Backend' ) $where[] = 'a.usertype = \'Manager\' OR a.usertype = \'Administrator\' OR a.usertype = \'Super Administrator\' ';
-				else                                         $where[] = 'a.usertype = LOWER( '.$db->Quote($filter_type).' ) ';
+				if ( $filter_usergrp == 'Public Frontend' )     $where[] = ' a.usertype = \'Registered\' OR a.usertype = \'Author\' OR a.usertype = \'Editor\' OR a.usertype = \'Publisher\' ';
+				else if ( $filter_usergrp == 'Public Backend' ) $where[] = 'a.usertype = \'Manager\' OR a.usertype = \'Administrator\' OR a.usertype = \'Super Administrator\' ';
+				else                                         $where[] = 'a.usertype = LOWER( '.$db->Quote($filter_usergrp).' ) ';
 			} else {
 				// Added as right join, see query bellow
-				$extra_joins[] = ' RIGHT JOIN #__user_usergroup_map AS ug ON ug.user_id = a.id AND ug.group_id='.$filter_type;
+				$extra_joins[] = ' RIGHT JOIN #__user_usergroup_map AS ug ON ug.user_id = a.id AND ug.group_id='.$filter_usergrp;
 			}
 		}
 		if ( $filter_logged == 1 )
@@ -263,7 +263,7 @@ class FlexicontentViewUsers extends JViewLegacy
 				$row->usergroups = array();
 				$user_ids[] = $row->id;
 			}
-			$query = 'SELECT user_id, group_id FROM #__user_usergroup_map WHERE user_id IN ('.implode(',',$user_ids).')';
+			$query = 'SELECT user_id, group_id FROM #__user_usergroup_map ' . (count($user_ids) ? 'WHERE user_id IN ('.implode(',',$user_ids).')'  :  '');
 			$db->setQuery( $query );
 			$ugdata_arr = $db->loadObjectList();
 			foreach ($ugdata_arr as $ugdata) $usergroups[$ugdata->user_id][] = $ugdata->group_id;
@@ -289,7 +289,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		$itemscount_options[] = JHTML::_('select.option',  2, JText::_( 'Any number' ) );
 		$lists['filter_itemscount'] = JHTML::_('select.genericlist',   $itemscount_options, 'filter_itemscount', 'class="inputbox" size="1" onchange="document.adminForm.submit( );"', 'value', 'text', "$filter_itemscount" );
 		
-		$lists['filter_type'] 	= JHTML::_('select.genericlist',   $types, 'filter_type', 'class="inputbox" style="width:auto;" size="1" onchange="document.adminForm.submit( );"', 'value', 'text', "$filter_type" );
+		$lists['filter_usergrp'] 	= JHTML::_('select.genericlist',   $types, 'filter_usergrp', 'class="inputbox" style="width:auto;" size="1" onchange="document.adminForm.submit( );"', 'value', 'text', "$filter_usergrp" );
 
 		// get list of Log Status for dropdown filter
 		$logged[] = JHTML::_('select.option',  '', '- '. JText::_( 'Select Log Status' ) .' -');
@@ -323,7 +323,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		// filters
 		$this->assignRef('filter_id'		, $filter_id);
 		$this->assignRef('filter_itemscount'		, $filter_itemscount);
-		$this->assignRef('filter_type'		, $filter_type);
+		$this->assignRef('filter_usergrp'		, $filter_usergrp);
 		$this->assignRef('filter_logged'	, $filter_logged);
 		$this->assignRef('search'			, $search);
 		$this->assignRef('filter_id'			, $filter_id);

@@ -53,7 +53,7 @@ function submitbutton(pressbutton) {
 		<tr>
 			<td class="key">
 				<label for="altname">
-					<?php echo JText::_( 'FLEXI_DISPLAY_TITLE' ).':'; ?>
+					<?php echo JText::_( 'FLEXI_FILE_TITLE' ).':'; ?>
 				</label>
 			</td>
 			<td>

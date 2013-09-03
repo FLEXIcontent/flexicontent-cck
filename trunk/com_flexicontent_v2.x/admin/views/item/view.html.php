@@ -181,19 +181,19 @@ class FlexicontentViewItem extends JViewLegacy
 
 			if ( !$params->get('use_versioning', 1) || ($row->version == $row->current_version && $row->version == $row->last_version) )
 			{
-				$toolbar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
+				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
 			} else {
 				// Add a preview button for (currently) LOADED version of the item
 				$previewlink_loaded_ver = $previewlink .'&version='.$row->version;
-				$toolbar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink_loaded_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION').' ['.$row->version.']</a>', 'preview' );
+				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_loaded_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION').' ['.$row->version.']</a>', 'preview' );
 
 				// Add a preview button for currently ACTIVE version of the item
 				$previewlink_active_ver = $previewlink .'&version='.$row->current_version;
-				$toolbar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink_active_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$row->current_version.']</a>', 'preview' );
+				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_active_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$row->current_version.']</a>', 'preview' );
 
 				// Add a preview button for currently LATEST version of the item
 				$previewlink_last_ver = $previewlink .'&preview='.$row->last_version;
-				$toolbar->appendButton( 'Custom', '<a class="preview" href="'.$previewlink_last_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$row->last_version.']</a>', 'preview' );
+				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_last_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$row->last_version.']</a>', 'preview' );
 			}
 			JToolBarHelper::spacer();
 			JToolBarHelper::divider();
