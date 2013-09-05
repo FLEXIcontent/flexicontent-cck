@@ -593,7 +593,7 @@ window.addEvent('domready', function() {
 			<td><?php echo $cid_checkbox; ?></td>
 			<td>
 				<?php
-				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug, 0, $row->type_id)) .'&preview=1' .$autologin;
+				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug)) .'&preview=1' .$autologin;
 				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
 				?>
 			</td>

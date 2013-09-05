@@ -2834,7 +2834,7 @@ class FlexicontentFields
 			if ($result->state != 1 && $result->state != -5) continue;
 			
 			// a. Replace some custom made strings
-			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($result->slug, $result->categoryslug, 0, $result->type_id));
+			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($result->slug, $result->categoryslug));
 			$item_title_escaped = htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8');
 			$item_tooltip = ' class="hasTip relateditem" title="'. JText::_('FLEXI_READ_MORE_ABOUT').'::'.$item_title_escaped.'" ';
 			

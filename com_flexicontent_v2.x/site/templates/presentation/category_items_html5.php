@@ -424,7 +424,7 @@ foreach ($items as $i => $item) :
 	
 	<?php if ( $readmore_shown ) : ?>
 	<span class="readmore group">
-		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id)); ?>" class="readon">
+		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>" class="readon">
 			<?php echo ' ' . ($item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title)); ?>
 		</a>
 	</span>

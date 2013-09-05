@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 1727 2013-08-19 17:57:10Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 1674 2013-04-18 03:41:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -126,7 +126,7 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<h2 class="contentheading"><span class="fc_item_title">
 					<?php if ($this->params->get('link_titles', 0)) : ?>
-					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug, 0, $items[$i]->type_id)); ?>"><?php echo $items[$i]->title; ?></a>
+					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>"><?php echo $items[$i]->title; ?></a>
 					<?php
 					else :
 					echo $items[$i]->title;
@@ -234,7 +234,7 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<?php if ($this->params->get('lead_use_image', 1) && $src) : ?>
 			<div class="image<?php echo $this->params->get('lead_position') ? ' right' : ' left'; ?>">
 				<?php if ($this->params->get('lead_link_image', 1)) : ?>
-				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug, 0, $items[$i]->type_id)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
+				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
 					<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
 				</a>
 				<?php else : ?>
@@ -320,11 +320,11 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<span class="readmore group">
 				<?php
 				/*$uniqueid = "read_more_fc_item_".$items[$i]->id;
-				$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug, 0, $items[$i]->type_id).'&tmpl=component');
+				$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug).'&tmpl=component');
 				echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>';
 				*/
 				?>
-				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $items[$i]->type_id)); ?>" class="readon">
+				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>" class="readon">
 					<?php echo ' ' . ($item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title)); ?>
 				</a>
 				<?php //echo '<script>document.write(\'</a> <div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.$items[$i]->title.'</div>\')</script>'; ?>
@@ -430,7 +430,7 @@ if ($count > $leadnum) :
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<h2 class="contentheading"><span class="fc_item_title">
 					<?php if ($this->params->get('link_titles', 0)) : ?>
-					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug, 0, $items[$i]->type_id)); ?>"><?php echo $items[$i]->title; ?></a>
+					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>"><?php echo $items[$i]->title; ?></a>
 					<?php
 					else :
 					echo $items[$i]->title;
@@ -538,7 +538,7 @@ if ($count > $leadnum) :
 			<?php if ($this->params->get('intro_use_image', 1) && $src) : ?>
 			<div class="image<?php echo $this->params->get('intro_position') ? ' right' : ' left'; ?>">
 				<?php if ($this->params->get('intro_link_image', 1)) : ?>
-					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug, 0, $items[$i]->type_id)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
+					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
 						<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
 					</a>
 				<?php else : ?>
@@ -624,11 +624,11 @@ if ($count > $leadnum) :
 			<span class="readmore">
 				<?php
 				/*$uniqueid = "read_more_fc_item_".$items[$i]->id;
-				$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug, 0, $items[$i]->type_id).'&tmpl=component');
+				$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug).'&tmpl=component');
 				echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>';
 				*/
 				?>
-				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug, 0, $items[$i]->type_id)); ?>" class="readon">
+				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
 				<?php
 				if ($items[$i]->params->get('readmore')) :
 					echo ' ' . $items[$i]->params->get('readmore');
