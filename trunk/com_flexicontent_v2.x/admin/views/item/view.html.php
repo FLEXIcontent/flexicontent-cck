@@ -177,7 +177,7 @@ class FlexicontentViewItem extends JViewLegacy
 		if ( $cid )
 		{
 			$autologin   = $params->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
-			$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug)) .$autologin;
+			$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug, 0, $row->type_id)) .$autologin;
 
 			if ( !$params->get('use_versioning', 1) || ($row->version == $row->current_version && $row->version == $row->last_version) )
 			{

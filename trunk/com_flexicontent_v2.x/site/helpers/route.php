@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: route.php 1649 2013-03-07 05:40:37Z ggppdk $
+ * @version 1.5 stable $Id: route.php 1729 2013-08-19 18:20:54Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -61,7 +61,8 @@ class FlexicontentHelperRoute
 	/**
 	 * function to discover a default item id only once
 	 */
-	static function _setComponentDefaultMenuitemId () {
+	static function _setComponentDefaultMenuitemId ()
+	{
 		// Cache the result on multiple calls
 		static $_component_default_menuitem_id = null;
 		if ($_component_default_menuitem_id || $_component_default_menuitem_id===false) return $_component_default_menuitem_id;
@@ -133,31 +134,63 @@ class FlexicontentHelperRoute
 	
 	
 	/**
+	 * Get type parameters
+	 */
+	static function _getTypeParams()
+	{
+		static $types = null;
+		if ($types !== null) return $types;
+		
+		// Retrieve item's Content Type parameters
+		$db = JFactory::getDBO();
+		$query = 'SELECT t.attribs, t.id '
+				. ' FROM #__flexicontent_types AS t'
+				;
+		$db->setQuery($query);
+		$types = $db->loadObjectList('id');
+		foreach ($types as $type) $type->params = FLEXI_J16GE ? new JRegistry($type->attribs) : new JParameter($type->attribs);
+		
+		return $types;
+	}
+	
+	
+	/**
 	 * Get routed links for content items
 	 */
-	static function getItemRoute($id, $catid = 0, $Itemid = 0)	{
+	static function getItemRoute($id, $catid = 0, $Itemid = 0, $type_id = 0)
+	{
+		static $component_default_menuitem_id = null;  // Calculate later only if needed
 		
 		$needles = array(
 			FLEXI_ITEMVIEW  => (int) $id,
 			'category' => (int) $catid
 		);
 
-		//Create the link
+		// Get type data (parameters, etc)
+		static $types = null;
+		if ($type_id && $types === null) {
+			$types = FlexicontentHelperRoute::_getTypeParams();
+		}
+		$type = $type_id && isset($types[$type_id)  ?  $types[$type_id] :  false;
+		
+		
+		// Create the link
 		$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW;
-
 		if($catid) {
 			$link .= '&cid='.$catid;
 		}
-
 		$link .= '&id='. $id;
-
-		if($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
+		
+		
+		// Find menu item id (best match)
+		if ($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 			$link .= '&Itemid='.$Itemid;
-		} else if($menuitem = FlexicontentHelperRoute::_findItem($needles)) {
+		} else if($menuitem = FlexicontentHelperRoute::_findItem($needles, $type) {
 			$link .= '&Itemid='.$menuitem->id;
 		} else {
-			$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
-			if($component_default_menuitem_id)
+			if ($component_default_menuitem_id === null)
+				$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
+			if ($component_default_menuitem_id)
 				$link .= '&Itemid='.$component_default_menuitem_id;
 		}
 		
@@ -168,7 +201,9 @@ class FlexicontentHelperRoute
 	/**
 	 * Get routed links for categories
 	 */
-	static function getCategoryRoute($catid, $Itemid = 0, $urlvars = array()) {
+	static function getCategoryRoute($catid, $Itemid = 0, $urlvars = array())
+	{
+		static $component_default_menuitem_id = null;  // Calculate later only if needed
 		
 		$needles = array(
 			'category' => (int) $catid
@@ -179,15 +214,15 @@ class FlexicontentHelperRoute
 		// Append given variables
 		foreach ($urlvars as $varname => $varval) $link .= '&'.$varname.'='.$varval;
 		
-		if($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
+		if ($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 			$link .= '&Itemid='.$Itemid;
 		} else if($menuitem = FlexicontentHelperRoute::_findCategory($needles, $urlvars)) {
 			$link .= '&Itemid='.$menuitem->id;
 		} else {
-			$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
-			if($component_default_menuitem_id) {
+			if ($component_default_menuitem_id === null)
+				$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
+			if ($component_default_menuitem_id)
 				$link .= '&Itemid='.$component_default_menuitem_id;
-			}
 		}
 		
 		return $link;
@@ -197,7 +232,10 @@ class FlexicontentHelperRoute
 	/**
 	 * Get routed link for search view
 	 */
-	static function getSearchRoute($reserved=0, $Itemid = 0) {
+	static function getSearchRoute($reserved=0, $Itemid = 0)
+	{
+		static $component_default_menuitem_id = null;  // Calculate later only if needed
+		
 		static $_search_default_menuitem_id = null;
 		if ($_search_default_menuitem_id === null) {
 			$params = JComponentHelper::getParams('com_flexicontent');
@@ -207,13 +245,14 @@ class FlexicontentHelperRoute
 		//Create the link
 		$link = 'index.php?option=com_flexicontent&view=search';
 
-		if($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
+		if ($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 			$link .= '&Itemid='.$Itemid;
 		} else if ($_search_default_menuitem_id) {
 			$link .= '&Itemid='.$_search_default_menuitem_id;
 		} else {
-			$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
-			if($component_default_menuitem_id)
+			if ($component_default_menuitem_id === null)
+				$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
+			if ($component_default_menuitem_id)
 				$link .= '&Itemid='.$component_default_menuitem_id;
 		}
 		
@@ -224,7 +263,10 @@ class FlexicontentHelperRoute
 	/**
 	 * Get routed link for favourites view
 	 */
-	static function getFavsRoute($reserved=0, $Itemid = 0) {
+	static function getFavsRoute($reserved=0, $Itemid = 0)
+	{
+		static $component_default_menuitem_id = null;  // Calculate later only if needed
+		
 		static $_favs_default_menuitem_id = null;
 		if ($_favs_default_menuitem_id === null) {
 			$params = JComponentHelper::getParams('com_flexicontent');
@@ -234,13 +276,14 @@ class FlexicontentHelperRoute
 		//Create the link
 		$link = 'index.php?option=com_flexicontent&view=favourites';
 
-		if($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
+		if ($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 			$link .= '&Itemid='.$Itemid;
 		} else if ($_favs_default_menuitem_id) {
 			$link .= '&Itemid='.$_favs_default_menuitem_id;
 		} else {
-			$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
-			if($component_default_menuitem_id)
+			if ($component_default_menuitem_id === null)
+				$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
+			if ($component_default_menuitem_id)
 				$link .= '&Itemid='.$component_default_menuitem_id;
 		}
 		
@@ -251,7 +294,10 @@ class FlexicontentHelperRoute
 	/**
 	 * Get routed links for tags
 	 */
-	static function getTagRoute($id, $Itemid = 0) {
+	static function getTagRoute($id, $Itemid = 0)
+	{
+		static $component_default_menuitem_id = null;  // Calculate later only if needed
+		
 		static $_tags_default_menuitem_id = null;
 		if ($_tags_default_menuitem_id === null) {
 			$params = JComponentHelper::getParams('com_flexicontent');
@@ -265,15 +311,16 @@ class FlexicontentHelperRoute
 		//Create the link
 		$link = 'index.php?option=com_flexicontent&view=tags&id='.$id;
 
-		if($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
+		if ($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 			$link .= '&Itemid='.$Itemid;
 		} else if ($menuitem = FlexicontentHelperRoute::_findTag($needles)) {
 			$link .= '&Itemid='.$menuitem->id;
 		} else if ($_tags_default_menuitem_id) {
 			$link .= '&Itemid='.$_tags_default_menuitem_id;
 		} else {
-			$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
-			if($component_default_menuitem_id)
+			if ($component_default_menuitem_id === null)
+				$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
+			if ($component_default_menuitem_id)
 				$link .= '&Itemid='.$component_default_menuitem_id;
 		}
 		
@@ -281,7 +328,7 @@ class FlexicontentHelperRoute
 	}
 	
 	
-	static function _findItem($needles)
+	static function _findItem($needles, &$type)
 	{
 		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		$match = null;
@@ -291,6 +338,13 @@ class FlexicontentHelperRoute
 		$db = JFactory::getDBO();
 		$db->setQuery('SELECT access FROM #__content WHERE id='.$needles[FLEXI_ITEMVIEW]);
 		$item_acclevel = $db->loadResult();
+		
+		// Type's default menu id ... either higher priority than item's category or lower ...
+		$type_default_itemid_usage = $type->params->get('type_default_itemid_usage', 0);
+		$type_default_itemid = $type->params->get('type_default_itemid', 0);
+		if ($type_default_itemid) {
+			$matches[ $type_default_itemid_usage ? 3 : 5 ] = $type_default_itemid_usage;
+		}
 		
 		foreach($component_menuitems as $menuitem)
 		{
@@ -320,13 +374,13 @@ class FlexicontentHelperRoute
 				//if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? new JRegistry($menuitem->params) : new JParameter($menuitem->params);
 				//if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
 				
-				$matches[3] = $menuitem; // priority 3 category cid
+				$matches[4] = $menuitem; // priority 3 category cid
 				// no break continue searching for better match ...
 			}
 		}
 		
 		// Use the one with higher priority
-		for ($priority=1; $priority<=3; $priority++) {
+		for ($priority=1; $priority<=5; $priority++) {
 			if (isset($matches[$priority])) {
 				$match = $matches[$priority];
 				break;

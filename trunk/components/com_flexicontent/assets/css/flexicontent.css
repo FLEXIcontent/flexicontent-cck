@@ -1444,7 +1444,7 @@ div.fancybox-wrap a { background: none!important;}
 	font-weight: bold;
 }
 
-#flexicontent .flexi.label {
+#flexicontent .flexi.label, .flexi.label {
 	float: left !important;
   /*width: 16% !important;*/
 	display: block !important;
@@ -1465,7 +1465,7 @@ div.fancybox-wrap a { background: none!important;}
   text-shadow: 0 0 !important;
 }
 
-#flexicontent .flexi.value {
+#flexicontent .flexi.value, .flexi.value {
 	/*float: left !important;*/
 	/*width: 79%;*/
 	padding: 0px !important;

@@ -207,7 +207,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$autologin= ($send_personalized && $user_autologin) ? '&fcu=__SUBSCRIBER_USERNAME__&fcp=__SUBSCRIBER_PASSWORD__' : '';
 		$siteurl  = str_replace('administrator/', '', JURI::base());
 		$siteurl  = str_replace('&amp;', '&', $siteurl);
-		$link     = $siteurl . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $globalcats[$item->catid]->slug)) . $autologin;
+		$link     = $siteurl . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $globalcats[$item->catid]->slug, 0, $item->type_id)) . $autologin;
 		$link     = str_replace('&amp;', '&', $link);
 		$sitename = $app->getCfg('sitename') . ' - ' . $siteurl;
 		

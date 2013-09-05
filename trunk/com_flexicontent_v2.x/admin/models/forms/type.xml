@@ -24,6 +24,12 @@
 		<fieldset name="basic">
 			
 			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" />
+			<field name="type_menu_itemid" type="menuitem" default="" label="FLEXI_TYPE_MENU_ITEM_FOR_URLS" description="FLEXI_TYPE_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
+			<field name="type_menu_itemid_usage" type="list" default="" label="FLEXI_TYPE_MENU_ITEM_USAGE" description="FLEXI_TYPE_MENU_ITEM_USAGE_DESC">
+				<option value="0">FLEXI_TYPE_MENU_ITEM_BEFORE_CAT</option>
+				<option value="1">FLEXI_TYPE_MENU_ITEM_AFTER_CAT</option>
+			</field>
+			
 			<field name="" type="separator" default="FLEXI_TYPE_CONTENT_CONF" level="level2"  />		
 			<field name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>

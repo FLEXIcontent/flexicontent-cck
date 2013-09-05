@@ -168,7 +168,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$orderby .= ', a.title';
 			
 			// array of articles in same category correctly ordered
-			$query 	= 'SELECT a.id, a.title,'
+			$query 	= 'SELECT a.id, a.title, ie.type_id,'
 					. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(":", a.id, a.alias) ELSE a.id END as slug,'
 					. ' CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(":", cc.id, cc.alias) ELSE cc.id END as catslug'
 					. ' FROM #__content AS a'
@@ -224,7 +224,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		
 			if ($field->prev) {
 				$field->prevtitle = $field->prev->title;
-				$field->prevurl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->prev->slug, $field->prev->catslug));
+				$field->prevurl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->prev->slug, $field->prev->catslug, 0, $field->prev->type_id));
 			} else {
 				$field->prevtitle = '';
 				$field->prevurl = '';
@@ -232,7 +232,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 	
 			if ($field->next) {
 				$field->nexttitle = $field->next->title;
-				$field->nexturl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->next->slug, $field->next->catslug));
+				$field->nexturl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->next->slug, $field->next->catslug, 0, $field->next->type_id));
 			} else {
 				$field->nexttitle = '';
 				$field->nexturl = '';

@@ -100,12 +100,12 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		//$users = $this->get('Users');
 		
 		// Get item using at least one file (-of- the currently listed files)
-		$items_single	= $model->getItemsSingleprop( array('file','minigallery') );
+		/*$items_single	= $model->getItemsSingleprop( array('file','minigallery') );
 		$items_multi	= $model->getItemsMultiprop ( $field_props=array('image'=>'originalname'), $value_props=array('image'=>'filename') );
 		$items = array();
 		foreach ($items_single as $item_id => $_item) $items[$item_id] = $_item;
 		foreach ($items_multi  as $item_id => $_item) $items[$item_id] = $_item;
-		ksort($items);
+		ksort($items);*/
 		
 		$assigned_fields_labels = array('image'=>'image/gallery', 'file'=>'file', 'minigallery'=>'minigallery');
 		$assigned_fields_icons = array('image'=>'picture_link', 'file'=>'page_link', 'minigallery'=>'film_link');
@@ -129,12 +129,13 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$lists['url'] = JHTML::_('select.genericlist', $url, 'filter_url', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_url );
 
 		//item lists
-		$items_list = array();
+		/*$items_list = array();
 		$items_list[] = JHTML::_('select.option', '', '- '. JText::_( 'FLEXI_FILTER_BY_ITEM' ) .' -' );
 		foreach($items as $item) {
 			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) . ' (#' . $item->id . ')' );
 		}
-		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
+		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );*/
+		$lists['item_id'] = '<input type="text" name="item_id" size="1" class="inputbox" onchange="submitform( );" value="'.$filter_item.'" />';
 		
 		//build secure/media filterlist
 		$secure 	= array();

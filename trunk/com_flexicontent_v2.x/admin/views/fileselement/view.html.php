@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1604 2012-12-16 11:55:43Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1750 2013-09-03 20:50:59Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -64,7 +64,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$filter_secure    = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_secure',    'filter_secure',    '',          'word' );
 		$filter_ext       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_ext',       'filter_ext',       '',          'alnum' );
 		$search           = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.search',           'search',           '',          'string' );
-		$filter_item      = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.item_id',          'item_id',          0,           'int' );
+		$filter_item      = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.item_id',          'item_id',          '',           'int' );
 		$u_item_id 	      = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.u_item_id',        'u_item_id',        0,           'string' );
 		$autoselect       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.autoselect',       'autoselect',       0, 				  'int' );
 		$autoassign       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.autoassign',       'autoassign',       0, 				  'int' );
@@ -83,17 +83,15 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$delfilename	= base64_decode(JRequest::getVar('delfilename', ''));
 		
 		//add css and submenu to document
-		$urlroot = JURI::root() . ($app->isSite() ? 'administrator/' : '' );
-		$document->addStyleSheet( $urlroot . 'components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet( $urlroot . 'components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet( $urlroot . 'components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet( $urlroot . 'components/com_flexicontent/assets/css/j15.css');
-		$document->addStyleSheet( $urlroot . 'templates/system/css/system.css');
+		$urlroot = JURI::root();
+		$document->addStyleSheet( $urlroot . 'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet( $urlroot . 'administrator/components/com_flexicontent/assets/css/j3x.css');
+		else if (FLEXI_J16GE) $document->addStyleSheet( $urlroot . 'administrator/components/com_flexicontent/assets/css/j25.css');
+		else                  $document->addStyleSheet( $urlroot . 'administrator/components/com_flexicontent/assets/css/j15.css');
+		$document->addStyleSheet( JURI::root() . 'administrator/templates/system/css/system.css');
 		// include khepri stylesheet only if we are in frontend
 		if ($app->isSite()) {
 			$document->addStyleSheet('administrator/templates/khepri/css/general.css');
-			$searchcss = '.adminform #search {border:1px solid silver;font-size:10px;margin:0;padding:0;float:none;height:14px;width:250px;}';
-			$document->addStyleDeclaration($searchcss);
 		}
 		//a trick to avoid loosing general style in modal window
 		$css = 'body, td, th { font-size: 11px; }
@@ -131,12 +129,12 @@ class FlexicontentViewFileselement extends JViewLegacy
 		//$users = $this->get('Users');
 		
 		// Get item using at least one file (-of- the currently listed files)
-		$items_single	= $model->getItemsSingleprop( array('file','minigallery') );
+		/*$items_single	= $model->getItemsSingleprop( array('file','minigallery') );
 		$items_multi	= $model->getItemsMultiprop ( $field_props=array('image'=>'originalname'), $value_props=array('image'=>'filename') );
 		$items = array();
 		foreach ($items_single as $item_id => $_item) $items[$item_id] = $_item;
 		foreach ($items_multi  as $item_id => $_item) $items[$item_id] = $_item;
-		ksort($items);
+		ksort($items);*/
 		
 		$fname = $model->getFieldName($fieldid);
 		$files_selected = $model->getItemFiles($u_item_id);
@@ -253,12 +251,13 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$lists['url'] = JHTML::_('select.genericlist', $url, 'filter_url', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_url );
 
 		//item lists
-		$items_list = array();
+		/*$items_list = array();
 		$items_list[] = JHTML::_('select.option', '', '- '. JText::_( 'FLEXI_FILTER_BY_ITEM' ) .' -' );
 		foreach($items as $item) {
 			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) . ' (#' . $item->id . ')' );
 		}
-		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );
+		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );*/
+		$lists['item_id'] = '<input type="text" name="item_id" size="1" class="inputbox" onchange="submitform( );" value="'.$filter_item.'" />';
 		
 		//build secure/media filterlist
 		$secure 	= array();

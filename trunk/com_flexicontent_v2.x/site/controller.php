@@ -685,7 +685,7 @@ class FlexicontentController extends JControllerLegacy
 			// REDIRECT CASE: Save and preview the latest version
 			else if ($task=='save_a_preview') {
 				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
-				$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
+				$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid, 0, $model->_item->type_id).'&preview=1', false);
 			}
 			// REDIRECT CASE: Return to the form 's referer (previous page) after item saving
 			else {
@@ -1423,12 +1423,30 @@ class FlexicontentController extends JControllerLegacy
 		
 		if ($task == 'download_tree')
 		{
-			// Get zTree data and parse JSON string
-			$tree_var = JRequest::getVar( 'tree_var', "" );
-			if ($session->has($tree_var, 'flexicontent')) {
-				$ztree_nodes_json = $session->get($tree_var, false,'flexicontent');
+			// TODO: maybe move this part in module
+			$cart_id = JRequest::getVar( 'cart_id', 0 );
+			$cart_token_matches = false;
+			if (!$cart_id) {
+				// Get zTree data and parse JSON string
+				$tree_var = JRequest::getVar( 'tree_var', "" );
+				if ($session->has($tree_var, 'flexicontent')) {
+					$ztree_nodes_json = $session->get($tree_var, false,'flexicontent');
+				}
+				$nodes = json_decode($ztree_nodes_json);
+			} else {
+				$cart_token = JRequest::getVar( 'cart_token', '' );
+				
+				$query = ' SELECT * FROM #__flexicontent_downloads_cart WHERE id='. $cart_id;
+				$db->setQuery( $query );
+				$cart = $db->loadObject();
+				
+				if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+				if (!$cart) { echo JText::_('cart id no '.$cart_id.', was not found'); jexit(); }
+				
+				$cart_token_matches = $cart_token==$cart->token;  // no access will be checked
+				$nodes = json_decode($cart->json);
 			}
-			$nodes = json_decode($ztree_nodes_json);
+			
 			
 			// Some validation check
 			if ( !is_array($nodes) ) {
@@ -1463,20 +1481,22 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Create JOIN + AND clauses for checking Access
 		$joinaccess = $andaccess = $joinaccess2 = $andaccess2 = '';
-		$this->_createFieldItemAccessClause( $joinaccess, $andaccess, $joinaccess2, $andaccess2);
-		
-		// Extra access CLAUSEs for given file (this is combined with the above CLAUSEs for field and item access)
-		if (FLEXI_J16GE) {
-			$aid_arr = $user->getAuthorisedViewLevels();
-			$aid_list = implode(",", $aid_arr);
-			$andaccess  .= ' AND f.access IN (0,'.$aid_list.')';
-		} else {
-			$aid = (int) $user->get('aid');
-			if (FLEXI_ACCESS) {
-				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gf ON f.id = gf.axo AND gf.aco = "read" AND gf.axosection = "file"';
-				$andaccess  .= ' AND (f.access IS NULL OR gf.aro IN ( '.$user->gmid.' ) OR f.access <= '. $aid . ')';
+		if ( empty($cart_token_matches) ) {
+			$this->_createFieldItemAccessClause( $joinaccess, $andaccess, $joinaccess2, $andaccess2);
+			
+			// Extra access CLAUSEs for given file (this is combined with the above CLAUSEs for field and item access)
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$andaccess  .= ' AND f.access IN (0,'.$aid_list.')';
 			} else {
-				$andaccess  .= ' AND (f.access IS NULL OR f.access <= '.$aid .')';
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gf ON f.id = gf.axo AND gf.aco = "read" AND gf.axosection = "file"';
+					$andaccess  .= ' AND (f.access IS NULL OR gf.aro IN ( '.$user->gmid.' ) OR f.access <= '. $aid . ')';
+				} else {
+					$andaccess  .= ' AND (f.access IS NULL OR f.access <= '.$aid .')';
+				}
 			}
 		}
 		

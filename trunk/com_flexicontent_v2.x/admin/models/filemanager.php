@@ -122,9 +122,8 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$this->_data = $this->_getList($query, $this->getState('limitstart'), $this->getState('limit'));
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
-			$db = JFactory::getDBO();
-			$db->setQuery("SELECT FOUND_ROWS()");
-			$this->_total = $db->loadResult();
+			$this->_db->setQuery("SELECT FOUND_ROWS()");
+			$this->_total = $this->_db->loadResult();
 			
 			$this->_data = flexicontent_images::BuildIcons($this->_data);
 			
@@ -519,7 +518,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		// File field relation sub query
 		$query = 'SELECT '. ($count_items  ?  'f.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
 			. ' FROM #__content AS i'
-			. ' JOIN #__flexicontent_items_ext as ie ON ie.item_id = i.id'
+			. (isset($ignored['lang_parent_id']) ? ' JOIN #__flexicontent_items_ext as ie ON ie.item_id = i.id' : '')
 			. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $field_type_list .')'
 			. ' JOIN #__flexicontent_files AS f ON f.id=rel.value '. $file_ids_list
@@ -584,7 +583,6 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			$where[] = ' ie.lang_parent_id!='. (int)$ignored['lang_parent_id'];
 		}
 		
-		
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
 		$groupby = !$count_items  ?  ' GROUP BY i.id'  :  ' GROUP BY f.id';   // file maybe used in more than one fields or ? in more than one values for same field
 		$orderby = !$count_items  ?  ' ORDER BY i.title ASC'  :  '';
@@ -608,7 +606,7 @@ class FlexicontentModelFilemanager extends JModelLegacy
 			// File field relation sub query
 			$query = 'SELECT '. ($count_items  ?  'f.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
 				. ' FROM #__content AS i'
-				. ' JOIN #__flexicontent_items_ext as ie ON ie.item_id = i.id'
+				. (isset($ignored['lang_parent_id']) ? ' JOIN #__flexicontent_items_ext as ie ON ie.item_id = i.id' : '')
 				. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $this->_db->Quote( $field_type ) .')' . $field_ids_list
 				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE '. $like_str . $file_ids_list
@@ -726,10 +724,6 @@ class FlexicontentModelFilemanager extends JModelLegacy
 	 */
 	function countFieldRelationsMultiProp(&$rows, $value_prop, $field_prop, $field_type)
 	{
-		// TEMPORARILY DISABLE this till we can implement a different way to do count file usage by multiproperty fields
-		foreach ($rows as $row)  $row->{'assigned_'.$field_type} = 0;
-		return;
-		
 		if (!$rows || !count($rows)) return array();  // No file records to check
 		
 		// Some fields may not be using DB, create a limitation for them
