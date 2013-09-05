@@ -165,7 +165,7 @@ endif;
 			<!-- BOF item title -->
 			<?php if ($show_title) : ?>
 				<?php if ($link_titles) : ?>
-					<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
+					<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id)); ?>"><?php echo $item->title; ?></a>
 				<?php else : echo $item->title; endif; ?>
 			<?php endif; ?>
 			<!-- EOF item title -->

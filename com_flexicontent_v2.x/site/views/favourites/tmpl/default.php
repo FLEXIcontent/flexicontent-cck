@@ -171,7 +171,7 @@ if ($use_fields && count($fields)) {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 			}
 		}
-		$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+		$item_link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id));
 		
 		$fc_item_classes = 'sectiontableentry';
 		foreach ($item->categories as $item_cat) {

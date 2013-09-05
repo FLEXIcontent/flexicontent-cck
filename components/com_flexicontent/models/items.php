@@ -236,7 +236,7 @@ class FlexicontentModelItems extends ParentClassItem
 				// (a) redirect user previewing a non-current item version, to either current item version or to refer if has no edit permission
 				JError::raiseNotice(403, JText::_('FLEXI_ALERTNOTAUTH_PREVIEW_UNEDITABLE')."<br />". JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 				if ( $item_n_cat_active && $canviewitem ) {
-					$app->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_item->slug, $this->_item->categoryslug)));
+					$app->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_item->slug, $this->_item->categoryslug, 0, $this->_item->type_id)));
 				} else {
 					$app->redirect($referer);  // Item not viewable OR no view access, redirect to refer page
 				}

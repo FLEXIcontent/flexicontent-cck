@@ -201,7 +201,7 @@ foreach ($cat_items as $catid => $items) :
 								<?php if ($this->params->get('show_title', 1)) : ?>
 									<!-- BOF item title -->
 									<?php if ($this->params->get('link_titles', 0)) : ?>
-						   			<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>">
+						   			<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id)); ?>">
 											<?php echo $item->title; ?>
 										</a>
 					   			<?php else : ?>

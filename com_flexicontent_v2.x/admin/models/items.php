@@ -631,7 +631,7 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		} else {
 			$query =
-				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, '. $lang .' u.name AS editor, rel.catid as rel_catid, '
+				'SELECT i.*, ie.item_id as item_id, ie.search_index AS search_index, ie.type_id, '. $lang .' u.name AS editor, rel.catid as rel_catid, '
 				.' GROUP_CONCAT(DISTINCT rel.catid SEPARATOR  ",") AS relcats, '
 				. (FLEXI_J16GE ? 'level.title AS access_level, ' : 'g.name AS groupname, ')
 				. ( in_array($filter_order, array('i.ordering','catsordering')) ? 

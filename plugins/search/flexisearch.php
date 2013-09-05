@@ -321,7 +321,7 @@ class plgSearchFlexisearch extends JPlugin
 		if ( $limit > 0)
 		{
 			$query 	= 'SELECT i.sectionid,'
-				.' i.id as id,'
+				.' i.id as id, ie.type_id,'
 				.' i.title AS title,'
 				.' i.metakey AS metakey,'
 				.' i.metadesc AS metadesc,'
@@ -371,7 +371,7 @@ class plgSearchFlexisearch extends JPlugin
 					// echo $item->title." ".$item->tagname."<br/>"; // Before checking for noHTML
 					if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION ) {
 						$item->categories = $item_cats[$item->id];
-						$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug));
+						$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug, 0, $item->type_id));
 					} else {
 						$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
 					}

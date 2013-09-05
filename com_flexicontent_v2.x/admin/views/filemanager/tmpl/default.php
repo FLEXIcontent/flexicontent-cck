@@ -290,13 +290,9 @@ table#filemanager-zone label {
 				<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
-			 	<?php
-			 	if ($this->CanViewAllFiles) {
-			 		echo " &nbsp;-&nbsp; ". $this->lists['uploader'];
-			 		echo " <span style='font-size:16px; font-family:tahoma;'>&#8594;</span> ";
-			 	}
-			 	?>
-				<?php echo $this->lists['item_id']; ?>
+			 	<?php if ($this->CanViewAllFiles) echo $this->lists['uploader']; ?>
+			 	&nbsp; &nbsp; &nbsp;
+				<label class="label">Item ID</label> <?php echo $this->lists['item_id']; ?>
 			</td>
 		</tr>
 	</table>

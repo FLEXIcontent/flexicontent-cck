@@ -257,8 +257,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 					break;
 				
 				case 'all':
-					$words = explode( ' ', $text );
-					$newtext = '+' . implode( '* +', $words ) .'*';
+					$words = preg_split('/\s\s*/u', $text);
+					$newtext = '+' . implode( ' +', $words );
 					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
 					$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
@@ -266,8 +266,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 				
 				case 'any':
 				default:
-					$words = explode( ' ', $text );
-					$newtext = implode( '* ', $words ) .'*';
+					$words = preg_split('/\s\s*/u', $text);
+					$newtext = implode( ' ', $words );
 					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
 					$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
@@ -487,7 +487,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$db->query();
 		
 		// Construct query's SQL
-		$query 	= 'SELECT i.id, i.title AS title, i.sectionid, i.created, i.id AS fc_item_id,'
+		$query 	= 'SELECT i.id, i.title AS title, i.sectionid, i.created, i.id AS fc_item_id, ie.type_id,'
 			. ( !$txtmode ?
 				' ie.search_index AS text,' :
 				//' GROUP_CONCAT(\'[[[b]]]\', f.label, \'[[[/b]]]: \', ai.search_index ORDER BY f.ordering ASC SEPARATOR \' [[[br/]]]\') AS text,'
@@ -531,7 +531,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			{
 				if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION ) {
 					$item->categories = $item_cats[$item->id];
-					$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+					$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id));
 				} else {
 					$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
 				}

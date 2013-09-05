@@ -118,7 +118,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 	{
 		// Get items using files VIA (single property) field types (that store file ids) by using main query
 		$s_assigned_via_main = false;
-			
+		
 		$s_assigned_fields = false; //array('file', 'minigallery');
 		$m_assigned_fields = false; //array('image');
 		
@@ -427,12 +427,8 @@ class FlexicontentModelFileselement extends JModelLegacy
 
 		$where = array();
 		
-		if (FLEXI_J16GE || FLEXI_ACCESS) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$CanViewAllFiles = $permission->CanViewAllFiles;
-		} else {
-			$CanViewAllFiles	= 1;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$CanViewAllFiles = $permission->CanViewAllFiles;
 		
 		if ( !$CanViewAllFiles ) {
 			$where[] = ' uploaded_by = ' . (int)$user->id;
@@ -459,7 +455,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 		if ( $filter_ext ) {
 			$where[] = ' ext = ' . $this->_db->Quote( $filter_ext );
 		}
-
+		
 		if ($search && $filter == 1) {
 			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
 			$where[] = ' LOWER(f.filename) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
@@ -534,15 +530,13 @@ class FlexicontentModelFileselement extends JModelLegacy
 				$query = "SELECT id FROM #__flexicontent_fields WHERE field_type='image' AND attribs NOT LIKE '%image_source=1%'";
 				$this->_db->setQuery($query);
 				$field_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-				if ($field_ids) {
-					$field_ids_list = " AND fi.id IN ('". implode("','", $field_ids) ."')";
-				}
 				break;
 			
 			default:
-				$field_ids_list = '';
+				$field_ids = array();
 				break;
 		}
+		return $field_ids;
 	}
 	
 	
@@ -552,7 +546,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 	 * @access public
 	 * @return object
 	 */
-	function getItemsSingleprop( $field_types=array('file','minigallery'), $file_ids=array(), $count_items=false)
+	function getItemsSingleprop( $field_types=array('file','minigallery'), $file_ids=array(), $count_items=false, $ignored=false )
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
@@ -564,20 +558,25 @@ class FlexicontentModelFileselement extends JModelLegacy
 		
 		$where = array();
 		
-		if (FLEXI_J16GE || FLEXI_ACCESS) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$CanViewAllFiles = $permission->CanViewAllFiles;
-		} else {
-			$CanViewAllFiles	= 1;
-		}
-		
 		$file_ids_list = '';
 		if ( count($file_ids) ) {
 			$file_ids_list = ' AND f.id IN (' . "'". implode("','", $file_ids)  ."')";
-		} else if ( !$CanViewAllFiles ) {
-			$where[] = ' f.uploaded_by = ' . (int)$user->id;
-		} else if ( $filter_uploader ) {
-			$where[] = ' f.uploaded_by = ' . $filter_uploader;
+		} else {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$CanViewAllFiles = $permission->CanViewAllFiles;
+			
+			if ( !$CanViewAllFiles ) {
+				$where[] = ' f.uploaded_by = ' . (int)$user->id;
+			} else if ( $filter_uploader ) {
+				$where[] = ' f.uploaded_by = ' . $filter_uploader;
+			}
+		}
+		
+		if ( isset($ignored['item_id']) ) {
+			$where[] = ' i.id!='. (int)$ignored['item_id'];
+		}
+		if ( isset($ignored['lang_parent_id']) ) {
+			$where[] = ' ie.lang_parent_id!='. (int)$ignored['lang_parent_id'];
 		}
 		
 		$where = ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
@@ -587,6 +586,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 		// File field relation sub query
 		$query = 'SELECT '. ($count_items  ?  'f.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
 			. ' FROM #__content AS i'
+			. (isset($ignored['lang_parent_id']) ? ' JOIN #__flexicontent_items_ext as ie ON ie.item_id = i.id' : '')
 			. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 			. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $field_type_list .')'
 			. ' JOIN #__flexicontent_files AS f ON f.id=rel.value '. $file_ids_list
@@ -620,7 +620,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 	 * @access public
 	 * @return object
 	 */
-	function getItemsMultiprop( $field_props=array('image'=>'originalname'), $value_props=array('image'=>'filename') , $file_ids=array(), $count_items=false)
+	function getItemsMultiprop( $field_props=array('image'=>'originalname'), $value_props=array('image'=>'filename') , $file_ids=array(), $count_items=false, $ignored=false )
 	{
 		$app    = JFactory::getApplication();
 		$user   = JFactory::getUser();
@@ -630,20 +630,25 @@ class FlexicontentModelFileselement extends JModelLegacy
 		
 		$where = array();
 		
-		if (FLEXI_J16GE || FLEXI_ACCESS) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$CanViewAllFiles = $permission->CanViewAllFiles;
-		} else {
-			$CanViewAllFiles	= 1;
-		}
-		
 		$file_ids_list = '';
 		if ( count($file_ids) ) {
 			$file_ids_list = ' AND f.id IN (' . "'". implode("','", $file_ids)  ."')";
-		} else if ( !$CanViewAllFiles ) {
-			$where[] = ' f.uploaded_by = ' . (int)$user->id;
-		} else if ( $filter_uploader ) {
-			$where[] = ' f.uploaded_by = ' . $filter_uploader;
+		} else {
+			$permission = FlexicontentHelperPerm::getPerm();
+			$CanViewAllFiles = $permission->CanViewAllFiles;
+			
+			if ( !$CanViewAllFiles ) {
+				$where[] = ' f.uploaded_by = ' . (int)$user->id;
+			} else if ( $filter_uploader ) {
+				$where[] = ' f.uploaded_by = ' . $filter_uploader;
+			}
+		}
+		
+		if ( isset($ignored['item_id']) ) {
+			$where[] = ' i.id!='. (int)$ignored['item_id'];
+		}
+		if ( isset($ignored['lang_parent_id']) ) {
+			$where[] = ' ie.lang_parent_id!='. (int)$ignored['lang_parent_id'];
 		}
 		
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
@@ -669,6 +674,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 			// File field relation sub query
 			$query = 'SELECT '. ($count_items  ?  'f.id as file_id, COUNT(i.id) as item_count'  :  'i.id as id, i.title')
 				. ' FROM #__content AS i'
+				. (isset($ignored['lang_parent_id']) ? ' JOIN #__flexicontent_items_ext as ie ON ie.item_id = i.id' : '')
 				. ' JOIN #__flexicontent_fields_item_relations AS rel ON rel.item_id = i.id'
 				. ' JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id AND fi.field_type IN ('. $this->_db->Quote( $field_type ) .')' . $field_ids_list
 				. ' JOIN #__flexicontent_files AS f ON rel.value LIKE '. $like_str . $file_ids_list
