@@ -98,7 +98,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// comments button
 		if ($display_comments)
 		{
-			$link = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id) . '#addcomments';
+			$link = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug) . '#addcomments';
 			$comment_link  = JRoute::_($link);
 
 			$display	.= '
@@ -144,7 +144,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// email button
 		if ($display_email)
 		{
-			$link = JURI::root().JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id));
+			$link = JURI::root().JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
 			//$link = JURI::root().JRoute::_( 'index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug, false );
 			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 			$url		 = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $link );
@@ -162,7 +162,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		{
 			$pop		 = JRequest::getInt('pop');
 			$pstatus 	 = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
-			$link = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id) . '&pop=1&print=1&tmpl=component';
+			$link = FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug) . '&pop=1&print=1&tmpl=component';
 			$print_link  = $pop ? '#' : JRoute::_($link);
 			$js_link  	 = $pop ? 'onclick="window.print();return false;"' : 'onclick="window.open(this.href,\'win2\',\''.$pstatus.'\'); return false;"';
 			$display	.= '

@@ -254,7 +254,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		// @TODO check that as it seems to be dirty :(
 		$uri   = JFactory::getURI();
 		$base  = $uri->getScheme() . '://' . $uri->getHost();
-		$ucanonical = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id));
+		$ucanonical = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
 		if ($params->get('add_canonical')) {
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
@@ -368,7 +368,7 @@ class FlexicontentViewItems  extends JViewLegacy
 			$p++;
 		}
 		if ($params->get('add_item_pathway', 1)) {
-			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id)) );
+			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)) );
 		}
 
 

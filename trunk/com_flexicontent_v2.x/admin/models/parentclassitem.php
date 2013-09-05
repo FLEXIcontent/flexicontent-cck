@@ -3845,7 +3845,7 @@ class ParentClassItem extends JModelAdmin
 		if ( in_array('viewlink',$nf_extra_properties) )
 		{
 			$body .= '<u>'.JText::_( 'FLEXI_NF_VIEW_IN_FRONTEND' ) . "</u> : <br/>\r\n &nbsp; ";
-			$link = JRoute::_( JURI::root(false).FlexicontentHelperRoute::getItemRoute($this->get('id'), $this->get('catid'), 0, $this->get('type_id')) . $lang);
+			$link = JRoute::_( JURI::root(false).FlexicontentHelperRoute::getItemRoute($this->get('id'), $this->get('catid')) . $lang);
 			$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 		if ( in_array('editlinkfe',$nf_extra_properties) )

@@ -125,7 +125,8 @@ class FlexicontentHelperRoute
 		// 4. Try to get the first menu item that points to the FlexiContent Component
 		//    ... Default fallback behaviour ... it is our last choice ...
 		//    ... otherwise component/flexicontent will be appended to the SEF URLs
-		/*$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
+		/*static $component_menuitems = null;
+		if ($component_menuitems === null) $component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		if ($component_menuitems !== null && count($component_menuitems)>=1) {
 			$_component_default_menuitem_id = $component_menuitems[0]->id;
 		}
@@ -157,7 +158,7 @@ class FlexicontentHelperRoute
 	/**
 	 * Get routed links for content items
 	 */
-	static function getItemRoute($id, $catid = 0, $Itemid = 0, $type_id = 0)
+	static function getItemRoute($id, $catid = 0, $Itemid = 0)
 	{
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
 		
@@ -165,14 +166,6 @@ class FlexicontentHelperRoute
 			FLEXI_ITEMVIEW  => (int) $id,
 			'category' => (int) $catid
 		);
-
-		// Get type data (parameters, etc)
-		static $types = null;
-		if ($type_id && $types === null) {
-			$types = FlexicontentHelperRoute::_getTypeParams();
-		}
-		$type = $type_id && isset($types[$type_id)  ?  $types[$type_id] :  false;
-		
 		
 		// Create the link
 		$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW;
@@ -181,11 +174,10 @@ class FlexicontentHelperRoute
 		}
 		$link .= '&id='. $id;
 		
-		
 		// Find menu item id (best match)
 		if ($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 			$link .= '&Itemid='.$Itemid;
-		} else if($menuitem = FlexicontentHelperRoute::_findItem($needles, $type) {
+		} else if ($menuitem = FlexicontentHelperRoute::_findItem($needles)) {
 			$link .= '&Itemid='.$menuitem->id;
 		} else {
 			if ($component_default_menuitem_id === null)
@@ -216,7 +208,7 @@ class FlexicontentHelperRoute
 		
 		if ($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 			$link .= '&Itemid='.$Itemid;
-		} else if($menuitem = FlexicontentHelperRoute::_findCategory($needles, $urlvars)) {
+		} else if ($menuitem = FlexicontentHelperRoute::_findCategory($needles, $urlvars)) {
 			$link .= '&Itemid='.$menuitem->id;
 		} else {
 			if ($component_default_menuitem_id === null)
@@ -328,22 +320,36 @@ class FlexicontentHelperRoute
 	}
 	
 	
-	static function _findItem($needles, &$type)
+	static function _findItem($needles)
 	{
-		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
+		static $component_menuitems = null;
+		if ($component_menuitems === null) $component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
+		
 		$match = null;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		
 		// Get access level of the FLEXIcontent item
 		$db = JFactory::getDBO();
-		$db->setQuery('SELECT access FROM #__content WHERE id='.$needles[FLEXI_ITEMVIEW]);
-		$item_acclevel = $db->loadResult();
+		$db->setQuery( 'SELECT i.access, ie.type_id '
+			.' FROM #__content AS i '
+			.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+			.' WHERE i.id='. $needles[FLEXI_ITEMVIEW]);
+		$item = $db->loadObject();
+		$item_access  = $item->access;
+		$type_id = $item->type_id;
+		
+		// Get type data (parameters, etc)
+		static $types = null;
+		if ($type_id && $types === null) {
+			$types = FlexicontentHelperRoute::_getTypeParams();
+		}
+		$type = $type_id && isset($types[$type_id])  ?  $types[$type_id] :  false;
 		
 		// Type's default menu id ... either higher priority than item's category or lower ...
-		$type_default_itemid_usage = $type->params->get('type_default_itemid_usage', 0);
-		$type_default_itemid = $type->params->get('type_default_itemid', 0);
-		if ($type_default_itemid) {
-			$matches[ $type_default_itemid_usage ? 3 : 5 ] = $type_default_itemid_usage;
+		$type_menu_itemid_usage = $type->params->get('type_menu_itemid_usage', 0);
+		$type_menu_itemid       = $type->params->get('type_menu_itemid', 0);
+		if ($type_menu_itemid) {
+			$matches[ $type_menu_itemid_usage ? 3 : 5 ] = $type_menu_itemid;
 		}
 		
 		foreach($component_menuitems as $menuitem)
@@ -351,10 +357,10 @@ class FlexicontentHelperRoute
 			// Require appropriate access level of the menu item, to avoid access problems and redirecting guest to login page
 			if (!FLEXI_J16GE) {
 				// In J1.5 we need menu access level lower than item access level
-				if ($menuitem->access > $item_acclevel) continue;
+				if ($menuitem->access > $item_access) continue;
 			} else {
 				// In J2.5 we need menu access level public or the access level of the item
-				if ($menuitem->access!=$public_acclevel && $menuitem->access==$item_acclevel) continue;
+				if ($menuitem->access!=$public_acclevel && $menuitem->access==$item_access) continue;
 			}
 			
 			if (@$menuitem->query['view'] == FLEXI_ITEMVIEW && @$menuitem->query['id'] == $needles[FLEXI_ITEMVIEW]) {
@@ -393,7 +399,9 @@ class FlexicontentHelperRoute
 	
 	static function _findCategory($needles, $urlvars=array())
 	{
-		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
+		static $component_menuitems = null;
+		if ($component_menuitems === null) $component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
+		
 		$match = null;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		
@@ -456,7 +464,9 @@ class FlexicontentHelperRoute
 	
 	static function _findTag($needles)
 	{
-		$component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
+		static $component_menuitems = null;
+		if ($component_menuitems === null) $component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
+		
 		$match = null;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		$user = JFactory::getUser();

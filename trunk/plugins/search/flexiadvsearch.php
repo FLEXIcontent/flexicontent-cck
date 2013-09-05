@@ -487,7 +487,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$db->query();
 		
 		// Construct query's SQL
-		$query 	= 'SELECT i.id, i.title AS title, i.sectionid, i.created, i.id AS fc_item_id, ie.type_id,'
+		$query 	= 'SELECT i.id, i.title AS title, i.sectionid, i.created, i.id AS fc_item_id,'
 			. ( !$txtmode ?
 				' ie.search_index AS text,' :
 				//' GROUP_CONCAT(\'[[[b]]]\', f.label, \'[[[/b]]]: \', ai.search_index ORDER BY f.ordering ASC SEPARATOR \' [[[br/]]]\') AS text,'
@@ -531,7 +531,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			{
 				if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION ) {
 					$item->categories = $item_cats[$item->id];
-					$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id));
+					$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
 				} else {
 					$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
 				}

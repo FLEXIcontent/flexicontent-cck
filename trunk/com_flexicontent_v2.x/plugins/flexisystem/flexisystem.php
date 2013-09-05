@@ -374,23 +374,7 @@ class plgSystemFlexisystem extends JPlugin
 					$catslug	= JRequest::getVar('catid');
 				
 					// Warning current menu item id must not be passed to the routing functions since it points to com_content, and thus it will break FC SEF URLs
-					
-					$query = "SELECT i.id, i.catid, ie.type_id"
-						.", CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug"
-						.", CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug"
-						." FROM #__content AS i"
-						." LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id"
-						." LEFT JOIN #__categories AS c on c.id = i.catid"
-						." WHERE i.id=". (int)$itemslug;
-					$db->setQuery($query);
-					$item = $db->loadObject();
-					if ($item) {
-						// item exists
-						$urlItem 	= FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item->type_id);
-					} else {
-						// item does not exist, create a redirection to a URL that will give appropriate error
-						$urlItem 	= $catslug ? FlexicontentHelperRoute::getItemRoute($itemslug, $catslug) : FlexicontentHelperRoute::getItemRoute($itemslug);
-					}
+					$urlItem 	= $catslug ? FlexicontentHelperRoute::getItemRoute($itemslug, $catslug) : FlexicontentHelperRoute::getItemRoute($itemslug);
 					$urlItem 	= JRoute::_($urlItem);
 				}
 				

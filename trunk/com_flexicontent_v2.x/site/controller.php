@@ -685,7 +685,7 @@ class FlexicontentController extends JControllerLegacy
 			// REDIRECT CASE: Save and preview the latest version
 			else if ($task=='save_a_preview') {
 				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
-				$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid, 0, $model->_item->type_id).'&preview=1', false);
+				$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
 			}
 			// REDIRECT CASE: Return to the form 's referer (previous page) after item saving
 			else {

@@ -22,11 +22,10 @@ class jc_com_flexicontent extends JCommentsPlugin
 			require_once($routerHelper);
 
 			$db = JFactory::getDBO();
-			$query = 'SELECT i.id, i.title, i.access, i.created_by, ext.type_id '
+			$query = 'SELECT i.id, i.title, i.access, i.created_by '
 				. ' , CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
 				. ' , CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
 				. ' FROM #__content AS i'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ext ON i.id=ext.item_id '
 				. ' LEFT JOIN #__categories AS c ON c.id = i.catid'
 				. ' WHERE i.id = '.$id
 				;
@@ -37,7 +36,7 @@ class jc_com_flexicontent extends JCommentsPlugin
 				$info->title = $row->title;
 				$info->access = $row->access;
 				$info->userid = $row->created_by;
-				$info->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catslug, 0, $row->type_id));
+				$info->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catslug));
 			}
 		}
 
