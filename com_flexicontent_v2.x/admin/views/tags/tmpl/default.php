@@ -25,6 +25,7 @@ $autologin = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.
 $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
 ?>
 
+<div class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminform">
@@ -157,3 +158,4 @@ $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
+</div>

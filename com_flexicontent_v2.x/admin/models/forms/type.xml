@@ -24,10 +24,10 @@
 		<fieldset name="basic">
 			
 			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" />
-			<field name="type_menu_itemid" type="menuitem" default="" label="FLEXI_TYPE_MENU_ITEM_FOR_URLS" description="FLEXI_TYPE_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
+			<field name="type_menu_itemid" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_TYPE_MENU_ITEM_FOR_URLS" description="FLEXI_TYPE_MENU_ITEM_FOR_URLS_DESC" menu="hide" />
 			<field name="type_menu_itemid_usage" type="list" default="" label="FLEXI_TYPE_MENU_ITEM_USAGE" description="FLEXI_TYPE_MENU_ITEM_USAGE_DESC">
-				<option value="0">FLEXI_TYPE_MENU_ITEM_BEFORE_CAT</option>
-				<option value="1">FLEXI_TYPE_MENU_ITEM_AFTER_CAT</option>
+				<option value="0">FLEXI_TYPE_MENU_ITEM_AFTER_CAT</option>
+				<option value="1">FLEXI_TYPE_MENU_ITEM_BEFORE_CAT</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_TYPE_CONTENT_CONF" level="level2"  />		
@@ -293,7 +293,7 @@
 			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level3" />
 			<field name="submit_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" />
 			<field name="submit_redirect_url_fe" type="text" default="" size="36" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" />
-			<field name="notauthurl" type="menuitem" default="" disable="separator" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" />
+			<field name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level3" />
 			

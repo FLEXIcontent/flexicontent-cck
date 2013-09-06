@@ -22,6 +22,7 @@ $user      = JFactory::getUser();
 
 ?>
 
+<div class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminform">
@@ -173,3 +174,4 @@ $user      = JFactory::getUser();
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
+</div>

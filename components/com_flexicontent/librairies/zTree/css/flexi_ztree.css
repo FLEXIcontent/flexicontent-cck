@@ -8,6 +8,7 @@ ul.ztree tt, ul.ztree var, ul.ztree dl, ul.ztree dt, ul.ztree dd, ul.ztree ol, u
 ul.ztree fieldset, ul.ztree form, ul.ztree label, ul.ztree legend, ul.ztree table, ul.ztree caption,
 ul.ztree tbody, ul.ztree tfoot, ul.ztree thead, ul.ztree tr, ul.ztree th, ul.ztree td
 {
+	position: relative !important;
 	margin: 0 !important;
 	padding: 0 !important;
 	border: 0 !important;

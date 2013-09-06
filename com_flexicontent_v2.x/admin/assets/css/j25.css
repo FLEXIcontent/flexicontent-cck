@@ -16,8 +16,9 @@
 .icon-32-advindexpurge	{ background-image: url(../../../../templates/bluestork/images/toolbar/icon-32-purge.png); }
 
 
-/* small labels */
-.label, .badge {
+
+/* Small labels */
+.label, .badge, .flexicontent label.label {
 	background-color: #999999;
 	color: #FFFFFF;
 	display: inline-block;
@@ -29,6 +30,7 @@
 	vertical-align: baseline;
 	white-space: nowrap;
 	border-radius: 4px;
+	margin: 0px 2px 2px 4px !important;
 }
 .label.highlight, .badge.highlight {
 	color: darkred;
@@ -66,13 +68,13 @@ div.credits img {
 
 
 
-/* Other */
+/* Other layout */
 
 ul.adminformlist {
-	list-style-position:outside !important;
-	list-style-type:none !important;
-	margin:0px !important;
-	padding:0px !important;
+	list-style-position: outside !important;
+	list-style-type: none !important;
+	margin: 0px !important;
+	padding: 0px !important;
 }
 
 div.col {
@@ -203,14 +205,24 @@ div #jform_params_filters { display:block; width:50%; float:left; }
 
 /* Tables layout */
 
+div table.adminform {
+	font-size:11px;
+}
+div table.adminform td {
+	font-size:11px;
+	padding:2px 2px;
+	text-align:left;
+}
+
+
 td.key label {
 	float:none;
 	display:inline;
 }
-
-div table.adminform {
-	background-color: #F4F4F4;
-	font-size:11px;
+table.admintable td .controls label {
+	float:left;
+	display:inline-block;
+	padding: 0px !important;
 }
 
 div table.admintable {
@@ -218,25 +230,6 @@ div table.admintable {
 	border-collapse: separate;
 	border-spacing: 2px !important;
 }
-
-#flexicontent table.adminform {
-	background-color: #FCFCFC;
-	font-size:11px;
-}
-
-#titleblock input, #aliasblock input {
-	font-size:10px !important; 
-}
-
-div table.adminform td {
-	font-size:11px;
-	padding:2px 2px;
-	text-align:left;
-}
-
-div table.adminform input { font-size:11px !important; padding:2px; }
-div table.adminform select { font-size:10px; }
-
 div table.admintable td {
 	/*background-color:#F9F9F9;*/
 	border: 0px solid #F0F0F0;
@@ -262,4 +255,13 @@ table.admintable fieldset {
 	float: left;
 	margin: 0 !important;
 	padding: 0 !important;
+}
+
+
+/* joomla TABS */
+
+dl.tabs dt h3 {
+	font-size: 11px !important;
+	margin: 0px !important;
+	line-height: 20px;
 }

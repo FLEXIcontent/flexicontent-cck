@@ -56,6 +56,8 @@ function delAllFilters() {
 	delFilter('search_index'); delFilter('search_itemtitle'); delFilter('search_itemid');
 }
 </script>
+
+<div class="flexicontent">
 <form action="index.php?option=com_flexicontent&amp;view=search" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminlist" style="clear: both;">
@@ -99,25 +101,25 @@ function delAllFilters() {
 				<td class="left"></td>
 				<td class="left"></td>
 				<td class="left" colspan="3">
-					<?php echo '<label class="label'.($this->f_active['search_itemtitle'] ? " highlight":"").'">'.JText::_('FLEXI_TITLE').'</label> '; ?> &nbsp;
+					<?php echo '<label class="label'.($this->f_active['search_itemtitle'] ? " highlight":"").'">'.JText::_('FLEXI_TITLE').'</label> '; ?>
 					<input type="text" name="search_itemtitle" id="search_itemtitle" value="<?php echo $this->lists['search_itemtitle']; ?>" class="text_area" onChange="document.adminForm.submit();" size="30"/>
-					<?php echo '<label class="label'.($this->f_active['search_itemid'] ? " highlight":"").'">'.JText::_('FLEXI_ID').'</label> '; ?> &nbsp;
+					<?php echo '<label class="label'.($this->f_active['search_itemid'] ? " highlight":"").'">'.JText::_('FLEXI_ID').'</label> '; ?>
 					<input type="text" name="search_itemid" id="search_itemid" value="<?php echo $this->lists['search_itemid']; ?>" class="text_area" onChange="document.adminForm.submit();" size="6" />
 					<br/>
-					<?php echo '<label class="label'.($this->f_active['filter_itemtype'] ? " highlight":"").'">'.JText::_('FLEXI_TYPE_NAME').'</label> '; ?> &nbsp;
+					<?php echo '<label class="label'.($this->f_active['filter_itemtype'] ? " highlight":"").'">'.JText::_('FLEXI_TYPE_NAME').'</label> '; ?>
 					<?php echo $this->lists['filter_itemtype']; ?>
-					<?php echo '<label class="label'.($this->f_active['filter_itemstate'] ? " highlight":"").'">'.JText::_('FLEXI_STATE').'</label> '; ?> &nbsp;
+					<?php echo '<label class="label'.($this->f_active['filter_itemstate'] ? " highlight":"").'">'.JText::_('FLEXI_STATE').'</label> '; ?>
 					<?php echo $this->lists['filter_itemstate']; ?>
 				</td>
 				
 				<td class="left col_fieldtype" >
-					<?php echo '<label class="label'.($this->f_active['filter_fieldtype'] ? " highlight":"").'">'.JText::_('FLEXI_FILTER').'</label> '; ?> &nbsp; <br/>
+					<?php echo '<label class="label'.($this->f_active['filter_fieldtype'] ? " highlight":"").'">'.JText::_('FLEXI_FILTER').'</label> '; ?><br/>
 					<?php echo $this->lists['filter_fieldtype']; ?>
 				</td>
 				
 				<td class="left"></td>
 				<td class="left col_search_index">
-					<?php echo '<label class="label'.($this->f_active['search_index'] ? " highlight":"").'">'.JText::_('FLEXI_FILTER').'</label> '; ?> &nbsp; <br/>
+					<?php echo '<label class="label'.($this->f_active['search_index'] ? " highlight":"").'">'.JText::_('FLEXI_FILTER').'</label> '; ?><br/>
 					<input type="text" name="search_index" id="search_index" value="<?php echo $this->lists['search_index']; ?>" class="text_area" onChange="document.adminForm.submit();" />
 				</td>
 				<td class="left"></td>
@@ -232,3 +234,4 @@ function delAllFilters() {
 	<input type="hidden" name="controller" value="search" />
 	<?php echo JHTML::_('form.token'); ?>
 </form>
+</div>

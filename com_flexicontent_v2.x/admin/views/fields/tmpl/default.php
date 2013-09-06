@@ -51,6 +51,7 @@ $ord_grp = 1;
 
 ?>
 
+<div class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminform">
@@ -391,3 +392,4 @@ $ord_grp = 1;
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
+</div>

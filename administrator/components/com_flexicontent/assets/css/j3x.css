@@ -1,7 +1,4 @@
-/*********************************
- * Styles specific to J3.x backend
- *********************************/
- 
+
 /* Toolbar icons */
 .icon-32-person2			{ background-image: url(../images/person2_f2.png); }
 .icon-32-savenew			{ background-image: url(../images/savenew.png); }
@@ -19,12 +16,24 @@
 .icon-32-advindexpurge	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-purge.png); }
 
 
-/* small labels */
+
+/* Small labels */
+.label, .badge, .flexicontent label.label {
+	margin: 0px 2px 2px 4px !important;
+}
 .label.highlight, .badge.highlight {
 	color: darkred;
 }
 
-/* other */
+
+
+/* Other layout */
+
+ul.adminformlist {
+	list-style: none !important;
+	margin: 0px !important;
+	padding: 0px !important;
+}
 
 #sidebar {
 	float: left !important;
@@ -60,6 +69,16 @@ fieldset legend {
 input, select {
 	width: auto !important;
 }
+
+.chzn-container, .chzn-drop {
+	max-width: 100% !important;
+	width: auto !important;
+}
+
+#user-groups legend + .control-group, #user-groups .control-group {
+	margin: 0px;
+}
+
 
 
 /* table styles */
@@ -185,19 +204,6 @@ pane-sliders .panel h3 {
 
 
 
-/* Other layout */
-
-ul.adminformlist {
-	list-style: none !important;
-	margin: 0px !important;
-	padding: 0px !important;
-}
-
-#user-groups legend + .control-group, #user-groups .control-group {
-	margin: 0px;
-}
-
-
 /* Fieldsets layout */
 
 fieldset.adminform fieldset.radio,
@@ -313,6 +319,21 @@ div #jform_params_filters { display:block; width:50%; float:left; }
 
 /* Tables layout */
 
+div table.adminform {
+	font-size:11px;
+	background-color: #FFFFFF;
+	border: 1px solid #D5D5D5;
+	border-collapse: collapse;
+	margin: 8px 0 15px;
+	width: 100%;
+}
+div table.adminform td {
+	font-size:11px;
+	padding:2px 2px;
+	text-align:left;
+}
+
+
 td.key label {
 	float:none;
 	display:inline;
@@ -323,34 +344,13 @@ table.admintable td .controls label {
 	padding: 0px !important;
 }
 
-div table.adminform {
-	background-color: #F4F4F4;
-	font-size:11px;
-}
+
 
 div table.admintable {
 	font-size:11px;
 	border-collapse: separate;
 	border-spacing: 2px !important;
 }
-
-#flexicontent table.adminform {
-	background-color: #FCFCFC;
-	font-size:11px;
-}
-
-#titleblock input, #aliasblock input {
-	font-size:10px !important; 
-}
-
-div table.adminform td {
-	font-size:11px;
-	padding:2px 2px;
-	text-align:left;
-}
-
-
-
 div table.admintable td {
 	/*background-color:#F9F9F9;*/
 	border: 0px solid #F0F0F0;
@@ -376,4 +376,44 @@ table.admintable fieldset {
 	float: left;
 	margin: 0 !important;
 	padding: 0 !important;
+}
+
+
+/* joomla TABS */
+
+dl.tabs {
+	float: left;
+	margin: 10px 0 -1px;
+	z-index: 50;
+}
+dl.tabs dt {
+	background: none repeat scroll 0 0 #E9E9E9;
+	border: 1px solid #CCCCCC;
+	color: #666666;
+	float: left;
+	margin-left: 3px;
+	padding: 4px 10px;
+}
+dl.tabs dt h3 {
+	font-size: 11px !important;
+	margin: 0px !important;
+	line-height: 20px;
+}
+dl.tabs dt.open {
+	background: none repeat scroll 0 0 #F9F9F9;
+	border-bottom: 1px solid #F9F9F9;
+	color: #000000;
+	z-index: 100;
+}
+div.current {
+	border: 1px solid #CCCCCC;
+	clear: both;
+	padding: 10px;
+}
+div.current dd {
+	margin: 0;
+	padding: 0;
+}
+dl#content-pane.tabs {
+	margin: 1px 0 0;
 }
