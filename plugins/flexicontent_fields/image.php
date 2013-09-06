@@ -1691,59 +1691,46 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					return;
 				}
 			} else {
+				$db     = JFactory::getDBO();
+				$user   = JFactory::getUser();
+				$config = JFactory::getConfig();
+				
+				$timezone = $config->get('offset');
+				if (FLEXI_J16GE) {
+					$date = JFactory::getDate('now');
+					$date->setTimeZone( new DateTimeZone( $timezone ) );
+				} else {
+					$tz_offset = $timezone;
+					$date = JFactory::getDate('now', $tz_offset);
+				}
+				
+				$obj = new stdClass();
+				$obj->filename	= $filename;
+				$obj->altname		= $file['name'];
+				$obj->url				= 0;
+				$obj->secure		= 1;
+				$obj->ext				= $ext;
+				$obj->hits			= 0;
+				$obj->uploaded			= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+				$obj->uploaded_by		= $user->get('id');
+				
 				if ($format == 'json') {
 					jimport('joomla.error.log');
 					$log = JLog::getInstance();
 					$log->addEntry(array('comment' => $filepath));
 					
-					$db     = JFactory::getDBO();
-					$user   = JFactory::getUser();
-					$config = JFactory::getConfig();
-
-					$tzoffset = $config->getValue('config.offset');
-					$date     = JFactory::getDate( 'now', -$tzoffset);
-
-					$obj = new stdClass();
-					$obj->filename 			= $filename;
-					$obj->altname 			= $file['name'];
-					$obj->url				= 0;
-					$obj->secure			= 1;
-					$obj->ext				= $ext;
-					$obj->hits				= 0;
-					$obj->uploaded			= $date->toMySQL();
-					$obj->uploaded_by		= $user->get('id');
-
 					$db->insertObject('#__flexicontent_files', $obj);
-					
 					jexit('Upload complete');
-				} else {
-
-					$db     = JFactory::getDBO();
-					$user   = JFactory::getUser();
-					$config = JFactory::getConfig();
-
-					$tzoffset = $config->getValue('config.offset');
-					$date     = JFactory::getDate( 'now', -$tzoffset);
-
-					$obj = new stdClass();
-					$obj->filename 			= $filename;
-					$obj->altname 			= $file['name'];
-					$obj->url				= 0;
-					$obj->secure			= 1;
-					$obj->ext				= $ext;
-					$obj->hits				= 0;
-					$obj->uploaded			= $date->toMySQL();
-					$obj->uploaded_by		= $user->get('id');
-
+				}
+				else {
 					$db->insertObject('#__flexicontent_files', $obj);
-
 					$app->enqueueMessage($field->label . ' : ' . JText::_('Upload complete'));
 					
-					$sizes 		= array('l','m','s','b');
-					foreach ($sizes as $size)
-					{
+					$sizes = array('l','m','s','b');
+					foreach ($sizes as $size) {
 						// create the thumbnail
 						$this->create_thumb( $field, $filename, $size, $onlypath='', $destpath='', $copy_original=0, $extra_prefix );
+						
 						// set the filename for posting
 						$post['originalname'] = $filename;
 					}

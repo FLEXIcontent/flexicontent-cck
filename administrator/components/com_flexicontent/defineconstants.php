@@ -175,9 +175,9 @@ if (!defined('FLEXI_CACHE_TIME'))	define('FLEXI_CACHE_TIME'	, $params->get('advc
 if (!defined('FLEXI_GC'))      define('FLEXI_GC'			, $params->get('purge_gc', 1));
 if (!defined('FLEXI_FISH'))    define('FLEXI_FISH'		, ($params->get('flexi_fish', 0) && (JPluginHelper::isEnabled('system', FLEXI_J16GE ? 'falangdriver' : 'jfdatabase' ))) ? 1 : 0);
 if ( FLEXI_FISH ) {
-	$db = JFactory::getDBO();
-	$config = JFactory::getConfig();
-	$dbprefix = $config->getValue('config.dbprefix');
+	$db  = JFactory::getDBO();
+	$app = JFactory::getApplication();
+	$dbprefix = $app->getCfg('dbprefix');
 	$db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jf_languages_ext"');
 	define('FLEXI_FISH_22GE', (boolean) count($db->loadObjectList()) );
 }
@@ -187,5 +187,5 @@ if (!defined('FLEXI_ICONPATH'))		define('FLEXI_ICONPATH'	, FLEXI_J16GE ? 'media/
 
 // Version constants
 define('FLEXI_VERSION',	FLEXI_J16GE ? '2.1.0' : '2.1.0');
-define('FLEXI_RELEASE',	'r1751');
+define('FLEXI_RELEASE',	'r1754');
 ?>

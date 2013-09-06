@@ -27,8 +27,8 @@ function utf8ord($char) {
 	return $number;
 }
 
-$config  = JFactory::getConfig();
-$caching = FLEXI_J16GE ? $config->get( 'caching' ) : $config->getValue( 'config.caching' );
+$app = JFactory::getApplication();
+$caching = $app->getCfg('caching');
 
 $show_alpha = $this->params->get('show_alpha',1);
 if ($show_alpha == 1) {

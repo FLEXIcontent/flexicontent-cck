@@ -17,6 +17,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 // Decide whether to show module contents
+$app    = JFactory::getApplication();
 $view   = JRequest::getVar('view');
 $option = JRequest::getVar('option');
 
@@ -53,8 +54,7 @@ if ( $show_mod )
 	
 	// initialize various variables
 	//$document	= JFactory::getDocument();
-	//$config 	= JFactory::getConfig();
-	//$caching 	= $config->getValue('config.caching', 0);
+	//$caching 	= $app->getCfg('caching', 0);
 	$add_ccs 			= $params->get('add_ccs', 1);
 	$layout       = $params->get('layout', 'default');
 	$button       = $params->get('button', '');
@@ -115,7 +115,6 @@ if ( $show_mod )
 	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
-		$app = JFactory::getApplication();
 		$modfc_jprof->mark('END: FLEXIcontent Adv Search Module');
 		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
 		$app->enqueueMessage( $msg, 'notice' );

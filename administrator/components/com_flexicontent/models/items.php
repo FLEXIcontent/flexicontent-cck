@@ -973,8 +973,8 @@ class FlexicontentModelItems extends JModelLegacy
 	 */
 	function copyitems($cid, $keeptags = 1, $prefix, $suffix, $copynr = 1, $lang = null, $state = null, $method = 1, $maincat = null, $seccats = null)
 	{
-		$config = JFactory::getConfig();
-		$dbprefix = $config->getValue('config.dbprefix');
+		$app = JFactory::getApplication();
+		$dbprefix = $app->getCfg('dbprefix');
 		
 		// Try to find falang
 		$_FALANG = false;

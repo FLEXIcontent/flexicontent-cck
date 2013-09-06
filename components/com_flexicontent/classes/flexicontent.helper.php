@@ -1052,7 +1052,6 @@ class flexicontent_html
 	{
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
-		$config   = JFactory::getConfig();
 		$document = JFactory::getDocument();
 		$nullDate = $db->getNullDate();
 		$app = JFactory::getApplication();
@@ -4305,9 +4304,9 @@ class flexicontent_db
 	static function &directQuery($query)
 	{
 		$db     = JFactory::getDBO();
-		$config = JFactory::getConfig();
-		$dbprefix = $config->getValue('config.dbprefix');
-		$dbtype   = $config->getValue('config.dbtype');
+		$app = JFactory::getApplication();
+		$dbprefix = $app->getCfg('dbprefix');
+		$dbtype   = $app->getCfg('dbtype');
 
 		if (FLEXI_J16GE) {
 			$query = $db->replacePrefix($query);
