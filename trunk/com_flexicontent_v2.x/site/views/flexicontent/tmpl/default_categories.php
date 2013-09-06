@@ -44,9 +44,8 @@ $subcat_image_method = $this->params->get('subcat_image_method', 1);
 $subcat_image_width = $this->params->get('subcat_image_width', 80);
 $subcat_image_height = $this->params->get('subcat_image_height', 80);
 
-jimport( 'joomla.html.parameter' );
-$config 	=& JFactory::getConfig();
-$joomla_image_path 	= FLEXI_J16GE ? $config->getValue('config.image_path', '') : $config->getValue('config.image_path', 'images'.DS.'stories');
+if (!FLEXI_J16GE) jimport( 'joomla.html.parameter' );
+$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 
 // Get the directory menu parameters 
 $cols = JRequest::getVar('columns_count',false);

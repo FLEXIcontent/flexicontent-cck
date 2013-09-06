@@ -465,8 +465,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		flexicontent_html::calculateItemMarkups($items, $params);
 		
 		// Get some variables
-		$config	= JFactory::getConfig();
-		$joomla_image_path 	= FLEXI_J16GE ? $config->get('image_path', '') : $config->getValue('config.image_path', 'images'.DS.'stories');
+		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 		
 		
 		// **************

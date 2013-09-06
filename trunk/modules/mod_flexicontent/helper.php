@@ -1487,8 +1487,8 @@ class modFlexicontentHelper
 	{
 		if (!$params->get('apply_config_per_category', 0)) return false;
 		
-		$db     = JFactory::getDBO();
-		$config = JFactory::getConfig();
+		$app = JFactory::getApplication();
+		$db  = JFactory::getDBO();
 		$view   = JRequest::getVar('view');
 		$option = JRequest::getVar('option');
 		
@@ -1573,8 +1573,8 @@ class modFlexicontentHelper
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		if (!$catdata_arr)  return false;
 		
-		jimport( 'joomla.html.parameter' );
-		$joomla_image_path 	= FLEXI_J16GE ? $config->getValue('config.image_path', '') : $config->getValue('config.image_path', 'images'.DS.'stories');
+		if (!FLEXI_J16GE) jimport( 'joomla.html.parameter' );
+		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 		foreach( $catdata_arr as $i => $catdata ) {
 			$catdata->params = FLEXI_J16GE ? new JRegistry($catdata->params) : new JParameter($catdata->params);
 			

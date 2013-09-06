@@ -17,6 +17,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 // Decide whether to show module contents
+$app    = JFactory::getApplication();
 $view   = JRequest::getVar('view');
 $option = JRequest::getVar('option');
 
@@ -57,8 +58,7 @@ if ( $show_mod )
 	// initialize various variables
 	global $globalcats;
 	$document = JFactory::getDocument();
-	$config   = JFactory::getConfig();
-	$caching  = $config->getValue('config.caching', 0);
+	$caching 	= $app->getCfg('caching', 0);
 	
 	// include the helper only once
 	require_once (dirname(__FILE__).DS.'helper.php');
@@ -216,7 +216,6 @@ if ( $show_mod )
 	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
-		$app = JFactory::getApplication();
 		$modfc_jprof->mark('END: FLEXIcontent Module');
 		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
 		$msg .= sprintf( '<code> <b><u>including</u></b>: <br/> -- Content Plugins: %.2f secs</code><br/>', $fc_content_plg_microtime/1000000);

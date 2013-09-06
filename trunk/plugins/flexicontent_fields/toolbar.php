@@ -363,12 +363,12 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 	
 	function _getCommentsCount($id)
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		static $jcomment_installed = null;
 		
 		if ($jcomment_installed===null) {
-			$config =& JFactory::getConfig();
-			$dbprefix = $config->getValue('config.dbprefix');
+			$app = JFactory::getApplication();
+			$dbprefix = $app->getCfg('dbprefix');
 			$db->setQuery('SHOW TABLES LIKE "'.$dbprefix.'jcomments"');
 			$jcomment_installed = (boolean) count($db->loadObjectList());
 		}

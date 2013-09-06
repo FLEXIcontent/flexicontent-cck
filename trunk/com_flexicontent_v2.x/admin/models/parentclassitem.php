@@ -300,7 +300,6 @@ class ParentClassItem extends JModelAdmin
 		$layout  = JRequest::getVar('layout', false);
 		$view    = JRequest::getVar('view', false);
 		$option  = JRequest::getVar('option', false);
-		$config  = JFactory::getConfig();
 		$use_versioning = $cparams->get('use_versioning', 1);
 		$allow_current_version = true;
 		$editjf_translations = $cparams->get('editjf_translations', 0);
@@ -522,7 +521,7 @@ class ParentClassItem extends JModelAdmin
 					$db->setQuery($query);
 					
 					// Try to execute query directly and load the data as an object
-					if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $config->getValue('config.dbtype') , array('mysqli','mysql') ) ) {
+					if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' && in_array( $app->getCfg('dbtype') , array('mysqli','mysql') ) ) {
 						$data = flexicontent_db::directQuery($query);
 						$data = @ $data[0];
 						//$data = $db->loadObject(null, false);   // do not, translate, this is the JoomFish overridden method of Database extended Class
@@ -1470,7 +1469,6 @@ class ParentClassItem extends JModelAdmin
 		$db   = $this->_db;
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
-		$config     = JFactory::getConfig();
 		$dispatcher = JDispatcher::getInstance();
 		$cparams    = $this->_cparams;
 		$nullDate   = $this->_db->getNullDate();
@@ -2655,9 +2653,9 @@ class ParentClassItem extends JModelAdmin
 		$nn_content_tbl = FLEXI_J16GE ? 'falang_content' : 'jf_content';
 		
 		$db = $this->_db;
-		$config = JFactory::getConfig();
-		$dbprefix = $config->getValue('config.dbprefix');
-		$dbtype = $config->getValue('config.dbtype');
+		$app = JFactory::getApplication();
+		$dbprefix = $app->getCfg('dbprefix');
+		$dbtype   = $app->getCfg('dbtype');
 		
 		if ( in_array($dbtype, array('mysqli','mysql')) )
 		{
@@ -3669,7 +3667,6 @@ class ParentClassItem extends JModelAdmin
 		$app     = JFactory::getApplication();
 		$db      = JFactory::getDBO();
 		$user    = JFactory::getUser();
-		$config  = JFactory::getConfig();
 		$use_versioning = $this->_cparams->get('use_versioning', 1);
 		
 		// Get category titles of categories add / removed from the item
@@ -3888,8 +3885,8 @@ class ParentClassItem extends JModelAdmin
 		
 		jimport( 'joomla.utilities.utility' );
 		$send_result = JUtility::sendMail(
-			$from = $config->getValue( 'config.mailfrom' ),
-			$fromname = $config->getValue( 'config.fromname' ),
+			$from      = $app->getCfg( 'mailfrom' ),
+			$fromname  = $app->getCfg( 'fromname' ),
 			$recipient = $params->get('nf_send_as_bcc', 0) ? array($from) : $notify_emails,
 			$subject,	$body, $html_mode=true, $cc=null,
 			$bcc = $params->get('nf_send_as_bcc', 0) ? $notify_emails : null,
