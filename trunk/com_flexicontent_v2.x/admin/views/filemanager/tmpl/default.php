@@ -26,6 +26,8 @@ table#filemanager-zone label {
 	clear:none;
 }
 </style>
+
+<div class="flexicontent">
 <table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;" id="filemanager-zone">
 	<tr>
 		<td>
@@ -487,3 +489,4 @@ table#filemanager-zone label {
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 </form>
+</div>

@@ -36,6 +36,8 @@ $image_rsslist = FLEXI_J16GE ?
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
 $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) );
 ?>
+
+<div class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table class="adminform">
@@ -244,3 +246,4 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
+</div>

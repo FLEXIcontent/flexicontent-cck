@@ -25,7 +25,7 @@
 			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level3" menu="hide" />
 			<field name="submit_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" />
 			<field name="submit_redirect_url_fe" type="text" default="" size="46" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" menu="hide" />
-			<field name="notauthurl" type="menuitem" default="" disable="separator" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" />
+			<field name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" />
 			
 			<!--field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level3" menu="hide" /-->
 			<!--field name="use_captcha" type="list" default="" label="FLEXI_USER_TYPE" description="FLEXI_USER_TYPE_DESC" menu="hide">

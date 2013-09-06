@@ -125,6 +125,7 @@ window.addEvent('domready', function(){
 });
 </script>
 
+<div class="flexicontent">
 <form action="index.php?option=com_flexicontent&controller=users&view=users" method="post" name="adminForm">
 	<table class="adminlist" cellpadding="1">
 		<thead>
@@ -379,3 +380,4 @@ window.addEvent('domready', function(){
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
+</div>

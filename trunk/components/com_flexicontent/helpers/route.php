@@ -84,7 +84,6 @@ class FlexicontentHelperRoute
 		}
 		
 		// 2. Case 1: Try to use current menu item if pointing to Flexicontent, (if so configure in global options)
-		$app = JFactory::getApplication();
 		if ($default_menuitem_preference==1) {
 			$menu  = $menus->getActive();
 			if ($menu && @$menu->query['option']=='com_flexicontent' ) {
@@ -325,10 +324,34 @@ class FlexicontentHelperRoute
 		static $component_menuitems = null;
 		if ($component_menuitems === null) $component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		
-		$match = null;
+		$min_matched = 99;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		
-		// Get access level of the FLEXIcontent item
+		
+		// ******************************************************************
+		// Try to use current menu item if pointing to a category of the item
+		// ******************************************************************
+		
+		static $curr_catmenu = null;
+		if ($curr_catmenu === null) {
+			$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
+			$menu = $menus->getActive();
+			if ( !$menu ) {
+				$curr_catmenu = false;
+			} else {
+				$cid = JRequest::getInt('cid', 0);
+				$view_is_scat = JRequest::getVar('option') == 'com_flexicontent' && JRequest::getVar('view') == 'category' && $cid; 
+				$menu_matches = $menu && $view_is_scat &&
+					@$menu->query['option'] == 'com_flexicontent' && @$menu->query['view'] == 'category' && @$menu->query['cid'] == $cid;
+				$curr_catmenu = $menu_matches ? $menu : false;
+			}
+		}
+		
+		
+		// *****************************************************
+		// Get access level and type id of the FLEXIcontent item
+		// *****************************************************
+		
 		$db = JFactory::getDBO();
 		$db->setQuery( 'SELECT i.access, ie.type_id '
 			.' FROM #__content AS i '
@@ -338,19 +361,47 @@ class FlexicontentHelperRoute
 		$item_access  = $item->access;
 		$type_id = $item->type_id;
 		
+		
+		// *******************************
 		// Get type data (parameters, etc)
+		// *******************************
+		
 		static $types = null;
 		if ($type_id && $types === null) {
 			$types = FlexicontentHelperRoute::_getTypeParams();
 		}
 		$type = $type_id && isset($types[$type_id])  ?  $types[$type_id] :  false;
 		
-		// Type's default menu id ... either higher priority than item's category or lower ...
+		
+		// ********************************************************************************************************
+		// Set (a) Content type's default menu id and (b) current category menu item id ... into the priority array
+		// ********************************************************************************************************
+		
 		$type_menu_itemid_usage = $type->params->get('type_menu_itemid_usage', 0);
 		$type_menu_itemid       = $type->params->get('type_menu_itemid', 0);
 		if ($type_menu_itemid) {
-			$matches[ $type_menu_itemid_usage ? 3 : 5 ] = $type_menu_itemid;
+			// Get type menu item, check that it is valid and cache it
+			if ( !isset($type->typeMenuItem) ) {
+				$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
+				$type->typeMenuItem = $menus->getItem( $type_menu_itemid );
+			}
+			// Valid type menu item
+			if ($type->typeMenuItem) {
+				$match_lvl = $type_menu_itemid_usage ? 3 : 6;  // Priority 3: prefer type menu item instead of category prorities 4,5, but 6 is less ...
+				$matches[ $match_lvl ] = $type->typeMenuItem;
+				$min_matched = $min_matched > $match_lvl ? $match_lvl : $min_matched;
+			}
 		}
+		
+		if ( $curr_catmenu && $needles['category'] == $curr_catmenu->query['cid'] ) {
+			$matches[4] = $curr_catmenu;
+			$min_matched = $min_matched > 4 ? 4 : $min_matched;  // Priority 4: prefer a matched category menu item that is also CURRENT
+		}
+		
+		
+		// *************************************************************
+		// Iterate through menu items pointing to FLEXIcontent component
+		// *************************************************************
 		
 		foreach($component_menuitems as $menuitem)
 		{
@@ -366,33 +417,28 @@ class FlexicontentHelperRoute
 			if (@$menuitem->query['view'] == FLEXI_ITEMVIEW && @$menuitem->query['id'] == $needles[FLEXI_ITEMVIEW]) {
 				if (@$menuitem->query['view'] == FLEXI_ITEMVIEW && @$menuitem->query['cid'] == $needles['category']) {
 					$matches[1] = $menuitem; // priority 1: item id+cid
-					break;
-				} else {
+					$min_matched = 1;
+					break;  // MAX prority, break out !
+				} else if ($min_matched > 2) {
 					$matches[2] = $menuitem; // priority 2: item id
-					// no break continue searching for better match ...
+					$min_matched = $min_matched > 2 ? 2 : $min_matched;
 				}
-			} else if (@$menuitem->query['view'] == 'category'      // match category menu items ...
+			} else if ($min_matched > 5 && @$menuitem->query['view'] == 'category'      // match category menu items ...
 				&& @$menuitem->query['cid'] == $needles['category']   // ... that point to item's category
 				&& @$menuitem->query['layout'] == '' // ... but do not match "author", "my items", etc, limited to the specific category
-			) {	
+			) {
 				// Do not match menu items that override category configuration parameters, these items will be selectable only
 				// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
-				//if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? new JRegistry($menuitem->params) : new JParameter($menuitem->params);
-				//if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
+				if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? $menuitem->params : new JParameter($menuitem->params);
+				if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
 				
-				$matches[4] = $menuitem; // priority 3 category cid
-				// no break continue searching for better match ...
+				$matches[5] = $menuitem; // priority 5 category cid
+				$min_matched = $min_matched > 5 ? 5 : $min_matched;
 			}
 		}
 		
 		// Use the one with higher priority
-		for ($priority=1; $priority<=5; $priority++) {
-			if (isset($matches[$priority])) {
-				$match = $matches[$priority];
-				break;
-			}
-		}
-
+		$match = $min_matched < 99 ? $matches[$min_matched] : null;
 		return $match;
 	}
 	
@@ -444,10 +490,8 @@ class FlexicontentHelperRoute
 						
 						// Do not match menu items that override category configuration parameters, these items will be selectable only
 						// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
-						if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? new JRegistry($menuitem->params) : new JParameter($menuitem->params);
+						if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? $menuitem->params : new JParameter($menuitem->params);
 						if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
-						if ( $menuitem->jparams->get('persistent_filters', '') ) continue;
-						if ( $menuitem->jparams->get('initial_filters', '') ) continue;
 
 						$match = $menuitem;
 						break;
