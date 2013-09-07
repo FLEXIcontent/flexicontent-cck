@@ -312,9 +312,9 @@ $_ns_fxOptions    = "{duration:".$duration."}";
 			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; ?>
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
 			<?php
-				if ($rowcount%$item_columns==0) {
+				/*if ($rowcount%$item_columns==0) {
 					$oe_class = $oe_class=='odd' ? 'even' : 'odd';
-				}
+				}*/
 				$rowcount++;
 			?>
 			
@@ -595,10 +595,7 @@ $css = ''.
 
 /* CAROUSEL container (internal) is the inner CONTAINER of standard items */'
 #mod_fcitems_box_standard'.$module->id.' div.mod_flexicontent_standard_wrapper {
-	background:#f0f0f0;
-	border-color: #d7d7d7 #a0a0a0 #a0a0a0 #d7d7d7;
-	border-width: 1px;
-	border-style: solid;
+	border-width: 1px !important;
 	padding: '.$padding_top_bottom.'px '.$padding_left_right.'px !important;
 	margin: '.($mode=="vertical" ? '0px 0px '.$vdir_margin_bottom.'px 0px' : '0px '.$hdir_margin_right.'px 0px 0px').' !important;
 	width: '.($mode=="vertical" ? "auto" : $hdir_item_width.'px').' !important;
