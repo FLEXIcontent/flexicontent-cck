@@ -77,7 +77,12 @@ $document->addStyleDeclaration($css);
 $option = JRequest::getVar('option');
 if ($option=='com_config') {
 	$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_form.css');
+	$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/tabber.css');
+	
 	if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
+	
+	$document->addScript(JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js');
+	$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 }
 
 if (FLEXI_J16GE) {
@@ -113,17 +118,6 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		if (FLEXI_J16GE && in_array($level, array('tblbreak','tabs_start','tab_open','tab_close','tabs_end')) ) return 'do no use type "'.$level.'" in J1.6+';
 		
 		static $tab_js_css_added = false;
-		static $initial_tbl_hidden = false;
-		
-		if (!$tab_js_css_added && in_array($level, array('tblbreak','tabs_start','tab_open','tab_close','tabs_end')) ) {
-			$tab_js_css_added = true;
-			$document = JFactory::getDocument();
-			$document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/tabber-minimized.js');
-			$document->addStyleSheet(JURI::root().'administrator/components/com_flexicontent/assets/css/tabber.css');
-			$document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
-		}
-		
-		
 		
 		if ($level == 'tblbreak') {
 			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #ffffff; color: darkred; font-size: 16px!important; font-weight: bold; margin: 24px 0% 2px 0%; width:auto; display: block; float: left; border: 1px solid lightgray; font-family:tahoma; font-size:12px;';

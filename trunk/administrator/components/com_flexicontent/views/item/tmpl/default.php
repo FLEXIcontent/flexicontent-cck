@@ -33,8 +33,8 @@ if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclarati
 if ($this->params->get('form_extra_js_be'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_be'));
 
 $this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
-$this->document->addScript('components/com_flexicontent/assets/js/tabber-minimized.js');
-$this->document->addStyleSheet('components/com_flexicontent/assets/css/tabber.css');
+$this->document->addScript(JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js');
+//$this->document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/tabber.css');  // imported by flexicontentbackend.css
 //$this->document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 
@@ -45,7 +45,6 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 	$this->document->addScript('components/com_flexicontent/assets/js/jquery.pager.js');
 
 	$this->document->addStyleSheet('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
-	$this->document->addStyleSheet('components/com_flexicontent/assets/css/Pager.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
 			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&controller=items&task=viewtags&format=raw&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1\", {
@@ -88,7 +87,7 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 			}
 		});
 		jQuery(document).ready(function() {
-			jQuery(\"#pager\").pager({ pagenumber: ".$this->current_page.", pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
+			jQuery(\"#fc_pager\").pager({ pagenumber: ".$this->current_page.", pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		});
 
 		PageClick = function(pageclickednumber) {
@@ -109,7 +108,7 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 					});
 				});
 			}});
-			jQuery(\"#pager\").pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
+			jQuery(\"#fc_pager\").pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		}
 	");
 }
@@ -1163,7 +1162,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			endif; ?>
 		</table>
 		</div>
-		<div id="pager"></div>
+		<div id="fc_pager"></div>
 		<div class="clear"></div>
 		<?php endif; ?>
 	<?php endif; ?>

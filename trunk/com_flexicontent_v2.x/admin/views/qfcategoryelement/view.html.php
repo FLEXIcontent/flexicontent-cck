@@ -61,9 +61,9 @@ class FlexicontentViewQfcategoryelement extends JViewLegacy
 		// Prepare the document: add css files, etc
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
 		$document->addStyleSheet(JURI::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
-		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::root().'administrator/components/com_flexicontent/assets/css/j3x.css');
-		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::root().'administrator/components/com_flexicontent/assets/css/j25.css');
-		else                  $document->addStyleSheet(JURI::root().'administrator/components/com_flexicontent/assets/css/j15.css');
+		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
+		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
+		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 		$document->addStyleSheet(JURI::root().'administrator/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
 
 		//Get data from the model

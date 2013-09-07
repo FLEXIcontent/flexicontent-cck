@@ -22,7 +22,7 @@ $tmpl = $this->tmpl;
 $user = JFactory::getUser();
 
 JFactory::getDocument()->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
-JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');
+//JFactory::getDocument()->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/tabber.css');  // imported by flexicontent.css
 ?>
 
 <div class="group">

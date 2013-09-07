@@ -51,8 +51,8 @@
 	cursor: pointer !important;
 	height: 100% !important;
 	left: 0 !important;
-	opacity: 0.3 !important;
-	filter: alpha(opacity = 30) !important;
+	opacity: 1 !important;
+	filter: alpha(opacity = 100) !important;
 	outline: medium none !important;
 	position: absolute !important;
 	text-indent: -9000px !important;
@@ -65,9 +65,10 @@
 	left: auto !important;
 	right: 0 !important;
 }
-.carousel.mod_flexicontent_wrapper a.mod_fc_nav:hover {
-	opacity: 0.8 !important;
-	filter: alpha(opacity = 80) !important;
+.carousel.mod_flexicontent_wrapper span.mod_fc_nav:hover {
+	opacity: 1 !important;
+	filter: alpha(opacity = 100) !important;
+	background-color: darkred !important;
 }
 
 
@@ -90,6 +91,12 @@
 	margin-left:1%;
 	margin-right:0%;
 	padding: 1%;
+	float: left;
+	margin-bottom:4px;
+	border-radius:0px;
+	border: 1px solid;
+	border-color: #e0e0e0 #a0a0a0 #a0a0a0 #e0e0e0;
+	background-color: #f9f9f9;
 }
 
 /* EXTERNAL ITEM CONTAINER (TWO COLUMNS) */
@@ -102,23 +109,18 @@
 
 
 /* EXTERNAL CONTAINER STYLING ODD EVEN (COUNTING) */
-.carousel.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.odd,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.odd {
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.odd,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.odd {
 	background-color: #efefef;
-	float: left;
-	margin-bottom:4px;
-	border-radius:0px;
-	border: solid lightgray;
-	border-width: 0px 0px;
 }
-.carousel.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.even,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.even {
-	background-color: #ffffff;
-	float: left;
-	margin-bottom:4px;
-	border-radius:0px;
-	border: solid lightgray;
-	border-width: 0px 0px;
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.even,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.even {
+	background-color: #f9f9f9;
+}
+
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover {
+	border-color: #888 !important;
 }
 
 
@@ -145,7 +147,7 @@
 
 /* INTERNAL ITEM CONTAINER (TWO COLUMN MODE for standard items) */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent.twocol .mod_flexicontent_standard {
-	background: url('images/vdot.gif') repeat-y 50% 0;
+	/*background: url('images/vdot.gif') repeat-y 50% 0;*/
 }
 
 

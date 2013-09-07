@@ -104,3 +104,46 @@ ul.statetoggler > li.topLevel > a.opener {
 	padding: 0 !important;
 	margin: 0 !important;
 }
+
+
+
+
+/**************************************************
+ * Pager Container, e.g. flexicontent item versions
+ **************************************************/
+ 
+#fc_pager ul.pages {
+	float:left;
+	left:50%;
+	list-style-type:none;
+	margin:0 auto;
+	padding:0;
+	position:relative;
+}
+
+#fc_pager ul.pages li {
+	float:left;
+	position:relative;
+	right:50%;
+	margin-left:5px;
+	padding:2px 4px;
+	border:1px solid #ddd;
+	list-style:none;
+	text-decoration:none;
+}
+
+#fc_pager ul.pages li:hover {
+	border:1px solid #aaa;
+}
+
+#fc_pager ul.pages li.pgEmpty {
+	border:1px solid #ddd;
+	color:#ddd;
+}
+
+#fc_pager ul.pages li.pgCurrent {
+	border:1px solid #aaa;
+	color:#000;
+	font-weight:bold;
+	background-color:#eee;
+}

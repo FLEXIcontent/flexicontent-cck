@@ -1331,7 +1331,14 @@ class flexicontent_html
 		// Check if user can ADD to current category or to any category
 		if ($maincat->id && $layout == 'default') {
 			$add_label = JText::_('FLEXI_ADD_NEW_CONTENT_TO_CURR_CAT');
-			$canAdd = $user->authorise('core.create', 'com_content.category.' . $maincat->id);
+			if (FLEXI_J16GE) {
+				$canAdd = $user->authorise('core.create', 'com_content.category.' . $maincat->id);
+			} else if (FLEXI_ACCESS) {
+				$canAdd = ($user->gid < 25) ? FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'category', $maincat->id) : 1;
+			} else {
+				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
+				//$canAdd = ($user->gid >= 19);  // At least J1.5 Author
+			}
 		} else  {
 			$add_label = JText::_('FLEXI_ADD_NEW_CONTENT_TO_LIST');
 			$specific_catids = $maincat->id ? array( $maincat->id ) : $maincat->ids;
