@@ -1,5 +1,8 @@
 
-/** header icons **/
+/**************
+ * Header icons
+ **************/
+
 .icon-48-flexicontent	{ background-image: url(../images/icon-48-dashboard.png); }
 .icon-48-items				{ background-image: url(../images/icon-48-items.png); }
 .icon-48-itemadd			{ background-image: url(../images/icon-48-item-add.png); }
@@ -28,7 +31,12 @@
 .icon-48-import				{ background-image: url(../images/icon-48-import.png); }
 .icon-48-searchindex	{ background-image: url(../images/icon-48-searchindex.png); }
 
-/* Toolbar icons */
+
+
+/***************
+ * Toolbar icons
+ ***************/
+
 .icon-32-person2			{ background-image: url(../images/icon-32-person2_f2.png); }
 .icon-32-savenew			{ background-image: url(../images/icon-32-savenew.png); }
 .icon-32-translate		{ background-image: url(../images/icon-32-country-flags.png); }
@@ -46,7 +54,10 @@
 
 
 
-/* Small labels */
+/**************
+ * Small labels
+ **************/
+
 .label, .badge, .flexicontent label.label {
 	background-color: #999999;
 	color: #FFFFFF;
@@ -65,7 +76,31 @@
 	color: darkred;
 }
 
-/* Permissions slider */
+
+/**************
+ * Other layout
+ **************/
+
+ul.adminformlist {
+	list-style-position: outside !important;
+	list-style-type: none !important;
+	margin: 0px !important;
+	padding: 0px !important;
+}
+
+div.col {
+	float:left;
+}
+
+div div#element-box div.m {
+	background-color: #FFFFFF;
+}
+
+
+
+/********************
+ * Permissions slider
+ ********************/
 
 #permissions-sliders .pane-toggler-down span.level,
 #permissions-sliders .pane-toggler span.level {
@@ -97,26 +132,24 @@ div.credits img {
 
 
 
-/* Other layout */
-
-ul.adminformlist {
-	list-style-position: outside !important;
-	list-style-type: none !important;
-	margin: 0px !important;
-	padding: 0px !important;
-}
-
-div.col {
-	float:left;
-}
-
-div div#element-box div.m {
-	background-color: #FFFFFF;
-}
+/**************
+ * Table styles
+ **************/
 
 
 
-/* Fieldsets layout */
+
+/***********************
+ * pane TABS and sliders
+ ***********************/
+
+
+
+
+/******************
+ * Fieldsets layout
+ ******************/
+
 fieldset.adminform ul.checklist li label {
 	clear: both; /* e.g. usergroups */
 }
@@ -149,8 +182,8 @@ div fieldset.panelform fieldset.radio label {
 }
 
 div fieldset.panelform {
-	padding:0px;
-	margin: 0px 12px 0px 8px;
+	padding: 3px !important;
+	margin: 3px !important;
 }
 
 #jform_tid-lbl, #jform_attribs_ilayout-lbl,
@@ -232,10 +265,17 @@ div #jform_params_filters { display:block; width:50%; float:left; }
 
 
 
-/* Tables layout */
+/***************
+ * Tables layout
+ ***************/
 
 div table.adminform {
 	font-size:11px;
+	background-color: #FFFFFF;
+	border: 1px solid #D5D5D5;
+	border-collapse: collapse;
+	margin: 8px 0 15px;
+	width: 100%;
 }
 div table.adminform td {
 	font-size:11px;

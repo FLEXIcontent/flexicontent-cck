@@ -52,7 +52,6 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$mediapath	= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
 		$app				= & JFactory::getApplication();
 		$client			= $app->isAdmin() ? '../' : '';
-		$clientpref	= $app->isAdmin() ? '' : 'administrator/';
 		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
 
@@ -109,7 +108,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			hid.value = id;
 			hid.id = ixid;
 
-			img.src = '".JURI::root()."administrator/components/com_flexicontent/assets/images/move2.png';
+			img.src = '".JURI::root()."components/com_flexicontent/assets/images/move2.png';
 			img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
 
 			filelist.appendChild(li);
@@ -183,7 +182,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		';
 		$document->addStyleDeclaration($css);
 		
-		$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+		$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		

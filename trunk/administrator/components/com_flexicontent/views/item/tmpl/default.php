@@ -32,19 +32,19 @@ if ($this->params->get('form_extra_css_be')) $this->document->addStyleDeclaratio
 if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclaration($this->params->get('form_extra_js'));
 if ($this->params->get('form_extra_js_be'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_be'));
 
-$this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
-$this->document->addScript(JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js');
-//$this->document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/tabber.css');  // imported by flexicontentbackend.css
-//$this->document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
-$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
+// Load JS tabber lib
+$this->document->addScript( JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js' );
+$this->document->addStyleSheet( JURI::root().'components/com_flexicontent/assets/css/tabber.css' );
+$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 if ($this->perms['cantags'] || $this->perms['canversion']) {
-	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
-	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
-	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
-	$this->document->addScript('components/com_flexicontent/assets/js/jquery.pager.js');
+	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js');
+	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js');
+	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js');
+	$this->document->addScript(JURI::root().'components/com_flexicontent/assets/js/jquery.pager.js');     // e.g. pagination for item versions
+	$this->document->addScript(JURI::root().'components/com_flexicontent/assets/js/jquery.autogrow.js');  // e.g. autogrow version comment textarea
 
-	$this->document->addStyleSheet('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
+	$this->document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
 			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&controller=items&task=viewtags&format=raw&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1\", {
@@ -350,7 +350,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			echo '<input type="hidden" name="vstate" id="vstate" value="2" />';
 		endif;
 		?>
-
+		
 		<?php if ($this->subscribers) : ?>
 			<div class="fcclear"></div>
 			<?php
@@ -380,7 +380,7 @@ $tabCnt[$tabSetCnt] = 0;
 <div class='fctabber fields_tabset' id='fcform_tabset_<?php echo $tabSetCnt; ?>' >
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
-
+		
 		<?php $fset_lbl = $tags_displayed ? 'FLEXI_CATEGORIES_TAGS' : 'FLEXI_CATEGORIES';?>
 		<fieldset class="basicfields_set">
 			<legend>
@@ -396,7 +396,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<?php echo $infoimage; ?>
 				</span>
 			</div>
-
+			
 			<?php if ( !empty($this->lists['featured_cid']) ) : ?>
 				<div class="fcclear"></div>
 				<label id="featured_cid-lbl" for="featured_cid" for_bck="featured_cid" class="flexi_label">
@@ -414,7 +414,7 @@ $tabCnt[$tabSetCnt] = 0;
 			<div class="container_fcfield container_fcfield_name_cid">
 				<?php echo $this->lists['cid']; ?>
 			</div>
-		
+			
 		<?php /*<fieldset class="basicfields_set">
 			<legend>
 				<?php echo JText::_( 'FLEXI_TAGGING' ); ?>
@@ -466,7 +466,7 @@ $tabCnt[$tabSetCnt] = 0;
 
 		</fieldset>
 
-
+		
 		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 		<fieldset class="basicfields_set">
 			<legend>
@@ -755,24 +755,24 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_PUBLISHING'); ?> </h3>
 		
-			<fieldset class="panelform fc_edit_container_full">
-				<div class='fc_mini_note_box'>
-				<?php
-					// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
-					$site_zone = JFactory::getApplication()->getCfg('offset');
-					$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
-					if (FLEXI_J16GE) {
-						$tz = new DateTimeZone( $user_zone );
-						$tz_offset = $tz->getOffset(new JDate()) / 3600;
-					} else {
-						$tz_offset = $site_zone;
-					}
-					$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
-					if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
-					echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '<br>', $tz_info );
-				?>
-				</div>
-				
+		<fieldset class="panelform fc_edit_container_full">
+			<div class='fc_mini_note_box'>
+			<?php
+				// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
+				$site_zone = JFactory::getApplication()->getCfg('offset');
+				$user_zone = JFactory::getUser()->getParam('timezone', $site_zone);
+				if (FLEXI_J16GE) {
+					$tz = new DateTimeZone( $user_zone );
+					$tz_offset = $tz->getOffset(new JDate()) / 3600;
+				} else {
+					$tz_offset = $site_zone;
+				}
+				$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
+				if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
+				echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '<br>', $tz_info );
+			?>
+			</div>
+			
 			<div class="flexi_params">
 				<?php echo $this->formparams->render('details'); ?>
 			</div>
@@ -950,12 +950,12 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
 				<?php echo "<br><br>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
 			</blockquote>
-		
+			
 			<?php
 				echo $this->pane->startPane( 'themes-pane' );
 				foreach ($this->tmpls as $tmpl) {
 					$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-		
+					
 					echo $this->pane->startPanel( $title, "params-".$tmpl->name );
 					echo $tmpl->params->render();
 					echo $this->pane->endPanel();
@@ -1126,6 +1126,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<td><textarea name="versioncomment" id="versioncomment" style="width: 300px; height: 30px; line-height:1"></textarea></td>
 			</tr>
 		</table>
+		
 		<?php if ( $this->perms['canversion'] ) : ?>
 		<div id="result" >
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 5px;" cellpadding="0" cellspacing="0">

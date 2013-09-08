@@ -1,5 +1,8 @@
 
-/** header icons **/
+/**************
+ * Header icons
+ **************/
+
 .icon-48-flexicontent	{ background-image: url(../images/icon-48-dashboard.png); }
 .icon-48-items				{ background-image: url(../images/icon-48-items.png); }
 .icon-48-itemadd			{ background-image: url(../images/icon-48-item-add.png); }
@@ -28,7 +31,12 @@
 .icon-48-import				{ background-image: url(../images/icon-48-import.png); }
 .icon-48-searchindex	{ background-image: url(../images/icon-48-searchindex.png); }
 
-/* Toolbar icons */
+
+
+/***************
+ * Toolbar icons
+ ***************/
+
 .icon-32-person2			{ background-image: url(../images/icon-32-person2_f2.png); }
 .icon-32-savenew			{ background-image: url(../images/icon-32-savenew.png); }
 .icon-32-translate		{ background-image: url(../images/icon-32-country-flags.png); }
@@ -46,7 +54,10 @@
 
 
 
-/* Small labels */
+/**************
+ * Small labels
+ **************/
+
 .label, .badge, .flexicontent label.label {
 	margin: 0px 2px 2px 4px !important;
 }
@@ -55,11 +66,13 @@
 }
 
 
-
-/* Other layout */
+/**************
+ * Other layout
+ **************/
 
 ul.adminformlist {
-	list-style: none !important;
+	list-style-position: outside !important;
+	list-style-type: none !important;
 	margin: 0px !important;
 	padding: 0px !important;
 }
@@ -110,14 +123,21 @@ input, select {
 
 
 
-/* table styles */
+/********************
+ * Permissions slider
+ ********************/
+
+
+
+/**************
+ * Table styles
+ **************/
 
 table.adminlist input[type="text"] {
 	width: auto !important;
 	padding-left: 0px !important;
 	padding-right: 0px !important;
 }
-
 table.adminlist {
 	background-color: #F3F3F3 !important;
 	border-spacing: 1px !important;
@@ -195,14 +215,15 @@ table.adminlist .pagination {
 
 
 
-
-/* pane TABS and sliders */
+/***********************
+ * pane TABS and sliders
+ ***********************/
 
 .pane-sliders .panel {
 	border: 1px solid #CCCCCC;
 	margin-bottom: 3px;
 }
-pane-sliders .panel h3 {
+.pane-sliders .panel h3 {
 	background: none repeat scroll 0 0 #FAFAFA;
 	color: #666666;
 }
@@ -212,7 +233,9 @@ pane-sliders .panel h3 {
 	margin: 0;
 	padding: 2px 2px 2px 5px;
 }
-
+.pane-sliders .content {
+	background-color: white !important;
+}
 .pane-toggler-down a:hover, .pane-toggler-down a:focus,
 .pane-toggler a:hover, .pane-toggler a:focus {
 	text-decoration: none !important;
@@ -233,7 +256,9 @@ pane-sliders .panel h3 {
 
 
 
-/* Fieldsets layout */
+/******************
+ * Fieldsets layout
+ ******************/
 
 fieldset.adminform fieldset.radio,
 fieldset.panelform fieldset.radio,
@@ -263,8 +288,8 @@ div fieldset.panelform fieldset.radio label {
 }
 
 div fieldset.panelform {
-	padding:0px;
-	margin: 0px 12px 0px 8px;
+	padding: 3px !important;
+	margin: 3px !important;
 }
 
 #jform_tid-lbl, #jform_attribs_ilayout-lbl,
@@ -346,7 +371,9 @@ div #jform_params_filters { display:block; width:50%; float:left; }
 
 
 
-/* Tables layout */
+/***************
+ * Tables layout
+ ***************/
 
 div table.adminform {
 	font-size:11px;
@@ -372,8 +399,6 @@ table.admintable td .controls label {
 	display:inline-block;
 	padding: 0px !important;
 }
-
-
 
 div table.admintable {
 	font-size:11px;

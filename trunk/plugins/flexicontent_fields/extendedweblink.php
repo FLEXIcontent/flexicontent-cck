@@ -215,7 +215,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -279,8 +279,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			
 			if ($allow_relative_addrs==2) $autoprefix =
 				'<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_AUTOPREFIX' ).  ':</td><td>
-					<input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="0" '.( !$has_prefix ? 'checked="checked"' : '' ).'/><label class="legende" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_NO').'</label>
-					<input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="1" '.( $has_prefix ? 'checked="checked"' : '' ).'/><label class="legende" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_YES').'</label>
+					<input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="0" '.( !$has_prefix ? 'checked="checked"' : '' ).'/><label class="label" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_NO').'</label>
+					<input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="1" '.( $has_prefix ? 'checked="checked"' : '' ).'/><label class="label" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_YES').'</label>
 				</td></tr>';
 			
 			if ($usetitle) $title =

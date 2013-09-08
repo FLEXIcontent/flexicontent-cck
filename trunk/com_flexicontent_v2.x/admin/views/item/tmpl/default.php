@@ -32,19 +32,19 @@ if ($this->params->get('form_extra_css_be')) $this->document->addStyleDeclaratio
 if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclaration($this->params->get('form_extra_js'));
 if ($this->params->get('form_extra_js_be'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_be'));
 
-$this->document->addScript('components/com_flexicontent/assets/js/jquery.autogrow.js');
-$this->document->addScript(JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js');
-//$this->document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/tabber.css');  // imported by flexicontentbackend.css
-//$this->document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
-$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
+// Load JS tabber lib
+$this->document->addScript( JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js' );
+$this->document->addStyleSheet( JURI::root().'components/com_flexicontent/assets/css/tabber.css' );
+$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 if ($this->perms['cantags'] || $this->perms['canversion']) {
-	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
-	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
-	$this->document->addScript('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
-	$this->document->addScript('components/com_flexicontent/assets/js/jquery.pager.js');
+	$this->document->addScript( JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js' );
+	$this->document->addScript( JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js' );
+	$this->document->addScript( JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js' );
+	$this->document->addScript( JURI::root().'components/com_flexicontent/assets/js/jquery.pager.js' );     // e.g. pagination for item versions
+	$this->document->addScript( JURI::root().'components/com_flexicontent/assets/js/jquery.autogrow.js' );  // e.g. autogrow version comment textarea
 
-	$this->document->addStyleSheet('components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
+	$this->document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
 			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&task=items.viewtags&format=raw&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1\", {
@@ -386,7 +386,7 @@ $tabCnt[$tabSetCnt] = 0;
 			<legend>
 				<?php echo JText::_( $fset_lbl ); ?>
 			</legend>
-
+			
 			<label id="jform_catid-lbl" for="jform_catid" for_bck="jform_catid" class="flexi_label" >
 				<?php echo JText::_( 'FLEXI_CATEGORIES_MAIN' ); ?>
 			</label>
@@ -786,8 +786,8 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '<br>', $tz_info );
 			?>
 			</div>
-
-
+			
+			
 			<?php /*if ($this->perms['isSuperAdmin']) :*/ ?>
 			<div class="fcclear"></div><?php echo $this->form->getLabel('created_by'); ?>
 			<div class="container_fcfield"><?php echo $this->form->getInput('created_by'); ?></div>
@@ -811,7 +811,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			<div class="container_fcfield"><?php echo $this->form->getInput('access'); ?></div>
 
 		</fieldset>
-	
+		
 	</div> <!-- end tab -->
 	
 	
@@ -863,7 +863,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			
 			<div class="fcclear"></div>
 			<?php echo $this->form->getLabel('metadesc'); ?>
-		
+			
 			<div class="container_fcfield">
 
 				<?php	if ( isset($this->row->item_translations) ) : ?>
@@ -943,7 +943,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<?php endif; ?>
 			<?php endforeach; ?>
 		</fieldset>
-
+		
 		<fieldset class="panelform params_set">
 			<legend>
 				<?php echo JText::_( 'FLEXI_SEO' ); ?>
@@ -1019,16 +1019,18 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<?php endif; ?>
 			<?php endforeach; ?>
 
+			<div class="fcclear"></div>
 			<blockquote id='__content_type_default_layout__'>
 				<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
 				<?php echo "<br><br>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
 			</blockquote>
-	
+			<div class="fcclear"></div>
+			
 			<?php echo JHtml::_('sliders.start','template-sliders-'.$this->row->id, array('useCookie'=>1)); ?>
 			<?php
 				foreach ($this->tmpls as $tmpl) {
 					$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-	
+					
 					echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
 					?>
 					<fieldset class="panelform">
@@ -1204,7 +1206,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		</tr>
 		</table>
 
-		<?php if ($this->params->get('use_versioning', 1)) : ?>
+	<?php if ($this->params->get('use_versioning', 1)) : ?>
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
 			<tr>
 				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></th>
@@ -1214,7 +1216,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			</tr>
 		</table>
 		
-	<?php if ( $this->perms['canversion'] ) : ?>
+		<?php if ( $this->perms['canversion'] ) : ?>
 		<div id="result" >
 		<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 5px;" cellpadding="0" cellspacing="0">
 			<tr>

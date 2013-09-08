@@ -38,7 +38,7 @@ class FlexicontentViewItemelement extends JViewLegacy {
 		//initialise variables
 		$db = JFactory::getDBO();
 		$document	= JFactory::getDocument();
-		$template = $app->getTemplate();
+		$template = $app->isSite() ? (!FLEXI_J16GE ? 'khepri' : (FLEXI_J30GE ? 'hathor' : 'bluestork')) : $app->getTemplate();
 		
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
@@ -57,12 +57,11 @@ class FlexicontentViewItemelement extends JViewLegacy {
 
 		//prepare the document
 		$document->setTitle(JText::_( 'FLEXI_SELECTITEM' ));
-		$document->addStyleSheet(JURI::root().'administrator/templates/'.$template.'/css/general.css');
-
-		$document->addStyleSheet(JURI::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
+		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
+		$document->addStyleSheet(JURI::root().'administrator/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
 
 		//Get data from the model
 		$rows     = $this->get( 'Data');

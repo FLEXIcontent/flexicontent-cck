@@ -51,7 +51,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$multiple  = 1; //$field->parameters->get( 'allow_multiple', 1 ) ;  // cannot be disable file adding function would need updating
 
 		$app				= JFactory::getApplication();
-		$prefix			= $app->isSite() ? 'administrator/' : '';
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 
@@ -98,7 +97,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				hid.value = id;
 				hid.id = ixid;
 				
-				img.src = '".$prefix."components/com_flexicontent/assets/images/move2.png';
+				img.src = '".JURI::root()."components/com_flexicontent/assets/images/move2.png';
 				img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
 				
 				filelist.appendChild(li);
@@ -172,7 +171,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';

@@ -83,15 +83,23 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$delfilename	= base64_decode(JRequest::getVar('delfilename', ''));
 		
 		//add css and submenu to document
-		$document->addStyleSheet(JURI::root().'administrator/components/com_flexicontent/assets/css/flexicontentbackend.css');
+		if ($app->isSite()) {
+			$document->addStyleSheet( JURI::base().'components/com_flexicontent/assets/css/flexicontent.css' );
+			$document->addStyleSheet( JURI::base().'components/com_flexicontent/assets/css/flexi_shared.css' );  // NOTE: this is imported by main Frontend CSS file
+		} else {
+			$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
+		}
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 		$document->addStyleSheet( JURI::root() . 'administrator/templates/system/css/system.css');
-		// include khepri stylesheet only if we are in frontend
+		
+		// include backend CSS template CSS file , access to backend folder may not be allowed but ...
 		if ($app->isSite()) {
-			$document->addStyleSheet('administrator/templates/khepri/css/general.css');
+			$template = !FLEXI_J16GE ? 'khepri' : (FLEXI_J30GE ? 'hathor' : 'bluestork');
+			$document->addStyleSheet(JURI::root().'administrator/templates/'.$template.(FLEXI_J16GE ? '/css/template.css': '/css/general.css'));
 		}
+		
 		//a trick to avoid loosing general style in modal window
 		$css = 'body, td, th { font-size: 11px; }
 		a.striketext {

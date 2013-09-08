@@ -179,7 +179,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -187,7 +187,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		}
 		
 		$css .='
-			#sortables_'.$field->id.' label.legende, #sortables_'.$field->id.' input.emailaddr, #sortables_'.$field->id.' input.emailtext, #sortables_'.$field->id.' input.fcfield-button {
+			#sortables_'.$field->id.' label.label, #sortables_'.$field->id.' input.emailaddr, #sortables_'.$field->id.' input.emailtext, #sortables_'.$field->id.' input.fcfield-button {
 				float: none!important;
 				display: inline-block!important;
 			}
@@ -206,12 +206,12 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 			
 			$addr = '
-				<label class="legende" for="'.$fieldname.'[addr]">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
+				<label class="label" for="'.$fieldname.'[addr]">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
 				<input class="emailaddr validate-email'.$required.'" name="'.$fieldname.'[addr]" type="text" size="'.$size.'" value="'.$value['addr'].'" />
 			';
 			
 			if ($usetitle) $text = '
-				<label class="legende" for="'.$fieldname.'[text]">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</label>
+				<label class="label" for="'.$fieldname.'[text]">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</label>
 				<input class="emailtext" name="'.$fieldname.'[text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
 			';
 			

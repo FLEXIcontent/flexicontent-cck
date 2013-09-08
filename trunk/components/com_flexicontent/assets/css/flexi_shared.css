@@ -734,6 +734,7 @@ table.adminform td #search { margin-bottom: 0px; }
 #flexicontent .flexi_label {
 	display: block;
 	float: left !important;
+	clear: left !important;
 	color: #606060;
   background-color: #F2F2F2;
   border-bottom: 1px solid #D0D0D0;
