@@ -40,8 +40,8 @@
 		<field name="version" type="text" class="readonly" label="COM_CONTENT_FIELD_VERSION_LABEL" size="6" description="COM_CONTENT_FIELD_VERSION_DESC" readonly="true" filter="unset" />
 		<field name="versioncomment" type="textarea" label="FLEXI_VERSION_COMMENT" description="FLEXI_VERSION_COMMENT_DESC" class="inputbox" rows="3" cols="30" />
 		<field name="ordering" type="text" label="JFIELD_ORDERING_LABEL" description="JFIELD_ORDERING_DESC" class="inputbox" size="6" default="0" />
-		<field name="metadesc" type="textarea" label="JFIELD_META_DESCRIPTION_LABEL" description="JFIELD_META_DESCRIPTION_DESC" class="fcfield_textareaval" rows="3" cols="46" />
-		<field name="metakey" type="textarea" label="JFIELD_META_KEYWORDS_LABEL" description="JFIELD_META_KEYWORDS_DESC" class="fcfield_textareaval" rows="3" cols="46" />
+		<field name="metadesc" type="textarea" label="FLEXI_DESCRIPTION" description="JFIELD_META_DESCRIPTION_DESC" class="fcfield_textareaval" rows="3" cols="46" />
+		<field name="metakey" type="textarea" label="FLEXI_KEYWORDS" description="JFIELD_META_KEYWORDS_DESC" class="fcfield_textareaval" rows="3" cols="46" />
 		<field name="access" type="accesslevel" label="JFIELD_ACCESS_LABEL" description="JFIELD_ACCESS_DESC" class="inputbox" size="1" />
 		<field name="hits" type="hidden" label="JGLOBAL_HITS" description="COM_CONTENT_FIELD_HITS_DESC" class="readonly" size="6" readonly="true" filter="unset" />
 		<field name="score" type="hidden" label="FLEXI_SCORE" description="FLEXI_SCORE_DESC" class="readonly" size="6" readonly="true" filter="unset" />

@@ -1265,25 +1265,6 @@ table.admintable td {
 
 
 
-/*********************************************
- * JCE EDITOR FIXES (most frontend templates?) 
- *********************************************/
-
-/* Fixes for JCE EDITOR BUTTONS */
-#flexicontent #editor-xtd-buttons a {
-	margin:0px !important;
-	padding:0 24px 0 6px !important;
-	border:0 none !important;
-	background:none !important;
-	font-weight: normal !important;
-}
-
-#flexicontent #editor-xtd-buttons .button2-left {
-	margin:4px 0px 0px 4px !important;
-}
-
-
-
 /********************************
  * ITEM FORM: CSS FIXES for J1.6+
  ********************************/

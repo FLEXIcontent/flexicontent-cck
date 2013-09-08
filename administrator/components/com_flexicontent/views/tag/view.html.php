@@ -48,8 +48,8 @@ class FlexicontentViewTag extends JViewLegacy
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 		//add js function to overload the joomla submitform
-		//$document->addScript('components/com_flexicontent/assets/js/admin.js');
-		//$document->addScript('components/com_flexicontent/assets/js/validate.js');
+		//$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
+		//$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
 
 		//Get data from the model
 		$model		= & $this->getModel();

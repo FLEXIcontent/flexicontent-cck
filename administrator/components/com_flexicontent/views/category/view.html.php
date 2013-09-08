@@ -147,8 +147,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 		
 		// Add js function to overload the joomla submitform
-		$document->addScript('components/com_flexicontent/assets/js/admin.js');
-		$document->addScript('components/com_flexicontent/assets/js/validate.js');
+		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
+		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
 		
 		
 		// ********************

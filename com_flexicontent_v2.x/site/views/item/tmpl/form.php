@@ -58,36 +58,26 @@ if ($return) {
 	$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
 }
 
-FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
-flexicontent_html::loadFramework('jQuery');
-flexicontent_html::loadFramework('select2');
-
 // add extra css/js for the edit form
 if ($this->params->get('form_extra_css'))    $this->document->addStyleDeclaration($this->params->get('form_extra_css'));
 if ($this->params->get('form_extra_css_fe')) $this->document->addStyleDeclaration($this->params->get('form_extra_css_fe'));
 if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclaration($this->params->get('form_extra_js'));
 if ($this->params->get('form_extra_js_fe'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_fe'));
 
-$this->document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexi_shared.css');
-if      (FLEXI_J30GE) $this->document->addStyleSheet(JURI::base().'administrator/components/com_flexicontent/assets/css/j3x.css');
-else if (FLEXI_J16GE) $this->document->addStyleSheet(JURI::base().'administrator/components/com_flexicontent/assets/css/j25.css');
-else                  $this->document->addStyleSheet(JURI::base().'administrator/components/com_flexicontent/assets/css/j15.css');
-$this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/itemscreen.js' );
-$this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/admin.js' );
-$this->document->addScript( JURI::base().'administrator/components/com_flexicontent/assets/js/validate.js' );
-$this->document->addScript( JURI::base().'components/com_flexicontent/assets/js/tabber-minimized.js');
-//$this->document->addStyleSheet(JURI::base().'administrator/components/com_flexicontent/assets/css/tabber.css');   // imported by flexicontent.css
-//$this->document->addStyleDeclaration(".fctabber{display:none;}");   // temporarily hide the tabbers until javascript runs, then the class will be changed to tabberlive
-$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
+// Load JS tabber lib
+$this->document->addScript( JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js' );
+$this->document->addStyleSheet( JURI::root().'components/com_flexicontent/assets/css/tabber.css' );
+$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
-	$this->document->addScript(JURI::base().'administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.bgiframe.min.js');
-	$this->document->addScript(JURI::base().'administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.ajaxQueue.js');
-	$this->document->addScript(JURI::base().'administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.min.js');
-	//if (!FLEXI_J30GE) $this->document->addScript(JURI::base().'components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.autocomplete.min.js');
-	$this->document->addScript(JURI::base().'administrator/components/com_flexicontent/assets/js/jquery.pager.js');
+	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js');
+	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js');
+	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js');
+	// These are not used in frontend form (in order to keep it simpler, maybe we will add via parameter ...)
+	//$this->document->addScript(JURI::root().'components/com_flexicontent/assets/js/jquery.pager.js');     // e.g. pagination for item versions
+	//$this->document->addScript(JURI::root().'components/com_flexicontent/assets/js/jquery.autogrow.js');  // e.g. autogrow version comment textarea
 	
-	//$this->document->addStyleSheet('administrator/components/com_flexicontent/assets/jquery-autocomplete/jquery.autocomplete.css');
+	$this->document->addStyleSheet('components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
 			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&view=item&task=viewtags&tmpl=component&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1\", {
@@ -1204,6 +1194,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 					<?php endif; ?>
 				<?php endforeach; ?>
 			
+				<div class="fcclear"></div>
 				<blockquote id='__content_type_default_layout__'>
 					<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
 				</blockquote>

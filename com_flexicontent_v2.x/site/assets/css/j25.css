@@ -1,0 +1,62 @@
+
+/**************
+ * Small labels
+ **************/
+ 
+.label, .badge, .flexicontent label.label {
+	background-color: #999999;
+	color: #FFFFFF;
+	display: inline-block;
+	font-size: 10.998px;
+	font-weight: bold;
+	line-height: 14px;
+	padding: 2px 4px;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	vertical-align: baseline;
+	white-space: nowrap;
+	border-radius: 4px;
+	margin: 0px 2px 2px 4px !important;
+}
+.label.highlight, .badge.highlight {
+	color: darkred;
+}
+
+
+
+/********************
+ * Permissions slider
+ ********************/
+
+#permissions-sliders .pane-toggler-down span.level,
+#permissions-sliders .pane-toggler span.level {
+	background-image:none; padding:0;
+}
+#flexicontent ul#rules ul .panel {
+	margin: 2px 0px !important;
+	padding: 0px !important;
+}
+#flexicontent .pane-slider ul.adminformlist,
+#flexicontent ul#rules,
+#flexicontent ul#rules ul {
+	list-style-type: none !important;
+	margin: 0px !important;
+	padding: 0px !important;
+}
+#permissions-sliders ul#rules table.group-rules th,
+#permissions-sliders ul#rules table.group-rules td {
+	padding: 0px 4px 0px 8px !important;
+	text-align: left;
+}
+#permissions-sliders ul#rules table.group-rules { border-collapse: collapse; width: 100%; }
+#permissions-sliders .mypanel table.group-rules { margin: 5px; }
+#permissions-sliders ul#rules table.group-rules td { margin: 0px 4px 0px 12px; }
+
+
+
+/*********************************************
+ * JCE EDITOR FIXES (most frontend templates?) 
+ *********************************************/
+
+#flexicontent #editor-xtd-buttons .button2-left {
+	margin:4px 0px 0px 4px !important;
+}

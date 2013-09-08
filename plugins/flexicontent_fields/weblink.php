@@ -185,14 +185,14 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
 			#sortables_'.$field->id.' li .admintable { text-align: left; }
 			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
-			#sortables_'.$field->id.' label.legende, #sortables_'.$field->id.' input.urllink, #sortables_'.$field->id.' input.urltitle, #sortables_'.$field->id.' input.fcfield-button {
+			#sortables_'.$field->id.' label.label, #sortables_'.$field->id.' input.urllink, #sortables_'.$field->id.' input.urltitle, #sortables_'.$field->id.' input.fcfield-button {
 				float: none!important;
 				display: inline-block!important;
 			}
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -215,12 +215,12 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 			
 			$link = '
-				<label class="legende">'.JText::_( 'FLEXI_FIELD_URL' ).':</label>
+				<label class="label">'.JText::_( 'FLEXI_FIELD_URL' ).':</label>
 				<input class="urllink'.$required.'" name="'.$fieldname.'[link]" id="'.$elementid.'_'.$n.'" type="text" size="'.$size.'" value="'.$value['link'].'" />
 			';
 			
 			if ($usetitle) $title = '
-				<label class="legende">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</label>
+				<label class="label">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</label>
 				<input class="urltitle" name="'.$fieldname.'[title]" type="text" size="'.$size.'" value="'.@$value['title'].'" />
 			';
 			

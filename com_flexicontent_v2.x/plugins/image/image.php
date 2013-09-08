@@ -330,7 +330,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" style="margin: 0px 0px 4px 8px !important;" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= ($none_props ? '<br/>' : ''). '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'administrator/components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= ($none_props ? '<br/>' : ''). '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';

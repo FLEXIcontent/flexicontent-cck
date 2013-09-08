@@ -46,8 +46,8 @@ class FlexicontentViewField extends JViewLegacy
 		//add js function to overload the joomla submitform
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		JHTML::_('behavior.tooltip');
-		$document->addScript('components/com_flexicontent/assets/js/admin.js');
-		$document->addScript('components/com_flexicontent/assets/js/validate.js');
+		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
+		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
 		
 		//Load pane behavior
 		jimport('joomla.html.pane');

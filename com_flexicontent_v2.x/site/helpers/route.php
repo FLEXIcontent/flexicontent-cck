@@ -352,6 +352,7 @@ class FlexicontentHelperRoute
 		// Get access level and type id of the FLEXIcontent item
 		// *****************************************************
 		
+		if ( !$needles[FLEXI_ITEMVIEW] ) return null;
 		$db = JFactory::getDBO();
 		$db->setQuery( 'SELECT i.access, ie.type_id '
 			.' FROM #__content AS i '

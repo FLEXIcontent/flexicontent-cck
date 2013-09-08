@@ -74,18 +74,22 @@ class FlexicontentViewItem extends JViewLegacy
 		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();
 
-		//JHTML::_('behavior.formvalidation'); // we use custom validation class
+		// Load custom behaviours: form validation, popup tooltips
+		//JHTML::_('behavior.formvalidation');
 		JHTML::_('behavior.tooltip');
-
+		
 		// Add css to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
-		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/itemscreen.js' );
+		
 		// Add js function to overload the joomla submitform
-		$document->addScript('components/com_flexicontent/assets/js/admin.js');
-		$document->addScript('components/com_flexicontent/assets/js/validate.js');
+		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
+		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
+		
+		// Add js function for custom code used by FLEXIcontent item form
+		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/itemscreen.js');
 		
 		
 		// ***********************
