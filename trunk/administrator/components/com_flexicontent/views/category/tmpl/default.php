@@ -34,63 +34,62 @@ dump($this->row);
 */
 ?>
 
+
+<div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">
-				<table  class="adminform">
-					<tr>
-						<td class="key">
-							<label for="title">
-								<?php echo JText::_( 'FLEXI_TITLE' ).':'; ?>
-							</label>
-						</td>
-						<td>
-							<input id="title" name="title" class="required" value="<?php echo $this->row->title; ?>" size="50" maxlength="100" />
-						</td>
-						<td>
-							<label for="published">
-								<?php echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
-							</label>
-						</td>
-						<td>
+				<div class="flexi_params">
+					
+					<div class="fcdualline_container">
+						<label for="title" class="hasTip">
+							<?php echo JText::_( 'FLEXI_TITLE' ).':'; ?>
+						</label>
+						<div class="container_fcfield fcdualline">
+							<input id="title" type="text" name="title" class="required" value="<?php echo $this->row->title; ?>" size="50" maxlength="100" />
+						</div>
+					</div>
+					<div class="fcdualline_container">
+						<label for="published" class="hasTip">
+							<?php echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
+						</label>
+						<div class="container_fcfield fcdualline">
 							<?php echo JHTML::_('select.booleanlist', 'published', 'class="inputbox"', $this->row->published ); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<label for="alias">
-								<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
-							</label>
-						</td>
-						<td>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+						
+					<div class="fcdualline_container">
+						<label for="alias" class="hasTip">
+							<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
+						</label>
+						<div class="container_fcfield fcdualline">
 							<input class="inputbox" type="text" name="alias" id="alias" size="50" maxlength="100" value="<?php echo $this->row->alias; ?>" />
-						</td>
-						<td>
-							<label for="parent">
-								<?php echo JText::_( 'FLEXI_PARENT' ).':'; ?>
-							</label>
-						</td>
-						<td>
+						</div>
+					</div>
+					<div class="fcdualline_container">
+						<label for="parent" class="hasTip">
+							<?php echo JText::_( 'FLEXI_PARENT' ).':'; ?>
+						</label>
+						<div class="container_fcfield fcdualline">
 							<?php echo $this->Lists['parent_id']; ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<label for="parent">
-								<?php echo JText::_( 'FLEXI_COPY_PARAMETERS' ).':'; ?>
-							</label>
-						</td>
-						<td>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+					
+					<div class="fcdualline_container">
+						<label for="parent" class="hasTip">
+							<?php echo JText::_( 'FLEXI_COPY_PARAMETERS' ).':'; ?>
+						</label>
+						<div class="container_fcfield fcdualline">
 							<?php echo $this->Lists['copyid']; ?>
-						</td>
-						<td>
-						</td>
-						<td>
-						</td>
-					</tr>
-				</table>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+					
+				</div>
 									
 				<?php
 				if (FLEXI_ACCESS) :
@@ -106,7 +105,7 @@ dump($this->row);
 					});
 				");
 				?>
-				<fieldset class="flexiaccess">
+				<fieldset class="flexiaccess" style="width: 95%;">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%">
 						<tr>
@@ -121,16 +120,12 @@ dump($this->row);
 				</fieldset>
 				<?php endif; ?>
 
-				<table class="adminform">
-					<tr>
-						<td>
-							<?php
-								// parameters : areaname, content, hidden field, width, height, rows, cols
-								echo $this->editor->display( FLEXI_J16GE ? 'jform[description]' : 'description',  $this->row->description, '100%', '350px', '75', '20', array('pagebreak', 'readmore') ) ;
-							?>
-						</td>
-					</tr>
-				</table>
+				<div class="flexi_params" style="margin:0px 24px; width: 99% !important;">
+					<?php
+						// parameters : areaname, content, hidden field, width, height, rows, cols
+						echo $this->editor->display( FLEXI_J16GE ? 'jform[description]' : 'description',  $this->row->description, '100%', '350px', '75', '20', array('pagebreak', 'readmore') ) ;
+					?>
+				</div>
 				
 			</td>
 			<td valign="top" width="480" style="padding: 7px 0 0 5px">
@@ -241,6 +236,7 @@ dump($this->row);
 <input type="hidden" name="view" value="category" />
 <input type="hidden" name="task" value="" />
 </form>
+</div>
 
 <?php
 //keep session alive while editing

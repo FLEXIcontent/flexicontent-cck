@@ -471,3 +471,7 @@ div.current dd {
 dl#content-pane.tabs {
 	margin: 1px 0 0;
 }
+
+#flexicontent .tabberlive ul.tabbernav {
+	margin-bottom: -4px !important;
+}

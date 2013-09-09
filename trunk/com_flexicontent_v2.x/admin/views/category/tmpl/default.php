@@ -38,65 +38,57 @@ dump($this->row);
 .pane-sliders { margin: 8px 0px 0px 0px; }
 </style>
 
+<div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">
-				<table  class="adminform">
-					<tr>
-						<td class="key">
-							<label for="title">
-								<?php echo $this->form->getLabel('title'); ?>
-							</label>
-						</td>
-						<td>
+				<div class="flexi_params">
+					
+					<div class="fcdualline_container">
+						<?php echo $this->form->getLabel('title'); ?>
+						<div class="container_fcfield fcdualline">
 							<?php echo $this->form->getInput('title'); ?>
-						</td>
-						<td>
-							<label for="published">
-								<?php echo $this->form->getLabel('published'); ?>
-							</label>
-						</td>
-						<td>
-							<?php echo $this->form->getInput('published'); ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<label for="alias">
-								<?php echo $this->form->getLabel('alias'); ?>
-							</label>
-						</td>
-						<td>
+						</div>
+					</div>
+					<div class="fcdualline_container">
+						<?php echo $this->form->getLabel('published'); ?>
+						<div class="container_fcfield fcdualline">
+								<?php echo $this->form->getInput('published'); ?>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+						
+					<div class="fcdualline_container">
+						<?php echo $this->form->getLabel('alias'); ?>
+						<div class="container_fcfield fcdualline">
 							<?php echo $this->form->getInput('alias'); ?>
-						</td>
-						<td>
-							<label for="parent">
-								<?php echo $this->form->getLabel('parent_id'); ?>
-							</label>
-						</td>
-						<td>
+						</div>
+					</div>
+					<div class="fcdualline_container">
+						<?php echo $this->form->getLabel('parent_id'); ?>
+						<div class="container_fcfield fcdualline">
 							<?php echo $this->Lists['parent_id']; ?>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<label for="copycid">
-								<?php echo $this->form->getLabel('copycid'); ?>
-							</label>
-						</td>
-						<td>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+					
+					<div class="fcdualline_container">
+						<?php echo $this->form->getLabel('copycid'); ?>
+						<div class="container_fcfield fcdualline">
 							<?php echo $this->Lists['copyid']; ?>
-						</td>
-						<td>
-							<?php echo $this->form->getLabel('language'); ?>
-						</td>
-						<td>
+						</div>
+					</div>
+					<div class="fcdualline_container">
+						<?php echo $this->form->getLabel('language'); ?>
+						<div class="container_fcfield fcdualline">
 							<?php echo $this->form->getInput('language'); ?>
-						</td>
-					</tr>
-				</table>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+					
+				</div>
 									
 				<?php
 				if ($this->perms->CanConfig) :
@@ -112,7 +104,7 @@ dump($this->row);
 					});
 				");
 				?>
-				<fieldset class="flexiaccess">
+				<fieldset class="flexiaccess" style="width: 95%;">
 					<legend><?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT' ); ?></legend>
 					<table id="tabacces" class="admintable" width="100%">
 						<tr>
@@ -127,17 +119,13 @@ dump($this->row);
 				</fieldset>
 				<?php endif; ?>
 
-				<table class="adminform">
-					<tr>
-						<td>
-							<?php
-								// parameters : areaname, content, hidden field, width, height, rows, cols
-								echo $this->editor->display( FLEXI_J16GE ? 'jform[description]' : 'description',  $this->row->description, '100%', '350px', '75', '20', array('pagebreak', 'readmore') ) ;
-								//echo $this->form->getInput('description');  // does not use default user editor, but instead the one specified in XML file or the Globally configured one
-							?>
-						</td>
-					</tr>
-				</table>
+				<div class="flexi_params" style="margin:0px 24px; width: 99% !important;">
+					<?php
+						// parameters : areaname, content, hidden field, width, height, rows, cols
+						echo $this->editor->display( FLEXI_J16GE ? 'jform[description]' : 'description',  $this->row->description, '100%', '350px', '75', '20', array('pagebreak', 'readmore') ) ;
+						//echo $this->form->getInput('description');  // does not use default user editor, but instead the one specified in XML file or the Globally configured one
+					?>
+				</div>
 				
 			</td>
 			<td valign="top" width="480" style="padding: 0px 0 0 5px;vertical-align:top;">
@@ -268,6 +256,7 @@ dump($this->row);
 <input type="hidden" name="task" value="" />
 <?php echo $this->form->getInput('extension'); ?>
 </form>
+</div>
 
 <?php
 //keep session alive while editing

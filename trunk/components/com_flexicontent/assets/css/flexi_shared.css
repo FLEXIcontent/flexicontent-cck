@@ -751,6 +751,13 @@ table.adminform td #search { margin-bottom: 0px; }
   border-radius:6px;
 }
 
+#flexicontent .flexi_params .fcdualline_container { margin: 0px; padding: 0px; float: left; min-width: 430px; }
+#flexicontent .flexi_params .fcdualline_container label.flexi_label,
+#flexicontent .flexi_params .fcdualline_container label.hasTip,
+#flexicontent .flexi_params .fcdualline_container label.hasTooltip { clear: none !important; width: 32% !important; }
+#flexicontent .flexi_params .fcdualline_container .container_fcfield input[type="text"],
+#flexicontent .flexi_params .fcdualline_container .container_fcfield select { max-width: 250px !important; }
+
 #flexicontent .flexi_params td.paramlist_key { vertical-align: top; }
 #flexicontent .flexi_params td.paramlist_key label.hasTip,
 #flexicontent .params_set td.paramlist_key label.hasTip {

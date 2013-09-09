@@ -412,7 +412,7 @@ class FlexicontentHelperRoute
 				if ($menuitem->access > $item_access) continue;
 			} else {
 				// In J2.5 we need menu access level public or the access level of the item
-				if ($menuitem->access!=$public_acclevel && $menuitem->access==$item_access) continue;
+				if ($menuitem->access!=$public_acclevel && $menuitem->access!=$item_access) continue;
 			}
 			
 			if (@$menuitem->query['view'] == FLEXI_ITEMVIEW && @$menuitem->query['id'] == $needles[FLEXI_ITEMVIEW]) {
