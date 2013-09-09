@@ -290,7 +290,7 @@ div.comments {
 /* ===============================================
    "micro" clearfix 
    http://nicolasgallagher.com/micro-clearfix-hack/
-=============================================== */
+   =============================================== */
 
 /**
  * For modern browsers
@@ -303,12 +303,12 @@ div.comments {
  */
 .group:before,
 .group:after {
-    content: " "; /* 1 */
-    display: table; /* 2 */
+	content: " "; /* 1 */
+	display: table; /* 2 */
 }
 
 .group:after {
-    clear: both;
+	clear: both;
 }
 
 /**
@@ -316,7 +316,7 @@ div.comments {
  */
 .group {
 	/* for IE 6/7 */
-    *zoom: expression(this.runtimeStyle.zoom="1", this.appendChild(document.createElement("br")).style.cssText="clear:both;font:0/0 serif");
-    /* non-JS fallback */
-    *zoom: 1;
+	*zoom: expression(this.runtimeStyle.zoom="1", this.appendChild(document.createElement("br")).style.cssText="clear:both;font:0/0 serif");
+	/* non-JS fallback */
+	*zoom: 1;
 }

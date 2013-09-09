@@ -43,12 +43,20 @@ class JElementQfcategory extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		$doc 		=& JFactory::getDocument();
+		$doc = JFactory::getDocument();
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+		
 		$fieldName	= $control_name.'['.$name.']';
 
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
-		$item =& JTable::getInstance('flexicontent_categories', '');
+		$item = JTable::getInstance('flexicontent_categories', '');
 		if ($value) {
 			$item->load($value);
 		} else {
@@ -56,7 +64,7 @@ class JElementQfcategory extends JElement
 			$value = "";
 		}
 
-		if ( $node->attributes('required') && JRequest::getVar('option')=='com_flexicontent' ) {
+		if ( @$attributes['required'] && JRequest::getVar('option')=='com_flexicontent' ) {
 			$required ="
 				$$('#toolbar-apply a.toolbar').setProperty('onclick',
 					\" if ( $('a_id').getProperty('value') != '' ) submitbutton('apply'); else alert('".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."'); \"

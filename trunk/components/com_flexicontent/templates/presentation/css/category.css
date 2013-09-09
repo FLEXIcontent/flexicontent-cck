@@ -2,9 +2,11 @@
 
 .flexi.lineinfo {
 	display: block;
+	padding: 0;
 	margin: 0 0 1em;
 	overflow: hidden;
 	clear: both;
+	border: 1px solid lightgray;
 }
 
 .flexi.subtitle1 {
@@ -18,12 +20,12 @@
 .subtitle1 .flexi.element,
 .subtitle2 .flexi.element,
 .subtitle3 .flexi.element {
-	clear: both;
+	clear: none;
 	display: block;
 	float: left;
-	width: 100% !important;  /* Allow responsive width while floating */
+	max-width: 100% !important;  /* Allow responsive width while floating */
 	padding: 0% !important;  /* Allow responsive width while floating */
-	margin: 0px 24px 12px 0px;
+	margin: 0.5em 2% 0.5em 2% !important;
 }
 
 
@@ -140,7 +142,10 @@ span.flexi.value, .flexi.value {
 	margin-bottom:0;
 }
 
-/* "micro" clearfix http://nicolasgallagher.com/micro-clearfix-hack/  */
+/* ===============================================
+   "micro" clearfix 
+   http://nicolasgallagher.com/micro-clearfix-hack/
+   =============================================== */
 
 /**
  * For modern browsers
@@ -153,12 +158,12 @@ span.flexi.value, .flexi.value {
  */
 .group:before,
 .group:after {
-    content: " "; /* 1 */
-    display: table; /* 2 */
+	content: " "; /* 1 */
+	display: table; /* 2 */
 }
 
 .group:after {
-    clear: both;
+	clear: both;
 }
 
 /**
@@ -166,7 +171,7 @@ span.flexi.value, .flexi.value {
  */
 .group {
 	/* for IE 6/7 */
-    *zoom: expression(this.runtimeStyle.zoom="1", this.appendChild(document.createElement("br")).style.cssText="clear:both;font:0/0 serif");
-    /* non-JS fallback */
-    *zoom: 1;
+	*zoom: expression(this.runtimeStyle.zoom="1", this.appendChild(document.createElement("br")).style.cssText="clear:both;font:0/0 serif");
+	/* non-JS fallback */
+	*zoom: 1;
 }
