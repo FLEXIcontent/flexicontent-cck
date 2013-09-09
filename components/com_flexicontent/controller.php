@@ -1716,7 +1716,16 @@ class FlexicontentController extends JControllerLegacy
 		// Finally read file and output it
 		// *******************************
 		
-		readfile($dlfile->abspath);
+		//readfile($abspath);  // this will read an output the file but it will cause a memory exhausted error on large files
+		
+		set_time_limit(0);
+		$handle = @fopen($abspath,"rb");
+		while(!feof($handle))
+		{
+			print(@fread($handle, 1024*8));
+			ob_flush();
+			flush();
+		}
 		
 		// ****************************************************
 		// In case of multi-download clear the session variable

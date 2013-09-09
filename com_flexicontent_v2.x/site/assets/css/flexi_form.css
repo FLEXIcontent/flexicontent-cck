@@ -313,7 +313,7 @@ html button {
 /*div table.adminform select,  .flexicontenttable.adminlist select*/
 
 .flexicontent label {
-	display: inline-block !important;
+	display: inline-block;  /* important causes problem hidden labels */
 	float: none !important;
 	margin-right: 12px !important;
 }
