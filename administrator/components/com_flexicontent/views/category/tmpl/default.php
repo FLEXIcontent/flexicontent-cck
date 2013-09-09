@@ -44,7 +44,7 @@ dump($this->row);
 				<div class="flexi_params">
 					
 					<div class="fcdualline_container">
-						<label for="title" class="hasTip">
+						<label for="title" class="flexi_label">
 							<?php echo JText::_( 'FLEXI_TITLE' ).':'; ?>
 						</label>
 						<div class="container_fcfield fcdualline">
@@ -52,7 +52,7 @@ dump($this->row);
 						</div>
 					</div>
 					<div class="fcdualline_container">
-						<label for="published" class="hasTip">
+						<label for="published" class="flexi_label">
 							<?php echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
 						</label>
 						<div class="container_fcfield fcdualline">
@@ -62,7 +62,7 @@ dump($this->row);
 					<div class="fcclear"></div>
 						
 					<div class="fcdualline_container">
-						<label for="alias" class="hasTip">
+						<label for="alias" class="flexi_label">
 							<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
 						</label>
 						<div class="container_fcfield fcdualline">
@@ -70,7 +70,7 @@ dump($this->row);
 						</div>
 					</div>
 					<div class="fcdualline_container">
-						<label for="parent" class="hasTip">
+						<label for="parent" class="flexi_label">
 							<?php echo JText::_( 'FLEXI_PARENT' ).':'; ?>
 						</label>
 						<div class="container_fcfield fcdualline">
@@ -80,7 +80,7 @@ dump($this->row);
 					<div class="fcclear"></div>
 					
 					<div class="fcdualline_container">
-						<label for="parent" class="hasTip">
+						<label for="parent" class="flexi_label">
 							<?php echo JText::_( 'FLEXI_COPY_PARAMETERS' ).':'; ?>
 						</label>
 						<div class="container_fcfield fcdualline">

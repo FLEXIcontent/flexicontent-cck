@@ -43,16 +43,22 @@ class JFormFieldQfcategory extends JFormField
 
 	function getInput()
 	{
-		$doc   = JFactory::getDocument();
-		$value = $this->__get('value');
-		if (!$value) $value = "";
-		$node = &$this->element;
-		$paramset = $node->getAttribute('paramset');
-		$paramset = $paramset ? $paramset : 'request';
+		$doc = JFactory::getDocument();
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+		
+		$value = FLEXI_J16GE ? $this->value : $value;
+		$paramset = isset($attributes['paramset']) ? $attributes['paramset'] : 'request';
+		$required = isset($attributes['required']) ? $attributes['required'] : false;
 
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
-		$item =& JTable::getInstance('flexicontent_categories', '');
+		$item = JTable::getInstance('flexicontent_categories', '');
 		if ($value) {
 			$item->load($value);
 		} else {
@@ -80,7 +86,7 @@ class JFormFieldQfcategory extends JFormField
 		$doc->addScriptDeclaration($js);
 
 		JHTML::_('behavior.modal', 'a.modal');
-		$required = $node->getAttribute('required') ? ' required="required" class="required" aria-required="true" ' : '';
+		$required = $required ? ' required="required" class="required" aria-required="true" ' : '';
 
 		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"a_name\" value=\"{$item->title}\" disabled=\"disabled\" /></div>";
 		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x: 800, y: 500}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
