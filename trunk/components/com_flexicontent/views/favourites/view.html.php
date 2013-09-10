@@ -94,6 +94,8 @@ class FlexicontentViewFavourites extends JViewLegacy
 				//$params->set('show_page_heading', '');
 				//$params->set('pageclass_sfx',	'');
 			}
+		} else {
+			$menu_matches = false;
 		}
 		
 		// Set a page title if one was not already set
@@ -118,9 +120,11 @@ class FlexicontentViewFavourites extends JViewLegacy
 		$params->def('page_title', $params->get('page_heading'));    // J2.5: to offer compatibility with old custom templates or template overrides
 		
 		if (FLEXI_J16GE) {
-			if ($menu && ($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
-			if ($menu && ($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
-			if ($menu && ($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
+			if ($menu && $menu_matches) {
+				if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
+				if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
+				if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
+			}
 		}
 		
 		
@@ -172,7 +176,7 @@ class FlexicontentViewFavourites extends JViewLegacy
 		$pageNav = $this->get('pagination');
 		
 		// Create links
-		$link = JRoute::_(FlexicontentHelperRoute::getFavsRoute(), false);
+		$link = JRoute::_(FlexicontentHelperRoute::getFavsRoute(0, $menu_matches ? $menu->id : 0));
 		$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
 		
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));

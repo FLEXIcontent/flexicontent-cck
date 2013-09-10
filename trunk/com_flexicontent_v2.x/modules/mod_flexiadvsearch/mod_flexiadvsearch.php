@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: mod_flexiadvsearch.php 1690 2013-06-24 07:27:15Z ggppdk $
+ * @version 1.0 $Id: mod_flexiadvsearch.php 1754 2013-09-06 02:06:28Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIadvsearch Module
  * @copyright (C) 2011 flexicontent.org
@@ -57,19 +57,23 @@ if ( $show_mod )
 	//$caching 	= $app->getCfg('caching', 0);
 	$add_ccs 			= $params->get('add_ccs', 1);
 	$layout       = $params->get('layout', 'default');
-	$button       = $params->get('button', '');
-	$button_text  = $params->get('button_text', '');
-	$imagebutton  = $params->get('imagebutton', '');
-	$width        = intval($params->get('width', 20));
-	$maxlength    = $width > 20 ? $width : 20;
-	$text         = $params->get('text', JText::_('search...'));
-	$button_pos   = $params->get('button_pos', 'left');
-	$linkadvsearch     = $params->get('linkadvsearch', 1);
-	$linkadvsearch_txt = $params->get('linkadvsearch_txt', 'Advanced Search');
 	$moduleclass_sfx   = $params->get('moduleclass_sfx', '');
 	
-	if($linkadvsearch && !trim($linkadvsearch_txt))
-		$linkadvsearch_txt = 'Advanced Search';
+	$text      = JText::_($params->get('text', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
+	$width     = intval($params->get('width', 20));
+	$maxlength = $width > 20 ? $width : 20;
+	
+	// display button and its position
+	$button       = $params->get('button', '');
+	$button_pos   = $params->get('button_pos', 'left');
+	
+	// button as image or as text
+	$button_as    = $params->get('button_as', '');
+	$button_text  = JText::_($params->get('button_text', 'FLEXI_ADV_MOD_GO'));
+	$button_image = $params->get('button_image', '');
+	
+	$linkadvsearch     = $params->get('linkadvsearch', 1);
+	$linkadvsearch_txt = JText::_($params->get('linkadvsearch_txt', 'FLEXI_ADV_MOD_ADVANCED_SEARCH'));
 	
 	// Currently no JS/CSS needed
 	/*
@@ -103,11 +107,8 @@ if ( $show_mod )
 	}
 	*/
 	
-	if ($useitemid = $params->get('useitemid', '0'))
-	{
-		$set_itemid = intval($params->get('set_itemid', 0));
-		$mitemid = $set_itemid > 0 ? $set_itemid : JRequest::getInt('Itemid');
-	}
+	$itemid_force = $params->get('itemid_force', '0');
+	$itemid = $itemid_force ? (int) $params->get('itemid_force_value', 0)  :  0;
 	
 	// Render Layout
 	require(JModuleHelper::getLayoutPath('mod_flexiadvsearch', $layout));

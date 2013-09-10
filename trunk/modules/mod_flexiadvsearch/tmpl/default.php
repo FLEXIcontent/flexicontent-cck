@@ -18,17 +18,19 @@
 
 defined('_JEXEC') or die('Restricted access');
 JHTML::_('behavior.tooltip');
+
+$action = JRoute::_(FlexicontentHelperRoute::getSearchRoute(0, $itemid), false);
 ?>
 
-<form id="mod-flexiadvsearch-<?php echo $module->id;?>" action="index.php" method="get">
+<form id="mod-flexiadvsearch-<?php echo $module->id;?>" action="<?php echo $action; ?>" method="get">
 	<div class="search<?php echo $params->get('moduleclass_sfx') ?>">
 	<?php
-	$output = '<input name="searchword" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="inputbox'.$moduleclass_sfx.'" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
+	$output = '<input name="searchword" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
 	if ($button) :
-	    if ($imagebutton) :
-	        $button = '<input type="image" value="'.$button_text.'" class="button'.$moduleclass_sfx.'" src="'.$img.'" onclick="this.form.searchword.focus();"/>';
+	    if ($button_as) :
+	        $button = '<input type="image" value="'.$button_text.'" class="button" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
 	    else :
-	        $button = '<input type="submit" value="'.$button_text.'" class="button'.$moduleclass_sfx.'" onclick="this.form.searchword.focus();"/>';
+	        $button = '<input type="submit" value="'.$button_text.'" class="fc_button" onclick="this.form.searchword.focus();"/>';
 	    endif;
 	endif;
 	switch ($button_pos) :
@@ -54,16 +56,9 @@ JHTML::_('behavior.tooltip');
 	echo $output;
 	?>
 	</div>
-	<?php
-	if($linkadvsearch) {
-	?>
-	<a href="index.php?option=com_flexicontent&amp;task=search<?php echo $useitemid?'&amp;Itemid='.$mitemid:'';?>" class="flexiadvsearchlink"><?php echo $linkadvsearch_txt;?></a>
-	<?php
-	}
-	?>
-	<input type="hidden" name="option" value="com_flexicontent" />
-	<input type="hidden" name="task" value="search" />
-	<?php if($useitemid) {?>
-	<input type="hidden" name="Itemid" value="<?php echo $mitemid; ?>" />
-	<?php }?>
+	
+	<?php if ($linkadvsearch) : ?>
+	<a href="<?php echo $action; ?>" class="fc_button fcsimple flexiadvsearchlink"><?php echo $linkadvsearch_txt;?></a>
+	<?php endif; ?>
+	
 </form>

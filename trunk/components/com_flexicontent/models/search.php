@@ -287,27 +287,6 @@ class FLEXIcontentModelSearch extends JModelLegacy
 			$params->merge($menu_params);
 		}
 		
-		// b. Merge module parameters overriding current configuration
-		//   (this done when module id is present in the HTTP request) (search module include search view configuration)
-		if ( JRequest::getInt('module', 0 ) )
-		{
-			// load by module name, not used
-			//jimport( 'joomla.application.module.helper' );
-			//$module_name = JRequest::getInt('module', 0 );
-			//$module = & JModuleHelper::getModule('mymodulename');
-			
-			// load by module id
-			$module_id = JRequest::getInt('module', 0 );
-			$module = JTable::getInstance ( 'Module', 'JTable' );
-			
-			if ( $module->load($module_id) ) {
-				$moduleParams = FLEXI_J16GE ? new JRegistry($module->params) : new JParameter($module->params);
-				$params->merge($moduleParams);
-			} else {
-				JError::raiseNotice ( 500, $module->getError() );
-			}
-		}
-		
 		$this->_params = $params;
 	}
 	
