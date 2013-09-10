@@ -194,6 +194,8 @@ class FlexicontentViewCategory extends JViewLegacy
 				//$params->set('show_page_heading', '');
 				//$params->set('pageclass_sfx',	'');
 			}
+		} else {
+			$menu_matches = false;
 		}
 		
 		// Set a page title if one was not already set
@@ -299,15 +301,15 @@ class FlexicontentViewCategory extends JViewLegacy
 			if (FLEXI_J16GE) {
 				if ($category->metadesc)
 					$document->setDescription( $category->metadesc );
-				elseif ($menu && ($_mp=$menu->params->get('menu-meta_description')))
+				elseif ($menu && $menu_matches && ($_mp=$menu->params->get('menu-meta_description')))
 					$document->setDescription( $_mp );
 					
 				if ($category->metakey)
 					$document->setMetadata('keywords', $category->metakey);
-				elseif ($menu && ($_mp=$menu->params->get('menu-meta_keywords')))
+				elseif ($menu && $menu_matches && ($_mp=$menu->params->get('menu-meta_keywords')))
 					$document->setMetadata('keywords', $_mp);
 				
-				if ($menu && ($_mp=$menu->params->get('robots')))
+				if ($menu && $menu_matches && ($_mp=$menu->params->get('robots')))
 					$document->setMetadata('robots', $_mp);
 				
 				$meta_params = new JRegistry($category->metadata);

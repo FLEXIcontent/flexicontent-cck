@@ -27,37 +27,51 @@
 	<fields name="params" addfieldpath="/modules/mod_flexicontent/elements">
 		<fieldset name="basic">
 		
-			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
 
-			<field name="width" type="text" default="20" label="FLEXI_BOX_WIDTH" description="FLEXI_BOX_WIDTH_DESC" />
-			<field name="text" type="text" default="" label="FLEXI_TEXT" description="FLEXI_TEXT_DESC" />
-			<field name="@spacer" type="spacer" default="" label="" description="" />
-			<field name="button" type="radio" default="" label="FLEXI_SEARCH_BUTTON" description="FLEXI_SEARCH_BUTTON_DESC">
+			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" description="" level="level1" />
+			<field  name="layout"  type="fclayout"  default="news"  label="FLEXI_CHOOSE_TMPL"
+						description="FLEXI_CHOOSE_TMPL_DESC"  directory="/modules/mod_flexiadvsearch/tmpl"
+						hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_"
+						tmpl_container="mod_tmpl_layout" params_source="inline"
+						/> <!-- params_source="file" -->
+			
+			<field name="" type="separator" default="FLEXI_MOD_MENU_ITEM" level="level1" menu="hide" />
+			<field name="itemid_force" type="list" default="0" label="FLEXI_MOD_FORCE_MENU_ITEMID" description="FLEXI_MOD_FORCE_MENU_ITEMID_DESC">
+				<option value="0">FLEXI_MOD_MENU_ITEMID_DEFAULT</option>
+				<option value="1">FLEXI_MOD_MENU_ITEMID_CUSTOM</option>
+			</field>
+			<field name="itemid_force_value" type="text" default="" label="FLEXI_MOD_CUSTOM_MENU_ITEMID" description="FLEXI_MOD_CUSTOM_MENU_ITEMID" />
+			
+			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
+			
+			<field name="" type="separator" default="FLEXI_MOD_TEXT_SEARCH_FIELD" level="level2" menu="hide" />
+			<field name="width" type="text" default="20" label="FLEXI_MOD_TEXT_SEARCH_WIDTH" description="FLEXI_MOD_TEXT_SEARCH_WIDTH_DESC" />
+			<field name="text" type="text" default="FLEXI_ADV_MOD_SEARCH_PROMPT" label="FLEXI_MOD_TEXT_SEARCH_PROMPT" description="FLEXI_MOD_TEXT_SEARCH_PROMPT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_MOD_GO_BUTTON" level="level2" menu="hide" />
+			<field name="button" type="radio" default="" label="FLEXI_MOD_SHOW_GO_BUTTON" description="FLEXI_MOD_SHOW_GO_BUTTON_DESC">
 				<option value="">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="button_pos" type="list" default="right" label="FLEXI_BUTTON_POSITION" description="FLEXI_BUTTON_POSITION_DESC">
+			<field name="button_pos" type="list" default="right" label="FLEXI_MOD_BUTTON_POSITION" description="FLEXI_MOD_BUTTON_POSITION_DESC">
 				<option value="right">FLEXI_BUTTON_RIGHT</option>
 				<option value="left">FLEXI_BUTTON_LEFT</option>
 				<option value="top">FLEXI_BUTTON_TOP</option>
 				<option value="bottom">FLEXI_BUTTON_BOTTOM</option>
 			</field>
-			<field name="imagebutton" type="radio" default="" label="FLEXI_BUTTON_IMAGE" description="FLEXI_BUTTON_IMAGE_DESC">
-				<option value="">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			<field name="imagebutton" type="radio" default="0" label="FLEXI_MOD_BUTTON_AS" description="FLEXI_MOD_BUTTON_AS_DESC">
+				<option value="0">FLEXI_MOD_BUTTON_AS_TEXT</option>
+				<option value="1">FLEXI_MOD_BUTTON_AS_IMAGE</option>
 			</field>
-			<field name="button_text" type="text" default="" label="FLEXI_BUTTON_TEXT" description="FLEXI_BUTTON_TEXT_DESC" />
-			<field name="@spacer" type="spacer" default="" label="" description="" />
-			<field name="useitemid" type="radio" default="0" label="FLEXI_MENU_ITEM" description="FLEXI_MENU_ITEM_DESC">
+			<field name="button_image" type="text" default="" label="FLEXI_MOD_BUTTON_IMAGE_SRC" description="FLEXI_MOD_BUTTON_IMAGE_SRC" />
+			<field name="button_text"  type="text" default="FLEXI_ADV_MOD_GO" label="FLEXI_MOD_BUTTON_TEXT" description="FLEXI_MOD_BUTTON_TEXT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_MOD_ADV_SEARCH" description="FLEXI_MOD_ADV_SEARCH_DESC" level="level2" menu="hide" />
+			<field name="linkadvsearch" type="radio" default="1" label="FLEXI_MOD_ADV_SEARCH_SHOW_LINK" description="FLEXI_MOD_ADV_SEARCH_SHOW_LINK_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="set_itemid" type="text" default="" label="FLEXI_MENU_ITEMID" description="FLEXI_MENU_ITEMID_DESC" />
-			<field name="linkadvsearch" type="radio" default="1" label="FLEXI_ADV_SEARCH" description="FLEXI_ADV_SEARCH_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="linkadvsearch_txt" type="text" default="Advanced Search" label="FLEXI_ADV_SEARCH_TEXT" description="FLEXI_ADV_SEARCH_TEXT_DESC" />
+			<field name="linkadvsearch_txt" type="text" default="FLEXI_ADV_MOD_ADVANCED_SEARCH" label="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT" description="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT_DESC" />
 			
 		</fieldset>
 		

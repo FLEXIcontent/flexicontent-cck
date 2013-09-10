@@ -73,9 +73,19 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// **********************
 		
 		// Verify menu item points to current FLEXIcontent object, IF NOT then clear page title and page class suffix
-		if ( $menu && $menu->query['view'] != 'flexicontent' ) {
-			$params->set('page_title',	'');
-			$params->set('pageclass_sfx',	'');
+		if ( $menu ) {
+			$view_ok     = @$menu->query['view']     == 'flexicontent';
+			$menu_matches = $view_ok;
+			
+			if ( !$menu_matches ) {
+				$params->set('page_title', '');
+				$params->set('page_heading', '');
+				// These are behavior, so do not clear ?
+				//$params->set('show_page_heading', '');
+				//$params->set('pageclass_sfx',	'');
+			}
+		} else {
+			$menu_matches = false;
 		}
 		
 		// Set a page title if one was not already set
@@ -100,9 +110,11 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$params->def('page_title', $params->get('page_heading'));    // J2.5: to offer compatibility with old custom templates or template overrides
 		
 		if (FLEXI_J16GE) {
-			if ($menu && ($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
-			if ($menu && ($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
-			if ($menu && ($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
+			if ($menu && $menu_matches) {
+				if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
+				if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
+				if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
+			}
 		}
 		
 		
