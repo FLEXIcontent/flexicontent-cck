@@ -718,7 +718,7 @@ dl.tabs dt { font-size:10px !important; font-family:tahoma !important; font-weig
 
 #flexicontent table.adminform td { padding: 0px 2px 0px 2px; }
 #flexicontent table.adminform { margin: 0px; }
-table.adminform td #search { margin-bottom: 0px; }
+table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 
 #flexicontent span.flexi_label label {
 	float:right; margin:0px; padding:0px;
@@ -758,6 +758,7 @@ table.adminform td #search { margin-bottom: 0px; }
 #flexicontent .flexi_params .fcdualline_container .container_fcfield input[type="text"],
 #flexicontent .flexi_params .fcdualline_container .container_fcfield select { max-width: 250px !important; }
 
+.flexicontent td.paramlist_key label { margin-right: 2px !important; }
 #flexicontent .flexi_params td.paramlist_key { vertical-align: top; }
 #flexicontent .flexi_params td.paramlist_key label.hasTip,
 #flexicontent .params_set td.paramlist_key label.hasTip {
@@ -973,7 +974,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 
 .fckey_high { color:darkred !important; }
-.container_fcfield { float:left!important; padding:0px!important;  margin: 3px 0% 3px 0%!important; width: 77%; }
+.container_fcfield { float:left!important; padding:0px!important;  margin: 2px 0% 3px 0%!important; width: 77%; }
 .container_fcfield.fcfield_row0 {}
 .container_fcfield.fcfield_row1 {}
 .container_fcfield .fc_mini_note_box,

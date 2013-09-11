@@ -154,13 +154,14 @@ fieldset.adminform ul.checklist li label {
 	clear: both; /* e.g. usergroups */
 }
 
+.controls fieldset.radio, .controls fieldset.checkbox,
 fieldset.adminform fieldset.radio,
 fieldset.panelform fieldset.radio,
 fieldset.adminform-legacy fieldset.radio {
 	border: 0 none !important;
 	float: left !important;
-	margin: 0 !important;
-	padding: 0 !important;
+	margin: 0 0 0 4px !important;
+	padding: 2px 0px !important;
 }
 
 div fieldset label.radiobtn {
@@ -182,8 +183,8 @@ div fieldset.panelform fieldset.radio label {
 }
 
 div fieldset.panelform {
-	padding: 3px !important;
-	margin: 3px !important;
+	padding: 0px !important;
+	margin: 0px !important;
 }
 
 #jform_tid-lbl, #jform_attribs_ilayout-lbl,
@@ -191,7 +192,7 @@ div fieldset.panelform label.hasTip, div fieldset.panelform label.hasTooltip,
 .fc_fieldset label.hasTip, .fc_fieldset label.hasTooltip
  {
 	clear: both;
-	padding: 4px 3px !important;
+	padding: 5px 3px !important;
 	margin: 2px 4px 0px 4px !important;
 	background-color: #F2F2F2;
 	border-bottom: 1px solid #D0D0D0;
@@ -216,11 +217,12 @@ fieldset.panelform label,
 fieldset.panelform input, fieldset.panelform textarea, fieldset.panelform select,
 fieldset.panelform img, fieldset.panelform button {
 	float: left !important;
-	margin:4px 8px 0px 12px!important;
-	padding:2px !important;
-	display:inline-block;
-	font-size:12px;
+	margin: 2px 8px 0px 6px!important;
+	padding: 3px !important;
+	display: inline-block;
+	font-size: 12px;
 	font-family: arial;
+	height: auto;
 }
 
 div.width-20 fieldset, div.width-30 fieldset, div.width-35 fieldset, div.width-40 fieldset, div.width-45 fieldset, div.width-50 fieldset, div.width-55 fieldset, div.width-60 fieldset, div.width-65 fieldset, div.width-70 fieldset, div.width-80 fieldset, div.width-100 fieldset {

@@ -11,7 +11,9 @@ defined('JPATH_PLATFORM') or die;
 
 jimport('joomla.filesystem.folder');
 jimport('joomla.filesystem.file');
-JFormHelper::loadFieldClass('list');
+if (FLEXI_J16GE) {
+	JFormHelper::loadFieldClass('list');
+}
 
 /**
  * Renders an HTML select list of FLEXIcontent layouts

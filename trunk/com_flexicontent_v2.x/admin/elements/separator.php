@@ -26,8 +26,10 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
-jimport('joomla.form.helper');
-JFormHelper::loadFieldClass('spacer');
+if (FLEXI_J16GE) {
+	jimport('joomla.form.helper');
+	JFormHelper::loadFieldClass('spacer');
+}
 
 $css="
 div.pane-sliders ul.adminformlist li label.hasTip {
@@ -41,8 +43,9 @@ div.pane-sliders ul.adminformlist li ul#rules label.hasTip {
 div.pane-sliders ul.adminformlist li select { margin-bottom: 0px;}
 div.pane-sliders ul.adminformlist li fieldset  { margin: 0; padding: 0; }
 
+div.control-group div.control-label label.hasTooltip,
 div.current ul.config-option-list li label.hasTip {
-	display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:220px; font-weight: bold;
+	display:inline-block; padding: 4px; margin: 1px 6px 0px 1px; text-align: right;	width:220px; font-weight: normal; font-size: 12px;
 	background-color: #F6F6F6; border-bottom: 1px solid #E9E9E9; border-right: 1px solid #E9E9E9; color: #666666;
 }
 div.current ul.config-option-list li ul#rules label.hasTip {

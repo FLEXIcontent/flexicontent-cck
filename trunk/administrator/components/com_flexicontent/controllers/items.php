@@ -2348,7 +2348,11 @@ class FlexicontentControllerItems extends FlexicontentController
 			header("Cache-Control: no-cache");
 			header("Pragma: no-cache");
 
-			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontentbackend.css">';
+			echo '<link rel="stylesheet" href="'.JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css" />';
+			if      (FLEXI_J30GE) $fc_css = JURI::base().'components/com_flexicontent/assets/css/j3x.css';
+			else if (FLEXI_J16GE) $fc_css = JURI::base().'components/com_flexicontent/assets/css/j25.css';
+			else                  $fc_css = JURI::base().'components/com_flexicontent/assets/css/j15.css';
+			echo '<link rel="stylesheet" href="'.$fc_css.'" />';
 			
 			if ($auth_publish) {
 				$state['P'] = array( 'name' =>'FLEXI_PUBLISHED', 'desc' =>'FLEXI_PUBLISHED_DESC', 'icon' => 'tick.png', 'color' => 'darkgreen' );
