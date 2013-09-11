@@ -26,9 +26,14 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage	FLEXIcontent
  * @since		1.5
  */
+if (FLEXI_J16GE) {
+	jimport('joomla.form.helper');
+	JFormHelper::loadFieldClass('spacer');
+}
+
 $css="
 div table td.paramlist_value {
-	padding-left:12px;
+	padding-left:8px;
 }
 div .paramlist_value label {
 	min-width:10px!important; padding: 0px 10px 0px 0px!important; margin: 4px 0px 0px 1px!important;

@@ -36,8 +36,9 @@ class FlexicontentControllerCategories extends JControllerAdmin
 	 */
 	function __construct()
 	{
-		if (FLEXI_J16GE)
+		if (FLEXI_J16GE) {
 			$this->text_prefix = 'com_content';
+		}
 		parent::__construct();
 
 		// Register Extra task
