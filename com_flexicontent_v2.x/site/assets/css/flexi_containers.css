@@ -15,7 +15,7 @@
 .fc-mssg-inline {
 	display: inline-block;
 	margin: 0 0 0 12px !important;
-	width: 62%;
+	max-width: 62%;
 }
 
 .fc-error {

@@ -217,8 +217,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// NULL and CURRENT dates, 
 		// NOTE: the above current date is needs to use built-in MYSQL function, otherwise filter caching can not work because the CURRENT DATETIME is continuously different !!!
 		//   $now = FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
-		//   $_now = $db->Quote( $now );
-		$_now = 'UTC_TIMESTAMP()';
+		//   $_nowDate = $db->Quote( $now );
+		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate = $db->getNullDate();
 		
 		// Section name
@@ -444,8 +444,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$and_where =  ' 1 '
 			. ' AND i.state IN (1,-5'. ($search_archived ? ','.(FLEXI_J16GE ? 2:-1) :'' ) .') '
 			. ' AND c.published = 1 '
-			. ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_now.' )'
-			. ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_now.' )'
+			. ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
+			. ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )'
 			. $andaccess
 			. $andlang
 			. $andcontenttypes

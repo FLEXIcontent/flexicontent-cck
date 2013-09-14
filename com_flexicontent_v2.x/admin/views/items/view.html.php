@@ -166,7 +166,8 @@ class FlexicontentViewItems extends JViewLegacy {
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false);
 			$add_divider = true;
 		}
-		if ( ($CanDelete || $CanDeleteOwn) && $filter_stategrp != 'trashed' ) {
+		
+		/*if ( ($CanDelete || $CanDeleteOwn) && $filter_stategrp != 'trashed' ) {
 			$btn_task    = FLEXI_J16GE ? 'items.display' : 'display';
 			$extra_js    = "document.getElementById('filter_stategrptrashed').checked=true;";
 			flexicontent_html::addToolBarButton(
@@ -182,7 +183,7 @@ class FlexicontentViewItems extends JViewLegacy {
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false);
 			$add_divider = true;
 		}
-		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
+		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }*/
 		
 		// Implementation of multiple-item state selector
 		$add_divider = false;
@@ -351,9 +352,9 @@ class FlexicontentViewItems extends JViewLegacy {
 		// build filter state group
 		if ($CanDelete || $CanDeleteOwn || $CanArchives)   // Create state group filter only if user can delete or archive
 		{
-			$sgn[''] = JText::_( 'FLEXI_GRP_NORMAL' );
-			$sgn['published'] = JText::_( 'FLEXI_GRP_PUBLISHED' );
-			$sgn['unpublished'] = JText::_( 'FLEXI_GRP_UNPUBLISHED' );
+			$sgn[''] = JText::_( 'FLEXI_GRP_NORMAL' ) .' '. JText::_( 'FLEXI_STATE_S' );
+			$sgn['published'] = JText::_( 'FLEXI_GRP_PUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
+			$sgn['unpublished'] = JText::_( 'FLEXI_GRP_UNPUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
 			if ($CanDelete || $CanDeleteOwn)
 				$sgn['trashed']  = JText::_( 'FLEXI_GRP_TRASHED' );
 			if ($CanArchives)
@@ -363,8 +364,6 @@ class FlexicontentViewItems extends JViewLegacy {
 			
 			/*$stategroups = array();
 			foreach ($sgn as $i => $v) {
-				if ($filter_stategrp == $i) $v = "<span class='flexi_radiotab highlight'>".$v."</span>";
-				else                        $v = "<span class='flexi_radiotab downlight'>".$v."</span>";
 				$stategroups[] = JHTML::_('select.option', $i, $v);
 			}
 			$lists['filter_stategrp'] = JHTML::_('select.radiolist', $stategroups, 'filter_stategrp', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_stategrp );*/

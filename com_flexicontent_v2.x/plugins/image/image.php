@@ -1947,17 +1947,18 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$destpath = JPath::clean( JPATH_SITE .DS. $dir . ($image_source ?  DS. 'item_'.$field->item_id . '_field_'.$field->id  :  "") .DS );
 			
 		} else {
-			$onlypath  = JPath::clean( JPATH_BASE .DS. dirname($value['default_image']) .DS );
+			$onlypath  = JPath::clean( JPATH_SITE .DS. dirname($value['default_image']) .DS );
 			$thumbpath = JPath::clean( JPATH_SITE .DS. $dir .DS );
 			
-			$filepath = JPath::clean( JPATH_BASE .DS. $value['default_image'] );
+			$filepath = JPath::clean( JPATH_SITE .DS. $value['default_image'] );
 			$destpath = JPath::clean( JPATH_SITE .DS. $dir .DS );
 		}
 		
 		// ******************************************
 		// Enforce protection of original image files
 		// ******************************************
-		if ($image_source) {
+		if ($image_source && JFolder::exists($onlypath))
+		{
 			$protect_original = $field->parameters->get('protect_original', 1);
 			$htaccess_file = JPath::clean( $onlypath . '.htaccess' );
 			if ($protect_original) {

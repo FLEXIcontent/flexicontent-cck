@@ -272,7 +272,7 @@ function submitbutton(task) {
 							<span style="color:red;"> *</span>
 							</label>
 						</td>
-						<td class="fcimportdata"  nowrap="nowrap">
+						<td class="fcimportdata">
 							<input type="text" name="field_separator" id="field_separator" value="<?php echo $params->get('csv_field_sep','~~'); ?>" class="fcfield_textval" /> &nbsp;
 							<span class="fc-mssg-inline fc-info"><?php echo JText::_( 'FLEXI_CSV_FIELD_SEPARATOR_DESC' ); ?></span>
 						</td>
@@ -282,7 +282,7 @@ function submitbutton(task) {
 							<label class="fckey" for="enclosure_char"><?php echo JText::_( 'FLEXI_CSV_FIELD_ENCLOSE_CHAR' ); ?>
 							</label>
 						</td>
-						<td class="fcimportdata"  nowrap="nowrap">
+						<td class="fcimportdata">
 							<input type="text" name="enclosure_char" id="enclosure_char" value="<?php echo $params->get('csv_field_enclose_char',''); ?>" class="fcfield_textval" /> &nbsp;
 							<span class="fc-mssg-inline fc-info"><?php echo JText::_( 'FLEXI_CSV_FIELD_ENCLOSE_CHAR_DESC' ); ?></span>
 						</td>
@@ -293,7 +293,7 @@ function submitbutton(task) {
 							<span style="color:red;"> *</span>
 							</label>
 						</td>
-						<td class="fcimportdata"  nowrap="nowrap">
+						<td class="fcimportdata">
 							<input type="text" name="record_separator" id="record_separator" value="<?php echo $params->get('csv_item_record_sep','\n~~'); ?>" class="fcfield_textval" /> &nbsp;
 							<span class="fc-mssg-inline fc-info"><?php echo JText::_( 'FLEXI_CSV_ITEM_SEPARATOR_DESC' ); ?></span>
 						</td>
@@ -302,7 +302,7 @@ function submitbutton(task) {
 						<td class="key">
 							<label class="fckey" for="csvfile"><?php echo JText::_( 'FLEXI_CSV_DEBUG_FIRST_RECORDS' ); ?></label>
 						</td>
-						<td class="fcimportdata"  nowrap="nowrap">
+						<td class="fcimportdata">
 							<input type="text" name="debug" id="debug" value="<?php echo $params->get('csv_debug_records','2'); ?>" class="fcfield_textval" /> &nbsp;
 							<span class="fc-mssg-inline fc-warning"><?php echo JText::_( 'FLEXI_CSV_DEBUG_FIRST_RECORDS_DESC' ); ?></span>
 						</td>
@@ -323,13 +323,8 @@ function submitbutton(task) {
 							<span style="color:red;"> *</span>
 							</label>
 						</td>
-						<td class="fcimportdata"  nowrap="nowrap">
+						<td class="fcimportdata">
 							<input type="file" name="csvfile" id="csvfile" value="" class="" />
-						</td>
-					</tr>
-					
-					<tr valign="top">
-						<td colspan="2">
 							<span class="fc-mssg-inline fc-success"> <?php echo JText::_( 'FLEXI_IMPORT_ABOUT_NEW_FILES' ); ?> </span>
 						</td>
 					</tr>
@@ -338,7 +333,7 @@ function submitbutton(task) {
 							<label class="fckey" for="import_media_folder"><?php echo JText::_( 'FLEXI_IMPORT_MEDIA_FOLDER' ); ?>
 							</label>
 						</td>
-						<td class="fcimportdata" nowrap="nowrap">
+						<td class="fcimportdata">
 							<input type="text" name="import_media_folder" id="import_media_folder" value="<?php echo $params->get('import_media_folder','tmp/fcimport_media'); ?>" class="fcfield_textval" size="40"/>
 							<span class="fc-mssg-inline fc-info"><?php echo JText::_( 'FLEXI_IMPORT_FOLDER_DESC' ); ?></span>
 						</td>
@@ -348,7 +343,7 @@ function submitbutton(task) {
 							<label class="fckey" for="import_docs_folder"><?php echo JText::_( 'FLEXI_IMPORT_DOCUMENTS_FOLDER' ); ?>
 							</label>
 						</td>
-						<td class="fcimportdata" nowrap="nowrap">
+						<td class="fcimportdata">
 							<input type="text" name="import_docs_folder" id="import_docs_folder" value="<?php echo $params->get('import_docs_folder','tmp/fcimport_docs'); ?>" class="fcfield_textval" size="40"/>
 							<span class="fc-mssg-inline fc-info"><?php echo JText::_( 'FLEXI_IMPORT_FOLDER_DESC' ); ?></span>
 						</td>
@@ -358,11 +353,12 @@ function submitbutton(task) {
 							<label class="fckey" for="import_docs_folder"><?php echo JText::_( 'FLEXI_IMPORT_SKIP_FILE_CHECK' ); ?>
 							</label>
 						</td>
-						<td class="fcimportdata" nowrap="nowrap">
+						<td class="fcimportdata">
 							<?php foreach ($this->file_fields as $i=> $file_fieid) : ?>
 								<input type="checkbox" id="skip_file_field_<?php echo $i; ?>" name="skip_file_field[]" value="<?php echo $file_fieid->name; ?>" />
 								<label for="skip_file_field_<?php echo $i; ?>" class=""><?php echo $file_fieid->label; ?></label>
 							<?php endforeach; ?>
+							<br/>
 							<span class="fc-mssg-inline fc-note"><?php echo JText::_( 'FLEXI_IMPORT_SKIP_FILE_CHECK_DESC' ); ?></span>
 						</td>
 					</tr>

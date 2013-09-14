@@ -18,6 +18,8 @@
 
 defined('_JEXEC') or die('Restricted access');
 
+flexicontent_html::jscode_to_showhide_table('mainChooseColBox','adminListTableFCitems');
+
 global $globalcats;
 $cparams = & JComponentHelper::getParams( 'com_flexicontent' );
 $limit = $this->pageNav->limit;
@@ -42,7 +44,7 @@ if ( FLEXI_J16GE || FLEXI_FISH ) {
 $items_list_cols += count($this->extra_fields);
 
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
-$image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
+$image_zoom = '<img src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
@@ -277,17 +279,45 @@ window.addEvent('domready', function() {
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
-	<table class="adminlist" cellspacing="1">
+	<div id="mainChooseColBox" class="fc_nice_box" style="margin-top:6px;"></div>
+	
+	<table class="adminform">
+		<tr>
+			<td>
+				<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_GO' /*'FLEXI_APPLY_FILTERS'*/ ); ?>" />
+				<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET' /*'FLEXI_RESET_FILTERS'*/ ); ?>" />
+				<!--
+				<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
+				<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
+				-->
+				
+				<div style="display:inline-block; white-space: nowrap;">
+					<?php echo $this->lists['filter_stategrp']; ?>
+				</div>
+				
+				<div class='fc_mini_note_box' style='display: inline-block !important;'>
+					<?php
+					$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
+					if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
+					echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
+					?>
+				</div>
+				
+			</td>
+		</tr>
+	</table>
+	
+	<table id="adminListTableFCitems" class="adminlist" cellspacing="1">
 	<thead>
 		<tr>
-			<th width="1%" class="center">
+			<th class="center" style="width:24px;">
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th>
-			<th width="1%" class="center">
+			<th class="center" style="width:24px;">
 				<input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" />
 			</th>
-			<th width="1%" class="center">&nbsp;</th>
-			<th class="left">
+			<th class="center" style="width:24px;">&nbsp;</th>
+			<th class="left hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TITLE', 'i.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->search) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
@@ -295,13 +325,16 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-
-    <?php foreach($this->extra_fields as $field) :?>
-			<th class="center"><?php echo $field->label; ?></td>
-		<?php endforeach; ?>
-
+			<th class="center hideOnDemandClass">
+				<?php echo JText::_( 'FLEXI_AUTHOR' ); ?>
+				<?php if ($this->filter_authors) : ?>
+				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
+					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_authors');document.adminForm.submit();" />
+				</span>
+				<?php endif; ?>
+			</th>			
 			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
-			<th width="" nowrap="nowrap" class="center">
+			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'ie.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
@@ -310,7 +343,7 @@ window.addEvent('domready', function() {
 				<?php endif; ?>
 			</th>
 			<?php endif; ?>
-			<th width="" nowrap="nowrap" class="center">
+			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_TYPE_NAME', 'type_name', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_type) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
@@ -318,7 +351,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th width="1%" nowrap="nowrap" class="center">
+			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JText::_( 'FLEXI_STATE', true ); ?>
 				<?php if ($this->filter_state) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
@@ -326,15 +359,23 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th width="" class="center">
+			<th class="center hideOnDemandClass">
 				<?php echo JText::_( 'FLEXI_TEMPLATE' ); ?>
 			</th>
-			<?php if ( $enable_translation_groups ) : ?>
-			<th width="" class="center">
+
+		<?php if ( $enable_translation_groups ) : ?>
+			<th class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'Translation Group', 'ie.lang_parent_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
-			<?php endif; ?>
-			<th width="<?php echo $this->CanOrder ? '' : ''; ?>" class="center">
+		<?php endif; ?>
+
+	   <?php foreach($this->extra_fields as $field) :?>
+			<th class="center hideOnDemandClass">
+				<?php echo $field->label; ?>
+			</td>
+		<?php endforeach; ?>
+
+			<th width="<?php echo $this->CanOrder ? '' : ''; ?>" class="center hideOnDemandClass">
 				<?php
 				echo $this->CanOrder ? $image_ordering_tip : '';
 
@@ -349,10 +390,10 @@ window.addEvent('domready', function() {
 				endif;
 				?>
 			</th>
-			<th width="" class="center">
+			<th class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
-			<th width="10%" class="left">
+			<th class="left hideOnDemandClass">
 				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->filter_cats) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
@@ -360,15 +401,7 @@ window.addEvent('domready', function() {
 				</span>
 				<?php endif; ?>
 			</th>
-			<th width="" class="center">
-				<?php echo JText::_( 'FLEXI_AUTHOR' ); ?>
-				<?php if ($this->filter_authors) : ?>
-				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
-					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_authors');document.adminForm.submit();" />
-				</span>
-				<?php endif; ?>
-			</th>
-			<th width="" class="center">
+			<th class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_CREATED', 'i.created', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '1') :
@@ -382,7 +415,7 @@ window.addEvent('domready', function() {
 				endif;
 				?>
 			</th>
-			<th width="" class="center">
+			<th class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort',   'FLEXI_REVISED', 'i.modified', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php
 				if ($this->date == '2') :
@@ -396,10 +429,10 @@ window.addEvent('domready', function() {
 				endif;
 				?>
 			</th>
-			<th width="1%" nowrap="nowrap" class="center">
+			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'i.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
-			<th width="2%" nowrap="nowrap" class="center">
+			<th nowrap="nowrap" class="center hideOnDemandClass">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'i.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_id) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
@@ -412,16 +445,14 @@ window.addEvent('domready', function() {
 
 		<tr id="filterline">
 			<td class="left col_title" colspan="4">
-				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
+				<!--label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label-->
 				<span class="radio"><?php echo $this->lists['scope']; ?></span>
 				<div class="clear"></div>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 			</td>
-
-    <?php foreach($this->extra_fields as $field) :?>
-			<td class="left"></td>
-		<?php endforeach; ?>
-
+			<td class="left col_authors">
+				<?php echo $this->lists['filter_authors']; ?>
+			</td>
 			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<td class="left col_lang">
 				<?php echo $this->lists['filter_lang']; ?>
@@ -434,61 +465,40 @@ window.addEvent('domready', function() {
 				<?php echo $this->lists['filter_state']; ?>
 			</td>
 			<td class="left"></td>
+
 		<?php if ( $enable_translation_groups ) : ?>
 			<td class="left"></td>
 		<?php endif; ?>
-			<td class="left" colspan="2">
+
+    <?php foreach($this->extra_fields as $field) :?>
+			<td class="left"></td>
+		<?php endforeach; ?>
+
+			<td class="left">
 				<?php echo $ordering_type_tip; ?>
-				<label class="label" for="filter_subcats"> <?php echo JText::_('FLEXI_ORDER_TYPE'); ?> </label>
-				<div style="float:none; width:20px; clear:both;"></div>
+				<label class="label" for="filter_order_type"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
+				<div class="clear"></div>
 				<?php echo $this->lists['filter_order_type']; ?>
 			</td>
+			<td class="left"></td>
 			<!--td class="left"></td-->
 			<td class="left col_cats">
 				<label class="label" for="filter_subcats"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
+				<div class="clear"></div>
 				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
+				<div class="clear"></div>
 				<?php echo $this->lists['filter_cats']; ?>
 			</td>
-			<td class="left col_authors">
-				<?php echo $this->lists['filter_authors']; ?>
-			</td>
 			<td class="left col_created col_revised" colspan="2">
-				<span class="radio"><?php echo $this->lists['date']; ?></span>  <div class="clear"></div>
-				<?php echo $this->lists['startdate']; ?>  <div class="clear"></div>
+				<span class="radio"><?php echo $this->lists['date']; ?></span>
+				<div class="clear"></div>
+				<?php echo $this->lists['startdate']; ?>
+				<div class="clear"></div>
 				<?php echo $this->lists['enddate']; ?>
 			</td>
 			<td class="left"></td>
 			<td class="left col_id">
 				<input type="text" name="filter_id" id="filter_id" size="4" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
-			</td>
-		</tr>
-
-
-		<tr>
-			<td colspan="<?php echo $items_list_cols; ?>" class="filterbuttons">
-				<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-				<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
-				<?php if (isset($this->lists['filter_stategrp'])) : ?>
-					<span class="radio flexi_tabbox" style="margin-left:16px;"><?php echo $this->lists['filter_stategrp']; ?></span>
-				<?php endif; ?>
-
-				<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
-				<?php
-				$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
-				if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
-				echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
-				?>
-				</div>
-
-<!--
-				<span style="float:right;">
-					<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
-					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-
-					<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
-					<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
-				</span>
--->
 			</td>
 		</tr>
 	</thead>
@@ -499,6 +509,32 @@ window.addEvent('domready', function() {
 				<?php echo $this->pageNav->getListFooter(); ?>
 			</td>
 		</tr>
+		
+		<tr>
+			<td colspan="<?php echo $items_list_cols; ?>" style="margin: 0 auto !important; background-color: white;">
+				<table class="admintable" style="margin: 0 auto !important; background-color: white;">
+					<tr>
+						<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
+						<td><img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
+					</tr><tr>
+						<td><img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></td>
+						<td><img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+						<td><img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+					</tr><tr>
+						<td><img src="../components/com_flexicontent/assets/images/archive.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_ARCHIVED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+						<td><img src="../components/com_flexicontent/assets/images/trash.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TRASHED', true ); ?>" /></td>
+						<td><?php echo JText::_( 'FLEXI_TRASHED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		
 	</tfoot>
 
 	<tbody id="<?php echo $ordering_draggable && $this->CanOrder && $this->ordering ? 'sortable_fcitems' : ''; ?>">
@@ -589,9 +625,9 @@ window.addEvent('domready', function() {
 			$row->lang = @$row->lang ? $row->lang : $lang_default;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td class="sort_handle"><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
-			<td><?php echo $cid_checkbox; ?></td>
-			<td>
+			<td align="center" class="sort_handle"><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td align="center"><?php echo $cid_checkbox; ?></td>
+			<td align="center">
 				<?php
 				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug)) .'&preview=1' .$autologin;
 				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
@@ -642,29 +678,9 @@ window.addEvent('domready', function() {
 				?>
 
 			</td>
-
-    <?php foreach($this->extra_fields as $field) :?>
-
-			<td align="center">
-		    <?php
-		    // Clear display HTML just in case
-		    if (isset($field->{$field->methodname}))
-		    	unset( $field->{$field->methodname} );
-
-		    // Field value for current item
-		    $field_value = & $row->extra_field_value[$field->name];
-
-		    if ( !empty($field_value) )
-		    {
-					// Create field's display HTML, via calling FlexicontentFields::renderField() for the given method name
-					FlexicontentFields::renderField($row, $field, $field_value, $method=$field->methodname);
-
-					// Output the field's display HTML
-					echo @$field->{$field->methodname};
-				}
-		    ?>
+			<td align="center" class="col_authors">
+				<?php echo $row->author; ?>
 			</td>
-		<?php endforeach; ?>
 
 		<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>
 			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE', true ).'::'.($row->lang=='*' ? JText::_("All") : $this->langs->{$row->lang}->name); ?>">
@@ -689,7 +705,8 @@ window.addEvent('domready', function() {
 			<td align="center">
 				<?php echo ($row->config->get("ilayout","") ? $row->config->get("ilayout") : $row->tconfig->get("ilayout")."<sup>[1]</sup>") ?>
 			</td>
-			<?php if ( $enable_translation_groups ) : ?>
+
+		<?php if ( $enable_translation_groups ) : ?>
 			<td align="center">
 				<?php
 					/*if ($this->lists['order']=='ie.lang_parent_id') {
@@ -730,9 +747,33 @@ window.addEvent('domready', function() {
 
 				?>
 			</td>
-			<?php endif ; ?>
+		<?php endif ; ?>
 
-			<?php if ($this->CanOrder) : ?>
+
+    <?php foreach($this->extra_fields as $field) :?>
+
+			<td align="center">
+		    <?php
+		    // Clear display HTML just in case
+		    if (isset($field->{$field->methodname}))
+		    	unset( $field->{$field->methodname} );
+
+		    // Field value for current item
+		    $field_value = & $row->extra_field_value[$field->name];
+
+		    if ( !empty($field_value) )
+		    {
+					// Create field's display HTML, via calling FlexicontentFields::renderField() for the given method name
+					FlexicontentFields::renderField($row, $field, $field_value, $method=$field->methodname);
+
+					// Output the field's display HTML
+					echo @$field->{$field->methodname};
+				}
+		    ?>
+			</td>
+		<?php endforeach; ?>
+
+		<?php if ($this->CanOrder) : ?>
 			<td class="order ">
 				<?php
 					$row_stategrp_prev = @ $stategrps[@$this->rows[$i-1]->state];
@@ -771,7 +812,7 @@ window.addEvent('domready', function() {
 				<input type="hidden" name="ord_grp[]" style="display:none;" value="<?php echo $show_orderDown ? $ord_grp : $ord_grp++; ?>" />
 
 			</td>
-			<?php else : ?>
+		<?php else : ?>
 			<td align="center">
 				<?php
 				if (!$this->filter_order_type) {
@@ -781,7 +822,8 @@ window.addEvent('domready', function() {
 				}
 				?>
 			</td>
-			<?php endif; ?>
+		<?php endif; ?>
+
 			<td align="center" class="col_access">
 				<?php echo $access; ?>
 			</td>
@@ -826,9 +868,6 @@ window.addEvent('domready', function() {
 				endforeach;
 				?>
 			</td>
-			<td align="center" class="col_authors">
-				<?php echo $row->author; ?>
-			</td>
 			<td nowrap="nowrap" class="col_created">
 				<?php echo JHTML::_('date',  $row->created, $date_format ); ?>
 			</td>
@@ -860,27 +899,6 @@ window.addEvent('domready', function() {
 	</table>
 
 	<div class="clear"></div>
-	
-	<table class="admintable" style="margin: 0 auto !important;">
-		<tr>
-			<td><img src="../components/com_flexicontent/assets/images/tick.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PUBLISHED', true ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_PUBLISHED_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
-			<td><img src="../components/com_flexicontent/assets/images/publish_g.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_IN_PROGRESS', true ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_NOT_FINISHED_YET' ); ?> <u><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></u></td>
-		</tr><tr>
-			<td><img src="../components/com_flexicontent/assets/images/publish_x.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_UNPUBLISHED', true ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></td>
-			<td><img src="../components/com_flexicontent/assets/images/publish_r.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_PENDING', true ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_NEED_TO_BE_APPROVED' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-			<td><img src="../components/com_flexicontent/assets/images/publish_y.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TO_WRITE', true ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_TO_WRITE_DESC' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-		</tr><tr>
-			<td><img src="../components/com_flexicontent/assets/images/archive.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_ARCHIVED', true ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_ARCHIVED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-			<td><img src="../components/com_flexicontent/assets/images/trash.png" width="16" height="16" border="0" alt="<?php echo JText::_( 'FLEXI_TRASHED', true ); ?>" /></td>
-			<td><?php echo JText::_( 'FLEXI_TRASHED_STATE' ); ?> <u><?php echo JText::_( 'FLEXI_UNPUBLISHED_DESC' ); ?></u></td>
-		</tr>
-	</table>
 
 	<sup>[1]</sup> <?php echo JText::_('FLEXI_TMPL_NOT_SET_USING_TYPE_DEFAULT'); ?><br />
 	<sup>[2]</sup> <?php echo JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $this->inline_ss_max); ?><br />

@@ -598,7 +598,7 @@ class modFlexicontentHelper
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
 		//$now		= $app->get('requestTime');
-		$now			= JFactory::getDate()->toMySQL();
+		$now			= FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
 		$nullDate	= $db->getNullDate();
 		
 		// $display_category_data

@@ -264,7 +264,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		static $mod_is_enabled = null;
 		if ($use_downloads_manager && $mod_is_enabled === null) {
 			$db = JFactory::getDBO();
-			$query = "SELECT published FROM #__modules WHERE module = 'mod_flexidownloads'";
+			$query = "SELECT published FROM #__modules WHERE module = 'mod_flexidownloads' AND published = 1";
 			$db->setQuery($query);
 			$mod_is_enabled = $db->loadResult();
 			if (!$mod_is_enabled) {
