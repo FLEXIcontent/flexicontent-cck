@@ -153,12 +153,12 @@ class modFlexicontentHelper
 		if (!is_array($ordering)) { $ordering = explode(',', $ordering); }
 		foreach ($ordering as $ord) {
 			$items_arr = modFlexicontentHelper::getItems($params, $ord);
-			if (!$items_arr) continue;
-			foreach ($items_arr as $cat_counter => $items) {
+			foreach ($items_arr as $catid => $items) {
+				if ( !isset($cat_items_arr[$catid]) ) $cat_items_arr[$catid] = array();
 				for ($i=0; $i<count($items); $i++) {
 					$items[$i]->featured = ($i < $featured) ? 1 : 0;
 					$items[$i]->fetching = $ord;
-					$cat_items_arr[$cat_counter][] = $items[$i];
+					$cat_items_arr[$catid][] = $items[$i];
 				}
 			}
 		}
@@ -178,7 +178,7 @@ class modFlexicontentHelper
 			//$skip_params = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 			//$skip_params->set('fields',$fields_list);
 			
-			foreach($cat_items_arr as $cat_items)
+			foreach($cat_items_arr as $catid => $cat_items)
 			{
 				// 1. The filtered rows
 				$filtered_rows = array();
@@ -246,7 +246,7 @@ class modFlexicontentHelper
 					$order_count[$item->fetching]++;
 					$filtered_rows[] =  $item;
 				}
-				$filtered_rows_arr[] = $filtered_rows;
+				$filtered_rows_arr[$catid] = $filtered_rows;
 			}
 			
 			$mod_fc_run_times['empty_fields_filter'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['empty_fields_filter'];
@@ -267,9 +267,11 @@ class modFlexicontentHelper
 		}
 		
 		$lists_arr = array();
-		foreach($filtered_rows_arr as $filtered_rows)
-		{	
-			if ( ($use_fields && count($fields)) || ($use_fields_feat && count($fields_feat)) ) {
+		foreach($filtered_rows_arr as $catid => $filtered_rows)
+		{
+			if ( empty($filtered_rows) ) {
+				$rows = array();
+			} else if ( ($use_fields && count($fields)) || ($use_fields_feat && count($fields_feat)) ) {
 				$rows = FlexicontentFields::getFields($filtered_rows, 'module', $params);
 			} else {
 				$rows = & $filtered_rows;
@@ -279,7 +281,7 @@ class modFlexicontentHelper
 			/*foreach ($order_skipcount as $skipordering => $skipcount) {
 			  echo "SKIPS $skipordering ==> $skipcount<br>\n";
 			}*/
-	
+			
 			$lists	= array();
 			foreach ( $ordering as $ord )
 			{
@@ -557,7 +559,7 @@ class modFlexicontentHelper
 					$i++;
 				}
 			}
-			$lists_arr[] = $lists;
+			$lists_arr[$catid] = $lists;
 		}
 		
 		$mod_fc_run_times['item_list_creation'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['item_list_creation'];
@@ -859,6 +861,10 @@ class modFlexicontentHelper
 		// ZERO 'behaviour' means statically selected records, but METHOD 1 is ALL records ... so NOTHING to do
 		if ( !$behaviour_cat && $method_cat == 1 )
 		{
+			if ($apply_config_per_category) {
+				echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item<br/>";
+				return;
+			}
 		}
 		
 		// ZERO 'behaviour' means statically decided records, and METHOD is either 2 (INCLUDE), or 3 (EXCLUDE)
@@ -892,7 +898,7 @@ class modFlexicontentHelper
 				} else {
 					// *** Applying configuration per category ***
 					foreach($catids_arr as $catid)                // The items retrieval query will be executed ... once per EVERY category
-						$multiquery_cats[] = ' AND c.id = '.$catid;
+						$multiquery_cats[$catid] = ' AND c.id = '.$catid;
 					$params->set('dynamic_catids', serialize($catids_arr));  // Set dynamic catids to be used by the getCategoryData
 				}
 			}
@@ -926,7 +932,7 @@ class modFlexicontentHelper
 				} else {
 					// *** Applying configuration per category ***
 					foreach($catids_arr as $catid)                // The items retrieval query will be executed ... once per EVERY category
-						$multiquery_cats[] = ' AND c.id = '.$catid;
+						$multiquery_cats[$catid] = ' AND c.id = '.$catid;
 					$params->set('dynamic_catids', serialize($catids_arr));  // Set dynamic catids to be used by the getCategoryData
 				}
 			} else {
@@ -1444,8 +1450,8 @@ class modFlexicontentHelper
 		// Execute query once OR per category
 		// **********************************
 		
-		if (!isset($multiquery_cats)) $multiquery_cats = array("");
-		foreach($multiquery_cats as $cat_where)
+		if (!isset($multiquery_cats)) $multiquery_cats = array(0 => "");
+		foreach($multiquery_cats as $catid => $cat_where)
 		{
 			$_microtime = $modfc_jprof->getmicrotime();
 			// Get content list per given category
@@ -1457,7 +1463,7 @@ class modFlexicontentHelper
 			
 			// Check for no content found for given category
 			if ( empty($content) ) {
-				$cat_items_arr[] = array();
+				$cat_items_arr[$catid] = array();
 				continue;
 			}
 			
@@ -1472,7 +1478,7 @@ class modFlexicontentHelper
 			// Secondary content list ordering and assign content list per category
 			$rows = array();
 			foreach($content as $_id) $rows[] = $_rows[$_id];
-			$cat_items_arr[] = $rows;
+			$cat_items_arr[$catid] = $rows;
 		}
 		
 		
@@ -1569,7 +1575,7 @@ class modFlexicontentHelper
 					. $orderby
 					;
 		$db->setQuery($query);
-		$catdata_arr = $db->loadObjectList();
+		$catdata_arr = $db->loadObjectList('id');
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		if (!$catdata_arr)  return false;
 		
@@ -1634,8 +1640,7 @@ class modFlexicontentHelper
 				$catdata->imagelink = $catlink;
 			}
 			
-			$catdata_arr[$i] = $catdata;
-			$catdata_arr[$i]->conf = $catconf;
+			$catdata->conf = $catconf;
 		}
 		
 		return $catdata_arr;
