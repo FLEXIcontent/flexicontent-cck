@@ -30,10 +30,9 @@ class modFlexiTagCloudHelper
 		// Initialize
 		$db				= JFactory::getDBO();
 		$user			= JFactory::getUser();
-		$nullDate		= $db->getNullDate();
-		$date 			= JFactory::getDate();
-		$now  			= $date->toMySQL();
-		$fparams 		= $mainframe->getParams('com_flexicontent');
+		$nullDate	= $db->getNullDate();
+		$now			= FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
+		$fparams 	= $mainframe->getParams('com_flexicontent');
 		$show_noauth 	= $fparams->get('show_noauth', 0);
 
 		// Get parameters

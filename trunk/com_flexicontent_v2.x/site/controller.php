@@ -287,7 +287,7 @@ class FlexicontentController extends JControllerLegacy
 		// checked them on edit form load, because user may have tampered with the form ... 
 		// ********************************************************************************
 		
-		$type_id = (int) $post['type_id'];  // Typecast to int, (already done for J2.5 via validating)
+		$type_id = (int) @ $post['type_id'];  // Typecast to int, (already done for J2.5 via validating)
 		if ( !$isnew && $model->get('type_id') == $type_id ) {
 			// Existing item with Type not being ALTERED, content type can be maintained regardless of privilege
 			$canCreateType = true;
@@ -1417,9 +1417,9 @@ class FlexicontentController extends JControllerLegacy
 		$session = JFactory::getSession();
 		
 		
-		// ***************************************************************************************************
-		// Single file download (via HTTP request) or multi-file downloaded (via a folder structure in COOKIE)
-		// ***************************************************************************************************
+		// *******************************************************************************************************************
+		// Single file download (via HTTP request) or multi-file downloaded (via a folder structure in session or in DB table)
+		// *******************************************************************************************************************
 		
 		if ($task == 'download_tree')
 		{

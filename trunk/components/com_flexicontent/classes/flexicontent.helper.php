@@ -27,6 +27,38 @@ if (!function_exists('json_encode')) { // PHP < 5.2 lack support for json
 
 class flexicontent_html
 {
+
+	// *** Output the javascript to dynamically hide/show columns of a table
+	function jscode_to_showhide_table($container_div_id,$data_tbl_id) {
+		$document = JFactory::getDocument();
+		$js = "
+		var show_col_${data_tbl_id} = Array();
+		jQuery(document).ready(function() {
+	  ";
+	  
+	  if (isset($_POST["columnchoose_${data_tbl_id}"])) {
+	    foreach ($_POST["columnchoose_${data_tbl_id}"] as $colnum => $ignore) {
+      	$js .= "show_col_${data_tbl_id}[".$colnum."]=1; \n";
+	    }
+ 	  }
+ 	  else if (isset($_COOKIE["columnchoose_${data_tbl_id}"])) {
+ 	  	$colnums = preg_split("/[\s]*,[\s]*/", $_COOKIE["columnchoose_${data_tbl_id}"]);
+	  	foreach ($colnums as $colnum) {
+	    	$colnum = (int) $colnum;
+      	$js .= "show_col_${data_tbl_id}[".$colnum."]=1; \n";
+	    }
+		}
+	  
+	  $firstload = isset($_POST["columnchoose_${data_tbl_id}"]) || isset($_COOKIE["columnchoose_${data_tbl_id}"]) ? "false" : "true";
+	  $js .= "create_column_choosers('$container_div_id', '$data_tbl_id', $firstload); \n";
+	  
+		$js .= "
+		});
+		";
+		$document->addScriptDeclaration($js);
+	}
+	
+	
 	static function escape($str) {
 		return addslashes(htmlspecialchars($str, ENT_COMPAT, 'UTF-8'));
 	}

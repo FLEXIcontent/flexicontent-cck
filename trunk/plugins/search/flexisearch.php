@@ -176,10 +176,10 @@ class plgSearchFlexisearch extends JPlugin
 		$limit				= $this->params->def('search_limit', 50);
 
 		// Dates for publish up & down items
-		$nullDate		= $db->getNullDate();
-		$date =& JFactory::getDate();
-		$now = $date->toMySQL();
-
+		$date = JFactory::getDate();
+		$nowDate  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+		$nullDate = $db->getNullDate();
+		
 		$text = trim($text);
 		if ($text == '') {
 			return array();
@@ -348,8 +348,8 @@ class plgSearchFlexisearch extends JPlugin
 				.' WHERE ( '.$where.' ) '
 				.' AND ie.type_id IN('.$types.') '
 				.' AND i.state IN (1, -5) AND c.published = 1 '
-				.' AND (i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).') '
-				.' AND (i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).') '
+				.' AND (i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($nowDate).') '
+				.' AND (i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($nowDate).') '
 				. $andaccess // Filter by user access
 				. $andlang   // Filter by current language
 				. ' GROUP BY i.id '

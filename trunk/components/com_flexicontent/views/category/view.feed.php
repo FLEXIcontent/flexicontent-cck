@@ -56,8 +56,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		$feed_link_image = $params->get('feed_link_image', 1);
 		$feed_image_method = $params->get('feed_image_method', 1);
 		
-		$feed_img_width = $params->get('feed_img_width', 100);
-		$feed_img_height = $params->get('feed_img_height', 80);
+		$feed_image_width = $params->get('feed_image_width', 100);
+		$feed_image_height = $params->get('feed_image_height', 80);
 
 		// Retrieve default image for the image field
 		if ($feed_use_image && $feed_image_source) {
@@ -104,8 +104,8 @@ class FlexicontentViewCategory extends JViewLegacy
 				$RESIZE_FLAG = !$feed_image_source || !$img_field_size;
 				if ($src && $RESIZE_FLAG) {
 					// Resize image when src path is set and RESIZE_FLAG: (a) using image extracted from item main text OR (b) not using image field's already created thumbnails
-					$h		= '&amp;h=' . $feed_img_height;
-					$w		= '&amp;w=' . $feed_img_width;
+					$h		= '&amp;h=' . $feed_image_height;
+					$w		= '&amp;w=' . $feed_image_width;
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
 					$zc		= $feed_image_method ? '&amp;zc=' . $feed_image_method : '';

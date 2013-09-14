@@ -85,16 +85,15 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		if (($view == FLEXI_ITEMVIEW) && ($option == 'com_flexicontent'))
 		{
 
-			$html 		= '';
-			$db 		= & JFactory::getDBO();
-			$user		= & JFactory::getUser();
-			$document	= & JFactory::getDocument();
+			$html  = '';
+			$db    = JFactory::getDBO();
+			$user  = JFactory::getUser();
+			$document	= JFactory::getDocument();
 	
+			$date     = JFactory::getDate();
+			$nowDate  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 			$nullDate	= $db->getNullDate();
-			$date		=& JFactory::getDate();
-			$config 	= & JFactory::getConfig();
-			$now 		= $date->toMySQL();
-	
+			
 			if ($use_tooltip)
 				JHTML::_('behavior.tooltip');
 			if ($load_css)
@@ -145,8 +144,8 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$types		= is_array($types_to_exclude) ? implode(',', $types_to_exclude) : $types_to_exclude;
 
 			$xwhere	=	' AND ( a.state = 1 OR a.state = -5 )' .
-						' AND ( publish_up = '.$db->Quote($nullDate).' OR publish_up <= '.$db->Quote($now).' )' .
-						' AND ( publish_down = '.$db->Quote($nullDate).' OR publish_down >= '.$db->Quote($now).' )' . 
+						' AND ( publish_up = '.$db->Quote($nullDate).' OR publish_up <= '.$db->Quote($nowDate).' )' .
+						' AND ( publish_down = '.$db->Quote($nullDate).' OR publish_down >= '.$db->Quote($nowDate).' )' . 
 						($types_to_exclude ? ' AND ie.type_id NOT IN (' . $types . ')' : '')
 						;
 			if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
