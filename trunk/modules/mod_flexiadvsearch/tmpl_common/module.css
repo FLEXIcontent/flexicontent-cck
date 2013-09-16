@@ -3,3 +3,6 @@
 .mod_flexiadvsearch_wrapper {
 }
 
+.mod_flexiadvsearch_wrapper .flexiadvsearchlink {
+	margin-left: 8px !important;
+}

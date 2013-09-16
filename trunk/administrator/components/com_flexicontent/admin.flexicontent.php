@@ -77,7 +77,7 @@ JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', 
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
 // Load language overrides, just before executing the component (DONE manually for J1.5)
-$overrideDir = JURI::base() . 'languages/overrides/';
+$overrideDir = JPATH_ADMINISTRATOR .DS. 'languages' .DS. 'overrides' .DS;
 if (!FLEXI_J16GE) {
 	JFactory::getLanguage()->load('override', $overrideDir, 'en-GB', true);
 	JFactory::getLanguage()->load('override', $overrideDir, null, true);

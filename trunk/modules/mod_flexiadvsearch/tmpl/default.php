@@ -22,7 +22,9 @@ JHTML::_('behavior.tooltip');
 $action = JRoute::_(FlexicontentHelperRoute::getSearchRoute(0, $itemid), false);
 ?>
 
-<form id="mod-flexiadvsearch-<?php echo $module->id;?>" action="<?php echo $action; ?>" method="get">
+<div class="mod_flexiadvsearch_wrapper mod_flexiadvsearch_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexiadvsearch_default<?php echo $module->id ?>">
+
+<form class="mod_flexiadvsearch<?php echo $params->get('moduleclass_sfx'); ?>" name="default_form_<?php echo $module->id; ?>" id="default_form_<?php echo $module->id;?>" action="<?php echo $action; ?>" method="get">
 	<div class="search<?php echo $params->get('moduleclass_sfx') ?>">
 	<?php
 	$output = '<input name="searchword" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
@@ -62,3 +64,5 @@ $action = JRoute::_(FlexicontentHelperRoute::getSearchRoute(0, $itemid), false);
 	<?php endif; ?>
 	
 </form>
+
+</div>

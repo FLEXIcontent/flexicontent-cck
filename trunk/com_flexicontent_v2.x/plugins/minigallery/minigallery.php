@@ -108,7 +108,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			hid.value = id;
 			hid.id = ixid;
 
-			img.src = '".JURI::root()."components/com_flexicontent/assets/images/move2.png';
+			img.src = '".JURI::base()."components/com_flexicontent/assets/images/move2.png';
 			img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
 
 			filelist.appendChild(li);
@@ -160,7 +160,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				});
 			});
 		";
-		if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+		if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 		$document->addScriptDeclaration($js);
 
 		$css = '
@@ -182,7 +182,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		';
 		$document->addStyleDeclaration($css);
 		
-		$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+		$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		
@@ -195,7 +195,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$img_path = $filename->filename;
 				if(substr($filename->filename, 0, 7)!='http://')
 					$img_path = JPATH_ROOT . DS . $mediapath . DS . $filename->filename;
-				$src = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
+				$src = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
 
 				$field->html .= ' <img class="thumbs" src="'.$src.'"/>';
 				$field->html .= '  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file.'" />';
@@ -207,7 +207,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		}
 
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
-		$linkfsel = JURI::base().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;autoselect='.$autoselect.'&amp;field='.$field->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+		$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;autoselect='.$autoselect.'&amp;field='.$field->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
 		$field->html .= "
 		</ul>
 		<div class=\"fcfield-button-add\">

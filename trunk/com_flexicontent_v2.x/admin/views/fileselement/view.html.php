@@ -148,7 +148,6 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$formfieldname = FLEXI_J16GE ? 'custom['.$fname.'][]' : $fname.'[]';
 		
 		//add js to document
-		//$document->addScript( JURI::base().'components/com_flexicontent/assets/js/fileselement.js' );
 		if ($folder_mode) {
 			$js = "
 			

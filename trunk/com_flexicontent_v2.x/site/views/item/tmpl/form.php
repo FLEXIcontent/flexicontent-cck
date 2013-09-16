@@ -80,7 +80,7 @@ if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
 	$this->document->addStyleSheet('components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&view=item&task=viewtags&tmpl=component&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1\", {
+			jQuery(\"#input-tags\").autocomplete(\"".JURI::base(true)."/index.php?option=com_flexicontent&view=item&task=viewtags&tmpl=component&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1\", {
 				width: 260,
 				max: 100,
 				matchContains: false,
@@ -812,7 +812,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 				</label>
 				
 				<div style="<?php echo $width; ?>;" class="<?php echo $classes; ?>">
-					<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>
+					<?php echo ($field->description && $edithelp==3) ? '<div class="fc-mssg fc-info">'.$field->description.'</div>' : ''; ?>
 					
 				<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing of joomfish (J1.5) or falang (J2.5+)
 					if ($field->field_type=='maintext' && isset($this->item->item_translations) ) : ?>
@@ -925,7 +925,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 			<h3 class="tabberheading"> <?php echo $title; ?> </h3>
 			
 			<fieldset class="flexi_params fc_edit_container_full">
-				<div class='fc_mini_note_box'>
+				<div class='fc-mssg fc-info'>
 				<?php
 					// Dates displayed in the item form, are in user timezone for J2.5, and in site's default timezone for J1.5
 					$site_zone = JFactory::getApplication()->getCfg('offset');
@@ -938,7 +938,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 					}
 					$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
 					if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
-					echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '<br>', $tz_info );
+					echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
 				?>
 				</div>
 				

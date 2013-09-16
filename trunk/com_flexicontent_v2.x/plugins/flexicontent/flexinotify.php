@@ -204,12 +204,30 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$itemid   = $item->id;
 		$title    = $item->title;
 		$maincat  = $globalcats[$item->catid]->title;
+		
+		// Domain URL and autologin vars
+		$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
 		$autologin= ($send_personalized && $user_autologin) ? '&fcu=__SUBSCRIBER_USERNAME__&fcp=__SUBSCRIBER_PASSWORD__' : '';
-		$siteurl  = str_replace('administrator/', '', JURI::base());
-		$siteurl  = str_replace('&amp;', '&', $siteurl);
-		$link     = $siteurl . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $globalcats[$item->catid]->slug)) . $autologin;
+		
+		// Check if we are in the backend, in the back end we need to set the application to the site app instead
+		$isAdmin = JFactory::getApplication()->isAdmin();
+		if ( $isAdmin ) JFactory::$application = JApplication::getInstance('site');
+		
+		// Create the URL
+		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $globalcats[$item->catid]->slug) . $autologin );
+		
+		// Check if we are in the backend again
+		// In backend we need to remove administrator from URL as it is added even though we've set the application to the site app
+		if( $isAdmin ) {
+			$admin_folder = str_replace(JURI::root(true),'',JURI::base(true));
+			$item_url = str_replace($admin_folder, '', $item_url);
+			// Restore application
+			JFactory::$application = JApplication::getInstance('administrator');
+		}
+		
+		$link     = $server . $item_url;
 		$link     = str_replace('&amp;', '&', $link);
-		$sitename = $app->getCfg('sitename') . ' - ' . $siteurl;
+		$sitename = $app->getCfg('sitename') . ' - ' . JURI::root();
 		
 		
 		// ************************************************

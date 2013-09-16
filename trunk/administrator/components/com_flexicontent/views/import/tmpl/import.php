@@ -106,7 +106,7 @@ function submitbutton(task) {
 								$_ignore_unused_cols_checked = $params->get('import_ignore_unused_cols', 0) ? 'checked="checked"' : '';
 							?>
 							<input type="checkbox" id="ignore_unused_cols" name="ignore_unused_cols" value="1" <?php echo $_ignore_unused_cols_checked; ?> />
-							<label for="ignore_unused_cols" class="label"><?php echo JText::_( 'FLEXI_IMPORT_IGNORE_REDUDANT_COLS' ); ?></label>
+							<label for="ignore_unused_cols"><?php echo JText::_( 'FLEXI_IMPORT_IGNORE_REDUDANT_COLS' ); ?></label>
 						</td>
 					</tr>
 					<tr valign="top">
@@ -130,7 +130,7 @@ function submitbutton(task) {
 								$_id_col_checked = $params->get('import_id_col', 0) ? 'checked="checked"' : '';
 							?>
 							<input type="checkbox" id="id_col" name="id_col" value="1" <?php echo $_id_col_checked; ?> />
-							<label for="id_col" class="label"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL");?></label>
+							<label for="id_col"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL");?></label>
 						</td>
 					</tr>
 					<tr valign="top">
@@ -154,10 +154,10 @@ function submitbutton(task) {
 								$checked1 = $dv==1 ? 'checked="checked"' : '';
 							?>
 							<input type="radio" id="created_col0" name="created_col" value="0" <?php echo $checked0; ?> />
-							<label for="created_col0" class="label">a. <?php echo JText::_("FLEXI_IMPORT_CREATION_CURR_DATE");?></label>
+							<label for="created_col0">a. <?php echo JText::_("FLEXI_IMPORT_CREATION_CURR_DATE");?></label>
 							<div class="fcclear"></div>
 							<input type="radio" id="created_col1" name="created_col" value="1" <?php echo $checked1; ?> />
-							<label for="created_col1" class="label">b. <?php echo JText::_("FLEXI_IMPORT_CREATION_USE_COL");?></label>
+							<label for="created_col1">b. <?php echo JText::_("FLEXI_IMPORT_CREATION_USE_COL");?></label>
 						</td>
 					</tr>
 					<tr valign="top">
@@ -169,10 +169,10 @@ function submitbutton(task) {
 								$checked1 = $dv==1 ? 'checked="checked"' : '';
 							?>
 							<input type="radio" id="created_by_col0" name="created_by_col" value="0" <?php echo $checked0; ?> />
-							<label for="created_by_col0" class="label">a. <?php echo JText::_("FLEXI_IMPORT_CREATOR_CURR_USER");?></label>
+							<label for="created_by_col0">a. <?php echo JText::_("FLEXI_IMPORT_CREATOR_CURR_USER");?></label>
 							<div class="fcclear"></div>
 							<input type="radio" id="created_by_col1" name="created_by_col" value="1" <?php echo $checked1; ?> />
-							<label for="created_by_col1" class="label">b. <?php echo JText::_("FLEXI_IMPORT_CREATOR_USE_COL");?></label>
+							<label for="created_by_col1">b. <?php echo JText::_("FLEXI_IMPORT_CREATOR_USE_COL");?></label>
 						</td>
 					</tr>
 					<tr valign="top">
@@ -183,10 +183,10 @@ function submitbutton(task) {
 								$_key_checked = $params->get('import_metakey_col', 0) == 1 ? 'checked="checked"' : '';
 							?>
 							<input type="checkbox" id="metadesc_col" name="metadesc_col" value="1" <?php echo $_desc_checked; ?> />
-							<label for="metadesc_col" class="label"><?php echo JText::_("FLEXI_IMPORT_USE_METADESC_COL");?></label>
+							<label for="metadesc_col"><?php echo JText::_("FLEXI_IMPORT_USE_METADESC_COL");?></label>
 							<div class="fcclear"></div>
 							<input type="checkbox" id="metakey_col" name="metakey_col" value="1" <?php echo $_key_checked; ?> />
-							<label for="metakey_col" class="label"><?php echo JText::_("FLEXI_IMPORT_USE_METAKEY_COL");?></label>
+							<label for="metakey_col"><?php echo JText::_("FLEXI_IMPORT_USE_METAKEY_COL");?></label>
 						</td>
 					<tr valign="top">
 						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_PUBLICATION_DATES");?></label></td>
@@ -197,10 +197,10 @@ function submitbutton(task) {
 								$_down_checked = $params->get('import_publish_down_col', 0) == 1 ? 'checked="checked"' : '';
 							?>
 							<input type="checkbox" id="publish_up_col" name="publish_up_col" value="1" <?php echo $_up_checked; ?> />
-							<label for="publish_up_col" class="label"><?php echo JText::_("FLEXI_IMPORT_USE_PUBLISH_UP_COL");?></label>
+							<label for="publish_up_col"><?php echo JText::_("FLEXI_IMPORT_USE_PUBLISH_UP_COL");?></label>
 							<div class="fcclear"></div>
 							<input type="checkbox" id="publish_down_col" name="publish_down_col" value="1" <?php echo $_down_checked; ?> />
-							<label for="publish_down_col" class="label"><?php echo JText::_("FLEXI_IMPORT_USE_PUBLISH_DOWN_COL");?></label>
+							<label for="publish_down_col"><?php echo JText::_("FLEXI_IMPORT_USE_PUBLISH_DOWN_COL");?></label>
 						</td>
 					</tr>
 					<tr valign="top">
@@ -214,13 +214,13 @@ function submitbutton(task) {
 								$checked2 = $dv==2 ? 'checked="checked"' : '';
 							?>
 							<input type="radio" id="tags_col0" name="tags_col" value="0" <?php echo $checked0; ?> />
-							<label for="tags_col0" class="label">a. <?php echo JText::_("FLEXI_IMPORT_DO_NOT_IMPORT_TAGS");?></label>
+							<label for="tags_col0">a. <?php echo JText::_("FLEXI_IMPORT_DO_NOT_IMPORT_TAGS");?></label>
 							<div class="fcclear"></div>
 							<input type="radio" id="tags_col1" name="tags_col" value="1" <?php echo $checked1; ?> />
-							<label for="tags_col1" class="label">b. <?php echo JText::_("FLEXI_IMPORT_USE_TAG_NAMES_COL");?></label>
+							<label for="tags_col1">b. <?php echo JText::_("FLEXI_IMPORT_USE_TAG_NAMES_COL");?></label>
 							<div class="fcclear"></div>
 							<input type="radio" id="tags_col2" name="tags_col" value="2" <?php echo $checked2; ?> />
-							<label for="tags_col2" class="label">c. <?php echo JText::_("FLEXI_IMPORT_USE_TAG_IDS_COL");?></label>
+							<label for="tags_col2">c. <?php echo JText::_("FLEXI_IMPORT_USE_TAG_IDS_COL");?></label>
 						</td>
 					</tr>
 				</table>
@@ -241,7 +241,7 @@ function submitbutton(task) {
 								<label class="fckey" for="maincat_col" style="clear:both;"><?php echo JText::_( 'FLEXI_IMPORT_FILE_OVERRIDE' ); ?> <?php echo JText::_( 'FLEXI_PRIMARY_CATEGORY' ); ?></label>
 							</td>
 							<td class="fcimportdata">
-								<input type="checkbox" id="maincat_col" name="maincat_col" value="1" /> <label for="maincat_col" class="label">(Use 'catid' column, e.g. 54)</label>
+								<input type="checkbox" id="maincat_col" name="maincat_col" value="1" /> <label for="maincat_col">(Use 'catid' column, e.g. 54)</label>
 							</td>
 						</tr>
 						<tr valign="top">
@@ -253,7 +253,7 @@ function submitbutton(task) {
 							</td>
 							</td>
 							<td class="fcimportdata">
-								<input type="checkbox" id="seccats_col" name="seccats_col" value="1" /> <label for="seccats_col" class="label">(Use 'cid' column, e.g. 54,14,51)</label>
+								<input type="checkbox" id="seccats_col" name="seccats_col" value="1" /> <label for="seccats_col">(Use 'cid' column, e.g. 54,14,51)</label>
 							</td>
 						</tr>
 					</table>

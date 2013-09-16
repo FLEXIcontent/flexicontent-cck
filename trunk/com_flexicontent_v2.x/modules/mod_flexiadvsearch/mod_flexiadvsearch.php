@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: mod_flexiadvsearch.php 1754 2013-09-06 02:06:28Z ggppdk $
+ * @version 1.0 $Id: mod_flexiadvsearch.php 1760 2013-09-10 10:42:37Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIadvsearch Module
  * @copyright (C) 2011 flexicontent.org
@@ -50,14 +50,15 @@ if ( $show_mod )
 	JFactory::getLanguage()->load('mod_flexiadvsearch', JPATH_SITE, null, true);
 	
 	// include the helper only once
-	//require_once (dirname(__FILE__).DS.'helper.php');  // currently helper class is empty ...
+	require_once (dirname(__FILE__).DS.'helper.php');  // currently helper class is empty ...
 	
 	// initialize various variables
-	//$document	= JFactory::getDocument();
-	//$caching 	= $app->getCfg('caching', 0);
-	$add_ccs 			= $params->get('add_ccs', 1);
-	$layout       = $params->get('layout', 'default');
-	$moduleclass_sfx   = $params->get('moduleclass_sfx', '');
+	$document	= JFactory::getDocument();
+	$caching 	= $app->getCfg('caching', 0);
+	$moduleclass_sfx= $params->get('moduleclass_sfx', '');
+	$layout 				= $params->get('layout', 'default');
+	$add_ccs 				= $params->get('add_ccs', 1);
+	$add_tooltips 	= $params->get('add_tooltips', 1);
 	
 	$text      = JText::_($params->get('text', 'FLEXI_ADV_MOD_SEARCH_PROMPT'));
 	$width     = intval($params->get('width', 20));
@@ -76,7 +77,7 @@ if ( $show_mod )
 	$linkadvsearch_txt = JText::_($params->get('linkadvsearch_txt', 'FLEXI_ADV_MOD_ADVANCED_SEARCH'));
 	
 	// Currently no JS/CSS needed
-	/*
+	
 	// Load needed JS libs & CSS styles
 	FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 	flexicontent_html::loadFramework('jQuery');
@@ -105,7 +106,6 @@ if ( $show_mod )
 		  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
 	  }
 	}
-	*/
 	
 	$itemid_force = $params->get('itemid_force', '0');
 	$itemid = $itemid_force ? (int) $params->get('itemid_force_value', 0)  :  0;

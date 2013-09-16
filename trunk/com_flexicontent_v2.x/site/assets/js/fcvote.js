@@ -1,4 +1,10 @@
 window.addEvent('domready', function() {
+	//var url = location.href;  // entire url including querystring - also: window.location.href;
+	//var live_site = url.substring(0, url.indexOf('/', 14)) + fcvote_rfolder + '/';
+	
+	var currentURL = window.location;
+	var live_site = currentURL.protocol + '//' + currentURL.host + fcvote_rfolder;
+	
 	if($$('.fcvote').length > 0) {
 		$$('.fcvote a.fc_dovote').addEvent('click', function(e) {
 			e = new Event(e).stop();
@@ -18,7 +24,7 @@ window.addEvent('domready', function() {
 			if(MooTools.version>="1.2.4") {
 				
 				var rating = this.get('text');
-				var voteurl = getBaseURL() + "index.php?option=com_flexicontent&format=raw&task=ajaxvote&user_rating=" + rating + "&cid=" + itemID + "&xid=" + xid;
+				var voteurl = live_site + "/index.php?option=com_flexicontent&format=raw&task=ajaxvote&user_rating=" + rating + "&cid=" + itemID + "&xid=" + xid;
 				var jsonRequest = new Request.JSON({
 					url: voteurl,
 					onSuccess: function(data){
@@ -39,7 +45,7 @@ window.addEvent('domready', function() {
 			} else {
 				
 				var rating = this.innerHTML;
-				var voteurl = getBaseURL() + "index.php?option=com_flexicontent&format=raw&task=ajaxvote&user_rating=" + rating + "&cid=" + itemID + "&xid=" + xid;
+				var voteurl = live_site + "/index.php?option=com_flexicontent&format=raw&task=ajaxvote&user_rating=" + rating + "&cid=" + itemID + "&xid=" + xid;
 				var ajax = new Ajax(voteurl, {
 					onComplete: function(data){
 						data=Json.evaluate(data);
@@ -65,10 +71,3 @@ window.addEvent('domready', function() {
 	}
 
 });
-
-function getBaseURL() {
-	var url = location.href;  // entire url including querystring - also: window.location.href;
-	var baseURL = url.substring(0, url.indexOf('/', 14));
-
-	return baseURL + sfolder + "/";
-}

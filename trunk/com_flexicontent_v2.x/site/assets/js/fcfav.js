@@ -1,6 +1,9 @@
-function FCFav(id){
+function FCFav(id) {
+	//var url = location.href;  // entire url including querystring - also: window.location.href;
+	//var live_site = url.substring(0, url.indexOf('/', 14)) + fcfav_rfolder + '/';
+	
 	var currentURL = window.location;
-	var live_site = currentURL.protocol+'//'+currentURL.host+sfolder;
+	var live_site = currentURL.protocol + '//' + currentURL.host + fcfav_rfolder;
 	var lsXmlHttp;
 	
 	var div = document.getElementById('fcfav-reponse_'+id);

@@ -28,6 +28,10 @@
 
 **************************************************************/
 
+if (typeof $chk != 'function') { 
+	var $chk = function(obj) {  return !!(obj || obj === 0);  };
+}
+
 //start multiBox class
 var multiBox = new Class({
 	
@@ -800,7 +804,7 @@ var multiBox = new Class({
 				var overlayIcon = new Element('div').inject(el,'inside');
 				overlayIcon.addClass('OverlayIcon');
 				//IE6 causes too many issues due to lack of PNG support
-				if(!Browser.Engine.trident4){
+				if ( (Browser.Engine && !Browser.Engine.trident4) || (Browser.ie && !Browser.ie6) ) {
 					overlayIcon.setStyle('opacity',0);
 					overlayIcon.set('tween',{duration:3000,transition:Fx.Transitions.Expo.easeIn}).tween('opacity',1);
 				};

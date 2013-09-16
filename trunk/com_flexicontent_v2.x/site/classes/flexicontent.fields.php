@@ -2636,12 +2636,19 @@ class FlexicontentFields
 		
 		// Get data like aliases and published state
 		$publish_where = '';
-		if ($params->get('use_publish_dates', 1 )) {
-			$nullDate	= $db->getNullDate();
-			$mainframe = JFactory::getApplication();
-			$now		= $mainframe->get('requestTime');
-			$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$db->Quote($now).' )'; 
-			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$db->Quote($now).' )';
+		if ($params->get('use_publish_dates', 1 ))
+		{
+			// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
+			//  thus the items are published globally at the time the author specified in his/her local clock
+			//$app  = JFactory::getApplication();
+			//$now  = FLEXI_J16GE ? $app->requestTime : $app->get('requestTime');   // NOT correct behavior it should be UTC (below)
+			//$date = JFactory::getDate();
+			//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
+			$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
+			$nullDate = $db->getNullDate();
+			
+			$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'; 
+			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )';
 		}
 		
 		// item IDs via reversing a relation field

@@ -180,8 +180,29 @@ class FlexicontentViewItem extends JViewLegacy
 		// Add a preview button for LATEST version of the item
 		if ( $cid )
 		{
+			// Domain URL and autologin vars
+			$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
 			$autologin   = $params->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
-			$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug)) .$autologin;
+			
+			// Check if we are in the backend, in the back end we need to set the application to the site app instead
+			$isAdmin = JFactory::getApplication()->isAdmin();
+			if ( $isAdmin ) JFactory::$application = JApplication::getInstance('site');
+			
+			// Create the URL
+			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug) . $autologin );
+			
+			// Check if we are in the backend again
+			// In backend we need to remove administrator from URL as it is added even though we've set the application to the site app
+			if( $isAdmin ) {
+				$admin_folder = str_replace(JURI::root(true),'',JURI::base(true));
+				$item_url = str_replace($admin_folder, '', $item_url);
+				// Restore application
+				JFactory::$application = JApplication::getInstance('administrator');
+			}
+			
+			$previewlink     = $server . $item_url;
+			$previewlink     = str_replace('&amp;', '&', $previewlink);
+			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug)) .$autologin;
 
 			if ( !$params->get('use_versioning', 1) || ($row->version == $row->current_version && $row->version == $row->last_version) )
 			{
