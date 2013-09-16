@@ -112,7 +112,7 @@ if ( $use_infoflds && count($infoflds) ) {
 				$conf	= $w . $h . $aoe . $q . $zc . $f;
 				
 				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-				$thumb = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+				$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 			} else {
 				// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
 				$thumb = $src;

@@ -2,7 +2,7 @@
 defined('_JEXEC') or die('Restricted access');
 ?>
 
-<div class="select mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="select<?php echo $module->id ?>">
+<div class="select mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_select<?php echo $module->id ?>">
 	
 	<?php
 	// Display FavList Information (if enabled)

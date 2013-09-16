@@ -481,7 +481,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		//JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
 
 		// Add css files to the document <head> section (also load CSS joomla template override)
-		$document->addStyleSheet( JURI::base().'components/com_flexicontent/assets/css/flexicontent.css' );
+		$document->addStyleSheet( JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css' );
 		if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
 			$document->addStyleSheet(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css');
 		}
@@ -491,17 +491,17 @@ class FlexicontentViewItems  extends JViewLegacy
 		//$document->addCustomTag('<!--[if IE]><style type="text/css">.floattext{zoom:1;}, * html #flexicontent dd { height: 1%; }</style><![endif]-->');
 		
 		// Load backend / frontend shared and Joomla version specific CSS (different for frontend / backend)
-		$document->addStyleSheet( JURI::base().'components/com_flexicontent/assets/css/flexi_shared.css' );  // NOTE: this is imported by main Frontend CSS file
-		if      (FLEXI_J30GE) $document->addStyleSheet( JURI::base().'components/com_flexicontent/assets/css/j3x.css' );
-		else if (FLEXI_J16GE) $document->addStyleSheet( JURI::base().'components/com_flexicontent/assets/css/j25.css' );
-		else                  $document->addStyleSheet( JURI::base().'components/com_flexicontent/assets/css/j15.css' );
+		$document->addStyleSheet( JURI::base(true).'/components/com_flexicontent/assets/css/flexi_shared.css' );  // NOTE: this is imported by main Frontend CSS file
+		if      (FLEXI_J30GE) $document->addStyleSheet( JURI::base(true).'/components/com_flexicontent/assets/css/j3x.css' );
+		else if (FLEXI_J16GE) $document->addStyleSheet( JURI::base(true).'/components/com_flexicontent/assets/css/j25.css' );
+		else                  $document->addStyleSheet( JURI::base(true).'/components/com_flexicontent/assets/css/j15.css' );
 		
 		// Add js function to overload the joomla submitform
-		$document->addScript(JURI::base().'components/com_flexicontent/assets/js/admin.js');
-		$document->addScript(JURI::base().'components/com_flexicontent/assets/js/validate.js');
+		$document->addScript(JURI::base(true).'/components/com_flexicontent/assets/js/admin.js');
+		$document->addScript(JURI::base(true).'/components/com_flexicontent/assets/js/validate.js');
 		
 		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScript( JURI::base().'components/com_flexicontent/assets/js/itemscreen.js' );
+		$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/itemscreen.js' );
 		
 		
 		// ***********************************************
@@ -793,9 +793,9 @@ class FlexicontentViewItems  extends JViewLegacy
 					$is_editable = 1;
 
 				if ( !$is_editable ) {
-					$field->html = '<div class="fc_mini_note_box">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
+					$field->html = '<div class="fc-mssg fc-warning">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
 				} else if ($modify_untraslatable_values && $field->untranslatable) {
-					$field->html = '<div class="fc_mini_note_box">'. JText::_('FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE') . '</div>';
+					$field->html = '<div class="fc-mssg fc-note">'. JText::_('FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE') . '</div>';
 				} else {
 					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
 				}

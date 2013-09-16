@@ -502,7 +502,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 				$conf	= $w . $h . $aoe . $q . $zc . $f;
 		
-				$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+				$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 			} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 	
 				$h		= '&amp;h=' . $cat_image_height;
@@ -517,7 +517,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 				$src = $base_url.$src;
 				
-				$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+				$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 			}
 			$cat->image_src = @$src;  // Also add image category URL for developers
 			
@@ -577,7 +577,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
-					$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+					$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 				} else if ( $subcat_image_source!=1 && $src = flexicontent_html::extractimagesrc($subcat) ) {
 		
 					$h		= '&amp;h=' . $subcat_image_height;
@@ -592,7 +592,7 @@ class FlexicontentViewCategory extends JViewLegacy
 					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 					$src = $base_url.$src;
 					
-					$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+					$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 				}
 				$subcat->image_src = @$src;  // Also add image category URL for developers
 				

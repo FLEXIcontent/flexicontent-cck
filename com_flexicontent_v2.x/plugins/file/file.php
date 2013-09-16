@@ -97,7 +97,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				hid.value = id;
 				hid.id = ixid;
 				
-				img.src = '".JURI::root()."components/com_flexicontent/assets/images/move2.png';
+				img.src = '".JURI::base()."components/com_flexicontent/assets/images/move2.png';
 				img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
 				
 				filelist.appendChild(li);
@@ -117,7 +117,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		if ($multiple) // handle multiple records
 		{
-			if (!FLEXI_J16GE) $document->addScript( JURI::root().'administrator/components/com_flexicontent/assets/js/sortables.js' );
+			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 			
 			// Add the drag and drop sorting feature
 			$js .= "
@@ -171,7 +171,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::root().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -207,7 +207,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		$user = JFactory::getUser();
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
-		$linkfsel = JURI::base().'index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;autoselect='.$autoselect.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+		$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;autoselect='.$autoselect.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
 		$field->html .= "
 		<div class=\"fcfield-button-add\">
 			<div class=\"blank\">
@@ -684,6 +684,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 	function addIcon( &$file )
 	{
+		static $icon_exists = array();
+		
 		switch ($file->ext)
 		{
 			// Image
@@ -699,8 +701,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 			// Non-image document
 			default:
-				$icon = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS.'images'.DS.'mime-icon-16'.DS.$file->ext.'.png';
-				if (file_exists($icon)) {
+				if ( !isset($icon_exists[$file->ext]) ) {
+					$icon = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS.'images'.DS.'mime-icon-16'.DS.$file->ext.'.png';
+					$icon_exists[$file->ext] = file_exists($icon);
+				}
+				if ( $icon_exists[$file->ext] ) {
 					$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/'.$file->ext.'.png';
 				} else {
 					$file->icon = 'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';

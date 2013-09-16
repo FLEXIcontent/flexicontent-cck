@@ -77,15 +77,6 @@ ul.adminformlist {
 	padding: 0px !important;
 }
 
-#sidebar {
-	float: left !important;
-	padding: 0 !important;
-	margin: 0 1% !important;
-	width: 98% !important;
-	font-size: 12px;
-	font-family: tahoma;
-}
-
 div.toolbar-box {
 	background: none repeat scroll 0 0 #FFFFFF;
 	border: 1px solid #C7C8B2;

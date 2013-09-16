@@ -976,16 +976,16 @@ class plgSystemFlexisystem extends JPlugin
 		if ($current_time_secs - $last_autoarchive_secs < $auto_archive_minute_interval*60) return;
 		
 		$archive_state = (FLEXI_J16GE ? 2:-1);
-		$_now = 'UTC_TIMESTAMP()';
+		$_nowDate = 'UTC_TIMESTAMP()';
 		$nullDate	= $db->getNullDate();
 		
 		if ($clear_publish_down_date) {
 			$query = 'UPDATE #__content '.
 				' SET state = '.$archive_state.', publish_down = '.$db->Quote($nullDate).
-				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_now;
+				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
 		} else {
 			$query = 'UPDATE #__content SET state = '.$archive_state.
-				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_now;
+				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
 		}
 		//echo $query;
 		$db->setQuery($query);

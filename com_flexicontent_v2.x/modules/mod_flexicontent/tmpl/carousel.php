@@ -108,7 +108,7 @@ $_ns_size         = $mode=="horizontal" ? $hdir_item_width + $extra_width : 240;
 $_ns_fxOptions    = "{duration:".$duration."}";
 ?>
 
-<div class="carousel mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="carousel<?php echo $module->id ?>">
+<div class="carousel mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_carousel<?php echo $module->id ?>">
 	
 	<?php
 	// Display FavList Information (if enabled)

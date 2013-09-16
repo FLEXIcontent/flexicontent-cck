@@ -153,6 +153,7 @@ class modFlexicontentHelper
 		if (!is_array($ordering)) { $ordering = explode(',', $ordering); }
 		foreach ($ordering as $ord) {
 			$items_arr = modFlexicontentHelper::getItems($params, $ord);
+			if ( empty($items_arr) ) continue;
 			foreach ($items_arr as $catid => $items) {
 				if ( !isset($cat_items_arr[$catid]) ) $cat_items_arr[$catid] = array();
 				for ($i=0; $i<count($items); $i++) {

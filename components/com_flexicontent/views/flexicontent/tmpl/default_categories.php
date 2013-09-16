@@ -144,7 +144,7 @@ switch ($cols)
 			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 			$conf	= $w . $h . $aoe . $q . $zc . $f;
 	
-			$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+			$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 		} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
 
 			$h		= '&amp;h=' . $cat_image_height;
@@ -157,7 +157,7 @@ switch ($cols)
 			$conf	= $w . $h . $aoe . $q . $zc . $f;
 
 			$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-			$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		}
 		
 		if ($image) {
@@ -222,7 +222,7 @@ switch ($cols)
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 			
-					$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+					$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 				} else if ( $subcat_image_source!=1 && $src = flexicontent_html::extractimagesrc($subcat) ) {
 		
 					$h		= '&amp;h=' . $subcat_image_height;
@@ -235,7 +235,7 @@ switch ($cols)
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
 		
 					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-					$image = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+					$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 				}
 				
 				if ($image) {

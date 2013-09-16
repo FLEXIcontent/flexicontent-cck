@@ -215,10 +215,9 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$lang = flexicontent_html::getUserCurrentLang();
 		
 		// NULL and CURRENT dates, 
-		// NOTE: the above current date is needs to use built-in MYSQL function, otherwise filter caching can not work because the CURRENT DATETIME is continuously different !!!
+		// NOTE: the current date needs to use built-in MYSQL function, otherwise filter caching can not work because the CURRENT DATETIME is continuously different !!!
 		//   $now = FLEXI_J16GE ? JFactory::getDate()->toSql() : JFactory::getDate()->toMySQL();
-		//   $_nowDate = $db->Quote( $now );
-		$_nowDate = 'UTC_TIMESTAMP()';
+		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
 		
 		// Section name

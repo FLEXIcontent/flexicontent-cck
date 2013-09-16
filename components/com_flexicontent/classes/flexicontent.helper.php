@@ -73,23 +73,23 @@ class flexicontent_html
 		return false;
 	}
 
-	static function is_safe_url($url, $baseonly=true)
+	static function is_safe_url($url, $baseonly=false)
 	{
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		$allowed_redirecturls = $cparams->get('allowed_redirecturls', 'internal_base');
+		$allowed_redirecturls = $cparams->get('allowed_redirecturls', 'internal_base');  // Parameter does not exist YET
 
 		// prefix the URL if needed so that parse_url will work
 		$has_prefix = preg_match("#^http|^https|^ftp#i", $url);
 		$url = (!$has_prefix ? "http://" : "") . $url;
 
-		// Require full internal url
-		if ( $allowed_redirecturls == 'internal_full' )
-			return parse_url($url, PHP_URL_HOST) == parse_url(JURI::base(), PHP_URL_HOST);
-
-		// Require baseonly internal url
-		else //if ( $allowed_redirecturls == 'internal_base' )
+		// Require baseonly internal url: (HOST only)
+		if ( $baseonly || $allowed_redirecturls == 'internal_base' )
 			return flexicontent_html::get_basedomain($url) == flexicontent_html::get_basedomain(JURI::base());
-
+		
+		// Require full internal url: (HOST + this JOOMLA folder)
+		else // if ( $allowed_redirecturls == 'internal_full' )
+			return parse_url($url, PHP_URL_HOST) == parse_url(JURI::base(), PHP_URL_HOST);
+		
 		// Allow any URL, (external too) this may be considered a vulnerability for unlogged/logged users, since
 		// users may be redirected to an offsite URL despite clicking an internal site URL received e.g. by an email
 		//else
@@ -677,7 +677,7 @@ class flexicontent_html
 			case 'flexi_tmpl_common':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				flexicontent_html::loadFramework('select2');  // make sure select2 is loaded
-				$document->addScript( JURI::base().'components/com_flexicontent/assets/js/tmpl-common.js' );
+				$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/tmpl-common.js' );
 				FLEXI_J16GE ? JText::script("FLEXI_APPLYING_FILTERING") : fcjsJText::script("FLEXI_APPLYING_FILTERING");
 				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_LIST") : fcjsJText::script("FLEXI_TYPE_TO_LIST");
 				$js = 'var fc_base_url="'.JURI::base().'"';
@@ -1116,7 +1116,7 @@ class flexicontent_html
 
 	 	if (!$js_and_css_added && $canChangeState && $addToggler )
 	 	{
-			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/stateselector.js' );
+			$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/stateselector.js' );
 	 		$js ='
 				if(MooTools.version>="1.2.4") {
 					window.addEvent("domready", function() {stateselector.init()});
@@ -1712,7 +1712,7 @@ class flexicontent_html
 			$document->addStyleSheet($css);
 			$document->addScript($js);
 
-			$document->addScriptDeclaration('var sfolder = "'.JURI::base(true).'";');
+			$document->addScriptDeclaration('var fcvote_rfolder = "'.JURI::base(true).'";');
 
 			$css = '
 			.'.$class.' .fcvote {line-height:'.$dim.'px;}
@@ -1879,7 +1879,7 @@ class flexicontent_html
 			$document->addScript( JURI::base(true) .'/components/com_flexicontent/assets/js/fcfav.js' );
 
 			$js = "
-				var sfolder = '".JURI::base(true)."';
+				var fcfav_rfolder = '".JURI::base(true)."';
 				var fcfav_text=Array(
 					'".JText::_( 'FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX',true )."',
 					'".JText::_( 'FLEXI_LOADING',true )."',
