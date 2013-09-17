@@ -2222,8 +2222,9 @@ class FlexicontentFields
 			$checked = ($display_filter_as==5) ? !count($value) || !strlen(reset($value)) : !strlen($value);
 			$checked_attr = $checked ? 'checked="checked"' : '';
 			$checked_class = $checked ? 'fc_highlight' : '';
-			$filter->html .= '<ul class="fc_field_filter fc_checkradio_group fc_list_filter">';
-			$filter->html .= '<li class="fc_checkradio_option fc_checkradio_special">';
+			$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
+			$filter->html .= '<ul class="fc_field_filter fc_checkradio_group'.(count($results) > 9 ? ' fc_list_filter':'').'">';
+			$filter->html .= '<li class="fc_checkradio_option fc_checkradio_special'.$checked_class_li.'">';
 			if ($display_filter_as==4) {
 				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this, \'fc_highlight\', 1);" ';
 				$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
@@ -2245,7 +2246,8 @@ class FlexicontentFields
 				$disable_attr = !$result->found ? ' disabled=disabled ' : '';
 				$checked_class = $checked ? 'fc_highlight' : '';
 				$checked_class .= !$result->found ? ' fcdisabled ' : '';
-				$filter->html .= '<li class="fc_checkradio_option">';
+				$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
+				$filter->html .= '<li class="fc_checkradio_option'.$checked_class_li.'">';
 				if ($display_filter_as==4) {
 					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this, \'fc_highlight\');" ';
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';

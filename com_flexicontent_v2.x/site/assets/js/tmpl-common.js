@@ -126,14 +126,21 @@
 	
 	function fc_toggleClass(ele, cls, fc_all) {
 		var inputs = ele.parentNode.parentNode.getElementsByTagName('input');
-	  var input_0 = jQuery(inputs[0]);
+		var input_0 = jQuery(inputs[0]);
 		if (typeof fc_all === "undefined" || fc_all === null || !fc_all)
 		{
-		  jQuery(ele).next().hasClass(cls) ? jQuery(ele).next().removeClass(cls) : jQuery(ele).next().addClass(cls);
+			if ( jQuery(ele).attr('checked') ) {
+				jQuery(ele).next().addClass(cls);
+				jQuery(ele).parent().addClass('fc_checkradio_checked');
+			} else {
+				jQuery(ele).next().removeClass(cls);
+				jQuery(ele).parent().removeClass('fc_checkradio_checked');
+			}
 		  // Handle disabling 'select all' checkbox (if it exists), not needed but to make sure ...
 		  if (input_0.val()=='') {
 				input_0.prop('checked', false);
 				input_0.next().removeClass(cls);
+				input_0.parent().removeClass('fc_checkradio_checked');
 		  }
 		}
 		else
@@ -142,10 +149,12 @@
 				var input_i = jQuery(inputs[i]);
 				input_i.prop('checked', false);
 				input_i.next().removeClass(cls);
+				input_i.parent().removeClass('fc_checkradio_checked');
 			}
 		  // Handle highlighting (but not enabling) 'select all' checkbox
 			jQuery(ele).prop('checked', true);
 			jQuery(ele).next().addClass(cls);
+			jQuery(ele).parent().addClass('fc_checkradio_checked');
 		}
 	}
 	
@@ -156,7 +165,13 @@
 		{
 			for (var i = 0; i < inputs.length; ++i) {
 				var input_i = jQuery(inputs[i]);
-				input_i.attr('checked') ? input_i.next().addClass(cls) : input_i.next().removeClass(cls);
+				if ( input_i.attr('checked') ) {
+					input_i.next().addClass(cls);
+					input_i.parent().addClass('fc_checkradio_checked');
+				} else {
+					input_i.next().removeClass(cls);
+					input_i.parent().removeClass('fc_checkradio_checked');
+				}
 			}
 		}
 		else
@@ -164,9 +179,11 @@
 			for (var i = 0; i < inputs.length; ++i) {
 				var input_i = jQuery(inputs[i]);
 				input_i.next().removeClass(cls);
+				input_i.parent().removeClass('fc_checkradio_checked');
 			}
 		  // Handle highlighting (but not enabling) 'select all' radio button
 			jQuery(ele).next().addClass(cls);
+			jQuery(ele).parent().addClass('fc_checkradio_checked');
 		}
 	}
 
@@ -189,16 +206,16 @@ jQuery(document).ready(function() {
 	jQuery('ul.fc_list_filter').each(function() {
 		var list = jQuery(this);
 		// prepend text filter input to the list
-		var form = jQuery("<form>").attr({"class":"fc_field_filter_list", "action":"#"}),
-		input = jQuery("<input>").attr({"class":"fc_field_filter fc_label_internal", "type":"text", "fc_label_text":Joomla.JText._('FLEXI_TYPE_TO_FILTER')});
+		var form = jQuery("<form>").attr({"class":"fc_instant_filter", "action":"#"}),
+		input = jQuery("<input>").attr({"class":"fc_field_filter fc_label_internal fc_instant_filter", "type":"text", "fc_label_text":Joomla.JText._('FLEXI_TYPE_TO_FILTER')});
 		jQuery(form).append(input).insertBefore(list);
 	
 		jQuery(input)
 		.change( function () {
 			var filter = jQuery(this).val();
 			if(filter) {
-				jQuery(list).find("li:not(.fc_checkradio_special) label:not(:contains_ci_fc(" + filter + "))").parent().slideUp();
-				jQuery(list).find("li:not(.fc_checkradio_special) label:contains_ci_fc(" + filter + ")").parent().slideDown();
+				jQuery(list).find("li:not(.fc_checkradio_checked):not(.fc_checkradio_special) label:not(:contains_ci_fc(" + filter + "))").parent().slideUp();
+				jQuery(list).find("li:not(.fc_checkradio_checked):not(.fc_checkradio_special) label:contains_ci_fc(" + filter + ")").parent().slideDown();
 			} else {
 				jQuery(list).find("li").slideDown();
 			}

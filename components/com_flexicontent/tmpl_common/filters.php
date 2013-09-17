@@ -205,7 +205,7 @@ if ($filter_instructions == 1) {
 if ($filter_autosubmit) {
 	$js = '
 		jQuery(document).ready(function() {
-			jQuery("#'.$form_id.' input, #'.$form_id.' select").on("change", function() {
+			jQuery("#'.$form_id.' input:not(.fc_instant_filter), #'.$form_id.' select").on("change", function() {
 				var form=document.getElementById("'.$form_id.'");
 				adminFormPrepare(form, 2);
 			});
@@ -214,7 +214,7 @@ if ($filter_autosubmit) {
 } else {
 	$js = '
 		jQuery(document).ready(function() {
-			jQuery("#'.$form_id.' input, #'.$form_id.' select").on("change", function() {
+			jQuery("#'.$form_id.' input:not(.fc_instant_filter), #'.$form_id.' select").on("change", function() {
 				var form=document.getElementById("'.$form_id.'");
 				adminFormPrepare(form, 1);
 			});
