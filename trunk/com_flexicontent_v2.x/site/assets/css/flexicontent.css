@@ -530,14 +530,17 @@ input.fc_field_filter, input.fc_field_filter:focus {
 }
 
 
-form.fc_field_filter_list { display: inline-block; margin: 0px !important; padding: 0px !important; }
+form.fc_instant_filter { display: block; margin: 0px !important; padding: 0px !important; }
 select.fc_field_filter { margin: 2px 2px 2px 2px !important; }
 input.fc_text_filter { vertical-align: top; }
 input.fc_field_filter { vertical-align: top; }
 span.fc_field_filter { border-width: 0px !important; }
 ul.fc_field_filter.fc_checkradio_group {
 	margin: 2px 0px 2px 2px !important;
-	padding: 3px 4px 3px 2px !important
+	padding: 3px 4px 3px 2px !important;
+	overflow-y: auto;
+	overflow-x: visible;
+	max-height: 240px;
 }
 ul.fc_field_filter.fc_checkradio_group label {
 	margin: 6px 6px 4px 0px !important;
