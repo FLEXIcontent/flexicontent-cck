@@ -2376,7 +2376,7 @@ class FlexicontentControllerItems extends FlexicontentController
 				$link = JURI::base(true)."/index.php?option=com_flexicontent&task=items.changestate&newstate=".$shortname."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1";
 				$icon = "../components/com_flexicontent/assets/images/".$statedata['icon'];
 		?>
-				<a	style="<?php echo $css; ?>" class="fc_select_button" href="javascript:;"
+				<a style="<?php echo $css; ?>" class="fc_button" href="javascript:;"
 						onclick="
 							window.parent.document.adminForm.newstate.value='<?php echo $shortname; ?>';
 							if(window.parent.document.adminForm.boxchecked.value==0)

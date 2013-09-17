@@ -1513,7 +1513,8 @@ class FlexicontentController extends JControllerLegacy
 			$contentid = (int) $file_node->contentid;
 			$fileid    = (int) $file_node->fileid;
 			
-			$query  = 'SELECT f.id, f.filename, f.secure, f.url'
+			$query  = 'SELECT f.id, f.filename, f.secure, f.url,'
+					.' i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext '
 					.' FROM #__flexicontent_fields_item_relations AS rel'
 					.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
 					.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
@@ -1619,6 +1620,33 @@ class FlexicontentController extends JControllerLegacy
 			// Copy Files
 			foreach ($valid_files as $file) JFile::copy($file->abspath, $file->node->targetpath);
 			
+			// Create text/html file with ITEM title / descriptions
+			// TODO replace this with a TEMPLATE file ...
+			$desc_filename = $targetpath .DS. "_descriptions";
+			$handle_txt = fopen($desc_filename.".txt", "w");
+			$handle_htm = fopen($desc_filename.".htm", "w");
+			fprintf($handle_htm, '
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb" dir="ltr" >
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />		
+</head>
+<body>
+'
+			);
+			foreach ($valid_files as $file) {
+				fprintf($handle_txt, $file->item_title."\n\n");
+				fprintf($handle_txt, flexicontent_html::striptagsandcut($file->item_introtext) ."\n\n" );
+				if ( strlen($file->item_fulltext) ) fprintf($handle_txt, flexicontent_html::striptagsandcut($file->item_fulltext)."\n\n" );
+				
+				fprintf($handle_htm, "<h2>".$file->item_title."</h2>");
+				fprintf($handle_htm, "<blockquote>".$file->item_introtext."</blockquote><br/>");
+				if ( strlen($file->item_fulltext) ) fprintf($handle_htm, "<blockquote>".$file->item_fulltext."</blockquote><br/>");
+				fprintf($handle_htm, "<hr/><br/>");
+			}
+			fclose($handle_txt);
+			fclose($handle_htm);
+			
 			// Get file list recursively, and calculate archive filename
 			$fileslist   = JFolder::files($targetpath, '.', $recurse=true, $fullpath=true);
 			$archivename = $tmp_ffname . (FLEXI_J16GE ? '.zip' : '.tar.gz');
@@ -1628,7 +1656,7 @@ class FlexicontentController extends JControllerLegacy
 			if (!FLEXI_J16GE) {
 				JArchive::create($archivepath, $fileslist, 'gz', '', $targetpath);
 			} else {
-				$app = JFactory::getApplication('administrator');
+				/*$app = JFactory::getApplication('administrator');
 				$files = array();
 				foreach ($fileslist as $i => $filename) {
 					$files[$i]=array();
@@ -1643,7 +1671,18 @@ class FlexicontentController extends JControllerLegacy
 					$app->enqueueMessage($msg, 'notice');
 					$this->setRedirect('index.php', '');
 					return;
+				}*/
+				
+				$za = new flexicontent_zip();
+				$res = $za->open($archivepath, ZipArchive::CREATE);
+				if($res !== true) {
+					$msg = JText::_('FLEXI_OPERATION_FAILED'). ": compressed archive could not be created";
+					$app->enqueueMessage($msg, 'notice');
+					$this->setRedirect('index.php', '');
+					return;
 				}
+				$za->addDir($targetpath, "");
+				$za->close();
 			}
 			
 			// Remove temporary folder structure
@@ -1690,17 +1729,6 @@ class FlexicontentController extends JControllerLegacy
 		// *****************************************
 		// Output an appropriate Content-Type header
 		// *****************************************
-		//echo "<pre>"; print_r($dlfile); jexit();
-		/*
-		JResponse::setHeader('Pragma', 'public');
-		JResponse::setHeader('Expires', 0);
-		JResponse::setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0');
-		JResponse::setHeader('Cache-Control', 'private', false);
-		JResponse::setHeader('Content-Type', $dlfile->ctype);
-		JResponse::setHeader('Content-Disposition', 'attachment; filename="'.$dlfile->filename.'";');
-		JResponse::setHeader('Content-Transfer-Encoding', 'binary');
-		JResponse::setHeader('Content-Length', $dlfile->size);
-		*/
 		header("Pragma: public"); // required
 		header("Expires: 0");
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
@@ -1944,4 +1972,3 @@ class FlexicontentController extends JControllerLegacy
 		FLEXIUtilities::doPlgAct();
 	}
 }
-?>

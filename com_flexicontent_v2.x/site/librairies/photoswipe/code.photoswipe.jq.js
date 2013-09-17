@@ -4938,6 +4938,7 @@
 		
 		var i, j, instance, image;
 		
+		if (images.length < 1) return null;
 		instance = PhotoSwipe.createInstance(images, options, id);
 		
 		// Add click event handlers if applicable

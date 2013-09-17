@@ -99,14 +99,15 @@
 			
 			<field name="" type="separator" level="level2" default="Basic Information (used by non-FC results too)" description=""/>
 			
-			<field name="show_section" type="radio" default="1" label="Show Content Section" description="Display Content Section for each result, e.g. 'weblinks', 'contacts' etc, plus category tree of it.">
+			<field name="show_section" type="radio" default="1" label="Show section" description="Display content section for each result, e.g. 'weblinks', 'contacts' etc, plus category tree of it.">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_text" type="radio" default="1" label="Show matched text &lt;br/&gt; &lt;small&gt;(Always ON for non-FC results)&lt;/small&gt;" description="Display the searchable text that matched for each result, showing which words were matched during search">
+			<field name="show_text" type="radio" default="1" label="Show context &lt;br/&gt; &lt;small&gt;(Always ON for non-FC results)&lt;/small&gt;" description="Display search words found along with content text around them. The search words found are highlighted">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="text_chars" type="text" default="240" label="Context Limit &lt;br/&gt; &lt;small&gt; (# of characters) &lt;/small&gt;" description="Number of characters of content text shown of around each found search word" />
 			<field name="show_date" type="radio" default="1" label="Show creation date" description="Display for each result its creation date">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

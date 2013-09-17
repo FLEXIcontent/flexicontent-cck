@@ -263,7 +263,7 @@ window.addEvent('domready', function() {
 				?>
 				<br/>
 				<?php echo JText::_( 'FLEXI_DEFAULT_CAT_FOR_NO_CAT_ITEMS' ).': '.$this->lists['default_cat']; ?>
-				<input id="button-bind" type="submit" class="fc_select_button" style='float:none; display:inline-block;' value="<?php echo JText::_( 'FLEXI_BIND' ); ?>"
+				<input id="button-bind" type="submit" class="fc_button" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_BIND' ); ?>"
 				onclick="	this.form.action += '&typeid='+this.form.elements['typeid'].options[this.form.elements['typeid'].selectedIndex].value;
 									this.form.action += '&default_cat='+this.form.elements['default_cat'].options[this.form.elements['default_cat'].selectedIndex].value;
 									this.form.action += '&extdata='+this.form.elements['extdata'].options[this.form.elements['extdata'].selectedIndex].value;" />

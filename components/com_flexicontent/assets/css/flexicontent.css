@@ -488,15 +488,15 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_line.fc_clear_label .fc_filter_html {  clear: both; width: 100% !important;  }
 
 /* Highlight date calendar inside FC filters */
-.fc_filter_html .calendar { vertical-align: bottom; margin: 0px 6px 9px -4px; cursor: pointer; }
+.fc_filter_html .calendar { vertical-align: bottom; margin: 0px 6px 9px 2px; cursor: pointer; }
 .fc_filter_html .calendar:hover { border: 1px solid darkred; }
 
 /* Mulitple form field elements inside a filter area */
 .fc_filter_html .fc_filter_element { display:inline-block; white-space: nowrap; position: relative; }
 
 /* The form element(s) of each field filter inside filter's HTML */
-.fc_text_filter,
-.fc_field_filter {
+.fc_text_filter, .flexicontent .fc_text_filter,
+.fc_field_filter, .flexicontent .fc_field_filter {
 	color: black !important;
 	font-size: 11px !important;
 	font-weight: normal !important;
@@ -508,6 +508,8 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	-webkit-border-radius: 5px !important;
 	width: auto !important;
 }
+.flexicontent input.fc_text_filter,
+.flexicontent input.fc_field_filter,
 input.fc_text_filter,  input.fc_text_filter:focus,
 input.fc_field_filter, input.fc_field_filter:focus {
 	height: 14px !important;
@@ -527,18 +529,21 @@ input.fc_field_filter, input.fc_field_filter:focus {
 	min-width: 180px !important;
 }
 
+
+form.fc_field_filter_list { display: inline-block; margin: 0px !important; padding: 0px !important; }
 select.fc_field_filter { margin: 2px 2px 2px 2px !important; }
-input.fc_text_filter { margin: 2px 2px 4px 8px !important; vertical-align: top; }
-input.fc_field_filter { margin: 2px 8px 4px 8px !important; vertical-align: top; }
+input.fc_text_filter { vertical-align: top; }
+input.fc_field_filter { vertical-align: top; }
 span.fc_field_filter { border-width: 0px !important; }
-.fc_field_filter.fc_checkradio_group {
+ul.fc_field_filter.fc_checkradio_group {
 	margin: 2px 0px 2px 2px !important;
 	padding: 3px 4px 3px 2px !important
 }
-.fc_field_filter.fc_checkradio_group label {
+ul.fc_field_filter.fc_checkradio_group label {
 	margin: 6px 6px 4px 0px !important;
 	display: inline-block;
 }
+
 
 /* Inner Labels */
 .fc_has_inner_label, .fc_has_inner_prompt {

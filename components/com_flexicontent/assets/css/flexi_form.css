@@ -146,13 +146,16 @@ input.fc_checkradio {
 	position: relative;
 	top: -1px;
 }
-.fc_checkradio_group .fc_checkradio_option {
-	white-space: nowrap !important;
+
+/* Styling for radio/checkboxes lists */
+ul.fc_checkradio_group { list-style-type: none !important; display: block; clear: both; }
+li.fc_checkradio_option { white-space: nowrap !important; display: inline-block; /* auto-hide do not force display */}
+ul.fc_checkradio_group,
+li.fc_checkradio_option {
 	padding: 0px !important;
 	margin: 0px !important;
-	display: inline-block !important;
+	background: none transparent !important;
 }
-
 
 
 
