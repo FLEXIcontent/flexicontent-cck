@@ -144,10 +144,15 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		// email button
 		if ($display_email)
 		{
-			$link = JURI::root().JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
-			//$link = JURI::root().JRoute::_( 'index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug, false );
 			require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
-			$url		 = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $link );
+			
+			// NOTE: the following uses current SSL setting (e.g menu item), and not URL scheme: http/https 
+			//$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug), true, -1);
+			
+			$server   = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
+			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+			$link = $server . $item_url;
+			$url  = 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink( $link );
 			$estatus	 = 'width=400,height=400,menubar=yes,resizable=yes';
 			$display	.= '
 			<div class="flexi-email toolbar-element">

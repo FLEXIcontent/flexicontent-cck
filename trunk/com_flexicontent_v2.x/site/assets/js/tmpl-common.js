@@ -124,44 +124,49 @@
 		}
 	}
 	
-	function fc_toggleClass(ele,cls, fc_all) {
+	function fc_toggleClass(ele, cls, fc_all) {
 		var inputs = ele.parentNode.parentNode.getElementsByTagName('input');
+	  var input_0 = jQuery(inputs[0]);
 		if (typeof fc_all === "undefined" || fc_all === null || !fc_all)
 		{
 		  jQuery(ele).next().hasClass(cls) ? jQuery(ele).next().removeClass(cls) : jQuery(ele).next().addClass(cls);
 		  // Handle disabling 'select all' checkbox (if it exists), not needed but to make sure ...
-		  if (inputs[0].value=='') {
-		  	inputs[0].checked = 0;
-				jQuery(inputs[0]).next().removeClass(cls);
+		  if (input_0.val()=='') {
+				input_0.prop('checked', false);
+				input_0.next().removeClass(cls);
 		  }
 		}
 		else
 		{
-			for (var i = 1; i < inputs.length; ++i) {
-				inputs[i].checked = 0;
-				jQuery(inputs[i]).next().removeClass(cls);
+			for (var i = 0; i < inputs.length; ++i) {
+				var input_i = jQuery(inputs[i]);
+				input_i.prop('checked', false);
+				input_i.next().removeClass(cls);
 			}
 		  // Handle highlighting (but not enabling) 'select all' checkbox
-			jQuery(inputs[0]).next().addClass(cls);
+			jQuery(ele).prop('checked', true);
+			jQuery(ele).next().addClass(cls);
 		}
 	}
 	
 	function fc_toggleClassGrp(ele, cls, fc_all) {
 		var inputs = ele.parentNode.parentNode.getElementsByTagName('input');
+		var input_0 = jQuery(inputs[0]);
 		if (typeof fc_all === "undefined" || fc_all === null || !fc_all)
 		{
 			for (var i = 0; i < inputs.length; ++i) {
-				inputs[i].checked ? jQuery(inputs[i]).next().addClass(cls) : jQuery(inputs[i]).next().removeClass(cls);
+				var input_i = jQuery(inputs[i]);
+				input_i.attr('checked') ? input_i.next().addClass(cls) : input_i.next().removeClass(cls);
 			}
 		}
 		else
 		{
-			for (var i = 1; i < inputs.length; ++i) {
-				inputs[i].checked = 0;
-				jQuery(inputs[i]).next().removeClass(cls);
+			for (var i = 0; i < inputs.length; ++i) {
+				var input_i = jQuery(inputs[i]);
+				input_i.next().removeClass(cls);
 			}
 		  // Handle highlighting (but not enabling) 'select all' radio button
-			jQuery(inputs[0]).next().addClass(cls);
+			jQuery(ele).next().addClass(cls);
 		}
 	}
 
@@ -172,7 +177,39 @@
 	}
 
 
+
 jQuery(document).ready(function() {
+
+	// case-insensitive contains()
+	jQuery.expr[':'].contains_ci_fc = function(el,i,txt){
+		return (el.textContent || el.innerText || "").toUpperCase().indexOf(txt[3].toUpperCase()) >= 0;
+	};
+	
+	// Add instant text type filter to lists
+	jQuery('ul.fc_list_filter').each(function() {
+		var list = jQuery(this);
+		// prepend text filter input to the list
+		var form = jQuery("<form>").attr({"class":"fc_field_filter_list", "action":"#"}),
+		input = jQuery("<input>").attr({"class":"fc_field_filter fc_label_internal", "type":"text", "fc_label_text":Joomla.JText._('FLEXI_TYPE_TO_FILTER')});
+		jQuery(form).append(input).insertBefore(list);
+	
+		jQuery(input)
+		.change( function () {
+			var filter = jQuery(this).val();
+			if(filter) {
+				jQuery(list).find("li:not(.fc_checkradio_special) label:not(:contains_ci_fc(" + filter + "))").parent().slideUp();
+				jQuery(list).find("li:not(.fc_checkradio_special) label:contains_ci_fc(" + filter + ")").parent().slideDown();
+			} else {
+				jQuery(list).find("li").slideDown();
+			}
+			return false;
+		})
+		.keyup( function () {
+			jQuery(this).change();
+		});
+	});
+	
+
 	// Initialize internal labels
 	jQuery('input.fc_label_internal').each(function() {
 		var el = jQuery(this);
@@ -223,7 +260,7 @@ jQuery(document).ready(function() {
 	
 	var fc_select_pageSize = 10;
 	
-	// Simple text search autocomplete
+	// add Simple text search autocomplete
 	jQuery( "input.fc_basicindex_complete_simple" ).autocomplete({
 		source: function( request, response ) {
 			jQuery.ajax({
@@ -267,7 +304,7 @@ jQuery(document).ready(function() {
 
 
 
-	// Tag-Like text search autocomplete
+	// add Tag-Like text search autocomplete
 	jQuery('input.fc_basicindex_complete_tlike').select2(
 	{
 		placeholder: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
@@ -308,9 +345,8 @@ jQuery(document).ready(function() {
 	})/*.on('change', function(){
 		alert(jQuery(this).val());
 	})*/;
-
-
-
+		
+	
 	jQuery('body').prepend(
 	 	"<span id='fc_filter_form_blocker'>" +
 	    "<span class='fc_blocker_opacity'></span>" +

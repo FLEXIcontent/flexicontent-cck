@@ -408,7 +408,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				$class_str .= ' button';   // Add an extra css class (button display)
 				
 				// MULTI-DOWNLOAD MODE: the button will add file to download list (tree) (handled via a downloads manager module)
-				if ($authorized && $use_downloads_manager && !$file->url) {
+				if ($authorized && $use_downloads_manager && !$file_data->url) {
 					$class_str .= ($class_str ? ' ' : '') .'fcfile_addFile';   // CSS class to anchor downloads list adding function
 					
 					$attribs  = ' class="'. $class_str .'"';

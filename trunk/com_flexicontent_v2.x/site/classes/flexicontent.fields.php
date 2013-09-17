@@ -2222,10 +2222,10 @@ class FlexicontentFields
 			$checked = ($display_filter_as==5) ? !count($value) || !strlen(reset($value)) : !strlen($value);
 			$checked_attr = $checked ? 'checked="checked"' : '';
 			$checked_class = $checked ? 'fc_highlight' : '';
-			$filter->html .= '<span class="fc_field_filter fc_checkradio_group">';
-			$filter->html .= '<span class="fc_checkradio_option">';
+			$filter->html .= '<ul class="fc_field_filter fc_checkradio_group fc_list_filter">';
+			$filter->html .= '<li class="fc_checkradio_option fc_checkradio_special">';
 			if ($display_filter_as==4) {
-				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode, \'fc_highlight\', 1);" ';
+				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this, \'fc_highlight\', 1);" ';
 				$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
 				$filter->html .= '  value="" '.$checked_attr.' class="fc_checkradio" />';
 			} else {
@@ -2236,7 +2236,7 @@ class FlexicontentFields
 			$filter->html .= '<label class="'.$checked_class.'" for="'.$filter_ffid.$i.'">'.
 				($label_filter==2  ?  $filter->label.': ' : '').
 				'- '.JText::_('FLEXI_ANY').' -';
-			$filter->html .= '</label></span>';
+			$filter->html .= '</label></li>';
 			$i++;
 			foreach($results as $result) {
 				if ( !strlen($result->value) ) continue;
@@ -2245,9 +2245,9 @@ class FlexicontentFields
 				$disable_attr = !$result->found ? ' disabled=disabled ' : '';
 				$checked_class = $checked ? 'fc_highlight' : '';
 				$checked_class .= !$result->found ? ' fcdisabled ' : '';
-				$filter->html .= '<span class="fc_checkradio_option">';
+				$filter->html .= '<li class="fc_checkradio_option">';
 				if ($display_filter_as==4) {
-					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this.parentNode, \'fc_highlight\');" ';
+					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this, \'fc_highlight\');" ';
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
 					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 				} else {
@@ -2258,10 +2258,10 @@ class FlexicontentFields
 				$filter->html .= '<label class="'.$checked_class.'" for="'.$filter_ffid.$i.'">';
 				$filter->html .= JText::_($result->text);
 				$filter->html .= '</label>';
-				$filter->html .= '</span>';
+				$filter->html .= '</li>';
 				$i++;
 			}
-			$filter->html .= '</span>';
+			$filter->html .= '</ul>';
 			break;
 		}
 		if ( $print_logging_info ) $current_filter_creation = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
