@@ -200,6 +200,10 @@ if ( $show_mod )
 			}
 			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css">';
 			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
+			//allow css override
+			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
+			}
 		} else {
 			// Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
 			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
@@ -208,11 +212,15 @@ if ( $show_mod )
 			}
 			$document->addStyleSheet(JURI::base(true).'/modules/mod_flexifilter/tmpl_common/module.css');
 			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
+			//allow css override
+			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+				$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			}
 		}
 	}
 	
 	$form_target = '';
-	$default_target = JRoute::_('index.php?option=com_flexicontent&view=category', false) . '&layout=mcats';
+	$default_target = JRoute::_('index.php?option=com_flexicontent&view=category&layout=mcats', false);
 	// !! target MCATS layout of category view when selecting multiple categories OR selecting single category but no default category set (or no current category)
 	if (($display_cat_list && $mcats_selection) || !$catid) {
 		$form_target = $default_target;

@@ -88,23 +88,31 @@ if ( $show_mod )
 	
 	// Add css
 	if ($add_ccs && $layout) {
-	  if ($caching && !FLEXI_J16GE) {
+		if ($caching && !FLEXI_J16GE) {
 			// Work around for caching bug in J1.5
-	    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
-	      // active layout css
-	      echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/'.$layout.'/'.$layout.'.css">';
-	    }
-	    echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexiadvsearch/tmpl_common/module.css">';
-		  echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
-	  } else {
-	    // Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
-	    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
-	      // active layout css
-	      $document->addStyleSheet(JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/'.$layout.'/'.$layout.'.css');
-	    }
-	    $document->addStyleSheet(JURI::base(true).'/modules/mod_flexiadvsearch/tmpl_common/module.css');
-		  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
-	  }
+			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+				// active layout css
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/'.$layout.'/'.$layout.'.css">';
+			}
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexiadvsearch/tmpl_common/module.css">';
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
+			//allow css override
+			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
+			}
+		} else {
+			// Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
+			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+				// active layout css
+				$document->addStyleSheet(JURI::base(true).'/modules/mod_flexiadvsearch/tmpl/'.$layout.'/'.$layout.'.css');
+			}
+			$document->addStyleSheet(JURI::base(true).'/modules/mod_flexiadvsearch/tmpl_common/module.css');
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
+			//allow css override
+			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+				$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			}
+		}
 	}
 	
 	$itemid_force = $params->get('itemid_force', '0');
@@ -120,6 +128,6 @@ if ( $show_mod )
 		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
 		$app->enqueueMessage( $msg, 'notice' );
 	}
-	
+
 }
 ?>

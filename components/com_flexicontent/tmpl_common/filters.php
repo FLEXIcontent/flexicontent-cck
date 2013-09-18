@@ -153,8 +153,9 @@ if ($filter_instructions == 1) {
 				
 				$_filter_html  = $pretext;
 				$_filter_html .= '<span class="'.$filter_container_class.(($n++)%2 ? ' fc_even': ' fc_odd').'" >' ."\n";
-				$_filter_html .= ($show_filter_labels==1 || ($show_filter_labels==0 && $filt->parameters->get('display_label_filter')==1)) ? ' <span class="fc_filter_label">' .$filt->label. '</span>' ."\n"  :  '';
-				$_filter_html .= ' <span class="fc_filter_html">' .$filt->html. '</span>' ."\n";
+				$_filter_html .= ($show_filter_labels==1 || ($show_filter_labels==0 && $filt->parameters->get('display_label_filter')==1))
+					? ' <span class="fc_filter_label fc_label_field_'.$filt->id.'">' .$filt->label. '</span>' ."\n"  :  '';
+				$_filter_html .= ' <span class="fc_filter_html fc_html_field_'.$filt->id.'">' .$filt->html. '</span>' ."\n";
 				$_filter_html .= '</span>'."\n";
 				$_filter_html .= $posttext;
 				$filters_html[] = $_filter_html;
@@ -205,7 +206,7 @@ if ($filter_instructions == 1) {
 if ($filter_autosubmit) {
 	$js = '
 		jQuery(document).ready(function() {
-			jQuery("#'.$form_id.' input:not(.fc_instant_filter), #'.$form_id.' select").on("change", function() {
+			jQuery("#'.$form_id.' input:not(.fc_autosubmit_exclude), #'.$form_id.' select:not(.fc_autosubmit_exclude)").on("change", function() {
 				var form=document.getElementById("'.$form_id.'");
 				adminFormPrepare(form, 2);
 			});
@@ -214,7 +215,7 @@ if ($filter_autosubmit) {
 } else {
 	$js = '
 		jQuery(document).ready(function() {
-			jQuery("#'.$form_id.' input:not(.fc_instant_filter), #'.$form_id.' select").on("change", function() {
+			jQuery("#'.$form_id.' input:not(.fc_autosubmit_exclude), #'.$form_id.' select:not(.fc_autosubmit_exclude)").on("change", function() {
 				var form=document.getElementById("'.$form_id.'");
 				adminFormPrepare(form, 1);
 			});

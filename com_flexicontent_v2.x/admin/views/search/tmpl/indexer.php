@@ -22,7 +22,7 @@ $search_task = FLEXI_J16GE ? 'task=search.' : 'controller=search&task=';
 <div style="heading">Indexer Running</div>
 <script type="text/javascript">
 jQuery(document).ready(function() {
-	var items_per_call = 20;
+	var items_per_call = 50;
 	var width = 0;
 	var looper = 0;
 	var onesector = 1000;
@@ -33,7 +33,7 @@ jQuery(document).ready(function() {
 	var number = 0;
 	function updateprogress() {
 		//looper=looper+1;
-		if(looper>number) {
+		if(looper>=number) {
 			jQuery('div#statuscomment').html( jQuery('div#statuscomment').text() + ' , INDEXING FINISHED. You may close this window');
 			//if(looper==(number+1)) {
 				//jQuery('div#statuscomment').text('Completed!');

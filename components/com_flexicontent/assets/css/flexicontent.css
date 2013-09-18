@@ -538,9 +538,11 @@ span.fc_field_filter { border-width: 0px !important; }
 ul.fc_field_filter.fc_checkradio_group {
 	margin: 2px 0px 2px 2px !important;
 	padding: 3px 4px 3px 2px !important;
-	overflow-y: auto;
-	overflow-x: visible;
-	max-height: 240px;
+	height: auto !important;
+	max-height: auto !important;
+	position: static !important;
+	float: left !important;
+	text-align: left !important;
 }
 ul.fc_field_filter.fc_checkradio_group label {
 	margin: 6px 6px 4px 0px !important;

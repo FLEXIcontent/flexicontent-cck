@@ -156,29 +156,37 @@ if ( $show_mod )
 	
 	// Add css
 	if ($add_ccs && $layout) {
-	  if ($caching && !FLEXI_J16GE) {
+		if ($caching && !FLEXI_J16GE) {
 			// Work around for caching bug in J1.5
-	    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
-	      // active layout css
-	      echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css">';
-	    }
-	    echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css">';
-		  echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
-	  } else {
-	    // Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
-	    if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
-	      // active layout css
-	      $document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css');
-	    }
-	    $document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css');
-		  $document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
-	  }
+			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+				// active layout css
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css">';
+			}
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css">';
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
+			//allow css override
+			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
+			}
+		} else {
+			// Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
+			if (file_exists(dirname(__FILE__).DS.'tmpl'.DS.$layout.DS.$layout.'.css')) {
+				// active layout css
+				$document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl/'.$layout.'/'.$layout.'.css');
+			}
+			$document->addStyleSheet(JURI::base(true).'/modules/mod_flexicontent/tmpl_common/module.css');
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
+			//allow css override
+			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+				$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			}
+		}
 	}
 	
 	// Render Layout, (once per category if apply per category is enabled ...)
 	foreach ($catdata_arr as $i => $catdata) {
 		$list = & $list_arr[$i];
-		
+	
 		// Check items exist
 		$items_exist = false;
 		foreach ($ordering as $ord)
@@ -188,30 +196,30 @@ if ( $show_mod )
 				break;
 			}
 		}
-		
+	
 		// Decide whether to skip rendering of the layout
 		$can_skip_category = !$catdata || $params->get('skip_category_if_noitems', 0);
 		if ( !$items_exist && $can_skip_category && !$params->get('display_favlist', 0) ) continue;
-		
+	
 		require(JModuleHelper::getLayoutPath('mod_flexicontent', $layout));
 	}
 	
 	// Add module Read More
 	if ($show_more == 1) : ?>
-		<span class="module_readon<?php echo $params->get('moduleclass_sfx'); ?>"<?php if ($more_css) : ?> style="<?php echo $more_css; ?>"<?php endif;?>>
-			<a class="readon" href="<?php echo JRoute::_($more_link); ?>" <?php if ($params->get('more_blank') == 1) {echo 'target="_blank"';} ?>><span><?php echo JText::_($more_title); ?></span></a>
-		</span>
+	<span class="module_readon<?php echo $params->get('moduleclass_sfx'); ?>"<?php if ($more_css) : ?> style="<?php echo $more_css; ?>"<?php endif;?>>
+		<a class="readon" href="<?php echo JRoute::_($more_link); ?>" <?php if ($params->get('more_blank') == 1) {echo 'target="_blank"';} ?>><span><?php echo JText::_($more_title); ?></span></a>
+	</span>
 	<?php endif;
 	
 	$mod_fc_run_times['rendering_template'] = $modfc_jprof->getmicrotime() - $mod_fc_run_times['rendering_template'];
 	
 	$task_lbls = array(
-		'query_items'=>'Main DB Querying of Items ('.count($catdata_arr).' queries): %.2f secs',
-		'query_items_sec'=>'Sec SQL Querying of Items ('.count($catdata_arr).' queries): %.2f secs',
-		'empty_fields_filter'=>'Empty fields filter (skip items)): %.2f secs',
-		'item_list_creation'=>'Item list creation (with custom field rendering): %.2f secs',
-		'category_data_retrieval'=>'Category data retrieval: %.2f secs',
-		'rendering_template'=>'Adding css/js & Rendering Template with item/category/etc data: %.2f secs'
+	'query_items'=>'Main DB Querying of Items ('.count($catdata_arr).' queries): %.2f secs',
+	'query_items_sec'=>'Sec SQL Querying of Items ('.count($catdata_arr).' queries): %.2f secs',
+	'empty_fields_filter'=>'Empty fields filter (skip items)): %.2f secs',
+	'item_list_creation'=>'Item list creation (with custom field rendering): %.2f secs',
+	'category_data_retrieval'=>'Category data retrieval: %.2f secs',
+	'rendering_template'=>'Adding css/js & Rendering Template with item/category/etc data: %.2f secs'
 	);
 	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
@@ -224,6 +232,5 @@ if ( $show_mod )
 		}
 		$app->enqueueMessage( $msg, 'notice' );
 	}
-	
 }
 ?>

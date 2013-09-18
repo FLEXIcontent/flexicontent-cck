@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.1 $Id: mod_flexitagcloud.php 1312 2012-05-17 01:08:16Z ggppdk $
+ * @version 1.1 $Id: mod_flexitagcloud.php 1754 2013-09-06 02:06:28Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Tag Cloud Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -44,36 +44,46 @@ if ( $show_mod )
 	jimport( 'joomla.error.profiler' );
 	$modfc_jprof = new JProfiler();
 	$modfc_jprof->mark('START: FLEXIcontent Tags Cloud Module');
-	
+
 	// load english language file for 'mod_flexitagcloud' module then override with current language file
 	JFactory::getLanguage()->load('mod_flexitagcloud', JPATH_SITE, 'en-GB', true);
 	JFactory::getLanguage()->load('mod_flexitagcloud', JPATH_SITE, null, true);
-	
+
 	// initialize various variables
 	$document = JFactory::getDocument();
 	$caching 	= $app->getCfg('caching', 0);
-	
+
 	// include the helper only once
 	require_once (dirname(__FILE__).DS.'helper.php');
-	
+
 	// get module's basic display parameters
 	$add_ccs 				= $params->get('add_ccs', 1);
 	$layout 				= $params->get('layout', 'default');
-	
+
 	// Add css
 	if ($add_ccs) {
-	  if ($caching && !FLEXI_J16GE) {
+		if ($caching && !FLEXI_J16GE) {
 			// Work around for caching bug in J1.5
 			echo '<link rel="stylesheet" href="'.JURI::base(true).'/modules/mod_flexitagcloud/tmpl/mod_flexitagcloud.css">';
-	  } else {
-	    // Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
+			echo '<link rel="stylesheet" href="'.JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css">';
+			//allow css override
+			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+				echo '<link rel="stylesheet" href="'.JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css">';
+			}
+		} else {
+			// Standards compliant implementation for >= J1.6 or earlier versions without caching disabled
 			$document->addStyleSheet(JURI::base(true).'/modules/mod_flexitagcloud/tmpl/mod_flexitagcloud.css');
-	  }
+			$document->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/flexicontent.css');
+			//allow css override
+			if (file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'css'.DS.'flexicontent.css')) {
+				$document->addStyleSheet(JURI::base(true).'/templates/'.$app->getTemplate().'/css/flexicontent.css');
+			}
+		}
 	}
 	
 	// Get data, etc by calling methods from helper file and include then include template to display them
 	$list = modFlexiTagCloudHelper::getTags($params, $module);
-	
+
 	// Render Layout
 	require(JModuleHelper::getLayoutPath('mod_flexitagcloud', $layout));
 	
@@ -84,6 +94,5 @@ if ( $show_mod )
 		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
 		$app->enqueueMessage( $msg, 'notice' );
 	}
-	
 }
 ?>

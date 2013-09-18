@@ -148,6 +148,15 @@ input.fc_checkradio {
 }
 
 /* Styling for radio/checkboxes lists */
+span.fc_checkradio_group_wrapper {
+	display: inline-block;
+	float: left; clear: both; 
+	margin: 0px; padding: 0px;
+	overflow-y: auto !important;
+	overflow-x: visible;
+	height: auto;
+	max-height: 240px;
+}
 ul.fc_checkradio_group { list-style-type: none !important; display: block; clear: both; }
 li.fc_checkradio_option { white-space: nowrap !important; display: inline-block; /* auto-hide do not force display */}
 ul.fc_checkradio_group,
