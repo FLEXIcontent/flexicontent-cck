@@ -203,12 +203,12 @@ jQuery(document).ready(function() {
 	};
 	
 	// Add instant text type filter to lists
-	jQuery('ul.fc_list_filter').each(function() {
-		var list = jQuery(this);
+	jQuery('span.fc_list_filter_wrapper').each(function() {
+		var list = jQuery(this).find('ul:first');
 		// prepend text filter input to the list
 		var form = jQuery("<form>").attr({"class":"fc_instant_filter", "action":"#"}),
-		input = jQuery("<input>").attr({"class":"fc_field_filter fc_label_internal fc_instant_filter", "type":"text", "fc_label_text":Joomla.JText._('FLEXI_TYPE_TO_FILTER')});
-		jQuery(form).append(input).insertBefore(list);
+		input = jQuery("<input>").attr({"class":"fc_field_filter fc_label_internal fc_instant_filter fc_autosubmit_exclude", "type":"text", "fc_label_text":Joomla.JText._('FLEXI_TYPE_TO_FILTER')});
+		jQuery(form).append(input).insertBefore(this);
 	
 		jQuery(input)
 		.change( function () {

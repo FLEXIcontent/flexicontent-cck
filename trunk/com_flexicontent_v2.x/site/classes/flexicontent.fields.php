@@ -1483,10 +1483,10 @@ class FlexicontentFields
 		$db = JFactory::getDBO();
 		
 
-		if ($search_type=='search') {   // ALL fields that must enter values in search index (also are published)
+		if ($search_type=='search') {   // All fields marked as text-searchable (also are published)
 			$where = $indexer=='basic' ? ' f.issearch IN (1,2)' : ' f.isadvsearch IN (1,2) ';
 			$where = '('.$where.' AND f.published = 1)';
-		} else if ($search_type=='filter') {   // ALL fields that must enter values in search index (also are published)
+		} else if ($search_type=='filter') {   // All fields marked as filterable (also are published)
 			$where = $indexer=='basic' ? ' f.isfilter IN (1,2)' : ' f.isadvfilter IN (1,2) ';
 			$where = '('.$where.' AND f.published = 1)';
 		} else if ($search_type=='all-search') {   // ALL fields that must enter values in search index (also are published)
@@ -2223,6 +2223,7 @@ class FlexicontentFields
 			$checked_attr = $checked ? 'checked="checked"' : '';
 			$checked_class = $checked ? 'fc_highlight' : '';
 			$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
+			$filter->html .= '<span class="fc_checkradio_group_wrapper'.(count($results) > 9 ? ' fc_list_filter_wrapper':'').'">';
 			$filter->html .= '<ul class="fc_field_filter fc_checkradio_group'.(count($results) > 9 ? ' fc_list_filter':'').'">';
 			$filter->html .= '<li class="fc_checkradio_option fc_checkradio_special'.$checked_class_li.'">';
 			if ($display_filter_as==4) {
@@ -2264,6 +2265,7 @@ class FlexicontentFields
 				$i++;
 			}
 			$filter->html .= '</ul>';
+			$filter->html .= '</span>';
 			break;
 		}
 		if ( $print_logging_info ) $current_filter_creation = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;

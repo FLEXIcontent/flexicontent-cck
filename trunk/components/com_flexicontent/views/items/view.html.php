@@ -351,7 +351,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		if ( $params->get('automatic_pathways', 0) ) {
 			$pathway_arr = $pathway->getPathway();
 			$pathway->setPathway( array() );
-			$pathway->set('_count', 0);
+			//$pathway->set('_count', 0);  // not needed ??
 			$item_depth = 0;  // menu item depth is now irrelevant ???, ignore it
 		} else {
 			$item_depth = $params->get('item_depth', 0);

@@ -62,6 +62,8 @@ class FlexicontentControllerSearch extends FlexicontentController
 		if ($rebuildmode=='quick' && $indexer=='advanced') {
 			$nse_fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='non-search');
 			$nsp_fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=false, 0, $search_type='dirty-nosupport');
+			$session->set($indexer.'_nse_fields', $nse_fields, 'flexicontent');
+			$session->set($indexer.'_nsp_fields', $nsp_fields, 'flexicontent');
 			$fields     = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=true,  0, $search_type='dirty-search');
 		} else {
 			$fields = FlexicontentFields::getSearchFields('id', $indexer, null, null, $_load_params=true, 0, $search_type='all-search');
@@ -76,8 +78,6 @@ class FlexicontentControllerSearch extends FlexicontentController
 		// Set item ids into session to avoid recalculation ...
 		$session->set($indexer.'_items_to_index', $itemids, 'flexicontent');
 		// Set field information into session to avoid recalculation ...
-		$session->set($indexer.'_nse_fields', $nse_fields, 'flexicontent');
-		$session->set($indexer.'_nsp_fields', $nsp_fields, 'flexicontent');
 		$session->set($indexer.'_fields', $fields, 'flexicontent');
 		
 		echo 'success';  //echo count($fieldids)*count($itemids).'|';
@@ -139,7 +139,8 @@ class FlexicontentControllerSearch extends FlexicontentController
 			$db->query();
 		}
 		
-		$items_per_query = 20;
+		$items_per_query = 50;
+		$items_per_query = $items_per_query > $items_per_call ? $items_per_call : $items_per_query;
 		$cnt = $itemcnt;
 		while($cnt < $itemcnt+$items_per_call)
 		{
@@ -190,18 +191,22 @@ class FlexicontentControllerSearch extends FlexicontentController
 			// Create query that will update/insert data into the DB
 			unset($query);  // make sure it is not set above
 			if ($indexer == 'basic') {
-				$query = "UPDATE #__flexicontent_items_ext SET search_index = CASE item_id ";
-				foreach ($searchindex as $query_itemid => $search_text)
-				{
-					// Add new search value into the DB
-					$query .= " WHEN $query_itemid THEN ".$db->Quote( implode(' | ', $search_text) );
+				if (count($searchindex)) {  // check for zero search index records
+					$query = "UPDATE #__flexicontent_items_ext SET search_index = CASE item_id ";
+					foreach ($searchindex as $query_itemid => $search_text)
+					{
+						// Add new search value into the DB
+						$query .= " WHEN $query_itemid THEN ".$db->Quote( implode(' | ', $search_text) );
+					}
+					$query .= " END ";
+					$query .= " WHERE item_id IN (". implode(',', array_keys($searchindex)) .")";
 				}
-				$query .= " END ";
-				$query .= " WHERE item_id IN (". implode(',', array_keys($searchindex)) .")";
-			} else if (count($ai_query_vals)) {
-				$query = "INSERT INTO #__flexicontent_advsearch_index "
-					." (field_id,item_id,extraid,search_index,value_id) VALUES "
-					.implode(",", $ai_query_vals);
+			} else {
+				if ( count($ai_query_vals) ) {  // check for zero search index records
+					$query = "INSERT INTO #__flexicontent_advsearch_index "
+						." (field_id,item_id,extraid,search_index,value_id) VALUES "
+						.implode(",", $ai_query_vals);
+				}
 			}
 			if ( !empty($query) ) {
 				$db->setQuery($query);

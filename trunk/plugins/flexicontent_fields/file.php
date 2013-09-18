@@ -405,39 +405,39 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// *****************************************************************************************
 			
 			else if ($usebutton) {
-				$class_str .= ' button';   // Add an extra css class (button display)
+				$class_str .= ' fc_button fcsimple';   // Add an extra css class (button display)
+				$str = $icon." ".$name_html;
 				
 				// MULTI-DOWNLOAD MODE: the button will add file to download list (tree) (handled via a downloads manager module)
 				if ($authorized && $use_downloads_manager && !$file_data->url) {
-					$class_str .= ($class_str ? ' ' : '') .'fcfile_addFile';   // CSS class to anchor downloads list adding function
+					$_class_str = $class_str;
+					$_class_str .= ($_class_str ? ' ' : '') .'fcfile_addFile';   // CSS class to anchor downloads list adding function
 					
-					$attribs  = ' class="'. $class_str .'"';
+					$attribs  = ' class="'. $_class_str .'"';
 					$attribs .= ' title="'. $alt_str .'"';
 					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filename,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';
 					$attribs .= ' contentid="'. $field->item_id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';
-					$str = '<input type="button" '. $attribs .' value="'.JText::_('FLEXI_DOWNLOAD').'" />'.$name_html ." ". $text_html;
+					$str .= '<input type="button" '. $attribs .' value="'.JText::_('FLEXI_FIELD_FILE_ADD_TO_DOWNLOADS_CART').'" />'. $text_html;
 				}
 				
 				// SINGLE (INSTANT) DOWNLOAD MODE
-				else {
-					
-					// NO ACCESS: add file info via form field elements, in case the URL target needs to use them
-					$file_data_fields = "";
-					if ( !$authorized && $noaccess_addvars) {
-						$file_data_fields =
-							'<input type="hidden" name="fc_field_id" value="'.$field->id.'"/>'."\n".
-							'<input type="hidden" name="fc_item_id" value="'.$field->item_id.'"/>'."\n".
-							'<input type="hidden" name="fc_file_id" value="'.$file_id.'"/>'."\n";
-					}
-					
-					// The download button in a mini form ...
-					$str  = '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'">';
-					$str .= $file_data_fields;
-					$str .= $icon.'<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>'. $name_html ." ". $text_html;
-					$str .= '</form>'."\n";
+				// NO ACCESS: add file info via form field elements, in case the URL target needs to use them
+				$file_data_fields = "";
+				if ( !$authorized && $noaccess_addvars) {
+					$file_data_fields =
+						'<input type="hidden" name="fc_field_id" value="'.$field->id.'"/>'."\n".
+						'<input type="hidden" name="fc_item_id" value="'.$field->item_id.'"/>'."\n".
+						'<input type="hidden" name="fc_file_id" value="'.$file_id.'"/>'."\n";
 				}
+				
+				// The download button in a mini form ...
+				$str .= '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" >';
+				$str .= $file_data_fields;
+				$str .= '<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>';
+				$str .= $text_html;
+				$str .= '</form>'."\n";
 			}
 			
 			
@@ -447,33 +447,39 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// *******************************************************************************************
 			
 			else {
+				$str = $icon;
 				
 				// MULTI-DOWNLOAD MODE: the link will add file to download list (tree) (handled via a downloads manager module)
 				if ($authorized && $use_downloads_manager && !$file_data->url) {
-					$class_str .= ($class_str ? ' ' : '') .'fcfile_addFile';   // CSS class to anchor downloads list adding function
+					$_class_str = $class_str;
+					$_class_str .= ($_class_str ? ' ' : '').'fc_button fcsimple';  // Force using button, since allowing both ADD to cart and direct download
+					$_class_str .= ($_class_str ? ' ' : '') .'fcfile_addFile';   // CSS class to anchor downloads list adding function
 					
-					$attribs  = ' class="'. $class_str .'"';
+					$attribs  = ' class="'. $_class_str .'"';
 					$attribs .= ' title="'. $alt_str .'"';
 					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filename,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';
 					$attribs .= ' contentid="'. $field->item_id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';
-					$str = '<a href="javascript:;" '. $attribs .' >'.$name_str.'</a> '. $text_html;
+					$str .= $name_html;
+					$str .= '<a href="javascript:;" '. $attribs .' >' .JText::_('FLEXI_FIELD_FILE_ADD_TO_DOWNLOADS_CART'). '</a> '. $text_html;
 				}
 				
 				// SINGLE (INSTANT) DOWNLOAD MODE
-				else {
-					
-					// NO ACCESS: add file info via URL variables, in case the URL target needs to use them
-					if ( !$authorized && $noaccess_addvars) {
-						$dl_link .=
-							'&fc_field_id="'.$field->id.
-							'&fc_item_id="'.$field->item_id.
-							'&fc_file_id="'.$file_id;
-					}
-					
-					// The download link
-					$str = $icon . '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</a> '. $text_html;
+				// NO ACCESS: add file info via URL variables, in case the URL target needs to use them
+				if ( !$authorized && $noaccess_addvars) {
+					$dl_link .=
+						'&fc_field_id="'.$field->id.
+						'&fc_item_id="'.$field->item_id.
+						'&fc_file_id="'.$file_id;
+				}
+				
+				// The download link
+				if ($use_downloads_manager) {  // if using downloads manager we need to display button
+					$class_str .= ($class_str ? ' ' : '').'fc_button fcsimple';
+					$str .= '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' .JText::_('FLEXI_DOWNLOAD'). '</a> '. $text_html;
+				} else {
+					$str .= '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</a> '. $text_html;
 				}
 			}
 			

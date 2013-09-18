@@ -1558,6 +1558,21 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
+		$image_source = $field->parameters->get('image_source', 0);
+		$dir = $field->parameters->get('dir');
+		
+		if ($image_source) {
+			jimport('joomla.filesystem.file');
+			jimport('joomla.filesystem.folder');
+			jimport('joomla.filesystem.jpath');
+			
+			// Delete image folder if it exists
+			$destpath = JPath::clean( JPATH_SITE .DS. $dir . DS. 'item_'.$field->item_id   . '_field_'.$field->id .DS);
+			if ( JFolder::exists($destpath) && !JFolder::delete($destpath) ) {
+				JError::raiseNotice(100, $field->label .': Notice: Unable to delete folder: '. $destpath );
+				return false;
+			}
+		}
 	}
 	
 	

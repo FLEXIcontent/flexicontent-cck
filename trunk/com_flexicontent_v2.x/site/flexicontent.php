@@ -176,7 +176,7 @@ if ( $cparams->get('default_menuitem_nopathway',1) ) {
 		if ($matches[1] == $default_menu_itemid) {
 			array_shift ($pathway_arr);
 			$pathway->setPathway($pathway_arr);
-			$pathway->set('_count',count($pathway_arr));
+			//$pathway->set('_count',count($pathway_arr));  // not needed ??
 		}
 	}
 }
