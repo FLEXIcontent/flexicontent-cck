@@ -118,9 +118,9 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$lists['search_itemtitle']= $search_itemtitle;
 		$lists['search_itemid']= $search_itemid;
 		
-		$pagination = $this->get('Pagination');
-		$data   = $this->get('Data');
+		$data   = $this->get('Data');  // MUST BE BEFORE getCount and getPagination because it also calculates total rows
 		$total  = $this->get('Count');
+		$pagination = $this->get('Pagination');
 		$limitstart = $this->get('LimitStart');
 
 		$js = "window.addEvent('domready', function(){";

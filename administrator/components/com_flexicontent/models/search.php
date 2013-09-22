@@ -121,7 +121,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	 */
 	public function getCount() {
 		// Lets load the Items if it doesn't already exist
-		if (empty($this->_total)) {
+		if ( $this->_total === null ) {
 			$query = $this->_buildQuery();
 			$this->_total = $this->_getListCount($query);
 		}
@@ -140,23 +140,53 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		if ( !$query_ids ) {
 			$where		= $this->_buildWhere();
 			$orderby	= $this->_buildOrderBy();
+			
+			$app = JFactory::getApplication();
+			$option = JRequest::getVar('option');
+			
+			$filter_order = $app->getUserStateFromRequest( $option.'.search.filter_order', 'filter_order', 'a.title', 'cmd' );
+			$filter_order = $filter_order ? $filter_order : 'a.title';  // this is default
+			
+			$filter_fieldtype = $app->getUserStateFromRequest( $option.'.search.filter_fieldtype', 'filter_fieldtype', '', 'word' );
+			$filter_itemstate	= $app->getUserStateFromRequest( $option.'.search.filter_itemstate', 'filter_itemstate', '', 'word' );
+			$filter_itemtype	= $app->getUserStateFromRequest( $option.'.search.filter_itemtype', 'filter_itemtype', '', 'int' );
+			
+			$search_itemtitle	= $app->getUserStateFromRequest( $option.'.search.search_itemtitle', 'search_itemtitle', '', 'string' );
+			$search_itemid		= $app->getUserStateFromRequest( $option.'.search.search_itemid', 'search_itemid', '', 'int' );
 		}
 		
 		$query = !$query_ids ?
-			'SELECT SQL_CALC_FOUND_ROWS ai.sid ' :
-			'SELECT f.label, f.name, f.field_type, ai.*, a.title, a.id ';
-		$query .= ''
-			.' FROM #__flexicontent_advsearch_index as ai'
-			.' JOIN #__content as a ON ai.item_id=a.id'
-			.' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'
-			.' JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=ai.field_id AND rel.type_id=ext.type_id'
-			.' JOIN #__flexicontent_fields as f ON ai.field_id=f.id'
-			;
+			'SELECT SQL_CALC_FOUND_ROWS ai.sid '."\n" :
+			'SELECT f.label, f.name, f.field_type, ai.*, a.title, a.id '."\n";
+		$query .= ' FROM #__flexicontent_advsearch_index as ai'."\n";
+		if ($query_ids) {
+			$query .= ''
+				.' JOIN #__content as a ON ai.item_id=a.id'."\n"
+				.' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'."\n"
+				.' JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=ai.field_id AND rel.type_id=ext.type_id'."\n"
+				.' JOIN #__flexicontent_fields as f ON ai.field_id=f.id'."\n"
+				;
+		} else {
+			if ( in_array($filter_order, array('f.label','f.name','f.field_type')) || $filter_fieldtype )
+				$query .= ''
+					.' JOIN #__content as a ON ai.item_id=a.id'."\n"
+					.' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'."\n"
+					.' JOIN #__flexicontent_fields_type_relations as rel ON rel.field_id=ai.field_id AND rel.type_id=ext.type_id'."\n"
+					.' JOIN #__flexicontent_fields as f ON ai.field_id=f.id'."\n"
+					;
+			else {
+				if ($filter_order == 'a.title' || $filter_itemstate || $filter_itemtype || $search_itemtitle || $search_itemid)
+					$query .= ' JOIN #__content as a ON ai.item_id=a.id'."\n";
+				if ($filter_itemtype)
+					$query .= ' JOIN #__flexicontent_items_ext as ext ON ext.item_id=a.id'."\n";
+			}
+		}
 		$query .= !$query_ids ?
 			$where.$orderby :
 			' WHERE ai.sid IN ('. implode(',', $query_ids) .')';
-			
-		//echo "<pre>"; die($query);
+		
+		//debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+		//echo "<pre>". $query ."</pre>";
 		return $query;
 	}
 
@@ -237,7 +267,7 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		}
 		
 		if ($search_itemtitle) {
-			$search_itemtitle_escaped = FLEXI_J16GE ? $this->_db->escape( $search_index, true ) : $this->_db->getEscaped( $search_index, true );
+			$search_itemtitle_escaped = FLEXI_J16GE ? $this->_db->escape( $search_itemtitle, true ) : $this->_db->getEscaped( $search_itemtitle, true );
 			$where[] = ' LOWER(a.title) LIKE '.$this->_db->Quote( '%'.$search_itemtitle_escaped.'%', false );
 		}
 		

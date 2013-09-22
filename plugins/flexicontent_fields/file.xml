@@ -95,7 +95,7 @@
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
 			
 			<field name="" type="separator" default="Support of 3rd-party software" level="level1" />

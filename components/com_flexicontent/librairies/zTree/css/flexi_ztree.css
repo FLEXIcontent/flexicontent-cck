@@ -42,8 +42,8 @@ ul.ztree h4, ul.ztree h5, ul.ztree h6 {color: #2f332a !important; font-weight: b
 ul.ztree h1 {font-size: 24px !important; line-height: 34px !important; text-align: center !important;}
 ul.ztree h2 {font-size: 14px !important; line-height: 24px !important; padding-top: 5px !important;}
 ul.ztree h6 {font-weight: normal !important; font-size: 12px !important; letter-spacing: 1px !important; line-height: 24px !important; text-align: center !important;}
-ul.ztree a {color: black  !important; text-decoration: none  !important;}
-ul.ztree a:hover {background-color: gray  !important; color:white  !important;}
+ul.ztree li a {color: black  !important; text-decoration: none  !important;}
+ul.ztree li a:hover {background-color: gray !important; color: white !important; text-decoration: none !important;}
 ul.ztree input.radio {margin: 0 2px 0 8px !important;}
 ul.ztree input.radio.first {margin-left:0 !important;}
 ul.ztree input.empty {color: lightgray !important;}
@@ -56,3 +56,6 @@ ul.ztree .highlight_green {color:#A7F43D !important;}
 .zTreeBackground ul.log li {color: #666666 !important;list-style: none !important;padding-left: 10px !important;}
 .zTreeBackground ul.log li.dark {background-color: #E3E3E3 !important;}
 
+ul.ztree li ul { right: 0 !important;  width: auto !important; }
+ul.ztree li a.curSelectedNode { width: 90% !important; display:block; }
+ul.ztree li a.curSelectedNode input.rename { width: 94% !important; padding 0px 1% !important;}

@@ -229,8 +229,8 @@ function delAllFilters() {
 
 	<input type="hidden" name="task" value="display" />
 	<input type="hidden" name="boxchecked" value="0" />
-	<input type="hidden" name="filter_order" value="<?php //echo $this->state->get('list.ordering') ?>" />
-	<input type="hidden" name="filter_order_Dir" value="<?php //echo $this->state->get('list.direction') ?>" />
+	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
+	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<input type="hidden" name="controller" value="search" />
 	<?php echo JHTML::_('form.token'); ?>
 </form>
