@@ -52,7 +52,7 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
@@ -62,7 +62,7 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
 			
 		</params>
@@ -96,13 +96,13 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
-				<option value="2">FLEXI_DISPLAY_AS_DUAL_SELECT_FIELD_RANGE</option>
-				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="1">FLEXI_DISPLAY_AS_DATE_PICKER</option>
+				<option value="2">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
+				<option value="3">FLEXI_DISPLAY_AS_DATE_PICKER_RANGE</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="date_filter_group" type="list" default="0" label="FLEXI_FILTER_DATE_GROUPING" description="FLEXI_FILTER_DATE_GROUPING_DESC">
 				<option value="year">FLEXI_YEAR</option>
@@ -121,20 +121,20 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
-				<option value="2">FLEXI_DISPLAY_AS_DUAL_SELECT_FIELD_RANGE</option>
-				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="1">FLEXI_DISPLAY_AS_DATE_PICKER</option>
+				<option value="2">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
+				<option value="3">FLEXI_DISPLAY_AS_DATE_PICKER_RANGE</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="date_filter_group_s" type="list" default="0" label="FLEXI_FILTER_DATE_GROUPING" description="FLEXI_FILTER_DATE_GROUPING_DESC">
 				<option value="year">FLEXI_YEAR</option>
 				<option value="month">FLEXI_MONTH</option>
 				<option value="day">FLEXI_DAY</option>
 			</field>
-			<field name="show_matching_items_" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
+			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -166,10 +166,10 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -183,10 +183,10 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -224,13 +224,13 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
-				<option value="2">FLEXI_DISPLAY_AS_DUAL_SELECT_FIELD_RANGE</option>
-				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="1">FLEXI_DISPLAY_AS_DATE_PICKER</option>
+				<option value="2">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
+				<option value="3">FLEXI_DISPLAY_AS_DATE_PICKER_RANGE</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="date_filter_group" type="list" default="0" label="FLEXI_FILTER_DATE_GROUPING" description="FLEXI_FILTER_DATE_GROUPING_DESC">
 				<option value="year">FLEXI_YEAR</option>
@@ -249,13 +249,13 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
-				<option value="2">FLEXI_DISPLAY_AS_DUAL_SELECT_FIELD_RANGE</option>
-				<option value="3">FLEXI_DISPLAY_AS_DUAL_TEXT_FIELD_RANGE</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="1">FLEXI_DISPLAY_AS_DATE_PICKER</option>
+				<option value="2">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
+				<option value="3">FLEXI_DISPLAY_AS_DATE_PICKER_RANGE</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="date_filter_group_s" type="list" default="0" label="FLEXI_FILTER_DATE_GROUPING" description="FLEXI_FILTER_DATE_GROUPING_DESC">
 				<option value="year">FLEXI_YEAR</option>
@@ -294,10 +294,10 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -311,10 +311,10 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -348,10 +348,10 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -365,10 +365,10 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -408,10 +408,10 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -425,10 +425,10 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -572,8 +572,8 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -588,8 +588,8 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -627,10 +627,10 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -644,10 +644,10 @@
 				<option value="2">FLEXI_INSIDE_FILTER</option>
 			</field>
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="0">FLEXI_DISPLAY_AS_SINGLE_SELECT_FIELD</option>
-				<option value="4">FLEXI_DISPLAY_AS_SINGLE_TOGGLE_BUTTONS</option>
-				<option value="5">FLEXI_DISPLAY_AS_MULTI_TOGGLE_BUTTONS</option>
-				<option value="6">FLEXI_DISPLAY_AS_MULTIPLE_SELECT_FIELD</option>
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -684,7 +684,7 @@
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
-				<option value="1">FLEXI_DISPLAY_AS_SINGLE_TEXT_FIELD</option>
+				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
 			
 		</params>

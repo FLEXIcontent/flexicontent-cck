@@ -567,6 +567,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// ******************************************************************
 		foreach ($fields_filter as $filter)
 		{
+			$filter->parameters->set('display_label_filter_s', 0);
 			$filter->value = JRequest::getVar('filter_'.$filter->id, false);
 			//$fieldsearch = $app->getUserStateFromRequest( 'flexicontent.search.'.'filter_'.$filter->id, 'filter_'.$filter->id, array(), 'array' );
 			//echo "Field name: ".$filter->name; echo ":: ". 'filter_'.$filter->id ." :: value: "; print_r($filter->value); echo "<br/>\n";

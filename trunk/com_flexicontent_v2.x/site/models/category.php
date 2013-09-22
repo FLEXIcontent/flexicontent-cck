@@ -642,8 +642,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _buildItemFromJoin()
 	{
-		$fromjoin = ''
-			. ' FROM #__content AS i'
+		static $fromjoin = null;
+		if ($fromjoin) return $fromjoin;
+		
+		$from_clause  = ' FROM #__content AS i';
+		$join_clauses = ''
 			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
@@ -653,6 +656,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '')
 			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '')
 			;
+		
+		global $fc_catviev;
+		$fc_catviev['join_clauses'] = $join_clauses;
+		
+		$fromjoin = $from_clause.$join_clauses;
 		return $fromjoin;
 	}
 	

@@ -267,7 +267,7 @@ class flexicontent_html
 			if (!$jquery_added) {
 				JHtml::_('jquery.framework');
 				JHtml::_('jquery.ui', array('core', 'sortable')); 
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
 			}
 			$jquery_added = 1;
 			return;
@@ -275,18 +275,18 @@ class flexicontent_html
 
 		if ( $add_jquery && !$jquery_added && !JPluginHelper::isEnabled('system', 'jquerysupport') )
 		{
-			$document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-'.FLEXI_JQUERY_VER.'.js');
+			$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-'.FLEXI_JQUERY_VER.'.js');
 			// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
 			//$document->addCustomTag('<script>jQuery.noConflict();</script>');
 			$jquery_added = 1;
 		}
 		if ( $add_jquery_ui && !$jquery_ui_added ) {
-			$document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery/js/jquery-ui-'.FLEXI_JQUERY_UI_VER.'.js');
+			$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui-'.FLEXI_JQUERY_UI_VER.'.js');
 			$jquery_ui_added = 1;
 		}
 		if ( $add_jquery_ui_css && !$jquery_ui_css_added ) {
 			$ui_style = 'smoothness'; // lightness
-			$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/jquery/css/ui-'.$ui_style.'/jquery-ui-'.FLEXI_JQUERY_UI_CSS_VER.'.css');
+			$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/jquery/css/ui-'.$ui_style.'/jquery-ui-'.FLEXI_JQUERY_UI_CSS_VER.'.css');
 			$jquery_ui_css_added = 1;
 		}
 	}
@@ -357,21 +357,33 @@ class flexicontent_html
 			case 'jQuery':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				break;
+			
+			case 'mCSB':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				$document->addScript( JURI::root(true).'/components/com_flexicontent/librairies/mCSB/jquery.mCustomScrollbar.min.js' );
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/mCSB/jquery.mCustomScrollbar.css');
+				$js .= "
+					jQuery(document).ready(function(){
+					    jQuery('.fc_add_scroller').mCustomScrollbar({theme:'dark-thick'});
+					});
+				";
+				break;
+			
 			case 'image-picker':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				$document->addScript( JURI::root().'components/com_flexicontent/librairies/image-picker/image-picker.min.js' );
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/image-picker/image-picker.css');
+				$document->addScript( JURI::root(true).'/components/com_flexicontent/librairies/image-picker/image-picker.min.js' );
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/image-picker/image-picker.css');
 				break;
 			
 			case 'masonry':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				$document->addScript( JURI::root().'components/com_flexicontent/librairies/masonry/jquery.masonry.min.js' );
+				$document->addScript( JURI::root(true).'/components/com_flexicontent/librairies/masonry/jquery.masonry.min.js' );
 				break;
 			
 			case 'select2':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				$document->addScript( JURI::root().'components/com_flexicontent/librairies/select2/select2.js' );
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/select2/select2.css');
+				$document->addScript( JURI::root(true).'/components/com_flexicontent/librairies/select2/select2.js' );
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/select2/select2.css');
 				
 				$js .= "
 					jQuery(document).ready(function() {
@@ -492,7 +504,7 @@ class flexicontent_html
 			
 			case 'inputmask':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				$document->addScript( JURI::root().'components/com_flexicontent/librairies/inputmask/jquery.inputmask.bundle.min.js' );
+				$document->addScript( JURI::root(true).'/components/com_flexicontent/librairies/inputmask/jquery.inputmask.bundle.min.js' );
 				
 				// Extra inputmask declarations definitions, e.g. ...
 				/*$js .= "
@@ -515,8 +527,8 @@ class flexicontent_html
 			
 			case 'prettyCheckable':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				$document->addScript( JURI::root().'components/com_flexicontent/librairies/prettyCheckable/prettyCheckable.js' );
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/prettyCheckable/prettyCheckable.css');
+				$document->addScript( JURI::root(true).'/components/com_flexicontent/librairies/prettyCheckable/prettyCheckable.js' );
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/prettyCheckable/prettyCheckable.css');
 				$js .= "
 					jQuery(document).ready(function(){
 						jQuery('input.use_prettycheckable').prettyCheckable();
@@ -532,18 +544,18 @@ class flexicontent_html
 			case 'fancybox':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				// Add mousewheel plugin (this is optional)
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/lib/jquery.mousewheel-3.0.6.pack.js');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/fancybox/lib/jquery.mousewheel-3.0.6.pack.js');
 				
 				// Add fancyBox CSS / JS
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/fancybox/source/jquery.fancybox.css?v=2.1.1');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/jquery.fancybox.pack.js?v=2.1.1');
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/fancybox/source/jquery.fancybox.css?v=2.1.1');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/fancybox/source/jquery.fancybox.pack.js?v=2.1.1');
 				
 				// Optionally add helpers - button, thumbnail and/or media
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-buttons.css?v=1.0.4');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-buttons.js?v=1.0.4');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-media.js?v=1.0.4');
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-thumbs.css?v=1.0.7');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-thumbs.js?v=1.0.7');
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-buttons.css?v=1.0.4');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-buttons.js?v=1.0.4');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-media.js?v=1.0.4');
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-thumbs.css?v=1.0.7');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/fancybox/source/helpers/jquery.fancybox-thumbs.js?v=1.0.7');
 				
 				// Attach fancybox to all elements having a specific CSS class
 				$js .= "
@@ -557,10 +569,10 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				// Add galleriffic CSS / JS
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/galleriffic/css/basic.css');
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/galleriffic/css/galleriffic-3.css');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/galleriffic/js/jquery.galleriffic.js');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/galleriffic/js/jquery.opacityrollover.js');
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/galleriffic/css/basic.css');
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/galleriffic/css/galleriffic-3.css');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/galleriffic/js/jquery.galleriffic.js');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/galleriffic/js/jquery.opacityrollover.js');
 				
 				//$view_width = 500;
 				$js = "
@@ -624,23 +636,23 @@ class flexicontent_html
 			case 'elastislide':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/elastislide/css/demo.css');
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/elastislide/css/style.css');
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/elastislide/css/elastislide.css');
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/elastislide/css/demo.css');
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/elastislide/css/style.css');
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/elastislide/css/elastislide.css');
 				
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/elastislide/js/jquery.tmpl.min.js');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/elastislide/js/jquery.easing.1.3.js');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/elastislide/js/jquery.elastislide.js');
-				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/elastislide/js/gallery.js'); // replace with field specific: gallery_tmpl.js
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/elastislide/js/jquery.tmpl.min.js');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/elastislide/js/jquery.easing.1.3.js');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/elastislide/js/jquery.elastislide.js');
+				//$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/elastislide/js/gallery.js'); // replace with field specific: gallery_tmpl.js
 				break;
 			
 			case 'photoswipe':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				// Add swipe CSS / JS
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/photoswipe/photoswipe.css');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/photoswipe/lib/klass.min.js');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/photoswipe/code.photoswipe.jq.min.js');
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/photoswipe/photoswipe.css');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/photoswipe/lib/klass.min.js');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/photoswipe/code.photoswipe.jq.min.js');
 				$js = "
 				jQuery(document).ready(function() {
 					var myPhotoSwipe = jQuery('.photoswipe_fccontainer a').photoSwipe({ enableMouseWheel: false , enableKeyboard: false }); 
@@ -653,10 +665,8 @@ class flexicontent_html
 				FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 				
 				// Add swipe CSS / JS
-				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/noobSlide/_class.noobSlide.js');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/noobSlide/_class.noobSlide.packed.js');
-				//$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/noobSlide/_web.css');
-				//$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/noobSlide/style.css');
+				//$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/noobSlide/_class.noobSlide.js');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/noobSlide/_class.noobSlide.packed.js');
 				
 				//$js = "";
 				break;
@@ -665,23 +675,22 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				// Add swipe CSS / JS
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/zTree/css/flexi_ztree.css');
-				$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/zTree/css/zTreeStyle/zTreeStyle.css');
-				$document->addScript(JURI::root().'components/com_flexicontent/librairies/zTree/js/jquery.ztree.all-3.5.min.js');
-				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/zTree/js/jquery.ztree.core-3.5.js');
-				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/zTree/js/jquery.ztree.excheck-3.5.js');
-				//$document->addScript(JURI::root().'components/com_flexicontent/librairies/zTree/js/jquery.ztree.exedit-3.5.js');
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/zTree/css/flexi_ztree.css');
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/zTree/css/zTreeStyle/zTreeStyle.css');
+				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/zTree/js/jquery.ztree.all-3.5.min.js');
+				//$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/zTree/js/jquery.ztree.core-3.5.js');
+				//$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/zTree/js/jquery.ztree.excheck-3.5.js');
+				//$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/zTree/js/jquery.ztree.exedit-3.5.js');
 				$js = "";
 				break;
 			
 			case 'flexi_tmpl_common':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				flexicontent_html::loadFramework('select2');  // make sure select2 is loaded
-				$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/tmpl-common.js' );
+				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js' );
 				FLEXI_J16GE ? JText::script("FLEXI_APPLYING_FILTERING") : fcjsJText::script("FLEXI_APPLYING_FILTERING");
 				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_LIST") : fcjsJText::script("FLEXI_TYPE_TO_LIST");
 				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_FILTER") : fcjsJText::script("FLEXI_TYPE_TO_FILTER");
-				$js = 'var fc_base_url="'.JURI::base().'"';
 				break;
 			
 			default:
@@ -1117,6 +1126,7 @@ class flexicontent_html
 
 	 	if (!$js_and_css_added && $canChangeState && $addToggler )
 	 	{
+			// File exists both in frontend & backend (and is different), so we will use 'base' method and not 'root'
 			$document->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/stateselector.js' );
 	 		$js ='
 				if(MooTools.version>="1.2.4") {
@@ -1161,7 +1171,7 @@ class flexicontent_html
 			$publish_down->setOffset($tz_offset);
 		}
 
-		$img_path = JURI::root()."components/com_flexicontent/assets/images/";
+		$img_path = JURI::root(true)."/components/com_flexicontent/assets/images/";
 
 
 		// Create publish information
@@ -1386,9 +1396,10 @@ class flexicontent_html
 
 		// Create the button
 		if ( $params->get('show_icons') ) {
+			$attribs = ' style="margin-right:4px;" width="16" align="top" ';
 			$image = FLEXI_J16GE ?
-				JHTML::image( 'components/com_flexicontent/assets/images/'.'add.png', JText::_( 'FLEXI_ADD_NEW_CONTENT' ), ' style="margin-right:4px;" width="16" align="top" ') :
-				JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_ADD_NEW_CONTENT' ), ' style="margin-right:4px;" width="16" align="top" ') ;
+				JHTML::image( 'components/com_flexicontent/assets/images/'.'add.png', JText::_( 'FLEXI_ADD_NEW_CONTENT' ), $attribs) :
+				JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_ADD_NEW_CONTENT' ), $attribs) ;
 		} else {
 			$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_ADD_NEW_CONTENT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 		}
@@ -1457,7 +1468,7 @@ class flexicontent_html
 
 		// Create state icon image
 		$app = JFactory::getApplication();
-		$path = (!FLEXI_J16GE && $app->isAdmin() ? '../' : '').'components/com_flexicontent/assets/images/';  // no need to prefix this with JURI::root(), it will be done below
+		$path = (!FLEXI_J16GE && $app->isAdmin() ? '../' : '').'components/com_flexicontent/assets/images/';
 		if ( $params->get('show_icons', 1) ) {
 			$icon = FLEXI_J16GE ?
 				JHTML::image( $path.$img, $alt, $attribs) :
@@ -1690,7 +1701,7 @@ class flexicontent_html
 		$dim			= $field->parameters->get( 'dimension', 16 );
 		$image		= $field->parameters->get( 'image', 'components/com_flexicontent/assets/images/star-small.png' );
 		$class 		= $field->name;
-		$img_path	= JURI::base(true) .'/'. $image;
+		$img_path	= JURI::root(true).'/'.$image;
 		
 		// Get number of displayed stars, configuration
 		$rating_resolution = (int)$field->parameters->get('rating_resolution', 5);
@@ -1708,12 +1719,12 @@ class flexicontent_html
 			$document = JFactory::getDocument();
 			FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
 	 		JHTML::_('behavior.tooltip');   // This is also needed
-			$css 	= JURI::base(true) .'/components/com_flexicontent/assets/css/fcvote.css';
-			$js		= JURI::base(true) .'/components/com_flexicontent/assets/js/fcvote.js';
+			$css 	= JURI::root(true).'/components/com_flexicontent/assets/css/fcvote.css';
+			$js		= JURI::root(true).'/components/com_flexicontent/assets/js/fcvote.js';
 			$document->addStyleSheet($css);
 			$document->addScript($js);
 
-			$document->addScriptDeclaration('var fcvote_rfolder = "'.JURI::base(true).'";');
+			$document->addScriptDeclaration('var fcvote_rfolder = "'.JURI::root(true).'";');
 
 			$css = '
 			.'.$class.' .fcvote {line-height:'.$dim.'px;}
@@ -1877,10 +1888,10 @@ class flexicontent_html
 			$document	= JFactory::getDocument();
 			FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
 	 		JHTML::_('behavior.tooltip');   // This is also needed
-			$document->addScript( JURI::base(true) .'/components/com_flexicontent/assets/js/fcfav.js' );
+			$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/fcfav.js' );
 
 			$js = "
-				var fcfav_rfolder = '".JURI::base(true)."';
+				var fcfav_rfolder = '".JURI::root(true)."';
 				var fcfav_text=Array(
 					'".JText::_( 'FLEXI_YOUR_BROWSER_DOES_NOT_SUPPORT_AJAX',true )."',
 					'".JText::_( 'FLEXI_LOADING',true )."',
@@ -2252,7 +2263,7 @@ class flexicontent_html
 			$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
 			$state_descrs = array(1=>'FLEXI_PUBLISH_THIS_ITEM', -5=>'FLEXI_SET_ITEM_IN_PROGRESS', 0=>'FLEXI_UNPUBLISH_THIS_ITEM', -3=>'FLEXI_SET_ITEM_PENDING', -4=>'FLEXI_SET_ITEM_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVE_THIS_ITEM', -2=>'FLEXI_TRASH_THIS_ITEM');
 			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png');
-			$img_path = JURI::root()."components/com_flexicontent/assets/images/";
+			$img_path = JURI::root(true)."/components/com_flexicontent/assets/images/";
 
 			$list = '';
 			foreach ($state_ids as $i => $state_id) {
@@ -3655,7 +3666,8 @@ class FLEXIUtilities
 			require_once(JPATH_ROOT.DS.'administrator'.DS.'components'.DS.'com_joomfish'.DS.'helpers'.DS.'extensionHelper.php' );
 			foreach ($languages as $lang) {
 				// Get image path via helper function
-				$lang->imgsrc = JURI::root().JoomfishExtensionHelper::getLanguageImageSource($lang);
+				$_imgsrc = JoomfishExtensionHelper::getLanguageImageSource($lang);
+				$lang->imgsrc = JURI::root(true).($_imgsrc[0]!='/' ? '/' : '').$_imgsrc;
 			}
 		}
 		else      // JoomFish until v2.1

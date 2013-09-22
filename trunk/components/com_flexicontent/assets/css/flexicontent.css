@@ -513,7 +513,8 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 input.fc_text_filter,  input.fc_text_filter:focus,
 input.fc_field_filter, input.fc_field_filter:focus {
 	height: 14px !important;
-	padding: 5px 26px 7px 4px !important;
+	padding: 6px 26px 7px 4px !important;
+	margin: 3px 4px 4px 8px !important;
 	position: relative;
 	/* background: transparent; ... does not work properly with ie8/9, it causes: */
 	/* any element with less z-index to be placed above this element, */
@@ -530,7 +531,7 @@ input.fc_field_filter, input.fc_field_filter:focus {
 }
 
 
-form.fc_instant_filter { display: block; margin: 0px !important; padding: 0px !important; }
+form.fc_instant_filter { display: block; margin: 0px !important; padding: 0px !important; position: relative !important; }
 select.fc_field_filter { margin: 2px 2px 2px 2px !important; }
 input.fc_text_filter { vertical-align: top; }
 input.fc_field_filter { vertical-align: top; }
@@ -563,7 +564,7 @@ ul.fc_field_filter.fc_checkradio_group label {
 
 .fc_has_inner_label.fc_has_inner_label_input,
 .fc_has_inner_prompt.fc_has_inner_prompt_input {
-	left:14px !important; top:8px !important; color: black !important;
+	left:14px !important; top:10px !important; color: black !important;
 }
 .fc_has_inner_label.fc_has_inner_label_select2,
 .fc_has_inner_prompt.fc_has_inner_prompt_select2 {

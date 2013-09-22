@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1699 2013-07-30 04:29:37Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1767 2013-09-18 17:46:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -2053,15 +2053,16 @@ class FlexicontentFields
 		
 		$isdate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
 		$default_size = $isdate ? 15 : 30;
+		$_s = $isSearchView ? '_s' : '';
 		
 		// Some parameter shortcuts
-		$label_filter = $filter->parameters->get( $isSearchView ? 'display_label_filter_s' : 'display_label_filter', 0 ) ;   // How to show filter label
+		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 0 ) ;   // How to show filter label
 		$size         = $filter->parameters->get( 'text_filter_size', $default_size );        // Size of filter
 		
-		$display_filter_as = $filter->parameters->get( $isSearchView ? 'display_filter_as_s' : 'display_filter_as', 0 );  // Filter Type of Display
-		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
+		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
+		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
-		$show_matching_items = $filter->parameters->get('show_matching_items', 1);
+		$show_matching_items = $filter->parameters->get( 'show_matching_items'.$_s, 1 );
 		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
 		
 		$filter_ffname = 'filter_'.$filter->id;
@@ -2179,7 +2180,7 @@ class FlexicontentFields
 			
 			foreach($results as $result) {
 				if ( !strlen($result->value) ) continue;
-				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text), 'value', 'text', $disabled = !$result->found);
+				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text), 'value', 'text', $disabled = ($show_matches && !$result->found));
 			}
 			if ($display_filter_as==0 || $display_filter_as==6) {
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
@@ -2218,14 +2219,20 @@ class FlexicontentFields
 			}
 			break;
 		case 4: case 5:  // 4: radio (single value selectable), 5: checkbox (multiple values selectable)
+			$lf_min = 10;  // add parameter for this ?
+			$add_lf = count($results) >= $lf_min;
+			if ($add_lf)  flexicontent_html::loadFramework('mCSB');
+			$clear_values = 0;
+			$value_style = $clear_values ? 'float:left; clear:both;' : '';
+			
 			$i = 0;
 			$checked = ($display_filter_as==5) ? !count($value) || !strlen(reset($value)) : !strlen($value);
 			$checked_attr = $checked ? 'checked="checked"' : '';
 			$checked_class = $checked ? 'fc_highlight' : '';
 			$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
-			$filter->html .= '<span class="fc_checkradio_group_wrapper'.(count($results) > 9 ? ' fc_list_filter_wrapper':'').'">';
-			$filter->html .= '<ul class="fc_field_filter fc_checkradio_group'.(count($results) > 9 ? ' fc_list_filter':'').'">';
-			$filter->html .= '<li class="fc_checkradio_option fc_checkradio_special'.$checked_class_li.'">';
+			$filter->html .= '<span class="fc_checkradio_group_wrapper fc_add_scroller'.($add_lf ? ' fc_list_filter_wrapper':'').'">';
+			$filter->html .= '<ul class="fc_field_filter fc_checkradio_group'.($add_lf ? ' fc_list_filter':'').'">';
+			$filter->html .= '<li class="fc_checkradio_option fc_checkradio_special'.$checked_class_li.'" style="'.$value_style.'">';
 			if ($display_filter_as==4) {
 				$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this, \'fc_highlight\', 1);" ';
 				$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
@@ -2244,11 +2251,11 @@ class FlexicontentFields
 				if ( !strlen($result->value) ) continue;
 				$checked = ($display_filter_as==5) ? in_array($result->value, $value) : $result->value==$value;
 				$checked_attr = $checked ? ' checked=checked ' : '';
-				$disable_attr = !$result->found ? ' disabled=disabled ' : '';
+				$disable_attr = $show_matches && !$result->found ? ' disabled=disabled ' : '';
 				$checked_class = $checked ? 'fc_highlight' : '';
-				$checked_class .= !$result->found ? ' fcdisabled ' : '';
+				$checked_class .= $show_matches && !$result->found ? ' fcdisabled ' : '';
 				$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
-				$filter->html .= '<li class="fc_checkradio_option'.$checked_class_li.'">';
+				$filter->html .= '<li class="fc_checkradio_option'.$checked_class_li.'" style="'.$value_style.'">';
 				if ($display_filter_as==4) {
 					$filter->html .= ' <input href="javascript:;" onclick="fc_toggleClassGrp(this, \'fc_highlight\');" ';
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
@@ -2311,9 +2318,9 @@ class FlexicontentFields
 	static function createFilterValues($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop)
 	{
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
-		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
+		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
-		$show_matching_items = $filter->parameters->get('show_matching_items', 1);
+		$show_matching_items = $filter->parameters->get( 'show_matching_items', 1 );
 		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
 		
 		$_results = FlexicontentFields::getFilterValues($filter, $view_join, $view_where, $filters_where);
@@ -2324,8 +2331,7 @@ class FlexicontentFields
 			// Limit indexed element according to DB results found
 			$results = array_intersect_key($indexed_elements, $_results);
 			if ($show_matches) foreach ($results as $i => $result) {
-				$results[$i] = clone($result);
-				$results[$i]->found = $_results[$i]->found;
+				$result->found = $_results[$i]->found;
 			}
 			
 		// Support for multi-property fields
@@ -2366,9 +2372,9 @@ class FlexicontentFields
 	static function createFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop)
 	{
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
-		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
+		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
-		$show_matching_items = $filter->parameters->get('show_matching_items', 1);
+		$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
 		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
 		
 		$filter->filter_isindexed = (boolean) $indexed_elements; 
@@ -2409,7 +2415,13 @@ class FlexicontentFields
 		$having  = @$filter->filter_having  ? $filter->filter_having  : '';
 		$orderby = @$filter->filter_orderby ? $filter->filter_orderby : '';
 		
-		$query = 'SELECT '. $valuesselect .', COUNT(DISTINCT i.id) as found '
+		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
+		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		
+		$show_matching_items = $filter->parameters->get( 'show_matching_items', 1 );
+		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
+		
+		$query = 'SELECT '. $valuesselect .($show_matches ? ', COUNT(DISTINCT i.id) as found ' : '')
 		. ' FROM #__content AS i'
 		. $valuesjoin
 		. $view_join
@@ -2456,8 +2468,14 @@ class FlexicontentFields
 		
 		$valuesselect = @$filter->filter_isindexed ? ' ai.value_id as value, ai.search_index as text ' : ' ai.search_index as value, ai.search_index as text';
 		
-		// Get ALL items that have such values for the given field
-		$query = ' SELECT '.$valuesselect.', COUNT(*) as found '
+		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
+		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		
+		$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
+		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
+		
+		// Get ALL records that have such values for the given field
+		$query = 'SELECT '. $valuesselect .($show_matches ? ', COUNT(DISTINCT i.id) as found ' : '')
 			.' FROM #__flexicontent_advsearch_index AS ai'
 			.' JOIN #__content i ON ai.item_id = i.id'
 			. $view_join
@@ -2889,7 +2907,7 @@ class FlexicontentFields
 	// Helper methods for handling runtime statistics
 	// **********************************************
 	
-	static function getFieldRenderTimes( &$fields_render_total=0)
+	static function getFieldRenderTimes( &$fields_render_total=0 )
 	{
 		global $fc_run_times;
 		$fields_render = array();
