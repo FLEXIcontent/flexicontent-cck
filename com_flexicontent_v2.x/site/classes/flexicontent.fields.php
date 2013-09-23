@@ -2030,7 +2030,8 @@ class FlexicontentFields
 		static $apply_cache = null;
 		$user = JFactory::getUser();
 		$mainframe = JFactory::getApplication();
-		$cparams   = $mainframe->getParams('com_flexicontent');
+		//$cparams   = $mainframe->getParams('com_flexicontent');
+		$cparams   = JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $cparams->get('print_logging_info');
 		
 		global $is_fc_component;
