@@ -19,6 +19,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 		</params>
+		
 		<params group="group-relation" addpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
@@ -164,6 +165,7 @@
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
 		</params>
+	
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_relation.ini</language>
 	</languages>

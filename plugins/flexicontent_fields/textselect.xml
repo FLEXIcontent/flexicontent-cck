@@ -19,6 +19,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 		</params>
+		
 		<params group="group-textselect" addpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TEXTSELECT_USAGE" level="level3" />

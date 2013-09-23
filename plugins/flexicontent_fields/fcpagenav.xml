@@ -13,6 +13,7 @@
 		<filename plugin="fcpagenav">fcpagenav.php</filename>
 		<folder plugin="fcpagenav">fcpagenav</folder>
 	</files>
+	
 		<params group="standard" addpath="/administrator/components/com_flexicontent/elements">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="1">FLEXI_YES</option>
@@ -21,8 +22,8 @@
 			<field name="frontend_hidden" type="hidden" default="1" />
 			<field name="backend_hidden" type="hidden" default="1" />
 		</params>
+		
 		<params group="group-fcpagenav">
-			
 			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_CSS" description="FLEXI_FIELD_PAGENAV_CSS_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
@@ -49,8 +50,8 @@
 				<option value="1">FLEXI_SHOW</option>
 				<option value="0">FLEXI_HIDE</option>
 			</field>
-			
 		</params>
+		
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_fcpagenav.ini</language>
 	</languages>

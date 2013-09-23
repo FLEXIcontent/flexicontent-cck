@@ -23,6 +23,7 @@
 			<field name="frontend_hidden" type="hidden" default="1" />
 			<field name="backend_hidden" type="hidden" default="1" />
 		</params>
+		
 		<params group="group-toolbar" addpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="Basic Configuration" level="level1" />

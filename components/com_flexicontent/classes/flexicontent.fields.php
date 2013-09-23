@@ -1871,6 +1871,7 @@ class FlexicontentFields
 		$db = JFactory::getDBO();
 		$display_filter_as = $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
 		$filter_compare_type = $filter->parameters->get( 'filter_compare_type', 0 );
+		$filter_values_combination = $filter->parameters->get( 'filter_values_combination', 0 );
 		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
 		
 		// Make sure the current filtering values match the field filter configuration to be single or multi-value
@@ -1924,11 +1925,12 @@ class FlexicontentFields
 			break;
 		// EXACT value cases
 		case 0: case 4: case 5: default:
-			$or_values = array();
+			$value_clauses = array();
 			foreach ($value as $val) {
-				$or_values[] = '_v_=' . $db->Quote( $val );
+				$value_clauses[] = '_v_=' . $db->Quote( $val );
 			}
-			$valueswhere .= ' AND ('.implode(' OR ', $or_values).') ';
+			$comb_op = $filter_values_combination ? 'AND' : ' OR ';
+			$valueswhere .= ' AND ('.implode($comb_op, $value_clauses).') ';
 			break;
 		}
 		
@@ -1995,7 +1997,9 @@ class FlexicontentFields
 
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );
 		$istext_input = $display_filter_as==1 || $display_filter_as==3;
-		$colname = $istext_input ? 'fs.search_index' : 'fs.value_id';
+		//$colname = $istext_input ? 'fs.search_index' : 'fs.value_id';
+		$colname = @ $filter->isindexed && !$istext_input ? 'fs.value_id' : 'fs.search_index';
+		
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
 		
 		// Get ALL items that have such values for the given field
@@ -2031,7 +2035,7 @@ class FlexicontentFields
 		$user = JFactory::getUser();
 		$mainframe = JFactory::getApplication();
 		//$cparams   = $mainframe->getParams('com_flexicontent');
-		$cparams   = JComponentHelper::getParams('com_flexicontent');
+		$cparams   = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
 		$print_logging_info = $cparams->get('print_logging_info');
 		
 		global $is_fc_component;
@@ -2060,11 +2064,13 @@ class FlexicontentFields
 		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 0 ) ;   // How to show filter label
 		$size         = $filter->parameters->get( 'text_filter_size', $default_size );        // Size of filter
 		
+		$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 1);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items'.$_s, 1 );
-		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
+		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
+		$hide_disabled_values = $filter->parameters->get( 'hide_disabled_values'.$_s, 0 );
 		
 		$filter_ffname = 'filter_'.$filter->id;
 		$filter_ffid   = $formName.'_'.$filter->id.'_val';
@@ -2094,53 +2100,75 @@ class FlexicontentFields
 			if ( $isCategoryView ) {
 				// category view, use parameter to decide if limitting filter values
 				global $fc_catviev;
-				$view_where = $fc_catviev['where_conf_only'];
-				//if ( $fc_catviev['params']->get('limit_filtervalues', 1) ) {
+				if ( $faceted_filter ) {
+					$view_join = @ $fc_catviev['join_clauses'];
+					$view_where = $fc_catviev['where_conf_only'];
 					$filters_where = $fc_catviev['filters_where'];
-					if ($fc_catviev['alpha_where']) $filters_where['alpha'] = $fc_catviev['alpha_where'];
-				//}
-				$view_join = @$fc_catviev['join_clauses'];  // NOT USED , instead it is hardcoded in filter value creation function
+					if ($fc_catviev['alpha_where']) $filters_where['alpha'] = $fc_catviev['alpha_where'];  // we use count bellow ... so add it only if it is non-empty
+				}
 			} else if ( $isSearchView ) {
 				// search view, use parameter to decide if limitting filter values
 				global $fc_searchview;
-				$view_where = $fc_searchview['where_conf_only'];
-				//if ( $fc_searchview['params']->get('limit_filtervalues', 1) ) {
+				if ( $faceted_filter ) {
+					$view_join = $fc_searchview['join_clauses'];
+					$view_where = $fc_searchview['where_conf_only'];
 					$filters_where = $fc_searchview['filters_where'];
-				//}
-				$view_join = $fc_searchview['join_clauses'];
+				}
 			}
 			$createFilterValues = !$isSearchView ? 'createFilterValues' : 'createFilterValuesSearch';
 			
-			// Get all filter values of view regardless of current filtering
-			if ( $apply_cache ) {
+			// Get filter values considering PAGE configuration (regardless of ACTIVE filters)
+			if (  $apply_cache ) {
 				$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expiration to default e.g. one hour
-				$results_all = $itemcache->call(array('FlexicontentFields', $createFilterValues), $filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
+				$results_page = $itemcache->call(array('FlexicontentFields', $createFilterValues), $filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
 			} else {
 				if (!$isSearchView)
-					$results_all = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
+					$results_page = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
 				else
-					$results_all = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
+					$results_page = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
 			}
 			
-			// Get filter values considering current filtering
-			if ( !count($filters_where) ) {
-				$_results = & $results_all;
-			/*} else if ( $apply_cache ) {
-				$itemcache->setLifeTime(300); 	// Set expiration to 5 minutes
-				$_results = $itemcache->call(array('FlexicontentFields', $createFilterValues), $filter, $view_where, $filters_where, $indexed_elements, $search_prop);
-			*/} else {
+			// Get filter values considering ACTIVE filters, but only if there is at least ONE filter active
+			if ( $faceted_filter==2 && count($filters_where) ) {
+				/*if ( $apply_cache ) { // Can produces big amounts of cached data, that will be rarely used ... commented out
+					$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expiration to default e.g. one hour
+					$results_active = $itemcache->call(array('FlexicontentFields', $createFilterValues), $filter, $view_where, $filters_where, $indexed_elements, $search_prop);
+				} else */
 				if (!$isSearchView)
-					$_results = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
+					$results_active = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
 				else
-					$_results = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
+					$results_active = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
 			}
 			
-			// Set usage counter of filter values
+			// Decide which results to show those based: (a) on active filters or (b) on page configuration
+			// This depends if hiding disabled values (for FACETED: 2) AND if active filters exist
+			$use_active_vals = $hide_disabled_values && isset($results_active);
+			$results_shown = $use_active_vals ? $results_active : $results_page;
+			$update_found = !$use_active_vals && isset($results_active);
+			
+			// Set usage counters
 			$results = array();
-			foreach ($results_all as $i => $result) {
+			foreach ($results_shown as $i => $result) {
 				$results[$i] = $result;
-				$results[$i]->found = (int) @ $_results[$i]->found;
-				if ($show_matches && $results[$i]->found) $results[$i]->text .= ' ('.$results[$i]->found.')';
+				
+				// FACETED: 0,1 or NOT showing usage
+				// Set usage to non-zero value e.g. -1 ... which maybe used (e.g. disabling values) but not be displayed
+				if (!$show_matches || $faceted_filter<2)
+					$results[$i]->found = -1;
+				
+				// FACETED: 2 and SHOWING PAGE VALUES (not hiding values or no active filters),
+				// Set usage of filter values that was calculated according to active filters
+				// 1. this overrides value usage calculated for page's configuration (faceted: 1)
+				// 2. we set zero if value was not found
+				else if ($update_found)
+					$results[$i]->found = (int) @ $results_active[$i]->found;
+				
+				// FACETED: 1 or hiding unavailable values ... leave value unchanged (if it has been calculated)
+				else ;
+				
+				// Append value usage to value's label
+				if ($faceted_filter==2 && $show_matches && $results[$i]->found)
+					$results[$i]->text .= ' ('.$results[$i]->found.')';
 			}
 		}
 		
@@ -2181,7 +2209,7 @@ class FlexicontentFields
 			
 			foreach($results as $result) {
 				if ( !strlen($result->value) ) continue;
-				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text), 'value', 'text', $disabled = ($show_matches && !$result->found));
+				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text), 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
 			}
 			if ($display_filter_as==0 || $display_filter_as==6) {
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
@@ -2199,7 +2227,7 @@ class FlexicontentFields
 			
 			if ($display_filter_as==1) {
 				if ($isdate) {
-					$filter->html	.= FlexicontentFields::createCalendarField($value, $allowtime, $fieldname, $filter_ffid, $attribs_arr);
+					$filter->html	.= FlexicontentFields::createCalendarField($value, $allowtime=0, $filter_ffname, $filter_ffid, $attribs_arr);
 				} else
 					$filter->html	.= '<input id="'.$filter_ffid.'" name="'.$filter_ffname.'" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value.'" />';
 			} else {
@@ -2252,9 +2280,9 @@ class FlexicontentFields
 				if ( !strlen($result->value) ) continue;
 				$checked = ($display_filter_as==5) ? in_array($result->value, $value) : $result->value==$value;
 				$checked_attr = $checked ? ' checked=checked ' : '';
-				$disable_attr = $show_matches && !$result->found ? ' disabled=disabled ' : '';
+				$disable_attr = $faceted_filter==2 && !$result->found ? ' disabled=disabled ' : '';
 				$checked_class = $checked ? 'fc_highlight' : '';
-				$checked_class .= $show_matches && !$result->found ? ' fcdisabled ' : '';
+				$checked_class .= $faceted_filter==2 && !$result->found ? ' fcdisabled ' : '';
 				$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
 				$filter->html .= '<li class="fc_checkradio_option'.$checked_class_li.'" style="'.$value_style.'">';
 				if ($display_filter_as==4) {
@@ -2276,8 +2304,19 @@ class FlexicontentFields
 			$filter->html .= '</span>';
 			break;
 		}
+		
 		if ( $print_logging_info ) $current_filter_creation = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		@$fc_run_times['filter_creation'] += $current_filter_creation;
+		$flt_active_count = isset($filters_where) ? count($filters_where) : 0;
+		$faceted_str = array(0=>'non-FACETED', 1=>'FACETED MODE: current view &nbsp; (cacheable) &nbsp; ', 2=>'FACETED MODE: current filters:'." (".$flt_active_count.' active) ');
+		
+		$fc_run_times['create_filter'][$filter->name] = $current_filter_creation;
+		if ( isset($fc_run_times['_create_filter_init']) ) {
+			$fc_run_times['create_filter'][$filter->name] -= $fc_run_times['_create_filter_init'];
+			$fc_run_times['create_filter_init'] = $fc_run_times['_create_filter_init'];
+			unset($fc_run_times['_create_filter_init']);
+		}
+		
+		$fc_run_times['create_filter_type'][$filter->name] = $faceted_str[$faceted_filter];
 		
 		//$filter_display_typestr = array(0=>'Single Select', 1=>'Single Text', 2=>'Range Dual Select', 3=>'Range Dual Text', 4=>'Radio Buttons', 5=>'Checkbox Buttons');
 		//echo "FIELD name: <b>". $filter->name ."</b> Field Type: <b>". $filter->field_type."</b> Filter Type: <b>". $filter_display_typestr[$display_filter_as] ."</b> (".$display_filter_as.") ".sprintf(" %.2f s",$current_filter_creation/1000000)." <br/>";
@@ -2318,20 +2357,26 @@ class FlexicontentFields
 	// Method to create filter values for a field filter to be used in content lists views (category, etc)
 	static function createFilterValues($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop)
 	{
+		$faceted_filter = $filter->parameters->get( 'faceted_filter', 1);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items', 1 );
-		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
+		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
 		
-		$_results = FlexicontentFields::getFilterValues($filter, $view_join, $view_where, $filters_where);
+		if ($faceted_filter || !$indexed_elements) {
+			$_results = FlexicontentFields::getFilterValues($filter, $view_join, $view_where, $filters_where);
+		}
 		
 		// Support of value-indexed fields
+		if ( !$faceted_filter && $indexed_elements) {
+			$results = & $indexed_elements;
+		} else 
 		if ( $indexed_elements ) {
 			
 			// Limit indexed element according to DB results found
 			$results = array_intersect_key($indexed_elements, $_results);
-			if ($show_matches) foreach ($results as $i => $result) {
+			if ($faceted_filter==2 && $show_matches) foreach ($results as $i => $result) {
 				$result->found = $_results[$i]->found;
 			}
 			
@@ -2372,11 +2417,12 @@ class FlexicontentFields
 	// Method to create filter values for a field filter to be used in search view
 	static function createFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop)
 	{
+		$faceted_filter = $filter->parameters->get( 'faceted_filter_s', 1);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
-		$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
-		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
+		//$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
+		//$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
 		
 		$filter->filter_isindexed = (boolean) $indexed_elements; 
 		$_results = FlexicontentFields::getFilterValuesSearch($filter, $view_join, $view_where, $filters_where);
@@ -2400,57 +2446,90 @@ class FlexicontentFields
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
 		$db = JFactory::getDBO();
 		
-		$listing_where = $view_where;
+		$filter_where_curr = '';
 		foreach ($filters_where as $filter_id => $filter_where) {
-			if ($filter_id != $filter->id)  $listing_where .= ' ' . $filter_where;
+			if ($filter_id != $filter->id)  $filter_where_curr .= ' ' . $filter_where;
 		}
-		//echo "listing_where : ". $listing_where ."<br/>";
+		//echo "filter_where_curr : ". $filter_where_curr ."<br/>";
 		
 		// partial SQL clauses
 		$valuesselect = @$filter->filter_valuesselect ? $filter->filter_valuesselect : ' fi.value AS value, fi.value AS text';
-		$valuesjoin   = @$filter->filter_valuesjoin   ? $filter->filter_valuesjoin   : ' JOIN #__flexicontent_fields_item_relations AS fi ON i.id = fi.item_id ';
-		$usersjoinon  = @$filter->filter_usersjoinon  ? $filter->filter_usersjoinon  : ' u.id = i.created_by ';
+		$valuesfrom   = @$filter->filter_valuesfrom   ? $filter->filter_valuesfrom   : ($filter->iscore ? ' FROM #__content AS i' : ' FROM #__flexicontent_fields_item_relations AS fi ');
+		$valuesjoin   = @$filter->filter_valuesjoin   ? $filter->filter_valuesjoin   : ' ';
 		$valueswhere  = @$filter->filter_valueswhere  ? $filter->filter_valueswhere  : ' AND fi.field_id ='.$filter->id;
 		// full SQL clauses
 		$groupby = @$filter->filter_groupby ? $filter->filter_groupby : ' GROUP BY value ';
 		$having  = @$filter->filter_having  ? $filter->filter_having  : '';
 		$orderby = @$filter->filter_orderby ? $filter->filter_orderby : '';
 		
+		$faceted_filter = $filter->parameters->get( 'faceted_filter', 1);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items', 1 );
-		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
+		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
 		
-		$query = 'SELECT '. $valuesselect .($show_matches ? ', COUNT(DISTINCT i.id) as found ' : '')
-		. ' FROM #__content AS i'
-		. $valuesjoin
-		. $view_join
-		. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-		. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-		. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-		. ' JOIN #__categories AS c ON c.id = i.catid'
-		. ' LEFT JOIN #__users AS u ON ' . $usersjoinon
-		. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"' : '')
-		. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '')
-		. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '')
-		. ($listing_where ? $listing_where : ' WHERE 1 ')
-		. $valueswhere
-		. $groupby
-		. $having
-		. $orderby
-		;
-		//if ( in_array($filter->field_type, array('tags','created','modified')) ) echo "<br><br>".$query."<br/><br/>";
+		static $item_ids_list = null;
+		if ( $faceted_filter )
+		{
+			if ($item_ids_list === null && empty($view_where) ) {
+				$item_ids_list = '';
+			}
+			if ($item_ids_list === null) {
+				$sub_query = 'SELECT DISTINCT i.id '."\n"
+					. ' FROM #__content AS i'."\n"
+					. $view_join."\n"
+					. $view_where."\n"
+					;
+				$db->setQuery($sub_query);
+				
+				global $fc_run_times, $fc_jprof;
+				$start_microtime = microtime(true);
+				//$fc_jprof->mark('BEFORE FACETED INIT: FLEXIcontent component');
+				
+				$item_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$item_ids_list = implode(',', $item_ids);
+				
+				$fc_run_times['_create_filter_init'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//$fc_jprof->mark('AFTER FACETED INIT: FLEXIcontent component');
+			}
+			
+			$item_id_col = $filter->iscore ? 'i.id' : 'fi.item_id';
+			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT '.$item_id_col.') as found ' : '')."\n"
+				. $valuesfrom."\n"
+				. $valuesjoin."\n"
+				. ' WHERE 1 '."\n"
+				. (!$item_ids_list ? '' : ' AND '.$item_id_col.' IN('.$item_ids_list.')'."\n")
+				.  ($filter->iscore ? $filter_where_curr : str_replace('i.id', 'fi.item_id', $filter_where_curr))."\n"
+				. $valueswhere."\n"
+				. $groupby."\n"
+				. $having."\n"
+				. $orderby
+				;
+		} else {
+			$query = 'SELECT DISTINCT '. $valuesselect ."\n"
+				. $valuesfrom."\n"
+				. $valuesjoin."\n"
+				. ' WHERE 1 '."\n"
+				. $valueswhere."\n"
+				//. $groupby."\n"
+				. $having."\n"
+				. $orderby
+				;
+		}
+		//if ( in_array($filter->field_type, array('tags','created','modified')) ) echo nl2br($query);
 		
-		//echo $query;
 		// Make sure there aren't any errors
 		$db->setQuery($query);
+		//$start_microtime = microtime(true);
 		$results = $db->loadObjectList('value');
 		if ($db->getErrorNum()) {
+			echo nl2br($query);
 			JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			$filter->html	 = "Filter for : {$filter->label} cannot be displayed, error during db query<br />";
 			return array();
 		}
+		//echo round(round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10000000, 2) . " secs <br><br>";
 		
 		return $results;
 	}
@@ -2462,31 +2541,81 @@ class FlexicontentFields
 		//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
 		$db = JFactory::getDBO();
 		
-		$listing_where = $view_where;
+		$filter_where_curr = '';
 		foreach ($filters_where as $filter_id => $filter_where) {
-			if ($filter_id != $filter->id)  $listing_where .= ' ' . $filter_where;
+			if ($filter_id != $filter->id)  $filter_where_curr .= ' ' . $filter_where;
 		}
 		
 		$valuesselect = @$filter->filter_isindexed ? ' ai.value_id as value, ai.search_index as text ' : ' ai.search_index as value, ai.search_index as text';
 		
+		$faceted_filter = $filter->parameters->get( 'faceted_filter_s', 1);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
-		$show_matches = $filter_as_range ?  0  :  $show_matching_items;
+		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
 		
-		// Get ALL records that have such values for the given field
-		$query = 'SELECT '. $valuesselect .($show_matches ? ', COUNT(DISTINCT i.id) as found ' : '')
-			.' FROM #__flexicontent_advsearch_index AS ai'
-			.' JOIN #__content i ON ai.item_id = i.id'
-			. $view_join
-			.' WHERE '
-			. ($listing_where ? $listing_where.' AND ' : '')
-			.' ai.field_id='.(int)$filter->id
-			.' GROUP BY ai.search_index, ai.value_id'
-			;
+		static $item_ids_list = null;
+		if ( $faceted_filter )
+		{
+			if ($item_ids_list === null && empty($view_where) ) {
+				$item_ids_list = '';
+			}
+			if ($item_ids_list === null) {
+				$sub_query = 'SELECT DISTINCT ai.item_id '."\n"
+					.' FROM #__flexicontent_advsearch_index AS ai'."\n"
+					.' JOIN #__content i ON ai.item_id = i.id'."\n"
+					. $view_join."\n"
+					.' WHERE '."\n"
+					. $view_where."\n"
+					;
+				$db->setQuery($sub_query);
+				
+				global $fc_run_times, $fc_jprof;
+				$start_microtime = microtime(true);
+				//$fc_jprof->mark('BEFORE FACETED INIT: FLEXIcontent component');
+				
+				$item_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				$item_ids_list = implode(',', $item_ids);
+				
+				$fc_run_times['_create_filter_init'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//$fc_jprof->mark('AFTER FACETED INIT: FLEXIcontent component');
+			}
+			
+			// Get ALL records that have such values for the given field
+			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT ai.item_id) as found ' : '')."\n"
+				. ' FROM #__flexicontent_advsearch_index AS ai'."\n"
+				. ' WHERE 1 '."\n"
+				. (!$item_ids_list ? '' : ' AND ai.item_id IN('.$item_ids_list.')'."\n")
+				. ' AND ai.field_id='.(int)$filter->id."\n"
+				.  str_replace('i.id', 'ai.item_id', $filter_where_curr)."\n"
+				. ' GROUP BY ai.search_index, ai.value_id'."\n"
+				;
+		} else {
+			
+			// Get ALL records that have such values for the given field
+			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT i.id) as found ' : '')."\n"
+				.' FROM #__flexicontent_advsearch_index AS ai'."\n"
+				.' JOIN #__content i ON ai.item_id = i.id'."\n"
+				. $view_join."\n"
+				.' WHERE '."\n"
+				. ($view_where ? $view_where.' AND ' : '')."\n"
+				.' ai.field_id='.(int)$filter->id."\n"
+				. $filter_where_curr
+				.' GROUP BY ai.search_index, ai.value_id'."\n"
+				;
+				
+			/*$query = 'SELECT DISTINCT '. $valuesselect ."\n"
+				.' FROM #__flexicontent_advsearch_index AS ai'."\n"
+				.' WHERE ai.field_id='.(int)$filter->id."\n"
+				//.' GROUP BY ai.search_index, ai.value_id'."\n"
+				;*/
+		}
+		
 		$db->setQuery($query);
 		$results = $db->loadObjectList('text');
+		//echo "<br/>". count($results) ."<br/>";
+		//echo nl2br($query) ."<br/><br/>";
 		
 		if ($db->getErrorNum()) {
 			JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
@@ -2930,6 +3059,27 @@ class FlexicontentFields
 		}
 		return $fields_render;
 	}
+	
+	
+	static function getFilterCreationTimes( &$filters_creation_total=0 )
+	{
+		global $fc_run_times;
+		$filters_creation = array();
 		
+		if ( isset($fc_run_times['create_filter_init']) ) {
+			$filters_creation_total += $fc_run_times['create_filter_init'];
+		}
+		foreach ($fc_run_times['create_filter'] as $field_type => $filter_msecs)
+		{
+			// Total creation time of filters
+			$filters_creation_total += $filter_msecs;
+			
+			// Create Log a message about current filter creation time
+			$fld_msg = $field_type." ... ".$fc_run_times['create_filter_type'][$field_type].": ". sprintf("%.3f s",$filter_msecs/1000000);
+			
+			$filters_creation[] = $fld_msg;
+		}
+		return $filters_creation;
+	}
+	
 }
-?>
