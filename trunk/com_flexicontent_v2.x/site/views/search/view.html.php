@@ -599,7 +599,6 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		$this->assign('total',  $total);
 		$this->assign('error',  $error);
-		$this->assign('action', $uri->toString());
 		$this->assignRef('document', $document);
 		
 		$print_logging_info = $params->get('print_logging_info');

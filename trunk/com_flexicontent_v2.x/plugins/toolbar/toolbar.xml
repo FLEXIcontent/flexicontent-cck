@@ -17,6 +17,7 @@
 
 	<config>
 	<fields name="attribs">
+		
 		<fieldset name="basic">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="1">FLEXI_YES</option>
@@ -25,6 +26,7 @@
 			<field name="frontend_hidden" type="hidden" default="1" />
 			<field name="backend_hidden" type="hidden" default="1" />
 		</fieldset>
+		
 		<fieldset name="group-toolbar" addfieldpath="/administrator/components/com_flexicontent/elements">
 
 			<field name="" type="separator" default="Basic Configuration" level="level1" />

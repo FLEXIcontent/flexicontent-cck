@@ -12,12 +12,14 @@
 	<files>
 		<filename plugin="selectmultiple">selectmultiple.php</filename>
 	</files>
+	
 		<params group="standard">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 		</params>
+		
 		<params group="group-selectmultiple" addpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
@@ -115,8 +117,12 @@
 				<option value="1">FLEXI_INTEGER</option>
 				<option value="2">FLEXI_FLOAT</option>
 			</field>
+			<field name="filter_values_combination" type="radio" default="0" label="FLEXI_FILTER_VALUES_COMBINATION" description="FLEXI_FILTER_VALUES_COMBINATION_DESC">
+				<option value="0">FLEXI_ANY</option>
+				<option value="1">FLEXI_ALL</option>
+			</field>
 			
-			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level3" />
+			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level2" />
 			<field name="display_label_filter" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
@@ -131,12 +137,23 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
+			<field name="faceted_filter" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+				<option value="0">FLEXI_FS_NONE</option>
+				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
+				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FACETED_BEHAVIOR_ACTIVE_FILTERS" level="level3" />
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="hide_disabled_values" type="radio" default="0" label="FLEXI_FILTER_UNAVAILABLE_VALUES" description="FLEXI_FILTER_UNAVAILABLE_VALUES_DESC">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_HIDE</option>
+			</field>
 			
-			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
 			<field name="display_label_filter_s" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
@@ -151,9 +168,20 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
+			<field name="faceted_filter_s" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+				<option value="0">FLEXI_FS_NONE</option>
+				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
+				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FACETED_BEHAVIOR_ACTIVE_FILTERS" level="level3" />
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="hide_disabled_values_s" type="radio" default="0" label="FLEXI_FILTER_UNAVAILABLE_VALUES" description="FLEXI_FILTER_UNAVAILABLE_VALUES_DESC">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_HIDE</option>
 			</field>
 			
 		</params>
