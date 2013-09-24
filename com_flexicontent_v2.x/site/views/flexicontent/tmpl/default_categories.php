@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default_categories.php 1108 2012-01-15 04:06:31Z ggppdk $
+ * @version 1.5 stable $Id: default_categories.php 1764 2013-09-16 08:00:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -47,6 +47,9 @@ $subcat_image_height = $this->params->get('subcat_image_height', 80);
 if (!FLEXI_J16GE) jimport( 'joomla.html.parameter' );
 $app = JFactory::getApplication();
 $joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
+$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
+$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
+$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';
 
 // Get the directory menu parameters 
 $cols = JRequest::getVar('columns_count',false);
@@ -133,8 +136,8 @@ switch ($cols)
 		$cat->introtext = & $cat->description;
 		$cat->fulltext = "";
 		
-		if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path .DS. $cat->image ) ) {
-			$src = JURI::base(true)."/".$joomla_image_path."/".$cat->image;
+		if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
+			$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
 	
 			$h		= '&amp;h=' . $cat_image_height;
 			$w		= '&amp;w=' . $cat_image_width;
@@ -211,8 +214,8 @@ switch ($cols)
 				$subcat->introtext = & $subcat->description;
 				$subcat->fulltext = "";
 				
-				if ( $subcat_image_source && $subcat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path .DS. $subcat->image ) ) {
-					$src = JURI::base(true)."/".$joomla_image_path."/".$subcat->image;
+				if ( $subcat_image_source && $subcat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $subcat->image ) ) {
+					$src = JURI::base(true) ."/". $joomla_image_url . $subcat->image;
 			
 					$h		= '&amp;h=' . $subcat_image_height;
 					$w		= '&amp;w=' . $subcat_image_width;

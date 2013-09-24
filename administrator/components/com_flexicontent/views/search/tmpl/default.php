@@ -67,7 +67,7 @@ function delAllFilters() {
 					<?php echo JText::_('NUM'); ?>
 				</th>
 				<th width="5">
-					<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->data); ?>);" />
+					<input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->data).');'; ?>" />
 				</th>
 				<th nowrap="nowrap" width="20%">
 					<?php echo JHTML::_('grid.sort', JText::_('FLEXI_ITEMS'), 'a.title', $this->lists['order_Dir'], $this->lists['order'] ); ?>

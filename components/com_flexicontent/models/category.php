@@ -231,28 +231,35 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ( $print_logging_info )  $start_microtime = microtime(true);
 			// Load the content if it doesn't already exist
 			
-			// 1, get filtered, limited, ordered items
+			// 1, create full query: filter, ordered, limited
 			$query = $this->_buildQuery();
-			//print_r($query); 
 			$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
-			$rows = $this->_db->loadObjectList();
-			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 			
-			// 2, get current items total for pagination
-			// *** CANNOT USE FOUND_ROWS() because Joom!Fish or Falang will interfer bye 
-			//$this->_db->setQuery("SELECT FOUND_ROWS()");
-			//$this->_total = $this->_db->loadResult();
-			if (!$this->_total)  // Retry in case something interfered
-				$this->_total = $this->_getListCount($query);
-			
-			// 3, get item ids
-			$query_ids = array();
-			foreach ($rows as $row) {
-				$query_ids[] = $row->id;
+			try {
+				// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
+				// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
+				$rows = flexicontent_db::directQuery($query . ' LIMIT '.(int)$this->getState('limit').' OFFSET '.(int)$this->getState('limitstart'));
+				$query_ids = array();
+				foreach ($rows as $row) $query_ids[] = $row->id;
+				
+				// 3, get current items total for pagination
+				$this->_db->setQuery("SELECT FOUND_ROWS()");
+				$this->_total = $this->_db->loadResult();
 			}
-
-			//$this->_total = $this->_getListCount($query);
-			//if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+			
+			catch (Exception $e) {
+				// 2, get items via normal joomla SQL layer
+				$query_ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+				
+				// 3, get current items total for pagination
+				if ( count($query_ids) && !$this->_total ) {
+					//$this->_total = $this->_getListCount($query);
+					$query_count = $this->_buildQuery(-1); // a more light query that strips ordering clause
+					$this->_db->setQuery($query_count);
+					$this->_total = $this->_db->loadResult();
+				}
+			}
 			
 			/*if ((int)$this->getState('limitstart') < (int)$this->_total) {
 				$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
@@ -346,7 +353,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Get FROM and JOIN SQL CLAUSES
 		$fromjoin = $this->_buildItemFromJoin();
 		
-		if ( !$query_ids ) {
+		if ( $query_ids==-1 ) {
+			// ... count rows
+			// Create sql WHERE clause
+			$where = $this->_buildItemWhere();
+		} else if ( !$query_ids ) {
 			
 			// Create JOIN (and select column) of image field used as item image in RSS feed
 			$feed_image_source = JRequest::getCmd("type", "") == "rss"  ?  (int) $params->get('feed_image_source', 0)  :  0;
@@ -356,7 +367,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 			
 			// Create sql WHERE clause
-			$where   = $this->_buildItemWhere();
+			$where = $this->_buildItemWhere();
 			
 			// Create sql ORDERBY clause -and- set 'order' variable (passed by reference), that is, if frontend user ordering override is allowed
 			$order = '';
@@ -383,12 +394,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$select_access = $this->_buildAccessSelect();
 		}
 		
-		if ( !$query_ids ) {
-			//$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id ';  // Will cause problems with 3rd-party extensions that modify the query
-			//$query = 'SELECT DISTINCT i.id ';
-			$query = 'SELECT i.id '
-				. @ $orderby_col
-				;
+		if ( $query_ids==-1 ) {
+			$query = ' SELECT count(i.id) ';
+		} else if ( !$query_ids ) {
+			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id ';  // Will cause problems with 3rd-party extensions that modify the query
+			//$query = 'SELECT i.id ';
+			$query .= @ $orderby_col;
 		} else {
 			//$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
 			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename,'
@@ -401,11 +412,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$query .= $fromjoin;
 		
-		if ( $query_ids ) {
+		if ( $query_ids==-1 ) {
+			$query .= ""
+				. $where
+				. ' GROUP BY i.id '
+				;
+		} else if ( $query_ids ) {
 			$query .= ""
 				. @ $feed_img_join    // optional
 				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
 				. ' GROUP BY i.id'
+				//. ' ORDER BY FIELD(i.id, '. implode(',', $query_ids) .')'
 				;
 		} else {
 			$query .= ""

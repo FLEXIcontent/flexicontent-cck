@@ -314,7 +314,7 @@ window.addEvent('domready', function() {
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th>
 			<th class="center" style="width:24px;">
-				<input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" />
+				<input type="checkbox" name="toggle" value="" onClick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" />
 			</th>
 			<th class="center" style="width:24px;">&nbsp;</th>
 			<th class="left hideOnDemandClass">
@@ -868,10 +868,10 @@ window.addEvent('domready', function() {
 				endforeach;
 				?>
 			</td>
-			<td nowrap="nowrap" class="col_created">
+			<td align="center" nowrap="nowrap" class="col_created">
 				<?php echo JHTML::_('date',  $row->created, $date_format ); ?>
 			</td>
-			<td nowrap="nowrap" class="col_revised">
+			<td align="center" nowrap="nowrap" class="col_revised">
 				<?php echo ($row->modified != $this->db->getNullDate()) ? JHTML::_('date', $row->modified, $date_format) : JText::_('FLEXI_NEVER'); ?>
 			</td>
 			<td align="center">

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1694 2013-07-12 09:42:03Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1767 2013-09-18 17:46:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -46,6 +46,7 @@ $print_logging_info = $cparams->get('print_logging_info');
 if ( $print_logging_info ) {
 	global $fc_run_times;
 	$fc_run_times['render_field'] = array(); $fc_run_times['render_subfields'] = array();
+	$fc_run_times['create_filter'] = array();
 	$start_microtime = microtime(true);
 	global $fc_jprof;
 	jimport( 'joomla.error.profiler' );
@@ -205,6 +206,8 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	// **************************************
 	$fields_render_total=0;
 	$fields_render_times = FlexicontentFields::getFieldRenderTimes($fields_render_total);
+	$filters_creation_total = 0;
+	$filters_creation_times = FlexicontentFields::getFilterCreationTimes($filters_creation_total);
 	
 	$fc_jprof->mark('END: FLEXIcontent component: '.$_msg);
 	$msg = '<span style="font-family:tahoma!important; font-size:11px!important;">'. implode('<br/>', $fc_jprof->getbuffer()) .'</span>';
@@ -263,15 +266,12 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	// **** EOF: ITEM FORM SAVING
 	
 	if (isset($fc_run_times['templates_parsing_cached']))
-		$msg .= sprintf('<br/>-- [FC Templates Parsing (cached): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
+		$msg .= sprintf('<br/>-- [FC Templates Parsing (cacheable): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
 	
 	if (isset($fc_run_times['templates_parsing_noncached']))
-		$msg .= sprintf('<br/>-- [FC Templates Parsing (not cached) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
+		$msg .= sprintf('<br/>-- [FC Templates Parsing (not cacheable) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
 	
 	// **** BOF: FRONTEND SPECIFIC
-	if (isset($fc_run_times['filter_creation']))
-		$msg .= sprintf('<br/>-- [FC Filter Creation: %.2f s] ', $fc_run_times['filter_creation']/1000000);
-	
 	if (isset($fc_run_times['search_query_runtime']))
 		$msg .= sprintf('<br/>-- [FC Advanced Search Plugin, Query: %.2f s] ', $fc_run_times['search_query_runtime']/1000000);
 	
@@ -294,7 +294,7 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	if (isset($fc_run_times['render_categories_select']))
 		$msg .= sprintf('<br/>-- [Render Categories Select: %.2f s] ', $fc_run_times['render_categories_select']/1000000);
 	
-	if (count($fields_render_times))
+	if (isset($fc_run_times['field_value_retrieval']))
 		$msg .= sprintf('<br/>-- [FC Fields Value Retrieval: %.2f s] ', $fc_run_times['field_value_retrieval']/1000000);
 	
 	if (isset($fc_run_times['template_render']))
@@ -306,8 +306,20 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	// **********************
 	
 	if (count($fields_render_times)) {
-		$msg .= sprintf('<br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
+		$msg .= sprintf('<br/><br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
 		$msg .= '<br/>FIELD: '.implode('<br/> FIELD: ', $fields_render_times).'';
+		if (count($filters_creation_times)) $msg .= '<br/>';
+	}
+	
+	// **********************
+	// Filters creation times
+	// **********************
+	
+	if (count($filters_creation_times)) {
+		$msg .= sprintf('<br/>-- [FC Filters Creation: %.2f s] ', $filters_creation_total/1000000);
+		if ( isset($fc_run_times['create_filter_init']) )
+			$msg .= sprintf('<br/>FACETED FILTER(s) INIT: %.2f s ', $fc_run_times['create_filter_init']/1000000);
+		$msg .= '<br/>FILTER: '.implode('<br/> FILTER: ', $filters_creation_times).'<br/><br/>';
 	}
 	
 	$msg .= '</span>';

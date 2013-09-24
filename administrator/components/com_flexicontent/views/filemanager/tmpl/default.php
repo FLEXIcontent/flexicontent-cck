@@ -303,7 +303,7 @@ table#filemanager-zone label {
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
+			<th width="5"><input type="checkbox" name="toggle" value="" onClick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th width="5"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_FILE_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
