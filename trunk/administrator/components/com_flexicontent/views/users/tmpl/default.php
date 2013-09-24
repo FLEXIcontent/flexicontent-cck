@@ -130,13 +130,13 @@ window.addEvent('domready', function(){
 	<table class="adminlist" cellpadding="1">
 		<thead>
 			<tr>
-				<th width="2%" class="title">
+				<th class="center" style="width:24px;">
 					<?php echo JText::_( 'NUM' ); ?>
 				</th>
-				<th width="3%" class="title">
-					<input type="checkbox" name="toggle" value="" onclick="checkAll(<?php echo count($this->items); ?>);" />
+				<th class="center" style="width:24px;">
+					<input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->items).');'; ?>" />
 				</th>
-				<th class="title">
+				<th class="left">
 					<?php echo JHTML::_('grid.sort',   'Name', 'a.name', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 					<?php if ($this->search) : ?>
 					<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
@@ -144,7 +144,7 @@ window.addEvent('domready', function(){
 					</span>
 					<?php endif; ?>
 				</th>
-				<th width="5%" class="title" >
+				<th class="center" >
 					<?php echo JHTML::_('grid.sort',   'FLEXI_ITEMS', 'itemscount', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 					<?php if ($this->filter_itemscount) : ?>
 					<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
@@ -152,10 +152,10 @@ window.addEvent('domready', function(){
 					</span>
 					<?php endif; ?>
 				</th>
-				<th width="15%" class="title" >
+				<th class="left" >
 					<?php echo JHTML::_('grid.sort',   'Username', 'a.username', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
-				<th width="5%" class="title" nowrap="nowrap">
+				<th class="center" nowrap="nowrap">
 					<?php echo JHTML::_('grid.sort',   'Logged In', 'loggedin', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 					<?php if ($this->filter_logged) : ?>
 					<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
@@ -163,10 +163,10 @@ window.addEvent('domready', function(){
 					</span>
 					<?php endif; ?>
 				</th>
-				<th width="5%" class="title" nowrap="nowrap">
+				<th class="center" nowrap="nowrap">
 					<?php echo JHTML::_('grid.sort',   'Enabled', 'a.block', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
-				<th width="15%" class="title">
+				<th class="center">
 					<?php echo FLEXI_J16GE ? JText::_( 'FLEXI_USERGROUPS' ) : JHTML::_('grid.sort',   'Group', 'groupname', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 					<?php if ($this->filter_usergrp) : ?>
 					<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
@@ -174,10 +174,10 @@ window.addEvent('domready', function(){
 					</span>
 					<?php endif; ?>
 				</th>
-				<th width="15%" class="title">
+				<th class="left">
 					<?php echo JHTML::_('grid.sort',   'E-Mail', 'a.email', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 				</th>
-				<th width="110" class="title">
+				<th width="110" class="center">
 					<?php echo JHTML::_('grid.sort',   'Registered', 'a.registerDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 					<?php
 					if ($this->date == '1') :
@@ -191,7 +191,7 @@ window.addEvent('domready', function(){
 					endif;
 					?>
 				</th>
-				<th width="110" class="title">
+				<th width="110" class="center">
 					<?php echo JHTML::_('grid.sort',   'Last Visit', 'a.lastvisitDate', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 					<?php
 					if ($this->date == '2') :
@@ -205,7 +205,7 @@ window.addEvent('domready', function(){
 					endif;
 					?>
 				</th>
-				<th width="2%" class="title" nowrap="nowrap">
+				<th class="center" nowrap="nowrap">
 					<?php echo JHTML::_('grid.sort',   'ID', 'a.id', @$this->lists['order_Dir'], @$this->lists['order'] ); ?>
 					<?php if ($this->filter_id) : ?>
 					<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC') ?>">
@@ -322,10 +322,10 @@ window.addEvent('domready', function(){
 				}
 			?>
 			<tr class="<?php echo "row$k"; ?>">
-				<td>
+				<td class="center">
 					<?php echo $i+1+$this->pagination->limitstart;?>
 				</td>
-				<td>
+				<td class="center">
 					<?php echo JHTML::_('grid.id', $i, $row->id ); ?>
 				</td>
 				<td class="col_title">
@@ -350,14 +350,14 @@ window.addEvent('domready', function(){
 				<td align="center" class="col_usergrp">
 					<?php echo JText::_( $row->groupname ); ?>
 				</td>
-				<td>
+				<td align="left">
 					<a href="mailto:<?php echo $row->email; ?>">
 						<?php echo $row->email; ?></a>
 				</td>
-				<td nowrap="nowrap" class="col_registered">
+				<td align="center" nowrap="nowrap" class="col_registered">
 					<?php echo $registered; ?>
 				</td>
-				<td nowrap="nowrap" class="col_visited">
+				<td align="center" nowrap="nowrap" class="col_visited">
 					<?php echo $lvisit; ?>
 				</td>
 				<td class="left col_id">

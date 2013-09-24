@@ -4384,7 +4384,7 @@ class flexicontent_db
 			}
 			mysql_free_result($result);
 		} else {
-			throw new Exception( 'unreachable code in '.__FUNCTION__.'(): direct db query, unsupported DB TYPE' );
+			throw new Exception( __FUNCTION__.'(): direct db query, unsupported DB TYPE' );
 		}
 
 		return $data;

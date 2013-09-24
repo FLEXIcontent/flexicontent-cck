@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1765 2013-09-17 09:34:53Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1768 2013-09-22 21:42:30Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -4384,7 +4384,7 @@ class flexicontent_db
 			}
 			mysql_free_result($result);
 		} else {
-			throw new Exception( 'unreachable code in '.__FUNCTION__.'(): direct db query, unsupported DB TYPE' );
+			throw new Exception( __FUNCTION__.'(): direct db query, unsupported DB TYPE' );
 		}
 
 		return $data;

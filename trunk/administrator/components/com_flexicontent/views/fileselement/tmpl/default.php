@@ -191,7 +191,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="5"><input type="checkbox" name="toggle" value="" onClick="checkAll(<?php echo count( $this->rows ); ?>);" /></th>
+			<th width="5"><input type="checkbox" name="toggle" value="" onClick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 <?php if ($this->folder_mode) { ?>
 			<th width="5">&nbsp;</th>
 <?php } ?>

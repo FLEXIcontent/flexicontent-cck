@@ -2470,11 +2470,13 @@ class FlexicontentFields
 		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
 		
 		static $item_ids_list = null;
-		if ( $faceted_filter )
-		{
-			if ($item_ids_list === null && empty($view_where) ) {
-				$item_ids_list = '';
-			}
+		
+		// FACETED filter
+		if ( $faceted_filter ) {
+			
+			// Find items belonging to current view
+			if ($item_ids_list === null && empty($view_where) )  $item_ids_list = '';
+			
 			if ($item_ids_list === null) {
 				$sub_query = 'SELECT DISTINCT i.id '."\n"
 					. ' FROM #__content AS i'."\n"
@@ -2484,11 +2486,12 @@ class FlexicontentFields
 				$db->setQuery($sub_query);
 				
 				global $fc_run_times, $fc_jprof;
-				$start_microtime = microtime(true);
 				//$fc_jprof->mark('BEFORE FACETED INIT: FLEXIcontent component');
+				$start_microtime = microtime(true);
 				
 				$item_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				$item_ids_list = implode(',', $item_ids);
+				unset($item_ids);
 				
 				$fc_run_times['_create_filter_init'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//$fc_jprof->mark('AFTER FACETED INIT: FLEXIcontent component');
@@ -2506,7 +2509,10 @@ class FlexicontentFields
 				. $having."\n"
 				. $orderby
 				;
-		} else {
+		}
+		
+		// NON-FACETED filter
+		else {
 			$query = 'SELECT DISTINCT '. $valuesselect ."\n"
 				. $valuesfrom."\n"
 				. $valuesjoin."\n"
@@ -2519,17 +2525,12 @@ class FlexicontentFields
 		}
 		//if ( in_array($filter->field_type, array('tags','created','modified')) ) echo nl2br($query);
 		
-		// Make sure there aren't any errors
 		$db->setQuery($query);
-		//$start_microtime = microtime(true);
 		$results = $db->loadObjectList('value');
 		if ($db->getErrorNum()) {
-			echo nl2br($query);
-			JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-			$filter->html	 = "Filter for : {$filter->label} cannot be displayed, error during db query<br />";
+			$filter->html	 = "Filter for : {$filter->label} cannot be displayed, error during db query :<br />" .$query ."<br/>" .__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 			return array();
 		}
-		//echo round(round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10000000, 2) . " secs <br><br>";
 		
 		return $results;
 	}
@@ -2618,8 +2619,7 @@ class FlexicontentFields
 		//echo nl2br($query) ."<br/><br/>";
 		
 		if ($db->getErrorNum()) {
-			JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-			$filter->html	 = "Filter for : {$filter->label} cannot be displayed, error during db query<br />";
+			$filter->html	 = "Filter for : {$filter->label} cannot be displayed, error during db query :<br />" .$query ."<br/>" .__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 			return array();
 		}
 		
