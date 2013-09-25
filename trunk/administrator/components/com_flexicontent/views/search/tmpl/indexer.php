@@ -33,7 +33,7 @@ jQuery(document).ready(function() {
 	var number = 0;
 	function updateprogress() {
 		//looper=looper+1;
-		if(looper>=number) {
+		if(looper>=number && looper) {
 			jQuery('div#statuscomment').html( jQuery('div#statuscomment').text() + ' , INDEXING FINISHED. You may close this window');
 			//if(looper==(number+1)) {
 				//jQuery('div#statuscomment').text('Completed!');
