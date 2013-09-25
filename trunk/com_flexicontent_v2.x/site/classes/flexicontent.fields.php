@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1770 2013-09-23 09:33:54Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1771 2013-09-24 22:01:25Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -2064,7 +2064,7 @@ class FlexicontentFields
 		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 0 ) ;   // How to show filter label
 		$size         = $filter->parameters->get( 'text_filter_size', $default_size );        // Size of filter
 		
-		$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 1);
+		$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
@@ -2305,18 +2305,20 @@ class FlexicontentFields
 			break;
 		}
 		
-		if ( $print_logging_info ) $current_filter_creation = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		$flt_active_count = isset($filters_where) ? count($filters_where) : 0;
-		$faceted_str = array(0=>'non-FACETED', 1=>'FACETED MODE: current view &nbsp; (cacheable) &nbsp; ', 2=>'FACETED MODE: current filters:'." (".$flt_active_count.' active) ');
-		
-		$fc_run_times['create_filter'][$filter->name] = $current_filter_creation;
-		if ( isset($fc_run_times['_create_filter_init']) ) {
-			$fc_run_times['create_filter'][$filter->name] -= $fc_run_times['_create_filter_init'];
-			$fc_run_times['create_filter_init'] = $fc_run_times['_create_filter_init'];
-			unset($fc_run_times['_create_filter_init']);
+		if ( $print_logging_info ) {
+			$current_filter_creation = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			$flt_active_count = isset($filters_where) ? count($filters_where) : 0;
+			$faceted_str = array(0=>'non-FACETED', 1=>'FACETED MODE: current view &nbsp; (cacheable) &nbsp; ', 2=>'FACETED MODE: current filters:'." (".$flt_active_count.' active) ');
+			
+			$fc_run_times['create_filter'][$filter->name] = $current_filter_creation;
+			if ( isset($fc_run_times['_create_filter_init']) ) {
+				$fc_run_times['create_filter'][$filter->name] -= $fc_run_times['_create_filter_init'];
+				$fc_run_times['create_filter_init'] = $fc_run_times['_create_filter_init'];
+				unset($fc_run_times['_create_filter_init']);
+			}
+			
+			$fc_run_times['create_filter_type'][$filter->name] = $faceted_str[$faceted_filter];
 		}
-		
-		$fc_run_times['create_filter_type'][$filter->name] = $faceted_str[$faceted_filter];
 		
 		//$filter_display_typestr = array(0=>'Single Select', 1=>'Single Text', 2=>'Range Dual Select', 3=>'Range Dual Text', 4=>'Radio Buttons', 5=>'Checkbox Buttons');
 		//echo "FIELD name: <b>". $filter->name ."</b> Field Type: <b>". $filter->field_type."</b> Filter Type: <b>". $filter_display_typestr[$display_filter_as] ."</b> (".$display_filter_as.") ".sprintf(" %.2f s",$current_filter_creation/1000000)." <br/>";
@@ -2357,7 +2359,7 @@ class FlexicontentFields
 	// Method to create filter values for a field filter to be used in content lists views (category, etc)
 	static function createFilterValues($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop)
 	{
-		$faceted_filter = $filter->parameters->get( 'faceted_filter', 1);
+		$faceted_filter = $filter->parameters->get( 'faceted_filter', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
@@ -2417,7 +2419,7 @@ class FlexicontentFields
 	// Method to create filter values for a field filter to be used in search view
 	static function createFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop)
 	{
-		$faceted_filter = $filter->parameters->get( 'faceted_filter_s', 1);
+		$faceted_filter = $filter->parameters->get( 'faceted_filter_s', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
@@ -2462,7 +2464,7 @@ class FlexicontentFields
 		$having  = @$filter->filter_having  ? $filter->filter_having  : '';
 		$orderby = @$filter->filter_orderby ? $filter->filter_orderby : '';
 		
-		$faceted_filter = $filter->parameters->get( 'faceted_filter', 1);
+		$faceted_filter = $filter->parameters->get( 'faceted_filter', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
@@ -2549,7 +2551,7 @@ class FlexicontentFields
 		
 		$valuesselect = @$filter->filter_isindexed ? ' ai.value_id as value, ai.search_index as text ' : ' ai.search_index as value, ai.search_index as text';
 		
-		$faceted_filter = $filter->parameters->get( 'faceted_filter_s', 1);
+		$faceted_filter = $filter->parameters->get( 'faceted_filter_s', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		

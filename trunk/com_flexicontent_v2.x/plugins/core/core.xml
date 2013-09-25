@@ -115,7 +115,7 @@
 				<option value="month">FLEXI_MONTH</option>
 				<option value="day">FLEXI_DAY</option>
 			</field>
-			<field name="faceted_filter" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
@@ -151,7 +151,7 @@
 				<option value="month">FLEXI_MONTH</option>
 				<option value="day">FLEXI_DAY</option>
 			</field>
-			<field name="faceted_filter_s" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter_s" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
@@ -205,7 +205,7 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="faceted_filter" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
@@ -234,7 +234,7 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="faceted_filter_s" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter_s" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
@@ -298,7 +298,7 @@
 				<option value="month">FLEXI_MONTH</option>
 				<option value="day">FLEXI_DAY</option>
 			</field>
-			<field name="faceted_filter" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
@@ -334,7 +334,7 @@
 				<option value="month">FLEXI_MONTH</option>
 				<option value="day">FLEXI_DAY</option>
 			</field>
-			<field name="faceted_filter_s" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter_s" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
@@ -388,7 +388,7 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="faceted_filter" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
@@ -417,7 +417,7 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="faceted_filter_s" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter_s" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
@@ -523,7 +523,7 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="faceted_filter" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
@@ -552,7 +552,7 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="faceted_filter_s" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter_s" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
@@ -759,7 +759,7 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="faceted_filter" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
@@ -788,7 +788,7 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="faceted_filter_s" type="list" default="1" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+			<field name="faceted_filter_s" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
 				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
