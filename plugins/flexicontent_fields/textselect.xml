@@ -125,7 +125,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
-
+			
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" description="FLEXI_TEXT_SEARCH_FILTER_CONF_DESC" level="level1" />
 		
 			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_CONF" description="" level="level2" menu="hide" />
@@ -136,16 +136,26 @@
 				<option value="2">FLEXI_USE_CUSTOM_ELEMENTS</option>
 			</field>
 			<field name="filter_custom_options" type="textarea" rows="6" cols="25" label="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY" description="FLEXI_CUSTOM_FILTER_ELEMENTS_OR_QUERY_DESC" default="SELECT value, value as text FROM #__flexicontent_fields_item_relations WHERE field_id='{field_id}' AND value != '' GROUP BY value" />
+			<field name="filter_default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
+			<field name="filter_usefirstoption" type="radio" default="1" label="FLEXI_FIELD_ADD_FIRST_OPTION" description="FLEXI_FIELD_ADD_FIRST_OPTION_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="filter_firstoptiontext" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_FILTER_APPEARANCE_CONF" level="level2" />
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
 			
 			<field name="filter_compare_type" type="list" default="0" label="FLEXI_FILTER_VALUE_COMPARISON" description="FLEXI_FILTER_VALUE_COMPARISON_DESC">
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_INTEGER</option>
 				<option value="2">FLEXI_FLOAT</option>
 			</field>
+			<field name="filter_values_combination" type="radio" default="0" label="FLEXI_FILTER_VALUES_COMBINATION" description="FLEXI_FILTER_VALUES_COMBINATION_DESC">
+				<option value="0">FLEXI_ANY</option>
+				<option value="1">FLEXI_ALL</option>
+			</field>
 			
-			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level3" />
+			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level2" />
 			<field name="display_label_filter" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
@@ -160,12 +170,23 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
+			<field name="faceted_filter" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+				<option value="0">FLEXI_FS_NONE</option>
+				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
+				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FACETED_BEHAVIOR_ACTIVE_FILTERS" level="level3" />
 			<field name="show_matching_items" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="hide_disabled_values" type="radio" default="0" label="FLEXI_FILTER_UNAVAILABLE_VALUES" description="FLEXI_FILTER_UNAVAILABLE_VALUES_DESC">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_HIDE</option>
+			</field>
 			
-			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level3" />
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
 			<field name="display_label_filter_s" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
@@ -180,9 +201,20 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
+			<field name="faceted_filter_s" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+				<option value="0">FLEXI_FS_NONE</option>
+				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
+				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FACETED_BEHAVIOR_ACTIVE_FILTERS" level="level3" />
 			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="hide_disabled_values_s" type="radio" default="0" label="FLEXI_FILTER_UNAVAILABLE_VALUES" description="FLEXI_FILTER_UNAVAILABLE_VALUES_DESC">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_HIDE</option>
 			</field>
 			
 		</params>
