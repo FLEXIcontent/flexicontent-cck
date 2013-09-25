@@ -1293,7 +1293,7 @@ class FlexicontentFields
 				$val = $listelement_props[0];
 				$results[$val] = new stdClass();
 				$results[$val]->value = $listelement_props[0];
-				$results[$val]->text  = $listelement_props[1];  // the text label
+				$results[$val]->text  = JText::_($listelement_props[1]);  // the text label
 				$el_prop_count = 2;
 				foreach ($extra_props as $extra_prop) {
 					$results[$val]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it

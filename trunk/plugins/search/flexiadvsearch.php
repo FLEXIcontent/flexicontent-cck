@@ -469,7 +469,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$fc_searchview['join_clauses'] = $join_clauses;
 		$fc_searchview['where_conf_only'] = $and_where;    // WHERE of the view (mainly configuration dependent)
 		$fc_searchview['filters_where'] = $filters_where;  // WHERE of the filters
-		$fc_searchview['filters_where']['txtsearch'] = $text_where;      // WHERE of text search
+		if ($text_where) $fc_searchview['filters_where']['txtsearch'] = $text_where;      // WHERE of text search
 		$fc_searchview['params'] = $params; // view's parameters
 		
 		
@@ -486,7 +486,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$db->query();
 		
 		// Construct query's SQL
-		$query 	= 'SELECT i.id, i.title AS title, i.sectionid, i.created, i.id AS fc_item_id,'
+		$query 	= 'SELECT i.id, i.title AS title, '.(FLEXI_J16GE ? '' : 'i.sectionid, ').'i.created, i.id AS fc_item_id,'
 			. ( !$txtmode ?
 				' ie.search_index AS text,' :
 				//' GROUP_CONCAT(\'[[[b]]]\', f.label, \'[[[/b]]]: \', ai.search_index ORDER BY f.ordering ASC SEPARATOR \' [[[br/]]]\') AS text,'
