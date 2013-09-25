@@ -35,11 +35,8 @@
 			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_PARAM_EXPLANATION" level="level3" menu="hide" />
 			<field name="catid" type="qfcategory" paramset="params" label="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY" description="FLEXI_FILTER_SPECIFIC_DEFAULT_CURRENT_CATEGORY_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_SELECTOR" level="level2" menu="hide" />
-			<field name="mcats_selection" type="radio" default="0" label="FLEXI_FILTER_CAT_SELECTION_LIMIT" description="FLEXI_FILTER_CAT_SELECTION_LIMIT_DESC" >
-				<option value="0">FLEXI_FILTER_SINGLE_CATEGORY</option>
-				<option value="1">FLEXI_FILTER_MULTIPLE_CATEGORIES</option>
-			</field>
+			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_SELECTOR_SMUL" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_FILTER_CATEGORY_SELECTOR_SMUL_INFO" level="level3" menu="hide" />
 			<field name="display_cat_list" type="list" default="0" label="FLEXI_FILTER_SHOW_CAT_SELECTOR" description="FLEXI_FILTER_SHOW_CAT_SELECTOR_DESC" >
 				<option value="0">FLEXI_FILTER_NO_USE_SINGLE_CAT_OR_CURR_CAT</option>
 				<option value="1">FLEXI_FILTER_YES_INCLUDE_SELECTED_CATEGORIES</option>
@@ -51,6 +48,13 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_FILTER_TARGET_VIEW" level="level2" menu="hide" />
+			<field name="mcats_selection" type="list" default="0" label="FLEXI_FILTER_FORM_TARGET" description="FLEXI_FILTER_FORM_TARGET_DESC" >
+				<option value="0">FLEXI_FILTER_TARGET_CAT_VIEW</option>
+				<option value="1">FLEXI_FILTER_TARGET_MCATS_VIEW</option>
+			</field>
+			<field name="mcats_itemid" type="text" default="" label="FLEXI_FILTER_MCATS_VIEW_ITEMID" description="FLEXI_FILTER_MCATS_VIEW_ITEMID_DESC" />
 						
 			<field name="" type="separator" default="FLEXI_SEARCH_FILTER_FORM" description="" level="level1" hr="false" menu="hide" />
 			<field name="show_search_go" type="radio" default="1" label="FLEXI_SEARCH_GO_BUTTON" description="FLEXI_SEARCH_GO_BUTTON_DESC" menu="hide" >

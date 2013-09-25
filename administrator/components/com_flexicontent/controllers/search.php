@@ -127,16 +127,25 @@ class FlexicontentControllerSearch extends FlexicontentController
 		$itemids = $session->get($indexer.'_items_to_index', array(),'flexicontent');
 		
 		// For advanced search index Remove old search values from the DB
-		if ($itemcnt==0 && $indexer=='advanced') {
-			if ($rebuildmode!='quick') {
-				$query = "TRUNCATE TABLE #__flexicontent_advsearch_index";
-			} else if (count($del_fieldids)) {
-				$del_fieldids_list = implode( ',' , $del_fieldids);
-				$query = "DELETE FROM #__flexicontent_advsearch_index "
-					." WHERE field_id IN (". $del_fieldids_list. ")";
+		if ($itemcnt==0) {
+			if ($indexer=='advanced') {
+				if ($rebuildmode!='quick') {
+					$clear_query = "TRUNCATE TABLE #__flexicontent_advsearch_index";
+				} else if (count($del_fieldids)) {
+					$del_fieldids_list = implode( ',' , $del_fieldids);
+					$clear_query = "DELETE FROM #__flexicontent_advsearch_index "
+						." WHERE field_id IN (". $del_fieldids_list. ")";
+				}
+			} else { // INDEX: basic 
+				if ( !count($fields) ) {
+					// (all items) Clear basic index records no fields marked as text searchable
+					$clear_query = "UPDATE #__flexicontent_items_ext SET search_index = '' ";
+				}
 			}
-			$db->setQuery($query);
-			$db->query();
+			if ( !empty($clear_query) ) {
+				$db->setQuery($clear_query);
+				$db->query();
+			}
 		}
 		
 		$items_per_query = 50;

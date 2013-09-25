@@ -75,10 +75,13 @@ if ( $show_mod )
 	$catid = !$isflexicat || !$current_cid ? $default_cid : $current_cid;  // id of category view or default value
 	
 	// CATEGORY SELECTION
-	$mcats_selection  = $params->get('mcats_selection', 0);
 	$display_cat_list = $params->get('display_cat_list', 0);
 	$catids           = $params->get('catids', array());
 	$catlistsize      = $params->get('catlistsize', 6);
+	
+	// TARGET VIEW
+	$mcats_selection = $params->get('mcats_selection', 0);
+	$mcats_itemid    = $params->get('mcats_itemid', 0);
 	
 	// FIELD FILTERS
 	$display_filter_list  = $params->get('display_filter_list', 0);
@@ -220,7 +223,10 @@ if ( $show_mod )
 	}
 	
 	$form_target = '';
-	$default_target = JRoute::_('index.php?option=com_flexicontent&view=category&layout=mcats', false);
+	$default_target = $mcats_itemid ? 
+		JRoute::_('&Itemid='.$mcats_itemid) :
+		JURI::base(true).'/index.php?option=com_flexiconten&view=category&layout=mcats'
+		;
 	// !! target MCATS layout of category view when selecting multiple categories OR selecting single category but no default category set (or no current category)
 	if (($display_cat_list && $mcats_selection) || !$catid) {
 		$form_target = $default_target;
