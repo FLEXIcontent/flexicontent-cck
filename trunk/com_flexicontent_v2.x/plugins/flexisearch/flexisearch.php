@@ -287,6 +287,9 @@ class plgSearchFlexisearch extends JPlugin
 			} else {
 				$aid = (int) $user->get('aid');
 				if (FLEXI_ACCESS) {
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
 					$select_access .= ', '
 						.' CASE WHEN '
 						.'  (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. (int) $aid . ') AND '
@@ -366,10 +369,7 @@ class plgSearchFlexisearch extends JPlugin
 			
 			$db->setQuery($query, 0, $limit);
 			$list = $db->loadObjectList();
-			if ( $db->getErrorNum() ) {
-				$jAp=& JFactory::getApplication();
-				$jAp->enqueueMessage(nl2br($query."\n".$db->getErrorMsg()."\n"),'error');
-			}
+			if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
 			if ( $list )
 			{
 				$item_cats = FlexicontentFields::_getCategories($list);

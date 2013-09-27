@@ -58,6 +58,9 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// Make sure field values were retrieved e.g. we need 'item->categories' for template classes
 		$items 	= FlexicontentFields::getFields($items, $view, $params);
 		
+		// Calculate CSS classes needed to add special styling markups to the items
+		flexicontent_html::calculateItemMarkups($items, $params);
+		
 		
 		// ********************************
 		// Load needed JS libs & CSS styles

@@ -26,7 +26,14 @@ if ( ($use_infoflds && count($infoflds)) || $fcr_use_image )
 		if ( ! @$result->fc_item_id ) continue;
 		$fcitems[$i] = JTable::getInstance('flexicontent_items', '');
 		$fcitems[$i]->load($result->fc_item_id);
+		$fcitems[$i]->category_access = $result->category_access;
+		$fcitems[$i]->type_access = $result->type_access ;
+		$fcitems[$i]->has_access  = $result->has_access;
+		$fcitems[$i]->categories = $result->categories;
 	}
+	
+	// Calculate CSS classes needed to add special styling markups to the items
+	flexicontent_html::calculateItemMarkups($fcitems, $this->params);
 }
 
 if ( $use_infoflds && count($infoflds) ) {
@@ -49,6 +56,20 @@ if ( $use_infoflds && count($infoflds) ) {
 				$fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
 			}
 			$fc_item_classes .= $result->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
+			
+			$markup_tags = '<span class="fc_mublock">';
+			$item = $fcitems[$i];
+			foreach($item->css_markups as $grp => $css_markups) {
+				if ( empty($css_markups) )  continue;
+				$fc_item_classes .= ' fc'.implode(' fc', $css_markups);
+				
+				$ecss_markups  = $item->ecss_markups[$grp];
+				$title_markups = $item->title_markups[$grp];
+				foreach($css_markups as $mui => $css_markup) {
+					$markup_tags .= '<span class="fc_markup mu' . $css_markups[$mui] . $ecss_markups[$mui] .'">' .$title_markups[$mui]. '</span>';
+				}
+			}
+			$markup_tags .= '</span>';
 		}
 	?>
 	<fieldset id="searchlist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
@@ -65,6 +86,9 @@ if ( $use_infoflds && count($infoflds) ) {
 			<?php endif; ?>
 		</div>
 		
+		
+		<?php if ( @ $result->fc_item_id ) echo $markup_tags; ?>
+		<div class="fcclear"></div>
 		
 		
 		<?php if ($this->params->get('show_date', 1)) : ?>

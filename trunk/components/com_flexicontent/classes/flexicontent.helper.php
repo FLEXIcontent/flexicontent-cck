@@ -4369,6 +4369,7 @@ class flexicontent_db
 		}
 		//echo "<pre>"; print_r($query); echo "\n\n";
 		
+		$data = array();
 		if ($dbtype == 'mysqli') {
 			$result = mysqli_query( $db_connection , $query );
 			if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysqli_error($db_connection));

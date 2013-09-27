@@ -23,9 +23,8 @@
 		<language tag="en-GB">languages/en-GB.mod_flexiadvsearch.ini</language>
 	</languages>
 	
-	<params addpath="/modules/mod_flexicontent/elements">
-		
-
+	<params addpath="/modules/mod_flexiadvsearch/elements">
+	
 			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" description="" level="level1" />
 			<field  name="layout"  type="fclayout"  default="news"  label="FLEXI_CHOOSE_TMPL"
 						description="FLEXI_CHOOSE_TMPL_DESC"  directory="/modules/mod_flexiadvsearch/tmpl"
@@ -70,10 +69,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="linkadvsearch_txt" type="text" default="FLEXI_ADV_MOD_ADVANCED_SEARCH" label="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT" description="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT_DESC" />
-			
-		</fieldset>
 		
-		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
+	  <field name="" type="jparamstab" title="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC" />
 			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC">
 				<option value="OR">FLEXI_OR</option>
 				<option value="AND">FLEXI_AND</option>
@@ -92,9 +89,8 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="php_rule" type="textarea" rows="5" cols="40" label="FLEXI_PHP_RULE_CODE" description="FLEXI_PHP_RULE_CODE_DESC" />
-		</fieldset>
 
-		<fieldset name="FLEXI_MOD_ADVANCED" label="FLEXI_MOD_ADVANCED">
+	  <field name="" type="jparamstab" title="FLEXI_MOD_ADVANCED" />
 			<field name="" type="separator" default="FLEXI_MODULE_STYLING" level="level1" menu="hide" />
 			<field name="moduleclass_sfx" type="text" default="" label="FLEXI_MODULE_CLASS_SUFFIX" description="FLEXI_MODULE_CLASS_SUFFIX_DESC" />
 			
@@ -105,6 +101,6 @@
 				<option value="0">FLEXI_NO_CACHING</option>
 			</field>
 			<field name="cache_time" type="text" default="900" label="FLEXI_CACHE_TIME" description="FLEXI_CACHE_TIME_DESC" />
-			
+		
 	</params>
 </install>

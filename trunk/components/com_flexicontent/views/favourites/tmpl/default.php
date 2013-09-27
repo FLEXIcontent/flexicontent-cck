@@ -178,6 +178,19 @@ if ($use_fields && count($fields)) {
 			$fc_item_classes .= ' fc_itemcat_'.$item_cat->id;
 		}
 		$fc_item_classes .= $item->has_access ? ' fc_item_has_access' : ' fc_item_no_access';
+		
+		$markup_tags = '<span class="fc_mublock">';
+		foreach($item->css_markups as $grp => $css_markups) {
+			if ( empty($css_markups) )  continue;
+			$fc_item_classes .= ' fc'.implode(' fc', $css_markups);
+			
+			$ecss_markups  = $item->ecss_markups[$grp];
+			$title_markups = $item->title_markups[$grp];
+			foreach($css_markups as $mui => $css_markup) {
+				$markup_tags .= '<span class="fc_markup mu' . $css_markups[$mui] . $ecss_markups[$mui] .'">' .$title_markups[$mui]. '</span>';
+			}
+		}
+		$markup_tags .= '</span>';
 	?>
 		<tr id="tablelist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
 		<?php if ($use_image) : ?>
@@ -199,6 +212,7 @@ if ($use_fields && count($fields)) {
 		<?php endif; ?>
 			<td headers="fc_title">
 				<a href="<?php echo $item_link; ?>"><?php echo $this->escape($item->title); ?></a>
+				<?php echo $markup_tags; ?>
 			</td>
 			<td headers="fc_intro">
 				<?php echo flexicontent_html::striptagsandcut( $item->introtext, 150 ); ?>

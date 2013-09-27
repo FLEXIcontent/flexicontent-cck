@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="plugin" version="1.5" group="search" method="upgrade">
-	<name>PLG_SEARCH_FLEXIADVSEARCH</name>
+	<name>Search - Flexiadvsearch, FLEXIcontent search view</name>
 	<author>Suriya Kaewmungmuang, ggppdk</author>
 	<creationDate>29 June 2011</creationDate>
 	<copyright>Copyright (C) 2011 flexicontent.org</copyright>
@@ -11,12 +11,13 @@
 	<description>PLG_SEARCH_FLEXIADVSEARCH_DESCRIPTION</description>
 	<files>
 		<filename plugin="flexiadvsearch">flexiadvsearch.php</filename>
+		<filename>index.html</filename>
 	</files>
-
+	
 	<languages>
 		<language tag="en-GB">en-GB.plg_search_flexiadvsearch.ini</language>
 	</languages>
-
+	
 	<params>
 			
 			<field name="search_limit" type="text" size="5" default="50" label="FLEXI_SEARCH_LIMIT" description="FLEXI_SEARCH_LIMIT_DESC"/>

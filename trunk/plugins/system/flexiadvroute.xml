@@ -12,6 +12,7 @@
 	
 	<files>
 		<filename plugin="flexiadvroute">flexiadvroute.php</filename>
+		<filename>index.html</filename>
 	</files>
 	
 	<languages>

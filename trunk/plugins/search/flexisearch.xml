@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="plugin" version="1.5" group="search" method="upgrade">
-	<name>PLG_SEARCH_FLEXISEARCH</name>
+	<name>Search - Flexisearch, Joomla standard search view</name>
 	<author>Emmanuel Danan, Aazam, ggppdk</author>
 	<creationDate>oct 2011</creationDate>
 	<copyright>Copyright (C) 2011 Aazam, Emmanuel Danan</copyright>
@@ -11,18 +11,19 @@
 	<description>PLG_SEARCH_FLEXISEARCH_DESCRIPTION</description>
 	<files>
 		<filename plugin="flexisearch">flexisearch.php</filename>
+		<filename>index.html</filename>
 	</files>
-
+	
 	<languages>
 		<language tag="en-GB">en-GB.plg_search_flexisearch.ini</language>
 	</languages>
-
+	
 	<params>
-			<param name="filter_lang" type="radio" default="1" label="FLEXI_FILTER_LANG" description="FLEXI_FILTER_LANG_DESC">
+			<param name="filter_lang" type="radio" default="1" label="FLEXI_STDSEARCH_LANG" description="FLEXI_STDSEARCH_LANG_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			<param name="search_limit" type="text" size="5" default="50" label="FLEXI_SEARCH_LIMIT" description="FLEXI_SEARCH_LIMIT_DESC"/>
+			<param name="search_limit" type="text" size="5" default="50" label="FLEXI_STDSEARCH_LIMIT" description="FLEXI_STDSEARCH_LIMIT_DESC"/>
 			<param name="search_title" type="radio" default="1" label="FLEXI_STDSEARCH_TITLE" description="FLEXI_STDSEARCH_TITLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
