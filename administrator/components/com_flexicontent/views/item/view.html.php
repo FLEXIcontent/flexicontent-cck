@@ -186,7 +186,7 @@ class FlexicontentViewItem extends JViewLegacy
 			
 			// Check if we are in the backend, in the back end we need to set the application to the site app instead
 			$isAdmin = JFactory::getApplication()->isAdmin();
-			if ( $isAdmin ) JFactory::$application = JApplication::getInstance('site');
+			if ( $isAdmin && FLEXI_J16GE ) JFactory::$application = JApplication::getInstance('site');
 			
 			// Create the URL
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug) . $autologin );
@@ -194,13 +194,17 @@ class FlexicontentViewItem extends JViewLegacy
 			// Check if we are in the backend again
 			// In backend we need to remove administrator from URL as it is added even though we've set the application to the site app
 			if( $isAdmin ) {
-				$admin_folder = str_replace(JURI::root(true),'',JURI::base(true));
-				$item_url = str_replace($admin_folder, '', $item_url);
-				// Restore application
-				JFactory::$application = JApplication::getInstance('administrator');
+				if ( FLEXI_J16GE ) {
+					$admin_folder = str_replace(JURI::root(true),'',JURI::base(true));
+					$item_url = str_replace($admin_folder, '', $item_url);
+					// Restore application
+					JFactory::$application = JApplication::getInstance('administrator');
+				} else {
+					$item_url = JURI::root(true).'/'.$item_url;
+				}
 			}
 			
-			$previewlink     = $server . $item_url;
+			$previewlink     = /*$server .*/ $item_url;
 			$previewlink     = str_replace('&amp;', '&', $previewlink);
 			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug)) .$autologin;
 
