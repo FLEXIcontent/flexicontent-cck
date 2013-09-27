@@ -117,6 +117,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		}
 		$level = $attributes['level'];
 		$description = @$attributes['description'];
+		$initial_tbl_hidden = @$attributes['initial_tbl_hidden'];
 		$value = $this->element['default'];
 		
 		if (FLEXI_J16GE && in_array($level, array('tblbreak','tabs_start','tab_open','tab_close','tabs_end')) ) return 'do no use type "'.$level.'" in J1.6+';
@@ -145,7 +146,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		
 		if ($level == 'tabs_start') {
 			$html = '';
-			if (!$initial_tbl_hidden) {
+			if (!empty($initial_tbl_hidden)) {
 				$initial_tbl_hidden = true;
 				$html = '<style> table.paramlist.admintable {display:none;} table.paramlist.admintable.flexi {display:table;} div.tabberlive {margin-top:0px;}</style>';
 			}
