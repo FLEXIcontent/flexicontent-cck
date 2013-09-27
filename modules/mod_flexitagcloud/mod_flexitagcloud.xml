@@ -10,13 +10,13 @@
 	<authorUrl>http://www.flexicontent.org</authorUrl>
 	<version>1.1</version>
 	<description>Tag Cloud Module for FLEXIcontent</description>
-
+	
 	<files>
 		<filename module="mod_flexitagcloud">mod_flexitagcloud.php</filename>
 		<filename>index.html</filename>
-        <filename>helper.php</filename>
-        <folder>tmpl</folder>
-        <folder>elements</folder>
+		<filename>helper.php</filename>
+		<folder>elements</folder>
+		<folder>tmpl</folder>
 	</files>
 	
 	<languages>
@@ -24,7 +24,7 @@
 	</languages>
 	
 	<params addpath="/modules/mod_flexitagcloud/elements">
-
+			
 			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
 			
 			<field name="min_size" type="text" default="1" label="FLEXI_MIN_SIZE" description="FLEXI_MIN_SIZE_DESC" />
@@ -230,5 +230,5 @@
 			</field>
 			<field name="cache_time" type="text" default="900" label="FLEXI_CACHE_TIME" description="FLEXI_CACHE_TIME_DESC" />
 		
-		</params>
+	</params>
 </install>

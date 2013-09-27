@@ -24,10 +24,9 @@
 	</languages>
 	
 	<config>
-	<fields name="params" addfieldpath="/modules/mod_flexicontent/elements">
+	<fields name="params" addfieldpath="/modules/mod_flexiadvsearch/elements">
+	
 		<fieldset name="basic">
-		
-
 			<field name="" type="separator" default="FLEXI_TEMPLATE_LAYOUT" description="" level="level1" />
 			<field  name="layout"  type="fclayout"  default="news"  label="FLEXI_CHOOSE_TMPL"
 						description="FLEXI_CHOOSE_TMPL_DESC"  directory="/modules/mod_flexiadvsearch/tmpl"
@@ -72,7 +71,6 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="linkadvsearch_txt" type="text" default="FLEXI_ADV_MOD_ADVANCED_SEARCH" label="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT" description="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT_DESC" />
-			
 		</fieldset>
 		
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
@@ -108,6 +106,7 @@
 			</field>
 			<field name="cache_time" type="text" default="900" label="FLEXI_CACHE_TIME" description="FLEXI_CACHE_TIME_DESC" />
 		</fieldset>
+		
 	</fields>
 	</config>
 </extension>

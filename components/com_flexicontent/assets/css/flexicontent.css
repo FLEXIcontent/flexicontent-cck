@@ -1089,6 +1089,7 @@ div.flexicontent.fcsearch  fieldset.fc_search_result:hover {
 }
 
 div.flexicontent.fcsearch  .fc_search_result_title {
+	float: left;
 }
 div.flexicontent.fcsearch  .fc_search_result_text {
 }
@@ -1100,7 +1101,7 @@ div.flexicontent.fcsearch  .fc_search_result_filters {
 }
 div.flexicontent.fcsearch  .fc_search_result_fields {
 }
-div.flexicontent.fcsearch  .highlight {
+div#flexicontent.flexicontent.fcsearch  .highlight {
 	background: none repeat scroll 0 0 #FFFFAA;
 	border-radius:5px;
 	-moz-border-radius: 5px;
@@ -1108,6 +1109,10 @@ div.flexicontent.fcsearch  .highlight {
 	color: darkred;
 	font-weight: normal;
 	padding: 3px 5px;
+}
+div#flexicontent.flexicontent.fcsearch  .fc_mublock {
+	display: block;
+	float: right;
 }
 
 

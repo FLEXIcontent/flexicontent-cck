@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="plugin" version="1.5" group="content" method="upgrade" >
-	<name>PLG_CONTENT_FLEXIBREAK</name>
+	<name>Content - Flexibreak, pagination for multi-paged articles</name>
 	<author>Peter Szalatnay, ggppdk</author>
 	<creationDate>2013 July</creationDate>
 	<copyright>Copyright (C) 2009 - 2013 Peter Szalatnay, ggppdk. All rights reserved.</copyright>

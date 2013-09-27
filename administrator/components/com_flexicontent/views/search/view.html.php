@@ -175,12 +175,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$$('li#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
 					.set('onclick', 'javascript:;')
 					.set('href', '".$popup_load_url."')
-					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 210}, onClose: function() {}}');
+					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', false );
 			JHtml::_('behavior.modal', 'li#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
 		} else {
-			$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', $popup_load_url, 500, 210);
+			$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', $popup_load_url, 500, 240);
 		}
 		
 		JToolBarHelper::divider();  JToolBarHelper::spacer();
@@ -192,12 +192,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$$('li#toolbar-advindex a.toolbar, #toolbar-advindex button')
 					.set('onclick', 'javascript:;')
 					.set('href', '".$popup_load_url."')
-					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 210}, onClose: function() {}}');
+					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', false );
 			JHtml::_('behavior.modal', 'li#toolbar-advindex a.toolbar, #toolbar-advindex button');
 		} else {
-			$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', $popup_load_url, 500, 210);
+			$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', $popup_load_url, 500, 240);
 		}
 		
 		$btn_task = '';
@@ -207,12 +207,12 @@ class FLEXIcontentViewSearch extends JViewLegacy
 				$$('li#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button')
 					.set('onclick', 'javascript:;')
 					.set('href', '".$popup_load_url."')
-					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 210}, onClose: function() {}}');
+					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'advindexdirty.png', 'advindexdirty_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', false );
 			JHtml::_('behavior.modal', 'li#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button');
 		} else {
-			$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', $popup_load_url, 500, 210);
+			$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', $popup_load_url, 500, 240);
 		}
 		
 		$toolbar->appendButton('Confirm', 'FLEXI_DELETE_INDEX_CONFIRM', 'trash', 'FLEXI_INDEX_ADVANCED_PURGE', FLEXI_J16GE ? 'search.purge' : 'purge', false);

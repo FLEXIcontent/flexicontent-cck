@@ -19,7 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 $search_task = FLEXI_J16GE ? 'task=search.' : 'controller=search&task=';
 ?>
-<div style="heading">Indexer Running</div>
+<div style="heading">Indexer Running ... <br/><br/><b>NOTE:</b><br/> Only the <b>execution time</b> of indexing process is displayed below, <br/> the <b>network request / reply time</b> is NOT included</div>
 <script type="text/javascript">
 jQuery(document).ready(function() {
 	var items_per_call = 50;

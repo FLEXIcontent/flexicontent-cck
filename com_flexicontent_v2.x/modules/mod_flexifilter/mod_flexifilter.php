@@ -224,7 +224,7 @@ if ( $show_mod )
 	
 	$form_target = '';
 	$default_target = $mcats_itemid ? 
-		JRoute::_('&Itemid='.$mcats_itemid) :
+		JRoute::_('index.php?Itemid='.$mcats_itemid) :
 		JURI::base(true).'/index.php?option=com_flexiconten&view=category&layout=mcats'
 		;
 	// !! target MCATS layout of category view when selecting multiple categories OR selecting single category but no default category set (or no current category)

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1641 2013-03-01 05:03:40Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1760 2013-09-10 10:42:37Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -66,6 +66,9 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		// Make sure field values were retrieved e.g. we need 'item->categories' for template classes
 		$items 	= FlexicontentFields::getFields($items, $view, $params);
+		
+		// Calculate CSS classes needed to add special styling markups to the items
+		flexicontent_html::calculateItemMarkups($items, $params);
 		
 		
 		// ********************************
