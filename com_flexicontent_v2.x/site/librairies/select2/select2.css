@@ -719,7 +719,7 @@ disabled look for disabled choices in the results dropdown
 	width: auto !important;
 	min-width: 124px !important;
 	min-height: 16px !important;
-	padding: 3px !important;
+	padding: 2px !important;
 	border: 1px solid lightgray !important;
 	/*background: url(../../assets/images/plus-button.png) no-repeat  50% 50% !important;*/
   background: #fff url('select2.png') no-repeat 100% -22px !important;

@@ -156,6 +156,7 @@
 			jQuery(ele).next().addClass(cls);
 			jQuery(ele).parent().addClass('fc_checkradio_checked');
 		}
+		//alert('done fc_toggleClass()');
 	}
 	
 	function fc_toggleClassGrp(ele, cls, fc_all) {
@@ -185,6 +186,7 @@
 			jQuery(ele).next().addClass(cls);
 			jQuery(ele).parent().addClass('fc_checkradio_checked');
 		}
+		//alert('done fc_toggleClassGrp()');
 	}
 
 
