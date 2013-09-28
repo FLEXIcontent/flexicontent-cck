@@ -357,6 +357,12 @@ fieldset.fc_filter_set {
 	background-color: #0099ff;
 }
 
+.fc_filter_set legend {
+	width: auto !important;
+	border: 0px solid !important;
+	padding: 0px !important;
+	margin: 0px !important;
+}
 .fc_filter_set legend .fc_legend_text {
 	background: transparent;
 	border:1px solid lightgray !important;
@@ -365,6 +371,10 @@ fieldset.fc_filter_set {
 	margin:0 0 5px 0 !important;
 	padding:8px 10px 8px 10px !important;
 	border-radius: 6px !important;
+	display: inline-block !important;
+	line-height: 0.5em !important;
+	position: relative !important;
+	top: 0px !important;
 }
 .fc_filter_set legend .fc_legend_text.hasTip {
 	background: lightyellow url(../images/note.gif) no-repeat 10px 50%;
@@ -372,8 +382,16 @@ fieldset.fc_filter_set {
 	color:gray !important;
 	display:block;
 	margin:0 0 5px 0 !important;
-	padding:8px 10px 8px 36px !important;
+	padding-left: 36px !important;
 	border-radius: 6px !important;
+}
+.fc_filter_set legend .fc_legend_text span {
+	font-weight: bold !important;
+	font-size: 12px !important;
+	padding: 0px !important;
+	margin: 0px !important;
+	display: inline-block !important;
+	line-height: 1em !important;
 }
 
 .fc_filter_set .fc-mssg.fc-info {

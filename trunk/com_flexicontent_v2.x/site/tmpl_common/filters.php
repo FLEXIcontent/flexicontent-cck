@@ -133,7 +133,7 @@ if ($filter_instructions == 1) {
 			
 			<?php
 			$n=0;
-			//$prepend_onchange = ' adminFormPrepare(document.getElementById(\''.$form_id.'\', 2); ';
+			$prepend_onchange = " adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
 			foreach ($filters as $filt) :
 				if (empty($filt->html)) continue;
 				
