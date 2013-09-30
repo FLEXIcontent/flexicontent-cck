@@ -623,8 +623,8 @@ disabled look for disabled choices in the results dropdown
 
 .use_select2_lib {
 	width: auto!important;
-	margin-top:0px!important;
-	margin-bottom:2px!important;
+	margin-top: 0px;
+	margin-bottom: 2px;
 }
 .select2-container-multi {
 	min-width: 40px!important;
