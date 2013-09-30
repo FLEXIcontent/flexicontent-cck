@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexinotify.php 1683 2013-06-02 07:51:11Z ggppdk $
+ * @version 1.5 stable $Id: flexinotify.php 1776 2013-09-27 10:52:20Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -177,6 +177,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 		// Import utility class that contains the send mail helper function
 		jimport( 'joomla.utilities.utility' );
+		jimport( 'joomla.mail.helper' );
 		
 		// Parameters for 'message' language string
 		//

@@ -177,6 +177,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 		// Import utility class that contains the send mail helper function
 		jimport( 'joomla.utilities.utility' );
+		jimport( 'joomla.mail.helper' );
 		
 		// Parameters for 'message' language string
 		//
