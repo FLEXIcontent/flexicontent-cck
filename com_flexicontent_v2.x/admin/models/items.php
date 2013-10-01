@@ -2473,7 +2473,22 @@ class FlexicontentModelItems extends JModelLegacy
 		// NOTE: array_unique() creates gaps in the index of the array,
 		// and if passed to json_encode it will output object !!! so we use array_values()
 		return array_values(array_unique($item_list));
-	}	
+	}
 	
+	
+	/**
+	 * Method to get an array of DB file data for the given file ids
+	 * 
+	 * @since 1.5
+	 */
+	function getFileData($fileids) {
+		$query = 'SELECT * '
+			. ' FROM #__flexicontent_files AS f'
+			. ' WHERE f.id IN ('.implode(',', $fileids).')'
+			;
+		$this->_db->setQuery($query);
+		$filedata= $this->_db->loadObjectList();
+		return $filedata;
+	}
 }
 ?>

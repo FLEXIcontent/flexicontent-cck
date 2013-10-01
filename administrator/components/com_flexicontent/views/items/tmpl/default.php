@@ -303,6 +303,11 @@ window.addEvent('domready', function() {
 					?>
 				</div>
 				
+				<?php if (@$this->lists['filter_fileid']): ?>
+					<div class="fcclear"></div>
+					<?php echo '<label class="label">'.JText::_('List items using file') . '</label> ' . $this->lists['filter_fileid']; ?>
+				<?php endif; ?>
+				
 			</td>
 		</tr>
 	</table>
@@ -915,7 +920,6 @@ window.addEvent('domready', function() {
 	<input type="hidden" name="newstate" id="newstate" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
-	<input type="hidden" name="filter_fileid" value="<?php echo $this->lists['filter_fileid']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
 </div>

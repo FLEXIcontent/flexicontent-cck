@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1746 2013-09-01 21:44:12Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1771 2013-09-24 22:01:25Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -302,6 +302,11 @@ window.addEvent('domready', function() {
 					echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
 					?>
 				</div>
+				
+				<?php if (@$this->lists['filter_fileid']): ?>
+					<div class="fcclear"></div>
+					<?php echo '<label class="label">'.JText::_('List items using file') . '</label> ' . $this->lists['filter_fileid']; ?>
+				<?php endif; ?>
 				
 			</td>
 		</tr>
@@ -915,7 +920,6 @@ window.addEvent('domready', function() {
 	<input type="hidden" name="newstate" id="newstate" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
-	<input type="hidden" name="filter_fileid" value="<?php echo $this->lists['filter_fileid']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
 </div>
