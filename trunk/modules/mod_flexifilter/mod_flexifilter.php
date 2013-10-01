@@ -64,7 +64,7 @@ if ( $show_mod )
 	$layout 				= $params->get('layout', 'default');
 	$add_ccs 				= $params->get('add_ccs', 1);
 	$add_tooltips 	= $params->get('add_tooltips', 1);
-	$autosubmit  	  = $params->get('autosubmit', 0);
+	$autosubmit  	  = $params->get('filter_autosubmit', 0);
 	
 	// current & default category IDs
 	$catid_fieldname = 'cid'; //'filter_catid_'.$module->id;
@@ -100,7 +100,7 @@ if ( $show_mod )
 	
 	if ($display_cat_list)
 	{
-		$_fld_class = ' class="fc_field_filter use_select2_lib select2_list_selected"';
+		$_fld_classes = 'fc_field_filter use_select2_lib select2_list_selected';
 		
 		$loader_html = '\'<p class=\\\'qf_centerimg=\\\'><img src=\\\''.JURI::base().'components/com_flexicontent/assets/images/ajax-loader.gif\\\' align=\\\'center\\\'></p>\'';
 		$url_to_load = JURI::root().'index.php?option=com_flexicontent&amp;task=getsefurl&amp;view=category&amp;tmpl=component&amp;cid=';
@@ -112,6 +112,7 @@ if ( $show_mod )
 			$_fld_multiple = ' multiple="multiple" ';
 			$_fld_name = 'cids[]';
 			$mcats_list = JRequest::getVar('cids', '');
+			$cats_filter =  JRequest::getVar('filter_13', array());  // ALSO consider categories filter if it is active in current view
 			if ( !is_array($mcats_list) ) {
 				$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
 				$mcats_list = explode(',', $mcats_list);
@@ -119,16 +120,18 @@ if ( $show_mod )
 			// make sure given data are integers ... !!
 			$cids = array();
 			foreach ($mcats_list as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+			if (is_array($cats_filter)) foreach ($cats_filter as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;   // ALSO consider categories filter if it is active in current view
 		} else {
+			$_fld_classes .= ' fc_autosubmit_exclude';  // exclude from autosubmit because we need to get single category SEF url before submitting, and then submit ...
 			$_fld_size = "";
 			$_fld_onchange = ' onchange="update_'.$form_name.'();" ';
 			$_fld_name = $catid_fieldname;
 		}
-		$_fld_attributes = $_fld_class.$_fld_size.$_fld_onchange.$_fld_multiple;
+		$_fld_attributes = ' class="'.$_fld_classes.'" '.$_fld_size.$_fld_onchange.$_fld_multiple;
 		
 		$allowedtree = modFlexifilterHelper::decideCats($params);
 		$selected_cats = $mcats_selection ? $cids : ($catid ? $catid : "") ;
-		$top = $mcats_selection ? false : 2;
+		$top = false;
 		$cats_select_field = flexicontent_cats::buildcatselect($allowedtree, $_fld_name, $selected_cats, $top, $_fld_attributes, $check_published = true, $check_perms = false, array(), $require_all=false);
 	} else if ($catid) {
 		$cat_hidden_field = '<input type="hidden" name="cid" value="'.$catid.'"/>';
@@ -169,6 +172,16 @@ if ( $show_mod )
 		foreach ($cat_filters as $filter_name => $filter) {
 			if ( isset($filterids_indexed[$filter->id]) ) {
 				$filters[] = $filter;
+			}
+		}
+	}
+	
+	// Remove categories filter
+	if ($display_cat_list || $catid) {
+		foreach ($filters as $i => $filter) {
+			if ($filter->field_type=='categories') {
+				unset($filters[$i]);
+				break;
 			}
 		}
 	}
@@ -274,11 +287,12 @@ if ( $show_mod )
 				if ( cid_val.length == 0 ) {
 					var fcform = jQuery(form);
 					var _action = fcform.attr("data-fcform_default_action"); 
-					form.action = _action;
+					fcform.attr("action", _action);
 					fcform.attr("data-fcform_action", _action ); 
+					adminFormPrepare(form, 1);
 					return;
 				}
-				getSEFurl("cid_loading_'.$module->id.'",	'.$loader_html.', form,"'.$url_to_load.'"+cid_val, "'.$autosubmit_msg.'", '.$autosubmit.');
+				getSEFurl("cid_loading_'.$module->id.'",	'.$loader_html.', form,"'.$url_to_load.'"+cid_val, "'.$autosubmit_msg.'", '.$autosubmit.', "'.$default_target.'");
 				/*jQuery("#'.$form_name.'_filter_box").css("display", "block");*/
 			}
 		';
