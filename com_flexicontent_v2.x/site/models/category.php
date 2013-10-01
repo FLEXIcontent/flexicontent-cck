@@ -1666,7 +1666,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			break;
 			
 			case 'type':
-				$filter_query = ' AND ie.type_id IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
+				//$filter_query = ' AND ie.type_id IN ('. implode(",", $values) .')';   // no db quoting needed since these were typecasted to ints
+				$query  = 'SELECT item_id'
+						. ' FROM #__flexicontent_items_ext'
+						. ' WHERE type_id IN ('. implode(",", $values) .')';
+						;
+				$filter_query = ' AND i.id IN (' . $query . ')';
 			break;
 			
 			case 'state':
@@ -1678,7 +1683,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 			break;
 			
 			case 'categories':
-				$filter_query = ' AND rel.catid IN ('. implode(",", $values) .')';
+				//$filter_query = ' AND rel.catid IN ('. implode(",", $values) .')';
+				$query  = 'SELECT itemid'
+						. ' FROM #__flexicontent_cats_item_relations'
+						. ' WHERE catid IN ('. implode(",", $values) .')';
+						;
+				$filter_query = ' AND i.id IN (' . $query . ')';
 			break;
 			
 			case 'tags':

@@ -465,6 +465,13 @@ table.adminlist td.order span {
 	width: 16px !important;
 }
 
+table.adminlist th {
+	padding: 4px 4px !important;
+}
+table.adminlist td {
+	padding: 2px 4px !important;
+}
+
 .novalue {
 	color: gray;
 	font-style: italic;

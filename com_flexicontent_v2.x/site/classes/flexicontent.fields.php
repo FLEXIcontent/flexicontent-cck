@@ -2502,6 +2502,7 @@ class FlexicontentFields
 			$item_id_col = $filter->iscore ? 'i.id' : 'fi.item_id';
 			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT '.$item_id_col.') as found ' : '')."\n"
 				. $valuesfrom."\n"
+				.(!$filter->iscore ? ' JOIN #__content AS i ON fi.item_id=i.id ' : '')
 				. $valuesjoin."\n"
 				. ' WHERE 1 '."\n"
 				. (!$item_ids_list ? '' : ' AND '.$item_id_col.' IN('.$item_ids_list.')'."\n")
