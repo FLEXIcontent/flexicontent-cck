@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1593 2012-12-11 21:41:25Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1762 2013-09-14 16:42:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -43,6 +43,9 @@ class FlexicontentViewItems extends JViewLegacy {
 		$task     = JRequest::getVar('task', '');
 		$cid      = JRequest::getVar('cid', array());
 		$extlimit = JRequest::getInt('extlimit', 500);
+		
+		$session = JFactory::getSession();
+		$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
 		$filter_fileid = JRequest::getInt('filter_fileid', 0);
 		
 		// Some flags
@@ -447,7 +450,16 @@ class FlexicontentViewItems extends JViewLegacy {
 		}
 		
 		// filter by item usage a specific file
-		$lists['filter_fileid'] = $filter_fileid;		
+		if ($fileid_to_itemids && count($fileid_to_itemids)) {
+			$files_data = $model->getFileData(array_keys($fileid_to_itemids));
+			$file_options = array();
+			$file_options[] = JHTML::_('select.option',  '', ' -- '.JText::_( 'FLEXI_SELECT' ).' '.JText::_( 'FLEXI_FILE' ).' -- ' );
+			foreach($files_data as $_file) {
+				$file_options[] = JHTML::_('select.option', $_file->id, $_file->altname );
+			}
+			flexicontent_html::loadFramework('select2');
+			$lists['filter_fileid'] = JHTML::_('select.genericlist', $file_options, 'filter_fileid', 'size="1" class="use_select2_lib" onchange="submitform();"', 'value', 'text', $filter_fileid );
+		}
 		
 		//assign data to template
 		$this->assignRef('db'				, $db);
@@ -473,6 +485,8 @@ class FlexicontentViewItems extends JViewLegacy {
 		$this->assignRef('filter_subcats'	, $filter_subcats);
 		$this->assignRef('filter_order_type', $filter_order_type);
 		$this->assignRef('filter_lang'		, $filter_lang);
+		$this->assignRef('filter_fileid'	, $filter_fileid);
+		
 		$this->assignRef('inline_ss_max'	, $inline_ss_max);
 		$this->assignRef('scope'			, $scope);
 		$this->assignRef('search'			, $search);

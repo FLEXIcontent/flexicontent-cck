@@ -38,11 +38,11 @@ $this->document->addStyleSheet( JURI::root().'components/com_flexicontent/assets
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 if ($this->perms['cantags'] || $this->perms['canversion']) {
-	$this->document->addScript( JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js' );
-	$this->document->addScript( JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js' );
-	$this->document->addScript( JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js' );
-	$this->document->addScript( JURI::root().'components/com_flexicontent/assets/js/jquery.pager.js' );     // e.g. pagination for item versions
-	$this->document->addScript( JURI::root().'components/com_flexicontent/assets/js/jquery.autogrow.js' );  // e.g. autogrow version comment textarea
+	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js');
+	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js');
+	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js');
+	$this->document->addScript(JURI::root().'components/com_flexicontent/assets/js/jquery.pager.js');     // e.g. pagination for item versions
+	$this->document->addScript(JURI::root().'components/com_flexicontent/assets/js/jquery.autogrow.js');  // e.g. autogrow version comment textarea
 
 	$this->document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addScriptDeclaration("
