@@ -4324,6 +4324,35 @@ class FLEXIUtilities
  */
 class flexicontent_db
 {
+	
+	/*
+	 Find stopwords and too small words
+	 */
+	function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index') {
+		$db = JFactory::getDBO();
+		$option = JRequest::getVar('option');
+		$min_word_len = JFactory::getApplication()->getUserState( $option.'.min_word_len', 0 );
+		
+		$query = 'SELECT '.$col
+			.' FROM #__'.$tbl
+			.' WHERE MATCH ('.$col.') AGAINST ("+%s")'
+			.' LIMIT 1';
+		$_words = array();
+		foreach ($words as $word) {
+			if ( mb_strlen($word) < $min_word_len ) {
+				$shortwords[] = $word;
+				continue;
+			}
+			$quoted_word = FLEXI_J16GE ? $db->escape($word, true) : $db->getEscaped($word, true);
+			$q = sprintf($query, $quoted_word);
+			$db->setQuery($q);
+			$result = $db->loadAssocList();
+			if ( empty($result) ) $stopwords[] = $word;
+			else $_words[] = $word;
+		}
+		return $_words;
+	}
+	
 	/**
 	 * Helper method to execute an SQL file containing multiple queries
 	 *

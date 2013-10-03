@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: controller.php 1384 2012-07-15 13:10:51Z ggppdk $
+ * @version 1.5 stable $Id: controller.php 1765 2013-09-17 09:34:53Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -70,7 +70,7 @@ class FlexicontentController extends JControllerLegacy
 	
 	
 	/**
-	 * Logic to create SEF urls via AJAX requests
+	 * Logic to get text search autocomplete strings
 	 *
 	 * @access public
 	 * @return void
@@ -78,15 +78,19 @@ class FlexicontentController extends JControllerLegacy
 	 */
 	function txtautocomplete() {
 		$app    = JFactory::getApplication();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		$option = JRequest::getVar('option');
+		
 		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
+		$filtercat  = $cparams->get('filtercat', 0);      // Filter items using currently selected language
+		$show_noauth = $cparams->get('show_noauth', 0);   // Show unauthorized items
 		
 		// Get request variables
 		$type = JRequest::getVar('type');
 		$text = JRequest::getVar('text');
 		$pageSize = JRequest::getInt('pageSize', 20);
 		$pageNum  = JRequest::getInt('pageNum', 1);
-		//$lang = flexicontent_html::getUserCurrentLang();
+		$lang = flexicontent_html::getUserCurrentLang();
 		
 		// Nothing to do
 		if ( $type!='basic_index' && $type!='adv_index' ) jexit();
@@ -100,26 +104,66 @@ class FlexicontentController extends JControllerLegacy
 		$db = JFactory::getDBO();
 		$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 		$quoted_text = $db->Quote( $quoted_text, false );
-		$_text_match  = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+		$_text_match  = ' MATCH (si.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 		
 		// Query retieval limits
 		$limitstart = $pageSize * ($pageNum - 1);
 		$limit      = $pageSize;
 		
+		$lang_where = '';
+		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
+			$lta = FLEXI_J16GE ? 'i': 'ie';
+			$lang_where .= '   AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
+		}
+		
+		$access_where = '';
+		$joinaccess = '';
+		/*if (!$show_noauth) {
+			$user = JFactory::getUser();
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$access_where .= ' AND ty.access IN (0,'.$aid_list.')';
+				$access_where .= ' AND mc.access IN (0,'.$aid_list.')';
+				$access_where .= ' AND  i.access IN (0,'.$aid_list.')';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+					$access_where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+					$access_where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
+					$access_where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
+				} else {
+					$access_where .= ' AND ty.access <= '.$aid;
+					$access_where .= ' AND mc.access <= '.$aid;
+					$access_where .= ' AND  i.access <= '.$aid;
+				}
+			}
+		}*/
+		
+		
 		// Do query ...
 		$tbl = $type=='basic_index' ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
-		$query 	= 'SELECT ie.item_id, ie.search_index'    //.', '. $_text_match. ' AS score'  // THIS MAYBE SLOW
-			.' FROM #__' . $tbl . ' AS ie'
-			.' JOIN #__content AS i ON i.id = ie.item_id'
-			//.' JOIN #__flexicontent_items_ext AS ext ON i.id = ext.item_id '
+		$query 	= 'SELECT si.item_id, si.search_index'    //.', '. $_text_match. ' AS score'  // THIS MAYBE SLOW
+			.' FROM #__' . $tbl . ' AS si'
+			.' JOIN #__content AS i ON i.id = si.item_id'
+			.($access_where || ($lang_where && !FLEXI_J16GE && $type!='basic_index') ?
+				' JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id ' : '')
+			.($access_where ? ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id' : '')
+			.($access_where ? ' JOIN #__categories AS mc ON mc.id = i.catid' : '')
+			.$joinaccess
 			.' WHERE '. $_text_match
-			.'   AND i.state IN (1,-5) '   //(FLEXI_J16GE ? 2:-1)
-			//.'   AND ( ext.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ext.language="*" ' : '') . ' ) '
+			.'   AND i.state IN (1,-5) '   //(FLEXI_J16GE ? 2:-1) // TODO search archived
+			. $lang_where
+			. $access_where
 			//.' ORDER BY score DESC'  // THIS MAYBE SLOW
 			.' LIMIT '.$limitstart.', '.$limit
 			;
 		$db->setQuery( $query  );
 		$data = $db->loadAssocList();
+		//if ($db->getErrorNum())  echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 		
 		// Get last word (this is a word prefix) and remove it from words array
 		$word_prefix = array_pop($words);

@@ -44,7 +44,7 @@ if ( $use_infoflds && count($infoflds) ) {
 }
 ?>
 
-<table class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>"><tr><td>
+<table class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" width="100%"><tr><td>
 
 <?php $count = -1; ?>
 <?php foreach($this->results as $i => $result) : ?>

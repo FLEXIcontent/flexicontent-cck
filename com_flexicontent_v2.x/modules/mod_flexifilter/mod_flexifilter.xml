@@ -104,7 +104,7 @@
 				<option value="1">FLEXI_OUTSIDE_INPUT</option>
 				<option value="2">FLEXI_INSIDE_INPUT</option>
 			</field>
-			<field name="search_autocomplete" type="radio" default="2" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" menu="hide" >
+			<field name="search_autocomplete" type="radio" default="1" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" menu="hide" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_AUTOCOMPLETE_SIMPLE</option>
 				<option value="2">FLEXI_AUTOCOMPLETE_TAG_LIKE</option>

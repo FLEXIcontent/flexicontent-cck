@@ -22,15 +22,16 @@ $text_search_val = JRequest::getString('filter', '', 'default');
 <form id='<?php echo $form_id; ?>' action='<?php echo $form_target; ?>' data-fcform_default_action='<?php echo $default_target; ?>' method='<?php echo $form_method; ?>' >
 
 <?php if ( !empty($cats_select_field) ) : ?>
-<span class="<?php echo $filter_container_class. ' fc_odd'; ?>">
-	<span class="fc_filter_label fc_cid_label"><?php echo JText::_($mcats_selection ? 'FLEXI_FILTER_CATEGORIES' : 'FLEXI_FILTER_CATEGORY'); ?> : </span>
-	<span class="fc_filter_html fc_cid_selector"><span class="cid_loading" id="cid_loading_<?php echo $module->id; ?>"></span><?php echo $cats_select_field; ?></span>
+<fieldset class="fc_filter_set" style="padding-bottom:0px;">
+	<span class="<?php echo $filter_container_class. ' fc_odd'; ?>" style="margin-bottom:0px;">
+		<span class="fc_filter_label fc_cid_label"><?php echo JText::_($mcats_selection ? 'FLEXI_FILTER_CATEGORIES' : 'FLEXI_FILTER_CATEGORY'); ?> : </span>
+		<span class="fc_filter_html fc_cid_selector"><span class="cid_loading" id="cid_loading_<?php echo $module->id; ?>"></span><?php echo $cats_select_field; ?></span>
+	</span>
+</fieldset>
+<div class="fcclear"></div>
 <?php elseif ( !empty($cat_hidden_field) ): ?>
 	<?php echo $cat_hidden_field; ?>
 <?php endif; ?>
-</span>
-
-<div class="fcclear"></div>
 
 <?php include(JPATH_SITE.'/components/com_flexicontent/tmpl_common/filters.php'); ?>
 

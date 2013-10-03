@@ -280,13 +280,14 @@ jQuery(document).ready(function() {
 	var fc_select_pageSize = 10;
 	
 	// add Simple text search autocomplete
-	jQuery( "input.fc_basicindex_complete_simple" ).autocomplete({
+	jQuery( "input.fc_index_complete_simple" ).autocomplete({
 		source: function( request, response ) {
+			el = jQuery(this.element);
 			jQuery.ajax({
 				url: "index.php?option=com_flexicontent&tmpl=component",
 				dataType: "json",
 				data: {
-					type: "basic_index",
+					type: (el.hasClass('fc_adv_complete') ? "adv_index" : "basic_index"),
 					task: "txtautocomplete",
 					pageSize: fc_select_pageSize,
 					text: request.term
@@ -324,7 +325,7 @@ jQuery(document).ready(function() {
 
 
 	// add Tag-Like text search autocomplete
-	jQuery('input.fc_basicindex_complete_tlike').select2(
+	jQuery('input.fc_index_complete_tlike').select2(
 	{
 		placeholder: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
 		multiple: true,
@@ -347,7 +348,7 @@ jQuery(document).ready(function() {
 			//Our search term and what page we are on
 			data: function (term, page) {
 				return {
-					type: "basic_index",
+					type: (jQuery(this).hasClass('fc_adv_complete') ? "adv_index" : "basic_index"),
 					task: "txtautocomplete",
 					text: term,
 					pageSize: fc_select_pageSize,

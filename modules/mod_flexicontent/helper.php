@@ -1389,10 +1389,10 @@ class modFlexicontentHelper
 			// Range value filter
 			else {
 				// Special case only one part of range provided ... must MATCH/INCLUDE empty values or NULL values ...
-				$value_empty = !strlen(@$filter_values[1]) && strlen(@$filter_values[2]) ? ' OR rel'.$filter_id.'="" OR rel'.$filter_id.' IS NULL ' : '';
+				$value_empty = !strlen(@$filter_values[1]) && strlen(@$filter_values[2]) ? ' OR rel'.$filter_id.'.value="" OR rel'.$filter_id.'.value IS NULL ' : '';
 				
-				if ( strlen(@$filter_values[1]) ) $where_field_filters .= ' AND (rel'.$filter_id.' >=' . $filter_values[1] . ') ';
-				if ( strlen(@$filter_values[2]) ) $where_field_filters .= ' AND (rel'.$filter_id.' <=' . $filter_values[2] . $value_empty . ') ';
+				if ( strlen(@$filter_values[1]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value >=' . $filter_values[1] . ') ';
+				if ( strlen(@$filter_values[2]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value <=' . $filter_values[2] . $value_empty . ') ';
 			}
 			
 			$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;

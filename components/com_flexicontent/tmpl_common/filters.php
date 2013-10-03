@@ -13,7 +13,7 @@ $filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
 // Text Search configuration
 $use_search  = $params->get('use_search', 1);
 $show_search_label = $params->get('show_search_label', 1);
-$search_autocomplete = $params->get( 'search_autocomplete', 2 );
+$search_autocomplete = $params->get( 'search_autocomplete', 1 );
 
 // Filters configuration
 $use_filters = $params->get('use_filters', 0) && $filters;
@@ -79,7 +79,7 @@ if ($filter_instructions == 1) {
 			<span class="<?php echo $filter_container_class; ?> fc_filter_text_search fc_odd">
 				<?php
 				$text_search_class = 'fc_text_filter';
-				$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_basicindex_complete_tlike' : ' fc_basicindex_complete_simple fc_label_internal') : ' fc_label_internal';
+				$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike fc_basic_complete' : ' fc_index_complete_simple fc_basic_complete fc_label_internal') : ' fc_label_internal';
 				$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
 				?>
 				
@@ -88,8 +88,6 @@ if ($filter_instructions == 1) {
 				<?php endif; ?>
 				
 				<span class="fc_filter_html">
-					<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>
-					
 					<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
 						fc_label_text="<?php echo $text_search_label; ?>" name="filter"
 						id="<?php echo $form_id; ?>_filter" value="<?php echo $text_search_val;?>" />
@@ -113,6 +111,7 @@ if ($filter_instructions == 1) {
 					</span>
 					<?php endif; ?>
 				
+					<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>
 				</span>
 				
 			</span>

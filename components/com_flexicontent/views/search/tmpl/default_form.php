@@ -1,5 +1,8 @@
 <?php defined('_JEXEC') or die('Restricted access');
 
+$txtmode = $this->params->get('txtmode', 0);
+$show_search_label = $this->params->get('show_search_label', 1);
+$search_autocomplete = $this->params->get( 'search_autocomplete', 1 );
 $show_searchphrase = $this->params->get('show_searchphrase', 1);
 $default_searchphrase = $this->params->get('default_searchphrase', 'all');
 
@@ -79,22 +82,47 @@ $r = 0;
 						<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS'); ?>:
 					</label>
 				</td>
-				<td colspan="3" class="fc_search_option_cell">
-					<input type="text" name="searchword" class="fc_field_filter" id="search_searchword" size="30" maxlength="50" value="<?php echo $this->escape($this->searchword); ?>" class="inputbox" />
-					<?php if ( $show_searchphrase ) echo $this->lists['searchphrase']; ?>
-					<button class="fc_button button_go" onclick="var form=document.getElementById('searchForm'); adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
-					
-					<?php if ($autodisplayadvoptions) {
-						$use_advsearch_options = JRequest::getInt('use_advsearch_options', 0);
-						$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
-						$checked_class = $use_advsearch_options ? 'highlight' : '';
-						$use_advsearch_options_ff = '';
-						$use_advsearch_options_ff .= '<label id="use_advsearch_options_lbl" class="flexi_radiotab rc5 '.$checked_class.'" style="float:none!important; display:inline-block!important; white-space:nowrap;" for="use_advsearch_options">';
-						$use_advsearch_options_ff .= ' <input  href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" id="use_advsearch_options" type="checkbox" name="use_advsearch_options" style="" value="1" '.$checked_attr.' />';
-						$use_advsearch_options_ff .= ' &nbsp;'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS');
-						$use_advsearch_options_ff .= '</label>';
-						echo $use_advsearch_options_ff;
-					} ?>
+				<td colspan="3" class="fc_search_option_cell" style="position:relative;">
+					<?php
+					$_ac_index = $txtmode ? 'fc_basic_complete' : 'fc_adv_complete';
+					$text_search_class  = 'fc_text_filter';
+					$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' fc_label_internal') : ' fc_label_internal';
+					$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
+					?>
+					<span class="fc_filter">
+						<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
+							fc_label_text="<?php echo $text_search_label; ?>" name="searchword" size="30" maxlength="120" 
+							id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" />
+
+						<?php if ( $show_searchphrase ) echo $this->lists['searchphrase']; ?>
+						
+						<?php
+						$ignoredwords = JRequest::getVar('ignoredwords');
+						$shortwords = JRequest::getVar('shortwords');
+						$shortwords_sanitize = JRequest::getVar('shortwords_sanitize');
+						$shortwords .= $shortwords_sanitize ? ' '.$shortwords_sanitize : '';
+						$min_word_len = JFactory::getApplication()->getUserState( JRequest::getVar('option').'.min_word_len', 0 );
+						$msg = '';
+						$msg .= $ignoredwords ? JText::_('FLEXI_WORDS_IGNORED_MISSING_COMMON').': <b>'.$ignoredwords.'</b>' : '';
+						$msg .= $ignoredwords && $shortwords ? ' <br/> ' : '';
+						$msg .= $shortwords ? JText::sprintf('FLEXI_WORDS_IGNORED_TOO_SHORT', $min_word_len) .': <b>'.$shortwords.'</b>' : '';
+						?>
+						<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>					
+						
+						<button class="fc_button button_go" onclick="var form=document.getElementById('searchForm'); adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
+						
+						<?php if ($autodisplayadvoptions) {
+							$use_advsearch_options = JRequest::getInt('use_advsearch_options', 0);
+							$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
+							$checked_class = $use_advsearch_options ? 'highlight' : '';
+							$use_advsearch_options_ff = '';
+							$use_advsearch_options_ff .= '<label id="use_advsearch_options_lbl" class="flexi_radiotab rc5 '.$checked_class.'" style="float:none!important; display:inline-block!important; white-space:nowrap;" for="use_advsearch_options">';
+							$use_advsearch_options_ff .= ' <input  href="javascript:;" onclick="fc_toggleClass(this.parentNode, \'highlight\');" id="use_advsearch_options" type="checkbox" name="use_advsearch_options" style="" value="1" '.$checked_attr.' />';
+							$use_advsearch_options_ff .= ' &nbsp;'.JText::_('FLEXI_SEARCH_ADVANCED_OPTIONS');
+							$use_advsearch_options_ff .= '</label>';
+							echo $use_advsearch_options_ff;
+						} ?>
+					</span>
 				</td>
 			</tr>
 			

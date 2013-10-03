@@ -107,7 +107,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$canseltypes  = $params->get('canseltypes', 1);
 		$txtmode      = $params->get('txtmode', 0);
 		$orderby_override = $params->get('orderby_override', 1);
-		
+		$si_tbl = !$txtmode ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
 		
 		
 		// *****************
@@ -257,6 +257,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 				
 				case 'all':
 					$words = preg_split('/\s\s*/u', $text);
+					$stopwords = array();
+					$shortwords = array();
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index');
+					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+					JRequest::setVar('shortwords', implode(' ', $shortwords));
+					
 					$newtext = '+' . implode( ' +', $words );
 					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
@@ -266,6 +272,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 				case 'any':
 				default:
 					$words = preg_split('/\s\s*/u', $text);
+					$stopwords = array();
+					$shortwords = array();
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index');
+					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+					JRequest::setVar('shortwords', implode(' ', $shortwords));
+					
 					$newtext = implode( ' ', $words );
 					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
@@ -532,12 +544,12 @@ class plgSearchFlexiadvsearch extends JPlugin
 			foreach($list as $key => $item)
 			{
 				if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION ) {
-					$item->categories = $item_cats[$item->id];
-					$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+					$item->categories = isset($item_cats[$item->id])  ?  $item_cats[$item->id] : array();  // in case of item categories missing
+					$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
 				} else {
-					$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
+					$item->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
 				}
-				$list[$key]->browsernav = $browsernav;
+				$item->browsernav = $browsernav;
 			}
 		}
 		
