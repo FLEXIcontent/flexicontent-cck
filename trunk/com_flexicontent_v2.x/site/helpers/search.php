@@ -57,7 +57,9 @@ class FLEXIadvsearchHelper
 			$pruned = array_diff( $aterms, $search_ignore );
 			$searchword = implode( ' ', $pruned );
 		}
-
+		// Set words that were removed due to being too short
+		JRequest::setVar('shortwords_sanitize', implode(' ', $search_ignore));
+		
 		return $ignored;
 	}
 

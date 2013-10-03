@@ -437,8 +437,9 @@ fieldset.fc_filter_set {
 .fc_filter {
 	clear: none;
 	margin: 0px 6px 6px 0px;
-	padding: 4px 0% 4px 0%;
+	padding: 1px 0% 1px 0%;
 	width: auto;
+	position: relative;
 }
 .fc_filter_line {
 	clear: both;

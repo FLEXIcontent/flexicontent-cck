@@ -86,15 +86,30 @@ class FLEXIcontentModelSearch extends JModelLegacy
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
 		
+		$default_searchphrase = $params->get('default_searchphrase', 'all');
+		
 		// Set the search parameters
 		$keyword		= urldecode(JRequest::getString('searchword'));
-		$match			= JRequest::getWord('searchphrase', 'all');
+		$match			= JRequest::getWord('searchphrase', $default_searchphrase);
 		$ordering		= JRequest::getWord('ordering', 'newest');
 		$this->setSearch($keyword, $match, $ordering);
 
 		//Set the search areas
 		$areas = JRequest::getVar('areas');
 		$this->setAreas($areas);
+		
+		// Get minimum word search length
+		$app = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		if ( !$app->getUserState( $option.'.min_word_len', 0 ) ) {
+			$db = JFactory::getDBO();
+			$db->setQuery("SHOW VARIABLES LIKE '%ft_min_word_len%'");
+			$_dbvariable = $db->loadObject();
+			$min_word_len = (int) @ $_dbvariable->Value;
+			$minchars = $params->get('minchars', 3);
+			$min_word_len = $min_word_len > $minchars  ?  $min_word_len : $minchars;
+			$app->setUserState($option.'.min_word_len', $min_word_len);
+		}
 	}
 	
 	

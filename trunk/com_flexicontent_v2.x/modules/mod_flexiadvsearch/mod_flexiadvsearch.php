@@ -118,6 +118,19 @@ if ( $show_mod )
 	$itemid_force = $params->get('itemid_force', '0');
 	$itemid = $itemid_force ? (int) $params->get('itemid_force_value', 0)  :  0;
 	
+	if ($itemid) {
+		$menu = JSite::getMenu()->getItem($itemid);     // Retrieve active menu
+		
+		// Get the COMPONENT only parameters, then merge the menu parameters
+		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
+		$comp_params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
+		$params->merge($comp_params);
+		if ($menu) {
+			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+			$params->merge($menu_params);
+		}
+	}
+	
 	// Render Layout
 	require(JModuleHelper::getLayoutPath('mod_flexiadvsearch', $layout));
 	

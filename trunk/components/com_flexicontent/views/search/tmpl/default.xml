@@ -18,6 +18,12 @@
 			
 			<field name="" type="separator" level="level3" default="Words of Text Search" />
 			 
+			<field name="show_search_label" type="list" default="" label="FLEXI_TEXT_SEARCH_LABEL" description="FLEXI_TEXT_SEARCH_LABEL_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_OUTSIDE_INPUT</option>
+				<option value="2">FLEXI_INSIDE_INPUT</option>
+			</field>
 			<field name="show_searchphrase" type="radio" default="1" label="Word Combination" description="Allow users to select method of combining the search words, e.g. phrase, phrase with guessing relevant, all, any, exact phrase">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -28,6 +34,12 @@
 				<option value="all">FLEXI_ALL_WORDS</option>
 				<option value="any">FLEXI_ANY_WORDS</option>
 				<option value="exact">FLEXI_EXACT_PHRASE</option>
+			</field>
+			<field name="search_autocomplete" type="list" default="" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" menu="hide" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_AUTOCOMPLETE_SIMPLE</option>
+				<option value="2">FLEXI_AUTOCOMPLETE_TAG_LIKE</option>
 			</field>
 			<field name="minchars" type="text" default="3" label="Word Min Length" description="Minimum character length that search words are allowed to have" />
 			<field name="maxchars" type="text" default="200" label="Word Max Length" description="Maximum characters length that search words are allowed to have" />

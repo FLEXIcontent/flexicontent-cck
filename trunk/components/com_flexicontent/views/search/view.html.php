@@ -41,6 +41,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		//initialize variables
 		$document = JFactory::getDocument();
 		$app   = JFactory::getApplication();
+		$option= JRequest::getVar('option');
 		$db    = JFactory::getDBO();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
@@ -464,14 +465,10 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		FLEXIadvsearchHelper::logSearch( $searchword);
 
 		//limit searchword
-		$min = $params->get('minchars', 3);
+		$min_word_len = JFactory::getApplication()->getUserState( $option.'.min_word_len', 0 );
+		$min = $min_word_len ? $min_word_len  : $params->get('minchars', 3);
 		$max = $params->get('maxchars', 200);
 		
-		$query = "SHOW VARIABLES LIKE '%ft_min_word_len%'";
-		$db->setQuery($query);
-		$_dbvariable = $db->loadObject();
-		$ft_min_word_len = (int) @ $_dbvariable->Value;
-		if ( $ft_min_word_len && ($ft_min_word_len > $min) ) $min = $ft_min_word_len;
 		if (FLEXIadvsearchHelper::limitSearchWord($searchword, $min, $max)) {
 			$error = JText::sprintf( 'FLEXI_SEARCH_MESSAGE', $min, $max );
 		}

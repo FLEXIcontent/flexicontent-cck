@@ -377,10 +377,10 @@ class plgSearchFlexisearch extends JPlugin
 				{
 					// echo $item->title." ".$item->tagname."<br/>"; // Before checking for noHTML
 					if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION ) {
-						$item->categories = $item_cats[$item->id];
-						$list[$key]->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug));
+						$item->categories = isset($item_cats[$item->id])  ?  $item_cats[$item->id] : array();  // in case of item categories missing
+						$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->catslug));
 					} else {
-						$list[$key]->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
+						$item->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
 					}
 					if (searchHelper::checkNoHTML($item, $searchText, array('title', 'metadesc', 'metakey', 'tagname', 'field', 'text' ))) {
 						$results[$item->id] = $item;

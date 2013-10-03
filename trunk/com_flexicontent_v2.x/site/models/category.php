@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1768 2013-09-22 21:42:30Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1779 2013-10-01 08:49:39Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -817,32 +817,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 	}
 	
 	
-	function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index') {
-		$db = JFactory::getDBO();
-		$option = JRequest::getVar('option');
-		$min_word_len = JFactory::getApplication()->getUserState( $option.'.min_word_len', 0 );
-		
-		$query = 'SELECT '.$col
-			.' FROM #__'.$tbl
-			.' WHERE MATCH ('.$col.') AGAINST ("+%s")'
-			.' LIMIT 1';
-		$_words = array();
-		foreach ($words as $word) {
-			if ( mb_strlen($word) < $min_word_len ) {
-				$shortwords[] = $word;
-				continue;
-			}
-			$quoted_word = FLEXI_J16GE ? $db->escape($word, true) : $db->getEscaped($word, true);
-			$q = sprintf($query, $quoted_word);
-			$db->setQuery($q);
-			$result = $db->loadAssocList();
-			if ( empty($result) ) $stopwords[] = $word;
-			else $_words[] = $word;
-		}
-		return $_words;
-	}
-	
-	
 	/**
 	 * Method to build the part of WHERE clause related to Alpha Index
 	 *
@@ -855,6 +829,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$app      = JFactory::getApplication();
 		$option   = JRequest::getVar('option');
 		$cparams  = $this->_params;
+		$db = $this->_db;
 		
 		$filters_where = array();
 		
@@ -879,8 +854,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$text = trim( $text );
 		if( strlen($text) )
 		{
-			$quoted_text = FLEXI_J16GE ? $this->_db->escape($text, true) : $this->_db->getEscaped($text, true);
-			$quoted_text = $this->_db->Quote( $quoted_text, false );
+			$quoted_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
+			$quoted_text = $db->Quote( $quoted_text, false );
 			
 			switch ($phrase)
 			{
@@ -900,13 +875,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = $this->removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
 					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
 					$newtext = '+' . implode( ' +', $words );
-					$quoted_text = FLEXI_J16GE ? $this->_db->escape($newtext, true) : $this->_db->getEscaped($newtext, true);
-					$quoted_text = $this->_db->Quote( $quoted_text, false );
+					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+					$quoted_text = $db->Quote( $quoted_text, false );
 					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 				
@@ -915,13 +890,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = $this->removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
 					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
 					$newtext = implode( ' ', $words );
-					$quoted_text = FLEXI_J16GE ? $this->_db->escape($newtext, true) : $this->_db->getEscaped($newtext, true);
-					$quoted_text = $this->_db->Quote( $quoted_text, false );
+					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+					$quoted_text = $db->Quote( $quoted_text, false );
 					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 			}
