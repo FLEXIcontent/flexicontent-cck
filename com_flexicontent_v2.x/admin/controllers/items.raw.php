@@ -119,7 +119,7 @@ class FlexicontentControllerItems extends FlexicontentController
 			$tagobjs 	=  $model->gettags(JRequest::getVar('q'));
 			$array = array();
 			echo "[";
-			foreach($tagobjs as $tag) {
+			if ($tagobjs) foreach($tagobjs as $tag) {
 				$array[] = "{\"id\":\"".$tag->id."\",\"name\":\"".$tag->name."\"}";
 			}
 			echo implode(",", $array);

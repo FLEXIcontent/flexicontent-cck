@@ -33,7 +33,6 @@ class FlexicontentViewImport extends JViewLegacy
 
 	function display( $tpl = null )
 	{
-		global $globalcats;
 		$mainframe = JFactory::getApplication();
 
 		//initialise variables
@@ -52,7 +51,8 @@ class FlexicontentViewImport extends JViewLegacy
 		$user 		= JFactory::getUser();
 		$document	= JFactory::getDocument();
 		$context	= 'com_flexicontent';
-
+		
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
 		JHTML::_('behavior.tooltip');
 
 		//add css to document
@@ -62,36 +62,82 @@ class FlexicontentViewImport extends JViewLegacy
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 
 		//get vars
-		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.items.filter_order', 		'filter_order', 	'', 	'cmd' );
-		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.items.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
+		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.import.filter_order', 		'filter_order', 	'', 	'cmd' );
+		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.import.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
 
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
 
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanImport');
-
+		
+		$session = JFactory::getSession();
+		$conf   = $session->get('csvimport_config', array(), 'flexicontent');
+		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
+		$session->set('csvimport_parse_log', null, 'flexicontent');
+		
 		//create the toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_COPYMOVE_ITEM' ), 'import' );
-		$ctrl_task = FLEXI_J16GE ? 'items.importcsv' : 'importcsv';
-		JToolBarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT', $list_check = false );  // list_check will check that at least one row is checked in listing-like views
+		$toolbar = JToolBar::getInstance('toolbar');
+		
+		if ( !empty($conf) ) {
+			if ($task!='processcsv') {
+				$ctrl_task = FLEXI_J16GE ? 'import.processcsv' : 'processcsv';
+				$import_btn_title = empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK';
+				JToolBarHelper::custom( $ctrl_task, 'refresh.png', 'refresh.png', $import_btn_title, $list_check = false );
+			}
+			$ctrl_task = FLEXI_J16GE ? 'import.clearcsv' : 'clearcsv';
+			JToolBarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
+		} else {
+			$ctrl_task = FLEXI_J16GE ? 'import.initcsv' : 'initcsv';
+			JToolBarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
+			$ctrl_task = FLEXI_J16GE ? 'import.testcsv' : 'testcsv';
+			JToolBarHelper::custom( $ctrl_task, 'preview.png', 'preview.png', 'FLEXI_IMPORT_TEST_FILE_FORMAT', $list_check = false );
+		}
 		//JToolBarHelper::Back();
 		if ($perms->CanConfig) {
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
 		}
-
+		
+		if ( !empty($conf) && $task=='processcsv' ) {
+			$this->assignRef('conf', $conf);
+			parent::display('process');
+			return;
+		}
+		
+		// Get types
 		$query = 'SELECT id, name'
 			. ' FROM #__flexicontent_types'
 			. ' WHERE published = 1'
 			. ' ORDER BY name ASC'
 			;
 		$db->setQuery($query);
-		$types = $db->loadObjectList();
-
+		$types = $db->loadObjectList('id');
+		
+		// Get Languages
+		$languages = FLEXIUtilities::getLanguages('code');
+		
+		// Get categories
+		global $globalcats;
+		$categories = $globalcats;
+		
+		if ( !empty($conf) ) {
+			$this->assignRef('conf', $conf);
+			$this->assignRef('cparams', $cparams);
+			$this->assignRef('types', $types);
+			$this->assignRef('languages', $languages);
+			$this->assignRef('categories', $globalcats);
+			parent::display('list');
+			return;
+		}
+		
+		
+		// ******************
+		// Create form fields
+		// ******************
 		$lists['type_id'] = flexicontent_html::buildtypesselect($types, 'type_id', '', true, 'class="fcfield_selectval" size="1"', 'type_id');
 		
-		$categories = $globalcats;
 		$actions_allowed = array('core.create');  // Creating categorories tree for item assignment, we use the 'create' privelege
 		
 		// build the secondary categories select list

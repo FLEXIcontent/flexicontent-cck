@@ -828,6 +828,8 @@
 			</field>
 			
 		<field name="" type="separator" default="FLEXI_IMPORT_MANAGER_CONF" label="" level="level1" menu="hide" />
+			<field name="import_items_per_step" type="text" default="2" size="12" label="FLEXI_IMPORT_ITEMS_PER_STEP" description="FLEXI_IMPORT_ITEMS_PER_STEP_DESC" menu="hide"/>
+			
 			<field name="" type="separator" default="FLEXI_IMPORT_CORE_CONF" label="" level="level2" menu="hide" />
 			<field name="import_ignore_unused_cols" type="radio" default="0" label="FLEXI_IMPORT_IGNORE_UNUSED_COLUMNS" description="FLEXI_IMPORT_IGNORE_REDUDANT_COLS" menu="hide">
 				<option value="0">FLEXI_NO</option>
@@ -883,7 +885,7 @@
 			<field name="csv_field_sep" type="text" size="12" default="~~" label="FLEXI_CSV_FIELD_SEPARATOR" description="FLEXI_CSV_FIELD_SEPARATOR_DESC" menu="hide"/>
 			<field name="csv_field_enclose_char" type="text" size="12" default="" label="FLEXI_CSV_FIELD_ENCLOSE_CHAR" description="FLEXI_CSV_FIELD_ENCLOSE_CHAR_DESC" menu="hide"/>
 			<field name="csv_item_record_sep" type="text" default="\n~~" size="12" label="FLEXI_CSV_ITEM_SEPARATOR" description="FLEXI_CSV_ITEM_SEPARATOR_DESC" menu="hide"/>
-			<field name="csv_debug_records" type="text" default="2" size="12" label="FLEXI_CSV_DEBUG_FIRST_RECORDS" description="FLEXI_CSV_DEBUG_FIRST_RECORDS_DESC" menu="hide"/>
+			<field name="csv_debug_records" type="text" default="2" size="12" label="FLEXI_CSV_DISPLAY_FIELDS_OF_FIRST_RECORDS" description="FLEXI_CSV_DISPLAY_FIELDS_OF_FIRST_RECORDS_DESC" menu="hide"/>
 			
 			<field name="" type="separator" default="FLEXI_IMPORT_FOLDERS" label="" level="level2" menu="hide" />
 			<field name="import_media_folder" type="text" default="tmp/fcimport_media" size="60" label="FLEXI_IMPORT_MEDIA_FOLDER" description="FLEXI_IMPORT_FOLDER_DESC" menu="hide"/>

@@ -398,7 +398,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
 				$newpost[$new]['link']    = $http_prefix.$post[$n]['link'];
 				$newpost[$new]['title']   = strip_tags(@$post[$n]['title']);
-				$newpost[$new]['hits']    = (int) $post[$n]['hits'];
+				$newpost[$new]['hits']    = (int) @ $post[$n]['hits'];
 				$new++;
 			}
 		}

@@ -1553,6 +1553,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+		if ( empty($post) ) return;
+		$is_importcsv = JRequest::getVar('task') == 'importcsv';
+		if ( !$is_importcsv ) return;
+		
+		$values = array();
+		foreach($post as $i => $d) {
+			$values[$i] = ( @unserialize($d)!== false || $d === 'b:0;' ) ? unserialize($d) : $d;
+			plgFlexicontent_fieldsImage::rebuildThumbs( $field, $values[$i] );
+		}
+		//echo "<b>{$field->field_type}</b>: <br/> <pre>".print_r($values, true)."</pre>\n";
 	}
 	
 	
