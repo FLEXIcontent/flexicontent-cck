@@ -52,7 +52,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_VARIOUS_BASIC_LABEL" description="" level="level2" />
-			<field name="default_image" type="text" default="" size="60" label="FLEXI_FIELD_DEFAULT_IMAGE" description="FLEXI_FIELD_DEFAULT_IMAGE_DESC" />
+			<field name="default_image" type="media" default="" size="60" label="FLEXI_FIELD_DEFAULT_IMAGE" description="FLEXI_FIELD_DEFAULT_IMAGE_DESC" />
 			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png,BMP,GIF,JPG,JPEG,PNG" size="60" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
 			<field name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
 			<field name="quality" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_QUALITY" description="FLEXI_FIELD_IMAGE_QUALITY_DESC" />

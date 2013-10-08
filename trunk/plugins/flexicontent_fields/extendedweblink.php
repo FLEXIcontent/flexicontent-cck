@@ -501,7 +501,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				$newpost[$new]['id']      = strip_tags(@$post[$n]['id']);
 				$newpost[$new]['class']   = strip_tags(@$post[$n]['class']);
 				$newpost[$new]['linktext']= strip_tags(@$post[$n]['linktext']);
-				$newpost[$new]['hits']    = (int) $post[$n]['hits'];
+				$newpost[$new]['hits']    = (int) @ $post[$n]['hits'];
 				$new++;
 			}
 		}

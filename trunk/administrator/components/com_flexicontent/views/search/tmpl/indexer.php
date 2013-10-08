@@ -26,22 +26,14 @@ jQuery(document).ready(function() {
 	var width = 0;
 	var looper = 0;
 	var onesector = 1000;
-	//var fields = new Array();
-	//var items = new Array();
 	var fields_length = 0;
 	var items_length = 0;
 	var number = 0;
 	function updateprogress() {
-		//looper=looper+1;
 		if(looper>=number && looper) {
 			jQuery('div#statuscomment').html( jQuery('div#statuscomment').text() + ' , INDEXING FINISHED. You may close this window');
-			//if(looper==(number+1)) {
-				//jQuery('div#statuscomment').text('Completed!');
-			//}
 			return;
 		}
-		//fieldindex = Math.floor((looper-1)/items_length)%fields.length;
-		itemindex = (looper-1)%items_length;
 		jQuery.ajax({
 			url: "index.php?option=com_flexicontent&<?php echo $search_task; ?>index&items_per_call="+items_per_call+"&itemcnt="+looper+"&indexer=<?php echo JRequest::getVar('indexer','advanced');?>"+"&rebuildmode=<?php echo JRequest::getVar('rebuildmode','');?>",
 			success: function(response, status2, xhr2) {
@@ -52,7 +44,7 @@ jQuery(document).ready(function() {
 					return;
 				}
 				width = onesector*looper;
-				if (width>300) width = 300
+				if (width>300) width = 300;
 				percent = width/3;
 				jQuery('div#insideprogress').css('width', width+'px');
 				jQuery('div#updatepercent').text(' '+percent.toFixed(2)+' %');

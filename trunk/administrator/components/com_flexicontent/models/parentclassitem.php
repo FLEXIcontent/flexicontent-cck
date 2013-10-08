@@ -2255,6 +2255,7 @@ class ParentClassItem extends JModelLegacy
 				
 				// Unserialize values already serialized values, e.g. (a) if current values used are from DB or (b) are being imported from CSV file
 				$postdata[$field->name] = !is_array($postdata[$field->name]) ? array($postdata[$field->name]) : $postdata[$field->name];
+				//echo "<b>{$field->field_type}</b>: <br/> <pre>".print_r($postdata[$field->name], true)."</pre>\n";
 				foreach ($postdata[$field->name] as $i => $postdata_val) {
 					if ( @unserialize($postdata_val)!== false || $postdata_val === 'b:0;' ) {
 						$postdata[$field->name][$i] = unserialize($postdata_val);
@@ -2875,7 +2876,8 @@ class ParentClassItem extends JModelLegacy
 	 */
 	function gettags($mask="")
 	{
-		$where = ($mask!="")?" name like '%$mask%' AND":"";
+		$escaped_mask = FLEXI_J16GE ? $this->_db->escape( $mask, true ) : $this->_db->getEscaped( $mask, true );
+		$where = ($mask!="")?" name like ".$this->_db->Quote( '%'.$escaped_mask.'%', false )." AND":"";
 		$query = 'SELECT * FROM #__flexicontent_tags WHERE '.$where.' published = 1 ORDER BY name';
 		$this->_db->setQuery($query);
 		$tags = $this->_db->loadObjectlist();
