@@ -151,7 +151,7 @@ if ($filter_instructions == 1) {
 				$filter_html[$filt->id] = preg_replace('/([\'"])adminForm([\'"])/', '${1}'.$form_name.'${2}', $filt->html);
 				
 				$_filter_html  = $pretext;
-				$_filter_html .= '<span class="'.$filter_container_class.(($n++)%2 ? ' fc_even': ' fc_odd').'" >' ."\n";
+				$_filter_html .= '<span class="'.$filter_container_class.(($n++)%2 ? ' fc_even': ' fc_odd').' '.$filter_container_class.'_'.$filt->id.'" >' ."\n";
 				$_filter_html .= ($show_filter_labels==1 || ($show_filter_labels==0 && $filt->parameters->get('display_label_filter')==1))
 					? ' <span class="fc_filter_label fc_label_field_'.$filt->id.'">' .$filt->label. '</span>' ."\n"  :  '';
 				$_filter_html .= ' <span class="fc_filter_html fc_html_field_'.$filt->id.'">' .$filt->html. '</span>' ."\n";
