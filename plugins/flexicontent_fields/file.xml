@@ -60,19 +60,30 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="usebutton" type="radio" default="0" label="FLEXI_FIELD_DOWNLOAD_BUTTON" description="FLEXI_FIELD_DOWNLOAD_BUTTON_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<field name="display_filename" type="radio" default="0" label="FLEXI_FIELD_FILE_SHOW_FILENAME" description="FLEXI_FIELD_FILE_SHOW_FILENAME_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+				<option value="1">FLEXI_YES_PREFER_FILE_TITLE</option>
+				<option value="2">FLEXI_YES</option>
 			</field>
 			<field name="display_descr" type="list" default="1" label="FLEXI_FIELD_FILE_SHOW_DESCR" description="FLEXI_FIELD_FILE_SHOW_DESCR_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_AS_TIP</option>
 				<option value="2">FLEXI_YES_AS_INLINE</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_OPTIONAL_BUTTONS" level="level3" menu="hide" />
+			<field name="usebutton" type="radio" default="0" label="FLEXI_FIELD_DOWNLOAD_BUTTON" description="FLEXI_FIELD_DOWNLOAD_BUTTON_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_CUSTOM_TEXT</option>
+			</field>
+			<field name="buttontext" type="text" size="40" default="FLEXI_DOWNLOAD" label="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
+			<field name="allowshare" type="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_SHARE" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_CUSTOM_TEXT</option>
+			</field>
+			<field name="sharetext" type="text" size="40" default="FLEXI_EMAIL_SHARE_LINK" label="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT_DESC"/>
 
 			<field name="" type="separator" default="FLEXI_DISPLAY_INACCESSIBLE_FILES_PARAMS_LABEL" level="level2" menu="hide" />
 			<field name="noaccess_display" type="radio" default="1" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_DISPLAY_DESC">

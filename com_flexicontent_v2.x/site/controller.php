@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: controller.php 1765 2013-09-17 09:34:53Z ggppdk $
+ * @version 1.5 stable $Id: controller.php 1781 2013-10-03 02:29:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1414,28 +1414,55 @@ class FlexicontentController extends JControllerLegacy
 		$exttype = JRequest::getVar( 'exttype', 'modules' );
 		$extname = JRequest::getVar( 'extname', '' );
 		$extfunc = JRequest::getVar( 'extfunc', '' );
+		$extfolder = JRequest::getVar( 'extfolder', '' );
 		
-		if ($exttype!='modules') { echo 'only modules are supported'; jexit(); }  // currently supporting only plugins
+		if ($exttype!='modules' && $exttype!='plugins') { echo 'only modules and plugins are supported'; jexit(); }  // currently supporting only module and plugins
 		if (!$extname || !$extfunc) { echo 'function or extension name not set'; jexit(); }  // require variable not set
+		if ($exttype=='plugins' && $extfolder=='') { echo 'only plugin folder is not set'; jexit(); }  // currently supporting only module and plugins		
 		
-		// Import helper file
-		$helper_path = JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php';
-		if ( !file_exists($helper_path) ) { echo "no helper file found at expected path"; jexit(); }
-		require_once ($helper_path);
+		if ($exttype=='modules') {
+			// Import module helper file
+			$helper_path = JPATH_SITE.DS.$exttype.DS.'mod_'.$extname.DS.'helper.php';
+			if ( !file_exists($helper_path) ) { echo "no helper file found at expected path, filepath is ".$helper_path; jexit(); }
+			require_once ($helper_path);
+			
+			// Create object
+			$classname = 'mod'.ucwords($extname).'Helper';
+			if ( !class_exists($classname) ) { echo "no correctly named class inside helper file"; jexit(); }
+			$obj = new $classname();
+		}
 		
-		// Create object
-		$classname = 'mod'.ucwords($extname).'Helper';
-		if ( !class_exists($classname) ) { echo "no correctly named class inside helper file"; jexit(); }
-		$obj = new $classname();
+		else {  // exttype is 'plugins'
+			// Load Flexicontent Field (the Plugin file) if not already loaded
+			$plgfolder = !FLEXI_J16GE ? '' : DS.strtolower($extname);
+			$path = JPATH_ROOT.DS.'plugins'.DS.$extfolder.$plgfolder.DS.strtolower($extname).'.php';
+			if ( !file_exists($path) ) { echo "no plugin file found at expected path, filepath is ".$path; jexit(); }
+			require_once ($path);
+			
+			// Create class name of the plugin
+			$classname = 'plg'. ucfirst($extfolder).$extname;
+			if ( !class_exists($classname) ) { echo "no correctly named class inside plugin file"; jexit(); }
+			
+			// Create a plugin instance
+			$dispatcher = JDispatcher::getInstance();
+			$obj = new $classname($dispatcher, array());
+			
+			// Assign plugin parameters, (most FLEXI plugins do not have plugin parameters), CHECKING if parameters exist
+			$plugin_db_data = JPluginHelper::getPlugin($extfolder,$extname);
+			$obj->params = FLEXI_J16GE ? new JRegistry( @ $plugin_db_data->params ) : new JParameter( @ $plugin_db_data->params );
+		}
 		
-		// Security concern, only methods 'confirmed' methods will be callable
+		// Security concern, only 'confirmed' methods will be callable
 		if ( !in_array($extfunc, $obj->task_callable) ) { echo "non-allowed method called"; jexit(); }
 		
 		// Method actually exists
 		if ( !method_exists($obj, $extfunc) ) { echo "non-existing method called "; jexit(); }
 		
 		// Load extension's english language file then override with current language file
-		$extension_name = 'mod_'.strtolower($extname);
+		if ($exttype=='modules')
+			$extension_name = 'mod_'.strtolower($extname);
+		else
+			$extension_name = 'plg_'.strtolower($extname);
 		JFactory::getLanguage()->load($extension_name, JPATH_SITE, 'en-GB', true);
 		JFactory::getLanguage()->load($extension_name, JPATH_SITE, null, true);
 		

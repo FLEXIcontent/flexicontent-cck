@@ -750,7 +750,7 @@ class flexicontent_html
 	 */
 	static function striptagsandcut( $text, $chars=null )
 	{
-		// Convert entiies to characters so that they will not be removed ... by strip_tags
+		// Convert html entities to characters so that they will not be removed ... by strip_tags
 		$text = html_entity_decode ($text, ENT_NOQUOTES, 'UTF-8');
 		
 		// Strip SCRIPT tags AND their containing code
@@ -776,15 +776,18 @@ class flexicontent_html
 		$cleantext = preg_replace('/[\p{Z}\s]{2,}/u', ' ', $cleantext);  // Unicode safe whitespace replacing
 		
 		// Calculate length according to UTF-8 encoding
-		$length = JString::strlen(htmlspecialchars( $cleantext ));
-
-		// cut the text if required
+		$length = JString::strlen($cleantext);
+		
+		// Cut off the text if required but reencode html entities before doing so
 		if ($chars) {
 			if ($length > $chars) {
-				$cleantext = JString::substr( htmlspecialchars($cleantext, ENT_QUOTES, 'UTF-8'), 0, $chars ).'...';
+				$cleantext = JString::substr( $cleantext, 0, $chars ).'...';
 			}
 		}
-
+		
+		// Reencode HTML special characters, (but do not encode UTF8 characters)
+		$cleantext = htmlspecialchars($cleantext, ENT_QUOTES, 'UTF-8');
+		
 		return $cleantext;
 	}
 
@@ -3415,6 +3418,7 @@ class flexicontent_tmpl
 		}
 		else {
 			$tmpls = flexicontent_tmpl::parseTemplates();
+			$cached = 0;
 		}
 
 		// Load Template-Specific language file(s) to override or add new language strings

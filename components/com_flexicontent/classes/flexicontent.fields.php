@@ -1929,7 +1929,7 @@ class FlexicontentFields
 			foreach ($value as $val) {
 				$value_clauses[] = '_v_=' . $db->Quote( $val );
 			}
-			$comb_op = $filter_values_combination ? 'AND' : ' OR ';
+			$comb_op = $filter_values_combination ? ' AND ' : ' OR ';
 			$valueswhere .= ' AND ('.implode($comb_op, $value_clauses).') ';
 			break;
 		}
