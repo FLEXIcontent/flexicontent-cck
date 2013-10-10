@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: file.php 1603 2012-12-16 07:26:51Z ggppdk $
+ * @version 1.0 $Id: file.php 1767 2013-09-18 17:46:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -20,6 +20,7 @@ jimport('joomla.event.plugin');
 class plgFlexicontent_fieldsFile extends JPlugin
 {
 	static $field_types = array('file');
+	var $task_callable = array('share_file_form', 'share_file_email');
 	
 	// ***********
 	// CONSTRUCTOR
@@ -244,10 +245,14 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		// some parameter shortcuts
 		$useicon		= $field->parameters->get( 'useicon', 1 ) ;
-		$usebutton	= $field->parameters->get( 'usebutton', 0 ) ;
 		$display_filename	= $field->parameters->get( 'display_filename', 0 ) ;
 		$display_descr		= $field->parameters->get( 'display_descr', 0 ) ;
-
+		
+		$usebutton	= $field->parameters->get( 'usebutton', 0 ) ;
+		$buttontext = $usebutton==2 ? $field->parameters->get( 'buttontext', 'FLEXI_DOWNLOAD' ) : 'FLEXI_DOWNLOAD';
+		$allowshare = $field->parameters->get( 'allowshare', 0 ) ;
+		$sharetext  = $allowshare==2 ? $field->parameters->get( 'sharetext', 'FLEXI_EMAIL_SHARE_LINK' ) : 'FLEXI_EMAIL_SHARE_LINK';
+		
 		$noaccess_display	     = $field->parameters->get( 'noaccess_display', 1 ) ;
 		$noaccess_url_unlogged = $field->parameters->get( 'noaccess_url_unlogged', false ) ;
 		$noaccess_url_logged   = $field->parameters->get( 'noaccess_url_logged', false ) ;
@@ -274,11 +279,26 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		}
 		$use_downloads_manager = $use_downloads_manager ? $mod_is_enabled : 0;
 		
+		
+		// Downloads manager feature
+		if ($allowshare) {
+			if (file_exists ( JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php' )) {
+				$com_mailto_found = true;
+				require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
+				
+				$status = 'width=700,height=360,menubar=yes,resizable=yes';
+				$send_form_title = JText::_( 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND' );
+				$send_form_desc = JText::_( 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND_INFO' );
+			} else {
+				$com_mailto_found = false;
+			}
+		}
+		
 		if($pretext) { $pretext = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) {	$posttext = $remove_space ? $posttext : ' ' . $posttext; }
 
 		// Description as tooltip
-		if ($display_filename==2) JHTML::_('behavior.tooltip');
+		if ($display_descr==2) JHTML::_('behavior.tooltip');
 
 		switch($separatorf)
 		{
@@ -326,15 +346,19 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		// This may be done by adding a new method to fields to prepare multiple fields with a single call
 		$files_data = $this->getFileData( $values, $published=true );   //print_r($files_data); exit;
 		
+		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		foreach($files_data as $file_id => $file_data) {
 			$icon = '';
 			$authorized = true;
+			$is_public  = true;
 			// Check user access on the file
 			if ( !empty($file_data->access) ) {
 				if (FLEXI_J16GE) {
 					$authorized = in_array($file_data->access,$aid_arr);
+					$is_public  = in_array($public_acclevel,$aid_arr);
 				} else {
-					$authorized = $aid >= $file_data->access;
+					$authorized = $file_data->access <= $aid;
+					$is_public  = $file_data->access <= $public_acclevel;
 				}
 			}
 
@@ -350,7 +374,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// --. Decide whether to show filename (if we do not use button, then displaying of filename is forced)
 			$_filename  = $file_data->altname ? $file_data->altname : $file_data->filename;
 			//$_filename  = mb_strtolower( $_filename, "UTF-8");
-			$name_str   = ($display_filename || !$usebutton || $prop=='namelist') ? $_filename : '';
+			$name_str   = ($display_filename || !$usebutton || $prop=='namelist') ? ($display_filename==2 ? $file_data->filename : $_filename) : '';
 			$name_html  = !empty($name_str) ? '&nbsp;<span class="fcfile_name">'. $name_str . '</span>' : '';
 
 			// --. Description as tooltip or inline text ... prepare related variables
@@ -435,9 +459,25 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				// The download button in a mini form ...
 				$str .= '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" >';
 				$str .= $file_data_fields;
-				$str .= '<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_('FLEXI_DOWNLOAD').'"/>';
+				$str .= '<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_($buttontext).'"/>';
 				$str .= $text_html;
 				$str .= '</form>'."\n";
+				
+				// The share popup form button (but disable it if com_mailto is missing)
+				if ($is_public && $allowshare && !$com_mailto_found) {
+					$str .= ' com_mailto component not found, please disable <b>download link sharing parameter</b> in this file field';
+					$allowshare = false;
+				}
+				
+				if ($is_public && $allowshare) {
+					$send_onclick = 'window.open(\'%s\',\'win2\',\''.$status.'\'); return false;';
+					$send_title = $send_form_title.'::'.$send_form_desc;
+					$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
+						.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
+						.'&file_id='.$file_id.'&content_id='.$item->id.'&file_id='.$field->id;
+					$str .= '<input type="button" class="fc_button fcsimple editlinktip hasTip" onclick="'.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$send_title.'"
+						value="'.JText::_( 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND' ).'" />';
+				}
 			}
 			
 			
@@ -480,6 +520,22 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$str .= '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' .JText::_('FLEXI_DOWNLOAD'). '</a> '. $text_html;
 				} else {
 					$str .= '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</a> '. $text_html;
+				}
+				
+				// The share popup form button (but disable it if com_mailto is missing)
+				if ($is_public && $allowshare && !$com_mailto_found) {
+					$str .= ' com_mailto component not found, please disable <b>download link sharing parameter</b> in this file field';
+					$allowshare = false;
+				}
+				
+				if ($is_public && $allowshare) {
+					$send_onclick = 'window.open(\'%s\',\'win2\',\''.$status.'\'); return false;';
+					$send_title = $send_form_title.'::'.$send_form_desc;
+					$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
+						.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form&file_id='.$file_id;
+
+					$str .= '<a href="javascript:;" class="editlinktip hasTip" onclick="'.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$send_title.'">'.
+						JText::_( 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND' ).'</a>';
 				}
 			}
 			
@@ -719,6 +775,220 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			break;
 		}
 		return $file;
+	}
+	
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
+	
+	/**
+	 * Create form for sharing the download link of given file
+	 *
+	 * @access public
+	 * @since 1.0
+	 */
+	function share_file_form($tpl = null)
+	{
+		$user = JFactory::getUser();
+		$db   = JFactory::getDBO();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
+		
+		//$tree_var = JRequest::getVar( 'tree_var', "" );
+		$file_id    = (int) JRequest::getInt( 'file_id', 0 );
+		$content_id = (int) JRequest::getInt( 'content_id', 0 );
+		$field_id   = (int) JRequest::getInt( 'field_id', 0 );
+		$tpl = JRequest::getCmd( '$tpl', 'default' );
+		if ( !$file_id ) {
+			echo JText::_('file id is missing');
+			jexit();
+		}
+		
+		$query = ' SELECT * '
+			. ' FROM #__flexicontent_files'
+			. ' WHERE id='. $file_id;
+			;
+		$db->setQuery( $query );
+		$file = $db->loadObject();
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+
+		if ( !$file ) {
+			echo JText::_('file id no '.$file_id.', was not found');
+			jexit();
+		}
+		
+		$data = new stdClass();
+		$data->file_id    = $file_id;
+		$data->content_id = $content_id;
+		$data->field_id   = $field_id;
+
+		// Load with previous data, if it exists
+		$mailto		= JRequest::getString('mailto', '', 'post');
+		$sender		= JRequest::getString('sender', '', 'post');
+		$from			= JRequest::getString('from', '', 'post');
+		$subject	= JRequest::getString('subject', '', 'post');
+
+		if ($user->get('id') > 0) {
+			$data->sender	= $user->get('name');
+			$data->from		= $user->get('email');
+		}
+		else
+		{
+			$data->sender	= $sender;
+			$data->from		= $from;
+		}
+
+		$data->subject	= $subject;
+		$data->mailto	= $mailto;
+		
+		$document->addStyleSheet(JURI::base() . 'components/com_flexicontent/assets/css/flexicontent.css');
+		include('share'.DS.'form.php');
+		$session->set('com_flexicontent.formtime', time());
+	}
+	
+	
+	/**
+	 * Send email with download (file) link, to the given email address
+	 *
+	 * @access public
+	 * @since 1.0
+	 */
+	function share_file_email()
+	{
+		// Check for request forgeries
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
+
+		$db  = JFactory::getDbo();
+		$app = JFactory::getApplication();
+		$session  = JFactory::getSession();
+		$document = JFactory::getDocument();
+		
+		$timeout = $session->get('com_flexicontent.formtime', 0);
+		if ($timeout == 0 || time() - $timeout < 2) {
+			JError::raiseNotice(500, JText:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
+			return $this->share_file_form();
+		}
+		
+		$SiteName	= $app->getCfg('sitename');
+		$MailFrom	= $app->getCfg('mailfrom');
+		$FromName	= $app->getCfg('fromname');
+		
+		
+		$file_id    = (int) JRequest::getInt( 'file_id', 0 );
+		$content_id = (int) JRequest::getInt( 'content_id', 0 );
+		$field_id   = (int) JRequest::getInt( 'field_id', 0 );
+		$tpl = JRequest::getCmd( '$tpl', 'default' );
+		if ( !$file_id ) {
+			echo JText::_('file id is missing');
+			jexit();
+		}
+		
+		$query = ' SELECT * '
+			. ' FROM #__flexicontent_files'
+			. ' WHERE id='. $file_id;
+			;
+		$db->setQuery( $query );
+		$file = $db->loadObject();
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+
+		if ( !$file ) {
+			echo JText::_('file id no '.$file_id.', was not found');
+			jexit();
+		}
+		
+		$uri  = JURI::getInstance();
+		$base = $uri->toString( array('scheme', 'host', 'port'));
+		$link = $base . JRoute::_( 'index.php?option=com_flexicontent&task=download&id='.$file_id.'&cid='.$content_id.'&fid='.$field_id, false );
+		
+		// Verify that this is a local link
+		if (!$link || !JURI::isInternal($link)) {
+			//Non-local url...
+			JError::raiseNotice(500, JText:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
+			return $this->share_file_form();
+		}
+
+		// An array of email headers we do not want to allow as input
+		$headers = array (	'Content-Type:',
+							'MIME-Version:',
+							'Content-Transfer-Encoding:',
+							'bcc:',
+							'cc:');
+
+		// An array of the input fields to scan for injected headers
+		$fields = array(
+			'mailto',
+			'sender',
+			'from',
+			'subject',
+		);
+
+		/*
+		 * Here is the meat and potatoes of the header injection test.  We
+		 * iterate over the array of form input and check for header strings.
+		 * If we find one, send an unauthorized header and die.
+		 */
+		foreach ($fields as $field)
+		{
+			foreach ($headers as $header)
+			{
+				if (strpos($_POST[$field], $header) !== false)
+				{
+					JError::raiseError(403, '');
+				}
+			}
+		}
+
+		/*
+		 * Free up memory
+		 */
+		unset ($headers, $fields);
+
+		$email		= JRequest::getString('mailto', '', 'post'); echo "<br>";
+		$sender		= JRequest::getString('sender', '', 'post'); echo "<br>";
+		$from			= JRequest::getString('from', '', 'post'); echo "<br>";
+		$subject_default = JText::sprintf('FLEXI_FIELD_FILE_SENT_BY', $sender); echo "<br>";
+		$subject	= JRequest::getString('subject', $subject_default, 'post'); echo "<br>";
+		
+		// Check for a valid to address
+		$error	= false;
+		if (! $email  || ! JMailHelper::isEmailAddress($email))
+		{
+			$error	= JText::sprintf('FLEXI_FIELD_FILE_EMAIL_INVALID', $email);
+			JError::raiseWarning(0, $error);
+		}
+
+		// Check for a valid from address
+		if (! $from || ! JMailHelper::isEmailAddress($from))
+		{
+			$error	= JText::sprintf('FLEXI_FIELD_FILE_EMAIL_INVALID', $from);
+			JError::raiseWarning(0, $error);
+		}
+
+		if ($error)
+		{
+			return $this->share_file_form();
+		}
+
+		// Build the message to send
+		$msg	= JText :: _('FLEXI_FIELD_FILE_EMAIL_MSG');
+		$body	= sprintf($msg, $SiteName, $sender, $from, $link);
+
+		// Clean the email data
+		$subject = JMailHelper::cleanSubject($subject);
+		$body    = JMailHelper::cleanBody($body);
+		$sender  = JMailHelper::cleanAddress($sender);
+
+		// Send the email
+		if (JFactory::getMailer()->sendMail($from, $sender, $email, $subject, $body) !== true)
+		{
+			JError::raiseNotice(500, JText:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
+			return $this->share_file_form();
+		}
+		
+		$document->addStyleSheet(JURI::base() . 'components/com_flexicontent/assets/css/flexicontent.css');
+		include('share'.DS.'result.php');
 	}
 	
 }
