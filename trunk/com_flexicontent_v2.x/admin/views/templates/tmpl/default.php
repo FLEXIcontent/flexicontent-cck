@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1577 2012-12-02 15:10:44Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1746 2013-09-01 21:44:12Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -44,6 +44,7 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 		$deltmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE' ) );
 		$k = 0;
 		$i = 1;
+		$form_token = FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken();
 		foreach ($this->rows as $row) {
 			$copylink 	= 'index.php?option=com_flexicontent&amp;view=templates&amp;layout=duplicate&amp;tmpl=component&amp;source='. $row->name;
 			$itemlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;folder='.$row->name;
@@ -52,33 +53,20 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 				$dellink 	= '#';
 		?>
 		<script type="text/javascript">
-			window.addEvent('domready', function(){
-				$('<?php echo 'del-'.$row->name ?>').addEvent('click', function(e) {
-
+			jQuery(document).ready(function() {
+				var tmpl_el = jQuery('#<?php echo 'up-'.$row->name ?>');
+				tmpl_el.click(function( event ) {
 					var answer = confirm('<?php echo JText::_( 'FLEXI_TEMPLATE_DELETE_CONFIRM',true ); ?>')
-					if (!answer){
-						new Event(e).stop();
-						return;
-					}
-
-					e = new Event(e).stop();
-					var url = "index.php?option=com_flexicontent&<?php echo $ctrl_task;?>remove&format=raw&dir=<?php echo $row->name ?>&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1";
-
-					if (MooTools.version>="1.2.4") {
-						$('<?php echo 'up-'.$row->name ?>').set('html','<td colspan="5" align="center"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></td>');
-						var ajax = new Request.HTML({
-							method: 'get',
-							url: url,
-							update: $('<?php echo 'up-'.$row->name ?>')
-						}).send();
-					} else {
-						$('<?php echo 'up-'.$row->name ?>').setHTML('<td colspan="5" align="center"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></td>');
-						var ajax = new Ajax(url, {
-							method: 'get',
-							update: $('<?php echo 'up-'.$row->name ?>')
-						});
-						ajax.request.delay(500, ajax);
-					}
+					if (!answer) return;
+					
+					tmpl_el.html('<td colspan="5" align="center"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></td>');
+					jQuery.ajax({
+						type: "GET",
+						url:  "index.php?option=com_flexicontent&<?php echo $ctrl_task;?>remove&format=raw&dir=<?php echo $row->name ?>&<?php echo $form_token; ?>=1",
+						success: function(str) {
+							tmpl_el.html(str);
+						}
+					});
 				});
 			});
 		</script>

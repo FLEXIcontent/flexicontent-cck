@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: duplicate.php 1614 2013-01-04 03:57:15Z ggppdk $
+ * @version 1.5 stable $Id: duplicate.php 1750 2013-09-03 20:50:59Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -22,28 +22,26 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 $close_popup_js = FLEXI_J16GE ? "window.parent.SqueezeBox.close();" : "window.parent.document.getElementById('sbox-window').close();";
 ?>
 <script type="text/javascript">
-window.addEvent('domready', function(){
-	$('adminForm').addEvent('submit', function(e) {
-		e = new Event(e).stop();
-		if (MooTools.version>="1.2.4") {
-			$('log-bind').set('html','<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
-			new Request.HTML({
-				 url: this.get('action'),
-			   evalScripts: true,
-			   update: $('log-bind'),
-			   data: $('adminForm')
-			}).send();
-		} else {
-			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
-			this.send({
-				update: $('log-bind')
-			});
-		}
-	});
+
+jQuery(document).ready(function() {
+	var adminForm = jQuery('#adminForm');
+	adminForm.submit(function( event ) {
+		var log_bind = jQuery('#log-bind');
+		log_bind.html('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></p>');
+		jQuery.ajax({
+			type: "POST",
+			data: adminForm.serialize(),
+			url:  adminForm.prop('action'),
+			success: function(str) {
+				log_bind.html(str);
+			}
+		});
+		event.preventDefault();
+	});	
 });
 </script>
 
-<form action="index.php?option=com_flexicontent&".$ctrl_task."duplicate&layout=duplicate&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&<?php echo $ctrl_task; ?>duplicate&layout=duplicate&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
 		<legend>
