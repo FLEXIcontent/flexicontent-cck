@@ -281,7 +281,7 @@ class FlexicontentController extends JControllerLegacy
 			if ($display_captcha)
 			{
 				// Try to force the use of recaptcha plugin
-				JFactory::getConfig()->setValue('captcha', 'recaptcha');
+				JFactory::getConfig()->set('captcha', 'recaptcha');
 				
 				if ( $app->getCfg('captcha') == 'recaptcha' && JPluginHelper::isEnabled('captcha', 'recaptcha') ) {
 					JPluginHelper::importPlugin('captcha');
@@ -1546,6 +1546,7 @@ class FlexicontentController extends JControllerLegacy
 			$tree_files = array($file_node);
 		}
 		
+		
 		// **************************************************
 		// Create and Execute SQL query to retrieve file info
 		// **************************************************
@@ -1576,7 +1577,9 @@ class FlexicontentController extends JControllerLegacy
 		// Get file data for all files
 		// ***************************
 		
+		$fields_conf = array();
 		$valid_files = array();
+		$email_recipients = array();
 		foreach ($tree_files as $file_node)
 		{
 			// Get file variable shortcuts (reforce being int)
@@ -1584,8 +1587,20 @@ class FlexicontentController extends JControllerLegacy
 			$contentid = (int) $file_node->contentid;
 			$fileid    = (int) $file_node->fileid;
 			
-			$query  = 'SELECT f.id, f.filename, f.secure, f.url,'
-					.' i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext '
+			if ( !isset($fields_conf[$fieldid]) ) {
+				$q = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $fieldid;
+				$db->setQuery($q);
+				$fld = $db->loadObject();
+				$fields_conf[$fieldid] = FLEXI_J16GE ? new JRegistry($fld->attribs) : new JParameter($fld->attribs);
+			}
+			
+			$query  = 'SELECT f.id, f.filename, f.altname, f.secure, f.url,'
+					.' i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email, '
+					
+					// Item and Current Category slugs (for URL)
+					. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as itemslug,'
+					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
+					
 					.' FROM #__flexicontent_fields_item_relations AS rel'
 					.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
 					.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
@@ -1593,6 +1608,7 @@ class FlexicontentController extends JControllerLegacy
 					.' LEFT JOIN #__categories AS c ON c.id = i.catid'
 					.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					.' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+					.' LEFT JOIN #__users AS u ON u.id = i.created_by'
 					. $joinaccess
 					. $joinaccess2
 					.' WHERE rel.item_id = ' . $contentid
@@ -1605,7 +1621,7 @@ class FlexicontentController extends JControllerLegacy
 			$db->setQuery($query);
 			$file = $db->loadObject();
 			if ($db->getErrorNum())  {
-				JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+				echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 				jexit();
 			}
 			
@@ -1677,8 +1693,112 @@ class FlexicontentController extends JControllerLegacy
 			
 			$file->node = $file_node;
 			$valid_files[$fileid] = $file;
+			
+			if ( $fields_conf[$fieldid]->get('send_notifications') ) {
+				
+				// Calculate (once per file) some text used for notifications
+				$file->__file_title__ = $file->altname && $file->altname != $file->filename ? 
+					$file->altname . ' ['.$file->filename.']'  :  $file->filename;
+				
+				$file->__item_url__ = JRoute::_(FlexicontentHelperRoute::getItemRoute($file->itemslug, $file->catslug));
+				
+				// Parse and identify language strings and then make language replacements
+				$notification_tmpl = $fields_conf[$fieldid]->get('notification_tmpl');
+				if ( empty($notification_tmpl) ) {
+					$notification_tmpl = '%%FLEXI_FDN_FILE_NO%% __FILE_ID__:  "__FILE_TITLE__" '."\n";
+					$notification_tmpl .= '%%FLEXI_FDN_FILE_IN_ITEM%% "__ITEM_TITLE__":' ."\n";
+					$notification_tmpl .= '__ITEM_URL__';
+				}
+				
+				$result = preg_match_all("/\%\%([^%]+)\%\%/", $notification_tmpl, $translate_matches);
+				$translate_strings = $result ? $translate_matches[1] : array();
+				foreach ($translate_strings as $translate_string)
+					$notification_tmpl = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $notification_tmpl);
+				$file->notification_tmpl = $notification_tmpl;
+				
+				// Send to hard-coded email list
+				$send_all_to_email = $fields_conf[$fieldid]->get('send_all_to_email');
+				if ($send_all_to_email) {
+					$emails = preg_split("/[\s]*;[\s]*/", $send_all_to_email);
+					foreach($emails as $email) $email_recipients[$email][] = $file;
+				}
+				
+				// Send to item owner
+				$send_to_current_item_owner = $fields_conf[$fieldid]->get('send_to_current_item_owner');
+				if ($send_to_current_item_owner) {
+					$email_recipients[$file->item_owner_email][] = $file;
+				}
+				
+				// Send to email assigned to email field in same content item
+				$send_to_email_field = (int) $fields_conf[$fieldid]->get('send_to_email_field');
+				if ($send_to_email_field) {
+
+					$q  = 'SELECT value '
+						.' FROM #__flexicontent_fields_item_relations '
+						.' WHERE field_id = ' . $send_to_email_field .' AND item_id='.$contentid;
+					$db->setQuery($q);
+					$email_values = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+					
+					foreach ($email_values as $i => $email_value) {
+						if ( @unserialize($email_value)!== false || $email_value === 'b:0;' ) {
+							$email_values[$i] = unserialize($email_value);
+						} else {
+							$email_values[$i] = array('addr' => $email_value, 'text' => '');
+						}
+						$addr = @ $email_values[$i]['addr'];
+						if ( $addr ) {
+							$email_recipients[$addr][] = $file;
+						}
+					}
+				}
+			}
 		}
-		//echo "<pre>"; print_r($valid_files); jexit();
+		//echo "<pre>". print_r($valid_files, true) ."</pre>";
+		//echo "<pre>". print_r($email_recipients, true) ."</pre>";
+		//sjexit();
+		
+		
+		if ( !empty($email_recipients) ) {
+			ob_start();
+			$sendermail	= $app->getCfg('mailfrom');
+			$sendermail	= JMailHelper::cleanAddress($sendermail);
+			$sendername	= $app->getCfg('sitename');
+			$subject	= JText::_('FLEXI_FILE_DOWNLOAD_REPORT');
+			$message_header    = 'Report of file(s) downloaded by user: '. $user->name .' ['.$user->username .']';
+			
+			
+			// ****************************************************
+			// Send email notifications about file being downloaded
+			// ****************************************************
+			
+			// Personalized email per subscribers
+			foreach ($email_recipients as $email_addr => $files_arr)
+			{
+				$to = JMailHelper::cleanAddress($email_addr);
+				$_message = $message_header;
+				foreach($files_arr as $filedata) {
+					$_mssg_file = $filedata->notification_tmpl;
+					$_mssg_file = str_replace('__FILE_ID__', $filedata->id, $_mssg_file);
+					$_mssg_file = str_replace('__FILE_TITLE__', $filedata->__file_title__, $_mssg_file);
+					$_mssg_file = str_replace('__ITEM_TITLE__', $filedata->item_title, $_mssg_file);
+					//$_mssg_file = str_replace('__ITEM_TITLE_LINKED__', $filedata->password, $_mssg_file);
+					$_mssg_file = str_replace('__ITEM_URL__', $filedata->__item_url__, $_mssg_file);
+					$_message .= "\n\n" . $_mssg_file;
+				}
+				//echo "<pre>". $_message ."</pre>";
+				
+				$send_result = JUtility::sendMail(
+					$from = $sendermail,
+					$fromname = $sendername,
+					$recipient = array($to),
+					$subject,	$_message, $html_mode=false, $cc=null,
+					$bcc = null,
+					$attachment=null, $replyto=null, $replytoname=null)
+					;
+			}
+			ob_end_clean();
+		}
+		
 		
 		// * Required for IE, otherwise Content-disposition is ignored
 		if (ini_get('zlib.output_compression')) {

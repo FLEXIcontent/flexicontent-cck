@@ -573,7 +573,7 @@ class FlexicontentViewItems  extends JViewLegacy
 			// Force using recaptcha
 			if ($display_captcha) {
 				// Try to force the use of recaptcha plugin
-				JFactory::getConfig()->setValue('captcha', 'recaptcha');
+				JFactory::getConfig()->set('captcha', 'recaptcha');
 				
 				if ( !$app->getCfg('captcha') ) {
 					$captcha_errmsg  = '-- Please select <b>CAPTCHA Type</b> at global Joomla parameters';

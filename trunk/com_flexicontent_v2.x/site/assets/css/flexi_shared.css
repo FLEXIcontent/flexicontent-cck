@@ -356,15 +356,23 @@ span.editlinktip.hasTip.tags img {
 	font-weight: bold;
 }
 
-.positions_readonly, .positions {
-	list-style: none;
+.positions_container {
+	border: 1px dashed silver;
+	display: inline-block;
+	background-color: #f0f0f0;
 	padding: 0;
 	margin: 0;
+	width: 100%;
+}
+.positions_readonly, .positions {
+	list-style: none;
+	padding: 5px 0px 0px 0px;
+	margin: 0;
 	display: block;
-	min-height: 26px;
-	background-color: #f0f0f0;
-	border: 1px dashed silver;
-	overflow: hidden;
+	height: 0px;
+	background-color: lightgray;
+	border: 0px dashed silver;
+	overflow: visible;  /* hidden, CAUSES annoying jumps with jQuery sortable */
 	width: 100%;
 }
 div .positions_readonly {
@@ -626,6 +634,7 @@ div label.lang_box img, .fc_assoc_translation img {	border: 1px solid lightgray 
 .fcimportdata {
 	padding-top:6px;
 	font-size:12px;
+	white-space:nowrap;
 }
 .fcimportdata label.fcdata {
 	font-weight: normal;
@@ -637,7 +646,53 @@ div label.lang_box img, .fc_assoc_translation img {	border: 1px solid lightgray 
 	display:block;
 	margin-top: 12px;
 }
+.fcimport_missingfile {
+	background: url(../images/warning.png) 0 0 no-repeat;
+	padding: 2px 0px 2px 20px;
+	color: red;
+}
 
+ol.fcimport_field_value_list {
+	margin:0px;
+	padding:0px;
+	position: relative;
+	left:0px;
+}
+ul.fcimport_field_value_list {
+	margin:0px;
+	padding:0px;
+	position: relative;
+	left:0px;
+}
+
+dl.fcimport_field_prop_list.fcimport_field_prop_mainlist dt { text-align: right; width:auto; clear:none;}
+dl.fcimport_field_prop_list.fcimport_field_prop_mainlist dd { float:left;  margin-right:48px; }
+
+dl.fcimport_field_prop_list { border: 0px solid; margin: 0px; padding: 0px; }
+dl.fcimport_field_prop_list > dt { float: left; clear: left; width:auto; text-align: left; font-weight: bold; color: green; margin-right:6px; }
+dl.fcimport_field_prop_list > dt:after { content: ":"; }
+dl.fcimport_field_prop_list > dd { margin:0; padding:0; }
+
+ol.fcimport_field_value_list { margin-left:1.5em; padding-left:0px; }
+ul.fcimport_field_value_list { margin-left:0em; padding-left:0.2em; margin-bottom:0; }
+ul.fcimport_field_value_list li {
+	background:url(../images/readon.gif) 0% 50% no-repeat transparent;
+  padding-left: 16px; 
+  list-style: none; 
+}
+ul.fcimport_field_value_list li:first-child { border-top: 0px dashed; width:100% }
+ul.fcimport_field_value_list li { border-top: 1px dashed lightgray; float:left; clear:both; }
+
+ol.fcimport_field_value_list li,
+ul.fcimport_field_value_list li { margin-bottom:0em; }
+.fcimport_field_value_list ul li {
+	/*background-image:url(../images/add.png);*/
+}
+.fcimport_field_value_list ol li { 
+  list-style:decimal; 
+  background-image:none; 
+  padding-left:0em; 
+}
 
 /* Edit form */
 #flexicontent .fc_edit_container_full {
@@ -1039,10 +1094,13 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	overflow: hidden !important;
 	min-width:24%;
 }
-
+#flexicontent select.fcfield_selectval {
+	padding: 4px 0 2px 4px !important;
+}
 #flexicontent select.fcfield_selectmulval,
 #flexicontent textarea.fcfield_textareaval {
 	line-height: 1em !important;
 	overflow: auto !important;
+	padding: 4px 0 2px 4px !important;
 }
 
