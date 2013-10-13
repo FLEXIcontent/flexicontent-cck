@@ -298,8 +298,9 @@ class FlexicontentModelFavourites extends JModelLegacy
 		$orderby	= $this->_buildItemOrderBy($order);
 		
 		// Create JOIN for ordering items by a custom field
-		if ($params->get('orderbycustomfieldid', 0) != 0) {
-			$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
+		if ($order=='field') {
+			$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
+			$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
 		}
 		
 		// Create JOIN for ordering items by a most commented
@@ -349,7 +350,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 * @access private
 	 * @return string
 	 */
-	function _buildItemOrderBy($order='')
+	function _buildItemOrderBy(& $order='')
 	{
 		$request_var = $this->_params->get('orderby_override') ? 'orderby' : '';
 		$default_order = $this->getState('filter_order');

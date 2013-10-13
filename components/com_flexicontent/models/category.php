@@ -374,9 +374,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$orderby = $this->_buildItemOrderBy($order);
 			
 			// Create JOIN for ordering items by a custom field
-			$orderbycustomfieldid = $params->get('orderbycustomfieldid', 0);
-			if ($orderbycustomfieldid) {
-				$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
+			if ($order=='field') {
+				$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
+				$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
 			}
 			
 			// Create JOIN for ordering items by a most commented

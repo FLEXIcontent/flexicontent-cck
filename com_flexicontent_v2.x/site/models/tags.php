@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 1699 2013-07-30 04:29:37Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 1775 2013-09-27 02:04:02Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -307,8 +307,9 @@ class FlexicontentModelTags extends JModelLegacy
 		$orderby	= $this->_buildItemOrderBy($order);
 		
 		// Create JOIN for ordering items by a custom field
-		if ($params->get('orderbycustomfieldid', 0) != 0) {
-			$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
+		if ($order=='field') {
+			$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
+			$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
 		}
 		
 		// Create JOIN for ordering items by a most commented
@@ -358,7 +359,7 @@ class FlexicontentModelTags extends JModelLegacy
 	 * @access private
 	 * @return string
 	 */
-	function _buildItemOrderBy($order='')
+	function _buildItemOrderBy(& $order='')
 	{
 		$request_var = $this->_params->get('orderby_override') ? 'orderby' : '';
 		$default_order = $this->getState('filter_order');
