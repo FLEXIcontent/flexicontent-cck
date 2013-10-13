@@ -567,7 +567,8 @@ $js ='
 			element.style.height = maxHeight_withpx;
 		});
 		*/'
-	})';
+	});
+	';
 
 $document->addScriptDeclaration($js);
 

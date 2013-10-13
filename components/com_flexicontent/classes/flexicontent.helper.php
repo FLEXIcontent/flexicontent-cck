@@ -364,7 +364,10 @@ class flexicontent_html
 				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/mCSB/jquery.mCustomScrollbar.css');
 				$js .= "
 					jQuery(document).ready(function(){
-					    jQuery('.fc_add_scroller').mCustomScrollbar({theme:'dark-thick'});
+					    jQuery('.fc_add_scroller').mCustomScrollbar({
+					    	theme:'dark-thick',
+					    	advanced:{updateOnContentResize: true}
+					    });
 					});
 				";
 				break;

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1518 2012-10-11 01:18:27Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1707 2013-08-07 11:37:01Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -160,37 +160,46 @@ defined('_JEXEC') or die('Restricted access'); ?>
 						</div>
 					</div>
 					
+					
 					<div class="postitle"><?php echo JText::_('FLEXI_CORE_FIELDS'); ?></div>
-					<ul id="sortablecorefields" class="positions">
-					<?php
-					foreach ($this->fields as $field) :
-						if ($field->iscore && (!in_array($field->name, $this->used))) :
-							$class_list  = "fields core";
-							$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
-							$class_list .= " field_type_".$field->field_type;
-					?>
-					<li class="<?php echo $class_list; ?>" id="field_<?php echo $field->name; ?>"><?php echo $field->label; ?></li>
-					<?php
-						endif;
-					endforeach;
-					?>
-					</ul>
+				
+					<div class="positions_container">
+						<ul id="sortablecorefields" class="positions">
+						<?php
+						foreach ($this->fields as $field) :
+							if ($field->iscore && (!in_array($field->name, $this->used))) :
+								$class_list  = "fields core";
+								$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
+								$class_list .= " field_type_".$field->field_type;
+						?>
+						<li class="<?php echo $class_list; ?>" id="field_<?php echo $field->name; ?>"><?php echo $field->label; ?></li>
+						<?php
+							endif;
+						endforeach;
+						?>
+						</ul>
+					</div>
+					
 					
 					<div class="postitle"><?php echo JText::_('FLEXI_NON_CORE_FIELDS'); ?></div>
-					<ul id="sortableuserfields" class="positions">
-					<?php
-					foreach ($this->fields as $field) :
-						if (!$field->iscore && (!in_array($field->name, $this->used))) :
-							$class_list  = "fields user";
-							$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
-							$class_list .= " field_type_".$field->field_type;
-					?>
-					<li class="<?php echo $class_list; ?>" id="field_<?php echo $field->name; ?>"><?php echo $field->label.' #'.$field->id; ?></li>
-					<?php
-						endif;
-					endforeach;
-					?>
-					</ul>
+					
+					<div class="positions_container">
+						<ul id="sortableuserfields" class="positions">
+						<?php
+						foreach ($this->fields as $field) :
+							if (!$field->iscore && (!in_array($field->name, $this->used))) :
+								$class_list  = "fields user";
+								$class_list .= !empty($field->type_ids) ? " content_type_".implode(" content_type_", $field->type_ids) : "";
+								$class_list .= " field_type_".$field->field_type;
+						?>
+						<li class="<?php echo $class_list; ?>" id="field_<?php echo $field->name; ?>"><?php echo $field->label.' #'.$field->id; ?></li>
+						<?php
+							endif;
+						endforeach;
+						?>
+						</ul>
+					</div>
+				
 				</fieldset>
 			</td>
 
@@ -213,6 +222,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 						</div>
 					</div>
 					
+					<span style="font-weight:bold;"><?php echo JText::_('FLEXI_NOTES');?>:</span>
+					<span style="color:darkred;"><?php echo JText::_('FLEXI_INSTRUCTIONS_ADD_FIELD_TO_LAYOUT_POSITION');?></span>
 					
 					<?php
 					if (isset($this->layout->positions)) :
@@ -247,6 +258,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 							continue;
 						}
 						?>
+					<div class="positions_container">
 						<ul id="sortable-<?php echo $pos; ?>" class="positions" >
 						<?php
 						if (isset($this->fbypos[$pos])) :
@@ -266,6 +278,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 						endif;	
 						?>
 						</ul>
+					</div>
 						<input type="hidden" name="<?php echo $pos; ?>" id="<?php echo $pos; ?>" value="" />
 					<?php 
 						endforeach;

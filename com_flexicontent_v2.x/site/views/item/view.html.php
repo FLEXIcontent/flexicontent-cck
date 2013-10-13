@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1694 2013-07-12 09:42:03Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1767 2013-09-18 17:46:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -573,7 +573,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			// Force using recaptcha
 			if ($display_captcha) {
 				// Try to force the use of recaptcha plugin
-				JFactory::getConfig()->setValue('captcha', 'recaptcha');
+				JFactory::getConfig()->set('captcha', 'recaptcha');
 				
 				if ( !$app->getCfg('captcha') ) {
 					$captcha_errmsg  = '-- Please select <b>CAPTCHA Type</b> at global Joomla parameters';

@@ -251,7 +251,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$usebutton	= $field->parameters->get( 'usebutton', 0 ) ;
 		$buttontext = $usebutton==2 ? $field->parameters->get( 'buttontext', 'FLEXI_DOWNLOAD' ) : 'FLEXI_DOWNLOAD';
 		$allowshare = $field->parameters->get( 'allowshare', 0 ) ;
-		$sharetext  = $allowshare==2 ? $field->parameters->get( 'sharetext', 'FLEXI_EMAIL_SHARE_LINK' ) : 'FLEXI_EMAIL_SHARE_LINK';
+		$sharetext  = $allowshare==2 ? $field->parameters->get( 'sharetext', 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND' ) : 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND';
 		
 		$noaccess_display	     = $field->parameters->get( 'noaccess_display', 1 ) ;
 		$noaccess_url_unlogged = $field->parameters->get( 'noaccess_url_unlogged', false ) ;
@@ -287,7 +287,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 				
 				$status = 'width=700,height=360,menubar=yes,resizable=yes';
-				$send_form_title = JText::_( 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND' );
+				$send_form_title = JText::_( $sharetext );
 				$send_form_desc = JText::_( 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND_INFO' );
 			} else {
 				$com_mailto_found = false;
@@ -474,9 +474,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$send_title = $send_form_title.'::'.$send_form_desc;
 					$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
 						.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
-						.'&file_id='.$file_id.'&content_id='.$item->id.'&file_id='.$field->id;
+						.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 					$str .= '<input type="button" class="fc_button fcsimple editlinktip hasTip" onclick="'.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$send_title.'"
-						value="'.JText::_( 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND' ).'" />';
+						value="'.$send_form_title.'" />';
 				}
 			}
 			
@@ -532,10 +532,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$send_onclick = 'window.open(\'%s\',\'win2\',\''.$status.'\'); return false;';
 					$send_title = $send_form_title.'::'.$send_form_desc;
 					$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
-						.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form&file_id='.$file_id;
-
+						.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
+						.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 					$str .= '<a href="javascript:;" class="editlinktip hasTip" onclick="'.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$send_title.'">'.
-						JText::_( 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND' ).'</a>';
+						$send_form_title.'</a>';
 				}
 			}
 			
@@ -829,6 +829,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$sender		= JRequest::getString('sender', '', 'post');
 		$from			= JRequest::getString('from', '', 'post');
 		$subject	= JRequest::getString('subject', '', 'post');
+		$desc     = JRequest::getString('desc', '', 'post');
 
 		if ($user->get('id') > 0) {
 			$data->sender	= $user->get('name');
@@ -840,11 +841,12 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$data->from		= $from;
 		}
 
-		$data->subject	= $subject;
-		$data->mailto	= $mailto;
+		$data->subject = $subject;
+		$data->desc    = $desc;
+		$data->mailto  = $mailto;
 		
 		$document->addStyleSheet(JURI::base() . 'components/com_flexicontent/assets/css/flexicontent.css');
-		include('share'.DS.'form.php');
+		include('file'.DS.'share_form.php');
 		$session->set('com_flexicontent.formtime', time());
 	}
 	
@@ -948,8 +950,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$email		= JRequest::getString('mailto', '', 'post'); echo "<br>";
 		$sender		= JRequest::getString('sender', '', 'post'); echo "<br>";
 		$from			= JRequest::getString('from', '', 'post'); echo "<br>";
-		$subject_default = JText::sprintf('FLEXI_FIELD_FILE_SENT_BY', $sender); echo "<br>";
-		$subject	= JRequest::getString('subject', $subject_default, 'post'); echo "<br>";
+		$_subject = JText::sprintf('FLEXI_FIELD_FILE_SENT_BY', $sender); echo "<br>";
+		$subject  = JRequest::getString('subject', $_subject, 'post'); echo "<br>";
+		$desc     = JRequest::getString('desc', '', 'post'); echo "<br>";
 		
 		// Check for a valid to address
 		$error	= false;
@@ -972,9 +975,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		}
 
 		// Build the message to send
-		$msg	= JText :: _('FLEXI_FIELD_FILE_EMAIL_MSG');
-		$body	= sprintf($msg, $SiteName, $sender, $from, $link);
-
+		$body  = JText::sprintf('FLEXI_FIELD_FILE_EMAIL_MSG', $SiteName, $sender, $from, $link);
+		$body	.= "\n\n".JText::_('FLEXI_FIELD_FILE_EMAIL_SENDER_NOTES').":\n\n".$desc;
+		
 		// Clean the email data
 		$subject = JMailHelper::cleanSubject($subject);
 		$body    = JMailHelper::cleanBody($body);
@@ -988,7 +991,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		}
 		
 		$document->addStyleSheet(JURI::base() . 'components/com_flexicontent/assets/css/flexicontent.css');
-		include('share'.DS.'result.php');
+		include('file'.DS.'share_result.php');
 	}
 	
 }
