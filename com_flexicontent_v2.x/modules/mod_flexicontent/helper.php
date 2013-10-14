@@ -1458,7 +1458,7 @@ class modFlexicontentHelper
 			// Get content list per given category
 			$per_cat_query = str_replace('__CID_WHERE__', $cat_where, $items_query);
 			$db->setQuery($per_cat_query, 0, $count);
-			$content = $db->loadResultArray(0);
+			$content = FLEXI_J16GE ? $db->loadColumn(0) : $db->loadResultArray(0);
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			@ $mod_fc_run_times['query_items'] += $modfc_jprof->getmicrotime() - $_microtime;
 			
