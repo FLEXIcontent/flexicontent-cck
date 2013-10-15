@@ -66,9 +66,17 @@ if (!FLEXI_J16GE) {
 			if ( $memory_limit < 64000000 ) @ini_set( 'memory_limit', '64M' );
 		}
 		
+
+		// Detect FLEXIcontent installed
+		if (FLEXI_J16GE)
+			define('FLEXI_INSTALLED', $this->release ? 1 : 0); 
+		else
+			define('FLEXI_INSTALLED', JPluginHelper::isEnabled('system', 'flexisystem') );
+		
 		
 		// first check if PHP5 is running
-		if (version_compare(PHP_VERSION, '5.0.0', '<')) {
+		$PHP_VERSION_NEEDED = '5.1.0';
+		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<')) {
 			// we add the component stylesheet to the installer
 			$document = JFactory::getDocument(); 
 			$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -80,7 +88,7 @@ if (!FLEXI_J16GE) {
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 		
-			Jerror::raiseWarning(null, JText::_( 'FLEXI_UPGRADE_PHP' ));
+			Jerror::raiseWarning(null, JText::sprintf( 'FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED ));
 			return false;
 		}
 		
@@ -133,7 +141,7 @@ if (!FLEXI_J16GE) {
 						'type' => (FLEXI_J16GE ? $ext->getName() : $ext->name()),
 						'folder' => $source.'/'.(FLEXI_J16GE ? $ext->attributes()->folder : $ext->attributes('folder')),
 						'installer' => new JInstaller(),
-						'status' => false);
+						'status' => null);
 		    }
 				//echo "<pre>"; print_r($extensions); echo "</pre>"; exit;
 		}
@@ -149,8 +157,11 @@ if (!FLEXI_J16GE) {
 			if ($jinstaller->install($extensions[$i]['folder'])) {
 				$extensions[$i]['status'] = true;
 			} else {
-				$error = true;
-				break;
+				$extensions[$i]['status'] = false;
+				if ( !FLEXI_INSTALLED ) {
+					$error = true;
+					break;
+				}
 			}
 		}
 		
@@ -204,8 +215,26 @@ if (!FLEXI_J16GE) {
 					<tr class="row<?php echo $i % 2; ?>">
 						<td class="key"><?php echo $ext['name']; ?> (<?php echo JText::_($ext['type']); ?>)</td>
 						<td>
-							<?php $style = $ext['status'] ? 'font-weight: bold; color: green;' : 'font-weight: bold; color: red;'; ?>
-							<span style="<?php echo $style; ?>"><?php echo $ext['status'] ? JText::_('Installed successfully') : JText::_('NOT Installed'); ?></span>
+							<?php
+							if ($ext['status']===null) $status_color = 'black';
+							else if ($ext['status']) $status_color = 'green';
+							else $status_color = 'red';
+							$style = 'font-weight: bold; color: '.$status_color.';';
+							?>
+							<span style="<?php echo $style; ?>">
+								<?php
+									if ( $ext['status'] === null ) {
+										echo JText::_('Installation skipped');
+									} else if ($ext['status']) {
+										echo JText::_('Installation successful');
+									} else {
+										$msg = JText::_(FLEXI_INSTALLED ? 'Upgrade ERROR (extension removed)' : 'Installation -- FAILED --' ) ."<br/>";
+										if (FLEXI_INSTALLED) $msg .= "FLEXIcontent may not work properly, please install an older or newer FLEXIcontent package";
+										echo $msg;
+										Jerror::raiseWarning(null, '<br/>'.$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .': '. $msg);
+									}
+								?>
+							</span>
 						</td>
 					</tr>
 				<?php endforeach; ?>
@@ -215,19 +244,24 @@ if (!FLEXI_J16GE) {
 		<?php
 		// Rollback on installation errors, abort() will be called on every additional extension installed above
 		if ($error) {
-			for ($i = 0; $i < count($extensions); $i++) { 
+			for ($i = 0; $i < count($extensions); $i++) {
 				if ( $extensions[$i]['status'] ) {
-					$extensions[$i]['installer']->abort(
-						$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('Install') .': <span style="color:green">'. JText::_('rolling back').'</span>',
+					$extensions[$i]['installer']->abort('<span style="color:black">'.
+						$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('Install') .':</span>'.
+						' <span style="color:green">'. JText::_('rolling back').'</span>',
 						$extensions[$i]['type']
 					);
 					//$extensions[$i]['status'] = false;
+				} /*else if ( $extensions[$i]['status'] === false ) {
+					$msg = ' <span style="color:red">'. JText::_('-- FAILED --').'</span>';
+					Jerror::raiseWarning(null, '<span style="color:black">'.$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('Install') .':</span>'.$msg);
 				} else {
-					Jerror::raiseWarning(null, $extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('Install') .': <span style="color:red">'. JText::_('Failed').'</span>');
-				}
+					$msg = ' <span style="color:darkgray">'. JText::_('Skipped').'</span>';
+					Jerror::raiseWarning(null, '<span style="color:black">'.$extensions[$i]['name'] .' '. JText::_($extensions[$i]['type']) .' '. JText::_('Install') .':</span>'.$msg);
+				}*/
 			}
 			if (!FLEXI_J16GE) {
-				$this->parent->abort(JText::_('Component').' '.JText::_('Install').': '.JText::_('Error'), 'component');
+				$this->parent->abort("<br/>".JText::_('Component installation aborted'), 'component');
 			} else {
 				return false;  // In J1.6+ , returning false here will cancel (abort) component installation and rollback changes
 			}

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1767 2013-09-18 17:46:46Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1771 2013-09-24 22:01:25Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -25,8 +25,11 @@ if ( JFactory::getApplication()->getCfg('offline') ) {
 	if (!$user->id) {
 		return;
 	} else {
-		jimport( 'joomla.version' );  $jversion = new JVersion;
-		define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
+		if (!defined('FLEXI_J16GE')) {
+			jimport( 'joomla.version' );  $jversion = new JVersion;
+			define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
+			define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
+		}
 		$isAdmin = FLEXI_J16GE ? JAccess::check($user->id, 'core.admin', 'root.1') : $user->gid >= 24;
 		if (!$isAdmin) return;
 	}

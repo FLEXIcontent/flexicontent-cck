@@ -131,6 +131,11 @@
 		<copy file="plugins/flexicontent_fields/file.php" tofile="flexipack/plugins/file/file.php" />
 		<copy file="plugins/flexicontent_fields/file.xml" tofile="flexipack/plugins/file/file.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_file.ini" tofile="flexipack/plugins/file/en-GB.plg_flexicontent_fields_file.ini" />
+		<copy todir="flexipack/plugins/file/file" >
+			<fileset dir="plugins/flexicontent_fields/file">
+				<exclude name=".**" />
+			</fileset>
+		</copy>
 		
 		<copy file="plugins/flexicontent_fields/groupmarker.php" tofile="flexipack/plugins/groupmarker/groupmarker.php" />
 		<copy file="plugins/flexicontent_fields/groupmarker.xml" tofile="flexipack/plugins/groupmarker/groupmarker.xml" />
