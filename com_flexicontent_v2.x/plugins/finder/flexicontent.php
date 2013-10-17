@@ -314,9 +314,11 @@ class plgFinderFLEXIcontent extends FinderIndexerAdapter
 		FinderIndexerHelper::getContentExtras($item);
 
 		// Index the item.
-		FinderIndexer::index($item);
+		if (defined('FLEXI_J30GE'))
+			FLEXI_J30GE ? $this->indexer->index($item) : FinderIndexer::index($item);
 	}
-
+	
+	
 	/**
 	 * Method to setup the indexer to be run.
 	 *
