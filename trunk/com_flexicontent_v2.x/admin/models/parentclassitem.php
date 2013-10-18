@@ -3321,23 +3321,19 @@ class ParentClassItem extends JModelAdmin
 				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 			;
 			$this->_db->setQuery( $query );
-			if (!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
-
+			$this->_db->query();
+			if ( $this->_db->getErrorNum() )  if (FLEXI_J16GE) throw new Exception($this->_db->getErrorMsg(), 500); else JError::raiseError(500, $this->_db->getErrorMsg());
+			
 			$query = 'UPDATE #__flexicontent_items_versions'
 				. ' SET value = ' . (int)$state
 				. ' WHERE item_id = '.(int)$id
 				. ' AND valueorder = 1'
 				. ' AND field_id = 10'
-				. ' AND version = ' . $v['version']
+				. ' AND version = ' .(int)$v['version']
 				;
 			$this->_db->setQuery( $query );
-			if (!$this->_db->query()) {
-				$this->setError($this->_db->getErrorMsg());
-				return false;
-			}
+			$this->_db->query();
+			if ( $this->_db->getErrorNum() )  if (FLEXI_J16GE) throw new Exception($this->_db->getErrorMsg(), 500); else JError::raiseError(500, $this->_db->getErrorMsg());
 		}
 		
 		

@@ -173,13 +173,15 @@ class FlexicontentController extends JControllerLegacy
 		
 		// Find out the words that matched
 		$words_found = array();
-		$regex = '/(\b)('.$word_prefix.'\w+)(\b)/iu';
+		$regex = '/(\b)('.$word_prefix.'\w*)(\b)/iu';
 		
 		foreach ($data as $_d) {
 			//echo $_d['item_id'] . ' ';
 			if (preg_match_all($regex, $_d['search_index'], $matches) ) {
-				foreach ($matches[2] as $_m)
-					$words_found[$_m] = 1;
+				foreach ($matches[2] as $_m) {
+					$_m_low = mb_strtolower($_m, 'UTF-8');
+					$words_found[$_m_low] = 1;
+				}
 			}
 		}
 		
