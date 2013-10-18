@@ -7,7 +7,6 @@ window.addEvent('domready', function() {
 	
 	if($$('.fcvote').length > 0) {
 		$$('.fcvote a.fc_dovote').addEvent('click', function(e) {
-			e = new Event(e).stop();
 			
 			var data_arr = this.getProperty('rel').split("_");
 			var itemID = data_arr[0];

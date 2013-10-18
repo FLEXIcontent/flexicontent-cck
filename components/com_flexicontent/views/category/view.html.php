@@ -646,7 +646,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($cids)     $urlvars['cids'] = $cids;
 		
 		$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, $Itemid, $urlvars), false);
-		$print_link    = $category_link .(strstr($category_link, '?') ? '&amp;'  : '?'). 'pop=1&amp;tmpl=component';
+    $curr_url = JURI::root(true) . $_SERVER['REQUEST_URI'];
+    $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component';		
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('action',    $category_link);  // $uri->toString()
