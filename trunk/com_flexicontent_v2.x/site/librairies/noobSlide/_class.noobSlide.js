@@ -106,7 +106,7 @@ var noobSlide = new Class({
 		};
 		if(params.addButtons){
 			for(var action in params.addButtons){
-				this.addActionButtons(action, $type(params.addButtons[action])=='array' ? params.addButtons[action] : [params.addButtons[action]]);
+				this.addActionButtons(action, typeOf(params.addButtons[action])=='array' ? params.addButtons[action] : [params.addButtons[action]]);
 			}
 		}
 		if(this.fade)
@@ -118,7 +118,7 @@ var noobSlide = new Class({
 		else
 		{
 			//original Sliding
-			this.fx = new Fx.Tween(this.box,$extend((params.fxOptions||{duration:500,wait:false}),{property:this.modes[this.mode][0]}));
+			this.fx = new Fx.Tween(this.box,Object.append((params.fxOptions||{duration:500,wait:false}),{property:this.modes[this.mode][0]}));
 			this.walk((params.startItem||0),true,true);
 		}
 	},
@@ -194,7 +194,7 @@ var noobSlide = new Class({
 	},
 
 	stop: function(){
-		$clear(this._play);
+		clearTimeout(this._play);
 	},
 
 	walk: function(item,manual,noFx){
