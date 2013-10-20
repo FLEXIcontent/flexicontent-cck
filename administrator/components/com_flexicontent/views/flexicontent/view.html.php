@@ -45,6 +45,10 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$user     = JFactory::getUser();		
 		$db       = JFactory::getDBO();
 		
+		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		flexicontent_html::loadJQuery();
+		JHTML::_('behavior.tooltip');
+		
 		// Special displaying when getting flexicontent version
 		$layout = JRequest::getVar('layout', 'default');
 		if($layout=='fversion') {

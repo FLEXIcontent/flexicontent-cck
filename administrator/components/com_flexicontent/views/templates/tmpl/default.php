@@ -54,7 +54,7 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 		?>
 		<script type="text/javascript">
 			jQuery(document).ready(function() {
-				var tmpl_el = jQuery('#<?php echo 'up-'.$row->name ?>');
+				var tmpl_el = jQuery('#<?php echo 'del-'.$row->name ?>');
 				tmpl_el.click(function( event ) {
 					var answer = confirm('<?php echo JText::_( 'FLEXI_TEMPLATE_DELETE_CONFIRM',true ); ?>')
 					if (!answer) return;
