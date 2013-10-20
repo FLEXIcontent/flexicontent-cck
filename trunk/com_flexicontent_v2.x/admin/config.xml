@@ -13,7 +13,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="disablecss" type="radio" default="0" label="FLEXI_DISABLE_FRONT_CSS" description="FLEXI_DISABLE_FRONT_CSS_DESC" menu="hide">
+			<field name="disablecss" type="radio" default="0" label="FLEXI_DISABLE_FRONTEND_CSS" description="FLEXI_DISABLE_FRONTEND_CSS_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
