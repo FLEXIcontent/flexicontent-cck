@@ -44,7 +44,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$document  = JFactory::getDocument();
 		$option    = JRequest::getVar('option');
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();
 		
 		JHTML::_('behavior.tooltip');

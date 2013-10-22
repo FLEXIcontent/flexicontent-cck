@@ -44,7 +44,7 @@ class FlexicontentViewType extends JViewLegacy
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 		
 		//add js function to overload the joomla submitform
-		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		JHTML::_('behavior.tooltip');
 		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
 		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');

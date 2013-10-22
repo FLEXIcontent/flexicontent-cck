@@ -79,7 +79,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Load needed JS libs & CSS styles
 		// ********************************
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('flexi_tmpl_common');
 		
@@ -645,9 +645,18 @@ class FlexicontentViewCategory extends JViewLegacy
 		if ($authorid) $urlvars['authorid'] = $authorid;
 		if ($cids)     $urlvars['cids'] = $cids;
 		
-		$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, $Itemid, $urlvars), false);
+		// Current url basic variables to be able to link to subcategories ...
+    $curr_url_basic = 'index.php?Itemid='.$Itemid;
+    foreach ($urlvars as $urlvar_name => $urlvar_val) $curr_url_basic .= '&'.$urlvar_name.'='.$urlvar_val;
+    
+    // Category link for single/multiple category(-ies)  --OR--  "current layout" link for myitems/author layouts
+		$category_link = ($layout=='myitems' || $layout=='author') ? JRoute::_( $curr_url_basic ) :
+			JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, $Itemid, $urlvars), false);
+		
+		// Print link ... must include current filtering url vars
     $curr_url = JURI::root(true) . $_SERVER['REQUEST_URI'];
     $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component';		
+    
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('action',    $category_link);  // $uri->toString()

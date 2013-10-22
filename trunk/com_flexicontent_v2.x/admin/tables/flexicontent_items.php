@@ -375,11 +375,16 @@ class flexicontent_items extends JTable{
 			}
 			
 			// Check for unique Alias
-			$query 	= 'SELECT COUNT(*) FROM #__content AS i '
+			$sub_q = 'SELECT catid FROM #__flexicontent_cats_item_relations WHERE itemid='.(int)$this->id;
+			$query = 'SELECT COUNT(*) FROM #__content AS i '
 				.' JOIN #__flexicontent_items_ext AS e ON i.id = e.item_id '
+				.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid '
 				.' WHERE i.alias='.$this->_db->Quote($this->alias)
+				.'  AND (i.catid='.(int)$this->id.' OR rel.catid IN ('.$sub_q.') )'
+				.'  AND e.language = '.$this->_db->Quote($type_ext->language)
 				.'  AND i.id <> '.(int)$this->id
-				.'  AND e.lang_parent_id <> '.(int)$type_ext->lang_parent_id;
+				//.'  AND e.lang_parent_id <> '.(int)$type_ext->lang_parent_id
+				;
 			$this->_db->setQuery($query);
 			$duplicate_aliases = (boolean) $this->_db->loadResult();
 			if ($duplicate_aliases) {

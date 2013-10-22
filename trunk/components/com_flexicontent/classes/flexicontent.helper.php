@@ -665,7 +665,7 @@ class flexicontent_html
 			
 			case 'noobSlide':
 				// Make sure mootools are loaded
-				FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+				FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 				
 				// Add swipe CSS / JS
 				//$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/noobSlide/_class.noobSlide.js');
@@ -1723,7 +1723,7 @@ class flexicontent_html
 	 	if (!$js_and_css_added)
 	 	{
 			$document = JFactory::getDocument();
-			FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
+			FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
 	 		JHTML::_('behavior.tooltip');   // This is also needed
 			$css 	= JURI::root(true).'/components/com_flexicontent/assets/css/fcvote.css';
 			$js		= JURI::root(true).'/components/com_flexicontent/assets/js/fcvote.js';
@@ -1892,7 +1892,7 @@ class flexicontent_html
 	 	if (!$js_and_css_added)
 	 	{
 			$document	= JFactory::getDocument();
-			FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
+			FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');  // Make sure mootools are loaded before our js
 	 		JHTML::_('behavior.tooltip');   // This is also needed
 			$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/fcfav.js' );
 

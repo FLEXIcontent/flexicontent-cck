@@ -830,7 +830,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		{
 			if (!$multiboxadded) {
 				//echo $field->name.": multiboxadded";
-				FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+				FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 				
 				// Multibox integration use different version for FC v2x
 				if (FLEXI_J16GE) {

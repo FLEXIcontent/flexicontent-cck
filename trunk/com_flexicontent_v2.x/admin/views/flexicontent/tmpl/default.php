@@ -32,9 +32,6 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 	return false;
 }
 
-FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
-flexicontent_html::loadJQuery();
-
 $ctrl = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 

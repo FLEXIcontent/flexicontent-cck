@@ -488,11 +488,15 @@ window.addEvent('domready', function() {
 			<td class="left"></td>
 			<!--td class="left"></td-->
 			<td class="left col_cats">
+				<?php echo $this->lists['filter_cats']; ?>
+				<div class="clear"></div>
 				<label class="label" for="filter_subcats"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
 				<div class="clear"></div>
 				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
 				<div class="clear"></div>
-				<?php echo $this->lists['filter_cats']; ?>
+				<label class="label" for="filter_catsinstate"><?php echo '&nbsp;'.JText::_( 'FLEXI_CATS_IN_STATE' ); ?></label>
+				<div class="clear"></div>
+				<span class="radio"><?php echo $this->lists['filter_catsinstate']; ?></span>
 			</td>
 			<td class="left col_created col_revised" colspan="2">
 				<span class="radio"><?php echo $this->lists['date']; ?></span>

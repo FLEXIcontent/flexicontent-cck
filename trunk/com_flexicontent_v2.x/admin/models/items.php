@@ -739,6 +739,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$filter_type 		= $app->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );
 		$filter_cats 		= $app->getUserStateFromRequest( $option.'.items.filter_cats',	'filter_cats', '', 'int' );
 		$filter_subcats	= $app->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
+		$filter_catsinstate = $app->getUserStateFromRequest( $option.'.items.filter_catsinstate',	'filter_catsinstate', 2, 'int' );
 		$filter_state 	= $app->getUserStateFromRequest( $option.'.items.filter_state', 	'filter_state', '', 'word' );
 		$filter_stategrp= $app->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp', '', 'word' );
 		$filter_id	 		= $app->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', '', 'int' );
@@ -866,7 +867,22 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( $filter_cats ) {
 			if ( $filter_subcats ) {
 				global $globalcats;
-				$where[] = 'rel.catid IN (' . $globalcats[$filter_cats]->descendants . ')';
+				
+				$_sub_cids = array();
+				if ($filter_catsinstate == 2) {
+					$_sub_cids = $globalcats[$filter_cats]->descendantsarray;
+				} else if ($filter_catsinstate == 1) {
+					foreach( $globalcats[$filter_cats]->descendantsarray as $_dcatid) {
+						if ($globalcats[$_dcatid]->published) $_sub_cids[] = $_dcatid;
+					}
+				} else if ($filter_catsinstate == 0) {
+					foreach( $globalcats[$filter_cats]->descendantsarray as $_dcatid) {
+						if ($globalcats[$_dcatid]->published!=1) $_sub_cids[] = $_dcatid;
+					}
+				}
+				if ( empty ($_sub_cids) ) $where[] = 'rel.catid IN (0)';
+				else $where[] = 'rel.catid IN (' . implode( ', ', $_sub_cids ) . ')';
+				
 			} else {
 				$where[] = 'rel.catid = ' . $filter_cats;
 			}

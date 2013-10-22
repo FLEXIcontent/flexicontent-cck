@@ -721,7 +721,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$id_arr = $this->_id ? array($this->_id) : $this->_ids;
 			// Get sub categories used to create items list, according to configuration and user access
 			$this->_getDataCats($id_arr);
-			$_data_cats = "'".implode("','", $this->_data_cats)."'";
+			$_data_cats = "'".implode("', '", $this->_data_cats)."'";
 			$where .= ' AND rel.catid IN ('.$_data_cats.')';
 		}
 		
@@ -734,7 +734,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		else
 			$ignoreState = $user->gid  > 19;  // author has 19 and editor has 20
 		
-		if (!$ignoreState) {
+		if (!$ignoreState && $this->_layout!='myitems') {
 			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
 			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 			
@@ -752,7 +752,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		// Checking item, category, content type access levels
-		if (!$show_noauth) {
+		if (!$show_noauth && $this->_layout!='myitems') {
 			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
@@ -1129,7 +1129,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$filtercat  = $params->get('filtercat', 0);       // Filter items using currently selected language
 		$show_noauth = $params->get('show_noauth', 0);    // Show unauthorized items
 		
+		// First thing we need to do is to select only the requested items
 		$where = ' WHERE 1 ';
+		if ($this->_authorid)
+			$where .= ' AND i.created_by = ' . $this->_db->Quote($this->_authorid);
 		
 		// Filter the category view with the current user language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
@@ -1333,6 +1336,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				( $this->_layout=='myitems' && !$this->_authorid ) ||
 				( $this->_layout=='author' && !$this->_authorid )
 			) {
+				$_layout_not_found = true;
 				$this->_category = false;
 			} else {
 				$this->_category = new stdClass;
@@ -1360,8 +1364,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$msg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_AUTHORID_NOT_SET');
 				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 			}
-			else if ( $this->_layout ) {
-				echo $this->_authorid; exit;
+			else if ( $_layout_not_found ) {
 				$msg = JText::sprintf( 'FLEXI_CONTENT_LIST_LAYOUT_IS_NOT_SUPPORTED', $this->_layout );
 				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 			}
@@ -1455,7 +1458,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Retrieve category parameters
 		$catparams = "";
-		if ($id) {
+		if ($id && $this->_layout!="myitems") {
 			$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
 			$this->_db->setQuery($query);
 			$catparams = $this->_db->loadResult();
