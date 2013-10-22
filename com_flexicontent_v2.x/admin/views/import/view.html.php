@@ -52,7 +52,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$document	= JFactory::getDocument();
 		$context	= 'com_flexicontent';
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		JHTML::_('behavior.tooltip');
 
 		//add css to document

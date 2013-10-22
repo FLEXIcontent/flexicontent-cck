@@ -354,6 +354,7 @@ class flexicontent_cats
 		foreach ($list as $cat) {
 			$cat->treename = str_replace("&nbsp;", " ", strip_tags($cat->treename));
 			$cat_title = $viewtree ? $cat->treename : $cat->title;
+			if (!$check_published && $cat->published!=1) $cat_title .= ' --U--';
 			
 			if ( !$check_published || $cat->published )
 			{	

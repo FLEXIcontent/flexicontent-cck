@@ -52,7 +52,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 		$print_logging_info = $cparams->get('print_logging_info');
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		
 		if($task == 'copy') {
 			$this->setLayout('copy');
@@ -67,6 +67,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		// Get filters
 		$filter_cats       = $app->getUserStateFromRequest( $option.'.items.filter_cats',				'filter_cats',			'',		'int' );
 		$filter_subcats    = $app->getUserStateFromRequest( $option.'.items.filter_subcats',		'filter_subcats',		1,		'int' );
+		$filter_catsinstate = $app->getUserStateFromRequest( $option.'.items.filter_catsinstate', 'filter_catsinstate',2,		'int' );
 		
 		$filter_order_type = $app->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type',	0,		'int' );
 		$filter_order      = $app->getUserStateFromRequest( $option.'.items.filter_order',			'filter_order',				'',		'cmd' );
@@ -382,6 +383,13 @@ class FlexicontentViewItems extends JViewLegacy {
 		// build the include subcats boolean list
 		$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox" onchange="submitform();"', $filter_subcats );
 		
+		// build the include non-published cats boolean list
+		$catsinstate = array();
+		$catsinstate[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_ANY' ) );
+		$catsinstate[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_PUBLISHED' ) );
+		$catsinstate[] = JHTML::_('select.option', '0', JText::_( 'FLEXI_UNPUBLISHED' ).'<br/>' );
+		$lists['filter_catsinstate'] = JHTML::_('select.radiolist', $catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_catsinstate );
+		
 		// build the order type boolean list
 		$order_types = array();
 		$order_types[] = JHTML::_('select.option', '0', JText::_( 'FLEXI_ORDER_JOOMLA' ).'<br/>' );
@@ -389,7 +397,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$lists['filter_order_type'] = JHTML::_('select.radiolist', $order_types, 'filter_order_type', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_order_type );
 		
 		// build the categories select list for filter
-		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', $check_published=true, $check_perms=false);
+		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', $check_published=false, $check_perms=false);
 
 		//build type select list
 		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="inputbox" size="1" onchange="submitform( );"', 'filter_type');
@@ -483,6 +491,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$this->assignRef('filter_type'		, $filter_type);
 		$this->assignRef('filter_cats'		, $filter_cats);
 		$this->assignRef('filter_subcats'	, $filter_subcats);
+		$this->assignRef('filter_catsinstate'	, $filter_catsinstate);
 		$this->assignRef('filter_order_type', $filter_order_type);
 		$this->assignRef('filter_lang'		, $filter_lang);
 		$this->assignRef('filter_fileid'	, $filter_fileid);

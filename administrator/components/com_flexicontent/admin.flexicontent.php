@@ -90,7 +90,7 @@ if (!FLEXI_J16GE) {
 
 if ( JRequest::getWord('format')!='raw') {
 	// Load mootools
-	FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 	// Load jquery Framework
 	flexicontent_html::loadJQuery();
 }

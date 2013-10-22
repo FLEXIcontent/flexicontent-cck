@@ -22,6 +22,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php
 $n = count($this->categories);
 $i = 0;
+$layout = JRequest::getCmd('layout', '');
 
 // Sub-category prefix/suffix/separator parameters
 $pretext = $this->params->get( 'subcat_pretext', '' ); $posttext = $this->params->get( 'subcat_posttext', '' );
@@ -59,7 +60,8 @@ foreach ($this->categories as $sub) {
 	$subcats_html[$i] .= "  <span class='catinfo ".$subcat_info_class."'>\n";
 	
 	// b. Category title with link and optional item counts
-	$cat_link = JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) );
+	$cat_link = ($layout=='myitems' || $layout=='author') ? $this->action .(strstr($this->action, '?') ? '&amp;'  : '?'). 'cid='.$sub->slug :
+		JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) );
 	$itemcount = !$show_itemcount ? '' : '	(' . ($sub->assigneditems != null ? $sub->assigneditems.'/'.$subsubcount : '0/'.$subsubcount) . ')';
 	$subcats_html[$i] .= "    <a class='catlink' href='".$cat_link."'>".$this->escape($sub->title)."</a>".$itemcount."</span>\n";
 	

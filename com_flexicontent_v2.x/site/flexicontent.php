@@ -108,7 +108,7 @@ if (!FLEXI_J16GE) {
 
 if ($cparams->get('add_tooltips', 1)) {
 	// Load mootools
-	FLEXI_J30GE ? JHtml::_('behavior.framework') : JHTML::_('behavior.mootools');
+	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 	JHTML::_('behavior.tooltip');
 }
 
