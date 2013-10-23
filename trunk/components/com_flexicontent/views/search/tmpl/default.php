@@ -4,7 +4,7 @@
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fcsearch';
-$menu = JSite::getMenu()->getActive();
+$menu = JFactory::getApplication()->getMenu()->getActive();
 if ($menu) $page_classes .= ' menuitem'.$menu->id; 
 ?>
 

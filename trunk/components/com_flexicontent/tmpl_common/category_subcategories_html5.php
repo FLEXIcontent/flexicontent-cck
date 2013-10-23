@@ -23,6 +23,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 <?php
 $n = count($this->categories);
 $i = 0;
+$layout = JRequest::getCmd('layout', '');
 
 // Sub-category prefix/suffix/separator parameters
 $pretext = $this->params->get( 'subcat_pretext', '' ); $posttext = $this->params->get( 'subcat_posttext', '' );
@@ -31,6 +32,8 @@ $opentag = $this->params->get( 'subcat_opentag', '' ); $closetag = $this->params
 $separatorf = $this->params->get( 'subcat_separatorf' ); 
 $separators_arr = array( 0 => '&nbsp;', 1 => '<br />', 2 => '&nbsp;|&nbsp;', 3 => ',&nbsp;', 4 => $closetag.$opentag, 5 => '' );
 $separatorf = isset($separators_arr[$separatorf]) ? $separators_arr[$separatorf] : '&nbsp;';
+
+$cats_label = JText::_( $this->category->id ? 'FLEXI_SUBCATEGORIES' : 'FLEXI_CATEGORIES' );
 
 // Sub-category information parameters
 $show_label_subcats = $this->params->get('show_label_subcats', 1);
@@ -58,7 +61,8 @@ foreach ($this->categories as $sub) {
 	$subcats_html[$i] .= "  <span class='catinfo ".$subcat_info_class."'>\n";
 	
 	// b. Category title with link and optional item counts
-	$cat_link = JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) );
+	$cat_link = ($layout=='myitems' || $layout=='author') ? $this->action .(strstr($this->action, '?') ? '&amp;'  : '?'). 'cid='.$sub->slug :
+		JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) );
 	$itemcount = !$show_itemcount ? '' : '	(' . ($sub->assigneditems != null ? $sub->assigneditems.'/'.$subsubcount : '0/'.$subsubcount) . ')';
 	$subcats_html[$i] .= "    <a class='catlink' href='".$cat_link."'>".$this->escape($sub->title)."</a>".$itemcount."</span>\n";
 	
@@ -80,7 +84,7 @@ $subcats_html = implode($separatorf, $subcats_html);
 $subcats_html = $opentag .$subcats_html. $closetag;
 // Add optional sub-categories list label
 if ($show_label_subcats) {
-	$subcats_label = "<span class='subcategorieslabel ".$subcats_lbl_class."'>".JText::_( 'FLEXI_SUBCATEGORIES' )."</span>".$subcats_lbl_dots;
+	$subcats_label = "<span class='subcategorieslabel ".$subcats_lbl_class."'>".$cats_label."</span>".$subcats_lbl_dots;
 	$subcats_html = $subcats_label.$subcats_html;
 }
 ?>

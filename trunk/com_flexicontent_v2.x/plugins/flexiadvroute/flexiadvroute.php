@@ -281,13 +281,12 @@ class plgSystemFlexiadvroute extends JPlugin
 	
 	function detectHomepage()
 	{
+		$app = JFactory::getApplication();
+		$menu = $app->getMenu();
 		if (FLEXI_J16GE) {
-			$app = JFactory::getApplication();
-			$menu = $app->getMenu();
 			$lang = JFactory::getLanguage();
 			$isHomePage = $menu->getActive() == $menu->getDefault($lang->getTag());
 		} else {
-			$menu = JSite::getMenu();
 			$isHomePage = $menu->getActive() == $menu->getDefault();
 		}
 		return $isHomePage;

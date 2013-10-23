@@ -451,7 +451,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$uri				= JFactory::getURI();
 		$db					= JFactory::getDBO();
 		$nullDate		= $db->getNullDate();
-		$menu				= JSite::getMenu()->getActive();
+		$menu				= $app->getMenu()->getActive();
 		
 		// Get the COMPONENT only parameters, then merge the menu parameters
 		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
@@ -724,7 +724,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			
 			if ( ($not_authorised && !$allowunauthorize) || @ $content_is_limited ) {
 				// User isn't authorize to add ANY content
-				if ( $notauth_menu = JSite::getMenu()->getItem($notauth_itemid) ) {
+				if ( $notauth_menu = $app->getMenu()->getItem($notauth_itemid) ) {
 					// a. custom unauthorized submission page via menu item
 					$internal_link_vars = @ $notauth_menu->component ? '&Itemid='.$notauth_itemid.'&option='.$notauth_menu->component : '';
 					$notauthurl = JRoute::_($notauth_menu->link.$internal_link_vars, false);

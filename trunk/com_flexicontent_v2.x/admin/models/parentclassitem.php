@@ -88,7 +88,7 @@ class ParentClassItem extends JModelAdmin
 		// --. Get component parameters , merge (for frontend) with current menu item parameters
 		$this->_cparams = clone( JComponentHelper::getParams('com_flexicontent') );
 		if (!$app->isAdmin()) {
-			$menu = JSite::getMenu()->getActive();
+			$menu = $app->getMenu()->getActive();
 			if ($menu) {
 				$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
 				$this->_cparams->merge($menu_params);

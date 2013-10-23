@@ -161,7 +161,7 @@ function FLEXIcontentParseRoute($segments)
 	$vars = array();
 	
 	// 1. Get the active menu item
-	$menu = JSite::getMenu()->getActive();
+	$menu = JFactory::getApplication()->getMenu()->getActive();
 
 	// 2. Count route segments
 	$count = count($segments);

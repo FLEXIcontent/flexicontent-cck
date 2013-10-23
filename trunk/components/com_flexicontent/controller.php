@@ -237,7 +237,7 @@ class FlexicontentController extends JControllerLegacy
 		$app     = JFactory::getApplication();
 		$db      = JFactory::getDBO();
 		$user    = JFactory::getUser();
-		$menu    = JSite::getMenu()->getActive();
+		$menu    = $app->getMenu()->getActive();
 		$config  = JFactory::getConfig();
 		$session = JFactory::getSession();
 		$task	   = JRequest::getVar('task');
@@ -2144,7 +2144,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		// If no current menu itemid, then set it using the first menu item that points to the search view
 		if (!JRequest::getVar('Itemid', 0)) {
-			$menus = JSite::getMenu();
+			$menus = JFactory::getApplication()->getMenu();
 			$items = $menus->getItems('link', 'index.php?option=com_flexicontent&view=search');
 	
 			if(isset($items[0])) {

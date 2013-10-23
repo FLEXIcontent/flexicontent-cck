@@ -1436,7 +1436,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( $this->_params !== NULL ) return;
 		
 		$app  = JFactory::getApplication();
-		$menu = JSite::getMenu()->getActive();     // Retrieve active menu
+		$menu = $app->getMenu()->getActive();     // Retrieve active menu
 		
 		// Retrieve author parameters if using displaying AUTHOR layout
 		$author_basicparams = '';
