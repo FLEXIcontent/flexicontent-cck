@@ -261,7 +261,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$field->html =
 			 '<div style="float:left">'
-			.($show_usage ? ' <div class="fc_mini_note_box">'.$append_str.'</div>' : '')
+			.(($show_usage && $append_str) ? ' <div class="fc_mini_note_box">'.$append_str.'</div>' : '')
 			.  $field->html
 			.'</div>';
 			
