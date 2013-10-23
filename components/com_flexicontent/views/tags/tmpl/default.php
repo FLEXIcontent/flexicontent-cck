@@ -58,7 +58,7 @@ if ( !strlen($fields[0]) ) unset($fields[0]);
 $page_classes  = '';
 $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 $page_classes .= ' fctags fctag'.$this->tag->id;
-$menu = JSite::getMenu()->getActive();
+$menu = JFactory::getApplication()->getMenu()->getActive();
 if ($menu) $page_classes .= ' menuitem'.$menu->id; 
 ?>
 

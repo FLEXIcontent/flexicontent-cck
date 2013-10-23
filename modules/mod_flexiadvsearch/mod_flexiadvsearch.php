@@ -119,7 +119,7 @@ if ( $show_mod )
 	$itemid = $itemid_force ? (int) $params->get('itemid_force_value', 0)  :  0;
 	
 	if ($itemid) {
-		$menu = JSite::getMenu()->getItem($itemid);     // Retrieve active menu
+		$menu = $app->getMenu()->getItem($itemid);     // Retrieve active menu
 		
 		// Get the COMPONENT only parameters, then merge the menu parameters
 		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;

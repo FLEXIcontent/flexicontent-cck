@@ -441,7 +441,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 		if ( $this->_params !== NULL ) return;
 		
 		$app  = JFactory::getApplication();
-		$menu = JSite::getMenu()->getActive();     // Retrieve active menu
+		$menu = $app->getMenu()->getActive();     // Retrieve active menu
 		
 		// Get the COMPONENT only parameters, then merge the menu parameters
 		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;

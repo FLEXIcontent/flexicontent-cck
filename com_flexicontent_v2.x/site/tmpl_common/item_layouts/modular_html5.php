@@ -21,7 +21,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
 $item = $this->item;
-$menu = JSite::getMenu()->getActive();
+$menu = JFactory::getApplication()->getMenu()->getActive();
 
 JFactory::getDocument()->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/tabber.css');

@@ -344,7 +344,7 @@ class FlexicontentModelItems extends ParentClassItem
 		if (!empty($this->_item->parameters)) return;
 		
 		$app = JFactory::getApplication();
-		$menu = JSite::getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
+		$menu = $app->getMenu()->getActive();  // Retrieve currently active menu item (NOTE: this applies when Itemid variable or menu item alias exists in the URL)
 		jimport('joomla.html.parameter');
 		
 		

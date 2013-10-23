@@ -20,7 +20,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
 $item = $this->item;
-$menu = JSite::getMenu()->getActive();
+$menu = JFactory::getApplication()->getMenu()->getActive();
 
 // USE HTML5 or XHTML
 $html5			= $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
