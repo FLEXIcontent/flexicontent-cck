@@ -1221,6 +1221,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$db->setQuery($query);
 		$db->query();					if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
+		// SET Access View Level to public (=1) for types that do not have their Level set
+		$query = $db->getQuery(true)->update('#__flexicontent_types')->set('access = 1')->where('access = 0');
+		$db->setQuery($query);
+		$db->query();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+		
 		// CHECK that we have the same Component Actions in assets DB table with the Actions as in component's access.xml file
 		$asset	= JTable::getInstance('asset');
 		if ($comp_section = $asset->loadByName($component_name)) {  // Try to load component asset, if missing it returns false

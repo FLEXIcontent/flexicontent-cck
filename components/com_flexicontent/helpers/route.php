@@ -47,7 +47,7 @@ class FlexicontentHelperRoute
 		// Get menu items pointing to the Flexicontent component
 		// NOTE: In J2.5 the method getItems() will return menu items that have language '*' (ALL) - OR - current user language,
 		// this is what we need, since using a menu item with incorrect language will cause problems withs SEF URLs ...
-		// NOTE: In J1.5 the static method JSite::getMenu() will give an error,
+		// NOTE: In J1.5 the static method JSite::getMenu() will give an error (in backend), and also an error in J3.2+
 		// while JFactory::getApplication('site')->getMenu() will not return the frontend menus
 		$component = JComponentHelper::getComponent('com_flexicontent');
 		$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
@@ -378,19 +378,21 @@ class FlexicontentHelperRoute
 		// Set (a) Content type's default menu id and (b) current category menu item id ... into the priority array
 		// ********************************************************************************************************
 		
-		$type_menu_itemid_usage = $type->params->get('type_menu_itemid_usage', 0);
-		$type_menu_itemid       = $type->params->get('type_menu_itemid', 0);
-		if ($type_menu_itemid) {
-			// Get type menu item, check that it is valid and cache it
-			if ( !isset($type->typeMenuItem) ) {
-				$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
-				$type->typeMenuItem = $menus->getItem( $type_menu_itemid );
-			}
-			// Valid type menu item
-			if ($type->typeMenuItem) {
-				$match_lvl = $type_menu_itemid_usage ? 3 : 6;  // Priority 3: prefer type menu item instead of category prorities 4,5, but 6 is less ...
-				$matches[ $match_lvl ] = $type->typeMenuItem;
-				$min_matched = $min_matched > $match_lvl ? $match_lvl : $min_matched;
+		if ( $type ) {
+			$type_menu_itemid_usage = $type->params->get('type_menu_itemid_usage', 0);
+			$type_menu_itemid       = $type->params->get('type_menu_itemid', 0);
+			if ($type_menu_itemid) {
+				// Get type menu item, check that it is valid and cache it
+				if ( !isset($type->typeMenuItem) ) {
+					$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
+					$type->typeMenuItem = $menus->getItem( $type_menu_itemid );
+				}
+				// Valid type menu item
+				if ($type->typeMenuItem) {
+					$match_lvl = $type_menu_itemid_usage ? 3 : 6;  // Priority 3: prefer type menu item instead of category prorities 4,5, but 6 is less ...
+					$matches[ $match_lvl ] = $type->typeMenuItem;
+					$min_matched = $min_matched > $match_lvl ? $match_lvl : $min_matched;
+				}
 			}
 		}
 		

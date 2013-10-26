@@ -236,7 +236,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	
 	<?php if ((isset($item->positions['image'])) || (isset($item->positions['top']))) : ?>
 		<!-- BOF image/top row -->
-		<div class="flexi topblock group row">  <!-- NOTE: image block is inside top block ... -->
+		<div class="flexi topblock group">  <!-- NOTE: image block is inside top block ... -->
 			
 			<?php if (isset($item->positions['image'])) : ?>
 				<!-- BOF image block -->

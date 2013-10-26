@@ -263,9 +263,9 @@ class FlexicontentModelFavourites extends JModelLegacy
 				$aid_list = implode(",", $aid_arr);
 				$select_access .= ', '
 					.' CASE WHEN '
-					.'  ty.access IN ('.$aid_list.') AND '
-					.'   c.access IN ('.$aid_list.') AND '
-					.'   i.access IN ('.$aid_list.') '
+					.'  ty.access IN (0,'.$aid_list.') AND '
+					.'   c.access IN (0,'.$aid_list.') AND '
+					.'   i.access IN (0,'.$aid_list.') '
 					.' THEN 1 ELSE 0 END AS has_access';
 			} else {
 				$aid = (int) $user->get('aid');

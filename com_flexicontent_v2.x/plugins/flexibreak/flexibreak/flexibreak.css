@@ -49,11 +49,8 @@ div#articleTOC p.tocHeader {
 }
 
 
-
-
-
 .tocNav {
-	text-align: center;
+	text-align: left;
 	display: block;
 	border: 0px solid;
 	display: block;

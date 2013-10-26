@@ -1069,10 +1069,10 @@ class modFlexicontentHelper
 				
 				// select the item ids related to current item via the relation fields
 				$query2 = 'SELECT DISTINCT value' .
-						' FROM #__flexicontent_fields_item_relations' .
-						' WHERE item_id = '.(int) $id .
-						$where2
-						;
+					' FROM #__flexicontent_fields_item_relations' .
+					' WHERE item_id = '.(int) $id .
+					$where2
+					;
 				$db->setQuery($query2);
 				$related = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				$related = is_array($related) ? array_map( 'intval', $related ) : $related;
@@ -1421,13 +1421,16 @@ class modFlexicontentHelper
 				. ' GROUP BY i.id'
 				. $orderby
 				;
-
+			
+			// if using CATEGORY SCOPE INCLUDE ... then link though them ... otherwise via main category
+			$_cl = (!$behaviour_cat && $method_cat == 3) ? 'c' : 'mc';
+			
 			$items_query_data 	= 'SELECT '
 				.' i.*, ie.*, ty.name AS typename,'
 				. ($select_comments ? $select_comments.',' : '')
 				. ($select_rated ? $select_rated.',' : '')
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
+				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', '.$_cl.'.id, '.$_cl.'.alias) ELSE '.$_cl.'.id END as categoryslug,'
 				. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
 				. ' FROM #__content AS i'
 				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
