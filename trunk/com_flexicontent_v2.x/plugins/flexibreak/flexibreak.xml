@@ -8,7 +8,7 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>2.0</version>
-	<description>PLG_CONTENT_FLEXIBREAK_XML_DESCRIPTION</description>
+	<description>PLG_CONTENT_FLEXIBREAK_DESCRIPTION</description>
 	<files>
 		<filename plugin="flexibreak">flexibreak.php</filename>
 		<filename plugin="flexibreak">flexibreak/flexibreak.css</filename>

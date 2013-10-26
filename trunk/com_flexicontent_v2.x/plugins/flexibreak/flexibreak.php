@@ -59,6 +59,8 @@ class plgContentFlexiBreak extends JPlugin
 		//simple performance check to determine whether bot should process further
 		if (strpos($row->text, 'class="system-pagebreak') === false && strpos($row->text, 'class=\'system-pagebreak') === false)
 			return true;
+		
+		if ( empty($row->id) && empty($row->slug) ) return;  // modify nothing
 
 		// Remove page markers when article in popup (printing)
 		$print = JRequest::getBool('pop');
@@ -74,7 +76,9 @@ class plgContentFlexiBreak extends JPlugin
 		
 		$display_method = $this->params->get('display_method', 1);
 		
+		$row->slug = @ $row->slug ? $row->slug : $row->id;
 		$limitstart = JRequest::getInt('limitstart', 0);
+		$type_id = isset($row->type_id) ? $row->type_id : 0;
 		$prev_link = $limitstart > 0 ?
 			JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid).'&showall=&limitstart='. ($limitstart-1)) :
 			'';

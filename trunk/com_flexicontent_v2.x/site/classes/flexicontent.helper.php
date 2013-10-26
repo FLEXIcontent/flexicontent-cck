@@ -2801,7 +2801,7 @@ class flexicontent_html
 			if (FLEXI_J16GE) {
 				$db->setQuery('SELECT id, title FROM #__viewlevels');
 				$_arr = $db->loadObjectList();
-				$access_names = array();
+				$access_names = array(0=>'Public');  // zero does not exist in J2.5+ but we set it for compatibility
 				foreach ($_arr as $o) $access_names[$o->id] = JText::_($o->title);
 			} else {
 				$access_names = array(0=>'Public', 1=>'Registered', 2=>'Special', 3=>'Privileged');
