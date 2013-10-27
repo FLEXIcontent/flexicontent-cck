@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: install.php 1640 2013-02-28 14:45:19Z ggppdk $
+ * @version 1.5 stable $Id: install.php 1789 2013-10-15 02:25:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -348,6 +348,14 @@ if (!FLEXI_J16GE) {
 		$db->setQuery($query);
 		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
 		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_download_history"';
+		$db->setQuery($query);
+		$dl_history_tbl_exists = (boolean) count($db->loadObjectList());
+		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_download_coupons"';
+		$db->setQuery($query);
+		$dl_coupons_tbl_exists = (boolean) count($db->loadObjectList());
+		
 		$failure_style = 'display:block; width:100%; font-weight: bold; color: red;';
 		$success_style = 'font-weight: bold; color: green;';
 		?>
@@ -554,6 +562,59 @@ if (!FLEXI_J16GE) {
 						}
 						if ( $result !== false ) {
 							echo "<span style='$success_style'>table created</span>";
+						}
+					}
+					else echo "<span style='$success_style'>nothing to do</span>";
+					?>
+					</td>
+				</tr>
+				
+		<?php
+		// Create/Upgrade DB tables for downloads enhancements
+		?>
+				<tr class="row0">
+					<td class="key">Create/Upgrade DB tables for downloads enhancements: </td>
+					<td>
+					<?php
+					
+			    $queries = array();
+					
+					if ( !$dl_history_tbl_exists ) {
+						$queries[] = "
+						CREATE TABLE `#__flexicontent_download_history` (
+							`id` int(11) NOT NULL AUTO_INCREMENT,
+							`user_id` int(11) NOT NULL,
+							`file_id` int(11) NOT NULL,
+							`hits` int(11) NOT NULL,
+							`last_hit_on` datetime NOT NULL,
+							PRIMARY KEY (`id`)
+						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					}
+					
+					if ( !$dl_coupons_tbl_exists ) {
+						$queries[] = "
+						CREATE TABLE `#__flexicontent_download_coupons` (
+							`id` int(11) NOT NULL AUTO_INCREMENT,
+							`user_id` int(11) NOT NULL,
+							`file_id` int(11) NOT NULL,
+							`token` varchar(255) NOT NULL,
+							`hits` int(11) NOT NULL,
+							`hits_limit` int(11) NOT NULL,
+							`expire_on` datetime NOT NULL default '0000-00-00 00:00:00',
+							PRIMARY KEY (`id`)
+						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
+					}
+					
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) {
+								$result = false;
+								echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>";
+							}
+						}
+						if ( $result !== false ) {
+							echo "<span style='$success_style'>columns/indexes added, table was truncated or recreated, please re-index your content</span>";
 						}
 					}
 					else echo "<span style='$success_style'>nothing to do</span>";

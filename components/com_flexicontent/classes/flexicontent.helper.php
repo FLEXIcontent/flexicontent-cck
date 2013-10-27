@@ -1735,7 +1735,7 @@ class flexicontent_html
 			$css = '
 			.'.$class.' .fcvote {line-height:'.$dim.'px;}
 			.'.$class.' .fcvote-label {margin-right: 6px;}
-			.'.$class.' .fcvote ul {height:'.$dim.'px; position:relative !important; left:0px; !important;}
+			.'.$class.' .fcvote ul {height:'.$dim.'px; position:relative !important; left:0px !important;}
 			.'.$class.' .fcvote ul, .'.$class.' .fcvote ul li a:hover, .'.$class.' .fcvote ul li.current-rating {background-image:url('.$img_path.')!important;}
 			.'.$class.' .fcvote ul li a, .'.$class.' .fcvote ul li.current-rating {height:'.$dim.'px;line-height:'.$dim.'px;}
 			';

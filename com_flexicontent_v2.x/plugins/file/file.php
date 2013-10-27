@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: file.php 1767 2013-09-18 17:46:46Z ggppdk $
+ * @version 1.0 $Id: file.php 1785 2013-10-13 05:54:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -801,22 +801,22 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$content_id = (int) JRequest::getInt( 'content_id', 0 );
 		$field_id   = (int) JRequest::getInt( 'field_id', 0 );
 		$tpl = JRequest::getCmd( '$tpl', 'default' );
-		if ( !$file_id ) {
-			echo JText::_('file id is missing');
-			jexit();
+		
+		// Check for missing file id
+		if (!$file_id) {
+			jexit( JText::_('file id is missing') );
 		}
 		
-		$query = ' SELECT * '
-			. ' FROM #__flexicontent_files'
-			. ' WHERE id='. $file_id;
-			;
+		// Check file exists
+		$query = ' SELECT * FROM #__flexicontent_files WHERE id='. $file_id;
 		$db->setQuery( $query );
 		$file = $db->loadObject();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-
-		if ( !$file ) {
-			echo JText::_('file id no '.$file_id.', was not found');
-			jexit();
+		
+		if ($db->getErrorNum())  {
+			jexit( __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()) );
+		}
+		if (!$file) {
+			jexit( JText::_('file id no '.$file_id.', was not found') );
 		}
 		
 		$data = new stdClass();
@@ -861,9 +861,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	{
 		// Check for request forgeries
 		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN'));
-
-		$db  = JFactory::getDbo();
-		$app = JFactory::getApplication();
+		
+		$user = JFactory::getUser();
+		$db   = JFactory::getDbo();
+		$app  = JFactory::getApplication();
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
 		
@@ -882,27 +883,96 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$content_id = (int) JRequest::getInt( 'content_id', 0 );
 		$field_id   = (int) JRequest::getInt( 'field_id', 0 );
 		$tpl = JRequest::getCmd( '$tpl', 'default' );
-		if ( !$file_id ) {
-			echo JText::_('file id is missing');
-			jexit();
+		
+		// Check for missing file id
+		if (!$file_id) {
+			jexit( JText::_('file id is missing') );
 		}
 		
-		$query = ' SELECT * '
-			. ' FROM #__flexicontent_files'
-			. ' WHERE id='. $file_id;
-			;
+		// Check file exists
+		$query = ' SELECT * FROM #__flexicontent_files WHERE id='. $file_id;
 		$db->setQuery( $query );
 		$file = $db->loadObject();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		
+		if ($db->getErrorNum())  {
+			jexit( __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()) );
+		}
+		if (!$file) {
+			jexit( JText::_('file id no '.$file_id.', was not found') );
+		}
+		
 
-		if ( !$file ) {
-			echo JText::_('file id no '.$file_id.', was not found');
-			jexit();
+
+		// Create SELECT OR JOIN / AND clauses for checking Access
+		$access_clauses['select'] = '';
+		$access_clauses['join']   = '';
+		$access_clauses['and']    = '';
+		$access_clauses = $this->_createFieldItemAccessClause( $get_select_access = false, $include_file = true );
+		
+		
+		// Get field's configuration
+		$q = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
+		$db->setQuery($q);
+		$fld = $db->loadObject();
+		$field_params = FLEXI_J16GE ? new JRegistry($fld->attribs) : new JParameter($fld->attribs);
+		
+		// Get all needed data related to the given file
+		$query  = 'SELECT f.id, f.filename, f.altname, f.secure, f.url,'
+				.' i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email, '
+				
+				// Item and Current Category slugs (for URL)
+				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as itemslug,'
+				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
+				
+				.' FROM #__flexicontent_fields_item_relations AS rel'
+				.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
+				.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
+				.' LEFT JOIN #__content AS i ON i.id = rel.item_id'
+				.' LEFT JOIN #__categories AS c ON c.id = i.catid'
+				.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				.' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+				.' LEFT JOIN #__users AS u ON u.id = i.created_by'
+				. $access_clauses['join']
+				.' WHERE rel.item_id = ' . $content_id
+				.' AND rel.field_id = ' . $field_id
+				.' AND f.id = ' . $file_id
+				.' AND f.published= 1'
+				. $access_clauses['and']
+				;
+		$db->setQuery($query);
+		$file = $db->loadObject();
+		
+		if ($db->getErrorNum())  {
+			jexit( __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()) );
+		}
+		if ( empty($file) ) {
+			// this is normally not reachable because the share link should not have been displayed for the user, but it is reachable if e.g. user session has expired
+			jexit( JText::_( 'FLEXI_ALERTNOTAUTH' ). "File data not found OR no access for file #: ". $file_id ." of content #: ". $content_id ." in field #: ".$field_id );
+		}
+		
+		$coupon_vars = '';
+		if ( $field_params->get('enable_coupons', 0) ) 
+		{
+			// Insert new download coupon into the DB, in the case the file is sent to a user with no ACCESS
+			$coupon_token = uniqid();  // create coupon token
+			$query = ' INSERT #__flexicontent_download_coupons '
+				. 'SET user_id = ' . (int)$user->id
+				. ', file_id = ' . $file_id
+				. ', token = ' . $db->Quote($coupon_token)
+				. ', hits = 0'
+				. ', hits_limit = '. (int)$field_params->get('coupon_hits_limit', 3)
+				. ', expire_on = NOW() + INTERVAL '. (int)$field_params->get('coupon_expiration_days', 15).' DAY'
+				;
+			$db->setQuery( $query );
+			$db->query();
+			$coupon_id = $db->insertid();  // get id of newly created coupon
+			$coupon_vars = '&conid='.$coupon_id.'&contok='.$coupon_token;
 		}
 		
 		$uri  = JURI::getInstance();
 		$base = $uri->toString( array('scheme', 'host', 'port'));
-		$link = $base . JRoute::_( 'index.php?option=com_flexicontent&task=download&id='.$file_id.'&cid='.$content_id.'&fid='.$field_id, false );
+		$vars = '&id='.$file_id.'&cid='.$content_id.'&fid='.$field_id . $coupon_vars;
+		$link = $base . JRoute::_( 'index.php?option=com_flexicontent&task=download'.$vars, false );
 		
 		// Verify that this is a local link
 		if (!$link || !JURI::isInternal($link)) {
@@ -992,6 +1062,97 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		$document->addStyleSheet(JURI::base() . 'components/com_flexicontent/assets/css/flexicontent.css');
 		include('file'.DS.'share_result.php');
+	}
+
+
+	// Private common method to create join + and-where SQL CLAUSEs, for checking access of field - item pair(s), IN FUTURE maybe moved
+	function _createFieldItemAccessClause($get_select_access = false, $include_file = false )
+	{
+		$user  = JFactory::getUser();
+		$select_access = $joinacc = $andacc = '';
+		
+		// Access Flags for: content item and field
+		if ( $get_select_access ) {
+			$select_access = '';
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				if ($include_file) $select_access .= ', CASE WHEN'.
+					'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
+				$select_access .= ', CASE WHEN'.
+					'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
+				$select_access .= ', CASE WHEN'.
+					'  ty.access IN (0,'.$aid_list.') AND '.
+					'   c.access IN (0,'.$aid_list.') AND '.
+					'   i.access IN (0,'.$aid_list.')'.
+					' THEN 1 ELSE 0 END AS has_content_access';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					if ($include_file) $select_access .= ', CASE WHEN'.
+						'   (gf.aro IN ( '.$user->gmid.' ) OR  f.access <= '. $aid . ')  THEN 1 ELSE 0 END AS has_file_access';
+					$select_access .= ', CASE WHEN'.
+						'  (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')  THEN 1 ELSE 0 END AS has_field_access';
+					$select_access .= ', CASE WHEN'.
+						'   (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ') AND '.
+						'   (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ') AND '.
+						'   (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')'.
+						' THEN 1 ELSE 0 END AS has_content_access';
+				} else {
+					if ($include_file) $select_access .= ', CASE WHEN'.
+						'   f.access <= '. $aid . '  THEN 1 ELSE 0 END AS has_file_access';
+					$select_access .= ', CASE WHEN'.
+						' fi.access <= '. $aid . '  THEN 1 ELSE 0 END AS has_field_access';
+					$select_access .= ', CASE WHEN'.
+						'  ty.access <= '. $aid . ' AND '.
+						'   c.access <= '. $aid . ' AND '.
+						'   i.access <= '. $aid .
+						' THEN 1 ELSE 0 END AS has_content_access';
+				}
+			}
+		}
+		
+		else {
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				if ($include_file)
+					$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
+				$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
+				$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					if ($include_file) $andacc .=
+						' AND  (gf.aro IN ( '.$user->gmid.' ) OR f.access <= '. $aid . ' OR f.access IS NULL)';  // AND file access
+					$andacc   .=
+						' AND (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')';  // AND field access
+					$andacc   .=
+						' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';   // AND content access: type, cat, item
+						' AND  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
+						' AND  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
+				} else {
+					if ($include_file)
+						$andacc .= ' AND (f.access <= '.$aid .' OR f.access IS NULL)';  // AND file access
+					$andacc   .= ' AND fi.access <= '.$aid ;                          // AND field access
+					$andacc   .= ' AND ty.access <= '.$aid . ' AND  c.access <= '.$aid . ' AND  i.access <= '.$aid ;  // AND content access
+				}
+			}
+		}
+		
+		if (FLEXI_ACCESS) {
+			if ($include_file)
+				$joinacc .= ' LEFT JOIN #__flexiaccess_acl AS gf ON f.id = gf.axo AND gf.aco = "read" AND gf.axosection = "file"';        // JOIN file access
+			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gfi ON fi.id = gfi.axo AND gfi.aco = "read" AND gfi.axosection = "field"';  // JOIN field access
+			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';       // JOIN content access: type, cat, item
+			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+		}
+		
+		$clauses['select'] = $select_access;
+		$clauses['join']   = $joinacc;
+		$clauses['and']    = $andacc;
+		return $clauses;
 	}
 	
 }

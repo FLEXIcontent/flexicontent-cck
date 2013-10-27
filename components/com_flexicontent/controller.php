@@ -1498,7 +1498,6 @@ class FlexicontentController extends JControllerLegacy
 		{
 			// TODO: maybe move this part in module
 			$cart_id = JRequest::getVar( 'cart_id', 0 );
-			$cart_token_matches = false;
 			if (!$cart_id) {
 				// Get zTree data and parse JSON string
 				$tree_var = JRequest::getVar( 'tree_var', "" );
@@ -1545,6 +1544,43 @@ class FlexicontentController extends JControllerLegacy
 			$file_node->fieldid   = JRequest::getInt( 'fid', 0 );
 			$file_node->contentid = JRequest::getInt( 'cid', 0 );
 			$file_node->fileid    = JRequest::getInt( 'id', 0 );
+			
+			$coupon_id    = JRequest::getInt( 'conid', 0 );
+			$coupon_token = JRequest::getString( 'contok', '' );
+			
+			if ( $coupon_id )
+			{
+				$_nowDate = 'UTC_TIMESTAMP()';
+				$_nullDate = $db->Quote( $db->getNullDate() );
+				$query = ' SELECT *'
+					.', CASE WHEN '
+					.'   expire_on = '.$_nullDate.'   OR   expire_on > '.$_nowDate
+					.'  THEN 0 ELSE 1 END AS has_expired'
+					.', CASE WHEN '
+					.'   hits_limit = -1   OR   hits < hits_limit'
+					.'  THEN 0 ELSE 1 END AS has_reached_limit'
+					.' FROM #__flexicontent_download_coupons'
+					.' WHERE id='. $coupon_id .' AND token='. $db->Quote( $coupon_token )
+					;
+				$db->setQuery( $query );
+				$coupon = $db->loadObject();
+				
+				if ($db->getErrorNum())  {
+					echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+					jexit();
+				}
+				
+				if ($coupon) {
+					$slink_valid_coupon = !$coupon->has_reached_limit && !$coupon->has_expired ;
+					if ( $slink_valid_coupon ) {
+						$query = ' DELETE FROM #__flexicontent_download_coupons WHERE id='. $coupon->id;
+						$db->setQuery( $query );
+						$db->query();
+					}
+				}
+				
+				$file_node->coupon = !empty($coupon) ? $coupon : false;  // NULL will not be catched by isset()
+			}
 			$tree_files = array($file_node);
 		}
 		
@@ -1553,25 +1589,13 @@ class FlexicontentController extends JControllerLegacy
 		// Create and Execute SQL query to retrieve file info
 		// **************************************************
 		
-		// Create JOIN + AND clauses for checking Access
-		$joinaccess = $andaccess = $joinaccess2 = $andaccess2 = '';
-		if ( empty($cart_token_matches) ) {
-			$this->_createFieldItemAccessClause( $joinaccess, $andaccess, $joinaccess2, $andaccess2);
-			
-			// Extra access CLAUSEs for given file (this is combined with the above CLAUSEs for field and item access)
-			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
-				$aid_list = implode(",", $aid_arr);
-				$andaccess  .= ' AND f.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gf ON f.id = gf.axo AND gf.aco = "read" AND gf.axosection = "file"';
-					$andaccess  .= ' AND (f.access IS NULL OR gf.aro IN ( '.$user->gmid.' ) OR f.access <= '. $aid . ')';
-				} else {
-					$andaccess  .= ' AND (f.access IS NULL OR f.access <= '.$aid .')';
-				}
-			}
+		// Create SELECT OR JOIN / AND clauses for checking Access
+		$access_clauses['select'] = '';
+		$access_clauses['join']   = '';
+		$access_clauses['and']    = '';
+		if ( empty($cart_token_matches) && empty($slink_valid_coupon) ) {
+			// note CURRENTLY multi-download feature does not use coupons
+			$access_clauses = $this->_createFieldItemAccessClause( $get_select_access = true, $include_file = true );
 		}
 		
 		
@@ -1585,23 +1609,26 @@ class FlexicontentController extends JControllerLegacy
 		foreach ($tree_files as $file_node)
 		{
 			// Get file variable shortcuts (reforce being int)
-			$fieldid   = (int) $file_node->fieldid;
-			$contentid = (int) $file_node->contentid;
-			$fileid    = (int) $file_node->fileid;
+			$field_id   = (int) $file_node->fieldid;
+			$content_id = (int) $file_node->contentid;
+			$file_id    = (int) $file_node->fileid;
 			
-			if ( !isset($fields_conf[$fieldid]) ) {
-				$q = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $fieldid;
+			if ( !isset($fields_conf[$field_id]) ) {
+				$q = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
 				$db->setQuery($q);
 				$fld = $db->loadObject();
-				$fields_conf[$fieldid] = FLEXI_J16GE ? new JRegistry($fld->attribs) : new JParameter($fld->attribs);
+				$fields_conf[$field_id] = FLEXI_J16GE ? new JRegistry($fld->attribs) : new JParameter($fld->attribs);
 			}
 			
-			$query  = 'SELECT f.id, f.filename, f.altname, f.secure, f.url,'
-					.' i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email, '
+			$query  = 'SELECT f.id, f.filename, f.altname, f.secure, f.url'
+					. ', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email'
 					
-					// Item and Current Category slugs (for URL)
-					. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as itemslug,'
-					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
+					// item and current category slugs (for URL in notifications)
+					. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as itemslug'
+					. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
+					
+					. ', dh.id as history_id'  // download history
+					. $access_clauses['select']  // has access
 					
 					.' FROM #__flexicontent_fields_item_relations AS rel'
 					.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
@@ -1611,14 +1638,13 @@ class FlexicontentController extends JControllerLegacy
 					.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					.' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 					.' LEFT JOIN #__users AS u ON u.id = i.created_by'
-					. $joinaccess
-					. $joinaccess2
-					.' WHERE rel.item_id = ' . $contentid
-					.' AND rel.field_id = ' . $fieldid
-					.' AND f.id = ' . $fileid
+					.' LEFT JOIN #__flexicontent_download_history AS dh ON dh.file_id = f.id AND dh.user_id = '. (int)$user->id
+					. $access_clauses['join']
+					.' WHERE rel.item_id = ' . $content_id
+					.' AND rel.field_id = ' . $field_id
+					.' AND f.id = ' . $file_id
 					.' AND f.published= 1'
-					. $andaccess
-					. $andaccess2
+					. $access_clauses['and']
 					;
 			$db->setQuery($query);
 			$file = $db->loadObject();
@@ -1626,19 +1652,50 @@ class FlexicontentController extends JControllerLegacy
 				echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
 				jexit();
 			}
+			//echo "<pre>". print_r($file, true) ."</pre>"; exit;
 			
 			
-			// ************************************************************************
-			// Check for user not having the required Access Level (empty query result)
-			// ************************************************************************
+			// **************************************************************
+			// Check if file was found AND IF user has required Access Levels
+			// **************************************************************
 			
-			if ( empty($file) )
+			if ( empty($file) || (!$file->has_content_access || !$file->has_field_access || !$file->has_file_access) )
 			{
-				$msg = JText::_( 'FLEXI_ALERTNOTAUTH' ). "No access for file #: ". $fileid ." of content #: ". $contentid ." in field #: ".$fieldid;
-				$app->enqueueMessage($msg,'notice');
+				if (empty($file)) {
+					$msg = JText::_('FLEXI_FDC_FAILED_TO_FIND_DATA');     // Failed to match DB data to the download URL data
+				}
+				
+				else {
+					$msg = JText::_( 'FLEXI_ALERTNOTAUTH' );
+					
+					if ( !empty($file_node->coupon) ) {
+						if ( $file_node->coupon->has_expired )              $msg .= JText::_('FLEXI_FDC_COUPON_HAS_EXPIRED');         // No access and given coupon has expired
+						else if ( $file_node->coupon->has_reached_limit )   $msg .= JText::_('FLEXI_FDC_COUPON_REACHED_USAGE_LIMIT'); // No access and given coupon has reached download limit
+						else $msg = "unreachable code in download coupon handling";
+					}
+					
+					else {
+						if ( isset($file_node->coupon) )  $msg .= "<br/> <small>".JText::_('FLEXI_FDC_COUPON_NO_LONGER_USABLE')."</small>";
+						$msg .= ''
+							.(!$file->has_content_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
+									." -- ".JText::_('FLEXI_FDC_CONTENT_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
+									."<br/><small>(".JText::_('FLEXI_FDC_CONTENT_EXPLANATION').")</small>"
+								: '')
+							.(!$file->has_field_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
+									." -- ".JText::_('FLEXI_FDC_FIELD_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
+								: '')
+							.(!$file->has_file_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO') ." -- ".JText::_('FLEXI_FDC_FILE')." " : '')
+						;
+					}
+					$msg .= "<br/><br/> ". JText::sprintf('FLEXI_FDC_FILE_DATA', $file_id, $content_id, $field_id);
+					$app->enqueueMessage($msg,'notice');
+				}
 				
 				// Only abort for single file download
-				if ($task != 'download_tree') { $this->setRedirect('index.php', ''); return; }
+				if ($task != 'download_tree') {
+					$this->setRedirect('index.php', '');
+					return;
+				}
 			}
 			
 			
@@ -1662,12 +1719,43 @@ class FlexicontentController extends JControllerLegacy
 			}
 			
 			
-			// **********************
-			// Increment hits counter
-			// **********************
+			// *********************************************************************
+			// Increment hits counter of file, and hits counter of file-user history
+			// *********************************************************************
 			
 			$filetable = JTable::getInstance('flexicontent_files', '');
-			$filetable->hit($fileid);
+			$filetable->hit($file_id);
+			if ( empty($file->history_id) ) {
+				$query = ' INSERT #__flexicontent_download_history '
+					. ' SET user_id = ' . (int)$user->id
+					. '  , file_id = ' . $file_id
+					. '  , last_hit_on = NOW()'
+					. '  , hits = 1'
+					;
+			} else {
+				$query = ' UPDATE #__flexicontent_download_history '
+					. ' SET last_hit_on = NOW()'
+					. '  , hits = hits + 1'
+					. ' WHERE id = '. (int)$file->history_id
+					;
+			}
+			$db->setQuery( $query );
+			$db->query();
+			
+			
+			// **************************************************************************************************
+			// Increment hits on download coupon or delete the coupon if it has expired due to date or hits limit 
+			// **************************************************************************************************
+			if ( !empty($file_node->coupon) ) {
+				if ( !$file_node->coupon->has_reached_limit && !$file_node->coupon->has_expired ) {
+					$query = ' UPDATE #__flexicontent_download_coupons'
+						.' SET hits = hits + 1'
+						.' WHERE id='. $file_node->coupon->id
+						;
+					$db->setQuery( $query );
+					$db->query();
+				}
+			}
 			
 			
 			// **************************
@@ -1694,9 +1782,9 @@ class FlexicontentController extends JControllerLegacy
 			// *********************************************************************
 			
 			$file->node = $file_node;
-			$valid_files[$fileid] = $file;
+			$valid_files[$file_id] = $file;
 			
-			if ( $fields_conf[$fieldid]->get('send_notifications') ) {
+			if ( $fields_conf[$field_id]->get('send_notifications') ) {
 				
 				// Calculate (once per file) some text used for notifications
 				$file->__file_title__ = $file->altname && $file->altname != $file->filename ? 
@@ -1705,7 +1793,7 @@ class FlexicontentController extends JControllerLegacy
 				$file->__item_url__ = JRoute::_(FlexicontentHelperRoute::getItemRoute($file->itemslug, $file->catslug));
 				
 				// Parse and identify language strings and then make language replacements
-				$notification_tmpl = $fields_conf[$fieldid]->get('notification_tmpl');
+				$notification_tmpl = $fields_conf[$field_id]->get('notification_tmpl');
 				if ( empty($notification_tmpl) ) {
 					$notification_tmpl = '%%FLEXI_FDN_FILE_NO%% __FILE_ID__:  "__FILE_TITLE__" '."\n";
 					$notification_tmpl .= '%%FLEXI_FDN_FILE_IN_ITEM%% "__ITEM_TITLE__":' ."\n";
@@ -1719,25 +1807,25 @@ class FlexicontentController extends JControllerLegacy
 				$file->notification_tmpl = $notification_tmpl;
 				
 				// Send to hard-coded email list
-				$send_all_to_email = $fields_conf[$fieldid]->get('send_all_to_email');
+				$send_all_to_email = $fields_conf[$field_id]->get('send_all_to_email');
 				if ($send_all_to_email) {
 					$emails = preg_split("/[\s]*;[\s]*/", $send_all_to_email);
 					foreach($emails as $email) $email_recipients[$email][] = $file;
 				}
 				
 				// Send to item owner
-				$send_to_current_item_owner = $fields_conf[$fieldid]->get('send_to_current_item_owner');
+				$send_to_current_item_owner = $fields_conf[$field_id]->get('send_to_current_item_owner');
 				if ($send_to_current_item_owner) {
 					$email_recipients[$file->item_owner_email][] = $file;
 				}
 				
 				// Send to email assigned to email field in same content item
-				$send_to_email_field = (int) $fields_conf[$fieldid]->get('send_to_email_field');
+				$send_to_email_field = (int) $fields_conf[$field_id]->get('send_to_email_field');
 				if ($send_to_email_field) {
 
 					$q  = 'SELECT value '
 						.' FROM #__flexicontent_fields_item_relations '
-						.' WHERE field_id = ' . $send_to_email_field .' AND item_id='.$contentid;
+						.' WHERE field_id = ' . $send_to_email_field .' AND item_id='.$content_id;
 					$db->setQuery($q);
 					$email_values = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 					
@@ -1972,45 +2060,68 @@ class FlexicontentController extends JControllerLegacy
 		$user  = JFactory::getUser();
 		
 		// Get HTTP REQUEST variables
-		$fieldid   = JRequest::getInt( 'fid', 0 );
-		$contentid = JRequest::getInt( 'cid', 0 );
-		$order     = JRequest::getInt( 'ord', 0 );
+		$field_id   = JRequest::getInt( 'fid', 0 );
+		$content_id = JRequest::getInt( 'cid', 0 );
+		$order      = JRequest::getInt( 'ord', 0 );
 		
 		
 		// **************************************************
 		// Create and Execute SQL query to retrieve file info
 		// **************************************************
 		
-		// Create JOIN + AND clauses for checking Access
-		$joinaccess = $andaccess = $joinaccess2 = $andaccess2 = '';
-		$this->_createFieldItemAccessClause( $joinaccess, $andaccess, $joinaccess2, $andaccess2);
+		// Create SELECT OR JOIN / AND clauses for checking Access
+		$access_clauses['select'] = '';
+		$access_clauses['join']   = '';
+		$access_clauses['and']    = '';
+		$access_clauses = $this->_createFieldItemAccessClause( $get_select_access = true, $include_file = false );
 		
 		$query  = 'SELECT value'
+				. $access_clauses['select']
 				.' FROM #__flexicontent_fields_item_relations AS rel'
 				.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
 				.' LEFT JOIN #__content AS i ON i.id = rel.item_id'
 				.' LEFT JOIN #__categories AS c ON c.id = i.catid'
 				.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				.' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-				. $joinaccess
-				. $joinaccess2
-				.' WHERE rel.item_id = ' . $contentid
-				.' AND rel.field_id = ' . $fieldid
+				. $access_clauses['join']
+				.' WHERE rel.item_id = ' . $content_id
+				.' AND rel.field_id = ' . $field_id
 				.' AND rel.valueorder = ' . $order
-				. $andaccess
-				. $andaccess2
+				. $access_clauses['and']
 				;
 		$db->setQuery($query);
-		$link = $db->loadResult();
+		$link_data = $db->loadObject();
+		if ($db->getErrorNum()) {
+			echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg());
+			jexit();
+		}
 		
 		
-		// ************************************************************************
-		// Check for user not having the required Access Level (empty query result)
-		// ************************************************************************
+		// **************************************************************
+		// Check if file was found AND IF user has required Access Levels
+		// **************************************************************
 		
-		if ( empty($link) ) {
-			$msg = !$db->getErrorNum() ? JText::_( 'FLEXI_ALERTNOTAUTH' ) : __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()) ;
-			$app->enqueueMessage($msg,'error');
+		if ( empty($link_data) || (!$link_data->has_content_access || !$link_data->has_field_access) )
+		{
+			if (empty($link_data)) {
+				$msg = JText::_('FLEXI_FDC_FAILED_TO_FIND_DATA');     // Failed to match DB data to the download URL data
+			}
+			
+			else {
+				$msg  = JText::_('FLEXI_ALERTNOTAUTH');
+				$msg .= ""
+					.(!$link_data->has_content_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
+							." -- ".JText::_('FLEXI_FDC_CONTENT_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
+							."<br/><small>(".JText::_('FLEXI_FDC_CONTENT_EXPLANATION').")</small>"
+						: '')
+					.(!$link_data->has_field_access ? "<br/><br/> ".JText::_('FLEXI_FDC_NO_ACCESS_TO')
+							." -- ".JText::_('FLEXI_FDC_FIELD_CONTAINS')." ".JText::_('FLEXI_FDC_WEBLINK')
+						: '')
+				;
+				$msg .= "<br/><br/> ". JText::sprintf('FLEXI_FDC_WEBLINK_DATA', $order, $content_id, $field_id);
+				$app->enqueueMessage($msg,'notice');
+			}
+			// Abort redirecting to home
 			$this->setRedirect('index.php', '');
 			return;
 		}
@@ -2021,7 +2132,7 @@ class FlexicontentController extends JControllerLegacy
 		// **********************
 		
 		// recover the link array (url|title|hits)
-		$link = unserialize($link);
+		$link = unserialize($link_data->value);
 		
 		// get the url from the array
 		$url = $link['link'];
@@ -2033,8 +2144,8 @@ class FlexicontentController extends JControllerLegacy
 		// update the array in the DB
 		$query 	= 'UPDATE #__flexicontent_fields_item_relations'
 				.' SET value = ' . $db->Quote($value)
-				.' WHERE item_id = ' . $contentid
-				.' AND field_id = ' . $fieldid
+				.' WHERE item_id = ' . $content_id
+				.' AND field_id = ' . $field_id
 				.' AND valueorder = ' . $order
 				;
 		$db->setQuery($query);
@@ -2053,41 +2164,93 @@ class FlexicontentController extends JControllerLegacy
 	
 	
 	// Private common method to create join + and-where SQL CLAUSEs, for checking access of field - item pair(s), IN FUTURE maybe moved
-	function _createFieldItemAccessClause( &$joinaccess='', &$andaccess='', &$joinaccess2='', &$andaccess2='')
+	function _createFieldItemAccessClause($get_select_access = false, $include_file = false )
 	{
 		$user  = JFactory::getUser();
-		if (FLEXI_J16GE) {
-			$aid_arr = $user->getAuthorisedViewLevels();
-			$aid_list = implode(",", $aid_arr);
-			// is the field available
-			$andaccess  .= ' AND fi.access IN (0,'.$aid_list.')';
-			// is the item available
-			$andaccess2 .= ' AND ty.access IN (0,'.$aid_list.')';
-			$andaccess2 .= ' AND  c.access IN (0,'.$aid_list.')';
-			$andaccess2 .= ' AND  i.access IN (0,'.$aid_list.')';
-		} else {
-			$aid = (int) $user->get('aid');
-			if (FLEXI_ACCESS) {
-				// is the field available
-				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gfi ON fi.id = gfi.axo AND gfi.aco = "read" AND gfi.axosection = "field"';
-				$andaccess  .= ' AND (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')';
-				// is the item available
-				$joinaccess2 .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-				$joinaccess2 .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-				$joinaccess2 .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-				$andaccess2  .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-				$andaccess2  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
-				$andaccess2  .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
+		$select_access = $joinacc = $andacc = '';
+		
+		// Access Flags for: content item and field
+		if ( $get_select_access ) {
+			$select_access = '';
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				if ($include_file) $select_access .= ', CASE WHEN'.
+					'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
+				$select_access .= ', CASE WHEN'.
+					'  fi.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_field_access';
+				$select_access .= ', CASE WHEN'.
+					'  ty.access IN (0,'.$aid_list.') AND '.
+					'   c.access IN (0,'.$aid_list.') AND '.
+					'   i.access IN (0,'.$aid_list.')'.
+					' THEN 1 ELSE 0 END AS has_content_access';
 			} else {
-				// is the field available
-				$andaccess  .= ' AND fi.access <= '.$aid ;
-				// is the item available
-				$andaccess2 .= ' AND ty.access <= '.$aid ;
-				$andaccess2 .= ' AND  c.access <= '.$aid ;
-				$andaccess2 .= ' AND  i.access <= '.$aid ;
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					if ($include_file) $select_access .= ', CASE WHEN'.
+						'   (gf.aro IN ( '.$user->gmid.' ) OR  f.access <= '. $aid . ')  THEN 1 ELSE 0 END AS has_file_access';
+					$select_access .= ', CASE WHEN'.
+						'  (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')  THEN 1 ELSE 0 END AS has_field_access';
+					$select_access .= ', CASE WHEN'.
+						'   (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ') AND '.
+						'   (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ') AND '.
+						'   (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')'.
+						' THEN 1 ELSE 0 END AS has_content_access';
+				} else {
+					if ($include_file) $select_access .= ', CASE WHEN'.
+						'   f.access <= '. $aid . '  THEN 1 ELSE 0 END AS has_file_access';
+					$select_access .= ', CASE WHEN'.
+						' fi.access <= '. $aid . '  THEN 1 ELSE 0 END AS has_field_access';
+					$select_access .= ', CASE WHEN'.
+						'  ty.access <= '. $aid . ' AND '.
+						'   c.access <= '. $aid . ' AND '.
+						'   i.access <= '. $aid .
+						' THEN 1 ELSE 0 END AS has_content_access';
+				}
 			}
 		}
-		return;
+		
+		else {
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				if ($include_file)
+					$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access
+				$andacc   .= ' AND fi.access IN (0,'.$aid_list.')';  // AND field access
+				$andacc   .= ' AND ty.access IN (0,'.$aid_list.')  AND  c.access IN (0,'.$aid_list.')  AND  i.access IN (0,'.$aid_list.')';  // AND content access
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					if ($include_file) $andacc .=
+						' AND  (gf.aro IN ( '.$user->gmid.' ) OR f.access <= '. $aid . ' OR f.access IS NULL)';  // AND file access
+					$andacc   .=
+						' AND (gfi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')';  // AND field access
+					$andacc   .=
+						' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';   // AND content access: type, cat, item
+						' AND  (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
+						' AND  (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
+				} else {
+					if ($include_file)
+						$andacc .= ' AND (f.access <= '.$aid .' OR f.access IS NULL)';  // AND file access
+					$andacc   .= ' AND fi.access <= '.$aid ;                          // AND field access
+					$andacc   .= ' AND ty.access <= '.$aid . ' AND  c.access <= '.$aid . ' AND  i.access <= '.$aid ;  // AND content access
+				}
+			}
+		}
+		
+		if (FLEXI_ACCESS) {
+			if ($include_file)
+				$joinacc .= ' LEFT JOIN #__flexiaccess_acl AS gf ON f.id = gf.axo AND gf.aco = "read" AND gf.axosection = "file"';        // JOIN file access
+			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gfi ON fi.id = gfi.axo AND gfi.aco = "read" AND gfi.axosection = "field"';  // JOIN field access
+			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';       // JOIN content access: type, cat, item
+			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+			$joinacc   .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+		}
+		
+		$clauses['select'] = $select_access;
+		$clauses['join']   = $joinacc;
+		$clauses['and']    = $andacc;
+		return $clauses;
 	}
 	
 	

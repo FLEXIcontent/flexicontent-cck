@@ -152,7 +152,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="subcat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC">
+			<field name="subcat_orderby" type="list" default="" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>

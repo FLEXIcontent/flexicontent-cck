@@ -492,7 +492,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			if ($post[$n]['link'] !== '')
 			{
 				if ( $allow_relative_addrs ==1 || ($allow_relative_addrs==2 && !@$post[$n]['autoprefix']) ) {
-					$http_prefix = '';
+					$http_prefix = (!preg_match("#^/#i", $post[$n]['link'])) ? '/' : '';
 				} else {
 					$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
 				}
