@@ -1769,5 +1769,31 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		return $comments;
 	}
+	
+	
+	/**
+	 * Increment the hit counter for the category.
+	 * @param   int  $pk  Optional primary key of the category to increment.
+	 * @return  boolean True if successful; false otherwise and internal error set.
+	 */
+	public function hit($pk = 0)
+	{
+		// Initialise variables.
+		$pk = !empty($pk) ? $pk : $this->_id;
+		if (!$pk) return;
+		
+		$db = $this->getDBO();
+		$query = $db->getQuery(true)
+			->update('#__categories')
+			->set('hits = hits + 1')
+			->where('id = ' . (int) $pk);
+		$db->setQuery($query);
+		
+		try { $db->execute(); }
+		catch (RuntimeException $e) { $this->setError($e->getMessage());  return false; }
+		
+		return true;
+	}
+	
 }
 ?>

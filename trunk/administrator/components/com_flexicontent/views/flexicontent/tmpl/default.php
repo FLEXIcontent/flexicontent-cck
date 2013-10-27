@@ -200,8 +200,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						if ($this->dopostinstall && $this->params->get('support_url'))
 						{
 							$link = $this->params->get('support_url');
-							$help_img = FLEXI_J16GE ? 'icon-48-support.png' : 'icon-48-help.png';
-							FlexicontentViewFlexicontent::quickiconButton( $link, $help_img, JText::_( 'FLEXI_SUPPORT' ), 1 );
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-help.png', JText::_( 'FLEXI_SUPPORT' ), 1 );
 						}
 						?>
 						</div>

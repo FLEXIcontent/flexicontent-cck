@@ -105,6 +105,37 @@
 			<field name="noaccess_url_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_URL_LOGGED_DESC" />
 			<field name="noaccess_msg_logged" type="text" default="" size="40" label="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG" description="FLEXI_FIELD_FILE_INACCESSIBLE_FILE_MSG_LOGGED_DESC" />
 			
+			<field name="" type="separator" default="FLEXI_FIELD_FILE_DOWNLOAD_COUPONS" level="level2" menu="hide" />
+			<field name="enable_coupons" type="radio" default="0" label="FLEXI_FIELD_FILE_ENABLE_COUPONS" description="FLEXI_FIELD_FILE_ENABLE_COUPONS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="coupon_hits_limit" type="text" size="5" default="3" label="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT" description="FLEXI_FIELD_FILE_COUPON_HITS_LIMIT_DESC"/>
+			<field name="coupon_expiration_days" type="text" size="5" default="15" label="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS" description="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS_DESC"/>
+			
+			
+			<field name="" type="separator" default="Email notifications &lt;br&gt; &lt;small&gt; when a file is downloaded (hit) &lt;/small&gt;" level="level2" />
+			<field name="send_notifications" type="radio" default="0" label="Send hit notifications" description="Enable this to send notifications emails when a file is downloaded">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES_EVERY_HIT</option>
+			</field>
+			
+			<field name="send_notifications" type="radio" default="0" label="Send hit notifications" description="Enable this to send notifications emails when a file is downloaded">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES_EVERY_HIT</option>
+			</field>
+			
+			<field name="notification_tmpl" type="textarea" cols="50" rows="10" default="%%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" size="50" label="Notification text" description="The text that will be sent for every file. &lt;br/&gt;&lt;br/&gt; &lt;b&gt;NOTE:&lt;/b&gt; &lt;br/&gt; you may use these replacements: &lt;br/&gt; %%LANGUAGE_STRING%%, &lt;br/&gt; __FILE_ID__ &lt;br/&gt; __FILE_NAME__ &lt;br/&gt; __ITEM_TITLE__ &lt;br/&gt; __ITEM_URL__" />
+			
+			<field name="" type="separator" default="Send TO" level="level3" />
+			<field name="send_all_to_email" type="text" default="" size="50" label="to specific emails" description="Notifications for any file will be sent these email(s) seperate emails with comma ," />
+			<field name="send_to_current_item_owner" type="radio" default="0" label="to content item owner" description="Send email to owner of the content item that contains the downloaded file">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="send_to_email_field" type="fields" field_type="email" label="to emails of EMAIL field" description="The email field must have value(s) in the SAME content item that the file field is contained, e.g. both file field and email field are displayed inside item 'A'" />
+			
+			
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
@@ -117,26 +148,6 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
-			<field name="" type="separator" default="Email notifications of hits (file downloaded)" level="level1" />
-			<field name="send_notifications" type="radio" default="0" label="Send hit notifications" description="Enable this to send notifications emails when a file is downloaded">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES_EVERY_HIT</option>
-			</field>
-			
-			<field name="send_notifications" type="radio" default="0" label="Send hit notifications" description="Enable this to send notifications emails when a file is downloaded">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES_EVERY_HIT</option>
-			</field>
-			<field name="notification_tmpl" type="textarea" cols="50" rows="10" default="%%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" size="50" label="Nsotification text" description="The text that will be sent for every file, you may use these replacements %%LANGUAGE_STRING%%, __FILE_ID__, __FILE_NAME__, __ITEM_TITLE__, __ITEM_URL__" />
-			
-			<field name="" type="separator" default="Send TO" level="level2" />
-			<field name="send_all_to_email" type="text" default="" size="50" label="to Specific emails" description="Notifications for any file will be sent these email(s) seperate emails with comma ," />
-			<field name="send_to_current_item_owner" type="radio" default="0" label="to Content item owner" description="Send email to owner of the content item that contains the downloaded file">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="send_to_email_field" type="fields" field_type="email" label="to emails of EMAIL field" description="The email field must have value(s) in the SAME content item that the file field is contained, e.g. both file field and email field are displayed inside item 'A'" />
 			
 		</params>
 	

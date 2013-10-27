@@ -193,3 +193,23 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
   PRIMARY KEY  (`user_id`)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS `jos__flexicontent_download_history` (
+  `id` int(11) NOT NULL auto_increment,
+  `user_id` int(11) NOT NULL,
+  `file_id` int(11) NOT NULL,
+  `hits` int(11) NOT NULL,
+  `last_hit_on` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `#__flexicontent_download_coupons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `file_id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `hits` int(11) NOT NULL,
+  `hits_limit` int(11) NOT NULL,
+  `expire_on` datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+

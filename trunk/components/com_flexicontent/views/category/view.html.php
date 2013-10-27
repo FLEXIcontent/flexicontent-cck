@@ -696,7 +696,23 @@ class FlexicontentViewCategory extends JViewLegacy
 			$this->addTemplatePath(JPATH_COMPONENT.DS.'templates'.DS.$clayout);
 			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout);
 		}
-
+		
+		// Increment hits counter ONLY once per user visit
+		if (FLEXI_J16GE && $category->id && empty($layout)) {
+			$hit_accounted = false;
+			$hit_arr = array();
+			if ($session->has('cats_hit', 'flexicontent')) {
+				$hit_arr 	= $session->get('cats_hit', array(), 'flexicontent');
+				$hit_accounted = isset($hit_arr[$category->id]);
+			}
+			if (!$hit_accounted) {
+				//add hit to session hit array
+				$hit_arr[$category->id] = $timestamp = time();  // Current time as seconds since Unix epoc;
+				$session->set('cats_hit', $hit_arr, 'flexicontent');
+				$this->getModel()->hit();
+			}
+		}
+		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }
 		

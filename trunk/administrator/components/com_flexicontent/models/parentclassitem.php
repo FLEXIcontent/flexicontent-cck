@@ -384,9 +384,9 @@ class ParentClassItem extends JModelLegacy
 					if (FLEXI_J16GE) {
 						$aid_arr = $user->getAuthorisedViewLevels();
 						$aid_list = implode(",", $aid_arr);
-						$select_access .= ', CASE WHEN ty.access IN ('.$aid_list.') THEN 1 ELSE 0 END AS has_type_access';
-						$select_access .= ', CASE WHEN mc.access IN ('.$aid_list.') THEN 1 ELSE 0 END AS has_mcat_access';
-						$select_access .= ', CASE WHEN  i.access IN ('.$aid_list.') THEN 1 ELSE 0 END AS has_item_access';
+						$select_access .= ', CASE WHEN ty.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_type_access';
+						$select_access .= ', CASE WHEN mc.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_mcat_access';
+						$select_access .= ', CASE WHEN  i.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_item_access';
 					} else {
 						$aid = (int) $user->get('aid');
 						if (FLEXI_ACCESS) {
