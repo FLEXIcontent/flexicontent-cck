@@ -1572,7 +1572,7 @@ class FlexicontentController extends JControllerLegacy
 				
 				if ($coupon) {
 					$slink_valid_coupon = !$coupon->has_reached_limit && !$coupon->has_expired ;
-					if ( $slink_valid_coupon ) {
+					if ( !$slink_valid_coupon ) {
 						$query = ' DELETE FROM #__flexicontent_download_coupons WHERE id='. $coupon->id;
 						$db->setQuery( $query );
 						$db->query();
@@ -1593,7 +1593,8 @@ class FlexicontentController extends JControllerLegacy
 		$access_clauses['select'] = '';
 		$access_clauses['join']   = '';
 		$access_clauses['and']    = '';
-		if ( empty($cart_token_matches) && empty($slink_valid_coupon) ) {
+		$using_access = empty($cart_token_matches) && empty($slink_valid_coupon);
+		if ( $using_access ) {
 			// note CURRENTLY multi-download feature does not use coupons
 			$access_clauses = $this->_createFieldItemAccessClause( $get_select_access = true, $include_file = true );
 		}
@@ -1659,7 +1660,7 @@ class FlexicontentController extends JControllerLegacy
 			// Check if file was found AND IF user has required Access Levels
 			// **************************************************************
 			
-			if ( empty($file) || (!$file->has_content_access || !$file->has_field_access || !$file->has_file_access) )
+			if ( empty($file) || ($using_access && (!$file->has_content_access || !$file->has_field_access || !$file->has_file_access)) )
 			{
 				if (empty($file)) {
 					$msg = JText::_('FLEXI_FDC_FAILED_TO_FIND_DATA');     // Failed to match DB data to the download URL data
@@ -1853,8 +1854,8 @@ class FlexicontentController extends JControllerLegacy
 			$sendermail	= $app->getCfg('mailfrom');
 			$sendermail	= JMailHelper::cleanAddress($sendermail);
 			$sendername	= $app->getCfg('sitename');
-			$subject	= JText::_('FLEXI_FILE_DOWNLOAD_REPORT');
-			$message_header    = 'Report of file(s) downloaded by user: '. $user->name .' ['.$user->username .']';
+			$subject    = JText::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT');
+			$message_header = JText::_('FLEXI_FDN_FILE_DOWNLOAD_REPORT_BY') .': '. $user->name .' ['.$user->username .']';
 			
 			
 			// ****************************************************

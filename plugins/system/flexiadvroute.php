@@ -283,11 +283,14 @@ class plgSystemFlexiadvroute extends JPlugin
 	{
 		$app = JFactory::getApplication();
 		$menu = $app->getMenu();
-		if (FLEXI_J16GE) {
-			$lang = JFactory::getLanguage();
-			$isHomePage = $menu->getActive() == $menu->getDefault($lang->getTag());
-		} else {
-			$isHomePage = $menu->getActive() == $menu->getDefault();
+		$isHomePage = false;
+		if ($menu) {
+			if (FLEXI_J16GE) {
+				$lang = JFactory::getLanguage();
+				$isHomePage = $menu->getActive() == $menu->getDefault($lang->getTag());
+			} else {
+				$isHomePage = $menu->getActive() == $menu->getDefault();
+			}
 		}
 		return $isHomePage;
 	}
