@@ -65,7 +65,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$skip_buttons = $field->parameters->get( 'skip_buttons', '' ) ;
 		
 		if (FLEXI_J16GE) {
-			$skip_buttons = explode('|',$skip_buttons);
+			$skip_buttons = is_array($skip_buttons) ? $skip_buttons : explode('|',$skip_buttons);
 		} else if ( !is_array($skip_buttons) ) {
 			$skip_buttons = array($skip_buttons);
 		}
