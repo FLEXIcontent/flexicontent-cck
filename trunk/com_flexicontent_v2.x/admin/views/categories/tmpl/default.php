@@ -127,7 +127,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			} else {
 				$access 	= JHTML::_('grid.access', $row, $i );
 			}
-			$checked 	= JHTML::_('grid.checkedout', $row, $i );
+			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
 			
 			if (FLEXI_J16GE) {

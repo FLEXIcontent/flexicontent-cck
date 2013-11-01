@@ -662,7 +662,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$values = null;
 		} else {
 			$values = array();
-			$db = &JFactory::getDBO();
+			$db = JFactory::getDBO();
 			if ($post) foreach ($post as $v) {
 				$valuecol = sprintf(' DATE_FORMAT("%s", "%s") ', $v, $date_valformat);
 				$textcol = sprintf(' DATE_FORMAT("%s", "%s") ', $v, $date_txtformat);

@@ -18,6 +18,7 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 $ctrl_task   = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;task=';
+$session = JFactory::getSession();
 ?>
 <table cellspacing="0" cellpadding="0" border="0" width="100%">
 	<tr>
@@ -52,7 +53,7 @@ $ctrl_task   = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp
             <?php endif; ?>
 
 	    <!-- File Upload Form -->
-            <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" id="uploadForm" method="post" enctype="multipart/form-data">
+            <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" id="uploadForm" method="post" enctype="multipart/form-data">
                 <fieldset>
                     <legend><?php echo JText::_( 'FLEXI_UPLOAD_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
                     <fieldset class="actions">

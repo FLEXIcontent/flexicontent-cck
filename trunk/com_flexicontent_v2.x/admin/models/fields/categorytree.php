@@ -101,8 +101,8 @@ class JFormFieldCategoryTree extends JFormFieldList{
 	 */
 	protected function getOptions() {
 		global $globalcats;
-		$user =& JFactory::getUser();
-		$cid = JRequest::getVar('cid');
+		$user = JFactory::getUser();
+		$cid  = JRequest::getVar('cid');
 		
 		$permission = FlexicontentHelperPerm::getPerm();
 

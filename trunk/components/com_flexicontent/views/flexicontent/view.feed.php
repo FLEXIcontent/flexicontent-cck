@@ -37,13 +37,12 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	 */
 	function display()
 	{
-		$mainframe =& JFactory::getApplication();
-		
-		$doc 		= & JFactory::getDocument();
-		$params 	= & $mainframe->getParams();
+		$app = JFactory::getApplication();
+		$doc    = JFactory::getDocument();
+		$params = $app->getParams();
 		$doc->link 	= JRoute::_('index.php?option=com_flexicontent&view=flexicontent');
 		
-		JRequest::setVar('limit', $mainframe->getCfg('feed_limit'));
+		JRequest::setVar('limit', $app->getCfg('feed_limit'));
 		$rows 		= & $this->get('Feed');
 				
 		foreach ( $rows as $row )

@@ -31,11 +31,11 @@ class FlexicontentViewEditacl extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 
 		//initialise variables
-		$document	= & JFactory::getDocument();
-		$user 		= & JFactory::getUser();
+		$document	= JFactory::getDocument();
+		$user 		= JFactory::getUser();
 		
 		//only admins have access to this view (view is used only in J1.5)
 		if ($user->get('gid') < 24) {
@@ -68,7 +68,7 @@ class FlexicontentViewEditacl extends JViewLegacy
 		$content = JFile::read($acl_path);
 		
 		jimport('joomla.client.helper');
-		$ftp =& JClientHelper::setCredentialsFromRequest('ftp');
+		$ftp = JClientHelper::setCredentialsFromRequest('ftp');
 
 		if ($content !== false)
 		{

@@ -31,13 +31,13 @@ class FlexicontentViewTag extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 
 		//initialise variables
-		$document	= & JFactory::getDocument();
-		$user 		= & JFactory::getUser();
-		$bar			= & JToolBar::getInstance('toolbar');
-		$cparams	= & JComponentHelper::getParams('com_flexicontent');
+		$document	= JFactory::getDocument();
+		$user 		= JFactory::getUser();
+		$bar			= JToolBar::getInstance('toolbar');
+		$cparams	= JComponentHelper::getParams('com_flexicontent');
 
 		//get vars
 		$cid 		= JRequest::getVar( 'cid' );
@@ -52,8 +52,8 @@ class FlexicontentViewTag extends JViewLegacy
 		//$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
 
 		//Get data from the model
-		$model		= & $this->getModel();
-		$row     	= & $this->get( 'Tag' );
+		$model = $this->getModel();
+		$row   = $this->get( 'Tag' );
 		
 		//create the toolbar
 		if ( $cid ) {

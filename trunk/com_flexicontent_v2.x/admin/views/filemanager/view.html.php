@@ -163,7 +163,6 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$ftp = !JClientHelper::hasCredentials('ftp');
 		
 		//assign data to template
-		$this->assignRef('session'    , JFactory::getSession());
 		$this->assignRef('params'     , $params);
 		$this->assign('require_ftp'		, $ftp);
 		//Load pane behavior

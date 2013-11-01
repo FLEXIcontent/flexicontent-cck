@@ -204,7 +204,7 @@ class FlexicontentModelFavourites extends JModelLegacy
 	 */
 	function _buildQuery()
 	{   	
-		$user		= & JFactory::getUser();
+		$user		= JFactory::getUser();
 		$params = & $this->_params;
 		
 		// image for an image field

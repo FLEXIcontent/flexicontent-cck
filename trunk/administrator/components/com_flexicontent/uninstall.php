@@ -37,7 +37,7 @@ if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion-
 		// init vars
 		$error = false;
 		$extensions = array();
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		// Uninstall additional flexicontent modules/plugins found in Joomla DB,
 		// This code part (for uninstalling additional extensions) originates from Zoo Component:

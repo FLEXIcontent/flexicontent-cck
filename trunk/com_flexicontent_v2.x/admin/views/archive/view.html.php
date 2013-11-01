@@ -31,13 +31,13 @@ class FlexicontentViewArchive extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		//initialise variables
-		$user 		= & JFactory::getUser();
-		$db  		= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
+		$user     = JFactory::getUser();
+		$db       = JFactory::getDBO();
+		$document	= JFactory::getDocument();
 		
 		JHTML::_('behavior.tooltip');
 

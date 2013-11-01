@@ -440,7 +440,7 @@ class FlexicontentModelType extends JModelAdmin
 	 * @since   1.6
 	 * @throws  Exception if there is an error in the form event.
 	 */
-	protected function preprocessForm(JForm $form, $data)
+	protected function preprocessForm(JForm $form, $data, $group = 'content')
 	{
 		parent::preprocessForm($form, $data);
 	}
@@ -474,7 +474,8 @@ class FlexicontentModelType extends JModelAdmin
 			}
 
 			// Convert to the JObject before adding other data.
-			$item = JArrayHelper::toObject($table->getProperties(1), 'JObject');
+			$_prop_arr = $table->getProperties(1);
+			$item = JArrayHelper::toObject($_prop_arr, 'JObject');
 
 			if (property_exists($item, 'attribs')) {
 				$registry = new JRegistry($item->attribs);

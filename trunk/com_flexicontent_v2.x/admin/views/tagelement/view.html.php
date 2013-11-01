@@ -31,13 +31,13 @@ class FlexicontentViewTagelement extends JViewLegacy {
 
 	function display($tpl = null)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		//initialise variables
-		$db			= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$template 	= $mainframe->getTemplate();
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		$template = $mainframe->getTemplate();
 		
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');

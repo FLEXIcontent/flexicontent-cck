@@ -50,7 +50,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 			$field->value[0] = '';
 		}
 		
-		$document	= & JFactory::getDocument();
+		$document	= JFactory::getDocument();
 		
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
 		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
@@ -85,7 +85,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		global $addthis;
-		$mainframe =& JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		
 		$values = $values ? $values : $field->value;
 		if ( empty($values[0]) ) {
@@ -99,7 +99,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		$position		= $field->parameters->get('position', '');
 		$style 			= $field->parameters->get('style', -2);
 		
-		$document		= &JFactory::getDocument();
+		$document		= JFactory::getDocument();
 		$display 		= '';
 		$renderer		= $document->loadRenderer('module');
 		$mparams		= array('style'=>$style);
@@ -187,7 +187,7 @@ echo '</xmp>';
 	
 	function _getModuleObject($id)
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		
 		$query 	= 'SELECT * FROM #__modules'
 				. ' WHERE id = ' . (int)$id

@@ -53,8 +53,8 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		global $mainframe, $addthis;
 		$view		= JRequest::getString('view', FLEXI_ITEMVIEW);
 		if ($view != FLEXI_ITEMVIEW) return;
-		$document	= & JFactory::getDocument();
-		$lang       = $document->getLanguage();
+		$document	= JFactory::getDocument();
+		$lang     = $document->getLanguage();
 		if(FLEXI_FISH) {
 			$lang = @$item->lang?$item->lang:$lang;
 		}else{

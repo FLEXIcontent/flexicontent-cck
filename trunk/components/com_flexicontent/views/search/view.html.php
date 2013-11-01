@@ -465,7 +465,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		FLEXIadvsearchHelper::logSearch( $searchword);
 
 		//limit searchword
-		$min_word_len = JFactory::getApplication()->getUserState( $option.'.min_word_len', 0 );
+		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
 		$min = $min_word_len ? $min_word_len  : $params->get('minchars', 3);
 		$max = $params->get('maxchars', 200);
 		

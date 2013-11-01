@@ -29,8 +29,8 @@ jimport('joomla.application.component.view');
 class FlexicontentViewField extends JViewLegacy
 {
 	function display($tpl = null) {
-		$mainframe = &JFactory::getApplication();
-		$user 		= & JFactory::getUser();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
 
 		JHTML::_('behavior.tooltip');
 
@@ -64,7 +64,7 @@ class FlexicontentViewField extends JViewLegacy
 		if ( !$isnew ) {
 			if ($model->isCheckedOut( $user->get('id') )) {
 				JError::raiseWarning( 'SOME_ERROR_CODE', $row->name.' '.JText::_( 'FLEXI_EDITED_BY_ANOTHER_ADMIN' ));
-				$mainframe->redirect( 'index.php?option=com_flexicontent&view=fields' );
+				$app->redirect( 'index.php?option=com_flexicontent&view=fields' );
 			}
 		}
 		

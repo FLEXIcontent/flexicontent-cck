@@ -48,7 +48,8 @@ class plgFlexicontent_fieldsRelation_reverse extends JPlugin
 			return;
 		}
 		
-		$field->html = FlexicontentFields::getItemsList($field->parameters, $_items=null, $isform=1, $reverse_field, $field, $item);
+		$_items = null;
+		$field->html = FlexicontentFields::getItemsList($field->parameters, $_items, $isform=1, $reverse_field, $field, $item);
 	}
 	
 	

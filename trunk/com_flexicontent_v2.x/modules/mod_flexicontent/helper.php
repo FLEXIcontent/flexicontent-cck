@@ -28,7 +28,7 @@ require_once (JPATH_SITE.DS.'modules'.DS.'mod_flexicontent'.DS.'classes'.DS.'dat
 
 class modFlexicontentHelper
 {	
-	function getList(&$params)
+	public static function getList(&$params)
 	{
 		global $modfc_jprof, $mod_fc_run_times;
 		
@@ -567,7 +567,7 @@ class modFlexicontentHelper
 		return $lists_arr;
 	}
 
-	function getItems(&$params, $ordering)
+	public static function getItems(&$params, $ordering)
 	{
 		global $dump, $globalcats;
 		global $modfc_jprof, $mod_fc_run_times;
@@ -880,7 +880,7 @@ class modFlexicontentHelper
 			// Make sure categories is an array
 			$catids = is_array($catids) ? $catids : array($catids);
 			// Retrieve extra categories, such children or parent categories
-			$catids_arr = modFlexicontentHelper::getExtraCats($catids, $treeinclude, array());
+			$catids_arr = flexicontent_cats::getExtraCats($catids, $treeinclude, array());
 			
 			if (empty($catids_arr)) {
 				if ($show_nocontent_msg) echo JText::_("No viewable content in Current View for your Access Level");
@@ -921,7 +921,7 @@ class modFlexicontentHelper
 			$cid = $cid ? $cid : $curitem->catid;
 			
 			// Retrieve extra categories, such children or parent categories
-			$catids_arr = modFlexicontentHelper::getExtraCats(array($cid), $treeinclude, $curritemcats);
+			$catids_arr = flexicontent_cats::getExtraCats(array($cid), $treeinclude, $curritemcats);
 			if (empty($catids_arr)) {
 				if ($show_nocontent_msg) echo JText::_("No viewable content in Current View for your Access Level");
 				return;
@@ -1493,7 +1493,7 @@ class modFlexicontentHelper
 	}
 	
 	
-	function getCategoryData(&$params)
+	public static function getCategoryData(&$params)
 	{
 		if (!$params->get('apply_config_per_category', 0)) return false;
 		
@@ -1651,80 +1651,13 @@ class modFlexicontentHelper
 	}
 	
 	
-	// Find and return extra parent/children/etc categories of givem categories
-	function getExtraCats($cids, $treeinclude, $curritemcats)
-	{
-		global $globalcats;
-		$app     = JFactory::getApplication();
-		$user    = JFactory::getUser();
-		$fparams = $app->getParams('com_flexicontent');
-		$show_noauth = $fparams->get('show_noauth', 0);
 		
-		$all_cats = $cids;
-		foreach ($cids as $cid)
-		{
-			$cats = array();
-			switch ($treeinclude) {
-				// current category only
-				case 0: default: 
-					$cats = array($cid);
-				break;
-				case 1: // current category + children
-					$cats = $globalcats[$cid]->descendantsarray;
-				break;
-				case 2: // current category + parents
-					$cats = $globalcats[$cid]->ancestorsarray;
-				break;
-				case 3: // current category + children + parents
-					$cats = array_unique(array_merge($globalcats[$cid]->descendantsarray, $globalcats[$cid]->ancestorsarray));						
-				break;
-				case 4: // all item's categories
-					$cats = $curritemcats;
-				break;
-			}
-			$all_cats = array_merge($all_cats, $cats);
-		}
-		
-		// Select only categories that user has view access, if listing of unauthorized content is not enabled
-		$joinaccess = '';
-		$andaccess = '';
-		if (!$show_noauth) {
-			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
-				$aid_list = implode(",", $aid_arr);
-				$andaccess .= ' AND c.access IN ('.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$andaccess  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
-				} else {
-					$andaccess  .= ' AND c.access <= '.$aid;
-				}
-			}
-		}
-		
-		// Filter categories (check that are published and that have ACCESS Level that is assinged to current user)
-		$db = JFactory::getDBO();
-		$query = 'SELECT DISTINCT c.id'
-			.' FROM #__categories AS c'
-			.$joinaccess
-			.' WHERE c.id IN ('.implode(',', $all_cats).') AND c.published = 1'
-			.$andaccess
-			;
-		$db->setQuery($query);
-		$published_cats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-		
-		return array_unique($published_cats);
-	}
-	
-	
 	// Verify parameters, altering them if needed
-	function verifyParams( &$params )
+	public static function verifyParams( &$params )
 	{
 		// Calculate menu itemid for item links
-		$menus = JApplication::getMenu('site', array());
+		$app   = JFactory::getApplication();
+		$menus = $app->getMenu();
 		$itemid_force	= (int)$params->get('itemid_force');
 		if ($itemid_force==1) {
 			$Itemid					= JRequest::getInt('Itemid');

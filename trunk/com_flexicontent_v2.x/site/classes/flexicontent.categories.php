@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.categories.php 1629 2013-01-19 08:45:07Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.categories.php 1794 2013-10-22 02:41:41Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -51,7 +51,7 @@ class flexicontent_cats
 	 * @param int $cid
 	 * @return flexicontent_categories
 	 */
-	function flexicontent_cats($cid)
+	public function flexicontent_cats($cid)
 	{
 		$this->id = $cid;
 		$this->buildParentCats($this->id);	// Retrieves ids of ancestors categories and set them in member array variable 'parentcats_ids'
@@ -63,7 +63,7 @@ class flexicontent_cats
 	 * and sets this parent in the member variable 'parentcats_ids'
 	 *
 	 */
-	function getParentCats()
+	protected function getParentCats()
 	{
 		$db = JFactory::getDBO();
 		global $globalnoroute;
@@ -91,7 +91,7 @@ class flexicontent_cats
 	 * and sets this parent in the member variable 'parentcats_ids'
 	 *
 	 */
-	function buildParentCats($cid)
+	protected function buildParentCats($cid)
 	{
 		$db = JFactory::getDBO();
 		
@@ -113,10 +113,16 @@ class flexicontent_cats
 	 * Returns the parent category array that was build by functions buildParentCats() and getParentCats(), which were by constructor for category cid
 	 *
 	 */
-	function getParentlist()
+	public function getParentlist()
 	{
 		return $this->parentcats_data;
 	}
+	
+	
+	
+	/*************************/
+	/* STATIC FUNCTION CALLS */
+	/*************************/
 	
 	/**
     * Get the category tree (a sorted and padded array) but without any filtering or disabling data 
@@ -130,7 +136,7 @@ class flexicontent_cats
     *
     * @return array
     */
-	function getCategoriesTree( $published_only = false, $parent_id = 0, $depth_limit=0 )
+	public static function getCategoriesTree( $published_only = false, $parent_id = 0, $depth_limit=0 )
 	{
 		global $globalcats;
 		$db = JFactory::getDBO();
@@ -188,7 +194,7 @@ class flexicontent_cats
     * @access public
     * @return array
     */
-	static function treerecurse( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null, $childs=null )
+	public static function treerecurse( $parent_id, $indent, $list, &$children, $title, $maxlevel=9999, $level=0, $type=1, $ancestors=null, $childs=null )
 	{
 		if (!$ancestors) $ancestors = array();
 		$ROOT_CATEGORY_ID = !FLEXI_J16GE ? 0 : 1;
@@ -253,7 +259,7 @@ class flexicontent_cats
 	 *
 	 * @return a category form field element
 	 */
-	static function buildcatselect($list, $name, $selected, $top,
+	public static function buildcatselect($list, $name, $selected, $top,
 		$attribs = 'class="inputbox"', $check_published = false, $check_perms = true,
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'),   // For item edit this should be array('core.create')
 		$require_all=true,   // Require (or not) all privileges present to accept a category
@@ -413,49 +419,78 @@ class flexicontent_cats
 	
 	
 	/**
-	 * Find and return extra parent/children/etc categories of given categories
+	 * Find and return extra parent/children/etc categories based on given criteria
 	 *
-	 * @param string $cids		the category ids for field object used as filter
-	 * @param string $force				controls whether to force only available values, ('all', 'limit', any other value uses the category configuration)
-	 * @return array							the available values
+	 * @param string $cids           the category ids for field object used as filter
+	 * @param string $treeinclude    which categories to include
+	 * @param string $curritemcats   categories of current item
+	 * @return array                 an array of category ids
 	 */
-
-	function getExtraCats($cids, $treeinclude, $curritemcats)
+	public static function getExtraCats($cids, $treeinclude, $curritemcats)
 	{
 		global $globalcats;
+		$app     = JFactory::getApplication();
+		$user    = JFactory::getUser();
+		$fparams = $app->getParams('com_flexicontent');
+		$show_noauth = $fparams->get('show_noauth', 0);
 		
-		if ( $treeinclude==0 ) {
-			// Only given categories, nothing more to do 
-			return $cids;
-		} else if ( $treeinclude == 4 ) {
-			// Also include current item's categories
-			$all_cats = array_merge($all_cats, $curritemcats);
-			return $all_cats;
-		} else {
-			// other cases, we will need to examine every given category
-			$all_cats = $cids;
-		}
-		
-		// Examine every given category, and include appropriate related categories
+		$all_cats = $cids;
 		foreach ($cids as $cid)
 		{
 			$cats = array();
 			switch ($treeinclude) {
+				// current category only
+				case 0: default: 
+					$cats = array($cid);
+				break;
 				case 1: // current category + children
 					$cats = $globalcats[$cid]->descendantsarray;
-					break;
+				break;
 				case 2: // current category + parents
 					$cats = $globalcats[$cid]->ancestorsarray;
-					break;
+				break;
 				case 3: // current category + children + parents
 					$cats = array_unique(array_merge($globalcats[$cid]->descendantsarray, $globalcats[$cid]->ancestorsarray));						
-					break;
-				default: // other cases UNKNOWN cases, just do not add any other categories
-					break;
+				break;
+				case 4: // all item's categories
+					$cats = $curritemcats;
+				break;
 			}
 			$all_cats = array_merge($all_cats, $cats);
 		}
-		return array_unique($all_cats);
+		
+		// Select only categories that user has view access, if listing of unauthorized content is not enabled
+		$joinaccess = '';
+		$andaccess = '';
+		if (!$show_noauth) {
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$andaccess .= ' AND c.access IN ('.$aid_list.')';
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$andaccess  .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR c.access <= '. $aid . ')';
+				} else {
+					$andaccess  .= ' AND c.access <= '.$aid;
+				}
+			}
+		}
+		
+		// Filter categories (check that are published and that have ACCESS Level that is assinged to current user)
+		$db = JFactory::getDBO();
+		$query = 'SELECT DISTINCT c.id'
+			.' FROM #__categories AS c'
+			.$joinaccess
+			.' WHERE c.id IN ('.implode(',', $all_cats).') AND c.published = 1'
+			.$andaccess
+			;
+		$db->setQuery($query);
+		$published_cats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		
+		return array_unique($published_cats);
 	}
 
 }

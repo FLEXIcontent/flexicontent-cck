@@ -29,7 +29,7 @@ class flexicontent_html
 {
 
 	// *** Output the javascript to dynamically hide/show columns of a table
-	function jscode_to_showhide_table($container_div_id,$data_tbl_id) {
+	static function jscode_to_showhide_table($container_div_id,$data_tbl_id) {
 		$document = JFactory::getDocument();
 		$js = "
 		var show_col_${data_tbl_id} = Array();
@@ -691,9 +691,9 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				flexicontent_html::loadFramework('select2');  // make sure select2 is loaded
 				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js' );
-				FLEXI_J16GE ? JText::script("FLEXI_APPLYING_FILTERING") : fcjsJText::script("FLEXI_APPLYING_FILTERING");
-				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_LIST") : fcjsJText::script("FLEXI_TYPE_TO_LIST");
-				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_FILTER") : fcjsJText::script("FLEXI_TYPE_TO_FILTER");
+				FLEXI_J16GE ? JText::script("FLEXI_APPLYING_FILTERING", true) : fcjsJText::script("FLEXI_APPLYING_FILTERING", true);
+				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_LIST", true) : fcjsJText::script("FLEXI_TYPE_TO_LIST", true);
+				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_FILTER", true) : fcjsJText::script("FLEXI_TYPE_TO_FILTER", true);
 				break;
 			
 			default:
@@ -4336,9 +4336,10 @@ class flexicontent_db
 	 Find stopwords and too small words
 	 */
 	function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index') {
-		$db = JFactory::getDBO();
+		$db     = JFactory::getDBO();
+		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-		$min_word_len = JFactory::getApplication()->getUserState( $option.'.min_word_len', 0 );
+		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
 		
 		$query = 'SELECT '.$col
 			.' FROM #__'.$tbl
@@ -4740,7 +4741,7 @@ class fcjsJText extends JText
 	 * alert( Joomla.JText._('MY_FIRST_COMPONENT_STRING_NEEDED_IN_JS') );
 	 * 				
 	 */
-	public static function script($string = null, $jsSafe = true)
+	public static function script($string = null, $jsSafe = false, $interpretBackSlashes = true)
 	{
 		static $language = null;
 		if ($language===null) $language = JFactory::getLanguage();

@@ -71,7 +71,7 @@ class FCDispatcher extends JDispatcher
 	 * @return	FCDispatcher	The EventDispatcher object.
 	 * @since	1.5
 	 */
-	function & getInstance_FC($debug)
+	public static function &getInstance_FC($debug)
 	{
 		static $instance;
 
@@ -87,7 +87,7 @@ class FCDispatcher extends JDispatcher
 	 * Find custom method names for content events
 	 *
 	 */
-	function findPrepContFuncs($plugin)
+	protected function findPrepContFuncs($plugin)
 	{
 		$plugin->type = preg_replace('/[^A-Z0-9_\.-]/i', '', $plugin->type);
 		$plugin->name  = preg_replace('/[^A-Z0-9_\.-]/i', '', $plugin->name);

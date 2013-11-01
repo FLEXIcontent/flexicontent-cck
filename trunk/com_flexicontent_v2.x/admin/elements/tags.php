@@ -42,8 +42,8 @@ class JFormFieldTags extends JFormField
 
 	function getInput()
 	{
-		$doc	= & JFactory::getDocument();
-		$db		= & JFactory::getDBO();
+		$doc = JFactory::getDocument();
+		$db  = JFactory::getDBO();
 		
 		if (FLEXI_J16GE) {
 			$node = & $this->element;

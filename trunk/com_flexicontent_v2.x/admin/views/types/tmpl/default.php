@@ -80,7 +80,7 @@ $user      = JFactory::getUser();
 				$access 	= JHTML::_('grid.access', $row, $i );
 			}
 			
-			$checked	= JHTML::_('grid.checkedout', $row, $i );
+			$checked	= @ JHTML::_('grid.checkedout', $row, $i );
 			$fields		= 'index.php?option=com_flexicontent&amp;view=fields&amp;filter_type='. $row->id;
 			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_type='. $row->id;
 			$canEdit    = 1;

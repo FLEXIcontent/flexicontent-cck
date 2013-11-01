@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1781 2013-10-03 02:29:51Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1798 2013-10-27 18:38:42Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -253,11 +253,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 				
 				// 3, get current items total for pagination
-				if ( count($query_ids) && !$this->_total ) {
-					//$this->_total = $this->_getListCount($query);
-					$query_count = $this->_buildQuery(-1); // a more light query that strips ordering clause
-					$this->_db->setQuery($query_count);
-					$this->_total = $this->_db->loadResult();
+				if ( count($query_ids) ) {
+					if ( !$this->_total ) $this->getTotal();
+				} else {
+					$this->_total = 0;
 				}
 			}
 			
@@ -303,8 +302,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Lets load the total nr if it doesn't already exist
 		if ( $this->_total===null )
 		{
-			$query = $this->_buildQuery();
-			$this->_total = (int) $this->_getListCount($query);
+			//$query = $this->_buildQuery();
+			//$this->_total = (int) $this->_getListCount($query);
+			
+			$query_count = $this->_buildQuery(-1);
+			$this->_db->setQuery($query_count);
+			$this->_total = $this->_db->loadResult();
 		}
 
 		return $this->_total;

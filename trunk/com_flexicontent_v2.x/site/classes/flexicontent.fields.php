@@ -1705,7 +1705,8 @@ class FlexicontentFields
 			if ( @$field->isindexed ) {
 				// Get Elements of the field these will be cached if they do not depend on the item ...
 				$field->item_id = $itemid;   // in case it needs to be loaded to replace item properties in a SQL query
-				$elements = FlexicontentFields::indexedField_getElements($field, $item, $field->extra_props, $item_pros=false, $createFilter=true);
+				$item_pros = false;
+				$elements = FlexicontentFields::indexedField_getElements($field, $item, $field->extra_props, $item_pros, $createFilter=true);
 				// Map index field vlaues to their real properties
 				$item_values = FlexicontentFields::indexedField_getValues($field, $elements, $item_values, $prepost_prop='');
 			}
@@ -2642,7 +2643,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function setFilterValues( &$cparams, $mfilter_name='persistent_filters', $is_persistent=1, $set_method="httpReq" )
+	static function setFilterValues( &$cparams, $mfilter_name='persistent_filters', $is_persistent=1, $set_method="httpReq" )
 	{
 		$field_filters = array();   // Used when set_method is 'array' instead of 'httpReq'
 		$is_persistent =            // Non-httpReq method does not have initial filters
@@ -2729,7 +2730,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	function renderFilters( &$params, &$filters, $form_name )
+	static function renderFilters( &$params, &$filters, $form_name )
 	{
 		// Make the filter compatible with Joomla standard cache
 		$cache = JFactory::getCache('com_flexicontent');
@@ -2769,7 +2770,7 @@ class FlexicontentFields
 		$db = JFactory::getDBO();
 		$query = FlexicontentFields::createItemsListSQL($params, $_itemids_catids, $isform, $reverse_field, $parentfield, $parentitem);
 		$db->setQuery($query);
-		$item_list = & $db->loadObjectList('id');
+		$item_list = $db->loadObjectList('id');
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		
 		// Item list must be returned too ...
@@ -3011,7 +3012,8 @@ class FlexicontentFields
 			$curr_relitem_html = str_replace('__display_text__', $display_text, $curr_relitem_html);
 			
 			// b. Replace item properties, e.g. {item->id}, (item->title}, etc
-			FlexicontentFields::doQueryReplacements($curr_relitem_html, $null_field=null, $result);
+			$null_field = null;
+			FlexicontentFields::doQueryReplacements($curr_relitem_html, $null_field, $result);
 			
 			// c. Replace HTML display of various item fields
 			$err_mssg = 'Cannot replace field: "%s" because it is of not allowed field type: "%s", which can cause loop or other problem';

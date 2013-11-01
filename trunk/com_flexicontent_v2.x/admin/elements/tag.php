@@ -49,7 +49,7 @@ class JFormFieldTag extends JFormField
 
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
-		$item =& JTable::getInstance('flexicontent_tags', '');
+		$item = JTable::getInstance('flexicontent_tags', '');
 		if ($value) {
 			$item->load($value);
 		} else {

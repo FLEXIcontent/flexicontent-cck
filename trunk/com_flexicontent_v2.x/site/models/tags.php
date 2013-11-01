@@ -213,7 +213,7 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function _buildQuery()
 	{   	
-		$user		= & JFactory::getUser();
+		$user		= JFactory::getUser();
 		$params = & $this->_params;
 		
 		// image for an image field
@@ -476,7 +476,7 @@ class FlexicontentModelTags extends JModelLegacy
 			// load by module name, not used
 			//jimport( 'joomla.application.module.helper' );
 			//$module_name = JRequest::getInt('module', 0 );
-			//$module = & JModuleHelper::getModule('mymodulename');
+			//$module = JModuleHelper::getModule('mymodulename');
 			
 			// load by module id
 			$module_id = JRequest::getInt('module', 0 );

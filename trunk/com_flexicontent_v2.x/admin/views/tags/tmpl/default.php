@@ -77,7 +77,7 @@ $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets
 			if (FLEXI_J16GE)	$published	= JHTML::_('jgrid.published', $row->published, $i, 'tags.' );
 			else							$published	= JHTML::_('grid.published', $row, $i );
 			
-			$checked	= JHTML::_('grid.checkedout', $row, $i );
+			$checked	= @ JHTML::_('grid.checkedout', $row, $i );
 			$canEdit    = 1;
 			$canEditOwn = 1;
    		?>
