@@ -31,17 +31,17 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 
 	function display($tpl = null)
 	{
-		$mainframe = &JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
 		//initialise variables
-		$db			= & JFactory::getDBO();
-		$document	= & JFactory::getDocument();
-		$template 	= $mainframe->getTemplate();
-		$dispatcher = & JDispatcher::getInstance();
-		$rev		= JRequest::getInt('version','','request');
-		$codemode 	= JRequest::getInt('codemode',0);
-		$cparams 	= & JComponentHelper::getParams('com_flexicontent');
+		$db       = JFactory::getDBO();
+		$document = JFactory::getDocument();
+		$template   = $mainframe->getTemplate();
+		$dispatcher = JDispatcher::getInstance();
+		$rev      = JRequest::getInt('version','','request');
+		$codemode = JRequest::getInt('codemode',0);
+		$cparams  = JComponentHelper::getParams('com_flexicontent');
 		
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');

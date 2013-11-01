@@ -210,7 +210,7 @@ class FlexicontentModelFile extends JModelLegacy
 	 */
 	function store($data)
 	{
-		$file  =& $this->getTable('flexicontent_files', '');
+		$file = $this->getTable('flexicontent_files', '');
 
 		// bind it to the table
 		if (!$file->bind($data)) {

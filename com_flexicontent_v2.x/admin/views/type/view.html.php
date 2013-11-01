@@ -93,7 +93,7 @@ class FlexicontentViewType extends JViewLegacy
 		//build access level list
 		if (!FLEXI_J16GE) {
 			if (FLEXI_ACCESS) {
-				$lang = & JFactory::getLanguage();
+				$lang = JFactory::getLanguage();
 				$lang->_strings['FLEXIACCESS_PADD'] = 'Create Items';
 				$lists['access']	= FAccess::TabGmaccess( $row, 'type', 1, 1, 0, 0, 0, 0, 0, 0, 0 );
 			} else {

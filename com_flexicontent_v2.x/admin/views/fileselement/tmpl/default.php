@@ -230,7 +230,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 			$filename    = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
 			if ( !in_array($row->ext, $imageexts)) $thumb_or_icon = JHTML::image($row->icon, $row->filename);
 			
-			$checked 	= JHTML::_('grid.checkedout', $row, $i );
+			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
 			
 			$path		= $row->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path | file_path>
 			$file_path = $row->filename;

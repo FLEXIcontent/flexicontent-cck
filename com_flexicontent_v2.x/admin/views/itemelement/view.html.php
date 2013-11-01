@@ -71,20 +71,9 @@ class FlexicontentViewItemelement extends JViewLegacy {
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$langs = FLEXIUtilities::getLanguages('code');
 		}
-		$categories = $globalcats;
-		
-		if (FLEXI_J16GE) {
-			JLoader::import('joomla.application.component.model');
-			JLoader::import( 'qfcategoryelement', JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_flexicontent' . DS . 'models' );
-			$cats_model = JModelLegacy::getInstance('qfcategoryelement', 'FlexicontentModel');
-			$categories = $cats_model->getItems();
-			//echo "<pre>"; var_dump($categories); echo "</pre>"; 
-			for ($i=0; $i<count($categories); $i++) {
-				$categories[$i]->treename .= $categories[$i]->title;
-			}
-		}
 		
 		// build the categories select list for filter
+		$categories = $globalcats;
 		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', $actions_allowed=array('core.create'), true);
 
 		// table ordering

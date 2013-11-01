@@ -298,16 +298,16 @@ class FlexicontentModelField extends JModelAdmin
 			$field->load($data['id']);
 			
 			if ($field->issearch==-1 || $field->issearch==2) unset($data['issearch']);  // Already dirty
-			else if ($data['issearch']==0 && $field->issearch==1) $data['issearch']=-1; // Becomes dirty OFF
-			else if ($data['issearch']==1 && $field->issearch==0) $data['issearch']=2;  // Becomes dirty ON
+			else if (@ $data['issearch']==0 && $field->issearch==1) $data['issearch']=-1; // Becomes dirty OFF
+			else if (@ $data['issearch']==1 && $field->issearch==0) $data['issearch']=2;  // Becomes dirty ON
 			
 			if ($field->isadvsearch==-1 || $field->isadvsearch==2) unset($data['isadvsearch']);  // Already dirty
-			else if ($data['isadvsearch']==0 && $field->isadvsearch==1) $data['isadvsearch']=-1; // Becomes dirty OFF
-			else if ($data['isadvsearch']==1 && $field->isadvsearch==0) $data['isadvsearch']=2;  // Becomes dirty ON
+			else if (@ $data['isadvsearch']==0 && $field->isadvsearch==1) $data['isadvsearch']=-1; // Becomes dirty OFF
+			else if (@ $data['isadvsearch']==1 && $field->isadvsearch==0) $data['isadvsearch']=2;  // Becomes dirty ON
 			
 			if ($field->isadvfilter==-1 || $field->isadvfilter==2) unset($data['isadvfilter']);  // Already dirty
-			else if ($data['isadvfilter']==0 && $field->isadvfilter==1) $data['isadvfilter']=-1; // Becomes dirty OFF
-			else if ($data['isadvfilter']==1 && $field->isadvfilter==0) $data['isadvfilter']=2;  // Becomes dirty ON
+			else if (@ $data['isadvfilter']==0 && $field->isadvfilter==1) $data['isadvfilter']=-1; // Becomes dirty OFF
+			else if (@ $data['isadvfilter']==1 && $field->isadvfilter==0) $data['isadvfilter']=2;  // Becomes dirty ON
 			
 			// FORCE dirty OFF, if field is being unpublished -and- is not already normal OFF
 			if ( isset($data['published']) && $data['published']==0 && $field->published==1 ) {
@@ -535,7 +535,8 @@ class FlexicontentModelField extends JModelAdmin
 			}
 
 			// Convert to the JObject before adding other data.
-			$item = JArrayHelper::toObject($table->getProperties(1), 'JObject');
+			$_prop_arr = $table->getProperties(1);
+			$item = JArrayHelper::toObject($_prop_arr, 'JObject');
 			if ($pk > 0) {
 				$item->tid = $this->getTypesselected();
 			}
@@ -558,7 +559,7 @@ class FlexicontentModelField extends JModelAdmin
 	 * @throws	Exception if there is an error in the form event.
 	 * @since	1.6
 	 */
-	protected function preprocessForm($form, $data) {
+	protected function preprocessForm(JForm $form, $data, $group = 'content') {
 		jimport('joomla.filesystem.file');
 		jimport('joomla.filesystem.folder');
 

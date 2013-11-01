@@ -47,7 +47,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// field_type is not changed text field can handle this field type
-		plgFlexicontent_fieldsText::onDisplayField($field, $item);
+		FLEXIUtilities::call_FC_Field_Func('text', 'onDisplayField', array(&$field, &$item));
 	}
 	
 	
@@ -58,7 +58,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// field_type is not changed text field can handle this field type
-		plgFlexicontent_fieldsText::onDisplayFieldValue($field, $item, $values, $prop);
+		FLEXIUtilities::call_FC_Field_Func('text', 'onDisplayFieldValue', array(&$field, $item, $values, $prop));
 	}
 	
 	
@@ -74,7 +74,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// field_type is not changed text field can handle this field type
-		plgFlexicontent_fieldsText::onBeforeSaveField($field, $post, $file, $item);
+		FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeSaveField', array(&$field, &$post, &$file, &$item));
 	}
 	
 	
@@ -84,7 +84,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// field_type is not changed text field can handle this field type
-		plgFlexicontent_fieldsText::onAfterSaveField($field, $post, $file, $item);
+		FLEXIUtilities::call_FC_Field_Func('text', 'onAfterSaveField', array(&$field, &$post, &$file, &$item));
 	}
 	
 	
@@ -94,7 +94,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// field_type is not changed text field can handle this field type
-		plgFlexicontent_fieldsText::onBeforeDeleteField($field, $item);
+		FLEXIUtilities::call_FC_Field_Func('text', 'onBeforeDeleteField', array(&$field, &$item));
 	}
 	
 	
@@ -163,9 +163,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
-		$field->field_type = 'text';
-		plgFlexicontent_fieldsText::onIndexAdvSearch($field, $post, $item);
-		$field->field_type = 'textselect';
+		FLEXIUtilities::call_FC_Field_Func('text', 'onIndexAdvSearch', array(&$field, &$post, &$item));
 		return true;
 	}
 	
@@ -176,9 +174,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
-		$field->field_type = 'text';
-		plgFlexicontent_fieldsText::onIndexSearch($field, $post, $item);
-		$field->field_type = 'textselect';
+		FLEXIUtilities::call_FC_Field_Func('text', 'onIndexSearch', array(&$field, &$post, &$item));
 		return true;
 	}
 	

@@ -60,7 +60,7 @@ class JFormFieldContenttypes extends JFormFieldList{
 		//return JHTMLSelect::genericList($options, $name, $attr, 'value', 'text', $value, $name);
 	}
 	protected function getOptions() {
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'
 		. ' WHERE published = 1'

@@ -21,11 +21,11 @@ defined('_JEXEC') or die('Restricted access');
 flexicontent_html::jscode_to_showhide_table('mainChooseColBox','adminListTableFCitems');
 
 global $globalcats;
-$cparams = & JComponentHelper::getParams( 'com_flexicontent' );
+$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $limit = $this->pageNav->limit;
-$ctrl = FLEXI_J16GE ? 'items.' : '';
+$ctrl  = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
-$cats_task = FLEXI_J16GE ? 'task=category.' : 'controller=categories&task=';
+$cats_task  = FLEXI_J16GE ? 'task=category.' : 'controller=categories&task=';
 
 $db 			= JFactory::getDBO();
 $config		= JFactory::getConfig();
@@ -586,8 +586,8 @@ window.addEvent('domready', function() {
 			$unpublishableFound = $unpublishableFound || !$canPublishCurrent;
 
 
-			$publish_up =& JFactory::getDate($row->publish_up);
-			$publish_down =& JFactory::getDate($row->publish_down);
+			$publish_up   = JFactory::getDate($row->publish_up);
+			$publish_down = JFactory::getDate($row->publish_down);
 			if (FLEXI_J16GE) {
 				$publish_up->setTimezone($tz);
 				$publish_down->setTimezone($tz);
@@ -614,7 +614,7 @@ window.addEvent('domready', function() {
 				$access 	= JHTML::_('grid.access', $row, $i );
 			}
 
-			$cid_checkbox = JHTML::_('grid.checkedout', $row, $i );
+			$cid_checkbox = @ JHTML::_('grid.checkedout', $row, $i );
 
 			// Check publication START/FINISH dates (publication Scheduled / Expired)
 			$is_published = in_array( $row->state, array(1, -5, (FLEXI_J16GE ? 2:-1) ) );

@@ -61,8 +61,8 @@ class JFormFieldItemlayout extends JFormFieldList
 		
 		$view	= JRequest::getVar('view');
 		$controller	= JRequest::getVar('controller');
-		$app = &JFactory::getApplication();
-		$db =& JFactory::getDBO();
+		$app = JFactory::getApplication();
+		$db  = JFactory::getDBO();
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		
 		// GET LIMITING to specific templates according to item's type, or according to type of new item
@@ -126,12 +126,12 @@ class JFormFieldItemlayout extends JFormFieldList
 		$lays = implode("','", $lays);
 		
 		if ( @$attributes['enableparam'] ) {
-			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 			if ( !$cparams->get($attributes['enableparam']) ) return FLEXI_J16GE ? '' : JText::_('FLEXI_DISABLED');
 		}
 		
 if ( ! @$attributes['skipparams'] ) {
-		$doc 	= & JFactory::getDocument();
+		$doc 	= JFactory::getDocument();
 		$js 	= "
 var tmpl = ['".$lays."'];	
 
@@ -235,7 +235,7 @@ window.addEvent('domready', function() {
 		}
 		
 		if ( @$attributes['enableparam'] ) {
-			$cparams =& JComponentHelper::getParams( 'com_flexicontent' );
+			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 			if ( !$cparams->get($attributes['enableparam']) ) return '';
 		}
 		

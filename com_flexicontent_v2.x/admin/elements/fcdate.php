@@ -44,7 +44,7 @@ class JFormFieldFcdate extends JFormField
 
 	public function getInput()
 	{
-		$document =& JFactory::getDocument();
+		$document = JFactory::getDocument();
 		if (FLEXI_J16GE) {
 			$node = & $this->element;
 			$attributes = get_object_vars($node->attributes());
@@ -74,7 +74,7 @@ class JFormFieldFcdate extends JFormField
 		if (is_array($attribs)) {
 			$attribs = JArrayHelper::toString( $attribs );
 		}
-		$document =& JFactory::getDocument();
+		$document = JFactory::getDocument();
 		$document->addScriptDeclaration('window.addEvent(\'domready\', function() {Calendar.setup({
         inputField     :    "'.$id.'",     // id of the input field
         ifFormat       :    "'.$format.'",      // format of the input field

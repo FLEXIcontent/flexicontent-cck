@@ -41,7 +41,7 @@ class JFormFieldAuthor extends JFormField
 
 	function getInput()
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 
 		$query = 'SELECT DISTINCT u.id AS value, u.name AS text'
 			. ' FROM #__users AS u'

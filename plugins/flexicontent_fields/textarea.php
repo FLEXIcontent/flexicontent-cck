@@ -44,10 +44,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
-		$app =& JFactory::getApplication();
+		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
-		$editor = & JFactory::getEditor($editor_name);
+		$editor = JFactory::getEditor($editor_name);
 		
 		// some parameter shortcuts
 		$default_value_use = $field->parameters->get( 'default_value_use', 0 ) ;

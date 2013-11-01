@@ -67,7 +67,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$field->value[0] = serialize($field->value[0]);
 		}
 		
-		$document	= & JFactory::getDocument();
+		$document	= JFactory::getDocument();
 		
 		if ($multiple) // handle multiple records
 		{

@@ -31,9 +31,8 @@ class FlexicontentViewItems extends JViewLegacy
 {
 	function display($tpl = null)
 	{
-		$mainframe =& JFactory::getApplication();
-		$user		=& JFactory::getUser();
-		$dispatcher	=& JDispatcher::getInstance();
+		$user       = JFactory::getUser();
+		$dispatcher = JDispatcher::getInstance();
 
 		// Initialize some variables
 		$item 		= & $this->get('Item');
@@ -53,7 +52,7 @@ class FlexicontentViewItems extends JViewLegacy
 			$dispatcher->trigger('onContentPrepare', array ('com_content.article', &$item, &$params, 0));
 		}
 
-		$document = &JFactory::getDocument();
+		$document = JFactory::getDocument();
 
 		// set document information
 		$document->setTitle($item->title);

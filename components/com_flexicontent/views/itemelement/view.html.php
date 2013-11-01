@@ -22,7 +22,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
-$document	= & JFactory::getDocument();
+$document	= JFactory::getDocument();
 $document->addStyleSheet(JURI::root().'administrator/templates/system/css/system.css');
 if (FLEXI_J16GE) {
 	$document->addStyleSheet(JURI::root().'administrator/templates/bluestork/css/general.css');

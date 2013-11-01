@@ -378,6 +378,7 @@ span.editlinktip.hasTip.tags img {
 div .positions_readonly {
 	padding: 2px 1%;
 	width: 98%;
+	display: inline;
 }
 
 .fields {

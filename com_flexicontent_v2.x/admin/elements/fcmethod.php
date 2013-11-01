@@ -43,7 +43,7 @@ class JFormFieldFcmethod extends JFormFieldRadio
 
 	function getInput()
 	{
-		$doc 	=& JFactory::getDocument();
+		$doc = JFactory::getDocument();
 		
 		if (FLEXI_J16GE) {
 			$node = & $this->element;

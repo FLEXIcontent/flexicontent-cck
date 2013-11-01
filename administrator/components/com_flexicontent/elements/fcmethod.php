@@ -43,7 +43,7 @@ class JElementFcmethod extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		$doc 	=& JFactory::getDocument();
+		$doc = JFactory::getDocument();
 		
 		if (FLEXI_J16GE) {
 			$node = & $this->element;

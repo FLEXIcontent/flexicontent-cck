@@ -164,7 +164,7 @@ class FlexicontentViewField extends JViewLegacy
 		$lists['field_type'] 	= flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type);
 		//build access level list
 		if (FLEXI_ACCESS) {
-			$lang = & JFactory::getLanguage();
+			$lang = JFactory::getLanguage();
 			$lang->_strings['FLEXIACCESS_PADD'] = 'Edit-Value';
 			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 1, 0, 1, 0, 1, 0, 1, 1 );
 		} else {

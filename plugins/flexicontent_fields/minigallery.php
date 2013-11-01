@@ -45,12 +45,12 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 
 		// some parameter shortcuts
-		$document		= & JFactory::getDocument();
+		$document		= JFactory::getDocument();
 		$size				= $field->parameters->get( 'size', 30 ) ;
 
-		$flexiparams=& JComponentHelper::getParams('com_flexicontent');
+		$flexiparams= JComponentHelper::getParams('com_flexicontent');
 		$mediapath	= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
-		$app				= & JFactory::getApplication();
+		$app				= JFactory::getApplication();
 		$client			= $app->isAdmin() ? '../' : '';
 		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
@@ -229,11 +229,11 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		$values = $values ? $values : $field->value ;
 
-		$mainframe = & JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 
-		$document		= & JFactory::getDocument();
-		$flexiparams 	=& JComponentHelper::getParams('com_flexicontent');
-		$mediapath		= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
+		$document    = JFactory::getDocument();
+		$flexiparams = JComponentHelper::getParams('com_flexicontent');
+		$mediapath   = $flexiparams->get('media_path', 'components/com_flexicontent/medias');
 		$controller = $field->parameters->get( 'controller', 1 ) ;
 		$thumbnails = $field->parameters->get( 'thumbnails', 1 ) ;
 
@@ -400,7 +400,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 
-		$mainframe =& JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 
 		$post = array_unique($post);
 	}
@@ -423,7 +423,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 	function getFileName( $value )
 	{
-		$db =& JFactory::getDBO();
+		$db = JFactory::getDBO();
 
 		$query = 'SELECT filename, altname, ext'
 				. ' FROM #__flexicontent_files'

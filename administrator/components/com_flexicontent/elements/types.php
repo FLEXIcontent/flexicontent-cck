@@ -41,8 +41,8 @@ class JElementTypes extends JElement
 
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		$doc	= & JFactory::getDocument();
-		$db		= & JFactory::getDBO();
+		$doc = JFactory::getDocument();
+		$db  = JFactory::getDBO();
 		if (FLEXI_J16GE) {
 			$node = & $this->element;
 			$attributes = get_object_vars($node->attributes());

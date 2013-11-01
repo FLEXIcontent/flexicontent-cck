@@ -51,13 +51,13 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 
-		$mainframe =& JFactory::getApplication();
+		$mainframe = JFactory::getApplication();
 		$view = JRequest::getString('view', FLEXI_ITEMVIEW);
 		if ($view != FLEXI_ITEMVIEW) return;
 		
 		// Global parameters
-		$gparams 	=& $mainframe->getParams('com_flexicontent');
-		$filtercat  = $gparams->get('filtercat', 0); // If language filtering is enabled in category view
+		$gparams   = $mainframe->getParams('com_flexicontent');
+		$filtercat = $gparams->get('filtercat', 0); // If language filtering is enabled in category view
 		
 		// Get the site default language in case no language is set in the url
 		$cntLang = substr(JFactory::getLanguage()->getTag(), 0,2);  // Current Content language (Can be natively switched in J2.5)

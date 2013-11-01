@@ -33,7 +33,7 @@ require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'models'.DS.'c
 class modFlexifilterHelper
 {
 
-	function decideCats( &$params )
+	public static function decideCats( &$params )
 	{
 		global $globalcats;
 		

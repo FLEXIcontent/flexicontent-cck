@@ -178,7 +178,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		$params = $this->_params;
 
-		$user = & JFactory::getUser();
+		$user = JFactory::getUser();
 		$orderby = $this->_buildCatOrderBy('cat_');
 
 		// Get a 2 character language tag
@@ -269,7 +269,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		$params = $this->_params;
 
-		$user = & JFactory::getUser();
+		$user = JFactory::getUser();
 		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
@@ -350,7 +350,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		$params = $this->_params;
 
-		$user = & JFactory::getUser();
+		$user = JFactory::getUser();
 		$orderby = $this->_buildCatOrderBy('subcat_');
 		
 		// Get a 2 character language tag
@@ -449,8 +449,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		$params = $this->_params;
 
-		$user = &JFactory::getUser();
-		$limit 		= JRequest::getVar('limit', 10);
+		$user  = JFactory::getUser();
+		$limit = JRequest::getVar('limit', 10);
 		
 		// Get a 2 character language tag
 		$lang = flexicontent_html::getUserCurrentLang();

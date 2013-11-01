@@ -22,7 +22,7 @@ $user    = JFactory::getUser();
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $ctrl = FLEXI_J16GE ? 'fields.' : '';
 $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&task=';
-//$field_model = & JModel::getInstance('field', 'FlexicontentModel'); 
+//$field_model = JModel::getInstance('field', 'FlexicontentModel'); 
 
 $flexi_yes = JText::_( 'FLEXI_YES' );
 $flexi_no  = JText::_( 'FLEXI_NO' );
@@ -239,7 +239,7 @@ $ord_grp = 1;
 				$access 	= JHTML::_('grid.access', $row, $i );
 			}
 			
-			$checked 	= JHTML::_('grid.checkedout', $row, $i );
+			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
 			$warning	= '<span class="hasTip" title="'. JText::_ ( 'FLEXI_WARNING' ) .'::'. JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) .'">' . JHTML::image ( 'administrator/components/com_flexicontent/assets/images/warning.png', JText::_ ( 'FLEXI_NO_TYPES_ASSIGNED' ) ) . '</span>';
    		?>
 		<tr class="<?php echo "row$k"; ?>" style="<?php echo $row_css; ?>">

@@ -62,7 +62,7 @@ $categories_task = FLEXI_J16GE ? 'task=categories.' : 'controller=categories&amp
 			$row = $this->rows[$i];
 
 			$link 		= 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
-			$checked 	= JHTML::_('grid.checkedout', $row, $i );
+			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>

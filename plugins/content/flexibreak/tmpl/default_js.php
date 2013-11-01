@@ -23,7 +23,7 @@ $onclick = $display_method == 1  ?  'javascript:return false;'  : '';  // need t
 
 		<?php
 		for ($i = 0; $i < $this->pagescount; $i++) :
-			$page =& $this->_generateToc($this->row, $i);
+			$page = $this->_generateToc($this->row, $i);
 			if ($display_method == 1) $link = '#'.$page->name;
 			else if ($display_method == 2) $link = $page->link;
 			else  $link = '#'.$page->name.'_toc_page';

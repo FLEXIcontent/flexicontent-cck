@@ -335,7 +335,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$field->{$prop} = array();
 
 		// Get user access level (these are multiple for J2.5)
-		$user = & JFactory::getUser();
+		$user = JFactory::getUser();
 		if (FLEXI_J16GE) $aid_arr = $user->getAuthorisedViewLevels();
 		else             $aid = (int) $user->get('aid');
 
