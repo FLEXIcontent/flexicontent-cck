@@ -628,7 +628,34 @@
 			</param>
 			<param name="feed_image_width" type="text" size="4" default="80" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH"  menu="hide"/>
 			<param name="feed_image_height" type="text" size="4" default="80" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT"  menu="hide"/>
-	
+			
+			<param name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level2" menu="hide" />
+			<param name="feed_orderby" type="list" default="rdate" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC" menu="hide" >
+				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+				<option value="id">FLEXI_ORDER_HIGHEST_ITEM_ID</option>
+				<option value="rid">FLEXI_ORDER_LOWEST_ITEM_ID</option>
+				<option value="commented">FLEXI_ORDER_MOST_COMMENTED</option>
+				<option value="rated">FLEXI_ORDER_BEST_RATED</option>
+				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
+			</param>
+			<param name="" type="separator" default="FLEXI_CUSTOM_ORDER" description="" level="level3" menu="hide" />
+			<param name="feed_orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" menu="hide" />
+			<param name="feed_orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR_DESC" menu="hide" >
+				<option value="ASC">FLEXI_ASC</option>
+				<option value="DESC">FLEXI_DESC</option>
+			</param>
+			<param name="feed_orderbycustomfieldint" type="list" default="0" label="FLEXI_PRIMARY_ORDERING_METHOD" description="FLEXI_PRIMARY_ORDERING_METHOD_DESC" menu="hide" >
+				<option value="0">FLEXI_ALPHANUMERIC</option>
+				<option value="1">FLEXI_NUMERIC</option>
+			</param>
 
 	<param name="" type="separator" default="FLEXI_FEATURED_AND_MARKUPS_CONF" label="" level="tab_close_open" description="" menu="hide" />
 	

@@ -356,24 +356,24 @@ class FlexicontentViewItems extends JViewLegacy {
 		// build filter state group
 		if ($CanDelete || $CanDeleteOwn || $CanArchives)   // Create state group filter only if user can delete or archive
 		{
-			$sgn[''] = JText::_( 'FLEXI_GRP_NORMAL' ) .' '. JText::_( 'FLEXI_STATE_S' );
-			$sgn['published'] = JText::_( 'FLEXI_GRP_PUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
-			$sgn['unpublished'] = JText::_( 'FLEXI_GRP_UNPUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
+			$stategroups[''] = JText::_( 'FLEXI_GRP_NORMAL' ) .' '. JText::_( 'FLEXI_STATE_S' );
+			$stategroups['published'] = JText::_( 'FLEXI_GRP_PUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
+			$stategroups['unpublished'] = JText::_( 'FLEXI_GRP_UNPUBLISHED' ) .' '. JText::_( 'FLEXI_STATE_S' );
 			if ($CanDelete || $CanDeleteOwn)
-				$sgn['trashed']  = JText::_( 'FLEXI_GRP_TRASHED' );
+				$stategroups['trashed']  = JText::_( 'FLEXI_GRP_TRASHED' );
 			if ($CanArchives)
-				$sgn['archived'] = JText::_( 'FLEXI_GRP_ARCHIVED' );
-			$sgn['orphan']      = JText::_( 'FLEXI_GRP_ORPHAN' );
-			$sgn['all']      = JText::_( 'FLEXI_GRP_ALL' );
+				$stategroups['archived'] = JText::_( 'FLEXI_GRP_ARCHIVED' );
+			$stategroups['orphan']      = JText::_( 'FLEXI_GRP_ORPHAN' );
+			$stategroups['all']      = JText::_( 'FLEXI_GRP_ALL' );
 			
-			/*$stategroups = array();
-			foreach ($sgn as $i => $v) {
-				$stategroups[] = JHTML::_('select.option', $i, $v);
+			/*$_stategroups = array();
+			foreach ($stategroups as $i => $v) {
+				$_stategroups[] = JHTML::_('select.option', $i, $v);
 			}
-			$lists['filter_stategrp'] = JHTML::_('select.radiolist', $stategroups, 'filter_stategrp', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_stategrp );*/
+			$lists['filter_stategrp'] = JHTML::_('select.radiolist', $_stategroups, 'filter_stategrp', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_stategrp );*/
 			
 			$lists['filter_stategrp'] = '';
-			foreach ($sgn as $i => $v) {
+			foreach ($stategroups as $i => $v) {
 				$checked = $filter_stategrp == $i ? ' checked="checked" ' : '';
 				$lists['filter_stategrp'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_stategrp'.$i.'" name="filter_stategrp">';
 				$lists['filter_stategrp'] .= '<label class="" id="filter_stategrp'.$i.'-lbl" for="filter_stategrp'.$i.'">'.$v.'</label>';
@@ -384,11 +384,20 @@ class FlexicontentViewItems extends JViewLegacy {
 		$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox" onchange="submitform();"', $filter_subcats );
 		
 		// build the include non-published cats boolean list
-		$catsinstate = array();
-		$catsinstate[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_ANY' ) );
-		$catsinstate[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_PUBLISHED' ) );
-		$catsinstate[] = JHTML::_('select.option', '0', JText::_( 'FLEXI_UNPUBLISHED' ).'<br/>' );
-		$lists['filter_catsinstate'] = JHTML::_('select.radiolist', $catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_catsinstate );
+		$catsinstate[2] = JText::_( 'FLEXI_ANY' );
+		$catsinstate[1] = JText::_( 'FLEXI_PUBLISHED' );
+		$catsinstate[0] = JText::_( 'FLEXI_UNPUBLISHED' );
+		/*$_catsinstate = array();
+		foreach ($catsinstate as $i => $v) {
+			$_catsinstate[] = JHTML::_('select.option', $i, $v);
+		}
+		$lists['filter_catsinstate'] = JHTML::_('select.radiolist', $_catsinstate, 'filter_catsinstate', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_catsinstate );*/
+		$lists['filter_catsinstate']  = '';
+		foreach ($catsinstate as $i => $v) {
+			$checked = $filter_catsinstate == $i ? ' checked="checked" ' : '';
+			$lists['filter_catsinstate'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_catsinstate'.$i.'" name="filter_catsinstate">';
+			$lists['filter_catsinstate'] .= '<label class="" id="filter_catsinstate'.$i.'-lbl" for="filter_catsinstate'.$i.'">'.$v.'</label>';
+		}
 		
 		// build the order type boolean list
 		$order_types = array();
@@ -409,17 +418,36 @@ class FlexicontentViewItems extends JViewLegacy {
 		
 		//search filter
 		$scopes = array();
-		$scopes[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_TITLE' ) );
-		$scopes[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_INTROTEXT' ) );
-		$scopes[] = JHTML::_('select.option', '4', JText::_( 'FLEXI_INDEXED_CONTENT' ) );
-		$lists['scope'] = JHTML::_('select.radiolist', $scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );
-
-		// build dates option list
-		$dates = array();
-		$dates[] = JHTML::_('select.option',  '1', JText::_( 'FLEXI_CREATED' ) );
-		$dates[] = JHTML::_('select.option',  '2', JText::_( 'FLEXI_REVISED' ) );
-		$lists['date'] = JHTML::_('select.radiolist', $dates, 'date', 'size="1" class="inputbox"', 'value', 'text', $date );
-
+		$scopes[1] = JText::_( 'FLEXI_TITLE' );
+		$scopes[2] = JText::_( 'FLEXI_INTROTEXT' );
+		$scopes[4] = JText::_( 'FLEXI_INDEXED_CONTENT' );
+		/*$_scopes = array();
+		foreach ($scopes as $i => $v) {
+			$_scopes[] = JHTML::_('select.option', $i, $v);
+		}
+		$lists['scope'] = JHTML::_('select.radiolist', $_scopes, 'scope', 'size="1" class="inputbox"', 'value', 'text', $scope );*/
+		$lists['scope']  = '';
+		foreach ($scopes as $i => $v) {
+			$checked = $scope == $i ? ' checked="checked" ' : '';
+			$lists['scope'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="scope'.$i.'" name="scope">';
+			$lists['scope'] .= '<label class="" id="scope'.$i.'-lbl" for="scope'.$i.'">'.$v.'</label>';
+		}
+		
+		// build item dates option list
+		$dates[1] = JText::_( 'FLEXI_CREATED' );
+		$dates[2] = JText::_( 'FLEXI_REVISED' );
+		/*$_dates = array();
+		foreach ($dates as $i => $v) {
+			$_dates[] = JHTML::_('select.option', $i, $v);
+		}
+		$lists['date'] = JHTML::_('select.radiolist', $_dates, 'date', 'size="1" class="inputbox"', 'value', 'text', $date );*/
+		$lists['date']  = '';
+		foreach ($dates as $i => $v) {
+			$checked = $date == $i ? ' checked="checked" ' : '';
+			$lists['date'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="date'.$i.'" name="date">';
+			$lists['date'] .= '<label class="" id="date'.$i.'-lbl" for="date'.$i.'">'.$v.'</label>';
+		}
+		
 		$lists['startdate'] = JHTML::_('calendar', $startdate, 'startdate', 'startdate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'11',  'maxlength'=>'20'));
 		$lists['enddate'] 	= JHTML::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'11',  'maxlength'=>'20'));
 

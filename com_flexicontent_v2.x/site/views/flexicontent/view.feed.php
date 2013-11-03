@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.feed.php 1108 2012-01-15 04:06:31Z ggppdk $
+ * @version 1.5 stable $Id: view.feed.php 1577 2012-12-02 15:10:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -35,40 +35,129 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function display()
+	function display( $tpl = null )
 	{
+		$db  = JFactory::getDBO();
+		$doc = JFactory::getDocument();
 		$app = JFactory::getApplication();
-		$doc    = JFactory::getDocument();
-		$params = $app->getParams();
-		$doc->link 	= JRoute::_('index.php?option=com_flexicontent&view=flexicontent');
+		$params = $this->get('Params');
 		
-		JRequest::setVar('limit', $app->getCfg('feed_limit'));
-		$rows 		= & $this->get('Feed');
-				
-		foreach ( $rows as $row )
+		$doc->link = JRoute::_('index.php?option=com_flexicontent&view=flexicontent&rootcat='. (int)$params->get('rootcat', FLEXI_J16GE ? 1:0));
+		JRequest::setVar('limit', $params->get('feed_limit'));   // Force a specific limit, this will be moved to the model
+		$cats = $this->get('Feed');
+		
+		//$feed_summary = $params->get('feed_summary', 0);
+		$feed_summary_cut = $params->get('feed_summary_cut', 200);
+		
+		$feed_use_image = $params->get('feed_use_image', 1);
+		$feed_image_source = $params->get('feed_image_source', '');
+		$feed_link_image = $params->get('feed_link_image', 1);
+		$feed_image_method = $params->get('feed_image_method', 1);
+		
+		$feed_image_width = $params->get('feed_image_width', 100);
+		$feed_image_height = $params->get('feed_image_height', 80);
+
+		// Retrieve default image for the image field
+		if ($feed_use_image && $feed_image_source) {
+			$query = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $feed_image_source;
+			$db->setQuery($query);
+			$image_dbdata = $db->loadObject();
+			//$image_dbdata->params = FLEXI_J16GE ? new JRegistry($image_dbdata->params) : new JParameter($image_dbdata->params);
+			
+			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', '' => '');
+			$img_field_size = $img_size_map[ $image_size ];
+			$img_field_name = $image_dbdata->name;
+		}
+		
+		foreach ( $cats as $cat )
 		{
 			// strip html from feed item title
-			$title = $this->escape( $row->title );
+			$title = $this->escape( $cat->title );
 			$title = html_entity_decode( $title );
-
-			$category = $this->escape( $row->cattitle );
 			
 			// url link to article
 			// & used instead of &amp; as this is converted by feed creator
-			$link = JRoute::_('index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='. $row->catslug .'&id='.$row->slug );
+			$link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($cat->slug));
 
 			// strip html from feed item description text
-			$description	= ($params->get('feed_summary', 0) ? $row->introtext.$row->fulltext : $row->introtext);
-		//	$author			= $row->created_by_alias ? $row->created_by_alias : $row->author;
-			@$date 			= ( $row->created ? date( 'r', strtotime($row->created) ) : '' );
+			$description	= $cat->description; //$feed_summary ? $cat->description : '';
+			$description = flexicontent_html::striptagsandcut( $description, $feed_summary_cut);
+			
+			
+	  	if ($feed_use_image) {  // feed image is enabled
+
+				// Get some variables
+				$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
+				$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
+				$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
+				$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';
+				
+				// **************
+				// CATEGORY IMAGE
+				// **************
+				
+				// category image params
+				$show_cat_image = $params->get('show_description_image', 0);  // we use different name for variable
+				$cat_image_source = $params->get('cat_image_source', 2); // 0: extract, 1: use param, 2: use both
+				$cat_link_image = $params->get('cat_link_image', 1);
+				$cat_image_method = $params->get('cat_image_method', 1);
+				$cat_image_width = $params->get('cat_image_width', 80);
+				$cat_image_height = $params->get('cat_image_height', 80);
+				
+				$cat 		= & $category;
+				$thumb = "";
+				if ($cat->id && $show_cat_image) {
+					$cat->image = FLEXI_J16GE ? $params->get('image') : $cat->image;
+					$thumb = "";
+					$cat->introtext = & $cat->description;
+					$cat->fulltext = "";
+					
+					if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
+						$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
+				
+						$h		= '&amp;h=' . $cat_image_height;
+						$w		= '&amp;w=' . $cat_image_width;
+						$aoe	= '&amp;aoe=1';
+						$q		= '&amp;q=95';
+						$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
+						$ext = pathinfo($src, PATHINFO_EXTENSION);
+						$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+						$conf	= $w . $h . $aoe . $q . $zc . $f;
+				
+						$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+					} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
+			
+						$h		= '&amp;h=' . $feed_image_height;
+						$w		= '&amp;w=' . $feed_image_width;
+						$aoe	= '&amp;aoe=1';
+						$q		= '&amp;q=95';
+						$zc		= $feed_image_method ? '&amp;zc=' . $feed_image_method : '';
+						$ext = pathinfo($src, PATHINFO_EXTENSION);
+						$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+						$conf	= $w . $h . $aoe . $q . $zc . $f;
+			
+						$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+						$src = $base_url.$src;
+						
+						$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+					}
+				}
+	  		if ($thumb) {
+	  			$description = "<a href='".$link."'><img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/></a><p>".$description."</p>";
+	  		}
+  		}
+	  	
+			//$author = $cat->created_by_alias ? $cat->created_by_alias : $cat->author;
+			@$date    = ( $cat->created ? date( 'r', strtotime($cat->created) ) : '' );
 
 			// load individual item creator class
 			$item = new JFeedItem();
-			$item->title 		= $title;
-			$item->link 		= $link;
-			$item->description 	= $description;
-			$item->date			= $date;
-			$item->category   	= $category;
+			$item->title 		   = $title .' ('.(int)$cat->assigneditems.')';
+			$item->link 		   = $link;
+			$item->description = $description;
+			$item->date			   = $date;
+			//$item->author    = $author;
+			//$item->category  = $this->escape( $category->title );
 
 			// loads item info into rss array
 			$doc->addItem( $item );

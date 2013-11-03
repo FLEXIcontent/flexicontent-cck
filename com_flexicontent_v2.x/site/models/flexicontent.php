@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1670 2013-04-15 08:01:57Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1800 2013-11-01 04:30:57Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -174,7 +174,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access private
 	 * @return string
 	 */
-	function _buildQuery()
+	function _buildQuery($type='')
 	{
 		$params = $this->_params;
 
@@ -230,7 +230,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			}
 		}
 		$join .= (FLEXI_J16GE ? ' LEFT JOIN #__users AS u ON u.id = c.created_user_id' : '');
-
+		
+		if ($type=='feed') {
+		}
 		$query = 'SELECT c.*,'
 			. (FLEXI_J16GE ? ' u.name as author,' : '')
 			. ' CASE WHEN CHAR_LENGTH( c.alias ) THEN CONCAT_WS( \':\', c.id, c.alias ) ELSE c.id END AS slug,'
@@ -238,16 +240,17 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			. ' ('
 			. ' SELECT COUNT( DISTINCT i.id )'
 			. ' FROM #__content AS i'
-			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			. ' JOIN #__categories AS cc ON cc.id = rel.catid'
+			. ' JOIN #__categories AS cc ON cc.id = rel.catid OR cc.id = i.catid'
 			. $subjoin
 			. $where
 			. $suband
 			. ') AS assigneditems'
-			
-			. ' FROM #__categories AS c'
+			;
+		
+		$query .= ' FROM #__categories AS c'
 			. $join
 			. ' WHERE c.published = 1'
 			. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
@@ -408,10 +411,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			. ' ('
 			. ' SELECT COUNT( DISTINCT i.id )'
 			. ' FROM #__content AS i'
-			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			. ' JOIN #__categories AS cc ON cc.id = rel.catid'
+			. ' JOIN #__categories AS cc ON cc.id = rel.catid OR cc.id = i.catid'
 			. $subjoin
 			. $where
 			. $suband
@@ -446,51 +449,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @return object
 	 */
 	function getFeed()
-	{
-		$params = $this->_params;
-
-		$user  = JFactory::getUser();
-		$limit = JRequest::getVar('limit', 10);
-		
-		// Get a 2 character language tag
-		$lang = flexicontent_html::getUserCurrentLang();
-		
-		// Do we filter the categories
-		$filtercat  = $params->get('filtercat', 0);
-
-		// Filter the category view with the active active language
-		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
+	{		
+		$feed = $this->_getList( $this->_buildQuery('feed'), $this->getState('limitstart'), $this->getState('limit') );
+		if ($this->_db->getErrorNum()) {
+			echo __FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error';
+			exit;
 		}
 		
-		// WE DO NOT show_noauth parameter in FEEDs ... we only list authorised ...
-		if (FLEXI_J16GE) {
-			$aid_arr  = $user->getAuthorisedViewLevels();
-			$aid_list = implode(",", $aid_arr);
-			$andaccess  = ' AND c.access IN (0,'.$aid_list.')';
-		} else {
-			$aid = (int) $user->get('aid');
-			$andaccess  = ' AND c.access <= '.$aid;
-		}
-
-		$query 	= 'SELECT DISTINCT i.*, ie.*, c.title AS cattitle,'
-				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as catslug'
-				. ' FROM #__flexicontent_items AS i'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-				. ' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-				. ' LEFT JOIN #__categories AS c ON c.id = rel.catid'
-				. ' WHERE c.published = 1'
-				. (!FLEXI_J16GE ? ' AND c.section = '.FLEXI_SECTION : ' AND c.extension="'.FLEXI_CAT_EXTENSION.'" ' )
-				. $andaccess
-				. $and
-				. ' AND i.state IN (1, -5)'
-				. ' LIMIT '. $limit
-				;
-		
-		$this->_db->setQuery($query);
-		$feed = $this->_db->loadObjectList();
-
 		return $feed;
 	}
 	

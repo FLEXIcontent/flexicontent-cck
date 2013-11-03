@@ -460,7 +460,7 @@
 				<option value="any">FLEXI_ANY_WORDS</option>
 				<option value="exact">FLEXI_EXACT_PHRASE</option>
 			</field>
-			<field name="search_autocomplete" type="list" default="" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" menu="hide" >
+			<field name="search_autocomplete" type="list" default="" label="FLEXI_SEARCHWORD_AUTOCOMPLETE" description="FLEXI_SEARCHWORD_AUTOCOMPLETE_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_AUTOCOMPLETE_SIMPLE</option>
@@ -529,14 +529,45 @@
 				<option value="m">FLEXI_MEDIUM</option>
 				<option value="l">FLEXI_LARGE</option>
 			</field>
-			<field name="feed_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="feed_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			<field name="feed_image_method" type="list" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
-			</field>		
+			</field>
+			<field name="feed_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="feed_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			
+			<field name="" type="separator" default="FLEXI_ITEMS_ORDER" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
+			<field name="feed_orderby" type="list" default="" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+				<option value="id">FLEXI_ORDER_HIGHEST_ITEM_ID</option>
+				<option value="rid">FLEXI_ORDER_LOWEST_ITEM_ID</option>
+				<option value="commented">FLEXI_ORDER_MOST_COMMENTED</option>
+				<option value="rated">FLEXI_ORDER_BEST_RATED</option>
+				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_CUSTOM_ORDER" description="" level="level3" />
+			<field name="feed_orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
+			<field name="feed_orderbycustomfielddir" type="list" default="" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="ASC">FLEXI_ASC</option>
+				<option value="DESC">FLEXI_DESC</option>
+			</field>
+			<field name="feed_orderbycustomfieldint" type="list" default="" label="FLEXI_PRIMARY_ORDERING_METHOD" description="FLEXI_PRIMARY_ORDERING_METHOD_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_ALPHANUMERIC</option>
+				<option value="1">FLEXI_NUMERIC</option>
+			</field>
+
 		</fieldset>
 		
 		<fieldset name="cat_notifications_conf" label="FLEXI_EMAIL_NOTIFICATIONS_ASSIGNED_ITEM_CONF"  addfieldpath="/administrator/components/com_flexicontent/elements" >

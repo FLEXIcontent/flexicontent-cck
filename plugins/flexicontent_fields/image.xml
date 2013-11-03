@@ -48,23 +48,80 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_VARIOUS_BASIC_LABEL" description="" level="level2" />
-			<field name="default_image" type="text" default="" size="60" label="FLEXI_FIELD_DEFAULT_IMAGE" description="FLEXI_FIELD_DEFAULT_IMAGE_DESC" />
 			<field name="upload_extensions" type="text" default="bmp,gif,jpg,jpeg,png,BMP,GIF,JPG,JPEG,PNG" size="60" label="FLEXI_LEGAL_EXTENSIONS_LABEL" description="FLEXI_LEGAL_EXTENSIONS_DESC" />
 			<field name="upload_maxsize" type="text" default="10000000" label="FLEXI_MAXIMUM_SIZE_LABEL" description="FLEXI_MAXIMUM_SIZE_DESC" />
-			<field name="quality" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_QUALITY" description="FLEXI_FIELD_IMAGE_QUALITY_DESC" />
-			<field name="dir" type="text" default="images/stories/flexicontent" size="60" label="FLEXI_FIELD_IMAGE_FOLDER" description="FLEXI_FIELD_IMAGE_FOLDER_DESC" />
-			<field name="wm_opacity" type="text" default="100" size="4" label="FLEXI_FIELD_IMAGE_WM_TRANS" description="FLEXI_FIELD_IMAGE_WM_TRANS_DESC" />
-			<field name="wm_position" type="list" default="BR" label="FLEXI_FIELD_IMAGE_WM_POS" description="FLEXI_FIELD_IMAGE_WM_POS_DESC">
-				<option value="*">FLEXI_FIELD_REPEAT</option>
-				<option value="C">FLEXI_FIELD_MIDDLE</option>
-				<option value="TL">FLEXI_FIELD_TOP_LEFT</option>
-				<option value="T">FLEXI_FIELD_TOP_CENTER</option>
-				<option value="TR">FLEXI_FIELD_TOP_RIGHT</option>
-				<option value="BL">FLEXI_FIELD_BOTTOM_LEFT</option>
-				<option value="B">FLEXI_FIELD_BOTTOM_CENTER</option>
-				<option value="BR">FLEXI_FIELD_BOTTOM_RIGHT</option>
+
+
+			<field name="" type="separator" default="FLEXI_DISPLAY_OPTIONS" level="level2" />
+
+			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" level="level3" />
+			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="popupinview" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="items,category,module,backend" defaultvals="items,category,module,backend"
+				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
+			<field name="popuptype" type="list" default="1" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC">
+				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
+				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
+				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
+				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
+				<option value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option>
+				<option value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
+				<option value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
+				<option value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
+			</field>
+			<field name="popuptype_mobile" type="list" default="" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE_DESC">
+				<option value="">FLEXI_FIELD_IMAGE_SAME_AS_DESKTOP</option>
+				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
+				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
+				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
+				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
+				<option value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option>
+				<option value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
+				<option value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
+				<option value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
+			</field>
+			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_WITH_OTHER_IMAGE_FIELDS" description="FLEXI_FIELD_GROUP_WITH_OTHER_IMAGE_FIELDS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_FIELD_GROUP_PER_ITEM</option>
+				<option value="2">FLEXI_FIELD_GROUP_PER_VIEW</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level3" />
+			<field name="thumbinitemview" type="list" default="2" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC">
+				<option value="1">FLEXI_SMALL</option>
+				<option value="2">FLEXI_MEDIUM</option>
+				<option value="3">FLEXI_LARGE</option>
+				<option value="4">FLEXI_ORIGINAL</option>
+			</field>
+			<field name="thumbincatview" type="list" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC">
+				<option value="1">FLEXI_SMALL</option>
+				<option value="2">FLEXI_MEDIUM</option>
+				<option value="3">FLEXI_LARGE</option>
+				<option value="4">FLEXI_ORIGINAL</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level3" />
+			<field name="showtitle" type="list" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="showdesc" type="list" default="0" label="FLEXI_FIELD_SHOW_LONGDESC" description="FLEXI_FIELD_SHOW_LONGDESC_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_IMGFIELD_HOVERING_LEGEND" level="level3" />
+			<field name="uselegend" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_LEGEND" description="FLEXI_FIELD_IMAGE_USE_LEGEND_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="legendinview" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="items,category,module,backend" defaultvals="items,category,module,backend"
+				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
+
 
 			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level1" />
 			<field name="useogp" type="radio" default="0" label="FLEXI_SOCIAL_SUGGEST_FIELD" description="FLEXI_SOCIAL_SUGGEST_IMG_DESC">
@@ -82,6 +139,21 @@
 			</field>
 
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAIL_CREATION" description="FLEXI_IMGFIELD_THUMBNAIL_CREATION_DESC" level="level1" />
+			
+			<field name="default_image" type="text" default="" size="60" label="FLEXI_FIELD_DEFAULT_IMAGE" description="FLEXI_FIELD_DEFAULT_IMAGE_DESC" />
+			<field name="dir" type="text" default="images/stories/flexicontent" size="60" label="FLEXI_FIELD_IMAGE_FOLDER" description="FLEXI_FIELD_IMAGE_FOLDER_DESC" />
+			<field name="quality" type="text" default="90" size="4" label="FLEXI_FIELD_IMAGE_QUALITY" description="FLEXI_FIELD_IMAGE_QUALITY_DESC" />
+			<field name="wm_opacity" type="text" default="100" size="4" label="FLEXI_FIELD_IMAGE_WM_TRANS" description="FLEXI_FIELD_IMAGE_WM_TRANS_DESC" />
+			<field name="wm_position" type="list" default="BR" label="FLEXI_FIELD_IMAGE_WM_POS" description="FLEXI_FIELD_IMAGE_WM_POS_DESC">
+				<option value="*">FLEXI_FIELD_REPEAT</option>
+				<option value="C">FLEXI_FIELD_MIDDLE</option>
+				<option value="TL">FLEXI_FIELD_TOP_LEFT</option>
+				<option value="T">FLEXI_FIELD_TOP_CENTER</option>
+				<option value="TR">FLEXI_FIELD_TOP_RIGHT</option>
+				<option value="BL">FLEXI_FIELD_BOTTOM_LEFT</option>
+				<option value="B">FLEXI_FIELD_BOTTOM_CENTER</option>
+				<option value="BR">FLEXI_FIELD_BOTTOM_RIGHT</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_LARGE_IMAGES" description="FLEXI_LARGE_IMAGES_DESC" level="level2" />
 			<field name="w_l" type="text" default="800" size="4" label="FLEXI_FIELD_IMAGE_WIDTH" description="FLEXI_FIELD_IMAGE_WIDTH_DESC" />
@@ -154,76 +226,8 @@
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_YES_REGARDLESS_SETTINGS</option>
 			</field>
-			
-			
-			<field name="" type="separator" default="FLEXI_DISPLAY_OPTIONS" level="level1" />
 
-			<field name="" type="separator" default="FLEXI_IMGFIELD_HOVERING_LEGEND" level="level2" />
-			<field name="uselegend" type="radio" default="1" label="FLEXI_FIELD_IMAGE_USE_LEGEND" description="FLEXI_FIELD_IMAGE_USE_LEGEND_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="legendinview" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="items,category,module,backend" defaultvals="items,category,module,backend"
-				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
-			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS_LIST" level="level2" />
-			<field name="usepopup" type="radio" default="1" label="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY" description="FLEXI_FIELD_IMAGE_THUBMNAILS_ADD_JS_GALLERY_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="popupinview" type="fccheckbox" default=""
-				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="items,category,module,backend" defaultvals="items,category,module,backend"
-				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
-			<field name="popuptype" type="list" default="1" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC">
-				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
-				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
-				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
-				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
-				<option value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option>
-				<option value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
-				<option value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
-				<option value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
-			</field>
-			<field name="popuptype_mobile" type="list" default="" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_MOBILE_DESC">
-				<option value="">FLEXI_FIELD_IMAGE_SAME_AS_DESKTOP</option>
-				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
-				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
-				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>
-				<option value="4">FLEXI_FIELD_IMAGE_FANCYBOX_BUILTIN</option>
-				<option value="5">FLEXI_FIELD_IMAGE_GALLERIFFIC_BUILTIN</option>
-				<option value="6">FLEXI_FIELD_IMAGE_WIDGETKIT</option>
-				<option value="7">FLEXI_FIELD_IMAGE_ELASTISLIDE</option>
-				<option value="8">FLEXI_FIELD_IMAGE_PHOTOSWIPE</option>
-			</field>
-			<field name="grouptype" type="list" default="1" label="FLEXI_FIELD_GROUP_WITH_OTHER_IMAGE_FIELDS" description="FLEXI_FIELD_GROUP_WITH_OTHER_IMAGE_FIELDS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_FIELD_GROUP_PER_ITEM</option>
-				<option value="2">FLEXI_FIELD_GROUP_PER_VIEW</option>
-			</field>
-			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level2" />
-			<field name="thumbinitemview" type="list" default="2" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC">
-				<option value="1">FLEXI_SMALL</option>
-				<option value="2">FLEXI_MEDIUM</option>
-				<option value="3">FLEXI_LARGE</option>
-				<option value="4">FLEXI_ORIGINAL</option>
-			</field>
-			<field name="thumbincatview" type="list" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC">
-				<option value="1">FLEXI_SMALL</option>
-				<option value="2">FLEXI_MEDIUM</option>
-				<option value="3">FLEXI_LARGE</option>
-				<option value="4">FLEXI_ORIGINAL</option>
-			</field>
-			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level2" />
-			<field name="showtitle" type="list" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="showdesc" type="list" default="0" label="FLEXI_FIELD_SHOW_LONGDESC" description="FLEXI_FIELD_SHOW_LONGDESC_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			
+
 			<field name="" type="separator" default="FLEXI_EDIT_OPTIONS" level="level1" />
 
 			<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE" description="FLEXI_PARAMETERS_BEHAVIOR_DB_MODE_DESC" level="level2" menu="hide" />

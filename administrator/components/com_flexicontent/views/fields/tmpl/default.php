@@ -115,7 +115,7 @@ $ord_grp = 1;
 
 	<tfoot>
 		<tr>
-			<td colspan="14">
+			<td colspan="15">
 				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>

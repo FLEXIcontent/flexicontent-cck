@@ -440,35 +440,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 	}
 	
 	
-	/**
-	 * Retrieve author item
-	 *
-	 * @access public
-	 * @return string
-	 */
-	function getAuthorDescrItem() {
-		$cparams = $this->_params;
-		$authordescr_itemid = $cparams->get('authordescr_itemid', 0);
-		if (!$authordescr_itemid) return false;
-		
-		$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
-			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
-			. ' FROM #__content AS i'
-			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			//. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-			. ' JOIN #__categories AS c ON c.id = i.catid'
-			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-			. ' WHERE i.id='. $authordescr_itemid
-			;
-		
-		$this->_db->setQuery($query);
-		$authorItem = $this->_db->loadObject();
-		
-		return $authorItem;
-	}
-	
 	
 	/**
 	 * Retrieve subcategory ids of a given category
@@ -669,7 +640,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$join_clauses = ''
 			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' JOIN #__categories AS c ON c.id = i.catid'
 			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"' : '')
@@ -725,7 +696,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// Get sub categories used to create items list, according to configuration and user access
 			$this->_getDataCats($id_arr);
 			$_data_cats = "'".implode("', '", $this->_data_cats)."'";
-			$where .= ' AND rel.catid IN ('.$_data_cats.')';
+			$where .= ' AND (rel.catid IN ('.$_data_cats.') OR i.catid IN ('.$_data_cats.'))';
 		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -1162,7 +1133,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Count items according to full depth level !!!
 		$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
-		$where .= ' AND rel.catid IN ('.$catlist.')';
+		$where .= ' AND (rel.catid IN ('.$catlist.') OR i.catid IN ('.$catlist.'))';
 		
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		// Checking item, category, content type access level
