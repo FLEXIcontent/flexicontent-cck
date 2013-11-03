@@ -35,9 +35,9 @@ class FlexicontentViewItems extends JViewLegacy
 		$dispatcher = JDispatcher::getInstance();
 
 		// Initialize some variables
-		$item 		= & $this->get('Item');
+		$item 		= $this->get('Item');
 		$params 	= & $item->parameters;
-		$fields		= & $this->get( 'Extrafields' );
+		$fields		= $this->get( 'Extrafields' );
 
 		$tags = & $item->tags;
 		$categories = & $item->categories;

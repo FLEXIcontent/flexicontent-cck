@@ -258,7 +258,7 @@ window.addEvent('domready', function() {
 				<span style="font-size:150%;"><span id="count"></span></span>&nbsp;<?php echo count($this->unassociated); ?>&nbsp;<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>&nbsp;&nbsp;
 				<?php echo $this->lists['extdata']; ?>
 				<?php
-					$types = & $this->get( 'Typeslist' );
+					$types = $this->get( 'Typeslist' );
 					echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"', 'typeid');
 				?>
 				<br/>
@@ -280,37 +280,59 @@ window.addEvent('domready', function() {
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
 	<div id="mainChooseColBox" class="fc_nice_box" style="margin-top:6px;"></div>
+
+	<div class="fc_nice_box" style="">
+		
+		<div style="float:left; margin-right:12px;">
+		<label class="label" for="filter_catsinstate"><?php echo '&nbsp;'.JText::_( 'FLEXI_LIST_ITEMS_WITH_STATE' ); ?></label>
+		<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="::<?php echo JText::_('FLEXI_LIST_ITEMS_WITH_STATE_DESC', true); ?>" style="vertical-align:middle;" />
+		<?php echo $this->lists['filter_stategrp']; ?>
+		</div>
+		
+		<div style="float:left;">
+		<label class="label" for="filter_catsinstate"><?php echo '&nbsp;'.JText::_( 'FLEXI_LIST_ITEMS_IN_CATS' ); ?></label>
+		<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="::<?php echo JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true); ?>" style="vertical-align:middle;" />
+		<span class="radio"><?php echo $this->lists['filter_catsinstate']; ?></span>
+		</div>
+	</div>
 	
-	<table class="adminform">
-		<tr>
-			<td>
-				<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_GO' /*'FLEXI_APPLY_FILTERS'*/ ); ?>" />
-				<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET' /*'FLEXI_RESET_FILTERS'*/ ); ?>" />
-				<!--
-				<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
-				<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
-				-->
-				
-				<div style="display:inline-block; white-space: nowrap;">
-					<?php echo $this->lists['filter_stategrp']; ?>
-				</div>
-				
-				<div class='fc_mini_note_box' style='display: inline-block !important;'>
-					<?php
-					$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
-					if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
-					echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
-					?>
-				</div>
-				
-				<?php if (@$this->lists['filter_fileid']): ?>
-					<div class="fcclear"></div>
-					<?php echo '<label class="label">'.JText::_('List items using file') . '</label> ' . $this->lists['filter_fileid']; ?>
-				<?php endif; ?>
-				
-			</td>
-		</tr>
-	</table>
+	<div style="margin: 6px 0px;">
+	
+		<div style="float:left; margin:0px 12px;">
+			<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_GO' /*'FLEXI_APPLY_FILTERS'*/ ); ?>" />
+			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET' /*'FLEXI_RESET_FILTERS'*/ ); ?>" />
+			<!--
+			<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
+			<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
+			-->
+		</div>
+		
+		<div class="limit" style="display: inline-block;">
+			<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pageNav->getLimitBox(); ?>
+		</div>
+		
+		<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
+			<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pageNav->getResultsCounter(); // custom Results Counter ?>
+		</span>
+		
+		<span class="fc_pages_counter">
+			<?php echo $this->pageNav->getPagesCounter(); ?>
+		</span>
+
+		<div class='fc_mini_note_box' style='display: inline-block !important;'>
+			<?php
+			$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
+			if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
+			echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
+			?>
+		</div>
+		
+		<?php if (@$this->lists['filter_fileid']): ?>
+			<div class="fcclear"></div>
+			<?php echo '<label class="label">'.JText::_('List items using file') . '</label> ' . $this->lists['filter_fileid']; ?>
+		<?php endif; ?>
+		
+	</div>
 	
 	<table id="adminListTableFCitems" class="adminlist" cellspacing="1">
 	<thead>
@@ -493,10 +515,6 @@ window.addEvent('domready', function() {
 				<label class="label" for="filter_subcats"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
 				<div class="clear"></div>
 				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
-				<div class="clear"></div>
-				<label class="label" for="filter_catsinstate"><?php echo '&nbsp;'.JText::_( 'FLEXI_CATS_IN_STATE' ); ?></label>
-				<div class="clear"></div>
-				<span class="radio"><?php echo $this->lists['filter_catsinstate']; ?></span>
 			</td>
 			<td class="left col_created col_revised" colspan="2">
 				<span class="radio"><?php echo $this->lists['date']; ?></span>

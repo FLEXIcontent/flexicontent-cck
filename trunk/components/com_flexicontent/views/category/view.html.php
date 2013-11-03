@@ -147,8 +147,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		$authordescr_item = false;
 		if ($authorid && $params->get('authordescr_itemid') && $format != 'feed') {
 			$authordescr_itemid = $params->get('authordescr_itemid');
-			//$authordescr_item = & $this->get('AuthorDescrItem');
-			//list($authordescr_item) = FlexicontentFields::getFields($authordescr_item, 'items', $params, $aid);
 		}
 		
 		// Bind Fields

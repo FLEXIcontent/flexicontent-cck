@@ -35,18 +35,25 @@ class FlexicontentViewCategory extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function display()
+	function display( $tpl = null )
 	{
 		$db  = JFactory::getDBO();
 		$doc = JFactory::getDocument();
+		$app = JFactory::getApplication();
+		$params = $this->get('Params');
 		
-		$doc->link 	= JRoute::_(FlexicontentHelperRoute::getCategoryRoute(JRequest::getVar('cid',null, '', 'int')));
-		//$doc->link 	= JRoute::_('index.php?option=com_flexicontent&view=category&cid='.JRequest::getVar('cid',null, '', 'int'));
+		$doc->link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute(JRequest::getVar('cid',null, '', 'int')));
 		
 		$category = $this->get('Category');
-		$params   = $this->get('Params');
+		
+		// Prepare query to match feed data
 		JRequest::setVar('limit', $params->get('feed_limit'));   // Force a specific limit, this will be moved to the model
-		$rows    = $this->get('Data');
+		$params->set('orderby', $params->get('feed_orderby', 'rdate'));
+		$params->set('orderbycustomfieldid' , $params->get('feed_orderbycustomfieldid' , '0'));
+		$params->set('orderbycustomfielddir', $params->get('feed_orderbycustomfielddir', 'ASC'));
+		$params->set('orderbycustomfieldint', $params->get('feed_orderbycustomfieldint', '0'));
+		
+		$cats = $this->get('Data');
 		
 		$feed_summary = $params->get('feed_summary', 0);
 		$feed_summary_cut = $params->get('feed_summary_cut', 200);
@@ -71,7 +78,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$img_field_name = $image_dbdata->name;
 		}
 		
-		foreach ( $rows as $row )
+		foreach ( $cats as $row )
 		{
 			// strip html from feed item title
 			$title = $this->escape( $row->title );
@@ -124,17 +131,17 @@ class FlexicontentViewCategory extends JViewLegacy
 	  		}
   		}
 	  	
-			//$author			= $row->created_by_alias ? $row->created_by_alias : $row->author;
-			@$date 			= ( $row->created ? date( 'r', strtotime($row->created) ) : '' );
+			//$author = $row->created_by_alias ? $row->created_by_alias : $row->author;
+			@$date    = ( $row->created ? date( 'r', strtotime($row->created) ) : '' );
 
 			// load individual item creator class
 			$item = new JFeedItem();
-			$item->title 		= $title;
-			$item->link 		= $link;
-			$item->description 	= $description;
-			$item->date			= $date;
-			//$item->author		= $author;
-			$item->category   	= $this->escape( $category->title );
+			$item->title 		   = $title;
+			$item->link 		   = $link;
+			$item->description = $description;
+			$item->date			   = $date;
+			//$item->author    = $author;
+			$item->category    = $this->escape( $category->title );
 
 			// loads item info into rss array
 			$doc->addItem( $item );

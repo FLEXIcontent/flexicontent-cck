@@ -1041,12 +1041,15 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			// Decide thumbnail to use
 			$thumb_size = 0;
-			if ($view == 'category')
-				$thumb_size =  $field->parameters->get('thumbincatview',1);
-			if($view == FLEXI_ITEMVIEW)
-				$thumb_size =  $field->parameters->get('thumbinitemview',2);
+			if ($isItemsManager)
+				$thumb_size = -1;
+			else if ($view == 'category')
+				$thumb_size = $field->parameters->get('thumbincatview',1);
+			else if ($view == FLEXI_ITEMVIEW)
+				$thumb_size = $field->parameters->get('thumbinitemview',2);
 			switch ($thumb_size)
 			{
+				case -1: $src = $srcb; break;
 				case 1: $src = $srcs; break;
 				case 2: $src = $srcm; break;
 				case 3: $src = $srcl; break;   // this makes little sense, since both thumbnail and popup image are size 'large'
@@ -1133,9 +1136,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$img_nolegend = '<img src="'.JURI::root().$srco.'" alt ="'.$alt.'" class="'.$class_img_field.'" />';
 					break;
 				case 'display': default:
-					$_src = $isItemsManager ? $srcb : $src;
-					$img_legend   = '<img src="'.JURI::root().$_src.'" alt ="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root().$_src.'" alt ="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root().$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
+					$img_nolegend = '<img src="'.JURI::root().$src.'" alt ="'.$alt.'" class="'.$class_img_field.'" />';
 					break;
 			}
 			
@@ -1255,7 +1257,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					// *** NEEDS: thumbnail list must be created with large size thubmnails, these will be then thumbnailed by the JS gallery code
 					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title,'s');
 					$img_legend_custom ='
-						 <img src="'.JURI::root().$_src.'" alt ="'.$alt.'"'.$legend.' class="'.$class_img_field.'"
+						 <img src="'.JURI::root().$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class_img_field.'"
 						 	data-large="' . JURI::root().$srcl . '" data-description="'.$title_attr.'"/>
 					';
 					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';

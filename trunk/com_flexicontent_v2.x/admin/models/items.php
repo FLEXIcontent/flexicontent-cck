@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1665 2013-04-08 02:26:21Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1794 2013-10-22 02:41:41Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -646,9 +646,9 @@ class FlexicontentModelItems extends JModelLegacy
 				. ' FROM #__content AS i'
 				. (($filter_state=='RV') ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' // left join needed to INCLUDE items do not have records in the multi-cats-items TABLE
 				.    ($filter_cats && !$filter_subcats ? ' AND rel.catid='.$filter_cats : '')
-				. ' JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
+				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'   // left join needed to detect items without type !!
 				. ' JOIN #__categories AS c ON c.id = i.catid'
 				. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
 				. $ver_specific_joins
@@ -666,6 +666,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. ' GROUP BY i.id'
 				;
 		}
+		//echo $query ."<br/><br/>";
 		return $query;
 	}
 
@@ -880,11 +881,17 @@ class FlexicontentModelItems extends JModelLegacy
 						if ($globalcats[$_dcatid]->published!=1) $_sub_cids[] = $_dcatid;
 					}
 				}
-				if ( empty ($_sub_cids) ) $where[] = 'rel.catid IN (0)';
-				else $where[] = 'rel.catid IN (' . implode( ', ', $_sub_cids ) . ')';
+				if ( empty ($_sub_cids) ) $where[] = ' FALSE  ';
+				else $where[] = '(rel.catid IN (' . implode( ', ', $_sub_cids ) . ')' .' OR '. 'c.id IN (' . implode( ', ', $_sub_cids ) . '))';
 				
 			} else {
 				$where[] = 'rel.catid = ' . $filter_cats;
+			}
+		} else {
+			if ($filter_catsinstate == 1) {
+				$where[] = '(rel.catid IN ( SELECT id FROM #__categories WHERE published=1 )' .' OR '. 'c.published = 1)';
+			} else if ($filter_catsinstate == 0) {
+				$where[] = '(rel.catid IN ( SELECT id FROM #__categories WHERE published=0 )' .' OR '. 'c.published = 0)';
 			}
 		}
 
@@ -947,7 +954,7 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 		if ($search && $scope == 4) {
-			$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $escaped_search, false ).' IN BOOLEAN MODE)';
+			$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $escaped_search.'*', false ).' IN BOOLEAN MODE)';
 		}
 		
 		// date filtering
