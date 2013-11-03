@@ -45,19 +45,19 @@ class FlexicontentController extends JControllerLegacy
 		
 		// GET POSTINSTALL tasks from session variable AND IF NEEDED re-evaluate it
 		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED
-		$dopostinstall = $session->get('flexicontent.postinstall');
+		$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 		$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
-		if(($dopostinstall===NULL) || ($dopostinstall===false) || $recheck_aftersave) {
+		if(($postinst_integrity_ok===NULL) || ($postinst_integrity_ok===false) || $recheck_aftersave) {
 			// NULL mean POSTINSTALL tasks has not been checked YET (current PHP user session),
 			// false means it has been checked during current session, but has failed one or more tasks
 			// In both cases we must evaluate the POSTINSTALL tasks,  and set the session variable
-			$session->set('flexicontent.postinstall', $dopostinstall = $this->getPostinstallState());
+			$session->set('flexicontent.postinstall', $postinst_integrity_ok = $this->getPostinstallState());
 			$session->set('unbounded_count', false, 'flexicontent');  // indicate to item manager to recheck unbound items
 		}
 		
-		// SET recheck_aftersave FLAG to indicate rechecking of postinstall tasks after configuration save or article importing
+		// SET recheck_aftersave FLAG to indicate rechecking of (a) post installation tasks AND (b) integrity checks after configuration save or article importing
 		if ($config_saved) {
-			$session->set('flexicontent.recheck_aftersave', !$dopostinstall);
+			$session->set('flexicontent.recheck_aftersave', !$postinst_integrity_ok);
 		} else {
 			$session->set('flexicontent.recheck_aftersave', true);
 		}
@@ -75,7 +75,7 @@ class FlexicontentController extends JControllerLegacy
 			$session->set('flexicontent.allplgpublish', $allplgpublish);
 		}
 		
-		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search', 'import')) && !$dopostinstall) {
+		if($view && in_array($view, array('items', 'item', 'types', 'type', 'categories', 'category', 'fields', 'field', 'tags', 'tag', 'archive', 'filemanager', 'templates', 'stats', 'search', 'import')) && !$postinst_integrity_ok) {
 			$msg = JText::_( 'FLEXI_PLEASE_COMPLETE_POST_INSTALL' );
 			$link 	= 'index.php?option=com_flexicontent';
 			$this->setRedirect($link, $msg);
@@ -90,6 +90,7 @@ class FlexicontentController extends JControllerLegacy
 		$this->registerTask( 'createdefaultype'			, 'createDefaultType' );
 		$this->registerTask( 'createdefaultfields'	, 'createDefaultFields' );
 		$this->registerTask( 'publishplugins'				, 'publishplugins' );
+		$this->registerTask( 'addmcatitemrelations'	, 'addMcatItemRelations' );
 		$this->registerTask( 'createlangcolumn'			, 'createLangColumn' );
 		$this->registerTask( 'createversionstbl'		, 'createVersionsTable' );
 		$this->registerTask( 'populateversionstbl'	, 'populateVersionsTable' );
@@ -163,6 +164,7 @@ class FlexicontentController extends JControllerLegacy
 		$existseplg 		= $model->getExistSearchPlugin();
 		$existsyplg 		= $model->getExistSystemPlugin();
 		
+		$existcats        = !$model->getItemsNoCat();
 		$existlang				= $model->getExistLanguageColumn() && !$model->getItemsNoLang();
 		$existversions 		= $model->getExistVersionsTable();
 		$existversionsdata= !$use_versioning || $model->getExistVersionsPopulated();
@@ -181,21 +183,21 @@ class FlexicontentController extends JControllerLegacy
 		
 		//echo "(!$existmenuitems) || (!$existtype) || (!$existfields) ||<br>";
 		//echo "     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
-		//echo "     (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
+		//echo "     (!existcats)  || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
 		//echo "     (!$oldbetafiles) || (!$nooldfieldsdata) || (!$missingversion) ||<br>";
 		//echo "     (!$initialpermission)<br>";
 		
 		// Display POST installation tasks if any task-check fails (returns false)
-		$dopostinstall = true;
+		$postinst_integrity_ok = true;
 		if ( !$existmenuitems || !$existtype || !$existfields ||
 		     //!$existfplg || !$existseplg || existsyplg ||
-		     !$existlang || !$existversions || !$existversionsdata || !$existauthors ||
+		     !$existcats || !$existlang || !$existversions || !$existversionsdata || !$existauthors ||
 		     !$oldbetafiles || !$nooldfieldsdata || !$missingversion || !$cachethumb ||
 				 !$initialpermission
 		   ) {
-			$dopostinstall = false;
+			$postinst_integrity_ok = false;
 		}
-		return $dopostinstall;
+		return $postinst_integrity_ok;
 	}
 	
 	
@@ -501,6 +503,8 @@ VALUES
 			}
 		}
 	}
+	
+	
 	/**
 	 * Method to set the default site language the items with no language
 	 * 
@@ -528,7 +532,7 @@ VALUES
 					. " WHERE i.language <> ie.language "				
 					;
 			$db->setQuery($query);
-			$result &= $db->query();
+			$result = $db->query();
 		}
 
 		// Set default translation group for items that don't have one
@@ -537,11 +541,39 @@ VALUES
 				. ' WHERE lang_parent_id = 0'
 				;
 		$db->setQuery($query);
-		$result &= $db->query();
+		$result = $db->query();
 		
 		return $result;
 	}
-
+	
+	/**
+	 * Method to set the default site language the items with no language
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function addmcatitemrelations()
+	{
+		$db = JFactory::getDBO();
+		$subquery 	= "SELECT i.catid, i.id, 0 FROM #__flexicontent_items_ext as ie "
+			. " JOIN #__content as i ON i.id=ie.item_id "
+			. " LEFT JOIN #__flexicontent_cats_item_relations as rel ON rel.catid=i.catid AND i.id=rel.itemid "
+			. " WHERE rel.catid IS NULL";
+		
+		// Set default language for items that do not have their language set
+		$query 	= 'INSERT INTO #__flexicontent_cats_item_relations'
+			.' (catid, itemid, ordering) '.$subquery;
+		$db->setQuery($query);
+		$result = $db->query();
+		
+		if (!$result) {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="existcats" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		} else {
+			echo '<span class="install-ok"></span>';
+		}
+	}
+	
 	/**
 	 * Method to create the language datas
 	 * 

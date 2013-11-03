@@ -105,6 +105,27 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		}
 	});
 <?php endif; ?>
+<?php if(!$this->existcats) : ?>
+	$('existcats').addEvent('click', function(e) {
+		//e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=addmcatitemrelations&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('existcats-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('existcats-log')
+			}).send();
+		}else{
+			$('existcats-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existcats-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
+<?php endif; ?>
 <?php if(!$this->existlang) : ?>
 	$('existlang').addEvent('click', function(e) {
 		//e = new Event(e).stop();
@@ -327,6 +348,14 @@ $('missingversion').addEvent('click', function(e) {
 		</td>
 		<td id="existfields-log">
 			<?php echo $this->existfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existfields" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_INSTALL_MCATS_RELATIONS' ); ?>
+		</td>
+		<td id="existcats-log">
+			<?php echo $this->existcats ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existcats" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 		</td>
 	</tr>
 	<tr>
