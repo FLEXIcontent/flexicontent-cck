@@ -396,7 +396,31 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 		return $return;
 	}
-
+	
+	/**
+	 * Method to get if main category of items exists in both category table and in flexicontent category-items relation table
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function getItemsNoCat()
+	{
+		static $return;
+		if ($return === NULL) {
+			$db = JFactory::getDBO();
+			$query = "SELECT count(*) FROM #__flexicontent_items_ext as ie "
+				. " JOIN #__content as i ON i.id=ie.item_id "
+				. " LEFT JOIN #__flexicontent_cats_item_relations as rel ON rel.catid=i.catid AND i.id=rel.itemid "
+				. " WHERE rel.catid IS NULL"
+				;
+			$db->setQuery($query);
+			$return = $db->loadResult();
+		}
+		
+		return $return;
+	}
+	
 	/**
 	 * Method to get if language of items is initialized properly
 	 * 

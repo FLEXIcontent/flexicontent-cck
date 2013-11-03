@@ -137,10 +137,10 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$optional_tasks = !$allplgpublish; // || ..
 		
 		// 3. OBLIGATORY AUTOMATIC TASKS, THAT WILL BLOCK COMPONENT USE UNTIL THEY ARE COMPLETED
-		$dopostinstall = $session->get('flexicontent.postinstall');
+		$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 		// THE FOLLOWING WILL ONLY BE DISPLAYED IF $DOPOSTINSTALL IS INCOMPLETE
 		// SO WHY CALCULATE THEM, WE SKIP THEM, USER MUST LOG OUT ANYWAY TO SEE THEM ...
-		if(($dopostinstall===NULL) || ($dopostinstall===false) || $optional_tasks) {
+		if(($postinst_integrity_ok===NULL) || ($postinst_integrity_ok===false) || $optional_tasks) {
 			$model 				= $this->getModel('flexicontent');
 			$use_versioning = $params->get('use_versioning', 1);
 			
@@ -152,6 +152,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$existseplg 		= $this->get( 'ExistSearchPlugin' );
 			$existsyplg 		= $this->get( 'ExistSystemPlugin' );
 			
+			$existcats					= !$this->get('ItemsNoCat');
 			$existlang	 				= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
 			$existversions 			= $this->get( 'ExistVersionsTable' );
 			$existversionsdata	= !$use_versioning || $this->get( 'ExistVersionsPopulated' );
@@ -270,7 +271,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$this->assignRef('website'		, $website);
 
 		// install check
-		$this->assignRef('dopostinstall'	, $dopostinstall);
+		$this->assignRef('dopostinstall'	, $postinst_integrity_ok);
 		$this->assignRef('allplgpublish'	, $allplgpublish);
 		$this->assignRef('existmenuitems'	, $existmenuitems);
 		$this->assignRef('existtype'			, $existtype);
@@ -278,6 +279,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$this->assignRef('existfplg'			, $existfplg);
 		$this->assignRef('existseplg'			, $existseplg);
 		$this->assignRef('existsyplg'			, $existsyplg);
+		$this->assignRef('existcats'			, $existcats);
 		$this->assignRef('existlang'			, $existlang);
 		$this->assignRef('existversions'		, $existversions);
 		$this->assignRef('existversionsdata', $existversionsdata);

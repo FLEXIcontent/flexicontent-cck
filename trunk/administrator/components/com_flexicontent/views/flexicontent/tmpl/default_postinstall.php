@@ -91,6 +91,24 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	});
 </script>
 <?php endif; ?>
+<?php if (!$this->existcats) : ?>
+<script type="text/javascript">
+	window.addEvent('domready', function(){
+		$('existcats').addEvent('click', function(e) {
+			$('existcats-log').setHTML('<img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center">');
+			e = new Event(e).stop();
+
+			var url = "index.php?option=com_flexicontent&task=addmcatitemrelations&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&format=raw";
+ 
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existcats-log')
+			});
+			ajax.request.delay(500, ajax);
+		});
+	});
+</script>
+<?php endif; ?>
 <?php if (!$this->existlang) : ?>
 <script type="text/javascript">
 	window.addEvent('domready', function(){
@@ -267,6 +285,14 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		</td>
 		<td id="existfields-log">
 			<?php echo $this->existfields ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existfields" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_INSTALL_MCATS_RELATIONS' ); ?>
+		</td>
+		<td id="existcats-log">
+			<?php echo $this->existcats ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existcats" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 		</td>
 	</tr>
 	<tr>
