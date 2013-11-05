@@ -101,6 +101,11 @@ $classspan = $tmpl_cols_spanclasses[$tmpl_cols];
 <ul class="faqblock <?php echo $classnum; ?> group row">	
 
 <?php
+$show_itemcount   = $this->params->get('show_itemcount', 1);
+$show_subcatcount = $this->params->get('show_subcatcount', 0);
+$itemcount_label   = ($show_itemcount==2   ? JText::_('FLEXI_ITEM_S') : '');
+$subcatcount_label = ($show_subcatcount==2 ? JText::_('FLEXI_CATEGORIES') : '');
+
 global $globalcats;
 $count_cat = -1;
 foreach ($cat_items as $catid => $items) :
@@ -132,10 +137,10 @@ foreach ($cat_items as $catid => $items) :
 			<?php if ($catid!=$currcatid) : ?>
 				<!-- BOF subcategory assigned/subcats_count  -->
 				<?php
-				if ($this->params->get('show_itemcount', 1)) {
-					$subsubcount = count($sub->subcats);
-					echo ' (' . ($sub->assigneditems != null ? $sub->assigneditems.'/'.$subsubcount : '0/'.$subsubcount) . ')';
-				}
+				$infocount_str = '';
+				if ($show_itemcount)   $infocount_str .= (int) $sub->assigneditems . $itemcount_label;
+				if ($show_subcatcount) $infocount_str .= ($show_itemcount ? ' / ' : '').count($sub->subcats) . $subcatcount_label;
+				if ($infocount_str) $infocount_str = ' (' . $infocount_str . ')';
 				?>
 				<!-- EOF subcategory assigned/subcats_count -->
 			<?php endif; ?>

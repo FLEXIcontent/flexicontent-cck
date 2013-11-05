@@ -36,7 +36,10 @@ $cats_label = JText::_( $this->category->id ? 'FLEXI_SUBCATEGORIES' : 'FLEXI_CAT
 
 // Sub-category information parameters
 $show_label_subcats = $this->params->get('show_label_subcats', 1);
-$show_itemcount     = $this->params->get('show_itemcount', 1);
+$show_itemcount   = $this->params->get('show_itemcount', 1);
+$show_subcatcount = $this->params->get('show_subcatcount', 0);
+$itemcount_label   = ($show_itemcount==2   ? ' '.JText::_('FLEXI_ITEM_S').' ' : '');
+$subcatcount_label = ($show_subcatcount==2 ? ' '.JText::_('FLEXI_CATEGORIES').' ' : '');
 $show_description_image_subcat = $this->params->get('show_description_image_subcat', 0);
 $show_description_subcat     = $this->params->get('show_description_subcat', 0);
 $description_cut_text_subcat = $this->params->get('description_cut_text_subcat', 120);
@@ -62,8 +65,11 @@ foreach ($this->categories as $sub) {
 	// b. Category title with link and optional item counts
 	$cat_link = ($layout=='myitems' || $layout=='author') ? $this->action .(strstr($this->action, '?') ? '&amp;'  : '?'). 'cid='.$sub->slug :
 		JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) );
-	$itemcount = !$show_itemcount ? '' : '	(' . ($sub->assigneditems != null ? $sub->assigneditems.'/'.$subsubcount : '0/'.$subsubcount) . ')';
-	$subcats_html[$i] .= "    <a class='catlink' href='".$cat_link."'>".$this->escape($sub->title)."</a>".$itemcount."</span>\n";
+	$infocount_str = '';
+	if ($show_itemcount)   $infocount_str .= (int) $sub->assigneditems . $itemcount_label;
+	if ($show_subcatcount) $infocount_str .= ($show_itemcount ? ' / ' : '').count($sub->subcats) . $subcatcount_label;
+	if ($infocount_str) $infocount_str = ' (' . $infocount_str . ')';
+	$subcats_html[$i] .= "    <a class='catlink' href='".$cat_link."'>".$this->escape($sub->title)."</a>".$infocount_str."</span>\n";
 	
 	// c. Optional sub-category description stripped of HTML and cut to given length
 	if ($show_description_subcat && $sub->description) {

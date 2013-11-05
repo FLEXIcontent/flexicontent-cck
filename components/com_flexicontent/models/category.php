@@ -1094,9 +1094,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
 		$nullDate = $db->getNullDate();
 		
-		// Show assigned items, this should not cause problems, category parameters says not to display itemcount for subcategories
-		if ( !$params->get('show_itemcount', 0) ) return null;
-		
 		// Get some parameters and other info
 		$catlang = $params->get('language', '');          // category language (currently UNUSED), this is property in J2.5 instead of as parameter in FC J1.5
 		$lang = flexicontent_html::getUserCurrentLang();   // Get user current language
@@ -1252,6 +1249,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( !$this->_id && !count($this->_ids)) return array();
 		
 		$cparams = $this->_params;
+		$show_itemcount   = $cparams->get('show_itemcount', 1);
+		//$show_subcatcount = $cparams->get('show_subcatcount', 0);
+		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
 		if ( $print_logging_info )  $start_microtime = microtime(true);
@@ -1264,7 +1264,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		for($i = 0; $i < $count; $i++)
 		{
 			$category =& $this->_childs[$i];
-			$category->assigneditems = $this->_getassigned( $category->id );
+			$category->assigneditems = !$show_itemcount   ? null : $this->_getassigned( $category->id );
 			$category->subcats       = $this->_getsubs( $category->id );
 			//$this->_id        = $category->id;
 			//$category->items  = $this->getData();

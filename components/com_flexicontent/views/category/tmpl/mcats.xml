@@ -138,6 +138,13 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
+				<option value="2">FLEXI_SHOW_WITH_LABEL</option>
+			</field>
+			<field name="show_subcatcount" type="list" default="" label="FLEXI_SHOW_SUBCATS_COUNT" description="FLEXI_SHOW_SUBCATS_COUNT_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+				<option value="2">FLEXI_SHOW_WITH_LABEL</option>
 			</field>
 			<field name="subcat_orderby" type="list" default="" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
