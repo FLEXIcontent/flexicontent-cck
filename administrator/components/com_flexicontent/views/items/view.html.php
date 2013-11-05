@@ -298,7 +298,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$unassociated	= $model->getUnassociatedItems(1000000, $_ids_only=true);
 		
 		$rows     	= $this->get( 'Data');
-		$pageNav 		= $this->get( 'Pagination' );
+		$pagination	= $this->get( 'Pagination' );
 		$types			= $this->get( 'Typeslist' );
 		$authors		= $this->get( 'Authorslist' );
 		// these depend on data rows and must be called after getting data
@@ -310,7 +310,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$categories = $globalcats ? $globalcats : array();
 		
 		
-		$limit = $pageNav->limit;
+		$limit = $pagination->limit;
 		$inline_ss_max = 30;
 		$drag_reorder_max = 100;
 		if ( $limit > $drag_reorder_max ) $cparams->set('draggable_reordering', 0);
@@ -506,7 +506,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		if ($enable_translation_groups)  $this->assignRef('lang_assocs', $langAssocs);
 		if (FLEXI_FISH || FLEXI_J16GE)   $this->assignRef('langs', $langs);
 		$this->assignRef('cid'      	, $cid);
-		$this->assignRef('pageNav' 		, $pageNav);
+		$this->assignRef('pagination'	, $pagination);
 		$this->assignRef('ordering'		, $ordering);
 		$this->assignRef('CanOrder'		, $CanOrder);
 		$this->assignRef('CanCats'		, $CanCats);

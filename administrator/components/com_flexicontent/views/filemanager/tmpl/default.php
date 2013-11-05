@@ -282,7 +282,7 @@ table#filemanager-zone label {
 
 	<table class="adminform">
 		<tr>
-			<td width="100%">
+			<td align="left">
 				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
 				<?php echo $this->lists['filter']; ?>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
@@ -290,6 +290,19 @@ table#filemanager-zone label {
 				<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 			</td>
 			<td nowrap="nowrap">
+				<div class="limit" style="display: inline-block;">
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+				</div>
+				
+				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
+					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+				</span>
+				
+				<span class="fc_pages_counter">
+					<?php echo $this->pagination->getPagesCounter(); ?>
+				</span>
+			</td>
+			<td style="text-align:right;">
 				<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
@@ -323,7 +336,7 @@ table#filemanager-zone label {
 	<tfoot>
 		<tr>
 			<td colspan="13">
-				<?php echo $this->pageNav->getListFooter(); ?>
+				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
 		
@@ -401,7 +414,7 @@ table#filemanager-zone label {
 			$items_list = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_fileid='. $row->id;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td width="7">
 				<?php echo $checked; ?>
 			</td>

@@ -22,7 +22,7 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox','adminListTableFC
 
 global $globalcats;
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
-$limit = $this->pageNav->limit;
+$limit = $this->pagination->limit;
 $ctrl  = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 $cats_task  = FLEXI_J16GE ? 'task=category.' : 'controller=categories&task=';
@@ -296,44 +296,6 @@ window.addEvent('domready', function() {
 		</div>
 	</div>
 	
-	<div style="margin: 6px 0px;">
-	
-		<div style="float:left; margin:0px 12px;">
-			<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_GO' /*'FLEXI_APPLY_FILTERS'*/ ); ?>" />
-			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET' /*'FLEXI_RESET_FILTERS'*/ ); ?>" />
-			<!--
-			<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
-			<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
-			-->
-		</div>
-		
-		<div class="limit" style="display: inline-block;">
-			<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pageNav->getLimitBox(); ?>
-		</div>
-		
-		<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
-			<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pageNav->getResultsCounter(); // custom Results Counter ?>
-		</span>
-		
-		<span class="fc_pages_counter">
-			<?php echo $this->pageNav->getPagesCounter(); ?>
-		</span>
-
-		<div class='fc_mini_note_box' style='display: inline-block !important;'>
-			<?php
-			$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
-			if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
-			echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
-			?>
-		</div>
-		
-		<?php if (@$this->lists['filter_fileid']): ?>
-			<div class="fcclear"></div>
-			<?php echo '<label class="label">'.JText::_('List items using file') . '</label> ' . $this->lists['filter_fileid']; ?>
-		<?php endif; ?>
-		
-	</div>
-	
 	<table id="adminListTableFCitems" class="adminlist" cellspacing="1">
 	<thead>
 		<tr>
@@ -528,12 +490,52 @@ window.addEvent('domready', function() {
 				<input type="text" name="filter_id" id="filter_id" size="4" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
 			</td>
 		</tr>
+		
+		
+		<tr>
+			<td colspan="<?php echo $items_list_cols; ?>" class="filterbuttons">
+				
+				<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+				<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				<!--
+				<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
+				<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
+				-->
+				
+				<div class="limit" style="display: inline-block; margin-left: 24px;">
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+				</div>
+				
+				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
+					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+				</span>
+				
+				<span class="fc_pages_counter">
+					<?php echo $this->pagination->getPagesCounter(); ?>
+				</span>
+				
+				<div class='fc_mini_note_box' style='display: inline-block; float:right; clear:both!important;'>
+					<?php
+					$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
+					if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
+					echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
+					?>
+				</div>
+				
+				<?php if (@$this->lists['filter_fileid']): ?>
+					<div class="fcclear"></div>
+					<?php echo '<label class="label">'.JText::_('List items using file') . '</label> ' . $this->lists['filter_fileid']; ?>
+				<?php endif; ?>
+				
+			</td>
+		</tr>
+
 	</thead>
 
 	<tfoot>
 		<tr>
 			<td colspan="<?php echo $items_list_cols; ?>">
-				<?php echo $this->pageNav->getListFooter(); ?>
+				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
 		
@@ -652,7 +654,7 @@ window.addEvent('domready', function() {
 			$row->lang = @$row->lang ? $row->lang : $lang_default;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td align="center" class="sort_handle"><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td align="center" class="sort_handle"><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td align="center"><?php echo $cid_checkbox; ?></td>
 			<td align="center">
 				<?php
@@ -826,8 +828,8 @@ window.addEvent('domready', function() {
 						else echo sprintf($drag_handle_box,'_none');
 					?>
 				<?php else: ?>
-					<span><?php echo $this->pageNav->orderUpIcon( $i, $show_orderUp, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
-					<span><?php echo $this->pageNav->orderDownIcon( $i, $n, $show_orderDown, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
+					<span><?php echo $this->pagination->orderUpIcon( $i, $show_orderUp, $ctrl.'orderup', 'Move Up', $this->ordering ); ?></span>
+					<span><?php echo $this->pagination->orderDownIcon( $i, $n, $show_orderDown, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
 				<?php endif; ?>
 
 				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>

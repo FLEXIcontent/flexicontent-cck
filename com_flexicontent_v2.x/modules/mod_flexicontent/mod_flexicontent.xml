@@ -86,7 +86,21 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="carousel_duration" type="text" default="500" label="Change duration (ms)" description="Milliseconds that a carousel change will last" />
+			<field name="carousel_effect" type="list" default="quart" label="Transition Effect" description="Select the effect to be used when carousel updates" >
+				<option value="linear">Linear</option>
+				<option value="quad">Easing end: Quadratic</option>
+				<option value="cubic">Easing end: Cubic</option>
+				<option value="quart">Easing end: Quartic</option>
+				<option value="quint">Easing end: Quintic</option>
+				<option value="pow">Easing end: Power</option>
+				<option value="expo">Easing end: Exponential</option>
+				<option value="circ">Easing end: Circular</option>
+				<option value="sine">Easing end: Sinusoidal</option>
+				<option value="back">Easing end + Bounce Effect: Back</option>
+				<option value="bounce">Easing end + Bounce effect: Bouncing</option>
+				<option value="elastic">Easing end + Bounce effect: Elastic</option>
+			</field>
+			<field name="carousel_duration" type="text" default="1000" label="Change duration (ms)" description="Milliseconds that a carousel change will last" />
 			<field name="carousel_interval" type="text" default="5000" label="Autoplay Interval (ms)" description="Milliseconds between autoplay steps" />
 			
 			<field name="" type="separator" default="Miscellaneous" level="level2" />

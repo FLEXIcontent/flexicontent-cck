@@ -129,6 +129,19 @@ function delAllFilters() {
 				<td colspan="9" class="filterbuttons">
 					<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
 					<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				
+					<div class="limit" style="display: inline-block; margin-left: 24px;">
+						<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+					</div>
+					
+					<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
+						<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+					</span>
+					
+					<span class="fc_pages_counter">
+						<?php echo $this->pagination->getPagesCounter(); ?>
+					</span>
+					
 					<?php if (isset($this->lists['filter_stategrp'])) : ?>
 						<span class="radio flexi_tabbox" style="margin-left:60px;"><?php echo '<span class="flexi_tabbox_label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_stategrp']; ?></span>
 					<?php endif; ?>
@@ -136,7 +149,7 @@ function delAllFilters() {
 					<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
 					<span class="radio flexi_tabbox" style="margin-left:60px;"><?php echo '<span class="flexi_tabbox_label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_indextype']; ?></span>
 					</div>
-	
+
 	<!--
 					<span style="float:right;">
 						<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />

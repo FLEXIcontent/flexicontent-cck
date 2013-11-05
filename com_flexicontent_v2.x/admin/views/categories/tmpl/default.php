@@ -45,13 +45,26 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 
 	<table class="adminform">
 		<tr>
-			<td width="100%">
+			<td align="left">
 				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
 				<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
 				<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
 			</td>
 			<td nowrap="nowrap">
+				<div class="limit" style="display: inline-block;">
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+				</div>
+				
+				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
+					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+				</span>
+				
+				<span class="fc_pages_counter">
+					<?php echo $this->pagination->getPagesCounter(); ?>
+				</span>
+			</td>
+			<td style="text-align:right;">
 				<div class="filter-select fltrt">
 					<?php echo $this->lists['cats']; ?>
 					<?php echo $this->lists['level']; ?>
