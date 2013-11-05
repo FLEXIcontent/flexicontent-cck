@@ -45,23 +45,39 @@
 	margin: 0 1%;
 }
 
-.carousel.mod_flexicontent_wrapper span.mod_fc_nav {
+.carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_horizontal {
 	background: url("images/nav.png") no-repeat scroll -20% 50% #000000 !important;
-	border-radius: 10px 0 0 10px !important;
-	cursor: pointer !important;
+	position: absolute !important;
 	height: 100% !important;
+	width: 28px;
+	border-radius: 10px 0 0 10px !important;
+}
+.carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_vertical {
+	background: url("images/nav_vertical.png") no-repeat scroll 50% -20% #000000 !important;
+	position: relative !important;
+	height: 28px;
+	width: 100%;
+	border-radius: 10px 10px 0 0 !important;
+}
+.carousel.mod_flexicontent_wrapper span.mod_fc_nav {
+	display: block !important;
+	cursor: pointer !important;
 	left: 0 !important;
 	opacity: 1 !important;
 	filter: alpha(opacity = 100) !important;
 	outline: medium none !important;
-	position: absolute !important;
 	text-indent: -9000px !important;
 	top: 0;
-	width: 28px;
 }
-.carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_next {
+.carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_horizontal.fc_next {
 	background-position: 115% 50% !important;
 	border-radius: 0 10px 10px 0 !important;
+	left: auto !important;
+	right: 0 !important;
+}
+.carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_vertical.fc_next {
+	background-position: 50% 115% !important;
+	border-radius: 0 0 10px 10px !important;
 	left: auto !important;
 	right: 0 !important;
 }
@@ -425,8 +441,13 @@
 	height: auto !important;
 }
 
-.mod_fc_carousel_mask.fc_has_nav {
+.mod_fc_carousel_mask.fc_has_nav.fc_horizontal {
 	margin: 0px 28px 0px 28px !important;
+	width: auto !important;
+}
+
+.mod_fc_carousel_mask.fc_has_nav.fc_vertical {
+	margin: 0px !important;
 	width: auto !important;
 }
 

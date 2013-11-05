@@ -96,7 +96,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		} else {
 			// TODO MORE ...
 		}
-		$pageNav = $this->get('Pagination');
+		$pagination = $this->get('Pagination');
 		//$users = $this->get('Users');
 		
 		// Get item using at least one file (-of- the currently listed files)
@@ -173,7 +173,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		}
 		$this->assignRef('lists'      , $lists);
 		$this->assignRef('rows'       , $rows);
-		$this->assignRef('pageNav'    , $pageNav);
+		$this->assignRef('pagination' , $pagination);
 		$this->assignRef('CanFiles'        , $perms->CanFiles);
 		$this->assignRef('CanUpload'       , $perms->CanUpload);
 		$this->assignRef('CanViewAllFiles' , $perms->CanViewAllFiles);

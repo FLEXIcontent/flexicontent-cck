@@ -85,8 +85,9 @@ $handle_event  = $params->get('carousel_handle_event', 'mouseover');
 
 // Autoplay, autoplay interval, and affect duration
 $autoplay = $params->get('carousel_autoplay', 1);
+$effect   = $params->get('carousel_effect', 'quart').':out';
+$duration = (int)$params->get('carousel_duration', 1000);
 $interval = (int)$params->get('carousel_interval', 5000);
-$duration = (int)$params->get('carousel_duration', 500);
 
 // Miscellaneous Optionally displayed
 $show_controls      = (int)$params->get('carousel_show_controls', 0);
@@ -105,7 +106,7 @@ $_ns_handle_event = $handle_event;
 $_ns_autoPlay     = $autoplay ? "true" : "false";
 $_ns_interval     = $interval;
 $_ns_size         = $mode=="horizontal" ? $hdir_item_width + $extra_width : 240;  // 240 is just a default it will be recalulated after page load ends
-$_ns_fxOptions    = "{duration:".$duration."}";
+$_ns_fxOptions    = '{ duration:'.$duration.', transition: "'.$effect.'", link: "cancel" }';
 ?>
 
 <div class="carousel mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_carousel<?php echo $module->id ?>">
@@ -301,11 +302,10 @@ $_ns_fxOptions    = "{duration:".$duration."}";
 <div class="mod_fc_carousel">
 	
 	<?php if ($show_controls==1) : ?>
-	<span id="previous_fcmod_<?php echo $module->id; ?>" class="mod_fc_nav fc_prev" ></span>
-	<span id="next_fcmod_<?php echo $module->id; ?>"     class="mod_fc_nav fc_next" ></span>
+	<span id="previous_fcmod_<?php echo $module->id; ?>"  class="mod_fc_nav fc_prev fc_<?php echo $mode; ?>" ></span> 
 	<?php endif; ?>
 	
-	<div id="mod_fc_carousel_mask<?php echo $module->id ?>" class="mod_fc_carousel_mask <?php echo $show_controls==1 ? 'fc_has_nav' : ''; ?>">
+	<div id="mod_fc_carousel_mask<?php echo $module->id ?>" class="mod_fc_carousel_mask <?php echo $show_controls==1 ? 'fc_has_nav fc_'.$mode : ''; ?>">
 		
 		<div class="mod_flexicontent_standard" id="mod_fcitems_box_standard<?php echo $module->id ?>">
 			
@@ -446,7 +446,11 @@ $_ns_fxOptions    = "{duration:".$duration."}";
 		<!-- EOF standard items -->
 		
 	</div> <!-- mod_fc_carousel_mask{module_id} -->
-		
+
+	<?php if ($show_controls==1) : ?>
+	<span id="next_fcmod_<?php echo $module->id; ?>"  class="mod_fc_nav fc_next fc_<?php echo $mode; ?>" ></span>
+	<?php endif; ?>
+
 </div> <!-- mod_fc_carousel -->
 		
 		<?php if ($show_controls==2) : ?>
@@ -498,6 +502,7 @@ flexicontent_html::loadFramework('noobSlide');
 $document = JFactory::getDocument();
 
 $js ='
+	var mod_fc_carousel'.$module->id.'_ns_fxOptions='.$_ns_fxOptions.';
 	var mod_fc_carousel'.$module->id.'_autoPlay='.$autoplay.';
 	var mod_fc_carousel'.$module->id.';
 	window.addEvent("domready",function(){
@@ -516,7 +521,7 @@ $js ='
 			mode: "'.$_ns_mode.'",
 			interval: '.$_ns_interval.',
 			autoPlay: '.$_ns_autoPlay.',
-			fxOptions: '.$_ns_fxOptions.',
+			fxOptions: mod_fc_carousel'.$module->id.'_ns_fxOptions,
 			onWalk: function(currentItem,currentHandle){
 				'.( !$show_curritem_info ? '' : '
 				(MooTools.version>="1.2.4" ?

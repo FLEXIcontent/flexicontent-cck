@@ -127,6 +127,7 @@ window.addEvent('domready', function(){
 
 <div class="flexicontent">
 <form action="index.php?option=com_flexicontent&controller=users&view=users" method="post" name="adminForm">
+	
 	<table class="adminlist" cellpadding="1">
 		<thead>
 			<tr>
@@ -215,66 +216,77 @@ window.addEvent('domready', function(){
 				</th>
 			</tr>
 
-		<tr id="filterline">
-			<td class="left col_title" colspan="3">
-				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
-				<input type="text" name="search" id="search" value="<?php echo htmlspecialchars($this->lists['search']);?>" class="text_area" style='width:140px;' onchange="document.adminForm.submit();" />
-			</td>
-			<td class="left col_itemscount">
-				<?php echo $this->lists['filter_itemscount']; ?>
-			</td>
-			<td class="left"></td>
-			<td class="left col_logged">
-				<?php echo $this->lists['filter_logged']; ?>
-			</td>
-			<td class="left"></td>
-			<td class="left col_usergrp">
-				<?php echo $this->lists['filter_usergrp']; ?>
-			</td>
-			<td class="left"></td>
-			<td class="left col_registered col_visited" colspan="2">
-				<span class="radio"><?php echo $this->lists['date']; ?></span>
-				<?php echo $this->lists['startdate']; ?>&nbsp;&nbsp;<?php echo $this->lists['enddate']; ?>
-			</td>
-			<td class="left col_id">
-				<input type="text" name="filter_id" id="filter_id" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
-			</td>
-		</tr>
+			<tr id="filterline">
+				<td class="left col_title" colspan="3">
+					<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
+					<input type="text" name="search" id="search" value="<?php echo htmlspecialchars($this->lists['search']);?>" class="text_area" style='width:140px;' onchange="document.adminForm.submit();" />
+				</td>
+				<td class="left col_itemscount">
+					<?php echo $this->lists['filter_itemscount']; ?>
+				</td>
+				<td class="left"></td>
+				<td class="left col_logged">
+					<?php echo $this->lists['filter_logged']; ?>
+				</td>
+				<td class="left"></td>
+				<td class="left col_usergrp">
+					<?php echo $this->lists['filter_usergrp']; ?>
+				</td>
+				<td class="left"></td>
+				<td class="left col_registered col_visited" colspan="2">
+					<span class="radio"><?php echo $this->lists['date']; ?></span>
+					<?php echo $this->lists['startdate']; ?>&nbsp;&nbsp;<?php echo $this->lists['enddate']; ?>
+				</td>
+				<td class="left col_id">
+					<input type="text" name="filter_id" id="filter_id" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
+				</td>
+			</tr>
 
+			<tr>
+				<td colspan="12" class="filterbuttons">
+					<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+					<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+				
+					<div class="limit" style="display: inline-block; margin-left: 24px;">
+						<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+					</div>
+					
+					<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
+						<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+					</span>
+					
+					<span class="fc_pages_counter">
+						<?php echo $this->pagination->getPagesCounter(); ?>
+					</span>
+					
+					<div class='fc_mini_note_box' style='display: inline-block; float:right; clear:both!important;'>
+					<?php
+					if (FLEXI_J16GE) {
+						$tz_string = JFactory::getApplication()->getCfg('offset');
+						$tz = new DateTimeZone( $tz_string );
+						$tz_offset = $tz->getOffset(new JDate()) / 3600;
+						$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
+						$tz_info .= ' ('.$tz_string.')';
+						echo JText::sprintf( 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE', '', $tz_info);
+					} else {
+						$tz_offset = JFactory::getApplication()->getCfg('offset');
+						$tz_info =  ($tz_offset > 0) ? ' UTC +'. $tz_offset : ' UTC '. $tz_offset;
+						echo JText::sprintf( 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '', $tz_info );
+					}
+					?>
+					</div>
 
-		<tr>
-			<td colspan="<?php echo '12'; ?>" class="filterbuttons">
-				<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-				<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
-
-				<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
-				<?php
-				if (FLEXI_J16GE) {
-					$tz_string = JFactory::getApplication()->getCfg('offset');
-					$tz = new DateTimeZone( $tz_string );
-					$tz_offset = $tz->getOffset(new JDate()) / 3600;
-					$tz_info =  $tz_offset > 0 ? ' UTC +'.$tz_offset : ' UTC '.$tz_offset;
-					$tz_info .= ' ('.$tz_string.')';
-					echo JText::sprintf( 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE', '', $tz_info);
-				} else {
-					$tz_offset = JFactory::getApplication()->getCfg('offset');
-					$tz_info =  ($tz_offset > 0) ? ' UTC +'. $tz_offset : ' UTC '. $tz_offset;
-					echo JText::sprintf( 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '', $tz_info );
-				}
-				?>
-				</div>
-
-<!--
-				<span style="float:right;">
-					<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
-					<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-
-					<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
-					<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
-				</span>
--->
-			</td>
-		</tr>
+	<!--
+					<span style="float:right;">
+						<input type="button" class="button" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+						<input type="button" class="button submitbutton" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+						
+						<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
+						<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
+					</span>
+	-->
+				</td>
+			</tr>
 
 
 		</thead>
