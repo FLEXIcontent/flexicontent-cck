@@ -234,7 +234,9 @@ class FlexicontentControllerUsers extends FlexicontentController
 				$adminName 	= $FromName;
 				$adminEmail = $MailFrom;
 			}
-			JUtility::sendMail( $adminEmail, $adminName, $user->get('email'), $subject, $message );
+			FLEXI_J16GE ?
+				JFactory::getMailer()->sendMail( $adminEmail, $adminName, $user->get('email'), $subject, $message ) :
+				JUtility::sendMail( $adminEmail, $adminName, $user->get('email'), $subject, $message );
 		}
 
 		// If updating self, load the new user object into the session

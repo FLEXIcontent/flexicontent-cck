@@ -22,7 +22,7 @@ flexicontent_html::jscode_to_showhide_table('mainChooseColBox','adminListTableFC
 
 global $globalcats;
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
-$limit = $this->pageNav->limit;
+$limit = $this->pagination->limit;
 $ctrl  = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 $cats_task  = FLEXI_J16GE ? 'task=category.' : 'controller=categories&task=';

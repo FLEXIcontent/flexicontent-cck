@@ -3880,15 +3880,20 @@ class ParentClassItem extends JModelLegacy
 		// **********
 		// Send email
 		// **********
+		$from      = $app->getCfg( 'mailfrom' );
+		$fromname  = $app->getCfg( 'fromname' );
+		$recipient = $params->get('nf_send_as_bcc', 0) ? array($from) : $notify_emails;
+		$html_mode = true;
+		$cc  = null;
+		$bcc = $params->get('nf_send_as_bcc', 0) ? $notify_emails : null;
+		$attachment  = null;
+		$replyto     = null;
+		$replytoname = null;
 		
-		jimport( 'joomla.utilities.utility' );
-		$send_result = JUtility::sendMail(
-			$from      = $app->getCfg( 'mailfrom' ),
-			$fromname  = $app->getCfg( 'fromname' ),
-			$recipient = $params->get('nf_send_as_bcc', 0) ? array($from) : $notify_emails,
-			$subject,	$body, $html_mode=true, $cc=null,
-			$bcc = $params->get('nf_send_as_bcc', 0) ? $notify_emails : null,
-			$attachment=null, $replyto=null, $replytoname=null);
+		if (!FLEXI_J16GE) jimport( 'joomla.utilities.utility' );
+		$send_result = FLEXI_J16GE ?
+			JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
+			JUtility::sendMail( $from, $fromname, $recipient, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 		
 		$debug_str = ""
 			."<br/>FROM: $from"

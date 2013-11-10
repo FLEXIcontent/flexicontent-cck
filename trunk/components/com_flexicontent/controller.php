@@ -431,7 +431,7 @@ class FlexicontentController extends JControllerLegacy
 		if ( !$isnew )
 		{
 			$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
-				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 				. ' WHERE rel.itemid = '.(int) $model->get('id');
 			$db->setQuery( $query );
 			$before_cats = $db->loadObjectList('id');
@@ -506,7 +506,7 @@ class FlexicontentController extends JControllerLegacy
 		// Get categories added / removed from the item
 		// ********************************************
 		$query 	= 'SELECT DISTINCT c.id, c.title FROM #__categories AS c'
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 			. ' WHERE rel.itemid = '.(int) $model->get('id');
 		$db->setQuery( $query );
 		$after_cats = $db->loadObjectList('id');
@@ -1878,14 +1878,15 @@ class FlexicontentController extends JControllerLegacy
 				}
 				//echo "<pre>". $_message ."</pre>";
 				
-				$send_result = JUtility::sendMail(
-					$from = $sendermail,
-					$fromname = $sendername,
-					$recipient = array($to),
-					$subject,	$_message, $html_mode=false, $cc=null,
-					$bcc = null,
-					$attachment=null, $replyto=null, $replytoname=null)
-					;
+				$from = $sendermail;
+				$fromname = $sendername;
+				$recipient = array($to);
+				$html_mode=false; $cc=null; $bcc=null;
+				$attachment=null; $replyto=null; $replytoname=null;
+				
+				$send_result = FLEXI_J16GE ?
+					JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
+					JUtility::sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 			}
 			ob_end_clean();
 		}
