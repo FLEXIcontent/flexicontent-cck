@@ -14,7 +14,7 @@
 	<fields name="params" addfieldpath="/administrator/components/com_flexicontent/elements">
 		
 		<fieldset name="basic" label="FLEXI_PARAMETERS_CAT_BASIC_OVERRIDE_CONF">
-			<field name="item_depth" type="list" default="O" label="FLEXI_START_ADDING_PARENTS_AT_DEPTH" description="FLEXI_START_ADDING_PARENTS_AT_DEPTH_DESC" >
+			<field name="item_depth" type="list" default="0" label="FLEXI_START_ADDING_PARENTS_AT_DEPTH" description="FLEXI_START_ADDING_PARENTS_AT_DEPTH_DESC" >
 				<option value="0">FLEXI_ROOT</option>
 				<option value="1">FLEXI_LEVEL_1</option>
 				<option value="2">FLEXI_LEVEL_2</option>

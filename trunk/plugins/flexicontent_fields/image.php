@@ -1241,9 +1241,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						';
 					break;
 				case 6:   // (Widgetkit) SPOTlight image popup
+					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title,'s');
 					$group_str = $group_name ? 'data-spotlight-group="'.$group_name.'"' : '';
-					$title_attr = $title .' | '. ($desc ? $desc : $title);
-					$title_attr = flexicontent_html::escapeJsText($title_attr,'s');
 					$field->{$prop}[] = '
 						<a href="'.$srcl.'" data-lightbox="on" data-spotlight="effect:bottom" '.$group_str.' title="'.$title_attr.'">
 							'.$img_nolegend.'

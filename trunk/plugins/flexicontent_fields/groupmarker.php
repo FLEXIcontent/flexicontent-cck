@@ -43,11 +43,11 @@ class plgFlexicontent_fieldsGroupmarker extends JPlugin
 				array_push($tabsetStack, $tabSetCur);
 				$tabSetCur = ++$tabSetCnt;
 				if (!isset($tabCnt[$tabSetCur])) $tabCnt[$tabSetCur] = 0;
-				
 				$field->html .= "<div style='margin-top:24px; width:100%; float:left; clear:both;'></div>\n";
 				$field->html .= "<!-- tabber start --><div class='fctabber ".$cont_cssclass."' id='grpmarker_tabset_".($tabSetCur)."'>\n";
 				break;
 			case 'tab_open':
+				if (empty($cont_label)) $cont_label = "TAB LABEL NOT SET";
 				$field->html .= " <div class='tabbertab' style='float:left;' id='grpmarker_tabset_".$tabSetCur."_tab_".($tabCnt[$tabSetCur]++)."'>\n";
 				$field->html .= "  <h3 class='tabberheading'>".JText::_( $cont_label )."</h3>\n";   // Current TAB LABEL
 				$field->html .= $cont_cssclass? "  <div class='".$cont_cssclass."'>\n" : " <div style='border:0px!important; margin:0px!important; padding:0px!important;'>\n";

@@ -208,17 +208,24 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		// ***********************************************
 		// Item retrieving query ... CREATE ORDERBY CLAUSE
 		// ***********************************************
-		$order = $field->parameters->get( 'orderby_form', 'alpha' );
+		$order = $field->parameters->get( 'orderby_form', 'alpha' );   // TODO: add more orderings: commented, rated
 		$orderby = flexicontent_db::buildItemOrderBy($field->parameters, $order, $request_var='', $config_param='', $item_tbl_alias = 'i', $relcat_tbl_alias = 'rel');
+		
+		// Create JOIN for ordering items by a most rated
+		if ($order=='author' || $order=='rauthor') {
+			$orderby_join = ' LEFT JOIN #__users AS u ON u.id = i.created_by';
+		}
 		
 		
 		// *****************************************************
 		// Item retrieving query ... put together and execute it
 		// *****************************************************
-		$query = "SELECT i.title, i.id, i.catid, i.state, GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist, i.alias FROM #__content AS i "
+		$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias'
+			.', GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist'
+			.' FROM #__content AS i '
 			. (($samelangonly || $method_types>1) ? " LEFT JOIN #__flexicontent_items_ext AS ie on i.id=ie.item_id " : "")
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel on i.id=rel.itemid '
-			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel on i.id=rel.itemid '
+			. @ $orderby_join
 			. $where
 			. " GROUP BY rel.itemid "
 			. $orderby

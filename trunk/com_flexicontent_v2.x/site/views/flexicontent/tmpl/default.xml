@@ -134,7 +134,7 @@
 				<option value="3">FLEXI_3_COLS</option>
 				<option value="4">FLEXI_4_COLS</option>
 			</field>
-			<field name="column1" type="text" default="200" size="4" label="FLEXI_COLUMN1_BLOCKS_COUNT" description="FLEXI_COLUMN1_BLOCKS_COUNT_DESC" />
+			<field name="column1" type="text" default="0" size="4" label="FLEXI_COLUMN1_BLOCKS_COUNT" description="FLEXI_COLUMN1_BLOCKS_COUNT_DESC" />
 			<field name="column2" type="text" default="0" size="4" label="FLEXI_COLUMN2_BLOCKS_COUNT" description="FLEXI_COLUMN2_BLOCKS_COUNT_DESC" />
 			<field name="column3" type="text" default="0" size="4" label="FLEXI_COLUMN3_BLOCKS_COUNT" description="FLEXI_COLUMN3_BLOCKS_COUNT_DESC" />
 			
