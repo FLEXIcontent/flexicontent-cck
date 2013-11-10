@@ -54,13 +54,18 @@ $joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';
 // Get the directory menu parameters 
 $cols = JRequest::getVar('columns_count',false);
 if(!$cols) $cols = $this->params->get('columns_count',1);
+
+// If 0 blocks for col, divide equally between columns
+$items_per_column = round(count($this->categories)/$cols);
+
 $c1 = $this->params->get('column1',false);
-if(!$c1) $c1 = $this->params->get('column1',200);
+if(!$c1) $c1 = $items_per_column;
 $c2 = $this->params->get('column2',false);
-if(!$c2) $c2 = $this->params->get('column2',200);
+if(!$c2) $c2 = $items_per_column;
 $c3 = $this->params->get('column3',false);
-if(!$c3) $c3 = $this->params->get('column3',200);
+if(!$c3) $c3 = $items_per_column;
 $i = 0;
+
 $condition1	= $condition2	= $condition3	= $style = '';
 switch ($cols) 
 {

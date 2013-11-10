@@ -54,10 +54,8 @@ $mod_height_feat 	= (int)$params->get('mod_height', 110);
 $mod_width 				= (int)$params->get('mod_width', 80);
 $mod_height 			= (int)$params->get('mod_height', 80);
 
-$force_width_feat="width='$mod_width_feat'";
-$force_height_feat="height='$mod_height_feat'";
-$force_width="width='$mod_width'";
-$force_height="height='$mod_height'";
+$img_force_dims_feat="width:".$mod_width_feat."; height:".$mod_height_feat."; display:inline-block!important";
+$img_force_dims="width:".$mod_width."; height:".$mod_height."; display:inline-block!important";
 
 $hide_label_onempty_feat = (int)$params->get('hide_label_onempty_feat', 0);
 $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
@@ -193,9 +191,11 @@ $_ns_fxOptions    = '{ duration:'.$duration.', transition: "'.$effect.'", link: 
 				
 				<div class="image_featured">
 					<?php if ($mod_link_image_feat) : ?>
-						<a href="<?php echo $item->link; ?>"><img <?php echo $force_height_feat." ".$force_width_feat; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
+						<a href="<?php echo $item->link; ?>">
+							<img style="<?php echo $img_force_dims_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+						</a>
 					<?php else : ?>
-						<img <?php echo $force_height_feat." ".$force_width_feat; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+						<img style="<?php echo $img_force_dims_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 					<?php endif; ?>
 				</div>
 				
@@ -350,9 +350,11 @@ $_ns_fxOptions    = '{ duration:'.$duration.', transition: "'.$effect.'", link: 
 				
 				<div class="image_standard">
 					<?php if ($mod_link_image) : ?>
-						<a href="<?php echo $item->link; ?>"><img <?php echo $force_height." ".$force_width; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" /></a>
+						<a href="<?php echo $item->link; ?>">
+							<img style="<?php echo $img_force_dims; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+						</a>
 					<?php else : ?>
-						<img <?php echo $force_height." ".$force_width; ?> src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+						<img style="<?php echo $img_force_dims; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 					<?php endif; ?>
 				</div>
 				

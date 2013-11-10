@@ -125,21 +125,33 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			}
 
 			// Determine sort order
-			$orderby = "a.title";
-			$order_method = $cparams->get('orderby', '');
-			switch ($order_method)
-			{
-				case 'date'    : $orderby = 'a.created';  break;
-				case 'rdate'   : $orderby = 'a.created DESC';  break;
-				case 'modified': $orderby = 'a.modified DESC';  break;
-				case 'alpha'   : $orderby = 'a.title'; break;
-				case 'ralpha'  : $orderby = 'a.title DESC'; break;
-				case 'author'  : $orderby = 'u.name';  break;
-				case 'rauthor' : $orderby = 'u.name DESC';  break;
-				case 'hits'    : $orderby = 'a.hits';  break;
-				case 'rhits'   : $orderby = 'a.hits DESC';  break;
-				case 'order'   : $orderby = 'rel.ordering';  break;
+			$order = $cparams->get('orderby', '');    // TODO: finish using category ORDERING, now we ignore: commented, rated
+			$orderby = '';
+			if ((int)$cparams->get('orderbycustomfieldid', 0) != 0) {
+				if ($cparams->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
+				$orderby		= 'f.value'.$int.' '.$cparams->get('orderbycustomfielddir', 'ASC');
+				$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = a.id AND f.field_id = '.(int)$cparams->get('orderbycustomfieldid', 0);
+			} else {
+				switch ($order)
+				{
+					case 'date'    : $orderby = 'a.created';  break;
+					case 'rdate'   : $orderby = 'a.created DESC';  break;
+					case 'modified': $orderby = 'a.modified DESC';  break;
+					case 'alpha'   : $orderby = 'a.title'; break;
+					case 'ralpha'  : $orderby = 'a.title DESC'; break;
+					case 'author'  : $orderby = 'u.name';  break;
+					case 'rauthor' : $orderby = 'u.name DESC';  break;
+					case 'hits'    : $orderby = 'a.hits';  break;
+					case 'rhits'   : $orderby = 'a.hits DESC';  break;
+					case 'order'   : $orderby = 'rel.ordering';  break;
+				}
+				
+				// Create JOIN for ordering items by a most rated
+				if ($order=='author' || $order=='rauthor') {
+					$orderby_join = ' LEFT JOIN #__users AS u ON u.id = a.created_by';
+				}
 			}
+			$orderby = $orderby ? $orderby.', a.title' : 'a.title';
 			
 			$types		= is_array($types_to_exclude) ? implode(',', $types_to_exclude) : $types_to_exclude;
 
@@ -152,29 +164,15 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 				$xwhere .= ' AND ( ie.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
 			}
 			
-			// Add sort items by custom field. Issue 126 => http://code.google.com/p/flexicontent/issues/detail?id=126#c0
-			$field_item = '';
-			if ( is_array($orderbycustomfieldid = $cparams->get('orderbycustomfieldid', 0)) ) {
-				echo "FLEXIcontent versions prior to v2.0 RC3, had a bug, please open category of item and resave the category, you can use 'copy parameters' to quickly update many categories";
-				$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
-			}
-			if ($cparams->get('orderbycustomfieldid', 0) != 0) {
-				if ($cparams->get('orderbycustomfieldint', 0) != 0) $int = ' + 0'; else $int ='';
-				$orderby		= 'f.value'.$int.' '.$cparams->get('orderbycustomfielddir', 'ASC');
-				$field_item = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = a.id AND f.field_id = '.(int)$cparams->get('orderbycustomfieldid', 0);
-			}
-			
-			$orderby .= ', a.title';
 			
 			// array of articles in same category correctly ordered
 			$query 	= 'SELECT a.id, a.title,'
 					. ' CASE WHEN CHAR_LENGTH(a.alias) THEN CONCAT_WS(":", a.id, a.alias) ELSE a.id END as slug,'
 					. ' CASE WHEN CHAR_LENGTH(cc.alias) THEN CONCAT_WS(":", cc.id, cc.alias) ELSE cc.id END as catslug'
 					. ' FROM #__content AS a'
-					. ' LEFT JOIN #__categories AS cc ON cc.id = '. ($cid ? $cid : (int) $item->catid)
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
-					. ' LEFT JOIN #__users AS u ON u.id = a.created_by'
-					. $field_item
+					. ' JOIN #__categories AS cc ON cc.id = '. ($cid ? $cid : (int) $item->catid)
+					. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = a.id '
+					. @ $orderby_join
 					. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = a.id'
 					. ' WHERE rel.catid = ' . ($cid ? $cid : (int) $item->catid)
 					. $xwhere
