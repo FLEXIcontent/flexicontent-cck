@@ -240,10 +240,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			. ' ('
 			. ' SELECT COUNT( DISTINCT i.id )'
 			. ' FROM #__content AS i'
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			. ' JOIN #__categories AS cc ON cc.id = rel.catid OR cc.id = i.catid'
+			. ' JOIN #__categories AS cc ON cc.id = rel.catid'
 			. $subjoin
 			. $where
 			. $suband
@@ -411,10 +411,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			. ' ('
 			. ' SELECT COUNT( DISTINCT i.id )'
 			. ' FROM #__content AS i'
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			. ' JOIN #__categories AS cc ON cc.id = rel.catid OR cc.id = i.catid'
+			. ' JOIN #__categories AS cc ON cc.id = rel.catid'
 			. $subjoin
 			. $where
 			. $suband

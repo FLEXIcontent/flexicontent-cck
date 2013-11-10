@@ -2840,7 +2840,12 @@ class FlexicontentFields
 			$orderby_join = ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
 		}
 		
-		// Because query includes a limited number of related field it should be fast
+		// Create JOIN for ordering items by author name
+		else if ($order=='author' || $order=='rauthor') {
+			$orderby_join = ' LEFT JOIN #__users AS u ON u.id = i.created_by';
+		}
+		
+		// Because query includes specific items it should be fast
 		$query = 'SELECT i.*, ext.type_id,'
 			.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
 			.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
@@ -2849,9 +2854,8 @@ class FlexicontentFields
 			.' LEFT JOIN #__flexicontent_items_ext AS ext ON i.id=ext.item_id '
 			. @ $item_join
 			. @ $orderby_join
-			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id=rel.itemid '
+			.' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON i.id=rel.itemid '  // to get info for item's categories
 			.' LEFT JOIN #__categories AS c ON c.id=rel.catid '
-			.' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			.' WHERE 1 '
 			. @ $item_where
 			. $publish_where

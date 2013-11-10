@@ -54,8 +54,8 @@ $mod_height_feat 	= (int)$params->get('mod_height', 110);
 $mod_width 				= (int)$params->get('mod_width', 80);
 $mod_height 			= (int)$params->get('mod_height', 80);
 
-$img_force_dims_feat="width:".$mod_width_feat."; height:".$mod_height_feat."; display:inline-block!important";
-$img_force_dims="width:".$mod_width."; height:".$mod_height."; display:inline-block!important";
+$img_force_dims_feat="width:".$mod_width_feat."px; height:".$mod_height_feat."px; display:inline-block!important";
+$img_force_dims="width:".$mod_width."px; height:".$mod_height."px; display:inline-block!important";
 
 $hide_label_onempty_feat = (int)$params->get('hide_label_onempty_feat', 0);
 $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);

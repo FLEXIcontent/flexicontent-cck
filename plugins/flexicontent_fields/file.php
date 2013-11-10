@@ -1052,9 +1052,15 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$subject = JMailHelper::cleanSubject($subject);
 		$body    = JMailHelper::cleanBody($body);
 		$sender  = JMailHelper::cleanAddress($sender);
-
+		
+		$html_mode=false; $cc=null; $bcc=null;
+		$attachment=null; $replyto=null; $replytoname=null;
+		
 		// Send the email
-		if (JFactory::getMailer()->sendMail($from, $sender, $email, $subject, $body) !== true)
+		$send_result = FLEXI_J16GE ?
+			JFactory::getMailer()->sendMail( $from, $sender, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
+			JUtility::sendMail( $from, $sender, $email, $subject, $body, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
+		if ( $send_result !== true )
 		{
 			JError::raiseNotice(500, JText:: _ ('FLEXI_FIELD_FILE_EMAIL_NOT_SENT'));
 			return $this->share_file_form();

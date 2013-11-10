@@ -221,7 +221,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		// Item retrieving query ... put together and execute it
 		// *****************************************************
 		$query = 'SELECT i.title, i.id, i.catid, i.state, i.alias'
-			.', GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist'
+			.", GROUP_CONCAT(rel.catid SEPARATOR ',') as catlist"
 			.' FROM #__content AS i '
 			. (($samelangonly || $method_types>1) ? " LEFT JOIN #__flexicontent_items_ext AS ie on i.id=ie.item_id " : "")
 			. ' JOIN #__flexicontent_cats_item_relations AS rel on i.id=rel.itemid '

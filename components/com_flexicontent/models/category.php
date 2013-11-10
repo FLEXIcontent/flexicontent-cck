@@ -640,7 +640,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$join_clauses = ''
 			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
+			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' JOIN #__categories AS c ON c.id = i.catid'
 			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
 			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"' : '')
@@ -696,7 +696,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// Get sub categories used to create items list, according to configuration and user access
 			$this->_getDataCats($id_arr);
 			$_data_cats = "'".implode("', '", $this->_data_cats)."'";
-			$where .= ' AND (rel.catid IN ('.$_data_cats.') OR i.catid IN ('.$_data_cats.'))';
+			$where .= ' AND rel.catid IN ('.$_data_cats.')';
 		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
@@ -1130,7 +1130,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Count items according to full depth level !!!
 		$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
-		$where .= ' AND (rel.catid IN ('.$catlist.') OR i.catid IN ('.$catlist.'))';
+		$where .= ' AND rel.catid IN ('.$catlist.')';
 		
 		// Select only items that user has view access, if listing of unauthorized content is not enabled
 		// Checking item, category, content type access level
@@ -1496,7 +1496,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$params->set('link_titles', $params->get('link_titles_lists'));  // Parameter meant for lists
 		
 		// Set filter values (initial or locked) via configuration parameters
-		FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
+		if ($params->get('use_persistent_filters')) FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
 		FlexicontentFields::setFilterValues( $params, 'initial_filters'   , $is_persistent=0);
 		
 		// Bugs of v2.0 RC2

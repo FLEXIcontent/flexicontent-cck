@@ -176,7 +176,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 		// Get the route helper
 		require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'helpers'.DS.'route.php');
 		// Import utility class that contains the send mail helper function
-		jimport( 'joomla.utilities.utility' );
+		if (!FLEXI_J16GE) jimport( 'joomla.utilities.utility' );
 		jimport( 'joomla.mail.helper' );
 		
 		// Parameters for 'message' language string
@@ -265,14 +265,15 @@ class plgFlexicontentFlexinotify extends JPlugin
 					$_message = str_replace('__SUBSCRIBER_PASSWORD__', $subscriber->password, $_message);
 				}
 				
-				$send_result = JUtility::sendMail(
-					$from = $sendermail,
-					$fromname = $sendername,
-					$recipient = array($to),
-					$subject,	$_message, $html_mode=false, $cc=null,
-					$bcc = null,
-					$attachment=null, $replyto=null, $replytoname=null)
-					;
+				$from      = $sendermail;
+				$fromname  = $sendername;
+				$recipient = array($to);
+				$html_mode=false; $cc=null; $bcc=null;
+				$attachment=null; $replyto=null; $replytoname=null;
+				
+				$send_result = FLEXI_J16GE ?
+					JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
+					JUtility::sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 				if ($send_result) $count_sent++;
 			}
 			$send_result = (boolean) $count_sent;
@@ -293,14 +294,15 @@ class plgFlexicontentFlexinotify extends JPlugin
 			$count_sent = 0;
 			foreach ($to_100_arr as $to_100)
 			{
-				$send_result = JUtility::sendMail(
-					$from = $sendermail,
-					$fromname = $sendername,
-					$recipient = array($from),
-					$subject,	$message, $html_mode=false, $cc=null,
-					$bcc = $to_100,
-					$attachment=null, $replyto=null, $replytoname=null)
-					;
+				$from      = $sendermail;
+				$fromname  = $sendername;
+				$recipient = array($from);
+				$html_mode=false; $cc=null; $bcc = $to_100;
+				$attachment=null; $replyto=null; $replytoname=null;
+				
+				$send_result = FLEXI_J16GE ?
+					JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
+					JUtility::sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 				if ($send_result) $count_sent += count($to_100);
 			}
 			$send_result = (boolean) $count_sent;
