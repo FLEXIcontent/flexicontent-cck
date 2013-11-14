@@ -1499,7 +1499,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					JRequest::setVar( 'keep', 1, 'post' );
 					$file_ids = $fman->addlocal();
 					reset($file_ids);  // Reset array to point to first element
-					$v = array('originalname' => key($file_ids));    // The keys of file_ids array is the cleaned up filenames
+					$v['originalname'] = key($file_ids);    // The keys of file_ids array is the cleaned up filenames
 				}
 			}
 			

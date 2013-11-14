@@ -301,9 +301,25 @@ div.credits {
 	text-align: center;
 }
 /* Filemanager */
-.filemanager img {
-	vertical-align: middle;
+.filemanager img { vertical-align: middle; }
+.filemanager-tab { margin: 0px; padding:4px 0 0 0; border:0; }
+#filemanager-zone fieldset.actions { margin: 0px; padding:0px; }
+#filemanager-zone textarea#file-desc,
+#filemanager-zone textarea#file-url-desc { width:100%; max-width:600px; }
+#file-upload {
+	font-size: 11px;
+	width: 246px;
+	height: 24px;
+	border-radius: 6px;
+	min-width: 40%;
 }
+/* Management filter forms */
+#fc-filter-buttons {
+	display: inline-block;
+	padding: 0px;
+	margin: 0px;
+}
+
 /* Access */
 fieldset.flexiaccess legend {
 	background: url(../images/toggle_blue.png) no-repeat 98% 50%;

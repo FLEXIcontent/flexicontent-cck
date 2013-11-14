@@ -51,6 +51,11 @@ defined('_JEXEC') or die('Restricted access');
 			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<?php if (FLEXI_J16GE) : ?>
+				<th width="5%" class="nowrap">
+					<?php echo JHtml::_('grid.sort', 'JGRID_HEADING_LANGUAGE', 'language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				</th>
+			<?php endif;?>
 			<th width="1%" nowrap="nowrap">
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'c.id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
@@ -112,6 +117,15 @@ defined('_JEXEC') or die('Restricted access');
 			<td align="center">
 				<?php echo $access; ?>
 			</td>
+			<?php if (FLEXI_J16GE) : ?>
+				<td class="center nowrap">
+				<?php if ($row->language=='*'):?>
+					<?php echo JText::alt('JALL','language'); ?>
+				<?php else:?>
+					<?php echo $row->language_title ? $this->escape($row->language_title) : JText::_('JUNDEFINED'); ?>
+				<?php endif;?>
+				</td>
+			<?php endif;?>
 			<td align="center">
 				<?php echo $row->id; ?>
 			</td>

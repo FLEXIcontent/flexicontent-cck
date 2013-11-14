@@ -22,9 +22,11 @@ $uri = JURI::getInstance();
 $current_uri = $uri->toString();
 $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;task=';
 $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
+$session = JFactory::getSession();
 ?>
 
-<table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;">
+<div class="flexicontent">
+<table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;" id="filemanager-zone">
 	<tr>
 		<td>
 			<?php
@@ -36,12 +38,13 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 			?>
 			
 			<!-- File Upload Form -->
-			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>" id="uploadForm" method="post" enctype="multipart/form-data">
-				<fieldset>
+			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" id="uploadForm" method="post" enctype="multipart/form-data">
+				<fieldset class="filemanager-tab" >
 					<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
-					<fieldset class="actions">
-
+					<fieldset class="actions" id="filemanager-1">
+						
 						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
+							
 							<tr>
 								<td class="key">
 									<label for="file-upload">
@@ -55,33 +58,34 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 <?php if (!$this->folder_mode) { ?>
 							<tr>
 								<td class="key">
-									<label for="file-title">
-									<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
-									</label>
-								</td>
-								<td>
-									<input type="text" id="file-title" size="40" class="required" name="file-title" />
-								<td>
-							</tr>
-							<tr>
-								<td class="key">
 									<label for="file-desc">
 									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 									</label>
 								</td>
 								<td>
-									<textarea name="file-desc" cols="23" rows="5" id="file-desc"></textarea>
+									<textarea name="file-desc" cols="24" rows="3" id="file-desc"></textarea>
 								</td>
 							</tr>
-						</table>
+							
+							<tr>
+								<td class="key">
+									<label for="file-title">
+									<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
+									</label>
+								</td>
+								<td>
+									<input type="text" id="file-title" size="44" class="required" name="file-title" />
+								</td>
+							</tr>
 <?php } ?>
-						<input type="submit" id="file-upload-submit" style="margin: 5px 0 0 150px;" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
+						</table>
+						<input type="submit" id="file-upload-submit" class="fc_button fcsimple" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
 						<span id="upload-clear"></span>
 						
 					</fieldset>
 					
 					<ul class="upload-queue" id="upload-queue">
-						<li style="display: none" />
+						<li style="display: none"></li>
 					</ul>
 				</fieldset>
 				<?php echo JHTML::_( 'form.token' ); ?>
@@ -101,14 +105,16 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;view=fileselement&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component&amp;layout=image&amp;filter_secure=M" method="post" name="adminForm" id="adminForm">
 
 <?php if (!$this->folder_mode) : ?>
-	<table class="adminform">
+	<table class="adminform" border="0">
 		<tr>
-			<td width="100%">
-			  	<?php echo JText::_( 'FLEXI_SEARCH' ); ?>
-			  	<?php echo $this->lists['filter']; ?>
+			<td align="left">
+				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
+				<?php echo $this->lists['filter']; ?>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
-				<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-				<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+				<div id="fc-filter-buttons">
+					<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
+					<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+				</div>
 			</td>
 			<td nowrap="nowrap">
 			 	<?php echo $this->lists['ext']; ?>
@@ -137,14 +143,16 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 <?php } ?>
 		</tr>
+		
 	</thead>
 
 	<tfoot>
 		<tr>
 			<td colspan="<?php echo $this->folder_mode ? 10 : 10; ?>">
-				<?php echo $this->pageNav->getListFooter(); ?>
+				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
+		
 	</tfoot>
 
 	<tbody>
@@ -183,7 +191,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 			}
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 <?php if ($this->folder_mode) { ?>
 			<td>
 				<a href="javascript:;" onclick="if (confirm('<?php echo JText::_('FLEXI_SURE_TO_DELETE_FILE'); ?>')) { document.adminForm.filename.value='<?php echo $row->filename;?>'; document.adminForm.controller.value='filemanager'; <?php echo FLEXI_J16GE ? "Joomla." : ""; ?>submitbutton('<?php echo $del_task; ?>'); }" href="#">
@@ -242,3 +250,4 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 	<input type="hidden" name="secure" value="0" />
 	<input type="hidden" name="filename" value="" />
 </form>
+</div>

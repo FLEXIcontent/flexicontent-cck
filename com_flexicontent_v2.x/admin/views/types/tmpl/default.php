@@ -30,8 +30,10 @@ $user      = JFactory::getUser();
 			<td align="left">
 				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
-				<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-				<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+				<div id="fc-filter-buttons">
+					<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
+					<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+				</div>
 			</td>
 			<td nowrap="nowrap">
 				<div class="limit" style="display: inline-block;">

@@ -420,7 +420,10 @@ if (FLEXI_J16GE) {
 					
 					$queries = array();
 					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__flexicontent_files'])) {
-						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL AFTER `altname`";
+						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL DEFAULT '' AFTER `altname`";
+					}
+					if ( $files_tbl_exists && !array_key_exists('language', $tbl_fields['#__flexicontent_files'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `language` CHAR(7) NOT NULL DEFAULT '*' AFTER `published`";
 					}
 					if ( $fields_tbl_exists && !array_key_exists('untranslatable', $tbl_fields['#__flexicontent_fields'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_fields` ADD `untranslatable` TINYINT(1) NOT NULL DEFAULT '0' AFTER `isadvsearch`";
@@ -614,7 +617,7 @@ if (FLEXI_J16GE) {
 							}
 						}
 						if ( $result !== false ) {
-							echo "<span style='$success_style'>columns/indexes added, table was truncated or recreated, please re-index your content</span>";
+							echo "<span style='$success_style'>tables was created / upgraded</span>";
 						}
 					}
 					else echo "<span style='$success_style'>nothing to do</span>";

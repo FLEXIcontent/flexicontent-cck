@@ -213,6 +213,22 @@
 /*********************
  * FLEXIcontent Tables
  *********************/
+ 
+div table.adminform {
+	font-size:11px;
+	background-color: #FFFFFF;
+	border: 1px solid #D5D5D5;
+	border-collapse: collapse;
+	margin: 8px 0 15px;
+	width: 100%;
+}
+div table.adminform td {
+	font-size:11px;
+	padding:2px 2px;
+	text-align:left;
+	border: 0px solid;
+}
+
 #flexicontent table.flexitable {
 	border: 1px solid #e5e5e5;
 	border-collapse: collapse;
@@ -903,13 +919,13 @@ div.comments {
 /*****************
  * Joomla Tabs CSS
  *****************/
-dl.tabs {
+dl.tabs, .flexicontent dl.tabs {
 	float: left;
 	margin: 10px 0 -1px 0;
 	z-index: 50;
 }
 
-dl.tabs dt {
+dl.tabs dt, .flexicontent dl.tabs dt {
 	background: #f0f0f0;
 	border-left: 1px solid #cccccc;
 	border-right: 1px solid #cccccc;
@@ -917,15 +933,29 @@ dl.tabs dt {
 	color: #666666;
 	float: left;
 	margin-left: 3px;
-	padding: 4px 10px;
+	padding: 10px;
+	display: block;
 }
 
-dl.tabs dt.open {
+dl.tabs dt.open, .flexicontent dl.tabs dt.open {
 	background: #f9f9f9;
 	border-bottom: 1px solid #f9f9f9;
 	color: #000000;
 	z-index: 100;
+	padding: 10px;
 }
+
+dl.tabs dt:hover, .flexicontent dl.tabs dt:hover {
+	background: #c9c9c9;
+}
+
+dl.tabs dt a:link, .flexicontent dl.tabs dt a:link {
+	color: black !important;
+	outline: medium none !important;
+	text-decoration: none !important;
+	background: none !important;
+}
+
 
 div.current {
 	border: 1px solid #cccccc;
@@ -1183,11 +1213,16 @@ table.admintable {
 
 table.admintable td.key, 
 table.admintable td.paramlist_key {
-	background-color: #E6E6E6;
-	border:1px solid #F0F0F0;
+	background-color: #F2F2F2;
+	border-bottom: 1px solid #D0D0D0;
+	border-right: 1px solid #D0D0D0;
 	color: #666666;
-	font-weight:normal;
-	text-align:right;
+	font-family: arial;
+	font-size: 11px;
+	font-weight: normal;
+	padding: 2px 4px;
+	text-align: right;
+	width: 140px;
 }
 table.admintable td {
 	border:1px solid #F0F0F0;

@@ -75,6 +75,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
 		$filetitle= JRequest::getVar( 'file-title', '');
 		$filedesc	= JRequest::getVar( 'file-desc', '');
+		$filelang	= JRequest::getVar( 'file-lang', '');
 		$fieldid	= JRequest::getVar( 'fieldid', 0);
 		$u_item_id= JRequest::getVar( 'u_item_id', 0);
 		$file_mode= JRequest::getVar( 'folder_mode', 0) ? 'folder_mode' : 'db_mode';
@@ -173,15 +174,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$date = JFactory::getDate( 'now' );
 
 				$obj = new stdClass();
-				$obj->filename	= $filename;
-				$obj->altname		= $filetitle ? $filetitle : $filename;
-				$obj->url				= 0;
-				$obj->secure		= $secure;
-				$obj->ext				= $ext;
-				$obj->hits			= 0;
-				$obj->description		= $filedesc;
-				$obj->uploaded			= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
-				$obj->uploaded_by		= $user->get('id');
+				$obj->filename    = $filename;
+				$obj->altname     = $filetitle ? $filetitle : $filename;
+				$obj->url         = 0;
+				$obj->secure      = $secure;
+				$obj->ext         = $ext;
+				$obj->hits        = 0;
+				$obj->description = $filedesc;
+				$obj->language    = $filelang;
+				$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+				$obj->uploaded_by = $user->get('id');
 					
 				// Insert file record in DB
 				$db->insertObject('#__flexicontent_files', $obj);
@@ -245,6 +247,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$altname	= JRequest::getVar( 'file-url-title', null, 'post', 'string' );
 		$ext			= JRequest::getVar( 'file-url-ext', null, 'post', 'alnum' );
 		$filedesc	= JRequest::getVar( 'file-url-desc', '');
+		$filelang	= JRequest::getVar( 'file-url-lang', '');
 
 		jimport('joomla.utilities.date');
 
@@ -268,15 +271,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$date = JFactory::getDate( 'now' );
 
 		$obj = new stdClass();
-		$obj->filename 			= $filename;
-		$obj->altname 			= $altname;
-		$obj->url			= 1;
-		$obj->secure			= 1;
-		$obj->ext			= $ext;
-		$obj->description		= $filedesc;
-		$obj->hits			= 0;
-		$obj->uploaded			= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
-		$obj->uploaded_by		= $user->get('id');
+		$obj->filename    = $filename;
+		$obj->altname     = $altname;
+		$obj->url         = 1;
+		$obj->secure      = 1;
+		$obj->ext         = $ext;
+		$obj->description = $filedesc;
+		$obj->language    = $filelang;
+		$obj->hits        = 0;
+		$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+		$obj->uploaded_by = $user->get('id');
 
 		$db->insertObject('#__flexicontent_files', $obj);
 
@@ -325,6 +329,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$destpath = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
 		
 		$filedesc	=  JRequest::getVar( 'file-desc', '' );
+		$filelang	=  JRequest::getVar( 'file-lang', '');
 
 		// allowed extensions
 		$filterext	=  JRequest::getVar( 'file-filter-ext', '', 'post' );
@@ -373,15 +378,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 							$date = JFactory::getDate( 'now' );
 						
 							$obj = new stdClass();
-							$obj->filename		= $filename;
-							$obj->altname			= $filename;
-							$obj->url					= 0;
-							$obj->secure			= $secure;
-							$obj->ext					= $ext;
-							$obj->description	= $filedesc;
-							$obj->hits				= 0;
-							$obj->uploaded		= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
-							$obj->uploaded_by	= $user->get('id');
+							$obj->filename    = $filename;
+							$obj->altname     = $filename;
+							$obj->url         = 0;
+							$obj->secure      = $secure;
+							$obj->ext         = $ext;
+							$obj->description = $filedesc;
+							$obj->language    = $filelang;
+							$obj->hits        = 0;
+							$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+							$obj->uploaded_by = $user->get('id');
 
 							// Add the record to the DB
 							$db->insertObject('#__flexicontent_files', $obj);
@@ -396,15 +402,16 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 							$date = JFactory::getDate( 'now' );
 						
 							$obj = new stdClass();
-							$obj->filename 			= $filename;
-							$obj->altname 			= $filename;
-							$obj->url			= 0;
-							$obj->secure			= $secure;
-							$obj->ext			= $ext;
-							$obj->description		= $filedesc;
-							$obj->hits			= 0;
-							$obj->uploaded			= FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
-							$obj->uploaded_by		= $user->get('id');
+							$obj->filename    = $filename;
+							$obj->altname     = $filename;
+							$obj->url         = 0;
+							$obj->secure      = $secure;
+							$obj->ext         = $ext;
+							$obj->description = $filedesc;
+							$obj->language    = $filelang;
+							$obj->hits        = 0;
+							$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+							$obj->uploaded_by = $user->get('id');
 
 							// Add the record to the DB
 							$db->insertObject('#__flexicontent_files', $obj);

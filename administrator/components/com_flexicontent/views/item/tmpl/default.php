@@ -208,7 +208,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			</label>
 			<?php /*echo $this->form->getLabel('title');*/ ?>
 
-			<div class="container_fcfield container_fcfield_id_1 container_fcfield_name_title">
+			<div class="container_fcfield container_fcfield_id_1 container_fcfield_name_title" id="container_fcfield_1">
 			<?php	if ( isset($this->row->item_translations) ) :?>
 
 				<!-- tabber start -->
@@ -288,7 +288,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			</label>
 			<?php /*echo $this->form->getLabel('type_id');*/ ?>
 				
-			<div class="container_fcfield container_fcfield_id_8 container_fcfield_name_type">
+			<div class="container_fcfield container_fcfield_id_8 container_fcfield_name_type" id="container_fcfield_8">
 				<?php echo $this->lists['type']; ?>
 				<?php //echo $this->form->getInput('type_id'); ?>
 				<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_TYPE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8');?>">
@@ -311,7 +311,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<?php /*echo $this->form->getLabel('state');*/ ?>
 			<?php
 			if ( $this->perms['canpublish'] ) : ?>
-				<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state fcdualline" style="margin-right:4% !important;" >
+				<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state fcdualline" id="container_fcfield_10" style="margin-right:4% !important;" >
 					<?php echo $this->lists['state']; ?>
 					<?php //echo $this->form->getInput('state'); ?>
 					<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_STATE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8');?>">
@@ -656,7 +656,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 						</label>
 
 						<div style="<?php echo $width; ?>;" class="fcfield_row<?php echo $row_k;?> container_fcfield
-							container_fcfield_id_<?php echo $field->id;?> container_fcfield_name_<?php echo $field->name;?>"
+							container_fcfield_id_<?php echo $field->id;?> container_fcfield_name_<?php echo $field->name;?>" id="container_fcfield_<?php echo $field->id;?>"
 						>
 								
 							<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1604 2012-12-16 11:55:43Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1803 2013-11-05 03:10:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -48,11 +48,14 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$db       = JFactory::getDBO();
 		$user     = JFactory::getUser();
 		$params   = JComponentHelper::getParams('com_flexicontent');
+		//$authorparams = flexicontent_db::getUserConfig($user->id);
+		$langs = FLEXIUtilities::getLanguages('code');
 		
 		//get vars
 		$filter_order		= $app->getUserStateFromRequest( $option.'.filemanager.filter_order', 	'filter_order', 	'f.filename', 	'cmd' );
 		$filter_order_Dir	= $app->getUserStateFromRequest( $option.'.filemanager.filter_order_Dir',	'filter_order_Dir',	'', 			'word' );
 		$filter 				= $app->getUserStateFromRequest( $option.'.filemanager.filter', 				'filter', 				1, 			'int' );
+		$filter_lang		= $app->getUserStateFromRequest( $option.'.filemanager.filter_lang', 		'filter_lang', 		'', 		'string' );
 		$filter_uploader= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader','filter_uploader',0,			'int' );
 		$filter_url			= $app->getUserStateFromRequest( $option.'.filemanager.filter_url', 		'filter_url', 		'',			'word' );
 		$filter_secure	= $app->getUserStateFromRequest( $option.'.filemanager.filter_secure', 	'filter_secure', 	'', 		'word' );
@@ -110,8 +113,34 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$assigned_fields_labels = array('image'=>'image/gallery', 'file'=>'file', 'minigallery'=>'minigallery');
 		$assigned_fields_icons = array('image'=>'picture_link', 'file'=>'page_link', 'minigallery'=>'film_link');
 		
-		// search
+		
+		/*****************
+		 ** BUILD LISTS **
+		 *****************/
+		
 		$lists 				= array();
+		
+		// ** FILE UPLOAD FORM **
+		
+		// Build languages list
+		//$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		//$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+		$allowed_langs = null;
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', '', '*', 3, $allowed_langs, $published_only=false);
+		} else {
+			$lists['file-lang'] = flexicontent_html::getSiteDefaultLang() . '<input type="hidden" name="file-lang" value="'.flexicontent_html::getSiteDefaultLang().'" />';
+		}
+		
+		
+		/*************
+		 ** FILTERS **
+		 *************/
+		
+		// language filter
+		$lists['language'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();" size="1" ', $filter_lang, 2);
+		
+		// search
 		$lists['search'] 	= $search;
 		
 		//search filter
@@ -179,6 +208,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$this->assignRef('CanViewAllFiles' , $perms->CanViewAllFiles);
 		$this->assignRef('assigned_fields_labels' , $assigned_fields_labels);
 		$this->assignRef('assigned_fields_icons'  , $assigned_fields_icons);
+		$this->assignRef('langs', $langs);
 		
 		parent::display($tpl);
 	}

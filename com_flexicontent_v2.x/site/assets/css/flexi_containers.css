@@ -46,7 +46,6 @@
 
 
 
-
 /****************
  * State Toggler
  ****************/
@@ -107,7 +106,6 @@ ul.statetoggler > li.topLevel > a.opener {
 
 
 
-
 /**************************************************
  * Pager Container, e.g. flexicontent item versions
  **************************************************/
@@ -146,4 +144,23 @@ ul.statetoggler > li.topLevel > a.opener {
 	color:#000;
 	font-weight:bold;
 	background-color:#eee;
+}
+
+
+
+/********************
+ * Various Containers
+ ********************/
+ 
+.fc_nice_box {
+	border-radius: 6px;
+	margin: 0px 0px 8px 0px;
+	padding: 2px 1%;
+	float: none;
+	clear: both !important;
+	border: 1px solid lightgray;
+	display: inline-block;
+	background-color: lightyellow;
+	font-weight: bold;
+	font-size: 11px;
 }

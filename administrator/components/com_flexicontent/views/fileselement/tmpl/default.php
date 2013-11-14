@@ -22,9 +22,11 @@ $uri = JURI::getInstance();
 $current_uri = $uri->toString();
 $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;task=';
 $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
+$session = JFactory::getSession();
 ?>
 
-<table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;">
+<div class="flexicontent">
+<table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;" id="filemanager-zone">
 	<tr>
 		<td>
 			<?php
@@ -36,21 +38,33 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 			?>
 			
 			<!-- File Upload Form -->
-			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>" id="uploadForm" method="post" enctype="multipart/form-data">
-				<fieldset>
+			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" id="uploadForm" method="post" enctype="multipart/form-data">
+				<fieldset class="filemanager-tab" >
 					<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
-					<fieldset class="actions">
-
+					<fieldset class="actions" id="filemanager-1">
+						
 						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
+							
 							<tr>
 								<td class="key">
 									<label for="file-upload">
 									<?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?>
 									</label>
 								</td>
-								<td>
+								<td width="260">
 									<input type="file" id="file-upload" name="Filedata" />
 								</td>
+								
+<?php if (!$this->folder_mode) { ?>
+								<td class="key">
+									<label for="file-language">
+									<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
+									</label>
+								</td>
+								<td>
+									<?php echo $this->lists['file-lang']; ?>
+								</td>
+<?php } ?>
 							</tr>
 <?php if (!$this->folder_mode) { ?>
 							<tr>
@@ -60,11 +74,19 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 									</label>
 								</td>
 								<td>
-									<?php
-									echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ) );
-									?>
+									<?php echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ) ); ?>
+								</td>
+								
+								<td class="key" rowspan="2">
+									<label for="file-desc">
+									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+									</label>
+								</td>
+								<td valign="top" rowspan="2">
+									<textarea name="file-desc" cols="24" rows="3" id="file-desc"></textarea>
 								</td>
 							</tr>
+							
 							<tr>
 								<td class="key">
 									<label for="file-title">
@@ -72,28 +94,19 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 									</label>
 								</td>
 								<td>
-									<input type="text" id="file-title" size="40" class="required" name="file-title" />
-								<td>
-							</tr>
-							<tr>
-								<td class="key">
-									<label for="file-desc">
-									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
-									</label>
-								</td>
-								<td>
-									<textarea name="file-desc" cols="23" rows="5" id="file-desc"></textarea>
+									<input type="text" id="file-title" size="44" class="required" name="file-title" />
 								</td>
 							</tr>
-						</table>
 <?php } ?>
-						<input type="submit" id="file-upload-submit" style="margin: 5px 0 0 150px;" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
+						</table>
+						
+						<input type="submit" id="file-upload-submit" class="fc_button fcsimple" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
 						<span id="upload-clear"></span>
 						
 					</fieldset>
 					
 					<ul class="upload-queue" id="upload-queue">
-						<li style="display: none" />
+						<li style="display: none"></li>
 					</ul>
 				</fieldset>
 				<?php echo JHTML::_( 'form.token' ); ?>
@@ -106,21 +119,33 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 			<?php endif; ?>
 			<!-- File URL Form -->
 			<?php echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) : $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) ; ?>
-			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $this->session->getName().'='.$this->session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="urlForm" id="urlForm" method="post">
-				<fieldset>
+			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="urlForm" id="urlForm" method="post">
+				<fieldset class="filemanager-tab" >
 					<legend><?php echo JText::_( 'FLEXI_ADD_FILE_BY_URL' ); ?></legend>
-					<fieldset class="actions">
+					<fieldset class="actions" id="filemanager-2">
+						
 						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
+							
 							<tr>
 								<td class="key">
 									<label for="file-url-data">
 									<?php echo JText::_( 'FLEXI_FILE_URL' ); ?>
 									</label>
 								</td>
+								<td width="260">
+									<input type="text" id="file-url-data" size="44" class="required" name="file-url-data" />
+								</td>
+								
+								<td class="key">
+									<label for="file-url-language">
+									<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
+									</label>
+								</td>
 								<td>
-									<input type="text" id="file-url-data" size="40" class="required" name="file-url-data" />
+									<?php echo str_replace('file-lang', 'file-url-lang', $this->lists['file-lang']); ?>
 								</td>
 							</tr>
+							
 							<tr>
 								<td class="key">
 									<label for="file-url-ext">
@@ -130,7 +155,16 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 								<td>
 									<input type="text" id="file-url-ext" size="5" class="required" name="file-url-ext" />
 								</td>
+								<td class="key" rowspan="3">
+									<label for="file-url-desc">
+									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+									</label>
+								</td>
+								<td rowspan="3">
+									<textarea name="file-url-desc" cols="24" rows="3" id="file-url-desc"></textarea>
+								</td>
 							</tr>
+							
 							<tr>
 								<td class="key">
 									<label for="file-url-title">
@@ -138,21 +172,13 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 									</label>
 								</td>
 								<td>
-									<input type="text" id="file-url-title" size="40" class="required" name="file-url-title" />
+									<input type="text" id="file-url-title" size="44" class="required" name="file-url-title" />
 								</td>
 							</tr>
-							<tr>
-								<td class="key">
-									<label for="file-url-desc">
-									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
-									</label>
-								</td>
-								<td>
-									<textarea name="file-url-desc" cols="23" rows="5" id="file-url-desc"></textarea>
-								</td>
-							</tr>
+							
 						</table>
-						<input type="submit" id="file-url-submit" style="margin: 5px 0 0 150px;" class="validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>"/>
+						
+						<input type="submit" id="file-url-submit" class="fc_button fcsimple" class="validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>"/>
 					</fieldset>
 				</fieldset>
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&field='.$this->fieldid.'&tmpl=component'); ?>" />
@@ -166,16 +192,32 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;view=fileselement&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component" method="post" name="adminForm" id="adminForm">
 
 <?php if (!$this->folder_mode) : ?>
-	<table class="adminform">
+	<table class="adminform" border="0">
 		<tr>
-			<td width="100%">
-			  	<?php echo JText::_( 'FLEXI_SEARCH' ); ?>
-			  	<?php echo $this->lists['filter']; ?>
+			<td align="left">
+				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
+				<?php echo $this->lists['filter']; ?>
 				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
-				<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-				<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+				<div id="fc-filter-buttons">
+					<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
+					<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+				</div>
 			</td>
 			<td nowrap="nowrap">
+				<div class="limit" style="display: inline-block;">
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+				</div>
+				
+				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
+					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+				</span>
+				
+				<span class="fc_pages_counter">
+					<?php echo $this->pagination->getPagesCounter(); ?>
+				</span>
+			</td>
+			<td style="text-align:right;">
+				<?php echo $this->lists['language']; ?>
 				<?php echo $this->lists['url']; ?>
 			 	<?php echo $this->lists['secure']; ?>
 			 	<?php echo $this->lists['ext']; ?>
@@ -200,6 +242,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_FILE_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width=""><?php echo JText::_( 'FLEXI_ACCESS' ); ?></th>
+			<th width=""><?php echo JText::_( 'FLEXI_LANGUAGE' ); ?></th>
 			<th width=""><?php echo JText::_( 'FLEXI_SIZE' ); ?></th>
 			<th width="15"><?php echo JHTML::_('grid.sort', 'FLEXI_HITS', 'f.hits', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_UPLOADER', 'uploader', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -208,14 +251,16 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 			<th width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_ID', 'f.id', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 <?php } ?>
 		</tr>
+		
 	</thead>
 
 	<tfoot>
 		<tr>
-			<td colspan="<?php echo $this->folder_mode ? 12 : 12; ?>">
-				<?php echo $this->pageNav->getListFooter(); ?>
+			<td colspan="<?php echo $this->folder_mode ? 12 : 13; ?>">
+				<?php echo $this->pagination->getListFooter(); ?>
 			</td>
 		</tr>
+		
 	</tfoot>
 
 	<tbody>
@@ -256,7 +301,7 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 			}
    		?>
 		<tr class="<?php echo "row$k"; ?>">
-			<td><?php echo $this->pageNav->getRowOffset( $i ); ?></td>
+			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
 			<td width="7">
 				<?php echo $checked; ?>
 			</td>
@@ -318,10 +363,24 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 			?>
 			</td>
 			
+<?php if (!$this->folder_mode) { ?>
+			<?php
+			// Set a row language, even if empty to avoid errors
+			$row->language = @$row->language ? $row->language : '*';
+   		?>
+			<td align="center" class="hasTip col_lang" title="<?php echo JText::_( 'FLEXI_LANGUAGE', true ).'::'.($row->language=='*' ? JText::_("All") : $this->langs->{$row->language}->name); ?>">
+				<?php if ( !empty($row->language) && !empty($this->langs->{$row->language}->imgsrc) ) : ?>
+					<img src="<?php echo $this->langs->{$row->language}->imgsrc; ?>" alt="<?php echo $row->language; ?>" />
+				<?php elseif( !empty($row->language) ) : ?>
+					<?php echo $row->language=='*' ? JText::_("FLEXI_ALL") : $row->language;?>
+				<?php endif; ?>
+			</td>
+<?php } ?>
+			
 			<td align="center"><?php echo $row->size; ?></td>
 			<td align="center"><?php echo $row->hits; ?></td>
 			<td align="center"><?php echo $row->uploader; ?></td>
-			<td align="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC4' )." H:i:s" ); ?></td>
+			<td align="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC2' ) ); ?></td>
 <?php if (!$this->folder_mode) { ?>
 			<td align="center"><?php echo $row->id; ?></td>
 <?php } ?>
@@ -347,3 +406,4 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 	<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
 	<input type="hidden" name="filename" value="" />
 </form>
+</div>
