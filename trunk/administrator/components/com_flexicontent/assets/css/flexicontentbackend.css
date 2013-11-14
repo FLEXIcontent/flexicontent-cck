@@ -3,18 +3,6 @@
 @import url('../../../../../components/com_flexicontent/assets/css/tabber.css');
 @import url('../../../../../components/com_flexicontent/assets/css/flexi_shared.css');
 
-.fc_nice_box {
-	border-radius: 6px;
-	margin: 0px 0px 8px 0px;
-	padding: 0px 1%;
-	float: none;
-	clear: both !important;
-	border: 1px solid lightgray;
-	display: inline-block;
-	background-color: lightyellow;
-	font-weight: bold;
-}
-
 .flexicontent #adminForm a.saveorder {
 	float: none !important;
 	vertical-align: middle !important;
@@ -36,3 +24,6 @@
 html body#minwidth-body {
 	min-width: 760px;
 }
+
+.col_created.col_revised .input-append { margin:0px; }
+

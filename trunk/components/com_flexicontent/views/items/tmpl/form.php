@@ -316,7 +316,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		</label>
 		<?php /*echo $this->form->getLabel('title');*/ ?>
 		
-		<div class="container_fcfield container_fcfield_id_1 container_fcfield_name_title">
+		<div class="container_fcfield container_fcfield_id_1 container_fcfield_name_title" id="container_fcfield_1">
 		<?php	if ( isset($this->item->item_translations) ) :?>
 		
 			<!-- tabber start -->
@@ -403,7 +403,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		<label id="type_id-lbl" for="type_id" for_bck="type_id" <?php echo $label_tooltip; ?> >
 			<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_TYPE' ); ?>
 		</label>
-		<div class="container_fcfield container_fcfield_id_8 container_fcfield_name_type">
+		<div class="container_fcfield container_fcfield_id_8 container_fcfield_name_type" id="container_fcfield_8">
 			<?php echo $this->lists['type']; ?>
 			<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_TYPE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8');?>">
 				<?php echo $infoimage; ?>
@@ -433,7 +433,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 		
 		<?php if ( $this->perms['canpublish'] ) : // Display state selection field to the user that can publish ?>
 
-			<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state fcdualline" style="margin-right:4% !important;" >
+			<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state fcdualline" id="container_fcfield_10" style="margin-right:4% !important;" >
 				<?php echo $this->lists['state']; ?>
 				<?php //echo $this->form->getInput('state'); ?>
 				<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_STATE_CHANGE_WARNING' ), ENT_COMPAT, 'UTF-8');?>">
@@ -460,7 +460,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			
 		<?php else :  // Display message to user that he/she can not publish or that changes are applied immediately for existing published item ?>
 
-			<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state">
+			<div class="container_fcfield container_fcfield_id_10 container_fcfield_name_state" id="container_fcfield_10">
 	  		<?php 
 	  			echo JText::_( ($isnew || $this->params->get('use_versioning', 1)) ? 'FLEXI_NEEDS_APPROVAL' : 'FLEXI_WITHOUT_APPROVAL' );
 					// Enable approval if versioning disabled, this make sense since if use can edit item THEN item should be updated !!!
@@ -811,7 +811,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 					<?php echo $field->label; ?>
 				</label>
 				
-				<div style="<?php echo $width; ?>;" class="<?php echo $classes; ?>">
+				<div style="<?php echo $width; ?>;" class="<?php echo $classes; ?>" id="container_fcfield_<?php echo $field->id; ?>">
 					<?php echo ($field->description && $edithelp==3) ? '<div class="fc-mssg fc-info">'.$field->description.'</div>' : ''; ?>
 					
 				<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing of joomfish (J1.5) or falang (J2.5+)

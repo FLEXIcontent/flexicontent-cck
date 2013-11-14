@@ -92,6 +92,16 @@ function submitbutton(pressbutton) {
 				<textarea name="description" cols="23" rows="5" id="file-desc"><?php echo $this->row->description; ?></textarea>
 			</td>
 		</tr>
+		<tr>
+			<td class="key">
+				<label for="access">
+					<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
+				</label>
+			</td>
+			<td>
+				<?php echo $this->lists['language']; ?>
+			</td>
+		</tr>
 	</table>
 
 

@@ -84,9 +84,11 @@ class FlexicontentModelFileselement extends JModelLegacy
 
 		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
-
-		$limit      = $app->getUserStateFromRequest( $option.'.fileselement.limit', 'limit', $app->getCfg('list_limit'), 'int');
-		$limitstart = $app->getUserStateFromRequest( $option.'.fileselement.limitstart', 'limitstart', 0, 'int' );
+		
+		$this->fieldid	= JRequest::getVar( 'field', null, 'request', 'int' );
+		
+		$limit      = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.limit',      'limit',      $app->getCfg('list_limit'),  'int');
+		$limitstart = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.limitstart', 'limitstart',  0,                          'int' );
 
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
@@ -313,7 +315,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 		}
 		//$having = $this->_buildContentHaving();
 		
-		$filter_item = $item_id  ?  $item_id  :  $app->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', 0, 'int' );
+		$filter_item = $item_id  ?  $item_id  :  $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.item_id',   'item_id',   0,   'int' );
 		
 		$extra_join = '';
 		$extra_where = '';
@@ -395,8 +397,8 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$filter_order     = $app->getUserStateFromRequest( $option.'.fileselement.filter_order', 		'filter_order', 	'f.filename', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.fileselement.filter_order_Dir',	'filter_order_Dir',	'', 'word' );
+		$filter_order     = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_order',     'filter_order',    'f.filename', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_order_Dir', 'filter_order_Dir', '',          'word' );
 
 		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', f.filename';
 
@@ -417,14 +419,16 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
 
-		$filter 	= $app->getUserStateFromRequest( $option.'.fileselement.filter', 'filter', 1, 'int' );
-		$search 	= $app->getUserStateFromRequest( $option.'.fileselement.search', 'search', '', 'string' );
+		$filter		= $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter',           'filter',           1,           'int' );
+		$search   = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.search',           'search',           '',          'string' );
 		$search 	= trim( JString::strtolower( $search ) );
-		$filter_uploader= $app->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 'filter_uploader', 0, 'int' );
-		$filter_url			= $app->getUserStateFromRequest( $option.'.fileselement.filter_url', 'filter_url', '', 'word' );
-		$filter_secure	= $app->getUserStateFromRequest( $option.'.fileselement.filter_secure', 'filter_secure', '', 'word' );
-		$filter_ext			= $app->getUserStateFromRequest( $option.'.fileselement.filter_ext', 'filter_ext', '', 'alnum' );
-
+		
+		$filter_lang			= $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_lang',      'filter_lang',      '',          'string' );
+		$filter_uploader  = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_uploader',  'filter_uploader',  0,           'int' );
+		$filter_url       = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_url',       'filter_url',       '',          'word' );
+		$filter_secure    = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_secure',    'filter_secure',    '',          'word' );
+		$filter_ext       = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_ext',       'filter_ext',       '',          'alnum' );
+		
 		$where = array();
 		
 		$permission = FlexicontentHelperPerm::getPerm();
@@ -435,7 +439,11 @@ class FlexicontentModelFileselement extends JModelLegacy
 		} else if ( $filter_uploader ) {
 			$where[] = ' uploaded_by = ' . $filter_uploader;
 		}
-
+		
+		if ( $filter_lang ) {
+			$where[] = ' language = '. $this->_db->Quote( $filter_lang );
+		}
+		
 		if ( $filter_url ) {
 			if ( $filter_url == 'F' ) {
 				$where[] = ' url = 0';
@@ -552,7 +560,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
 		
-		$filter_uploader	= $app->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 'filter_uploader', 0, 'int' );
+		$filter_uploader  = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_uploader',  'filter_uploader',  0,   'int' );
 		
 		$field_type_list = $this->_db->Quote( implode( "','", $field_types ), $escape=false );
 		
@@ -626,7 +634,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$user   = JFactory::getUser();
 		$option = JRequest::getVar('option');
 		
-		$filter_uploader	= $app->getUserStateFromRequest( $option.'.fileselement.filter_uploader', 'filter_uploader', 0, 'int' );
+		$filter_uploader  = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_uploader',  'filter_uploader',  0,   'int' );
 		
 		$where = array();
 		

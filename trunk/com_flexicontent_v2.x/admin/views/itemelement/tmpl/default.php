@@ -30,8 +30,10 @@ $type_id  = $app->getUserStateFromRequest( $option.'.itemelement.type_id', 'type
 		<td width="100%">
 			<?php echo JText::_( 'FLEXI_SEARCH' ); ?>
 			<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
-			<button onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-			<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+			<div id="fc-filter-buttons">
+				<button onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
+				<button onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+			</div>
 		</td>
 		<td nowrap="nowrap">
 			<?php if ( !$type_id) : ?>

@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `secure` tinyint(3) unsigned NOT NULL default '1',
   `ext` varchar(10) NOT NULL,
   `published` tinyint(1) NOT NULL default '1',
+  `language` char(7) NOT NULL DEFAULT '*',
   `hits` int(11) unsigned NOT NULL default '0',
   `uploaded` datetime NOT NULL default '0000-00-00 00:00:00',
   `uploaded_by` int(11) unsigned NOT NULL default '0',

@@ -2122,12 +2122,12 @@ class flexicontent_html
 	 * @return object
 	 * @since 1.5
 	 */
-	static function buildlanguageslist($name, $class, $selected, $type = 1, $allowed_langs = null)
+	static function buildlanguageslist($name, $class, $selected, $type = 1, $allowed_langs = null, $published_only=true)
 	{
 		$db = JFactory::getDBO();
 
 		$selected_found = false;
-		$all_langs = FLEXIUtilities::getlanguageslist();
+		$all_langs = FLEXIUtilities::getlanguageslist($published_only);
 		$user_langs = array();
 		if ($allowed_langs) {
 			foreach ($all_langs as $index => $lang)
@@ -3587,12 +3587,22 @@ class FLEXIUtilities
 	 * @return object
 	 * @since 1.5
 	 */
-	static function getlanguageslist()
+	static function getlanguageslist($published_only=false)
 	{
 		$app = JFactory::getApplication();
 		$db = JFactory::getDBO();
-		static $languages = null;
-		if ($languages) return $languages;
+		static $pub_languages = null;
+		static $all_languages = null;
+		
+		if ( $published_only ) {
+			if ($pub_languages) return $pub_languages;
+			else $pub_languages = false;
+		}
+		
+		if ( !$published_only ) {
+			if ($all_languages) return $all_languages;
+			else $all_languages = false;
+		}
 
 		// ******************
 		// Retrieve languages
@@ -3601,7 +3611,8 @@ class FLEXIUtilities
 			$query = 'SELECT DISTINCT le.*, lc.lang_id as id, lc.image as image_prefix'
 					.', CASE WHEN CHAR_LENGTH(lc.title_native) THEN lc.title_native ELSE le.name END as name'
 					.' FROM #__extensions as le'
-					.' JOIN #__languages as lc ON lc.lang_code=le.element AND lc.published=1'  // INNER Join to get only languages having content entries
+					// INNER Join to get only languages having content entries
+					.' JOIN #__languages as lc ON lc.lang_code=le.element'.($published_only ? ' AND lc.published=1' : '')
 					.' WHERE le.type="language" '
 					.' GROUP BY le.element';
 		} else if (FLEXI_FISH) {   // Use joomfish languages table
@@ -3684,7 +3695,25 @@ class FLEXIUtilities
 				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $lang->shortcode . '.gif';
 			}
 		}
-
+		
+		if ( $published_only ) {
+			$pub_languages = $languages;
+		} else if (FLEXI_J16GE) {
+			$all_languages = $languages;
+		} else {
+			$lang_all = new stdClass();
+			$lang_all->code = '*';
+			$lang_all->name = JText::_('FLEXI_ALL');
+			$lang_all->shortcode = '*';
+			$lang_all->id = 0;
+			$lang_all->imgsrc = '';
+			
+			$all_languages[0] = $lang_all;
+			foreach($languages as $lang) {
+				$all_languages[] = $lang;
+				$languages = $all_languages;
+			}
+		}
 		return $languages;
 	}
 
@@ -4331,11 +4360,30 @@ class FLEXIUtilities
  */
 class flexicontent_db
 {
+	/*
+	 * Retrieve author/user configuration
+	 *
+	 * @return object
+	 * @since 1.5
+	 */
+	static function getUserConfig($user_id)
+	{
+		$db = JFactory::getDBO();
+		$db->setQuery('SELECT author_basicparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $user_id);
+		if ( $authorparams = $db->loadResult() )
+			$authorparams = FLEXI_J16GE ? new JRegistry($authorparams) : new JParameter($authorparams);
+		
+		return $authorparams;
+	}
+	
 	
 	/*
-	 Find stopwords and too small words
+	 * Find stopwords and too small words
+	 *
+	 * @return array
+	 * @since 1.5
 	 */
-	function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index') {
+	static function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index') {
 		$db     = JFactory::getDBO();
 		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
@@ -4367,7 +4415,7 @@ class flexicontent_db
 	 * @return object
 	 * @since 1.5
 	 */
-	function execute_sql_file($sql_file)
+	static function execute_sql_file($sql_file)
 	{
 		$queries = file_get_contents( $sql_file );
 		$queries = preg_split("/;+(?=([^'|^\\\']*['|\\\'][^'|^\\\']*['|\\\'])*[^'|^\\\']*[^'|^\\\']$)/", $queries);
@@ -4390,7 +4438,7 @@ class flexicontent_db
 	 * @return object
 	 * @since 1.5
 	 */
-	static function &directQuery($query)
+	static function & directQuery($query)
 	{
 		$db     = JFactory::getDBO();
 		$app = JFactory::getApplication();

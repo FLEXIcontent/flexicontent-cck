@@ -35,6 +35,7 @@ class FlexicontentViewFile extends JViewLegacy {
 		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
+		//$authorparams = flexicontent_db::getUserConfig($user->id);
 
 		//add css to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
@@ -74,6 +75,16 @@ class FlexicontentViewFile extends JViewLegacy {
 			$lists['access']	= FAccess::TabGmaccess( $row, 'field', 1, 0, 0, 0, 0, 0, 0, 0, 0 );
 		} else {
 			$lists['access'] 	= JHTML::_('list.accesslevel', $row );
+		}
+		
+		// Build languages list
+		//$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		//$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+		$allowed_langs = null;
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			$lists['language'] = flexicontent_html::buildlanguageslist('language', '', $row->language, 3, $allowed_langs, $published_only=false);
+		} else {
+			$lists['language'] = flexicontent_html::getSiteDefaultLang() . '<input type="hidden" name="language" value="'.flexicontent_html::getSiteDefaultLang().'" />';
 		}
 		
 		//clean data

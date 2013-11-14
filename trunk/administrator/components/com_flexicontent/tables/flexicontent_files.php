@@ -44,11 +44,10 @@ class flexicontent_files extends JTable
 	var $ext				= '';
 	/** @var text */
 	var $description				= '';
-	/**
-	 * @var int 
-	 * @TODO implement
-	 */
+	/** @var int */
 	var $published			= 1;
+	/** @var string */
+	var $language		= '*';
 	/** @var int */
 	var $hits				= 0;
 	/** @var date */

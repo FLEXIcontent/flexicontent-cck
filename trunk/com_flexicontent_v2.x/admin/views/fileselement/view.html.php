@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1750 2013-09-03 20:50:59Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1764 2013-09-16 08:00:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -51,6 +51,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$db       = JFactory::getDBO();
 		$user     = JFactory::getUser();
 		$params   = JComponentHelper::getParams('com_flexicontent');
+		//$authorparams = flexicontent_db::getUserConfig($user->id);
+		$langs = FLEXIUtilities::getLanguages('code');
 		
 		$fieldid	= JRequest::getVar( 'field', null, 'request', 'int' );
 		$client		= $app->isAdmin() ? '../' : '';
@@ -59,6 +61,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$filter_order     = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_order',     'filter_order',    'f.filename', 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_order_Dir', 'filter_order_Dir', '',          'word' );
 		$filter           = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter',           'filter',           1,           'int' );
+		$filter_lang			= $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_lang',      'filter_lang',      '',          'string' );
 		$filter_uploader  = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_uploader',  'filter_uploader',  0,           'int' );
 		$filter_url       = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_url',       'filter_url',       '',          'word' );
 		$filter_secure    = $app->getUserStateFromRequest( $option.'.fileselement'.$fieldid.'.filter_secure',    'filter_secure',    '',          'word' );
@@ -132,7 +135,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		//echo $upload_path_var . "<br>";
 		//echo $app->getUserState( $upload_path_var, 'noset' );
 		
-		$pageNav = $this->get('Pagination');
+		$pagination = $this->get('Pagination');
 		//$users = $this->get('Users');
 		
 		// Get item using at least one file (-of- the currently listed files)
@@ -167,8 +170,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 				var delfilename = '".$delfilename."';
 				var remove_existing_files_from_list = 0;
 				var remove_new_files_from_list = 0;
-				original_objs = $(window.parent.document.body).getElement('#sortables_".$fieldid."').getElements('.originalname');
-				existing_objs = $(window.parent.document.body).getElement('#sortables_".$fieldid."').getElements('.existingname');
+				original_objs = $(window.parent.document.body).getElement('#container_fcfield_".$fieldid."').getElements('.originalname');
+				existing_objs = $(window.parent.document.body).getElement('#container_fcfield_".$fieldid."').getElements('.existingname');
 				
 				var imgobjs = Array();
 				for(i=0,n=original_objs.length; i<n; i++)  {
@@ -192,7 +195,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 				
 				if ( remove_existing_files_from_list || remove_new_files_from_list ) {
 					mssg = '".JText::_('FLEXI_DELETE_FILE_IN_LIST_WINDOW_MUST_CLOSE')."';
-					mssg = mssg + '\\n' + (remove_existing_files_from_list ? '".JText::_('FLEXI_EXISTING_FILE_REMOVED_SAVE_RECOMMENEDED')."' : '');
+					mssg = mssg + '\\n' + (remove_existing_files_from_list ? '".JText::_('FLEXI_EXISTING_FILE_REMOVED_SAVE_RECOMMENEDED',true)."' : '');
 					alert( mssg );
 					(MooTools.version>='1.2.4') ?  window.parent.SqueezeBox.close()  :  window.parent.document.getElementById('sbox-window').close();
 				}
@@ -238,8 +241,34 @@ class FlexicontentViewFileselement extends JViewLegacy
 			$app->enqueueMessage(JText::_( 'FLEXI_UPLOADED_FILE_WAS_SELECTED' ), 'message');
 		}
 		
-		// search
+		
+		/*****************
+		 ** BUILD LISTS **
+		 *****************/
+		
 		$lists 				= array();
+		
+		// ** FILE UPLOAD FORM **
+		
+		// Build languages list
+		//$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
+		//$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+		$allowed_langs = null;
+		if (FLEXI_FISH || FLEXI_J16GE) {
+			$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', '', '*', 3, $allowed_langs, $published_only=false);
+		} else {
+			$lists['file-lang'] = flexicontent_html::getSiteDefaultLang() . '<input type="hidden" name="file-lang" value="'.flexicontent_html::getSiteDefaultLang().'" />';
+		}
+		
+		
+		/*************
+		 ** FILTERS **
+		 *************/
+		
+		// language filter
+		$lists['language'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();" size="1" ', $filter_lang, 2);
+		
+		// search
 		$lists['search'] 	= $search;
 		
 		//search filter
@@ -304,7 +333,6 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$files .= $file;
 		
 		//assign data to template
-		$this->assignRef('session'    , JFactory::getSession());
 		$this->assignRef('params'     , $params);
 		$this->assignRef('client'     , $client);
 		//Load pane behavior
@@ -319,7 +347,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$this->assignRef('img_folder' , $img_folder);
 		$this->assignRef('thumb_w'    , $thumb_w);
 		$this->assignRef('thumb_h'    , $thumb_h);
-		$this->assignRef('pageNav'    , $pageNav);
+		$this->assignRef('pagination' , $pagination);
 		$this->assignRef('files' 			, $files);
 		$this->assignRef('fieldid' 		, $fieldid);
 		$this->assignRef('u_item_id' 	, $u_item_id);
@@ -328,6 +356,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$this->assignRef('CanUpload'       , $perms->CanUpload);
 		$this->assignRef('CanViewAllFiles' , $perms->CanViewAllFiles);
 		$this->assignRef('files_selected'  , $files_selected);
+		$this->assignRef('langs', $langs);
 		
 		parent::display($tpl);
 	}

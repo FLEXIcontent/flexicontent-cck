@@ -324,11 +324,13 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		$filter 	= $app->getUserStateFromRequest( $option.'.filemanager.filter', 'filter', 1, 'int' );
 		$search 	= $app->getUserStateFromRequest( $option.'.filemanager.search', 'search', '', 'string' );
 		$search 	= trim( JString::strtolower( $search ) );
-		$filter_uploader= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader', 'filter_uploader', 0, 'int' );
-		$filter_url			= $app->getUserStateFromRequest( $option.'.filemanager.filter_url', 'filter_url', '', 'word' );
-		$filter_secure	= $app->getUserStateFromRequest( $option.'.filemanager.filter_secure', 'filter_secure', '', 'word' );
-		$filter_ext			= $app->getUserStateFromRequest( $option.'.filemanager.filter_ext', 'filter_ext', '', 'alnum' );
-
+		
+		$filter_lang		= $app->getUserStateFromRequest( $option.'.filemanager.filter_lang', 		'filter_lang', 		'', 		'string' );
+		$filter_uploader= $app->getUserStateFromRequest( $option.'.filemanager.filter_uploader','filter_uploader',0,			'int' );
+		$filter_url			= $app->getUserStateFromRequest( $option.'.filemanager.filter_url', 		'filter_url', 		'',			'word' );
+		$filter_secure	= $app->getUserStateFromRequest( $option.'.filemanager.filter_secure', 	'filter_secure', 	'', 		'word' );
+		$filter_ext			= $app->getUserStateFromRequest( $option.'.filemanager.filter_ext', 		'filter_ext', 		'', 		'alnum' );
+		
 		$where = array();
 		
 		$permission = FlexicontentHelperPerm::getPerm();
@@ -339,7 +341,11 @@ class FlexicontentModelFilemanager extends JModelLegacy
 		} else if ( $filter_uploader ) {
 			$where[] = ' uploaded_by = ' . $filter_uploader;
 		}
-
+		
+		if ( $filter_lang ) {
+			$where[] = ' language = '. $this->_db->Quote( $filter_lang );
+		}
+		
 		if ( $filter_url ) {
 			if ( $filter_url == 'F' ) {
 				$where[] = ' url = 0';
