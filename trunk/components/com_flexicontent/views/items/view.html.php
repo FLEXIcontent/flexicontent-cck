@@ -623,10 +623,10 @@ class FlexicontentViewItems  extends JViewLegacy
 			$model->checkout();
 
 			if (FLEXI_J16GE) {
-				$asset = 'com_content.article.' . $model->get('id');
-				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
+				$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 				// ALTERNATIVE 1
-				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
+				//$asset = 'com_content.article.' . $model->get('id');
+				//$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
 				// ALTERNATIVE 2
 				//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $model->get('id'));
 				//$canEdit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $model->get('created_by') == $user->get('id')) ;
@@ -675,13 +675,7 @@ class FlexicontentViewItems  extends JViewLegacy
 			// CREATE action
 
 			if (FLEXI_J16GE) {
-				$canAdd	= $user->authorise('core.create', 'com_flexicontent');
-				// ALTERNATIVE 1
-				//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
-				// ALTERNATIVE 2
-				//$allowed_cats = count( FlexicontentHelperPerm::getAllowedCats($user, array('core.create')) );
-				//$allowed_cats = FlexicontentHelperPerm::checkUserElementsAccess($user->get('id'), 'core.create', 'category');
-				//$canAdd = count($allowed_cats) > 1;
+				$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
 				$not_authorised = !$canAdd;
 			} else if ($user->gid >= 25) {
 				$not_authorised = 0;
