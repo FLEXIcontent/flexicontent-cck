@@ -34,6 +34,9 @@ dump($this->row);
 */
 ?>
 
+<style>
+.pane-sliders { margin: 8px 0px 0px 0px; }
+</style>
 
 <div id="flexicontent" class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
@@ -45,7 +48,7 @@ dump($this->row);
 					
 					<div class="fcdualline_container">
 						<label for="title" class="flexi_label">
-							<?php echo JText::_( 'FLEXI_TITLE' ).':'; ?>
+							<?php echo JText::_( 'FLEXI_TITLE' ); ?>
 						</label>
 						<div class="container_fcfield fcdualline">
 							<input id="title" type="text" name="title" class="required" value="<?php echo $this->row->title; ?>" size="50" maxlength="100" />
@@ -53,7 +56,7 @@ dump($this->row);
 					</div>
 					<div class="fcdualline_container">
 						<label for="published" class="flexi_label">
-							<?php echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
+							<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>
 						</label>
 						<div class="container_fcfield fcdualline">
 							<?php echo JHTML::_('select.booleanlist', 'published', 'class="inputbox"', $this->row->published ); ?>
@@ -63,7 +66,7 @@ dump($this->row);
 						
 					<div class="fcdualline_container">
 						<label for="alias" class="flexi_label">
-							<?php echo JText::_( 'FLEXI_ALIAS' ).':'; ?>
+							<?php echo JText::_( 'FLEXI_ALIAS' ); ?>
 						</label>
 						<div class="container_fcfield fcdualline">
 							<input class="inputbox" type="text" name="alias" id="alias" size="50" maxlength="100" value="<?php echo $this->row->alias; ?>" />
@@ -71,7 +74,7 @@ dump($this->row);
 					</div>
 					<div class="fcdualline_container">
 						<label for="parent" class="flexi_label">
-							<?php echo JText::_( 'FLEXI_PARENT' ).':'; ?>
+							<?php echo JText::_( 'FLEXI_PARENT' ); ?>
 						</label>
 						<div class="container_fcfield fcdualline">
 							<?php echo $this->Lists['parent_id']; ?>
@@ -79,15 +82,6 @@ dump($this->row);
 					</div>
 					<div class="fcclear"></div>
 					
-					<div class="fcdualline_container">
-						<label for="parent" class="flexi_label">
-							<?php echo JText::_( 'FLEXI_COPY_PARAMETERS' ).':'; ?>
-						</label>
-						<div class="container_fcfield fcdualline">
-							<?php echo $this->Lists['copyid']; ?>
-						</div>
-					</div>
-					<div class="fcclear"></div>
 					
 				</div>
 									
@@ -129,8 +123,33 @@ dump($this->row);
 				
 			</td>
 			<td valign="top" width="480" style="padding: 7px 0 0 5px">
+
+				<fieldset class="flexi_params">
+					<legend><?php echo JText::_( 'Parameter handling' ); ?></legend>
+					<div class="fcdualline_container">
+						<label for="parent" class="flexi_label hasTip" title="::<?php echo JText::_( 'FLEXI_COPY_PARAMETERS_DESC',true ); ?>">
+							<?php echo JText::_( 'FLEXI_COPY_PARAMETERS' ); ?>
+						</label>
+						<div class="container_fcfield fcdualline">
+							<?php echo $this->Lists['copycid']; ?>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+
+					<div class="fcdualline_container">
+						<label for="parent" class="flexi_label hasTip" title="::<?php echo JText::_( 'FLEXI_CATS_INHERIT_PARAMS_DESC',true ); ?>">
+							<?php echo JText::_( 'FLEXI_CATS_INHERIT_PARAMS' ); ?>
+						</label>
+						<div class="container_fcfield fcdualline">
+							<?php echo $this->Lists['inheritcid']; ?>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+				</fieldset>
+				
+				
 				<?php
-				echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS');
+				echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS_INHERIT');
 				$title = JText::_( 'FLEXI_ACCESS' );
 				echo $this->pane->startPane( 'det-pane' );
 				if (!FLEXI_ACCESS) :

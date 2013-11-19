@@ -298,7 +298,16 @@
 		
 		<field name="" type="separator" default="FLEXI_CATEGORY_VIEW_CONF" label="" level="level1" menu="hide" />
 			
-
+			<field name="inheritcid" type="list" default="0" label="FLEXI_CATS_INHERIT_PARAMS" description="FLEXI_CATS_INHERIT_PARAMS_DESC" >
+				<option value="0">FLEXI_COMPONENT_ONLY</option>
+				<option value="-1">FLEXI_PARENT_CAT_MULTI_LEVEL</option>
+			</field>
+			<field name="debug_inheritcid" type="list" default="0" label="FLEXI_CATS_INHERIT_PARAMS_DEBUG" description="FLEXI_CATS_INHERIT_PARAMS_DEBUG_DESC" menu="hide" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			
 			<field name="" type="separator" default="FLEXI_CATEGORY_EXTRA" description="FLEXI_CATEGORY_EXTRA_DESC" level="level2" menu="hide" />
 			<field name="show_feed_link" type="list" default="1" label="FLEXI_ADD_FEED_TO_HEAD" description="FLEXI_ADD_FEED_TO_HEAD_DESC" menu="hide" >
 				<option value="0">FLEXI_NO</option>

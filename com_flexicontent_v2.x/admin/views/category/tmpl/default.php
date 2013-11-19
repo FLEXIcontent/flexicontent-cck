@@ -75,12 +75,6 @@ dump($this->row);
 					<div class="fcclear"></div>
 					
 					<div class="fcdualline_container">
-						<?php echo $this->form->getLabel('copycid'); ?>
-						<div class="container_fcfield fcdualline">
-							<?php echo $this->Lists['copyid']; ?>
-						</div>
-					</div>
-					<div class="fcdualline_container">
 						<?php echo $this->form->getLabel('language'); ?>
 						<div class="container_fcfield fcdualline">
 							<?php echo $this->form->getInput('language'); ?>
@@ -129,8 +123,31 @@ dump($this->row);
 				
 			</td>
 			<td valign="top" width="480" style="padding: 0px 0 0 5px;vertical-align:top;">
+
+				<fieldset class="flexi_params">
+					<legend><?php echo JText::_( 'Parameter handling' ); ?></legend>
+					<div class="fcdualline_container">
+						<?php echo $this->form->getLabel('copycid'); ?>
+						<div class="container_fcfield fcdualline">
+							<?php echo $this->Lists['copycid']; ?>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+
+					<?php foreach($this->form->getGroup('special') as $field): ?>
+					<div class="fcdualline_container">
+						<?php echo $field->label; ?>
+						<div class="container_fcfield fcdualline">
+							<?php echo $this->Lists[$field->fieldname]; ?>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+					<?php endforeach; ?>
+				</fieldset>
+				
+				
 				<?php
-				echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS');
+				echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS_INHERIT');
 				echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				echo JHtml::_('sliders.panel',JText::_('FLEXI_PUBLISHING_FIELDSET_LABEL'), 'publishing-details');
 				?>

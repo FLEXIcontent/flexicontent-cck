@@ -266,6 +266,9 @@ class FlexicontentModelCategory extends JModelAdmin
 		if(isset($_REQUEST['jform']['templates']))
 			$data['params'] = array_merge($data['params'], $_REQUEST['jform']['templates']);
 			
+		if(isset($_REQUEST['jform']['special']))
+			$data['params'] = array_merge($data['params'], $_REQUEST['jform']['special']);
+			
 		// Set the new parent id if parent id not matched OR while New/Save as Copy .
 		if ($table->parent_id != $data['parent_id'] || $data['id'] == 0)
 		{
