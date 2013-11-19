@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.categories.php 1794 2013-10-22 02:41:41Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.categories.php 1800 2013-11-01 04:30:57Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -256,6 +256,9 @@ class flexicontent_cats
 	 * @param string $check_published
 	 * @param string $check_perms
 	 * @param string $require_all
+	 * @param array $skip_subtrees
+	 * @param array $disable_subtrees
+	 * @param array $custom_options
 	 *
 	 * @return a category form field element
 	 */
@@ -263,7 +266,7 @@ class flexicontent_cats
 		$attribs = 'class="inputbox"', $check_published = false, $check_perms = true,
 		$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'),   // For item edit this should be array('core.create')
 		$require_all=true,   // Require (or not) all privileges present to accept a category
-		$skip_subtrees=array(), $disable_subtrees=array()
+		$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array()
 	) {
 		
 		// ***************************
@@ -350,6 +353,11 @@ class flexicontent_cats
 			$_first_item_treename = $first_item->treename; $_first_item_title = $first_item->title; $_first_item_id = $first_item->id;
 			$first_item->treename = $first_item->title = JText::_( 'FLEXI_SELECT_CAT' );
 			$first_item->id = "";
+		}
+		
+		// Extra custom options ... applies to all top parameters
+		foreach ($custom_options as $custom_value => $custom_option) {
+			$catlist[] 	= JHTML::_( 'select.option', $custom_value, '-- '.JText::_( $custom_option ).' --');
 		}
 		
 		

@@ -567,10 +567,14 @@
 		</params>
 	
 	
-	<params group="templates" addpath="/administrator/components/com_flexicontent/elements">	
+	<params group="templates" addpath="/administrator/components/com_flexicontent/elements">
 		<!-- Please do not change default category layout 'blog', as currently, it is hard coded in (a) the frontend category's view.html.php and (b) in the backend category manager listing -->
 		<field name="clayout" type="categorylayout" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
 		<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 	</params> 
 	
+	<params group="special" addpath="/administrator/components/com_flexicontent/elements">
+		<field name="inheritcid" type="text" default="" label="FLEXI_CATS_INHERIT_PARAMS" description="FLEXI_CATS_INHERIT_PARAMS_DESC" />
+	</params>
+
 </form>

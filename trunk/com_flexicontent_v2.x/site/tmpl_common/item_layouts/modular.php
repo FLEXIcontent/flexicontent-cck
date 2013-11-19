@@ -17,16 +17,17 @@
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
-// first define the template name
-$tmpl = $this->tmpl;
-$item = $this->item;
-$menu = JFactory::getApplication()->getMenu()->getActive();
 
 // USE HTML5 or XHTML
 $html5			= $this->params->get('htmlmode', 0); // 0 = XHTML , 1 = HTML5
 if ($html5) {  /* BOF html5  */
 	echo $this->loadTemplate('html5');
 } else {
+
+// first define the template name
+$tmpl = $this->tmpl;
+$item = $this->item;
+$menu = JFactory::getApplication()->getMenu()->getActive();
 
 JFactory::getDocument()->addScript( JURI::base(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
 JFactory::getDocument()->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/tabber.css');

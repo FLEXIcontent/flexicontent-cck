@@ -4,7 +4,7 @@
 	<field name="id" type="text" default="0" label="FLEXI_TITLE" description ="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" />
 	<field name="asset_id" type="hidden" filter="unset"/>
 	<field name="parent_id" type="categorytree" top="1" label="FLEXI_PARENT" description="COM_CATEGORIES_FIELD_PARENT_DESC" class="inputbox" />
-	<field name="copycid" type="categorytree" top="2" label="FLEXI_COPY_PARAMETERS" description="FLEXI_COPY_PARAMETERS" class="inputbox" />
+	<field name="copycid" type="categorytree" top="2" label="FLEXI_COPY_PARAMETERS" description="FLEXI_COPY_PARAMETERS_DESC" class="inputbox" />
 	<field name="lft" type="hidden" filter="unset"/>
 	<field name="rgt" type="hidden" filter="unset"/>
 	<field name="level" type="hidden" filter="unset"/>
@@ -614,7 +614,7 @@
 			<option value="noindex, follow">JGLOBAL_NOINDEX_FOLLOW</option>
 			<option value="index, nofollow">JGLOBAL_INDEX_NOFOLLOW</option>
 			<option value="noindex, nofollow">JGLOBAL_NOINDEX_NOFOLLOW</option>
-			</field>
+		</field>
 	</fields>
 	
 	<fields name="templates">
@@ -623,4 +623,8 @@
 		<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
 	</fields>
 	
+	<fields name="special">
+		<field name="inheritcid" type="text" default="" label="FLEXI_CATS_INHERIT_PARAMS" description="FLEXI_CATS_INHERIT_PARAMS_DESC" />
+	</fields>
+
 </form>

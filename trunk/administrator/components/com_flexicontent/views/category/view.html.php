@@ -53,6 +53,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		} else {
 			$row  = $this->get( 'Category' );
 		}
+		$catparams = FLEXI_J16GE ? new JRegistry($row->params) : new JParameter($row->params);
 		
 		$cid    =	$row->id;
 		$isnew  = !$cid;
@@ -228,6 +229,13 @@ class FlexicontentViewCategory extends JViewLegacy
 					unset($form->_xml['templates']->param[$i]);
 				}
 			}
+			
+			foreach($form->_xml['special']->_children as $i => $child) {
+				if ( isset($child->_attributes['enableparam']) && !$cparams->get($child->_attributes['enableparam']) ) {
+					unset($form->_xml['special']->_children[$i]);
+					unset($form->_xml['special']->param[$i]);
+				}
+			}
 		}
 		
 		
@@ -269,7 +277,16 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
 		$fieldname = FLEXI_J16GE ? 'jform[copycid]' : 'copycid';
-		$Lists['copyid']    = flexicontent_cats::buildcatselect($categories, $fieldname, '', $top=2, 'class="inputbox"', $check_published, $check_perms, $actions_allowed, $require_all=false);
+		$Lists['copycid']    = flexicontent_cats::buildcatselect($categories, $fieldname, '', $top=2, 'class="inputbox"', $check_published, $check_perms, $actions_allowed, $require_all=false);
+		
+		$custom_options[''] = 'FLEXI_USE_GLOBAL';
+		$custom_options['0'] = 'FLEXI_COMPONENT_ONLY';
+		$custom_options['-1'] = 'FLEXI_PARENT_CAT_MULTI_LEVEL';
+		
+		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
+		$fieldname = FLEXI_J16GE ? 'jform[special][inheritcid]' : 'params[inheritcid]';
+		$Lists['inheritcid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $catparams->get('inheritcid', ''),$top=false, 'class="inputbox"',
+			$check_published, $check_perms, $actions_allowed, $require_all=false, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options);
 		
 		
 		// ************************

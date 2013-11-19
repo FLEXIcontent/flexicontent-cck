@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1798 2013-10-27 18:38:42Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1806 2013-11-10 01:38:20Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -130,15 +130,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 	protected function populateCategoryState($ordering = null, $direction = null) {
 		$this->_layout = JRequest::getCmd('layout', '');  // !! This should be empty for empty for 'category' layout
 		
-		$load_category_params = true;
 		if ($this->_layout=='author') {
 			$this->_authorid = JRequest::getInt('authorid', 0);
-			if (!$this->_authorid) $load_category_params = false;
 		}
 		else if ($this->_layout=='myitems') {
 			$user = JFactory::getUser();
 			$this->_authorid = $user->id;
-			if (!$this->_authorid) $load_category_params = false;
 		}
 		else if ($this->_layout=='mcats') {
 			$mcats_list = JRequest::getVar('cids', '');
@@ -150,7 +147,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 			foreach ($mcats_list as $i => $_id)  if ((int)$_id) $this->_ids[] = (int)$_id;
 		}
 		else if (!$this->_id) {
-			$load_category_params = false;
 		}
 		
 		// Set layout and authorid variables into state
@@ -1410,60 +1406,92 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( $this->_params !== NULL ) return;
 		
 		$app  = JFactory::getApplication();
-		$menu = $app->getMenu()->getActive();     // Retrieve active menu
+		$menu = $app->getMenu()->getActive();     // Retrieve active menu item
+		$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);  // Get active menu item parameters
+		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;   // Get the COMPONENT only parameters
 		
-		// Retrieve author parameters if using displaying AUTHOR layout
-		$author_basicparams = '';
-		$author_catparams = '';
+		// a. Clone component parameters ... we will use these as parameters base for merging
+		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
+		$debug_inheritcid = $params->get('debug_inheritcid');
+		if ($debug_inheritcid)	JFactory::getApplication()->enqueueMessage("CLONED COMPONENT PARAMETERS<br/>\n");
+		
+		// b. Retrieve category parameters and create parameter object
+		if ($id) {
+			$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
+			$this->_db->setQuery($query);
+			$catparams = $this->_db->loadResult();
+			$cparams = FLEXI_J16GE ? new JRegistry($catparams) : new JParameter($catparams);
+		} else {
+			$cparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+		}
+		
+		
+		// c. Retrieve author parameters if using displaying AUTHOR/MYITEMS layouts, and merge them into category parameters
 		if ($this->_authorid!=0) {
 			$query = 'SELECT author_basicparams, author_catparams FROM #__flexicontent_authors_ext WHERE user_id = ' . $this->_authorid;
 			$this->_db->setQuery($query);
 			$author_extdata = $this->_db->loadObject();
-			if ($author_extdata) {
-				$author_basicparams = $author_extdata->author_basicparams;
-				$author_catparams =  $author_extdata->author_catparams;
+			if ($author_extdata)
+			{
+				// Merge author basic parameters
+				$_author_basicreg = FLEXI_J16GE ? new JRegistry($author_extdata->author_basicparams) : new JParameter($author_extdata->author_basicparams);
+				$cparams->merge( $_author_basicreg );
 				
-				$authorparams = FLEXI_J16GE ? new JRegistry($author_basicparams) : new JParameter($author_basicparams);
-				if (!$authorparams->get('override_currcatconf',0)) {
-					$author_catparams = '';
+				// Merge author OVERRIDDEN category parameters
+				$_author_catreg = FLEXI_J16GE ? new JRegistry($author_extdata->author_catparams)   : new JParameter($author_extdata->author_catparams);
+				if ( $_author_catreg->get('override_currcatconf',0) ) {
+					$cparams->merge( $_author_catreg );
 				}
 			}
 		}
 		
-		// Retrieve category parameters
-		$catparams = "";
-		if ($id && $this->_layout!="myitems") {
-			$query = 'SELECT params FROM #__categories WHERE id = ' . $id;
+		
+		// d. Retrieve parent categories parameters and create parameter object
+		global $globalcats;
+		$heritage_stack = array();
+		$inheritcid = $cparams->get('inheritcid', '');
+		$inheritcid_comp = $params->get('inheritcid', '');
+		$inrerit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
+		
+		if ( $id && $inrerit_parent && !empty($globalcats[$id]->ancestorsonly) ) {
+			$order_clause = FLEXI_J16GE ? 'level' : 'FIELD(id, ' . $globalcats[$id]->ancestorsonly . ')';
+			$query = 'SELECT title, id, params FROM #__categories'
+				.' WHERE id IN ( ' . $globalcats[$id]->ancestorsonly . ')'
+				.' ORDER BY '.$order_clause.' DESC';
 			$this->_db->setQuery($query);
-			$catparams = $this->_db->loadResult();
+			$catdata = $this->_db->loadObjectList('id');
+			if (!empty($catdata)) {
+				foreach ($catdata as $parentcat) {
+					$parentcat->params = FLEXI_J16GE ? new JRegistry($parentcat->params) : new JParameter($parentcat->params);
+					array_push($heritage_stack, $parentcat);
+					$inheritcid = $parentcat->params->get('inheritcid', '');
+					$inrerit_parent = $inheritcid==='-1' || ($inheritcid==='' && $inheritcid_comp);
+					if ( !$inrerit_parent ) break; // Stop inheriting from further parent categories
+				}
+			}
+		} else if ( $id && $inheritcid > 0 && !empty($globalcats[$inheritcid]) ){
+			$query = 'SELECT title, params FROM #__categories WHERE id = '. $inheritcid;
+			$this->_db->setQuery($query);
+			$catdata = $this->_db->loadObject();
+			if ($catdata) {
+				$catdata->params = FLEXI_J16GE ? new JRegistry($catdata->params) : new JParameter($catdata->params);
+				array_push($heritage_stack, $catdata);
+			}
 		}
 		
-		// a. Get the COMPONENT only parameters, NOTE: we will merge the menu parameters later selectively.
-		$comp_params = JComponentHelper::getComponent('com_flexicontent')->params;
-		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
-		if ($menu) {
-			$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+		// e. Merge inherited category parameters (e.g. ancestor categories or specific category)
+		while (!empty($heritage_stack)) {
+			$catdata = array_pop($heritage_stack);
+			$params->merge($catdata->params);
+			if ($debug_inheritcid) JFactory::getApplication()->enqueueMessage("MERGED CATEGORY PARAMETERS of (inherit-from) category: ".$catdata->title ."<br/>\n");
 		}
 		
-		// b. Merge category parameters
-		$cparams = FLEXI_J16GE ? new JRegistry($catparams) : new JParameter($catparams);
+		// f. Merge category parameter / author overriden category parameters
 		$params->merge($cparams);
+		if ($debug_inheritcid && $id) JFactory::getApplication()->enqueueMessage("MERGED CATEGORY PARAMETERS of current category<br/>\n");
+		if ($debug_inheritcid && $this->_authorid) JFactory::getApplication()->enqueueMessage("MERGED CATEGORY PARAMETERS of (current) author: {$this->_authorid} <br/>\n");
 		
-		// c. Merge author basic parameters
-		if ($author_basicparams!=='') {
-			// DO NOT move directly below or the following call fails in PHP <=5.3 (with reference error)
-			$_author_basicreg = FLEXI_J16GE ? new JRegistry($author_basicparams) : new JParameter($author_basicparams);
-			$params->merge( $_author_basicreg );
-		}
-
-		// d. Merge author OVERRIDDEN category parameters
-		if ($author_catparams!=='') {
-			// DO NOT move directly below or the following call fails in PHP <=5.3 (with reference error)
-			$_author_catreg = FLEXI_J16GE ? new JRegistry($author_catparams) : new JParameter($author_catparams);
-			$params->merge( $_author_catreg );
-		}
-
-		// Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
+		// g. Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
 		if ( !empty($menu) )
 		{
 			$this->_menu_itemid = $menu->id;
@@ -1481,6 +1509,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ( $menu_matches && $overrideconf ) {
 				// Add - all - menu parameters related or not related to category parameters override
 				$params->merge($menu_params);
+				if ($debug_inheritcid) JFactory::getApplication()->enqueueMessage("MERGED CATEGORY PARAMETERS of (current) menu item: ".$menu->id."<br/>\n");
 			} else if ($menu_matches) {
 				// Add menu parameters - not - related to category parameters override
 				$params->set( 'item_depth', $menu_params->get('item_depth') );
@@ -1490,6 +1519,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$params->set( 'pageclass_sfx', $menu_params->get('pageclass_sfx') );
 			}
 		}
+		
+		
 		
 		// Parameters meant for lists
 		$params->set('show_title', $params->get('show_title_lists'));    // Parameter meant for lists
@@ -1503,11 +1534,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if (FLEXI_J16GE) {
 			if ( is_array($orderbycustomfieldid = $params->get('orderbycustomfieldid', 0)) ) {
 				JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, had a bug, please open category and resave it, you can use 'copy parameters' to quickly update many categories");
-				$cparams->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
+				$params->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
 			}
 			if ( preg_match("/option=com_user&/", $params->get('login_page', '')) ) {
 				JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, set the login url wrongly in the global configuration.<br /> Please replace: <u>option=com_user</u> with <u>option=com_users</u>");
-				$cparams->set( 'login_page', str_replace("com_user&", "com_users&", $params->get('login_page', '')) );
+				$params->set( 'login_page', str_replace("com_user&", "com_users&", $params->get('login_page', '')) );
 			}
 		}
 		
@@ -1526,7 +1557,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @return object
 	 * @since 1.5
 	 */
-	function & getFilters($filt_param='filters', $usage_param='use_filters', & $params = null, $check_access=true)
+	function &getFilters($filt_param='filters', $usage_param='use_filters', & $params = null, $check_access=true)
 	{
 		$user    = JFactory::getUser();
 		$filters = array();
