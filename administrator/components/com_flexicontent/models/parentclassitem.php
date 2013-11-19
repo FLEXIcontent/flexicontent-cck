@@ -981,15 +981,18 @@ class ParentClassItem extends JModelLegacy
 		
 		// Compute CREATE access permissions.
 		if ( !$this->_id ) {
-			// first check if general create permission is missing, to avoid unneeded checking of creation in individual categories
-			if ( !$user->authorise('core.create', 'com_flexicontent') ) {
+			
+			// Check if general create permission is missing, NOTE: THIS CAN BE SOFT DENY
+			// ... so we do need to check category 'create' privilege for all categories !!
+			/*if ( !$user->authorise('core.create', 'com_flexicontent') ) {
 				$iparams_extra->set('access-create', false);
-			}
-			// general permission is present, check that user can create item in at least one category
-			else {
-				$usercats = FlexicontentHelperPerm::getAllowedCats($user, array('core.create'));
-				$iparams_extra->set('access-create', count($usercats));
-			}
+				return $iparams_extra;  // New item, so do not calculate EDIT, DELETE and VIEW access
+			}*/
+			
+			// Check that user can create item in at least one category ... this check is not wasted,
+			// since joomla will cache it and use it later during creation of allowed Category Tree
+			$usercats = FlexicontentHelperPerm::getAllowedCats($user, array('core.create'));
+			$iparams_extra->set('access-create', count($usercats));
 			return $iparams_extra;  // New item, so do not calculate EDIT, DELETE and VIEW access
 		}
 		
