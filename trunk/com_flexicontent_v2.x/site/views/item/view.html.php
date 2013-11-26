@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1767 2013-09-18 17:46:46Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1809 2013-11-19 23:01:31Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -50,9 +50,10 @@ class FlexicontentViewItem  extends JViewLegacy
 			$this->setLayout('item');
 		}
 
-		// Get Content Types with no category links in item view pathways
-		global $globalnopath;
-		if (!is_array($globalnopath))     $globalnopath	= array();
+		// Get Content Types with no category links in item view pathways, and for unroutable (non-linkable) categories
+		global $globalnoroute, $globalnopath, $globalcats;
+		if (!is_array($globalnopath))  $globalnopath  = array();
+		if (!is_array($globalnoroute)) $globalnoroute = array();
 		
 		//initialize variables
 		$dispatcher = JDispatcher::getInstance();
@@ -177,13 +178,15 @@ class FlexicontentViewItem  extends JViewLegacy
 		}*/
 
 		$fields = $item->fields;
-
-		// Pathway need to be improved
-		$cats		= new flexicontent_cats($cid);
-		$parents	= $cats->getParentlist();
-		$depth		= $params->get('item_depth', 0);
-
-
+		
+		// Pathway needed variables
+		//$catshelper = new flexicontent_cats((int)$category->id);
+		//$parents    = $catshelper->getParentlist();
+		//echo "<pre>".print_r($parents,true)."</pre>";
+		$parent_ids = $globalcats[$cid]->ancestorsarray;
+		foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
+		
+		
 		// **********************
 		// Calculate a page title
 		// **********************
@@ -218,7 +221,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$params->def('show_page_heading', 0);
 		$params->def('show_page_title', 0);
 		
-		// ... the page heading text
+		// ... the page heading text, set it only if not already set
 		$params->def('page_heading', $params->get('page_title'));    // J1.5: parameter name was show_page_title instead of show_page_heading
 		$params->def('page_title', $params->get('page_heading'));    // J2.5: to offer compatibility with old custom templates or template overrides
 		
@@ -245,12 +248,12 @@ class FlexicontentViewItem  extends JViewLegacy
 				$doc_title = $doc_title ." - ". $app->getCfg('sitename') ;
 			}
 		}
-
+		
 		// Finally, set document title
 		$document->setTitle($doc_title);
-
-
-
+		
+		
+		
 		// @TODO check that as it seems to be dirty :(
 		$uri   = JFactory::getURI();
 		$base  = $uri->getScheme() . '://' . $uri->getHost();
@@ -341,12 +344,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		if(isset($item->fields['text']->toc)) {
 			$item->toc = &$item->fields['text']->toc;
 		}
-
+		
 		// ********************************************************************************************
 		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
 		// ********************************************************************************************
 		$pathway = $app->getPathWay();
-
+		
 		// Clear pathway, if automatic pathways are enabled
 		if ( $params->get('automatic_pathways', 0) ) {
 			$pathway_arr = $pathway->getPathway();
@@ -356,22 +359,25 @@ class FlexicontentViewItem  extends JViewLegacy
 		} else {
 			$item_depth = $params->get('item_depth', 0);
 		}
-
+		
 		// Respect menu item depth, defined in menu item
 		$p = $item_depth;
 		while ( $p < count($parents) ) {
 			// For some Content Types the pathway should not be populated with category links
 			if ( in_array($item->type_id, $globalnopath) )  break;
-
+			
+			// Do not add to pathway unroutable categories
+			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
+			
 			// Add current parent category
-			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
+			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
 			$p++;
 		}
 		if ($params->get('add_item_pathway', 1)) {
 			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)) );
 		}
-
-
+		
+		
 		// ************************
 		// Set document's META tags
 		// ************************

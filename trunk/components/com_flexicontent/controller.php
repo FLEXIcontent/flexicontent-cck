@@ -1796,9 +1796,9 @@ class FlexicontentController extends JControllerLegacy
 				// Parse and identify language strings and then make language replacements
 				$notification_tmpl = $fields_conf[$field_id]->get('notification_tmpl');
 				if ( empty($notification_tmpl) ) {
-					$notification_tmpl = '%%FLEXI_FDN_FILE_NO%% __FILE_ID__:  "__FILE_TITLE__" '."\n";
-					$notification_tmpl .= '%%FLEXI_FDN_FILE_IN_ITEM%% "__ITEM_TITLE__":' ."\n";
-					$notification_tmpl .= '__ITEM_URL__';
+					$notification_tmpl = '%%FLEXI_FDN_FILE_NO%% __file_id__:  "__file_title__" '."\n";
+					$notification_tmpl .= '%%FLEXI_FDN_FILE_IN_ITEM%% "__item_title__":' ."\n";
+					$notification_tmpl .= '__item_url__';
 				}
 				
 				$result = preg_match_all("/\%\%([^%]+)\%\%/", $notification_tmpl, $translate_matches);
@@ -1869,11 +1869,11 @@ class FlexicontentController extends JControllerLegacy
 				$_message = $message_header;
 				foreach($files_arr as $filedata) {
 					$_mssg_file = $filedata->notification_tmpl;
-					$_mssg_file = str_replace('__FILE_ID__', $filedata->id, $_mssg_file);
-					$_mssg_file = str_replace('__FILE_TITLE__', $filedata->__file_title__, $_mssg_file);
-					$_mssg_file = str_replace('__ITEM_TITLE__', $filedata->item_title, $_mssg_file);
-					//$_mssg_file = str_replace('__ITEM_TITLE_LINKED__', $filedata->password, $_mssg_file);
-					$_mssg_file = str_replace('__ITEM_URL__', $filedata->__item_url__, $_mssg_file);
+					$_mssg_file = str_ireplace('__file_id__', $filedata->id, $_mssg_file);
+					$_mssg_file = str_ireplace('__file_title__', $filedata->__file_title__, $_mssg_file);
+					$_mssg_file = str_ireplace('__item_title__', $filedata->item_title, $_mssg_file);
+					//$_mssg_file = str_ireplace('__item_title_linked__', $filedata->password, $_mssg_file);
+					$_mssg_file = str_ireplace('__item_url__', $filedata->__item_url__, $_mssg_file);
 					$_message .= "\n\n" . $_mssg_file;
 				}
 				//echo "<pre>". $_message ."</pre>";

@@ -36,9 +36,9 @@ class flexicontent_cats
 	 *
 	 * @var array
 	 */
-	var $parentcats_ids  = array();  // ids of ancestors categories, populated by buildParentCats(), used by getParentCats()
+	var $parentcats_ids  = null;  // ids of ancestors categories, populated by buildParentCats(), used by getParentCats()
 	
-	var $parentcats_data = array();  // data (id,title,categoryslug) of ancestors categories, populated by getParentCats() and accessed via getParentlist()
+	var $parentcats_data = null;  // data (id,title,categoryslug) of ancestors categories, populated by getParentCats() and accessed via getParentlist()
 	
 	/**
 	 * Constructor
@@ -54,8 +54,6 @@ class flexicontent_cats
 	public function flexicontent_cats($cid)
 	{
 		$this->id = $cid;
-		$this->buildParentCats($this->id);	// Retrieves ids of ancestors categories and set them in member array variable 'parentcats_ids'
-		$this->getParentCats();							// Get basic data for ancestors (id,title,categoryslug) and set them in member array variable 'category'
 	}
     
 	/**
@@ -66,23 +64,17 @@ class flexicontent_cats
 	protected function getParentCats()
 	{
 		$db = JFactory::getDBO();
-		global $globalnoroute;
-		$globalnoroute = !is_array($globalnoroute) ? array() : $globalnoroute;
 		
-		$this->parentcats_ids = array_reverse($this->parentcats_ids);
-				
+		$query = 'SELECT id, title, published,'
+				.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
+				.' FROM #__categories'
+				.' WHERE id IN ('.implode($this->parentcats_ids, ',').')'
+				. (!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ' )
+				;
+		$db->setQuery($query);
+		$cats = $db->loadObjectList('id');
 		foreach($this->parentcats_ids as $cid) {
-			
-			$query = 'SELECT id, title,'
-					.' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as categoryslug'
-					.' FROM #__categories'
-					.' WHERE id ='. $db->Quote((int)$cid)
-					. (!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ' )
-					.' AND published = 1'
-					;
-			$db->setQuery($query);
-			$cat = $db->loadObject();
-			if ($cat && !in_array($cat->id, $globalnoroute) )	$this->parentcats_data[] = $cat;
+			if ( isset($cats[$cid]) )	$this->parentcats_data[] = $cats[$cid];
 		}
 	}
 	
@@ -95,26 +87,39 @@ class flexicontent_cats
 	{
 		$db = JFactory::getDBO();
 		
-		$query = 'SELECT parent_id FROM #__categories WHERE id = '.(int)$cid
-			. (!FLEXI_J16GE ? ' AND section = '.FLEXI_SECTION : ' AND extension="'.FLEXI_CAT_EXTENSION.'" ' );
+		// ALTERNATIVE 1
+		/*$currcat = JCategories::getInstance('Content')->get($cid);
+		while ($currcat->id != 'root') {
+			$this->parentcats_ids[] = $currcat->id;
+			$currcat = $currcat->getParent();
+		}*/
+		
+		// ALTERNATIVE 2
+		/*$query = ' SELECT cat.id as id '
+		 .' FROM #__categories AS cat '
+		 .' WHERE cat.extension = ' . $db->Quote('com_content') .' AND (SELECT lft FROM #__categories WHERE id='.(int)$cid.' ) BETWEEN cat.lft AND cat.rgt'
+		 .' GROUP BY cat.id '
+		 .' ORDER BY cat.level ASC';
 		
 		$db->setQuery( $query );
-		$parents[$cid] = $db->loadResult();
-
-		array_push($this->parentcats_ids, $cid);
-
-		//if we still have results
-		if ( (!FLEXI_J16GE && $parents[$cid] > 0 )  ||  (FLEXI_J16GE && $parents[$cid] > 1) ) {
-			$this->buildParentCats($parents[$cid]);
-		}
+		$this->parentcats_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');*/
+		
+		global $globalcats;
+		$this->parentcats_ids = $globalcats[$cid]->ancestorsarray;
+		//echo "<pre>" . print_r($this->parentcats_ids, true) ."</pre>";
 	}
 	
 	/*
-	 * Returns the parent category array that was build by functions buildParentCats() and getParentCats(), which were by constructor for category cid
+	 * Returns the parent category array that is build by functions buildParentCats() and getParentCats()
 	 *
 	 */
 	public function getParentlist()
 	{
+		if ($this->parentcats_data===null) {
+			$this->buildParentCats($this->id);	// Retrieves ids of ancestors categories and set them in member array variable 'parentcats_ids'
+			$this->getParentCats();							// Get basic data for ancestors (id,title,slug, etc) and set them in member array variable 'category'
+		}
 		return $this->parentcats_data;
 	}
 	
