@@ -38,9 +38,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// *******************************************
 	
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, $item)
+	function onDisplayField(&$field, &$item)
 	{
+		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
 		$field->label = JText::_($field->label);
 		
 		$app      = JFactory::getApplication();
@@ -50,10 +52,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		static $common_js_css_added = false;
 		
 		// some parameter shortcuts
-		$multiple     = $field->parameters->get('allow_multiple', 1) ;
-		$maxval       = $field->parameters->get('max_values', 0) ;
-		$image_source = $field->parameters->get('image_source', 0) ;
-		$imagepicker  = $field->parameters->get('imagepicker', 1) ;
+		$multiple     = $field->parameters->get('allow_multiple', 1);
+		$max_values   = (int)$field->parameters->get('max_values', 0);
+		$image_source = $field->parameters->get('image_source', 0);
+		$imagepicker  = $field->parameters->get('imagepicker', 1);
 		$all_media    = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		
@@ -117,6 +119,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		if ($multiple) // handle multiple records
 		{
+			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
+			
 			//add the drag and drop sorting feature
 			$js = "
 			window.addEvent('domready', function(){
@@ -127,142 +131,143 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					});			
 				});
 			";
-			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
-			$document->addScriptDeclaration($js);
 			
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
 			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 			
 			// WARNING: bellow we also use $field->name which is different than $fieldname
 			
+			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$auto_enable_imgpicker = 0;  // Disabled to help performance
-			$js = "
+			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxVal".$field->id."		= ".$maxval.";
+			var maxValues".$field->id."	= ".$max_values.";
 
 			function addField".$field->id."(el) {
-				if((rowCount".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
-
-					var thisField 	 = $(el).getPrevious().getLast();
-					var thisNewField = thisField.clone();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
-					} else {
-						var fx = thisNewField.effects(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
-					}
+				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
+					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
+					return 'cancel';
+				}
+				
+				var thisField 	 = $(el).getPrevious().getLast();
+				var thisNewField = thisField.clone();
+				if (MooTools.version>='1.2.4') {
+					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+				} else {
+					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+				}
+				
+			".( $image_source ? "" :"
+				var has_imagepicker = jQuery(thisNewField).find('ul.image_picker_selector').length != 0;
+				var has_select2     = jQuery(thisNewField).find('div.select2-container').length != 0;
+				if (has_imagepicker) jQuery(thisNewField).find('ul.image_picker_selector').remove();
+				if (has_select2)     jQuery(thisNewField).find('div.select2-container').remove();
+				").
+			"
+			
+				thisNewField.getElements('input.newfile').setProperty('value','');
+				thisNewField.getElements('input.newfile').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+']');
+				thisNewField.getElements('input.newfile').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_newfile');
+				
+				thisNewField.getElements('input.originalname').setProperty('value','');
+				thisNewField.getElements('input.originalname').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][originalname]');
+				thisNewField.getElements('input.originalname').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_originalname');
+				
+				thisNewField.getElements('.existingname').setProperty('value','');
+				thisNewField.getElements('.existingname').addClass('no_value_selected');
+				thisNewField.getElements('.existingname').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][existingname]');
+				thisNewField.getElements('.existingname').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_existingname');
+				
+			".( $image_source ? "" :"
+				if (has_imagepicker && ".$auto_enable_imgpicker." ) jQuery(thisNewField).find('select.image-picker').imagepicker({ hide_select:false, show_label:true });
+				if (has_select2)  jQuery(thisNewField).find('select.use_select2_lib').select2();
+				").
+			"
+				thisNewField.getElements('a.addfile_".$field->id."').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
+				thisNewField.getElements('a.addfile_".$field->id."').setProperty('href','".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$thumb_w_s.'&thumb_h='.$thumb_h_s.'&autoassign='.$autoassign."');
+				
+				// COPYING an existing value
+				if (thisNewField.getElement('img.preview_image')) {
+					var tmpDiv = jQuery('<div class=\"empty_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>');
+					tmpDiv.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
+					tmpDiv.insertAfter( jQuery(thisNewField).find('img.preview_image') );
+					jQuery(thisNewField).find('img.preview_image').remove();
+				}
+				
+				// COPYING an empty value
+				else if (thisNewField.getElement('div.empty_image')) {
+					jQuery(thisNewField).find('div.empty_image').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
+				}
+				
+				var imgchange_toggler = jQuery(thisNewField).find('input.imgchange');
+				if (imgchange_toggler.length) {
+					imgchange_toggler.prop('name','".$field->name."['+uniqueRowNum".$field->id."+']');
+					imgchange_toggler.prop('id','".$elementid."_'+uniqueRowNum".$field->id."+'_change');
+					imgchange_toggler.parent().find('label').prop('for','".$elementid."_'+uniqueRowNum".$field->id."+'_change');
 					
-				".( $image_source ? "" :"
-					var has_imagepicker = jQuery(thisNewField).find('ul.image_picker_selector').length != 0;
-					var has_select2     = jQuery(thisNewField).find('div.select2-container').length != 0;
-					if (has_imagepicker) jQuery(thisNewField).find('ul.image_picker_selector').remove();
-					if (has_select2)     jQuery(thisNewField).find('div.select2-container').remove();
-					").
+					thisNewField.getElements('table.img_upload_select').setProperty('id','".$field->name."_upload_select_tbl_'+uniqueRowNum".$field->id.");
+					thisNewField.getElements('table.img_upload_select').setStyle('display', 'table');
+					jQuery(thisNewField).find('input.imgchange').prop('checked', true);
+				}
+				";
+				
+			if ($linkto_url) $js .= "
+				thisNewField.getElements('input.imglink').setProperty('value','');
+				thisNewField.getElements('input.imglink').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][urllink]');
+				";
+				
+			if ($usealt) $js .= "
+				thisNewField.getElements('input.imgalt').setProperty('value','".$default_alt."');
+				thisNewField.getElements('input.imgalt').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][alt]');
+				";
+				
+			if ($usetitle) $js .= "
+				thisNewField.getElements('input.imgtitle').setProperty('value','".$default_title."');
+				thisNewField.getElements('input.imgtitle').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				";
+				
+			if ($usedesc) $js .= "
+				thisNewField.getElements('textarea.imgdesc').setProperty('value','".$default_desc."');
+				thisNewField.getElements('textarea.imgdesc').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][desc]');
+				";
+				
+			$js .= "
+				jQuery(thisNewField).insertAfter( jQuery(thisField) );
+				".// We need to re-execute setting of modal popup since when this run the current element did not exist
 				"
 				
-					thisNewField.getElements('input.newfile').setProperty('value','');
-					thisNewField.getElements('input.newfile').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+']');
-					thisNewField.getElements('input.newfile').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_newfile');
-					
-					thisNewField.getElements('input.originalname').setProperty('value','');
-					thisNewField.getElements('input.originalname').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][originalname]');
-					thisNewField.getElements('input.originalname').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_originalname');
-					
-					thisNewField.getElements('.existingname').setProperty('value','');
-					thisNewField.getElements('.existingname').addClass('no_value_selected');
-					thisNewField.getElements('.existingname').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][existingname]');
-					thisNewField.getElements('.existingname').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_existingname');
-					
-				".( $image_source ? "" :"
-					if (has_imagepicker && ".$auto_enable_imgpicker." ) jQuery(thisNewField).find('select.image-picker').imagepicker({ hide_select:false, show_label:true });
-					if (has_select2)  jQuery(thisNewField).find('select.use_select2_lib').select2();
-					").
-				"
-					thisNewField.getElements('a.addfile_".$field->id."').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
-					thisNewField.getElements('a.addfile_".$field->id."').setProperty('href','".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$thumb_w_s.'&thumb_h='.$thumb_h_s.'&autoassign='.$autoassign."');
-					
-					// COPYING an existing value
-					if (thisNewField.getElement('img.preview_image')) {
-						var tmpDiv = jQuery('<div class=\"empty_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>');
-						tmpDiv.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
-						tmpDiv.insertAfter( jQuery(thisNewField).find('img.preview_image') );
-						jQuery(thisNewField).find('img.preview_image').remove();
-					}
-					
-					// COPYING an empty value
-					else if (thisNewField.getElement('div.empty_image')) {
-						jQuery(thisNewField).find('div.empty_image').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
-					}
-					
-					var imgchange_toggler = jQuery(thisNewField).find('input.imgchange');
-					if (imgchange_toggler.length) {
-						imgchange_toggler.prop('name','".$field->name."['+uniqueRowNum".$field->id."+']');
-						imgchange_toggler.prop('id','".$elementid."_'+uniqueRowNum".$field->id."+'_change');
-						imgchange_toggler.parent().find('label').prop('for','".$elementid."_'+uniqueRowNum".$field->id."+'_change');
-						
-						thisNewField.getElements('table.img_upload_select').setProperty('id','".$field->name."_upload_select_tbl_'+uniqueRowNum".$field->id.");
-						thisNewField.getElements('table.img_upload_select').setStyle('display', 'table');
-						jQuery(thisNewField).find('input.imgchange').prop('checked', true);
-					}
-					";
-					
-			if ($linkto_url) $js .= "
-					thisNewField.getElements('input.imglink').setProperty('value','');
-					thisNewField.getElements('input.imglink').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][urllink]');
-					";
-					
-			if ($usealt) $js .= "
-					thisNewField.getElements('input.imgalt').setProperty('value','".$default_alt."');
-					thisNewField.getElements('input.imgalt').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][alt]');
-					";
-					
-			if ($usetitle) $js .= "
-					thisNewField.getElements('input.imgtitle').setProperty('value','".$default_title."');
-					thisNewField.getElements('input.imgtitle').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
-					";
-					
-			if ($usedesc) $js .= "
-					thisNewField.getElements('textarea.imgdesc').setProperty('value','".$default_desc."');
-					thisNewField.getElements('textarea.imgdesc').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][desc]');
-					";
-					
-			$js .= "
-					jQuery(thisNewField).insertAfter( jQuery(thisField) );
-					".// We need to re-execute setting of modal popup since when this run the current element did not exist
-					"
-					
-					SqueezeBox.initialize({});
-					if (MooTools.version>='1.2.4') {
-						SqueezeBox.assign($$('a.addfile_".$field->id."'), {
-							parse: 'rel'
+				SqueezeBox.initialize({});
+				if (MooTools.version>='1.2.4') {
+					SqueezeBox.assign($$('a.addfile_".$field->id."'), {
+						parse: 'rel'
+					});
+				} else {
+					$$('a.addfile_".$field->id."').each(function(el) {
+						el.addEvent('click', function(e) {
+							new Event(e).stop();
+							SqueezeBox.fromElement(el);
 						});
-					} else {
-						$$('a.addfile_".$field->id."').each(function(el) {
-							el.addEvent('click', function(e) {
-								new Event(e).stop();
-								SqueezeBox.fromElement(el);
-							});
-						});
-					}
-					
-					new Sortables($('sortables_".$field->id."'), {
-						'constrain': true,
-						'clone': true,
-						'handle': '.fcfield-drag'
-					});			
-
-					fx.start({ 'opacity': 1 }).chain(function(){
-						this.setOptions({duration: 600});
-						this.start({ 'opacity': 0 });
-						})
-						.chain(function(){
-							this.setOptions({duration: 300});
-							this.start({ 'opacity': 1 });
-						});
-
-					rowCount".$field->id."++;       // incremented / decremented
-					uniqueRowNum".$field->id."++;   // incremented only
+					});
 				}
+				
+				new Sortables($('sortables_".$field->id."'), {
+					'constrain': true,
+					'clone': true,
+					'handle': '.fcfield-drag'
+				});			
+
+				fx.start({ 'opacity': 1 }).chain(function(){
+					this.setOptions({duration: 600});
+					this.start({ 'opacity': 0 });
+					})
+					.chain(function(){
+						this.setOptions({duration: 300});
+						this.start({ 'opacity': 1 });
+					});
+
+				rowCount".$field->id."++;       // incremented / decremented
+				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
 			function deleteField".$field->id."(el)
@@ -305,7 +310,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					rowCount".$field->id."--;
 				}
 			}
-			
 			";
 			
 			$css = '
@@ -437,8 +441,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			table.fcfield'.$field->id.'.img_upload_select ul { width:'.(2*($thumb_w_s+64)).'px; }
 		';
 		
-		$document->addScriptDeclaration($js);
-		$document->addStyleDeclaration($css);
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
 		
 		if ( $image_source ) {
 			JHTML::_('behavior.modal', 'a.addfile_'.$field->id);

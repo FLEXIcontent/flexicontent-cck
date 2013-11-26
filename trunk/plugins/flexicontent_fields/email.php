@@ -45,120 +45,124 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
-		// some parameter shortcuts
-		$size			= $field->parameters->get( 'size', 30 ) ;
-		$multiple	= $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval		= $field->parameters->get( 'max_values', 0 ) ;
+		// initialize framework object and other variables
+		$document  = JFactory::getDocument();
 		
-		$default_value    = ($item->version == 0) ? $field->parameters->get( 'default_value', '' ) : '';
+		// some parameter shortcuts
+		$size      = $field->parameters->get( 'size', 30 ) ;
+		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$max_values= (int)$field->parameters->get( 'max_values', 0 ) ;
+		
+		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
+		$default_addr = ($item->version == 0 || $addr_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($item->version == 0 || $title_usage > 0)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
 		
-		$required		= $field->parameters->get( 'required', 0 ) ;
-		$required		= $required ? ' required' : '';
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
-			$field->value[0]['addr'] = JText::_($default_value);
+			$field->value[0]['addr'] = JText::_($default_addr);
 			$field->value[0]['text'] = JText::_($default_title);
 			$field->value[0] = serialize($field->value[0]);
 		}
 		
-		$document	= JFactory::getDocument();
+		$js = "";
 		
 		if ($multiple) // handle multiple records
 		{
-			//add the drag and drop sorting feature
-			$js = "
+			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
+			
+			// Add the drag and drop sorting feature
+			$js .= "
 			window.addEvent('domready', function(){
 				new Sortables($('sortables_".$field->id."'), {
 					'constrain': true,
 					'clone': true,
 					'handle': '.fcfield-drag'
-					});			
+					});
 				});
 			";
-			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
-			$document->addScriptDeclaration($js);
-
+			
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
 			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 			
-			$js = "
+			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxVal".$field->id."		= ".$maxval.";
+			var maxValues".$field->id."		= ".$max_values.";
 
 			function addField".$field->id."(el) {
-				if((rowCount".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
-
-					var thisField 	 = $(el).getPrevious().getLast();
-					var thisNewField = thisField.clone();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
-					} else {
-						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
-					}
-					
-					thisNewField.getElements('input.emailaddr').setProperty('value','');
-					thisNewField.getElements('input.emailaddr').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
-					thisNewField.getElements('input.emailaddr').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id.");
-					";
-					
-			if ($usetitle) $js .= "
-					thisNewField.getElements('input.emailtext').setProperty('value','');
-					thisNewField.getElements('input.emailtext').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
-					";
-					
-			$js .= "
-					jQuery(thisNewField).insertAfter( jQuery(thisField) );
-		
-					new Sortables($('sortables_".$field->id."'), {
-						'constrain': true,
-						'clone': true,
-						'handle': '.fcfield-drag'
-					});			
-
-					fx.start({ 'opacity': 1 }).chain(function(){
-						this.setOptions({duration: 600});
-						this.start({ 'opacity': 0 });
-						})
-						.chain(function(){
-							this.setOptions({duration: 300});
-							this.start({ 'opacity': 1 });
-						});
-
-					rowCount".$field->id."++;       // incremented / decremented
-					uniqueRowNum".$field->id."++;   // incremented only
+				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
+					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
+					return 'cancel';
 				}
+
+				var thisField 	 = $(el).getPrevious().getLast();
+				var thisNewField = thisField.clone();
+				if (MooTools.version>='1.2.4') {
+					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+				} else {
+					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+				}
+				
+				thisNewField.getElements('input.emailaddr').setProperty('value','');
+				thisNewField.getElements('input.emailaddr').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
+				thisNewField.getElements('input.emailaddr').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id.");
+				";
+				
+			if ($usetitle) $js .= "
+				thisNewField.getElements('input.emailtext').setProperty('value','');
+				thisNewField.getElements('input.emailtext').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
+				";
+				
+			$js .= "
+				jQuery(thisNewField).insertAfter( jQuery(thisField) );
+	
+				new Sortables($('sortables_".$field->id."'), {
+					'constrain': true,
+					'clone': true,
+					'handle': '.fcfield-drag'
+				});			
+
+				fx.start({ 'opacity': 1 }).chain(function(){
+					this.setOptions({duration: 600});
+					this.start({ 'opacity': 0 });
+					})
+					.chain(function(){
+						this.setOptions({duration: 300});
+						this.start({ 'opacity': 1 });
+					});
+
+				rowCount".$field->id."++;       // incremented / decremented
+				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
 			function deleteField".$field->id."(el)
 			{
-				if(rowCount".$field->id." > 1)
-				{
-					var field	= $(el);
-					var row		= field.getParent();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
-					} else {
-						var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
-					}
-					
-					fx.start({
-						'height': 0,
-						'opacity': 0
-						}).chain(function(){
-							(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
-						});
-					rowCount".$field->id."--;
+				if(rowCount".$field->id." <= 1) return;
+				var field	= $(el);
+				var row		= field.getParent();
+				if (MooTools.version>='1.2.4') {
+					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+				} else {
+					var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
 				}
+				
+				fx.start({
+					'height': 0,
+					'opacity': 0
+				}).chain(function(){
+					(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
+				});
+				rowCount".$field->id."--;
 			}
 			";
-			$document->addScriptDeclaration($js);
 			
 			$css = '
 			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
@@ -176,6 +180,10 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
 			#sortables_'.$field->id.' li .admintable { text-align: left; }
 			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
+			#sortables_'.$field->id.' label.label, #sortables_'.$field->id.' input.emailaddr, #sortables_'.$field->id.' input.emailtext, #sortables_'.$field->id.' input.fcfield-button {
+				float: none!important;
+				display: inline-block!important;
+			}
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
@@ -183,16 +191,12 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		} else {
 			$remove_button = '';
 			$move2 = '';
+			$js = '';
 			$css = '';
 		}
 		
-		$css .='
-			#sortables_'.$field->id.' label.label, #sortables_'.$field->id.' input.emailaddr, #sortables_'.$field->id.' input.emailtext, #sortables_'.$field->id.' input.fcfield-button {
-				float: none!important;
-				display: inline-block!important;
-			}
-		';
-		$document->addStyleDeclaration($css);
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
 		
 		$field->html = array();
 		$n = 0;
@@ -214,6 +218,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				<label class="label" for="'.$fieldname.'[text]">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</label>
 				<input class="emailtext" name="'.$fieldname.'[text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
 			';
+			
 			
 			$field->html[] = '
 				'.$addr.'
@@ -244,8 +249,26 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
+		// some parameter shortcuts
+		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
+		$default_addr = ($addr_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
+		
+		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
+		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
+		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		
 		$values = $values ? $values : $field->value;
-		if ( !$values ) {	$field->{$prop} = '';	return;	}
+		
+		// Handle default value loading, instead of empty value
+		if ( empty($values) && !strlen($default_addr) ) {
+			$field->{$prop} = '';
+			return;
+		} else if ( empty($values) && strlen($default_addr) ) {
+			$values = array();
+			$values[0]['addr'] = JText::_($default_addr);
+			$values[0]['text'] = JText::_($default_title);
+			$values[0] = serialize($values[0]);
+		}
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -258,10 +281,6 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
-		// some parameter shortcuts
-		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
-		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
 		
 		switch($separatorf)
 		{
@@ -327,8 +346,8 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		
 		// Apply seperator and open/close tags
 		if(count($field->{$prop})) {
-			$field->{$prop}  = implode($separatorf, $field->{$prop});
-			$field->{$prop}  = $opentag . $field->{$prop} . $closetag;
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 		} else {
 			$field->{$prop} = '';
 		}
@@ -345,7 +364,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-		if(!is_array($post) && !strlen($post)) return;
+		if ( !is_array($post) && !strlen($post) ) return;
 		
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		
@@ -355,7 +374,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		// Reformat the posted data
 		$newpost = array();
 		$new = 0;
-		foreach ($post as $n=>$v)
+		foreach ($post as $n => $v)
 		{
 			// support for basic CSV import / export
 			if ( $is_importcsv && !is_array($post[$n]) ) {

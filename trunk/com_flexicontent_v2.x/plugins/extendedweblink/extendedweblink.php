@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: extendedweblink.php 1627 2013-01-14 06:59:25Z ggppdk $
+ * @version 1.0 $Id: extendedweblink.php 1798 2013-10-27 18:38:42Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.extendedweblink
@@ -45,30 +45,35 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
-		// some parameter shortcuts
+		// initialize framework object and other variables
 		$document  = JFactory::getDocument();
+		
+		// some parameter shortcuts
 		$size      = $field->parameters->get( 'size', 30 ) ;
 		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval    = $field->parameters->get( 'max_values', 0 ) ;
+		$max_values= (int)$field->parameters->get( 'max_values', 0 ) ;
 		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
 		
-		$default_link_usage = $field->parameters->get( 'default_link_usage', 0 ) ;
-		$default_link       = ($item->version == 0 || $default_link_usage > 0) ? $field->parameters->get( 'default_link', '' ) : '';
+		// This is field 's MAIN value property
+		$link_usage   = $field->parameters->get( 'default_link_usage', 0 ) ;
+		$default_link = ($item->version == 0 || $link_usage > 0) ? $field->parameters->get( 'default_link', '' ) : '';
 		
-		$title_usage = $field->parameters->get( 'title_usage', 0 ) ;
-		$text_usage  = $field->parameters->get( 'text_usage', 0 ) ;
-		$class_usage = $field->parameters->get( 'class_usage', 0 ) ;
-		$id_usage    = $field->parameters->get( 'id_usage', 0 ) ;
+		// Optional value properties
+		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
+		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
+		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		
-		$default_title  = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
-		$default_text   = ($item->version == 0 || $text_usage > 0) ? $field->parameters->get( 'default_text', '' ) : '';
-		$default_class  = ($item->version == 0 || $class_usage > 0) ? $field->parameters->get( 'default_class', '' ) : '';
-		$default_id     = ($item->version == 0 || $id_usage > 0) ? $field->parameters->get( 'default_id', '' ) : '';
+		$text_usage   = $field->parameters->get( 'text_usage', 0 ) ;
+		$default_text = ($item->version == 0 || $text_usage > 0) ? $field->parameters->get( 'default_text', '' ) : '';
+		$usetext      = $field->parameters->get( 'use_text', 0 ) ;
 		
-		$usetitle  = $field->parameters->get( 'use_title', 0 ) ;
-		$usetext   = $field->parameters->get( 'use_text', 0 ) ;
-		$useclass  = $field->parameters->get( 'use_class', 0 ) ;
-		$useid     = $field->parameters->get( 'use_id', 0 ) ;
+		$class_usage   = $field->parameters->get( 'class_usage', 0 ) ;
+		$default_class = ($item->version == 0 || $class_usage > 0) ? $field->parameters->get( 'default_class', '' ) : '';
+		$useclass      = $field->parameters->get( 'use_class', 0 ) ;
+		
+		$id_usage   = $field->parameters->get( 'id_usage', 0 ) ;
+		$default_id = ($item->version == 0 || $id_usage > 0) ? $field->parameters->get( 'default_id', '' ) : '';
+		$useid      = $field->parameters->get( 'use_id', 0 ) ;
 		
 		$class_choices = $field->parameters->get( 'class_choices', '') ;
 		
@@ -79,6 +84,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		if ( !$field->value ) {
 			$field->value = array();
 			$field->value[0]['link']  = JText::_($default_link);
+			$field->value[0]['title'] = JText::_($default_title);
+			$field->value[0]['text']  = JText::_($default_text);
+			$field->value[0]['class'] = JText::_($default_class);
+			$field->value[0]['id']    = JText::_($default_id);
+			$field->value[0]['hits']  = 0;
 			$field->value[0] = serialize($field->value[0]);
 		}
 		
@@ -102,78 +112,81 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
 			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 			
+			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxVal".$field->id."		= ".$maxval.";
+			var maxValues".$field->id."		= ".$max_values.";
 
 			function addField".$field->id."(el) {
-				if((rowCount".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
-
-					var thisField 	 = $(el).getPrevious().getLast();
-					var thisNewField = thisField.clone();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
-					} else {
-						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
-					}
-					
-					thisNewField.getElements('input.urllink').setProperty('value','".$default_link."');
-					thisNewField.getElements('input.urllink').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
-					thisNewField.getElements('input.urllink').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id.");
-					";
-					
-			if ($usetitle) $js .= "
-					thisNewField.getElements('input.urltitle').setProperty('value','".$default_title."');
-					thisNewField.getElements('input.urltitle').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
-					";
-					
-			if ($usetext) $js .= "
-					thisNewField.getElements('input.urllinktext').setProperty('value','".$default_text."');
-					thisNewField.getElements('input.urllinktext').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][linktext]');
-					";
-					
-			if ($useclass) $js .= "
-					thisNewField.getElements('.urlclass').setProperty('value','".$default_class."');
-					thisNewField.getElements('.urlclass').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
-					";
-					
-			if ($useid) $js .= "
-					thisNewField.getElements('input.urlid').setProperty('value','".$default_id."');
-					thisNewField.getElements('input.urlid').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][id]');
-					";
-					
-			$js .= "
-					thisNewField.getElements('input.urlhits').setProperty('value','0');
-					thisNewField.getElements('input.urlhits').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
-					
-					// Set hits to zero for new row value
-					if (MooTools.version>='1.2.4') {
-						thisNewField.getElements('span span').set('html','0');
-					} else {
-						thisNewField.getElements('span span').setHTML('0');
-					}
-
-					jQuery(thisNewField).insertAfter( jQuery(thisField) );
-		
-					new Sortables($('sortables_".$field->id."'), {
-						'constrain': true,
-						'clone': true,
-						'handle': '.fcfield-drag'
-					});			
-
-					fx.start({ 'opacity': 1 }).chain(function(){
-						this.setOptions({duration: 600});
-						this.start({ 'opacity': 0 });
-						})
-						.chain(function(){
-							this.setOptions({duration: 300});
-							this.start({ 'opacity': 1 });
-						});
-
-					rowCount".$field->id."++;       // incremented / decremented
-					uniqueRowNum".$field->id."++;   // incremented only
+				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
+					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
+					return 'cancel';
 				}
+
+				var thisField 	 = $(el).getPrevious().getLast();
+				var thisNewField = thisField.clone();
+				if (MooTools.version>='1.2.4') {
+					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+				} else {
+					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+				}
+				
+				thisNewField.getElements('input.urllink').setProperty('value','".$default_link."');
+				thisNewField.getElements('input.urllink').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
+				thisNewField.getElements('input.urllink').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id.");
+				";
+				
+			if ($usetitle) $js .= "
+				thisNewField.getElements('input.urltitle').setProperty('value','".$default_title."');
+				thisNewField.getElements('input.urltitle').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				";
+				
+			if ($usetext) $js .= "
+				thisNewField.getElements('input.urllinktext').setProperty('value','".$default_text."');
+				thisNewField.getElements('input.urllinktext').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][linktext]');
+				";
+				
+			if ($useclass) $js .= "
+				thisNewField.getElements('.urlclass').setProperty('value','".$default_class."');
+				thisNewField.getElements('.urlclass').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][class]');
+				";
+				
+			if ($useid) $js .= "
+				thisNewField.getElements('input.urlid').setProperty('value','".$default_id."');
+				thisNewField.getElements('input.urlid').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][id]');
+				";
+				
+			$js .= "
+				thisNewField.getElements('input.urlhits').setProperty('value','0');
+				thisNewField.getElements('input.urlhits').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
+				
+				// Set hits to zero for new row value
+				if (MooTools.version>='1.2.4') {
+					thisNewField.getElements('span span').set('html','0');
+				} else {
+					thisNewField.getElements('span span').setHTML('0');
+				}
+
+				jQuery(thisNewField).insertAfter( jQuery(thisField) );
+	
+				new Sortables($('sortables_".$field->id."'), {
+					'constrain': true,
+					'clone': true,
+					'handle': '.fcfield-drag'
+				});			
+
+				fx.start({ 'opacity': 1 }).chain(function(){
+					this.setOptions({duration: 600});
+					this.start({ 'opacity': 0 });
+					})
+					.chain(function(){
+						this.setOptions({duration: 300});
+						this.start({ 'opacity': 1 });
+					});
+
+				rowCount".$field->id."++;       // incremented / decremented
+				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
 			function deleteField".$field->id."(el)
@@ -344,22 +357,15 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
-		// Get field values
-		$values = $values ? $values : $field->value;
-		if ( empty($values) ) { $field->{$prop} = ''; return; }
-		
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
-		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
-		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
-		
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-		
 		// some parameter shortcuts
+		$target         = $field->parameters->get( 'target', '' );
+		$target_param   = $target ? ' target="'.$target.'"' : '';
+		
+		// This is field 's MAIN value property
+		$link_usage   = $field->parameters->get( 'default_link_usage', 0 ) ;
+		$default_link = ($item->version == 0 || $link_usage > 0) ? $field->parameters->get( 'default_link', '' ) : '';
+		
+		// Optional value properties
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_title', '' )) : '';
@@ -376,8 +382,35 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$id_usage	  = $field->parameters->get( 'id_usage', 0 ) ;
 		$default_id = ($id_usage == 2)  ?  $field->parameters->get( 'default_id', '' ) : '';
 		
-		$target         = $field->parameters->get( 'target', '' );
-		$target_param   = $target ? ' target="'.$target.'"' : '';
+		// Get field values
+		$values = $values ? $values : $field->value;
+		
+		// Handle default value loading, instead of empty value
+		if ( empty($values) && !strlen($default_link) ) {
+			$field->{$prop} = '';
+			return;
+		} else if ( empty($values) && strlen($default_link) ) {
+			$values = array();
+			$values[0]['link']  = JText::_($default_link);
+			$values[0]['title'] = JText::_($default_title);
+			$values[0]['text']  = JText::_($default_text);
+			$values[0]['class'] = JText::_($default_class);
+			$values[0]['id']    = JText::_($default_id);
+			$values[0]['hits'] = 0;
+			$values[0] = serialize($values[0]);
+		}
+		
+		
+		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
+		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
+		$separatorf	= $field->parameters->get( 'separatorf', 1 ) ;
+		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );
+		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );
+		
+		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
+		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
 		switch($separatorf)
 		{
@@ -480,7 +513,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			// support for basic CSV import / export,  TO BE REMOVED added to the 'store' function of the model
+			// support for basic CSV import / export
 			if ( $is_importcsv && !is_array($post[$n]) ) {
 				if ( @unserialize($post[$n])!== false || $post[$n] === 'b:0;' ) {  // support for exported serialized data)
 					$post[$n] = unserialize($post[$n]);

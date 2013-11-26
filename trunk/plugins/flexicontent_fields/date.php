@@ -59,8 +59,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		// some parameter shortcuts
 		$size				= $field->parameters->get( 'size', 30 ) ;
-		$multiple		= $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval			= $field->parameters->get( 'max_values', 0 ) ;
+		$multiple   = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$max_values = (int)$field->parameters->get( 'max_values', 0 ) ;
 		$required = $field->parameters->get( 'required', 0 ) ;
 		$required = $required ? ' required' : '';
 		
@@ -104,8 +104,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		}
 		$append_str = $append_str ? '<b>'.JText::_('FLEXI_NOTES').'</b>: '.$append_str : '';
 		
-		// initialise property
-		if (!$field->value) {
+		// Initialise property with default value
+		if ( !$field->value ) {
 			$field->value = array();
 			$field->value[0] = '';
 		}
@@ -115,6 +115,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		if ($multiple) // handle multiple records
 		{
+			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
+			
 			//add the drag and drop sorting feature
 			$js = "
 			window.addEvent('domready', function(){
@@ -125,85 +127,83 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					});			
 				});
 			";
-			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
-			$document->addScriptDeclaration($js);
-
-			$js = "
+			
+			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxVal".$field->id."		= ".$maxval.";
+			var maxValues".$field->id." = ".$max_values.";
 
 			function addField".$field->id."(el) {
-				if((rowCount".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
-
-					var thisField 	 = $(el).getPrevious().getLast();
-					var thisNewField = thisField.clone();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
-					} else {
-						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
-					}
-					
-					jQuery(thisNewField).find('input').first().val('');  /* First element is the value input field, second is e.g remove button */
-					jQuery(thisNewField).insertAfter( jQuery(thisField) );
-
-					var input = jQuery(thisNewField).find('input').first();
-					input.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
-					var img = input.next();
-					img.attr('id', '".$elementid."_' +uniqueRowNum".$field->id." +'_img');
-					
-					
-					Calendar.setup({
-        				inputField:	input.attr('id'),
-        				ifFormat:		'%Y-%m-%d',
-        				button:			img.attr('id'),
-        				align:			'Tl',
-        				singleClick:	true
-					});
-					
-					new Sortables($('sortables_".$field->id."'), {
-						'constrain': true,
-						'clone': true,
-						'handle': '.fcfield-drag'
-					});			
-
-					fx.start({ 'opacity': 1 }).chain(function(){
-						this.setOptions({duration: 600});
-						this.start({ 'opacity': 0 });
-						})
-						.chain(function(){
-							this.setOptions({duration: 300});
-							this.start({ 'opacity': 1 });
-						});
-
-					rowCount".$field->id."++;       // incremented / decremented
-					uniqueRowNum".$field->id."++;   // incremented only
+				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
+					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
+					return 'cancel';
 				}
+				
+				var thisField 	 = $(el).getPrevious().getLast();
+				var thisNewField = thisField.clone();
+				if (MooTools.version>='1.2.4') {
+					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+				} else {
+					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+				}
+				
+				jQuery(thisNewField).find('input').first().val('');  /* First element is the value input field, second is e.g remove button */
+				jQuery(thisNewField).insertAfter( jQuery(thisField) );
+
+				var input = jQuery(thisNewField).find('input').first();
+				input.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
+				var img = input.next();
+				img.attr('id', '".$elementid."_' +uniqueRowNum".$field->id." +'_img');
+				
+				
+				Calendar.setup({
+      				inputField:	input.attr('id'),
+      				ifFormat:		'%Y-%m-%d',
+      				button:			img.attr('id'),
+      				align:			'Tl',
+      				singleClick:	true
+				});
+				
+				new Sortables($('sortables_".$field->id."'), {
+					'constrain': true,
+					'clone': true,
+					'handle': '.fcfield-drag'
+				});			
+
+				fx.start({ 'opacity': 1 }).chain(function(){
+					this.setOptions({duration: 600});
+					this.start({ 'opacity': 0 });
+					})
+					.chain(function(){
+						this.setOptions({duration: 300});
+						this.start({ 'opacity': 1 });
+					});
+
+				rowCount".$field->id."++;       // incremented / decremented
+				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
 			function deleteField".$field->id."(el)
 			{
-				if(rowCount".$field->id." > 1)
-				{
-					var field	= $(el);
-					var row		= field.getParent();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
-					} else {
-						var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
-					}
-					
-					fx.start({
-						'height': 0,
-						'opacity': 0
-						}).chain(function(){
-							(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
-						});
-					rowCount".$field->id."--;
+				if(rowCount".$field->id." <= 1) return;
+				var field	= $(el);
+				var row		= field.getParent();
+				if (MooTools.version>='1.2.4') {
+					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+				} else {
+					var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
 				}
+				
+				fx.start({
+					'height': 0,
+					'opacity': 0
+				}).chain(function(){
+					(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
+				});
+				rowCount".$field->id."--;
 			}
 			";
-			$document->addScriptDeclaration($js);
 			
 			$css = '
 			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
@@ -228,10 +228,12 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		} else {
 			$remove_button = '';
 			$move2 = '';
+			$js = '';
 			$css = '';
 		}
 		
-		$document->addStyleDeclaration($css);
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
 		
 		$field->html = array();
 		$n = 0;

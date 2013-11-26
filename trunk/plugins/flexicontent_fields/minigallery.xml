@@ -25,8 +25,13 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 			
-			<field name="" type="separator" level="level1" default="FLEXI_FIELD_GALLERY_IMAGES" description="FLEXI_FIELD_GALLERY_IMAGES_DESC" />
+			<field name="" type="separator" level="level1" default="FLEXI_FIELD_GALLERY_IMAGES" description="FLEXI_FIELD_GALLERY_IMAGES_DESC" menu="hide" />
 			<field name="thumbposition" type="list" default="3" label="FLEXI_FIELD_GALLERY_THUMBS_POSITION" description="FLEXI_FIELD_GALLERY_THUMBS_POSITION_DESC">
 				<option value="1">FLEXI_FIELD_GALLERY_TOP</option>
 				<option value="2">FLEXI_FIELD_GALLERY_LEFT</option>
@@ -38,7 +43,7 @@
 			<field name="w_s" type="text" default="100" size="4" label="FLEXI_FIELD_GALLERY_WIDTH_MINI" description="FLEXI_FIELD_GALLERY_WIDTH_MINI_DESC" />
 			<field name="h_s" type="text" default="66" size="4" label="FLEXI_FIELD_GALLERY_HEIGHT_MINI" description="FLEXI_FIELD_GALLERY_HEIGHT_MINI_DESC" />
  			
-			<field name="" type="separator" level="level1" default="FLEXI_FIELD_GALLERY_SLIDESHOW" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" />
+			<field name="" type="separator" level="level1" default="FLEXI_FIELD_GALLERY_SLIDESHOW" description="FLEXI_FIELD_GALLERY_SLIDESHOW_DESC" menu="hide" />
 			<field name="controller" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_CONTROLS" description="FLEXI_FIELD_DISPLAY_CONTROLS_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
