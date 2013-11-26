@@ -49,8 +49,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$default_value     = ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		$size				= (int)$field->parameters->get( 'size', 30 ) ;
 		$maxlength	= (int)$field->parameters->get( 'maxlength', 0 ) ;
-		$multiple		= $field->parameters->get( 'allow_multiple', 1 ) ;
-		$maxval			= (int)$field->parameters->get( 'max_values', 0 ) ;
+		$multiple   = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$max_values = (int)$field->parameters->get( 'max_values', 0 ) ;
 		
 		$inputmask	= $field->parameters->get( 'inputmask', false ) ;
 		$custommask = $field->parameters->get( 'custommask', false ) ;
@@ -83,14 +83,12 @@ class plgFlexicontent_fieldsText extends JPlugin
 			flexicontent_html::loadFramework('inputmask');
 		}
 		
-		$js = "";
-		
 		if ($multiple) // handle multiple records
 		{
 			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 			
 			//add the drag and drop sorting feature
-			$js .= "
+			$js = "
 			window.addEvent('domready', function(){
 				new Sortables($('sortables_".$field->id."'), {
 					'constrain': true,
@@ -100,59 +98,62 @@ class plgFlexicontent_fieldsText extends JPlugin
 				});
 			";
 			
+			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxVal".$field->id."		= ".$maxval.";
+			var maxValues".$field->id." = ".$max_values.";
 
 			function addField".$field->id."(el) {
-				if((rowCount".$field->id." < maxVal".$field->id.") || (maxVal".$field->id." == 0)) {
-
-					var thisField 	 = $(el).getPrevious().getLast();
-					var thisNewField = thisField.clone();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
-					} else {
-						var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
-					}
-					
-					thisNewField.getFirst().setProperty('value','');  /* First element is the value input field, second is e.g remove button */
-
-					var has_inputmask = jQuery(thisNewField).find('input.has_inputmask').length != 0;
-					if (has_inputmask)  jQuery(thisNewField).find('input.has_inputmask').inputmask();
-					
-					var has_select2 = jQuery(thisNewField).find('div.select2-container').length != 0;
-					if (has_select2) {
-						jQuery(thisNewField).find('div.select2-container').remove();
-						jQuery(thisNewField).find('select.use_select2_lib').select2();
-					}
-					
-					jQuery(thisNewField).insertAfter( jQuery(thisField) );
-					";
-			
-			if ($field->field_type=='textselect') $js .= "
-					thisNewField.getParent().getElement('select.fcfield_textselval').setProperty('value','');
-					";
-					
-			$js .="
-					new Sortables($('sortables_".$field->id."'), {
-						'constrain': true,
-						'clone': true,
-						'handle': '.fcfield-drag'
-					});			
-
-					fx.start({ 'opacity': 1 }).chain(function(){
-						this.setOptions({duration: 600});
-						this.start({ 'opacity': 0 });
-						})
-						.chain(function(){
-							this.setOptions({duration: 300});
-							this.start({ 'opacity': 1 });
-						});
-
-					rowCount".$field->id."++;       // incremented / decremented
-					uniqueRowNum".$field->id."++;   // incremented only
+				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
+					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
+					return 'cancel';
 				}
+				
+				var thisField 	 = $(el).getPrevious().getLast();
+				var thisNewField = thisField.clone();
+				if (MooTools.version>='1.2.4') {
+					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
+				} else {
+					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
+				}
+				
+				thisNewField.getFirst().setProperty('value','');  /* First element is the value input field, second is e.g remove button */
+
+				var has_inputmask = jQuery(thisNewField).find('input.has_inputmask').length != 0;
+				if (has_inputmask)  jQuery(thisNewField).find('input.has_inputmask').inputmask();
+				
+				var has_select2 = jQuery(thisNewField).find('div.select2-container').length != 0;
+				if (has_select2) {
+					jQuery(thisNewField).find('div.select2-container').remove();
+					jQuery(thisNewField).find('select.use_select2_lib').select2();
+				}
+				
+				jQuery(thisNewField).insertAfter( jQuery(thisField) );
+				";
+		
+			if ($field->field_type=='textselect') $js .= "
+				thisNewField.getParent().getElement('select.fcfield_textselval').setProperty('value','');
+				";
+				
+			$js .="
+				new Sortables($('sortables_".$field->id."'), {
+					'constrain': true,
+					'clone': true,
+					'handle': '.fcfield-drag'
+				});			
+
+				fx.start({ 'opacity': 1 }).chain(function(){
+					this.setOptions({duration: 600});
+					this.start({ 'opacity': 0 });
+					})
+					.chain(function(){
+						this.setOptions({duration: 300});
+						this.start({ 'opacity': 1 });
+					});
+
+				rowCount".$field->id."++;       // incremented / decremented
+				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
 			function deleteField".$field->id."(el)
@@ -195,7 +196,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -254,7 +255,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
 		} else {  // handle single values
-			$field->html = $field->html[0];
+			$field->html = '<div>'.$field->html[0].'</div>';
 		}
 	}
 	

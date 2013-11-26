@@ -46,17 +46,19 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		// some parameter shortcuts
 		$document		= JFactory::getDocument();
-		$size				= $field->parameters->get( 'size', 30 ) ;
-
-		$flexiparams= JComponentHelper::getParams('com_flexicontent');
-		$mediapath	= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
 		$app				= JFactory::getApplication();
 		$client			= $app->isAdmin() ? '../' : '';
-		$required 	= $field->parameters->get( 'required', 0 ) ;
+		$flexiparams= JComponentHelper::getParams('com_flexicontent');
+		$mediapath	= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
+		
+		$size				= $field->parameters->get('size', 30 );
+		$max_values = (int)$field->parameters->get('max_values', 0);
+		$required 	= $field->parameters->get('required', 0 );
 		$required 	= $required ? ' required' : '';
 
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
 
+		if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 		$js = "
 		function randomString() {
 			var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
@@ -69,13 +71,18 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			return randomstring;
 		}
 
-		var value_counter=".count($field->value).";
+		var value_counter".$field->id."=".count($field->value).";
+		var maxValues".$field->id."=".$max_values.";
 
 		function qfSelectFile".$field->id."(id, file) {
-		  value_counter++;
-
+			if((value_counter".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
+				alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
+				return 'cancel';
+			}
+			
+		  value_counter".$field->id."++;
 		  var valcounter = $('".$field->name."');
-			valcounter.value = value_counter;
+			valcounter.value = value_counter".$field->id.";
 
 			var name 	= 'a_name'+id;
 			var ixid 	= randomString();
@@ -126,10 +133,10 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		}
 
 		function deleteField".$field->id."(el) {
-		  value_counter--;
+		  value_counter".$field->id."--;
 
 		  var valcounter = $('".$field->name."');
-			if ( value_counter > 0 ) valcounter.value = value_counter;
+			if ( value_counter".$field->id." > 0 ) valcounter.value = value_counter".$field->id.";
 			else valcounter.value = '';
 
 			var field	= $(el);

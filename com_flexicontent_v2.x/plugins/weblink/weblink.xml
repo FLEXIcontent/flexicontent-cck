@@ -46,6 +46,12 @@
 			</field>
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 			<field name="default_value_link" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE_LINK" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
+			<field name="link_usage" type="list" default="0" label="FLEXI_FIELD_DEFAULT_VALUE_USE" description="FLEXI_FIELD_DEFAULT_VALUE_USE_DESC">
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
+			</field>
+			
 			<field name="targetblank" type="radio" default="0" label="FLEXI_FIELD_FIELD_NEW_WINDOW" description="FLEXI_FIELD_FIELD_NEW_WINDOW_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

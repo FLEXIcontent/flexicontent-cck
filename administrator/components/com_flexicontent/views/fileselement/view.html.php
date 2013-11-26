@@ -217,9 +217,10 @@ class FlexicontentViewFileselement extends JViewLegacy
 		} else {
 			$js = "
 			function qffileselementadd(obj, id, file) {
-				obj.className = 'striketext';//work
+				var result = window.parent.qfSelectFile".$fieldid."(id, file);
+				if ((typeof result) != 'undefined' && result == 'cancel') return;
+				obj.className = 'striketext';
 				document.adminForm.file.value=id;
-				window.parent.qfSelectFile".$fieldid."(id, file);
 			}
 			window.addEvent('domready', function() {
 				fileobjs = window.parent.document.getElementsByName('{$formfieldname}');

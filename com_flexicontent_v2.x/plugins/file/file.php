@@ -51,15 +51,22 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$app				= JFactory::getApplication();
 		
 		$size       = $field->parameters->get('size', 30 );
+		$max_values = (int)$field->parameters->get('max_values', 0 );
 		$required   = $field->parameters->get('required', 0 );
 		$required   = $required ? ' required' : '';
 		
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
 		
+		if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 		$js = "
 			var value_counter".$field->id."=".count($field->value).";
+			var maxValues".$field->id."=".$max_values.";
 			
 			function qfSelectFile".$field->id."(id, file) {
+				if((value_counter".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
+					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
+					return 'cancel';
+				}
 				
 			  value_counter".$field->id."++;
 			  var valcounter = $('".$field->name."');
