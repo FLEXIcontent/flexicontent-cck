@@ -268,6 +268,19 @@ class modFlexicontentHelper
 		  $params->set('fields',$fields_list);
 		}
 		
+		// *** OPTIMIZATION: we should create some variables outside the loop ... TODO MORE
+		if (($display_hits_feat || $display_hits) && $has_access_hits) {
+			$hits_icon = FLEXI_J16GE ?
+				JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS_L' )) :
+				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
+		}
+		if ($display_comments_feat || $display_comments) {
+			$comments_icon = FLEXI_J16GE ?
+				JHTML::image('components/com_flexicontent/assets/images/'.'comments.png', JText::_( 'FLEXI_COMMENTS_L' )) :
+				JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
+		}
+		
+		
 		$lists_arr = array();
 		foreach($filtered_rows_arr as $catid => $filtered_rows)
 		{
@@ -381,9 +394,7 @@ class modFlexicontentHelper
 					if ($display_hits_feat && $has_access_hits) {
 						FlexicontentFields::loadFieldConfig($hitsfield, $row);
 						$lists[$ord]['featured'][$i]->hits_rendered .= $params->get('hits_label_feat') ? '<span class="hits_label_feat">'.JText::_($hitsfield->label).':</span> ' : '';
-						$lists[$ord]['featured'][$i]->hits_rendered .= FLEXI_J16GE ?
-							JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS_L' )) :
-							JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
+						$lists[$ord]['featured'][$i]->hits_rendered .= $hits_icon;
 						$lists[$ord]['featured'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label_feat') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
 					$lists[$ord]['featured'][$i]->voting = '';
@@ -395,9 +406,7 @@ class modFlexicontentHelper
 					if ($display_comments_feat) {
 						$lists[$ord]['featured'][$i]->comments = $row->comments_total;
 						$lists[$ord]['featured'][$i]->comments_rendered = $params->get('comments_label_feat') ? '<span class="comments_label_feat">'.JText::_('FLEXI_COMMENTS').':</span> ' : '';
-						$lists[$ord]['featured'][$i]->comments_rendered .= FLEXI_J16GE ?
-							JHTML::image('components/com_flexicontent/assets/images/'.'comments.png', JText::_( 'FLEXI_COMMENTS_L' )) :
-							JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
+						$lists[$ord]['featured'][$i]->comments_rendered .= $comments_icon;
 						$lists[$ord]['featured'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label_feat') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
 					$lists[$ord]['featured'][$i]->catid = $row->catid; 
@@ -513,9 +522,7 @@ class modFlexicontentHelper
 					if ($display_hits && $has_access_hits) {
 						FlexicontentFields::loadFieldConfig($hitsfield, $row);
 						$lists[$ord]['standard'][$i]->hits_rendered .= $params->get('hits_label') ? '<span class="hits_label">'.JText::_($hitsfield->label).':</span> ' : '';
-						$lists[$ord]['standard'][$i]->hits_rendered .= FLEXI_J16GE ?
-							JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS_L' )) :
-							JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS_L' ));
+						$lists[$ord]['standard'][$i]->hits_rendered .= $hits_icon;
 						$lists[$ord]['standard'][$i]->hits_rendered .= ' ('.$row->hits.(!$params->get('hits_label') ? ' '.JTEXT::_('FLEXI_HITS_L') : '').')';
 					}
 					$lists[$ord]['standard'][$i]->voting = '';
@@ -527,9 +534,7 @@ class modFlexicontentHelper
 					if ($display_comments) {
 						$lists[$ord]['standard'][$i]->comments = $row->comments_total;
 						$lists[$ord]['standard'][$i]->comments_rendered = $params->get('comments_label') ? '<span class="comments_label">'.JText::_('FLEXI_COMMENTS').':</span> ' : '';
-						$lists[$ord]['standard'][$i]->comments_rendered .= FLEXI_J16GE ?
-							JHTML::image('components/com_flexicontent/assets/images/'.'comments.png', JText::_( 'FLEXI_COMMENTS_L' )) :
-							JHTML::_('image.site', 'comments.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_COMMENTS_L' ));
+						$lists[$ord]['standard'][$i]->comments_rendered .= $comments_icon;
 						$lists[$ord]['standard'][$i]->comments_rendered .= ' ('.$row->comments_total.(!$params->get('comments_label') ? ' '.JTEXT::_('FLEXI_COMMENTS_L') : '').')';
 					}
 					$lists[$ord]['standard'][$i]->catid = $row->catid;

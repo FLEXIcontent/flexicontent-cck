@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1767 2013-09-18 17:46:46Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1801 2013-11-03 14:32:18Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -40,8 +40,7 @@ class FlexicontentViewCategory extends JViewLegacy
 	{
 		// Get Non-routing Categories, and Category Tree
 		global $globalnoroute, $globalcats;
-		if (!is_array($globalnoroute))	$globalnoroute	= array();
-		if (!is_array($globalcats))     $globalcats	= array();
+		if (!is_array($globalnoroute)) $globalnoroute = array();
 		
 		//initialize variables
 		$dispatcher = JDispatcher::getInstance();
@@ -158,19 +157,17 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->setLayout('category');
 
 		$limit		= $app->getUserStateFromRequest('com_flexicontent'.$category->id.'.category.limit', 'limit', $params->def('limit', 0), 'int');
-
-		$cats		= new flexicontent_cats((int)$category->id);
-		$parents	= $cats->getParentlist();
 		
-		// We can probaly optimize this part later
-		if ($params->get('rootcat')) {
-			$rootcats	= new flexicontent_cats((int)$params->get('rootcat'));
-			$allroots	= $rootcats->getParentlist();
-			$roots		= array();
-			foreach ($allroots as $root) {
-				array_push($roots, $root->id);
-			}
-		}
+		// Pathway needed variables
+		//$catshelper = new flexicontent_cats((int)$category->id);
+		//$parents    = $catshelper->getParentlist();
+		//echo "<pre>".print_r($parents,true)."</pre>";
+		$parent_ids = $globalcats[(int)$category->id]->ancestorsarray;
+		foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
+		
+		$rootcat = (int) $params->get('rootcat');
+		if ($rootcat) $root_parents = $globalcats[$rootcat]->ancestorsarray;
+		
 		
 		
 		// **********************
@@ -257,7 +254,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		// ********************************************************************************************
 		// Create pathway, if automatic pathways is enabled, then path will be cleared before populated
 		// ********************************************************************************************
-		$pathway 	= $app->getPathWay();
+		$pathway = $app->getPathWay();
 		
 		// Clear pathway, if automatic pathways are enabled
 		if ( $params->get('automatic_pathways', 0) ) {
@@ -272,11 +269,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Respect menu item depth, defined in menu item
 		$p = $item_depth;
 		while ( $p < count($parents) ) {
-			// Do not add the above and root categories when coming from a directory view
-			if ( isset($allroots) && in_array($parents[$p]->id, $roots) )  continue;
+			// Do not add the directory root category or its parents (this when coming from a directory view)
+			if ( !empty($root_parents) && in_array($parents[$p]->id, $root_parents) )  { $p++; continue; }
+			
+			// Do not add to pathway unroutable categories
+			if ( in_array($parents[$p]->id, $globalnoroute) )  { $p++; continue; }
 			
 			// Add current parent category
-			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->categoryslug) ) );
+			$pathway->addItem( $this->escape($parents[$p]->title), JRoute::_( FlexicontentHelperRoute::getCategoryRoute($parents[$p]->slug) ) );
 			$p++;
 		}
 		

@@ -95,7 +95,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$default_order     = $cparams->get('items_manager_order', 'i.ordering');
 		$default_order_dir = $cparams->get('items_manager_order_dir', 'ASC');
 		
-		$filter_order_type = $app->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type', 0, 'int' );
+		$filter_order_type = $app->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type', 1, 'int' );
 		$filter_order      = $app->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', $default_order, 'cmd' );
 		$filter_order_Dir  = $app->getUserStateFromRequest( $option.'.items.filter_order_Dir', 'filter_order_Dir', $default_order_dir, 'word' );
 		
