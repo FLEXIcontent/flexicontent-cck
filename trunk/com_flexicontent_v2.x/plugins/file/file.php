@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: file.php 1785 2013-10-13 05:54:36Z ggppdk $
+ * @version 1.0 $Id: file.php 1806 2013-11-10 01:38:20Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -48,23 +48,22 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		// some parameter shortcuts
 		$document  = JFactory::getDocument();
-		$size      = $field->parameters->get( 'size', 30 ) ;
-		$multiple  = 1; //$field->parameters->get( 'allow_multiple', 1 ) ;  // cannot be disable file adding function would need updating
-
 		$app				= JFactory::getApplication();
-		$required   = $field->parameters->get( 'required', 0 ) ;
+		
+		$size       = $field->parameters->get('size', 30 );
+		$required   = $field->parameters->get('required', 0 );
 		$required   = $required ? ' required' : '';
-
+		
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
 		
 		$js = "
-			var value_counter=".count($field->value).";
+			var value_counter".$field->id."=".count($field->value).";
 			
 			function qfSelectFile".$field->id."(id, file) {
-			  value_counter++;
 				
+			  value_counter".$field->id."++;
 			  var valcounter = $('".$field->name."');
-				valcounter.value = value_counter;
+				valcounter.value = value_counter".$field->id.";
 				
 				var name 	= 'a_name'+id;
 				var ixid 	= 'a_id'+id;
@@ -116,69 +115,61 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			}
 			";
 		
-		if ($multiple) // handle multiple records
+		if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
+		
+		// Add the drag and drop sorting feature
+		$js .= "
+		window.addEvent('domready', function(){
+			new Sortables($('sortables_".$field->id."'), {
+				'constrain': true,
+				'clone': true,
+				'handle': '.fcfield-drag'
+				});
+			});
+		";
+		
+		$js .= "					
+		function deleteField".$field->id."(el)
 		{
-			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
+		  value_counter".$field->id."--;
 			
-			// Add the drag and drop sorting feature
-			$js .= "
-			window.addEvent('domready', function(){
-				new Sortables($('sortables_".$field->id."'), {
-					'constrain': true,
-					'clone': true,
-					'handle': '.fcfield-drag'
-					});
-				});
-			";
+		  var valcounter = $('".$field->name."');
+			if ( value_counter".$field->id." > 0 ) valcounter.value = value_counter".$field->id.";
+			else valcounter.value = '';
 			
-			$js .= "					
-			function deleteField".$field->id."(el)
-			{
-			  value_counter--;
-				
-			  var valcounter = $('".$field->name."');
-				if ( value_counter > 0 ) valcounter.value = value_counter;
-				else valcounter.value = '';
-				
-				var field	= $(el);
-				var row		= field.getParent();
-				if (MooTools.version>='1.2.4') {
-					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
-				} else {
-					var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
-				}
-				
-				fx.start({
-					'height': 0,
-					'opacity': 0
-				}).chain(function(){
-					(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
-				});
+			var field	= $(el);
+			var row		= field.getParent();
+			if (MooTools.version>='1.2.4') {
+				var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
+			} else {
+				var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
 			}
-			";
 			
-			$css = '
-			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
-			#sortables_'.$field->id.' li {
-				clear: both;
-				display: block;
-				list-style: none;
-				height: auto;
-				position: relative;
-			}
-			#sortables_'.$field->id.' li input { cursor: text;}
-			#sortables_'.$field->id.' li input.inline_style_published   { font-family:tahoma!important; font-style:italic!important; color:#444!important; font-style:tahona; }
-			#sortables_'.$field->id.' li input.inline_style_unpublished { background: #ffffff; color:gray; border-width:0px; text-decoration:line-through; }
-			';
-			
-			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
-		} else {
-			$remove_button = '';
-			$move2 = '';
-			$js = '';
-			$css = '';
+			fx.start({
+				'height': 0,
+				'opacity': 0
+			}).chain(function(){
+				(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
+			});
 		}
+		";
+		
+		$css = '
+		#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+		#sortables_'.$field->id.' li {
+			clear: both;
+			display: block;
+			list-style: none;
+			height: auto;
+			position: relative;
+		}
+		#sortables_'.$field->id.' li input { cursor: text;}
+		#sortables_'.$field->id.' li input.inline_style_published   { font-family:tahoma!important; font-style:italic!important; color:#444!important; font-style:tahona; }
+		#sortables_'.$field->id.' li input.inline_style_unpublished { background: #ffffff; color:gray; border-width:0px; text-decoration:line-through; }
+		';
+		
+		$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" onclick="deleteField'.$field->id.'(this);" />';
+		$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
@@ -197,14 +188,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			.$remove_button
 			;
 			$i++;
+			//if ($max_values && $i >= $max_values) break;  // break out of the loop, if maximum file limit was reached
 		}
 		
-		if ($multiple) { // handle multiple records (FORCED ON , partially implemented, variable is always true)
-			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
-			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-		} else {  // handle single values
-			$field->html = '<div>'.$field->html[0].'</div>';
-		}
+		$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
+		$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 		
 		$user = JFactory::getUser();
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
@@ -227,6 +215,24 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
+		static $langs = null;
+		if ($langs === null) $langs = FLEXIUtilities::getLanguages('code');
+		
+		static $isMobile = null;
+		static $isTablet = null;
+		static $useMobile = null;
+		if ($useMobile===null) 
+		{
+			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+			$force_desktop_layout = $cparams->get('force_desktop_layout', 0 );
+			//$start_microtime = microtime(true);
+			$mobileDetector = flexicontent_html::getMobileDetector();
+			$isMobile = $mobileDetector->isMobile();
+			$isTablet = $mobileDetector->isTablet();
+			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			//printf('<br/>-- [Detect Mobile: %.3f s] ', $time_passed/1000000);
+		}
+		
 		$field->label = JText::_($field->label);
 		
 		$values = $values ? $values : $field->value;
@@ -244,14 +250,38 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
 		// some parameter shortcuts
-		$useicon		= $field->parameters->get( 'useicon', 1 ) ;
-		$display_filename	= $field->parameters->get( 'display_filename', 0 ) ;
-		$display_descr		= $field->parameters->get( 'display_descr', 0 ) ;
+		$useicon = $field->parameters->get( 'useicon', 1 ) ;
+		$lowercase_filename = $field->parameters->get( 'lowercase_filename', 1 ) ;
+		$link_filename      = $field->parameters->get( 'link_filename', 1 ) ;
+		$display_filename	= $field->parameters->get( 'display_filename', 1 ) ;
+		$display_lang     = $field->parameters->get( 'display_lang', 1 ) ;
+		$display_hits     = $field->parameters->get( 'display_hits', 0 ) ;
+		$display_descr		= $field->parameters->get( 'display_descr', 1 ) ;
 		
-		$usebutton	= $field->parameters->get( 'usebutton', 0 ) ;
-		$buttontext = $usebutton==2 ? $field->parameters->get( 'buttontext', 'FLEXI_DOWNLOAD' ) : 'FLEXI_DOWNLOAD';
+		$add_lang_img = $display_lang == 1 || $display_lang == 3;
+		$add_lang_txt = $display_lang == 2 || $display_lang == 3 || $isMobile;
+		$add_hits_img = $display_hits == 1 || $display_hits == 3;
+		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
+		
+		$usebutton    = $field->parameters->get( 'usebutton', 1 ) ;
+		$infoseptxt   = ' '. $field->parameters->get( 'infoseptxt', '' ) .' ';
+		$actionseptxt = ' '. $field->parameters->get( 'actionseptxt', '' ) .' ';
+		$actionseptxt = (!$actionseptxt && $usebutton) ? " | " : $actionseptxt;
+		
+		$allowdownloads = $field->parameters->get( 'allowdownloads', 1 ) ;
+		$downloadstext  = $allowdownloads==2 ? $field->parameters->get( 'downloadstext', 'FLEXI_DOWNLOAD' ) : 'FLEXI_DOWNLOAD';
+		$downloadstext  = JText::_($downloadstext);
+		$downloadinfo   = JText::_('FLEXI_FIELD_FILE_DOWNLOAD_INFO', true);
+		
 		$allowshare = $field->parameters->get( 'allowshare', 0 ) ;
 		$sharetext  = $allowshare==2 ? $field->parameters->get( 'sharetext', 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND' ) : 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND';
+		$sharetext  = JText::_($sharetext);
+		$shareinfo  = JText::_('FLEXI_FIELD_FILE_EMAIL_TO_FRIEND_INFO', true);
+		
+		$allowaddtocart = $field->parameters->get( 'use_downloads_manager', 0);
+		$addtocarttext  = $allowaddtocart==2 ? $field->parameters->get( 'addtocarttext', 'FLEXI_FIELD_FILE_ADD_TO_DOWNLOADS_CART' ) : 'FLEXI_FIELD_FILE_ADD_TO_DOWNLOADS_CART';
+		$addtocarttext  = JText::_($addtocarttext);
+		$addtocartinfo  = JText::_('FLEXI_FIELD_FILE_ADD_TO_DOWNLOADS_CART_INFO', true);
 		
 		$noaccess_display	     = $field->parameters->get( 'noaccess_display', 1 ) ;
 		$noaccess_url_unlogged = $field->parameters->get( 'noaccess_url_unlogged', false ) ;
@@ -264,10 +294,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$noaccess_url = JFactory::getUser()->guest ? $noaccess_url_unlogged : $noaccess_url_logged;
 		$noaccess_msg = JFactory::getUser()->guest ? $noaccess_msg_unlogged : $noaccess_msg_logged;
 		
-		// Downloads manager feature
-		$use_downloads_manager = $field->parameters->get( 'use_downloads_manager', 0);
+		// VERIFY downloads manager module is installed and enabled
 		static $mod_is_enabled = null;
-		if ($use_downloads_manager && $mod_is_enabled === null) {
+		if ($allowaddtocart && $mod_is_enabled === null) {
 			$db = JFactory::getDBO();
 			$query = "SELECT published FROM #__modules WHERE module = 'mod_flexidownloads' AND published = 1";
 			$db->setQuery($query);
@@ -277,7 +306,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				$app->enqueueMessage("FILE FIELD: please disable parameter \"Use Downloads Manager Module\", the module is not install or not published", 'message' );
 			}
 		}
-		$use_downloads_manager = $use_downloads_manager ? $mod_is_enabled : 0;
+		$allowaddtocart = $allowaddtocart ? $mod_is_enabled : 0;
 		
 		
 		// Downloads manager feature
@@ -287,8 +316,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				require_once(JPATH_SITE.DS.'components'.DS.'com_mailto'.DS.'helpers'.DS.'mailto.php');
 				
 				$status = 'width=700,height=360,menubar=yes,resizable=yes';
-				$send_form_title = JText::_( $sharetext );
-				$send_form_desc = JText::_( 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND_INFO' );
 			} else {
 				$com_mailto_found = false;
 			}
@@ -346,12 +373,24 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		// This may be done by adding a new method to fields to prepare multiple fields with a single call
 		$files_data = $this->getFileData( $values, $published=true );   //print_r($files_data); exit;
 		
+		// Optimization, do some stuff outside the loop
+		static $hits_icon = null;
+		if ($hits_icon===null && ($display_hits==1 || $display_hits==3)) {
+			$_attribs = $display_hits==1 ? 'class="hasTip" title=":: %s '.JText::_( 'FLEXI_HITS', true ).'"' : '';
+			$hits_icon = FLEXI_J16GE ?
+				JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) :
+				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
+		}
+		
+		$show_filename = $display_filename || $prop=='namelist';
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
-		foreach($files_data as $file_id => $file_data) {
-			$icon = '';
+		foreach($files_data as $file_id => $file_data)
+		{
+			// *****************************
+			// Check user access on the file
+			// *****************************
 			$authorized = true;
 			$is_public  = true;
-			// Check user access on the file
 			if ( !empty($file_data->access) ) {
 				if (FLEXI_J16GE) {
 					$authorized = in_array($file_data->access,$aid_arr);
@@ -364,53 +403,118 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 			// If no access and set not to show then continue
 			if ( !$authorized && !$noaccess_display ) continue;
-
-			// --. Create icon according to filetype
+			
+			
+			
+			// *****************************
+			// Prepare displayed information
+			// *****************************
+			
+			
+			// a. ICON: create it according to filetype
+			$icon = '';
 			if ($useicon) {
 				$file_data	= $this->addIcon( $file_data );
-				$icon		= JHTML::image($file_data->icon, $file_data->ext, 'class="icon-mime"') .'&nbsp;';
+				$icon = JHTML::image($file_data->icon, $file_data->ext, 'class="fcfile_mime icon-mime hasTip" title="'.JText::_('FLEXI_FIELD_FILE_TYPE').'::'.$file_data->ext.'"');
+				$icon = '<span class="fcfile_mime">'.$icon.'</span>';
 			}
-
-			// --. Decide whether to show filename (if we do not use button, then displaying of filename is forced)
+			
+			
+			// b. LANGUAGE: either as icon or as inline text or both
+			$lang = ''; $lang_str = '';
+			if ($display_lang && $file_data->language!='*')  // ... skip 'ALL' language ... maybe allow later
+			{
+				$lang = '<span class="fcfile_lang">';
+				if ( $add_lang_img && @ $langs->{$file_data->language}->imgsrc ) {
+					$_attribs = '';
+					if (!$add_lang_txt) {
+						$lang_tip = JText::_( 'FLEXI_LANGUAGE', true ).'::'.($file_data->language=='*' ? JText::_("All") : $langs->{$file_data->language}->name);
+						$_attribs = '" class="hasTip" title="'.$lang_tip.'"';
+					}
+					$lang .= "\n".'<img src="'.$langs->{$file_data->language}->imgsrc.'" '.$_attribs.' />';
+				}
+				if ( $add_lang_txt ) {
+					$lang .= '['. ($file_data->language=='*' ? JText::_("FLEXI_ALL_LANGUAGES") : $langs->{$file_data->language}->name) .']';
+				}
+				$lang .= '</span>';
+			}
+			
+			
+			// c. HITS: either as icon or as inline text or both
+			$hits = '';
+			if ($display_hits)
+			{
+				$hits = '<span class="fcfile_hits">';
+				if ( $add_hits_img && @ $hits_icon ) {
+					$hits .= sprintf($hits_icon, $file_data->hits);
+				}
+				if ( $add_hits_txt ) {
+					$hits .= '('.$file_data->hits.'&nbsp;'.JTEXT::_('FLEXI_HITS').')';
+				}
+				$hits .= '</span>';
+			}
+			
+			
+			// d. FILENAME / TITLE: decide whether to show it (if we do not use button, then displaying of filename is forced)
 			$_filename  = $file_data->altname ? $file_data->altname : $file_data->filename;
-			//$_filename  = mb_strtolower( $_filename, "UTF-8");
-			$name_str   = ($display_filename || !$usebutton || $prop=='namelist') ? ($display_filename==2 ? $file_data->filename : $_filename) : '';
-			$name_html  = !empty($name_str) ? '&nbsp;<span class="fcfile_name">'. $name_str . '</span>' : '';
-
-			// --. Description as tooltip or inline text ... prepare related variables
-			$alt_str = $class_str = $text_html  = '';
+			if ($lowercase_filename) $_filename = mb_strtolower( $_filename, "UTF-8");
+			$name_str   = $display_filename==2 ? $file_data->filename : $_filename;
+			$name_html  = '<span class="fcfile_name">'. $name_str . '</span>';
+			$name_classes = '';
+			
+			
+			// e. DESCRIPTION: either as tooltip or as inline text
+			$descr_tip = $descr_inline = $descr_icon = '';
 			if (!empty($file_data->description)) {
 				if ( !$authorized ) {
 					if ($noaccess_display != 2 ) {
-						$alt_str    = flexicontent_html::escapeJsText($name_str . '::' . $file_data->description,'s');
-						$class_str  = ' hasTip';
-						$text_html  = '';
+						$descr_tip    = flexicontent_html::escapeJsText($name_str . '::' . $file_data->description,'s');
+						$descr_icon = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'. $descr_tip .'"/>';
+						$descr_inline  = '';
 					}
 				} else if ($display_descr==1 || $prop=='namelist') {   // As tooltip
-					$alt_str    = flexicontent_html::escapeJsText($name_str . '::' . $file_data->description,'s');
-					$class_str  = ' hasTip';
-					$text_html  = '';
+					$descr_tip    = flexicontent_html::escapeJsText($name_str . '::' . $file_data->description,'s');
+					$descr_icon = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'. $descr_tip .'"/>';
+					$descr_inline  = '';
 				} else if ($display_descr==2) {  // As inline text
-					$alt_str    = '';
-					$class_str  = '';
-					$text_html  = ' <span class="fcfile_descr">'. $file_data->description . '</span>';
+					$descr_inline = ' <span class="fcfile_descr_inline fc-mssg fc-caption" style="max-wdith">'. $file_data->description . '</span>';
 				}
+				if ($descr_icon) $descr_icon = ' <span class="fcfile_descr_tip">'. $descr_icon . '</span>';
 			}
-
-			// --. Create the download link or use no authorized link ...
+			
+			
+			
+			
+			// *****************************
+			// Create field's displayed html
+			// *****************************
+			
+			// [1]: either create the download link -or- use no authorized link ...
 			if ( !$authorized ) {
 				$dl_link = $noaccess_url;
-				$str = $noaccess_msg . ($noaccess_msg ? ': ' : '') . $icon;
-				$class_str .= ' fc_file_noauth';   // Add an extra css class
+				if ($noaccess_msg) {
+					$str = '<span class="fcfile_noauth_msg fc-mssg-inline fc-noauth">' .$noaccess_msg. '</span> ';
+				}
+				$name_classes .= ($name_classes ? ' ' : '').'fcfile_noauth';   // Add an extra css class
 			} else {
 				$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
 				$str = '';
 			}
 			
 			
-			// *****************************
-			// Create field's displayed html
-			// *****************************
+			// [2]: Add information properties: filename, and icons with optional inline text
+			$filename_shown = (!$authorized || $show_filename) && !$file_data->url;
+			$info_arr = array();
+			if ($lang) $info_arr[] = $lang;
+			if ($hits) $info_arr[] = $hits;
+			if ($descr_icon) $info_arr[] = $descr_icon;
+			if ($filename_shown && (!$allowdownloads || !$link_filename))
+				$info_arr[] = $icon .' '. $name_html;
+			$str .= implode($info_arr, $infoseptxt);
+			
+			// [3]: Display the buttons:  DOWNLOAD, SHARE, ADD TO CART
+			
+			$str .= '<span class="fcfile_actions">';
 			
 			// ****************************
 			// CASE 1: no download link ... 
@@ -419,7 +523,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// EITHER (a) Current user NOT authorized to download file AND no access URL is not configured
 			// OR     (b) creating a file list with no download links, (the 'prop' display variable is 'namelist')
 			if (!$dl_link || $prop=='namelist') {
-				$str = $icon . '<span class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</span>' ." ". $text_html;
+				$name_classes .= ($name_classes ? ' ' : '') .' fcfile_title';
+				$str .= '<span class="'.$name_classes.'" >' . $name_html . '</span>';
 			}
 			
 			
@@ -429,54 +534,58 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// *****************************************************************************************
 			
 			else if ($usebutton) {
-				$class_str .= ' fc_button fcsimple';   // Add an extra css class (button display)
-				$str = $icon." ".$name_html;
 				
-				// MULTI-DOWNLOAD MODE: the button will add file to download list (tree) (handled via a downloads manager module)
-				if ($authorized && $use_downloads_manager && !$file_data->url) {
-					$_class_str = $class_str;
-					$_class_str .= ($_class_str ? ' ' : '') .'fcfile_addFile';   // CSS class to anchor downloads list adding function
+				$links_arr = array();
+				$name_classes .= ($name_classes ? ' ' : '').'fc_button fcsimple';   // Add an extra css class (button display)
+				
+				// DOWNLOAD: single file instant download
+				if ($allowdownloads) {
+					// NO ACCESS: add file info via form field elements, in case the URL target needs to use them
+					$file_data_fields = "";
+					if ( !$authorized && $noaccess_addvars) {
+						$file_data_fields =
+							'<input type="hidden" name="fc_field_id" value="'.$field->id.'"/>'."\n".
+							'<input type="hidden" name="fc_item_id" value="'.$field->item_id.'"/>'."\n".
+							'<input type="hidden" name="fc_file_id" value="'.$file_id.'"/>'."\n";
+					}
 					
-					$attribs  = ' class="'. $_class_str .'"';
-					$attribs .= ' title="'. $alt_str .'"';
+					// The download button in a mini form ...
+					$links_arr[] = ''
+						.'<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" >'
+						.$file_data_fields
+						.'<input type="submit" name="download-'.$field->id.'[]" class="'.$name_classes.' fcfile_downloadFile" title="'. $downloadinfo .'" value="'.$downloadstext.'"/>'
+						.'</form>'."\n";
+				}
+				
+				// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)
+				if ($authorized && $allowaddtocart && !$file_data->url) {
+					// CSS class to anchor downloads list adding function
+					$_name_classes = $name_classes. ($name_classes ? ' ' : '') .'fcfile_addFile';
+					
+					$attribs  = ' class="'. $_name_classes .'"';
+					$attribs .= ' title="'. $addtocartinfo .'"';
 					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filename,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';
 					$attribs .= ' contentid="'. $field->item_id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';
-					$str .= '<input type="button" '. $attribs .' value="'.JText::_('FLEXI_FIELD_FILE_ADD_TO_DOWNLOADS_CART').'" />'. $text_html;
+					$links_arr[] =
+						'<input type="button" '. $attribs .' value="'.$addtocarttext.'" />';
 				}
 				
-				// SINGLE (INSTANT) DOWNLOAD MODE
-				// NO ACCESS: add file info via form field elements, in case the URL target needs to use them
-				$file_data_fields = "";
-				if ( !$authorized && $noaccess_addvars) {
-					$file_data_fields =
-						'<input type="hidden" name="fc_field_id" value="'.$field->id.'"/>'."\n".
-						'<input type="hidden" name="fc_item_id" value="'.$field->item_id.'"/>'."\n".
-						'<input type="hidden" name="fc_file_id" value="'.$file_id.'"/>'."\n";
-				}
 				
-				// The download button in a mini form ...
-				$str .= '<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" >';
-				$str .= $file_data_fields;
-				$str .= '<input type="submit" name="download-'.$field->id.'[]" class="'.$class_str.'" title="'. $alt_str .'" value="'.JText::_($buttontext).'"/>';
-				$str .= $text_html;
-				$str .= '</form>'."\n";
-				
-				// The share popup form button (but disable it if com_mailto is missing)
+				// SHARE FILE VIA EMAIL: open a popup or inline email form ...
 				if ($is_public && $allowshare && !$com_mailto_found) {
-					$str .= ' com_mailto component not found, please disable <b>download link sharing parameter</b> in this file field';
-					$allowshare = false;
-				}
-				
-				if ($is_public && $allowshare) {
+					// skip share popup form button if com_mailto is missing
+					$links_arr[] =
+						' com_mailto component not found, please disable <b>download link sharing parameter</b> in this file field';
+				} else if ($is_public && $allowshare) {
 					$send_onclick = 'window.open(\'%s\',\'win2\',\''.$status.'\'); return false;';
-					$send_title = $send_form_title.'::'.$send_form_desc;
 					$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
 						.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
 						.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
-					$str .= '<input type="button" class="fc_button fcsimple editlinktip hasTip" onclick="'.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$send_title.'"
-						value="'.$send_form_title.'" />';
+					$links_arr[] =
+						'<input type="button" class="'.$name_classes.' fcfile_shareFile" onclick="'
+							.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$shareinfo.'" value="'.$sharetext.'" />';
 				}
 			}
 			
@@ -487,57 +596,69 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// *******************************************************************************************
 			
 			else {
-				$str = $icon;
 				
-				// MULTI-DOWNLOAD MODE: the link will add file to download list (tree) (handled via a downloads manager module)
-				if ($authorized && $use_downloads_manager && !$file_data->url) {
-					$_class_str = $class_str;
-					$_class_str .= ($_class_str ? ' ' : '').'fc_button fcsimple';  // Force using button, since allowing both ADD to cart and direct download
-					$_class_str .= ($_class_str ? ' ' : '') .'fcfile_addFile';   // CSS class to anchor downloads list adding function
+				$links_arr = array();
+				
+				// DOWNLOAD: single file instant download
+				if ($allowdownloads) {
+					// NO ACCESS: add file info via URL variables, in case the URL target needs to use them
+					if ( !$authorized && $noaccess_addvars) {
+						$dl_link .=
+							'&fc_field_id="'.$field->id.
+							'&fc_item_id="'.$field->item_id.
+							'&fc_file_id="'.$file_id;
+					}
 					
-					$attribs  = ' class="'. $_class_str .'"';
-					$attribs .= ' title="'. $alt_str .'"';
+					// The download link, if filename/title not shown, then display a 'download' prompt text
+					$links_arr[] =
+						($filename_shown && $link_filename ? $icon.' ' : '')
+						.'<a href="' . $dl_link . '" class="'.$name_classes.' fcfile_downloadFile" title="'. $downloadinfo .'" >'
+						.($filename_shown && $link_filenames ? $name_html : $downloadstext)
+						.'</a>';
+				}
+				
+				// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)
+				if ($authorized && $allowaddtocart && !$file_data->url) {
+					// CSS class to anchor downloads list adding function
+					$_name_classes = $name_classes. ($name_classes ? ' ' : '') .'fcfile_addFile';
+					
+					$attribs  = ' class="'. $_name_classes .'"';
+					$attribs .= ' title="'. $addtocartinfo .'"';
 					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filename,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';
 					$attribs .= ' contentid="'. $field->item_id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';
-					$str .= $name_html;
-					$str .= '<a href="javascript:;" '. $attribs .' >' .JText::_('FLEXI_FIELD_FILE_ADD_TO_DOWNLOADS_CART'). '</a> '. $text_html;
+					$links_arr[] =
+						'<a href="javascript:;" '. $attribs .' >'
+						.$addtocarttext
+						.'</a>';
 				}
 				
-				// SINGLE (INSTANT) DOWNLOAD MODE
-				// NO ACCESS: add file info via URL variables, in case the URL target needs to use them
-				if ( !$authorized && $noaccess_addvars) {
-					$dl_link .=
-						'&fc_field_id="'.$field->id.
-						'&fc_item_id="'.$field->item_id.
-						'&fc_file_id="'.$file_id;
-				}
-				
-				// The download link
-				if ($use_downloads_manager) {  // if using downloads manager we need to display button
-					$class_str .= ($class_str ? ' ' : '').'fc_button fcsimple';
-					$str .= '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' .JText::_('FLEXI_DOWNLOAD'). '</a> '. $text_html;
-				} else {
-					$str .= '<a href="' . $dl_link . '" class="'.$class_str.'" title="'. $alt_str .'" >' . $name_html . '</a> '. $text_html;
-				}
-				
-				// The share popup form button (but disable it if com_mailto is missing)
+				// SHARE FILE VIA EMAIL: open a popup or inline email form ...
 				if ($is_public && $allowshare && !$com_mailto_found) {
+					// skip share popup form button if com_mailto is missing
 					$str .= ' com_mailto component not found, please disable <b>download link sharing parameter</b> in this file field';
-					$allowshare = false;
-				}
-				
-				if ($is_public && $allowshare) {
+				} else if ($is_public && $allowshare) {
 					$send_onclick = 'window.open(\'%s\',\'win2\',\''.$status.'\'); return false;';
-					$send_title = $send_form_title.'::'.$send_form_desc;
 					$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
 						.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
 						.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
-					$str .= '<a href="javascript:;" class="editlinktip hasTip" onclick="'.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$send_title.'">'.
-						$send_form_title.'</a>';
+					$links_arr[] =
+						'<a href="javascript:;" class="fcfile_shareFile" onclick="'.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$shareinfo.'">'
+						.$sharetext
+						.'</a>';
 				}
 			}
+			
+			$str .=
+				(count($links_arr) ?  $infoseptxt : "")
+				.implode($links_arr, $actionseptxt);
+			$str .= '</span>';
+			
+			
+			// [4]: Add the file description (if displayed inline)
+			if ($descr_inline) $str .= $descr_inline;
+			
 			
 			// Values Prefix and Suffix Texts
 			$field->{$prop}[]	=  $pretext . $str . $posttext;

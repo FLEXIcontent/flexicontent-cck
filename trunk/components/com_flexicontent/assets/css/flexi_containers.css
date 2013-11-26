@@ -11,6 +11,7 @@
 	font-family: tahoma;
 	font-size:11px;
 	white-space: normal;
+	line-height: 140%;
 }
 .fc-mssg-inline {
 	display: inline-block;
@@ -42,6 +43,20 @@
 	background: #FEEFB3 url(../images/note.gif) no-repeat 10px 50%;
 	color:#9F6000 !important;
 	border-color: #9F6000 !important;
+}
+
+
+.fc-noauth {
+	background: #FEEFB3 url(../images/warning.png) no-repeat 10px 50%;
+	color:#9F6000 !important;
+	border-color: #9F6000 !important;
+	padding: 3px 6px 4px 36px !important;
+}
+.fc-caption {
+	background: #888 url(../images/comment.png) no-repeat 10px 50%;
+	color: white !important;
+	border-color: #aaa !important;
+	padding: 3px 6px 4px 36px !important;
 }
 
 
