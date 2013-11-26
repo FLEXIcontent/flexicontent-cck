@@ -54,8 +54,8 @@ $mod_height_feat 	= (int)$params->get('mod_height', 110);
 $mod_width 				= (int)$params->get('mod_width', 80);
 $mod_height 			= (int)$params->get('mod_height', 80);
 
-$img_force_dims_feat="width:".$mod_width_feat."px; height:".$mod_height_feat."px; display:inline-block!important";
-$img_force_dims="width:".$mod_width."px; height:".$mod_height."px; display:inline-block!important";
+$img_force_dims_feat="max-width:".$mod_width_feat."px; max-height:".$mod_height_feat."px; width: auto; height: auto; display: block!important;";
+$img_force_dims="max-width:".$mod_width."px; max-height:".$mod_height."px; width: auto; height: auto; display: block!important;";
 
 $hide_label_onempty_feat = (int)$params->get('hide_label_onempty_feat', 0);
 $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
@@ -83,7 +83,8 @@ $handle_event  = $params->get('carousel_handle_event', 'mouseover');
 
 // Autoplay, autoplay interval, and affect duration
 $autoplay = $params->get('carousel_autoplay', 1);
-$effect   = $params->get('carousel_effect', 'quart').':out';
+$effect   = $params->get('carousel_effect', 'quart');
+$effect_eased = !FLEXI_J16GE ? 'Fx.Transitions.'.ucfirst($effect).'.easeOut' : '"'.$effect.':out'.'"';
 $duration = (int)$params->get('carousel_duration', 1000);
 $interval = (int)$params->get('carousel_interval', 5000);
 
@@ -104,7 +105,7 @@ $_ns_handle_event = $handle_event;
 $_ns_autoPlay     = $autoplay ? "true" : "false";
 $_ns_interval     = $interval;
 $_ns_size         = $mode=="horizontal" ? $hdir_item_width + $extra_width : 240;  // 240 is just a default it will be recalulated after page load ends
-$_ns_fxOptions    = '{ duration:'.$duration.', transition: "'.$effect.'", link: "cancel" }';
+$_ns_fxOptions    = '{ duration:'.$duration.', transition: '.$effect_eased.', link: "cancel" }';
 ?>
 
 <div class="carousel mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_carousel<?php echo $module->id ?>">
@@ -324,8 +325,8 @@ $_ns_fxOptions    = '{ duration:'.$duration.', transition: "'.$effect.'", link: 
 				onmouseout="if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $_ns_interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==-1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $_ns_interval; ?>,'previous',true);"
 			>
 
-				<?php if ($display_title) : ?>
-				<div class="fc_block" >
+				<?php if ($display_title || $show_curritem_info) : ?>
+				<div class="fc_block" <?php echo !$display_title ? 'style="display:none!important;"' : ''; ?> >
 					<div class="fc_inline_block fcitem_title">
 						<?php if ($link_title) : ?>
 						<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
@@ -466,7 +467,10 @@ $_ns_fxOptions    = '{ duration:'.$duration.', transition: "'.$effect.'", link: 
 		<?php endif; ?>
 		
 		<?php if ($show_curritem_info) : ?>
-			<h4 id="mod_fc_activeitem_info<?php echo $module->id; ?>" class="mod_fc_activeitem_info" >Show: <span id="mod_fc_info<?php echo $module->id; ?>"></span></h4>
+			<h4 id="mod_fc_activeitem_info<?php echo $module->id; ?>" class="mod_fc_activeitem_info" >
+				<?php echo JText::_( 'FLEXI_MOD_CAROUSEL_DISPLAYING'); ?>:
+				<span id="mod_fc_info<?php echo $module->id; ?>"></span>
+			</h4>
 		<?php endif; ?>
 		
 		<?php if ($show_handles) : ?>

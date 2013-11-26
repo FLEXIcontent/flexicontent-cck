@@ -157,8 +157,9 @@
 
 			<field name="" type="separator" default="FLEXI_FLEXI_VIEW_RULES" level="level2" menu="hide" />
 			<field name="show_in_views" type="fccheckbox" default=""
-					checkoptions="FLEXI_CATEGORY_V,FLEXI_ITEM_V,FLEXI_FAVOURITES_V,FLEXI_TAGS_V,FLEXI_SEARCH_V,FLEXI_OTHERS_V" checkvals="category,item,favourites,tags,search,others"
-					defaultvals="category,item,favourites,tags,search,others"
+					checkoptions="FLEXI_CATEGORY_V,FLEXI_ITEM_V,FLEXI_FAVOURITES_V,FLEXI_TAGS_V,FLEXI_DIRECTORY_V,FLEXI_SEARCH_V,FLEXI_OTHERS_V"
+					checkvals="category,item,favourites,tags,directory,search,others"
+					defaultvals="category,item,favourites,tags,directory,search,others"
 					label="FLEXI_SHOW_IN_VIEWS" description="FLEXI_SHOW_IN_VIEWS_DESC"
 			/>
 			
