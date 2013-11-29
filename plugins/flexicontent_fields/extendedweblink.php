@@ -292,8 +292,10 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			
 			if ($allow_relative_addrs==2) $autoprefix =
 				'<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_AUTOPREFIX' ).  ':</td><td>
-					<input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="0" '.( !$has_prefix ? 'checked="checked"' : '' ).'/><label class="label" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_NO').'</label>
-					<input class="autoprefix" name="'.$fieldname.'[autoprefix]" type="radio" value="1" '.( $has_prefix ? 'checked="checked"' : '' ).'/><label class="label" for="'.$fieldname.'[autoprefix]">'.JText::_('FLEXI_YES').'</label>
+					<input class="autoprefix" id="'.$elementid.'_autoprefix_0" name="'.$fieldname.'[autoprefix]" type="radio" value="0" '.( !$has_prefix ? 'checked="checked"' : '' ).'/>
+					<label for="'.$elementid.'_autoprefix_0">'.JText::_('FLEXI_NO').'</label>
+					<input class="autoprefix" id="'.$elementid.'_autoprefix_1" name="'.$fieldname.'[autoprefix]" type="radio" value="1" '.( $has_prefix ? 'checked="checked"' : '' ).'/>
+					<label for="'.$elementid.'_autoprefix_1">'.JText::_('FLEXI_YES').'</label>
 				</td></tr>';
 			
 			if ($usetitle) $title =
@@ -360,10 +362,13 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		// some parameter shortcuts
 		$target         = $field->parameters->get( 'target', '' );
 		$target_param   = $target ? ' target="'.$target.'"' : '';
+		$display_hits = $field->parameters->get( 'display_hits', 0 ) ;
+		$add_hits_img = $display_hits == 1 || $display_hits == 3;
+		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
 		
 		// This is field 's MAIN value property
 		$link_usage   = $field->parameters->get( 'default_link_usage', 0 ) ;
-		$default_link = ($item->version == 0 || $link_usage > 0) ? $field->parameters->get( 'default_link', '' ) : '';
+		$default_link = ($link_usage == 2) ? $field->parameters->get( 'default_link', '' ) : '';
 		
 		// Optional value properties
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
@@ -443,6 +448,21 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			break;
 		}
 		
+		$app = JFactory::getApplication();
+		
+		// Optimization, do some stuff outside the loop
+		static $hits_icon = null;
+		if ($hits_icon===null && ($display_hits==1 || $display_hits==3)) {
+			$_attribs = $display_hits==1 ? 'class="hasTip" title=":: %s '.JText::_( 'FLEXI_HITS', true ).'"' : '';
+			$hits_icon = FLEXI_J16GE ?
+				JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) :
+				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
+		}
+		
+		// needed for backend display
+		//if ($display_hits)
+		//	$isAdmin = JFactory::getApplication()->isAdmin();
+		
 		// initialise property
 		$field->{$prop} = array();
 		$n = 0;
@@ -450,6 +470,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		{
 			if ( empty($value) ) continue;
 			$value  = unserialize($value);
+			$hits = (int) @ $value['hits'];
 			
 			// If not using property or property is empty, then use default property value
 			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
@@ -475,7 +496,25 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				$href = JRoute::_( 'index.php?option=com_flexicontent&fid='. $field->id .'&cid='.$field->item_id.'&ord='.($n+1).'&task=weblink' );
 			
 			// Create indirect link to web-link address with custom displayed text
-			$field->{$prop}[] = $pretext. '<a href="'.$href.'" '.$link_params.'>'. $linktext .'</a>' .$posttext;
+			$field->{$prop}[$n] = $pretext. '<a href="'.$href.'" '.$link_params.'>'. $linktext .'</a>' .$posttext;
+			
+			// HITS: either as icon or as inline text or both
+			$hits_html = '';
+			if ($display_hits && $hits)
+			{
+				$hits_html = '<span class="fcweblink_hits">';
+				if ( $add_hits_img && @ $hits_icon ) {
+					$hits_html .= sprintf($hits_icon, $hits);
+				}
+				if ( $add_hits_txt ) {
+					$hits_html .= '('.$hits.'&nbsp;'.JTEXT::_('FLEXI_HITS').')';
+				}
+				$hits_html .= '</span>';
+				if ($prop == 'display_hitsonly')
+					$field->{$prop}[$n] = $hits_html;
+				else
+					$field->{$prop}[$n] .= ' '. $hits_html;
+			}
 			
 			$n++;
 		}

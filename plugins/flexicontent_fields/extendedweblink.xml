@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
 	<name>FLEXIcontent - Extended Weblink</name>
-	<author>Stian Didriksen</author>
+	<author>FLEXIContent Team, Stian Didriksen</author>
 	<creationDate>February 2010</creationDate>
-	<copyright>Copyright (C) 2010 ProThemer</copyright>
+	<copyright>Copyright (C) 2013 FLEXIContent Team, ProThemer</copyright>
 	<license>GNU/GPL v2</license>
-	<authorEmail>stian@prothemer.com</authorEmail>
-	<authorUrl>prothemer.com</authorUrl>
+	<authorEmail>emmanuel@vistamedia.fr, stian@prothemer.com</authorEmail>
+	<authorUrl>www.flexicontent.org, www.prothemer.com</authorUrl>
 	<version>1.0</version>
 	<description>FLEXI_FIELD_EXTENDED_WEBLINK</description>
 	<files>
@@ -28,7 +28,13 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-
+			<field name="display_hits" type="list" default="0" label="FLEXI_FIELD_SHOW_HITS" description="FLEXI_FIELD_SHOW_HITS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES_AS_ICON</option>
+				<option value="2">FLEXI_YES_AS_TEXT</option>
+				<option value="3">FLEXI_YES_BOTH</option>
+			</field>
+			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
 			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
 				<option value="0">FLEXI_NO</option>

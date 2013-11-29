@@ -159,11 +159,14 @@ class FlexicontentViewCategory extends JViewLegacy
 		$limit		= $app->getUserStateFromRequest('com_flexicontent'.$category->id.'.category.limit', 'limit', $params->def('limit', 0), 'int');
 		
 		// Pathway needed variables
-		//$catshelper = new flexicontent_cats((int)$category->id);
+		//$catshelper = new flexicontent_cats($cid);
 		//$parents    = $catshelper->getParentlist();
 		//echo "<pre>".print_r($parents,true)."</pre>";
-		$parent_ids = $globalcats[(int)$category->id]->ancestorsarray;
-		foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
+		$parents = array();
+		if ( $category->id && $cid && isset($globalcats[$cid]->ancestorsarray) ) {
+			$parent_ids = $globalcats[$cid]->ancestorsarray;
+			foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
+		}
 		
 		$rootcat = (int) $params->get('rootcat');
 		if ($rootcat) $root_parents = $globalcats[$rootcat]->ancestorsarray;
