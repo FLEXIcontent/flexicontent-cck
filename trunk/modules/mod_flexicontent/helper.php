@@ -742,13 +742,13 @@ class modFlexicontentHelper
 		// NON-STATIC behaviors that need current item information
 		// *******************************************************
 		
-		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW);
+		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW && JRequest::getInt('id'));
 		
 		if ( ($behaviour_cat || $behaviour_types || $behaviour_auth || $behaviour_items || $date_compare) && $isflexi_itemview ) {
 			// initialize variables
-			$cid 		= JRequest::getInt('cid');
+			$cid		= JRequest::getInt('cid');
 			$id			= JRequest::getInt('id');
-			$Itemid		= JRequest::getInt('Itemid');
+			$Itemid	= JRequest::getInt('Itemid');
 			// Check for new item nothing to retrieve,
 			// NOTE: aborting execution if current view is not item view, but item view is required
 			// and also proper usage of current item, both of these will be handled by SCOPEs

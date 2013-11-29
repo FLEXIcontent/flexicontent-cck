@@ -447,9 +447,14 @@ class flexicontent_cats
 		$fparams = $app->getParams('com_flexicontent');
 		$show_noauth = $fparams->get('show_noauth', 0);
 		
-		$all_cats = $cids;
+		$all_cats = array();
+		foreach ($cids as $cid) {
+			if ($cid) $all_cats[] = $cid;
+		}
+		
 		foreach ($cids as $cid)
 		{
+			if (!$cid) continue;
 			$cats = array();
 			switch ($treeinclude) {
 				// current category only
@@ -471,6 +476,7 @@ class flexicontent_cats
 			}
 			$all_cats = array_merge($all_cats, $cats);
 		}
+		if ( empty($all_cats) ) return array();
 		
 		// Select only categories that user has view access, if listing of unauthorized content is not enabled
 		$joinaccess = '';

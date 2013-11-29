@@ -269,16 +269,20 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		// some parameter shortcuts
 		$target = $field->parameters->get( 'targetblank', 0 ) ? ' target="_blank"' : '';
+		$display_hits = $field->parameters->get( 'display_hits', 0 ) ;
+		$add_hits_img = $display_hits == 1 || $display_hits == 3;
+		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
 		
 		// This is field 's MAIN value property
 		$link_usage   = $field->parameters->get( 'link_usage', 0 ) ;
 		$default_link = ($link_usage == 2) ? $field->parameters->get( 'default_value_link', '' ) : '';
 		
-		// Optional value properties 
+		// Optional value properties
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
 		
+		// Get field values
 		$values = $values ? $values : $field->value;
 		
 		// Handle default value loading, instead of empty value
@@ -287,9 +291,9 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			return;
 		} else if ( empty($values) && strlen($default_link) ) {
 			$values = array();
-			$values[0]['link'] = JText::_($default_link);
-			$values[0]['text'] = JText::_($default_title);
-			$values[0]['hits'] = 0;
+			$values[0]['link']  = JText::_($default_link);
+			$values[0]['text']  = JText::_($default_title);
+			$values[0]['hits']  = 0;
 			$values[0] = serialize($values[0]);
 		}
 		
@@ -304,7 +308,6 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-		
 		
 		switch($separatorf)
 		{
@@ -337,6 +340,19 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			break;
 		}
 		
+		// Optimization, do some stuff outside the loop
+		static $hits_icon = null;
+		if ($hits_icon===null && ($display_hits==1 || $display_hits==3)) {
+			$_attribs = $display_hits==1 ? 'class="hasTip" title=":: %s '.JText::_( 'FLEXI_HITS', true ).'"' : '';
+			$hits_icon = FLEXI_J16GE ?
+				JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) :
+				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
+		}
+		
+		// needed for backend display
+		//if ($display_hits)
+		//	$isAdmin = JFactory::getApplication()->isAdmin();
+		
 		// initialise property
 		$field->{$prop} = array();
 		$n = 0;
@@ -347,9 +363,9 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			// Compatibility for old unserialized values
 			$value = (@unserialize($value)!== false || $value === 'b:0;') ? unserialize($value) : $value;
 			if ( is_array($value) ) {
-				$link = $value['link'];
+				$link  = $value['link'];
 				$title = $value['title'];
-				$hits = $value['hits'];
+				$hits  = $value['hits'];
 			} else {
 				$link = $value;
 				$title = '';
@@ -369,9 +385,27 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			
 			// Create indirect link to web-link address with custom displayed text
 			if ( strlen($title) && $usetitle ) {
-				$field->{$prop}[] = $pretext. '<a href="' .$href. '" title="' . $title . '"' . $target . '>' .$title. '</a>' .$posttext;
+				$field->{$prop}[$n] = $pretext. '<a href="' .$href. '" title="' . $title . '"' . $target . '>' .$title. '</a>' .$posttext;
 			} else {
-				$field->{$prop}[] = $pretext. '<a href="' .$href. '" title="' . $title . '"' . $target . '>'. $this->cleanurl($link) .'</a>' .$posttext;
+				$field->{$prop}[$n] = $pretext. '<a href="' .$href. '" title="' . $title . '"' . $target . '>'. $this->cleanurl($link) .'</a>' .$posttext;
+			}
+			
+			// HITS: either as icon or as inline text or both
+			$hits_html = '';
+			if ($display_hits && $hits)
+			{
+				$hits_html = '<span class="fcweblink_hits">';
+				if ( $add_hits_img && @ $hits_icon ) {
+					$hits_html .= sprintf($hits_icon, $hits);
+				}
+				if ( $add_hits_txt ) {
+					$hits_html .= '('.$hits.'&nbsp;'.JTEXT::_('FLEXI_HITS').')';
+				}
+				$hits_html .= '</span>';
+				if ($prop == 'display_hitsonly')
+					$field->{$prop}[$n] = $hits_html;
+				else
+					$field->{$prop}[$n] .= ' '. $hits_html;
 			}
 			
 			$n++;

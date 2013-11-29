@@ -180,11 +180,14 @@ class FlexicontentViewItem  extends JViewLegacy
 		$fields = $item->fields;
 		
 		// Pathway needed variables
-		//$catshelper = new flexicontent_cats((int)$category->id);
+		//$catshelper = new flexicontent_cats($cid);
 		//$parents    = $catshelper->getParentlist();
 		//echo "<pre>".print_r($parents,true)."</pre>";
-		$parent_ids = $globalcats[$cid]->ancestorsarray;
-		foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
+		$parents = array();
+		if ( $category->id && $cid && isset($globalcats[$cid]->ancestorsarray) ) {
+			$parent_ids = $globalcats[$cid]->ancestorsarray;
+			foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
+		}
 		
 		
 		// **********************
