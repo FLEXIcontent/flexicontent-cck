@@ -163,7 +163,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		//$parents    = $catshelper->getParentlist();
 		//echo "<pre>".print_r($parents,true)."</pre>";
 		$parents = array();
-		if ( $category->id && $cid && isset($globalcats[$cid]->ancestorsarray) ) {
+		if ( $cid && isset($globalcats[$cid]->ancestorsarray) ) {
 			$parent_ids = $globalcats[$cid]->ancestorsarray;
 			foreach ($parent_ids as $parent_id) $parents[] = $globalcats[$parent_id];
 		}
