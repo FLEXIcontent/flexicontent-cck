@@ -980,8 +980,11 @@ div.current dd {
  **************************************/
 
 /* File field (item form) */
-.icon-mime {
+.fcfile_mime .icon-mime,
+.fcfile_hits .icon-hits,
+.fcfile_lang .icon-lang {
 	vertical-align: middle;
+	margin-bottom: 2px;
 }
 
 /* strange property in japurity /-) */
