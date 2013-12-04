@@ -20,7 +20,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 // Do nothing if site is offline
-if ( JFactory::getApplication()->getCfg('offline') ) {
+if ( !FLEXI_J16GE && JFactory::getApplication()->getCfg('offline') ) {
 	$user = JFactory::getUser();
 	if (!$user->id) {
 		return;
