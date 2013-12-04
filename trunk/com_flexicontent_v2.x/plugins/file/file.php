@@ -271,9 +271,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
 		
 		$usebutton    = $field->parameters->get( 'usebutton', 1 ) ;
-		$infoseptxt   = ' '. $field->parameters->get( 'infoseptxt', '' ) .' ';
-		$actionseptxt = ' '. $field->parameters->get( 'actionseptxt', '' ) .' ';
-		$actionseptxt = (!$actionseptxt && $usebutton) ? " | " : $actionseptxt;
+		$use_infoseptxt   = $field->parameters->get( 'use_infoseptxt', 1 ) ;
+		$use_actionseptxt = $field->parameters->get( 'use_actionseptxt', 1 ) ;
+		$infoseptxt   = $use_infoseptxt   ?  ' '.$field->parameters->get( 'infoseptxt', '' ).' '    :  ' ';
+		$actionseptxt = $use_actionseptxt ?  ' '.$field->parameters->get( 'actionseptxt', '' ).' '  :  ' ';
 		
 		$allowdownloads = $field->parameters->get( 'allowdownloads', 1 ) ;
 		$downloadstext  = $allowdownloads==2 ? $field->parameters->get( 'downloadstext', 'FLEXI_DOWNLOAD' ) : 'FLEXI_DOWNLOAD';
@@ -383,10 +384,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		// Optimization, do some stuff outside the loop
 		static $hits_icon = null;
 		if ($hits_icon===null && ($display_hits==1 || $display_hits==3)) {
-			$_attribs = $display_hits==1 ? 'class="hasTip" title=":: %s '.JText::_( 'FLEXI_HITS', true ).'"' : '';
+			$_attribs = $display_hits==1 ? 'class="icon-hits hasTip" title=":: %s '.JText::_( 'FLEXI_HITS', true ).'"' : 'class="icon-hits"';
 			$hits_icon = FLEXI_J16GE ?
 				JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) :
 				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
+			$hits_icon .= ' ';
 		}
 		
 		$show_filename = $display_filename || $prop=='namelist';
@@ -422,7 +424,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$icon = '';
 			if ($useicon) {
 				$file_data	= $this->addIcon( $file_data );
-				$icon = JHTML::image($file_data->icon, $file_data->ext, 'class="fcfile_mime icon-mime hasTip" title="'.JText::_('FLEXI_FIELD_FILE_TYPE').'::'.$file_data->ext.'"');
+				$icon = JHTML::image($file_data->icon, $file_data->ext, 'class="icon-mime hasTip" title="'.JText::_('FLEXI_FIELD_FILE_TYPE').'::'.$file_data->ext.'"');
 				$icon = '<span class="fcfile_mime">'.$icon.'</span>';
 			}
 			
@@ -433,12 +435,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			{
 				$lang = '<span class="fcfile_lang">';
 				if ( $add_lang_img && @ $langs->{$file_data->language}->imgsrc ) {
-					$_attribs = '';
 					if (!$add_lang_txt) {
 						$lang_tip = JText::_( 'FLEXI_LANGUAGE', true ).'::'.($file_data->language=='*' ? JText::_("All") : $langs->{$file_data->language}->name);
-						$_attribs = '" class="hasTip" title="'.$lang_tip.'"';
+						$_attribs = '" class="icon-lang hasTip" title="'.$lang_tip.'"';
+					} else {
+						$_attribs = '" class="icon-lang"';
 					}
-					$lang .= "\n".'<img src="'.$langs->{$file_data->language}->imgsrc.'" '.$_attribs.' />';
+					$lang .= "\n".'<img src="'.$langs->{$file_data->language}->imgsrc.'" '.$_attribs.' /> ';
 				}
 				if ( $add_lang_txt ) {
 					$lang .= '['. ($file_data->language=='*' ? JText::_("FLEXI_ALL_LANGUAGES") : $langs->{$file_data->language}->name) .']';
@@ -512,16 +515,18 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// [2]: Add information properties: filename, and icons with optional inline text
 			$filename_shown = (!$authorized || $show_filename) && !$file_data->url;
 			$info_arr = array();
+			if ($filename_shown && !$link_filename) {
+				$info_arr[] = $icon .' '. $name_html;
+			}
 			if ($lang) $info_arr[] = $lang;
 			if ($hits) $info_arr[] = $hits;
 			if ($descr_icon) $info_arr[] = $descr_icon;
-			if ($filename_shown && (!$allowdownloads || !$link_filename))
-				$info_arr[] = $icon .' '. $name_html;
 			$str .= implode($info_arr, $infoseptxt);
 			
 			// [3]: Display the buttons:  DOWNLOAD, SHARE, ADD TO CART
 			
 			$str .= '<span class="fcfile_actions">';
+			$actions_arr = array();
 			
 			// ****************************
 			// CASE 1: no download link ... 
@@ -531,7 +536,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// OR     (b) creating a file list with no download links, (the 'prop' display variable is 'namelist')
 			if (!$dl_link || $prop=='namelist') {
 				$name_classes .= ($name_classes ? ' ' : '') .' fcfile_title';
-				$str .= '<span class="'.$name_classes.'" >' . $name_html . '</span>';
+				$str .= $infoseptxt .'<span class="'.$name_classes.'" >' . $name_html . '</span>';
 			}
 			
 			
@@ -542,7 +547,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			else if ($usebutton) {
 				
-				$links_arr = array();
 				$name_classes .= ($name_classes ? ' ' : '').'fc_button fcsimple';   // Add an extra css class (button display)
 				
 				// DOWNLOAD: single file instant download
@@ -557,7 +561,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					}
 					
 					// The download button in a mini form ...
-					$links_arr[] = ''
+					$actions_arr[] = ''
 						.'<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" >'
 						.$file_data_fields
 						.'<input type="submit" name="download-'.$field->id.'[]" class="'.$name_classes.' fcfile_downloadFile" title="'. $downloadinfo .'" value="'.$downloadstext.'"/>'
@@ -575,7 +579,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$attribs .= ' fieldid="'. $field->id .'"';
 					$attribs .= ' contentid="'. $field->item_id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';
-					$links_arr[] =
+					$actions_arr[] =
 						'<input type="button" '. $attribs .' value="'.$addtocarttext.'" />';
 				}
 				
@@ -583,14 +587,14 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				// SHARE FILE VIA EMAIL: open a popup or inline email form ...
 				if ($is_public && $allowshare && !$com_mailto_found) {
 					// skip share popup form button if com_mailto is missing
-					$links_arr[] =
+					$actions_arr[] =
 						' com_mailto component not found, please disable <b>download link sharing parameter</b> in this file field';
 				} else if ($is_public && $allowshare) {
 					$send_onclick = 'window.open(\'%s\',\'win2\',\''.$status.'\'); return false;';
 					$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
 						.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
 						.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
-					$links_arr[] =
+					$actions_arr[] =
 						'<input type="button" class="'.$name_classes.' fcfile_shareFile" onclick="'
 							.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$shareinfo.'" value="'.$sharetext.'" />';
 				}
@@ -604,8 +608,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			else {
 				
-				$links_arr = array();
-				
 				// DOWNLOAD: single file instant download
 				if ($allowdownloads) {
 					// NO ACCESS: add file info via URL variables, in case the URL target needs to use them
@@ -617,10 +619,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					}
 					
 					// The download link, if filename/title not shown, then display a 'download' prompt text
-					$links_arr[] =
+					$actions_arr[] =
 						($filename_shown && $link_filename ? $icon.' ' : '')
 						.'<a href="' . $dl_link . '" class="'.$name_classes.' fcfile_downloadFile" title="'. $downloadinfo .'" >'
-						.($filename_shown && $link_filenames ? $name_html : $downloadstext)
+						.($filename_shown && $link_filename ? $name_html : $downloadstext)
 						.'</a>';
 				}
 				
@@ -635,7 +637,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$attribs .= ' fieldid="'. $field->id .'"';
 					$attribs .= ' contentid="'. $field->item_id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';
-					$links_arr[] =
+					$actions_arr[] =
 						'<a href="javascript:;" '. $attribs .' >'
 						.$addtocarttext
 						.'</a>';
@@ -650,7 +652,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$send_form_url = 'index.php?option=com_flexicontent&tmpl=component'
 						.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
 						.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
-					$links_arr[] =
+					$actions_arr[] =
 						'<a href="javascript:;" class="fcfile_shareFile" onclick="'.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$shareinfo.'">'
 						.$sharetext
 						.'</a>';
@@ -658,8 +660,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			}
 			
 			$str .=
-				(count($links_arr) ?  $infoseptxt : "")
-				.implode($links_arr, $actionseptxt);
+				(count($actions_arr) ?  $infoseptxt : "")
+				.implode($actions_arr, $actionseptxt);
 			$str .= '</span>';
 			
 			
