@@ -77,18 +77,23 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 <?php endif; ?>
 <!-- EOF category info -->
 	
-<?php if ( count($this->categories) ) : /* Category specific data may not be not available, e.g. for -author- layout view */ ?>
-
 <!-- BOF sub-categories info -->
 <?php 
 	// Only show this part if subcategories are available
 	if ( count($this->categories) && $this->params->get('show_subcategories') ) :
-		echo $this->loadTemplate('subcategories');
+		echo file_exists(dirname(__FILE__).DS.'category_subcategories.php') ?  $this->loadTemplate('subcategories') : 'FILE MISSING: category_subcategories.php <br/>';
 	endif;
 ?>
-	<!-- EOF sub-categories info -->
+<!-- EOF sub-categories info -->
 	
-<?php endif; ?>
+<!-- BOF peer-categories info -->
+<?php 
+	// Only show this part if subcategories are available
+	if ( count($this->peercats) && $this->params->get('show_peercategories') ) :
+		echo file_exists(dirname(__FILE__).DS.'category_peercategories.php') ?  $this->loadTemplate('peercategories') : 'FILE MISSING: category_peercategories.php <br/>';
+	endif;
+?>
+<!-- EOF peer-categories info -->
 
 
 <!-- BOF item list display -->

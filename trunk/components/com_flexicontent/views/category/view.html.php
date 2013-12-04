@@ -60,6 +60,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Get various data from the model
 		$categories = $this->get('Childs');
+		$peercats   = $this->get('Peers');
 		$items   = $this->get('Data');
 		$total   = $this->get('Total');
 		$filters  = $this->get('Filters');
@@ -467,11 +468,40 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Calculate CSS classes needed to add special styling markups to the items
 		flexicontent_html::calculateItemMarkups($items, $params);
 		
-		// Get some variables
+		
+		
+		// *****************************************************
+		// Remove unroutable categories from sub/peer categories
+		// *****************************************************
+		
+		// sub-cats
+		$_categories = array();
+		foreach ($categories as $i => $cat) {
+			if (in_array($cat->id, $globalnoroute)) continue;
+			$_categories[] = $categories[$i];
+		}
+		$categories = $_categories;
+		
+		// peer-cats
+		$_categories = array();
+		foreach ($peercats as $i => $cat) {
+			if (in_array($cat->id, $globalnoroute)) continue;
+			$_categories[] = $peercats[$i];
+		}
+		$peercats = $_categories;
+		
+		
+		
+		// ************************************
+		// Get some variables needed for images
+		// ************************************
+		
 		$joomla_image_path = $app->getCfg('image_path',  FLEXI_J16GE ? '' : 'images'.DS.'stories' );
 		$joomla_image_url  = str_replace (DS, '/', $joomla_image_path);
 		$joomla_image_path = $joomla_image_path ? $joomla_image_path.DS : '';
 		$joomla_image_url  = $joomla_image_url  ? $joomla_image_url.'/' : '';
+		
+		
 		
 		// **************
 		// CATEGORY IMAGE
@@ -485,131 +515,198 @@ class FlexicontentViewCategory extends JViewLegacy
 		$cat_image_width = $params->get('cat_image_width', 80);
 		$cat_image_height = $params->get('cat_image_height', 80);
 		
-		$cat 		= & $category;
+		$cat = $category;
 		$image = "";
-		if ($cat->id && $show_cat_image) {
-			$cat->image = FLEXI_J16GE ? $params->get('image') : $cat->image;
-			$image = "";
-			$cat->introtext = & $cat->description;
-			$cat->fulltext = "";
-			
-			if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
-				$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
-		
-				$h		= '&amp;h=' . $cat_image_height;
-				$w		= '&amp;w=' . $cat_image_width;
-				$aoe	= '&amp;aoe=1';
-				$q		= '&amp;q=95';
-				$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
-				$ext = pathinfo($src, PATHINFO_EXTENSION);
-				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-				$conf	= $w . $h . $aoe . $q . $zc . $f;
-		
-				$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
-			} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
-	
-				$h		= '&amp;h=' . $cat_image_height;
-				$w		= '&amp;w=' . $cat_image_width;
-				$aoe	= '&amp;aoe=1';
-				$q		= '&amp;q=95';
-				$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
-				$ext = pathinfo($src, PATHINFO_EXTENSION);
-				$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
-				$conf	= $w . $h . $aoe . $q . $zc . $f;
-	
-				$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
-				$src = $base_url.$src;
+		if ($cat) {
+			if ($cat->id && $show_cat_image) {
+				$cat->image = FLEXI_J16GE ? $params->get('image') : $cat->image;
+				$image = "";
+				$cat->introtext = & $cat->description;
+				$cat->fulltext = "";
 				
-				$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
+					$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
+					
+					$h		= '&amp;h=' . $cat_image_height;
+					$w		= '&amp;w=' . $cat_image_width;
+					$aoe	= '&amp;aoe=1';
+					$q		= '&amp;q=95';
+					$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
+					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					
+					$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+				} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
+					
+					$h		= '&amp;h=' . $cat_image_height;
+					$w		= '&amp;w=' . $cat_image_width;
+					$aoe	= '&amp;aoe=1';
+					$q		= '&amp;q=95';
+					$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
+					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					
+					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+					$src = $base_url.$src;
+					
+					$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+				}
+				$cat->image_src = @$src;  // Also add image category URL for developers
+				
+				if ($image) {
+					$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
+				} else {
+					//$image = '<div class="fccat_image" style="height:'.$cat_image_height.'px;width:'.$cat_image_width.'px;" ></div>';
+				}
+				if ($cat_link_image && $image) {
+					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
+				}
 			}
-			$cat->image_src = @$src;  // Also add image category URL for developers
-			
-			if ($image) {
-				$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
-			} else {
-				//$image = '<div class="fccat_image" style="height:'.$cat_image_height.'px;width:'.$cat_image_width.'px;" ></div>';
-			}
-			if ($cat_link_image && $image) {
-				$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
-			}
+			$cat->image = $image;
 		}
-		$cat->image = $image;
 		
 		
 		// ******************************
 		// SUBCATEGORIES (some templates)
 		// ******************************
 		
-		// Remove unroutable categories from subcategories
-		$_categories = array();
-		foreach ($categories as $i => $subcat) {
-			if (in_array($subcat->id, $globalnoroute)) continue;
-			$_categories[] = $categories[$i];
-		}
-		$categories = $_categories;
+		// sub-category image params
+		$show_cat_image = $params->get('show_description_image_subcat', 1);  // we use different name for variable
+		$cat_image_source = $params->get('subcat_image_source', 2); // 0: extract, 1: use param, 2: use both
+		$cat_link_image = $params->get('subcat_link_image', 1);
+		$cat_image_method = $params->get('subcat_image_method', 1);
+		$cat_image_width = $params->get('subcat_image_width', 24);
+		$cat_image_height = $params->get('subcat_image_height', 24);
 		
-		// subcategory image params
-		$show_subcat_image = $params->get('show_description_image_subcat', 1);  // we use different name for variable
-		$subcat_image_source = $params->get('subcat_image_source', 2); // 0: extract, 1: use param, 2: use both
-		$subcat_link_image = $params->get('subcat_link_image', 1);
-		$subcat_image_method = $params->get('subcat_image_method', 1);
-		$subcat_image_width = $params->get('subcat_image_width', 24);
-		$subcat_image_height = $params->get('subcat_image_height', 24);
-		
-		// Create subcategory image/description/etc data 
-		foreach ($categories as $subcat) {
-			if ($show_subcat_image)  {
-				if (FLEXI_J16GE && !is_object($subcat->params)) {
-					$subcat->params = new JRegistry($subcat->params);
+		// Create sub-category image/description/etc data 
+		foreach ($categories as $cat) {
+			$image = "";
+			if ($show_cat_image)  {
+				if (FLEXI_J16GE && !is_object($cat->params)) {
+					$cat->params = new JRegistry($cat->params);
 				}
 				
-				$subcat->image = FLEXI_J16GE ? $subcat->params->get('image') : $subcat->image;
+				$cat->image = FLEXI_J16GE ? $cat->params->get('image') : $cat->image;
 				$image = "";
-				$subcat->introtext = & $subcat->description;
-				$subcat->fulltext = "";
+				$cat->introtext = & $cat->description;
+				$cat->fulltext = "";
 				
-				if ( $subcat_image_source && $subcat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $subcat->image ) ) {
-					$src = JURI::base(true) ."/". $joomla_image_url  . $subcat->image;
-			
-					$h		= '&amp;h=' . $subcat_image_height;
-					$w		= '&amp;w=' . $subcat_image_width;
+				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
+					$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
+					
+					$h		= '&amp;h=' . $cat_image_height;
+					$w		= '&amp;w=' . $cat_image_width;
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
-					$zc		= $subcat_image_method ? '&amp;zc=' . $subcat_image_method : '';
+					$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 					$ext = pathinfo($src, PATHINFO_EXTENSION);
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
-			
+					
 					$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
-				} else if ( $subcat_image_source!=1 && $src = flexicontent_html::extractimagesrc($subcat) ) {
-		
-					$h		= '&amp;h=' . $subcat_image_height;
-					$w		= '&amp;w=' . $subcat_image_width;
+				} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
+					
+					$h		= '&amp;h=' . $cat_image_height;
+					$w		= '&amp;w=' . $cat_image_width;
 					$aoe	= '&amp;aoe=1';
 					$q		= '&amp;q=95';
-					$zc		= $subcat_image_method ? '&amp;zc=' . $subcat_image_method : '';
+					$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
 					$ext = pathinfo($src, PATHINFO_EXTENSION);
 					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
 					$conf	= $w . $h . $aoe . $q . $zc . $f;
-		
+					
 					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
 					$src = $base_url.$src;
 					
 					$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
 				}
-				$subcat->image_src = @$src;  // Also add image category URL for developers
+				$cat->image_src = @$src;  // Also add image category URL for developers
 				
 				if ($image) {
-					$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($subcat->title).'" title="'.$this->escape($subcat->title).'"/>';
+					$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
 				} else {
-					//$image = '<div class="fccat_image" style="height:'.$subcat_image_height.'px;width:'.$subcat_image_width.'px;" ></div>';
+					//$image = '<div class="fccat_image" style="height:'.$cat_image_height.'px;width:'.$cat_image_width.'px;" ></div>';
 				}
-				if ($subcat_link_image && $image) {
-					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($subcat->slug) ).'">'.$image.'</a>';
+				if ($cat_link_image && $image) {
+					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
 				}
 			}
-			$subcat->image = $image;
+			$cat->image = $image;
 		}
+		
+		
+		
+		// *******************************
+		// PEERCATEGORIES (some templates)
+		// *******************************
+		
+		// peer-category image params
+		$show_cat_image = $params->get('show_description_image_peercat', 1);  // we use different name for variable
+		$cat_image_source = $params->get('peercat_image_source', 2); // 0: extract, 1: use param, 2: use both
+		$cat_link_image = $params->get('peercat_link_image', 1);
+		$cat_image_method = $params->get('peercat_image_method', 1);
+		$cat_image_width = $params->get('peercat_image_width', 24);
+		$cat_image_height = $params->get('peercat_image_height', 24);
+		
+		// Create peer-category image/description/etc data 
+		foreach ($peercats as $cat) {
+			$image = "";
+			if ($show_cat_image)  {
+				if (FLEXI_J16GE && !is_object($cat->params)) {
+					$cat->params = new JRegistry($cat->params);
+				}
+				
+				$cat->image = FLEXI_J16GE ? $cat->params->get('image') : $cat->image;
+				$image = "";
+				$cat->introtext = & $cat->description;
+				$cat->fulltext = "";
+				
+				if ( $cat_image_source && $cat->image && JFile::exists( JPATH_SITE .DS. $joomla_image_path . $cat->image ) ) {
+					$src = JURI::base(true) ."/". $joomla_image_url . $cat->image;
+					
+					$h		= '&amp;h=' . $cat_image_height;
+					$w		= '&amp;w=' . $cat_image_width;
+					$aoe	= '&amp;aoe=1';
+					$q		= '&amp;q=95';
+					$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
+					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					
+					$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+				} else if ( $cat_image_source!=1 && $src = flexicontent_html::extractimagesrc($cat) ) {
+					
+					$h		= '&amp;h=' . $cat_image_height;
+					$w		= '&amp;w=' . $cat_image_width;
+					$aoe	= '&amp;aoe=1';
+					$q		= '&amp;q=95';
+					$zc		= $cat_image_method ? '&amp;zc=' . $cat_image_method : '';
+					$ext = pathinfo($src, PATHINFO_EXTENSION);
+					$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+					$conf	= $w . $h . $aoe . $q . $zc . $f;
+					
+					$base_url = (!preg_match("#^http|^https|^ftp#i", $src)) ?  JURI::base(true).'/' : '';
+					$src = $base_url.$src;
+					
+					$image = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$src.$conf;
+				}
+				$cat->image_src = @$src;  // Also add image category URL for developers
+				
+				if ($image) {
+					$image = '<img class="fccat_image" src="'.$image.'" alt="'.$this->escape($cat->title).'" title="'.$this->escape($cat->title).'"/>';
+				} else {
+					//$image = '<div class="fccat_image" style="height:'.$cat_image_height.'px;width:'.$cat_image_width.'px;" ></div>';
+				}
+				if ($cat_link_image && $image) {
+					$image = '<a href="'.JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat->slug) ).'">'.$image.'</a>';
+				}
+			}
+			$cat->image = $image;
+		}
+		
+		
 		
 		// remove previous alpha index filter
 		//$uri->delVar('letter');
@@ -664,6 +761,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->assignRef('print_link',$print_link);
 		$this->assignRef('category',  $category);
 		$this->assignRef('categories',$categories);
+		$this->assignRef('peercats',  $peercats);
 		$this->assignRef('items',     $items);
 		$this->assignRef('authordescr_item_html', $authordescr_item_html);
 		$this->assignRef('lists',     $lists);

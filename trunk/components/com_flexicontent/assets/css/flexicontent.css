@@ -193,18 +193,21 @@
 	margin: 0 0 0.5em 0;
 }
 
-#flexicontent .subcategorieslabel {
+#flexicontent .subcategorieslabel,
+#flexicontent .peercategorieslabel {
 	display:inline-block !important;
 	margin:0px 0px 6px;
 	font-weight:bold;
 	border-bottom:1px dashed gray;
 }
 
-#flexicontent .subcategorieslist {
+#flexicontent .subcategorieslist,
+#flexicontent .peercategorieslist {
 	margin: 0 0 1em 0;
 }
 
-#flexicontent .subcat {
+#flexicontent .subcat,
+#flexicontent .peercat {
 	margin: 0px;
 }
 
