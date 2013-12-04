@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1806 2013-11-10 01:38:20Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1811 2013-11-26 01:01:47Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -51,11 +51,19 @@ class FlexicontentModelCategory extends JModelLegacy {
 	var $_category = null;
 
 	/**
-	 * Array of Subcategories properties
+	 * Array of sub-categories data
 	 *
 	 * @var mixed
 	 */
 	var $_childs = null;
+	
+
+	/**
+	 * Array of peer-categories data
+	 *
+	 * @var mixed
+	 */
+	var $_peers = null;
 	
 	/**
 	 * Category/Subcategory (current page) ITEMS  (belonging to $_data_cats Categories)
@@ -1012,7 +1020,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access private
 	 * @return string
 	 */
-	function _buildChildsQuery()
+	function _buildChildsQuery($id=0)
 	{
 		$user    = JFactory::getUser();
 		$cparams = $this->_params;
@@ -1042,7 +1050,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		
 		// AND-WHERE clause : filter by parent category (-ies)
-		$id_arr  = $this->_id ? array($this->_id) : $this->_ids;
+		if ($id) $id_arr = array($id);
+		else $id_arr  = $this->_id ? array($this->_id) : $this->_ids;
 		$id_list = implode(',', $id_arr);
 		$andparent = ' AND c.parent_id IN ('. $id_list .')';
 		
@@ -1260,7 +1269,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		for($i = 0; $i < $count; $i++)
 		{
 			$category =& $this->_childs[$i];
-			$category->assigneditems = !$show_itemcount   ? null : $this->_getassigned( $category->id );
+			$category->assigneditems = !$show_itemcount      ? null    : $this->_getassigned( $category->id );
 			$category->subcats       = $this->_getsubs( $category->id );
 			//$this->_id        = $category->id;
 			//$category->items  = $this->getData();
@@ -1274,6 +1283,49 @@ class FlexicontentModelCategory extends JModelLegacy {
 		return $this->_childs;
 	}
 	
+
+
+	/**
+	 * Method to get the children of a category
+	 *
+	 * @access private
+	 * @return array
+	 */
+
+	function getPeers()
+	{
+		if ( !$this->_id || !$this->_category ) return array();
+		
+		$cparams = $this->_params;
+		$show_itemcount   = $cparams->get('show_itemcount_peercat', 1);
+		//$show_subcatcount = $cparams->get('show_subcatcount_peercat', 0);
+		
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		
+		$query = $this->_buildChildsQuery($this->_category->parent_id);
+		$this->_peers = $this->_getList($query);
+		$id = $this->_id;  // save id in case we need to change it
+		$k = 0;
+		$count = count($this->_peers);
+		for($i = 0; $i < $count; $i++)
+		{
+			$category =& $this->_peers[$i];
+			$category->assigneditems = !$show_itemcount      ? null    : $this->_getassigned( $category->id );
+			$category->subcats       = $this->_getsubs( $category->id );
+			//$this->_id        = $category->id;
+			//$category->items  = $this->getData();
+			//$this->_data      = null;
+			$k = 1 - $k;
+		}
+		$this->_id = $id;  // restore id in case it has been changed
+		
+		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		
+		return $this->_peers;
+	}
+
 	
 	/**
 	 * Method to load the Category

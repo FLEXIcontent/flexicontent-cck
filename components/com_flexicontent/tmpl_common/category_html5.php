@@ -76,18 +76,24 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 <?php endif; ?>
 <!-- EOF category info -->
 	
-<?php if ( count($this->categories) ) : /* Category specific data may not be not available, e.g. for -author- layout view */ ?>
-
 <!-- BOF sub-categories info -->
 <?php 
 	// Only show this part if subcategories are available
 	if ( count($this->categories) && $this->params->get('show_subcategories') ) :
-		echo $this->loadTemplate('subcategories_html5');
+		echo file_exists(dirname(__FILE__).DS.'category_subcategories_html5.php') ?  $this->loadTemplate('subcategories_html5') : 'FILE MISSING: category_subcategories_html5.php <br/>';
 	endif;
 ?>
-	<!-- EOF sub-categories info -->
+<!-- EOF sub-categories info -->
 	
-<?php endif; ?>
+<!-- BOF peer-categories info -->
+<?php 
+	// Only show this part if subcategories are available
+	if ( count($this->peercats) && $this->params->get('show_peercategories') ) :
+		echo file_exists(dirname(__FILE__).DS.'category_peercategories_html5.php') ?  $this->loadTemplate('peercategories_html5') : 'FILE MISSING: category_peercategories_html5.php <br/>';
+	endif;
+?>
+<!-- EOF peer-categories info -->
+
 
 <?php if ($this->category->id || (count($this->categories) && $this->params->get('show_subcategories')))  echo '</section>'; ?>
 
