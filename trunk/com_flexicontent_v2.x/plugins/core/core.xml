@@ -809,8 +809,7 @@
 		<fieldset name="group-maintext" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- Maintext Intro+Full -->
 			
 			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level1"  />
-			<field name="hide_html" type="radio" default="" label="FLEXI_HIDE_HTML" description="FLEXI_HIDE_HTML_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
+			<field name="hide_html" type="radio" default="0" label="FLEXI_HIDE_HTML" description="FLEXI_HIDE_HTML_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

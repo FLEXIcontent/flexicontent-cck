@@ -57,7 +57,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$required = $field->parameters->get( 'required', 0 ) ;
 		$required = $required ? ' required' : '';
 		
-		$use_html     = $field->parameters->get( 'use_html', 1 ) ;  // Default to 1 to avoid problems with rendering the maintext description field
+		$use_html     = $field->parameters->get( 'use_html', !$field->parameters->get( 'hide_html', 0) ) ;   // maintext has no 'use_html' instead it has 'hide_html'
 		$height       = $field->parameters->get( 'height', ($field->field_type == 'textarea') ? '300px' : '400px' ) ;
 		if ($height != (int)$height) $height .= 'px';
 		
@@ -125,10 +125,11 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		{
 			$field->tab_names[0] = $field_name;//.'[0]';
 			$field->tab_labels[0] = $field->label;
+			
+			$field_value = htmlspecialchars( $field_value, ENT_COMPAT, 'UTF-8' );
 			if (!$use_html) {
 				$field->html[0]	 = '<textarea name="' . $field->tab_names[0] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$field_value.'</textarea>'."\n";
 			} else {
-				$field_value = htmlspecialchars( $field_value, ENT_NOQUOTES, 'UTF-8' );
 				$field->html[0] = $editor->display( $field->tab_names[0], $field_value, '100%', $height, $cols, $rows, $skip_buttons_arr );
 			}
 			$field->html = $field->html[0];
