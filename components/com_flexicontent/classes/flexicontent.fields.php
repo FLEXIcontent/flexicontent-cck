@@ -1172,9 +1172,7 @@ class FlexicontentFields
 				$skipparam = false;
 				
 				if ( strlen($param_value) ) {
-					if ($o_field_type=='maintext' && $o_param_name=='hide_html') {
-						$tinfo['params'][$o_field_type]['use_html'] = !$param_value;
-					} else if ($o_field_type=='voting') {
+					if ($o_field_type=='voting') {
 						$skipparam = in_array($o_param_name, array('override_extra_votes','voting_extra_votes','voting_main_label'));
 					} else if ( in_array($o_param_name, array('label','desc','viewdesc')) ) {
 						$skipparam = true;
