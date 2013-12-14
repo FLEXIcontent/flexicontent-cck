@@ -73,8 +73,8 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		$tooltip_title_next	= $field->parameters->get('tooltip_title_next', JText::_('FLEXI_FIELDS_PAGENAV_GOTONEXT'));
 		$tooltip_title_prev	= $field->parameters->get('tooltip_title_prev', JText::_('FLEXI_FIELDS_PAGENAV_GOTOPREV'));
 		$types_to_exclude	= $field->parameters->get('type_to_exclude', '');
-		$prev_label			= $field->parameters->get('prev_label', JText::_('FLEXI_FIELDS_PAGENAV_GOTONEXT'));
-		$next_label			= $field->parameters->get('next_label', JText::_('FLEXI_FIELDS_PAGENAV_GOTOPREV'));
+		$prev_label			= $field->parameters->get('prev_label', JText::_('FLEXI_FIELDS_PAGENAV_GOTOPREV'));
+		$next_label			= $field->parameters->get('next_label', JText::_('FLEXI_FIELDS_PAGENAV_GOTONEXT'));
 		$category_label	= $field->parameters->get('category_label', JText::_('FLEXI_FIELDS_PAGENAV_CATEGORY'));
 
 		$view		= JRequest::getCmd('view');

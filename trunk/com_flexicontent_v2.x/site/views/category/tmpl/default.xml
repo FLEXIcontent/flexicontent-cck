@@ -36,7 +36,7 @@
 		<fieldset name="cat_info_options" label="FLEXI_PARAMETERS_CAT_INFO_OPTIONS_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<!--param name="language" type="languages" client="site" label="FLEXI_CATEGORY_LANGUAGE" description="FLEXI_CATEGORY_LANGUAGE_DESC" /-->
-			<field name="" type="separator" default="FLEXI_CATEGORY_EXTRA" description="FLEXI_CATEGORY_EXTRA_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_EXTRA" level="level2" />
 			<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -86,7 +86,7 @@
 				<option value="1">FLEXI_Show</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" description="FLEXI_CATEGORY_INFO_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" />
 			<field name="show_cat_title" type="list" default="" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
@@ -131,12 +131,30 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_SUBCATEGORY_INFO" description="FLEXI_SUBCATEGORY_INFO_DESC" level="level2" />
+		</fieldset>
+		
+		<fieldset name="subcats_info_options" label="FLEXI_PARAMETERS_CAT_SUBCATS_INFO_OPTIONS_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
 			<field name="show_subcategories" type="list" default="" label="FLEXI_SHOW_SUBCATS" description="FLEXI_SHOW_SUBCATS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			<field name="subcat_orderby" type="list" default="" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER_CAT</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" />
 			<field name="show_label_subcats" type="list" default="" label="FLEXI_SHOW_SUBCATS_LABEL" description="FLEXI_SHOW_SUBCATS_LABEL_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
@@ -153,19 +171,6 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 				<option value="2">FLEXI_SHOW_WITH_LABEL</option>
-			</field>
-			<field name="subcat_orderby" type="list" default="" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC">
-				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
-				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
-				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
-				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
-				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
-				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
-				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
-				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
-				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
-				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER_CAT</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" />
@@ -201,7 +206,7 @@
 			</field>
 			<field name="description_cut_text_subcat" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_SUBCATEGORY_ENCLOSING" level="level3" />
+			<field name="" type="separator" default="FLEXI_SUBCATEGORY_ENCLOSING" level="level2" />
 			<field name="subcat_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
 			<field name="subcat_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
 			<field name="subcat_separatorf" type="list" default="" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
@@ -215,6 +220,96 @@
 			</field>
 			<field name="subcat_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
 			<field name="subcat_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
+			
+		</fieldset>
+		
+		<fieldset name="peercats_info_options" label="FLEXI_PARAMETERS_CAT_PEERCATS_INFO_OPTIONS_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="show_peercategories" type="list" default="" label="FLEXI_SHOW_PEERCATS" description="FLEXI_SHOW_PEERCATS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="peercat_orderby" type="list" default="" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
+				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
+				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
+				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
+				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>
+				<option value="rauthor">FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE</option>
+				<option value="hits">FLEXI_ORDER_MOST_HITS</option>
+				<option value="rhits">FLEXI_ORDER_LEAST_HITS</option>
+				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER_CAT</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" />
+			<field name="show_label_peercats" type="list" default="" label="FLEXI_SHOW_PEERCATS_LABEL" description="FLEXI_SHOW_PEERCATS_LABEL_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="show_itemcount_peercat" type="list" default="" label="FLEXI_SHOW_ITEMS_COUNT_PEER" description="FLEXI_SHOW_ITEMS_COUNT_PEER_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+				<option value="2">FLEXI_SHOW_WITH_LABEL</option>
+			</field>
+			<field name="show_subcatcount_peercat" type="list" default="" label="FLEXI_SHOW_SUBCATS_COUNT_PEER" description="FLEXI_SHOW_SUBCATS_COUNT_PEER_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+				<option value="2">FLEXI_SHOW_WITH_LABEL</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" />
+			<field name="show_description_image_peercat" type="list" default="" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="peercat_image_source" type="list" default="" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_CAT_IMAGE_EXTRACT</option>
+				<option value="1">FLEXI_CAT_IMAGE_USEPARAM</option>
+				<option value="2">FLEXI_CAT_IMAGE_BOTH</option>
+			</field>
+			<field name="peercat_link_image" type="list" default="" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="peercat_image_method" type="list" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_SCALE</option>
+				<option value="1">FLEXI_CROP</option>
+			</field>		
+			<field name="peercat_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="peercat_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			
+			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" />
+			<field name="show_description_peercat" type="list" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="description_cut_text_peercat" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_PEERCATEGORY_ENCLOSING" level="level2" />
+			<field name="peercat_pretext" type="text" filter="RAW" default="" label="FLEXI_RECORD_PREFIX_TEXT" description="FLEXI_RECORD_PREFIX_TEXT_DESC" />
+			<field name="peercat_posttext" type="text" filter="RAW" default="" label="FLEXI_RECORD_SUFFIX_TEXT" description="FLEXI_RECORD_SUFFIX_TEXT_DESC" />
+			<field name="peercat_separatorf" type="list" default="" label="FLEXI_RECORD_SEPARATOR" description="FLEXI_RECORD_SEPARATOR_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CONVERT_OPEN_CLOSE_TEXTS_TO_SEPARATOR</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+			</field>
+			<field name="peercat_opentag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_OPENING_TEXT" description="FLEXI_RECORD_LIST_OPENING_TEXT_DESC" />
+			<field name="peercat_closetag" type="text" filter="RAW" default="" label="FLEXI_RECORD_LIST_CLOSING_TEXT" description="FLEXI_RECORD_LIST_CLOSING_TEXT_DESC" />
 			
 		</fieldset>
 		

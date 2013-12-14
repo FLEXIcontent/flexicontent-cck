@@ -413,6 +413,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			// If no access and set not to show then continue
 			if ( !$authorized && !$noaccess_display ) continue;
 			
+			// Initialize CSS classes variable
+			$file_classes = !$authorized ? 'fcfile_noauth' : '';
+			
 			
 			
 			// *****************************
@@ -469,8 +472,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$_filename  = $file_data->altname ? $file_data->altname : $file_data->filename;
 			if ($lowercase_filename) $_filename = mb_strtolower( $_filename, "UTF-8");
 			$name_str   = $display_filename==2 ? $file_data->filename : $_filename;
-			$name_html  = '<span class="fcfile_name">'. $name_str . '</span>';
-			$name_classes = '';
+			$name_classes = $file_classes.($file_classes ? ' ' : '').'fcfile_title';
+			$name_html  = '<span class="'.$name_classes.'">'. $name_str . '</span>';
 			
 			
 			// e. DESCRIPTION: either as tooltip or as inline text
@@ -505,17 +508,19 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				if ($noaccess_msg) {
 					$str = '<span class="fcfile_noauth_msg fc-mssg-inline fc-noauth">' .$noaccess_msg. '</span> ';
 				}
-				$name_classes .= ($name_classes ? ' ' : '').'fcfile_noauth';   // Add an extra css class
 			} else {
 				$dl_link = JRoute::_( 'index.php?option=com_flexicontent&id='. $file_id .'&cid='.$field->item_id.'&fid='.$field->id.'&task=download' );
 				$str = '';
 			}
 			
+			// SOME behavior FLAGS
+			$not_downloadable = !$dl_link || $prop=='namelist';
+			$filename_shown = (!$authorized || $show_filename) && !$file_data->url;
+			
 			
 			// [2]: Add information properties: filename, and icons with optional inline text
-			$filename_shown = (!$authorized || $show_filename) && !$file_data->url;
 			$info_arr = array();
-			if ($filename_shown && !$link_filename) {
+			if ( ($filename_shown && !$link_filename) || $not_downloadable ) {
 				$info_arr[] = $icon .' '. $name_html;
 			}
 			if ($lang) $info_arr[] = $lang;
@@ -528,15 +533,14 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$str .= '<span class="fcfile_actions">';
 			$actions_arr = array();
 			
-			// ****************************
-			// CASE 1: no download link ... 
-			// ****************************
+			// ***********************
+			// CASE 1: no download ... 
+			// ***********************
 			
 			// EITHER (a) Current user NOT authorized to download file AND no access URL is not configured
 			// OR     (b) creating a file list with no download links, (the 'prop' display variable is 'namelist')
-			if (!$dl_link || $prop=='namelist') {
-				$name_classes .= ($name_classes ? ' ' : '') .' fcfile_title';
-				$str .= $infoseptxt .'<span class="'.$name_classes.'" >' . $name_html . '</span>';
+			if ( $not_downloadable ) {
+				// nothing to do here, the file name/title will be shown above
 			}
 			
 			
@@ -547,7 +551,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			else if ($usebutton) {
 				
-				$name_classes .= ($name_classes ? ' ' : '').'fc_button fcsimple';   // Add an extra css class (button display)
+				$file_classes .= ($file_classes ? ' ' : '').'fc_button fcsimple';   // Add an extra css class (button display)
 				
 				// DOWNLOAD: single file instant download
 				if ($allowdownloads) {
@@ -564,16 +568,16 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$actions_arr[] = ''
 						.'<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" >'
 						.$file_data_fields
-						.'<input type="submit" name="download-'.$field->id.'[]" class="'.$name_classes.' fcfile_downloadFile" title="'. $downloadinfo .'" value="'.$downloadstext.'"/>'
+						.'<input type="submit" name="download-'.$field->id.'[]" class="'.$file_classes.' fcfile_downloadFile" title="'. $downloadinfo .'" value="'.$downloadstext.'"/>'
 						.'</form>'."\n";
 				}
 				
 				// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)
 				if ($authorized && $allowaddtocart && !$file_data->url) {
 					// CSS class to anchor downloads list adding function
-					$_name_classes = $name_classes. ($name_classes ? ' ' : '') .'fcfile_addFile';
+					$addtocart_classes = $file_classes. ($file_classes ? ' ' : '') .'fcfile_addFile';
 					
-					$attribs  = ' class="'. $_name_classes .'"';
+					$attribs  = ' class="'. $addtocart_classes .'"';
 					$attribs .= ' title="'. $addtocartinfo .'"';
 					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filename,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';
@@ -595,7 +599,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 						.'&task=call_extfunc&exttype=plugins&extfolder=flexicontent_fields&extname=file&extfunc=share_file_form'
 						.'&file_id='.$file_id.'&content_id='.$item->id.'&field_id='.$field->id;
 					$actions_arr[] =
-						'<input type="button" class="'.$name_classes.' fcfile_shareFile" onclick="'
+						'<input type="button" class="'.$file_classes.' fcfile_shareFile" onclick="'
 							.sprintf($send_onclick, JRoute::_($send_form_url)).'" title="'.$shareinfo.'" value="'.$sharetext.'" />';
 				}
 			}
@@ -621,17 +625,17 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					// The download link, if filename/title not shown, then display a 'download' prompt text
 					$actions_arr[] =
 						($filename_shown && $link_filename ? $icon.' ' : '')
-						.'<a href="' . $dl_link . '" class="'.$name_classes.' fcfile_downloadFile" title="'. $downloadinfo .'" >'
-						.($filename_shown && $link_filename ? $name_html : $downloadstext)
+						.'<a href="' . $dl_link . '" class="'.$file_classes.' fcfile_downloadFile" title="'. $downloadinfo .'" >'
+						.($filename_shown && $link_filename ? $name_str : $downloadstext)
 						.'</a>';
 				}
 				
 				// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)
 				if ($authorized && $allowaddtocart && !$file_data->url) {
 					// CSS class to anchor downloads list adding function
-					$_name_classes = $name_classes. ($name_classes ? ' ' : '') .'fcfile_addFile';
+					$addtocart_classes = $file_classes. ($file_classes ? ' ' : '') .'fcfile_addFile';
 					
-					$attribs  = ' class="'. $_name_classes .'"';
+					$attribs  = ' class="'. $addtocart_classes .'"';
 					$attribs .= ' title="'. $addtocartinfo .'"';
 					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filename,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';

@@ -6,7 +6,7 @@
 		<params group="cat_info_options" addpath="/administrator/components/com_flexicontent/elements">
 			
 			<!--param name="language" type="languages" client="site" label="FLEXI_CATEGORY_LANGUAGE" description="FLEXI_CATEGORY_LANGUAGE_DESC" /-->
-			<field name="" type="separator" default="FLEXI_CATEGORY_EXTRA" description="FLEXI_CATEGORY_EXTRA_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_EXTRA" level="level2" />
 			<field name="comments" type="list" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -56,7 +56,7 @@
 				<option value="1">FLEXI_Show</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" description="FLEXI_CATEGORY_INFO_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" />
 			<field name="show_cat_title" type="list" default="" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_Hide</option>
@@ -117,7 +117,7 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER_CAT</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" description="FLEXI_SUBCATEGORY_INFO_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" />
 			<field name="show_label_subcats" type="list" default="" label="FLEXI_SHOW_SUBCATS_LABEL" description="FLEXI_SHOW_SUBCATS_LABEL_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
@@ -200,7 +200,7 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER_CAT</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" description="FLEXI_CATEGORY_INFO_DESC" level="level2" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" />
 			<field name="show_label_peercats" type="list" default="" label="FLEXI_SHOW_PEERCATS_LABEL" description="FLEXI_SHOW_PEERCATS_LABEL_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>

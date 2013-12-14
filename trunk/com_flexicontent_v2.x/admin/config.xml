@@ -310,7 +310,7 @@
 			</field>
 			
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_EXTRA" description="FLEXI_CATEGORY_EXTRA_DESC" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_EXTRA" level="level2" menu="hide" />
 			<field name="show_feed_link" type="list" default="1" label="FLEXI_ADD_FEED_TO_HEAD" description="FLEXI_ADD_FEED_TO_HEAD_DESC" menu="hide" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -320,7 +320,7 @@
 				<option value="1">FLEXI_Show</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" description="FLEXI_CATEGORY_INFO_DESC" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" menu="hide" />
 			<field name="show_cat_title" type="radio" default="1" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC" menu="hide" >
 				<option value="0">FLEXI_Hide</option>
 				<option value="1">FLEXI_Show</option>
@@ -456,7 +456,7 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER_CAT</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" description="FLEXI_CATEGORY_INFO_DESC" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" menu="hide" />
 			<field name="show_label_peercats" type="radio" default="1" label="FLEXI_SHOW_PEERCATS_LABEL" description="FLEXI_SHOW_PEERCATS_LABEL_DESC" menu="hide" >
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
