@@ -878,7 +878,7 @@ class FlexicontentController extends JControllerLegacy
 		{
 			if (FLEXI_J16GE) {
 				$asset = 'com_content.article.' . $model->get('id');
-				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $item->created_by == $user->get('id'));
+				$canEdit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $model->get('created_by') == $user->get('id'));
 				// ALTERNATIVE 1
 				//$canEdit = $model->getItemAccess()->get('access-edit'); // includes privileges edit and edit-own
 				// ALTERNATIVE 2

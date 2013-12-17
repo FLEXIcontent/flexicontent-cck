@@ -206,10 +206,25 @@ dump($this->row);
 				echo $this->pane->startPanel( $title, "params-cat_info_options" );
 				echo $this->form->render('params', "cat_info_options" );
 				echo $this->pane->endPanel();
-
+				
+				$title = JText::_( 'FLEXI_PARAMETERS_SUBCATS_INFO_OPTIONS' );
+				echo $this->pane->startPanel( $title, "params-subcats_info_options" );
+				echo $this->form->render('params', "subcats_info_options" );
+				echo $this->pane->endPanel();
+				
+				$title = JText::_( 'FLEXI_PARAMETERS_PEERCATS_INFO_OPTIONS' );
+				echo $this->pane->startPanel( $title, "params-peercats_info_options" );
+				echo $this->form->render('params', "peercats_info_options" );
+				echo $this->pane->endPanel();
+				
 				$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEMS_LIST' );
 				echo $this->pane->startPanel( $title, "params-cat_items_list" );
 				echo $this->form->render('params', 'cat_items_list');
+				echo $this->pane->endPanel();
+				
+				$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEM_MARKUPS' );
+				echo $this->pane->startPanel( $title, "params-cat_item_markups" );
+				echo $this->form->render('params', 'cat_item_markups');
 				echo $this->pane->endPanel();
 				
 				$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEM_FILTERING' );

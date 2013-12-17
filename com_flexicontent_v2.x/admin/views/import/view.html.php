@@ -116,7 +116,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$types = $db->loadObjectList('id');
 		
 		// Get Languages
-		$languages = FLEXIUtilities::getLanguages('code');
+		$languages = (FLEXI_FISH || FLEXI_J16GE) ? FLEXIUtilities::getLanguages('code') : array();
 		
 		// Get categories
 		global $globalcats;
@@ -175,8 +175,8 @@ class FlexicontentViewImport extends JViewLegacy
 			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $default_lang, 6, $allowed_langs, $default_lang);
 		} else {
 			$default_lang = flexicontent_html::getSiteDefaultLang();
-			$languages[] = JHTML::_('select.option', $default_lang, JText::_( 'Default' ).' ('.flexicontent_html::getSiteDefaultLang().')' );
-			$lists['languages'] = JHTML::_('select.radiolist', $languages, 'language', $class='', 'value', 'text', $default_lang );
+			$_langs[] = JHTML::_('select.option', $default_lang, JText::_( 'Default' ).' ('.flexicontent_html::getSiteDefaultLang().')' );
+			$lists['languages'] = JHTML::_('select.radiolist', $_langs, 'language', $class='', 'value', 'text', $default_lang );
 		}
 
 		$default_state= $cparams->get('import_state', 1);
