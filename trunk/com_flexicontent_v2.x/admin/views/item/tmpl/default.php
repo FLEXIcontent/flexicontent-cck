@@ -110,6 +110,15 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 			}});
 			jQuery(\"#fc_pager\").pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		}
+		
+		jQuery(document).ready(function($){
+			$('#versioncomment').autogrow({
+				minHeight: 26,
+				maxHeight: 250,
+				lineHeight: 12
+			});
+		})
+		
 	");
 }
 ?>
@@ -160,14 +169,6 @@ function deleteTag(obj) {
 	parent.innerHTML = "";
 	parent.parentNode.removeChild(parent);
 }
-jQuery(document).ready(function($){
-//autogrow
-$("#versioncomment").autogrow({
-	minHeight: 26,
-	maxHeight: 250,
-	lineHeight: 12
-	});
-})
 </script>
 <?php
 // Create info images
