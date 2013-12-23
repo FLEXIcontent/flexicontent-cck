@@ -137,9 +137,14 @@
 				<option value="1">FLEXI_INTEGER</option>
 				<option value="2">FLEXI_FLOAT</option>
 			</field>
-			<field name="filter_values_combination" type="radio" default="0" label="FLEXI_FILTER_VALUES_COMBINATION" description="FLEXI_FILTER_VALUES_COMBINATION_DESC">
-				<option value="0">FLEXI_ANY</option>
-				<option value="1">FLEXI_ALL</option>
+			<field name="" type="separator" default="FLEXI_FILTER_VALUES_MATCHING_CONF" level="level3" />
+			<field name="filter_values_require_all" type="radio" default="0" label="FLEXI_FILTER_VALUES_REQUIRE_ALL" description="FLEXI_FILTER_VALUES_REQUIRE_ALL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES_SLOWER</option>
+			</field>
+			<field name="filter_values_require_all_tip" type="radio" default="0" label="FLEXI_FILTER_VALUES_REQUIRE_ALL_TIP" description="FLEXI_FILTER_VALUES_REQUIRE_ALL_TIP_DESC">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level2" />

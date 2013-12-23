@@ -39,7 +39,7 @@ class FlexicontentViewField extends JViewLegacy
 		$field_type = JRequest::getVar( 'field_type', 0 );
 		
 		//Get data from the model
-		$model = & $this->getModel();
+		$model = $this->getModel();
 		if (FLEXI_J16GE) {
 			$form = $this->get('Form');
 		} else {

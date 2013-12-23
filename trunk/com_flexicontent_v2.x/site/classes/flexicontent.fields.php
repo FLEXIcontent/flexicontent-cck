@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1771 2013-09-24 22:01:25Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1819 2013-12-07 04:03:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1872,7 +1872,8 @@ class FlexicontentFields
 		$db = JFactory::getDBO();
 		$display_filter_as = $filter->parameters->get( $is_search ? 'display_filter_as_s' : 'display_filter_as', 0 );
 		$filter_compare_type = $filter->parameters->get( 'filter_compare_type', 0 );
-		$filter_values_combination = $filter->parameters->get( 'filter_values_combination', 0 );
+		$require_all = count($value)>1 && !in_array( $display_filter_as, array(1,2,3) ) ?
+			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
 		//echo "createFilterValueMatchSQL : filter name: ".$filter->name." Filter Type: ".$display_filter_as." Values: "; print_r($value); echo "<br>";
 		
 		// Make sure the current filtering values match the field filter configuration to be single or multi-value
@@ -1927,11 +1928,18 @@ class FlexicontentFields
 		// EXACT value cases
 		case 0: case 4: case 5: default:
 			$value_clauses = array();
-			foreach ($value as $val) {
-				$value_clauses[] = '_v_=' . $db->Quote( $val );
+			
+			if ( ! $require_all ) {
+				foreach ($value as $val) {
+					$value_clauses[] = '_v_=' . $db->Quote( $val );
+				}
+				$valueswhere .= ' AND ('.implode(' OR ', $value_clauses).') ';
+			} else {
+				foreach ($value as $val) {
+					$value_clauses[] = $db->Quote( $val );
+				}
+				$valueswhere = ' AND _v_ IN ('. implode(',', $value_clauses) .')';
 			}
-			$comb_op = $filter_values_combination ? ' AND ' : ' OR ';
-			$valueswhere .= ' AND ('.implode($comb_op, $value_clauses).') ';
 			break;
 		}
 		
@@ -1956,21 +1964,36 @@ class FlexicontentFields
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
 		$valuesjoin  = @$filter->filter_valuesjoin   ? $filter->filter_valuesjoin   : ' JOIN #__flexicontent_fields_item_relations rel ON rel.item_id=c.id AND rel.field_id = ' . $filter->id;
 		
+		// Decide to require all values
+		$display_filter_as = $filter->parameters->get('display_filter_as', 0 );
+		$require_all = count($value)>1 && !in_array( $display_filter_as, array(1,2,3) ) ?
+			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
+		
 		if ( @$filter->filter_valuesjoin ) {
-			$query  = 'SELECT DISTINCT id'
+			$query = 'SELECT '.($require_all ? 'c.id' : 'DISTINCT c.id')
 				.' FROM #__content c'
 				.$filter->filter_valuesjoin
 				.' WHERE 1'
-				. $valueswhere
-				;
+				. $valueswhere ;
+				if ($require_all) {
+					// Do not use distinct on column, it makes it is very slow, despite column having an index !!
+					// e.g. HAVING COUNT(DISTINCT colname) = ...
+					// Instead the field code should make sure that no duplicate values are saved in the DB !!
+					$query .= ' GROUP BY c.id ' .' HAVING COUNT(*) >= '.count($value);
+				}
 		} else {
-			$query  = 'SELECT DISTINCT item_id'
+			$query = 'SELECT '.($require_all ? 'rel.item_id' : 'DISTINCT rel.item_id')
 				.' FROM #__flexicontent_fields_item_relations as rel'
 				.' WHERE rel.field_id = ' . $filter->id
-				. $valueswhere
-				;
+				. $valueswhere ;
+				if ($require_all) {
+					// Do not use distinct on column, it makes it is very slow, despite column having an index !!
+					// e.g. HAVING COUNT(DISTINCT colname) = ...
+					// Instead the field code should make sure that no duplicate values are saved in the DB !!
+					$query .= ' GROUP BY rel.item_id ' .' HAVING COUNT(*) >= '.count($value);
+				}
 		}
-		//$query .= ' GROUP BY c.id';   // VERY VERY BAD PERFORMANCE
+		//$query .= ' GROUP BY id';   // BAD PERFORMANCE ?
 		
 		if ( !$return_sql ) {
 			//echo "<br>FlexicontentFields::getFiltered() ".$filter->name." appying  query :<br>". $query."<br>\n";
@@ -1996,7 +2019,11 @@ class FlexicontentFields
 		$valueswhere = FlexicontentFields::createFilterValueMatchSQL($filter, $value, $is_full_text=1, $is_search=1);
 		if ( !$valueswhere ) { return; }
 
+		// Decide to require all values
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );
+		$require_all = count($value)>1 && !in_array( $display_filter_as, array(1,2,3) ) ?
+			$filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
+		
 		$istext_input = $display_filter_as==1 || $display_filter_as==3;
 		//$colname = $istext_input ? 'fs.search_index' : 'fs.value_id';
 		$colname = @ $filter->isindexed && !$istext_input ? 'fs.value_id' : 'fs.search_index';
@@ -2004,12 +2031,17 @@ class FlexicontentFields
 		$valueswhere = str_replace('_v_', $colname, $valueswhere);
 		
 		// Get ALL items that have such values for the given field
-		$query = "SELECT fs.item_id "
+		$query = "SELECT ".($require_all ? 'fs.item_id' : 'DISTINCT fs.item_id')
 			." FROM #__flexicontent_advsearch_index AS fs"
 			." WHERE fs.field_id='".$filter->id."' "
-			. $valueswhere
-			;
-
+			. $valueswhere ;
+		if ($require_all) {
+			// Do not use distinct on column, it makes it is very slow, despite column having an index !!
+			// e.g. HAVING COUNT(DISTINCT colname) = ...
+			// Instead the field code should make sure that no duplicate values are saved in the DB !!
+			$query .= ' GROUP BY fs.item_id ' .' HAVING COUNT(*) >= '.count($value);
+		}
+		
 		if ( !$return_sql ) {
 			//echo "<br>FlexicontentFields::getFiltered() ".$filter->name." appying  query :<br>". $query."<br>\n";
 			$db->setQuery($query);
@@ -2069,9 +2101,13 @@ class FlexicontentFields
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
+		$require_all = !in_array( $display_filter_as, array(1,2,3) ) ? $filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
+		$combine_tip = $filter->parameters->get( 'filter_values_require_all_tip', 0 );
+		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items'.$_s, 1 );
 		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
 		$hide_disabled_values = $filter->parameters->get( 'hide_disabled_values'.$_s, 0 );
+		$get_filter_vals = in_array($display_filter_as, array(0,2,4,5,6));
 		
 		$filter_ffname = 'filter_'.$filter->id;
 		$filter_ffid   = $formName.'_'.$filter->id.'_val';
@@ -2091,7 +2127,7 @@ class FlexicontentFields
 		}
 		
 		// Get filtering values, this can be cached if not filtering according to current category filters
-		if ( in_array($display_filter_as, array(0,2,4,5,6)) )
+		if ( $get_filter_vals )
 		{
 			$view_join = '';
 			$view_where = '';
@@ -2171,6 +2207,8 @@ class FlexicontentFields
 				if ($faceted_filter==2 && $show_matches && $results[$i]->found)
 					$results[$i]->text .= ' ('.$results[$i]->found.')';
 			}
+		} else {
+			$faceted_filter = 0; // clear faceted filter flag
 		}
 		
 		// Prepend Field's Label to filter HTML
@@ -2212,6 +2250,9 @@ class FlexicontentFields
 				if ( !strlen($result->value) ) continue;
 				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text), 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
 			}
+			if ($display_filter_as==6 && $combine_tip) {
+				$filter->html	.= ' <span class="fc_filter_tip_inline">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
+			}
 			if ($display_filter_as==0 || $display_filter_as==6) {
 				$filter->html	.= JHTML::_('select.genericlist', $options, $filter_ffname.'[]', $attribs_str, 'value', 'text', $value, $filter_ffid);
 			} else {
@@ -2242,9 +2283,13 @@ class FlexicontentFields
 					$filter->html	.= '</span>';
 				} else {
 					$size = (int)($size / 2);
-					$filter->html	.= '<input name="'.$filter_ffname.'[1]" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value[1].'" /> - ';
+					$filter->html	.= '<span class="fc_filter_element">';
+					$filter->html	.= '<input name="'.$filter_ffname.'[1]" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value[1].'" />';
+					$filter->html	.= '</span>';
 					$filter->html	.= '<span class="fc_range"></span>';
+					$filter->html	.= '<span class="fc_filter_element">';
 					$filter->html	.= '<input name="'.$filter_ffname.'[2]" '.$attribs_str.' type="text" size="'.$size.'" value="'.@ $value[2].'" />'."\n";
+					$filter->html	.= '</span>';
 				}
 			}
 			break;
@@ -2263,6 +2308,7 @@ class FlexicontentFields
 			$filter->html .= '<span class="fc_checkradio_group_wrapper fc_add_scroller'.($add_lf ? ' fc_list_filter_wrapper':'').'">';
 			$filter->html .= '<ul class="fc_field_filter fc_checkradio_group'.($add_lf ? ' fc_list_filter':'').'">';
 			$filter->html .= '<li class="fc_checkradio_option fc_checkradio_special'.$checked_class_li.'" style="'.$value_style.'">';
+			$filter->html	.= ($label_filter==2  ? ' <span class="fc_filter_label_inline">'.$filter->label.'</span> ' : '');
 			if ($display_filter_as==4) {
 				$filter->html .= ' <input href="javascript:;" onchange="fc_toggleClassGrp(this, \'fc_highlight\', 1);" ';
 				$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
@@ -2272,10 +2318,14 @@ class FlexicontentFields
 				$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'['.$i.']" ';
 				$filter->html .= '  value="" '.$checked_attr.' class="fc_checkradio" />';
 			}
-			$filter->html .= '<label class="'.$checked_class.'" for="'.$filter_ffid.$i.'">'.
-				($label_filter==2  ?  $filter->label.': ' : '').
-				'- '.JText::_('FLEXI_ANY').' -';
-			$filter->html .= '</label></li>';
+			
+			$filter->html .= '<label class="hasTip '.$checked_class.'" for="'.$filter_ffid.$i.'" '
+				.' title="::'.JText::_('FLEXI_REMOVE_ALL').'"'
+				.($checked ? ' style="display:none!important;" ' : 'style="background:none!important; padding-left:0px!important;"').'>'.
+				'<span class="fc_delall_filters"></span>';
+			$filter->html .= '</label> '
+				.($combine_tip ? ' <span class="fc_filter_tip_inline">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ' : '')
+				.' </li>';
 			$i++;
 			foreach($results as $result) {
 				if ( !strlen($result->value) ) continue;
@@ -2309,7 +2359,7 @@ class FlexicontentFields
 		if ( $print_logging_info ) {
 			$current_filter_creation = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			$flt_active_count = isset($filters_where) ? count($filters_where) : 0;
-			$faceted_str = array(0=>'non-FACETED', 1=>'FACETED MODE: current view &nbsp; (cacheable) &nbsp; ', 2=>'FACETED MODE: current filters:'." (".$flt_active_count.' active) ');
+			$faceted_str = array(0=>'non-FACETED MODE', 1=>'FACETED MODE: current view &nbsp; (cacheable) &nbsp; ', 2=>'FACETED MODE: current filters:'." (".$flt_active_count.' active) ');
 			
 			$fc_run_times['create_filter'][$filter->name] = $current_filter_creation;
 			if ( isset($fc_run_times['_create_filter_init']) ) {
