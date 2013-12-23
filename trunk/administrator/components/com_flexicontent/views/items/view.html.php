@@ -138,8 +138,13 @@ class FlexicontentViewItems extends JViewLegacy {
 			$js .= "$$('.col_title').each(function(el){ el.removeClass('yellow'); });";
 		}
 		
-		$perms 	= FlexicontentHelperPerm::getPerm();
-		$CanAdd				= $perms->CanAdd;
+		// Check if user can create in at least one published category
+		require_once("components/com_flexicontent/models/item.php");
+		$itemmodel = new FlexicontentModelItem();
+		$CanAdd = !FLEXI_J16GE ? $itemmodel->canAdd()  : $itemmodel->getItemAccess()->get('access-create');
+		
+		// Performance consideration: ... CHECK ONLY global permissions, and not individual categories
+		$perms = FlexicontentHelperPerm::getPerm();
 		
 		$CanEdit			= $perms->CanEdit;
 		$CanPublish		= $perms->CanPublish;
@@ -187,7 +192,7 @@ class FlexicontentViewItems extends JViewLegacy {
 				$btn_task, $extra_js, $btn_list=false, $btn_menu=true, $btn_confirm=false);
 			$add_divider = true;
 		}
-		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }*/
+		if ($add_divider) { JToolBarHelper::divider(); }*/
 		
 		// Implementation of multiple-item state selector
 		$add_divider = false;
@@ -244,7 +249,7 @@ class FlexicontentViewItems extends JViewLegacy {
 				'FLEXI_RESTORE', 'restore', $full_js='', $msg_alert, $msg_confirm,
 				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		}
-		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
+		if ($add_divider) { JToolBarHelper::divider(); }
 		
 		$add_divider = false;
 		if ($CanAdd) {
@@ -270,7 +275,7 @@ class FlexicontentViewItems extends JViewLegacy {
 			JToolBarHelper::editList($btn_task);
 			$add_divider = true;
 		}
-		if ($add_divider) { JToolBarHelper::divider(); JToolBarHelper::spacer(); }
+		if ($add_divider) { JToolBarHelper::divider(); }
 		
 		$add_divider = false;
 		if ($CanAdd && $CanCopy) {

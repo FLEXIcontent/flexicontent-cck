@@ -432,6 +432,8 @@ fieldset.fc_filter_set {
 /* (b) FIELD FILTERs */
 /*********************/
 
+/* */
+
 /* displayed between ranges */
 .fc_range {
 	background: url("../images/arrow_double.png") no-repeat scroll 0px 0px transparent !important;
@@ -442,6 +444,18 @@ fieldset.fc_filter_set {
 	margin: 0px 0px 10px 0px !important;
 	display: inline-block !important;
 	vertical-align: bottom !important;
+}
+
+/* removing filter choices */
+.fc_delall_filters {
+	background: url("../images/delete.png") no-repeat scroll 0px 0px transparent !important;
+	width: 16px !important;
+	height: 16px !important;
+	border: 0px solid !important;
+	padding: 0px !important;
+	margin: 4px 0px -4px 0px !important;
+	display: inline-block !important;
+	vertical-align: baseline !important;
 }
 
 /* Container of each individual field filter (both label and html) */
@@ -471,13 +485,34 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	width: 96%;
 }
 
+.fc_filter .fc_filter_tip_inline,
+.fc_filter .fc_filter_label_inline {
+	color: #FFFFFF;
+	display: inline-block;
+	font-size: 10.998px;
+	font-weight: bold;
+	line-height: 14px;
+	padding: 3px 4px;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	vertical-align: baseline;
+	white-space: nowrap;
+	border-radius: 4px;
+	margin: 0px 2px 2px 4px !important;
+}
+.fc_filter .fc_filter_label_inline {
+	background-color: darkred;
+}
+.fc_filter .fc_filter_tip_inline {
+	background-color: darkgray;
+}
+
 /* Container of each individual field filter LABEL */
 .fc_filter .fc_filter_label,
 .fc_filter_line .fc_filter_label {
 	float: left !important;
 	display: inline-block !important;
 	color: white !important;
-  background-color: darkorange !important;
+  background-color: darkred !important;
   border-bottom: 1px solid #D0D0D0 !important;
   border-right: 1px solid #D0D0D0 !important;
   font-weight: normal !important;
@@ -491,7 +526,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	clear: both;
 	width: auto !important;
 	max-width: 150px !important;
-	padding: 6px !important;
+	padding: 3px 4px !important;
   margin: 2px 8px 3px 8px !important;
 }
 .fc_filter_line .fc_filter_label {
@@ -1506,21 +1541,27 @@ div.fancybox-wrap a { background: none!important;}
 	float: left !important;
   /*width: 16% !important;*/
 	display: block !important;
-	color: #606060 !important;
-  background-color: #F2F2F2 !important;
+	
+	background-color: darkred !important;
+	color: #FFFFFF !important;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
+	
+	font-size: 10.998px !important;
+	font-weight: bold !important;
+	line-height: 14px !important;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
+	vertical-align: baseline !important;
+	
   border-bottom: 1px solid #D0D0D0 !important;
   border-right: 1px solid #D0D0D0 !important;
-  font-style: italic !important;
-  font-size: 12px !important;
+  font-style: normal !important;
   font-family: arial !important;
-  font-weight: normal !important;
   text-align: right !important;
   max-width: 120px !important;
   min-width: auto !important;
   margin: 2px 6px 2px 2px !important;
-  padding: 3px 3px 3px 3px !important;
+	padding: 3px 4px !important;
   border-radius: 6px !important;
-  text-shadow: 0 0 !important;
 }
 
 #flexicontent .flexi.value, .flexi.value {

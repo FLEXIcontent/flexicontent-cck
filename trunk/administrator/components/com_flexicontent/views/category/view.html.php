@@ -108,11 +108,13 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		// Get if we can create inside at least one (com_content) category
-		if (FLEXI_J16GE) {
-			$cancreate_in_cats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed = array('core.create') );
-			$cancreate_cat  = count($cancreate_in_cats);
-		} else {
+		if ( !FLEXI_J16GE || $user->authorise('core.create', 'com_flexicontent') ) {
 			$cancreate_cat = true;
+		} else {
+			$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
+				, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
+			);
+			$cancreate_cat  = count($usercats) > 0;
 		}
 		
 		// Creating new category: Check if user can create inside any existing category
