@@ -945,7 +945,7 @@ class flexicontent_html
 
 			if ($params->get('show_icons')) 	{
 				$image = FLEXI_J16GE ?
-					JHTML::image( FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' )) :
+					JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), NULL, true) :
 					JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_FEED' )) ;
 			} else {
 				$image = '&nbsp;'.JText::_( 'FLEXI_FEED' );
@@ -977,7 +977,7 @@ class flexicontent_html
 			// checks template image directory for image, if non found default are loaded
 			if ( $params->get( 'show_icons' ) ) {
 				$image = FLEXI_J16GE ?
-					JHTML::image( FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' )) :
+					JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), NULL, true) :
 					JHTML::_('image.site', 'printButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_PRINT' )) ;
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_PRINT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
@@ -1045,7 +1045,7 @@ class flexicontent_html
 
 		if ($params->get('show_icons')) 	{
 			$image = FLEXI_J16GE ?
-				JHTML::image( FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' )) :
+				JHTML::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), NULL, true) :
 				JHTML::_('image.site', 'emailButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EMAIL' )) ;
 		} else {
 			$image = '&nbsp;'.JText::_( 'FLEXI_EMAIL' );
@@ -1072,7 +1072,7 @@ class flexicontent_html
 
 			if ( $params->get('show_icons') ) {
 				$image = FLEXI_J16GE ?
-					JHTML::image( FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' )) :
+					JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), NULL, true) :
 					JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_CREATE_PDF' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
@@ -1293,7 +1293,7 @@ class flexicontent_html
 			if ( $params->get('show_icons') ) {
 				$attribs = ' style="margin:4px;" width="16" align="top" ';
 				$image = FLEXI_J16GE ?
-					JHTML::image( 'components/com_flexicontent/assets/images/'.'person2_f2.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) :
+					JHTML::image('components/com_flexicontent/assets/images/'.'person2_f2.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs, true) :
 					JHTML::_('image.site', 'person2_f2.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) ;
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
@@ -1344,7 +1344,7 @@ class flexicontent_html
 		if ($has_edit) {
 			if ( $params->get('show_icons') ) {
 				$image = FLEXI_J16GE ?
-					JHTML::image( FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' )) :
+					JHTML::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), NULL, true) :
 					JHTML::_('image.site', 'edit.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EDIT' )) ;
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
@@ -1367,54 +1367,93 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function addbutton(&$params, &$maincat = null)
+	static function addbutton(&$params, &$submit_cat = null, $menu_itemid = 0, $submit_text = '', $auto_relations = false, $ignore_unauthorized = false)
 	{
+		// Currently add button will appear to logged users only
+		// ... unless unauthorized users are allowed
 		$user	= JFactory::getUser();
-		if (!$user->id) return '';
-
-		// Check if current view / layout can use ADD button
+		if ( !$user->id && $ignore_unauthorized < 2 ) return '';
+		
+		
+		// IF not auto-relation given ... then check if current view / layout can use ADD button
 		$view = JRequest::getVar('view');
 		$layout = JRequest::getVar('layout', 'default');
-		if ( $view!='category' || !in_array($layout, array('default','mcats','myitems')) ) return '';
-
-		// Check if user can ADD to current category or to any category
-		if ($maincat->id && $layout == 'default') {
-			$add_label = JText::_('FLEXI_ADD_NEW_CONTENT_TO_CURR_CAT');
+		if ( !$auto_relations ) {
+			if ( $view!='category' || $layout != 'author' ) return '';
+		}
+		
+		
+		// *********************************************************************
+		// Check if user can ADD to (a) given category or to (b) at any category
+		// *********************************************************************
+		
+		// (a) Given category
+		if ( $submit_cat && $submit_cat->id )
+		{
 			if (FLEXI_J16GE) {
-				$canAdd = $user->authorise('core.create', 'com_content.category.' . $maincat->id);
+				$canAdd = $user->authorise('core.create', 'com_content.category.' . $submit_cat->id);
 			} else if (FLEXI_ACCESS) {
-				$canAdd = ($user->gid < 25) ? FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'category', $maincat->id) : 1;
+				$canAdd = ($user->gid < 25) ? FAccess::checkAllContentAccess('com_content','submit','users', $user->gmid, 'category', $submit_cat->id) : 1;
 			} else {
 				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
 				//$canAdd = ($user->gid >= 19);  // At least J1.5 Author
 			}
-		} else  {
-			$add_label = JText::_('FLEXI_ADD_NEW_CONTENT_TO_LIST');
-			$specific_catids = $maincat->id ? array( $maincat->id ) : $maincat->ids;
-			if ( !empty($specific_catids ) ) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, $specific_catids );
-				$canAdd = count($allowedcats);
-			} else {
-				$canAdd = FlexicontentHelperPerm::getPerm()->CanAdd;
-			}
 		}
-		if ( !$canAdd) return '';
-
-		// Create the button
-		if ( $params->get('show_icons') ) {
+		
+		// (b) Any category (or to the CATEGORY IDS of given CATEGORY VIEW OBJECT)
+		else
+		{
+			// Given CATEGORY VIEW OBJECT may limit to specific category ids
+			$specific_catids = $submit_cat ? @ $submit_cat->ids  :  false;
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, $specific_catids );
+			$canAdd = count($allowedcats);
+		}
+		
+		if ( !$canAdd && !$ignore_unauthorized ) return '';
+		
+		
+		// ******************************
+		// Create submit button/icon text
+		// ******************************
+		
+		if ($submit_text) {
+			$submit_lbl = JText::_($submit_text);
+		} else {
+			$submit_lbl = JText::_( $submit_cat && $submit_cat->id  ?  'FLEXI_ADD_NEW_CONTENT_TO_CURR_CAT'  :  'FLEXI_ADD_NEW_CONTENT_TO_LIST' );
+		}		
+		
+		
+		// ***********
+		// Create link
+		// ***********
+		
+		// Add Itemid (if given)
+		$link = $menu_itemid  ?  'index.php?Itemid='.$menu_itemid  :  'index.php?view='.FLEXI_ITEMVIEW.'&task=add';
+		
+		// Add main category ID (if given)
+		$link .= ($submit_cat && $submit_cat->id)  ?  '&maincat='.$submit_cat->id  :  '';
+		
+		// Append autorelate information to the URL (if given)
+		if ($auto_relations) foreach ( $auto_relations as $auto_relation ) {
+			$link .= '&autorelation_'.$auto_relation->fieldid.'='.$auto_relation->itemid;
+		}
+		
+		// ***************************************
+		// Finally create the submit icon / button
+		// ***************************************
+		
+		$tip_text = JText::_( 'FLEXI_ADD' ) .'::'. $submit_lbl;
+		if ( $params->get('show_icons') && !$auto_relations ) {
 			$attribs = ' style="margin-right:4px;" width="16" align="top" ';
 			$image = FLEXI_J16GE ?
-				JHTML::image( 'components/com_flexicontent/assets/images/'.'add.png', JText::_( 'FLEXI_ADD_NEW_CONTENT' ), $attribs) :
-				JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_ADD_NEW_CONTENT' ), $attribs) ;
+				JHTML::image('components/com_flexicontent/assets/images/'.'add.png', $submit_lbl, $attribs, true) :
+				JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $submit_lbl, $attribs) ;
+			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$tip_text.'">'.$image.'</a>';
 		} else {
-			$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_ADD_NEW_CONTENT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
+			$output	= '<a href="'.JRoute::_($link).'" class="hasTip fc_button fcsimple" title="'.$tip_text.'">'.$submit_lbl.'</a>';
 		}
-		$overlib = $add_label;
-		$text = JText::_( 'FLEXI_ADD' );
-
-		$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&task=add'.($maincat->id ? '&maincat='.$maincat->id : '');
-		$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.JText::_( 'FLEXI_ADD_NEW_CONTENT' ).'</a>';
-
+		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		
 		return $output;
 	}
 
@@ -1477,7 +1516,7 @@ class flexicontent_html
 		$path = (!FLEXI_J16GE && $app->isAdmin() ? '../' : '').'components/com_flexicontent/assets/images/';
 		if ( $params->get('show_icons', 1) ) {
 			$icon = FLEXI_J16GE ?
-				JHTML::image( $path.$img, $alt, $attribs) :
+				JHTML::image($path.$img, $alt, $attribs, true) :
 				JHTML::_('image.site', $img, $path, NULL, NULL, $alt, $attribs) ;
 		} else {
 			$icon = $descr;
@@ -1521,10 +1560,10 @@ class flexicontent_html
 	{
 		if ( $params->get('show_icons') ) {
 			$voteup = FLEXI_J16GE ?
-				JHTML::image( 'components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ) ) :
+				JHTML::image('components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ), NULL, true) :
 				JHTML::_('image.site', 'thumb_up.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_GOOD' ) ) ;
 			$votedown = FLEXI_J16GE ?
-				JHTML::image( 'components/com_flexicontent/assets/images/'.'thumb_down.png', JText::_( 'FLEXI_BAD' ) ) :
+				JHTML::image('components/com_flexicontent/assets/images/'.'thumb_down.png', JText::_( 'FLEXI_BAD' ), NULL, true) :
 				JHTML::_('image.site', 'thumb_down.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_BAD' ) ) ;
 		} else {
 			$voteup = JText::_( 'FLEXI_GOOD' ). '&nbsp;';
@@ -1917,7 +1956,7 @@ class flexicontent_html
 		if ($user->id && $favoured)
 		{
 			$image = FLEXI_J16GE ?
-				JHTML::image( 'components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_( 'FLEXI_REMOVE_FAVOURITE' )) :
+				JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_( 'FLEXI_REMOVE_FAVOURITE' ), NULL, true) :
 				JHTML::_('image.site', 'heart_delete.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_REMOVE_FAVOURITE' )) ;
 			$text 		= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
 			$overlib 	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
@@ -1935,7 +1974,7 @@ class flexicontent_html
 		elseif($user->id)
 		{
 			$image = FLEXI_J16GE ?
-				JHTML::image( 'components/com_flexicontent/assets/images/'.'heart_add.png', JText::_( 'FLEXI_FAVOURE' )) :
+				JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_( 'FLEXI_FAVOURE' ), NULL, true) :
 				JHTML::_('image.site', 'heart_add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_FAVOURE' )) ;
 			$text 		= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
 			$overlib 	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
@@ -1954,7 +1993,7 @@ class flexicontent_html
 			$overlib 	= JText::_( 'FLEXI_FAVOURE_LOGIN_TIP' );
 			$text 		= JText::_( 'FLEXI_FAVOURE' );
 			$image = FLEXI_J16GE ?
-				JHTML::image( 'components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' )) :
+				JHTML::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), NULL, true) :
 				JHTML::_('image.site', 'heart_login.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $text, 'class="editlinktip hasTip" title="'.$text.'::'.$overlib.'"' ) ;
 
 			$output		= $image;
