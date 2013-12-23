@@ -993,7 +993,7 @@ class ParentClassItem extends JModelLegacy
 			// since joomla will cache it and use it later during creation of allowed Category Tree
 			$usercats = FlexicontentHelperPerm::getAllowedCats($user, array('core.create')
 				, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
-				);
+			);
 			//print_r($usercats); die( "can create in cats: ".count($usercats) );
 			$iparams_extra->set('access-create', count($usercats));
 			return $iparams_extra;  // New item, so do not calculate EDIT, DELETE and VIEW access

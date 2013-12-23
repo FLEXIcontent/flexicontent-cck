@@ -99,7 +99,16 @@ class FlexicontentViewCategories extends JViewLegacy
 		JToolBarHelper::divider();
 		
 		$add_divider = false;
-		if ( !FLEXI_J16GE || ( $user->authorise('core.create', 'com_flexicontent') || (count($user->getAuthorisedCategories('com_content', 'core.create'))) > 0 ) ) {
+		if ( !FLEXI_J16GE || $user->authorise('core.create', 'com_flexicontent') ) {
+			$cancreate_cat = true;
+		} else {
+			$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
+				, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
+			);
+			$cancreate_cat  = count($usercats) > 0;
+		}
+		
+		if ( $cancreate_cat ) {
 			JToolBarHelper::addNew($contrl_singular.'add');
 			$add_divider = true;
 		}

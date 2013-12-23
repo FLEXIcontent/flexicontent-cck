@@ -342,7 +342,12 @@ class FlexicontentController extends JControllerLegacy
 			$canCreateType = $model->canCreateType( array($type_id), true, $types );
 		}
 		
+		
+		// ****************************************************************
 		// Calculate user's privileges on current content item
+		// ... canPublish IS RECALCULATED after saving, maybe comment out ?
+		// ****************************************************************
+		
 		if (!$isnew) {
 			
 			if (FLEXI_J16GE) {
@@ -379,9 +384,7 @@ class FlexicontentController extends JControllerLegacy
 		} else {
 			
 			if (FLEXI_J16GE) {
-				$canAdd	= $user->authorise('core.create', 'com_flexicontent') && count( FlexicontentHelperPerm::getAllowedCats($user, array('core.create')) );
-				// ALTERNATIVE 1
-				//$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
+				$canAdd = $model->getItemAccess()->get('access-create'); // includes check of creating in at least one category
 				$not_authorised = !$canAdd;
 				
 				$canPublish	= $user->authorise('core.edit.state', 'com_flexicontent') || $user->authorise('core.edit.state.own', 'com_flexicontent');
@@ -651,7 +654,7 @@ class FlexicontentController extends JControllerLegacy
 			
 			else if ( $newly_submitted_item ) {
 				// NEW ITEM: Do not use editable till logoff behaviour
-				// ALSO: Clear editable FLAG set due to 'apply' task
+				// ALSO: Clear editable FLAG set in the case that 'apply' button was used during new item creation
 				if ( !$params->get('items_session_editable', 0) ) {
 					$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 					if ( isset($rendered_uneditable[$model->get('id')]) ) {
@@ -662,7 +665,7 @@ class FlexicontentController extends JControllerLegacy
 			}
 			
 			else {
-				// EXISTING ITEM: We can use editable till logoff behaviour
+				// EXISTING ITEM: (if enabled) Use the editable till logoff behaviour
 				if ( $params->get('items_session_editable', 0) ) {
 					
 					// Set notice for existing item being editable till logoff 
@@ -693,7 +696,8 @@ class FlexicontentController extends JControllerLegacy
 			unset($newly_submitted[$model->get('id')]);
 			$session->set('newly_submitted', $newly_submitted, 'flexicontent');
 			
-			// Clear editable FLAG set temporarily, e.g. due to 'apply' task
+			// The 'apply' task may set 'editable till logoff' FLAG ...
+			// CLEAR IT, since NEW content this is meant to be used temporarily
 			if ( !$params->get('items_session_editable', 0) ) {
 				$rendered_uneditable = $session->get('rendered_uneditable', array(),'flexicontent');
 				if ( isset($rendered_uneditable[$model->get('id')]) ) {

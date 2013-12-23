@@ -231,7 +231,7 @@ class FlexicontentHelperPerm
 	 * @return array									The category IDs
 	 * @since	2.0
 	 */
-	static function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false )
+	static function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false, $find_first = false )
 	{
 		global $globalcats;
 		$db = JFactory::getDBO();
@@ -261,7 +261,10 @@ class FlexicontentHelperPerm
 				{
 					$has_access = $require_all ? ($has_access && $user->authorise($action_name, $asset)) : ($has_access || $user->authorise($action_name, $asset));
 				}
-				if ($has_access) $usercats[] = $category_id;
+				if ($has_access) {
+					$usercats[] = $category_id;
+					if ($find_first) break;  // J1.6+ performance consideration skip checking permissions of remaining categories
+				}
 			}
 			return $usercats;
 			

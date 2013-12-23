@@ -86,7 +86,17 @@ class FlexicontentControllerCategory extends JControllerForm
 	 */
 	protected function allowAdd($data = array())
 	{
-		return JFactory::getUser()->authorise('core.create', $this->extension);
+		$user = JFactory::getUser();
+		if ( !FLEXI_J16GE || $user->authorise('core.create', $this->extension) ) {
+			$cancreate_cat = true;
+		} else {
+			$usercats = FlexicontentHelperPerm::getAllowedCats($user, $actions_allowed = array('core.create')
+				, $require_all = true, $check_published = true, $specific_catids = false, $find_first = true
+			);
+			$cancreate_cat = count($usercats) > 0;
+		}
+		
+		return $cancreate_cat;
 	}
 
 	/**
