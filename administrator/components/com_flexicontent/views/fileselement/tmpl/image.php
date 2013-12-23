@@ -165,7 +165,7 @@ $session = JFactory::getSession();
 		foreach ($this->rows as $row) {
 			unset($thumb_or_icon);
 			$filename    = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
-			if ( !in_array($row->ext, $imageexts)) continue;  // verify image is in allowed extensions
+			if ( !in_array(strtolower($row->ext), $imageexts)) continue;  // verify image is in allowed extensions
 			
 			$path      = COM_FLEXICONTENT_MEDIAPATH;  // JPATH_ROOT . DS . <media_path>
 			$file_path = $row->filename;

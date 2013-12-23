@@ -40,7 +40,7 @@ if (!$this->items) {
 	// No items exist
 	if ($this->getModel()->getState('limit')) {
 		// Not creating a category view without items
-		echo '<div class="noitems group">' . JText::_( 'FLEXI_NO_ITEMS_CAT' ) . '</div>';
+		echo '<div class="noitems group">' . JText::_( 'FLEXI_NO_ITEMS_FOUND' ) . '</div>';
 	}
 	return;
 }
