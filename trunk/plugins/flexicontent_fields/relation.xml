@@ -23,66 +23,31 @@
 		<params group="group-relation" addpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
 			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
+			
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_EDIT_OPTIONS" level="level1" menu="hide" />
+			
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_REQUIRED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			
-			<field name="" type="separator" default="FLEXI_RIFLD_SCOPE" hr="false" level="level1" menu="hide" />
-			<field name="" type="separator" default="FLEXI_RIFLD_CAT_SCOPE" hr="false" level="level2" menu="hide" />
-			<field name="method_cat" type="fcmethod" default="1" label="FLEXI_RIFLD_METHOD" description="FLEXI_RIFLD_METHOD_DESC" />
-			<field name="catids" type="flexicategories" multiple="true" size="9" label="FLEXI_RIFLD_CATEGORIES" description="FLEXI_RIFLD_CATEGORIES_DESC" />
-			<field name="usesubcats" type="radio" default="0" label="FLEXI_RIFLD_INCLUDE_SUBCATS" description="FLEXI_RIFLD_INCLUDE_SUBCATS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-
-			<field name="" type="separator" default="FLEXI_RIFLD_TYPES_SCOPE" level="level2" menu="hide" />
-			<field name="method_types" type="fcmethod" default="1" label="FLEXI_RIFLD_METHOD" description="FLEXI_RIFLD_METHOD_DESC" />
-			<field name="types" type="types" multiple="true" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_RIFLD_OTHER_SCOPE_LIMITS" level="level2" menu="hide" />
-			<field name="samelangonly" type="radio" default="1" label="FLEXI_RIFLD_SAME_LANGUAGE_ONLY" description="FLEXI_RIFLD_SAME_LANGUAGE_ONLY_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" >	
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="onlypublished" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC">
-				<option value="0">FLEXI_RIFLD_ANY_USER</option>
-				<option value="1">FLEXI_RIFLD_EDITOR</option>
-				<option value="2">FLEXI_RIFLD_ITEM_OWNER</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_RIFLD_EDIT_OPTIONS" level="level1" menu="hide" />
-			
 			<field name="size" type="text" default="12" size="2" label="FLEXI_RIFLD_SELECTBOX_LINES" description="FLEXI_RIFLD_SELECTBOX_LINES_DESC" />
+			
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEMS_SELECTOR" level="level2" menu="hide" />
 			
 			<field name="prepend_item_state" type="radio" default="1" label="FLEXI_RIFLD_PREPEND_ITEM_STATE" description="FLEXI_RIFLD_PREPEND_ITEM_STATE_DESC" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="maxtitlechars" type="text" default="40" label="FLEXI_RIFLD_TITLE_MAXLEN" description="FLEXI_RIFLD_TITLE_MAXLEN_DESC" />
-			
-			<field name="title_filter" type="radio" default="1" label="FLEXI_RIFLD_TITLE_FILTER" description="FLEXI_RIFLD_TITLE_FILTER_DESC" >	
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			
 			<field name="orderby_form" type="list" default="alpha" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
 				<option value="">FLEXI_ORDER_DEFAUKT</option>
@@ -102,7 +67,50 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_LIST_CREATION_FRONTEND_VIEWS" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_RIFLD_INSTANT_FILTERS" hr="false" level="level3" menu="hide" />
+			
+			<field name="cat_filter" type="radio" default="1" label="FLEXI_RIFLD_CAT_FILTER" description="FLEXI_RIFLD_CAT_FILTER_DESC" >	
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="title_filter" type="radio" default="1" label="FLEXI_RIFLD_TITLE_FILTER" description="FLEXI_RIFLD_TITLE_FILTER_DESC" >	
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_ITEMS_SCOPES" description="FLEXI_RIFLD_ITEMS_SCOPES_DESC" hr="false" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_RIFLD_CAT_SCOPE" hr="false" level="level3" menu="hide" />
+			<field name="method_cat" type="fcmethod" default="1" label="FLEXI_RIFLD_METHOD" description="FLEXI_RIFLD_METHOD_DESC" />
+			<field name="catids" type="flexicategories" multiple="true" size="9" label="FLEXI_RIFLD_CATEGORIES" description="FLEXI_RIFLD_CATEGORIES_DESC" />
+			<field name="usesubcats" type="radio" default="0" label="FLEXI_RIFLD_INCLUDE_SUBCATS" description="FLEXI_RIFLD_INCLUDE_SUBCATS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="" type="separator" default="FLEXI_RIFLD_TYPES_SCOPE" level="level3" menu="hide" />
+			<field name="method_types" type="fcmethod" default="1" label="FLEXI_RIFLD_METHOD" description="FLEXI_RIFLD_METHOD_DESC" />
+			<field name="types" type="types" multiple="true" size="3" label="FLEXI_RIFLD_FCTYPES" description="FLEXI_RIFLD_FCTYPES_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_OTHER_SCOPE_LIMITS" level="level3" menu="hide" />
+			<field name="samelangonly" type="radio" default="1" label="FLEXI_RIFLD_SAME_LANGUAGE_ONLY" description="FLEXI_RIFLD_SAME_LANGUAGE_ONLY_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="use_publish_dates" type="radio" default="1" label="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES" description="FLEXI_RIFLD_USE_PLUBLISH_UPDOWN_DATES_DESC" >	
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="onlypublished" type="radio" default="1" label="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS" description="FLEXI_RIFLD_ONLY_PLUBLISHED_ITEMS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="ownedbyuser" type="radio" default="0" label="FLEXI_RIFLD_OWNED_BY" description="FLEXI_RIFLD_OWNED_BY_DESC">
+				<option value="0">FLEXI_RIFLD_ANY_USER</option>
+				<option value="1">FLEXI_RIFLD_EDITOR</option>
+				<option value="2">FLEXI_RIFLD_ITEM_OWNER</option>
+			</field>
+			
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEM_LIST" level="level1" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_ORDER_ORDERING" level="level2" menu="hide" />
 			<field name="orderby" type="list" default="alpha" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
@@ -151,6 +159,10 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level2" />
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
 			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
@@ -163,6 +175,50 @@
 			</field>
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_AUTORELATE_SUBMISSION" description="FLEXI_RIFLD_AUTORELATE_SUBMISSION_DESC" hr="false" level="level1" menu="hide" />
+			<field name="auto_relate_curritem" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON" description="FLEXI_RIFLD_AUTORELATE_SHOW_SUBMIT_BUTTON_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="auto_relate_submit_text" type="text" default="" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_BUTTON_TEXT_DESC" />
+			<field name="auto_relate_position" type="radio" default="0" label="FLEXI_RIFLD_AUTORELATE_POSITION" description="FLEXI_RIFLD_AUTORELATE_POSITION_DESC">
+				<option value="0">FLEXI_BEFORE</option>
+				<option value="1">FLEXI_AFTER</option>
+				<option value="2">FLEXI_BOTH</option>
+			</field>
+			<field name="auto_relate_menu_itemid" type="text" multiple="false" label="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID" description="FLEXI_RIFLD_AUTORELATE_SUBMIT_MENU_ITEMID_DESC" />
+			<field name="auto_relate_show_to_unauth" type="list" default="0" label="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED" description="FLEXI_RIFLD_AUTORELATE_SHOW_TO_UNLOGGED_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES_EXCLUDE_GUESTS</option>
+				<option value="2">FLEXI_YES</option>
+			</field>
+			
+			
+			<field name="" type="separator" default="FLEXI_RIFLD_SPECIAL_DISPLAY_CASES" level="level1" />
+			
+			<field name="" type="separator" default="FLEXI_DISPLAY_SHOW_TOTAL_ONLY" level="level2" />
+			<field name="show_total_only" type="radio" default="0" label="FLEXI_RIFLD_SHOW_TOTAL_RELATED" description="FLEXI_RIFLD_SHOW_TOTAL_RELATED_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_HIDE_ZERO</option>
+			</field>
+			<field name="total_in_view" type="fccheckbox" default=""
+				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="items,category,module,backend" defaultvals="backend"
+				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
+			<field name="total_append_text" type="text" label="FLEXI_RIFLD_TOTAL_APPEND_TEXT" description="FLEXI_RIFLD_TOTAL_APPEND_TEXT_DESC" />
+			
+			<field name="" type="separator" default="Show extra information" level="level3" menu="hide" />
+			<field name="total_show_auto_btn" type="radio" default="0" label="FLEXI_RIFLD_TOTAL_SHOW_AUTO_BTN" description="FLEXI_RIFLD_TOTAL_SHOW_AUTO_BTN_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="total_show_list" type="radio" default="0" label="FLEXI_RIFLD_TOTAL_SHOW_LIST" description="FLEXI_RIFLD_TOTAL_SHOW_LIST_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="total_relitem_html" type="textarea" cols="38" rows="5" default="__display_text__" label="FLEXI_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
 			
 		</params>
 	

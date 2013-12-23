@@ -46,6 +46,76 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
 		$document = JFactory::getDocument();
+		$field->html = '';
+		
+		$ri_field_name = str_replace('-','_',$field->name);
+		$fieldname = FLEXI_J16GE ? 'custom['.$ri_field_name.'][]' : $ri_field_name.'[]';
+		
+		// Case of autorelated item
+		$autorelation_itemid = JRequest::getInt('autorelation_'.$field->id);
+		if ( $autorelation_itemid)
+		{
+			// automatically related item
+			$query = 'SELECT title, id, catid, state, alias '
+				. ' FROM #__content '
+				. ' WHERE id ='. $autorelation_itemid
+				;
+			$db->setQuery($query);
+			$rel_item = $db->loadObject();
+			
+			if (!$rel_item) {
+				$field->html = 'auto relating item id: '.$autorelation_itemid .' : item not found ';
+				return;
+			}
+			
+			$field->html = '<input id="'.$ri_field_name.'" name="'.$fieldname.'" type="hidden" value="'.$rel_item->id.':'.$rel_item->catid.'" />';
+			$field->html .= $rel_item->title;
+			return;
+		}
+		
+		
+		// ************************************************************************
+		// Initialise values and split them into: (a) item ids and (b) category ids
+		// ************************************************************************
+		$default_values		= '';
+		if( $item->version == 0 && $default_values) {
+			$field->value = explode(",", $default_values);
+		} else if (!$field->value) {
+			$field->value = array();
+		} else {
+			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed more easily !!!
+			$field->value = ( $field_data = @unserialize($field->value[0]) ) ? $field_data : $field->value;
+		}
+		
+		$_itemids_catids = array();
+		foreach($field->value as $i => $val) {
+			list ($itemid,$catid) = explode(":", $val);
+			$itemid = (int) $itemid;
+			$catid  = (int) $catid;
+			$_itemids_catids[$itemid] = new stdClass();
+			$_itemids_catids[$itemid]->itemid = $itemid;
+			$_itemids_catids[$itemid]->catid  = $catid;
+			$_itemids_catids[$itemid]->value  = $val;
+		}
+		
+		$auto_relate_curritem = $field->parameters->get( 'auto_relate_curritem', 0);
+		if ($auto_relate_curritem && !empty($_itemids_catids) && !FlexicontentHelperPerm::getPerm()->SuperAdmin)
+		{
+			$query = 'SELECT title, id, catid, state, alias '
+				. ' FROM #__content '
+				. ' WHERE id IN ('. implode( array_keys($_itemids_catids), ',') .')'
+				;
+			$db->setQuery($query);
+			$rel_items = $db->loadObjectList();
+			$i = 0;
+			foreach ($rel_items as $rel_item) {
+				$field->html .= '<input id="'.$ri_field_name.$i.'" name="'.$fieldname.'" type="hidden" value="'.$rel_item->id.':'.$rel_item->catid.'" />';
+				$field->html .= $rel_item->title." <br/> \n";
+				$i++;
+			}
+			return;
+		}
+		
 		
 		
 		// ******************
@@ -85,29 +155,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$title_filter = $field->parameters->get( 'title_filter', 1 ) ;
 		$required 	= $field->parameters->get( 'required', 0 ) ;
 		$required 	= $required ? ' required' : '';
-		
-		
-		// ************************************************************************
-		// Initialise values and split them into: (a) item ids and (b) category ids
-		// ************************************************************************
-		$default_values		= '';
-		if( $item->version == 0 && $default_values) {
-			$field->value = explode(",", $default_values);
-		} else if (!$field->value) {
-			$field->value = array();
-		} else {
-			// Compatibility with old values, we no longer serialize all values to one, this way the field can be reversed more easily !!!
-			$field->value = ( $field_data = @unserialize($field->value[0]) ) ? $field_data : $field->value;
-		}
-		
-		$_itemids_catids = array();
-		foreach($field->value as $i => $val) {
-			list ($itemid,$catid) = explode(":", $val);
-			$_itemids_catids[$itemid] = new stdClass();
-			$_itemids_catids[$itemid]->itemid = $itemid;
-			$_itemids_catids[$itemid]->catid  = $catid;
-			$_itemids_catids[$itemid]->value  = $val;
-		}
+		$select_items_prompt = $field->parameters->get( 'select_items_prompt', 'FLEXI_RIFLD_SELECT_ITEMS_PROMPT' ) ;
+		$selected_items_label = $field->parameters->get( 'selected_items_label', 'FLEXI_RIFLD_SELECTED_ITEMS_LABEL' ) ;
 		
 		
 		// ***********************************************
@@ -264,58 +313,21 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		// *************************************************
 		// Create the HTML for editing/entering field values
 		// *************************************************
-		static $select2_added = false;
-	  if ( !$select2_added )
+		
+		static $common_css_js_added = false;
+	  if ( !$common_css_js_added )
 	  {
-			$select2_added = true;
+			$common_css_js_added = true;
 			flexicontent_html::loadFramework('select2');
+			
+			$css = ''
+				.'.fcrelation_field_filters span.label { min-width:140px !important; }'
+				.'.fcrelation_field_used_items select, .fcrelation_field_unused_items select { min-width: 90% !important; }'
+				.'.fcrelation_field_controls { margin: 2px 20% 6px 20%; }'
+				;
+			if ($css) $document->addStyleDeclaration($css);
 		}
 		
-		$ri_field_name  = str_replace('-','_',$field->name);
-		
-		$css = '.'.$ri_field_name.'_fccats { min-width:500px !important; }';
-		if ($css) $document->addStyleDeclaration($css);
-		
-		$field->html .= "<div style='float:none;margin-bottom:12px;'>";
-		$field->html .= flexicontent_cats::buildcatselect(
-			$allowedtree, $ri_field_name.'_fccats', $catvals="",
-			$top=2, // (adds first option "please select") Important otherwise single entry in select cannot initiate onchange event
-			' class="use_select2_lib inputbox '.$ri_field_name.'_fccats" ',
-			$check_published = true, $check_perms = true,
-			$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false
-		);
-		$field->html .= "</div>\n";
-		
-		$field->html  .= "&nbsp;&nbsp;&nbsp;";
-		
-		$field->html .= "<div style='float:left;clear:left;margin-right:16px;'>Category Items:<br>\n";
-		$field->html .= '<select id="'.$ri_field_name.'_visitems" name="'.$ri_field_name.'_visitems[]" multiple="multiple" style="min-width:180px;" class="fcfield_selectmulval" '.$size.' >'."\n";
-		$field->html .= '</select>'."\n";
-		$field->html .= "</div>\n";
-		
-		$field->html .= "<div style='float:left;margin-right:16px; text-align:center;'><br>\n";
-		$field->html .= '<a href="JavaScript:void(0);" id="btn-add_'.$ri_field_name.'" class="fcfield-button" >Add &raquo;</a><br>'."\n";
-    $field->html .= '<a href="JavaScript:void(0);" id="btn-remove_'.$ri_field_name.'" class="fcfield-button" >&laquo; Remove</a><br>'."\n";
-    
-    if ($title_filter)
-    {
-			$document->addScript( JURI::root().'components/com_flexicontent/assets/js/filterlist.js' );
-			$field->html.=	'<br />
-				<br /><input class="fcfield_textval" id="'.$ri_field_name.'_regexp" name="'.$ri_field_name.'_regexp" onKeyUp="'.$ri_field_name.'_titlefilter.set(this.value)" size="30" />
-				<br /><input style="margin-left:0px!important;" class="fcfield-button" type="button" onClick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_RIFLD_FILTER').'" style="margin-top:6px;" />
-				<input style="margin-left:0px!important;" class="fcfield-button" type="button" onClick="'.$ri_field_name.'_titlefilter.reset();this.form.'.$ri_field_name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_RIFLD_RESET').'" style="margin-top:6px;" />
-				
-				<script type="text/javascript">
-				<!--
-				var filteredfield = document.getElementById("'.$ri_field_name.'_visitems");
-				var '.$ri_field_name.'_titlefilter = new filterlist( filteredfield );
-				//-->
-				</script>
-				';
-    }
-    
-		$field->html .= "</div>\n";
-    
     // The split up the items
 		$items_options = '';
 		$items_options_select = '';
@@ -339,29 +351,76 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			}
 		}
 		
-		$fieldname = FLEXI_J16GE ? 'custom['.$ri_field_name.'][]' : $ri_field_name.'[]';
 		
-		$field->html .= "<div style='float:left;margin-right:16px;'>Related Items<br>\n";
+		$field->html .= "<div class='fcrelation_field_filters'>";
 		
-		$field->html .= '<select id="'.$ri_field_name.'" name="'.$fieldname.'" multiple="multiple" class="'.$required.'" style="min-width:180px;display:none;" '.$size.' >';
+		$field->html .= " <span class='fcrelation_field_filter_by_cat'>";
+		$field->html .= "  <span class='label'>".JText::_('FLEXI_RIFLD_FILTER_BY_CAT')."</span>\n";
+		$field->html .= flexicontent_cats::buildcatselect(
+			$allowedtree, $ri_field_name.'_fccats', $catvals="",
+			$top=2, // (adds first option "please select") Important otherwise single entry in select cannot initiate onchange event
+			' class="use_select2_lib inputbox '.$ri_field_name.'_fccats" ',
+			$check_published = true, $check_perms = true,
+			$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false,
+			$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array('__ALL__'=>'FLEXI_RIFLD_FILTER_LIST_ALL')
+		);
+		$field->html .= " </span>\n";
+		
+		$field->html .= " <div class='fcclear'></div>";
+		$field->html .= " <span class='fcrelation_field_filter_by_title'>";
+		$field->html .= "  <span class='label'>".JText::_('FLEXI_RIFLD_FILTER_BY_TITLE')."</span>\n";
+    
+    if ($title_filter)
+    {
+			$document->addScript( JURI::root().'components/com_flexicontent/assets/js/filterlist.js' );
+			$field->html.=	''
+				.'<input class="fcfield_textval" id="'.$ri_field_name.'_regexp" name="'.$ri_field_name.'_regexp" onKeyUp="'.$ri_field_name.'_titlefilter.set(this.value)" size="30" />'
+				//.'<input style="margin-left:0px!important;" class="fcfield-button" type="button" onClick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_RIFLD_FILTER').'" style="margin-top:6px;" />'
+				.'<input style="margin-left:0px!important;" class="fcfield-button" type="button" onClick="'.$ri_field_name.'_titlefilter.reset();this.form.'.$ri_field_name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_RIFLD_RESET').'" style="margin-top:6px;" />'
+				;
+    }
+		$field->html .= " </span>\n";
+		
+		$field->html .= "</div>\n";  // fcrelation_field_filters
+    
+		
+		$field->html .= "<div class='fcrelation_field_unused_items'>";
+		$field->html .= "<span class='label'>".JText::_($select_items_prompt)."</span><br>\n";
+		$field->html .= '<select id="'.$ri_field_name.'_visitems" name="'.$ri_field_name.'_visitems[]" multiple="multiple" class="fcfield_selectmulval" '.$size.' >'."\n";
+		$field->html .= '</select>'."\n";
+		$field->html .= "</div>\n";
+		
+		$field->html .= "<div class='fcrelation_field_controls'>";
+		$field->html .= '<a href="JavaScript:void(0);" id="btn-add_'.$ri_field_name.'" class="fcfield-button" >Add &raquo;</a>'."\n";
+    $field->html .= '<a href="JavaScript:void(0);" id="btn-remove_'.$ri_field_name.'" class="fcfield-button" >&laquo; Remove</a>'."\n";
+		$field->html .= "</div>\n";
+    
+		$field->html .= "<div class='fcrelation_field_used_items'>";
+		$field->html .= "<span class='label'>".JText::_($selected_items_label)."</span><br>\n";
+		
+		$field->html .= '<select id="'.$ri_field_name.'" name="'.$fieldname.'" multiple="multiple" class="'.$required.'" style="display:none;" '.$size.' >';
 		$field->html .= $items_options_select;
 		$field->html .= '</select>'."\n";
 		
-		$field->html .= '<select id="'.$ri_field_name.'_selitems" name="'.$ri_field_name.'_selitems[]" multiple="multiple" style="min-width:180px;" class="fcfield_selectmulval" '.$size.' >';
+		$field->html .= '<select id="'.$ri_field_name.'_selitems" name="'.$ri_field_name.'_selitems[]" multiple="multiple" class="fcfield_selectmulval" '.$size.' >';
 		$field->html .= $items_options;
 		$field->html .= '</select>'."\n";
-		
-		$field->html .= "</div>\n";
 		
 		$field->html .= '<select id="'.$ri_field_name.'_hiditems" name="'.$ri_field_name.'_hiditems" style="display:none;" >';
 		$field->html .= $items_options_unused;
 		$field->html .= '</select>'."\n";
+		$field->html .= "</div>\n";
 		
 		
-		$js= "
-		
+		$js= ($title_filter ? ' var filteredfield, '.$ri_field_name.'_titlefilter;' : '')."
+
 jQuery(document).ready(function() {
-	
+
+".($title_filter ? '
+	filteredfield = document.getElementById("'.$ri_field_name.'_visitems");
+	'.$ri_field_name.'_titlefilter = new filterlist( filteredfield );
+	' : '')."
+
   jQuery('#btn-add_".$ri_field_name."').click(function(){
       jQuery('#".$ri_field_name."_visitems option:selected').each( function() {
           jQuery('#".$ri_field_name."_selitems').append(\"<option class='\"+jQuery(this).attr('class')+\"' value='\"+jQuery(this).val()+\"'>\"+jQuery(this).text()+\"</option>\");
@@ -383,6 +442,8 @@ jQuery(document).ready(function() {
 	
 	jQuery('#".$ri_field_name."_fccats').change(function() {
 		
+		var ".$ri_field_name."_fccats_val = jQuery('#".$ri_field_name."_fccats').attr('value');
+		
 		". ( $title_filter ? $ri_field_name."_titlefilter.reset(); this.form.".$ri_field_name."_regexp.value='';" : "" ) . "
 		
 	  jQuery('#".$ri_field_name."_visitems option').each( function() {
@@ -393,8 +454,8 @@ jQuery(document).ready(function() {
 		});
 		
 	  jQuery('#".$ri_field_name."_hiditems option').each( function() {
-	  	if ( jQuery(this).hasClass('cat_' + jQuery('#".$ri_field_name."_fccats').attr('value') ) ) {
-			  jQuery('#".$ri_field_name."_visitems').append(\"<option class='\"+jQuery(this).attr('class')+\"'value='\"+jQuery(this).val()+\":\"+jQuery('#".$ri_field_name."_fccats').val()+\"'>\"+jQuery(this).text()+\"</option>\");
+	  	if ( ".$ri_field_name."_fccats_val == '__ALL__' || jQuery(this).hasClass('cat_' + ".$ri_field_name."_fccats_val ) ) {
+			  jQuery('#".$ri_field_name."_visitems').append(\"<option class='\"+jQuery(this).attr('class')+\"'value='\"+jQuery(this).val()+\":\"+ ".$ri_field_name."_fccats_val+\"'>\"+jQuery(this).text()+\"</option>\");
 				jQuery(this).remove();
 	  	}
 		});
@@ -419,11 +480,62 @@ jQuery(document).ready(function() {
 		$field->{$prop} = '';
 		$values = $values ? $values : $field->value;
 		
+		
+		// *******************************************
+		// Check for special display : total info only
+		// *******************************************
+		$show_total_only = $field->parameters->get('show_total_only', 0);
+		
+		if ($prop=='display_total') {
+			$display_total = true;
+		}
+		
+		else if ( $show_total_only==1 || ($show_total_only == 2 && count($values)) ) {
+			$app = JFactory::getApplication();
+			$view = JRequest::getVar('view');
+			$option = JRequest::getVar('option');
+			$isItemsManager = $app->isAdmin() && $view=='items' && $option=='com_flexicontent';
+			
+			$total_in_view = $field->parameters->get('total_in_view', array('backend'));
+			$total_in_view = FLEXIUtilities::paramToArray($total_in_view);
+			$display_total = ($isItemsManager && in_array('backend', $total_in_view)) || in_array($view, $total_in_view);
+		}
+		
+		else {
+			$display_total = false;
+		}
+		
+		
+		// ***********************************************************
+		// Create total info and terminate if not adding the item list
+		// ***********************************************************
+		
+		if ($display_total)
+		{
+			$total_append_text   = $field->parameters->get('total_append_text', '');
+			$total_show_list     = $field->parameters->get('total_show_list', 0);
+			$total_show_auto_btn = $field->parameters->get('total_show_auto_btn', 0);
+			
+			$field->{$prop} .= '<span class="fcrelation_field_total">'. count($values) .' '. $total_append_text .'<span>';
+			
+			// Terminate if not adding any extra information
+			if ( !$total_show_list && !$total_show_auto_btn ) return;
+			
+			// Override the item list HTML parameter ...
+			$total_relitem_html = $field->parameters->get('total_relitem_html', '');
+			if ($total_relitem_html) $field->parameters->set('relitem_html', $total_relitem_html );
+		}
+		
+		
+		// ***********************************************************
+		// Prepare item list data for rendering the related items list
+		// ***********************************************************
+		
 		if ($field->field_type == 'relation_reverse')
 		{
 			$reverse_field = $field->parameters->get( 'reverse_field', 0) ;
 			if ( !$reverse_field ) {
-				$field->{$prop} = 'Field [id:'.$field->id.'] : '.JText::_('FLEXI_FIELD_NO_FIELD_SELECTED');
+				$field->{$prop} .= 'Field [id:'.$field->id.'] : '.JText::_('FLEXI_FIELD_NO_FIELD_SELECTED');
 				return;
 			}
 			$_itemids_catids = null;  // Always ignore passed items, the DB query will determine the items
@@ -445,7 +557,44 @@ jQuery(document).ready(function() {
 			}
 		}
 		
-		$field->{$prop} = FlexicontentFields::getItemsList($field->parameters, $_itemids_catids, $isform=0, @ $reverse_field, $field, $item);
+		
+		// **********************************************
+		// Create the submit button for auto related item
+		// **********************************************
+		
+		$auto_relate_curritem = $field->parameters->get( 'auto_relate_curritem', 0);
+		$auto_relate_menu_itemid = $field->parameters->get( 'auto_relate_menu_itemid', 0);
+		$auto_relate_position = $field->parameters->get( 'auto_relate_position', 0);
+		$auto_rel_btn = '';
+		if ( $auto_relate_curritem && $auto_relate_menu_itemid && (!$display_total || $total_show_auto_btn) )
+		{
+			$_submit_text = $field->parameters->get( 'auto_relate_submit_text', 'FLEXI_ADD_RELATED');
+			$_show_to_unauth = $field->parameters->get( 'auto_relate_show_to_unauth', 0);
+			$auto_relations[0] = new stdClass();
+			$auto_relations[0]->itemid  = $item->id;
+			$auto_relations[0]->fieldid = $field->id;
+			$category = null;
+			$auto_rel_btn = flexicontent_html::addbutton(
+				$field->parameters, $category, $auto_relate_menu_itemid, $_submit_text, $auto_relations, $_show_to_unauth
+			);
+		}
+		
+		
+		// *****************************
+		// Finally, create the item list
+		// *****************************
+		
+		if ( !$display_total || $total_show_list ) {
+			$add_before = $auto_rel_btn && ($auto_relate_position == 0 || $auto_relate_position == 2);
+			$add_after  = $auto_rel_btn && ($auto_relate_position == 1 || $auto_relate_position == 2);
+			
+			$field->{$prop} .= ''
+				.($add_before ? $auto_rel_btn : '')
+				.FlexicontentFields::getItemsList($field->parameters, $_itemids_catids, $isform=0, @ $reverse_field, $field, $item)
+				.($add_after ? $auto_rel_btn : '');
+		} else if ($auto_rel_btn) {
+			$field->{$prop} .= $auto_rel_btn;
+		}
 	}
 	
 	
@@ -471,4 +620,5 @@ jQuery(document).ready(function() {
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
+	
 }
