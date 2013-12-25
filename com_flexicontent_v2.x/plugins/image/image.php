@@ -1928,7 +1928,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// Done nothing more to clean
 		} else {
 			$query = 'DELETE FROM #__flexicontent_files'
-				. ' WHERE ' . $db->nameQuote('filename') . ' = ' . $db->Quote($filename);
+				. ' WHERE ' . (FLEXI_J16GE ? $db->quoteName('filename') : $db->nameQuote('filename') ) . ' = ' . $db->Quote($filename);
 			$db->setQuery( $query );
 			if(!$db->query())
 			{

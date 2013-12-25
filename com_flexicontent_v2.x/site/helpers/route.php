@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: route.php 1752 2013-09-05 10:21:10Z ggppdk $
+ * @version 1.5 stable $Id: route.php 1797 2013-10-26 02:45:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -208,6 +208,8 @@ class FlexicontentHelperRoute
 		if ($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 			$link .= '&Itemid='.$Itemid;
 		} else if ($menuitem = FlexicontentHelperRoute::_findCategory($needles, $urlvars)) {
+			$link .= '&Itemid='.$menuitem->id;
+		} else if ($menuitem = FlexicontentHelperRoute::_findDirectory($needles)) {
 			$link .= '&Itemid='.$menuitem->id;
 		} else {
 			if ($component_default_menuitem_id === null)
@@ -453,13 +455,13 @@ class FlexicontentHelperRoute
 		
 		$match = null;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
+		$db = JFactory::getDBO();
 		
 		// multiple needles, because maybe searching for multiple categories,
 		// also earlier needles (catids) takes priority over later ones
 		foreach($needles as $needle => $cid)  {
 
 			// Get access level of the FLEXIcontent category
-			$db = JFactory::getDBO();
 			$db->setQuery('SELECT access FROM #__categories WHERE id='.$cid);
 			$cat_acclevel = $db->loadResult();
 
@@ -474,35 +476,91 @@ class FlexicontentHelperRoute
 					if ($menuitem->access!=$public_acclevel && $menuitem->access==$cat_acclevel) continue;
 				}
 
+				// Try to match important menu / url variables
 				if (
-					@$menuitem->query['view'] == $needle &&
-					@$menuitem->query['cid'] == $cid &&
-					@$menuitem->query['layout'] == @$urlvars['layout'] && // match layout "author", "myitems", "mcats" etc
-					@$menuitem->query['authorid'] == @$urlvars['authorid'] && // match "authorid" for user id of author
-					@$menuitem->query['cids'] == @$urlvars['cids'] // match "cids" of "mcats" (multi-category view)
-				) {
-					
-					// Try to match optional url variables, if these were specified
-					$all_matched = true;
-					foreach ($urlvars as $varname => $varval) {
-						$all_matched = $all_matched &&  (@$menuitem->query[$varname] == $varval);
-					}
-					
-					// all view , cid and urlvars were matched an appropriate menu item was found
-					if ($all_matched) {
-						
-						// Do not match menu items that override category configuration parameters, these items will be selectable only
-						// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
-						if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? $menuitem->params : new JParameter($menuitem->params);
-						if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
-
-						$match = $menuitem;
-						break;
-					}
+					@$menuitem->query['view'] != $needle ||
+					@$menuitem->query['cid'] != $cid ||
+					// these variables must be explicitely checked, we must not rely on the urlvars loop below !
+					@$menuitem->query['layout'] != @$urlvars['layout'] || // match layout "author", "myitems", "mcats" etc
+					@$menuitem->query['authorid'] != @$urlvars['authorid'] || // match "authorid" for user id of author
+					@$menuitem->query['cids'] != @$urlvars['cids'] // match "cids" of "mcats" (multi-category view)
+				) continue;
+				
+				// Try to match any other given url variables, if these were specified and thus are required
+				$all_matched = true;
+				foreach ($urlvars as $varname => $varval) {
+					$all_matched = $all_matched &&  (@$menuitem->query[$varname] == $varval);
 				}
+				if ( !$all_matched ) continue;
+				
+				// All important menu variables and the optional urlvars were matched, an appropriate menu item was found
+				// ... but do not match menu items that override category configuration parameters, these items will be selectable only
+				// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
+				if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? $menuitem->params : new JParameter($menuitem->params);
+				if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
+
+				$match = $menuitem;
+				break;
 			}
 			
-			if(isset($match))  break;  // If a menu item for a category found, do not search for next needles (category ids)
+			if (isset($match))  break;  // If a menu item for a category found, do not search for next needles (category ids)
+		}
+
+		return $match;
+	}
+	
+	
+	static function _findDirectory($needles, $urlvars=array())
+	{
+		static $component_menuitems = null;
+		if ($component_menuitems === null) $component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
+		
+		$match = null;
+		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
+		
+		global $globalcats;
+		$db = JFactory::getDBO();
+		
+		// multiple needles, because maybe searching for multiple categories,
+		// also earlier needles (catids) takes priority over later ones
+		foreach($needles as $needle => $cid)  {
+
+			// Get access level of the FLEXIcontent category
+			$db->setQuery('SELECT access FROM #__categories WHERE id='.$cid);
+			$cat_acclevel = $db->loadResult();
+
+			foreach($component_menuitems as $menuitem) {
+
+				// Require appropriate access level of the menu item, to avoid access problems and redirecting guest to login page
+				if (!FLEXI_J16GE) {
+					// In J1.5 we need menu access level lower than category access level
+					if ($menuitem->access > $cat_acclevel) continue;
+				} else {
+					// In J2.5 we need menu access level public or the access level of the category
+					if ($menuitem->access!=$public_acclevel && $menuitem->access==$cat_acclevel) continue;
+				}
+
+				// Check menu item points to directory view
+				if ( @$menuitem->query['view'] != 'flexicontent' ) continue;
+				
+				// Check non-related directory view
+				$matched_root   = @$menuitem->query['rootcat'] == $cid;
+				$matched_parent = @$menuitem->query['rootcat'] == $globalcats[$cid]->parent_id;
+				if ( !$matched_root && !$matched_parent ) continue;
+				
+				// Try to match any other given url variables, if these were specified and thus are required
+				$all_matched = true;
+				foreach ($urlvars as $varname => $varval) {
+					$all_matched = $all_matched &&  (@$menuitem->query[$varname] == $varval);
+				}
+				if ( !$all_matched ) continue;
+				
+				$match = $menuitem;
+				if ( $matched_root ) break; // DONE: we matched a directory having root the given category
+				// else ... category's parent was matched ... continue searching for better match
+			}
+			
+			if (isset($match))  break;  // If a menu item for a category found, do not search for next needles (category ids)
 		}
 
 		return $match;
