@@ -945,7 +945,7 @@ class flexicontent_html
 
 			if ($params->get('show_icons')) 	{
 				$image = FLEXI_J16GE ?
-					JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), NULL, true) :
+					JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), NULL) :
 					JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_FEED' )) ;
 			} else {
 				$image = '&nbsp;'.JText::_( 'FLEXI_FEED' );
@@ -977,7 +977,7 @@ class flexicontent_html
 			// checks template image directory for image, if non found default are loaded
 			if ( $params->get( 'show_icons' ) ) {
 				$image = FLEXI_J16GE ?
-					JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), NULL, true) :
+					JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), NULL) :
 					JHTML::_('image.site', 'printButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_PRINT' )) ;
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_PRINT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
@@ -1045,7 +1045,7 @@ class flexicontent_html
 
 		if ($params->get('show_icons')) 	{
 			$image = FLEXI_J16GE ?
-				JHTML::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), NULL, true) :
+				JHTML::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), NULL) :
 				JHTML::_('image.site', 'emailButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EMAIL' )) ;
 		} else {
 			$image = '&nbsp;'.JText::_( 'FLEXI_EMAIL' );
@@ -1072,7 +1072,7 @@ class flexicontent_html
 
 			if ( $params->get('show_icons') ) {
 				$image = FLEXI_J16GE ?
-					JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), NULL, true) :
+					JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), NULL) :
 					JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_CREATE_PDF' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
@@ -1293,7 +1293,7 @@ class flexicontent_html
 			if ( $params->get('show_icons') ) {
 				$attribs = ' style="margin:4px;" width="16" align="top" ';
 				$image = FLEXI_J16GE ?
-					JHTML::image('components/com_flexicontent/assets/images/'.'person2_f2.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs, true) :
+					JHTML::image('components/com_flexicontent/assets/images/'.'person2_f2.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) :
 					JHTML::_('image.site', 'person2_f2.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) ;
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
@@ -1344,7 +1344,7 @@ class flexicontent_html
 		if ($has_edit) {
 			if ( $params->get('show_icons') ) {
 				$image = FLEXI_J16GE ?
-					JHTML::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), NULL, true) :
+					JHTML::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), NULL) :
 					JHTML::_('image.site', 'edit.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EDIT' )) ;
 			} else {
 				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
@@ -1404,9 +1404,12 @@ class flexicontent_html
 		else
 		{
 			// Given CATEGORY VIEW OBJECT may limit to specific category ids
-			$specific_catids = $submit_cat ? @ $submit_cat->ids  :  false;
-			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, $specific_catids );
-			$canAdd = count($allowedcats);
+			$canAdd = $user->authorise('core.create', 'com_flexicontent');
+			if ($canAdd === NULL) {
+				$specific_catids = $submit_cat ? @ $submit_cat->ids  :  false;
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, $specific_catids, $find_first = true );
+				$canAdd = count($allowedcats);
+			}
 		}
 		
 		if ( !$canAdd && !$ignore_unauthorized ) return '';
@@ -1446,7 +1449,7 @@ class flexicontent_html
 		if ( $params->get('show_icons') && !$auto_relations ) {
 			$attribs = ' style="margin-right:4px;" width="16" align="top" ';
 			$image = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'add.png', $submit_lbl, $attribs, true) :
+				JHTML::image('components/com_flexicontent/assets/images/'.'add.png', $submit_lbl, $attribs) :
 				JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $submit_lbl, $attribs) ;
 			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$tip_text.'">'.$image.'</a>';
 		} else {
@@ -1516,7 +1519,7 @@ class flexicontent_html
 		$path = (!FLEXI_J16GE && $app->isAdmin() ? '../' : '').'components/com_flexicontent/assets/images/';
 		if ( $params->get('show_icons', 1) ) {
 			$icon = FLEXI_J16GE ?
-				JHTML::image($path.$img, $alt, $attribs, true) :
+				JHTML::image($path.$img, $alt, $attribs) :
 				JHTML::_('image.site', $img, $path, NULL, NULL, $alt, $attribs) ;
 		} else {
 			$icon = $descr;
@@ -1560,10 +1563,10 @@ class flexicontent_html
 	{
 		if ( $params->get('show_icons') ) {
 			$voteup = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ), NULL, true) :
+				JHTML::image('components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ), NULL) :
 				JHTML::_('image.site', 'thumb_up.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_GOOD' ) ) ;
 			$votedown = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'thumb_down.png', JText::_( 'FLEXI_BAD' ), NULL, true) :
+				JHTML::image('components/com_flexicontent/assets/images/'.'thumb_down.png', JText::_( 'FLEXI_BAD' ), NULL) :
 				JHTML::_('image.site', 'thumb_down.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_BAD' ) ) ;
 		} else {
 			$voteup = JText::_( 'FLEXI_GOOD' ). '&nbsp;';
@@ -1956,7 +1959,7 @@ class flexicontent_html
 		if ($user->id && $favoured)
 		{
 			$image = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_( 'FLEXI_REMOVE_FAVOURITE' ), NULL, true) :
+				JHTML::image('components/com_flexicontent/assets/images/'.'heart_delete.png', JText::_( 'FLEXI_REMOVE_FAVOURITE' ), NULL) :
 				JHTML::_('image.site', 'heart_delete.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_REMOVE_FAVOURITE' )) ;
 			$text 		= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
 			$overlib 	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
@@ -1974,7 +1977,7 @@ class flexicontent_html
 		elseif($user->id)
 		{
 			$image = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_( 'FLEXI_FAVOURE' ), NULL, true) :
+				JHTML::image('components/com_flexicontent/assets/images/'.'heart_add.png', JText::_( 'FLEXI_FAVOURE' ), NULL) :
 				JHTML::_('image.site', 'heart_add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_FAVOURE' )) ;
 			$text 		= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE' );
 			$overlib 	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
@@ -1993,7 +1996,7 @@ class flexicontent_html
 			$overlib 	= JText::_( 'FLEXI_FAVOURE_LOGIN_TIP' );
 			$text 		= JText::_( 'FLEXI_FAVOURE' );
 			$image = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), NULL, true) :
+				JHTML::image('components/com_flexicontent/assets/images/'.'heart_login.png', JText::_( 'FLEXI_FAVOURE' ), NULL) :
 				JHTML::_('image.site', 'heart_login.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $text, 'class="editlinktip hasTip" title="'.$text.'::'.$overlib.'"' ) ;
 
 			$output		= $image;

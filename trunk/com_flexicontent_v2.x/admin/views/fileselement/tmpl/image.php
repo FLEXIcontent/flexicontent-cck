@@ -157,7 +157,7 @@ $session = JFactory::getSession();
 
 	<tbody>
 		<?php
-		$imageexts = array('jpg','gif','png','bmp');
+		$imageexts = array('jpg','gif','png','bmp','jpeg');
 		$index = JRequest::getInt('index', 0);
 		$k = 0;
 		$i = 0;

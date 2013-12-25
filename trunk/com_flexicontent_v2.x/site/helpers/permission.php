@@ -65,13 +65,49 @@ class FlexicontentHelperPerm
 			// ITEMS/CATEGORIES: category-inherited permissions, (NOTE: these are the global settings, so:)
 			// *** 1. the action permissions of individual items are checked seperately per item
 			// *** 2. the view permission is checked via the access level of each item
-			$permission->CanAdd				= $user->authorise('core.create', 				'com_flexicontent');
-			$permission->CanEdit			= $user->authorise('core.edit', 					'com_flexicontent');
-			$permission->CanEditOwn		= $user->authorise('core.edit.own', 			'com_flexicontent');
-			$permission->CanPublish		= $user->authorise('core.edit.state',			'com_flexicontent');
+			// --- *. We will check for SOFT DENY, and then try to find the FIRST ALLOWED CATEGORY FOR EACH ACTION
+			
+			$permission->CanAdd     = $user->authorise('core.create', 				'com_flexicontent');
+			if ($permission->CanAdd === NULL) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, false, $find_first = true );
+				$permission->CanAdd = count($allowedcats) > 0;
+			}
+			
+			$permission->CanEdit    = $user->authorise('core.edit', 					'com_flexicontent');
+			if ($permission->CanEdit === NULL) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit'), $require_all=true, $check_published = true, false, $find_first = true );
+				$permission->CanEdit = count($allowedcats) > 0;
+			}
+			
+			$permission->CanEditOwn = $user->authorise('core.edit.own', 			'com_flexicontent');
+			if ($permission->CanEditOwn === NULL) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit.own'), $require_all=true, $check_published = true, false, $find_first = true );
+				$permission->CanEditOwn = count($allowedcats) > 0;
+			}
+			
+			$permission->CanPublish = $user->authorise('core.edit.state',			'com_flexicontent');
+			if ($permission->CanPublish === NULL) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit.state'), $require_all=true, $check_published = true, false, $find_first = true );
+				$permission->CanPublish = count($allowedcats) > 0;
+			}
+			
 			$permission->CanPublishOwn= $user->authorise('core.edit.state.own',	'com_flexicontent');
+			if ($permission->CanPublishOwn === NULL) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit.state.own'), $require_all=true, $check_published = true, false, $find_first = true );
+				$permission->CanPublishOwn = count($allowedcats) > 0;
+			}
+			
 			$permission->CanDelete		= $user->authorise('core.delete', 				'com_flexicontent');
+			if ($permission->CanDelete === NULL) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.delete'), $require_all=true, $check_published = true, false, $find_first = true );
+				$permission->CanDelete = count($allowedcats) > 0;
+			}
+			
 			$permission->CanDeleteOwn	= $user->authorise('core.delete.own', 		'com_flexicontent');
+			if ($permission->CanDeleteOwn === NULL) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.delete.own'), $require_all=true, $check_published = true, false, $find_first = true );
+				$permission->CanDeleteOwn = count($allowedcats) > 0;
+			}
 			
 			// Permission for changing the access level of items and categories that user can edit
 			// (a) In J1.5, this is the FLEXIaccess component access permission, and
