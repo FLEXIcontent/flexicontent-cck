@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: route.php 1797 2013-10-26 02:45:09Z ggppdk $
+ * @version 1.5 stable $Id: route.php 1825 2013-12-25 19:31:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -381,9 +381,9 @@ class FlexicontentHelperRoute
 		// ********************************************************************************************************
 		
 		if ( $type ) {
-			$type_menu_itemid_usage = $type->params->get('type_menu_itemid_usage', 0);
+			$type_menu_itemid_usage = $type->params->get('type_menu_itemid_usage', 0);  // ZERO: do not use, 1: before component default, 2: after component default
 			$type_menu_itemid       = $type->params->get('type_menu_itemid', 0);
-			if ($type_menu_itemid) {
+			if ($type_menu_itemid_usage && $type_menu_itemid) {
 				// Get type menu item, check that it is valid and cache it
 				if ( !isset($type->typeMenuItem) ) {
 					$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
@@ -391,7 +391,7 @@ class FlexicontentHelperRoute
 				}
 				// Valid type menu item
 				if ($type->typeMenuItem) {
-					$match_lvl = $type_menu_itemid_usage ? 3 : 6;  // Priority 3: prefer type menu item instead of category prorities 4,5, but 6 is less ...
+					$match_lvl = $type_menu_itemid_usage==1 ? 3 : 6;  // Priority 3: prefer type menu item instead of category prorities 4,5, but 6 is less ...
 					$matches[ $match_lvl ] = $type->typeMenuItem;
 					$min_matched = $min_matched > $match_lvl ? $match_lvl : $min_matched;
 				}
@@ -544,9 +544,8 @@ class FlexicontentHelperRoute
 				if ( @$menuitem->query['view'] != 'flexicontent' ) continue;
 				
 				// Check non-related directory view
-				$matched_root   = @$menuitem->query['rootcat'] == $cid;
 				$matched_parent = @$menuitem->query['rootcat'] == $globalcats[$cid]->parent_id;
-				if ( !$matched_root && !$matched_parent ) continue;
+				if ( !$matched_parent ) continue;
 				
 				// Try to match any other given url variables, if these were specified and thus are required
 				$all_matched = true;
@@ -556,8 +555,7 @@ class FlexicontentHelperRoute
 				if ( !$all_matched ) continue;
 				
 				$match = $menuitem;
-				if ( $matched_root ) break; // DONE: we matched a directory having root the given category
-				// else ... category's parent was matched ... continue searching for better match
+				break; // DONE: we matched a directory having root the parent of given category
 			}
 			
 			if (isset($match))  break;  // If a menu item for a category found, do not search for next needles (category ids)
