@@ -44,7 +44,8 @@ class FlexicontentControllerImport extends FlexicontentController
 	
 	function getlineno() {
 		$session = JFactory::getSession();
-		$conf   = $session->get('csvimport_config', array(), 'flexicontent');
+		$conf   = $session->get('csvimport_config', "", 'flexicontent');
+		$conf		= unserialize(base64_decode($conf));
 		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 		if ( !empty($conf) )
 			echo 'success|'.count($conf['contents_parsed']).'|'.$lineno.'|'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());

@@ -334,11 +334,17 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		// allowed extensions
 		$filterext	=  JRequest::getVar( 'file-filter-ext', '', 'post' );
 		$filterext	= $filterext ? explode(',', $filterext) : array();
-		$confext	=  explode(',', $params->get('upload_extensions','jpg,png,gif,bmp'));
+		foreach($filterext as $_i => $_ext) $filterext[$_i] = strtolower($_ext);
+		
+		$confext	=  explode(',', $params->get('upload_extensions','jpg,png,gif,bmp,jpeg'));
+		foreach($confext as $_i => $_ext) $confext[$_i] = strtolower($_ext);
+		
+		// (optionally) Limit COMPONENT configured extensions, to those extensions requested by the FORM/URL variable
 		$allowed	= $filterext ? array_intersect($filterext, $confext) : $confext;
 	
 		jimport('joomla.utilities.date');
 		jimport('joomla.filesystem.file');
+		jimport('joomla.filesystem.folder');
 
 		$filesdir = JPath::clean(JPATH_SITE . $filesdir . DS);
 		
@@ -363,62 +369,64 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		
 		$c = 0;
 		$file_ids = array();
-		if($filenames) {
-			for ($n=0; $n<count($filenames); $n++) {
-				if (in_array(JFile::getExt($filesdir . $filenames[$n]), $allowed)) {
-					$source 		= $filesdir . $filenames[$n];
-					$filename		= flexicontent_upload::sanitize($destpath, $filenames[$n]);
-					$destination 	= $destpath . $filename;
-					$ext			= JFile::getExt($filesdir . $filenames[$n]);
-					
-					if ($keep) {
-						// Copy the file
-						if (JFile::copy($source, $destination))
-						{
-							$date = JFactory::getDate( 'now' );
+		if($filenames)
+		{
+			for ($n=0; $n<count($filenames); $n++)
+			{
+				$ext = strtolower(JFile::getExt($filesdir . $filenames[$n]));
+				if ( !in_array($ext, $allowed) ) continue;
+				
+				$source 		= $filesdir . $filenames[$n];
+				$filename		= flexicontent_upload::sanitize($destpath, $filenames[$n]);
+				$destination 	= $destpath . $filename;
+				
+				if ($keep) {
+					// Copy the file
+					if (JFile::copy($source, $destination))
+					{
+						$date = JFactory::getDate( 'now' );
 						
-							$obj = new stdClass();
-							$obj->filename    = $filename;
-							$obj->altname     = $filename;
-							$obj->url         = 0;
-							$obj->secure      = $secure;
-							$obj->ext         = $ext;
-							$obj->description = $filedesc;
-							$obj->language    = $filelang;
-							$obj->hits        = 0;
-							$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
-							$obj->uploaded_by = $user->get('id');
+						$obj = new stdClass();
+						$obj->filename    = $filename;
+						$obj->altname     = $filename;
+						$obj->url         = 0;
+						$obj->secure      = $secure;
+						$obj->ext         = $ext;
+						$obj->description = $filedesc;
+						$obj->language    = $filelang;
+						$obj->hits        = 0;
+						$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+						$obj->uploaded_by = $user->get('id');
 
-							// Add the record to the DB
-							$db->insertObject('#__flexicontent_files', $obj);
-							$file_ids[$filename] = $db->insertid();
-							
-							$c++;
-						}
-					} else {
-						// Move the file
-						if (JFile::move($source, $destination))
-						{
-							$date = JFactory::getDate( 'now' );
+						// Add the record to the DB
+						$db->insertObject('#__flexicontent_files', $obj);
+						$file_ids[$filename] = $db->insertid();
 						
-							$obj = new stdClass();
-							$obj->filename    = $filename;
-							$obj->altname     = $filename;
-							$obj->url         = 0;
-							$obj->secure      = $secure;
-							$obj->ext         = $ext;
-							$obj->description = $filedesc;
-							$obj->language    = $filelang;
-							$obj->hits        = 0;
-							$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
-							$obj->uploaded_by = $user->get('id');
+						$c++;
+					}
+				} else {
+					// Move the file
+					if (JFile::move($source, $destination))
+					{
+						$date = JFactory::getDate( 'now' );
+						
+						$obj = new stdClass();
+						$obj->filename    = $filename;
+						$obj->altname     = $filename;
+						$obj->url         = 0;
+						$obj->secure      = $secure;
+						$obj->ext         = $ext;
+						$obj->description = $filedesc;
+						$obj->language    = $filelang;
+						$obj->hits        = 0;
+						$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+						$obj->uploaded_by = $user->get('id');
 
-							// Add the record to the DB
-							$db->insertObject('#__flexicontent_files', $obj);
-							$file_ids[$filename] = $db->insertid();
-							
-							$c++;
-						}
+						// Add the record to the DB
+						$db->insertObject('#__flexicontent_files', $obj);
+						$file_ids[$filename] = $db->insertid();
+						
+						$c++;
 					}
 				}
 			}

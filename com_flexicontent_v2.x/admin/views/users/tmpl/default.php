@@ -126,7 +126,7 @@ window.addEvent('domready', function(){
 </script>
 
 <div class="flexicontent">
-<form action="index.php?option=com_flexicontent&controller=users&view=users" method="post" name="adminForm">
+<form action="index.php?option=com_flexicontent&controller=users&view=users" method="post" name="adminForm" id="adminForm">
 	
 	<table class="adminlist" cellpadding="1">
 		<thead>

@@ -27,7 +27,11 @@ jimport('joomla.application.component.view');
  */
 class FlexicontentViewUsers extends JViewLegacy
 {
-	function display($tpl = null)
+
+	/**
+	 * Display the view
+	 */
+	public function display($tpl = null)
 	{
 		$app      = JFactory::getApplication();
 		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );

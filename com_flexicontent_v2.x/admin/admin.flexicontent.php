@@ -129,7 +129,10 @@ if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) ) {
 	// Singular views do not (usually) have a controller, instead the 'Plural' controller is used
 	// Going through the controller makes sure that appropriate code is always executed
 	// Views/Layouts that can be called without a forced controller task (and without redirect to them, these must contain permission checking)
-	$view_to_ctrl = array('type'=>'types', 'item'=>'items', 'field'=>'fields', 'tag'=>'tags', 'category'=>'categories', 'user'=>'users', 'file'=>'filemanager');
+	$view_to_ctrl = array(
+		'type'=>'types', 'item'=>'items', 'field'=>'fields', 'tag'=>'tags',
+		'category'=>'categories', 'user'=>'users', 'file'=>'filemanager'
+	);
 	if ( isset($view_to_ctrl[$view]) ) {
 		$controller = $view_to_ctrl[$view];
 		if ( !$task ) $task = 'edit';  // default task for singular views is edit
