@@ -244,7 +244,7 @@ class com_flexicontentInstallerScript
 				</td>
 				<td valign="top" width="100%">
 		       	 	<strong>FLEXIcontent</strong><br/>
-		       	 	<span>Flexible content management system for Joomla! J1.5/J2.5</span><br />
+		       	 	<span>Flexible content management system for Joomla! J1.5/J2.5/J3.2</span><br />
 		        	<font class="small">by <a href="http://www.vistamedia.fr" target="_blank">Emmanuel Danan</a>,
 							Georgios Papadakis<br/>
 		        	<font class="small">and <a href="http://www.marvelic.co.th" target="_blank">Marvelic Engine Co.,Ltd.</a><br/>

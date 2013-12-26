@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1824 2013-12-23 03:42:45Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1825 2013-12-25 19:31:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

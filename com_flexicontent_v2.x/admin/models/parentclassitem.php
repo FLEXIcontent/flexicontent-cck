@@ -998,7 +998,7 @@ class ParentClassItem extends JModelAdmin
 				);
 				$canCreate = count($allowedcats) > 0;
 			}
-			$iparams_extra->set('access-create', canCreate);
+			$iparams_extra->set('access-create', $canCreate);
 			return $iparams_extra;  // New item, so do not calculate EDIT, DELETE and VIEW access
 		}
 		
