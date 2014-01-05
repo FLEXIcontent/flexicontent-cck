@@ -517,9 +517,10 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
   border-right: 1px solid #D0D0D0 !important;
   font-weight: normal !important;
   font-size: 12px !important;
-  font-family: arial !important;
+  font-family: georgia,arial !important;
   text-align: right !important;
   border-radius: 6px !important;
+  text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
 }
 
 .fc_filter .fc_filter_label {
@@ -808,7 +809,9 @@ ul.fc_field_filter.fc_checkradio_group label {
   padding:6px 3% 6px 1% !important;
   width: 14%;
   max-width:126px;
-	background: url(../images/icon-16-hint.png) 99% 5px no-repeat #F6F6F6;
+	background-image: url(../images/icon-16-hint.png);
+	background-position: 99% 5px;
+	background-repeat: no-repeat;
 }
 
 

@@ -70,6 +70,7 @@ class FlexicontentViewFields extends JViewLegacy
 			if (!$notice_content_type_order) {
 				$app->setUserState( $option.'.fields.notice_content_type_order', 1 );
 				$app->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_BY_TYPE'), 'notice');
+				$app->enqueueMessage(JText::_('FLEXI_DEFINE_FIELD_ORDER_FILTER_WITHOUT_TYPE'), 'notice');
 				$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
 			}
 		}

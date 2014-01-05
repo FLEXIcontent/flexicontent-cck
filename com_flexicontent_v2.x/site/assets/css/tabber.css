@@ -169,9 +169,9 @@ ul.tabbernav li.tabberactive a:hover
 }
 
 #flexicontent ul.tabbernav li a {
-	background: none repeat scroll 0 0 #AAAAEE;
+	background: none repeat scroll 0 0 #3276B1;
 	/*border-color: #222277;*/
-	color: #000000;
+	color: white;
 }
 
 #flexicontent ul.tabbernav li:hover a {
