@@ -4480,7 +4480,7 @@ class flexicontent_db
 	 * @return object
 	 * @since 1.5
 	 */
-	static function & directQuery($query)
+	static function & directQuery($query, $assoc = false, $unbuffered = false)
 	{
 		$db     = JFactory::getDBO();
 		$app = JFactory::getApplication();
@@ -4498,20 +4498,37 @@ class flexicontent_db
 		
 		$data = array();
 		if ($dbtype == 'mysqli') {
-			$result = mysqli_query( $db_connection , $query );
-			if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysqli_error($db_connection));
-			while($row = mysqli_fetch_object($result)) {
-				$data[] = $row;
+			$result = $unbuffered ?
+				mysqli_query( $db_connection , $query, MYSQLI_USE_RESULT ) :
+				mysqli_query( $db_connection , $query ) ;
+			if ($result===false)
+				throw new Exception('error '.__FUNCTION__.'():: '.mysqli_error($db_connection));
+			
+			if ($assoc) {
+				while($row = mysqli_fetch_assoc($result)) $data[] = $row;
+			} else {
+				while($row = mysqli_fetch_object($result)) $data[] = $row;
 			}
 			mysqli_free_result($result);
-		} else if ($dbtype == 'mysql') {
-			$result = mysql_query( $query, $db_connection  );
-			if ($result===false) throw new Exception('error '.__FUNCTION__.'():: '.mysql_error($db_connection));
-			while($row = mysql_fetch_object($result)) {
-				$data[] = $row;
+		}
+		
+		else if ($dbtype == 'mysql') {
+			$result = $unbuffered ?
+				mysql_unbuffered_query( $query, $db_connection ) :
+				mysql_query( $query, $db_connection  ) ;
+			
+			if ($result===false)
+				throw new Exception('error '.__FUNCTION__.'():: '.mysql_error($db_connection));
+				
+			if ($assoc) {
+				while($row = mysql_fetch_assoc($result)) $data[] = $row;
+			} else {
+				while($row = mysql_fetch_object($result)) $data[] = $row;
 			}
 			mysql_free_result($result);
-		} else {
+		}
+		
+		else {
 			throw new Exception( __FUNCTION__.'(): direct db query, unsupported DB TYPE' );
 		}
 

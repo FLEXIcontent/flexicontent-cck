@@ -544,8 +544,10 @@ class FlexicontentHelperRoute
 				if ( @$menuitem->query['view'] != 'flexicontent' ) continue;
 				
 				// Check non-related directory view
-				$matched_parent = @$menuitem->query['rootcat'] == @$globalcats[$cid]->parent_id;
-				if ( !$matched_parent ) continue;
+				if ($cid) {
+					$matched_parent = @$menuitem->query['rootcat'] == $globalcats[$cid]->parent_id;
+					if ( !$matched_parent ) continue;
+				}
 				
 				// Try to match any other given url variables, if these were specified and thus are required
 				$all_matched = true;

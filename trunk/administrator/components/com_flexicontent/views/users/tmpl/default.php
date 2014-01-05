@@ -384,6 +384,8 @@ window.addEvent('domready', function(){
 			?>
 		</tbody>
 	</table>
+	
+	<sup>[1]</sup> <?php echo JText::_('FLEXI_BY_DEFAULT_ONLY_AUTHORS_WITH_ITEMS_SHOWN'); ?><br />
 
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />

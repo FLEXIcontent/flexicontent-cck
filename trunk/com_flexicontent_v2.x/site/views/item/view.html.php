@@ -325,8 +325,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		$item->event->afterDisplayContent = trim(implode("\n", $results));
 
 		// Reverse the compatibility steps, set the view and option back to 'items' and 'com_flexicontent'
-	  JRequest::setVar('view', FLEXI_ITEMVIEW);
-	  JRequest::setVar('option', 'com_flexicontent');
+		JRequest::setVar('view', FLEXI_ITEMVIEW);
+		JRequest::setVar('option', 'com_flexicontent');
 
 		// Restore suppressed plugins
 		FLEXIUtilities::suppressPlugins($suppress_arr, 'restore' );

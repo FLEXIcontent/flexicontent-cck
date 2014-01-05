@@ -802,7 +802,7 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 #flexicontent span.flexi_label label {
 	float:right; margin:0px; padding:0px;
 	color:auto; font-size: 12px;
-	font-style: italic; font-family: arial;
+	font-style: normal; font-family: georgia, tahoma;
 }
 #flexicontent span.flexi_label label label { float:right; margin:auto; padding:auto; }
 
@@ -814,20 +814,21 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	display: block;
 	float: left !important;
 	clear: left !important;
-	color: #606060;
-  background-color: #F2F2F2;
+	color: white;
+  background-color: gray;
   border-bottom: 1px solid #D0D0D0;
   border-right: 1px solid #D0D0D0;
   font-size: 12px;
-  font-family: tahoma;
+  font-family: georgia, tahoma;
   font-weight: normal;
   text-align: right !important;
   width: 16%;
   max-width:150px;
   min-width:auto !important;
   margin: 2px 1% 3px 0% !important;
-  padding: 6px 1% 6px 1% !important;
+  padding: 4px 1% 4px 1% !important;
   border-radius:6px;
+  text-shadow: 1px 3px 2px rgba(0,0,0,0.3);
 }
 
 #flexicontent .flexi_params .fcdualline_container { margin: 0px; padding: 0px; float: left; min-width: 430px; }

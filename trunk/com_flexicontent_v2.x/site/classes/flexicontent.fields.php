@@ -2536,13 +2536,25 @@ class FlexicontentFields
 					. $view_join."\n"
 					. $view_where."\n"
 					;
-				$db->setQuery($sub_query);
 				
 				global $fc_run_times, $fc_jprof;
 				//$fc_jprof->mark('BEFORE FACETED INIT: FLEXIcontent component');
 				$start_microtime = microtime(true);
 				
-				$item_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+				try {
+					// 1, try to bypass joomla SQL layer, including Falang (slow in large sites, not needed in this query ?) !!
+					$rows = flexicontent_db::directQuery($sub_query, false, true);
+					$item_ids = array();
+					foreach ($rows as $row) $item_ids[] = $row->id;
+				}
+				
+				catch (Exception $e) {
+					// 2, get items via normal joomla SQL layer
+					$db->setQuery($sub_query);
+					$item_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+					if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+				}
+				
 				$item_ids_list = implode(',', $item_ids);
 				unset($item_ids);
 				

@@ -237,12 +237,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			// 1, create full query: filter, ordered, limited
 			$query = $this->_buildQuery();
-			$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
 			
 			try {
 				// 2, get items, we use direct query because some extensions break the SQL_CALC_FOUND_ROWS, so let's bypass them (at this point it is OK)
 				// *** Usage of FOUND_ROWS() will fail when (e.g.) Joom!Fish or Falang are installed, in this case we will be forced to re-execute the query ...
-				$rows = flexicontent_db::directQuery($query . ' LIMIT '.(int)$this->getState('limit').' OFFSET '.(int)$this->getState('limitstart'));
+				// PLUS, we don't need Joom!Fish or Falang layer at --this-- STEP which may slow down the query considerably in large sites
+				$query_limited = $query . ' LIMIT '.(int)$this->getState('limit').' OFFSET '.(int)$this->getState('limitstart');
+				$rows = flexicontent_db::directQuery($query_limited);
 				$query_ids = array();
 				foreach ($rows as $row) $query_ids[] = $row->id;
 				
@@ -253,6 +254,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			catch (Exception $e) {
 				// 2, get items via normal joomla SQL layer
+				$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
 				$query_ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 				
