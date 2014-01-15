@@ -225,6 +225,36 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 				$addthis_code .= $addthis_custom_code;
 			}
 			else {
+				$doc = JFactory::getDocument();
+				$app = JFactory::getApplication();
+				$title = trim($item->title)."<br />";
+				$matches = NULL;
+				preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $item->text, $matches);
+				$imageurl = @$matches[1][0];
+				if($imageurl) {
+					if($imageurl{0} == '/') {
+						$imageurls = explode('/', $imageurl);
+						$paths = array();
+						$found = false;
+						foreach($imageurls as $folder) {
+							if(!$found) {
+								if($folder!='images') continue;
+								else {
+									$found = true;
+								}
+							}
+							$paths[] = $folder;
+						}
+						$paths = implode('/', $paths);
+						$imageurl = JURI::root().$paths;
+					}
+				}
+				$text = trim(strip_tags($item->text));
+				$doc->addCustomTag("<meta property=\"og:title\" content=\"{$title}\" />");
+				$doc->addCustomTag("<meta property=\"og:site_name\" content=\"".$app->getCfg('sitename')."\" />");
+				$doc->addCustomTag("<meta property=\"og:description\" content=\"{$text}\" />");
+				$doc->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
+				$doc->addCustomTag("<meta property=\"og:type\" content=\"website\">");
 				switch ($addthis_custom_predefined) {
 					case 1:
 						$addthis_code .= '
