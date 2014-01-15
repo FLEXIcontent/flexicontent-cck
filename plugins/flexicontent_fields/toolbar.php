@@ -227,7 +227,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			else {
 				$doc = JFactory::getDocument();
 				$app = JFactory::getApplication();
-				$title = trim($item->title)."<br />";
+				$title = trim(strip_tags($item->title));
 				$matches = NULL;
 				preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $item->text, $matches);
 				$imageurl = @$matches[1][0];
@@ -245,8 +245,10 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 							}
 							$paths[] = $folder;
 						}
-						$paths = implode('/', $paths);
-						$imageurl = JURI::root().$paths;
+						$imageurl = implode('/', $paths);
+						$imageurl = JURI::root().$imageurl;
+					}elseif(substr($imageurl, 0, 7)=='images/') {
+						$imageurl = JURI::root().$imageurl;
 					}
 				}
 				$text = trim(strip_tags($item->text));
