@@ -28,7 +28,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
-	<table cellpadding="0" cellspacing="0" width="100%">
+	<table cellpadding="4" cellspacing="0" width="100%">
 		<tr>
 			<td width="50%" valign="top">
 				
@@ -132,7 +132,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 									</table>
 								</td>
 								<td valign="top">
-									<img src="../<?php echo $this->layout->thumb; ?>" alt="<?php echo JText::_( 'FLEXI_TEMPLATE_THUMBNAIL' ); ?>" />
+									<img src="../<?php echo $this->layout->thumb; ?>" alt="<?php echo JText::_( 'FLEXI_TEMPLATE_THUMBNAIL' ); ?>" style="max-width:none;" />
 								</td>
 							</tr>
 						</table>

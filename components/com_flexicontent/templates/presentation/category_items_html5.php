@@ -387,9 +387,7 @@ foreach ($items as $i => $item) :
 	
 	
 	<?php
-		$readmore_forced = $this->params->get('lead_strip_html', 1) == 1 ;  // option 2 strip-cuts without forcing read more
 		$readmore_shown  = $this->params->get('show_readmore', 1) && strlen(trim($item->fulltext)) >= 1;
-		$readmore_shown  = $readmore_shown || $readmore_forced;
 		$footer_shown = $readmore_shown ||
 			isset($item->positions['bottom']) || $item->event->afterDisplayContent;
 	?>

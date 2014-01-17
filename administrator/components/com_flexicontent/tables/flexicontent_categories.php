@@ -103,10 +103,15 @@ class flexicontent_categories extends JTable
 		if(empty($this->alias)) {
 			$this->alias = $this->title;
 		}
-		$this->alias = JFilterOutput::stringURLSafe($this->alias);
+		$this->alias = FLEXI_J16GE ?
+			JApplication::stringURLSafe($this->alias) :
+			JFilterOutput::stringURLSafe($this->alias);
+		
 		if(trim(str_replace('-','',$this->alias)) == '') {
 			$datenow = JFactory::getDate();
-			$this->alias = $datenow->toFormat("%Y-%m-%d-%H-%M-%S");
+			$this->alias = FLEXI_J16GE ?
+				$datenow->format($format = 'Y-M-d-H-i-s', $local = true) :
+				$datenow->toFormat($format = '%Y-%m-%d-%H-%M-%S');
 		}
 
 		return true;

@@ -129,6 +129,14 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-author-add.png', JText::_( 'FLEXI_ADD_AUTHOR' ) );
 						}
 
+						if ($this->dopostinstall && $this->perms->CanGroups)
+						{
+							$link = 'index.php?option='.$option.'&amp;view=groups';
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-groups.png', JText::_( 'FLEXI_GROUPS' ) );
+							$link = 'index.php?option='.$option.'&amp;'.(FLEXI_J16GE ? 'task=groups.add' : 'controller=groups&amp;task=add');
+							FlexicontentViewFlexicontent::quickiconButton( $link, 'icon-48-groups-add.png', JText::_( 'FLEXI_ADD_GROUP' ) );
+						}
+
 						/*if ($this->dopostinstall && $this->perms->CanArchives)
 						{
 							$link = 'index.php?option='.$option.'&amp;view=archive';

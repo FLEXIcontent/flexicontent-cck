@@ -1541,6 +1541,7 @@ div.fancybox-wrap a { background: none!important;}
 }
 
 #flexicontent .flexi.label, .flexi.label {
+  white-space: normal !important;
 	float: left !important;
   /*width: 16% !important;*/
 	display: block !important;

@@ -1069,6 +1069,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			. $joinaccess
 			. $creator_join
 			. ' WHERE c.published = 1'
+			.(FLEXI_J16GE ? ' AND c.extension='.$this->_db->Quote(FLEXI_CAT_EXTENSION) : '')
 			. $andparent
 			. $andaccess
 			. $orderby
@@ -1626,7 +1627,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($filter_ids === false) return $filters;
 		
 		// Sanitize the given filter_ids ... just in case
-		if ( is_string($filter_ids) ) $filter_ids = array($filter_ids);
+		if ( !is_array($filter_ids) ) $filter_ids = array($filter_ids);
 		$filter_ids = array_filter($filter_ids, 'is_numeric');
 		
 		// None selected filters means ALL

@@ -1174,11 +1174,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			<install type="language" version="1.5" client="both" method="upgrade">
 			    <name>FLEXIcontent '.$code.'</name>
 			    <tag>'.$code.'</tag>
-			    <creationDate>'.$date->toFormat("%Y-%m-%d").'</creationDate>
+			    <creationDate>'.(FLEXI_J16GE ? $date->format('Y-M-d', $local = true) : $date->toFormat("%Y-%m-%d")).'</creationDate>
 			    <author>'.$fromname.'</author>
 			    <authorEmail>'.$mailfrom.'</authorEmail>
 			    <authorUrl>'.$website.'</authorUrl>
-			    <copyright>(C) '.$date->toFormat("%Y").' '.$fromname.'</copyright>
+			    <copyright>(C) '.(FLEXI_J16GE ? $date->format('Y', $local = true) : $date->toFormat("%Y")).' '.$fromname.'</copyright>
 			    <license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 			    <description>'.$code.' language pack for FLEXIcontent</description>
 			    <administration>

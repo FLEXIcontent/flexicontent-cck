@@ -869,7 +869,7 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
   padding: 6px 3% 6px 1% !important;
   width: 14%;
   max-width:126px;
-	background: url(../images/lightbulb.png) 98% 5px no-repeat #F2F2F2;
+	background: url(../images/lightbulb.png) 98% 5px no-repeat gray;
 }
 
 #flexicontent .flexi_label.invalid {

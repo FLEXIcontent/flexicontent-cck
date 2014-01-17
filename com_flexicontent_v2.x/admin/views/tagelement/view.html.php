@@ -54,8 +54,8 @@ class FlexicontentViewTagelement extends JViewLegacy {
 		$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexicontent.css');
 
 		//Get data from the model
-		$rows      	= & $this->get( 'Data');
-		$pageNav 	= & $this->get( 'Pagination' );
+		$rows    = $this->get( 'Data');
+		$pageNav = $this->get( 'Pagination' );
 
 		// search filter
 		$lists['search']= $search;
@@ -66,9 +66,9 @@ class FlexicontentViewTagelement extends JViewLegacy {
 
 
 		//assign data to template
-		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('rows'      	, $rows);
-		$this->assignRef('pageNav' 		, $pageNav);
+		$this->assignRef('lists'     , $lists);
+		$this->assignRef('rows'      , $rows);
+		$this->assignRef('pageNav'   , $pageNav);
 
 		parent::display($tpl);
 	}

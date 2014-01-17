@@ -160,6 +160,7 @@ class FlexicontentHelperPerm
 			
 			// AUTHORS: management tab
 			$permission->CanAuthors		= $user->authorise('core.manage', 'com_users');
+			$permission->CanGroups		= 0;//FLEXI_J16GE ? $permission->CanAuthors : 0;
 			
 			// SEARCH INDEX: management tab
 			$permission->CanIndex			= $permission->CanFields && ($permission->CanAddField || $permission->CanEditField);

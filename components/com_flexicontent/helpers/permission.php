@@ -201,6 +201,7 @@ class FlexicontentHelperPerm
 			
 			// AUTHORS: management tab
 			$permission->CanAuthors		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_users', 'manage', 'users', $user->gmid) : 1;
+			$permission->CanGroups		= 0;//FLEXI_J16GE ? $permission->CanAuthors : 0;
 			
 			// SEARCH INDEX: management tab
 			$permission->CanIndex			= $permission->CanFields && ($permission->CanAddField || $permission->CanEditField);
