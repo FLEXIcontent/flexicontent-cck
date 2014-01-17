@@ -28,15 +28,17 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 <!-- BOF buttons -->
 	<?php
+	$add_button = $this->params->get('show_addbutton', 1) ? flexicontent_html::addbutton( $this->params, $this->category ) : '';
+	
 	if ( $this->params->get('show_print_icon')
 		|| $this->params->get('show_email_icon')
 		|| JRequest::getCmd('print')
 		|| $this->params->get('show_feed_icon', 1)
-		|| $this->params->get('show_addbutton', 1)
+		|| $add_button
 		) {
 	?>
 	<p class="buttons">
-		<?php if ($this->params->get('show_addbutton', 1)) echo flexicontent_html::addbutton( $this->params, $this->category ); ?>
+		<?php echo $add_button; ?>
 		<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
 		<?php echo flexicontent_html::mailbutton( 'category', $this->params, $this->category->slug ); ?>
 		<?php echo flexicontent_html::feedbutton( 'category', $this->params, $this->category->slug ); ?>

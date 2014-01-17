@@ -759,8 +759,9 @@ class flexicontent_html
 		// Strip SCRIPT tags AND their containing code
 		$text = preg_replace( '#<script\b[^>]*>(.*?)<\/script>#is', '', $text );
 		
-		// Add whitespaces at start/end of tags so that words will not be joined
-		$text = preg_replace('/(<\/[^>]+>)|(<[^>\/][^>]*>)/', ' $1', $text);
+		// Add whitespaces at start/end of tags so that words will not be joined,
+		//$text = preg_replace('/(<\/[^>]+>((?!\P{L})|(?=[0-9])))|(<[^>\/][^>]*>)/u', ' $1', $text);
+		$text = preg_replace('/(<\/[^>]+>(?![\:|\.|,|:|"|\']))|(<[^>\/][^>]*>)/u', ' $1', $text);
 		
 		// Strip html tags
 		$cleantext = strip_tags($text);
@@ -3049,7 +3050,10 @@ class flexicontent_upload
 		$format 	= strtolower(flexicontent_upload::getExt($file['name']));
 
 		$allowable = explode( ',', $params->get( 'upload_extensions' ));
+		foreach($allowable as $a => $allowable_ext) $allowable[$a] = strtolower($allowable_ext);
+		
 		$ignored = explode(',', $params->get( 'ignore_extensions' ));
+		foreach($ignored as $a => $ignored_ext) $ignored[$a] = strtolower($ignored_ext);
 		if (!in_array($format, $allowable) && !in_array($format,$ignored))
 		{
 			$err = 'FLEXI_WARNFILETYPE';
@@ -4805,6 +4809,7 @@ function FLEXISubmenu($cando)
 		if ($perms->CanFields) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
 		if ($perms->CanTags) 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
 		if ($perms->CanAuthors)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_AUTHORS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
+		if ($perms->CanGroups)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups');
 	//if ($perms->CanArchives)	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
 		if ($perms->CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
 		if ($perms->CanIndex)			JSubMenuHelper::addEntry( JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search');

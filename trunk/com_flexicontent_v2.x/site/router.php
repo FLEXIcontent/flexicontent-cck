@@ -198,6 +198,9 @@ function FLEXIcontentParseRoute($segments)
 	if($segments[0] == 'item' || $segments[0] == 'items') {
 		$vars['view'] = FLEXI_ITEMVIEW;
 		if ($count==2) {  // no cid provided
+			if ($menu->query['view']=='category' && (int)$menu->query['cid']) {
+				$vars['cid'] = (int)$menu->query['cid'];
+			}
 			$vars['id'] = $segments[1];
 		} else if ($count==3) {  // also cid provided
 			$vars['cid'] = $segments[1];
