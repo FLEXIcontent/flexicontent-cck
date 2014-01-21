@@ -79,9 +79,21 @@
 }
 /* Share */
 .flexi-socials-outside {
-	clear: both;
+	/*clear: both; Commented by Enjoyman*/
 	padding-top: 9px;
 	display:block;
+	
+	/* Added by Enjoyman */
+	float:left;
+	margin:0;
+	padding:0;
+	width:140px;
+}
+/* Added by Enjoyman */
+.addthis_toolbox{
+	margin:0;
+	padding:0;
+	width:140px;
 }
 
 .addthis_toolbox {font-size: 12px;}
