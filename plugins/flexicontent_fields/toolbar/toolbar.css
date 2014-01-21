@@ -85,8 +85,10 @@
 	
 	/* Added by Enjoyman */
 	float:left;
-	margin:0;
-	padding:0;
+	margin-left:0;
+	margin-right:0;
+	padding-left:0;
+	padding-right:0;
 	width:140px;
 }
 /* Added by Enjoyman */
