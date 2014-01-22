@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1762 2013-09-14 16:42:09Z ggppdk $
+ * @version 1.2 $Id: helper.php 1814 2013-11-29 21:40:32Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -107,21 +107,27 @@ class modFlexicontentHelper
 			//$img_fieldparams = FLEXI_J16GE ? new JRegistry($mod_image_dbdata->attribs) : new JParameter($mod_image_dbdata->attribs);
 		}
 		
-		// Retrieve default image for the image field
-		if ($display_hits || $display_hits_feat) {
-			$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type="hits"';
+		// Retrieve custom displayed field data (including their parameters and access):  hits/voting/etc
+		if ($display_hits || $display_hits_feat || $display_voting || $display_voting_feat) {
+			$query = 'SELECT * FROM #__flexicontent_fields';
+			
+			$disp_field_where = array();
+			if ($display_hits || $display_hits_feat)      $disp_field_where[] = 'field_type="hits"';
+			if ($display_voting || $display_voting_feat)  $disp_field_where[] = 'field_type="voting"';
+			$query .= ' WHERE ' . implode($disp_field_where, ' OR ');
 			$db->setQuery($query);
-			$hitsfield = $db->loadObject();
-			$hitsfield->parameters = FLEXI_J16GE ? new JRegistry($hitsfield->attribs) : new JParameter($hitsfield->attribs);
-			$has_access_hits = FLEXI_J16GE ? in_array($hitsfield->access, $aid_arr) : $hitsfield->access <= $aid;
-		}
-		
-		if ($display_voting || $display_voting_feat) {
-			$query = 'SELECT * FROM #__flexicontent_fields WHERE field_type="voting"';
-			$db->setQuery($query);
-			$votingfield = $db->loadObject();
-			$votingfield->parameters = FLEXI_J16GE ? new JRegistry($votingfield->attribs) : new JParameter($votingfield->attribs);
-			$has_access_voting = FLEXI_J16GE ? in_array($votingfield->access, $aid_arr) : $votingfield->access <= $aid;
+			$disp_fields_data = $db->loadObjectList('field_type');
+			
+			if ($display_hits || $display_hits_feat) {
+				$hitsfield = $disp_fields_data['hits'];
+				$hitsfield->parameters = FLEXI_J16GE ? new JRegistry($hitsfield->attribs) : new JParameter($hitsfield->attribs);
+				$has_access_hits = FLEXI_J16GE ? in_array($hitsfield->access, $aid_arr) : $hitsfield->access <= $aid;
+			}
+			if ($display_voting || $display_voting_feat) {
+				$votingfield = $disp_fields_data['voting'];
+				$votingfield->parameters = FLEXI_J16GE ? new JRegistry($votingfield->attribs) : new JParameter($votingfield->attribs);
+				$has_access_voting = FLEXI_J16GE ? in_array($votingfield->access, $aid_arr) : $votingfield->access <= $aid;
+			}
 		}
 		
 		// get module fields parameters
@@ -281,6 +287,11 @@ class modFlexicontentHelper
 		}
 		
 		
+		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW);
+		$active_item_id = JRequest::getInt('id', 0);
+		
 		$lists_arr = array();
 		foreach($filtered_rows_arr as $catid => $filtered_rows)
 		{
@@ -366,6 +377,8 @@ class modFlexicontentHelper
 					}
 					$lists[$ord]['featured'][$i] = new stdClass();
 					$lists[$ord]['featured'][$i]->id = $row->id;
+					$lists[$ord]['featured'][$i]->is_active_item = ($isflexi_itemview && $row->id==$active_item_id);
+					
 					//date
 					if ($display_date_feat == 1) {
 						$dateformat = JText::_($params->get('date_format_feat', 'DATE_FORMAT_LC3'));
@@ -494,6 +507,8 @@ class modFlexicontentHelper
 					
 					$lists[$ord]['standard'][$i] = new stdClass();
 					$lists[$ord]['standard'][$i]->id = $row->id;
+					$lists[$ord]['standard'][$i]->is_active_item = ($isflexi_itemview && $row->id==$active_item_id);
+					
 					//date
 					if ($display_date == 1) {
 						$dateformat = JText::_($params->get('date_format', 'DATE_FORMAT_LC3'));

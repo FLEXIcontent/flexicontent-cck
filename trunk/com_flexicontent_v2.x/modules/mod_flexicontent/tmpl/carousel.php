@@ -161,7 +161,7 @@ $_ns_fxOptions    = '{ duration:'.$duration.', transition: '.$effect_eased.', li
 			<?php $rowtoggler = !$rowtoggler; ?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler) ? 'odd' : 'even'; ?>">
+			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler) ? 'odd' : 'even'; ?> <?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>">
 				
 				<!-- BOF current item's title -->	
 				<?php if ($display_title_feat) : ?>
@@ -320,7 +320,7 @@ $_ns_fxOptions    = '{ duration:'.$duration.', transition: '.$effect_eased.', li
 			?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_standard_wrapper <?php echo $oe_class; ?>"
+			<div class="mod_flexicontent_standard_wrapper <?php echo $oe_class; ?> <?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>"
 				onmouseover="mod_fc_carousel<?php echo $module->id; ?>.stop(); mod_fc_carousel<?php echo $module->id; ?>.autoPlay=false;"
 				onmouseout="if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $_ns_interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==-1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $_ns_interval; ?>,'previous',true);"
 			>

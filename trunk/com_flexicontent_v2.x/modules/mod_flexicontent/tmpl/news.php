@@ -116,7 +116,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 			<?php $rowtoggler = !$rowtoggler; ?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler) ? 'odd' : 'even'; ?>">
+			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler) ? 'odd' : 'even'; ?> <?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>">
 				
 				<!-- BOF current item's title -->	
 				<?php if ($display_title_feat) : ?>
@@ -261,7 +261,7 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 			?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_standard_wrapper <?php echo $oe_class; ?>"
+			<div class="mod_flexicontent_standard_wrapper <?php echo $oe_class; ?> <?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>"
 				onmouseover=""
 				onmouseout=""
 			>
