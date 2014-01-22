@@ -166,6 +166,14 @@
 	font-weight: bold !important;
 }
 
+.mod_flexicontent_wrapper .fcitem_active .fcitem_title a,  /* news template, etc */
+.mod_flexicontent_wrapper .fcitem_active a.fcitem_link    /* default template, etc */
+{
+	border-radius: 8px !important;
+	background-color: darkred !important;
+	color: white !important;
+	padding: 2px 4px !important;
+}
 
 /*******************/
 /* CSS HACKS START */

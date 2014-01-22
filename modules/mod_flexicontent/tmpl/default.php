@@ -49,9 +49,11 @@ defined('_JEXEC') or die('Restricted access');
 		<ul class="mod_flexicontent<?php echo $moduleclass_sfx; ?> mod_flexicontent_featured">
 			
 			<?php foreach ($list[$ord]['featured'] as $item) : ?>
-			<li>
+			<li class="<?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>" >
 				<?php if ($add_tooltips) : ?>
-				<a href="<?php echo $item->link; ?>" class="hasTip" title="<?php echo htmlspecialchars($item->fulltitle, ENT_COMPAT, "UTF-8").'::'.htmlspecialchars($item->text, ENT_COMPAT, "UTF-8"); ?>">
+				<a href="<?php echo $item->link; ?>"
+						class="hasTip fcitem_link"
+						title="<?php echo htmlspecialchars($item->fulltitle, ENT_COMPAT, "UTF-8").'::'.htmlspecialchars($item->text, ENT_COMPAT, "UTF-8"); ?>">
 					<?php echo $item->title; ?>
 				</a>
 				<?php else : ?>
@@ -72,9 +74,11 @@ defined('_JEXEC') or die('Restricted access');
 		<ul class="mod_flexicontent<?php echo $moduleclass_sfx; ?> mod_flexicontent_standard">
 			
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
-			<li>
+			<li class="<?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>" >
 				<?php if ($add_tooltips) : ?>
-				<a href="<?php echo $item->link; ?>" class="hasTip" title="<?php echo htmlspecialchars($item->fulltitle, ENT_COMPAT, "UTF-8").'::'.htmlspecialchars($item->text, ENT_COMPAT, "UTF-8"); ?>">
+				<a href="<?php echo $item->link; ?>"
+						class="hasTip fcitem_link"
+						title="<?php echo htmlspecialchars($item->fulltitle, ENT_COMPAT, "UTF-8").'::'.htmlspecialchars($item->text, ENT_COMPAT, "UTF-8"); ?>">
 					<?php echo $item->title; ?>
 				</a>
 				<?php else : ?>

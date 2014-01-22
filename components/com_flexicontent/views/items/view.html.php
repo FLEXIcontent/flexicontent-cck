@@ -197,7 +197,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		$m_cid = (int) @$menu->query['cid'] ;
 
 		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
-		if ( $menu && ($menu->query['view'] != FLEXI_ITEMVIEW || $m_cid != JRequest::getInt('cid') || JRequest::getInt('id') ) ) {
+		if ( $menu && (@$menu->query['view'] != FLEXI_ITEMVIEW || $m_cid != JRequest::getInt('cid') || JRequest::getInt('id') ) ) {
 			$params->set('page_title',	$item->title);
 			$params->set('pageclass_sfx',	'');
 		}
