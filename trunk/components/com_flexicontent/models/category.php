@@ -834,21 +834,36 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$text = trim( $text );
 		if( strlen($text) )
 		{
-			$quoted_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
-			$quoted_text = $db->Quote( $quoted_text, false );
+			$escaped_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
+			$quoted_text = $db->Quote( $escaped_text, false );
 			
 			switch ($phrase)
 			{
 				case 'natural':
-					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.') ';
+					$_text_match = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.') ';
 					break;
 				
 				case 'natural_expanded':
-					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
+					$_text_match = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
 					break;
 				
 				case 'exact':
-					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$words = preg_split('/\s\s*/u', $text);
+					$stopwords = array();
+					$shortwords = array();
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
+					if (empty($words)) {
+						// All words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
+						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+						JRequest::setVar('shortwords', implode(' ', $shortwords));
+						$_text_match = ' 0=1 ';
+					} else {
+						$newtext = '+' . implode( ' +', $words );
+						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+						$quoted_text = $db->Quote( $quoted_text, false );
+						$exact_text  = $db->Quote( '%'. $escaped_text .'%', false );
+						$_text_match = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND ie.search_index LIKE '.$exact_text;
+					}
 					break;
 				
 				case 'all':
@@ -862,7 +877,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$newtext = '+' . implode( ' +', $words );
 					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 				
 				case 'any':
@@ -877,7 +892,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$newtext = implode( ' ', $words );
 					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match  = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 			}
 			
