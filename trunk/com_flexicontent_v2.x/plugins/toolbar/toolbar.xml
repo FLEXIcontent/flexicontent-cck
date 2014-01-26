@@ -74,7 +74,7 @@
 			</field>
 			<field name="addthis_user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USERNAME" description="FLEXI_FIELD_TOOLBAR_USERNAME_DESC" />
 			<field name="addthis_pubid" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_PUBID" description="FLEXI_FIELD_TOOLBAR_PUBID_DESC" />
-			<field name="addthis_outside_toolbar" type="radio" default="1" label="Place outside toolbar" description="Place AddThis social buttons inside toolbar. Note: This effects online inline buttons and not the floating buttons">
+			<field name="addthis_outside_toolbar" type="radio" default="1" label="Place outside of toolbar" description="Place AddThis social buttons outside of toolbar. &lt;br/&gt; &lt;b&gt;Note:&lt;b&gt; This only effects display of inline buttons and is ignored when using the floating buttons">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
@@ -92,6 +92,52 @@
 			
 			<field name="" type="separator" default="CASE B: Custom HTML code (overrides above)" description="" level="level2" />
 			<field name="addthis_custom_code" type="textarea" default="" label="(Addthis) HTML Code" description="Enter custom -AddThis- HTML code. First, please read AddThis online documentation, and make sure not to enter broken HTML code" rows="20" cols="38"  filter="raw" />
+			
+			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level2" />
+			
+			<field name="" type="separator" default="Site name" description="page" level="level3" />
+			<field name="add_og_site_name" type="list" default="0" label="FLEXI_ADD" description="Select what should be suggested as site name of current page">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Real site name</option>
+				<!--option value="2">Custom Field</option-->
+			</field>
+			<!--field name="og_site_name_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
+			
+			<field name="" type="separator" default="Title" description="" level="level3" />
+			<field name="add_og_title" type="list" default="0" label="FLEXI_ADD" description="Select what should be suggested as title of current page">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Item's title</option>
+				<!--option value="2">Custom Field</option-->
+			</field>
+			<!--field name="og_title_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
+			<!--field name="og_title_maxlen" type="text" default="100" label="Max length" description="Max length of the text" /-->
+			
+			<field name="" type="separator" default="Description" description="" level="level3" />
+			<field name="add_og_descr" type="list" default="0" label="FLEXI_ADD" description="Select what should be suggested as description of current page">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Item's description</option>
+				<!--option value="2">Custom Field</option-->
+			</field>
+			<!--field name="og_descr_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text or textarea field" /-->
+			<!--field name="og_descr_maxlen" type="text" default="300" label="Max length" description="Max length of the text" /-->
+			
+			<field name="" type="separator" default="Content type" description="page" level="level3" />
+			<field name="add_og_type" type="list" default="0" label="FLEXI_ADD" description="Select what should be suggested as content type of current page">
+				<option value="0">FLEXI_NO</option>
+				<option value="website">Use 'website'</option>
+				<!--option value="1">Item's type</option-->
+				<!--option value="2">Custom Field</option-->
+			</field>
+			<!--field name="og_type_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
+			
+			<field name="" type="separator" default="Image" description="page" level="level3" />
+			<field name="add_og_image" type="list" default="0" label="FLEXI_ADD" description="Select what should be suggested as image of current page">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Extract from description</option>
+				<!--option value="2">Custom field</option-->
+				<!--option value="3">Custom field, then fallback to extract</option-->
+			</field>
+			<!--field name="og_image_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be an image field" /-->
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_DISPLAY" level="level1" />
 			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_CSS" description="FLEXI_FIELD_TOOLBAR_CSS_DESC">

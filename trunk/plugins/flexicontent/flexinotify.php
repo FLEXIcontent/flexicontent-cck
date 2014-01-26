@@ -178,6 +178,10 @@ class plgFlexicontentFlexinotify extends JPlugin
 		// Import utility class that contains the send mail helper function
 		if (!FLEXI_J16GE) jimport( 'joomla.utilities.utility' );
 		jimport( 'joomla.mail.helper' );
+		if (FLEXI_J16GE) {
+			$mailer = JFactory::getMailer();
+			$mailer->Encoding = 'base64';
+		}
 		
 		// Parameters for 'message' language string
 		//
@@ -189,9 +193,12 @@ class plgFlexicontentFlexinotify extends JPlugin
 		// 6: $sitename	Website
 		
 		$send_personalized  = $params->get('send_personalized', 1);
-		$personalized_limit = $params->get('personalized_limit', 50);
-		$personalized_limit = $personalized_limit <= 100 ? $personalized_limit : 100;
-		$send_personalized  = count($subscribers) <= $personalized_limit ? true : false;
+		if ($send_personalized) {
+			// Disable personalized messages if subscriber limit for personal messages is exceeded
+			$personalized_limit = $params->get('personalized_limit', 50);
+			$personalized_limit = $personalized_limit <= 100 ? $personalized_limit : 100;
+			$send_personalized  = count($subscribers) <= $personalized_limit ? true : false;
+		}
 		$include_fullname   = $params->get('include_fullname', 1);
 		$user_autologin     = $params->get('autologin', 1);
 		$debug_notifications= $params->get('debug_notifications', 0);
@@ -243,7 +250,8 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$sendermail	= JMailHelper::cleanAddress($sendermail);
 		$sendername	= $params->get('sendername', $app->getCfg('sitename'));
 		$subject	= $params->get('mailsubject', '') ? JMailHelper::cleanSubject($params->get('mailsubject')) : JText::_('FLEXI_SUBJECT_DEFAULT');
-		$message 	= JText::sprintf('FLEXI_NOTIFICATION_MESSAGE', $subname, $itemid, $title, $maincat, $link, $sitename);
+		$message 	= JText::sprintf('FLEXI_NOTIFICATION_MESSAGE', $subname, $itemid, $title, $maincat, '<a href="'.$link.'">'.$link.'</a>', $sitename);
+		$message  = nl2br($message);
 		
 		
 		// *************************************************
@@ -268,11 +276,11 @@ class plgFlexicontentFlexinotify extends JPlugin
 				$from      = $sendermail;
 				$fromname  = $sendername;
 				$recipient = array($to);
-				$html_mode=false; $cc=null; $bcc=null;
+				$html_mode=true; $cc=null; $bcc=null;
 				$attachment=null; $replyto=null; $replytoname=null;
 				
 				$send_result = FLEXI_J16GE ?
-					JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
+					$mailer->sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
 					JUtility::sendMail( $from, $fromname, $recipient, $subject, $_message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 				if ($send_result) $count_sent++;
 			}
@@ -297,11 +305,11 @@ class plgFlexicontentFlexinotify extends JPlugin
 				$from      = $sendermail;
 				$fromname  = $sendername;
 				$recipient = array($from);
-				$html_mode=false; $cc=null; $bcc = $to_100;
+				$html_mode=true; $cc=null; $bcc = $to_100;
 				$attachment=null; $replyto=null; $replytoname=null;
 				
 				$send_result = FLEXI_J16GE ?
-					JFactory::getMailer()->sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
+					$mailer->sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname ) :
 					JUtility::sendMail( $from, $fromname, $recipient, $subject, $message, $html_mode, $cc, $bcc, $attachment, $replyto, $replytoname );
 				if ($send_result) $count_sent += count($to_100);
 			}
