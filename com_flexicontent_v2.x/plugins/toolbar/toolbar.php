@@ -213,21 +213,39 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			';
 		}
 
-		// AddThis button
+		// AddThis social SHARE buttons, also optionally add OPEN GRAPH TAGs
 		if ($display_social)
 		{
-			$addthis_outside_toolbar  = $field->parameters->get('addthis_outside_toolbar', 0);
-			$addthis_custom_code       = $field->parameters->get('addthis_custom_code', false);
-			$addthis_custom_predefined = $field->parameters->get('addthis_custom_predefined', false);
-			
-			$addthis_code = '';
-			if ($addthis_custom_code) {
-				$addthis_code .= $addthis_custom_code;
+			// ***************
+			// OPEN GRAPH TAGs
+			// ***************
+			// OPEN GRAPH: site name
+			if ($field->parameters->get('add_og_site_name'))
+			{
+				$document->addCustomTag("<meta property=\"og:site_name\" content=\"".JFactory::getApplication()->getCfg('sitename')."\" />");
 			}
-			else {
-				$doc = JFactory::getDocument();
-				$app = JFactory::getApplication();
+			
+			// OPEN GRAPH: title
+			if ($field->parameters->get('add_og_title')) {
 				$title = trim(strip_tags($item->title));
+				$document->addCustomTag("<meta property=\"og:title\" content=\"{$title}\" />");
+			}
+			
+			// OPEN GRAPH: description
+			if ($field->parameters->get('add_og_descr'))
+			{
+				$text = trim(strip_tags($item->text));
+				$document->addCustomTag("<meta property=\"og:description\" content=\"{$text}\" />");
+			}
+			
+			// OPEN GRAPH: type
+			if ($field->parameters->get('add_og_type')) {
+				$document->addCustomTag("<meta property=\"og:type\" content=\"website\">");
+			}
+			
+			// OPEN GRAPH: image (extracted from item's description text)
+			if ($field->parameters->get('add_og_image'))
+			{
 				$matches = NULL;
 				preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $item->text, $matches);
 				$imageurl = @$matches[1][0];
@@ -251,12 +269,23 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 						$imageurl = JURI::root().$imageurl;
 					}
 				}
-				$text = trim(strip_tags($item->text));
-				$doc->addCustomTag("<meta property=\"og:title\" content=\"{$title}\" />");
-				$doc->addCustomTag("<meta property=\"og:site_name\" content=\"".$app->getCfg('sitename')."\" />");
-				$doc->addCustomTag("<meta property=\"og:description\" content=\"{$text}\" />");
-				$doc->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
-				$doc->addCustomTag("<meta property=\"og:type\" content=\"website\">");
+				$document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
+			}
+			
+			
+			// ****************************
+			// AddThis social SHARE buttons
+			// ****************************
+			
+			$addthis_outside_toolbar  = $field->parameters->get('addthis_outside_toolbar', 0);
+			$addthis_custom_code       = $field->parameters->get('addthis_custom_code', false);
+			$addthis_custom_predefined = $field->parameters->get('addthis_custom_predefined', false);
+			
+			$addthis_code = '';
+			if ($addthis_custom_code) {
+				$addthis_code .= $addthis_custom_code;
+			}
+			else {
 				switch ($addthis_custom_predefined) {
 					case 1:
 						$addthis_code .= '

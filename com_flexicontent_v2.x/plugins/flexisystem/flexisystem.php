@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexisystem.php 1693 2013-07-01 23:12:46Z ggppdk $
+ * @version 1.5 stable $Id: flexisystem.php 1764 2013-09-16 08:00:21Z ggppdk $
  * @plugin 1.1
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -606,7 +606,7 @@ class plgSystemFlexisystem extends JPlugin
 	public function onAfterRender()
 	{
 		$fparams = JComponentHelper::getParams('com_flexicontent');
-		$session 	= JFactory::getSession();
+		$session = JFactory::getSession();
 		
 		// If this is reached we now that the code for setting screen cookie has been added
 		if ( $session->get('screenSizeCookieToBeAdded', 0, 'flexicontent') ) {
@@ -614,107 +614,21 @@ class plgSystemFlexisystem extends JPlugin
 			$session->set('screenSizeCookieToBeAdded', 0, 'flexicontent');
 		}
 		
-		$print_logging_info = $fparams->get('print_logging_info');
-		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
-		
-		$this->replaceFieldsInResponse();
-		
-		if ($print_logging_info) $fc_run_times['global_field_replacements'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		
 		// Load language string for javascript usage in J1.5
 		if ( !FLEXI_J16GE && class_exists('fcjsJText') )  fcjsJText::load();
 		
 		return true;
 	}
 	
+		
+	
 	
 	/**
-    * Utility Function: Implements field replacements, allowing 'rendered display' of any field(s) to be placed anywhere inside the joomla response HTML, formats are:
-    * {flexifield: %fieldname% item:%itemid% method:%methodname%} e.g. {flexifield:field29 item:117 method:display}
-    * {flexifield: %fieldid%   item:%itemid% method:%methodname%} e.g. {flexifield:29      item:117 method:display}
-    *
-    * @access public
-    * @return void
-    */
-	function replaceFieldsInResponse()
-	{
-		$app = JFactory::getApplication();
-		
-		// Only execute in SITE environment
-		if ($app->getName() == 'site' ) {
-			$document = JFactory::getDocument();
-			$docType = $document->getType();
-			
-			// Only in html
-			if ($docType != 'html') return;
-			$html = JResponse::getBody();
-			
-			$regex_full = '/{flexifield:'
-					.'\s*'
-					.'([^\s]+)'  // field name or field id
-					.'\s+'
-				 .'([^}]+)'    // other properties ...
-				 .'}/i';
-			
-			$result = preg_match_all($regex_full, $html, $matches);
-			//echo "<pre>"; print_r($matches); echo "</pre>";
-			if (!$result) return true;
-			
-			foreach ($matches as $k => $match_arr) {
-				if ($k==0) continue;
-				foreach ($match_arr as $i => $match)
-					$matches[$k][$i] = trim(str_replace('&nbsp;','',$match));
-			}
-			
-			$full_texts  = $matches[0];
-			$field_names = $matches[1];
-			
-			$prop_lists  = $matches[2];
-			//echo "Fields: "; print_r($field_names); echo "<br/>";
-			
-			$item_ids  = array();
-			$methods   = array();
-
-			$regex_properties = '/\s*'
-				.'([^\s]+)'    // property name
-				.'\s*:\s*'
-				.'([^\s}]+)\s*'  // property value
-			 	.'/i';
-			foreach ($prop_lists as $p => $property_list) {
-				preg_match_all($regex_properties, $property_list, $property_matches, PREG_SET_ORDER);
-				// echo "<pre>"; print_r($property_matches); echo "</pre>";
-				foreach ($property_matches as $pm) {
-					//echo "{$pm[1]} : {$pm[2]}\n<br>"; 
-					switch ( $pm[1] ) {
-						case 'item':
-						$item_ids[$p] = (int)$pm[2];
-						break;
-						case 'method':
-							$methods[$p] = JFilterInput::clean( htmlspecialchars_decode($pm[2]), 'CMD');
-							break;
-						default: break;
-					}
-				}
-			}
-			echo "item_ids: "; print_r($item_ids); echo "<br/>"; echo "methods: ";print_r($methods); 
-			
-			$disp = FlexicontentFields::renderFields( $item_per_field=true, $item_ids, $field_names, $view=FLEXI_ITEMVIEW, $methods, $cfparams=array() );
-			
-			foreach ($full_texts as $i => $full_text) {
-				echo $full_text ." - ";
-				if ( isset( $disp[ $item_ids[$i] ] [ $field_names[$i] ] ) )
-					$html = str_replace( $full_text, $disp[ $item_ids[$i] ] [ $field_names[$i] ] ,$html);
-				else
-					$html = str_replace( $full_text, 'not found item: '.$item_ids[$i].' '.$field_names[$i]  ,$html);
-			}
-			
-			//$html = preg_replace( "/<body/", "<body somevar='aaa' ", $html);
-			JResponse::setBody($html);
-		}
-	}
-	
-	
-	// J1.6+ only
+	 * Before header HTML is created but after modules and component HTML has been created, this is a good place to call any code that needs to add CSS/JS files
+	 *
+	 * @access public
+	 * @return boolean
+	 */
 	/*public function onBeforeCompileHead() {
 	}*/
 	

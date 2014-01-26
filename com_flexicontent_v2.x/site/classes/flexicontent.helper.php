@@ -1380,7 +1380,7 @@ class flexicontent_html
 		$view = JRequest::getVar('view');
 		$layout = JRequest::getVar('layout', 'default');
 		if ( !$auto_relations ) {
-			if ( $view!='category' || $layout != 'author' ) return '';
+			if ( $view!='category' || $layout == 'author' ) return '';
 		}
 		
 		
