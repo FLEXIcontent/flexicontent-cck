@@ -5,7 +5,7 @@
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- *
+ * 
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -52,45 +52,67 @@ class JElementQfcategory extends JElement
 			$attributes = & $node->_attributes;
 		}
 		
-		$fieldName	= $control_name.'['.$name.']';
+		$value = FLEXI_J16GE ? $this->value : $value;
+		if (FLEXI_J16GE) {
+			$paramset = isset($attributes['paramset']) ? $attributes['paramset'] : 'request';
+		}
+		$required = isset($attributes['required']) ? $attributes['required'] : false;
+		
+		$fieldname = FLEXI_J16GE ? "jform[".$paramset."][".$this->element["name"]."]" : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? "jform_".$paramset."_".$node["name"] : "a_id";
+		$prompt_str = JText::_( 'FLEXI_SELECT_ONE_CATEGORY', true );
 
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
 		$item = JTable::getInstance('flexicontent_categories', '');
 		if ($value) {
 			$item->load($value);
+			$title = $item->title;
 		} else {
-			$item->title = JText::_( 'FLEXI_SELECT_ONE_CATEGORY' );
-			$value = "";
+			$title = "";
+			$value = "";  // clear possible invalid value
 		}
+		
+		$required_js = "";
+		$required_param = "";
+		
+		// J1.5 does not have required, we implement it via custom JS
+		if (!FLEXI_J16GE) {
+			if ( @$attributes['required'] ) {
+				$required_js ="
+					$$('#toolbar-apply a.toolbar').setProperty('onclick',
+						\" if ( $('a_id').getProperty('value') != '' ) { $('urlparams".$attributes["name"]."-lbl').setStyle('color',''); submitbutton('apply'); } else { alert('".$prompt_str."'); $('urlparams".$attributes["name"]."-lbl').setStyle('color','red'); } \"
+					);
 
-		if ( @$attributes['required'] && JRequest::getVar('option')=='com_flexicontent' ) {
-			$required ="
-				$$('#toolbar-apply a.toolbar').setProperty('onclick',
-					\" if ( $('a_id').getProperty('value') != '' ) submitbutton('apply'); else alert('".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."'); \"
-				);
-
-				$$('#toolbar-save a.toolbar').setProperty('onclick',
-					\" if ( $('a_id').getProperty('value') != '' ) submitbutton('save'); else alert('".JText::_( 'FLEXI_SELECT_ONE_CATEGORY' )."'); \"
-				);
-			";
-		} else $required="";
-
+					$$('#toolbar-save a.toolbar').setProperty('onclick',
+						\" if ( $('a_id').getProperty('value') != '' ) { $('urlparams".$attributes["name"]."-lbl').setStyle('color',''); submitbutton('save'); } else { alert('".$prompt_str."'); $('urlparams".$attributes["name"]."-lbl').setStyle('color','red'); } \"
+					);
+				";
+			}
+		}
+		
+		// J1.6+ does have required form capability, add a HTML tag parameter
+		else {
+			$required_param = $required ? ' required="required" class="required" aria-required="true" ' : '';
+		}
+		
 		$js = "
 		window.addEvent( 'domready', function()
 		{
 			$('remove').addEvent('click', function(){
-				$('a_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_ONE_CATEGORY',true )."');
-				$('a_id').setProperty('value', '');
+				$('a_name').setProperty('value', '');
+				$('".$element_id."').setProperty('value', '');
 			});
-
-		".$required."
+			".$required_js."
 		});
 
-		function qfSelectCategory(cid, title) {
-			document.getElementById('a_id').value = cid;
+		function qfSelectCategory(id, title) {
+			document.getElementById('".$element_id."').value = id;
 			document.getElementById('a_name').value = title;
-			document.getElementById('sbox-window').close();
+			".(!FLEXI_J16GE ?
+				"document.getElementById('sbox-window').close();" :
+				"$('sbox-btn-close').fireEvent('click');"
+			)."
 		}";
 
 		$link = 'index.php?option=com_flexicontent&amp;view=qfcategoryelement&amp;tmpl=component';
@@ -98,10 +120,10 @@ class JElementQfcategory extends JElement
 
 		JHTML::_('behavior.modal', 'a.modal');
 
-		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"a_name\" value=\"{$item->title}\" disabled=\"disabled\" /></div>";
-		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x: 800, y: 500}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
-		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldName\" value=\"$value\" />";
-		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a id=\"remove\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\"  href=\"#\"\">".JText::_( 'FLEXI_REMOVE_VALUE' )."</a></div></div>\n";
+		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"a_name\" value=\"{$title}\" ".$required_param." readonly=\"readonly\" /></div>";
+		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal btn btn-small btn-success\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x: 800, y: 500}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
+		$html .= "\n<input type=\"hidden\" id=\"".$element_id."\" name=\"".$fieldname."\" ".$required_param." value=\"{$value}\" />";
+		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"btn btn-small btn-danger\" id=\"remove\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\"  href=\"#\"\">".JText::_( 'FLEXI_REMOVE_VALUE' )."</a></div></div>\n";
 
 		return $html;
 	}

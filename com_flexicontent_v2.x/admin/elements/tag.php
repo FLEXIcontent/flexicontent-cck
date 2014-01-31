@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tag.php 171 2010-03-20 00:44:02Z emmanuel.danan $
+ * @version 1.5 stable $Id: fctag.php 1800 2013-11-01 04:30:57Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -22,66 +22,24 @@ if (FLEXI_J16GE) {
 	jimport('joomla.html.html');
 	jimport('joomla.form.formfield');
 }
+require "fctag.php";
 
 /**
- * Renders an Tag element
+ * Renders an FC Tag element
  *
  * @package Joomla
  * @subpackage FLEXIcontent
  * @since 1.0
  */
 
-class JFormFieldTag extends JFormField
+class JFormFieldTag extends JFormFieldFctag
 {
-/**
+ /**
 	* Element name
 	*
 	* @access	protected
 	* @var		string
 	*/
 	var	$type = 'Tag';
-
-	function getInput()
-	{
-		$doc = JFactory::getDocument();
-		$value     = FLEXI_J16GE ? $this->value : $value;
-		$fieldname = FLEXI_J16GE ? "jform[request][".$this->element["name"]."]" : $control_name.'['.$name.']';
-
-		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-
-		$item = JTable::getInstance('flexicontent_tags', '');
-		if ($value) {
-			$item->load($value);
-		} else {
-			$item->name = JText::_( 'FLEXI_SELECT_TAG' );
-		}
-
-		$js = "
-		window.addEvent( 'domready', function()
-		{
-			$('remove').addEvent('click', function(){
-				$('a_name').setProperty('value', '".JText::_( 'FLEXI_SELECT_TAG' )."');
-				$('a_id').setProperty('value', '0');
-			});
-		});
-
-		function qfSelectTag(id, title) {
-			document.getElementById('a_id').value = id;
-			document.getElementById('a_name').value = title;
-			$('sbox-btn-close').fireEvent('click');
-		}";
-
-		$link = 'index.php?option=com_flexicontent&amp;view=tagelement&amp;tmpl=component';
-		$doc->addScriptDeclaration($js);
-
-		JHTML::_('behavior.modal', 'a.modal');
-
-		$html = "\n<div style=\"float: left;\"><input style=\"background: #ffffff;\" type=\"text\" id=\"a_name\" value=\"$item->name\" disabled=\"disabled\" /></div>";
-		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a class=\"modal\" title=\"".JText::_( 'FLEXI_SELECT' )."\"  href=\"$link\" rel=\"{handler: 'iframe', size: {x: 650, y: 375}}\">".JText::_( 'FLEXI_SELECT' )."</a></div></div>\n";
-		$html .= "\n<input type=\"hidden\" id=\"a_id\" name=\"$fieldname\" value=\"$value\" />";
-		$html .= "<div class=\"button2-left\"><div class=\"blank\"><a id=\"remove\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\"  href=\"#\"\">".JText::_( 'FLEXI_REMOVE_VALUE' )."</a></div></div>\n";
-
-		return $html;
-	}
 }
 ?>

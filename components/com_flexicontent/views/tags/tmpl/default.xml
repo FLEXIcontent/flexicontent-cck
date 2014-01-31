@@ -10,7 +10,7 @@
 		<name>FLEXICONTENT_TAGS</name>
 		<description>FLEXICONTENT_TAGS_DESC</description>
 		<url addpath="/administrator/components/com_flexicontent/elements">
-			<field name="id" type="tag" default="0" label="FLEXI_SELECT_TAG" description="FLEXI_SELECT_TAG_DESC" />
+			<field name="id" type="fctag" default="0" label="FLEXI_SELECT_TAG" required="required" description="FLEXI_SELECT_TAG_DESC" />
 		</url>
 		<params addpath="/administrator/components/com_flexicontent/elements">
 			

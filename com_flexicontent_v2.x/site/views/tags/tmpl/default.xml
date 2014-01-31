@@ -9,7 +9,7 @@
 	
 	<fields name="request">
 		<fieldset name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
-			<field name="id" type="tag" default="0" label="FLEXI_SELECT_TAG" description="FLEXI_SELECT_TAG_DESC" />
+			<field name="id" type="fctag" default="0" label="FLEXI_SELECT_TAG" required="required" description="FLEXI_SELECT_TAG_DESC" />
 		</fieldset> 
 	</fields>
 	
