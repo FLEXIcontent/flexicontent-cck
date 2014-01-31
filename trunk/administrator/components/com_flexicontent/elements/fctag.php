@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: qfcategory.php 1759 2013-09-09 16:39:47Z ggppdk $
+ * @version 1.5 stable $Id: fctag.php 1800 2013-11-01 04:30:57Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -24,14 +24,14 @@ if (FLEXI_J16GE) {
 }
 
 /**
- * Renders an Item element
+ * Renders an FC Tag element
  *
  * @package Joomla
  * @subpackage FLEXIcontent
  * @since 1.0
  */
 
-class JFormFieldQfcategory extends JFormField
+class JElementFctag extends JElement
 {
  /**
 	* Element name
@@ -39,9 +39,9 @@ class JFormFieldQfcategory extends JFormField
 	* @access	protected
 	* @var		string
 	*/
-	var	$type = 'Qfcategory';
+	var	$_name = 'Fctag';
 
-	function getInput()
+	function fetchElement($name, $value, &$node, $control_name)
 	{
 		$doc = JFactory::getDocument();
 		if (FLEXI_J16GE) {
@@ -60,14 +60,14 @@ class JFormFieldQfcategory extends JFormField
 		
 		$fieldname = FLEXI_J16GE ? "jform[".$paramset."][".$this->element["name"]."]" : $control_name.'['.$name.']';
 		$element_id = FLEXI_J16GE ? "jform_".$paramset."_".$node["name"] : "a_id";
-		$prompt_str = JText::_( 'FLEXI_SELECT_ONE_CATEGORY', true );
+		$prompt_str = JText::_( 'FLEXI_SELECT_TAG', true );
 
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 
-		$item = JTable::getInstance('flexicontent_categories', '');
+		$item = JTable::getInstance('flexicontent_tags', '');
 		if ($value) {
 			$item->load($value);
-			$title = $item->title;
+			$title = $item->name;
 		} else {
 			$title = "";
 			$value = "";  // clear possible invalid value
@@ -106,7 +106,7 @@ class JFormFieldQfcategory extends JFormField
 			".$required_js."
 		});
 
-		function qfSelectCategory(id, title) {
+		function qfSelectTag(id, title) {
 			document.getElementById('".$element_id."').value = id;
 			document.getElementById('a_name').value = title;
 			".(!FLEXI_J16GE ?
@@ -115,7 +115,7 @@ class JFormFieldQfcategory extends JFormField
 			)."
 		}";
 
-		$link = 'index.php?option=com_flexicontent&amp;view=qfcategoryelement&amp;tmpl=component';
+		$link = 'index.php?option=com_flexicontent&amp;view=tagelement&amp;tmpl=component';
 		$doc->addScriptDeclaration($js);
 
 		JHTML::_('behavior.modal', 'a.modal');

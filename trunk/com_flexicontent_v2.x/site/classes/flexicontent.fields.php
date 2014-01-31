@@ -2565,8 +2565,8 @@ class FlexicontentFields
 			$item_id_col = $filter->iscore ? 'i.id' : 'fi.item_id';
 			$query = 'SELECT '. $valuesselect .($faceted_filter && $show_matches ? ', COUNT(DISTINCT '.$item_id_col.') as found ' : '')."\n"
 				. $valuesfrom."\n"
-				.(!$filter->iscore ? ' JOIN #__content AS i ON fi.item_id=i.id ' : '')
-				.(!empty($filters_where['search']) ? ' LEFT JOIN #__flexicontent_items_ext AS ie ON fi.item_id = ie.item_id' : '')
+				.(!$filter->iscore ? ' JOIN #__content AS i ON fi.item_id = i.id ' : '')    // CUSTOM fields only, content table is not already JOINED, join it
+				.(@ $filters_where['search'] ? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' : '')   // extended data TABLE, needs to be joined when doing TEXT search
 				. $valuesjoin."\n"
 				. ' WHERE 1 '."\n"
 				. (!$item_ids_list ? '' : ' AND '.$item_id_col.' IN('.$item_ids_list.')'."\n")

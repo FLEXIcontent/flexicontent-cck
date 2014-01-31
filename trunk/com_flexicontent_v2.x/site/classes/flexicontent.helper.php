@@ -4562,9 +4562,12 @@ class flexicontent_db
 		if ($order=='commented') {
 			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
 				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br>\n";
-				$order='';
+				$order='default';
 			} 
 		}
+		
+		
+		
 		
 		// 'order' contains a symbolic order name to indicate using the category / global ordering setting
 		switch ($order) {

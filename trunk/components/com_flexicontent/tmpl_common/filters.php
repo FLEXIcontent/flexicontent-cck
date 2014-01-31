@@ -20,7 +20,7 @@ $use_filters = $params->get('use_filters', 0) && $filters;
 $show_filter_labels = $params->get('show_filter_labels', 1);
 
 // a ZERO initial value of show_search_go ... is AUTO
-$show_search_go = $show_search_go || !$filter_autosubmit || $use_search;
+$show_search_go = $show_search_go || !$filter_autosubmit;// || $use_search;
 
 // Calculate needed flags
 $filter_instructions = ($use_search || $use_filters) ? $filter_instructions : 0;
