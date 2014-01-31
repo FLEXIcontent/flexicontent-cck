@@ -16,10 +16,11 @@ if ($this->params->get('show_alpha', 1)) :
 endif;
 
 $limit_selector = flexicontent_html::limit_selector( $this->params );
-$orderby_selector = flexicontent_html::ordery_selector( $this->params );
+$orderby_selector = flexicontent_html::ordery_selector( $this->params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='');
+$orderby_selector_2nd = flexicontent_html::ordery_selector( $this->params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='_2nd');
 ?>
 
-<?php if (count($this->items) && ($this->params->get('show_item_total', 1) || $limit_selector || $orderby_selector )) : ?>
+<?php if (count($this->items) && ($this->params->get('show_item_total', 1) || $limit_selector || $orderby_selector || $orderby_selector_2nd )) : ?>
 
 	<!-- BOF items total-->
 	<div id="item_total" class="item_total group">
@@ -39,6 +40,12 @@ $orderby_selector = flexicontent_html::ordery_selector( $this->params );
 		<?php if ($orderby_selector) : ?>
 			<span class="fc_orderby_label hasTip" title="<?php echo JText::_('FLEXI_ORDERBY'); ?>::<?php echo JText::_('FLEXI_ORDERBY_INFO'); ?>">
 				<span class="fc_orderby_selector"><?php echo $orderby_selector;?></span>
+			</span>
+		<?php endif; ?>
+		
+		<?php if ($orderby_selector_2nd) : ?>
+			<span class="fc_orderby_label hasTip" title="<?php echo JText::_('FLEXI_ORDERBY'); ?>::<?php echo JText::_('FLEXI_ORDERBY_INFO'); ?>">
+				<span class="fc_orderby_selector"><?php echo $orderby_selector_2nd;?></span>
 			</span>
 		<?php endif; ?>
 		

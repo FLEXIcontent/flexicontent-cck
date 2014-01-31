@@ -2883,28 +2883,35 @@ class FlexicontentFields
 		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
 		$order = $params->get( 'orderby'.$sfx, 'alpha' );
 		$orderby = flexicontent_db::buildItemOrderBy($params, $order, $request_var='', $config_param='', $item_tbl_alias = 'i', $relcat_tbl_alias = 'rel', '', '', $sfx);
+		$orderby_join = '';
 		
-		// Create JOIN for ordering items by a custom field
-		$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid'.$sfx, 0);
-		if ($orderbycustomfieldid) {
-			$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
+		// Create JOIN for ordering items by a custom field (use SFC)
+		if ( 'field' == $order[1] ) {
+			$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid'.$sfx, 0);
+			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
+		}
+		
+		// Create JOIN for ordering items by a custom field (Level 2)
+		if ( $sfx=='' && 'field' == $order[2] ) {
+			$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
+			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
 		}
 		
 		// Create JOIN for ordering items by a most commented
-		else if ($order=='commented') {
-			$orderby_col  = ', count(com.object_id) AS comments_total';
-			$orderby_join = ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
+		if ( in_array('commented', $order) ) {
+			$orderby_col   = ', count(com.object_id) AS comments_total';
+			$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
 		}
 		
 		// Create JOIN for ordering items by a most rated
-		else if ($order=='rated') {
-			$orderby_col  = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
-			$orderby_join = ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
+		if ( in_array('rated', $order) ) {
+			$orderby_col   = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
+			$orderby_join .= ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
 		}
 		
 		// Create JOIN for ordering items by author name
-		else if ($order=='author' || $order=='rauthor') {
-			$orderby_join = ' LEFT JOIN #__users AS u ON u.id = i.created_by';
+		if ( in_array('author', $order) || in_array('rauthor', $order) ) {
+			$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
 		}
 		
 		// Because query includes specific items it should be fast

@@ -168,7 +168,7 @@
 			<field name="" type="separator" default="Defaults" description="" level="level3" hr="false" menu="hide" />
 			
 			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
-			<field name="orderby" type="list" default="rdate" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
+			<field name="orderby" type="list" default="rdate" label="FLEXI_BASIC_ORDER" description="FLEXI_BASIC_ORDER_DESC">
 				<!--option value="drelevanceate">FLEXI_ORDER_OLDEST_FIRST</option-->
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
@@ -188,7 +188,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="orderby_override" type="radio" default="1" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC" menu="hide" >
+			<field name="orderby_override" type="radio" default="1" label="FLEXI_BASIC_ORDER" description="FLEXI_BASIC_ORDER_DESC" menu="hide" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -199,7 +199,7 @@
 			<field name="orderby_options" type="fccheckbox" default="" display_useglobal="0" menu="hide" 
 				checkoptions="FLEXI_ORDER_DEFAULT_INITIAL,FLEXI_ORDER_OLDEST_FIRST,FLEXI_ORDER_MOST_RECENT_FIRST,FLEXI_ORDER_LAST_MODIFIED_FIRST, FLEXI_ORDER_TITLE_ALPHABETICAL,FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE,FLEXI_ORDER_AUTHOR_ALPHABETICAL,FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE, FLEXI_ORDER_MOST_HITS,FLEXI_ORDER_LEAST_HITS,FLEXI_ORDER_CONFIGURED_ORDER"
 				checkvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order" defaultvals="_preconfigured_,date,rdate,modified,alpha,ralpha,author,rauthor,hits,rhits,order"
-				label="FLEXI_PRIMARY_ORDER_OPTIONS" description="FLEXI_PRIMARY_ORDER_OPTIONS_DESC" />
+				label="FLEXI_ORDER_OPTIONS" description="FLEXI_ORDER_OPTIONS_DESC" />
 		
 		
 		<field name="" type="separator" level="level1" default="FC Advanced Search plugin: &lt;small&gt;Override Configuration&lt;/small&gt;" />

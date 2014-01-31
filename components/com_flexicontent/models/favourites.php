@@ -291,33 +291,40 @@ class FlexicontentModelFavourites extends JModelLegacy
 		}
 		
 		// Create sql WHERE clause
-		$where		= $this->_buildItemWhere();
+		$where = $this->_buildItemWhere();
 		
 		// Create sql ORDERBY clause -and- set 'order' variable (passed by reference), that is, if frontend user ordering override is allowed
 		$order = '';
-		$orderby	= $this->_buildItemOrderBy($order);
+		$orderby = $this->_buildItemOrderBy($order);
+		$orderby_join = '';
 		
-		// Create JOIN for ordering items by a custom field
-		if ($order=='field') {
+		// Create JOIN for ordering items by a custom field (Level 1)
+		if ( 'field' == $order[1] ) {
 			$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
-			$orderby_join = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
+			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
+		}
+		
+		// Create JOIN for ordering items by a custom field (Level 2)
+		if ( 'field' == $order[2] ) {
+			$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
+			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
 		}
 		
 		// Create JOIN for ordering items by a most commented
-		else if ($order=='commented') {
-			$orderby_col  = ', count(com.object_id) AS comments_total';
-			$orderby_join = ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
+		if ( in_array('commented', $order) ) {
+			$orderby_col   = ', count(com.object_id) AS comments_total';
+			$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
 		}
 		
 		// Create JOIN for ordering items by a most rated
-		else if ($order=='rated') {
-			$orderby_col  = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
-			$orderby_join = ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
+		if ( in_array('rated', $order) ) {
+			$orderby_col   = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
+			$orderby_join .= ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
 		}
 		
 		// Create JOIN for ordering items by their ordering attribute (in item's main category)
-		else if ($order=='order') {
-			$orderby_join = ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id AND rel.catid = i.catid';
+		if ($order=='order') {
+			$orderby_join .= ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id AND rel.catid = i.catid';
 		}
 		
 		$query = 'SELECT i.id, i.*, ie.* '
