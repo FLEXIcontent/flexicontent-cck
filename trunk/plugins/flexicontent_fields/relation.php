@@ -261,7 +261,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$orderby = flexicontent_db::buildItemOrderBy($field->parameters, $order, $request_var='', $config_param='', $item_tbl_alias = 'i', $relcat_tbl_alias = 'rel');
 		
 		// Create JOIN for ordering items by a most rated
-		if ($order=='author' || $order=='rauthor') {
+		if ( in_array('author', $order) || in_array('rauthor', $order) ) {
 			$orderby_join = ' LEFT JOIN #__users AS u ON u.id = i.created_by';
 		}
 		

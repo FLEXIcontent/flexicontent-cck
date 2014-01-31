@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1825 2013-12-25 19:31:46Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1836 2014-01-26 00:23:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -184,20 +184,20 @@ class flexicontent_html
 		return JHTML::_('select.genericlist', $limiting, 'limit', $attribs, 'value', 'text', $limit );
 	}
 
-	static function ordery_selector(&$params, $formname='adminForm', $autosubmit=1, $extra_order_types=array())
+	static function ordery_selector(&$params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='')
 	{
-		if ( !$params->get('orderby_override') ) return '';
+		if ( !$params->get('orderby_override'.$sfx, 0) ) return '';
 
 		$app	= JFactory::getApplication();
 		//$orderby = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-		$orderby = $app->getUserStateFromRequest( 'orderby', 'orderby', ''/*$params->get('orderby')*/, 'string' );
+		$orderby = $app->getUserStateFromRequest( 'orderby', 'orderby', ''/*$params->get('orderby'.$sfx)*/, 'string' );
 
 		flexicontent_html::loadFramework('select2');
 		$classes  = "fc_field_filter use_select2_lib";
 		$onchange = !$autosubmit ? '' : ' onchange="document.getElementById(\''.$formname.'\').submit();" ';
 		$attribs  = ' class="'.$classes.'" ' . $onchange;
 		
-		$orderby_options = $params->get('orderby_options', array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','id','rid','order'));
+		$orderby_options = $params->get('orderby_options'.$sfx, array('_preconfigured_','date','rdate','modified','alpha','ralpha','author','rauthor','hits','rhits','id','rid','order'));
 		$orderby_options = FLEXIUtilities::paramToArray($orderby_options);
 
 		$orderby_names =array('_preconfigured_'=>'FLEXI_ORDER_DEFAULT_INITIAL',
@@ -4553,7 +4553,7 @@ class flexicontent_db
 
 		// 1. If forced ordering not given, then use ordering parameters from configuration
 		if (!$order) {
-			$order = $params->get('orderbycustomfieldid'.$sfx, 0) ? 'field' : $params->get($config_param.$sfx, 'default');
+			$order = $params->get('orderbycustomfieldid'.$sfx, 0) ? 'field' : $params->get($config_param.$sfx,  $order_default_1st = 'rdate');
 		}
 
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
@@ -4566,9 +4566,59 @@ class flexicontent_db
 			} 
 		}
 		
+		$filter_order_1st = $default_order;
+		$filter_order_dir_1st = $default_order_dir;
+		flexicontent_db::_getOrderByClause($params, $order, $i_as, $rel_as, $filter_order_1st, $filter_order_dir_1st, $sfx);
+		$order_arr[1] = $order;
+		$orderby = ' ORDER BY '.$filter_order_1st.' '.$filter_order_dir_1st;
 		
 		
+		// ****************************************************************
+		// 2nd level ordering, (currently only supported when no SFX given)
+		// ****************************************************************
 		
+		if ($sfx!='') {
+			$orderby .= $filter_order_1st != $i_as.'.title'  ?  ', '.$i_as.'.title'  :  '';
+			$order = $order_arr[1];  // compatibility with other views ?
+			return $orderby;
+		}
+		
+		$order = '';  // Clear this, thus force retrieval from parameters (below)
+		$sfx='_2nd';  // Set suffix of second level ordering
+		
+		// 1. If forced ordering not given, then use ordering parameters from configuration
+		if (!$order) {
+			$order = $params->get('orderbycustomfieldid'.$sfx, 0) ? 'field' : $params->get($config_param.$sfx, $order_default_2nd = 'alpha');
+		}
+
+		// 2. If allowing user ordering override, then get ordering from HTTP request variable
+		$order = $request_var && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
+
+		if ($order=='commented') {
+			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
+				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br>\n";
+				$order='default';
+			} 
+		}
+		
+		$filter_order_2nd='';
+		$filter_order_dir_2nd='';
+		if ($order!='default') {
+			flexicontent_db::_getOrderByClause($params, $order, $i_as, $rel_as, $filter_order_2nd, $filter_order_dir_2nd, $sfx);
+			$order_arr[2] = $order;
+			$orderby .= ', '.$filter_order_2nd.' '.$filter_order_dir_2nd;
+		}
+		
+		// Order by title after default ordering
+		$orderby .= ($filter_order_1st != $i_as.'.title' && $filter_order_2nd != $i_as.'.title')  ?  ', '.$i_as.'.title'  :  '';
+		$order = $order_arr;
+		return $orderby;
+	}
+	
+	
+	// Create order clause sub-parts
+	static function _getOrderByClause(&$params, &$order='', $i_as='i', $rel_as='rel', &$filter_order='', &$filter_order_dir='', $sfx='')
+	{
 		// 'order' contains a symbolic order name to indicate using the category / global ordering setting
 		switch ($order) {
 			case 'date': case 'addedrev': /* 2nd is for module */
@@ -4614,7 +4664,8 @@ class flexicontent_db
 
 			// SPECIAL case custom field
 			case 'field':
-				$filter_order = $params->get('orderbycustomfieldint'.$sfx, 0) ? 'CAST(f.value AS UNSIGNED)' : 'f.value';
+				$cf = $sfx == '_2nd' ? 'f2' : 'f';
+				$filter_order = $params->get('orderbycustomfieldint'.$sfx, 0) ? 'CAST('.$cf.'.value AS UNSIGNED)' : $cf.'.value';
 				$filter_order_dir	= $params->get('orderbycustomfielddir'.$sfx, 'ASC');
 				break;
 
@@ -4642,15 +4693,10 @@ class flexicontent_db
 
 			case 'default':
 			default:
-				$filter_order     = $default_order ? $default_order : $i_as.'.title';
-				$filter_order_dir = $default_order_dir ? $default_order_dir : 'ASC';
+				$filter_order     = $filter_order ? $filter_order : $i_as.'.title';
+				$filter_order_dir = $filter_order_dir ? $filter_order_dir : 'ASC';
 				break;
 		}
-
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir;
-		$orderby .= ($filter_order!=$i_as.'.title')  ?  ', '.$i_as.'.title'  :  '';   // Order by title after default ordering
-
-		return $orderby;
 	}
 
 
@@ -4671,7 +4717,7 @@ class flexicontent_db
 		}
 
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$order = $request_var && ($request_order = JRequest::getVar($request_var)) ? $request_order : $order;
+		$order = $request_var && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
 
 		switch ($order) {
 			case 'date' :                  // *** J2.5 only ***

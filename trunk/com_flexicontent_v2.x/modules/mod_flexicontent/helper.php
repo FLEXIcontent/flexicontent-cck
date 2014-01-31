@@ -1422,8 +1422,8 @@ class modFlexicontentHelper
 		if ( empty($items_query) ) {  // If a custom query has not been set above then use the default one ...
 			$items_query 	= 'SELECT '
 				.' i.id '
-				. ($ordering=='commented' ? ','.$select_comments : '')
-				. ($ordering=='rated'? ','.$select_rated : '')
+				. (in_array('commented', $ordering) ? ','.$select_comments : '')
+				. (in_array('rated', $ordering) ? ','.$select_rated : '')
 				. ' FROM #__content AS i'
 				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 				. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
@@ -1433,8 +1433,8 @@ class modFlexicontentHelper
 				. $joinaccess
 				. $join_favs
 				. $join_date
-				.($ordering=='commented' ? $join_comments : '')
-				.($ordering=='rated' ? $join_rated : '')
+				. (in_array('commented', $ordering) ? $join_comments : '')
+				. (in_array('rated', $ordering) ? $join_rated : '')
 				. $join_field
 				. $join_field_filters
 				. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')

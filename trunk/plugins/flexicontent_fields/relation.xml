@@ -49,7 +49,7 @@
 			</field>
 			<field name="maxtitlechars" type="text" default="40" label="FLEXI_RIFLD_TITLE_MAXLEN" description="FLEXI_RIFLD_TITLE_MAXLEN_DESC" />
 			
-			<field name="orderby_form" type="list" default="alpha" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
+			<field name="orderby_form" type="list" default="alpha" label="FLEXI_BASIC_ORDER" description="FLEXI_BASIC_ORDER_DESC">
 				<option value="">FLEXI_ORDER_DEFAUKT</option>
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
@@ -113,7 +113,7 @@
 			<field name="" type="separator" default="FLEXI_RIFLD_RELATED_ITEM_LIST" level="level1" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_ORDER_ORDERING" level="level2" menu="hide" />
-			<field name="orderby" type="list" default="alpha" label="FLEXI_PRIMARY_ORDER" description="FLEXI_PRIMARY_ORDER_DESC">
+			<field name="orderby" type="list" default="alpha" label="FLEXI_BASIC_ORDER" description="FLEXI_BASIC_ORDER_DESC">
 				<option value="">FLEXI_ORDER_DEFAUKT</option>
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
@@ -131,12 +131,12 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_ORDER" description="" level="level3" />
-			<field name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_ID_DESC" />
-			<field name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_PRIMARY_ORDER_CUSTOM_FIELD_DIR_DESC" >
+			<field name="orderbycustomfieldid" type="fields" exclude_field_type="toolbar,file,image" isnotcore="1" default="0" label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" />
+			<field name="orderbycustomfielddir" type="list" default="ASC" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" >
 				<option value="ASC">FLEXI_ASC</option>
 				<option value="DESC">FLEXI_DESC</option>
 			</field>
-			<field name="orderbycustomfieldint" type="list" default="0" label="FLEXI_PRIMARY_ORDERING_METHOD" description="FLEXI_PRIMARY_ORDERING_METHOD_DESC" >
+			<field name="orderbycustomfieldint" type="list" default="0" label="FLEXI_ORDERING_METHOD" description="FLEXI_ORDERING_METHOD_DESC" >
 				<option value="0">FLEXI_ALPHANUMERIC</option>
 				<option value="1">FLEXI_NUMERIC</option>
 			</field>
