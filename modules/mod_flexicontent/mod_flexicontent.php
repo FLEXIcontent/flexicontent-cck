@@ -67,11 +67,14 @@ if ( $show_mod )
 	modFlexicontentHelper::verifyParams( $params );
 	
 	// get module ordering & count parameters
-	$ordering 				= $params->get('ordering');
-	$ordering_addtitle 	= $params->get('ordering_addtitle',1);
-	if (!is_array($ordering)) { $ordering = explode(',', $ordering); }
+	$ordering					= $params->get('ordering', array());
+	$ordering_addtitle= $params->get('ordering_addtitle',1);
 	$count 					= (int)$params->get('count', 5);
 	$featured				= (int)$params->get('count_feat', 1);
+	
+	// Default ordering is 'added' if none ordering is set. Also make sure $ordering is an array (of ordering groups)
+	if ( empty($ordering) )    $ordering = array('added');
+	if (!is_array($ordering))  $ordering = explode(',', $ordering);
 	
 	// get module's basic display parameters
 	$moduleclass_sfx= $params->get('moduleclass_sfx', '');

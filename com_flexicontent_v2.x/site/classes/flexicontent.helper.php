@@ -4550,19 +4550,29 @@ class flexicontent_db
 	{
 		// Use global params ordering if parameters were not given
 		if (!$params) $params = JComponentHelper::getParams( 'com_flexicontent' );
-
-		// 1. If forced ordering not given, then use ordering parameters from configuration
+		
+		$order_fallback = 'rdate';  // Use as default or when an invalid ordering is requested
+		$orderbycustomfieldid = (int) $params->get('orderbycustomfieldid'.$sfx, 0);
+		
+		// 1. If a FORCED -ORDER- is not given, then use ordering parameters from configuration. NOTE: custom field ordering takes priority
 		if (!$order) {
-			$order = $params->get('orderbycustomfieldid'.$sfx, 0) ? 'field' : $params->get($config_param.$sfx,  $order_default_1st = 'rdate');
+			$order = $orderbycustomfieldid  ?  'field'  :  $params->get($config_param.$sfx, $order_fallback);
 		}
-
+		
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$order = $request_var && ($request_order = JRequest::getVar($request_var)) ? $request_order : $order;
-
+		$order = $request_var && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
+		
+		// 3. Check various cases of invalid order, print warning, and reset ordering to default
+		if ($order=='field') {
+			if ( !$orderbycustomfieldid ) {
+				echo "Custom field ordering was selected, but no custom field is selected to be used for ordering<br/>";
+				$order = $order_fallback;
+			}
+		}
 		if ($order=='commented') {
 			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
 				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br>\n";
-				$order='default';
+				$order = $order_fallback;
 			} 
 		}
 		
@@ -4579,25 +4589,34 @@ class flexicontent_db
 		
 		if ($sfx!='') {
 			$orderby .= $filter_order_1st != $i_as.'.title'  ?  ', '.$i_as.'.title'  :  '';
-			$order = $order_arr[1];  // compatibility with other views ?
+			$order = $order_arr;
 			return $orderby;
 		}
 		
 		$order = '';  // Clear this, thus force retrieval from parameters (below)
 		$sfx='_2nd';  // Set suffix of second level ordering
+		$order_fallback = 'alpha';  // Use as default or when an invalid ordering is requested
+		$orderbycustomfieldid = (int) $params->get('orderbycustomfieldid'.$sfx, 0);
 		
-		// 1. If forced ordering not given, then use ordering parameters from configuration
+		// 1. If a FORCED -ORDER- is not given, then use ordering parameters from configuration. NOTE: custom field ordering takes priority
 		if (!$order) {
-			$order = $params->get('orderbycustomfieldid'.$sfx, 0) ? 'field' : $params->get($config_param.$sfx, $order_default_2nd = 'alpha');
+			$order = $orderbycustomfieldid  ?  'field'  :  $params->get($config_param.$sfx, $order_fallback);
 		}
-
+		
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
 		$order = $request_var && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
-
+		
+		// 3. Check various cases of invalid order, print warning, and reset ordering to default
+		if ($order=='field') {
+			if ( !$orderbycustomfieldid ) {
+				echo "Custom field ordering was selected, but no custom field is selected to be used for ordering<br/>";
+				$order = $order_fallback;
+			}
+		}
 		if ($order=='commented') {
 			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
 				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br>\n";
-				$order='default';
+				$order = $order_fallback;
 			} 
 		}
 		
