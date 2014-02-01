@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1814 2013-11-29 21:40:32Z ggppdk $
+ * @version 1.2 $Id: helper.php 1839 2014-01-31 05:02:05Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -44,18 +44,22 @@ class modFlexicontentHelper
 		$flexiparams = JComponentHelper::getParams('com_flexicontent');
 		
 		// get module ordering parameters
-		$ordering 				= $params->get('ordering');
-		$count 					= (int)$params->get('count', 5);
-		$featured				= (int)$params->get('count_feat', 1);
+		$ordering		= $params->get('ordering', array());
+		$count			= (int)$params->get('count', 5);
+		$featured		= (int)$params->get('count_feat', 1);
 
+		// Default ordering is 'added' if none ordering is set. Also make sure $ordering is an array (of ordering groups)
+		if ( empty($ordering) )    $ordering = array('added');
+		if (!is_array($ordering))  $ordering = explode(',', $ordering);
+		
 		// get module display parameters
-		$moduleclass_sfx 		= $params->get('moduleclass_sfx');
-		$layout 				= $params->get('layout');
-		$add_ccs 				= $params->get('add_ccs');
-		$add_tooltips 			= $params->get('add_tooltips', 1);
+		$moduleclass_sfx	= $params->get('moduleclass_sfx');
+		$layout						= $params->get('layout');
+		$add_ccs					= $params->get('add_ccs');
+		$add_tooltips			= $params->get('add_tooltips', 1);
 		
 		// get other module parameters
-		$method_curlang	= (int)$params->get('method_curlang', 0);
+		$method_curlang		= (int)$params->get('method_curlang', 0);
 		
 		// standard
 		$display_title 		= $params->get('display_title');
@@ -318,7 +322,7 @@ class modFlexicontentHelper
 			foreach ( $rows as $row )  // Single pass of rows
 			{
 			  if ($ord != $row->fetching) {  // Detect change of next ordering group
-			    $ord = $row->fetching;
+					$ord = $row->fetching;
 			    $i = 0;
 			  }
 			  
@@ -1307,10 +1311,35 @@ class modFlexicontentHelper
 			}
 		}
 		
+		
+		// *****************************************************************************************************************************
+		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
+		// *****************************************************************************************************************************
+		
+		$orderby = '';
+		$orderby = flexicontent_db::buildItemOrderBy(
+			$params,
+			$ordering, $request_var='', $config_param = 'ordering',
+			$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
+			$default_order = '', $default_order_dir = ''
+		);
+		//echo "<br/>" . print_r($ordering, true) ."<br/>";
+		
+		
 		// EXTRA join of field used in custom ordering
+		// NOTE: if (1st/2nd level) custom field id is not set, THEN 'field' ordering was changed to level's default, by the ORDER CLAUSE creating function
 		$join_field = '';
-		if ($ordering=='field' && $params->get('orderbycustomfieldid') ) {
-			$join_field = ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.(int)$params->get('orderbycustomfieldid', 0);
+		
+		// Create JOIN for ordering items by a custom field (Level 1)
+		if ( 'field' == $ordering[1] ) {
+			$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
+			$join_field .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
+		}
+		
+		// Create JOIN for ordering items by a custom field (Level 2)
+		if ( 'field' == $ordering[2] ) {
+			$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
+			$join_field .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
 		}
 		
 		
@@ -1322,23 +1351,23 @@ class modFlexicontentHelper
 		$display_comments_feat = $params->get('display_comments_feat');
 		
 		// Check (when needed) if jcomments are installed, and also clear 'commented' ordering if they jcomments is missing
-		if ($display_comments_feat || $display_comments || $ordering=='commented') {
-			// handle jcomments integration
+		if ($display_comments_feat || $display_comments || in_array('commented', $ordering)) {
+			// Handle jcomments integratio. No need to reset 'commented' ordering if jcomments not installed,
+			// and neither print message, the ORDER CLAUSE creating function should have done this already
 			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
-				echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br>\n";
+				//echo "jcomments not installed, you need jcomments to use 'Most commented' ordering OR display comments information.<br>\n";
 				$jcomments_exist = false;
 			} else {
 				$jcomments_exist = true;
 			}
-			if (!$jcomments_exist && $ordering=='commented') $ordering='';
 		}
 		
 		// Decide to JOIN (or not) with comments TABLE, needed when displaying comments and/or when ordering by comments
-		$add_comments = ($display_comments_feat || $display_comments || $ordering=='commented') && $jcomments_exist;
+		$add_comments = ($display_comments_feat || $display_comments || in_array('commented', $ordering)) && $jcomments_exist;
 		
 		// Additional select and joins for comments
 		$select_comments     = $add_comments ? ' count(com.object_id) AS comments_total' : '';
-		$join_comments_type  = $ordering=='commented' ? ' INNER JOIN' : ' LEFT JOIN';
+		$join_comments_type  = $ordering[1]=='commented' ? ' INNER JOIN' : ' LEFT JOIN';   // Do not require most commented for 2nd level ordering
 		$join_comments       = $add_comments ? $join_comments_type.' #__jcomments AS com ON com.object_id = i.id' : '' ;
 		
 		
@@ -1350,28 +1379,13 @@ class modFlexicontentHelper
 		$display_voting_feat = $params->get('display_voting_feat');
 		
 		// Decide to JOIN (or not) with rating TABLE, needed when displaying ratings and/or when ordering by ratings
-		$add_rated = $display_voting_feat || $display_voting || $ordering=='rated';
+		$add_rated = $display_voting_feat || $display_voting || in_array('rated', $ordering);
 		
 		// Additional select and joins for ratings
-		$select_rated     = $ordering=='rated' ? ' (cr.rating_sum / cr.rating_count) * 20 AS votes' : '';
+		$select_rated     = in_array('rated', $ordering) ? ' (cr.rating_sum / cr.rating_count) * 20 AS votes' : '';
 		$select_rated    .= $add_rated ? ($select_rated ? ',' :'').' cr.rating_sum as rating_sum, cr.rating_count as rating_count' : '';
-		$join_rated_type  = $ordering=='rated' ? ' INNER JOIN' : ' LEFT JOIN';
+		$join_rated_type  = in_array('rated', $ordering) ? ' INNER JOIN' : ' LEFT JOIN';
 		$join_rated       = $add_rated ? $join_rated_type.' #__content_rating AS cr ON cr.content_id = i.id' : '' ;
-		
-		
-		// *****************************************************************************************************************************
-		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
-		// *****************************************************************************************************************************
-		
-		$orderby = '';
-		if ($ordering) {
-			$orderby = flexicontent_db::buildItemOrderBy(
-				$params,
-				$ordering, $request_var='', $config_param = '',
-				$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
-				$default_order = '', $default_order_dir = ''
-			);
-		}
 		
 		
 		// ***********************************************************

@@ -52,21 +52,31 @@ class JFormFieldFcordering extends JFormFieldList
 		} else {
 			$attributes = & $node->_attributes;
 		}
-
-		$ordering[] = JHTML::_('select.option',  'popular', 	JText::_( 'FLEXI_MOST_POPULAR' ) );
-		$ordering[] = JHTML::_('select.option',  'commented',	JText::_( 'FLEXI_MOST_COMMENTED' ) );
-		$ordering[] = JHTML::_('select.option',  'rated',			JText::_( 'FLEXI_BEST_RATED' ) ); 
-		$ordering[] = JHTML::_('select.option',  'added', 		JText::_( 'FLEXI_RECENTLY_ADDED' ) );
-		$ordering[] = JHTML::_('select.option',  'addedrev', 	JText::_( 'FLEXI_RECENTLY_ADDED_REVERSE' ) );
-		$ordering[] = JHTML::_('select.option',  'updated', 	JText::_( 'FLEXI_RECENTLY_UPDATED' ) );
-		$ordering[] = JHTML::_('select.option',  'alpha', 		JText::_( 'FLEXI_ALPHABETICAL' ) );
-		$ordering[] = JHTML::_('select.option',  'alpharev', 	JText::_( 'FLEXI_ALPHABETICAL_REVERSE' ) );
-		$ordering[] = JHTML::_('select.option',  'id', 				JText::_( 'FLEXI_HIGHEST_ITEM_ID' ) );
-		$ordering[] = JHTML::_('select.option',  'rid', 			JText::_( 'FLEXI_LOWEST_ITEM_ID' ) );
-		$ordering[] = JHTML::_('select.option',  'catorder', 	JText::_( 'FLEXI_CAT_ORDER' ) );
+		
+		$ordering[] = JHTML::_('select.option',  'addedrev', 	JText::_( 'FLEXI_ORDER_OLDEST_FIRST' ) );       // 'date'
+		$ordering[] = JHTML::_('select.option',  'added', 		JText::_( 'FLEXI_ORDER_MOST_RECENT_FIRST' ) );  // 'rdate'
+		$ordering[] = JHTML::_('select.option',  'updated', 	JText::_( 'FLEXI_ORDER_LAST_MODIFIED_FIRST' ) );
+		
+		$ordering[] = JHTML::_('select.option',  'alpha', 		JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL' ) );
+		$ordering[] = JHTML::_('select.option',  'alpharev', 	JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE' ) );  // 'ralpha'
+		
+		$ordering[] = JHTML::_('select.option',  'author', 		JText::_( 'FLEXI_ORDER_AUTHOR_ALPHABETICAL' ) );
+		$ordering[] = JHTML::_('select.option',  'rauthor', 	JText::_( 'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE' ) );
+		
+		$ordering[] = JHTML::_('select.option',  'popular', 	JText::_( 'FLEXI_ORDER_MOST_HITS' ) );          // 'hits'
+		$ordering[] = JHTML::_('select.option',  'rhits',			JText::_( 'FLEXI_ORDER_LEAST_HITS' ) );
+		
+		$ordering[] = JHTML::_('select.option',  'id', 				JText::_( 'FLEXI_ORDER_HIGHEST_ITEM_ID' ) );
+		$ordering[] = JHTML::_('select.option',  'rid', 			JText::_( 'FLEXI_ORDER_LOWEST_ITEM_ID' ) );
+		
+		$ordering[] = JHTML::_('select.option',  'commented',	JText::_( 'FLEXI_ORDER_MOST_COMMENTED' ) );
+		$ordering[] = JHTML::_('select.option',  'rated',			JText::_( 'FLEXI_ORDER_BEST_RATED' ) ); 
+		$ordering[] = JHTML::_('select.option',  'catorder', 	JText::_( 'FLEXI_ORDER_CONFIGURED_ORDER' ) );   // 'order'
+		
 		$ordering[] = JHTML::_('select.option',  'random', 		JText::_( 'FLEXI_RANDOM' ) );
+		
 		$ordering[] = JHTML::_('select.option',  'field', 		JText::_( 'FLEXI_CUSTOM_FIELD' ) );
-
+		
 		return $ordering;
 	}
 }
