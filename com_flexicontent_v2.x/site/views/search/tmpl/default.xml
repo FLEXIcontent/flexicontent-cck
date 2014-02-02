@@ -168,7 +168,7 @@
 			<field name="" type="separator" default="Defaults" description="" level="level3" hr="false" menu="hide" />
 			
 			<field name="limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
-			<field name="orderby" type="list" default="rdate" label="FLEXI_BASIC_ORDER" description="FLEXI_BASIC_ORDER_DESC">
+			<field name="orderby" type="list" default="rdate" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC">
 				<!--option value="drelevanceate">FLEXI_ORDER_OLDEST_FIRST</option-->
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
@@ -188,7 +188,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="orderby_override" type="radio" default="1" label="FLEXI_BASIC_ORDER" description="FLEXI_BASIC_ORDER_DESC" menu="hide" >
+			<field name="orderby_override" type="radio" default="1" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC" menu="hide" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

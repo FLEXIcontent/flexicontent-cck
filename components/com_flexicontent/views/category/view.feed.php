@@ -50,14 +50,16 @@ class FlexicontentViewCategory extends JViewLegacy
 		JRequest::setVar('limit', $params->get('feed_limit'));   // Force a specific limit, this will be moved to the model
 		
 		$params->set('orderby', $params->get('feed_orderby', 'rdate'));
-		$params->set('orderbycustomfieldid' , $params->get('feed_orderbycustomfieldid' , '0'));
+		$params->set('orderbycustomfield'   , $params->get('feed_orderbycustomfield' , 1));
+		$params->set('orderbycustomfieldid' , $params->get('feed_orderbycustomfieldid' , 0));
 		$params->set('orderbycustomfielddir', $params->get('feed_orderbycustomfielddir', 'ASC'));
-		$params->set('orderbycustomfieldint', $params->get('feed_orderbycustomfieldint', '0'));
+		$params->set('orderbycustomfieldint', $params->get('feed_orderbycustomfieldint', 0));
 		
 		$params->set('orderby_2nd', $params->get('feed_orderby', 'alpha'));
-		$params->set('orderbycustomfieldid_2nd' , $params->get('feed_orderbycustomfieldid_2nd' , '0'));
+		$params->set('orderbycustomfield_2nd'   , $params->get('feed_orderbycustomfield_2nd' , 1));
+		$params->set('orderbycustomfieldid_2nd' , $params->get('feed_orderbycustomfieldid_2nd' , 0));
 		$params->set('orderbycustomfielddir_2nd', $params->get('feed_orderbycustomfielddir_2nd', 'ASC'));
-		$params->set('orderbycustomfieldint_2nd', $params->get('feed_orderbycustomfieldint_2nd', '0'));
+		$params->set('orderbycustomfieldint_2nd', $params->get('feed_orderbycustomfieldint_2nd', 0));
 		
 		$cats = $this->get('Data');
 		
