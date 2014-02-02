@@ -4542,32 +4542,32 @@ class flexicontent_db
 
 	/**
 	 * Build the order clause of item listings
-	 * precedence: $request_var ==> $order ==> $config_param ==> $default_order (& $default_order_dir)
+	 * precedence: $request_var ==> $order ==> $config_param ==> $default_order_col (& $default_order_dir)
 	 * @access private
 	 * @return string
 	 */
-	static function buildItemOrderBy(&$params=null, &$order='', $request_var='orderby', $config_param='orderby', $i_as='i', $rel_as='rel', $default_order='', $default_order_dir='', $sfx='')
+	static function buildItemOrderBy(&$params=null, &$order='', $request_var='orderby', $config_param='orderby', $i_as='i', $rel_as='rel', $default_order_col_1st='', $default_order_dir_1st='', $sfx='')
 	{
 		// Use global params ordering if parameters were not given
 		if (!$params) $params = JComponentHelper::getParams( 'com_flexicontent' );
 		
 		$order_fallback = 'rdate';  // Use as default or when an invalid ordering is requested
-		$orderbycustomfieldid = (int) $params->get('orderbycustomfieldid'.$sfx, 0);
+		$orderbycustomfield   = (int) $params->get('orderbycustomfield'.$sfx, 1);    // Backwards compatibility, defaults to enabled *
+		$orderbycustomfieldid = (int) $params->get('orderbycustomfieldid'.$sfx, 0);  // * but this needs to be set in order for field ordering to be used
 		
 		// 1. If a FORCED -ORDER- is not given, then use ordering parameters from configuration. NOTE: custom field ordering takes priority
 		if (!$order) {
-			$order = $orderbycustomfieldid  ?  'field'  :  $params->get($config_param.$sfx, $order_fallback);
+			$order = ($orderbycustomfield && $orderbycustomfieldid)  ?  'field'  :  $params->get($config_param.$sfx, $order_fallback);
 		}
 		
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
 		$order = $request_var && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
 		
 		// 3. Check various cases of invalid order, print warning, and reset ordering to default
-		if ($order=='field') {
-			if ( !$orderbycustomfieldid ) {
-				echo "Custom field ordering was selected, but no custom field is selected to be used for ordering<br/>";
-				$order = $order_fallback;
-			}
+		if ($order=='field' && !$orderbycustomfieldid ) {
+			// This can occur only if field ordering was requested explicitly, otherwise an not set 'orderbycustomfieldid' will prevent 'field' ordering
+			echo "Custom field ordering was selected, but no custom field is selected to be used for ordering<br/>";
+			$order = $order_fallback;
 		}
 		if ($order=='commented') {
 			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
@@ -4576,11 +4576,11 @@ class flexicontent_db
 			} 
 		}
 		
-		$filter_order_1st = $default_order;
-		$filter_order_dir_1st = $default_order_dir;
-		flexicontent_db::_getOrderByClause($params, $order, $i_as, $rel_as, $filter_order_1st, $filter_order_dir_1st, $sfx);
+		$order_col_1st = $default_order_col_1st;
+		$order_dir_1st = $default_order_dir_1st;
+		flexicontent_db::_getOrderByClause($params, $order, $i_as, $rel_as, $order_col_1st, $order_dir_1st, $sfx);
 		$order_arr[1] = $order;
-		$orderby = ' ORDER BY '.$filter_order_1st.' '.$filter_order_dir_1st;
+		$orderby = ' ORDER BY '.$order_col_1st.' '.$order_dir_1st;
 		
 		
 		// ****************************************************************
@@ -4588,7 +4588,7 @@ class flexicontent_db
 		// ****************************************************************
 		
 		if ($sfx!='') {
-			$orderby .= $filter_order_1st != $i_as.'.title'  ?  ', '.$i_as.'.title'  :  '';
+			$orderby .= $order_col_1st != $i_as.'.title'  ?  ', '.$i_as.'.title'  :  '';
 			$order = $order_arr;
 			return $orderby;
 		}
@@ -4596,22 +4596,22 @@ class flexicontent_db
 		$order = '';  // Clear this, thus force retrieval from parameters (below)
 		$sfx='_2nd';  // Set suffix of second level ordering
 		$order_fallback = 'alpha';  // Use as default or when an invalid ordering is requested
-		$orderbycustomfieldid = (int) $params->get('orderbycustomfieldid'.$sfx, 0);
+		$orderbycustomfield   = (int) $params->get('orderbycustomfield'.$sfx, 1);    // Backwards compatibility, defaults to enabled *
+		$orderbycustomfieldid = (int) $params->get('orderbycustomfieldid'.$sfx, 0);  // * but this needs to be set in order for field ordering to be used
 		
 		// 1. If a FORCED -ORDER- is not given, then use ordering parameters from configuration. NOTE: custom field ordering takes priority
 		if (!$order) {
-			$order = $orderbycustomfieldid  ?  'field'  :  $params->get($config_param.$sfx, $order_fallback);
+			$order = ($orderbycustomfield && $orderbycustomfieldid)  ?  'field'  :  $params->get($config_param.$sfx, $order_fallback);
 		}
 		
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
 		$order = $request_var && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
 		
 		// 3. Check various cases of invalid order, print warning, and reset ordering to default
-		if ($order=='field') {
-			if ( !$orderbycustomfieldid ) {
-				echo "Custom field ordering was selected, but no custom field is selected to be used for ordering<br/>";
-				$order = $order_fallback;
-			}
+		if ($order=='field' && !$orderbycustomfieldid ) {
+			// This can occur only if field ordering was requested explicitly, otherwise an not set 'orderbycustomfieldid' will prevent 'field' ordering
+			echo "Custom field ordering was selected, but no custom field is selected to be used for ordering<br/>";
+			$order = $order_fallback;
 		}
 		if ($order=='commented') {
 			if (!file_exists(JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'jcomments.php')) {
@@ -4620,100 +4620,100 @@ class flexicontent_db
 			} 
 		}
 		
-		$filter_order_2nd='';
-		$filter_order_dir_2nd='';
+		$order_col_2nd = '';
+		$order_dir_2nd = '';
 		if ($order!='default') {
-			flexicontent_db::_getOrderByClause($params, $order, $i_as, $rel_as, $filter_order_2nd, $filter_order_dir_2nd, $sfx);
+			flexicontent_db::_getOrderByClause($params, $order, $i_as, $rel_as, $order_col_2nd, $order_dir_2nd, $sfx);
 			$order_arr[2] = $order;
-			$orderby .= ', '.$filter_order_2nd.' '.$filter_order_dir_2nd;
+			$orderby .= ', '.$order_col_2nd.' '.$order_dir_2nd;
 		}
 		
 		// Order by title after default ordering
-		$orderby .= ($filter_order_1st != $i_as.'.title' && $filter_order_2nd != $i_as.'.title')  ?  ', '.$i_as.'.title'  :  '';
+		$orderby .= ($order_col_1st != $i_as.'.title' && $order_col_2nd != $i_as.'.title')  ?  ', '.$i_as.'.title'  :  '';
 		$order = $order_arr;
 		return $orderby;
 	}
 	
 	
 	// Create order clause sub-parts
-	static function _getOrderByClause(&$params, &$order='', $i_as='i', $rel_as='rel', &$filter_order='', &$filter_order_dir='', $sfx='')
+	static function _getOrderByClause(&$params, &$order='', $i_as='i', $rel_as='rel', &$order_col='', &$order_dir='', $sfx='')
 	{
 		// 'order' contains a symbolic order name to indicate using the category / global ordering setting
 		switch ($order) {
 			case 'date': case 'addedrev': /* 2nd is for module */
-				$filter_order		= $i_as.'.created';
-				$filter_order_dir	= 'ASC';
+				$order_col		= $i_as.'.created';
+				$order_dir	= 'ASC';
 				break;
 			case 'rdate': case 'added': /* 2nd is for module */
-				$filter_order		= $i_as.'.created';
-				$filter_order_dir	= 'DESC';
+				$order_col		= $i_as.'.created';
+				$order_dir	= 'DESC';
 				break;
 			case 'modified': case 'updated': /* 2nd is for module */
-				$filter_order		= $i_as.'.modified';
-				$filter_order_dir	= 'DESC';
+				$order_col		= $i_as.'.modified';
+				$order_dir	= 'DESC';
 				break;
 			case 'alpha':
-				$filter_order		= $i_as.'.title';
-				$filter_order_dir	= 'ASC';
+				$order_col		= $i_as.'.title';
+				$order_dir	= 'ASC';
 				break;
 			case 'ralpha': case 'alpharev': /* 2nd is for module */
-				$filter_order		= $i_as.'.title';
-				$filter_order_dir	= 'DESC';
+				$order_col		= $i_as.'.title';
+				$order_dir	= 'DESC';
 				break;
 			case 'author':
-				$filter_order		= 'u.name';
-				$filter_order_dir	= 'ASC';
+				$order_col		= 'u.name';
+				$order_dir	= 'ASC';
 				break;
 			case 'rauthor':
-				$filter_order		= 'u.name';
-				$filter_order_dir	= 'DESC';
+				$order_col		= 'u.name';
+				$order_dir	= 'DESC';
 				break;
 			case 'hits':
-				$filter_order		= $i_as.'.hits';
-				$filter_order_dir	= 'ASC';
+				$order_col		= $i_as.'.hits';
+				$order_dir	= 'ASC';
 				break;
 			case 'rhits': case 'popular': /* 2nd is for module */
-				$filter_order		= $i_as.'.hits';
-				$filter_order_dir	= 'DESC';
+				$order_col		= $i_as.'.hits';
+				$order_dir	= 'DESC';
 				break;
 			case 'order': case 'catorder': /* 2nd is for module */
-				$filter_order		= $rel_as.'.catid, '.$rel_as.'.ordering';
-				$filter_order_dir	= 'ASC';
+				$order_col		= $rel_as.'.catid, '.$rel_as.'.ordering';
+				$order_dir	= 'ASC';
 				break;
 
 			// SPECIAL case custom field
 			case 'field':
 				$cf = $sfx == '_2nd' ? 'f2' : 'f';
-				$filter_order = $params->get('orderbycustomfieldint'.$sfx, 0) ? 'CAST('.$cf.'.value AS UNSIGNED)' : $cf.'.value';
-				$filter_order_dir	= $params->get('orderbycustomfielddir'.$sfx, 'ASC');
+				$order_col = $params->get('orderbycustomfieldint'.$sfx, 0) ? 'CAST('.$cf.'.value AS UNSIGNED)' : $cf.'.value';
+				$order_dir	= $params->get('orderbycustomfielddir'.$sfx, 'ASC');
 				break;
 
 			// NEW ADDED
 			case 'random':
-				$filter_order = 'RAND()';
-				$filter_order_dir	= '';
+				$order_col = 'RAND()';
+				$order_dir	= '';
 				break;
 			case 'commented':
-				$filter_order = 'comments_total';
-				$filter_order_dir	= 'DESC';
+				$order_col = 'comments_total';
+				$order_dir	= 'DESC';
 				break;
 			case 'rated':
-				$filter_order = 'votes';
-				$filter_order_dir	= 'DESC';
+				$order_col = 'votes';
+				$order_dir	= 'DESC';
 				break;
 			case 'id':
-				$filter_order = $i_as.'.id';
-				$filter_order_dir	= 'DESC';
+				$order_col = $i_as.'.id';
+				$order_dir	= 'DESC';
 				break;
 			case 'rid':
-				$filter_order = $i_as.'.id';
-				$filter_order_dir	= 'ASC';
+				$order_col = $i_as.'.id';
+				$order_dir	= 'ASC';
 				break;
 
 			case 'default':
 			default:
-				$filter_order     = $filter_order ? $filter_order : $i_as.'.title';
-				$filter_order_dir = $filter_order_dir ? $filter_order_dir : 'ASC';
+				$order_col     = $order_col ? $order_col : $i_as.'.title';
+				$order_dir = $order_dir ? $order_dir : 'ASC';
 				break;
 		}
 	}
@@ -4725,7 +4725,7 @@ class flexicontent_db
 	 * @access private
 	 * @return string
 	 */
-	static function buildCatOrderBy(&$params, $order='', $request_var='', $config_param='cat_orderby', $c_as='c', $u_as='u', $default_order='', $default_order_dir='')
+	static function buildCatOrderBy(&$params, $order='', $request_var='', $config_param='cat_orderby', $c_as='c', $u_as='u', $default_order_col='', $default_order_dir='')
 	{
 		// Use global params ordering if parameters were not given
 		if (!$params) $params = JComponentHelper::getParams( 'com_flexicontent' );
@@ -4740,54 +4740,54 @@ class flexicontent_db
 
 		switch ($order) {
 			case 'date' :                  // *** J2.5 only ***
-				$filter_order		= $c_as.'.created_time';
-				$filter_order_dir	= 'ASC';
+				$order_col = $c_as.'.created_time';
+				$order_dir = 'ASC';
 				break;
 			case 'rdate' :                 // *** J2.5 only ***
-				$filter_order		= $c_as.'.created_time';
-				$filter_order_dir	= 'DESC';
+				$order_col = $c_as.'.created_time';
+				$order_dir = 'DESC';
 				break;
 			case 'modified' :              // *** J2.5 only ***
-				$filter_order		= $c_as.'.modified_time';
-				$filter_order_dir	= 'DESC';
+				$order_col = $c_as.'.modified_time';
+				$order_dir = 'DESC';
 				break;
 			case 'alpha' :
-				$filter_order		= $c_as.'.title';
-				$filter_order_dir	= 'ASC';
+				$order_col = $c_as.'.title';
+				$order_dir = 'ASC';
 				break;
 			case 'ralpha' :
-				$filter_order		= $c_as.'.title';
-				$filter_order_dir	= 'DESC';
+				$order_col = $c_as.'.title';
+				$order_dir = 'DESC';
 				break;
 			case 'author' :                // *** J2.5 only ***
-				$filter_order		= $u_as.'.name';
-				$filter_order_dir	= 'ASC';
+				$order_col = $u_as.'.name';
+				$order_dir = 'ASC';
 				break;
 			case 'rauthor' :               // *** J2.5 only ***
-				$filter_order		= $u_as.'.name';
-				$filter_order_dir	= 'DESC';
+				$order_col = $u_as.'.name';
+				$order_dir = 'DESC';
 				break;
 			case 'hits' :                  // *** J2.5 only ***
-				$filter_order		= $c_as.'.hits';
-				$filter_order_dir	= 'ASC';
+				$order_col = $c_as.'.hits';
+				$order_dir = 'ASC';
 				break;
 			case 'rhits' :                 // *** J2.5 only ***
-				$filter_order		= $c_as.'.hits';
-				$filter_order_dir	= 'DESC';
+				$order_col = $c_as.'.hits';
+				$order_dir = 'DESC';
 				break;
 			case 'order' :
-				$filter_order		= !FLEXI_J16GE ? $c_as.'.ordering' : $c_as.'.lft';
-				$filter_order_dir	= 'ASC';
+				$order_col = !FLEXI_J16GE ? $c_as.'.ordering' : $c_as.'.lft';
+				$order_dir = 'ASC';
 				break;
 			case 'default' :
 			default:
-				$filter_order     = $default_order ? $default_order : $i_as.'.title';
-				$filter_order_dir = $default_order_dir ? $default_order_dir : 'ASC';
+				$order_col = $default_order_col ? $default_order_col : $i_as.'.title';
+				$order_dir = $default_order_dir ? $default_order_dir : 'ASC';
 				break;
 		}
 
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_dir;
-		$orderby .= $filter_order!=$c_as.'.title' ? ', '.$c_as.'.title' : '';   // Order by title after default ordering
+		$orderby 	= ' ORDER BY '.$order_col.' '.$order_dir;
+		$orderby .= $order_col!=$c_as.'.title' ? ', '.$c_as.'.title' : '';   // Order by title after default ordering
 
 		return $orderby;
 	}
