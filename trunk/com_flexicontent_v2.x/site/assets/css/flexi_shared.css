@@ -749,6 +749,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 /* buttons in forms, special class for add button */
 #flexicontent .fcfield-button,
 #flexicontent .fcfield-addvalue { padding:6px 8px; margin:2px 2px 0px 6px !important; }
+#flexicontent .fcfield-addvalue { clear:both!important; display:block!important; float:left!important; }
 
 /* special classes for button-like add-link */
 #flexicontent .fcfield-button-add {	float:none!important; margin:0px; padding:0px; }

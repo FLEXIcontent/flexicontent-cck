@@ -40,6 +40,15 @@ window.addEvent('domready', function(){
 	
 	jQuery("#sortable_fcitems").sortable({
 		handle: 'div.fc_drag_handle',
+		helper: function(e, tr) {
+			var $originals = tr.children();
+			var $helper = tr.clone();
+			$helper.children().each(function(index) {
+				// Set helper cell sizes to match the original sizes
+				jQuery(this).width($originals.eq(index).width());
+			});
+			return $helper;
+		},
 		revert: 100,
 		start: function(event, ui) {
 			moved_row_order = ui.item.find("td input[name=order\\[\\]]").val();

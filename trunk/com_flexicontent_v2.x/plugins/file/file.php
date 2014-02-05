@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: file.php 1806 2013-11-10 01:38:20Z ggppdk $
+ * @version 1.0 $Id: file.php 1820 2013-12-14 18:19:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -75,7 +75,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				var name 	= 'a_name'+id;
 				var ixid 	= 'a_id'+id;
 				var li 		= document.createElement('li');
-				var txt		= document.createElement('input');
+				var txt		= document.createElement('span');
 				var hid		= document.createElement('input');
 				var span	= document.createElement('span');
 				var img		= document.createElement('img');
@@ -94,9 +94,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				
 				txt.type = 'text';
 				txt.size = '".$size."';
-				txt.disabled = 'disabled';
+				txt.readonly = 'readonly';  /*txt.disabled = 'disabled';*/  /*txt.dir='rtl';*/
 				txt.id	= name;
-				txt.value	= file;
+				txt.innerHTML	= file;
 				txt.addClass('fcfield_textval inputbox inline_style_published');
 				
 				hid.type = 'hidden';
@@ -108,10 +108,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
 				
 				filelist.appendChild(li);
-				li.appendChild(txt);
 				li.appendChild(span);
 				span.appendChild(img);
 				li.appendChild(button);
+				li.appendChild(txt);
 				li.appendChild(hid);
 				
 				new Sortables($('sortables_".$field->id."'), {
@@ -170,9 +170,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			height: auto;
 			position: relative;
 		}
-		#sortables_'.$field->id.' li input { cursor: text;}
-		#sortables_'.$field->id.' li input.inline_style_published   { font-family:tahoma!important; font-style:italic!important; color:#444!important; font-style:tahona; }
-		#sortables_'.$field->id.' li input.inline_style_unpublished { background: #ffffff; color:gray; border-width:0px; text-decoration:line-through; }
+		#sortables_'.$field->id.' li span.fcfield_textval { cursor:text; padding:4px!important; font-family:tahoma!important; white-space:pre-wrap!important; word-wrap:break-word!important; }
+		#sortables_'.$field->id.' li span.inline_style_published   { color:#444!important; }
+		#sortables_'.$field->id.' li span.inline_style_unpublished { background: #ffffff; color:gray; border-width:0px; text-decoration:line-through; }
 		';
 		
 		$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" onclick="deleteField'.$field->id.'(this);" />';
@@ -186,13 +186,16 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$field->html = array();
 		$i = 0;
 		foreach($files_data as $file_id => $file_data) {
-			$field->html[] = ($file_data->published ?
-			'  <input class="fcfield_textval inputbox inline_style_published" size="'.$size.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.'" disabled="disabled" />' :
-			'  <input class="fcfield_textval inputbox inline_style_unpublished" size="'.$size.'" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.' [UNPUBLISHED]" disabled="disabled" />'
-			)
-			.'  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file_id.'" />'
-			.$move2
-			.$remove_button
+			/*$field->html[] = ($file_data->published ?
+			'  <input class="fcfield_textval inputbox inline_style_published" size="'.$size.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.'" readonly="readonly" dir="rtl"/>' :
+			'  <input class="fcfield_textval inputbox inline_style_unpublished" size="'.$size.'" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.' [UNPUBLISHED]" readonly="readonly" dir="rtl"/>'
+			)*/
+			$field->html[] = $move2 . $remove_button .
+				($file_data->published ?
+				'  <span class="fcfield_textval inputbox inline_style_published" type="text" id="a_name'.$i.'" readonly="readonly" >'.$file_data->filename.'</span>' :
+				'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" [UNPUBLISHED]" readonly="readonly" >'.$file_data->filename.'</span>'
+				)
+				.'  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file_id.'" />'
 			;
 			$i++;
 			//if ($max_values && $i >= $max_values) break;  // break out of the loop, if maximum file limit was reached
@@ -205,6 +208,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
 		$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;autoselect='.$autoselect.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
 		$field->html .= "
+		<div class=\"fcclear\"></div>
 		<div class=\"fcfield-button-add\">
 			<div class=\"blank\">
 				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
@@ -469,9 +473,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			
 			// d. FILENAME / TITLE: decide whether to show it (if we do not use button, then displaying of filename is forced)
-			$_filename  = $file_data->altname ? $file_data->altname : $file_data->filename;
-			if ($lowercase_filename) $_filename = mb_strtolower( $_filename, "UTF-8");
-			$name_str   = $display_filename==2 ? $file_data->filename : $_filename;
+			$_filetitle = $file_data->altname ? $file_data->altname : $file_data->filename;
+			if ($lowercase_filename) $_filetitle = mb_strtolower( $_filetitle, "UTF-8");
+			$name_str   = $display_filename==2 ? $file_data->filename : $_filetitle;
 			$name_classes = $file_classes.($file_classes ? ' ' : '').'fcfile_title';
 			$name_html  = '<span class="'.$name_classes.'">'. $name_str . '</span>';
 			
@@ -515,12 +519,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			// SOME behavior FLAGS
 			$not_downloadable = !$dl_link || $prop=='namelist';
-			$filename_shown = (!$authorized || $show_filename) && !$file_data->url;
+			$filename_shown = (!$authorized || $show_filename);
+			$filename_shown_as_link = $filename_shown && $link_filename && !$usebutton;
 			
 			
 			// [2]: Add information properties: filename, and icons with optional inline text
 			$info_arr = array();
-			if ( ($filename_shown && !$link_filename) || $not_downloadable ) {
+			if ( ($filename_shown && !$filename_shown_as_link) || $not_downloadable ) {   // Filename will be shown if not l
 				$info_arr[] = $icon .' '. $name_html;
 			}
 			if ($lang) $info_arr[] = $lang;
@@ -530,7 +535,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			// [3]: Display the buttons:  DOWNLOAD, SHARE, ADD TO CART
 			
-			$str .= '<span class="fcfile_actions">';
 			$actions_arr = array();
 			
 			// ***********************
@@ -579,7 +583,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					
 					$attribs  = ' class="'. $addtocart_classes .'"';
 					$attribs .= ' title="'. $addtocartinfo .'"';
-					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filename,'s') .'"';
+					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filetitle,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';
 					$attribs .= ' contentid="'. $field->item_id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';
@@ -637,7 +641,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					
 					$attribs  = ' class="'. $addtocart_classes .'"';
 					$attribs .= ' title="'. $addtocartinfo .'"';
-					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filename,'s') .'"';
+					$attribs .= ' filename="'. flexicontent_html::escapeJsText($_filetitle,'s') .'"';
 					$attribs .= ' fieldid="'. $field->id .'"';
 					$attribs .= ' contentid="'. $field->item_id .'"';
 					$attribs .= ' fileid="'. $file_data->id .'"';
@@ -663,10 +667,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				}
 			}
 			
-			$str .=
-				(count($actions_arr) ?  $infoseptxt : "")
-				.implode($actions_arr, $actionseptxt);
-			$str .= '</span>';
+			$str .= (count($actions_arr) ?  $infoseptxt : "")
+				.'<span class="fcfile_actions">'
+				.  implode($actions_arr, $actionseptxt)
+				.'</span>';
 			
 			
 			// [4]: Add the file description (if displayed inline)
@@ -738,7 +742,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					JRequest::setVar( 'keep', 1, 'post' );
 					$file_ids = $fman->addlocal();
 					$v = !empty($file_ids) ? reset($file_ids) : ''; // Get fist element
-					//$_filename = key($file_ids);  this is the cleaned up filename, currently not needed
+					//$_filetitle = key($file_ids);  this is the cleaned up filename, currently not needed
 				}
 			}
 			if ( !empty ($v) && is_numeric($v) ) $newpost[$v] = $new++;
