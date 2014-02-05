@@ -216,6 +216,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				clear: both;
 				display: block;
 				list-style: none;
+				height: auto;
 				position: relative;
 			}
 			#sortables_'.$field->id.' li.sortabledisabled {
@@ -331,8 +332,8 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 					'.@$class.'
 					'.@$id.'
 				</tbody></table>
-				'.$remove_button.'
 				'.$move2.'
+				'.$remove_button.'
 				<input class="urlhits" name="'.$fieldname.'[hits]" type="hidden" value="'.$hits.'" />
 				<span class="hits"><span class="hitcount">'.$hits.'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 				';
@@ -342,9 +343,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		}
 		
 		if ($multiple) { // handle multiple records
-			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
-			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_WEBLINK' ).'" />';
+			$_list = "<li>". implode("</li>\n<li>", $field->html) ."</li>\n";
+			$field->html = '
+				<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$_list. '</ul>
+				<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_WEBLINK' ).'" />
+			';
 		} else {  // handle single values
 			$field->html = $field->html[0];
 		}
@@ -356,6 +359,23 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
+		// Get isMobile / isTablet Flags
+		static $isMobile = null;
+		static $isTablet = null;
+		static $useMobile = null;
+		if ($useMobile===null) 
+		{
+			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+			$force_desktop_layout = $cparams->get('force_desktop_layout', 0 );
+			//$start_microtime = microtime(true);
+			$mobileDetector = flexicontent_html::getMobileDetector();
+			$isMobile = $mobileDetector->isMobile();
+			$isTablet = $mobileDetector->isTablet();
+			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			//printf('<br/>-- [Detect Mobile: %.3f s] ', $time_passed/1000000);
+		}
 		
 		$field->label = JText::_($field->label);
 		

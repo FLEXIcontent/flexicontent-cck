@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: weblink.php 1782 2013-10-08 22:47:51Z ggppdk $
+ * @version 1.0 $Id: weblink.php 1814 2013-11-29 21:40:32Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.weblink
@@ -224,12 +224,12 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			
 			$link = '
 				<label class="label">'.JText::_( 'FLEXI_FIELD_URL' ).':</label>
-				<input class="urllink'.$required.'" name="'.$fieldname.'[link]" id="'.$elementid.'_'.$n.'" type="text" size="'.$size.'" value="'.$value['link'].'" />
+				<input class="urllink fcfield_textval'.$required.'" name="'.$fieldname.'[link]" id="'.$elementid.'_'.$n.'" type="text" size="'.$size.'" value="'.$value['link'].'" />
 			';
 			
 			if ($usetitle) $title = '
 				<label class="label">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</label>
-				<input class="urltitle" name="'.$fieldname.'[title]" type="text" size="'.$size.'" value="'.@$value['title'].'" />
+				<input class="urltitle fcfield_textval" name="'.$fieldname.'[title]" type="text" size="'.$size.'" value="'.@$value['title'].'" />
 			';
 			
 			$hits= '
@@ -250,9 +250,11 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		}
 		
 		if ($multiple) { // handle multiple records
-			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
-			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" style="clear:both;" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+			$_list = "<li>". implode("</li>\n<li>", $field->html) ."</li>\n";
+			$field->html = '
+				<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$_list. '</ul>
+				<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />
+			';
 		} else {  // handle single values
 			$field->html = $field->html[0];
 		}
@@ -264,6 +266,23 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
+		// Get isMobile / isTablet Flags
+		static $isMobile = null;
+		static $isTablet = null;
+		static $useMobile = null;
+		if ($useMobile===null) 
+		{
+			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+			$force_desktop_layout = $cparams->get('force_desktop_layout', 0 );
+			//$start_microtime = microtime(true);
+			$mobileDetector = flexicontent_html::getMobileDetector();
+			$isMobile = $mobileDetector->isMobile();
+			$isTablet = $mobileDetector->isTablet();
+			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			//printf('<br/>-- [Detect Mobile: %.3f s] ', $time_passed/1000000);
+		}
 		
 		$field->label = JText::_($field->label);
 		
@@ -291,9 +310,9 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			return;
 		} else if ( empty($values) && strlen($default_link) ) {
 			$values = array();
-			$values[0]['link']  = JText::_($default_link);
-			$values[0]['text']  = JText::_($default_title);
-			$values[0]['hits']  = 0;
+			$values[0]['link'] = JText::_($default_link);
+			$values[0]['text'] = JText::_($default_title);
+			$values[0]['hits'] = 0;
 			$values[0] = serialize($values[0]);
 		}
 		

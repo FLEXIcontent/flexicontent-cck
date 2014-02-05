@@ -53,12 +53,14 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
 		$max_values= (int)$field->parameters->get( 'max_values', 0 ) ;
 		
+		// This is field 's MAIN value property
 		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_addr = ($item->version == 0 || $addr_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		
-		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
+		// Optional value properties
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($item->version == 0 || $title_usage > 0)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
@@ -232,11 +234,13 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		}
 		
 		if ($multiple) { // handle multiple records
-			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
-			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+			$_list = "<li>". implode("</li>\n<li>", $field->html) ."</li>\n";
+			$field->html = '
+				<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$_list. '</ul>
+				<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />
+			';
 		} else {  // handle single values
-			$field->html = '<div>'.$field->html[0].'</div>';
+			$field->html = $field->html[0];
 		}
 	}
 	
@@ -250,13 +254,17 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// some parameter shortcuts
+		
+		// This is field 's MAIN value property
 		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_addr = ($addr_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
 		
+		// Optional value properties
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
 		
+		// Get field values
 		$values = $values ? $values : $field->value;
 		
 		// Handle default value loading, instead of empty value
@@ -270,6 +278,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$values[0] = serialize($values[0]);
 		}
 		
+		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
@@ -280,7 +289,6 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-		
 		
 		switch($separatorf)
 		{
