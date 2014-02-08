@@ -117,6 +117,7 @@ class FlexicontentHelperPerm
 				
 				// AUTHORS: management tab
 				$permission->CanAuthors		= ($user->gid >= 24);  // At least J1.5 Administrator
+				$permission->CanGroups		= 0;//FLEXI_J16GE ? $permission->CanAuthors : 0;
 				
 				// SEARCH INDEX: management tab
 				$permission->CanIndex			= ($user->gid >= 23);  // At least J1.5 Manager
