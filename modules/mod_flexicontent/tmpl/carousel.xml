@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- currently unused because J2.5 clears extra parameters during validation, instead this is/must copied inside the module XML file -->
+<!-- currently unused because J2.5 clears extra parameters during validation, instead this is/must be copied inside the module XML file -->
 <metadata>
 
 	<name>mod_flexicontent - Carousel Layout</name>

@@ -2,6 +2,9 @@
 Author:
 	luistar15, <leo020588 [at] gmail.com>
 	Rainer Ilgen <raineri@gmx.net> Extention for Fading
+	ggppdk:
+		- Horizontal responsive behavior,
+		- Horizontal/Vertical slider improvement (only slide if new current item is not already visible)
 	
 License:
 	MIT License
@@ -14,6 +17,8 @@ Arguments:
 	Parameters - see Parameters below
 
 Parameters:
+	marginR: int | item right margin | default: 0
+	mask: dom element | optional
 	box: dom element | required
 	items: dom collection | required
 	size: int | item size (px) | default: 240
@@ -34,8 +39,11 @@ Parameters:
 	autoPlay: boolean | default: false
 	onWalk: event | pass arguments: currentItem, currentHandle | default: null
 	startItem: int | default: 0
+	minVisible: int | default: 1
 
 Properties:
+	marginR: int
+	mask: dom element
 	box: dom element
 	items: dom collection
 	size: int
@@ -51,6 +59,7 @@ Properties:
 	interval: int
 	autoPlay: boolean
 	onWalk: function
+	minVisible: int
 	
 Methods:
 	previous(manual): walk to previous item
@@ -78,16 +87,20 @@ Requires:
 var noobSlide = new Class({
 
 	initialize: function(params){
+		this.minVisible = params.minVisible||1;
+		this.marginR = params.marginR || 0;
 		this.items = params.items;
 		this.mode = params.mode || 'horizontal';
 		this.fade = params.fade || false;
 		this.modes = {horizontal:['left','width'], vertical:['top','height']};
 		this.size = params.size || 240;
+		this.mask = params.mask || null;
 		this.box = params.box.setStyle(this.modes[this.mode][1],(this.size*this.items.length)+'px');
 		this.button_event = params.button_event || 'click';
 		this.handle_event = params.handle_event || 'click';
 		this.onWalk = params.onWalk || null;
 		this.currentIndex = null;
+		this.lastIndex = null;
 		this.previousIndex = null;
 		this.nextIndex = null;
 		this.interval = params.interval || 5000;
@@ -112,7 +125,7 @@ var noobSlide = new Class({
 		if(this.fade)
 		{
 			//Prepare Fading
-			this.orderItems()
+			this.orderItems();
 			this.fading((params.startItem||0),true,true);
 		}
 		else
@@ -127,7 +140,7 @@ var noobSlide = new Class({
 	orderItems: function() {
 		for(i=0;i<this.items.length;i++)
 		{
-			this.items[i].setStyle('position', 'absolute')
+			this.items[i].setStyle('position', 'absolute');
 			this.items[i].setStyle('left', '0px');
 			this.items[i].setStyle('z-index', i+1);
 			if(i>0)
@@ -198,17 +211,37 @@ var noobSlide = new Class({
 	},
 
 	walk: function(item,manual,noFx){
-		if(item!=this.currentIndex){
+		if (item!=this.currentIndex)
+		{
+			if (this.mask && this.mode=='horizontal') {
+				minVisible = (this.mask.clientWidth+this.marginR) / this.size;
+				this.minVisible = parseInt(minVisible);
+			}
+			
 			this.currentIndex=item;
 			this.previousIndex = this.currentIndex + (this.currentIndex>0 ? -1 : this.items.length-1);
 			this.nextIndex = this.currentIndex + (this.currentIndex<this.items.length-1 ? 1 : 1-this.items.length);
+			
+			if (this.currentIndex >= this.lastIndex && this.currentIndex <= this.lastIndex + this.minVisible - 1) {
+				var offSetIndex = this.lastIndex;  // Already viewable
+			} else if (this.currentIndex + this.minVisible >= this.items.length) {
+				var offSetIndex = this.lastIndex < this.items.length - this.minVisible ?
+					this.currentIndex - (this.minVisible-1) : // Position at rightmost of viewport
+					this.items.length - this.minVisible;     // Do not position leftmost of viewport, instead position to view all last rightmost items
+			} else {
+				var offSetIndex = this.lastIndex < this.currentIndex ?
+					this.currentIndex - (this.minVisible-1) :  // Position at rightmost of viewport
+					this.currentIndex;    // Position at leftmost of viewport
+			}
+			this.lastIndex = offSetIndex;
+			
 			if(manual){
 				this.stop();
 			}
 			if(noFx){
-				this.fx.cancel().set((this.size*-this.currentIndex)+'px');
+				this.fx.cancel().set((this.size*-offSetIndex)+'px');
 			}else{
-				this.fx.start(this.size*-this.currentIndex);
+				this.fx.start(this.size*-offSetIndex);
 			}
 			if(manual && this.autoPlay){
 				this.play(this.interval,'next',true);

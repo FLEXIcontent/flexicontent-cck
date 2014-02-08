@@ -70,6 +70,8 @@ $border_width = (int)$params->get('carousel_border_width', 1);
 // Direction specific Dimensions : HORIZONTAL
 $hdir_item_width   = (int)$params->get('carousel_hdir_item_width', 250);
 $hdir_margin_right = (int)$params->get('carousel_hdir_margin_right', 12);
+$hdir_min_visible = (int) $params->get('carousel_hdir_min_visible', 0);
+$hdir_min_visible = $hdir_min_visible < 0 ? 0 : $hdir_min_visible;
 
 // Direction specific Dimensions : VERTICAL
 $vdir_items = (int)$params->get('carousel_vdir_items', 2);
@@ -104,8 +106,10 @@ $_ns_mode         = $mode;
 $_ns_handle_event = $handle_event;
 $_ns_autoPlay     = $autoplay ? "true" : "false";
 $_ns_interval     = $interval;
-$_ns_size         = $mode=="horizontal" ? $hdir_item_width + $extra_width : 240;  // 240 is just a default it will be recalulated after page load ends
+$_ns_size         = $mode=="horizontal" ? $hdir_item_width + $extra_width : 240;  // 240 is just a default for vertical it will be recalulated after page load ends
 $_ns_fxOptions    = '{ duration:'.$duration.', transition: '.$effect_eased.', link: "cancel" }';
+$_ns_minVisible   = $mode=="horizontal" ? ($hdir_min_visible >=0 ? $hdir_min_visible : 1) : $vdir_items;  // o for horizontal, means to auto-calulate it after page load ends
+
 ?>
 
 <div class="carousel mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_carousel<?php echo $module->id ?>">
@@ -514,6 +518,9 @@ $js ='
 	window.addEvent("domready",function(){
 		// Walk to item
 		mod_fc_carousel'.$module->id.' = new noobSlide({
+			minVisible: '.$_ns_minVisible.',
+			marginR: '.$hdir_margin_right.',
+			mask: $("mod_fc_carousel_mask'.$module->id.'"),
 			box: $("mod_fcitems_box_standard'.$module->id.'"),
 			items: (MooTools.version>="1.2.4" ?
 				$("mod_fcitems_box_standard'.$module->id.'").getElements("div.mod_flexicontent_standard_wrapper") : 
@@ -529,6 +536,8 @@ $js ='
 			autoPlay: '.$_ns_autoPlay.',
 			fxOptions: mod_fc_carousel'.$module->id.'_ns_fxOptions,
 			onWalk: function(currentItem,currentHandle){
+				this.items.removeClass("mod_fc_activeitem");
+				currentItem.addClass("mod_fc_activeitem");
 				'.( !$show_curritem_info ? '' : '
 				(MooTools.version>="1.2.4" ?
 					$("mod_fc_info'.$module->id.'").set("html",currentItem.getElement(".fcitem_title").get("html")) :
@@ -565,6 +574,14 @@ $js ='
 		'.($mode!="vertical" ? '':'
 		mod_fcitems_box_standard'.$module->id.'.style.height = ('.$vdir_items.' * (maxHeight +'.$extra_height.')) + "px";
 		mod_fc_carousel'.$module->id.'.size = maxHeight +'.$extra_height.';
+		').'
+		
+		'.($mode!="horizontal" ? '':'
+		minVisible = ($("mod_fc_carousel_mask'.$module->id.'").clientWidth + '.$hdir_margin_right.') / '.$_ns_size.';
+		minVisible = parseInt(minVisible);
+		if ('.$hdir_min_visible.'==0 || '.$hdir_min_visible.'>minVisible) {
+			mod_fc_carousel'.$module->id.'.minVisible = minVisible;
+		}
 		').'
 		
 		/*}*/

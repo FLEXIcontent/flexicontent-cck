@@ -473,7 +473,7 @@
 					checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="created,modified" defaultvals="created,modified"
 					label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
 			/>
-			<field name="date_format" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
+			<field name="date_format" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" description="...">
 				<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
 				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>
@@ -496,7 +496,7 @@
 					checkoptions="FLEXI_DATE_CREATED,FLEXI_DATE_MODIFIED" checkvals="created,modified" defaultvals="created,modified"
 					label="FLEXI_DISPLAY_DATE_TYPE" description="FLEXI_DISPLAY_DATE_TYPE_DESC"
 			/>
-			<field name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" >
+			<field name="date_format_feat" type="list" default="DATE_FORMAT_LC3" label="FLEXI_DATE_FORMAT" description="...">
 				<option value="DATE_FORMAT_LC">DATE_FORMAT_LC</option>
 				<option value="DATE_FORMAT_LC1">DATE_FORMAT_LC1</option>
 				<option value="DATE_FORMAT_LC2">DATE_FORMAT_LC2</option>

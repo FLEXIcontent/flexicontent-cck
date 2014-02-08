@@ -347,7 +347,20 @@
 /* CAROUSEL SPECIFIC */
 /*********************/
 
-/* CURRENTLY active item data */
+/* CURRENTLY ACTIVATED item container */
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_fc_activeitem,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_fc_activeitem {
+	background-color: #D9D9D9!important;
+}
+/* image of CURRENTLY ACTIVATED item container */
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_fc_activeitem .image_standard img,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_fc_activeitem .image_featured img
+{
+  border:1px solid #444444;
+}
+
+
+/* INFO box of currently active item */
 .carousel.mod_flexicontent_wrapper .mod_fc_activeitem_info {
 	float:left;
 	display:block;
