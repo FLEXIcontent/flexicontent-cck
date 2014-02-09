@@ -385,14 +385,16 @@ class flexicontent_html
 			
 			case 'select2':
 				if ($load_jquery) flexicontent_html::loadJQuery();
-				$document->addScript( JURI::root(true).'/components/com_flexicontent/librairies/select2/select2.js' );
+				$document->addScript( JURI::root(true).'/components/com_flexicontent/librairies/select2/select2.min.js' );
 				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/select2/select2.css');
 				
 				$js .= "
 					jQuery(document).ready(function() {
 						
-						"/* Attach select2 to specific to select elements having specific CSS class */."
-						jQuery('select.use_select2_lib').select2();
+						"/* Attach select2 to specific to select elements having specific CSS class, show selected values as both: unselectable and disabled */."
+						jQuery('select.use_select2_lib').select2({
+							hideSelectionFromResult: function(selectedObject) { selectedObject.removeClass('select2-result-selectable').addClass('select2-result-unselectable').addClass('select2-disabled'); return false;/*return undefined;*/ }
+						});
 						
 						jQuery('div.use_select2_lib').each(function() {
 							var el_container = jQuery(this);
