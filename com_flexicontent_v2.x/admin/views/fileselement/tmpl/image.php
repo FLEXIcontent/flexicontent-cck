@@ -23,6 +23,65 @@ $current_uri = $uri->toString();
 $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;task=';
 $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 $session = JFactory::getSession();
+
+$jquerylib = JURI::root().'components/com_flexicontent/librairies/jquery/';
+$pluploadlib = JURI::root().'components/com_flexicontent/librairies/plupload/';
+
+$doc = JFactory::getDocument();
+$doc->addStyleSheet($pluploadlib.'js/jquery.plupload.queue/css/jquery.plupload.queue.css');
+//<link rel="stylesheet" href="../../js/jquery.plupload.queue/css/jquery.plupload.queue.css" type="text/css" media="screen" />
+
+$doc->addScript($jquerylib.'js/jquery-1.9.0.min.js');
+//<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+
+//<!-- production -->
+//<script type="text/javascript" src="../../js/plupload.full.min.js"></script>
+//<script type="text/javascript" src="../../js/jquery.plupload.queue/jquery.plupload.queue.js"></script>
+$doc->addScript($pluploadlib.'js/plupload.full.min.js');
+$doc->addScript($pluploadlib.'js/jquery.plupload.queue/jquery.plupload.queue.js');
+
+/*<!-- debug 
+<script type="text/javascript" src="../../js/moxie.js"></script>
+<script type="text/javascript" src="../../js/plupload.dev.js"></script>
+<script type="text/javascript" src="../../js/jquery.plupload.queue/jquery.plupload.queue.js"></script>
+-->*/
+$doc->addScript($pluploadlib.'js/moxie.js');
+$doc->addScript($pluploadlib.'js/plupload.dev.js');
+$doc->addScript($pluploadlib.'js/jquery.plupload.queue/jquery.plupload.queue.js');
+
+$doc->addScriptDeclaration('
+jQuery(function() {
+	// Setup flash version
+	jQuery("#flash_uploader").pluploadQueue({
+		// General settings
+		runtimes : "flash",
+		url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.JUtility::getToken().'=1",
+		chunk_size : "1mb",
+		unique_names : true,
+
+		filters : {
+			max_file_size : "10mb",
+			mime_types: [
+				{title : "Image files", extensions : "jpg,gif,png"},
+				{title : "Zip files", extensions : "zip"}
+			]
+		},
+
+		// Resize images on clientside if we can
+		resize : {width : 320, height : 240, quality : 90},
+
+		// Flash settings
+		flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf"
+	});
+	
+	var uploader = jQuery("#flash_uploader").pluploadQueue();
+	
+	uploader.bind(\'UploadComplete\',function(){
+        console.log("All Files Uploaded");
+		window.location.reload();
+    });
+});
+');
 ?>
 
 <div class="flexicontent">
@@ -36,15 +95,13 @@ $session = JFactory::getSession();
 					JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
 					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
 			?>
-			
+
 			<!-- File Upload Form -->
 			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" id="uploadForm" method="post" enctype="multipart/form-data">
 				<fieldset class="filemanager-tab" >
 					<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
 					<fieldset class="actions" id="filemanager-1">
-						
 						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
-							
 							<tr>
 								<td class="key">
 									<label for="file-upload">
@@ -96,6 +153,23 @@ $session = JFactory::getSession();
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
 			</form>
 			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
+			
+			<!----start files tab---->
+			<?php
+			echo FLEXI_J16GE ?
+					JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILES' ), 'local-files' ) :
+					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILES' ), 'local-files' ) ;
+			?>
+			<fieldset class="filemanager-tabx" >
+				<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
+				<fieldset class="actions" id="filemanager-2">
+					<div id="flash_uploader" style="width: 100%; height: 330px;">Your browser doesn't have Flash installed.</div>
+				</fieldset>
+			</fieldset>
+			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
+			<!----end files tab---->
+			
+			
 			<?php endif; ?>
 			<?php echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane(); ?>
 		</td>
