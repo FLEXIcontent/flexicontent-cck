@@ -213,6 +213,189 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		}
 	}
 	
+	/**
+	 * Upload the files
+	 *
+	 * @since 1.0
+	 */
+	function uploads() {
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		
+		$user = JFactory::getUser();
+		$app = JFactory::getApplication();
+		
+		// calculate access
+		$canupload = $user->authorise('flexicontent.uploadfiles', 'com_flexicontent');
+		$is_authorised = $canupload;
+		
+		// check access
+		if ( !$is_authorised ) {
+			//JError::raiseNotice( 403, JText::_( 'FLEXI_ALERTNOTAUTH' ) );
+			//$this->setRedirect( 'index.php?option=com_flexicontent&view=filemanager', '');
+			die('{"jsonrpc" : "2.0", "error" : {"code": 101, "message": "'.JText::_( 'FLEXI_ALERTNOTAUTH' ).'"}, "id" : "id"}');
+			return;
+		}
+
+		$option		= JRequest::getVar( 'option');
+		$file 		= JRequest::getVar( 'file', '', 'files', 'array' );
+		$format		= JRequest::getVar( 'format', 'html', '', 'cmd');
+		$secure		= JRequest::getVar( 'secure', 1, '', 'int');
+		$return		= JRequest::getVar( 'return-url', null, 'post', 'base64' );
+		$filetitle= JRequest::getVar( 'file-title', '');
+		$filedesc	= JRequest::getVar( 'file-desc', '');
+		$filelang	= JRequest::getVar( 'file-lang', '');
+		$fieldid	= JRequest::getVar( 'fieldid', 0);
+		$u_item_id= JRequest::getVar( 'u_item_id', 0);
+		$file_mode= JRequest::getVar( 'folder_mode', 0) ? 'folder_mode' : 'db_mode';
+		$err		= null;
+
+		// *****************************************
+		// Check that a file was provided / uploaded
+		// *****************************************
+		if ( !isset($file['name']) )
+		{
+			//JError::raiseWarning(100, JText::_( 'Filename has invalid characters (or other error occured)' ));
+			//$this->setRedirect( $_SERVER['HTTP_REFERER'], '' );
+			die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "'.JText::_( 'Filename has invalid characters (or other error occured)' ).'"}, "id" : "id"}');
+			return;
+		}
+		
+		if ($file_mode == 'folder_mode') {
+			$upload_path_var = 'fc_upload_path_'.$fieldid.'_'.$u_item_id;
+			$path = $app->getUserState( $upload_path_var, '' ).DS;
+			$app->setUserState( $upload_path_var, '');
+		} else {
+			$path = $secure ? COM_FLEXICONTENT_FILEPATH.DS : COM_FLEXICONTENT_MEDIAPATH.DS;
+		}
+		
+		jimport('joomla.utilities.date');
+
+		// Set FTP credentials, if given
+		jimport('joomla.client.helper');
+		JClientHelper::setCredentialsFromRequest('ftp');
+
+		// Make the filename safe
+		jimport('joomla.filesystem.file');
+		$file['name']	= JFile::makeSafe($file['name']);
+
+		//sanitize filename further and make unique
+		$params = null;
+		$upload_check = flexicontent_upload::check( $file, $err, $params );
+		$filename 	= flexicontent_upload::sanitize($path, $file['name']);
+		$filepath 	= JPath::clean($path.strtolower($filename));
+
+		if (!$upload_check) {
+			if ($format == 'json') {
+				jimport('joomla.error.log');
+				$log = JLog::getInstance('com_flexicontent.error.php');
+				$log->addEntry(array('comment' => 'Invalid: '.$filepath.': '.$err));
+				header('HTTP/1.0 415 Unsupported Media Type');
+				//die('Error. Unsupported Media Type!');
+				die('{"jsonrpc" : "2.0", "error" : {"code": 103, "message": "Error. Unsupported Media Type!"}, "id" : "id"}');
+			} else {
+				//JError::raiseNotice(100, JText::_($err));
+				die('{"jsonrpc" : "2.0", "error" : {"code": 104, "message": "'.$err.'"}, "id" : "id"}');
+				// REDIRECT
+				//if ($return) {
+					//$app->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
+				//}
+				return;
+			}
+		}
+
+		//get the extension to record it in the DB
+		$ext = strtolower(flexicontent_upload::getExt($filename));
+
+		// Upload Failed
+		if (!JFile::upload($file['tmp_name'], $filepath)) {
+			if ($format == 'json') {
+				jimport('joomla.error.log');
+				$log = JLog::getInstance('com_flexicontent.error.php');
+				$log->addEntry(array('comment' => 'Cannot upload: '.$filepath));
+				header('HTTP/1.0 409 Conflict');
+				//jexit('Error. File already exists');
+				die('{"jsonrpc" : "2.0", "error" : {"code": 105, "message": "File already exists"}, "id" : "id"}');
+			} else {
+				//JError::raiseWarning(100, JText::_( 'FLEXI_UNABLE_TO_UPLOAD_FILE' ));
+				// REDIRECT
+				//if ($return) {
+					//$app->redirect(base64_decode($return)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
+				//}
+				die('{"jsonrpc" : "2.0", "error" : {"code": 106, "message": "'.JText::_( 'FLEXI_UNABLE_TO_UPLOAD_FILE' ).'"}, "id" : "id"}');
+				return;
+			}
+				
+		// Upload Successful
+		} else {
+				
+			// a. Database mode
+			if ($file_mode == 'db_mode')
+			{
+				if ($format == 'json')
+				{
+					jimport('joomla.error.log');
+					$log = JLog::getInstance();
+					$log->addEntry(array('comment' => $filepath));
+				}
+					
+				$db 	= JFactory::getDBO();
+				$user	= JFactory::getUser();
+				$config = JFactory::getConfig();
+
+				$date = JFactory::getDate( 'now' );
+
+				$obj = new stdClass();
+				$obj->filename    = $filename;
+				$obj->altname     = $filetitle ? $filetitle : $filename;
+				$obj->url         = 0;
+				$obj->secure      = $secure;
+				$obj->ext         = $ext;
+				$obj->hits        = 0;
+				$obj->description = $filedesc;
+				$obj->language    = $filelang;
+				$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
+				$obj->uploaded_by = $user->get('id');
+					
+				// Insert file record in DB
+				$db->insertObject('#__flexicontent_files', $obj);
+					
+				// Get id of new file record
+				$file_id = (int)$db->insertid();
+
+				$option = JRequest::getVar('option');
+				$filter_item = $app->getUserStateFromRequest( $option.'.fileselement.item_id', 'item_id', '', 'int' );
+				if($filter_item) {
+					$session = JFactory::getSession();
+					$files = $session->get('fileselement.'.$filter_item, null);
+
+					if(!$files) {
+						$files = array();
+					}
+					$files[] = $db->insertid();
+					$session->set('fileselement.'.$filter_item, $files);
+				}
+				
+			// b. Custom Folder mode
+			} else {
+				$file_id = 0;
+			}
+				
+			// JSON output: Terminate printing a message
+			if ($format == 'json') {
+				// Return Success JSON-RPC response
+				die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+			// Normal output: Redirect setting a message
+			} else {
+				//$app->enqueueMessage(JText::_( 'FLEXI_UPLOAD_COMPLETE' ));
+				die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+				//if ( !$return ) return;  // No return URL
+				//$app->redirect(base64_decode($return)."&newfileid=".$file_id."&newfilename=".base64_encode($filename)."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1");
+			}
+				
+		}
+	}
+	
 	function ftpValidate()
 	{
 		// Set FTP credentials, if given
