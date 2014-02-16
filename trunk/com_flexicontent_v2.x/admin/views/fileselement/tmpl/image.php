@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: image.php 1845 2014-02-13 07:54:35Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: image.php 1847 2014-02-16 06:29:06Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -24,31 +24,12 @@ $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;
 $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 $session = JFactory::getSession();
 
-$jquerylib = JURI::root().'components/com_flexicontent/librairies/jquery/';
+// Load plupload JS framework
+flexicontent_html::loadFramework('plupload');
+$doc = JFactory::getDocument();
 $pluploadlib = JURI::root().'components/com_flexicontent/librairies/plupload/';
 
-$doc = JFactory::getDocument();
-$doc->addStyleSheet($pluploadlib.'js/jquery.plupload.queue/css/jquery.plupload.queue.css');
-//<link rel="stylesheet" href="../../js/jquery.plupload.queue/css/jquery.plupload.queue.css" type="text/css" media="screen" />
-
-$doc->addScript($jquerylib.'js/jquery-1.9.0.min.js');
-//<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-
-//<!-- production -->
-//<script type="text/javascript" src="../../js/plupload.full.min.js"></script>
-//<script type="text/javascript" src="../../js/jquery.plupload.queue/jquery.plupload.queue.js"></script>
-$doc->addScript($pluploadlib.'js/plupload.full.min.js');
-$doc->addScript($pluploadlib.'js/jquery.plupload.queue/jquery.plupload.queue.js');
-
-/*<!-- debug 
-<script type="text/javascript" src="../../js/moxie.js"></script>
-<script type="text/javascript" src="../../js/plupload.dev.js"></script>
-<script type="text/javascript" src="../../js/jquery.plupload.queue/jquery.plupload.queue.js"></script>
--->*/
-$doc->addScript($pluploadlib.'js/moxie.js');
-$doc->addScript($pluploadlib.'js/plupload.dev.js');
-$doc->addScript($pluploadlib.'js/jquery.plupload.queue/jquery.plupload.queue.js');
-
+// Initialize a plupload Queue
 $doc->addScriptDeclaration('
 jQuery(function() {
 	// Setup flash version
@@ -77,9 +58,9 @@ jQuery(function() {
 	var uploader = jQuery("#flash_uploader").pluploadQueue();
 	
 	uploader.bind(\'UploadComplete\',function(){
-        console.log("All Files Uploaded");
+		console.log("All Files Uploaded");
 		window.location.reload();
-    });
+	});
 });
 ');
 ?>

@@ -425,8 +425,9 @@ class FlexicontentHelperRoute
 					$min_matched = 1;
 					break;  // MAX prority, break out !
 				} else if ($min_matched > 2) {
-					$matches[2] = $menuitem; // priority 2: item id
-					$min_matched = $min_matched > 2 ? 2 : $min_matched;
+					// Do not use case that category ID does not match, TODO: (maybe) provide alternatives, e.g. use this menu item by append to it: ?cid=nnn
+					//$matches[2] = $menuitem; // priority 2: item id
+					//$min_matched = $min_matched > 2 ? 2 : $min_matched;
 				}
 			} else if ($min_matched > 5 && @$menuitem->query['view'] == 'category'      // match category menu items ...
 				&& @$menuitem->query['cid'] == $needles['category']   // ... that point to item's category
@@ -457,6 +458,15 @@ class FlexicontentHelperRoute
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		$db = JFactory::getDBO();
 		
+		// Get current menu item, we will prefer current menu if it points to given tag,
+		// thus maintaining current menu item if multiple menu items to same tag exist !!
+		static $menu = null;
+		if ($menu == null) {
+			$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
+			$menu = $menus->getActive();
+			if ($menu && @$menu->query['option']!='com_flexicontent') $menu=false;
+		}
+		
 		// multiple needles, because maybe searching for multiple categories,
 		// also earlier needles (catids) takes priority over later ones
 		foreach($needles as $needle => $cid)  {
@@ -464,9 +474,22 @@ class FlexicontentHelperRoute
 			// Get access level of the FLEXIcontent category
 			$db->setQuery('SELECT access FROM #__categories WHERE id='.$cid);
 			$cat_acclevel = $db->loadResult();
-
-			foreach($component_menuitems as $menuitem) {
-
+			
+			// Prefer current menu item if pointing to given category url ...
+			if ($menu && 
+				@$menu->query['view'] == $needle &&
+				@$menu->query['cid'] == $cid &&
+				// these variables must be explicitely checked, we must not rely on the urlvars loop below !
+				@$menu->query['layout'] == @$urlvars['layout'] && // match layout "author", "myitems", "mcats" etc
+				@$menu->query['authorid'] == @$urlvars['authorid'] && // match "authorid" for user id of author
+				@$menu->query['cids'] == @$urlvars['cids'] // match "cids" of "mcats" (multi-category view)
+			) {
+				$match = $menu;
+				break;
+			}
+			
+			foreach($component_menuitems as $menuitem)
+			{
 				// Require appropriate access level of the menu item, to avoid access problems and redirecting guest to login page
 				if (!FLEXI_J16GE) {
 					// In J1.5 we need menu access level lower than category access level
@@ -580,12 +603,27 @@ class FlexicontentHelperRoute
 		else
 			$aid = (int) $user->get('aid');
 		
+		// Get current menu item, we will prefer current menu if it points to given tag,
+		// thus maintaining current menu item if multiple menu items to same tag exist !!
+		static $menu = null;
+		if ($menu == null) {
+			$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
+			$menu = $menus->getActive();
+			if ($menu && @$menu->query['option']!='com_flexicontent') $menu=false;
+		}
+		
 		// multiple needles, because maybe searching for multiple tag ids,
 		// also earlier needles (tag ids) takes priority over later ones
 		foreach($needles as $needle => $id)
 		{
-			foreach($component_menuitems as $menuitem) {
-
+			// Prefer current menu item if pointing to given tag
+			if ($menu && (@$menu->query['view'] == $needle) && (@$menu->query['id'] == $id) ) {
+				$match = $menu;
+				break;
+			}
+			
+			foreach($component_menuitems as $menuitem)
+			{
 				// Require appropriate access level of the menu item, to avoid access problems and redirecting guest to login page
 				// Since tags do not have access level we will get a menu item accessible by the access levels of the current user
 				if (!FLEXI_J16GE) {

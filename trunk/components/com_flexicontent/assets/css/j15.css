@@ -54,3 +54,8 @@
 #flexicontent #editor-xtd-buttons .button2-left {
 	margin:4px 0px 0px 4px !important;
 }
+
+/* ITEM form */
+#fcform_language_container {
+	margin:8px 0px 16px 0px;
+}

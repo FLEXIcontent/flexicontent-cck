@@ -665,30 +665,35 @@
 				<option value="1">FLEXI_FULL_TEXT</option>
 			</field>
 			<field name="feed_summary_cut" type="text" size="4" default="" label="FLEXI_FEED_SUMMARY_MAXLEN" description="FLEXI_FEED_SUMMARY_MAXLEN_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_IMAGE" description="FLEXI_USE_IMAGE" level="level2" />
 			<field name="feed_use_image" type="list" default="" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="feed_image_source" type="fcimage" valcolumn="id" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
 			<field name="feed_link_image" type="list" default="" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="feed_image_source" type="fcimage" valcolumn="id" size="5" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
 			<field name="feed_image_size" type="list" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC">
 				<option value="">FLEXI_USE_PARAMS</option>
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
 				<option value="l">FLEXI_LARGE</option>
 			</field>
+			<field name="feed_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="feed_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			<field name="feed_image_method" type="list" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
-			<field name="feed_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="feed_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			
+			<field name="" type="separator" default="Display custom fields &lt;br/&gt; &lt;small&gt; do not add fields that will break feeds display&lt;/small&gt;" description="..." level="level2" menu="hide" />
+			<field name="feed_extra_fields" type="textarea" rows="4" cols="60" label="Extra fields &lt;br/&gt; &lt;small&gt; comma separated list of field names&lt;/small&gt;" description="Fields that requires extra CSS/JS will not work properly, fields that might be suitable are fields like e.g. date,text,select,etc. Enter a comma separated list of field names" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
 			<field name="feed_orderby" type="list" default="" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC" >

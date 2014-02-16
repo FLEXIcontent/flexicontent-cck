@@ -311,10 +311,12 @@ class FlexicontentViewCategory extends JViewLegacy
 				elseif ($menu && $menu_matches && ($_mp=$menu->params->get('menu-meta_keywords')))
 					$document->setMetadata('keywords', $_mp);
 				
-				if ($menu && $menu_matches && ($_mp=$menu->params->get('robots')))
-					$document->setMetadata('robots', $_mp);
-				
 				$meta_params = new JRegistry($category->metadata);
+				
+				if ( $meta_params->get('robots') )
+					$document->setMetadata('robots', $meta_params->get('robots'));
+				elseif ($menu && $menu_matches && ($_mp=$menu->params->get('robots')))
+					$document->setMetadata('robots', $_mp);
 				
 				// Deprecated <title> tag is used instead by search engines
 				/*if ($app->getCfg('MetaTitle') == '1') {
