@@ -518,7 +518,7 @@ $tabCnt[$tabSetCnt] = 0;
 		<?php $fset_lbl = $tags_displayed ? 'FLEXI_CATEGORIES_TAGS' : 'FLEXI_CATEGORIES';?>
 		
 		<div class="fcclear"></div>
-		<fieldset class="basicfields_set">
+		<fieldset class="basicfields_set" id="fcform_categories_tags_container">
 			<legend>
 				<?php echo JText::_( $fset_lbl ); ?>
 			</legend>
@@ -540,16 +540,6 @@ $tabCnt[$tabSetCnt] = 0;
 				?>
 			</div>
 			
-			<?php if ( !empty($this->lists['featured_cid']) ) : ?>
-				<div class="fcclear"></div>
-				<label id="featured_cid-lbl" for="featured_cid" for_bck="featured_cid" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
-				</label>
-				<div class="container_fcfield container_fcfield_name_featured_cid">
-					<?php echo $this->lists['featured_cid']; ?>
-				</div>
-			<?php endif; ?>
-			
 			<?php if ($secondary_displayed) : /* MENU SPECIFIED categories subset (instead of categories with CREATE perm) */ ?>
 				
 				<div class="fcclear"></div>
@@ -562,6 +552,18 @@ $tabCnt[$tabSetCnt] = 0;
 				</div>
 				
 			<?php endif; ?>
+
+			<?php if ( !empty($this->lists['featured_cid']) ) : ?>
+				<div class="fcclear"></div>
+				<label id="featured_cid-lbl" for="featured_cid" for_bck="featured_cid" class="flexi_label">
+					<?php echo JText::_( 'FLEXI_FEATURED_CATEGORIES' ); ?>
+				</label>
+				<div class="container_fcfield container_fcfield_name_featured_cid">
+					<?php echo $this->lists['featured_cid']; ?>
+				</div>
+			<?php endif; ?>
+
+
 
 
 			<?php if ($tags_displayed) : ?>
@@ -591,7 +593,7 @@ $tabCnt[$tabSetCnt] = 0;
 						?>
 						</ul>
 					</div>
-					
+
 					<?php if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) : ?>
 					<div class="fcclear"></div>
 					<div id="tags">
@@ -606,113 +608,115 @@ $tabCnt[$tabSetCnt] = 0;
 					</div>
 					<?php endif; ?>
 				</div>
-		<?php endif; ?>
+			<?php endif; ?>
+
 		</fieldset>
 
 
-		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+	<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 		
-			<div class="fcclear"></div>
-			<fieldset class="basicfields_set" style="margin:8px 0px 16px 0px;">
-				<legend>
-					<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
-				</legend>
+		<div class="fcclear"></div>
+		<fieldset class="basicfields_set" id="fcform_language_container">
+			<legend>
+				<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
+			</legend>
 			
-				<label id="language" for="language" class="flexi_label">
-					<?php echo JText::_( 'FLEXI_LANGUAGE' );?>
-				</label>
-				<div class="container_fcfield container_fcfield_name_language">
-					<?php if ( in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew ) : ?>
-						<?php echo $this->lists['languages']; ?>
-					<?php else: ?>
-						<?php echo $this->itemlang->image.' ['.$this->itemlang->name.']'; ?>
-					<?php endif; ?>
-				</div>
+			<label id="language" for="language" class="flexi_label">
+				<?php echo JText::_( 'FLEXI_LANGUAGE' );?>
+			</label>
 			
-				<?php if ( $this->params->get('enable_translation_groups') ) : ?>
-					<div class="fcclear"></div>
-					<?php
-						$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8').'"';
-					?>
-					<label id="lang_parent_id-lbl" for="lang_parent_id" <?php echo $label_tooltip; ?> >
-						<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
-					</label>
-				
-					<div class="container_fcfield container_fcfield_name_originalitem">
-					<?php if ( !$isnew  && (substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->item->language, 0,2) || $this->item->language=='*') ) : ?>
-						<br/><?php echo JText::_( $this->item->language=='*' ? 'FLEXI_ORIGINAL_CONTENT_ALL_LANGS' : 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?>
-						<input type="hidden" name="lang_parent_id" id="lang_parent_id" value="<?php echo $this->item->id; ?>" />
-					<?php else : ?>
-						<?php
-						if ( in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew || $this->item->id==$this->item->lang_parent_id) {
-							require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'elements'.DS.'item.php');
-							$attrs = array(
-								'type'=>"item", 'label'=>"FLEXI_ORIGINAL_CONTENT_ITEM", 'description'=>"FLEXI_ORIGINAL_CONTENT_ITEM_DESC",
-								'langparent_item'=>"1", 'type_id'=>$this->item->type_id, 'created_by'=>$this->item->created_by,
-								'class'=>"inputbox", 'size'=>"6"
-							);
-							$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
-							$ff_lang_parent_id = new JElementItem();
-							//echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br>';
-							echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->item->lang_parent_id, $jelement, '');
-						?>
-							<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ), ENT_COMPAT, 'UTF-8');?>">
-								<?php echo $infoimage; ?>
-							</span>
-						<?php
-						} else {
-							echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ALREADY_SET' );
-						}
-						?>
-					<?php endif; ?>
-					</div>
-			
-					<div class="fcclear"></div>
-					<label id="langassocs-lbl" for="langassocs" class="flexi_label" >
-						<?php echo JText::_( 'FLEXI_ASSOC_TRANSLATIONS' );?>
-					</label>
+			<div class="container_fcfield container_fcfield_name_language">
+				<?php if ( in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew ) : ?>
+					<?php echo $this->lists['languages']; ?>
+				<?php else: ?>
+					<?php echo $this->itemlang->image.' ['.$this->itemlang->name.']'; ?>
+				<?php endif; ?>
+			</div>
 
-					<div class="container_fcfield container_fcfield_name_langassocs">
+			<?php if ( $this->params->get('enable_translation_groups') ) : ?>
+
+				<div class="fcclear"></div>
+				<?php
+					$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8').'"';
+				?>
+				<label id="lang_parent_id-lbl" for="lang_parent_id" <?php echo $label_tooltip; ?> >
+					<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
+				</label>
+				
+				<div class="container_fcfield container_fcfield_name_originalitem">
+				<?php if ( !$isnew  && (substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->item->language, 0,2) || $this->item->language=='*') ) : ?>
+					<br/><?php echo JText::_( $this->item->language=='*' ? 'FLEXI_ORIGINAL_CONTENT_ALL_LANGS' : 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?>
+					<input type="hidden" name="lang_parent_id" id="lang_parent_id" value="<?php echo $this->item->id; ?>" />
+				<?php else : ?>
 					<?php
-					if ( !empty($this->lang_assocs) )
-					{
-						$row_modified = 0;
-						foreach($this->lang_assocs as $assoc_item) {
-							if ($assoc_item->id == $this->item->lang_parent_id) {
-								$row_modified = strtotime($assoc_item->modified);
-								if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
-							}
-						}
-					
-						foreach($this->lang_assocs as $assoc_item) {
-							if ($assoc_item->id==$this->item->id) continue;
-						
-							$_link  = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='. $assoc_item->id;
-							$_title = htmlspecialchars(JText::_ ( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
-							echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
-							//echo $assoc_item->id;
-							if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
-								echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
-							} else if( !empty($assoc_item->lang) ) {
-								echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
-							}
-						
-							$assoc_modified = strtotime($assoc_item->modified);
-							if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
-							if ( $assoc_modified < $row_modified ) echo "(!)";
-							echo "</a>";
-						}
+					if ( in_array( 'mod_item_lang', $allowlangmods_fe) || $isnew || $this->item->id==$this->item->lang_parent_id) {
+						require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'elements'.DS.'item.php');
+						$attrs = array(
+							'type'=>"item", 'label'=>"FLEXI_ORIGINAL_CONTENT_ITEM", 'description'=>"FLEXI_ORIGINAL_CONTENT_ITEM_DESC",
+							'langparent_item'=>"1", 'type_id'=>$this->item->type_id, 'created_by'=>$this->item->created_by,
+							'class'=>"inputbox", 'size'=>"6"
+						);
+						$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
+						$ff_lang_parent_id = new JElementItem();
+						//echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br>';
+						echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->item->lang_parent_id, $jelement, '');
+					?>
+						<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ), ENT_COMPAT, 'UTF-8');?>">
+							<?php echo $infoimage; ?>
+						</span>
+					<?php
+					} else {
+						echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ALREADY_SET' );
 					}
 					?>
-					</div>
+				<?php endif; ?>
+				</div>
+			
+				<div class="fcclear"></div>
+				<label id="langassocs-lbl" for="langassocs" class="flexi_label" >
+					<?php echo JText::_( 'FLEXI_ASSOC_TRANSLATIONS' );?>
+				</label>
 				
-				</fieldset>
-			<?php endif; ?>
+				<div class="container_fcfield container_fcfield_name_langassocs">
+				<?php
+				if ( !empty($this->lang_assocs) )
+				{
+					$row_modified = 0;
+					foreach($this->lang_assocs as $assoc_item) {
+						if ($assoc_item->id == $this->item->lang_parent_id) {
+							$row_modified = strtotime($assoc_item->modified);
+							if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
+						}
+					}
+					
+					foreach($this->lang_assocs as $assoc_item)
+					{
+						if ($assoc_item->id==$this->item->id) continue;
+						
+						$_link  = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='. $assoc_item->id;
+						$_title = htmlspecialchars(JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
+						echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
+						//echo $assoc_item->id;
+						if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
+							echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
+						} else if( !empty($assoc_item->lang) ) {
+							echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
+						}
+						
+						$assoc_modified = strtotime($assoc_item->modified);
+						if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
+						if ( $assoc_modified < $row_modified ) echo "(!)";
+						echo "</a>";
+					}
+				}
+				?>
+				</div>
+			<?php endif; /* IF enable_translation_groups */ ?>
 			
-			
-		<?php endif; ?>
-		
-		
+		</fieldset>
+	<?php endif; /* IF language */ ?>
+
+
 	<?php if (FLEXI_ACCESS && $this->perms['canright'] && $this->item->id) : ?>
 		<?php
 		$this->document->addScriptDeclaration("
@@ -737,11 +741,10 @@ $tabCnt[$tabSetCnt] = 0;
 			<?php echo JText::_( 'FLEXI_RIGHTS_MANAGEMENT_DESC' ); ?>
 			</div>
 		</fieldset>
+
 	<?php endif; ?>
 
-		
 	</div> <!-- end tab -->
-	
 
 
 
@@ -779,39 +782,46 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 				// SKIP frontend hidden fields from this listing
 				if (
 					($field->iscore && $field->field_type!='maintext')  ||
-				  $field->parameters->get('frontend_hidden')  ||
-				  (in_array($field->field_type, $hidden) && empty($field->html)) ||
-				  in_array($field->formhidden, array(1,3))
+					$field->parameters->get('frontend_hidden')  ||
+					(in_array($field->field_type, $hidden) && empty($field->html)) ||
+					in_array($field->formhidden, array(1,3))
 				) continue;
 				
 				// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
 				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
 				
-				// -- Tooltip for the current field label
-				$edithelp = $field->edithelp ? $field->edithelp : 1;
-				$label_tooltip = ( $field->description && ($edithelp==1 || $edithelp==2) ) ?
-					' class="flexi_label hasTip '.($edithelp==2 ? ' fc_tooltip_icon_fe ' : '').'" title="'.'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'" ' :
-					' class="flexi_label" ';
-				$label_style = ""; //( $field->field_type == 'maintext' || $field->field_type == 'textarea' ) ? " style='clear:both; float:none;' " : "";
 				$not_in_tabs = "";
-				
 				if ($field->field_type=='groupmarker') {
 					echo $field->html;
 					continue;
 				}
 				
+				// Decide label classes, tooltip, etc
+				$lbl_class = 'flexi_label';
+				$lbl_title = '';
+				// field has tooltip
+				$edithelp = $field->edithelp ? $field->edithelp : 1;
+				if ( $field->description && ($edithelp==1 || $edithelp==2) ) {
+					 $lbl_class .= ' hasTip'.($edithelp==2 ? ' fc_tooltip_icon_fe' : '');
+					 $lbl_title = '::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8');
+				}
+				// field is required
+				$required = $field->parameters->get('required', 0 );
+				if ($required)  $lbl_class .= ' required';
+				
+				// Some fields may force a container width ?
 				$row_k = 1 - $row_k;
 				$width = $field->parameters->get('container_width', '' );
 				$width = !$width ? '' : 'width:' .$width. ($width != (int)$width ? 'px' : '');
-				$classes = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
+				$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
 				?>
 				
 				<div class='fcclear'></div>
-				<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name; ?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
+				<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
 					<?php echo $field->label; ?>
 				</label>
 				
-				<div style="<?php echo $width; ?>;" class="<?php echo $classes; ?>" id="container_fcfield_<?php echo $field->id; ?>">
+				<div style="<?php echo $width; ?>;" class="<?php echo $container_class; ?>" id="container_fcfield_<?php echo $field->id; ?>">
 					<?php echo ($field->description && $edithelp==3) ? '<div class="fc-mssg fc-info">'.$field->description.'</div>' : ''; ?>
 					
 				<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing of joomfish (J1.5) or falang (J2.5+)

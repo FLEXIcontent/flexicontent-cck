@@ -77,9 +77,9 @@ jQuery(function() {
 	var uploader = jQuery("#flash_uploader").pluploadQueue();
 	
 	uploader.bind(\'UploadComplete\',function(){
-Â Â Â Â Â Â Â Â console.log("All Files Uploaded");
+        console.log("All Files Uploaded");
 		window.location.reload();
-Â Â Â Â });
+    });
 });
 ');
 ?>

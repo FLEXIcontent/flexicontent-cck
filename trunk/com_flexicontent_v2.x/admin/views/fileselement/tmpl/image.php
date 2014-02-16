@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: image.php 1750 2013-09-03 20:50:59Z ggppdk $
+ * @version 1.5 stable $Id: image.php 1845 2014-02-13 07:54:35Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -77,9 +77,9 @@ jQuery(function() {
 	var uploader = jQuery("#flash_uploader").pluploadQueue();
 	
 	uploader.bind(\'UploadComplete\',function(){
-Â Â Â Â Â Â Â Â console.log("All Files Uploaded");
+        console.log("All Files Uploaded");
 		window.location.reload();
-Â Â Â Â });
+    });
 });
 ');
 ?>
@@ -95,13 +95,15 @@ jQuery(function() {
 					JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
 					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
 			?>
-
+			
 			<!-- File Upload Form -->
 			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" id="uploadForm" method="post" enctype="multipart/form-data">
 				<fieldset class="filemanager-tab" >
 					<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
 					<fieldset class="actions" id="filemanager-1">
+						
 						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
+							
 							<tr>
 								<td class="key">
 									<label for="file-upload">
@@ -153,7 +155,7 @@ jQuery(function() {
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
 			</form>
 			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
-			
+
 			<!----start files tab---->
 			<?php
 			echo FLEXI_J16GE ?
@@ -168,8 +170,7 @@ jQuery(function() {
 			</fieldset>
 			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 			<!----end files tab---->
-			
-			
+
 			<?php endif; ?>
 			<?php echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane(); ?>
 		</td>

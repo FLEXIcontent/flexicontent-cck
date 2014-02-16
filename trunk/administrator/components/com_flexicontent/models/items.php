@@ -740,7 +740,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$filter_type 		= $app->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );
 		$filter_cats 		= $app->getUserStateFromRequest( $option.'.items.filter_cats',	'filter_cats', '', 'int' );
 		$filter_subcats	= $app->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
-		$filter_catsinstate = $app->getUserStateFromRequest( $option.'.items.filter_catsinstate',	'filter_catsinstate', 2, 'int' );
+		$filter_catsinstate = $app->getUserStateFromRequest( $option.'.items.filter_catsinstate',	'filter_catsinstate', 1, 'int' );
 		$filter_state 	= $app->getUserStateFromRequest( $option.'.items.filter_state', 	'filter_state', '', 'word' );
 		$filter_stategrp= $app->getUserStateFromRequest( $option.'.items.filter_stategrp',	'filter_stategrp', '', 'word' );
 		$filter_id	 		= $app->getUserStateFromRequest( $option.'.items.filter_id', 		'filter_id', '', 'int' );

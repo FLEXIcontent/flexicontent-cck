@@ -383,21 +383,35 @@ $tabCnt[$tabSetCnt] = 0;
 		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_BASIC' ); ?> </h3>
 		
 		<?php $fset_lbl = $tags_displayed ? 'FLEXI_CATEGORIES_TAGS' : 'FLEXI_CATEGORIES';?>
-		<fieldset class="basicfields_set">
+		
+		<div class="fcclear"></div>
+		<fieldset class="basicfields_set" id="fcform_categories_tags_container">
 			<legend>
 				<?php echo JText::_( $fset_lbl ); ?>
 			</legend>
 			
-			<label id="catid-lbl" for="catid" for_bck="catid" class="flexi_label" >
+			<label id="catid-lbl" for="catid" for_bck="catid" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_CATEGORIES_MAIN' ); ?>
 			</label>
 			<div class="container_fcfield container_fcfield_name_catid">
 				<?php echo $this->lists['catid']; ?>
-				<span class="editlinktip hasTip" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
+				<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8');?>">
 				<?php echo $infoimage; ?>
 				</span>
 			</div>
 			
+			<?php if (1) : /* secondary categories always available in backend */ ?>
+				
+				<div class="fcclear"></div>
+				<label id="cid-lbl" for="cid" for_bck="cid" class="flexi_label" >
+					<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
+				</label>
+				<div class="container_fcfield container_fcfield_name_cid">
+					<?php echo $this->lists['cid']; ?>
+				</div>
+				
+			<?php endif; ?>
+
 			<?php if ( !empty($this->lists['featured_cid']) ) : ?>
 				<div class="fcclear"></div>
 				<label id="featured_cid-lbl" for="featured_cid" for_bck="featured_cid" class="flexi_label">
@@ -407,32 +421,22 @@ $tabCnt[$tabSetCnt] = 0;
 					<?php echo $this->lists['featured_cid']; ?>
 				</div>
 			<?php endif; ?>
-			
-			<div class="fcclear"></div>
-			<label id="cid-lbl" for="cid" for_bck="cid" class="flexi_label" >
-				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
-			</label>
-			<div class="container_fcfield container_fcfield_name_cid">
-				<?php echo $this->lists['cid']; ?>
-			</div>
-			
-		<?php /*<fieldset class="basicfields_set">
-			<legend>
-				<?php echo JText::_( 'FLEXI_TAGGING' ); ?>
-			</legend>*/ ?>
-			
-			<div class="fcclear"></div>
-			<div id="tags">
+
+
+
+
+			<?php if (1) : /* tags always available in backend */ ?>
 				<?php
 					$field = $this->fields['tags'];
 					$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
 				?>
+				<div class="fcclear"></div>
 				<label id="tag-lbl" for="tag" <?php echo $label_tooltip; ?> >
 					<?php echo $field->label; ?>
 					<?php /*echo JText::_( 'FLEXI_TAGS' );*/ ?>
 				</label>
 				<div class="container_fcfield container_fcfield_name_tags">
-
+					
 					<div class="qf_tagbox" id="qf_tagbox">
 						<ul id="ultagbox">
 						<?php
@@ -447,12 +451,13 @@ $tabCnt[$tabSetCnt] = 0;
 									echo '<input type="hidden" name="tag[]" value="'.$tag->tid.'" /></li>';
 								}
 							}
-							?>
+						?>
 						</ul>
 					</div>
 
 					<?php if ( $this->perms['cantags'] ) : ?>
-						<div class="fcclear"></div>
+					<div class="fcclear"></div>
+					<div id="tags">
 						<label for="input-tags">
 							<?php echo JText::_( 'FLEXI_ADD_TAG' ); ?>
 						</label>
@@ -461,15 +466,18 @@ $tabCnt[$tabSetCnt] = 0;
 						<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_TAG_EDDITING_FULL' ), ENT_COMPAT, 'UTF-8');?>">
 							<?php echo $infoimage; ?>
 						</span>
+					</div>
 					<?php endif; ?>
 				</div>
-			</div>
+			<?php endif; ?>
 
 		</fieldset>
 
+
+	<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 		
-		<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
-		<fieldset class="basicfields_set">
+		<div class="fcclear"></div>
+		<fieldset class="basicfields_set" id="fcform_language_container">
 			<legend>
 				<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 			</legend>
@@ -477,12 +485,12 @@ $tabCnt[$tabSetCnt] = 0;
 			<label id="language-lbl" for="language" class="flexi_label">
 				<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 			</label>
-
+			
 			<div class="container_fcfield container_fcfield_name_language">
 				<?php echo $this->lists['languages']; ?>
 			</div>
 
-			<?php if ($this->params->get('enable_translation_groups')) : ?>
+			<?php if ( $this->params->get('enable_translation_groups') ) : ?>
 
 				<div class="fcclear"></div>
 				<?php
@@ -491,12 +499,14 @@ $tabCnt[$tabSetCnt] = 0;
 				<label id="lang_parent_id-lbl" for="lang_parent_id" <?php echo $label_tooltip; ?> >
 					<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
 				</label>
+				
 				<div class="container_fcfield container_fcfield_name_originalitem">
 				<?php if ( $this->row->id  && (substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($this->row->language, 0,2) || $this->row->language=='*') ) : ?>
 					<br/><small><?php echo JText::_( $this->row->language=='*' ? 'FLEXI_ORIGINAL_CONTENT_ALL_LANGS' : 'FLEXI_ORIGINAL_TRANSLATION_CONTENT' );?></small>
 					<input type="hidden" name="lang_parent_id" id="lang_parent_id" value="<?php echo $this->row->id; ?>" />
 				<?php else : ?>
 					<?php
+					if (1) { // currently selecting associated item, is always allowed in backend
 						require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'elements'.DS.'item.php');
 						$attrs = array(
 							'type'=>"item", 'label'=>"FLEXI_ORIGINAL_CONTENT_ITEM", 'description'=>"FLEXI_ORIGINAL_CONTENT_ITEM_DESC",
@@ -508,9 +518,14 @@ $tabCnt[$tabSetCnt] = 0;
 						//echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br>';
 						echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->row->lang_parent_id, $jelement, '');
 					?>
-					<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ), ENT_COMPAT, 'UTF-8');?>">
-						<?php echo $infoimage; ?>
-					</span>
+						<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ), ENT_COMPAT, 'UTF-8');?>">
+							<?php echo $infoimage; ?>
+						</span>
+					<?php
+					} else {
+						echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ALREADY_SET' );
+					}
+					?>
 				<?php endif; ?>
 				</div>
 
@@ -518,6 +533,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<label id="langassocs-lbl" for="langassocs" class="flexi_label" >
 					<?php echo JText::_( 'FLEXI_ASSOC_TRANSLATIONS' );?>
 				</label>
+				
 				<div class="container_fcfield container_fcfield_name_langassocs">
 				<?php
 				if ( !empty($this->lang_assocs) )
@@ -529,11 +545,11 @@ $tabCnt[$tabSetCnt] = 0;
 							if (!$row_modified)  $row_modified = strtotime($assoc_item->created);
 						}
 					}
-
+					
 					foreach($this->lang_assocs as $assoc_item)
 					{
 						if ($assoc_item->id==$this->row->id) continue;
-
+						
 						$_link  = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&cid[]='. $assoc_item->id;
 						$_title = htmlspecialchars(JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
 						echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
@@ -543,7 +559,7 @@ $tabCnt[$tabSetCnt] = 0;
 						} else if( !empty($assoc_item->lang) ) {
 							echo $assoc_item->lang=='*' ? JText::_("All") : $assoc_item->lang;
 						}
-
+						
 						$assoc_modified = strtotime($assoc_item->modified);
 						if (!$assoc_modified)  $assoc_modified = strtotime($assoc_item->created);
 						if ( $assoc_modified < $row_modified ) echo "(!)";
@@ -555,10 +571,11 @@ $tabCnt[$tabSetCnt] = 0;
 			<?php endif; /* IF enable_translation_groups */ ?>
 			
 		</fieldset>
-		<?php endif; /* IF language */ ?>
+	<?php endif; /* IF language */ ?>
 
-	<?php
-		if (FLEXI_ACCESS && $this->perms['canright'] && $this->row->id) :
+
+	<?php if (FLEXI_ACCESS && $this->perms['canright'] && $this->row->id) : ?>
+		<?php
 		$this->document->addScriptDeclaration("
 			window.addEvent('domready', function() {
 			var slideaccess = new Fx.Slide('tabacces');
@@ -597,139 +614,141 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		<h3 class="tabberheading"> <?php echo $type_lbl; ?> </h3>
 		
 		<?php
-		$this->document->addScriptDeclaration("
-			jQuery(document).ready(function() {
-				jQuery('#type_id').change(function() {
-					if (jQuery('#type_id').val() != '".$this->row->type_id."')
-						jQuery('#fc-change-error').css('display', 'block');
-					else
-						jQuery('#fc-change-error').css('display', 'none');
+			$this->document->addScriptDeclaration("
+				jQuery(document).ready(function() {
+					jQuery('#type_id').change(function() {
+						if (jQuery('#type_id').val() != '".$this->row->type_id."')
+							jQuery('#fc-change-error').css('display', 'block');
+						else
+							jQuery('#fc-change-error').css('display', 'none');
+					});
 				});
-			});
-		");
+			");
 		?>
-
+		
 		<div class="fc_edit_container_full">
-		<?php /*<fieldset class="customfields_set">
-			<legend>
-				<?php echo $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this->typesselected->name : JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
-			</legend>*/ ?>
-
-				<?php
-				$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
-				$noplugin = '<div class="fc-mssg fc-warning">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
-				$row_k = 0;
-				foreach ($this->fields as $field)
-				{
-					// SKIP backend hidden fields from this listing
-					if (
-						($field->iscore && $field->field_type!='maintext')  ||
-						$field->parameters->get('backend_hidden')  ||
-						(in_array($field->field_type, $hidden) && empty($field->html)) ||
-						in_array($field->formhidden, array(2,3))
-					) continue;
-
-					// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
-					if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
-
-					// -- Tooltip for the current field label
-					$edithelp = $field->edithelp ? $field->edithelp : 1;
-					$label_tooltip = ( $field->description && ($edithelp==1 || $edithelp==2) ) ?
-						' class="flexi_label hasTip '.($edithelp==2 ? ' fc_tooltip_icon_bg ' : '').'" title="'.'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'" ' :
-						' class="flexi_label" ';
-					$label_style = ""; //( $field->field_type == 'maintext' || $field->field_type == 'textarea' ) ? " style='clear:both; float:none;' " : "";
-					$not_in_tabs = "";
-
-					if ($field->field_type=='groupmarker') :
-						echo $field->html;
-						continue;
-					endif;
-							
-					$row_k = 1 - $row_k;
-					$width = $field->parameters->get('container_width', '' );
-					if ($width)  $width = 'width:' .$width. ($width != (int)$width ? 'px' : '');
+			
+			<?php
+			$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
+			$noplugin = '<div class="fc-mssg fc-warning">'. JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) .'</div>';
+			$row_k = 0;
+			foreach ($this->fields as $field)
+			{
+				// SKIP backend hidden fields from this listing
+				if (
+					($field->iscore && $field->field_type!='maintext')  ||
+					$field->parameters->get('backend_hidden')  ||
+					(in_array($field->field_type, $hidden) && empty($field->html)) ||
+					in_array($field->formhidden, array(2,3))
+				) continue;
+				
+				// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
+				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
+				
+				$not_in_tabs = "";
+				if ($field->field_type=='groupmarker') {
+					echo $field->html;
+					continue;
+				}
+				
+				// Decide label classes, tooltip, etc
+				$lbl_class = 'flexi_label';
+				$lbl_title = '';
+				// field has tooltip
+				$edithelp = $field->edithelp ? $field->edithelp : 1;
+				if ( $field->description && ($edithelp==1 || $edithelp==2) ) {
+					 $lbl_class .= ' hasTip'.($edithelp==2 ? ' fc_tooltip_icon_bg' : '');
+					 $lbl_title = '::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8');
+				}
+				// field is required
+				$required = $field->parameters->get('required', 0 );
+				if ($required)  $lbl_class .= ' required';
+				
+				// Some fields may force a container width ?
+				$row_k = 1 - $row_k;
+				$width = $field->parameters->get('container_width', '' );
+				$width = !$width ? '' : 'width:' .$width. ($width != (int)$width ? 'px' : '');
+				$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
 				?>
 						
-						<div class='fcclear'></div>
+				<div class='fcclear'></div>
 
-						<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name; ?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name; ?>" <?php echo $label_tooltip . $label_style; ?> >
-							<?php echo $field->label; ?>
-						</label>
+				<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
+					<?php echo $field->label; ?>
+				</label>
 
-						<div style="<?php echo $width; ?>;" class="fcfield_row<?php echo $row_k;?> container_fcfield
-							container_fcfield_id_<?php echo $field->id;?> container_fcfield_name_<?php echo $field->name;?>" id="container_fcfield_<?php echo $field->id;?>"
-						>
+				<div style="<?php echo $width; ?>;" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
 								
-							<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>
+					<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>
 
-					<?php	if ($field->field_type=='maintext' && isset($this->row->item_translations) ) : ?>
+				<?php	if ($field->field_type=='maintext' && isset($this->row->item_translations) ) : ?>
 
-						<!-- tabber start -->
-						<div class="fctabber" style=''>
-							<div class="tabbertab" style="padding: 0px;" >
-								<h3 class="tabberheading"> <?php echo '- '.$itemlangname.' -'; // $t->name; ?> </h3>
-								<?php
-									$field_tab_labels = & $field->tab_labels;
-									$field_html       = & $field->html;
-									echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
-								?>
-							</div>
-							<?php foreach ($this->row->item_translations as $t): ?>
-								<?php if ($itemlang!=$t->shortcode && $t->shortcode!='*') : ?>
-									<div class="tabbertab" style="padding: 0px;" >
-										<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
-										<?php
-										$field_tab_labels = & $t->fields->text->tab_labels;
-										$field_html       = & $t->fields->text->html;
-										echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
-										?>
-									</div>
-								<?php endif; ?>
-							<?php endforeach; ?>
+					<!-- tabber start -->
+					<div class="fctabber" style=''>
+						<div class="tabbertab" style="padding: 0px;" >
+							<h3 class="tabberheading"> <?php echo '- '.$itemlangname.' -'; // $t->name; ?> </h3>
+							<?php
+								$field_tab_labels = & $field->tab_labels;
+								$field_html       = & $field->html;
+								echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
+							?>
 						</div>
-						<!-- tabber end -->
+						<?php foreach ($this->row->item_translations as $t): ?>
+							<?php if ($itemlang!=$t->shortcode && $t->shortcode!='*') : ?>
+								<div class="tabbertab" style="padding: 0px;" >
+									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+									<?php
+									$field_tab_labels = & $t->fields->text->tab_labels;
+									$field_html       = & $t->fields->text->html;
+									echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
+									?>
+								</div>
+							<?php endif; ?>
+						<?php endforeach; ?>
+					</div>
+					<!-- tabber end -->
+
+				<?php else : ?>
+
+					<?php	if ( !is_array($field->html) ) : ?>
+
+						<?php echo isset($field->html) ? $field->html : $noplugin; ?>
 
 					<?php else : ?>
 
-						<?php	if ( !is_array($field->html) ) : ?>
+						<!-- tabber start -->
+						<div class="fctabber">
+						<?php foreach ($field->html as $i => $fldhtml): ?>
+							<?php
+								// Hide field when it has no label, and skip creating tab
+								$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
+								if (!isset($field->tab_labels[$i]))	continue;
+							?>
 
-							<?php echo isset($field->html) ? $field->html : $noplugin; ?>
-
-						<?php else : ?>
-
-							<!-- tabber start -->
-							<div class="fctabber">
-							<?php foreach ($field->html as $i => $fldhtml): ?>
+							<div class="tabbertab">
+								<h3 class="tabberheading"> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
 								<?php
-									// Hide field when it has no label, and skip creating tab
-									$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
-									if (!isset($field->tab_labels[$i]))	continue;
+									echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
+									$not_in_tabs = "";      // Clear the hidden fields variable
+									echo $field->html[$i];  // Current TAB CONTENTS
 								?>
-
-								<div class="tabbertab">
-									<h3 class="tabberheading"> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
-									<?php
-										echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
-										$not_in_tabs = "";      // Clear the hidden fields variable
-										echo $field->html[$i];  // Current TAB CONTENTS
-									?>
-								</div>
-
-							<?php endforeach; ?>
 							</div>
-							<!-- tabber end -->
-							<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
 
-						<?php endif; ?>
+						<?php endforeach; ?>
+						</div>
+						<!-- tabber end -->
+						<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
 
 					<?php endif; ?>
 
-						</div>
+				<?php endif; ?>
 
-				<?php
-				}
-				?>
-		<?php /*</fieldset>*/ ?>
+					</div>
+
+			<?php
+			}
+			?>
+			
 		</div>
 	
 	</div> <!-- end tab -->
