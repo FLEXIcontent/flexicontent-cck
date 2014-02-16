@@ -423,14 +423,84 @@ class FlexicontentModelFavourites extends JModelLegacy
 		 * If we have a filter, and this is enabled... lets tack the AND clause
 		 * for the filter onto the WHERE clause of the item query.
 		 */
-		if ($params->get('use_search'))
+		
+		// ****************************************
+		// Create WHERE clause part for Text Search 
+		// ****************************************
+		
+		$text = JRequest::getString('filter', '', 'default');
+		//$text = $this->_params->get('use_search') ? $text : '';
+		$phrase = JRequest::getVar('searchphrase', 'exact', 'default');
+		$si_tbl = 'flexicontent_items_ext';
+		
+		$text = trim( $text );
+		if( strlen($text) )
 		{
-			$filter 		= JRequest::getString('filter', '', 'request');
-
-			if ($filter) {
-				$search_term = FLEXI_J16GE ? $this->_db->escape( $filter, true ) : $this->_db->getEscaped( $filter, true );
-				$where .= ' AND MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $search_term, false ).' IN BOOLEAN MODE)';
+			$ts = 'ie';
+			$escaped_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
+			$quoted_text = $db->Quote( $escaped_text, false );
+			
+			switch ($phrase)
+			{
+				case 'natural':
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.') ';
+					break;
+				
+				case 'natural_expanded':
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
+					break;
+				
+				case 'exact':
+					$words = preg_split('/\s\s*/u', $text);
+					$stopwords = array();
+					$shortwords = array();
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=0);
+					if (empty($words)) {
+						// All words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
+						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+						JRequest::setVar('shortwords', implode(' ', $shortwords));
+						$_text_match = ' 0=1 ';
+					} else {
+						// speed optimization ... 2-level searching: first require ALL words, then require exact text
+						$newtext = '+' . implode( ' +', $words );
+						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+						$quoted_text = $db->Quote( $quoted_text, false );
+						$exact_text  = $db->Quote( '%'. $escaped_text .'%', false );
+						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
+					}
+					break;
+				
+				case 'all':
+					$words = preg_split('/\s\s*/u', $text);
+					$stopwords = array();
+					$shortwords = array();
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
+					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+					JRequest::setVar('shortwords', implode(' ', $shortwords));
+					
+					$newtext = '+' . implode( '* +', $words ) . '*';
+					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+					$quoted_text = $db->Quote( $quoted_text, false );
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					break;
+				
+				case 'any':
+				default:
+					$words = preg_split('/\s\s*/u', $text);
+					$stopwords = array();
+					$shortwords = array();
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
+					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+					JRequest::setVar('shortwords', implode(' ', $shortwords));
+					
+					$newtext = implode( '* ', $words ) . '*';
+					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+					$quoted_text = $db->Quote( $quoted_text, false );
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					break;
 			}
+			
+			$where .= ' AND '. $_text_match;
 		}
 		return $where;
 	}

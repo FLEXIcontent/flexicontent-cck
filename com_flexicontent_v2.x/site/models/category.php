@@ -820,56 +820,64 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$filters_where = array();
 		
-		// NOT USING to ALLOW filtering VIA MODULE $cparams->get('use_search',1) 
-		
-		// Get value of search text ('filter') , setting into appropriate session variables
-		// *** Commented out to get variable only by HTTP GET or POST thus supporting FULL PAGE CACHING (e.g. Joomla's system plugin 'Cache')
+		// Get value of search text ('filter') from URL or SESSION (which is set new value if not already set)
+		// *** Commented out to get variable only by HTTP GET or POST
+		// thus supporting FULL PAGE CACHING (e.g. Joomla's system plugin 'Cache')
 		/*if ($this->_id) {
-			$filter  = $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter', 'filter', '', 'string' );
+			$text  = $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter', 'filter', '', 'string' );
 		} else if ($this->_layout=='author') {
-			$filter  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter', 'filter', '', 'string' );
+			$text  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter', 'filter', '', 'string' );
 		} else if ($this->_layout=='mcats') {
-			$filter  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
+			$text  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
 		} else if ($this->_layout=='myitems') {
-			$filter  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
+			$text  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
 		} else {
-			$filter  = JRequest::getVar('filter', NULL, 'default');
+			$text  = JRequest::getString('filter', '', 'default');
 		}*/
-		$text   = JRequest::getVar('filter', NULL, 'default');
+		
+		// ****************************************
+		// Create WHERE clause part for Text Search 
+		// ****************************************
+		
+		$text = JRequest::getString('filter', '', 'default');
+		//$text = $this->_params->get('use_search') ? $text : '';
 		$phrase = JRequest::getVar('searchphrase', 'exact', 'default');
+		$si_tbl = 'flexicontent_items_ext';
 		
 		$text = trim( $text );
 		if( strlen($text) )
 		{
+			$ts = 'ie';
 			$escaped_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
 			$quoted_text = $db->Quote( $escaped_text, false );
 			
 			switch ($phrase)
 			{
 				case 'natural':
-					$_text_match = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.') ';
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.') ';
 					break;
 				
 				case 'natural_expanded':
-					$_text_match = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
 					break;
 				
 				case 'exact':
 					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=0);
 					if (empty($words)) {
 						// All words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
 						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 						JRequest::setVar('shortwords', implode(' ', $shortwords));
 						$_text_match = ' 0=1 ';
 					} else {
+						// speed optimization ... 2-level searching: first require ALL words, then require exact text
 						$newtext = '+' . implode( ' +', $words );
 						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 						$quoted_text = $db->Quote( $quoted_text, false );
 						$exact_text  = $db->Quote( '%'. $escaped_text .'%', false );
-						$_text_match = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND ie.search_index LIKE '.$exact_text;
+						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
 					}
 					break;
 				
@@ -877,14 +885,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
 					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
-					$newtext = '+' . implode( ' +', $words );
+					$newtext = '+' . implode( '* +', $words ) . '*';
 					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 				
 				case 'any':
@@ -892,14 +900,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, 'flexicontent_items_ext', 'search_index');
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
 					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
-					$newtext = implode( ' ', $words );
+					$newtext = implode( '* ', $words ) . '*';
 					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH (ie.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 			}
 			
@@ -1491,7 +1499,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// a. Clone component parameters ... we will use these as parameters base for merging
 		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
 		$debug_inheritcid = $params->get('debug_inheritcid');
-		if ($debug_inheritcid)	JFactory::getApplication()->enqueueMessage("CLONED COMPONENT PARAMETERS<br/>\n");
+		if ($debug_inheritcid)	$app->enqueueMessage("CLONED COMPONENT PARAMETERS<br/>\n");
 		
 		// b. Retrieve category parameters and create parameter object
 		if ($id) {
@@ -1517,7 +1525,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				
 				// Merge author OVERRIDDEN category parameters
 				$_author_catreg = FLEXI_J16GE ? new JRegistry($author_extdata->author_catparams)   : new JParameter($author_extdata->author_catparams);
-				if ( $_author_catreg->get('override_currcatconf',0) ) {
+				if ( $_author_basicreg->get('override_currcat_config',0) ) {
 					$cparams->merge( $_author_catreg );
 				}
 			}
@@ -1561,13 +1569,15 @@ class FlexicontentModelCategory extends JModelLegacy {
 		while (!empty($heritage_stack)) {
 			$catdata = array_pop($heritage_stack);
 			$params->merge($catdata->params);
-			if ($debug_inheritcid) JFactory::getApplication()->enqueueMessage("MERGED CATEGORY PARAMETERS of (inherit-from) category: ".$catdata->title ."<br/>\n");
+			if ($debug_inheritcid) $app->enqueueMessage("MERGED CATEGORY PARAMETERS of (inherit-from) category: ".$catdata->title ."<br/>\n");
 		}
 		
 		// f. Merge category parameter / author overriden category parameters
 		$params->merge($cparams);
-		if ($debug_inheritcid && $id) JFactory::getApplication()->enqueueMessage("MERGED CATEGORY PARAMETERS of current category<br/>\n");
-		if ($debug_inheritcid && $this->_authorid) JFactory::getApplication()->enqueueMessage("MERGED CATEGORY PARAMETERS of (current) author: {$this->_authorid} <br/>\n");
+		if ($debug_inheritcid && $id)
+			$app->enqueueMessage("MERGED CATEGORY PARAMETERS of current category<br/>\n");
+		if ($debug_inheritcid && $this->_authorid && !empty($_author_catreg) && $_author_catreg->get('override_currcat_config',0))
+			$app->enqueueMessage("MERGED CATEGORY PARAMETERS of (current) author: {$this->_authorid} <br/>\n");
 		
 		// g. Verify menu item points to current FLEXIcontent object, and then merge menu item parameters
 		if ( !empty($menu) )
@@ -1587,7 +1597,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			if ( $menu_matches && $overrideconf ) {
 				// Add - all - menu parameters related or not related to category parameters override
 				$params->merge($menu_params);
-				if ($debug_inheritcid) JFactory::getApplication()->enqueueMessage("MERGED CATEGORY PARAMETERS of (current) menu item: ".$menu->id."<br/>\n");
+				if ($debug_inheritcid) $app->enqueueMessage("MERGED CATEGORY PARAMETERS of (current) menu item: ".$menu->id."<br/>\n");
 			} else if ($menu_matches) {
 				// Add menu parameters - not - related to category parameters override
 				$params->set( 'item_depth', $menu_params->get('item_depth') );

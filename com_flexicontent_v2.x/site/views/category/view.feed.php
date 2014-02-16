@@ -61,14 +61,15 @@ class FlexicontentViewCategory extends JViewLegacy
 		$params->set('orderbycustomfielddir_2nd', $params->get('feed_orderbycustomfielddir_2nd', 'ASC'));
 		$params->set('orderbycustomfieldint_2nd', $params->get('feed_orderbycustomfieldint_2nd', 0));
 		
-		$cats = $this->get('Data');
+		$rows = $this->get('Data');
 		
 		$feed_summary = $params->get('feed_summary', 0);
 		$feed_summary_cut = $params->get('feed_summary_cut', 200);
 		
 		$feed_use_image = $params->get('feed_use_image', 1);
-		$feed_image_source = $params->get('feed_image_source', '');
 		$feed_link_image = $params->get('feed_link_image', 1);
+		$feed_image_source = $params->get('feed_image_source', '');
+		$feed_image_size = $params->get('feed_image_size', '');
 		$feed_image_method = $params->get('feed_image_method', 1);
 		
 		$feed_image_width = $params->get('feed_image_width', 100);
@@ -82,11 +83,21 @@ class FlexicontentViewCategory extends JViewLegacy
 			//$image_dbdata->params = FLEXI_J16GE ? new JRegistry($image_dbdata->params) : new JParameter($image_dbdata->params);
 			
 			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', '' => '');
-			$img_field_size = $img_size_map[ $image_size ];
+			$img_field_size = $img_size_map[ $feed_image_size ];
 			$img_field_name = $image_dbdata->name;
 		}
 		
-		foreach ( $cats as $row )
+		// TODO render and add extra fields here ... maybe via special display function for feeds view
+		$extra_fields = $params->get('feed_extra_fields', '');
+		$extra_fields = array_unique(preg_split("/\s*,\s*/u", $extra_fields));
+		if ($extra_fields) {
+			foreach($extra_fields as $fieldname) {
+				// Render given field for ALL ITEMS
+				FlexicontentFields::getFieldDisplay($rows, $fieldname, $values=null, $method='display');
+			}
+		}
+		
+		foreach ( $rows as $row )
 		{
 			// strip html from feed item title
 			$title = $this->escape( $row->title );
@@ -137,6 +148,13 @@ class FlexicontentViewCategory extends JViewLegacy
 	  		if ($thumb) {
 	  			$description = "<a href='".$link."'><img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/></a><p>".$description."</p>";
 	  		}
+				if ($extra_fields) {
+					foreach($extra_fields as $fieldname) {
+						if ( $row->fields[$fieldname]->display ) {
+			  			$description .= '<br/><b>'.$row->fields[$fieldname]->label .":</b> ". $row->fields[$fieldname]->display;
+						}
+					}
+				}
   		}
 	  	
 			//$author = $row->created_by_alias ? $row->created_by_alias : $row->author;

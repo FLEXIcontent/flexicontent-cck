@@ -238,35 +238,37 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$text = trim( $text );
 		if( strlen($text) )
 		{
+			$ts = 'ts';
 			$escaped_text = FLEXI_J16GE ? $db->escape($text, true) : $db->getEscaped($text, true);
 			$quoted_text = $db->Quote( $escaped_text, false );
 			
 			switch ($phrase)
 			{
 				case 'natural':
-					$_text_match = ' MATCH (search_index) AGAINST ('.$quoted_text.') ';
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.') ';
 					break;
 				
 				case 'natural_expanded':
-					$_text_match = ' MATCH (search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' WITH QUERY EXPANSION) ';
 					break;
 				
 				case 'exact':
 					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index');
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=0);
 					if (empty($words)) {
 						// All words are stop-words or too short, we could try to execute a query that only contains a LIKE %...% , but it would be too slow
 						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 						JRequest::setVar('shortwords', implode(' ', $shortwords));
 						$_text_match = ' 0=1 ';
 					} else {
+						// speed optimization ... 2-level searching: first require ALL words, then require exact text
 						$newtext = '+' . implode( ' +', $words );
 						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 						$quoted_text = $db->Quote( $quoted_text, false );
 						$exact_text  = $db->Quote( '%'. $escaped_text .'%', false );
-						$_text_match = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND search_index LIKE '.$exact_text;
+						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) AND '.$ts.'.search_index LIKE '.$exact_text;
 					}
 					break;
 				
@@ -274,14 +276,14 @@ class plgSearchFlexiadvsearch extends JPlugin
 					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index');
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
 					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
-					$newtext = '+' . implode( ' +', $words );
+					$newtext = '+' . implode( '* +', $words ) . '*';
 					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 				
 				case 'any':
@@ -289,22 +291,22 @@ class plgSearchFlexiadvsearch extends JPlugin
 					$words = preg_split('/\s\s*/u', $text);
 					$stopwords = array();
 					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index');
+					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
 					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
 					JRequest::setVar('shortwords', implode(' ', $shortwords));
 					
-					$newtext = implode( ' ', $words );
+					$newtext = implode( '* ', $words ) . '*';
 					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
 					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH (search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
 					break;
 			}
 			
 			// Construct TEXT SEARCH limitation SUB-QUERY (contained in a AND-WHERE clause)
 			if (!$txtmode)
-				$_text_SQL = ' SELECT item_id FROM #__flexicontent_items_ext WHERE %s ';
+				$_text_SQL = ' SELECT item_id FROM #__flexicontent_items_ext AS '.$ts.' WHERE %s ';
 			else
-				$_text_SQL = ' SELECT item_id FROM #__flexicontent_advsearch_index WHERE %s AND field_id IN ('. implode(',',array_keys($fields_text)) .')';
+				$_text_SQL = ' SELECT item_id FROM #__flexicontent_advsearch_index AS '.$ts.' WHERE %s AND field_id IN ('. implode(',',array_keys($fields_text)) .')';
 			
 			$text_where = ' AND i.id IN ( '. sprintf($_text_SQL, $_text_match) .')';
 		} else {

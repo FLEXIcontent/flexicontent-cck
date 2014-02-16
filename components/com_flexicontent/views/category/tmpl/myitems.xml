@@ -59,8 +59,8 @@
 			</field>
 			<field name="show_pdf_icon" type="list" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="show_print_icon" type="list" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -69,28 +69,28 @@
 			</field>
 			<field name="show_email_icon" type="list" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="show_feed_icon" type="list" default="" label="FLEXI_SHOW_FEED_ICON" description="FLEXI_SHOW_FEED_ICON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_CATEGORY_INFO" level="level2" />
 			<field name="show_cat_title" type="list" default="" label="FLEXI_SHOW_CAT_TITLE" description="FLEXI_SHOW_CAT_TITLE_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_IMAGE" description="..." level="level3" />
 			<field name="show_description_image" type="list" default="" label="FLEXI_CAT_IMAGE" description="FLEXI_CAT_IMAGE_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="cat_image_source" type="list" default="" label="FLEXI_CATIMAGE_SOURCE" description="FLEXI_CATIMAGE_SOURCE_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -114,8 +114,8 @@
 			<field name="" type="separator" default="FLEXI_DESCRIPTION" description="..." level="level3" />
 			<field name="show_description" type="list" default="" label="FLEXI_CAT_DESCRIPTION" description="FLEXI_CAT_DESCRIPTION_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="trigger_onprepare_content_cat" type="list" default="" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_CAT_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -293,13 +293,13 @@
 			<field name="" type="separator" default="FLEXI_ITEMS_LIST" description="FLEXI_ITEMS_LIST_DESC" level="level2" />
 			<field name="show_addbutton" type="list" default="" label="FLEXI_SHOW_ADD_TO_LIST_BUTTON" description="FLEXI_SHOW_ADD_TO_LIST_BUTTON_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="show_editbutton" type="list" default="" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="show_comments_count" type="list" default="" label="FLEXI_SHOW_COMMENTS_COUNTER" description="FLEXI_SHOW_COMMENTS_COUNTER_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -308,8 +308,8 @@
 			</field>
 			<field name="show_title_lists" type="list" default="" label="FLEXI_SHOWTITLE_IN_LISTS" description="FLEXI_SHOWTITLE_IN_LISTS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="link_titles_lists" type="list" default="" label="FLEXI_LINKED_TITLES_IN_LISTS" description="FLEXI_LINKED_TITLES_IN_LISTS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -323,8 +323,8 @@
 			</field>
 			<field name="show_readmore" type="list" default="" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
@@ -394,8 +394,8 @@
 			<field name="" type="separator" default="FLEXI_ITEMS_RETIEVAL" description="FLEXI_ITEMS_RETIEVAL_DESC" level="level2" />
 			<field name="show_noauth" type="list" default="" label="FLEXI_SHOW_UNAUTHORIZED_LINKS" description="FLEXI_SHOW_UNAUTHORIZED_LINKS_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="display_subcategories_items" type="list" default="" label="FLEXI_DISPLAY_SUBCATS" description="FLEXI_DISPLAY_SUBCATS_DESC"> 
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -412,20 +412,20 @@
 			<field name="" type="separator" default="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" level="level2" />
 			<field name="show_item_total" type="list" default="" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="limit" type="text" size="4" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC"/>
 			<field name="show_pagination" type="list" default="" label="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 				<option value="2">FLEXI_Auto</option>
 			</field>
 			<field name="show_pagination_results" type="list" default="" label="FLEXI_PAGINATION_RES" description="FLEXI_PAGINATION_RES_DESC">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_Hide</option>
-				<option value="1">FLEXI_Show</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FRONTEND_OVERRIDES" description="FLEXI_FRONTEND_OVERRIDES_DESC" level="level2" />
@@ -623,30 +623,35 @@
 				<option value="1">FLEXI_FULL_TEXT</option>
 			</field>
 			<field name="feed_summary_cut" type="text" size="4" default="" label="FLEXI_FEED_SUMMARY_MAXLEN" description="FLEXI_FEED_SUMMARY_MAXLEN_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_IMAGE" description="FLEXI_USE_IMAGE" level="level2" />
 			<field name="feed_use_image" type="list" default="" label="FLEXI_USE_IMAGE" description="FLEXI_USE_IMAGE_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="feed_image_source" type="fcimage" valcolumn="id" size="10" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
 			<field name="feed_link_image" type="list" default="" label="FLEXI_LINK_IMAGE" description="FLEXI_LINK_IMAGE_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="feed_image_source" type="fcimage" valcolumn="id" size="5" default="" label="FLEXI_IMAGE_SOURCE" description="FLEXI_IMAGE_SOURCE_DESC" />
 			<field name="feed_image_size" type="list" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC">
 				<option value="">FLEXI_USE_PARAMS</option>
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
 				<option value="l">FLEXI_LARGE</option>
 			</field>
+			<field name="feed_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
+			<field name="feed_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
 			<field name="feed_image_method" type="list" default="" label="FLEXI_PROCESSING_METHOD" description="FLEXI_PROCESSING_METHOD_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_SCALE</option>
 				<option value="1">FLEXI_CROP</option>
 			</field>
-			<field name="feed_image_width" type="text" size="4" default="" label="FLEXI_IMAGE_WIDTH" description="FLEXI_IMAGE_WIDTH" />
-			<field name="feed_image_height" type="text" size="4" default="" label="FLEXI_IMAGE_HEIGHT" description="FLEXI_IMAGE_HEIGHT" />
+			
+			<field name="" type="separator" default="Display custom fields &lt;br/&gt; &lt;small&gt; do not add fields that will break feeds display&lt;/small&gt;" description="..." level="level2" menu="hide" />
+			<field name="feed_extra_fields" type="textarea" rows="4" cols="60" label="Extra fields &lt;br/&gt; &lt;small&gt; comma separated list of field names&lt;/small&gt;" description="Fields that requires extra CSS/JS will not work properly, fields that might be suitable are fields like e.g. date,text,select,etc. Enter a comma separated list of field names" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
 			<field name="feed_orderby" type="list" default="" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC" >
@@ -667,6 +672,11 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
+			<field name="feed_orderbycustomfield" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="feed_orderbycustomfieldid" type="fields" default="" orderable="1" isnotcore="1" display_useglobal="1"
 				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" />
 			<field name="feed_orderbycustomfielddir" type="list" default="" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" >
@@ -699,6 +709,11 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
+			<field name="feed_orderbycustomfield_2nd" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="feed_orderbycustomfieldid_2nd" type="fields" default="" orderable="1" isnotcore="1" display_useglobal="1"
 				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" />
 			<field name="feed_orderbycustomfielddir_2nd" type="list" default="" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" >

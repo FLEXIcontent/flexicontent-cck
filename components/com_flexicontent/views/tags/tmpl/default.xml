@@ -26,7 +26,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="image_size" type="list" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC">
+			<field name="image_size" type="list" size="5" default="" label="FLEXI_INTRO_IMAGE_SIZE" description="FLEXI_INTRO_IMAGE_SIZE_DESC">
 				<option value="">FLEXI_USE_PARAMS</option>
 				<option value="s">FLEXI_SMALL</option>
 				<option value="m">FLEXI_MEDIUM</option>
