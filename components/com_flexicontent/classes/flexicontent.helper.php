@@ -4431,28 +4431,30 @@ class flexicontent_db
 	 * @return array
 	 * @since 1.5
 	 */
-	static function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index') {
+	static function removeInvalidWords($words, &$stopwords, &$shortwords, $tbl='flexicontent_items_ext', $col='search_index', $isprefix=1) {
 		$db     = JFactory::getDBO();
 		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
 		
+		$_word_clause = $isprefix ? '+%s*' : '+%s';
 		$query = 'SELECT '.$col
 			.' FROM #__'.$tbl
-			.' WHERE MATCH ('.$col.') AGAINST ("+%s")'
+			.' WHERE MATCH ('.$col.') AGAINST ("'.$_word_clause.'" IN BOOLEAN MODE)'
 			.' LIMIT 1';
 		$_words = array();
 		foreach ($words as $word) {
-			if ( mb_strlen($word) < $min_word_len ) {
-				$shortwords[] = $word;
-				continue;
-			}
 			$quoted_word = FLEXI_J16GE ? $db->escape($word, true) : $db->getEscaped($word, true);
 			$q = sprintf($query, $quoted_word);
 			$db->setQuery($q);
 			$result = $db->loadAssocList();
-			if ( empty($result) ) $stopwords[] = $word;
-			else $_words[] = $word;
+			if ( !empty($result) ) {
+				$_words[] = $word;      // word found
+			} else if ( mb_strlen($word) < $min_word_len ) {
+				$shortwords[] = $word;  // word not found and word too short
+			} else {
+				$stopwords[] = $word;   // word not found
+			}
 		}
 		return $_words;
 	}

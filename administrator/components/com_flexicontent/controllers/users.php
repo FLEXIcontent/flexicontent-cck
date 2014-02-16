@@ -204,6 +204,9 @@ class FlexicontentControllerUsers extends FlexicontentController
 		$author_postdata['user_id']	= $user->get('id');
 		$author_postdata['author_basicparams']	= $data['authorbasicparams'];
 		$author_postdata['author_catparams']	= $data['authorcatparams'];
+		$author_postdata['templates']	= $data['templates'];
+		$author_postdata['attribs']	= $data['attribs'];
+		
 		//echo "<pre>"; print_r($data); exit;
 		
 		$flexiauthor_extdata = JTable::getInstance('flexicontent_authors_ext', '');

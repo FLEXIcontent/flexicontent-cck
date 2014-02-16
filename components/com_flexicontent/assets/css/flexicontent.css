@@ -801,20 +801,6 @@ ul.fc_field_filter.fc_checkradio_group label {
 }
 
 
-/********************
- * Other CSS for Form
- ********************/
-
-#flexicontent .flexi_label.fc_tooltip_icon_fe {
-  padding:6px 3% 6px 1% !important;
-  width: 14%;
-  max-width:126px;
-	background-image: url(../images/icon-16-hint.png);
-	background-position: 99% 5px;
-	background-repeat: no-repeat;
-}
-
-
 /****************
  * Access related
  ****************/

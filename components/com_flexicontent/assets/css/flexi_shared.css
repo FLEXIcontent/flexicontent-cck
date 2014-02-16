@@ -862,15 +862,31 @@ td.paramlist_key label#params-lbl.hasTip { display:none; }
 	background: none !important;
 }
 
-#flexicontent .flexi_label.invalid {
+#flexicontent .flexi_label.invalid,
+#flexicontent .flexi_label.invalid.required {
 	color:red !important;
+}
+#flexicontent .flexi_label.required:after {
+	content:"*";
+}
+
+
+#flexicontent .flexi_label.fc_tooltip_icon_fe {
+  padding:6px 3% 6px 1% !important;
+  width: 14%;
+  max-width:126px;
+	background-image: url(../images/icon-16-hint.png);
+	background-position: 99% 5px;
+	background-repeat: no-repeat;
 }
 
 #flexicontent .flexi_label.fc_tooltip_icon_bg {
   padding: 6px 3% 6px 1% !important;
   width: 14%;
   max-width:126px;
-	background: url(../images/lightbulb.png) 98% 5px no-repeat gray;
+	background-image: url(../images/lightbulb.png);
+	background-position: 98% 5px;
+	background-repeat: no-repeat;
 }
 
 #flexicontent .flexi_label.invalid {

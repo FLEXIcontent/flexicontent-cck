@@ -79,6 +79,9 @@ class flexicontent_authors_ext extends JTable
   {
   	// Convert params from arrays to text, so that they can be stored in the text DB column
   	
+  	// ****************************************************
+  	// AUTHOR BASIC PARAMETERS (author-specific parameters)
+  	// ****************************************************
   	$params = "";
   	if (isset($array['author_basicparams']) && is_array($array['author_basicparams'])) {
 	  	foreach($array['author_basicparams'] as $index => $value) {
@@ -93,6 +96,9 @@ class flexicontent_authors_ext extends JTable
 	  	$array['author_basicparams'] = $params;
   	}
   	
+  	// ************************************************************************
+  	// CATEGORY PARAMETERS (will be saved but used only if override is enabled)
+  	// ************************************************************************
   	$params = "";
   	if (isset($array['author_catparams']) && is_array($array['author_catparams'])) {
 	  	foreach($array['author_catparams'] as $index => $value) {
@@ -104,8 +110,30 @@ class flexicontent_authors_ext extends JTable
 	  		}
 	 			$params .= "\n";
 	  	}
-	  	$array['author_catparams'] = $params;
   	}
+  	if (isset($array['templates']) && is_array($array['templates'])) {
+	  	foreach($array['templates'] as $index => $value) {
+	  		$params .= "$index=";
+	  		if ( is_array($value) ) {
+	  			$params .= implode('|', $value);
+	  		} else {
+	  			$params .= "$value";
+	  		}
+	 			$params .= "\n";
+	  	}
+  	}
+  	if (isset($array['attribs']) && is_array($array['attribs'])) {
+	  	foreach($array['attribs'] as $index => $value) {
+	  		$params .= "$index=";
+	  		if ( is_array($value) ) {
+	  			$params .= implode('|', $value);
+	  		} else {
+	  			$params .= "$value";
+	  		}
+	 			$params .= "\n";
+	  	}
+  	}
+  	$array['author_catparams'] = $params;
   	
   	return parent::bind( $array, $ignore );
   }

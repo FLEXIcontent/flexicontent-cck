@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
 	<name>Author User Type</name>
-	
 	<fields name="params">
-	
 		<fieldset name="author_ext_config" label="FLEXI_AUTHOR_BASIC_PARAMS" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="authordescr_itemid" type="item" default="" label="FLEXI_AUTHOR_DETAILS_ITEM" description="FLEXI_AUTHOR_DETAILS_ITEM_DESC" />
 			<field name="max_auth_limit" type="text" default="0" label="Maximum # of content" description="Maximum number of content items this user can create (aka own too)" />		
 			<field name="max_cat_assign" type="text" default="0" label="Maximum categories per item" description="Maximum number of categories the user can assign to an item" />		
 			<field name="langs_allowed" type="fclanguage" default="" multiple="multiple" label="Languages Allowed" description="Languages allowed to be used by the user. Select none to allow ANY" />		
-			<field name="override_currcatconf" type="list" default="1" label="FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG" description="FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG_DESC">
+			<field name="override_currcat_config" type="list" default="0" label="FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG" description="FLEXI_AUTHOR_OVERRIDE_CURCAT_CONFIG_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 		</fieldset>
-		
 	</fields>
-	
 </form>

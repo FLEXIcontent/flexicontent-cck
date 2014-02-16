@@ -67,7 +67,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		// Get filters
 		$filter_cats       = $app->getUserStateFromRequest( $option.'.items.filter_cats',				'filter_cats',			'',		'int' );
 		$filter_subcats    = $app->getUserStateFromRequest( $option.'.items.filter_subcats',		'filter_subcats',		1,		'int' );
-		$filter_catsinstate = $app->getUserStateFromRequest( $option.'.items.filter_catsinstate', 'filter_catsinstate',2,		'int' );
+		$filter_catsinstate = $app->getUserStateFromRequest( $option.'.items.filter_catsinstate', 'filter_catsinstate', 1,		'int' );
 		
 		$filter_order_type = $app->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type',	1,		'int' );
 		$filter_order      = $app->getUserStateFromRequest( $option.'.items.filter_order',			'filter_order',				'',		'cmd' );

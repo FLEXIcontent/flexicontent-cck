@@ -189,7 +189,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				// COPYING an existing value
 				if (thisNewField.getElement('img.preview_image')) {
-					var tmpDiv = jQuery('<div class=\"empty_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>');
+					var tmpDiv = jQuery('<div class=\"empty_image empty_image".$field->id."\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>');
 					tmpDiv.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
 					tmpDiv.insertAfter( jQuery(thisNewField).find('img.preview_image') );
 					jQuery(thisNewField).find('img.preview_image').remove();
@@ -198,6 +198,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				// COPYING an empty value
 				else if (thisNewField.getElement('div.empty_image')) {
 					jQuery(thisNewField).find('div.empty_image').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
+					jQuery(thisNewField).find('div.empty_image').html('');
 				}
 				
 				var imgchange_toggler = jQuery(thisNewField).find('input.imgchange');
@@ -422,8 +423,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					if (file || !$( elementid + '_existingname' ).hasClass('no_value_selected') ) {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" />';
 					} else {
-						var preview_container = '<div class=\"empty_image\" id=\"'+elementid+'_preview_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\">'
-						if ( replacestr == '_newfile' && newfilename!='' ) preview_container = preview_container + '<br/>&nbsp; File selected<br/>&nbsp; for uploading';
+						var preview_container = '<div class=\"empty_image empty_image".$field->id."\" id=\"'+elementid+'_preview_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\">'
+						if ( replacestr == '_newfile' && newfilename!='' )
+							preview_container += newfilename.replace(/^.*[\\\/]/, '');
 						preview_container = preview_container + '</div>';
 					}
 					
@@ -435,7 +437,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			}
 		";
 		$css .='
-			table.fcfield'.$field->id.'.img_upload_select { float:left; clear:left; }
+			.empty_image'.$field->id.' { word-wrap:break-word !important; }
+			table.fcfield'.$field->id.'.img_upload_select { float:left; clear:none; border:1px dashed gray; margin-bottom:16px; }
 			table.fcfield'.$field->id.'.img_upload_select li { min-height:'.($thumb_h_s+56).'px; }
 			table.fcfield'.$field->id.'.img_upload_select ul { height:'.($thumb_h_s+96).'px; }
 			table.fcfield'.$field->id.'.img_upload_select ul { width:'.(2*($thumb_w_s+64)).'px; }
@@ -538,7 +541,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			} else {
 				
 				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="" />';
-				$imgpreview = '<div class="empty_image" id="'.$elementid.'_preview_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>';
+				$imgpreview = '<div class="empty_image empty_image'.$field->id.'" id="'.$elementid.'_preview_image" style="height:'.$field->parameters->get('h_s').'px; width:'.$field->parameters->get('w_s').'px;"></div>';
 			}
 			
 			if ( !$image_source ) {
@@ -594,7 +597,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			</div>'.
 			
 			( !$image_source ? '
-				<table class="admintable fcfield'.$field->id.' img_upload_select" id="'.$field->name.'_upload_select_tbl_'.$n.'" style="border:1px dashed gray; float:left; margin-bottom:16px;'.($image_name ? "display:none;" : "").'" ><tbody>
+				<table class="admintable fcfield'.$field->id.' img_upload_select" id="'.$field->name.'_upload_select_tbl_'.$n.'" style="'.($image_name ? "display:none;" : "").'" ><tbody>
 					<tr class="img_newfile_row">
 						<td class="key fckey_high">'.JText::_( 'FLEXI_FIELD_NEWFILE' ).':</td>
 						<td style="white-space: normal;">'.
