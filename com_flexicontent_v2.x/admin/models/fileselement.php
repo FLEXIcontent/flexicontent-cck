@@ -221,7 +221,7 @@ class FlexicontentModelFileselement extends JModelLegacy
 		
 		// Get image names
 		$rows = array();
-		foreach($images as $i => $image) {
+		if ($images) foreach($images as $i => $image) {
 			$pinfo = pathinfo($image);
 			$pinfo['filename'] = !isset($pinfo['filename']) ?   			// workaround for 'filename' added in PHP 5.2+
 				str_replace('.'.$pinfo['extension'], '', $pinfo['basename']) : $pinfo['filename'];
