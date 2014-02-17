@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: image.php 1847 2014-02-16 06:29:06Z ggppdk $
+ * @version 1.5 stable $Id: image.php 1848 2014-02-16 12:03:55Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -25,44 +25,120 @@ $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 $session = JFactory::getSession();
 
 // Load plupload JS framework
-flexicontent_html::loadFramework('plupload');
 $doc = JFactory::getDocument();
 $pluploadlib = JURI::root().'components/com_flexicontent/librairies/plupload/';
+$plupload_mode = 'runtime';  // 'runtime,ui'
+flexicontent_html::loadFramework('plupload', $plupload_mode);
 
 // Initialize a plupload Queue
-$doc->addScriptDeclaration('
-jQuery(function() {
-	// Setup flash version
-	jQuery("#flash_uploader").pluploadQueue({
-		// General settings
-		runtimes : "flash",
-		url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.JUtility::getToken().'=1",
-		chunk_size : "1mb",
-		unique_names : true,
-
-		filters : {
-			max_file_size : "10mb",
-			mime_types: [
+$js ='
+var uploader = 0;
+function showUploader() {
+	if (uploader) {
+		// Already initialized, re-initialize and empty it
+		uploader.init();
+		uploader.splice();
+	} else if ("'.$plupload_mode.'"=="ui") {
+    jQuery("#flash_uploader").plupload({
+			// General settings
+			runtimes : "html5,flash,silverlight,html4",
+			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.JUtility::getToken().'=1",
+			
+			// Maximum file size
+			max_file_size : "2mb",
+			
+			chunk_size: "1mb",
+			
+			// Resize images on clientside if we can
+			/*resize : {width : 320, height : 240, quality : 90, crop: true},*/
+			
+			// Specify what files to browse for
+			filters : [
 				{title : "Image files", extensions : "jpg,gif,png"},
-				{title : "Zip files", extensions : "zip"}
-			]
-		},
+				{title : "Zip files", extensions : "zip,avi"}
+			],
+			
+			// Rename files by clicking on their titles
+			rename: true,
+			 
+			// Sort files
+			sortable: true,
+			
+			// Enable ability to drag n drop files onto the widget (currently only HTML5 supports that)
+			dragdrop: true,
+			
+			// Views to activate
+			views: {
+				list: true,
+				thumbs: true, // Show thumbs
+				active: "list"
+			},
+			
+			// Flash settings
+			flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf",
+			
+			// Flash settings
+			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap"
+    });
+    
 
-		// Resize images on clientside if we can
-		resize : {width : 320, height : 240, quality : 90},
+		uploader = jQuery("#flash_uploader").plupload();
+		
+		uploader.bind(\'complete\',function(){
+			console.log("All Files Uploaded");
+			window.location.reload();
+		});
+	} else {
+		uploader = jQuery("#flash_uploader").pluploadQueue({
+			// General settings
+			runtimes : "html5,flash,silverlight,html4",
+			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.JUtility::getToken().'=1",
+			chunk_size : "1mb",
+			unique_names : true,
+			
+			filters : {
+				max_file_size : "10mb",
+				mime_types: [
+					{title : "Image files", extensions : "jpg,gif,png"},
+					{title : "Zip files", extensions : "zip,avi"}
+				]
+			},
+			
+			views: {
+				list: true,
+				thumbs: true, // Show thumbs
+				active: "thumbs"
+			},
+			
+			// Resize images on clientside if we can
+			/*resize : {width : 320, height : 240, quality : 90, crop: true},*/
+			
+			// Flash settings
+			flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf",
+			
+			// Flash settings
+			silverlight_xap_url : "'.$pluploadlib.'/js/Moxie.xap"
+		});
+		
+		uploader = jQuery("#flash_uploader").pluploadQueue();
+		
+		uploader.bind(\'UploadComplete\',function(){
+			console.log("All Files Uploaded");
+			window.location.reload();
+		});
+	}
+};
+';
 
-		// Flash settings
-		flash_swf_url : "'.$pluploadlib.'/js/Moxie.swf"
+$doc->addScriptDeclaration($js);
+flexicontent_html::loadFramework('flexi-lib');
+
+/*<div id="themeswitcher" class="pull-right"> </div>
+<script>
+	jQuery(function() {
+		jQuery.fn.themeswitcher && jQuery('#themeswitcher').themeswitcher({cookieName:''});
 	});
-	
-	var uploader = jQuery("#flash_uploader").pluploadQueue();
-	
-	uploader.bind(\'UploadComplete\',function(){
-		console.log("All Files Uploaded");
-		window.location.reload();
-	});
-});
-');
+</script>*/
 ?>
 
 <div class="flexicontent">
@@ -77,11 +153,17 @@ jQuery(function() {
 					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
 			?>
 			
+			<button id="single_multi_uploader" class="" onclick="jQuery('#filemanager-1').toggle(); jQuery('#filemanager-2').toggle(); jQuery('#flash_uploader').height(330); setTimeout(function(){showUploader()}, 100);">
+				<?php echo JText::_( 'FLEXI_SINGLE_MULTIPLE_UPLOADER' ); ?>
+			</button>
+			<div class="fcclear"></div>
+			
 			<!-- File Upload Form -->
-			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" id="uploadForm" method="post" enctype="multipart/form-data">
-				<fieldset class="filemanager-tab" >
-					<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
-					<fieldset class="actions" id="filemanager-1">
+			<fieldset class="filemanager-tab" >
+				<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
+				
+				<fieldset class="actions" id="filemanager-1">
+					<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" id="uploadForm" method="post" enctype="multipart/form-data">
 						
 						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 							
@@ -92,7 +174,9 @@ jQuery(function() {
 									</label>
 								</td>
 								<td>
-									<input type="file" id="file-upload" name="Filedata" />
+									<div id="img_preview_msg" style="float:left;"></div>
+									<img id="img_preview" src="" style="float:left;"/>
+									<input type="file" id="file-upload" name="Filedata" onchange="loadImagePreview(this.id,'img_preview', 'img_preview_msg', 60, 60);" />
 								</td>
 							</tr>
 <?php if (!$this->folder_mode) { ?>
@@ -122,35 +206,23 @@ jQuery(function() {
 						<input type="submit" id="file-upload-submit" class="fc_button fcsimple" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
 						<span id="upload-clear"></span>
 						
-					</fieldset>
+						<?php echo JHTML::_( 'form.token' ); ?>
+						<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
+						<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
+						<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
+						<input type="hidden" name="secure" value="0" />
+						<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
+					</form>
 					
-					<ul class="upload-queue" id="upload-queue">
-						<li style="display: none"></li>
-					</ul>
 				</fieldset>
-				<?php echo JHTML::_( 'form.token' ); ?>
-				<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
-				<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
-				<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
-				<input type="hidden" name="secure" value="0" />
-				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
-			</form>
-			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
-
-			<!----start files tab---->
-			<?php
-			echo FLEXI_J16GE ?
-					JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILES' ), 'local-files' ) :
-					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILES' ), 'local-files' ) ;
-			?>
-			<fieldset class="filemanager-tabx" >
-				<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
-				<fieldset class="actions" id="filemanager-2">
-					<div id="flash_uploader" style="width: 100%; height: 330px;">Your browser doesn't have Flash installed.</div>
+				
+				<fieldset class="actions" id="filemanager-2" style="display:none;">
+					<div id="flash_uploader" style="width: auto; height: 0px;">Your browser doesn't have Flash installed.</div>
 				</fieldset>
+				
 			</fieldset>
+			
 			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
-			<!----end files tab---->
 
 			<?php endif; ?>
 			<?php echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane(); ?>
