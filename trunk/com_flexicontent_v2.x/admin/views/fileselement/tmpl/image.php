@@ -42,7 +42,7 @@ function showUploader() {
     jQuery("#flash_uploader").plupload({
 			// General settings
 			runtimes : "html5,flash,silverlight,html4",
-			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.JUtility::getToken().'=1",
+			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1",
 			
 			// Maximum file size
 			max_file_size : "2mb",
@@ -92,7 +92,7 @@ function showUploader() {
 		uploader = jQuery("#flash_uploader").pluploadQueue({
 			// General settings
 			runtimes : "html5,flash,silverlight,html4",
-			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.JUtility::getToken().'=1",
+			url : "'.JURI::base().'index.php?option=com_flexicontent&'.$ctrl_task.'uploads&'.$session->getName().'='.$session->getId().'&fieldid='.$this->fieldid.'&u_item_id='.$this->u_item_id.'&folder_mode='.$this->folder_mode.'&secure=0&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1",
 			chunk_size : "1mb",
 			unique_names : true,
 			

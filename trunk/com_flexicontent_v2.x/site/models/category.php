@@ -704,6 +704,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($this->_authorid)
 			$where .= ' AND i.created_by = ' . $this->_db->Quote($this->_authorid);
 		
+		// Prevent author's description item from appearing in the author listings
+		if ($this->_authorid && (int)$this->_params->get('authordescr_itemid'))
+			$where .= ' AND i.id != ' . (int)$this->_params->get('authordescr_itemid');
+		
 		if ($this->_id || count($this->_ids)) {
 			$id_arr = $this->_id ? array($this->_id) : $this->_ids;
 			// Get sub categories used to create items list, according to configuration and user access
