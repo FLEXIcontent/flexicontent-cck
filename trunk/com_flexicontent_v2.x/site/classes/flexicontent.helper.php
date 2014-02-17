@@ -321,7 +321,7 @@ class flexicontent_html
 	 * @return 	string
 	 * @since 1.5
 	 */
-	static function loadFramework( $framework )
+	static function loadFramework( $framework, $mode='' )
 	{
 		// Detect already loaded framework
 		static $_loaded = array();
@@ -710,12 +710,19 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/plupload';
-				$document->addStyleSheet($framework_path.'/js/jquery.plupload.queue/css/jquery.plupload.queue.css');
 				$document->addScript($framework_path.'/js/plupload.full.min.js');
-				$document->addScript($framework_path.'/js/jquery.plupload.queue/jquery.plupload.queue.js');
-				$document->addScript($framework_path.'/js/moxie.js');
-				$document->addScript($framework_path.'/js/plupload.dev.js');
-				$document->addScript($framework_path.'/js/jquery.plupload.queue/jquery.plupload.queue.js');
+				
+				if ($mode=='ui') {
+					$document->addStyleSheet($framework_path.'/js/jquery.ui.plupload/css/jquery.ui.plupload.css');
+					$document->addScript($framework_path.'/js/jquery.ui.plupload/jquery.ui.plupload.min.js');
+					$document->addScript($framework_path.'/js/themeswitcher.js');
+				} else {
+					$document->addStyleSheet($framework_path.'/js/jquery.plupload.queue/css/jquery.plupload.queue.css');
+					$document->addScript($framework_path.'/js/jquery.plupload.queue/jquery.plupload.queue.js');
+				}
+				// For debugging
+				//$document->addScript($framework_path.'/js/moxie.min.js');
+				//$document->addScript($framework_path.'/js/plupload.dev.js');
 				$js = "";
 				break;
 			
@@ -727,6 +734,13 @@ class flexicontent_html
 				FLEXI_J16GE ? JText::script("FLEXI_APPLYING_FILTERING", true) : fcjsJText::script("FLEXI_APPLYING_FILTERING", true);
 				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_LIST", true) : fcjsJText::script("FLEXI_TYPE_TO_LIST", true);
 				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_FILTER", true) : fcjsJText::script("FLEXI_TYPE_TO_FILTER", true);
+				break;
+			
+			case 'flexi-lib':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				
+				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/flexi-lib.js' );
+				FLEXI_J16GE ? JText::script("FLEXI_NOT_AN_IMAGE_FILE", true) : fcjsJText::script("FLEXI_NOT_AN_IMAGE_FILE", true);
 				break;
 			
 			default:

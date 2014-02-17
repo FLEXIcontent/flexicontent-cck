@@ -69,12 +69,12 @@ label input[type=radio   ].fc_checkradio:not(old),
 
 /* Style the label to also include the nice checkbox, radio */
 
-input[type=checkbox].fc_checkradio:not(old) + label,
-input[type=radio   ].fc_checkradio:not(old) + label,
-[name="adminForm"]  input[type=checkbox]:not(old) + label,
-[name="adminForm"]  input[type=radio   ]:not(old) + label,
-.flexicontent input[type=checkbox]:not(old) + label,
-.flexicontent input[type=radio   ]:not(old) + label {
+input[type=checkbox].fc_checkradio:not(old) + label:not(.plupload_button),
+input[type=radio   ].fc_checkradio:not(old) + label:not(.plupload_button),
+[name="adminForm"]  input[type=checkbox]:not(old) + label:not(.plupload_button),
+[name="adminForm"]  input[type=radio   ]:not(old) + label:not(.plupload_button),
+.flexicontent input[type=checkbox]:not(old) + label:not(.plupload_button),
+.flexicontent input[type=radio   ]:not(old) + label:not(.plupload_button) {
 	display: inline-block !important;
 	margin: 1px 12px 1px 0px !important;
 	padding: 0px 0px 0px 24px !important;
@@ -89,27 +89,27 @@ input[type=radio   ].fc_checkradio:not(old) + label,
 	line-height: 19px !important;
 	height: 19px !important;*/
 }
-input[type=checkbox].fc_checkradio:not(old):disabled + label,
-input[type=radio].fc_checkradio:not(old):disabled + label,
-[name="adminForm"]  input[type=checkbox]:not(old):disabled + label,
-[name="adminForm"]  input[type=radio]:not(old):disabled + label,
-.flexicontent input[type=checkbox]:not(old):disabled + label,
-.flexicontent input[type=radio]:not(old):disabled + label {
+input[type=checkbox].fc_checkradio:not(old):disabled + label:not(.plupload_button),
+input[type=radio].fc_checkradio:not(old):disabled + label:not(.plupload_button),
+[name="adminForm"]  input[type=checkbox]:not(old):disabled + label:not(.plupload_button),
+[name="adminForm"]  input[type=radio]:not(old):disabled + label:not(.plupload_button),
+.flexicontent input[type=checkbox]:not(old):disabled + label:not(.plupload_button),
+.flexicontent input[type=radio]:not(old):disabled + label:not(.plupload_button) {
 	background-position: 0 -72px !important;
 	font-style: italic !important;
 	color: gray !important;
 	cursor: normal !important;
 	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
 }
-input[type=checkbox].fc_checkradio:not(old) + label,
-[name="adminForm"]  input[type=checkbox]:not(old) + label,
-.flexicontent input[type=checkbox]:not(old) + label {
+input[type=checkbox].fc_checkradio:not(old) + label:not(.plupload_button),
+[name="adminForm"]  input[type=checkbox]:not(old) + label:not(.plupload_button),
+.flexicontent input[type=checkbox]:not(old) + label:not(.plupload_button) {
 	background: url(../images/checks.png) no-repeat 0 0 !important;
 	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
 }
-input[type=radio].fc_checkradio:not(old) + label,
-[name="adminForm"]  input[type=radio]:not(old) + label,
-.flexicontent input[type=radio]:not(old) + label {
+input[type=radio].fc_checkradio:not(old) + label:not(.plupload_button),
+[name="adminForm"]  input[type=radio]:not(old) + label:not(.plupload_button),
+.flexicontent input[type=radio]:not(old) + label:not(.plupload_button) {
 	background: url(../images/checks.png) no-repeat 0 0 !important;
 	/*background: url(../images/checks2.png) no-repeat 0 -38px !important;*/
 }
@@ -117,15 +117,15 @@ input[type=radio].fc_checkradio:not(old) + label,
 
 /* Style the checked versions of checkbox,radio */
 
-input[type=checkbox]:not(old):checked + label,
-[name="adminForm"]  input[type=checkbox]:not(old):checked + label,
-.flexicontent input[type=checkbox]:not(old):checked + label {
+input[type=checkbox]:not(old):checked + label:not(.plupload_button),
+[name="adminForm"]  input[type=checkbox]:not(old):checked + label:not(.plupload_button),
+.flexicontent input[type=checkbox]:not(old):checked + label:not(.plupload_button) {
 	background-position: 0 -24px !important;
 	/*background-position: 0 -19px !important;*/
 }
-input[type=radio]:not(old):checked + label,
-[name="adminForm"]  input[type=radio]:not(old):checked + label,
-.flexicontent input[type=radio]:not(old):checked + label {
+input[type=radio]:not(old):checked + label:not(.plupload_button),
+[name="adminForm"]  input[type=radio]:not(old):checked + label:not(.plupload_button),
+.flexicontent input[type=radio]:not(old):checked + label:not(.plupload_button) {
 	background-position: 0 -48px !important;
 	/*background-position: 0 -57px !important;*/
 }

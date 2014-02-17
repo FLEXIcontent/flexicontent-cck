@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: image.php 1807 2013-11-14 01:43:15Z ggppdk $
+ * @version 1.0 $Id: image.php 1847 2014-02-16 06:29:06Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.image
@@ -420,18 +420,28 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (file == '') jQuery( '#' + elementid + '_imgdelete' ).remove();
 				
 				if (prv_obj) {
+					preview_msg = '<span id=\"'+elementid+'_preview_msg\"></span>';
 					if (file || !$( elementid + '_existingname' ).hasClass('no_value_selected') ) {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" />';
 					} else {
-						var preview_container = '<div class=\"empty_image empty_image".$field->id."\" id=\"'+elementid+'_preview_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\">'
+						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"\" style=\"border: 1px solid silver; float:left;\" />';
+						
+						/*var preview_container = '<div class=\"empty_image empty_image".$field->id."\" id=\"'+elementid+'_preview_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\">'
 						if ( replacestr == '_newfile' && newfilename!='' )
 							preview_container += newfilename.replace(/^.*[\\\/]/, '');
-						preview_container = preview_container + '</div>';
+						preview_container = preview_container + '</div>';*/
 					}
 					
 					var tmpDiv = jQuery(preview_container);
 					tmpDiv.insertAfter( jQuery(prv_obj) );
+					var tmpDiv = jQuery(preview_msg);
+					tmpDiv.insertAfter( jQuery(prv_obj) );
 					jQuery(prv_obj).remove();
+					
+					if (file || !$( elementid + '_existingname' ).hasClass('no_value_selected') ) {
+					} else {
+						loadImagePreview(tagid, elementid+'_preview_image', elementid+'_preview_msg', ".$thumb_w_s.", ".$thumb_h_s.");
+					}
 				}
 				(MooTools.version>='1.2.4') ?  window.SqueezeBox.close()  :  window.document.getElementById('sbox-window').close();
 			}
@@ -446,6 +456,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
+		flexicontent_html::loadFramework('flexi-lib');
 		
 		if ( $image_source ) {
 			JHTML::_('behavior.modal', 'a.addfile_'.$field->id);

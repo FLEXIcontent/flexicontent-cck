@@ -1139,3 +1139,20 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	padding: 4px 0 2px 4px !important;
 }
 
+
+/* pluploader CSS compatibility fixes */
+#flash_uploader_container {
+	padding:0px!important;
+	margin:0px!important;
+}
+.plupload_filelist_content {
+	overflow: hidden!important;
+}
+.plupload_view_switch .ui-button {
+	min-width:1px !important;
+	display:inline-block !important;
+	margin:0px !important;
+}
+.plupload_filelist_content .plupload_file {
+	padding:0 !important;
+}
