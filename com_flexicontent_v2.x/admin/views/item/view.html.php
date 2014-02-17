@@ -304,7 +304,7 @@ class FlexicontentViewItem extends JViewLegacy
 					}
 				}
 				$field->name = 'text';
-				$field->value[0] = html_entity_decode(FLEXI_J16GE ? $row->text: $row->text, ENT_QUOTES, 'UTF-8');
+				//$field->value[0] = htmlspecialchars($row->text, ENT_COMPAT, 'UTF-8');  // will be handled by textarea field
 				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$row) );
 			}
 		}
