@@ -397,10 +397,10 @@ class FlexicontentModelFileselement extends JModelLegacy
 		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
 
-		$filter_order     = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_order',     'filter_order',    'f.filename', 'cmd' );
-		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_order_Dir', 'filter_order_Dir', '',          'word' );
+		$filter_order     = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_order',     'filter_order',    'f.id', 'cmd' );
+		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.fileselement'.$this->fieldid.'.filter_order_Dir', 'filter_order_Dir', 'DESC',          'word' );
 
-		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', f.filename';
+		$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir.', f.filename ASC';
 
 		return $orderby;
 	}
