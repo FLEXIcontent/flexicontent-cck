@@ -236,14 +236,14 @@
 			</field>
 			
 			<!--field name="" type="separator" default="FLEXI_FEATURED_ITEMS_SCOPE" level="level1" menu="hide" /-->
-			<!--field name="method_featured" type="radio" default="0" label="FLEXI_METHOD" description="FLEXI_FEATURED_ITEMS_DESC">
+			<!--field name="method_featured" type="radio" default="0" label="FLEXI_METHOD_STATIC" description="FLEXI_FEATURED_ITEMS_DESC">
 				<option value="0">FLEXI_ALL</option>
 				<option value="1">FLEXI_EXCLUDE</option>
 				<option value="2">FLEXI_INCLUDE</option>
 			</field-->
 			
 			<field name="" type="separator" default="FLEXI_STATES_SCOPE" level="level1" menu="hide" />
-			<field name="method_states" type="radio" default="0" label="FLEXI_METHOD" description="FLEXI_STATES_DESC">
+			<field name="method_states" type="radio" default="0" label="FLEXI_METHOD_STATIC" description="FLEXI_STATES_DESC">
 				<option value="0">FLEXI_NORMAL_STATES</option>
 				<option value="1">FLEXI_EXCLUDE</option>
 				<option value="2">FLEXI_INCLUDE</option>
@@ -251,12 +251,14 @@
 			<field name="item_states" type="fcitemstate" multiple="true" size="6" default="" label="FLEXI_ITEM_STATES" description="FLEXI_ITEM_STATES_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_CAT_SCOPE" level="level1" menu="hide" />
-			<field name="method_cat" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
+			<field name="method_cat" type="fcmethod" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" />
 			<field name="catids" type="flexicategories" multiple="true" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
-			<field name="behaviour_cat" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
+			<field name="behaviour_cat" type="groupedlist" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
 				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_CURRENT_ITEM</option>
-				<option value="1">FLEXI_SAME_CAT</option>
-				<option value="2">FLEXI_NOT_SAME_CAT</option>
+				<group label="FLEXI_DYNAMIC_CMP_TO_CURR_ITEM">
+					<option value="1">FLEXI_SAME_CAT</option>
+					<option value="2">FLEXI_NOT_SAME_CAT</option>
+				</group>
 			</field>
 			<field name="treeinclude" type="list" default="0" label="FLEXI_INCLUDE_EXTRACATS" description="FLEXI_INCLUDE_EXTRACATS_DESC">
 				<option value="0">FLEXI_NONE</option>
@@ -267,39 +269,45 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_TYPES_SCOPE" level="level1" menu="hide" />
-			<field name="method_types" type="fcmethod" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC" />
+			<field name="method_types" type="fcmethod" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC" />
 			<field name="types" type="types" multiple="true" size="5" label="FLEXI_TYPES" description="FLEXI_TYPES_DESC" />
-			<field name="behaviour_types" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
+			<field name="behaviour_types" type="groupedlist" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
 				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_CURRENT_ITEM</option>
-				<option value="1">FLEXI_SAME_TYPE</option>
-				<option value="2">FLEXI_NOT_SAME_TYPE</option>
+				<group label="FLEXI_DYNAMIC_CMP_TO_CURR_ITEM">
+					<option value="1">FLEXI_SAME_TYPE</option>
+					<option value="2">FLEXI_NOT_SAME_TYPE</option>
+				</group>
 			</field>
 	
 			<field name="" type="separator" default="FLEXI_AUTH_MY_ITEMS_SCOPE" level="level1" menu="hide" />
-			<field name="method_auth" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC">
+			<field name="method_auth" type="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC">
 				<option value="1">FLEXI_ALL</option>
 				<option value="2">FLEXI_EXCLUDE</option>
 				<option value="3">FLEXI_INCLUDE</option>
 			</field>
 			<field name="authors" type="text" default="" size="50" label="FLEXI_AUTHORS" description="FLEXI_AUTHORS_DESC" />
-			<field name="behaviour_auth" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
+			<field name="behaviour_auth" type="groupedlist" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
 				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_CURRENT_ITEM</option>
-				<option value="1">FLEXI_SAME_AUTHOR</option>
-				<option value="2">FLEXI_NOT_SAME_AUTHOR</option>
-				<option value="3">FLEXI_CURRENT_USER_MY_ITEMS</option>
+				<group label="FLEXI_DYNAMIC_CMP_TO_CURR_ITEM">
+					<option value="1">FLEXI_SAME_AUTHOR</option>
+					<option value="2">FLEXI_NOT_SAME_AUTHOR</option>
+					<option value="3">FLEXI_CURRENT_USER_MY_ITEMS</option>
+				</group>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_ITEM_SCOPE" level="level1" menu="hide" />
-			<field name="method_items" type="radio" default="1" label="FLEXI_METHOD" description="FLEXI_METHOD_DESC">
+			<field name="method_items" type="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC">
 				<option value="1">FLEXI_ALL</option>
 				<option value="2">FLEXI_EXCLUDE</option>
 				<option value="3">FLEXI_INCLUDE</option>
 			</field>
 			<field name="items" type="text" default="" size="50" label="FLEXI_SELECT_ITEM" description="FLEXI_SELECT_ITEM_DESC" />
-			<field name="behaviour_items" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
+			<field name="behaviour_items" type="groupedlist" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
 				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_CURRENT_ITEM</option>
-				<option value="1">FLEXI_RELATED_COMMON_TAGS</option>
-				<option value="2">FLEXI_RELATED_RELITEMS_FIELD</option>
+				<group label="FLEXI_DYNAMIC_CMP_TO_CURR_ITEM">
+					<option value="1">FLEXI_RELATED_COMMON_TAGS</option>
+					<option value="2">FLEXI_RELATED_RELITEMS_FIELD</option>
+				</group>
 			</field>
 			<field name="excluded_tags" type="tags" default="" multiple="true" size="6" label="FLEXI_EXCLUDED_TAGS" description="FLEXI_EXCLUDED_TAGS_DESC" />
 			<field name="relitems_fields" type="fields" default="" multiple="true" size="3" field_type="relation" label="FLEXI_SELECT_RELITEMS_FIELD" description="FLEXI_SELECT_RELITEMS_FIELD_DESC" />
@@ -312,7 +320,50 @@
 			</field>
 			<field name="tag_ids" type="tags" default="" multiple="true" size="6" label="FLEXI_SELECT_TAGS" description="FLEXI_SELECT_TAGS_DESC" />
 
+
 			<field name="" type="separator" default="FLEXI_DATES_SCOPE" level="level1" menu="hide" />
+			<field name="date_type" type="radio" default="0" label="FLEXI_DATE_DATA" description="FLEXI_DATE_DATA_DESC">
+				<option value="0">FLEXI_DATE_CREATED</option>
+				<option value="1">FLEXI_DATE_MODIFIED</option>
+				<option value="2">FLEXI_DATE_PUBLISH_UP</option>
+				<option value="3">FLEXI_CUSTOM_DATE_FIELD</option>
+			</field>
+			<field name="datecomp_field" type="fields" fieldnameastext="true" default="" multiple="false" field_type="date" label="FLEXI_CUSTOM_FIELD_AS_DATE_DATA" description="FLEXI_CUSTOM_FIELD_AS_DATE_DATA_DESC" />
+			<field name="behaviour_dates" type="groupedlist" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE_DESC">
+				<option value="0">FLEXI_STATIC_USE_SPECIFIC_DATES</option>
+				<group label="FLEXI_DYNAMIC_CMP_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
+					<option value="1">FLEXI_DATE_OFFSET</option>
+				</group>
+				<group label="FLEXI_DYNAMIC_SAME_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
+					<option value="8">FLEXI_SAME_DAY</option>
+					<option value="2">FLEXI_SAME_MONTH</option>
+					<option value="3">FLEXI_SAME_YEAR</option>
+				</group>
+				<group label="FLEXI_DYNAMIC_PREV_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
+					<option value="9">FLEXI_PREVIOUS_DAY</option>
+					<option value="4">FLEXI_PREVIOUS_MONTH</option>
+					<option value="5">FLEXI_PREVIOUS_YEAR</option>
+				</group>
+				<group label="FLEXI_DYNAMIC_NEXT_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
+					<option value="10">FLEXI_NEXT_DAY</option>
+					<option value="6">FLEXI_NEXT_MONTH</option>
+					<option value="7">FLEXI_NEXT_YEAR</option>
+				</group>
+				<group label="FLEXI_DYNAMIC_IGNY_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
+					<option value="11">FLEXI_SAME_DAY_IGNORE_YEAR</option>
+					<option value="12">FLEXI_SAME_WEEK_IGNORE_YEAR</option>
+					<option value="13">FLEXI_SAME_MONTH_IGNORE_YEAR</option>
+				</group>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_STATIC_DATE_BEHAVIOUR" level="level3" menu="hide" />
+			<field name="method_dates" type="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC">
+				<option value="1">FLEXI_ALL</option>
+				<option value="2">FLEXI_EXCLUDE</option>
+				<option value="3">FLEXI_INCLUDE</option>
+			</field>
+			<field name="bdate" type="fcdate" size="50" label="FLEXI_BDATE" description="FLEXI_BDATE_DESC" />
+			<field name="edate" type="fcdate" size="50" label="FLEXI_EDATE" description="FLEXI_EDATE_DESC" />
 			<field name="raw_bdate" type="radio" default="0" label="FLEXI_TREAT_BDATE_AS" description="FLEXI_TREAT_XDATE_AS_DESC">
 				<option value="0">FLEXI_DATE_STRING</option>
 				<option value="1">FLEXI_DATE_EXPRESSION</option>
@@ -321,35 +372,33 @@
 				<option value="0">FLEXI_DATE_STRING</option>
 				<option value="1">FLEXI_DATE_EXPRESSION</option>
 			</field>
-			<field name="bdate" type="fcdate" size="50" label="FLEXI_BDATE" description="FLEXI_BDATE_DESC" />
-			<field name="edate" type="fcdate" size="50" label="FLEXI_EDATE" description="FLEXI_EDATE_DESC" />
 			
-			<field name="behaviour_dates" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DATE_DESC">
-				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_SERVER_OR_ITEM</option>
-				<option value="1">FLEXI_OFFSET</option>
-				<option value="2">FLEXI_SAME_MONTH</option>
-				<option value="3">FLEXI_SAME_YEAR</option>
-				<option value="4">FLEXI_PREVIOUS_MONTH</option>
-				<option value="5">FLEXI_PREVIOUS_YEAR</option>
-				<option value="6">FLEXI_NEXT_MONTH</option>
-				<option value="7">FLEXI_NEXT_YEAR</option>
-			</field>
-			<field name="date_type" type="radio" default="0" label="FLEXI_DATE_TYPE" description="FLEXI_DATE_TYPE_DESC">
-				<option value="0">FLEXI_DATE_CREATED</option>
-				<option value="1">FLEXI_DATE_MODIFIED</option>
-				<option value="2">FLEXI_DATE_PUBLISH_UP</option>
-				<option value="3">FLEXI_CUSTOM_DATE_FIELD</option>
-			</field>
-			<field name="date_compare" type="radio" default="0" label="FLEXI_DATE_COMPARE_DYNAMIC" description="FLEXI_DATE_COMPARE_DESC">
-				<option value="0">FLEXI_CURRENT_SERVER_DATE</option>
+			<field name="" type="separator" default="FLEXI_DYNAMIC_DATE_BEHAVIOUR" level="level3" menu="hide" />
+			<field name="date_compare" type="radio" default="0" label="FLEXI_COMPARE_DATE_DATA_WITH" description="FLEXI_COMPARE_DATE_DATA_WITH_DESC">
+				<option value="0">FLEXI_CURRENT_SERVER_TIME</option>
 				<option value="1">FLEXI_CURRENT_ITEM_DATE_ABOVE</option>
 			</field>
-			<field name="datecomp_field" type="fields" fieldnameastext="true" default="" multiple="false" field_type="date" label="FLEXI_SELECT_DATECOMP_FIELD" description="FLEXI_SELECT_DATECOMP_FIELD_DESC" />
+			<field name="week_start" type="radio" default="0" label="FLEXI_FIRST_DAY_OF_WEEK" description="FLEXI_FIRST_DAY_OF_WEEK_DESC">
+				<option value="0">FLEXI_FIRST_DAY_SUNDAY</option>
+				<option value="5">FLEXI_FIRST_DAY_MONDAY</option>
+			</field>
 			
-			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_SCOPE" level="level1" menu="hide" />
-		<field name="static_filters" default="" type="textarea" rows="5" cols="32" label="Static Field Filters &lt;br/&gt; &lt;small&gt; (applied regardless of current item) &lt;/small&gt;" description="These field filters apply a STATIC filtering, regardless of current item being displayed. &lt;br/&gt; &lt;b&gt; Enter like: &lt;/b&gt; &lt;br/&gt; field_id##value %% field_id##value %% &lt;br/&gt; e.g. &lt;br/&gt; 22##14 %% 47##some field value %% 19##someword &lt;br/&gt; &lt;br/&gt; &lt;b&gt; for single values use: &lt;/b&gt; &lt;br/&gt; field_id##value1 &lt;br/&gt; &lt;br/&gt; &lt;b&gt; for ranges use: &lt;/b&gt; &lt;br/&gt; field_id##value1---value2 &lt;br/&gt; &lt;br/&gt; &lt;b&gt; for multiple values use: &lt;/b&gt; &lt;br/&gt; field_id##value1+++value2+++value3" />
+			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_SCOPE" description="FLEXI_CUSTOM_FIELD_SCOPE_DESC" level="level1" menu="hide" />
+			<field name="method_filt" type="radio" default="1" label="FLEXI_METHOD_STATIC" description="FLEXI_METHOD_STATIC_DESC">
+				<option value="1">FLEXI_ALL</option>
+				<option value="2">FLEXI_EXCLUDE</option>
+				<option value="3">FLEXI_INCLUDE</option>
+			</field>
+			<field name="behaviour_filt" type="list" default="0" label="FLEXI_BEHAVIOUR_STATIC_DYNAMIC" description="FLEXI_BEHAVIOUR_STATIC_DYNAMIC_DESC">
+				<option value="0">FLEXI_FILTER_BY_STATIC_FIELD_VALUES</option>
+				<option value="1">FLEXI_FILTER_BY_DYNAMIC_FIELD_VALUES</option>
+				<option value="2">FLEXI_FILTER_BY_BOTH_DYNAMIC_STATIC_FIELD_VALUES</option>
+			</field>
+			<field name="static_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_STATIC_FILTERS" description="FLEXI_STATIC_FILTERS_DESC" />
+			<field name="dynamic_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_DYNAMIC_FILTERS" description="FLEXI_DYNAMIC_FILTERS_DESC" />
+		</fieldset>
 		
-	  <field name="" type="jparamstab" title="FLEXI_ITEM_LIST_FIELD_SELECTION" description="FLEXI_ITEM_LIST_FIELD_SELECTION_DESC" />
+		<fieldset name="FLEXI_ITEM_LIST_FIELD_SELECTION" label="FLEXI_ITEM_LIST_FIELD_SELECTION" description="FLEXI_ITEM_LIST_FIELD_SELECTION_DESC">
 			<field name="" type="separator" default="FLEXI_TITLE" level="level1" menu="hide" />
 			<field name="" type="separator" default="FLEXI_STD" level="level3" menu="hide" />
 			<field name="display_title" type="radio" default="1" label="FLEXI_DISPLAY_TITLE" description="FLEXI_DISPLAY_TITLE_DESC">

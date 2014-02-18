@@ -684,14 +684,15 @@ class modFlexicontentHelper
 		$tag_ids			= $params->get('tag_ids', array());
 		
 		// date scope parameters
-		$date_type	= (int)$params->get('date_type', 0);
-		$bdate 			= $params->get('bdate', '');
-		$edate 			= $params->get('edate', '');
-		$raw_bdate	= $params->get('raw_bdate', 0);
-		$raw_edate	= $params->get('raw_edate', 0);
+		$method_dates	= (int)$params->get('method_dates', 1);  // parameter added later, maybe not to break compatibility this should be INCLUDE=3 by default ?
+		$date_type		= (int)$params->get('date_type', 0);
+		$bdate 				= $params->get('bdate', '');
+		$edate 				= $params->get('edate', '');
+		$raw_bdate		= $params->get('raw_bdate', 0);
+		$raw_edate		= $params->get('raw_edate', 0);
 		$behaviour_dates 	= $params->get('behaviour_dates', 0);
 		$date_compare 		= $params->get('date_compare', 0);
-		$datecomp_field		= $params->get('datecomp_field', 0);
+		$datecomp_field		= (int)$params->get('datecomp_field', 0);
 		// Server date
 		$sdate 			= explode(' ', $now);
 		$cdate 			= $sdate[0] . ' 00:00:00';
@@ -705,6 +706,13 @@ class modFlexicontentHelper
 		} else { // $date_type == 3
 			$comp = 'dfrel.value';
 		}
+		
+		// custom field scope
+		$method_filt			= (int)$params->get('method_filt', 1);  // parameter added later, maybe not to break compatibility this should be INCLUDE=3 by default ?
+		$behaviour_filt		= (int)$params->get('behaviour_filt', 0);
+		$static_filters		= $params->get('static_filters', '');
+		$dynamic_filters	= $params->get('dynamic_filters', '');
+		
 		
 		// get module fetching parameters
 		if ($params->get('skip_items',0) ) {
@@ -762,8 +770,13 @@ class modFlexicontentHelper
 		// *******************************************************
 		
 		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW && JRequest::getInt('id'));
+		$curritem_date_field_needed =
+			$behaviour_dates &&  // Dynamic
+			$date_compare && // Comparing to current item
+			$date_type==3 && // Comparing to custom date field
+			$datecomp_field;  // Date field selected
 		
-		if ( ($behaviour_cat || $behaviour_types || $behaviour_auth || $behaviour_items || $date_compare) && $isflexi_itemview ) {
+		if ( ($behaviour_cat || $behaviour_types || $behaviour_auth || $behaviour_items || $curritem_date_field_needed || $behaviour_filt) && $isflexi_itemview ) {
 			// initialize variables
 			$cid		= JRequest::getInt('cid');
 			$id			= JRequest::getInt('id');
@@ -771,24 +784,39 @@ class modFlexicontentHelper
 			// Check for new item nothing to retrieve,
 			// NOTE: aborting execution if current view is not item view, but item view is required
 			// and also proper usage of current item, both of these will be handled by SCOPEs
+			
+			$sel_date = ''; $join_date = '';
+			if ($curritem_date_field_needed) {
+				$sel_date = ', dfrel.value as custom_date';
+				$join_date =
+						'	LEFT JOIN #__flexicontent_fields_item_relations AS dfrel'
+					. '   ON ( i.id = dfrel.item_id AND dfrel.valueorder = 1 AND dfrel.field_id = '.$datecomp_field.' )';
+			}
+			
 			if ( $id ) {
-				$query = 'SELECT c.*, ie.*, GROUP_CONCAT(ci.catid SEPARATOR ",") as itemcats FROM #__content as c'
-							. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = c.id'
-							. ' LEFT JOIN #__flexicontent_cats_item_relations AS ci on ci.itemid = c.id'
-							. ' WHERE c.id = ' . $id
+				$query = 'SELECT i.*, ie.*, GROUP_CONCAT(ci.catid SEPARATOR ",") as itemcats'
+							. $sel_date
+							.' FROM #__content as i'
+							. ' LEFT JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
+							. ' LEFT JOIN #__flexicontent_cats_item_relations AS ci on ci.itemid = i.id'
+							. $join_date
+							. ' WHERE i.id = ' . $id
 							. ' GROUP BY ci.itemid'
 							;
 				$db->setQuery($query);
 				$curitem	= $db->loadObject();
-	
+				
 				// Get item dates
-				if ($date_type == 1) {
-					$idate = $curitem->modified;
-				} elseif ($date_type == 2) {
-					$idate = $curitem->publish_up;
-				} else {
+				if ($date_type == 0) {        // created
 					$idate = $curitem->created;			
+				} else if ($date_type == 1) { // modified
+					$idate = $curitem->modified;
+				} else if ($date_type == 2) { // publish up
+					$idate = $curitem->publish_up;
+				} else { // $date_type == 3
+					$idate = $curitem->custom_date;
 				}
+				
 				$idate 	= explode(' ', $idate);
 				$cdate 	= $idate[0] . ' 00:00:00';
 				$curritemcats = explode(',', $curitem->itemcats);
@@ -1183,15 +1211,23 @@ class modFlexicontentHelper
 		// date scope
 		// **********
 		
-		// ZERO 'behaviour' means statically selected date limits
-		if (!$behaviour_dates)
+		// ZERO 'behaviour' means statically selected records, but METHOD 1 is ALL records ... so NOTHING to do
+		// NOTE: currently we only have ALL, INCLUDE methods
+		if ( !$behaviour_dates && $method_dates == 1 )
 		{
+		}
+		
+		// ZERO 'behaviour' means statically selected date limits
+		else if (!$behaviour_dates)
+		{
+			$negate_op = $method_dates == 2 ? 'NOT' : '';
+			
 			if (!$raw_edate && $edate && !FLEXIUtilities::isSqlValidDate($edate)) {
 				echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior) and enter custom offset e.g. five days ago (be careful with space character): -5 d<br/>";
 				//$edate = '';
 				return;
 			} else if ($edate) {
-				$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' <= '.(!$raw_edate ? $db->Quote($edate) : $edate).' )';
+				$where .= ' AND '.$negate_op.' ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' <= '.(!$raw_edate ? $db->Quote($edate) : $edate).' )';
 			}
 			
 			if (!$raw_bdate && $bdate && !FLEXIUtilities::isSqlValidDate($bdate)) {
@@ -1199,7 +1235,7 @@ class modFlexicontentHelper
 				//$bdate = '';
 				return;
 			} else if ($bdate) {
-				$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.(!$raw_bdate ? $db->Quote($bdate) : $bdate).' )';
+				$where .= ' AND '.$negate_op.' ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.(!$raw_bdate ? $db->Quote($bdate) : $bdate).' )';
 			}
 		}
 		
@@ -1211,7 +1247,7 @@ class modFlexicontentHelper
 			}
 			
 			// FOR date_compare==0, $cdate is SERVER DATE
-			// FOR date_compare==1, $cdate is CURRENT ITEM DATE of type created or modified or publish_up
+			// FOR date_compare==1, $cdate is CURRENT ITEM DATE of type created or modified or publish_up or CUSTOM date field
 			switch ($behaviour_dates) 
 			{
 				case '1' : // custom offset
@@ -1235,6 +1271,15 @@ class modFlexicontentHelper
 					}
 				break;
 
+				case '8' : // same day
+					$cdate = explode(' ', $cdate);
+					$cdate = explode('-', $cdate[0]);
+					$cdate = $cdate[0].'-'.$cdate[1].'-'.$cdate[2].' 00:00:00';
+
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'd')).' )';
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote($cdate).' )';
+				break;
+
 				case '2' : // same month
 					$cdate = explode(' ', $cdate);
 					$cdate = explode('-', $cdate[0]);
@@ -1251,6 +1296,15 @@ class modFlexicontentHelper
 
 					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'Y')).' )';
 					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote($cdate).' )';
+				break;
+
+				case '9' : // previous day
+					$cdate = explode(' ', $cdate);
+					$cdate = explode('-', $cdate[0]);
+					$cdate = $cdate[0].'-'.$cdate[1].'-'.$cdate[2].' 00:00:00';
+
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote($cdate).' )';
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'd')).' )';
 				break;
 
 				case '4' : // previous month
@@ -1271,6 +1325,15 @@ class modFlexicontentHelper
 					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'Y')).' )';
 				break;
 
+				case '10' : // next day
+					$cdate = explode(' ', $cdate);
+					$cdate = explode('-', $cdate[0]);
+					$cdate = $cdate[0].'-'.$cdate[1].'-'.$cdate[2].' 00:00:00';
+
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'd')).' )';
+					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'd')).' )';
+				break;
+
 				case '6' : // next month
 					$cdate = explode(' ', $cdate);
 					$cdate = explode('-', $cdate[0]);
@@ -1288,6 +1351,19 @@ class modFlexicontentHelper
 					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'Y')).' )';
 					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'Y')).' )';
 				break;
+
+				case '11' : // same day, ignore year
+					$where .= ' AND ( DAYOFYEAR('.$comp.') = '.$db->Quote('DAYOFYEAR('.$cdate.')').' )';
+				break;
+
+				case '12' : // same week, ignore year
+					$week_start = (int)$params->get('week_start', 0);  // 0 is sunday, 5 is monday
+					$where .= ' AND ( WEEK('.$comp.') = '.$db->Quote('WEEK('.$cdate.','.$week_start.')').' )';
+				break;
+
+				case '13' : // same month, ignore year
+					$where .= ' AND ( MONTH('.$comp.') = '.$db->Quote('MONTH('.$cdate.')').' )';
+				break;
 			}
 		}
 		
@@ -1299,15 +1375,17 @@ class modFlexicontentHelper
 		
 		// EXTRA joins when comparing to custom date field
 		$join_date = '';
-		if ( ($bdate || $edate || $behaviour_dates) && $date_type == 3) {
-			if ($datecomp_field) {
-				$join_date =
-						'	LEFT JOIN #__flexicontent_fields_item_relations AS dfrel'
-					. '   ON ( i.id = dfrel.item_id AND dfrel.valueorder = 1 AND dfrel.field_id = '.$datecomp_field.' )';
-			} else {
-				echo "<b>WARNING:</b> Misconfigured date scope, you have set DATE TYPE as CUSTOM DATE Field, but have not select any specific DATE Field to be used<br/>";
-				//$join_date = '';
-				return;
+		if ( $behaviour_dates || $method_dates != 1 ) {  // using date SCOPE: dynamic behaviour, or static behavior with (static) method != ALL(=1)
+			if ( ($bdate || $edate || $behaviour_dates) && $date_type == 3) {
+				if ($datecomp_field) {
+					$join_date =
+							'	LEFT JOIN #__flexicontent_fields_item_relations AS dfrel'
+						. '   ON ( i.id = dfrel.item_id AND dfrel.valueorder = 1 AND dfrel.field_id = '.$datecomp_field.' )';
+				} else {
+					echo "<b>WARNING:</b> Misconfigured date scope, you have set DATE TYPE as CUSTOM DATE Field, but have not select any specific DATE Field to be used<br/>";
+					//$join_date = '';
+					return;
+				}
 			}
 		}
 		
@@ -1396,41 +1474,95 @@ class modFlexicontentHelper
 		// Custom FIELD scope
 		// ******************
 		
-		// ******* TODO: (a) add dynamic behaviour, (b) add method (ALL, include, exclude) ******* 
-		
-		// Static Field Filters (These are a string that MAPs filter ID TO filter VALUES)
-		// These field filters apply a STATIC filtering, regardless of current item being displayed.
-		$static_filters = FlexicontentFields::setFilterValues( $params, 'static_filters', $is_persistent=1, $set_method="array");
-		
-		// Dynamic Field Filters (THIS is filter IDs list)
-		// These field filters apply a DYNAMIC filtering, that depend on current item being displayed. The items that have same value as currently displayed item will be included in the list.
-		//$dynamic_filters = FlexicontentFields::setFilterValues( $params, 'dynamic_filters', $is_persistent=0);
-		
 		$where_field_filters = '';
 		$join_field_filters = '';
-		foreach ($static_filters as $filter_id => $filter_values)
+		
+		// ZERO 'behaviour' means statically selected records, but METHOD 1 is ALL records ... so NOTHING to do
+		if ( !$behaviour_filt && $method_filt == 1 )
 		{
-			// Handle single-valued filter as multi-valued
-			if ( !is_array($filter_values) ) $filter_values = array(0 => $filter_values);
+		}
+		
+		else if ($behaviour_filt==0 || $behaviour_filt==2)
+		{
+			$negate_op = $method_filt == 2 ? 'NOT' : '';
 			
-			// Single or Multi valued filter
-			if ( isset($filter_values[0]) )
+			// These field filters apply a STATIC filtering, regardless of current item being displayed.
+			// Static Field Filters (These are a string that MAPs filter ID TO filter VALUES)
+			$static_filters_data = FlexicontentFields::setFilterValues( $params, 'static_filters', $is_persistent=1, $set_method="array");
+			
+			// Dynamic Field Filters (THIS is filter IDs list)
+			// These field filters apply a DYNAMIC filtering, that depend on current item being displayed. The items that have same value as currently displayed item will be included in the list.
+			//$dynamic_filters = FlexicontentFields::setFilterValues( $params, 'dynamic_filters', $is_persistent=0);
+			
+			foreach ($static_filters_data as $filter_id => $filter_values)
 			{
-				$in_values = array();
-				foreach ($filter_values as $val) $in_values[] = $db->Quote( $val );   // Quote in case they are strings !!
-				$where_field_filters .= ' AND rel'.$filter_id.'.value IN ('.implode(',', $in_values).') ';
-			}
-			
-			// Range value filter
-			else {
-				// Special case only one part of range provided ... must MATCH/INCLUDE empty values or NULL values ...
-				$value_empty = !strlen(@$filter_values[1]) && strlen(@$filter_values[2]) ? ' OR rel'.$filter_id.'.value="" OR rel'.$filter_id.'.value IS NULL ' : '';
+				// Handle single-valued filter as multi-valued
+				if ( !is_array($filter_values) ) $filter_values = array(0 => $filter_values);
 				
-				if ( strlen(@$filter_values[1]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value >=' . $filter_values[1] . ') ';
-				if ( strlen(@$filter_values[2]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value <=' . $filter_values[2] . $value_empty . ') ';
+				// Single or Multi valued filter
+				if ( isset($filter_values[0]) )
+				{
+					$in_values = array();
+					foreach ($filter_values as $val) $in_values[] = $db->Quote( $val );   // Quote in case they are strings !!
+					$where_field_filters .= ' AND '.$negage_op.' (rel'.$filter_id.'.value IN ('.implode(',', $in_values).') ) ';
+				}
+				
+				// Range value filter
+				else {
+					// Special case only one part of range provided ... must MATCH/INCLUDE empty values or NULL values ...
+					$value_empty = !strlen(@$filter_values[1]) && strlen(@$filter_values[2]) ? ' OR rel'.$filter_id.'.value="" OR rel'.$filter_id.'.value IS NULL ' : '';
+					
+					if ( strlen(@$filter_values[1]) || ( strlen(@$filter_values[2]) ) ) {
+						$where_field_filters .= ' AND '.$negage_op.' ( 1 ';
+						if ( strlen(@$filter_values[1]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value >=' . $filter_values[1] . ') ';
+						if ( strlen(@$filter_values[2]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value <=' . $filter_values[2] . $value_empty . ') ';
+						$where_field_filters .= ' )';
+					}
+				}
+				
+				$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;
+			}
+		}
+		
+		if ($behaviour_filt==1 || $behaviour_filt==2)
+		{
+			// 1. Get ids of dynamic filters
+			$dynamic_filter_ids = preg_split("/[\s]*,[\s]*/", $dynamic_filters);
+			
+			// 2. Get values of dynamic filters
+			$where2 = (count($dynamic_filter_ids) > 1) ? ' AND field_id IN ('.implode(',', $dynamic_filter_ids).')' : ' AND field_id = '.$dynamic_filter_ids[0];
+			// select the item ids related to current item via the relation fields
+			$query2 = 'SELECT DISTINCT value, field_id' .
+				' FROM #__flexicontent_fields_item_relations' .
+				' WHERE item_id = '.(int) $id .
+				$where2
+				;
+			$db->setQuery($query2);
+			$curritem_vals = $db->loadObjectList();
+			
+			// 3. Group values by field
+			$_vals = array();
+			foreach ($curritem_vals as $v) {
+				$_vals[$v->field_id][] = $v->value;
 			}
 			
-			$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS rel'.$filter_id.' ON rel'.$filter_id.'.item_id=i.id AND rel'.$filter_id.'.field_id = ' . $filter_id;
+			foreach ($dynamic_filter_ids as $filter_id)
+			{
+				// Handle non-existent value by requiring that matching item do not have a value for this field either
+				if ( !isset($_vals[$filter_id]) ) {
+					$where_field_filters .= ' AND reldyn'.$filter_id.'.value IS NULL';
+				}
+				
+				// Single or Multi valued filter , handle by requiring ANY value
+				else if ( isset($filter_values[0]) )
+				{
+					$in_values = array();
+					foreach ($curritem_vals as $v) $in_values[] = $db->Quote( $v->value );
+					$where_field_filters .= ' AND reldyn'.$filter_id.'.value IN ('.implode(',', $in_values).') ';
+				}
+				
+				$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS reldyn'.$filter_id.' ON reldyn'.$filter_id.'.item_id=i.id AND reldyn'.$filter_id.'.field_id = ' . $filter_id;
+			}
 		}
 
 		if ( empty($items_query) ) {  // If a custom query has not been set above then use the default one ...
