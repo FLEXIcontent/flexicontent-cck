@@ -228,7 +228,7 @@
 
 /* CONTAINER of item description */
 .carousel.mod_flexicontent_wrapper .fcitem_text { /* for image (not contained inside) see more below */
-	text-align:justify;
+/*	text-align:justify;*/
 	margin:0px; padding:0px;
 }
 
