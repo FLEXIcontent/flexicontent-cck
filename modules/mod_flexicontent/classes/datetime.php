@@ -29,7 +29,7 @@ class date_time{
      * @param    string    $shift_unit    Unit you would like to shift
      * @return timestamp
      */
-    function shift_dates($datetime="", $shift_amount, $shift_unit) {
+    static function shift_dates($datetime="", $shift_amount, $shift_unit) {
 
         /* Check for $datetime */
         if(!$datetime){
@@ -82,7 +82,7 @@ class date_time{
      * @param  date  $date  MM-DD-YYYY
      * @return string
      */
-    function machine_date($date){
+    static function machine_date($date){
         
         list($month, $date, $year)=preg_split("/-/", $date);
         
@@ -98,7 +98,7 @@ class date_time{
      * @param  date  $date  YYYY-MM-DD
      * @return string
      */
-     function human_date($date){
+     static function human_date($date){
      
          list($year, $month, $date)=preg_split("/-/", $date);
         
@@ -115,7 +115,7 @@ class date_time{
      * @param  string  $ampm   Values are am or pm
      * @return string
      */
-    function convert_to_24_hr($time, $ampm){
+    static function convert_to_24_hr($time, $ampm){
     
         /* Make sure it's lower case */
         $ampm=strtolower($ampm);
@@ -151,7 +151,7 @@ class date_time{
      * @param  string  $time   Time in the form of HH:MI
      * @return array
      */
-    function convert_from_24_hr($time){
+    static function convert_from_24_hr($time){
     
         /* Split up the time */
         list($hour, $min)=preg_split("/:/", $time);
@@ -186,7 +186,7 @@ class date_time{
      * @param  string  $string
      * @return string
      */
-    function fill_time($string){
+    static function fill_time($string){
     
         if(strlen($string)==1){
         
