@@ -506,6 +506,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		$query_catids = array_keys($query_catids);
 		
+		// Items in featured categories
+		/*$cats_featured = $cparams->get('display_cats_featured', 0);
+		$featured_cats_parent = $cparams->get('featured_cats_parent', 0);
+		$query_catids_exclude = array();
+		if ($cats_featured && $featured_cats_parent) {
+			foreach ($globalcats[$featured_cats_parent]->descendantsarray as $subcatid) $query_catids_exclude[$subcatid] = 1;
+		}*/
+		
 		// filter by depth level
 		if ($display_subcats==0) {
 			// Include categories
@@ -781,13 +789,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$session  = JFactory::getSession();
 		
 		// Featured items, this item property exists in J1.6+ only
-		if (FLEXI_J16GE) {
-			$featured = $cparams->get('featured');
-			switch ($featured) {
-				case 'show': $where .= ' AND i.featured=1'; break;
-				case 'hide': $where .= ' AND i.featured=0'; break;
-				default: break;
-			}
+		$flag_featured = FLEXI_J16GE ? $cparams->get('display_flag_featured', 0) : 0;
+		switch ($flag_featured) {
+			case 1: $where .= ' AND i.featured=0'; break;   // 1: normal only
+			case 2: $where .= ' AND i.featured=1'; break;   // 2: featured only
+			default: break;  // 0: both normal and featured
 		}
 		
 		$filters_where = $this->_buildFiltersWhere();
