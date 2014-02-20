@@ -1639,6 +1639,11 @@ div.fancybox-wrap a { background: none!important;}
 #flexicontent .fc_markup.mu_ra_timeframe.mu_has_text {
 	padding-left: 24px !important;
 	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat transparent;
-	color: darkorange !important;
+	color: brown !important;
 }
 
+#flexicontent .fc_markup.mu_ru_timeframe.mu_has_text {
+	padding-left: 24px !important;
+	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat transparent;
+	color: darkgreen !important;
+}

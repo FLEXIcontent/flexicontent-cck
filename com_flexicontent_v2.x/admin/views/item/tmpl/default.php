@@ -981,7 +981,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	</div> <!-- end tab -->
 	
 	
-	<?php if (0 && JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 0) ) : ?>
+	<?php if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 0) ) : ?>
 	
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('Compatibility'); ?> </h3>

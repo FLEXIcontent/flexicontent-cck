@@ -2828,7 +2828,8 @@ class flexicontent_html
 		$mu_addcss_cats = FLEXIUtilities::paramToArray($mu_addcss_cats);
 		$mu_addcss_acclvl = $params->get('mu_addcss_acclvl', array('needed_acc', 'obtained_acc'));
 		$mu_addcss_acclvl = FLEXIUtilities::paramToArray($mu_addcss_acclvl);
-		$mu_addcss_radded = $params->get('mu_addcss_radded', 0);
+		$mu_addcss_radded   = $params->get('mu_addcss_radded', 0);
+		$mu_addcss_rupdated = $params->get('mu_addcss_rupdated', 0);
 		
 		// Calculate addcss flags
 		$add_featured_cats = in_array('featured', $mu_addcss_cats);
@@ -2842,7 +2843,8 @@ class flexicontent_html
 		$mu_addtext_cats   = $params->get('mu_addtext_cats', 1);
 		$mu_addtext_acclvl = $params->get('mu_addtext_acclvl', array('no_acc', 'free_acc', 'needed_acc', 'obtained_acc'));
 		$mu_addtext_acclvl = FLEXIUtilities::paramToArray($mu_addtext_acclvl);
-		$mu_addtext_radded = $params->get('mu_addtext_radded', 1);
+		$mu_addtext_radded   = $params->get('mu_addtext_radded', 1);
+		$mu_addtext_rupdated = $params->get('mu_addtext_rupdated', 1);
 		
 		// Calculate addtext flags
 		$add_txt_no_acc       = in_array('no_acc', $mu_addtext_acclvl);
@@ -2928,6 +2930,35 @@ class flexicontent_html
 		}
 		
 		
+		// d. Calculate updated time intervals
+		if ( $mu_addcss_rupdated )
+		{
+		  $nowdate_secs = time();
+			$ru_timeframes = $params->get('mu_ru_timeframe_intervals', '24h,2d,7d,1m,3m,1y,3y');
+			$ru_timeframes = preg_split("/\s*,\s*/u", $ru_timeframes);
+			
+			$ru_names = $params->get('mu_ru_timeframe_names', '24h,2d,7d,1m,3m,1y,3y');
+			$ru_names = preg_split("/\s*,\s*/u", $ru_names);
+			
+			$unit_hour_map = array('h'=>1, 'd'=>24, 'm'=>24*30, 'y'=>24*365);
+			$unit_word_map = array('h'=>'hours', 'd'=>'days', 'm'=>'months', 'y'=>'years');
+			$unit_text_map = array(
+				'h'=>'FLEXI_MU_HOURS', 'd'=>'FLEXI_MU_DAYS', 'm'=>'FLEXI_MU_MONTHS', 'y'=>'FLEXI_MU_YEARS'
+			);
+			foreach($ru_timeframes as $i => $timeframe) {
+				$unit = substr($timeframe, -1);
+				if ( !isset($unit_hour_map[$unit]) ) {
+					echo "Improper timeframe ': ".$timeframe."' for recently updated content, please fix in configuration";
+					continue;
+				}
+				$timeframe  = (int) $timeframe;
+				$ru_css_classes[$i] = '_item_updated_within_' . $timeframe . $unit_word_map[$unit];
+				$ru_timeframe_secs[$i] = $timeframe * $unit_hour_map[$unit] * 3600;
+				$ru_timeframe_text[$i] = @ $ru_names[$i] ? JText::_($ru_names[$i]) : JText::sprintf($unit_text_map[$unit], $timeframe);
+			}
+		}
+		
+		
 		// **********************************
 		// Create CSS markup classes per item
 		// **********************************
@@ -2951,7 +2982,7 @@ class flexicontent_html
 			}
 			
 			
-			// Timeframe markups
+			// recently-added Timeframe markups
 			if ($mu_addcss_radded) {
 				$item_timeframe_secs = $nowdate_secs - strtotime($item->created);
 				$mr = -1;
@@ -2970,6 +3001,29 @@ class flexicontent_html
 					$item->css_markups['timeframe'][] = $ra_css_classes[$mr];
 					$item->ecss_markups['timeframe'][] = ' mu_ra_timeframe' . ($mu_addtext_radded ? ' mu_has_text' : '');
 					$item->title_markups['timeframe'][] = $mu_addtext_radded ? $ra_timeframe_text[$mr] : '';
+				}
+			}
+			
+			
+			// recently-updated Timeframe markups
+			if ($mu_addcss_rupdated) {
+				$item_timeframe_secs = $nowdate_secs - strtotime($item->modified);
+				$mr = -1;
+				
+				foreach($ru_timeframe_secs as $i => $timeframe_secs) {
+					// Check if item creation time has surpassed this time frame
+					if ( $item_timeframe_secs > $timeframe_secs) continue;
+					
+					// Check if this time frame is more recent than the best one found so far
+					if ($mr != -1 && $timeframe_secs > $ru_timeframe_secs[$mr]) continue;
+					
+					// Use current time frame
+					$mr = $i;
+			  }
+				if ($mr >= 0) {
+					$item->css_markups['timeframe'][] = $ru_css_classes[$mr];
+					$item->ecss_markups['timeframe'][] = ' mu_ru_timeframe' . ($mu_addtext_rupdated ? ' mu_has_text' : '');
+					$item->title_markups['timeframe'][] = $mu_addtext_rupdated ? $ru_timeframe_text[$mr] : '';
 				}
 			}
 			

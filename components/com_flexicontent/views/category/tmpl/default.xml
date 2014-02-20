@@ -354,6 +354,11 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
+			<field name="orderbycustomfield" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="orderbycustomfieldid" type="fields" default="" orderable="1" isnotcore="1" display_useglobal="1"
 				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" />
 			<field name="orderbycustomfielddir" type="list" default="" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" >
@@ -386,6 +391,11 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" />
+			<field name="orderbycustomfield_2nd" type="radio" default="" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			<field name="orderbycustomfieldid_2nd" type="fields" default="" orderable="1" isnotcore="1" display_useglobal="1"
 				label="FLEXI_ORDER_CUSTOM_FIELD_ID" description="FLEXI_ORDER_CUSTOM_FIELD_ID_DESC" />
 			<field name="orderbycustomfielddir_2nd" type="list" default="" label="FLEXI_ORDER_CUSTOM_FIELD_DIR" description="FLEXI_ORDER_CUSTOM_FIELD_DIR_DESC" >
@@ -416,6 +426,21 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			
+			<!--field name="" type="separator" default="FLEXI_DISPLAY_FEATURED_ITEMS" description="FLEXI_DISPLAY_FEATURED_ITEMS_DESC" level="level3" /-->
+			<!--field name="display_flag_featured" type="list" default="" label="FLEXI_DISPLAY_FLAG_FEATURED" description="FLEXI_DISPLAY_FLAG_FEATURED_DESC"> 
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_BOTH</option>
+				<option value="1">FLEXI_NORMAL_ONLY</option>
+				<option value="2">FLEXI_FEATURED_ONLY</option> 
+			</field-->
+			<!--field name="display_cats_featured" type="list" default="" label="FLEXI_DISPLAY_CATS_FEATURED" description="FLEXI_DISPLAY_CATS_FEATURED_DESC"> 
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_BOTH</option>
+				<option value="1">FLEXI_NORMAL_ONLY</option>
+				<option value="2">FLEXI_FEATURED_ONLY</option>
+				<option value="3">FLEXI_EXCLUDE_SPECIFIC</option>
+			</field-->
 			
 			<field name="" type="separator" default="FLEXI_PAGINATION" description="FLEXI_PAGINATION_DESC" level="level2" />
 			<field name="show_item_total" type="list" default="" label="FLEXI_SHOW_ITEM_TOTAL" description="FLEXI_SHOW_ITEM_TOTAL_DESC">
@@ -507,6 +532,21 @@
 			<field name="" type="separator" default="FLEXI_MU_RADDED_TIMEFRAMES_CONF" description="FLEXI_MU_RADDED_TIMEFRAMES_CONF_DESC" level="level3" />
 			<field name="mu_ra_timeframe_intervals" type="text" size="60" default="" label="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS" description="FLEXI_MU_RADDED_TIMEFRAME_INTERVALS_DESC" />
 			<field name="mu_ra_timeframe_names" type="textarea" rows="4" cols="60" default="" label="FLEXI_MU_RADDED_TIMEFRAME_NAMES" description="FLEXI_MU_RADDED_TIMEFRAME_NAMES_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_MU_RUPDATED" description="FLEXI_MU_RUPDATED_DESC" level="level2" />
+			<field name="mu_addcss_rupdated" type="list" default="" label="FLEXI_MU_ADD_MARKUP" description="FLEXI_MU_ADD_MARKUP_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="mu_addtext_rupdated" type="list" default="" label="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME" description="FLEXI_MU_ADD_TXT_TIMEFRAME_NAME_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_MU_RUPDATED_TIMEFRAMES_CONF" description="FLEXI_MU_RUPDATED_TIMEFRAMES_CONF_DESC" level="level3" />
+			<field name="mu_ru_timeframe_intervals" type="text" size="60" default="" label="FLEXI_MU_RUPDATED_TIMEFRAME_INTERVALS" description="FLEXI_MU_RUPDATED_TIMEFRAME_INTERVALS_DESC" />
+			<field name="mu_ru_timeframe_names" type="textarea" rows="4" cols="60" default="" label="FLEXI_MU_RUPDATED_TIMEFRAME_NAMES" description="FLEXI_MU_RUPDATED_TIMEFRAME_NAMES_DESC" />
 			
 		
 		<field name="" type="jparamstab" description="FLEXI_PARAMETERS_CAT_ITEM_FILTERING_OVERRIDE" />
