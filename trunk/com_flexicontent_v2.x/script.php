@@ -734,6 +734,11 @@ class com_flexicontentInstallerScript
 	function uninstall( $parent ) {
 		// Installing component manifest file version
 		$this->release = $parent->get( "manifest" )->version;
+		
+		//error_reporting(E_ALL & ~E_STRICT);
+		//ini_set('display_errors',1);
+		//$cache = JFactory::getCache();
+		//$cache->clean( '_system' );  // This might be necessary as installing-uninstalling in same session may result in wrong extension ids, etc
 
 		echo '<p>' . JText::_('Uninstalling FLEXIcontent ' . $this->release) . '</p>';
 		
@@ -751,7 +756,7 @@ class com_flexicontentInstallerScript
 		// @license   http://www.gnu.org/licenses/gpl-2.0.html GNU/GPLv2 only
 		if (FLEXI_J16GE) {
 			$manifest = isset($parent) ? $parent->getParent()->manifest : $this->manifest;
-			$add_array =& $manifest->xpath('additional');
+			$add_array = $manifest->xpath('additional');
 			$add = NULL;
 			if(count($add_array)) $add = $add_array[0];
 		} else {
@@ -760,7 +765,7 @@ class com_flexicontentInstallerScript
 		
 		if ( is_object($add) && count( $add->children() ) )
 		{
-			$exts =& $add->children();
+			$exts = $add->children();
 			foreach ($exts as $ext)
 			{
 				// set query
@@ -905,7 +910,7 @@ class com_flexicontentInstallerScript
 		// Restore com_content component asset, as asset parent_id, for the top-level 'com_content' categories
 		?>
 				<tr class="row1">
-					<td class="key">Restore com_content assets</td>
+					<td class="key">Restore com_content top-level category assets</td>
 					<td>
 						<?php
 						$asset	= JTable::getInstance('asset');
@@ -913,17 +918,30 @@ class com_flexicontentInstallerScript
 						if (!$asset_loaded) {
 							$result = 0;
 						} else {
-							$query = 'UPDATE #__assets AS s'
+							$cc_asset	= JTable::getInstance('asset');
+							$query = 'SELECT s.id FROM #__assets AS s'
 								.' JOIN #__categories AS c ON s.id=c.asset_id'
-								.' SET s.parent_id='.$db->Quote($asset->id)
 								.' WHERE c.parent_id=1 AND c.extension="com_content"';
 							$db->setQuery($query);
-							$db->query();
-							if ($db->getErrorNum()) {
-								echo $db->getErrorMsg();
-								$result = 1;
-							} else {
-								$result = 2;
+							$asset_ids = $db->loadColumn();
+							
+							$result = 2;
+							foreach ($asset_ids as $asset_id) 
+							{
+								//echo $asset_id." parent to -> " .$asset->id ."<br/>";
+								$cc_asset->load($asset_id);
+								$cc_asset->parent_id = $asset->id;
+								$cc_asset->lft = $asset->rgt;
+								$cc_asset->setLocation($asset->id, 'last-child');
+								
+								// Save the category asset (create or update it)
+								if (!$cc_asset->check() || !$cc_asset->store(false)) {
+									echo $cc_asset->getError();
+									echo " Problem restoring asset with id: ".$cc_asset ->id;
+									//echo " Problem for category with id: ".$category->id. "(".$category->title.")";
+									//echo $cc_asset->getError();
+									$result = 1;
+								}
 							}
 						}
 						
@@ -933,7 +951,7 @@ class com_flexicontentInstallerScript
 						if ($result==2) {
 							echo JText::_("Assets restored");
 						} else if ($result==1) {
-							echo JText::_("Failed to set assets for com_content categories");
+							echo JText::_("Failed to restore some assets");
 						} else {
 							echo JText::_("Failed to load asset for com_content.");
 						}
