@@ -70,8 +70,6 @@ $border_width = (int)$params->get('carousel_border_width', 1);
 // Direction specific Dimensions : HORIZONTAL
 $hdir_item_width   = (int)$params->get('carousel_hdir_item_width', 250);
 $hdir_margin_right = (int)$params->get('carousel_hdir_margin_right', 12);
-$hdir_min_visible = (int) $params->get('carousel_hdir_min_visible', 0);
-$hdir_min_visible = $hdir_min_visible < 0 ? 0 : $hdir_min_visible;
 
 // Direction specific Dimensions : VERTICAL
 $vdir_items = (int)$params->get('carousel_vdir_items', 2);
@@ -107,9 +105,10 @@ $_ns_handle_event = $handle_event;
 $_ns_autoPlay     = $autoplay ? "true" : "false";
 $_ns_interval     = $interval;
 $_ns_size         = $mode=="horizontal" ? $hdir_item_width + $extra_width : 240;  // 240 is just a default for vertical it will be recalulated after page load ends
-$_ns_fxOptions    = '{ duration:'.$duration.', transition: '.$effect_eased.', link: "cancel" }';
-$_ns_minVisible   = $mode=="horizontal" ? ($hdir_min_visible >=0 ? $hdir_min_visible : 1) : $vdir_items;  // o for horizontal, means to auto-calulate it after page load ends
-
+$_ns_fxOptions    = $effect=='fade' ?
+	'{ duration:'.$duration.'}' :
+	'{ duration:'.$duration.', transition: '.$effect_eased.', link: "cancel" }';
+$_ns_minVisible   = $mode=="horizontal" ? 0 : $vdir_items;  // ZERO for horizontal, means to auto-calulate it after page load ends
 ?>
 
 <div class="carousel mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_carousel<?php echo $module->id ?>">
@@ -520,6 +519,7 @@ $js ='
 		mod_fc_carousel'.$module->id.' = new noobSlide({
 			minVisible: '.$_ns_minVisible.',
 			marginR: '.$hdir_margin_right.',
+			fade: '.($effect=='fade' ? 'true' : 'false').',
 			mask: $("mod_fc_carousel_mask'.$module->id.'"),
 			box: $("mod_fcitems_box_standard'.$module->id.'"),
 			items: (MooTools.version>="1.2.4" ?
@@ -579,9 +579,7 @@ $js ='
 		'.($mode!="horizontal" ? '':'
 		minVisible = ($("mod_fc_carousel_mask'.$module->id.'").clientWidth + '.$hdir_margin_right.') / '.$_ns_size.';
 		minVisible = parseInt(minVisible);
-		if ('.$hdir_min_visible.'==0 || '.$hdir_min_visible.'>minVisible) {
-			mod_fc_carousel'.$module->id.'.minVisible = minVisible;
-		}
+		mod_fc_carousel'.$module->id.'.minVisible = minVisible;
 		').'
 		
 		/*}*/
@@ -627,7 +625,7 @@ $css = ''.
 	border-width: 1px !important;
 	padding: '.$padding_top_bottom.'px '.$padding_left_right.'px !important;
 	margin: '.($mode=="vertical" ? '0px 0px '.$vdir_margin_bottom.'px 0px' : '0px '.$hdir_margin_right.'px 0px 0px').' !important;
-	width: '.($mode=="vertical" ? "auto" : $hdir_item_width.'px').' !important;
+	width: '.($mode=="vertical" ? "" : $hdir_item_width.'px!important').';
 	float: '.($mode=="vertical" ? "none" : 'left').' !important;
 	overflow: '.($mode=="vertical" ? "hidden" : 'auto').' !important;
 	'.

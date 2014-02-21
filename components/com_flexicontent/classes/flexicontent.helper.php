@@ -1940,9 +1940,9 @@ class flexicontent_html
 		$userlisttype = $field->parameters->get('display_favoured_userlist', 0);
 		$maxusercount = $field->parameters->get('display_favoured_max', 12);
 
-		$favuserlist = $favourites ? '['.$favourites.' '.JText::_('FLEXI_USERS') : '';
+		$favuserlist = $favourites ? '('.$favourites.' '.JText::_('FLEXI_USERS') : '';
 
-		if ( !$userlisttype ) return $favuserlist ? $favuserlist.']' : '';
+		if ( !$userlisttype ) return $favuserlist ? $favuserlist.')' : '';
 		else if ($userlisttype==1) $uname="u.username";
 		else /*if ($userlisttype==2)*/ $uname="u.name";
 
@@ -1963,7 +1963,7 @@ class flexicontent_html
 			if ($count >= $maxusercount) break;
 		}
 		if (count($favusers) > $maxusercount) $favuserlist .=" ...";
-		if (!empty($favuserlist)) $favuserlist .="]";
+		if (!empty($favuserlist)) $favuserlist .=")";
 		return $favuserlist;
 	}
 
@@ -2908,7 +2908,7 @@ class flexicontent_html
 			$ra_timeframes = $params->get('mu_ra_timeframe_intervals', '24h,2d,7d,1m,3m,1y,3y');
 			$ra_timeframes = preg_split("/\s*,\s*/u", $ra_timeframes);
 			
-			$ra_names = $params->get('mu_ra_timeframe_names', '24h,2d,7d,1m,3m,1y,3y');
+			$ra_names = $params->get('mu_ra_timeframe_names', 'FLEXI_24H_RA , FLEXI_2D_RA , FLEXI_7D_RA , FLEXI_1M_RA , FLEXI_3M_RA , FLEXI_1Y_RA , FLEXI_3Y_RA');
 			$ra_names = preg_split("/\s*,\s*/u", $ra_names);
 			
 			$unit_hour_map = array('h'=>1, 'd'=>24, 'm'=>24*30, 'y'=>24*365);
@@ -2925,7 +2925,7 @@ class flexicontent_html
 				$timeframe  = (int) $timeframe;
 				$ra_css_classes[$i] = '_item_added_within_' . $timeframe . $unit_word_map[$unit];
 				$ra_timeframe_secs[$i] = $timeframe * $unit_hour_map[$unit] * 3600;
-				$ra_timeframe_text[$i] = @ $ra_names[$i] ? JText::_($ra_names[$i]) : JText::sprintf($unit_text_map[$unit], $timeframe);
+				$ra_timeframe_text[$i] = @ $ra_names[$i] ? JText::_($ra_names[$i]) : JText::_('FLEXI_MU_ADDED') . JText::sprintf($unit_text_map[$unit], $timeframe);
 			}
 		}
 		
@@ -2937,7 +2937,7 @@ class flexicontent_html
 			$ru_timeframes = $params->get('mu_ru_timeframe_intervals', '24h,2d,7d,1m,3m,1y,3y');
 			$ru_timeframes = preg_split("/\s*,\s*/u", $ru_timeframes);
 			
-			$ru_names = $params->get('mu_ru_timeframe_names', '24h,2d,7d,1m,3m,1y,3y');
+			$ru_names = $params->get('mu_ru_timeframe_names', 'FLEXI_24H_RU , FLEXI_2D_RU , FLEXI_7D_RU , FLEXI_1M_RU , FLEXI_3M_RU , FLEXI_1Y_RU , FLEXI_3Y_RU');
 			$ru_names = preg_split("/\s*,\s*/u", $ru_names);
 			
 			$unit_hour_map = array('h'=>1, 'd'=>24, 'm'=>24*30, 'y'=>24*365);
@@ -2954,7 +2954,7 @@ class flexicontent_html
 				$timeframe  = (int) $timeframe;
 				$ru_css_classes[$i] = '_item_updated_within_' . $timeframe . $unit_word_map[$unit];
 				$ru_timeframe_secs[$i] = $timeframe * $unit_hour_map[$unit] * 3600;
-				$ru_timeframe_text[$i] = @ $ru_names[$i] ? JText::_($ru_names[$i]) : JText::sprintf($unit_text_map[$unit], $timeframe);
+				$ru_timeframe_text[$i] = @ $ru_names[$i] ? JText::_($ru_names[$i]) : JText::_('FLEXI_MU_UPDATED') . JText::sprintf($unit_text_map[$unit], $timeframe);
 			}
 		}
 		
