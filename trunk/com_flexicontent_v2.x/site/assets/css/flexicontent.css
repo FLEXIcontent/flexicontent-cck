@@ -1588,13 +1588,14 @@ div.fancybox-wrap a { background: none!important;}
   margin: 0px !important;
   padding: 0px !important;
   border-radius: 6px !important;
+  line-height: 100%;
 }
 
 #flexicontent .fc_markup.mu_has_text {
   border-bottom: 1px solid #D0D0D0 !important;
   border-right: 1px solid #D0D0D0 !important;
   margin: 2px 2px 2px 12px !important;
-  padding: 5px 3px 5px 3px !important;
+  padding: 4px !important;
 }
 
 #flexicontent .fc_markup.mu_featured_cat.mu_has_text {

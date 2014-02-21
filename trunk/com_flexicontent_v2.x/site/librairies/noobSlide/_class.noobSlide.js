@@ -5,6 +5,7 @@ Author:
 	ggppdk:
 		- Horizontal responsive behavior,
 		- Horizontal/Vertical slider improvement (only slide if new current item is not already visible)
+		- Horizontal/Vertical fader improvement (only fade if new current item is not already visible)
 	
 License:
 	MIT License
@@ -33,6 +34,7 @@ Parameters:
 	}
 	button_event: string | event type | default: 'click'
 	handles: dom collection | default: null
+	page_handles: dom collection | default: null
 	handle_event: string | event type| default: 'click'
 	fxOptions: object | Fx.Tween options | default: {duration:500,wait:false}
 	interval: int | for periodical | default: 5000
@@ -52,6 +54,7 @@ Properties:
 	buttons: object
 	button_event: string
 	handles: dom collection
+	page_handles: dom collection
 	handle_event: string
 	previousIndex: int
 	nextIndex: int
@@ -77,6 +80,8 @@ Methods:
 		noFx: boolean | default:false
 	addHandleButtons(handles):
 		handles: dom collection | required
+	addPageHandleButtons(page_handles):
+		page_handles: dom collection | null
 	addActionButtons(action,buttons):
 		action: string | "previous", "next", "play", "playback", "stop" | required
 		buttons: dom collection | required
@@ -92,6 +97,7 @@ var noobSlide = new Class({
 		this.items = params.items;
 		this.mode = params.mode || 'horizontal';
 		this.fade = params.fade || false;
+		this.fxOptions = params.fxOptions;
 		this.modes = {horizontal:['left','width'], vertical:['top','height']};
 		this.size = params.size || 240;
 		this.mask = params.mask || null;
@@ -99,7 +105,7 @@ var noobSlide = new Class({
 		this.button_event = params.button_event || 'click';
 		this.handle_event = params.handle_event || 'click';
 		this.onWalk = params.onWalk || null;
-		this.currentIndex = null;
+		this.currentIndex = 0;
 		this.lastIndex = null;
 		this.previousIndex = null;
 		this.nextIndex = null;
@@ -107,8 +113,12 @@ var noobSlide = new Class({
 		this.autoPlay = params.autoPlay || false;
 		this._play = null;
 		this.handles = params.handles || null;
+		this.page_handles = params.page_handles || null;
 		if(this.handles){
 			this.addHandleButtons(this.handles);
+		}
+		if(this.page_handles){
+			this.addPageHandleButtons(this.page_handles);
 		}
 		this.buttons = {
 			previous: [],
@@ -131,7 +141,7 @@ var noobSlide = new Class({
 		else
 		{
 			//original Sliding
-			this.fx = new Fx.Tween(this.box,Object.append((params.fxOptions||{duration:500,wait:false}),{property:this.modes[this.mode][0]}));
+			this.fx = new Fx.Tween(this.box,Object.append((this.fxOptions||{duration:500,wait:false}),{property:this.modes[this.mode][0]}));
 			this.walk((params.startItem||0),true,true);
 		}
 	},
@@ -140,13 +150,10 @@ var noobSlide = new Class({
 	orderItems: function() {
 		for(i=0;i<this.items.length;i++)
 		{
-			this.items[i].setStyle('position', 'absolute');
-			this.items[i].setStyle('left', '0px');
-			this.items[i].setStyle('z-index', i+1);
-			if(i>0)
-			{
-				this.items[i].fade('out');
-			}
+			//this.items[i].setStyle('position', 'absolute');
+			//this.items[i].setStyle('left', '0px');
+			//this.items[i].setStyle('z-index', i+1);
+			//this.items[i].fade('out');
 		}
 	},
 
@@ -161,6 +168,19 @@ var noobSlide = new Class({
 				handles[i].addEvent(this.handle_event,this.walk.pass([i,true],this));
 			}
 		}
+	},
+
+	addPageHandleButtons: function(page_handles){
+		/*for(var i=0;i<page_handles.length;i++){
+			if(this.fade)
+			{
+				page_handles[i].addEvent(this.handle_event,this.fading.pass([i,true],this));
+			}
+			else
+			{
+				page_handles[i].addEvent(this.handle_event,this.walk.pass([i,true],this));
+			}
+		}*/
 	},
 
 	addActionButtons: function(action,buttons){
@@ -211,14 +231,17 @@ var noobSlide = new Class({
 	},
 
 	walk: function(item,manual,noFx){
+		item = item < this.items.length ? item : this.items.length-1;
 		if (item!=this.currentIndex)
 		{
 			if (this.mask && this.mode=='horizontal') {
 				minVisible = (this.mask.clientWidth+this.marginR) / this.size;
 				this.minVisible = parseInt(minVisible);
 			}
+			if (!this.minVisible) this.minVisible = 1;  // if detection fails
 			
-			this.currentIndex=item;
+			this.lastIndex = this.lastIndex || 0;
+			this.currentIndex = item;
 			this.previousIndex = this.currentIndex + (this.currentIndex>0 ? -1 : this.items.length-1);
 			this.nextIndex = this.currentIndex + (this.currentIndex<this.items.length-1 ? 1 : 1-this.items.length);
 			
@@ -254,18 +277,54 @@ var noobSlide = new Class({
 	
 	//Fading
 	fading: function(item,manual,noFx){
-		if(item!=this.currentIndex){
-			this.lastIndex=this.currentIndex;
-			this.currentIndex=item;
+		item = item < this.items.length ? item : this.items.length-1;
+		if (item!=this.currentIndex)
+		{
+			if (this.mask && this.mode=='horizontal') {
+				minVisible = (this.mask.clientWidth+this.marginR) / this.size;
+				this.minVisible = parseInt(minVisible);
+			}
+			if (!this.minVisible) this.minVisible = 1;  // if detection fails
+			
+			this.lastIndex = this.lastIndex || 0;
+			this.currentIndex = item;
 			this.previousIndex = this.currentIndex + (this.currentIndex>0 ? -1 : this.items.length-1);
 			this.nextIndex = this.currentIndex + (this.currentIndex<this.items.length-1 ? 1 : 1-this.items.length);
+			
+			if (this.currentIndex >= this.lastIndex && this.currentIndex <= this.lastIndex + this.minVisible - 1) {
+				var offSetIndex = this.lastIndex;  // Already viewable
+			} else if (this.currentIndex + this.minVisible >= this.items.length) {
+				var offSetIndex = this.lastIndex < this.items.length - this.minVisible ?
+					this.currentIndex - (this.minVisible-1) : // Position at rightmost of viewport
+					this.items.length - this.minVisible;     // Do not position leftmost of viewport, instead position to view all last rightmost items
+			} else {
+				var offSetIndex = this.lastIndex < this.currentIndex ?
+					this.currentIndex - (this.minVisible-1) :  // Position at rightmost of viewport
+					this.currentIndex;    // Position at leftmost of viewport
+			}
+			offSetIndex = offSetIndex || 0;
+			this.lastIndex = offSetIndex;
+			
 			if(manual){
 				this.stop();
 			}
-			if(!noFx){
-				this.items[this.lastIndex].fade('out');
-				this.items[this.currentIndex].fade('in');
+			
+			if (this.mask && this.mode=='horizontal') {
+				this.mask.setStyle('min-height', '' + this.mask.clientHeight + 'px');
 			}
+			for(i=0;i<this.items.length;i++) {
+				this.items[i].set('tween', this.fxOptions).fade(noFx ? 'hide' : 'out');
+			}
+			limit = noFx ? this.items.length - offSetIndex : this.minVisible;
+			for(i=0;i<limit;i++) {
+				if (offSetIndex+i >= this.items.length) break;
+				this.items[offSetIndex+i].setStyle('position', 'absolute');
+				this.mode=='horizontal' ?
+					this.items[offSetIndex+i].setStyle('left', '' + (i*this.size) + 'px') :
+					this.items[offSetIndex+i].setStyle('top', '' + (i*this.size) + 'px');
+				this.items[offSetIndex+i].set('tween', this.fxOptions).fade(noFx ? 'show' : 'in');
+			}
+			
 			if(manual && this.autoPlay){
 				this.play(this.interval,'next',true);
 			}

@@ -12,9 +12,9 @@ Class
 	noobSlide (rev.03-11-10)
 
 Arguments:
-	Options - see Options below
+	Parameters - see Parameters below
 
-Options:
+Parameters:
 	marginR: int | item right margin | default: 0
 	mask: dom element | optional
 	box: dom element | required
@@ -30,6 +30,7 @@ Options:
 	}
 	button_event: string | event type | default: 'click'
 	handles: dom collection | default: null
+	page_handles: dom collection | default: null
 	handle_event: string | event type| default: 'click'
 	fxOptions: object | Fx.Style options | default: {duration:500,wait:false}
 	interval: int | for periodical | default: 5000
@@ -48,6 +49,7 @@ Properties:
 	buttons: object
 	button_event: string
 	handles: dom collection
+	page_handles: dom collection
 	handle_event: string
 	previousIndex: int
 	nextIndex: int
@@ -72,6 +74,8 @@ Methods:
 		manual: bolean | default:false
 	addHandleButtons(handles):
 		handles: dom collection | required
+	addPageHandleButtons(page_handles):
+		page_handles: dom collection | null
 	addActionButtons(action,buttons):
 		action: string | "previous", "next", "play", "playback", "stop" | required
 		buttons: dom collection | required
@@ -93,7 +97,7 @@ var noobSlide = new Class({
 		this.button_event = params.button_event || 'click';
 		this.handle_event = params.handle_event || 'click';
 		this.onWalk = params.onWalk || null;
-		this.currentIndex = null;
+		this.currentIndex = 0;
 		this.lastIndex = null;
 		this.previousIndex = null;
 		this.nextIndex = null;
@@ -101,6 +105,7 @@ var noobSlide = new Class({
 		this.autoPlay = params.autoPlay || false;
 		this._auto = null;
 		this.handles = params.handles || null;
+		this.page_handles = params.page_handles || null;
 		if(this.handles){
 			this.addHandleButtons(this.handles);
 		}
@@ -162,14 +167,17 @@ var noobSlide = new Class({
 	},
 
 	walk: function(item,manual){
+		item = item < this.items.length ? item : this.items.length-1;
 		if (1) //item!=this.currentIndex) // dirty workaround to allow re-execution (this function fails when previous walk has not finished) (mootools v1.1)
 		{
 			if (this.mask && this.mode=='horizontal') {
 				minVisible = (this.mask.clientWidth+this.marginR) / this.size;
 				this.minVisible = parseInt(minVisible);
 			}
+			if (!this.minVisible) this.minVisible = 1;  // if detection fails
 			
-			this.currentIndex=item;
+			this.lastIndex = this.lastIndex || 0;
+			this.currentIndex = item;
 			this.previousIndex = this.currentIndex + (this.currentIndex>0 ? -1 : this.items.length-1);
 			this.nextIndex = this.currentIndex + (this.currentIndex<this.items.length-1 ? 1 : 1-this.items.length);
 			
