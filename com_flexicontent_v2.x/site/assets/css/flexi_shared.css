@@ -1109,7 +1109,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent .fcfield_textval {
 	background-clip: padding-box !important;
 	background-color: #FFFFFF !important;
-	background-image: -moz-linear-gradient(center bottom , #EEEEEE 0%, white 50%) !important;
+/*	background-image: -moz-linear-gradient(center bottom , #EEEEEE 0%, white 50%) !important;*/
 	border: 1px solid #AAAAAA !important;
 	border-radius: 4px 4px 4px 4px !important;
 	color: #444444 !important;
