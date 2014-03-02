@@ -70,8 +70,8 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="carousel_handle_width" type="text" default="24" label="Width" description="This is the width of thumbnail image of each item" />
-			<field name="carousel_handle_height" type="text" default="24" label="Height" description="This is the height of thumbnail image of each item" />
+			<field name="carousel_handle_width" type="text" default="80" label="Width" description="This is the width of thumbnail image of each item" />
+			<field name="carousel_handle_height" type="text" default="80" label="Height" description="This is the height of thumbnail image of each item" />
 			<field name="carousel_handle_event" type="radio" default="mouseover" label="Activation Event" description="How the content item buttons get activated">
 				<option value="mouseover">Mouse Over</option>
 				<option value="click">Click</option>
@@ -82,7 +82,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="carousel_effect" type="groupedlist" default="fade" label="Transition Effect" description="Select the effect to be used when carousel updates" >
+			<field name="carousel_effect" type="groupedlist" default="quart" label="Transition Effect" description="Select the effect to be used when carousel updates" >
 				<!--option value="fade">Fade</option-->
 				<group label="Scroll">
 					<option value="linear">Linear</option>
@@ -322,6 +322,10 @@
 				<option value="3">FLEXI_INCLUDE</option>
 			</field>
 			<field name="tag_ids" type="tags" default="" multiple="true" size="6" label="FLEXI_SELECT_TAGS" description="FLEXI_SELECT_TAGS_DESC" />
+			<field name="combine_tags" type="radio" default="1" label="FLEXI_TAGS_REQUIRE_ALL" description="FLEXI_TAGS_REQUIRE_ALL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES_SLOW</option>
+			</field>
 
 
 			<field name="" type="separator" default="FLEXI_DATES_SCOPE" level="level1" menu="hide" />
@@ -352,10 +356,17 @@
 					<option value="6">FLEXI_NEXT_MONTH</option>
 					<option value="7">FLEXI_NEXT_YEAR</option>
 				</group>
-				<group label="FLEXI_DYNAMIC_IGNY_TO_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
-					<option value="11">FLEXI_SAME_DAY_IGNORE_YEAR</option>
-					<option value="12">FLEXI_SAME_WEEK_IGNORE_YEAR</option>
-					<option value="13">FLEXI_SAME_MONTH_IGNORE_YEAR</option>
+				<group label="FLEXI_DYNAMIC_SAME_IGN_Y_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
+					<option value="11">FLEXI_SAME_DAY_OF_MONTH</option>
+					<option value="12">FLEXI_M3D_P4D_OF_MONTH</option>
+					<option value="13">FLEXI_SAME_WEEK_OF_MONTH</option>
+					<option value="14">FLEXI_SAME_WEEK_OF_YEAR</option>
+					<option value="15">FLEXI_SAME_MONTH_OF_YEAR</option>
+				</group>
+				<group label="FLEXI_DYNAMIC_SAME_IGN_MY_CURR_SRV_TIME_OR_CURR_ITEM_DATES">
+					<option value="16">FLEXI_SAME_DAY_OF_MONTH</option>
+					<option value="17">FLEXI_M3D_P4D_OF_MONTH</option>
+					<option value="18">FLEXI_SAME_WEEK_OF_MONTH</option>
 				</group>
 			</field>
 			

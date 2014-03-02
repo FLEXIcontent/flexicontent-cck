@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1840 2014-02-01 18:12:56Z ggppdk $
+ * @version 1.2 $Id: helper.php 1855 2014-02-18 23:11:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -682,6 +682,7 @@ class modFlexicontentHelper
 		// tags scope parameters
 		$method_tags	= (int)$params->get('method_tags', 1);
 		$tag_ids			= $params->get('tag_ids', array());
+		$tag_combine	= $params->get('tag_combine', 0);
 		
 		// date scope parameters
 		$method_dates	= (int)$params->get('method_dates', 1);  // parameter added later, maybe not to break compatibility this should be INCLUDE=3 by default ?
@@ -1194,9 +1195,10 @@ class modFlexicontentHelper
 			$tag_ids = !is_array($tag_ids) ? array($tag_ids) : $tag_ids ;
 			
 			// Create query to match item ids using the selected tags
-			$query2 = 'SELECT DISTINCT itemid'
+			$query2 = 'SELECT '.($tag_combine ? 'itemid' : 'DISTINCT itemid')
 				. ' FROM #__flexicontent_tags_item_relations'
 				. ' WHERE tid IN ('.implode(',', $tag_ids).')'
+				. ($tag_combine ? ' GROUP by itemid HAVING COUNT(*) >= '.count($tag_ids) : '')
 				;
 			
 			if ($method_tags == 2) { // exclude method
@@ -1352,17 +1354,41 @@ class modFlexicontentHelper
 					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'Y')).' )';
 				break;
 
-				case '11' : // same day, ignore year
-					$where .= ' AND ( DAYOFYEAR('.$comp.') = '.$db->Quote('DAYOFYEAR('.$cdate.')').' )';
+				case '11' : // same day of month, ignore year
+					$where .= ' AND ( DAYOFMONTH('.$comp.') = '.'DAYOFMONTH('.$db->Quote($cdate).') AND MONTH('.$comp.') = '.'MONTH('.$db->Quote($cdate).') )';
 				break;
 
-				case '12' : // same week, ignore year
+				case '12' : // [-3d,+3d] days of month, IGNORE YEAR
+					$where .= ' AND ((DAYOFMONTH('.$db->Quote($cdate).')-3) <= DAYOFMONTH('.$comp.') AND DAYOFMONTH('.$comp.') <= (DAYOFMONTH('.$db->Quote($cdate).')+4) AND MONTH('.$comp.') = '.'MONTH('.$db->Quote($cdate).') )';
+				break;
+
+				case '13' : // same week of month, IGNORE YEAR
 					$week_start = (int)$params->get('week_start', 0);  // 0 is sunday, 5 is monday
-					$where .= ' AND ( WEEK('.$comp.') = '.$db->Quote('WEEK('.$cdate.','.$week_start.')').' )';
+					$week_of_month = '(WEEK(%s,5) - WEEK(DATE_SUB(%s, INTERVAL DAYOFMONTH(%s)-1 DAY),5)+1)';
+					$where .= ' AND ('. str_replace('%s', $comp, $week_of_month).' = '.str_replace('%s', $db->Quote($cdate), $week_of_month) .' AND ( MONTH('.$comp.') = '.'MONTH('.$db->Quote($cdate).') ) )';
 				break;
 
-				case '13' : // same month, ignore year
-					$where .= ' AND ( MONTH('.$comp.') = '.$db->Quote('MONTH('.$cdate.')').' )';
+				case '14' : // same week of year, IGNORE YEAR
+					$week_start = (int)$params->get('week_start', 0);  // 0 is sunday, 5 is monday
+					$where .= ' AND ( WEEK('.$comp.') = '.'WEEK('.$db->Quote($cdate).','.$week_start.') )';
+				break;
+
+				case '15' : // same month of year, IGNORE YEAR
+					$where .= ' AND ( MONTH('.$comp.') = '.'MONTH('.$db->Quote($cdate).') )';
+				break;
+
+				case '16' : // same day of month, IGNORE MONTH, YEAR
+					$where .= ' AND ( DAYOFMONTH('.$comp.') = '.'DAYOFMONTH('.$db->Quote($cdate).') )';
+				break;
+
+				case '17' : // [-3d,+3d] days of month, IGNORE  MONTH, YEAR
+					$where .= ' AND ((DAYOFMONTH('.$db->Quote($cdate).')-3) <= DAYOFMONTH('.$comp.') AND DAYOFMONTH('.$comp.') <= (DAYOFMONTH('.$db->Quote($cdate).')+4) )';
+				break;
+
+				case '18' : // same week of month, IGNORE MONTH, YEAR
+					$week_start = (int)$params->get('week_start', 0);  // 0 is sunday, 5 is monday
+					$week_of_month = '(WEEK(%s,5) - WEEK(DATE_SUB(%s, INTERVAL DAYOFMONTH(%s)-1 DAY),5)+1)';
+					$where .= ' AND ('. str_replace('%s', $comp, $week_of_month).' = '.str_replace('%s', $db->Quote($cdate), $week_of_month) .' )';
 				break;
 			}
 		}
