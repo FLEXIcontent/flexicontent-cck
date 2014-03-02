@@ -590,3 +590,19 @@ if(MooTools.version>="1.2.4") {
 		document.formvalidator = new JFormValidator();
 	});
 }
+
+
+function flexi_submit(task, btn_box, msg_box) {
+	var res = flexi_j16ge ? Joomla.submitbutton(task) : submitbutton(task);
+	if (!res) {
+		if (typeof btn_box !== 'undefined') {
+			//alert('hide submit btns');
+			jQuery('#'+btn_box).hide();
+		}
+		if (typeof msg_box !== 'undefined') {
+			//alert('show submit msg');
+			jQuery('#'+msg_box).show();
+		}
+	}
+	return res;
+}
