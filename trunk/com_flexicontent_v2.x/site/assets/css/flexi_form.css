@@ -345,3 +345,15 @@ html button {
 	padding: 4px 2px !important;
 	border-radius: 4px !important;
 }
+
+
+/* Form submit handling */
+#flexi_form_submit_msg {
+	font-size:11px;
+	display:none;
+	padding: 4px 0px 4px 30px;
+	background: white url(../images/ajax-loader.gif) 0px 3px no-repeat;
+}
+#flexi_form_submit_btns {
+	font-size:11px;
+}

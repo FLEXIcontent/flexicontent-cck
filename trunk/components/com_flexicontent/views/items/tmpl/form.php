@@ -197,22 +197,25 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
 
-		<div class="flexi_buttons" style="font-size:11px;">
+		<div id="flexi_form_submit_msg">
+			<?php echo JText::_('FLEXI_FORM_IS_BEING_SUBMITTED'); ?>
+		</div>
+		<div id="flexi_form_submit_btns" class="flexi_buttons">
 			
 			<?php if ( $this->perms['canedit'] || in_array( 'apply', $allowbuttons_fe) || !$typeid ) : ?>
-				<button class="fc_button" type="button" onclick="return submitbutton('apply');">
+				<button class="fc_button" type="button" onclick="return flexi_submit('apply', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 					<span class="fcbutton_apply"><?php echo JText::_( !$isnew ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
 				</button>
 			<?php endif; ?>
 			
 			<?php if ( $typeid ) : ?>
 				
-				<button class="fc_button" type="button" onclick="return submitbutton('save');">
+				<button class="fc_button" type="button" onclick="return flexi_submit('save', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 					<span class="fcbutton_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
 				</button>
 			
 				<?php if ( in_array( 'save_preview', $allowbuttons_fe) && !$isredirected_after_submit ) : ?>
-					<button class="fc_button" type="button" onclick="return submitbutton('save_a_preview');">
+					<button class="fc_button" type="button" onclick="return flexi_submit('save_a_preview', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 						<span class="fcbutton_preview_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
 					</button>
 				<?php endif; ?>
@@ -230,7 +233,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			
 			<?php endif; ?>
 			
-			<button class="fc_button" type="button" onclick="return submitbutton('cancel')">
+			<button class="fc_button" type="button" onclick="return flexi_submit('cancel', 'flexi_form_submit_btns', 'flexi_form_submit_msg')">
 				<span class="fcbutton_cancel"><?php echo JText::_( 'FLEXI_CANCEL' ) ?></span>
 			</button>
 			

@@ -200,22 +200,25 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
 
-		<div class="flexi_buttons" style="font-size:11px;">
+		<div id="flexi_form_submit_msg">
+			<?php echo JText::_('FLEXI_FORM_IS_BEING_SUBMITTED'); ?>
+		</div>
+		<div id="flexi_form_submit_btns" class="flexi_buttons">
 			
 			<?php if ( $this->perms['canedit'] || in_array( 'apply', $allowbuttons_fe) || !$typeid ) : ?>
-				<button class="fc_button" type="button" onclick="return Joomla.submitbutton('apply');">
+				<button class="fc_button" type="button" onclick="return flexi_submit('apply', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 					<span class="fcbutton_apply"><?php echo JText::_( !$isnew ? 'FLEXI_APPLY' : ($typeid ? 'FLEXI_ADD' : 'FLEXI_APPLY_TYPE' ) ) ?></span>
 				</button>
 			<?php endif; ?>
 			
 			<?php if ( $typeid ) : ?>
 				
-				<button class="fc_button" type="button" onclick="return Joomla.submitbutton('save');">
+				<button class="fc_button" type="button" onclick="return flexi_submit('save', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 					<span class="fcbutton_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_RETURN' : 'FLEXI_ADD_A_RETURN' ) ?></span>
 				</button>
 			
 				<?php if ( in_array( 'save_preview', $allowbuttons_fe) && !$isredirected_after_submit ) : ?>
-					<button class="fc_button" type="button" onclick="return Joomla.submitbutton('save_a_preview');">
+					<button class="fc_button" type="button" onclick="return flexi_submit('save_a_preview', 'flexi_form_submit_btns', 'flexi_form_submit_msg');">
 						<span class="fcbutton_preview_save"><?php echo JText::_( !$isnew ? 'FLEXI_SAVE_A_PREVIEW' : 'FLEXI_ADD_A_PREVIEW' ) ?></span>
 					</button>
 				<?php endif; ?>
@@ -233,7 +236,7 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			
 			<?php endif; ?>
 			
-			<button class="fc_button" type="button" onclick="return Joomla.submitbutton('cancel')">
+			<button class="fc_button" type="button" onclick="return flexi_submit('cancel', 'flexi_form_submit_btns', 'flexi_form_submit_msg')">
 				<span class="fcbutton_cancel"><?php echo JText::_( 'FLEXI_CANCEL' ) ?></span>
 			</button>
 			
@@ -1146,18 +1149,18 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 	
 	
 	
-	<?php if (0 && JComponentHelper::getParams('com_content')->get('show_urls_images_frontend', 0) ) : ?>
+	<?php if (JComponentHelper::getParams('com_content')->get('show_urls_images_frontend', 0) ) : ?>
 	
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('Compatibility'); ?> </h3>
 		
 		<?php
-		$fieldSets_compatibility = array('images'=>1, 'urls'=>1);
-		foreach ($fieldSets_compatibility as $name => $fieldSet) :
+		$fields_grps_compatibility = array('images', 'urls');
+		foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
 		?>
 		
 		<fieldset class="flexi_params fc_edit_container_full">
-			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+			<?php foreach ($this->form->getGroup($fields_grp_name) as $field) : ?>
 				<div class="fcclear"></div>
 				<?php if ($field->hidden): ?>
 					<span style="visibility:hidden !important;">
