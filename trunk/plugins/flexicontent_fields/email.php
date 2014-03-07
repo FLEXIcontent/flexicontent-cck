@@ -81,13 +81,13 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			
 			// Add the drag and drop sorting feature
 			$js .= "
-			window.addEvent('domready', function(){
-				new Sortables($('sortables_".$field->id."'), {
-					'constrain': true,
-					'clone': true,
-					'handle': '.fcfield-drag'
-					});
+			jQuery(document).ready(function(){
+				jQuery('#sortables_".$field->id."').sortable({
+					handle: '.fcfield-drag',
+					containment: 'parent',
+					tolerance: 'pointer'
 				});
+			});
 			";
 			
 			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
@@ -107,11 +107,6 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 
 				var thisField 	 = $(el).getPrevious().getLast();
 				var thisNewField = thisField.clone();
-				if (MooTools.version>='1.2.4') {
-					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
-				} else {
-					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
-				}
 				
 				thisNewField.getElements('input.emailaddr').setProperty('value','');
 				thisNewField.getElements('input.emailaddr').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
@@ -124,23 +119,17 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				";
 				
 			$js .= "
+				jQuery(thisNewField).css('display', 'none');
 				jQuery(thisNewField).insertAfter( jQuery(thisField) );
 	
-				new Sortables($('sortables_".$field->id."'), {
-					'constrain': true,
-					'clone': true,
-					'handle': '.fcfield-drag'
-				});			
-
-				fx.start({ 'opacity': 1 }).chain(function(){
-					this.setOptions({duration: 600});
-					this.start({ 'opacity': 0 });
-					})
-					.chain(function(){
-						this.setOptions({duration: 300});
-						this.start({ 'opacity': 1 });
-					});
-
+				jQuery('#sortables_".$field->id."').sortable({
+					handle: '.fcfield-drag',
+					containment: 'parent',
+					tolerance: 'pointer'
+				});
+				
+				jQuery(thisNewField).show('slideDown');
+				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
@@ -148,20 +137,8 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			function deleteField".$field->id."(el)
 			{
 				if(rowCount".$field->id." <= 1) return;
-				var field	= $(el);
-				var row		= field.getParent();
-				if (MooTools.version>='1.2.4') {
-					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
-				} else {
-					var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
-				}
-				
-				fx.start({
-					'height': 0,
-					'opacity': 0
-				}).chain(function(){
-					(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
-				});
+				var row = jQuery(el).closest('li');
+				jQuery(row).hide('slideUp', function() { $(this).remove(); } );
 				rowCount".$field->id."--;
 			}
 			";
@@ -213,12 +190,12 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			
 			$addr = '
 				<label class="label" for="'.$fieldname.'[addr]">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
-				<input class="emailaddr validate-email'.$required.'" name="'.$fieldname.'[addr]" type="text" size="'.$size.'" value="'.$value['addr'].'" />
+				<input class="fcfield_textval emailaddr validate-email'.$required.'" name="'.$fieldname.'[addr]" type="text" size="'.$size.'" value="'.$value['addr'].'" />
 			';
 			
 			if ($usetitle) $text = '
 				<label class="label" for="'.$fieldname.'[text]">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</label>
-				<input class="emailtext" name="'.$fieldname.'[text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
+				<input class="fcfield_textval emailtext" name="'.$fieldname.'[text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
 			';
 			
 			
