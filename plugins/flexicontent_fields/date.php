@@ -119,13 +119,13 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			
 			//add the drag and drop sorting feature
 			$js = "
-			window.addEvent('domready', function(){
-				new Sortables($('sortables_".$field->id."'), {
-					'constrain': true,
-					'clone': true,
-					'handle': '.fcfield-drag'
-					});			
+			jQuery(document).ready(function(){
+				jQuery('#sortables_".$field->id."').sortable({
+					handle: '.fcfield-drag',
+					containment: 'parent',
+					tolerance: 'pointer'
 				});
+			});
 			";
 			
 			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
@@ -142,13 +142,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				
 				var thisField 	 = $(el).getPrevious().getLast();
 				var thisNewField = thisField.clone();
-				if (MooTools.version>='1.2.4') {
-					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
-				} else {
-					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
-				}
 				
 				jQuery(thisNewField).find('input').first().val('');  /* First element is the value input field, second is e.g remove button */
+				
+				jQuery(thisNewField).css('display', 'none');
 				jQuery(thisNewField).insertAfter( jQuery(thisField) );
 
 				var input = jQuery(thisNewField).find('input').first();
@@ -156,30 +153,22 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				var img = input.next();
 				img.attr('id', '".$elementid."_' +uniqueRowNum".$field->id." +'_img');
 				
-				
 				Calendar.setup({
-      				inputField:	input.attr('id'),
-      				ifFormat:		'%Y-%m-%d',
-      				button:			img.attr('id'),
-      				align:			'Tl',
-      				singleClick:	true
+					inputField:	input.attr('id'),
+					ifFormat:		'%Y-%m-%d',
+					button:			img.attr('id'),
+					align:			'Tl',
+					singleClick:	true
 				});
 				
-				new Sortables($('sortables_".$field->id."'), {
-					'constrain': true,
-					'clone': true,
-					'handle': '.fcfield-drag'
-				});			
+				jQuery('#sortables_".$field->id."').sortable({
+					handle: '.fcfield-drag',
+					containment: 'parent',
+					tolerance: 'pointer'
+				});
 
-				fx.start({ 'opacity': 1 }).chain(function(){
-					this.setOptions({duration: 600});
-					this.start({ 'opacity': 0 });
-					})
-					.chain(function(){
-						this.setOptions({duration: 300});
-						this.start({ 'opacity': 1 });
-					});
-
+				jQuery(thisNewField).show('slideDown');
+				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
@@ -187,20 +176,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			function deleteField".$field->id."(el)
 			{
 				if(rowCount".$field->id." <= 1) return;
-				var field	= $(el);
-				var row		= field.getParent();
-				if (MooTools.version>='1.2.4') {
-					var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
-				} else {
-					var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
-				}
-				
-				fx.start({
-					'height': 0,
-					'opacity': 0
-				}).chain(function(){
-					(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
-				});
+				var row = jQuery(el).closest('li');
+				jQuery(row).hide('slideUp', function() { $(this).remove(); } );
 				rowCount".$field->id."--;
 			}
 			";
