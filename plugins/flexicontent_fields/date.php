@@ -57,19 +57,21 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			return;
 		}
 		
+		// initialize framework objects and other variables
+		$document  = JFactory::getDocument();
+		$config    = JFactory::getConfig();
+		$app       = JFactory::getApplication();
+		$user      = JFactory::getUser();
+		
 		// some parameter shortcuts
-		$size				= $field->parameters->get( 'size', 30 ) ;
+		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$multiple   = $field->parameters->get( 'allow_multiple', 1 ) ;
-		$max_values = (int)$field->parameters->get( 'max_values', 0 ) ;
-		$required = $field->parameters->get( 'required', 0 ) ;
-		$required = $required ? ' required' : '';
+		$max_values = (int) $field->parameters->get( 'max_values', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
 		
-		$document	= JFactory::getDocument();
-		$config 	= JFactory::getConfig();
-		$app      = JFactory::getApplication();
-		$user			= JFactory::getUser();
-		
-		$show_usage = $field->parameters->get( 'show_usage', 0 ) ;
+		// find timezone and create user instructions, both according to given configuration
+		$show_usage     = $field->parameters->get( 'show_usage', 0 ) ;
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
@@ -110,15 +112,18 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$field->value[0] = '';
 		}
 		
+		// Field name and HTML TAG id
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
 		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		
+		$js = "";
 		
 		if ($multiple) // handle multiple records
 		{
 			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 			
-			//add the drag and drop sorting feature
-			$js = "
+			// add the drag and drop sorting feature
+			$js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
@@ -166,7 +171,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
-
+				
 				jQuery(thisNewField).show('slideDown');
 				
 				rowCount".$field->id."++;       // incremented / decremented
@@ -217,11 +222,13 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$skipped_vals = array();
 		foreach ($field->value as $value)
 		{
-			$calendar = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname, $elementid.'_'.$n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
+			$elementid_n = $elementid.'_'.$n;
+			
+			$calendar = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname, $elementid_n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
 			if (!$calendar)  { $skipped_vals[] = $value; continue; }
 			
-			$field->html[] =
-				$calendar.'
+			$field->html[] = '
+				'.$calendar.'
 				'.$move2.'
 				'.$remove_button.'
 				';
@@ -231,9 +238,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		}
 		
 		if ($multiple) { // handle multiple records
-			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
-			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+			$_list = "<li>". implode("</li>\n<li>", $field->html) ."</li>\n";
+			$field->html = '
+				<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$_list. '</ul>
+				<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />
+			';
 		} else {  // handle single values
 			$field->html = '<div>'.$field->html[0].'</div>';
 		}
@@ -257,13 +266,14 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
-		// Some variables
+		// initialize framework objects and other variables
 		$config = JFactory::getConfig();
 		$user = JFactory::getUser();
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
-
+		// DO NOT terminate yet if value is empty since a default value on empty may have been defined
+		
 		$date_source = $field->parameters->get('date_source', 0);
 		if ( $date_source ) {
 			$_value = ($date_source == 1) ? $item->publish_up : $item->publish_down;
@@ -372,9 +382,9 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		// initialise property
 		$field->{$prop} = array();
-		
 		$n = 0;
-		foreach ($values as $value) {
+		foreach ($values as $value)
+		{
 			if ( !strlen($value) ) continue;
 			
 			// Check if dates are allowed to have time part
@@ -389,16 +399,19 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				$date = '';
 			}
 			
-			$field->{$prop}[]	= $pretext.$date.$posttext;
+			$field->{$prop}[$n]	= $pretext.$date.$posttext;
 			
+			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
-		$field->{$prop} = implode($separatorf, $field->{$prop});
 		
-		if ( !$field->{$prop} && $show_no_value )
-			$field->{$prop} = JText::_($no_value_msg);
-		else
+		// Apply separator and open/close tags
+		$field->{$prop} = implode($separatorf, $field->{$prop});
+		if ( $field->{$prop}!=='' ) {
 			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+		} else {
+			$field->{$prop} = $show_no_value ? JText::_($no_value_msg) : '';
+		}
 	}
 	
 	
@@ -435,7 +448,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// Reformat the posted data
 		$newpost = array();
 		$new = 0;
-		foreach ($post as $n=>$v)
+		foreach ($post as $n => $v)
 		{
 			if ($post[$n] !== '')
 			{
@@ -491,7 +504,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		self::onDisplayFilter($filter, $value, $formName);
@@ -501,7 +513,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
@@ -539,7 +550,6 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	// This is for content lists e.g. category view, and not for search view
 	function getFiltered(&$filter, $value)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
@@ -585,7 +595,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	// *************************
 	
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item) {
+	function onIndexAdvSearch(&$field, &$post, &$item)
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
@@ -595,7 +606,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// b. Each of the indexes of $values will be added to the column 'value_id',
 		//    and it is meant for fields that we want to be filterable via a drop-down select
 		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
-		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair
+		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
 		// 'search_properties'   containts property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
@@ -614,7 +625,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$values = $this->_prepareForSearchIndexing($field, $post, $for_advsearch=0);
 		
 		// a. Each of the values of $values array will be added to the basic search index (one record per item)
-		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair
+		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
 		// 'search_properties'   containts property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
@@ -623,6 +634,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		return true;
 	}
 	
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
 	
 	// Method to prepare for indexing, either preparing SQL query (if post is null) or formating/preparing given $post data for usage bu index
 	function _prepareForSearchIndexing(&$field, &$post, $for_advsearch=0)
@@ -653,4 +669,5 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		}
 		return $values;
 	}
+	
 }

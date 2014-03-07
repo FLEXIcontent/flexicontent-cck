@@ -136,8 +136,15 @@
 		
 	</fieldset>
 	
+	<fieldset name="themes" label="FLEXI_TEMPLATE" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<field name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" class="use_select2_lib" onchange="activatePanel(this.value);" />
+		<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" />
+	</fieldset>
 	
-	<fieldset name="images" label="Images" description="">
+</fields>
+
+
+<fields name="images" label="Images" description="">
 		
 		<field name="" type="separator" default="Images (Joomla Built-in Views and modules)" description="..." level="level2" />
 		
@@ -163,8 +170,9 @@
 		<field name="image_fulltext_alt" type="text" label="COM_CONTENT_FIELD_IMAGE_ALT_LABEL" description="COM_CONTENT_FIELD_IMAGE_ALT_DESC" class="inputbox" size="20" />
 		<field name="image_fulltext_caption" type="text" label="COM_CONTENT_FIELD_IMAGE_CAPTION_LABEL" description="COM_CONTENT_FIELD_IMAGE_CAPTION_DESC" class="inputbox" size="20" />
 	
-	</fieldset>	
-	<fieldset name="urls" label="Links" description="">
+</fields>	
+
+<fields name="urls" label="Links" description="">
 		
 		<field name="" type="separator" default="Links (Joomla built-in views and modules)" description="..." level="level2" />
 		
@@ -201,17 +209,9 @@
 			<option value="3">JBROWSERTARGET_MODAL</option>
 		</field>
 		
-	</fieldset>
-	
-	
-	<fieldset name="themes" label="FLEXI_TEMPLATE" addfieldpath="/administrator/components/com_flexicontent/elements">
-		<field name="ilayout" type="itemlayout" label="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_ITEM_LAYOUT_DESC" class="use_select2_lib" onchange="activatePanel(this.value);" />
-		<field name="ilayout_mobile" type="itemlayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" class="use_select2_lib" />
-	</fieldset>
-	
 </fields>
 
-	
+
 <fields name="metadata">
 		<field name="" type="separator" default="FLEXI_ADVANCED" description="" level="level2" />
 		<field name="robots" type="list" label="FLEXI_METADATA_ROBOTS_LABEL" description="FLEXI_METADATA_ROBOTS_DESC" class="use_select2_lib">

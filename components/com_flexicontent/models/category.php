@@ -1635,7 +1635,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$params->set('orderbycustomfieldid', $orderbycustomfieldid[0]);
 			}
 			if ( preg_match("/option=com_user&/", $params->get('login_page', '')) ) {
-				JError::raiseNotice(0, "FLEXIcontent versions up to to v2.0 RC2a, set the login url wrongly in the global configuration.<br /> Please replace: <u>option=com_user</u> with <u>option=com_users</u>");
+				JError::raiseNotice(0, "The login url seems to be wrongly set in the FLEXIcontent component configuration.<br /> Please replace: <u>option=com_user</u> with <u>option=com_users</u>");
 				$params->set( 'login_page', str_replace("com_user&", "com_users&", $params->get('login_page', '')) );
 			}
 		}

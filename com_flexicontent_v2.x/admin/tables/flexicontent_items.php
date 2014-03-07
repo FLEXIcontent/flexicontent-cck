@@ -72,7 +72,7 @@ class flexicontent_items extends JTable{
 	/** @var string */
 	var $images				= null;
 	/** @var string */
-	var $urls				= null;
+	var $urls					= null;
 	/** @var string */
 	var $attribs			= null;
 	/** @var int */
@@ -271,6 +271,18 @@ class flexicontent_items extends JTable{
 	 */
 	public function bind($array, $ignore = '')
 	{
+		if (isset($array['images']) && is_array($array['images'])) {
+			$registry = new JRegistry;
+			$registry->loadArray($array['images']);
+			$array['images'] = (string)$registry;
+		}
+
+		if (isset($array['urls']) && is_array($array['urls'])) {
+			$registry = new JRegistry;
+			$registry->loadArray($array['urls']);
+			$array['urls'] = (string)$registry;
+		}
+		
 		if (isset($array['attribs']) && is_array($array['attribs'])) {
 			$registry = new JRegistry;
 			$registry->loadArray($array['attribs']);

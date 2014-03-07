@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: controller.php 1795 2013-10-23 00:08:42Z ggppdk $
+ * @version 1.5 stable $Id: controller.php 1823 2013-12-23 03:27:29Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1608,8 +1608,9 @@ class FlexicontentController extends JControllerLegacy
 		// Get file data for all files
 		// ***************************
 		
-		$fields_conf = array();
-		$valid_files = array();
+		$fields_props = array();
+		$fields_conf  = array();
+		$valid_files  = array();
 		$email_recipients = array();
 		foreach ($tree_files as $file_node)
 		{
@@ -1619,11 +1620,13 @@ class FlexicontentController extends JControllerLegacy
 			$file_id    = (int) $file_node->fileid;
 			
 			if ( !isset($fields_conf[$field_id]) ) {
-				$q = 'SELECT attribs, name FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
+				$q = 'SELECT attribs, name, field_type FROM #__flexicontent_fields WHERE id = '.(int) $field_id;
 				$db->setQuery($q);
 				$fld = $db->loadObject();
 				$fields_conf[$field_id] = FLEXI_J16GE ? new JRegistry($fld->attribs) : new JParameter($fld->attribs);
+				$fields_props[$field_id] = $fld;
 			}
+			$field_type = $fields_props[$field_id]->field_type;
 			
 			$query  = 'SELECT f.id, f.filename, f.altname, f.secure, f.url'
 					. ', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email'
@@ -1635,18 +1638,18 @@ class FlexicontentController extends JControllerLegacy
 					. ', dh.id as history_id'  // download history
 					. $access_clauses['select']  // has access
 					
-					.' FROM #__flexicontent_fields_item_relations AS rel'
-					.' LEFT JOIN #__flexicontent_files AS f ON f.id = rel.value'
-					.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = rel.field_id'
-					.' LEFT JOIN #__content AS i ON i.id = rel.item_id'
+					.' FROM #__flexicontent_files AS f '
+					.($field_type=='file' ? ' LEFT JOIN #__flexicontent_fields_item_relations AS rel ON rel.field_id = '. $field_id : '')  // Only check value usage for 'file' field
+					.' LEFT JOIN #__flexicontent_fields AS fi ON fi.id = '. $field_id
+					.' LEFT JOIN #__content AS i ON i.id = '. $content_id
 					.' LEFT JOIN #__categories AS c ON c.id = i.catid'
 					.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 					.' LEFT JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 					.' LEFT JOIN #__users AS u ON u.id = i.created_by'
 					.' LEFT JOIN #__flexicontent_download_history AS dh ON dh.file_id = f.id AND dh.user_id = '. (int)$user->id
 					. $access_clauses['join']
-					.' WHERE rel.item_id = ' . $content_id
-					.' AND rel.field_id = ' . $field_id
+					.' WHERE i.id = ' . $content_id
+					.' AND fi.id = ' . $field_id
 					.' AND f.id = ' . $file_id
 					.' AND f.published= 1'
 					. $access_clauses['and']

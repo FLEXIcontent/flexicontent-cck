@@ -855,13 +855,27 @@ class ParentClassItem extends JModelAdmin
 		
 		// *********************************************************
 		// Prepare item data for being loaded into the form:
-		// (a) Convert parameters 'attribs' & 'metadata' to an array
+		// (a) Convert parameters 'images', 'urls,' 'attribs' & 'metadata' to an array
 		// (b) Set property 'cid' (form field categories)
 		// *********************************************************
 		
 		$this->_item->itemparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 		
 		if ($this->_id) {
+			// Convert the images
+			$images = $this->_item->images;
+			$registry = new JRegistry;
+			$registry->loadString($images);
+			$this->_item->images = $registry->toArray();
+			$this->_item->itemparams->merge($registry);
+	
+			// Convert the urls
+			$urls = $this->_item->urls;
+			$registry = new JRegistry;
+			$registry->loadString($urls);
+			$this->_item->urls = $registry->toArray();
+			$this->_item->itemparams->merge($registry);
+	
 			// Convert the attribs
 			$attribs = $this->_item->attribs;
 			$registry = new JRegistry;
@@ -879,6 +893,8 @@ class ParentClassItem extends JModelAdmin
 			$attribs = $metadata = '';
 			$this->_item->attribs = array();
 			$this->_item->metadata = array();
+			$this->_item->images = array();
+			$this->_item->urls = array();
 		}
 		
 		// Set item property 'cid' (form field categories is named cid)
@@ -891,7 +907,9 @@ class ParentClassItem extends JModelAdmin
 		if (empty($form)) {
 			return false;
 		}
-		$this->_item->attribs = $attribs;
+		$this->_item->images = $images;
+		$this->_item->urls   = $urls;
+		$this->_item->attribs  = $attribs;
 		$this->_item->metadata = $metadata;
 		unset($this->_item->cid);
 		
@@ -1348,13 +1366,13 @@ class ParentClassItem extends JModelAdmin
 			$item->modifier     = null;
 			$item->publish_up   = $createdate->toUnix();
 			$item->publish_down = null;
+			$item->images       = null;
+			$item->urls         = null;
 			$item->attribs      = null;
 			$item->metadata     = null;
 			$item->access       = $default_accesslevel;
 			$item->state        = $default_state;
 			$item->mask         = null;  // deprecated do not use
-			$item->images       = null;
-			$item->urls         = null;
 			$item->language     = FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang();
 			$item->lang_parent_id = 0;
 			$item->search_index = null;
@@ -1629,10 +1647,12 @@ class ParentClassItem extends JModelAdmin
 		}
 		
 		
-		// *******************************************************************************
-		// Handle Parameters: attribs & metadata, merging POST values into existing values
+		// ***************************************************************************************
+		// Handle Parameters: attribs & metadata, merging POST values into existing values,
+		// IF these were not set at all then there will be no need to merge,
+		// BUT part of them may have been displayed, so we use mergeAttributes() instead of bind()
 		// Keys that are not set will not be set, thus the previous value is maintained
-		// *******************************************************************************
+		// ***************************************************************************************
 		
 		// Retrieve (a) item parameters (array PARAMS or ATTRIBS ) and (b) item metadata (array METADATA or META )
 		if ( !FLEXI_J16GE ) {
@@ -1647,7 +1667,7 @@ class ParentClassItem extends JModelAdmin
 			unset($data['metadata']);
 		}
 		
-		// Merge  (form posted)  item attributes and metadata parameters
+		// Merge (form posted) item attributes and metadata parameters INTO EXISTING DATA (see above for explanation)
 		$this->mergeAttributes($item, $params, $metadata);
 		
 		
@@ -2493,7 +2513,7 @@ class ParentClassItem extends JModelAdmin
 				$item_data = array();
 				$iproperties = array('alias', 'catid', 'metadesc', 'metakey', 'metadata', 'attribs');
 				if (FLEXI_J16GE) {
-					$j16ge_iproperties = array();
+					$j16ge_iproperties = array('urls', 'images');
 					$iproperties = array_merge($iproperties, $j16ge_iproperties);
 				}
 				foreach ( $iproperties as $iproperty) $item_data[$iproperty] = $item->{$iproperty};
@@ -3589,9 +3609,15 @@ class ParentClassItem extends JModelAdmin
 			
 			// emails for user ids
 			$user_emails_ulist = array();
+			$_user_ids = array();
+			$_user_names = array();
+			foreach ($nConf->{$ulist[$ntype]} as $user_id_name) {
+				if ( is_numeric($user_id_name) ) $_user_ids[] = (int) $user_id_name;
+				else $_user_names[] = $db->Quote($user_id_name);
+			}
 			if ( count( $nConf->{$ulist[$ntype]} ) )
 			{
-				$query = "SELECT DISTINCT email FROM #__users WHERE id IN (".implode(",",$nConf->{$ulist[$ntype]}).")";
+				$query = "SELECT DISTINCT email FROM #__users WHERE id IN (".implode(",",$_user_ids).") OR username IN (".implode(",",$_user_names).")";
 				$db->setQuery( $query );
 				$user_emails_ulist = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { echo "<pre>"; print_r($user_emails_ulist); exit; }
@@ -3968,7 +3994,7 @@ class ParentClassItem extends JModelAdmin
 	
 	
 	/**
-	 * Method to find validators for an item
+	 * Method to find reviewers of new item
 	 *
 	 * @access	public
 	 * @params	int			the id of the item
@@ -3978,61 +4004,21 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function getApprovalRequestReceivers($id, $catid)
 	{
+		// Get component parameters
+		$params  = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$params->merge($cparams);
+		
+		// Merge into them the type parameters
+		$tparams = $this->getTypeparams();
+		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
+		$params->merge($tparams);
+		
+		// We will use the email receivers of --new items-- pending approval, as receivers of the manual approval request
+		$nConf = $this->getNotificationsConf($params);
 		$validators = new stdClass();
-		/*if ( FLEXI_ACCESS ) {   // Compatibility with previous flexi versions
-			global $globalcats;
-		
-			$query	= 'SELECT DISTINCT aro from #__flexiaccess_acl'
-					. ' WHERE acosection = ' . $this->_db->Quote('com_content')
-					. ' AND aco = ' . $this->_db->Quote('publish')
-					// first step : get all groups that can publish everything
-					. ' AND ( ( axosection = ' . $this->_db->Quote('content') . ' AND axo = ' . $this->_db->Quote('all') . ' )'
-					// second step : get all groups that can publish in the item's cats (main cat and ancestors)
-					. ' OR 	( axosection = ' . $this->_db->Quote('category') . ' AND axo IN ( ' . $globalcats[$catid]->ancestors . ') )'
-					// third step : get all groups that can publish this specific item
-					. ' OR 	( axosection = ' . $this->_db->Quote('item') . ' AND axo = ' . $id . ' ) )'
-					;
-			$this->_db->setQuery($query);
-			$publishers = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-		
-			// find all nested groups
-			if ($publishers) {
-				$users = $publishers;
-				foreach ($publishers as $publisher) {
-					$validators = FAccess::mgenfant($publisher);
-					$users = array_merge($users, $validators);
-				}
-			}
-			
-			// get all users from these groups that wants to receive system emails
-			$query	= 'SELECT DISTINCT u.email from #__flexiaccess_members AS m'
-					. ' LEFT JOIN #__users AS u ON u.id = m.member_id'
-					. ' WHERE m.group_id IN ( ' . implode(',', $users) . ' )'
-					. ' AND u.sendEmail = 1'
-					;		
-			$this->_db->setQuery($query);
-			$validators->notify_emails = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-			$validators->notify_text = '';
-		} else {*/
-			// J1.5 with no FLEXIaccess or J2.5+
-			
-			// Get component parameters and them merge into them the type parameters
-			$params  = FLEXI_J16GE ? new JRegistry() : new JParameter("");
-			$cparams = JComponentHelper::getParams('com_flexicontent');
-			$params->merge($cparams);
-		
-			$tparams = $this->getTypeparams();
-			$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
-			$params->merge($tparams);
-			
-			// Get notifications configuration and select appropriate emails for current saving case
-			$nConf = & $this->getNotificationsConf($params);
-		
-			$validators->notify_emails = $nConf->emails->notify_new_pending;
-		
-			$validators->notify_text = '';//$params->get('text_notify_new_pending');
-		//}
-		//print_r($validators); exit;
+		$validators->notify_emails = $nConf->emails->notify_new_pending;
+		$validators->notify_text = ''; // clear this ... default is : 'text_notify_new_pending', but it is not used the case of manual approval
 		
 		return $validators;
 	}

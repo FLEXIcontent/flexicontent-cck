@@ -1156,3 +1156,9 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 .plupload_filelist_content .plupload_file {
 	padding:0 !important;
 }
+
+
+/* Common field CSS for forms */
+#flexicontent .admintable .fcfield_textval { height:22px !important; margin-top:0px !important; margin-bottom: 0px!important;  }
+#flexicontent .admintable .fcfield-button { padding:3px 6px !important; }
+#flexicontent .ui-sortable > li { background: white; }

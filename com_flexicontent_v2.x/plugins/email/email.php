@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: email.php 1842 2014-02-05 02:10:33Z ggppdk $
+ * @version 1.0 $Id: email.php 1862 2014-03-07 03:29:42Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.email
@@ -45,7 +45,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
-		// initialize framework object and other variables
+		// initialize framework objects and other variables
 		$document  = JFactory::getDocument();
 		
 		// some parameter shortcuts
@@ -121,7 +121,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$js .= "
 				jQuery(thisNewField).css('display', 'none');
 				jQuery(thisNewField).insertAfter( jQuery(thisField) );
-	
+				
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
 					containment: 'parent',
