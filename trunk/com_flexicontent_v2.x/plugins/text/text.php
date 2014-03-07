@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: text.php 1764 2013-09-16 08:00:21Z ggppdk $
+ * @version 1.0 $Id: text.php 1862 2014-03-07 03:29:42Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.text
@@ -44,25 +44,32 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
+		// initialize framework objects and other variables
+		$document  = JFactory::getDocument();
+		
 		// some parameter shortcuts
 		$default_value_use = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value     = ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$size				= (int)$field->parameters->get( 'size', 30 ) ;
 		$maxlength	= (int)$field->parameters->get( 'maxlength', 0 ) ;
+		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$multiple   = $field->parameters->get( 'allow_multiple', 1 ) ;
-		$max_values = (int)$field->parameters->get( 'max_values', 0 ) ;
+		$max_values = (int) $field->parameters->get( 'max_values', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
 		
+	  // add setMask function on the document.ready event
 		$inputmask	= $field->parameters->get( 'inputmask', false ) ;
 		$custommask = $field->parameters->get( 'custommask', false ) ;
+		static $inputmask_added = false;
+	  if ($inputmask && !$inputmask_added) {
+			$inputmask_added = true;
+			flexicontent_html::loadFramework('inputmask');
+		}
 		
-		$required = $field->parameters->get( 'required', 0 ) ;
-		$required = $required ? ' required' : '';
-		
-		// Initialize extra HTML TAG parameters
+		// create extra HTML TAG parameters for the text form field
 		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
 		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
 		
-		$document	= JFactory::getDocument();
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
@@ -73,22 +80,18 @@ class plgFlexicontent_fieldsText extends JPlugin
 			}
 		}
 		
+		// Field name and HTML TAG id
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
 		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 		
-	  // add setMask function on the document.ready event
-		static $inputmask_added = false;
-	  if ($inputmask && !$inputmask_added) {
-			$inputmask_added = true;
-			flexicontent_html::loadFramework('inputmask');
-		}
+		$js = "";
 		
 		if ($multiple) // handle multiple records
 		{
 			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 			
-			//add the drag and drop sorting feature
-			$js = "
+			// add the drag and drop sorting feature
+			$js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
@@ -126,6 +129,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 				
 				jQuery(thisNewField).css('display', 'none');
 				jQuery(thisNewField).insertAfter( jQuery(thisField) );
+
+				var input = jQuery(thisNewField).find('input').first();
+				input.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 				";
 			
 			if ($field->field_type=='textselect') $js .= "
@@ -196,9 +202,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 			
 			$fieldname_sel = FLEXI_J16GE ? 'custom['.$field->name.'_sel][]' : $field->name.'_sel[]';
 			$sel_ops = plgFlexicontent_fieldsText::buildSelectOptions($field, $item);
-			$selhtml = JHTML::_('select.genericlist', $sel_ops, $fieldname_sel, $sel_attribs, 'value', 'text', array());
+			$select_field = JHTML::_('select.genericlist', $sel_ops, $fieldname_sel, $sel_attribs, 'value', 'text', array());
 		} else {
-			$selhtml='';
+			$select_field='';
 		}
 		
 		if ($js)  $document->addScriptDeclaration($js);
@@ -216,9 +222,13 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$n = 0;
 		foreach ($field->value as $value)
 		{
+			$elementid_n = $elementid.'_'.$n;
+			
+			$text_field = '<input '. $validate_mask .' id="'.$elementid_n.'" name="'.$fieldname.'" class="'.$classes.'" type="text" size="'.$size.'" value="'.$value.'" '.$attribs.' />';
+			
 			$field->html[] = '
-				<input '. $validate_mask .' id="'.$elementid.'_'.$n.'" name="'.$fieldname.'" class="'.$classes.'" type="text" size="'.$size.'" value="'.$value.'" '.$attribs.' />
-				'.$selhtml.'
+				'.$text_field.'
+				'.$select_field.'
 				'.$move2.'
 				'.$remove_button.'
 				';
@@ -228,11 +238,13 @@ class plgFlexicontent_fieldsText extends JPlugin
 		}
 		
 		if ($multiple) { // handle multiple records
-			$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
-			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />';
+			$_list = "<li>". implode("</li>\n<li>", $field->html) ."</li>\n";
+			$field->html = '
+				<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$_list. '</ul>
+				<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />
+			';
 		} else {  // handle single values
-			$field->html = '<div>'.$field->html[0].'</div>';
+			$field->html = $field->html[0];
 		}
 	}
 	
@@ -245,9 +257,6 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
-		// Some variables
-		$document = JFactory::getDocument();
-		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
@@ -263,6 +272,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$values = array($default_value);
 		}
 		
+		// Value handling parameters
+		$multiple       = $field->parameters->get( 'allow_multiple', 1 ) ;
+		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
@@ -273,13 +285,6 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-		
-		// Get ogp configuration
-		$useogp     = $field->parameters->get('useogp', 0);
-		$ogpinview  = $field->parameters->get('ogpinview', array());
-		$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
-		$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
-		$ogpusage   = $field->parameters->get('ogpusage', 0);
 		
 		switch($separatorf)
 		{
@@ -318,19 +323,30 @@ class plgFlexicontent_fieldsText extends JPlugin
 		foreach ($values as $value)
 		{
 			if ( !strlen($value) ) continue;
-			$field->{$prop}[]	= strlen($values[$n]) ? $pretext.$values[$n].$posttext : '';
+			
+			$field->{$prop}[$n]	= $pretext.$value.$posttext;
+			
 			$n++;
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		// Apply seperator and open/close tags
-		if(count($field->{$prop})) {
-			$field->{$prop} = implode($separatorf, $field->{$prop});
+		// Apply separator and open/close tags
+		$field->{$prop} = implode($separatorf, $field->{$prop});
+		if ( $field->{$prop}!=='' ) {
 			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 		} else {
 			$field->{$prop} = '';
 		}
 		
+		// Add OGP Data
+		$useogp     = $field->parameters->get('useogp', 0);
+		$ogpinview  = $field->parameters->get('ogpinview', array());
+		$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
+		$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
+		$ogpusage   = $field->parameters->get('ogpusage', 0);
+		
 		if ($useogp && $field->{$prop}) {
+			$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
 			if ( in_array($view, $ogpinview) ) {
 				switch ($ogpusage)
 				{
@@ -340,7 +356,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 				}
 				if ($usagetype) {
 					$content_val = flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen);
-					$document->addCustomTag('<meta property="og:'.$usagetype.'" content="'.$content_val.'" />');
+					JFactory::getDocument()->addCustomTag('<meta property="og:'.$usagetype.'" content="'.$content_val.'" />');
 				}
 			}
 		}
@@ -370,8 +386,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 			if ($post[$n] !== '')
 			{
 				$newpost[$new] = $post[$n];
+				$new++;
 			}
-			$new++;
 		}
 		$post = $newpost;
 	}
@@ -395,7 +411,6 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		self::onDisplayFilter($filter, $value, $formName);
@@ -405,7 +420,6 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		FlexicontentFields::createFilter($filter, $value, $formName);
@@ -416,7 +430,6 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// This is for content lists e.g. category view, and not for search view
 	function getFiltered(&$filter, $value)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
@@ -444,6 +457,15 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
+		// a. Each of the values of $values array will be added to the advanced search index as searchable text (column value)
+		// b. Each of the indexes of $values will be added to the column 'value_id',
+		//    and it is meant for fields that we want to be filterable via a drop-down select
+		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
+		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
@@ -455,10 +477,21 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
+		// a. Each of the values of $values array will be added to the basic search index (one record per item)
+		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	
+	
+	
+	// **********************
+	// VARIOUS HELPER METHODS
+	// **********************
 	
 	// Method to build the options of drop-down select for field
 	function buildSelectOptions(&$field, &$item)

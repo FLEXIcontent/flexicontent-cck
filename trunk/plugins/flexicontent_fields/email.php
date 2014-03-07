@@ -45,7 +45,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
-		// initialize framework object and other variables
+		// initialize framework objects and other variables
 		$document  = JFactory::getDocument();
 		
 		// some parameter shortcuts
@@ -121,7 +121,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$js .= "
 				jQuery(thisNewField).css('display', 'none');
 				jQuery(thisNewField).insertAfter( jQuery(thisField) );
-	
+				
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
 					containment: 'parent',

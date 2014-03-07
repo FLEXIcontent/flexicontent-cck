@@ -3,6 +3,7 @@
  * @license		GNU General Public License version 2 or later; see LICENSE.txt
  */
 
+var fcform_isValid = false;
 var flexi_j16ge = 1;
 var tab_focused;
 var max_cat_assign_fc = 0;
@@ -520,6 +521,7 @@ var JFormValidator = new Class({
 			}
 		}
 		
+		fcform_isValid = valid;
 		return valid;
 	},
 
@@ -593,8 +595,8 @@ if(MooTools.version>="1.2.4") {
 
 
 function flexi_submit(task, btn_box, msg_box) {
-	var res = flexi_j16ge ? Joomla.submitbutton(task) : submitbutton(task);
-	if (!res) {
+	flexi_j16ge ? Joomla.submitbutton(task) : submitbutton(task);
+	if (fcform_isValid) {
 		if (typeof btn_box !== 'undefined') {
 			//alert('hide submit btns');
 			jQuery('#'+btn_box).hide();
@@ -604,5 +606,4 @@ function flexi_submit(task, btn_box, msg_box) {
 			jQuery('#'+msg_box).show();
 		}
 	}
-	return res;
 }

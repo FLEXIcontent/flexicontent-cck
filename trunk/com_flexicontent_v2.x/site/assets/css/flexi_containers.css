@@ -53,9 +53,9 @@
 	padding: 3px 6px 4px 36px !important;
 }
 .fc-caption {
-	background: #888 url(../images/comment.png) no-repeat 10px 50%;
-	color: white !important;
-	border-color: #aaa !important;
+	background: lightgray url(../images/comment.png) no-repeat 10px 50%;
+	color: black !important;
+	border-color: #ddd !important;
 	padding: 3px 6px 4px 36px !important;
 }
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: weblink.php 1814 2013-11-29 21:40:32Z ggppdk $
+ * @version 1.0 $Id: weblink.php 1862 2014-03-07 03:29:42Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.weblink
@@ -14,7 +14,6 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsWeblink extends JPlugin
@@ -45,13 +44,15 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
-		// initialize framework object and other variables
+		// initialize framework objects and other variables
 		$document  = JFactory::getDocument();
 		
 		// some parameter shortcuts
-		$size      = $field->parameters->get( 'size', 30 ) ;
-		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
-		$max_values= (int)$field->parameters->get( 'max_values', 0 ) ;
+		$size       = (int) $field->parameters->get( 'size', 30 ) ;
+		$multiple   = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$max_values = (int) $field->parameters->get( 'max_values', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
 		
 		// This is field 's MAIN value property
 		$link_usage   = $field->parameters->get( 'link_usage', 0 ) ;
@@ -62,9 +63,6 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		
-		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
-		
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
@@ -74,13 +72,17 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$field->value[0] = serialize($field->value[0]);
 		}
 		
+		// Field name and HTML TAG id
+		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
+		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		
 		$js = "";
 		
 		if ($multiple) // handle multiple records
 		{
 			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 			
-			// Add the drag and drop sorting feature
+			// add the drag and drop sorting feature
 			$js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
@@ -91,21 +93,18 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			});
 			";
 			
-			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
-			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
-			
 			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id."		= ".$max_values.";
+			var maxValues".$field->id." = ".$max_values.";
 
 			function addField".$field->id."(el) {
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
-
+				
 				var thisField 	 = $(el).getPrevious().getLast();
 				var thisNewField = thisField.clone();
 				
@@ -129,10 +128,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				} else {
 					thisNewField.getElements('span span').setHTML('0');
 				}
-
+				
 				jQuery(thisNewField).css('display', 'none');
 				jQuery(thisNewField).insertAfter( jQuery(thisField) );
-	
+				
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
 					containment: 'parent',
@@ -177,7 +176,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -190,33 +189,39 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
-		foreach ($field->value as $value) {
+		foreach ($field->value as $value)
+		{
+			if ( !strlen($value) ) continue;
+			
+			// Compatibility for old unserialized values
 			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
 				$value = unserialize($value);
 			} else {
 				$value = array('link' => $value, 'title' => '', 'hits'=>0);
 			}
-			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
-			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+			$fieldname_n = $fieldname.'['.$n.']';
+			$elementid_n = $elementid.'_'.$n;
 			
 			$link = '
 				<label class="label">'.JText::_( 'FLEXI_FIELD_URL' ).':</label>
-				<input class="urllink fcfield_textval'.$required.'" name="'.$fieldname.'[link]" id="'.$elementid.'_'.$n.'" type="text" size="'.$size.'" value="'.$value['link'].'" />
+				<input class="urllink fcfield_textval'.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['link'].'" />
 			';
 			
+			$title = '';
 			if ($usetitle) $title = '
 				<label class="label">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</label>
-				<input class="urltitle fcfield_textval" name="'.$fieldname.'[title]" type="text" size="'.$size.'" value="'.@$value['title'].'" />
+				<input class="urltitle fcfield_textval" name="'.$fieldname_n.'[title]" type="text" size="'.$size.'" value="'.@$value['title'].'" />
 			';
 			
-			$hits= '
-				<input class="urlhits" name="'.$fieldname.'[hits]" type="hidden" value="'.$value['hits'].'" />
-				<span class="hits"><span class="hitcount">'.$value['hits'].'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
+			$hits = (int) @ $value['hits'];
+			$hits = '
+					<input class="urlhits" name="'.$fieldname_n.'[hits]" type="hidden" value="'.$hits.'" />
+					<span class="hits"><span class="hitcount">'.$hits.'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
 			';
 			
 			$field->html[] = '
 				'.$link.'
-				'.@$title.'
+				'.$title.'
 				'.$hits.'
 				'.$move2.'
 				'.$remove_button.'
@@ -264,7 +269,8 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// some parameter shortcuts
-		$target = $field->parameters->get( 'targetblank', 0 ) ? ' target="_blank"' : '';
+		$target = $field->parameters->get( 'targetblank', 0 );
+		$target_param   = $target ? ' target="_blank"' : '';
 		$display_hits = $field->parameters->get( 'display_hits', 0 ) ;
 		$add_hits_img = $display_hits == 1 || $display_hits == 3;
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
@@ -280,6 +286,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
+		// DO NOT terminate yet if value is empty since a default value on empty may have been defined
 		
 		// Handle default value loading, instead of empty value
 		if ( empty($values) && !strlen($default_link) ) {
@@ -287,12 +294,14 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			return;
 		} else if ( empty($values) && strlen($default_link) ) {
 			$values = array();
-			$values[0]['link'] = JText::_($default_link);
-			$values[0]['text'] = JText::_($default_title);
-			$values[0]['hits'] = 0;
+			$values[0]['link']  = JText::_($default_link);
+			$values[0]['title'] = JText::_($default_title);
+			$values[0]['hits']  = 0;
 			$values[0] = serialize($values[0]);
 		}
 		
+		// Value handling parameters
+		$multiple       = $field->parameters->get( 'allow_multiple', 1 ) ;
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -354,23 +363,23 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$n = 0;
 		foreach ($values as $value)
 		{
-			if ( empty($value) ) continue;
+			if ( !strlen($value) ) continue;
 			
 			// Compatibility for old unserialized values
-			$value = (@unserialize($value)!== false || $value === 'b:0;') ? unserialize($value) : $value;
-			if ( is_array($value) ) {
-				$link  = $value['link'];
-				$title = $value['title'];
-				$hits  = $value['hits'];
+			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
+				$value = unserialize($value);
 			} else {
-				$link = $value;
-				$title = '';
-				$hits = 0;
+				$value = array('link' => $value, 'title' => '', 'hits'=>0);
 			}
+			if ( empty($value['link']) ) continue;  // no link ...
 			
 			// If not using property or property is empty, then use default property value
 			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
-			$title = ($usetitle && strlen($title))  ?  $title  :  $default_title;
+			$title    = ($usetitle && @$value['title']   )  ?  $value['title']    : $default_title;
+			$hits     = (int) @ $value['hits'];
+			
+			$link_params  = $title ? ' title="'.$title.'"' : '';
+			$link_params .= $target_param;
 			
 			if ( $field->parameters->get( 'use_direct_link', 0 ) )
 				// Direct access to the web-link, hits counting not possible
@@ -380,11 +389,9 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				$href = JRoute::_( 'index.php?option=com_flexicontent&fid='. $field->id .'&cid='.$field->item_id.'&ord='.($n+1).'&task=weblink' );
 			
 			// Create indirect link to web-link address with custom displayed text
-			if ( strlen($title) && $usetitle ) {
-				$field->{$prop}[$n] = $pretext. '<a href="' .$href. '" title="' . $title . '"' . $target . '>' .$title. '</a>' .$posttext;
-			} else {
-				$field->{$prop}[$n] = $pretext. '<a href="' .$href. '" title="' . $title . '"' . $target . '>'. $this->cleanurl($link) .'</a>' .$posttext;
-			}
+			if( empty($linktext) )
+				$linktext = $title ? $title: $this->cleanurl($value['link']);
+			$field->{$prop}[$n] = $pretext. '<a href="' .$href. '" '.$link_params.'>' .$linktext. '</a>' .$posttext;
 			
 			// HITS: either as icon or as inline text or both
 			$hits_html = '';
@@ -405,6 +412,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			}
 			
 			$n++;
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
 		// Apply seperator and open/close tags
@@ -514,6 +522,15 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
+		// a. Each of the values of $values array will be added to the advanced search index as searchable text (column value)
+		// b. Each of the indexes of $values will be added to the column 'value_id',
+		//    and it is meant for fields that we want to be filterable via a drop-down select
+		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
+		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('link','title'), $search_properties=array('title'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
@@ -525,6 +542,12 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
+		// a. Each of the values of $values array will be added to the basic search index (one record per item)
+		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('link','title'), $search_properties=array('title'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
@@ -535,6 +558,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	// VARIOUS HELPER METHODS
 	// **********************
 	
+	// Get a url without the protocol
 	function cleanurl($url)
 	{
 		$prefix = array("http://", "https://", "ftp://");
