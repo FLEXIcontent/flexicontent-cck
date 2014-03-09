@@ -154,7 +154,8 @@ class FlexicontentViewFields extends JViewLegacy
 		$fftype[] = JHTML::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
 		$fftype[] = JHTML::_('select.option',  'NC', JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
 		foreach ($fieldtypes as $field_type => $ftdata) {
-			$fftype[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_type);
+			$field_friendlyname = str_ireplace("FLEXIcontent - ","",$ftdata->field_friendlyname);
+			$fftype[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_friendlyname);
 		}
 
 		$lists['fftype'] = JHTML::_('select.genericlist', $fftype, 'filter_fieldtype', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );

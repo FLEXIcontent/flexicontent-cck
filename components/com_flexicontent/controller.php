@@ -1492,6 +1492,8 @@ class FlexicontentController extends JControllerLegacy
 		$user  = JFactory::getUser();
 		$task  = JRequest::getVar( 'task', 'download' );
 		$session = JFactory::getSession();
+		$method  = JRequest::getVar( 'method', 'download' );
+		if ($method!='view' && $method!='download') die('unknown download method:' . $method);
 		
 		
 		// *******************************************************************************************************************
@@ -2025,7 +2027,11 @@ class FlexicontentController extends JControllerLegacy
 		header("Cache-Control: private", false); // required for certain browsers
 		header("Content-Type: ".$dlfile->ctype);
 		//quotes to allow spaces in filenames
-		header("Content-Disposition: attachment; filename=\"".$dlfile->filename."\";" );
+		if ($method == 'view') {
+			header("Content-Disposition: inline; filename=\"".$dlfile->filename."\";" );
+		} else {
+			header("Content-Disposition: attachment; filename=\"".$dlfile->filename."\";" );
+		}
 		header("Content-Transfer-Encoding: binary");
 		header("Content-Length: ".$dlfile->size);
 		
