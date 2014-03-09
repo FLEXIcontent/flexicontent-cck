@@ -120,6 +120,14 @@
 			</field>
 			<field name="downloadstext" type="text" size="40" default="FLEXI_DOWNLOAD" label="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
 			
+			<field name="" type="separator" default="In-browser viewing" level="level3" menu="hide" />
+			<field name="allowview" type="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_VIEW" description="FLEXI_FIELD_FILE_ALLOW_VIEW_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_YES_CUSTOM_TEXT</option>
+			</field>
+			<field name="viewtext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT_DESC"/>
+			
 			<field name="" type="separator" default="Sharing" level="level3" menu="hide" />
 			<field name="allowshare" type="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_SHARE" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC">
 				<option value="0">FLEXI_NO</option>

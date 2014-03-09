@@ -677,8 +677,12 @@ class FlexicontentModelFields extends JModelLegacy
 	 */
 	function getFieldTypes ()
 	{
-		$query = 'SELECT field_type, count(id) as assigned'
-				. ' FROM #__flexicontent_fields'
+		$query = 'SELECT f.field_type, count(f.id) as assigned, plg.name as field_friendlyname'
+				. ' FROM #__flexicontent_fields AS f'
+				. (FLEXI_J16GE ?
+					' LEFT JOIN #__extensions AS plg ON (plg.element = f.field_type AND plg.type="plugin" AND plg.folder="flexicontent_fields")' :
+					' LEFT JOIN #__plugins AS plg ON (plg.element = f.field_type AND plg.folder="flexicontent_fields")'
+				  )
 				. ' WHERE iscore=0 '
 				. ' GROUP BY field_type'
 				;

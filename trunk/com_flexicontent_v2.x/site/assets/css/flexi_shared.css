@@ -780,6 +780,9 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 div fieldset input, div fieldset textarea, div fieldset select, div fieldset img, div fieldset button {
 	margin: 2px 2px 2px 0px !important;
 }
+div fieldset td input, div fieldset td textarea {
+	min-width: 80%;
+}
 
 #flexicontent .fc_form_title,
 #flexicontent .fc_form_alias,

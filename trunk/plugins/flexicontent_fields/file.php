@@ -271,7 +271,12 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$allowdownloads = $field->parameters->get( 'allowdownloads', 1 ) ;
 		$downloadstext  = $allowdownloads==2 ? $field->parameters->get( 'downloadstext', 'FLEXI_DOWNLOAD' ) : 'FLEXI_DOWNLOAD';
 		$downloadstext  = JText::_($downloadstext);
-		$downloadinfo   = JText::_('FLEXI_FIELD_FILE_DOWNLOAD_INFO', true);
+		$downloadsinfo  = JText::_('FLEXI_FIELD_FILE_DOWNLOAD_INFO', true);
+		
+		$allowview = $field->parameters->get( 'allowview', 1 ) ;
+		$viewtext  = $allowview==2 ? $field->parameters->get( 'viewtext', 'FLEXI_FIELD_FILE_VIEW' ) : 'FLEXI_FIELD_FILE_VIEW';
+		$viewtext  = JText::_($viewtext);
+		$viewinfo  = JText::_('FLEXI_FIELD_FILE_VIEW_INFO', true);
 		
 		$allowshare = $field->parameters->get( 'allowshare', 0 ) ;
 		$sharetext  = $allowshare==2 ? $field->parameters->get( 'sharetext', 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND' ) : 'FLEXI_FIELD_FILE_EMAIL_TO_FRIEND';
@@ -560,8 +565,16 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$actions_arr[] = ''
 						.'<form id="form-download-'.$field->id.'-'.($n+1).'" method="post" action="'.$dl_link.'" style="display:inline-block;" >'
 						.$file_data_fields
-						.'<input type="submit" name="download-'.$field->id.'[]" class="'.$file_classes.' fcfile_downloadFile" title="'. $downloadinfo .'" value="'.$downloadstext.'"/>'
+						.'<input type="submit" name="download-'.$field->id.'[]" class="'.$file_classes.' fcfile_downloadFile" title="'.$downloadsinfo.'" value="'.$downloadstext.'"/>'
 						.'</form>'."\n";
+				}
+				
+				if ($authorized && $allowview && !$file_data->url) {
+					$actions_arr[] = '
+						<a href="'.$dl_link.'?method=view" class="fancybox '.$file_classes.' fcfile_viewFile" data-fancybox-type="iframe" title="'.$viewinfo.'" style="line-height:1.3em;" >
+							'.$viewtext.'
+						</a>';
+					$fancybox_needed = 1;
 				}
 				
 				// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)
@@ -617,9 +630,17 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					// The download link, if filename/title not shown, then display a 'download' prompt text
 					$actions_arr[] =
 						($filename_shown && $link_filename ? $icon.' ' : '')
-						.'<a href="' . $dl_link . '" class="'.$file_classes.' fcfile_downloadFile" title="'. $downloadinfo .'" >'
+						.'<a href="' . $dl_link . '" class="'.$file_classes.' fcfile_downloadFile" title="'.$downloadsinfo.'" >'
 						.($filename_shown && $link_filename ? $name_str : $downloadstext)
 						.'</a>';
+				}
+				
+				if ($authorized && $allowview && !$file_data->url) {
+					$actions_arr[] = '
+						<a href="'.$dl_link.'?method=view" class="fancybox '.$file_classes.' fcfile_viewFile" data-fancybox-type="iframe" title="'.$viewinfo.'" >
+							'.$viewtext.'
+						</a>';
+					$fancybox_needed = 1;
 				}
 				
 				// ADD TO CART: the link will add file to download list (tree) (handled via a downloads manager module)
@@ -667,9 +688,16 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			// Values Prefix and Suffix Texts
 			$field->{$prop}[]	=  $pretext . $str . $posttext;
+			
+			// Some extra data for developers: (absolute) file URL and (absolute) file path
 			$field->url[]	=  $dl_link;
+			$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+			$file->abspath[] = str_replace(DS, '/', JPath::clean($basePath.DS.$file_data->filename));
+			
 			$n++;
 		}
+		
+		if (!empty($fancybox_needed)) flexicontent_html::loadFramework('fancybox');
 		
 		// Apply seperator and open/close tags
 		if(count($field->{$prop})) {
