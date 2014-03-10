@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Shared Video (youtube,vimeo,dailymotion,etc)</name>
+	<author>Lyquix, ggppdk</author>
+	<creationDate>July 2013</creationDate>
+	<copyright>Copyright (C) 2013 Lyquix</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>info@lyquix.com</authorEmail>
+	<authorUrl>http://www.lyquix.com</authorUrl>
+	<version>1.2</version>
+	<description>PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO</description>
+	<files>
+		<filename plugin="sharedvideo">sharedvideo.php</filename>
+	</files>
+	
+	
+	<params group="standard">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+	</params>
+		
+	<params group="group-sharedvideo" addpath="/administrator/components/com_flexicontent/elements">
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
+			<field name="display_title" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TITLE" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_TITLE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="headinglevel" type="list" default="3" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_TITLE_HEADING" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_TITLE_HEADING_DESC">
+				<option value="1">H1</option>
+				<option value="2">H2</option>
+				<option value="3">H3</option>
+				<option value="4">H4</option>
+				<option value="5">H5</option>
+				<option value="6">H6</option>
+			</field>
+			<field name="display_author" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_AUTHOR" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_AUTHOR_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="display_duration" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DURATION_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="display_description" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DESCRIPTION" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_DISPLAY_DESCRIPTION_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="width" type="text" default="480" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_WIDTH" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_WIDTH_DESC" />
+			<field name="height" type="text" default="270" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_HEIGHT" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_PLAYER_HEIGHT_DESC" />
+			<field name="autostart" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_AUTOSTART" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_AUTOSTART_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="embedly_key" type="text" default="" size="20" label="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EMBEDLY_KEY" description="PLG_FLEXICONTENT_FIELDS_SHAREDVIDEO_EMBEDLY_KEY_DESC" />
+			
+	</params>
+	
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_sharedvideo.ini</language>
+	</languages>
+</install>

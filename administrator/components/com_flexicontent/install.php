@@ -142,7 +142,7 @@ if (FLEXI_J16GE) {
 		    $exts =& $add->children();
 		    foreach ($exts as $ext) {
 					$extensions[] = array(
-						'name' => (FLEXI_J16GE ? $ext->asXml() : $ext->data()),
+						'name' => strip_tags(FLEXI_J16GE ? $ext->asXml() : $ext->data()),
 						'type' => (FLEXI_J16GE ? $ext->getName() : $ext->name()),
 						'folder' => $source.'/'.(FLEXI_J16GE ? $ext->attributes()->folder : $ext->attributes('folder')),
 						'ext_name' => ''.(FLEXI_J16GE ? $ext->attributes()->name : $ext->attributes('name')),  // concat to empty string to convert to string

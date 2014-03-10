@@ -214,7 +214,7 @@ class com_flexicontentInstallerScript
 		    $exts =& $add->children();
 		    foreach ($exts as $ext) {
 					$extensions[] = array(
-						'name' => strip_tags(FLEXI_J16GE ? ''.$ext->asXML() : $ext->children()->data()),
+						'name' => strip_tags(FLEXI_J16GE ? $ext->asXml() : $ext->data()),
 						'type' => (FLEXI_J16GE ? $ext->getName() : $ext->name()),
 						'folder' => $source.'/'.(FLEXI_J16GE ? $ext->attributes()->folder : $ext->attributes('folder')),
 						'ext_name' => ''.(FLEXI_J16GE ? $ext->attributes()->name : $ext->attributes('name')),  // concat to empty string to convert to string
@@ -239,13 +239,12 @@ class com_flexicontentInstallerScript
 				// Force existing plugins/modules to use name from manifest.xml file
 				if (FLEXI_J16GE || $extensions[$i]['ext_folder'] == 'flexicontent_fields') {
 					$ext_tbl   = FLEXI_J16GE ? '#__extensions' : '#__plugins';
-					echo $query = 'UPDATE '.$ext_tbl
+					$query = 'UPDATE '.$ext_tbl
 						.' SET name = '.$db->Quote($extensions[$i]['name'])
 						.' WHERE element = '.$db->Quote($extensions[$i]['ext_name'])
 						.'  AND folder = '.$db->Quote($extensions[$i]['ext_folder'])
 						.(FLEXI_J16GE ? '  AND type = '.$db->Quote($extensions[$i]['type']) : '')
 						;
-					echo "<br/>";
 					$db->setQuery($query);
 					$db->query();
 				}
