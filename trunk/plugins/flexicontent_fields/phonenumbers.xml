@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Phone Numbers</name>
+	<author>Lyquix, ggppdk</author>
+	<creationDate>July 2013</creationDate>
+	<copyright>Copyright (C) 2013 Lyquix</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>info@lyquix.com</authorEmail>
+	<authorUrl>http://www.lyquix.com</authorUrl>
+	<version>1.2</version>
+	<description>PLG_FLEXICONTENT_FIELDS_PHONENUMBERS</description>
+	<files>
+		<filename plugin="phonenumbers">phonenumbers.php</filename>
+	</files>
+	
+	
+	<params group="standard">
+			<field name="display_label" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_DISPLAY_LABEL" description="PLG_FLEXICONTENT_FIELDS_DISPLAY_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+	</params>
+		
+	<params group="group-phonenumbers" addpath="/administrator/components/com_flexicontent/elements">
+			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="plugins" type="pluginlist" label="PLG_FLEXICONTENT_FIELDS_CHOOSE_SPECIFIC_PLUGINS" description="PLG_FLEXICONTENT_FIELDS_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<field name="allow_multiple" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_ALLOW_MULTIPLE" description="PLG_FLEXICONTENT_FIELDS_ALLOW_MULTIPLE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="max_values" type="text" default="0" size="2" label="PLG_FLEXICONTENT_FIELDS_MAX_VALUES" description="PLG_FLEXICONTENT_FIELDS_MAX_VALUES_DESC" />
+			<field name="size" type="text" default="30" size="2" label="PLG_FLEXICONTENT_FIELDS_SIZE" description="PLG_FLEXICONTENT_FIELDS_SIZE_DESC" />				
+			<field name="opentag" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_OPEN_TAG" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_OPEN_TAG_DESC" />
+			<field name="closetag" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_CLOSE_TAG" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_CLOSE_TAG_DESC" />
+			<field name="display_phone_label" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_PHONE_LABEL" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_PHONE_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="label_prefix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_PREFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_PREFIX_DESC" />
+			<field name="label_suffix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_SUFFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_LABEL_SUFFIX_DESC" />
+			<field name="display_country_code" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_COUNTRY_CODE" description="">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="country_code_prefix" type="text" default="+" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE_PREFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_CODE_PREFIX_DESC" />
+			<field name="display_area_code" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_DISPLAY_AREA_CODE" description="">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="separator_cc_phone1" type="text" default=" " size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_AREA_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_COUNTRY_AREA_SEP_DESC" />
+			<field name="separator_phone1_phone2" type="text" default="-" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_AREA_SWITCH_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_AREA_SWITCH_SEP_DESC" />
+			<field name="separator_phone2_phone3" type="text" default="-" size="3" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_SWITCH_USER_SEP" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_SWITCH_USER_SEP_DESC" />
+			<field name="field_prefix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_FIELD_PREFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_FIELD_PREFIX_DESC" />
+			<field name="field_suffix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_FIELD_SUFFIX" description="PLG_FLEXICONTENT_FIELDS_PHONENUMBERS_FIELD_SUFFIX_DESC" />
+			
+	</params>
+	
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_phonenumbers.ini</language>
+	</languages>
+</install>

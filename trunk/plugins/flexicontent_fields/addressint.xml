@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - Address International / Google Maps</name>
+	<author>Lyquix, ggppdk</author>
+	<creationDate>July 2013</creationDate>
+	<copyright>Copyright (C) 2013 Lyquix</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>info@lyquix.com</authorEmail>
+	<authorUrl>http://www.lyquix.com</authorUrl>
+	<version>1.2</version>
+	<description>PLG_FLEXICONTENT_FIELDS_ADDRESSINT</description>
+	<files>
+		<filename plugin="addressint">addressint.php</filename>
+	</files>
+	
+	
+	<params group="standard">
+			<field name="display_label" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_DISPLAY_LABEL" description="PLG_FLEXICONTENT_FIELDS_DISPLAY_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+	</params>
+		
+	<params group="group-addressint" addpath="/administrator/components/com_flexicontent/elements">
+			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC"  menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="plugins" type="pluginlist" label="PLG_FLEXICONTENT_FIELDS_CHOOSE_SPECIFIC_PLUGINS" description="PLG_FLEXICONTENT_FIELDS_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			<field name="show_map" type="list" default="none" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_MAP" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SHOW_MAP_DESC">
+				<option value="none">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NEVER</option>
+				<option value="category">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_CATEGORY_VIEW</option>
+				<option value="item">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ITEM_VIEW</option>
+				<option value="both">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ALWAYS</option>
+			</field>
+			<field name="map_width" type="text" default="200" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_WIDTH" description="" />
+			<field name="map_height" type="text" default="150" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_HEIGHT" description="" />
+			<field name="map_type" type="list" default="roadmap" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_TYPE_DESC">
+				<option value="roadmap">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ROADMAP</option>
+				<option value="satellite">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SATELLITE</option>
+				<option value="hybrid">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_HYBRID</option>
+				<option value="terrain">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_TERRAIN</option>
+			</field>
+			<field name="map_zoom" type="list" default="16" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_ZOOM_DESC">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="10">10</option>
+				<option value="11">11</option>
+				<option value="12">12</option>
+				<option value="13">13</option>
+				<option value="14">14</option>
+				<option value="15">15</option>
+				<option value="16">16</option>
+				<option value="17">17</option>
+				<option value="18">18</option>
+				<option value="19">19</option>
+				<option value="20">20</option>
+			</field>
+			<field name="link_map" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_LINK" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_LINK_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="map_position" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_POSITION" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MAP_POSITION_DESC">
+				<option value="0">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BEFORE_ADDR</option>
+				<option value="1">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_AFTER_ADDR</option>
+			</field>
+			<field name="marker_color" type="list" default="red" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_COLOR" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_COLOR_DESC">
+				<option value="black">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BLACK</option>
+				<option value="brown">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BROWN</option>
+				<option value="green">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GREEN</option>
+				<option value="purple">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_PURPLE</option>
+				<option value="yellow">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_YELLOW</option>
+				<option value="blue">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_BLUE</option>
+				<option value="gray">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GRAY</option>
+				<option value="orange">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_ORANGE</option>
+				<option value="red">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_RED</option>
+				<option value="white">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_WHITE</option>
+			</field>
+			<field name="marker_size" type="list" default="mid" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_SIZE" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MARKER_SIZE_DESC">
+				<option value="tiny">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_TINY</option>
+				<option value="mid">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_MID</option>
+				<option value="small">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_SMALL</option>
+				<option value="normal">PLG_FLEXICONTENT_FIELDS_ADDRESSINT_NORMAL</option>
+			</field>
+			<field name="field_prefix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_PREFIX" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_PREFIX_DESC" />
+			<field name="field_suffix" type="text" default="" size="10" label="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_SUFFIX" description="PLG_FLEXICONTENT_FIELDS_ADDRESSINT_FIELD_SUFFIX_DESC" />
+			
+	</params>
+	
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_addressint.ini</language>
+	</languages>
+</install>
