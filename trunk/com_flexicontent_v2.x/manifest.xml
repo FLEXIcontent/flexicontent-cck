@@ -125,40 +125,44 @@
 	</administration>
 
 <additional>
-	<plugin name="checkbox"        folder="plugins/checkbox"        instfolder="flexicontent_fields">Checkbox Field</plugin>
-	<plugin name="checkboximage"   folder="plugins/checkboximage"   instfolder="flexicontent_fields">Checkbox Image Field</plugin>
-	<plugin name="core"            folder="plugins/core"            instfolder="flexicontent_fields">Core Fields</plugin>
-	<plugin name="date"            folder="plugins/date"            instfolder="flexicontent_fields">Date Field</plugin>
-	<plugin name="email"           folder="plugins/email"           instfolder="flexicontent_fields">Email Field</plugin>
-	<plugin name="extendedweblink" folder="plugins/extendedweblink" instfolder="flexicontent_fields">Extended Weblink Field</plugin>
-	<plugin name="fcloadmodule"    folder="plugins/fcloadmodule"    instfolder="flexicontent_fields">Load Module Field</plugin>
-	<plugin name="fcpagenav"       folder="plugins/fcpagenav"       instfolder="flexicontent_fields">Page Navigation Field</plugin>
-	<plugin name="file"            folder="plugins/file"            instfolder="flexicontent_fields">File Field</plugin>
-	<plugin name="groupmarker"     folder="plugins/groupmarker"     instfolder="flexicontent_fields">Group Marker field</plugin>
-	<plugin name="image"           folder="plugins/image"           instfolder="flexicontent_fields">Image Field</plugin>
-	<plugin name="linkslist"       folder="plugins/linkslist"       instfolder="flexicontent_fields">Links List Field</plugin>
-	<plugin name="minigallery"     folder="plugins/minigallery"     instfolder="flexicontent_fields">Minigallery Field</plugin>
-	<plugin name="radio"           folder="plugins/radio"           instfolder="flexicontent_fields">Radio Field</plugin>
-	<plugin name="radioimage"      folder="plugins/radioimage"      instfolder="flexicontent_fields">Radio Image Field</plugin>
-	<plugin name="relation"        folder="plugins/relation"        instfolder="flexicontent_fields">Relation Field</plugin>
-	<plugin name="relation_reverse" folder="plugins/relation_reverse" instfolder="flexicontent_fields">Relation Reverse Field</plugin>
-	<plugin name="select"          folder="plugins/select"          instfolder="flexicontent_fields">Select List Field</plugin>
-	<plugin name="selectmultiple"  folder="plugins/selectmultiple"  instfolder="flexicontent_fields">Select List Multiple Field</plugin>
-	<plugin name="text"            folder="plugins/text"            instfolder="flexicontent_fields">Text Field</plugin>
-	<plugin name="textarea"        folder="plugins/textarea"        instfolder="flexicontent_fields">Textarea Field</plugin>
-	<plugin name="textselect"      folder="plugins/textselect"      instfolder="flexicontent_fields">TextSelect Field</plugin>
-	<plugin name="toolbar"         folder="plugins/toolbar"         instfolder="flexicontent_fields">Toolbar Field</plugin>
-	<plugin name="weblink"         folder="plugins/weblink"         instfolder="flexicontent_fields">Weblink Field</plugin>
+	<plugin name="addressint"       folder="plugins/addressint"       instfolder="flexicontent_fields">FLEXIcontent - Address International / Google Maps</plugin>
+	<plugin name="checkbox"         folder="plugins/checkbox"         instfolder="flexicontent_fields">FLEXIcontent - Checkbox</plugin>
+	<plugin name="checkboximage"    folder="plugins/checkboximage"    instfolder="flexicontent_fields">FLEXIcontent - Checkbox Image</plugin>
+	<plugin name="core"             folder="plugins/core"             instfolder="flexicontent_fields">FLEXIcontent - Core Fields (Joomla article properties)</plugin>
+	<plugin name="date"             folder="plugins/date"             instfolder="flexicontent_fields">FLEXIcontent - Date / Publish Up-Down Dates</plugin>
+	<plugin name="email"            folder="plugins/email"            instfolder="flexicontent_fields">FLEXIcontent - Email</plugin>
+	<plugin name="extendedweblink"  folder="plugins/extendedweblink"  instfolder="flexicontent_fields">FLEXIcontent - Extended Weblink</plugin>
+	<plugin name="fcloadmodule"     folder="plugins/fcloadmodule"     instfolder="flexicontent_fields">FLEXIcontent - Load Module / Module position</plugin>
+	<plugin name="fcpagenav"        folder="plugins/fcpagenav"        instfolder="flexicontent_fields">FLEXIcontent - Navigation (Next/Previous Item)</plugin>
+	<plugin name="file"             folder="plugins/file"             instfolder="flexicontent_fields">FLEXIcontent - File (Download/View/Share/Download cart)</plugin>
+	<plugin name="groupmarker"      folder="plugins/groupmarker"      instfolder="flexicontent_fields">FLEXIcontent - Item Form Tab / Fieldset / Custom HTML</plugin>
+	<plugin name="image"            folder="plugins/image"            instfolder="flexicontent_fields">FLEXIcontent - Image or Gallery (image + details)</plugin>
+	<plugin name="linkslist"        folder="plugins/linkslist"        instfolder="flexicontent_fields">FLEXIcontent - HTML list of URLs/Anchors/JS links</plugin>
+	<plugin name="minigallery"      folder="plugins/minigallery"      instfolder="flexicontent_fields">FLEXIcontent - Mini-Gallery (image-only slideshow)</plugin>
+	<plugin name="phonenumbers"     folder="plugins/phonenumbers"     instfolder="flexicontent_fields">FLEXIcontent - Phone Numbers</plugin>
+	<plugin name="radio"            folder="plugins/radio"            instfolder="flexicontent_fields">FLEXIcontent - Radio</plugin>
+	<plugin name="radioimage"       folder="plugins/radioimage"       instfolder="flexicontent_fields">FLEXIcontent - Radio Image</plugin>
+	<plugin name="relation"         folder="plugins/relation"         instfolder="flexicontent_fields">FLEXIcontent - Relation (List of related items</plugin>
+	<plugin name="relation_reverse" folder="plugins/relation_reverse" instfolder="flexicontent_fields">FLEXIcontent - Relation - Reverse</plugin>
+	<plugin name="select"           folder="plugins/select"           instfolder="flexicontent_fields">FLEXIcontent - Select</plugin>
+	<plugin name="selectmultiple"   folder="plugins/selectmultiple"   instfolder="flexicontent_fields">FLEXIcontent - Select Multiple</plugin>
+	<plugin name="sharedaudio"      folder="plugins/sharedaudio"      instfolder="flexicontent_fields">FLEXIcontent - Shared Audio (youtube,vimeo,dailymotion,etc)</plugin>
+	<plugin name="sharedvideo"      folder="plugins/sharedvideo"      instfolder="flexicontent_fields">FLEXIcontent - Shared Video (youtube,vimeo,dailymotion,etc)</plugin>
+	<plugin name="text"             folder="plugins/text"             instfolder="flexicontent_fields">FLEXIcontent - Text (number/time/etc/custom validation)</plugin>
+	<plugin name="textarea"         folder="plugins/textarea"         instfolder="flexicontent_fields">FLEXIcontent - Textarea</plugin>
+	<plugin name="textselect"       folder="plugins/textselect"       instfolder="flexicontent_fields">FLEXIcontent - TextSelect (Text with existing value selection)</plugin>
+	<plugin name="toolbar"          folder="plugins/toolbar"          instfolder="flexicontent_fields">FLEXIcontent - Toolbar (social share/other tools)</plugin>
+	<plugin name="weblink"          folder="plugins/weblink"          instfolder="flexicontent_fields">FLEXIcontent - Weblink</plugin>
 	
-	<plugin name="flexinotify"     folder="plugins/flexicontent"    instfolder="flexicontent">Flexicontent - Notifications for favoured content</plugin>
+	<plugin name="flexinotify"      folder="plugins/flexicontent"     instfolder="flexicontent">Flexicontent - Notifications for favoured content</plugin>
 	
-	<plugin name="flexicontent"    folder="plugins/finder"          instfolder="finder">Finder - Flexicontent, indexer for Smart Search view</plugin>
-	<plugin name="flexisearch"     folder="plugins/flexisearch"     instfolder="search">Search - Flexisearch, for Joomla standard search view</plugin>
-	<plugin name="flexiadvsearch"  folder="plugins/flexiadvsearch"  instfolder="search">Search - Flexiadvsearch, for FLEXIcontent search view</plugin>
-	<plugin name="flexisystem"     folder="plugins/flexisystem"     instfolder="system">System - Flexisystem, core functions</plugin>
-	<plugin name="flexiadvroute"   folder="plugins/flexiadvroute"   instfolder="system">System - Flexiadvroute, advanced routing functions</plugin>
+	<plugin name="flexicontent"     folder="plugins/finder"           instfolder="finder">Finder - Flexicontent, indexer for Smart Search view</plugin>
+	<plugin name="flexisearch"      folder="plugins/flexisearch"      instfolder="search">Search - Flexisearch, for Joomla standard search view</plugin>
+	<plugin name="flexiadvsearch"   folder="plugins/flexiadvsearch"   instfolder="search">Search - Flexiadvsearch, for FLEXIcontent search view</plugin>
+	<plugin name="flexisystem"      folder="plugins/flexisystem"      instfolder="system">System - Flexisystem, core functions</plugin>
+	<plugin name="flexiadvroute"    folder="plugins/flexiadvroute"    instfolder="system">System - Flexiadvroute, advanced routing functions</plugin>
 	
-	<plugin name="flexibreak"      folder="plugins/flexibreak"      instfolder="content">Content - Flexibreak, pagination for multi-paged articles</plugin>
+	<plugin name="flexibreak"       folder="plugins/flexibreak"       instfolder="content">Content - Flexibreak, pagination for multi-paged articles</plugin>
 	
 	<module name="mod_flexicontent"   folder="modules/mod_flexicontent">Universal Content for FLEXIcontent</module>
 	<module name="mod_flexifilter"    folder="modules/mod_flexifilter">Content Lists Filter for FLEXIcontent</module>

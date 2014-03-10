@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Relation</name>
+	<name>FLEXIcontent - Relation (List of related items)</name>
 	<author>ggppdk</author>
 	<creationDate>Aug 2011</creationDate>
 	<copyright>Copyright (C) 2011 ggppdk</copyright>

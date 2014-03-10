@@ -675,20 +675,39 @@ class FlexicontentModelFields extends JModelLegacy
 	 * @return array
 	 * @since 1.5
 	 */
-	function getFieldTypes ()
+	function getFieldTypes ($group=false)
 	{
-		$query = 'SELECT f.field_type, count(f.id) as assigned, plg.name as field_friendlyname'
-				. ' FROM #__flexicontent_fields AS f'
-				. (FLEXI_J16GE ?
-					' LEFT JOIN #__extensions AS plg ON (plg.element = f.field_type AND plg.type="plugin" AND plg.folder="flexicontent_fields")' :
-					' LEFT JOIN #__plugins AS plg ON (plg.element = f.field_type AND plg.folder="flexicontent_fields")'
-				  )
-				. ' WHERE iscore=0 '
-				. ' GROUP BY field_type'
+		$query = 'SELECT plg.element AS field_type, count(f.id) as assigned, plg.name as field_friendlyname'
+				. ' FROM ' . (FLEXI_J16GE ? '#__extensions': '#__plugins') .' AS plg'
+				. ' LEFT JOIN #__flexicontent_fields AS f ON (plg.element = f.field_type AND f.iscore=0)'
+				. ' WHERE plg.folder="flexicontent_fields" AND plg.element<>"core"'. (FLEXI_J16GE ? ' AND plg.type="plugin" ' : '')
+				. ' GROUP BY plg.element'
 				;
 		$this->_db->setQuery($query);
-		$fieldtypes = $this->_db->loadObjectList('field_type');
-		return $fieldtypes;
+		$ft_types = $this->_db->loadObjectList('field_type');
+		if (!$group) return $ft_types;
+		
+		$ft_grps = array(
+			'Selection fields'         => array('radio', 'radioimage', 'checkbox', 'checkboximage', 'select', 'selectmultiple'),
+			'Media fields / Mini apps' => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
+			'Single property fields'   => array('date', 'text', 'textarea', 'textselect'),
+			'Muti property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers'),
+			'Item form'                => array('groupmarker'),
+			'Item relations fields'    => array('relation', 'relation_reverse'),
+			'Special action fields'    => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist')
+		);
+		foreach($ft_grps as $ft_grpname => $ft_arr) {
+			//$ft_types_grp[$ft_grpname] = array();
+			foreach($ft_arr as $ft) {
+				if ( !empty($ft_types[$ft]) )
+				$ft_types_grp[$ft_grpname][$ft] = $ft_types[$ft];
+				unset($ft_types[$ft]);
+			}
+		}
+		// Remaining fields
+		$ft_types_grp['3rd-Party / Other Fields'] = $ft_types;
+		
+		return $ft_types_grp;
 	}
 	
 	

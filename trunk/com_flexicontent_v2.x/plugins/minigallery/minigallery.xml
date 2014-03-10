@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Minigallery</name>
+	<name>FLEXIcontent - Mini-Gallery (image-only slideshow)</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>June 2009</creationDate>
 	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>

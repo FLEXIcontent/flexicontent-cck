@@ -410,9 +410,9 @@
 			</field>
 			<field name="static_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_STATIC_FILTERS" description="FLEXI_STATIC_FILTERS_DESC" />
 			<field name="dynamic_filters" default="" type="textarea" rows="5" cols="32" label="FLEXI_DYNAMIC_FILTERS" description="FLEXI_DYNAMIC_FILTERS_DESC" />
-		</fieldset>
 		
-		<fieldset name="FLEXI_ITEM_LIST_FIELD_SELECTION" label="FLEXI_ITEM_LIST_FIELD_SELECTION" description="FLEXI_ITEM_LIST_FIELD_SELECTION_DESC">
+		<field name="" type="jparamstab" title="FLEXI_ITEM_LIST_FIELD_SELECTION" description="FLEXI_ITEM_LIST_FIELD_SELECTION_DESC" />
+			
 			<field name="" type="separator" default="FLEXI_TITLE" level="level1" menu="hide" />
 			<field name="" type="separator" default="FLEXI_STD" level="level3" menu="hide" />
 			<field name="display_title" type="radio" default="1" label="FLEXI_DISPLAY_TITLE" description="FLEXI_DISPLAY_TITLE_DESC">

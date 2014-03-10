@@ -1030,21 +1030,88 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function formatFlexiPlugins()
 	{
 		$db = $this->_db;
-		$query	= 'SELECT extension_id, name FROM #__extensions'
-				. ' WHERE folder = ' . $db->Quote('flexicontent_fields')
-				. ' AND `type`=' . $db->Quote('plugin')
+		$tbl   = FLEXI_J16GE ? '#__extensions' : '#__plugins';
+		$idcol = FLEXI_J16GE ? 'extension_id' : 'id';
+		
+		$query	= 'SELECT '.$idcol.' AS id, name, element FROM '.$tbl
+				. ' WHERE folder =' . $db->Quote('flexicontent_fields')
+				. (FLEXI_J16GE ? ' AND `type`=' . $db->Quote('plugin') : '')
 				;
 		$db->setQuery($query);
 		$flexiplugins = $db->loadObjectList();
 		
+		$query = 'UPDATE '.$tbl.' SET name = CASE '.$idcol;
+		$cases   = array();
+		$ext_ids = array();
 		foreach ($flexiplugins as $fp) {
-			if (substr($fp->name, 0, 15) != 'FLEXIcontent - ') {
-				$query = 'UPDATE #__extensions SET name = ' . $db->Quote('FLEXIcontent - '.$fp->name) . ' WHERE `type`='.$db->Quote('plugin').' AND extension_id = ' . (int)$fp->extension_id;
-				$db->setQuery($query);
-				$db->query();
-				if ($db->getErrorNum()) echo $db->getErrorMsg();
-			}
+			if ( substr($fp->name, 0, 15) == 'FLEXIcontent - ' ) continue;
+			$cases[] = '	WHEN '.(int)$fp->id.' THEN '.$db->Quote('FLEXIcontent - '.$fp->name);
+			$ext_ids[] = $fp->id;
 		}
+		$ext_ids_list = implode(', ', $ext_ids);
+		$query .= implode(' ',$cases)
+			. ' END'
+			. ' WHERE '.$idcol.' IN ('.$ext_ids_list.')'
+			. ' AND folder =' . $db->Quote('flexicontent_fields')
+			. (FLEXI_J16GE ? ' AND `type`=' . $db->Quote('plugin') : '')
+			;
+		if ( count($cases) ) {
+			$db->setQuery($query);
+			$db->query();
+			if ($db->getErrorNum()) echo $db->getErrorMsg();
+		}
+		
+		/*$map = array(
+			'addressint'=>'FLEXIcontent - Address International / Google Maps',
+			'checkbox'=>'FLEXIcontent - Checkbox',
+			'checkboximage'=>'FLEXIcontent - Checkbox Image',
+			'core'=>'FLEXIcontent - Core Fields (Joomla article properties)',
+			'date'=>'FLEXIcontent - Date / Publish Up-Down Dates',
+			'email'=>'FLEXIcontent - Email',
+			'extendedweblink'=>'FLEXIcontent - Extended Weblink',
+			'fcloadmodule'=>'FLEXIcontent - Load Module / Module position',
+			'fcpagenav'=>'FLEXIcontent - Navigation (Next/Previous Item)',
+			'file'=>'FLEXIcontent - File (Download/View/Share/Download cart)',
+			'groupmarker'=>'FLEXIcontent - Item Form Tab / Fieldset / Custom HTML',
+			'image'=>'FLEXIcontent - Image or Gallery (image + details)',
+			'linkslist'=>'FLEXIcontent - HTML list of URLs/Anchors/JS links',
+			'minigallery'=>'FLEXIcontent - Mini-Gallery (image-only slideshow)',
+			'phonenumbers'=>'FLEXIcontent - Phone Numbers',
+			'radio'=>'FLEXIcontent - Radio',
+			'radioimage'=>'FLEXIcontent - Radio Image',
+			'relation'=>'FLEXIcontent - Relation (List of related items)',
+			'relation_reverse'=>'FLEXIcontent - Relation - Reverse',
+			'select'=>'FLEXIcontent - Select',
+			'selectmultiple'=>'FLEXIcontent - Select Multiple',
+			'sharedaudio'=>'FLEXIcontent - Shared Audio (youtube,vimeo,dailymotion,etc)',
+			'sharedvideo'=>'FLEXIcontent - Shared Video (youtube,vimeo,dailymotion,etc)',
+			'text'=>'FLEXIcontent - Text (number/time/etc/custom validation)',
+			'textarea'=>'FLEXIcontent - Textarea',
+			'textselect'=>'FLEXIcontent - TextSelect (Text with existing value selection)',
+			'toolbar'=>'FLEXIcontent - Toolbar (social share/other tools)',
+			'weblink'=>'FLEXIcontent - Weblink'
+		);
+		
+		$query = 'UPDATE '.$tbl.' SET name = CASE element';
+		$cases    = array();
+		$elements = array();
+		foreach ($flexiplugins as $fp) {
+			if ( empty($map[$fp->element]) ) continue;
+			$cases[] = '	WHEN '.$db->Quote($fp->element).' THEN '.$db->Quote($map[$fp->element]);
+			$elements[] = $db->Quote($fp->element);
+		}
+		$elements_list = implode(', ', $elements);
+		$query .= implode(' ',$cases)
+			. ' END'
+			. ' WHERE folder =' . $db->Quote('flexicontent_fields')
+			. (FLEXI_J16GE ? ' AND `type`='. $db->Quote('plugin') : '')
+			. ' AND element IN ('.$elements_list.')'
+			;
+		if ( count($cases) ) {
+			$db->setQuery($query);
+			$db->query();
+			if ($db->getErrorNum()) echo $db->getErrorMsg();
+		}*/
 	}
 
 	function processLanguageFiles($code = 'en-GB', $method = '', $params = array())

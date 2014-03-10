@@ -43,6 +43,10 @@ class com_flexicontentInstallerScript
 	*/
 	function preflight( $type, $parent ) {
 		
+		// Make sure that fatal errors are printed
+		error_reporting(E_ERROR);
+		ini_set('display_errors',1);
+		
 		// Try to increment some limits
 		
 		@set_time_limit( 240 );    // execution time 5 minutes
@@ -163,6 +167,7 @@ class com_flexicontentInstallerScript
 	
 	
 	function do_extra( $parent ) {
+		
 		// init vars
 		$error = false;
 		$extensions = array();
@@ -185,6 +190,7 @@ class com_flexicontentInstallerScript
 		if ( !FLEXI_J16GE ) {
 			$this->parent->getDBO = $this->parent->getDBO();
 		}
+		$db = JFactory::getDBO();
 		
 		// Parse XML file to identify additional extensions,
 		// This code part (for installing additional extensions) originates from Zoo Component:
@@ -208,9 +214,11 @@ class com_flexicontentInstallerScript
 		    $exts =& $add->children();
 		    foreach ($exts as $ext) {
 					$extensions[] = array(
-						'name' => (FLEXI_J16GE ? $ext->asXml() : $ext->data()),
+						'name' => strip_tags(FLEXI_J16GE ? ''.$ext->asXML() : $ext->children()->data()),
 						'type' => (FLEXI_J16GE ? $ext->getName() : $ext->name()),
 						'folder' => $source.'/'.(FLEXI_J16GE ? $ext->attributes()->folder : $ext->attributes('folder')),
+						'ext_name' => ''.(FLEXI_J16GE ? $ext->attributes()->name : $ext->attributes('name')),  // concat to empty string to convert to string
+						'ext_folder' => ''.(FLEXI_J16GE ? $ext->attributes()->instfolder : $ext->attributes('instfolder')),  // concat to empty string to convert to string
 						'installer' => new JInstaller(),
 						'status' => null);
 		    }
@@ -227,6 +235,20 @@ class com_flexicontentInstallerScript
 			}
 			if ($jinstaller->install($extensions[$i]['folder'])) {
 				$extensions[$i]['status'] = true;
+				
+				// Force existing plugins/modules to use name from manifest.xml file
+				if (FLEXI_J16GE || $extensions[$i]['ext_folder'] == 'flexicontent_fields') {
+					$ext_tbl   = FLEXI_J16GE ? '#__extensions' : '#__plugins';
+					echo $query = 'UPDATE '.$ext_tbl
+						.' SET name = '.$db->Quote($extensions[$i]['name'])
+						.' WHERE element = '.$db->Quote($extensions[$i]['ext_name'])
+						.'  AND folder = '.$db->Quote($extensions[$i]['ext_folder'])
+						.(FLEXI_J16GE ? '  AND type = '.$db->Quote($extensions[$i]['type']) : '')
+						;
+					echo "<br/>";
+					$db->setQuery($query);
+					$db->query();
+				}
 			} else {
 				$extensions[$i]['status'] = false;
 				if ( !FLEXI_INSTALLED ) {

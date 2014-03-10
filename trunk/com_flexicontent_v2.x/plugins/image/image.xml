@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Image / Image Gallery</name>
+	<name>FLEXIcontent - Image or Gallery (image + details)</name>
 	<author>Emmanuel Danan, Georgios Papadakis</author>
 	<creationDate>March 2009</creationDate>
 	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>

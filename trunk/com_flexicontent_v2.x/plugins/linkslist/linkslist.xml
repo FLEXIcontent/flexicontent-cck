@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Linked List</name>
+	<name>FLEXIcontent - HTML list of URLs/Anchors/JS links</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>March 2009</creationDate>
 	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
@@ -57,6 +57,11 @@
 			</field>
 			<field name="list_class" type="text" default="" label="FLEXI_FIELD_LIST_CLASS" description="FLEXI_FIELD_LIST_CLASS_DESC" />
 			<field name="list_id" type="text" default="" label="FLEXI_FIELD_LIST_ID" description="FLEXI_FIELD_LIST_ID_DESC" />
+			
+			<field name="add_non_selected" type="list" default="0" label="FLEXI_FIELD_LIST_ADD_NON_SELECTED" description="FLEXI_FIELD_LIST_ADD_NON_SELECTED_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LINKSLIST_CUSTOM_CSS_JS" level="level3" />
 			<field name="js_code" type="textarea" default="" class="" rows="6" cols="21" label="FLEXI_FIELD_LINKSLIST_JS_CODE" description="FLEXI_FIELD_LINKSLIST_JS_CODE_DESC" />			
