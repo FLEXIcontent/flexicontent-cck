@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Form Field Group Marker</name>
+	<name>FLEXIcontent - Item Form Tab / Fieldset / Custom HTML</name>
 	<author>ggppdk</author>
 	<creationDate>July 2012</creationDate>
 	<copyright>Copyright (C) 2012 ggppdk</copyright>
@@ -23,22 +23,28 @@
 	
 		<params group="group-groupmarker" addpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="marker_type" type="list" default="fieldset_open" label="Marker type" description="BE CAREFULL to match-close all open type of markers with an appropriate closing type. BE CAREFULL to which content types you assign the field to.">
-				<option value="tabset_start"   >Tab-set: START</option>
-				<option value="tab_open"       >Tab: open</option>
-				<option value="tab_close"      >Tab: close</option>
-				<option value="tabset_end"     >Tab-set: END</option>
-				<option value="fieldset_open"  >Field-set: open</option>
-				<option value="fieldset_close" >Field-set: close</option>
-				<option value="html_separator" >Custom HTML Separator</option>
+			<field name="marker_type" type="groupedlist" default="fieldset_open" label="Marker type" description="BE CAREFULL to match-close all open type of markers with an appropriate closing type. BE CAREFULL to which content types you assign the field to.">
+				<group label="Tabs">
+					<option value="tabset_start"   >Tab-set: START</option>
+					<option value="tab_open"       >Tab: open</option>
+					<option value="tab_close"      >Tab: close</option>
+					<option value="tabset_end"     >Tab-set: END</option>
+				</group>
+				<group label="Fieldsets">
+					<option value="fieldset_open"  >Field-set: open</option>
+					<option value="fieldset_close" >Field-set: close</option>
+				</group>
+				<group label="Other">
+					<option value="html_separator" >Custom HTML Separator</option>
+				</group>
 			</field>
 			
 			<field name="" type="separator" default="Tab/Fieldset" level="level3" menu="hide" />
-			<field name="cont_label"    type="text" default="" label="Tab/Fieldset Label"     description="Label of tab / fieldset / etc, only appropriate 'opening' markers" />
-			<field name="cont_cssclass" type="text" default="" label="Container CSS class" description="CSS class of tab / fieldset / etc inner container, only appropriate 'opening' markers" />
+			<field name="cont_label"    type="text" size="24" default="" label="Tab/Fieldset Label"     description="Label of tab / fieldset / etc, only appropriate 'opening' markers" />
+			<field name="cont_cssclass" type="text" size="24" default="" label="Container CSS class" description="CSS class of tab / fieldset / etc inner container, only appropriate 'opening' markers" />
 			
 			<field name="" type="separator" default="Custom HTML Separator" level="level3" menu="hide" />
-			<field name="custom_html_sep" type="text" default="&lt;hr style='clear:both;' /&gt;" label="Custom HTML" description="Enter the custom HTML code that will be placed between the fields" />
+			<field name="custom_html_sep" type="textarea" cols="21" rows="5" default="&lt;hr style='clear:both;' /&gt;" label="Custom HTML" description="Enter the custom HTML code that will be placed between the fields" />
 			
 		</params>
 	

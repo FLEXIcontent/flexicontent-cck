@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Toolbar</name>
+	<name>FLEXIcontent - Toolbar (social share/other tools)</name>
 	<author>Emmanuel Danan, George Papadakis</author>
 	<creationDate>March 2011</creationDate>
 	<copyright>Copyright (C) 2009-2012 Emmanuel Danan</copyright>

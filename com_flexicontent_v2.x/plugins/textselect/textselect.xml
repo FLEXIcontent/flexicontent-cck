@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - TextSelect</name>
-	<author>Suriya Kaewmungmuang(enjoyman), ggppdk</author>
+	<name>FLEXIcontent - TextSelect (Text with existing value selection)</name>
+	<author>Suriya Kaewmungmuang, ggppdk</author>
 	<creationDate>25 July 2011</creationDate>
 	<copyright>Copyright (C) 2011 flexicontent.org</copyright>
 	<license>GNU/GPL v3</license>

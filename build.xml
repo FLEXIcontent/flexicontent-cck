@@ -108,6 +108,10 @@
 		</copy>
 
 		<!-- plugins -->
+		<copy file="plugins/flexicontent_fields/addressint.php" tofile="flexipack/plugins/addressint/addressint.php" />
+		<copy file="plugins/flexicontent_fields/addressint.xml" tofile="flexipack/plugins/addressint/addressint.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_addressint.ini" tofile="flexipack/plugins/addressint/en-GB.plg_flexicontent_fields_addressint.ini" />
+		
 		<copy file="plugins/flexicontent_fields/checkbox.php" tofile="flexipack/plugins/checkbox/checkbox.php" />
 		<copy file="plugins/flexicontent_fields/checkbox.xml" tofile="flexipack/plugins/checkbox/checkbox.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_checkbox.ini" tofile="flexipack/plugins/checkbox/en-GB.plg_flexicontent_fields_checkbox.ini" />
@@ -150,6 +154,10 @@
 			</fileset>
 		</copy>
 		
+		<copy file="plugins/flexicontent_fields/phonenumbers.php" tofile="flexipack/plugins/phonenumbers/phonenumbers.php" />
+		<copy file="plugins/flexicontent_fields/phonenumbers.xml" tofile="flexipack/plugins/phonenumbers/phonenumbers.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_phonenumbers.ini" tofile="flexipack/plugins/phonenumbers/en-GB.plg_flexicontent_fields_phonenumbers.ini" />
+		
 		<copy file="plugins/flexicontent_fields/radio.php" tofile="flexipack/plugins/radio/radio.php" />
 		<copy file="plugins/flexicontent_fields/radio.xml" tofile="flexipack/plugins/radio/radio.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_radio.ini" tofile="flexipack/plugins/radio/en-GB.plg_flexicontent_fields_radio.ini" />
@@ -165,6 +173,14 @@
 		<copy file="plugins/flexicontent_fields/selectmultiple.php" tofile="flexipack/plugins/selectmultiple/selectmultiple.php" />
 		<copy file="plugins/flexicontent_fields/selectmultiple.xml" tofile="flexipack/plugins/selectmultiple/selectmultiple.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_selectmultiple.ini" tofile="flexipack/plugins/selectmultiple/en-GB.plg_flexicontent_fields_selectmultiple.ini" />
+		
+		<copy file="plugins/flexicontent_fields/sharedvideo.php" tofile="flexipack/plugins/sharedvideo/sharedvideo.php" />
+		<copy file="plugins/flexicontent_fields/sharedvideo.xml" tofile="flexipack/plugins/sharedvideo/sharedvideo.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_sharedvideo.ini" tofile="flexipack/plugins/sharedvideo/en-GB.plg_flexicontent_fields_sharedvideo.ini" />
+		
+		<copy file="plugins/flexicontent_fields/sharedaudio.php" tofile="flexipack/plugins/sharedaudio/sharedaudio.php" />
+		<copy file="plugins/flexicontent_fields/sharedaudio.xml" tofile="flexipack/plugins/sharedaudio/sharedaudio.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_sharedaudio.ini" tofile="flexipack/plugins/sharedaudio/en-GB.plg_flexicontent_fields_sharedaudio.ini" />
 		
 		<copy file="plugins/flexicontent_fields/text.php" tofile="flexipack/plugins/text/text.php" />
 		<copy file="plugins/flexicontent_fields/text.xml" tofile="flexipack/plugins/text/text.xml" />

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Core Fields</name>
+	<name>FLEXIcontent - Core Fields (Joomla article properties)</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>March 2009</creationDate>
 	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>

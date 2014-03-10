@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Image / Image Gallery</name>
+	<name>FLEXIcontent - Image or Gallery (image + details)</name>
 	<author>Emmanuel Danan, Georgios Papadakis</author>
 	<creationDate>March 2009</creationDate>
 	<copyright>Copyright (C) 2009 Emmanuel Danan</copyright>
@@ -19,6 +19,7 @@
 	</files>
 	
 		<params group="standard">
+		
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

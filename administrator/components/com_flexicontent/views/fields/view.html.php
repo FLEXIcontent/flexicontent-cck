@@ -140,24 +140,31 @@ class FlexicontentViewFields extends JViewLegacy
 		}
 		
 		//Get data from the model
+		$model = $this->getModel();
 		$rows       = $this->get( FLEXI_J16GE ? 'Items' : 'Data' );
 		$pagination = $this->get( 'Pagination' );
 		$types      = $this->get( 'Typeslist' );
-		$fieldtypes = $this->get( 'Fieldtypes' );
+		$fieldtypes = $model->getFieldtypes($fields_in_groups = true);
 
 		$lists = array();
 		
 		//build backend visible filter
+		$ALL = mb_strtoupper(JText::_( 'FLEXI_ALL' ), 'UTF-8') . ' : ';
 		$fftype 	= array();
 		$fftype[] = JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_FIELDS_TYPE' ) .' -' );
-		$fftype[] = JHTML::_('select.option',  'BV', JText::_( 'FLEXI_BACKEND_FIELDS' ) );
-		$fftype[] = JHTML::_('select.option',  'C', JText::_( 'FLEXI_CORE_FIELDS' ) );
-		$fftype[] = JHTML::_('select.option',  'NC', JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
-		foreach ($fieldtypes as $field_type => $ftdata) {
-			$field_friendlyname = str_ireplace("FLEXIcontent - ","",$ftdata->field_friendlyname);
-			$fftype[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_friendlyname);
+		$fftype[] = JHTML::_('select.option',  'BV', $ALL . JText::_( 'FLEXI_BACKEND_FIELDS' ) );
+		$fftype[] = JHTML::_('select.option',  'C', $ALL . JText::_( 'FLEXI_CORE_FIELDS' ) );
+		$fftype[] = JHTML::_('select.option',  'NC', $ALL . JText::_( 'FLEXI_NON_CORE_FIELDS' ) );
+		
+		foreach ($fieldtypes as $field_group => $ft_types) {
+			$fftype[] = JHTML::_('select.optgroup', $field_group );
+			foreach ($ft_types as $field_type => $ftdata) {
+				$field_friendlyname = str_ireplace("FLEXIcontent - ","",$ftdata->field_friendlyname);
+				$fftype[] = JHTML::_('select.option', $field_type, '-'.$ftdata->assigned.'- '. $field_friendlyname);
+			}
+			$fftype[] = JHTML::_('select.optgroup', '' );
 		}
-
+		
 		$lists['fftype'] = JHTML::_('select.genericlist', $fftype, 'filter_fieldtype', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
 
 		//build arphaned/assigned filter

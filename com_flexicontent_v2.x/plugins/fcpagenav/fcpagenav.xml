@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Page Navigation</name>
+	<name>FLEXIcontent - Navigation (Next/Previous Item)</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>January 2011</creationDate>
 	<copyright>Copyright (C) 2011 Emmanuel Danan</copyright>

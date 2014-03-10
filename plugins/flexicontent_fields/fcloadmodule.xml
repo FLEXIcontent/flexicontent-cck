@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="plugin" version="1.5" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Load Module</name>
+	<name>FLEXIcontent - Load Module / Module position</name>
 	<author>Emmanuel Danan</author>
 	<creationDate>January 2011</creationDate>
 	<copyright>Copyright (C) 2011 Emmanuel Danan</copyright>
@@ -8,11 +8,12 @@
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>www.vistamedia.fr</authorUrl>
 	<version>1.1</version>
-	<description>Load a module in a content item</description>
+	<description>Load a module or module position inside a content item</description>
 	<files>
 		<filename plugin="fcloadmodule">fcloadmodule.php</filename>
 		<folder plugin="fcloadmodule">fcloadmodule</folder>
 	</files>
+	
 		
 		<params group="standard" addpath="/plugins/flexicontent_fields/fcloadmodule">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
@@ -34,6 +35,7 @@
 			<field name="mod_params" type="textarea" rows="8" cols="50" default="" label="Customize module parameters per item (not for position mode)" description="You can - try - to customize some module parameters by allowing user to enter values for them in item form. &lt;br/&gt;&lt;br/&gt; &lt;b&gt;NOTE:&lt;/b&gt; You need to examine XML file of target module to find parameter names  &lt;br/&gt;&lt;br/&gt; &lt;b&gt;Example:&lt;/b&gt;  &lt;br/&gt; param_label1!!param_name1 %% param_label2!!param_name2 %% param_label3!!param_name3 " />
 		</params>
 		
+	
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_fcloadmodule.ini</language>
 	</languages>
