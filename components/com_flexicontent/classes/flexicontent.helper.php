@@ -29,7 +29,7 @@ class flexicontent_html
 {
 
 	// *** Output the javascript to dynamically hide/show columns of a table
-	static function jscode_to_showhide_table($container_div_id,$data_tbl_id) {
+	static function jscode_to_showhide_table($container_div_id,$data_tbl_id, $lbltext) {
 		$document = JFactory::getDocument();
 		$js = "
 		var show_col_${data_tbl_id} = Array();
@@ -50,7 +50,7 @@ class flexicontent_html
 		}
 	  
 	  $firstload = isset($_POST["columnchoose_${data_tbl_id}"]) || isset($_COOKIE["columnchoose_${data_tbl_id}"]) ? "false" : "true";
-	  $js .= "create_column_choosers('$container_div_id', '$data_tbl_id', $firstload); \n";
+	  $js .= "create_column_choosers('$container_div_id', '$data_tbl_id', $firstload,'".$lbltext."'); \n";
 	  
 		$js .= "
 		});

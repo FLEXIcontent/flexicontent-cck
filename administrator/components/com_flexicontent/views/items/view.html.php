@@ -324,7 +324,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		// Add usability notices if these are enabled
 		// ******************************************
 		
-		if ( $cparams->get('show_usability_messages', 1) )     // Important usability messages
+		if ( $cparams->get('show_usability_messages', 1)  && !$unassociated )     // Important usability messages
 		{
 			$notice_iss_disabled = $app->getUserStateFromRequest( $option.'.items.notice_iss_disabled',	'notice_iss_disabled',	0, 'int' );
 			if (!$notice_iss_disabled && $limit > $inline_ss_max) {
@@ -339,6 +339,14 @@ class FlexicontentViewItems extends JViewLegacy {
 				$app->enqueueMessage(JText::sprintf('FLEXI_DRAG_REORDER_DISABLED', $drag_reorder_max), 'notice');
 				$show_turn_off_notice = 1;
 			}
+			
+			$notice_add_custom_columns = $app->getUserStateFromRequest( $option.'.items.notice_add_custom_columns',	'notice_add_custom_columns',	0, 'int' );
+			if (!$notice_add_custom_columns) {
+				$app->setUserState( $option.'.items.notice_add_custom_columns', 1 );
+				$app->enqueueMessage(JText::_('FLEXI_YOU_MAY_CONFIGURE_CUSTOM_COLUMNS_GLOBAL_AND_PER_TYPE'), 'message');
+				$show_turn_off_notice = 1;
+			}
+			
 			if (!empty($show_turn_off_notice))
 				$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
 		}
@@ -386,8 +394,14 @@ class FlexicontentViewItems extends JViewLegacy {
 		}
 		
 		// build the include subcats boolean list
-		$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox" onchange="submitform();"', $filter_subcats );
 		
+		// build the include non-published cats boolean list
+		if ( ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering')) ) {
+			$lists['filter_subcats'] = '<span class="fc-mssg-inline fc-note">'.JText::_( 'Sub category items not show during category ordering' ).'</span>';
+		} else {
+			$lists['filter_subcats'] = JHTML::_('select.booleanlist',  'filter_subcats', 'class="inputbox" onchange="submitform();"', $filter_subcats );
+		}
+
 		// build the include non-published cats boolean list
 		$catsinstate[2] = JText::_( 'FLEXI_ANY' );
 		$catsinstate[1] = JText::_( 'FLEXI_PUBLISHED' );
@@ -526,6 +540,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$this->assignRef('filter_subcats'	, $filter_subcats);
 		$this->assignRef('filter_catsinstate'	, $filter_catsinstate);
 		$this->assignRef('filter_order_type', $filter_order_type);
+		$this->assignRef('filter_order', $filter_order);
 		$this->assignRef('filter_lang'		, $filter_lang);
 		$this->assignRef('filter_fileid'	, $filter_fileid);
 		

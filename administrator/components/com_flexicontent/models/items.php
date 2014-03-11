@@ -105,6 +105,12 @@ class FlexicontentModelItems extends JModelLegacy
 		JRequest::setVar( 'filter_order', $filter_order );
 		JRequest::setVar( 'filter_order_Dir', $filter_order_Dir );
 		
+		$filter_cats      = $app->getUserStateFromRequest( $option.'.items.filter_cats',	'filter_cats', '', 'int' );
+		$filter_subcats   = $app->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
+		if ($filter_order_type && $filter_cats && ($filter_order=='i.ordering' || $filter_order=='catsordering')) {
+			JRequest::setVar( 'filter_subcats',	0 );
+		}
+		
 		$limit      = $app->getUserStateFromRequest( $option.'.items.limit', 'limit', $app->getCfg('list_limit'), 'int');
 		$limitstart = $app->getUserStateFromRequest( $option.'.items.limitstart', 'limitstart', 0, 'int' );
 

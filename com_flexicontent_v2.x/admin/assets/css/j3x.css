@@ -113,6 +113,11 @@ input, select {
 	margin: 0px;
 }
 
+.chzn-container,
+.form-horizontal .chzn-container {
+	width:auto !important;
+	max-width: 500px !important;
+}
 
 
 /********************

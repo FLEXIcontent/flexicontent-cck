@@ -152,7 +152,9 @@ if ( $show_mod )
 	//$_params = $catmodel->getParams();
 	// ALL filters
 	if ($display_filter_list==0) {
-		$filters = $catmodel->getFilters('filters', '__ALL_FILTERS__');
+		// WARNING: this CASE is supposed to get ALL filters regardless category,
+		// but __ALL_FILTERS__ ignores the 'use_filters' parameter, so we must check it separetely
+		$filters = ! $params->get('use_filters', 0) ? array() : $catmodel->getFilters('filters', '__ALL_FILTERS__');
 	}
 	// Filter selected in category configuration
 	else if ($display_filter_list==1) {
@@ -194,7 +196,7 @@ if ( $show_mod )
 	FlexicontentFields::setFilterValues( $params, 'initial_filters'   , $is_persistent=0);
 	
 	// 4. Add html to filter objects
-	if ($filters) {
+	if ( !empty($filters) ) {
 		FlexicontentFields::renderFilters( $params, $filters, $form_name );
 	}
 	
