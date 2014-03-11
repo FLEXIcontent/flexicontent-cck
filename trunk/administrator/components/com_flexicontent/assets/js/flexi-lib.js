@@ -40,6 +40,8 @@ window.addEvent('domready', function(){
 	
 	jQuery("#sortable_fcitems").sortable({
 		handle: 'div.fc_drag_handle',
+		containment: 'parent',
+		tolerance: 'pointer',
 		helper: function(e, tr) {
 			var $originals = tr.children();
 			var $helper = tr.clone();
@@ -51,6 +53,8 @@ window.addEvent('domready', function(){
 		},
 		revert: 100,
 		start: function(event, ui) {
+			jQuery("#fcorder_save_warn_box").show('slide');
+			jQuery("#fcorder_notes_box").hide('slide');
 			moved_row_order = ui.item.find("td input[name=order\\[\\]]").val();
 			row_old_index  = ui.item.index();
 		},
@@ -220,7 +224,7 @@ function toggle_column(container_div_id, data_tbl_id, col_no, firstrun) {
 }
 
 // *** Create column choosers row for a table. NOTE must have <th> cells at row 0
-function create_column_choosers(container_div_id, data_tbl_id, firstload) {
+function create_column_choosers(container_div_id, data_tbl_id, firstload, lbltext) {
   // 1. Get column-status array for the table with id: data_tbl_id
   var show_col = eval('show_col_'+data_tbl_id);
   
@@ -229,7 +233,7 @@ function create_column_choosers(container_div_id, data_tbl_id, firstload) {
   var thcells = firstrow.find('th');
   
   // 3. Iterate through the 'th' cells and create column hiders for those having the class 'hideOnDemandClass'
-  var str = '';
+  var str = (typeof lbltext != "undefined") ? lbltext : '';
   for (var col=0; col<thcells.length;col++) {
     // 4. Skip if not having 'hideOnDemandClass' class
     if (!jQuery(thcells[col]).hasClass('hideOnDemandClass')) continue;

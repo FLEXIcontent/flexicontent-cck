@@ -329,11 +329,22 @@ fieldset.flexiaccess legend {
 }
 option[disabled], option[readonly] { color: #bbb; }
 /* Categories in the items view */
+span.orderingcat {
+	display:inline-block;
+	border-radius: 6px;
+	border: 1px dashed gray;
+	padding: 2px 4px;
+	background: white;
+}
+span.maincat a: hover {
+	text-decoration: none!improtant;
+}
 span.maincat a {
-/* 	color: red; */
+	color: black;
+	font-weight:bold;
 }
 span.secondarycat a {
-	color: black;
+	color: gray;
 }
 /* Category view */
 h3.themes-title {
@@ -483,7 +494,7 @@ table.adminlist thead #startdate,
 table.adminlist thead #enddate { width: 100px !important; }
 
 table.adminlist td.order {
-	width: auto !important;
+	width: 120px !important;
 }
 
 table.adminlist td.order span {

@@ -18,7 +18,12 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-flexicontent_html::jscode_to_showhide_table('mainChooseColBox','adminListTableFCitems');
+$header_text = '<span class="label">'.JText::_('FLEXI_COLUMNS', true).'</span>  &nbsp; '
+.'<a onclick="alert(this.title);" title="'.str_replace("<br/>","\\n", JText::_('FLEXI_CAN_ADD_CUSTOM_FIELD_COLUMNS_COMPONENT_AND_PER_TYPE', true)).'" style="vertical-align:middle; font-size:12px; cursor:pointer;" href="javascript:;" >'
+.'<img src="components/com_flexicontent/assets/images/plus-button.png" /><sup>[5]</sup>'
+.'</a> &nbsp; '
+;
+flexicontent_html::jscode_to_showhide_table('mainChooseColBox', 'adminListTableFCitems', $header_text);
 
 global $globalcats;
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
@@ -464,6 +469,10 @@ window.addEvent('domready', function() {
 		<?php endforeach; ?>
 
 			<td class="left">
+				<span style="display:none; color:darkred;" class="fc_nice_box" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
+				<?php if ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
+					<span style="color:darkgreen;" class="fc_nice_box" id="fcorder_notes_box"><?php echo JText::_('FLEXI_FCORDER_USE_CATEGORY_FILTER'); ?></span>
+				<?php endif; ?>
 				<?php echo $ordering_type_tip; ?>
 				<label class="label" for="filter_order_type"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
 				<div class="clear"></div>
@@ -477,6 +486,9 @@ window.addEvent('domready', function() {
 				<label class="label" for="filter_subcats"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
 				<div class="clear"></div>
 				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
+				<?php if (!$this->filter_order_type && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
+					<br/><span style="color:darkgreen;" class="fc-mssg-inline fc-note" id=""><?php echo JText::_('Items ordered by by Joomla order, only main category is shown'); ?></span>
+				<?php endif; ?>
 			</td>
 			<td class="left col_created col_revised" colspan="2">
 				<span class="radio"><?php echo $this->lists['date']; ?></span>
@@ -863,8 +875,14 @@ window.addEvent('domready', function() {
 				foreach ($row->categories as $key => $_item_cat) :
 					if ( !isset($this->itemCats[$_item_cat]) ) continue;
 					$category = & $this->itemCats[$_item_cat];
-
-					$typeofcats = ((int)$category->id == (int)$row->catid) ? ' maincat' : ' secondarycat';
+					
+					$isMainCat = ((int)$category->id == (int)$row->catid);
+					if (!$this->filter_order_type && !$isMainCat) continue;
+					
+					$typeofcats = '';
+					if ( $ix==0 && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering') )
+						$typeofcats .= ' orderingcat';
+					$typeofcats .= $isMainCat ? ' maincat' : ' secondarycat';
 					$catlink	= 'index.php?option=com_flexicontent&'.$cats_task.'edit&cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 					if ($this->CanCats) :
@@ -872,17 +890,17 @@ window.addEvent('domready', function() {
 					<span class="editlinktip hasTip<?php echo $typeofcats; ?>" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY', true );?>::<?php echo $title; ?>">
 					<a href="<?php echo $catlink; ?>">
 						<?php
-						if (JString::strlen($title) > 20) {
-							echo JString::substr( $title , 0 , 20).'...';
+						if (JString::strlen($title) > 40) {
+							echo JString::substr( $title , 0 , 40).'...';
 						} else {
 							echo $title;
 						}
 						?></a></span>
 					<?php
 					else :
-						if (JString::strlen($title) > 20) {
+						if (JString::strlen($title) > 40) {
 							echo ($category->id != $row->catid) ? '' : '<strong>';
-							echo JString::substr( $title , 0 , 20).'...';
+							echo JString::substr( $title , 0 , 40).'...';
 							echo ($category->id != $row->catid) ? '' : '</strong>';
 						} else {
 							echo ($category->id != $row->catid) ? '' : '<strong>';
@@ -937,6 +955,7 @@ window.addEvent('domready', function() {
 		<sup>[3]</sup> <?php echo JText::_('FLEXI_SORT_TO_GROUP_TRANSLATION'); ?><br />
 	<?php endif; ?>
 	<sup>[4]</sup> <?php echo JText::_('FLEXI_MULTIPLE_ITEM_ORDERINGS'); ?></><br />
+	<sup>[5]</sup> <?php echo JText::_('FLEXI_CAN_ADD_CUSTOM_FIELD_COLUMNS_COMPONENT_AND_PER_TYPE'); ?></><br />
 
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />

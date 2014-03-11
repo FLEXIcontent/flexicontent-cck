@@ -71,7 +71,7 @@ class FlexicontentViewUsers extends JViewLegacy
 			if (!$notice_author_with_items_only) {
 				$app->setUserState( $option.'.users.notice_author_with_items_only', 1 );
 				$app->enqueueMessage(JText::_('FLEXI_BY_DEFAULT_ONLY_AUTHORS_WITH_ITEMS_SHOWN'), 'notice');
-				$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'notice');
+				$app->enqueueMessage(JText::_('FLEXI_USABILITY_MESSAGES_TURN_OFF'), 'message');
 			}
 		}
 
