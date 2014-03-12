@@ -223,6 +223,48 @@ fieldset.panelform img, fieldset.panelform button {
 	font-size: 12px;
 	font-family: arial;
 	height: auto;
+	min-width: 60%;
+}
+
+@media only screen and (min-width:1341px) and (max-width: 1680px) {
+	div.fieldset_value,
+	div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
+	div.panel fieldset img, div.panel fieldset button,
+	fieldset.panelform label,
+	fieldset.panelform input, fieldset.panelform textarea, fieldset.panelform select,
+	fieldset.panelform img, fieldset.panelform button {
+		min-width: 55%;
+	}
+}
+@media only screen and (min-width:1201px) and (max-width: 1340px) {
+	div.fieldset_value,
+	div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
+	div.panel fieldset img, div.panel fieldset button,
+	fieldset.panelform label,
+	fieldset.panelform input, fieldset.panelform textarea, fieldset.panelform select,
+	fieldset.panelform img, fieldset.panelform button {
+		min-width: 50%;
+	}
+}
+@media only screen and (min-width:1051px) and (max-width: 1200px) {
+	div.fieldset_value,
+	div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
+	div.panel fieldset img, div.panel fieldset button,
+	fieldset.panelform label,
+	fieldset.panelform input, fieldset.panelform textarea, fieldset.panelform select,
+	fieldset.panelform img, fieldset.panelform button {
+		min-width: 45%;
+	}
+}
+@media only screen and (min-width:0px) and (max-width: 1050px) {
+	div.fieldset_value,
+	div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
+	div.panel fieldset img, div.panel fieldset button,
+	fieldset.panelform label,
+	fieldset.panelform input, fieldset.panelform textarea, fieldset.panelform select,
+	fieldset.panelform img, fieldset.panelform button {
+		min-width: 0;
+	}
 }
 
 div.width-20 fieldset, div.width-30 fieldset, div.width-35 fieldset, div.width-40 fieldset, div.width-45 fieldset, div.width-50 fieldset, div.width-55 fieldset, div.width-60 fieldset, div.width-65 fieldset, div.width-70 fieldset, div.width-80 fieldset, div.width-100 fieldset {
@@ -231,8 +273,19 @@ div.width-20 fieldset, div.width-30 fieldset, div.width-35 fieldset, div.width-4
 }
 
 div fieldset.panelform textarea {
-	margin:2px 4px 4px 12px !important;
+	margin:2px 4px 4px 6px !important;
 	width:auto !important;
+}
+
+fieldset.panelform select {
+	min-width: 40% !important;
+}
+@media only screen and (min-width:0px) and (max-width: 1270px) {
+	fieldset.panelform select {
+		min-width: 0 !important;
+		font-family: tahoma;
+		font-size: 11px !important;
+	}
 }
 
 div fieldset.panelform label {

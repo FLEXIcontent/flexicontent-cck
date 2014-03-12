@@ -64,7 +64,11 @@ class FlexicontentViewTemplates extends JViewLegacy
 		//JToolBarHelper::Back();
 		if ($perms->CanConfig) {
 			//JToolBarHelper::divider(); JToolBarHelper::spacer();
-			JToolBarHelper::preferences('com_flexicontent', '550', '850', 'Configuration');
+			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
+			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
+			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
 		$tmpldirectory = JPATH_COMPONENT_SITE . DS . 'templates' . DS;

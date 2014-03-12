@@ -60,9 +60,13 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 							if ( $config_not_saved )
 							{
 								if ( FLEXI_J16GE ) {
+									$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
+									$_width = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+									$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+									$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
 									$conf_link = 'index.php?option=com_config&view=component&component=com_flexicontent&path=';
 									$conf_link = FLEXI_J30GE ? "<a href='".$conf_link."' style='color: red;'>" :
-										"<a class='modal' rel=\"{handler: 'iframe', size: {x: 850, y: 550}, onClose: function() {}}\" href='".$conf_link."&tmpl=component' style='color: red;'>" ;
+										"<a class='modal' rel=\"{handler: 'iframe', size: {x: ".$_width.", y: ".$_height."}, onClose: function() {}}\" href='".$conf_link."&tmpl=component' style='color: red;'>" ;
 									$msg = JText::sprintf( 'FLEXI_CONFIGURATION_NOT_SAVED', $conf_link.JText::_("FLEXI_CONFIG")."</a>" );
 								} else {
 									$msg = str_replace('"_QQ_"', '"', JText::_( 'FLEXI_NO_SECTION_CHOOSEN' ));

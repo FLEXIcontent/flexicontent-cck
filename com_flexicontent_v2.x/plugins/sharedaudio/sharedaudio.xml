@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
-	<name>FLEXIcontent - Shared Audio (youtube,vimeo,dailymotion,etc)</name>
+	<name>FLEXIcontent - Shared Audio (SoundCloud,Spotify,Last.fm,etc)</name>
 	<author>Lyquix, ggppdk</author>
 	<creationDate>July 2013</creationDate>
 	<copyright>Copyright (C) 2013 Lyquix</copyright>

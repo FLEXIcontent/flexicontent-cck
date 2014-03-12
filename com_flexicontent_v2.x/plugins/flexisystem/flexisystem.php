@@ -107,18 +107,16 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function onAfterRoute()
 	{
-		// ensure the PHP version is correct
-		$fparams = JComponentHelper::getParams('com_flexicontent');
-		
-		// Detect mobile devices, and set fc_use_mobile session flag
-		if ($fparams->get('use_mobile_layouts')) $this->detectClientResolution($fparams);
-		
+		$fparams= JComponentHelper::getParams('com_flexicontent');
 		$app    = JFactory::getApplication();
 		$option = JRequest::getCMD('option');
 		$view   = JRequest::getVar('view', '');
 		$layout = JRequest::getVar('layout', '');
 		$tmpl   = JRequest::getVar('tmpl', '');
 		$task   = JRequest::getVar('task', '');
+		
+		// Detect resultion we will do this regardless of ... using mobile layouts
+		if ($fparams->get('use_mobile_layouts') || $app->isAdmin()) $this->detectClientResolution($fparams);
 		
 		// Exclude pagebreak outputing dialog from redirection
 		if( !FLEXI_J16GE ) {
