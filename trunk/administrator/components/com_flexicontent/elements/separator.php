@@ -50,12 +50,9 @@ fieldset.radio  { margin: 0; padding: 0; }
 $document = JFactory::getDocument();
 $document->addStyleDeclaration($css);
 $option = JRequest::getVar('option');
+$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_form.css');
 if ($option=='com_config') {
-	$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_form.css');
 	$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/tabber.css');
-	
-	if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
-	
 	$document->addScript(JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js');
 	$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 }
@@ -64,8 +61,9 @@ if (FLEXI_J16GE) {
 	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 	flexicontent_html::loadJQuery();
-	$document->addScript(JURI::root().'administrator/components/com_flexicontent/assets/js/admin.js');
-	$document->addScript(JURI::root().'administrator/components/com_flexicontent/assets/js/validate.js');
+	$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
+	$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
+	if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 }
 
 class JElementSeparator extends JElement
@@ -76,6 +74,10 @@ class JElementSeparator extends JElement
 	 * @var		string
 	 */
 	var	$_name = 'separator';
+	
+	function getLabel() {
+		return "";
+	}
 	
 	function fetchElement($name, $value, &$node, $control_name)
 	{
@@ -89,6 +91,7 @@ class JElementSeparator extends JElement
 		$level = $attributes['level'];
 		$description = @$attributes['description'];
 		$initial_tbl_hidden = @$attributes['initial_tbl_hidden'];
+		$value = FLEXI_J16GE ? $this->element['default'] : $value;
 		
 		if (FLEXI_J16GE && in_array($level, array('tblbreak','tabs_start','tab_open','tab_close','tabs_end')) ) return 'do no use type "'.$level.'" in J1.6+';
 		
@@ -97,13 +100,15 @@ class JElementSeparator extends JElement
 		if ($level == 'tblbreak') {
 			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #ffffff; color: darkred; font-size: 16px!important; font-weight: bold; margin: 24px 0% 2px 0%; width:auto; display: block; float: left; border: 1px solid lightgray; font-family:tahoma; font-size:12px;';
 		} else if ($level == 'level2') {
-			$style = 'padding: 2px 0% 2px 4%; display: block; background-color: #ccc; color: #000; font-weight: bold; margin: 0px 2% 2px 2%; width:92%; display: block; float: left; text-align: center; border: 1px outset #E9E9E9;';
+			$pad_left = FLEXI_J16GE ? '226px' : '2%';
+			$width = FLEXI_J16GE ? '78%' : '92%';
+			$style = 'padding: 2px 0% 2px 4%; display: block; background-color:darkseagreen; color: #000; font-weight: bold; margin: 0px 2% 2px '.$pad_left.'; width:'.$width.'; display: block; float: left; text-align: left; border: 1px outset #E9E9E9;';
 		} else if ($level == 'level3') {
 			$pad_left = FLEXI_J16GE ? 'left:20%;' : 'left:0%;';
-			$width_val = FLEXI_J16GE ? 'width:64%;' : 'width:auto;';
-			$style = 'padding: 2px 2% 4px 6%; margin-top:6px; font-weight: bold; clear:both; '.$width_val.' display: block; float: left; position:relative; '.$pad_left.' border:1px dashed gray; background:#eeeeee;';
+			$width_val = FLEXI_J16GE ? 'min-width:300px' : 'min-width:300px';
+			$style = 'padding: 2px 3% 4px 3%; margin-top:6px; font-weight: bold; clear:both; '.$width_val.'; display: block; float: left; position:relative; '.$pad_left.'; border:1px dashed gray; background:#eeeeee;';
 		} else if ($level == 'level1') {
-			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #333333; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left; border: 1px outset #E9E9E9; font-family:tahoma; font-size:12px;';
+			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #333; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left; border: 1px outset #E9E9E9; font-family:tahoma; font-size:12px;';
 		} else {
 			$style = '';
 		}

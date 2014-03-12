@@ -143,7 +143,9 @@ div.credits img {
  * pane TABS and sliders
  ***********************/
 
-
+body.contentpane {
+	font-size:12px;
+}
 
 
 /******************
@@ -350,7 +352,7 @@ table.admintable td .controls label {
 }
 
 div table.admintable {
-	font-size:11px;
+	font-size:12px;
 	border-collapse: separate;
 	border-spacing: 2px !important;
 }

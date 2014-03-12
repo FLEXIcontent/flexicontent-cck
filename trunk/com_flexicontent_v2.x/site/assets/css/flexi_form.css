@@ -69,12 +69,12 @@ label input[type=radio   ].fc_checkradio:not(old),
 
 /* Style the label to also include the nice checkbox, radio */
 
-input[type=checkbox].fc_checkradio:not(old) + label:not(.plupload_button),
-input[type=radio   ].fc_checkradio:not(old) + label:not(.plupload_button),
-[name="adminForm"]  input[type=checkbox]:not(old) + label:not(.plupload_button),
-[name="adminForm"]  input[type=radio   ]:not(old) + label:not(.plupload_button),
-.flexicontent input[type=checkbox]:not(old) + label:not(.plupload_button),
-.flexicontent input[type=radio   ]:not(old) + label:not(.plupload_button) {
+input[type=checkbox].fc_checkradio:not(old) + label:not(.plupload_button):not(.btn),
+input[type=radio   ].fc_checkradio:not(old) + label:not(.plupload_button):not(.btn),
+[name="adminForm"]  input[type=checkbox]:not(old) + label:not(.plupload_button):not(.btn),
+[name="adminForm"]  input[type=radio   ]:not(old) + label:not(.plupload_button):not(.btn),
+.flexicontent input[type=checkbox]:not(old) + label:not(.plupload_button):not(.btn),
+.flexicontent input[type=radio   ]:not(old) + label:not(.plupload_button):not(.btn) {
 	display: inline-block !important;
 	margin: 1px 12px 1px 0px !important;
 	padding: 0px 0px 0px 24px !important;
@@ -89,27 +89,27 @@ input[type=radio   ].fc_checkradio:not(old) + label:not(.plupload_button),
 	line-height: 19px !important;
 	height: 19px !important;*/
 }
-input[type=checkbox].fc_checkradio:not(old):disabled + label:not(.plupload_button),
-input[type=radio].fc_checkradio:not(old):disabled + label:not(.plupload_button),
-[name="adminForm"]  input[type=checkbox]:not(old):disabled + label:not(.plupload_button),
-[name="adminForm"]  input[type=radio]:not(old):disabled + label:not(.plupload_button),
-.flexicontent input[type=checkbox]:not(old):disabled + label:not(.plupload_button),
-.flexicontent input[type=radio]:not(old):disabled + label:not(.plupload_button) {
+input[type=checkbox].fc_checkradio:not(old):disabled + label:not(.plupload_button):not(.btn),
+input[type=radio].fc_checkradio:not(old):disabled + label:not(.plupload_button):not(.btn),
+[name="adminForm"]  input[type=checkbox]:not(old):disabled + label:not(.plupload_button):not(.btn),
+[name="adminForm"]  input[type=radio]:not(old):disabled + label:not(.plupload_button):not(.btn),
+.flexicontent input[type=checkbox]:not(old):disabled + label:not(.plupload_button):not(.btn),
+.flexicontent input[type=radio]:not(old):disabled + label:not(.plupload_button):not(.btn) {
 	background-position: 0 -72px !important;
 	font-style: italic !important;
 	color: gray !important;
 	cursor: normal !important;
 	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
 }
-input[type=checkbox].fc_checkradio:not(old) + label:not(.plupload_button),
-[name="adminForm"]  input[type=checkbox]:not(old) + label:not(.plupload_button),
-.flexicontent input[type=checkbox]:not(old) + label:not(.plupload_button) {
+input[type=checkbox].fc_checkradio:not(old) + label:not(.plupload_button):not(.btn),
+[name="adminForm"]  input[type=checkbox]:not(old) + label:not(.plupload_button):not(.btn),
+.flexicontent input[type=checkbox]:not(old) + label:not(.plupload_button):not(.btn) {
 	background: url(../images/checks.png) no-repeat 0 0 !important;
 	/*background: url(../images/checks2.png) no-repeat 0 0 !important;*/
 }
-input[type=radio].fc_checkradio:not(old) + label:not(.plupload_button),
-[name="adminForm"]  input[type=radio]:not(old) + label:not(.plupload_button),
-.flexicontent input[type=radio]:not(old) + label:not(.plupload_button) {
+input[type=radio].fc_checkradio:not(old) + label:not(.plupload_button):not(.btn),
+[name="adminForm"]  input[type=radio]:not(old) + label:not(.plupload_button):not(.btn),
+.flexicontent input[type=radio]:not(old) + label:not(.plupload_button):not(.btn) {
 	background: url(../images/checks.png) no-repeat 0 0 !important;
 	/*background: url(../images/checks2.png) no-repeat 0 -38px !important;*/
 }
@@ -117,15 +117,15 @@ input[type=radio].fc_checkradio:not(old) + label:not(.plupload_button),
 
 /* Style the checked versions of checkbox,radio */
 
-input[type=checkbox]:not(old):checked + label:not(.plupload_button),
-[name="adminForm"]  input[type=checkbox]:not(old):checked + label:not(.plupload_button),
-.flexicontent input[type=checkbox]:not(old):checked + label:not(.plupload_button) {
+input[type=checkbox]:not(old):checked + label:not(.plupload_button):not(.btn),
+[name="adminForm"]  input[type=checkbox]:not(old):checked + label:not(.plupload_button):not(.btn),
+.flexicontent input[type=checkbox]:not(old):checked + label:not(.plupload_button):not(.btn) {
 	background-position: 0 -24px !important;
 	/*background-position: 0 -19px !important;*/
 }
-input[type=radio]:not(old):checked + label:not(.plupload_button),
-[name="adminForm"]  input[type=radio]:not(old):checked + label:not(.plupload_button),
-.flexicontent input[type=radio]:not(old):checked + label:not(.plupload_button) {
+input[type=radio]:not(old):checked + label:not(.plupload_button):not(.btn),
+[name="adminForm"]  input[type=radio]:not(old):checked + label:not(.plupload_button):not(.btn),
+.flexicontent input[type=radio]:not(old):checked + label:not(.plupload_button):not(.btn) {
 	background-position: 0 -48px !important;
 	/*background-position: 0 -57px !important;*/
 }
@@ -347,6 +347,11 @@ html button {
 }
 
 
+
+/***********************************
+ * Flexicontent form submit handling
+ ***********************************/
+ 
 /* Form submit handling */
 #flexi_form_submit_msg {
 	font-size:11px;
@@ -355,5 +360,18 @@ html button {
 	background: white url(../images/ajax-loader.gif) 0px 3px no-repeat;
 }
 #flexi_form_submit_btns {
+	font-size:11px;
+}
+
+
+
+/*********************************
+/* J1.5/J2.5 configuration forms */
+/*********************************
+
+body.contentpane  {
+	font-size:12px;
+}
+body.contentpane input {
 	font-size:11px;
 }

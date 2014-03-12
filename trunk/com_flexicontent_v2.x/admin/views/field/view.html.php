@@ -63,6 +63,24 @@ class FlexicontentViewField extends JViewLegacy
 			$types				= $this->get( 'Typeslist' );
 			$typesselected= $this->get( 'Typesselected' );
 		}
+		$fieldtypes = $model->getFieldtypes($fields_in_groups = true);
+		
+		//build backend visible filter
+		$ALL = mb_strtoupper(JText::_( 'FLEXI_ALL' ), 'UTF-8') . ' : ';
+		$fftype 	= array();
+		
+		foreach ($fieldtypes as $field_group => $ft_types) {
+			$fftype[] = JHTML::_('select.optgroup', $field_group );
+			foreach ($ft_types as $field_type => $ftdata) {
+				$field_friendlyname = str_ireplace("FLEXIcontent - ","",$ftdata->field_friendlyname);
+				$fftype[] = JHTML::_('select.option', $field_type, $field_friendlyname);
+			}
+			$fftype[] = JHTML::_('select.optgroup', '' );
+		}
+		
+		$fieldname = FLEXI_J16GE ? 'jform[field_type]' : 'field_type';
+		$elementid = FLEXI_J16GE ? 'jform_field_type'  : 'field_type';
+		$lists['fftype'] = JHTML::_('select.genericlist', $fftype, $fieldname, 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $row->field_type, $elementid );
 		
 		//create the toolbar
 		if ( $row->id ) {

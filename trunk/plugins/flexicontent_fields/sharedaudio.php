@@ -48,7 +48,7 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 			$value['description'] = '';
 		}
 		
-		$field->html = '';
+		$field->html  = '';
 		$field->html .= '<table class="admintable" border="0" cellspacing="0" cellpadding="5">';
 		$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_URL').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][url]" value="'.$value['url'].'" size="60" '.$required.' /> <input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_FETCH').'" onclick="fetchAudio_'.$field->name.'();"></td></tr>';
 		$field->html .= '<tr><td class="key" align="right">'.JText::_('PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_AUDIO_TYPE').'</td><td><input type="text" class="fcfield_textval" name="custom['.$field->name.'][audiotype]" value="'.$value['audiotype'].'" size="10" readonly="readonly" style="background-color:#eee" /></td></tr>';
@@ -138,10 +138,8 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 			document.forms["adminForm"].elements[field].value = data.title;
 			field = fieldname+"[author]";
 			document.forms["adminForm"].elements[field].value = data.author;
-			/*
-			field = fieldname+"[duration]";
-			document.forms["adminForm"].elements[field].value = data.duration;
-			*/
+			/*field = fieldname+"[duration]";
+			document.forms["adminForm"].elements[field].value = data.duration;*/
 			field = fieldname+"[description]";
 			document.forms["adminForm"].elements[field].value = data.description;
 		}
@@ -177,7 +175,7 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 			
 			// generate html output
 			$field->{$prop} .= $pretext;
-			$field->{$prop} .= '<iframe class="sharedaudio" src="'.$value['audioid'].'?autostart='.$autostart.'" width="'.$width.'" height="'.$height.'" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
+			$field->{$prop} .= '<iframe class="sharedaudio" src="'.$value['audioid'].'?autoplay='.$autostart.'" width="'.$width.'" height="'.$height.'" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
 			if($display_title==1 && $value['title']!='') $field->{$prop} .= '<h'.$headinglevel.'>'.$value['title'].'</h'.$headinglevel.'>';
 			if($display_author==1 && $value['author']!='') $field->{$prop} .= '<div class="author">'.$value['author'].'</div>';
 			if($display_description==1 && $value['description']!='') $field->{$prop} .= '<div class="description">'.$value['description'].'</div>';

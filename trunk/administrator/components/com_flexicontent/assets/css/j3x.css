@@ -83,10 +83,7 @@ div.toolbar-box {
 	margin-top: -1px;
 	padding: 4px 16px;
 }
-
 .form-horizontal div.control-label {
-	min-width: 15%;
-	padding-top: 0px;
 }
 .form-horizontal div.control-group {
 	margin-bottom: 2px;
@@ -104,19 +101,46 @@ input, select {
 	width: auto !important;
 }
 
-.chzn-container, .chzn-drop {
-	max-width: 100% !important;
-	width: auto !important;
-}
-
 #user-groups legend + .control-group, #user-groups .control-group {
 	margin: 0px;
 }
 
-.chzn-container,
 .form-horizontal .chzn-container {
-	width:auto !important;
+	width: 90% !important;
 	max-width: 500px !important;
+}
+.form-horizontal .chzn-container .chzn-drop {
+	width: 100% !important;
+	max-width: 500px !important;
+	border: 1px solid lightgray !important;
+}
+.form-horizontal .controls {
+	margin:0px !important;
+}
+.form-horizontal .nav-tabs {
+}
+.form-horizontal .nav-tabs {
+	padding-bottom: 2px;
+}
+.form-horizontal .nav-tabs > li {
+	margin-bottom: 6px;
+}
+.form-horizontal .nav-tabs > li > a {
+	border:1px solid darkgray;
+	background-color: #eee;
+}
+.form-horizontal .nav-tabs > li.active > a {
+	border:1px solid black;
+	border-bottom: 1px solid white;
+	background-color: white;
+	color: black;
+}
+.form-horizontal .chzn-container-single .chzn-single {
+	width:auto;
+	float:left;
+}
+.form-horizontal .chzn-container-single .chzn-search {
+	border: 1px solid lightgray;
 }
 
 
