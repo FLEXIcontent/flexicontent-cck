@@ -217,11 +217,12 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 					$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), $popup_load_url, 800, 500);
 				}
 				
+				$session = JFactory::getSession();
 				$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
-			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
-			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
-			$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
-			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
+				$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
+				$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
+				$_height = ($fc_screen_height && $fc_screen_height-128 > 550 ) ? ($fc_screen_height-128 > 1000 ? 1000 : $fc_screen_height-128 ) : 550;
+				JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 			}
 			
 			$js .= "});";

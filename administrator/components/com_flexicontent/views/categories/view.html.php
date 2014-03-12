@@ -146,6 +146,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		if ($perms->CanConfig) {
 			//JToolBarHelper::custom($contrl.'rebuild', 'refresh.png', 'refresh_f2.png', 'JTOOLBAR_REBUILD', false);
+			$session = JFactory::getSession();
 			$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
 			$_width  = ($fc_screen_width && $fc_screen_width-84 > 940 ) ? ($fc_screen_width-84 > 1400 ? 1400 : $fc_screen_width-84 ) : 940;
 			$fc_screen_height = (int) $session->get('fc_screen_height', 0, 'flexicontent');
