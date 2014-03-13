@@ -101,6 +101,7 @@ class FlexicontentViewField extends JViewLegacy
 		//build selectlists, (for J1.6+ most of these are defined via XML file and custom form field classes)
 		$lists = array();
 		
+		//build formhidden selector
 		$formhidden[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
 		$formhidden[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_FRONTEND' ) );
 		$formhidden[] = JHTML::_('select.option',  2, JText::_( 'FLEXI_BACKEND' ) );
@@ -123,7 +124,7 @@ class FlexicontentViewField extends JViewLegacy
 		$lists['edithelp'] = JHTML::_('select.radiolist', $edithelp, $edithelp_fieldname, '', 'value', 'text', $row->edithelp );
 		
 		//build type select list
-		$lists['tid'] 			= flexicontent_html::buildtypesselect($types, 'tid[]', $typesselected, false, 'multiple="multiple" size="6"');
+		$lists['tid'] = flexicontent_html::buildtypesselect($types, 'tid[]', $typesselected, false, 'multiple="multiple" size="6"');
 
 		// build the html select list for ordering
 		$query = 'SELECT ordering AS value, label AS text'
@@ -137,8 +138,8 @@ class FlexicontentViewField extends JViewLegacy
 		else
 			$lists['ordering'] 			= JHTML::_('list.specificordering',  $row, '', $query );
 		
-		
 		//build field_type list
+		if (!$row->field_type) $row->field_type = 'text';
 		if ($row->iscore == 1) { $class = 'disabled="disabled"'; } else {
 			$class = '';
 			$document->addScriptDeclaration("
@@ -161,7 +162,10 @@ class FlexicontentViewField extends JViewLegacy
 					});
 				");
 		}
-		$lists['field_type'] 	= flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type);
+		
+		//build field select list
+		$lists['field_type'] = flexicontent_html::buildfieldtypeslist('field_type', $class, $row->field_type, $group=true);
+		
 		//build access level list
 		if (FLEXI_ACCESS) {
 			$lang = JFactory::getLanguage();

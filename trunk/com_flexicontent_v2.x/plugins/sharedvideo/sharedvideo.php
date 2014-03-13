@@ -237,21 +237,21 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 			switch($value['videotype']){
 				case 'youtube':
 					$field->{$prop} .= '//www.youtube.com/embed/';
-					$show_related = 'rel=0';
-					$show_srvlogo = 'modestbranding=1';
+					$_show_related = '&rel=0';
+					$_show_srvlogo = '&modestbranding=1';
 					break;
 				case 'vimeo':
 					$field->{$prop} .= '//player.vimeo.com/video/';
-					$show_related = '';
-					$show_srvlogo = '';
+					$_show_related = '';
+					$_show_srvlogo = '';
 					break;
 				case 'dailymotion':
 					$field->{$prop} .= '//www.dailymotion.com/embed/video/';
-					$show_related = 'related=0';
-					$show_srvlogo = 'logo=0';
+					$_show_related = '&related=0';
+					$_show_srvlogo = '&logo=0';
 					break;
 			}
-			$field->{$prop} .= $value['videoid'].'?autoplay='.$autostart.'" '.$show_related.' '.$show_srvlogo.' width="'.$width.'" height="'.$height.'" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
+			$field->{$prop} .= $value['videoid'].'?autoplay='.$autostart.$_show_related.$_show_srvlogo.'" width="'.$width.'" height="'.$height.'" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>';
 			if($display_title==1 && $value['title']!='') $field->{$prop} .= '<h'.$headinglevel.'>'.$value['title'].'</h'.$headinglevel.'>';
 			if($display_author==1 && $value['author']!='') $field->{$prop} .= '<div class="author">'.$value['author'].'</div>';
 			if($display_duration==1 && $value['duration']!='') {

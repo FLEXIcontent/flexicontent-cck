@@ -31,7 +31,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				<table class="admintable">
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('label').': *'; ?>
+							<?php echo $this->form->getLabel('label').'*'; ?>
 						</td>
 						<td>
 							<?php echo $this->form->getInput('label'); ?>
@@ -40,7 +40,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->form->getValue('iscore') == 0) : ?>
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('name').': *'; ?>
+							<?php echo $this->form->getLabel('name').'*'; ?>
 						</td>
 						<td>
 							<?php echo $this->form->getInput('name'); ?>
@@ -60,7 +60,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					?>
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('published').':'; ?>
+							<?php echo $this->form->getLabel('published'); ?>
 						</td>
 						<td>
 							<?php
@@ -73,17 +73,19 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->form->getValue("iscore") == 0) : ?>
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('field_type').': *'; ?>
+							<?php echo $this->form->getLabel('field_type').'*'; ?>
 						</td>
 						<td>
-							<?php echo $this->lists['fftype'] /*$this->form->getInput('field_type')*/; ?> &nbsp;&nbsp;&nbsp;
+							<?php /*echo $this->form->getInput('field_type');*/ ?>
+							<?php echo $this->lists['field_type']; ?>
+							&nbsp;&nbsp;&nbsp;
 							[ <span id="field_typename"><?php echo $this->form->getValue('field_type'); ?></span> ]
 						</td>
 					</tr>
 					<?php endif; ?>
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('ordering').': '; ?>
+							<?php echo $this->form->getLabel('ordering'); ?>
 						</td>
 						<td>
 							<?php echo $this->form->getInput('ordering'); ?>
@@ -92,8 +94,8 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					
 					<?php if ($this->supportsearch || $this->supportfilter) : ?>
 					<tr>
-						<td colspan="2" class="key tbl_group" >
-							<?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?>
+						<td colspan="2">
+							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?></span>
 						</td>
 					</tr>
 					<?php endif; ?>
@@ -101,7 +103,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->supportsearch) : ?>
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('issearch').':'; ?>
+							<?php echo $this->form->getLabel('issearch'); ?>
 						</td>
 						<td>
 							<?php echo
@@ -115,7 +117,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->supportfilter) : ?>
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('isfilter').':'; ?>
+							<?php echo $this->form->getLabel('isfilter'); ?>
 						</td>
 						<td>
 							<?php echo $this->form->getInput('isfilter'); ?>
@@ -126,8 +128,8 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 
 					<?php if ($this->supportadvsearch || $this->supportadvfilter) : ?>
 					<tr>
-						<td colspan="2" class="key tbl_group" >
-							<?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW' ); ?>
+						<td colspan="2">
+							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW' ); ?></span>
 						</td>
 					</tr>
 					<?php endif; ?>
@@ -135,7 +137,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->supportadvsearch) : ?>
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('isadvsearch').':'; ?>
+							<?php echo $this->form->getLabel('isadvsearch'); ?>
 						</td>
 						<td>
 							<?php echo
@@ -149,7 +151,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->supportadvfilter) : ?>
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('isadvfilter').':'; ?>
+							<?php echo $this->form->getLabel('isadvfilter'); ?>
 						</td>
 						<td>
 							<?php echo
@@ -161,13 +163,13 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php endif; ?>
 					
 					<tr>
-						<td colspan="2" class="key tbl_group" >
-							<?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?>
+						<td colspan="2">
+							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?></span>
 						</td>
 					</tr>
 					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>
 						<td class="key">
-							<?php echo $this->form->getLabel('untranslatable').':'; ?>
+							<?php echo $this->form->getLabel('untranslatable'); ?>
 						</td>
 						<td>
 							<?php echo $this->form->getInput('untranslatable'); ?>
@@ -177,7 +179,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr<?php echo !$this->supportformhidden?' style="display:none;"':'';?>>
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('formhidden').':'; ?>
+							<?php echo $this->form->getLabel('formhidden'); ?>
 						</td>
 						<td>
 							<?php echo $this->form->getInput('formhidden'); ?>
@@ -187,7 +189,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if (FLEXI_ACCESS || FLEXI_J16GE) : ?>
 					<tr<?php echo !$this->supportvalueseditable?' style="display:none;"':'';?>>
 						<td class="key">
-							<?php echo $this->form->getLabel('valueseditable').':'; ?>
+							<?php echo $this->form->getLabel('valueseditable'); ?>
 						</td>
 						<td>
 							<?php echo $this->form->getInput('valueseditable'); ?>
@@ -197,7 +199,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					
 					<tr<?php echo !$this->supportedithelp?' style="display:none;"':'';?>>
 						<td class="key">
-							<?php echo $this->form->getLabel('edithelp').':'; ?>
+							<?php echo $this->form->getLabel('edithelp'); ?>
 						</td>
 						<td>
 							<?php echo $this->form->getInput('edithelp'); ?>
@@ -207,7 +209,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if (!FLEXI_ACCESS || FLEXI_J16GE) : ?>
 					<tr>
 						<td class="key">
-							<?php echo $this->form->getLabel('access').':'; ?>
+							<?php echo $this->form->getLabel('access'); ?>
 						</td>
 						<td>
 							<?php echo $this->form->getInput('access'); ?>
@@ -306,19 +308,6 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php
 						endforeach;
 					} else {
-						/*global $global_field_types;
-						if(isset($global_field_types[0])) {
-							// Create the form
-							foreach($this->form->getFieldset('group-' . $global_field_types[0]->value) as $field) :
-								//$input = str_replace("name=\"".$field->inputName."\"", "name=\"params[".$field->inputName."]\"", $field->input);
-								?>
-								<fieldset class="panelform">
-								<?php echo $field->label; ?>
-								<?php echo $field->input; ?>
-								</fieldset>
-								<?php
-							endforeach;
-						}else*/
 						echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
 					}
 					?>

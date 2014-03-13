@@ -63,6 +63,7 @@ if (FLEXI_J16GE) {
 	flexicontent_html::loadJQuery();
 	$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
 	$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
+	//if (!FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 	if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 }
 
@@ -98,24 +99,23 @@ class JElementSeparator extends JElement
 		static $tab_js_css_added = false;
 		
 		if ($level == 'tblbreak') {
-			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #ffffff; color: darkred; font-size: 16px!important; font-weight: bold; margin: 24px 0% 2px 0%; width:auto; display: block; float: left; border: 1px solid lightgray; font-family:tahoma; font-size:12px;';
-		} else if ($level == 'level2') {
-			$pad_left = FLEXI_J16GE ? '226px' : '2%';
-			$width = FLEXI_J16GE ? '78%' : '92%';
-			$style = 'padding: 2px 0% 2px 4%; display: block; background-color:darkseagreen; color: #000; font-weight: bold; margin: 0px 2% 2px '.$pad_left.'; width:'.$width.'; display: block; float: left; text-align: left; border: 1px outset #E9E9E9;';
-		} else if ($level == 'level3') {
-			$pad_left = FLEXI_J16GE ? 'left:20%;' : 'left:0%;';
-			$width_val = FLEXI_J16GE ? 'min-width:300px' : 'min-width:300px';
-			$style = 'padding: 2px 3% 4px 3%; margin-top:6px; font-weight: bold; clear:both; '.$width_val.'; display: block; float: left; position:relative; '.$pad_left.'; border:1px dashed gray; background:#eeeeee;';
+			$style = '';
 		} else if ($level == 'level1') {
-			$style = 'padding: 4px 2% 4px 2%; display: block; background-color: #333; color: #fff; font-weight: bold; margin: 2px 0% 2px 0%; width:96%; display: block; float: left; border: 1px outset #E9E9E9; font-family:tahoma; font-size:12px;';
+			$style = '';
+		} else if ($level == 'level2') {
+			$pos_left   = FLEXI_J16GE ? 'left:4%;' : 'left:2%;';
+			$width_vals = FLEXI_J16GE ? 'width:86%;' : 'width:91%;';
+			$style = ''.$pos_left.$width_vals;
+		} else if ($level == 'level3') {
+			$pos_left = FLEXI_J16GE ? 'left:144px;' : 'left:4%;';
+			$style = ''.$pos_left;
 		} else {
 			$style = '';
 		}
 		
-		$class = ""; $title = "";
+		$class = 'fcsep_'.$level; $title = "";
 		if ($description) {
-			$class = FLEXI_J30GE ? "hasTooltip" : "hasTip";
+			$class .= FLEXI_J30GE ? " hasTooltip" : " hasTip";
 			$title = JText::_($value)."::".JText::_($description);
 		}
 		
