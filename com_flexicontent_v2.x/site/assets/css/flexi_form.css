@@ -78,8 +78,8 @@ input[type=radio   ].fc_checkradio:not(old) + label:not(.plupload_button):not(.b
 	display: inline-block !important;
 	margin: 1px 12px 1px 0px !important;
 	padding: 0px 0px 0px 24px !important;
-	line-height: 24px !important;
-	height: 24px !important;
+	line-height: 22px !important;
+	height: 22px !important;
 	text-align: left !important;
 	min-width: 12px !important;
 	cursor: pointer !important;
@@ -157,13 +157,22 @@ span.fc_checkradio_group_wrapper {
 	height: auto;
 	max-height: 220px;
 }
-ul.fc_checkradio_group { list-style-type: none !important; display: block; clear: both; }
-li.fc_checkradio_option { white-space: nowrap !important; display: inline-block; /* auto-hide do not force display */}
 ul.fc_checkradio_group,
 li.fc_checkradio_option {
 	padding: 0px !important;
 	margin: 0px !important;
 	background: none transparent !important;
+}
+ul.fc_checkradio_group {
+	list-style-type: none !important;
+	display: block;
+	clear: both;
+}
+li.fc_checkradio_option {
+	white-space: nowrap !important;
+	display: inline-block; /* auto-hide do not force display */
+	margin-top: 1px !important;
+	margin-bottom: 1px !important;
 }
 
 
@@ -365,13 +374,75 @@ html button {
 
 
 
-/*********************************
-/* J1.5/J2.5 configuration forms */
-/*********************************
+/*******************************
+ * J1.5/J2.5 configuration forms
+ *******************************/
 
 body.contentpane  {
 	font-size:12px;
 }
-body.contentpane input {
-	font-size:11px;
+
+
+
+/**********************************************
+ * Form field separator element CSS for forms *
+ **********************************************/
+.fcsep_tblbreak {
+	padding: 4px 2% 4px 2%;
+	background-color: #ffffff;
+	color: darkred;
+	font-size: 16px!important;
+	font-weight: bold;
+	margin: 24px 0% 2px 0%;
+	width:auto;
+	display: block;
+	float: left;
+	border: 1px solid lightgray;
+	font-family:tahoma;
+	font-size:12px;
+}
+.fcsep_level1 {
+	padding:6px 2% 6px 2%;
+	margin:2px 0% 0 0%;
+	clear:both; display:block;
+	float:left;
+	position:relative;
+	left:0%;
+	width:96%;
+	border:1px outset #E9E9E9;
+	background-color:#333;
+	color:#fff;
+	font-weight:normal;
+	font-family:tahoma;
+	font-size:14px;
+}
+.fcsep_level2 {
+	padding:6px 2%;
+	margin:2px 0% 0 0%;
+	clear:both;
+	display:block;
+	float:left;
+	position:relative;
+	'.$pos_left.$width_vals.'
+	border: 1px outset #E9E9E9;
+	background-color:#aaa;
+	color:#000;
+	font-weight:bold;
+	font-family:tahoma;
+	font-size:12px;
+	border-radius:8px;
+}
+.fcsep_level3 {
+	padding:4px 3%;
+	margin:2px 0% 0 0%;
+	clear:both;
+	display:block;
+	float:left;
+	position:relative;
+	min-width:300px;
+	border:1px dashed #bbb;
+	background-color:#eee;
+	color:#000;
+	font-weight:bold;
+	border-radius:8px;
 }

@@ -32,7 +32,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr>
 						<td class="key">
 							<label for="label" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_LABEL').'::'.JText::_('FLEXI_FIELD_FIELDLABEL_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_LABEL' ).': *'; ?>
+								<?php echo JText::_( 'FLEXI_FIELD_LABEL' ).'*'; ?>
 							</label>
 						</td>
 						<td>
@@ -43,7 +43,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr>
 						<td class="key">
 							<label for="name" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_NAME').'::'.JText::_('FLEXI_FIELD_FIELDNAME_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_NAME' ).': *'; ?>
+								<?php echo JText::_( 'FLEXI_FIELD_NAME' ).'*'; ?>
 							</label>
 						</td>
 						<td>
@@ -53,7 +53,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php else : ?>
 						<td class="key">
 							<label for="name" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_NAME').'::'.JText::_('FLEXI_FIELD_FIELDNAME_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_NAME' ).': *'; ?>
+								<?php echo JText::_( 'FLEXI_FIELD_NAME' ).'*'; ?>
 							</label>
 						</td>
 						<td>
@@ -67,7 +67,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr>
 						<td class="key">
 							<label for="published" class="hasTip" title="<?php echo JText::_('FLEXI_PUBLISHED').'::'.JText::_('FLEXI_FIELD_PUBLISHED_DESC');?>">
-								<?php echo JText::_( 'FLEXI_PUBLISHED' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>
 							</label>
 						</td>
 						<td>
@@ -82,11 +82,12 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr>
 						<td class="key">
 							<label for="field_type" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_TYPE').'::'.JText::_('FLEXI_FIELD_FIELDTYPE_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_TYPE' ).': *'; ?>
+								<?php echo JText::_( 'FLEXI_FIELD_TYPE' ).'*'; ?>
 							</label>
 						</td>
 						<td>
-							<?php echo $this->lists['field_type']; ?> &nbsp;&nbsp;&nbsp;
+							<?php echo $this->lists['field_type']; ?>
+							&nbsp;&nbsp;&nbsp;
 							[ <span id="field_typename"><?php echo $this->row->field_type; ?></span> ]
 						</td>
 					</tr>
@@ -94,7 +95,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr>
 						<td class="key">
 							<label for="ordering" class="hasTip" title="<?php echo JText::_('Ordering').'::'.JText::_('FLEXI_FIELD_ORDER_DESC');?>">
-								<?php echo JText::_( 'Ordering' ).': '; ?>
+								<?php echo JText::_( 'Ordering' ); ?>
 							</label>
 						</td>
 						<td>
@@ -114,7 +115,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr>
 						<td class="key">
 							<label for="issearch" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE').'::'.JText::_('FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE' ); ?>
 							</label>
 						</td>
 						<td>
@@ -130,7 +131,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr>
 						<td class="key">
 							<label for="isfilter" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_CONTENT_LIST_FILTERABLE').'::'.JText::_('FLEXI_FIELD_CONTENT_LIST_FILTERABLE_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_CONTENT_LIST_FILTERABLE' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_FIELD_CONTENT_LIST_FILTERABLE' ); ?>
 							</label>
 						</td>
 						<td>
@@ -152,7 +153,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr>
 						<td class="key">
 							<label for="isadvsearch" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE').'::'.JText::_('FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE' ); ?>
 							</label>
 						</td>
 						<td>
@@ -168,7 +169,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr>
 						<td class="key">
 							<label for="isadvfilter" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ADVANCED_FILTERABLE').'::'.JText::_('FLEXI_FIELD_ADVANCED_FILTERABLE_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_ADVANCED_FILTERABLE' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_FIELD_ADVANCED_FILTERABLE' ); ?>
 							</label>
 						</td>
 						<td>
@@ -188,7 +189,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>
 						<td class="key">
 							<label for="untranslatable" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_UNTRANSLATABLE').'::'.JText::_('FLEXI_FIELD_UNTRANSLATABLE_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_UNTRANSLATABLE' ).':'; ?>
+								<?php echo JText::_( 'FLEXI_FIELD_UNTRANSLATABLE' ); ?>
 							</label>
 						</td>
 						<td>
@@ -238,7 +239,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<tr>
 						<td class="key">
 							<label for="description" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_DESCRIPTION').'::'.JText::_('FLEXI_FIELD_DESCRIPTION_DESC');?>">
-								<?php echo JText::_( 'FLEXI_FIELD_DESCRIPTION' ).': '; ?>
+								<?php echo JText::_( 'FLEXI_FIELD_DESCRIPTION' ); ?>
 							</label>
 						</td>
 						<td>
@@ -327,17 +328,6 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					{
 						echo $this->form->render('params', 'group-' . $this->row->field_type );
 					} else {
-						global $global_field_types;
-						if(isset($global_field_types[0])) {
-							// Create the form
-							$pluginpath = JPATH_PLUGINS.DS.'flexicontent_fields'.DS.$global_field_types[0]->value.'.xml';
-							if (JFile::exists( $pluginpath )) {
-								$form = new JParameter('', $pluginpath);
-							} else {
-								$form = new JParameter('', JPATH_PLUGINS.DS.'flexicontent_fields'.DS.'core.xml');
-							}
-							echo $form->render('params', 'group-' . $global_field_types[0]->value );
-						}else
 						echo "<br /><span style=\"padding-left:25px;\"'>" . JText::_( 'FLEXI_APPLY_TO_SEE_THE_PARAMETERS' ) . "</span><br /><br />";
 					}
 					?>

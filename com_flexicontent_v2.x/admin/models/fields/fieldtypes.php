@@ -40,7 +40,6 @@ class JFormFieldFieldtypes extends JFormFieldList{
 	protected $type = 'Fieldtypes';
 
 	protected function getOptions() {
-		global $global_field_types;
 		$db = JFactory::getDBO();
 		
 		$query = 'SELECT element AS value, REPLACE(name, "FLEXIcontent - ", "") AS text'
@@ -53,10 +52,10 @@ class JFormFieldFieldtypes extends JFormFieldList{
 		;
 		
 		$db->setQuery($query);
-		$global_field_types = $db->loadObjectList();
+		$field_types = $db->loadObjectList();
 		
 		// This should not be neccessary as, it was already done in DB query above
-		foreach($global_field_types as $field_type) {
+		foreach($field_types as $field_type) {
 			$field_type->text = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->text);
 			$field_arr[$field_type->text] = $field_type;
 		}

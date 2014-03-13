@@ -100,3 +100,29 @@
 	background-color: white !important;
 }
 
+
+
+/***************
+ * Tables layout
+ ***************/
+
+
+div.panel table.paramlist label,
+div.panel table.paramlist input, div.panel table.paramlist textarea, div.panel table.paramlist select,
+div.panel table.paramlist img, div.panel table.paramlist button {
+	font-size: 12px;
+	font-family: arial;
+	border-radius:4px;
+}
+div table.admintable td {
+	font-weight: normal;
+	font-size: 12px;
+}
+div table.admintable td.key, div table.admintable td.paramlist_key {
+	color: #666666;
+	font-family: arial;
+	font-weight: normal;
+	font-size: 12px;
+	text-align: right;
+	border-radius: 4px;
+}

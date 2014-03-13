@@ -2119,32 +2119,33 @@ class flexicontent_html
 	 * @return array
 	 * @since 1.5
 	 */
-	static function buildfieldtypeslist($name, $class, $selected)
+	static function buildfieldtypeslist($name, $class, $selected, $group=false)
 	{
-		global $global_field_types;
-		$db = JFactory::getDBO();
-
-		$query = 'SELECT element AS value, REPLACE(name, "FLEXIcontent - ", "") AS text'
-		. ' FROM '.(FLEXI_J16GE ? '#__extensions' : '#__plugins')
-		. ' WHERE '.(FLEXI_J16GE ? 'enabled = 1' : 'published = 1')
-		. (FLEXI_J16GE ? ' AND `type`=' . $db->Quote('plugin') : '')
-		. ' AND folder = ' . $db->Quote('flexicontent_fields')
-		. ' AND element <> ' . $db->Quote('core')
-		. ' ORDER BY text ASC'
-		;
-
-		$db->setQuery($query);
-		$global_field_types = $db->loadObjectList();
-
-		// This should not be neccessary as, it was already done in DB query above
-		foreach($global_field_types as $field_type) {
-			$field_type->text = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->text);
-			$field_arr[$field_type->text] = $field_type;
+		$field_types = flexicontent_db::getfieldtypes($group);
+		if (!$group) {
+			// This should not be neccessary as, it was already done in DB query above
+			foreach($field_types as $field_type) {
+				$field_type->text = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $field_type->text);
+				$field_arr[$field_type->text] = $field_type;
+			}
+			ksort( $field_arr, SORT_STRING );
+			
+			$list = JHTML::_('select.genericlist', $field_arr, $name, $class, 'value', 'text', $selected );
+		} else {
+			$fftype = array();
+			foreach ($field_types as $field_group => $ft_types) {
+				$fftype[] = JHTML::_('select.optgroup', $field_group );
+				foreach ($ft_types as $field_type => $ftdata) {
+					$field_friendlyname = preg_replace("/FLEXIcontent[ \t]*-[ \t]*/i", "", $ftdata->text);
+					$fftype[] = JHTML::_('select.option', $field_type, $field_friendlyname);
+				}
+				$fftype[] = JHTML::_('select.optgroup', '' );
+			}
+			
+			$fieldname = FLEXI_J16GE ? 'jform[field_type]' : 'field_type';
+			$elementid = FLEXI_J16GE ? 'jform_field_type'  : 'field_type';
+			$list = JHTML::_('select.genericlist', $fftype, $fieldname, 'class="inputbox" size="1"', 'value', 'text', $selected, $elementid );
 		}
-		ksort( $field_arr, SORT_STRING );
-
-		$list = JHTML::_('select.genericlist', $field_arr, $name, $class, 'value', 'text', $selected );
-
 		return $list;
 	}
 
@@ -4950,7 +4951,53 @@ class flexicontent_db
 		$controller->setRedirect( $redirect_url, JText::sprintf('FLEXI_RECORD_CHECKED_IN_SUCCESSFULLY', 1) );
 		return;// true;
 	}
+	
+	
+	/**
+	 * Return field types grouped or not
+	 *
+	 * @return array
+	 * @since 1.5
+	 */
+	static function getfieldtypes($group=false)
+	{
+		$db = JFactory::getDBO();
 
+		$query = 'SELECT element AS value, REPLACE(name, "FLEXIcontent - ", "") AS text'
+		. ' FROM '.(FLEXI_J16GE ? '#__extensions' : '#__plugins')
+		. ' WHERE '.(FLEXI_J16GE ? 'enabled = 1' : 'published = 1')
+		. (FLEXI_J16GE ? ' AND `type`=' . $db->Quote('plugin') : '')
+		. ' AND folder = ' . $db->Quote('flexicontent_fields')
+		. ' AND element <> ' . $db->Quote('core')
+		. ' ORDER BY text ASC'
+		;
+
+		$db->setQuery($query);
+		$field_types = $db->loadObjectList('value');
+		
+		if (!$group) return $field_types;
+		
+		$ft_grps = array(
+			'Selection fields'         => array('radio', 'radioimage', 'checkbox', 'checkboximage', 'select', 'selectmultiple'),
+			'Media fields / Mini apps' => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
+			'Single property fields'   => array('date', 'text', 'textarea', 'textselect'),
+			'Muti property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers'),
+			'Item form'                => array('groupmarker'),
+			'Item relations fields'    => array('relation', 'relation_reverse'),
+			'Special action fields'    => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist')
+		);
+		foreach($ft_grps as $ft_grpname => $ft_arr) {
+			foreach($ft_arr as $ft) {
+				if ( !empty($field_types[$ft]) )
+				$field_types_grp[$ft_grpname][$ft] = $field_types[$ft];
+				unset($field_types[$ft]);
+			}
+		}
+		// Remaining fields
+		$field_types_grp['3rd-Party / Other Fields'] = $field_types;
+		
+		return $field_types_grp;
+	}
 }
 
 

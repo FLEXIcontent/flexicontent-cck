@@ -143,9 +143,7 @@ div.credits img {
  * pane TABS and sliders
  ***********************/
 
-body.contentpane {
-	font-size:12px;
-}
+
 
 
 /******************
@@ -226,6 +224,7 @@ fieldset.panelform img, fieldset.panelform button {
 	font-family: arial;
 	height: auto;
 	min-width: 60%;
+	border-radius:4px;
 }
 
 @media only screen and (min-width:1341px) and (max-width: 1680px) {
@@ -352,14 +351,14 @@ table.admintable td .controls label {
 }
 
 div table.admintable {
-	font-size:12px;
+	font-size:11px;
 	border-collapse: separate;
 	border-spacing: 2px !important;
 }
 div table.admintable td {
-	/*background-color:#F9F9F9;*/
 	border: 0px solid #F0F0F0;
 	font-weight: normal;
+	font-size: 12px;
 	text-align: left;
 	padding: 2px 4px 2px 8px;
 }
@@ -370,10 +369,11 @@ div table.admintable td.key, div table.admintable td.paramlist_key {
 	color: #666666;
 	font-family: arial;
 	font-weight: normal;
-	font-size: 11px;
+	font-size: 12px;
 	text-align: right;
 	width: 140px;
 	padding: 2px 4px 2px 4px;
+	border-radius: 4px;
 }
 
 table.admintable fieldset {

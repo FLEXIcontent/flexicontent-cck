@@ -467,46 +467,6 @@ class FlexicontentModelField extends JModelAdmin
 		return $used;
 	}
 	
-	
-	/**
-	 * Method to get list of field types used
-	 * 
-	 * @return array
-	 * @since 1.5
-	 */
-	function getFieldTypes ($group=false)
-	{
-		$query = 'SELECT plg.element AS field_type, plg.name as field_friendlyname'
-				. ' FROM ' . (FLEXI_J16GE ? '#__extensions': '#__plugins') .' AS plg'
-				. ' WHERE plg.folder="flexicontent_fields" AND plg.element<>"core"'. (FLEXI_J16GE ? ' AND plg.type="plugin" ' : '')
-				;
-		$this->_db->setQuery($query);
-		$ft_types = $this->_db->loadObjectList('field_type');
-		if (!$group) return $ft_types;
-		
-		$ft_grps = array(
-			'Selection fields'         => array('radio', 'radioimage', 'checkbox', 'checkboximage', 'select', 'selectmultiple'),
-			'Media fields / Mini apps' => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
-			'Single property fields'   => array('date', 'text', 'textarea', 'textselect'),
-			'Muti property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers'),
-			'Item form'                => array('groupmarker'),
-			'Item relations fields'    => array('relation', 'relation_reverse'),
-			'Special action fields'    => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist')
-		);
-		foreach($ft_grps as $ft_grpname => $ft_arr) {
-			//$ft_types_grp[$ft_grpname] = array();
-			foreach($ft_arr as $ft) {
-				if ( !empty($ft_types[$ft]) )
-				$ft_types_grp[$ft_grpname][$ft] = $ft_types[$ft];
-				unset($ft_types[$ft]);
-			}
-		}
-		// Remaining fields
-		$ft_types_grp['3rd-Party / Other Fields'] = $ft_types;
-		
-		return $ft_types_grp;
-	}
-	
 		
 	/**
 	 * Method to get the row form.
