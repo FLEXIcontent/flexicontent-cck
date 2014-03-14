@@ -143,8 +143,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
-			
-			
+			<param name="add_item_sef_segment" type="radio" default="1" label="FLEXI_ADD_ITEM_TO_ITEM_SEF_URLS" description="FLEXI_ADD_ITEM_TO_ITEM_SEF_URLS_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</param>
+						
 		<param name="" type="separator" default="FLEXI_MULTILINGUAL_CONF" label="" level="level1" menu="hide" />
 			
 			<param name="" type="separator" default="FLEXI_NON_NATIVE_TRANSLATIONS" label="" level="level2" menu="hide" />
@@ -230,7 +233,7 @@
 			
 	<param name="" type="separator" default="FLEXI_CONTENT_DISPLAY" label="" level="tab_close_open" description="" menu="hide" />
 		
-		<param name="" type="separator" default="FLEXI_VARIOUS_VIEWS" description="" level="level1" hr="false" menu="hide" />
+		<param name="" type="separator" default="FLEXI_VARIOUS_VIEWS" description="" level="level0" hr="false" menu="hide" />
 			
 			<param name="" type="separator" default="FLEXI_PARAMETERS_ICONS" label="" level="level3" menu="hide" />
 			<param name="show_icons" type="radio" default="1" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC" menu="hide">
@@ -250,7 +253,7 @@
 				<option value="1">FLEXI_SHOW</option>
 			</param>
 			
-			<param name="" type="separator" default="FLEXI_ITEM_VIEW" label="" level="level1" menu="hide" />
+			<param name="" type="separator" default="FLEXI_ITEM_VIEW" label="" level="level2" menu="hide" />
 			<param name="show_title" type="radio" default="1" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE" menu="hide">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -269,7 +272,7 @@
 				<option value="2">FLEXI_JOMCOMMENTS</option>
 			</param>
 			
-		<param name="" type="separator" default="FLEXI_DIRECTORY_VIEW_CONF" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_DIRECTORY_VIEW_CONF" level="level2" menu="hide" />
 		
 			<param name="cat_orderby" type="list" default="order" label="FLEXI_CATEGORY_ORDER" description="FLEXI_CATEGORY_ORDER_DESC" menu="hide" >
 				<option value="">FLEXI_USE_VIEW_DEFAULT</option>
@@ -280,16 +283,16 @@
 			<param name="catlimit" type="text" size="4" default="100" label="FLEXI_DIRECTORY_CAT_LIST_LIMIT" description="FLEXI_DIRECTORY_CAT_LIST_LIMIT_DESC" menu="hide"/>
 			
 			
-		<param name="" type="separator" default="FLEXI_TAGS_VIEW_CONF" label="" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_TAGS_VIEW_CONF" label="" level="level2" menu="hide" />
 			<param name="tags_view_default_menu_itemid" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_TAGS_DEFAULT_MENU_ITEMID" description="FLEXI_TAGS_DEFAULT_MENU_ITEMID_DESC" menu="hide" />
 		
-		<param name="" type="separator" default="FLEXI_FAVS_VIEW_CONF" label="" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_FAVS_VIEW_CONF" label="" level="level2" menu="hide" />
 			<param name="favs_view_default_menu_itemid" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_FAVS_DEFAULT_MENU_ITEMID" description="FLEXI_FAVS_DEFAULT_MENU_ITEMID_DESC" menu="hide" />
 		
-		<param name="" type="separator" default="FLEXI_SEARCH_VIEW_CONF" label="" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_SEARCH_VIEW_CONF" label="" level="level2" menu="hide" />
 			<param name="search_view_default_menu_itemid" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_SEARCH_DEFAULT_MENU_ITEMID" description="FLEXI_SEARCH_DEFAULT_MENU_ITEMID_DESC" menu="hide" />
 		
-		<param name="" type="separator" default="FLEXI_CATEGORY_VIEW_CONF" label="" level="level1" menu="hide" />
+		<param name="" type="separator" default="FLEXI_CATEGORY_VIEW_CONF" label="" level="level0" menu="hide" />
 			
 		<param name="" type="separator" default="FLEXI_PARAMETERS_CAT_INFO_OPTIONS" label="" level="level1" menu="hide" />
 			

@@ -795,6 +795,10 @@ div fieldset input, div fieldset textarea, div fieldset select, div fieldset img
 div fieldset td input, div fieldset td textarea {
 	min-width: 80%;
 }
+div fieldset td input, div fieldset td textarea, div fieldset td select {
+	border-radius:4px;
+	padding:2px 4px;;
+}
 
 #flexicontent .fc_form_title,
 #flexicontent .fc_form_alias,

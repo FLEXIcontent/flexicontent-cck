@@ -26,8 +26,11 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 function FLEXIcontentBuildRoute(&$query)
 {
 	$segments = array();
+	
 	$app = JFactory::getApplication();
-
+	$params = JComponentHelper::getParams('com_flexicontent');
+	$add_item_sef_segment = $params->get('add_item_sef_segment', 1);
+	
 	// 1. Get a menu item based on Itemid or currently active
 	$menus = $app->getMenu();
 	if (empty($query['Itemid'])) {
@@ -110,8 +113,10 @@ function FLEXIcontentBuildRoute(&$query)
 			unset($query['cid']);
 			unset($query['id']);
 		} else {
-			// EXPLICIT view (will be contained in the url)
-			$segments[] = 'item';
+			// EXPLICIT view ('item' be contained in the url), but only if configured to add 'item'
+			if ($add_item_sef_segment) {
+				$segments[] = 'item';
+			}
 			$segments[] = @$query['id'];  // Required ...
 			unset($query['cid']);
 			unset($query['id']);
@@ -159,6 +164,9 @@ function FLEXIcontentBuildRoute(&$query)
 function FLEXIcontentParseRoute($segments)
 {
 	$vars = array();
+	
+	$params = JComponentHelper::getParams('com_flexicontent');
+	$add_item_sef_segment = $params->get('add_item_sef_segment', 1);
 	
 	// 1. Get the active menu item
 	$menu = JFactory::getApplication()->getMenu()->getActive();
@@ -250,11 +258,19 @@ function FLEXIcontentParseRoute($segments)
 		return $vars;
 	}
 
-	// 5.b Segments Length 1 is 'category' view
+	// 5.b Segments Length 1 is 'category' view, unless current menu item is a category menu item, and adding /item/ is not enabled
 	if($count == 1) {
-		$vars['view'] = 'category';
-		$vars['cid'] = $segments[0];
-		return $vars;
+		$iscat_menu_item = $menu && @$menu->query['view']=='category' && @$menu->query['cid'];
+		if ($iscat_menu_item && !$add_item_sef_segment) {
+			$vars['view'] = FLEXI_ITEMVIEW;
+			$vars['cid']  = (int) $menu->query['cid'];
+			$vars['id']   = $segments[0];
+			return $vars;
+		} else {
+			$vars['view'] = 'category';
+			$vars['cid']  = $segments[0];
+			return $vars;
+		}
 	}
 
 	// 5.c Segments Length 2 is 'item(s)' view

@@ -30,6 +30,11 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			<legend><?php echo JText::_( 'FLEXI_FIELD_PROPERTIES' ); ?></legend>
 				<table class="admintable">
 					<tr>
+						<td colspan="2">
+							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_BASIC' ); ?></span>
+						</td>
+					</tr>
+					<tr>
 						<td class="key">
 							<label for="label" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_LABEL').'::'.JText::_('FLEXI_FIELD_FIELDLABEL_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_LABEL' ).'*'; ?>
@@ -105,8 +110,8 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					
 					<?php if ($this->supportsearch || $this->supportfilter) : ?>
 					<tr>
-						<td colspan="2" class="key tbl_group" >
-							<?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?>
+						<td colspan="2">
+							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?></span>
 						</td>
 					</tr>
 					<?php endif; ?>
@@ -143,8 +148,8 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 
 					<?php if ($this->supportadvsearch || $this->supportadvfilter) : ?>
 					<tr>
-						<td colspan="2" class="key tbl_group" >
-							<?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW' ); ?>
+						<td colspan="2">
+							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW' ); ?></span>
 						</td>
 					</tr>
 					<?php endif; ?>
@@ -182,8 +187,8 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php endif; ?>
 					
 					<tr>
-						<td colspan="2" class="key tbl_group" >
-							<?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?>
+						<td colspan="2">
+							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?></span>
 						</td>
 					</tr>
 					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>

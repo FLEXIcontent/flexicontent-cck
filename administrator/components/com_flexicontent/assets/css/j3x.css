@@ -117,6 +117,10 @@ input, select {
 .form-horizontal .controls {
 	margin:0px !important;
 }
+.form-horizontal div.control-label {
+	padding-top:0;
+	padding-bottom:0;
+}
 .form-horizontal .nav-tabs {
 }
 .form-horizontal .nav-tabs {
@@ -143,6 +147,11 @@ input, select {
 	border: 1px solid lightgray;
 }
 
+.form-horizontal .tabs-left > .nav-tabs .active > a,
+.form-horizontal .tabs-left > .nav-tabs .active > a:hover,
+.form-horizontal .tabs-left > .nav-tabs .active > a:focus {
+    border-color: #A9A9A9 rgba(0, 0, 0, 0) #A9A9A9 #A9A9A9;
+}
 
 /********************
  * Permissions slider
