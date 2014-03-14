@@ -30,6 +30,11 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			<legend><?php echo JText::_( 'FLEXI_FIELD_PROPERTIES' ); ?></legend>
 				<table class="admintable">
 					<tr>
+						<td colspan="2">
+							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_BASIC' ); ?></span>
+						</td>
+					</tr>
+					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('label').'*'; ?>
 						</td>

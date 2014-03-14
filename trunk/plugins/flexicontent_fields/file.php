@@ -273,7 +273,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$downloadstext  = JText::_($downloadstext);
 		$downloadsinfo  = JText::_('FLEXI_FIELD_FILE_DOWNLOAD_INFO', true);
 		
-		$allowview = $field->parameters->get( 'allowview', 1 ) ;
+		$allowview = $field->parameters->get( 'allowview', 0 ) ;
 		$viewtext  = $allowview==2 ? $field->parameters->get( 'viewtext', 'FLEXI_FIELD_FILE_VIEW' ) : 'FLEXI_FIELD_FILE_VIEW';
 		$viewtext  = JText::_($viewtext);
 		$viewinfo  = JText::_('FLEXI_FIELD_FILE_VIEW_INFO', true);

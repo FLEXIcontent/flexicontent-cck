@@ -157,7 +157,7 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 		$field->label = JText::_($field->label);
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
-		if($field->value[0] != '') {
+		if ( !empty($field->value[0]) ) {
 			// get value
 			$value = $value ? unserialize($value) : unserialize($field->value[0]) ;
 	

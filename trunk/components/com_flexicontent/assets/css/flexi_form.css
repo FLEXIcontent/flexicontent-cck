@@ -401,20 +401,38 @@ body.contentpane  {
 	font-family:tahoma;
 	font-size:12px;
 }
-.fcsep_level1 {
-	padding:6px 2% 6px 2%;
+.fcsep_level0 {
+	padding:6px 2% 6px 1%;
 	margin:2px 0% 0 0%;
 	clear:both; display:block;
 	float:left;
 	position:relative;
 	left:0%;
+	width:97%;
+	border:3px double;
+	background-color:darkcyan;
+	color:#fff;
+	font-weight:normal;
+	font-family:tahoma;
+	font-size:14px;
+	border-radius:0px;
+}
+.fcsep_level1 {
+	padding:6px 2% 6px 2%;
+	margin:3px 0 0px 3px;
+	clear:both;
+	display:block;
+	float:left;
+	position:relative;
+	left:0%;
 	width:96%;
-	border:1px outset #E9E9E9;
+	border:none;
 	background-color:#333;
 	color:#fff;
 	font-weight:normal;
 	font-family:tahoma;
 	font-size:14px;
+	border-radius:8px;
 }
 .fcsep_level2 {
 	padding:6px 2%;
@@ -423,7 +441,6 @@ body.contentpane  {
 	display:block;
 	float:left;
 	position:relative;
-	'.$pos_left.$width_vals.'
 	border: 1px outset #E9E9E9;
 	background-color:#aaa;
 	color:#000;
