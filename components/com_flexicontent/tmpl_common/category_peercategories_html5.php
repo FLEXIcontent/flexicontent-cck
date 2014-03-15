@@ -21,7 +21,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
 
 <?php
-$n = count($this->categories);
 $i = 0;
 $layout = JRequest::getCmd('layout', '');
 
@@ -52,8 +51,8 @@ $peercat_cont_class = $show_description_peercat ? "fc_block"  : "fc_inline_block
 $peercat_info_class = $show_description_peercat ? "fc_inline_clear" : "fc_inline";
 
 $peercats_html = array();
-foreach ($this->categories as $sub) {
-	$subsubcount = count($sub->peercats);
+foreach ($this->peercats as $sub) {
+	$subsubcount = count($sub->subcats);
 	
 	// a. Optional sub-category image
 	$peercats_html[$i] = "<span class='floattext peercat ".$peercat_cont_class."'>\n";
@@ -68,7 +67,7 @@ foreach ($this->categories as $sub) {
 		JRoute::_( FlexicontentHelperRoute::getCategoryRoute($sub->slug) );
 	$infocount_str = '';
 	if ($show_itemcount)   $infocount_str .= (int) $sub->assigneditems . $itemcount_label;
-	if ($show_subcatcount) $infocount_str .= ($show_itemcount ? ' / ' : '').count($sub->peercats) . $peercatcount_label;
+	if ($show_subcatcount) $infocount_str .= ($show_itemcount ? ' / ' : '').count($sub->subcats) . $peercatcount_label;
 	if ($infocount_str) $infocount_str = ' (' . $infocount_str . ')';
 	$peercats_html[$i] .= "    <a class='catlink' href='".$cat_link."'>".$this->escape($sub->title)."</a>".$infocount_str."</span>\n";
 	

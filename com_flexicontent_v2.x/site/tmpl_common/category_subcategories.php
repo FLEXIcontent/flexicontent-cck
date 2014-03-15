@@ -20,7 +20,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
 
 <?php
-$n = count($this->categories);
 $i = 0;
 $layout = JRequest::getCmd('layout', '');
 

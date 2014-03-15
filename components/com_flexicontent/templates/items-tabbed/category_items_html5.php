@@ -26,13 +26,19 @@ JFactory::getDocument()->addScript( JURI::base(true).'/components/com_flexiconte
 JFactory::getDocument()->addStyleSheet(JURI::base(true).'/components/com_flexicontent/assets/css/tabber.css');
 ?>
 
-<aside class="group">
 <?php
+	ob_start();
+	
 	// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
 	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
 	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_html5.php');
+	
+	$filter_form_html = trim(ob_get_contents());
+	ob_end_clean();
+	if ( $filter_form_html ) {
+		echo '<aside class="group">'."\n".$filter_form_html."\n".'</aside>';
+	}
 ?>
-</aside>
 
 <div class="fcclear"></div>
 
