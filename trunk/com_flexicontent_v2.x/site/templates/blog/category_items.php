@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 1674 2013-04-18 03:41:15Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 1822 2013-12-23 02:58:40Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -22,14 +22,19 @@ $tmpl = $this->tmpl;
 $user = JFactory::getUser();
 ?>
 
-<div class="group">
 <?php
+	ob_start();
+	
 	// Form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
 	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
 	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form.php');
+	
+	$filter_form_html = trim(ob_get_contents());
+	ob_end_clean();
+	if ( $filter_form_html ) {
+		echo '<div class="group">'."\n".$filter_form_html."\n".'</div>';
+	}
 ?>
-</div>
-
 <div class="clear"></div>
 
 <?php

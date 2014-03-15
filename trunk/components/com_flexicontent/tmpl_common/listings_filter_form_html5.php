@@ -1,10 +1,18 @@
-<form action="<?php echo $this->action; ?>" method="post" id="adminForm" onsubmit="" class="group well">
-
 <?php
-	// Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
-	// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
-	include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_body_html5.php');
+ob_start();
+
+// Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
+// If customizing via CSS rules or JS scripts is not enough, then please copy the following file here to customize the HTML too
+include(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'tmpl_common'.DS.'listings_filter_form_body_html5.php');
+
+$filter_form_body = trim(ob_get_contents());
+ob_end_clean();
+if ( empty($filter_form_body) ) return;
 ?>
+
+<form action="<?php echo $this->action; ?>" method="post" id="adminForm" onsubmit="" class="group">
+
+<?php echo $filter_form_body; ?>
 
 <?php if ( JRequest::getVar('clayout') == $this->params->get('clayout', 'blog') ) :?>
 	<input type="hidden" name="clayout" value="<?php echo JRequest::getVar('clayout'); ?>" />

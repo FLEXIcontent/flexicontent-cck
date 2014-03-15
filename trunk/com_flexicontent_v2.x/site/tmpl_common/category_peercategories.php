@@ -20,7 +20,6 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 ?>
 
 <?php
-$n = count($this->peercats);
 $i = 0;
 $layout = JRequest::getCmd('layout', '');
 
