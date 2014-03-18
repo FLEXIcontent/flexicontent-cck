@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <install type="component" version="1.5.0" method="upgrade">
 	<name>FLEXIcontent</name>
-	<creationDate>14 March 2014</creationDate>
+	<creationDate>18 March 2014</creationDate>
 	<author>Emmanuel Danan, Georgios Papadakis</author>
 	<copyright>(C) 2009-2013 Emmanuel Danan</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>2.1.3 r1871</version>
+	<version>2.1.3 r1873</version>
 	<description>A flexible content management system for Joomla! J1.5/J2.5/J3.2</description>
 
 	<languages folder="site/language">
@@ -123,7 +123,7 @@
 	</administration>
 
 <additional>
-	<plugin name="addressint"       folder="plugins/addressint"       instfolder="flexicontent_fields">FLEXIcontent - Address International / Google Maps</plugin>
+	<plugin name="addressint"       folder="plugins/addressint"       instfolder="flexicontent_fields">FLEXIcontent - International Address / Google Maps</plugin>
 	<plugin name="checkbox"         folder="plugins/checkbox"         instfolder="flexicontent_fields">FLEXIcontent - Checkbox</plugin>
 	<plugin name="checkboximage"    folder="plugins/checkboximage"    instfolder="flexicontent_fields">FLEXIcontent - Checkbox Image</plugin>
 	<plugin name="core"             folder="plugins/core"             instfolder="flexicontent_fields">FLEXIcontent - Core Fields (Joomla article properties)</plugin>
@@ -137,15 +137,15 @@
 	<plugin name="image"            folder="plugins/image"            instfolder="flexicontent_fields">FLEXIcontent - Image or Gallery (image + details)</plugin>
 	<plugin name="linkslist"        folder="plugins/linkslist"        instfolder="flexicontent_fields">FLEXIcontent - HTML list of URLs/Anchors/JS links</plugin>
 	<plugin name="minigallery"      folder="plugins/minigallery"      instfolder="flexicontent_fields">FLEXIcontent - Mini-Gallery (image-only slideshow)</plugin>
-	<plugin name="phonenumbers"     folder="plugins/phonenumbers"     instfolder="flexicontent_fields">FLEXIcontent - Phone Numbers</plugin>
+	<plugin name="phonenumbers"     folder="plugins/phonenumbers"     instfolder="flexicontent_fields">FLEXIcontent - International Phone Numbers</plugin>
 	<plugin name="radio"            folder="plugins/radio"            instfolder="flexicontent_fields">FLEXIcontent - Radio</plugin>
 	<plugin name="radioimage"       folder="plugins/radioimage"       instfolder="flexicontent_fields">FLEXIcontent - Radio Image</plugin>
-	<plugin name="relation"         folder="plugins/relation"         instfolder="flexicontent_fields">FLEXIcontent - Relation (List of related items</plugin>
+	<plugin name="relation"         folder="plugins/relation"         instfolder="flexicontent_fields">FLEXIcontent - Relation (List of related items)</plugin>
 	<plugin name="relation_reverse" folder="plugins/relation_reverse" instfolder="flexicontent_fields">FLEXIcontent - Relation - Reverse</plugin>
 	<plugin name="select"           folder="plugins/select"           instfolder="flexicontent_fields">FLEXIcontent - Select</plugin>
 	<plugin name="selectmultiple"   folder="plugins/selectmultiple"   instfolder="flexicontent_fields">FLEXIcontent - Select Multiple</plugin>
-	<plugin name="sharedaudio"      folder="plugins/sharedaudio"      instfolder="flexicontent_fields">FLEXIcontent - Shared Audio (youtube,vimeo,dailymotion,etc)</plugin>
-	<plugin name="sharedvideo"      folder="plugins/sharedvideo"      instfolder="flexicontent_fields">FLEXIcontent - Shared Video (youtube,vimeo,dailymotion,etc)</plugin>
+	<plugin name="sharedaudio"      folder="plugins/sharedaudio"      instfolder="flexicontent_fields">FLEXIcontent - Shared Audio (SoundCloud,Spotify,Last.fm,etc)</plugin>
+	<plugin name="sharedvideo"      folder="plugins/sharedvideo"      instfolder="flexicontent_fields">FLEXIcontent - Shared Video (YouTube,Vimeo,DailyMotion,etc)</plugin>
 	<plugin name="text"             folder="plugins/text"             instfolder="flexicontent_fields">FLEXIcontent - Text (number/time/etc/custom validation)</plugin>
 	<plugin name="textarea"         folder="plugins/textarea"         instfolder="flexicontent_fields">FLEXIcontent - Textarea</plugin>
 	<plugin name="textselect"       folder="plugins/textselect"       instfolder="flexicontent_fields">FLEXIcontent - TextSelect (Text with existing value selection)</plugin>

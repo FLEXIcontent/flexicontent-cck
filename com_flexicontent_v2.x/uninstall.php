@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: uninstall.php 1800 2013-11-01 04:30:57Z ggppdk $
+ * @version 1.5 stable $Id: uninstall.php 1856 2014-02-20 10:10:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -18,13 +18,6 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-?>
-<style type="text/css">
-table.adminlist tbody tr td {
-	height: auto!important;
-}
-</style>
-<?php
 
 // Joomla version variables
 if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE')) {
@@ -34,6 +27,9 @@ if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion-
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
 
 
+		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
+		echo '<p>' . JText::_('Uninstalling FLEXIcontent ' . $this->release) . '</p>';
+		
 		// init vars
 		$error = false;
 		$extensions = array();

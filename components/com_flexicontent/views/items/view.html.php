@@ -805,7 +805,6 @@ class FlexicontentViewItems  extends JViewLegacy
 			}
 
 			// c. Create main text field, via calling the display function of the textarea field (will also check for tabs)
-			// NOTE: We use the text created by the model and not the text retrieved by the CORE plugin code, which maybe overwritten with JoomFish data
 			if ($field->field_type == 'maintext')
 			{
 				if ( isset($item->item_translations) ) {
@@ -822,7 +821,9 @@ class FlexicontentViewItems  extends JViewLegacy
 					}
 				}
 				$field->name = 'text';
-				//$field->value[0] = htmlspecialchars($item->text, ENT_COMPAT, 'UTF-8');  // will be handled by textarea field
+				// NOTE: We use the text created by the model and not the text retrieved by the CORE plugin code, which maybe overwritten with JoomFish/Falang data
+				$field->value[0] = $item->text; // do not decode special characters this was handled during saving !
+				// Render the field's (form) HTML
 				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
 			}
 		}

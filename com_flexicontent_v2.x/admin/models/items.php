@@ -872,6 +872,10 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 
 		if ( $filter_cats ) {
+			// Limit sub-category items by main or by main/secondary item's cats , TODO: add if ... needed
+			//$cat_type = ($filter_maincat) ? 'i.catid' : 'rel.catid';
+			$cat_type = 'rel.catid';
+			
 			if ( $filter_subcats ) {
 				global $globalcats;
 				
@@ -888,10 +892,10 @@ class FlexicontentModelItems extends JModelLegacy
 					}
 				}
 				if ( empty ($_sub_cids) ) $where[] = ' FALSE  ';
-				else $where[] = '(rel.catid IN (' . implode( ', ', $_sub_cids ) . ')' .' OR '. 'c.id IN (' . implode( ', ', $_sub_cids ) . '))';
+				else $where[] = '('.$cat_type.' IN (' . implode( ', ', $_sub_cids ) . ')' .' OR '. 'c.id IN (' . implode( ', ', $_sub_cids ) . '))';
 				
 			} else {
-				$where[] = 'rel.catid = ' . $filter_cats;
+				$where[] = $cat_type.' = ' . $filter_cats;
 			}
 		} else {
 			if ($filter_catsinstate == 1) {

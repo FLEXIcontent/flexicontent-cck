@@ -18,13 +18,6 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-?>
-<style type="text/css">
-table.adminlist tbody tr td {
-	height: auto!important;
-}
-</style>
-<?php
 
 // Joomla version variables
 if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE')) {
@@ -34,6 +27,9 @@ if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion-
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
 
 
+		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
+		echo '<p>' . JText::_('Uninstalling FLEXIcontent ' . $this->release) . '</p>';
+		
 		// init vars
 		$error = false;
 		$extensions = array();
