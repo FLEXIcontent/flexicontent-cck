@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1694 2013-07-12 09:42:03Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1853 2014-02-17 23:48:45Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -44,23 +44,24 @@ class FlexicontentViewItem extends JViewLegacy
 		global $globalcats;
 		$categories = $globalcats;		
 		
-		$mainframe  = JFactory::getApplication();
+		$app        = JFactory::getApplication();
 		$dispatcher = JDispatcher::getInstance();
 		$document   = JFactory::getDocument();
 		$session    = JFactory::getSession();
 		$user       = JFactory::getUser();
 		$db         = JFactory::getDBO();
-		
-		$params     = clone( JComponentHelper::getParams('com_flexicontent') );
 		$option     = JRequest::getVar('option');
 		$nullDate   = $db->getNullDate();
+		
+		// Get the COMPONENT only parameters
+		$params     = clone( JComponentHelper::getParams('com_flexicontent') );
 		
 		if (!FLEXI_J16GE) {
 			jimport('joomla.html.pane');
 			$pane   = JPane::getInstance('sliders');
 			$editor = JFactory::getEditor();
 		}
-
+		
 		// Some flags
 		$enable_translation_groups = $params->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 		$print_logging_info = $params->get('print_logging_info');
@@ -72,8 +73,9 @@ class FlexicontentViewItem extends JViewLegacy
 		// *****************
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		flexicontent_html::loadJQuery();
-
+		flexicontent_html::loadFramework('jQuery');
+		flexicontent_html::loadFramework('select2');
+		
 		// Load custom behaviours: form validation, popup tooltips
 		//JHTML::_('behavior.formvalidation');
 		JHTML::_('behavior.tooltip');
@@ -99,14 +101,17 @@ class FlexicontentViewItem extends JViewLegacy
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		
 		$model = $this->getModel();
-		$row   = $this->get('Item');
+		$item   = $this->get('Item');
 		if (FLEXI_J16GE) {
-			$form  = $this->get('Form');
+			$form = $this->get('Form');
 		}
 		
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
+
+		// ***************************
 		// Get Associated Translations
+		// ***************************
 		if ($enable_translation_groups)  $langAssocs = $this->get( 'LangAssocs' );
 		if (FLEXI_FISH || FLEXI_J16GE)   $langs = FLEXIUtilities::getLanguages('code');
 
@@ -116,7 +121,7 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		// Get user allowed permissions on the item ... to be used by the form rendering
 		// Also hide parameters panel if user can not edit parameters
-		$perms = $this->_getItemPerms($row);
+		$perms = $this->_getItemPerms($item);
 		if (!$perms['canparams'])  $document->addStyleDeclaration( (FLEXI_J16GE ? '#details-options' : '#det-pane') .'{display:none;}');
 		
 		// Create and set a unique item id for plugins that needed it
@@ -142,7 +147,7 @@ class FlexicontentViewItem extends JViewLegacy
 		{
 			if ( $k && ( $k % $versionsperpage == 0 ) )
 				$current_page++;
-			if ( $v->nr == $row->version ) break;
+			if ( $v->nr == $item->version ) break;
 			$k++;
 		}
 		
@@ -189,7 +194,7 @@ class FlexicontentViewItem extends JViewLegacy
 			if ( $isAdmin && FLEXI_J16GE ) JFactory::$application = JApplication::getInstance('site');
 			
 			// Create the URL
-			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug) . $autologin );
+			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug) . $autologin );
 			
 			// Check if we are in the backend again
 			// In backend we need to remove administrator from URL as it is added even though we've set the application to the site app
@@ -206,23 +211,23 @@ class FlexicontentViewItem extends JViewLegacy
 			
 			$previewlink     = /*$server .*/ $item_url;
 			$previewlink     = str_replace('&amp;', '&', $previewlink);
-			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $categories[$row->catid]->slug)) .$autologin;
+			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)) .$autologin;
 
-			if ( !$params->get('use_versioning', 1) || ($row->version == $row->current_version && $row->version == $row->last_version) )
+			if ( !$params->get('use_versioning', 1) || ($item->version == $item->current_version && $item->version == $item->last_version) )
 			{
 				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('Preview').'</a>', 'preview' );
 			} else {
 				// Add a preview button for (currently) LOADED version of the item
-				$previewlink_loaded_ver = $previewlink .'&version='.$row->version;
-				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_loaded_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION').' ['.$row->version.']</a>', 'preview' );
+				$previewlink_loaded_ver = $previewlink .'&version='.$item->version;
+				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_loaded_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FORM_LOADED_VERSION').' ['.$item->version.']</a>', 'preview' );
 
 				// Add a preview button for currently ACTIVE version of the item
-				$previewlink_active_ver = $previewlink .'&version='.$row->current_version;
-				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_active_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$row->current_version.']</a>', 'preview' );
+				$previewlink_active_ver = $previewlink .'&version='.$item->current_version;
+				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_active_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$item->current_version.']</a>', 'preview' );
 
 				// Add a preview button for currently LATEST version of the item
-				$previewlink_last_ver = $previewlink .'&preview='.$row->last_version;
-				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_last_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$row->last_version.']</a>', 'preview' );
+				$previewlink_last_ver = $previewlink .'&preview='.$item->last_version;
+				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_last_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$item->last_version.']</a>', 'preview' );
 			}
 			JToolBarHelper::spacer();
 			JToolBarHelper::divider();
@@ -232,16 +237,20 @@ class FlexicontentViewItem extends JViewLegacy
 		// Common Buttons
 		if (FLEXI_J16GE) {
 			JToolBarHelper::apply('items.apply');
-			if (!$isnew || $row->version) JToolBarHelper::save('items.save');
-			if (!$isnew || $row->version) JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+			if (!$isnew || $item->version) JToolBarHelper::save('items.save');
+			if (!$isnew || $item->version) JToolBarHelper::custom( 'items.saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 			JToolBarHelper::cancel('items.cancel');
 		} else {
 			JToolBarHelper::apply();
-			if (!$isnew || $row->version) JToolBarHelper::save();
-			if (!$isnew || $row->version) JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
+			if (!$isnew || $item->version) JToolBarHelper::save();
+			if (!$isnew || $item->version) JToolBarHelper::custom( 'saveandnew', 'savenew.png', 'savenew.png', 'FLEXI_SAVE_AND_NEW', false );
 			JToolBarHelper::cancel();
 		}
 		
+		
+		// Check if saving an item that translates an original content in site's default language
+		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($item->language, 0,2);
+		$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
 		
 		// *****************************************************************************
 		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
@@ -253,17 +262,13 @@ class FlexicontentViewItem extends JViewLegacy
 		$fields = $this->get( 'Extrafields' );
 		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
-		// Check if saving an item that translates an original content in site's default language
-		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($row->language, 0,2);
-		$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $row->lang_parent_id && $row->lang_parent_id!=$row->id;
-		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		foreach ($fields as $field)
 		{
 			// a. Apply CONTENT TYPE customizations to CORE FIELDS, e.g a type specific label & description
 			// NOTE: the field parameters are already created so there is not need to call this for CUSTOM fields, which do not have CONTENT TYPE customizations
 			if ($field->iscore) {
-				FlexicontentFields::loadFieldConfig($field, $row);
+				FlexicontentFields::loadFieldConfig($field, $item);
 			}
 
 			// b. Create field 's editing HTML (the form field)
@@ -278,24 +283,24 @@ class FlexicontentViewItem extends JViewLegacy
 					$is_editable = 1;
 
 				if ( !$is_editable ) {
-					$field->html = '<div class="fc_mini_note_box">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
+					$field->html = '<div class="fc-mssg fc-warning">'. JText::_('FLEXI_NO_ACCESS_LEVEL_TO_EDIT_FIELD') . '</div>';
 				} else if ($modify_untraslatable_values && $field->untranslatable) {
-					$field->html = '<div class="fc_mini_note_box">'. JText::_('FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE') . '</div>';
+					$field->html = '<div class="fc-mssg fc-note">'. JText::_('FLEXI_FIELD_VALUE_IS_UNTRANSLATABLE') . '</div>';
 				} else {
-					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$row ));
+					FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayField', array( &$field, &$item ));
 				}
 			}
 
 			// c. Create main text field, via calling the display function of the textarea field (will also check for tabs)
 			if ($field->field_type == 'maintext')
 			{
-				if ( isset($row->item_translations) ) {
-					$shortcode = substr($row->language ,0,2);
-					foreach ($row->item_translations as $lang_id => $t)	{
+				if ( isset($item->item_translations) ) {
+					$shortcode = substr($item->language ,0,2);
+					foreach ($item->item_translations as $lang_id => $t)	{
 						if ($shortcode == $t->shortcode) continue;
 						$field->name = array('jfdata',$t->shortcode,'text');
 						$field->value[0] = html_entity_decode($t->fields->text->value, ENT_QUOTES, 'UTF-8');
-						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$row) );
+						FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
 						$t->fields->text->tab_labels = $field->tab_labels;
 						$t->fields->text->html = $field->html;
 						unset( $field->tab_labels );
@@ -304,9 +309,9 @@ class FlexicontentViewItem extends JViewLegacy
 				}
 				$field->name = 'text';
 				// NOTE: We use the text created by the model and not the text retrieved by the CORE plugin code, which maybe overwritten with JoomFish/Falang data
-				$field->value[0] = $row->text; // do not decode special characters this was handled during saving !
+				$field->value[0] = $item->text; // do not decode special characters this was handled during saving !
 				// Render the field's (form) HTML
-				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$row) );
+				FLEXIUtilities::call_FC_Field_Func('textarea', 'onDisplayField', array(&$field, &$item) );
 			}
 		}
 		if ( $print_logging_info ) $fc_run_times['render_field_html'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -316,7 +321,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// Get tags used by the item
 		// *************************
 		
-		$usedtagsIds = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($row->tags)
+		$usedtagsIds = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
 		$usedtags = $model->getUsedtagsData($usedtagsIds);
 		
 		
@@ -324,29 +329,30 @@ class FlexicontentViewItem extends JViewLegacy
 		// Get categories used by the item
 		// *******************************
 		
-		if ($cid) {
-			// NOTE: This will normally return the already set versioned value of categories ($row->categories)
-			$selectedcats	= $this->get( 'Catsselected' );
-		} else {
+		if ($isnew) {
+			// Case for preselected main category for new items
 			$maincat = JRequest::getInt('maincat', 0);
 			if (!$maincat) {
-				$maincat = $mainframe->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
+				$maincat = $app->getUserStateFromRequest( $option.'.items.filter_cats', 'filter_cats', '', 'int' );
 			}
 			if ($maincat) {
 				$selectedcats = array($maincat);
-				$row->catid = $maincat;
+				$item->catid = $maincat;
 			} else {
 				$selectedcats = array();
 			}
+		} else {
+			// NOTE: This will normally return the already set versioned value of categories ($item->categories)
+			$selectedcats = $this->get( 'Catsselected' );
 		}
 
 		//$selectedcats 	= $isnew ? array() : $fields['categories']->value;
 
-		//echo "<br>row->tags: "; print_r($row->tags);
+		//echo "<br>row->tags: "; print_r($item->tags);
 		//echo "<br>usedtagsIds: "; print_r($usedtagsIds);
 		//echo "<br>usedtags (data): "; print_r($usedtags);
 
-		//echo "<br>row->categories: "; print_r($row->categories);
+		//echo "<br>row->categories: "; print_r($item->categories);
 		//echo "<br>selectedcats: "; print_r($selectedcats);
 		
 		
@@ -356,33 +362,31 @@ class FlexicontentViewItem extends JViewLegacy
 		// (a) form XML file to declare them and then (b) getInput() method form field to create them
 		// *********************************************************************************************
 		
-		// First clean form data
-		JFilterOutput::objectHTMLSafe( $row, ENT_QUOTES );
+		// First clean form data, we do this after creating the description field which may contain HTML
+		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES );
 		
 		flexicontent_html::loadFramework('select2');
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		$lists = array();
-
-		//buid types selectlist
-		$class   = 'required use_select2_lib';
-		$attribs = 'class="'.$class.'"';
-		$fieldname = FLEXI_J16GE ? 'jform[type_id]' : 'type_id';
-		$elementid = FLEXI_J16GE ? 'jform_type_id'  : 'type_id';
-		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected->id, 1, $attribs, $elementid, $check_perms=true );
 		
 		// build granular access list
-		if (FLEXI_ACCESS) {
-			if (isset($user->level)) {
-			$lists['access'] = FAccess::TabGmaccess( $row, 'item', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
+		if (!FLEXI_J16GE) {
+			if (FLEXI_ACCESS) {
+				if (isset($user->level)) {
+					$lists['access'] = FAccess::TabGmaccess( $item, 'item', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
+				} else {
+					$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
+				}
 			} else {
-				$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
+				$lists['access'] = JHTML::_('list.accesslevel', $item); // created but not used in J1.5 backend form
 			}
 		}
-
+		
+		
 		// build state list
 		$_arc_ = FLEXI_J16GE ? 2:-1;
-		$non_publishers_stategrp    = $perms['isSuperAdmin'] || $row->state==-3 || $row->state==-4 ;
-		$special_privelege_stategrp = ($row->state==$_arc_ || $perms['canarchive']) || ($row->state==-2 || $perms['candelete']) ;
+		$non_publishers_stategrp    = $perms['isSuperAdmin'] || $item->state==-3 || $item->state==-4 ;
+		$special_privelege_stategrp = ($item->state==$_arc_ || $perms['canarchive']) || ($item->state==-2 || $perms['candelete']) ;
 		
 		$state = array();
 		if ($non_publishers_stategrp || $special_privelege_stategrp)
@@ -396,23 +400,22 @@ class FlexicontentViewItem extends JViewLegacy
 			$state[] = JHTML::_('select.optgroup', '' );
 			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_NON_PUBLISHERS_WORKFLOW_STATES' ) );
 		}
-		if ($row->state==-3 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
-		if ($row->state==-4 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
+		if ($item->state==-3 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
+		if ($item->state==-4 || $perms['isSuperAdmin'])  $state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
 		
 		// Special access states
 		if ( $special_privelege_stategrp ) {
 			$state[] = JHTML::_('select.optgroup', '' );
 			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_SPECIAL_ACTION_STATES' ) );
 		}
-		if ($row->state==$_arc_ || $perms['canarchive']) $state[] = JHTML::_('select.option',  $_arc_, JText::_( 'FLEXI_ARCHIVED' ) );
-		if ($row->state==-2     || $perms['candelete'])  $state[] = JHTML::_('select.option',  -2,     JText::_( 'FLEXI_TRASHED' ) );
+		if ($item->state==$_arc_ || $perms['canarchive']) $state[] = JHTML::_('select.option',  $_arc_, JText::_( 'FLEXI_ARCHIVED' ) );
+		if ($item->state==-2     || $perms['candelete'])  $state[] = JHTML::_('select.option',  -2,     JText::_( 'FLEXI_TRASHED' ) );
 		
-		if( !$perms['canpublish'] )  $row->state = $row->state ? $row->state : -4;
 		$fieldname = FLEXI_J16GE ? 'jform[state]' : 'state';
 		$elementid = FLEXI_J16GE ? 'jform_state'  : 'state';
 		$class = 'inputbox use_select2_lib';
 		$attribs = 'class="'.$class.'"';
-		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $row->state, $elementid );
+		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
 		
 		// *** BOF: J2.5 SPECIFIC SELECT LISTS
 		if (FLEXI_J16GE)
@@ -425,7 +428,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$options[] = JHTML::_('select.option',  0, JText::_( 'FLEXI_NO' ) );
 			$options[] = JHTML::_('select.option',  1, JText::_( 'FLEXI_YES' ) );
 			$attribs = FLEXI_J16GE ? ' style ="float:none!important;" '  :  '';   // this is not right for J1.5' style ="float:left!important;" ';
-			$lists['featured'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $row->featured, $elementid);
+			$lists['featured'] = JHTML::_('select.radiolist', $options, $fieldname, $attribs, 'value', 'text', $item->featured, $elementid);
 			*/
 			$classes = !$prettycheckable_added ? '' : ' use_prettycheckable ';
 			$attribs = ' class="'.$classes.'" ';
@@ -433,7 +436,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$options = array(0=>JText::_( 'FLEXI_NO' ), 1=>JText::_( 'FLEXI_YES' ) );
 			$lists['featured'] = '';
 			foreach ($options as $option_id => $option_label) {
-				$checked = $option_id==$row->featured ? ' checked="checked"' : '';
+				$checked = $option_id==$item->featured ? ' checked="checked"' : '';
 				$elementid_no = $elementid.'_'.$i;
 				if (!$prettycheckable_added) $lists['featured'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
 				$extra_params = !$prettycheckable_added ? '' : ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
@@ -479,7 +482,7 @@ class FlexicontentViewItem extends JViewLegacy
 		} else {
 			// b. Check if notification emails to subscribers , were already sent during current session
 			$subscribers_notified = $session->get('subscribers_notified', array(),'flexicontent');
-			if ( !empty($subscribers_notified[$row->id]) ) {
+			if ( !empty($subscribers_notified[$item->id]) ) {
 				$lists['notify'] = JText::_('FLEXI_SUBSCRIBERS_ALREADY_NOTIFIED');
 			} else {
 				// build favs notify field
@@ -513,12 +516,14 @@ class FlexicontentViewItem extends JViewLegacy
 			max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES',true).'";
 		');
 		
+		
 		// Creating categorories tree for item assignment, we use the 'create' privelege
 		$actions_allowed = array('core.create');
 
 		// Featured categories form field
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
 		$featured_cats = array();
+		$enable_featured_cid_selector = $perms['multicat'] && ($isnew || $perms['canchange_featcat']);
 		if ( $featured_cats_parent )
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
@@ -526,41 +531,101 @@ class FlexicontentViewItem extends JViewLegacy
 			foreach($selectedcats as $featured_cat) if (isset($featured_tree[$featured_cat])) $featured_sel[] = $featured_cat;
 			
 			$class  = "use_select2_lib select2_list_selected";
-			$attribs = 'class="'.$class.'" multiple="multiple" size="8"';
+			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
+			$attribs .= $enable_featured_cid_selector ? '' : ' disabled="disabled"';
+			
 			$fieldname = FLEXI_J16GE ? 'jform[featured_cid][]' : 'featured_cid[]';
-			$lists['featured_cid'] = flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed);
+			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed);
+		}
+		else{
+			// Do not display, if not configured or not allowed to the user
+			$lists['featured_cid'] = false;
 		}
 		
+		
 		// Multi-category form field, for user allowed to use multiple categories
-		$class  = "mcat use_select2_lib select2_list_selected";
-		$class .= $max_cat_assign ? " validate-fccats" : "";
-		$attribs = 'multiple="multiple" size="20" class="'.$class.'"';
-		$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
-		$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
-		$lists['cid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $selectedcats, false, $attribs, true, true,
-			$actions_allowed, $require_all=true, $skip_subtrees, $disable_subtrees=array());
-
+		$lists['cid'] = '';
+		$enable_cid_selector = $perms['multicat'] && ($isnew || $perms['canchange_seccat']);
+		if ( 1 )
+		{
+			// Get author's maximum allowed categories per item and set js limitation
+			$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
+			$document->addScriptDeclaration('
+				max_cat_assign_fc = '.$max_cat_assign.';
+				existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
+				max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES',true).'";
+			');
+			
+			$class  = "mcat use_select2_lib select2_list_selected";
+			$class .= $max_cat_assign ? " validate-fccats" : " validate";
+			
+			$attribs  = 'class="'.$class.'" multiple="multiple" size="20"';
+			$attribs .= $enable_cid_selector ? '' : ' disabled="disabled"';
+			
+			$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
+			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
+			$lists['cid'] = ($enable_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+				flexicontent_cats::buildcatselect($categories, $fieldname, $selectedcats, false, $attribs, true, true,
+				$actions_allowed, $require_all=true, $skip_subtrees, $disable_subtrees=array());
+		}
+		else {
+			if ( count($selectedcats)>1 ) {
+				foreach ($selectedcats as $catid) {
+					$cat_titles[$catid] = $globalcats[$catid]->title;
+				}
+				$lists['cid'] .= implode(', ', $cat_titles);
+			} else {
+				$lists['cid'] = false;
+			}
+		}
+		
+		
 		// Main category form field
-		$attribs = 'class="scat validate-catid use_select2_lib"';
+		$class = 'scat use_select2_lib';
+		if ($perms['multicat']) {
+			$class .= ' validate-catid';
+		} else {
+			$class .= ' required';
+		}
+		$attribs = 'class="'.$class.'"';
 		$fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
-		$lists['catid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $row->catid, 2, $attribs, true, true, $actions_allowed);
+		
+		$enable_catid_selector =  $isnew || $perms['canchange_cat'];
+		if ( 1 ) {
+			$disabled = $enable_catid_selector ? '' : ' disabled="disabled"';
+			$attribs .= $disabled;
+			$lists['catid'] = ($enable_catid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+				flexicontent_cats::buildcatselect($categories, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed);
+		} else {
+			$lists['catid'] = $globalcats[$item->catid]->title;
+		}
+		
+		
+		//buid types selectlist
+		$class   = 'required use_select2_lib';
+		$attribs = 'class="'.$class.'"';
+		$fieldname = FLEXI_J16GE ? 'jform[type_id]' : 'type_id';
+		$elementid = FLEXI_J16GE ? 'jform_type_id'  : 'type_id';
+		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected->id, 1, $attribs, $elementid, $check_perms=true );
+		
 		
 		//build languages list
 		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
-		if (!$isnew && $allowed_langs) $allowed_langs[] = $row->language;
+		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
 
 		// We will not use the default getInput() function of J1.6+ since we want to create a radio selection field with flags
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
 		$language_fieldname = FLEXI_J16GE ? 'jform[language]' : 'language';
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$lists['languages'] = flexicontent_html::buildlanguageslist($language_fieldname, '', $row->language, 3, $allowed_langs);
+			$lists['languages'] = flexicontent_html::buildlanguageslist($language_fieldname, '', $item->language, 3, $allowed_langs);
 		} else {
-			$row->language = flexicontent_html::getSiteDefaultLang();
+			$item->language = flexicontent_html::getSiteDefaultLang();
 		}
 
 		// Label for current item state: published, unpublished, archived etc
-		switch ($row->state) {
+		switch ($item->state) {
 			case 0:
 			$published = JText::_( 'FLEXI_UNPUBLISHED' );
 			break;
@@ -597,22 +662,22 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 
 			// Details Group
-			$active = (intval($row->created_by) ? intval($row->created_by) : $user->get('id'));
+			$active = (intval($item->created_by) ? intval($item->created_by) : $user->get('id'));
 			if (!FLEXI_ACCESS) {
-				$formparams->set('access', $row->access);
+				$formparams->set('access', $item->access);
 			}
 			$formparams->set('created_by', $active);
-			$formparams->set('created_by_alias', $row->created_by_alias);
-			$formparams->set('created', JHTML::_('date', $row->created, '%Y-%m-%d %H:%M:%S'));
-			$formparams->set('publish_up', JHTML::_('date', $row->publish_up, '%Y-%m-%d %H:%M:%S'));
-			if ( JHTML::_('date', $row->publish_down, '%Y') <= 1969 || $row->publish_down == $db->getNullDate() || empty($row->publish_down) ) {
+			$formparams->set('created_by_alias', $item->created_by_alias);
+			$formparams->set('created', JHTML::_('date', $item->created, '%Y-%m-%d %H:%M:%S'));
+			$formparams->set('publish_up', JHTML::_('date', $item->publish_up, '%Y-%m-%d %H:%M:%S'));
+			if ( JHTML::_('date', $item->publish_down, '%Y') <= 1969 || $item->publish_down == $db->getNullDate() || empty($item->publish_down) ) {
 				$formparams->set('publish_down', JText::_( 'FLEXI_NEVER' ));
 			} else {
-				$formparams->set('publish_down', JHTML::_('date', $row->publish_down, '%Y-%m-%d %H:%M:%S'));
+				$formparams->set('publish_down', JHTML::_('date', $item->publish_down, '%Y-%m-%d %H:%M:%S'));
 			}
 
 			// Advanced Group
-			$formparams->loadINI($row->attribs);
+			$formparams->loadINI($item->attribs);
 
 			//echo "<pre>"; print_r($formparams->_xml['themes']->_children[0]);  echo "<pre>"; print_r($formparams->_xml['themes']->param[0]); exit;
 			foreach($formparams->_xml['themes']->_children as $i => $child) {
@@ -623,11 +688,11 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 
 			// Metadata Group
-			$formparams->set('description', $row->metadesc);
-			$formparams->set('keywords', $row->metakey);
-			$formparams->loadINI($row->metadata);
+			$formparams->set('description', $item->metadesc);
+			$formparams->set('keywords', $item->metakey);
+			$formparams->loadINI($item->metadata);
 		} else {
-			if ( JHTML::_('date', $row->publish_down , 'Y') <= 1969 || $row->publish_down == $db->getNullDate() || empty($row->publish_down) ) {
+			if ( JHTML::_('date', $item->publish_down , 'Y') <= 1969 || $item->publish_down == $db->getNullDate() || empty($item->publish_down) ) {
 				$form->setValue('publish_down', null, JText::_( 'FLEXI_NEVER' ) );
 			}
 		}
@@ -669,11 +734,11 @@ class FlexicontentViewItem extends JViewLegacy
 				$tmpl->params = $jform;
 				foreach ($tmpl->params->getGroup('attribs') as $field) {
 					$fieldname =  $field->__get('fieldname');
-					$value = $row->itemparams->get($fieldname);
+					$value = $item->itemparams->get($fieldname);
 					if (strlen($value)) $tmpl->params->setValue($fieldname, 'attribs', $value);
 				}
 			} else {
-				$tmpl->params->loadINI($row->attribs);
+				$tmpl->params->loadINI($item->attribs);
 			}
 		}
 
@@ -682,7 +747,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// ******************************
 		$this->assignRef('document'     , $document);
 		$this->assignRef('lists'      	, $lists);
-		$this->assignRef('row'      		, $row);
+		$this->assignRef('row'      		, $item);
 		if (FLEXI_J16GE) {
 			$this->assignRef('form'				, $form);
 		} else {
@@ -740,10 +805,12 @@ class FlexicontentViewItem extends JViewLegacy
 		//else $perms['editcreationdate'] = ($user->gid >= 25);
 		
 		// Get general edit/publish/delete permissions (we will override these for existing items)
-		$perms['canadd']     = $permission->CanAdd;
 		$perms['canedit']    = $permission->CanEdit    || $permission->CanEditOwn;
 		$perms['canpublish'] = $permission->CanPublish || $permission->CanPublishOwn;
 		$perms['candelete']  = $permission->CanDelete  || $permission->CanDeleteOwn;
+		$perms['canchange_cat'] = $permission->CanChangeCat;
+		$perms['canchange_seccat'] = $permission->CanChangeSecCat;
+		$perms['canchange_featcat'] = $permission->CanChangeFeatCat;
 		
 		// OVERRIDE global with existing item's atomic settings
 		if ( $item->id )
@@ -753,12 +820,18 @@ class FlexicontentViewItem extends JViewLegacy
 				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
 				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
+				$perms['canchange_cat'] = $user->authorise('core.change.cat', $asset);
+				$perms['canchange_seccat'] = $user->authorise('core.change.cat.sec', $asset);
+				$perms['canchange_featcat'] = $user->authorise('core.change.cat.feat', $asset);
 			}
 			else if (FLEXI_ACCESS) {
 				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 				$perms['canedit']			= ($user->gid < 25) ? ( (in_array('editown', $rights) && $isOwner) || (in_array('edit', $rights)) ) : 1;
 				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
 				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $isOwner) || (in_array('delete', $rights)) ) : 1;
+				$perms['canchange_cat'] = 1;
+				$perms['canchange_seccat'] = 1;
+				$perms['canchange_featcat'] = 1;
 				// Only FLEXI_ACCESS has per item rights permission
 				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
 			}

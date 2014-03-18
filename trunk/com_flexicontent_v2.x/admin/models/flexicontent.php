@@ -1813,7 +1813,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			if( !empty($flexi_rules['core.edit.state'][$group->id]) ) {
 				if (in_array('core.edit.state.own', $flexi_action_names)) $flexi_rules['core.edit.state.own'][$group->id] = 1;  //CanPublishOwn
 			}
+			// By default give to everybody (a) can edit field values and (b) can edit (change) item's main/secondary/featured categories
 			if (in_array('flexicontent.editfieldvalues', $flexi_action_names)) $flexi_rules['flexicontent.editfieldvalues'][$group->id] = 1;  //CanEditFieldValues
+			if (in_array('core.change.cat', $flexi_action_names)) $flexi_rules['core.change.cat'][$group->id] = 1;  // CanChangeCat
+			if (in_array('core.change.cat.sec', $flexi_action_names)) $flexi_rules['core.change.cat.sec'][$group->id] = 1;  // CanChangeSecCat
+			if (in_array('core.change.cat.feat', $flexi_action_names)) $flexi_rules['core.change.cat.feat'][$group->id] = 1;  // CanChangeFeatCat
 		}
 		
 		// return rules, a NOTE: MAYBE in future we create better initial permissions by checking allow/deny/inherit values instead of just HAS ACTION ...

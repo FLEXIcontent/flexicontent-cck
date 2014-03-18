@@ -109,6 +109,24 @@ class FlexicontentHelperPerm
 				$permission->CanDeleteOwn = count($allowedcats) > 0;
 			}
 			
+			$permission->CanChangeCat= $user->authorise('core.change.cat',	'com_flexicontent');
+			if ($permission->CanChangeCat === NULL) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat'), $require_all=true, $check_published = true, false, $find_first = true );
+				$permission->CanChangeCat = count($allowedcats) > 0;
+			}
+			
+			$permission->CanChangeSecCat= $user->authorise('core.change.cat.sec',	'com_flexicontent');
+			if ($permission->CanChangeSecCat === NULL) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat.sec'), $require_all=true, $check_published = true, false, $find_first = true );
+				$permission->CanChangeSecCat = count($allowedcats) > 0;
+			}
+			
+			$permission->CanChangeFeatCat= $user->authorise('core.change.cat.feat',	'com_flexicontent');
+			if ($permission->CanChangeFeatCat === NULL) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat.feat'), $require_all=true, $check_published = true, false, $find_first = true );
+				$permission->CanChangeFeatCat = count($allowedcats) > 0;
+			}
+			
 			// Permission for changing the access level of items and categories that user can edit
 			// (a) In J1.5, this is the FLEXIaccess component access permission, and
 			// (b) In J2.5, this is the FLEXIcontent component ACTION 'accesslevel'
@@ -129,7 +147,7 @@ class FlexicontentHelperPerm
 			$permission->CanCats			= $user->authorise('flexicontent.managecats',	'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
 			$permission->ViewAllCats	= $user->authorise('flexicontent.usercats',		'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
 			$permission->ViewTree			= $user->authorise('flexicontent.viewtree',		'com_flexicontent'); // (item edit form) view categories as tree instead of flat list
-			$permission->MultiCat			= $user->authorise('flexicontent.multicat',		'com_flexicontent'); // (item edit form) allow user to assign each item to multiple categories
+			$permission->MultiCat			= $user->authorise('flexicontent.multicat',		'com_flexicontent'); // (item edit form) allow user to assign items to multiple categories
 			$permission->CanAddCats		= $permission->CanAdd && $permission->CanCats;
 			
 			// TAGS: management tab and usage

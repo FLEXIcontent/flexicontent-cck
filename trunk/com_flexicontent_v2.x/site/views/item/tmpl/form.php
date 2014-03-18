@@ -42,9 +42,9 @@ $tabCnt = array();
 $secondary_displayed =
   ($this->menuCats  && $this->menuCats->cid) ||   // New Content  -with-  Menu Override, check if secondary categories were enabled in menu
   (!$this->menuCats && $this->lists['cid']);      // New Content but  -without-  Menu override ... OR Existing Content, check if secondary are permitted  OR already set
-$cats_canselect =
+$cats_canselect_sec =
 	($this->menuCats && $this->menuCats->cancid) ||
-	(!$this->menuCats && $this->perms['multicat']) ;
+	(!$this->menuCats && $this->perms['multicat'] && $this->perms['canchange_seccat']) ;
 $tags_displayed = $typeid && ( $this->perms['cantags'] || count(@$this->usedtagsdata) ) ;
 
 // Create info images
@@ -536,7 +536,7 @@ $tabCnt[$tabSetCnt] = 0;
 				<?php /* MENU SPECIFIED main category (new item) or main category according to perms */ ?>
 				<?php echo $this->menuCats ? $this->menuCats->catid : $this->lists['catid']; ?>
 				<?php
-					if ($cats_canselect) {
+					if ($cats_canselect_sec) {
 						// display secondary categories if permitted
 						$mcats_tooltip = 'class="editlinktip hasTip" style="display:inline-block;" title="'
 							.htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'
