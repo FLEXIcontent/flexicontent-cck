@@ -18,13 +18,6 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-?>
-<style type="text/css">
-table.adminlist tbody tr td {
-	height: auto!important;
-}
-</style>
-<?php
 
 // Joomla version variables
 if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE')) {
@@ -74,23 +67,30 @@ class com_flexicontentInstallerScript
 			if ( $memory_limit < 32000000 ) @ini_set( 'memory_limit', '32M' );
 			if ( $memory_limit < 64000000 ) @ini_set( 'memory_limit', '64M' );
 		}
-	
+		
+		// first check if PHP5 is running
+		$PHP_VERSION_NEEDED = '5.1.0';
+		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
+		{
+			// load english language file for 'com_flexicontent' component then override with current language file
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
+			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
+		
+			Jerror::raiseWarning(null, JText::sprintf( 'FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED ));
+			return false;
+		}
+		
+		// Get Joomla version
 		$jversion = new JVersion();
 		
 		// File version of new manifest file
-		$this->release = $parent->get( "manifest" )->version;
-
-		// Detect FLEXIcontent installed
-		if (FLEXI_J16GE)
-			define('FLEXI_INSTALLED', $this->release ? 1 : 0); 
-		else
-			define('FLEXI_INSTALLED', JPluginHelper::isEnabled('system', 'flexisystem') );
+		$this->release = FLEXI_J16GE ?  $parent->get( "manifest" )->version : $this->manifest->getElementByPath('version')->data();
 		
 		// File version of existing manifest file
-		$this->release_existing = $this->getParam('version');
+		$this->release_existing = FLEXI_J16GE ? $this->getParam('version') : 0;
 		
 		// Manifest file minimum Joomla version
-		$this->minimum_joomla_release = $parent->get( "manifest" )->attributes()->version;
+		$this->minimum_joomla_release = FLEXI_J16GE ? $parent->get( "manifest" )->attributes()->version : $this->manifest->attributes('version');
 		
 		// Show the essential information at the install/update back-end
 		if ($this->release_existing) {
@@ -110,30 +110,18 @@ class com_flexicontentInstallerScript
 		// Abort if the component being installed is not newer than the currently installed version
 		if ( $type == 'update' ) {
 			$oldRelease = $this->getParam('version');
-			$rel = $oldRelease . ' to ' . $this->release;
+			$rel = $this->release_existing . ' to ' . $this->release;
 			if ( version_compare( $this->release, $oldRelease, 'l' ) ) {
 				Jerror::raiseNotice(null, 'Downgrading component from ' . $rel);
 				//return false;  // Returning false here would abort
 			}
 		}
 		
-		// first check if PHP5 is running
-		$PHP_VERSION_NEEDED = '5.1.0';
-		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<')) {
-			// we add the component stylesheet to the installer
-			$document = JFactory::getDocument(); 
-			$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
-			if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
-			else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
-			else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
-			
-			// load english language file for 'com_flexicontent' component then override with current language file
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
-			JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
-		
-			Jerror::raiseWarning(null, JText::sprintf( 'FLEXI_UPGRADE_PHP_VERSION_GE', $PHP_VERSION_NEEDED ));
-			return false;
-		}
+		// Detect FLEXIcontent installed
+		if (FLEXI_J16GE)
+			define('FLEXI_INSTALLED', $this->release_existing ? 1 : 0); 
+		else
+			define('FLEXI_INSTALLED', JPluginHelper::isEnabled('system', 'flexisystem') );
 	}
 
 	/*
@@ -236,11 +224,16 @@ class com_flexicontentInstallerScript
 			if ($jinstaller->install($extensions[$i]['folder'])) {
 				$extensions[$i]['status'] = true;
 				
-				// Force existing plugins/modules to use name from manifest.xml file
+				$ext_manifest = $jinstaller->getManifest();
+				$ext_manifest_name = FLEXI_J16GE ? $ext_manifest->name : $ext_manifest->document->getElementByPath('name')->data();
+				//if ($ext_manifest_name!=$extensions[$i]['name'])  echo $ext_manifest_name." - ".$extensions[$i]['name'] . "<br/>";
+				
+				// Force existing plugins/modules to use name found in each extension's manifest.xml file
 				if (FLEXI_J16GE || $extensions[$i]['ext_folder'] == 'flexicontent_fields') {
 					$ext_tbl   = FLEXI_J16GE ? '#__extensions' : '#__plugins';
 					$query = 'UPDATE '.$ext_tbl
-						.' SET name = '.$db->Quote($extensions[$i]['name'])
+						//.' SET name = '.$db->Quote($extensions[$i]['name'])
+						.' SET name = '.$db->Quote($ext_manifest_name)
 						.' WHERE element = '.$db->Quote($extensions[$i]['ext_name'])
 						.'  AND folder = '.$db->Quote($extensions[$i]['ext_folder'])
 						.(FLEXI_J16GE ? '  AND type = '.$db->Quote($extensions[$i]['type']) : '')
@@ -305,7 +298,7 @@ class com_flexicontentInstallerScript
 			<tbody>
 				<?php foreach ($extensions as $i => $ext) : ?>
 					<tr class="row<?php echo $i % 2; ?>">
-						<td class="key"><?php echo $ext['name']; ?> (<?php echo JText::_($ext['type']); ?>)</td>
+						<td class="key">[<?php echo JText::_($ext['type']); ?>] <?php echo $ext['name']; ?></td>
 						<td>
 							<?php
 							if ($ext['status']===null) $status_color = 'black';
@@ -382,6 +375,7 @@ class com_flexicontentInstallerScript
 		
 		$this->setParams( $params );*/
 		
+		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 		echo '<p> -- ' . JText::_('Performing POST-installation Task/Checks') .'</p>';
 		
 		$db = JFactory::getDBO();
@@ -761,6 +755,7 @@ class com_flexicontentInstallerScript
 		//$cache = JFactory::getCache();
 		//$cache->clean( '_system' );  // This might be necessary as installing-uninstalling in same session may result in wrong extension ids, etc
 
+		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
 		echo '<p>' . JText::_('Uninstalling FLEXIcontent ' . $this->release) . '</p>';
 		
 		// init vars

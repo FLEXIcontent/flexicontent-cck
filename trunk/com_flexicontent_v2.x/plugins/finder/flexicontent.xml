@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension version="2.5" type="plugin" group="finder" method="upgrade">
-	<name>plg_finder_flexicontent</name>
+	<name>PLG_FINDER_FLEXICONTENT</name>
 	<author>FLEXIcontent Project</author>
 	<creationDate>July 2013</creationDate>
 	<copyright>(C) 2013 FLEXIcontent Project. All rights reserved.</copyright>

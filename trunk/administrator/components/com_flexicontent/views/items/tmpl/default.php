@@ -60,6 +60,7 @@ if ($this->ordering) {
 	$drag_handle_box = '<div class="fc_drag_handle %s" alt="'.JText::_('FLEXI_ORDER_COLUMN_FIRST').'" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
 	$image_saveorder    = '';
 }
+$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.'::'.JText::_('MAIN category shown in bold', true).'" />';
 
 if ( !$this->filter_order_type ) {
 	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_ORDER_JOOMLA', true).'::'.JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA', true)).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP', true).'" />';
@@ -388,6 +389,7 @@ window.addEvent('domready', function() {
 				<?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'i.access', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 			<th class="left hideOnDemandClass">
+				<?php echo $categories_tip; ?>
 				<?php echo JText::_( 'FLEXI_CATEGORIES' ); ?>
 				<?php if ($this->filter_cats) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
@@ -487,7 +489,9 @@ window.addEvent('domready', function() {
 				<div class="clear"></div>
 				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
 				<?php if (!$this->filter_order_type && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
-					<br/><span style="color:darkgreen;" class="fc-mssg-inline fc-note" id=""><?php echo JText::_('Items ordered by by Joomla order, only main category is shown'); ?></span>
+					<br/><span style="color:darkgreen;" class="fc-mssg-inline fc-note" id=""><?php echo JText::_('Joomla order, GROUPING BY main category'); ?></span>
+				<?php elseif ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
+					<br/><span style="color:darkgreen;" class="fc-mssg-inline fc-note" id=""><?php echo JText::_('Grouping by first listed category'); ?></span>
 				<?php endif; ?>
 			</td>
 			<td class="left col_created col_revised" colspan="2">
@@ -870,14 +874,29 @@ window.addEvent('domready', function() {
 			</td>
 			<td class="col_cats">
 				<?php
+				// Reorder categories when changing Joomla ordering and place item's MAIN category first ...
+				if (!$this->filter_order_type) {
+					$__cats = array();
+					$nn = 1;
+					foreach ($row->categories as $key => $_icat) {
+						if ( !isset($this->itemCats[$_icat]) ) continue;
+						$category = & $this->itemCats[$_icat];
+						$isMainCat = ((int)$category->id == (int)$row->catid);
+						if ($isMainCat) $__cats[0] = $_icat;
+						else $__cats[$nn++] = $_icat;
+					}
+					$row->categories = $__cats;
+				}
 				$nr = count($row->categories);
 				$ix = 0;
-				foreach ($row->categories as $key => $_item_cat) :
+				$nn = 0;
+				for ($nn=0; $nn < $nr; $nn++) :
+					$_item_cat = $row->categories[$nn];
 					if ( !isset($this->itemCats[$_item_cat]) ) continue;
 					$category = & $this->itemCats[$_item_cat];
 					
 					$isMainCat = ((int)$category->id == (int)$row->catid);
-					if (!$this->filter_order_type && !$isMainCat) continue;
+					//if (!$this->filter_order_type && !$isMainCat) continue;
 					
 					$typeofcats = '';
 					if ( $ix==0 && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering') )
@@ -912,7 +931,7 @@ window.addEvent('domready', function() {
 					if ($ix != $nr) :
 						echo ', ';
 					endif;
-				endforeach;
+				endfor;
 				?>
 			</td>
 			<td align="center" nowrap="nowrap" class="col_created">

@@ -81,12 +81,24 @@ div.current ul.config-option-list li fieldset  { margin: 0; padding: 0; }
 
 $document = JFactory::getDocument();
 $document->addStyleDeclaration($css);
-$option = JRequest::getVar('option');
 $document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_form.css');
-if ($option=='com_config') {
+
+if (FLEXI_J30GE) $jinput = JFactory::getApplication()->input;
+$option = FLEXI_J30GE ? $jinput->get('option', '', 'string') : JRequest::getVar('option');
+$view   = FLEXI_J30GE ? $jinput->get('view', '', 'string') : JRequest::getVar('view');
+$component = FLEXI_J30GE ? $jinput->get('component', '', 'string') : JRequest::getVar('component');
+
+if ($option=='com_config' && $view == 'component' && $component == 'com_flexicontent') {
 	$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/tabber.css');
 	$document->addScript(JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js');
 	$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
+	
+	if (FLEXI_J30GE) {
+		// Make sure chosen JS file is loaded before our code
+		JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
+		// replace chosen function
+		$document->addScriptDeclaration(" jQuery.fn.chosen = function(){} ");
+	}
 }
 
 if (FLEXI_J16GE) {
