@@ -451,15 +451,17 @@ class FlexicontentViewItems  extends JViewLegacy
 		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, 'en-GB', true);
 		JFactory::getLanguage()->load('com_flexicontent', JPATH_ADMINISTRATOR, null, true);
 
-		// Initialize variables
-		$app	= JFactory::getApplication();
-		$dispatcher	= JDispatcher::getInstance();
-		$document		= JFactory::getDocument();
+		// ********************************
+		// Initialize variables, flags, etc
+		// ********************************
+		$app        = JFactory::getApplication();
+		$dispatcher = JDispatcher::getInstance();
+		$document   = JFactory::getDocument();
 		$session    = JFactory::getSession();
-		$user				= JFactory::getUser();
-		$uri				= JFactory::getURI();
-		$db					= JFactory::getDBO();
-		$nullDate		= $db->getNullDate();
+		$user       = JFactory::getUser();
+		$db         = JFactory::getDBO();
+		$uri        = JFactory::getURI();
+		$nullDate   = $db->getNullDate();
 		$menu				= $app->getMenu()->getActive();
 		
 		// Get the COMPONENT only parameters, then merge the menu parameters
@@ -541,7 +543,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		if (FLEXI_J16GE) {
 			$form = $this->get('Form');
 		}
-
+		
 		if ( $print_logging_info ) $fc_run_times['get_item_data'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 
 
@@ -761,16 +763,18 @@ class FlexicontentViewItems  extends JViewLegacy
 		} else {
 			$params = $item->parameters;
 		}
-
+		
+		
 		// Check if saving an item that translates an original content in site's default language
 		$is_content_default_lang = substr(flexicontent_html::getSiteDefaultLang(), 0,2) == substr($item->language, 0,2);
 		$modify_untraslatable_values = $enable_translation_groups && !$is_content_default_lang && $item->lang_parent_id && $item->lang_parent_id!=$item->id;
-
+		
 		// *****************************************************************************
 		// Get (CORE & CUSTOM) fields and their VERSIONED values and then
 		// (a) Apply Content Type Customization to CORE fields (label, description, etc)
 		// (b) Create the edit html of the CUSTOM fields by triggering 'onDisplayField'
 		// *****************************************************************************
+		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$fields = $this->get( 'Extrafields' );
 		if ( $print_logging_info ) $fc_run_times['get_field_vals'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -981,7 +985,8 @@ class FlexicontentViewItems  extends JViewLegacy
 				$item->publish_down= JText::_( 'FLEXI_NEVER' );
 			}
 		}
-
+		
+		
 		// ****************************
 		// Handle Template related work
 		// ****************************
@@ -1050,96 +1055,57 @@ class FlexicontentViewItems  extends JViewLegacy
 
 		global $globalcats;
 		$categories = $globalcats;			// get the categories tree
-		$selectedcats = $this->get( 'Catsselected' );		// get category ids, NOTE: This will normally return the already set versioned value of categories ($item->categories)
-		$actions_allowed = array('core.create');					// user actions allowed for categories
 		$types = $this->get( 'Typeslist' );
 		$subscribers = $this->get( 'SubscribersCount' );
-		$typesselected = '';
+		$typesselected = new stdClass();
+		$typesselected->id = 0;
 		$isnew = !$item->id;
 
-		// Case for preselected main category for new items
+		// *******************************
+		// Get categories used by the item
+		// *******************************
+		
 		if ($isnew) {
+			// Case for preselected main category for new items
 			$maincat = JRequest::getInt('maincat', 0);
 			if ($maincat) {
 				$selectedcats = array($maincat);
 				$item->catid = $maincat;
+			} else {
+				$selectedcats = array();
 			}
+		} else {
+			// NOTE: This will normally return the already set versioned value of categories ($item->categories)
+			$selectedcats = $this->get( 'Catsselected' );
 		}
-		// Default state
-		if ( $perms['canpublish'] && !$item->id ) $item->state = 1;
+		
 		
 		
 		// *********************************************************************************************
 		// Build select lists for the form field. Only few of them are used in J1.6+, since we will use:
 		// (a) form XML file to declare them and then (b) getInput() method form field to create them
 		// *********************************************************************************************
+		
+		// First clean form data, we do this after creating the description field which may contain HTML
+		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES );
+		
 		flexicontent_html::loadFramework('select2');
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		$lists = array();
 		
-		// Featured categories form field
-		$featured_cats_parent = $params->get('featured_cats_parent', 0);
-		$featured_cats = array();
-		if ( $featured_cats_parent )
-		{
-			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
-			$featured_sel = array();
-			foreach($selectedcats as $featured_cat) if (isset($featured_tree[$featured_cat])) $featured_sel[] = $featured_cat;
-			
-			$class  = "use_select2_lib select2_list_selected";
-			$attribs = 'class="'.$class.'" multiple="multiple" size="8"';
-			$fieldname = FLEXI_J16GE ? 'jform[featured_cid][]' : 'featured_cid[]';
-			$lists['featured_cid'] = flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed);
-		}
-		
-		// Multi-category form field, for user allowed to use multiple categories
-		$lists['cid'] = '';
-		if ($perms['multicat'])
-		{
-			// Get author's maximum allowed categories per item and set js limitation
-			$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
-			$document->addScriptDeclaration('
-				max_cat_assign_fc = '.$max_cat_assign.';
-				existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
-				max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES',true).'";
-			');
-			
-			$class  = "mcat use_select2_lib select2_list_selected";
-			$class .= $max_cat_assign ? " validate-fccats" : " validate";
-			$attribs = 'class="'.$class.'" multiple="multiple" size="8"';
-			$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
-			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
-			$lists['cid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $selectedcats, false, $attribs, true, true,
-				$actions_allowed, $require_all=true, $skip_subtrees, $disable_subtrees=array());
-		}
-		else {
-			if ( count($selectedcats)>1 ) {
-				foreach ($selectedcats as $catid) {
-					$cat_titles[$catid] = $globalcats[$catid]->title;
+		// build granular access list
+		if (!FLEXI_J16GE) {
+			if (FLEXI_ACCESS) {
+				if (isset($user->level)) {
+					$lists['access'] = FAccess::TabGmaccess( $item, 'item', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
+				} else {
+					$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
 				}
-				$lists['cid'] .= implode(', ', $cat_titles);
 			} else {
-				$lists['cid'] = false;
+				$lists['access'] = JHTML::_('list.accesslevel', $item); // created but not used in J1.5 backend form
 			}
 		}
-
-		//buid types selectlist
-		$class = 'required use_select2_lib';
-		$attribs = 'class="'.$class.'"';
-		$fieldname = FLEXI_J16GE ? 'jform[type_id]' : 'type_id';
-		$elementid = FLEXI_J16GE ? 'jform_type_id'  : 'type_id';
-		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected, 1, $attribs, $elementid, $check_perms=true );
 		
-		// Main category form field
-		$class = 'scat use_select2_lib';
-		if ($perms['multicat']) {
-			$class .= ' validate-catid';
-		} else {
-			$class .= ' required';
-		}
-		$attribs = 'class="'.$class.'"';
-		$fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
-		$lists['catid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed);
 		
 		// build state list
 		$_arc_ = FLEXI_J16GE ? 2:-1;
@@ -1175,6 +1141,12 @@ class FlexicontentViewItems  extends JViewLegacy
 		$attribs = 'class="'.$class.'"';
 		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
 		
+		// *** BOF: J2.5 SPECIFIC SELECT LISTS
+		if (FLEXI_J16GE)
+		{
+		}
+		// *** EOF: J1.5 SPECIFIC SELECT LISTS
+		
 		// build version approval list
 		$fieldname = FLEXI_J16GE ? 'jform[vstate]' : 'vstate';
 		$elementid = FLEXI_J16GE ? 'jform_vstate' : 'vstate';
@@ -1201,6 +1173,8 @@ class FlexicontentViewItems  extends JViewLegacy
 			$i++;
 		}
 		
+		
+		// build field for notifying subscribers
 		if ( !$subscribers )
 		{
 			$lists['notify'] = !$isnew ? JText::_('FLEXI_NO_SUBSCRIBERS_EXIST') : '';
@@ -1226,6 +1200,106 @@ class FlexicontentViewItems  extends JViewLegacy
 					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' checked="checked" />';
 				if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
 			}
+		}
+		
+
+		// Get author's maximum allowed categories per item and set js limitation
+		$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
+		$document->addScriptDeclaration('
+			max_cat_assign_fc = '.$max_cat_assign.';
+			existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
+			max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES',true).'";
+		');
+		
+		// Creating categorories tree for item assignment, we use the 'create' privelege
+		$actions_allowed = array('core.create');
+
+		// Featured categories form field
+		$featured_cats_parent = $params->get('featured_cats_parent', 0);
+		$featured_cats = array();
+		$enable_featured_cid_selector = $perms['multicat'] && ($isnew || $perms['canchange_featcat']);
+		if ( $featured_cats_parent )
+		{
+			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
+			$featured_sel = array();
+			foreach($selectedcats as $featured_cat) if (isset($featured_tree[$featured_cat])) $featured_sel[] = $featured_cat;
+			
+			$class  = "use_select2_lib select2_list_selected";
+			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
+			$attribs .= $enable_featured_cid_selector ? '' : ' disabled="disabled"';
+			
+			$fieldname = FLEXI_J16GE ? 'jform[featured_cid][]' : 'featured_cid[]';
+			$lists['featured_cid'] = flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed)
+				.($enable_featured_cid_selector ? '' : '<label class="label">locked</label>');
+		}
+		else{
+			// Do not display, if not configured or not allowed to the user
+			$lists['featured_cid'] = false;
+		}
+		
+		
+		// Multi-category form field, for user allowed to use multiple categories
+		$lists['cid'] = '';
+		$enable_cid_selector = $perms['multicat'] && ($isnew || $perms['canchange_cat']);
+		if ( 1 )
+		{
+			// Get author's maximum allowed categories per item and set js limitation
+			$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
+			$document->addScriptDeclaration('
+				max_cat_assign_fc = '.$max_cat_assign.';
+				existing_cats_fc  = ["'.implode('","',$selectedcats).'"];
+				max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES',true).'";
+			');
+			
+			$class  = "mcat use_select2_lib select2_list_selected";
+			$class .= $max_cat_assign ? " validate-fccats" : " validate";
+			
+			$attribs  = 'class="'.$class.'" multiple="multiple" size="20"';
+			$attribs .= $enable_cid_selector ? '' : ' disabled="disabled"';
+			
+			$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
+			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
+			$lists['cid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $selectedcats, false, $attribs, true, true,
+				$actions_allowed, $require_all=true, $skip_subtrees, $disable_subtrees=array())
+				.($enable_cid_selector ? '' : '<label class="label">locked</label>');
+		}
+		else {
+			if ( count($selectedcats)>1 ) {
+				foreach ($selectedcats as $catid) {
+					$cat_titles[$catid] = $globalcats[$catid]->title;
+				}
+				$lists['cid'] .= implode(', ', $cat_titles);
+			} else {
+				$lists['cid'] = false;
+			}
+		}
+		
+		//buid types selectlist
+		$class   = 'required use_select2_lib';
+		$attribs = 'class="'.$class.'"';
+		$fieldname = FLEXI_J16GE ? 'jform[type_id]' : 'type_id';
+		$elementid = FLEXI_J16GE ? 'jform_type_id'  : 'type_id';
+		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected->id, 1, $attribs, $elementid, $check_perms=true );
+		
+		
+		// Main category form field
+		$class = 'scat use_select2_lib';
+		if ($perms['multicat']) {
+			$class .= ' validate-catid';
+		} else {
+			$class .= ' required';
+		}
+		$attribs = 'class="'.$class.'"';
+		$fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
+		
+		$enable_catid_selector =  $isnew || $perms['canchange_cat'];
+		if ( 1 ) {
+			$disabled = $enable_catid_selector ? '' : ' disabled="disabled"';
+			$attribs .= $disabled;
+			$lists['catid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed)
+				.($enable_catid_selector ? '' : '<label class="label">locked</label>');
+		} else {
+			$lists['catid'] = $globalcats[$item->catid]->title;
 		}
 		
 		// build version approval list
@@ -1262,18 +1336,6 @@ class FlexicontentViewItems  extends JViewLegacy
 			}
 		}
 
-		// build granular access list
-		if (!FLEXI_J16GE) {
-			if (FLEXI_ACCESS) {
-				if (isset($user->level)) {
-					$lists['access'] = FAccess::TabGmaccess( $item, 'item', 1, 0, 0, 1, 0, 1, 0, 1, 1 );
-				} else {
-					$lists['access'] = JText::_('Your profile has been changed, please logout to access to the permissions');
-				}
-			} else {
-				$lists['access'] = JHTML::_('list.accesslevel', $item);
-			}
-		}
 
 		// Build languages list
 		$site_default_lang = flexicontent_html::getSiteDefaultLang();
@@ -1289,7 +1351,8 @@ class FlexicontentViewItems  extends JViewLegacy
 
 		return $lists;
 	}
-
+	
+	
 	/**
 	 * Calculates the user permission on the given item
 	 *
@@ -1321,6 +1384,9 @@ class FlexicontentViewItems  extends JViewLegacy
 		$perms['canedit']    = $permission->CanEdit    || $permission->CanEditOwn;
 		$perms['canpublish'] = $permission->CanPublish || $permission->CanPublishOwn;
 		$perms['candelete']  = $permission->CanDelete  || $permission->CanDeleteOwn;
+		$perms['canchange_cat'] = $permission->CanChangeCat;
+		$perms['canchange_seccat'] = $permission->CanChangeSecCat;
+		$perms['canchange_featcat'] = $permission->CanChangeFeatCat;
 		
 		// OVERRIDE global with existing item's atomic settings
 		if ( $item->id )
@@ -1330,12 +1396,18 @@ class FlexicontentViewItems  extends JViewLegacy
 				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
 				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
+				$perms['canchange_cat'] = $user->authorise('core.change.cat', $asset);
+				$perms['canchange_seccat'] = $user->authorise('core.change.cat.sec', $asset);
+				$perms['canchange_featcat'] = $user->authorise('core.change.cat.feat', $asset);
 			}
 			else if (FLEXI_ACCESS) {
 				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 				$perms['canedit']			= ($user->gid < 25) ? ( (in_array('editown', $rights) && $isOwner) || (in_array('edit', $rights)) ) : 1;
 				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
 				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $isOwner) || (in_array('delete', $rights)) ) : 1;
+				$perms['canchange_cat'] = 1;
+				$perms['canchange_seccat'] = 1;
+				$perms['canchange_featcat'] = 1;
 				// Only FLEXI_ACCESS has per item rights permission
 				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
 			}

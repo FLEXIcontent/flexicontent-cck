@@ -68,6 +68,9 @@ class FlexicontentHelperPerm
 				$permission->CanPublishOwn= $user->authorize('com_content', 'publish', 'content', 'own');  // ($user->gid >= 21);  // At least J1.5 Publisher
 				$permission->CanDelete		= ($user->gid >= 23);  // At least J1.5 Manager
 				$permission->CanDeleteOwn	= ($user->gid >= 23);  // At least J1.5 Manager
+				$permission->CanChangeCat     = 1; // J1.5 lacks this
+				$permission->CanChangeSecCat  = 1; // J1.5 lacks this
+				$permission->CanChangeFeatCat = 1; // J1.5 lacks this
 				
 				$permission->CanRights		= ($user->gid >= 21);  // At least J1.5 Publisher
 				
@@ -150,6 +153,9 @@ class FlexicontentHelperPerm
 			$permission->CanPublishOwn= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'publishown', 'users', $user->gmid)	: 1;
 			$permission->CanDelete		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'delete', 'users', $user->gmid)	: 1;
 			$permission->CanDeleteOwn	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_content', 'deleteown', 'users', $user->gmid)		: 1;
+			$permission->CanChangeCat     = 1;
+			$permission->CanChangeSecCat  = 1;
+			$permission->CanChangeFeatCat = 1;
 			
 			// Permission for changing the access level of items and categories that user can edit
 			// (a) In J1.5, this is the FLEXIaccess component access permission, and
