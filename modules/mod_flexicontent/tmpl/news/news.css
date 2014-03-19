@@ -167,10 +167,10 @@
 }
 .news.mod_flexicontent_wrapper .date_value,
 .news.mod_flexicontent_wrapper .date_value_feat {
-	display:inline;
+	display:inline-block;
 	color: black;
   font-weight: normal;
-  margin: 0;
+  margin: 2px 0;
   padding: 0;
   white-space: nowrap;
 }
@@ -262,14 +262,16 @@
 	border:solid gray;
 	border-width:0px 0px;
 	padding: 1px 6px 1px 20px;
-	margin: 0px 0px 3px 4px;
+	margin: 3px 3px 3px 4px;
+	display:inline-block;
 }
 .news.mod_flexicontent_wrapper .fcitem_readon:hover {
 	background: url("images/readmore.png") lightgray no-repeat scroll 0px 1px;
 	border: solid gray;
 	border-width:1px 0px;
 	padding: 0px 6px 0px 20px;
-	margin: 0px 0px 3px 4px;
+	margin: 3px 3px 3px 4px;
+	display:inline-block;
 }
 
 /* item read more styling (link, etc) */

@@ -440,13 +440,17 @@ class modFlexicontentHelper
 					if ($use_fields_feat && @$row->fields && $fields_feat) {
 						$lists[$ord]['featured'][$i]->fields = array();
 						foreach ($fields_feat as $field) {
-							$lists[$ord]['featured'][$i]->fields[$field] = new stdClass();
-							if ($display_label_feat) {
-								$lists[$ord]['featured'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
-							}
+							if ( !isset($row->fields[$field]) ) continue;
+							/*$lists[$ord]['featured'][$i]->fields[$field] = new stdClass();
 							$lists[$ord]['featured'][$i]->fields[$field]->display 	= @$row->fields[$field]->display ? $row->fields[$field]->display : '';
 							$lists[$ord]['featured'][$i]->fields[$field]->name = $row->fields[$field]->name;
-							$lists[$ord]['featured'][$i]->fields[$field]->id   = $row->fields[$field]->id;
+							$lists[$ord]['featured'][$i]->fields[$field]->id   = $row->fields[$field]->id;*/
+							// Expose field to the module template  ... the template should NOT modify this ...
+							if ( !isset($row->fields[$field]->display) )
+							{
+								$row->fields[$field]->display = '';
+							}
+							$lists[$ord]['featured'][$i]->fields[$field] = $row->fields[$field];
 						}
 					}
 					
@@ -571,14 +575,16 @@ class modFlexicontentHelper
 						$lists[$ord]['standard'][$i]->fields = array();
 						foreach ($fields as $field) {
 							if ( !isset($row->fields[$field]) ) continue;
-							
-							$lists[$ord]['standard'][$i]->fields[$field] = new stdClass();
-							if ($display_label) {
-								$lists[$ord]['standard'][$i]->fields[$field]->label = @$row->fields[$field]->label ? $row->fields[$field]->label : '';
-							}
+							/*$lists[$ord]['standard'][$i]->fields[$field] = new stdClass();
 							$lists[$ord]['standard'][$i]->fields[$field]->display 	= @$row->fields[$field]->display ? $row->fields[$field]->display : '';
 							$lists[$ord]['standard'][$i]->fields[$field]->name = $row->fields[$field]->name;
-							$lists[$ord]['standard'][$i]->fields[$field]->id   = $row->fields[$field]->id;
+							$lists[$ord]['standard'][$i]->fields[$field]->id   = $row->fields[$field]->id;*/
+							// Expose field to the module template  ... the template should NOT modify this ...
+							if ( !isset($row->fields[$field]->display) )
+							{
+								$row->fields[$field]->display = '';
+							}
+							$lists[$ord]['standard'][$i]->fields[$field] = $row->fields[$field];  // Expose field to the module template  ... but template may modify it ...
 						}
 					}
 	
