@@ -181,13 +181,37 @@ class FlexicontentControllerImport extends FlexicontentController
 			// ******************************************************************************************************
 			// Retrieve CSV file format variables, EXPANDING the Escape Characters like '\n' ... provided by the form
 			// ******************************************************************************************************
-			$pattern = '/(?<!\\\)(\\\(?:n|r|t|v|f|[0-7]{1,3}|x[0-9a-f]{1,2}))/ie';
+			$pattern = '/(?<!\\\)(\\\(?:n|r|t|v|f|[0-7]{1,3}|x[0-9a-f]{1,2}))/i';
 			$replace = 'eval(\'return "$1";\')';
-			$conf['field_separator']  = preg_replace($pattern, $replace, JRequest::getVar('field_separator'));  
-			$conf['enclosure_char']   = preg_replace($pattern, $replace, JRequest::getVar('enclosure_char'));  ;
-			$conf['record_separator'] = preg_replace($pattern, $replace, JRequest::getVar('record_separator'));  
-			
-			
+
+			$conf['field_separator']  = preg_replace_callback(
+				$pattern,
+				function ($matches) {
+					$r = $matches[1];
+					eval("\$r = \"$r\";");
+					return $r;
+				},
+				JRequest::getVar('field_separator')
+			);
+			$conf['enclosure_char']   = preg_replace_callback(
+				$pattern,
+				function ($matches) {
+					$r = $matches[1];
+					eval("\$r = \"$r\";");
+					return $r;
+				},
+				JRequest::getVar('enclosure_char')
+			);
+			$conf['record_separator'] = preg_replace_callback(
+				$pattern,
+				function ($matches) {
+					$r = $matches[1];
+					eval("\$r = \"$r\";");
+					return $r;
+				},
+				JRequest::getVar('record_separator')
+			);
+
 			// ****************************************************************************************************************
 			// Check for proper CSV file format variables, js validation should have prevented form submission but check anyway
 			// ****************************************************************************************************************
@@ -215,7 +239,7 @@ class FlexicontentControllerImport extends FlexicontentController
 			$contents = FLEXIUtilities::csvstring_to_array(file_get_contents($csvfile), $conf['field_separator'], $conf['enclosure_char'], $conf['record_separator']);
 			
 			// Basic error checking, for empty data
-			if(count($contents[0])<=0) {
+			if(!$contents || count($contents[0])<=0) {
 				echo "<script>alert ('Upload file error! CSV file format is not correct!');";
 				echo "window.history.back();";
 				echo "</script>";
