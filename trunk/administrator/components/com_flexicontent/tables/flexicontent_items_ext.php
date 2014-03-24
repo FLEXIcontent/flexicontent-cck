@@ -33,6 +33,14 @@ class flexicontent_items_ext extends JTable{
 	/** @var string */
 	var $language				= null;
 	/** @var int */
+	
+	// for item counting in categories
+	var $cnt_state        = null;
+	var $cnt_access       = null;
+	var $cnt_publish_up   = null;
+	var $cnt_publish_down = null;
+	var $cnt_created_by   = null;
+		
 	var $lang_parent_id	= null;
 	/** @var string */
 	var $sub_items		= null;

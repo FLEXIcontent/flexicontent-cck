@@ -178,6 +178,10 @@ if (!FLEXI_J16GE) {
 }
 
 
+// initialization done ... log stats for initialization
+if ( $print_logging_info ) @$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+
 // ****************************
 // Create a controller instance
 // ****************************
@@ -188,10 +192,6 @@ if (FLEXI_J16GE) {
 	$classname  = 'FlexicontentController'.ucfirst($controller);
 	$controller = new $classname();
 }
-
-// initialization done ... log stats for initialization
-if ( $print_logging_info ) @$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-
 
 
 // **************************
@@ -233,6 +233,22 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 		
 	if (isset($fc_run_times['initialize_component']))
 		$msg .= sprintf('<br/>-- [Initialize component: %.2f s] ', $fc_run_times['initialize_component']/1000000);
+		
+		
+	if (isset($fc_run_times['post_installation_tasks']))
+		$msg .= sprintf('<br/>-- [Post installation task: %.2f s] ', $fc_run_times['post_installation_tasks']/1000000);
+		
+			$msg .= '<small>';
+			if (isset($fc_run_times['getExistMenuItems']))
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Default menu items exist: %.2f s ', $fc_run_times['getExistMenuItems']/1000000);
+			if (isset($fc_run_times['getItemsNoLang']))
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items with no Language: %.2f s ', $fc_run_times['getItemsNoLang']/1000000);
+			if (isset($fc_run_times['getItemCountingDataOK']))
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Item counting data in cats (sub/peer): %.2f s ', $fc_run_times['getItemCountingDataOK']/1000000);
+			if (isset($fc_run_times['checkInitialPermission']))
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Check initial permissions: %.2f s ', $fc_run_times['checkInitialPermission']/1000000);
+			$msg .= '</small>';
+	
 	
 	if (isset($fc_run_times['test_time']))
 		$msg .= sprintf('<br/>-- [Time of TEST part: %.2f s] ', $fc_run_times['test_time']/1000000);
@@ -312,6 +328,9 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	
 	if (isset($fc_run_times['template_render']))
 		$msg .= sprintf('<br/>-- [FC "%s" view Template Rendering: %.2f s] ', $view, $fc_run_times['template_render']/1000000);
+	
+	if (isset($fc_run_times['quick_sliders']))
+		$msg .= sprintf('<br/>-- [Workflow sliders (Pending/Revised/etc): %.2f s] ', $fc_run_times['quick_sliders']/1000000);
 	
 	if (isset($fc_run_times['auto_checkin_auto_state']))
 		$msg .= sprintf('<br/>-- [Auto Checkin/Auto state(e.g. archive): %.2f s] ', $fc_run_times['auto_checkin_auto_state']/1000000);

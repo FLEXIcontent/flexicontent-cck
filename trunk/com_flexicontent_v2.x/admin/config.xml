@@ -459,7 +459,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_itemcount" type="list" default="1" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC" menu="hide" >
+			<field name="show_itemcount" type="list" default="0" label="FLEXI_SHOW_ITEMS_COUNT" description="FLEXI_SHOW_ITEMS_COUNT_DESC" menu="hide" >
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 				<option value="2">FLEXI_SHOW_WITH_LABEL</option>

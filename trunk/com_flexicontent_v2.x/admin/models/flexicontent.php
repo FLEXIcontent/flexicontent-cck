@@ -413,17 +413,27 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		static $return;
 		if ($return === NULL) {
 			$db = JFactory::getDBO();
-			$query = "SELECT count(*) FROM #__flexicontent_items_ext as ie "
-				. " JOIN #__content as i ON i.id=ie.item_id "
-				. " LEFT JOIN #__flexicontent_cats_item_relations as rel ON rel.catid=i.catid AND i.id=rel.itemid "
-				. " WHERE rel.catid IS NULL"
-				;
+			$query = "SELECT i.id"
+				." FROM #__content AS i"
+				." LEFT JOIN #__flexicontent_cats_item_relations as rel ON rel.catid=i.catid AND i.id=rel.itemid "
+				." WHERE rel.catid IS NULL"
+				." LIMIT 1";
 			$db->setQuery($query);
-			$return = $db->loadResult();
+			$item_id = $db->loadResult();
+			
+			if ($item_id) {
+				$query = "SELECT item_id "
+					." FROM #__flexicontent_items_ext as ie"
+					." WHERE item_id = ". $item_id;
+				$db->setQuery($query);
+				$item_id = $db->loadResult();
+			}
+			$return = $item_id ? 1 : 0;
 		}
 		
 		return $return;
 	}
+	
 	
 	/**
 	 * Method to get if language of items is initialized properly
@@ -438,18 +448,63 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($return === NULL) {
 			$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 			$db = JFactory::getDBO();
-			$query 	= "SELECT count(*) FROM #__flexicontent_items_ext as ie "
+			/*$query = "SELECT COUNT(*) FROM #__flexicontent_items_ext as ie "
 				. (FLEXI_J16GE ? " LEFT JOIN #__content as i ON i.id=ie.item_id " : "")
-				. " WHERE ie.language='' "
-				. ($enable_translation_groups ? " OR ie.lang_parent_id='0' " : "")
-				. (FLEXI_J16GE ? " OR i.language='' OR i.language<>ie.language " : "")   // J2.5 has a language property
-				;
+				. " WHERE ie.language='' " . ($enable_translation_groups ? " OR ie.lang_parent_id='0' " : "")
+				. (FLEXI_J16GE ? " OR i.language='' OR i.language<>ie.language " : "")
+				;*/
+			$query = "SELECT COUNT(*)"
+				." FROM #__flexicontent_items_ext as ie"
+				." WHERE ie.language='' " . ($enable_translation_groups ? " OR ie.lang_parent_id='0' " : "")
+				." LIMIT 1";
 			$db->setQuery($query);
-			$return = $db->loadResult();
+			$cnt1 = $db->loadResult();
+			$cnt2 = 0;
+			if (FLEXI_J16GE) {
+				$query = "SELECT COUNT(*)"
+					." FROM #__content as i"
+					." WHERE i.language=''"
+					." LIMIT 1";
+				$db->setQuery($query);
+				$cnt2 = $db->loadResult();
+			}
+			$return = $cnt1 || $cnt2;
 		}
 		
 		return $return;
 	}
+	
+	
+	/**
+	 * Method to get if some items do not have their no index columns up to date with the main content table (these are used for item counting)
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function getItemCountingDataOK()
+	{
+		static $return;
+		if ($return === NULL) {
+			$db = JFactory::getDBO();
+			$query 	= "SELECT COUNT(*)"
+				. " FROM #__flexicontent_items_ext as ie "
+				. " LEFT JOIN #__content as i ON i.id=ie.item_id "
+				. " WHERE "
+				. (FLEXI_J16GE ? " i.language<>ie.language " : "0")   // IF THIS FUNCTION IS REMOVED THIS MUST BE MOVED TO ... getItemsNoLang(), if it does not exist already
+				. " OR i.state<>ie.cnt_state "
+				. " OR i.access<>ie.cnt_access "
+				. " OR i.publish_up<>ie.cnt_publish_up "
+				. " OR i.publish_down<>ie.cnt_publish_down "
+				. " OR i.created_by<>ie.cnt_created_by "
+				;
+			$db->setQuery($query);
+			$return = $this->_db->loadResult() ? false : true;
+		}
+		
+		return $return;
+	}
+	
 	
 	/**
 	 * Method to check if the versions table is created
@@ -484,7 +539,32 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 		return $return;
 	}
-
+	
+	
+	/**
+	 * Method to check if the versions table is created
+	 *
+	 * @access public
+	 * @return	boolean	True on success
+	 */
+	function getExistDBindexes()
+	{
+		static $return;
+		if ($return === NULL) {
+			$app = JFactory::getApplication();
+			$dbprefix = $app->getCfg('dbprefix');
+			$dbname = $app->getCfg('db');
+			
+			$query = "SELECT COUNT(1) IndexIsThere "
+				." FROM INFORMATION_SCHEMA.STATISTICS"
+				." WHERE table_schema='".$dbname."' AND table_name='".$dbprefix."flexicontent_fields_item_relations' AND index_name='value'";
+			$this->_db->setQuery($query);
+			$return = $this->_db->loadResult() ? true : false;
+		}
+		return $return;
+	}
+	
+	
 	/**
 	 * Method to check if the system plugin is installed
 	 *
@@ -1813,11 +1893,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			if( !empty($flexi_rules['core.edit.state'][$group->id]) ) {
 				if (in_array('core.edit.state.own', $flexi_action_names)) $flexi_rules['core.edit.state.own'][$group->id] = 1;  //CanPublishOwn
 			}
-			// By default give to everybody (a) can edit field values and (b) can edit (change) item's main/secondary/featured categories
+			if( !empty($flexi_rules['core.edit'][$group->id]) || !empty($flexi_rules['core.edit.own'][$group->id])) {
+				if (in_array('core.change.cat', $flexi_action_names)) $flexi_rules['core.change.cat'][$group->id] = 1;  // CanChangeCat
+				if (in_array('core.change.cat.sec', $flexi_action_names)) $flexi_rules['core.change.cat.sec'][$group->id] = 1;  // CanChangeSecCat
+				if (in_array('core.change.cat.feat', $flexi_action_names)) $flexi_rules['core.change.cat.feat'][$group->id] = 1;  // CanChangeFeatCat
+			}
+			// By default give to everybody the edit field values privelege
 			if (in_array('flexicontent.editfieldvalues', $flexi_action_names)) $flexi_rules['flexicontent.editfieldvalues'][$group->id] = 1;  //CanEditFieldValues
-			if (in_array('core.change.cat', $flexi_action_names)) $flexi_rules['core.change.cat'][$group->id] = 1;  // CanChangeCat
-			if (in_array('core.change.cat.sec', $flexi_action_names)) $flexi_rules['core.change.cat.sec'][$group->id] = 1;  // CanChangeSecCat
-			if (in_array('core.change.cat.feat', $flexi_action_names)) $flexi_rules['core.change.cat.feat'][$group->id] = 1;  // CanChangeFeatCat
 		}
 		
 		// return rules, a NOTE: MAYBE in future we create better initial permissions by checking allow/deny/inherit values instead of just HAS ACTION ...

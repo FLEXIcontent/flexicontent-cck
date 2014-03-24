@@ -3347,7 +3347,16 @@ class ParentClassItem extends JModelLegacy
 			$query = 'UPDATE #__content'
 				. ' SET state = ' . (int)$state
 				. ' WHERE id = '.(int)$id
-				. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
+				//. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
+			;
+			$this->_db->setQuery( $query );
+			$this->_db->query();
+			if ( $this->_db->getErrorNum() )  if (FLEXI_J16GE) throw new Exception($this->_db->getErrorMsg(), 500); else JError::raiseError(500, $this->_db->getErrorMsg());
+			
+			$query = 'UPDATE #__flexicontent_items_ext'
+				. ' SET cnt_state = ' . (int)$state
+				. ' WHERE item_id = '.(int)$id
+				//. ' AND ( checked_out = 0 OR ( checked_out = ' . (int) $user->get('id'). ' ) )'
 			;
 			$this->_db->setQuery( $query );
 			$this->_db->query();

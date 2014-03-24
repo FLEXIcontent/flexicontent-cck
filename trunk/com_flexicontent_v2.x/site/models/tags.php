@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 1775 2013-09-27 02:04:02Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 1848 2014-02-16 12:03:55Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -414,7 +414,8 @@ class FlexicontentModelTags extends JModelLegacy
 		
 		// Filter the tag view with the active language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtertag) {
-			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
+			$lta = FLEXI_J16GE ? 'i': 'ie';
+			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
 		
 		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).

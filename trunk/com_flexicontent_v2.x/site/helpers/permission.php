@@ -19,179 +19,194 @@ class FlexicontentHelperPerm
 	 */
 	static function getPerm($force = false)
 	{
+		// Return already calculated data
 		static $permission = null;
+		if ($permission && !$force) return $permission;
 		
-		if(!$permission || $force)
-		{
-			// handle jcomments integration
-			if (JPluginHelper::isEnabled('system', 'jcomments')) {
-				$Comments_Enabled 	= 1;
-				$destpath		= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
-				$dest 			= $destpath.DS.'com_flexicontent.plugin.php';
-				$source 		= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
-				
-				jimport('joomla.filesystem.file');
-				if (!JFile::exists($dest)) {
-					if (!JFolder::exists($destpath)) { 
-						if (!JFolder::create($destpath)) { 
-							JError::raiseWarning(100, JText::_('FLEXIcontent: Unable to create jComments plugin folder'));
-						}
-					}
-					if (!JFile::copy($source, $dest)) {
-						JError::raiseWarning(100, JText::_('FLEXIcontent: Unable to copy jComments plugin'));
-					} else {
-						$mainframe->enqueueMessage(JText::_('Copied FLEXIcontent jComments plugin'));
+		// Return cached data
+		$catscache = JFactory::getCache('com_flexicontent_cats');  // Get Joomla Cache of '...items' Caching Group
+		$catscache->setCaching(1); 		              // Force cache ON
+		$catscache->setLifeTime(84600); //set expiry to one day
+		
+		$user_id = JFactory::getUser()->id;
+		$permission = $catscache->call(array('FlexicontentHelperPerm', 'getUserPerms'), $user_id);
+		
+		return $permission;
+	}
+	
+	
+	
+	static function getUserPerms($user_id)
+	{
+		// handle jcomments integration
+		if (JPluginHelper::isEnabled('system', 'jcomments')) {
+			$Comments_Enabled 	= 1;
+			$destpath		= JPATH_SITE.DS.'components'.DS.'com_jcomments'.DS.'plugins';
+			$dest 			= $destpath.DS.'com_flexicontent.plugin.php';
+			$source 		= JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'jcomments'.DS.'com_flexicontent.plugin.php';
+			
+			jimport('joomla.filesystem.file');
+			if (!JFile::exists($dest)) {
+				if (!JFolder::exists($destpath)) { 
+					if (!JFolder::create($destpath)) { 
+						JError::raiseWarning(100, JText::_('FLEXIcontent: Unable to create jComments plugin folder'));
 					}
 				}
-			} else {
-				$Comments_Enabled 	= 0;
+				if (!JFile::copy($source, $dest)) {
+					JError::raiseWarning(100, JText::_('FLEXIcontent: Unable to copy jComments plugin'));
+				} else {
+					$mainframe->enqueueMessage(JText::_('Copied FLEXIcontent jComments plugin'));
+				}
 			}
-			
-			$user = JFactory::getUser();
-			$permission = new stdClass;
-			
-			// !!! This is the Super User Privelege of GLOBAL Configuration		(==> (for J2.5) core.admin ACTION allowed on ROOT ASSET: 'root.1')
-			$permission->SuperAdmin		= JAccess::check($user->id, 'core.admin', 'root.1');
-			
-			//!!! ALLOWs USERS to change component's CONFIGURATION						(==> (for J2.5) core.admin ACTION allowed on COMPONENT ASSET: e.g. 'com_flexicontent')
-			$permission->CanConfig		= $user->authorise('core.admin', 				'com_flexicontent');
-					
-			//!!! ALLOWs USERS in JOOMLA BACKEND : (not used in J1.5)
-			//   (a) to view the FLEXIcontent menu item in Components Menu and
-			//   (b) to access the FLEXIcontent component screens (whatever they are allowed to see by individual FLEXIcontent area permissions)
-			//       NOTE: the initially installed permissions allows all areas to be managed for J2.5 and none (except for items) for J1.5
-			$permission->CanManage		= $user->authorise('core.manage', 			'com_flexicontent');
-			
-			// ITEMS/CATEGORIES: category-inherited permissions, (NOTE: these are the global settings, so:)
-			// *** 1. the action permissions of individual items are checked seperately per item
-			// *** 2. the view permission is checked via the access level of each item
-			// --- *. We will check for SOFT DENY, and then try to find the FIRST ALLOWED CATEGORY FOR EACH ACTION
-			
-			$permission->CanAdd     = $user->authorise('core.create', 				'com_flexicontent');
-			if ($permission->CanAdd === NULL) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, false, $find_first = true );
-				$permission->CanAdd = count($allowedcats) > 0;
-			}
-			
-			$permission->CanEdit    = $user->authorise('core.edit', 					'com_flexicontent');
-			if ($permission->CanEdit === NULL) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit'), $require_all=true, $check_published = true, false, $find_first = true );
-				$permission->CanEdit = count($allowedcats) > 0;
-			}
-			
-			$permission->CanEditOwn = $user->authorise('core.edit.own', 			'com_flexicontent');
-			if ($permission->CanEditOwn === NULL) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit.own'), $require_all=true, $check_published = true, false, $find_first = true );
-				$permission->CanEditOwn = count($allowedcats) > 0;
-			}
-			
-			$permission->CanPublish = $user->authorise('core.edit.state',			'com_flexicontent');
-			if ($permission->CanPublish === NULL) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit.state'), $require_all=true, $check_published = true, false, $find_first = true );
-				$permission->CanPublish = count($allowedcats) > 0;
-			}
-			
-			$permission->CanPublishOwn= $user->authorise('core.edit.state.own',	'com_flexicontent');
-			if ($permission->CanPublishOwn === NULL) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit.state.own'), $require_all=true, $check_published = true, false, $find_first = true );
-				$permission->CanPublishOwn = count($allowedcats) > 0;
-			}
-			
-			$permission->CanDelete		= $user->authorise('core.delete', 				'com_flexicontent');
-			if ($permission->CanDelete === NULL) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.delete'), $require_all=true, $check_published = true, false, $find_first = true );
-				$permission->CanDelete = count($allowedcats) > 0;
-			}
-			
-			$permission->CanDeleteOwn	= $user->authorise('core.delete.own', 		'com_flexicontent');
-			if ($permission->CanDeleteOwn === NULL) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.delete.own'), $require_all=true, $check_published = true, false, $find_first = true );
-				$permission->CanDeleteOwn = count($allowedcats) > 0;
-			}
-			
-			$permission->CanChangeCat= $user->authorise('core.change.cat',	'com_flexicontent');
-			if ($permission->CanChangeCat === NULL) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat'), $require_all=true, $check_published = true, false, $find_first = true );
-				$permission->CanChangeCat = count($allowedcats) > 0;
-			}
-			
-			$permission->CanChangeSecCat= $user->authorise('core.change.cat.sec',	'com_flexicontent');
-			if ($permission->CanChangeSecCat === NULL) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat.sec'), $require_all=true, $check_published = true, false, $find_first = true );
-				$permission->CanChangeSecCat = count($allowedcats) > 0;
-			}
-			
-			$permission->CanChangeFeatCat= $user->authorise('core.change.cat.feat',	'com_flexicontent');
-			if ($permission->CanChangeFeatCat === NULL) {
-				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat.feat'), $require_all=true, $check_published = true, false, $find_first = true );
-				$permission->CanChangeFeatCat = count($allowedcats) > 0;
-			}
-			
-			// Permission for changing the access level of items and categories that user can edit
-			// (a) In J1.5, this is the FLEXIaccess component access permission, and
-			// (b) In J2.5, this is the FLEXIcontent component ACTION 'accesslevel'
-			$permission->CanRights		= $user->authorise('flexicontent.accesslevel',		'com_flexicontent');
-			
-			// ITEMS: component controlled permissions
-			$permission->DisplayAllItems		= $user->authorise('flexicontent.displayallitems','com_flexicontent'); // (backend) List all items (otherwise only items that can be edited)
-			$permission->CanCopy			= $user->authorise('flexicontent.copyitems',	'com_flexicontent'); // (backend) Item Copy Task
-			$permission->CanOrder			= $user->authorise('flexicontent.orderitems',	'com_flexicontent'); // (backend) Reorder items inside the category
-			$permission->CanParams		= $user->authorise('flexicontent.paramsitem',	'com_flexicontent'); // (backend) Edit item parameters like meta data and template parameters
-			$permission->CanVersion		= $user->authorise('flexicontent.versioning',	'com_flexicontent'); // (backend) Use item versioning
-			
-			$permission->AssocAnyTrans		= $user->authorise('flexicontent.assocanytrans',		'com_flexicontent'); // (item edit form) associate any translation
-			$permission->EditCreationDate	= $user->authorise('flexicontent.editcreationdate',	'com_flexicontent'); // (item edit form) edit creation date (frontend)
-			$permission->IgnoreViewState	= $user->authorise('flexicontent.ignoreviewstate',	'com_flexicontent'); // (Frontend Content Lists) ignore view state
-			
-			// CATEGORIES: management tab and usage
-			$permission->CanCats			= $user->authorise('flexicontent.managecats',	'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
-			$permission->ViewAllCats	= $user->authorise('flexicontent.usercats',		'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
-			$permission->ViewTree			= $user->authorise('flexicontent.viewtree',		'com_flexicontent'); // (item edit form) view categories as tree instead of flat list
-			$permission->MultiCat			= $user->authorise('flexicontent.multicat',		'com_flexicontent'); // (item edit form) allow user to assign items to multiple categories
-			$permission->CanAddCats		= $permission->CanAdd && $permission->CanCats;
-			
-			// TAGS: management tab and usage
-			$permission->CanTags			= $user->authorise('flexicontent.managetags',	'com_flexicontent'); // (backend) Allow management of Item Types
-			$permission->CanUseTags		= $user->authorise('flexicontent.usetags', 		'com_flexicontent'); // edit already assigned Tags of items
-			$permission->CanNewTags		= $user->authorise('flexicontent.newtags',		'com_flexicontent'); // add new Tags to items
-			
-			// VARIOUS management TABS: types, archives, statistics, templates, tags
-			$permission->CanTypes			= $user->authorise('flexicontent.managetypes',			'com_flexicontent'); // (backend) Allow management of Item Types
-			$permission->CanArchives	= $user->authorise('flexicontent.managearchives', 	'com_flexicontent'); // (backend) Allow management of Archives
-			$permission->CanTemplates	= $user->authorise('flexicontent.managetemplates',	'com_flexicontent'); // (backend) Allow management of Templates
-			$permission->CanStats			= $user->authorise('flexicontent.managestats', 			'com_flexicontent'); // (backend) Allow management of Statistics
-			$permission->CanImport		= $user->authorise('flexicontent.manageimport',			'com_flexicontent'); // (backend) Allow management of (Content) Import
-			
-			// FIELDS: management tab
-			$permission->CanFields			= $user->authorise('flexicontent.managefields', 'com_flexicontent'); // (backend) Allow management of Fields
-			$permission->CanCopyFields	= $user->authorise('flexicontent.copyfields', 	'com_flexicontent'); // (backend) Field Copy Task
-			$permission->CanOrderFields	= $user->authorise('flexicontent.orderfields', 	'com_flexicontent'); // (backend) Reorder fields inside each item type
-			$permission->CanAddField		= $user->authorise('flexicontent.createfield', 	'com_flexicontent'); // (backend) Create fields
-			$permission->CanEditField		= $user->authorise('flexicontent.editfield', 		'com_flexicontent'); // (backend) Edit fields
-			$permission->CanDeleteField	= $user->authorise('flexicontent.deletefield', 	'com_flexicontent'); // (backend) Delete fields
-			$permission->CanPublishField= $user->authorise('flexicontent.publishfield', 'com_flexicontent'); // (backend) Publish fields
-			
-			// FILES: management tab
-			$permission->CanFiles				= $user->authorise('flexicontent.managefiles', 	'com_flexicontent'); // (backend) Allow management of Files
-			$permission->CanUpload	 		= $user->authorise('flexicontent.uploadfiles', 	'com_flexicontent'); // allow user to upload Files
-			$permission->CanViewAllFiles= $user->authorise('flexicontent.viewallfiles',	'com_flexicontent'); // allow user to view all Files
-			
-			// AUTHORS: management tab
-			$permission->CanAuthors		= $user->authorise('core.manage', 'com_users');
-			$permission->CanGroups		= 0;//FLEXI_J16GE ? $permission->CanAuthors : 0;
-			
-			// SEARCH INDEX: management tab
-			$permission->CanIndex			= $permission->CanFields && ($permission->CanAddField || $permission->CanEditField);
-			
-			// OTHER components permissions
-			$permission->CanPlugins	 	= $user->authorise('core.manage', 'com_plugins');
-			$permission->CanComments 	= $user->authorise('core.manage', 'com_jcomments');
-			$permission->CanComments	=	$permission->CanComments && $Comments_Enabled;
-			
-			// Global parameter to force always displaying of categories as tree
-			if (JComponentHelper::getParams('com_flexicontent')->get('cats_always_astree', 1)) {
-				$permission->ViewTree = 1;
-			}
+		} else {
+			$Comments_Enabled 	= 0;
+		}
+		
+		// Find permissions for given user id
+		$user = JFactory::getUser($user_id);
+		$permission = new stdClass;
+		
+		// !!! This is the Super User Privelege of GLOBAL Configuration		(==> (for J2.5) core.admin ACTION allowed on ROOT ASSET: 'root.1')
+		$permission->SuperAdmin		= JAccess::check($user->id, 'core.admin', 'root.1');
+		
+		//!!! ALLOWs USERS to change component's CONFIGURATION						(==> (for J2.5) core.admin ACTION allowed on COMPONENT ASSET: e.g. 'com_flexicontent')
+		$permission->CanConfig		= $user->authorise('core.admin', 				'com_flexicontent');
+				
+		//!!! ALLOWs USERS in JOOMLA BACKEND : (not used in J1.5)
+		//   (a) to view the FLEXIcontent menu item in Components Menu and
+		//   (b) to access the FLEXIcontent component screens (whatever they are allowed to see by individual FLEXIcontent area permissions)
+		//       NOTE: the initially installed permissions allows all areas to be managed for J2.5 and none (except for items) for J1.5
+		$permission->CanManage		= $user->authorise('core.manage', 			'com_flexicontent');
+		
+		// ITEMS/CATEGORIES: category-inherited permissions, (NOTE: these are the global settings, so:)
+		// *** 1. the action permissions of individual items are checked seperately per item
+		// *** 2. the view permission is checked via the access level of each item
+		// --- *. We will check for SOFT DENY, and then try to find the FIRST ALLOWED CATEGORY FOR EACH ACTION
+		
+		$permission->CanAdd     = $user->authorise('core.create', 				'com_flexicontent');
+		if ($permission->CanAdd === NULL) {
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, false, $find_first = true );
+			$permission->CanAdd = count($allowedcats) > 0;
+		}
+		
+		$permission->CanEdit    = $user->authorise('core.edit', 					'com_flexicontent');
+		if ($permission->CanEdit === NULL) {
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit'), $require_all=true, $check_published = true, false, $find_first = true );
+			$permission->CanEdit = count($allowedcats) > 0;
+		}
+		
+		$permission->CanEditOwn = $user->authorise('core.edit.own', 			'com_flexicontent');
+		if ($permission->CanEditOwn === NULL) {
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit.own'), $require_all=true, $check_published = true, false, $find_first = true );
+			$permission->CanEditOwn = count($allowedcats) > 0;
+		}
+		
+		$permission->CanPublish = $user->authorise('core.edit.state',			'com_flexicontent');
+		if ($permission->CanPublish === NULL) {
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit.state'), $require_all=true, $check_published = true, false, $find_first = true );
+			$permission->CanPublish = count($allowedcats) > 0;
+		}
+		
+		$permission->CanPublishOwn= $user->authorise('core.edit.state.own',	'com_flexicontent');
+		if ($permission->CanPublishOwn === NULL) {
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit.state.own'), $require_all=true, $check_published = true, false, $find_first = true );
+			$permission->CanPublishOwn = count($allowedcats) > 0;
+		}
+		
+		$permission->CanDelete		= $user->authorise('core.delete', 				'com_flexicontent');
+		if ($permission->CanDelete === NULL) {
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.delete'), $require_all=true, $check_published = true, false, $find_first = true );
+			$permission->CanDelete = count($allowedcats) > 0;
+		}
+		
+		$permission->CanDeleteOwn	= $user->authorise('core.delete.own', 		'com_flexicontent');
+		if ($permission->CanDeleteOwn === NULL) {
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.delete.own'), $require_all=true, $check_published = true, false, $find_first = true );
+			$permission->CanDeleteOwn = count($allowedcats) > 0;
+		}
+		
+		$permission->CanChangeCat= $user->authorise('core.change.cat',	'com_flexicontent');
+		if ($permission->CanChangeCat === NULL) {
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat'), $require_all=true, $check_published = true, false, $find_first = true );
+			$permission->CanChangeCat = count($allowedcats) > 0;
+		}
+		
+		$permission->CanChangeSecCat= $user->authorise('core.change.cat.sec',	'com_flexicontent');
+		if ($permission->CanChangeSecCat === NULL) {
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat.sec'), $require_all=true, $check_published = true, false, $find_first = true );
+			$permission->CanChangeSecCat = count($allowedcats) > 0;
+		}
+		
+		$permission->CanChangeFeatCat= $user->authorise('core.change.cat.feat',	'com_flexicontent');
+		if ($permission->CanChangeFeatCat === NULL) {
+			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat.feat'), $require_all=true, $check_published = true, false, $find_first = true );
+			$permission->CanChangeFeatCat = count($allowedcats) > 0;
+		}
+		
+		// Permission for changing the access level of items and categories that user can edit
+		// (a) In J1.5, this is the FLEXIaccess component access permission, and
+		// (b) In J2.5, this is the FLEXIcontent component ACTION 'accesslevel'
+		$permission->CanRights		= $user->authorise('flexicontent.accesslevel',		'com_flexicontent');
+		
+		// ITEMS: component controlled permissions
+		$permission->DisplayAllItems		= $user->authorise('flexicontent.displayallitems','com_flexicontent'); // (backend) List all items (otherwise only items that can be edited)
+		$permission->CanCopy			= $user->authorise('flexicontent.copyitems',	'com_flexicontent'); // (backend) Item Copy Task
+		$permission->CanOrder			= $user->authorise('flexicontent.orderitems',	'com_flexicontent'); // (backend) Reorder items inside the category
+		$permission->CanParams		= $user->authorise('flexicontent.paramsitem',	'com_flexicontent'); // (backend) Edit item parameters like meta data and template parameters
+		$permission->CanVersion		= $user->authorise('flexicontent.versioning',	'com_flexicontent'); // (backend) Use item versioning
+		
+		$permission->AssocAnyTrans		= $user->authorise('flexicontent.assocanytrans',		'com_flexicontent'); // (item edit form) associate any translation
+		$permission->EditCreationDate	= $user->authorise('flexicontent.editcreationdate',	'com_flexicontent'); // (item edit form) edit creation date (frontend)
+		$permission->IgnoreViewState	= $user->authorise('flexicontent.ignoreviewstate',	'com_flexicontent'); // (Frontend Content Lists) ignore view state
+		
+		// CATEGORIES: management tab and usage
+		$permission->CanCats			= $user->authorise('flexicontent.managecats',	'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
+		$permission->ViewAllCats	= $user->authorise('flexicontent.usercats',		'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
+		$permission->ViewTree			= $user->authorise('flexicontent.viewtree',		'com_flexicontent'); // (item edit form) view categories as tree instead of flat list
+		$permission->MultiCat			= $user->authorise('flexicontent.multicat',		'com_flexicontent'); // (item edit form) allow user to assign items to multiple categories
+		$permission->CanAddCats		= $permission->CanAdd && $permission->CanCats;
+		
+		// TAGS: management tab and usage
+		$permission->CanTags			= $user->authorise('flexicontent.managetags',	'com_flexicontent'); // (backend) Allow management of Item Types
+		$permission->CanUseTags		= $user->authorise('flexicontent.usetags', 		'com_flexicontent'); // edit already assigned Tags of items
+		$permission->CanNewTags		= $user->authorise('flexicontent.newtags',		'com_flexicontent'); // add new Tags to items
+		
+		// VARIOUS management TABS: types, archives, statistics, templates, tags
+		$permission->CanTypes			= $user->authorise('flexicontent.managetypes',			'com_flexicontent'); // (backend) Allow management of Item Types
+		$permission->CanArchives	= $user->authorise('flexicontent.managearchives', 	'com_flexicontent'); // (backend) Allow management of Archives
+		$permission->CanTemplates	= $user->authorise('flexicontent.managetemplates',	'com_flexicontent'); // (backend) Allow management of Templates
+		$permission->CanStats			= $user->authorise('flexicontent.managestats', 			'com_flexicontent'); // (backend) Allow management of Statistics
+		$permission->CanImport		= $user->authorise('flexicontent.manageimport',			'com_flexicontent'); // (backend) Allow management of (Content) Import
+		
+		// FIELDS: management tab
+		$permission->CanFields			= $user->authorise('flexicontent.managefields', 'com_flexicontent'); // (backend) Allow management of Fields
+		$permission->CanCopyFields	= $user->authorise('flexicontent.copyfields', 	'com_flexicontent'); // (backend) Field Copy Task
+		$permission->CanOrderFields	= $user->authorise('flexicontent.orderfields', 	'com_flexicontent'); // (backend) Reorder fields inside each item type
+		$permission->CanAddField		= $user->authorise('flexicontent.createfield', 	'com_flexicontent'); // (backend) Create fields
+		$permission->CanEditField		= $user->authorise('flexicontent.editfield', 		'com_flexicontent'); // (backend) Edit fields
+		$permission->CanDeleteField	= $user->authorise('flexicontent.deletefield', 	'com_flexicontent'); // (backend) Delete fields
+		$permission->CanPublishField= $user->authorise('flexicontent.publishfield', 'com_flexicontent'); // (backend) Publish fields
+		
+		// FILES: management tab
+		$permission->CanFiles				= $user->authorise('flexicontent.managefiles', 	'com_flexicontent'); // (backend) Allow management of Files
+		$permission->CanUpload	 		= $user->authorise('flexicontent.uploadfiles', 	'com_flexicontent'); // allow user to upload Files
+		$permission->CanViewAllFiles= $user->authorise('flexicontent.viewallfiles',	'com_flexicontent'); // allow user to view all Files
+		
+		// AUTHORS: management tab
+		$permission->CanAuthors		= $user->authorise('core.manage', 'com_users');
+		$permission->CanGroups		= 0;//FLEXI_J16GE ? $permission->CanAuthors : 0;
+		
+		// SEARCH INDEX: management tab
+		$permission->CanIndex			= $permission->CanFields && ($permission->CanAddField || $permission->CanEditField);
+		
+		// OTHER components permissions
+		$permission->CanPlugins	 	= $user->authorise('core.manage', 'com_plugins');
+		$permission->CanComments 	= $user->authorise('core.manage', 'com_jcomments');
+		$permission->CanComments	=	$permission->CanComments && $Comments_Enabled;
+		
+		// Global parameter to force always displaying of categories as tree
+		if (JComponentHelper::getParams('com_flexicontent')->get('cats_always_astree', 1)) {
+			$permission->ViewTree = 1;
 		}
 		
 		return $permission;
@@ -211,9 +226,24 @@ class FlexicontentHelperPerm
 	 */
 	static function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false, $find_first = false )
 	{
+		// Return cached data
+		$catscache = JFactory::getCache('com_flexicontent_cats');  // Get Joomla Cache of '...items' Caching Group
+		$catscache->setCaching(1); 		              // Force cache ON
+		$catscache->setLifeTime(84600); //set expiry to one day
+		
+		$user_id = $user ? $user->id : JFactory::getUser()->id;
+		$allowedCats = $catscache->call(array('FlexicontentHelperPerm', '_getAllowedCats'), $user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first);
+		
+		return $allowedCats;
+	}
+	
+	
+	static function _getAllowedCats( $user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first)
+	{
 		global $globalcats;
 		$db = JFactory::getDBO();
 		$usercats = array();
+		$user = JFactory::getUser($user_id);
 		
 		if (FLEXI_J16GE)
 		{

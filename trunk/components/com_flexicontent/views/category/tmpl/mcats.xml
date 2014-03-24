@@ -9,7 +9,7 @@
 		<name>FLEXICONTENT_MCATS</name>
 		<description>FLEXICONTENT_MCATS_DESC</description>
 		<url addpath="/administrator/components/com_flexicontent/elements">
-			<field name="cids" type="flexicategories" multiple="true" default="0" label="FLEXI_CATEGORIES" required="required" description="FLEXI_CATEGORIES_DESC" />
+			<field name="cids" type="flexicategories" multiple="true" default="0" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
 		</url>
 	
 		<params addpath="/administrator/components/com_flexicontent/elements">

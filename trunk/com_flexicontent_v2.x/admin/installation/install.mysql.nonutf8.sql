@@ -52,7 +52,8 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_item_relations` (
   PRIMARY KEY  (`field_id`,`item_id`,`valueorder`),
   KEY `field_id` (`field_id`),
   KEY `item_id` (`item_id`),
-  KEY `valueorder` (`valueorder`)
+  KEY `valueorder` (`valueorder`),
+  KEY `value` (`valueorder`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_type_relations` (
@@ -87,7 +88,12 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
   `item_id` int(11) unsigned NOT NULL,
   `type_id` int(11) unsigned NOT NULL,
-  `language` varchar(11) NOT NULL default '',
+  `language` varchar(11) NOT NULL default '*',
+  `cnt_state` int(11) NOT NULL,
+  `cnt_access` int(11) NOT NULL,
+  `cnt_publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `cnt_publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `cnt_created_by` INT NOT NULL DEFAULT '0',
   `lang_parent_id` int(11) unsigned NOT NULL default 0,
   `sub_items` text NOT NULL,
   `sub_categories` text NOT NULL,

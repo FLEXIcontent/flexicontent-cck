@@ -237,10 +237,13 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 
 	
 	if (isset($fc_run_times['execute_main_query']))
-		$msg .= sprintf('<br/>-- [Execute Main Query: %.2f s] ', $fc_run_times['execute_main_query']/1000000);
+		$msg .= sprintf('<br/>-- [Query: item LISTING: %.2f s] ', $fc_run_times['execute_main_query']/1000000);
 	
-	if (isset($fc_run_times['execute_sec_queries']))
-		$msg .= sprintf('<br/>-- [Execute Secondary Query(-ies): %.2f s] ', $fc_run_times['execute_sec_queries']/1000000);
+	if (isset($fc_run_times['item_counting_sub_cats']))
+		$msg .= sprintf('<br/>-- [Queries: SUB-cats item COUNTING : %.2f s] ', $fc_run_times['item_counting_sub_cats']/1000000);
+	
+	if (isset($fc_run_times['item_counting_peer_cats']))
+		$msg .= sprintf('<br/>-- [Queries: PEER-cats item COUNTING : %.2f s] ', $fc_run_times['item_counting_peer_cats']/1000000);
 	
 	// **** BOF: ITEM FORM SAVING
 	if (isset($fc_run_times['onAfterSaveField_event']) && $fc_run_times['onAfterSaveField_event']/1000000 >= 0.01)
@@ -269,10 +272,10 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	// **** EOF: ITEM FORM SAVING
 	
 	if (isset($fc_run_times['templates_parsing_cached']))
-		$msg .= sprintf('<br/>-- [FC Templates Parsing (cacheable): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
+		$msg .= sprintf('<br/>-- [FC Templates XML Parsing (cacheable): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
 	
 	if (isset($fc_run_times['templates_parsing_noncached']))
-		$msg .= sprintf('<br/>-- [FC Templates Parsing (not cacheable) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
+		$msg .= sprintf('<br/>-- [FC Templates XML Parsing (not cacheable) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
 	
 	// **** BOF: FRONTEND SPECIFIC
 	if (isset($fc_run_times['search_query_runtime']))

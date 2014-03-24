@@ -32,6 +32,9 @@ class FlexicontentController extends JControllerLegacy
 	{
 		parent::__construct();
 		$params = JComponentHelper::getParams('com_flexicontent');
+		$print_logging_info = $params->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		
 		$config_saved = !FLEXI_J16GE ? $params->get('flexi_section', 0) : $params->get('flexi_cat_extension', 0);
 		//$config_saved = $config_saved && $params->get('search_mode', 0);  // an Extra configuration check
 		
@@ -47,12 +50,15 @@ class FlexicontentController extends JControllerLegacy
 		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED
 		$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 		$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
-		if(($postinst_integrity_ok===NULL) || ($postinst_integrity_ok===false) || $recheck_aftersave) {
+		$format	= JRequest::getCmd('format', null);
+		 if ( $format!="raw"  &&  ($postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave) ) {
 			// NULL mean POSTINSTALL tasks has not been checked YET (current PHP user session),
 			// false means it has been checked during current session, but has failed one or more tasks
 			// In both cases we must evaluate the POSTINSTALL tasks,  and set the session variable
+			if ( $print_logging_info ) $start_microtime = microtime(true);
 			$session->set('flexicontent.postinstall', $postinst_integrity_ok = $this->getPostinstallState());
 			$session->set('unbounded_count', false, 'flexicontent');  // indicate to item manager to recheck unbound items
+			if ( $print_logging_info ) @$fc_run_times['post_installation_tasks'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
 		
 		// SET recheck_aftersave FLAG to indicate rechecking of (a) post installation tasks AND (b) integrity checks after configuration save or article importing
@@ -61,7 +67,9 @@ class FlexicontentController extends JControllerLegacy
 		} else {
 			$session->set('flexicontent.recheck_aftersave', true);
 		}
-
+		
+		if ( $print_logging_info ) $start_microtime = microtime(true);
+		
 		// GET ALLPLGPUBLISH task from session variable AND IF NEEDED re-evaluate it
 		// NOTE, we choose to have this separate from REQUIRED POSTINSTALL tasks,
 		// because WE DON'T WANT TO FORCE the user to enable all plugins but rather recommend it
@@ -92,9 +100,11 @@ class FlexicontentController extends JControllerLegacy
 		$this->registerTask( 'publishplugins'				, 'publishplugins' );
 		$this->registerTask( 'addmcatitemrelations'	, 'addMcatItemRelations' );
 		$this->registerTask( 'createlangcolumn'			, 'createLangColumn' );
+		$this->registerTask( 'createdbindexes'			, 'createDBindexes' );
 		$this->registerTask( 'createversionstbl'		, 'createVersionsTable' );
 		$this->registerTask( 'populateversionstbl'	, 'populateVersionsTable' );
 		$this->registerTask( 'createauthorstbl'			, 'createauthorstable' );
+		$this->registerTask( 'updateitemcounting'   , 'updateItemCountingData' );
 		$this->registerTask( 'deleteoldfiles'				, 'deleteOldBetaFiles' );
 		$this->registerTask( 'cleanupoldtables'			, 'cleanupOldTables' );
 		$this->registerTask( 'addcurrentversiondata', 'addCurrentVersionData' );
@@ -105,6 +115,8 @@ class FlexicontentController extends JControllerLegacy
 			JRequest::setVar('task', 'copy');
 			JRequest::setVar('copy_behaviour', 'translate');
 		}
+		
+		if ( $print_logging_info ) @$fc_run_times['initialize_component'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 	}
 	
 	function processLanguageFiles() 
@@ -151,31 +163,112 @@ class FlexicontentController extends JControllerLegacy
 		}
 	}
 
-	function getPostinstallState() {
+	function getPostinstallState()
+	{
+		$params = JComponentHelper::getParams('com_flexicontent');
+		$print_logging_info = $params->get('print_logging_info');
+		if ( $print_logging_info ) {
+			global $fc_run_times;
+			$start_microtime = microtime(true);
+		}
+		
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$model  = $this->getModel('flexicontent');
 		$params = JComponentHelper::getParams('com_flexicontent');
 		$use_versioning = $params->get('use_versioning', 1);
+					if ( $print_logging_info ) @$fc_run_times['checking_postinstall_task_init'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [checking_postinstall_task_init: %.2f s] ', $fc_run_times['checking_postinstall_task_init']/1000000);
 
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existmenuitems	= $model->getExistMenuItems();
+				if ( $print_logging_info ) @$fc_run_times['getExistMenuItems'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getExistMenuItems: %.2f s] ', $fc_run_times['getExistMenuItems']/1000000);
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existtype 			= $model->getExistType();
+				if ( $print_logging_info ) @$fc_run_times['getExistType'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getExistType: %.2f s] ', $fc_run_times['getExistType']/1000000);
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existfields 		= $model->getExistFields();
+				if ( $print_logging_info ) @$fc_run_times['getExistFields'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getExistFields: %.2f s] ', $fc_run_times['getExistFields']/1000000);
 
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existfplg 			= $model->getExistFieldsPlugins();
+				if ( $print_logging_info ) @$fc_run_times['getExistFieldsPlugins'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getExistFieldsPlugins: %.2f s] ', $fc_run_times['getExistFieldsPlugins']/1000000);
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existseplg 		= $model->getExistSearchPlugin();
+				if ( $print_logging_info ) @$fc_run_times['getExistSearchPlugin'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getExistSearchPlugin: %.2f s] ', $fc_run_times['getExistSearchPlugin']/1000000);
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existsyplg 		= $model->getExistSystemPlugin();
+				if ( $print_logging_info ) @$fc_run_times['getExistSystemPlugin'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getExistSystemPlugin: %.2f s] ', $fc_run_times['getExistSystemPlugin']/1000000);
 		
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existcats        = !$model->getItemsNoCat();
+				if ( $print_logging_info ) @$fc_run_times['getItemsNoCat'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getItemsNoCat: %.2f s] ', $fc_run_times['getItemsNoCat']/1000000);
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existlang				= $model->getExistLanguageColumn() && !$model->getItemsNoLang();
+				if ( $print_logging_info ) @$fc_run_times['getItemsNoLang'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getItemsNoLang: %.2f s] ', $fc_run_times['getItemsNoLang']/1000000);
+			
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
+		$existdbindexes = $model->getExistDBindexes();
+				if ( $print_logging_info ) @$fc_run_times['getExistDBindexes'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getExistDBindexes: %.2f s] ', $fc_run_times['getExistDBindexes']/1000000);
+		
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
+		$itemcountingdok  = $model->getItemCountingDataOK();
+				if ( $print_logging_info ) @$fc_run_times['getItemCountingDataOK'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getItemCountingDataOK: %.2f s] ', $fc_run_times['getItemCountingDataOK']/1000000);
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existversions 		= $model->getExistVersionsTable();
+				if ( $print_logging_info ) @$fc_run_times['getExistVersionsTable'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getExistVersionsTable: %.2f s] ', $fc_run_times['getExistVersionsTable']/1000000);
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existversionsdata= !$use_versioning || $model->getExistVersionsPopulated();
+				if ( $print_logging_info ) @$fc_run_times['getExistVersionsPopulated'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getExistVersionsPopulated: %.2f s] ', $fc_run_times['getExistVersionsPopulated']/1000000);
 		
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existauthors 		= $model->getExistAuthorsTable();
+				if ( $print_logging_info ) @$fc_run_times['getExistAuthorsTable'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getExistAuthorsTable: %.2f s] ', $fc_run_times['getExistAuthorsTable']/1000000);
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$cachethumb				= $model->getCacheThumbChmod();
+				if ( $print_logging_info ) @$fc_run_times['getCacheThumbChmod'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getCacheThumbChmod: %.2f s] ', $fc_run_times['getCacheThumbChmod']/1000000);
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$oldbetafiles			= $model->getOldBetaFiles();
+				if ( $print_logging_info ) @$fc_run_times['getOldBetaFiles'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getOldBetaFiles: %.2f s] ', $fc_run_times['getOldBetaFiles']/1000000);
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$nooldfieldsdata	= $model->getNoOldFieldsData();
+				if ( $print_logging_info ) @$fc_run_times['getNoOldFieldsData'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [getNoOldFieldsData: %.2f s] ', $fc_run_times['getNoOldFieldsData']/1000000);
+			
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
+				if ( $print_logging_info ) @$fc_run_times['checkCurrentVersionData'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [checkCurrentVersionData: %.2f s] ', $fc_run_times['checkCurrentVersionData']/1000000);
 		
+			 if ( $print_logging_info ) $start_microtime = microtime(true);
 		$initialpermission = FLEXI_J16GE ? $model->checkInitialPermission() : true;
+				if ( $print_logging_info ) @$fc_run_times['checkInitialPermission'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				//printf('<br/>-- [checkInitialPermission: %.2f s] ', $fc_run_times['checkInitialPermission']/1000000);
 		
 		// This will check and add custom FLEXI_ACCESS privileges
 		if (!FLEXI_J16GE)
@@ -183,7 +276,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		//echo "(!$existmenuitems) || (!$existtype) || (!$existfields) ||<br>";
 		//echo "     (!$existfplg) || (!$existseplg) || (!$existsyplg) ||<br>";
-		//echo "     (!existcats)  || (!$existlang) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
+		//echo "     (!$existcats)  || (!$existlang) || (!$existdbindexes) || (!$itemcountingdok) || (!$existversions) || (!$existversionsdata) || (!$existauthors) || (!$cachethumb) ||<br>";
 		//echo "     (!$oldbetafiles) || (!$nooldfieldsdata) || (!$missingversion) ||<br>";
 		//echo "     (!$initialpermission)<br>";
 		
@@ -191,7 +284,7 @@ class FlexicontentController extends JControllerLegacy
 		$postinst_integrity_ok = true;
 		if ( !$existmenuitems || !$existtype || !$existfields ||
 		     //!$existfplg || !$existseplg || existsyplg ||
-		     !$existcats || !$existlang || !$existversions || !$existversionsdata || !$existauthors ||
+		     !$existcats || !$existlang || !$existdbindexes || !$itemcountingdok || !$existversions || !$existversionsdata || !$existauthors ||
 		     !$oldbetafiles || !$nooldfieldsdata || !$missingversion || !$cachethumb ||
 				 !$initialpermission
 		   ) {
@@ -515,35 +608,31 @@ VALUES
 	function setItemsDefaultLang($lang)
 	{
 		$db = JFactory::getDBO();
-
+		
 		// Set default language for items that do not have their language set
 		$query 	= 'UPDATE #__flexicontent_items_ext'
 				. ' SET language = ' . $db->Quote($lang)
 				. ' WHERE language = ""'
 				;
 		$db->setQuery($query);
-		$result = $db->query();
+		$result1 = $db->query();
 		
-		// Set language in the content to be same as in items_ext db table
-		if (FLEXI_J16GE) {
-			$query 	= 'UPDATE #__content i '
-					. " LEFT JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
-					. ' SET i.language = ie.language '
-					. " WHERE i.language <> ie.language "				
-					;
-			$db->setQuery($query);
-			$result = $db->query();
-		}
-
+		$query 	= 'UPDATE #__content'
+				. ' SET language = ' . $db->Quote($lang)
+				. ' WHERE language = ""'
+				;
+		$db->setQuery($query);
+		$result2 = $db->query();
+		
 		// Set default translation group for items that don't have one
 		$query 	= 'UPDATE #__flexicontent_items_ext'
 				. ' SET lang_parent_id = item_id '
 				. ' WHERE lang_parent_id = 0'
 				;
 		$db->setQuery($query);
-		$result = $db->query();
+		$result3 = $db->query();
 		
-		return $result;
+		return $result1 && result2 && result3;
 	}
 	
 	/**
@@ -631,6 +720,78 @@ VALUES
 			echo '<span class="install-ok"></span>';
 		}
 	}
+	
+	
+	/**
+	 * Method to create missing DB indexes
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function createDBindexes()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+
+		$db = JFactory::getDBO();
+		$nullDate	= $db->getNullDate();
+		
+		$model  = $this->getModel('flexicontent');
+		$existdbindexes = $model->getExistDBindexes();
+		if (!$existdbindexes) {
+			$app = JFactory::getApplication();
+			$dbprefix = $app->getCfg('dbprefix');
+			
+			$query	= "ALTER TABLE `".$dbprefix."flexicontent_fields_item_relations` ADD INDEX value(`value`(32))";
+			$db->setQuery($query);
+			
+			if (!$db->query()) {
+				echo '<span class="install-notok"></span><span class="button-add"><a id="existauthors" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			} else {
+				echo '<span class="install-ok"></span>';
+			}
+		} else {
+			echo '<span class="install-ok"></span>';
+		}
+	}
+		
+	
+	/**
+	 * Method to update content into non-indexed columns
+	 * 
+	 * @access	public
+	 * @return	boolean	True on success
+	 * @since 1.5
+	 */
+	function updateItemCountingData()
+	{
+		// Check for request forgeries
+		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
+		
+		$app = JFactory::getApplication();
+		$db = JFactory::getDBO();
+		
+		// Set language in the content to be same as in items_ext db table
+		$query 	= 'UPDATE #__flexicontent_items_ext AS ie '
+				. ' JOIN #__content AS i ON i.id=ie.item_id '
+				. ' SET ' . (FLEXI_J16GE ? ' ie.language = i.language,' : '')
+				. '  ie.cnt_state = i.state '
+				. ', ie.cnt_access = i.access '
+				. ', ie.cnt_publish_up = i.publish_up '
+				. ', ie.cnt_publish_down = i.publish_down '
+				. ', ie.cnt_created_by = i.created_by '
+				;
+		
+		$db->setQuery($query);
+		
+		if (!$db->query()) {
+			echo '<span class="install-notok"></span><span class="button-add"><a id="itemcountingdok" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		} else {
+			echo '<span class="install-ok"></span>';
+		}
+	}
+	
 	
 	/**
 	 * Method to create the versions table

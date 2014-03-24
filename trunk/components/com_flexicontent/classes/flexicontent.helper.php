@@ -1453,10 +1453,14 @@ class flexicontent_html
 		{
 			// Given CATEGORY VIEW OBJECT may limit to specific category ids
 			$canAdd = $user->authorise('core.create', 'com_flexicontent');
-			if ($canAdd === NULL) {
+			if ($canAdd === NULL && $user->id) {
 				$specific_catids = $submit_cat ? @ $submit_cat->ids  :  false;
+				if ($specific_catids && count($specific_catids) > 3) $specific_catids = false;
 				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, $specific_catids, $find_first = true );
 				$canAdd = count($allowedcats);
+			} else {
+				// Avoid SOFT DENY leading to checking some/ALL categories for "create" privelege for unlogged users
+				$canAdd = false;
 			}
 		}
 		
