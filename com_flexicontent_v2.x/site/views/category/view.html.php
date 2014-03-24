@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1815 2013-12-04 03:31:42Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1848 2014-02-16 12:03:55Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -59,8 +59,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		$params   = $category->parameters;
 		
 		// Get various data from the model
-		$categories = $this->get('Childs');
-		$peercats   = $this->get('Peers');
+		$categories = $params->get('show_subcategories')  ? $this->get('Childs') : array();
+		$peercats   = $params->get('show_peercategories') ? $this->get('Peers')  : array();
 		$items   = $this->get('Data');
 		$total   = $this->get('Total');
 		$filters  = $this->get('Filters');

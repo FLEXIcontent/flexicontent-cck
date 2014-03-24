@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent_items.php 287 2010-06-12 18:09:22Z enjoyman $
+ * @version 1.5 stable $Id: flexicontent_items.php 1832 2014-01-17 00:17:27Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -100,6 +100,14 @@ class flexicontent_items extends JTable{
 	var $type_id			= null;
 	/** @var string */
 	var $language			= null;
+	
+	// for item counting in categories
+	var $cnt_state        = null;
+	var $cnt_access       = null;
+	var $cnt_publish_up   = null;
+	var $cnt_publish_down = null;
+	var $cnt_created_by   = null;
+	
 	/** @var int */
 	var $lang_parent_id		= null;
 	/** @var string */
@@ -138,6 +146,11 @@ class flexicontent_items extends JTable{
     var $_join_prop    		= array('item_id',
     								'type_id',
     								'language',
+										'cnt_state',
+										'cnt_access',
+										'cnt_publish_up',
+										'cnt_publish_down',
+										'cnt_created_by',
     								'lang_parent_id',
     								'sub_items',
     								'sub_categories',
@@ -348,9 +361,16 @@ class flexicontent_items extends JTable{
 				
 				// Else we add it to the type object
 			} else {
+				// normal item properties
 				$type->$p = $v;
+				
+				// catch case of item counting properties
+				if ( in_array($p, array("state","access","publish_up","publish_down","created_by")) ) {
+					//$jAp= JFactory::getApplication();
+					//$jAp->enqueueMessage('setting cnt_'.$p.' to' . $v,'message');
+					$type_ext->{'cnt_'.$p} = $v;
+				}
 			}
-
 		}
 
 		if( $this->$k )

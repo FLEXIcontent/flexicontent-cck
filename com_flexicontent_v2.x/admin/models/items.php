@@ -2186,6 +2186,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$row->load( $id );
 		$row->id = $id;
 		$row->access = $access;
+		$row->cnt_access = $access;
 
 		if ( !$row->check() ) {
 			$this->setError($this->_db->getErrorMsg());

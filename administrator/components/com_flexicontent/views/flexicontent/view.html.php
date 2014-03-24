@@ -44,6 +44,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$session  = JFactory::getSession();
 		$user     = JFactory::getUser();		
 		$db       = JFactory::getDBO();
+		$print_logging_info = $params->get('print_logging_info');
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		flexicontent_html::loadJQuery();
@@ -115,10 +116,13 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$themes		= flexicontent_tmpl::getThemes();
 		
 		// Get data from the model
+		if ( $print_logging_info )  global $fc_run_times;
+		if ( $print_logging_info ) $start_microtime = microtime(true);
 		$draft      = $this->get( 'Draft' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['draft'] = $db->loadResult();
 		$pending    = $this->get( 'Pending' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['pending'] = $db->loadResult();
 		$revised    = $this->get( 'Revised' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['revised'] = $db->loadResult();
 		$inprogress = $this->get( 'Inprogress' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['inprogress'] = $db->loadResult();
+		if ( $print_logging_info ) $fc_run_times['quick_sliders'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		
 		// 1. CHECK REQUIRED NON-AUTOMATIC TASKs
@@ -154,6 +158,8 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			
 			$existcats					= !$this->get('ItemsNoCat');
 			$existlang	 				= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
+			$existdbindexes			= $this->get( 'ExistDBindexes' );
+			$itemcountingdok    = $model->getItemCountingDataOK();
 			$existversions 			= $this->get( 'ExistVersionsTable' );
 			$existversionsdata	= !$use_versioning || $this->get( 'ExistVersionsPopulated' );
 			
@@ -286,6 +292,8 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$this->assignRef('existsyplg'			, $existsyplg);
 		$this->assignRef('existcats'			, $existcats);
 		$this->assignRef('existlang'			, $existlang);
+		$this->assignRef('existdbindexes'	, $existdbindexes);
+		$this->assignRef('itemcountingdok', $itemcountingdok);
 		$this->assignRef('existversions'		, $existversions);
 		$this->assignRef('existversionsdata', $existversionsdata);
 		$this->assignRef('existauthors'			, $existauthors);

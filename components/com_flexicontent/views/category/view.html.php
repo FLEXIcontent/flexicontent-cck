@@ -59,8 +59,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		$params   = $category->parameters;
 		
 		// Get various data from the model
-		$categories = $this->get('Childs');
-		$peercats   = $this->get('Peers');
+		$categories = $params->get('show_subcategories')  ? $this->get('Childs') : array();
+		$peercats   = $params->get('show_peercategories') ? $this->get('Peers')  : array();
 		$items   = $this->get('Data');
 		$total   = $this->get('Total');
 		$filters  = $this->get('Filters');

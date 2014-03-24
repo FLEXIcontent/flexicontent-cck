@@ -1252,6 +1252,9 @@ class FlexicontentFields
 			$field->parameters->set('field_elements', $field_elements);
 		}
 		
+		// TODO: examine this in combination with canCache
+		//$field_elements = FlexicontentFields::replaceFieldValue( $field, $item, $field_elements, 'field_elements' );
+		
 		if ($sql_mode) {  // SQL mode, parameter field_elements contains an SQL query
 			
 			$db = JFactory::getDBO();
@@ -2065,6 +2068,7 @@ class FlexicontentFields
 	static function createFilter(&$filter, $value='', $formName='adminForm', $indexed_elements=false, $search_prop='')
 	{
 		static $apply_cache = null;
+		static $faceted_overlimit_msg = null;
 		$user = JFactory::getUser();
 		$mainframe = JFactory::getApplication();
 		//$cparams   = $mainframe->getParams('com_flexicontent');
@@ -2141,6 +2145,7 @@ class FlexicontentFields
 					$view_join = @ $fc_catviev['join_clauses'];
 					$view_where = $fc_catviev['where_conf_only'];
 					$filters_where = $fc_catviev['filters_where'];
+					$view_total = $fc_catviev['view_total'];
 					if ($fc_catviev['alpha_where']) $filters_where['alpha'] = $fc_catviev['alpha_where'];  // we use count bellow ... so add it only if it is non-empty
 				}
 			} else if ( $isSearchView ) {
@@ -2166,15 +2171,21 @@ class FlexicontentFields
 			}
 			
 			// Get filter values considering ACTIVE filters, but only if there is at least ONE filter active
+			$faceted_max_item_limit = 10000;
 			if ( $faceted_filter==2 && count($filters_where) ) {
-				/*if ( $apply_cache ) { // Can produces big amounts of cached data, that will be rarely used ... commented out
-					$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expiration to default e.g. one hour
-					$results_active = $itemcache->call(array('FlexicontentFields', $createFilterValues), $filter, $view_where, $filters_where, $indexed_elements, $search_prop);
-				} else */
-				if (!$isSearchView)
-					$results_active = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
-				else
-					$results_active = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
+				if ($view_total <= $faceted_max_item_limit) {
+					// DO NOT cache at this point the filter combinations are endless, so they will produce big amounts of cached data, that will be rarely used ...
+					if (!$isSearchView)
+						$results_active = FlexicontentFields::createFilterValues($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
+					else
+						$results_active = FlexicontentFields::createFilterValuesSearch($filter, $view_join, $view_where, $filters_where, $indexed_elements, $search_prop);
+				} else if ($faceted_overlimit_msg === null) {
+					// Set a notice message about not counting item per filter values and instead showing item TOTAL of current category / view
+					$faceted_overlimit_msg = 1;
+					$filter_messages = JRequest::getVar('filter_message', array());
+					$filter_messages[] = JText::sprintf('FLEXI_FACETED_ITEM_LIST_OVER_LIMIT', $faceted_max_item_limit, $view_total);
+					JRequest::setVar('filter_messages', $filter_messages);
+				}
 			}
 			
 			// Decide which results to show those based: (a) on active filters or (b) on page configuration
@@ -2523,43 +2534,48 @@ class FlexicontentFields
 		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
 		
 		static $item_ids_list = null;
+		static $item_ids_sub_query = null;
 		
-		// FACETED filter
 		if ( $faceted_filter ) {
 			
 			// Find items belonging to current view
 			if ($item_ids_list === null && empty($view_where) )  $item_ids_list = '';
 			
-			if ($item_ids_list === null) {
+			if ($item_ids_list === null || $item_ids_sub_query === null) {
 				$sub_query = 'SELECT DISTINCT i.id '."\n"
 					. ' FROM #__content AS i'."\n"
 					. $view_join."\n"
 					. $view_where."\n"
 					;
 				
-				global $fc_run_times, $fc_jprof;
-				//$fc_jprof->mark('BEFORE FACETED INIT: FLEXIcontent component');
+				global $fc_run_times, $fc_jprof, $fc_catviev;
 				$start_microtime = microtime(true);
+				$view_total = (int) $fc_catviev['view_total'];
+				$use_item_list_below = 0;
 				
-				try {
-					// 1, try to bypass joomla SQL layer, including Falang (slow in large sites, not needed in this query ?) !!
-					$rows = flexicontent_db::directQuery($sub_query, false, true);
-					$item_ids = array();
-					foreach ($rows as $row) $item_ids[] = $row->id;
+				if ($view_total >= $use_item_list_below) {
+					// Use sub-query only if current view has more than 0 items
+					$item_ids_sub_query = $sub_query;
+				} else {
+					// If current view has less than nnn items, then pre-calculate an item_id list ... ??? this is may or may not be benfitial ...
+					try {
+						// 1, try to bypass joomla SQL layer, including Falang (slow in large sites, not needed in this query ?) !!
+						$rows = flexicontent_db::directQuery($sub_query, false, true);
+						$item_ids = array();
+						foreach ($rows as $row) $item_ids[] = $row->id;
+					}
+					
+					catch (Exception $e) {
+						// 2, get items via normal joomla SQL layer
+						$db->setQuery($sub_query);
+						$item_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+						if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+					}
+					
+					$item_ids_list = implode(',', $item_ids);
+					unset($item_ids);
 				}
-				
-				catch (Exception $e) {
-					// 2, get items via normal joomla SQL layer
-					$db->setQuery($sub_query);
-					$item_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-					if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-				}
-				
-				$item_ids_list = implode(',', $item_ids);
-				unset($item_ids);
-				
 				$fc_run_times['_create_filter_init'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-				//$fc_jprof->mark('AFTER FACETED INIT: FLEXIcontent component');
 			}
 			
 			$item_id_col = $filter->iscore ? 'i.id' : 'fi.item_id';
@@ -2570,6 +2586,7 @@ class FlexicontentFields
 				. $valuesjoin."\n"
 				. ' WHERE 1 '."\n"
 				. (!$item_ids_list ? '' : ' AND '.$item_id_col.' IN('.$item_ids_list.')'."\n")
+				. (!$item_ids_sub_query ? '' : ' AND '.$item_id_col.' IN('.$item_ids_sub_query.')'."\n")
 				.  ($filter->iscore ? $filter_where_curr : str_replace('i.id', 'fi.item_id', $filter_where_curr))."\n"
 				. $valueswhere."\n"
 				. $groupby."\n"
@@ -2624,12 +2641,14 @@ class FlexicontentFields
 		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
 		
 		static $item_ids_list = null;
+		static $item_ids_sub_query = null;
+		
 		if ( $faceted_filter )
 		{
-			if ($item_ids_list === null && empty($view_where) ) {
-				$item_ids_list = '';
-			}
-			if ($item_ids_list === null) {
+			// Find items belonging to current view
+			if ($item_ids_list === null && empty($view_where) )  $item_ids_list = '';
+			
+			if ($item_ids_list === null || $item_ids_sub_query === null) {
 				$sub_query = 'SELECT DISTINCT ai.item_id '."\n"
 					.' FROM #__flexicontent_advsearch_index AS ai'."\n"
 					.' JOIN #__content i ON ai.item_id = i.id'."\n"
@@ -2639,15 +2658,34 @@ class FlexicontentFields
 					;
 				$db->setQuery($sub_query);
 				
-				global $fc_run_times, $fc_jprof;
+				global $fc_run_times, $fc_jprof, $fc_searchview;
 				$start_microtime = microtime(true);
-				//$fc_jprof->mark('BEFORE FACETED INIT: FLEXIcontent component');
+				$view_total = 1; //(int) $fc_searchview['view_total'];
+				$use_item_list_below = 0;
 				
-				$item_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
-				$item_ids_list = implode(',', $item_ids);
-				
+				if ($view_total >= $use_item_list_below) {
+					// Use sub-query only if current view has more than 0 items
+					$item_ids_sub_query = $sub_query;
+				} else {
+					// If current view has less than nnn items, then pre-calculate an item_id list ... ??? this is may or may not be benfitial ...
+					try {
+						// 1, try to bypass joomla SQL layer, including Falang (slow in large sites, not needed in this query ?) !!
+						$rows = flexicontent_db::directQuery($sub_query, false, true);
+						$item_ids = array();
+						foreach ($rows as $row) $item_ids[] = $row->id;
+					}
+					
+					catch (Exception $e) {
+						// 2, get items via normal joomla SQL layer
+						$db->setQuery($sub_query);
+						$item_ids = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+						if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+					}
+					
+					$item_ids_list = implode(',', $item_ids);
+					unset($item_ids);
+				}
 				$fc_run_times['_create_filter_init'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-				//$fc_jprof->mark('AFTER FACETED INIT: FLEXIcontent component');
 			}
 			
 			// Get ALL records that have such values for the given field
@@ -2655,6 +2693,7 @@ class FlexicontentFields
 				. ' FROM #__flexicontent_advsearch_index AS ai'."\n"
 				. ' WHERE 1 '."\n"
 				. (!$item_ids_list ? '' : ' AND ai.item_id IN('.$item_ids_list.')'."\n")
+				. (!$item_ids_sub_query ? '' : ' AND ai.item_id IN('.$item_ids_sub_query.')'."\n")
 				. ' AND ai.field_id='.(int)$filter->id."\n"
 				.  str_replace('i.id', 'ai.item_id', $filter_where_curr)."\n"
 				. ' GROUP BY ai.search_index, ai.value_id'."\n"

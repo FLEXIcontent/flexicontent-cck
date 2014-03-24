@@ -265,6 +265,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 					$this->_total = 0;
 				}
 			}
+			// Assign total number of items found this will be used to decide whether to do item counting per filter value
+			global $fc_catviev;
+			$fc_catviev['view_total']  = $this->_total;
 			
 			/*if ((int)$this->getState('limitstart') < (int)$this->_total) {
 				$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
@@ -710,7 +713,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE 1';
 		if ($this->_authorid)
-			$where .= ' AND i.created_by = ' . $this->_db->Quote($this->_authorid);
+			$where .= ' AND i.created_by = ' . $db->Quote($this->_authorid);
 		
 		// Prevent author's description item from appearing in the author listings
 		if ($this->_authorid && (int)$this->_params->get('authordescr_itemid'))
@@ -738,13 +741,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 			
 			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
 		}
 		
 		// Filter the category view with the active language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
+			$lta = FLEXI_J16GE ? 'i': 'ie';
+			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
 		
 		$where .= !FLEXI_J16GE ? ' AND i.sectionid = ' . FLEXI_SECTION : '';
@@ -1130,97 +1134,201 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
 		
-		// Get the view's parameters
-		$params = $this->_params;
+		// Use item count method
+		$no_index_item_count = true;
+		if ($no_index_item_count) {
 		
-		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
-		//  thus the items are published globally at the time the author specified in his/her local clock
-		//$app  = JFactory::getApplication();
-		//$now  = FLEXI_J16GE ? $app->requestTime : $app->get('requestTime');   // NOT correct behavior it should be UTC (below)
-		//$date = JFactory::getDate();
-		//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
-		$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
-		$nullDate = $db->getNullDate();
+			// Get the view's parameters
+			$params = $this->_params;
 		
-		// Get some parameters and other info
-		$catlang = $params->get('language', '');          // category language (currently UNUSED), this is property in J2.5 instead of as parameter in FC J1.5
-		$lang = flexicontent_html::getUserCurrentLang();   // Get user current language
-		$filtercat  = $params->get('filtercat', 0);       // Filter items using currently selected language
-		$show_noauth = $params->get('show_noauth', 0);    // Show unauthorized items
+			// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
+			//  thus the items are published globally at the time the author specified in his/her local clock
+			//$app  = JFactory::getApplication();
+			//$now  = FLEXI_J16GE ? $app->requestTime : $app->get('requestTime');   // NOT correct behavior it should be UTC (below)
+			//$date = JFactory::getDate();
+			//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
+			$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
+			$nullDate = $db->getNullDate();
 		
-		// First thing we need to do is to select only the requested items
-		$where = ' WHERE 1 ';
-		if ($this->_authorid)
-			$where .= ' AND i.created_by = ' . $this->_db->Quote($this->_authorid);
+			// Get some parameters and other info
+			$catlang = $params->get('language', '');          // category language (currently UNUSED), this is property in J2.5 instead of as parameter in FC J1.5
+			$lang = flexicontent_html::getUserCurrentLang();   // Get user current language
+			$filtercat  = $params->get('filtercat', 0);       // Filter items using currently selected language
+			$show_noauth = $params->get('show_noauth', 0);    // Show unauthorized items
 		
-		// Filter the category view with the current user language
-		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
-		}
+			// First thing we need to do is to select only the requested items
+			$where = ' WHERE 1 ';
+			if ($this->_authorid)
+				//$where .= ' AND i.created_by = ' . $db->Quote($this->_authorid);
+				$where .= ' AND ie.cnt_created_by = ' . $db->Quote($this->_authorid);
 		
-		// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
-		// NOTE:  ACL view level is checked at a different place
-		if ( FLEXI_J16GE )
-			$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
-		else if (FLEXI_ACCESS)
-			$ignoreState = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'ignoreviewstate', 'users', $user->gmid) : 1;
-		else
-			$ignoreState = $user->gid  > 19;  // author has 19 and editor has 20
+			// Filter the category view with the current user language
+			if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
+				$lta = 'ie'; //FLEXI_J16GE ? 'i': 'ie';
+				$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
+			}
 		
-		if (!$ignoreState) {
-			// Limit by publication state. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			
-			// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
-			$where .= ' AND ( ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-			$where .= ' AND ( ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
-		}
+			// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
+			// NOTE:  ACL view level is checked at a different place
+			if ( FLEXI_J16GE )
+				$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
+			else if (FLEXI_ACCESS)
+				$ignoreState = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'ignoreviewstate', 'users', $user->gmid) : 1;
+			else
+				$ignoreState = $user->gid  > 19;  // author has 19 and editor has 20
 		
-		// Count items according to full depth level !!!
-		$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
-		$where .= ' AND rel.catid IN ('.$catlist.')';
+			if (!$ignoreState) {
+				// Limit by publication state. Exception: when displaying personal user items or items modified by the user
+				//$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';
+				$where .= ' AND ( ie.cnt_state IN (1, -5) OR ( ie.cnt_created_by = '.$user->id.' AND ie.cnt_created_by != 0 ) )';
+				
+				// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
+				//$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';
+				//$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';
+				$where .= ' AND ( ( ie.cnt_publish_up = '.$db->Quote($nullDate).' OR ie.cnt_publish_up <= '.$_nowDate.' ) OR ( ie.cnt_created_by = '.$user->id.' AND ie.cnt_created_by != 0 ) )';
+				$where .= ' AND ( ( ie.cnt_publish_down = '.$db->Quote($nullDate).' OR ie.cnt_publish_down >= '.$_nowDate.' ) OR ( ie.cnt_created_by = '.$user->id.' AND ie.cnt_created_by != 0 ) )';
+			}
 		
-		// Select only items that user has view access, if listing of unauthorized content is not enabled
-		// Checking item, category, content type access level
-		$joinaccess = '';
-		if (!$show_noauth) {
-			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
-				$aid_list = implode(",", $aid_arr);
-				$where .= ' AND ty.access IN (0,'.$aid_list.')';
-				$where .= ' AND mc.access IN (0,'.$aid_list.')';
-				$where .= ' AND  i.access IN (0,'.$aid_list.')';
-			} else {
-				$aid = (int) $user->get('aid');
-				if (FLEXI_ACCESS) {
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
-					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
-					$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
-					$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
-					$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
+			// Count items according to full depth level !!!
+			$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
+			$where .= ' AND rel.catid IN ('.$catlist.')';
+		
+			// Select only items that user has view access, if listing of unauthorized content is not enabled
+			// Checking item, category, content type access level
+			$joinaccess = '';
+			if (!$show_noauth) {
+				if (FLEXI_J16GE) {
+					$aid_arr = $user->getAuthorisedViewLevels();
+					$aid_list = implode(",", $aid_arr);
+					$where .= ' AND ty.access IN (0,'.$aid_list.')';
+					$where .= ' AND cc.access IN (0,'.$aid_list.')';
+					$where .= ' AND ie.cnt_access IN (0,'.$aid_list.')';
 				} else {
-					$where .= ' AND ty.access <= '.$aid;
-					$where .= ' AND mc.access <= '.$aid;
-					$where .= ' AND  i.access <= '.$aid;
+					$aid = (int) $user->get('aid');
+					if (FLEXI_ACCESS) {
+						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
+						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON cc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON rel.itemid = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+						$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+						$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR cc.access <= '. $aid . ')';
+						$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR ie.cnt_access <= '. $aid . ')';
+					} else {
+						$where .= ' AND ty.access <= '.$aid;
+						$where .= ' AND cc.access <= '.$aid;
+						$where .= ' AND ie.cnt_access <= '.$aid;
+					}
 				}
 			}
+		
+			$query 	= 'SELECT COUNT(DISTINCT rel.itemid)'
+				. ' FROM #__flexicontent_cats_item_relations AS rel'
+				//. ' JOIN #__content AS i ON rel.itemid = i.id'
+				. ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid = ie.item_id'
+				. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+				//. ' JOIN #__categories AS mc ON mc.id =   i.catid AND mc.published = 1'
+				. ' JOIN #__categories AS cc ON cc.id = rel.catid AND cc.published = 1'
+				. $joinaccess
+				. $where
+				;
+		
+			$db->setQuery($query);
+			$assigneditems = $db->loadResult();
+		
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		} else {
+			// Get the view's parameters
+			$params = $this->_params;
+		
+			// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
+			//  thus the items are published globally at the time the author specified in his/her local clock
+			//$app  = JFactory::getApplication();
+			//$now  = FLEXI_J16GE ? $app->requestTime : $app->get('requestTime');   // NOT correct behavior it should be UTC (below)
+			//$date = JFactory::getDate();
+			//$now  = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();              // NOT good if string passed to function that will be cached, because string continuesly different
+			$_nowDate = 'UTC_TIMESTAMP()'; //$db->Quote($now);
+			$nullDate = $db->getNullDate();
+		
+			// Get some parameters and other info
+			$catlang = $params->get('language', '');          // category language (currently UNUSED), this is property in J2.5 instead of as parameter in FC J1.5
+			$lang = flexicontent_html::getUserCurrentLang();   // Get user current language
+			$filtercat  = $params->get('filtercat', 0);       // Filter items using currently selected language
+			$show_noauth = $params->get('show_noauth', 0);    // Show unauthorized items
+		
+			// First thing we need to do is to select only the requested items
+			$where = ' WHERE 1 ';
+			if ($this->_authorid)
+				$where .= ' AND i.created_by = ' . $db->Quote($this->_authorid);
+		
+			// Filter the category view with the current user language
+			if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
+				$lta = FLEXI_J16GE ? 'i': 'ie';
+				$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
+			}
+			
+			// Get privilege to view non viewable items (upublished, archived, trashed, expired, scheduled).
+			// NOTE:  ACL view level is checked at a different place
+			if ( FLEXI_J16GE )
+				$ignoreState = $user->authorise('flexicontent.ignoreviewstate', 'com_flexicontent');
+			else if (FLEXI_ACCESS)
+				$ignoreState = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'ignoreviewstate', 'users', $user->gmid) : 1;
+			else
+				$ignoreState = $user->gid  > 19;  // author has 19 and editor has 20
+		
+			if (!$ignoreState) {
+				// Limit by publication state. Exception: when displaying personal user items or items modified by the user
+				$where .= ' AND ( i.state IN (1, -5) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			
+				// Limit by publish up/down dates. Exception: when displaying personal user items or items modified by the user
+				$where .= ' AND ( ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';       //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+				$where .= ' AND ( ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' ) OR ( i.created_by = '.$user->id.' AND i.created_by != 0 ) )';   //.' OR ( i.modified_by = '.$user->id.' AND i.modified_by != 0 ) )';
+			}
+		
+			// Count items according to full depth level !!!
+			$catlist = !empty($globalcats[$id]->descendants) ? $globalcats[$id]->descendants : $id;
+			$where .= ' AND rel.catid IN ('.$catlist.')';
+		
+			// Select only items that user has view access, if listing of unauthorized content is not enabled
+			// Checking item, category, content type access level
+			$joinaccess = '';
+			if (!$show_noauth) {
+				if (FLEXI_J16GE) {
+					$aid_arr = $user->getAuthorisedViewLevels();
+					$aid_list = implode(",", $aid_arr);
+					$where .= ' AND ty.access IN (0,'.$aid_list.')';
+					$where .= ' AND mc.access IN (0,'.$aid_list.')';
+					$where .= ' AND  i.access IN (0,'.$aid_list.')';
+				} else {
+					$aid = (int) $user->get('aid');
+					if (FLEXI_ACCESS) {
+						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
+						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON mc.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+						$where .= ' AND (gt.aro IN ( '.$user->gmid.' ) OR ty.access <= '. $aid . ')';
+						$where .= ' AND (gc.aro IN ( '.$user->gmid.' ) OR mc.access <= '. $aid . ')';
+						$where .= ' AND (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
+					} else {
+						$where .= ' AND ty.access <= '.$aid;
+						$where .= ' AND mc.access <= '.$aid;
+						$where .= ' AND  i.access <= '.$aid;
+					}
+				}
+			}
+			
+			$query 	= 'SELECT COUNT(DISTINCT rel.itemid)'
+				. ' FROM #__flexicontent_cats_item_relations AS rel'
+				. ' JOIN #__content AS i ON rel.itemid = i.id'
+				. ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid = ie.item_id'
+				. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+				. ' JOIN #__categories AS mc ON mc.id =   i.catid AND mc.published = 1'
+				. ' JOIN #__categories AS cc ON cc.id = rel.catid AND cc.published = 1'
+				. $joinaccess
+				. $where
+				;
+		
+			$db->setQuery($query);
+			$assigneditems = $db->loadResult();
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		}
-		
-		$query 	= 'SELECT DISTINCT rel.itemid'
-			. ' FROM #__flexicontent_cats_item_relations AS rel'
-			. ' JOIN #__content AS i ON rel.itemid = i.id'
-			. ' JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id'
-			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
-			. ' JOIN #__categories AS mc ON mc.id =   i.catid AND mc.published = 1'
-			. ' JOIN #__categories AS cc ON cc.id = rel.catid AND cc.published = 1'
-			. $joinaccess
-			. $where
-			;
-		
-		$this->_db->setQuery($query);
-		$assigneditems = count(FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray());
-		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		
 		return $assigneditems;
 	}
@@ -1321,7 +1429,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		$this->_id = $id;  // restore id in case it has been changed
 		
-		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ( $print_logging_info ) @$fc_run_times['item_counting_sub_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		return $this->_childs;
 	}
@@ -1364,7 +1472,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		$this->_id = $id;  // restore id in case it has been changed
 		
-		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		if ( $print_logging_info ) @$fc_run_times['item_counting_peer_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		return $this->_peers;
 	}

@@ -392,6 +392,10 @@ if (FLEXI_J16GE) {
 		$db->setQuery($query);
 		$types_tbl_exists = (boolean) count($db->loadObjectList());
 		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_items_ext"';
+		$db->setQuery($query);
+		$iext_tbl_exists = (boolean) count($db->loadObjectList());
+		
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_advsearch_index"';
 		$db->setQuery($query);
 		$advsearch_index_tbl_exists = (boolean) count($db->loadObjectList());
@@ -465,12 +469,23 @@ if (FLEXI_J16GE) {
 					if ($files_tbl_exists)   $tbls[] = "#__flexicontent_files";
 					if ($fields_tbl_exists)  $tbls[] = "#__flexicontent_fields";
 					if ($types_tbl_exists)   $tbls[] = "#__flexicontent_types";
+					if ($iext_tbl_exists)    $tbls[] = "#__flexicontent_items_ext";
 					if ($advsearch_index_tbl_exists)
 						$tbls[] = "#__flexicontent_advsearch_index";
 					if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
 					else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
 					
 					$queries = array();
+					if ( $iext_tbl_exists ) {
+						$_query = "ALTER TABLE `#__flexicontent_items_ext`";
+						$_querycols = array();
+						if (!array_key_exists('cnt_state', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = "  ADD `cnt_state` int(11) NOT NULL AFTER `language`";
+						if (!array_key_exists('cnt_access', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " ADD `cnt_access` int(11) NOT NULL AFTER `cnt_state`";
+						if (!array_key_exists('cnt_publish_up', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " ADD `cnt_publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `cnt_access`";
+						if (!array_key_exists('cnt_publish_down', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " ADD `cnt_publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `cnt_publish_up`";
+						if (!array_key_exists('cnt_created_by', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " ADD `cnt_created_by` INT NOT NULL DEFAULT '0' AFTER `cnt_publish_down`";
+						if (!empty($_querycols)) $queries[] = $_query . implode(",", $_querycols);
+					}
 					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__flexicontent_files'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL DEFAULT '' AFTER `altname`";
 					}

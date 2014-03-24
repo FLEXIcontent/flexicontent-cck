@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1800 2013-11-01 04:30:57Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1806 2013-11-10 01:38:20Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -179,6 +179,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$params = $this->_params;
 
 		$user = JFactory::getUser();
+		$db   = JFactory::getDBO();
 		$orderby = $this->_buildCatOrderBy('cat_');
 
 		// Get a 2 character language tag
@@ -194,9 +195,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$where .= ' AND c.id = cc.id';
 		// Filter the category view with the active active language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
+			$lta = FLEXI_J16GE ? 'i': 'ie';
+			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
-
+		
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
 		
@@ -354,6 +356,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$params = $this->_params;
 
 		$user = JFactory::getUser();
+		$db   = JFactory::getDBO();
 		$orderby = $this->_buildCatOrderBy('subcat_');
 		
 		// Get a 2 character language tag
@@ -369,9 +372,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$where .= ' AND c.id = cc.id';
 		// Filter the category view with the active active language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$where .= ' AND ( ie.language LIKE ' . $this->_db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR ie.language="*" ' : '') . ' ) ';
+			$lta = FLEXI_J16GE ? 'i': 'ie';
+			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
-
+		
 		$states = ((int)$user->get('gid') > 19) ? '1, -5, 0, -3, -4' : '1, -5';
 		$where .= ' AND i.state IN ('.$states.')';
 		

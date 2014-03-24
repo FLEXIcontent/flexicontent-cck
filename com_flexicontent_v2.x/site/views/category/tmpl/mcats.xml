@@ -7,7 +7,7 @@
 	</layout>
 	<fields name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<fieldset name="request">
-			<field name="cids" type="flexicategories" multiple="true" default="0" label="FLEXI_CATEGORIES" required="required" description="FLEXI_CATEGORIES_DESC" />
+			<field name="cids" type="flexicategories" multiple="true" default="0" label="FLEXI_CATEGORIES" description="FLEXI_CATEGORIES_DESC" />
 		</fieldset> 
 	</fields>
 	

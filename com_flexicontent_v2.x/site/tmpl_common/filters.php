@@ -118,6 +118,14 @@ if ($filter_instructions == 1) {
 			
 		<?php endif; /* EOF search */ ?>
 		
+		<?php
+			$filter_messages = JRequest::getVar('filter_messages', array());
+			$msg = '';
+			$msg = implode(' <br/> ', $filter_messages);
+			if ( $msg ) :
+				?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php
+			endif;
+		?>
 		
 		<?php if ($use_filters): /* BOF filter */ ?>
 			<?php

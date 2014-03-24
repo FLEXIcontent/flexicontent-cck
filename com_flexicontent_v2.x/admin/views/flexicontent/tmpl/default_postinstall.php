@@ -147,6 +147,27 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		}
 	});
 <?php endif; ?>
+<?php if(!$this->existdbindexes) : ?>
+	$('existdbindexes').addEvent('click', function(e) {
+		//e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=createdbindexes&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('existdbindexes-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('existdbindexes-log')
+			}).send();
+		}else{
+			$('existdbindexes-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('existdbindexes-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
+<?php endif; ?>
 <?php if(!$this->existversions) : ?>
 	$('existversions').addEvent('click', function(e) {
 		//e = new Event(e).stop();
@@ -226,6 +247,27 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 			var ajax = new Ajax(url, {
 				method: 'get',
 				update: $('cachethumb-log')
+			});
+			ajax.request.delay(500, ajax);
+		}
+	});
+<?php endif; ?>
+<?php if (!$this->itemcountingdok) : ?>
+	$('itemcountingdok').addEvent('click', function(e) {
+		//e = new Event(e).stop();
+		var url = "index.php?option=com_flexicontent&task=updateitemcounting&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
+		if(MooTools.version>="1.2.4") {
+			$('itemcountingdok-log').set('html', ajaxloader);
+			new Request.HTML({
+				url: url,
+				method: 'get',
+				update: $('itemcountingdok-log')
+			}).send();
+		}else{
+			$('itemcountingdok-log').set('html',ajaxloader);
+			var ajax = new Ajax(url, {
+				method: 'get',
+				update: $('itemcountingdok-log')
 			});
 			ajax.request.delay(500, ajax);
 		}
@@ -368,6 +410,14 @@ $('missingversion').addEvent('click', function(e) {
 	</tr>
 	<tr>
 		<td class="key">
+			<?php echo JText::_( 'FLEXI_CREATE_DB_INDEXES' ); ?>
+		</td>
+		<td id="existdbindexes-log">
+			<?php echo $this->existdbindexes ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existdbindexes" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
 			<?php echo JText::_( 'FLEXI_INSTALL_VERSIONS_TABLE' ); ?>
 		</td>
 		<td id="existversions-log">
@@ -388,6 +438,14 @@ $('missingversion').addEvent('click', function(e) {
 		</td>
 		<td id="existauthors-log">
 			<?php echo $this->existauthors ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existauthors" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="key">
+			<?php echo JText::_( 'FLEXI_UPDATE_ITEM_COUNTING' ); ?>
+		</td>
+		<td id="itemcountingdok-log">
+			<?php echo $this->itemcountingdok ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="itemcountingdok" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 		</td>
 	</tr>
 	<tr>

@@ -35,7 +35,7 @@ $cats_label = JText::_( $this->category->id ? 'FLEXI_PEERCATEGORIES' : 'FLEXI_CA
 
 // Sub-category information parameters
 $show_label_peercats = $this->params->get('show_label_peercats', 1);
-$show_itemcount   = $this->params->get('show_itemcount_peercat', 1);
+$show_itemcount   = $this->params->get('show_itemcount_peercat', 0);
 $show_subcatcount = $this->params->get('show_subcatcount_peercat', 0);
 $itemcount_label   = ($show_itemcount==2   ? ' '.JText::_('FLEXI_ITEM_S').' ' : '');
 $peercatcount_label = ($show_subcatcount==2 ? ' '.JText::_('FLEXI_CATEGORIES').' ' : '');
