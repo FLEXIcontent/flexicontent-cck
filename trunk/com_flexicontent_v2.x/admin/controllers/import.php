@@ -97,7 +97,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		if ($task == 'clearcsv')
 		{
 			// Clear any import data from session
-			$conf		= base64_encode(serialize(null));
+			$conf		= base64_encode(zlib_encode(serialize(null)));
 			$session->set('csvimport_config', $conf, 'flexicontent');
 			$session->set('csvimport_lineno', 0, 'flexicontent');
 			
@@ -111,7 +111,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		else if ($task == 'importcsv')
 		{
 			$conf   = $session->get('csvimport_config', "", 'flexicontent');
-			$conf		= unserialize(base64_decode($conf));
+			$conf		= unserialize(zlib_decode(base64_decode($conf)));
 			$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 			if ( empty($conf) ) {
 				$app->enqueueMessage( 'Can not continue import, import task not initialized or already finished:' , 'warning' );
@@ -448,7 +448,7 @@ class FlexicontentControllerImport extends FlexicontentController
 			if ($task == 'initcsv')
 			{
 				// Set import configuration and file data into session
-				$session->set('csvimport_config', base64_encode(serialize($conf)), 'flexicontent');
+				$session->set('csvimport_config', base64_encode(zlib_encode(serialize($conf), -15)), 'flexicontent');
 				$session->set('csvimport_lineno', 0, 'flexicontent');
 				
 				// Set a total results message and redirect

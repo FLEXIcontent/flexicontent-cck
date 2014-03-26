@@ -73,7 +73,7 @@ class FlexicontentViewImport extends JViewLegacy
 		
 		$session = JFactory::getSession();
 		$conf   = $session->get('csvimport_config', "", 'flexicontent');
-		$conf		= unserialize(base64_decode($conf));
+		$conf		= unserialize(zlib_decode(base64_decode($conf)));
 		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 		$session->set('csvimport_parse_log', null, 'flexicontent');
 		
