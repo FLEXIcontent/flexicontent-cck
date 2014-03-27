@@ -100,14 +100,6 @@ class flexicontent_items extends JTable{
 	var $type_id			= null;
 	/** @var string */
 	var $language			= null;
-	
-	// for item counting in categories
-	var $cnt_state        = null;
-	var $cnt_access       = null;
-	var $cnt_publish_up   = null;
-	var $cnt_publish_down = null;
-	var $cnt_created_by   = null;
-	
 	/** @var int */
 	var $lang_parent_id		= null;
 	/** @var string */
@@ -123,12 +115,12 @@ class flexicontent_items extends JTable{
 	var $search_index		= null;
 
     /**
-     * Name of the the link table
+     * Name of the the items ext table
      *
      * @var    string
      * @access protected
      */
-    var $_tbl_join			= '#__flexicontent_items_ext';
+    var $_tbl_join_ext			= '#__flexicontent_items_ext';
     /**
      * Name of the foreign key in the link table
      * $_tbl_key property maps to this property
@@ -136,30 +128,55 @@ class flexicontent_items extends JTable{
      * @var		string
      * @access	protected
      */
-    var $_frn_key			= 'item_id';
+    var $_frn_key_ext			= 'item_id';
     /**
      * Array of all properties from the join table added to this object
      *
      * @var    array
      * @access protected
      */
-    var $_join_prop    		= array('item_id',
+    var $_join_prop_ext		= array('item_id',
     								'type_id',
     								'language',
-										'cnt_state',
-										'cnt_access',
-										'cnt_publish_up',
-										'cnt_publish_down',
-										'cnt_created_by',
     								'lang_parent_id',
     								'sub_items',
     								'sub_categories',
     								'related_items',
     								'search_index');
+
+    /**
+     * Name of the the items ext table
+     *
+     * @var    string
+     * @access protected
+     */
+    var $_tbl_join_tmp			= '#__flexicontent_items_tmp';
+    /**
+     * Name of the foreign key in the link table
+     * $_tbl_key property maps to this property
+     *
+     * @var		string
+     * @access	protected
+     */
+    var $_frn_key_tmp			= 'id';
+    /**
+     * Array of all properties from the join table added to this object
+     *
+     * @var    array
+     * @access protected
+     */
+    var $_join_prop_tmp		= array();
+
 	/**
 	* @param database A database connector object
 	*/
 	function flexicontent_items(& $db) {
+		$tbls = array($this->_tbl_join_tmp);
+		if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
+		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
+		
+		$this->_join_prop_tmp = array_keys($tbl_fields[$this->_tbl_join_tmp]);
+		
 		parent::__construct('#__content', 'id', $db);
 	}
 
@@ -254,8 +271,10 @@ class flexicontent_items extends JTable{
 
 		$query = 'SELECT *'
 		. ' FROM '.$this->_tbl
-		. ' LEFT JOIN '.$this->_tbl_join
-		. ' ON '.$this->_tbl_key.' = '.$this->_frn_key
+		. ' LEFT JOIN '.$this->_tbl_join_ext
+		. ' ON '.$this->_tbl_key.' = '.$this->_frn_key_ext
+		//. ' LEFT JOIN '.$this->_tbl_join_tmp                        // same name and same data columns
+		//. ' ON '.$this->_tbl_key.' = '.$this->_frn_key_tmp          // ... so do not join
 		. ' WHERE '.$this->_tbl_key.' = '.$db->Quote($oid);
 		$db->setQuery( $query );
 		
@@ -327,7 +346,8 @@ class flexicontent_items extends JTable{
 	function store( $updateNulls=false )
 	{
 		$k             = $this->_tbl_key;
-		$frn_key       = $this->_frn_key;
+		$frn_key_ext   = $this->_frn_key_ext;
+		$frn_key_tmp   = $this->_frn_key_tmp;
 
 		// Split the object for the two tables #__content and #__flexicontent_items_ext
 		//$type     = new stdClass();
@@ -336,13 +356,17 @@ class flexicontent_items extends JTable{
 		$type->_tbl_key = $this->_tbl_key;
 		//$type_ext = new stdClass();
 		$type_ext = JTable::getInstance('flexicontent_items_ext', '');
-		$type_ext->_tbl = $this->_tbl_join;
-		$type_ext->_tbl_key = $this->_frn_key;
+		$type_ext->_tbl = $this->_tbl_join_ext;
+		$type_ext->_tbl_key = $this->_frn_key_ext;
+		//$type_tmp = new stdClass();
+		$type_tmp = JTable::getInstance('flexicontent_items_tmp', '');
+		$type_tmp->_tbl = $this->_tbl_join_tmp;
+		$type_tmp->_tbl_key = $this->_frn_key_tmp;
 		
 		foreach ($this->getProperties() as $p => $v) {
 		
 			// If the property is in the join properties array we add it to the items_ext object
-			if (in_array($p, $this->_join_prop)) {
+			if (in_array($p, $this->_join_prop_ext)) {
 				$type_ext->$p = $v;
 				
 				// Catch case of new J1.6+ article language column
@@ -358,17 +382,15 @@ class flexicontent_items extends JTable{
 					//$jAp->enqueueMessage('Setting default lang_parent_id to '. $type->id,'message');
 					$type_ext->$p = $type->id;
 				}
+			}
 				
-				// Else we add it to the type object
-			} else {
-				// normal item properties
+			// Else we add it to the core item properties
+			else {
 				$type->$p = $v;
 				
-				// catch case of item counting properties
-				if ( in_array($p, array("state","access","publish_up","publish_down","created_by")) ) {
-					//$jAp= JFactory::getApplication();
-					//$jAp->enqueueMessage('setting cnt_'.$p.' to' . $v,'message');
-					$type_ext->{'cnt_'.$p} = $v;
+				// If the property is in the join properties array we add it to the items_tmp object
+				if (in_array($p, $this->_join_prop_tmp)) {
+					$type_tmp->$p = $v;
 				}
 			}
 		}
@@ -376,7 +398,8 @@ class flexicontent_items extends JTable{
 		if( $this->$k )
 		{
 			$ret = $this->_db->updateObject( $this->_tbl, $type, $this->_tbl_key, $updateNulls );
-			$type_ext->$frn_key = $this->$k;
+			$type_ext->$frn_key_ext   = $this->$k;
+			$type_tmp->$frn_key_tmp = $this->$k;
 		}
 		else
 		{
@@ -394,16 +417,24 @@ class flexicontent_items extends JTable{
 		else
 		{
 			// check for foreign key
-			if (isset($type_ext->$frn_key) && !empty($type_ext->$frn_key))
-			{
+			if (isset($type_ext->$frn_key_ext) && !empty($type_ext->$frn_key_ext)) {
 				// update #__flexicontent_items_ext table
-				$ret = $this->_db->updateObject( $this->_tbl_join, $type_ext, $this->_frn_key, $updateNulls );
-			} else {
+				$ret = $this->_db->updateObject( $this->_tbl_join_ext, $type_ext, $this->_frn_key_ext, $updateNulls );
+				
+				// update #__flexicontent_items_tmp table
+				$ret = $this->_db->updateObject( $this->_tbl_join_tmp, $type_tmp, $this->_frn_key_tmp, $updateNulls );
+			}
+			
+			else {
 				if ($type_ext->lang_parent_id == 0) $type_ext->lang_parent_id = $this->id;  // case of new item we need to set lang_parent_id after initial content creation
 				
 				// insert into #__flexicontent_items_ext table
-				$type_ext->$frn_key = $this->id;
-				$ret = $this->_db->insertObject( $this->_tbl_join, $type_ext, $this->_frn_key );
+				$type_ext->$frn_key_ext = $this->id;
+				$ret = $this->_db->insertObject( $this->_tbl_join_ext, $type_ext, $this->_frn_key_ext );
+				
+				// insert into #__flexicontent_items_ext table
+				$type_tmp->$frn_key_tmp = $this->id;
+				$ret = $this->_db->insertObject( $this->_tbl_join_tmp, $type_tmp, $this->_frn_key_tmp );
 			}
 			
 			// Check for unique Alias

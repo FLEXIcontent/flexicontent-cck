@@ -3,12 +3,20 @@
 	$show_cat_image = $catdata->conf->show_image && ($catdata->image || $catdata->conf->show_default_image );
 	$show_cat_data = $catdata->conf->showtitle || $show_cat_image || !empty($catdata->description);
 	if ( !$show_cat_data  ) return;
+	
+	$view   = JRequest::getVar('view');
+	$option = JRequest::getVar('option');
+	$cid = JRequest::getInt('cid');
+	$is_active_cat = $cid == $catdata->id && $option == 'com_flexicontent';
+	$cat_classes  = 'catdata';
+	$cat_classes .= ($is_active_cat && $view == FLEXI_ITEMVIEW) ? ' fcitemcat_active' : '';
+	$cat_classes .= ($is_active_cat && $view == 'category')     ? ' fccat_active' : '';
 	?>
 	
-	<div class='catdata'>
+	<div class='<?php echo $cat_classes; ?>'>
 		
 		<?php if ($catdata->conf->showtitle) : ?>
-		<span class='fc_block'>
+		<span class='fc_block <?php ?>'>
 			<span class='fc_block cattitle'>
 				<?php	if ($catdata->conf->link_title) : ?>
 					<a class="cattitle_link" href='<?php echo $catdata->titlelink; ?>'><?php echo $catdata->title; ?></a>

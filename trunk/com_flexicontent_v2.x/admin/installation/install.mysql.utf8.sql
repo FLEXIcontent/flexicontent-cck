@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_item_relations` (
   KEY `field_id` (`field_id`),
   KEY `item_id` (`item_id`),
   KEY `valueorder` (`valueorder`),
-  KEY `value` (`valueorder`)
+  KEY `value` (`value`(32))
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_type_relations` (
@@ -220,3 +220,22 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_download_coupons` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
+CREATE TABLE `#__flexicontent_items_tmp` (
+ `id` int(10) unsigned NOT NULL,
+ `title` varchar(255) NOT NULL,
+ `state` tinyint(3) NOT NULL DEFAULT '0',
+ `catid` int(10) unsigned NOT NULL DEFAULT '0',
+ `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `created_by` int(10) unsigned NOT NULL DEFAULT '0',
+ `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
+ `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+ `version` int(10) unsigned NOT NULL DEFAULT '1',
+ `ordering` int(11) NOT NULL DEFAULT '0',
+ `access` int(10) unsigned NOT NULL DEFAULT '0',
+ `hits` int(10) unsigned NOT NULL DEFAULT '0',
+ `featured` tinyint(3) unsigned NOT NULL DEFAULT '0',
+ `language` char(7) NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;

@@ -245,6 +245,9 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	if (isset($fc_run_times['item_counting_peer_cats']))
 		$msg .= sprintf('<br/>-- [Queries: PEER-cats item COUNTING : %.2f s] ', $fc_run_times['item_counting_peer_cats']/1000000);
 	
+	if (isset($fc_run_times['execute_alphaindex_query']))
+		$msg .= sprintf('<br/>-- [Query: ALPHA-index creation: %.2f s] ', $fc_run_times['execute_alphaindex_query']/1000000);
+	
 	// **** BOF: ITEM FORM SAVING
 	if (isset($fc_run_times['onAfterSaveField_event']) && $fc_run_times['onAfterSaveField_event']/1000000 >= 0.01)
 		$msg .= sprintf('<br/>-- [FLEXIcontent plugins (event: onAfterSaveField): %.2f s] ', $fc_run_times['onAfterSaveField_event']/1000000);

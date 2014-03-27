@@ -1602,7 +1602,7 @@ class modFlexicontentHelper
 				.' i.id '
 				. (in_array('commented', $ordering) ? ','.$select_comments : '')
 				. (in_array('rated', $ordering) ? ','.$select_rated : '')
-				. ' FROM #__content AS i'
+				. ' FROM #__flexicontent_items_tmp AS i'
 				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 				. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
 				. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'

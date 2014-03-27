@@ -632,7 +632,7 @@ VALUES
 		$db->setQuery($query);
 		$result3 = $db->query();
 		
-		return $result1 && result2 && result3;
+		return $result1 && $result2 && $result3;
 	}
 	
 	/**
@@ -772,16 +772,26 @@ VALUES
 		$app = JFactory::getApplication();
 		$db = JFactory::getDBO();
 		
-		// Set language in the content to be same as in items_ext db table
-		$query 	= 'UPDATE #__flexicontent_items_ext AS ie '
-				. ' JOIN #__content AS i ON i.id=ie.item_id '
-				. ' SET ' . (FLEXI_J16GE ? ' ie.language = i.language,' : '')
-				. '  ie.cnt_state = i.state '
-				. ', ie.cnt_access = i.access '
-				. ', ie.cnt_publish_up = i.publish_up '
-				. ', ie.cnt_publish_down = i.publish_down '
-				. ', ie.cnt_created_by = i.created_by '
-				;
+		$cache_tbl = "#__flexicontent_items_tmp";
+		$tbls = array($cache_tbl);
+		if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
+		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
+		
+		// Get the column names
+		$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
+		
+		// Truncate the table
+		$db->setQuery('TRUNCATE TABLE '.$cache_tbl);
+		$db->query();
+		
+		// Copy data into it
+		$query 	= 'INSERT INTO '.$cache_tbl.' (';
+		$query .= "`".implode("`, `", $tbl_fields)."`";
+		$query .= ") SELECT ";
+		
+		$cols_select = array();
+		$query .= "`".implode("`, `", $tbl_fields)."`";
+		$query .= "FROM #__content";
 		
 		$db->setQuery($query);
 		

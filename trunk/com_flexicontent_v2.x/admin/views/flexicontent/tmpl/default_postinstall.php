@@ -442,7 +442,7 @@ $('missingversion').addEvent('click', function(e) {
 	</tr>
 	<tr>
 		<td class="key">
-			<?php echo JText::_( 'FLEXI_UPDATE_ITEM_COUNTING' ); ?>
+			<?php echo JText::_( 'FLEXI_UPDATE_TEMPORARY_ITEM_DATA' ); ?>
 		</td>
 		<td id="itemcountingdok-log">
 			<?php echo $this->itemcountingdok ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="itemcountingdok" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
