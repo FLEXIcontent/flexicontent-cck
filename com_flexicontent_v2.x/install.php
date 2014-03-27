@@ -404,6 +404,10 @@ if (!FLEXI_J16GE) {
 		$db->setQuery($query);
 		$authors_ext_tbl_exists = (boolean) count($db->loadObjectList());
 		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_items_tmp"';
+		$db->setQuery($query);
+		$content_cache_tbl_exists = (boolean) count($db->loadObjectList());
+		
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_download_history"';
 		$db->setQuery($query);
 		$dl_history_tbl_exists = (boolean) count($db->loadObjectList());
@@ -479,12 +483,12 @@ if (!FLEXI_J16GE) {
 					if ( $iext_tbl_exists ) {
 						$_query = "ALTER TABLE `#__flexicontent_items_ext`";
 						$_querycols = array();
-						if (!array_key_exists('cnt_state', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = "  ADD `cnt_state` int(11) NOT NULL AFTER `language`";
-						if (!array_key_exists('cnt_access', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " ADD `cnt_access` int(11) NOT NULL AFTER `cnt_state`";
-						if (!array_key_exists('cnt_publish_up', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " ADD `cnt_publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `cnt_access`";
-						if (!array_key_exists('cnt_publish_down', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " ADD `cnt_publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `cnt_publish_up`";
-						if (!array_key_exists('cnt_created_by', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " ADD `cnt_created_by` INT NOT NULL DEFAULT '0' AFTER `cnt_publish_down`";
-						if (!empty($_querycols)) $queries[] = $_query . implode(",", $_querycols);
+						if (array_key_exists('cnt_state', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = "  DROP `cnt_state`";
+						if (array_key_exists('cnt_access', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " DROP `cnt_access`";
+						if (array_key_exists('cnt_publish_up', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " DROP `cnt_publish_up`";
+						if (array_key_exists('cnt_publish_down', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " DROP `cnt_publish_down`";
+						if (array_key_exists('cnt_created_by', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " DROP `cnt_created_by`";
+						if (empty($_querycols)) $queries[] = $_query . implode(",", $_querycols);
 					}
 					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__flexicontent_files'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL DEFAULT '' AFTER `altname`";
@@ -608,7 +612,7 @@ if (!FLEXI_J16GE) {
 		// Create authors_ext table if it does not exist
 		?>
 				<tr class="row1">
-					<td class="key">Create/Upgrade authors extended data table: </td>
+					<td class="key">Create/Upgrade authors extended DB table: </td>
 					<td>
 					<?php
 					
@@ -640,9 +644,59 @@ if (!FLEXI_J16GE) {
 				</tr>
 				
 		<?php
-		// Create/Upgrade DB tables for downloads enhancements
+		// Create content_cache table if it does not exist
 		?>
 				<tr class="row0">
+					<td class="key">Create/Upgrade content cache DB table: </td>
+					<td>
+					<?php
+					
+			    $queries = array();
+					if ( !$content_cache_tbl_exists ) {
+						$queries[] = "
+							CREATE TABLE `#__flexicontent_items_tmp` (
+							 `id` int(10) unsigned NOT NULL,
+							 `title` VARCHAR(255) NOT NULL,
+							 `state` tinyint(3) NOT NULL DEFAULT '0',
+							 `catid` int(10) unsigned NOT NULL DEFAULT '0',
+							 `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+							 `created_by` int(10) unsigned NOT NULL DEFAULT '0',
+							 `modified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+							 `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
+							 `publish_up` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+							 `publish_down` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+							 `version` int(10) unsigned NOT NULL DEFAULT '1',
+							 `ordering` int(11) NOT NULL DEFAULT '0',
+							 `access` int(10) unsigned NOT NULL DEFAULT '0',
+							 `hits` int(10) unsigned NOT NULL DEFAULT '0',
+							 `featured` tinyint(3) unsigned NOT NULL DEFAULT '0',
+							 `language` char(7) NOT NULL,
+							 PRIMARY KEY (`id`)
+							) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+						";
+					}
+					
+					if ( !empty($queries) ) {
+						foreach ($queries as $query) {
+							$db->setQuery($query);
+							if ( !($result = $db->query()) ) {
+								$result = false;
+								echo "<span style='$failure_style'>SQL QUERY failed: ". $query ."</span>";
+							}
+						}
+						if ( $result !== false ) {
+							echo "<span style='$success_style'>table created</span>";
+						}
+					}
+					else echo "<span style='$success_style'>nothing to do</span>";
+					?>
+					</td>
+				</tr>
+				
+		<?php
+		// Create/Upgrade DB tables for downloads enhancements
+		?>
+				<tr class="row1">
 					<td class="key">Create/Upgrade DB tables for downloads enhancements: </td>
 					<td>
 					<?php

@@ -68,7 +68,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			$comments = $this->get('CommentsInfo');
 		else
 			$comments = null;
-		$alpha   = $this->get('Alphaindex');
+		$alpha   = $params->get('show_alpha', 1) ? $this->get('Alphaindex') : array();
 		
 		// Request variables, WARNING, must be loaded after retrieving items, because limitstart may have been modified
 		$limitstart = JRequest::getInt('limitstart');

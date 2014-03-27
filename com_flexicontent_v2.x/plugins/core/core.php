@@ -120,6 +120,19 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			case 'title': // title
 				$field->value[] = $item->title;
 				$field->display = $pretext.$item->title.$posttext;
+				
+				// Get ogp configuration
+				$useogp     = $field->parameters->get('useogp', 1);
+				$ogpinview  = $field->parameters->get('ogpinview', array());
+				$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
+				$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
+				
+				if ($useogp && $field->{$prop}) {
+					if ( in_array($view, $ogpinview) ) {
+						$content_val = flexicontent_html::striptagsandcut($field->display, $ogpmaxlen);
+						JFactory::getDocument()->addCustomTag('<meta property="og:title" content="'.$content_val.'" />');
+					}
+				}
 				break;
 
 			case 'hits': // hits
@@ -240,7 +253,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				}
 				
 				// Get ogp configuration
-				$useogp     = $field->parameters->get('useogp', 0);
+				$useogp     = $field->parameters->get('useogp', 1);
 				$ogpinview  = $field->parameters->get('ogpinview', array());
 				$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
 				$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);

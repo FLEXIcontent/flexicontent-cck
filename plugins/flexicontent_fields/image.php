@@ -1067,7 +1067,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$orig_urlpath  = $thumb_urlpath . '/original';
 		} else {
 			// db-mode
-			$orig_urlpath  = $thumb_folder;
+			$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+			$orig_urlpath  = str_replace('\\','/', JPath::clean($cparams->get('file_path', 'components/com_flexicontent/uploads')) );
 		}
 		
 		$i = -1;

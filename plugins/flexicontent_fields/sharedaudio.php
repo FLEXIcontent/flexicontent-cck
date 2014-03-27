@@ -157,10 +157,17 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 		$field->label = JText::_($field->label);
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
-		if ( !empty($field->value[0]) ) {
-			// get value
-			$value = $value ? unserialize($value) : unserialize($field->value[0]) ;
-	
+		// Get field values
+		$values = $values ? $values : $field->value;
+		
+		$field->{$prop} = '';
+		foreach ( $values as $value )
+		{
+			if (empty($value)) continue;
+			
+			$value = unserialize($value);
+			if ( empty($value['audioid']) ) continue;
+			
 			// some parameter shortcuts
 			$display_title = $field->parameters->get('display_title',1) ;
 			$display_author = $field->parameters->get('display_author',0) ;
@@ -181,7 +188,6 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 			if($display_description==1 && $value['description']!='') $field->{$prop} .= '<div class="description">'.$value['description'].'</div>';
 			$field->{$prop} .= $posttext;
 		}
-		else $field->{$prop} = '';
 	}
 	
 	

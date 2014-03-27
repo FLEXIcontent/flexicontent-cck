@@ -2550,7 +2550,7 @@ class FlexicontentFields
 				
 				global $fc_run_times, $fc_jprof, $fc_catviev;
 				$start_microtime = microtime(true);
-				$view_total = (int) $fc_catviev['view_total'];
+				$view_total = (int) @ $fc_catviev['view_total'];
 				$use_item_list_below = 0;
 				
 				if ($view_total >= $use_item_list_below) {
@@ -2660,7 +2660,7 @@ class FlexicontentFields
 				
 				global $fc_run_times, $fc_jprof, $fc_searchview;
 				$start_microtime = microtime(true);
-				$view_total = 1; //(int) $fc_searchview['view_total'];
+				$view_total = 1; //(int) @ $fc_searchview['view_total'];
 				$use_item_list_below = 0;
 				
 				if ($view_total >= $use_item_list_below) {

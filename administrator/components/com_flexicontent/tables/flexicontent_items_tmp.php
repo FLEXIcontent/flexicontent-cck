@@ -25,28 +25,28 @@ defined('_JEXEC') or die('Restricted access');
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class flexicontent_items_ext extends JTable{
-	/** @var int Primary key */
-	var $item_id					= null;
-	/** @var int */
-	var $type_id				= null;
-	/** @var string */
-	var $language				= null;
-	/** @var int */
-	var $lang_parent_id	= null;
-	/** @var string */
-	var $sub_items		= null;
-	/** @var string */
-	var $sub_categories			= null;
-	/** @var string */
-	var $related_items			= null;
-	/** @var string */
-	var $search_index				= null;
-
+class flexicontent_items_tmp extends JTable{
+	/* content properties
+	(a) CORE content relations that maybe used for ordering too
+	(b) other simple attributes used for ordering
+	*/
+	/* PRIMARY key */
+	var $id = null;
+	
 	/**
 	* @param database A database connector object
 	*/
-	function flexicontent_items_ext(& $db) {
-		parent::__construct('#__flexicontent_items_ext', 'item_id', $db);
+	function flexicontent_items_tmp(& $db) {
+		$tbl_name = '#__flexicontent_items_tmp';
+		
+		// Get columns
+		$tbls = array($tbl_name);
+		if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
+		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
+		
+		$tbl_fields = array_keys($tbl_fields[$tbl_name]);
+		foreach ($tbl_fields as $tbl_field) $this->$tbl_field = null;
+		
+		parent::__construct($tbl_name, 'id', $db);
 	}
 }

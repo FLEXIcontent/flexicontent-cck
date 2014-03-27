@@ -278,8 +278,9 @@ class FlexicontentController extends JControllerLegacy
 			// *** MANUALLY CHECK CAPTCHA ***
 			$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
 			$captcha_formop = $params->get('captcha_formop', 0);  // 0 for submit, 1 for submit/edit (aka always)
+			$is_submitop = ((int) $data['id']) == 0;
 			$display_captcha = $use_captcha >= 2 || ( $use_captcha == 1 &&  $user->guest );
-			$display_captcha = $display_captcha && ((int) $data['id'] || $captcha_formop);
+			$display_captcha = $display_captcha && ( $is_submitop || $captcha_formop);  // for submit operation we do not need to check 'captcha_formop' ...
 			if ($display_captcha)
 			{
 				// Try to force the use of recaptcha plugin

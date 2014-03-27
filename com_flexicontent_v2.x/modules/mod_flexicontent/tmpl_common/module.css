@@ -43,12 +43,22 @@
 	background-color:#dddddd; color:black;
 	font-size:12px;  font-weight:bold;  text-align:left;
 }
+.mod_flexicontent_wrapper .catdata.fccat_active .cattitle,  /* title of active category */
+.mod_flexicontent_wrapper .catdata.fcitemcat_active .cattitle {  /* title of category of active item */
+	background-color:#aaa; 
+	color:darkred;
+}
 .mod_flexicontent_wrapper .catdata .cattitle:hover {  /* the category title hover */
 	border: 1px dashed #444444;
 }
 .mod_flexicontent_wrapper .catdata .cattitle a.cattitle_link {  /* the link to category title */
 	background-color: transparent; color: black;
 	text-decoration:none;
+}
+.mod_flexicontent_wrapper .catdata.fccat_active .cattitle a.cattitle_link,        /* the link of active category */
+.mod_flexicontent_wrapper .catdata.fcitemcat_active .cattitle a.cattitle_link {   /* the link of category of active item */
+	background-color:#aaa; 
+	color: darkred;
 }
 .mod_flexicontent_wrapper .catdata .cattitle:hover a.cattitle_link,
 .mod_flexicontent_wrapper .catdata .cattitle a.cattitle_link:hover {  /* the link to category title on mouse over */

@@ -32,7 +32,7 @@
 	<field id="rules" name="rules" type="rules" label="JFIELD_RULES_LABEL" description="JFIELD_RULES_DESC" filter="rules" class="inputbox" component="com_flexicontent" section="category" />
 	<fields name="params">
 		<fieldset name="cat_basic">
-			<field name="target" type="componentlayout" label="FLEXI_OVERRIDE_TMPL_LAYOUT" description="FLEXI_OVERRIDE_TMPL_LAYOUT_DESC" view="categories" />
+			<!--field name="target" type="componentlayout" label="FLEXI_OVERRIDE_TMPL_LAYOUT" description="FLEXI_OVERRIDE_TMPL_LAYOUT_DESC" view="categories" /-->
 			<field name="image" type="media" label="FLEXI_IMAGE" description="FLEXI_CHOOSE_IMAGE_FOR_CATEGORY" />
 			<field name="note" type="text" label="JFIELD_NOTE_LABEL" description="JFIELD_NOTE_DESC" class="inputbox" size="40"/>
 		</fieldset>

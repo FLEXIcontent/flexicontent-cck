@@ -483,17 +483,25 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		static $return;
 		if ($return === NULL) {
 			$db = JFactory::getDBO();
-			$query 	= "SELECT COUNT(*)"
-				. " FROM #__flexicontent_items_ext as ie "
-				. " LEFT JOIN #__content as i ON i.id=ie.item_id "
-				. " WHERE "
-				. (FLEXI_J16GE ? " i.language<>ie.language " : "0")   // IF THIS FUNCTION IS REMOVED THIS MUST BE MOVED TO ... getItemsNoLang(), if it does not exist already
-				. " OR i.state<>ie.cnt_state "
-				. " OR i.access<>ie.cnt_access "
-				. " OR i.publish_up<>ie.cnt_publish_up "
-				. " OR i.publish_down<>ie.cnt_publish_down "
-				. " OR i.created_by<>ie.cnt_created_by "
-				;
+			
+			// Find columns cached
+			$cache_tbl = "#__flexicontent_items_tmp";
+			$tbls = array($cache_tbl);
+			if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
+			else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
+			
+			// Get the column names
+			$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
+			
+			$query = "SELECT COUNT(*)"
+				. " FROM #__content AS i "
+				. " LEFT JOIN ".$cache_tbl." AS ca ON i.id=ca.id "
+				. " WHERE ca.id IS NULL ";
+			foreach ($tbl_fields as $col_name) {
+				if ($col_name == "id" || $col_name == "hits") continue;
+				else $query .= " OR i.`".$col_name."`<>ca.`".$col_name."`";
+			}
+			
 			$db->setQuery($query);
 			$return = $this->_db->loadResult() ? false : true;
 		}

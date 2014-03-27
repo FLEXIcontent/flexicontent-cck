@@ -227,7 +227,9 @@ class FlexicontentModelFields extends JModelList
 				}
 	
 			if ($search) {
-				$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false );
+				$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
+				$where[] = ' (LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false )
+					.' OR LOWER(t.label) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false ) .')';
 			}
 			
 			$where[] = ' (plg.extension_id IS NULL OR plg.folder="flexicontent_fields") ';

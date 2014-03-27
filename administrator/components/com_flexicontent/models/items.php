@@ -649,14 +649,14 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		}
 		$query .= ""
-				. ' FROM #__content AS i'
+				. ( !$query_ids ? ' FROM #__flexicontent_items_tmp AS i' :' FROM #__content AS i')
 				. (($filter_state=='RV') ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
 				. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' // left join needed to INCLUDE items do not have records in the multi-cats-items TABLE
 				.    ($filter_cats && !$filter_subcats ? ' AND rel.catid='.$filter_cats : '')
 				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'   // left join needed to detect items without type !!
 				. ' JOIN #__categories AS c ON c.id = i.catid'
-				. ' LEFT JOIN #__users AS u ON u.id = i.checked_out'
+				. ( !$query_ids ? '' : ' LEFT JOIN #__users AS u ON u.id = i.checked_out')
 				. $ver_specific_joins
 				;
 		if ( !$query_ids ) {
@@ -2186,8 +2186,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$row->load( $id );
 		$row->id = $id;
 		$row->access = $access;
-		$row->cnt_access = $access;
-
+		
 		if ( !$row->check() ) {
 			$this->setError($this->_db->getErrorMsg());
 			return false;
