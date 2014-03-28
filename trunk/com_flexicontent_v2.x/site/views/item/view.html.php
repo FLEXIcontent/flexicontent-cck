@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1809 2013-11-19 23:01:31Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1874 2014-03-18 20:55:22Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -388,8 +388,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Set item's META data: desc, keyword, title, author
 		if ($item->metadesc)		$document->setDescription( $item->metadesc );
 		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
-		// Deprecated <title> tag is used instead by search engines
-		//if ($app->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
+		// ?? Deprecated <title> tag is used instead by search engines
+		if ($app->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
 		if ($app->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
 
 		// Set remaining META keys

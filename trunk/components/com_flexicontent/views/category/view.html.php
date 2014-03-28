@@ -57,6 +57,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Get category and set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
 		$category = $this->get('Category');
 		$params   = $category->parameters;
+		if ($category->id && FLEXI_J16GE)
+			$meta_params = new JRegistry($category->metadata);
+		else
+			$meta_params = false;
 		
 		// Get various data from the model
 		$categories = $params->get('show_subcategories')  ? $this->get('Childs') : array();
@@ -200,16 +204,26 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Set a page title if one was not already set
 		if ($layout=='author')
 			$author_user = JFactory::getUser($authorid);
+		
+		// set title to alternative category page title if this is set
+		$category_title =	!$meta_params ? $category->title : $meta_params->get('page_title', $category->title);
 		switch($layout) {
-			case ''        :  $default_title = $category->title;                  break;
+			case ''        :  $default_title = $category_title;                   break;
 			case 'myitems' :  $default_title = JText::_('FLEXICONTENT_MYITEMS');  break;
 			case 'author'  :  $default_title = JText::_('FLEXICONTENT_AUTHOR')  .': '. $author_user->get('name');  break;
 			default        :  $default_title = JText::_('FLEXICONTENT_CATEGORY');
 		}
 		if ($layout && $cid) { // Special views limited to a specific category
-			$default_title .= ', '.JText::_('FLEXI_IN_CATEGORY').': '.$category->title;
+			$default_title .= ', '.JText::_('FLEXI_IN_CATEGORY').': '.$category_title;
 		}
 		$params->def('page_title',	$default_title);  // set title ONLY if not already set
+		
+		// Check if (a) s category title is enabled to be printed AND a page title different than category title was created, and use the later instead of category title
+		if ($params->get('show_cat_title') && $params->get('page_title') != $category->title) {
+			$params->def('show_page_heading', 1);
+			$params->def('show_page_title', 1);
+			if ($params->get('show_page_heading'))  $params->set('show_cat_title', 0);   // suppress category title
+		}
 		
 		
 		// *******************
@@ -311,18 +325,17 @@ class FlexicontentViewCategory extends JViewLegacy
 				elseif ($menu && $menu_matches && ($_mp=$menu->params->get('menu-meta_keywords')))
 					$document->setMetadata('keywords', $_mp);
 				
-				$meta_params = new JRegistry($category->metadata);
-				
+				// meta_params are always set if J1.6+ and category id is set
 				if ( $meta_params->get('robots') )
 					$document->setMetadata('robots', $meta_params->get('robots'));
 				elseif ($menu && $menu_matches && ($_mp=$menu->params->get('robots')))
 					$document->setMetadata('robots', $_mp);
 				
-				// Deprecated <title> tag is used instead by search engines
-				/*if ($app->getCfg('MetaTitle') == '1') {
+				// ?? Deprecated <title> tag is used instead by search engines
+				if ($app->getCfg('MetaTitle') == '1') {
 					$meta_title = $meta_params->get('page_title') ? $meta_params->get('page_title') : $category->title;
 					$document->setMetaData('title', $meta_title);
-				}*/
+				}
 				
 				if ($app->getCfg('MetaAuthor') == '1') {
 					if ( $meta_params->get('author') ) {
@@ -334,8 +347,8 @@ class FlexicontentViewCategory extends JViewLegacy
 					$document->setMetaData('author', $meta_author);
 				}
 			} else {
-				// Deprecated <title> tag is used instead by search engines
-				/*if ($app->getCfg('MetaTitle') == '1')   $document->setMetaData('title', $category->title);*/
+				// ?? Deprecated <title> tag is used instead by search engines
+				if ($app->getCfg('MetaTitle') == '1')   $document->setMetaData('title', $category->title);
 			}
 		}
 		

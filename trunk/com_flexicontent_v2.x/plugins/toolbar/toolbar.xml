@@ -122,22 +122,32 @@
 			<!--field name="og_descr_maxlen" type="text" default="300" label="Max length" description="Max length of the text" /-->
 			
 			<field name="" type="separator" default="Content type" description="page" level="level3" />
-			<field name="add_og_type" type="list" default="0" label="FLEXI_ADD" description="Select what should be suggested as content type of current page">
+			<field name="add_og_type" type="list" default="article" label="FLEXI_ADD" description="Select what should be suggested as content type of current page">
 				<option value="0">FLEXI_NO</option>
+				<option value="article">Use 'article'</option>
 				<option value="website">Use 'website'</option>
-				<!--option value="1">Item's type</option-->
-				<!--option value="2">Custom Field</option-->
+				<!--option value="1">Item's type name</option-->
+				<!--option value="2">Custom text Field</option-->
 			</field>
 			<!--field name="og_type_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
 			
 			<field name="" type="separator" default="Image" description="page" level="level3" />
-			<field name="add_og_image" type="list" default="0" label="FLEXI_ADD" description="Select what should be suggested as image of current page">
+			<field name="add_og_image" type="radio" default="0" label="FLEXI_ADD" description="Select what should be suggested as image of current page">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">Extract from description</option>
-				<!--option value="2">Custom field</option-->
-				<!--option value="3">Custom field, then fallback to extract</option-->
+				<option value="1">FLEXI_YES</option>
 			</field>
-			<!--field name="og_image_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be an image field" /-->
+
+			<field name="og_image_field" type="fcimage" default="" label="Image source" description="NOTE: usually, this should be an image field" />
+			<field name="og_image_fallback" type="list" default="" label="FLEXI_FIELD_TOOLBAR_FALLBACK_IMG" description="FLEXI_FIELD_TOOLBAR_FALLBACK_IMG_DESC" >
+				<option value="0">FLEXI_FIELD_TOOLBAR_NO_FALLBACK</option>
+				<option value="1">FLEXI_FIELD_TOOLBAR_USE_INTROTEXT_FALLBACK</option>
+				<option value="2">FLEXI_FIELD_TOOLBAR_USE_INTROTEXT_FALLBACK_IGNORE_DEFAULTIMG</option>
+			</field>
+			<field name="og_image_thumbsize" type="list" default="medium" label="Thumbnail size" description="Thumbnail size (if using image field)">
+				<option value="small">FLEXI_FIELD_TOOLBAR_SMALL_THUMB</option>
+				<option value="medium">FLEXI_FIELD_TOOLBAR_MEDIUM_THUMB</option>
+				<option value="large">FLEXI_FIELD_TOOLBAR_LARGE_THUMB</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_DISPLAY" level="level1" />
 			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_CSS" description="FLEXI_FIELD_TOOLBAR_CSS_DESC">

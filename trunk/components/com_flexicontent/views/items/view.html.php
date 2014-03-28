@@ -388,8 +388,8 @@ class FlexicontentViewItems  extends JViewLegacy
 		// Set item's META data: desc, keyword, title, author
 		if ($item->metadesc)		$document->setDescription( $item->metadesc );
 		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
-		// Deprecated <title> tag is used instead by search engines
-		//if ($app->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
+		// ?? Deprecated <title> tag is used instead by search engines
+		if ($app->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
 		if ($app->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
 
 		// Set remaining META keys
@@ -1211,6 +1211,7 @@ class FlexicontentViewItems  extends JViewLegacy
 			max_cat_overlimit_msg_fc = "'.JText::_('FLEXI_TOO_MANY_ITEM_CATEGORIES',true).'";
 		');
 		
+		
 		// Creating categorories tree for item assignment, we use the 'create' privelege
 		$actions_allowed = array('core.create');
 
@@ -1229,8 +1230,8 @@ class FlexicontentViewItems  extends JViewLegacy
 			$attribs .= $enable_featured_cid_selector ? '' : ' disabled="disabled"';
 			
 			$fieldname = FLEXI_J16GE ? 'jform[featured_cid][]' : 'featured_cid[]';
-			$lists['featured_cid'] = flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed)
-				.($enable_featured_cid_selector ? '' : '<label class="label">locked</label>');
+			$lists['featured_cid'] = ($enable_featured_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+				flexicontent_cats::buildcatselect($featured_tree, $fieldname, $featured_sel, 3, $attribs, true, true,	$actions_allowed);
 		}
 		else{
 			// Do not display, if not configured or not allowed to the user
@@ -1240,7 +1241,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		
 		// Multi-category form field, for user allowed to use multiple categories
 		$lists['cid'] = '';
-		$enable_cid_selector = $perms['multicat'] && ($isnew || $perms['canchange_cat']);
+		$enable_cid_selector = $perms['multicat'] && ($isnew || $perms['canchange_seccat']);
 		if ( 1 )
 		{
 			// Get author's maximum allowed categories per item and set js limitation
@@ -1259,9 +1260,9 @@ class FlexicontentViewItems  extends JViewLegacy
 			
 			$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
 			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
-			$lists['cid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $selectedcats, false, $attribs, true, true,
-				$actions_allowed, $require_all=true, $skip_subtrees, $disable_subtrees=array())
-				.($enable_cid_selector ? '' : '<label class="label">locked</label>');
+			$lists['cid'] = ($enable_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+				flexicontent_cats::buildcatselect($categories, $fieldname, $selectedcats, false, $attribs, true, true,
+				$actions_allowed, $require_all=true, $skip_subtrees, $disable_subtrees=array());
 		}
 		else {
 			if ( count($selectedcats)>1 ) {
@@ -1273,13 +1274,6 @@ class FlexicontentViewItems  extends JViewLegacy
 				$lists['cid'] = false;
 			}
 		}
-		
-		//buid types selectlist
-		$class   = 'required use_select2_lib';
-		$attribs = 'class="'.$class.'"';
-		$fieldname = FLEXI_J16GE ? 'jform[type_id]' : 'type_id';
-		$elementid = FLEXI_J16GE ? 'jform_type_id'  : 'type_id';
-		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected->id, 1, $attribs, $elementid, $check_perms=true );
 		
 		
 		// Main category form field
@@ -1296,11 +1290,20 @@ class FlexicontentViewItems  extends JViewLegacy
 		if ( 1 ) {
 			$disabled = $enable_catid_selector ? '' : ' disabled="disabled"';
 			$attribs .= $disabled;
-			$lists['catid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed)
-				.($enable_catid_selector ? '' : '<label class="label">locked</label>');
+			$lists['catid'] = ($enable_catid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
+				flexicontent_cats::buildcatselect($categories, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed);
 		} else {
 			$lists['catid'] = $globalcats[$item->catid]->title;
 		}
+		
+		
+		//buid types selectlist
+		$class   = 'required use_select2_lib';
+		$attribs = 'class="'.$class.'"';
+		$fieldname = FLEXI_J16GE ? 'jform[type_id]' : 'type_id';
+		$elementid = FLEXI_J16GE ? 'jform_type_id'  : 'type_id';
+		$lists['type'] = flexicontent_html::buildtypesselect($types, $fieldname, $typesselected->id, 1, $attribs, $elementid, $check_perms=true );
+		
 		
 		// build version approval list
 		if ( $params->get('allowdisablingcomments_fe') )
