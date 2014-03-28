@@ -239,37 +239,32 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			}
 			
 			// OPEN GRAPH: type
-			if ($field->parameters->get('add_og_type')) {
-				$document->addCustomTag("<meta property=\"og:type\" content=\"website\">");
+			$og_type = (int) $field->parameters->get('add_og_type');
+			if ($og_type) {
+				if ($og_type > 2) $og_type = 1;
+				$og_type_names = array(1=>'article', 2=>'website');
+				$document->addCustomTag("<meta property=\"og:type\" content=\"".$og_type_names[$og_type]."\">");
 			}
 			
 			// OPEN GRAPH: image (extracted from item's description text)
 			if ($field->parameters->get('add_og_image'))
 			{
-				$matches = NULL;
-				preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $item->text, $matches);
-				$imageurl = @$matches[1][0];
-				if($imageurl) {
-					if($imageurl{0} == '/') {
-						$imageurls = explode('/', $imageurl);
-						$paths = array();
-						$found = false;
-						foreach($imageurls as $folder) {
-							if(!$found) {
-								if($folder!='images') continue;
-								else {
-									$found = true;
-								}
-							}
-							$paths[] = $folder;
-						}
-						$imageurl = implode('/', $paths);
-						$imageurl = JURI::root().$imageurl;
-					}elseif(substr($imageurl, 0, 7)=='images/') {
-						$imageurl = JURI::root().$imageurl;
+				$og_image_field     = $field->parameters->get('og_image_field');
+				$og_image_fallback  = $field->parameters->get('og_image_fallback');
+				$og_image_thumbsize = $field->parameters->get('og_image_thumbsize');
+				if ($og_image_field)
+				{
+					$imageurl = FlexicontentFields::getFieldDisplay($item, $og_image_field, null, 'display_'.$og_image_thumbsize.'_src', 'module');
+					$img_field = $item->fields[$og_image_field];
+					if ( (!$imageurl && $og_image_fallback==1) || ($imageurl && $og_image_fallback==2 && $img_field->using_default_value) ) {
+						$imageurl = $this->_extractimageurl($item);
 					}
 				}
-				$document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
+				else
+				{
+					$imageurl = $this->_extractimageurl($item);
+				}
+				if ($imageurl) $document->addCustomTag("<meta property=\"og:image\" content=\"{$imageurl}\" />");
 			}
 			
 			
@@ -449,6 +444,35 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$db->setQuery($query);
 				
 		return $db->loadResult() ? (int)$db->loadResult() : 0;
+	}
+	
+	
+	function _extractimageurl(& $item)
+	{
+		$matches = NULL;
+		preg_match_all('/<img.+src=[\'"]([^\'"]+)[\'"].*>/i', $item->text, $matches);
+		$imageurl = @$matches[1][0];
+		if($imageurl) {
+			if($imageurl{0} == '/') {
+				$imageurls = explode('/', $imageurl);
+				$paths = array();
+				$found = false;
+				foreach($imageurls as $folder) {
+					if(!$found) {
+						if($folder!='images') continue;
+						else {
+							$found = true;
+						}
+					}
+					$paths[] = $folder;
+				}
+				$imageurl = implode('/', $paths);
+				$imageurl = JURI::root().$imageurl;
+			}elseif(substr($imageurl, 0, 7)=='images/') {
+				$imageurl = JURI::root().$imageurl;
+			}
+		}
+		return $imageurl;
 	}
 
 }
