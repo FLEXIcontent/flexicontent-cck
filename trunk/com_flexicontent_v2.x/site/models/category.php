@@ -1314,7 +1314,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		if ( $print_logging_info )  $start_microtime = microtime(true);
 		
 		$query = $this->_buildChildsQuery();
 		$this->_childs = $this->_getList($query);
@@ -1324,7 +1323,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 		for($i = 0; $i < $count; $i++)
 		{
 			$category =& $this->_childs[$i];
-			$category->assigneditems = !$show_itemcount      ? null    : $this->_getassigned( $category->id );
+			$category->assigneditems = null;
+			if ($show_itemcount) {
+				if ( $print_logging_info )  $start_microtime = microtime(true);
+				$category->assigneditems = $this->_getassigned( $category->id );
+				if ( $print_logging_info ) @$fc_run_times['item_counting_sub_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			}
 			$category->subcats       = $this->_getsubs( $category->id );
 			//$this->_id        = $category->id;
 			//$category->items  = $this->getData();
@@ -1332,8 +1336,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$k = 1 - $k;
 		}
 		$this->_id = $id;  // restore id in case it has been changed
-		
-		if ( $print_logging_info ) @$fc_run_times['item_counting_sub_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		return $this->_childs;
 	}
@@ -1357,7 +1359,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		if ( $print_logging_info )  $start_microtime = microtime(true);
 		
 		$query = $this->_buildChildsQuery($this->_category->parent_id);
 		$this->_peers = $this->_getList($query);
@@ -1367,7 +1368,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 		for($i = 0; $i < $count; $i++)
 		{
 			$category =& $this->_peers[$i];
-			$category->assigneditems = !$show_itemcount      ? null    : $this->_getassigned( $category->id );
+			$category->assigneditems = null;
+			if ($show_itemcount) {
+				if ( $print_logging_info )  $start_microtime = microtime(true);
+				$category->assigneditems = $this->_getassigned( $category->id );
+				if ( $print_logging_info ) @$fc_run_times['item_counting_peer_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			}
 			$category->subcats       = $this->_getsubs( $category->id );
 			//$this->_id        = $category->id;
 			//$category->items  = $this->getData();
@@ -1375,8 +1381,6 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$k = 1 - $k;
 		}
 		$this->_id = $id;  // restore id in case it has been changed
-		
-		if ( $print_logging_info ) @$fc_run_times['item_counting_peer_cats'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		return $this->_peers;
 	}

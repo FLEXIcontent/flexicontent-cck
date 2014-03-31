@@ -1928,13 +1928,13 @@ class FlexicontentController extends JControllerLegacy
 '
 			);
 			foreach ($valid_files as $file) {
-				fprintf($handle_txt, $file->item_title."\n\n");
-				fprintf($handle_txt, flexicontent_html::striptagsandcut($file->item_introtext) ."\n\n" );
-				if ( strlen($file->item_fulltext) ) fprintf($handle_txt, flexicontent_html::striptagsandcut($file->item_fulltext)."\n\n" );
+				fprintf($handle_txt, "%s", $file->item_title."\n\n");
+				fprintf($handle_txt, "%s", flexicontent_html::striptagsandcut($file->item_introtext) ."\n\n" );
+				if ( strlen($file->item_fulltext) ) fprintf($handle_txt, "%s", flexicontent_html::striptagsandcut($file->item_fulltext)."\n\n" );
 				
-				fprintf($handle_htm, "<h2>".$file->item_title."</h2>");
-				fprintf($handle_htm, "<blockquote>".$file->item_introtext."</blockquote><br/>");
-				if ( strlen($file->item_fulltext) ) fprintf($handle_htm, "<blockquote>".$file->item_fulltext."</blockquote><br/>");
+				fprintf($handle_htm, "%s", "<h2>".$file->item_title."</h2>");
+				fprintf($handle_htm, "%s", "<blockquote>".$file->item_introtext."</blockquote><br/>");
+				if ( strlen($file->item_fulltext) ) fprintf($handle_htm, "%s", "<blockquote>".$file->item_fulltext."</blockquote><br/>");
 				fprintf($handle_htm, "<hr/><br/>");
 			}
 			fclose($handle_txt);

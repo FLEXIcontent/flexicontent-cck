@@ -168,7 +168,7 @@ class FlexicontentFields
 		}
 		
 		// Apply cache to public (unlogged) users only 
-		if ($apply_cache === null) {
+		/*if ($apply_cache === null) {
 			if (FLEXI_J16GE) {
 				$apply_cache = max($aid) <= 1;  // ACCESS LEVEL : PUBLIC 1 , REGISTERED 2
 			} else {
@@ -192,7 +192,7 @@ class FlexicontentFields
 				$filtercache->gc();
 				$expired_cleaned = true;
 			}
-		}
+		}*/
 		
 		// @TODO : move to the constructor
 		// This is optimized regarding the use of SINGLE QUERY to retrieve the core item data
@@ -206,31 +206,9 @@ class FlexicontentFields
 		$vars['votes']      = FlexicontentFields::_getVotes($items);
 		$vars['custom']     = FlexicontentFields::_getCustomValues($items);
 		
-		foreach ($items as $i => $item)
-		{
-			$var = array();
-			$item_id = $items[$i]->id;
-			$var['cats']      = isset($vars['cats'][$item_id])      ? $vars['cats'][$item_id]             : array();
-			$var['tags']      = isset($vars['tags'][$item_id])      ? $vars['tags'][$item_id]             : array();
-			$var['favourites']= isset($vars['favourites'][$item_id])? $vars['favourites'][$item_id]->favs : 0;
-			$var['favoured']  = isset($vars['favoured'][$item_id])  ? $vars['favoured'][$item_id]->fav    : 0;
-			$var['authors']   = isset($vars['authors'][$item_id])   ? $vars['authors'][$item_id]          : '';
-			$var['modifiers'] = isset($vars['modifiers'][$item_id]) ? $vars['modifiers'][$item_id]        : '';
-			$var['typenames'] = isset($vars['typenames'][$item_id]) ? $vars['typenames'][$item_id]        : '';
-			$var['votes']     = isset($vars['votes'][$item_id])     ? $vars['votes'][$item_id]            : '';
-			$var['custom']    = isset($vars['custom'][$item_id])    ? $vars['custom'][$item_id]           : array();
-			
-			// NEW optimized code is faster WITHOUT CACHE ?
-			/*if ( $apply_cache ) {
-				$hits = $items[$i]->hits;
-				$items[$i]->hits = 0;  // clear hits because it will prevent caching (changes frequently)
-				$items[$i] = $itemcache->call(array('FlexicontentFields', 'getItemFields'), $items[$i], $var, $view, $aid);
-				$items[$i]->hits = $hits;
-			} else {*/
-				$items[$i] = FlexicontentFields::getItemFields($items[$i], $var, $view, $aid);
-			//}
-		}
-		if ( $print_logging_info )  @$fc_run_times['field_value_retrieval'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		FlexicontentFields::getItemFields($items, $vars, $view, $aid);
+		
+		if ( $print_logging_info )  @$fc_run_times['field_values_params'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		if ($params)  // NULL/empty parameters mean only retrieve field values
 		{
@@ -266,10 +244,9 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function getItemFields($item, $var, $view=FLEXI_ITEMVIEW, $aid=false)
+	static function & getItemFields(&$items, &$vars, $view=FLEXI_ITEMVIEW, $aid=false)
 	{
-		if (!$item) return;
-		if (!FLEXI_J16GE && $item->sectionid != FLEXI_SECTION) return;
+		if ( empty($items) ) return;
 		
 		static $type_fields = array();
 		
@@ -277,86 +254,95 @@ class FlexicontentFields
 		$dispatcher = JDispatcher::getInstance();
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
-
-		$cats			= $var['cats'];
-		$tags			= $var['tags'];
-		$favourites	= $var['favourites'];
-		$favoured	= $var['favoured'];
-		$author		= $var['authors'];
-		$modifier	= $var['modifiers'];
-		$typename	= $var['typenames'];
-		$vote			= $var['votes'];
-		
-		if (FLEXI_J16GE) {
-			$aid_arr = is_array($aid) ? $aid : $user->getAuthorisedViewLevels();
-			$aid_list = implode(",", $aid);
-			$andaccess 	= ' AND fi.access IN (0,'.$aid_list.')' ;
-			$joinaccess = '';
-		} else {
-			$aid = $aid!==false ? (int) $aid : (int) $user->get('aid');
-			$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')' : ' AND fi.access <= '.$aid ;
-			$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
-		}
-		
-		// ONCE per Content Item Type
-		if ( !isset($type_fields[$item->type_id]) )
-		{
-			$query 	= 'SELECT fi.*'
-					. ' FROM #__flexicontent_fields AS fi'
-					. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = '.$item->type_id
-					. $joinaccess
-					. ' WHERE fi.published = 1'
-					. $andaccess
-					. ' GROUP BY fi.id'
-					. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
-					;
-			$db->setQuery($query);
-			$type_fields[$item->type_id] = $db->loadObjectList('name');
-		}
-		$item->fields = array();
-		if ($type_fields[$item->type_id]) foreach($type_fields[$item->type_id] as $field_name => $field_data)
-			$item->fields[$field_name]	= clone($field_data);
-		$item->fields	= $item->fields	? $item->fields	: array();
-		
 		jimport('joomla.html.parameter');
-		if (!isset($item->parameters)) $item->parameters = FLEXI_J16GE ? new JRegistry($item->attribs) : new JParameter($item->attribs);
-		$item->params		= $item->parameters;
 		
-		$item->text			= $item->introtext . chr(13).chr(13) . $item->fulltext;
-		$item->tags = $tags;
-		$item->cats = $cats;
-		$item->favs			= $favourites;
-		$item->fav			= $favoured;
+		foreach ($items as $i => $item)
+		{
+			if (!FLEXI_J16GE && $item->sectionid != FLEXI_SECTION) continue;
+			
+			$item_id = $item->id;
+			
+			$cats      = isset($vars['cats'][$item_id])      ? $vars['cats'][$item_id]             : array();
+			$tags      = isset($vars['tags'][$item_id])      ? $vars['tags'][$item_id]             : array();
+			$favourites= isset($vars['favourites'][$item_id])? $vars['favourites'][$item_id]->favs : 0;
+			$favoured  = isset($vars['favoured'][$item_id])  ? $vars['favoured'][$item_id]->fav    : 0;
+			$author    = isset($vars['authors'][$item_id])   ? $vars['authors'][$item_id]          : '';
+			$modifier  = isset($vars['modifiers'][$item_id]) ? $vars['modifiers'][$item_id]        : '';
+			$typename  = isset($vars['typenames'][$item_id]) ? $vars['typenames'][$item_id]        : '';
+			$vote      = isset($vars['votes'][$item_id])     ? $vars['votes'][$item_id]            : '';
+			$custom    = isset($vars['custom'][$item_id])    ? $vars['custom'][$item_id]           : array();
+			
+			
+			// ONCE per Content Item Type
+			if ( !isset($type_fields[$item->type_id]) )
+			{
+				if (FLEXI_J16GE) {
+					$aid_arr = is_array($aid) ? $aid : $user->getAuthorisedViewLevels();
+					$aid_list = implode(",", $aid);
+					$andaccess 	= ' AND fi.access IN (0,'.$aid_list.')' ;
+					$joinaccess = '';
+				} else {
+					$aid = $aid!==false ? (int) $aid : (int) $user->get('aid');
+					$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')' : ' AND fi.access <= '.$aid ;
+					$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
+				}
+				
+				$query 	= 'SELECT fi.*'
+						. ' FROM #__flexicontent_fields AS fi'
+						. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = '.$item->type_id
+						. $joinaccess
+						. ' WHERE fi.published = 1'
+						. $andaccess
+						. ' GROUP BY fi.id'
+						. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
+						;
+				$db->setQuery($query);
+				$type_fields[$item->type_id] = $db->loadObjectList('name');
+			}
+			$item->fields = array();
+			if ($type_fields[$item->type_id]) foreach($type_fields[$item->type_id] as $field_name => $field_data)
+				$item->fields[$field_name]	= clone($field_data);
+			$item->fields	= $item->fields	? $item->fields	: array();
+			
+			if (!isset($item->parameters)) $item->parameters = FLEXI_J16GE ? new JRegistry($item->attribs) : new JParameter($item->attribs);
+			$item->params		= $item->parameters;
+			
+			$item->text			= $item->introtext . chr(13).chr(13) . $item->fulltext;
+			$item->tags = $tags;
+			$item->cats = $cats;
+			$item->favs			= $favourites;
+			$item->fav			= $favoured;
+			
+			$item->creator 	= @$author->alias ? $author->alias : (@$author->name 		? $author->name 	: '') ;
+			$item->author		= & $item->creator;  // An alias ... of creator
+			$item->modifier	= @$modifier->name 		? $modifier->name 	: $item->creator;   // If never modified, set modifier to be the creator
+			$item->modified	= ($item->modified != $db->getNulldate()) ? $item->modified : $item->created;   // If never modified, set modification date to be the creation date
+			
+			$item->cmail 		= @$author->email 		? $author->email 	: '' ;
+			$item->cuname 	= @$author->username 	? $author->username 	: '' ;
+			$item->mmail		= @$modifier->email 	? $modifier->email 	: $item->cmail;
+			$item->muname		= @$modifier->muname 	? $modifier->muname : $item->cuname;
+			
+			$item->typename	= @$typename->name 		? $typename->name 	: JText::_('Article');
+			$item->vote			= @$vote ? $vote : '';
+			
+			// some aliases to much CORE field names
+			$item->categories    = & $item->cats;
+			$item->favourites    = & $item->favs;
+			$item->document_type = & $item->typename;
+			$item->voting        = & $item->vote;
+			
+			// custom field values
+			$item->fieldvalues = $custom;
+			
+			/*if ($item->fields) {
+				// IMPORTANT the items model and possibly other will set item PROPERTY version_id to indicate loading an item version,
+				// It is not the responisibility of this CODE to try to detect previewing of an item version, it is better left to the model
+				$item->fieldvalues = FlexicontentFields::_getFieldsvalues($item->id, $item->fields, !empty($item->version_id) ? $item->version_id : 0);
+			}*/
+		}
 		
-		$item->creator 	= @$author->alias ? $author->alias : (@$author->name 		? $author->name 	: '') ;
-		$item->author		= & $item->creator;  // An alias ... of creator
-		$item->modifier	= @$modifier->name 		? $modifier->name 	: $item->creator;   // If never modified, set modifier to be the creator
-		$item->modified	= ($item->modified != $db->getNulldate()) ? $item->modified : $item->created;   // If never modified, set modification date to be the creation date
-		
-		$item->cmail 		= @$author->email 		? $author->email 	: '' ;
-		$item->cuname 	= @$author->username 	? $author->username 	: '' ;
-		$item->mmail		= @$modifier->email 	? $modifier->email 	: $item->cmail;
-		$item->muname		= @$modifier->muname 	? $modifier->muname : $item->cuname;
-		
-		$item->typename	= @$typename->name 		? $typename->name 	: JText::_('Article');
-		$item->vote			= @$vote ? $vote : '';
-		
-		// some aliases to much CORE field names
-		$item->categories = & $item->cats;
-		$item->favourites	= & $item->favs;
-		$item->document_type = & $item->typename;
-		$item->voting			= & $item->vote;
-		
-		// custom field values
-		$item->fieldvalues = $var['custom'];
-		
-		/*if ($item->fields) {
-			// IMPORTANT the items model and possibly other will set item PROPERTY version_id to indicate loading an item version,
-			// It is not the responisibility of this CODE to try to detect previewing of an item version, it is better left to the model
-			$item->fieldvalues = FlexicontentFields::_getFieldsvalues($item->id, $item->fields, !empty($item->version_id) ? $item->version_id : 0);
-		}*/
-		
-		return $item;
+		return $items;
 	}
 	
 	
@@ -438,26 +424,26 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function renderField(&$item, &$field, &$values, $method='display', $view=FLEXI_ITEMVIEW)
+	static function renderField(&$_items, &$_field, &$values, $method='display', $view=FLEXI_ITEMVIEW)
 	{
 		static $_trigger_plgs_ft = array();
 		$flexiview = JRequest::getVar('view');
 		
 		// If $method (e.g. display method) is already created, then return the $field without recreating the $method
-		if (isset($field->{$method})) return $field;
+		if ( is_object($_field) && isset($_field->{$method}) ) return $_field;
 		
-		$cparams = JComponentHelper::getParams('com_flexicontent');
-		$print_logging_info = $cparams->get('print_logging_info');
-		if ($print_logging_info)  global $fc_run_times;
-		
-		// Append some values to the field object
-		$field->item_id 	= (int)$item->id;
-		$field->value 		= $values;               // NOTE: currently ignored and overritten by all CORE fields
+		// Handle multi-item call
+		if (!is_array($_items))  $items = array( & $_items );  else  $items = & $_items ;
 		
 		// **********************************************************************************************
 		// Create field parameters in an optimized way, and also apply Type Customization for CORE fields
 		// **********************************************************************************************
-		FlexicontentFields::loadFieldConfig($field, $item);
+		foreach($items as $item) {
+			$field = is_object($_field) ?  $_field  :  $item->fields[$_field];
+			$field->item_id 	= (int)$item->id;
+			$field->value = $values;               // NOTE: currently ignored and overwritten by all CORE fields
+			FlexicontentFields::loadFieldConfig($field, $item);
+		}
 		
 		
 		// ***************************************************************************************************
@@ -469,16 +455,23 @@ class FlexicontentFields
 		//         ignored and instead the other method parameters are used, along with the ITEM properties
 		// ****************************************************************************************************
 		// Log content plugin and other performance information
+		
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ($print_logging_info)  global $fc_run_times;
 		if ($print_logging_info)  $start_microtime = microtime(true);
+		
 		if ($field->iscore == 1)  // CORE field
 		{
 			//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$item->parameters, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
-			FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$field, $item, &$item->parameters, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote, null, $method ) );
+			//FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$_field, & $items, &$item->parameters, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote, null, $method ) );
+			$items_params = null;
+			FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$_field, & $items, &  $items_params, false, false, false, false, false, null, $method ) );
 		}
 		else                      // NON CORE field
 		{
 			//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
-			FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array(&$field, $item, null, $method) );
+			FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array(&$field, $_items, null, $method) );
 		}
 		if ($print_logging_info) {
 			$field_render_time = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -658,57 +651,72 @@ class FlexicontentFields
 		
 		$always_create_fields_display = $params->get('always_create_fields_display',0);
 		
-		// *** RENDER fields on DEMAND, (if present in template positions)
-		for ($i=0; $i < sizeof($items); $i++)
+		foreach ($items as $item)
 		{
 			if ($always_create_fields_display != 3) { // value 3 means never create for any view (blog template incompatible)
 				
 			  // 'description' item field is implicitly used by category layout of some templates (blog), render it
 			  $custom_values = false;
 			  if ($view == 'category') {
-			    if (isset($items[$i]->fields['text'])) {
-			    	$field = $items[$i]->fields['text'];
-			    	$field = FlexicontentFields::renderField($items[$i], $field, $custom_values, $method='display', $view);
+			    if (isset($item->fields['text'])) {
+			    	$field = $item->fields['text'];
+			    	$field = FlexicontentFields::renderField($item, $field, $custom_values, $method='display', $view);
 			    }
 			  }
 				// 'core' item fields are IMPLICITLY used by some item layout of some templates (blog), render them
 				else if ($view == FLEXI_ITEMVIEW) {
-					foreach ($items[$i]->fields as $field) {
+					foreach ($item->fields as $field) {
 						if ($field->iscore) {
-							$field 	= FlexicontentFields::renderField($items[$i], $field, $custom_values, $method='display', $view);
+							$field 	= FlexicontentFields::renderField($item, $field, $custom_values, $method='display', $view);
 						}
 					}
 				}
 		  }
-		  
+		}
+		
+		
+		// *** RENDER fields on DEMAND, (if present in template positions)
+		foreach ($fbypos as $pos) {
 		  // RENDER fields if they are present in a template position (or in a dummy template position ... e.g. when called by module)
-			foreach ($fbypos as $pos) {
-				foreach ($pos->fields as $c => $f) {
-					// Check that field with given name: $f exists, (this will handle deleted fields, that still exist in a template position)
-					if (!isset($items[$i]->fields[$f])) {	
-						continue;
-					}
-					$field = $items[$i]->fields[$f];
+			foreach ($pos->fields as $c => $f) {
+				
+				// Render field (if already rendered above, the function will return result immediately)
+				$method = (isset($pos->methods[$c]) && $pos->methods[$c]) ? $pos->methods[$c] : 'display';
+				
+				// Check that field with given name: $f exists, (this will handle deleted fields, that still exist in a template position)
+				$item = reset($items);
+				if (!isset($item->fields[$f]))  continue;
+				$field = $item->fields[$f];
+				
+				if ($field->iscore) {
+					$values = null;
+					FlexicontentFields::renderField($items, $f, $values, $method, $view);
+				}
+				
+				else foreach ($items as $item) {
+					$field = $item->fields[$f];
 					
 					// Set field values, currently, this exists for CUSTOM fields only, OR versioned CORE/CUSTOM fields too ...
-					$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
+					$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
 					
-					// Render field (if already rendered above, the function will return result immediately)
-					$method = (isset($pos->methods[$c]) && $pos->methods[$c]) ? $pos->methods[$c] : 'display';
-					$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method, $view);
+					$field 	= FlexicontentFields::renderField($item, $field, $values, $method, $view);
+				}
+				
+				foreach ($items as $item) {
+					$field = $item->fields[$f];
 					
 					// Set template position field data
 					if (isset($field->display) && strlen($field->display))
 					{
-						if (!isset($items[$i]->positions[$pos->position]))
-							$items[$i]->positions[$pos->position] = new stdClass();
-						$items[$i]->positions[$pos->position]->{$f} = new stdClass();
+						if (!isset($item->positions[$pos->position]))
+							$item->positions[$pos->position] = new stdClass();
+						$item->positions[$pos->position]->{$f} = new stdClass();
 						
-						$items[$i]->positions[$pos->position]->{$f}->id				= $field->id;
-						$items[$i]->positions[$pos->position]->{$f}->id				= $field->id;
-						$items[$i]->positions[$pos->position]->{$f}->name			= $field->name;
-						$items[$i]->positions[$pos->position]->{$f}->label		= $field->parameters->get('display_label') ? $field->label : '';
-						$items[$i]->positions[$pos->position]->{$f}->display	= $field->display;
+						$item->positions[$pos->position]->{$f}->id				= $field->id;
+						$item->positions[$pos->position]->{$f}->id				= $field->id;
+						$item->positions[$pos->position]->{$f}->name			= $field->name;
+						$item->positions[$pos->position]->{$f}->label		= $field->parameters->get('display_label') ? $field->label : '';
+						$item->positions[$pos->position]->{$f}->display	= $field->display;
 					}
 				}
 			}
@@ -769,7 +777,7 @@ class FlexicontentFields
 				.' WHERE item_id IN (' . implode(',', $item_ids) .')'
 				.( $version ? ' AND version=' . (int)$version:'')
 				.' AND value > "" '
-				.' ORDER BY item_id, field_id, valueorder'
+				.' ORDER BY item_id, field_id, valueorder'  // first 2 parts are not needed ...
 				;
 		$db->setQuery($query);
 		$values = $db->loadObjectList();
@@ -982,17 +990,24 @@ class FlexicontentFields
 	static function _getTypenames($items)
 	{
 		$db = JFactory::getDBO();
-		$cids = array();
-		foreach ($items as $item) { array_push($cids, $item->id); }		
 
-		$query 	= 'SELECT ie.item_id, t.name FROM #__flexicontent_items_ext AS ie'
-				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'
-				. " WHERE ie.item_id IN ('" . implode("','", $cids) . "')"
+		$type_ids = array();
+		foreach ($items as $item) { $type_ids[$item->type_id]=1; }
+		$type_ids = array_keys($type_ids);
+		
+		$query 	= 'SELECT id, name FROM #__flexicontent_types'
+				. " WHERE id IN ('" . implode("','", $type_ids) . "')"
 				;
 		$db->setQuery($query);
-		$types = $db->loadObjectList('item_id');
+		$types = $db->loadObjectList('id');
 		
-		return $types;
+		$typenames = array();
+		foreach ($items as $item) {
+			$typenames[$item->id] = new stdClass();
+			$typenames[$item->id]->name = $types[$item->type_id]->name;
+		}
+		
+		return $typenames;
 	}
 
 	/**
@@ -1384,7 +1399,7 @@ class FlexicontentFields
 	
 	
 	// Helper method to replace a field value inside a given named variable of a given item/field pair
-	static function replaceFieldValue( &$field, &$item, $variable, $varname )
+	static function replaceFieldValue( &$field, &$item, $variable, $varname, & $cacheable = false )
 	{
 		static $parsed = array();
 		static $d;
@@ -1411,6 +1426,10 @@ class FlexicontentFields
 				$c[$field->id][$varname]['propname']  = $field_matches[2];
 			} else {
 				$c[$field->id][$varname]['fulltxt']   = array();
+			}
+			
+			if ( !count($d[$field->id][$varname]['fulltxt']) && !count($c[$field->id][$varname]['fulltxt']) ) {
+				$cacheable = true;
 			}
 		}
 		

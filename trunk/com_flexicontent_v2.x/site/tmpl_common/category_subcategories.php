@@ -67,7 +67,7 @@ foreach ($this->categories as $sub) {
 	$infocount_str = '';
 	if ($show_itemcount)   $infocount_str .= (int) $sub->assigneditems . $itemcount_label;
 	if ($show_subcatcount) $infocount_str .= ($show_itemcount ? ' / ' : '').count($sub->subcats) . $subcatcount_label;
-	if ($infocount_str) $infocount_str = ' (' . $infocount_str . ')';
+	if (strlen($infocount_str)) $infocount_str = ' (' . $infocount_str . ')';
 	$subcats_html[$i] .= "    <a class='catlink' href='".$cat_link."'>".$this->escape($sub->title)."</a>".$infocount_str."</span>\n";
 	
 	// c. Optional sub-category description stripped of HTML and cut to given length
