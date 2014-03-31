@@ -247,6 +247,11 @@ class flexicontent_items extends JTable{
 		
 		foreach ($this->getProperties() as $p => $v) {
 		
+			// If the property is in the join properties array we add it to the items_tmp object (coming either from tbl or tbl_ext or from other joined table)
+			if (in_array($p, $this->_join_prop_tmp)) {
+				$type_tmp->$p = $v;
+			}
+			
 			// If the property is in the join properties array we add it to the items_ext object
 			if (in_array($p, $this->_join_prop_ext)) {
 				$type_ext->$p = $v;
@@ -269,11 +274,6 @@ class flexicontent_items extends JTable{
 			// Else we add it to the core item properties
 			else {
 				$type->$p = $v;
-				
-				// If the property is in the join properties array we add it to the items_tmp object
-				if (in_array($p, $this->_join_prop_tmp)) {
-					$type_tmp->$p = $v;
-				}
 			}
 		}
 

@@ -36,236 +36,273 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	// *******************************************
 	
 	// Method to create field's HTML display for item form
-	function onDisplayCoreFieldValue( &$field, $item, &$params, $tags=null, $categories=null, $favourites=null, $favoured=null, $vote=null, $values=null, $prop='display' )
+	function onDisplayCoreFieldValue( &$_field, & $_item, &$params, $_tags=null, $_categories=null, $_favourites=null, $_favoured=null, $_vote=null, $values=null, $prop='display' )
 	{
 		// this function is a mess and need complete refactoring
 		// execute the code only if the field type match the plugin type
 		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
-		$values = $values ? $values : $field->value;
-
-		if($field->iscore != 1) return;
+		static $cat_links = array();
+		static $tag_links = array();
 		
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
-		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
-		$posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext' );
-		$separatorf	= $field->parameters->get( 'separatorf', 3 ) ;       // used by some fields
-		$opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag' );     // used by some fields
-		$closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag' );   // used by some fields
+		if ( !is_array($_item) ) 
+			$items = array( & $_item );
+		else
+			$items = & $_item;
 		
-		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
+		$pretext_cacheable = $posttext_cacheable = $opentag_cacheable = $closetag_cacheable = false;
 		
-		// some parameter shortcuts
-		$dateformat			= $field->parameters->get( 'date_format', '' ) ;
-		$customdate			= $field->parameters->get( 'custom_date', '' ) ;		
-		
-		switch($separatorf)
+		foreach($items as $item)
 		{
-			case 0:
-			$separatorf = ' ';
-			break;
-
-			case 1:
-			$separatorf = '<br />';
-			break;
-
-			case 2:
-			$separatorf = ' | ';
-			break;
-
-			case 3:
-			$separatorf = ', ';
-			break;
-
-			case 4:
-			$separatorf = $closetag . $opentag;
-			break;
-
-			case 5:
-			$separatorf = '';
-			break;
-
-			default:
-			$separatorf = '&nbsp;';
-			break;
-		}
+			//if (!is_object($_field)) echo $item->id." - ".$_field ."<br/>";
+			if (is_object($_field)) $field = $_field;
+			else $field = $item->fields[$_field];
 			
-		$field->value = array();
-		switch ($field->field_type)
-		{
-			case 'created': // created
-				$field->value[] = $item->created;
-				$dateformat = $dateformat ? $dateformat : $customdate;
-				$field->display = $pretext.JHTML::_( 'date', $item->created, JText::_($dateformat) ).$posttext;
-				break;
+			if($field->iscore != 1) continue;
+			$values = $values ? $values : $field->value;
+			$field->item_id = $item->id;
 			
-			case 'createdby': // created by
-				$field->value[] = $item->created_by;
-				$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->cuname : $item->creator).$posttext;
-				break;
-
-			case 'modified': // modified
-				$field->value[] = $item->modified;
-				$dateformat = $dateformat ? $dateformat : $customdate;
-				$field->display = $pretext.JHTML::_( 'date', $item->modified, JText::_($dateformat) ).$posttext;
-				break;
+			// Prefix - Suffix - Separator parameters, replacing other field values if found
+			$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+			if (!$pretext_cacheable)  $pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext', $pretext_cacheable );
+			if (!$posttext_cacheable) $posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext', $posttext_cacheable );
+			$separatorf	= $field->parameters->get( 'separatorf', 3 ) ;       // used by some fields
+			if (!$opentag_cacheable)  $opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag', $opentag_cacheable );     // used by some fields
+			if (!$closetag_cacheable) $closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag', $closetag_cacheable );   // used by some fields
 			
-			case 'modifiedby': // modified by
-				$field->value[] = $item->modified_by;
-				$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->muname : $item->modifier).$posttext;
+			if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
+			if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
+			
+			// some parameter shortcuts
+			$dateformat			= $field->parameters->get( 'date_format', '' ) ;
+			$customdate			= $field->parameters->get( 'custom_date', '' ) ;		
+			
+			switch($separatorf)
+			{
+				case 0:
+				$separatorf = ' ';
 				break;
-
-			case 'title': // title
-				$field->value[] = $item->title;
-				$field->display = $pretext.$item->title.$posttext;
+	
+				case 1:
+				$separatorf = '<br />';
+				break;
+	
+				case 2:
+				$separatorf = ' | ';
+				break;
+	
+				case 3:
+				$separatorf = ', ';
+				break;
+	
+				case 4:
+				$separatorf = $closetag . $opentag;
+				break;
+	
+				case 5:
+				$separatorf = '';
+				break;
+	
+				default:
+				$separatorf = '&nbsp;';
+				break;
+			}
 				
-				// Get ogp configuration
-				$useogp     = $field->parameters->get('useogp', 1);
-				$ogpinview  = $field->parameters->get('ogpinview', array());
-				$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
-				$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
+			$field->value = array();
+			switch ($field->field_type)
+			{
+				case 'created': // created
+					$field->value[] = $item->created;
+					$dateformat = $dateformat ? $dateformat : $customdate;
+					$field->display = $pretext.JHTML::_( 'date', $item->created, JText::_($dateformat) ).$posttext;
+					break;
 				
-				if ($useogp && $field->{$prop}) {
-					if ( in_array($view, $ogpinview) ) {
-						$content_val = flexicontent_html::striptagsandcut($field->display, $ogpmaxlen);
-						JFactory::getDocument()->addCustomTag('<meta property="og:title" content="'.$content_val.'" />');
-					}
-				}
-				break;
-
-			case 'hits': // hits
-				$field->value[] = $item->hits;
-				$field->display = $pretext.$item->hits.$posttext;
-				break;
-
-			case 'type': // document type
-				$field->value[] = $item->type_id;
-				$field->display = $pretext.JText::_($item->typename).$posttext;
-				break;
-
-			case 'version': // version
-				$field->value[] = $item->version;
-				$field->display = $pretext.$item->version.$posttext;
-				break;
-
-			case 'state': // state
-				$field->value[] = $item->state;
-				$field->display = $pretext.flexicontent_html::stateicon( $item->state, $field->parameters ).$posttext;
-				break;
-
-			case 'voting': // voting button
-				$field->value[] = 'button'; // dummy value to force display
-				$field->display = $pretext.flexicontent_html::ItemVote( $field, 'all', $vote ).$posttext;
-				break;
-
-			case 'favourites': // favourites button
-				$field->value[] = 'button'; // dummy value to force display
-				$favs = flexicontent_html::favoured_userlist( $field, $item, $favourites);
-				$field->display = $pretext.'
-				<span class="fav-block">
-					'.flexicontent_html::favicon( $field, $favoured, $item ).'
-					<span id="fcfav-reponse_'.$field->item_id.'" class="fcfav-reponse">
-						<small>'.$favs.'</small>
-					</span>
-				</span>
-					'.$posttext;
-				break;
-
-			case 'categories': // assigned categories
-				$field->display = '';
-				if ($categories) :
-					// Get categories that should be excluded from linking
-					global $globalnoroute;
-					if ( !is_array($globalnoroute) ) $globalnoroute = array();
+				case 'createdby': // created by
+					$field->value[] = $item->created_by;
+					$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->cuname : $item->creator).$posttext;
+					break;
+	
+				case 'modified': // modified
+					$field->value[] = $item->modified;
+					$dateformat = $dateformat ? $dateformat : $customdate;
+					$field->display = $pretext.JHTML::_( 'date', $item->modified, JText::_($dateformat) ).$posttext;
+					break;
+				
+				case 'modifiedby': // modified by
+					$field->value[] = $item->modified_by;
+					$field->display = $pretext.(($field->parameters->get('name_username', 1) == 2) ? $item->muname : $item->modifier).$posttext;
+					break;
+	
+				case 'title': // title
+					$field->value[] = $item->title;
+					$field->display = $pretext.$item->title.$posttext;
 					
-					// Create list of category links, excluding the "noroute" categories
-					$field->display = array();
-					foreach ($categories as $category) {
-						if (!in_array($category->id, @$globalnoroute)) :
-							$cat_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
-							$display = '<a class="fc_categories fc_category_' .$category->id. ' link_' .$field->name. '" href="' . $cat_link . '">' . $category->title . '</a>';
+					// Get ogp configuration
+					$useogp     = $field->parameters->get('useogp', 1);
+					$ogpinview  = $field->parameters->get('ogpinview', array());
+					$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
+					$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
+					
+					if ($useogp && $field->{$prop}) {
+						if ( in_array($view, $ogpinview) ) {
+							$content_val = flexicontent_html::striptagsandcut($field->display, $ogpmaxlen);
+							JFactory::getDocument()->addCustomTag('<meta property="og:title" content="'.$content_val.'" />');
+						}
+					}
+					break;
+	
+				case 'hits': // hits
+					$field->value[] = $item->hits;
+					$field->display = $pretext.$item->hits.$posttext;
+					break;
+	
+				case 'type': // document type
+					$field->value[] = $item->type_id;
+					$field->display = $pretext.JText::_($item->typename).$posttext;
+					break;
+	
+				case 'version': // version
+					$field->value[] = $item->version;
+					$field->display = $pretext.$item->version.$posttext;
+					break;
+	
+				case 'state': // state
+					$field->value[] = $item->state;
+					$field->display = $pretext.flexicontent_html::stateicon( $item->state, $field->parameters ).$posttext;
+					break;
+	
+				case 'voting': // voting button
+					if ($_vote===false) $vote = & $item->vote;
+					else $vote = & $_vote;
+					
+					$field->value[] = 'button'; // dummy value to force display
+					$field->display = $pretext.flexicontent_html::ItemVote( $field, 'all', $vote ).$posttext;
+					break;
+	
+				case 'favourites': // favourites button
+					if ($_favourites===false) $favourites = & $item->favs;
+					else $favourites = & $_favourites;
+					if ($_favoured===false) $favoured = & $item->fav;
+					else $favoured = & $_favoured;
+					
+					$field->value[] = 'button'; // dummy value to force display
+					$favs = flexicontent_html::favoured_userlist( $field, $item, $favourites);
+					$field->display = $pretext.'
+					<span class="fav-block">
+						'.flexicontent_html::favicon( $field, $favoured, $item ).'
+						<span id="fcfav-reponse_'.$field->item_id.'" class="fcfav-reponse">
+							<small>'.$favs.'</small>
+						</span>
+					</span>
+						'.$posttext;
+					break;
+	
+				case 'categories': // assigned categories
+					$field->display = '';
+					
+					if ($_categories===false) $categories = & $item->cats;
+					else $categories = & $_categories;
+					
+					if ($categories) :
+						// Get categories that should be excluded from linking
+						global $globalnoroute;
+						if ( !is_array($globalnoroute) ) $globalnoroute = array();
+						
+						// Create list of category links, excluding the "noroute" categories
+						$field->display = array();
+						foreach ($categories as $category) {
+							$cat_id = $category->id;
+							if ( in_array($cat_id, @$globalnoroute) )  continue;
+							
+							if ( !isset($cat_links[$cat_id]) )   $cat_links[$cat_id] = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug));
+							$cat_link = $cat_links[$cat_id];
+							$display = '<a class="fc_categories fc_category_' .$cat_id. ' link_' .$field->name. '" href="' . $cat_link . '">' . $category->title . '</a>';
 							$field->display[] = $pretext. $display .$posttext;
 							$field->value[] = $category->title;
-						endif;
-					}
-					$field->display = implode($separatorf, $field->display);
-					$field->display = $opentag . $field->display . $closetag;
-				endif;
-				break;
-
-			case 'tags': // assigned tags
-				$field->display = '';
-				if ($tags) :
-					// Create list of tag links
-					$field->display = array();
-					foreach ($tags as $tag) :
-						$tag_link = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug));
-						$display = '<a class="fc_tags fc_tag_' .$tag->id. ' link_' .$field->name. '" href="' . $tag_link . '">' . $tag->name . '</a>';
-						$field->display[] = $pretext. $display .$posttext;
-						$field->value[] = $tag->name; 
-					endforeach;
-					$field->display = implode($separatorf, $field->display);
-					$field->display = $opentag . $field->display . $closetag;
-				endif;
-				break;
-			
-			case 'maintext': // main text
-			
-				// Special display variables
-				if ($prop != 'display')
-				{
-					switch ($prop) {
-						case 'display_if': $field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;  break;
-						case 'display_i' : $field->{$prop} = $item->introtext;  break;
-						case 'display_f' : $field->{$prop} = $item->fulltext;   break;
-					}
-				}
+						}
+						$field->display = implode($separatorf, $field->display);
+						$field->display = $opentag . $field->display . $closetag;
+					endif;
+					break;
+	
+				case 'tags': // assigned tags
+					$field->display = '';
+					
+					if ($_tags===false) $tags = & $item->tags;
+					else $tags = & $_tags;
+					
+					if ($tags) :
+						// Create list of tag links
+						$field->display = array();
+						foreach ($tags as $tag) :
+							$tag_id = $tag->id;
+							if ( !isset($tag_links[$tag_id]) )   $tag_links[$tag_id] = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug));
+							$tag_link = $tag_links[$tag_id];
+							$display = '<a class="fc_tags fc_tag_' .$tag->id. ' link_' .$field->name. '" href="' . $tag_link . '">' . $tag->name . '</a>';
+							$field->display[] = $pretext. $display .$posttext;
+							$field->value[] = $tag->name; 
+						endforeach;
+						$field->display = implode($separatorf, $field->display);
+						$field->display = $opentag . $field->display . $closetag;
+					endif;
+					break;
 				
-				// Check for no fulltext present and force using introtext
-				else if ( !$item->fulltext )
-				{
-					$field->display = $item->introtext;
-				}
+				case 'maintext': // main text
 				
-				// Multi-item views: category/tags/favourites/module etc, only show introtext, but we have added 'force_full' item parameter
-				// to allow showing the fulltext too. This parameter can be inherited by category/menu parameters or be set inside template files
-				else if ($view != FLEXI_ITEMVIEW)
-				{	
-					if ( $item->parameters->get('force_full', 0) )
+					// Special display variables
+					if ($prop != 'display')
 					{
-						$field->display = $item->introtext . chr(13).chr(13) . $item->fulltext;
-					} else {
+						switch ($prop) {
+							case 'display_if': $field->{$prop} = $item->introtext . chr(13).chr(13) . $item->fulltext;  break;
+							case 'display_i' : $field->{$prop} = $item->introtext;  break;
+							case 'display_f' : $field->{$prop} = $item->fulltext;   break;
+						}
+					}
+					
+					// Check for no fulltext present and force using introtext
+					else if ( !$item->fulltext )
+					{
 						$field->display = $item->introtext;
 					}
-				}
 					
-				// ITEM view only shows fulltext, introtext is shown only if 'show_intro' item parameter is set
-				else
-				{
-					if ( $item->parameters->get('show_intro', 1) )
+					// Multi-item views: category/tags/favourites/module etc, only show introtext, but we have added 'force_full' item parameter
+					// to allow showing the fulltext too. This parameter can be inherited by category/menu parameters or be set inside template files
+					else if ($view != FLEXI_ITEMVIEW)
+					{	
+						if ( $item->parameters->get('force_full', 0) )
+						{
+							$field->display = $item->introtext . chr(13).chr(13) . $item->fulltext;
+						} else {
+							$field->display = $item->introtext;
+						}
+					}
+						
+					// ITEM view only shows fulltext, introtext is shown only if 'show_intro' item parameter is set
+					else
 					{
-						$field->display = $item->introtext . chr(13).chr(13) . $item->fulltext;
-					} else {
-						$field->display = $item->fulltext;
+						if ( $item->parameters->get('show_intro', 1) )
+						{
+							$field->display = $item->introtext . chr(13).chr(13) . $item->fulltext;
+						} else {
+							$field->display = $item->fulltext;
+						}
 					}
-				}
-				
-				// Get ogp configuration
-				$useogp     = $field->parameters->get('useogp', 1);
-				$ogpinview  = $field->parameters->get('ogpinview', array());
-				$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
-				$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
-				
-				if ($useogp && $field->{$prop}) {
-					if ( in_array($view, $ogpinview) ) {
-						$content_val = flexicontent_html::striptagsandcut($field->display, $ogpmaxlen);
-						JFactory::getDocument()->addCustomTag('<meta property="og:description" content="'.$content_val.'" />');
+					
+					// Get ogp configuration
+					$useogp     = $field->parameters->get('useogp', 1);
+					$ogpinview  = $field->parameters->get('ogpinview', array());
+					$ogpinview  = FLEXIUtilities::paramToArray($ogpinview);
+					$ogpmaxlen  = $field->parameters->get('ogpmaxlen', 300);
+					
+					if ($useogp && $field->{$prop}) {
+						if ( in_array($view, $ogpinview) ) {
+							$content_val = flexicontent_html::striptagsandcut($field->display, $ogpmaxlen);
+							JFactory::getDocument()->addCustomTag('<meta property="og:description" content="'.$content_val.'" />');
+						}
 					}
-				}
-				
-				break;
+					
+					break;
+			}
 		}
 	}
 	
