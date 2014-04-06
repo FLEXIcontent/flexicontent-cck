@@ -533,6 +533,8 @@ class com_flexicontentInstallerScript
 					if ($fields_tbl_exists)  $tbls[] = "#__flexicontent_fields";
 					if ($types_tbl_exists)   $tbls[] = "#__flexicontent_types";
 					if ($iext_tbl_exists)    $tbls[] = "#__flexicontent_items_ext";
+					if ($content_cache_tbl_exists)
+						$tbls[] = "#__flexicontent_items_tmp";
 					if ($advsearch_index_tbl_exists)
 						$tbls[] = "#__flexicontent_advsearch_index";
 					if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
@@ -728,11 +730,18 @@ class com_flexicontentInstallerScript
 							 `ordering` int(11) NOT NULL DEFAULT '0',
 							 `access` int(10) unsigned NOT NULL DEFAULT '0',
 							 `hits` int(10) unsigned NOT NULL DEFAULT '0',
-							 `featured` tinyint(3) unsigned NOT NULL DEFAULT '0',
+							 ".(FLEXI_J16GE ? "`featured` tinyint(3) unsigned NOT NULL DEFAULT '0'," : "")."
 							 `language` char(7) NOT NULL,
+							 ".(!FLEXI_J16GE ? "`sectionid` int(10) unsigned NOT NULL DEFAULT '0'," : "")."
 							 PRIMARY KEY (`id`)
 							) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 						";
+						if (FLEXI_J16GE) {
+							$_query = "ALTER TABLE `#__flexicontent_items_tmp`";
+							$_querycols = array();
+							if (array_key_exists('sectionid', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = "  DROP `sectionid`";
+							if (empty($_querycols)) $queries[] = $_query . implode(",", $_querycols);
+						}
 					}
 					
 					if ( !empty($queries) ) {

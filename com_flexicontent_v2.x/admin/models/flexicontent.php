@@ -231,6 +231,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			return $return = false;
 		}
 		
+		// Verify that language of menu item is not empty
+		if ( FLEXI_J16GE && $menu->language=='' ) {
+			$query 	=	"UPDATE #__menu SET `language`='*' WHERE id=". (int)$_component_default_menuitem_id;
+			$this->_db->setQuery($query);
+			$result = $this->_db->query();
+		}
+		
 		// All checks passed
 		return $return = true;
 	}
@@ -500,14 +507,19 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$query = "SELECT COUNT(*)"
 				. " FROM #__content AS i "
 				. " LEFT JOIN ".$cache_tbl." AS ca ON i.id=ca.id "
+				.(!FLEXI_J16GE ? " JOIN #__flexicontent_items_ext AS ext ON i.id = ext.item_id" : "")
 				. " WHERE ca.id IS NULL ";
 			foreach ($tbl_fields as $col_name) {
 				if ($col_name == "id" || $col_name == "hits") continue;
-				else $query .= " OR i.`".$col_name."`<>ca.`".$col_name."`";
+				else if (!FLEXI_J16GE && $col_name == "language" )
+					$query .= " OR ext.`language`<>ca.`language`";
+				else
+					$query .= " OR i.`".$col_name."`<>ca.`".$col_name."`";
 			}
 			
 			$db->setQuery($query);
 			$return = $this->_db->loadResult() ? false : true;
+			if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
 		}
 		
 		return $return;
@@ -1439,14 +1451,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$category_section = count($result) == 0 ? 1 : 0;
 
 		// CHECK if some items don't have permissions set, , !!! WARNING this query must be same like the one USED in function initialPermission()
-		$query = $db->getQuery(true)
+		/*$query = $db->getQuery(true)
 			->select('c.id')
 			->from('#__assets AS se')->join('RIGHT', '#__content AS c ON se.id=c.asset_id AND se.name=concat("com_content.article.",c.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);
 		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
-		if (count($result) && $debug_initial_perms) { echo "bad assets for items: "; print_r($result); echo "<br>"; }
-		$article_section = count($result) == 0 ? 1 : 0;
+		if (count($result) && $debug_initial_perms) { echo "bad assets for items: "; print_r($result); echo "<br>"; }*/
+		$article_section = 1; //count($result) == 0 ? 1 : 0;
 
 		// CHECK if some fields don't have permissions set, !!! WARNING this query must be same like the one USED in function initialPermission()
 		$query = $db->getQuery(true)
@@ -1634,7 +1646,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		
 		/*** ITEM assets ***/
-		
+		/*
 		// Get a list com_content items that do not have assets (or have wrong asset names)
 		$query = $db->getQuery(true)
 			->select('c.id, c.catid as parent_id, c.title, c.asset_id')
@@ -1664,19 +1676,19 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
 					$asset->rules = new JRules();
 					
-					/*if ($parentId == $component_asset->id) {				
-						$actions	= JAccess::getActions($component_name, 'article');
-						$rules 		= json_decode($component_asset->rules);		
-						foreach ($actions as $action) {
-							$catrules[$action->name] = $rules->{$action->name};
-						}
-						$rules = new JRules(json_encode($catrules));
-						$asset->rules = $rules->__toString();
-					} else {
-						$parent = JTable::getInstance('asset');
-						$parent->load($parentId);
-						$asset->rules = $parent->rules;
-					}*/
+					//if ($parentId == $component_asset->id) {				
+					//	$actions	= JAccess::getActions($component_name, 'article');
+					//	$rules 		= json_decode($component_asset->rules);		
+					//	foreach ($actions as $action) {
+					//		$catrules[$action->name] = $rules->{$action->name};
+					//	}
+					//	$rules = new JRules(json_encode($catrules));
+					//	$asset->rules = $rules->__toString();
+					//} else {
+					//	$parent = JTable::getInstance('asset');
+					//	$parent->load($parentId);
+					//	$asset->rules = $parent->rules;
+					//}
 				} else {
 					// do not change (a) the id OR (b) the rules, of the asset
 				}
@@ -1707,7 +1719,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				}
 			}
 		}
-		
+		*/
 		
 		
 		/*** FLEXIcontent FIELDS assets ***/

@@ -244,7 +244,7 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 			if (isset($fc_run_times['getItemsNoLang']))
 				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items with no Language: %.2f s ', $fc_run_times['getItemsNoLang']/1000000);
 			if (isset($fc_run_times['getItemCountingDataOK']))
-				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Item counting data in cats (sub/peer): %.2f s ', $fc_run_times['getItemCountingDataOK']/1000000);
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Item temporary accounting data: %.2f s ', $fc_run_times['getItemCountingDataOK']/1000000);
 			if (isset($fc_run_times['checkInitialPermission']))
 				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Check initial permissions: %.2f s ', $fc_run_times['checkInitialPermission']/1000000);
 			$msg .= '</small>';

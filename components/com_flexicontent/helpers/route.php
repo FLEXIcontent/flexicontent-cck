@@ -104,7 +104,7 @@ class FlexicontentHelperRoute
 			
 			// For J1.7+ we need to get menu item associations and select the current language item
 			$curr_langtag = JFactory::getLanguage()->getTag();  // Current language tag for J2.5 but not for J1.5
-			if ( FLEXI_J16GE && $menu->language!='*' && $menu->language!=$curr_langtag )
+			if ( FLEXI_J16GE && $menu->language!='*' && $menu->language!='' && $menu->language!=$curr_langtag )
 			{
 				require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_menus'.DS.'helpers'.DS.'menus.php');
 				$helper = new MenusHelper();

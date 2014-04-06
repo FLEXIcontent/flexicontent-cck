@@ -227,6 +227,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			return $return = false;
 		}
 		
+		// Verify that language of menu item is not empty
+		if ( FLEXI_J16GE && $menu->language=='' ) {
+			$query 	=	"UPDATE #__menu SET `language`='*' WHERE id=". (int)$_component_default_menuitem_id;
+			$this->_db->setQuery($query);
+			$result = $this->_db->query();
+		}
+		
 		// All checks passed
 		return $return = true;
 	}
@@ -496,14 +503,19 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$query = "SELECT COUNT(*)"
 				. " FROM #__content AS i "
 				. " LEFT JOIN ".$cache_tbl." AS ca ON i.id=ca.id "
+				.(!FLEXI_J16GE ? " JOIN #__flexicontent_items_ext AS ext ON i.id = ext.item_id" : "")
 				. " WHERE ca.id IS NULL ";
 			foreach ($tbl_fields as $col_name) {
 				if ($col_name == "id" || $col_name == "hits") continue;
-				else $query .= " OR i.`".$col_name."`<>ca.`".$col_name."`";
+				else if (!FLEXI_J16GE && $col_name == "language" )
+					$query .= " OR ext.`language`<>ca.`language`";
+				else
+					$query .= " OR i.`".$col_name."`<>ca.`".$col_name."`";
 			}
 			
 			$db->setQuery($query);
 			$return = $this->_db->loadResult() ? false : true;
+			if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
 		}
 		
 		return $return;

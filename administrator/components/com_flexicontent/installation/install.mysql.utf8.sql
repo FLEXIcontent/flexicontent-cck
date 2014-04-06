@@ -222,6 +222,7 @@ CREATE TABLE `#__flexicontent_items_tmp` (
  `id` int(10) unsigned NOT NULL,
  `title` varchar(255) NOT NULL,
  `state` tinyint(3) NOT NULL DEFAULT '0',
+ `sectionid` int(10) unsigned NOT NULL DEFAULT '0',
  `catid` int(10) unsigned NOT NULL DEFAULT '0',
  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
  `created_by` int(10) unsigned NOT NULL DEFAULT '0',

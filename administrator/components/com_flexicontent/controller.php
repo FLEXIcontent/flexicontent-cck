@@ -441,13 +441,13 @@ class FlexicontentController extends JControllerLegacy
 		$db->query();
 		
 		if (FLEXI_J30GE) {
-			$query 	=	"INSERT INTO #__menu (`menutype`,`title`,`alias`,`path`,`link`,`type`,`published`,`parent_id`,`component_id`,`level`,`checked_out`,`checked_out_time`,`browserNav`,`access`,`params`,`lft`,`rgt`,`home`)
+			$query 	=	"INSERT INTO #__menu (`menutype`,`title`,`alias`,`path`,`link`,`type`,`published`,`parent_id`,`component_id`,`level`,`checked_out`,`checked_out_time`,`browserNav`,`access`,`params`,`lft`,`rgt`,`home`, `language`)
 			VALUES ".
-			"('flexihiddenmenu','Site Content','site_content','site_content','index.php?option=com_flexicontent&view=flexicontent','component',1,1,$flexi_comp_id,1,0,'0000-00-00 00:00:00',0,1,'rootcat=0',0,0,0)";
+			"('flexihiddenmenu','Site Content','site_content','site_content','index.php?option=com_flexicontent&view=flexicontent','component',1,1,$flexi_comp_id,1,0,'0000-00-00 00:00:00',0,1,'rootcat=0',0,0,0,'*')";
 		} else if (FLEXI_J16GE) {
-			$query 	=	"INSERT INTO #__menu (`menutype`,`title`,`alias`,`path`,`link`,`type`,`published`,`parent_id`,`component_id`,`level`,`ordering`,`checked_out`,`checked_out_time`,`browserNav`,`access`,`params`,`lft`,`rgt`,`home`)
+			$query 	=	"INSERT INTO #__menu (`menutype`,`title`,`alias`,`path`,`link`,`type`,`published`,`parent_id`,`component_id`,`level`,`ordering`,`checked_out`,`checked_out_time`,`browserNav`,`access`,`params`,`lft`,`rgt`,`home`, `language`)
 			VALUES ".
-			"('flexihiddenmenu','Site Content','site_content','site_content','index.php?option=com_flexicontent&view=flexicontent','component',1,1,$flexi_comp_id,1,1,0,'0000-00-00 00:00:00',0,1,'rootcat=0',0,0,0)";
+			"('flexihiddenmenu','Site Content','site_content','site_content','index.php?option=com_flexicontent&view=flexicontent','component',1,1,$flexi_comp_id,1,1,0,'0000-00-00 00:00:00',0,1,'rootcat=0',0,0,0,'*')";
 		} else {
 			$query 	=	"INSERT INTO #__menu (`menutype`,`name`,`alias`,`link`,`type`,`published`,`parent`,`componentid`,`sublevel`,`ordering`,`checked_out`,`checked_out_time`,`pollid`,`browserNav`,`access`,`utaccess`,`params`,`lft`,`rgt`,`home`)
 			VALUES ".
@@ -792,6 +792,7 @@ VALUES
 		$cols_select = array();
 		$query .= "`".implode("`, `", $tbl_fields)."`";
 		$query .= "FROM #__content";
+		$query .= (!FLEXI_J16GE ? " JOIN #__flexicontent_items_ext ON id=item_id" : "");
 		
 		$db->setQuery($query);
 		
@@ -800,6 +801,7 @@ VALUES
 		} else {
 			echo '<span class="install-ok"></span>';
 		}
+		if ($db->getErrorNum()) echo $db->getErrorMsg();
 	}
 	
 	

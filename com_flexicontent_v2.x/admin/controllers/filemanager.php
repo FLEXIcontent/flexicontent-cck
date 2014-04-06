@@ -211,7 +211,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 				$obj->ext         = $ext;
 				$obj->hits        = 0;
 				$obj->description = $filedesc;
-				$obj->language    = $filelang;
+				$obj->language    = ($filelang ? $filelang : '*');
 				$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 				$obj->uploaded_by = $user->get('id');
 					
@@ -316,7 +316,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 		$obj->secure      = 1;
 		$obj->ext         = $ext;
 		$obj->description = $filedesc;
-		$obj->language    = $filelang;
+		$obj->language    = ($filelang ? $filelang : '*');
 		$obj->hits        = 0;
 		$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 		$obj->uploaded_by = $user->get('id');
@@ -432,7 +432,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 						$obj->secure      = $secure;
 						$obj->ext         = $ext;
 						$obj->description = $filedesc;
-						$obj->language    = $filelang;
+						$obj->language    = ($filelang ? $filelang : '*');
 						$obj->hits        = 0;
 						$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 						$obj->uploaded_by = $user->get('id');
@@ -456,7 +456,7 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 						$obj->secure      = $secure;
 						$obj->ext         = $ext;
 						$obj->description = $filedesc;
-						$obj->language    = $filelang;
+						$obj->language    = ($filelang ? $filelang : '*');
 						$obj->hits        = 0;
 						$obj->uploaded    = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
 						$obj->uploaded_by = $user->get('id');

@@ -1547,11 +1547,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			{
 				// Merge author basic parameters
 				$_author_basicreg = FLEXI_J16GE ? new JRegistry($author_extdata->author_basicparams) : new JParameter($author_extdata->author_basicparams);
+				if ($_author_basicreg->get('orderbycustomfieldid')==="0") $_author_basicreg->set('orderbycustomfieldid', '');
 				$cparams->merge( $_author_basicreg );
 				
 				// Merge author OVERRIDDEN category parameters
 				$_author_catreg = FLEXI_J16GE ? new JRegistry($author_extdata->author_catparams)   : new JParameter($author_extdata->author_catparams);
 				if ( $_author_basicreg->get('override_currcat_config',0) ) {
+					if ($_author_catreg->get('orderbycustomfieldid')==="0") $_author_catreg->set('orderbycustomfieldid', '');
 					$cparams->merge( $_author_catreg );
 				}
 			}
@@ -1594,11 +1596,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// e. Merge inherited category parameters (e.g. ancestor categories or specific category)
 		while (!empty($heritage_stack)) {
 			$catdata = array_pop($heritage_stack);
+			if ($catdata->params->get('orderbycustomfieldid')==="0") $catdata->params->set('orderbycustomfieldid', '');
 			$params->merge($catdata->params);
 			if ($debug_inheritcid) $app->enqueueMessage("MERGED CATEGORY PARAMETERS of (inherit-from) category: ".$catdata->title ."<br/>\n");
 		}
 		
 		// f. Merge category parameter / author overriden category parameters
+		if ($cparams->get('orderbycustomfieldid')==="0") $cparams->set('orderbycustomfieldid', '');
 		$params->merge($cparams);
 		if ($debug_inheritcid && $id)
 			$app->enqueueMessage("MERGED CATEGORY PARAMETERS of current category<br/>\n");
@@ -1622,6 +1626,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			if ( $menu_matches && $overrideconf ) {
 				// Add - all - menu parameters related or not related to category parameters override
+				if ($menu_params->get('orderbycustomfieldid')==="0") $menu_params->set('orderbycustomfieldid', '');
 				$params->merge($menu_params);
 				if ($debug_inheritcid) $app->enqueueMessage("MERGED CATEGORY PARAMETERS of (current) menu item: ".$menu->id."<br/>\n");
 			} else if ($menu_matches) {
@@ -1637,8 +1642,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		
 		// Parameters meant for lists
-		$params->set('show_title', $params->get('show_title_lists'));    // Parameter meant for lists
-		$params->set('link_titles', $params->get('link_titles_lists'));  // Parameter meant for lists
+		$params->set('show_title', $params->get('show_title_lists', 1));    // Parameter meant for lists
+		$params->set('link_titles', $params->get('link_titles_lists', 1));  // Parameter meant for lists
 		
 		// Set filter values (initial or locked) via configuration parameters
 		if ($params->get('use_persistent_filters')) FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
@@ -1730,9 +1735,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 			return $filters;
 		}
 		
-		// Create filter parameters
+		// Create filter parameters, language filter label, etc
 		foreach ($filters as $filter) {
 			$filter->parameters = FLEXI_J16GE ? new JRegistry($filter->attribs) : new JParameter($filter->attribs);
+			$filter->label = JText::_($filter->label);
 		}
 		
 		// Return found filters

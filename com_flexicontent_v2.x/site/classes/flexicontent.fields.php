@@ -1971,7 +1971,7 @@ class FlexicontentFields
 	
 	
 	// Method to get the active filter result for Content Lists Views (an SQL where clause part OR an array of item ids, matching field filter)
-	static function getFiltered( &$filter, $value, $return_sql=false )
+	static function getFiltered( &$filter, $value, $return_sql=true )
 	{
 		$db = JFactory::getDBO();
 		
@@ -2030,7 +2030,7 @@ class FlexicontentFields
 	
 	
 	// Method to get the active filter result Search View (an SQL where clause part OR an array of item ids, matching field filter)
-	static function getFilteredSearch( &$filter, $value, $return_sql=false )
+	static function getFilteredSearch( &$filter, $value, $return_sql=true )
 	{
 		$db = JFactory::getDBO();
 		

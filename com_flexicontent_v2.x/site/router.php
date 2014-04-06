@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: router.php 1835 2014-01-22 00:19:20Z ggppdk $
+ * @version 1.5 stable $Id: router.php 1871 2014-03-14 00:21:45Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -123,6 +123,11 @@ function FLEXIcontentBuildRoute(&$query)
 		}
 		break;
 	case 'category':
+		if (!$add_item_sef_segment && $mview == 'category') {
+			// Adding explicit view /item/ is disabled for item URLs, and current menu item is category and so is this URL,
+			// so ... we explicitly declare than URL is a category URL, otherwise it will be wrongly interpreted as 'item' URL
+			$segments[] = 'category';
+		}
 		// IMPLY view = 'category' when count($segments) == 1
 		$segments[] = @$query['cid'];  // Required ...
 		unset($query['cid']);
