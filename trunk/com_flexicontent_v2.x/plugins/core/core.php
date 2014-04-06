@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: core.php 1879 2014-03-27 12:20:20Z ggppdk $
+ * @version 1.0 $Id: core.php 1881 2014-03-31 01:48:58Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea
@@ -50,6 +50,17 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		else
 			$items = & $_item;
 		
+		// Prefix - Suffix - Separator parameters
+		// these parameters should be common so we will retrieve them from the first item instead of inside the loop
+		$item = reset($items);
+		if (is_object($_field)) $field = $_field;
+		else $field = $item->fields[$_field];
+		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
+		$_pretext = $field->parameters->get( 'pretext', '' );
+		$_posttext = $field->parameters->get( 'posttext', '' );
+		$separatorf	= $field->parameters->get( 'separatorf', 3 ) ;
+		$_opentag = $field->parameters->get( 'opentag', '' );
+		$_closetag = $field->parameters->get( 'closetag', '' );
 		$pretext_cacheable = $posttext_cacheable = $opentag_cacheable = $closetag_cacheable = false;
 		
 		foreach($items as $item)
@@ -59,23 +70,20 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			else $field = $item->fields[$_field];
 			
 			if($field->iscore != 1) continue;
-			$values = $values ? $values : $field->value;
 			$field->item_id = $item->id;
 			
-			// Prefix - Suffix - Separator parameters, replacing other field values if found
-			$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
-			if (!$pretext_cacheable)  $pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext', $pretext_cacheable );
-			if (!$posttext_cacheable) $posttext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'posttext', '' ), 'posttext', $posttext_cacheable );
-			$separatorf	= $field->parameters->get( 'separatorf', 3 ) ;       // used by some fields
-			if (!$opentag_cacheable)  $opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'opentag', '' ), 'opentag', $opentag_cacheable );     // used by some fields
-			if (!$closetag_cacheable) $closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'closetag', '' ), 'closetag', $closetag_cacheable );   // used by some fields
+			// Replace item properties or values of other fields
+			if (!$pretext_cacheable) {
+				$pretext = FlexicontentFields::replaceFieldValue( $field, $item, $_pretext, 'pretext', $pretext_cacheable );
+				if ($pretext && !$remove_space)  $pretext  =  $pretext . ' ';
+			}
+			if (!$posttext_cacheable) {
+				$posttext = FlexicontentFields::replaceFieldValue( $field, $item, $_posttext, 'posttext', $posttext_cacheable );
+				if ($posttext && !$remove_space) $posttext = ' ' . $posttext;
+			}
+			if (!$opentag_cacheable)  $opentag		= FlexicontentFields::replaceFieldValue( $field, $item, $_opentag, 'opentag', $opentag_cacheable );     // used by some fields
+			if (!$closetag_cacheable) $closetag		= FlexicontentFields::replaceFieldValue( $field, $item, $_closetag, 'closetag', $closetag_cacheable );   // used by some fields
 			
-			if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
-			if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
-			
-			// some parameter shortcuts
-			$dateformat			= $field->parameters->get( 'date_format', '' ) ;
-			$customdate			= $field->parameters->get( 'custom_date', '' ) ;		
 			
 			switch($separatorf)
 			{
@@ -113,6 +121,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			{
 				case 'created': // created
 					$field->value[] = $item->created;
+					$dateformat = $field->parameters->get( 'date_format', '' ) ;
+					$customdate = $field->parameters->get( 'custom_date', '' ) ;		
 					$dateformat = $dateformat ? $dateformat : $customdate;
 					$field->display = $pretext.JHTML::_( 'date', $item->created, JText::_($dateformat) ).$posttext;
 					break;
@@ -124,6 +134,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	
 				case 'modified': // modified
 					$field->value[] = $item->modified;
+					$dateformat = $field->parameters->get( 'date_format', '' ) ;
+					$customdate = $field->parameters->get( 'custom_date', '' ) ;		
 					$dateformat = $dateformat ? $dateformat : $customdate;
 					$field->display = $pretext.JHTML::_( 'date', $item->modified, JText::_($dateformat) ).$posttext;
 					break;

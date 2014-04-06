@@ -198,8 +198,8 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
   PRIMARY KEY  (`user_id`)
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS `jos__flexicontent_download_history` (
-  `id` int(11) NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS `#__flexicontent_download_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `file_id` int(11) NOT NULL,
   `hits` int(11) NOT NULL,
@@ -222,6 +222,7 @@ CREATE TABLE `#__flexicontent_items_tmp` (
  `id` int(10) unsigned NOT NULL,
  `title` varchar(255) NOT NULL,
  `state` tinyint(3) NOT NULL DEFAULT '0',
+ `sectionid` int(10) unsigned NOT NULL DEFAULT '0',
  `catid` int(10) unsigned NOT NULL DEFAULT '0',
  `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
  `created_by` int(10) unsigned NOT NULL DEFAULT '0',

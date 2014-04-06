@@ -83,9 +83,22 @@ class JFormFieldMultiList extends JFormField
 		$options = array ();
 		foreach ($node->children() as $option)
 		{
-			$val    = FLEXI_J16GE ? $option->attributes()->value : $option->attributes('value');
-			$text   = $option->data();
-			$options[] = JHTML::_('select.option', $val, JText::_($text));
+			$val  = FLEXI_J16GE ? $option->attributes()->value : $option->attributes('value');
+			$text = $option->data();
+			$name = FLEXI_J16GE ? $option->name() : $option->_name;
+			//echo "<pre>"; print_r($option); echo "</pre>"; exit;
+			if ($name=="group") {
+				$group_label = FLEXI_J16GE ? $option->attributes()->label : $option->attributes('label');
+				$options[] = JHTML::_('select.optgroup', $group_label );
+				foreach ($option->children() as $sub_option)
+				{
+					$val    = FLEXI_J16GE ? $sub_option->attributes()->value : $sub_option->attributes('value');
+					$text   = $sub_option->data();
+					$options[] = JHTML::_('select.option', $val, JText::_($text));
+				}
+			}
+			else
+				$options[] = JHTML::_('select.option', $val, JText::_($text));
 		}
 		
 		$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);

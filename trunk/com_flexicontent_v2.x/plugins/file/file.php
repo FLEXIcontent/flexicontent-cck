@@ -431,6 +431,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			// b. LANGUAGE: either as icon or as inline text or both
 			$lang = ''; $lang_str = '';
+			$file_data->language = $file_data->language=='' ? '*' : $file_data->language;
 			if ($display_lang && $file_data->language!='*')  // ... skip 'ALL' language ... maybe allow later
 			{
 				$lang = '<span class="fcfile_lang">';
@@ -690,7 +691,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$field->{$prop}[]	=  $pretext . $str . $posttext;
 			
 			// Some extra data for developers: (absolute) file URL and (absolute) file path
-			$field->url[]	=  $dl_link;
+			$field->url[]      = $dl_link;
+			$field->file_data[] = $file_data;
 			$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
 			$file->abspath[] = str_replace(DS, '/', JPath::clean($basePath.DS.$file_data->filename));
 			

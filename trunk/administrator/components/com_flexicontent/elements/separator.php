@@ -54,9 +54,10 @@ $document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/fl
 if (FLEXI_J30GE) $jinput = JFactory::getApplication()->input;
 $option = FLEXI_J30GE ? $jinput->get('option', '', 'string') : JRequest::getVar('option');
 $view   = FLEXI_J30GE ? $jinput->get('view', '', 'string') : JRequest::getVar('view');
-$component = FLEXI_J30GE ? $jinput->get('component', '', 'string') : JRequest::getVar('component');
+$controller = FLEXI_J30GE ? $jinput->get('controller', '', 'string') : JRequest::getVar('controller');
+$component  = FLEXI_J30GE ? $jinput->get('component', '', 'string')  : JRequest::getVar('component');
 
-if ($option=='com_config' && $view == 'component' && $component == 'com_flexicontent') {
+if ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') {
 	$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/tabber.css');
 	$document->addScript(JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js');
 	$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');

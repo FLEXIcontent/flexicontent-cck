@@ -200,8 +200,8 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_authors_ext` (
   PRIMARY KEY  (`user_id`)
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS `jos__flexicontent_download_history` (
-  `id` int(11) NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS `#__flexicontent_download_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `file_id` int(11) NOT NULL,
   `hits` int(11) NOT NULL,
