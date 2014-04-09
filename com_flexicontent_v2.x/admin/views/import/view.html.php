@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1579 2012-12-03 03:37:21Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1878 2014-03-26 04:49:44Z enjoyman@gmail.com $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -73,12 +73,12 @@ class FlexicontentViewImport extends JViewLegacy
 		
 		$session = JFactory::getSession();
 		$conf   = $session->get('csvimport_config', "", 'flexicontent');
-		$conf		= unserialize(zlib_decode(base64_decode($conf)));
+		$conf		= unserialize( $conf ? zlib_decode(base64_decode($conf)) : "" );
 		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 		$session->set('csvimport_parse_log', null, 'flexicontent');
 		
 		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_COPYMOVE_ITEM' ), 'import' );
+		JToolBarHelper::title( JText::_( 'FLEXI_CONTENT_IMPORT_TASK' ), 'import' );
 		$toolbar = JToolBar::getInstance('toolbar');
 		
 		if ( !empty($conf) ) {

@@ -525,9 +525,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$valuecol = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_valformat);
 			$textcol  = sprintf(' DATE_FORMAT(fi.value, "%s") ', $date_txtformat);
 		} else {
+			$db = JFactory::getDBO();
+			$nullDate = $db->getNullDate();
 			$_value_col = ($date_source == 1) ? 'i.publish_up' : 'i.publish_down';
-			$valuecol = sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_valformat);
-			$textcol  = sprintf(' DATE_FORMAT(%s, "%s") ', $_value_col, $date_txtformat);
+			$valuecol = sprintf(' CASE WHEN %s='.$db->Quote($nullDate).' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_valformat);
+			$textcol  = sprintf(' CASE WHEN %s='.$db->Quote($nullDate).' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_txtformat);
 		}
 		
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display

@@ -203,7 +203,7 @@ class plgFlexicontent_fieldsSharedaudio extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!$post) return;
 		
-		if($post['url'] != '') {
+		if( !empty($post['url']) ) {
 			// create the fulltext search index
 			$searchindex = $post['title'].' '.$post['author'].' '.$post['description'].' '.$post['title'].' '.$post['url'].' '.$post['audiotype'].' '.$post['audioid'].'|';
 			$field->search = $searchindex;

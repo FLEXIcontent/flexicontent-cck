@@ -508,8 +508,9 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; $date_txtformat='%Y-%b'; }
 				else { $date_valformat='%Y-%m-%d'; $date_txtformat='%Y-%b-%d'; }
 				
-				$valuecol = sprintf(' DATE_FORMAT(i.%s, "%s") ', $filter->field_type, $date_valformat);
-				$textcol  = sprintf(' DATE_FORMAT(i.%s, "%s") ', $filter->field_type, $date_txtformat);
+				$nullDate = $db->getNullDate();
+				$valuecol = sprintf(' CASE WHEN i.%s='.$db->Quote($nullDate).' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_valformat);
+				$textcol  = sprintf(' CASE WHEN i.%s='.$db->Quote($nullDate).' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_txtformat);
 				
 				// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
 				// partial SQL clauses

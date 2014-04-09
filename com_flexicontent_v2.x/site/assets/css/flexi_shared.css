@@ -671,8 +671,8 @@ div label.lang_box img, .fc_assoc_translation img {	border: 1px solid lightgray 
 	font-size:12px;
 	font-familiy:tahoma;
 	line-height:1.6em;
-	display:block;
-	margin-top: 12px;
+	display: inline-block;
+	margin-top: 4px;
 }
 .fcimport_missingfile {
 	background: url(../images/warning.png) 0 0 no-repeat;

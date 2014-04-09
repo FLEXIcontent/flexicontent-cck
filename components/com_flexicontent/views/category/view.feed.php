@@ -61,6 +61,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		$params->set('orderbycustomfielddir_2nd', $params->get('feed_orderbycustomfielddir_2nd', 'ASC'));
 		$params->set('orderbycustomfieldint_2nd', $params->get('feed_orderbycustomfieldint_2nd', 0));
 		
+		$model = $this->getModel();
+		$model->setState('limit', $params->get('feed_limit', $model->getState('limit')));
 		$rows = $this->get('Data');
 		
 		$feed_summary = $params->get('feed_summary', 0);
@@ -146,7 +148,11 @@ class FlexicontentViewCategory extends JViewLegacy
 				}
 	  		
 	  		if ($thumb) {
-	  			$description = "<a href='".$link."'><img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/></a><p>".$description."</p>";
+	  			$description = "
+	  			<a href='".$link."'>
+	  				<img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/>
+	  			</a>
+	  			<p>".$description."</p>";
 	  		}
 				if ($extra_fields) {
 					foreach($extra_fields as $fieldname) {

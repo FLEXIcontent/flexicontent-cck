@@ -429,28 +429,17 @@ class plgFlexicontent_fieldsAddressint extends JPlugin
 		
 		// create the fulltext search index
 		$searchindex = '';
-		$searchindex .= $post['addr1'];
-		$searchindex .= ' ';
-		if($post['addr2'] != '') {
-			$searchindex .= $post['addr2'];
-			$searchindex .= ' ';
-		}
-		if($post['addr3'] != '') {
-			$searchindex .= $post['addr3'];
-			$searchindex .= ' ';
-		}
-		$searchindex .= $post['city'];
-		$searchindex .= ' ';
-		$searchindex .= $post['state'];
-		$searchindex .= ' ';
-		$searchindex .= $post['province'];
-		$searchindex .= ' ';
-		$searchindex .= $post['zip'];
-		$searchindex .= ' ';
-		$searchindex .= $post['country'];
-		$searchindex .= ' ';
+		// note this can not save "0" (ZERO) ... but we do not need it
+		if( !empty($post['addr1']) )  $searchindex .= $post['addr1'].' ';
+		if( !empty($post['addr2']) )  $searchindex .= $post['addr2'].' ';
+		if( !empty($post['addr3']) )  $searchindex .= $post['addr3'].' ';
+		if( !empty($post['city']) )  $searchindex .= $post['city'].' ';
+		if( !empty($post['state']) )  $searchindex .= $post['state'].' ';
+		if( !empty($post['province']) )  $searchindex .= $post['province'].' ';
+		if( !empty($post['zip']) )  $searchindex .= $post['zip'].' ';
+		if( !empty($post['country']) )  $searchindex .= $post['country'].' ';
 		$searchindex .= ' | ';
-
+		
 		$field->search = $searchindex;
 		$post = serialize($post);
 	}

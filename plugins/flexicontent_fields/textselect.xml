@@ -25,7 +25,7 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_TEXTSELECT_USAGE" level="level3" />
 			
-		<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
 			<field name="" type="separator" default="FLEXI_FIELD_TEXT_INPUT" level="level3" />
 			
 			<field name="default_value" type="text" default="" size="50" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
@@ -104,14 +104,15 @@
 				<option value="yyyy-mm-dd">Date (yyyy-mm-dd)</option>
 				<option value="datetime">Date Time 24h (dd/mm/yyyy hh:mm)</option>
 				<option value="datetime12">Date Time 12h (dd/mm/yyyy hh:mm xm)</option>
-				<option value="hh:mm t">Time (hh:mm t)</option>
-				<option value="h:s t">Time (h:s t)</option>
+				<option value="hh:mm t">Time (hh:mm xm)</option>
+				<!--option value="h:s t">Time (h:s t)</option-->
 				<option value="hh:mm:ss">Time (hh:mm:ss)</option>
 				<option value="hh:mm">Time (hh:mm)</option>
+				<option value="mm/yyyy">Month/Year (mm/yyyy)</option>
 				<option value="url">URL</option>
 				<option value="ip">IP (i.i.i.i)</option>
 				<option value="decimal">Decimal</option>
-				<option value="non-negative-decimal">Non-negative Decimal</option>
+				<!--option value="non-negative-decimal">Non-negative Decimal</option-->
 				<option value="integer">Integer</option>
 			</field>
 			<field name="custommask" type="text" default="" size="50" label="FLEXI_VALUE_VALIDATION_MASK_CUSTOM" description="FLEXI_VALUE_VALIDATION_MASK_CUSTOM_DESC" />

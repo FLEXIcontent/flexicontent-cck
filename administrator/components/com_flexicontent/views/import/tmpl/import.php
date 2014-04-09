@@ -145,6 +145,7 @@ function submitbutton(task) {
 							<?php echo str_replace('<br />', '', $this->lists['states']); ?>
 						</td>
 					</tr>
+					
 					<tr valign="top">
 						<td class="key"><label class="fckey" for="created_col"><?php echo JText::_("FLEXI_CREATION_DATE");?></label></td>
 						<td class="fcimportdata">
@@ -175,6 +176,38 @@ function submitbutton(task) {
 							<label for="created_by_col1">b. <?php echo JText::_("FLEXI_IMPORT_CREATOR_USE_COL");?></label>
 						</td>
 					</tr>
+					
+					<tr valign="top">
+						<td class="key"><label class="fckey" for="modified_col"><?php echo JText::_("FLEXI_MODIFICATION_DATE");?></label></td>
+						<td class="fcimportdata">
+							<?php
+								$dv = $params->get('import_modified_col', 0);
+								$checked0 = $dv==0 ? 'checked="checked"' : '';
+								$checked1 = $dv==1 ? 'checked="checked"' : '';
+							?>
+							<input type="radio" id="modified_col0" name="modified_col" value="0" <?php echo $checked0; ?> />
+							<label for="modified_col0">a. <?php echo JText::_("FLEXI_IMPORT_MODIFICATION_NEVER_DATE");?></label>
+							<div class="fcclear"></div>
+							<input type="radio" id="modified_col1" name="modified_col" value="1" <?php echo $checked1; ?> />
+							<label for="modified_col1">b. <?php echo JText::_("FLEXI_IMPORT_MODIFICATION_USE_COL");?></label>
+						</td>
+					</tr>
+					<tr valign="top">
+						<td class="key"><label class="fckey" for="modified_by_col"><?php echo JText::_("FLEXI_MODIFIER");?></label></td>
+						<td class="fcimportdata">
+							<?php
+								$dv = $params->get('import_modified_by_col', 0);
+								$checked0 = $dv==0 ? 'checked="checked"' : '';
+								$checked1 = $dv==1 ? 'checked="checked"' : '';
+							?>
+							<input type="radio" id="modified_by_col0" name="modified_by_col" value="0" <?php echo $checked0; ?> />
+							<label for="modified_by_col0">a. <?php echo JText::_("FLEXI_IMPORT_MODIFIER_NONE_USER");?></label>
+							<div class="fcclear"></div>
+							<input type="radio" id="modified_by_col1" name="modified_by_col" value="1" <?php echo $checked1; ?> />
+							<label for="modified_by_col1">b. <?php echo JText::_("FLEXI_IMPORT_MODIFIER_USE_COL");?></label>
+						</td>
+					</tr>
+					
 					<tr valign="top">
 						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_META_DATA");?></label></td>
 						<td class="fcimportdata">
@@ -413,12 +446,12 @@ function submitbutton(task) {
 
 <u>CSV example Format:</u> <br/>
 
-<span class="fcimport_sampleline">title ~~ text ~~ textfield3 ~~ emailfield6 ~~ weblinkfld8 ~~ single_value_field22 ~~ multi_value_field24 </span>
-<span class="fcimport_sampleline">~~ title 1 ~~ description 1 ~~ textfield3 value ~~ [-addr-]=usera@somedomain.com!![-text-]=usera ~~ www.somedomaina.com ~~ f22_valuea ~~ f24_value01%%f24_value02%%f24_value03 </span>
-<span class="fcimport_sampleline">~~ title 2 ~~ description 2 ~~ textfield3 value ~~ [-addr-]=userb@somedomain.com!![-text-]=userb ~~ www.somedomainb.com ~~ f22_valuea ~~ f24_value04%%f24_value05%%f24_value06 </span>
-<span class="fcimport_sampleline">~~ title 3 ~~ description 3 ~~ textfield3 value ~~ [-addr-]=userc@somedomain.com!![-text-]=userc ~~ www.somedomainc.com ~~ f22_valuea ~~ f24_value07%%f24_value08%%f24_value09 </span>
-<span class="fcimport_sampleline">~~ title 4 ~~ description 4 ~~ textfield3 value ~~ userd@somedomain.com ~~ [-link-]=www.somedomaind.com!![-title-]=somedomainD ~~ f22_valuea ~~ f24_value10%%f24_value11%%f24_value12 </span>
-<span class="fcimport_sampleline">~~ title 5 ~~ description 5 ~~ textfield3 value ~~ usere@somedomain.com ~~ [-link-]=www.somedomaine.com!![-title-]=somedomainE ~~ f22_valuea ~~ f24_value13%%f24_value14%%f24_value15 </span>
+<span class="fcimport_sampleline">title ~~ text ~~ textfield3 ~~ emailfield6 ~~ weblinkfld8 ~~ single_value_field22 ~~ multi_value_field24 </span><br/>
+<span class="fcimport_sampleline">~~ title 1 ~~ description 1 ~~ textfield3 value ~~ [-addr-]=usera@somedomain.com!![-text-]=usera ~~ www.somedomaina.com ~~ f22_valuea ~~ f24_value01%%f24_value02%%f24_value03 </span><br/>
+<span class="fcimport_sampleline">~~ title 2 ~~ description 2 ~~ textfield3 value ~~ [-addr-]=userb@somedomain.com!![-text-]=userb ~~ www.somedomainb.com ~~ f22_valuea ~~ f24_value04%%f24_value05%%f24_value06 </span><br/>
+<span class="fcimport_sampleline">~~ title 3 ~~ description 3 ~~ textfield3 value ~~ [-addr-]=userc@somedomain.com!![-text-]=userc ~~ www.somedomainc.com ~~ f22_valuea ~~ f24_value07%%f24_value08%%f24_value09 </span><br/>
+<span class="fcimport_sampleline">~~ title 4 ~~ description 4 ~~ textfield3 value ~~ userd@somedomain.com ~~ [-link-]=www.somedomaind.com!![-title-]=somedomainD ~~ f22_valuea ~~ f24_value10%%f24_value11%%f24_value12 </span><br/>
+<span class="fcimport_sampleline">~~ title 5 ~~ description 5 ~~ textfield3 value ~~ usere@somedomain.com ~~ [-link-]=www.somedomaine.com!![-title-]=somedomainE ~~ f22_valuea ~~ f24_value13%%f24_value14%%f24_value15 </span><br/>
 
 <br/>
 			</fieldset>
