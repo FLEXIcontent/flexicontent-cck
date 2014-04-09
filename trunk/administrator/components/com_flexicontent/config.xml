@@ -763,6 +763,7 @@
 			
 		<param name="" type="separator" default="FLEXI_FEED_LIST_CONF" label="" level="level1" menu="hide" />
 			
+			<param name="feed_limit" type="text" size="4" default="10" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" menu="hide" />
 			<param name="feed_summary" type="radio" default="0" label="FLEXI_SHOW_FEED" description="FLEXI_SHOW_FEED_DESC" menu="hide">
 				<option value="0">FLEXI_INTRO_TEXT</option>
 				<option value="1">FLEXI_FULL_TEXT</option>
@@ -1085,6 +1086,15 @@
 				<option value="0">FLEXI_IMPORT_CREATOR_CURR_USER</option>
 				<option value="1">FLEXI_IMPORT_CREATOR_USE_COL</option>
 			</param>
+			<param name="import_modified_col" type="radio" default="0" label="FLEXI_MODIFICATION_DATE" description="..." menu="hide">
+				<option value="0">FLEXI_IMPORT_MODIFICATION_NEVER_DATE</option>
+				<option value="1">FLEXI_IMPORT_MODIFICATION_USE_COL</option>
+			</param>
+			<param name="import_modified_by_col" type="radio" default="0" label="FLEXI_MODIFIER" description="..." menu="hide">
+				<option value="0">FLEXI_IMPORT_MODIFIER_NONE_USER</option>
+				<option value="1">FLEXI_IMPORT_MODIFIER_USE_COL</option>
+			</param>
+			
 			<param name="import_metadesc_col" type="radio" default="0" label="FLEXI_IMPORT_USE_METADESC_COL" description="..." menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

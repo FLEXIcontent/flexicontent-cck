@@ -31,7 +31,13 @@
 		<dd><?php echo $this->conf['created_col'] ? 'Using column' : 'NOW'; ?></dd>
 		
 		<dt>Created by (user)</dt>
-		<dd><?php echo $this->conf['created_by_col'] ? 'Using column' : 'Current'; ?></dd>
+		<dd><?php echo $this->conf['created_by_col'] ? 'Using column' : 'Current user'; ?></dd>
+		
+		<dt>Modification date</dt>
+		<dd><?php echo $this->conf['modified_col'] ? 'Using column' : 'Never'; ?></dd>
+		
+		<dt>Modified by (user)</dt>
+		<dd><?php echo $this->conf['modified_by_col'] ? 'Using column' : 'NULL (none)'; ?></dd>
 		
 		<dt>Item ID</dt>
 		<dd><?php echo $this->conf['id_col'] ? 'Using column' : 'AUTO (new ID)'; ?></dd>

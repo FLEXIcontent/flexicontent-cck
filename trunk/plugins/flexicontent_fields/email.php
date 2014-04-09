@@ -255,6 +255,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$values[0] = serialize($values[0]);
 		}
 		
+		$format = JRequest::getCmd('format', null);
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -321,9 +322,15 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			
 			// Create cloacked email address with custom displayed text
 			if ( strlen($text) && $usetitle ) {
-				$field->{$prop}[]	= $pretext. JHTML::_('email.cloak', $addr, 1, $text, 0) .$posttext;
+				$field->{$prop}[]	=
+					($format!='feed') ?
+						$pretext. JHTML::_('email.cloak', $addr, 1, $text, 0) .$posttext :
+						$pretext. '<a href="mailto:'.$addr.'" target="_blank">' .$text. '</a>' .$posttext;
 			} else {
-				$field->{$prop}[]	= $pretext. JHTML::_('email.cloak', $addr) .$posttext;
+				$field->{$prop}[]	=
+					($format!='feed') ?
+						$pretext. JHTML::_('email.cloak', $addr) .$posttext :
+						$pretext. '<a href="mailto:'.$addr.'" target="_blank">' .$addr. '</a>' .$posttext;
 			}
 			
 			$n++;

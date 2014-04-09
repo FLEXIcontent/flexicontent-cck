@@ -260,7 +260,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// @TODO check that as it seems to be dirty :(
 		$uri   = JFactory::getURI();
 		$base  = $uri->getScheme() . '://' . $uri->getHost();
-		$ucanonical = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+		$ucanonical = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $globalcats[$item->maincatid]->slug));  // $item->categoryslug
 		if ($params->get('add_canonical')) {
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}

@@ -665,6 +665,7 @@
 		
 		<field name="" type="jparamstab" description="FLEXI_PARAMETERS_CAT_RSS_FEEDS_OVERRIDE" />
 			
+			<field name="feed_limit" type="text" size="4" default="" label="FLEXI_NUM_PER_PAGE" description="FLEXI_NUM_PER_PAGE_DESC" />
 			<field name="feed_summary" type="list" default="" label="FLEXI_SHOW_FEED" description="FLEXI_SHOW_FEED_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_INTRO_TEXT</option>

@@ -97,7 +97,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		if ($task == 'clearcsv')
 		{
 			// Clear any import data from session
-			$conf		= base64_encode(zlib_encode(serialize(null)));
+			$conf		= base64_encode(zlib_encode(serialize(null), -15));
 			$session->set('csvimport_config', $conf, 'flexicontent');
 			$session->set('csvimport_lineno', 0, 'flexicontent');
 			
@@ -111,7 +111,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		else if ($task == 'importcsv')
 		{
 			$conf   = $session->get('csvimport_config', "", 'flexicontent');
-			$conf		= unserialize(zlib_decode(base64_decode($conf)));
+			$conf		= unserialize( $conf ? zlib_decode(base64_decode($conf)) : "" );
 			$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 			if ( empty($conf) ) {
 				$app->enqueueMessage( 'Can not continue import, import task not initialized or already finished:' , 'warning' );
@@ -149,6 +149,9 @@ class FlexicontentControllerImport extends FlexicontentController
 			
 			$conf['created_col'] = JRequest::getInt( 'created_col', 0 );
 			$conf['created_by_col'] = JRequest::getInt( 'created_by_col', 0 );
+			
+			$conf['modified_col'] = JRequest::getInt( 'modified_col', 0 );
+			$conf['modified_by_col'] = JRequest::getInt( 'modified_by_col', 0 );
 			
 			$conf['metadesc_col'] = JRequest::getInt( 'metadesc_col', 0 );
 			$conf['metakey_col'] = JRequest::getInt( 'metakey_col', 0 );
@@ -211,7 +214,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				},
 				JRequest::getVar('record_separator')
 			);
-
+			
 			// ****************************************************************************************************************
 			// Check for proper CSV file format variables, js validation should have prevented form submission but check anyway
 			// ****************************************************************************************************************
@@ -322,6 +325,20 @@ class FlexicontentControllerImport extends FlexicontentController
 				echo "</script>";
 				jexit();
 			} else if ($conf['created_by_col']) $core_props['created_by'] = 'Creator (Author)';
+			
+			if ( $conf['modified_col'] && !in_array('modified', $conf['columns']) ) {
+				echo "<script>alert ('CSV file lacks column \'modified\' (Modification date)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($conf['modified_col']) $core_props['modified'] = 'Modification Date';
+			
+			if ( $conf['modified_by_col'] && !in_array('modified_by', $conf['columns']) ) {
+				echo "<script>alert ('CSV file lacks column \'modified_by\' (Last modifier)');";
+				echo "window.history.back();";
+				echo "</script>";
+				jexit();
+			} else if ($conf['modified_by_col']) $core_props['modified_by'] = 'Last modifier';
 			
 			if ( $conf['metadesc_col'] && !in_array('metadesc', $conf['columns']) ) {
 				echo "<script>alert ('CSV file lacks column \'metadesc\' (META Description)');";
@@ -878,6 +895,14 @@ class FlexicontentControllerImport extends FlexicontentController
 				else if ( $fieldname=='created_by' )
 				{
 					if ($conf['created_by_col']) $data[$fieldname] = $field_values;
+				}
+				else if ( $fieldname=='modified' )
+				{
+					if ($conf['modified_col']) $data[$fieldname] = $field_values;
+				}
+				else if ( $fieldname=='modified_by' )
+				{
+					if ($conf['modified_by_col']) $data[$fieldname] = $field_values;
 				}
 				else if ( $fieldname=='metadesc' )
 				{
