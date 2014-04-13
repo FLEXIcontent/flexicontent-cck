@@ -144,9 +144,9 @@
 				<option value="2">2</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_2ND_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_ORDER_ORDERING" description="FLEXI_ORDERING_MULTIPLE" level="level1" menu="hide" />
 			
-			<field name="" type="separator" default="FLEXI_ORDERING_MULTIPLE" description="" level="level2" />
+			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="" level="level2" />
 			<field name="ordering" type="fcordering" default="added" size="16" multiple="true" label="FLEXI_ORDERING_GROUPS" description="FLEXI_ORDERING_GROUPS_DESC" />
 			<field name="ordering_addtitle" type="radio" default="0" label="FLEXI_ORDERING_GROUP_ADDTITLE" description="FLEXI_ORDERING_GROUP_ADDTITLE_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -170,6 +170,7 @@
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
 				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+				<option value="published">FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST</option>
 				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
 				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
 				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>

@@ -90,6 +90,27 @@ class FlexicontentController extends JControllerLegacy
 		$text = JRequest::getVar('text');
 		$pageSize = JRequest::getInt('pageSize', 20);
 		$pageNum  = JRequest::getInt('pageNum', 1);
+		$cid =  JRequest::getInt('cid', 0);
+		$cids = array();
+		$_cids = JRequest::getVar('cids', '');
+		if ( $cid ) {
+			// single category view
+			$_cids = array($cid); 
+		} else if ( empty($_cids) ) {
+			// try to get category ids from the categories filter
+			$_cids = JRequest::getVar('filter_13', '');
+			$_cids = empty($_cids) ? array() : $_cids;
+			$_cids = !is_array($_cids) ? json_decode($_cids) : $_cids;
+		} else if ( !is_array($_cids) ) {
+			// multi category view
+			$_cids = preg_replace( '/[^0-9,]/i', '', (string) $_cids );
+			$_cids = explode(',', $_cids);
+		}
+		
+		// make sure given data are integers ... !!
+		foreach ($_cids as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+		$cid_list = implode(',', $cids);
+		
 		$lang = flexicontent_html::getUserCurrentLang();
 		
 		// Nothing to do
@@ -145,14 +166,16 @@ class FlexicontentController extends JControllerLegacy
 		
 		
 		// Do query ...
+		$use_tmp = true;
 		$tbl = $type=='basic_index' ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
 		$query 	= 'SELECT si.item_id, si.search_index'    //.', '. $_text_match. ' AS score'  // THIS MAYBE SLOW
 			.' FROM #__' . $tbl . ' AS si'
-			.' JOIN #__content AS i ON i.id = si.item_id'
+			.' JOIN '. ($use_tmp ? '#__flexicontent_items_tmp' : '#__content') .' AS i ON i.id = si.item_id'
 			.($access_where || ($lang_where && !FLEXI_J16GE && $type!='basic_index') ?
 				' JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id ' : '')
 			.($access_where ? ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id' : '')
 			.($access_where ? ' JOIN #__categories AS mc ON mc.id = i.catid' : '')
+			.($cid_list ? ' JOIN #__flexicontent_cats_item_relations AS rel ON i.id = rel.itemid AND rel.catid IN ('.$cid_list.')' : '')
 			.$joinaccess
 			.' WHERE '. $_text_match
 			.'   AND i.state IN (1,-5) '   //(FLEXI_J16GE ? 2:-1) // TODO search archived

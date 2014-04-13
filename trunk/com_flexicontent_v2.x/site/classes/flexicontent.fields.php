@@ -2174,6 +2174,7 @@ class FlexicontentFields
 					$view_join = $fc_searchview['join_clauses'];
 					$view_where = $fc_searchview['where_conf_only'];
 					$filters_where = $fc_searchview['filters_where'];
+					$view_total = isset($fc_searchview['view_total']) ? $fc_searchview['view_total'] : 0;
 				}
 			}
 			$createFilterValues = !$isSearchView ? 'createFilterValues' : 'createFilterValuesSearch';
@@ -2940,7 +2941,7 @@ class FlexicontentFields
 		
 		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
 		$order = $params->get( 'orderby'.$sfx, 'alpha' );
-		$orderby = flexicontent_db::buildItemOrderBy($params, $order, $request_var='', $config_param='', $item_tbl_alias = 'i', $relcat_tbl_alias = 'rel', '', '', $sfx);
+		$orderby = flexicontent_db::buildItemOrderBy($params, $order, $request_var='', $config_param='', $item_tbl_alias = 'i', $relcat_tbl_alias = 'rel', '', '', $sfx, $support_2nd_lvl=true);
 		$orderby_join = '';
 		
 		// Create JOIN for ordering items by a custom field (use SFC)

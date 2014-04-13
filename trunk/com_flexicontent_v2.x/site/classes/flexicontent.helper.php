@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1847 2014-02-16 06:29:06Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1876 2014-03-24 03:24:41Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -202,7 +202,7 @@ class flexicontent_html
 
 		$orderby_names =array('_preconfigured_'=>'FLEXI_ORDER_DEFAULT_INITIAL',
 		'date'=>'FLEXI_ORDER_OLDEST_FIRST','rdate'=>'FLEXI_ORDER_MOST_RECENT_FIRST',
-		'modified'=>'FLEXI_ORDER_LAST_MODIFIED_FIRST',
+		'modified'=>'FLEXI_ORDER_LAST_MODIFIED_FIRST', 'published'=>'FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST',
 		'alpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL','ralpha'=>'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE',
 		'author'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL','rauthor'=>'FLEXI_ORDER_AUTHOR_ALPHABETICAL_REVERSE',
 		'hits'=>'FLEXI_ORDER_MOST_HITS','rhits'=>'FLEXI_ORDER_LEAST_HITS',
@@ -368,6 +368,11 @@ class flexicontent_html
 					jQuery(document).ready(function(){
 					    jQuery('.fc_add_scroller').mCustomScrollbar({
 					    	theme:'dark-thick',
+					    	advanced:{updateOnContentResize: true}
+					    });
+					    jQuery('.fc_add_scroller_horizontal').mCustomScrollbar({
+					    	theme:'dark-thick',
+					    	horizontalScroll:true,
 					    	advanced:{updateOnContentResize: true}
 					    });
 					});
@@ -681,6 +686,22 @@ class flexicontent_html
 				";
 				break;
 			
+			case 'fcxSlide':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				
+				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/fcxSlide';
+				$document->addScript($framework_path.'/class.fcxSlide.js');
+				//$document->addScript($framework_path.'/class.fcxSlide.packed.js');
+				break;
+			
+			case 'imagesLoaded':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				
+				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/imagesLoaded';
+				$document->addScript($framework_path.'/imagesloaded.pkgd.js');
+				//$document->addScript($framework_path.'/imagesloaded.pkgd.min.js');
+				break;
+			
 			case 'noobSlide':
 				// Make sure mootools are loaded
 				FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
@@ -688,8 +709,6 @@ class flexicontent_html
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/noobSlide';
 				//$document->addScript($framework_path.'/_class.noobSlide.js');
 				$document->addScript($framework_path.'/_class.noobSlide.packed.js');
-				
-				//$js = "";
 				break;
 			
 			case 'zTree':
@@ -702,7 +721,6 @@ class flexicontent_html
 				//$document->addScript($framework_path.'/js/jquery.ztree.core-3.5.js');
 				//$document->addScript($framework_path.'/js/jquery.ztree.excheck-3.5.js');
 				//$document->addScript($framework_path.'/js/jquery.ztree.exedit-3.5.js');
-				$js = "";
 				break;
 			
 			
@@ -723,13 +741,17 @@ class flexicontent_html
 				// For debugging
 				//$document->addScript($framework_path.'/js/moxie.min.js');
 				//$document->addScript($framework_path.'/js/plupload.dev.js');
-				$js = "";
 				break;
 			
 			case 'flexi_tmpl_common':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				flexicontent_html::loadFramework('select2');  // make sure select2 is loaded
 				
+				$js = "
+					var _FC_GET = ".json_encode($_GET).";
+				";
+				//var _FC_POST = ".json_encode($_POST).";
+				//var _FC_REQUEST = ".json_encode($_REQUEST).";
 				$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/tmpl-common.js' );
 				FLEXI_J16GE ? JText::script("FLEXI_APPLYING_FILTERING", true) : fcjsJText::script("FLEXI_APPLYING_FILTERING", true);
 				FLEXI_J16GE ? JText::script("FLEXI_TYPE_TO_LIST", true) : fcjsJText::script("FLEXI_TYPE_TO_LIST", true);
@@ -4654,7 +4676,7 @@ class flexicontent_db
 	 * @access private
 	 * @return string
 	 */
-	static function buildItemOrderBy(&$params=null, &$order='', $request_var='orderby', $config_param='orderby', $i_as='i', $rel_as='rel', $default_order_col_1st='', $default_order_dir_1st='', $sfx='')
+	static function buildItemOrderBy(&$params=null, &$order='', $request_var='orderby', $config_param='orderby', $i_as='i', $rel_as='rel', $default_order_col_1st='', $default_order_dir_1st='', $sfx='', $support_2nd_lvl=false)
 	{
 		// Use global params ordering if parameters were not given
 		if (!$params) $params = JComponentHelper::getParams( 'com_flexicontent' );
@@ -4669,7 +4691,7 @@ class flexicontent_db
 		}
 		
 		// 2. If allowing user ordering override, then get ordering from HTTP request variable
-		$order = $request_var && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
+		$order = $params->get('orderby_override') && ($request_order = JRequest::getVar($request_var.$sfx)) ? $request_order : $order;
 		
 		// 3. Check various cases of invalid order, print warning, and reset ordering to default
 		if ($order=='field' && !$orderbycustomfieldid ) {
@@ -4695,8 +4717,9 @@ class flexicontent_db
 		// 2nd level ordering, (currently only supported when no SFX given)
 		// ****************************************************************
 		
-		if ($sfx!='') {
+		if ($sfx!='' || !$support_2nd_lvl) {
 			$orderby .= $order_col_1st != $i_as.'.title'  ?  ', '.$i_as.'.title'  :  '';
+			$order_arr[2] = '';
 			$order = $order_arr;
 			return $orderby;
 		}
@@ -4749,79 +4772,83 @@ class flexicontent_db
 		// 'order' contains a symbolic order name to indicate using the category / global ordering setting
 		switch ($order) {
 			case 'date': case 'addedrev': /* 2nd is for module */
-				$order_col		= $i_as.'.created';
+				$order_col	= $i_as.'.created';
 				$order_dir	= 'ASC';
 				break;
 			case 'rdate': case 'added': /* 2nd is for module */
-				$order_col		= $i_as.'.created';
+				$order_col	= $i_as.'.created';
 				$order_dir	= 'DESC';
 				break;
 			case 'modified': case 'updated': /* 2nd is for module */
-				$order_col		= $i_as.'.modified';
+				$order_col	= $i_as.'.modified';
+				$order_dir	= 'DESC';
+				break;
+			case 'published':
+				$order_col	= $i_as.'.publish_up';
 				$order_dir	= 'DESC';
 				break;
 			case 'alpha':
-				$order_col		= $i_as.'.title';
+				$order_col	= $i_as.'.title';
 				$order_dir	= 'ASC';
 				break;
 			case 'ralpha': case 'alpharev': /* 2nd is for module */
-				$order_col		= $i_as.'.title';
+				$order_col	= $i_as.'.title';
 				$order_dir	= 'DESC';
 				break;
 			case 'author':
-				$order_col		= 'u.name';
+				$order_col	= 'u.name';
 				$order_dir	= 'ASC';
 				break;
 			case 'rauthor':
-				$order_col		= 'u.name';
+				$order_col	= 'u.name';
 				$order_dir	= 'DESC';
 				break;
 			case 'hits':
-				$order_col		= $i_as.'.hits';
+				$order_col	= $i_as.'.hits';
 				$order_dir	= 'ASC';
 				break;
 			case 'rhits': case 'popular': /* 2nd is for module */
-				$order_col		= $i_as.'.hits';
+				$order_col	= $i_as.'.hits';
 				$order_dir	= 'DESC';
 				break;
 			case 'order': case 'catorder': /* 2nd is for module */
-				$order_col		= $rel_as.'.catid, '.$rel_as.'.ordering';
+				$order_col	= $rel_as.'.catid, '.$rel_as.'.ordering';
 				$order_dir	= 'ASC';
 				break;
 
 			// SPECIAL case custom field
 			case 'field':
 				$cf = $sfx == '_2nd' ? 'f2' : 'f';
-				$order_col = $params->get('orderbycustomfieldint'.$sfx, 0) ? 'CAST('.$cf.'.value AS UNSIGNED)' : $cf.'.value';
+				$order_col	= $params->get('orderbycustomfieldint'.$sfx, 0) ? 'CAST('.$cf.'.value AS UNSIGNED)' : $cf.'.value';
 				$order_dir	= $params->get('orderbycustomfielddir'.$sfx, 'ASC');
 				break;
 
 			// NEW ADDED
 			case 'random':
-				$order_col = 'RAND()';
+				$order_col	= 'RAND()';
 				$order_dir	= '';
 				break;
 			case 'commented':
-				$order_col = 'comments_total';
+				$order_col	= 'comments_total';
 				$order_dir	= 'DESC';
 				break;
 			case 'rated':
-				$order_col = 'votes';
+				$order_col	= 'votes';
 				$order_dir	= 'DESC';
 				break;
 			case 'id':
-				$order_col = $i_as.'.id';
+				$order_col	= $i_as.'.id';
 				$order_dir	= 'DESC';
 				break;
 			case 'rid':
-				$order_col = $i_as.'.id';
+				$order_col	= $i_as.'.id';
 				$order_dir	= 'ASC';
 				break;
 
 			case 'default':
 			default:
-				$order_col     = $order_col ? $order_col : $i_as.'.title';
-				$order_dir = $order_dir ? $order_dir : 'ASC';
+				$order_col	= $order_col ? $order_col : $i_as.'.title';
+				$order_dir	= $order_dir ? $order_dir : 'ASC';
 				break;
 		}
 	}
@@ -4985,9 +5012,9 @@ class flexicontent_db
 			'Selection fields'         => array('radio', 'radioimage', 'checkbox', 'checkboximage', 'select', 'selectmultiple'),
 			'Media fields / Mini apps' => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
 			'Single property fields'   => array('date', 'text', 'textarea', 'textselect'),
-			'Muti property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers'),
+			'Multi property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers', 'termlist'),
 			'Item form'                => array('groupmarker'),
-			'Item relations fields'    => array('relation', 'relation_reverse'),
+			'Item relations fields'    => array('relation', 'relation_reverse', 'autorelationfilters'),
 			'Special action fields'    => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist')
 		);
 		foreach($ft_grps as $ft_grpname => $ft_arr) {

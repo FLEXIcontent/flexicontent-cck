@@ -1426,30 +1426,34 @@ class modFlexicontentHelper
 		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
 		// *****************************************************************************************************************************
 		
-		$orderby = '';
 		$orderby = flexicontent_db::buildItemOrderBy(
 			$params,
 			$ordering, $request_var='', $config_param = 'ordering',
 			$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
-			$default_order = '', $default_order_dir = ''
+			$default_order = '', $default_order_dir = '', $sfx='', $support_2nd_lvl=true
 		);
 		//echo "<br/>" . print_r($ordering, true) ."<br/>";
 		
 		
 		// EXTRA join of field used in custom ordering
 		// NOTE: if (1st/2nd level) custom field id is not set, THEN 'field' ordering was changed to level's default, by the ORDER CLAUSE creating function
-		$join_field = '';
+		$orderby_join = '';
 		
 		// Create JOIN for ordering items by a custom field (Level 1)
 		if ( 'field' == $ordering[1] ) {
 			$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
-			$join_field .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
+			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
 		}
 		
 		// Create JOIN for ordering items by a custom field (Level 2)
 		if ( 'field' == $ordering[2] ) {
 			$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
-			$join_field .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
+			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
+		}
+		
+		// Create JOIN for ordering items by author's name
+		if ( in_array('author', $ordering) || in_array('rauthor', $ordering) ) {
+			$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
 		}
 		
 		
@@ -1476,7 +1480,7 @@ class modFlexicontentHelper
 		$add_comments = ($display_comments_feat || $display_comments || in_array('commented', $ordering)) && $jcomments_exist;
 		
 		// Additional select and joins for comments
-		$select_comments     = $add_comments ? ' count(com.object_id) AS comments_total' : '';
+		$select_comments     = $add_comments ? ', count(com.object_id) AS comments_total' : '';
 		$join_comments_type  = $ordering[1]=='commented' ? ' INNER JOIN' : ' LEFT JOIN';   // Do not require most commented for 2nd level ordering
 		$join_comments       = $add_comments ? $join_comments_type.' #__jcomments AS com ON com.object_id = i.id' : '' ;
 		
@@ -1492,8 +1496,8 @@ class modFlexicontentHelper
 		$add_rated = $display_voting_feat || $display_voting || in_array('rated', $ordering);
 		
 		// Additional select and joins for ratings
-		$select_rated     = in_array('rated', $ordering) ? ' (cr.rating_sum / cr.rating_count) * 20 AS votes' : '';
-		$select_rated    .= $add_rated ? ($select_rated ? ',' :'').' cr.rating_sum as rating_sum, cr.rating_count as rating_count' : '';
+		$select_rated     = in_array('rated', $ordering) ? ', (cr.rating_sum / cr.rating_count) * 20 AS votes' : '';
+		$select_rated    .= $add_rated ? ', cr.rating_sum as rating_sum, cr.rating_count as rating_count' : '';
 		$join_rated_type  = in_array('rated', $ordering) ? ' INNER JOIN' : ' LEFT JOIN';
 		$join_rated       = $add_rated ? $join_rated_type.' #__content_rating AS cr ON cr.content_id = i.id' : '' ;
 		
@@ -1600,8 +1604,8 @@ class modFlexicontentHelper
 		if ( empty($items_query) ) {  // If a custom query has not been set above then use the default one ...
 			$items_query 	= 'SELECT '
 				.' i.id '
-				. (in_array('commented', $ordering) ? ','.$select_comments : '')
-				. (in_array('rated', $ordering) ? ','.$select_rated : '')
+				. (in_array('commented', $ordering) ? $select_comments : '')
+				. (in_array('rated', $ordering) ? $select_rated : '')
 				. ' FROM #__flexicontent_items_tmp AS i'
 				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 				. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
@@ -1613,7 +1617,7 @@ class modFlexicontentHelper
 				. $join_date
 				. (in_array('commented', $ordering) ? $join_comments : '')
 				. (in_array('rated', $ordering) ? $join_rated : '')
-				. $join_field
+				. $orderby_join
 				. $join_field_filters
 				. $where .' '. ($apply_config_per_category ? '__CID_WHERE__' : '')
 				. $where_field_filters
@@ -1625,12 +1629,12 @@ class modFlexicontentHelper
 			$_cl = (!$behaviour_cat && $method_cat == 3) ? 'c' : 'mc';
 			
 			$items_query_data 	= 'SELECT '
-				.' i.*, ie.*, ty.name AS typename,'
-				. ($select_comments ? $select_comments.',' : '')
-				. ($select_rated ? $select_rated.',' : '')
-				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', '.$_cl.'.id, '.$_cl.'.alias) ELSE '.$_cl.'.id END as categoryslug,'
-				. ' GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats '
+				.' i.*, ie.*, ty.name AS typename'
+				. $select_comments
+				. $select_rated
+				. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
+				. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', '.$_cl.'.id, '.$_cl.'.alias) ELSE '.$_cl.'.id END as categoryslug'
+				. ', GROUP_CONCAT(rel.catid SEPARATOR ",") as itemcats'
 				. ' FROM #__content AS i'
 				. ' JOIN #__flexicontent_items_ext AS ie on ie.item_id = i.id'
 				. ' JOIN #__flexicontent_types AS ty on ie.type_id = ty.id'
@@ -1642,7 +1646,7 @@ class modFlexicontentHelper
 				. $join_date
 				. $join_comments
 				. $join_rated
-				. $join_field
+				. $orderby_join
 				. ' WHERE i.id IN (__content__)'
 				. ' GROUP BY i.id'
 				;

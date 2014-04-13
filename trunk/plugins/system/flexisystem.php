@@ -547,9 +547,11 @@ class plgSystemFlexisystem extends JPlugin
 		$component 	= JRequest::getVar('component');
 		$task 		= JRequest::getVar('task');
 		
-		if ($option == 'com_config' && $component == 'com_flexicontent' && $task == 'save') {
-			$catscache = JFactory::getCache('com_flexicontent_cats');
-			$catscache->clean();
+		if ($option == 'com_config' && $component == 'com_flexicontent') {
+			if ($task == 'apply' || $task == 'component.apply' || $task == 'save' || $task == 'component.save') {
+				$catscache = JFactory::getCache('com_flexicontent_cats');
+				$catscache->clean();
+			}
 		}
 	}
 	

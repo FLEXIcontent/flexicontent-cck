@@ -216,20 +216,6 @@ class FlexicontentModelTags extends JModelLegacy
 		$user		= JFactory::getUser();
 		$params = & $this->_params;
 		
-		// image for an image field
-		/*$use_image    = (int)$params->get('use_image', 1);
-		$image_source = $params->get('image_source');
-
-		// EXTRA select and join for special fields: --image--
-		if ($use_image && $image_source) {
-			$select_image = ' img.value AS image,';
-			$join_image   = '	LEFT JOIN #__flexicontent_fields_item_relations AS img'
-				. '	ON ( i.id = img.item_id AND img.valueorder = 1 AND img.field_id = '.$image_source.' )';
-		} else {
-			$select_image	= '';
-			$join_image		= '';
-		}*/
-		
 		// show unauthorized items
 		$show_noauth = $params->get('show_noauth', 0);
 		
@@ -306,6 +292,7 @@ class FlexicontentModelTags extends JModelLegacy
 		$order = '';
 		$orderby = $this->_buildItemOrderBy($order);
 		$orderby_join = '';
+		$orderby_col = '';
 		
 		// Create JOIN for ordering items by a custom field (Level 1)
 		if ( 'field' == $order[1] ) {
@@ -317,6 +304,12 @@ class FlexicontentModelTags extends JModelLegacy
 		if ( 'field' == $order[2] ) {
 			$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
 			$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
+		}
+		
+		// Create JOIN for ordering items by author's name
+		if ( in_array('author', $order) || in_array('rauthor', $order) ) {
+			$orderby_col   = '';
+			$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
 		}
 		
 		// Create JOIN for ordering items by a most commented
@@ -332,13 +325,12 @@ class FlexicontentModelTags extends JModelLegacy
 		}
 		
 		// Create JOIN for ordering items by their ordering attribute (in item's main category)
-		if ($order=='order') {
+		if ( in_array('order', $order) ) {
 			$orderby_join .= ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id AND rel.catid = i.catid';
 		}
 		
 		$query = 'SELECT i.id, i.*, ie.* '
-			//. @ $select_image
-			. @ $orderby_col
+			. $orderby_col
 			. $select_access
 			. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
 			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -347,9 +339,7 @@ class FlexicontentModelTags extends JModelLegacy
 			. ' JOIN #__flexicontent_tags_item_relations AS tag ON tag.itemid = i.id'
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 			. ' JOIN #__categories AS c ON c.id = i.catid'
-			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
-			//. $join_image
-			. @ $orderby_join
+			. $orderby_join
 			. $joinaccess
 			. $where
 			. $andaccess
@@ -377,7 +367,7 @@ class FlexicontentModelTags extends JModelLegacy
 			$this->_params,
 			$order, $request_var, $config_param='orderby',
 			$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
-			$default_order, $default_order_dir
+			$default_order, $default_order_dir, $sfx='', $support_2nd_lvl=true
 		);
 	}
 	

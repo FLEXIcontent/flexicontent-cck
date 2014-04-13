@@ -320,28 +320,29 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// *******************
 		
 		// First try FLEXIcontent advanced search plugin specific ordering
-		$orderby = $orderby_override  ?  JRequest::getWord( 'orderby', $params->get('orderby', '') )  :  $params->get('orderby', '');
-		if ( $orderby ) {
-				$order = flexicontent_db::buildItemOrderBy(
-					$params, $ordering, $_request_var='orderby', $_config_param='orderby',
+		$fc_order = $orderby_override  ?  JRequest::getWord( 'orderby', $params->get('orderby', '') )  :  $params->get('orderby', '');
+		if ( $fc_order ) {
+				$orderby = flexicontent_db::buildItemOrderBy(
+					$params,
+					$fc_order, $_request_var='orderby', $_config_param='orderby',
 					$_item_tbl_alias = 'i', $_relcat_tbl_alias = 'rel',
-					$_default_order='', $_default_order_dir=''
+					$_default_order='', $_default_order_dir='', $sfx='', $support_2nd_lvl=false
 				);
 		}
 		
 		// Second try to use general ordering of search plugins
 		else {
-			switch ( $orderby )
+			switch ( $ordering )  // this is a parameter passed to this onContentSearch() function 
 			{
-				//case 'relevance': $order = ' ORDER BY score DESC, i.title ASC'; break;
-				case 'oldest':   $order = 'i.created ASC'; break;
-				case 'popular':  $order = 'i.hits DESC'; break;
-				case 'alpha':    $order = 'i.title ASC'; break;
-				case 'category': $order = 'c.title ASC, i.title ASC'; break;
-				case 'newest':   $order = 'i.created DESC'; break;
-				default:         $order = 'i.created DESC'; break;
+				//case 'relevance': $orderby = ' ORDER BY score DESC, i.title ASC'; break;
+				case 'oldest':   $orderby = 'i.created ASC'; break;
+				case 'popular':  $orderby = 'i.hits DESC'; break;
+				case 'alpha':    $orderby = 'i.title ASC'; break;
+				case 'category': $orderby = 'c.title ASC, i.title ASC'; break;
+				case 'newest':   $orderby = 'i.created DESC'; break;
+				default:         $orderby = 'i.created DESC'; break;
 			}
-			$order = ' ORDER BY '. $order;
+			$orderby = ' ORDER BY '. $orderby;
 		}
 		
 		
@@ -535,7 +536,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. $and_where
 			. $and_where_text_n_filters 
 			. ' GROUP BY i.id '
-			. $order
+			. $orderby
 		;
 		//echo nl2br($query);
 		
@@ -547,6 +548,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$db->setQuery( $query, 0, $search_limit );
 		$list = $db->loadObjectList();
 		if ($db->getErrorNum()) { echo $db->getErrorMsg(); }
+		$fc_searchview['view_total'] = $search_limit;
 		
 		if ( $print_logging_info ) @$fc_run_times['search_query_runtime'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		

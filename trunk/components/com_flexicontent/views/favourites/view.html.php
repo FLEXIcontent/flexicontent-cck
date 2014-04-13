@@ -38,8 +38,8 @@ class FlexicontentViewFavourites extends JViewLegacy
 	function display( $tpl = null )
 	{
 		//initialize variables
+		$app      = JFactory::getApplication();
 		$document = JFactory::getDocument();
-		$app   = JFactory::getApplication();
 		$menus = $app->getMenu();
 		$menu  = $menus->getActive();
 		$uri   = JFactory::getURI();
@@ -81,54 +81,55 @@ class FlexicontentViewFavourites extends JViewLegacy
 		}
 		
 		
-		// **********************
-		// Calculate a page title
-		// **********************
+		// **********************************************************
+		// Calculate a (browser window) page title and a page heading
+		// **********************************************************
 		
-		// Verify menu item points to current FLEXIcontent object, IF NOT then clear page title and page class suffix
+		// Verify menu item points to current FLEXIcontent object
 		if ( $menu ) {
-			$view_ok     = @$menu->query['view']     == 'favourites';
+			$view_ok     = 'favourites' == @$menu->query['view'];
 			$menu_matches = $view_ok;
-			
-			if ( !$menu_matches ) {
-				$params->set('page_title', '');
-				$params->set('page_heading', '');
-				// These are behavior, so do not clear ?
-				//$params->set('show_page_heading', '');
-				//$params->set('pageclass_sfx',	'');
-			}
+			//$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);  // Get active menu item parameters
 		} else {
 			$menu_matches = false;
 		}
 		
-		// Set a page title if one was not already set
-		$params->def('page_title',	JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' ));
-		
-		
-		// *******************
-		// Create page heading
-		// *******************
-		
-		if ( !FLEXI_J16GE )
-			$params->def('show_page_heading', $params->get('show_page_title'));  // J1.5: parameter name was show_page_title instead of show_page_heading
-		else
-			$params->def('show_page_title', $params->get('show_page_heading'));  // J2.5: to offer compatibility with old custom templates or template overrides
-		
-		// if above did not set the parameter, then default to NOT showing page heading (title)
-		$params->def('show_page_heading', 0);
-		$params->def('show_page_title', 0);
-		
-		// ... the page heading text
-		$params->def('page_heading', $params->get('page_title'));    // J1.5: parameter name was show_page_title instead of show_page_heading
-		$params->def('page_title', $params->get('page_heading'));    // J2.5: to offer compatibility with old custom templates or template overrides
-		
-		if (FLEXI_J16GE) {
-			if ($menu && $menu_matches) {
-				if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
-				if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
-				if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
-			}
+		// MENU ITEM matched, use its page title (=browser window title) and its page heading
+		if ( $menu_matches ) {
+			$params->def('page_title', $menu->title);  // default value for page title is menu item title
+			$params->def('page_heading', $params->get('page_title')); // default value for page heading is the page title
+			// Cross set show_page_heading and show_page_title for J1.5 template compatibility, (J1.5 used 'show_page_title'),
+			// also default to zero in order to prevent templates from use 1 as default value
+		  $params->def('show_page_heading', $params->get('show_page_title', 0));
+		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
 		}
+		
+		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
+		else {
+			$params->set('page_title', '');
+			$params->set('page_heading', '');
+			$params->set('show_page_heading', '');
+			$params->set('show_page_title', '');  // compatibility with J1.5 that used this instead of 'show_page_heading'
+			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
+		}
+		
+		// If 'page_heading' is empty or disabled, then calculate a title for both page title and page heading
+		if ( empty($params->get('page_heading')) || !$params->get('show_page_heading') ) {
+			// ... a default title
+			$default_title = JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' );
+			
+			$params->set('page_title', $default_title);
+			$params->set('page_heading', $default_title);
+		  $params->set('show_page_heading', 1);
+			$params->set('show_page_title', 1);  // compatibility with J1.5 that used this instead of 'show_page_heading'
+		}
+		
+		// Prevent showing the page heading if ... currently no reason
+		if ( 0 ) {
+			$params->set('show_page_heading', 0);
+			$params->set('show_page_title', 0);  // compatibility with J1.5 templating
+		}
+		
 		
 		
 		// ************************************************************
@@ -156,13 +157,16 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// Set document's META tags
 		// ************************
 		
-		// ** writting both old and new way as an example
-		// Deprecated <title> tag is used instead by search engines
-		/*if (!FLEXI_J16GE) {
-			if ($app->getCfg('MetaTitle') == '1') 	$app->addMetaTag('title', $params->get('page_title'));
-		} else {
-			if ($app->getCfg('MetaTitle') == '1') $document->setMetaData('title', $params->get('page_title'));
-		}*/
+		// Overwrite with menu META data if menu matched
+		if (FLEXI_J16GE) {
+			if ($menu_matches) {
+				if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
+				if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
+				if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
+				if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
+			}
+		}
+		
 		
 		
 		//ordering
@@ -178,10 +182,9 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// Create the pagination object
 		$pageNav = $this->get('pagination');
 		
-		// Create links
+		// Create links, etc
 		$link = JRoute::_(FlexicontentHelperRoute::getFavsRoute(0, $menu_matches ? $menu->id : 0));
 		$print_link  = JRoute::_('index.php?view=favourites&pop=1&tmpl=component');
-		
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('action',    $link);  // $uri->toString()
