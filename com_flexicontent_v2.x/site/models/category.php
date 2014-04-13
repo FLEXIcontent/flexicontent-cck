@@ -146,13 +146,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_authorid = $user->id;
 		}
 		else if ($this->_layout=='mcats') {
-			$mcats_list = JRequest::getVar('cids', '');
-			if ( !is_array($mcats_list) ) {
-				$mcats_list = preg_replace( '/[^0-9,]/i', '', (string) $mcats_list );
-				$mcats_list = explode(',', $mcats_list);
+			$_cids = JRequest::getVar('cids', '');
+			if ( !is_array($_cids) ) {
+				$_cids = preg_replace( '/[^0-9,]/i', '', (string) $_cids );
+				$_cids = explode(',', $_cids);
 			}
 			// make sure given data are integers ... !!
-			foreach ($mcats_list as $i => $_id)  if ((int)$_id) $this->_ids[] = (int)$_id;
+			$this->_ids = array();
+			foreach ($_cids as $i => $_id)  if ((int)$_id) $this->_ids[] = (int)$_id;
 		}
 		else if (!$this->_id) {
 		}
@@ -401,6 +402,12 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
 			}
 			
+			// Create JOIN for ordering items by author's name
+			if ( in_array('author', $order) || in_array('rauthor', $order) ) {
+				$orderby_col   = '';
+				$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
+			}
+			
 			// Create JOIN for ordering items by a most commented
 			if ( in_array('commented', $order) ) {
 				$orderby_col   = ', count(com.object_id) AS comments_total';
@@ -423,11 +430,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( $query_ids==-1 ) {
 			$query = ' SELECT count(i.id) ';
 		} else if ( !$query_ids ) {
-			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id ';  // Will cause problems with 3rd-party extensions that modify the query
-			//$query = 'SELECT i.id ';
+			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id ';  // SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
 			$query .= @ $orderby_col;
 		} else {
-			//$query = 'SELECT DISTINCT i.*, ie.*, u.name as author, ty.name AS typename,'
 			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename,'
 				. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
 				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
@@ -628,7 +633,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$this->_params,
 			$order, $request_var, $config_param='orderby',
 			$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
-			$default_order, $default_order_dir
+			$default_order, $default_order_dir, $sfx='', $support_2nd_lvl=true
 		);
 	}
 	
@@ -673,7 +678,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' JOIN #__categories AS c ON c.id = i.catid'
-			. ' LEFT JOIN #__users AS u ON u.id = i.created_by'
+			. (!$counting ? ' LEFT JOIN #__users AS u ON u.id = i.created_by' : '')
 			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gt ON ty.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"' : '')
 			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"' : '')
 			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '')

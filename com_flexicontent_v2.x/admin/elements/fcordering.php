@@ -56,6 +56,7 @@ class JFormFieldFcordering extends JFormFieldList
 		$ordering[] = JHTML::_('select.option',  'addedrev', 	JText::_( 'FLEXI_ORDER_OLDEST_FIRST' ) );       // 'date'
 		$ordering[] = JHTML::_('select.option',  'added', 		JText::_( 'FLEXI_ORDER_MOST_RECENT_FIRST' ) );  // 'rdate'
 		$ordering[] = JHTML::_('select.option',  'updated', 	JText::_( 'FLEXI_ORDER_LAST_MODIFIED_FIRST' ) );
+		$ordering[] = JHTML::_('select.option',  'published',	JText::_( 'FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST' ) );
 		
 		$ordering[] = JHTML::_('select.option',  'alpha', 		JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL' ) );
 		$ordering[] = JHTML::_('select.option',  'alpharev', 	JText::_( 'FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE' ) );  // 'ralpha'

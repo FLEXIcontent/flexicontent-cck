@@ -290,9 +290,13 @@ jQuery(document).ready(function() {
 					type: (el.hasClass('fc_adv_complete') ? "adv_index" : "basic_index"),
 					task: "txtautocomplete",
 					pageSize: fc_select_pageSize,
-					text: request.term
+					text: request.term,
+					cid: parseInt(_FC_GET['cid']),
+					cids: _FC_GET['cids'],
+					filter_13: _FC_GET['filter_13']
 				},
 				success: function( data ) {
+					//console.log( '... done' );
 					response( jQuery.map( data.Matches, function( item ) {
 						return {
 							/*label: item.item_id +': '+ item.text,*/
@@ -306,7 +310,7 @@ jQuery(document).ready(function() {
 		delay: 200,
 		minLength: 1,
 		select: function( event, ui ) {
-			/*log( ui.item  ?  "Selected: " + ui.item.label  :  "Nothing selected, input was " + this.value);*/
+			//console.log( ui.item  ?  "Selected: " + ui.item.label  :  "Nothing selected, input was " + this.value);
 			var ele = event.target;
 			jQuery(ele).trigger('change');
 		},
@@ -318,6 +322,7 @@ jQuery(document).ready(function() {
 			jQuery( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
 		},
 		search: function() {
+			//console.log( 'quering ... ' );
 			jQuery(this).addClass('working');
 		}
 	});
@@ -352,7 +357,10 @@ jQuery(document).ready(function() {
 					task: "txtautocomplete",
 					text: term,
 					pageSize: fc_select_pageSize,
-					pageNum: page
+					pageNum: page,
+					cid: parseInt(_FC_GET['cid']),
+					cids: _FC_GET['cids'],
+					filter_13: _FC_GET['filter_13']
 				};
 			},
 			results: function (data, page) {

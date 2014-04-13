@@ -176,6 +176,7 @@
 				<option value="date">FLEXI_ORDER_OLDEST_FIRST</option>
 				<option value="rdate">FLEXI_ORDER_MOST_RECENT_FIRST</option>
 				<option value="modified">FLEXI_ORDER_LAST_MODIFIED_FIRST</option>
+				<option value="published">FLEXI_ORDER_RECENTLY_PUBLISHED_FIRST</option>
 				<option value="alpha">FLEXI_ORDER_TITLE_ALPHABETICAL</option>
 				<option value="ralpha">FLEXI_ORDER_TITLE_ALPHABETICAL_REVERSE</option>
 				<option value="author">FLEXI_ORDER_AUTHOR_ALPHABETICAL</option>

@@ -693,9 +693,9 @@ class FlexicontentModelFields extends JModelLegacy
 			'Selection fields'         => array('radio', 'radioimage', 'checkbox', 'checkboximage', 'select', 'selectmultiple'),
 			'Media fields / Mini apps' => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
 			'Single property fields'   => array('date', 'text', 'textarea', 'textselect'),
-			'Muti property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers'),
+			'Multi property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers', 'termlist'),
 			'Item form'                => array('groupmarker'),
-			'Item relations fields'    => array('relation', 'relation_reverse'),
+			'Item relations fields'    => array('relation', 'relation_reverse', 'autorelationfilters'),
 			'Special action fields'    => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist')
 		);
 		foreach($ft_grps as $ft_grpname => $ft_arr) {

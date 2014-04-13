@@ -1,11 +1,11 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1874 2014-03-18 20:55:22Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1880 2014-03-28 07:10:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
  * @license GNU/GPL v2
- *
+ * 
  * FLEXIcontent is a derivative work of the excellent QuickFAQ component
  * @copyright (C) 2008 Christoph Lukes
  * see www.schlu.net for more information
@@ -60,11 +60,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		$app      = JFactory::getApplication();
 		$session  = JFactory::getSession();
 		$document = JFactory::getDocument();
-		$menus    = $app->getMenu();
-		$menu     = $menus->getActive();
-		$user     = JFactory::getUser();
-		$aid      = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
-		$db       = JFactory::getDBO();
+		$menus = $app->getMenu();
+		$menu  = $menus->getActive();
+		$uri   = JFactory::getURI();
+		$user  = JFactory::getUser();
+		$aid   = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
+		$db    = JFactory::getDBO();
 		$nullDate = $db->getNullDate();
 		
 		
@@ -121,12 +122,14 @@ class FlexicontentViewItem  extends JViewLegacy
 		// ********************
 
 		// (a) Decide to use mobile or normal item template layout
-		$use_mobile_layouts = $params->get('use_mobile_layouts', 0 );
-		$force_desktop_layout = $params->get('force_desktop_layout', 0 );
-		$mobileDetector = flexicontent_html::getMobileDetector();
-		$isMobile = $mobileDetector->isMobile();
-		$isTablet = $mobileDetector->isTablet();
-		$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+		$useMobile = $params->get('use_mobile_layouts', 0 );
+		if ($useMobile) {
+			$force_desktop_layout = $params->get('force_desktop_layout', 0 );
+			$mobileDetector = flexicontent_html::getMobileDetector();
+			$isMobile = $mobileDetector->isMobile();
+			$isTablet = $mobileDetector->isTablet();
+			$useMobile = $force_desktop_layout  ?  $isMobile && !$isTablet  :  $isMobile;
+		}
 		$_ilayout = $useMobile ? 'ilayout_mobile' : 'ilayout';
 
 		// (b) Get from item parameters, allowing URL override
@@ -190,49 +193,65 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		
-		// **********************
-		// Calculate a page title
-		// **********************
-		$m_id  = (int) @$menu->query['id'] ;
-		$m_cid = (int) @$menu->query['cid'] ;
-
-		// Verify menu item points to current FLEXIcontent object, IF NOT then overwrite page title and clear page class sufix
-		if ( $menu && (@$menu->query['view'] != FLEXI_ITEMVIEW || $m_cid != JRequest::getInt('cid') || JRequest::getInt('id') ) ) {
-			$params->set('page_title',	$item->title);
-			$params->set('pageclass_sfx',	'');
-		}
-
-		if ($params->get('override_title', 0)) {
-			if ($params->get('custom_ititle', '')) {
-				$params->set('page_title',	$params->get('custom_ititle'));
-			} else {
-				$params->set('page_title',	$item->title);
-			}
+		
+		// **********************************************************
+		// Calculate a (browser window) page title and a page heading
+		// **********************************************************
+		
+		// Verify menu item points to current FLEXIcontent object
+		if ( $menu ) {
+			$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'];
+			$cid_ok  = JRequest::getInt('cid') == (int) @$menu->query['cid'];
+			$id_ok   = JRequest::getInt('id')  == (int) @$menu->query['id'];
+			$menu_matches = $view_ok /*&& $cid_ok*/ && $id_ok;
+			//$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);  // Get active menu item parameters
+		} else {
+			$menu_matches = false;
 		}
 		
+		// MENU ITEM matched, use its page title (=browser window title) and its page heading
+		if ( $menu_matches ) {
+			$params->def('page_title', $menu->title);  // default value for page title is menu item title
+			$params->def('page_heading', $params->get('page_title')); // default value for page heading is the page title
+			// Cross set show_page_heading and show_page_title for J1.5 template compatibility, (J1.5 used 'show_page_title'),
+			// also default to zero in order to prevent templates from use 1 as default value
+		  $params->def('show_page_heading', $params->get('show_page_title', 0));
+		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
+		}
 		
-		// *******************
-		// Create page heading
-		// *******************
+		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
+		else {
+			$params->set('page_title', '');
+			$params->set('page_heading', '');
+			$params->set('show_page_heading', '');
+			$params->set('show_page_title', '');  // compatibility with J1.5 that used this instead of 'show_page_heading'
+			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
+		}
 		
-		if ( !FLEXI_J16GE )
-			$params->def('show_page_heading', $params->get('show_page_title'));  // J1.5: parameter name was show_page_title instead of show_page_heading
-		else
-			$params->def('show_page_title', $params->get('show_page_heading'));  // J2.5: to offer compatibility with old custom templates or template overrides
+		// If 'page_heading' is empty or disabled, then calculate a title for both page title and page heading
+		if ( empty($params->get('page_heading')) || !$params->get('show_page_heading') ) {
+			// set item title to the overriden item title if this is set and enabled
+			$default_title = !$params->get('override_title', 0) ? $item->title : $params->get('custom_ititle', $item->title);
+			
+			$params->set('page_title', $default_title);
+			$params->set('page_heading', $default_title);
+		  $params->set('show_page_heading', ($default_title != $item->title));
+			$params->set('show_page_title', ($default_title != $item->title));  // compatibility with J1.5 that used this instead of 'show_page_heading'
+		}
 		
-		// if above did not set the parameter, then default to NOT showing page heading (title)
-		$params->def('show_page_heading', 0);
-		$params->def('show_page_title', 0);
+		// Prevent showing the page heading if IT IS same as category title that will be also shown
+		if ( $params->get('page_heading') == $item->title && $params->get('show_page_heading') && $params->get('show_cat_title', 1) ) {
+			$params->set('show_page_heading', 0);
+			$params->set('show_page_title', 0);  // compatibility with J1.5 templating
+		}
 		
-		// ... the page heading text, set it only if not already set
-		$params->def('page_heading', $params->get('page_title'));    // J1.5: parameter name was show_page_title instead of show_page_heading
-		$params->def('page_title', $params->get('page_heading'));    // J2.5: to offer compatibility with old custom templates or template overrides
+		
 		
 		
 		// ************************************************************
 		// Create the document title, by from page title and other data
 		// ************************************************************
-
+		
 		// Check and prepend category title
 		if($cid && $params->get('addcat_title', 1) && (count($parents)>0)) {
 			$parentcat = end($parents);
@@ -240,7 +259,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		} else {
 			$doc_title = $params->get( 'page_title' );
 		}
-
+		
 		// Check and prepend or append site name
 		if (FLEXI_J16GE) {  // Not available in J1.5
 			// Add Site Name to page title
@@ -256,16 +275,50 @@ class FlexicontentViewItem  extends JViewLegacy
 		$document->setTitle($doc_title);
 		
 		
+		// ************************
+		// Set document's META tags
+		// ************************
+
+		// Set item's META data: desc, keyword, title, author
+		if ($item->metadesc)		$document->setDescription( $item->metadesc );
+		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
+		// ?? Deprecated <title> tag is used instead by search engines
+		if ($app->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
+		if ($app->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
+
+		// Set remaining META keys
+		$mdata = $item->metadata->toArray();
+		foreach ($mdata as $k => $v)
+		{
+			if ($v)  $document->setMetadata($k, $v);
+		}
 		
-		// @TODO check that as it seems to be dirty :(
-		$uri   = JFactory::getURI();
+		// Overwrite with menu META data if menu matched
+		if (FLEXI_J16GE) {
+			if ($menu_matches) {
+				if (($_mp=$menu->params->get('menu-meta_description')))  $document->setDescription( $_mp );
+				if (($_mp=$menu->params->get('menu-meta_keywords')))     $document->setMetadata('keywords', $_mp);
+				if (($_mp=$menu->params->get('robots')))                 $document->setMetadata('robots', $_mp);
+				if (($_mp=$menu->params->get('secure')))                 $document->setMetadata('secure', $_mp);
+			}
+		}
+		
+		
+		// ************************************
+		// Add rel canonical html head link tag (TODO: improve multi-page handing)
+		// ************************************
+		
 		$base  = $uri->getScheme() . '://' . $uri->getHost();
 		$ucanonical = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $globalcats[$item->maincatid]->slug));  // $item->categoryslug
 		if ($params->get('add_canonical')) {
 			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
 		}
-
-		// increment the hit counter
+		
+		
+		// *************************
+		// increment the hit counter (TODO: move this to system plugin, to make it work when caching is ON)
+		// *************************
+		
 		if (FLEXIUtilities::count_new_hit($item) ) {
 			$model->hit();
 		}
@@ -380,28 +433,10 @@ class FlexicontentViewItem  extends JViewLegacy
 			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)) );
 		}
 		
-		
-		// ************************
-		// Set document's META tags
-		// ************************
-
-		// Set item's META data: desc, keyword, title, author
-		if ($item->metadesc)		$document->setDescription( $item->metadesc );
-		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
-		// ?? Deprecated <title> tag is used instead by search engines
-		if ($app->getCfg('MetaTitle') == '1')		$document->setMetaData('title', $item->title);
-		if ($app->getCfg('MetaAuthor') == '1')	$document->setMetaData('author', $item->author);
-
-		// Set remaining META keys
-		$mdata = $item->metadata->toArray();
-		foreach ($mdata as $k => $v)
-		{
-			if ($v)  $document->setMetadata($k, $v);
-		}
-
+		// Create links, etc
 		$print_link = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component&print=1');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
-
+		
 		$this->assignRef('item' , 				$item);
 		$this->assignRef('user' , 				$user);
 		$this->assignRef('params' , 			$params);

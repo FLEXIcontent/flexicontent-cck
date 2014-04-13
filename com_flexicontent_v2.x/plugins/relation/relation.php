@@ -257,8 +257,13 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		// ***********************************************
 		// Item retrieving query ... CREATE ORDERBY CLAUSE
 		// ***********************************************
-		$order = $field->parameters->get( 'orderby_form', 'alpha' );   // TODO: add more orderings: commented, rated
-		$orderby = flexicontent_db::buildItemOrderBy($field->parameters, $order, $request_var='', $config_param='', $item_tbl_alias = 'i', $relcat_tbl_alias = 'rel');
+		$order = $field->parameters->get( 'orderby_form', 'alpha' );;   // TODO: add more orderings: commented, rated
+		$orderby = flexicontent_db::buildItemOrderBy(
+			$field->parameters,
+			$order, $request_var='', $config_param='',
+			$item_tbl_alias = 'i', $relcat_tbl_alias = 'rel',
+			$default_order='', $default_order_dir='', $sfx='_form', $support_2nd_lvl=false
+		);
 		
 		// Create JOIN for ordering items by a most rated
 		if ( in_array('author', $order) || in_array('rauthor', $order) ) {
