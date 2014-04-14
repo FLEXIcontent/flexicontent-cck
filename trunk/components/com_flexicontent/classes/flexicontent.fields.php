@@ -2845,6 +2845,83 @@ class FlexicontentFields
 	
 	
 	/**
+	 * Method to get data of filters
+	 * 
+	 * @access public
+	 * @return object
+	 * @since 1.5
+	 */
+	static function &getFilters($filt_param='filters', $usage_param='use_filters', & $params = null, $check_access=true)
+	{
+		// Parameter that controls using these filters
+		$filters = array();
+		if ( $usage_param!='__ALL_FILTERS__' && $params && !$params->get($usage_param,0) ) return $filters;
+		
+		// Get Filter IDs, false means do retrieve any filter
+		$filter_ids = $params  ?  $params->get($filt_param, array())  :  array();
+		if ($filter_ids === false) return $filters;
+		
+		// Sanitize the given filter_ids ... just in case
+		if ( !is_array($filter_ids) ) $filter_ids = array($filter_ids);
+		$filter_ids = array_filter($filter_ids, 'is_numeric');
+		
+		$user = JFactory::getUser();
+		$db   = JFactory::getDBO();
+		
+		// None selected filters means ALL
+		$and_scope = $usage_param!='__ALL_FILTERS__' && count($filter_ids) ? ' AND fi.id IN (' . implode(',', $filter_ids) . ')' : '';
+		
+		// Use ACCESS Level, usually this is only for shown filters
+		$and_access = '';
+		if ($check_access) {
+			if (FLEXI_J16GE) {
+				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_list = implode(",", $aid_arr);
+				$and_access = ' AND fi.access IN (0,'.$aid_list.') ';
+			} else {
+				$aid = (int) $user->get('aid');
+				
+				if (FLEXI_ACCESS) {
+					$readperms = FAccess::checkUserElementsAccess($user->gmid, 'read');
+					if (isset($readperms['field']) && count($readperms['field']) ) {
+						$and_access = ' AND ( fi.access <= '.$aid.' OR fi.id IN ('.implode(",", $readperms['field']).') )';
+					} else {
+						$and_access = ' AND fi.access <= '.$aid;
+					}
+				} else {
+					$and_access = ' AND fi.access <= '.$aid;
+				}
+			}
+		}
+		
+		// Create and execute SQL query for retrieving filters
+		$query  = 'SELECT fi.*'
+			. ' FROM #__flexicontent_fields AS fi'
+			. ' WHERE fi.published = 1'
+			. ' AND fi.isfilter = 1'
+			. $and_access
+			. $and_scope
+			. ' ORDER BY fi.ordering, fi.name'
+		;
+		$db->setQuery($query);
+		$filters = $db->loadObjectList('name');
+		if ( !$filters ) {
+			$filters = array(); // need to do this because we return reference, but false here will also mean an error
+			return $filters;
+		}
+		
+		// Create filter parameters, language filter label, etc
+		foreach ($filters as $filter) {
+			$filter->parameters = FLEXI_J16GE ? new JRegistry($filter->attribs) : new JParameter($filter->attribs);
+			$filter->label = JText::_($filter->label);
+		}
+		
+		// Return found filters
+		return $filters;
+	}
+	
+	
+	/**
 	 * Method to creat the HTML of filters
 	 * 
 	 * @access public

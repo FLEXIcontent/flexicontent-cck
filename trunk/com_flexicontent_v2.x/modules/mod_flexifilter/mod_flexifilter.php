@@ -148,25 +148,26 @@ if ( $show_mod )
 	JRequest::setVar('layout', $mcats_selection || !$catid ? 'mcats' : '');
 	JRequest::setVar('cid', $limit_filters_to_cat ? $catid : 0);
 	
+	// Get/Create current category model ... according to configuaration set above into the JRequest variables ...
 	$catmodel = new FlexicontentModelCategory();
-	//$_params = $catmodel->getParams();
+	$catparams = $catmodel->getParams();  // Get current's view category parameters this will if needed to get category specific filters ...
 	// ALL filters
 	if ($display_filter_list==0) {
 		// WARNING: this CASE is supposed to get ALL filters regardless category,
 		// but __ALL_FILTERS__ ignores the 'use_filters' parameter, so we must check it separetely
-		$filters = ! $params->get('use_filters', 0) ? array() : $catmodel->getFilters('filters', '__ALL_FILTERS__');
+		$filters = ! $params->get('use_filters', 0) ? array() : FlexicontentFields::getFilters('filters', '__ALL_FILTERS__', $catparams);
 	}
 	// Filter selected in category configuration
 	else if ($display_filter_list==1) {
-		$filters = $catmodel->getFilters('filters', 'use_filters');
+		$filters = FlexicontentFields::getFilters('filters', 'use_filters', $catparams);
 	}
 	// Filters selected in module
 	else if ($display_filter_list==2) {
-		$filters = $catmodel->getFilters('filters', 'use_filters', $params);
+		$filters = FlexicontentFields::getFilters('filters', 'use_filters', $params);
 	}
 	// Filters selected in module
 	else if ($display_filter_list) {  // ==3
-		$cat_filters = $catmodel->getFilters('filters', 'use_filters', $params);
+		$cat_filters = FlexicontentFields::getFilters('filters', 'use_filters', $params);
 		
 		// Intersection of selected filters and of category assigned filters
 		$filters = array();

@@ -57,10 +57,10 @@ class FCPagination extends JPagination
 			$items_total_msg = $fc_view_limit_max && ($this->total >= $fc_view_limit_max) ? 'FLEXI_ITEM_S_OR_MORE' : 'FLEXI_ITEM_S';
 			
 			$html =
-				 "<span class='item_total_label'>".JText::_( 'FLEXI_TOTAL')."</span> "
-				."<span class='item_total_value'>".$this->total." " .JText::_( $items_total_msg )."</span>"
-				."<span class='item_total_label'>".JText::_( 'FLEXI_DISPLAYING')."</span> "
-				."<span class='item_total_value'>".$fromResult ." - " .$toResult ." " .JText::_( 'FLEXI_ITEM_S')."</span>"
+				 "<span class='flexi label item_total_label'>".JText::_( 'FLEXI_TOTAL')."</span> "
+				."<span class='flexi value item_total_value'>".$this->total." " .JText::_( $items_total_msg )."</span>"
+				."<span class='flexi label item_total_label'>".JText::_( 'FLEXI_DISPLAYING')."</span> "
+				."<span class='flexi value item_total_value'>".$fromResult ." - " .$toResult ." " .JText::_( 'FLEXI_ITEM_S')."</span>"
 				;
 		} else {
 			$html .= "\n".JText::_('No records found');
