@@ -500,7 +500,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	margin: 0px 2px 2px 4px !important;
 }
 .fc_filter .fc_filter_label_inline {
-	background-color: darkred;
+	background-color: #555;
 }
 .fc_filter .fc_filter_tip_inline {
 	background-color: darkgray;
@@ -512,7 +512,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	float: left !important;
 	display: inline-block !important;
 	color: white !important;
-  background-color: darkred !important;
+  background-color: #555 !important;
   border-bottom: 1px solid #D0D0D0 !important;
   border-right: 1px solid #D0D0D0 !important;
   font-weight: normal !important;
@@ -1576,7 +1576,7 @@ div.fancybox-wrap a { background: none!important;}
 #flexicontent .fc_markup {
 	float: right !important;
 	display: block !important;
-  background-color: #F2F2F2 !important;
+  background-color: #F2F2F2;
   border-width: 0px!important;
   font-style: normal !important;
   font-size: 11px !important;
@@ -1592,41 +1592,39 @@ div.fancybox-wrap a { background: none!important;}
 }
 
 #flexicontent .fc_markup.mu_has_text {
-  border-bottom: 1px solid #D0D0D0 !important;
-  border-right: 1px solid #D0D0D0 !important;
+  border-bottom: 1px solid #AAA !important;
+  border-right: 1px solid #AAA !important;
   margin: 2px 2px 2px 12px !important;
   padding: 4px !important;
 }
 
 #flexicontent .fc_markup.mu_featured_cat.mu_has_text {
 	padding-left: 24px !important;
-	background: url(../images/star.png) 4px 50% no-repeat transparent;
-	color: #333333 !important;
+	background: url(../images/star.png) 4px 50% no-repeat lightgoldenrodyellow;
+	color: black !important;
 }
 
 #flexicontent .fc_markup.mu_normal_cat.mu_has_text {
 	padding-left: 24px !important;
-	background: url(../images/star-empty.png) 4px 50% no-repeat transparent;
-	color: #777777 !important;
+	background: url(../images/star-empty.png) 4px 50% no-repeat lightgoldenrodyellow;
+	color: #888 !important;
 }
 
 #flexicontent .fc_markup.mu_item_no_access.mu_has_text {
 	padding-left: 24px !important;
-	background: url(../images/eye-half.png) 4px 50% no-repeat transparent;
-	background-color: #FFD700 !important;
-	color: white !important;
+	background: url(../images/eye-half.png) 4px 50% no-repeat #FFD700;
+	color: #555 !important;
 }
 
 #flexicontent .fc_markup.mu_item_free_access.mu_has_text {
 	padding-left: 24px !important;
-	background: url(../images/eye.png) 4px 50% no-repeat transparent;
-	color: darkorange !important;
+	background: url(../images/eye.png) 4px 50% no-repeat #50EE90;
+	color: #777 !important;
 }
 
 #flexicontent .fc_markup.mu_needed_acclvl.mu_has_text {
 	padding-left: 24px !important;
-	background: url(../images/lock.png) 4px 50% no-repeat transparent !important; !important;
-	background-color: darkred !important;
+	background: url(../images/lock.png) 4px 50% no-repeat darkorange;
 	color: white !important;
 }
 
@@ -1639,12 +1637,12 @@ div.fancybox-wrap a { background: none!important;}
 
 #flexicontent .fc_markup.mu_ra_timeframe.mu_has_text {
 	padding-left: 24px !important;
-	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat transparent;
-	color: brown !important;
+	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat lightskyblue;
+	color: #333 !important;
 }
 
 #flexicontent .fc_markup.mu_ru_timeframe.mu_has_text {
 	padding-left: 24px !important;
-	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat transparent;
-	color: darkgreen !important;
+	background: url(../images/calendar-select-days-span.png) 4px 50% no-repeat lightskyblue;
+	color: #333 !important;
 }

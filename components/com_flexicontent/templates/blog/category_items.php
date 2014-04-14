@@ -187,7 +187,7 @@ if ($this->limitstart != 0) $leadnum = 0;
 				<?php foreach ($items[$i]->positions['above-description-line1'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
-					<span class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -214,7 +214,7 @@ if ($this->limitstart != 0) $leadnum = 0;
 				<?php foreach ($items[$i]->positions['above-description-line2'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
-					<span class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -265,7 +265,7 @@ if ($this->limitstart != 0) $leadnum = 0;
 				<?php foreach ($items[$i]->positions['under-description-line1'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
-					<span class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -292,7 +292,7 @@ if ($this->limitstart != 0) $leadnum = 0;
 				<?php foreach ($items[$i]->positions['under-description-line2'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
-					<span class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -491,7 +491,7 @@ if ($count > $leadnum) :
 				<?php foreach ($items[$i]->positions['above-description-line1'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
-					<span class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -518,7 +518,7 @@ if ($count > $leadnum) :
 				<?php foreach ($items[$i]->positions['above-description-line2'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
-					<span class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -569,7 +569,7 @@ if ($count > $leadnum) :
 				<?php foreach ($items[$i]->positions['under-description-line1'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
-					<span class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -596,7 +596,7 @@ if ($count > $leadnum) :
 				<?php foreach ($items[$i]->positions['under-description-line2'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
-					<span class="label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
+					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
 					<?php endif; ?>
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>

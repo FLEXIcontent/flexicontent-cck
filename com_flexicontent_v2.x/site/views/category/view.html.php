@@ -215,7 +215,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		}
 		
 		// If 'page_heading' is empty or disabled, then calculate a title for both page title and page heading
-		if ( empty($params->get('page_heading')) || !$params->get('show_page_heading') ) {
+		if ( !$params->get('page_heading') || !$params->get('show_page_heading') ) {
 			// set title to alternative category page title if this is set
 			$category_title =	!$meta_params ? $category->title : $meta_params->get('page_title', $category->title);
 			switch($layout) {

@@ -120,7 +120,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		}
 		
 		// If 'page_heading' is empty or disabled, then calculate a title for both page title and page heading
-		if ( empty($params->get('page_heading')) || !$params->get('show_page_heading') ) {
+		if ( !$params->get('page_heading') || !$params->get('show_page_heading') ) {
 			// ... a default title
 			$default_title = JText::_( 'FLEXI_SEARCH' );
 			

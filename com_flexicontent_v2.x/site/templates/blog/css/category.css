@@ -268,8 +268,9 @@ div.comments {
 #flexicontent .lineinfo .element,
 #flexicontent .lineinfo .element .label,
 #flexicontent .lineinfo .element .value {
-	display: block;
+	display: inline-block;
 	float: left;
+	min-width: 90px;
 }
 
 #flexicontent .readmore {

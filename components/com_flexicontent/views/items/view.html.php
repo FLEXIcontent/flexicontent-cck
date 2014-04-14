@@ -229,7 +229,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		}
 		
 		// If 'page_heading' is empty or disabled, then calculate a title for both page title and page heading
-		if ( empty($params->get('page_heading')) || !$params->get('show_page_heading') ) {
+		if ( !$params->get('page_heading') || !$params->get('show_page_heading') ) {
 			// set item title to the overriden item title if this is set and enabled
 			$default_title = !$params->get('override_title', 0) ? $item->title : $params->get('custom_ititle', $item->title);
 			

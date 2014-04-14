@@ -269,6 +269,8 @@ jQuery(document).ready(function() {
 		}
 	});
 	
+	/* handle calender fields being changed by popup calendar, focus/blur is cross-browser compatible ... to detect input field being changed */
+	/* up to J2.5 */
 	jQuery('img.calendar').bind('click', function() {
 		var el = jQuery(this).prev();
 		el.prev().hide();
@@ -276,56 +278,74 @@ jQuery(document).ready(function() {
 		el.css("opacity", "1");
 		el.focus();
 	});
+	/* up to J3.0+ */
+	jQuery('button i.icon-calendar').parent().bind('click', function() {
+		var el = jQuery(this).prev();
+		el.prev().hide();
+		el.attr('data-previous_value', el.val());
+		el.css("opacity", "1");
+		el.focus();
+	});
+	if (typeof Calendar.prototype.callCloseHandler === 'function') {
+		var oldFunc = Calendar.prototype.callCloseHandler;
+		Calendar.prototype.callCloseHandler = function() {
+			var oldFuncResult = oldFunc.apply(this, arguments);
+			document.activeElement.blur();
+			return oldFuncResult;
+		}
+	}
 	
 	var fc_select_pageSize = 10;
 	
 	// add Simple text search autocomplete
-	jQuery( "input.fc_index_complete_simple" ).autocomplete({
-		source: function( request, response ) {
-			el = jQuery(this.element);
-			jQuery.ajax({
-				url: "index.php?option=com_flexicontent&tmpl=component",
-				dataType: "json",
-				data: {
-					type: (el.hasClass('fc_adv_complete') ? "adv_index" : "basic_index"),
-					task: "txtautocomplete",
-					pageSize: fc_select_pageSize,
-					text: request.term,
-					cid: parseInt(_FC_GET['cid']),
-					cids: _FC_GET['cids'],
-					filter_13: _FC_GET['filter_13']
-				},
-				success: function( data ) {
-					//console.log( '... done' );
-					response( jQuery.map( data.Matches, function( item ) {
-						return {
-							/*label: item.item_id +': '+ item.text,*/
-							label: item.text,
-							value: item.text
-						}
-					}));
-				}
-			});
-		},
-		delay: 200,
-		minLength: 1,
-		select: function( event, ui ) {
-			//console.log( ui.item  ?  "Selected: " + ui.item.label  :  "Nothing selected, input was " + this.value);
-			var ele = event.target;
-			jQuery(ele).trigger('change');
-		},
-		open: function() {
-			jQuery( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
-			jQuery(this).removeClass('working');
-		},
-		close: function() {
-			jQuery( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
-		},
-		search: function() {
-			//console.log( 'quering ... ' );
-			jQuery(this).addClass('working');
-		}
-	});
+	if (typeof jQuery.autocomplete==='function') {
+		jQuery( "input.fc_index_complete_simple" ).autocomplete({
+			source: function( request, response ) {
+				el = jQuery(this.element);
+				jQuery.ajax({
+					url: "index.php?option=com_flexicontent&tmpl=component",
+					dataType: "json",
+					data: {
+						type: (el.hasClass('fc_adv_complete') ? "adv_index" : "basic_index"),
+						task: "txtautocomplete",
+						pageSize: fc_select_pageSize,
+						text: request.term,
+						cid: parseInt(_FC_GET['cid']),
+						cids: _FC_GET['cids'],
+						filter_13: _FC_GET['filter_13']
+					},
+					success: function( data ) {
+						//console.log( '... done' );
+						response( jQuery.map( data.Matches, function( item ) {
+							return {
+								/*label: item.item_id +': '+ item.text,*/
+								label: item.text,
+								value: item.text
+							}
+						}));
+					}
+				});
+			},
+			delay: 200,
+			minLength: 1,
+			select: function( event, ui ) {
+				//console.log( ui.item  ?  "Selected: " + ui.item.label  :  "Nothing selected, input was " + this.value);
+				var ele = event.target;
+				jQuery(ele).trigger('change');
+			},
+			open: function() {
+				jQuery( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+				jQuery(this).removeClass('working');
+			},
+			close: function() {
+				jQuery( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+			},
+			search: function() {
+				//console.log( 'quering ... ' );
+				jQuery(this).addClass('working');
+			}
+		});
+	}
 
 
 
