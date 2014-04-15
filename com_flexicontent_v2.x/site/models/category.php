@@ -982,6 +982,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 	
 	
 	/**
+	 * Method to get the visible category filters according to category parameters
+	 *
+	 * @access private
+	 * @return array
+	 */
+	function &getFilters() {
+		return FlexicontentFields::getFilters('filters', 'use_filters', $this->_params, $check_access=true);
+	}
+	
+	
+	/**
 	 * Method to build the part of WHERE clause related to Alpha Index
 	 *
 	 * @access private
