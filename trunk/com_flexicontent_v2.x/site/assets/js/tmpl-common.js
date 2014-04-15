@@ -286,7 +286,7 @@ jQuery(document).ready(function() {
 		el.css("opacity", "1");
 		el.focus();
 	});
-	if (typeof Calendar.prototype.callCloseHandler === 'function') {
+	if (typeof Calendar !== "undefined" && typeof Calendar.prototype.callCloseHandler === 'function') {
 		var oldFunc = Calendar.prototype.callCloseHandler;
 		Calendar.prototype.callCloseHandler = function() {
 			var oldFuncResult = oldFunc.apply(this, arguments);
@@ -298,7 +298,7 @@ jQuery(document).ready(function() {
 	var fc_select_pageSize = 10;
 	
 	// add Simple text search autocomplete
-	if (typeof jQuery.autocomplete==='function') {
+	if (typeof jQuery.fn.autocomplete==='function') {
 		jQuery( "input.fc_index_complete_simple" ).autocomplete({
 			source: function( request, response ) {
 				el = jQuery(this.element);
