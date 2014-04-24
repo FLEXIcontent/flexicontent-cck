@@ -256,38 +256,68 @@ class flexicontent_html
 	 * @return 	string
 	 * @since 1.5
 	 */
-	static function loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1 )
+	static function loadJQuery( $add_jquery = 1, $add_jquery_ui = 1, $add_jquery_ui_css = 1, $add_remote = 1, $params = null )
 	{
 		static $jquery_added = false;
 		static $jquery_ui_added = false;
 		static $jquery_ui_css_added = false;
 		$document = JFactory::getDocument();
-
-		if (FLEXI_J30GE) {
-			if (!$jquery_added) {
-				JHtml::_('jquery.framework');
-				JHtml::_('jquery.ui', array('core', 'sortable')); 
-				$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
-			}
-			$jquery_added = 1;
-			return;
-		}
-
+		
+		// Set jQuery to load in views that use it
+		$JQUERY_VER    = !$params ? '1.8.3' : $params->get('jquery_ver', '1.8.3');
+		$JQUERY_UI_VER = !$params ? '1.9.2' : $params->get('jquery_ui_ver', '1.9.2');
+		$JQUERY_UI_THEME = !$params ? 'ui-lightness' : $params->get('jquery_ui_theme', 'ui-lightness');
+		$add_remote = (FLEXI_J30GE && $add_remote==2) || (!FLEXI_J30GE && $add_remote);
+		
+		
+		// **************
+		// jQuery library
+		// **************
+		
 		if ( $add_jquery && !$jquery_added && !JPluginHelper::isEnabled('system', 'jquerysupport') )
 		{
-			$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-'.FLEXI_JQUERY_VER.'.js');
-			// The 'noConflict()' statement is inside the above jquery file, to make sure it executed immediately
-			//$document->addCustomTag('<script>jQuery.noConflict();</script>');
+			if ( $add_remote ) {
+				$document->addScript('//ajax.googleapis.com/ajax/libs/jquery/'.$JQUERY_VER.'/jquery.min.js');
+			} else {
+				FLEXI_J30GE ?
+					JHtml::_('jquery.framework') :
+					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-'.$JQUERY_VER.'.min.js');
+			}
+			// The 'noConflict()' statement must be inside a js file, to make sure it executed immediately
+			if (!FLEXI_J30GE) $document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-no-conflict.js');
+			//$document->addCustomTag('<script>jQuery.noConflict();</script>');  // not placed in proper place
 			$jquery_added = 1;
 		}
+		
+		
+		// *******************************
+		// jQuery-UI library (and its CSS)
+		// *******************************
+		
 		if ( $add_jquery_ui && !$jquery_ui_added ) {
-			$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui-'.FLEXI_JQUERY_UI_VER.'.js');
+			// Load all components of jQuery-UI
+			if ($add_remote) {
+				$document->addScript('//ajax.googleapis.com/ajax/libs/jqueryui/'.$JQUERY_UI_VER.'/jquery-ui.min.js');
+			} else {
+				if (FLEXI_J30GE) {
+					JHtml::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position
+					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
+				} else {
+					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
+				}
+			}
 			$jquery_ui_added = 1;
 		}
-		if ( $add_jquery_ui_css && !$jquery_ui_css_added ) {
-			$ui_style = 'smoothness'; // lightness
-			$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/jquery/css/ui-'.$ui_style.'/jquery-ui-'.FLEXI_JQUERY_UI_CSS_VER.'.css');
-			$jquery_ui_css_added = 1;
+		
+		// Add jQuery UI theme, this is included in J3+ when executing jQuery-UI framework is called
+		if ( !FLEXI_J30GE && $add_jquery_ui_css && !$jquery_ui_css_added ) {
+			// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
+			if ($add_remote) {
+				$document->addStyleSheet('//ajax.googleapis.com/ajax/libs/jqueryui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css');
+			} else {
+				$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/jquery/css/'.$JQUERY_UI_THEME.'/jquery-ui-'.$JQUERY_UI_VER.'.css');
+				$jquery_ui_css_added = 1;
+			}
 		}
 	}
 	
@@ -1474,7 +1504,17 @@ class flexicontent_html
 		else
 		{
 			// Given CATEGORY VIEW OBJECT may limit to specific category ids
-			$canAdd = $user->authorise('core.create', 'com_flexicontent');
+			if (FLEXI_J16GE) {
+				$canAdd = $user->authorise('core.create', 'com_flexicontent');
+			} else if ($user->gid >= 25) {
+				$canAdd = 1;
+			} else if (FLEXI_ACCESS) {
+				$canAdd = FAccess::checkUserElementsAccess($user->gmid, 'submit');
+				$canAdd = @$canAdd['content'] || @$canAdd['category'];
+			} else {
+				$canAdd	= $user->authorize('com_content', 'add', 'content', 'all');
+			}
+			
 			if ($canAdd === NULL && $user->id) {
 				$specific_catids = $submit_cat ? @ $submit_cat->ids  :  false;
 				if ($specific_catids && count($specific_catids) > 3) $specific_catids = false;
@@ -4290,107 +4330,7 @@ class FLEXIUtilities
 		}
 		return($ords);
 	}
-
-
-	static function count_new_hit(&$item) // If needed to modify params then clone them !! ??
-	{
-		$params = JComponentHelper::getParams( 'com_flexicontent' );
-		if (!$params->get('hits_count_unique', 0)) return 1; // Counting unique hits not enabled
-
-		$db = JFactory::getDBO();
-		$visitorip = $_SERVER['REMOTE_ADDR'];  // Visitor IP
-		$current_secs = time();  // Current time as seconds since Unix epoch
-		if ($item->id==0) {
-			JFactory::getApplication()->enqueueMessage(nl2br("Invalid item id or item id is not set in http request"),'error');
-			return 1; // Invalid item id ?? (do not try to decrement hits in content table)
-		}
-
-
-		// CHECK RULE 1: Skip if visitor is from the specified ips
-		$hits_skip_ips = $params->get('hits_skip_ips', 1);   // Skip ips enabled
-		$hits_ips_list = $params->get('hits_ips_list', '127.0.0.1');  // List of ips, by default localhost
-		if($hits_skip_ips)
-		{
-			// consider as blocked ip , if remote address is not set (is this correct behavior?)
-			if( !isset($_SERVER['REMOTE_ADDR']) ) return 0;
-
-			$remoteaddr = $_SERVER['REMOTE_ADDR'];
-			$ips_array = explode(",", $hits_ips_list);
-			foreach($ips_array as $blockedip)
-			{
-				if (preg_match('/'.trim($blockedip).'/i', $remoteaddr)) return 0;  // found blocked ip, do not count new hit
-			}
-		}
-
-
-		// CHECK RULE 2: Skip if visitor is a bot
-		$hits_skip_bots = $params->get('hits_skip_bots', 1);  // Skip bots enabled
-		$hits_bots_list = $params->get('hits_bots_list', 'bot,spider,crawler,search,libwww,archive,slurp,teoma');   // List of bots
-		if($hits_skip_bots)
-		{
-			// consider as bot , if user agent name is not set (is this correct behavior?)
-			if( !isset($_SERVER['HTTP_USER_AGENT']) ) return 0;
-
-			$useragent = $_SERVER['HTTP_USER_AGENT'];
-			$bots_array = explode(",", $hits_bots_list);
-			foreach($bots_array as $botname)
-			{
-				if (preg_match('/'.trim($botname).'/i', $useragent)) return 0;  // found bot, do not count new hit
-			}
-		}
-
-		// CHECK RULE 3: item hit does not exist in current session
-		$hit_method = 'use_session';  // 'use_db_table', 'use_session'
-		if ($hit_method == 'use_session') {
-			$session 	= JFactory::getSession();
-			$hit_accounted = false;
-			$hit_arr = array();
-			if ($session->has('hit', 'flexicontent')) {
-				$hit_arr 	= $session->get('hit', array(), 'flexicontent');
-				$hit_accounted = isset($hit_arr[$item->id]);
-			}
-			if (!$hit_accounted) {
-				//add hit to session hit array
-				$hit_arr[$item->id] = $timestamp = time();  // Current time as seconds since Unix epoc;
-				$session->set('hit', $hit_arr, 'flexicontent');
-				return 1;
-			}
-
-		} else {  // ALTERNATIVE METHOD (above is better, this will be removed?), by using db table to account hits, instead of user session
-
-			// CHECK RULE 3: minimum time to consider as unique visitor aka count hit
-			$secs_between_unique_hit = 60 * $params->get('hits_mins_to_unique', 10);  // Seconds between counting unique hits from an IP
-
-			// Try to find matching records for visitor's IP, that is within time limit of unique hit
-			$query = "SELECT COUNT(*) FROM #__flexicontent_hits_log WHERE ip=".$db->quote($visitorip)." AND (timestamp + ".$db->quote($secs_between_unique_hit).") > ".$db->quote($current_secs). " AND item_id=". $item->id;
-			$db->setQuery($query);
-			$result = $db->query();
-			if ($db->getErrorNum()) {
-				$query_create = "CREATE TABLE #__flexicontent_hits_log (item_id INT PRIMARY KEY, timestamp INT NOT NULL, ip VARCHAR(16) NOT NULL DEFAULT '0.0.0.0')";
-				$db->setQuery($query_create);
-				$result = $db->query();
-				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
-				return 1; // on select error e.g. table created, count a new hit
-			}
-			$count = $db->loadResult();
-
-			// Log the visit into the hits logging db table
-			if(empty($count))
-			{
-				$query = "INSERT INTO #__flexicontent_hits_log (item_id, timestamp, ip) "
-						."  VALUES (".$db->quote($item->id).", ".$db->quote($current_secs).", ".$db->quote($visitorip).")"
-						." ON DUPLICATE KEY UPDATE timestamp=".$db->quote($current_secs).", ip=".$db->quote($visitorip);
-				$db->setQuery($query);
-				$result = $db->query();
-				if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-				return 1;  // last visit not found or is beyond time limit, count a new hit
-			}
-		}
-
-		// Last visit within time limit, do not count new hit
-		return 0;
-	}
-
+	
 
 	/*
 	 * Method to confirm if a given string is a valid MySQL date

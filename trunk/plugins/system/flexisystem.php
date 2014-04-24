@@ -115,6 +115,9 @@ class plgSystemFlexisystem extends JPlugin
 		$tmpl   = JRequest::getVar('tmpl', '');
 		$task   = JRequest::getVar('task', '');
 		
+		// Count an item or category hit if appropriate
+		if ( $app->isSite() )$this->countHit();
+		
 		// Detect resultion we will do this regardless of ... using mobile layouts
 		if ($fparams->get('use_mobile_layouts') || $app->isAdmin()) $this->detectClientResolution($fparams);
 		
@@ -906,6 +909,144 @@ class plgSystemFlexisystem extends JPlugin
 		$db->query();
 	}
 	
+	
+	
+	function countHit() {
+		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		if ( ($option=='com_flexicontent' && $view==FLEXI_ITEMVIEW) || ($option=='com_content' && $view=='article') ) {
+			$item_id = JRequest::getInt('id');
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+			if ( $item_id && $this->count_new_hit($item_id) )
+			{
+				$db = JFactory::getDBO();
+				$db->setQuery('UPDATE #__content SET hits=hits+1 WHERE id = '.$item_id );
+				$db->query();
+				$db->setQuery('UPDATE #__flexicontent_items_tmp SET hits=hits+1 WHERE id = '.$item_id );
+				$db->query();
+			}
+		} else if (FLEXI_J16GE && $option=='com_flexicontent' &&  $view=='category') {
+			$cat_id = JRequest::getInt('cid');
+			$layout = JRequest::getVar('layout');
+			if (FLEXI_J16GE && $cat_id && empty($layout)) {
+				$hit_accounted = false;
+				$hit_arr = array();
+				$session = JFactory::getSession();
+				if ($session->has('cats_hit', 'flexicontent')) {
+					$hit_arr 	= $session->get('cats_hit', array(), 'flexicontent');
+					$hit_accounted = isset($hit_arr[$cat_id]);
+				}
+				if (!$hit_accounted) {
+					//add hit to session hit array
+					$hit_arr[$cat_id] = $timestamp = time();  // Current time as seconds since Unix epoc;
+					$session->set('cats_hit', $hit_arr, 'flexicontent');
+					$db = JFactory::getDBO();
+					$db->setQuery('UPDATE #__categories SET hits=hits+1 WHERE id = '.$cat_id );
+					$db->query();
+				}
+			}
+		}
+	}
+	
+	
+	function count_new_hit($item_id) // If needed to modify params then clone them !! ??
+	{
+		$params = JComponentHelper::getParams( 'com_flexicontent' );
+		if (!$params->get('hits_count_unique', 0)) return 1; // Counting unique hits not enabled
+
+		$db = JFactory::getDBO();
+		$visitorip = $_SERVER['REMOTE_ADDR'];  // Visitor IP
+		$current_secs = time();  // Current time as seconds since Unix epoch
+		if ($item_id==0) {
+			JFactory::getApplication()->enqueueMessage(nl2br("Invalid item id or item id is not set in http request"),'error');
+			return 1; // Invalid item id ?? (do not try to decrement hits in content table)
+		}
+
+
+		// CHECK RULE 1: Skip if visitor is from the specified ips
+		$hits_skip_ips = $params->get('hits_skip_ips', 1);   // Skip ips enabled
+		$hits_ips_list = $params->get('hits_ips_list', '127.0.0.1');  // List of ips, by default localhost
+		if($hits_skip_ips)
+		{
+			// consider as blocked ip , if remote address is not set (is this correct behavior?)
+			if( !isset($_SERVER['REMOTE_ADDR']) ) return 0;
+
+			$remoteaddr = $_SERVER['REMOTE_ADDR'];
+			$ips_array = explode(",", $hits_ips_list);
+			foreach($ips_array as $blockedip)
+			{
+				if (preg_match('/'.trim($blockedip).'/i', $remoteaddr)) return 0;  // found blocked ip, do not count new hit
+			}
+		}
+
+
+		// CHECK RULE 2: Skip if visitor is a bot
+		$hits_skip_bots = $params->get('hits_skip_bots', 1);  // Skip bots enabled
+		$hits_bots_list = $params->get('hits_bots_list', 'bot,spider,crawler,search,libwww,archive,slurp,teoma');   // List of bots
+		if($hits_skip_bots)
+		{
+			// consider as bot , if user agent name is not set (is this correct behavior?)
+			if( !isset($_SERVER['HTTP_USER_AGENT']) ) return 0;
+
+			$useragent = $_SERVER['HTTP_USER_AGENT'];
+			$bots_array = explode(",", $hits_bots_list);
+			foreach($bots_array as $botname)
+			{
+				if (preg_match('/'.trim($botname).'/i', $useragent)) return 0;  // found bot, do not count new hit
+			}
+		}
+
+		// CHECK RULE 3: item hit does not exist in current session
+		$hit_method = 'use_session';  // 'use_db_table', 'use_session'
+		if ($hit_method == 'use_session') {
+			$session 	= JFactory::getSession();
+			$hit_accounted = false;
+			$hit_arr = array();
+			if ($session->has('hit', 'flexicontent')) {
+				$hit_arr 	= $session->get('hit', array(), 'flexicontent');
+				$hit_accounted = isset($hit_arr[$item_id]);
+			}
+			if (!$hit_accounted) {
+				//add hit to session hit array
+				$hit_arr[$item_id] = $timestamp = time();  // Current time as seconds since Unix epoc;
+				$session->set('hit', $hit_arr, 'flexicontent');
+				return 1;
+			}
+
+		} else {  // ALTERNATIVE METHOD (above is better, this will be removed?), by using db table to account hits, instead of user session
+
+			// CHECK RULE 3: minimum time to consider as unique visitor aka count hit
+			$secs_between_unique_hit = 60 * $params->get('hits_mins_to_unique', 10);  // Seconds between counting unique hits from an IP
+
+			// Try to find matching records for visitor's IP, that is within time limit of unique hit
+			$query = "SELECT COUNT(*) FROM #__flexicontent_hits_log WHERE ip=".$db->quote($visitorip)." AND (timestamp + ".$db->quote($secs_between_unique_hit).") > ".$db->quote($current_secs). " AND item_id=". $item_id;
+			$db->setQuery($query);
+			$result = $db->query();
+			if ($db->getErrorNum()) {
+				$query_create = "CREATE TABLE #__flexicontent_hits_log (item_id INT PRIMARY KEY, timestamp INT NOT NULL, ip VARCHAR(16) NOT NULL DEFAULT '0.0.0.0')";
+				$db->setQuery($query_create);
+				$result = $db->query();
+				if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
+				return 1; // on select error e.g. table created, count a new hit
+			}
+			$count = $db->loadResult();
+
+			// Log the visit into the hits logging db table
+			if(empty($count))
+			{
+				$query = "INSERT INTO #__flexicontent_hits_log (item_id, timestamp, ip) "
+						."  VALUES (".$db->quote($item_id).", ".$db->quote($current_secs).", ".$db->quote($visitorip).")"
+						." ON DUPLICATE KEY UPDATE timestamp=".$db->quote($current_secs).", ip=".$db->quote($visitorip);
+				$db->setQuery($query);
+				$result = $db->query();
+				if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+				return 1;  // last visit not found or is beyond time limit, count a new hit
+			}
+		}
+
+		// Last visit within time limit, do not count new hit
+		return 0;
+	}
 	
 	
 	// ***********************

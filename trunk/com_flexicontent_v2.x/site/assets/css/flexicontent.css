@@ -747,20 +747,19 @@ ul.fc_field_filter.fc_checkradio_group label {
 	display:inline-block;
 	float:left;
 	padding: 8px 0px;
-	margin-right:24px;
 }
 
-#flexicontent .item_total .item_total_label {
-	display: inline-block;
-	float:left;
-	margin-right: 6px;
-	font-weight: bold;
+#flexicontent .item_total .flexi.item_total_label {
+	display: inline-block !important;
+	float:left !important;
+	margin-right: 6px !important;
+	font-weight: bold !important;
 }
 
-#flexicontent .item_total .item_total_value {
-	display: inline-block;
-	float:left;
-	margin-right: 24px;
+#flexicontent .item_total .flexi.item_total_value {
+	display: inline-block !important;
+	float:left !important;
+	margin-right: 24px !important;
 }
 
 /* Containers of per page limit selector and order by selector */

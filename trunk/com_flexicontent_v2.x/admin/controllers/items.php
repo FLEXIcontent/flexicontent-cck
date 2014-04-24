@@ -42,13 +42,6 @@ class FlexicontentControllerItems extends FlexicontentController
 		$this->registerTask( 'add',					'edit' );
 		$this->registerTask( 'apply', 			'save' );
 		$this->registerTask( 'saveandnew', 	'save' );
-		$this->registerTask( 'cancel', 			'cancel' );
-		$this->registerTask( 'copymove',		'copymove' );
-		$this->registerTask( 'restore', 		'restore' );
-		$this->registerTask( 'import', 			'import' );
-		$this->registerTask( 'bindextdata', 		'bindextdata' );
-		$this->registerTask( 'approval', 				'approval' );
-		$this->registerTask( 'getversionlist',	'getversionlist');
 		if (!FLEXI_J16GE) {
 			$this->registerTask( 'accesspublic',		'access' );
 			$this->registerTask( 'accessregistered','access' );
@@ -923,23 +916,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	}
 	
 	
-	/**
-	 * Bind fields, category relations and items_ext data to Joomla! com_content imported articles
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.5
-	 */
-	function bindextdata()
-	{
-		$extdata 	= JRequest::getInt('extdata', '');		
-		$model 		= $this->getModel('items');
-		$rows 		= $model->getUnassociatedItems($extdata, $_ids_only=false);
-		
-		echo ($model->addFlexiData($rows));
-	}
-	
-	
+
 	/**
 	 * Logic to change state of multiple items
 	 *

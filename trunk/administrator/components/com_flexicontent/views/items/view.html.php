@@ -42,7 +42,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$option   = JRequest::getCmd( 'option' );
 		$task     = JRequest::getVar('task', '');
 		$cid      = JRequest::getVar('cid', array());
-		$extlimit = JRequest::getInt('extlimit', 500);
+		$bind_limit = JRequest::getInt('bind_limit', 1000);
 		
 		$session = JFactory::getSession();
 		$fileid_to_itemids = $session->get('fileid_to_itemids', array(),'flexicontent');
@@ -305,7 +305,8 @@ class FlexicontentViewItems extends JViewLegacy {
 		// ***********************
 		
 		$model = $this->getModel();
-		$unassociated	= $model->getUnassociatedItems(1000000, $_ids_only=true);
+		$badcatitems  = (int) $model->getUnboundedItems($limit=10000000, $count_only=true, $checkNoExtData=false, $checkInvalidCat=true);
+		$unassociated = (int) $model->getUnboundedItems($limit=10000000, $count_only=true, $checkNoExtData=true, $checkInvalidCat=false);
 		
 		$rows     	= $this->get( 'Data');
 		$pagination	= $this->get( 'Pagination' );
@@ -329,7 +330,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		// Add usability notices if these are enabled
 		// ******************************************
 		
-		if ( $cparams->get('show_usability_messages', 1)  && !$unassociated )     // Important usability messages
+		if ( $cparams->get('show_usability_messages', 1)  && !$unassociated && !$badcatitems)     // Important usability messages
 		{
 			$notice_iss_disabled = $app->getUserStateFromRequest( $option.'.items.notice_iss_disabled',	'notice_iss_disabled',	0, 'int' );
 			if (!$notice_iss_disabled && $limit > $inline_ss_max) {
@@ -441,7 +442,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		//build authors select list
 		$lists['filter_authors'] = flexicontent_html::buildauthorsselect($authors, 'filter_authors', $filter_authors, true, 'class="inputbox" size="1" onchange="submitform( );"');
 
-		if ($unassociated) $lists['default_cat'] = flexicontent_cats::buildcatselect($categories, 'default_cat', '', 2, 'class="inputbox"', false, false);
+		if ($badcatitems) $lists['default_cat'] = flexicontent_cats::buildcatselect($categories, 'default_cat', '', 2, 'class="inputbox"', false, false);
 		
 		//search filter
 		$scopes = array();
@@ -479,16 +480,14 @@ class FlexicontentViewItems extends JViewLegacy {
 		$lists['enddate'] 	= JHTML::_('calendar', $enddate, 'enddate', 'enddate', '%Y-%m-%d', array('class'=>'inputbox', 'size'=>'11',  'maxlength'=>'20'));
 
 		// search filter
-		$extdata = array();
-		$extdata[] = JHTML::_('select.option', 100, '100 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 250, '200 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 500, '500 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 1000,'1000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 2000,'2000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 3000,'3000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 4000,'4000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$extdata[] = JHTML::_('select.option', 5000,'5000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$lists['extdata'] = JHTML::_('select.genericlist', $extdata, 'extdata', 'size="1" class="inputbox"', 'value', 'text', $extlimit );
+		$bind_limits = array();
+		$bind_limits[] = JHTML::_('select.option', 250, '250 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$bind_limits[] = JHTML::_('select.option', 500, '500 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$bind_limits[] = JHTML::_('select.option', 750, '750 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$bind_limits[] = JHTML::_('select.option', 1000,'1000 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$bind_limits[] = JHTML::_('select.option', 1500,'1500 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$bind_limits[] = JHTML::_('select.option', 2000,'2000 ' . JText::_( 'FLEXI_ITEMS' ) );
+		$lists['bind_limits'] = JHTML::_('select.genericlist', $bind_limits, 'bind_limit', 'size="1" class="inputbox"', 'value', 'text', $bind_limit, 'bind_limit' );
 
 		// search filter
 		$lists['search'] = $search;
@@ -539,6 +538,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$this->assignRef('CanCats'		, $CanCats);
 		$this->assignRef('CanRights'	, $CanRights);
 		$this->assignRef('unassociated'	, $unassociated);
+		$this->assignRef('badcatitems'	, $badcatitems);
 		// filters
 		$this->assignRef('filter_id'			, $filter_id);
 		$this->assignRef('filter_state'		, $filter_state);

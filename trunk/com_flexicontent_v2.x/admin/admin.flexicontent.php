@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: admin.flexicontent.php 1827 2013-12-26 08:19:22Z ggppdk $ 
+ * @version 1.5 stable $Id: admin.flexicontent.php 1882 2014-04-06 19:24:37Z ggppdk $ 
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -37,6 +37,13 @@ if ( $print_logging_info ) {
 	$fc_jprof->mark('START: FLEXIcontent component');
 }
 
+$force_print = false;
+/*if (JRequest::getCmd('format', null)!="raw") {
+	$session = JFactory::getSession();
+	$postinst_integrity_ok = $session->get('flexicontent.postinstall');
+	$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
+	$force_print = $postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave;
+}*/
 
 
 // ********************************
@@ -206,7 +213,7 @@ $controller->execute( JRequest::getCmd('task') );
 // Enqueue PERFORMANCE statistics as a message BUT  NOT if in RAW FORMAT or COMPONENT only views
 // *********************************************************************************************
 
-if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::getWord('format')!='raw')
+if ( ($force_print || $print_logging_info) && JRequest::getWord('tmpl')!='component' && JRequest::getWord('format')!='raw')
 {
 	
 	// ***************************************
@@ -236,17 +243,21 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 		
 		
 	if (isset($fc_run_times['post_installation_tasks']))
-		$msg .= sprintf('<br/>-- [Post installation task: %.2f s] ', $fc_run_times['post_installation_tasks']/1000000);
+		$msg .= sprintf('<br/>-- [Post installation / DB intergrity TASKs: %.2f s] ', $fc_run_times['post_installation_tasks']/1000000);
 		
 			$msg .= '<small>';
 			if (isset($fc_run_times['getExistMenuItems']))
-				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Default menu items exist: %.2f s ', $fc_run_times['getExistMenuItems']/1000000);
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Default menu item for URLs : %.2f s ', $fc_run_times['getExistMenuItems']/1000000);
 			if (isset($fc_run_times['getItemsNoLang']))
-				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items with no Language: %.2f s ', $fc_run_times['getItemsNoLang']/1000000);
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items language and translation associations: %.2f s ', $fc_run_times['getItemsNoLang']/1000000);
+			if (isset($fc_run_times['getItemsNoCat']))
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items multi-category relations: %.2f s ', $fc_run_times['getItemsNoCat']/1000000);
+			if (isset($fc_run_times['checkCurrentVersionData']))
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items current version data: %.2f s ', $fc_run_times['checkCurrentVersionData']/1000000);
 			if (isset($fc_run_times['getItemCountingDataOK']))
-				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Item temporary accounting data: %.2f s ', $fc_run_times['getItemCountingDataOK']/1000000);
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Items temporary accounting data: %.2f s ', $fc_run_times['getItemCountingDataOK']/1000000);
 			if (isset($fc_run_times['checkInitialPermission']))
-				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - Check initial permissions: %.2f s ', $fc_run_times['checkInitialPermission']/1000000);
+				$msg .= sprintf('<br/>&nbsp; &nbsp; &nbsp; - ACL initial permissions: %.2f s ', $fc_run_times['checkInitialPermission']/1000000);
 			$msg .= '</small>';
 	
 	

@@ -1418,6 +1418,7 @@ class FlexicontentFields
 				$d[$field->id][$varname]['propname']  = $field_matches[5];
 			} else {
 				$d[$field->id][$varname]['fulltxt']   = array();
+				$d[$field->id][$varname]['valueno']   = false;
 			}
 			
 			$result = preg_match_all("/\{\{(item->)([a-zA-Z_0-9]+)\}\}/", $variable, $field_matches);
@@ -1450,8 +1451,13 @@ class FlexicontentFields
 			}
 			
 			$is_indexable = $propname && preg_match("/^_([a-zA-Z_0-9]+)_$/", $propname, $prop_matches) && ($propname = $prop_matches[1]);
-			if ( $is_indexable )
-			{
+			if ($fieldid <= 14 ) {
+				if ($fieldid==13) {
+					$value = @ $item->categories[$valueno]->{$propname};
+				} else if ($fieldid==14) {
+					$value = @ $item->tags[$valueno]->{$propname};
+				}
+			} else if ( $is_indexable ) {
 				if ( $propname!='value' ) // no need for value to retrieve custom elements
 				{
 					$extra_props = $propname!='text' ? array($propname) : array();  // this will work only if field has a single extra property
@@ -1469,6 +1475,7 @@ class FlexicontentFields
 			$variable = str_replace($fulltxt, $value, $variable);
 			//echo "<pre>"; print_r($item->fieldvalues[$fieldid]); echo "</pre>"; echo "Replaced $fulltxt with ITEM field VALUE: $value <br>";
 		}
+		
 		
 		// Replace variable
 		foreach($c[$field->id][$varname]['fulltxt'] as $i => $fulltxt)
@@ -2563,7 +2570,8 @@ class FlexicontentFields
 			
 			if ($item_ids_list === null || $item_ids_sub_query === null) {
 				$sub_query = 'SELECT DISTINCT i.id '."\n"
-					. ' FROM #__content AS i'."\n"
+					//. ' FROM #__content AS i'."\n"
+					. ' FROM #__flexicontent_items_tmp AS i'."\n"
 					. $view_join."\n"
 					. $view_where."\n"
 					;
@@ -2934,10 +2942,12 @@ class FlexicontentFields
 		$cache = JFactory::getCache('com_flexicontent');
 		$cache->clean();
 		
+		$filter_prefix = ($form_name == 'item_form' ? 'iform_' : '') .'filter_';
+		
 		$display_label_filter_override = (int) $params->get('show_filter_labels', 0);
 		foreach ($filters as $filter_name => $filter)
 		{
-			$filtervalue = JRequest::getVar('filter_'.$filter->id, '', 'default');
+			$filtervalue = JRequest::getVar($filter_prefix.$filter->id, '', 'default');
 			//print_r($filtervalue);
 			
 			// make sure filter HTML is cleared, and create it

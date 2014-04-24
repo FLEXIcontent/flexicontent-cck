@@ -176,20 +176,20 @@ class FlexicontentController extends JControllerLegacy
 		$model  = $this->getModel('flexicontent');
 		$params = JComponentHelper::getParams('com_flexicontent');
 		$use_versioning = $params->get('use_versioning', 1);
-					if ( $print_logging_info ) @$fc_run_times['checking_postinstall_task_init'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+				if ( $print_logging_info ) @$fc_run_times['checking_postinstall_task_init'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [checking_postinstall_task_init: %.2f s] ', $fc_run_times['checking_postinstall_task_init']/1000000);
 
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existmenuitems	= $model->getExistMenuItems();
 				if ( $print_logging_info ) @$fc_run_times['getExistMenuItems'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getExistMenuItems: %.2f s] ', $fc_run_times['getExistMenuItems']/1000000);
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existtype 			= $model->getExistType();
 				if ( $print_logging_info ) @$fc_run_times['getExistType'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getExistType: %.2f s] ', $fc_run_times['getExistType']/1000000);
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existfields 		= $model->getExistFields();
 				if ( $print_logging_info ) @$fc_run_times['getExistFields'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getExistFields: %.2f s] ', $fc_run_times['getExistFields']/1000000);
@@ -199,73 +199,73 @@ class FlexicontentController extends JControllerLegacy
 				if ( $print_logging_info ) @$fc_run_times['getExistFieldsPlugins'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getExistFieldsPlugins: %.2f s] ', $fc_run_times['getExistFieldsPlugins']/1000000);
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existseplg 		= $model->getExistSearchPlugin();
 				if ( $print_logging_info ) @$fc_run_times['getExistSearchPlugin'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getExistSearchPlugin: %.2f s] ', $fc_run_times['getExistSearchPlugin']/1000000);
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existsyplg 		= $model->getExistSystemPlugin();
 				if ( $print_logging_info ) @$fc_run_times['getExistSystemPlugin'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getExistSystemPlugin: %.2f s] ', $fc_run_times['getExistSystemPlugin']/1000000);
 		
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existcats        = !$model->getItemsNoCat();
 				if ( $print_logging_info ) @$fc_run_times['getItemsNoCat'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getItemsNoCat: %.2f s] ', $fc_run_times['getItemsNoCat']/1000000);
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existlang				= $model->getExistLanguageColumn() && !$model->getItemsNoLang();
 				if ( $print_logging_info ) @$fc_run_times['getItemsNoLang'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getItemsNoLang: %.2f s] ', $fc_run_times['getItemsNoLang']/1000000);
 			
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existdbindexes = $model->getExistDBindexes();
 				if ( $print_logging_info ) @$fc_run_times['getExistDBindexes'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getExistDBindexes: %.2f s] ', $fc_run_times['getExistDBindexes']/1000000);
 		
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$itemcountingdok  = $model->getItemCountingDataOK();
 				if ( $print_logging_info ) @$fc_run_times['getItemCountingDataOK'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getItemCountingDataOK: %.2f s] ', $fc_run_times['getItemCountingDataOK']/1000000);
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existversions 		= $model->getExistVersionsTable();
 				if ( $print_logging_info ) @$fc_run_times['getExistVersionsTable'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getExistVersionsTable: %.2f s] ', $fc_run_times['getExistVersionsTable']/1000000);
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existversionsdata= !$use_versioning || $model->getExistVersionsPopulated();
 				if ( $print_logging_info ) @$fc_run_times['getExistVersionsPopulated'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getExistVersionsPopulated: %.2f s] ', $fc_run_times['getExistVersionsPopulated']/1000000);
 		
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$existauthors 		= $model->getExistAuthorsTable();
 				if ( $print_logging_info ) @$fc_run_times['getExistAuthorsTable'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getExistAuthorsTable: %.2f s] ', $fc_run_times['getExistAuthorsTable']/1000000);
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$cachethumb				= $model->getCacheThumbChmod();
 				if ( $print_logging_info ) @$fc_run_times['getCacheThumbChmod'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getCacheThumbChmod: %.2f s] ', $fc_run_times['getCacheThumbChmod']/1000000);
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
-		$oldbetafiles			= $model->getOldBetaFiles();
+				if ( $print_logging_info ) $start_microtime = microtime(true);
+		$oldbetafiles			= true; //$model->getOldBetaFiles();
 				if ( $print_logging_info ) @$fc_run_times['getOldBetaFiles'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getOldBetaFiles: %.2f s] ', $fc_run_times['getOldBetaFiles']/1000000);
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$nooldfieldsdata	= $model->getNoOldFieldsData();
 				if ( $print_logging_info ) @$fc_run_times['getNoOldFieldsData'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getNoOldFieldsData: %.2f s] ', $fc_run_times['getNoOldFieldsData']/1000000);
 			
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 				if ( $print_logging_info ) @$fc_run_times['checkCurrentVersionData'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [checkCurrentVersionData: %.2f s] ', $fc_run_times['checkCurrentVersionData']/1000000);
 		
-			 if ( $print_logging_info ) $start_microtime = microtime(true);
+				if ( $print_logging_info ) $start_microtime = microtime(true);
 		$initialpermission = FLEXI_J16GE ? $model->checkInitialPermission() : true;
 				if ( $print_logging_info ) @$fc_run_times['checkInitialPermission'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [checkInitialPermission: %.2f s] ', $fc_run_times['checkInitialPermission']/1000000);
@@ -617,12 +617,21 @@ VALUES
 		$db->setQuery($query);
 		$result1 = $db->query();
 		
-		$query 	= 'UPDATE #__content'
+		$query 	= 'UPDATE #__flexicontent_items_tmp'
 				. ' SET language = ' . $db->Quote($lang)
 				. ' WHERE language = ""'
 				;
 		$db->setQuery($query);
-		$result2 = $db->query();
+		$result1a = $db->query();
+		
+		if (FLEXI_J16GE) {
+			$query 	= 'UPDATE #__content'
+					. ' SET language = ' . $db->Quote($lang)
+					. ' WHERE language = ""'
+					;
+			$db->setQuery($query);
+			$result2 = $db->query();
+		}
 		
 		// Set default translation group for items that don't have one
 		$query 	= 'UPDATE #__flexicontent_items_ext'
@@ -632,7 +641,7 @@ VALUES
 		$db->setQuery($query);
 		$result3 = $db->query();
 		
-		return $result1 && $result2 && $result3;
+		return $result1 && $result1a && $result2 && $result3;
 	}
 	
 	/**
@@ -733,29 +742,49 @@ VALUES
 	{
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
-
+		
 		$db = JFactory::getDBO();
 		$nullDate	= $db->getNullDate();
 		
 		$model  = $this->getModel('flexicontent');
-		$existdbindexes = $model->getExistDBindexes();
-		if (!$existdbindexes) {
+		$missing_indexes = $model->getExistDBindexes($check_only=false);
+		if ( !empty($missing_indexes) ) {
 			$app = JFactory::getApplication();
 			$dbprefix = $app->getCfg('dbprefix');
 			
-			$query	= "ALTER TABLE `".$dbprefix."flexicontent_fields_item_relations` ADD INDEX value(`value`(32))";
-			$db->setQuery($query);
-			
-			if (!$db->query()) {
-				echo '<span class="install-notok"></span><span class="button-add"><a id="existauthors" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
-			} else {
-				echo '<span class="install-ok"></span>';
+			foreach($missing_indexes as $tblname => $indexnames)
+			{
+				$index_cols = array();
+				if ( isset($indexnames['__indexing_started__']) ) continue;
+				foreach($indexnames as $indexname => $size) {
+					$size_str = $size ? "(".$size.")" : "";
+					$index_cols[]	= " ADD INDEX ".$indexname."(`".$indexname."`" .$size_str. ")";
+				}
+				
+				// For MyISAM the table is copied for the purpose of adding indexes and then old table is dropped
+				// so it is better to add ALL table indexes via single command ?
+				// For InnoDB in MySQL 5.1+, table is not copied so these when adding indexes it is better to have InnoDB tables
+				if ( !empty($index_cols) ) {
+					$file = JPATH_SITE.DS.'tmp'.DS.'tbl_indexes_'.$tblname;
+					$file_contents = "".time();
+					JFile::write($file, $file_contents);
+					
+					$query  = "ALTER TABLE `".$dbprefix.$tblname."` ";
+					$query .= implode(', ', $index_cols);
+					$db->setQuery($query);
+					if (!$db->query()) {
+						echo '<span class="install-notok"></span><span class="button-add"><a id="existdbindexes" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+						exit;
+					}
+					JFile::delete($file);
+				}
 			}
+			echo '<span class="install-ok"></span>';
 		} else {
 			echo '<span class="install-ok"></span>';
 		}
 	}
-		
+	
 	
 	/**
 	 * Method to update content into non-indexed columns
@@ -779,8 +808,15 @@ VALUES
 		
 		// Get the column names
 		$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
+		$tbl_fields_sel = array();
+		foreach ($tbl_fields as $tbl_field) {
+			if ( (!FLEXI_J16GE && $tbl_field=='language') || $tbl_field=='type_id')
+				$tbl_fields_sel[] = 'ie.'.$tbl_field;
+			else
+				$tbl_fields_sel[] = 'c.'.$tbl_field;
+		}
 		
-		// Truncate the table
+		// Truncate the table, this will handle redudant columns too
 		$db->setQuery('TRUNCATE TABLE '.$cache_tbl);
 		$db->query();
 		
@@ -790,9 +826,9 @@ VALUES
 		$query .= ") SELECT ";
 		
 		$cols_select = array();
-		$query .= "`".implode("`, `", $tbl_fields)."`";
-		$query .= "FROM #__content";
-		$query .= (!FLEXI_J16GE ? " JOIN #__flexicontent_items_ext ON id=item_id" : "");
+		$query .= implode(", ", $tbl_fields_sel);
+		$query .= " FROM #__content AS c";
+		$query .= " JOIN #__flexicontent_items_ext AS ie ON c.id=ie.item_id";
 		
 		$db->setQuery($query);
 		

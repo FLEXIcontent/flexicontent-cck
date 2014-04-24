@@ -64,6 +64,24 @@ class FlexicontentModelCategories extends JModelList
 		$this->_data = null;
 	}
 
+
+	function getAssignedItems($cids) {
+		if (empty($cids)) return array();
+		
+		$db = JFactory::getDBO();
+		
+		// Select the required fields from the table.
+		$query  = " SELECT catid, COUNT(rel.catid) AS nrassigned";
+		$query .= " FROM #__flexicontent_cats_item_relations AS rel";
+		$query .= " WHERE catid IN (".implode(",", $cids).") ";
+		$query .= " GROUP BY rel.catid";
+		
+		$db->setQuery( $query );
+		$assigned = $db->loadObjectList('catid');
+		return $assigned;
+	}
+	
+	
 	/**
 	 * Method to get the query used to retrieve categories data
 	 *
@@ -99,13 +117,12 @@ class FlexicontentModelCategories extends JModelList
 		$query->select(
 			$this->getState(
 				'list.select',
-				'c.*, u.name AS editor, level.title AS access_level, COUNT(rel.catid) AS nrassigned, c.params as config, ag.title AS access_level '
+				'c.*, u.name AS editor, level.title AS access_level, c.params as config, ag.title AS access_level '
 			)
 		);
 		$query->from('#__categories AS c');
 		$query->select('l.title AS language_title');
 		$query->join('LEFT', '#__languages AS l ON l.lang_code = c.language');
-		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.catid = c.id');
 		$query->join('LEFT', '#__viewlevels as level ON level.id=c.access');
 		$query->join('LEFT', '#__users AS u ON u.id = c.checked_out');
 		$query->join('LEFT', '#__viewlevels AS ag ON ag.id = c.access');

@@ -197,7 +197,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// MENU ITEM matched, use its page title (=browser window title) and its page heading
 		if ( $menu_matches ) {
-			$params->def('page_title', $menu->title);  // default value for page title is menu item title
+			$params->def('page_title', FLEXI_J16GE ? $menu->title : $menu->name);  // default value for page title is menu item title
 			$params->def('page_heading', $params->get('page_title')); // default value for page heading is the page title
 			// Cross set show_page_heading and show_page_title for J1.5 template compatibility, (J1.5 used 'show_page_title'),
 			// also default to zero in order to prevent templates from use 1 as default value
@@ -806,8 +806,12 @@ class FlexicontentViewCategory extends JViewLegacy
 			$this->addTemplatePath(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$clayout);
 		}
 		
-		// Increment hits counter ONLY once per user visit
-		if (FLEXI_J16GE && $category->id && empty($layout)) {
+		
+		// **************************************************
+		// increment the hit counter ONLY once per user visit
+		// **************************************************
+		// MOVED to flexisystem plugin due to ...
+		/*if (FLEXI_J16GE && $category->id && empty($layout)) {
 			$hit_accounted = false;
 			$hit_arr = array();
 			if ($session->has('cats_hit', 'flexicontent')) {
@@ -820,7 +824,7 @@ class FlexicontentViewCategory extends JViewLegacy
 				$session->set('cats_hit', $hit_arr, 'flexicontent');
 				$this->getModel()->hit();
 			}
-		}
+		}*/
 		
 		$print_logging_info = $params->get('print_logging_info');
 		if ( $print_logging_info ) { global $fc_run_times; $start_microtime = microtime(true); }

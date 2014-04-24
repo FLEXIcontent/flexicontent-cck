@@ -470,7 +470,10 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				$rootcatid = $filter->parameters->get( 'rootcatid', '' ) ;
 				$option = JRequest::getVar('option', '');
 				$view   = JRequest::getVar('view', '');
-				$cid    = JRequest::getInt('cid', '');
+				$cid    = JFactory::getApplication()->isSite() ? JRequest::getInt('cid', '') : 0;
+				/*$cid = JRequest::getVar( 'cid', array(0), $hash='default', 'array' );
+				JArrayHelper::toInteger($cid, array(0));*/
+				
 				if ($option=='com_flexicontent' && $view=='category' && $cid) {   // Current view is category view limit to descendants
 					$options[] = JHTML::_('select.option', $globalcats[$cid]->id, $globalcats[$cid]->treename);
 					$cats = $globalcats[$cid]->childrenarray;

@@ -71,6 +71,24 @@ class FlexicontentModelCategories extends JModelLegacy
 		$this->_data = null;
 	}
 
+
+	function getAssignedItems($cids) {
+		if (empty($cids)) return array();
+		
+		$db = JFactory::getDBO();
+		
+		// Select the required fields from the table.
+		$query  = " SELECT catid, COUNT(rel.catid) AS nrassigned";
+		$query .= " FROM #__flexicontent_cats_item_relations AS rel";
+		$query .= " WHERE catid IN (".implode(",", $cids).") ";
+		$query .= " GROUP BY rel.catid";
+		
+		$db->setQuery( $query );
+		$assigned = $db->loadObjectList('catid');
+		return $assigned;
+	}
+	
+	
 	/**
 	 * Method to get categories data
 	 *
@@ -151,10 +169,9 @@ class FlexicontentModelCategories extends JModelLegacy
 			$search_rows = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();					
 		}
 		
-		$query = 'SELECT c.*, u.name AS editor, COUNT(rel.catid) AS nrassigned, c.params as config, '
+		$query = 'SELECT c.*, u.name AS editor, c.params as config, '
 					. (FLEXI_J16GE ? 'level.title AS access_level' : 'g.name AS groupname')
 					. ' FROM #__categories AS c'
-					. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.catid = c.id'
 					. (FLEXI_J16GE ?
 					  ' LEFT JOIN #__viewlevels AS level ON level.id=c.access' :
 					  ' LEFT JOIN #__groups AS g ON g.id = c.access'

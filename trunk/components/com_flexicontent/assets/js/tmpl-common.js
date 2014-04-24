@@ -390,10 +390,7 @@ jQuery(document).ready(function() {
 				return { results: data.Matches, more: more };
 			}
 		}
-	})/*.on('change', function(){
-		alert(jQuery(this).val());
-	})*/;
-		
+	});
 	
 	jQuery('body').prepend(
 	 	"<span id='fc_filter_form_blocker'>" +
@@ -403,5 +400,15 @@ jQuery(document).ready(function() {
 	    	"<div class='fc_blocker_bar'><div></div></div>" +
 	    "</span>" +
 	  "</span>");
+
+	/* recalculate window  scrollbars */
+	document.documentElement.style.overflow = "hidden";
+	document.body.style.overflow = "hidden";
+	//document.body.scroll = "no"; // ie only
+	setTimeout(function() {
+		//document.body.style.overflow = "auto";
+		//document.body.scroll = "yes"; // ie only
+		document.documentElement.style.overflow = "auto";  // firefox, chrome
+	}, 100);
 
 });

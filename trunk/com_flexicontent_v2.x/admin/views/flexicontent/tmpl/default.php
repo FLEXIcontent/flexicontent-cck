@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1665 2013-04-08 02:26:21Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1874 2014-03-18 20:55:22Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -37,7 +37,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 
 ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
-	<table cellspacing="0" cellpadding="0" border="0" width="100%">
+	<table cellspacing="0" cellpadding="0" border="0" width="">
 		<tr>
 			<td valign="top">
 			<table class="adminlist">
@@ -220,8 +220,10 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 					</td>
 				</tr>
 			</table>
+			<?php if ($this->dopostinstall && $this->allplgpublish) : ?>
 			</td>
-			<td valign="top" width="420px" style="padding: 7px 0 0 5px">
+			<td valign="top" width="520px" style="padding: 7px 0 0 5px">
+			<?php endif; ?>
 			<?php
 			echo FLEXI_J16GE ? JHtml::_('sliders.start') : $this->pane->startPane( 'stat-pane' );
 			if (!$this->dopostinstall || !$this->allplgpublish) {

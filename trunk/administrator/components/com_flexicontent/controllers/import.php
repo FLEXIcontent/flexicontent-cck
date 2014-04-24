@@ -625,6 +625,9 @@ class FlexicontentControllerImport extends FlexicontentController
 					$q = "UPDATE #__flexicontent_items_ext SET item_id='".$c_item_id."' WHERE item_id='".$item_id."'";
 					$db->setQuery($q);
 					$db->query();
+					$q = "UPDATE #__flexicontent_items_tmp SET id='".$c_item_id."' WHERE id='".$item_id."'";
+					$db->setQuery($q);
+					$db->query();
 					$q = "UPDATE #__flexicontent_tags_item_relations SET itemid='".$c_item_id."' WHERE itemid='".$item_id."'";
 					$db->setQuery($q);
 					$db->query();

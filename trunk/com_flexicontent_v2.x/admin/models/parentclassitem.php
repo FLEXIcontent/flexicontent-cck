@@ -890,7 +890,7 @@ class ParentClassItem extends JModelAdmin
 			$this->_item->metadata = $registry->toArray();
 			$this->_item->itemparams->merge($registry);
 		} else {
-			$attribs = $metadata = '';
+			$images = $urls = $attribs = $metadata = '';
 			$this->_item->attribs = array();
 			$this->_item->metadata = array();
 			$this->_item->images = array();

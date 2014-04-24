@@ -59,19 +59,32 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$allitems 	= 1;
 		}
 		
-		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier'
-				. ' FROM #__content as c'
+		$use_tmp = true;
+		$query_select_ids = 'SELECT c.id'; //SQL_CALC_FOUND_ROWS
+		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier';
+		
+		$query_from_join = ''
+				. ' FROM '.($use_tmp ? '#__flexicontent_items_tmp' : '#__content').' as c'
 				. ' LEFT JOIN #__users AS cr ON cr.id = c.created_by'
 				. ' LEFT JOIN #__users AS mr ON mr.id = c.modified_by'
+				;
+		$query_where_orderby_having = ''
 				. ' WHERE state = -3'
-				. ' AND sectionid = ' . (int)FLEXI_SECTION
+				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
-
-		$this->_db->SetQuery($query, 0, 5);
-		$genstats = $this->_db->loadObjectList();
 		
+		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
+		$this->_db->SetQuery($query, 0, 5);
+		$ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		
+		$genstats = array();
+		if ( !empty($ids) ) {
+			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')';
+			$this->_db->SetQuery($query, 0, 5);
+			$genstats = $this->_db->loadObjectList();
+		}
 		return $genstats;
 	}
 	
@@ -93,22 +106,35 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$allitems 	= 1;
 		}
 		
-		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier, c.version, MAX(fv.version_id) '
-				. ' FROM #__content AS c'
+		$use_tmp = true;
+		$query_select_ids = 'SELECT c.id'.', c.version, MAX(fv.version_id)'; //SQL_CALC_FOUND_ROWS
+		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier'.', c.version, MAX(fv.version_id)';
+		
+		$query_from_join = ''
+				. ' FROM '.($use_tmp ? '#__flexicontent_items_tmp' : '#__content').' as c'
 				. ' LEFT JOIN #__flexicontent_versions AS fv ON c.id=fv.item_id'
 				. ' LEFT JOIN #__users AS cr ON cr.id = c.created_by'
 				. ' LEFT JOIN #__users AS mr ON mr.id = c.modified_by'
+				;
+		$query_where_orderby_having = ''
 				. ' WHERE c.state = -5 OR c.state = 1'
-				. ' AND c.sectionid = ' . (int)FLEXI_SECTION
+				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' GROUP BY fv.item_id '
 				. ' HAVING c.version<>MAX(fv.version_id) '
 				. ' ORDER BY c.modified DESC'
 				;
-
-		$this->_db->SetQuery($query, 0, 5);
-		$genstats = $this->_db->loadObjectList();
 		
+		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
+		$this->_db->SetQuery($query, 0, 5);
+		$ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		
+		$genstats = array();
+		if ( !empty($ids) ) {
+			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')';
+			$this->_db->SetQuery($query, 0, 5);
+			$genstats = $this->_db->loadObjectList();
+		}
 		return $genstats;
 	}
 	
@@ -129,20 +155,33 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		} else {
 			$allitems 	= 1;
 		}
-
-		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier'
-				. ' FROM #__content as c'
+		
+		$use_tmp = true;
+		$query_select_ids = 'SELECT c.id'; //SQL_CALC_FOUND_ROWS
+		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier';
+		
+		$query_from_join = ''
+				. ' FROM '.($use_tmp ? '#__flexicontent_items_tmp' : '#__content').' as c'
 				. ' LEFT JOIN #__users AS cr ON cr.id = c.created_by'
 				. ' LEFT JOIN #__users AS mr ON mr.id = c.modified_by'
+				;
+		$query_where_orderby_having = ''
 				. ' WHERE state = -4'
-				. ' AND sectionid = ' . (int)FLEXI_SECTION
+				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
-
-		$this->_db->SetQuery($query, 0, 5);
-		$genstats = $this->_db->loadObjectList();
 		
+		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
+		$this->_db->SetQuery($query, 0, 5);
+		$ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		
+		$genstats = array();
+		if ( !empty($ids) ) {
+			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')';
+			$this->_db->SetQuery($query, 0, 5);
+			$genstats = $this->_db->loadObjectList();
+		}
 		return $genstats;
 	}
 
@@ -163,20 +202,33 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		} else {
 			$allitems 	= 1;
 		}
-
-		$query = 'SELECT SQL_CALC_FOUND_ROWS c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier'
-				. ' FROM #__content as c'
+		
+		$use_tmp = true;
+		$query_select_ids = 'SELECT c.id'; //SQL_CALC_FOUND_ROWS
+		$query_select_data = 'SELECT c.id, c.title, c.catid, c.created, cr.name as creator, c.created_by, c.modified, c.modified_by, mr.name as modifier';
+		
+		$query_from_join = ''
+				. ' FROM '.($use_tmp ? '#__flexicontent_items_tmp' : '#__content').' as c'
 				. ' LEFT JOIN #__users AS cr ON cr.id = c.created_by'
 				. ' LEFT JOIN #__users AS mr ON mr.id = c.modified_by'
+				;
+		$query_where_orderby_having = ''
 				. ' WHERE c.state = -5'
-				. ' AND sectionid = ' . (int)FLEXI_SECTION
+				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
 				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
-
-		$this->_db->SetQuery($query, 0, 5);
-		$genstats = $this->_db->loadObjectList();
 		
+		$query = $query_select_ids . $query_from_join . $query_where_orderby_having;
+		$this->_db->SetQuery($query, 0, 5);
+		$ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
+		
+		$genstats = array();
+		if ( !empty($ids) ) {
+			$query = $query_select_data . $query_from_join . ' WHERE c.id IN ('.implode(',',$ids).')';
+			$this->_db->SetQuery($query, 0, 5);
+			$genstats = $this->_db->loadObjectList();
+		}
 		return $genstats;
 	}
 	
@@ -479,7 +531,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	
 	
 	/**
-	 * Method to get if some items do not have their no index columns up to date with the main content table (these are used for item counting)
+	 * Method to get if temporary item data table is up-to-date
 	 * 
 	 * @access	public
 	 * @return	boolean	True on success
@@ -488,36 +540,41 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getItemCountingDataOK()
 	{
 		static $return;
-		if ($return === NULL) {
-			$db = JFactory::getDBO();
-			
-			// Find columns cached
-			$cache_tbl = "#__flexicontent_items_tmp";
-			$tbls = array($cache_tbl);
-			if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
-			else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
-			
-			// Get the column names
-			$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
-			
-			$query = "SELECT COUNT(*)"
-				. " FROM #__content AS i "
-				. " LEFT JOIN ".$cache_tbl." AS ca ON i.id=ca.id "
-				.(!FLEXI_J16GE ? " JOIN #__flexicontent_items_ext AS ext ON i.id = ext.item_id" : "")
-				. " WHERE ca.id IS NULL ";
-			foreach ($tbl_fields as $col_name) {
-				if ($col_name == "id" || $col_name == "hits") continue;
-				else if (!FLEXI_J16GE && $col_name == "language" )
-					$query .= " OR ext.`language`<>ca.`language`";
-				else
-					$query .= " OR i.`".$col_name."`<>ca.`".$col_name."`";
-			}
-			
-			$db->setQuery($query);
-			$return = $this->_db->loadResult() ? false : true;
-			if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
+		if ($return !== NULL) return $return;
+		
+		$db = JFactory::getDBO();
+		
+		// Find columns cached
+		$cache_tbl = "#__flexicontent_items_tmp";
+		$tbls = array($cache_tbl);
+		if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
+		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
+		
+		// Get the column names
+		$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
+		
+		$query = "SELECT COUNT(*) AS total1, (SELECT COUNT(*) FROM `#__content`".(!FLEXI_J16GE ? ' WHERE sectionid=' .FLEXI_SECTION : '').") AS total2"
+			." FROM `#__content` AS i"
+			." JOIN `#__flexicontent_items_tmp` AS ca ON i.id=ca.id"
+			." JOIN `#__flexicontent_items_ext` AS ie ON ie.item_id=i.id"
+			." WHERE 1 ";
+		;
+		foreach ($tbl_fields as $col_name) {
+			if ($col_name == "id") continue;  // || $col_name == "hits"
+			else if ($col_name == "type_id" )
+				$query .= " AND ie.`type_id`=ca.`type_id`";
+			else if (!FLEXI_J16GE && $col_name == "language" )
+				$query .= " AND ie.`language`=ca.`language`";
+			else
+				$query .= " AND i.`".$col_name."`=ca.`".$col_name."`";
 		}
 		
+		// Check missing in item counting table
+		$db->setQuery($query);
+		$res = $this->_db->loadObject();
+		if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
+		
+		$return = $res->total1 == $res->total2;
 		return $return;
 	}
 	
@@ -563,21 +620,59 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getExistDBindexes()
+	function getExistDBindexes($check_only=true)
 	{
-		static $return;
-		if ($return === NULL) {
-			$app = JFactory::getApplication();
-			$dbprefix = $app->getCfg('dbprefix');
-			$dbname = $app->getCfg('db');
+		static $missing;
+		if ($missing !== NULL) return $check_only ? empty($missing) : $missing;
+		
+		jimport('joomla.filesystem.file');
+		$app = JFactory::getApplication();
+		$dbprefix = $app->getCfg('dbprefix');
+		$dbname = $app->getCfg('db');
+		
+		$tblname_indexnames = array(
+			'flexicontent_items_ext'=>array('lang_parent_id'=>0),
+			'flexicontent_items_tmp'=>array('state'=>0, 'catid'=>0, 'created_by'=>0, 'access'=>0, 'featured'=>0, 'language'=>0, 'type_id'=>0),
+			'flexicontent_fields_item_relations'=>array('value'=>32),
+			'flexicontent_download_history'=>array('user_id'=>0, 'file_id'=>0),
+			'flexicontent_download_coupons'=>array('user_id'=>0, 'file_id'=>0, 'token'=>0, 'expire_on'=>0)
+		);
+		if (!FLEXI_J16GE) unset($tblname_indexnames['flexicontent_items_tmp']['featured']);
+		
+		$missing = array();
+		$all_started = true;
+		foreach($tblname_indexnames as $tblname => $indexnames) {
+			$indexing_started = false;
+			$file = JPATH_SITE.DS.'tmp'.DS.'tbl_indexes_'.$tblname;
+			if ( JFile::exists($file) ) {
+				$indexing_start_secs = (int)JFile::read($file);
+				$indexing_started = $indexing_start_secs + 3600 > time();
+				if (!$indexing_started) {
+					JFile::delete($file);
+				}
+			}
 			
-			$query = "SELECT COUNT(1) IndexIsThere "
-				." FROM INFORMATION_SCHEMA.STATISTICS"
-				." WHERE table_schema='".$dbname."' AND table_name='".$dbprefix."flexicontent_fields_item_relations' AND index_name='value'";
-			$this->_db->setQuery($query);
-			$return = $this->_db->loadResult() ? true : false;
+			foreach($indexnames as $indexname => $size) {
+				$query = "SELECT COUNT(1) IndexIsThere "
+					." FROM INFORMATION_SCHEMA.STATISTICS"
+					." WHERE table_schema='".$dbname."' AND table_name='".$dbprefix.$tblname."' AND index_name='".$indexname."'";
+				$this->_db->setQuery($query);
+				$exists = $this->_db->loadResult();
+				if ($indexing_started) {
+					if ($exists) {
+						JFile::delete($file);
+						continue;
+					}
+					else $missing[$tblname]['__indexing_started__'] = 1;
+				} else if (!$exists) {
+					$all_started = false;
+					$missing[$tblname][$indexname] = $size;
+				}
+			}
 		}
-		return $return;
+		
+		if ($all_started) $missing = array();  // Indexing for all tables has started, clear the 'missing' array ... so that post-installation task will not appear
+		return $check_only ? empty($missing) : $missing;
 	}
 	
 	
@@ -813,6 +908,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				
 			if ($count > 0) {
 				return true;
+			} else if (FLEXI_J16GE) {
+				die("Category table corrupted, SYSTEM root category not found");
 			} else {
 				// Save the created section as flexi_section for the component
 				$params = JComponentHelper::getParams('com_flexicontent');
@@ -1003,7 +1100,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$query = "SELECT c.id,c.catid,c.version,c.created,c.modified,c.created_by,c.introtext,c.`fulltext`"
 			." FROM #__content as c"
 			." WHERE sectionid='".FLEXI_SECTION."'"
-			.($item_id ? " AND id=".$item_id : "")
+			.($item_id ? " AND c.id=".$item_id : "")
 			;
 
 		$db->setQuery($query);

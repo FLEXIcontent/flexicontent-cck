@@ -447,7 +447,7 @@ jQuery(document).ready(function() {
 	
 	jQuery('#".$ri_field_name."_fccats').change(function() {
 		
-		var ".$ri_field_name."_fccats_val = jQuery('#".$ri_field_name."_fccats').attr('value');
+		var ".$ri_field_name."_fccats_val = jQuery('#".$ri_field_name."_fccats').val();
 		
 		". ( $title_filter ? $ri_field_name."_titlefilter.reset(); this.form.".$ri_field_name."_regexp.value='';" : "" ) . "
 		

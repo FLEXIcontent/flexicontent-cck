@@ -47,7 +47,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$print_logging_info = $params->get('print_logging_info');
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		flexicontent_html::loadJQuery();
+		flexicontent_html::loadFramework('jQuery');
 		JHTML::_('behavior.tooltip');
 		
 		// Special displaying when getting flexicontent version
@@ -158,14 +158,14 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			
 			$existcats					= !$this->get('ItemsNoCat');
 			$existlang	 				= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
-			$existdbindexes			= $this->get( 'ExistDBindexes' );
+			$existdbindexes			= $model->getExistDBindexes($check_only=false);
 			$itemcountingdok    = $model->getItemCountingDataOK();
 			$existversions 			= $this->get( 'ExistVersionsTable' );
 			$existversionsdata	= !$use_versioning || $this->get( 'ExistVersionsPopulated' );
 			
 			$existauthors			= $this->get( 'ExistAuthorsTable' );
 			$cachethumb				= $this->get( 'CacheThumbChmod' );
-			$oldbetafiles			= $this->get( 'OldBetaFiles' );
+			$oldbetafiles			= true; //$this->get( 'OldBetaFiles' );
 			$nooldfieldsdata	= $this->get( 'NoOldFieldsData' );
 			$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 			

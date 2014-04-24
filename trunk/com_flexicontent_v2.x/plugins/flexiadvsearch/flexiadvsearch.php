@@ -319,20 +319,57 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Create ORDER clause
 		// *******************
 		
-		// First try FLEXIcontent advanced search plugin specific ordering
-		$fc_order = $orderby_override  ?  JRequest::getWord( 'orderby', $params->get('orderby', '') )  :  $params->get('orderby', '');
-		if ( $fc_order ) {
-				$orderby = flexicontent_db::buildItemOrderBy(
-					$params,
-					$fc_order, $_request_var='orderby', $_config_param='orderby',
-					$_item_tbl_alias = 'i', $_relcat_tbl_alias = 'rel',
-					$_default_order='', $_default_order_dir='', $sfx='', $support_2nd_lvl=false
-				);
+		// FLEXIcontent search view, use FLEXIcontent ordering
+		$orderby_join = '';
+		$orderby_col = '';
+		if (JRequest::getVar('option') == 'com_flexicontent') {
+			$order = '';
+			$orderby = flexicontent_db::buildItemOrderBy(
+				$params,
+				$order, $_request_var='orderby', $_config_param='orderby',
+				$_item_tbl_alias = 'i', $_relcat_tbl_alias = 'rel',
+				$_default_order='', $_default_order_dir='', $sfx='', $support_2nd_lvl=false
+			);
+			
+			// Create JOIN for ordering items by a custom field (Level 1)
+			if ( 'field' == $order[1] ) {
+				$orderbycustomfieldid = (int)$params->get('orderbycustomfieldid', 0);
+				$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f ON f.item_id = i.id AND f.field_id='.$orderbycustomfieldid;
+			}
+			
+			// Create JOIN for ordering items by a custom field (Level 2)
+			if ( 'field' == $order[2] ) {
+				$orderbycustomfieldid_2nd = (int)$params->get('orderbycustomfieldid'.'_2nd', 0);
+				$orderby_join .= ' LEFT JOIN #__flexicontent_fields_item_relations AS f2 ON f2.item_id = i.id AND f2.field_id='.$orderbycustomfieldid_2nd;
+			}
+			
+			// Create JOIN for ordering items by author's name
+			if ( in_array('author', $order) || in_array('rauthor', $order) ) {
+				$orderby_col   = '';
+				$orderby_join .= ' LEFT JOIN #__users AS u ON u.id = i.created_by';
+			}
+			
+			// Create JOIN for ordering items by a most commented
+			if ( in_array('commented', $order) ) {
+				$orderby_col   = ', count(com.object_id) AS comments_total';
+				$orderby_join .= ' LEFT JOIN #__jcomments AS com ON com.object_id = i.id';
+			}
+			
+			// Create JOIN for ordering items by a most rated
+			if ( in_array('rated', $order) ) {
+				$orderby_col   = ', (cr.rating_sum / cr.rating_count) * 20 AS votes';
+				$orderby_join .= ' LEFT JOIN #__content_rating AS cr ON cr.content_id = i.id';
+			}
+			
+			// Create JOIN for ordering items by their ordering attribute (in item's main category)
+		if ( in_array('order', $order) ) {
+				$orderby_join .= ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id AND rel.catid = i.catid';
+			}
 		}
 		
-		// Second try to use general ordering of search plugins
+		// non-FLEXIcontent search view, use general ordering of search plugins (this is a parameter passed to this onContentSearch() function)
 		else {
-			switch ( $ordering )  // this is a parameter passed to this onContentSearch() function 
+			switch ( $ordering )
 			{
 				//case 'relevance': $orderby = ' ORDER BY score DESC, i.title ASC'; break;
 				case 'oldest':   $orderby = 'i.created ASC'; break;
@@ -469,7 +506,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 			. ( $txtmode ? ' JOIN #__flexicontent_fields as f ON f.id=ai.field_id' : '' )
-			. $joinaccess
+			. $orderby_join
 			;
 		
 		// AND-WHERE sub-clauses ... (shared with filters)
@@ -519,19 +556,21 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$db->query();
 		
 		// Construct query's SQL
-		$query 	= 'SELECT i.id, i.title AS title, '.(FLEXI_J16GE ? '' : 'i.sectionid, ').'i.created, i.id AS fc_item_id,'
+		$query 	= 'SELECT i.id, i.title AS title, '.(FLEXI_J16GE ? '' : 'i.sectionid, ').'i.created, i.id AS fc_item_id'
+			. $orderby_col
 			. ( !$txtmode ?
-				' ie.search_index AS text,' :
-				//' GROUP_CONCAT(\'[[[b]]]\', f.label, \'[[[/b]]]: \', ai.search_index ORDER BY f.ordering ASC SEPARATOR \' [[[br/]]]\') AS text,'
-				' GROUP_CONCAT(ai.search_index ORDER BY f.ordering ASC SEPARATOR \' \') AS text,'
+				', ie.search_index AS text' :
+				//', GROUP_CONCAT(\'[[[b]]]\', f.label, \'[[[/b]]]: \', ai.search_index ORDER BY f.ordering ASC SEPARATOR \' [[[br/]]]\') AS text'
+				', GROUP_CONCAT(ai.search_index ORDER BY f.ordering ASC SEPARATOR \' \') AS text'
 				)
-			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
-			. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug,'
-			. ' CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, i.title ) AS section'
+			. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug'
+			. ', CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as categoryslug'
+			. ', CONCAT_WS( " / ", '. $db->Quote($searchFlexicontent) .', c.title, i.title ) AS section'
 			. $select_access
 			. ' FROM #__content AS i'
 			. $join_textsearch
 			. $join_clauses
+			. $joinaccess
 			. ' WHERE '
 			. $and_where
 			. $and_where_text_n_filters 
@@ -565,7 +604,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			{
 				if( FLEXI_J16GE || $item->sectionid==FLEXI_SECTION ) {
 					$item->categories = isset($item_cats[$item->id])  ?  $item_cats[$item->id] : array();  // in case of item categories missing
-					$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug));
+					$item->href = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item));
 				} else {
 					$item->href = JRoute::_(ContentHelperRoute::getArticleRoute($item->slug, $item->catslug, $item->sectionid));
 				}
