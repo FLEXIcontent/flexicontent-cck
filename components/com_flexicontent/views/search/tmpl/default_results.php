@@ -1,6 +1,33 @@
 <?php defined('_JEXEC') or die('Restricted access'); ?>
 
 <?php
+
+
+// **************************************************
+// Indentify result ITEMs that are FLEXIcontent items
+// **************************************************
+$fcitems = array();
+foreach ($this->results as $i => $result)
+{
+	if ( ! @$result->fc_item_id ) continue;
+	$fcitems[$i] = JTable::getInstance('flexicontent_items', '');
+	$fcitems[$i]->load($result->fc_item_id);
+	$fcitems[$i]->category_access = $result->category_access;
+	$fcitems[$i]->type_access = $result->type_access ;
+	$fcitems[$i]->has_access  = $result->has_access;
+	$fcitems[$i]->categories = $result->categories;
+}
+
+
+// ************************************************************************
+// Calculate CSS classes needed to add special styling markups to the items
+// ************************************************************************
+flexicontent_html::calculateItemMarkups($fcitems, $this->params);
+
+
+// *****************************************************
+// Get image configuration for FLEXIcontent result items
+// *****************************************************
 $fcr_use_image = $this->params->get('fcr_use_image', 1);
 $fcr_image = $this->params->get('fcr_image');
 
@@ -11,38 +38,22 @@ if ($fcr_use_image && $fcr_image) {
 }
 
 
+// *******************************************************************
+// Get custom displayed fields to add to each FLEXIcontent result item
+// *******************************************************************
 $use_infoflds = (int)$this->params->get('use_infoflds', 1);
-
 $infoflds = $this->params->get('infoflds');
 $infoflds = preg_replace("/[\"'\\\]/u", "", $infoflds);
 $infoflds = array_unique(preg_split("/\s*,\s*/u", $infoflds));
 if ( !strlen($infoflds[0]) ) unset($infoflds[0]);
 
-$fcitems = array();
-if ( ($use_infoflds && count($infoflds)) || $fcr_use_image )
-{
-	foreach ($this->results as $i => $result)
-	{
-		if ( ! @$result->fc_item_id ) continue;
-		$fcitems[$i] = JTable::getInstance('flexicontent_items', '');
-		$fcitems[$i]->load($result->fc_item_id);
-		$fcitems[$i]->category_access = $result->category_access;
-		$fcitems[$i]->type_access = $result->type_access ;
-		$fcitems[$i]->has_access  = $result->has_access;
-		$fcitems[$i]->categories = $result->categories;
-	}
-	
-	// Calculate CSS classes needed to add special styling markups to the items
-	flexicontent_html::calculateItemMarkups($fcitems, $this->params);
-}
-
 if ( $use_infoflds && count($infoflds) ) {
-	foreach ($infoflds as $fieldname)
-	{
+	foreach ($infoflds as $fieldname) {
 		FlexicontentFields::getFieldDisplay($fcitems, $fieldname, $values=null, $method='display');
 	}
 }
 ?>
+
 
 <table class="contentpaneopen<?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" width="100%"><tr><td>
 

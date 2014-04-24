@@ -42,13 +42,6 @@ class FlexicontentControllerItems extends FlexicontentController
 		$this->registerTask( 'add',					'edit' );
 		$this->registerTask( 'apply', 			'save' );
 		$this->registerTask( 'saveandnew', 	'save' );
-		$this->registerTask( 'cancel', 			'cancel' );
-		$this->registerTask( 'copymove',		'copymove' );
-		$this->registerTask( 'restore', 		'restore' );
-		$this->registerTask( 'import', 			'import' );
-		$this->registerTask( 'bindextdata', 		'bindextdata' );
-		$this->registerTask( 'approval', 				'approval' );
-		$this->registerTask( 'getversionlist',	'getversionlist');
 		if (!FLEXI_J16GE) {
 			$this->registerTask( 'accesspublic',		'access' );
 			$this->registerTask( 'accessregistered','access' );
@@ -923,23 +916,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	}
 	
 	
-	/**
-	 * Bind fields, category relations and items_ext data to Joomla! com_content imported articles
-	 *
-	 * @access public
-	 * @return void
-	 * @since 1.5
-	 */
-	function bindextdata()
-	{
-		$extdata 	= JRequest::getInt('extdata', '');		
-		$model 		= $this->getModel('items');
-		$rows 		= $model->getUnassociatedItems($extdata, $_ids_only=false);
-		
-		echo ($model->addFlexiData($rows));
-	}
-	
-	
+
 	/**
 	 * Logic to change state of multiple items
 	 *
@@ -1719,16 +1696,64 @@ class FlexicontentControllerItems extends FlexicontentController
 	
 	
 	/**
-	 * Method to fetch the tags form
+	 * Method to fetch total count the unassociated items
 	 * 
 	 * @since 1.5
 	 */
-	function getorphans()
+	function getOrphansItems()
 	{
-		$model 		=  $this->getModel('items');
-		$status 	=  $model->getExtDataStatus();
-
-		echo count($status['unbounded']);
+		$model  = $this->getModel('items');
+		$status = $model->getUnboundedItems($limit=1000000, $count_only=true, $checkNoExtData=true, $checkInvalidCat=false);
+		echo $status;
+		exit;
+	}
+	
+	
+	/**
+	 * Method to fetch total count the unassociated items
+	 * 
+	 * @since 1.5
+	 */
+	function getBadCatItems()
+	{
+		$model  = $this->getModel('items');
+		$status = $model->getUnboundedItems($limit=1000000, $count_only=true, $checkNoExtData=false, $checkInvalidCat=true);
+		echo $status;
+		exit;
+	}
+	
+	
+	/**
+	 * Bind fields, category relations and items_ext data to Joomla! com_content imported articles
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function bindextdata()
+	{
+		$bind_limit = JRequest::getInt('bind_limit', 25000);
+		if ($bind_limit < 1 || $bind_limit > 25000) $bind_limit = 25000;  // make sure this is valid
+		$model = $this->getModel('items');
+		$rows  = $model->getUnboundedItems($bind_limit, $count_only=false, $checkNoExtData=true, $checkInvalidCat=false, $noCache=true);
+		$model->bindExtData($rows);
+		jexit();
+	}
+	
+	
+	/**
+	 * Fix Items having bad main category
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function fixmaincat()
+	{
+		$default_cat = JRequest::getInt('default_cat', 0);
+		$model = $this->getModel('items');
+		$model->fixMainCat($default_cat);
+		jexit();
 	}
 	
 	

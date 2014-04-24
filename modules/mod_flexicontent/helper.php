@@ -428,7 +428,7 @@ class modFlexicontentHelper
 					}
 					$lists[$ord]['featured'][$i]->catid = $row->catid; 
 					$lists[$ord]['featured'][$i]->itemcats = explode("," , $row->itemcats);
-					$lists[$ord]['featured'][$i]->link 	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
+					$lists[$ord]['featured'][$i]->link 	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid, $row).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
 					$lists[$ord]['featured'][$i]->title	= (strlen($row->title) > $cuttitle_feat) ? JString::substr($row->title, 0, $cuttitle_feat) . '...' : $row->title;
 					$lists[$ord]['featured'][$i]->alias	= $row->alias;
 					$lists[$ord]['featured'][$i]->fulltitle = $row->title;
@@ -562,7 +562,7 @@ class modFlexicontentHelper
 					}
 					$lists[$ord]['standard'][$i]->catid = $row->catid;
 					$lists[$ord]['standard'][$i]->itemcats = explode("," , $row->itemcats);
-					$lists[$ord]['standard'][$i]->link	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
+					$lists[$ord]['standard'][$i]->link	= JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->categoryslug, $forced_itemid, $row).(($method_curlang == 1) ? "&lang=".substr($row->language ,0,2) : ""));
 					$lists[$ord]['standard'][$i]->title	= (strlen($row->title) > $cuttitle) ? JString::substr($row->title, 0, $cuttitle) . '...' : $row->title;
 					$lists[$ord]['standard'][$i]->alias	= $row->alias;
 					$lists[$ord]['standard'][$i]->fulltitle = $row->title;
@@ -1231,19 +1231,19 @@ class modFlexicontentHelper
 			$negate_op = $method_dates == 2 ? 'NOT' : '';
 			
 			if (!$raw_edate && $edate && !FLEXIUtilities::isSqlValidDate($edate)) {
-				echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior) and enter custom offset e.g. five days ago (be careful with space character): -5 d<br/>";
+				echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior 'custom offset') and enter custom offset e.g. five days ago (be careful with space character): -5 d<br/>";
 				//$edate = '';
 				return;
 			} else if ($edate) {
-				$where .= ' AND '.$negate_op.' ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' <= '.(!$raw_edate ? $db->Quote($edate) : $edate).' )';
+				$where .= ' AND '.$negate_op.' ( '.$comp.' <= '.(!$raw_edate ? $db->Quote($edate) : $edate).' )';
 			}
 			
 			if (!$raw_bdate && $bdate && !FLEXIUtilities::isSqlValidDate($bdate)) {
-				echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior) and enter custom offset e.g. five days ago (be careful with space character): -5 d<br/>";
+				echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date:<br>(a) Enter a valid date via callendar OR <br>(b) leave blank OR <br>(c) choose (non-static behavior 'custom offset') and enter custom offset e.g. five days ago (be careful with space character): -5 d<br/>";
 				//$bdate = '';
 				return;
 			} else if ($bdate) {
-				$where .= ' AND '.$negate_op.' ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.(!$raw_bdate ? $db->Quote($bdate) : $bdate).' )';
+				$where .= ' AND '.$negate_op.' ( '.$comp.' >= '.(!$raw_bdate ? $db->Quote($bdate) : $bdate).' )';
 			}
 		}
 		
@@ -1262,19 +1262,19 @@ class modFlexicontentHelper
 					if ($edate) {
 						$edate = explode(' ', $edate);
 						if (count($edate)!=2) {
-							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d<br/>";
+							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -END- date:Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d (DO NOT FORGET the space between e.g. '-5 d')<br/>";
 							return;
 						} else {
-							$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, $edate[0], $edate[1])).' )';
+							$where .= ' AND ( '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, $edate[0], $edate[1])).' )';
 						}
 					}
 					if ($bdate) {
 						$bdate = explode(' ', $bdate);
 						if (count($bdate)!=2) {
-							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date:Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d<br/>";
+							echo "<b>WARNING:</b> Misconfigured date scope, you have entered invalid -BEGIN- date: Custom offset is invalid e.g. in order to enter five days ago (be careful with space character) use: -5 d (DO NOT FORGET the space between e.g. '-5 d')<br/>";
 							return;
 						} else {
-							$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, $bdate[0], $bdate[1])).' )';
+							$where .= ' AND ( '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, $bdate[0], $bdate[1])).' )';
 						}
 					}
 				break;
@@ -1284,8 +1284,8 @@ class modFlexicontentHelper
 					$cdate = explode('-', $cdate[0]);
 					$cdate = $cdate[0].'-'.$cdate[1].'-'.$cdate[2].' 00:00:00';
 
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'd')).' )';
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote($cdate).' )';
+					$where .= ' AND ( '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'd')).' )';
+					$where .= ' AND ( '.$comp.' >= '.$db->Quote($cdate).' )';
 				break;
 
 				case '2' : // same month
@@ -1293,8 +1293,8 @@ class modFlexicontentHelper
 					$cdate = explode('-', $cdate[0]);
 					$cdate = $cdate[0].'-'.$cdate[1].'-01 00:00:00';
 
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'm')).' )';
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote($cdate).' )';
+					$where .= ' AND ( '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'm')).' )';
+					$where .= ' AND ( '.$comp.' >= '.$db->Quote($cdate).' )';
 				break;
 
 				case '3' : // same year
@@ -1302,8 +1302,8 @@ class modFlexicontentHelper
 					$cdate = explode('-', $cdate[0]);
 					$cdate = $cdate[0].'-01-01 00:00:00';
 
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'Y')).' )';
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote($cdate).' )';
+					$where .= ' AND ( '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 1, 'Y')).' )';
+					$where .= ' AND ( '.$comp.' >= '.$db->Quote($cdate).' )';
 				break;
 
 				case '9' : // previous day
@@ -1311,8 +1311,8 @@ class modFlexicontentHelper
 					$cdate = explode('-', $cdate[0]);
 					$cdate = $cdate[0].'-'.$cdate[1].'-'.$cdate[2].' 00:00:00';
 
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote($cdate).' )';
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'd')).' )';
+					$where .= ' AND ( '.$comp.' < '.$db->Quote($cdate).' )';
+					$where .= ' AND ( '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'd')).' )';
 				break;
 
 				case '4' : // previous month
@@ -1320,8 +1320,8 @@ class modFlexicontentHelper
 					$cdate = explode('-', $cdate[0]);
 					$cdate = $cdate[0].'-'.$cdate[1].'-01 00:00:00';
 
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote($cdate).' )';
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'm')).' )';
+					$where .= ' AND ( '.$comp.' < '.$db->Quote($cdate).' )';
+					$where .= ' AND ( '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'm')).' )';
 				break;
 
 				case '5' : // previous year
@@ -1329,8 +1329,8 @@ class modFlexicontentHelper
 					$cdate = explode('-', $cdate[0]);
 					$cdate = $cdate[0].'-01-01 00:00:00';
 
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote($cdate).' )';
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'Y')).' )';
+					$where .= ' AND ( '.$comp.' < '.$db->Quote($cdate).' )';
+					$where .= ' AND ( '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, -1, 'Y')).' )';
 				break;
 
 				case '10' : // next day
@@ -1338,8 +1338,8 @@ class modFlexicontentHelper
 					$cdate = explode('-', $cdate[0]);
 					$cdate = $cdate[0].'-'.$cdate[1].'-'.$cdate[2].' 00:00:00';
 
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'd')).' )';
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'd')).' )';
+					$where .= ' AND ( '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'd')).' )';
+					$where .= ' AND ( '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'd')).' )';
 				break;
 
 				case '6' : // next month
@@ -1347,8 +1347,8 @@ class modFlexicontentHelper
 					$cdate = explode('-', $cdate[0]);
 					$cdate = $cdate[0].'-'.$cdate[1].'-01 00:00:00';
 
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'm')).' )';
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'm')).' )';
+					$where .= ' AND ( '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'm')).' )';
+					$where .= ' AND ( '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'm')).' )';
 				break;
 
 				case '7' : // next year
@@ -1356,8 +1356,8 @@ class modFlexicontentHelper
 					$cdate = explode('-', $cdate[0]);
 					$cdate = $cdate[0].'-01-01 00:00:00';
 
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'Y')).' )';
-					$where .= ' AND ( '.$comp.' = '.$db->Quote($nullDate).' OR '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'Y')).' )';
+					$where .= ' AND ( '.$comp.' < '.$db->Quote(date_time::shift_dates($cdate, 2, 'Y')).' )';
+					$where .= ' AND ( '.$comp.' >= '.$db->Quote(date_time::shift_dates($cdate, 1, 'Y')).' )';
 				break;
 
 				case '11' : // same day of month, ignore year
@@ -1412,7 +1412,7 @@ class modFlexicontentHelper
 				if ($datecomp_field) {
 					$join_date =
 							'	LEFT JOIN #__flexicontent_fields_item_relations AS dfrel'
-						. '   ON ( i.id = dfrel.item_id AND dfrel.valueorder = 1 AND dfrel.field_id = '.$datecomp_field.' )';
+						. '   ON ( i.id = dfrel.item_id AND dfrel.field_id = '.$datecomp_field.' )';
 				} else {
 					echo "<b>WARNING:</b> Misconfigured date scope, you have set DATE TYPE as CUSTOM DATE Field, but have not select any specific DATE Field to be used<br/>";
 					//$join_date = '';

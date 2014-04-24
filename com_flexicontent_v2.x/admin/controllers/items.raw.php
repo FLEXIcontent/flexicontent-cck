@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1223 2012-03-30 08:34:34Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1782 2013-10-08 22:47:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -215,16 +215,64 @@ class FlexicontentControllerItems extends FlexicontentController
 	
 	
 	/**
-	 * Method to fetch the tags form
+	 * Method to fetch total count the unassociated items
 	 * 
 	 * @since 1.5
 	 */
-	function getorphans()
+	function getOrphansItems()
 	{
-		$model 		=  $this->getModel('items');
-		$status 	=  $model->getExtDataStatus();
-
-		echo count($status['unbounded']);
+		$model  = $this->getModel('items');
+		$status = $model->getUnboundedItems($limit=1000000, $count_only=true, $checkNoExtData=true, $checkInvalidCat=false);
+		echo $status;
+		exit;
+	}
+	
+	
+	/**
+	 * Method to fetch total count the unassociated items
+	 * 
+	 * @since 1.5
+	 */
+	function getBadCatItems()
+	{
+		$model  = $this->getModel('items');
+		$status = $model->getUnboundedItems($limit=1000000, $count_only=true, $checkNoExtData=false, $checkInvalidCat=true);
+		echo $status;
+		exit;
+	}
+	
+	
+	/**
+	 * Bind fields, category relations and items_ext data to Joomla! com_content imported articles
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function bindextdata()
+	{
+		$bind_limit = JRequest::getInt('bind_limit', 25000);
+		if ($bind_limit < 1 || $bind_limit > 25000) $bind_limit = 25000;  // make sure this is valid
+		$model = $this->getModel('items');
+		$rows  = $model->getUnboundedItems($bind_limit, $count_only=false, $checkNoExtData=true, $checkInvalidCat=false, $noCache=true);
+		$model->bindExtData($rows);
+		jexit();
+	}
+	
+	
+	/**
+	 * Fix Items having bad main category
+	 *
+	 * @access public
+	 * @return void
+	 * @since 1.5
+	 */
+	function fixmaincat()
+	{
+		$default_cat = JRequest::getInt('default_cat', 0);
+		$model = $this->getModel('items');
+		$model->fixMainCat($default_cat);
+		jexit();
 	}
 	
 	

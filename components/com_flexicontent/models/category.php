@@ -247,6 +247,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$rows = flexicontent_db::directQuery($query_limited);
 				$query_ids = array();
 				foreach ($rows as $row) $query_ids[] = $row->id;
+				//$this->_db->setQuery($query, $this->getState('limitstart'), $this->getState('limit'));
+				//$query_ids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
 				
 				// 3, get current items total for pagination
 				$this->_db->setQuery("SELECT FOUND_ROWS()");
@@ -297,7 +299,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
-
+		
+		// maybe removed in the future, this is useful in places that item data need to be retrieved again because item object was not given
+		global $fc_list_items;
+		foreach ($this->_data as $_item) $fc_list_items[$_item->id] = $_item;
+		
 		return $this->_data;
 	}
 
@@ -370,7 +376,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			// ... count rows
 			// Create sql WHERE clause
-			$where = $this->_buildItemWhere();
+			$where = $this->_buildItemWhere('where', $counting=true);
 		} else if ( !$query_ids ) {
 			// Get FROM and JOIN SQL CLAUSES
 			$fromjoin = $this->_buildItemFromJoin($counting=true);
@@ -383,7 +389,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 			
 			// Create sql WHERE clause
-			$where = $this->_buildItemWhere();
+			$where = $this->_buildItemWhere('where', $counting=true);
 			
 			// Create sql ORDERBY clause -and- set 'order' variable (passed by reference), that is, if frontend user ordering override is allowed
 			$order = '';
@@ -430,7 +436,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ( $query_ids==-1 ) {
 			$query = ' SELECT count(i.id) ';
 		} else if ( !$query_ids ) {
-			$query = 'SELECT SQL_CALC_FOUND_ROWS i.id ';  // SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
+			$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT i.id ';  // SQL_CALC_FOUND_ROWS, will cause problems with 3rd-party extensions that modify the query, this will be tried with direct DB query
 			$query .= @ $orderby_col;
 		} else {
 			$query = 'SELECT i.*, ie.*, u.name as author, ty.name AS typename,'
@@ -448,19 +454,19 @@ class FlexicontentModelCategory extends JModelLegacy {
 				. $where
 				. ' GROUP BY i.id '
 				;
-		} else if ( $query_ids ) {
+		} else if ( !$query_ids ) {
+			$query .= ""
+				. @ $orderby_join  // optional
+				. $where
+				//. ' GROUP BY i.id '
+				. $orderby
+				;
+		} else {
 			$query .= ""
 				. @ $feed_img_join    // optional
 				. ' WHERE i.id IN ('. implode(',', $query_ids) .')'
 				. ' GROUP BY i.id'
 				//. ' ORDER BY FIELD(i.id, '. implode(',', $query_ids) .')'
-				;
-		} else {
-			$query .= ""
-				. @ $orderby_join  // optional
-				. $where
-				. ' GROUP BY i.id '
-				. $orderby
 				;
 		}
 		
@@ -672,10 +678,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		static $fromjoin = null;
 		if (!empty($fromjoin[$counting])) return $fromjoin[$counting];
 		
+		$tmp_only = $counting && !JRequest::getVar('filter');
 		$from_clause  = !$counting ? ' FROM #__content AS i' : ' FROM #__flexicontent_items_tmp AS i';
 		$join_clauses = ''
-			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			. (!$tmp_only ? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' : '')
+			. ' JOIN #__flexicontent_types AS ty ON '. (!$tmp_only ? 'ie.' : 'i.') .'type_id = ty.id'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' JOIN #__categories AS c ON c.id = i.catid'
 			. (!$counting ? ' LEFT JOIN #__users AS u ON u.id = i.created_by' : '')
@@ -685,7 +692,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			;
 		
 		global $fc_catviev;
-		$fc_catviev['join_clauses'] = $join_clauses;
+		if ($counting) $fc_catviev['join_clauses'] = $join_clauses;
 		
 		$fromjoin[$counting] = $from_clause.$join_clauses;
 		return $fromjoin[$counting];
@@ -698,7 +705,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 * @access private
 	 * @return array
 	 */
-	function _buildItemWhere( $wherepart='where' )
+	function _buildItemWhere( $wherepart='where', $counting = false )
 	{
 		global $globalcats, $fc_catviev;
 		if ( isset($fc_catviev[$wherepart]) ) return $fc_catviev[$wherepart];
@@ -721,6 +728,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$catlang = $cparams->get('language', '');         // Category language parameter, currently UNUSED
 		$filtercat  = $cparams->get('filtercat', 0);      // Filter items using currently selected language
 		$show_noauth = $cparams->get('show_noauth', 0);   // Show unauthorized items
+		$use_tmp = $counting == true;
 		
 		// First thing we need to do is to select only the requested items
 		$where = ' WHERE 1';
@@ -759,7 +767,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Filter the category view with the active language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$lta = FLEXI_J16GE ? 'i': 'ie';
+			$lta = FLEXI_J16GE || $use_tmp ? 'i': 'ie';
 			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
 		
@@ -950,31 +958,31 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($locked_filters) foreach($locked_filters as $_filter) $filters[] = $_filter;
 		
 		// Get SQL clause for filtering via each field
-		if ($filters) foreach ($filters as $filtre)
+		if ($filters) foreach ($filters as $filter)
 		{
 			// Get filter values, setting into appropriate session variables
 			// *** Commented out to get variable only by HTTP GET or POST thus supporting FULL PAGE CACHING (e.g. Joomla's system plugin 'Cache')
 			/*if ($this->_id) {
-				$filtervalue 	= $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+				$filt_vals 	= $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
 			} else if ($this->_layout=='author') {
-				$filtervalue  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+				$filt_vals  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
 			} else if ($this->_layout=='mcats') {
-				$filtervalue  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+				$filt_vals  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
 			} else if ($this->_layout=='myitems') {
-				$filtervalue  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter_'.$filtre->id, 'filter_'.$filtre->id, '', '' );
+				$filt_vals  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
 			} else {
-				$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
+				$filt_vals  = JRequest::getVar('filter_'.$filter->id, '', '');
 			}*/
-			$filtervalue  = JRequest::getVar('filter_'.$filtre->id, '', '');
+			$filt_vals  = JRequest::getVar('filter_'.$filter->id, '', '');
 			
 			// Skip filters without value
-			$empty_filtervalue_array  = is_array($filtervalue)  && !strlen(trim(implode('',$filtervalue)));
-			$empty_filtervalue_string = !is_array($filtervalue) && !strlen(trim($filtervalue));
-			$allow_filtering_empty = $filtre->parameters->get('allow_filtering_empty', 0);
-			if ( !$allow_filtering_empty && ($empty_filtervalue_array || $empty_filtervalue_string) ) continue;
+			$empty_filt_vals_array  = is_array($filt_vals)  && !strlen(trim(implode('',$filt_vals)));
+			$empty_filt_vals_string = !is_array($filt_vals) && !strlen(trim($filt_vals));
+			$allow_filtering_empty = $filter->parameters->get('allow_filtering_empty', 0);
+			if ( !$allow_filtering_empty && ($empty_filt_vals_array || $empty_filt_vals_string) ) continue;
 			
-			//echo "category model found filters: "; print_r($filtervalue);
-			$filters_where[ $filtre->id ] = $this->_getFiltered($filtre, $filtervalue);
+			//echo "category model found filters: "; print_r($filt_vals);
+			$filters_where[ $filter->id ] = $this->_getFiltered($filter, $filt_vals);
 		}
 		
 		return $filters_where;
@@ -1158,7 +1166,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Get the view's parameters
 		$params = $this->_params;
-	
+		$use_tmp = true;
+		
 		// Date-Times are stored as UTC, we should use current UTC time to compare and not user time (requestTime),
 		//  thus the items are published globally at the time the author specified in his/her local clock
 		//$app  = JFactory::getApplication();
@@ -1181,7 +1190,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	
 		// Filter the category view with the current user language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$lta = FLEXI_J16GE ? 'i': 'ie';
+			$lta = FLEXI_J16GE || $use_tmp ? 'i': 'ie';
 			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
 		
@@ -1236,10 +1245,11 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$query 	= 'SELECT COUNT(DISTINCT rel.itemid)'
 			. ' FROM #__flexicontent_cats_item_relations AS rel'
-			//. ' JOIN #__content AS i ON rel.itemid = i.id'
-			. ' JOIN #__flexicontent_items_tmp AS i ON rel.itemid = i.id'
-			. ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid = ie.item_id'
-			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
+			. (!$use_tmp ?
+				' JOIN #__content AS i ON rel.itemid = i.id' :
+				' JOIN #__flexicontent_items_tmp AS i ON rel.itemid = i.id' )
+			. (!$use_tmp ? ' JOIN #__flexicontent_items_ext AS ie ON rel.itemid = ie.item_id' : '' )
+			. ' JOIN #__flexicontent_types AS ty ON ' .(!$use_tmp ? 'ie' : 'i'). '.type_id = ty.id'
 			. ' JOIN #__categories AS mc ON mc.id =   i.catid AND mc.published = 1'
 			. $joinaccess
 			. $where

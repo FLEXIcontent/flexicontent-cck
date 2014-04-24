@@ -211,7 +211,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		
 		// MENU ITEM matched, use its page title (=browser window title) and its page heading
 		if ( $menu_matches ) {
-			$params->def('page_title', $menu->title);  // default value for page title is menu item title
+			$params->def('page_title', FLEXI_J16GE ? $menu->title : $menu->name);  // default value for page title is menu item title
 			$params->def('page_heading', $params->get('page_title')); // default value for page heading is the page title
 			// Cross set show_page_heading and show_page_title for J1.5 template compatibility, (J1.5 used 'show_page_title'),
 			// also default to zero in order to prevent templates from use 1 as default value
@@ -316,12 +316,12 @@ class FlexicontentViewItems  extends JViewLegacy
 		
 		
 		// *************************
-		// increment the hit counter (TODO: move this to system plugin, to make it work when caching is ON)
+		// increment the hit counter
 		// *************************
-		
-		if (FLEXIUtilities::count_new_hit($item) ) {
+		// MOVED to flexisystem plugin due to ...
+		/*if (FLEXIUtilities::count_new_hit($item->id) ) {
 			$model->hit();
-		}
+		}*/
 
 		// Load template css/js and set template data variable
 		$tmplvar	= $themes->items->{$ilayout}->tmplvar;

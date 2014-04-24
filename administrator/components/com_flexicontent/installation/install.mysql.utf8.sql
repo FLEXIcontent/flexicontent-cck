@@ -204,7 +204,9 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_download_history` (
   `file_id` int(11) NOT NULL,
   `hits` int(11) NOT NULL,
   `last_hit_on` datetime NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `file_id` (`file_id`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_download_coupons` (
@@ -215,10 +217,14 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_download_coupons` (
   `hits` int(11) NOT NULL,
   `hits_limit` int(11) NOT NULL,
   `expire_on` datetime NOT NULL default '0000-00-00 00:00:00',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `file_id` (`file_id`),
+  KEY `token` (`token`),
+  KEY `expire_on` (`expire_on`)
 ) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`;
 
-CREATE TABLE `#__flexicontent_items_tmp` (
+CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
  `id` int(10) unsigned NOT NULL,
  `title` varchar(255) NOT NULL,
  `state` tinyint(3) NOT NULL DEFAULT '0',
@@ -235,5 +241,13 @@ CREATE TABLE `#__flexicontent_items_tmp` (
  `access` int(10) unsigned NOT NULL DEFAULT '0',
  `hits` int(10) unsigned NOT NULL DEFAULT '0',
  `language` char(7) NOT NULL,
- PRIMARY KEY (`id`)
+ `type_id` int(11) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`id`),
+ KEY `state` (`state`),
+ KEY `catid` (`catid`),
+ KEY `created_by` (`created_by`),
+ KEY `access` (`access`),
+ KEY `language` (`language`),
+ KEY `featured` (`featured`),
+ KEY `type_id` (`type_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

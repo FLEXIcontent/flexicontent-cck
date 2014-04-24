@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: install.php 1873 2014-03-18 01:47:48Z ggppdk $
+ * @version 1.5 stable $Id: install.php 1882 2014-04-06 19:24:37Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -674,15 +674,17 @@ if (!FLEXI_J16GE) {
 							 ".(FLEXI_J16GE ? "`featured` tinyint(3) unsigned NOT NULL DEFAULT '0'," : "")."
 							 `language` char(7) NOT NULL,
 							 ".(!FLEXI_J16GE ? "`sectionid` int(10) unsigned NOT NULL DEFAULT '0'," : "")."
+							 `type_id` int(11) NOT NULL DEFAULT '0',
 							 PRIMARY KEY (`id`)
 							) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 						";
+					} else {
+						$_querycols = array();
 						if (FLEXI_J16GE) {
-							$_query = "ALTER TABLE `#__flexicontent_items_tmp`";
-							$_querycols = array();
-							if (array_key_exists('sectionid', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = "  DROP `sectionid`";
-							if (empty($_querycols)) $queries[] = $_query . implode(",", $_querycols);
+							if (array_key_exists('sectionid', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " DROP `sectionid`";
 						}
+						if (!array_key_exists('type_id', $tbl_fields['#__flexicontent_items_tmp'])) $_querycols[] = " ADD `type_id` INT(11) NOT NULL DEFAULT '0' AFTER `language`";
+						if (!empty($_querycols)) $queries[] = "ALTER TABLE `#__flexicontent_items_tmp` " . implode(",", $_querycols);
 					}
 					
 					if ( !empty($queries) ) {
@@ -720,7 +722,9 @@ if (!FLEXI_J16GE) {
 							`file_id` int(11) NOT NULL,
 							`hits` int(11) NOT NULL,
 							`last_hit_on` datetime NOT NULL,
-							PRIMARY KEY (`id`)
+							PRIMARY KEY (`id`),
+							KEY `user_id` (`user_id`),
+							KEY `file_id` (`file_id`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
 					
@@ -734,7 +738,10 @@ if (!FLEXI_J16GE) {
 							`hits` int(11) NOT NULL,
 							`hits_limit` int(11) NOT NULL,
 							`expire_on` datetime NOT NULL default '0000-00-00 00:00:00',
-							PRIMARY KEY (`id`)
+							PRIMARY KEY (`id`),
+							KEY `user_id` (`user_id`),
+							KEY `file_id` (`file_id`),
+							KEY `token` (`token`)
 						) ENGINE=MyISAM CHARACTER SET `utf8` COLLATE `utf8_general_ci`";
 					}
 					

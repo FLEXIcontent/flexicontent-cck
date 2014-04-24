@@ -199,8 +199,9 @@ class FlexicontentModelItems extends JModelLegacy
 				$item = $_data[$item_id];
 				
 				$item->categories = preg_split("/[\s]*,[\s]*/", $item->relcats);
-				foreach ($item->categories as $item_cat)
-					$this->_catids[$item_cat] = 1;
+				foreach ($item->categories as $item_cat) {
+					if ($item_cat) $this->_catids[$item_cat] = 1;
+				}
 				
 				$this->_data[] = $item;
 			}
@@ -372,110 +373,86 @@ class FlexicontentModelItems extends JModelLegacy
 	
 	
 	/**
-	 * Method to get the extended data associations
+	 * Method to get items not having extended data associations
 	 * 
 	 * @return array
 	 * @since 1.5
 	 */
-	function getExtDataStatus()
+	function getUnboundedItems($limit=25, $count_only=true, $checkNoExtData=true, $checkInvalidCat=true, $noCache=false)
 	{
+		if (!$checkNoExtData && !$checkInvalidCat) return $count_only ? 0 : array();
+		
 		$session = JFactory::getSession();
 		$configured = FLEXI_J16GE ? FLEXI_CAT_EXTENSION : FLEXI_SECTION;
-		
-		if ( !$configured ) {
-			$unbounded_count = 0;
-		} else if ($session->has('unbounded_count', 'flexicontent') ) {
-			$unbounded_count = $session->get('unbounded_count', false, 'flexicontent');
-		} else {
-			$unbounded_count = false;
-		}
-		if ($unbounded_count===0) return null;
-		
-		$status = array();
-		$query 	= 'SELECT c.id FROM #__content as c'
-					. (FLEXI_J16GE ?  ' LEFT JOIN #__categories as cat ON c.catid=cat.id' : '')
-					. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE (cat.extension="'.FLEXI_CAT_EXTENSION.'" OR cat.id IS NULL)')
-				;
-		$this->_db->setQuery($query);
-		$allids = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-		$allids = is_array($allids)?$allids:array();// !important
-		//echo count($allids); exit;
-
-		$query 	= 'SELECT item_id FROM #__flexicontent_items_ext';
-		$this->_db->setQuery($query);
-		$allext = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-		$allext = is_array($allext)?$allext:array();// !important
-
-		$query 	= 'SELECT DISTINCT c.id FROM #__content as c'
-						. ' LEFT JOIN #__categories as cat ON c.catid=cat.id'
-						. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE cat.extension="'.FLEXI_CAT_EXTENSION.'" ')
-						. ' AND cat.id IS NOT NULL';
-		$this->_db->setQuery($query);
-		$allcat = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-		$allcat = is_array($allcat)?$allcat:array();// !important
-		//echo count($allcat); exit;
-
-		/*$query 	= 'SELECT item_id FROM #__flexicontent_fields_item_relations'
-				. ' GROUP BY item_id'
-				. ' HAVING COUNT(field_id) >= 5'  // we set 5 instead of 7 for the new created items that doesn't have any created date
-				;
-		$this->_db->setQuery($query);
-		$allfi = FLEXI_J16GE ? $this->_db->loadColumn() : $this->_db->loadResultArray();
-		$allfi = is_array($allfi)?$allfi:array();*/
-		
-		$status['allids'] = $allids;
-		$status['allext'] = $allext;
-		$status['allcat'] = $allcat;
-		
-		$status['noext']  = array_diff($allids,$allext);
-		$status['nocat']  = array_diff($allids,$allcat);
-		$status['unbounded'] = array_unique(array_merge($status['noext'],$status['nocat']));
-		
-		$session->set('unbounded_count', count($status['unbounded']), 'flexicontent');
-		return $status;
-	}
-
-	/**
-	 * Method to get the new added items from the content table
-	 * 
-	 * @return object
-	 * @since 1.5
-	 */
-	function getUnassociatedItems($limit = 1000000, $ids_only=true)
-	{
-		static $unassociated;
-		if ( isset($unassociated[$ids_only]) ) return $unassociated[$ids_only];
 		
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ( $print_logging_info )  global $fc_run_times;
-		
 		if ( $print_logging_info )  $start_microtime = microtime(true);
-		$status = $this->getExtDataStatus();
 		
-		if ( !empty($status['unbounded']) ) {
-			$and = ' AND c.id IN ( ' . implode(',', $status['unbounded']) . ' )';
-			if ($ids_only) {
-				$query 	= 'SELECT c.id ';
-			} else {
-				$query 	= 'SELECT c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state';
-			}
-			$query .= ''
-				. (FLEXI_J16GE ? ', c.language' : '')
-				. ' FROM #__content as c'
-				. (FLEXI_J16GE ? ' LEFT JOIN #__categories as cat ON c.catid=cat.id' : '')
-				. (!FLEXI_J16GE ? ' WHERE sectionid = ' . $this->_db->Quote(FLEXI_SECTION) : ' WHERE (cat.extension="'.FLEXI_CAT_EXTENSION.'" OR cat.id IS NULL)')
-				. $and
-				;
-			$this->_db->setQuery($query, 0, $limit);
-			$unassociated[$ids_only] = $this->_db->loadObjectList();
+		if ($checkNoExtData && $checkInvalidCat) $_var = 'unbounded_total';
+		else if ($checkNoExtData)  $_var = 'unbounded_noext';
+		else $_var = 'unbounded_badcat';
+		
+		if ( !$configured ) {
+			$unbounded_count = 0;
+		} else if ($session->has($_var, 'flexicontent') ) {
+			$unbounded_count = $session->get($_var, false, 'flexicontent');
 		} else {
-			$unassociated[$ids_only] = '';
+			$unbounded_count = false;
 		}
+		if ( !$noCache && $unbounded_count===0 ) return null;
+		
+		$match_rules = array();
+		if ($checkNoExtData)  $match_rules[] = 'ie.item_id IS NULL';
+		if ($checkInvalidCat) $match_rules[] = 'cat.id IS NULL';
+		if ( empty($match_rules) ) return null;
+		$query 	= 'SELECT '. ($count_only ? 'COUNT(*)' : 'c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state')
+			. (FLEXI_J16GE ? ', c.language' : '')
+			. ' FROM #__content as c'
+			. ($checkNoExtData ? ' LEFT JOIN #__flexicontent_items_ext as ie ON c.id=ie.item_id' : '')
+			. ($checkInvalidCat ? ' LEFT JOIN #__categories as cat ON c.catid=cat.id' : '')
+			. (!FLEXI_J16GE ? ' WHERE sectionid = ' . (int)FLEXI_SECTION : ' WHERE 1')
+			. ' AND ('.implode(' OR ',$match_rules).')'
+			;
+		$this->_db->setQuery($query, 0, $limit);
+		
+		if ($count_only) {
+			$unbounded_count = (int) $this->_db->loadResult();
+			if ($checkNoExtData && $checkInvalidCat)  $session->set('unbounded_total', $unbounded_count, 'flexicontent');
+			else if ($checkNoExtData)  $session->set('unbounded_noext', $unbounded_count, 'flexicontent');
+			else  $session->set('unbounded_badcat', $unbounded_count, 'flexicontent');
+		} else {
+			$unbounded = $this->_db->loadObjectList();
+		}
+		
 		if ( $print_logging_info ) @$fc_run_times['unassoc_items_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-		return $unassociated[$ids_only];
+		
+		return $count_only ? $unbounded_count : $unbounded;
 	}
-
+	
+	
+	
+	function fixMainCat($default_cat)
+	{
+		// Correct non-existent main category in content table
+		echo $query = 'UPDATE #__content as c '
+					.' LEFT JOIN #__categories as cat ON c.catid=cat.id'
+					.' SET c.catid=' .$default_cat
+					.' WHERE cat.id IS NULL';
+		$this->_db->setQuery($query);
+		$this->_db->query();
+		
+		// Correct non-existent main category in content table
+		echo $query = 'UPDATE #__flexicontent_items_tmp as c '
+					.' LEFT JOIN #__categories as cat ON c.catid=cat.id'
+					.' SET c.catid=' .$default_cat
+					.' WHERE cat.id IS NULL';
+		$this->_db->setQuery($query);
+		$this->_db->query();
+	}
+	
+	
 	/**
 	 * Method to add flexi extended datas to standard content
 	 * 
@@ -484,7 +461,7 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return boolean
 	 * @since 1.5
 	 */
-	function addFlexiData($rows)
+	function bindExtData($rows)
 	{
 		if (!$rows || !count($rows)) return;
 		
@@ -502,54 +479,68 @@ class FlexicontentModelItems extends JModelLegacy
 		if (!$badcats) $badcats = array();
 		$badcats = array_flip($badcats);
 		
-		// insert items to category relations
+		// Insert main category-item relation via single query
 		$catrel = array();
 		foreach ($rows as $row) {
 			$row_catid = !isset($badcats[$row->catid]) ? (int)$row->catid : $default_cat;
 			$catrel[] = '('.$row_catid.', '.(int)$row->id.')';
 			// append the text property to the object
 			if (JString::strlen($row->fulltext) > 1) {
-				$row->text = $row->introtext = $row->introtext . '<hr id="system-readmore" />' . $row->fulltext;
+				$row->text_stripped = $row->introtext . '<hr id="system-readmore" />' . $row->fulltext;
 			} else {
-				$row->text = $row->introtext;
+				$row->text_stripped = flexicontent_html::striptagsandcut($row->introtext);
 			}			
 		}
+		
 		$catrel = implode(', ', $catrel);
-
-		$nullDate	= $this->_db->getNullDate();
-		
-		$query = 'UPDATE #__content as c '
-					.' LEFT JOIN #__categories as cat ON c.catid=cat.id'
-					.' SET c.catid=' .$default_cat
-					.' WHERE cat.id IS NULL';
-		$this->_db->setQuery($query);
-		$this->_db->query();
-		
-		$query = 'UPDATE #__content SET language=' .$this->_db->Quote($default_lang). ' WHERE language=""' ;
-		$this->_db->setQuery($query);
-		$this->_db->query();
-		
 		$query = "INSERT INTO #__flexicontent_cats_item_relations (`catid`, `itemid`) "
 				."  VALUES ".$catrel
 				." ON DUPLICATE KEY UPDATE ordering=ordering";
 		$this->_db->setQuery($query);
 		$this->_db->query();
-
-		// insert items_ext datas,
-		// NOTE: we will not use a single query for creating multiple records,
+		
+		// Correct non-existent main category in content table
+		/*$query = 'UPDATE #__content as c '
+					.' LEFT JOIN #__categories as cat ON c.catid=cat.id'
+					.' SET c.catid=' .$default_cat
+					.' WHERE cat.id IS NULL';
+		$this->_db->setQuery($query);
+		$this->_db->query();*/
+		
+		// Correct empty language, although this is handled by post-installation task too
+		/*$query = 'UPDATE #__content SET language=' .$this->_db->Quote($default_lang). ' WHERE language=""' ;
+		$this->_db->setQuery($query);
+		$this->_db->query();*/
+		
+		// Insert items_ext datas,
+		// NOTE: we will not use a single query for creating multiple records, instead we will create only e.g. 100 at once,
 		// because of the column search_index which can be quite long
+		$itemext = array();
+		$id_arr  = array();
+		$row_count = count($rows);
+		$n = 0;
 		foreach ($rows as $row) {
 			if (FLEXI_J16GE) $ilang = $row->language ? $row->language : $default_lang;
 			else $ilang = $default_lang;  // J1.5 has no language setting
-			$itemext = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.flexicontent_html::striptagsandcut($row->text)).')';
-			$query = "INSERT INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`)"
-					." VALUES " . $itemext
-					." ON DUPLICATE KEY UPDATE type_id=VALUES(type_id), language=VALUES(language), search_index=VALUES(search_index)";
-			$this->_db->setQuery($query);
-			$this->_db->query();
+			$itemext[] = '('.(int)$row->id.', '. $typeid .', '.$this->_db->Quote($ilang).', '.$this->_db->Quote($row->title.' | '.$row->text_stripped).')';
+			$id_arr[] = (int)$row->id;
+			$n++;
+			if ( ($n%101 == 0) || ($n==$row_count) ) {
+				$itemext_list = implode(', ', $itemext);
+				$query = "INSERT INTO #__flexicontent_items_ext (`item_id`, `type_id`, `language`, `search_index`)"
+						." VALUES " . $itemext_list
+						." ON DUPLICATE KEY UPDATE type_id=VALUES(type_id), language=VALUES(language), search_index=VALUES(search_index)";
+				$this->_db->setQuery($query);
+				$this->_db->query();
+				$itemext = array();
+				
+				$query = "UPDATE #__flexicontent_items_tmp"
+					." SET type_id=".$typeid
+					." WHERE id IN(".implode(',',$id_arr).")";
+				$this->_db->setQuery($query);
+				$this->_db->query();
+			}
 		}
-		
-		return;
 	}
 
 	/**
@@ -648,15 +639,18 @@ class FlexicontentModelItems extends JModelLegacy
 				. 't.name AS type_name, rel.ordering as catsordering, (' . $subquery . ') AS author, i.attribs AS config, t.attribs as tconfig'
 				;
 		}
+		
+		$use_tmp = !$query_ids;
+		$tmp_only = $use_tmp && !JRequest::getVar('search');
 		$query .= ""
-				. ( !$query_ids ? ' FROM #__flexicontent_items_tmp AS i' :' FROM #__content AS i')
+				. ( $use_tmp ? ' FROM #__flexicontent_items_tmp AS i' :' FROM #__content AS i')
+				. ( $tmp_only ? '' : ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id')
+				. ' JOIN #__categories AS c ON c.id = i.catid'
 				. (($filter_state=='RV') ? ' LEFT JOIN #__flexicontent_versions AS fv ON i.id=fv.item_id' : '')
-				. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
 				. ' LEFT JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id' // left join needed to INCLUDE items do not have records in the multi-cats-items TABLE
 				.    ($filter_cats && !$filter_subcats ? ' AND rel.catid='.$filter_cats : '')
-				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = ie.type_id'   // left join needed to detect items without type !!
-				. ' JOIN #__categories AS c ON c.id = i.catid'
-				. ( !$query_ids ? '' : ' LEFT JOIN #__users AS u ON u.id = i.checked_out')
+				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = '.( $tmp_only ? 'i.' : 'ie.').'type_id'   // left join needed to detect items without type !!
+				. ( $use_tmp ? '' : ' LEFT JOIN #__users AS u ON u.id = i.checked_out')
 				. $ver_specific_joins
 				;
 		if ( !$query_ids ) {
@@ -856,19 +850,9 @@ class FlexicontentModelItems extends JModelLegacy
 				}
 			}
 		}
-
-		// get not associated items to remove them from the displayed datas
-		/*$unassociated = $this->getUnassociatedItems(1000000, $_ids_only=true);
-		if ($unassociated) {
-			$notin = array();
-			foreach ($unassociated as $ua) {
-				$notin[] = $ua->id;
-			}
-			$where[] = ' i.id NOT IN (' . implode(', ', $notin) . ')';
-		}*/
-
+		
 		if ( $filter_type ) {
-			$where[] = 'ie.type_id = ' . $filter_type;
+			$where[] = 'i.type_id = ' . $filter_type;
 		}
 
 		if ( $filter_cats ) {
@@ -904,7 +888,7 @@ class FlexicontentModelItems extends JModelLegacy
 				$where[] = '(rel.catid IN ( SELECT id FROM #__categories WHERE published=0 )' .' OR '. 'c.published = 0)';
 			}
 		}
-
+		
 		if ( $filter_authors ) {
 			$where[] = 'i.created_by = ' . $filter_authors;
 			}
@@ -915,7 +899,7 @@ class FlexicontentModelItems extends JModelLegacy
 
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			if ( $filter_lang ) {
-				$where[] = 'ie.language = ' . $this->_db->Quote($filter_lang);
+				$where[] = 'i.language = ' . $this->_db->Quote($filter_lang);
 			}
 		}
 		
@@ -2289,6 +2273,7 @@ class FlexicontentModelItems extends JModelLegacy
 	
 	/**
 	 * Method to import Joomla! com_content datas and structure
+	 * this is UNUSED in J2.5+, it may be used in the future
 	 * 
 	 * @return boolean true on success
 	 * @since 1.5
@@ -2296,16 +2281,19 @@ class FlexicontentModelItems extends JModelLegacy
 	 
 	function import()
 	{
+		jimport('joomla.utilities.simplexml');  // Deprecated J2.5, removed J3.x
 		// Get the site default language
 		$lang = flexicontent_html::getSiteDefaultLang();
 		
-		// Get all Joomla sections
-		$query = 'SELECT * FROM #__sections';
-		$this->_db->setQuery($query);
-		$sections = $this->_db->loadObjectList();
-	
+		if (!FLEXI_J16GE) {
+			// Get all Joomla sections
+			$query = 'SELECT * FROM #__sections';
+			$this->_db->setQuery($query);
+			$sections = $this->_db->loadObjectList();
+		}
+		
 		$logs = new stdClass();
-		$logs->sec = 0;
+		if (!FLEXI_J16GE) $logs->sec = 0;
 		$logs->cat = 0;
 		$logs->art = 0;
 		//$logs->err = new stdClass();
@@ -2324,7 +2312,7 @@ class FlexicontentModelItems extends JModelLegacy
 		// Get the category default parameters in a string
 		$xml = new JSimpleXML;
 		$xml->loadFile(JPATH_COMPONENT.DS.'models'.DS.'category.xml');
-		$catparams = new JParameter('');
+		$catparams = FLEXI_J16GE ? new JRegistry() : new JParameter("");
 		
 		foreach ($xml->document->params as $paramGroup) {
 			foreach ($paramGroup->param as $param) {
@@ -2363,10 +2351,10 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 			
 			// Get the categories of each imported section
-			$query = 'SELECT * FROM #__categories WHERE section = ' . $section->id;
+			$query = "SELECT * FROM #__categories WHERE section = " . $section->id;
 			$this->_db->setQuery($query);
 			$categories = $this->_db->loadObjectList();
-	
+			
 			// Loop throught the categories of the created section
 			foreach ($categories as $category)
 			{

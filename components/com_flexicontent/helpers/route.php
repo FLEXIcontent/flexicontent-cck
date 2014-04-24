@@ -157,13 +157,21 @@ class FlexicontentHelperRoute
 	/**
 	 * Get routed links for content items
 	 */
-	static function getItemRoute($id, $catid = 0, $Itemid = 0)
+	static function getItemRoute($id, $catid = 0, $Itemid = 0, $item = null)
 	{
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
 		
+		// Compatibility with calls not passing item data, check for item data in global object, just avoid an extra SQL call
+		if ( !$item ) {
+			global $fc_list_items;
+			$_item_id = (int) $id;
+			if ( !empty($fc_list_items) && isset($fc_list_items[$_item_id]) ) $item = $fc_list_items[$_item_id];
+		}
+		
 		$needles = array(
 			FLEXI_ITEMVIEW  => (int) $id,
-			'category' => (int) $catid
+			'category' => (int) $catid,
+			'item' => $item
 		);
 		
 		// Create the link
@@ -354,15 +362,20 @@ class FlexicontentHelperRoute
 		// Get access level and type id of the FLEXIcontent item
 		// *****************************************************
 		
-		if ( !$needles[FLEXI_ITEMVIEW] ) return null;
-		$db = JFactory::getDBO();
-		$db->setQuery( 'SELECT i.access, ie.type_id '
-			.' FROM #__content AS i '
-			.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-			.' WHERE i.id='. $needles[FLEXI_ITEMVIEW]);
-		$item = $db->loadObject();
-		$item_access  = $item->access;
-		$type_id = $item->type_id;
+		if ( empty($needles[FLEXI_ITEMVIEW]) ) return null;
+		if ( empty($needles['item']) ) {
+			$db = JFactory::getDBO();
+			$db->setQuery( 'SELECT i.access, ie.type_id '
+				.' FROM #__content AS i '
+				.' LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
+				.' WHERE i.id='. $needles[FLEXI_ITEMVIEW]);
+			$item = $db->loadObject();
+			$item_access = $item->access;
+			$type_id = $item->type_id;
+		} else {
+			$item_access = $needles['item']->access;
+			$type_id = $needles['item']->type_id;
+		}
 		
 		
 		// *******************************

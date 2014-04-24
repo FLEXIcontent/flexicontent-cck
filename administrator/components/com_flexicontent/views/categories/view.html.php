@@ -166,6 +166,15 @@ class FlexicontentViewCategories extends JViewLegacy
 			$rows = $this->get( 'Data');
 		}
 		
+		// Get assigned items
+		$model =  $this->getModel();
+		$catids = array();
+		foreach ($rows as $row) $catids[] = $row->id;
+		$catdata = $model->getAssignedItems($catids);
+		foreach ($rows as $row) {
+			$row->nrassigned = isset ($catdata[$row->id]) ? $catdata[$row->id]->nrassigned : 0;
+		}
+		
 		// Parse configuration for every category
    	foreach ($rows as $cat)  $cat->config = FLEXI_J16GE ? new JRegistry($cat->config) : new JParameter($cat->config);
 		

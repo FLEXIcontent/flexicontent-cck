@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1577 2012-12-02 15:10:44Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1869 2014-03-12 12:18:40Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -164,6 +164,15 @@ class FlexicontentViewCategories extends JViewLegacy
 			$rows = $this->get( 'Items');
 		} else {
 			$rows = $this->get( 'Data');
+		}
+		
+		// Get assigned items
+		$model =  $this->getModel();
+		$catids = array();
+		foreach ($rows as $row) $catids[] = $row->id;
+		$catdata = $model->getAssignedItems($catids);
+		foreach ($rows as $row) {
+			$row->nrassigned = isset ($catdata[$row->id]) ? $catdata[$row->id]->nrassigned : 0;
 		}
 		
 		// Parse configuration for every category

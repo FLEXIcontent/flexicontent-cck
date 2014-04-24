@@ -298,6 +298,14 @@ class FlexicontentController extends JControllerLegacy
 			$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
 			if ( ! @ $data['rules'] ) $data['rules'] = array();
 			
+			// Work around for not set main category, TODO more proper fix
+			$_id = $model->getId();
+			if ($_id) {
+				if ( empty($data['catid']) ) {
+					$data['catid'] = $model->get('catid');
+				}
+			}
+
 			// *** MANUALLY CHECK CAPTCHA ***
 			$use_captcha    = $params->get('use_captcha', 1);     // 1 for guests, 2 for any user
 			$captcha_formop = $params->get('captcha_formop', 0);  // 0 for submit, 1 for submit/edit (aka always)

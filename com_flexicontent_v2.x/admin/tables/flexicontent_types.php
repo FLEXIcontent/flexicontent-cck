@@ -22,6 +22,43 @@ if (FLEXI_J16GE) {
 	jimport('joomla.database.tableasset');
 	jimport('joomla.access.accessrules');
 }
+
+class _flexicontent_types_common extends JTable {
+	/**
+	 * Get the parent asset id for the record
+	 *
+	 * @param   JTable   $table  A JTable object for the asset parent.
+	 * @param   integer  $id     The id for the asset
+	 *
+	 * @return  integer  The id of the asset's parent
+	 *
+	 * @since   11.1
+	 */
+	protected function __getAssetParentId(JTable $table = null, $id = null)
+	{
+		$asset = JTable::getInstance('Asset');
+		$asset->loadByName('com_flexicontent');
+		return $asset->id;
+	}
+}
+
+if (FLEXI_J30GE) {
+	class _flexicontent_types extends _flexicontent_types_common {
+		protected function _getAssetParentId(JTable $table = null, $id = null) {
+			return parent::__getAssetParentId($table, $id);
+		}
+	}
+}
+
+else {
+	class _flexicontent_types extends _flexicontent_types_common {
+		protected function _getAssetParentId($table = null, $id = null) {
+			return parent::__getAssetParentId($table, $id);
+		}
+	}
+}
+
+
 /**
  * FLEXIcontent table class
  *
@@ -29,7 +66,7 @@ if (FLEXI_J16GE) {
  * @subpackage FLEXIcontent
  * @since 1.0
  */
-class flexicontent_types extends JTable
+class flexicontent_types extends _flexicontent_types
 {
 	/** @var int */
 	var $id 					= null;
@@ -115,24 +152,6 @@ class flexicontent_types extends JTable
 		return $this->name;
 	}
 	
-	/**
-	 * Get the parent asset id for the record
-	 *
-	 * @param   JTable   $table  A JTable object for the asset parent.
-	 * @param   integer  $id     The id for the asset
-	 *
-	 * @return  integer  The id of the asset's parent
-	 *
-	 * @since   11.1
-	 */
-	protected function _getAssetParentId($table = null, $id = null)
-	{
-		$asset = JTable::getInstance('Asset');
-		$asset->loadByName('com_flexicontent');
-		return $asset->id;
-		//return 0;
-	}
-
 	
 	/**
 	 * Overloaded bind function.

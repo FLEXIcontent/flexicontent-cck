@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default_postinstall.php 1163 2012-03-07 10:11:22Z enjoyman@gmail.com $
+ * @version 1.5 stable $Id: default_postinstall.php 1879 2014-03-27 12:20:20Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -147,7 +147,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		}
 	});
 <?php endif; ?>
-<?php if(!$this->existdbindexes) : ?>
+<?php if( !empty($this->existdbindexes) ) : ?>
 	$('existdbindexes').addEvent('click', function(e) {
 		//e = new Event(e).stop();
 		var url = "index.php?option=com_flexicontent&task=createdbindexes&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1&tmpl=component";
@@ -359,7 +359,7 @@ $('missingversion').addEvent('click', function(e) {
 <?php endif; ?>
 	});
 </script>
-<table class="adminlist" cellspacing="0" cellpadding="0" border="0" width="100%">
+<table class="adminlist" cellspacing="0" cellpadding="0" border="0">
 	<tr>
 		<td class="key">
 			<?php echo JText::_( 'FLEXI_PUBLISH_ALL_PLUGINS' ); ?>
@@ -369,7 +369,7 @@ $('missingversion').addEvent('click', function(e) {
 		</td>
 	</tr>
 	<tr>
-		<td class="key" style="width:280px;">
+		<td class="key">
 			<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_TYPE' ); ?>
 		</td>
 		<td id="existtype-log">
@@ -377,7 +377,7 @@ $('missingversion').addEvent('click', function(e) {
 		</td>
 	</tr>
 	<tr>
-		<td class="key" style="width:280px;">
+		<td class="key">
 			<?php echo JText::_( 'Default Menu Item for URLs' ); ?>
 		</td>
 		<td id="existmenuitems-log">
@@ -411,9 +411,22 @@ $('missingversion').addEvent('click', function(e) {
 	<tr>
 		<td class="key">
 			<?php echo JText::_( 'FLEXI_CREATE_DB_INDEXES' ); ?>
+			<?php
+				if (!empty($this->existdbindexes)) {
+					echo "<br/><span class='fc-mssg-inline fc-mssg fc-note'>this may take a long time on big web-sites, if it timeouts (or takes >5 min) then please refresh, and click to create remaining indexes</span>";
+					echo "<br># tables: ". count($this->existdbindexes) ." : ";
+					foreach($this->existdbindexes as $tblname => $indexes) {
+						if ( isset($indexes['__indexing_started__']) ) {
+							echo "<br/><b>" .$tblname. "</b> (<small style='color:green'>Indexing started</small>)";
+						} else {
+							echo "<br/><b>" .$tblname. "</b> (". count($indexes) ." <small>indexes missing</small>)";
+						}
+					}
+				}
+			?>
 		</td>
 		<td id="existdbindexes-log">
-			<?php echo $this->existdbindexes ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existdbindexes" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+			<?php echo empty($this->existdbindexes) ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existdbindexes" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 		</td>
 	</tr>
 	<tr>

@@ -88,28 +88,32 @@ if (FLEXI_J16GE) {
 ?>
 <script language="javascript" type="text/javascript">
 
-function fetchcounter()
+function fetchcounter(el_id, task_name)
 {
-	var url = "index.php?option=com_flexicontent&<?php echo $items_task; ?>getorphans&tmpl=component&format=raw";
+	var url = "index.php?option=com_flexicontent&<?php echo $items_task; ?>"+task_name+"&tmpl=component&format=raw";
 	if(MooTools.version>="1.2.4") {
 		new Request.HTML({
 			url: url,
 			method: 'get',
-			update: $('count'),
+			update: $(el_id),
 			onSuccess:function(responseTree, responseElements, responseHTML, responseJavaScript) {
-				if(responseHTML==0)
+				if(responseHTML==0) {
 					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>"))
 						location.href = 'index.php?option=com_flexicontent&view=items';
+				}
+				return responseHTML;
 			}
 		}).send();
 	}else{
 		var ajax = new Ajax(url, {
 			method: 'get',
-			update: $('count'),
+			update: $(el_id),
 			onComplete:function(v) {
-				if(v==0)
+				if(v==0) {
 					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>"))
 						location.href = 'index.php?option=com_flexicontent&view=items';
+				}
+				return v;
 			}
 		});
 		ajax.request();
@@ -216,42 +220,90 @@ window.addEvent('domready', function(){
 */ ?>
 });
 </script>
-<?php if ($this->unassociated) : ?>
+
 <script type="text/javascript">
+
+<?php if ($this->unassociated && !$this->badcatitems) : ?>
+	var unassociated_items = <?php echo $this->unassociated; ?>;
+	function bindItems() {
+		jQuery('#log-bind').html('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
+		
+		//$('bindForm').submb
+		//this.form.action += '&typeid='+this.form.elements['typeid'].options[this.form.elements['typeid'].selectedIndex].value;
+		//this.form.action += '&bind_limit='+this.form.elements['bind_limit'].options[this.form.elements['bind_limit'].selectedIndex].value;		
+		
+    var postData = jQuery('#bindForm').serializeArray();
+    var formURL = jQuery('#bindForm').attr("action");
+    jQuery.ajax(
+		{
+			url : formURL,
+			type: "POST",
+			data : postData,
+			success:function(data, textStatus, jqXHR)
+			{
+				jQuery('#log-bind').html(data);
+				bind_limit = jQuery('#bind_limit').val();
+				unassociated_items = unassociated_items - bind_limit;
+				if (unassociated_items > 0) {
+					jQuery('#orphan_items_count').html(unassociated_items);
+					bindItems();
+				} else {
+					jQuery('#orphan_items_count').html('0');
+					if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>")) {
+						location.href = 'index.php?option=com_flexicontent&view=items';
+					}
+				}
+				//if (fetchcounter('orphan_items_count', 'getOrphansItems', jQuery('#bind_limit').val()) != 0) bindItems();
+			},
+			error: function(jqXHR, textStatus, errorThrown)
+			{
+			    //if fails     
+			}
+		});
+	}
+<?php endif; ?>
+
+<?php if ($this->badcatitems) : ?>
 window.addEvent('domready', function() {
-	$('bindForm').addEvent('submit', function(e) {
+	$('fixcatForm').addEvent('submit', function(e) {
+		if ( !$('fixcatForm').elements['default_cat'].options[$('fixcatForm').elements['default_cat'].selectedIndex].value ) {
+			alert('Please select a category');
+			return false;
+		}
+		$('fixcatForm').action += '&default_cat='+$('fixcatForm').elements['default_cat'].options[$('fixcatForm').elements['default_cat'].selectedIndex].value;
+		
 		if(MooTools.version>="1.2.4") {
-			$('log-bind').set('html', '<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
+			$('log-fixcat').set('html', '<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
 			e = e.stop();
 		}else{
-			$('log-bind').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
+			$('log-fixcat').setHTML('<p class="centerimg"><img src="components/com_flexicontent/assets/images/ajax-loader-orange.gif" align="center"></p>');
 			e = new Event(e).stop();
 		}
 		if(MooTools.version>="1.2.4") {
 			new Request.HTML({
 				url: this.action,
 				method: 'post',
-				update: $('log-bind'),
+				update: $('log-fixcat'),
 				onComplete: function() {
-					fetchcounter();
+					fetchcounter('badcat_items_count', 'getBadCatItems');
 				}
 			}).send();
 		}else{
 			this.send({
-				update: $('log-bind'),
+				update: $('log-fixcat'),
 				onComplete: function() {
-					fetchcounter();
+					fetchcounter('badcat_items_count', 'getBadCatItems');
 				}
 			});
 		}
 	});
 });
-</script>
 <?php endif; ?>
+
+</script>
 <div class="flexicontent">
 
-<?php if ($this->unassociated) : ?>
-<form action="index.php?option=com_flexicontent&<?php echo $items_task; ?>bindextdata&tmpl=component" method="post" name="bindForm" id="bindForm">
+<?php if ($this->unassociated && !$this->badcatitems) : ?>
 	<div class="fc-mssg fc-warning">
 	<table>
 		<tr>
@@ -261,27 +313,49 @@ window.addEvent('domready', function() {
 			</span>
 			</td>
 			<td align="center" width="35%">
-				<span style="font-size:150%;"><span id="count"></span></span>&nbsp;<?php echo count($this->unassociated); ?>&nbsp;<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>&nbsp;&nbsp;
-				<?php echo $this->lists['extdata']; ?>
-				<?php
-					$types = $this->get( 'Typeslist' );
-					echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"', 'typeid');
-				?>
+				<span style="font-size:150%;"><span id="orphan_items_count"><?php echo $this->unassociated; ?></span></span>
+				<span style="font-size:115%;"><?php echo JText::_( 'FLEXI_ITEMS_TO_BIND' ); ?></span>
+				<div id="log-bind"></div>
+				<form action="index.php?option=com_flexicontent&<?php echo $items_task; ?>bindextdata&tmpl=component&format=raw" method="post" name="bindForm" id="bindForm">
+					<?php echo $this->lists['bind_limits']; ?>
+					<?php
+						$types = $this->get( 'Typeslist' );
+						echo JText::_( 'Bind to' ). flexicontent_html::buildtypesselect($types, 'typeid', $typesselected='', false, 'size="1"', 'typeid');
+					?>
+					<input id="button-bind" type="button" class="fc_button" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_BIND' ); ?>"
+					onclick="jQuery(this.form).hide(); bindItems();" />
+				</form>
+			</td>
+		</tr>
+	</table>
+	</div>
+<?php endif; ?>
+
+
+<?php if ($this->badcatitems) : ?>
+<form action="index.php?option=com_flexicontent&<?php echo $items_task; ?>fixmaincat&tmpl=component&format=raw" method="post" name="fixcatForm" id="fixcatForm">
+	<div class="fc-mssg fc-warning">
+	<table>
+		<tr>
+			<td>
+			<span style="font-size:115%;">
+			<?php echo JText::_( 'Item with invalid or missing main category' ); ?>
+			</span>
+			</td>
+			<td align="center" width="35%">
+				<span style="font-size:150%;"><span id="badcat_items_count"><?php echo $this->badcatitems; ?></span></span>&nbsp;
 				<br/>
 				<?php echo JText::_( 'FLEXI_DEFAULT_CAT_FOR_NO_CAT_ITEMS' ).': '.$this->lists['default_cat']; ?>
-				<input id="button-bind" type="submit" class="fc_button" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_BIND' ); ?>"
-				onclick="	this.form.action += '&typeid='+this.form.elements['typeid'].options[this.form.elements['typeid'].selectedIndex].value;
-									this.form.action += '&default_cat='+this.form.elements['default_cat'].options[this.form.elements['default_cat'].selectedIndex].value;
-									this.form.action += '&extdata='+this.form.elements['extdata'].options[this.form.elements['extdata'].selectedIndex].value;" />
-				<div id="log-bind"></div>
+				<input id="button-fixcat" type="submit" class="fc_button" style='float:none !important;' value="<?php echo JText::_( 'FLEXI_FIX' ); ?>"
+				onclick="" />
+				<div id="log-fixcat"></div>
 			</td>
 		</tr>
 	</table>
 	</div>
 </form>
-</div>
-
 <?php endif; ?>
+
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
@@ -330,7 +404,7 @@ window.addEvent('domready', function() {
 			</th>			
 			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
 			<th nowrap="nowrap" class="center hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'ie.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHTML::_('grid.sort', 'FLEXI_LANGUAGE', 'i.language', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 				<?php if ($this->filter_lang) : ?>
 				<span class="hasTip filterdel" title="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER_DESC', true) ?>">
 					<img src="components/com_flexicontent/assets/images/bullet_delete.png" alt="<?php echo JText::_('FLEXI_REMOVE_THIS_FILTER', true) ?>" onclick="delFilter('filter_lang');document.adminForm.submit();" />
@@ -360,7 +434,7 @@ window.addEvent('domready', function() {
 
 		<?php if ( $enable_translation_groups ) : ?>
 			<th class="center hideOnDemandClass">
-				<?php echo JHTML::_('grid.sort', 'Translation Group', 'ie.lang_parent_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
+				<?php echo JHTML::_('grid.sort', 'Translation Group', 'i.lang_parent_id', $this->lists['order_Dir'], $this->lists['order'] ); ?>
 			</th>
 		<?php endif; ?>
 
@@ -674,7 +748,7 @@ window.addEvent('domready', function() {
 			<td align="center"><?php echo $cid_checkbox; ?></td>
 			<td align="center">
 				<?php
-				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug)) .'&preview=1' .$autologin;
+				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug), 0, $row) .'&preview=1' .$autologin;
 				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
 				?>
 			</td>
@@ -712,7 +786,7 @@ window.addEvent('domready', function() {
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM', true );?>::<?php echo $row->title; ?>">
 					<?php
 					if ( $enable_translation_groups ) :
-						if ($this->lists['order']=='ie.lang_parent_id'&& $row->id!=$row->lang_parent_id) echo "<sup>|</sup>--";
+						if ($this->lists['order']=='i.lang_parent_id'&& $row->id!=$row->lang_parent_id) echo "<sup>|</sup>--";
 					endif;
 					?>
 					<a href="<?php echo $link; ?>">
@@ -754,7 +828,7 @@ window.addEvent('domready', function() {
 		<?php if ( $enable_translation_groups ) : ?>
 			<td align="center">
 				<?php
-					/*if ($this->lists['order']=='ie.lang_parent_id') {
+					/*if ($this->lists['order']=='i.lang_parent_id') {
 						if ($row->id==$row->lang_parent_id) echo "Main";
 						else echo "+";
 					}*/// else echo "unsorted<sup>[3]</sup>";
@@ -970,11 +1044,11 @@ window.addEvent('domready', function() {
 
 	<sup>[1]</sup> <?php echo JText::_('FLEXI_TMPL_NOT_SET_USING_TYPE_DEFAULT'); ?><br />
 	<sup>[2]</sup> <?php echo JText::sprintf('FLEXI_INLINE_ITEM_STATE_SELECTOR_DISABLED', $this->inline_ss_max); ?><br />
-	<?php if ( $enable_translation_groups )	: ?>
-		<sup>[3]</sup> <?php echo JText::_('FLEXI_SORT_TO_GROUP_TRANSLATION'); ?><br />
-	<?php endif; ?>
-	<sup>[4]</sup> <?php echo JText::_('FLEXI_MULTIPLE_ITEM_ORDERINGS'); ?></><br />
-	<sup>[5]</sup> <?php echo JText::_('FLEXI_CAN_ADD_CUSTOM_FIELD_COLUMNS_COMPONENT_AND_PER_TYPE'); ?></><br />
+	<?php if ( $enable_translation_groups )	:?>
+	<sup>[3]</sup> <?php echo JText::_('FLEXI_SORT_TO_GROUP_TRANSLATION'); ?><br />
+	<?php endif;?>
+	<sup>[4]</sup> <?php echo JText::_('FLEXI_MULTIPLE_ITEM_ORDERINGS'); ?><br />
+	<sup>[5]</sup> <?php echo JText::_('FLEXI_CAN_ADD_CUSTOM_FIELD_COLUMNS_COMPONENT_AND_PER_TYPE'); ?><br />
 
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />

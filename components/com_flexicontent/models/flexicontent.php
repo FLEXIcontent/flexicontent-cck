@@ -177,7 +177,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function _buildQuery($type='')
 	{
 		$params = $this->_params;
-
+		$use_tmp = true;
+		
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
 		$orderby = $this->_buildCatOrderBy('cat_');
@@ -195,7 +196,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$where .= ' AND c.id = cc.id';
 		// Filter the category view with the active active language
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$lta = FLEXI_J16GE ? 'i': 'ie';
+			$lta = FLEXI_J16GE || $use_tmp ? 'i': 'ie';
 			$where .= ' AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
 		
@@ -241,10 +242,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			
 			. ' ('
 			. ' SELECT COUNT( DISTINCT i.id )'
-			. ' FROM #__content AS i'
+			. (!$use_tmp ? ' FROM #__content AS i' : ' FROM #__flexicontent_items_tmp AS i')
+			. (!$use_tmp ? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' : '')
+			. ' JOIN #__flexicontent_types AS ty ON '. (!$use_tmp ? 'ie.' : 'i.') .'type_id = ty.id'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
-			. ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id'
-			. ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id'
 			. ' JOIN #__categories AS cc ON cc.id = rel.catid'
 			. $subjoin
 			. $where

@@ -127,7 +127,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	});
 </script>
 <?php endif; ?>
-<?php if (!$this->existdbindexes) : ?>
+<?php if( !empty($this->existdbindexes) ) : ?>
 <script type="text/javascript">
 	window.addEvent('domready', function(){
 		$('existdbindexes').addEvent('click', function(e) {
@@ -301,7 +301,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		</td>
 	</tr>
 	<tr>
-		<td class="key" style="width:280px;">
+		<td class="key">
 			<?php echo JText::_( 'FLEXI_INSTALL_DEFAULT_TYPE' ); ?>
 		</td>
 		<td id="existtype-log">
@@ -309,7 +309,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 		</td>
 	</tr>
 	<tr>
-		<td class="key" style="width:280px;">
+		<td class="key">
 			<?php echo JText::_( 'Default Menu Item for URLs' ); ?>
 		</td>
 		<td id="existmenuitems-log">
@@ -343,9 +343,22 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 	<tr>
 		<td class="key">
 			<?php echo JText::_( 'FLEXI_CREATE_DB_INDEXES' ); ?>
+			<?php
+				if (!empty($this->existdbindexes)) {
+					echo "<br/><span class='fc-mssg-inline fc-mssg fc-note'>this may take a long time on big web-sites, if it timeouts (or takes >5 min) then please refresh, and click to create remaining indexes</span>";
+					echo "<br># tables: ". count($this->existdbindexes) ." : ";
+					foreach($this->existdbindexes as $tblname => $indexes) {
+						if ( isset($indexes['__indexing_started__']) ) {
+							echo "<br/><b>" .$tblname. "</b> (<small style='color:green'>Indexing started</small>)";
+						} else {
+							echo "<br/><b>" .$tblname. "</b> (". count($indexes) ." <small>indexes missing</small>)";
+						}
+					}
+				}
+			?>
 		</td>
 		<td id="existdbindexes-log">
-			<?php echo $this->existdbindexes ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existdbindexes" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
+			<?php echo empty($this->existdbindexes) ? '<span class="install-ok"></span>' : '<span class="install-notok"></span><span class="button-add"><a id="existdbindexes" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>' ; ?>
 		</td>
 	</tr>
 	<tr>

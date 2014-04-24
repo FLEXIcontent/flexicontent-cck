@@ -24,7 +24,77 @@ defined('_JEXEC') or die('Restricted access');
  */
 jimport('joomla.database.tablenested');
 jimport('joomla.access.accessrules');
-class flexicontent_categories extends JTableNested
+
+class _flexicontent_categories_common extends JTableNested {
+	protected function __getAssetParentId(JTable $table = null, $id = null)
+	{
+		// Initialise variables.
+		$assetId = null;
+		$db		= $this->getDbo();
+
+		if ($this->parent_id > 1) {
+			// This is a category under a category.
+			// Build the query to get the asset id for the parent category.
+			$query	= $db->getQuery(true);
+			$query->select('asset_id');
+			$query->from('#__categories');
+			$query->where('id = '.(int) $this->parent_id);
+
+			// Get the asset id from the database.
+			$db->setQuery($query);
+			if ($result = $db->loadResult()) {
+				$assetId = (int) $result;
+			}
+		
+		} else {
+			// This is root category.
+			// Build the query to get the asset id of component.
+			$query	= $db->getQuery(true);
+			$query->select('id');
+			$query->from('#__assets');
+			$query->where('name= "com_flexicontent"');
+
+			// Get the asset id from the database.
+			$db->setQuery($query);
+			if ($result = $db->loadResult()) {
+				$assetId = (int) $result;
+			}
+		}
+
+		// Return the asset id.
+		if ($assetId) {
+			return $assetId;
+		} else {
+			return parent::_getAssetParentId($table, $id);
+		}
+	}
+}
+
+if (FLEXI_J30GE) {
+	class _flexicontent_categories extends _flexicontent_categories_common {
+		protected function _getAssetParentId(JTable $table = null, $id = null) {
+			return parent::__getAssetParentId($table, $id);
+		}
+	}
+}
+
+else {
+	class _flexicontent_categories extends _flexicontent_categories_common {
+		protected function _getAssetParentId($table = null, $id = null) {
+			return parent::__getAssetParentId($table, $id);
+		}
+	}
+}
+
+
+/**
+ * FLEXIcontent table class
+ *
+ * @package Joomla
+ * @subpackage FLEXIcontent
+ * @since 1.0
+ */
+class flexicontent_categories extends _flexicontent_categories
 {
 	/** @var int Primary key */
 	var $id					= null;
@@ -111,50 +181,9 @@ class flexicontent_categories extends JTableNested
 	 *
 	 * @since   11.1
 	 */
-	protected function _getAssetParentId($table = null, $id = null)
-	{
-		// Initialise variables.
-		$assetId = null;
-		$db		= $this->getDbo();
-
-		if ($this->parent_id > 1) {
-			// This is a category under a category.
-			// Build the query to get the asset id for the parent category.
-			$query	= $db->getQuery(true);
-			$query->select('asset_id');
-			$query->from('#__categories');
-			$query->where('id = '.(int) $this->parent_id);
-
-			// Get the asset id from the database.
-			$db->setQuery($query);
-			if ($result = $db->loadResult()) {
-				$assetId = (int) $result;
-			}
-		
-		} else {
-			// This is root category.
-			// Build the query to get the asset id of component.
-			$query	= $db->getQuery(true);
-			$query->select('id');
-			$query->from('#__assets');
-			$query->where('name= "com_flexicontent"');
-
-			// Get the asset id from the database.
-			$db->setQuery($query);
-			if ($result = $db->loadResult()) {
-				$assetId = (int) $result;
-			}
-		}
-
-		// Return the asset id.
-		if ($assetId) {
-			return $assetId;
-		} else {
-			return parent::_getAssetParentId($table, $id);
-		}
-	}
+	// see (above) parent class method: _getAssetParentId($table = null, $id = null)
 	
-
+	
 	/**
 	 * Overloaded check function
 	 *
