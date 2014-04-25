@@ -682,6 +682,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$app     = JFactory::getApplication();
 		$option  = JRequest::getVar('option');
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$use_tmp = true;
 		
 		$filter_order_type= $app->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type', 0, 'int' );
 		$filter_order     = $app->getUserStateFromRequest( $option.'.items.filter_order', 'filter_order', '', 'cmd' );
@@ -693,7 +694,7 @@ class FlexicontentModelItems extends JModelLegacy
 			($filter_order_type && (FLEXI_FISH || FLEXI_J16GE)) ||   // FLEXIcontent order supports language in J1.5 too
 			(!$filter_order_type && FLEXI_J16GE)   // Joomla order does not support language in J1.5
 		) {
-			$extra_order .= ' ie.language, ';
+			$extra_order .= FLEXI_J16GE || $use_tmp ? ' i.language, ' : ' ie.language, ';
 		}
 		
 		if ($filter_order == 'ie.lang_parent_id') {
@@ -2026,6 +2027,20 @@ class FlexicontentModelItems extends JModelLegacy
 		// *************************
 		$query = 'DELETE FROM #__flexicontent_items_ext'
 				. ' WHERE item_id IN ('. $cids .')'
+				;
+		$this->_db->setQuery( $query );
+		
+		if(!$this->_db->query()) {
+			$this->setError($this->_db->getErrorMsg());
+			return false;
+		}
+		
+		
+		// **************************
+		// Remove temporary item data
+		// **************************
+		$query = 'DELETE FROM #__flexicontent_items_tmp'
+				. ' WHERE id IN ('. $cids .')'
 				;
 		$this->_db->setQuery( $query );
 		

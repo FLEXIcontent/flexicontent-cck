@@ -63,17 +63,24 @@ class FlexicontentModelCategories extends JModelList
 		$this->_id	 = $id;
 		$this->_data = null;
 	}
-
-
+	
+	
+	/**
+	 * Method to count assigned items for the given categories
+	 *
+	 * @access public
+	 * @return	string
+	 * @since	1.6
+	 */
 	function getAssignedItems($cids) {
 		if (empty($cids)) return array();
 		
 		$db = JFactory::getDBO();
 		
 		// Select the required fields from the table.
-		$query  = " SELECT catid, COUNT(rel.catid) AS nrassigned";
+		$query  = " SELECT rel.catid, COUNT(rel.itemid) AS nrassigned";
 		$query .= " FROM #__flexicontent_cats_item_relations AS rel";
-		$query .= " WHERE catid IN (".implode(",", $cids).") ";
+		$query .= " WHERE rel.catid IN (".implode(",", $cids).") ";
 		$query .= " GROUP BY rel.catid";
 		
 		$db->setQuery( $query );
