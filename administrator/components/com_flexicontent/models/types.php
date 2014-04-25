@@ -76,7 +76,32 @@ class FlexicontentModelTypes extends JModelLegacy
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
 	}
-
+	
+	
+	/**
+	 * Method to count assigned items for the given types
+	 *
+	 * @access public
+	 * @return	string
+	 * @since	1.6
+	 */
+	function getAssignedItems($tids) {
+		if (empty($tids)) return array();
+		
+		$db = JFactory::getDBO();
+		
+		// Select the required fields from the table.
+		$query  = " SELECT i.type_id, COUNT(i.id) AS iassigned";
+		$query .= " FROM #__flexicontent_items_tmp AS i";
+		$query .= " WHERE i.type_id IN (".implode(",", $tids).") ";
+		$query .= " GROUP BY i.type_id";
+		
+		$db->setQuery( $query );
+		$assigned = $db->loadObjectList('type_id');
+		return $assigned;
+	}
+	
+	
 	/**
 	 * Method to get types data
 	 *
@@ -147,12 +172,7 @@ class FlexicontentModelTypes extends JModelLegacy
 		$orderby	= $this->_buildContentOrderBy();
 //		$having		= $this->_buildContentHaving();
 
-		$subquery = 'SELECT COUNT(type_id)'
-					. ' FROM #__flexicontent_items_ext'
-					. ' WHERE type_id = t.id'
-					;
-
-		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor, g.name AS groupname, COUNT(rel.type_id) AS fassigned, ('.$subquery.') AS iassigned, t.attribs AS config'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor, g.name AS groupname, COUNT(rel.type_id) AS fassigned, t.attribs AS config'
 					. ' FROM #__flexicontent_types AS t'
 					. ' LEFT JOIN #__flexicontent_fields_type_relations AS rel ON t.id = rel.type_id'
 					. ' LEFT JOIN #__groups AS g ON g.id = t.access'

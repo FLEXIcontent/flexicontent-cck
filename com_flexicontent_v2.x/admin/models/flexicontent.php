@@ -466,25 +466,28 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getItemsNoCat()
 	{
 		static $return;
-		if ($return === NULL) {
-			$db = JFactory::getDBO();
-			$query = "SELECT i.id"
-				." FROM #__content AS i"
-				." LEFT JOIN #__flexicontent_cats_item_relations as rel ON rel.catid=i.catid AND i.id=rel.itemid "
-				." WHERE rel.catid IS NULL"
-				." LIMIT 1";
-			$db->setQuery($query);
-			$item_id = $db->loadResult();
-			
-			if ($item_id) {
-				$query = "SELECT item_id "
-					." FROM #__flexicontent_items_ext as ie"
-					." WHERE item_id = ". $item_id;
-				$db->setQuery($query);
-				$item_id = $db->loadResult();
-			}
-			$return = $item_id ? 1 : 0;
-		}
+		if ($return !== NULL) return $return;
+		
+		$db = JFactory::getDBO();
+		
+		$query = "SELECT rel.itemid"
+			." FROM #__flexicontent_cats_item_relations AS rel"
+			." LEFT JOIN #__content AS i ON i.id = rel.itemid"
+			." WHERE i.id IS NULL"
+			." LIMIT 1";
+		$db->setQuery($query);
+		$item_id = $db->loadResult();
+		if ($item_id) return $return = true;
+		
+		$query = "SELECT i.id"
+			." FROM #__content AS i"
+			." LEFT JOIN #__flexicontent_cats_item_relations as rel ON rel.catid=i.catid AND i.id=rel.itemid "
+			." LEFT JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
+			." WHERE rel.catid IS NULL"
+			." LIMIT 1";
+		$db->setQuery($query);
+		$item_id = $db->loadResult();
+		if ($item_id) return $return = true;
 		
 		return $return;
 	}
@@ -500,31 +503,31 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getItemsNoLang()
 	{
 		static $return;
-		if ($return === NULL) {
-			$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
-			$db = JFactory::getDBO();
-			/*$query = "SELECT COUNT(*) FROM #__flexicontent_items_ext as ie "
-				. (FLEXI_J16GE ? " LEFT JOIN #__content as i ON i.id=ie.item_id " : "")
-				. " WHERE ie.language='' " . ($enable_translation_groups ? " OR ie.lang_parent_id='0' " : "")
-				. (FLEXI_J16GE ? " OR i.language='' OR i.language<>ie.language " : "")
-				;*/
+		if ($return !== NULL) return $return;
+		
+		$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
+		$db = JFactory::getDBO();
+		/*$query = "SELECT COUNT(*) FROM #__flexicontent_items_ext as ie "
+			. (FLEXI_J16GE ? " LEFT JOIN #__content as i ON i.id=ie.item_id " : "")
+			. " WHERE ie.language='' " . ($enable_translation_groups ? " OR ie.lang_parent_id='0' " : "")
+			. (FLEXI_J16GE ? " OR i.language='' OR i.language<>ie.language " : "")
+			;*/
+		$query = "SELECT COUNT(*)"
+			." FROM #__flexicontent_items_ext as ie"
+			." WHERE ie.language='' " . ($enable_translation_groups ? " OR ie.lang_parent_id='0' " : "")
+			." LIMIT 1";
+		$db->setQuery($query);
+		$cnt1 = $db->loadResult();
+		$cnt2 = 0;
+		if (FLEXI_J16GE) {
 			$query = "SELECT COUNT(*)"
-				." FROM #__flexicontent_items_ext as ie"
-				." WHERE ie.language='' " . ($enable_translation_groups ? " OR ie.lang_parent_id='0' " : "")
+				." FROM #__content as i"
+				." WHERE i.language=''"
 				." LIMIT 1";
 			$db->setQuery($query);
-			$cnt1 = $db->loadResult();
-			$cnt2 = 0;
-			if (FLEXI_J16GE) {
-				$query = "SELECT COUNT(*)"
-					." FROM #__content as i"
-					." WHERE i.language=''"
-					." LIMIT 1";
-				$db->setQuery($query);
-				$cnt2 = $db->loadResult();
-			}
-			$return = $cnt1 || $cnt2;
+			$cnt2 = $db->loadResult();
 		}
+		$return = $cnt1 || $cnt2;
 		
 		return $return;
 	}

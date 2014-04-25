@@ -817,7 +817,7 @@ class FlexicontentController extends JControllerLegacy
 	/**
 	 * Display the view
 	 */
-	function display($cachable = false, $urlparams = false)
+	function display($cachable = null, $urlparams = false)
 	{
 		// Debuging message
 		//JError::raiseNotice(500, 'IN display()'); // TOREMOVE
@@ -825,20 +825,25 @@ class FlexicontentController extends JControllerLegacy
 		// Access checking for --items-- viewing, will be handled by the items model, this is because THIS display() TASK is used by other views too
 		// in future it maybe moved here to the controller, e.g. create a special task item_display() for item viewing, or insert some IF bellow
 		
+		// Compatibility check: Layout is form and task is not set:  this is new item submit ...
 		if ( JRequest::getVar('layout', false) == "form" && !JRequest::getVar('task', false)) {
-			// Compatibility check: Layout is form and task is not set:  this is new item submit ...
 			JRequest::setVar('task', 'add');
 			$this->add();
-		} else {
-			// Display a FLEXIcontent frontend view (category, item, favourites, etc)
-			if (JFactory::getUser()->get('id')) {
-				// WITHOUT CACHING (logged users)
-				parent::display(false);
+		}
+		
+		// Display a FLEXIcontent frontend view (category, item, favourites, etc)
+		else {
+			if (!FLEXI_J16GE) {
+				// Default behaviour: WITHOUT CACHING (logged users) and WITH CACHING (guests)
+				$cacheable = JFactory::getUser()->get('id') ? false : true;
+				parent::display($cacheable);
 			} else {
-				// WITH CACHING (guests)
-				parent::display(true);
+				// Allow only in item view caching until we pass proper 'safeurlparams'
+				$view = JRequest::getVar('view');
+				$cacheable = $view == FLEXI_ITEM;
+				$safeurlparams = $urlparams;
+				parent::display($cacheable, $safeurlparams);
 			}
-			
 		}
 	}
 

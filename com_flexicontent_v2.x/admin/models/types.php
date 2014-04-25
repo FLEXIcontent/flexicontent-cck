@@ -77,6 +77,31 @@ class FlexicontentModelTypes extends JModelList
 		$this->setState('limitstart', $limitstart);
 	}
 	
+	
+	/**
+	 * Method to count assigned items for the given types
+	 *
+	 * @access public
+	 * @return	string
+	 * @since	1.6
+	 */
+	function getAssignedItems($tids) {
+		if (empty($tids)) return array();
+		
+		$db = JFactory::getDBO();
+		
+		// Select the required fields from the table.
+		$query  = " SELECT i.type_id, COUNT(i.id) AS iassigned";
+		$query .= " FROM #__flexicontent_items_tmp AS i";
+		$query .= " WHERE i.type_id IN (".implode(",", $tids).") ";
+		$query .= " GROUP BY i.type_id";
+		
+		$db->setQuery( $query );
+		$assigned = $db->loadObjectList('type_id');
+		return $assigned;
+	}
+	
+	
 	/**
 	 * Method to build the query for the types
 	 *
@@ -101,15 +126,11 @@ class FlexicontentModelTypes extends JModelList
 		$filter_order     = $app->getUserStateFromRequest( $option.'.types.filter_order', 		'filter_order', 	't.name', 'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.types.filter_order_Dir',	'filter_order_Dir',	'ASC', 'word' );
 
-		$subquery = 'SELECT COUNT(type_id)'
-					. ' FROM #__flexicontent_items_ext'
-					. ' WHERE type_id = t.id'
-					;
 		// Select the required fields from the table.
 		$query->select(
 			$this->getState(
 				'list.select',
-				't.*, u.name AS editor, level.title AS access_level, COUNT(rel.type_id) AS fassigned, ('.$subquery.') AS iassigned, t.attribs AS config'
+				't.*, u.name AS editor, level.title AS access_level, COUNT(rel.type_id) AS fassigned, t.attribs AS config'
 			)
 		);
 		

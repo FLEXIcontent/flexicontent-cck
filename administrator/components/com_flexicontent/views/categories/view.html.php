@@ -29,7 +29,7 @@ jimport('joomla.application.component.view');
  */
 class FlexicontentViewCategories extends JViewLegacy
 {
-	function display($tpl = null)
+	function display( $tpl = null )
 	{
 		//initialise variables
 		global $globalcats;
@@ -41,7 +41,7 @@ class FlexicontentViewCategories extends JViewLegacy
 		$document	= JFactory::getDocument();
 		
 		JHTML::_('behavior.tooltip');
-
+		
 		//get vars
 		$order_property = !FLEXI_J16GE ? 'c.ordering' : 'c.lft';
 		$filter_order     = $app->getUserStateFromRequest( $option.'.'.$view.'.filter_order',     'filter_order',     $order_property, 'cmd' );
@@ -170,9 +170,9 @@ class FlexicontentViewCategories extends JViewLegacy
 		$model =  $this->getModel();
 		$catids = array();
 		foreach ($rows as $row) $catids[] = $row->id;
-		$catdata = $model->getAssignedItems($catids);
+		$cattotals = $model->getAssignedItems($catids);
 		foreach ($rows as $row) {
-			$row->nrassigned = isset ($catdata[$row->id]) ? $catdata[$row->id]->nrassigned : 0;
+			$row->nrassigned = isset($cattotals[$row->id]) ? $cattotals[$row->id]->nrassigned : 0;
 		}
 		
 		// Parse configuration for every category

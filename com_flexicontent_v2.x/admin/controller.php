@@ -654,6 +654,17 @@ VALUES
 	function addmcatitemrelations()
 	{
 		$db = JFactory::getDBO();
+		
+		// 1st: remove orphan relations
+		$query = "DELETE rel.*"
+			." FROM #__flexicontent_cats_item_relations AS rel"
+			." LEFT JOIN #__content AS i ON i.id = rel.itemid"
+			." WHERE i.id IS NULL";
+		$db->setQuery($query);
+		$item_id = $db->query();
+		
+		
+		// 2nd: add missing main category relations
 		$subquery 	= "SELECT i.catid, i.id, 0 FROM #__flexicontent_items_ext as ie "
 			. " JOIN #__content as i ON i.id=ie.item_id "
 			. " LEFT JOIN #__flexicontent_cats_item_relations as rel ON rel.catid=i.catid AND i.id=rel.itemid "

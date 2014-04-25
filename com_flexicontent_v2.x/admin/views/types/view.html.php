@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1579 2012-12-03 03:37:21Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1869 2014-03-12 12:18:40Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -37,10 +37,10 @@ class FlexicontentViewTypes extends JViewLegacy
 	function display( $tpl = null )
 	{
 		//initialise variables
-		$app = JFactory::getApplication();
-		$option    = JRequest::getVar('option');
-		$user 		= JFactory::getUser();
-		$db       = JFactory::getDBO();
+		$app    = JFactory::getApplication();
+		$option = JRequest::getVar('option');
+		$user = JFactory::getUser();
+		$db   = JFactory::getDBO();
 		$document	= JFactory::getDocument();
 		
 		JHTML::_('behavior.tooltip');
@@ -90,6 +90,16 @@ class FlexicontentViewTypes extends JViewLegacy
 		} else {
 			$rows = $this->get( 'Data');
 		}
+		
+		// Get assigned items
+		$model =  $this->getModel();
+		$typeids = array();
+		foreach ($rows as $row) $typeids[] = $row->id;
+		$typetotals = $model->getAssignedItems($typeids);
+		foreach ($rows as $row) {
+			$row->iassigned = isset ($typetotals[$row->id]) ? $typetotals[$row->id]->iassigned : 0;
+		}
+		
 		foreach($rows as $type) {
 			$type->config = FLEXI_J16GE ? new JRegistry($type->config) : new JParameter($type->config);
 		}
