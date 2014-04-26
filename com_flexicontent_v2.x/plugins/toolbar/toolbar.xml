@@ -12,7 +12,8 @@
 
 	<files>
 		<filename plugin="toolbar">toolbar.php</filename>
-		<folder plugin="toolbar">toolbar</folder>
+		<filename>index.html</filename>
+		<folder>toolbar</folder>
 	</files>
 
 	<config>

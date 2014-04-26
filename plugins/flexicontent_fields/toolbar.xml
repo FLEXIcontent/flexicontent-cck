@@ -12,7 +12,7 @@
 
 	<files>
 		<filename plugin="toolbar">toolbar.php</filename>
-		<folder plugin="toolbar">toolbar</folder>
+		<folder>toolbar</folder>
 	</files>
 
 		<params group="standard">

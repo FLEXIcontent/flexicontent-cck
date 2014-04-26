@@ -11,6 +11,7 @@
 	<description>FLEXI_FIELD_TEXTSELECT</description>
 	<files>
 		<filename plugin="textselect">textselect.php</filename>
+		<filename>index.html</filename>
 	</files>
 	<config>
 	

@@ -11,6 +11,7 @@
 	<description>FLEXI_FIELD_TEXT</description>
 	<files>
 		<filename plugin="text">text.php</filename>
+		<filename>index.html</filename>
 	</files>
 	<config>
 	

@@ -1732,6 +1732,10 @@ class FlexicontentControllerItems extends FlexicontentController
 	 */
 	function bindextdata()
 	{
+		// Need to recheck post-installation / integrity tasks after,
+		// this should NOT effect RAW HTTP requests, used by AJAX ITEM binding
+		//JFactory::getSession()->set('flexicontent.recheck_aftersave', true);
+		
 		$bind_limit = JRequest::getInt('bind_limit', 25000);
 		if ($bind_limit < 1 || $bind_limit > 25000) $bind_limit = 25000;  // make sure this is valid
 		$model = $this->getModel('items');

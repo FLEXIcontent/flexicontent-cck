@@ -26,8 +26,14 @@ if (!defined('FLEXI_J16GE') || !defined('FLEXI_J30GE')) {
 if (!defined('FLEXI_J16GE'))   define('FLEXI_J16GE', version_compare( $jversion->getShortVersion(), '1.6.0', 'ge' ) );
 if (!defined('FLEXI_J30GE'))   define('FLEXI_J30GE', version_compare( $jversion->getShortVersion(), '3.0.0', 'ge' ) );
 
+		//error_reporting(E_ALL & ~E_STRICT);
+		//ini_set('display_errors',1);
 
+		// Extra CSS needed for J3.x+
 		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
+		
+		// Installed component manifest file version
+		$this->release = FLEXI_J16GE ? $parent->get( "manifest" )->version : $this->manifest->getElementByPath('version')->data();
 		echo '<p>' . JText::_('Uninstalling FLEXIcontent ' . $this->release) . '</p>';
 		
 		// init vars

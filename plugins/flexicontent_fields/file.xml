@@ -11,7 +11,7 @@
 	<description>FLEXI_FIELD_FILE</description>
 	<files>
 		<filename plugin="file">file.php</filename>
-		<folder plugin="file">file</folder>
+		<folder>file</folder>
 	</files>
 	
 		<params group="standard">

@@ -481,10 +481,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		$query = "SELECT i.id"
 			." FROM #__content AS i"
+			." JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
 			." LEFT JOIN #__flexicontent_cats_item_relations as rel ON rel.catid=i.catid AND i.id=rel.itemid "
-			." LEFT JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
 			." WHERE rel.catid IS NULL"
-			.(!FLEXI_J16GE ? ' AND i.sectionid='.(int)FLEXI_SECTION : '')
 			." LIMIT 1";
 		$db->setQuery($query);
 		$item_id = $db->loadResult();
@@ -557,7 +556,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// Get the column names
 		$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
 		
-		$query = "SELECT COUNT(*) AS total1, (SELECT COUNT(*) FROM `#__content`".(!FLEXI_J16GE ? ' WHERE sectionid=' .FLEXI_SECTION : '').") AS total2"
+		$query = "SELECT COUNT(*) AS total1, (SELECT COUNT(*) FROM `#__flexicontent_items_ext`) AS total2"
 			." FROM `#__content` AS i"
 			." JOIN `#__flexicontent_items_tmp` AS ca ON i.id=ca.id"
 			." JOIN `#__flexicontent_items_ext` AS ie ON ie.item_id=i.id"

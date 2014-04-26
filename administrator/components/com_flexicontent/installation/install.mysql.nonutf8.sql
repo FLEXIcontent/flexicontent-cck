@@ -250,6 +250,5 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
  KEY `created_by` (`created_by`),
  KEY `access` (`access`),
  KEY `language` (`language`),
- KEY `featured` (`featured`),
  KEY `type_id` (`type_id`)
 ) ENGINE=MyISAM;

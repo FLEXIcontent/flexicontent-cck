@@ -11,7 +11,7 @@
 	<description>Load a module or module position inside a content item</description>
 	<files>
 		<filename plugin="fcloadmodule">fcloadmodule.php</filename>
-		<folder plugin="fcloadmodule">fcloadmodule</folder>
+		<folder>fcloadmodule</folder>
 	</files>
 	
 		
