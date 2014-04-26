@@ -595,7 +595,7 @@ class FlexicontentFields
 		}
 		
 		// ALL OTHER CASES: (FLEXIcontent category, FLEXIcontent module, etc),
-		// Set triggering 'context' to 'com_content.article', (and also set the 'view' request variable)
+		// Set triggering 'context' to 'com_content.category', (and also set the 'view' request variable)
 		else {
 		  JRequest::setVar('view', 'category');
 		  $context = 'com_content.category';
@@ -2177,6 +2177,7 @@ class FlexicontentFields
 			} else if ( $isSearchView ) {
 				// search view, use parameter to decide if limitting filter values
 				global $fc_searchview;
+				if ( empty($fc_searchview) ) return array();  // search view plugin disabled ?
 				if ( $faceted_filter ) {
 					$view_join = $fc_searchview['join_clauses'];
 					$view_where = $fc_searchview['where_conf_only'];

@@ -507,3 +507,11 @@ dl#content-pane.tabs {
 #flexicontent .tabberlive ul.tabbernav {
 	margin-bottom: -4px !important;
 }
+
+.blank {
+	display: inline-block;
+}
+.button2-left {
+	display: inline-block;
+	margin: 2px 0 0 4px;
+}

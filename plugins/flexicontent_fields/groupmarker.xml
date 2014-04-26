@@ -23,7 +23,7 @@
 	
 		<params group="group-groupmarker" addpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="marker_type" type="groupedlist" default="fieldset_open" label="Marker type" description="BE CAREFULL to match-close all open type of markers with an appropriate closing type. BE CAREFULL to which content types you assign the field to.">
+			<field name="marker_type" type="multilist" default="fieldset_open" label="Marker type" description="BE CAREFULL to match-close all open type of markers with an appropriate closing type. BE CAREFULL to which content types you assign the field to.">
 				<group label="Tabs">
 					<option value="tabset_start"   >Tab-set: START</option>
 					<option value="tab_open"       >Tab: open</option>

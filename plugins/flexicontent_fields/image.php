@@ -355,7 +355,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// Common JS/CSS
-		$image_folder = JURI::root().$dir_url;
+		$image_folder = JURI::root(true).'/'.$dir_url;
 		$js .= "
 			var fc_db_img_path='".$image_folder."';
 			function qmAssignFile".$field->id."(tagid, file, file_url) {
@@ -555,7 +555,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				$originalname = '<input name="'.$fieldname.'[originalname]" id="'.$elementid.'_originalname" type="hidden" class="originalname" value="'.$value['originalname'].'" />';
 				
-				$img_link  = JURI::root().$dir_url;
+				$img_link  = JURI::root(true).'/'.$dir_url;
 				$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : "");
 				$img_link .= '/s_' .$extra_prefix. $value['originalname'];
 				$imgpreview = '<img class="preview_image" id="'.$elementid.'_preview_image" src="'.$img_link.'" style="border: 1px solid silver; float:left;" />';
@@ -893,16 +893,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (FLEXI_J16GE) {
 					
 					// Include MultiBox CSS files
-					$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBox.css');
+					$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/multibox/Styles/multiBox.css');
 					
 					// NEW ie6 hack
 					if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
-						$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
+						$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
 					}  // This is the new code for new multibox version, old multibox hack is the following lines
 					
 					// Include MultiBox Javascript files
-					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/overlay.js');
-					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/Scripts/multiBox.js');
+					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/multibox/Scripts/overlay.js');
+					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/multibox/Scripts/multiBox.js');
 					
 					// Add js code for creating a multibox instance
 					$extra_options = '';
@@ -936,7 +936,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				} else {
 					
 					// Include MultiBox CSS files
-					$document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/multibox/multibox.css');
+					$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/multibox/multibox.css');
 					
 					// OLD ie6 hack
 					$csshack = '
@@ -951,8 +951,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$document->addCustomTag($csshack);
 					
 					// Include MultiBox Javascript files
-					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/js/overlay.js');
-					$document->addScript(JURI::root().'components/com_flexicontent/librairies/multibox/js/multibox.js');
+					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/multibox/js/overlay.js');
+					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/multibox/js/multibox.js');
 					
 					// Add js code for creating a multibox instance
 					$extra_options = $isItemsManager ? ', showNumbers: false, showControls: false' : '';
@@ -1145,17 +1145,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			// ADD some extra (display) properties that point to all sizes, currently SINGLE IMAGE only
 			if ($i==0) {
-				$field->{"display_backend_src"} = JURI::root().$srcb;
-				$field->{"display_small_src"} = JURI::root().$srcs;
-				$field->{"display_medium_src"} = JURI::root().$srcm;
-				$field->{"display_large_src"} = JURI::root().$srcl;
-				$field->{"display_original_src"} = JURI::root().$srco;
+				$field->{"display_backend_src"} = JURI::root(true).'/'.$srcb;
+				$field->{"display_small_src"} = JURI::root(true).'/'.$srcs;
+				$field->{"display_medium_src"} = JURI::root(true).'/'.$srcm;
+				$field->{"display_large_src"} = JURI::root(true).'/'.$srcl;
+				$field->{"display_original_src"} = JURI::root(true).'/'.$srco;
 			}
-			$field->thumbs_src['backend'][] = JURI::root().$srcb;
-			$field->thumbs_src['small'][] = JURI::root().$srcs;
-			$field->thumbs_src['medium'][] = JURI::root().$srcm;
-			$field->thumbs_src['large'][] = JURI::root().$srcl;
-			$field->thumbs_src['original'][] = JURI::root().$srco;
+			$field->thumbs_src['backend'][] = JURI::root(true).'/'.$srcb;
+			$field->thumbs_src['small'][] = JURI::root(true).'/'.$srcs;
+			$field->thumbs_src['medium'][] = JURI::root(true).'/'.$srcm;
+			$field->thumbs_src['large'][] = JURI::root(true).'/'.$srcl;
+			$field->thumbs_src['original'][] = JURI::root(true).'/'.$srco;
 			
 			$field->thumbs_path['backend'][] = JPATH_SITE.DS.$srcb;
 			$field->thumbs_path['small'][] = JPATH_SITE.DS.$srcs;
@@ -1191,28 +1191,28 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			switch ($prop)
 			{
 				case 'display_backend':
-					$img_legend   = '<img src="'.JURI::root().$srcb.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root().$srcb.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcb.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcb.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
 					break;
 				case 'display_small':
-					$img_legend   = '<img src="'.JURI::root().$srcs.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root().$srcs.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcs.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcs.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
 					break;
 				case 'display_medium':
-					$img_legend   = '<img src="'.JURI::root().$srcm.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root().$srcm.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcm.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcm.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
 					break;
 				case 'display_large':
-					$img_legend   = '<img src="'.JURI::root().$srcl.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root().$srcl.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcl.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcl.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
 					break;
 				case 'display_original':
-					$img_legend   = '<img src="'.JURI::root().$srco.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root().$srco.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$srco.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srco.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
 					break;
 				case 'display': default:
-					$img_legend   = '<img src="'.JURI::root().$src.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root().$src.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$src.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$src.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
 					break;
 			}
 			
@@ -1331,8 +1331,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					// *** NEEDS: thumbnail list must be created with large size thubmnails, these will be then thumbnailed by the JS gallery code
 					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title,'s');
 					$img_legend_custom ='
-						 <img src="'.JURI::root().$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class_img_field.'"
-						 	data-large="' . JURI::root().$srcl . '" data-description="'.$title_attr.'"/>
+						 <img src="'.JURI::root(true).'/'.$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class_img_field.'"
+						 	data-large="' . JURI::root(true).'/'.$srcl . '" data-description="'.$title_attr.'"/>
 					';
 					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
 					$field->{$prop}[] = '
@@ -2261,7 +2261,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$all_media         = $field->parameters->get('list_all_media_files', 0);
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$limit_by_uploader = $field->parameters->get('limit_by_uploader', 0);  // USED ONLY WHEN all_media is ENABLED
-		$image_folder = JURI::root().$field->parameters->get('dir');
+		$dir          = $field->parameters->get('dir');
+		$dir_url      = str_replace('\\','/', $dir);
+		$image_folder = JURI::root(true).'/'.$dir_url;
 		
 		// Retrieve available (and appropriate) images from the DB
 		if ($all_media) {

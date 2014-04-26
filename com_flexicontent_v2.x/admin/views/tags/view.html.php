@@ -38,6 +38,10 @@ class FlexicontentViewTags extends JViewLegacy
 		$db       = JFactory::getDBO();
 		$document = JFactory::getDocument();
 		
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		
 		JHTML::_('behavior.tooltip');
 
 		//get vars
@@ -110,7 +114,21 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		
 		//Get data from the model
-		$rows       = $this->get( 'Data');
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$rows = $this->get( 'Data');
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+
+		// Get assigned items
+		$model =  $this->getModel();
+		$rowids = array();
+		foreach ($rows as $row) $rowids[] = $row->id;
+		if ( $print_logging_info )  $start_microtime = microtime(true);
+		$rowtotals = $model->getAssignedItems($rowids);
+		if ( $print_logging_info ) @$fc_run_times['execute_sec_queries'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+		foreach ($rows as $row) {
+			$row->nrassigned = isset($rowtotals[$row->id]) ? $rowtotals[$row->id]->nrassigned : 0;
+		}
+		
 		$pagination = $this->get( 'Pagination' );
 
 		$lists = array();

@@ -100,7 +100,9 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_ext` (
   `related_items` text NOT NULL,
   `search_index` mediumtext NOT NULL,
   PRIMARY KEY  (`item_id`),
-  FULLTEXT KEY `search_index` (`search_index`)
+  FULLTEXT KEY `search_index` (`search_index`),
+  KEY `lang_parent_id` (`lang_parent_id`),
+  KEY `type_id` (`type_id`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `#__flexicontent_items_extravote` (

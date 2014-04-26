@@ -124,7 +124,13 @@ class FlexicontentModelCategories extends JModelList
 		$query->select(
 			$this->getState(
 				'list.select',
-				'c.*, u.name AS editor, level.title AS access_level, c.params as config, ag.title AS access_level '
+				'c.*'
+				.', u.name AS editor, level.title AS access_level'
+				// because of multi-multi category-item relation it is faster to calculate ITEM COUNT with a seperate query
+				// if it was single mapping e.g. like it is 'item' TO 'content type' or 'item' TO 'creator' we could use a subquery
+				// the more categories are listed (query LIMIT) the bigger the performance difference ...
+				//.', (SELECT COUNT(*) FROM #__flexicontent_cats_item_relations AS rel WHERE rel.catid = c.id) AS nrassigned '
+				.', c.params as config, ag.title AS access_level '
 			)
 		);
 		$query->from('#__categories AS c');

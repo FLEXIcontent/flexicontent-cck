@@ -92,7 +92,32 @@ class FlexicontentModelTags extends JModelLegacy
 		$this->_id	 = $id;
 		$this->_data = null;
 	}
-
+	
+	
+	/**
+	 * Method to count assigned items for the given categories
+	 *
+	 * @access public
+	 * @return	string
+	 * @since	1.6
+	 */
+	function getAssignedItems($tids) {
+		if (empty($tids)) return array();
+		
+		$db = JFactory::getDBO();
+		
+		// Select the required fields from the table.
+		$query  = " SELECT rel.tid, COUNT(rel.itemid) AS nrassigned";
+		$query .= " FROM #__flexicontent_tags_item_relations AS rel";
+		$query .= " WHERE rel.tid IN (".implode(",", $tids).") ";
+		$query .= " GROUP BY rel.tid";
+		
+		$db->setQuery( $query );
+		$assigned = $db->loadObjectList('tid');
+		return $assigned;
+	}
+	
+	
 	/**
 	 * Method to get tags data
 	 *
@@ -164,15 +189,18 @@ class FlexicontentModelTags extends JModelLegacy
 		$orderby	= $this->_buildContentOrderBy();
 		$having		= $this->_buildContentHaving();
 
-		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor, COUNT(rel.tid) AS nrassigned'
-					. ' FROM #__flexicontent_tags AS t'
-					. ' LEFT JOIN #__flexicontent_tags_item_relations AS rel ON rel.tid = t.id'
-					. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
-					. $where
-					. ' GROUP BY t.id'
-					. $having
-					. $orderby
-					;
+		$query = 'SELECT SQL_CALC_FOUND_ROWS t.*, u.name AS editor'
+			// because of multi-multi tag-item relations it is faster to calculate this with a single seperate query
+			// if it was single mapping e.g. like it is 'item' TO 'content type' or 'item' TO 'creator' we could use a subquery
+			// the more categories are listed (query LIMIT) the bigger the performance difference ...
+			//. ', (SELECT COUNT(rel.tid) FROM #__flexicontent_tags_item_relations AS rel WHERE rel.tid=t.id GROUP BY t.id) AS nrassigned'
+			. ' FROM #__flexicontent_tags AS t'
+			. ' LEFT JOIN #__users AS u ON u.id = t.checked_out'
+			. $where
+			. ' GROUP BY t.id'
+			. $having
+			. $orderby
+			;
 
 		return $query;
 	}
@@ -224,7 +252,8 @@ class FlexicontentModelTags extends JModelLegacy
 		}
 
 		if ($search) {
-			$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
+			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
+			$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );

@@ -1,6 +1,6 @@
 <?php
 /**
-* @version		$Id: view.html.php 1749 2013-09-02 10:01:54Z ggppdk $
+* @version		$Id: view.html.php 1869 2014-03-12 12:18:40Z ggppdk $
 * @package		Joomla
 * @subpackage	Users
 * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
@@ -34,12 +34,15 @@ class FlexicontentViewUsers extends JViewLegacy
 	public function display($tpl = null)
 	{
 		$app      = JFactory::getApplication();
-		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
 		$db				= JFactory::getDBO();
 		$document	= JFactory::getDocument();
 		$option   = JRequest::getCmd('option');
 		$user     = JFactory::getUser();
 		$acl      = JFactory::getACL();
+		
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
 		
 		JHTML::_('behavior.tooltip');
 
@@ -237,23 +240,25 @@ class FlexicontentViewUsers extends JViewLegacy
 		$extra_joins = ( count( $extra_joins ) ? implode( ' ', $extra_joins ) : '' );
 		
 		// Do main query to get the authors
-		$query = 'SELECT SQL_CALC_FOUND_ROWS a.*, COUNT(i.id) as itemscount, s.userid IS NOT NULL AS loggedin'
+		$query = 'SELECT SQL_CALC_FOUND_ROWS DISTINCT a.*, s.userid IS NOT NULL AS loggedin'
+			. ', (SELECT COUNT(*) FROM #__content AS i WHERE i.created_by = a.id) AS itemscount '
 			. (!FLEXI_J16GE ? ', g.name AS groupname' : '')
 			. ' FROM #__users AS a'
 			. (!FLEXI_J16GE ? ' INNER JOIN #__core_acl_aro AS aro ON aro.value = a.id' : '')
 			. (!FLEXI_J16GE ? ' INNER JOIN #__core_acl_groups_aro_map AS gm ON gm.aro_id = aro.id' : '')
 			. (!FLEXI_J16GE ? ' INNER JOIN #__core_acl_aro_groups AS g ON g.id = gm.group_id' : '')
 			. ' LEFT JOIN #__flexicontent_authors_ext AS ue ON a.id = ue.user_id'
-			. ' LEFT JOIN #__content AS i ON i.created_by = a.id '
 			. ' LEFT JOIN #__session AS s ON s.userid = a.id'
 			. $extra_joins
 			. $where
-			. ' GROUP BY a.id'
+			//. ' GROUP BY a.id'
 			. $having
 			. $orderby
 		;
 		$db->setQuery( $query, $limitstart, $limit );
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 		$rows = $db->loadObjectList();
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		if ($db->getErrorMsg())	echo $db->getErrorMsg();
 		
 		// Get total and create pagination controls
@@ -261,6 +266,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		$total = $db->loadResult();
 		if (!$total) echo $db->getErrorMsg();
 		
+		// Create pagination
 		jimport('joomla.html.pagination');
 		$pagination = new JPagination( $total, $limitstart, $limit );
 		

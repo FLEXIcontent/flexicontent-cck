@@ -120,13 +120,15 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		$query->select(
 			$this->getState(
 				'list.select',
-				'c.*, u.name AS editor, level.title AS access_level, COUNT(rel.catid) AS nrassigned, c.params as config, ag.title AS access_level '
+				'c.*'
+				.', u.name AS editor, level.title AS access_level'
+				.', (SELECT COUNT(*) FROM #__flexicontent_cats_item_relations AS rel WHERE rel.catid = c.id) AS nrassigned '
+				.', c.params as config, ag.title AS access_level '
 			)
 		);
 		$query->from('#__categories AS c');
 		$query->select('l.title AS language_title');
 		$query->join('LEFT', '#__languages AS l ON l.lang_code = c.language');
-		$query->join('LEFT', '#__flexicontent_cats_item_relations AS rel ON rel.catid = c.id');
 		$query->join('LEFT', '#__viewlevels as level ON level.id=c.access');
 		$query->join('LEFT', '#__users AS u ON u.id = c.checked_out');
 		$query->join('LEFT', '#__viewlevels AS ag ON ag.id = c.access');

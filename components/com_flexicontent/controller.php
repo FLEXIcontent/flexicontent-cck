@@ -80,6 +80,7 @@ class FlexicontentController extends JControllerLegacy
 		$app    = JFactory::getApplication();
 		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		$option = JRequest::getVar('option');
+		$use_tmp = true;
 		
 		$min_word_len = $app->getUserState( $option.'.min_word_len', 0 );
 		$filtercat  = $cparams->get('filtercat', 0);      // Filter items using currently selected language
@@ -95,7 +96,8 @@ class FlexicontentController extends JControllerLegacy
 		$_cids = JRequest::getVar('cids', '');
 		if ( $cid ) {
 			// single category view
-			$_cids = array($cid); 
+			global $globalcats;
+			$_cids = $globalcats[$cid]->descendantsarray;
 		} else if ( empty($_cids) ) {
 			// try to get category ids from the categories filter
 			$_cids = JRequest::getVar('filter_13', '');
@@ -133,7 +135,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		$lang_where = '';
 		if ((FLEXI_FISH || FLEXI_J16GE) && $filtercat) {
-			$lta = FLEXI_J16GE ? 'i': 'ie';
+			$lta = FLEXI_J16GE || $use_tmp ? 'i': 'ie';
 			$lang_where .= '   AND ( '.$lta.'.language LIKE ' . $db->Quote( $lang .'%' ) . (FLEXI_J16GE ? ' OR '.$lta.'.language="*" ' : '') . ' ) ';
 		}
 		
@@ -166,12 +168,11 @@ class FlexicontentController extends JControllerLegacy
 		
 		
 		// Do query ...
-		$use_tmp = true;
 		$tbl = $type=='basic_index' ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
 		$query 	= 'SELECT si.item_id, si.search_index'    //.', '. $_text_match. ' AS score'  // THIS MAYBE SLOW
 			.' FROM #__' . $tbl . ' AS si'
 			.' JOIN '. ($use_tmp ? '#__flexicontent_items_tmp' : '#__content') .' AS i ON i.id = si.item_id'
-			.($access_where || ($lang_where && !FLEXI_J16GE && $type!='basic_index') ?
+			.(($access_where && !$use_tmp) || ($lang_where && !FLEXI_J16GE && !$use_tmp) || $type!='basic_index' ?
 				' JOIN #__flexicontent_items_ext AS ie ON i.id = ie.item_id ' : '')
 			.($access_where ? ' JOIN #__flexicontent_types AS ty ON ie.type_id = ty.id' : '')
 			.($access_where ? ' JOIN #__categories AS mc ON mc.id = i.catid' : '')
@@ -751,7 +752,9 @@ class FlexicontentController extends JControllerLegacy
 			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='.(int) $model->_item->id .'&'. (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()) .'=1';
 			
 			// Important pass referer back to avoid making the form itself the referer
+			// but also check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise set referer to HOME page
 			$referer = JRequest::getString('referer', JURI::base(), 'post');
+			if ( ! flexicontent_html::is_safe_url($referer) ) $referer = JURI::base();
 			$return = '&return='.base64_encode( $referer );
 			$link .= $return;
 		}
@@ -817,7 +820,7 @@ class FlexicontentController extends JControllerLegacy
 	/**
 	 * Display the view
 	 */
-	function display($cachable = false, $urlparams = false)
+	function display($cachable = null, $urlparams = false)
 	{
 		// Debuging message
 		//JError::raiseNotice(500, 'IN display()'); // TOREMOVE
@@ -825,20 +828,24 @@ class FlexicontentController extends JControllerLegacy
 		// Access checking for --items-- viewing, will be handled by the items model, this is because THIS display() TASK is used by other views too
 		// in future it maybe moved here to the controller, e.g. create a special task item_display() for item viewing, or insert some IF bellow
 		
+		// Compatibility check: Layout is form and task is not set:  this is new item submit ...
 		if ( JRequest::getVar('layout', false) == "form" && !JRequest::getVar('task', false)) {
-			// Compatibility check: Layout is form and task is not set:  this is new item submit ...
 			JRequest::setVar('task', 'add');
 			$this->add();
-		} else {
-			// Display a FLEXIcontent frontend view (category, item, favourites, etc)
-			if (JFactory::getUser()->get('id')) {
-				// WITHOUT CACHING (logged users)
-				parent::display(false);
+		}
+		
+		// Display a FLEXIcontent frontend view (category, item, favourites, etc)
+		else {
+			if (!FLEXI_J16GE) {
+				// Default cacheable behaviour: WITHOUT CACHING (logged users) and WITH CACHING (guests)
+				$cacheable = JFactory::getUser()->get('id') ? false : true;
+				parent::display($cacheable);
 			} else {
-				// WITH CACHING (guests)
-				parent::display(true);
+				// Default cacheable behaviour: YES, depending on _GET array
+				$cacheable = true;
+				$safeurlparams = empty($urlparams) ? $_GET : $urlparams;
+				parent::display($cacheable, $safeurlparams);
 			}
-			
 		}
 	}
 
@@ -939,7 +946,7 @@ class FlexicontentController extends JControllerLegacy
 			if ($canEdit) $model->checkin();
 		}
 		
-		// If the task was edit or cancel, we go back to the form referer
+		// since the task is cancel, we go back to the form referer
 		$referer = JRequest::getString('referer', JURI::base(), 'post');
 		
 		// Check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise for returning to HOME page
