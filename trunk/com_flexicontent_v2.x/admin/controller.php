@@ -809,41 +809,14 @@ VALUES
 		// Check for request forgeries
 		JRequest::checkToken( 'request' ) or jexit( 'Invalid Token' );
 		
-		$app = JFactory::getApplication();
 		$db = JFactory::getDBO();
-		
 		$cache_tbl = "#__flexicontent_items_tmp";
-		$tbls = array($cache_tbl);
-		if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
-		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
-		
-		// Get the column names
-		$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
-		$tbl_fields_sel = array();
-		foreach ($tbl_fields as $tbl_field) {
-			if ( (!FLEXI_J16GE && $tbl_field=='language') || $tbl_field=='type_id')
-				$tbl_fields_sel[] = 'ie.'.$tbl_field;
-			else
-				$tbl_fields_sel[] = 'c.'.$tbl_field;
-		}
 		
 		// Truncate the table, this will handle redudant columns too
 		$db->setQuery('TRUNCATE TABLE '.$cache_tbl);
 		$db->query();
-		
-		// Copy data into it
-		$query 	= 'INSERT INTO '.$cache_tbl.' (';
-		$query .= "`".implode("`, `", $tbl_fields)."`";
-		$query .= ") SELECT ";
-		
-		$cols_select = array();
-		$query .= implode(", ", $tbl_fields_sel);
-		$query .= " FROM #__content AS c";
-		$query .= " JOIN #__flexicontent_items_ext AS ie ON c.id=ie.item_id";
-		
-		$db->setQuery($query);
-		
-		if (!$db->query()) {
+		$model = $this->getModel('items');
+		if ( !$model->updateItemCountingData($rows = false) ) {
 			echo '<span class="install-notok"></span><span class="button-add"><a id="itemcountingdok" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
 		} else {
 			echo '<span class="install-ok"></span>';

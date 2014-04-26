@@ -406,21 +406,22 @@ jQuery(document).ready(function() {
 
 
 /* recalculate window width/height and widow scrollbars */
-function fc_recalculateWindow() {
-	
+function fc_recalculateWindow()
+{
+	// Set these to hidden to force scrollbar recalculation when we set to auto	
 	document.documentElement.style.overflow = "hidden";
-	document.documentElement.style.height   = "auto";
-	document.documentElement.style.width    = "auto";
-	
-	// make sure height is appropriate
 	document.body.style.overflow = "hidden";
+	
+	// make sure widht & height is automatic
+	document.documentElement.style.height = "auto";
+	document.documentElement.style.width  = "auto";
 	document.body.style.height = "auto";
-	document.body.style.width = "auto";
+	document.body.style.width  = "auto";
 	
 	//document.body.scroll = "no";  // old ie versions ??
 	setTimeout(function() {
-		document.documentElement.style.overflow = "auto";  // firefox, chrome
-		document.body.style.overflow = "auto";
+		document.documentElement.style.overflow = "auto";  // firefox, chrome, ie11+
+		//document.body.style.overflow = "auto";
 		//document.body.scroll = "yes";  // old ie versions ??
 	}, 100);
 	

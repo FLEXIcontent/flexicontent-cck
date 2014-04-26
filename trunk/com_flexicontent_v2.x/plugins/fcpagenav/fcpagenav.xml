@@ -11,7 +11,8 @@
 	<description>Page Navigation Field Plugin for FLEXIcontent</description>
 	<files>
 		<filename plugin="fcpagenav">fcpagenav.php</filename>
-		<folder plugin="fcpagenav">fcpagenav</folder>
+		<filename>index.html</filename>
+		<folder>fcpagenav</folder>
 	</files>
 	
 	<config>

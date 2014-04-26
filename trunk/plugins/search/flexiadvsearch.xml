@@ -11,7 +11,6 @@
 	<description>PLG_SEARCH_FLEXIADVSEARCH_DESCRIPTION</description>
 	<files>
 		<filename plugin="flexiadvsearch">flexiadvsearch.php</filename>
-		<filename>index.html</filename>
 	</files>
 	
 	<languages>

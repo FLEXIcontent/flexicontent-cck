@@ -173,6 +173,9 @@ class com_flexicontentInstallerScript
 		$session  = JFactory::getSession();
 		$session->set('flexicontent.postinstall', false);
 		$session->set('flexicontent.allplgpublish', false);
+		$session->set('flexicontent.allplgpublish', false);
+		$session->set('unbounded_noext', false, 'flexicontent');
+		$session->set('unbounded_badcat', false, 'flexicontent');
 		
 		// fix joomla 1.5 bug
 		if ( !FLEXI_J16GE ) {
@@ -832,15 +835,14 @@ class com_flexicontentInstallerScript
 	* uninstall runs before any other action is taken (file removal or database processing).
 	*/
 	function uninstall( $parent ) {
-		// Installing component manifest file version
-		$this->release = $parent->get( "manifest" )->version;
-		
 		//error_reporting(E_ALL & ~E_STRICT);
 		//ini_set('display_errors',1);
-		//$cache = JFactory::getCache();
-		//$cache->clean( '_system' );  // This might be necessary as installing-uninstalling in same session may result in wrong extension ids, etc
 
+		// Extra CSS needed for J3.x+
 		if (FLEXI_J30GE)  echo '<link type="text/css" href="components/com_flexicontent/assets/css/j3x.css" rel="stylesheet">';
+		
+		// Installed component manifest file version
+		$this->release = FLEXI_J16GE ? $parent->get( "manifest" )->version : $this->manifest->getElementByPath('version')->data();
 		echo '<p>' . JText::_('Uninstalling FLEXIcontent ' . $this->release) . '</p>';
 		
 		// init vars

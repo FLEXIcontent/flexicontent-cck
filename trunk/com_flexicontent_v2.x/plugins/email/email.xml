@@ -11,6 +11,7 @@
 	<description>FLEXI_FIELD_EMAIL</description>
 	<files>
 		<filename plugin="email">email.php</filename>
+		<filename>index.html</filename>
 	</files>
 	<config>
 	

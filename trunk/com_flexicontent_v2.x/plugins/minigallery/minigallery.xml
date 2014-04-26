@@ -11,8 +11,9 @@
 	<description>FLEXI_FIELD_MINIGALLERY</description>
 	<files>
 		<filename plugin="minigallery">minigallery.php</filename>
-		<folder plugin="minigallery">css</folder>
-		<folder plugin="minigallery">js</folder>
+		<filename>index.html</filename>
+		<folder>css</folder>
+		<folder>js</folder>
 	</files>
 	<config>
 	<fields name="attribs">

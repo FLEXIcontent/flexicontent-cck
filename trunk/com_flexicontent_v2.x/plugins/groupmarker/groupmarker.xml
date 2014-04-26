@@ -9,9 +9,9 @@
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
 	<description>Form Field Group Marker Field Plugin for FLEXIcontent. This field is used to mark the start/end of FLEXIcontent field groups in ITEM edit FORM. Group will appear inside Tabs/Fieldsets/etc. Take care to match all openings with a closing marker appropriately.</description>
-	
 	<files>
 		<filename plugin="groupmarker">groupmarker.php</filename>
+		<filename>index.html</filename>
 	</files>
 	
 	<config>

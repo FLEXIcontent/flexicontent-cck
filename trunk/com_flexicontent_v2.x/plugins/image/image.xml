@@ -11,11 +11,8 @@
 	<description>FLEXI_FIELD_IMAGE</description>
 	<files>
 		<filename plugin="image">image.php</filename>
-		<filename plugin="image">image/index.html</filename>
-		<filename plugin="image">image/watermarks/index.html</filename>
-		<filename plugin="image">image/watermarks/wm_l.png</filename>
-		<filename plugin="image">image/watermarks/wm_m.png</filename>
-		<filename plugin="image">image/watermarks/wm_s.png</filename>
+		<filename>index.html</filename>
+		<folder>image</folder>
 	</files>
 	<config>
 	

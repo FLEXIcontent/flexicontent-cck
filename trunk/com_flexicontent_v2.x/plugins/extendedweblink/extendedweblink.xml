@@ -11,6 +11,7 @@
 	<description>FLEXI_FIELD_EXTENDED_WEBLINK</description>
 	<files>
 		<filename plugin="extendedweblink">extendedweblink.php</filename>
+		<filename>index.html</filename>
 	</files>
 	
 	<config>

@@ -137,6 +137,9 @@ if (!FLEXI_J16GE) {
 		$session  = JFactory::getSession();
 		$session->set('flexicontent.postinstall', false);
 		$session->set('flexicontent.allplgpublish', false);
+		$session->set('flexicontent.allplgpublish', false);
+		$session->set('unbounded_noext', false, 'flexicontent');
+		$session->set('unbounded_badcat', false, 'flexicontent');
 		
 		// fix joomla 1.5 bug
 		if ( !FLEXI_J16GE ) {

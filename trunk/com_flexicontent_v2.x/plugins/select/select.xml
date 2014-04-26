@@ -11,6 +11,7 @@
 	<description>FLEXI_FIELD_SELECT</description>
 	<files>
 		<filename plugin="select">select.php</filename>
+		<filename>index.html</filename>
 	</files>
 	<config>
 	
