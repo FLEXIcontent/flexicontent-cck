@@ -336,6 +336,7 @@ class plgSearchFlexisearch extends JPlugin
 				.' i.modified AS created,'     // TODO ADD a PARAMETER FOR CONTROLING the use of modified by or created by date as "created"
 				.' t.name AS tagname,'
 				.' fir.value as field,'
+				.' i.access, ie.type_id,'
 				.' CONCAT(i.introtext, i.fulltext) AS text,'
 				.' CONCAT_WS( " / ", '. $db->Quote( JText::_( 'FLEXICONTENT' ) ) .', c.title, i.title ) AS section,'
 				.' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END AS slug,'

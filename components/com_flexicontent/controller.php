@@ -843,7 +843,8 @@ class FlexicontentController extends JControllerLegacy
 			} else {
 				// Default cacheable behaviour: YES, depending on full _GET array, with some exceptions (e.g. search/ filtering)
 				$cacheable = true;
-				if ( $_GET['view']=='search' || isset($_GET['filter']) ) {
+				//echo "<pre>" .print_r($_GET, true). "</pre><br/>\n";
+				if ( JRequest::getVar('view')=='search' || JRequest::getVar('filter') ) {
 					// Exception 1: SEARCH view or OTHER view with TEXT search active
 					$cacheable = false;
 				} else {
