@@ -400,15 +400,30 @@ jQuery(document).ready(function() {
 	    	"<div class='fc_blocker_bar'><div></div></div>" +
 	    "</span>" +
 	  "</span>");
-
-	/* recalculate window  scrollbars */
-	document.documentElement.style.overflow = "hidden";
-	document.body.style.overflow = "hidden";
-	//document.body.scroll = "no"; // ie only
-	setTimeout(function() {
-		//document.body.style.overflow = "auto";
-		//document.body.scroll = "yes"; // ie only
-		document.documentElement.style.overflow = "auto";  // firefox, chrome
-	}, 100);
-
+		
+		fc_recalculateWindow();
 });
+
+
+/* recalculate window width/height and widow scrollbars */
+function fc_recalculateWindow() {
+	
+	document.documentElement.style.overflow = "hidden";
+	document.documentElement.style.height   = "auto";
+	document.documentElement.style.width    = "auto";
+	
+	// make sure height is appropriate
+	document.body.style.overflow = "hidden";
+	document.body.style.height = "auto";
+	document.body.style.width = "auto";
+	
+	//document.body.scroll = "no";  // old ie versions ??
+	setTimeout(function() {
+		document.documentElement.style.overflow = "auto";  // firefox, chrome
+		document.body.style.overflow = "auto";
+		//document.body.scroll = "yes";  // old ie versions ??
+	}, 100);
+	
+	/* reset popup overlay containers ... TODO add more ? */
+	jQuery('#OverlayContainer').css("height", jQuery('body').css('height'));
+}

@@ -176,24 +176,29 @@ class FlexicontentModelCategories extends JModelLegacy
 			$search_rows = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();					
 		}
 		
-		$query = 'SELECT c.*, u.name AS editor, c.params as config, '
-					. (FLEXI_J16GE ? 'level.title AS access_level' : 'g.name AS groupname')
-					. ' FROM #__categories AS c'
-					. (FLEXI_J16GE ?
-					  ' LEFT JOIN #__viewlevels AS level ON level.id=c.access' :
-					  ' LEFT JOIN #__groups AS g ON g.id = c.access'
-						)
-					. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
-					. (FLEXI_J16GE ? '' : ' LEFT JOIN #__sections AS sec ON sec.id = c.section')
-					. (FLEXI_J16GE ? 
-					  ' WHERE c.extension = '.$db->Quote(FLEXI_CAT_EXTENSION).' AND c.lft >= ' . $db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$db->Quote(FLEXI_RGT_CATEGORY) :
-					  ' WHERE c.section = '.FLEXI_SECTION
-					)
-					. (FLEXI_J16GE ? '' : ' AND sec.scope = ' . $db->Quote('content'))
-					. $where
-					. ' GROUP BY c.id'
-					. $orderby
-					;
+		$query = 'SELECT c.*'
+			.', u.name AS editor, c.params as config'
+			. (FLEXI_J16GE ? ', level.title AS access_level' : ', g.name AS groupname')
+			// because of multi-multi category-item relation it is faster to calculate ITEM COUNT with a seperate query
+			// if it was single mapping e.g. like it is 'item' TO 'content type' or 'item' TO 'creator' we could use a subquery
+			// the more categories are listed (query LIMIT) the bigger the performance difference ...
+			//.', (SELECT COUNT(*) FROM #__flexicontent_cats_item_relations AS rel WHERE rel.catid = c.id) AS nrassigned '
+			. ' FROM #__categories AS c'
+			. (FLEXI_J16GE ?
+			  ' LEFT JOIN #__viewlevels AS level ON level.id=c.access' :
+			  ' LEFT JOIN #__groups AS g ON g.id = c.access'
+				)
+			. ' LEFT JOIN #__users AS u ON u.id = c.checked_out'
+			. (FLEXI_J16GE ? '' : ' LEFT JOIN #__sections AS sec ON sec.id = c.section')
+			. (FLEXI_J16GE ? 
+			  ' WHERE c.extension = '.$db->Quote(FLEXI_CAT_EXTENSION).' AND c.lft >= ' . $db->Quote(FLEXI_LFT_CATEGORY).' AND c.rgt<='.$db->Quote(FLEXI_RGT_CATEGORY) :
+			  ' WHERE c.section = '.FLEXI_SECTION
+			)
+			. (FLEXI_J16GE ? '' : ' AND sec.scope = ' . $db->Quote('content'))
+			. $where
+			. ' GROUP BY c.id'
+			. $orderby
+			;
 		$db->setQuery( $query );
 		$rows = $db->loadObjectList();
 		

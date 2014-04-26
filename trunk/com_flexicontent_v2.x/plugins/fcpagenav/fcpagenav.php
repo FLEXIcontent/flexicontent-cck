@@ -97,7 +97,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			if ($use_tooltip)
 				JHTML::_('behavior.tooltip');
 			if ($load_css)
-				$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');	
+				$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/fcpagenav/'.(FLEXI_J16GE ? 'fcpagenav/' : '').'fcpagenav.css');	
 
 			// get active category ordering
 			$query 	= 'SELECT params FROM #__categories WHERE id = ' . ($cid ? $cid : $item->catid);

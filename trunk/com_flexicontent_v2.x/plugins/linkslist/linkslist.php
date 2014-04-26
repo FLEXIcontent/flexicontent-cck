@@ -148,7 +148,7 @@ class plgFlexicontent_fieldsLinkslist extends JPlugin
 		
 		
 		// Create HTML of list elements
-		$items = array('<'.$list_type.$list_class.$list_id.'>');
+		$items = array();
 		foreach($elements as $name => $item)
 		{
 			if ( !$display_non_selected && !in_array($name, $values) ) continue;

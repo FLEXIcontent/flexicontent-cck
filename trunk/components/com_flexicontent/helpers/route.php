@@ -466,6 +466,7 @@ class FlexicontentHelperRoute
 	{
 		static $component_menuitems = null;
 		if ($component_menuitems === null) $component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
+		global $globalcats;
 		
 		$match = null;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
@@ -485,8 +486,7 @@ class FlexicontentHelperRoute
 		foreach($needles as $needle => $cid)  {
 
 			// Get access level of the FLEXIcontent category
-			$db->setQuery('SELECT access FROM #__categories WHERE id='.$cid);
-			$cat_acclevel = $db->loadResult();
+			$cat_acclevel = $cid ? $globalcats[$cid]->access : 0;
 			
 			// Prefer current menu item if pointing to given category url ...
 			if ($menu && 
@@ -550,6 +550,7 @@ class FlexicontentHelperRoute
 	{
 		static $component_menuitems = null;
 		if ($component_menuitems === null) $component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
+		global $globalcats;
 		
 		$match = null;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
@@ -562,8 +563,7 @@ class FlexicontentHelperRoute
 		foreach($needles as $needle => $cid)  {
 
 			// Get access level of the FLEXIcontent category
-			$db->setQuery('SELECT access FROM #__categories WHERE id='.$cid);
-			$cat_acclevel = $db->loadResult();
+			$cat_acclevel = $cid ? $globalcats[$cid]->access : 0;
 
 			foreach($component_menuitems as $menuitem) {
 

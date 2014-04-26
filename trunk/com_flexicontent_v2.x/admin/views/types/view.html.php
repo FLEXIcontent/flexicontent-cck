@@ -43,6 +43,10 @@ class FlexicontentViewTypes extends JViewLegacy
 		$db   = JFactory::getDBO();
 		$document	= JFactory::getDocument();
 		
+		$cparams  = JComponentHelper::getParams( 'com_flexicontent' );
+		$print_logging_info = $cparams->get('print_logging_info');
+		if ( $print_logging_info )  global $fc_run_times;
+		
 		JHTML::_('behavior.tooltip');
 		
 		//get vars
@@ -84,25 +88,21 @@ class FlexicontentViewTypes extends JViewLegacy
 			JToolBarHelper::preferences('com_flexicontent', $_height, $_width, 'Configuration');
 		}
 		
-		//Get data from the model
+		// Get data from the model
+		if ( $print_logging_info )  $start_microtime = microtime(true);
 		if (FLEXI_J16GE) {
 			$rows = $this->get( 'Items');
 		} else {
 			$rows = $this->get( 'Data');
 		}
+		if ( $print_logging_info ) @$fc_run_times['execute_main_query'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
-		// Get assigned items
-		$model =  $this->getModel();
-		$typeids = array();
-		foreach ($rows as $row) $typeids[] = $row->id;
-		$typetotals = $model->getAssignedItems($typeids);
-		foreach ($rows as $row) {
-			$row->iassigned = isset ($typetotals[$row->id]) ? $typetotals[$row->id]->iassigned : 0;
-		}
-		
+		// Create type's parameters
 		foreach($rows as $type) {
 			$type->config = FLEXI_J16GE ? new JRegistry($type->config) : new JParameter($type->config);
 		}
+		
+		// Create pagination object
 		$pagination = $this->get( 'Pagination' );
 
 		$lists = array();

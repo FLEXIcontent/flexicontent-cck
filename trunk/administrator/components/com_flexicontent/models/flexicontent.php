@@ -484,6 +484,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			." LEFT JOIN #__flexicontent_cats_item_relations as rel ON rel.catid=i.catid AND i.id=rel.itemid "
 			." LEFT JOIN #__flexicontent_items_ext as ie ON i.id=ie.item_id "
 			." WHERE rel.catid IS NULL"
+			.(!FLEXI_J16GE ? ' AND i.sectionid='.(int)FLEXI_SECTION : '')
 			." LIMIT 1";
 		$db->setQuery($query);
 		$item_id = $db->loadResult();
@@ -634,7 +635,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$dbname = $app->getCfg('db');
 		
 		$tblname_indexnames = array(
-			'flexicontent_items_ext'=>array('lang_parent_id'=>0),
+			'flexicontent_items_ext'=>array('lang_parent_id'=>0, 'type_id'=>0),
 			'flexicontent_items_tmp'=>array('state'=>0, 'catid'=>0, 'created_by'=>0, 'access'=>0, 'featured'=>0, 'language'=>0, 'type_id'=>0),
 			'flexicontent_fields_item_relations'=>array('value'=>32),
 			'flexicontent_download_history'=>array('user_id'=>0, 'file_id'=>0),

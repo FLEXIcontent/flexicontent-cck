@@ -248,14 +248,7 @@ class FlexicontentHelperPerm
 		if (FLEXI_J16GE)
 		{
 			// *** J1.6+ ***
-			$query = 'SELECT c.id '
-				. ' FROM #__categories AS c'
-				. ' WHERE extension='.$db->Quote(FLEXI_CAT_EXTENSION)
-				. ($check_published ? '  AND c.published = 1 ' : '')
-				. ($specific_catids ? '  AND c.id IN ('.implode(",", $specific_catids).')' : '')
-				;
-			$db->setQuery($query);
-			$allcats = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
+			$allcats = FlexicontentHelperPerm::returnAllCats ($check_published, $specific_catids);
 			
 			foreach ($allcats as $category_id)
 			{
@@ -360,20 +353,20 @@ class FlexicontentHelperPerm
 	/*
 	 * Method to return all categories ids checking if published and if in specific subset
 	 */
-	function returnAllCats ($check_published, $specific_catids)
+	static function returnAllCats ($check_published, $specific_catids)
 	{
 		global $globalcats;
 		$usercats = array();
 		
 		if ($specific_catids) {
 			foreach ($specific_catids as $k) {
-				if (!$check_published || $globalcats[$k]->published) {
+				if (!$check_published || $globalcats[$k]->published==1) {
 					$usercats[] = $k;
 				}
 			}
 		} else {
 			foreach ($globalcats as $k => $v) {
-				if(!$check_published || $v->published) {
+				if(!$check_published || $v->published==1) {
 					$usercats[] = $k;
 				}
 			}

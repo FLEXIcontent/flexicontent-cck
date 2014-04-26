@@ -1568,7 +1568,7 @@ div.fancybox-wrap a { background: none!important;}
 #flexicontent .fc_mublock {
 	display:block;
 	float:left;
-	clear:both;
+	clear:none;
 	margin-bottom:6px;
 }
 
@@ -1594,7 +1594,7 @@ div.fancybox-wrap a { background: none!important;}
   border-bottom: 1px solid #AAA !important;
   border-right: 1px solid #AAA !important;
   margin: 2px 2px 2px 12px !important;
-  padding: 4px !important;
+  padding: 8px 4px !important;
 }
 
 #flexicontent .fc_markup.mu_featured_cat.mu_has_text {

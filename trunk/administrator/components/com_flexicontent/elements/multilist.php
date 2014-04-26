@@ -89,7 +89,7 @@ class JElementMultiList extends JElement
 			//echo "<pre>"; print_r($option); echo "</pre>"; exit;
 			if ($name=="group") {
 				$group_label = FLEXI_J16GE ? $option->attributes()->label : $option->attributes('label');
-				$options[] = JHTML::_('select.optgroup', $group_label );
+				$options[] = JHTML::_('select.optgroup', JText::_($group_label) );
 				foreach ($option->children() as $sub_option)
 				{
 					$val    = FLEXI_J16GE ? $sub_option->attributes()->value : $sub_option->attributes('value');

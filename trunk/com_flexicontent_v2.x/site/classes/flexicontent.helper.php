@@ -301,6 +301,7 @@ class flexicontent_html
 			} else {
 				if (FLEXI_J30GE) {
 					JHtml::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position
+					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.menu.min.js');
 					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
 				} else {
 					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui-'.$JQUERY_UI_VER.'.js');
@@ -310,7 +311,7 @@ class flexicontent_html
 		}
 		
 		// Add jQuery UI theme, this is included in J3+ when executing jQuery-UI framework is called
-		if ( !FLEXI_J30GE && $add_jquery_ui_css && !$jquery_ui_css_added ) {
+		if ( $add_jquery_ui_css && !$jquery_ui_css_added ) {
 			// FLEXI_JQUERY_UI_CSS_STYLE:  'ui-lightness', 'smoothness'
 			if ($add_remote) {
 				$document->addStyleSheet('//ajax.googleapis.com/ajax/libs/jqueryui/'.$JQUERY_UI_VER.'/themes/'.$JQUERY_UI_THEME.'/jquery-ui.css');

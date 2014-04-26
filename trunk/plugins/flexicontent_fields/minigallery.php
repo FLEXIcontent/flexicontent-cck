@@ -107,7 +107,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			$(button).addEvent('click', function() { deleteField".$field->id."(this) });
 			button.value = '".JText::_( 'FLEXI_REMOVE_FILE',true )."';
 
-			thumb.src = '".JURI::root()."components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
+			thumb.src = '".JURI::root(true)."/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
 			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
 
 			hid.type = 'hidden';
@@ -190,7 +190,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 				$img_path = $filename->filename;
 				if(substr($filename->filename, 0, 7)!='http://')
 					$img_path = JPATH_ROOT . DS . $mediapath . DS . $filename->filename;
-				$src = JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
+				$src = JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
 
 				$field->html .= ' <img class="thumbs" src="'.$src.'"/>';
 				$field->html .= '  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file.'" />';
@@ -265,23 +265,23 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		{
 			if (!$js_and_css_added) {
 				if (FLEXI_J16GE) {
-					$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/minigallery/css/minigallery.css');
+					$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/minigallery/css/minigallery.css');
 				  FLEXI_J16GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-				  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/js/slideshow.js');
+				  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.js');
 				  if($slideshowtype!='slideshow') {
-				  	$document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
+				  	$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
 				  	$slideshowClass .= '.'.$slideshowtype;
 				  }
 				} else {
-					$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/minigallery/minigallery.css');
+					$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/minigallery/minigallery.css');
 				  FLEXI_J16GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-				  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/backgroundslider.js');
-				  $document->addScript(JURI::root().'plugins/flexicontent_fields/minigallery/slideshow.js');
+				  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/backgroundslider.js');
+				  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/slideshow.js');
 				}
 			  // this allows you to override the default css files
 			  $csspath = JPATH_ROOT.'/templates/'.$mainframe->getTemplate().'/css/minigallery.css';
 			  if(file_exists($csspath)) {
-					$document->addStyleSheet(JURI::root().'templates/'.$mainframe->getTemplate().'/css/minigallery.css');
+					$document->addStyleSheet(JURI::root(true).'/templates/'.$mainframe->getTemplate().'/css/minigallery.css');
 			  }
 			}
 			$js_and_css_added = true;
@@ -342,7 +342,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 			if ($controller) {
 				$controls_html = '<div id="'.$thumbbox_id.'" class="mingalcontrolbox" >';
-				$icontag = '<img src="'.JURI::root().'plugins/flexicontent_fields/minigallery/icons/%s" />';
+				$icontag = '<img src="'.JURI::root(true).'/plugins/flexicontent_fields/minigallery/icons/%s" />';
 				$controls_html .= '<a href="javascript:;" onclick="'.$mingalobj.'.play();" class="mingalbutton">'.sprintf($icontag,'playback_start.png').'</a>';
 				$controls_html .= '<a href="javascript:;" onclick="'.$mingalobj.'.stop();" class="mingalbutton">'.sprintf($icontag,'playback_pause.png').'</a>';
 				$controls_html .= '<a href="javascript:;" onclick="'.$mingalobj.'.previous();" class="mingalbutton">'.sprintf($icontag,'skip_backward.png').'</a>';
@@ -365,8 +365,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 					if(substr($filename->filename,0,7)!='http://') {
 						$img_path = JURI::base(true) . '/' . $mediapath . '/' . $filename->filename;
 					}
-					$srcs	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
-					$srcb	= JURI::root().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
+					$srcs	= JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
+					$srcb	= JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
 
 					$display[]	= '<a href="'.$srcb.'" class="'.$slidethumb.' slideshowThumbnail"><img src="'.$srcs.'" border="0" /></a>';
 					$n++;
@@ -443,16 +443,16 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			case 'odg':
 			case 'bmp':
 			case 'jpeg':
-				$file->icon = JURI::root().'components/com_flexicontent/assets/images/mime-icon-16/image.png';
+				$file->icon = JURI::root(true).'/components/com_flexicontent/assets/images/mime-icon-16/image.png';
 			break;
 
 			// Non-image document
 			default:
 				$icon = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS.'images'.DS.'mime-icon-16'.DS.$file->ext.'.png';
 				if (file_exists($icon)) {
-					$file->icon = JURI::root().'components/com_flexicontent/assets/images/mime-icon-16/'.$file->ext.'.png';
+					$file->icon = JURI::root(true).'/components/com_flexicontent/assets/images/mime-icon-16/'.$file->ext.'.png';
 				} else {
-					$file->icon = JURI::root().'components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
+					$file->icon = JURI::root(true).'/components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
 				}
 			break;
 		}

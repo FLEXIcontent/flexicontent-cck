@@ -377,7 +377,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
     
     if ($title_filter)
     {
-			$document->addScript( JURI::root().'components/com_flexicontent/assets/js/filterlist.js' );
+			$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/filterlist.js' );
 			$field->html.=	''
 				.'<input class="fcfield_textval" id="'.$ri_field_name.'_regexp" name="'.$ri_field_name.'_regexp" onKeyUp="'.$ri_field_name.'_titlefilter.set(this.value)" size="30" />'
 				//.'<input style="margin-left:0px!important;" class="fcfield-button" type="button" onClick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_RIFLD_FILTER').'" style="margin-top:6px;" />'

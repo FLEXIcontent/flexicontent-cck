@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: toolbar.php 1836 2014-01-26 00:23:21Z ggppdk $
+ * @version 1.0 $Id: toolbar.php 1880 2014-03-28 07:10:44Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -90,7 +90,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 		$addthis		= isset($addthis) ? $addthis : 0;
 		
 		if ($load_css) {
-			$document->addStyleSheet(JURI::root().'plugins/flexicontent_fields/toolbar'.(FLEXI_J16GE ? '/toolbar' : '').'/toolbar.css');
+			$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/toolbar/'.(FLEXI_J16GE ? 'toolbar/' : '').'/toolbar.css');
 		}
 		
 		$display	 = '<div class="flexitoolbar">'; // begin of the toolbar container
@@ -185,7 +185,7 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			<div class=\"flexi-voice toolbar-element\">";
 			if ($lang=='th') {
 				// Special case language case, maybe la=laos, and Bhutan languages in the future (NECTEC support these languages)
-				$document->addScript(JURI::root().'plugins/flexicontent_fields/toolbar'.(FLEXI_J16GE ? '/toolbar' : '').'/th.js');
+				$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/toolbar'.(FLEXI_J16GE ? '/toolbar' : '').'/th.js');
 				$display .="
 					<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"openwindow('".$voicetarget."','".$lang."');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
 				";
@@ -466,10 +466,10 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 					}
 					$paths[] = $folder;
 				}
-				$imageurl = implode('/', $paths);
-				$imageurl = JURI::root().$imageurl;
+				$imageurl = '/'.implode('/', $paths);
+				$imageurl = JURI::root(true).$imageurl;
 			}elseif(substr($imageurl, 0, 7)=='images/') {
-				$imageurl = JURI::root().$imageurl;
+				$imageurl = JURI::root(true).'/'.$imageurl;
 			}
 		}
 		return $imageurl;
