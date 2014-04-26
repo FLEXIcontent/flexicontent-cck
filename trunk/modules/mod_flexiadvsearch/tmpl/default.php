@@ -38,7 +38,7 @@ $search_autocomplete = $params->get( 'search_autocomplete', 1 );
 		<?php
 		//$output = '<input name="searchword" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
 		
-		$_ac_index = $txtmode ? 'fc_basic_complete' : 'fc_adv_complete';
+		$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
 		$text_search_class  = 'fc_text_filter';
 		$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' fc_label_internal') : ' fc_label_internal';
 		$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');

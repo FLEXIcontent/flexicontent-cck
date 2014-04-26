@@ -84,7 +84,7 @@ $r = 0;
 				</td>
 				<td colspan="3" class="fc_search_option_cell" style="position:relative;">
 					<?php
-					$_ac_index = $txtmode ? 'fc_basic_complete' : 'fc_adv_complete';
+					$_ac_index = $txtmode ? 'fc_adv_complete' : 'fc_basic_complete';
 					$text_search_class  = 'fc_text_filter';
 					$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' fc_label_internal') : ' fc_label_internal';
 					$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
