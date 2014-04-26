@@ -841,8 +841,20 @@ class FlexicontentController extends JControllerLegacy
 				$cacheable = JFactory::getUser()->get('id') ? false : true;
 				parent::display($cacheable);
 			} else {
-				// Default cacheable behaviour: YES, depending on _GET array
+				// Default cacheable behaviour: YES, depending on full _GET array, with some exceptions (e.g. search/ filtering)
 				$cacheable = true;
+				if ( $_GET['view']=='search' || isset($_GET['filter']) ) {
+					// Exception 1: SEARCH view or OTHER view with TEXT search active
+					$cacheable = false;
+				} else {
+					// Exception 2: 1 or more field filters are active
+					foreach($_GET as $i => $v) {
+						if (substr($i, 0, 7) === "filter_") {
+							$cacheable = false;
+							break;
+						}
+					}
+				}
 				$safeurlparams = empty($urlparams) ? $_GET : $urlparams;
 				parent::display($cacheable, $safeurlparams);
 			}
