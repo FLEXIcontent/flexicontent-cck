@@ -50,7 +50,7 @@
 		<fieldset name="mod_tmpl_layout_carousel" label="Layout: &lt;small&gt; Carousel &lt;/small&gt;" description="FLEXI_MOD_TMPL_LAYOUT_OPTIONS_DESC">
 			<field name="" type="separator" level="level3" default="NOTE: &lt;small&gt; &lt;br/&gt; -- ONLY standard items are placed inside the carousel. &lt;br/&gt; -- the featured items are display statically above the carousel. Set featured items to zero to only show items inside carousel &lt;/small&gt;" />
 			
-			<field name="" type="separator" default="Layout" level="level2" />
+			<field name="" type="separator" default="Layout" level="level1" />
 			<field name="carousel_mode" type="radio" default="horizontal" label="Direction" description="Description of scrolling">
 				<option value="vertical">Vertical</option>
 				<option value="horizontal">Horizontal</option>
@@ -63,59 +63,134 @@
 			
 			<field name="" type="separator" default="Horizontal Layout" level="level3" />
 			<field name="carousel_hdir_item_width" type="text" default="250" label="item width (px)" description="Width of items when scrolling horizontally" />
-			<field name="carousel_hdir_margin_right" type="text" default="12" label="item padding right (px)" description="This is the margin applied at right of items in a horizontal carousel" />
+			<field name="carousel_hdir_margin_right" type="text" default="1" label="item margin right (px)" description="This is the margin applied at right of items in a horizontal carousel" />
 			
 			<field name="" type="separator" default="Vertical Layout" level="level3" />
 			<field name="carousel_vdir_items" type="text" default="2" label="# items" description="Number of items that will be displayed when scrolling vertically" />
-			<field name="carousel_vdir_margin_bottom" type="text" default="6" label="item margin bottom (px)" description="This is the margin applied at bottom of items in a vertical carousel" />
+			<field name="carousel_vdir_margin_bottom" type="text" default="1" label="item margin bottom (px)" description="This is the margin applied at bottom of items in a vertical carousel" />
 			
-			<field name="" type="separator" default="Thumbnails Buttons" level="level3" />
-			<field name="carousel_show_handles" type="radio" default="1" label="Enable" description="Display One Thumbnail will be created per content item, and content will be accessible via click or mouseover">
+			<field name="" type="separator" default="Navigation" level="level1" />
+			<field name="carousel_edgewrap" type="radio" default="1" label="Edge wrap around" description="When an edge is reached wrap around to the other edge">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="carousel_handle_width" type="text" default="80" label="Width" description="This is the width of thumbnail image of each item" />
-			<field name="carousel_handle_height" type="text" default="80" label="Height" description="This is the height of thumbnail image of each item" />
-			<field name="carousel_handle_event" type="radio" default="mouseover" label="Activation Event" description="How the content item buttons get activated">
+			
+			<field name="" type="separator" default="Autoplay" level="level2" />
+			<field name="carousel_autoplay" type="radio" default="1" label="Enable" description="Start playing after page loads">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="carousel_interval" type="text" default="5000" label="Play Interval (ms)" description="Milliseconds between autoplay steps" />
+			<field name="carousel_method" type="radio" default="page" label="Play Method" description="The carousel can move to next / previous item, or to next / previous page">
+				<option value="item">Single Item</option>
+				<option value="page">Full Page</option>
+			</field>
+			
+			<field name="" type="separator" default="Page Buttons" level="level2" />
+			<field name="carousel_show_page_handles" type="radio" default="1" label="Enable" description="Display One page button per page of items">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="carousel_page_handle_event" type="radio" default="click" label="Activation Event" description="How the page buttons will get activated">
 				<option value="mouseover">Mouse Over</option>
 				<option value="click">Click</option>
 			</field>
 			
-			<field name="" type="separator" default="Behaviour" level="level2" />
-			<field name="carousel_autoplay" type="radio" default="1" label="Autoplay" description="Carousel will start playing after page loads">
+			<field name="" type="separator" default="Item Buttons" level="level2" />
+			<field name="carousel_show_handles" type="radio" default="1" label="Enable" description="Display One Thumbnail will be created per content item, and content will be accessible via click or mouseover">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="carousel_effect" type="groupedlist" default="quart" label="Transition Effect" description="Select the effect to be used when carousel updates" >
-				<option value="fade">Fade</option>
-				<group label="Scroll">
-					<option value="linear">Linear</option>
-					<option value="quad">Easing end: Quadratic</option>
-					<option value="cubic">Easing end: Cubic</option>
-					<option value="quart">Easing end: Quartic</option>
-					<option value="quint">Easing end: Quintic</option>
-					<option value="pow">Easing end: Power</option>
-					<option value="expo">Easing end: Exponential</option>
-					<option value="circ">Easing end: Circular</option>
-					<option value="sine">Easing end: Sinusoidal</option>
-					<option value="back">Easing end + Bounce Effect: Back</option>
-					<option value="bounce">Easing end + Bounce effect: Bouncing</option>
-					<option value="elastic">Easing end + Bounce effect: Elastic</option>
-				</group>
-			</field>
-			<field name="carousel_duration" type="text" default="1000" label="Change duration (ms)" description="Milliseconds that a carousel change will last" />
-			<field name="carousel_interval" type="text" default="5000" label="Autoplay Interval (ms)" description="Milliseconds between autoplay steps" />
+			<field name="carousel_handle_duration" type="text" default="400" label="Auto-scroll duration (ms)" description="Milliseconds when auto-scrolling the handles box e.g. at edges or when a new page is selected" />
 			
-			<field name="" type="separator" default="Miscellaneous" level="level2" />
-			<field name="carousel_show_controls" type="radio" default="0" label="Playback Controls" description="Carousel will display stop, previous, next, etc controls">
+			<field name="" type="separator" default="Thumbnails" level="level3" />
+			<field name="carousel_handle_width" type="text" default="64" label="Width" description="This is the width of thumbnail image of each item" />
+			<field name="carousel_handle_height" type="text" default="64" label="Height" description="This is the height of thumbnail image of each item" />
+			<field name="carousel_handle_event" type="radio" default="mouseover" label="Activation Event" description="How the content item buttons get activated">
+				<option value="mouseover">Mouse Over</option>
+				<option value="click">Click</option>
+			</field>
+			<field name="" type="separator" default="Item Info" level="level3" />
+			<field name="carousel_handle_title" type="radio" default="0" label="Title" description="Display a title for the thumbnail, e.g. as tooltip or caption">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">Intergrated (Horizontal Only)</option>
+				<option value="1">Thumbnail Tooltip</option>
+				<option value="2">Info Box</option>
+			</field>
+			<field name="carousel_handle_text" type="radio" default="0" label="Description" description="Display a title for the thumbnail, e.g. as tooltip or caption">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Thumbnail Tooltip</option>
+				<option value="2">Info Box</option>
+			</field>
+			
+			<field name="" type="separator" default="Playback controls" level="level2" />
+			<field name="carousel_show_controls" type="radio" default="0" label="Enable" description="Display  previous, next, previous page, next page, play, playback, stop, etc controls. The integrated controls will be placed inside or at the edges of the ITEM display area usually as big arrows but maybe customized to display differently. Integrated controls can be configured to transition single item or a full page">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">Intergrated</option>
 				<option value="2">Detached controls</option>
 			</field>
-			<field name="carousel_show_curritem_info" type="radio" default="0" label="Mini Information &lt;br/&gt;&lt;small&gt;(current item)&lt;/small&gt;" description="Carousel will one button per content item">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
+			
+			<field name="" type="separator" default="Intergrated controls" level="level3" />
+			<field name="carousel_icontrols_method" type="radio" default="page" label="Play Method" description="The carousel can move to next / previous item, or to next / previous page">
+				<option value="item">Single Item</option>
+				<option value="page">Full Page</option>
 			</field>
+			
+			<field name="" type="separator" default="Detached controls" level="level3" />
+			<field name="carousel_dcontrols_labels" type="radio" default="1" label="Show labels" description="Display Autoplay, Pages, Items label in front of the controls">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="carousel_dcontrols_auto" type="radio" default="1" label="Autoplay controls" description="Display Autoplay controls">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="carousel_dcontrols_pages" type="radio" default="1" label="Page controls" description="Display Page controls">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			<field name="carousel_dcontrols_items" type="radio" default="1" label="Item controls" description="Display Item controls">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+			
+			<field name="" type="separator" default="Transition Effect" level="level1" />
+			<field name="carousel_transition" type="list" default="scroll" label="Enable" description="Select the effect to be used when carousel updates" >
+				<option value="0">No, instant</option>
+				<option value="scroll">Scroll</option>
+				<option value="fade">Fade</option>
+				<option value="slide">Slide</option>
+				<option value="fade-slide">Fade + Slide</option>
+			</field>
+			<field name="carousel_duration" type="text" default="800" label="Duration (ms)" description="Milliseconds that a carousel change will last" />
+			
+			<field name="" type="separator" default="Transition smoothing" level="level3" />
+			<field name="carousel_easing" type="groupedlist" default="quart" label="Method" description="Select the method for easing the above selected effect" >
+				<group label="Basic">
+					<option value="linear">Linear</option>
+					<option value="swing">Swing</option>
+				</group>
+				<group label="Advanced (use smoothing function)">
+					<option value="quad">Quadratic</option>
+					<option value="cubic">Cubic</option>
+					<option value="quart">Quartic</option>
+					<option value="quint">Quintic</option>
+					<option value="expo">Exponential</option>
+					<option value="circ">Circular</option>
+					<option value="sine">Sinusoidal</option>
+					<option value="back">Back</option>
+					<option value="bounce">Bouncing</option>
+					<option value="elastic">Elastic</option>
+				</group>
+			</field>
+			<field name="carousel_easing_inout" type="list" default="easeOut" label="Slow start/ending" description="Select to use a slow transition start (easeIn) or slow transition ending (easeOut) or both of them (easeInOut)" >
+				<option value="easeIn">easeIn</option>
+				<option value="easeOut">easeOut</option>
+				<option value="easeInOut">easeInOut</option>
+			</field>
+			
+			<field name="" type="separator" default="Already visible items handling (for fade/slide effects)" level="level3" />
+			<field name="carousel_transition_visible_duration" type="text" default="100" label="Moving Duration (ms)" description="Already visible item will be moved instead of fading, select the moving duration in milliseconds. NOTE: this is for non-scroll transitions" />
+			
 		</fieldset>
 		
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
