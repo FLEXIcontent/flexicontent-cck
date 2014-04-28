@@ -756,6 +756,21 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Current url basic variables to be able to link to subcategories ...
     $curr_url_basic = 'index.php?Itemid='.$Itemid;
     foreach ($urlvars as $urlvar_name => $urlvar_val) $curr_url_basic .= '&'.$urlvar_name.'='.$urlvar_val;
+	
+	$vars = array();
+	if(is_array($_GET)) {
+		foreach($_GET as $k=>$v) {
+			if(substr($k, 0, 7)=='filter_') {
+				if(is_array($_GET[$k])) {
+					foreach($v as $k2=>$v2) {
+						$vars[] = "{$k}[{$k2}]={$v2}";
+					}
+				}else{
+					$vars[] = "{$k}={$v}";
+				}
+			}
+		}
+	}
     
     // Category link for single/multiple category(-ies)  --OR--  "current layout" link for myitems/author layouts
 		$category_link = ($layout=='myitems' || $layout=='author') ? JRoute::_( $curr_url_basic ) :
@@ -763,7 +778,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		// Print link ... must include current filtering url vars
     $curr_url = JURI::root(true) . $_SERVER['REQUEST_URI'];
-    $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component';		
+    $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;'.implode("&amp;", $vars);
     
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
