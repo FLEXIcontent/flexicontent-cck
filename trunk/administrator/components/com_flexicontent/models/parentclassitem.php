@@ -3624,9 +3624,13 @@ class ParentClassItem extends JModelLegacy
 				if ( is_numeric($user_id_name) ) $_user_ids[] = (int) $user_id_name;
 				else $_user_names[] = $db->Quote($user_id_name);
 			}
-			if ( count( $nConf->{$ulist[$ntype]} ) )
+			if ( count($_user_ids) || count($_user_names) )
 			{
-				$query = "SELECT DISTINCT email FROM #__users WHERE id IN (".implode(",",$_user_ids).") OR username IN (".implode(",",$_user_names).")";
+				$query = "SELECT DISTINCT email FROM #__users";
+				$where_clauses = array();
+				if ( count($_user_ids) )   $where_clauses[] = " id IN (".implode(",",$_user_ids).") ";
+				if ( count($_user_names) ) $where_clauses[] = " username IN (".implode(",",$_user_names).") ";
+				$query .= " WHERE " . implode (' OR ', $where_clauses);
 				$db->setQuery( $query );
 				$user_emails_ulist = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();
 				if ( $db->getErrorNum() ) echo $db->getErrorMsg();  // if ($ntype=='notify_new_pending') { echo "<pre>"; print_r($user_emails_ulist); exit; }

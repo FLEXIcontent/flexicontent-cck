@@ -556,12 +556,17 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// Get the column names
 		$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
 		
-		$query = "SELECT COUNT(*) AS total1, (SELECT COUNT(*) FROM `#__flexicontent_items_ext`) AS total2"
+		$subquery = " SELECT COUNT(*) "
+			." FROM `#__flexicontent_items_ext` AS ie"
+			." JOIN `#__content` AS i ON ie.item_id=i.id"
+			." WHERE 1 ".(!FLEXI_J16GE ? ' AND i.sectionid = ' . (int)FLEXI_SECTION : '')
+			;
+		$query = "SELECT COUNT(*) AS total1, (".$subquery.") AS total2"
 			." FROM `#__content` AS i"
 			." JOIN `#__flexicontent_items_tmp` AS ca ON i.id=ca.id"
 			." JOIN `#__flexicontent_items_ext` AS ie ON ie.item_id=i.id"
-			." WHERE 1 ";
-		;
+			." WHERE 1 " . (!FLEXI_J16GE ? ' AND i.sectionid = ' . (int)FLEXI_SECTION : '')
+			;
 		foreach ($tbl_fields as $col_name) {
 			if ($col_name == "id") continue;  // || $col_name == "hits"
 			else if ($col_name == "type_id" )
