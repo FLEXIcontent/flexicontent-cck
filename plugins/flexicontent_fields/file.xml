@@ -176,11 +176,6 @@
 				<option value="1">FLEXI_YES_EVERY_HIT</option>
 			</field>
 			
-			<field name="send_notifications" type="radio" default="0" label="Send hit notifications" description="Enable this to send notifications emails when a file is downloaded">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES_EVERY_HIT</option>
-			</field>
-			
 			<field name="notification_tmpl" type="textarea" cols="50" rows="10" default="%%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" size="50" label="Notification text" description="The text that will be sent for every file. &lt;br/&gt;&lt;br/&gt; &lt;b&gt;NOTE:&lt;/b&gt; &lt;br/&gt; you may use these replacements: &lt;br/&gt; %%language_string%%, &lt;br/&gt; __file_id__ &lt;br/&gt; __file_name__ &lt;br/&gt; __item_title__ &lt;br/&gt; __item_url__" />
 			
 			<field name="" type="separator" default="Send TO" level="level3" />
