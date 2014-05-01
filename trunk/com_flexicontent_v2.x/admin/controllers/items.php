@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1765 2013-09-17 09:34:53Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1892 2014-04-26 23:22:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -61,6 +61,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+		//echo '<html>  <meta http-equiv="content-type" content="text/html; charset=utf-8" /> <body>';
 		
 		// Initialize variables
 		$app     = JFactory::getApplication();
@@ -471,6 +472,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 		$this->setRedirect($link, $msg);
+		
+		//echo "</body></html>"; exit;
 	}
 
 

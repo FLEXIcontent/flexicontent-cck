@@ -61,6 +61,7 @@ class FlexicontentControllerItems extends FlexicontentController
 	{
 		// Check for request forgeries
 		JRequest::checkToken() or jexit( 'Invalid Token' );
+		//echo '<html>  <meta http-equiv="content-type" content="text/html; charset=utf-8" /> <body>';
 		
 		// Initialize variables
 		$app     = JFactory::getApplication();
@@ -471,6 +472,8 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		$msg = JText::_( 'FLEXI_ITEM_SAVED' );
 		$this->setRedirect($link, $msg);
+		
+		//echo "</body></html>"; exit;
 	}
 
 
