@@ -1116,7 +1116,7 @@ class modFlexicontentHelper
 		}
 		
 		// 'behaviour' 2 means records that are related to current item via the relation Field
-		else if ($behaviour_items==2)
+		else if ($behaviour_items==2 || $behaviour_items==3)
 		{
 			if ( !$isflexi_itemview ) {
 				return;  // current view is not item view ... , nothing to display
@@ -1128,10 +1128,10 @@ class modFlexicontentHelper
 				$where2 = (count($relitems_fields) > 1) ? ' AND field_id IN ('.implode(',', $relitems_fields).')' : ' AND field_id = '.$relitems_fields[0];
 				
 				// select the item ids related to current item via the relation fields
-				$query2 = 'SELECT DISTINCT value' .
-					' FROM #__flexicontent_fields_item_relations' .
-					' WHERE item_id = '.(int) $id .
-					$where2
+				$query2 = 'SELECT DISTINCT '. ($behaviour_items==2 ? 'value' : 'item_id')
+					.' FROM #__flexicontent_fields_item_relations'
+					.' WHERE '. ($behaviour_items==2 ? 'item_id' : 'value') .' = '.(int) $id
+					.$where2
 					;
 				$db->setQuery($query2);
 				$related = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();

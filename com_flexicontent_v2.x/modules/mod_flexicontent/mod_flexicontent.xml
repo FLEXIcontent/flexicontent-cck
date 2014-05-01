@@ -418,11 +418,12 @@
 				<option value="0">FLEXI_STATIC_DO_NOT_COMPARE_CURRENT_ITEM</option>
 				<group label="FLEXI_DYNAMIC_CMP_TO_CURR_ITEM">
 					<option value="1">FLEXI_RELATED_COMMON_TAGS</option>
-					<option value="2">FLEXI_RELATED_RELITEMS_FIELD</option>
+					<option value="2">FLEXI_RELATED_RELATION_FIELD</option>
+					<option value="3">FLEXI_REVERSE_RELATED_RELATION_FIELD</option>
 				</group>
 			</field>
 			<field name="excluded_tags" type="tags" default="" multiple="true" size="6" label="FLEXI_EXCLUDED_TAGS" description="FLEXI_EXCLUDED_TAGS_DESC" />
-			<field name="relitems_fields" type="fields" default="" multiple="true" size="3" field_type="relation" label="FLEXI_SELECT_RELITEMS_FIELD" description="FLEXI_SELECT_RELITEMS_FIELD_DESC" />
+			<field name="relitems_fields" type="fields" default="" multiple="true" size="3" field_type="relation" label="FLEXI_SELECT_RELATION_FIELDS" description="FLEXI_SELECT_RELATION_FIELDS_DESC" />
 
 
 			<field name="" type="separator" default="FLEXI_UMOD_EXPERT_FILTERING" level="level0" menu="hide" />
