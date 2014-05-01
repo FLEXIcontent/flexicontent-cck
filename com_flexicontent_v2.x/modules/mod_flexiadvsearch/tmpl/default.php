@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1760 2013-09-10 10:42:37Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1890 2014-04-26 04:19:53Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -44,7 +44,7 @@ $search_autocomplete = $params->get( 'search_autocomplete', 1 );
 		$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
 		$maxchars = $params->get('maxchars', 200);
 		$output = '<input type="'.($search_autocomplete==2 ? 'hidden' : 'text').'" class="'.$text_search_class.'"
-				fc_label_text="'.$text_search_label.'" name="searchword" size="" maxlength="'.$maxchars.'" 
+				data-fc_label_text="'.$text_search_label.'" name="searchword" size="" maxlength="'.$maxchars.'" 
 				id="search_searchword" value="" />';
 		
 		if ($button) :

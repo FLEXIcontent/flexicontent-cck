@@ -133,6 +133,10 @@ $_fcx_autoPlay     = $autoplay ? "true" : "false";
 $_fcx_fxOptions    = '{ duration:'.$duration.', easing: "'.$easing_name.'" }';
 $_fcx_item_size    = $mode=="horizontal" ? $hdir_item_width + $extra_width : 240;  // 240 is just a default for vertical it will be recalulated after page load ends
 $_fcx_items_per_page = $mode=="horizontal" ? 0 : $vdir_items;  // ZERO for horizontal, this value will be overwritten by auto-calulation, after page load ends
+
+if ($interval < $duration) {
+	echo "autoplay interval must not be smaller than the EFFECT (scroll/fade/etc) duration (even if autoplay is disabled), please correct in module configuration";
+}
 ?>
 
 <div class="carousel mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_carousel<?php echo $module->id ?>">
