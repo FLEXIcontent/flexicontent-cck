@@ -140,6 +140,7 @@ ul.tabbernav li.tabberactive a:hover
 	padding: 0px 6px 0px 4px !important;
 	width: 99% !important;
 	display: inline-block !important;
+	float:left;
 }
 
 #flexicontent ul.tabbernav li {

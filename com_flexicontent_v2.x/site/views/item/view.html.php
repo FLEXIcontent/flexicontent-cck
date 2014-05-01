@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1880 2014-03-28 07:10:44Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1887 2014-04-24 23:53:14Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -200,7 +200,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// Verify menu item points to current FLEXIcontent object
 		if ( $menu ) {
-			$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'];
+			$view_ok = FLEXI_ITEMVIEW          == @$menu->query['view'] || 'article' == @$menu->query['view'];
 			$cid_ok  = JRequest::getInt('cid') == (int) @$menu->query['cid'];
 			$id_ok   = JRequest::getInt('id')  == (int) @$menu->query['id'];
 			$menu_matches = $view_ok /*&& $cid_ok*/ && $id_ok;
@@ -209,40 +209,39 @@ class FlexicontentViewItem  extends JViewLegacy
 			$menu_matches = false;
 		}
 		
-		// MENU ITEM matched, use its page title (=browser window title) and its page heading
+		// MENU ITEM matched, use its page heading (but use menu title if the former is not set)
 		if ( $menu_matches ) {
-			$params->def('page_title', FLEXI_J16GE ? $menu->title : $menu->name);  // default value for page title is menu item title
-			$params->def('page_heading', $params->get('page_title')); // default value for page heading is the page title
-			// Cross set show_page_heading and show_page_title for J1.5 template compatibility, (J1.5 used 'show_page_title'),
-			// also default to zero in order to prevent templates from use 1 as default value
-		  $params->def('show_page_heading', $params->get('show_page_title', 0));
+			$default_heading = FLEXI_J16GE ? $menu->title : $menu->name;
+			
+			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->def('page_heading', $params->get('page_title',   $default_heading));
+			$params->def('page_title',   $params->get('page_heading', $default_heading));
+		  $params->def('show_page_heading', $params->get('show_page_title',   0));
 		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
 		}
 		
 		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
 		else {
-			$params->set('page_title', '');
-			$params->set('page_heading', '');
-			$params->set('show_page_heading', '');
-			$params->set('show_page_title', '');  // compatibility with J1.5 that used this instead of 'show_page_heading'
+			// Clear some menu parameters
 			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
-		}
-		
-		// If 'page_heading' is empty or disabled, then calculate a title for both page title and page heading
-		if ( !$params->get('page_heading') || !$params->get('show_page_heading') ) {
-			// set item title to the overriden item title if this is set and enabled
-			$default_title = !$params->get('override_title', 0) ? $item->title : $params->get('custom_ititle', $item->title);
 			
-			$params->set('page_title', $default_title);
-			$params->set('page_heading', $default_title);
-		  $params->set('show_page_heading', ($default_title != $item->title));
-			$params->set('show_page_title', ($default_title != $item->title));  // compatibility with J1.5 that used this instead of 'show_page_heading'
+			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
+			$default_heading = $item->title;
+			
+			// Decide to show page heading (=J1.5 page title), there is no need for this in item view
+			$show_default_heading = 0;
+			
+			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->set('page_title',   $default_heading);
+			$params->set('page_heading', $default_heading);
+		  $params->set('show_page_heading', $show_default_heading);
+			$params->set('show_page_title',   $show_default_heading);
 		}
 		
-		// Prevent showing the page heading if IT IS same as category title that will be also shown
-		if ( $params->get('page_heading') == $item->title && $params->get('show_page_heading') && $params->get('show_cat_title', 1) ) {
-			$params->set('show_page_heading', 0);
-			$params->set('show_page_title', 0);  // compatibility with J1.5 templating
+		// Prevent showing the page heading if (a) IT IS same as item title and (b) item title is already configured to be shown
+		if ( $params->get('show_title', 1) ) {
+			if ($params->get('page_heading') == $item->title) $params->set('show_page_heading', 0);
+			if ($params->get('page_title')   == $item->title) $params->set('show_page_title',   0);
 		}
 		
 		
@@ -252,12 +251,14 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Create the document title, by from page title and other data
 		// ************************************************************
 		
+		// Use the page heading as document title, (already calculated above via 'appropriate' logic ...)
+		// or the overriden custom <title> ... set via parameter
+		$doc_title  =  !$params->get('override_title', 0)  ?  $params->get( 'page_title' )  :  $params->get( 'custom_ititle', $item->title);
+		
 		// Check and prepend category title
-		if($cid && $params->get('addcat_title', 1) && (count($parents)>0)) {
+		if ( $params->get('addcat_title', 1) && count($parents) ) {
 			$parentcat = end($parents);
-			$doc_title = (isset($parentcat->title) ? $parentcat->title.' - ':"") .$params->get( 'page_title' );
-		} else {
-			$doc_title = $params->get( 'page_title' );
+			$doc_title = (isset($parentcat->title) ? $parentcat->title.' - ' : '') . $doc_title;
 		}
 		
 		// Check and prepend or append site name

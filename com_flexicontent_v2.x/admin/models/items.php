@@ -545,7 +545,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
 		$tbl_fields_sel = array();
 		foreach ($tbl_fields as $tbl_field) {
-			if ( (!FLEXI_J16GE && $tbl_field=='language') || $tbl_field=='type_id')
+			if ( (!FLEXI_J16GE && $tbl_field=='language') || $tbl_field=='type_id' || $tbl_field=='lang_parent_id')
 				$tbl_fields_sel[] = 'ie.'.$tbl_field;
 			else
 				$tbl_fields_sel[] = 'c.'.$tbl_field;

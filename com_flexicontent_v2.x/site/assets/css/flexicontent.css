@@ -446,6 +446,16 @@ fieldset.fc_filter_set {
 	vertical-align: bottom !important;
 }
 
+/* displayed in date picker */
+#flexicontent .fc_filter .input-append,
+#flexicontent .fc_filter .input-prepend {
+	margin:0px !important;
+}
+#flexicontent .fc_filter .input-append button,
+#flexicontent .fc_filter .input-prepend button {
+	margin-top:6px !important;
+}
+
 /* removing filter choices */
 .fc_delall_filters {
 	background: url("../images/delete.png") no-repeat scroll 0px 0px transparent !important;
@@ -599,9 +609,13 @@ input.fc_field_filter, input.fc_field_filter:focus {
 	min-width: 120px !important;
 }
 /* enlarge field in views ... (non-module) */
-#flexicontent input.fc_text_filter,  #flexicontent input.fc_text_filter:focus,
-#flexicontent input.fc_field_filter, #flexicontent input.fc_field_filter:focus {
+#flexicontent input.fc_text_filter:not(.fc_iscalendar),  #flexicontent input.fc_text_filter:not(.fc_iscalendar):focus,
+#flexicontent input.fc_field_filter:not(.fc_iscalendar), #flexicontent input.fc_field_filter:not(.fc_iscalendar):focus {
 	min-width: 180px !important;
+}
+#flexicontent input.fc_text_filter.fc_iscalendar,
+#flexicontent input.fc_field_filter.fc_iscalendar {
+	min-width: 60px !important;
 }
 
 

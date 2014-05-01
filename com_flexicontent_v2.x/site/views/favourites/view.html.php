@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1794 2013-10-22 02:41:41Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1887 2014-04-24 23:53:14Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -46,7 +46,7 @@ class FlexicontentViewFavourites extends JViewLegacy
 		$view  = JRequest::getCmd('view');
 		
 		// Get view's Model
-		$model = $this->getModel();
+		$model  = $this->getModel();
 		
 		// Get parameters via model
 		$params  = $model->getParams();
@@ -94,40 +94,40 @@ class FlexicontentViewFavourites extends JViewLegacy
 			$menu_matches = false;
 		}
 		
-		// MENU ITEM matched, use its page title (=browser window title) and its page heading
+		// MENU ITEM matched, use its page heading (but use menu title if the former is not set)
 		if ( $menu_matches ) {
-			$params->def('page_title', FLEXI_J16GE ? $menu->title : $menu->name);  // default value for page title is menu item title
-			$params->def('page_heading', $params->get('page_title')); // default value for page heading is the page title
-			// Cross set show_page_heading and show_page_title for J1.5 template compatibility, (J1.5 used 'show_page_title'),
-			// also default to zero in order to prevent templates from use 1 as default value
-		  $params->def('show_page_heading', $params->get('show_page_title', 0));
+			$default_heading = FLEXI_J16GE ? $menu->title : $menu->name;
+			
+			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->def('page_heading', $params->get('page_title',   $default_heading));
+			$params->def('page_title',   $params->get('page_heading', $default_heading));
+		  $params->def('show_page_heading', $params->get('show_page_title',   0));
 		  $params->def('show_page_title',   $params->get('show_page_heading', 0));
 		}
 		
 		// MENU ITEM did not match, clear page title (=browser window title) and page heading so that they are calculated below
 		else {
-			$params->set('page_title', '');
-			$params->set('page_heading', '');
-			$params->set('show_page_heading', '');
-			$params->set('show_page_title', '');  // compatibility with J1.5 that used this instead of 'show_page_heading'
+			// Clear some menu parameters
 			//$params->set('pageclass_sfx',	'');  // CSS class SUFFIX is behavior, so do not clear it ?
-		}
-		
-		// If 'page_heading' is empty or disabled, then calculate a title for both page title and page heading
-		if ( !$params->get('page_heading') || !$params->get('show_page_heading') ) {
-			// ... a default title
-			$default_title = JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' );
 			
-			$params->set('page_title', $default_title);
-			$params->set('page_heading', $default_title);
-		  $params->set('show_page_heading', 1);
-			$params->set('show_page_title', 1);  // compatibility with J1.5 that used this instead of 'show_page_heading'
+			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
+			// meta_params->get('page_title') is meant for <title> but let's use as ... default page heading
+			$default_heading = JText::_( 'FLEXI_YOUR_FAVOURED_ITEMS' );
+			
+			// Decide to show page heading (=J1.5 page title), this is always yes
+			$show_default_heading = 1;
+			
+			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->set('page_title',   $default_heading);
+			$params->set('page_heading', $default_heading);
+		  $params->set('show_page_heading', $show_default_heading);
+			$params->set('show_page_title',   $show_default_heading);
 		}
 		
 		// Prevent showing the page heading if ... currently no reason
 		if ( 0 ) {
 			$params->set('show_page_heading', 0);
-			$params->set('show_page_title', 0);  // compatibility with J1.5 templating
+			$params->set('show_page_title',   0);
 		}
 		
 		
@@ -136,6 +136,7 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// Create the document title, by from page title and other data
 		// ************************************************************
 		
+		// Use the page heading as document title, (already calculated above via 'appropriate' logic ...)
 		$doc_title = $params->get( 'page_title' );
 		
 		// Check and prepend or append site name

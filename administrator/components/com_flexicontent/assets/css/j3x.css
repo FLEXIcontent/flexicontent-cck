@@ -296,7 +296,7 @@ fieldset.panelform fieldset.radio,
 fieldset.adminform-legacy fieldset.radio {
 	border: 0 none !important;
 	float: left !important;
-	margin: 0 0 0 4px !important;
+	margin: 2px 0 0 4px !important;
 	padding: 2px 0px !important;
 }
 
@@ -322,6 +322,13 @@ div fieldset.panelform {
 	padding: 0px !important;
 	margin: 0px !important;
 }
+div fieldset.panelform ul.adminformlist > li {
+	clear: both;
+}
+div fieldset.panelform ul.adminformlist > li .input-append,
+div fieldset.panelform ul.adminformlist > li .input-prepend {
+	margin:0px;
+}
 
 #jform_tid-lbl, #jform_attribs_ilayout-lbl,
 div fieldset.panelform label.hasTip, div fieldset.panelform label.hasTooltip,
@@ -341,10 +348,15 @@ div fieldset.panelform label.hasTip, div fieldset.panelform label.hasTooltip,
 	display: inline-block;
 }
 
-div fieldset label {
+div fieldset label:not(.btn) {
 	margin: 2px 8px 2px 2px;
 	clear: none;
 }
+div fieldset label.btn {
+	margin: 0px 0px !important;
+	padding: 1px 12px !important;
+}
+
 
 div.fieldset_value,
 div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
@@ -367,7 +379,7 @@ div.width-20 fieldset, div.width-30 fieldset, div.width-35 fieldset, div.width-4
 }
 
 div fieldset.panelform textarea {
-	margin:2px 4px 4px 12px !important;
+	margin:2px 4px 4px 6px !important;
 	width:auto !important;
 }
 

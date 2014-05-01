@@ -438,7 +438,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 * @access public
 	 * @return	boolean	True on success
 	 */
-	function getExistLanguageColumn()
+	function getExistLanguageColumns()
 	{
 		static $return;
 		if ($return === NULL) {
@@ -514,7 +514,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			;*/
 		$query = "SELECT COUNT(*)"
 			." FROM #__flexicontent_items_ext as ie"
-			." WHERE ie.language='' " . ($enable_translation_groups ? " OR ie.lang_parent_id='0' " : "")
+			." WHERE ie.language='' " . ($enable_translation_groups ? " OR (ie.lang_parent_id=0 AND ie.item_id<>0) " : "")
 			." LIMIT 1";
 		$db->setQuery($query);
 		$cnt1 = $db->loadResult();
@@ -568,11 +568,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			." WHERE 1 " . (!FLEXI_J16GE ? ' AND i.sectionid = ' . (int)FLEXI_SECTION : '')
 			;
 		foreach ($tbl_fields as $col_name) {
-			if ($col_name == "id") continue;  // || $col_name == "hits"
-			else if ($col_name == "type_id" )
-				$query .= " AND ie.`type_id`=ca.`type_id`";
-			else if (!FLEXI_J16GE && $col_name == "language" )
-				$query .= " AND ie.`language`=ca.`language`";
+			if ($col_name == "id")
+				continue;
+			else if ( (!FLEXI_J16GE && $col_name=='language') || $col_name=='type_id' || $col_name=='lang_parent_id')
+				$query .= " AND ie.`".$col_name."`=ca.`".$col_name."`";
 			else
 				$query .= " AND i.`".$col_name."`=ca.`".$col_name."`";
 		}

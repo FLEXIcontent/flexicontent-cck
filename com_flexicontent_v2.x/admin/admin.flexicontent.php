@@ -334,7 +334,7 @@ if ( ($force_print || $print_logging_info) && JRequest::getWord('tmpl')!='compon
 	if (isset($fc_run_times['render_categories_select']))
 		$msg .= sprintf('<br/>-- [Render Categories Select: %.2f s] ', $fc_run_times['render_categories_select']/1000000);
 	
-	if (count($fields_render_times))
+	if (isset($fields_render_times) && count($fields_render_times))
 		$msg .= sprintf('<br/>-- [FC Fields Value Retrieval: %.2f s] ', $fc_run_times['field_value_retrieval']/1000000);
 	
 	if (isset($fc_run_times['template_render']))
