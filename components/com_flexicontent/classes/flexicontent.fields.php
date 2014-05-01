@@ -1699,7 +1699,18 @@ class FlexicontentFields
 	static function createIndexRecords(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null, $for_advsearch=0) {
 		$fi = FlexicontentFields::getPropertySupport($field->field_type, $field->iscore);
 		$db = JFactory::getDBO();
-			
+		
+		// * Decide to load and create the word segmenter object (adds spaces between words)
+		static $word_segmenter = null;
+		if ($item->language == 'th-TH' && $word_segmenter === null) {
+			$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
+			$word_segmenter = false;
+			if ( JFile::exists($segmenter_path) ) {
+				require_once ($segmenter_path);
+				$word_segmenter = new Segment();
+			}
+		}
+		
 		if ( !$for_advsearch )
 		{
 			// Check if field type supports text search, this will also skip fields wrongly marked as text searchable
@@ -1764,6 +1775,13 @@ class FlexicontentFields
 				$searchindex[$vi] = $filter_func ? $filter_func($searchindex[$vi]) : $searchindex[$vi];
 			}
 			
+			// * Use word segmenter (if it was created) to add spaces between words
+			if ($word_segmenter) {
+				foreach($searchindex as $i => $_searchindex) {
+					$searchindex[$i] = implode(' ', $word_segmenter->get_segment_array($_searchindex));
+				}
+			}
+			
 			if ( !$for_advsearch )
 			{
 				$field->search[$itemid] = implode(' | ', $searchindex);
@@ -1783,7 +1801,7 @@ class FlexicontentFields
 		}
 		
 		//echo $field->name . ": "; print_r($values);echo "<br/>";
-		//echo implode(' | ', $searchindex) ."<br/><br/>";
+		//echo if ( !empty($searchindex) ) implode(' | ', $searchindex) ."<br/><br/>";
 	}
 	
 	
