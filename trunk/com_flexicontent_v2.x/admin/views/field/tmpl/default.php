@@ -59,18 +59,25 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->form->getValue("name"); ?>
 						</td>
 					<?php endif; ?>
-					<?php
-					$disabled = '';
-					if ($this->form->getValue("id") > 0 && $this->form->getValue("id") < 7) $disabled = 'disabled="disabled"';
-					?>
+					
 					<tr>
 						<td class="key">
 							<?php echo $this->form->getLabel('published'); ?>
 						</td>
 						<td>
-							<?php
-							$html = JHTML::_('select.booleanlist', 'jform[published]', 'class="inputbox"'.$disabled, $this->row->published );
-							echo $html;
+							<?php echo $this->form->getInput('published'); ?>
+							<?php 
+							$disabled = ($this->form->getValue("id") > 0 && $this->form->getValue("id") < 7);
+							if ($disabled) {
+								$this->document->addScriptDeclaration("
+									jQuery( document ).ready(function() {
+										setTimeout(function(){ 
+											jQuery('#jform_published input').attr('disabled', 'disabled').off('click');
+											jQuery('#jform_published label').attr('disabled', true).off('click');
+										}, 1);
+									});
+								");
+							}
 							?>
 						</td>
 					</tr>

@@ -89,7 +89,14 @@
 					var_sep = '&';
 				}
 			} else {
-				extra_action += var_sep + element.name + '=' + element.value;
+				element_value = element.value;
+				if ( jQuery(element).hasClass('fc_iscalendar') ) {
+					var frmt = '%Y-%m-%d';
+					var date = Date.parseDate(element.value || element.innerHTML, frmt);
+					if (postprep==2) element.value = date.print(frmt, true);
+					element_value = date.print(frmt, true);
+				}
+				extra_action += var_sep + element.name + '=' + element_value;
 				var_sep = '&';
 			}
 		}
@@ -209,7 +216,7 @@ jQuery(document).ready(function() {
 		var list = jQuery(this).find('ul:first');
 		// prepend text filter input to the list
 		var form = jQuery("<form>").attr({"class":"fc_instant_filter", "action":"#"}),
-		input = jQuery("<input>").attr({"class":"fc_field_filter fc_label_internal fc_instant_filter fc_autosubmit_exclude", "type":"text", "fc_label_text":Joomla.JText._('FLEXI_TYPE_TO_FILTER')});
+		input = jQuery("<input>").attr({"class":"fc_field_filter fc_label_internal fc_instant_filter fc_autosubmit_exclude", "type":"text", "data-fc_label_text":Joomla.JText._('FLEXI_TYPE_TO_FILTER')});
 		jQuery(form).append(input).insertBefore(this);
 	
 		jQuery(input)
@@ -232,7 +239,8 @@ jQuery(document).ready(function() {
 	// Initialize internal labels
 	jQuery('input.fc_label_internal').each(function() {
 		var el = jQuery(this);
-		var fc_label_text = el.attr('fc_label_text');
+		var fc_label_text = el.attr('data-fc_label_text');
+		if (!fc_label_text) fc_label_text = el.attr('fc_label_text');
 		if (!fc_label_text) return;
 		var _label = (fc_label_text.length >= 27) ? fc_label_text.substring(0, 25) + '...' : fc_label_text;
 		
@@ -246,13 +254,15 @@ jQuery(document).ready(function() {
 	
 	jQuery('input.fc_label_internal').bind('focus', function() {
 		var el = jQuery(this);
-		var fc_label_text = el.attr('fc_label_text');
+		var fc_label_text = el.attr('data-fc_label_text');
+		if (!fc_label_text) fc_label_text = el.attr('fc_label_text');
 		if (!fc_label_text) return;
 		el.prev().hide();
 		el.css("opacity", "1");
 	}).bind('change blur', function(event) {
 		var el = jQuery(this);
-		var fc_label_text = el.attr('fc_label_text');
+		var fc_label_text = el.attr('data-fc_label_text');
+		if (!fc_label_text) fc_label_text = el.attr('fc_label_text');
 		if (!fc_label_text) return;
 		
 		if (event.type=='blur') {

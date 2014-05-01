@@ -390,7 +390,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			case 'title':
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_TYPE_TO_LIST');
 				$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
-				$attribs_str = ' class="fc_field_filter fc_label_internal" fc_label_text="'.$_inner_lb.'"';
+				$attribs_str = ' class="fc_field_filter fc_label_internal" data-fc_label_text="'.$_inner_lb.'"';
 				
 				$filter_ffname = 'filter_'.$filter->id;
 				$filter_ffid   = $formName.'_'.$filter->id.'_val';
@@ -554,8 +554,8 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				// Add field's LABEL internally or click to select PROMPT (via js)
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
 				// Add type to filter PROMPT (via js)
-				$extra_param  = ' fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
-				$extra_param .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
+				$extra_param  = ' data-fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
+				$extra_param .= ' data-fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
 			}
 			
 			// Create HTML tag attributes
@@ -581,6 +581,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	function getFiltered(&$filter, $value)
 	{
 		if ( !$filter->iscore ) return;
+		//echo __FUNCTION__ ." of CORE field type: ".$filter->field_type;
 		
 		$isdate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
 		if ($isdate) {
@@ -591,8 +592,12 @@ class plgFlexicontent_fieldsCore extends JPlugin
 			
 			$filter->filter_colname    = sprintf(' DATE_FORMAT(c.%s, "%s") ', $filter->field_type, $date_valformat);
 			$filter->filter_valuesjoin = ' ';   // ... a space, (indicates not needed)
-			$filter->filter_valueformat = sprintf(' DATE_FORMAT("__filtervalue__", "%s") ', $date_valformat);
-			return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
+			$filter->filter_valueformat = sprintf(' DATE_FORMAT(__filtervalue__, "%s") ', $date_valformat);
+			
+			// Dates are given in user calendar convert them to valid SQL dates
+			$sql = FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
+			//echo "<br/>\n" .print_r($sql,true). "<br/>\n";
+			return $sql;
 		} else {
 			return array(0);
 		}

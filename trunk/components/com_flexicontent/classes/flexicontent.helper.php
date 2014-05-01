@@ -445,7 +445,8 @@ class flexicontent_html
 							var el_select = el_container.next('select');
 							
 							"/* MULTI-SELECT2: Initialize internal labels, placing the label so that it overlaps the text filter box */."
-							var fc_label_text = el_select.attr('fc_label_text');
+							var fc_label_text = el_select.attr('data-fc_label_text');
+							if (!fc_label_text) fc_label_text = el_select.attr('fc_label_text');
 							if (fc_label_text) {
 								var _label = (fc_label_text.length >= 30) ? fc_label_text.substring(0, 28) + '...' : fc_label_text;
 								
@@ -456,7 +457,8 @@ class flexicontent_html
 							}
 							
 							"/* MULTI-SELECT2: Initialize internal prompts, placing the prompt so that it overlaps the text filter box */."
-							var fc_prompt_text = el_select.attr('fc_prompt_text');
+							var fc_prompt_text = el_select.attr('data-fc_prompt_text');
+							if (!fc_prompt_text) fc_prompt_text = el_select.attr('fc_prompt_text');
 							if (fc_prompt_text) {
 								var _prompt = (fc_prompt_text.length >= 30) ? fc_prompt_text.substring(0, 28) + '...' : fc_prompt_text;
 								

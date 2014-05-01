@@ -215,7 +215,7 @@ class FlexicontentController extends JControllerLegacy
 				//printf('<br/>-- [getItemsNoCat: %.2f s] ', $fc_run_times['getItemsNoCat']/1000000);
 			
 				if ( $print_logging_info ) $start_microtime = microtime(true);
-		$existlang				= $model->getExistLanguageColumn() && !$model->getItemsNoLang();
+		$existlang				= $model->getExistLanguageColumns() && !$model->getItemsNoLang();
 				if ( $print_logging_info ) @$fc_run_times['getItemsNoLang'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 				//printf('<br/>-- [getItemsNoLang: %.2f s] ', $fc_run_times['getItemsNoLang']/1000000);
 			

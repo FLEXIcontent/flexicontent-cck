@@ -91,7 +91,7 @@ $r = 0;
 					?>
 					<span class="fc_filter">
 						<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
-							fc_label_text="<?php echo $text_search_label; ?>" name="searchword" size="30" maxlength="120" 
+							data-fc_label_text="<?php echo $text_search_label; ?>" name="searchword" size="30" maxlength="120" 
 							id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" />
 
 						<?php if ( $show_searchphrase ) echo $this->lists['searchphrase']; ?>

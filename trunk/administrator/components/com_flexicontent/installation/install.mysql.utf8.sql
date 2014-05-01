@@ -244,11 +244,13 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_items_tmp` (
  `hits` int(10) unsigned NOT NULL DEFAULT '0',
  `language` char(7) NOT NULL,
  `type_id` int(11) NOT NULL DEFAULT '0',
+ `lang_parent_id` int(11) NOT NULL DEFAULT '0',
  PRIMARY KEY (`id`),
  KEY `state` (`state`),
  KEY `catid` (`catid`),
  KEY `created_by` (`created_by`),
  KEY `access` (`access`),
  KEY `language` (`language`),
- KEY `type_id` (`type_id`)
+ KEY `type_id` (`type_id`),
+ KEY `lang_parent_id` (`lang_parent_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

@@ -2276,7 +2276,7 @@ class FlexicontentFields
 				// Add field's LABEL internally or click to select PROMPT (via js)
 				$_inner_lb = $label_filter==2 ? $filter->label : JText::_('FLEXI_CLICK_TO_LIST');
 				// Add type to filter PROMPT (via js)
-				$extra_param  = ' fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
+				$extra_param  = ' data-fc_label_text="'.flexicontent_html::escapeJsText($_inner_lb,'s').'"';
 				$extra_param .= ' fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
 			}
 			
@@ -2303,8 +2303,8 @@ class FlexicontentFields
 		case 1: case 3:  // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars
 			$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isdate ? 'FLEXI_CLICK_CALENDAR' : 'FLEXI_TYPE_TO_LIST');
 			$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
-			$attribs_str = ' class="fc_field_filter fc_label_internal" fc_label_text="'.$_inner_lb.'"';
-			$attribs_arr = array('class'=>'fc_field_filter fc_label_internal', 'fc_label_text' => $_inner_lb );
+			$attribs_str = ' class="fc_field_filter fc_label_internal fc_iscalendar" data-fc_label_text="'.$_inner_lb.'"';
+			$attribs_arr = array('class'=>'fc_field_filter fc_label_internal fc_iscalendar', 'data-fc_label_text' => $_inner_lb );
 			
 			if ($display_filter_as==1) {
 				if ($isdate) {
@@ -2426,12 +2426,15 @@ class FlexicontentFields
 		$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
 		
 		try {
+			// we check if date has no SYNTAX error (=being invalid) so use $gregorian = true,
+			// to avoid it being change according to CALENDAR of current user
+			// because user already entered the date in his/her calendar
 			if ( !$value ) {
 				$date = '';
 			} else if (!$date_allowtime || !$time) {
-				$date = JHTML::_('date',  $date, JText::_( FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ), $timezone);
+				$date = JHTML::_('date',  $date, (FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d'), $timezone, $gregorian = true);
 			} else {
-				$date = JHTML::_('date',  $value, JText::_( FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M' ), $timezone);
+				$date = JHTML::_('date',  $value, (FLEXI_J16GE ? 'Y-m-d H:i' : '%Y-%m-%d %H:%M'), $timezone, $gregorian = true);
 			}
 		} catch ( Exception $e ) {
 			if (!$skip_on_invalid) return '';
@@ -2439,9 +2442,10 @@ class FlexicontentFields
 		}
 		
 		// Create JS calendar
-		$date_formats_map = array('0'=>'%Y-%m-%d', '1'=>'%Y-%m-%d %H:%M', '2'=>'%Y-%m-%d 00:00');
-		$date_format = $date_formats_map[$date_allowtime];
-		$calendar = JHTML::_('calendar', $date, $fieldname, $elementid, $date_format, $attribs);
+		$date_format = '%Y-%m-%d';
+		$time_formats_map = array('0'=>'', '1'=>' %H:%M', '2'=>' 00:00');
+		$date_time_format = $date_format . $time_formats_map[$date_allowtime];
+		$calendar = JHTML::_('calendar', $date, $fieldname, $elementid, $date_time_format, $attribs);
 		return $calendar;
 	}
 	
@@ -2961,7 +2965,6 @@ class FlexicontentFields
 			//$results 	= $dispatcher->trigger('onDisplayFilter', array( &$filter, $filtervalue ));
 			FLEXIUtilities::call_FC_Field_Func($field_type, 'onDisplayFilter', array( &$filter, $filtervalue, $form_name ) );
 			$filter->parameters->set('display_label_filter', $display_label_filter_saved);
-			$lists['filter_' . $filter->id] = $filtervalue;
 		}
 	}	
 
