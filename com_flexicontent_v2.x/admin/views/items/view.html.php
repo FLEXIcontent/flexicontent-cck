@@ -155,7 +155,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$CanDeleteOwn		= $perms->CanDeleteOwn;
 		
 		$CanCats		= $perms->CanCats;
-		$CanRights	= $perms->CanConfig;
+		$CanAccLvl	= $perms->CanAccLvl;
 		$CanOrder		= $perms->CanOrder;
 		$CanCopy		= $perms->CanCopy;
 		$CanArchives= $perms->CanArchives;
@@ -536,7 +536,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$this->assignRef('ordering'		, $ordering);
 		$this->assignRef('CanOrder'		, $CanOrder);
 		$this->assignRef('CanCats'		, $CanCats);
-		$this->assignRef('CanRights'	, $CanRights);
+		$this->assignRef('CanAccLvl'	, $CanAccLvl);
 		$this->assignRef('unassociated'	, $unassociated);
 		$this->assignRef('badcatitems'	, $badcatitems);
 		// filters
@@ -592,23 +592,8 @@ class FlexicontentViewItems extends JViewLegacy {
 		$filter_order     = $app->getUserStateFromRequest( $option.'.items.filter_order', 		'filter_order', 	'', 	'cmd' );
 		$filter_order_Dir = $app->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
 		
-		if (FLEXI_J16GE) {
-			$perms 	= FlexicontentHelperPerm::getPerm();
-			$CanCats		= $perms->CanCats;
-			$CanRights	= $perms->CanConfig;
-			$CanOrder		= $perms->CanOrder;
-			
-		} else if (FLEXI_ACCESS) {
-			$CanCats		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid)	: 1;
-			$CanRights	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid)			: 1;
-			$CanOrder		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'order', 'users', $user->gmid)			: 1;
-			
-		} else {
-			$CanCats		= 1;
-			$CanRights	= 1;
-			$CanOrder		= 1;
-		}
-
+		//$perms 	= FlexicontentHelperPerm::getPerm();
+		
 		//create the toolbar
 		$copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 		if ($copy_behaviour == 'translate') {
@@ -636,10 +621,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$this->assignRef('itemCats'		, $itemCats);
 		$this->assignRef('cid'      	, $cid);
 		$this->assignRef('user'				, $user);
-		$this->assignRef('CanOrder'		, $CanOrder);
-		$this->assignRef('CanCats'		, $CanCats);
-		$this->assignRef('CanRights'	, $CanRights);
-
+		
 		parent::display($tpl);
 	}
 

@@ -639,7 +639,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		$tblname_indexnames = array(
 			'flexicontent_items_ext'=>array('lang_parent_id'=>0, 'type_id'=>0),
-			'flexicontent_items_tmp'=>array('state'=>0, 'catid'=>0, 'created_by'=>0, 'access'=>0, 'featured'=>0, 'language'=>0, 'type_id'=>0),
+			'flexicontent_items_tmp'=>array('state'=>0, 'catid'=>0, 'created_by'=>0, 'access'=>0, 'featured'=>0, 'language'=>0, 'type_id'=>0, 'lang_parent_id'=>0),
 			'flexicontent_fields_item_relations'=>array('value'=>32),
 			'flexicontent_download_history'=>array('user_id'=>0, 'file_id'=>0),
 			'flexicontent_download_coupons'=>array('user_id'=>0, 'file_id'=>0, 'token'=>0, 'expire_on'=>0)
@@ -867,7 +867,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($return === NULL) {
 			$query 	= 'SELECT COUNT( item_id )'
 					. ' FROM #__flexicontent_fields_item_relations'
-					. ' WHERE field_id < 13'
+					. ' WHERE field_id < 15'
+					. ' LIMIT 1';
 					;
 			$this->_db->setQuery( $query );
 			$return = $this->_db->loadResult() ? false : true;
@@ -1121,7 +1122,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$diff_arrays = array( FLEXIUtilities::getCurrentVersions($item_id) );
 		}
 		
-		$jcorefields = flexicontent_html::getJCoreFields();
+		//$jcorefields = flexicontent_html::getJCoreFields();
 		$add_cats = true;
 		$add_tags = true;
 		

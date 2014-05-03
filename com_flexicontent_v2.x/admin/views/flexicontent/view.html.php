@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1869 2014-03-12 12:18:40Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1887 2014-04-24 23:53:14Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -109,6 +109,9 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			}
 		}
 		
+		// Get model
+		$model = $this->getModel('flexicontent');
+		
 		// initialise template related variables
 		if (!FLEXI_J16GE)
 			$pane = JPane::getInstance('sliders');
@@ -118,25 +121,25 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// Get data from the model
 		if ( $print_logging_info )  global $fc_run_times;
 		if ( $print_logging_info ) $start_microtime = microtime(true);
-		$draft      = $this->get( 'Draft' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['draft'] = $db->loadResult();
-		$pending    = $this->get( 'Pending' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['pending'] = $db->loadResult();
-		$revised    = $this->get( 'Revised' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['revised'] = $db->loadResult();
-		$inprogress = $this->get( 'Inprogress' );   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['inprogress'] = $db->loadResult();
+		$draft      = $model->getDraft();   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['draft'] = $db->loadResult();
+		$pending    = $model->getPending();   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['pending'] = $db->loadResult();
+		$revised    = $model->getRevised();   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['revised'] = $db->loadResult();
+		$inprogress = $model->getInprogress();   $db->setQuery("SELECT FOUND_ROWS()");	 $totalrows['inprogress'] = $db->loadResult();
 		if ( $print_logging_info ) $fc_run_times['quick_sliders'] = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
 		
 		// 1. CHECK REQUIRED NON-AUTOMATIC TASKs
 		//  THEY ARE TASKs THAT USER MUST COMPLETE MANUALLY
-		$existcat 	= $this->get( 'Existcat' );
+		$existcat 	= $model->getExistcat();
 		if (!FLEXI_J16GE)
-			$existsec = $this->get( 'Existsec' );
-		$existmenu 	= $this->get( 'Existmenu' );
+			$existsec = $model->getExistsec();
+		$existmenu 	= $model->getExistmenu();
 		
 		// 2. OPTIONAL AUTOMATIC TASKS,
 		//  THESE ARE SEPARETELY CHECKED, AS THEY ARE NOT OBLIGATORY BUT RATHER RECOMMENDED
 		$allplgpublish = $session->get('flexicontent.allplgpublish');
 		if (($allplgpublish===NULL) || ($allplgpublish===false)) {
-			$allplgpublish = $this->get( 'AllPluginsPublished' );
+			$allplgpublish = $model->getAllPluginsPublished();
 		}
 		$optional_tasks = !$allplgpublish; // || ..
 		
@@ -145,35 +148,34 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		// THE FOLLOWING WILL ONLY BE DISPLAYED IF $DOPOSTINSTALL IS INCOMPLETE
 		// SO WHY CALCULATE THEM, WE SKIP THEM, USER MUST LOG OUT ANYWAY TO SEE THEM ...
 		if(($postinst_integrity_ok===NULL) || ($postinst_integrity_ok===false) || $optional_tasks) {
-			$model 				= $this->getModel('flexicontent');
 			$use_versioning = $params->get('use_versioning', 1);
 			
-			$existmenuitems	= $this->get( 'ExistMenuItems' );
-			$existtype 			= $this->get( 'ExistType' );
-			$existfields 		= $this->get( 'ExistFields' );
+			$existmenuitems	= $model->getExistMenuItems();
+			$existtype 			= $model->getExistType();
+			$existfields 		= $model->getExistFields();
 			
-			$existfplg 			= $this->get( 'ExistFieldsPlugins' );
-			$existseplg 		= $this->get( 'ExistSearchPlugin' );
-			$existsyplg 		= $this->get( 'ExistSystemPlugin' );
+			$existfplg 			= $model->getExistFieldsPlugins();
+			$existseplg 		= $model->getExistSearchPlugin();
+			$existsyplg 		= $model->getExistSystemPlugin();
 			
-			$existcats					= !$this->get('ItemsNoCat');
-			$existlang	 				= $this->get( 'ExistLanguageColumn' ) && !$this->get('ItemsNoLang');
+			$existcats					= !$model->getItemsNoCat();
+			$existlang	 				= $model->getExistLanguageColumns() && !$model->getItemsNoLang();
 			$existdbindexes			= $model->getExistDBindexes($check_only=false);
 			$itemcountingdok    = $model->getItemCountingDataOK();
-			$existversions 			= $this->get( 'ExistVersionsTable' );
-			$existversionsdata	= !$use_versioning || $this->get( 'ExistVersionsPopulated' );
+			$existversions 			= $model->getExistVersionsTable();
+			$existversionsdata	= !$use_versioning || $model->getExistVersionsPopulated();
 			
-			$existauthors			= $this->get( 'ExistAuthorsTable' );
-			$cachethumb				= $this->get( 'CacheThumbChmod' );
-			$oldbetafiles			= true; //$this->get( 'OldBetaFiles' );
-			$nooldfieldsdata	= $this->get( 'NoOldFieldsData' );
+			$existauthors			= $model->getExistAuthorsTable();
+			$cachethumb				= $model->getCacheThumbChmod();
+			$oldbetafiles			= true; //$model->getOldBetaFiles();
+			$nooldfieldsdata	= $model->getNoOldFieldsData();
 			$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 			
 			$initialpermission = FLEXI_J16GE ? $model->checkInitialPermission() : true;
 		}
 		
 		// 4. SILENTLY CHECKED and EXECUTED TASKs WITHOUT ALERTING THE USER
-		$this->get( 'FieldsPositions' );
+		$model->getFieldsPositions();
 		
 		//build toolbar
 		JToolBarHelper::title( JText::_( 'FLEXI_DASHBOARD' ), 'flexicontent' );
@@ -253,7 +255,6 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$lists['languages'] = JHTML::_('select.genericlist', $options, 'lang', '', 'value', 'text', $activelang);
 
 		// Missing files
-		$model = $this->getModel('flexicontent');
 		$lists['missing_lang'] = $model->processlanguagefiles();
 
 		// Get the default copyright values to populate the form automatically

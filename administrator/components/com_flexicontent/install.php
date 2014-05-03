@@ -469,7 +469,7 @@ if (FLEXI_J16GE) {
 		// Upgrade DB tables: ADD new columns
 		?>
 				<tr class="row1">
-					<td class="key">Upgrading DB tables (adding new columns): </td>
+					<td class="key">Upgrading DB tables (adding/dropping columns): </td>
 					<td>
 					<?php
 					$tbls = array();
@@ -493,7 +493,7 @@ if (FLEXI_J16GE) {
 						if (array_key_exists('cnt_publish_up', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " DROP `cnt_publish_up`";
 						if (array_key_exists('cnt_publish_down', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " DROP `cnt_publish_down`";
 						if (array_key_exists('cnt_created_by', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " DROP `cnt_created_by`";
-						if (empty($_querycols)) $queries[] = $_query . implode(",", $_querycols);
+						if (!empty($_querycols)) $queries[] = $_query . implode(",", $_querycols);
 					}
 					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__flexicontent_files'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL DEFAULT '' AFTER `altname`";
@@ -535,7 +535,7 @@ if (FLEXI_J16GE) {
 							}
 						}
 						if ( $result !== false ) {
-							echo "<span style='$success_style'>columns added</span>";
+							echo "<span style='$success_style'>tables altered</span>";
 						}
 					}
 					else echo "<span style='$success_style'>nothing to do</span>";
@@ -605,7 +605,7 @@ if (FLEXI_J16GE) {
 							}
 						}
 						if ( $result !== false ) {
-							echo "<span style='$success_style'>columns/indexes added, table was truncated or recreated, please re-index your content</span>";
+							echo "<span style='$success_style'>table was truncated/updated or recreated, please re-index your content</span>";
 						}
 					}
 					else echo "<span style='$success_style'>nothing to do</span>";
@@ -678,6 +678,7 @@ if (FLEXI_J16GE) {
 							 `language` char(7) NOT NULL,
 							 ".(!FLEXI_J16GE ? "`sectionid` int(10) unsigned NOT NULL DEFAULT '0'," : "")."
 							 `type_id` int(11) NOT NULL DEFAULT '0',
+							 `lang_parent_id` int(11) NOT NULL DEFAULT '0',
 							 PRIMARY KEY (`id`)
 							) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 						";
@@ -700,7 +701,7 @@ if (FLEXI_J16GE) {
 							}
 						}
 						if ( $result !== false ) {
-							echo "<span style='$success_style'>table created</span>";
+							echo "<span style='$success_style'>table created or upgraded</span>";
 						}
 					}
 					else echo "<span style='$success_style'>nothing to do</span>";
@@ -758,7 +759,7 @@ if (FLEXI_J16GE) {
 							}
 						}
 						if ( $result !== false ) {
-							echo "<span style='$success_style'>tables was created / upgraded</span>";
+							echo "<span style='$success_style'>table(s) created or upgraded</span>";
 						}
 					}
 					else echo "<span style='$success_style'>nothing to do</span>";

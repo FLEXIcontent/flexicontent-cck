@@ -143,10 +143,15 @@ class FlexicontentHelperPerm
 			$permission->CanChangeFeatCat = count($allowedcats) > 0;
 		}
 		
+		// Permission for changing the ACL rules of items and categories that user can edit
+		// Currently given to user that can edit component configuration
+		$permission->CanRights		= $permission->CanConfig;
+		
 		// Permission for changing the access level of items and categories that user can edit
-		// (a) In J1.5, this is the FLEXIaccess component access permission, and
-		// (b) In J2.5, this is the FLEXIcontent component ACTION 'accesslevel'
-		$permission->CanRights		= $user->authorise('flexicontent.accesslevel',		'com_flexicontent');
+		// (a) In J1.5 with FLEXIaccess, this is given to those that can edit the FLEXIaccess configuration
+		// (b) In J1.5 without FLEXIaccess, this is given to users being at least an Editor
+		// (c) In J2.5, this is the FLEXIcontent component ACTION 'accesslevel'
+		$permission->CanAccLvl		= $user->authorise('flexicontent.accesslevel',		'com_flexicontent');
 		
 		// ITEMS: component controlled permissions
 		$permission->DisplayAllItems		= $user->authorise('flexicontent.displayallitems','com_flexicontent'); // (backend) List all items (otherwise only items that can be edited)

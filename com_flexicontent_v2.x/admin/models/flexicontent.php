@@ -867,7 +867,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		if ($return === NULL) {
 			$query 	= 'SELECT COUNT( item_id )'
 					. ' FROM #__flexicontent_fields_item_relations'
-					. ' WHERE field_id < 13'
+					. ' WHERE field_id < 15'
+					. ' LIMIT 1';
 					;
 			$this->_db->setQuery( $query );
 			$return = $this->_db->loadResult() ? false : true;
@@ -1122,7 +1123,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			$diff_arrays = array( FLEXIUtilities::getCurrentVersions($item_id) );
 		}
 		
-		$jcorefields = flexicontent_html::getJCoreFields();
+		//$jcorefields = flexicontent_html::getJCoreFields();
 		$add_cats = true;
 		$add_tags = true;
 		
@@ -1522,17 +1523,23 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// DELETE old namespace (flexicontent.*) permissions of v2.0beta, we do not try to rename them ... instead we will use com_content (for some of them),
 		$query = $db->getQuery(true)->delete('#__assets')->where('name LIKE ' . $db->quote('flexicontent.%'));
 		$db->setQuery($query);
-		$db->query();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+		
+		try { $db->query(); } catch (Exception $e) { }
+		if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
 		// SET Access View Level to public (=1) for fields that do not have their Level set
 		$query = $db->getQuery(true)->update('#__flexicontent_fields')->set('access = 1')->where('access = 0');
 		$db->setQuery($query);
-		$db->query();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+		
+		try { $db->query(); } catch (Exception $e) { }
+		if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
 		// SET Access View Level to public (=1) for types that do not have their Level set
 		$query = $db->getQuery(true)->update('#__flexicontent_types')->set('access = 1')->where('access = 0');
 		$db->setQuery($query);
-		$db->query();					if ($db->getErrorNum()) echo $db->getErrorMsg();
+		
+		try { $db->query(); } catch (Exception $e) { }
+		if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
 		// CHECK that we have the same Component Actions in assets DB table with the Actions as in component's access.xml file
 		$asset	= JTable::getInstance('asset');
@@ -1563,8 +1570,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			->where( 'c.extension = ' . $db->quote('com_content') );
 		
 		$db->setQuery($query);
-		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
-		if (count($result) && $debug_initial_perms) { echo "bad assets for categories: "; print_r($result); echo "<br>"; }
+		
+		try { $result = $db->loadObjectList(); } catch (Exception $e) { $result = array(); }
+		if ($db->getErrorNum()) echo $db->getErrorMsg();
+		
+		if (!empty($result) && $debug_initial_perms) { echo "bad assets for categories: "; print_r($result); echo "<br>"; }
 		$category_section = count($result) == 0 ? 1 : 0;
 
 		// CHECK if some items don't have permissions set, , !!! WARNING this query must be same like the one USED in function initialPermission()
@@ -1583,8 +1593,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_fields AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.field.",ff.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);
-		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
-		if (count($result) && $debug_initial_perms) { echo "bad assets for fields: "; print_r($result); echo "<br>"; }
+		
+		try { $result = $db->loadObjectList(); } catch (Exception $e) { $result = array(); }
+		if ($db->getErrorNum()) echo $db->getErrorMsg();
+		
+		if (!empty($result) && $debug_initial_perms) { echo "bad assets for fields: "; print_r($result); echo "<br>"; }
 		$field_section = count($result) == 0 ? 1 : 0;
 
 		// CHECK if some types don't have permissions set, !!! WARNING this query must be same like the one USED in function initialPermission()
@@ -1593,8 +1606,11 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			->from('#__assets AS se')->join('RIGHT', '#__flexicontent_types AS ff ON se.id=ff.asset_id AND se.name=concat("com_flexicontent.type.",ff.id)')
 			->where('se.id is NULL');
 		$db->setQuery($query);
-		$result = $db->loadObjectList();					if ($db->getErrorNum()) echo $db->getErrorMsg();
-		if (count($result) && $debug_initial_perms) { echo "bad assets for types: "; print_r($result); echo "<br>"; }
+		
+		try { $result = $db->loadObjectList(); } catch (Exception $e) { $result = array(); }
+		if ($db->getErrorNum()) echo $db->getErrorMsg();
+		
+		if (!empty($result) && $debug_initial_perms) { echo "bad assets for types: "; print_r($result); echo "<br>"; }
 		$type_section = count($result) == 0 ? 1 : 0;
 		
 		if ($debug_initial_perms) { echo "PASSED comp_section:$comp_section && category_section:$category_section && article_section:$article_section && field_section:$field_section && type_section:$type_section <br>"; }
@@ -1602,6 +1618,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$init_required = $comp_section && $category_section && $article_section && $field_section && $type_section;
 		return $init_required;
 	}
+	
 	
 	function initialPermission() {
 		$component_name	= JRequest::getCmd('option');

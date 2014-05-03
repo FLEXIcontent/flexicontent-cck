@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1677 2013-04-21 21:53:05Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1807 2013-11-14 01:43:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -17,9 +17,13 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
-$listOrder  = $this->lists['order'];
-$listDirn   = $this->lists['order_Dir'];
-$saveOrder  = ($listOrder == 'c.lft' && $listDirn == 'asc');
+
+// This ordering data are needed for J2.5 + ordering
+if (FLEXI_J16GE) {
+	$listOrder  = $this->lists['order'];
+	$listDirn   = $this->lists['order_Dir'];
+	$saveOrder  = ($listOrder == 'c.lft' && $listDirn == 'asc');
+}
 
 $user      = JFactory::getUser();
 $cparams   = JComponentHelper::getParams( 'com_flexicontent' );
@@ -117,9 +121,11 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 		$k = 0;
 		$i = 0;
 		$n = count($this->rows);
-		$originalOrders = array();
-		$extension	= 'com_content';
-		
+		if (FLEXI_J16GE) {
+			$originalOrders = array();
+			$extension	= 'com_content';
+		}
+				
 		if (FLEXI_J16GE) {
 			$canCheckinRecords = $user->authorise('core.admin', 'checkin');
 		} else if (FLEXI_ACCESS) {
@@ -130,34 +136,48 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 		foreach ($this->rows as $row)
 		{
 			if (FLEXI_J16GE) {
-				$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
-				$link	= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
-			} else {
-				$link	= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $row->id;
-			}
-			if (FLEXI_J16GE) {
-				$access		= flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'categories.access\')"');
-			} else if (FLEXI_ACCESS) {
-				$access 	= $this->CanRights ? FAccess::accessswitch('category', $row, $i)  :  FAccess::accessswitch('category', $row, $i, 'content', 1);
-			} else {
-				$access 	= JHTML::_('grid.access', $row, $i );
-			}
-			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
-			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
-			
-			if (FLEXI_J16GE) {
 				$canEdit		= $user->authorise('core.edit', $extension.'.category.'.$row->id);
 				$canEditOwn	= $user->authorise('core.edit.own', $extension.'.category.'.$row->id) && $row->created_user_id == $user->get('id');
 				$canEditState			= $user->authorise('core.edit.state', $extension.'.category.'.$row->id);
 				$canEditStateOwn	= $user->authorise('core.edit.state.own', $extension.'.category.'.$row->id) && $row->created_user_id==$user->get('id');
 				$recordAvailable	= ($canCheckinRecords && $row->checked_out == $user->id) || !$row->checked_out;
 				$canChange		= ($canEditState || $canEditStateOwn ) && $recordAvailable;
+			} else {
+				$canEdit		= 1;  // No category edit ACL in J1.5
+				$canEditOwn	= 1;  // No category edit.own ACL in J1.5
+			}
+			
+			if (FLEXI_J16GE) {
 				$published		= JHTML::_('jgrid.published', $row->published, $i, 'categories.', $canChange );
 			} else {
-				$canEdit		= 1;
-				$canEditOwn	= 1;
 				$published 	= JHTML::_('grid.published', $row, $i );
 			}
+			
+			if (FLEXI_J16GE) {
+				$orderkey = array_search($row->id, $this->ordering[$row->parent_id]);
+				$link	= 'index.php?option=com_flexicontent&amp;task=category.edit&amp;cid[]='. $row->id;
+			} else {
+				$link	= 'index.php?option=com_flexicontent&amp;controller=categories&amp;task=edit&amp;cid[]='. $row->id;
+			}
+			
+			if (FLEXI_J16GE) {
+				if (($canEdit || $canEditOwn) && $this->perms->CanAccLvl) {
+					$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'categories.access\')"');
+				} else {
+					$access = $this->escape($row->access_level);
+				}
+			} else if (FLEXI_ACCESS) {
+				if (($canEdit || $canEditOwn) && $this->perms->CanAccLvl) {
+					$access = FAccess::accessswitch('category', $row, $i);
+				} else {
+					$access = FAccess::accessswitch('category', $row, $i, 'content', 1);
+				}
+			} else {
+				$access 	= JHTML::_('grid.access', $row, $i );
+			}
+			
+			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
+			$items		= 'index.php?option=com_flexicontent&amp;view=items&amp;filter_cats='. $row->id;
    		?>
 		<tr class="<?php echo "row$k"; ?>">
 			<td><?php echo $this->pagination->getRowOffset( $i ); ?></td>
@@ -215,9 +235,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				}
 				?>
 				
-				<?php
-				// Display category note in a tooltip
-				if (!empty($row->note)) : ?>
+				<?php	if (!empty($row->note)) : /* Display J1.6+ category note in a tooltip */ ?>
 					<span class="hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo $this->escape($row->note);?>">
 						<?php echo $infoimage; ?>
 					</span

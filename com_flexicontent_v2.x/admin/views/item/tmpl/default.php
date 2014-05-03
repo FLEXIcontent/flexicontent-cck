@@ -827,7 +827,11 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			<div class="container_fcfield"><?php echo $this->form->getInput('publish_down'); ?></div>
 			
 			<div class="fcclear"></div><?php echo $this->form->getLabel('access'); ?>
-			<div class="container_fcfield"><?php echo $this->form->getInput('access'); ?></div>
+			<?php if ($this->perms['canacclvl']) :?>
+				<div class="container_fcfield"><?php echo $this->form->getInput('access'); ?></div>
+			<?php else :?>
+				<div class="container_fcfield"><span class="label"><?php echo $this->row->access_level; ?></span></div>
+			<?php endif; ?>
 
 		</fieldset>
 		

@@ -709,13 +709,13 @@ window.addEvent('domready', function() {
 			$link = 'index.php?option=com_flexicontent&'.$items_task.'edit&cid[]='. $row->id;
 
 			if (FLEXI_J16GE) {
-				if ($canPublish || $canPublishOwn) {
+				if (($canEdit || $canEditOwn) && $this->CanAccLvl) {
 					$access = flexicontent_html::userlevel('access['.$row->id.']', $row->access, 'onchange="return listItemTask(\'cb'.$i.'\',\'items.access\')"');
 				} else {
 					$access = $this->escape($row->access_level);
 				}
 			} else if (FLEXI_ACCESS) {
-				if ($this->CanRights) {
+				if (($canEdit || $canEditOwn) && $this->CanAccLvl) {
 					$access 	= FAccess::accessswitch('item', $row, $i);
 				} else {
 					$access 	= FAccess::accessswitch('item', $row, $i, 'content', 1);

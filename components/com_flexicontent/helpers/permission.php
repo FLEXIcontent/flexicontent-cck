@@ -88,7 +88,8 @@ class FlexicontentHelperPerm
 			$permission->CanChangeSecCat  = 1; // J1.5 lacks this
 			$permission->CanChangeFeatCat = 1; // J1.5 lacks this
 			
-			$permission->CanRights		= ($user->gid >= 21);  // At least J1.5 Publisher
+			$permission->CanRights		= ($user->gid >= 23);  // At least J1.5 Manager
+			$permission->CanAccLvl		= ($user->gid >= 20);  // At least J1.5 Editor
 			
 			// ITEMS: component controlled permissions
 			$permission->DisplayAllItems = ($user->gid >= 23);  // At least J1.5 Manager
@@ -173,10 +174,15 @@ class FlexicontentHelperPerm
 		$permission->CanChangeSecCat  = 1;
 		$permission->CanChangeFeatCat = 1;
 		
-		// Permission for changing the access level of items and categories that user can edit
-		// (a) In J1.5, this is the FLEXIaccess component access permission, and
-		// (b) In J2.5, this is the FLEXIcontent component ACTION 'accesslevel'
+		// Permission for changing the ACL rules of items and categories that user can edit
+		// Given to users that FLEXIaccess configuration
 		$permission->CanRights		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexiaccess', 'manage', 'users', $user->gmid) : 1;
+		
+		// Permission for changing the access level of items and categories that user can edit
+		// (a) In J1.5 with FLEXIaccess, this is given to those that can edit the FLEXIaccess configuration
+		// (b) In J1.5 without FLEXIaccess, this is given to users being at least an Editor
+		// (c) In J2.5, this is the FLEXIcontent component ACTION 'accesslevel'
+		$permission->CanAccLvl		= $permission->CanRights;
 		
 		// ITEMS: component controlled permissions
 		$permission->DisplayAllItems = ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1; // (backend) List all items (otherwise only items that can be edited)
@@ -190,11 +196,11 @@ class FlexicontentHelperPerm
 		$permission->IgnoreViewState	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'ignoreviewstate', 'users', $user->gmid) : 1; // (Frontend Content Lists) ignore view state
 		
 		// CATEGORIES: management tab and usage
-		$permission->CanCats			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1; // (item edit form) view the categories which user cannot assign to items
-		$permission->ViewAllCats	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1; // (item edit form) view the categories which user cannot assign to items
-		$permission->ViewTree			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'cattree', 'users', $user->gmid) : 1; // (item edit form) view categories as tree instead of flat list
-		$permission->MultiCat			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'multicat', 'users', $user->gmid) : 1; // (item edit form) allow user to assign each item to multiple categories
-		$permission->CanAddCats		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'addcats', 'users', $user->gmid) : 1;
+		$permission->CanCats			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1; // (backend) Allow management of Categories
+		$permission->ViewAllCats	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'usercats', 'users', $user->gmid) : 1; // (e.g. item edit form) view the categories which user cannot assign to items
+		$permission->ViewTree			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'cattree', 'users', $user->gmid) : 1; // (e.g. item edit form) view categories as tree instead of flat list
+		$permission->MultiCat			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'multicat', 'users', $user->gmid) : 1; // (e.g. item edit form) allow user to assign each item to multiple categories
+		$permission->CanAddCats		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'addcats', 'users', $user->gmid) : 1; // add new Categories
 		
 		// TAGS: management tab and usage
 		$permission->CanTags			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'tags', 'users', $user->gmid) : 1; // (backend) Allow management of Item Types
