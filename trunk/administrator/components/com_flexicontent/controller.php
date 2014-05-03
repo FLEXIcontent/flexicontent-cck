@@ -380,33 +380,44 @@ class FlexicontentController extends JControllerLegacy
 			." VALUES(1, ".(FLEXI_J16GE ? "0, " : "")."'Article', 'article', 1, 0, '0000-00-00 00:00:00', ".(FLEXI_J16GE ? 1 : 0).", 'ilayout=default\nhide_maintext=0\nhide_html=0\nmaintext_label=\nmaintext_desc=\ncomments=\ntop_cols=two\nbottom_cols=two')"
 			;
 		$db->setQuery($query);
-		if (!$db->query()) {
+		
+		try { $result = $db->query(); }
+		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+		
+		if (!$result) {
+			echo '<span class="install-notok"></span>';
 			if ($db->getErrorNum()) echo $db->getErrorMsg();
-			echo '<span class="install-notok"></span><span class="button-add"><a id="existtype" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			jexit();
+		}
+		
+		$query 	=	"INSERT INTO `#__flexicontent_fields_type_relations` (`field_id`,`type_id`,`ordering`)
+			VALUES
+				(1,1,1),
+				(2,1,2),
+				(3,1,3),
+				(4,1,4),
+				(5,1,5),
+				(6,1,6),
+				(7,1,7),
+				(8,1,8),
+				(9,1,9),
+				(10,1,10),
+				(11,1,11),
+				(12,1,12),
+				(13,1,13),
+				(14,1,14)"
+			;
+		$db->setQuery($query);
+		
+		try { $result = $db->query(); }
+		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+		
+		if (!$result) {
+			echo '<span class="install-notok"></span>';
+			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			jexit();
 		} else {
-			$query 	=	"INSERT INTO `#__flexicontent_fields_type_relations` (`field_id`,`type_id`,`ordering`)
-						VALUES
-							(1,1,1),
-							(2,1,2),
-							(3,1,3),
-							(4,1,4),
-							(5,1,5),
-							(6,1,6),
-							(7,1,7),
-							(8,1,8),
-							(9,1,9),
-							(10,1,10),
-							(11,1,11),
-							(12,1,12),
-							(13,1,13),
-							(14,1,14)" ;
-			$db->setQuery($query);
-			if (!$db->query()) {
-				if ($db->getErrorNum()) echo $db->getErrorMsg();
-				echo '<span class="install-notok"></span><span class="button-add"><a id="existtype" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
-			} else {
-				echo '<span class="install-ok"></span>';
-			}
+			echo '<span class="install-ok"></span>';
 		}
 	}
 	
@@ -455,33 +466,44 @@ class FlexicontentController extends JControllerLegacy
 		}
 		
 		$db->setQuery($query);
-		$result = $db->query();
-		if($result) {
-			// Save the created menu item as default_menu_itemid for the component
-			$component = JComponentHelper::getParams('com_flexicontent');
-			$component->set('default_menu_itemid', $db->insertid());
-			$cparams = $component->toString();
-
-			$flexi = JComponentHelper::getComponent('com_flexicontent');
-
-			$query 	= 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__components')
-					. ' SET params = ' . $db->Quote($cparams)
-					. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .' = '. $flexi->id
-					;
-			$db->setQuery($query);
-			$result = $db->query();
+		
+		try { $result = $db->query(); }
+		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+		
+		if (!$result) {
+			echo '<span class="install-notok"></span>';
+			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			jexit();
+		}
+		
+		// Save the created menu item as default_menu_itemid for the component
+		$flexi   = JComponentHelper::getComponent('com_flexicontent');
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$cparams->set('default_menu_itemid', $db->insertid());
+		$cparams_str = $cparams->toString();
+		
+		$query 	= 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__components')
+				. ' SET params = ' . $db->Quote($cparams_str)
+				. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .' = '. $flexi->id
+				;
+		$db->setQuery($query);
+		
+		try { $result = $db->query(); }
+		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+		
+		if (!$result) {
+			echo '<span class="install-notok"></span>';
+			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			jexit();
+		} else {
+			echo '<span class="install-ok"></span>';
 		}
 		
 		// This is necessary as extension data are cached ... and just above we updated the component parameters -manually- (and (also added menu item)
 		$cache = JFactory::getCache();
 		$cache->clean( '_system' );
-		
-		if (!$result) {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="existmenuitems" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
-		} else {
-			echo '<span class="install-ok"></span>';
-		}
 	}
+	
 	
 	/**
 	 * Method to create default fields data
@@ -515,8 +537,14 @@ VALUES
 	(13,'categories','categories','Categories','The categories assigned to this item',0,1,1,0,'top.items.default\nunder-description-line1.category.blog',1,'display_label=1\nseparatorf=2',0,'0000-00-00 00:00:00',{$acclevel},13),
 	(14,'tags','tags','Tags','The tags assigned to this item',0,1,1,0,'top.items.default\nunder-description-line2.category.blog',1,'display_label=1\nseparatorf=2',0,'0000-00-00 00:00:00',{$acclevel},14)" ;
 		$db->setQuery($query);
-		if (!$db->query()) {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="existfields" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		
+		try { $result = $db->query(); }
+		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+		
+		if (!$result) {
+			echo '<span class="install-notok"></span>';
+			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			jexit();
 		} else {
 			echo '<span class="install-ok"></span>';
 		}
@@ -547,13 +575,19 @@ VALUES
 				. ' OR element = ' . $db->Quote('flexiadvroute')
 				. ')'
 				;
-		
 		$db->setQuery($query);
-		if (!$db->query()) {
+		
+		try { $result = $db->query(); }
+		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+		
+		if (!$result) {
 			if ($format == 'raw') {
-				echo '<span class="install-notok"></span><span class="button-add"><a id="publishplugins" href="index.php?option=com_flexicontent&task=publishplugins&format=raw">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+				echo '<span class="install-notok"></span>';
+				if ($db->getErrorNum()) echo $db->getErrorMsg();
+				jexit();
 			} else {
-				JError::raiseNotice(1, JText::_( 'FLEXI_COULD_NOT_PUBLISH_PLUGINS' ));
+				$db_err_msg = $db->getErrorNum() ? ' :<br/>'.$db->getErrorMsg() : '';
+				JError::raiseNotice(1, JText::_('FLEXI_COULD_NOT_PUBLISH_PLUGINS') . $db_err_msg);
 				return false;
 			}
 		} else {
@@ -583,9 +617,10 @@ VALUES
 		$success = JPath::setPermissions($phpthumbcache, '0644', '0755');
 		if (!$success) {
 			if ($format == 'raw') {
-				echo '<span class="install-notok"></span><span class="button-add"><a id="cachethumb" href="index.php?option=com_flexicontent&task=cachethumbchmod&format=raw">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+				echo '<span class="install-notok"></span>';
+				jexit();
 			} else {
-				JError::raiseNotice(1, JText::_( 'FLEXI_COULD_NOT_PUBLISH_PLUGINS' ));
+				JError::raiseNotice(1, JText::_( 'FLEXI_COULD_NOT_SET_PHPTHUMB_PERMS' ));
 				return false;
 			}
 		} else {
@@ -661,8 +696,15 @@ VALUES
 			." LEFT JOIN #__content AS i ON i.id = rel.itemid"
 			." WHERE i.id IS NULL";
 		$db->setQuery($query);
-		$item_id = $db->query();
 		
+		try { $result = $db->query(); }
+		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+		
+		if (!$result) {
+			echo '<span class="install-notok"></span>';
+			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			jexit();
+		}
 		
 		// 2nd: add missing main category relations
 		$subquery 	= "SELECT i.catid, i.id, 0 FROM #__flexicontent_items_ext as ie "
@@ -674,10 +716,14 @@ VALUES
 		$query 	= 'INSERT INTO #__flexicontent_cats_item_relations'
 			.' (catid, itemid, ordering) '.$subquery;
 		$db->setQuery($query);
-		$result = $db->query();
+		
+		try { $result = $db->query(); }
+		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
 		
 		if (!$result) {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="existcats" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			echo '<span class="install-notok"></span>';
+			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			jexit();
 		} else {
 			echo '<span class="install-ok"></span>';
 		}
@@ -735,7 +781,8 @@ VALUES
 			|| !$result_tgrp_col
 			|| !$result_items_default_lang
 		) {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="existlanguagecolumn" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			echo '<span class="install-notok"></span>';
+			jexit();
 		} else {
 			echo '<span class="install-ok"></span>';
 		}
@@ -761,7 +808,6 @@ VALUES
 		$missing_indexes = $model->getExistDBindexes($check_only=false);
 		if ( !empty($missing_indexes) ) {
 			$app = JFactory::getApplication();
-			$dbprefix = $app->getCfg('dbprefix');
 			
 			foreach($missing_indexes as $tblname => $indexnames)
 			{
@@ -780,12 +826,17 @@ VALUES
 					$file_contents = "".time();
 					JFile::write($file, $file_contents);
 					
-					$query  = "ALTER TABLE `".$dbprefix.$tblname."` ";
+					$query  = "ALTER TABLE `#__".$tblname."` ";
 					$query .= implode(', ', $index_cols);
 					$db->setQuery($query);
-					if (!$db->query()) {
-						echo '<span class="install-notok"></span><span class="button-add"><a id="existdbindexes" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
-						exit;
+					
+					try { $result = $db->query(); }
+					catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+					
+					if (!$result) {
+						echo '<span class="install-notok"></span>';
+						if ($db->getErrorNum()) echo $db->getErrorMsg();
+						jexit();
 					}
 					JFile::delete($file);
 				}
@@ -816,12 +867,14 @@ VALUES
 		$db->setQuery('TRUNCATE TABLE '.$cache_tbl);
 		$db->query();
 		$model = $this->getModel('items');
-		if ( !$model->updateItemCountingData($rows = false) ) {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="itemcountingdok" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		$result = $model->updateItemCountingData($rows = false);
+		
+		if ( !$result ) {
+			echo '<span class="install-notok"></span>';
+			jexit();
 		} else {
 			echo '<span class="install-ok"></span>';
 		}
-		if ($db->getErrorNum()) echo $db->getErrorMsg();
 	}
 	
 	
@@ -854,8 +907,13 @@ VALUES
 					;
 		$db->setQuery($query);
 		
-		if (!$db->query()) {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="existversions" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		try { $result = $db->query(); }
+		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+		
+		if (!$result) {
+			echo '<span class="install-notok"></span>';
+			if ($db->getErrorNum()) echo $db->getErrorMsg();
+			jexit();
 		} else {
 			echo '<span class="install-ok"></span>';
 		}
@@ -885,8 +943,11 @@ VALUES
 					;
 		$db->setQuery($query);
 		
-		if (!$db->query()) {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="existauthors" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+		try { $result = $db->query(); }
+		catch (Exception $e) { $result = false; } // suppress exception in case of SQL error, we will print it below
+		
+		if (!$result) {
+			echo '<span class="install-notok"></span>';
 		} else {
 			echo '<span class="install-ok"></span>';
 		}
@@ -991,7 +1052,7 @@ VALUES
 		if ($model->getOldBetaFiles()) {
 			echo '<span class="install-ok"></span>';
 		} else {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="oldbetafiles" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			echo '<span class="install-notok"></span>';
 		}
 	}
 
@@ -1016,11 +1077,12 @@ VALUES
 		// alter some table field types
 		$queries[] 	= "ALTER TABLE #__flexicontent_fields_item_relations CHANGE `value` `value` MEDIUMTEXT" ;
 		$queries[] 	= "ALTER TABLE #__flexicontent_items_versions CHANGE `value` `value` MEDIUMTEXT" ;
-		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `search_index` `search_index` MEDIUMTEXT" ;
-		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `sub_items` `sub_items` TEXT" ;
-		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `sub_categories` `sub_categories` TEXT" ;
-		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext CHANGE `related_items` `related_items` TEXT" ;
-
+		$queries[] 	= "ALTER TABLE #__flexicontent_items_ext"
+			."  CHANGE `search_index` `search_index` MEDIUMTEXT"
+			.", CHANGE `sub_items` `sub_items` TEXT"
+			.", CHANGE `sub_categories` `sub_categories` TEXT"
+			.", CHANGE `related_items` `related_items` TEXT"
+			;
 		foreach ($queries as $query) {
 			$db->setQuery($query);
 			$db->query();
@@ -1029,7 +1091,7 @@ VALUES
 		$db->setQuery($query);
 		$rows = $db->loadObjectList();
 		
-		$jcorefields = flexicontent_html::getJCoreFields();
+		//$jcorefields = flexicontent_html::getJCoreFields();
 		$add_cats = true;
 		$add_tags = true;
 		$clean_database = true;
@@ -1156,7 +1218,8 @@ VALUES
 		if ($model->getNoOldFieldsData()) {
 			echo '<span class="install-ok"></span>';
 		} else {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="oldfieldsdata" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			echo '<span class="install-notok"></span>';
+			jexit();
 		}
 	}
 	
@@ -1169,7 +1232,8 @@ VALUES
 		if ($model->addCurrentVersionData()) {
 			echo '<span class="install-ok"></span>';
 		} else {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="missingversion" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			echo '<span class="install-notok"></span>';
+			jexit();
 		}
 	}
 	
@@ -1181,7 +1245,8 @@ VALUES
 		if ($model->initialPermission()) {
 			echo '<span class="install-ok"></span>';
 		} else {
-			echo '<span class="install-notok"></span><span class="button-add"><a id="initialpermission" href="#">'.JText::_( 'FLEXI_UPDATE' ).'</a></span>';
+			echo '<span class="install-notok"></span>';
+			jexit();
 		}
 	}
 

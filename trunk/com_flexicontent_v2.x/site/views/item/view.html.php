@@ -1412,6 +1412,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$perms['cantemplates'] = $permission->CanTemplates;
 		$perms['canarchive']   = $permission->CanArchives;
 		$perms['canright']     = $permission->CanRights;
+		$perms['canacclvl']    = $permission->CanAccLvl;
 		$perms['canversion']   = $permission->CanVersion;
 		
 		// J2.5+ specific

@@ -196,21 +196,8 @@ class FlexicontentViewCategories extends JViewLegacy
 		$pagination 	= $this->get( 'Pagination' );
 		
 		$categories = & $globalcats;
-		if (FLEXI_J16GE) {
-			$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"', false, true, $actions_allowed=array('core.edit'));
-			$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"', false, true, $actions_allowed=array('core.edit'));
-		} else if (FLEXI_ACCESS && ($user->gid < 25)) {
-			if ((FAccess::checkAllContentAccess('com_content','add','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','edit','users',$user->gmid,'content','all')) || (FAccess::checkAllContentAccess('com_content','editown','users',$user->gmid,'content','all')) || $CanCats) {
-				$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"', false, false);
-				$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"', false, false);
-			} else {
-				$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"');
-				$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"');
-			}
-		} else {
-			$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"');
-			$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"');
-		}
+		$lists['copyid'] = flexicontent_cats::buildcatselect($categories, 'copycid', '', 2, 'class="inputbox"', false, true, $actions_allowed=array('core.edit'));
+		$lists['destid'] = flexicontent_cats::buildcatselect($categories, 'destcid[]', '', false, 'class="inputbox" size="15" multiple="true"', false, true, $actions_allowed=array('core.edit'));
 		
 		
 		// *******************
@@ -274,16 +261,15 @@ class FlexicontentViewCategories extends JViewLegacy
 		$ordering = ($lists['order'] == $order_property) ? $order_property : '';
 
 		//assign data to template
-		$this->assignRef('lists'			, $lists);
-		$this->assignRef('rows'				, $rows);
+		$this->assignRef('lists'	, $lists);
+		$this->assignRef('rows'		, $rows);
+		$this->assignRef('perms'	, $perms);
 		if (FLEXI_J16GE) {
-			$this->assignRef('permission'	, $perms);
 			$this->assignRef('orderingx'	, $ordering);
 		} else {
-			$this->assignRef('CanRights'	, $CanRights);
 			$this->assignRef('ordering'		, $ordering);
 		}
-		$this->assignRef('pagination'		, $pagination);
+		$this->assignRef('pagination'	, $pagination);
 		$this->assignRef('user'				, $user);
 
 		parent::display($tpl);

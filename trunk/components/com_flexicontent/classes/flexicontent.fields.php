@@ -1695,21 +1695,34 @@ class FlexicontentFields
 	}
 	
 	
+	// Get a language specific handler for parsing the text to be added to the search index
+	// e.g. doing word segmentation for a language that does not space-separate the words
+	static function getLangHandler($language) {
+		if ($language == 'th-TH') {
+			$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
+			if ( JFile::exists($segmenter_path) )
+			{
+				require_once ($segmenter_path);
+				$handlercache = JFactory::getCache('com_flexicontent_lang_handlers');  // Get Joomla Cache of '... lang_handlers' Caching Group
+				$handlercache->setCaching(1);           // Force cache ON
+				$handlercache->setLifeTime(24*3600);    // Set expiration to 24 hours
+				$dictionary = $handlercache->call(array('Segment', 'loadDictionary'));
+				Segment::setDictionary($dictionary);
+				$handler = new Segment();
+				return $handler;
+			}
+		}
+		return false;
+	}
+	
+	
 	// Common method to create basic/advanced search index for various fields
 	static function createIndexRecords(&$field, &$values, &$item, $required_props=array(), $search_props=array(), $props_spacer=' ', $filter_func=null, $for_advsearch=0) {
 		$fi = FlexicontentFields::getPropertySupport($field->field_type, $field->iscore);
 		$db = JFactory::getDBO();
 		
-		// * Decide to load and create the word segmenter object (adds spaces between words)
-		static $word_segmenter = null;
-		if ($item->language == 'th-TH' && $word_segmenter === null) {
-			$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
-			$word_segmenter = false;
-			if ( JFile::exists($segmenter_path) ) {
-				require_once ($segmenter_path);
-				$word_segmenter = new Segment();
-			}
-		}
+		// * Per language handlers e.g. word segmenter objects (add spaces between words for language without spaces)
+		static $lang_handlers = array();
 		
 		if ( !$for_advsearch )
 		{
@@ -1742,6 +1755,14 @@ class FlexicontentFields
 		// Create the new search data
 		foreach($items_values as $itemid => $item_values) 
 		{
+			$language = $field->items_data[$itemid]->language;
+			if ( !isset($lang_handlers[$language]) )
+			{
+				$lang_handlers[$language] = FlexicontentFields::getLangHandler($field->items_data[$itemid]->language);
+			}
+			$lang_handler = $lang_handlers[$language];
+			
+			
 			if ( @$field->isindexed ) {
 				// Get Elements of the field these will be cached if they do not depend on the item ...
 				$field->item_id = $itemid;   // in case it needs to be loaded to replace item properties in a SQL query
@@ -1776,9 +1797,9 @@ class FlexicontentFields
 			}
 			
 			// * Use word segmenter (if it was created) to add spaces between words
-			if ($word_segmenter) {
+			if ($lang_handler) {
 				foreach($searchindex as $i => $_searchindex) {
-					$searchindex[$i] = implode(' ', $word_segmenter->get_segment_array($_searchindex));
+					$searchindex[$i] = implode(' ', $lang_handler->get_segment_array($clear_previous = true, $_searchindex));
 				}
 			}
 			

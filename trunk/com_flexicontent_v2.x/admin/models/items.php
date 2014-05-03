@@ -567,10 +567,11 @@ class FlexicontentModelItems extends JModelLegacy
 		}
 		
 		$db->setQuery($query);
-		$res = $db->query();
+		
+		try { $result = $db->query(); } catch (Exception $e) { $result = false; }
 		if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
-		return $res;
+		return $result;
 	}
 	
 	

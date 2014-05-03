@@ -159,6 +159,14 @@ class FlexicontentControllerSearch extends FlexicontentController
 			// Item is not needed, later and only if field uses item replacements then it will be loaded
 			$item = null;
 			
+			$lang_query = "SELECT id, language"
+				." FROM #__content"
+				.(!FLEXI_J16GE ? " LEFT JOIN #__flexicontent_items_ext" : "")
+				." WHERE id IN (".implode(', ',$query_itemids).")"
+				;
+			$db->setQuery($lang_query);
+			$items_data = $db->loadObjectList('id');
+			
 			if ($indexer == 'basic') {
 				$searchindex = array();
 				// Add all query itemids to searchindex array so that it will be cleared even if zero fields are indexed
@@ -177,6 +185,7 @@ class FlexicontentControllerSearch extends FlexicontentController
 				// Indicate multiple items per query
 				$field->item_id = 0;
 				$field->query_itemids = $query_itemids;
+				$field->items_data = $items_data;
 				
 				// Indicate that the indexing fuction should retrieve the values
 				$values = null;

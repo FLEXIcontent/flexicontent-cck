@@ -975,7 +975,11 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 				<div class="container_fcfield"><?php echo $this->form->getInput('publish_down'); ?></div>
 				
 				<div class="fcclear"></div><?php echo $this->form->getLabel('access'); ?>
-				<div class="container_fcfield"><?php echo $this->form->getInput('access'); ?></div>
+				<?php if ($this->perms['canacclvl']) :?>
+					<div class="container_fcfield"><?php echo $this->form->getInput('access'); ?></div>
+				<?php else :?>
+					<div class="container_fcfield"><span class="label"><?php echo $this->item->access_level; ?></span></div>
+				<?php endif; ?>
 				
 			</fieldset>
 		</div> <!-- end tab -->

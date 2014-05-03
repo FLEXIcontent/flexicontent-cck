@@ -9,7 +9,7 @@
 class Segment {
 
     private $_input_string;
-    private $_dictionary_array = array();
+    private static $_dictionary_array = array();
     private $_thcharacter_obj;
     private $_unicode_obj;
     private $_segmented_result = array();
@@ -17,23 +17,34 @@ class Segment {
     
     
     function __construct() {
-        include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'thcharacter.php');
-        include(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'unicode.php');
-
-
-        $file_handle = fopen(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'dictionary' . DIRECTORY_SEPARATOR . 'dictionary.txt', "rb");
-        while (!feof($file_handle)) {
-            $line_of_text = fgets($file_handle);
-            $this->_dictionary_array[crc32(trim($line_of_text))] = trim($line_of_text);
-        }
-        fclose($file_handle);
-
-
-
+        require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'thcharacter.php');
+        require_once(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'unicode.php');
+        
+        if (empty(self::$_dictionary_array)) self::$_dictionary_array = self::loadDictionary();
+        
         // Load Helper Class/
         $this->_unicode_obj = new Unicode();
         $this->_thcharacter_obj = new Thchracter();
     }
+    
+    
+    public static function loadDictionary() {
+    	$_dictionary_array = array();
+    	
+      $file_handle = fopen(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'dictionary' . DIRECTORY_SEPARATOR . 'dictionary.txt', "rb");
+      while (!feof($file_handle)) {
+          $line_of_text = fgets($file_handle);
+          $_dictionary_array[crc32(trim($line_of_text))] = trim($line_of_text);
+      }
+      fclose($file_handle);
+      
+    	return $_dictionary_array;
+    }
+    
+    public static function setDictionary( &$dictionary ) {
+    	self::$_dictionary_array = $dictionary;
+    }
+    
 
     private function clear_duplicated($string) {
         //หดรูปตัวอักษรซ้ำๆ//
@@ -64,9 +75,9 @@ class Segment {
         return str_replace($dup_list_array, $dup_list_array_replace, $string);
     }
 
-    public function get_segment_array($input_string) {
+    public function get_segment_array($clear_previous, $input_string) {
+        if ($clear_previous)  $this->_segmented_result = array();
         $this->_input_string = $input_string;
-
 
         // ลบเครื่องหมายคำพูด, ตัวแบ่งประโยค //
         $this->_input_string = str_replace(array('\'', '‘', '’', '“', '”', '"', '-', '/', '(', ')', '{', '}', '...', '..', '…', '', ',', ':', '|', '\\'), '', $this->_input_string);
@@ -127,7 +138,7 @@ class Segment {
 
             $tmp_string .= $input_array[$pointer];
 
-            if (isset($this->_dictionary_array[crc32($tmp_string)])) { // ถ้าเจอใน Dict //
+            if (isset(self::$_dictionary_array[crc32($tmp_string)])) { // ถ้าเจอใน Dict //
                 $dup_array = array();
                 $dup_array[] = array(
                     'title' => $tmp_string,
@@ -142,7 +153,7 @@ class Segment {
                     $more_tmp .= $input_array[$i];
                     //echo $more_tmp.'<br/>';
                     //echo $more_tmp.'<br/>';
-                    if (isset($this->_dictionary_array[crc32($more_tmp)])) {
+                    if (isset(self::$_dictionary_array[crc32($more_tmp)])) {
                         $dup_array[] = array(
                             'title' => $more_tmp,
                             'to_mark' => $i + 1,
@@ -193,7 +204,7 @@ class Segment {
 
             $tmp_string = $input_array[$pointer] . $tmp_string;
 
-            if (isset($this->_dictionary_array[crc32($tmp_string)])) { // ถ้าเจอใน Dict //
+            if (isset(self::$_dictionary_array[crc32($tmp_string)])) { // ถ้าเจอใน Dict //
                 $dup_array = array();
                 $dup_array[] = array(
                     'title' => $tmp_string,
@@ -208,7 +219,7 @@ class Segment {
                     $more_tmp = $input_array[$i] . $more_tmp;
                     //echo $more_tmp.'<br/>';
                     //echo $more_tmp.'<br/>';
-                    if (isset($this->_dictionary_array[crc32($more_tmp)])) {
+                    if (isset(self::$_dictionary_array[crc32($more_tmp)])) {
                         $dup_array[] = array(
                             'title' => $more_tmp,
                             'to_mark' => $i + 1,
