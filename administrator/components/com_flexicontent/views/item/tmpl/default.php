@@ -802,47 +802,6 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	</div> <!-- end tab -->
 	
 	
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_DISPLAYING'); ?> </h3>
-		
-		<?php
-			/*
-			echo $this->pane->startPane( 'det-pane' );
-			
-			$title = JText::_('FLEXI_PARAMETERS_ITEM_BASIC' );
-			echo $this->pane->startPanel( $title, "params-basic" );
-			echo $this->formparams->render('params', 'basic');
-			echo $this->pane->endPanel();
-			
-			$title = JText::_('FLEXI_PARAMETERS_ITEM_ADVANCED' );
-			echo $this->pane->startPanel( $title, "params-advanced" );
-			echo $this->formparams->render('params', 'advanced');
-			echo $this->pane->endPanel();
-	
-			$title = JText::_('FLEXI_METADATA_INFORMATION' );
-			echo $this->pane->startPanel( $title, "params-metadata" );
-			echo $this->formparams->render('meta', 'metadata');
-			echo $this->pane->endPanel();
-			
-			$title = JText::_('FLEXI_PARAMETERS_ITEM_SEO' );
-			echo $this->pane->startPanel( $title, "params-seoconf" );
-			echo $this->formparams->render('params', 'seoconf');
-			echo $this->pane->endPanel();
-			
-			echo $this->pane->endPane();
-			*/
-		?>
-		
-		<div class="flexi_params">
-			<?php echo $this->formparams->render('params', 'basic'); ?>
-		</div>
-		
-		<div class="flexi_params">
-			<?php echo $this->formparams->render('params', 'advanced'); ?>
-		</div>
-	
-	</div> <!-- end tab -->
-	
 	
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_META_SEO'); ?> </h3>
@@ -957,19 +916,73 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	
 	
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_DISPLAYING'); ?> </h3>
+		
+		<?php
+			/*
+			echo $this->pane->startPane( 'det-pane' );
+			
+			$title = JText::_('FLEXI_PARAMETERS_ITEM_BASIC' );
+			echo $this->pane->startPanel( $title, "params-basic" );
+			echo $this->formparams->render('params', 'basic');
+			echo $this->pane->endPanel();
+			
+			$title = JText::_('FLEXI_PARAMETERS_ITEM_ADVANCED' );
+			echo $this->pane->startPanel( $title, "params-advanced" );
+			echo $this->formparams->render('params', 'advanced');
+			echo $this->pane->endPanel();
+	
+			$title = JText::_('FLEXI_METADATA_INFORMATION' );
+			echo $this->pane->startPanel( $title, "params-metadata" );
+			echo $this->formparams->render('meta', 'metadata');
+			echo $this->pane->endPanel();
+			
+			$title = JText::_('FLEXI_PARAMETERS_ITEM_SEO' );
+			echo $this->pane->startPanel( $title, "params-seoconf" );
+			echo $this->formparams->render('params', 'seoconf');
+			echo $this->pane->endPanel();
+			
+			echo $this->pane->endPane();
+			*/
+		?>
+		
+		<div class="flexi_params">
+			<?php echo $this->formparams->render('params', 'basic'); ?>
+		</div>
+		
+		<div class="flexi_params">
+			<?php echo $this->formparams->render('params', 'advanced'); ?>
+		</div>
+	
+	</div> <!-- end tab -->
+	
+	
+	
+	
+	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 		
 		<fieldset class="flexi_params fc_edit_container_full">
 			<?php
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+				echo '<span class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
 				$type_default_layout = $this->tparams->get('ilayout');
-				echo $this->formparams->render('params', 'themes');
 			?>
+			<br/><br/>
+			<ol style="margin:0 0 0 16px; padding:0;">
+				<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
+				<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
+			</ol>
+			<br/>
+			<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
+			</span>
 			
-			<blockquote id='__content_type_default_layout__'>
+			<?php echo $this->formparams->render('params', 'themes'); ?>
+			<div class="fcclear"></div>
+			<span class="fc-success fc-mssg-inline" id='__content_type_default_layout__'>
 				<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
 				<?php echo "<br><br>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
-			</blockquote>
+			</span>
+			<div class="fcclear"></div>
 			
 			<?php
 				echo $this->pane->startPane( 'themes-pane' );

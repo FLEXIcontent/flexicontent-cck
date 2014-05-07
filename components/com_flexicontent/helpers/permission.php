@@ -28,15 +28,20 @@ class FlexicontentHelperPerm
 		$catscache->setCaching(1); 		              // Force cache ON
 		$catscache->setLifeTime(84600); //set expiry to one day
 		
-		$user_id = JFactory::getUser()->id;
-		$permission = $catscache->call(array('FlexicontentHelperPerm', 'getUserPerms'), $user_id);
+		if (FLEXI_J16GE || !FLEXI_ACCESS) {
+			$user_id = JFactory::getUser()->id;
+			$permission = $catscache->call(array('FlexicontentHelperPerm', 'getUserPerms'), $user_id);
+		} else {
+			// No Caching for FLEXI_ACCESS
+			$permission = FlexicontentHelperPerm::getUserPerms();
+		}
 		
 		return $permission;
 	}
 	
 	
 	
-	static function getUserPerms($user_id)
+	static function getUserPerms($user_id = null)
 	{
 		// handle jcomments integration
 		if (JPluginHelper::isEnabled('system', 'jcomments')) {
@@ -63,7 +68,7 @@ class FlexicontentHelperPerm
 		}
 		
 		// Find permissions for given user id
-		$user = JFactory::getUser($user_id);
+		$user = $user_id ? JFactory::getUser($user_id) : JFactory::getUser();  // no user id given, use current user)
 		$permission = new stdClass;
 		
 		// !!! This is the Super User Privelege of GLOBAL Configuration		(==> (for J2.5) core.admin ACTION allowed on ROOT ASSET: 'root.1')

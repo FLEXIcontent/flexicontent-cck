@@ -10,7 +10,7 @@
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">
 		<field name="description_cut_text" type="text" size="3" default="180" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
-		<field name="tmpl_cols" type="list" default="2" label="FLEXI_SUBCAT_COLS" description="FLEXI_SUBCAT_COLS_DESC">
+		<field name="tmpl_cols" type="radio" default="2" label="FLEXI_SUBCAT_COLS" description="FLEXI_SUBCAT_COLS_DESC" class="btn-group btn-group-yesno">
 			<option value="1">FLEXI_1_COL</option>
 			<option value="2">FLEXI_2_COLS</option>
 			<option value="3">FLEXI_3_COLS</option>
@@ -18,7 +18,7 @@
 		</field>
 		
 		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
-		<field name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+		<field name="htmlmode" type="radio" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
 			<option value="0">FLEXI_XHTML</option>
 			<option value="1">FLEXI_HTML5</option>
 		</field>

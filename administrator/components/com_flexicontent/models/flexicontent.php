@@ -243,25 +243,23 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		static $return;
 		if ($return !== null) return $return;
+		$return = false;
 		
-		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		$app = JFactory::getApplication();
 		
 		// Get 'default_menu_itemid' parameter
 		$params = JComponentHelper::getParams('com_flexicontent');
-		if ($params) {
-			$menus = $app->getMenu('site', array());
-			$_component_default_menuitem_id = $params->get('default_menu_itemid', false);
-			$menu = $menus->getItem($_component_default_menuitem_id);
-		} else {
-			$_component_default_menuitem_id = '';
-			return $return = false;
-		}
+		$default_menu_itemid = $params->get('default_menu_itemid', false);
 		
+		// Load the default menu item
+		$menus = $app->getMenu('site', array());
+		$menu = $menus->getItem($default_menu_itemid);
+		
+		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		$prompt  = '<br>'.JText::_('FLEXI_DEFAULT_MENU_ITEM_PROMPT');
 		
 		// Check menu item exists
-		$config_saved = (bool) $params->get('flexi_section');
+		$config_saved = (bool) $params->get('flexi_cat_extension');
 		if ( !$menu ) {
 			if ( $config_saved ) {
 				$app->enqueueMessage( JText::_('FLEXI_DEFAULT_MENU_ITEM_MISSING_DISABLED').$prompt, 'notice' );
@@ -281,7 +279,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		
 		// Verify that language of menu item is not empty
 		if ( FLEXI_J16GE && $menu->language=='' ) {
-			$query 	=	"UPDATE #__menu SET `language`='*' WHERE id=". (int)$_component_default_menuitem_id;
+			$query 	=	"UPDATE #__menu SET `language`='*' WHERE id=". (int)$default_menu_itemid;
 			$this->_db->setQuery($query);
 			$result = $this->_db->query();
 		}
@@ -298,17 +296,16 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	 */
 	function getExistType() {
 		static $return;
-		if ($return === NULL) {
-			$return = false;
-			$query = 'SELECT COUNT( id )'
+		if ($return !== NULL) return $return;
+		$return = false;
+		
+		$query = 'SELECT COUNT( id )'
 			. ' FROM #__flexicontent_types'
 			;
-			$this->_db->setQuery( $query );
-			$count = $this->_db->loadResult();
-			if ($count > 0) {
-				$return = true;
-			}
-		}
+		$this->_db->setQuery( $query );
+		$count = $this->_db->loadResult();
+		$return = $count > 0;
+		
 		return $return;
 	}
 
@@ -321,18 +318,16 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getExistFields()
 	{
 		static $return;
-		if ($return === NULL) {
-			$return = false;
-			$query = 'SELECT COUNT( id )'
+		if ($return !== NULL) return $return;
+		$return = false;
+		
+		$query = 'SELECT COUNT( id )'
 			. ' FROM #__flexicontent_fields'
 			;
-			$this->_db->setQuery( $query );
-			$count = $this->_db->loadResult();
-			
-			if ($count > 13) {
-				$return = true;
-			}
-		}
+		$this->_db->setQuery( $query );
+		$count = $this->_db->loadResult();
+		$return = $count > 13;
+		
 		return $return;
 	}
 
@@ -345,19 +340,17 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getExistFieldsPlugins()
 	{
 		static $return;
-		if ($return === NULL) {
-			$return = false;
-			$query = 'SELECT COUNT( id )'
-				. ' FROM #__plugins'
-				. ' WHERE folder = ' . $this->_db->Quote('flexicontent_fields')
-				;
-			$this->_db->setQuery( $query );
-			$count = $this->_db->loadResult();
-			
-			if ($count > 13) {
-				$return = true;
-			}
-		}
+		if ($return !== NULL) return $return;
+		$return = false;
+		
+		$query = 'SELECT COUNT( extension_id )'
+			. ' FROM #__extensions'
+			. ' WHERE `type`= '.$this->_db->Quote('plugin').' AND folder = ' . $this->_db->Quote('flexicontent_fields')
+			;
+		$this->_db->setQuery( $query );
+		$count = $this->_db->loadResult();
+		$return = $count > 13;
+		
 		return $return;
 	}
 
@@ -370,14 +363,16 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getExistSearchPlugin()
 	{
 		static $return;
-		if ($return === NULL) {
-			$query = 'SELECT COUNT( id )'
-			. ' FROM #__plugins'
-			. ' WHERE element = ' . $this->_db->Quote('flexisearch')
-			;
-			$this->_db->setQuery( $query );
-			$return = $this->_db->loadResult() ? true : false;
-		}
+		if ($return !== NULL) return $return;
+		$return = false;
+		
+		$query = 'SELECT COUNT( extension_id )'
+		. ' FROM #__extensions'
+		. ' WHERE `type`='.$this->_db->Quote('plugin').' AND element = ' . $this->_db->Quote('flexisearch')
+		;
+		$this->_db->setQuery( $query );
+		$return = $this->_db->loadResult() ? true : false;
+		
 		return $return;
 	}
 
@@ -390,14 +385,16 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getExistSystemPlugin()
 	{
 		static $return;
-		if ($return === NULL) {
-			$query = 'SELECT COUNT( id )'
-			. ' FROM #__plugins'
-			. ' WHERE element = ' . $this->_db->Quote('flexisystem')
-			;
-			$this->_db->setQuery( $query );
-			$return = $this->_db->loadResult() ? true : false;
-		}
+		if ($return !== NULL) return $return;
+		$return = false;
+		
+		$query = 'SELECT COUNT( extension_id )'
+		. ' FROM #__extensions'
+		. ' WHERE `type`='.$this->_db->Quote('plugin').' AND element = ' . $this->_db->Quote('flexisystem')
+		;
+		$this->_db->setQuery( $query );
+		$return = $this->_db->loadResult() ? true : false;
+		
 		return $return;
 	}
 
@@ -410,25 +407,27 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getAllPluginsPublished()
 	{
 		static $return;
-		if ($return === NULL) {
-			// Make sure basic CORE fields are published
-			$q = 'UPDATE #__flexicontent_fields SET published=1 WHERE id > 0 AND id < 7';
-			$this->_db->setQuery( $q );
-			$this->_db->query();
-			
-			$query 	= 'SELECT COUNT( id )'
-				. ' FROM #__plugins'
-				. ' WHERE '
-				. ' ( folder = ' . $this->_db->Quote('flexicontent_fields')
-				//. ' OR element = ' . $this->_db->Quote('flexisearch')
-				. ' OR element = ' . $this->_db->Quote('flexisystem')
-				//. ' OR element = ' . $this->_db->Quote('flexiadvsearch')
-				. ' OR element = ' . $this->_db->Quote('flexiadvroute') . ')'
-				. ' AND published <> 1'
-				;
-			$this->_db->setQuery( $query );
-			$return = $this->_db->loadResult() ? false : true;
-		}
+		if ($return !== NULL) return $return;
+		$return = false;
+		
+		// Make sure basic CORE fields are published
+		$q = 'UPDATE #__flexicontent_fields SET published=1 WHERE id > 0 AND id < 7';
+		$this->_db->setQuery( $q );
+		$this->_db->query();
+		
+		$query 	= 'SELECT COUNT( extension_id )'
+			. ' FROM #__extensions'
+			. ' WHERE `type`='.$this->_db->Quote('plugin').' AND '
+			. ' ( folder = ' . $this->_db->Quote('flexicontent_fields')
+			//. ' OR element = ' . $this->_db->Quote('flexisearch')
+			. ' OR element = ' . $this->_db->Quote('flexisystem')
+			//. ' OR element = ' . $this->_db->Quote('flexiadvsearch')
+			. ' OR element = ' . $this->_db->Quote('flexiadvroute') . ')'
+			. ' AND enabled <> 1'
+			;
+		$this->_db->setQuery( $query );
+		$return = $this->_db->loadResult() ? false : true;
+		
 		return $return;
 	}
 
@@ -441,18 +440,20 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getExistLanguageColumns()
 	{
 		static $return;
-		if ($return === NULL) {
-			if (FLEXI_J16GE) {
-				$columns = $this->_db->getTableColumns('#__flexicontent_items_ext');
-				$result_lang_col = array_key_exists('language', $columns) ? true : false;
-				$result_tgrp_col = array_key_exists('lang_parent_id', $columns) ? true : false;
-			} else {
-				$fields = $this->_db->getTableFields('#__flexicontent_items_ext');
-				$result_lang_col = array_key_exists('language', $fields['#__flexicontent_items_ext']) ? true : false;
-				$result_tgrp_col = array_key_exists('lang_parent_id', $fields['#__flexicontent_items_ext']) ? true : false;
-			}
-			$return = $result_lang_col && $result_tgrp_col;
+		if ($return !== NULL) return $return;
+		$return = false;
+		
+		if (FLEXI_J16GE) {
+			$columns = $this->_db->getTableColumns('#__flexicontent_items_ext');
+			$result_lang_col = array_key_exists('language', $columns) ? true : false;
+			$result_tgrp_col = array_key_exists('lang_parent_id', $columns) ? true : false;
+		} else {
+			$fields = $this->_db->getTableFields('#__flexicontent_items_ext');
+			$result_lang_col = array_key_exists('language', $fields['#__flexicontent_items_ext']) ? true : false;
+			$result_tgrp_col = array_key_exists('lang_parent_id', $fields['#__flexicontent_items_ext']) ? true : false;
 		}
+		$return = $result_lang_col && $result_tgrp_col;
+		
 		return $return;
 	}
 	
@@ -467,16 +468,15 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		static $return;
 		if ($return !== NULL) return $return;
-		
-		$db = JFactory::getDBO();
+		$return = false;
 		
 		$query = "SELECT rel.itemid"
 			." FROM #__flexicontent_cats_item_relations AS rel"
 			." LEFT JOIN #__content AS i ON i.id = rel.itemid"
 			." WHERE i.id IS NULL"
 			." LIMIT 1";
-		$db->setQuery($query);
-		$item_id = $db->loadResult();
+		$this->_db->setQuery($query);
+		$item_id = $this->_db->loadResult();
 		if ($item_id) return $return = true;
 		
 		$query = "SELECT i.id"
@@ -485,8 +485,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			." LEFT JOIN #__flexicontent_cats_item_relations as rel ON rel.catid=i.catid AND i.id=rel.itemid "
 			." WHERE rel.catid IS NULL"
 			." LIMIT 1";
-		$db->setQuery($query);
-		$item_id = $db->loadResult();
+		$this->_db->setQuery($query);
+		$item_id = $this->_db->loadResult();
 		if ($item_id) return $return = true;
 		
 		return $return;
@@ -504,30 +504,28 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		static $return;
 		if ($return !== NULL) return $return;
+		$return = false;
 		
-		$enable_translation_groups = JComponentHelper::getParams( 'com_flexicontent' )->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
-		$db = JFactory::getDBO();
-		/*$query = "SELECT COUNT(*) FROM #__flexicontent_items_ext as ie "
-			. (FLEXI_J16GE ? " LEFT JOIN #__content as i ON i.id=ie.item_id " : "")
-			. " WHERE ie.language='' " . ($enable_translation_groups ? " OR ie.lang_parent_id='0' " : "")
-			. (FLEXI_J16GE ? " OR i.language='' OR i.language<>ie.language " : "")
-			;*/
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH );
+		
 		$query = "SELECT COUNT(*)"
 			." FROM #__flexicontent_items_ext as ie"
 			." WHERE ie.language='' " . ($enable_translation_groups ? " OR (ie.lang_parent_id=0 AND ie.item_id<>0) " : "")
 			." LIMIT 1";
-		$db->setQuery($query);
-		$cnt1 = $db->loadResult();
-		$cnt2 = 0;
-		if (FLEXI_J16GE) {
-			$query = "SELECT COUNT(*)"
-				." FROM #__content as i"
-				." WHERE i.language=''"
-				." LIMIT 1";
-			$db->setQuery($query);
-			$cnt2 = $db->loadResult();
-		}
-		$return = $cnt1 || $cnt2;
+		$this->_db->setQuery($query);
+		$cnt = $this->_db->loadResult();
+		if ($cnt) return $return = true;
+		
+		if (!FLEXI_J16GE) return $return;
+		
+		$query = "SELECT COUNT(*)"
+			." FROM #__content as i"
+			." WHERE i.language=''"
+			." LIMIT 1";
+		$this->_db->setQuery($query);
+		$cnt = $this->_db->loadResult();
+		if ($cnt) return $return = true;
 		
 		return $return;
 	}
@@ -544,14 +542,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		static $return;
 		if ($return !== NULL) return $return;
-		
-		$db = JFactory::getDBO();
+		$return = false;
 		
 		// Find columns cached
 		$cache_tbl = "#__flexicontent_items_tmp";
 		$tbls = array($cache_tbl);
-		if (!FLEXI_J16GE) $tbl_fields = $db->getTableFields($tbls);
-		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $db->getTableColumns($tbl);
+		if (!FLEXI_J16GE) $tbl_fields = $this->_db->getTableFields($tbls);
+		else foreach ($tbls as $tbl) $tbl_fields[$tbl] = $this->_db->getTableColumns($tbl);
 		
 		// Get the column names
 		$tbl_fields = array_keys($tbl_fields[$cache_tbl]);
@@ -577,7 +574,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		}
 		
 		// Check missing in item counting table
-		$db->setQuery($query);
+		$this->_db->setQuery($query);
 		$res = $this->_db->loadObject();
 		if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
 		
@@ -920,15 +917,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				die("Category table corrupted, SYSTEM root category not found");
 			} else {
 				// Save the created section as flexi_section for the component
-				$params = JComponentHelper::getParams('com_flexicontent');
-				$params->set('flexi_section', '');
-				$cparams = $component->toString();
-	
-				$flexi = JComponentHelper::getComponent('com_flexicontent');
+				$cparams = JComponentHelper::getParams('com_flexicontent');
+				$cparams->set('flexi_section', '');
+				$cparams_str = $cparams->toString();
 				
-				$query 	= 'UPDATE #__components'
-						. ' SET params = ' . $this->_db->Quote($cparams)
-						. ' WHERE id = ' . $flexi->id;
+				$flexi = JComponentHelper::getComponent('com_flexicontent');
+				$query = 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__components')
+						. ' SET params = ' . $this->_db->Quote($cparams_str)
+						. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .'='. $flexi->id
 						;
 				$this->_db->setQuery($query);
 				$this->_db->query();

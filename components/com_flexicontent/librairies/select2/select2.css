@@ -667,17 +667,23 @@ html[dir="rtl"] .select2-search-choice-close {
 /* Drop-down value-selection container */
 /***************************************/
 .select2-drop {
-	min-width: 140px!important;
-	width: auto!important;
+	/*min-width: 400px!important;*/
+	width: auto !important;
+	float: left !important;
+	width: auto !important;
+	max-width: 800px;
 }
 /* results listing box */
 .select2-drop .select2-results {
 	max-height: 240px !important;
 	text-align: left !important;
+	float:left;
+	width: 100%;
 }
 /* style disable choise, and force showing already selected value as disabled */
 .select2-results .select2-selected,
 .select2-results .select2-disabled {
+	max-width: 97%;
   background: #f4f4f4 !important;
   display: list-item !important;
 	color: gray !important;

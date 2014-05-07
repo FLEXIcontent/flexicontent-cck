@@ -2452,8 +2452,8 @@ class FlexicontentModelItems extends JModelLegacy
 			$subcat->load($map_old_new[$category->id]);
 			$subcat->lft			= null;
 			$subcat->rgt			= null;
-			$subcat->level			= null;
-			$subcat->parent_id		= isset($map_old_new[$category->parent_id])?$map_old_new[$category->parent_id]:$topcat->id;
+			$subcat->level		= null;
+			$subcat->parent_id	= isset($map_old_new[$category->parent_id])?$map_old_new[$category->parent_id]:$topcat->id;
 			$subcat->setLocation($subcat->parent_id, 'last-child');
 			$subcat->check();
 			$subcat->store();
@@ -2463,12 +2463,12 @@ class FlexicontentModelItems extends JModelLegacy
 		// Save the created top category as the flexi_top_category for the component
 		$fparams = JComponentHelper::getParams('com_flexicontent');
 		$fparams->set('flexi_top_category', $topcat->id);
-		$fparams = $fparams->toString();
+		$fparams_str = $fparams->toString();
 		
 		$flexi = JComponentHelper::getComponent('com_flexicontent');
-		$query = 'UPDATE #__extensions'
-			. ' SET params = ' . $this->_db->Quote($fparams)
-			. ' WHERE extension_id = ' . $this->_db->Quote($flexi->id);
+		$query = 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__components')
+			. ' SET params = ' . $this->_db->Quote($fparams_str)
+			. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .'='. $flexi->id
 			;
 		$this->_db->setQuery($query);
 		$this->_db->query();

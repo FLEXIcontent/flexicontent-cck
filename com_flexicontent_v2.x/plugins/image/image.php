@@ -810,6 +810,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $default_image_val) ) $values = array(serialize($default_image_val));
 				// Also default image can (possibly) be used across multiple fields, so set flag to add field id to filenames of thumbnails
 				$multiple_image_usages = true;
+				$extra_prefix = 'fld'.$field->id.'_';
 				$field->using_default_value = true;
 			}
 		}

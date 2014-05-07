@@ -42,9 +42,8 @@ div .paramlist_value input, div .paramlist_value textarea, div .paramlist_value 
 div .paramlist_value select { margin:0px; }
 fieldset.radio  { margin: 0; padding: 0; }
 
-.tool-tip { min-width: 480px !important; }
-.tool-title { }
-
+.tool-tip { }
+.tip-title { }
 ";
 
 $document = JFactory::getDocument();

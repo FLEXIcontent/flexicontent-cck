@@ -979,64 +979,6 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 	<?php endif; ?>
 	
 	
-	<?php if ( $this->params->get('usedisplaydetails_fe') ) : ?>
-		<?php $title=JText::_('FLEXI_DISPLAYING'); ?>
-		
-		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-			<h3 class="tabberheading"> <?php echo $title; ?> </h3>
-			
-			<?php
-				/*
-				echo $this->pane->startPane( 'det-pane' );
-				
-				if ( $this->params->get('usedisplaydetails_fe') >= 1 ) {
-					$title = JText::_('FLEXI_PARAMETERS_ITEM_BASIC' );
-					echo $this->pane->startPanel( $title, "params-basic" );
-					echo $this->formparams->render('params', 'basic');
-					echo $this->pane->endPanel();
-				}
-				
-				if ( $this->params->get('usedisplaydetails_fe') >= 2 ) {
-					$title = JText::_('FLEXI_PARAMETERS_ITEM_ADVANCED' );
-					echo $this->pane->startPanel( $title, "params-advanced" );
-					echo $this->formparams->render('params', 'advanced');
-					echo $this->pane->endPanel();
-				}
-				
-				if ($this->params->get('usemetadata_fe', 1) == 2 ) {
-					$title = JText::_('FLEXI_METADATA_INFORMATION' );
-					echo $this->pane->startPanel( $title, "params-metadata" );
-					echo $this->formparams->render('meta', 'metadata');
-					echo $this->pane->endPanel();
-				}
-				
-				if ( $this->params->get('useseoconf_fe', 0) ) {
-					$title = JText::_('FLEXI_PARAMETERS_ITEM_SEO' );
-					echo $this->pane->startPanel( $title, "params-seoconf" );
-					echo $this->formparams->render('params', 'seoconf');
-					echo $this->pane->endPanel();
-				}
-				
-				echo $this->pane->endPane();
-				*/
-			?>
-			
-			<?php if ( $this->params->get('usedisplaydetails_fe') >= 1 ) : ?>
-				<div class="flexi_params">
-					<?php echo $this->formparams->render('params', 'basic'); ?>
-				</div>
-			<?php endif; ?>
-			
-			<?php if ( $this->params->get('usedisplaydetails_fe') >= 2 ) : ?>
-				<div class="flexi_params">
-					<?php echo $this->formparams->render('params', 'advanced'); ?>
-				</div>
-			<?php endif; ?>
-			
-		</div> <!-- end tab -->
-		
-	<?php endif; ?>
-	
 	
 	<?php if ( $this->params->get('usemetadata_fe', 1) || $this->params->get('useseoconf_fe', 0)  ) : ?>
 		<?php
@@ -1164,6 +1106,67 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 	<?php endif; ?>
 	
 	
+		
+	<?php if ( $this->params->get('usedisplaydetails_fe') ) : ?>
+		<?php $title=JText::_('FLEXI_DISPLAYING'); ?>
+		
+		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+			<h3 class="tabberheading"> <?php echo $title; ?> </h3>
+			
+			<?php
+				/*
+				echo $this->pane->startPane( 'det-pane' );
+				
+				if ( $this->params->get('usedisplaydetails_fe') >= 1 ) {
+					$title = JText::_('FLEXI_PARAMETERS_ITEM_BASIC' );
+					echo $this->pane->startPanel( $title, "params-basic" );
+					echo $this->formparams->render('params', 'basic');
+					echo $this->pane->endPanel();
+				}
+				
+				if ( $this->params->get('usedisplaydetails_fe') >= 2 ) {
+					$title = JText::_('FLEXI_PARAMETERS_ITEM_ADVANCED' );
+					echo $this->pane->startPanel( $title, "params-advanced" );
+					echo $this->formparams->render('params', 'advanced');
+					echo $this->pane->endPanel();
+				}
+				
+				if ($this->params->get('usemetadata_fe', 1) == 2 ) {
+					$title = JText::_('FLEXI_METADATA_INFORMATION' );
+					echo $this->pane->startPanel( $title, "params-metadata" );
+					echo $this->formparams->render('meta', 'metadata');
+					echo $this->pane->endPanel();
+				}
+				
+				if ( $this->params->get('useseoconf_fe', 0) ) {
+					$title = JText::_('FLEXI_PARAMETERS_ITEM_SEO' );
+					echo $this->pane->startPanel( $title, "params-seoconf" );
+					echo $this->formparams->render('params', 'seoconf');
+					echo $this->pane->endPanel();
+				}
+				
+				echo $this->pane->endPane();
+				*/
+			?>
+			
+			<?php if ( $this->params->get('usedisplaydetails_fe') >= 1 ) : ?>
+				<div class="flexi_params">
+					<?php echo $this->formparams->render('params', 'basic'); ?>
+				</div>
+			<?php endif; ?>
+			
+			<?php if ( $this->params->get('usedisplaydetails_fe') >= 2 ) : ?>
+				<div class="flexi_params">
+					<?php echo $this->formparams->render('params', 'advanced'); ?>
+				</div>
+			<?php endif; ?>
+			
+		</div> <!-- end tab -->
+		
+	<?php endif; ?>
+	
+	
+	
 	<?php if ($this->perms['cantemplates'] && $this->params->get('selecttheme_fe')) : ?>
 
 		<?php $title=JText::_('FLEXI_TEMPLATE'); ?>
@@ -1174,10 +1177,9 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 			<fieldset class="flexi_params fc_edit_container_full">
 				
 				<?php $type_default_layout = $this->tparams->get('ilayout'); ?>
-				<?php echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>'; ?>
+				<?php echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) . '</h3>'; ?>
 				
 				<?php	$type_default_layout = $this->tparams->get('ilayout'); ?>
-				<?php /*echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';*/ ?>
 				
 				<div class="fcclear"></div>
 				<div class="flexi_params">

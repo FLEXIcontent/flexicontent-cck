@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexisystem.php 1884 2014-04-13 10:38:52Z ggppdk $
+ * @version 1.5 stable $Id: flexisystem.php 1887 2014-04-24 23:53:14Z ggppdk $
  * @plugin 1.1
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -554,6 +554,7 @@ class plgSystemFlexisystem extends JPlugin
 			if ($task == 'apply' || $task == 'component.apply' || $task == 'save' || $task == 'component.save') {
 				$catscache = JFactory::getCache('com_flexicontent_cats');
 				$catscache->clean();
+				JFactory::getApplication()->enqueueMessage( "com_flexicontent_cats cache CLEANED", 'message');
 			}
 		}
 	}

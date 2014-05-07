@@ -233,7 +233,8 @@ class FlexicontentModelArchive extends JModelLegacy
 		$where[] = FLEXI_J16GE ? ' c.extension="'.FLEXI_CAT_EXTENSION.'"' : ' i.sectionid = '.FLEXI_SECTION;
 		
 		if ($search) {
-			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->getEscaped( $search, true ).'%', false );
+			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
+			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );

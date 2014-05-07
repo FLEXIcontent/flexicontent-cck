@@ -162,8 +162,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		$editor 	   = JFactory::getEditor($editor_name);
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$bar     = JToolBar::getInstance('toolbar');
-		if (!FLEXI_J16GE)
-			$pane			= JPane::getInstance('sliders');
+		if (!FLEXI_J16GE) {
+			$pane  = JPane::getInstance('sliders');
+			$tpane = JPane::getInstance('tabs', array('startOffset'=>0, 'allowAllClose'=>true, 'opacityTransition'=>true, 'duration'=>600));
+		}
 		$categories = $globalcats;
 		
 		
@@ -303,8 +305,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		$this->assignRef('editor'		, $editor);
 		$this->assignRef('tmpls'		, $tmpls);
 		$this->assignRef('cparams'	, $cparams);
-		if (!FLEXI_J16GE)
+		if (!FLEXI_J16GE) {
 			$this->assignRef('pane'		, $pane);
+			$this->assignRef('tpane'	, $tpane);
+		}
 
 		parent::display($tpl);
 	}

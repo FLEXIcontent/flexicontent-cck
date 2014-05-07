@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: archive.php 1577 2012-12-02 15:10:44Z ggppdk $
+ * @version 1.5 stable $Id: archive.php 1681 2013-05-04 23:51:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -233,7 +233,8 @@ class FlexicontentModelArchive extends JModelList
 		$where[] = FLEXI_J16GE ? ' c.extension="'.FLEXI_CAT_EXTENSION.'"' : ' i.sectionid = '.FLEXI_SECTION;
 		
 		if ($search) {
-			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false );
+			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
+			$where[] = ' LOWER(i.title) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );

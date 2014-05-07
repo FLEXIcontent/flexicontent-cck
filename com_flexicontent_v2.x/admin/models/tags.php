@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: tags.php 1681 2013-05-04 23:51:21Z ggppdk $
+ * @version 1.5 stable $Id: tags.php 1889 2014-04-26 03:25:28Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr

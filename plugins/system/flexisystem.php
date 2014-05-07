@@ -554,6 +554,7 @@ class plgSystemFlexisystem extends JPlugin
 			if ($task == 'apply' || $task == 'component.apply' || $task == 'save' || $task == 'component.save') {
 				$catscache = JFactory::getCache('com_flexicontent_cats');
 				$catscache->clean();
+				JFactory::getApplication()->enqueueMessage( "com_flexicontent_cats cache CLEANED", 'message');
 			}
 		}
 	}
