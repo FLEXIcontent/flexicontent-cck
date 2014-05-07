@@ -477,14 +477,14 @@ class FlexicontentController extends JControllerLegacy
 		}
 		
 		// Save the created menu item as default_menu_itemid for the component
-		$flexi   = JComponentHelper::getComponent('com_flexicontent');
 		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$cparams->set('default_menu_itemid', $db->insertid());
 		$cparams_str = $cparams->toString();
 		
-		$query 	= 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__components')
+		$flexi = JComponentHelper::getComponent('com_flexicontent');
+		$query = 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__components')
 				. ' SET params = ' . $db->Quote($cparams_str)
-				. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .' = '. $flexi->id
+				. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .'='. $flexi->id
 				;
 		$db->setQuery($query);
 		

@@ -124,7 +124,7 @@ defined('_JEXEC') or die('Restricted access');
 				echo $this->form->render('params');
 				echo $this->pane->endPanel();
 				
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+				echo '<span class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) . '</span>';
 				
 				echo $this->form->render('params', 'themes');
 				

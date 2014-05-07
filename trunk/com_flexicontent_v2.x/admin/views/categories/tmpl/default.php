@@ -227,7 +227,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY' );?>::<?php echo $row->alias; ?>">
+					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY', true );?>::<?php echo $row->alias; ?>">
 					<a href="<?php echo $link; ?>">
 					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
 					</a></span>
@@ -236,7 +236,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				?>
 				
 				<?php	if (!empty($row->note)) : /* Display J1.6+ category note in a tooltip */ ?>
-					<span class="hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES' ); ?>::<?php echo $this->escape($row->note);?>">
+					<span class="hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES', true ); ?>::<?php echo $this->escape($row->note);?>">
 						<?php echo $infoimage; ?>
 					</span
 				<?php endif; ?>

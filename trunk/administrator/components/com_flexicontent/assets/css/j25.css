@@ -304,9 +304,6 @@ div fieldset.panelform table {
 }
 
 div #jform_params_target { width: 170px; }
-
-div #jform_params_image { width: 60px; }
-
 div #jform_params_show_print_icon,
 div #jform_params_show_email_icon {	width:140px; }
 
@@ -389,5 +386,9 @@ table.admintable fieldset {
 dl.tabs dt h3 {
 	font-size: 11px !important;
 	margin: 0px !important;
-	line-height: 20px;
 }
+
+.fltlft { min-width: 50%; }
+.fltlft.media-preview { min-width: 0; }
+.fltlft input{ width: 94%; }
+

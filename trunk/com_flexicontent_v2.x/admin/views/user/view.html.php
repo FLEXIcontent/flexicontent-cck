@@ -1,6 +1,6 @@
 <?php
 /**
-* @version		$Id: view.html.php 1579 2012-12-03 03:37:21Z ggppdk $
+* @version		$Id: view.html.php 1794 2013-10-22 02:41:41Z ggppdk $
 * @package		Joomla
 * @subpackage	Users
 * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
@@ -131,6 +131,16 @@ class FlexicontentViewUser extends JViewLegacy
 		$document->addScript('components/com_flexicontent/assets/js/validate.js');
 		
 		
+		// ********************
+		// Initialise variables
+		// ********************
+		
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		if (!FLEXI_J16GE) {
+			$pane  = JPane::getInstance('sliders');
+			$tpane = JPane::getInstance('tabs', array('startOffset'=>2, 'allowAllClose'=>true, 'opacityTransition'=>true, 'duration'=>600));
+		}
+		
 		// *************************************************************************************************
 		// Get author extended data, basic (described in author.xml) and category (described incategory.xml)
 		// *************************************************************************************************
@@ -227,13 +237,6 @@ class FlexicontentViewUser extends JViewLegacy
 		//$javascript = "onchange=\"javascript:if (document.forms[0].image.options[selectedIndex].value!='') {document.imagelib.src='../images/stories/' + document.forms[0].image.options[selectedIndex].value} else {document.imagelib.src='../images/blank.png'}\"";
 		//$lists['imagelist'] 		= JHTML::_('list.images', 'image', $flexiauthor_extdata->image, $javascript, '/images/stories/' );
 
-		if (!FLEXI_J16GE)
-			$pane = JPane::getInstance('sliders');
-		
-		
-		// *** Get Component's Global Configuration ***
-		$fcconfig = JComponentHelper::getParams( 'com_flexicontent' );
-		$authordetails_itemscat		= $fcconfig->get( 'authordetails_itemscat', 0 );
 		
 		if (!FLEXI_J16GE) {
 			$userObjectID 	= $acl->get_object_id( 'users', $user->get('id'), 'ARO' );
@@ -346,15 +349,16 @@ class FlexicontentViewUser extends JViewLegacy
 		$this->assignRef('me'				, $me);
 		$this->assignRef('document'	, $document);
 		$this->assignRef('lists'		, $lists);
-		if (!FLEXI_J16GE)
+		if (!FLEXI_J16GE) {
 			$this->assignRef('pane'		, $pane);
+			$this->assignRef('tpane'	, $tpane);
+		}
 		
 		$this->assignRef('user'				, $user);
 		$this->assignRef('usergroups'	, $usergroups);
 		$this->assignRef('contact'		, $contact);
 		
-		$this->assignRef('fcconfig',	$fcconfig);
-		$this->assignRef('authordetails_itemscat',	$authordetails_itemscat);
+		$this->assignRef('cparams',	$cparams);
 		
 		$this->assignRef('params_authorbasic'	, $params_authorbasic);
 		$this->assignRef('params_authorcat'		, $params_authorcat);

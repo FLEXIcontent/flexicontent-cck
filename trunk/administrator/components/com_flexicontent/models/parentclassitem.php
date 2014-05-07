@@ -732,9 +732,27 @@ class ParentClassItem extends JModelLegacy
 				// 'cats' is an alias of categories
 				$item->cats = & $item->categories;
 				
+				
 				// *********************************************************
 				// Retrieve item properties not defined in the model's CLASS
 				// *********************************************************
+				
+				if (FLEXI_J16GE) {
+					$query = 'SELECT title FROM #__viewlevels WHERE id = '. (int) $item->access;
+				} else {
+					$query = 'SELECT name FROM #__groups WHERE id = '. (int) $item->access;
+				}
+				$db->setQuery($query);
+				$item->access_level = $db->loadResult();
+				
+				// Category access is retrieved here for J1.6+, for J1.5 we use FLEXIaccess
+				if (FLEXI_J16GE) {
+					// Get category access for the item's main category, used later to determine viewing of the item
+					$query = 'SELECT access FROM #__categories WHERE id = '. (int) $item->catid;
+					$db->setQuery($query);
+					$item->category_access = $db->loadResult();
+				}
+				
 				
 				// Category access is retrieved here for J1.6+, for J1.5 we use FLEXIaccess
 				if (FLEXI_J16GE) {

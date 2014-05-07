@@ -359,10 +359,11 @@ div fieldset label.btn {
 
 
 div.fieldset_value,
-div.panel fieldset input, div.panel fieldset textarea, div.panel fieldset select,
+div.panel fieldset input:not(.input-small), div.panel fieldset textarea, div.panel fieldset select,
 div.panel fieldset img, div.panel fieldset button,
 fieldset.panelform label,
-fieldset.panelform input, fieldset.panelform textarea, fieldset.panelform select,
+fieldset.panelform input:not(.input-small),
+fieldset.panelform textarea, fieldset.panelform select,
 fieldset.panelform img, fieldset.panelform button {
 	float: left !important;
 	margin: 2px 8px 0px 6px!important;

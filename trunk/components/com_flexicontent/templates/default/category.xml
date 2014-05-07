@@ -8,14 +8,14 @@
 	<release>25 november 2009</release>
 	<description>This HTML5 layout presents category items in a table. Each field put in the table position will be rendered as a column</description>
 	<params addpath="/administrator/components/com_flexicontent/elements">
-		<param name="show_field_labels_row" type="list" default="1" label="FLEXI_SHOW_LABELS_ROW" description="FLEXI_SHOW_LABELS_ROW_DESC">
+		<param name="show_field_labels_row" type="radio" default="1" label="FLEXI_SHOW_LABELS_ROW" description="FLEXI_SHOW_LABELS_ROW_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</param>
 		
 		<param name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
-		<param name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+		<param name="htmlmode" type="radio" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
 			<option value="0">FLEXI_XHTML</option>
 			<option value="1">FLEXI_HTML5</option>
 		</param>

@@ -32,10 +32,20 @@ $this->document->addScriptDeclaration("
 	");
 dump($this->row);
 */
+
+// Load JS tabber lib
+$this->document->addScript( JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js' );
+$this->document->addStyleSheet( JURI::root().'components/com_flexicontent/assets/css/tabber.css' );
+$this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
+
 ?>
 
 <style>
-.pane-sliders { margin: 8px 0px 0px 0px; }
+.current:after{
+	clear: both;
+	content: "";
+	display: block;
+}
 </style>
 
 <div id="flexicontent" class="flexicontent">
@@ -44,8 +54,9 @@ dump($this->row);
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">
+				
 				<div class="flexi_params">
-					
+				
 					<div class="fcdualline_container">
 						<label for="title" class="flexi_label">
 							<?php echo JText::_( 'FLEXI_TITLE' ); ?>
@@ -63,7 +74,7 @@ dump($this->row);
 						</div>
 					</div>
 					<div class="fcclear"></div>
-						
+					
 					<div class="fcdualline_container">
 						<label for="alias" class="flexi_label">
 							<?php echo JText::_( 'FLEXI_ALIAS' ); ?>
@@ -82,9 +93,8 @@ dump($this->row);
 					</div>
 					<div class="fcclear"></div>
 					
-					
 				</div>
-									
+				
 				<?php
 				if (FLEXI_ACCESS) :
 				$this->document->addScriptDeclaration("
@@ -113,6 +123,14 @@ dump($this->row);
 					</div>
 				</fieldset>
 				<?php endif; ?>
+				
+				
+				<?php
+				echo $this->tpane->startPane( 'core-tabs' );
+				$title = JText::_( 'FLEXI_DESCRIPTION' ) ;
+				echo $this->tpane->startPanel( $title, 'core-props' );
+				?>
+				
 
 				<div class="flexi_params" style="margin:0px 24px; width: 99% !important;">
 					<?php
@@ -121,11 +139,40 @@ dump($this->row);
 					?>
 				</div>
 				
-			</td>
-			<td valign="top" width="480" style="padding: 7px 0 0 5px">
+				<?php
+				echo $this->tpane->endPanel();
+				$title = JText::_( 'FLEXI_IMAGE' );
+				echo $this->tpane->startPanel( $title, 'access' );
+				?>
+				
+				<fieldset class="flexi_params">
+					<table>
+						<tr>
+							<td> <label for="image"> <?php echo JText::_( 'FLEXI_CHOOSE_IMAGE' ).':'; ?> </label> </td>
+							<td> <?php echo $this->Lists['imagelist']; ?> </td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>
+								<script language="javascript" type="text/javascript">
+									jsimg = (document.forms[0].image.options.value!='') ?
+										'../images/stories/' + getSelectedValue( 'adminForm', 'image' ) :
+										'../images/M_images/blank.png';
+									document.write('<img src=' + jsimg + ' name="imagelib" width="80" height="80" border="2" alt="Preview" />');
+								</script>
+								<br /><br />
+							</td>
+						</tr>
+					</table>
+				</fieldset>
+				
+				<?php
+				echo $this->tpane->endPanel();				
+				$title = JText::_( 'FLEXI_PARAMETERS_HANDLING' ) ;
+				echo $this->tpane->startPanel( $title, 'cat-params-handling' );
+				?>
 
 				<fieldset class="flexi_params">
-					<legend><?php echo JText::_( 'Parameter handling' ); ?></legend>
 					<div class="fcdualline_container">
 						<label for="parent" class="flexi_label hasTip" title="::<?php echo JText::_( 'FLEXI_COPY_PARAMETERS_DESC',true ); ?>">
 							<?php echo JText::_( 'FLEXI_COPY_PARAMETERS' ); ?>
@@ -147,13 +194,13 @@ dump($this->row);
 					<div class="fcclear"></div>
 				</fieldset>
 				
-				
 				<?php
-				echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS_INHERIT');
-				$title = JText::_( 'FLEXI_ACCESS' );
-				echo $this->pane->startPane( 'det-pane' );
+				echo '<span class="fc-note fc-mssg">'.JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS_INHERIT'). '</span>';
+				echo $this->tpane->endPanel();
+				
 				if (!FLEXI_ACCESS) :
-				echo $this->pane->startPanel( $title, 'access' );
+				$title = JText::_( 'FLEXI_ACCESS' );
+				echo $this->tpane->startPanel( $title, 'access' );
 				?>
 				<table>
 					<tr>
@@ -168,95 +215,88 @@ dump($this->row);
 					</tr>
 				</table>
 				<?php
-				echo $this->pane->endPanel();
+				echo $this->tpane->endPanel();
 				endif;
-				$title = JText::_( 'FLEXI_IMAGE' );
-				echo $this->pane->startPanel( $title, 'image' );
+				
+				$title = JText::_( 'FLEXI_PARAMETERS' ) ;
+				echo $this->tpane->startPanel( $title, 'cat-params-common' );
 				?>
-				<table>
-					<tr>
-						<td>
-							<label for="image">
-								<?php echo JText::_( 'FLEXI_CHOOSE_IMAGE' ).':'; ?>
-							</label>
-						</td>
-						<td>
-							<?php echo $this->Lists['imagelist']; ?>
-						</td>
-					</tr>
-					<tr>
-						<td></td>
-						<td>
-							<script language="javascript" type="text/javascript">
-								if (document.forms[0].image.options.value!=''){
-									jsimg='../images/stories/' + getSelectedValue( 'adminForm', 'image' );
-								} else {
-									jsimg='../images/M_images/blank.png';
-								}
-								document.write('<img src=' + jsimg + ' name="imagelib" width="80" height="80" border="2" alt="Preview" />');
-							</script>
-							<br /><br />
-						</td>
-					</tr>
-				</table>
+				
+				<div class="fctabber" style=''>
+					
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3 class="tabberheading"> <?php echo str_replace('&', ' / ', JText::_( 'FLEXI_PARAMS_CAT_INFO_OPTIONS' )); ?> </h3>
+						<?php echo $this->form->render('params', "cat_info_options" ); ?>
+					</div>
+					
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_SUBCATS_INFO_OPTIONS' ); ?> </h3>
+						<?php echo $this->form->render('params', "subcats_info_options" ); ?>
+					</div>
+					
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_PEERCATS_INFO_OPTIONS' ); ?> </h3>
+						<?php echo $this->form->render('params', "peercats_info_options" ); ?>
+					</div>
+					
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_CAT_ITEMS_LIST' ); ?> </h3>
+						<?php echo $this->form->render('params', 'cat_items_list'); ?>
+					</div>
+					
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_CAT_ITEM_MARKUPS' ); ?> </h3>
+						<?php echo $this->form->render('params', 'cat_item_markups'); ?>
+					</div>
+					
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_CAT_ITEM_FILTERING' ); ?> </h3>
+						<?php echo $this->form->render('params', 'cat_item_filtering'); ?>
+					</div>
+					
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_PARAMS_CAT_RSS_FEEDS' ); ?> </h3>
+						<?php echo $this->form->render('params', 'cat_rss_feeds'); ?>
+					</div>
+					
+					<?php if ( $this->cparams->get('enable_notifications', 0) && $this->cparams->get('nf_allow_cat_specific', 0) ) :?>
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_EMAIL_NOTIFICATIONS_CONF' ); ?> </h3>
+						<?php echo $this->form->render('params', 'cat_notifications_conf'); ?>
+					</div>				
+					<?php endif; ?>
+					
+				</div>
+				
 				<?php
-				echo $this->pane->endPanel();
+				echo $this->tpane->endPanel();
 
-				$title = JText::_( 'FLEXI_PARAMETERS_CAT_INFO_OPTIONS' );
-				echo $this->pane->startPanel( $title, "params-cat_info_options" );
-				echo $this->form->render('params', "cat_info_options" );
-				echo $this->pane->endPanel();
+				$title = JText::_( 'FLEXI_TEMPLATE' ) ;
+				echo $this->tpane->startPanel( $title, 'cat-params-template' );
+				echo '<span class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
+				?>
+				<br/><br/>
+				<ol style="margin:0 0 0 16px; padding:0;">
+					<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
+					<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
+				</ol>
+				<br/>
+				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
+				</span>
 				
-				$title = JText::_( 'FLEXI_PARAMETERS_SUBCATS_INFO_OPTIONS' );
-				echo $this->pane->startPanel( $title, "params-subcats_info_options" );
-				echo $this->form->render('params', "subcats_info_options" );
-				echo $this->pane->endPanel();
-				
-				$title = JText::_( 'FLEXI_PARAMETERS_PEERCATS_INFO_OPTIONS' );
-				echo $this->pane->startPanel( $title, "params-peercats_info_options" );
-				echo $this->form->render('params', "peercats_info_options" );
-				echo $this->pane->endPanel();
-				
-				$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEMS_LIST' );
-				echo $this->pane->startPanel( $title, "params-cat_items_list" );
-				echo $this->form->render('params', 'cat_items_list');
-				echo $this->pane->endPanel();
-				
-				$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEM_MARKUPS' );
-				echo $this->pane->startPanel( $title, "params-cat_item_markups" );
-				echo $this->form->render('params', 'cat_item_markups');
-				echo $this->pane->endPanel();
-				
-				$title = JText::_( 'FLEXI_PARAMETERS_CAT_ITEM_FILTERING' );
-				echo $this->pane->startPanel( $title, "params-cat_item_filtering" );
-				echo $this->form->render('params', 'cat_item_filtering');
-				echo $this->pane->endPanel();
-				
-				$title = JText::_( 'FLEXI_PARAMETERS_CAT_RSS_FEEDS' );
-				echo $this->pane->startPanel( $title, "params-cat_rss_feeds" );
-				echo $this->form->render('params', 'cat_rss_feeds');
-				echo $this->pane->endPanel();
-				
-				if ( $this->cparams->get('enable_notifications', 0) && $this->cparams->get('nf_allow_cat_specific', 0) )
-				{
-					$title = JText::_( 'FLEXI_EMAIL_NOTIFICATIONS_ASSIGNED_ITEM_CONF' );
-					echo $this->pane->startPanel( $title, "params-cat_notifications_conf" );
-					echo $this->form->render('params', 'cat_notifications_conf');
-					echo $this->pane->endPanel();
-				}
-				
-				
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+				<?php
 				echo $this->form->render('params', 'templates')."<br/>";
-
+				echo $this->pane->startPane( 'det-pane' );
 				foreach ($this->tmpls as $tmpl) {
 					$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 					echo $this->pane->startPanel( $title, "params-".$tmpl->name );
 					echo $tmpl->params->render();
 					echo $this->pane->endPanel();
 				}
-
 				echo $this->pane->endPane();
+				
+				echo $this->tpane->endPanel();
+				echo $this->tpane->endPane();
 				?>
 			</td>
 		</tr>

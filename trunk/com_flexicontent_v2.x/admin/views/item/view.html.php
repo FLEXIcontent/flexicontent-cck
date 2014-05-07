@@ -75,6 +75,7 @@ class FlexicontentViewItem extends JViewLegacy
 		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('select2');
+		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		
 		// Load custom behaviours: form validation, popup tooltips
 		//JHTML::_('behavior.formvalidation');
@@ -365,8 +366,6 @@ class FlexicontentViewItem extends JViewLegacy
 		// First clean form data, we do this after creating the description field which may contain HTML
 		JFilterOutput::objectHTMLSafe( $item, ENT_QUOTES );
 		
-		flexicontent_html::loadFramework('select2');
-		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		$lists = array();
 		
 		// build granular access list
@@ -413,7 +412,7 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		$fieldname = FLEXI_J16GE ? 'jform[state]' : 'state';
 		$elementid = FLEXI_J16GE ? 'jform_state'  : 'state';
-		$class = 'inputbox use_select2_lib';
+		$class = 'use_select2_lib';
 		$attribs = 'class="'.$class.'"';
 		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
 		

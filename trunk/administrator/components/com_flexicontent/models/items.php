@@ -568,7 +568,7 @@ class FlexicontentModelItems extends JModelLegacy
 		
 		$db->setQuery($query);
 		
-		try { $result = $db->query(); } catch (Exception $e) { }
+		try { $result = $db->query(); } catch (Exception $e) { $result = false; }
 		if ($db->getErrorNum()) echo $db->getErrorMsg();
 		
 		return $result;
@@ -2450,12 +2450,12 @@ class FlexicontentModelItems extends JModelLegacy
 		// Save the created section as flexi_section for the component
 		$fparams = JComponentHelper::getParams('com_flexicontent');
 		$fparams->set('flexi_section', $flexisection->id);
-		$fparams = $fparams->toString();
+		$fparams_str = $fparams->toString();
 		
 		$flexi = JComponentHelper::getComponent('com_flexicontent');
-		$query 	= 'UPDATE #__components'
-			. ' SET params = ' . $this->_db->Quote($fparams)
-			. ' WHERE id = ' . $flexi->id;
+		$query = 'UPDATE '. (FLEXI_J16GE ? '#__extensions' : '#__components')
+			. ' SET params = ' . $this->_db->Quote($fparams_str)
+			. ' WHERE '. (FLEXI_J16GE ? 'extension_id' : 'id') .'='. $flexi->id
 			;
 		$this->_db->setQuery($query);
 		$this->_db->query();

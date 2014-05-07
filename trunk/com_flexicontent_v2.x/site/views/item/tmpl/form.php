@@ -987,44 +987,6 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 	<?php endif; ?>
 	
 	
-	<?php if ( $this->params->get('usedisplaydetails_fe') ) : ?>
-		<?php $title=JText::_('FLEXI_DISPLAYING'); ?>
-		
-		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-			<h3 class="tabberheading"> <?php echo $title; ?> </h3>
-			
-			<div class="fc_edit_container_full">
-			<?php foreach ($fieldSets as $name => $fieldSet) : ?>
-				<?php
-				$fieldsetname = str_replace("params-", "", $name);
-				if ( $fieldsetname=='basic') {
-					if ( $this->params->get('usedisplaydetails_fe') < 1 ) continue;
-				} else if ( $fieldsetname=='advanced') {
-					if ( $this->params->get('usedisplaydetails_fe') < 2 ) continue;
-				} else {
-					continue;
-				}
-				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
-				?>
-				
-				<fieldset class="flexi_params panelform">
-					<!--legend><?php echo JText::_($label); ?></legend-->
-					
-					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-						<?php if ( $this->params->get('allowdisablingcomments_fe') && $fieldsetname=='advanced' && $field->__get('fieldname')=='comments')  continue; ?>
-						<div class="fcclear"></div>
-						<?php echo $field->label; ?>
-						<div class="container_fcfield">
-							<?php echo $field->input;?>
-						</div>
-					<?php endforeach; ?>
-				</fieldset>
-			<?php endforeach; ?>
-			</div>
-			
-		</div> <!-- end tab -->
-	<?php endif; ?>
-	
 	
 	<?php if ( $this->params->get('usemetadata_fe', 1) || $this->params->get('useseoconf_fe', 0)  ) : ?>
 		<?php
@@ -1151,6 +1113,47 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 		</div> <!-- end tab -->
 	<?php endif; ?>
 	
+		
+	
+	<?php if ( $this->params->get('usedisplaydetails_fe') ) : ?>
+		<?php $title=JText::_('FLEXI_DISPLAYING'); ?>
+		
+		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+			<h3 class="tabberheading"> <?php echo $title; ?> </h3>
+			
+			<div class="fc_edit_container_full">
+			<?php foreach ($fieldSets as $name => $fieldSet) : ?>
+				<?php
+				$fieldsetname = str_replace("params-", "", $name);
+				if ( $fieldsetname=='basic') {
+					if ( $this->params->get('usedisplaydetails_fe') < 1 ) continue;
+				} else if ( $fieldsetname=='advanced') {
+					if ( $this->params->get('usedisplaydetails_fe') < 2 ) continue;
+				} else {
+					continue;
+				}
+				$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+				?>
+				
+				<fieldset class="flexi_params panelform">
+					<!--legend><?php echo JText::_($label); ?></legend-->
+					
+					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+						<?php if ( $this->params->get('allowdisablingcomments_fe') && $fieldsetname=='advanced' && $field->__get('fieldname')=='comments')  continue; ?>
+						<div class="fcclear"></div>
+						<?php echo $field->label; ?>
+						<div class="container_fcfield">
+							<?php echo $field->input;?>
+						</div>
+					<?php endforeach; ?>
+				</fieldset>
+			<?php endforeach; ?>
+			</div>
+			
+		</div> <!-- end tab -->
+	<?php endif; ?>
+
+	
 	
 	
 	<?php if (JComponentHelper::getParams('com_content')->get('show_urls_images_frontend', 0) ) : ?>
@@ -1195,7 +1198,7 @@ $type_lbl = $typename ? JText::_( 'FLEXI_CONTENT_TYPE' ) . ' : ' . $typename : J
 			
 			<fieldset class="flexi_params fc_edit_container_full">
 				<?php $type_default_layout = $this->tparams->get('ilayout'); ?>
-				<?php echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>'; ?>
+				<?php echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) . '</h3>'; ?>
 				
 				<?php foreach($this->form->getFieldset('themes') as $field) : ?>
 					<div class="fcclear"></div>

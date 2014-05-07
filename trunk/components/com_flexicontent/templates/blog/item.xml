@@ -9,57 +9,59 @@
 	<description>HTML5 layout</description>
 	<params>  
 		<param name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
-		<param name="show_author" type="list" default="1" label="FLEXI_SHOWAUTHOR" description="FLEXI_SHOWAUTHOR_DESC">
+		<param name="show_author" type="radio" default="1" label="FLEXI_SHOWAUTHOR" description="FLEXI_SHOWAUTHOR_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="show_create_date" type="list" default="1" label="FLEXI_SHOWCREATED" description="FLEXI_SHOWCREATED_DESC">
+		<param name="show_create_date" type="radio" default="1" label="FLEXI_SHOWCREATED" description="FLEXI_SHOWCREATED_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="show_modifier" type="list" default="1" label="FLEXI_SHOWMODIFIEDBY" description="FLEXI_SHOWMODIFIEDBY_DESC">
+		<param name="show_modifier" type="radio" default="1" label="FLEXI_SHOWMODIFIEDBY" description="FLEXI_SHOWMODIFIEDBY_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="show_modify_date" type="list" default="1" label="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC">
+		<param name="show_modify_date" type="radio" default="1" label="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="show_category" type="list" default="1" label="FLEXI_SHOWCATS" description="FLEXI_SHOWCATS_DESC">
+		<param name="show_category" type="radio" default="1" label="FLEXI_SHOWCATS" description="FLEXI_SHOWCATS_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="show_vote" type="list" default="1" label="FLEXI_SHOWRATING" description="FLEXI_SHOWRATING_DESC">
+		<param name="show_vote" type="radio" default="1" label="FLEXI_SHOWRATING" description="FLEXI_SHOWRATING_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="show_favs" type="list" default="1" label="FLEXI_SHOWFAVS" description="FLEXI_SHOWFAVS_DESC">
+		<param name="show_favs" type="radio" default="1" label="FLEXI_SHOWFAVS" description="FLEXI_SHOWFAVS_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
-		<param name="show_tags" type="list" default="1" label="FLEXI_SHOWTAGS" description="FLEXI_SHOWTAGS_DESC">
+		<param name="show_tags" type="radio" default="1" label="FLEXI_SHOWTAGS" description="FLEXI_SHOWTAGS_DESC">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</param>
 		
-		<param name="Customblocks" type="spacer" hr="false" default="FLEXI_BLOCKS_CUSTOM_FIELDS" level="level2" menu="hide" />
+		<param name="Customblocks" type="separator" hr="false" default="FLEXI_BLOCKS_CUSTOM_FIELDS" level="level2" menu="hide" />
 		
-		<param name="columnmode" type="list" default="2" label="FLEXI_COLUMN_MODE" description="FLEXI_COLUMN_MODE_DESC">
+		<param name="columnmode" type="radio" default="2" label="FLEXI_COLUMN_MODE" description="FLEXI_COLUMN_MODE_DESC">
+			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_COLUMN_MODE_FORCE_1_COLS</option>
 			<option value="1">FLEXI_COLUMN_MODE_FORCE_2_COLS</option>
 			<option value="2">FLEXI_COLUMN_MODE_FORCE_AUTO_COLS</option>
 		</param>
 		
 		<param name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
-		<param name="htmlmode" type="list" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+		<param name="htmlmode" type="radio" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_XHTML</option>
 			<option value="1">FLEXI_HTML5</option>
 		</param>

@@ -838,36 +838,6 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	</div> <!-- end tab -->
 	
 	
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_DISPLAYING'); ?> </h3>
-		
-		<?php //echo JHtml::_('sliders.start','plugin-sliders-'.$this->row->id, array('useCookie'=>1)); ?>
-
-		<?php
-			$fieldSets = $this->form->getFieldsets('attribs');
-			foreach ($fieldSets as $name => $fieldSet) :
-				if ( $name=='themes' || $name=='params-seoconf'  || $name=='images' ||  $name=='urls' ) continue;
-
-				//$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
-				//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
-				?>
-				<fieldset class="flexi_params panelform">
-					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
-						<div class="fcclear"></div>
-						<?php echo $field->label; ?>
-						<?php if (strlen(trim($field->input))) :?>
-							<div class="container_fcfield">
-								<?php echo $field->input; ?>
-							</div>
-						<?php endif; ?>
-					<?php endforeach; ?>
-				</fieldset>
-		<?php endforeach; ?>
-
-		<?php	//echo JHtml::_('sliders.end'); ?>
-		
-	</div> <!-- end tab -->
-	
 	
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_META_SEO'); ?> </h3>
@@ -985,18 +955,51 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	</div> <!-- end tab -->
 	
 	
+	
+	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_DISPLAYING'); ?> </h3>
+		
+		<?php //echo JHtml::_('sliders.start','plugin-sliders-'.$this->row->id, array('useCookie'=>1)); ?>
+
+		<?php
+			$fieldSets = $this->form->getFieldsets('attribs');
+			foreach ($fieldSets as $name => $fieldSet) :
+				if ( $name=='themes' || $name=='params-seoconf'  || $name=='images' ||  $name=='urls' ) continue;
+
+				//$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_'.$name.'_FIELDSET_LABEL';
+				//echo JHtml::_('sliders.panel', JText::_($label), $name.'-options');
+				?>
+				<fieldset class="flexi_params panelform">
+					<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+						<div class="fcclear"></div>
+						<?php echo $field->label; ?>
+						<?php if (strlen(trim($field->input))) :?>
+							<div class="container_fcfield">
+								<?php echo $field->input; ?>
+							</div>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</fieldset>
+		<?php endforeach; ?>
+
+		<?php	//echo JHtml::_('sliders.end'); ?>
+		
+	</div> <!-- end tab -->
+	
+	
+	
 	<?php if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 0) ) : ?>
 	
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('Compatibility'); ?> </h3>
 		
 		<?php
-		$fieldSets_compatibility = array('images'=>1, 'urls'=>1);
-		foreach ($fieldSets_compatibility as $name => $fieldSet) :
+		$fields_grps_compatibility = array('images', 'urls');
+		foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
 		?>
 		
 		<fieldset class="flexi_params fc_edit_container_full">
-			<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+			<?php foreach ($this->form->getGroup($fields_grp_name) as $field) : ?>
 				<div class="fcclear"></div>
 				<?php if ($field->hidden): ?>
 					<span style="visibility:hidden !important;">
@@ -1016,17 +1019,25 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	</div> <!-- end tab -->
 	
 	<?php endif; ?>
-
-
-
+	
+	
+	
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 		
 		<fieldset class="flexi_params fc_edit_container_full">
 			<?php
+				echo '<span class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
 				$type_default_layout = $this->tparams->get('ilayout');
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
 			?>
+			<br/><br/>
+			<ol style="margin:0 0 0 16px; padding:0;">
+				<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
+				<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
+			</ol>
+			<br/>
+			<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
+			</span>
 			
 			<?php foreach($this->form->getFieldset('themes') as $field): ?>
 				<div class="fcclear"></div>
@@ -1043,10 +1054,10 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			<?php endforeach; ?>
 
 			<div class="fcclear"></div>
-			<blockquote id='__content_type_default_layout__'>
+			<span class="fc-success fc-mssg-inline" id='__content_type_default_layout__'>
 				<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
 				<?php echo "<br><br>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
-			</blockquote>
+			</span>
 			<div class="fcclear"></div>
 			
 			<?php echo JHtml::_('sliders.start','template-sliders-'.$this->row->id, array('useCookie'=>1)); ?>

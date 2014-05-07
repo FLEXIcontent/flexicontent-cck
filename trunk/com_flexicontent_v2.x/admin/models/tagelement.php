@@ -179,7 +179,8 @@ class FlexicontentModelTagelement extends JModelLegacy
 		$where[] = 't.published = 1';
 
 		if ($search) {
-			$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$this->_db->escape( $search, true ).'%', false );
+			$search_escaped = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
+			$where[] = ' LOWER(t.name) LIKE '.$this->_db->Quote( '%'.$search_escaped.'%', false );
 		}
 
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );

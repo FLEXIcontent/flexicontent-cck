@@ -35,7 +35,11 @@ dump($this->row);
 ?>
 
 <style>
-.pane-sliders { margin: 8px 0px 0px 0px; }
+.current:after{
+	clear: both;
+	content: "";
+	display: block;
+}
 </style>
 
 <div id="flexicontent" class="flexicontent">
@@ -44,8 +48,9 @@ dump($this->row);
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
 			<td valign="top">
+				
 				<div class="flexi_params">
-					
+				
 					<div class="fcdualline_container">
 						<?php echo $this->form->getLabel('title'); ?>
 						<div class="container_fcfield fcdualline">
@@ -59,7 +64,7 @@ dump($this->row);
 						</div>
 					</div>
 					<div class="fcclear"></div>
-						
+					
 					<div class="fcdualline_container">
 						<?php echo $this->form->getLabel('alias'); ?>
 						<div class="container_fcfield fcdualline">
@@ -83,7 +88,7 @@ dump($this->row);
 					<div class="fcclear"></div>
 					
 				</div>
-									
+				
 				<?php
 				if ($this->perms->CanConfig) :
 				$this->document->addScriptDeclaration("
@@ -112,6 +117,14 @@ dump($this->row);
 					</div>
 				</fieldset>
 				<?php endif; ?>
+				
+				
+				<?php
+				echo JHtml::_('tabs.start','core-tabs-'.$this->form->getValue("id"), array('useCookie'=>1));
+				$title = JText::_( 'FLEXI_DESCRIPTION' ) ;
+				echo JHtml::_('tabs.panel', $title, 'cat-description');
+				?>
+				
 
 				<div class="flexi_params" style="margin:0px 24px; width: 99% !important;">
 					<?php
@@ -121,36 +134,29 @@ dump($this->row);
 					?>
 				</div>
 				
-			</td>
-			<td valign="top" width="480" style="padding: 0px 0 0 5px;vertical-align:top;">
-
-				<fieldset class="flexi_params">
-					<legend><?php echo JText::_( 'Parameter handling' ); ?></legend>
-					<div class="fcdualline_container">
-						<?php echo $this->form->getLabel('copycid'); ?>
-						<div class="container_fcfield fcdualline">
-							<?php echo $this->Lists['copycid']; ?>
-						</div>
-					</div>
-					<div class="fcclear"></div>
-
-					<?php foreach($this->form->getGroup('special') as $field): ?>
-					<div class="fcdualline_container">
-						<?php echo $field->label; ?>
-						<div class="container_fcfield fcdualline">
-							<?php echo $this->Lists[$field->fieldname]; ?>
-						</div>
-					</div>
-					<div class="fcclear"></div>
-					<?php endforeach; ?>
-				</fieldset>
-				
-				
+				<?php echo JHtml::_('tabs.panel',JText::_('FLEXI_IMAGE'), 'cat-image'); ?>
+								
 				<?php
-				echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS_INHERIT');
-				echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
-				echo JHtml::_('sliders.panel',JText::_('FLEXI_PUBLISHING_FIELDSET_LABEL'), 'publishing-details');
+				$fieldSets = $this->form->getFieldsets('params');
+				foreach ($fieldSets as $name => $fieldSet) :
+					if ($name != 'cat_basic' ) continue;
+					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMS_'.$name;
+					if (isset($fieldSet->description) && trim($fieldSet->description)) :
+						echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+					endif;
+					?>
+					<fieldset class="panelform">
+						<?php foreach ($this->form->getFieldset($name) as $field) : ?>
+							<?php echo $field->label; ?>
+							<?php echo $field->input; ?>
+						<?php endforeach; ?>
+					</fieldset>
+				<?php endforeach;
 				?>
+				
+				
+				<?php echo JHtml::_('tabs.panel',JText::_('FLEXI_PUBLISHING'), 'publishing-details'); ?>
+				
 				<fieldset class="panelform">
 					<ul class="adminformlist">
 						<li><?php echo $this->form->getLabel('created_user_id'); ?>
@@ -174,7 +180,7 @@ dump($this->row);
 					<?php echo $this->form->getInput('access'); ?>
 				</fieldset>
 
-				<?php echo JHtml::_('sliders.panel',JText::_('FLEXI_METADATA_INFORMATION_FIELDSET_LABEL'), 'meta-options'); ?>
+				<?php echo JHtml::_('tabs.panel',JText::_('FLEXI_META_SEO'), 'meta-options'); ?>
 				<fieldset class="panelform">
 				<ul class="adminformlist">
 					<li><?php echo $this->form->getLabel('metadesc'); ?>
@@ -193,13 +199,49 @@ dump($this->row);
 					<?php endforeach; ?>
 				</ul>
 				</fieldset>
-
+				
 				<?php
+				$title = JText::_( 'FLEXI_PARAMETERS_HANDLING' ) ;
+				echo JHtml::_('tabs.panel', $title, 'cat-params-handling');
+				?>
+
+				<fieldset class="flexi_params">
+					<div class="fcdualline_container">
+						<?php echo $this->form->getLabel('copycid'); ?>
+						<div class="container_fcfield fcdualline">
+							<?php echo $this->Lists['copycid']; ?>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+
+					<?php foreach($this->form->getGroup('special') as $field): ?>
+					<div class="fcdualline_container">
+						<?php echo $field->label; ?>
+						<div class="container_fcfield fcdualline">
+							<?php echo $this->Lists[$field->fieldname]; ?>
+						</div>
+					</div>
+					<div class="fcclear"></div>
+					<?php endforeach; ?>
+				</fieldset>
+				
+				<span class="fc-note fc-mssg">
+					<?php echo JText::_('FLEXI_CAT_PARAM_OVERRIDE_ORDER_DETAILS_INHERIT'); ?>
+				</span>
+				
+				<?php
+				$title = JText::_( 'FLEXI_PARAMETERS' ) ;
+				echo JHtml::_('tabs.panel', $title, 'cat-params-common');
+				
+				//echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS' ) . '</h3>';
+				echo JHtml::_('tabs.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+				
 				$fieldSets = $this->form->getFieldsets('params');
 				foreach ($fieldSets as $name => $fieldSet) :
+					if ($name == 'cat_basic' ) continue;
 					if ($name == 'cat_notifications_conf' && ( !$this->cparams->get('enable_notifications', 0) || !$this->cparams->get('nf_allow_cat_specific', 0) ) ) continue;
-					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMETERS_'.$name;
-					echo JHtml::_('sliders.panel',JText::_($label), $name.'-options');
+					$label = !empty($fieldSet->label) ? $fieldSet->label : 'FLEXI_PARAMS_'.$name;
+					echo JHtml::_('tabs.panel',JText::_($label), $name.'-options');
 					if (isset($fieldSet->description) && trim($fieldSet->description)) :
 						echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
 					endif;
@@ -211,12 +253,26 @@ dump($this->row);
 						<?php endforeach; ?>
 					</fieldset>
 				<?php endforeach;
-				echo JHtml::_('sliders.end');
-				
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+				echo JHtml::_('tabs.end');
 				?>
 				
-				<div class="fc_fieldset">
+				<?php
+
+				$title = JText::_( 'FLEXI_TEMPLATE' ) ;
+				echo JHtml::_('tabs.panel', $title, 'cat-params-template');
+				echo '<span class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
+				?>
+				<br/><br/>
+				<ol style="margin:0 0 0 16px; padding:0;">
+					<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
+					<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
+				</ol>
+				<br/>
+				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
+				</span>
+				
+				
+				<fieldset class="panelform">
 				<?php foreach($this->form->getGroup('templates') as $field): ?>
 					<?php if ($field->hidden): ?>
 						<?php echo $field->input; ?>
@@ -232,12 +288,13 @@ dump($this->row);
 					<?php endif; ?>
 					<div class="clear"></div>
 				<?php endforeach; ?>
-				</div>
+				</fieldset>
 				
 				<?php
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
-				foreach ($this->tmpls as $tmpl) {
+				
+				foreach ($this->tmpls as $tmpl) :
 					$fieldSets = $tmpl->params->getFieldsets($groupname);
 					foreach ($fieldSets as $fsname => $fieldSet) :
 						$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
@@ -245,22 +302,21 @@ dump($this->row);
 						if (isset($fieldSet->description) && trim($fieldSet->description)) :
 							echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
 						endif;
-				?>
+						?>
 						<fieldset class="panelform">
 							<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
 								$fieldname =  $field->__get('fieldname');
 								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->params[$fieldname]);
-							?>
-								<?php echo $tmpl->params->getLabel($fieldname, $groupname); ?>
-								<?php echo $tmpl->params->getInput($fieldname, $groupname, $value); ?>
-							<?php endforeach; ?>
+								echo $tmpl->params->getLabel($fieldname, $groupname);
+								echo $tmpl->params->getInput($fieldname, $groupname, $value);
+							endforeach; ?>
 						</fieldset>
-				<?php
-					endforeach;
-				}
-				echo JHtml::_('sliders.end');
-				?>
-				<?php  ?>
+					<?php endforeach; ?>
+				<?php endforeach; ?>
+				
+				<?php echo JHtml::_('sliders.end'); ?>
+				<?php echo JHtml::_('tabs.end'); ?>
+				
 			</td>
 		</tr>
 	</table>

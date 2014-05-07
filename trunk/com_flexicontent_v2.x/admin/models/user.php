@@ -87,7 +87,6 @@ class FlexicontentModelUser extends UsersModelUser
 	function getId() {
 		return $this->_id;
 	}
-	
 
 	/**
 	 * Method to get the record form.
@@ -106,6 +105,7 @@ class FlexicontentModelUser extends UsersModelUser
 
 		// Get the form.
 		$form = $this->loadForm('com_flexicontent.user', 'user', array('control' => 'jform', 'load_data' => $loadData));
+
 		if (empty($form))
 		{
 			return false;

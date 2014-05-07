@@ -122,15 +122,22 @@ defined('_JEXEC') or die('Restricted access');
 					</fieldset>
 				<?php endforeach;
 				echo JHtml::_('sliders.end');
+				?>
 				
-				echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_THEMES' ) . '</h3>';
+				<fieldset class="panelform">
+					<?php
+					echo '<span class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) .'</span>';
+					echo '<div class="clear"></div>';
+					
+					foreach ($this->form->getFieldset('themes') as $field) :
+						if ($field->hidden) echo $field->input;
+						else echo $field->label . $field->input;
+						echo '<div class="clear"></div>';
+					endforeach;
+					?>
+				</fieldset>
 				
-				foreach ($this->form->getFieldset('themes') as $field) :
-					if ($field->hidden) echo $field->input;
-					else echo $field->label . $field->input;
-					?><div class="clear"></div><?php
-				endforeach;
-				
+				<?php
 				echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 				$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 				foreach ($this->tmpls as $tmplname => $tmpl) :

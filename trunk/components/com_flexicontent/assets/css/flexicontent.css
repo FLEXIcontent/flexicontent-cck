@@ -825,12 +825,6 @@ fieldset.flexiaccess legend {
 	cursor: pointer;
 }
 
-fieldset.flexiaccess {
-	margin: 4px 0px 4px 0px!important;
-	padding: 5px!important;
-}
-
-
 
 /*************************
  * FLEXIcontent rating bar
