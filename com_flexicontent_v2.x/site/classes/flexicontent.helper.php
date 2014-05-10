@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1884 2014-04-13 10:38:52Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1902 2014-05-10 16:06:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -709,13 +709,19 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/photoswipe';
+				
+				//$document->addStyleSheet($framework_path.'/lib/jquery.mobile/jquery.mobile.css');
 				$document->addStyleSheet($framework_path.'/photoswipe.css');
-				$document->addScript($framework_path.'/lib/klass.min.js');
-				$document->addScript($framework_path.'/code.photoswipe.jq.min.js');
+				
+				//$document->addScript($framework_path.'/lib/jquery.mobile/jquery.mobile.js');
+				$document->addScript($framework_path.'/lib/simple-inheritance.min.js');
+				//$document->addScript($framework_path.'/lib/jquery.animate-enhanced.min.js');
+				$document->addScript($framework_path.'/code.photoswipe.min.js');
+				
 				$js = "
 				jQuery(document).ready(function() {
-					var myPhotoSwipe = jQuery('.photoswipe_fccontainer a').photoSwipe({ enableMouseWheel: false , enableKeyboard: false }); 
-				}); 
+					var myPhotoSwipe = jQuery('.photoswipe_fccontainer a').photoSwipe(); 
+				});
 				";
 				break;
 			
