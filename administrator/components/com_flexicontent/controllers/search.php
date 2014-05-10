@@ -160,8 +160,8 @@ class FlexicontentControllerSearch extends FlexicontentController
 			$item = null;
 			
 			$lang_query = "SELECT id, language"
-				." FROM #__content"
-				.(!FLEXI_J16GE ? " LEFT JOIN #__flexicontent_items_ext" : "")
+				." FROM #__content AS i "
+				.(!FLEXI_J16GE ? " LEFT JOIN #__flexicontent_items_ext AS ie ON i.id=ie.item_id" : "")
 				." WHERE id IN (".implode(', ',$query_itemids).")"
 				;
 			$db->setQuery($lang_query);

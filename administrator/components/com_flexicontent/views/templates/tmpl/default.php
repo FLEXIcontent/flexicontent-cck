@@ -20,6 +20,28 @@ defined('_JEXEC') or die('Restricted access');
 
 $basetemplates = array('default', 'blog', 'faq', 'items-tabbed', 'presentation');
 $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
+$form_token = FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken();
+$js = "
+jQuery(document).ready(function() {
+	jQuery('a.deletable-template').click(function( event ) {
+		var answer = confirm('".JText::_( 'FLEXI_TEMPLATE_DELETE_CONFIRM',true )."')
+		if (!answer) return;
+		var el = jQuery(this);
+		var tmpl_name = el.attr('id').replace('del-','');
+		
+		el.html('<img src=\"components/com_flexicontent/assets/images/ajax-loader.gif\" align=\"center\">');
+		jQuery.ajax({
+			type: \"GET\",
+			url:  \"index.php?option=com_flexicontent&".$ctrl_task."remove&format=raw&dir=\" + tmpl_name + \"&".$form_token."=1\",
+			success: function(str) {
+				el.parent().css('width','200px');
+				el.parent().html(str);
+			}
+		});
+	});
+});
+";
+JFactory::getDocument()->addScriptDeclaration($js);
 ?>
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
@@ -44,47 +66,30 @@ $ctrl_task = FLEXI_J16GE ? 'task=templates.' : 'controller=templates&task=';
 		$deltmpl = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/layout_delete.png', JText::_( 'FLEXI_REMOVE' ) );
 		$k = 0;
 		$i = 1;
-		$form_token = FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken();
-		foreach ($this->rows as $row) {
+		foreach ($this->rows as $row) :
 			$copylink 	= 'index.php?option=com_flexicontent&amp;view=templates&amp;layout=duplicate&amp;tmpl=component&amp;source='. $row->name;
 			$itemlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=items&amp;folder='.$row->name;
 			$catlink	= 'index.php?option=com_flexicontent&amp;view=template&amp;type=category&amp;folder='.$row->name;
-			if (!in_array($row->name, $basetemplates)) {
-				$dellink 	= '#';
-		?>
-		<script type="text/javascript">
-			jQuery(document).ready(function() {
-				var tmpl_el = jQuery('#<?php echo 'del-'.$row->name ?>');
-				tmpl_el.click(function( event ) {
-					var answer = confirm('<?php echo JText::_( 'FLEXI_TEMPLATE_DELETE_CONFIRM',true ); ?>')
-					if (!answer) return;
-					
-					tmpl_el.html('<td colspan="5" align="center"><img src="components/com_flexicontent/assets/images/ajax-loader.gif" align="center"></td>');
-					jQuery.ajax({
-						type: "GET",
-						url:  "index.php?option=com_flexicontent&<?php echo $ctrl_task;?>remove&format=raw&dir=<?php echo $row->name ?>&<?php echo $form_token; ?>=1",
-						success: function(str) {
-							tmpl_el.html(str);
-						}
-					});
-				});
-			});
-		</script>
-		<?php }	?>
+			?>
 		<tr class="<?php echo "row$k"; ?>" id="<?php echo 'up-'.$row->name ?>">
 			<td><?php echo $i; ?></td>
-			<td align="right"><span style="padding-right: 5px">
-			<a id="<?php echo 'del-' . $row->name ?>" href="<?php echo @$dellink; ?>"><?php if (!in_array($row->name, $basetemplates)) echo $deltmpl; ?></a></span><a class="modal" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>"><?php echo $copytmpl; ?></a></span>
-			<td align="left">
-			<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
+			<td align="right">
+				<?php if (!in_array($row->name, $basetemplates)) :?>
+					<a style="margin-right: 5px" id="<?php echo 'del-' . $row->name ?>" class="deletable-template" href="javascript:;">
+						<?php echo $deltmpl; ?>
+					</a>
+			 	<?php endif; ?>
+				<a class="modal" rel="{handler: 'iframe', size: {x: 390, y: 210}}" href="<?php echo $copylink; ?>">  <?php echo $copytmpl; ?> </a>
 			</td>
+			<td align="left"><?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?></td>
 			<td align="center"><?php echo @$row->items ? ((isset($row->items->positions)) ? '<a href="'.$itemlink.'">'.$editlayout.'</a>' : $noeditlayout) : ''; ?></td>
 			<td align="center"><?php echo @$row->category ? ((isset($row->category->positions)) ? '<a href="'.$catlink.'">'.$editlayout.'</a>' : $noeditlayout) : ''; ?></td>
 		</tr>
 		<?php
 		$k = 1 - $k;
 		$i++;
-		} ?>
+		endforeach;
+		?>
 	</tbody>
 
 	</table>

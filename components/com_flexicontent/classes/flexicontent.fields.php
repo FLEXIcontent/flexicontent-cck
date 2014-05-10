@@ -3175,6 +3175,10 @@ class FlexicontentFields
 			$separatorf = $closetag . $opentag;
 			break;
 
+			case 5:
+			$separatorf = '';
+			break;
+
 			default:
 			$separatorf = '&nbsp;';
 			break;

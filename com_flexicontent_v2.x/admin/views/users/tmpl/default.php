@@ -1,17 +1,17 @@
 <?php defined('_JEXEC') or die('Restricted access'); ?>
 
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 
 function fetchcounter()
 {
-	var url = "index.php?option=com_flexicontent&controller=items&task=getorphans&format=raw";
+	var url = "index.php?option=com_flexicontent&amp;controller=items&amp;task=getorphans&amp;format=raw";
 	var ajax = new Ajax(url, {
 		method: 'get',
 		update: $('count'),
 		onComplete:function(v) {
 			if(v==0)
 				if(confirm("<?php echo JText::_( 'FLEXI_ITEMS_REFRESH_CONFIRM',true ); ?>"))
-					location.href = 'index.php?option=com_flexicontent&view=items';
+					location.href = 'index.php?option=com_flexicontent&amp;view=items';
 		}
 	});
 	ajax.request();
@@ -126,7 +126,7 @@ window.addEvent('domready', function(){
 </script>
 
 <div class="flexicontent">
-<form action="index.php?option=com_flexicontent&controller=users&view=users" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_flexicontent&amp;controller=users&amp;view=users" method="post" name="adminForm" id="adminForm">
 	
 	<table class="adminlist" cellpadding="1">
 		<thead>
@@ -250,7 +250,7 @@ window.addEvent('domready', function(){
 					</div>
 				
 					<div class="limit" style="display: inline-block; margin-left: 24px;">
-						<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+						<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . str_replace('id="limit"', 'id="limit_top"', $this->pagination->getLimitBox()); ?>
 					</div>
 					
 					<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >

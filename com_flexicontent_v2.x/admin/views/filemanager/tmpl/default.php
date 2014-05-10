@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1803 2013-11-05 03:10:36Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1807 2013-11-14 01:43:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -83,7 +83,7 @@ $session = JFactory::getSession();
 								</td>
 								
 								<td class="key">
-									<label for="file-language">
+									<label>
 									<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 									</label>
 								</td>
@@ -94,7 +94,7 @@ $session = JFactory::getSession();
 							
 							<tr>
 								<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_CHOOSE_DIR' ); ?>">
-									<label for="secure">
+									<label>
 									<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
 									</label>
 								</td>
@@ -159,7 +159,7 @@ $session = JFactory::getSession();
 								</td>
 								
 								<td class="key">
-									<label for="file-url-language">
+									<label>
 									<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 									</label>
 								</td>
@@ -200,7 +200,7 @@ $session = JFactory::getSession();
 							
 						</table>
 						
-						<input type="submit" id="file-url-submit" class="fc_button fcsimple" class="validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>"/>
+						<input type="submit" id="file-url-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>"/>
 					</fieldset>
 				</fieldset>
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
@@ -231,7 +231,7 @@ $session = JFactory::getSession();
 								</td>
 								
 								<td class="key">
-									<label for="file-language">
+									<label>
 									<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 									</label>
 								</td>
@@ -273,7 +273,7 @@ $session = JFactory::getSession();
 							
 							<tr>
 								<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_KEEP_ORIGINAL_FILE_DESC' ); ?>">
-									<label for="secure">
+									<label>
 									<?php echo JText::_( 'FLEXI_KEEP_ORIGINAL_FILE' ); ?>
 									</label>
 								</td>
@@ -286,7 +286,7 @@ $session = JFactory::getSession();
 							
 							<tr>
 								<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_CHOOSE_DIR' ); ?>">
-									<label for="secure">
+									<label>
 									<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
 									</label>
 								</td>
@@ -299,7 +299,7 @@ $session = JFactory::getSession();
 							
 						</table>
 						
-						<input type="submit" id="file-dir-submit" class="fc_button fcsimple" class="validate" value="<?php echo JText::_( 'FLEXI_ADD_DIR' ); ?>"/>
+						<input type="submit" id="file-dir-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_DIR' ); ?>"/>
 					</fieldset>
 				</fieldset>
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
@@ -318,7 +318,7 @@ $session = JFactory::getSession();
 			<td align="left">
 				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
 				<?php echo $this->lists['filter']; ?>
-				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
+				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onchange="document.adminForm.submit();" />
 				<div id="fc-filter-buttons">
 					<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
 					<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
@@ -353,7 +353,7 @@ $session = JFactory::getSession();
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="5"><input type="checkbox" name="toggle" value="" onClick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+			<th width="5"><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th width="5"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_FILE_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -422,7 +422,7 @@ $session = JFactory::getSession();
 			
 			$file_path    = str_replace('\\', '/', $file_path);
 			if ( empty($thumb_or_icon) ) {
-				$thumb_or_icon = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&w=60&h=60';
+				$thumb_or_icon = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&amp;w=60&amp;h=60';
 				$thumb_or_icon = "<img src=\"$thumb_or_icon\" alt=\"$filename\" />";
 			}
 			
@@ -520,16 +520,17 @@ $session = JFactory::getSession();
 					<?php echo count($row->itemids); ?>
 					<a href="<?php echo $items_list; ?>">
 					[<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>]
+					</a>
 				<?php endif; ?>
 			</td>
 			<td align="center">
-<?php if ($permissions->CanAuthors) { ?>
+			<?php if ($permissions->CanAuthors) :?>
 				<a target="_blank" href="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task_authors; ?>edit&amp;hidemainmenu=1&amp;cid[]=<?php echo $row->uploaded_by; ?>">
 					<?php echo $row->uploader; ?>
 				</a>
-<?php } else { ?>
+			<?php else :?>
 				<?php echo $row->uploader; ?>
-<?php } ?>
+			<?php endif; ?>
 			</td>
 			<td align="center"><?php echo JHTML::Date( $row->uploaded, JText::_( 'DATE_FORMAT_LC2' ) ); ?></td>
 			<td align="center"><?php echo $row->id; ?></td>

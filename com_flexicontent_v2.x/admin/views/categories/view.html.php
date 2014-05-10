@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1887 2014-04-24 23:53:14Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1900 2014-05-03 07:25:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -73,6 +73,12 @@ class FlexicontentViewCategories extends JViewLegacy
 		FLEXISubmenu('CanCats');
 		
 		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_CATEGORIES' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'fc_categories' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
 		// ******************
 		// Create the toolbar
 		// ******************
@@ -80,7 +86,6 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		$contrl = FLEXI_J16GE ? "categories." : "";
 		$contrl_singular = FLEXI_J16GE ? "category." : "";
-		JToolBarHelper::title( JText::_( 'FLEXI_CATEGORIES' ), 'fc_categories' );
 		$toolbar = JToolBar::getInstance('toolbar');
 		
 		// Copy Parameters
@@ -90,13 +95,13 @@ class FlexicontentViewCategories extends JViewLegacy
 			$js .= "
 				$$('li#toolbar-params a.toolbar, #toolbar-params button')
 					.set('onclick', 'javascript:;')
-					.set('href', '".$popup_load_url."')
+					.set('href', '". $popup_load_url ."')
 					.set('rel', '{handler: \'iframe\', size: {x: 600, y: 440}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
 			JHtml::_('behavior.modal', 'li#toolbar-params a.toolbar, #toolbar-params button');
 		} else {
-			$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), $popup_load_url, 600, 440);
+			$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), str_replace('&', '&amp;', $popup_load_url), 600, 440);
 		}
 		//if (FLEXI_J16GE)
 		//	$toolbar->appendButton('Popup', 'move', JText::_('FLEXI_COPY_MOVE'), JURI::base().'index.php?option=com_flexicontent&amp;view=categories&amp;layout=batch&amp;tmpl=component', 800, 440);
@@ -138,8 +143,16 @@ class FlexicontentViewCategories extends JViewLegacy
 		
 		$add_divider = false;
 		if ( !FLEXI_J16GE || ( $filter_state == -2 && $user->authorise('core.delete', 'com_flexicontent') ) ) {
-			JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
-			//JToolBarHelper::deleteList('', $contrl.'delete', 'JTOOLBAR_EMPTY_TRASH');
+			//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+			// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
+			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
+			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
+			$btn_task    = $contrl.'remove';
+			$extra_js    = "";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+			
 			$add_divider = true;
 		}
 		elseif ( $user->authorise('core.edit.state', 'com_flexicontent') ) {

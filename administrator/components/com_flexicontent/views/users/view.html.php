@@ -120,12 +120,28 @@ class FlexicontentViewUsers extends JViewLegacy
 		
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanAuthors');
-
-		//create the toolbar
+		
+		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_AUTHORS' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'authors' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		$contrl = FLEXI_J16GE ? "users." : "";
-		JToolBarHelper::title( JText::_( 'FLEXI_AUTHORS' ), 'authors' );
 		JToolBarHelper::custom( 'logout', 'cancel.png', 'cancel_f2.png', 'Logout' );
-		JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
+		
+		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+		// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
+		$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
+		$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
+		$btn_task    = $contrl.'remove';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+		
 		JToolBarHelper::addNew($contrl.'add');
 		JToolBarHelper::editList($contrl.'edit');
 		JToolBarHelper::divider(); JToolBarHelper::spacer();

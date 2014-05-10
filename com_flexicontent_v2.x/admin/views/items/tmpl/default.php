@@ -29,8 +29,8 @@ global $globalcats;
 $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 $limit = $this->pagination->limit;
 $ctrl  = FLEXI_J16GE ? 'items.' : '';
-$items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
-$cats_task  = FLEXI_J16GE ? 'task=category.' : 'controller=categories&task=';
+$items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
+$cats_task  = FLEXI_J16GE ? 'task=category.' : 'controller=categories&amp;task=';
 
 $db 			= JFactory::getDBO();
 $config		= JFactory::getConfig();
@@ -38,7 +38,7 @@ $nullDate	= $db->getNullDate();
 $user 		= JFactory::getUser();
 
 $enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
-$autologin = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+$autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
 $items_list_cols = 15;
 if ( FLEXI_J16GE || FLEXI_FISH ) {
@@ -54,10 +54,10 @@ $image_zoom = '<img src="components/com_flexicontent/assets/images/monitor_go.pn
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
 	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_ENABLED_TIP', true).'" />' .' ';
-	$drag_handle_box = '<div class="fc_drag_handle%s" alt="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE').'" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
+	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 } else {
 	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_DISABLED_TIP', true).'" />' .' ';
-	$drag_handle_box = '<div class="fc_drag_handle %s" alt="'.JText::_('FLEXI_ORDER_COLUMN_FIRST').'" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
+	$drag_handle_box = '<div class="fc_drag_handle %s" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
 	$image_saveorder    = '';
 }
 $categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.'::'.JText::_('MAIN category shown in bold', true).'" />';
@@ -86,11 +86,11 @@ if (FLEXI_J16GE) {
 	$tz_offset = $site_zone;
 }
 ?>
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 
 function fetchcounter(el_id, task_name)
 {
-	var url = "index.php?option=com_flexicontent&<?php echo $items_task; ?>"+task_name+"&tmpl=component&format=raw";
+	var url = "index.php?option=com_flexicontent&amp;<?php echo $items_task; ?>"+task_name+"&amp;tmpl=component&amp;format=raw";
 	if(MooTools.version>="1.2.4") {
 		new Request.HTML({
 			url: url,
@@ -364,13 +364,13 @@ window.addEvent('domready', function() {
 	<div class="fc_nice_box" style="">
 		
 		<div style="float:left; margin-right:12px;">
-		<label class="label" for="filter_catsinstate"><?php echo '&nbsp;'.JText::_( 'FLEXI_LIST_ITEMS_WITH_STATE' ); ?></label>
+		<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_LIST_ITEMS_WITH_STATE' ); ?></label>
 		<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="::<?php echo JText::_('FLEXI_LIST_ITEMS_WITH_STATE_DESC', true); ?>" style="vertical-align:middle;" />
 		<?php echo $this->lists['filter_stategrp']; ?>
 		</div>
 		
 		<div style="float:left;">
-		<label class="label" for="filter_catsinstate"><?php echo '&nbsp;'.JText::_( 'FLEXI_LIST_ITEMS_IN_CATS' ); ?></label>
+		<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_LIST_ITEMS_IN_CATS' ); ?></label>
 		<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="::<?php echo JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true); ?>" style="vertical-align:middle;" />
 		<span class="radio"><?php echo $this->lists['filter_catsinstate']; ?></span>
 		</div>
@@ -383,7 +383,7 @@ window.addEvent('domready', function() {
 				<?php echo JText::_( 'FLEXI_NUM' ); ?>
 			</th>
 			<th class="center" style="width:24px;">
-				<input type="checkbox" name="toggle" value="" onClick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" />
+				<input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" />
 			</th>
 			<th class="center" style="width:24px;">&nbsp;</th>
 			<th class="left hideOnDemandClass">
@@ -441,7 +441,7 @@ window.addEvent('domready', function() {
 	   <?php foreach($this->extra_fields as $field) :?>
 			<th class="center hideOnDemandClass">
 				<?php echo $field->label; ?>
-			</td>
+			</th>
 		<?php endforeach; ?>
 
 			<th width="<?php echo $this->CanOrder ? '' : ''; ?>" class="center hideOnDemandClass">
@@ -550,7 +550,7 @@ window.addEvent('domready', function() {
 					<span style="color:darkgreen;" class="fc_nice_box" id="fcorder_notes_box"><?php echo JText::_('FLEXI_FCORDER_USE_CATEGORY_FILTER'); ?></span>
 				<?php endif; ?>
 				<?php echo $ordering_type_tip; ?>
-				<label class="label" for="filter_order_type"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
+				<label class="label"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
 				<div class="clear"></div>
 				<?php echo $this->lists['filter_order_type']; ?>
 			</td>
@@ -559,13 +559,13 @@ window.addEvent('domready', function() {
 			<td class="left col_cats">
 				<?php echo $this->lists['filter_cats']; ?>
 				<div class="clear"></div>
-				<label class="label" for="filter_subcats"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
+				<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
 				<div class="clear"></div>
 				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
 				<?php if (!$this->filter_order_type && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
-					<br/><span style="color:darkgreen;" class="fc-mssg-inline fc-note" id=""><?php echo JText::_('Joomla order, GROUPING BY main category'); ?></span>
+					<br/><span style="color:darkgreen;" class="fc-mssg-inline fc-note"><?php echo JText::_('Joomla order, GROUPING BY main category'); ?></span>
 				<?php elseif ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
-					<br/><span style="color:darkgreen;" class="fc-mssg-inline fc-note" id=""><?php echo JText::_('Grouping by first listed category'); ?></span>
+					<br/><span style="color:darkgreen;" class="fc-mssg-inline fc-note"><?php echo JText::_('Grouping by first listed category'); ?></span>
 				<?php endif; ?>
 			</td>
 			<td class="left col_created col_revised" colspan="2">
@@ -593,7 +593,7 @@ window.addEvent('domready', function() {
 				-->
 				
 				<div class="limit" style="display: inline-block; margin-left: 24px;">
-					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . str_replace('id="limit"', 'id="limit_top"', $this->pagination->getLimitBox()); ?>
 				</div>
 				
 				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
@@ -656,7 +656,7 @@ window.addEvent('domready', function() {
 		
 	</tfoot>
 
-	<tbody id="<?php echo $ordering_draggable && $this->CanOrder && $this->ordering ? 'sortable_fcitems' : ''; ?>">
+	<tbody <?php echo $ordering_draggable && $this->CanOrder && $this->ordering ? 'id="sortable_fcitems"' : ''; ?> >
 		<?php
 		$k = 0;
 		if (FLEXI_J16GE)
@@ -706,7 +706,7 @@ window.addEvent('domready', function() {
 				$publish_down->setOffset($tz_offset);
 			}
 
-			$link = 'index.php?option=com_flexicontent&'.$items_task.'edit&cid[]='. $row->id;
+			$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 
 			if (FLEXI_J16GE) {
 				if (($canEdit || $canEditOwn) && $this->CanAccLvl) {
@@ -748,7 +748,9 @@ window.addEvent('domready', function() {
 			<td align="center"><?php echo $cid_checkbox; ?></td>
 			<td align="center">
 				<?php
-				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug), 0, $row) .'&preview=1' .$autologin;
+				$item_link = str_replace('&', '&amp;', FlexicontentHelperRoute::getItemRoute($row->id.':'.$row->alias, $globalcats[$row->catid]->slug, 0, $row));
+				$item_link = JRoute::_(JURI::root().$item_link, $xhtml=false);  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
+				$previewlink = $item_link .'&amp;preview=1' .$autologin;
 				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
 				?>
 			</td>
@@ -847,7 +849,7 @@ window.addEvent('domready', function() {
 					foreach($this->lang_assocs[$row->lang_parent_id] as $assoc_item) {
 						if ($assoc_item->id==$row->id) continue;
 
-						$_link  = 'index.php?option=com_flexicontent&'.$items_task.'edit&cid[]='. $assoc_item->id;
+						$_link  = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $assoc_item->id;
 						$_title = JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION', true ).':: ['. $assoc_item->lang .'] '. $assoc_item->title;
 						echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
 						//echo $assoc_item->id;
@@ -922,8 +924,8 @@ window.addEvent('domready', function() {
 					<span><?php echo $this->pagination->orderDownIcon( $i, $n, $show_orderDown, $ctrl.'orderdown', 'Move Down', $this->ordering );?></span>
 				<?php endif; ?>
 
-				<?php $disabled = $this->ordering ?  '' : '"disabled=disabled"'; ?>
-				<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" <?php echo $disabled; ?> class="text_area" style="text-align: center" />
+				<?php $disabled = $this->ordering ?  '' : 'disabled="disabled"'; ?>
+				<input class="fcitem_order_no" type="text" name="order[]" size="5" value="<?php echo $row->$ord_col; ?>" <?php echo $disabled; ?> style="text-align: center" />
 
 				<input type="hidden" name="item_cb[]" style="display:none;" value="<?php echo $row->id; ?>" />
 				<input type="hidden" name="ord_catid[]" style="display:none;" value="<?php echo $row->$ord_catid; ?>" />
@@ -976,7 +978,7 @@ window.addEvent('domready', function() {
 					if ( $ix==0 && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering') )
 						$typeofcats .= ' orderingcat';
 					$typeofcats .= $isMainCat ? ' maincat' : ' secondarycat';
-					$catlink	= 'index.php?option=com_flexicontent&'.$cats_task.'edit&cid[]='. $category->id;
+					$catlink	= 'index.php?option=com_flexicontent&amp;'.$cats_task.'edit&amp;cid[]='. $category->id;
 					$title = htmlspecialchars($category->title, ENT_QUOTES, 'UTF-8');
 					if ($this->CanCats) :
 				?>

@@ -59,8 +59,14 @@ class FlexicontentViewTemplates extends JViewLegacy
 		//Create Submenu
 		FLEXISubmenu('CanTemplates');
 		
-		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_TEMPLATES' ), 'templates' );
+		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_TEMPLATES' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'templates' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		//JToolBarHelper::Back();
 		if ($perms->CanConfig) {
 			//JToolBarHelper::divider(); JToolBarHelper::spacer();

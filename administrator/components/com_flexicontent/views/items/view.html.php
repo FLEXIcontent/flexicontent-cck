@@ -160,10 +160,17 @@ class FlexicontentViewItems extends JViewLegacy {
 		$CanCopy		= $perms->CanCopy;
 		$CanArchives= $perms->CanArchives;
 		
+		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('notvariable');
-
-		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_ITEMS' ), 'items' );
+		
+		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_ITEMS' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'items' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		$toolbar = JToolBar::getInstance('toolbar');
 		
 		$add_divider = false;
@@ -197,8 +204,8 @@ class FlexicontentViewItems extends JViewLegacy {
 		// Implementation of multiple-item state selector
 		$add_divider = false;
 		if ( $CanPublish || $CanPublishOwn ) {
-			$btn_task = FLEXI_J16GE ? '&task=items.selectstate' : '&controller=items&task=selectstate';
-			$popup_load_url = JURI::base().'index.php?option=com_flexicontent'.$btn_task.'&format=raw';
+			$btn_task = FLEXI_J16GE ? '&amp;task=items.selectstate' : '&amp;controller=items&amp;task=selectstate';
+			$popup_load_url = JURI::base().'index.php?option=com_flexicontent'.$btn_task.'&amp;format=raw';
 			if (FLEXI_J30GE) {  // Layout of Popup button broken in J3.1, add manually
 				$js .= "
 					$$('li#toolbar-publish a.toolbar, #toolbar-publish button')
@@ -254,7 +261,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$add_divider = false;
 		if ($CanAdd) {
 			$btn_task = FLEXI_J16GE ? 'items.add' : 'add';
-			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=types&format=raw';
+			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&amp;view=types&amp;format=raw';
 			if (FLEXI_J30GE) {  // Layout of Popup button broken in J3.1, add manually
 				$js .= "
 					$$('li#toolbar-new a.toolbar, #toolbar-new button')
@@ -394,7 +401,7 @@ class FlexicontentViewItems extends JViewLegacy {
 			$lists['filter_stategrp'] = '';
 			foreach ($stategroups as $i => $v) {
 				$checked = $filter_stategrp == $i ? ' checked="checked" ' : '';
-				$lists['filter_stategrp'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_stategrp'.$i.'" name="filter_stategrp">';
+				$lists['filter_stategrp'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_stategrp'.$i.'" name="filter_stategrp" />';
 				$lists['filter_stategrp'] .= '<label class="" id="filter_stategrp'.$i.'-lbl" for="filter_stategrp'.$i.'">'.$v.'</label>';
 			}
 		}
@@ -423,7 +430,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$lists['filter_catsinstate']  = '';
 		foreach ($catsinstate as $i => $v) {
 			$checked = $filter_catsinstate == $i ? ' checked="checked" ' : '';
-			$lists['filter_catsinstate'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_catsinstate'.$i.'" name="filter_catsinstate">';
+			$lists['filter_catsinstate'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_catsinstate'.$i.'" name="filter_catsinstate" />';
 			$lists['filter_catsinstate'] .= '<label class="" id="filter_catsinstate'.$i.'-lbl" for="filter_catsinstate'.$i.'">'.$v.'</label>';
 		}
 		
@@ -457,7 +464,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$lists['scope']  = '';
 		foreach ($scopes as $i => $v) {
 			$checked = $scope == $i ? ' checked="checked" ' : '';
-			$lists['scope'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="scope'.$i.'" name="scope">';
+			$lists['scope'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="scope'.$i.'" name="scope" />';
 			$lists['scope'] .= '<label class="" id="scope'.$i.'-lbl" for="scope'.$i.'">'.$v.'</label>';
 		}
 		
@@ -472,7 +479,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$lists['date']  = '';
 		foreach ($dates as $i => $v) {
 			$checked = $date == $i ? ' checked="checked" ' : '';
-			$lists['date'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="date'.$i.'" name="date">';
+			$lists['date'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="date'.$i.'" name="date" />';
 			$lists['date'] .= '<label class="" id="date'.$i.'-lbl" for="date'.$i.'">'.$v.'</label>';
 		}
 		
@@ -594,14 +601,19 @@ class FlexicontentViewItems extends JViewLegacy {
 		
 		//$perms 	= FlexicontentHelperPerm::getPerm();
 		
-		//create the toolbar
+		
+		// Create document/toolbar titles
 		$copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 		if ($copy_behaviour == 'translate') {
-			$page_title =  JText::_( 'FLEXI_TRANSLATE_ITEM' );
+			$doc_title =  JText::_( 'FLEXI_TRANSLATE_ITEM' );
 		} else {
-			$page_title = JText::_( 'FLEXI_COPYMOVE_ITEM' );
+			$doc_title = JText::_( 'FLEXI_COPYMOVE_ITEM' );
 		}
-		JToolBarHelper::title( $page_title, 'itemadd' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'itemadd' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		JToolBarHelper::save(FLEXI_J16GE ? 'items.copymove' : 'copymove');
 		JToolBarHelper::cancel(FLEXI_J16GE ? 'items.cancel' : 'cancel');
 

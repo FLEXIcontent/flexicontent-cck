@@ -149,17 +149,12 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		$model = $this->getModel('templates');
 		
 		if (!$model->delete($dir)) {
-			echo '<td colspan="5" align="center">';
 			echo JText::sprintf( 'FLEXI_TEMPLATE_FAILED_DELETE', $dir );
-			echo '</td>';
 			return;
 		} else {
 			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');
 			$tmplcache->clean();
-
-			echo '<td colspan="5" align="center">';
 			echo '<span class="copyok">'.JText::sprintf( 'FLEXI_TEMPLATE_DELETED', $dir ).'</span>';
-			echo '</td>';
 		}
 	}
 

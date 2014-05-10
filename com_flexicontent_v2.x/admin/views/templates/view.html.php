@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1577 2012-12-02 15:10:44Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1869 2014-03-12 12:18:40Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -59,8 +59,14 @@ class FlexicontentViewTemplates extends JViewLegacy
 		//Create Submenu
 		FLEXISubmenu('CanTemplates');
 		
-		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_TEMPLATES' ), 'templates' );
+		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_TEMPLATES' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'templates' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		//JToolBarHelper::Back();
 		if ($perms->CanConfig) {
 			//JToolBarHelper::divider(); JToolBarHelper::spacer();

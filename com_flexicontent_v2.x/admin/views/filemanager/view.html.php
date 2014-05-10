@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1803 2013-11-05 03:10:36Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1869 2014-03-12 12:18:40Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -79,7 +79,13 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// **************************
 		FLEXISubmenu('CanFiles');
 		
-		JToolBarHelper::title( JText::_( 'FLEXI_FILEMANAGER' ), 'files' );
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_FILEMANAGER' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'files' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		if (FLEXI_J16GE) {
 			JToolBarHelper::deleteList('Are you sure?', 'filemanager.remove');
 		} else {

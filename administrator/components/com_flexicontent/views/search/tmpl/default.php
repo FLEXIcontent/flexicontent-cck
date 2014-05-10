@@ -18,10 +18,10 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
+$items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 ?>
 
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 
 // the function overloads joomla standard event
 function submitform(pressbutton)
@@ -102,9 +102,9 @@ function delAllFilters() {
 				<td class="left"></td>
 				<td class="left" colspan="3">
 					<?php echo '<label class="label'.($this->f_active['search_itemtitle'] ? " highlight":"").'">'.JText::_('FLEXI_TITLE').'</label> '; ?>
-					<input type="text" name="search_itemtitle" id="search_itemtitle" value="<?php echo $this->lists['search_itemtitle']; ?>" class="text_area" onChange="document.adminForm.submit();" size="30"/>
+					<input type="text" name="search_itemtitle" id="search_itemtitle" value="<?php echo $this->lists['search_itemtitle']; ?>" class="text_area" onchange="document.adminForm.submit();" size="30"/>
 					<?php echo '<label class="label'.($this->f_active['search_itemid'] ? " highlight":"").'">'.JText::_('FLEXI_ID').'</label> '; ?>
-					<input type="text" name="search_itemid" id="search_itemid" value="<?php echo $this->lists['search_itemid']; ?>" class="text_area" onChange="document.adminForm.submit();" size="6" />
+					<input type="text" name="search_itemid" id="search_itemid" value="<?php echo $this->lists['search_itemid']; ?>" class="text_area" onchange="document.adminForm.submit();" size="6" />
 					<br/>
 					<?php echo '<label class="label'.($this->f_active['filter_itemtype'] ? " highlight":"").'">'.JText::_('FLEXI_TYPE_NAME').'</label> '; ?>
 					<?php echo $this->lists['filter_itemtype']; ?>
@@ -120,7 +120,7 @@ function delAllFilters() {
 				<td class="left"></td>
 				<td class="left col_search_index">
 					<?php echo '<label class="label'.($this->f_active['search_index'] ? " highlight":"").'">'.JText::_('FLEXI_FILTER').'</label> '; ?><br/>
-					<input type="text" name="search_index" id="search_index" value="<?php echo $this->lists['search_index']; ?>" class="text_area" onChange="document.adminForm.submit();" />
+					<input type="text" name="search_index" id="search_index" value="<?php echo $this->lists['search_index']; ?>" class="text_area" onchange="document.adminForm.submit();" />
 				</td>
 				<td class="left"></td>
 			</tr>
@@ -131,7 +131,7 @@ function delAllFilters() {
 					<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
 				
 					<div class="limit" style="display: inline-block; margin-left: 24px;">
-						<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+						<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . str_replace('id="limit"', 'id="limit_top"', $this->pagination->getLimitBox()); ?>
 					</div>
 					
 					<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
@@ -141,10 +141,6 @@ function delAllFilters() {
 					<span class="fc_pages_counter">
 						<?php echo $this->pagination->getPagesCounter(); ?>
 					</span>
-					
-					<?php if (isset($this->lists['filter_stategrp'])) : ?>
-						<span class="radio flexi_tabbox" style="margin-left:60px;"><?php echo '<span class="flexi_tabbox_label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_stategrp']; ?></span>
-					<?php endif; ?>
 	
 					<div class='fc_mini_note_box' style='float:right; clear:both!important;'>
 					<span class="radio flexi_tabbox" style="margin-left:60px;"><?php echo '<span class="flexi_tabbox_label">'.JText::_('FLEXI_LISTING_RECORDS').': </span>'.$this->lists['filter_indextype']; ?></span>
@@ -164,6 +160,15 @@ function delAllFilters() {
 
 
 		</thead>
+		
+		<tfoot>
+			<tr>
+				<td colspan="9" nowrap="nowrap">
+					<?php echo $this->pagination->getListFooter(); ?>
+				</td>
+			</tr>
+		</tfoot>
+		
 		<tbody>
 
 			
@@ -195,7 +200,7 @@ function delAllFilters() {
 				<td>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->title; ?>">
 					<?php
-						$link = 'index.php?option=com_flexicontent&'.$items_task.'edit&cid[]='. $row->id;
+						$link = 'index.php?option=com_flexicontent&amp;'.$items_task.'edit&amp;cid[]='. $row->id;
 						echo '<a target="_blank" href="'.$link.'">'.$this->escape($row->title).'</a>';
 					?>
 					</span>
@@ -231,13 +236,6 @@ function delAllFilters() {
 			<?php $n++; $o = ++$o % 2; ?>
 			<?php endforeach; ?>
 		</tbody>
-		<tfoot>
-			<tr>
-				<td colspan="9" nowrap="nowrap">
-					<?php echo $this->pagination->getListFooter(); ?>
-				</td>
-			</tr>
-		</tfoot>
 	</table>
 
 	<input type="hidden" name="task" value="display" />

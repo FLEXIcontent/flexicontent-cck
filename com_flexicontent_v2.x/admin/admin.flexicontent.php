@@ -138,7 +138,7 @@ if ( file_exists( JPATH_COMPONENT.DS.'controllers'.DS.$view.'.php' ) ) {
 	// Views/Layouts that can be called without a forced controller task (and without redirect to them, these must contain permission checking)
 	$view_to_ctrl = array(
 		'type'=>'types', 'item'=>'items', 'field'=>'fields', 'tag'=>'tags',
-		'category'=>'categories', 'user'=>'users', 'file'=>'filemanager'
+		'category'=>'categories', 'user'=>'users', 'file'=>'filemanager', 'group'=>'groups'
 	);
 	if ( isset($view_to_ctrl[$view]) ) {
 		$controller = $view_to_ctrl[$view];
@@ -158,12 +158,16 @@ JRequest::setVar('task', $task);   //echo "$controller -- $task <br/>\n";
 // Files needed for user groups manager
 // ************************************
 
-if (FLEXI_J16GE && ($view=='group' || $view=='groups' || $ctrlname=='group' || $ctrlname=='groups') ) {
+if (FLEXI_J16GE && ( $view=='group' || $ctrlname=='group'   || $view=='groups' || $ctrlname=='groups'   || $view=='debuggroup' || $ctrlname=='debuggroup') ) {
 	// Load english language file for 'com_users' component then override with current language file
 	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);
 	JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, null, true);
 	// users helper file
-	require_once (JPATH_COMPONENT_SITE.DS.'helpers'.DS.'users.php');
+	require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'helpers'.DS.'users.php');
+}
+if (FLEXI_J16GE && ($view=='debuggroup' || $ctrlname=='debuggroup') ) {
+	// users helper file
+	require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'helpers'.DS.'debug.php');
 }
 
 

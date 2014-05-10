@@ -66,7 +66,14 @@ class FlexicontentViewStats extends JViewLegacy
 		// **************************
 		FLEXISubmenu('CanStats');
 		
-		JToolBarHelper::title( JText::_( 'FLEXI_STATISTICS' ), 'stats' );
+		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_STATISTICS' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'stats' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		//JToolBarHelper::Back();
 		if ($perms->CanConfig) {
 			//JToolBarHelper::divider(); JToolBarHelper::spacer();

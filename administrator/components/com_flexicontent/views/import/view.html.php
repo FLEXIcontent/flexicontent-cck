@@ -61,24 +61,30 @@ class FlexicontentViewImport extends JViewLegacy
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 
-		//get vars
+		// Get filter vars
 		$filter_order		= $mainframe->getUserStateFromRequest( $context.'.import.filter_order', 		'filter_order', 	'', 	'cmd' );
 		$filter_order_Dir	= $mainframe->getUserStateFromRequest( $context.'.import.filter_order_Dir',	'filter_order_Dir',	'', 		'word' );
-
-		// Get User's Global Permissions
-		$perms = FlexicontentHelperPerm::getPerm();
-
-		// Create Submenu (and also check access to current view)
-		FLEXISubmenu('CanImport');
 		
+		// Get session information
 		$session = JFactory::getSession();
 		$conf   = $session->get('csvimport_config', "", 'flexicontent');
 		$conf		= unserialize( $conf ? zlib_decode(base64_decode($conf)) : "" );
 		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 		$session->set('csvimport_parse_log', null, 'flexicontent');
 		
-		//create the toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_CONTENT_IMPORT_TASK' ), 'import' );
+		// Get User's Global Permissions
+		$perms = FlexicontentHelperPerm::getPerm();
+		
+		// Create Submenu (and also check access to current view)
+		FLEXISubmenu('CanImport');
+		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_IMPORT' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'import' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		$toolbar = JToolBar::getInstance('toolbar');
 		
 		if ( !empty($conf) ) {
