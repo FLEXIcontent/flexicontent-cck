@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1887 2014-04-24 23:53:14Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1900 2014-05-03 07:25:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -172,15 +172,13 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$missingversion		= !$use_versioning || !$model->checkCurrentVersionData();
 			
 			$initialpermission = FLEXI_J16GE ? $model->checkInitialPermission() : true;
+			
+			// Check if old field positions were converted
+			$model->getFieldsPositions();
 		}
 		
-		// 4. SILENTLY CHECKED and EXECUTED TASKs WITHOUT ALERTING THE USER
-		$model->getFieldsPositions();
 		
-		//build toolbar
-		JToolBarHelper::title( JText::_( 'FLEXI_DASHBOARD' ), 'flexicontent' );
-
-		//add css and submenu to document
+		// Add custom css and js to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
@@ -197,9 +195,20 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 				 .install-notok { background: url(components/com_flexicontent/assets/images/delete.png) 0% 50% no-repeat transparent; padding:1px 0; width: 20px; height:16px; display:block; float:left;}';		
 		$document->addStyleDeclaration($css);
 		
+		
+		//Create Submenu
+		FLEXISubmenu('notvariable');
+		
+		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_DASHBOARD' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'flexicontent' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		// Get User's Global Permissions
 		$perms = FlexicontentHelperPerm::getPerm();
-
 		if (version_compare(PHP_VERSION, '5.0.0', '>')) {
 			$js = "window.addEvent('domready', function(){";
 			
@@ -210,7 +219,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 					$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
 				}
 				
-				$btn_task = '';
+				/*$btn_task = '';
 				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=language&tmpl=component';
 				if (FLEXI_J16GE) {
 					$js .= "
@@ -222,8 +231,8 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 					JToolBarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
 					JHtml::_('behavior.modal', 'li#toolbar-language a.toolbar, #toolbar-language button');
 				} else {
-					$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), $popup_load_url, 800, 500);
-				}
+					$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), str_replace('&', '&amp;', $popup_load_url), 800, 500);
+				}*/
 				
 				$session = JFactory::getSession();
 				$fc_screen_width = (int) $session->get('fc_screen_width', 0, 'flexicontent');
@@ -236,10 +245,6 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			$js .= "});";
 			$document->addScriptDeclaration($js);
 		}
-		
-		
-		//Create Submenu
-		FLEXISubmenu('notvariable');
 		
 		// Lists
 		jimport('joomla.filesystem.folder');

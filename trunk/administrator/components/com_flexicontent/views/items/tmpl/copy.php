@@ -54,13 +54,6 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 							endif;
 						endforeach;
 						?>
-						<tr>
-							<td>
-								<ul>
-								</ul>
-							</td>
-							<td></td>
-						</tr>
 					</tbody>
 				</table>
 			</fieldset>

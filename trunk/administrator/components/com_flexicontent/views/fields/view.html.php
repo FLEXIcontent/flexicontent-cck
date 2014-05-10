@@ -88,13 +88,19 @@ class FlexicontentViewFields extends JViewLegacy
 		
 		// Create Submenu and check access
 		FLEXISubmenu('CanFields');
-
-		//create the toolbar
+		
+		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_FIELDS' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'fields' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		$contrl = FLEXI_J16GE ? "fields." : "";
-		JToolBarHelper::title( JText::_( 'FLEXI_FIELDS' ), 'fields' );
 		if ($perms->CanCopyFields) {
 			JToolBarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
-			JToolBarHelper::custom( $contrl.'copy_wvalues', 'copy.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
+			JToolBarHelper::custom( $contrl.'copy_wvalues', 'copy_wvalues.png', 'copy_f2.png', 'FLEXI_COPY_WITH_VALUES' );
 			JToolBarHelper::divider();
 		}
 		JToolBarHelper::publishList($contrl.'publish');
@@ -106,29 +112,40 @@ class FlexicontentViewFields extends JViewLegacy
 			JToolBarHelper::editList($contrl.'edit');
 		}
 		if ($perms->CanDeleteField) {
-			JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
+			//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+			// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
+			$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
+			$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
+			$btn_task    = $contrl.'remove';
+			$extra_js    = "";
+			flexicontent_html::addToolBarButton(
+				'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+				$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
 		}
 		
 		JToolBarHelper::divider(); JToolBarHelper::spacer();
-		$toggle_icon = FLEXI_J16GE ? 'refresh' : 'apply';
+		$toggle_icon = 'basicindex';
 		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='issearch';";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_TEXT_SEARCHABLE', $toggle_icon, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
 		
+		$toggle_icon = 'basicfilter';
 		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isfilter';";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_FILTERABLE', $toggle_icon, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
 		
+		$toggle_icon = 'advindex';
 		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isadvsearch';";
 		flexicontent_html::addToolBarButton(
 			'FLEXI_TOGGLE_ADV_TEXT_SEARCHABLE', $toggle_icon, $full_js='', $msg_alert=JText::_('FLEXI_SELECT_FIELDS_TO_TOGGLE_PROPERTY'), $msg_confirm='',
 			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=false);
 		
+		$toggle_icon = 'advfilter';
 		$btn_task    = FLEXI_J16GE ? 'fields.toggleprop' : 'toggleprop';
 		$extra_js    = "document.getElementById('adminForm').elements['propname'].value='isadvfilter';";
 		flexicontent_html::addToolBarButton(
@@ -172,7 +189,8 @@ class FlexicontentViewFields extends JViewLegacy
 		}
 		
 		$lists['fftype'] = JHTML::_('select.genericlist', $fftype, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
-
+		if (!FLEXI_J16GE) $lists['fftype'] = str_replace('<optgroup label="">', '</optgroup>', $lists['fftype']);
+		
 		//build arphaned/assigned filter
 		$assigned 	= array();
 		$assigned[] = JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_FIELDS' ) .' -' );

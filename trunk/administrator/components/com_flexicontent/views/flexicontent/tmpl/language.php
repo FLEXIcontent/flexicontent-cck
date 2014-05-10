@@ -156,7 +156,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 							</label>
 						</td>
 						<td>
-							<input id="myname" name="myname" class="required" value="<?php echo $this->fromname; ?>" size="50" maxlength="100" />
+							<input id="myname" name="myname" class="required" value="<?php echo $this->fromname; ?>" size="40" maxlength="100" />
 						</td>
 					</tr>
 					<tr>
@@ -166,7 +166,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 							</label>
 						</td>
 						<td>
-							<input id="myemail" name="myemail" class="required" value="<?php echo $this->mailfrom; ?>" size="50" maxlength="100" />
+							<input id="myemail" name="myemail" class="required" value="<?php echo $this->mailfrom; ?>" size="40" maxlength="100" />
 						</td>
 					</tr>
 					<tr>
@@ -176,7 +176,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 							</label>
 						</td>
 						<td>
-							<input id="website" name="website" class="required" value="<?php echo $this->website; ?>" size="50" maxlength="100" />
+							<input id="website" name="website" class="required" value="<?php echo $this->website; ?>" size="40" maxlength="100" />
 						</td>
 					</tr>
 					<tr>
@@ -218,16 +218,16 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 					<tr>
 						<th style="text-align:left;" colspan="2">
-							<label class="flexi_label" style="width: auto !important; max-width: 400px !important;">
+							<label class="flexi_label" style="width: auto !important; max-width:400px !important;">
 								<?php echo JText::_( 'FLEXI_SEND_LANGUAGE_MISSING_FILES_TITLE' ); ?>
 							</label>
 						</th>
 					</tr>
 					<tr>
 						<td>
-							<div id="log" style="width:330px; display:block;">
+							<div id="log" style="width:320px; display:block;">
 								<?php if ( !is_array($this->lists['missing_lang']) ) : ?>
-									<div id="log" style="width:330px; display:block;"><?php echo $this->lists['missing_lang']; ?>
+									<div id="log" style="width:320px; display:block;"><?php echo $this->lists['missing_lang']; ?>
 								<?php else : ?>
 									<?php
 									$missing = & $this->lists['missing_lang'];

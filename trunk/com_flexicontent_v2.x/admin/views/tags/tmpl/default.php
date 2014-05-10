@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1502 2012-09-30 17:26:18Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1807 2013-11-14 01:43:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -20,9 +20,14 @@ defined('_JEXEC') or die('Restricted access');
 
 $user      = JFactory::getUser();
 $cparams   = JComponentHelper::getParams( 'com_flexicontent' );
-$autologin = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+$autologin = $cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
-$image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
+
+$attribs_preview = ' style="float:right;" class="hasTip" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this category in a new browser window" ';
+
+$image_preview = FLEXI_J16GE ?
+	JHTML::image( 'components/com_flexicontent/assets/images/'.'monitor_go.png', JText::_('FLEXI_PREVIEW'),  $attribs_preview) :
+	JHTML::_('image.site', 'monitor_go.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_('FLEXI_PREVIEW'), $attribs_preview) ;
 ?>
 
 <div class="flexicontent">
@@ -32,7 +37,7 @@ $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets
 		<tr>
 			<td align="left">
 				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
-				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
+				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onchange="document.adminForm.submit();" />
 				<div id="fc-filter-buttons">
 					<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
 					<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
@@ -40,7 +45,7 @@ $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets
 			</td>
 			<td nowrap="nowrap">
 				<div class="limit" style="display: inline-block;">
-					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . str_replace('id="limit"', 'id="limit_top"', $this->pagination->getLimitBox()); ?>
 				</div>
 				
 				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
@@ -52,8 +57,10 @@ $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets
 				</span>
 			</td>
 			<td style="text-align:right;">
-				<?php echo $this->lists['assigned']; ?>
-				<?php echo $this->lists['state']; ?>
+				<div class="filter-select fltrt">
+					<?php echo $this->lists['assigned']; ?>
+					<?php echo $this->lists['state']; ?>
+				</div>
 			</td>
 		</tr>
 	</table>
@@ -62,7 +69,7 @@ $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="5"><input type="checkbox" name="toggle" value="" onClick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+			<th width="5"><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th width="1%" nowrap="nowrap">&nbsp;</th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_TAG_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="30%"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 't.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -101,8 +108,10 @@ $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets
 			<td width="7"><?php echo $checked; ?></td>
 			<td width="1%" >
 				<?php
-				$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getTagRoute($row->id)) . $autologin;
-				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_zoom.'</a>';
+				$tag_link    = str_replace('&', '&amp;', FlexicontentHelperRoute::getTagRoute($row->id));
+				$tag_link    = JRoute::_(JURI::root().$tag_link, $xhtml=false);  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
+				$previewlink = $tag_link . $autologin;
+				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
 				?>
 			</td>
 			<td align="left">
@@ -137,13 +146,15 @@ $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets
 				} else {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_ITEM' );?>::<?php echo $row->name; ?>">
-					<a href="<?php echo $link; ?>">
-					<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
-					</a></span>
+						<a href="<?php echo $link; ?>">
+						<?php echo htmlspecialchars($row->name, ENT_QUOTES, 'UTF-8'); ?>
+						</a>
+					</span>
 				<?php
 				}
 				?>
 			</td>
+			
 			<td>
 				<?php
 				if (JString::strlen($row->alias) > 25) {
@@ -163,7 +174,7 @@ $image_zoom = '<img style="float:right;" src="components/com_flexicontent/assets
 	</tbody>
 
 	</table>
-
+	
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="tags" />

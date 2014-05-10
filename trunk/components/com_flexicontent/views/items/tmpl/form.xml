@@ -84,11 +84,11 @@
 				<option value="1">FLEXI_PARAMETERS_ITEM_BASIC</option>
 				<option value="2">FLEXI_PARAMETERS_ITEM_ADVANCED</option>
 			</field>
-			<field name="selecttheme_fe" type="list" default="" label="FLEXI_MENU_THEME_SELECTION" description="FLEXI_MENU_THEME_SELECTION_DESC" menu="hide">
+			<field name="selecttheme_fe" type="list" default="" label="FLEXI_MENU_TEMPLATE_SELECTION" description="FLEXI_MENU_TEMPLATE_SELECTION_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_MENU_YES_SELECT_THEME</option>
-				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_THEME</option>
+				<option value="1">FLEXI_MENU_YES_SELECT_TEMPLATE</option>
+				<option value="2">FLEXI_MENU_YES_SELECT_CONFIGURE_TEMPLATE</option>
 			</field>
 			
 		

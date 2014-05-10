@@ -1428,10 +1428,10 @@ table.admintable td {
 /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_4, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_5, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_6,
 /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_7, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_8, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_9,
 /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_10, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_11, /*#flexicontent.fctypeNN*/ a#fc_subtitle_tabset_nav_12 {
-	background-image: url(../images/information.png) !important;
+	/*background-image: url(../images/information.png) !important;*/
 	background-position: 1px 2px !important;
 	background-repeat: no-repeat !important;
-	padding-left: 20px !important;
+	/*padding-left: 20px !important;*/
 }
 
 /*#flexicontent.fctypeNN*/ #fc_bottom_tabset ul.tabbernav li a {  padding-left: 20px;  }
@@ -1439,10 +1439,10 @@ table.admintable td {
 /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_4, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_5, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_6,
 /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_7, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_8, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_9,
 /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_10, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_11, /*#flexicontent.fctypeNN*/ a#fc_bottom_tabset_nav_12 {
-	background-image: url(../images/information.png) !important;
+	/*background-image: url(../images/information.png) !important;*/
 	background-position: 1px 2px !important;
 	background-repeat: no-repeat !important;
-	padding-left: 20px !important;
+	/*padding-left: 20px !important;*/
 }
 
 

@@ -47,14 +47,11 @@ window.addEvent('domready', function(){
 <form action="index.php?option=com_flexicontent&".$ctrl_task."import&layout=import&<?php echo FLEXI_J16GE ? 'format=raw' : 'tmpl=component';?>" method="post" name="adminForm" id="adminForm">
 
 	<fieldset>
-		<legend>
+		<legend style="font-size:12px; font-style:arial;" >
 			<?php echo JText::_( 'FLEXI_IMPORT_TAGS' ); ?>
-			<span class="editlinktip hasTip tags" title="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_DESC' ); ?>" style="text-decoration: none; color: #333;">
-				<img src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
-			</span>
+			<img class="editlinktip hasTip tags" title="<?php echo JText::_( 'FLEXI_IMPORT_TAGS_DESC' ); ?>" style="float:none; margin:0 0 -4px 4px;" src="components/com_flexicontent/assets/images/information.png" border="0" alt="Note"/>
 		</legend>
-		<?php echo FLEXI_J16GE ? '<br />' : ''; ?>
-		<textarea id="taglist" name="taglist" rows="20" cols="52"></textarea>
+		<textarea id="taglist" name="taglist" rows="20" cols="51" style="font-size:11px; font-style:arial;"></textarea>
 	</fieldset>
 	<table width="100%" align="center">
 		<tr>

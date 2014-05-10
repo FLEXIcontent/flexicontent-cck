@@ -240,7 +240,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 			<?php
 			$title = JText::_( 'FLEXI_PENDING_SLIDER' )." (".count($this->pending)."/".$this->totalrows['pending'].")";
 			echo FLEXI_J16GE ? JHtml::_('sliders.panel', $title, 'pending' ) : $this->pane->startPanel( $title, 'pending' );
-			$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=PE';
+			$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=PE';
 			echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 			?>
 				<table class="adminlist">
@@ -248,7 +248,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
 						<td><?php echo JText::_('FLEXI_CREATED'); ?></td>
 						<td><?php echo JText::_('FLEXI_AUTHOR'); ?></td>
-					<tr>
+					</tr>
 			<?php
 					$k = 0;
 					$n = count($this->pending);
@@ -296,7 +296,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				<?php
 				$title = JText::_( 'FLEXI_REVISED_VER_SLIDER' )." (".count($this->revised)."/".$this->totalrows['revised'].")";
 				echo FLEXI_J16GE ? JHtml::_('sliders.panel', $title, 'revised' ) : $this->pane->startPanel( $title, 'revised' );
-				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=RV';
+				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=RV';
 				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
 				<table class="adminlist">
@@ -304,7 +304,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
 						<td><?php echo JText::_('FLEXI_MODIFIED'); ?></td>
 						<td><?php echo JText::_('FLEXI_NF_MODIFIER'); ?></td>
-					<tr>
+					</tr>
 			<?php
 					$k = 0;
 					$n = count($this->revised);
@@ -354,7 +354,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				echo FLEXI_J16GE ?
 					JHtml::_('sliders.panel', $title, 'inprogress' ) :
 					$this->pane->startPanel( $title, 'inprogress' );
-				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=IP';
+				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=IP';
 				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
 				<table class="adminlist">
@@ -362,7 +362,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
 						<td><?php echo JText::_('FLEXI_CREATED'); ?></td>
 						<td><?php echo JText::_('FLEXI_AUTHOR'); ?></td>
-					<tr>
+					</tr>
 			<?php
 					$k = 0;
 					$n = count($this->inprogress);
@@ -412,7 +412,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 				echo FLEXI_J16GE ?
 					JHtml::_('sliders.panel', $title, 'draft' ) : 
 					$this->pane->startPanel( $title, 'draft' );
-				$show_all_link = 'index.php?option=com_flexicontent&view=items&filter_state=OQ';
+				$show_all_link = 'index.php?option=com_flexicontent&amp;view=items&amp;filter_state=OQ';
 				echo "<div style='text-align:right;'><a href='$show_all_link' style='color:darkred;font-weight:bold;'>Show All</a></div>";
 				?>
 				<table class="adminlist">
@@ -420,7 +420,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						<td><?php echo JText::_('FLEXI_TITLE'); ?></td>
 						<td><?php echo JText::_('FLEXI_CREATED'); ?></td>
 						<td><?php echo JText::_('FLEXI_AUTHOR'); ?></td>
-					<tr>
+					</tr>
 			<?php
 					$k = 0;
 					$n = count($this->draft);
@@ -461,7 +461,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 						<td><?php echo $row->creator; ?></td>
 					</tr>
 					<?php $k = 1 - $k; } ?>
-				</table>		
+				</table>
 				<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 				
 				

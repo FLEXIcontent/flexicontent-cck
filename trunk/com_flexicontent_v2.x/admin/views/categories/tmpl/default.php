@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1807 2013-11-14 01:43:15Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1901 2014-05-07 02:37:25Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -27,8 +27,7 @@ if (FLEXI_J16GE) {
 
 $user      = JFactory::getUser();
 $cparams   = JComponentHelper::getParams( 'com_flexicontent' );
-$autologin = $cparams->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
-
+$autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
 $attribs_preview = ' style="float:right;" class="hasTip" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this category in a new browser window" ';
 $attribs_rsslist = ' style="float:right;" class="hasTip" title="'.JText::_('FLEXI_FEED')   .':: Click to display the frontend RSS listing of this category in a new browser window" ';
@@ -51,7 +50,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 		<tr>
 			<td align="left">
 				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
-				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onChange="document.adminForm.submit();" />
+				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onchange="document.adminForm.submit();" />
 				<div id="fc-filter-buttons">
 					<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
 					<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
@@ -59,7 +58,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			</td>
 			<td nowrap="nowrap">
 				<div class="limit" style="display: inline-block;">
-					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . str_replace('id="limit"', 'id="limit_top"', $this->pagination->getLimitBox()); ?>
 				</div>
 				
 				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
@@ -86,12 +85,12 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 	<thead>
 		<tr>
 			<th width="5"><?php echo JText::_( 'FLEXI_NUM' ); ?></th>
-			<th width="5"><input type="checkbox" name="toggle" value="" onClick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
+			<th width="5"><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th width="1%" nowrap="nowrap">&nbsp;</th>
 			<th width="1%" nowrap="nowrap">&nbsp;</th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_CATEGORY', 'c.title', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="20%"><?php echo JHTML::_('grid.sort', 'FLEXI_ALIAS', 'c.alias', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th width=""><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
+			<th><?php echo JText::_( 'FLEXI_TEMPLATE' ); ?></th>
 			<th width="10%"><?php echo JHTML::_('grid.sort', 'FLEXI_ITEMS_ASSIGNED', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width="7%"><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 'c.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -184,15 +183,15 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			<td width="7"><?php echo $checked; ?></td>
 			<td width="1%" >
 				<?php
-				$cat_link    = FlexicontentHelperRoute::getCategoryRoute($row->id);
-				$previewlink = JRoute::_(JURI::root().$cat_link). $autologin;
-				$rsslink     = JRoute::_(JURI::root().$cat_link.'&format=feed&type=rss');
+				$cat_link    = str_replace('&', '&amp;', FlexicontentHelperRoute::getCategoryRoute($row->id));
+				$cat_link    = JRoute::_(JURI::root().$cat_link, $xhtml=false);  // xhtml to false we do it manually above (at least the ampersand) also it has no effect because we prepended the root URL ?
+				$previewlink = $cat_link . $autologin;
 				echo '<a class="preview" href="'.$previewlink.'" target="_blank">'.$image_preview.'</a>';
 				?>
 			</td>
 			<td width="1%" >
 				<?php
-				$rsslink     = JRoute::_(JURI::root().$cat_link.'&format=feed&type=rss');
+				$rsslink     = $cat_link . '&amp;format=feed&amp;type=rss';
 				echo '<a class="preview" href="'.$rsslink.'" target="_blank">'.$image_rsslist.'</a>';
 				?>
 			</td>
@@ -228,9 +227,10 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				} else {
 				?>
 					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_CATEGORY', true );?>::<?php echo $row->alias; ?>">
-					<a href="<?php echo $link; ?>">
-					<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
-					</a></span>
+						<a href="<?php echo $link; ?>">
+						<?php echo htmlspecialchars($row->title, ENT_QUOTES, 'UTF-8'); ?>
+						</a>
+					</span>
 				<?php
 				}
 				?>
@@ -238,7 +238,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				<?php	if (!empty($row->note)) : /* Display J1.6+ category note in a tooltip */ ?>
 					<span class="hasTip" title="<?php echo JText::_ ( 'FLEXI_NOTES', true ); ?>::<?php echo $this->escape($row->note);?>">
 						<?php echo $infoimage; ?>
-					</span
+					</span>
 				<?php endif; ?>
 				
 			</td>
@@ -259,6 +259,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				<?php echo $row->nrassigned?>
 				<a href="<?php echo $items; ?>">
 				[<?php echo JText::_( 'FLEXI_VIEW_ITEMS' );?>]
+				</a>
 			</td>
 			<td align="center">
 				<?php echo $published; ?>
@@ -272,6 +273,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<span><?php echo $this->pagination->orderUpIcon($i, isset($this->ordering[$row->parent_id][$orderkey - 1]), 'categories.orderup', 'JLIB_HTML_MOVE_UP', $this->orderingx); ?></span>
 					<span><?php echo $this->pagination->orderDownIcon($i, $this->pagination->total, isset($this->ordering[$row->parent_id][$orderkey + 1]), 'categories.orderdown', 'JLIB_HTML_MOVE_DOWN', $this->orderingx); ?></span>
 				<?php endif; ?>
+				
 				<?php $disabled = $saveOrder ?  '' : 'disabled="disabled"'; ?>
 				<input type="text" name="order[]" size="5" value="<?php echo $orderkey + 1;?>" <?php echo $disabled ?> class="text-area-order" />
 				<?php $originalOrders[] = $orderkey + 1; ?>
@@ -300,12 +302,12 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 	</tbody>
 
 	</table>
-  
-  <sup>[1]</sup> Params not saved yet, default values will be used.
-  
+	
+	<sup>[1]</sup> Params not saved yet, default values will be used.
+	
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
-	<!---input type="hidden" name="controller" value="categories" /--->
+	<!---input type="hidden" name="controller" value="categories" /-->
 	<input type="hidden" name="view" value="categories" />
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />

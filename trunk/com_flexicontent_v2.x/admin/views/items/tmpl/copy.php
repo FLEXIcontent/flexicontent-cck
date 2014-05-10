@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: copy.php 1319 2012-05-26 19:27:51Z ggppdk $
+ * @version 1.5 stable $Id: copy.php 1738 2013-08-24 17:42:17Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -54,13 +54,6 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 							endif;
 						endforeach;
 						?>
-						<tr>
-							<td>
-								<ul>
-								</ul>
-							</td>
-							<td></td>
-						</tr>
 					</tbody>
 				</table>
 			</fieldset>

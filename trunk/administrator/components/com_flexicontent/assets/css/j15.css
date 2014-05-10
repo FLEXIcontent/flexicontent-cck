@@ -46,9 +46,14 @@
 .icon-32-params				{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
 .icon-32-import				{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-upload.png); }
 .icon-32-duplicate		{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
+.icon-32-copy_wvalues	{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-copy.png); }
 .icon-32-preview			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-preview.png); }
+
 .icon-32-basicindex		{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-refresh.png); }
+.icon-32-basicfilter	{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-refresh.png); }
 .icon-32-advindex			{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-refresh.png); }
+.icon-32-advfilter		{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-refresh.png); }
+
 .icon-32-advindexdirty	{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-refresh.png); }
 .icon-32-advindexpurge	{ background-image: url(../../../../templates/khepri/images/toolbar/icon-32-purge.png); }
 

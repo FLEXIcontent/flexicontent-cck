@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: import.php 1782 2013-10-08 22:47:51Z ggppdk $
+ * @version 1.5 stable $Id: import.php 1883 2014-04-09 17:49:21Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -19,18 +19,34 @@
 defined('_JEXEC') or die('Restricted access');
 
 $params = $this->cparams;
-?>
-<script type="text/javascript">
-<?php if (FLEXI_J16GE) echo "Joomla.submitform = "; ?>
+$document	= JFactory::getDocument();
+
+// Add some CSS to the doc header
+$document->addStyleDeclaration("
+#adminForm table fieldset.fleximport ul {
+	padding: 0px 0px 0px 24px;
+	margin: 12px 0px 12px 0px;
+}
+#adminForm table fieldset.fleximport li {
+	list-style: disc inside none !important;
+	margin: 0 !important;
+	padding: 1px 0 0 8px !important;
+}
+");
+
+
+// Add form validation JS to the doc header
+$document->addScriptDeclaration("
+".(FLEXI_J16GE ? 'Joomla.submitform = ' : '')."
 
 function submitbutton(task) {
 	if(task=='cancel') {
 		submitform(task);
 		return;
 	}
-	if(!$("type_id").value) {
-		alert("Please select item type.");
-		$("type_id").focus();
+	if(!$('type_id').value) {
+		alert('Please select item type.');
+		$('type_id').focus();
 		return;
 	}
 
@@ -41,7 +57,7 @@ function submitbutton(task) {
 		}
 	}
 	if( !radio_ischecked ) {
-		alert("Please select item language.");
+		alert('Please select item language.');
 		return;
 	}
 
@@ -52,52 +68,56 @@ function submitbutton(task) {
 		}
 	}
 	if( !radio_ischecked ) {
-		alert("Please select item state.");
+		alert('Please select item state.');
 		return;
 	}
 
-	if( $("maincat").value.length<=0 && !$("maincat_col").checked ) {
-		alert("Please select a primary category or select to use 'catid' column");
-		$("maincat").focus();
+	if( $('maincat').value.length<=0 && !$('maincat_col').checked ) {
+		alert('Please select a primary category or select to use \'catid\' column');
+		$('maincat').focus();
 		return;
 	}
-	if($("field_separator").value=="") {
-		alert("Please select your FLEXIcontent field separator string e.g ~~");
-		$("csvfile").focus();
+	if($('field_separator').value=='') {
+		alert('Please select your FLEXIcontent field separator string e.g ~~');
+		$('csvfile').focus();
 		return;
 	}
-	if($("record_separator").value=="") {
-		alert("Please select your FLEXIcontent item separator string e.g \n~~");
-		$("csvfile").focus();
+	if($('record_separator').value=='') {
+		alert('Please select your FLEXIcontent item separator string e.g \\n~~');
+		$('csvfile').focus();
 		return;
 	}
-	if($("csvfile").value=="") {
-		alert("Please select your csv file that you want to import.");
-		$("csvfile").focus();
+	if($('csvfile').value=='') {
+		alert('Please select your csv file that you want to import.');
+		$('csvfile').focus();
 		return;
 	}
 	submitform(task);
 }
-</script>
+");
+?>
+
 <div class="flexicontent" id="flexicontent">
 
 <form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm">
 	<table cellspacing="10" cellpadding="0" border="0" width="100%">
 		
 		<tr>
-			<td value="top" colspan="2">
+			<td valign="top" colspan="2">
 			<div style="width:95%; text-align:right; clear:both; float:right;">
 				<a href="#tools_3rd_party" ><?php echo JText::_( 'FLEXI_3RD_PARTY_DEV_IMPORT_EXPORT_TOOLS' ); ?></a>
 			</div>
 			<fieldset style="width:99%">
 				<legend><?php echo JText::_( 'FLEXI_IMPORT_TYPE_AND_CORE_PROPS_LEGEND' ); ?></legend>
 				<table class="fcimporttbl" >
+					
 					<tr valign="top">
 						<td class="key"><label class="fckey" for="type_id"><?php echo JText::_("FLEXI_ITEM_TYPE");?><span style="color:red;"> *</span></label></td>
 						<td class="fcimportdata">
 							<?php echo $this->lists['type_id'];?>
 						</td>
 					</tr>
+					
 					<tr valign="top">
 						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_IMPORT_IGNORE_UNUSED_COLUMNS");?></label></td>
 						<td class="fcimportdata">
@@ -109,19 +129,22 @@ function submitbutton(task) {
 							<label for="ignore_unused_cols"><?php echo JText::_( 'FLEXI_IMPORT_IGNORE_REDUDANT_COLS' ); ?></label>
 						</td>
 					</tr>
+					
 					<tr valign="top">
 						<td class="key"> &nbsp; </td>
 						<td class="fcimportdata">-------------------------------</td>
 					</tr>
+					
 					<tr valign="top">
 						<td class="key"> &nbsp; </td>
 						<td class="fcimportdata"><span style="color:darkgreen; font-weight:bold;"><?php echo JText::_("FLEXI_IMPORT_CUSTOM_COLS");?></span></td>
 					</tr>
+					
 					<tr valign="top">
 						<td class="key"> &nbsp; </td>
 						<td class="fcimportdata">-------------------------------</td>
 					</tr>
-
+					
 					<tr valign="top">
 						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_IMPORT_CUSTOM_ITEM_ID");?></label></td>
 						<td class="fcimportdata">
@@ -133,21 +156,23 @@ function submitbutton(task) {
 							<label for="id_col"><?php echo JText::_("FLEXI_IMPORT_USE_ID_COL");?></label>
 						</td>
 					</tr>
+					
 					<tr valign="top">
-						<td class="key"><label class="fckey" for="language"><?php echo JText::_("FLEXI_LANGUAGE");?><span style="color:red;"> *</span></label></td>
+						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_LANGUAGE");?><span style="color:red;"> *</span></label></td>
 						<td class="fcimportdata">
 							<?php echo str_replace('<br />', '', $this->lists['languages']); ?>
 						</td>
 					</tr>
+					
 					<tr valign="top">
-						<td class="key"><label class="fckey" for="state"><?php echo JText::_("FLEXI_STATE");?></label></td>
+						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_STATE");?></label></td>
 						<td class="fcimportdata">
 							<?php echo str_replace('<br />', '', $this->lists['states']); ?>
 						</td>
 					</tr>
 					
 					<tr valign="top">
-						<td class="key"><label class="fckey" for="created_col"><?php echo JText::_("FLEXI_CREATION_DATE");?></label></td>
+						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_CREATION_DATE");?></label></td>
 						<td class="fcimportdata">
 							<?php
 								$dv = $params->get('import_created_col', 0);
@@ -161,8 +186,9 @@ function submitbutton(task) {
 							<label for="created_col1">b. <?php echo JText::_("FLEXI_IMPORT_CREATION_USE_COL");?></label>
 						</td>
 					</tr>
+					
 					<tr valign="top">
-						<td class="key"><label class="fckey" for="created_by_col"><?php echo JText::_("FLEXI_CREATOR_AUTHOR");?></label></td>
+						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_CREATOR_AUTHOR");?></label></td>
 						<td class="fcimportdata">
 							<?php
 								$dv = $params->get('import_created_by_col', 0);
@@ -178,7 +204,7 @@ function submitbutton(task) {
 					</tr>
 					
 					<tr valign="top">
-						<td class="key"><label class="fckey" for="modified_col"><?php echo JText::_("FLEXI_MODIFICATION_DATE");?></label></td>
+						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_MODIFICATION_DATE");?></label></td>
 						<td class="fcimportdata">
 							<?php
 								$dv = $params->get('import_modified_col', 0);
@@ -192,8 +218,9 @@ function submitbutton(task) {
 							<label for="modified_col1">b. <?php echo JText::_("FLEXI_IMPORT_MODIFICATION_USE_COL");?></label>
 						</td>
 					</tr>
+					
 					<tr valign="top">
-						<td class="key"><label class="fckey" for="modified_by_col"><?php echo JText::_("FLEXI_MODIFIER");?></label></td>
+						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_MODIFIER");?></label></td>
 						<td class="fcimportdata">
 							<?php
 								$dv = $params->get('import_modified_by_col', 0);
@@ -221,6 +248,8 @@ function submitbutton(task) {
 							<input type="checkbox" id="metakey_col" name="metakey_col" value="1" <?php echo $_key_checked; ?> />
 							<label for="metakey_col"><?php echo JText::_("FLEXI_IMPORT_USE_METAKEY_COL");?></label>
 						</td>
+					</tr>
+					
 					<tr valign="top">
 						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_PUBLICATION_DATES");?></label></td>
 						<td class="fcimportdata">
@@ -236,6 +265,7 @@ function submitbutton(task) {
 							<label for="publish_down_col"><?php echo JText::_("FLEXI_IMPORT_USE_PUBLISH_DOWN_COL");?></label>
 						</td>
 					</tr>
+					
 					<tr valign="top">
 						<td class="key"><label class="fckey"><?php echo JText::_("FLEXI_TAGS");?></label></td>
 						<td class="fcimportdata">
@@ -256,6 +286,7 @@ function submitbutton(task) {
 							<label for="tags_col2">c. <?php echo JText::_("FLEXI_IMPORT_USE_TAG_IDS_COL");?></label>
 						</td>
 					</tr>
+					
 				</table>
 			</fieldset>
 			</td>
@@ -283,7 +314,6 @@ function submitbutton(task) {
 							<td class="fcimportdata">&nbsp;</td>
 							<td class="key" align="left">
 								<label class="fckey" for="seccats_col" style="clear:both;"><?php echo JText::_( 'FLEXI_IMPORT_FILE_OVERRIDE' ); ?> <?php echo JText::_( 'FLEXI_SECONDARY_CATEGORIES' ); ?></label>
-							</td>
 							</td>
 							<td class="fcimportdata">
 								<input type="checkbox" id="seccats_col" name="seccats_col" value="1" /> <label for="seccats_col">(Use 'cid' column, e.g. 54,14,51)</label>
@@ -457,8 +487,9 @@ function submitbutton(task) {
 			</fieldset>
 			</td>
 		</tr>
+		
 		<tr>
-			<td value="top" width="">
+			<td valign="top" width="">
 				<fieldset class="fleximport" style="min-height:220px; background-color:white;">
 					<legend style="color:darkred; background-color:white;" ><?php echo JText::_( 'FLEXI_3RD_PARTY_DEV_IMPORT_EXPORT_TOOLS' ); ?></legend>
 					<a id="tools_3rd_party"></a>
@@ -466,6 +497,7 @@ function submitbutton(task) {
 				</fieldset>
 			</td>
 		</tr>
+		
 	</table>
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="controller" value="import" />
@@ -474,14 +506,3 @@ function submitbutton(task) {
 	<?php echo JHTML::_( 'form.token' ); ?>
 </form>
 </div>
-<style>
-#adminForm table fieldset.fleximport ul {
-	padding: 0px 0px 0px 24px;
-	margin: 12px 0px 12px 0px;
-}
-#adminForm table fieldset.fleximport li {
-	list-style: disc inside none !important;
-	margin: 0 !important;
-	padding: 1px 0 0 8px !important;
-}
-</style>

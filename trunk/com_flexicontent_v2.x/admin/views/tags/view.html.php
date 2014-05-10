@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1577 2012-12-02 15:10:44Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1889 2014-04-26 03:25:28Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -63,11 +63,18 @@ class FlexicontentViewTags extends JViewLegacy
 
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanTags');
-
-		//create the toolbar
+		
+		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_TAGS' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'tags' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		$js = "window.addEvent('domready', function(){";
 		
-		JToolBarHelper::title( JText::_( 'FLEXI_TAGS' ), 'tags' );
+		$contrl = FLEXI_J16GE ? "tags." : "";
 		$toolbar = JToolBar::getInstance('toolbar');
 		if ($perms->CanConfig) {
 			$btn_task = '';
@@ -82,23 +89,26 @@ class FlexicontentViewTags extends JViewLegacy
 				JToolBarHelper::custom( $btn_task, 'import.png', 'import_f2.png', 'FLEXI_IMPORT', false );
 				JHtml::_('behavior.modal', 'li#toolbar-import a.toolbar, #toolbar-import button');
 			} else {
-				$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), $popup_load_url, 430, 500);
+				$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), str_replace('&', '&amp;', $popup_load_url), 430, 500);
 			}
 			JToolBarHelper::divider();  JToolBarHelper::spacer();
 		}
-		if (FLEXI_J16GE) {
-			JToolBarHelper::publishList('tags.publish');
-			JToolBarHelper::unpublishList('tags.unpublish');
-			JToolBarHelper::addNew('tags.add');
-			JToolBarHelper::editList('tags.edit');
-			JToolBarHelper::deleteList('Are you sure?', 'tags.remove');
-		} else {
-			JToolBarHelper::publishList();
-			JToolBarHelper::unpublishList();
-			JToolBarHelper::addNew();
-			JToolBarHelper::editList();
-			JToolBarHelper::deleteList();
-		}
+		
+		JToolBarHelper::publishList($contrl.'publish');
+		JToolBarHelper::unpublishList($contrl.'unpublish');
+		JToolBarHelper::addNew($contrl.'add');
+		JToolBarHelper::editList($contrl.'edit');
+		
+		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+		// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
+		$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
+		$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
+		$btn_task    = $contrl.'remove';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+		
 		if ($perms->CanConfig) {
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			$session = JFactory::getSession();

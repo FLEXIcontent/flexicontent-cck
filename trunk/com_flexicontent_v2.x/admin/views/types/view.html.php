@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1869 2014-03-12 12:18:40Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1889 2014-04-26 03:25:28Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -68,16 +68,32 @@ class FlexicontentViewTypes extends JViewLegacy
 		// Create Submenu (and also check access to current view)
 		FLEXISubmenu('CanTypes');
 
-		//create the toolbar
+		
+		// Create document/toolbar titles
+		$doc_title = JText::_( 'FLEXI_TYPES' );
+		$site_title = $document->getTitle();
+		JToolBarHelper::title( $doc_title, 'types' );
+		$document->setTitle($doc_title .' - '. $site_title);
+		
+		// Create the toolbar
 		$contrl = FLEXI_J16GE ? "types." : "";
-		JToolBarHelper::title( JText::_( 'FLEXI_TYPES' ), 'types' );
 		JToolBarHelper::custom( $contrl.'copy', 'copy.png', 'copy_f2.png', 'FLEXI_COPY' );
 		JToolBarHelper::divider(); JToolBarHelper::spacer();
 		JToolBarHelper::publishList($contrl.'publish');
 		JToolBarHelper::unpublishList($contrl.'unpublish');
 		JToolBarHelper::addNew($contrl.'add');
 		JToolBarHelper::editList($contrl.'edit');
-		JToolBarHelper::deleteList('Are you sure?', $contrl.'remove');
+		
+		//JToolBarHelper::deleteList(JText::_('FLEXI_ARE_YOU_SURE'), $contrl.'remove');
+		// This will work in J2.5+ too and is offers more options (above a little bogus in J1.5, e.g. bad HTML id tag)
+		$msg_alert   = JText::sprintf( 'FLEXI_SELECT_LIST_ITEMS_TO', JText::_('FLEXI_DELETE') );
+		$msg_confirm = JText::_('FLEXI_ITEMS_DELETE_CONFIRM');
+		$btn_task    = $contrl.'remove';
+		$extra_js    = "";
+		flexicontent_html::addToolBarButton(
+			'FLEXI_DELETE', 'delete', '', $msg_alert, $msg_confirm,
+			$btn_task, $extra_js, $btn_list=true, $btn_menu=true, $btn_confirm=true);
+		
 		if ($perms->CanConfig) {
 			JToolBarHelper::divider(); JToolBarHelper::spacer();
 			$session = JFactory::getSession();
