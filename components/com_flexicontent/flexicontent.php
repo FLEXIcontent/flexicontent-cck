@@ -66,6 +66,12 @@ if ( $print_logging_info ) {
 //include constants file
 require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
 
+// Enable printing of notices,etc, except strict if error_reporting is enabled
+if( !FLEXI_J16GE && error_reporting() && ini_get('display_errors') /*&& in_array($_SERVER['HTTP_HOST'], array('localhost', '127.0.0.1'))*/ ) { 
+	error_reporting(E_ALL & ~E_STRICT);
+	//ini_set('display_errors',1);  // ... check above that this is enabled already
+}
+
 //include the needed classes and helpers
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.categories.php');
@@ -239,6 +245,7 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	if (isset($fc_run_times['execute_main_query']))
 		$msg .= sprintf('<br/>-- [Query: item LISTING: %.2f s] ', $fc_run_times['execute_main_query']/1000000);
 	
+	// **** BOF: FRONTEND SPECIFIC
 	if (isset($fc_run_times['item_counting_sub_cats']))
 		$msg .= sprintf('<br/>-- [Queries: SUB-cats item COUNTING : %.2f s] ', $fc_run_times['item_counting_sub_cats']/1000000);
 	
@@ -247,6 +254,7 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	
 	if (isset($fc_run_times['execute_alphaindex_query']))
 		$msg .= sprintf('<br/>-- [Query: ALPHA-index creation: %.2f s] ', $fc_run_times['execute_alphaindex_query']/1000000);
+	// **** EOF: FRONTEND SPECIFIC
 	
 	// **** BOF: ITEM FORM SAVING
 	if (isset($fc_run_times['onAfterSaveField_event']) && $fc_run_times['onAfterSaveField_event']/1000000 >= 0.01)
@@ -316,8 +324,14 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	
 	if (count($fields_render_times)) {
 		$msg .= sprintf('<br/><br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
-		$msg .= '<br/>FIELD: '.implode('<br/> FIELD: ', $fields_render_times).'';
-		if (count($filters_creation_times)) $msg .= '<br/>';
+		$msg .= '<br/>';
+		foreach($fields_render_times as $i => $_time) {
+			$msg .= 
+				'<div style="white-space:nowrap; float:left;'.($i%3==0 ? 'clear:both !important;' : '').'">'.
+					$fields_render_times[$i].
+				'</div>';
+		}
+		$msg .= '<br/><div class="fcclear"></div>';
 	}
 	
 	// **********************
@@ -326,9 +340,14 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	
 	if (count($filters_creation_times)) {
 		$msg .= sprintf('<br/>-- [FC Filters Creation: %.2f s] ', $filters_creation_total/1000000);
-		if ( isset($fc_run_times['create_filter_init']) )
-			$msg .= sprintf('<br/>FACETED FILTER(s) INIT: %.2f s ', $fc_run_times['create_filter_init']/1000000);
-		$msg .= '<br/>FILTER: '.implode('<br/> FILTER: ', $filters_creation_times).'<br/><br/>';
+		
+		$msg .= '<br/>';
+		foreach($filters_creation_times as $i => $_time) {
+			$msg .= 
+				'<div style="white-space:nowrap; float:left;'.($i%3==0 ? 'clear:both !important;' : '').'" >'.
+					$filters_creation_times[$i].
+				'</div>';
+		}
 	}
 	
 	$msg .= '</span>';
@@ -336,12 +355,13 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	
 	// SYSTEM PLGs
 	if (isset($fc_run_times['auto_checkin_auto_state']))
-		$msg = sprintf('<br/><small>** [Flexisystem PLG: Auto Checkin/Auto state(e.g. archive): %.2f s] ', $fc_run_times['auto_checkin_auto_state']/1000000) .'</small><br/>'.$msg;
+		$msg = sprintf('** [Flexisystem PLG: Auto Checkin/Auto state(e.g. archive): %.2f s] ', $fc_run_times['auto_checkin_auto_state']/1000000) .'<br/>'.$msg.'<br/>';
 	
 	if (isset($fc_run_times['global_field_replacements']))
-		$msg = sprintf('<br/><small>** [Flexisystem PLG: Replace Field Times: %.2f s] ', $fc_run_times['global_field_replacements']/1000000) .'</small><br/>'.$msg;
+		$msg = sprintf('** [Flexisystem PLG: Replace Field Times: %.2f s] ', $fc_run_times['global_field_replacements']/1000000) .'<br/>'.$msg.'<br/>';
 	
-	$app->enqueueMessage( $msg, 'notice' );
+	global $fc_performance_msg;
+	$fc_performance_msg .= $msg . '<div class="fcclear"></div>';
 }
 unset ($is_fc_component);
 

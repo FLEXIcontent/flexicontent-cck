@@ -72,6 +72,17 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 
 	<?php if (FLEXI_J16GE): ?>
 
+		<fieldset id="user-basic_set" class="adminform" style="border:0 !important; margin:0 !important;">
+			<table class="admintable" cellspacing="1">
+				<?php foreach($this->form->getFieldset('user_basic') as $field) :?>
+					<tr>
+						<td width="150" class="key"><?php echo $field->label; ?></td>
+						<td><?php echo $field->input; ?></td>
+					</tr>
+				<?php endforeach; ?>
+			</table>
+		</fieldset>
+		
 		<?php
 			echo JHtml::_('tabs.start','basic-tabs-'.$this->form->getValue("id"), array('useCookie'=>1));
 			echo JHtml::_('tabs.panel',JText::_('FLEXI_ACCOUNT_DETAILS'), 'user-details');
@@ -95,7 +106,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		<?php
 		echo JHtml::_('sliders.start');
 		foreach ($this->form->getFieldsets() as $fieldset) :
-			if ($fieldset->name == 'user_details') :
+			if ($fieldset->name == 'user_basic' || $fieldset->name == 'user_details') :
 				continue;
 			endif;
 			echo JHtml::_('sliders.panel', JText::_($fieldset->label), $fieldset->name);
@@ -126,11 +137,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		</fieldset>
 		
 	<?php else :?>
-	
-		<?php
-		echo $this->tpane->startPane( 'author-pane' );
-		echo $this->tpane->startPanel( JText::_( 'User Details' ), 'user-details' );
-		?>
+
 		<table class="admintable" cellspacing="1">
 			<tr>
 				<td width="150" class="key">
@@ -190,6 +197,13 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 					<?php endif; ?>
 				</td>
 			</tr>
+		</table>
+		
+		<?php
+		echo $this->tpane->startPane( 'author-pane' );
+		echo $this->tpane->startPanel( JText::_( 'User Details' ), 'user-details' );
+		?>
+		<table class="admintable" cellspacing="1">
 			<tr>
 				<td valign="top" class="key">
 					<label for="gid">
@@ -493,7 +507,14 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		foreach ($this->tmpls as $tmpl) {
 			$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 			echo $this->pane->startPanel( $title, "params-".$tmpl->name );
-			echo $tmpl->params->render('params');
+			echo
+				str_replace('id="layouts', 'id="layouts_'.$tmpl->name.'_', 
+					str_replace('for="layouts', 'for="layouts_'.$tmpl->name.'_', 
+						str_replace('name="layouts[', 'name="layouts['.$tmpl->name.'][',
+							$tmpl->params->render('layouts')
+						)
+					)
+				);
 			echo $this->pane->endPanel();
 		}
 		echo $this->pane->endPane();
@@ -574,9 +595,14 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 				echo '<fieldset class="panelform">';
 				foreach ($tmpl->params->getFieldset($name) as $field) :
 					$fieldname =  $field->fieldname;
-					$value = $tmpl->params->getValue($fieldname, $name, $this->params_author->get($field->fieldname));
+					$value = $tmpl->params->getValue($fieldname, $name, $this->params_authorcat->get($field->fieldname));
 					echo $tmpl->params->getLabel($fieldname, $name);
-					echo $tmpl->params->getInput($fieldname, $name, $value);
+					echo
+						str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+							str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+								$tmpl->params->getInput($fieldname, $name, $value)
+							)
+						);
 				endforeach;
 				echo '</fieldset>';
 			endforeach;

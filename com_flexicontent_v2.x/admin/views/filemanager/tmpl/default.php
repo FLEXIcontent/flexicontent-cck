@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1807 2013-11-14 01:43:15Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1902 2014-05-10 16:06:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -22,20 +22,32 @@ $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;
 $ctrl_task_authors = FLEXI_J16GE ? 'task=users.'  :  'controller=users&amp;task=';
 $permissions = FlexicontentHelperPerm::getPerm();
 $session = JFactory::getSession();
+$document = JFactory::getDocument();
+
+// Load JS tabber lib
+$document->addScript( JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js' );
+$document->addStyleSheet( JURI::root().'components/com_flexicontent/assets/css/tabber.css' );
+$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 ?>
 
-<div class="flexicontent">
+<div id="flexicontent" class="flexicontent">
 <table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;" id="filemanager-zone">
 	<tr>
 		<td>
+			<div class="fctabber" style=''>
+			
+			<!-- File(s) by uploading -->
 			<?php
-			echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
+			//echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
+			
 			if ($this->CanUpload) :
-				echo FLEXI_J16GE ?
+				/*echo FLEXI_J16GE ?
 					JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
-					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
+					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;*/
 			?>
-		    <?php if ($this->require_ftp): ?>
+			<div class="tabbertab" style="padding: 0px;" id="local_tab" >
+				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ); ?> </h3>
+				<?php if ($this->require_ftp): ?>
             <form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>ftpValidate" name="ftpForm" id="ftpForm" method="post">
                 <fieldset title="<?php echo JText::_( 'FLEXI_DESCFTPTITLE' ); ?>">
                     <legend><?php echo JText::_( 'FLEXI_DESCFTPTITLE' ); ?></legend>
@@ -62,10 +74,10 @@ $session = JFactory::getSession();
                     </table>
                 </fieldset>
             </form>
-            <?php endif; ?>
+				<?php endif; ?>
 			
 			<!-- File Upload Form -->
-			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" id="uploadForm" method="post" enctype="multipart/form-data">
+			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
 				<fieldset class="filemanager-tab" >
 					<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
 					<fieldset class="actions" id="filemanager-1">
@@ -99,16 +111,16 @@ $session = JFactory::getSession();
 									</label>
 								</td>
 								<td>
-									<?php echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ) ); ?>
+									<?php echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_uploadFileForm' ); ?>
 								</td>
 								
 								<td class="key" rowspan="3">
-									<label for="file-desc">
+									<label for="file-desc_uploadFileForm">
 									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 									</label>
 								</td>
 								<td valign="top" rowspan="3">
-									<textarea name="file-desc" cols="24" rows="3" id="file-desc"></textarea>
+									<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm"></textarea>
 								</td>
 							</tr>
 							
@@ -137,11 +149,21 @@ $session = JFactory::getSession();
 				<?php echo JHTML::_( 'form.token' ); ?>
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 			</form>
-			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
+			<?php /*echo FLEXI_J16GE ? '' : $this->pane->endPanel();*/ ?>
+			</div>
 			<?php endif; ?>
-			<!-- File URL Form -->
-			<?php echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) : $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) ; ?>
-			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="urlForm" id="urlForm" method="post">
+			
+			
+			<!-- File URL by Form -->
+			<?php
+				/*echo FLEXI_J16GE ?
+					JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) :
+					$this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) ;*/
+			?>
+			<div class="tabbertab" style="padding: 0px;" id="fileurl_tab" >
+				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_BY_URL' ); ?> </h3>
+			
+			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="addUrlForm" id="addUrlForm" method="post">
 				<fieldset class="filemanager-tab" >
 					<legend><?php echo JText::_( 'FLEXI_ADD_FILE_BY_URL' ); ?></legend>
 					<fieldset class="actions" id="filemanager-2">
@@ -205,13 +227,21 @@ $session = JFactory::getSession();
 				</fieldset>
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 			</form>
-			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
+			<?php /*echo FLEXI_J16GE ? '' : $this->pane->endPanel();*/ ?>
+			</div>
+			
+			
+			<!-- File(s) from server Form -->
 			<?php
 			if ($this->CanUpload) :
-				echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' ) : $this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' ) ;
+				/*echo FLEXI_J16GE ?
+					JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' ) :
+					$this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' ) ;*/
 			?>
-			<!-- File from server Form -->
-			<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="urlForm" id="urlForm" method="post">
+			<div class="tabbertab" style="padding: 0px;" id="server_tab" >
+				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ); ?> </h3>
+			
+			<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="addFileForm" id="addFileForm" method="post">
 				<fieldset class="filemanager-tab" >
 					<legend>
 						<?php echo JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ); ?>
@@ -236,7 +266,10 @@ $session = JFactory::getSession();
 									</label>
 								</td>
 								<td>
-									<?php echo $this->lists['file-lang']; ?>
+									<?php echo
+										str_replace('id="file-lang', 'id="_file-lang',
+										str_replace('id="file-lang', 'id="_file-lang', $this->lists['file-lang'])
+										); ?>
 								</td>
 							</tr>
 							
@@ -251,12 +284,12 @@ $session = JFactory::getSession();
 								</td>
 								
 								<td class="key" rowspan="4">
-									<label for="file-desc">
+									<label for="file-desc_addFileForm">
 									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 									</label>
 								</td>
 								<td rowspan="4">
-									<textarea name="file-desc" cols="24" rows="6" id="file-desc"></textarea>
+									<textarea name="file-desc" cols="24" rows="6" id="file-desc_addFileForm"></textarea>
 								</td>
 							</tr>
 							
@@ -292,7 +325,7 @@ $session = JFactory::getSession();
 								</td>
 								<td>
 									<?php
-									echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ) );
+									echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_addFileForm' );
 									?>
 								</td>
 							</tr>
@@ -304,9 +337,13 @@ $session = JFactory::getSession();
 				</fieldset>
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 			</form>
-			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
+			<?php /*echo FLEXI_J16GE ? '' : $this->pane->endPanel();*/ ?>
+			</div>
 			<?php endif; ?>
-			<?php echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane(); ?>
+			
+			<?php /*echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane();*/ ?>
+			</div>
+			
 		</td>
 	</tr>
 </table>
@@ -326,7 +363,7 @@ $session = JFactory::getSession();
 			</td>
 			<td nowrap="nowrap">
 				<div class="limit" style="display: inline-block;">
-					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . $this->pagination->getLimitBox(); ?>
+					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . str_replace('id="limit"', 'id="limit_top"', $this->pagination->getLimitBox()); ?>
 				</div>
 				
 				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >

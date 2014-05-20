@@ -100,7 +100,7 @@ foreach ($items as $i => $item) :
 	<?php
 	$show_editbutton = $this->params->get('show_editbutton', 1);
 	$pdfbutton = flexicontent_html::pdfbutton( $item, $this->params );
-	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug );
+	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug, 0, $item );
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = $show_editbutton ? flexicontent_html::editbutton( $item, $this->params ) : '';
 	$statebutton = $show_editbutton ? flexicontent_html::statebutton( $item, $this->params ) : '';
@@ -409,7 +409,7 @@ foreach ($items as $i => $item) :
 	
 	<?php if ( $readmore_shown ) : ?>
 	<span class="readmore group">
-		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>" class="readon">
+		<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="readon">
 			<?php echo ' ' . ($item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title)); ?>
 		</a>
 	</span>

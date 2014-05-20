@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: admin.flexicontent.php 1882 2014-04-06 19:24:37Z ggppdk $ 
+ * @version 1.5 stable $Id: admin.flexicontent.php 1902 2014-05-10 16:06:11Z ggppdk $ 
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -25,6 +25,10 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // Initialize some variables
 // *************************
 
+global $is_fc_component;
+$is_fc_component = 1;
+
+// Get component parameters and add tooltips css and js code
 $cparams = JComponentHelper::getParams('com_flexicontent');
 $print_logging_info = $cparams->get('print_logging_info');
 if ( $print_logging_info ) {
@@ -52,6 +56,12 @@ $force_print = false;
 
 //include constants file
 require_once (JPATH_COMPONENT_ADMINISTRATOR.DS.'defineconstants.php');
+
+// Enable printing of notices,etc, except strict if error_reporting is enabled
+if( !FLEXI_J16GE && error_reporting() && ini_get('display_errors') /*&& in_array($_SERVER['HTTP_HOST'], array('localhost', '127.0.0.1'))*/ ) { 
+	error_reporting(E_ALL & ~E_STRICT);
+	//ini_set('display_errors',1);  // ... check above that this is enabled already
+}
 
 //include the needed classes and helpers
 require_once (JPATH_COMPONENT_SITE.DS.'classes'.DS.'flexicontent.helper.php');
@@ -286,7 +296,7 @@ if ( ($force_print || $print_logging_info) && JRequest::getWord('tmpl')!='compon
 	// **** EOF: BACKEND SPECIFIC
 	
 	if (isset($fc_run_times['execute_main_query']))
-		$msg .= sprintf('<br/>-- [Execute Main Query: %.2f s] ', $fc_run_times['execute_main_query']/1000000);
+		$msg .= sprintf('<br/>-- [Query: item LISTING: %.2f s] ', $fc_run_times['execute_main_query']/1000000);
 	
 	if (isset($fc_run_times['execute_sec_queries']))
 		$msg .= sprintf('<br/>-- [Execute Secondary Query(-ies): %.2f s] ', $fc_run_times['execute_sec_queries']/1000000);
@@ -318,10 +328,10 @@ if ( ($force_print || $print_logging_info) && JRequest::getWord('tmpl')!='compon
 	// **** EOF: ITEM FORM SAVING
 	
 	if (isset($fc_run_times['templates_parsing_cached']))
-		$msg .= sprintf('<br/>-- [FC Templates Parsing (cached): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
+		$msg .= sprintf('<br/>-- [FC Templates XML Parsing (cacheable): %.2f s] ', $fc_run_times['templates_parsing_cached']/1000000);
 	
 	if (isset($fc_run_times['templates_parsing_noncached']))
-		$msg .= sprintf('<br/>-- [FC Templates Parsing (not cached) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
+		$msg .= sprintf('<br/>-- [FC Templates XML Parsing (not cacheable) : %.2f s] ', $fc_run_times['templates_parsing_noncached']/1000000);
 	
 	if (isset($fc_run_times['get_item_data']))
 		$msg .= sprintf('<br/>-- [Get/Calculate Item Properties: %.2f s] ', $fc_run_times['get_item_data']/1000000);
@@ -338,8 +348,8 @@ if ( ($force_print || $print_logging_info) && JRequest::getWord('tmpl')!='compon
 	if (isset($fc_run_times['render_categories_select']))
 		$msg .= sprintf('<br/>-- [Render Categories Select: %.2f s] ', $fc_run_times['render_categories_select']/1000000);
 	
-	if (isset($fields_render_times) && count($fields_render_times))
-		$msg .= sprintf('<br/>-- [FC Fields Value Retrieval: %.2f s] ', $fc_run_times['field_value_retrieval']/1000000);
+	if (isset($fc_run_times['field_values_params']))
+		$msg .= sprintf('<br/>-- [FC fields values retrieval + field params creation: %.2f s] ', $fc_run_times['field_values_params']/1000000);
 	
 	if (isset($fc_run_times['template_render']))
 		$msg .= sprintf('<br/>-- [FC "%s" view Template Rendering: %.2f s] ', $view, $fc_run_times['template_render']/1000000);
@@ -347,24 +357,36 @@ if ( ($force_print || $print_logging_info) && JRequest::getWord('tmpl')!='compon
 	if (isset($fc_run_times['quick_sliders']))
 		$msg .= sprintf('<br/>-- [Workflow sliders (Pending/Revised/etc): %.2f s] ', $fc_run_times['quick_sliders']/1000000);
 	
-	if (isset($fc_run_times['auto_checkin_auto_state']))
-		$msg .= sprintf('<br/>-- [Auto Checkin/Auto state(e.g. archive): %.2f s] ', $fc_run_times['auto_checkin_auto_state']/1000000);
-	
-	
 	// **********************
 	// Fields rendering times
 	// **********************
 	
 	if (count($fields_render_times)) {
-		$msg .= sprintf('<br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
-		$msg .= '<br/>FIELD: '.implode('<br/> FIELD: ', $fields_render_times).'';
+		$msg .= sprintf('<br/><br/>-- [FC Fields Rendering: %.2f s] ', $fields_render_total/1000000);
+		$msg .= '<br/>';
+		foreach($fields_render_times as $i => $_time) {
+			$msg .= 
+				'<div style="white-space:nowrap; float:left;'.($i%3==0 ? 'clear:both !important;' : '').'">'.
+					$fields_render_times[$i].
+				'</div>';
+		}
+		$msg .= '<br/><div class="fcclear"></div>';
 	}
 	
 	$msg .= '</span>';
 	
-	$app->enqueueMessage( $msg, 'notice' );
+	
+	// SYSTEM PLGs
+	if (isset($fc_run_times['auto_checkin_auto_state']))
+		$msg = sprintf('** [Flexisystem PLG: Auto Checkin/Auto state(e.g. archive): %.2f s] ', $fc_run_times['auto_checkin_auto_state']/1000000) .'<br/>'.$msg.'<br/>';
+	
+	if (isset($fc_run_times['global_field_replacements']))
+		$msg = sprintf('** [Flexisystem PLG: Replace Field Times: %.2f s] ', $fc_run_times['global_field_replacements']/1000000) .'<br/>'.$msg.'<br/>';
+	
+	global $fc_performance_msg;
+	$fc_performance_msg .= $msg . '<div class="fcclear"></div>';
 }
-
+unset ($is_fc_component);
 
 
 // ************************************************************************

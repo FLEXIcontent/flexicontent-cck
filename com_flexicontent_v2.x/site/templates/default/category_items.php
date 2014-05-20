@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 1822 2013-12-23 02:58:40Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 1872 2014-03-15 15:50:42Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -168,7 +168,7 @@ endif;
 			<!-- BOF item title -->
 			<?php if ($show_title) : ?>
 				<?php if ($link_titles) : ?>
-					<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>"><?php echo $item->title; ?></a>
+					<a class="fc_item_title" href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>"><?php echo $item->title; ?></a>
 				<?php else : echo $item->title; endif; ?>
 			<?php endif; ?>
 			<!-- EOF item title -->

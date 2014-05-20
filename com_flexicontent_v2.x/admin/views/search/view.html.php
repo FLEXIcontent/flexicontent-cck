@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1869 2014-03-12 12:18:40Z ggppdk $ 
+ * @version 1.5 stable $Id: view.html.php 1902 2014-05-10 16:06:11Z ggppdk $ 
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -173,15 +173,15 @@ class FLEXIcontentViewSearch extends JViewLegacy
 
 		$btn_task = '';
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=basic';
-		if (FLEXI_J16GE) {
+		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
 			$js .= "
-				$$('li#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
-					.set('onclick', 'javascript:;')
-					.set('href', '".$popup_load_url."')
-					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
+				jQuery('#toolbar-basicindex a.toolbar, #toolbar-basicindex button')
+					.attr('onclick', 'javascript:;')
+					.attr('href', '".$popup_load_url."')
+					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'basicindex.png', 'basicindex_f2.png', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', false );
-			JHtml::_('behavior.modal', 'li#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
+			JHtml::_('behavior.modal', '#toolbar-basicindex a.toolbar, #toolbar-basicindex button');
 		} else {
 			$toolbar->appendButton('Popup', 'basicindex', 'FLEXI_INDEX_BASIC_CONTENT_LISTS', str_replace('&', '&amp;', $popup_load_url), 500, 240);
 		}
@@ -190,30 +190,30 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		$btn_task = '';
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced';
-		if (FLEXI_J16GE) {
+		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
 			$js .= "
-				$$('li#toolbar-advindex a.toolbar, #toolbar-advindex button')
-					.set('onclick', 'javascript:;')
-					.set('href', '".$popup_load_url."')
-					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
+				jQuery('#toolbar-advindex a.toolbar, #toolbar-advindex button')
+					.attr('onclick', 'javascript:;')
+					.attr('href', '".$popup_load_url."')
+					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'advindex.png', 'advindex_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', false );
-			JHtml::_('behavior.modal', 'li#toolbar-advindex a.toolbar, #toolbar-advindex button');
+			JHtml::_('behavior.modal', '#toolbar-advindex a.toolbar, #toolbar-advindex button');
 		} else {
 			$toolbar->appendButton('Popup', 'advindex', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW', str_replace('&', '&amp;', $popup_load_url), 500, 240);
 		}
 		
 		$btn_task = '';
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=search&layout=indexer&tmpl=component&indexer=advanced&rebuildmode=quick';
-		if (FLEXI_J16GE) {
+		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
 			$js .= "
-				$$('li#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button')
-					.set('onclick', 'javascript:;')
-					.set('href', '".$popup_load_url."')
-					.set('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
+				jQuery('#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button')
+					.attr('onclick', 'javascript:;')
+					.attr('href', '".$popup_load_url."')
+					.attr('rel', '{handler: \'iframe\', size: {x: 500, y: 240}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'advindexdirty.png', 'advindexdirty_f2.png', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', false );
-			JHtml::_('behavior.modal', 'li#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button');
+			JHtml::_('behavior.modal', '#toolbar-advindexdirty a.toolbar, #toolbar-advindexdirty button');
 		} else {
 			$toolbar->appendButton('Popup', 'advindexdirty', 'FLEXI_INDEX_ADVANCED_SEARCH_VIEW_DIRTY_ONLY', str_replace('&', '&amp;', $popup_load_url), 500, 240);
 		}

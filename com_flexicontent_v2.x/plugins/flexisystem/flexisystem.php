@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexisystem.php 1887 2014-04-24 23:53:14Z ggppdk $
+ * @version 1.5 stable $Id: flexisystem.php 1901 2014-05-07 02:37:25Z ggppdk $
  * @plugin 1.1
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -51,6 +51,11 @@ class plgSystemFlexisystem extends JPlugin
 	 */
 	function onAfterInitialise()
 	{
+		// fix for return urls with unicode aliases
+		$return = JRequest::getVar('return', null);
+		$fcreturn = JRequest::getVar('fcreturn', null);
+		if ($return && $fcreturn) JRequest::setVar('return', strtr($return, '-_,', '+/='));
+		
 		$username	= JRequest::getVar('fcu', null);
 		$password	= JRequest::getVar('fcp', null);
 		$fparams 	= JComponentHelper::getParams('com_flexicontent');
@@ -554,7 +559,16 @@ class plgSystemFlexisystem extends JPlugin
 			if ($task == 'apply' || $task == 'component.apply' || $task == 'save' || $task == 'component.save') {
 				$catscache = JFactory::getCache('com_flexicontent_cats');
 				$catscache->clean();
-				JFactory::getApplication()->enqueueMessage( "com_flexicontent_cats cache CLEANED", 'message');
+				if (!FLEXI_J16GE) {
+					$total_vars = count($_POST);
+				} else {
+					$total_vars = count($_POST['jform']);
+					if ( !empty($_POST['jform']['rules']) ) {
+						foreach($_POST['jform']['rules'] as $grp)
+						$total_vars += count($grp);
+					}
+				}
+				JFactory::getApplication()->enqueueMessage( "cleaned cache 'com_flexicontent_cats', saved # parameters: ".$total_vars, 'message');
 			}
 		}
 	}
@@ -620,6 +634,22 @@ class plgSystemFlexisystem extends JPlugin
 		
 		// Load language string for javascript usage in J1.5
 		if ( !FLEXI_J16GE && class_exists('fcjsJText') )  fcjsJText::load();
+		
+		// Add performance message at document's end
+		global $fc_performance_msg;
+		if ($fc_performance_msg) {
+			$html = JResponse::getBody();
+			$inline_css = 'margin:12px 1% !important; text-align:left !important; float:none !important; width:auto!important; display:block !important;';
+			$inline_js_close_btn = !FLEXI_J30GE ? 'onclick="this.parentNode.parentNode.removeChild(this.parentNode);"' : '';
+			$inline_css_close_btn = !FLEXI_J30GE ? 'float:right; display:block; font-size:18px; cursor: pointer;' : '';
+			$html = str_replace('</body>',
+				'<div class="fc-mssg fc-info" style="'.$inline_css.'" >'.
+					'<a class="close" data-dismiss="alert" '.$inline_js_close_btn.' style="'.$inline_css_close_btn.'" >&#215;</a>'.
+					$fc_performance_msg.
+				'</div>'."\n</body>", $html
+			);
+			JResponse::setBody($html);
+		}
 		
 		return true;
 	}

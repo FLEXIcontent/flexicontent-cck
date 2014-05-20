@@ -79,15 +79,15 @@ class FlexicontentViewTags extends JViewLegacy
 		if ($perms->CanConfig) {
 			$btn_task = '';
 			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=tags&layout=import&tmpl=component';
-			if (FLEXI_J16GE) {
+			if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
 				$js .= "
-					$$('li#toolbar-import a.toolbar, #toolbar-import button')
-						.set('onclick', 'javascript:;')
-						.set('href', '".$popup_load_url."')
-						.set('rel', '{handler: \'iframe\', size: {x: 430, y: 500}, onClose: function() {}}');
+					jQuery('#toolbar-import a.toolbar, #toolbar-import button')
+						.attr('onclick', 'javascript:;')
+						.attr('href', '".$popup_load_url."')
+						.attr('rel', '{handler: \'iframe\', size: {x: 430, y: 500}, onClose: function() {}}');
 				";
 				JToolBarHelper::custom( $btn_task, 'import.png', 'import_f2.png', 'FLEXI_IMPORT', false );
-				JHtml::_('behavior.modal', 'li#toolbar-import a.toolbar, #toolbar-import button');
+				JHtml::_('behavior.modal', '#toolbar-import a.toolbar, #toolbar-import button');
 			} else {
 				$toolbar->appendButton('Popup', 'import', JText::_('FLEXI_IMPORT'), str_replace('&', '&amp;', $popup_load_url), 430, 500);
 			}

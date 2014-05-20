@@ -18,7 +18,10 @@
 
 defined('_JEXEC') or die('Restricted access');
 
-$ctrl_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
+$task_items = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
+$ctrl_items = FLEXI_J16GE ? 'items.' : '';
+$tags_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&task=';
+
 
 // For tabsets/tabs ids (focusing, etc)
 $tabSetCnt = -1;
@@ -47,13 +50,13 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 	$this->document->addStyleSheet(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addScriptDeclaration("
 		jQuery(document).ready(function () {
-			jQuery(\"#input-tags\").autocomplete(\"".JURI::base()."index.php?option=com_flexicontent&controller=items&task=viewtags&format=raw&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1\", {
+			jQuery('#input-tags').autocomplete('".JURI::base()."index.php?option=com_flexicontent&".$task_items."viewtags&format=raw&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1', {
 				width: 260,
 				max: 100,
 				matchContains: false,
 				mustMatch: false,
 				selectFirst: false,
-				dataType: \"json\",
+				dataType: 'json',
 				parse: function(data) {
 					return jQuery.map(data, function(row) {
 						return {
@@ -67,12 +70,12 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 					return row.name;
 				}
 			}).result(function(e, row) {
-				jQuery(\"#input-tags\").attr('tagid',row.id);
-				jQuery(\"#input-tags\").attr('tagname',row.name);
+				jQuery('#input-tags').attr('tagid',row.id);
+				jQuery('#input-tags').attr('tagname',row.name);
 				addToList(row.id, row.name);
 			}).keydown(function(event) {
-				if((event.keyCode==13)&&(jQuery(\"#input-tags\").attr('tagid')=='0') ) {//press enter button
-					addtag(0, jQuery(\"#input-tags\").attr('value'));
+				if((event.keyCode==13)&&(jQuery('#input-tags').attr('tagid')=='0') ) {//press enter button
+					addtag(0, jQuery('#input-tags').attr('value'));
 					resetField();
 					return false;
 				}else if(event.keyCode==13) {
@@ -81,17 +84,44 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 				}
 			});
 			function resetField() {
-				jQuery(\"#input-tags\").attr('tagid',0);
-				jQuery(\"#input-tags\").attr('tagname','');
-				jQuery(\"#input-tags\").attr('value','');
+				jQuery('#input-tags').attr('tagid',0);
+				jQuery('#input-tags').attr('tagname','');
+				jQuery('#input-tags').attr('value','');
 			}
 		});
+		
 		jQuery(document).ready(function() {
-			jQuery(\"#fc_pager\").pager({ pagenumber: ".$this->current_page.", pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
+			// Initialize popup container
+			var winwidth = jQuery( window ).width() - 80;
+			var winheight= jQuery( window ).height() - 80;
+			jQuery('#fc_modal_popup_container').dialog({
+			   autoOpen: false,
+			   width: winwidth,
+			   height: winheight,
+			   modal: true,
+			   position: [40, 40]
+			});
+			
+			// For the initially displayed versions page:  Add onclick event that opens compare in popup 
+			jQuery('a.modal-versions').each(function(index, value) {
+				jQuery(this).on('click', function() {
+					var url = jQuery(this).attr('href');
+					showDialog(url);
+					return false;
+				});
+			});
+			// Attach pagination for versions listing
+			jQuery('#fc_pager').pager({ pagenumber: ".$this->current_page.", pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		});
-
+		
+		// Load given URL in an open dialog
+		function showDialog(url){
+			jQuery('#fc_modal_popup_container').load(url);
+			jQuery('#fc_modal_popup_container').dialog('open');         
+		}
+		
 		PageClick = function(pageclickednumber) {
-			jQuery.ajax({ url: \"index.php?option=com_flexicontent&controller=items&task=getversionlist&id=".$this->row->id."&active=".$this->row->version."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1&format=raw&page=\"+pageclickednumber, context: jQuery(\"#result\"), success: function(str){
+			jQuery.ajax({ url: 'index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1&format=raw&page='+pageclickednumber, context: jQuery('#result'), success: function(str){
 				jQuery(this).html(\"<table width='100%' class='versionlist' cellpadding='0' cellspacing='0'>\\
 				<tr>\\
 					<th colspan='4'>".JText::_( 'FLEXI_VERSIONS_HISTORY',true )."</th>\\
@@ -99,20 +129,23 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 				\"+str+\"\\
 				</table>\");
 				var JTooltips = new Tips($$('table.versionlist tr td a.hasTip'), { maxTitleChars: 50, fixed: false});
-
-				SqueezeBox.initialize({});
-				$$('a.modal-versions').each(function(el) {
-					el.addEvent('click', function(e) {
-						new Event(e).stop();
-						SqueezeBox.fromElement(el);
+				
+				// Attach click event to version compare links of the newly created page
+				jQuery(this).find('a.modal-versions').each(function(index, value) {
+					jQuery(this).on('click', function() {
+						var url = jQuery(this).attr('href');
+						showDialog(url);
+						return false;
 					});
 				});
 			}});
-			jQuery(\"#fc_pager\").pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
+			
+			// Reattach pagination inside the newly created page
+			jQuery('#fc_pager').pager({ pagenumber: pageclickednumber, pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		}
 		
-		jQuery(document).ready(function($){
-			$('#versioncomment').autogrow({
+		jQuery(document).ready(function(){
+			jQuery('#versioncomment').autogrow({
 				minHeight: 26,
 				maxHeight: 250,
 				lineHeight: 12
@@ -121,56 +154,54 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 		
 	");
 }
-?>
-<script language="javascript" type="text/javascript">
-window.addEvent( "domready", function() {
-    var hits = new itemscreen('hits', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'gethits'});
-    hits.fetchscreen();
 
-    var votes = new itemscreen('votes', {id:<?php echo $this->row->id ? $this->row->id : 0; ?>, task:'getvotes'});
-    votes.fetchscreen();
-});
-function addToList(id, name) {
-	obj = $('ultagbox');
-	obj.innerHTML+="<li class=\"tagitem\"><span>"+name+"</span><input type='hidden' name='tag[]' value='"+id+"' /><a href=\"javascript:;\"  class=\"deletetag\" onclick=\"javascript:deleteTag(this);\" title=\"<?php echo JText::_( 'FLEXI_DELETE_TAG',true ); ?>\"></a></li>";
-}
-function addtag(id, tagname) {
-	if(id==null) {
-		id=0;
+// version variables
+$tags_fieldname = FLEXI_J16GE ? 'jform[tag][]' : 'tag[]';
+
+$this->document->addScriptDeclaration("
+	jQuery(document).ready(function(){
+		var hits = new itemscreen('hits', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."gethits'});
+		hits.fetchscreen();
+	
+		var votes = new itemscreen('votes', {id:".($this->row->id ? $this->row->id : 0).", task:'".$ctrl_items."getvotes'});
+		votes.fetchscreen();
+	});
+
+	function addToList(id, name) {
+		obj = jQuery('#ultagbox');
+		obj.append(\"<li class='tagitem'><span>\"+name+\"</span><input type='hidden' name='".$tags_fieldname."' value='\"+id+\"' /><a href='javascript:;' class='deletetag' onclick='javascript:deleteTag(this);' title='". JText::_( 'FLEXI_DELETE_TAG',true ) ."'></a></li>\");
 	}
-	if(tagname == '') {
-		alert('<?php echo JText::_( 'FLEXI_ENTER_TAG', true); ?>' );
-		return;
-	}
-
-	var tag = new itemscreen();
-	tag.addtag( id, tagname, 'index.php?option=com_flexicontent&controller=tags&task=addtag&format=raw&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1');
-}
-
-function reseter(task, id, div){
-	var form = document.adminForm;
-
-	if (task == 'resethits') {
-		form.hits.value = 0;
-	} else {
+	function addtag(id, tagname) {
+		if (id==null) id = 0;
+	
+		if(tagname == '') {
+			alert('".JText::_( 'FLEXI_ENTER_TAG', true)."');
+			return;
+		}
+	
+		var tag = new itemscreen();
+		tag.addtag( id, tagname, 'index.php?option=com_flexicontent&".$tags_task."addtag&format=raw&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1');
 	}
 
-	var res = new itemscreen();
-	res.reseter( task, id, div, 'index.php?option=com_flexicontent&controller=items' );
-}
-function clickRestore(link) {
-	if(confirm("<?php echo JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE',true ); ?>")) {
-		location.href=link;
+	function reseter(task, id, div){
+		var res = new itemscreen();
+		task = '".$ctrl_items."' + task;
+		res.reseter( task, id, div, 'index.php?option=com_flexicontent&controller=items' );
 	}
-	return false;
-}
-function deleteTag(obj) {
-	var parent = obj.parentNode;
-	parent.innerHTML = "";
-	parent.parentNode.removeChild(parent);
-}
-</script>
-<?php
+	function clickRestore(link) {
+		if(confirm('".JText::_( 'FLEXI_CONFIRM_VERSION_RESTORE',true )."')) {
+			location.href=link;
+		}
+		return false;
+	}
+	function deleteTag(obj) {
+		var parent = obj.parentNode;
+		parent.innerHTML = '';
+		parent.parentNode.removeChild(parent);
+	}
+");
+
+
 // Create info images
 $infoimage    = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) );
 $revertimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
@@ -182,12 +213,14 @@ $itemlang = substr($this->row->language ,0,2);
 if (isset($this->row->item_translations)) foreach ($this->row->item_translations as $t) if ($t->shortcode==$itemlang) {$itemlangname = $t->name; break;}
 ?>
 
-<?php /* echo "Version: ". $this->row->version."<br>\n"; */?>
-<?php /* echo "id: ". $this->row->id."<br>\n"; */?>
-<?php /* echo "type_id: ". @$this->row->type_id."<br>\n"; */?>
+<?php /* echo "Version: ". $this->row->version."<br/>\n"; */?>
+<?php /* echo "id: ". $this->row->id."<br/>\n"; */?>
+<?php /* echo "type_id: ". @$this->row->type_id."<br/>\n"; */?>
 
 
 <div id="flexicontent" class="flexi_edit" >
+<div id="fc_modal_popup_container"></div>
+
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data" >
 <table width="100%"><tr>
 	<td valign="top" style="width:auto; padding: 0px">
@@ -515,7 +548,7 @@ $tabCnt[$tabSetCnt] = 0;
 						);
 						$jelement = new JSimpleXMLElement('lang_parent_id', $attrs);
 						$ff_lang_parent_id = new JElementItem();
-						//echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br>';
+						//echo '<small>'.JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ).'</small><br/>';
 						echo $ff_lang_parent_id->fetchElement('lang_parent_id', $this->row->lang_parent_id, $jelement, '');
 					?>
 						<span class="editlinktip hasTip" style="display:inline-block;" title="<?php echo htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8'); ?>::<?php echo htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_IGNORED_IF_DEFAULT_LANG' ), ENT_COMPAT, 'UTF-8');?>">
@@ -550,7 +583,7 @@ $tabCnt[$tabSetCnt] = 0;
 					{
 						if ($assoc_item->id==$this->row->id) continue;
 						
-						$_link  = 'index.php?option=com_flexicontent&'.$ctrl_task.'edit&cid[]='. $assoc_item->id;
+						$_link  = 'index.php?option=com_flexicontent&'.$task_items.'edit&cid[]='. $assoc_item->id;
 						$_title = htmlspecialchars(JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
 						echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
 						//echo $assoc_item->id;
@@ -648,6 +681,8 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				$not_in_tabs = "";
 				if ($field->field_type=='groupmarker') {
 					echo $field->html;
+					continue;
+				} else if ($field->field_type=='coreprops') {  // not used in backend (yet?)
 					continue;
 				}
 				
@@ -789,7 +824,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				}
 				$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
 				if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
-				echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '<br>', $tz_info );
+				echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', '<br/>', $tz_info );
 			?>
 			</div>
 			
@@ -963,24 +998,25 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 		
 		<fieldset class="flexi_params fc_edit_container_full">
+			<div class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">
 			<?php
-				echo '<span class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
+				echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
 				$type_default_layout = $this->tparams->get('ilayout');
 			?>
-			<br/><br/>
-			<ol style="margin:0 0 0 16px; padding:0;">
-				<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
-				<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
-			</ol>
-			<br/>
-			<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
-			</span>
+				<br/><br/>
+				<ol style="margin:0 0 0 16px; padding:0;">
+					<li style="margin:0; padding:0;"> Select TEMPLATE layout </li>
+					<li style="margin:0; padding:0;"> Open slider with TEMPLATE (layout) PARAMETERS </li>
+				</ol>
+				<br/>
+				<b>NOTE:</b> Common method for -displaying- fields is by <b>editing the template layout</b> in template manager and placing the fields into <b>template positions</b>
+			</div>
 			
 			<?php echo $this->formparams->render('params', 'themes'); ?>
 			<div class="fcclear"></div>
 			<span class="fc-success fc-mssg-inline" id='__content_type_default_layout__'>
 				<?php echo JText::sprintf( 'FLEXI_USING_CONTENT_TYPE_LAYOUT', $type_default_layout ); ?>
-				<?php echo "<br><br>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
+				<?php echo "<br/><br/>". JText::_( 'FLEXI_RECOMMEND_CONTENT_TYPE_LAYOUT' ); ?>
 			</span>
 			<div class="fcclear"></div>
 			
@@ -1062,10 +1098,9 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<strong <?php echo $label_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_HITS' ) */ ?></strong>
 			</td>
 			<td>
-				<div id="hits" style="display:none;"></div>
-				<input id="hits" type="text" name="hits" size="6" value="<?php echo $this->row->hits; ?>" />
+				<div id="hits" style="float:left;"></div> &nbsp;
 				<span <?php echo $visibility; ?>>
-					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('resethits', '<?php echo $this->row->id; ?>', 'hits')" />
+					<input name="reset_hits" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resethits', '<?php echo $this->row->id; ?>', 'hits')" />
 				</span>
 			</td>
 		</tr>
@@ -1078,9 +1113,9 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<strong <?php echo $label_tooltip; ?>><?php echo $field->label;  /* JText::_( 'FLEXI_SCORE' ) */ ?></strong>
 			</td>
 			<td>
-				<div id="votes" style="float:left;"></div>
+				<div id="votes" style="float:left;"></div> &nbsp;
 				<span <?php echo $visibility2; ?>>
-					<input name="reset_votes" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('resetvotes', '<?php echo $this->row->id; ?>', 'votes')" />
+					<input name="reset_votes" type="button" class="button" value="<?php echo JText::_( 'FLEXI_RESET' ); ?>" onclick="reseter('<?php echo $ctrl_items; ?>resetvotes', '<?php echo $this->row->id; ?>', 'votes')" />
 				</span>
 			</td>
 		</tr>
@@ -1156,7 +1191,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<th style="border-bottom: 1px dotted silver; padding-bottom: 3px;" colspan="4"><?php echo JText::_( 'FLEXI_VERSION_COMMENT' ); ?></th>
 			</tr>
 			<tr>
-				<td><textarea name="versioncomment" id="versioncomment" style="width: 300px; height: 30px; line-height:1"></textarea></td>
+				<td><textarea name="versioncomment" id="versioncomment" style="width: 300px; height: 30px; line-height:100%" rows="5" cols="32"></textarea></td>
 			</tr>
 		</table>
 		
@@ -1172,7 +1207,6 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			</tr>
 			<?php
 			else :
-			JHTML::_('behavior.modal', 'a.modal-versions');
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS' )) == 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS') ? "%d/%m %H:%M" : $date_format;
 			foreach ($this->versions as $version) :
 				$class = ($version->nr == $this->row->version) ? ' class="active-version"' : '';
@@ -1184,10 +1218,21 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				<td class="versions"><span style="padding: 0 5px 0 0;"><?php echo ($version->nr == 1) ? flexicontent_html::striptagsandcut($this->row->creator, 25) : flexicontent_html::striptagsandcut($version->modifier, 25); ?></span></td>
 				<td class="versions" align="center"><a href="javascript:;" class="hasTip" title="Comment::<?php echo htmlspecialchars($version->comment, ENT_COMPAT, 'UTF-8');?>"><?php echo $commentimage;?></a><?php
 				if((int)$version->nr==(int)$this->row->current_version) { ?>
-					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&<?php echo $ctrl_task;?>edit&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
+					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&view=item&<?php echo $task_items;?>edit&cid=<?php echo $this->row->id;?>&version=<?php echo $version->nr; ?>');" href="#"><?php echo JText::_( 'FLEXI_CURRENT' ); ?></a>
 				<?php }else{
 				?>
-					<a class="modal-versions" href="index.php?option=com_flexicontent&view=itemcompare&cid[]=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component" title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>" rel="{handler: 'iframe', size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}"><?php echo $viewimage; ?></a><a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1');" href="javascript:;" title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"><?php echo $revertimage; ?>
+					<a class="modal-versions"
+						href="index.php?option=com_flexicontent&view=itemcompare&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&tmpl=component"
+						title="<?php echo JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' ); ?>"
+					>
+						<?php echo $viewimage; ?>
+					</a>
+					<a onclick="javascript:return clickRestore('index.php?option=com_flexicontent&controller=items&task=edit&cid=<?php echo $this->row->id; ?>&version=<?php echo $version->nr; ?>&<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1');"
+						href="javascript:;"
+						title="<?php echo JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $version->nr ); ?>"
+					>
+						<?php echo $revertimage; ?>
+					</a>
 				<?php }?></td>
 			</tr>
 			<?php

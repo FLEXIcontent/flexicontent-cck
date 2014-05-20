@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" version="1.6" group="flexicontent_fields" method="upgrade">
+	<name>FLEXIcontent - CORE property</name>
+	<author>ggppdk</author>
+	<creationDate>July 2012</creationDate>
+	<copyright>Copyright (C) 2012 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>ggppdk@...</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Item Form CORE property placer Plugin for FLEXIcontent. This field is used to define the place that the CORE property will appear in Item Form. This is done by ordering it in fields manager, while Content Type filter is enabled</description>
+	<files>
+		<filename plugin="coreprops">coreprops.php</filename>
+		<filename>index.html</filename>
+	</files>
+	
+	<config>
+	<fields name="attribs">
+		<fieldset name="basic">
+			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+		</fieldset>
+		
+		<fieldset name="group-coreprops" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="For placing: title, state, created, createdby, modified, modified, please use the existing CORE fields" level="level3" menu="hide" />
+			
+			<field name="props_type" type="groupedlist" default="" label="Property type" description="Select the CORE property or CORE property group (normally these will appear in a TAB by default), that you want to place in item form">
+				<group label="Basic or Single properties">
+					<option value="alias"             >Alias</option>
+					<option value="language"          >Language and associations</option>
+					<option value="disable_comments"  >Disable comments</option>
+					<option value="notify_subscribers" >Notify subscibers</option>
+					<option value="captcha"           >Captcha</option>
+				</group>
+				<group label="Publishing properties">
+					<option value="timezone_info"     >Timezone info</option>
+					<option value="created_by_alias"  >Created by alias</option>
+					<option value="publish_up"        >Publish up</option>
+					<option value="publish_down"      >Publish down</option>
+					<option value="access"            >View access</option>
+				</group>
+				<group label="Property groups">
+					<option value="perms"             >Permissions</option>
+					<option value="metadata"          >META data</option>
+					<option value="seoconf"           >SEO configuration</option>
+					<option value="display_params"    >Displaying parameters</option>
+					<option value="layout_selection"  >Layout selection</option>
+					<option value="layout_params"     >Layout parameters</option>
+				</group>
+			</field>
+			
+			<field name="" type="separator" default="Prefix/Suffix" level="level3" menu="hide" />
+			<field name="prefix" type="textarea" cols="21" rows="5" default="" label="Prefix" description="Enter the custom HTML code that will be placed before the fields" />
+			<field name="suffix" type="textarea" cols="21" rows="5" default="" label="Suffix" description="Enter the custom HTML code that will be placed after the fields" />
+			
+		</fieldset>
+	</fields>
+	</config>
+	
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_fields_coreprops.ini</language>
+	</languages>
+	
+</extension>

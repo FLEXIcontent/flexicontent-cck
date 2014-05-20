@@ -60,7 +60,7 @@ class JFormFieldMultiList extends JFormField
 		
 		$attribs = ' style="float:left;" ';
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
-			$attribs .= ' multiple="true" ';
+			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
@@ -96,12 +96,14 @@ class JFormFieldMultiList extends JFormField
 					$text   = $sub_option->data();
 					$options[] = JHTML::_('select.option', $val, JText::_($text));
 				}
+				$options[] = JHTML::_('select.optgroup', '' );
 			}
 			else
 				$options[] = JHTML::_('select.option', $val, JText::_($text));
 		}
 		
 		$html = JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $values, $element_id);
+		if (!FLEXI_J16GE) $html = str_replace('<optgroup label="">', '</optgroup>', $html);
 		return $html.$maximize_link;
 	}
 }

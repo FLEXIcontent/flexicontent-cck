@@ -158,35 +158,25 @@ var JFormValidator = new Class({
 
 		this.setHandler('catid',
 			function (el) {
-				var value = el.get('value');
+				// Check for value if primary category is set
+				el = jQuery(el);
+				var value = el.val();
+				if (value) return true;
 				
-				// Check for value for primary category was not set
-				if (!value) {
-					
-					// Retrieve selected values for secondary categories
-					var element_id = flexi_j16ge ? 'jform_cid' : 'cid';
-					var field_name = flexi_j16ge ? 'jform[cid][]' : 'cid[]';
-					
-					if(MooTools.version>="1.2.4") {
-						//var values = $(element_id).getSelected();  // does not work in old template form overrides with no id parameter
-						var values = $$(document.getElementsByName(field_name))[0].getSelected();
-						values = values.map( function(g) { return g.get('value'); } );
-					} else {
-						//values = $(element_id).getValue();  // does not work in old template form overrides with no id parameter
-						var values = $$(document.getElementsByName(field_name))[0].getValue();
-						//  ** Alternative code **
-						//var values = $(element_id).getChildren().filter( function(g) { return g.selected; } );
-						//values = values.map( function(g) { return g.getProperty('value'); } );
+				// Retrieve selected values for secondary categories
+				var element_id = flexi_j16ge ? 'jform_cid' : 'cid';
+				var field_name = flexi_j16ge ? 'jform[cid][]' : 'cid[]';
+				
+				// If exactly one secondary category was selected then set it as primary
+				var values = jQuery(document.getElementsByName(field_name)).val();
+				if (values && values.length == 1) {
+					el.val(values[0]);
+					if (el.hasClass('use_select2_lib')) {
+						el.select2();
 					}
-					
-					// If exactly one secondary category was selected then set it as primary
-					if (values.length == 1) {
-						el.set('value', values[0]);
-						return true;
-					}
-					return false;
+					return true;
 				}
-				return true;
+				return false;
 			}
 		);
 		
@@ -324,10 +314,6 @@ var JFormValidator = new Class({
 				}
 			}
 		);
-
-		// Attach to forms with class 'form-validate'
-		var forms = $$('form.form-validate');
-		forms.each(function(form){ this.attachToForm(form); }, this);
 	},
 
 	setHandler: function(name, fn, en)
@@ -582,16 +568,12 @@ var JFormValidator = new Class({
 	}
 });
 
-document.formvalidator = null;
-if(MooTools.version>="1.2.4") {
-	window.addEvent('domready', function(){
-		document.formvalidator = new JFormValidator();
+document.formvalidator = new JFormValidator();
+jQuery(document).ready(function() {
+	jQuery('form.form-validate').each(function(){
+		document.formvalidator.attachToForm($(this));
 	});
-} else {
-	Window.onDomReady(function(){
-		document.formvalidator = new JFormValidator();
-	});
-}
+});
 
 
 function flexi_submit(task, btn_box, msg_box) {

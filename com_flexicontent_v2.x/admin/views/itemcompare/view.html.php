@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1138 2012-02-07 03:01:38Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1800 2013-11-01 04:30:57Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -43,6 +43,8 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		$codemode = JRequest::getInt('codemode',0);
 		$cparams  = JComponentHelper::getParams('com_flexicontent');
 		
+		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+		flexicontent_html::loadFramework('jQuery');
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
 
@@ -51,11 +53,11 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		$document->addStyleDeclaration($css);
 
 		//Get data from the model
-		$model			= & $this->getModel();
-		$row     		= & $this->get( 'Item' );
-		$fields			= & $this->get( 'Extrafields' );
-		$versions		= & $this->get( 'VersionList' );
-		$tparams		= & $this->get( 'Typeparams' );
+		$model			= $this->getModel();
+		$row     		= $this->get( 'Item' );
+		$fields			= $this->get( 'Extrafields' );
+		$versions		= $this->get( 'VersionList' );
+		$tparams		= $this->get( 'Typeparams' );
 				
 		// Create the type parameters
 		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);

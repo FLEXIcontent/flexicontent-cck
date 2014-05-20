@@ -79,26 +79,24 @@ class Segment {
         if ($clear_previous)  $this->_segmented_result = array();
         $this->_input_string = $input_string;
 
-        // ลบเครื่องหมายคำพูด, ตัวแบ่งประโยค //
+        // ลบเครื่องหมายคำพูด, ตัวแบ่งประโยค  // Remove the quotes, sentence breaks.
         $this->_input_string = str_replace(array('\'', '‘', '’', '“', '”', '"', '-', '/', '(', ')', '{', '}', '...', '..', '…', '', ',', ':', '|', '\\'), '', $this->_input_string);
-        // เปลี่ยน newline ให้กลายเป็น Space เพื่อที่ใช้สำหรับ Trim
+        // เปลี่ยน newline ให้กลายเป็น Space เพื่อที่ใช้สำหรับ Trim // Space to change into a newline is used for.
         $this->_input_string = str_replace(array("\r", "\r\n", "\n"), ' ', $this->_input_string);
 
 
-        // กำจัดซ้ำ //
+        // กำจัดซ้ำ  // duplicate removal
         $this->_input_string = $this->clear_duplicated($this->_input_string);
 
 
-        // แยกประโยคจากช่องว่าง (~เผื่อไว้สำหรับภาษาอังกฤษ) //
+        // แยกประโยคจากช่องว่าง (~เผื่อไว้สำหรับภาษาอังกฤษ)  // Separate sentences from space (~ Provision for English).
         $this->_input_string_exploded = explode(' ', $this->_input_string);
 
 
 
-        // Reverse Array สำหรับการใช้ Dictionary แบบ Reverse //
+        // Reverse Array สำหรับการใช้ Dictionary แบบ Reverse  // Reverse Array using a Dictionary for the Reverse.
         foreach ($this->_input_string_exploded as $input_string_exploded_row) {
             $current_string_reverse_array = array_reverse($this->_unicode_obj->uni_strsplit(trim($input_string_exploded_row)));
-
-
 
             $current_array_result = $this->_segment_by_dictionary_reverse($current_string_reverse_array);
             foreach ($current_array_result as $each_result) {
@@ -107,7 +105,7 @@ class Segment {
             }
         }
 
-        // จัดการคำที่ตัดที่ยาวผิดปกติ (~อาจจะเป็นเพราะว่าพิมผิด) โดยการตัดตาม Dict แบบธรรมดา//
+        // จัดการคำที่ตัดที่ยาวผิดปกติ (~อาจจะเป็นเพราะว่าพิมผิด) โดยการตัดตาม Dict แบบธรรมดา // Cut the long term management of the disorder. (~ May be wrong because PIM) by cutting the conventional Dict.
         $tmp_result = array();
         foreach ($this->_segmented_result as $result_row) {
             if (mb_strlen($result_row) > 10) {

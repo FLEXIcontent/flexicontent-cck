@@ -123,7 +123,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		{
 			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 			
-			// add the drag and drop sorting feature
+			// Add the drag and drop sorting feature
 			$js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
@@ -146,7 +146,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					return 'cancel';
 				}
 				
-				var thisField 	 = $(el).getPrevious().getLast();
+				var thisField 	 = jQuery(el).prev().children().last();
 				var thisNewField = thisField.clone();
 				
 				jQuery(thisNewField).find('input').first().val('');  /* First element is the value input field, second is e.g remove button */
@@ -183,7 +183,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			{
 				if(rowCount".$field->id." <= 1) return;
 				var row = jQuery(el).closest('li');
-				jQuery(row).hide('slideUp', function() { $(this).remove(); } );
+				jQuery(row).hide('slideUp', function() { this.remove(); } );
 				rowCount".$field->id."--;
 			}
 			";

@@ -60,17 +60,17 @@ class FlexicontentControllerCategory extends JControllerForm
 		parent::add();
 	}
 	
-	function edit() {
+	function edit($key = NULL, $urlVar = NULL) {
 		$cid = JRequest::getVar('cid', array(), 'get', 'array');
 		if (count($cid)) JRequest::setVar('cid', $cid, 'post', 'array');
 		parent::edit();
 	}
 
-	function save() {
+	function save($key = NULL, $urlVar = NULL) {
 		parent::save();
 	}
 	
-	function cancel() {
+	function cancel($key = NULL) {
 		parent::cancel();
 	}
 	

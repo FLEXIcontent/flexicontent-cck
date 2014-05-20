@@ -380,8 +380,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/filterlist.js' );
 			$field->html.=	''
 				.'<input class="fcfield_textval" id="'.$ri_field_name.'_regexp" name="'.$ri_field_name.'_regexp" onKeyUp="'.$ri_field_name.'_titlefilter.set(this.value)" size="30" />'
-				//.'<input style="margin-left:0px!important;" class="fcfield-button" type="button" onClick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_RIFLD_FILTER').'" style="margin-top:6px;" />'
-				.'<input style="margin-left:0px!important;" class="fcfield-button" type="button" onClick="'.$ri_field_name.'_titlefilter.reset();this.form.'.$ri_field_name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_RIFLD_RESET').'" style="margin-top:6px;" />'
+				//.'<input style="margin-left:0px!important; margin-top:6px;" class="fcfield-button" type="button" onclick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_RIFLD_FILTER').'" />'
+				.'<input style="margin-left:0px!important; margin-top:6px;" class="fcfield-button" type="button" onclick="'.$ri_field_name.'_titlefilter.reset();this.form.'.$ri_field_name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_RIFLD_RESET').'" />'
 				;
     }
 		$field->html .= " </span>\n";
@@ -390,7 +390,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
     
 		
 		$field->html .= "<div class='fcrelation_field_unused_items'>";
-		$field->html .= "<span class='label'>".JText::_($select_items_prompt)."</span><br>\n";
+		$field->html .= "<span class='label'>".JText::_($select_items_prompt)."</span><br/>\n";
 		$field->html .= '<select id="'.$ri_field_name.'_visitems" name="'.$ri_field_name.'_visitems[]" multiple="multiple" class="fcfield_selectmulval" '.$size.' >'."\n";
 		$field->html .= '</select>'."\n";
 		$field->html .= "</div>\n";
@@ -401,7 +401,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$field->html .= "</div>\n";
     
 		$field->html .= "<div class='fcrelation_field_used_items'>";
-		$field->html .= "<span class='label'>".JText::_($selected_items_label)."</span><br>\n";
+		$field->html .= "<span class='label'>".JText::_($selected_items_label)."</span><br/>\n";
 		
 		$field->html .= '<select id="'.$ri_field_name.'" name="'.$fieldname.'" multiple="multiple" class="'.$required.'" style="display:none;" '.$size.' >';
 		$field->html .= $items_options_select;

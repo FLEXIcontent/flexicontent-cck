@@ -415,15 +415,19 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$this->_db->setQuery( $q );
 		$this->_db->query();
 		
-		$query 	= 'SELECT COUNT( extension_id )'
-			. ' FROM #__extensions'
-			. ' WHERE `type`='.$this->_db->Quote('plugin').' AND '
-			. ' ( folder = ' . $this->_db->Quote('flexicontent_fields')
-			//. ' OR element = ' . $this->_db->Quote('flexisearch')
+		$tbl   = FLEXI_J16GE ? '#__extensions' : '#__plugins';
+		$idcol = FLEXI_J16GE ? 'extension_id' : 'id';
+		$stcol = FLEXI_J16GE ? 'enabled' : 'published';
+		$query 	= 'SELECT COUNT( '.$idcol.' )'
+			. ' FROM '.$tbl
+			. ' WHERE 1 '. (FLEXI_J16GE ? ' AND `type`=' . $this->_db->Quote('plugin') : '')
+			. ' AND ( folder = ' . $this->_db->Quote('flexicontent_fields')
 			. ' OR element = ' . $this->_db->Quote('flexisystem')
+			. ' OR element = ' . $this->_db->Quote('flexiadvroute')
 			//. ' OR element = ' . $this->_db->Quote('flexiadvsearch')
-			. ' OR element = ' . $this->_db->Quote('flexiadvroute') . ')'
-			. ' AND enabled <> 1'
+			//. ' OR element = ' . $this->_db->Quote('flexisearch')
+			. ')'
+			. ' AND '.$stcol.' <> 1'
 			;
 		$this->_db->setQuery( $query );
 		$return = $this->_db->loadResult() ? false : true;

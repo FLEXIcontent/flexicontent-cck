@@ -90,9 +90,9 @@ if ($this->limitstart != 0) $leadnum = 0;
 		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
 			
 			<!-- BOF beforeDisplayContent -->
-			<?php if ($items[$i]->event->beforeDisplayContent) : ?>
+			<?php if ($item->event->beforeDisplayContent) : ?>
 				<div class="fc_beforeDisplayContent group">
-					<?php echo $items[$i]->event->beforeDisplayContent; ?>
+					<?php echo $item->event->beforeDisplayContent; ?>
 				</div>
 			<?php endif; ?>
 			<!-- EOF beforeDisplayContent -->
@@ -105,25 +105,25 @@ if ($this->limitstart != 0) $leadnum = 0;
 			?>
 			
 			<?php if ($this->params->get('show_editbutton', 1)) : ?>
-				<?php $editbutton = flexicontent_html::editbutton( $items[$i], $this->params ); ?>
+				<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
 				<?php if ($editbutton) : ?>
 					<div class="fc_edit_link"><?php echo $editbutton;?></div>
 				<?php endif; ?>
-				<?php $statebutton = flexicontent_html::statebutton( $items[$i], $this->params ); ?>
+				<?php $statebutton = flexicontent_html::statebutton( $item, $this->params ); ?>
 				<?php if ($statebutton) : ?>
 					<div class="fc_state_toggle_link"><?php echo $statebutton;?></div>
 				<?php endif; ?>
 			<?php endif; ?>
 			
-			<?php $approvalbutton = flexicontent_html::approvalbutton( $items[$i], $this->params ); ?>
+			<?php $approvalbutton = flexicontent_html::approvalbutton( $item, $this->params ); ?>
 			<?php if ($approvalbutton) : ?>
 				<div class="fc_approval_request_link"><?php echo $approvalbutton;?></div>
 			<?php endif; ?>	
 			
 			<?php if ($this->params->get('show_comments_count')) : ?>
-				<?php if ( isset($this->comments[ $items[$i]->id ]->total) ) : ?>
+				<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
 					<div class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
-						<?php echo $this->comments[ $items[$i]->id ]->total; ?>
+						<?php echo $this->comments[ $item->id ]->total; ?>
 					</div>
 				<?php endif; ?>
 			<?php endif; ?>
@@ -131,19 +131,19 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<h2 class="contentheading"><span class="fc_item_title">
 					<?php if ($this->params->get('link_titles', 0)) : ?>
-					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>"><?php echo $items[$i]->title; ?></a>
+					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>"><?php echo $item->title; ?></a>
 					<?php
 					else :
-					echo $items[$i]->title;
+					echo $item->title;
 					endif;
 					?>
 				</span></h2>
 			<?php endif; ?>	
 			
 			<!-- BOF afterDisplayTitle -->
-			<?php if ($items[$i]->event->afterDisplayTitle) : ?>
+			<?php if ($item->event->afterDisplayTitle) : ?>
 				<div class="fc_afterDisplayTitle group">
-					<?php echo $items[$i]->event->afterDisplayTitle; ?>
+					<?php echo $item->event->afterDisplayTitle; ?>
 				</div>
 			<?php endif; ?>
 			<!-- EOF afterDisplayTitle -->
@@ -153,11 +153,11 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<?php 
 				if ($this->params->get('lead_use_image', 1)) :
 					if (!empty($img_field_name)) :
-						FlexicontentFields::getFieldDisplay($items[$i], $img_field_name, $values=null, $method='display');
-						$img_field = & $items[$i]->fields[$img_field_name];
+						FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display');
+						$img_field = & $item->fields[$img_field_name];
 						$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 					else :
-						$src = flexicontent_html::extractimagesrc($items[$i]);
+						$src = flexicontent_html::extractimagesrc($item);
 					endif;
 						
 					$RESIZE_FLAG = !$this->params->get('lead_image') || !$this->params->get('lead_image_size');
@@ -182,9 +182,9 @@ if ($this->limitstart != 0) $leadnum = 0;
 			?>
 				
 			<!-- BOF above-description-line1 block -->
-			<?php if (isset($items[$i]->positions['above-description-line1'])) : ?>
+			<?php if (isset($item->positions['above-description-line1'])) : ?>
 			<div class="lineinfo line1">
-				<?php foreach ($items[$i]->positions['above-description-line1'] as $field) : ?>
+				<?php foreach ($item->positions['above-description-line1'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -197,9 +197,9 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<!-- EOF above-description-line1 block -->
 
 			<!-- BOF above-description-nolabel-line1 block -->
-			<?php if (isset($items[$i]->positions['above-description-line1-nolabel'])) : ?>
+			<?php if (isset($item->positions['above-description-line1-nolabel'])) : ?>
 			<div class="lineinfo line1">
-				<?php foreach ($items[$i]->positions['above-description-line1-nolabel'] as $field) : ?>
+				<?php foreach ($item->positions['above-description-line1-nolabel'] as $field) : ?>
 				<span class="element">
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -209,9 +209,9 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<!-- EOF above-description-nolabel-line1 block -->
 				
 			<!-- BOF above-description-line2 block -->
-			<?php if (isset($items[$i]->positions['above-description-line2'])) : ?>
+			<?php if (isset($item->positions['above-description-line2'])) : ?>
 			<div class="lineinfo line2">
-				<?php foreach ($items[$i]->positions['above-description-line2'] as $field) : ?>
+				<?php foreach ($item->positions['above-description-line2'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -224,9 +224,9 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<!-- EOF above-description-line2 block -->
 				
 			<!-- BOF above-description-nolabel-line2 block -->
-			<?php if (isset($items[$i]->positions['above-description-line2-nolabel'])) : ?>
+			<?php if (isset($item->positions['above-description-line2-nolabel'])) : ?>
 			<div class="lineinfo line2">
-				<?php foreach ($items[$i]->positions['above-description-line2-nolabel'] as $field) : ?>
+				<?php foreach ($item->positions['above-description-line2-nolabel'] as $field) : ?>
 				<span class="element">
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -239,30 +239,30 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<?php if ($this->params->get('lead_use_image', 1) && $src) : ?>
 			<div class="image<?php echo $this->params->get('lead_position') ? ' right' : ' left'; ?>">
 				<?php if ($this->params->get('lead_link_image', 1)) : ?>
-				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
-					<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
+				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>">
+					<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>" />
 				</a>
 				<?php else : ?>
-				<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
+				<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>" />
 				<?php endif; ?>
 			</div>
 			<?php endif; ?>
 			<p>
 			<?php
-				FlexicontentFields::getFieldDisplay($items[$i], 'text', $values=null, $method='display');
+				FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
 				if ($this->params->get('lead_strip_html', 1)) :
-					echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('lead_cut_text', 400) );
+					echo flexicontent_html::striptagsandcut( $item->fields['text']->display, $this->params->get('lead_cut_text', 400) );
 				else :
-					echo $items[$i]->fields['text']->display;
+					echo $item->fields['text']->display;
 				endif;
 			?>
 			</p>
 			</div>
 
 			<!-- BOF under-description-line1 block -->
-			<?php if (isset($items[$i]->positions['under-description-line1'])) : ?>
+			<?php if (isset($item->positions['under-description-line1'])) : ?>
 			<div class="lineinfo line3">
-				<?php foreach ($items[$i]->positions['under-description-line1'] as $field) : ?>
+				<?php foreach ($item->positions['under-description-line1'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -275,9 +275,9 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<!-- EOF under-description-line1 block -->
 				
 			<!-- BOF under-description-line1-nolabel block -->
-			<?php if (isset($items[$i]->positions['under-description-line1-nolabel'])) : ?>
+			<?php if (isset($item->positions['under-description-line1-nolabel'])) : ?>
 			<div class="lineinfo line3">
-				<?php foreach ($items[$i]->positions['under-description-line1-nolabel'] as $field) : ?>
+				<?php foreach ($item->positions['under-description-line1-nolabel'] as $field) : ?>
 				<span class="element">
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -287,9 +287,9 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<!-- EOF under-description-line1-nolabel block -->
 
 			<!-- BOF under-description-line2 block -->
-			<?php if (isset($items[$i]->positions['under-description-line2'])) : ?>
+			<?php if (isset($item->positions['under-description-line2'])) : ?>
 			<div class="lineinfo line4">
-				<?php foreach ($items[$i]->positions['under-description-line2'] as $field) : ?>
+				<?php foreach ($item->positions['under-description-line2'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -302,9 +302,9 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<!-- EOF under-description-line2 block -->
 
 			<!-- BOF under-description-line2-nolabel block -->
-			<?php if (isset($items[$i]->positions['under-description-line2-nolabel'])) : ?>
+			<?php if (isset($item->positions['under-description-line2-nolabel'])) : ?>
 			<div class="lineinfo line4">
-				<?php foreach ($items[$i]->positions['under-description-line2-nolabel'] as $field) : ?>
+				<?php foreach ($item->positions['under-description-line2-nolabel'] as $field) : ?>
 				<span class="element">
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -324,22 +324,22 @@ if ($this->limitstart != 0) $leadnum = 0;
 			<?php if ( $readmore_shown ) : ?>
 			<span class="readmore group">
 				<?php
-				/*$uniqueid = "read_more_fc_item_".$items[$i]->id;
-				$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug).'&tmpl=component');
+				/*$uniqueid = "read_more_fc_item_".$item->id;
+				$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item).'&tmpl=component');
 				echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>';
 				*/
 				?>
-				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug)); ?>" class="readon">
+				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="readon">
 					<?php echo ' ' . ($item->params->get('readmore')  ?  $item->params->get('readmore') : JText::sprintf('FLEXI_READ_MORE', $item->title)); ?>
 				</a>
-				<?php //echo '<script>document.write(\'</a> <div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.$items[$i]->title.'</div>\')</script>'; ?>
+				<?php //echo '<script>document.write(\'</a> <div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.$item->title.'</div>\')</script>'; ?>
 			</span>
 			<?php endif; ?>
 
 			<!-- BOF afterDisplayContent -->
-			<?php if ($items[$i]->event->afterDisplayContent) : ?>
+			<?php if ($item->event->afterDisplayContent) : ?>
 				<div class="fc_afterDisplayContent group">
-					<?php echo $items[$i]->event->afterDisplayContent; ?>
+					<?php echo $item->event->afterDisplayContent; ?>
 				</div>
 			<?php endif; ?>
 			<!-- EOF afterDisplayContent -->
@@ -390,26 +390,26 @@ if ($count > $leadnum) :
 		<li id="fc_bloglist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>" style="overflow: hidden;">
 			
 			<!-- BOF beforeDisplayContent -->
-			<?php if ($items[$i]->event->beforeDisplayContent) : ?>
+			<?php if ($item->event->beforeDisplayContent) : ?>
 				<div class="fc_beforeDisplayContent group">
-					<?php echo $items[$i]->event->beforeDisplayContent; ?>
+					<?php echo $item->event->beforeDisplayContent; ?>
 				</div>
 			<?php endif; ?>
 			<!-- EOF beforeDisplayContent -->
 
 			<?php if ($this->params->get('show_editbutton', 1)) : ?>
 				
-				<?php $editbutton = flexicontent_html::editbutton( $items[$i], $this->params ); ?>
+				<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
 				<?php if ($editbutton) : ?>
 					<div class="fc_edit_link"><?php echo $editbutton;?></div>
 				<?php endif; ?>
 
-				<?php $statebutton = flexicontent_html::statebutton( $items[$i], $this->params ); ?>
+				<?php $statebutton = flexicontent_html::statebutton( $item, $this->params ); ?>
 				<?php if ($statebutton) : ?>
 					<div class="fc_state_toggle_link"><?php echo $statebutton;?></div>
 				<?php endif; ?>
 
-				<?php $approvalbutton = flexicontent_html::approvalbutton( $items[$i], $this->params ); ?>
+				<?php $approvalbutton = flexicontent_html::approvalbutton( $item, $this->params ); ?>
 				<?php if ($approvalbutton) : ?>
 					<div class="fc_approval_request_link"><?php echo $approvalbutton;?></div>
 				<?php endif; ?>
@@ -425,9 +425,9 @@ if ($count > $leadnum) :
 			?>
 			
 			<?php if ($this->params->get('show_comments_count')) : ?>
-				<?php if ( isset($this->comments[ $items[$i]->id ]->total )) : ?>
+				<?php if ( isset($this->comments[ $item->id ]->total )) : ?>
 					<div class="fc_comments_count hasTip" alt=="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
-						<?php echo $this->comments[ $items[$i]->id ]->total; ?>
+						<?php echo $this->comments[ $item->id ]->total; ?>
 					</div>
 				<?php endif; ?>
 			<?php endif; ?>
@@ -435,19 +435,19 @@ if ($count > $leadnum) :
 			<?php if ($this->params->get('show_title', 1)) : ?>
 				<h2 class="contentheading"><span class="fc_item_title">
 					<?php if ($this->params->get('link_titles', 0)) : ?>
-					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>"><?php echo $items[$i]->title; ?></a>
+					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>"><?php echo $item->title; ?></a>
 					<?php
 					else :
-					echo $items[$i]->title;
+					echo $item->title;
 					endif;
 					?>
 				</span></h2>
 			<?php endif; ?>
 				
 			<!-- BOF afterDisplayTitle -->
-			<?php if ($items[$i]->event->afterDisplayTitle) : ?>
+			<?php if ($item->event->afterDisplayTitle) : ?>
 				<div class="fc_afterDisplayTitle group">
-					<?php echo $items[$i]->event->afterDisplayTitle; ?>
+					<?php echo $item->event->afterDisplayTitle; ?>
 				</div>
 			<?php endif; ?>
 			<!-- EOF afterDisplayTitle -->
@@ -457,11 +457,11 @@ if ($count > $leadnum) :
 			<?php 
 			if ($this->params->get('intro_use_image', 1)) :
 				if (!empty($img_field_name)) :
-					FlexicontentFields::getFieldDisplay($items[$i], $img_field_name, $values=null, $method='display');
-					$img_field = & $items[$i]->fields[$img_field_name];
+					FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display');
+					$img_field = & $item->fields[$img_field_name];
 					$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 				else :
-					$src = flexicontent_html::extractimagesrc($items[$i]);
+					$src = flexicontent_html::extractimagesrc($item);
 				endif;
 					
 				$RESIZE_FLAG = !$this->params->get('intro_image') || !$this->params->get('intro_image_size');
@@ -486,9 +486,9 @@ if ($count > $leadnum) :
 			?>
 				
 			<!-- BOF above-description-line1 block -->
-			<?php if (isset($items[$i]->positions['above-description-line1'])) : ?>
+			<?php if (isset($item->positions['above-description-line1'])) : ?>
 			<div class="lineinfo line1">
-				<?php foreach ($items[$i]->positions['above-description-line1'] as $field) : ?>
+				<?php foreach ($item->positions['above-description-line1'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -501,9 +501,9 @@ if ($count > $leadnum) :
 			<!-- EOF above-description-line1 block -->
 
 			<!-- BOF above-description-nolabel-line1 block -->
-			<?php if (isset($items[$i]->positions['above-description-line1-nolabel'])) : ?>
+			<?php if (isset($item->positions['above-description-line1-nolabel'])) : ?>
 			<div class="lineinfo line1">
-				<?php foreach ($items[$i]->positions['above-description-line1-nolabel'] as $field) : ?>
+				<?php foreach ($item->positions['above-description-line1-nolabel'] as $field) : ?>
 				<span class="element">
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -513,9 +513,9 @@ if ($count > $leadnum) :
 			<!-- EOF above-description-nolabel-line1 block -->
 
 			<!-- BOF above-description-line2 block -->
-			<?php if (isset($items[$i]->positions['above-description-line2'])) : ?>
+			<?php if (isset($item->positions['above-description-line2'])) : ?>
 			<div class="lineinfo line2">
-				<?php foreach ($items[$i]->positions['above-description-line2'] as $field) : ?>
+				<?php foreach ($item->positions['above-description-line2'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -528,9 +528,9 @@ if ($count > $leadnum) :
 			<!-- EOF above-description-line2 block -->
 
 			<!-- BOF above-description-nolabel-line2 block -->
-			<?php if (isset($items[$i]->positions['above-description-line2-nolabel'])) : ?>
+			<?php if (isset($item->positions['above-description-line2-nolabel'])) : ?>
 			<div class="lineinfo line2">
-				<?php foreach ($items[$i]->positions['above-description-line2-nolabel'] as $field) : ?>
+				<?php foreach ($item->positions['above-description-line2-nolabel'] as $field) : ?>
 				<span class="element">
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -543,30 +543,30 @@ if ($count > $leadnum) :
 			<?php if ($this->params->get('intro_use_image', 1) && $src) : ?>
 			<div class="image<?php echo $this->params->get('intro_position') ? ' right' : ' left'; ?>">
 				<?php if ($this->params->get('intro_link_image', 1)) : ?>
-					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>">
-						<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
+					<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>">
+						<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>" />
 					</a>
 				<?php else : ?>
-					<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($items[$i]->title, ENT_COMPAT, 'UTF-8'); ?>" />
+					<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>" />
 				<?php endif; ?>
 			</div>
 			<?php endif; ?>
 			<p>
 			<?php
-				FlexicontentFields::getFieldDisplay($items[$i], 'text', $values=null, $method='display');
+				FlexicontentFields::getFieldDisplay($item, 'text', $values=null, $method='display');
 				if ($this->params->get('intro_strip_html', 1)) :
-					echo flexicontent_html::striptagsandcut( $items[$i]->fields['text']->display, $this->params->get('intro_cut_text', 200) );
+					echo flexicontent_html::striptagsandcut( $item->fields['text']->display, $this->params->get('intro_cut_text', 200) );
 				else :
-					echo $items[$i]->fields['text']->display;
+					echo $item->fields['text']->display;
 				endif;
 			?>
 			</p>
 			</div>
 
 			<!-- BOF under-description-line1 block -->
-			<?php if (isset($items[$i]->positions['under-description-line1'])) : ?>
+			<?php if (isset($item->positions['under-description-line1'])) : ?>
 			<div class="lineinfo line3">
-				<?php foreach ($items[$i]->positions['under-description-line1'] as $field) : ?>
+				<?php foreach ($item->positions['under-description-line1'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -579,9 +579,9 @@ if ($count > $leadnum) :
 			<!-- EOF under-description-line1 block -->
 
 			<!-- BOF under-description-line1-nolabel block -->
-			<?php if (isset($items[$i]->positions['under-description-line1-nolabel'])) : ?>
+			<?php if (isset($item->positions['under-description-line1-nolabel'])) : ?>
 			<div class="lineinfo line3">
-				<?php foreach ($items[$i]->positions['under-description-line1-nolabel'] as $field) : ?>
+				<?php foreach ($item->positions['under-description-line1-nolabel'] as $field) : ?>
 				<span class="element">
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -591,9 +591,9 @@ if ($count > $leadnum) :
 			<!-- EOF under-description-line1-nolabel block -->
 
 			<!-- BOF under-description-line2 block -->
-			<?php if (isset($items[$i]->positions['under-description-line2'])) : ?>
+			<?php if (isset($item->positions['under-description-line2'])) : ?>
 			<div class="lineinfo line4">
-				<?php foreach ($items[$i]->positions['under-description-line2'] as $field) : ?>
+				<?php foreach ($item->positions['under-description-line2'] as $field) : ?>
 				<span class="element">
 					<?php if ($field->label) : ?>
 					<span class="flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></span>
@@ -606,9 +606,9 @@ if ($count > $leadnum) :
 			<!-- EOF under-description-line2 block -->
 
 			<!-- BOF under-description-line2-nolabel block -->
-			<?php if (isset($items[$i]->positions['under-description-line2-nolabel'])) : ?>
+			<?php if (isset($item->positions['under-description-line2-nolabel'])) : ?>
 			<div class="lineinfo line4">
-				<?php foreach ($items[$i]->positions['under-description-line2-nolabel'] as $field) : ?>
+				<?php foreach ($item->positions['under-description-line2-nolabel'] as $field) : ?>
 				<span class="element">
 					<span class="value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></span>
 				</span>
@@ -628,28 +628,28 @@ if ($count > $leadnum) :
 			<?php if ( $readmore_shown ) : ?>
 			<span class="readmore">
 				<?php
-				/*$uniqueid = "read_more_fc_item_".$items[$i]->id;
-				$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug).'&tmpl=component');
+				/*$uniqueid = "read_more_fc_item_".$item->id;
+				$itemlnk = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item).'&tmpl=component');
 				echo '<script>document.write(\'<a href="'.$itemlnk.'" id="mb'.$uniqueid.'" class="mb" rel="width:\'+((MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-150)+\',height:\'+((MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-150)+\'">\')</script>';
 				*/
 				?>
-				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($items[$i]->slug, $items[$i]->categoryslug)); ?>" class="readon">
+				<a href="<?php echo JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)); ?>" class="readon">
 				<?php
-				if ($items[$i]->params->get('readmore')) :
-					echo ' ' . $items[$i]->params->get('readmore');
+				if ($item->params->get('readmore')) :
+					echo ' ' . $item->params->get('readmore');
 				else :
-					echo ' ' . JText::sprintf('FLEXI_READ_MORE', $items[$i]->title);
+					echo ' ' . JText::sprintf('FLEXI_READ_MORE', $item->title);
 				endif;
 				?>
 				</a>
-				<?php //echo '<script>document.write(\'</a> <div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.$items[$i]->title.'</div>\')</script>'; ?>
+				<?php //echo '<script>document.write(\'</a> <div class="multiBoxDesc mbox_img_url mb'.$uniqueid.'">'.$item->title.'</div>\')</script>'; ?>
 			</span>
 			<?php endif; ?>
 				
 			<!-- BOF afterDisplayContent -->
-			<?php if ($items[$i]->event->afterDisplayContent) : ?>
+			<?php if ($item->event->afterDisplayContent) : ?>
 				<div class="fc_afterDisplayContent group">
-					<?php echo $items[$i]->event->afterDisplayContent; ?>
+					<?php echo $item->event->afterDisplayContent; ?>
 				</div>
 
 			<?php endif; ?>

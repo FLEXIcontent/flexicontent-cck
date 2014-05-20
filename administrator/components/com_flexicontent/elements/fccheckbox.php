@@ -100,7 +100,7 @@ class JElementFccheckbox extends JElement
 			$curr_element_id = $element_id.$i;
 			$html .= '<div style="'.$inline_style.'" ><input id="'.$curr_element_id.'" type="checkbox"'.$disable_all;
 			$html .= in_array($checkvals[$i], $values) ? ' checked="checked"' : '' ;
-			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'">';
+			$html .= ' name="'.$fieldname.'" value="'.$checkvals[$i].'" />';
 			$html .= '<label for="'.$curr_element_id.'" >'.JText::_($checkoptions[$i]).'</label></div>';
 			$html .= FLEXI_J16GE ? ' &nbsp; ' : '';
 		}

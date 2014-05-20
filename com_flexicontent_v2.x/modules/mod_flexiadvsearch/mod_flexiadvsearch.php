@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: mod_flexiadvsearch.php 1764 2013-09-16 08:00:21Z ggppdk $
+ * @version 1.0 $Id: mod_flexiadvsearch.php 1795 2013-10-23 00:08:42Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIadvsearch Module
  * @copyright (C) 2011 flexicontent.org
@@ -134,13 +134,13 @@ if ( $show_mod )
 	// Render Layout
 	require(JModuleHelper::getLayoutPath('mod_flexiadvsearch', $layout));
 	
+	// append performance stats to global variable
 	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
 		$modfc_jprof->mark('END: FLEXIcontent Adv Search Module');
-		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
-		$app->enqueueMessage( $msg, 'notice' );
+		$msg  = '<br/><br/>'.implode('<br/>', $modfc_jprof->getbuffer());
+		global $fc_performance_msg;
+		$fc_performance_msg .= $msg;
 	}
-
 }
-?>

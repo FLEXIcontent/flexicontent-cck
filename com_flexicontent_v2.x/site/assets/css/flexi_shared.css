@@ -321,10 +321,11 @@ div.credits {
 
 /* Access */
 fieldset.flexiaccess legend {
-	background: url(../images/toggle_blue.png) no-repeat 98% 50%;
-	padding-right: 22px;
-	line-height: 18px;
-	cursor: pointer;
+	background: url(../images/toggle_blue.png) no-repeat 98% 50% !important;
+	padding-right: 22px !important;
+	line-height: 18px !important;
+	cursor: pointer !important;
+	color: #0B55C4 !important;
 }
 option[disabled], option[readonly] { color: #bbb; }
 /* Categories in the items view */
@@ -966,11 +967,13 @@ fieldset.flexiaccess, fieldset.adminform,
 	min-width: inherit !important; /* workaround for chrome fieldset width bug */
 	display: block;
 }
+#flexicontent fieldset legend { padding:0px 6px; width:auto; border:0px; margin:0px; font-size:14px; font-family:georgia; font-weight:bold; }
+
 fieldset.flexiaccess, fieldset.adminform { margin-bottom: 1em !important; }
 fieldset.flexiaccess legend, fieldset.adminform legend { font-weight:bold; font-size: 14px; }
 
 #flexicontent form input,
-#flexicontent form button,
+#flexicontent form button:not(.btn),
 #flexicontent form select,
 #flexicontent form textarea {
 	background-color: #ffffff;

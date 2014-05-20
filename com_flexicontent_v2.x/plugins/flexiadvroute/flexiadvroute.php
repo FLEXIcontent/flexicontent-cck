@@ -242,7 +242,7 @@ class plgSystemFlexiadvroute extends JPlugin
 				$app->enqueueMessage( "*** Language switching category no: $cat_id<br><br>", 'message');
 			
 			$session->set('flexi_lang_switched', 1);
-			$cat_url = JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat_slug).'&lang='.$curr_lang );
+			$cat_url = JRoute::_( FlexicontentHelperRoute::getCategoryRoute($cat_slug).'&lang='.$curr_lang, false );
 			$app->redirect( $cat_url );
 		}
 		
@@ -270,7 +270,7 @@ class plgSystemFlexiadvroute extends JPlugin
 			$app->enqueueMessage( "*** Found translation of item {$item_id} for language $curr_lang. <br>Translating item is {$translation->id}<br><br>", 'message');
 		
 		if (FLEXI_J16GE) {
-			$item_url = JRoute::_( FlexicontentHelperRoute::getItemRoute($translation->slug, $cat_slug).'&lang='.$curr_lang );
+			$item_url = JRoute::_( FlexicontentHelperRoute::getItemRoute($translation->slug, $cat_slug).'&lang='.$curr_lang, false );
 			$session->set('flexi_lang_switched', 1);
 			$app->redirect( $item_url );
 		} else {

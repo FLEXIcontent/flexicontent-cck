@@ -91,15 +91,15 @@ class FlexicontentViewCategories extends JViewLegacy
 		// Copy Parameters
 		$btn_task = '';
 		$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=categories&layout=params&tmpl=component';
-		if (FLEXI_J16GE) {
+		if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
 			$js .= "
-				$$('li#toolbar-params a.toolbar, #toolbar-params button')
-					.set('onclick', 'javascript:;')
-					.set('href', '". $popup_load_url ."')
-					.set('rel', '{handler: \'iframe\', size: {x: 600, y: 440}, onClose: function() {}}');
+				jQuery('#toolbar-params a.toolbar, #toolbar-params button')
+					.attr('onclick', 'javascript:;')
+					.attr('href', '". $popup_load_url ."')
+					.attr('rel', '{handler: \'iframe\', size: {x: 600, y: 440}, onClose: function() {}}');
 			";
 			JToolBarHelper::custom( $btn_task, 'params.png', 'params_f2.png', 'FLEXI_COPY_PARAMS', false );
-			JHtml::_('behavior.modal', 'li#toolbar-params a.toolbar, #toolbar-params button');
+			JHtml::_('behavior.modal', '#toolbar-params a.toolbar, #toolbar-params button');
 		} else {
 			$toolbar->appendButton('Popup', 'params', JText::_('FLEXI_COPY_PARAMS'), str_replace('&', '&amp;', $popup_load_url), 600, 440);
 		}

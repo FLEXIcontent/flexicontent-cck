@@ -770,7 +770,7 @@ class FlexicontentController extends JControllerLegacy
 			// REDIRECT CASE: Save and preview the latest version
 			else if ($task=='save_a_preview') {
 				$msg = JText::_( 'FLEXI_ITEM_SAVED' );
-				$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid).'&preview=1', false);
+				$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($model->_item->id.':'.$model->_item->alias, $model->_item->catid, 0, $model->_item).'&preview=1', false);
 			}
 			// REDIRECT CASE: Return to the form 's referer (previous page) after item saving
 			else {
@@ -1682,8 +1682,10 @@ class FlexicontentController extends JControllerLegacy
 			}
 			$field_type = $fields_props[$field_id]->field_type;
 			
+			$lta = FLEXI_J16GE ? 'i' : 'ie';
 			$query  = 'SELECT f.id, f.filename, f.altname, f.secure, f.url'
 					. ', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email'
+					. ', i.access as item_access, '.$lta.'.language as item_language, ie.type_id as item_type_id'
 					
 					// item and current category slugs (for URL in notifications)
 					. ', CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as itemslug'
@@ -1852,7 +1854,11 @@ class FlexicontentController extends JControllerLegacy
 				$file->__file_title__ = $file->altname && $file->altname != $file->filename ? 
 					$file->altname . ' ['.$file->filename.']'  :  $file->filename;
 				
-				$file->__item_url__ = JRoute::_(FlexicontentHelperRoute::getItemRoute($file->itemslug, $file->catslug));
+				$item = new stdClass();
+				$item->access = $file->item_access;
+				$item->type_id = $file->item_type_id;
+				$item->language = $file->item_language;
+				$file->__item_url__ = JRoute::_(FlexicontentHelperRoute::getItemRoute($file->itemslug, $file->catslug, 0, $item));
 				
 				// Parse and identify language strings and then make language replacements
 				$notification_tmpl = $fields_conf[$field_id]->get('notification_tmpl');

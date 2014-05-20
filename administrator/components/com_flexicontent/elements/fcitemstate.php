@@ -45,7 +45,7 @@ class JElementFcitemstate extends JElement
 	
 	function fetchElement($name, $value, &$node, $control_name)
 	{
-		$class = 'class="inputbox" multiple="true" size="6"';
+		$class = 'class="inputbox" multiple="multiple" size="6"';
 		
 		$states[] = JHTML::_('select.option',   1, 	JText::_( 'FLEXI_PUBLISHED' ) );
 		$states[] = JHTML::_('select.option',  -5,	JText::_( 'FLEXI_IN_PROGRESS' ) );

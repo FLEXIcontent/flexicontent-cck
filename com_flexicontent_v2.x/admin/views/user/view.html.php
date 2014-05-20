@@ -1,6 +1,6 @@
 <?php
 /**
-* @version		$Id: view.html.php 1794 2013-10-22 02:41:41Z ggppdk $
+* @version		$Id: view.html.php 1901 2014-05-07 02:37:25Z ggppdk $
 * @package		Joomla
 * @subpackage	Users
 * @copyright	Copyright (C) 2005 - 2010 Open Source Matters. All rights reserved.
@@ -149,7 +149,7 @@ class FlexicontentViewUser extends JViewLegacy
 		$author_user_id = (int) $cid[0];
 		$flexiauthor_extdata = JTable::getInstance('flexicontent_authors_ext', '');
 		$flexiauthor_extdata->load( $author_user_id );
-		//echo "<pre>"; print_r($flexiauthor_extdata); echo "</pre>";
+		//echo "<pre>"; print_r($flexiauthor_extdata); echo "</pre>"; exit;
 		
 		// ***********************
 		// AUTHOR basic parameters
@@ -164,7 +164,7 @@ class FlexicontentViewUser extends JViewLegacy
 			$params_authorbasic = new JRegistry($flexiauthor_extdata->author_basicparams);
 		else
 			$params_authorbasic = new JParameter($flexiauthor_extdata->author_basicparams, $auth_xml);
-		//echo "<pre>"; print_r($params_authorbasic); echo "</pre>";
+		//echo "<pre>"; print_r($params_authorbasic); echo "</pre>"; exit;
 		
 		if (FLEXI_J16GE)
 		{
@@ -176,7 +176,7 @@ class FlexicontentViewUser extends JViewLegacy
 			$jform_authorbasic->load($xml_string, $isFile=false);
 			
 			// Set DB parameter values into the JForm object
-			foreach ($jform_authorbasic->getFieldset() as $field) {
+			foreach ($jform_authorbasic->getFieldset() as $fsetname =>  $field) {
 				$jform_authorbasic->setValue($field->fieldname, $group = 'authorbasicparams', $value = $params_authorbasic->get($field->fieldname) );
 			}
 		}
@@ -194,7 +194,7 @@ class FlexicontentViewUser extends JViewLegacy
 			$params_authorcat = new JRegistry($flexiauthor_extdata->author_catparams);
 		else
 			$params_authorcat = new JParameter($flexiauthor_extdata->author_catparams, $cat_xml);
-		//echo "<pre>"; print_r($params_authorcat); echo "</pre>";
+		//echo "<pre>"; print_r($params_authorcat); echo "</pre>"; exit;
 			
 		if (FLEXI_J16GE)
 		{
@@ -206,7 +206,7 @@ class FlexicontentViewUser extends JViewLegacy
 			$jform_authorcat->load($xml_string, $isFile=false);
 			
 			// Set DB parameter values into the JForm object
-			foreach ($jform_authorcat->getFieldset() as $field) {
+			foreach ($jform_authorcat->getFieldset() as $fsetname => $field) {
 				$jform_authorcat->setValue($field->fieldname, $group = 'authorcatparams', $value = $params_authorcat->get($field->fieldname) );
 			}
 		}
@@ -229,7 +229,7 @@ class FlexicontentViewUser extends JViewLegacy
 				$tmpl->params = $jform;
 				// ... values applied at the template form file
 			} else {
-				$tmpl->params->loadINI($user->params);
+				$tmpl->params->loadINI($flexiauthor_extdata->author_catparams);
 			}
 		}
 		

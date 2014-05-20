@@ -45,21 +45,27 @@ class JFormFieldContenttypes extends JFormFieldList{
 	 * @return	string	The field input markup.
 	 * @since	1.6
 	 */
-	protected function getInput() {
-		$name = $this->name;
-		$value = $this->value;
-		$attr = '';
-
+	protected function getInput()
+	{
 		// Initialize some field attributes.
-		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
+		$attr  = '';
+		$attr .= $this->element['class'] ? ' class="use_select2_lib '.(string) $this->element['class'].'"' : '';
 		$attr .= ((string) $this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
 		$attr .= $this->element['size'] ? ' size="'.(int) $this->element['size'].'"' : '';
 		$attr .= $this->multiple ? ' multiple="multiple"' : '';
 		$options = (array) $this->getOptions();
-		return JHtml::_('select.genericlist', $options, $name, trim($attr), 'value', 'text', $value, $name);
-		//return JHTMLSelect::genericList($options, $name, $attr, 'value', 'text', $value, $name);
+		
+		$value = $this->value;
+		$fieldname	= FLEXI_J16GE ? $this->name : $control_name.'['.$name.']';
+		$element_id = FLEXI_J16GE ? $this->id : $control_name.$name;
+		
+		return JHtml::_('select.genericlist', $options, $fieldname, trim($attr), 'value', 'text', $value, $element_id);
+		//return JHTMLSelect::genericList($options, $fieldname, $attr, 'value', 'text', $value, $element_id);
 	}
-	protected function getOptions() {
+	
+	
+	protected function getOptions()
+	{
 		$db = JFactory::getDBO();
 		$query = 'SELECT id AS value, name AS text'
 		. ' FROM #__flexicontent_types'
@@ -71,7 +77,10 @@ class JFormFieldContenttypes extends JFormFieldList{
 		$types = $db->loadObjectList();
 		return $types;
 	}
-	public function setAttributes($attribs = array()) {
+	
+	
+	public function setAttributes($attribs = array())
+	{
 		$this->name = $attribs['name'];
 		$this->value = $attribs['value'];
 		$this->label = JText::_($attribs['label']);

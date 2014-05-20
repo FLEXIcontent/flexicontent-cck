@@ -1471,6 +1471,11 @@ class FlexicontentControllerItems extends FlexicontentController
 		exit;
 	}
 	
+	
+	//*************************
+	// RAW output functions ...
+	//*************************
+	
 	function getversionlist()
 	{
 		// Check for request forgeries
@@ -1520,10 +1525,6 @@ class FlexicontentControllerItems extends FlexicontentController
 		exit;
 	}
 	
-	
-	//*************************
-	// RAW output functions ...
-	//*************************
 	
 	/**
 	 * Method to reset hits

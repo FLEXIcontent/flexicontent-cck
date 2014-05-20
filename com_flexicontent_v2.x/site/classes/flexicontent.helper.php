@@ -1115,7 +1115,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function mailbutton($view, &$params, $slug = null, $itemslug = null )
+	static function mailbutton($view, &$params, $slug = null, $itemslug = null, $item = null )
 	{
 		static $initialize = null;
 		static $uri, $base;
@@ -1139,7 +1139,7 @@ class flexicontent_html
 			$link = $base . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($slug));
 			//$link = $base . JRoute::_( 'index.php?view='.$view.'&cid='.$slug, false );
 		} elseif($view == FLEXI_ITEMVIEW) {
-			$link = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $slug));
+			$link = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $slug, 0, $item));
 			//$link = $base . JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug, false );
 		} elseif($view == 'tags') {
 			$link = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($itemslug));
@@ -1327,11 +1327,11 @@ class flexicontent_html
 			<ul class="statetoggler">
 				<li class="topLevel">
 					<a href="javascript:void(0);" class="opener" style="outline:none;">
-					<div id="row'.$item->id.'">
+					<span id="row'.$item->id.'">
 						<span class="editlinktip hasTip" title="'.flexicontent_html::escape(JText::_('FLEXI_PUBLISH_INFORMATION')).'::'.flexicontent_html::escape($publish_info).'">
 							'.$stateicon.'
 						</span>
-					</div>
+					</span>
 					</a>
 					<div class="options" style="'.$box_css.'">
 						<ul>';
@@ -2220,6 +2220,7 @@ class flexicontent_html
 			$fieldname = FLEXI_J16GE ? 'jform[field_type]' : 'field_type';
 			$elementid = FLEXI_J16GE ? 'jform_field_type'  : 'field_type';
 			$list = JHTML::_('select.genericlist', $fftype, $fieldname, 'class="inputbox" size="1"', 'value', 'text', $selected, $elementid );
+			if (!FLEXI_J16GE) $list = str_replace('<optgroup label="">', '</optgroup>', $list);
 		}
 		return $list;
 	}
@@ -2288,28 +2289,44 @@ class flexicontent_html
 	 * @return object
 	 * @since 1.5
 	 */
-	static function buildlanguageslist($name, $class, $selected, $type = 1, $allowed_langs = null, $published_only=true)
+	static function buildlanguageslist($name, $class, $selected, $type=1, $allowed_langs=null, $published_only=true, $disable_langs=null, $add_all=true)
 	{
 		$db = JFactory::getDBO();
 
 		$selected_found = false;
-		$all_langs = FLEXIUtilities::getlanguageslist($published_only);
-		$user_langs = array();
+		$all_langs = FLEXIUtilities::getlanguageslist($published_only, $add_all);
+		$user_langs = null;
 		if ($allowed_langs) {
+			$_allowed = array_flip($allowed_langs);
 			foreach ($all_langs as $index => $lang)
-				if ( in_array($lang->code, $allowed_langs) ) {
+				if ( isset($_allowed[$lang->code] ) ) {
 					$user_langs[] = $lang;
 					// Check if selected language was added to the user langs
 					$selected_found = ($lang->code == $selected) ? true : $selected_found;
 				}
-		}	else {
+		} else {
 			$user_langs = & $all_langs;
 			$selected_found = true;
 		}
+		
+		if ($disable_langs) {
+			$_disabled = array_flip($disable_langs);
+			$_user_langs = array();
+			foreach ($user_langs as $index => $lang) {
+				if ( !isset($_disabled[$lang->code] ) ) {
+					$_user_langs[] = $lang;
+					// Check if selected language was added to the user langs
+					$selected_found = ($lang->code == $selected) ? true : $selected_found;
+				}
+			}
+			$user_langs = $_user_langs;
+		}
+		
 		if ( !count($user_langs) )  return "user is not allowed to use any language";
 		if (!$selected_found) $selected = $user_langs[0]->code;  // Force first language to be selected
-
-
+		
+		$element_id = preg_replace('#[\[\]]#', '_', $name);
+		
 		$langs = array();
 		switch ($type)
 		{
@@ -2334,8 +2351,8 @@ class flexicontent_html
 					if ($lang->code == $selected) {
 						$checked = ' checked="checked"';
 					}
-					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
-					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'" >';
+					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" value="'.$lang->code.'"'.$checked.' />';
+					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'" >';
 					if($lang->shortcode=="*") {
 						$list 	.= '<span class="lang_lbl">'.JText::_('FLEXI_ALL').'</span>';  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -2354,8 +2371,8 @@ class flexicontent_html
 				$list .= '</label><div class="clear"></div>';
 
 				foreach ($user_langs as $lang) {
-					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
-					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -2370,8 +2387,8 @@ class flexicontent_html
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					if ($lang->code==$selected) continue;
-					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
-					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" />';
+					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -2386,8 +2403,8 @@ class flexicontent_html
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					$checked = $lang->code==$selected ? 'checked="checked"' : '';
-					$list 	.= '<input id="lang'.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" '.$checked.'/>';
-					$list 	.= '<label class="lang_box" for="lang'.$lang->id.'" title="'.$lang->name.'">';
+					$list 	.= '<input id="'.$element_id.$lang->id.'" type="radio" name="'.$name.'" class="lang" value="'.$lang->code.'" '.$checked.'/>';
+					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'">';
 					if($lang->shortcode=="*") {
 						$list 	.= JText::_('FLEXI_ALL');  // Can appear in J1.6+ only
 					} else if (@$lang->imgsrc) {
@@ -3810,7 +3827,7 @@ class FLEXIUtilities
 	 * @return object
 	 * @since 1.5
 	 */
-	static function getlanguageslist($published_only=false)
+	static function getlanguageslist($published_only=false, $add_all = true)
 	{
 		$app = JFactory::getApplication();
 		$db = JFactory::getDBO();
@@ -3831,19 +3848,17 @@ class FLEXIUtilities
 		// Retrieve languages
 		// ******************
 		if (FLEXI_J16GE) {   // Use J1.6+ language info
-			$query = 'SELECT DISTINCT le.*, lc.lang_id as id, lc.image as image_prefix'
-					.', CASE WHEN CHAR_LENGTH(lc.title_native) THEN lc.title_native ELSE le.name END as name'
-					.' FROM #__extensions as le'
-					// INNER Join to get only languages having content entries
-					.' JOIN #__languages as lc ON lc.lang_code=le.element'.($published_only ? ' AND lc.published=1' : '')
-					.' WHERE le.type="language" '
-					.' GROUP BY le.element';
+			$query = 'SELECT DISTINCT lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, '
+					. ' CASE WHEN CHAR_LENGTH(lc.title_native) THEN CONCAT(lc.title, " (", lc.title_native, ")") ELSE lc.title END as name '
+					.' FROM #__languages as lc '
+					.' WHERE 1 '.($published_only ? ' AND lc.published=1' : '')
+					;
 		} else if (FLEXI_FISH) {   // Use joomfish languages table
 			$query = 'SELECT l.* '
-				. ( FLEXI_FISH_22GE ? ", lext.* " : "" )
-				. ( FLEXI_FISH_22GE ? ", l.lang_id as id " : ", l.id " )
-				. ( FLEXI_FISH_22GE ? ", l.lang_code as code, l.sef as shortcode" : ", l.code, l.shortcode" )
-				. ( FLEXI_FISH_22GE ? ", CASE WHEN CHAR_LENGTH(l.title) THEN l.title ELSE l.title_native END as name" : ", l.name " )
+				. ( FLEXI_FISH_22GE ? ', lext.* ' : '' )
+				. ( FLEXI_FISH_22GE ? ', l.lang_id as id ' : ', l.id ' )
+				. ( FLEXI_FISH_22GE ? ', l.lang_code as code, l.sef as shortcode' : ', l.code, l.shortcode' )
+				. ( FLEXI_FISH_22GE ? ', CASE WHEN CHAR_LENGTH(l.title_native) THEN CONCAT(l.title, " (", l.title_native, ")") ELSE l.title END as name ' : ', l.name ' )
 				. ' FROM #__languages as l'
 				. ( FLEXI_FISH_22GE ? ' LEFT JOIN #__jf_languages_ext as lext ON l.lang_id=lext.lang_id ' : '')
 				. ' WHERE '.    (FLEXI_FISH_22GE ? ' l.published=1 ' : ' l.active=1 ')
@@ -3877,16 +3892,17 @@ class FLEXIUtilities
 		// ************************
 		if (FLEXI_J16GE)  // FLEXI_J16GE, based on J1.6+ language data and images
 		{
-			$lang_all = new stdClass();
-			$lang_all->code = '*';
-			$lang_all->name = JText::_('FLEXI_ALL');
-			$lang_all->shortcode = '*';
-			$lang_all->id = 0;
-			$_languages = array( 0 => $lang_all);
-
+			if ($add_all) {
+				$lang_all = new stdClass();
+				$lang_all->code = '*';
+				$lang_all->name = JText::_('FLEXI_ALL');
+				$lang_all->shortcode = '*';
+				$lang_all->id = 0;
+				$_languages = array( 0 => $lang_all);
+			}
+			
 			foreach ($languages as $lang) {
 				// Calculate/Fix languages data
-				$lang->code = $lang->element;
 				$lang->shortcode = substr($lang->code, 0, strpos($lang->code,'-'));
 				//$lang->id = $lang->extension_id;
 				$image_prefix = $lang->image_prefix ? $lang->image_prefix : $lang->shortcode;
@@ -3924,14 +3940,17 @@ class FLEXIUtilities
 		} else if (FLEXI_J16GE) {
 			$all_languages = $languages;
 		} else {
-			$lang_all = new stdClass();
-			$lang_all->code = '*';
-			$lang_all->name = JText::_('FLEXI_ALL');
-			$lang_all->shortcode = '*';
-			$lang_all->id = 0;
-			$lang_all->imgsrc = '';
+			if ($add_all) {
+				$lang_all = new stdClass();
+				$lang_all->code = '*';
+				$lang_all->name = JText::_('FLEXI_ALL');
+				$lang_all->shortcode = '*';
+				$lang_all->id = 0;
+				$lang_all->imgsrc = '';
+				
+				$all_languages[0] = $lang_all;
+			}
 			
-			$all_languages[0] = $lang_all;
 			foreach($languages as $lang) {
 				$all_languages[] = $lang;
 				$languages = $all_languages;
@@ -4962,7 +4981,7 @@ class flexicontent_db
 			'Media fields / Mini apps' => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
 			'Single property fields'   => array('date', 'text', 'textarea', 'textselect'),
 			'Multi property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers', 'termlist'),
-			'Item form'                => array('groupmarker'),
+			'Item form'                => array('groupmarker', 'coreprops'),
 			'Item relations fields'    => array('relation', 'relation_reverse', 'autorelationfilters'),
 			'Special action fields'    => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist')
 		);
@@ -5071,9 +5090,15 @@ class fcjsJText extends JText
 	 */
 	public static function load($after_render=true)
 	{
+		static $loaded = null;
+		if ($loaded !== null) return;
+		$loaded = true;
+		if (FLEXI_J16GE) return;
+		
 		$js = '
-			<script type="text/javascript">
 			
+			<script type="text/javascript">
+			// <![CDATA[
 			if (typeof(Joomla) === "undefined")
 			{
 				var Joomla = {};
@@ -5094,13 +5119,14 @@ class fcjsJText extends JText
 			}
 			var strings = '.json_encode(self::$strings).';
 			Joomla.JText.load(strings);
+			// ]]>
 			</script>
 		';
 		
 		if ($after_render) {
 			// Add to header, after rendering has completed ...
 			$buffer = JResponse::getBody();
-			$buffer = str_replace ("</head>", "\n\n".$js."\n\n</head>", $buffer);
+			$buffer = str_replace ("</head>", "\n\n" .$js ."\n\n</head>", $buffer );
 			JResponse::setBody($buffer);
 		} else {
 			JFactory::getDocument()->addCustomTag ($js);

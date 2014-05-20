@@ -33,7 +33,7 @@ class ParentClassItem extends JModelAdmin
 	var $_name = 'ParentClassItem';
 	
 	/**
-	 * Component parameters
+	 * component + type + menu parameters
 	 *
 	 * @var object
 	 */
@@ -85,16 +85,6 @@ class ParentClassItem extends JModelAdmin
 		
 		$app = JFactory::getApplication();
 		
-		// --. Get component parameters , merge (for frontend) with current menu item parameters
-		$this->_cparams = clone( JComponentHelper::getParams('com_flexicontent') );
-		if (!$app->isAdmin()) {
-			$menu = $app->getMenu()->getActive();
-			if ($menu) {
-				$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
-				$this->_cparams->merge($menu_params);
-			}
-		}
-		
 		// --. Get & Set ITEM's primary key (pk) and (for frontend) the current category
 		if (!$app->isAdmin()) {
 			// FRONTEND, use "id" from request
@@ -121,6 +111,26 @@ class ParentClassItem extends JModelAdmin
 			$curcatid = 0;
 		}
 		$this->setId($pk, $curcatid);  // NOTE: when setting $pk to a new value the $this->_item is cleared
+		
+		
+		// Get component parameters
+		$params  = FLEXI_J16GE ? new JRegistry() : new JParameter("");
+		$cparams = JComponentHelper::getParams('com_flexicontent');
+		$params->merge($cparams);
+		
+		// Merge into them the type parameters
+		$tparams = $this->getTypeparams();
+		$tparams = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
+		$params->merge($tparams);
+		
+		if (!$app->isAdmin()) {
+			$menu = $app->getMenu()->getActive();
+			if ($menu) {
+				$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);
+				$params->merge($menu_params);
+			}
+		}
+		$this->_cparams = $params;
 		
 		$this->populateState();
 	}
@@ -563,7 +573,7 @@ class ParentClassItem extends JModelAdmin
 				// *************************************************************************************************
 				$nn_content_tbl = FLEXI_J16GE ? 'falang_content' : 'jf_content';
 				
-				if ( FLEXI_FISH /*|| FLEXI_J16GE*/ )
+				if ( FLEXI_FISH )
 				{
 					$site_languages = FLEXIUtilities::getlanguageslist();
 					$item_translations = new stdClass();
@@ -578,7 +588,7 @@ class ParentClassItem extends JModelAdmin
 				// **********************************
 				// Retrieve and prepare JoomFish data
 				// **********************************
-				if ( (FLEXI_FISH /*|| FLEXI_J16GE*/) && $task=='edit' && $option=='com_flexicontent' && $editjf_translations > 0 )
+				if ( FLEXI_FISH && $task=='edit' && $option=='com_flexicontent' )
 				{
 					// -- Try to retrieve all joomfish data for the current item
 					$query = "SELECT jfc.language_id, jfc.reference_field, jfc.value, jfc.published "
@@ -587,10 +597,10 @@ class ParentClassItem extends JModelAdmin
 					$db->setQuery($query);
 					$translated_fields = $db->loadObjectList();
 					
-					if ( $editjf_translations < 2 && $translated_fields ) {
-						$app->enqueueMessage("Third party Joom!Fish translations detected for current content, but editting Joom!Fish translations is disabled in global configuration", 'message' );
-						$app->enqueueMessage("You can enable Joom!Fish translations editting or disable this warning in Global configuration",'message');
-					} else {
+					if ( $editjf_translations == 0 && $translated_fields ) {  // 1:disable without warning about found translations
+						$app->enqueueMessage( "3rd party Joom!Fish/Falang translations detected for current item."
+							." You can either enable editing them or disable this message in FLEXIcontent component configuration", 'message' );
+					} else if ( $editjf_translations == 2 ) {
 						if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 						
 						// -- Parse translation data according to their language
@@ -767,10 +777,20 @@ class ParentClassItem extends JModelAdmin
 					$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 					$item->type_access = $public_acclevel;
 				}
+				if ( !isset($item->rating_count) ) {
+					// Get category access for the item's main category, used later to determine viewing of the item
+					$query = 'SELECT '
+						.' v.rating_count as rating_count, ROUND( v.rating_sum / v.rating_count ) AS rating, ((v.rating_sum / v.rating_count)*20) as score'
+						.' FROM #__content_rating AS v WHERE v.content_id = '. (int) $item->id
+						;
+					$db->setQuery($query);
+					$rating_data = $db->loadObject();
+					$item->rating_count = !$rating_data ? 0 : $rating_data->rating_count;
+					$item->rating       = !$rating_data ? 0 : $rating_data->rating_count;
+					$item->score        = !$rating_data ? 0 : $rating_data->score;
+				}
 				$item->typename     = (string) @ $item->typename;
 				$item->typealias    = (string) @ $item->typealias;
-				$item->rating_count = (int) @ $item->rating_count;
-				$item->score        = (int) @ $item->score;
 				
 				// Retrieve Creator NAME and email (used to display the gravatar)
 				$query = 'SELECT name, email FROM #__users WHERE id = '. (int) $item->created_by;
@@ -1350,6 +1370,9 @@ class ParentClassItem extends JModelAdmin
 				$default_state = $cparams->get('new_item_state_fe', $pubished_state);  // Use the configured setting for frontend items
 			}
 			
+			// Decide default language
+			$default_lang = $app->isSite() ? $cparams->get('default_language_fe', '*') : (FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang());
+			
 			// Override defaults values, we assigned all properties, 
 			// despite many of them having the correct value already
 			$item->id           = 0;
@@ -1391,7 +1414,7 @@ class ParentClassItem extends JModelAdmin
 			$item->access       = $default_accesslevel;
 			$item->state        = $default_state;
 			$item->mask         = null;  // deprecated do not use
-			$item->language     = FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang();
+			$item->language     = $default_lang;
 			$item->lang_parent_id = 0;
 			$item->search_index = null;
 			$item->parameters   = clone ($cparams);   // Assign component parameters, merge with menu item (for frontend)
@@ -1863,6 +1886,12 @@ class ParentClassItem extends JModelAdmin
 			if ($isnew) return false;
 		}
 		
+		if ( $app->isSite() && $cparams->get('uselang_fe', 1)!=1 && isset($data['language']) ) {
+			$app->enqueueMessage('You are not allowed to set language to this content items', 'warning');
+			unset($data['language']);
+			if ($isnew) return false;
+		}
+		
 		
 		// ************************************************
 		// Bind given item DATA and PARAMETERS to the model
@@ -1951,9 +1980,9 @@ class ParentClassItem extends JModelAdmin
 			$item->ordering = $item->getNextOrder();
 		}
 		
-		// auto assign the default language if not set
-		$default_language = FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang() ;
-		$item->language   = $item->language ? $item->language : $default_language ;
+		// Auto assign the default language if not set, (security of allowing language usage and of language in user's allowed languages was checked above)
+		$item->language   = $item->language ? $item->language :
+			($app->isSite() ? $cparams->get('default_language_fe', '*') : (FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang()));
 		
 		// Ignore language parent id if item language is site's (content) default language, and for language 'ALL'
 		if ( substr($item->language, 0,2) == substr(flexicontent_html::getSiteDefaultLang(), 0,2) || $item->language=='*' ) {
@@ -2172,12 +2201,12 @@ class ParentClassItem extends JModelAdmin
 		$vcount	= FLEXIUtilities::getVersionsCount($item->id);
 		$vmax	= $cparams->get('nr_versions', 10);
 
-		if ($vcount > ($vmax+1)) {
+		if ($vcount > $vmax) {
 			$deleted_version = FLEXIUtilities::getFirstVersion($item->id, $vmax, $current_version);
 			$query = 'DELETE'
 					.' FROM #__flexicontent_items_versions'
 					.' WHERE item_id = ' . (int)$item->id
-					.' AND version <' . $deleted_version
+					.' AND version <=' . $deleted_version
 					.' AND version!=' . (int)$current_version
 					;
 			$this->_db->setQuery($query);
@@ -2186,7 +2215,7 @@ class ParentClassItem extends JModelAdmin
 			$query = 'DELETE'
 					.' FROM #__flexicontent_versions'
 					.' WHERE item_id = ' . (int)$item->id
-					.' AND version_id <' . $deleted_version
+					.' AND version_id <=' . $deleted_version
 					.' AND version_id!=' . (int)$current_version
 					;
 			$this->_db->setQuery($query);
@@ -2301,7 +2330,9 @@ class ParentClassItem extends JModelAdmin
 				}
 				
 				// Unserialize values already serialized values, e.g. (a) if current values used are from DB or (b) are being imported from CSV file
-				$postdata[$field->name] = !is_array($postdata[$field->name]) ? array($postdata[$field->name]) : $postdata[$field->name];
+				if ( !is_array($postdata[$field->name]) ) {
+					$postdata[$field->name] = strlen($postdata[$field->name]) ? array($postdata[$field->name]) : array();
+				}
 				//echo "<b>{$field->field_type}</b>: <br/> <pre>".print_r($postdata[$field->name], true)."</pre>\n";
 				foreach ($postdata[$field->name] as $i => $postdata_val) {
 					if ( @unserialize($postdata_val)!== false || $postdata_val === 'b:0;' ) {
@@ -2634,7 +2665,7 @@ class ParentClassItem extends JModelAdmin
 		// ****************************
 		// Save joomfish data in the db
 		// ****************************
-		if ( (FLEXI_FISH /*|| FLEXI_J16GE*/) && $editjf_translations )
+		if ( FLEXI_FISH && $editjf_translations==1 )   // 0:disable with warning about found translations,  1:disable without warning about found translations,  2:edit-save translations, 
 			$this->_saveJFdata( $data['jfdata'], $item );
 		
 		

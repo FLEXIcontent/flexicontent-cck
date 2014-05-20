@@ -261,15 +261,7 @@ if ( $show_mod )
 	// Render Layout
 	require(JModuleHelper::getLayoutPath('mod_flexifilter', $layout));
 	
-	
-	$flexiparams = JComponentHelper::getParams('com_flexicontent');
-	if ( $flexiparams->get('print_logging_info') )
-	{
-		$modfc_jprof->mark('END: FLEXIcontent Filter-Search Module');
-		$msg = implode('<br/>', $modfc_jprof->getbuffer());
-		$app->enqueueMessage( $msg, 'notice' );
-	}
-	
+	// Add needed js
 	$js = "";
 	/*if (!$display_cat_list || !empty($selected_cats)) {
 		$js .= '
@@ -301,5 +293,14 @@ if ( $show_mod )
 		';
 	}
 	if ($js) JFactory::getDocument()->addScriptDeclaration($js);
+	
+	// append performance stats to global variable
+	$flexiparams = JComponentHelper::getParams('com_flexicontent');
+	if ( $flexiparams->get('print_logging_info') )
+	{
+		$modfc_jprof->mark('END: FLEXIcontent Filter-Search Module');
+		$msg  = '<br/><br/>'.implode('<br/>', $modfc_jprof->getbuffer());
+		global $fc_performance_msg;
+		$fc_performance_msg .= $msg;
+	}
 }
-?>

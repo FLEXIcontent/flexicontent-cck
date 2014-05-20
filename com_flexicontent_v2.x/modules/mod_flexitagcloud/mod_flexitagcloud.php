@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.1 $Id: mod_flexitagcloud.php 1754 2013-09-06 02:06:28Z ggppdk $
+ * @version 1.1 $Id: mod_flexitagcloud.php 1767 2013-09-18 17:46:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Tag Cloud Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -87,12 +87,13 @@ if ( $show_mod )
 	// Render Layout
 	require(JModuleHelper::getLayoutPath('mod_flexitagcloud', $layout));
 	
+	// append performance stats to global variable
 	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
 		$modfc_jprof->mark('END: FLEXIcontent Tags Cloud Module');
-		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
-		$app->enqueueMessage( $msg, 'notice' );
+		$msg  = '<br/><br/>'.implode('<br/>', $modfc_jprof->getbuffer());
+		global $fc_performance_msg;
+		$fc_performance_msg .= $msg;
 	}
 }
-?>

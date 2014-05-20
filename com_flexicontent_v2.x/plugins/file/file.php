@@ -204,7 +204,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		</div>
 		";
 		
-		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($i ? $i : '').'">';
+		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($i ? $i : '').'" />';
 	}
 	
 	
