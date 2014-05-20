@@ -41,7 +41,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							</label>
 						</td>
 						<td>
-							<input id ="label" name="label" value="<?php echo $this->row->label; ?>" class="required" maxlength="255" />
+							<input id="label" name="label" value="<?php echo $this->row->label; ?>" class="required" maxlength="255" />
 						</td>
 					</tr>
 					<?php if ($this->row->iscore == 0) : ?>
@@ -71,7 +71,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					?>
 					<tr>
 						<td class="key">
-							<label for="published" class="hasTip" title="<?php echo JText::_('FLEXI_PUBLISHED').'::'.JText::_('FLEXI_FIELD_PUBLISHED_DESC');?>">
+							<label class="hasTip" title="<?php echo JText::_('FLEXI_PUBLISHED').'::'.JText::_('FLEXI_FIELD_PUBLISHED_DESC');?>">
 								<?php echo JText::_( 'FLEXI_PUBLISHED' ); ?>
 							</label>
 						</td>
@@ -107,11 +107,30 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 							<?php echo $this->lists['ordering']; ?>
 						</td>
 					</tr>
+
+					<tr>
+						<td colspan="2">
+							<?php $box_class = $this->row->iscore ? 'fc-info' : ($this->typesselected ? 'fc-success' : 'fc-warning'); ?>
+							<span class="<?php echo $box_class; ?> fc-mssg" style="width:90%; margin:6px 0px 0px 0px !important;">
+								<?php echo JText::_( $this->row->iscore ? 'FLEXI_SELECT_TYPES_CORE_NOTES' : 'FLEXI_SELECT_TYPES_CUSTOM_NOTES' ); ?>
+							</span>
+						</td>
+					</tr>
 					
+					<tr>
+						<td colspan="2">
+							<span class="flexi label hasTip" title="<?php echo JText::_('FLEXI_TYPES').'::'.JText::_('FLEXI_TYPES_NOTES');?>">
+								<?php echo JText::_( 'FLEXI_TYPES' ); ?>
+							</span>
+							<?php echo /*FLEXI_J16GE ? $this->form->getInput('tid') :*/ $this->lists['tid']; ?>
+						</td>
+					</tr>
+
 					<?php if ($this->supportsearch || $this->supportfilter) : ?>
 					<tr>
 						<td colspan="2">
-							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_CONTENT_LISTS' ); ?></span>
+							<span class="fcsep_level2" style="width:90%; margin-top:16px;"><?php echo JText::_( 'FLEXI_BASIC_INDEX' ); ?></span>
+							<span class="fcsep_level3"><?php echo JText::_( 'FLEXI_BASIC_INDEX_NOTES' ); ?></span>
 						</td>
 					</tr>
 					<?php endif; ?>
@@ -119,7 +138,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->supportsearch) : ?>
 					<tr>
 						<td class="key">
-							<label for="issearch" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE').'::'.JText::_('FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC');?>">
+							<label class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE').'::'.JText::_('FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_CONTENT_LIST_TEXT_SEARCHABLE' ); ?>
 							</label>
 						</td>
@@ -135,7 +154,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->supportfilter) : ?>
 					<tr>
 						<td class="key">
-							<label for="isfilter" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_CONTENT_LIST_FILTERABLE').'::'.JText::_('FLEXI_FIELD_CONTENT_LIST_FILTERABLE_DESC');?>">
+							<label class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_CONTENT_LIST_FILTERABLE').'::'.JText::_('FLEXI_FIELD_CONTENT_LIST_FILTERABLE_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_CONTENT_LIST_FILTERABLE' ); ?>
 							</label>
 						</td>
@@ -149,7 +168,8 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->supportadvsearch || $this->supportadvfilter) : ?>
 					<tr>
 						<td colspan="2">
-							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW' ); ?></span>
+							<span class="fcsep_level2" style="width:90%; margin-top:16px; "><?php echo JText::_( 'FLEXI_ADV_INDEX' ); ?></span>
+							<span class="fcsep_level3"><?php echo JText::_( 'FLEXI_ADV_INDEX_NOTES' ); ?></span>
 						</td>
 					</tr>
 					<?php endif; ?>
@@ -157,7 +177,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->supportadvsearch) : ?>
 					<tr>
 						<td class="key">
-							<label for="isadvsearch" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE').'::'.JText::_('FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE_DESC');?>">
+							<label class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE').'::'.JText::_('FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_ADVANCED_TEXT_SEARCHABLE' ); ?>
 							</label>
 						</td>
@@ -173,7 +193,7 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<?php if ($this->supportadvfilter) : ?>
 					<tr>
 						<td class="key">
-							<label for="isadvfilter" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ADVANCED_FILTERABLE').'::'.JText::_('FLEXI_FIELD_ADVANCED_FILTERABLE_DESC');?>">
+							<label class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_ADVANCED_FILTERABLE').'::'.JText::_('FLEXI_FIELD_ADVANCED_FILTERABLE_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_ADVANCED_FILTERABLE' ); ?>
 							</label>
 						</td>
@@ -188,12 +208,12 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					
 					<tr>
 						<td colspan="2">
-							<span class="fcsep_level2" style="width:90%"><?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?></span>
+							<span class="fcsep_level2" style="width:90%; margin-top:16px; "><?php echo JText::_( 'FLEXI_ITEM_FORM' ); ?></span>
 						</td>
 					</tr>
 					<tr<?php echo !$this->supportuntranslatable?' style="display:none;"':'';?>>
 						<td class="key">
-							<label for="untranslatable" class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_UNTRANSLATABLE').'::'.JText::_('FLEXI_FIELD_UNTRANSLATABLE_DESC');?>">
+							<label class="hasTip" title="<?php echo JText::_('FLEXI_FIELD_UNTRANSLATABLE').'::'.JText::_('FLEXI_FIELD_UNTRANSLATABLE_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FIELD_UNTRANSLATABLE' ); ?>
 							</label>
 						</td>
@@ -206,7 +226,6 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					</tr>
 
 					<tr<?php echo !$this->supportformhidden?' style="display:none;"':'';?>>
-					<tr>
 						<td class="key">
 							<label for="access" class="hasTip" title="<?php echo JText::_('FLEXI_FORM_HIDDEN').'::'.JText::_('FLEXI_FORM_HIDDEN_DESC');?>">
 								<?php echo JText::_( 'FLEXI_FORM_HIDDEN' ); ?>
@@ -299,35 +318,24 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 		
 		</td>
 
-		<td valign="top" width="40%" style="padding: 7px 0 0 5px">
-			<table width="100%" style="border: 1px dashed silver; padding: 5px; margin-bottom: 10px;">
-				<tr>
-					<td width="40%">
-						<label for="tid">
-						<strong><?php echo JText::_( 'FLEXI_TYPES' ); ?></strong>
-						<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_NOTES' ); ?>::<?php echo JText::_( 'FLEXI_TYPES_NOTES' );?>">
-							<?php echo $infoimage; ?>
-						</span>
-						</label>
-					</td>
-					<td>
-						<?php echo $this->lists['tid']; ?>
-					</td>
-				</tr>
-			</table>
-	
-			<div class="pane-sliders" id="det-pane">
-				<div class="panel">
+		<td valign="top" width="50%" style="padding: 7px 0 0 24px">
+			
+			<div class="pane-sliders" id="det-pane" style="margin-top:0px !important;">
+				
+				<div class="panel" style="margin-bottom:24px !important; padding:2px !important;">
 					<h3 id="standard-page" class="title jpane-toggler-down"><span><?php echo JText::_( 'FLEXI_STANDARD_FIELDS_PROPERTIES' ); ?></span></h3>
-					<div class="jpane-slider content" style="border-top: medium none; border-bottom: medium none; overflow: hidden; padding-top: 0px; padding-bottom: 0px;">
-					<?php
-					echo $this->form->render('params', 'standard');
-					?>
+					<div class="jpane-slider content" style="border-top: medium none; border-bottom: medium none; overflow: hidden; padding-top: 6px; padding-bottom: 6px;">
+						
+						<?php
+						echo $this->form->render('params', 'standard');
+						?>
 					</div>
+					
 				</div>
-				<div class="panel">
+				
+				<div class="panel" style="padding:2px !important;">
 					<h3 id="group-page" class="title jpane-toggler-down"><span><?php echo JText::_( 'FLEXI_THIS_FIELDTYPE_PROPERTIES' ); ?></span></h3>
-					<div id="fieldspecificproperties" class="jpane-slider content" style="border-top: medium none; border-bottom: medium none; overflow: hidden; padding-top: 0px; padding-bottom: 0px;">
+					<div id="fieldspecificproperties" class="jpane-slider content" style="border-top: medium none; border-bottom: medium none; overflow: hidden; padding-top: 6px; padding-bottom: 6px;">
 					<?php
 					if ($this->row->field_type)
 					{

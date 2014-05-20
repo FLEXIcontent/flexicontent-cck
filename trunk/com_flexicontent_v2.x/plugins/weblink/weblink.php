@@ -82,7 +82,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		{
 			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 			
-			// add the drag and drop sorting feature
+			// Add the drag and drop sorting feature
 			$js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
@@ -105,30 +105,25 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 					return 'cancel';
 				}
 				
-				var thisField 	 = $(el).getPrevious().getLast();
+				var thisField 	 = jQuery(el).prev().children().last();
 				var thisNewField = thisField.clone();
 				
-				thisNewField.getElements('input.urllink').setProperty('value','".$default_link."');
-				thisNewField.getElements('input.urllink').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
-				thisNewField.getElements('input.urllink').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id.");
+				jQuery(thisNewField).find('input.urllink').attr('value','".$default_link."');
+				jQuery(thisNewField).find('input.urllink').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
+				jQuery(thisNewField).find('input.urllink').attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
 				";
 				
 			if ($usetitle) $js .= "
-				thisNewField.getElements('input.urltitle').setProperty('value','".$default_title."');
-				thisNewField.getElements('input.urltitle').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				jQuery(thisNewField).find('input.urltitle').attr('value','".$default_title."');
+				jQuery(thisNewField).find('input.urltitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				";
 				
 			$js .= "
-				thisNewField.getElements('input.urlhits').setProperty('value','0');
-				thisNewField.getElements('input.urlhits').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
+				jQuery(thisNewField).find('input.urlhits').attr('value','0');
+				jQuery(thisNewField).find('input.urlhits').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
 				
 				// Set hits to zero for new row value
-				if (MooTools.version>='1.2.4') {
-					thisNewField.getElements('span span').set('html','0');
-				} else {
-					thisNewField.getElements('span span').setHTML('0');
-				}
-				
+				jQuery(thisNewField).find('span span').html('0');
 				jQuery(thisNewField).css('display', 'none');
 				jQuery(thisNewField).insertAfter( jQuery(thisField) );
 				
@@ -148,7 +143,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			{
 				if(rowCount".$field->id." <= 1) return;
 				var row = jQuery(el).closest('li');
-				jQuery(row).hide('slideUp', function() { $(this).remove(); } );
+				jQuery(row).hide('slideUp', function() { this.remove(); } );
 				rowCount".$field->id."--;
 			}
 			";

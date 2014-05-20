@@ -124,6 +124,10 @@
 		<copy file="plugins/flexicontent_fields/core.xml" tofile="flexipack/plugins/core/core.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_core.ini" tofile="flexipack/plugins/core/en-GB.plg_flexicontent_fields_core.ini" />
 		
+		<copy file="plugins/flexicontent_fields/coreprops.php" tofile="flexipack/plugins/coreprops/coreprops.php" />
+		<copy file="plugins/flexicontent_fields/coreprops.xml" tofile="flexipack/plugins/coreprops/coreprops.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_coreprops.ini" tofile="flexipack/plugins/coreprops/en-GB.plg_flexicontent_fields_coreprops.ini" />
+		
 		<copy file="plugins/flexicontent_fields/date.php" tofile="flexipack/plugins/date/date.php" />
 		<copy file="plugins/flexicontent_fields/date.xml" tofile="flexipack/plugins/date/date.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_date.ini" tofile="flexipack/plugins/date/en-GB.plg_flexicontent_fields_date.ini" />

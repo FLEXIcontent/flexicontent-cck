@@ -236,7 +236,7 @@ class FlexicontentModelItem extends ParentClassItem
 				// (a) redirect user previewing a non-current item version, to either current item version or to refer if has no edit permission
 				JError::raiseNotice(403, JText::_('FLEXI_ALERTNOTAUTH_PREVIEW_UNEDITABLE')."<br />". JText::_('FLEXI_ALERTNOTAUTH_TASK') );
 				if ( $item_n_cat_active && $canviewitem ) {
-					$app->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_item->slug, $this->_item->categoryslug)));
+					$app->redirect(JRoute::_(FlexicontentHelperRoute::getItemRoute($this->_item->slug, $this->_item->categoryslug, 0, $this->_item)));
 				} else {
 					$app->redirect($referer);  // Item not viewable OR no view access, redirect to refer page
 				}
@@ -272,7 +272,9 @@ class FlexicontentModelItem extends ParentClassItem
 					$return		= $uri->toString();
 					$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
 					$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
-					$url .= '&return='.base64_encode($return);
+					$return = strtr(base64_encode($return), '+/=', '-_,');
+					$url .= '&return='.$return;
+					//$url .= '&return='.base64_encode($return);
 					$url .= '&fcreturn='.base64_encode($fcreturn);
 			
 					JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));

@@ -207,7 +207,7 @@ window.addEvent('domready', function() {
 		
 		$attribs = !FLEXI_J16GE ? ' style="float:left;" ' : '';
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
-			$attribs .= ' multiple="true" ';
+			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.@$attributes['size'].'" ' : ' size="6" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
 		}

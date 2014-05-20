@@ -83,7 +83,7 @@ class JElementPluginlist extends JElement
 			$plugins[] = JHTMLSelect::option($plg->name, $plg->name); 
 		}
 		
-		$class = 'class="inputbox" multiple="true" size="5"';
+		$class = 'class="inputbox" multiple="multiple" size="5"';
 		
 		$html = JHTMLSelect::genericList($plugins, $fieldname, $class, 'value', 'text', $values, $element_id);
 		

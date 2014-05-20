@@ -36,9 +36,17 @@ class JFormFieldFieldordering extends JFormField{
 	 */
 	protected function getInput() {
 		// Initialize variables.
+		$attr  = '';
 		$html = array();
-		$attr = '';
-
+		
+		if (FLEXI_J16GE) {
+			$node = & $this->element;
+			$attributes = get_object_vars($node->attributes());
+			$attributes = $attributes['@attributes'];
+		} else {
+			$attributes = & $node->_attributes;
+		}
+		
 		// Initialize some field attributes.
 		$attr .= $this->element['class'] ? ' class="'.(string) $this->element['class'].'"' : '';
 		$attr .= ((string) $this->element['disabled'] == 'true') ? ' disabled="disabled"' : '';
@@ -46,8 +54,7 @@ class JFormFieldFieldordering extends JFormField{
 
 		// Initialize JavaScript field attributes.
 		$attr .= $this->element['onchange'] ? ' onchange="'.(string) $this->element['onchange'].'"' : '';
-
-
+		
 		$db = JFactory::getDbo();
 		
 		// Build the query for the ordering list.
@@ -57,19 +64,22 @@ class JFormFieldFieldordering extends JFormField{
 		. ' ORDER BY ordering'
 		;
 		
+		$fieldname	= $this->name;
+		$element_id = $this->id;
 		$fieldid = $this->form->getValue('id');
-
+		
 		// Create a read-only list (no name) with a hidden input to store the value.
-		if ((string) $this->element['readonly'] == 'true') {
-			$html[] = JHtml::_('list.ordering', '', $query, trim($attr), $this->value, $fieldid ? 0 : 1);
-			$html[] = '<input type="hidden"'.'value="'.$this->ordering.'"/>';
+		if ( (string) $this->element['readonly'] == 'true' ) {
+			$attr .= ' disabled="disabled" ';
+			$ordering = $this->form->getValue('ordering');
+			$html[] = str_replace('jform'.$attributes['name'], $element_id, JHtml::_('list.ordering', $this->name, $query, trim($attr), $ordering, $fieldid ? 0 : 1));
 		}
 		// Create a regular list.
 		else {
 			$ordering = $this->form->getValue('ordering');
-			$html[] = JHtml::_('list.ordering', $this->name, $query, trim($attr), $ordering, $fieldid ? 0 : 1);
+			$html[] = str_replace('jform'.$attributes['name'], $element_id, JHtml::_('list.ordering', $this->name, $query, trim($attr), $ordering, $fieldid ? 0 : 1));
 		}
-
+		
 		return implode($html);
 	}
 }

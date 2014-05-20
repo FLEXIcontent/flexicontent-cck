@@ -11,7 +11,6 @@
 		<fieldset name="request" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="typeid" type="types" default="" label="FLEXI_MENU_FORM_TYPE" description="FLEXI_MENU_FORM_TYPE_DESC" user_selection="1" /> 
 			<field name="" type="separator" default="FLEXI_MENU_OVERRIDE_FORM_CONF_ACL_DESC" label="" level="level3" menu="hide" />
-			
 		</fieldset>
 	</fields>
 		
@@ -23,12 +22,12 @@
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST" checkvals="apply,save_preview,preview_latest" defaultvals=""
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC" />
 			
-			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level3" menu="hide" />
+			<field name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level2" menu="hide" />
 			<field name="submit_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" />
 			<field name="submit_redirect_url_fe" type="text" default="" size="46" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" menu="hide" />
 			<field name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level2" menu="hide" />
 			<field name="use_captcha" type="list" default="" label="FLEXI_USER_TYPE" description="FLEXI_USER_TYPE_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NEVER</option>
@@ -40,7 +39,7 @@
 		
 		<fieldset name="simplifyform" label="FLEXI_MENU_OVERRIDE_FORM_DISPLAY" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_BASIC" label="" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_BASIC" label="" level="level2" menu="hide" />
 			
 			<field name="usealias_fe" type="list" default="" label="FLEXI_MENU_USE_ALIAS" description="FLEXI_MENU_USE_ALIAS_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -59,7 +58,17 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_ADVANCED" label="" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_LANGUAGE" label="" level="level3" menu="hide" />
+			<field name="uselang_fe" type="radio" default="" label="FLEXI_MENU_USE_LANGUAGE" description="FLEXI_MENU_USE_LANGUAGE_DESC" menu="hide">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+				<option value="2">FLEXI_MENU_ONLY_DISPLAY</option>
+			</field>
+			<field name="default_language_fe" type="fclanguage" default="" use_global="1" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_DEFAULT_LANGUAGE_DESC" menu="hide" />
+			<field name="disable_languages_fe" type="fclanguage" default="" use_global="1" multiple="multiple" class="use_select2_lib" label="FLEXI_MENU_DISABLE_LANGUAGES" description="FLEXI_MENU_DISABLE_LANGUAGES_DESC" menu="hide" />
+			
+			<field name="" type="separator" default="FLEXI_ADVANCED" label="" level="level2" menu="hide" />
 			
 			<field name="usepublicationdetails_fe" type="list" default="" label="FLEXI_MENU_USE_PUBL_DETAILS" description="FLEXI_MENU_USE_PUBL_DETAILS_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
@@ -97,14 +106,14 @@
 		
 		<fieldset name="acloverrides" label="FLEXI_MENU_OVERRIDE_SUBMIT_PUBLISH_ACL" description="FLEXI_MENU_ITEM_FORM_OVERRIDES_DESC" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" label="" type="separator" default="FLEXI_MENU_UNAUTHORIZED_USERS" level="level3" menu="hide" />
+			<field name="" label="" type="separator" default="FLEXI_MENU_UNAUTHORIZED_USERS" level="level2" menu="hide" />
 			<field name="allowunauthorize" type="list" default="0" label="FLEXI_MENU_UNAUTHORIZED_SUBMIT" description="FLEXI_MENU_UNAUTHORIZED_SUBMIT_DESC">
 				<option value="0">FLEXI_MENU_NO_OVERRIDE_USE_ACL</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_MENU_YES_EXCLUDE_GUESTS</option>
 			</field>
 			
-			<field name="" label="" type="separator" default="FLEXI_MENU_AUTOPUBLISH_OVERRIDE" level="level3" menu="hide" />
+			<field name="" label="" type="separator" default="FLEXI_MENU_AUTOPUBLISH_OVERRIDE" level="level2" menu="hide" />
 			<field name="autopublished" type="list" default="0" label="FLEXI_MENU_AUTOPUBLISH" description="FLEXI_MENU_AUTOPUBLISH_DESC">
 				<option value="0">FLEXI_MENU_AUTOPUBLISH_NO_SHOW_STATE</option>
 				<option value="1">FLEXI_MENU_AUTOPUBLISH_YES_HIDE_STATE</option>

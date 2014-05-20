@@ -151,8 +151,7 @@ class FlexicontentFields
 		if (!is_array($_items))  $items = array( & $_items );  else  $items = & $_items ;
 		
 		$user      = JFactory::getUser();
-		$mainframe = JFactory::getApplication();
-		$cparams   = $mainframe->getParams('com_flexicontent');
+		$cparams   = JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $cparams->get('print_logging_info');
 		
 		if ( $print_logging_info ) {
@@ -298,6 +297,7 @@ class FlexicontentFields
 						;
 				$db->setQuery($query);
 				$type_fields[$item->type_id] = $db->loadObjectList('name');
+				//echo "<pre>";  print_r( array_keys($type_fields[$item->type_id]) ); exit;
 			}
 			$item->fields = array();
 			if ($type_fields[$item->type_id]) foreach($type_fields[$item->type_id] as $field_name => $field_data)
@@ -1755,10 +1755,11 @@ class FlexicontentFields
 		// Create the new search data
 		foreach($items_values as $itemid => $item_values) 
 		{
-			$language = $field->items_data[$itemid]->language;
+			// Get item language: (a) multi-item indexing via the search indexer or (b) single item indexing via the item save task (e.g. item form)
+			$language = isset($field->items_data) ? $field->items_data[$itemid]->language : $item->language;
 			if ( !isset($lang_handlers[$language]) )
 			{
-				$lang_handlers[$language] = FlexicontentFields::getLangHandler($field->items_data[$itemid]->language);
+				$lang_handlers[$language] = FlexicontentFields::getLangHandler($language);
 			}
 			$lang_handler = $lang_handlers[$language];
 			
@@ -2437,7 +2438,7 @@ class FlexicontentFields
 		if ( $print_logging_info ) {
 			$current_filter_creation = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			$flt_active_count = isset($filters_where) ? count($filters_where) : 0;
-			$faceted_str = array(0=>'non-FACETED MODE', 1=>'FACETED MODE: current view &nbsp; (cacheable) &nbsp; ', 2=>'FACETED MODE: current filters:'." (".$flt_active_count.' active) ');
+			$faceted_str = array(0=>'non-FACETED ', 1=>'FACETED: current view &nbsp; (cacheable) ', 2=>'FACETED: current filters:'." (".$flt_active_count.' active) ');
 			
 			$fc_run_times['create_filter'][$filter->name] = $current_filter_creation;
 			if ( isset($fc_run_times['_create_filter_init']) ) {
@@ -3264,7 +3265,7 @@ class FlexicontentFields
 			if ($result->state != 1 && $result->state != -5) continue;
 			
 			// a. Replace some custom made strings
-			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($result->slug, $result->categoryslug));
+			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($result->slug, $result->categoryslug, 0, $result));
 			$item_title_escaped = htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8');
 			$item_tooltip = ' class="hasTip relateditem" title="'. JText::_('FLEXI_READ_MORE_ABOUT').'::'.$item_title_escaped.'" ';
 			
@@ -3314,14 +3315,18 @@ class FlexicontentFields
 		global $fc_run_times;
 		$fields_render = array();
 		
+		$inline_css_val = 'float:left !important; display:inline-block !important;';
+		$inline_css_lbl = 'float:left !important; display:inline-block !important; margin-left:8px !important; min-width:100px; text-align:left !important;';
 		foreach ($fc_run_times['render_field'] as $field_type => $field_msecs)
 		{
 			// Total rendering time of fields
 			$fields_render_total += $field_msecs;
 			
 			// Create Log a message about current field rendering time
-			$fld_msg = $field_type." : ". sprintf("%.3f s",$field_msecs/1000000);
-			
+			$fld_msg =
+				'<span class="flexi value" style="'.$inline_css_val.'">'. sprintf("%.3f s",$field_msecs/1000000) .'</span>'.
+				'<span class="flexi label" style="'.$inline_css_lbl.'">'.$field_type.'</span>'
+				;
 			// Check if field rendered other fields as part of it's display
 			if ( isset($fc_run_times['render_subfields'][$field_type]) ) {
 				$fld_msg .= " <small> - Field rendered other fields. Time was (retrieval+render)= ";
@@ -3341,13 +3346,19 @@ class FlexicontentFields
 		if ( isset($fc_run_times['create_filter_init']) ) {
 			$filters_creation_total += $fc_run_times['create_filter_init'];
 		}
+		$inline_css_val = 'float:left !important; display:inline-block !important;';
+		$inline_css_lbl = 'float:left !important; display:inline-block !important; margin-left:8px !important; min-width:100px !important; text-align:left !important;';
 		foreach ($fc_run_times['create_filter'] as $field_type => $filter_msecs)
 		{
 			// Total creation time of filters
 			$filters_creation_total += $filter_msecs;
 			
 			// Create Log a message about current filter creation time
-			$fld_msg = $field_type." ... ".$fc_run_times['create_filter_type'][$field_type].": ". sprintf("%.3f s",$filter_msecs/1000000);
+			$fld_msg =
+				'<span class="" style="'.$inline_css_val.'">'. sprintf("%.3f s",$filter_msecs/1000000) .'</span>'.
+				'<span class="flexi label" style="'.$inline_css_lbl.'">'.$field_type.'</span>'.
+				'<span class="" style="'.$inline_css_val.' min-width:200px;">'.$fc_run_times['create_filter_type'][$field_type].'</span>'
+				;
 			
 			$filters_creation[] = $fld_msg;
 		}

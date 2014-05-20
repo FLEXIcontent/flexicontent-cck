@@ -90,9 +90,9 @@ class JElementItem extends JElement
 		$type_id = @$attributes['type_id'];
 		$created_by = @$attributes['created_by'];
 		$link = 'index.php?option=com_flexicontent&amp;view=itemelement&amp;tmpl=component';
-		$link .= $langparent_item ? '&langparent_item=1' : '&langparent_item=0';
-		$link .= $type_id ? '&type_id='.$type_id : '';
-		$link .= $created_by ? '&created_by='.$created_by : '';
+		$link .= '&amp;langparent_item='.($langparent_item ? '1' : '0');
+		$link .= $type_id ? '&amp;type_id='.$type_id : '';
+		$link .= $created_by ? '&amp;created_by='.$created_by : '';
 		$doc->addScriptDeclaration($js);
 
 		JHTML::_('behavior.modal', 'a.modal');
@@ -100,7 +100,7 @@ class JElementItem extends JElement
 		$app = JFactory::getApplication();
 		$rel = "{handler: \"iframe\", size: {x:((window.getSize().size.x<1100)?window.getSize().size.x-100:1000), y: window.getSize().size.y-100}}";
 		$html  = "
-		<input class='fcfield_textval' type='text' id='".$element_id."_name' value='{$item->title}' disabled='disabled' class='inputbox fcfield_textval'/>
+		<input type='text' id='".$element_id."_name' value='{$item->title}' disabled='disabled' class='inputbox fcfield_textval'/>
 		<div class='button2-left' style='margin-top:2px;'><div class='blank'>
 			<a class='modal' style='margin:0px !important;' title='".JText::_( 'FLEXI_SELECT' )."'  href='".$link."' rel='".$rel."'>
 				".JText::_( 'FLEXI_SELECT' )."

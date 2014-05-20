@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1887 2014-04-24 23:53:14Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1900 2014-05-03 07:25:51Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -151,7 +151,7 @@ class FlexicontentViewItem  extends JViewLegacy
 
 		// (e) Verify the item layout is within templates: Content Type default template OR Content Type allowed templates
 		if ( $ilayout!=$type_default_layout && count($allowed_tmpls) && !in_array($ilayout,$allowed_tmpls) ) {
-			$app->enqueueMessage("<small>Current Item Layout Template is '$ilayout':<br>- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Content Type Default Template Layout: '$type_default_layout'</small>", 'notice');
+			$app->enqueueMessage("<small>Current Item Layout Template is '$ilayout':<br/>- This is neither the Content Type Default Template, nor does it belong to the Content Type allowed templates.<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Content Type Default Template Layout: '$type_default_layout'</small>", 'notice');
 			$ilayout = $type_default_layout;
 		}
 
@@ -161,7 +161,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		// (g) Verify the item layout exists
 		if ( !isset($themes->items->{$ilayout}) ) {
 			$fixed_ilayout = isset($themes->items->{$type_default_layout}) ? $type_default_layout : 'default';
-			$app->enqueueMessage("<small>Current Item Layout Template is '$ilayout' does not exist<br>- Please correct this in the URL or in Content Type configuration.<br>- Using Template Layout: '$fixed_ilayout'</small>", 'notice');
+			$app->enqueueMessage("<small>Current Item Layout Template is '$ilayout' does not exist<br/>- Please correct this in the URL or in Content Type configuration.<br/>- Using Template Layout: '$fixed_ilayout'</small>", 'notice');
 			$ilayout = $fixed_ilayout;
 			if (FLEXI_FISH || FLEXI_J16GE) FLEXIUtilities::loadTemplateLanguageFile( $ilayout ); // Manually load Template-Specific language file of back fall ilayout
 		}
@@ -702,7 +702,9 @@ class FlexicontentViewItem  extends JViewLegacy
 					$fcreturn = serialize( array('id'=>@$this->_item->id, 'cid'=>$cid) );     // a special url parameter, used by some SEF code
 					$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
 					$url  = $params->get('login_page', 'index.php?option='.$com_users.'&view=login');
-					$url .= '&return='.base64_encode($return);
+					$return = strtr(base64_encode($return), '+/=', '-_,');
+					$url .= '&return='.$return;
+					//$url .= '&return='.urlencode(base64_encode($return));
 					$url .= '&fcreturn='.base64_encode($fcreturn);
 
 					JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
@@ -873,8 +875,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		$usedtagsids  = $this->get( 'UsedtagsIds' );  // NOTE: This will normally return the already set versioned value of tags ($item->tags)
 		//$usedtagsIds 	= $isnew ? array() : $fields['tags']->value;
 		$usedtagsdata = $model->getUsedtagsData($usedtagsids);
-		//echo "<br>usedtagsIds: "; print_r($usedtagsids);
-		//echo "<br>usedtags (data): "; print_r($usedtagsdata);
+		//echo "<br/>usedtagsIds: "; print_r($usedtagsids);
+		//echo "<br/>usedtags (data): "; print_r($usedtagsdata);
 
 		// Compatibility for old overriden templates ...
 		if (!FLEXI_J16GE) {
@@ -894,9 +896,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		// Get menu overridden categories/main category fields
 		$menuCats = $this->_getMenuCats($item, $perms, $params);
 
-		// Create and submit configuration (for new items) into the session
+		// Create submit configuration (for new items) into the session
 		$submitConf = $this->_createSubmitConf($item, $perms, $params);
-
+		
+		// Create placement configuration for CORE properties
+		$placementConf = $this->_createPlacementConf($fields, $params);
+		
 		// Item language related vars
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$languages = FLEXIUtilities::getLanguages();
@@ -948,6 +953,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$this->assignRef('nullDate',   $nullDate);
 		$this->assignRef('menuCats',   $menuCats);
 		$this->assignRef('submitConf', $submitConf);
+		$this->assignRef('placementConf', $placementConf);
 		$this->assignRef('itemlang',   $itemlang);
 		$this->assignRef('pageclass_sfx', $pageclass_sfx);
 		$this->assign('captcha_errmsg', @ $captcha_errmsg);
@@ -1149,8 +1155,10 @@ class FlexicontentViewItem  extends JViewLegacy
 		$special_privelege_stategrp = ($item->state==$_arc_ || $perms['canarchive']) || ($item->state==-2 || $perms['candelete']) ;
 		
 		$state = array();
+		// Using <select> groups
 		if ($non_publishers_stategrp || $special_privelege_stategrp)
 			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_PUBLISHERS_WORKFLOW_STATES' ) );
+			
 		$state[] = JHTML::_('select.option',  1,  JText::_( 'FLEXI_PUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  0,  JText::_( 'FLEXI_UNPUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
@@ -1171,11 +1179,16 @@ class FlexicontentViewItem  extends JViewLegacy
 		if ($item->state==$_arc_ || $perms['canarchive']) $state[] = JHTML::_('select.option',  $_arc_, JText::_( 'FLEXI_ARCHIVED' ) );
 		if ($item->state==-2     || $perms['candelete'])  $state[] = JHTML::_('select.option',  -2,     JText::_( 'FLEXI_TRASHED' ) );
 		
+		// Close last <select> group
+		if ($non_publishers_stategrp || $special_privelege_stategrp)
+			$state[] = JHTML::_('select.optgroup', '');
+		
 		$fieldname = FLEXI_J16GE ? 'jform[state]' : 'state';
 		$elementid = FLEXI_J16GE ? 'jform_state'  : 'state';
-		$class = 'inputbox use_select2_lib';
+		$class = 'use_select2_lib';
 		$attribs = 'class="'.$class.'"';
 		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
+		if (!FLEXI_J16GE) $lists['state'] = str_replace('<optgroup label="">', '</optgroup>', $lists['state']);
 		
 		// *** BOF: J2.5 SPECIFIC SELECT LISTS
 		if (FLEXI_J16GE)
@@ -1374,16 +1387,21 @@ class FlexicontentViewItem  extends JViewLegacy
 				$i++;
 			}
 		}
-
-
-		// Build languages list
+		
+		
+		// find user's allowed languages
 		$site_default_lang = flexicontent_html::getSiteDefaultLang();
 		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
+		
+		// find globaly or per content type disabled languages
+		$disable_langs = $params->get('disable_languages_fe', array());
+		
+		// Build languages list
 		if (FLEXI_J16GE || FLEXI_FISH) {
 			$item_lang = $isnew ? $site_default_lang : $item->language;
-			$lists['languages'] = flexicontent_html::buildlanguageslist( (FLEXI_J16GE ? 'jform[language]' : 'language') , '', $item_lang, 3, $allowed_langs);
+			$lists['languages'] = flexicontent_html::buildlanguageslist( (FLEXI_J16GE ? 'jform[language]' : 'language') , '', $item_lang, 3, $allowed_langs, $published_only=1, $disable_langs);
 		} else {
 			$item->language = $site_default_lang;
 		}
@@ -1579,5 +1597,100 @@ class FlexicontentViewItem  extends JViewLegacy
 		else
 			return '<input type="hidden" name="submit_conf" value="'.$submit_conf_hash.'" >';
 	}
+
+
+	function _createPlacementConf(&$fields, &$params) {
+		// 1. Find core placer fields (of type 'coreprops')
+		$core_placers = array();
+		foreach($fields as $field) {
+			if ($field->field_type=='coreprops')
+			{
+				$core_placers[$field->parameters->get('props_type')] = $field;
+			}
+		}
+		
+		
+		// 2. Field name arrays:  (a) placeable and  (b) placeable via placer  (c) above tabs fields
+		$via_core_field  = array('title'=>1, 'type_id'=>1, 'state'=>1,
+			'cats'=>1, 'tags'=>1, 'maintext'=>1,
+			'created'=>1, 'created_by'=>1, 'modified'=>1, 'modified_by'=>1
+		);
+		$via_core_prop = array('alias'=>1, 'disable_comments'=>1, 'notify_subscribers'=>1,
+			'language'=>1, 'perms'=>1,
+			'timezone_info'=>1, 'created_by_alias'=>1, 'publish_up'=>1, 'publish_down'=>1, 'access'=>1,
+			'metadata'=>1, 'seoconf'=>1, 'display_params'=>1, 'layout_selection'=>1, 'layout_params'=>1
+		);
+		$placeable_fields = array_merge($via_core_field, $via_core_prop);
+		
+		
+		// 3. Decide placement of CORE properties / fields
+		$tab_fields['above'] = $params->get('form_tabs_above',    'title, alias, type, state, disable_comments, notify_subscribers');
+		
+		$tab_fields['tab01'] = $params->get('form_tab01_fields',  'categories, tags, language, perms');
+		$tab_fields['tab02'] = $params->get('form_tab02_fields',  'maintext');
+		$tab_fields['tab03'] = $params->get('form_tab03_fields',  'fields_manager');
+		$tab_fields['tab04'] = $params->get('form_tab04_fields',  (!FLEXI_J16GE ? 'timezone_info, publishing_details' : 'timezone_info, created, createdby, created_by_alias, publish_up, publish_down, access'));
+		$tab_fields['tab05'] = $params->get('form_tab05_fields',  'metadata, seoconf');
+		$tab_fields['tab06'] = $params->get('form_tab06_fields',  'display_params');
+		$tab_fields['tab07'] = $params->get('form_tab07_fields',  'layout_selection, layout_params');
+		
+		$tab_fields['fman']  = $params->get('form_tabs_fieldsman','');
+		$tab_fields['below'] = $params->get('form_tabs_below',    '');
+		
+		// fix aliases
+		foreach($tab_fields as $tab_name => $field_list) {
+			$tab_fields[$tab_name] = str_replace('created_by', 'createdby', $field_list);
+		}
+		//echo "<pre>"; print_r($tab_fields); echo "</pre>";
+		
+		// Split field lists
+		$all_tab_fields = array();
+		foreach($tab_fields as $i => $field_list)
+		{
+			$tab_fields[$i] = (empty($tab_fields[$i]) || $tab_fields[$i]=='_skip_')  ?  array()  :  array_flip( preg_split("/[\s]*,[\s]*/", $field_list ) );
+			foreach ($tab_fields[$i] as $tbl_name => $ignore) {
+				$all_tab_fields[$tbl_name] = 1;
+			}
+			//$all_tab_fields = array_merge($all_tab_fields, $tab_fields[$i]);
+		}
+		// Find fields missing from configuration, and place them below the tabs
+		foreach($placeable_fields as $fn => $i)
+		{
+			if ( !isset($all_tab_fields[$fn]) )
+			{
+				$tab_fields['below'][$fn] = 1;
+			}
+		}
+		
+		// get TAB titles
+		$_tmp = $params->get('form_tab_titles', '1:FLEXI_BASIC, 2:FLEXI_DESCRIPTION, 3:FLEXI_CONTENT_TYPE, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
+		$_tmp = preg_split("/[\s]*,[\s]*/", $_tmp);
+		$tab_titles = array();
+		foreach($_tmp as $_data) {
+			list($tab_no, $tab_title) = preg_split("/[\s]*:[\s]*/", $_data);
+			$tab_titles['tab0'.$tab_no] = JText::_($tab_title);
+		}
+		
+		
+		// 4. find if some fields are missing placement field
+		$coreprop_missing = array();
+		foreach($via_core_prop as $fn => $i)
+		{
+			// -EITHER- configured to be shown at default position -OR- 
+			if ( isset($tab_fields['fman'][$fn])  &&  !isset($core_placers[$fn]) ) {
+				$coreprop_missing[$fn] = true;
+				unset($tab_fields['fman'][$fn]);
+				$tab_fields['below'][$fn] = 1;
+			}
+		}
+		
+		$placementConf['via_core_field']   = $via_core_field;
+		$placementConf['via_core_prop']    = $via_core_prop;
+		$placementConf['placeable_fields'] = $placeable_fields;
+		$placementConf['tab_fields']       = $tab_fields;
+		$placementConf['tab_titles']       = $tab_titles;
+		$placementConf['coreprop_missing'] = $coreprop_missing;
+		
+		return $placementConf;
+	}
 }
-?>

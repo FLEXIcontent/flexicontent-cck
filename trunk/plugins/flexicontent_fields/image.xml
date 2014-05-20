@@ -31,6 +31,10 @@
 				<option value="0">FLEXI_FIELD_REUSABLE_DB_MODE</option>
 				<option value="1">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
 			</field>
+			<field name="of_usage" type="radio" default="0" label="Image folder location &lt;br/&gt; &lt;small&gt; when in folder mode&lt;/small&gt;" description="If item belongs to a translation group the use the folder of original content item">
+				<option value="0">1 per item</option>
+				<option value="1">use original content's folder</option>
+			</field>
 			<field name="protect_original" type="radio" default="1" label="FLEXI_FIELD_PROTECT_ORIGINAL" description="FLEXI_FIELD_PROTECT_ORIGINAL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

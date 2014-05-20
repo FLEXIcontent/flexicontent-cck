@@ -108,15 +108,21 @@ class FlexicontentControllerUsers extends FlexicontentController
 
 		$post = JRequest::get('post');
 		$data = FLEXI_J16GE ? $post['jform'] : $post;
+		
+		// Merge template fieldset this should include at least 'clayout' and optionally 'clayout_mobile' parameters
 		if (FLEXI_J16GE) {
-			if(isset($_REQUEST['jform']['attribs'])) {
-				$data['params'] = array_merge($data['params'], $_REQUEST['jform']['attribs']);
+			if( !empty($data['templates']) ) {
+				$data['authorcatparams'] = array_merge($data['authorcatparams'], $data['templates']);
 			}
-	
-			if(isset($_REQUEST['jform']['templates'])) {
-				$data['params'] = array_merge($data['params'], $_REQUEST['jform']['templates']);
-			}
-		} else if (!FLEXI_J16GE) {
+		}
+		
+		// Merge the parameters of the select clayout
+		$clayout = FLEXI_J16GE ? $data['templates']['clayout'] : $data['authorcatparams']['clayout'];
+		if( !empty($data['layouts'][$clayout]) ) {
+			$data['authorcatparams'] = array_merge($data['authorcatparams'], $data['layouts'][$clayout]);
+		}
+		
+		if (!FLEXI_J16GE) {
 			$data['username']	= JRequest::getVar('username', '', 'post', 'username');
 			$data['password']	= JRequest::getVar('password', '', 'post', 'string', JREQUEST_ALLOWRAW);
 			$data['password2']	= JRequest::getVar('password2', '', 'post', 'string', JREQUEST_ALLOWRAW);
@@ -204,10 +210,6 @@ class FlexicontentControllerUsers extends FlexicontentController
 		$author_postdata['user_id']	= $user->get('id');
 		$author_postdata['author_basicparams']	= $data['authorbasicparams'];
 		$author_postdata['author_catparams']	= $data['authorcatparams'];
-		$author_postdata['templates']	= $data['templates'];
-		$author_postdata['attribs']	= $data['attribs'];
-		
-		//echo "<pre>"; print_r($data); exit;
 		
 		$flexiauthor_extdata = JTable::getInstance('flexicontent_authors_ext', '');
 		

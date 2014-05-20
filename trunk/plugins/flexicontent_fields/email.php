@@ -49,9 +49,11 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$document  = JFactory::getDocument();
 		
 		// some parameter shortcuts
-		$size      = $field->parameters->get( 'size', 30 ) ;
-		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
-		$max_values= (int)$field->parameters->get( 'max_values', 0 ) ;
+		$size       = (int) $field->parameters->get( 'size', 30 ) ;
+		$multiple   = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$max_values = (int) $field->parameters->get( 'max_values', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
 		
 		// This is field 's MAIN value property
 		$addr_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
@@ -62,9 +64,6 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		
-		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
-		
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
@@ -72,6 +71,10 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$field->value[0]['text'] = JText::_($default_title);
 			$field->value[0] = serialize($field->value[0]);
 		}
+		
+		// Field name and HTML TAG id
+		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
+		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
 		
 		$js = "";
 		
@@ -90,32 +93,29 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			});
 			";
 			
-			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
-			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
-			
 			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id."		= ".$max_values.";
+			var maxValues".$field->id." = ".$max_values.";
 
 			function addField".$field->id."(el) {
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
-
-				var thisField 	 = $(el).getPrevious().getLast();
+				
+				var thisField 	 = jQuery(el).prev().children().last();
 				var thisNewField = thisField.clone();
 				
-				thisNewField.getElements('input.emailaddr').setProperty('value','');
-				thisNewField.getElements('input.emailaddr').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
-				thisNewField.getElements('input.emailaddr').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id.");
+				jQuery(thisNewField).find('input.emailaddr').attr('value','');
+				jQuery(thisNewField).find('input.emailaddr').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][addr]');
+				jQuery(thisNewField).find('input.emailaddr').attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
 				";
 				
 			if ($usetitle) $js .= "
-				thisNewField.getElements('input.emailtext').setProperty('value','');
-				thisNewField.getElements('input.emailtext').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
+				jQuery(thisNewField).find('input.emailtext').attr('value','');
+				jQuery(thisNewField).find('input.emailtext').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
 				";
 				
 			$js .= "
@@ -138,7 +138,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			{
 				if(rowCount".$field->id." <= 1) return;
 				var row = jQuery(el).closest('li');
-				jQuery(row).hide('slideUp', function() { $(this).remove(); } );
+				jQuery(row).hide('slideUp', function() { this.remove(); } );
 				rowCount".$field->id."--;
 			}
 			";
@@ -166,7 +166,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
@@ -179,23 +179,27 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
-		foreach ($field->value as $value) {
+		foreach ($field->value as $value)
+		{
+			if ( !strlen($value) ) continue;
+			
+			// Compatibility for old unserialized values
 			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
 				$value = unserialize($value);
 			} else {
 				$value = array('addr' => $value, 'text' => '');
 			}
-			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
-			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+			$fieldname_n = $fieldname.'['.$n.']';
+			$elementid_n = $elementid.'_'.$n;
 			
 			$addr = '
-				<label class="label" for="'.$fieldname.'[addr]">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
-				<input class="fcfield_textval emailaddr validate-email'.$required.'" name="'.$fieldname.'[addr]" type="text" size="'.$size.'" value="'.$value['addr'].'" />
+				<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
+				<input class="emailaddr fcfield_textval validate-email'.$required.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['addr'].'" />
 			';
 			
 			if ($usetitle) $text = '
-				<label class="label" for="'.$fieldname.'[text]">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</label>
-				<input class="fcfield_textval emailtext" name="'.$fieldname.'[text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
+				<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</label>
+				<input class="emailtext fcfield_textval" name="'.$fieldname_n.'[text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
 			';
 			
 			
@@ -243,6 +247,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
+		// DO NOT terminate yet if value is empty since a default value on empty may have been defined
 		
 		// Handle default value loading, instead of empty value
 		if ( empty($values) && !strlen($default_addr) ) {
@@ -304,7 +309,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$n = 0;
 		foreach ($values as $value)
 		{
-			if ( empty($value) ) continue;
+			if ( !strlen($value) ) continue;
 			
 			// Compatibility for old unserialized values
 			$value = (@unserialize($value)!== false || $value === 'b:0;') ? unserialize($value) : $value;
@@ -441,6 +446,15 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
+		// a. Each of the values of $values array will be added to the advanced search index as searchable text (column value)
+		// b. Each of the indexes of $values will be added to the column 'value_id',
+		//    and it is meant for fields that we want to be filterable via a drop-down select
+		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
+		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('addr'), $search_properties=array('addr','text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
@@ -452,6 +466,12 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
+		// a. Each of the values of $values array will be added to the basic search index (one record per item)
+		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('addr'), $search_properties=array('addr','text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}

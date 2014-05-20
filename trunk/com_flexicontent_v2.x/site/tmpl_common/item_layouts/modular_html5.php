@@ -74,7 +74,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	
 	<?php
 	$pdfbutton = flexicontent_html::pdfbutton( $item, $this->params );
-	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug );
+	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug, 0, $item );
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
 	$editbutton = flexicontent_html::editbutton( $item, $this->params );
 	$statebutton = flexicontent_html::statebutton( $item, $this->params );

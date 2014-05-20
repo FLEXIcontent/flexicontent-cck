@@ -308,7 +308,12 @@ dump($this->row);
 								$fieldname =  $field->__get('fieldname');
 								$value = $tmpl->params->getValue($fieldname, $groupname, @$this->row->params[$fieldname]);
 								echo $tmpl->params->getLabel($fieldname, $groupname);
-								echo $tmpl->params->getInput($fieldname, $groupname, $value);
+								echo
+									str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+										str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+											$tmpl->params->getInput($fieldname, $groupname, $value)
+										)
+									);
 							endforeach; ?>
 						</fieldset>
 					<?php endforeach; ?>

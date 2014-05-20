@@ -64,7 +64,7 @@ if (FLEXI_J16GE) {
 		}
 		
 		// first check if PHP5 is running
-		$PHP_VERSION_NEEDED = '5.1.0';
+		$PHP_VERSION_NEEDED = FLEXI_J16GE ? '5.3.0' : '5.1.0';
 		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
 		{
 			// load english language file for 'com_flexicontent' component then override with current language file
@@ -493,6 +493,7 @@ if (FLEXI_J16GE) {
 						if (array_key_exists('cnt_publish_up', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " DROP `cnt_publish_up`";
 						if (array_key_exists('cnt_publish_down', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " DROP `cnt_publish_down`";
 						if (array_key_exists('cnt_created_by', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " DROP `cnt_created_by`";
+						if (!array_key_exists('lang_parent_id', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " ADD `lang_parent_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `type_id`";
 						if (!empty($_querycols)) $queries[] = $_query . implode(",", $_querycols);
 					}
 					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__flexicontent_files'])) {

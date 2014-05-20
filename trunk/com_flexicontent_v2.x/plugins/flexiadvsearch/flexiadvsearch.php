@@ -556,7 +556,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$db->query();
 		
 		// Construct query's SQL
-		$query 	= 'SELECT i.id, i.title AS title, '.(FLEXI_J16GE ? '' : 'i.sectionid, ').'i.created, i.id AS fc_item_id, i.access, ie.type_id'
+		$lta = FLEXI_J16GE ? 'i': 'ie';
+		$query 	= 'SELECT i.id, i.title AS title, '.(FLEXI_J16GE ? '' : 'i.sectionid, ').'i.created, i.id AS fc_item_id, i.access, ie.type_id, '.$lta.'language'
 			. $orderby_col
 			. ( !$txtmode ?
 				', ie.search_index AS text' :

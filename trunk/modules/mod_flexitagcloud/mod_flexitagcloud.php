@@ -87,12 +87,13 @@ if ( $show_mod )
 	// Render Layout
 	require(JModuleHelper::getLayoutPath('mod_flexitagcloud', $layout));
 	
+	// append performance stats to global variable
 	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
 		$modfc_jprof->mark('END: FLEXIcontent Tags Cloud Module');
-		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
-		$app->enqueueMessage( $msg, 'notice' );
+		$msg  = '<br/><br/>'.implode('<br/>', $modfc_jprof->getbuffer());
+		global $fc_performance_msg;
+		$fc_performance_msg .= $msg;
 	}
 }
-?>

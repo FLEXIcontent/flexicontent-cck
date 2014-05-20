@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-	<fieldset name="user_details">
+	<fieldset name="user_basic">
 		<field name="name" type="text" class="inputbox" description="COM_USERS_USER_FIELD_NAME_DESC" label="COM_USERS_HEADING_NAME" required="true" size="30" />
 		<field name="username" type="text" class="inputbox" description="COM_USERS_USER_FIELD_USERNAME_DESC" label="COM_USERS_USER_FIELD_USERNAME_LABEL" required="true" size="30" />
 		<field name="password" type="password" autocomplete="off" class="inputbox" description="COM_USERS_USER_FIELD_PASSWORD_DESC" filter="raw" label="JGLOBAL_PASSWORD" size="30" />
 		<field name="password2" type="password" autocomplete="off" class="inputbox" description="COM_USERS_USER_FIELD_PASSWORD2_DESC" filter="raw" label="COM_USERS_USER_FIELD_PASSWORD2_LABEL" size="30" />
 		<field name="email" type="email" class="inputbox" description="COM_USERS_USER_FIELD_EMAIL_DESC" label="JGLOBAL_EMAIL" required="true" size="30" validate="email" />
+	</fieldset>
+	<fieldset name="user_details">
 		<field name="registerDate" type="calendar" class="readonly" label="COM_USERS_USER_FIELD_REGISTERDATE_LABEL" description="COM_USERS_USER_FIELD_REGISTERDATE_DESC" readonly="true" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" />
 		<field name="lastvisitDate" type="calendar" class="readonly" label="COM_USERS_USER_FIELD_LASTVISIT_LABEL" description="COM_USERS_USER_FIELD_LASTVISIT_DESC" readonly="true" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" />
 		<field name="lastResetTime" type="calendar" class="readonly" label="COM_USERS_USER_FIELD_LASTRESET_LABEL" description="COM_USERS_USER_FIELD_LASTRESET_DESC" readonly="true" format="%Y-%m-%d %H:%M:%S" size="22" filter="user_utc" />

@@ -69,12 +69,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$dir          = $field->parameters->get('dir');
 		$dir_url      = str_replace('\\','/', $dir);
 		
+		// Get a unique id to use as item id if current item is new
+		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
+		
+		// Check if using folder of original content being translated
+		$of_usage = $field->untranslatable ? 1 : $field->parameters->get('of_usage', 0);
+		$u_item_id = ($of_usage && $item->lang_parent_id && $item->lang_parent_id != $item->id)  ?  $item->lang_parent_id  :  $u_item_id;
+		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
 		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
 		$extra_prefix = $multiple_image_usages  ?  'fld'.$field->id.'_'  :  '';
-		
-		// Get a unique id to use as item id if current item is new
-		$u_item_id = $item->id ? $item->id : JRequest::getVar( 'unique_tmp_itemid' );
 		
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
@@ -433,9 +437,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (prv_obj) {
 					preview_msg = '<span id=\"'+elementid+'_preview_msg\"></span>';
 					if (file || !$( elementid + '_existingname' ).hasClass('no_value_selected') ) {
-						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" />';
+						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" alt=\"Preview image\" />';
 					} else {
-						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"\" style=\"border: 1px solid silver; float:left;\" />';
+						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"\" style=\"border: 1px solid silver; float:left;\" alt=\"Preview image\" />';
 						
 						/*var preview_container = '<div class=\"empty_image empty_image".$field->id."\" id=\"'+elementid+'_preview_image\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\">'
 						if ( replacestr == '_newfile' && newfilename!='' )
@@ -500,7 +504,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$image_name = trim(@$value['originalname']);
 			
 			// Check and rebuild thumbnails if needed
-			$rebuild_res = plgFlexicontent_fieldsImage::rebuildThumbs($field,$value);
+			$rebuild_res = plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item);
 			
 			// Check if rebuilding thumbnails failed (e.g. file has been deleted)  
 			if ( !$rebuild_res ) {
@@ -558,7 +562,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$img_link  = JURI::root(true).'/'.$dir_url;
 				$img_link .= ($image_source ? '/item_'.$u_item_id . '_field_'.$field->id : "");
 				$img_link .= '/s_' .$extra_prefix. $value['originalname'];
-				$imgpreview = '<img class="preview_image" id="'.$elementid.'_preview_image" src="'.$img_link.'" style="border: 1px solid silver; float:left;" />';
+				$imgpreview = '<img class="preview_image" id="'.$elementid.'_preview_image" src="'.$img_link.'" style="border: 1px solid silver; float:left;" alt="Preview image" />';
 				
 			} else {
 				
@@ -609,6 +613,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					'.($delete ? $delete : '').'
 				</div>
 			</div>
+			'
+			
+			.(($linkto_url || $usealt || $usetitle || $usedesc) ?
+			'
 			<div style="float:left; clear:none;" class="img_value_props">
 				<table class="admintable"><tbody>
 					'.@$urllink.'
@@ -616,7 +624,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					'.@$title.'
 					'.@$desc.'
 				</tbody></table>
-			</div>'.
+			</div>'
+			: '').
 			
 			( !$image_source ? '
 				<table class="admintable fcfield'.$field->id.' img_upload_select" id="'.$field->name.'_upload_select_tbl_'.$n.'" style="'.($image_name ? "display:none;" : "").'" ><tbody>
@@ -627,6 +636,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 							'<b>'.JText::_( 'FLEXI_FIELD_MAXSIZE' ).'</b>: '.($field->parameters->get('upload_maxsize') / 1000000).' MBs &nbsp; - &nbsp; <br/>' .
 							'<b>'.JText::_( 'FLEXI_FIELD_ALLOWEDEXT' ).'</b>: '.str_replace(",", ", ", $field->parameters->get('upload_extensions')) .'
 						</td>
+					</tr>
 					<tr class="img_existingfile_row">
 						<td class="key fckey_high">'.JText::_( !$image_source ? 'FLEXI_FIELD_EXISTINGFILE' : 'FLEXI_SELECT' ).':</td>
 						<td>'.$curr_select.'</td>
@@ -648,7 +658,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$field->html = '<div class="fcfieldval_container">' . $field->html[0] .'</div>';
 		}
 		
-		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'">';
+		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
 		
 		if ( count($skipped_vals) )
 			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
@@ -702,6 +712,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$dir          = $field->parameters->get('dir');
 		$dir_url      = str_replace('\\','/', $dir);
+		
+		// Check if using folder of original content being translated
+		$of_usage = $field->untranslatable ? 1 : $field->parameters->get('of_usage', 0);
+		$u_item_id = ($of_usage && $item->lang_parent_id && $item->lang_parent_id != $item->id)  ?  $item->lang_parent_id  :  $item->id;
 		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
 		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
@@ -786,7 +800,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$usable_values = array();
 		if ($values) foreach ($values as $index => $value) {
 			$value	= unserialize($value);
-			if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $value) )  $usable_values[] = $values[$index];
+			if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $value, $item) )  $usable_values[] = $values[$index];
 		}
 		$values = & $usable_values;
 		
@@ -807,7 +821,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$default_image_val['urllink'] = '';
 				
 				// Create thumbnails for default image
-				if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $default_image_val) ) $values = array(serialize($default_image_val));
+				if ( plgFlexicontent_fieldsImage::rebuildThumbs($field, $default_image_val, $item) ) $values = array(serialize($default_image_val));
 				// Also default image can (possibly) be used across multiple fields, so set flag to add field id to filenames of thumbnails
 				$multiple_image_usages = true;
 				$extra_prefix = 'fld'.$field->id.'_';
@@ -1047,7 +1061,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$extra_folder = 'intro_full';  // intro-full images mode
 		}
 		else if ( $image_source > 0 ) {
-			$extra_folder = 'item_'.$field->item_id . '_field_'.$field->id;  // folder-mode 1
+			$extra_folder = 'item_'.$u_item_id.'_field_'.$field->id;  // folder-mode 1
 			if ( $image_source > 1 ) ; // TODO
 		}
 		else {
@@ -1647,7 +1661,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$values = array();
 		foreach($post as $i => $d) {
 			$values[$i] = ( @unserialize($d)!== false || $d === 'b:0;' ) ? unserialize($d) : $d;
-			plgFlexicontent_fieldsImage::rebuildThumbs( $field, $values[$i] );
+			plgFlexicontent_fieldsImage::rebuildThumbs( $field, $values[$i], $item );
 		}
 		//echo "<b>{$field->field_type}</b>: <br/> <pre>".print_r($values, true)."</pre>\n";
 	}
@@ -2066,7 +2080,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// ***********************************************
 	// Smart image thumbnail size check and rebuilding
 	// ***********************************************
-	function rebuildThumbs( &$field, $value )
+	function rebuildThumbs( &$field, &$value, &$item )
 	{
 		static $images_processed = array();
 		
@@ -2086,6 +2100,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$unique_thumb_method = $field->parameters->get('unique_thumb_method', 0);
 		$dir = $field->parameters->get('dir');
 		
+		// Check if using folder of original content being translated
+		$of_usage = $field->untranslatable ? 1 : $field->parameters->get('of_usage', 0);
+		$u_item_id = ($of_usage && $item->lang_parent_id && $item->lang_parent_id != $item->id)  ?  $item->lang_parent_id  :  $item->id;
+		
 		// FLAG to indicate if images are shared across fields, has the effect of adding field id to image thumbnails
 		$multiple_image_usages = !$image_source && $all_media && $unique_thumb_method==0;
 		$multiple_image_usages = $multiple_image_usages || @ $value['default_image'];
@@ -2100,7 +2118,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$extra_folder = 'intro_full';  // intro-full images mode
 		}
 		else if ( $image_source > 0 ) {
-			$extra_folder = 'item_'.$field->item_id . '_field_'.$field->id;  // folder-mode 1
+			$extra_folder = 'item_'.$u_item_id . '_field_'.$field->id;  // folder-mode 1
 			if ( $image_source > 1 ) ; // TODO
 		}
 		else {
@@ -2132,7 +2150,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// ** PERFORMANCE CONSIDERATION : Try to avoid rechecking/recreating image thumbnails multiple times
 		// *************************************************************************************************
 		if ( $image_source > 0 ) {  // folder-modes
-			$pindex = 'item_'.$field->item_id . '_field_'.$field->id;
+			$pindex = 'item_'.$u_item_id . '_field_'.$field->id;
 			if ( $image_source > 1 ) ; // TODO
 		} else {  // db-mode or intro-full mode
 			$pindex = 'field_'.$field->id;
@@ -2375,7 +2393,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			JHTML::_('select.genericlist', $options, $formfldname, $attribs, 'value', 'text', '', $formfldid) ;
 		if ($use_imgpicker) {
 			$btn_name = JText::_( 'FLEXI_TOGGLE_ALL_THUMBS' )." (". $images_count .")";
-			$list	= "<input class=\"fcfield-button\" type=\"button\" value=\"".$btn_name."\" onclick=\"fcimgfld_toggle_image_picker(this);\" > " .$list;
+			$list	= "<input class=\"fcfield-button\" type=\"button\" value=\"".$btn_name."\" onclick=\"fcimgfld_toggle_image_picker(this);\" /> " .$list;
 		}
 		
 		return $list;

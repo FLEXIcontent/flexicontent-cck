@@ -92,6 +92,23 @@ class JElementSeparator extends JElement
 		return "";
 	}
 	
+	function fetchTooltip($label, $description, &$xmlElement, $control_name='', $name='')
+	{
+		static $count = 1;
+		$count++;
+		
+		$output = '<label ';
+		if ($description) {
+			$output .= ' class="hasTip" title="'.JText::_($label).'::'.JText::_($description).'">';
+		} else {
+			$output .= '>';
+		}
+		$output .= JText::_( $label ).'</label>';
+		
+		return $output;
+	}
+	
+	
 	function fetchElement($name, $value, &$node, $control_name)
 	{
 		if (FLEXI_J16GE) {

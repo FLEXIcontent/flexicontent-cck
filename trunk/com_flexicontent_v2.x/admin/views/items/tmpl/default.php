@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1887 2014-04-24 23:53:14Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1902 2014-05-10 16:06:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -49,25 +49,33 @@ if ( FLEXI_J16GE || FLEXI_FISH ) {
 $items_list_cols += count($this->extra_fields);
 
 $image_flag_path = !FLEXI_J16GE ? "../components/com_joomfish/images/flags/" : "../media/mod_languages/images/";
-$image_zoom = '<img src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.JText::_('FLEXI_PREVIEW').'" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this item in a new browser window" />';
+$_img_title = JText::_('FLEXI_PREVIEW', true);
+$image_zoom = '<img src="components/com_flexicontent/assets/images/monitor_go.png" width="16" height="16" border="0" class="hasTip" alt="'.$_img_title.'" title="'.$_img_title.':: Click to display the frontend view of this item in a new browser window" />';
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
 if ($this->ordering) {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_ENABLED_TIP', true).'" />' .' ';
+	$_img_title = JText::_('FLEXI_REORDERING_ENABLED_TIP', true);
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" alt="'.$_img_title.'" title="'.$_img_title.'" />' .' ';
 	$drag_handle_box = '<div class="fc_drag_handle%s" title="'.JText::_('FLEXI_ORDER_SAVE_WHEN_DONE', true).'"></div>';
 } else {
-	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.JText::_('FLEXI_REORDERING_DISABLED_TIP', true).'" />' .' ';
+	$_img_title = JText::_('FLEXI_REORDERING_DISABLED_TIP', true);
+	$image_ordering_tip = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" alt="'.$_img_title.'" title="'.$_img_title.'" />' .' ';
 	$drag_handle_box = '<div class="fc_drag_handle %s" title="'.JText::_('FLEXI_ORDER_COLUMN_FIRST', true).'" ></div>';
 	$image_saveorder    = '';
 }
-$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="'.'::'.JText::_('MAIN category shown in bold', true).'" />';
+$_img_title = JText::_('MAIN category shown in bold', true);
+$categories_tip  = '<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" alt="'.$_img_title.'" title="'.'::'.$_img_title.'" />';
 
 if ( !$this->filter_order_type ) {
-	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_ORDER_JOOMLA', true).'::'.JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA', true)).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP', true).'" />';
+	$_img_title = JText::_('FLEXI_ORDER_JOOMLA', true);
+	$_img_title_desc = JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_JOOMLA', true)).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP', true);
+	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" alt="'.$_img_title.'" title="'.$_img_title.'::'.$_img_title_desc.'" />';
 	$ord_catid = 'catid';
 	$ord_col = 'ordering';
 } else {
-	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'.JText::_('FLEXI_ORDER_FLEXICONTENT', true).'::'.JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_FLEXICONTENT', true)).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP', true).'" />';
+	$_img_title = JText::_('FLEXI_ORDER_FLEXICONTENT', true);
+	$_img_title_desc = JText::sprintf('FLEXI_CURRENT_ORDER_IS',JText::_('FLEXI_ORDER_FLEXICONTENT', true)).' '.JText::_('FLEXI_ITEM_ORDER_EXPLANATION_TIP', true);
+	$ordering_type_tip  = '<img align="left" src="components/com_flexicontent/assets/images/comment.png" class="hasTip" alt="'.$_img_title.'" title="'.$_img_title.'::'.$_img_title_desc.'" />';
 	$ord_catid = 'rel_catid';
 	$ord_col = 'catsordering';
 }
@@ -364,14 +372,22 @@ window.addEvent('domready', function() {
 	<div class="fc_nice_box" style="">
 		
 		<div style="float:left; margin-right:12px;">
-		<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_LIST_ITEMS_WITH_STATE' ); ?></label>
-		<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="::<?php echo JText::_('FLEXI_LIST_ITEMS_WITH_STATE_DESC', true); ?>" style="vertical-align:middle;" />
+		<?php
+		$_img_title = JText::_('FLEXI_LIST_ITEMS_WITH_STATE', true);
+		$_img_title_desc = JText::_('FLEXI_LIST_ITEMS_WITH_STATE_DESC', true);
+		?>
+		<label class="label"><?php echo '&nbsp;'.$_img_title; ?></label>
+		<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" alt="<?php echo $_img_title_desc; ?>" title="::<?php echo $_img_title_desc; ?>" style="vertical-align:middle;" />
 		<?php echo $this->lists['filter_stategrp']; ?>
 		</div>
 		
 		<div style="float:left;">
-		<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_LIST_ITEMS_IN_CATS' ); ?></label>
-		<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" title="::<?php echo JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true); ?>" style="vertical-align:middle;" />
+		<?php
+		$_img_title = JText::_('FLEXI_LIST_ITEMS_IN_CATS', true);
+		$_img_title_desc = JText::_('FLEXI_LIST_ITEMS_IN_CATS_DESC', true);
+		?>
+		<label class="label"><?php echo '&nbsp;'.$_img_title; ?></label>
+		<img src="components/com_flexicontent/assets/images/information.png" class="hasTip" alt="<?php echo $_img_title_desc; ?>" title="::<?php echo $_img_title_desc; ?>" style="vertical-align:middle;" />
 		<span class="radio"><?php echo $this->lists['filter_catsinstate']; ?></span>
 		</div>
 	</div>

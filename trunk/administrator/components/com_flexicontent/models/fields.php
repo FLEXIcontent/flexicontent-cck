@@ -694,7 +694,7 @@ class FlexicontentModelFields extends JModelLegacy
 			'Media fields / Mini apps' => array('file', 'image', 'minigallery', 'sharedvideo', 'sharedaudio', 'addressint'),
 			'Single property fields'   => array('date', 'text', 'textarea', 'textselect'),
 			'Multi property fields'     => array('weblink', 'email', 'extendedweblink', 'phonenumbers', 'termlist'),
-			'Item form'                => array('groupmarker'),
+			'Item form'                => array('groupmarker', 'coreprops'),
 			'Item relations fields'    => array('relation', 'relation_reverse', 'autorelationfilters'),
 			'Special action fields'    => array('toolbar', 'fcloadmodule', 'fcpagenav', 'linkslist')
 		);

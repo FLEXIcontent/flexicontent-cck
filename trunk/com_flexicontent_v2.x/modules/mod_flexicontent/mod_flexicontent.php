@@ -224,16 +224,18 @@ if ( $show_mod )
 	'category_data_retrieval'=>'Category data retrieval: %.2f secs',
 	'rendering_template'=>'Adding css/js & Rendering Template with item/category/etc data: %.2f secs'
 	);
+	
+	// append performance stats to global variable
 	$flexiparams = JComponentHelper::getParams('com_flexicontent');
 	if ( $flexiparams->get('print_logging_info') )
 	{
 		$modfc_jprof->mark('END: FLEXIcontent Module');
-		$msg  = implode('<br/>', $modfc_jprof->getbuffer());
+		$msg  = '<br/><br/>'.implode('<br/>', $modfc_jprof->getbuffer());
 		$msg .= sprintf( '<code> <b><u>including</u></b>: <br/> -- Content Plugins: %.2f secs</code><br/>', $fc_content_plg_microtime/1000000);
 		foreach ($mod_fc_run_times as $modtask => $modtime) {
 			$msg .= '<code>'.sprintf( ' -- '.$task_lbls[$modtask].'<br/>', $modtime) .'</code>';
 		}
-		$app->enqueueMessage( $msg, 'notice' );
+		global $fc_performance_msg;
+		$fc_performance_msg .= $msg;
 	}
 }
-?>

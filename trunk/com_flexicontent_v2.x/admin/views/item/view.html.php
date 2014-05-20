@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1853 2014-02-17 23:48:45Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1901 2014-05-07 02:37:25Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -146,7 +146,7 @@ class FlexicontentViewItem extends JViewLegacy
 		$allversions  = $model->getVersionList();
 		foreach($allversions as $v)
 		{
-			if ( $k && ( $k % $versionsperpage == 0 ) )
+			if ( $k > 1 && (($k-1) % $versionsperpage) == 0 )
 				$current_page++;
 			if ( $v->nr == $item->version ) break;
 			$k++;
@@ -188,7 +188,7 @@ class FlexicontentViewItem extends JViewLegacy
 		{
 			// Domain URL and autologin vars
 			$server = JURI::getInstance()->toString(array('scheme', 'host', 'port'));
-			$autologin   = $params->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
+			$autologin = ''; //$params->get('autoflogin', 1) ? '&fcu='.$user->username . '&fcp='.$user->password : '';
 			
 			// Check if we are in the backend, in the back end we need to set the application to the site app instead
 			$isAdmin = JFactory::getApplication()->isAdmin();
@@ -211,7 +211,7 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 			
 			$previewlink     = /*$server .*/ $item_url;
-			$previewlink     = str_replace('&amp;', '&', $previewlink);
+			//$previewlink     = str_replace('&amp;', '&', $previewlink);
 			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)) .$autologin;
 
 			if ( !$params->get('use_versioning', 1) || ($item->version == $item->current_version && $item->version == $item->last_version) )
@@ -349,12 +349,12 @@ class FlexicontentViewItem extends JViewLegacy
 
 		//$selectedcats 	= $isnew ? array() : $fields['categories']->value;
 
-		//echo "<br>row->tags: "; print_r($item->tags);
-		//echo "<br>usedtagsIds: "; print_r($usedtagsIds);
-		//echo "<br>usedtags (data): "; print_r($usedtags);
+		//echo "<br/>row->tags: "; print_r($item->tags);
+		//echo "<br/>usedtagsIds: "; print_r($usedtagsIds);
+		//echo "<br/>usedtags (data): "; print_r($usedtags);
 
-		//echo "<br>row->categories: "; print_r($item->categories);
-		//echo "<br>selectedcats: "; print_r($selectedcats);
+		//echo "<br/>row->categories: "; print_r($item->categories);
+		//echo "<br/>selectedcats: "; print_r($selectedcats);
 		
 		
 		
@@ -388,8 +388,10 @@ class FlexicontentViewItem extends JViewLegacy
 		$special_privelege_stategrp = ($item->state==$_arc_ || $perms['canarchive']) || ($item->state==-2 || $perms['candelete']) ;
 		
 		$state = array();
+		// Using <select> groups
 		if ($non_publishers_stategrp || $special_privelege_stategrp)
 			$state[] = JHTML::_('select.optgroup', JText::_( 'FLEXI_PUBLISHERS_WORKFLOW_STATES' ) );
+			
 		$state[] = JHTML::_('select.option',  1,  JText::_( 'FLEXI_PUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  0,  JText::_( 'FLEXI_UNPUBLISHED' ) );
 		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
@@ -410,11 +412,16 @@ class FlexicontentViewItem extends JViewLegacy
 		if ($item->state==$_arc_ || $perms['canarchive']) $state[] = JHTML::_('select.option',  $_arc_, JText::_( 'FLEXI_ARCHIVED' ) );
 		if ($item->state==-2     || $perms['candelete'])  $state[] = JHTML::_('select.option',  -2,     JText::_( 'FLEXI_TRASHED' ) );
 		
+		// Close last <select> group
+		if ($non_publishers_stategrp || $special_privelege_stategrp)
+			$state[] = JHTML::_('select.optgroup', '');
+		
 		$fieldname = FLEXI_J16GE ? 'jform[state]' : 'state';
 		$elementid = FLEXI_J16GE ? 'jform_state'  : 'state';
 		$class = 'use_select2_lib';
 		$attribs = 'class="'.$class.'"';
 		$lists['state'] = JHTML::_('select.genericlist', $state, $fieldname, $attribs, 'value', 'text', $item->state, $elementid );
+		if (!FLEXI_J16GE) $lists['state'] = str_replace('<optgroup label="">', '</optgroup>', $lists['state']);
 		
 		// *** BOF: J2.5 SPECIFIC SELECT LISTS
 		if (FLEXI_J16GE)

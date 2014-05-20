@@ -204,20 +204,21 @@ class FlexicontentViewItems extends JViewLegacy {
 		// Implementation of multiple-item state selector
 		$add_divider = false;
 		if ( $CanPublish || $CanPublishOwn ) {
-			$btn_task = FLEXI_J16GE ? '&amp;task=items.selectstate' : '&amp;controller=items&amp;task=selectstate';
-			$popup_load_url = JURI::base().'index.php?option=com_flexicontent'.$btn_task.'&amp;format=raw';
-			if (FLEXI_J30GE) {  // Layout of Popup button broken in J3.1, add manually
+			$btn_task = '';
+			$ctrl_task = FLEXI_J16GE ? '&task=items.selectstate' : '&controller=items&task=selectstate';
+			$popup_load_url = JURI::base().'index.php?option=com_flexicontent'.$ctrl_task.'&format=raw';
+			if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
 				$js .= "
-					$$('li#toolbar-publish a.toolbar, #toolbar-publish button')
-						.set('onclick', 'javascript:;')
-						.set('href', '".$popup_load_url."')
-						.set('rel', '{handler: \'iframe\', size: {x: 800, y: 240}, onClose: function() {}}');
+					jQuery('#toolbar-publish a.toolbar, #toolbar-publish button')
+						.attr('onclick', 'javascript:;')
+						.attr('href', '".$popup_load_url."')
+						.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 240}, onClose: function() {}}');
 				";
 				//JToolBarHelper::publishList( $btn_task );
 				JToolBarHelper::custom( $btn_task, 'publish.png', 'publish_f2.png', 'FLEXI_CHANGE_STATE', false );
-				JHtml::_('behavior.modal', 'li#toolbar-publish a.toolbar, #toolbar-publish button');
+				JHtml::_('behavior.modal', '#toolbar-publish a.toolbar, #toolbar-publish button');
 			} else {
-				$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), $popup_load_url, 800, 240);
+				$toolbar->appendButton('Popup', 'publish', JText::_('FLEXI_CHANGE_STATE'), str_replace('&', '&amp;', $popup_load_url), 800, 240);
 			}
 			$add_divider = true;
 		}
@@ -260,20 +261,20 @@ class FlexicontentViewItems extends JViewLegacy {
 		
 		$add_divider = false;
 		if ($CanAdd) {
-			$btn_task = FLEXI_J16GE ? 'items.add' : 'add';
-			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&amp;view=types&amp;format=raw';
-			if (FLEXI_J30GE) {  // Layout of Popup button broken in J3.1, add manually
+			$btn_task = '';
+			$popup_load_url = JURI::base().'index.php?option=com_flexicontent&view=types&format=raw';
+			if (FLEXI_J30GE || !FLEXI_J16GE) {  // Layout of Popup button broken in J3.1, add in J1.5 it generates duplicate HTML tag id (... just for validation), so add manually
 				$js .= "
-					$$('li#toolbar-new a.toolbar, #toolbar-new button')
-						.set('onclick', 'javascript:;')
-						.set('href', '".$popup_load_url."')
-						.set('rel', '{handler: \'iframe\', size: {x: 800, y: 240}, onClose: function() {}}');
+					jQuery('#toolbar-new a.toolbar, #toolbar-new button')
+						.attr('onclick', 'javascript:;')
+						.attr('href', '".$popup_load_url."')
+						.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 240}, onClose: function() {}}');
 				";
 				//JToolBarHelper::addNew( $btn_task );
 				JToolBarHelper::custom( $btn_task, 'new.png', 'new_f2.png', 'FLEXI_NEW', false );
-				JHtml::_('behavior.modal', 'li#toolbar-new a.toolbar, #toolbar-new button');
+				JHtml::_('behavior.modal', '#toolbar-new a.toolbar, #toolbar-new button');
 			} else {
-				$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), $popup_load_url, 800, 240);
+				$toolbar->appendButton('Popup', 'new',  JText::_('FLEXI_NEW'), str_replace('&', '&amp;', $popup_load_url), 800, 240);
 			}
 			$add_divider = true;
 		}
@@ -401,7 +402,7 @@ class FlexicontentViewItems extends JViewLegacy {
 			$lists['filter_stategrp'] = '';
 			foreach ($stategroups as $i => $v) {
 				$checked = $filter_stategrp == $i ? ' checked="checked" ' : '';
-				$lists['filter_stategrp'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_stategrp'.$i.'" name="filter_stategrp" />';
+				$lists['filter_stategrp'] .= '<input type="radio" onchange="submitform();" class="inputbox" '.$checked.' value="'.$i.'" id="filter_stategrp'.$i.'" name="filter_stategrp" />';
 				$lists['filter_stategrp'] .= '<label class="" id="filter_stategrp'.$i.'-lbl" for="filter_stategrp'.$i.'">'.$v.'</label>';
 			}
 		}
@@ -430,7 +431,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$lists['filter_catsinstate']  = '';
 		foreach ($catsinstate as $i => $v) {
 			$checked = $filter_catsinstate == $i ? ' checked="checked" ' : '';
-			$lists['filter_catsinstate'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="filter_catsinstate'.$i.'" name="filter_catsinstate" />';
+			$lists['filter_catsinstate'] .= '<input type="radio" onchange="submitform();" class="inputbox" '.$checked.' value="'.$i.'" id="filter_catsinstate'.$i.'" name="filter_catsinstate" />';
 			$lists['filter_catsinstate'] .= '<label class="" id="filter_catsinstate'.$i.'-lbl" for="filter_catsinstate'.$i.'">'.$v.'</label>';
 		}
 		
@@ -464,7 +465,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$lists['scope']  = '';
 		foreach ($scopes as $i => $v) {
 			$checked = $scope == $i ? ' checked="checked" ' : '';
-			$lists['scope'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="scope'.$i.'" name="scope" />';
+			$lists['scope'] .= '<input type="radio" onchange="submitform();" class="inputbox" '.$checked.' value="'.$i.'" id="scope'.$i.'" name="scope" />';
 			$lists['scope'] .= '<label class="" id="scope'.$i.'-lbl" for="scope'.$i.'">'.$v.'</label>';
 		}
 		
@@ -479,7 +480,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$lists['date']  = '';
 		foreach ($dates as $i => $v) {
 			$checked = $date == $i ? ' checked="checked" ' : '';
-			$lists['date'] .= '<input type="radio" onchange="submitform();" class="inputbox" size="1" '.$checked.' value="'.$i.'" id="date'.$i.'" name="date" />';
+			$lists['date'] .= '<input type="radio" onchange="submitform();" class="inputbox" '.$checked.' value="'.$i.'" id="date'.$i.'" name="date" />';
 			$lists['date'] .= '<label class="" id="date'.$i.'-lbl" for="date'.$i.'">'.$v.'</label>';
 		}
 		

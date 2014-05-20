@@ -27,7 +27,7 @@ table#itemcompare s{
 }
 </style>
 <div class="flexicontent">
-	<table cellspacing="0" cellpadding="0" border="0" width="100%" id="itemcompare">
+	<table cellspacing="0" cellpadding="0" border="0" width="100%" id="itemcompare" style="background-color:white;">
 		<tr>
 			<td valign="top">
 					<?php if (!$this->cparams->get('disable_diff')) : ?>

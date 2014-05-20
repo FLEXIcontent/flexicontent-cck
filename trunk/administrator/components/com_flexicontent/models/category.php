@@ -243,6 +243,9 @@ class FlexicontentModelCategory extends JModelLegacy
 	 */
 	function store($data)
 	{
+		$copyparams = JRequest::getVar( 'copycid', null, 'post', 'int' );
+		if ($copyparams) unset($data['params']);
+		
 		$category = JTable::getInstance('flexicontent_categories','');
 		
 		// Bind the data.
@@ -256,18 +259,26 @@ class FlexicontentModelCategory extends JModelLegacy
 			$category->ordering = $category->getNextOrder();
 		}
 		
-		$params			= JRequest::getVar( 'params', null, 'post', 'array' );
-		$copyparams		= JRequest::getVar( 'copycid', null, 'post', 'int' );
-		
-		if ($copyparams)
-		{
+		// Either set parameters via copying from a given category
+		if ($copyparams) {
 			$category->params = $this->getParams($copyparams);
 		}
-		else
-		{
+		
+		// Or use posted parameters
+		else {
 			// Build parameter INI string
-			if (is_array($params))
+			if ( is_array($data['params']) )
 			{
+				// Get layout parameters
+				$clayout = $data['params']['clayout'];
+				$tmpl_params = $data['layouts'][$clayout];
+				
+				// Clear parameters of all layouts
+				unset($data['layouts']);
+				
+				// Merge the parameters of currently selected layout
+				$params = array_merge($data['params'], $tmpl_params);
+				
 				$txt = array ();
 				foreach ($params as $k => $v) {
 					if (is_array($v)) {

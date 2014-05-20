@@ -248,10 +248,10 @@ html button {
 
 .flexi_buttons, .fc_buttons { margin: 0px; padding:0px 2px 0px 2px; display: inline-block; }
 
-.flexicontent button,
-.fc_button,
-.fc_buttons button,
-.flexi_buttons button {
+.flexicontent button:not(.btn),
+.fc_button:not(.btn),
+.fc_buttons button:not(.btn),
+.flexi_buttons button:not(.btn) {
 	border:1px solid #7d99ca !important;
 	-webkit-border-radius: 6px !important;
 	-moz-border-radius: 6px !important;
@@ -275,7 +275,7 @@ html button {
 	filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#a5b8da, endColorstr=#7089b3) !important;
 }
 
-.fc_button.fcsimple {
+.fc_button.fcsimple:not(.btn) {
 	font-size: 11px !important;
 	font-family: tahoma !important;
 	padding: 3px 10px 3px 10px !important;
@@ -291,7 +291,7 @@ html button {
 }
 
 
-.fc_button.fcsimple:hover {
+.fc_button.fcsimple:not(.btn):hover {
 	background-color: #770000 !important;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#aa0000), to(#770000)) !important;
 	background-image: -webkit-linear-gradient(top, #aa0000, #770000) !important;
@@ -303,10 +303,10 @@ html button {
 	border:1px solid #770000 !important;
 }
 
-.flexicontent button:hover,
-.fc_button:hover,
-.fc_buttons button:hover,
-.flexi_buttons button:hover {
+.flexicontent button:not(.btn):hover,
+.fc_button:not(.btn):hover,
+.fc_buttons button:not(.btn):hover,
+.flexi_buttons button:not(.btn):hover {
 	border:1px solid #5d7fbc !important;
 	background-color: #819bcb !important;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#819bcb), to(#536f9d)) !important;

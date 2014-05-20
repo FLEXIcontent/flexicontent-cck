@@ -53,7 +53,7 @@ class JElementFcordering extends JElement
 			$attributes = & $node->_attributes;
 		}
 		$size = @$attributes['size'] ? $attributes['size'] : 16 ;
-		$class = 'class="inputbox" multiple="true" size="'.$size.'"';
+		$class = 'class="inputbox" multiple="multiple" size="'.$size.'"';
 		
 		$ordering[] = JHTML::_('select.option',  'addedrev', 	JText::_( 'FLEXI_ORDER_OLDEST_FIRST' ) );       // 'date'
 		$ordering[] = JHTML::_('select.option',  'added', 		JText::_( 'FLEXI_ORDER_MOST_RECENT_FIRST' ) );  // 'rdate'

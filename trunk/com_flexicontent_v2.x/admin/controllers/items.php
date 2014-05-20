@@ -1470,55 +1470,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		exit;
 	}
-	
-	function getversionlist()
-	{
-		// Check for request forgeries
-		JRequest::checkToken('request') or jexit( 'Invalid Token' );
-		@ob_end_clean();
-		$id 		= JRequest::getInt('id', 0);
-		$active 	= JRequest::getInt('active', 0);
-		if(!$id) return;
-		$revert 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/arrow_rotate_anticlockwise.png', JText::_( 'FLEXI_REVERT' ) );
-		$view 		= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/magnifier.png', JText::_( 'FLEXI_VIEW' ) );
-		$comment 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/images/comment.png', JText::_( 'FLEXI_COMMENT' ) );
 
-		$model 	= $this->getModel('item');
-		$model->setId($id);
-		$item = $model->getItem( $id );
-		
-		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
-		$versionsperpage = $cparams->get('versionsperpage', 10);
-		$currentversion = $item->version;
-		$page=JRequest::getInt('page', 0);
-		$versioncount = $model->getVersionCount();
-		$numpage = ceil($versioncount/$versionsperpage);
-		if($page>$numpage) $page = $numpage;
-		elseif($page<1) $page = 1;
-		$limitstart = ($page-1)*$versionsperpage;
-		$versions = $model->getVersionList();
-		$versions	= $model->getVersionList($limitstart, $versionsperpage);
-		
-		$jt_date_format = FLEXI_J16GE ? 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS_J16GE' : 'FLEXI_DATE_FORMAT_FLEXI_VERSIONS';
-		$df_date_format = FLEXI_J16GE ? "d/M H:i" : "%d/%m %H:%M" ;
-		$date_format = JText::_( $jt_date_format );
-		$date_format = ( $date_format == $jt_date_format ) ? $df_date_format : $date_format;
-		$ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
-		foreach($versions as $v) {
-			$class = ($v->nr == $active) ? ' class="active-version"' : '';
-			echo "<tr".$class."><td class='versions'>#".$v->nr."</td>
-				<td class='versions'>".JHTML::_('date', (($v->nr == 1) ? $item->created : $v->date), $date_format )."</td>
-				<td class='versions'>".(($v->nr == 1) ? $item->creator : $v->modifier)."</td>
-				<td class='versions' align='center'><a href='#' class='hasTip' title='Comment::".$v->comment."'>".$comment."</a>";
-				if((int)$v->nr==(int)$currentversion) {//is current version?
-					echo "<a onclick='javascript:return clickRestore(\"index.php?option=com_flexicontent&".$ctrl_task."&cid=".$item->id."&version=".$v->nr."\");' href='#'>".JText::_( 'FLEXI_CURRENT' )."</a>";
-				}else{
-					echo "<a class='modal-versions' href='index.php?option=com_flexicontent&view=itemcompare&cid[]=".$item->id."&version=".$v->nr."&tmpl=component' title='".JText::_( 'FLEXI_COMPARE_WITH_CURRENT_VERSION' )."' rel='{handler: \"iframe\", size: {x:window.getSize().scrollSize.x-100, y: window.getSize().size.y-100}}'>".$view."</a><a onclick='javascript:return clickRestore(\"index.php?option=com_flexicontent&".$ctrl_task."&cid=".$item->id."&version=".$v->nr."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1\");' href='#' title='".JText::sprintf( 'FLEXI_REVERT_TO_THIS_VERSION', $v->nr )."'>".$revert;
-				}
-				echo "</td></tr>";
-		}
-		exit;
-	}
 	
 	
 }

@@ -328,7 +328,7 @@ if ($interval < $duration) {
 		<?php	$rowcount = 0; ?>
 		
 		<div id="mod_fc_carousel_mask<?php echo $module->id ?>_loading" class="mod_fc_carousel_mask_loading">
-			... <?php echo  JText::_('FLEXI_MOD_CAROUSEL_LOADING_IMAGES'); ?> <img alt="" src="<?php echo JURI::root(); ?>components/com_flexicontent/assets/images/ajax-loader.gif" align="center">
+			... <?php echo  JText::_('FLEXI_MOD_CAROUSEL_LOADING_IMAGES'); ?> <img alt="" src="<?php echo JURI::root(); ?>components/com_flexicontent/assets/images/ajax-loader.gif" align="middle" />
 		</div>
 		
 <div class="mod_fc_carousel" id="mod_fc_carousel_container_<?php echo $module->id ?>" >

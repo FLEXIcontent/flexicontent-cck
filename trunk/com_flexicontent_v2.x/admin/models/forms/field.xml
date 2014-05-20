@@ -52,6 +52,6 @@
 		<option value="1">FLEXI_YES</option>
 	</field>
 	<field id="access" name="access" type="accesslevel" label="JField_Access_Label" description="FLEXI_FIELD_ACCESSLEVEL_DESC" class="inputbox" size="1" default="" />
-	<field name="tid" type="contenttypes" multiple="true" label="FLEXI_TYPES" description="" class="inputbox" size="1" default="" />
+	<field name="tid" type="contenttypes" multiple="true" label="FLEXI_TYPES" description="" class="inputbox" size="8" default="" />
 	<field name="rules" type="rules" label="COM_CONTENT_FIELD_RULES_LABEL" description="COM_CONTENT_FIELD_RULES_DESC" class="inputbox" filter="rules" component="com_flexicontent" section="field" />
 </form>

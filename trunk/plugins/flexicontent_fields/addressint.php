@@ -6,6 +6,12 @@ jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsAddressint extends JPlugin
 {
+	static $field_types = array('addressint');
+	
+	// ***********
+	// CONSTRUCTOR
+	// ***********
+	
 	function plgFlexicontent_fieldsAddressint( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
@@ -14,8 +20,10 @@ class plgFlexicontent_fieldsAddressint extends JPlugin
 
 	function onDisplayField(&$field, &$item)
 	{
+		// displays the field when editing content item
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'addressint') return;
+		$field->label = JText::_($field->label);
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 
 		$editor 	= JFactory::getEditor();
 		
@@ -389,66 +397,90 @@ class plgFlexicontent_fieldsAddressint extends JPlugin
 		}
 		
 		$field->html	.= '<td>'.JHTML::_('select.genericlist', $options, 'custom['.$field->name.'][country]', $required, 'value', 'text', $value['country']).'</td>';
-		$field->html	.= '<tr><td></td><td><input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GEOLOCATE').'" onclick="geolocateAddr(\'custom['.$field->name.']\');"> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lat]" value="'.$value['lat'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lon]" value="'.$value['lon'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <div id="'.$field->name.'_map"><img src="http://maps.google.com/maps/api/staticmap?center='.$value['lat'].','.$value['lon'].'&zoom=12&size=250x150&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|'.$value['lat'].','.$value['lon'].'&sensor=false" /></div></td>';
-		$field->html	.= '</tr></table>
-		<script type="text/javascript" src="//maps.google.com/maps/api/js?sensor=false"></script>
-		<script>
-		function geolocateAddr(fieldname) {
-			var geocoder = new google.maps.Geocoder();
-			var address = document.forms["adminForm"].elements[fieldname+"[addr1]"].value +", "+document.forms["adminForm"].elements[fieldname+"[city]"].value +", "+document.forms["adminForm"].elements[fieldname+"[state]"].value +" "+document.forms["adminForm"].elements[fieldname+"[province]"].value +", "+document.forms["adminForm"].elements[fieldname+"[zip]"].value +", "+document.forms["adminForm"].elements[fieldname+"[country]"].value;
-			geocoder.geocode( { \'address\': address}, function(results, status) {
-				if (status == google.maps.GeocoderStatus.OK) {
-					var latitude = results[0].geometry.location.lat();
-					var longitude = results[0].geometry.location.lng();
-					var latfield = fieldname+"[lat]";
-					var lonfield = fieldname+"[lon]";
-					document.forms["adminForm"].elements[latfield].value = latitude;
-					document.forms["adminForm"].elements[lonfield].value = longitude;
-					document.getElementById("'.$field->name.'_map").innerHTML = \'<img src="http://maps.google.com/maps/api/staticmap?center=\'+latitude+\',\'+longitude+\'&zoom=12&size=250x150&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|\'+latitude+\',\'+longitude+\'&sensor=false" />\';
-				} 
-				else {
-					var latfield = fieldname+"[lat]";
-					var lonfield = fieldname+"[lon]";
-					document.forms["adminForm"].elements[latfield].value = "";
-					document.forms["adminForm"].elements[lonfield].value = "";
-					document.getElementById("'.$field->name.'_map").innerHTML = \'<img src="http://maps.google.com/maps/api/staticmap?center=0,0&zoom=12&size=250x150&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|0,0&sensor=false" />\';
-				}
-			}); 
+		$field->html	.= '</tr><tr><td></td><td><input class="fcfield-button" type="button" value="'.JText::_('PLG_FLEXICONTENT_FIELDS_ADDRESSINT_GEOLOCATE').'" onclick="geolocateAddr(\'custom['.$field->name.']\', \''.$field->name.'\');" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lat]" value="'.$value['lat'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <input type="text" class="fcfield_textval" name="custom['.$field->name.'][lon]" value="'.$value['lon'].'" size="5" maxlength="10"'.$required.' readonly="readonly" /> <div id="'.$field->name.'_map"><img src="http://maps.google.com/maps/api/staticmap?center='.$value['lat'].','.$value['lon'].'&zoom=12&size=250x150&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|'.$value['lat'].','.$value['lon'].'&sensor=false" alt="" /></div></td>';
+		$field->html	.= '</tr></table>';
+		
+		static $js_added = false;
+		if (!$js_added) {
+			$js_added = true;
+			$document = JFactory::getDocument();
+			$document->addScript('//maps.google.com/maps/api/js?sensor=false');
+			$document->addScriptDeclaration('
+			function geolocateAddr(fieldname, plainname) {
+				var geocoder = new google.maps.Geocoder();
+				var address = document.forms["adminForm"].elements[fieldname+"[addr1]"].value +", "+document.forms["adminForm"].elements[fieldname+"[city]"].value +", "+document.forms["adminForm"].elements[fieldname+"[state]"].value +" "+document.forms["adminForm"].elements[fieldname+"[province]"].value +", "+document.forms["adminForm"].elements[fieldname+"[zip]"].value +", "+document.forms["adminForm"].elements[fieldname+"[country]"].value;
+				geocoder.geocode( { \'address\': address}, function(results, status) {
+					if (status == google.maps.GeocoderStatus.OK) {
+						var latitude = results[0].geometry.location.lat();
+						var longitude = results[0].geometry.location.lng();
+						var latfield = fieldname+"[lat]";
+						var lonfield = fieldname+"[lon]";
+						document.forms["adminForm"].elements[latfield].value = latitude;
+						document.forms["adminForm"].elements[lonfield].value = longitude;
+						document.getElementById(plainname+"_map").innerHTML = \'<img src="http://maps.google.com/maps/api/staticmap?center=\'+latitude+\',\'+longitude+\'&zoom=12&size=250x150&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|\'+latitude+\',\'+longitude+\'&sensor=false" alt="Geographical address locator" />\';
+					} 
+					else {
+						var latfield = fieldname+"[lat]";
+						var lonfield = fieldname+"[lon]";
+						document.forms["adminForm"].elements[latfield].value = "";
+						document.forms["adminForm"].elements[lonfield].value = "";
+						document.getElementById(plainname+"_map").innerHTML = \'<img src="http://maps.google.com/maps/api/staticmap?center=0,0&zoom=12&size=250x150&maptype=roadmap&markers=size:mid%7Ccolor:red%7C|0,0&sensor=false" alt="Geographical address locator" />\';
+					}
+				}); 
+			}
+			');
 		}
-		</script>';
+	}
+	
+
+
+	// *************************
+	// SEARCH / INDEXING METHODS
+	// *************************
+	
+	// Method to create (insert) advanced search index DB records for the field values
+	function onIndexAdvSearch(&$field, &$post, &$item)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array('addr1','addr2','addr3','city','state','province','zip','country'), $properties_spacer=' ', $filter_func=null);
+		return true;
+	}
+	
+	
+	// Method to create basic search index (added as the property field->search)
+	function onIndexSearch(&$field, &$post, &$item)
+	{
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		if ( !$field->issearch ) return;
 		
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array('addr1','addr2','addr3','city','state','province','zip','country'), $properties_spacer=' ', $filter_func=null);
+		return true;
 	}
 
-
+	
 	function onBeforeSaveField( $field, &$post, &$file )
 	{
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'addressint') return;
-		if(!$post) return;
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
-		// create the fulltext search index
-		$searchindex = '';
-		// note this can not save "0" (ZERO) ... but we do not need it
-		if( !empty($post['addr1']) )  $searchindex .= $post['addr1'].' ';
-		if( !empty($post['addr2']) )  $searchindex .= $post['addr2'].' ';
-		if( !empty($post['addr3']) )  $searchindex .= $post['addr3'].' ';
-		if( !empty($post['city']) )  $searchindex .= $post['city'].' ';
-		if( !empty($post['state']) )  $searchindex .= $post['state'].' ';
-		if( !empty($post['province']) )  $searchindex .= $post['province'].' ';
-		if( !empty($post['zip']) )  $searchindex .= $post['zip'].' ';
-		if( !empty($post['country']) )  $searchindex .= $post['country'].' ';
-		$searchindex .= ' | ';
+		// Check if field has posted data
+		if ( empty($post) ) return;
 		
-		$field->search = $searchindex;
+		// Serialize multi-property data before storing them into the DB
 		$post = serialize($post);
 	}
 
 
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		// displays the field in the frontend
+		
 		// execute the code only if the field type match the plugin type
-		if($field->field_type != 'addressint') return;
+		$field->label = JText::_($field->label);
+		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
 		// get parameters
 		$show_map = $field->parameters->get('show_map','none');
 		$map_width = $field->parameters->get('map_width',200);
@@ -467,6 +499,7 @@ class plgFlexicontent_fieldsAddressint extends JPlugin
 		$values = $field->value[0] ;
 		$address = unserialize($values);
 		// generate map
+		$map = '';
 		if(($view=='category' && ($show_map=='category' || $show_map=='both')) || ($view!='category' && ($show_map=='item' || $show_map=='both'))) {
 			
 			$map_link = "http://maps.google.com/maps?q=".$address['lat'].",".$address['lon'];
@@ -477,7 +510,7 @@ class plgFlexicontent_fieldsAddressint extends JPlugin
 			if($link_map==1) $map .= '<br />Click Map for Directions</a>';
 			$map .= '</div>';
 		}
-		$field->{$prop} .= $field_prefix;
+		$field->{$prop} = $field_prefix;
 		if($map_position==0) $field->{$prop} .= $map;
 		if($address['addr1']) $field->{$prop} .= '<div class="addr1">'.$address['addr1'].'</div>';
 		if($address['addr2']) $field->{$prop} .= '<div class="addr2">'.$address['addr2'].'</div>';

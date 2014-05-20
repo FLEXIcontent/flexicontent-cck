@@ -110,30 +110,8 @@ class flexicontent_authors_ext extends JTable
 	  		}
 	 			$params .= "\n";
 	  	}
+			$array['author_catparams'] = $params;
   	}
-  	if (isset($array['templates']) && is_array($array['templates'])) {
-	  	foreach($array['templates'] as $index => $value) {
-	  		$params .= "$index=";
-	  		if ( is_array($value) ) {
-	  			$params .= implode('|', $value);
-	  		} else {
-	  			$params .= "$value";
-	  		}
-	 			$params .= "\n";
-	  	}
-  	}
-  	if (isset($array['attribs']) && is_array($array['attribs'])) {
-	  	foreach($array['attribs'] as $index => $value) {
-	  		$params .= "$index=";
-	  		if ( is_array($value) ) {
-	  			$params .= implode('|', $value);
-	  		} else {
-	  			$params .= "$value";
-	  		}
-	 			$params .= "\n";
-	  	}
-  	}
-  	$array['author_catparams'] = $params;
   	
   	return parent::bind( $array, $ignore );
   }

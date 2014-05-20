@@ -130,7 +130,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			
 			//$field_value = htmlspecialchars( $field_value, ENT_COMPAT, 'UTF-8' );
 			if (!$use_html) {
-				$field->html[0]	 = '<textarea name="' . $field->tab_names[0] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$field_value.'</textarea>'."\n";
+				$field->html[0]	 = '<textarea id="'.$field_idtag.'_0" name="' . $field->tab_names[0] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$field_value.'</textarea>'."\n";
 			} else {
 				$field->html[0] = $editor->display( $field->tab_names[0], $field_value, '100%', $height, $cols, $rows, $skip_buttons_arr );
 			}
@@ -147,7 +147,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				$field->tab_labels[$ta_count] = /*$field->label.'<br />'.*/ 'Intro Text';
 				
 				if (!$use_html) {
-					$field->html[$ta_count]	 = '<textarea name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$ti->beforetabs.'</textarea>'."\n";
+					$field->html[$ta_count]	 = '<textarea id="'.$field_idtag.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$ti->beforetabs.'</textarea>'."\n";
 				} else {
 					//$ti->beforetabs = htmlspecialchars( $ti->beforetabs, ENT_NOQUOTES, 'UTF-8' );
 					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $ti->beforetabs, '100%', $height, $cols, $rows, $skip_buttons_arr );
@@ -159,7 +159,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
 			if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = !$merge_tabs_code_editor ? 'TabBegin' : 'T';
 			if (!$merge_tabs_code_editor) {
-				$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $ti->tabs_start .'</textarea>'."\n";
+				$field->html[$ta_count] = '<textarea id="'.$field_idtag.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $ti->tabs_start .'</textarea>'."\n";
 				$ta_count++;
 			} else {
 				$field->html[$ta_count] = $ti->tabs_start;
@@ -169,14 +169,14 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				// START OF TAB
 				$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
 				if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = 'T';//'Start of tab: '. $ti->tab_titles[$i]; 
-				$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$ti->tab_startings[$i] .'</textarea>'."\n";
+				$field->html[$ta_count] = '<textarea id="'.$field_idtag.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$ti->tab_startings[$i] .'</textarea>'."\n";
 				$ta_count++;
 
 				$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
 				$field->tab_labels[$ta_count] = /*$field->label.'<br />'.*/ $ti->tab_titles[$i]; 
 				
 				if (!$use_html) {
-					$field->html[$ta_count]	 = '<textarea name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$tab_content.'</textarea>'."\n";
+					$field->html[$ta_count]	 = '<textarea id="'.$field_idtag.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$tab_content.'</textarea>'."\n";
 				} else {
 					//$tab_content = htmlspecialchars( $tab_content, ENT_NOQUOTES, 'UTF-8' );
 					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $tab_content, '100%', $height, $cols, $rows, $skip_buttons_arr );
@@ -187,7 +187,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
 				if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] = 'T';//'End of tab: '. $ti->tab_titles[$i]; 
 				if (!$merge_tabs_code_editor) {
-					$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $ti->tab_endings[$i] .'</textarea>'."\n";
+					$field->html[$ta_count] = '<textarea id="'.$field_idtag.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $ti->tab_endings[$i] .'</textarea>'."\n";
 					$ta_count++;
 				} else {
 					$field->html[$ta_count] = $ti->tab_endings[$i];
@@ -197,7 +197,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			// 2. END OF TABS
 			$field->tab_names[$ta_count] = $field_name.'['.($ta_count).']';
 			if ($allow_tabs_code_editing) $field->tab_labels[$ta_count] =  !$merge_tabs_code_editor ? 'TabEnd' : 'T';
-			$field->html[$ta_count] = '<textarea name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$ti->tabs_end .'</textarea>'."\n";
+			$field->html[$ta_count] = '<textarea id="'.$field_idtag.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] .'" style="display:block!important;" cols="70" rows="3">'. $field->html[$ta_count]."\n".$ti->tabs_end .'</textarea>'."\n";
 			$ta_count++;
 			
 			if ( $force_aftertabs == 1  ||  ($ti->aftertabs && trim(strip_tags($ti->aftertabs))) ) {
@@ -205,7 +205,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				$field->tab_labels[$ta_count] = /*$field->label.'<br />'.*/ 'Foot Text' ;
 				
 				if (!$use_html) {
-					$field->html[$ta_count]	 = '<textarea name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$ti->aftertabs.'</textarea>'."\n";
+					$field->html[$ta_count]	 = '<textarea id="'.$field_idtag.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$ti->aftertabs.'</textarea>'."\n";
 				} else {
 					//$ti->aftertabs = htmlspecialchars( $ti->aftertabs, ENT_NOQUOTES, 'UTF-8' );
 					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $ti->aftertabs, '100%', $height, $cols, $rows, $skip_buttons_arr );

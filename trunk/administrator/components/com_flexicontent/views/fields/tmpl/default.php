@@ -26,8 +26,9 @@ $fields_task = FLEXI_J16GE ? 'task=fields.' : 'controller=fields&amp;task=';
 
 $flexi_yes = JText::_( 'FLEXI_YES' );
 $flexi_no  = JText::_( 'FLEXI_NO' );
-$flexi_nosupport = JText::_( 'FLEXI_PROPERTY_NOT_SUPPORTED' );
-$flexi_rebuild   = JText::_( 'FLEXI_REBUILD_SEARCH_INDEX' );
+$flexi_nosupport = JText::_( 'FLEXI_PROPERTY_NOT_SUPPORTED', true );
+$flexi_rebuild   = JText::_( 'FLEXI_REBUILD_SEARCH_INDEX', true );
+$flexi_toggle    = JText::_( 'FLEXI_CLICK_TO_TOGGLE', true );
 
 
 $ordering_draggable = $cparams->get('draggable_reordering', 1);
@@ -95,8 +96,8 @@ $ord_grp = 1;
 			<th rowspan="2" class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_NAME', 't.name', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th rowspan="2" class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_TYPE', 't.field_type', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th rowspan="2" width=""><?php echo JHTML::_('grid.sort', 'FLEXI_FIELD_DESCRIPTION', 't.description', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
-			<th colspan="2" class="center" nowrap="nowrap"><?php echo JText::_( 'FLEXI_CONTENT_LISTS_S' ); ?></th>
-			<th colspan="2" class="center" nowrap="nowrap"><?php echo JText::_( 'FLEXI_ADVANCED_SEARCH_VIEW_S' ); ?></th>
+			<th colspan="2" class="center" nowrap="nowrap"><?php echo JText::_( 'FLEXI_BASIC_INDEX_S' ); ?></th>
+			<th colspan="2" class="center" nowrap="nowrap"><?php echo JText::_( 'FLEXI_ADV_INDEX_S' ); ?></th>
 			<th rowspan="2" width="20"><?php echo JHTML::_('grid.sort', 'FLEXI_ASSIGNED_TYPES', 'nrassigned', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th rowspan="2" width=""><?php echo JHTML::_('grid.sort', 'FLEXI_ACCESS', 't.access', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th rowspan="2" width="1%" nowrap="nowrap"><?php echo JHTML::_('grid.sort', 'FLEXI_PUBLISHED', 't.published', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
@@ -150,19 +151,19 @@ $ord_grp = 1;
 			$padspacer = '';
 			$row_css = '';
 			
-			if ($row->field_type=='groupmarker') {
-				$grpm_params = FLEXI_J16GE ? new JRegistry($row->attribs) : new JParameter($row->attribs);
+			if ($row->field_type=='groupmarker' || $row->field_type=='coreprops') {
+				$fld_params = FLEXI_J16GE ? new JRegistry($row->attribs) : new JParameter($row->attribs);
 			}
 			if ( $this->filter_type ) // Create coloring and padding for groupmarker fields if filtering by specific type is enabled
 			{
 				if ($row->field_type=='groupmarker') {
-					if ( in_array ($grpm_params->get('marker_type'), array( 'tabset_start', 'tabset_end' ) ) ) {
+					if ( in_array ($fld_params->get('marker_type'), array( 'tabset_start', 'tabset_end' ) ) ) {
 						$row_css = 'color:black;';
-					} else if ( in_array ($grpm_params->get('marker_type'), array( 'tab_open', 'fieldset_open' ) ) ) {
+					} else if ( in_array ($fld_params->get('marker_type'), array( 'tab_open', 'fieldset_open' ) ) ) {
 						$row_css = 'color:darkgreen;';
 						for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
 						$padcount++;
-					} else if ( in_array ($grpm_params->get('marker_type'), array( 'tab_close', 'fieldset_close' ) ) ) {
+					} else if ( in_array ($fld_params->get('marker_type'), array( 'tab_close', 'fieldset_close' ) ) ) {
 						$row_css = 'color:darkred;';
 						$padcount--;
 						for ($icnt=0; $icnt < $padcount; $icnt++) $padspacer .= "&nbsp;|_&nbsp;";
@@ -213,24 +214,24 @@ $ord_grp = 1;
 			if ($row->issearch==0 || $row->issearch==1 || !$supportsearch) {
 				$search_dirty = 0;
 				$issearch = ($row->issearch && $supportsearch) ? "tick.png" : "publish_x".(!$supportsearch ? '_f2' : '').".png";
-				$issearch_tip = ($row->issearch && $supportsearch) ? $flexi_yes : ($supportsearch ? $flexi_no : $flexi_nosupport);
+				$issearch_tip = ($row->issearch && $supportsearch) ? $flexi_yes.", ".$flexi_toggle : ($supportsearch ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
 			} else {
 				$search_dirty = 1;
 				$issearch = $row->issearch==-1 ? "disconnect.png" : "connect.png";
-				$issearch_tip = ($row->issearch==2 ? $flexi_yes : $flexi_no) .", ". $flexi_rebuild;
+				$issearch_tip = ($row->issearch==2 ? $flexi_yes : $flexi_no) .", ".$flexi_toggle.", ". $flexi_rebuild;
 			}
 			
 			$isfilter = ($row->isfilter && $supportfilter) ? "tick.png" : "publish_x".(!$supportfilter ? '_f2' : '').".png";	
-			$isfilter_tip = ($row->isfilter && $supportfilter) ? $flexi_yes : ($supportsearch ? $flexi_no : $flexi_nosupport);
+			$isfilter_tip = ($row->isfilter && $supportfilter) ? $flexi_yes.", ".$flexi_toggle : ($supportsearch ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
 			
 			if ($row->isadvsearch==0 || $row->isadvsearch==1 || !$supportadvsearch) {
 				$advsearch_dirty = 0;
 				$isadvsearch = ($row->isadvsearch && $supportadvsearch) ? "tick.png" : "publish_x".(!$supportadvsearch ? '_f2' : '').".png";
-				$isadvsearch_tip = ($row->isadvsearch && $supportadvsearch) ? $flexi_yes : ($supportadvsearch ? $flexi_no : $flexi_nosupport);
+				$isadvsearch_tip = ($row->isadvsearch && $supportadvsearch) ? $flexi_yes.", ".$flexi_toggle : ($supportadvsearch ? $flexi_no.", ".$flexi_toggle : $flexi_nosupport);
 			} else {
 				$advsearch_dirty = 1;
 				$isadvsearch = $row->isadvsearch==-1 ? "disconnect.png" : "connect.png";
-				$isadvsearch_tip = ($row->isadvsearch==2 ? $flexi_yes : $flexi_no) .", ". $flexi_rebuild;
+				$isadvsearch_tip = ($row->isadvsearch==2 ? $flexi_yes : $flexi_no) .", ".$flexi_toggle.", ". $flexi_rebuild;
 			}
 			
 			if ($row->isadvfilter==0 || $row->isadvfilter==1 || !$supportadvfilter) {
@@ -309,7 +310,9 @@ $ord_grp = 1;
 				<?php
 				echo "<strong>".$row->type."</strong><br/><small>-&nbsp;";
 				if ($row->field_type=='groupmarker') {
-					echo $grpm_params->get('marker_type');
+					echo $fld_params->get('marker_type');
+				} else if ($row->field_type=='coreprops') {
+					echo $fld_params->get('props_type');
 				} else {
 					echo $row->iscore?"[Core]" : "{$row->field_friendlyname}";
 				}
@@ -335,7 +338,7 @@ $ord_grp = 1;
 			<td align="center">
 				<?php if($supportfilter) :?>
 				<a title="Toggle property" onclick="document.adminForm.propname.value='isfilter'; return listItemTask('cb<?php echo $i;?>','toggleprop')" href="javascript:void(0);">
-					<img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" border="0" title="<?php echo ( $row->isfilter ) ? JText::_( 'FLEXI_YES' ) : JText::_( 'FLEXI_NO' );?>" />
+					<img src="components/com_flexicontent/assets/images/<?php echo $isfilter;?>" width="16" height="16" border="0" title="<?php echo $isfilter_tip;?>" alt="<?php echo $isfilter_tip;?>" />
 				</a>
 				<?php endif; ?>
 			</td>

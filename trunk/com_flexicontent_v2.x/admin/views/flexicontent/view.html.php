@@ -215,21 +215,32 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 			if($perms->CanConfig)  {
 				$toolbar = JToolBar::getInstance('toolbar');
 				
+				$btn_task = '';
+				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=import&tmpl=component';
 				if (!FLEXI_J16GE) {
-					$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), JURI::base().'index.php?option=com_flexicontent&amp;layout=import&amp;tmpl=component', 400, 300);
+					$js .= "
+						jQuery('#toolbar-download a.toolbar, #toolbar-download button')
+							.attr('onclick', 'javascript:;')
+							.attr('href', '".$popup_load_url."')
+							.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 500}, onClose: function() {}}');
+					";
+					JToolBarHelper::custom( $btn_task, 'download.png', 'download_f2.png', 'FLEXI_IMPORT_JOOMLA', false );
+					JHtml::_('behavior.modal', '#toolbar-download a.toolbar, #toolbar-download button');
+				} else {
+					//$toolbar->appendButton('Popup', 'download', JText::_('FLEXI_IMPORT_JOOMLA'), str_replace('&', '&amp;', $popup_load_url), 400, 300);
 				}
 				
 				/*$btn_task = '';
 				$popup_load_url = JURI::base().'index.php?option=com_flexicontent&layout=language&tmpl=component';
 				if (FLEXI_J16GE) {
 					$js .= "
-						$$('li#toolbar-language a.toolbar, #toolbar-language button')
-							.set('onclick', 'javascript:;')
-							.set('href', '".$popup_load_url."')
-							.set('rel', '{handler: \'iframe\', size: {x: 800, y: 500}, onClose: function() {}}');
+						jQuery('#toolbar-language a.toolbar, #toolbar-language button')
+							.attr('onclick', 'javascript:;')
+							.attr('href', '".$popup_load_url."')
+							.attr('rel', '{handler: \'iframe\', size: {x: 800, y: 500}, onClose: function() {}}');
 					";
 					JToolBarHelper::custom( $btn_task, 'language.png', 'language_f2.png', 'FLEXI_SEND_LANGUAGE', false );
-					JHtml::_('behavior.modal', 'li#toolbar-language a.toolbar, #toolbar-language button');
+					JHtml::_('behavior.modal', '#toolbar-language a.toolbar, #toolbar-language button');
 				} else {
 					$toolbar->appendButton('Popup', 'language', JText::_('FLEXI_SEND_LANGUAGE'), str_replace('&', '&amp;', $popup_load_url), 800, 500);
 				}*/
