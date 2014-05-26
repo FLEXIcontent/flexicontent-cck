@@ -934,6 +934,7 @@ class ParentClassItem extends JModelAdmin
 			$this->_item->images = array();
 			$this->_item->urls = array();
 		}
+		//echo "<pre>"; print_r($this->_item->itemparams); exit;
 		
 		// Set item property 'cid' (form field categories is named cid)
 		$this->_item->cid = $this->_item->categories;
@@ -3526,35 +3527,59 @@ class ParentClassItem extends JModelAdmin
 		if (is_array($params))
 		{
 			$item->attribs = FLEXI_J16GE ? new JRegistry($item->attribs) : new JParameter($item->attribs);
-			foreach ($params as $k => $v) {
-				//$v = is_array($v) ? implode('|', $v) : $v;
-				$item->attribs->set($k, $v);
-			}
 			
-			// Clear any old parameters of all item template layouts, except the currently used one
-			$themes = flexicontent_tmpl::getTemplates();
-			foreach ($themes->items as $tmpl_name => $tmpl)
-			{
-				if ( $tmpl_name == @$params['ilayout'] ) continue;
-				
-				$tmpl_params = $tmpl->params;
-				if (FLEXI_J16GE) {
-					$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
-					$jform->load($tmpl_params);
-					foreach ($jform->getGroup('attribs') as $p) {
-						if (!empty($p->fieldname))
-							$item->attribs->set($p->fieldname, null);
-					}
-				} else {
-					if ( !empty($tmpl_params->_xml['_default']) )  // check if parameters group is empty
-					{
-						foreach ( $tmpl_params->_xml['_default']->children() as $p ) {
-							if (!empty($p->_attributes['name']))
-								$item->attribs->set($p->_attributes['name'], null);
+			
+			$new_ilayout = isset($params['ilayout']) ? $params['ilayout'] : null;  // a non-set will return null, but let's make this cleaner
+			$old_ilayout = $item->attribs->get('ilayout');
+			
+			//echo "new_ilayout: $new_ilayout,  old_ilayout: $old_ilayout <br/>";
+			//echo "<pre>"; print_r($params); exit;
+			
+			if (
+				// non-null but empty string value means: use type's defaults (ilayout and its parameters), aka clear old parameters to allow proper heritage from content type
+				($new_ilayout!==null && $new_ilayout=='')  ||
+				// new ilayout was given and is different than old ilayout, clear ilayout parameters, in case old parameters are have same name with of new ilayout parameters
+				($new_ilayout!='' && $new_ilayout!=$old_ilayout)
+			) {
+				$themes = flexicontent_tmpl::getTemplates();
+				foreach ($themes->items as $tmpl_name => $tmpl)
+				{
+					//if ( $tmpl_name == @$params['ilayout'] ) continue;
+					
+					$tmpl_params = $tmpl->params;
+					if (FLEXI_J16GE) {
+						$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+						$jform->load($tmpl_params);
+						foreach ($jform->getGroup('attribs') as $p) {
+							if (!empty($p->fieldname))
+								$item->attribs->set($p->fieldname, null);
+						}
+					} else {
+						if ( !empty($tmpl_params->_xml['_default']) )  // check if parameters group is empty
+						{
+							foreach ( $tmpl_params->_xml['_default']->children() as $p ) {
+								if (!empty($p->_attributes['name']))
+									$item->attribs->set($p->_attributes['name'], null);
+							}
 						}
 					}
 				}
 			}
+			
+			if ( isset($params['layouts']) ) {
+				if (isset($params['layouts'][$new_ilayout])) {
+					foreach ($params['layouts'][$new_ilayout] as $k => $v) {
+						//echo "$k: $v <br/>";
+						$item->attribs->set($k, $v);
+					}
+				}
+				unset($params['layouts']);
+			}
+			foreach ($params as $k => $v) {
+				//$v = is_array($v) ? implode('|', $v) : $v;
+				$item->attribs->set($k, $v);
+			}
+			//echo "<pre>"; print_r($params); print_r($item->attribs); exit;
 			$item->attribs = $item->attribs->toString();
 		}
 		

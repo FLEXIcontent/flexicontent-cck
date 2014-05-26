@@ -503,7 +503,7 @@ $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">
 		<?php
 		echo $this->params_authorcat->render('authorcatparams', 'templates')."<br/>";
 			
-		echo $this->pane->startPane( 'theme-pane' );
+		echo $this->pane->startPane( 'themes-pane' );
 		foreach ($this->tmpls as $tmpl) {
 			$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 			echo $this->pane->startPanel( $title, "params-".$tmpl->name );

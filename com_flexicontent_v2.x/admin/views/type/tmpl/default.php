@@ -22,7 +22,7 @@ defined('_JEXEC') or die('Restricted access');
 
 	<table cellspacing="0" cellpadding="0" border="0" width="100%">
 		<tr>
-			<td valign="top">
+			<td valign="top" style="width:50%;">
 				<table  class="admintable">
 					<tr>
 						<td class="key">
@@ -98,7 +98,7 @@ defined('_JEXEC') or die('Restricted access');
 		<?php endif; ?>
 			
 			</td>
-			<td valign="top" width="600" style="padding: 7px 0 0 5px" align="left" valign="top">
+			<td valign="top" style="width:50%; padding: 7px 0 0 5px" align="left">
 				<?php
 				echo JText::_('FLEXI_ITEM_PARAM_OVERRIDE_ORDER_DETAILS');
 				echo JHtml::_('sliders.start','basic-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));

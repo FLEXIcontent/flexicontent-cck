@@ -105,12 +105,30 @@ class FlexicontentControllerItems extends FlexicontentController
 			$post['attribs'] = @$data['attribs'];  // Workaround for item's template parameters being clear by validation since they are not present in item.xml
 			$post['custom']  = & $custom;          // Assign array of custom field values, they are in the 'custom' form array instead of jform
 			$post['jfdata']  = & $jfdata;          // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform
+			
+			// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
+			$ilayout = $data['attribs']['ilayout'];
+			if( !empty($data['layouts'][$ilayout]) ) {
+				//echo "<pre>"; print_r($post['attribs']);
+				//$post['attribs'] = array_merge($post['attribs'], $data['layouts'][$ilayout]);
+				$post['attribs']['layouts'] = $data['layouts'];
+				//echo "<pre>"; print_r($post['attribs']); exit;
+			}
 		} else {
 			// Retrieve form data these are subject to basic filtering
 			$post = JRequest::get( 'post' );  // Core & Custom Fields and item Parameters
 			
 			// Some values need to be assigned after validation
 			$post['text'] = JRequest::getVar( 'text', '', 'post', 'string', JREQUEST_ALLOWRAW ); // Workaround for allowing raw text field
+			
+			// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
+			$ilayout = $post['params']['ilayout'];
+			if( !empty($post['layouts'][$ilayout]) ) {
+				//echo "<pre>"; print_r($post['attribs']);
+				//$post['attribs'] = array_merge($post['attribs'], $data['layouts'][$ilayout]);
+				$post['params']['layouts'] = $post['layouts'];
+				//echo "<pre>"; print_r($post['params']); exit;
+			}
 		}
 		
 		// USEFULL FOR DEBUGING for J2.5 (do not remove commented code)

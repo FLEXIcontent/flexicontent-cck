@@ -316,5 +316,29 @@ class FLEXIcontentModelSearch extends JModelLegacy
 	{
 		return $this->_params;
 	}
-
+	
+	
+	/**
+	 * Method to get parameters of all types
+	 *
+	 * @access public
+	 * @return object
+	 */
+	function getTypeData($contenttypes_list)
+	{
+		static $types = null;
+		if ($types !== null) return $types;
+		
+		// Retrieve item's Content Type parameters
+		$db = JFactory::getDBO();
+		$query = 'SELECT * '
+				. ' FROM #__flexicontent_types AS t'
+				. ($contenttypes_list ? ' WHERE id IN('.$contenttypes_list.')' : '')
+				;
+		$db->setQuery($query);
+		$types = $db->loadObjectList('id');
+		foreach ($types as $type) $type->params = FLEXI_J16GE ? new JRegistry($type->attribs) : new JParameter($type->attribs);
+		
+		return $types;
+	}
 }

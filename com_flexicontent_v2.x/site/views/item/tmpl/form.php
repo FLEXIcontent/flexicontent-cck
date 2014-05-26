@@ -64,6 +64,17 @@ if ($return) {
 	$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
 }
 
+
+// Placement configuration
+$via_core_field   = $this->placementConf['via_core_field'];
+$via_core_prop    = $this->placementConf['via_core_prop'];
+$placeable_fields = $this->placementConf['placeable_fields'];
+$tab_fields       = $this->placementConf['tab_fields'];
+$tab_titles       = $this->placementConf['tab_titles'];
+$all_tab_fields   = $this->placementConf['all_tab_fields'];
+$coreprop_missing = $this->placementConf['coreprop_missing'];
+
+
 // add extra css/js for the edit form
 if ($this->params->get('form_extra_css'))    $this->document->addStyleDeclaration($this->params->get('form_extra_css'));
 if ($this->params->get('form_extra_css_fe')) $this->document->addStyleDeclaration($this->params->get('form_extra_css_fe'));
@@ -743,7 +754,7 @@ if ( $this->perms['canright'] ) : ob_start(); // perms ?>
 
 
 
-if ($typeid && $this->params->get('usepublicationdetails_fe', 1) && (!FLEXI_J16GE || $this->perms[$publication_priv]) ) : // timezone_info, publishing_details ?>
+if ($typeid && $this->params->get('usepublicationdetails_fe', 1) && (!FLEXI_J16GE || $this->perms[$publication_priv]) ) : // timezone_info, publication_details ?>
 
 	<?php ob_start(); ?>
 		<?php
@@ -768,35 +779,35 @@ if ($typeid && $this->params->get('usepublicationdetails_fe', 1) && (!FLEXI_J16G
 			<?php echo $this->form->getLabel('created_by'); ?>
 			<div class="container_fcfield"><?php echo $this->form->getInput('created_by'); ?></div>
 		</fieldset>
-	<?php $publishing_details[] = $captured['createdby'] = ob_get_clean(); endif; ?>
+	<?php $captured['createdby'] = ob_get_clean(); endif; ?>
 	
 	<?php if ($this->perms['editcreationdate'] && $this->params->get('usepublicationdetails_fe', 1) == 2 ) : ob_start(); ?>
 		<fieldset class="flexi_params panelform">
 			<?php echo $this->form->getLabel('created'); ?>
 			<div class="container_fcfield"><?php echo $this->form->getInput('created'); ?></div>
 		</fieldset>
-	<?php $publishing_details[] = $captured['created'] = ob_get_clean(); endif; ?>
+	<?php $captured['created'] = ob_get_clean(); endif; ?>
 	
 	<?php ob_start(); ?>
 		<fieldset class="flexi_params panelform">
 			<?php echo $this->form->getLabel('created_by_alias'); ?>
 			<div class="container_fcfield"><?php echo $this->form->getInput('created_by_alias'); ?></div>
 		</fieldset>
-	<?php $publishing_details[] = $captured['created_by_alias'] = ob_get_clean(); ?>
+	<?php $captured['created_by_alias'] = ob_get_clean(); ?>
 	
 	<?php ob_start(); ?>
 		<fieldset class="flexi_params panelform">
 			<?php echo $this->form->getLabel('publish_up'); ?>
 			<div class="container_fcfield"><?php echo $this->form->getInput('publish_up'); ?></div>
 		</fieldset>
-	<?php $publishing_details[] = $captured['publish_up'] = ob_get_clean(); ?>
+	<?php $captured['publish_up'] = ob_get_clean(); ?>
 	
 	<?php ob_start(); ?>
 		<fieldset class="flexi_params panelform">
 			<?php echo $this->form->getLabel('publish_down'); ?>
 			<div class="container_fcfield"><?php echo $this->form->getInput('publish_down'); ?></div>
 		</fieldset>
-	<?php $publishing_details[] = $captured['publish_down'] = ob_get_clean(); ?>
+	<?php $captured['publish_down'] = ob_get_clean(); ?>
 	
 	<?php ob_start(); ?>
 		<fieldset class="flexi_params panelform">
@@ -807,9 +818,7 @@ if ($typeid && $this->params->get('usepublicationdetails_fe', 1) && (!FLEXI_J16G
 				<div class="container_fcfield"><span class="label"><?php echo $this->item->access_level; ?></span></div>
 			<?php endif; ?>
 		</fieldset>
-	<?php $publishing_details[] = $captured['access'] = ob_get_clean(); ?>
-	
-	<?php $captured['publishing_details'] = implode('<div class="fcclear"></div>'."\n", $publishing_details);?>
+	<?php $captured['access'] = ob_get_clean(); ?>
 <?php endif;
 
 
@@ -993,33 +1002,214 @@ if ( $typeid && $this->perms['cantemplates'] && $this->params->get('selecttheme_
 	
 	
 	if ( $this->params->get('selecttheme_fe') >= 2 ) : ob_start();
-		echo JHtml::_('sliders.start','template-sliders-'.$this->item->id, array('useCookie'=>1));
+		echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+		echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) . '</h3>';
+		$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
+			
 		foreach ($this->tmpls as $tmpl) :
-			$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-			echo JHtml::_('sliders.panel', $title,  $tmpl->name."-attribs-options");
-			?><fieldset class="panelform params_set"><?php
-				foreach ($tmpl->params->getGroup('attribs') as $field) {
-					echo $field->label;
-					echo '<div class="container_fcfield">'.$field->input .'</div>';
-				}
-			?></fieldset><?php
-		endforeach;
-		echo JHtml::_('sliders.end');
+			$fieldSets = $tmpl->params->getFieldsets($groupname);
+			foreach ($fieldSets as $fsname => $fieldSet) :
+				$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
+				echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$fsname.'-options');
+				if (isset($fieldSet->description) && trim($fieldSet->description)) :
+					echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+				endif;
+				?>
+				<fieldset class="panelform">
+					<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
+						$fieldname =  $field->__get('fieldname');
+						$value = $tmpl->params->getValue($fieldname, $groupname, $this->item->itemparams->get($fieldname));
+						echo $tmpl->params->getLabel($fieldname, $groupname);
+						echo
+							str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+								str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+									$tmpl->params->getInput($fieldname, $groupname, $value)
+								)
+							);
+					endforeach; ?>
+				</fieldset>
+			<?php endforeach; ?>
+		<?php endforeach; ?>
+				
+		<?php echo JHtml::_('sliders.end');
 	$captured['layout_params'] = ob_get_clean(); endif; ?>
 	
 <?php endif; // end of template: layout_selection, layout_params
 
 
-// Placement configuration
-$via_core_field   = $this->placementConf['via_core_field'];
-$via_core_prop    = $this->placementConf['via_core_prop'];
-$placeable_fields = $this->placementConf['placeable_fields'];
-$tab_fields       = $this->placementConf['tab_fields'];
-$tab_titles       = $this->placementConf['tab_titles'];
-$coreprop_missing = $this->placementConf['coreprop_missing'];
 
 
-// 5. Find fields not congfigured to be displayed
+ob_start();
+if ($this->fields && $typeid) :
+	
+	$this->document->addScriptDeclaration("
+		jQuery(document).ready(function() {
+			jQuery('#jform_type_id').change(function() {
+				if (jQuery('#jform_type_id').val() != '".$typeid."')
+					jQuery('#fc-change-warning').css('display', 'block');
+				else
+					jQuery('#fc-change-warning').css('display', 'none');
+			});
+		});
+	");
+	?>
+	
+	<div class="fc_edit_container_full">
+		
+		<?php
+		$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
+		$noplugin = sprintf( $alert_box, '', 'warning', 'fc-nobgimage', JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) );
+		$row_k = 0;
+		foreach ($this->fields as $field_name => $field)
+		{
+			// SKIP frontend hidden fields from this listing
+			if ( $field->iscore &&  isset($tab_fields['fman'][ $field->field_type ]) ) {
+				echo $captured[ $field->field_type ];
+				echo "\n<div class='fcclear'></div>\n";
+				continue;
+			} else if (
+				($field->iscore && $field->field_type!='maintext')  ||
+				$field->parameters->get('frontend_hidden')  ||
+				(in_array($field->field_type, $hidden) && empty($field->html)) ||
+				in_array($field->formhidden, array(1,3))
+			) continue;
+			
+			if ( $field->field_type=='maintext' && isset($all_tab_fields['maintext']) ) {
+				ob_start();
+			}
+			
+			// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
+			if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
+			
+			$not_in_tabs = "";
+			if ($field->field_type=='groupmarker') {
+				echo $field->html;
+				continue;
+			} else if ($field->field_type=='coreprops') {
+				$props_type = $field->parameters->get('props_type');
+				if ( isset($tab_fields['fman'][$props_type]) ) {
+					echo $captured[ $props_type ];
+					echo "\n<div class='fcclear'></div>\n";
+				}
+				continue;
+			}
+			
+			// Decide label classes, tooltip, etc
+			$lbl_class = 'flexi_label';
+			$lbl_title = '';
+			// field has tooltip
+			$edithelp = $field->edithelp ? $field->edithelp : 1;
+			if ( $field->description && ($edithelp==1 || $edithelp==2) ) {
+				 $lbl_class .= ' hasTip'.($edithelp==2 ? ' fc_tooltip_icon_fe' : '');
+				 $lbl_title = '::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8');
+			}
+			// field is required
+			$required = $field->parameters->get('required', 0 );
+			if ($required)  $lbl_class .= ' required';
+			
+			// Some fields may force a container width ?
+			$row_k = 1 - $row_k;
+			$width = $field->parameters->get('container_width', '' );
+			$width = !$width ? '' : 'width:' .$width. ($width != (int)$width ? 'px' : '');
+			$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
+			?>
+			
+			<div class='fcclear'></div>
+			<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
+				<?php echo $field->label; ?>
+			</label>
+			
+			<div style="<?php echo $width; ?>;" class="<?php echo $container_class; ?>" id="container_fcfield_<?php echo $field->id; ?>">
+				<?php echo ($field->description && $edithelp==3)  ?  sprintf( $alert_box, '', 'info', 'fc-nobgimage', $field->description )  :  ''; ?>
+				
+			<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing of joomfish (J1.5) or falang (J2.5+)
+				if ($field->field_type=='maintext' && isset($this->item->item_translations) ) : ?>
+				
+				<!-- tabber start -->
+				<div class="fctabber" style=''>
+					<div class="tabbertab" style="padding: 0px;" >
+						<h3 class="tabberheading"> <?php echo '- '.$this->itemlang->name.' -'; // $t->name; ?> </h3>
+						<?php
+							$field_tab_labels = & $field->tab_labels;
+							$field_html       = & $field->html;
+							echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
+						?>
+					</div>
+					<?php foreach ($this->item->item_translations as $t): ?>
+						<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
+							<div class="tabbertab" style="padding: 0px;" >
+								<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
+								<?php
+								$field_tab_labels = & $t->fields->text->tab_labels;
+								$field_html       = & $t->fields->text->html;
+								echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
+								?>
+							</div>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</div>
+				<!-- tabber end -->
+				
+			<?php elseif ( !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
+				
+				<?php echo isset($field->html) ? $field->html : $noplugin; ?>
+				
+			<?php else : /* MULTI-TABBED FIELD e.g textarea, description */ ?>
+				
+				<!-- tabber start -->
+				<div class="fctabber">
+				<?php foreach ($field->html as $i => $fldhtml): ?>
+					<?php
+						// Hide field when it has no label, and skip creating tab
+						$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
+						if (!isset($field->tab_labels[$i]))	continue;
+					?>
+							
+					<div class="tabbertab">
+						<h3 class="tabberheading"> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
+						<?php
+							echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
+							$not_in_tabs = "";      // Clear the hidden fields variable
+							echo $field->html[$i];  // Current TAB CONTENTS
+						?>
+					</div>
+							
+				<?php endforeach; ?>
+				</div>
+				<!-- tabber end -->
+				<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
+						
+			<?php endif; /* END MULTI-TABBED FIELD */ ?>
+			
+			</div>
+			
+		<?php
+			if ( $field->field_type=='maintext' && isset($all_tab_fields['maintext']) ) {
+				$captured['maintext'] = ob_get_clean();
+			}
+		}
+		?>
+		
+	</div>
+
+<?php else : /* NO TYPE SELECTED */ ?>
+
+	<?php if ( $isnew ) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
+		<input name="jform[type_id_not_set]" value="1" type="hidden" />
+		<?php echo sprintf( $alert_box, '', 'note', '', JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ) ); ?>
+	<?php else : // existing item that has no custom fields, warn the user ?>
+		<?php echo sprintf( $alert_box, '', 'warning', '', JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) ); ?>
+	<?php	endif; ?>
+	
+<?php	endif;
+$captured['fields_manager'] = ob_get_clean();
+
+
+
+
+// *******************************************
+// Find fields not congfigured to be displayed
+// *******************************************
 $duplicate_display = array();
 $_tmp = $tab_fields;
 foreach($_tmp as $tabname => $fieldnames) {
@@ -1065,7 +1255,7 @@ if ( count($tab_fields['above']) ) : ?>
 	
 	<?php foreach($tab_fields['above'] as $fn => $i) : ?>
 		<div class="fcclear"></div>
-		<?php echo $captured[$fn] ?>
+		<?php echo $captured[$fn]; unset($captured[$fn]); ?>
 	<?php endforeach; ?>
 	
 </div>
@@ -1098,7 +1288,7 @@ if ( count($tab_fields['tab01']) ) :
 		
 		<?php foreach($tab_fields['tab01'] as $fn => $i) : ?>
 			<div class="fcclear"></div>
-			<?php echo $captured[$fn] ?>
+			<?php echo $captured[$fn]; unset($captured[$fn]); ?>
 		<?php endforeach; ?>
 		
 	</div>
@@ -1116,7 +1306,7 @@ if ( count($tab_fields['tab02']) ) :
 		
 		<?php foreach($tab_fields['tab02'] as $fn => $i) : ?>
 			<div class="fcclear"></div>
-			<?php echo $captured[$fn] ?>
+			<?php echo $captured[$fn]; unset($captured[$fn]); ?>
 		<?php endforeach; ?>
 		
 	</div>
@@ -1127,178 +1317,19 @@ if ( count($tab_fields['tab02']) ) :
 // *****************
 // CUSTOM FIELDS TAB
 // *****************
-if ($this->fields && $typeid) :
-	$types = flexicontent_html::getTypesList();
-	$typename = @$types[$typeid]['name'];
-	$tab_lbl = isset($tab_titles['tab03']) ? $tab_titles['tab03'] : JText::_( 'FLEXI_CONTENT_TYPE' );
-	$tab_lbl .= ($typename ? ': '. JText::_($typename) : '');
+if ( count($tab_fields['tab03']) ) :
+	$tab_lbl = isset($tab_titles['tab03']) ? $tab_titles['tab03'] : JText::_( 'FLEXI_FIELDS' );
 	?>
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
 		
-		<?php
-			$this->document->addScriptDeclaration("
-				jQuery(document).ready(function() {
-					jQuery('#jform_type_id').change(function() {
-						if (jQuery('#jform_type_id').val() != '".$typeid."')
-							jQuery('#fc-change-warning').css('display', 'block');
-						else
-							jQuery('#fc-change-warning').css('display', 'none');
-					});
-				});
-			");
-		?>
+		<?php foreach($tab_fields['tab03'] as $fn => $i) : ?>
+			<div class="fcclear"></div>
+			<?php echo $captured[$fn]; unset($captured[$fn]); ?>
+		<?php endforeach; ?>
 		
-		<div class="fc_edit_container_full">
-			
-			<?php
-			$hidden = array('fcloadmodule', 'fcpagenav', 'toolbar');
-			$noplugin = sprintf( $alert_box, '', 'warning', 'fc-nobgimage', JText::_( 'FLEXI_PLEASE_PUBLISH_PLUGIN' ) );
-			$row_k = 0;
-			foreach ($this->fields as $field_name => $field)
-			{
-				// SKIP frontend hidden fields from this listing
-				if ( $field->iscore &&  isset($tab_fields['fman'][ $field->field_type ]) ) {
-					echo $captured[ $field->field_type ];
-					echo "\n<div class='fcclear'></div>\n";
-					continue;
-				} else if (
-					($field->iscore && $field->field_type!='maintext')  ||
-					$field->parameters->get('frontend_hidden')  ||
-					(in_array($field->field_type, $hidden) && empty($field->html)) ||
-					in_array($field->formhidden, array(1,3))
-				) continue;
-				
-				// check to SKIP (hide) field e.g. description field ('maintext'), alias field etc
-				if ( $this->tparams->get('hide_'.$field->field_type) ) continue;
-				
-				$not_in_tabs = "";
-				if ($field->field_type=='groupmarker') {
-					echo $field->html;
-					continue;
-				} else if ($field->field_type=='coreprops') {
-					$props_type = $field->parameters->get('props_type');
-					if ( isset($tab_fields['fman'][$props_type]) ) {
-						echo $captured[ $props_type ];
-						echo "\n<div class='fcclear'></div>\n";
-					}
-					continue;
-				}
-				
-				// Decide label classes, tooltip, etc
-				$lbl_class = 'flexi_label';
-				$lbl_title = '';
-				// field has tooltip
-				$edithelp = $field->edithelp ? $field->edithelp : 1;
-				if ( $field->description && ($edithelp==1 || $edithelp==2) ) {
-					 $lbl_class .= ' hasTip'.($edithelp==2 ? ' fc_tooltip_icon_fe' : '');
-					 $lbl_title = '::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8');
-				}
-				// field is required
-				$required = $field->parameters->get('required', 0 );
-				if ($required)  $lbl_class .= ' required';
-				
-				// Some fields may force a container width ?
-				$row_k = 1 - $row_k;
-				$width = $field->parameters->get('container_width', '' );
-				$width = !$width ? '' : 'width:' .$width. ($width != (int)$width ? 'px' : '');
-				$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
-				?>
-				
-				<div class='fcclear'></div>
-				<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
-					<?php echo $field->label; ?>
-				</label>
-				
-				<div style="<?php echo $width; ?>;" class="<?php echo $container_class; ?>" id="container_fcfield_<?php echo $field->id; ?>">
-					<?php echo ($field->description && $edithelp==3)  ?  sprintf( $alert_box, '', 'info', 'fc-nobgimage', $field->description )  :  ''; ?>
-					
-				<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing of joomfish (J1.5) or falang (J2.5+)
-					if ($field->field_type=='maintext' && isset($this->item->item_translations) ) : ?>
-					
-					<!-- tabber start -->
-					<div class="fctabber" style=''>
-						<div class="tabbertab" style="padding: 0px;" >
-							<h3 class="tabberheading"> <?php echo '- '.$this->itemlang->name.' -'; // $t->name; ?> </h3>
-							<?php
-								$field_tab_labels = & $field->tab_labels;
-								$field_html       = & $field->html;
-								echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
-							?>
-						</div>
-						<?php foreach ($this->item->item_translations as $t): ?>
-							<?php if ($this->itemlang->shortcode!=$t->shortcode && $t->shortcode!='*') : ?>
-								<div class="tabbertab" style="padding: 0px;" >
-									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
-									<?php
-									$field_tab_labels = & $t->fields->text->tab_labels;
-									$field_html       = & $t->fields->text->html;
-									echo !is_array($field_html) ? $field_html : flexicontent_html::createFieldTabber( $field_html, $field_tab_labels, "");
-									?>
-								</div>
-							<?php endif; ?>
-						<?php endforeach; ?>
-					</div>
-					<!-- tabber end -->
-					
-				<?php elseif ( !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
-					
-					<?php echo isset($field->html) ? $field->html : $noplugin; ?>
-					
-				<?php else : /* MULTI-TABBED FIELD e.g textarea, description */ ?>
-					
-					<!-- tabber start -->
-					<div class="fctabber">
-					<?php foreach ($field->html as $i => $fldhtml): ?>
-						<?php
-							// Hide field when it has no label, and skip creating tab
-							$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
-							if (!isset($field->tab_labels[$i]))	continue;
-						?>
-								
-						<div class="tabbertab">
-							<h3 class="tabberheading"> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
-							<?php
-								echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
-								$not_in_tabs = "";      // Clear the hidden fields variable
-								echo $field->html[$i];  // Current TAB CONTENTS
-							?>
-						</div>
-								
-					<?php endforeach; ?>
-					</div>
-					<!-- tabber end -->
-					<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
-							
-				<?php endif; /* END MULTI-TABBED FIELD */ ?>
-				
-				</div>
-				
-			<?php
-			}
-			?>
-			
-		</div>
-
-	</div> <!-- end tab -->
-	
-<?php else : /* NO TYPE SELECTED */ ?>
-
-	<?php $tab_lbl = JText::_( 'FLEXI_TYPE_NOT_DEFINED' ); ?>
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-		<h3 class="tabberheading"> <?php echo $tab_lbl; ?> </h3>
-
-	<?php if ( $isnew ) : // new item, since administrator did not limit this, display message (user allowed to select item type) ?>
-		<input name="jform[type_id_not_set]" value="1" type="hidden" />
-		<?php echo sprintf( $alert_box, '', 'note', '', JText::_( 'FLEXI_CHOOSE_ITEM_TYPE' ) ); ?>
-	<?php else : // existing item that has no custom fields, warn the user ?>
-		<?php echo sprintf( $alert_box, '', 'warning', '', JText::_( 'FLEXI_NO_FIELDS_TO_TYPE' ) ); ?>
-	<?php	endif; ?>
-	
-	</div> <!-- end tab -->
-	
-<?php	endif;
-
+	</div>
+<?php endif;
 
 
 
@@ -1319,7 +1350,7 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 			<fieldset class="flexi_params fc_edit_container_full">
 			<?php foreach($tab_fields['tab04'] as $fn => $i) : ?>
 				<div class="fcclear"></div>
-				<?php echo $captured[$fn]; ?>
+				<?php echo $captured[$fn]; unset($captured[$fn]); ?>
 			<?php endforeach; ?>
 			</fieldset>
 			
@@ -1339,7 +1370,7 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	
 			<?php foreach($tab_fields['tab05'] as $fn => $i) : ?>
 				<div class="fcclear"></div>
-				<?php echo $captured[$fn]; ?>
+				<?php echo $captured[$fn]; unset($captured[$fn]); ?>
 			<?php endforeach; ?>
 			
 		</div> <!-- end tab -->
@@ -1358,7 +1389,7 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 	
 			<?php foreach($tab_fields['tab06'] as $fn => $i) : ?>
 				<div class="fcclear"></div>
-				<?php echo $captured[$fn]; ?>
+				<?php echo $captured[$fn]; unset($captured[$fn]); ?>
 			<?php endforeach; ?>
 			
 		</div>
@@ -1396,7 +1427,7 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 			
 			<?php endforeach; ?>
 			
-			</div>
+		</div>
 	<?php endif;
 
 
@@ -1411,11 +1442,9 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 			
 			<fieldset class="flexi_params fc_edit_container_full">
 				
-				<?php echo '<h3 class="themes-title">' . JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) . '</h3>'; ?>
-				
 				<?php foreach($tab_fields['tab07'] as $fn => $i) : ?>
 					<div class="fcclear"></div>
-					<?php echo $captured[$fn]; ?>
+					<?php echo $captured[$fn]; unset($captured[$fn]); ?>
 				<?php endforeach; ?>
 
 			</fieldset>
@@ -1439,12 +1468,17 @@ if ($typeid) : // hide items parameters (standard, extended, template) if conten
 // ************
 // BELOW TABSET
 // ************
-if ( count($tab_fields['below']) ) : ?>
+if ( count($tab_fields['below']) || count($captured) ) : ?>
 <div class="fc_edit_container_full">
 	
 	<?php foreach($tab_fields['below'] as $fn => $i) : ?>
 		<div class="fcclear"></div>
-		<?php echo $captured[$fn] ?>
+		<?php echo $captured[$fn]; unset($captured[$fn]); ?>
+	<?php endforeach; ?>
+	
+	<?php foreach($captured as $fn => $i) : ?>
+		<div class="fcclear"></div>
+		<?php echo $captured[$fn]; unset($captured[$fn]); ?>
 	<?php endforeach; ?>
 	
 </div>

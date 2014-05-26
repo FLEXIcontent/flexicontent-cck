@@ -253,7 +253,11 @@ class FlexicontentHelperPerm
 		global $globalcats;
 		$db = JFactory::getDBO();
 		$usercats = array();
-		$user = JFactory::getUser($user_id);
+		
+		// We ignore the user_id in the case FLEXIaccess, because FLEXIaccess only calculates access for current user,
+		// this is ok since, because we pass the user_id only for the purpose of being able to cache this function call
+		// -- passing by different user_id parameter this function call can be cached properly
+		$user = FLEXI_ACCESS ? JFactory::getUser() : JFactory::getUser($user_id);
 		
 		if (FLEXI_J16GE)
 		{
@@ -387,7 +391,8 @@ class FlexicontentHelperPerm
 	
 		
 	/*
-	 * Lookups the SECTION ids on which the given USER can perform the given ACTION
+	 * Lookups the SECTION ids on which the given USER can perform the given ACTION,
+	 * !! CURRENTLY UNUSED not implemented properly, e.g. items may not have an asset, and this is not taken in to account, maybe will be useful in the future
 	 *
 	 * @access	public
 	 * @param	integer		$uid			The USER id

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1901 2014-05-07 02:37:25Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1904 2014-05-20 12:21:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -22,12 +22,15 @@ $task_items = FLEXI_J16GE ? 'task=items.' : 'controller=items&task=';
 $ctrl_items = FLEXI_J16GE ? 'items.' : '';
 $tags_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&task=';
 
-
 // For tabsets/tabs ids (focusing, etc)
 $tabSetCnt = -1;
 $tabCnt = array();
 
 $tags_displayed = $this->row->type_id && ( $this->perms['cantags'] || count(@$this->usedtags) ) ;
+
+$close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
+$alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
+$btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
 
 // add extra css/js for the edit form
 if ($this->params->get('form_extra_css'))    $this->document->addStyleDeclaration($this->params->get('form_extra_css'));
@@ -688,7 +691,8 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				if ($field->field_type=='groupmarker') {
 					echo $field->html;
 					continue;
-				} else if ($field->field_type=='coreprops') {  // not used in backend (yet?)
+				} else if ($field->field_type=='coreprops') {
+					// not used in backend (yet?)
 					continue;
 				}
 				
@@ -711,19 +715,18 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				$width = !$width ? '' : 'width:' .$width. ($width != (int)$width ? 'px' : '');
 				$container_class = "fcfield_row".$row_k." container_fcfield container_fcfield_id_".$field->id." container_fcfield_name_".$field->name;
 				?>
-						
+				
 				<div class='fcclear'></div>
-
 				<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
 					<?php echo $field->label; ?>
 				</label>
-
+				
 				<div style="<?php echo $width; ?>;" class="<?php echo $container_class;?>" id="container_fcfield_<?php echo $field->id;?>">
-								
 					<?php echo ($field->description && $edithelp==3) ? '<div class="fc_mini_note_box">'.$field->description.'</div>' : ''; ?>
-
-				<?php	if ($field->field_type=='maintext' && isset($this->row->item_translations) ) : ?>
-
+					
+				<?php // CASE 1: CORE 'description' FIELD with multi-tabbed editing of joomfish (J1.5) or falang (J2.5+)
+					if ($field->field_type=='maintext' && isset($this->row->item_translations) ) : ?>
+					
 					<!-- tabber start -->
 					<div class="fctabber" style=''>
 						<div class="tabbertab" style="padding: 0px;" >
@@ -748,52 +751,48 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 						<?php endforeach; ?>
 					</div>
 					<!-- tabber end -->
-
-				<?php else : ?>
-
-					<?php	if ( !is_array($field->html) ) : ?>
-
-						<?php echo isset($field->html) ? $field->html : $noplugin; ?>
-
-					<?php else : ?>
-
-						<!-- tabber start -->
-						<div class="fctabber">
-						<?php foreach ($field->html as $i => $fldhtml): ?>
+					
+				<?php elseif ( !is_array($field->html) ) : /* CASE 2: NORMAL FIELD non-tabbed */ ?>
+					
+					<?php echo isset($field->html) ? $field->html : $noplugin; ?>
+					
+				<?php else : /* MULTI-TABBED FIELD e.g textarea, description */ ?>
+					
+					<!-- tabber start -->
+					<div class="fctabber">
+					<?php foreach ($field->html as $i => $fldhtml): ?>
+						<?php
+							// Hide field when it has no label, and skip creating tab
+							$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
+							if (!isset($field->tab_labels[$i]))	continue;
+						?>
+								
+						<div class="tabbertab">
+							<h3 class="tabberheading"> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
 							<?php
-								// Hide field when it has no label, and skip creating tab
-								$not_in_tabs .= !isset($field->tab_labels[$i]) ? "<div style='display:none!important'>".$field->html[$i]."</div>" : "";
-								if (!isset($field->tab_labels[$i]))	continue;
+								echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
+								$not_in_tabs = "";      // Clear the hidden fields variable
+								echo $field->html[$i];  // Current TAB CONTENTS
 							?>
-
-							<div class="tabbertab">
-								<h3 class="tabberheading"> <?php echo $field->tab_labels[$i]; // Current TAB LABEL ?> </h3>
-								<?php
-									echo $not_in_tabs;      // Output hidden fields (no tab created), by placing them inside the next appearing tab
-									$not_in_tabs = "";      // Clear the hidden fields variable
-									echo $field->html[$i];  // Current TAB CONTENTS
-								?>
-							</div>
-
-						<?php endforeach; ?>
 						</div>
-						<!-- tabber end -->
-						<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
-
-					<?php endif; ?>
-
-				<?php endif; ?>
-
+								
+					<?php endforeach; ?>
 					</div>
-
+					<!-- tabber end -->
+					<?php echo $not_in_tabs;      // Output ENDING hidden fields, by placing them outside the tabbing area ?>
+							
+				<?php endif; /* END MULTI-TABBED FIELD */ ?>
+				
+				</div>
+				
 			<?php
 			}
 			?>
 			
 		</div>
-	
-	</div> <!-- end tab -->
 
+	</div> <!-- end tab -->
+	
 <?php else : /* NO TYPE SELECTED */ ?>
 
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
@@ -893,9 +892,9 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			<?php echo $this->form->getLabel('metadesc'); ?>
 			
 			<div class="container_fcfield">
-
+				
 				<?php	if ( isset($this->row->item_translations) ) : ?>
-	
+					
 					<!-- tabber start -->
 					<div class="fctabber" style='display:inline-block;'>
 						<div class="tabbertab" style="padding: 0px;" >
@@ -916,20 +915,19 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 						<?php endforeach; ?>
 					</div>
 					<!-- tabber end -->
-	
+				
 				<?php else : ?>
 					<?php echo $this->form->getInput('metadesc'); ?>
 				<?php endif; ?>
 				
 			</div>
-
 			
 			<div class="fcclear"></div>
 			<?php echo $this->form->getLabel('metakey'); ?>
-		
+			
 			<div class="container_fcfield">
 				<?php	if ( isset($this->row->item_translations) ) :?>
-	
+					
 					<!-- tabber start -->
 					<div class="fctabber" style='display:inline-block;'>
 						<div class="tabbertab" style="padding: 0px;" >
@@ -950,11 +948,11 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 						<?php endforeach; ?>
 					</div>
 					<!-- tabber end -->
-	
+					
 				<?php else : ?>
 					<?php echo $this->form->getInput('metakey'); ?>
 				<?php endif; ?>
-
+				
 				</div>
 
 			<?php foreach($this->form->getGroup('metadata') as $field): ?>
@@ -990,7 +988,6 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	</div> <!-- end tab -->
 	
 	
-	
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_DISPLAYING'); ?> </h3>
 		
@@ -1022,45 +1019,47 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 	</div> <!-- end tab -->
 	
 	
-	
-	<?php if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 0) ) : ?>
-	
-	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
-		<h3 class="tabberheading"> <?php echo JText::_('Compatibility'); ?> </h3>
-		
-		<?php
-		$fields_grps_compatibility = array('images', 'urls');
-		foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
-		?>
-		
-		<fieldset class="flexi_params fc_edit_container_full">
-			<?php foreach ($this->form->getGroup($fields_grp_name) as $field) : ?>
-				<div class="fcclear"></div>
-				<?php if ($field->hidden): ?>
-					<span style="visibility:hidden !important;">
-						<?php echo $field->input; ?>
-					</span>
-				<?php else: ?>
-					<?php echo $field->label; ?>
-					<div class="container_fcfield">
-						<?php echo $field->input;?>
-					</div>
-				<?php endif; ?>
+	<?php 
+	// *********************
+	// JOOMLA IMAGE/URLS TAB
+	// *********************
+	if (JComponentHelper::getParams('com_content')->get('show_urls_images_backend', 0) ) : ?>
+		<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
+			<h3 class="tabberheading"> <?php echo JText::_('Compatibility'); ?> </h3>
+			
+			<?php
+			$fields_grps_compatibility = array('images', 'urls');
+			foreach ($fields_grps_compatibility as $name => $fields_grp_name) :
+			?>
+			
+			<fieldset class="flexi_params fc_edit_container_full">
+				<?php foreach ($this->form->getGroup($fields_grp_name) as $field) : ?>
+					<div class="fcclear"></div>
+					<?php if ($field->hidden): ?>
+						<span style="visibility:hidden !important;">
+							<?php echo $field->input; ?>
+						</span>
+					<?php else: ?>
+						<?php echo $field->label; ?>
+						<div class="container_fcfield">
+							<?php echo $field->input;?>
+						</div>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			</fieldset>
+			
 			<?php endforeach; ?>
-		</fieldset>
-		
-		<?php endforeach; ?>
-		
-	</div> <!-- end tab -->
-	
-	<?php endif; ?>
+			
+		</div>
+	<?php endif;
+	?>
 	
 	
 	
 	<div class='tabbertab' id='fcform_tabset_<?php echo $tabSetCnt; ?>_tab_<?php echo $tabCnt[$tabSetCnt]++; ?>' >
 		<h3 class="tabberheading"> <?php echo JText::_('FLEXI_TEMPLATE'); ?> </h3>
 		
-		<fieldset class="flexi_params fc_edit_container_full">
+		<fieldset class="fc_edit_container_full">
 			<div class="fc-note fc-mssg-inline" style="margin: 8px 0px!important;">
 			<?php
 				echo JText::_( 'FLEXI_PARAMETERS_LAYOUT_EXPLANATION' ) ;
@@ -1096,33 +1095,36 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			</span>
 			<div class="fcclear"></div>
 			
-			<?php echo JHtml::_('sliders.start','template-sliders-'.$this->row->id, array('useCookie'=>1)); ?>
 			<?php
-				foreach ($this->tmpls as $tmpl) {
-					$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
-					
-					echo JHtml::_('sliders.panel',JText::_($title),  $tmpl->name."-attribs-options");
+			echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
+			$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
+			
+			foreach ($this->tmpls as $tmpl) :
+				$fieldSets = $tmpl->params->getFieldsets($groupname);
+				foreach ($fieldSets as $fsname => $fieldSet) :
+					$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
+					echo JHtml::_('sliders.panel',JText::_($label), $tmpl->name.'-'.$fsname.'-options');
+					if (isset($fieldSet->description) && trim($fieldSet->description)) :
+						echo '<p class="tip">'.$this->escape(JText::_($fieldSet->description)).'</p>';
+					endif;
 					?>
 					<fieldset class="panelform">
-						<?php foreach ($tmpl->params->getGroup('attribs') as $field) : ?>
-							<div class="fcclear"></div>
-							<?php if ($field->hidden): ?>
-								<span style="visibility:hidden !important;">
-									<?php echo $field->input; ?>
-								</span>
-							<?php else: ?>
-								<?php echo $field->label; ?>
-								<div class="container_fcfield">
-									<?php echo $field->input;?>
-								</div>
-							<?php endif; ?>
-						<?php endforeach; ?>
+						<?php foreach ($tmpl->params->getFieldset($fsname) as $field) :
+							$fieldname =  $field->__get('fieldname');
+							$value = $tmpl->params->getValue($fieldname, $groupname, $this->row->itemparams->get($fieldname));
+							echo $tmpl->params->getLabel($fieldname, $groupname);
+							echo
+								str_replace('jform_attribs_', 'jform_layouts_'.$tmpl->name.'_', 
+									str_replace('[attribs]', '[layouts]['.$tmpl->name.']',
+										$tmpl->params->getInput($fieldname, $groupname, $value)
+									)
+								);
+						endforeach; ?>
 					</fieldset>
-					<?php
-				}
-			?>
+				<?php endforeach; ?>
+			<?php endforeach; ?>
+				
 			<?php echo JHtml::_('sliders.end'); ?>
-			
 		</fieldset>
 		
 	</div> <!-- end tab -->

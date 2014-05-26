@@ -116,7 +116,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 				var thisField 	 = jQuery(el).prev().children().last();
 				var thisNewField = thisField.clone();
 				
-				thisNewField.getFirst().setProperty('value','');  /* First element is the value input field, second is e.g remove button */
+				jQuery(thisNewField).find('input').first().val('');  /* First element is the value input field, second is e.g remove button */
 
 				var has_inputmask = jQuery(thisNewField).find('input.has_inputmask').length != 0;
 				if (has_inputmask)  jQuery(thisNewField).find('input.has_inputmask').inputmask();
@@ -135,7 +135,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 				";
 			
 			if ($field->field_type=='textselect') $js .= "
-				thisNewField.getParent().getElement('select.fcfield_textselval').setProperty('value','');
+				thisNewField.parent().find('select.fcfield_textselval').val('');
 				";
 			
 			$js .= "

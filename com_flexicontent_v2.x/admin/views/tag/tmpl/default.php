@@ -56,10 +56,21 @@ defined('_JEXEC') or die('Restricted access');
 				</label>
 			</td>
 			<td>
-				<?php
-				$html = JHTML::_('select.booleanlist', 'published', 'class="inputbox"', $this->row->published );
-				echo $html;
-				?>
+				<fieldset class="radio btn-group btn-group-yesno" id="published">
+					<?php
+					$options = array( 0 => JText::_('FLEXI_NO'), 1 => JText::_('FLEXI_YES') );
+					$curvalue = $this->row->published;
+					$fieldname = 'published';
+					$n=0;
+					foreach ($options as $value => $label) {
+						$checked = $curvalue==$value ? ' checked="checked" ' : '';
+						echo '
+							<input type="radio" '.$checked.' value="'.$value.'" name="'.$fieldname.'" id="'.$fieldname.$n.'">
+							<label for="'.$fieldname.$n.'">'.$label.'</label>';
+						$n++;
+					}
+					?>
+				</fieldset>
 			</td>
 		</tr>
 	</table>

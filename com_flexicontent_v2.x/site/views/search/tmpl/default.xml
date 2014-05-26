@@ -81,8 +81,15 @@
 				<option value="AND">FLEXI_ALL</option>
 			</field-->
 			
-			<field name="advfilter_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvfilter="1" onchange="f=document.getElementById('{control_name}filtflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
-			<field name="filtflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to be used as filters (thus limiting the text search result list), these will appear inside advanced search options box. You can separate each fieldname by comma(,). NOTE that fields not marked as (Search View) Filter will be skipped even if you add them here" cols="30" rows="3" />
+			<field name="filters_per_type" type="radio" default="1" label="FLEXI_FILTERS_ACCORDING_TYPE" description="FLEXI_FILTERS_ACCORDING_TYPE_DESC">
+				<option value="0">FLEXI_NO_USE_BELOW</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="filters_order" type="radio" default="1" label="FLEXI_FILTERS_ORDER" description="FLEXI_FILTERS_ORDER_DESC">
+				<option value="0">FLEXI_ORDER_FMAN</option>
+				<option value="1">FLEXI_ORDER_CUSTOM_BELOW</option>
+			</field>
+			<field name="filtflds" type="filters" isadvfilter="1" fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to be used as filters (thus limiting the text search result list), these will appear inside advanced search options box. You can separate each fieldname by comma(,). NOTE that fields not marked as (Search View) Filter will be skipped even if you add them here" cols="30" rows="3" />
 			
 			<field name="" type="separator" level="level2" default="Search Areas (non-FC Content)" description=""/>
 			

@@ -141,9 +141,13 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				$canEditStateOwn	= $user->authorise('core.edit.state.own', $extension.'.category.'.$row->id) && $row->created_user_id==$user->get('id');
 				$recordAvailable	= ($canCheckinRecords && $row->checked_out == $user->id) || !$row->checked_out;
 				$canChange		= ($canEditState || $canEditStateOwn ) && $recordAvailable;
+			} else if (FLEXI_ACCESS) {
+				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, 0,$row->id);
+				$canEdit = ($user->gid < 25) ? (in_array('edit', $rights) || in_array('editown', $rights)) : 1;
+				$canEditOwn	= 0;  // edit.own ACL applies only to items, no category ownership in J1.5
 			} else {
 				$canEdit		= 1;  // No category edit ACL in J1.5
-				$canEditOwn	= 1;  // No category edit.own ACL in J1.5
+				$canEditOwn	= 0;  // No category edit.own ACL in J1.5, set to zero because there is no category ownership J1.5
 			}
 			
 			if (FLEXI_J16GE) {

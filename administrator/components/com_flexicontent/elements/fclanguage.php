@@ -24,6 +24,7 @@ if (FLEXI_J16GE) {
 	jimport('joomla.form.helper');
 	JFormHelper::loadFieldClass('list');
 }
+require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 
 /**
  * Renders a fields element

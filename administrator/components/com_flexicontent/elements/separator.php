@@ -31,53 +31,6 @@ if (FLEXI_J16GE) {
 	JFormHelper::loadFieldClass('spacer');
 }
 
-$css="
-div table td.paramlist_value {
-	padding-left:8px;
-}
-div .paramlist_value label {
-	min-width:10px!important; padding: 0px 10px 0px 0px!important; margin: 4px 0px 0px 1px!important;
-}
-div .paramlist_value input, div .paramlist_value textarea, div .paramlist_value img, div .paramlist_value button { margin:5px 0px 2px 0px; }
-div .paramlist_value select { margin:0px; }
-fieldset.radio  { margin: 0; padding: 0; }
-
-.tool-tip { }
-.tip-title { }
-";
-
-$document = JFactory::getDocument();
-$document->addStyleDeclaration($css);
-$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_form.css');
-
-if (FLEXI_J30GE) $jinput = JFactory::getApplication()->input;
-$option = FLEXI_J30GE ? $jinput->get('option', '', 'string') : JRequest::getVar('option');
-$view   = FLEXI_J30GE ? $jinput->get('view', '', 'string') : JRequest::getVar('view');
-$controller = FLEXI_J30GE ? $jinput->get('controller', '', 'string') : JRequest::getVar('controller');
-$component  = FLEXI_J30GE ? $jinput->get('component', '', 'string')  : JRequest::getVar('component');
-
-if ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') {
-	$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/tabber.css');
-	$document->addScript(JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js');
-	$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
-	
-	if (FLEXI_J30GE) {
-		// Make sure chosen JS file is loaded before our code
-		JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
-		// replace chosen function
-		$document->addScriptDeclaration(" jQuery.fn.chosen = function(){} ");
-	}
-}
-
-if (FLEXI_J16GE) {
-	require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
-	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-	flexicontent_html::loadJQuery();
-	$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
-	$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
-	//if (!FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
-	if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
-}
 
 class JElementSeparator extends JElement
 {
@@ -87,6 +40,81 @@ class JElementSeparator extends JElement
 	 * @var		string
 	 */
 	var	$_name = 'separator';
+		
+	function add_css_js() {
+		$css="
+		div table td.paramlist_value {
+			padding-left:8px;
+		}
+		div .paramlist_value label {
+			min-width:10px!important; padding: 0px 10px 0px 0px!important; margin: 4px 0px 0px 1px!important;
+		}
+		div .paramlist_value input, div .paramlist_value textarea, div .paramlist_value img, div .paramlist_value button { margin:5px 0px 2px 0px; }
+		div .paramlist_value select { margin:0px; }
+		fieldset.radio  { margin: 0; padding: 0; }
+		
+		.tool-tip { }
+		.tip-title { }
+		";
+		
+		$document = JFactory::getDocument();
+		$document->addStyleDeclaration($css);
+		$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_form.css');
+		
+		// WORKAROUNDs of for 2 issues in com_config: slow chosen JS and PHP 5.3.9+ 'max_input_vars' limit
+		if (FLEXI_J30GE) $jinput = JFactory::getApplication()->input;
+		$option = FLEXI_J30GE ? $jinput->get('option', '', 'string') : JRequest::getVar('option');
+		$view   = FLEXI_J30GE ? $jinput->get('view', '', 'string') : JRequest::getVar('view');
+		$controller = FLEXI_J30GE ? $jinput->get('controller', '', 'string') : JRequest::getVar('controller');
+		$component  = FLEXI_J30GE ? $jinput->get('component', '', 'string')  : JRequest::getVar('component');
+		
+		if ($option=='com_config' || $option=='com_menus') {
+			$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_shared.css');
+		}
+		
+		$js = '';
+		if ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') {
+			$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/tabber.css');
+			$document->addScript(JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js');
+			$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
+			
+			if (FLEXI_J30GE) {
+				// Make sure chosen JS file is loaded before our code
+				JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
+				// replace chosen function
+				$js .= "
+					jQuery.fn.chosen = function(){};
+				";
+			}
+			
+			if (FLEXI_J16GE) {
+				/*$js .= "
+					function fc_prepare_config_form(){
+						jQuery('#jform_fcdata_serialized').val( '' );
+						jQuery('#jform_fcdata_serialized').val( JSON.stringify(jQuery('#component-form').serializeArray()) );
+						jQuery('#component-form select').attr('disabled', true);
+						jQuery('#component-form textarea').attr('disabled', true);
+						jQuery('#component-form input[type=text], #component-form input[type=checkbox], #component-form input[type=radio]').attr('disabled', true);
+					}
+					jQuery(document).ready(function() {
+						jQuery('#component-form').attr('onsubmit', \"fc_prepare_config_form();\");
+					})
+				";*/
+			}
+		}
+		if ($js) $document->addScriptDeclaration($js);
+		
+		if (FLEXI_J16GE) {
+			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+			FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+			flexicontent_html::loadJQuery();
+			$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
+			$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
+			//if (!FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
+			if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
+		}
+	}
+	
 	
 	function getLabel() {
 		return "";
@@ -111,6 +139,12 @@ class JElementSeparator extends JElement
 	
 	function fetchElement($name, $value, &$node, $control_name)
 	{
+		static $js_css_added = null;
+		if ($js_css_added===null) {
+			$this->add_css_js();
+			$js_css_added = true;
+		}
+		
 		if (FLEXI_J16GE) {
 			$node = & $this->element;
 			$attributes = get_object_vars($node->attributes());

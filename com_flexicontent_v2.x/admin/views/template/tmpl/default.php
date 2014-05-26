@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1707 2013-08-07 11:37:01Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1832 2014-01-17 00:17:27Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -40,8 +40,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 								<td width="100%" valign="top">
 									<table class="admintable" id="lay-desc-table">
 										<tr>
-											<td class="key">
-												<label for="label">
+											<td style="text-align:right;">
+												<label class="label">
 												<?php echo JText::_( 'FLEXI_FOLDER' ); ?>
 												</label>
 											</td>
@@ -50,8 +50,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 											</td>
 										</tr>
 										<tr>
-											<td class="key">
-												<label for="label">
+											<td style="text-align:right;">
+												<label class="label">
 													<?php echo JText::_( 'View' ); ?>
 												</label>
 											</td>
@@ -60,8 +60,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 											</td>
 										</tr>
 										<tr>
-											<td class="key">
-												<label for="label">
+											<td style="text-align:right;">
+												<label class="label">
 													<?php echo JText::_( 'Author' ); ?>
 												</label>
 											</td>
@@ -70,8 +70,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 											</td>
 										</tr>
 										<tr>
-											<td class="key">
-												<label for="label">
+											<td style="text-align:right;">
+												<label class="label">
 													<?php echo JText::_( 'FLEXI_WEBSITE' ); ?>
 												</label>
 											</td>
@@ -80,8 +80,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 											</td>
 										</tr>
 										<tr>
-											<td class="key">
-												<label for="label">
+											<td style="text-align:right;">
+												<label class="label">
 													<?php echo JText::_( 'Email' ); ?>
 												</label>
 											</td>
@@ -90,8 +90,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 											</td>
 										</tr>
 										<tr>
-											<td class="key">
-												<label for="label">
+											<td style="text-align:right;">
+												<label class="label">
 													<?php echo JText::_( 'License' ); ?>
 												</label>
 											</td>
@@ -100,8 +100,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 											</td>
 										</tr>
 										<tr>
-											<td class="key">
-												<label for="label">
+											<td style="text-align:right;">
+												<label class="label">
 													<?php echo JText::_( 'Version' ); ?>
 												</label>
 											</td>
@@ -110,8 +110,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 											</td>
 										</tr>
 										<tr>
-											<td class="key">
-												<label for="label">
+											<td style="text-align:right;">
+												<label class="label">
 													<?php echo JText::_( 'FLEXI_RELEASE' ); ?>
 												</label>
 											</td>
@@ -120,8 +120,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 											</td>
 										</tr>
 										<tr>
-											<td class="key">
-												<label for="label">
+											<td style="text-align:right;">
+												<label class="label">
 													<?php echo JText::_( 'Description' ); ?>
 												</label>
 											</td>
@@ -254,7 +254,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 								case 'category': $msg='in each individual <b>Category</b>'; break;
 								default: $msg='in each <b>'.$this->layout->view.'</b>'; break;
 							}
-							echo "<div class='positions_readonly'>NON-editable position.<br> To customize edit TEMPLATE parameters ".$msg."</div>";
+							echo "<div class='positions_readonly'>NON-editable position.<br/> To customize edit TEMPLATE parameters ".$msg."</div>";
 							continue;
 						}
 						?>

@@ -261,21 +261,22 @@ class FlexicontentModelCategory extends JModelAdmin
 			$isNew = false;
 		}
 		
+		// Retrieve form data these are subject to basic filtering
+		$jform = JRequest::getVar('jform', array(), 'post', 'array');
 		
 		// Merge template fieldset this should include at least 'clayout' and optionally 'clayout_mobile' parameters
-		if( !empty($_REQUEST['jform']['templates']) )
-			$data['params'] = array_merge($data['params'], $_REQUEST['jform']['templates']);
+		if( !empty($jform['templates']) )
+			$data['params'] = array_merge($data['params'], $jform['templates']);
 		
 		// Merge the parameters of the select clayout
-		$clayout = $_REQUEST['jform']['templates']['clayout'];
-		if( !empty($_REQUEST['jform']['layouts'][$clayout]) ) {
-			$data['params'] = array_merge($data['params'], $_REQUEST['jform']['layouts'][$clayout]);
+		$clayout = $jform['templates']['clayout'];
+		if( !empty($jform['layouts'][$clayout]) ) {
+			$data['params'] = array_merge($data['params'], $jform['layouts'][$clayout]);
 		}
 		
 		// Merge other special parameters, e.g. 'inheritcid'
-		if( !empty($_REQUEST['jform']['special']) )
-			$data['params'] = array_merge($data['params'], $_REQUEST['jform']['special']);
-		
+		if( !empty($jform['special']) )
+			$data['params'] = array_merge($data['params'], $jform['special']);
 		
 		// Set the new parent id if parent id not matched OR while New/Save as Copy .
 		if ($table->parent_id != $data['parent_id'] || $data['id'] == 0)
@@ -293,7 +294,6 @@ class FlexicontentModelCategory extends JModelAdmin
 
 		//$params			= JRequest::getVar( 'params', null, 'post', 'array' );
 		//$params			= $data["params"];
-		$jform = JRequest::getVar( 'jform', null, 'post', 'array' );
 		$copyparams = $jform['copycid'];
 		if ($copyparams) unset($data['params']);
 		

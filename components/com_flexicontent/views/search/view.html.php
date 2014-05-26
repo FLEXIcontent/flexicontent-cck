@@ -176,9 +176,10 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		
 		
-		// ***************************************************************
+		// ********************************************************************
 		// Get Content Types allowed for user selection in the Search Form
-		// ***************************************************************
+		// Also retrieve their configuration, plus the currently selected types
+		// ********************************************************************
 		// Get them from configuration
 		$contenttypes = $params->get('contenttypes', array());
 		
@@ -187,7 +188,34 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$contenttypes = array_unique(array_map('intval', $contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
 		
 		// Create a comma list of them
-		$contenttypes_list = count($contenttypes) ? "'".implode("','", $contenttypes)."'"  :  "";
+		$contenttypes_list = count($contenttypes) ? implode(",", $contenttypes) : "";
+		
+		// Type data and configuration (parameters)
+		$types_data = $canseltypes ? $model->getTypeData($contenttypes_list) : false;
+		
+		// Get if filtering according to specific (single) content type
+		$filters_per_type = $params->get('filters_per_type', 1);
+		
+		// Get Content Types to use either those currently selected in the Search Form, or those hard-configured in the search menu item
+		if ( $canseltypes ) {
+			$form_contenttypes = JRequest::getVar('contenttypes', array());
+			
+			// Sanitize them
+			$form_contenttypes = !is_array($form_contenttypes)  ?  array($form_contenttypes)  :  $form_contenttypes;
+			$form_contenttypes = array_unique(array_map('intval', $form_contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
+			
+			$single_contenttype = $filters_per_type && !empty($form_contenttypes) ? reset($form_contenttypes) : false;
+			$in_contenttypes = !$canseltypes ? $contenttypes : $form_contenttypes;
+		} else {
+			$in_contenttypes = $contenttypes;
+		}
+		if ( !empty($in_contenttypes) ) {
+			foreach($in_contenttypes as $i => $v) if (!strlen($in_contenttypes[$i])) unset($in_contenttypes[$i]);
+		}
+		
+		// Get content
+		//print_r($form_contenttypes); exit;
+		
 		
 		
 		// *************************************
@@ -202,20 +230,23 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if ( !strlen($txtflds[0]) ) unset($txtflds[0]);
 		
 		// Create a comma list of them
-		$txtflds_list = "'".implode("','", $txtflds)."'";
+		$txtflds_list = count($txtflds) ? "'".implode("','", $txtflds)."'" : '';
 		
 		// Retrieve field properties/parameters, verifying the support to be used as Text Search Fields
 		// This will return all supported fields if field limiting list is empty
-		$fields_text = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', $txtflds_list, $contenttypes, $load_params=true, 0, 'search');
+		$fields_text = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', $txtflds_list, $in_contenttypes, $load_params=true, 0, 'search');
 		if ( !count($fields_text) )  // all entries of field limiting list were invalid , get ALL
-			$fields_text = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'search');
+			$fields_text = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $in_contenttypes, $load_params=true, 0, 'search');
 		
 		
 		// ********************************
 		// Filter Fields of the search form
 		// ********************************
-		// Get them from configuration
-		$filtflds = $params->get('filtflds', '');
+		if ( $canseltypes && $filters_per_type ) {
+			$filtflds = $single_contenttype ? $types_data[$single_contenttype]->params->get('filters', '') : '';
+		} else {
+			$filtflds = $params->get('filtflds', '');
+		}
 		
 		// Sanitize them
 		$filtflds = preg_replace("/[\"'\\\]/u", "", $filtflds);
@@ -223,17 +254,37 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		if ( !strlen($filtflds[0]) ) unset($filtflds[0]);
 		
 		// Create a comma list of them
-		$filtflds_list = "'".implode("','", $filtflds)."'";
+		$filtflds_list = count($filtflds) ? "'".implode("','", $filtflds)."'" : '';
 		
 		// Retrieve field properties/parameters, verifying the support to be used as Filter Fields
 
 		// This will return all supported fields if field limiting list is empty
-		if ( count($filtflds) )
-			$fields_filter = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', $filtflds_list, $contenttypes, $load_params=true, 0, 'filter');
-		else
-			$fields_filter = array();
-		//if ( !count($fields_filter) )  // all entries of field limiting list were invalid , get ALL
-		//	$fields_filter = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'filter');
+		if ( count($filtflds) ) {
+			$filters_tmp = FlexicontentFields::getSearchFields($key='name', $indexer='advanced', $filtflds_list, $in_contenttypes, $load_params=true, 0, 'filter');
+			
+			// Use custom order
+			if ($canseltypes && $filters_per_type) {
+				$filters = array();
+				foreach( $filtflds as $field_name) {
+					if ( empty($filters_tmp[$field_name]) ) continue;
+					$filter_id = $filters_tmp[$field_name]->id;
+					$filters[$filter_id] = $filters_tmp[$field_name];
+				}
+			} else {
+				$filters = $filters_tmp;
+			}
+			unset($filters_tmp);
+		}
+		
+		
+		// If: (a) configured filters are empty, or (b) configured filters were not found for the current content type(s)
+		// then retrieve all fields marked as filterable for the give content type(s) this is useful to list per content type filters automatically, even when not set or misconfigured
+		if ( empty($filters) ) {
+			if( !empty($in_contenttypes) )
+				$filters = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $in_contenttypes, $load_params=true, 0, 'filter');
+			else
+				$filters = array();
+		}
 		
 		
 		// ****************************************
@@ -244,26 +295,26 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// *** Selector of Content Types
 		if( $canseltypes && count($contenttypes) )
 		{
-			// Get Content Types currently selected in the Search Form
-			$form_contenttypes = JRequest::getVar('contenttypes', array());
-			if ( !$form_contenttypes || empty($form_contenttypes) ) {
-				$form_contenttypes = array(); //array('__FC_ALL__'); //$contenttypes;
-			}
-			
 			// Get all configured content Types *(or ALL if these were not set)
-			$query = "SELECT id AS value, name AS text"
+			/*$query = "SELECT id AS value, name AS text"
 			. " FROM #__flexicontent_types"
 			. " WHERE published = 1"
 			. (count($contenttypes) ? " AND id IN (". $contenttypes_list .")"  :  "")
 			. " ORDER BY name ASC, id ASC"
 			;
 			$db->setQuery($query);
-			$types = $db->loadObjectList();
+			$types = $db->loadObjectList();*/
+			$types = array();
+			if ($filters_per_type) $types[] = JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT'));
+			foreach($types_data as $type) {
+				$types[] = JHTML::_('select.option', $type->id, JText::_($type->name));
+			}
 			
-			$attribs  = 'multiple="true" size="5" class="fc_field_filter use_select2_lib fc_label_internal fc_prompt_internal"';
+			$multiple_param = $filters_per_type ? ' onchange="adminFormPrepare(this.form); this.form.submit();" ' : 'multiple="true"';
+			$attribs  = $multiple_param.' size="5" class="fc_field_filter use_select2_lib fc_label_internal fc_prompt_internal"';
 			$attribs .= ' data-fc_label_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_CLICK_TO_LIST'),'s').'"';
 			$attribs .= ' data-fc_prompt_text="'.flexicontent_html::escapeJsText(JText::_('FLEXI_TYPE_TO_FILTER'),'s').'"';
-			$lists['contenttypes'] = JHTML::_('select.genericlist', $types, 'contenttypes[]', $attribs, 'value', 'text', $form_contenttypes, 'contenttypes');
+			$lists['contenttypes'] = JHTML::_('select.genericlist', $types, 'contenttypes[]', $attribs, 'value', 'text', (empty($form_contenttypes) ? '' : $form_contenttypes), 'contenttypes');
 			
 			/*
 			$checked = !count($form_contenttypes) || !strlen($form_contenttypes[0]);
@@ -279,7 +330,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$lists['contenttypes'] .= '   -'.JText::_('FLEXI_ALL').'-';
 			$lists['contenttypes'] .= '  </label>';
 			$lists['contenttypes'] .= ' </li>';
-			foreach($types as $type) {
+			foreach($types_data as $type) {
 				$checked = in_array($type->value, $form_contenttypes);
 				$checked_attr = $checked ? 'checked=checked' : '';
 				$checked_class = $checked ? ' fc_highlight' : '';
@@ -567,7 +618,7 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// ******************************************************************
 		// Create HTML of filters (-AFTER- getData of model have been called)
 		// ******************************************************************
-		foreach ($fields_filter as $filter)
+		foreach ($filters as $filter)
 		{
 			$filter->parameters->set('display_label_filter_s', 0);
 			$filter->value = JRequest::getVar('filter_'.$filter->id, false);
@@ -587,7 +638,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		
 		$this->assignRef('action',    $link);  // $uri->toString()
 		$this->assignRef('print_link',$print_link);
-		$this->assignRef('filters',   $fields_filter);
+		$this->assignRef('in_contenttypes', $in_contenttypes);
+		$this->assignRef('filters',   $filters);
 		$this->assignRef('results',   $results);
 		$this->assignRef('lists',     $lists);
 		$this->assignRef('params',    $params);

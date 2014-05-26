@@ -637,7 +637,12 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
+			<field name="filters_order" type="list" default="" label="FLEXI_FILTERS_ORDER" description="FLEXI_FILTERS_ORDER_DESC" >
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_ORDER_FMAN</option>
+				<option value="1">FLEXI_ORDER_CUSTOM_BELOW</option>
+			</field>
+			<field name="filters" type="filters" multiple="false" default="" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" />
 			<field name="show_filter_labels" type="list" default="" label="FLEXI_FILTER_LABELS" description="FLEXI_FILTER_LABELS_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>

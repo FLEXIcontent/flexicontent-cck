@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-	<author>Emmanuel Danan</author>
+	<author>Emmanuel Danan, George Papadakis</author>
 	<website>www.flexicontent.org</website>
 	<email>emmanuel@vistamedia.fr</email>
-	<license>GPLv2</license>
-	<version>1.1</version>
-	<release>25 november 2009</release>
+	<license>GPLv3</license>
+	<version>1.2</version>
+	<release>20 May 2014</release>
 	<description>This HTML5 layout presents category items as faq like listings. Each field put in the aftertitle position will be rendered in a separate row</description>
 	<params addpath="/administrator/components/com_flexicontent/elements">
-		<param name="description_cut_text" type="text" size="3" default="180" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
-		<param name="tmpl_cols" type="radio" default="2" label="FLEXI_SUBCAT_COLS" description="FLEXI_SUBCAT_COLS_DESC">
+		<param name="description_cut_text" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
+		
+		<param name="subcat_conf" type="separator" hr="false" default="FLEXI_SUBCATEGORIES" level="level2" menu="hide" />
+		<param name="description_cut_text_subcat" type="text" size="3" default="" label="FLEXI_CATDESCR_MAXLEN" description="FLEXI_CATDESCR_MAXLEN_DESC" />
+		<param name="tmpl_cols" type="radio" default="" label="FLEXI_SUBCAT_COLS" description="FLEXI_SUBCAT_COLS_DESC" class="btn-group btn-group-yesno">
+			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="1">FLEXI_1_COL</option>
 			<option value="2">FLEXI_2_COLS</option>
 			<option value="3">FLEXI_3_COLS</option>
@@ -17,7 +21,8 @@
 		</param>
 		
 		<param name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
-		<param name="htmlmode" type="radio" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int">
+		<param name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
+			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_XHTML</option>
 			<option value="1">FLEXI_HTML5</option>
 		</param>

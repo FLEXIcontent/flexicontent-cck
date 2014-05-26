@@ -104,14 +104,14 @@ class plgFlexicontentFlexinotify extends JPlugin
 		
 		// a. Check if new document version was approved
 		if ( $post['vstate']!=2 ) {
-			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("FAVOURITES NOTIFICATION PLUGIN: &nbsp; Not sending notifications, because new document version did not become active (needs approval by a publisher/administrator)", 'message' );
+			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("** Favourites Notification Plugin: &nbsp; Not sending notifications, because new document version did not become active (needs approval by a publisher/administrator)", 'message' );
 			return;
 		}
 		
 		// b. Check if current item has subscribers
 		$subscribers = $this->_getSubscribers($item->id);
 		if (count($subscribers) == 0) {
-			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("FAVOURITES NOTIFICATION PLUGIN: &nbsp; Current content item has no subscribers", 'message' );
+			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("** Favourites Notification Plugin: &nbsp; Current content item has no subscribers", 'message' );
 			return;
 		}
 		
@@ -119,13 +119,13 @@ class plgFlexicontentFlexinotify extends JPlugin
 		$session = JFactory::getSession();
 		$subscribers_notified = $session->get('subscribers_notified', array(),'flexicontent');
 		if ( !empty($subscribers_notified[$item->id]) ) {
-			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("FAVOURITES NOTIFICATION PLUGIN: &nbsp; Notifications emails to subscribers were already sent during current session", 'message' );
+			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("** Favourites Notification Plugin: &nbsp; Notifications emails to subscribers were already sent during current session", 'message' );
 			return;
 		}
 		
 		// d. Check if notification flag was set
 		if ( empty($post['notify']) ) {
-			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("FAVOURITES NOTIFICATION PLUGIN: &nbsp; Current editor did not request to notify subscribers", 'message' );
+			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("** Favourites Notification Plugin: &nbsp; Current editor did not request to notify subscribers", 'message' );
 			return;
 		}
 		
@@ -285,7 +285,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 				if ($send_result) $count_sent++;
 			}
 			$send_result = (boolean) $count_sent;
-			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("FAVOURITES NOTIFICATION PLUGIN: &nbsp; Sent personalized message per subscriber", 'message' );
+			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("** Favourites Notification Plugin: &nbsp; Sent personalized message per subscriber", 'message' );
 		}
 		
 		// Single same message for ALL subscribers
@@ -314,7 +314,7 @@ class plgFlexicontentFlexinotify extends JPlugin
 				if ($send_result) $count_sent += count($to_100);
 			}
 			$send_result = (boolean) $count_sent;
-			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("FAVOURITES NOTIFICATION PLUGIN: &nbsp; Sent same message to all subscribers", 'message' );
+			if ($debug_notifications) JFactory::getApplication()->enqueueMessage("** Favourites Notification Plugin: &nbsp; Sent same message to all subscribers", 'message' );
 		}
 		
 		// Finally give some feedback to current editor, optionally including emails of receivers if debug is enabled

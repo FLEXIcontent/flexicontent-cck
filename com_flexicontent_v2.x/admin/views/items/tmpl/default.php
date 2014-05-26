@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1902 2014-05-10 16:06:11Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1904 2014-05-20 12:21:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -311,6 +311,7 @@ window.addEvent('domready', function() {
 </script>
 <div class="flexicontent">
 
+
 <?php if ($this->unassociated && !$this->badcatitems) : ?>
 	<div class="fc-mssg fc-warning">
 	<table>
@@ -365,11 +366,115 @@ window.addEvent('domready', function() {
 <?php endif; ?>
 
 
+
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
-	<div id="mainChooseColBox" class="fc_nice_box" style="margin-top:6px;"></div>
+	<table style="white-space:nowrap">
+		<tr class="filterbuttons_head">
+			<td>
+				<div style="float:left; margin:2px 48px 0px 0px;">
+					<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
+					<span class="radio"><?php echo $this->lists['scope']; ?></span>
+					<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
+				</div>
+				
+				<input type="button" class="fc_button" onclick="jQuery('#mainChooseColBox').slideToggle();" value="<?php echo JText::_( 'Columns' ); ?>" />
+				<input type="button" class="fc_button" onclick="jQuery('#stateGroupsBox').slideToggle();" value="<?php echo JText::_( 'State Groups' ); ?>" />
+				<input type="button" class="fc_button" onclick="jQuery('#filterline').slideToggle('slow');" value="<?php echo JText::_( 'Filters' ); ?>" />
+				<!--
+				<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
+				<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
+				-->
+				
+				<div class="clear"></div>
+				
+				<div class="limit" style="display: inline-block;">
+					<label class="label">
+						<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
+					</label>
+					<?php echo str_replace('id="limit"', 'id="limit_top"', $this->pagination->getLimitBox()); ?>
+				</div>
+				
+				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
+					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
+				</span>
+				
+				<span class="fc_pages_counter" style="display:inline-block; white-space:nowrap;">
+					<?php echo $this->pagination->getPagesCounter(); ?>
+				</span>
+				
+				<div class='fc_mini_note_box' style='display: inline-block;'>
+					<?php
+					$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
+					if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
+					echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
+					?>
+				</div>
+				
+				<?php if (@$this->lists['filter_fileid']): ?>
+					<div class="fcclear"></div>
+					<?php echo '<label class="label">'.JText::_('List items using file') . '</label> ' . $this->lists['filter_fileid']; ?>
+				<?php endif; ?>
+				
+			</td>
+		</tr>
+	</table>
+	
+	
+	<div id="filterline" <?php if (!$this->count_filters) echo 'style="display:none;"'; ?> >
+	
+		<div class="fc-mssg-inline fc-nobgimage fc-success">
+			<?php echo $this->lists['filter_authors']; ?>
+			
+			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
+				<?php echo $this->lists['filter_lang']; ?>
+			<?php endif; ?>
+			
+			<?php echo $this->lists['filter_type']; ?>
+			<?php echo $this->lists['filter_state']; ?>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-success">
+			<div style="display:inline-block; white-space:nowrap;">
+				<span style="display:none; color:darkred;" class="fc_nice_box" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
+				<?php echo $ordering_type_tip; ?>
+				<label class="label"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
+				<?php echo $this->lists['filter_order_type']; ?>
+			</div>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-success">
+			<div style="display:inline-block; white-space:nowrap;">
+				<?php echo $this->lists['filter_cats']; ?>
+				<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
+				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
+			</div>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-success">
+			<div style="display:inline-block; white-space:nowrap;">
+				<span class="radio"><?php echo $this->lists['date']; ?></span>
+				<?php echo $this->lists['startdate']; ?>
+				<?php echo $this->lists['enddate']; ?>
+			</div>
+		</div>
+		
+		<div class="fc-mssg-inline fc-nobgimage fc-success">
+			<div style="display:inline-block;">
+				<label class="label"><?php echo JText::_('FLEXI_ID'); ?></label>
+				<input type="text" name="filter_id" id="filter_id" size="4" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
+			</div>
+		</div>
+		
+		<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+		<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+		
+	</div>
+	
+	
+	<div id="mainChooseColBox" class="fc_nice_box" style="margin-top:6px; display:none;"></div>
 
-	<div class="fc_nice_box" style="">
+	<div id="stateGroupsBox" class="fc_nice_box" style="display:none;">
 		
 		<div style="float:left; margin-right:12px;">
 		<?php
@@ -392,7 +497,7 @@ window.addEvent('domready', function() {
 		</div>
 	</div>
 	
-	<table id="adminListTableFCitems" class="adminlist" cellspacing="1">
+	<table id="adminListTableFCitems" class="adminlist" cellspacing="1" style="margin-top:12px;">
 	<thead>
 		<tr>
 			<th class="center" style="width:24px;">
@@ -528,112 +633,45 @@ window.addEvent('domready', function() {
 
 			</th>
 		</tr>
-
-		<tr id="filterline">
-			<td class="left col_title" colspan="4">
-				<!--label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label-->
-				<span class="radio"><?php echo $this->lists['scope']; ?></span>
-				<div class="clear"></div>
-				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
-			</td>
-			<td class="left col_authors">
-				<?php echo $this->lists['filter_authors']; ?>
-			</td>
-			<?php if (FLEXI_FISH || FLEXI_J16GE) : ?>
-			<td class="left col_lang">
-				<?php echo $this->lists['filter_lang']; ?>
-			</td>
-			<?php endif; ?>
-			<td class="left col_type">
-				<?php echo $this->lists['filter_type']; ?>
-			</td>
-			<td class="left col_state">
-				<?php echo $this->lists['filter_state']; ?>
-			</td>
-			<td class="left"></td>
-
-		<?php if ( $enable_translation_groups ) : ?>
-			<td class="left"></td>
-		<?php endif; ?>
-
-    <?php foreach($this->extra_fields as $field) :?>
-			<td class="left"></td>
-		<?php endforeach; ?>
-
-			<td class="left">
-				<span style="display:none; color:darkred;" class="fc_nice_box" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
-				<?php if ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
-					<span style="color:darkgreen;" class="fc_nice_box" id="fcorder_notes_box"><?php echo JText::_('FLEXI_FCORDER_USE_CATEGORY_FILTER'); ?></span>
-				<?php endif; ?>
-				<?php echo $ordering_type_tip; ?>
-				<label class="label"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
-				<div class="clear"></div>
-				<?php echo $this->lists['filter_order_type']; ?>
-			</td>
-			<td class="left"></td>
-			<!--td class="left"></td-->
-			<td class="left col_cats">
-				<?php echo $this->lists['filter_cats']; ?>
-				<div class="clear"></div>
-				<label class="label"><?php echo '&nbsp;'.JText::_( 'FLEXI_INCLUDE_SUBS' ); ?></label>
-				<div class="clear"></div>
-				<span class="radio"><?php echo $this->lists['filter_subcats']; ?></span>
-				<?php if (!$this->filter_order_type && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
-					<br/><span style="color:darkgreen;" class="fc-mssg-inline fc-note"><?php echo JText::_('Joomla order, GROUPING BY main category'); ?></span>
-				<?php elseif ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
-					<br/><span style="color:darkgreen;" class="fc-mssg-inline fc-note"><?php echo JText::_('Grouping by first listed category'); ?></span>
-				<?php endif; ?>
-			</td>
-			<td class="left col_created col_revised" colspan="2">
-				<span class="radio"><?php echo $this->lists['date']; ?></span>
-				<div class="clear"></div>
-				<?php echo $this->lists['startdate']; ?>
-				<div class="clear"></div>
-				<?php echo $this->lists['enddate']; ?>
-			</td>
-			<td class="left"></td>
-			<td class="left col_id">
-				<input type="text" name="filter_id" id="filter_id" size="4" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
-			</td>
-		</tr>
-		
 		
 		<tr>
-			<td colspan="<?php echo $items_list_cols; ?>" class="filterbuttons">
-				
-				<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-				<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
-				<!--
-				<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
-				<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
-				-->
-				
-				<div class="limit" style="display: inline-block; margin-left: 24px;">
-					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . str_replace('id="limit"', 'id="limit_top"', $this->pagination->getLimitBox()); ?>
-				</div>
-				
-				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
-					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
-				</span>
-				
-				<span class="fc_pages_counter">
-					<?php echo $this->pagination->getPagesCounter(); ?>
-				</span>
-				
-				<div class='fc_mini_note_box' style='display: inline-block; float:right; clear:both!important;'>
-					<?php
-					$tz_info =  $tz_offset > 0 ? ' UTC +' . $tz_offset : ' UTC ' . $tz_offset;
-					if (FLEXI_J16GE) $tz_info .= ' ('.$user_zone.')';
-					echo JText::sprintf( FLEXI_J16GE ? 'FLEXI_DATES_IN_USER_TIMEZONE_NOTE' : 'FLEXI_DATES_IN_SITE_TIMEZONE_NOTE', ' ', $tz_info );
-					?>
-				</div>
-				
-				<?php if (@$this->lists['filter_fileid']): ?>
-					<div class="fcclear"></div>
-					<?php echo '<label class="label">'.JText::_('List items using file') . '</label> ' . $this->lists['filter_fileid']; ?>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<?php if ( (FLEXI_FISH || FLEXI_J16GE) ): ?>
+				<td></td>
+			<?php endif; ?>
+			<td></td>
+			<td></td>
+			<td></td>
+			<?php if ( $enable_translation_groups ) : ?>
+				<td></td>
+			<?php endif; ?>
+
+	  	<?php foreach($this->extra_fields as $field) :?>
+				<td></td>
+			<?php endforeach; ?>
+			
+			<td>
+				<?php if ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
+					<span style="color:darkgreen; white-space:nowrap;" class="fc_nice_box" id="fcorder_notes_box"><?php echo JText::_('FLEXI_FCORDER_USE_CATEGORY_FILTER'); ?></span>
 				<?php endif; ?>
-				
 			</td>
+			
+			<td></td>
+			<td>
+				<?php if (!$this->filter_order_type && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
+					<span style="color:darkgreen;" class="fc_nice_box"><?php echo JText::_('Joomla order, GROUPING BY main category'); ?></span>
+				<?php elseif ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
+					<span style="color:darkgreen; white-space:nowrap;" class="fc_nice_box"><?php echo JText::_('Grouping by first listed category'); ?></span>
+				<?php endif; ?>
+			</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
 		</tr>
 
 	</thead>

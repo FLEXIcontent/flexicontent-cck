@@ -1542,7 +1542,7 @@ class FlexicontentFields
 			.' JOIN #__flexicontent_fields_type_relations AS ftr ON ftr.field_id = f.id'
 			.' WHERE '. $where 
 			.' GROUP BY f.id'
-			.' ORDER BY f.ordering, f.name'
+			.' ORDER BY '.(($content_types && count($content_types)==1) ? ' ftr.ordering, f.name' : ' f.ordering, f.name') // if single type given then retrieve ordering for fields of this type
 		;
 		$db->setQuery($query);
 		$fields = $db->loadObjectList($key);
@@ -2211,7 +2211,7 @@ class FlexicontentFields
 					$view_join = @ $fc_catviev['join_clauses'];
 					$view_where = $fc_catviev['where_conf_only'];
 					$filters_where = $fc_catviev['filters_where'];
-					$view_total = $fc_catviev['view_total'];
+					$view_total = isset($fc_catviev['view_total']) ? $fc_catviev['view_total'] : 0;
 					if ($fc_catviev['alpha_where']) $filters_where['alpha'] = $fc_catviev['alpha_where'];  // we use count bellow ... so add it only if it is non-empty
 				}
 			} else if ( $isSearchView ) {

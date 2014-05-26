@@ -287,17 +287,22 @@ $ord_grp = 1;
 					}
 				}
 				
+				$translated_label = JText::_($row->label);
+				$original_label_text = ($translated_label != $row->label) ? '<br/><small>'.$row->label.'</small>' : '';
+				$escaped_label = htmlspecialchars(JText::_($row->label), ENT_QUOTES, 'UTF-8');
 				// Display title with no edit link ... if row checked out by different user -OR- is uneditable
 				if ( ( $row->checked_out && $row->checked_out != $user->id ) || ( !$canEdit ) ) {
-					echo htmlspecialchars($row->label, ENT_QUOTES, 'UTF-8');
+					echo $translated_label;
+					echo $original_label_text;
 				
 				// Display title with edit link ... (row editable and not checked out)
 				} else {
 				?>
-					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_FIELD' );?>::<?php echo $row->label; ?>">
+					<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_EDIT_FIELD' );?>::<?php echo $escaped_label; ?>">
 					<a href="<?php echo $link; ?>">
-					<?php echo htmlspecialchars($row->label, ENT_QUOTES, 'UTF-8'); ?>
+					<?php echo $translated_label; ?>
 					</a></span>
+					<?php echo $original_label_text;?>
 				<?php
 				}
 				?>

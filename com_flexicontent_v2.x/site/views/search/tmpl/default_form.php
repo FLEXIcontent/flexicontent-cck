@@ -9,7 +9,12 @@ $default_searchphrase = $this->params->get('default_searchphrase', 'all');
 $show_searchordering = $this->params->get('show_searchordering', 1);
 $default_searchordering = $this->params->get('default_searchordering', 'newest');
 
+// Whether to show advanced options,  (a) the filters, (b) the text search fields, which these depend on content types selected/configured
 $autodisplayadvoptions = $this->params->get('autodisplayadvoptions', 1);
+if (empty($this->in_contenttypes)) $autodisplayadvoptions = 0;
+
+// Whether to show advanced options or hide them, initial behaviour depends on $autodisplayadvoptions, which is calculated above
+$use_advsearch_options = JRequest::getInt('use_advsearch_options', $autodisplayadvoptions==2);
 
 //$show_filtersop = $this->params->get('show_filtersop', 1);
 //$default_filtersop = $this->params->get('default_filtersop', 'all');
@@ -29,7 +34,7 @@ if($autodisplayadvoptions) {
     
 	  jQuery("#fcsearch_txtflds_row").css("position","relative").hide(0, function(){}).css("position","static");
 	  
-	  '. (($autodisplayadvoptions==1 && !JRequest::getInt('use_advsearch_options')) ? '' : 'jQuery("#fcsearch_txtflds_row").css("position","relative").toggle(500, function(){}).css("position","static");') .'
+	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#fcsearch_txtflds_row").css("position","relative").toggle(500, function(){}).css("position","static");') .'
 		
 	  jQuery("#use_advsearch_options").click(function() {
 	  
@@ -39,7 +44,7 @@ if($autodisplayadvoptions) {
   .( $this->params->get('canseltypes', 1)!=2 ? '' : '
 	  jQuery("#fcsearch_contenttypes_row").css("position","relative").hide(0, function(){}).css("position","static");
 	  
-	  '. (($autodisplayadvoptions==1 && !JRequest::getInt('use_advsearch_options')) ? '' : 'jQuery("#fcsearch_contenttypes_row").css("position","relative").toggle(500, function(){}).css("position","static");') .'
+	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#fcsearch_contenttypes_row").css("position","relative").toggle(500, function(){}).css("position","static");') .'
 		
 	  jQuery("#use_advsearch_options").click(function() {
 	  
@@ -48,7 +53,7 @@ if($autodisplayadvoptions) {
   '
 	  jQuery("#fc_advsearch_options_set").css("position","relative").hide(0, function(){}).css("position","static");
 	  
-	  '. (($autodisplayadvoptions==1 && !JRequest::getInt('use_advsearch_options')) ? '' : 'jQuery("#fc_advsearch_options_set").css("position","relative").toggle(500, function(){}).css("position","static");') .'
+	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#fc_advsearch_options_set").css("position","relative").toggle(500, function(){}).css("position","static");') .'
 		
 	  jQuery("#use_advsearch_options").click(function() {
 	  
@@ -71,8 +76,31 @@ $r = 0;
 
 <form action="<?php echo $this->action; ?>" method="POST" id="searchForm" name="searchForm" onsubmit="">
 	
+	<?php if ($this->params->get('canseltypes', 1) && isset($this->lists['contenttypes'])) : ?>
+	<fieldset id='fc_contenttypes_set' class='fc_search_set'>
+		<legend>
+			<span class='hasTip' title='<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>::<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE_TIP'); ?>'><?php echo $infoimage; ?></span>
+			<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>
+		</legend>
+		
+		<table id="fc_textsearch_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
+		
+			<tr id="fcsearch_contenttypes_row" class="fc_search_row_<?php echo (($r++)%2);?>">
+				<td colspan="1" class="fc_search_option_cell">
+					<span class="fc_filter_html">
+						<?php echo $this->lists['contenttypes'];?>
+					</span>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	<?php endif; ?>
+	
 	<fieldset id='fc_textsearch_set' class='fc_search_set'>
-		<legend><span class="hasTip" <?php echo $text_search_title_tip;?> ><?php echo $infoimage; ?></span><?php echo JText::_('FLEXI_TEXT_SEARCH'); ?></legend>
+		<legend>
+			<span class="hasTip" <?php echo $text_search_title_tip;?> ><?php echo $infoimage; ?></span>
+			<?php echo JText::_('FLEXI_TEXT_SEARCH'); ?>
+		</legend>
 		
 		<table id="fc_textsearch_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
 			
@@ -112,7 +140,6 @@ $r = 0;
 						<button class="fc_button button_go" onclick="var form=document.getElementById('searchForm'); adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
 						
 						<?php if ($autodisplayadvoptions) {
-							$use_advsearch_options = JRequest::getInt('use_advsearch_options', 0);
 							$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
 							$checked_class = $use_advsearch_options ? 'highlight' : '';
 							$use_advsearch_options_ff = '';
@@ -158,23 +185,6 @@ $r = 0;
 				
 			<?php endif; ?>
 			
-			<?php if ($this->params->get('canseltypes', 1) && isset($this->lists['contenttypes'])) : ?>
-			
-				<tr id="fcsearch_contenttypes_row" class="fc_search_row_<?php echo (($r++)%2);?>">
-					<td class='fc_search_label_cell' valign='top'>
-						<label for="contenttypes" class='hasTip' title='<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>::<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE_TIP'); ?>'>
-							<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>:
-						</label>
-					</td>
-					<td colspan="3" class="fc_search_option_cell">
-						<span class="fc_filter_html">
-							<?php echo $this->lists['contenttypes'];?>
-						</span>
-					</td>
-				</tr>
-				
-			<?php endif; ?>
-			
 		</table>
 	
 	</fieldset>
@@ -187,7 +197,10 @@ $r = 0;
 		
 		<?php if ( count($this->filters) > 0 ) : ?>
 			<fieldset id='fc_fieldfilters_set' class='fc_search_set'>
-				<legend><span class="hasTip" <?php echo $field_filters_title_tip;?> ><?php echo $infoimage; ?></span><?php echo JText::_('FLEXI_FIELD_FILTERS')." ".JText::_('FLEXI_TO_FILTER_TEXT_SEARCH_RESULTS'); ?></legend>
+				<legend>
+					<span class="hasTip" <?php echo $field_filters_title_tip;?> ><?php echo $infoimage; ?></span>
+					<?php echo JText::_('FLEXI_FIELD_FILTERS')." ".JText::_('FLEXI_TO_FILTER_TEXT_SEARCH_RESULTS'); ?>
+				</legend>
 				
 				<table id="fc_fieldfilters_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">		
 				
@@ -204,17 +217,21 @@ $r = 0;
 					</tr>
 				<?php endif; */ ?>
 				
-				<?php foreach($this->filters as $filt) { ?>
-					<?php if (empty($filt->html)) continue; ?>
+				<?php
+				foreach($this->filters as $filt) {
+					if (empty($filt->html)) continue;
+					$label = JText::_($filt->label);
+					$descr = JText::_($filt->description);
+					?>
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 						<td class='fc_search_label_cell' valign='top'>
-						<?php if ($filt->description) : ?>
-							<label for="<?php echo $filt->name; ?>" class="hasTip" title="<?php echo $filt->label; ?>::<?php echo $filt->description; ?>">
-								<?php echo $filt->label; ?>:
+						<?php if ($descr) : ?>
+							<label for="<?php echo $filt->name; ?>" class="hasTip" title="<?php echo $label; ?>::<?php echo $descr; ?>">
+								<?php echo JText::_($label); ?>:
 							</label>
 						<?php else : ?>
-							<label for="<?php echo $filt->name; ?>" class="hasTip" title="<?php echo JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'); ?>::<?php echo JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $filt->label ); ?>">
-								<?php echo $filt->label; ?>:
+							<label for="<?php echo $filt->name; ?>" class="hasTip" title="<?php echo JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'); ?>::<?php echo JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $label ); ?>">
+								<?php echo $label; ?>:
 							</label>
 						<?php endif; ?>
 						</td>
