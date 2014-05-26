@@ -301,6 +301,7 @@ class flexicontent_html
 			} else {
 				if (FLEXI_J30GE) {
 					JHtml::_('jquery.ui', array('core', 'sortable'));   // 'core' in J3+ includes all parts of jQuery-UI CORE component: Core, Widget, Mouse, Position
+					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.dialog.min.js');
 					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.menu.min.js');
 					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery/js/jquery-ui/jquery.ui.autocomplete.min.js');
 				} else {
@@ -2764,7 +2765,7 @@ class flexicontent_html
 	{
 		$db = JFactory::getDBO();
 
-		$query = 'SELECT id, name'
+		$query = 'SELECT *'
 		. ' FROM #__flexicontent_types'
 		. ' WHERE published = 1'
 		;
@@ -3848,7 +3849,7 @@ class FLEXIUtilities
 		// Retrieve languages
 		// ******************
 		if (FLEXI_J16GE) {   // Use J1.6+ language info
-			$query = 'SELECT DISTINCT lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, '
+			$query = 'SELECT DISTINCT lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, lc.title_native, '
 					. ' CASE WHEN CHAR_LENGTH(lc.title_native) THEN CONCAT(lc.title, " (", lc.title_native, ")") ELSE lc.title END as name '
 					.' FROM #__languages as lc '
 					.' WHERE 1 '.($published_only ? ' AND lc.published=1' : '')

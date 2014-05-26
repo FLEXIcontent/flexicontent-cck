@@ -623,8 +623,9 @@ class FlexicontentModelItems extends JModelLegacy
 		$option = JRequest::getCmd( 'option' );
 		
 		// Get the WHERE and ORDER BY clauses for the query
+		$extra_joins = "";
 		if ( !$query_ids ) {
-			$where		= $this->_buildContentWhere();
+			$where		= $this->_buildContentWhere($extra_joins);
 			$orderby	= $this->_buildContentOrderBy();
 		}
 		
@@ -672,8 +673,10 @@ class FlexicontentModelItems extends JModelLegacy
 				;
 		}
 		
-		$use_tmp = !$query_ids;
-		$tmp_only = $use_tmp && !JRequest::getVar('search');
+		$scope  = $app->getUserStateFromRequest( $option.'.items.scope', 			'scope', '', 'int' );
+		$search = $app->getUserStateFromRequest( $option.'.items.search', 		'search', '', 'string' );
+		$use_tmp = !$query_ids && (!$search || $scope!=2);
+		$tmp_only = $use_tmp && (!$search || $scope!=4);
 		$query .= ""
 				. ( $use_tmp ? ' FROM #__flexicontent_items_tmp AS i' :' FROM #__content AS i')
 				. ( $tmp_only ? '' : ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id')
@@ -684,6 +687,7 @@ class FlexicontentModelItems extends JModelLegacy
 				. ' LEFT JOIN #__flexicontent_types AS t ON t.id = '.( $tmp_only ? 'i.' : 'ie.').'type_id'   // left join needed to detect items without type !!
 				. ( $use_tmp ? '' : ' LEFT JOIN #__users AS u ON u.id = i.checked_out')
 				. $ver_specific_joins
+				. $extra_joins
 				;
 		if ( !$query_ids ) {
 			$query .= ""
@@ -749,13 +753,31 @@ class FlexicontentModelItems extends JModelLegacy
 	 * @return string
 	 * @since 1.0
 	 */
-	function _buildContentWhere()
+	function _buildContentWhere(& $extra_joins = "")
 	{
-		$app    = JFactory::getApplication();
-		$option = JRequest::getVar('option');
+		$app     = JFactory::getApplication();
+		$option  = JRequest::getVar('option');
 		$session = JFactory::getSession();
+		$user    = JFactory::getUser();
+		$cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		$perms   = FlexicontentHelperPerm::getPerm();
 		
-		// Check for SPECIAL item listing CASES, in which the item ids are alredy calculated
+		
+		// ***********************************
+		// FLAGs to decide which items to list
+		// ***********************************
+		
+		$allitems	= $perms->DisplayAllItems;
+		$viewable_items = $cparams->get('iman_viewable_items', 1);
+		$editable_items = $cparams->get('iman_editable_items', 0);
+		
+		
+		// ************************************************************************
+		// SPECIAL item listing CASES, item ids are already calculated and provided,
+		// in such a case WHERE clause limits to the given item ids
+		// ************************************************************************
+		
+		// CASE 1: listing items using a file
 		$filter_fileid = JRequest::getInt('filter_fileid', 0);
 		if ($filter_fileid)
 		{
@@ -768,8 +790,11 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 		}
 		
-		$nullDate = $this->_db->getNullDate();
 
+		// *********************
+		// Get item list filters
+		// *********************
+		
 		$filter_type 		= $app->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );
 		$filter_cats 		= $app->getUserStateFromRequest( $option.'.items.filter_cats',	'filter_cats', '', 'int' );
 		$filter_subcats	= $app->getUserStateFromRequest( $option.'.items.filter_subcats',	'filter_subcats', 1, 'int' );
@@ -791,7 +816,12 @@ class FlexicontentModelItems extends JModelLegacy
 		$enddate   = $app->getUserStateFromRequest( $option.'.items.enddate', 		'enddate',	 '', 	'cmd' );
 		if ($enddate == JText::_('FLEXI_TO')) { $enddate = $app->setUserState( $option.'.items.enddate', '' ); }
 		$enddate   = trim( JString::strtolower( $enddate ) );
-
+		
+		
+		// ********************************************
+		// Start building the AND parts of where clause
+		// ********************************************
+		
 		$where = array();
 		
 		if (FLEXI_J16GE) {
@@ -802,96 +832,71 @@ class FlexicontentModelItems extends JModelLegacy
 			// Limit items to FLEXIcontent Section
 			$where[] = ' i.sectionid = ' . $this->_db->Quote(FLEXI_SECTION);
 		}
-
-		$user = JFactory::getUser();
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$allitems	= $permission->DisplayAllItems;
-			
-			if (!@$allitems) {
+		
+		
+		// *************************************
+		// IF items viewable: default is enabled
+		// *************************************
+		
+		$joinaccess = "";
+		if (!$allitems && $viewable_items) {
+			if (FLEXI_J16GE) {
 				$aid_arr = $user->getAuthorisedViewLevels();
 				$aid_list = implode(",", $aid_arr);
-				
-				//$canEdit['item'] 	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'item');
-				//$canEdit['category'] = FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit', 'category');  // SHOULD not be used
-				//$canEditOwn['item']		= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'item');
-				//$canEditOwn['category']	= FlexicontentHelperPerm::checkUserElementsAccess($user->id, 'core.edit.own', 'category');  // SHOULD not be used
-			}
-		} else if (FLEXI_ACCESS) {
-			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
-				
-			if (!@$allitems) {				
-				$canEdit 	= FAccess::checkUserElementsAccess($user->gmid, 'edit');
-				$canEditOwn = FAccess::checkUserElementsAccess($user->gmid, 'editown');
-			}
-		} else {
-			$allitems = 1;
-		}
-		
-		if (FLEXI_J16GE) {
-			if (!@$allitems) {
-				/*$where_edit = array();
-				if (count($canEditOwn['item'])) {
-					$where_edit[] = ' ( i.created_by = ' . $user->id . ' AND i.id IN (' . implode(',', $canEditOwn['item']) . ') )';
-				}
-				if (count($canEdit['item']))  {
-					$where_edit[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
-				}
-				// Add limits to where ...
-				if (count($where_edit)) {
-					$where[] = ' ('.implode(' OR', $where_edit).')';
-				}*/
 				$where[] = ' t.access IN (0,'.$aid_list.')';
 				$where[] = ' c.access IN (0,'.$aid_list.')';
 				$where[] = ' i.access IN (0,'.$aid_list.')';
-			}
-		} else if (FLEXI_ACCESS) {
-			if (!@$allitems) {				
-				if (!@$canEdit['content']) { // first exclude the users allowed to edit all items
-					if (@$canEditOwn['content']) { // custom rules for users allowed to edit all their own items
-						$allown = array();
-						$allown[] = ' i.created_by = ' . $user->id;
-						if (isset($canEdit['category'])) {
-							if (count($canEdit['category']))		$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
-						}
-						if (isset($canEdit['item'])) {
-							if (count($canEdit['item']))				$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
-						}
-						if (count($allown) > 0) {
-							$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
-						}
-					} else if ( ( isset($canEditOwn['category']) && count($canEditOwn['category']) ) || ( isset($canEditOwn['item']) && count($canEditOwn['item']) ) ) { // standard rules for the other users
-						$allown = array();
-						if (isset($canEditOwn['category'])) {
-							if (count($canEditOwn['category']))	$allown[] = ' (i.catid IN (' . implode(',', $canEditOwn['category']) . ') AND i.created_by = ' . $user->id . ')'; 
-						}
-						
-						if (isset($canEdit['category'])) {
-							if (count($canEdit['category']))	$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
-						}
-						if (isset($canEdit['item']))  {
-							if (count($canEdit['item']))			$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
-						}
-						if (count($allown) > 0) {
-							$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
-						}
-					} else {
-						$jAp= JFactory::getApplication();
-						$jAp->enqueueMessage( JText::_('FLEXI_CANNOT_VIEW_EDIT_ANY_ITEMS'), 'notice' );
-						$where[] = ' 0 ';
-					}
+			} else {
+				$aid = (int) $user->get('aid');
+				if (FLEXI_ACCESS) {
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gt ON  t.id = gt.axo AND gt.aco = "read" AND gt.axosection = "type"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gc ON  c.id = gc.axo AND gc.aco = "read" AND gc.axosection = "category"';
+					$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"';
+					$where[] = ' (gt.aro IN ( '.$user->gmid.' ) OR  t.access <= '. $aid . ')';
+					$where[] = ' (gc.aro IN ( '.$user->gmid.' ) OR  c.access <= '. $aid . ')';
+					$where[] = ' (gi.aro IN ( '.$user->gmid.' ) OR  i.access <= '. $aid . ')';
+				} else {
+					$where[] = '  t.access <= '.$aid;
+					$where[] = '  c.access <= '.$aid;
+					$where[] = '  i.access <= '.$aid;
 				}
 			}
 		}
+		$extra_joins .= $joinaccess;
 		
-		if ( $filter_type ) {
-			$where[] = 'i.type_id = ' . $filter_type;
+		
+		// ************************************************************
+		// IF items in an editable (main) category: default is disabled
+		// ************************************************************
+		
+		$allowedcats = false;
+		$allowedcats_own = false;
+		if (!$allitems && $editable_items) {
+			if (FLEXI_J16GE || FLEXI_ACCESS) {
+				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit'), $require_all=true, $check_published = false, false, $find_first = false);
+				$allowedcats_own = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.edit.own'), $require_all=true, $check_published = false, false, $find_first = false);
+			} else {
+				// In J1.5 without FLEXIaccess, the backend users can edit all files by default,
+				// since they belong to at least the managers user-group
+				// and ... listing only editable items is too slow in large websites, disable it
+				//if (FLEXI_ACCESS)  $this->faccess_items_editable_where($where);
+			}
+			if ($allowedcats) {
+				$where[] = '( i.catid IN (' . implode( ', ', $allowedcats ) . ') )';
+			}
+			if ($allowedcats_own) {
+				$where[] = '( i.catid IN (' . implode( ', ', $allowedcats_own ) . ') AND i.created_by='.$user->id.')';
+			}
 		}
-
+		
+		
+		// *******************************
+		// Limit using the category filter
+		// *******************************
+		
 		if ( $filter_cats ) {
-			// Limit sub-category items by main or by main/secondary item's cats , TODO: add if ... needed
-			//$cat_type = ($filter_maincat) ? 'i.catid' : 'rel.catid';
-			$cat_type = 'rel.catid';
+			// CURRENTLY in main or secondary category.  -TODO-  maybe add limiting by main category, if ... needed
+			$cat_type = 'rel.catid';  // $filter_maincat ? 'i.catid' : 'rel.catid';
 			
 			if ( $filter_subcats ) {
 				global $globalcats;
@@ -922,19 +927,10 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 		}
 		
-		if ( $filter_authors ) {
-			$where[] = 'i.created_by = ' . $filter_authors;
-			}
-
-		if ( $filter_id ) {
-			$where[] = 'i.id = ' . $filter_id;
-			}
-
-		if (FLEXI_FISH || FLEXI_J16GE) {
-			if ( $filter_lang ) {
-				$where[] = 'i.language = ' . $this->_db->Quote($filter_lang);
-			}
-		}
+		
+		// ************************************************************
+		// Limit using state or group of states (e.g. published states)
+		// ************************************************************
 		
 		if ( $filter_stategrp=='all' ) {
 			// no limitations
@@ -968,6 +964,23 @@ class FlexicontentModelItems extends JModelLegacy
 			}
 		}
 		
+		
+		// ***********************************************************************
+		// Limit using simpler filtering, (item) type, author, (item) id, language
+		// ***********************************************************************
+		
+		if ( $filter_type )    $where[] = 'i.type_id = ' . $filter_type;
+		if ( $filter_authors ) $where[] = 'i.created_by = ' . $filter_authors;
+		if ( $filter_id )      $where[] = 'i.id = ' . $filter_id;
+		if ( (FLEXI_FISH || FLEXI_J16GE) && $filter_lang ) {
+			$where[] = 'i.language = ' . $this->_db->Quote($filter_lang);
+		}
+		
+		
+		// *********************
+		// TEXT search filtering	
+		// *********************
+		
 		if ($search) {
 			$escaped_search = FLEXI_J16GE ? $this->_db->escape( $search, true ) : $this->_db->getEscaped( $search, true );
 		}
@@ -984,7 +997,13 @@ class FlexicontentModelItems extends JModelLegacy
 			$where[] = ' MATCH (ie.search_index) AGAINST ('.$this->_db->Quote( $escaped_search.'*', false ).' IN BOOLEAN MODE)';
 		}
 		
-		// date filtering
+		
+		// ***************************************************
+		// Date range filtering (creation and/or modification)
+		// ***************************************************
+		
+		$nullDate = $this->_db->getNullDate();
+		
 		if ($date == 1) {
 			if ($startdate && !$enddate) {  // from only
 				$where[] = ' i.created >= ' . $this->_db->Quote($startdate);
@@ -1008,9 +1027,13 @@ class FlexicontentModelItems extends JModelLegacy
 				$where[] = '(( i.modified >= ' . $this->_db->Quote($startdate) . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created >= ' . $this->_db->Quote($startdate) . ')) AND ( i.modified <= ' . $this->_db->Quote($enddate) . ' OR ( i.modified = ' . $this->_db->Quote($nullDate) . ' AND i.created <= ' . $this->_db->Quote($enddate) . ')))';
 			}
 		}
-
+		
+		
+		// *************************************************
+		// Finally create the AND clause of the WHERE clause
+		// *************************************************
+		
 		$where 		= ( count( $where ) ? ' WHERE ' . implode( ' AND ', $where ) : '' );
-
 		return $where;
 	}
 
@@ -1236,7 +1259,7 @@ class FlexicontentModelItems extends JModelLegacy
 				
 				foreach($fields as $field)
 				{
-					if (!empty($field->value)) {
+					if (strlen($field->value)) {
 						$query 	= 'INSERT INTO #__flexicontent_fields_item_relations (`field_id`, `item_id`, `valueorder`, `value`)'
 								.' VALUES(' . $field->field_id . ', ' . $copyid . ', ' . $field->valueorder . ', ' . $this->_db->Quote($field->value) . ')'
 								;
@@ -2563,5 +2586,47 @@ class FlexicontentModelItems extends JModelLegacy
 		$filedata= $this->_db->loadObjectList();
 		return $filedata;
 	}
+	
+	
+	// FLEXIaccess behaviour: GET ALL EDITABLE ITEMS and CATEGORIES, SLOW IN LARGE websites e.g. > 2000 items
+	function faccess_items_editable_where(& $where)
+	{
+		$canEdit    = FAccess::checkUserElementsAccess($user->gmid, 'edit');
+		$canEditOwn = FAccess::checkUserElementsAccess($user->gmid, 'editown');
+		if (!@$canEdit['content']) { // first exclude the users allowed to edit all items
+			if (@$canEditOwn['content']) { // custom rules for users allowed to edit all their own items
+				$allown = array();
+				$allown[] = ' i.created_by = ' . $user->id;
+				if (isset($canEdit['category'])) {
+					if (count($canEdit['category']))		$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
+				}
+				if (isset($canEdit['item'])) {
+					if (count($canEdit['item']))				$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
+				}
+				if (count($allown) > 0) {
+					$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
+				}
+			} else if ( ( isset($canEditOwn['category']) && count($canEditOwn['category']) ) || ( isset($canEditOwn['item']) && count($canEditOwn['item']) ) ) { // standard rules for the other users
+				$allown = array();
+				if (isset($canEditOwn['category'])) {
+					if (count($canEditOwn['category']))	$allown[] = ' (i.catid IN (' . implode(',', $canEditOwn['category']) . ') AND i.created_by = ' . $user->id . ')'; 
+				}
+				
+				if (isset($canEdit['category'])) {
+					if (count($canEdit['category']))	$allown[] = ' i.catid IN (' . implode(',', $canEdit['category']) . ')'; 
+				}
+				if (isset($canEdit['item']))  {
+					if (count($canEdit['item']))			$allown[] = ' i.id IN (' . implode(',', $canEdit['item']) . ')'; 
+				}
+				if (count($allown) > 0) {
+					$where[] = (count($allown) > 1) ? ' ('.implode(' OR', $allown).')' : $allown[0];
+				}
+			} else {
+				$jAp= JFactory::getApplication();
+				$jAp->enqueueMessage( JText::_('FLEXI_CANNOT_VIEW_EDIT_ANY_ITEMS'), 'notice' );
+				$where[] = ' 0 ';
+			}
+		}
+	}
+
 }
-?>

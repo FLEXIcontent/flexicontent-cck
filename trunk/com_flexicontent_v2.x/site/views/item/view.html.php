@@ -566,12 +566,12 @@ class FlexicontentViewItem  extends JViewLegacy
 		{
 			JRequest::setVar('typeid', (int)$menu->query['typeid']);  // This also forces zero if value not set
 		}
-		$typeid = JRequest::getVar('typeid', 0, '', 'int');
-		if ( !$typeid )
+		$new_typeid = JRequest::getVar('typeid', 0, '', 'int');
+		if ( !$new_typeid )
 		{
-			$types = $model->getTypeslist(false, true);
-			if ( $types && count($types)==1 ) $typeid = $types[0]->id;
-			JRequest::setVar('typeid', $typeid);
+			$types = $model->getTypeslist($type_ids_arr = false, $check_perms = true);
+			if ( $types && count($types)==1 ) $new_typeid = $types[0]->id;
+			JRequest::setVar('typeid', $new_typeid);
 			$canCreateType = true;
 		}
 		
@@ -739,8 +739,8 @@ class FlexicontentViewItem  extends JViewLegacy
 			
 			// Check if Content Type can be created by current user
 			if ( empty($canCreateType) ) {
-				if ($typeid) {
-					$canCreateType = $model->canCreateType( array($typeid) );  // Can create given Content Type
+				if ($new_typeid) {
+					$canCreateType = $model->canCreateType( array($new_typeid) );  // Can create given Content Type
 				} else {
 					$canCreateType = $model->canCreateType( );  // Can create at least one Content Type
 				}
@@ -753,7 +753,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			if ($not_authorised && !$allowunauthorize)
 			{
 				if ( !$canCreateType ) {
-					$type_name = isset($types[$typeid]) ? '"'.JText::_($types[$typeid]->name).'"' : JText::_('FLEXI_ANY');
+					$type_name = isset($types[$new_typeid]) ? '"'.JText::_($types[$new_typeid]->name).'"' : JText::_('FLEXI_ANY');
 					$msg = JText::sprintf( 'FLEXI_NO_ACCESS_CREATE_CONTENT_OF_TYPE', $type_name );
 				} else {
 					$msg = JText::_( 'FLEXI_ALERTNOTAUTH_CREATE' );
@@ -796,7 +796,7 @@ class FlexicontentViewItem  extends JViewLegacy
 
 		// Merge item parameters, or type/menu parameters for new item
 		if ( $isnew ) {
-			if ( $typeid ) $params->merge($tparams);       // Apply type configuration if it type is set
+			if ( $new_typeid ) $params->merge($tparams);       // Apply type configuration if it type is set
 			if ( $menu )   $params->merge($menu_params);  // Apply menu configuration if it menu is set, to override type configuration
 		} else {
 			$params = $item->parameters;
@@ -900,7 +900,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$submitConf = $this->_createSubmitConf($item, $perms, $params);
 		
 		// Create placement configuration for CORE properties
-		$placementConf = $this->_createPlacementConf($fields, $params);
+		$placementConf = $this->_createPlacementConf($fields, $params, $item);
 		
 		// Item language related vars
 		if (FLEXI_FISH || FLEXI_J16GE) {
@@ -1599,7 +1599,7 @@ class FlexicontentViewItem  extends JViewLegacy
 	}
 
 
-	function _createPlacementConf(&$fields, &$params) {
+	function _createPlacementConf(&$fields, &$params, &$item) {
 		// 1. Find core placer fields (of type 'coreprops')
 		$core_placers = array();
 		foreach($fields as $field) {
@@ -1611,15 +1611,23 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		
 		// 2. Field name arrays:  (a) placeable and  (b) placeable via placer  (c) above tabs fields
-		$via_core_field  = array('title'=>1, 'type_id'=>1, 'state'=>1,
-			'cats'=>1, 'tags'=>1, 'maintext'=>1,
-			'created'=>1, 'created_by'=>1, 'modified'=>1, 'modified_by'=>1
+		$via_core_field  = array(
+			'title'=>1, 'type_id'=>1, 'state'=>1, 'cats'=>1, 'tags'=>1, 'maintext'=>1
 		);
-		$via_core_prop = array('alias'=>1, 'disable_comments'=>1, 'notify_subscribers'=>1,
-			'language'=>1, 'perms'=>1,
-			'timezone_info'=>1, 'created_by_alias'=>1, 'publish_up'=>1, 'publish_down'=>1, 'access'=>1,
+		$via_core_field = array_merge($via_core_field, FLEXI_J16GE ?
+			array('created'=>1, 'created_by'=>1, 'modified'=>1, 'modified_by'=>1) :
+			array()
+		);
+		
+		$via_core_prop = array(
+			'alias'=>1, 'disable_comments'=>1, 'notify_subscribers'=>1, 'language'=>1, 'perms'=>1,
 			'metadata'=>1, 'seoconf'=>1, 'display_params'=>1, 'layout_selection'=>1, 'layout_params'=>1
 		);
+		$via_core_prop = array_merge($via_core_prop, FLEXI_J16GE ?
+			array('timezone_info'=>1, 'created_by_alias'=>1, 'publish_up'=>1, 'publish_down'=>1, 'access'=>1) :
+			array('timezone_info'=>1, 'publication_details'=>1)
+		);
+		
 		$placeable_fields = array_merge($via_core_field, $via_core_prop);
 		
 		
@@ -1629,7 +1637,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$tab_fields['tab01'] = $params->get('form_tab01_fields',  'categories, tags, language, perms');
 		$tab_fields['tab02'] = $params->get('form_tab02_fields',  'maintext');
 		$tab_fields['tab03'] = $params->get('form_tab03_fields',  'fields_manager');
-		$tab_fields['tab04'] = $params->get('form_tab04_fields',  (!FLEXI_J16GE ? 'timezone_info, publishing_details' : 'timezone_info, created, createdby, created_by_alias, publish_up, publish_down, access'));
+		$tab_fields['tab04'] = $params->get('form_tab04_fields',  (!FLEXI_J16GE ? 'timezone_info, publication_details' : 'timezone_info, created, createdby, created_by_alias, publish_up, publish_down, access'));
 		$tab_fields['tab05'] = $params->get('form_tab05_fields',  'metadata, seoconf');
 		$tab_fields['tab06'] = $params->get('form_tab06_fields',  'display_params');
 		$tab_fields['tab07'] = $params->get('form_tab07_fields',  'layout_selection, layout_params');
@@ -1639,7 +1647,9 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// fix aliases
 		foreach($tab_fields as $tab_name => $field_list) {
-			$tab_fields[$tab_name] = str_replace('created_by', 'createdby', $field_list);
+			$field_list = str_replace('created_by', 'createdby', $field_list);
+			$field_list = str_replace('createdby_alias', 'created_by_alias', $field_list);
+			$tab_fields[$tab_name] = $field_list;
 		}
 		//echo "<pre>"; print_r($tab_fields); echo "</pre>";
 		
@@ -1663,12 +1673,28 @@ class FlexicontentViewItem  extends JViewLegacy
 		}
 		
 		// get TAB titles
-		$_tmp = $params->get('form_tab_titles', '1:FLEXI_BASIC, 2:FLEXI_DESCRIPTION, 3:FLEXI_CONTENT_TYPE, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
+		$_tmp = $params->get('form_tab_titles', '1:FLEXI_BASIC, 2:FLEXI_DESCRIPTION, 3:__TYPE_NAME__, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE');
+		
+		// Create title of the custom fields default TAB (field manager TAB)
+		if ($item->type_id) {
+			$types_arr = flexicontent_html::getTypesList();
+			$typename = @ $types_arr[$item->type_id]['name'];
+			$typename = $typename ? JText::_($typename) : JText::_('FLEXI_CONTENT_TYPE');
+			$typename = $typename .' ('. JText::_('FLEXI_DETAILS') .')';
+		} else {
+			$typename = JText::_('FLEXI_TYPE_NOT_DEFINED');
+		}
+		
+		
+		// Split title of default tabs and language filter the titles
 		$_tmp = preg_split("/[\s]*,[\s]*/", $_tmp);
 		$tab_titles = array();
 		foreach($_tmp as $_data) {
 			list($tab_no, $tab_title) = preg_split("/[\s]*:[\s]*/", $_data);
-			$tab_titles['tab0'.$tab_no] = JText::_($tab_title);
+			if ($tab_title == '__TYPE_NAME__')
+				$tab_titles['tab0'.$tab_no] = $typename;
+			else
+				$tab_titles['tab0'.$tab_no] = JText::_($tab_title);
 		}
 		
 		
@@ -1689,6 +1715,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$placementConf['placeable_fields'] = $placeable_fields;
 		$placementConf['tab_fields']       = $tab_fields;
 		$placementConf['tab_titles']       = $tab_titles;
+		$placementConf['all_tab_fields']   = $all_tab_fields;
 		$placementConf['coreprop_missing'] = $coreprop_missing;
 		
 		return $placementConf;

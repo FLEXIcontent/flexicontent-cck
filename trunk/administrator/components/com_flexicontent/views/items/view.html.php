@@ -65,21 +65,29 @@ class FlexicontentViewItems extends JViewLegacy {
 		JHTML::_('behavior.calendar');
 
 		// Get filters
+		$count_filters = 0;
+		
 		$filter_cats       = $app->getUserStateFromRequest( $option.'.items.filter_cats',				'filter_cats',			'',		'int' );
 		$filter_subcats    = $app->getUserStateFromRequest( $option.'.items.filter_subcats',		'filter_subcats',		1,		'int' );
 		$filter_catsinstate = $app->getUserStateFromRequest( $option.'.items.filter_catsinstate', 'filter_catsinstate', 1,		'int' );
+		if ($filter_cats) $count_filters++;
 		
 		$filter_order_type = $app->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type',	1,		'int' );
+		if ($filter_order_type!=1) $count_filters++;
+		
 		$filter_order      = $app->getUserStateFromRequest( $option.'.items.filter_order',			'filter_order',				'',		'cmd' );
 		$filter_order_Dir  = $app->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',		'',		'word' );
 		
 		$filter_type			= $app->getUserStateFromRequest( $option.'.items.filter_type',				'filter_type',			0,		'int' );
 		$filter_authors		= $app->getUserStateFromRequest( $option.'.items.filter_authors',			'filter_authors',		0,		'int' );
 		$filter_state 		= $app->getUserStateFromRequest( $option.'.items.filter_state',				'filter_state',			'',		'word' );
+		if ($filter_type) $count_filters++; if ($filter_authors) $count_filters++; if ($filter_state) $count_filters++;
+		
 		$filter_stategrp	= $app->getUserStateFromRequest( $option.'.items.filter_stategrp',		'filter_stategrp',	'',		'word' );
 		
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$filter_lang	 = $app->getUserStateFromRequest( $option.'.items.filter_lang', 		'filter_lang', 		'', 			'string' );
+			if ($filter_lang) $count_filters++;
 		}
 		
 		$scope	 			= $app->getUserStateFromRequest( $option.'.items.scope', 			'scope', 			1, 			'int' );
@@ -87,13 +95,18 @@ class FlexicontentViewItems extends JViewLegacy {
 		
 		$startdate	 	= $app->getUserStateFromRequest( $option.'.items.startdate', 	'startdate',	'',			'cmd' );
 		if ($startdate == JText::_('FLEXI_FROM')) { $startdate	= $app->setUserState( $option.'.items.startdate', '' ); }
+		if ($startdate) $count_filters++;
 		
 		$enddate	 		= $app->getUserStateFromRequest( $option.'.items.enddate', 		'enddate', 		'', 		'cmd' );
 		if ($enddate == JText::_('FLEXI_TO')) { $enddate	= $app->setUserState( $option.'.items.enddate', '' ); }
+		if ($enddate) $count_filters++;
 		
 		$filter_id 		= $app->getUserStateFromRequest( $option.'.items.filter_id', 	'filter_id', 		'', 			'int' );
+		if ($filter_id) $count_filters++;
+		
 		$search 			= $app->getUserStateFromRequest( $option.'.items.search', 		'search', 			'', 			'string' );
 		$search 			= FLEXI_J16GE ? $db->escape( trim(JString::strtolower( $search ) ) ) : $db->getEscaped( trim(JString::strtolower( $search ) ) );
+		if ($search) $count_filters++;
 		
 		
 		// Add custom css and js to document
@@ -532,6 +545,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		}
 		
 		//assign data to template
+		$this->assignRef('count_filters', $count_filters);
 		$this->assignRef('db'				, $db);
 		$this->assignRef('lists'		, $lists);
 		$this->assignRef('rows'			, $rows);

@@ -7,6 +7,7 @@
 		<field name="" type="separator" default="FLEXI_GENERAL_CONF" label="" level="level1" menu="hide" />
 			
 			<field name="flexi_cat_extension" type="hidden" size="1" default="com_content" label="Category Type" description="Please save configuration once"  menu="hide" />
+			<field name="fcdata_serialized" type="hidden" size="1" default="" label=".." description="..."  menu="hide" />
 			
 			<field name="support_url" type="text" size="50" default="" label="FLEXI_HELP" description="FLEXI_HELP_DESC" menu="hide" />
 			<field name="add_tooltips" type="radio" default="1" label="FLEXI_LOAD_TOOLTIPS" description="FLEXI_LOAD_TOOLTIPS_DESC" menu="hide">
@@ -754,7 +755,12 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" menu="hide" />
+			<field name="filters_order" type="radio" default="0" label="FLEXI_FILTERS_ORDER" description="FLEXI_FILTERS_ORDER_DESC" menu="hide" >
+				<option value="0">FLEXI_ORDER_FMAN</option>
+				<option value="1">FLEXI_ORDER_CUSTOM_BELOW</option>
+			</field>
+			<field name="filters" type="filters" multiple="false" default="" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" menu="hide" />
+			
 			<field name="show_filter_labels" type="radio" default="1" label="FLEXI_FILTER_LABELS" description="FLEXI_FILTER_LABELS_DESC" menu="hide" >
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>
@@ -1042,8 +1048,10 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FORM_CORE_PROPS_PLACEMENT" label="" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_NOT_PLACED_FIELDS_AND_DISABLING" label="" level="level3" menu="hide" />
+			
 			<field name="form_tab_titles" type="textarea" rows="3" cols="60" label="FLEXI_FORM_TAB_TITLES" description="FLEXI_FORM_TAB_TITLES_DESC" menu="hide"
-				default="1:FLEXI_BASIC, 2:FLEXI_DESCRIPTION, 3:FLEXI_CONTENT_TYPE, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE" />
+				default="1:FLEXI_BASIC, 2:FLEXI_DESCRIPTION, 3:__TYPE_NAME__, 4:FLEXI_PUBLISHING, 5:FLEXI_META_SEO, 6:FLEXI_DISPLAYING, 7:FLEXI_TEMPLATE" />
 			
 			<field name="" type="separator" default="FLEXI_PLACEMENT_INSIDE_DEFAULT_TABS" label="" level="level2" menu="hide" />
 			
@@ -1086,17 +1094,26 @@
 		<field name="" type="separator" default="FLEXI_ITEMS_MANAGER_CONF" label="" level="level1" menu="hide" />
 			
 		<field name="" type="separator" default="FLEXI_PARAMETERS_BEHAVIOR" label="" level="level2" menu="hide" />
-			<field name="copytask_allow_uneditable" type="list" default="1" label="FLEXI_COPYTASK_ALLOW_UNEDITABLE" description="FLEXI_COPYTASK_ALLOW_UNEDITABLE_DESC" menu="hide">
+			<field name="iman_viewable_items" type="radio" default="1" label="FLEXI_IMAN_LIST_VIEWABLE" description="FLEXI_IMAN_LIST_VIEWABLE_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="items_session_editable" type="list" default="0" label="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF" description="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF_DESC" menu="hide">
+			<field name="iman_editable_items" type="radio" default="0" label="FLEXI_IMAN_LIST_IN_EDITABLE_CATEGORIES" description="FLEXI_IMAN_LIST_IN_EDITABLE_CATEGORIES_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="autoflogin" type="list" default="1" label="FLEXI_AUTOLOGIN" description="FLEXI_AUTOLOGIN_DESC" menu="hide">
+			
+			<field name="copytask_allow_uneditable" type="radio" default="1" label="FLEXI_COPYTASK_ALLOW_UNEDITABLE" description="FLEXI_COPYTASK_ALLOW_UNEDITABLE_DESC" menu="hide">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="items_session_editable" type="radio" default="0" label="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF" description="FLEXI_ITEMS_EDITABLE_TILL_LOGOFF_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="autoflogin" type="radio" default="1" label="FLEXI_AUTOLOGIN" description="FLEXI_AUTOLOGIN_DESC" menu="hide">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">yes, (this is currently ignored)</option>
 			</field>
 			
 		<field name="" type="separator" default="FLEXI_PARAMETERS_APPEARANCE" label="" level="level2" menu="hide" />

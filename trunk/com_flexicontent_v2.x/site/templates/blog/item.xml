@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-	<author>Emmanuel Danan</author>
+	<author>Emmanuel Danan, George Papadakis</author>
 	<website>www.flexicontent.org</website>
 	<email>emmanuel@vistamedia.fr</email>
-	<license>GPLv2</license>
-	<version>1.1</version>
-	<release>25 november 2009</release>
+	<license>GPLv3</license>
+	<version>1.2</version>
+	<release>20 May 2014</release>
 	<description>HTML5 layout</description>
 	<fields name="attribs">
 		<fieldset name="attribs">
-		<field name="title_cut_text" type="text" size="3" default="200" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
-		<field name="show_author" type="radio" default="1" label="FLEXI_SHOWAUTHOR" description="FLEXI_SHOWAUTHOR_DESC" class="btn-group btn-group-yesno">
+		<field name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
+		<field name="show_author" type="radio" default="" label="FLEXI_SHOWAUTHOR" description="FLEXI_SHOWAUTHOR_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_create_date" type="radio" default="1" label="FLEXI_SHOWCREATED" description="FLEXI_SHOWCREATED_DESC" class="btn-group btn-group-yesno">
+		<field name="show_create_date" type="radio" default="" label="FLEXI_SHOWCREATED" description="FLEXI_SHOWCREATED_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_modifier" type="radio" default="1" label="FLEXI_SHOWMODIFIEDBY" description="FLEXI_SHOWMODIFIEDBY_DESC" class="btn-group btn-group-yesno">
+		<field name="show_modifier" type="radio" default="" label="FLEXI_SHOWMODIFIEDBY" description="FLEXI_SHOWMODIFIEDBY_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_modify_date" type="radio" default="1" label="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC" class="btn-group btn-group-yesno">
+		<field name="show_modify_date" type="radio" default="" label="FLEXI_SHOWMODIFIED" description="FLEXI_SHOWMODIFIED_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_category" type="radio" default="1" label="FLEXI_SHOWCATS" description="FLEXI_SHOWCATS_DESC" class="btn-group btn-group-yesno">
+		<field name="show_category" type="radio" default="" label="FLEXI_SHOWCATS" description="FLEXI_SHOWCATS_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_vote" type="radio" default="1" label="FLEXI_SHOWRATING" description="FLEXI_SHOWRATING_DESC" class="btn-group btn-group-yesno">
+		<field name="show_vote" type="radio" default="" label="FLEXI_SHOWRATING" description="FLEXI_SHOWRATING_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_favs" type="radio" default="1" label="FLEXI_SHOWFAVS" description="FLEXI_SHOWFAVS_DESC" class="btn-group btn-group-yesno">
+		<field name="show_favs" type="radio" default="" label="FLEXI_SHOWFAVS" description="FLEXI_SHOWFAVS_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_tags" type="radio" default="1" label="FLEXI_SHOWTAGS" description="FLEXI_SHOWTAGS_DESC" class="btn-group btn-group-yesno">
+		<field name="show_tags" type="radio" default="" label="FLEXI_SHOWTAGS" description="FLEXI_SHOWTAGS_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
@@ -53,7 +53,7 @@
 		
 		<field name="Customblocks" type="separator" hr="false" default="FLEXI_BLOCKS_CUSTOM_FIELDS" level="level2" menu="hide" />
 		
-		<field name="columnmode" type="radio" default="2" label="FLEXI_COLUMN_MODE" description="FLEXI_COLUMN_MODE_DESC" class="btn-group btn-group-yesno">
+		<field name="columnmode" type="radio" default="" label="FLEXI_COLUMN_MODE" description="FLEXI_COLUMN_MODE_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_COLUMN_MODE_FORCE_1_COLS</option>
 			<option value="1">FLEXI_COLUMN_MODE_FORCE_2_COLS</option>
@@ -61,7 +61,7 @@
 		</field>
 		
 		<field name="templatehtmlmode" type="separator" hr="false" default="FLEXI_TEMPLATE_HTML_MODE" level="level2" menu="hide" />
-		<field name="htmlmode" type="radio" default="0" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
+		<field name="htmlmode" type="radio" default="" label="FLEXI_HTML_MODE" description="FLEXI_HTML_MODE_DESC" filter="int" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_XHTML</option>
 			<option value="1">FLEXI_HTML5</option>

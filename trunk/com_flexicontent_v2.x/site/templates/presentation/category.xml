@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
-	<author>Emmanuel Danan</author>
+	<author>Emmanuel Danan, George Papadakis</author>
 	<website>www.flexicontent.org</website>
 	<email>emmanuel@vistamedia.fr</email>
-	<license>GPLv2</license>
-	<version>1.0</version>
-	<release>05 december 2011</release>
+	<license>GPLv3</license>
+	<version>1.2</version>
+	<release>20 May 2014</release>
 	<description>This HTML5 layout presents category items in a modular layout, with optional tabbed positions, suitable for presenting items as list.</description>
 	<fields name="attribs">
 		<fieldset name="attribs" addfieldpath="/administrator/components/com_flexicontent/elements">

@@ -119,6 +119,7 @@ class plgSystemFlexisystem extends JPlugin
 		$layout = JRequest::getVar('layout', '');
 		$tmpl   = JRequest::getVar('tmpl', '');
 		$task   = JRequest::getVar('task', '');
+		$session= JFactory::getSession();
 		
 		// Count an item or category hit if appropriate
 		if ( $app->isSite() )$this->countHit();
@@ -134,11 +135,20 @@ class plgSystemFlexisystem extends JPlugin
 		}
 		//if( $option=='com_content' && $view=='articles' && $layout=='modal' && $tmpl=='component' ) return;
 
-		$this->trackSaveConf();
+		// Clear categories cache if previous page has saved FC component configuration
+		if ( $session->get('clear_cats_cache', 0, 'flexicontent') )
+		{
+			$session->set('clear_cats_cache', 0, 'flexicontent');
+			$catscache = JFactory::getCache('com_flexicontent_cats');
+			$catscache->clean();
+			//JFactory::getApplication()->enqueueMessage( "cleaned cache group 'com_flexicontent_cats'", 'message');
+		}
+		
 		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
 			global $globalcats;
-			//$start_microtime = microtime(true);
-			if (FLEXI_CACHE) {
+			$start_microtime = microtime(true);
+			if (FLEXI_CACHE) 
+			{
 				// add the category tree to categories cache
 				$catscache = JFactory::getCache('com_flexicontent_cats');
 				$catscache->setCaching(1); 		//force cache
@@ -147,10 +157,12 @@ class plgSystemFlexisystem extends JPlugin
 			} else {
 				$globalcats = $this->getCategoriesTree();
 			}
-			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			//$msg = sprintf('<br/>-- Create globalcats array: %.2f s', $time_passed/1000000);
-			//echo $msg;
+			$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			//JFactory::getApplication()->enqueueMessage( "recalculated categories data, execution time: ". sprintf('%.2f s', $time_passed/1000000), 'message');
 		}
+		
+		// Detect saving configuration, e.g. set a flag to indicate cleaning categories cache on next page load
+		$this->trackSaveConf();
 		
 		if ( $app->isAdmin() )
 			$this->redirectAdminComContent();
@@ -551,25 +563,41 @@ class plgSystemFlexisystem extends JPlugin
    */
 	function trackSaveConf() 
 	{
-		$option 	= JRequest::getVar('option');
-		$component 	= JRequest::getVar('component');
+		$option   = JRequest::getVar('option');
+		$component= JRequest::getVar('component');
 		$task 		= JRequest::getVar('task');
+		$session  = JFactory::getSession();
 		
-		if ($option == 'com_config' && $component == 'com_flexicontent') {
-			if ($task == 'apply' || $task == 'component.apply' || $task == 'save' || $task == 'component.save') {
-				$catscache = JFactory::getCache('com_flexicontent_cats');
-				$catscache->clean();
-				if (!FLEXI_J16GE) {
-					$total_vars = count($_POST);
-				} else {
-					$total_vars = count($_POST['jform']);
-					if ( !empty($_POST['jform']['rules']) ) {
-						foreach($_POST['jform']['rules'] as $grp)
-						$total_vars += count($grp);
-					}
+		if ( $option == 'com_config' && $component == 'com_flexicontent' &&
+			($task == 'apply' || $task == 'save' || $task == 'component.apply' || $task == 'component.save' || $task == 'config.save.component.apply' || $task == 'config.save.component.save') )
+		{
+			// Indicate that next page load will clean categories cache so that cache configuration will be recalculated
+			// (we will not do this at this step, because new component configuration has not been saved yet)
+			$session->set('clear_cats_cache', 1, 'flexicontent');
+			
+			// Workaround for max_input_vars (PHP 5.3.9+), in the case that form sender is com_config
+			// J1.6+ adds ACL which is 50+ variables (due to FLEXIcontent's access.xml) per user-group
+			/*if (FLEXI_J16GE) {
+				$data = $this->parse_json_decode( $_POST['jform']['fcdata_serialized'] );
+				//echo "<pre>".$_POST['jform']['fcdata_serialized'];
+				//print_r($_POST);
+				//print_r($data);
+				//exit;
+				foreach($data as $n => $v) {
+					JRequest::setVar($n, $v, 'POST');
 				}
-				JFactory::getApplication()->enqueueMessage( "cleaned cache 'com_flexicontent_cats', saved # parameters: ".$total_vars, 'message');
 			}
+			
+			if (!FLEXI_J16GE) {
+				$total_vars = count($_POST);
+			} else {
+				$total_vars = count($_POST['jform']);
+				if ( !empty($_POST['jform']['rules']) ) {
+					foreach($_POST['jform']['rules'] as $grp)
+					$total_vars += count($grp);
+				}
+			}*/
+			//JFactory::getApplication()->enqueueMessage( "FLEXIcontent component parameters saved, max_input_vars:".ini_get('max_input_vars')." total parameters: ".$total_vars, 'message');
 		}
 	}
 	
@@ -1077,6 +1105,60 @@ class plgSystemFlexisystem extends JPlugin
 
 		// Last visit within time limit, do not count new hit
 		return 0;
+	}
+	
+  
+  /*
+   * Function to restore serialized form data
+   */
+	function parse_json_decode($string) {
+		$result = array();
+		$pairs = json_decode($string, true);
+		//echo "<pre>"; print_r($pairs); exit;
+		
+		// find the pairs "name=value"
+		//$pairs = explode('&', $string);
+		$toEvaluate = ''; // we will do a big eval() at the end not pretty but simplier
+		foreach ($pairs as $pair) {
+			//list($name, $value) = explode('=', $pair, 2);
+			//$name = urldecode($name);
+			//$value = urldecode($value);
+			$name = $pair['name'];
+			$value = $pair['value'];
+			
+			// escape the name and value strings
+			$name = str_replace('\\', '\\\\', $name);
+			$value = str_replace('\\', '\\\\', $value);
+			
+			// Always quote the value even if it is numeric, the parameters in Joomla are treated as strings
+			//if (!is_numeric($value)) {
+				$value = '"' . str_replace('"', '\"', $value) . '"';
+			//}
+			
+			// CASE: name is an array,  some'var[index1][inde'x2]=value    -->   ][\'some\\\'var\'][\'index1\'][\'index2\']=\'value\';
+			if (strpos($name, '[') !== false)
+			{
+				// we prepend an the 'result' array so replace first [ with ][
+				$name = preg_replace('|\[|', '][', $name, 1);
+				// Add double slashes to all multi-level index names of the array to handles slashes and Quote them thus treating indexes as strings
+				$name = str_replace(array('\'', '[', ']'), array('\\\'', '[\'', '\']'), $name);
+				// WHEN no index name, remove the empty string being used as index, thus an integer auto-incremented index will be used (e.g. checkbox values)
+				$name = str_replace("['']", '[]', $name);
+				// Final create the assignment to be evaluated:  $result['na']['me'] = 'value';
+				$toEvaluate .= '$result[\'' . $name . ' = ' . $value . "; \n"; ;
+			}
+			
+			// CASE name is not an array, a single variable assignment
+			else {
+				// Add double slashes to index name
+				$name = str_replace('\'', '\\\'', $name);
+				// Finally quote the name, thus treating index as string and create assignment to be evaluated: $result['name'] = 'value';
+				$toEvaluate .= '$result[\'' . $name . '\'] = ' . $value . "; \n";
+			}
+		}
+		eval($toEvaluate);
+		//echo "<pre>". $toEvaluate; exit;
+		return $result;
 	}
 	
 	

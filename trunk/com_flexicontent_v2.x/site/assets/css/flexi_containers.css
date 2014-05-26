@@ -38,6 +38,7 @@
 	max-width: 62%;
 }
 
+.fc-mssg-inline.fc-nobgimage,
 .fc-mssg.fc-nobgimage {
 	background-image: none !important;
 	padding-left: 12px !important;

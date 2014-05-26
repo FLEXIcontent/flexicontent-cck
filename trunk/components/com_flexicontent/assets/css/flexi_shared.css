@@ -419,6 +419,13 @@ div .positions_readonly {
 	float: left;
 	cursor: move;
 }
+.fields.delfield {
+	background: url("../images/publish_r.png") no-repeat scroll 100% 50% #F9F9F9 !important;
+	padding: 4px 0px 3px 6px;
+	margin: 2px;
+	float: left;
+	cursor: move;
+}
 .fields.user {
 	background: url(../images/textfield.png) #f9f9f9 no-repeat  3px 50%;
 }
@@ -430,7 +437,7 @@ div .positions_readonly {
 }
 fieldset.tmplprop legend {
 	background: url(../images/toggle_blue_up.png) no-repeat 98% 50%;
-	padding-right: 22px;
+	padding-right: 22px !important;
 	line-height: 18px;
 	cursor: pointer;
 }
@@ -1222,4 +1229,4 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 /* Common field CSS for forms */
 #flexicontent .admintable .fcfield_textval { height:22px !important; margin-top:0px !important; margin-bottom: 0px!important;  }
 #flexicontent .admintable .fcfield-button { padding:3px 6px !important; }
-#flexicontent .ui-sortable > li { background: white; }
+#flexicontent .ui-sortable > li { background-color: white; }

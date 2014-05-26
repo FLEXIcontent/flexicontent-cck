@@ -117,12 +117,15 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Use HTTP request (if user is allowed to select them)
 		if ( $canseltypes ) $contenttypes = JRequest::getVar('contenttypes', array());
 		
-		// Fallback to configuration if user did not set them in HTTP request (or if user is not allowed to use them)
-		if( !$canseltypes || empty($contenttypes) )  $contenttypes = $params->get('contenttypes', array());
-		
 		// Sanitize them
 		$contenttypes = !is_array($contenttypes)  ?  array($contenttypes)  :  $contenttypes;
 		$contenttypes = array_unique(array_map('intval', $contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
+		if ( !empty($contenttypes) ) {
+			foreach($contenttypes as $i => $v) if (!strlen($contenttypes[$i])) unset($contenttypes[$i]);
+		}
+		
+		// Fallback to configuration if user did not set them in HTTP request (or if user is not allowed to use them)
+		if( !$canseltypes || empty($contenttypes) )  $contenttypes = $params->get('contenttypes', array());
 		
 		// Create a comma list of them
 		$contenttypes_list = count($contenttypes) ? "'".implode("','", $contenttypes)."'"  :  "";
@@ -156,7 +159,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			if ( !strlen($txtflds[0]) ) unset($txtflds[0]);
 			
 			// Create a comma list of them
-			$txtflds_list = "'".implode("','", $txtflds)."'";
+			$txtflds_list = count($txtflds) ? "'".implode("','", $txtflds)."'" : '';
 			
 			// Retrieve field properties/parameters, verifying the support to be used as Text Search Fields
 			// This will return all supported fields if field limiting list is empty
@@ -179,7 +182,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		if ( !strlen($filtflds[0]) ) unset($filtflds[0]);
 		
 		// Create a comma list of them
-		$filtflds_list = "'".implode("','", $filtflds)."'";
+		$filtflds_list = count($filtflds) ? "'".implode("','", $filtflds)."'" : '';
 		
 		// Retrieve field properties/parameters, verifying the support to be used as Filter Fields
 		// This will return all supported fields if field limiting list is empty
@@ -557,7 +560,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// Construct query's SQL
 		$lta = FLEXI_J16GE ? 'i': 'ie';
-		$query 	= 'SELECT i.id, i.title AS title, '.(FLEXI_J16GE ? '' : 'i.sectionid, ').'i.created, i.id AS fc_item_id, i.access, ie.type_id, '.$lta.'language'
+		$query 	= 'SELECT i.id, i.title AS title, '.(FLEXI_J16GE ? '' : 'i.sectionid, ').'i.created, i.id AS fc_item_id, i.access, ie.type_id, '.$lta.'.language'
 			. $orderby_col
 			. ( !$txtmode ?
 				', ie.search_index AS text' :
