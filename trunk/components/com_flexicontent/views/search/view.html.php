@@ -263,15 +263,17 @@ class FLEXIcontentViewSearch extends JViewLegacy
 			$filters_tmp = FlexicontentFields::getSearchFields($key='name', $indexer='advanced', $filtflds_list, $in_contenttypes, $load_params=true, 0, 'filter');
 			
 			// Use custom order
+			$filters = array();
 			if ($canseltypes && $filters_per_type) {
-				$filters = array();
 				foreach( $filtflds as $field_name) {
 					if ( empty($filters_tmp[$field_name]) ) continue;
 					$filter_id = $filters_tmp[$field_name]->id;
 					$filters[$filter_id] = $filters_tmp[$field_name];
 				}
 			} else {
-				$filters = $filters_tmp;
+				foreach( $filters_tmp as $filter) {
+					$filters[$filter->id] = $filter;  // index by filter_id in this case too (for consistency, although we do not use the array index ?)
+				}
 			}
 			unset($filters_tmp);
 		}

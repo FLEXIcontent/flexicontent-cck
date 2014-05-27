@@ -392,7 +392,10 @@ window.addEvent('domready', function() {
 					<label class="label">
 						<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
 					</label>
-					<?php echo str_replace('id="limit"', 'id="limit_top"', $this->pagination->getLimitBox()); ?>
+					<?php
+					$pagination_footer = $this->pagination->getListFooter();
+					if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
+					?>
 				</div>
 				
 				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
@@ -474,7 +477,7 @@ window.addEvent('domready', function() {
 	
 	<div id="mainChooseColBox" class="fc_nice_box" style="margin-top:6px; display:none;"></div>
 
-	<div id="stateGroupsBox" class="fc_nice_box" style="display:none;">
+	<div id="stateGroupsBox" class="fc_nice_box" <?php if (!$this->filter_stategrp && $this->filter_catsinstate==1) echo 'style="display:none;"'; ?> >
 		
 		<div style="float:left; margin-right:12px;">
 		<?php
@@ -679,7 +682,7 @@ window.addEvent('domready', function() {
 	<tfoot>
 		<tr>
 			<td colspan="<?php echo $items_list_cols; ?>">
-				<?php echo $this->pagination->getListFooter(); ?>
+				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>
 		

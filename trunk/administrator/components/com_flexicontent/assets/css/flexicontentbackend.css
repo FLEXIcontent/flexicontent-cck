@@ -75,12 +75,10 @@ div.current dd .pane-sliders .panel {
 #filterline .fc-mssg-inline {
 	margin-bottom: 12px !important;
 }
-
 #filterline .controls {
 	display: inline-block;
 	margin: 3px 0 7px;
 }
-
 #filterline input[type="text"] {
 	padding: 2px 2px 3px !important;
 }
@@ -91,5 +89,9 @@ div.current dd .pane-sliders .panel {
 #filterline .input-append input {
     margin: 0 !important;
     padding: 4px !important;
+}
+#stateGroupsBox input:checked + label {
+	color: #8B0000;
+	font-weight: bold;
 }
 

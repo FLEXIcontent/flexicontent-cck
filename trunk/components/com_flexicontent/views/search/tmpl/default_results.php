@@ -44,8 +44,9 @@ if ($fcr_use_image && $fcr_image) {
 $use_infoflds = (int)$this->params->get('use_infoflds', 1);
 $infoflds = $this->params->get('infoflds');
 $infoflds = preg_replace("/[\"'\\\]/u", "", $infoflds);
-$infoflds = array_unique(preg_split("/\s*,\s*/u", $infoflds));
+$infoflds = preg_split("/\s*,\s*/u", $infoflds);
 if ( !strlen($infoflds[0]) ) unset($infoflds[0]);
+$infoflds = array_keys(array_flip($infoflds));  // array_flip to get unique filter ids as KEYS (due to flipping) ... and then array_keys to get filter_ids in 0,1,2, ... array
 
 if ( $use_infoflds && count($infoflds) ) {
 	foreach ($infoflds as $fieldname) {

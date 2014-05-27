@@ -164,7 +164,7 @@ class JFormFieldFilters extends JFormFieldList
 		
 		$isfilter = (int) @$attributes['isfilter'];
 		if ( $isfilter || (!$issearch && !$isadvsearch && !$isadvfilter)) {
-			$and .= " AND isfilter='{$isfilter}'";
+			$and .= " AND isfilter='1'";
 		}
 		
 		$field_type = @$attributes['field_type'];
