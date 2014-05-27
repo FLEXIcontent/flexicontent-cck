@@ -71,3 +71,25 @@ div.current dd .pane-sliders .panel {
 	padding: 0px !important;
 	border: 0px !important;
 }
+
+#filterline .fc-mssg-inline {
+	margin-bottom: 12px !important;
+}
+
+#filterline .controls {
+	display: inline-block;
+	margin: 3px 0 7px;
+}
+
+#filterline input[type="text"] {
+	padding: 2px 2px 3px !important;
+}
+#filterline .input-append, #filterline .input-prepend {
+	margin:0px;
+}
+#filterline .input-prepend input,
+#filterline .input-append input {
+    margin: 0 !important;
+    padding: 4px !important;
+}
+

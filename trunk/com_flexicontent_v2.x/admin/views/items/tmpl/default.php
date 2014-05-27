@@ -474,7 +474,7 @@ window.addEvent('domready', function() {
 	
 	<div id="mainChooseColBox" class="fc_nice_box" style="margin-top:6px; display:none;"></div>
 
-	<div id="stateGroupsBox" class="fc_nice_box" style="display:none;">
+	<div id="stateGroupsBox" class="fc_nice_box" <?php if (!$this->filter_stategrp && $this->filter_catsinstate==1) echo 'style="display:none;"'; ?> >
 		
 		<div style="float:left; margin-right:12px;">
 		<?php
