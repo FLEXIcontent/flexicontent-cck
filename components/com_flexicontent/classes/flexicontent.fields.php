@@ -2914,9 +2914,15 @@ class FlexicontentFields
 		$filter_ids = $params  ?  $params->get($filt_param, array())  :  array();
 		if ($filter_ids === false) return $filters;
 		
+		// Check if array or comma separated list
+		if ( !is_array($filter_ids) ) {
+			$filter_ids = preg_split("/\s*,\s*/u", $filter_ids);
+			if ( empty($filter_ids[0]) ) unset($filter_ids[0]);
+		}
 		// Sanitize the given filter_ids ... just in case
-		if ( !is_array($filter_ids) ) $filter_ids = array($filter_ids);
 		$filter_ids = array_filter($filter_ids, 'is_numeric');
+		// array_flip to get unique filter ids as KEYS (due to flipping) ... and then array_keys to get filter_ids in 0,1,2, ... array
+		$filter_ids = array_keys(array_flip($filter_ids));
 		
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
@@ -2957,11 +2963,29 @@ class FlexicontentFields
 			. ' ORDER BY fi.ordering, fi.name'
 		;
 		$db->setQuery($query);
-		$filters = $db->loadObjectList('name');
+		$filters = $db->loadObjectList('id');
 		if ( !$filters ) {
 			$filters = array(); // need to do this because we return reference, but false here will also mean an error
 			return $filters;
 		}
+		
+		// Order filters according to given order
+		$filters_tmp = array();
+		if ( $params->get('filters_order', 0) && !empty($filter_ids) ) {
+			foreach( $filter_ids as $filter_id) {
+				if ( empty($filters[$filter_id]) ) continue;
+				$filter = $filters[$filter_id];
+				$filters_tmp[$filter->name] = $filter;
+			}
+		}
+		
+		// Not re-ordering, but index them via fieldname in this case too (for consistency)
+		else {
+			foreach( $filters as $filter) {
+				$filters_tmp[$filter->name] = $filter;
+			}
+		}
+		$filters = $filters_tmp;
 		
 		// Create filter parameters, language filter label, etc
 		foreach ($filters as $filter) {

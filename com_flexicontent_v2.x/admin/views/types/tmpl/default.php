@@ -37,7 +37,11 @@ $user      = JFactory::getUser();
 			</td>
 			<td nowrap="nowrap">
 				<div class="limit" style="display: inline-block;">
-					<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM') . str_replace('id="limit"', 'id="limit_top"', $this->pagination->getLimitBox()); ?>
+					<?php
+					echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM');
+					$pagination_footer = $this->pagination->getListFooter();
+					if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
+					?>
 				</div>
 				
 				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
@@ -74,7 +78,7 @@ $user      = JFactory::getUser();
 	<tfoot>
 		<tr>
 			<td colspan="10">
-				<?php echo $this->pagination->getListFooter(); ?>
+				<?php echo $pagination_footer; ?>
 			</td>
 		</tr>
 	</tfoot>
