@@ -73,7 +73,6 @@ class FlexicontentViewItems extends JViewLegacy {
 		if ($filter_cats) $count_filters++;
 		
 		$filter_order_type = $app->getUserStateFromRequest( $option.'.items.filter_order_type',	'filter_order_type',	1,		'int' );
-		if ($filter_order_type!=1) $count_filters++;
 		
 		$filter_order      = $app->getUserStateFromRequest( $option.'.items.filter_order',			'filter_order',				'',		'cmd' );
 		$filter_order_Dir  = $app->getUserStateFromRequest( $option.'.items.filter_order_Dir',	'filter_order_Dir',		'',		'word' );
@@ -433,9 +432,9 @@ class FlexicontentViewItems extends JViewLegacy {
 		}
 
 		// build the include non-published cats boolean list
-		$catsinstate[2] = JText::_( 'FLEXI_ANY' );
 		$catsinstate[1] = JText::_( 'FLEXI_PUBLISHED' );
 		$catsinstate[0] = JText::_( 'FLEXI_UNPUBLISHED' );
+		$catsinstate[2] = JText::_( 'FLEXI_ANY' );
 		/*$_catsinstate = array();
 		foreach ($catsinstate as $i => $v) {
 			$_catsinstate[] = JHTML::_('select.option', $i, $v);
@@ -546,6 +545,8 @@ class FlexicontentViewItems extends JViewLegacy {
 		
 		//assign data to template
 		$this->assignRef('count_filters', $count_filters);
+		$this->assignRef('filter_stategrp', $filter_stategrp);
+		$this->assignRef('filter_catsinstate', $filter_catsinstate);
 		$this->assignRef('db'				, $db);
 		$this->assignRef('lists'		, $lists);
 		$this->assignRef('rows'			, $rows);
