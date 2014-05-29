@@ -457,6 +457,7 @@ body.contentpane  {
 	float:left;
 	position:relative;
 	min-width:266px;
+	max-width:60%;
 	border:1px dashed #bbb;
 	background-color:#eee;
 	color:#000;

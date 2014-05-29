@@ -48,7 +48,8 @@ $secondary_displayed =
 $cats_canselect_sec =
 	($this->menuCats && $this->menuCats->cancid) ||
 	(!$this->menuCats && $this->perms['multicat'] && $this->perms['canchange_seccat']) ;
-$tags_displayed = $typeid && ( $this->perms['cantags'] || count(@$this->usedtagsdata) ) ;
+$usetags_fe = $this->params->get('usetags_fe', 1);
+$tags_displayed = $typeid && ( ($this->perms['cantags'] && $usetags_fe) || (count(@$this->usedtagsdata) && $usetags_fe==2) ) ;
 
 // Create reusable html code
 $infoimage = JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-hint.png', JText::_( 'FLEXI_NOTES' ) );
@@ -1064,6 +1065,7 @@ if ($this->fields && $typeid) :
 		{
 			// SKIP frontend hidden fields from this listing
 			if ( $field->iscore &&  isset($tab_fields['fman'][ $field->field_type ]) ) {
+				if ( !isset($captured[ $field->field_type ]) ) continue;
 				echo $captured[ $field->field_type ];
 				echo "\n<div class='fcclear'></div>\n";
 				continue;
@@ -1088,6 +1090,7 @@ if ($this->fields && $typeid) :
 			} else if ($field->field_type=='coreprops') {
 				$props_type = $field->parameters->get('props_type');
 				if ( isset($tab_fields['fman'][$props_type]) ) {
+					if ( !isset($captured[ $props_type ]) ) continue;
 					echo $captured[ $props_type ];
 					echo "\n<div class='fcclear'></div>\n";
 				}

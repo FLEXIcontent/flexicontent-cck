@@ -881,11 +881,19 @@ class FlexicontentModelItems extends JModelLegacy
 				// and ... listing only editable items is too slow in large websites, disable it
 				//if (FLEXI_ACCESS)  $this->faccess_items_editable_where($where);
 			}
-			if ($allowedcats) {
-				$where[] = '( i.catid IN (' . implode( ', ', $allowedcats ) . ') )';
-			}
-			if ($allowedcats_own) {
-				$where[] = '( i.catid IN (' . implode( ', ', $allowedcats_own ) . ') AND i.created_by='.$user->id.')';
+			if ($allowedcats || $allowedcats_own) {
+				$_edit_where = '( ';
+				
+				if ($allowedcats)
+					$_edit_where .= '( i.catid IN (' . implode( ', ', $allowedcats ) . ') )';
+					
+				if ($allowedcats && $allowedcats_own)
+					$_edit_where .= ' OR ';
+					
+				if ($allowedcats_own)
+					$_edit_where .= '( i.catid IN (' . implode( ', ', $allowedcats_own ) . ') AND i.created_by='.$user->id.')';
+					
+				$where[] = $_edit_where .' )';
 			}
 		}
 		

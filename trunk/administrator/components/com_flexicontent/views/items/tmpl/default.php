@@ -438,7 +438,7 @@ window.addEvent('domready', function() {
 		</div>
 		
 		<div class="fc-mssg-inline fc-nobgimage fc-success">
-			<div style="display:inline-block; white-space:nowrap;">
+			<div style="display:inline-block; white-space:nowrap; padding:1px 0px 5px 0px;">
 				<span style="display:none; color:darkred;" class="fc_nice_box" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
 				<?php echo $ordering_type_tip; ?>
 				<label class="label"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
@@ -455,7 +455,7 @@ window.addEvent('domready', function() {
 		</div>
 		
 		<div class="fc-mssg-inline fc-nobgimage fc-success">
-			<div style="display:inline-block; white-space:nowrap;">
+			<div style="display:inline-block; white-space:nowrap; padding:1px 0px 5px 0px;">
 				<span class="radio"><?php echo $this->lists['date']; ?></span>
 				<?php echo $this->lists['startdate']; ?>
 				<?php echo $this->lists['enddate']; ?>
@@ -463,14 +463,16 @@ window.addEvent('domready', function() {
 		</div>
 		
 		<div class="fc-mssg-inline fc-nobgimage fc-success">
-			<div style="display:inline-block;">
+			<div style="display:inline-block; white-space:nowrap; padding:1px 0px 5px 0px;">
 				<label class="label"><?php echo JText::_('FLEXI_ID'); ?></label>
 				<input type="text" name="filter_id" id="filter_id" size="4" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
 			</div>
 		</div>
 		
-		<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
-		<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+		<div style="display:inline-block; white-space:nowrap; margin:0px 0px 12px 12px;">
+			<input type="submit" class="fc_button fcsimple" onclick="this.form.submit();" value="<?php echo JText::_( 'FLEXI_APPLY_FILTERS' ); ?>" />
+			<input type="button" class="fc_button fcsimple" onclick="delAllFilters();this.form.submit();" value="<?php echo JText::_( 'FLEXI_RESET_FILTERS' ); ?>" />
+		</div>
 		
 	</div>
 	
