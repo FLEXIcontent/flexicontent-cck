@@ -305,7 +305,7 @@ class JFormFieldFilters extends JFormFieldList
 		}*/
 		
 		$html =
-		'<div style="border-width:0px; margin:0px; padding:0px; width:76%; float:left;">'.
+		'<div style="border-width:0px; margin:0px; padding:0px; width:68%; float:left;">'.
 			$html.$maximize_link.$tip.$sorter_html.
 		'</div>';
 		return $html;

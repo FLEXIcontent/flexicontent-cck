@@ -2290,7 +2290,7 @@ class flexicontent_html
 	 * @return object
 	 * @since 1.5
 	 */
-	static function buildlanguageslist($name, $class, $selected, $type=1, $allowed_langs=null, $published_only=true, $disable_langs=null, $add_all=true)
+	static function buildlanguageslist($name, $attribs, $selected, $type=1, $allowed_langs=null, $published_only=true, $disable_langs=null, $add_all=true, $conf=false)
 	{
 		$db = JFactory::getDBO();
 
@@ -2328,6 +2328,11 @@ class flexicontent_html
 		
 		$element_id = preg_replace('#[\[\]]#', '_', $name);
 		
+		
+		if ( $conf && empty($conf['flags']) && empty($conf['texts']) ) {
+			 $conf['flags'] = $conf['texts'] = 1;
+		}
+		
 		$langs = array();
 		switch ($type)
 		{
@@ -2335,16 +2340,18 @@ class flexicontent_html
 				foreach ($user_langs as $lang) {
 					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
 				}
-				$list = JHTML::_('select.genericlist', $langs, $name, $class, 'value', 'text', $selected );
+				$list = JHTML::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected );
 				break;
 			case 2:  // Drop-down SELECT of ALL languages , WITH empty prompt to select language, e.g. used in items/category manager
 				$langs[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_LANGUAGE' ));
 				foreach ($user_langs as $lang) {
 					$langs[] = JHTML::_('select.option',  $lang->code, $lang->name );
 				}
-				$list = JHTML::_('select.genericlist', $langs, $name, $class, 'value', 'text', $selected );
+				$list = JHTML::_('select.genericlist', $langs, $name, $attribs, 'value', 'text', $selected );
 				break;
-			case 3:   // CHECK-BOX selection of ALL languages , e.g. item form
+			
+			// RADIO selection of ALL languages , e.g. item form,
+			case 3:   // flag icons only
 				$checked	= '';
 				$list		= '';
 
@@ -2356,16 +2363,31 @@ class flexicontent_html
 					$list 	.= '<label class="lang_box" for="'.$element_id.$lang->id.'" title="'.$lang->name.'" >';
 					if($lang->shortcode=="*") {
 						$list 	.= '<span class="lang_lbl">'.JText::_('FLEXI_ALL').'</span>';  // Can appear in J1.6+ only
-					} else if (@$lang->imgsrc) {
-						$list 	.= '<img class="lang_lbl" src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />';
 					} else {
-						$list 	.= $lang->name;
+						// Add Flag if configure and it exists
+						if (!$conf || $conf['flags']) {
+							$list .= !empty($lang->imgsrc)  ?  '<img class="lang_lbl" src="'.$lang->imgsrc.'" alt="'.$lang->name.'" />'  :  $lang->code;
+						}
+						
+						// Add text if configured
+						if ( !$conf || $conf['texts']==1 ) {
+							$list .= $lang->code;
+						} else if ( $conf['texts']==2 ) {
+							$list .= $lang->title;
+						} else if ( $conf['texts']==3 ) {
+							$list .= $lang->title_native;
+						} else if ( $conf['texts']==4 ) {
+							$list .= $lang->name;
+						} else {
+							$list .= '';
+						}
 					}
+					
 					$list 	.= '</label>';
 					$checked	= '';
 				}
 				break;
-			case 4:   // CHECK-BOX selection of ALL languages, with empty default option "Keep original language", e.g. when copying/moving items
+			case 4:   // RADIO selection of ALL languages, with empty default option "Keep original language", e.g. when copying/moving items
 				$list  = '<input id="lang9999" type="radio" name="'.$name.'" class="lang" value="" checked="checked" />';
 				$list .= '<label class="lang_box" for="lang9999" title="'.JText::_( 'FLEXI_NOCHANGE_LANGUAGE_DESC' ).'" >';
 				$list .= JText::_( 'FLEXI_NOCHANGE_LANGUAGE' );
@@ -2384,7 +2406,7 @@ class flexicontent_html
 					$list 	.= '&nbsp;</label><div class="clear"></div>';
 				}
 				break;
-			case 5:   // CHECK-BOX selection of ALL languages, EXCLUDE selected language, e.g. when translating items into another language
+			case 5:   // RADIO selection of ALL languages, EXCLUDE selected language, e.g. when translating items into another language
 				$list		= '';
 				foreach ($user_langs as $lang) {
 					if ($lang->code==$selected) continue;
@@ -2431,7 +2453,7 @@ class flexicontent_html
 	 * @return object
 	 * @since 1.5
 	 */
-	static function buildstateslist($name, $class, $selected, $type=1)
+	static function buildstateslist($name, $attribs, $selected, $type=1)
 	{
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_DO_NOT_CHANGE' ) );
 		$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
@@ -2443,7 +2465,7 @@ class flexicontent_html
 		$state[] = JHTML::_('select.option',  -2, JText::_( 'FLEXI_TRASHED' ) );
 
 		if ($type==1) {
-			$list = JHTML::_('select.genericlist', $state, $name, $class, 'value', 'text', $selected );
+			$list = JHTML::_('select.genericlist', $state, $name, $attribs, 'value', 'text', $selected );
 		} else if ($type==2) {
 
 			$state_ids   = array(1, -5, 0, -3, -4);
@@ -4997,6 +5019,32 @@ class flexicontent_db
 		$field_types_grp['3rd-Party / Other Fields'] = $field_types;
 		
 		return $field_types_grp;
+	}
+	
+	
+	/**
+	 * Method to get data/parameters of thie given or all types
+	 *
+	 * @access public
+	 * @return object
+	 */
+	static function getTypeData($contenttypes_list)
+	{
+		static $cached = null;
+		if ( isset($cached[$contenttypes_list]) ) return $cached[$contenttypes_list];
+		
+		// Retrieve item's Content Type parameters
+		$db = JFactory::getDBO();
+		$query = 'SELECT * '
+				. ' FROM #__flexicontent_types AS t'
+				. ($contenttypes_list ? ' WHERE id IN('.$contenttypes_list.')' : '')
+				;
+		$db->setQuery($query);
+		$types = $db->loadObjectList('id');
+		foreach ($types as $type) $type->params = FLEXI_J16GE ? new JRegistry($type->attribs) : new JParameter($type->attribs);
+		
+		$cached[$contenttypes_list] = $types;
+		return $types;
 	}
 }
 

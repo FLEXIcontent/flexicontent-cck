@@ -41,7 +41,7 @@
 .fc-mssg-inline.fc-nobgimage,
 .fc-mssg.fc-nobgimage {
 	background-image: none !important;
-	padding-left: 12px !important;
+	padding: 8px !important;
 }
 
 .fc-mssg-inline.fc-note,

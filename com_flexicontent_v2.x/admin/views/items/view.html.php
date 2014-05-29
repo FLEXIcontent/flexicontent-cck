@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1904 2014-05-20 12:21:09Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1907 2014-05-27 12:35:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -61,6 +61,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		}
 		
 		flexicontent_html::loadJQuery();
+		flexicontent_html::loadFramework('select2');
 		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.calendar');
 
@@ -390,7 +391,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$state[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
 		$state[] = JHTML::_('select.option',  'RV', JText::_( 'FLEXI_REVISED_VER' ) );
 
-		$lists['filter_state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
+		$lists['filter_state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
 		
 		// build filter state group
 		if ($CanDelete || $CanDeleteOwn || $CanArchives)   // Create state group filter only if user can delete or archive
@@ -454,15 +455,15 @@ class FlexicontentViewItems extends JViewLegacy {
 		$lists['filter_order_type'] = JHTML::_('select.radiolist', $order_types, 'filter_order_type', 'size="1" class="inputbox" onchange="submitform();"', 'value', 'text', $filter_order_type );
 		
 		// build the categories select list for filter
-		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="inputbox" size="1" onchange="submitform( );"', $check_published=false, $check_perms=false);
+		$lists['filter_cats'] = flexicontent_cats::buildcatselect($categories, 'filter_cats', $filter_cats, 2, 'class="use_select2_lib" size="1" onchange="submitform( );"', $check_published=false, $check_perms=false);
 
 		//build type select list
-		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="inputbox" size="1" onchange="submitform( );"', 'filter_type');
+		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="use_select2_lib" size="1" onchange="submitform( );"', 'filter_type');
 
 		//build authors select list
-		$lists['filter_authors'] = flexicontent_html::buildauthorsselect($authors, 'filter_authors', $filter_authors, true, 'class="inputbox" size="1" onchange="submitform( );"');
+		$lists['filter_authors'] = flexicontent_html::buildauthorsselect($authors, 'filter_authors', $filter_authors, true, 'class="use_select2_lib" size="1" onchange="submitform( );"');
 
-		if ($badcatitems) $lists['default_cat'] = flexicontent_cats::buildcatselect($categories, 'default_cat', '', 2, 'class="inputbox"', false, false);
+		if ($badcatitems) $lists['default_cat'] = flexicontent_cats::buildcatselect($categories, 'default_cat', '', 2, 'class="use_select2_lib"', false, false);
 		
 		//search filter
 		$scopes = array();
@@ -507,7 +508,7 @@ class FlexicontentViewItems extends JViewLegacy {
 		$bind_limits[] = JHTML::_('select.option', 1000,'1000 ' . JText::_( 'FLEXI_ITEMS' ) );
 		$bind_limits[] = JHTML::_('select.option', 1500,'1500 ' . JText::_( 'FLEXI_ITEMS' ) );
 		$bind_limits[] = JHTML::_('select.option', 2000,'2000 ' . JText::_( 'FLEXI_ITEMS' ) );
-		$lists['bind_limits'] = JHTML::_('select.genericlist', $bind_limits, 'bind_limit', 'size="1" class="inputbox"', 'value', 'text', $bind_limit, 'bind_limit' );
+		$lists['bind_limits'] = JHTML::_('select.genericlist', $bind_limits, 'bind_limit', 'size="1" class="use_select2_lib"', 'value', 'text', $bind_limit, 'bind_limit' );
 
 		// search filter
 		$lists['search'] = $search;
@@ -528,7 +529,7 @@ class FlexicontentViewItems extends JViewLegacy {
 
 		if (FLEXI_FISH || FLEXI_J16GE) {
 		//build languages filter
-			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();" size="1" ', $filter_lang, 2);
+			$lists['filter_lang'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="submitform();" size="1" ', $filter_lang, 2);
 		}
 		
 		// filter by item usage a specific file

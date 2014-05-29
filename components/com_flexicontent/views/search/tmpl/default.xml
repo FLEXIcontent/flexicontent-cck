@@ -12,12 +12,23 @@
 		
 		<field name="" type="separator" level="level3" default="Please note these reasons for some results not being included:&lt;small&gt; &lt;br/&gt;- word is less than 4 characters (default for MySql DBs)&lt;br/&gt;- word is too common e.g. appears in about half of the articles&lt;br/&gt;- wrong language or article not publish or article has expired&lt;/small&gt;" />
 		
-		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Basic Options&lt;/small&gt;" />
+		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Content Types&lt;/small&gt;" description="The content types the search will include, selecting none will include ALL. &lt;br/&gt; NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here &lt;br/&gt; NOTE: if only 1 content type is selected below, then selector will be hidden"/>
 			
-			<field name="" type="separator" level="level2" default="Text Search" />
+			<field name="canseltypes" type="list" default="1" label="User selection" description="Allow users to select content types they want to include in their search">
+				<option value="0">No, Use all below</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="contenttypes" type="types" default="" label="Searchable Types &lt;br/&gt; &lt;small&gt;(Select NONE for -ALL-)&lt;/small&gt;" description="The content types the search will include, selecting none will include ALL. NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here" multiple="true" />
 			
-			<field name="" type="separator" level="level3" default="Words of Text Search" />
-			 
+			
+			<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Text Search&lt;/small&gt;" description="&lt;small&gt; (a) Either use BASIC Search Index (can not select individual fields) &lt;br/&gt; (b) OR use ADVANCED Search Index (the above configured fields will be used) &lt;/small&gt;"/>
+			
+			<field name="txtmode" type="list" default="0" label="Search Words in" description="Using the basic search index is faster and is recommended for LARGE SITES, (test to see evaluate performance difference)">
+				<option value="0">Basic Index (faster, fields not selectable)</option>
+				<option value="1">Advanced Index (use configured fields)</option>
+				<option value="2">Advanced Index (use configured fields, allow user selection)</option>
+			</field>
+			
 			<field name="show_search_label" type="list" default="" label="FLEXI_TEXT_SEARCH_LABEL" description="FLEXI_TEXT_SEARCH_LABEL_DESC" >
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
@@ -44,26 +55,6 @@
 			<field name="minchars" type="text" default="3" label="Word Min Length" description="Minimum character length that search words are allowed to have" />
 			<field name="maxchars" type="text" default="200" label="Word Max Length" description="Maximum characters length that search words are allowed to have" />
 			
-			<field name="" type="separator" level="level3" default="Fields of Text Search &lt;br/&gt; &lt;small&gt; (a) Either use BASIC Search Index (can not select individual fields) &lt;br/&gt; (b) OR use ADVANCED Search Index (can specify a sub-set of fields below and allow user to select too &lt;/small&gt;" description=""/>
-			
-			<field name="txtmode" type="list" default="0" label="Search Words in" description="Using the basic search index is faster and is recommended for LARGE SITES, (test to see evaluate performance difference)">
-				<option value="0">All fields of Basic Search Index (Faster)</option>
-				<option value="1">Advanced Index (Below fields)</option>
-				<option value="2">Advanced Index (Below fields) + user selection</option>
-			</field>
-			<field name="advsearch_fieldlist" type="fields" default="" label="Select Field" description="Please select one by one fields to add to textarea below." fieldnameastext="true" fieldnameasvalue="true" isadvsearch="1" onchange="f=document.getElementById('{control_name}txtflds'); f.value = f.value ? f.value + ','+this.value : this.value; this.value='';" />
-			<field name="txtflds" type="textarea" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Only for Advanced Index)&lt;/small&gt; &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to be included in text searching. You can separate each fieldname by comma(,). NOTE that fields not marked as (Search View) Text Searchable will be skipped even if you add them here" cols="30" rows="3" />
-			
-			<field name="" type="separator" level="level2" default="Content types" description="The content types the search will include, selecting none will include ALL. NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here"/>
-			
-			<field name="canseltypes" type="list" default="1" label="User selection" description="Allow users to select content types they want to include in their search">
-				<option value="0">No, Use all Content Types</option>
-				<option value="1">Yes, Always</option>
-				<option value="2">Yes, as Advanced Option</option>
-			</field>
-			<field name="contenttypes" type="types" default="" label="Searchable Types &lt;br/&gt; &lt;small&gt;(Select NONE for -ALL-)&lt;/small&gt;" description="The content types the search will include, selecting none will include ALL. NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here" multiple="true" />
-			
-			
 		<field name="" type="separator" level="level1" default="Search Form: &lt;small&gt;Advanced Options&lt;/small&gt;" />
 		
 			<field name="autodisplayadvoptions" type="list" default="1" label="Advanced Search Box" description="If this is disabled. Then a clickable text will appear to allow user to toggle the advanced search box on/off.">
@@ -72,8 +63,22 @@
 				<option value="2">FLEXI_YES_INITIALLY_ENABLED</option>
 			</field>
 			
-			<field name="" type="separator" level="level2" default="Fields as Filters" />
 			
+			<field name="" type="separator" level="level2" default="PER content type configuration (ADVANCED Index)" description="1. Fields manager: mark -fields- as ADVANCED text-searchable and filterable &lt;br/&gt; 2. Indexes manager: rebuild advanced index &lt;br/&gt; 3. Type manager: in each content type, select text-search fields and filters &lt;br/&gt;&lt;br/&gt; NOTE: if this is enabled content type selector becomes -visible- and -single- value"/>
+			
+			<field name="show_txtfields" type="radio" default="1" label="FLEXI_TEXT_SEARCH_FIELDS" description="FLEXI_TEXT_SEARCH_FIELDS_DESC">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_ACCORDING_TO_TYPE</option>
+				<option value="2">FLEXI_NO_CONFIGURE_BELOW</option>
+			</field>
+			<field name="txtflds" type="filters" isadvsearch="1" fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index text-searchable are listed" />
+			
+			<field name="show_filters" type="radio" default="1" label="FLEXI_FIELDS_AS_FILTERS" description="FLEXI_FIELDS_AS_FILTERS_DESC">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_ACCORDING_TO_TYPE</option>
+				<option value="2">FLEXI_NO_CONFIGURE_BELOW</option>
+			</field>
+			<field name="filtflds" type="filters" isadvfilter="1" fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -ALL-)&lt;/small&gt;" description="NOTE: only fields marked as advanced index filters are listed" />
 			<!--field name="show_filtersop" type="radio" default="1" label="Filters Combination" description="Allow users to select method of combining the search filters, e.g. any filter, all filters">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -83,15 +88,6 @@
 				<option value="AND">FLEXI_ALL</option>
 			</field-->
 			
-			<field name="filters_per_type" type="radio" default="1" label="FLEXI_FILTERS_ACCORDING_TYPE" description="FLEXI_FILTERS_ACCORDING_TYPE_DESC">
-				<option value="0">FLEXI_NO_USE_BELOW</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="filters_order" type="radio" default="1" label="FLEXI_FILTERS_ORDER" description="FLEXI_FILTERS_ORDER_DESC">
-				<option value="0">FLEXI_ORDER_FMAN</option>
-				<option value="1">FLEXI_ORDER_CUSTOM_BELOW</option>
-			</field>
-			<field name="filtflds" type="filters" isadvfilter="1" fieldnameasvalue="1" multiple="false" default="" label="Fields &lt;br/&gt; &lt;small&gt;(Leave EMPTY for -NONE-)&lt;/small&gt;" description="Enter Fields (their fieldnames) to be used as filters (thus limiting the text search result list), these will appear inside advanced search options box. You can separate each fieldname by comma(,). NOTE that fields not marked as (Search View) Filter will be skipped even if you add them here" cols="30" rows="3" />
 			
 			<field name="" type="separator" level="level2" default="Search Areas (non-FC Content)" description=""/>
 			

@@ -297,7 +297,7 @@ function FLEXIcontentParseRoute($segments)
 		
 		$explicit_view = $segments[0];
 		if ( !isset( $flexi_views[$explicit_view]) ) {
-			$msg = "The request content or the requested view '$explicit_view' was not found";
+			$msg = JText::sprintf('FLEXI_REQUESTED_CONTENT_OR_VIEW_NOT_FOUND', $explicit_view);
 			JError::raiseError(404, $msg);  // Cannot throw exception here since it will not be caught
 		}
 		

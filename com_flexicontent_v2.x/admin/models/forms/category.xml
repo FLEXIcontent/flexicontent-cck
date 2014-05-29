@@ -2,8 +2,8 @@
 <form>
 	<field name="id" type="text" default="0" label="FLEXI_TITLE" description ="JGLOBAL_FIELD_ID_DESC" class="readonly" readonly="true" />
 	<field name="asset_id" type="hidden" filter="unset"/>
-	<field name="parent_id" type="categorytree" top="1" label="FLEXI_PARENT" description="COM_CATEGORIES_FIELD_PARENT_DESC" class="inputbox" />
-	<field name="copycid" type="categorytree" top="2" label="FLEXI_COPY_PARAMETERS" description="FLEXI_COPY_PARAMETERS_DESC" class="inputbox" />
+	<field name="parent_id" type="categorytree" top="1" label="FLEXI_PARENT" description="COM_CATEGORIES_FIELD_PARENT_DESC" class="use_select2_lib" />
+	<field name="copycid" type="categorytree" top="2" label="FLEXI_COPY_PARAMETERS" description="FLEXI_COPY_PARAMETERS_DESC" class="use_select2_lib" />
 	<field name="lft" type="hidden" filter="unset"/>
 	<field name="rgt" type="hidden" filter="unset"/>
 	<field name="level" type="hidden" filter="unset"/>
@@ -12,9 +12,11 @@
 	<field name="title" type="text" label="JGLOBAL_TITLE" description="JFIELD_TITLE_DESC" class="inputbox" size="40" required="true" />
 	<field name="alias" type="text" label="FLEXI_ALIAS" description="JFIELD_ALIAS_DESC" class="inputbox" size="40" />
 	<field name="description" type="editor" label="JGLOBAL_DESCRIPTION" description="COM_CATEGORIES_DESCRIPTION_DESC" class="inputbox" filter="safehtml" buttons="true" hide="readmore,pagebreak"/>
-	<field name="published" type="list" class="inputbox" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC">
+	<field name="published" type="list" class="use_select2_lib" default="1" size="1" label="FLEXI_PUBLISHED" description="JFIELD_PUBLISHED_DESC">
 		<option value="1">JPUBLISHED</option>
 		<option value="0">JUNPUBLISHED</option>
+		<option value="2">JARCHIVED</option>
+		<option value="-2">JTRASHED</option>
 	</field>
 	<field name="checked_out" type="hidden" filter="unset"/>
 	<field name="checked_out_time" type="hidden" filter="unset"/>

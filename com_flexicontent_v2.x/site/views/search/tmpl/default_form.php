@@ -1,5 +1,8 @@
 <?php defined('_JEXEC') or die('Restricted access');
 
+$form_id = $this->form_id;
+$form_name = $this->form_name;
+
 $txtmode = $this->params->get('txtmode', 0);
 $show_search_label = $this->params->get('show_search_label', 1);
 $search_autocomplete = $this->params->get( 'search_autocomplete', 1 );
@@ -11,7 +14,7 @@ $default_searchordering = $this->params->get('default_searchordering', 'newest')
 
 // Whether to show advanced options,  (a) the filters, (b) the text search fields, which these depend on content types selected/configured
 $autodisplayadvoptions = $this->params->get('autodisplayadvoptions', 1);
-if (empty($this->in_contenttypes)) $autodisplayadvoptions = 0;
+if (empty($this->contenttypes)) $autodisplayadvoptions = 0;
 
 // Whether to show advanced options or hide them, initial behaviour depends on $autodisplayadvoptions, which is calculated above
 $use_advsearch_options = JRequest::getInt('use_advsearch_options', $autodisplayadvoptions==2);
@@ -41,7 +44,7 @@ if($autodisplayadvoptions) {
 		  jQuery("#fcsearch_txtflds_row").css("position","relative").toggle(500, function(){}).css("position","static");
     });
   '
-  .( $this->params->get('canseltypes', 1)!=2 ? '' : '
+  .( 1 /*$this->params->get('canseltypes', 1)!=2*//*disable hiding*/ ? '' : '
 	  jQuery("#fcsearch_contenttypes_row").css("position","relative").hide(0, function(){}).css("position","static");
 	  
 	  '. (($autodisplayadvoptions==1 && !$use_advsearch_options) ? '' : 'jQuery("#fcsearch_contenttypes_row").css("position","relative").toggle(500, function(){}).css("position","static");') .'
@@ -74,7 +77,7 @@ $other_search_areas_title_tip = ' title="'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN
 $r = 0;
 ?>
 
-<form action="<?php echo $this->action; ?>" method="POST" id="searchForm" name="searchForm" onsubmit="">
+<form action="<?php echo $this->action; ?>" method="POST" id="<?php echo $form_id; ?>" name="<?php echo $form_name; ?>" onsubmit="">
 	
 	<?php if ($this->params->get('canseltypes', 1) && isset($this->lists['contenttypes'])) : ?>
 	<fieldset id='fc_contenttypes_set' class='fc_search_set'>
@@ -137,7 +140,9 @@ $r = 0;
 						?>
 						<?php if ( $msg ) : ?><span class="fc-mssg fc-note"><?php echo $msg; ?></span><?php endif; ?>					
 						
-						<button class="fc_button button_go" onclick="var form=document.getElementById('searchForm'); adminFormPrepare(form);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
+						<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
+						
+						<button class="fc_button button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 1);"><span class="fcbutton_go"><?php echo JText::_( 'FLEXI_GO' ); ?></span></button>
 						
 						<?php if ($autodisplayadvoptions) {
 							$checked_attr  = $use_advsearch_options ? 'checked=checked' : '';
@@ -218,6 +223,7 @@ $r = 0;
 				<?php endif; */ ?>
 				
 				<?php
+				$prepend_onchange = " adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
 				foreach($this->filters as $filt) {
 					if (empty($filt->html)) continue;
 					$label = JText::_($filt->label);
@@ -237,12 +243,8 @@ $r = 0;
 						</td>
 						<td colspan="3" class="fc_search_option_cell">
 							<?php
-							// Form field that have form auto submit, need to be have their onChange Event prepended with the FORM PREPARATION function call
-							if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) ) {
-								if ( preg_match('/\.submit\(\)/', $filt->html, $matches) ) {
-									// Autosubmit detected inside onChange event, prepend the event with form preparation function call
-									$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}adminFormPrepare(document.getElementById(\'searchForm\')); ', $filt->html);
-								}
+							if ( preg_match('/onchange[ ]*=[ ]*([\'"])/i', $filt->html, $matches) && preg_match('/\.submit\(\)/', $filt->html, $matches) ) {
+								$filt->html = preg_replace('/onchange[ ]*=[ ]*([\'"])/i', 'onchange=${1}'.$prepend_onchange, $filt->html);
 							}
 							?>
 							<span class="fc_filter_html">
@@ -370,3 +372,38 @@ $r = 0;
 <input type="hidden" name="task" value="search" />
 <input type="hidden" name="Itemid" value="<?php echo JRequest::getVar("Itemid");?>" />
 </form>
+
+<?php
+// Automatic submission
+$filter_autosubmit = 0;
+if ($filter_autosubmit) {
+	$js = '
+		jQuery(document).ready(function() {
+			jQuery("#'.$form_id.' input:not(.fc_autosubmit_exclude), #'.$form_id.' select:not(.fc_autosubmit_exclude)").on("change", function() {
+				var form=document.getElementById("'.$form_id.'");
+				adminFormPrepare(form, 2);
+			});
+		});
+	';
+} else {
+	$js = '
+		jQuery(document).ready(function() {
+			jQuery("#'.$form_id.' input:not(.fc_autosubmit_exclude), #'.$form_id.' select:not(.fc_autosubmit_exclude)").on("change", function() {
+				var form=document.getElementById("'.$form_id.'");
+				adminFormPrepare(form, 1);
+			});
+		});
+	';
+}
+
+// Notify select2 fields to clear their values when reseting the form
+$js .= '
+		jQuery(document).ready(function() {
+			jQuery("#'.$form_id.' .fc_button.button_reset").on("click", function() {
+				jQuery("#'.$form_id.'_filter_box .use_select2_lib").select2("val", "");
+			});
+		});
+	';
+$document = JFactory::getDocument();
+$document->addScriptDeclaration($js);
+?>

@@ -951,6 +951,16 @@ addpath="/administrator/components/com_flexicontent/elements">
 			<param name="submit_redirect_url_fe" type="text" default="" size="106" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" menu="hide" />
 			<param name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" menu="hide" />
 			
+			<param name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level2" menu="hide" />
+			<param name="use_captcha" type="radio" default="1" label="FLEXI_USER_TYPE" description="FLEXI_USER_TYPE_DESC" menu="hide">
+				<option value="0">FLEXI_NEVER</option>
+				<option value="1">FLEXI_GUESTS_RECOMMENEDED</option>
+				<option value="2">FLEXI_ANY_USER</option>
+			</param>
+			<param name="captcha_formop" type="radio" default="0" label="FLEXI_OPERATION_TYPE" description="FLEXI_OPERATION_TYPE_DESC" menu="hide">
+				<option value="0">FLEXI_SUBMIT_RECOMMENDED</option>
+				<option value="1">FLEXI_SUBMIT_EDIT</option>
+			</param>
 			
 			<param name="" type="separator" default="FLEXI_BASIC_EDITING" label="" level="level1" menu="hide" />
 			

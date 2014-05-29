@@ -136,11 +136,13 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Include needed files and add needed js / css files
 		// **************************************************
 		
+		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+		flexicontent_html::loadFramework('jQuery');
+		flexicontent_html::loadFramework('select2');
+		
 		// Load pane behavior
 		jimport('joomla.html.pane');
-		
 		// Load tooltips
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		JHTML::_('behavior.tooltip');
 		
 		// Add css to document
@@ -276,12 +278,12 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.create');
 		$fieldname = FLEXI_J16GE ? 'jform[parent_id]' : 'parent_id';
-		$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, $fieldname, $row->parent_id, $top=1, 'class="inputbox"',
+		$Lists['parent_id'] = flexicontent_cats::buildcatselect($categories, $fieldname, $row->parent_id, $top=1, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=true, $skip_subtrees=array(), $disable_subtrees=array($row->id));
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
 		$fieldname = FLEXI_J16GE ? 'jform[copycid]' : 'copycid';
-		$Lists['copycid']    = flexicontent_cats::buildcatselect($categories, $fieldname, '', $top=2, 'class="inputbox"', $check_published, $check_perms, $actions_allowed, $require_all=false);
+		$Lists['copycid']    = flexicontent_cats::buildcatselect($categories, $fieldname, '', $top=2, 'class="use_select2_lib"', $check_published, $check_perms, $actions_allowed, $require_all=false);
 		
 		$custom_options[''] = 'FLEXI_USE_GLOBAL';
 		$custom_options['0'] = 'FLEXI_COMPONENT_ONLY';
@@ -289,7 +291,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		
 		$check_published = false;  $check_perms = true;  $actions_allowed=array('core.edit', 'core.edit.own');
 		$fieldname = FLEXI_J16GE ? 'jform[special][inheritcid]' : 'params[inheritcid]';
-		$Lists['inheritcid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $catparams->get('inheritcid', ''),$top=false, 'class="inputbox"',
+		$Lists['inheritcid'] = flexicontent_cats::buildcatselect($categories, $fieldname, $catparams->get('inheritcid', ''),$top=false, 'class="use_select2_lib"',
 			$check_published, $check_perms, $actions_allowed, $require_all=false, $skip_subtrees=array(), $disable_subtrees=array(), $custom_options);
 		
 		

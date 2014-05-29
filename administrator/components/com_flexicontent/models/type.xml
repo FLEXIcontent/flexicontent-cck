@@ -259,7 +259,7 @@
 		
 		<field name="" type="jparamstab" description="FLEXI_SEARCH_VIEW_CONF" />
 			
-			<field name="" label="" type="separator" default="FLEXI_DISPLAYED_FILTERS" level="level2" />
+			<field name="searchable" type="filters" isadvsearch="1" fieldnameasvalue="1" multiple="false" type_id_variable="cid" default="" label="FLEXI_TYPE_SEARCHABLE_FIELDS" description="FLEXI_TYPE_SEARCHABLE_FIELDS_DESC" />
 			<field name="filters" type="filters" isadvfilter="1" fieldnameasvalue="1" multiple="false" type_id_variable="cid" default="" label="FLEXI_TYPE_FILTERS" description="FLEXI_TYPE_FILTERS_DESC" />
 			
 		
@@ -319,6 +319,25 @@
 			</field>
 			<field name="default_language_fe" type="fclanguage" default="" use_global="1" label="FLEXI_MENU_DEFAULT_LANGUAGE" description="FLEXI_DEFAULT_LANGUAGE_DESC" />
 			<field name="disable_languages_fe" type="fclanguage" default="" use_global="1" multiple="multiple" class="use_select2_lib" label="FLEXI_MENU_DISABLE_LANGUAGES" description="FLEXI_MENU_DISABLE_LANGUAGES_DESC" />
+			
+			<field name="langdisplay_fe" type="radio" default="" label="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS" description="FLEXI_MENU_LANG_SELECTOR_DISPLAY_AS_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="2">FLEXI_LANG_AS_DROP_DOWN</option>
+				<option value="3">FLEXI_LANG_AS_RADIO</option>
+			</field>
+			<field name="langdisplay_flags_fe" type="radio" default="" label="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO" description="FLEXI_MENU_LANG_SHOW_FLAGS_RADIO_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="langdisplay_texts_fe" type="radio" default="" label="FLEXI_MENU_LANG_SHOW_TEXT_RADIO" description="FLEXI_MENU_LANG_SHOW_TEXT_RADIO_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_LANG_NO_TEXT</option>
+				<option value="1">FLEXI_LANG_CODE</option>
+				<option value="2">FLEXI_LANG_TITLE</option>
+				<option value="3">FLEXI_LANG_TITLE_NATIVE</option>
+				<option value="4">FLEXI_LANG_FULL_NAME</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_EXISTING_ITEMS" label="" level="level2" />
 			<field name="allowlangmods_fe" type="fccheckbox" default="" display_useglobal="1"

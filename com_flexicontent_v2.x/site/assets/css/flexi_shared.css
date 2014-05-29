@@ -754,13 +754,18 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	padding-bottom: 1.4em !important;
 }
 
-#flexicontent .panel h3 a { padding:0px 0px 4px 0px; }
+#flexicontent .panel > h3 a { padding:0px 0px 4px 0px; }
 #flexicontent .pane-sliders .panel .pane-slider { padding: 0px !important; }
 #flexicontent .pane-sliders .panel .pane-slider fieldset.panelform {
+	padding: 8px !important;
 	margin: 4px !important;
-	border: 1px solid lightgray !important;
+	border: 0px solid lightgray !important;
+	background: white !important;
 }
-
+#flexicontent .pane-sliders label.hasTip, #flexicontent .pane-sliders label.hasTooltip {
+	color: black !important;
+  background-color: #eee !important;
+}
 
 #flexicontent .fcfield-sortables { margin:0px!important; padding:0px!important; }
 #flexicontent .fcfield-sortables li { margin:0px 0px 4px 0px; padding:0px;  }
@@ -798,13 +803,33 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 #flexicontent .fcfield-drag img { margin:2px 4px -3px 6px !important; cursor: move!important; float: none!important; display: inline!important; }
 #flexicontent .fcfield-row img.calendar { margin:0px 0px 0px 2px !important; }
 
+#flexicontent div fieldset.panelform input,
+#flexicontent div fieldset.panelform textarea,
+#flexicontent div fieldset.panelform select,
+#flexicontent div fieldset.panelform img,
+#flexicontent div fieldset.panelform button {
+	float: left;
+}
+
+#flexicontent div fieldset.panelform input,
+#flexicontent div fieldset.panelform textarea,
+#flexicontent div fieldset.panelform select,
+#flexicontent div fieldset.panelform img,
+#flexicontent div fieldset.panelform button,
 div fieldset input, div fieldset textarea, div fieldset select, div fieldset img, div fieldset button {
 	margin: 2px 2px 2px 0px !important;
 	font-size: 12px;
 }
+#flexicontent div fieldset.panelform input,
+#flexicontent div fieldset.panelform textarea {
+	min-width: 70%;
+}
 div fieldset td input, div fieldset td textarea {
 	min-width: 80%;
 }
+#flexicontent div fieldset.panelform input,
+#flexicontent div fieldset.panelform textarea,
+#flexicontent div fieldset.panelform select,
 div fieldset td input, div fieldset td textarea, div fieldset td select {
 	border-radius:4px;
 	padding:2px 4px;;
@@ -874,15 +899,16 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 #flexicontent span.flexi_label label label { float:right; margin:auto; padding:auto; }
 
 #flexicontent .flexi_label.fcdualline { width:32%; padding: 6px 2% 6px 2% !important; }
+
+#flexicontent .pane-sliders label.hasTip, #flexicontent .pane-sliders label.hasTooltip,
 #flexicontent .params_set label.hasTip, #flexicontent .params_set label.hasTooltip,
 #flexicontent .flexi_params label.hasTip, #flexicontent .flexi_params label.hasTooltip,
-#flexicontent label.fckey,
-#flexicontent .flexi_label {
+#flexicontent label.fckey, #flexicontent .flexi_label {
 	display: block;
 	float: left !important;
 	clear: left !important;
-	color: white;
-  background-color: gray;
+	color: black;
+  background-color: #eee;
   border-bottom: 1px solid #D0D0D0;
   border-right: 1px solid #D0D0D0;
   font-size: 12px;
@@ -968,13 +994,14 @@ fieldset.flexiaccess, fieldset.adminform,
 #flexicontent fieldset.customfields_set,
 #flexicontent fieldset.params_set {
 	border: 1px solid lightgray !important;
-	margin: 4px 6px 4px 6px !important;
+	margin: 16x 6px !important;
 	padding: 4px 4px 4px 4px !important;
 	width: auto !important;
 	min-width: inherit !important; /* workaround for chrome fieldset width bug */
 	display: block;
 }
 #flexicontent fieldset legend { padding:0px 6px; width:auto; border:0px; margin:0px; font-size:14px; font-family:georgia; font-weight:bold; }
+#flexicontent fieldset.basicfields_set legend { color: #483D8B; }
 
 fieldset.flexiaccess, fieldset.adminform { margin-bottom: 1em !important; }
 fieldset.flexiaccess legend, fieldset.adminform legend { font-weight:bold; font-size: 14px; }
