@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: fcloadmodule.php 1559 2012-11-26 02:23:07Z ggppdk $
+ * @version 1.0 $Id: fcloadmodule.php 1800 2013-11-01 04:30:57Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -95,7 +95,7 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		// parameters shortcuts
 		$module_method_oldname = $field->parameters->get('module-method', 1);
 		$module_method	= $field->parameters->get('module_method', $module_method_oldname );
-		$mymodule		= $field->parameters->get('modules', '');
+		$mymodule		= (int) $field->parameters->get('modules', 0);
 		$position		= $field->parameters->get('position', '');
 		$style 			= $field->parameters->get('style', -2);
 		
@@ -104,26 +104,43 @@ class plgFlexicontent_fieldsFcloadmodule extends JPlugin
 		$renderer		= $document->loadRenderer('module');
 		$mparams		= array('style'=>$style);
 		
-		if ($module_method == 1) { // module case
-			if (!$mymodule) { $field->{$prop} = 'Please select a module'; return; }
-/*
-echo '<xmp>';
-print_r($mymodule);
-echo '</xmp>';
-*/
-			$object  = $this->_getModuleObject((int)$mymodule);
-/*
-echo '<xmp>';
-print_r($object);
-echo '</xmp>';
-*/
-			$mod	 = JModuleHelper::getModule(substr(@$object->module, 4), @$object->title);
+		
+		// *********************
+		// CASE: specific module
+		// *********************
+		if ($module_method == 1)
+		{
+			if ( $mymodule==0 ) { $field->{$prop} = 'Please select a module'; return; }
 			
+			
+			// *****************
+			// Query module data
+			// *****************
+			$object  = $this->_getModuleObject($mymodule);
+			if ( empty($object) ) { $field->{$prop} = 'Selected module was not found, e.g. it was deleted'; return; }
+			//echo '<pre>'; print_r($object); echo '</pre>';
+			
+			
+			// *****************
+			// Get module object
+			// *****************
+			$mod = JModuleHelper::getModule($object->module, $object->title);
+			//$mod = JModuleHelper::getModule(substr($object->module, 4), $object->title);
+			//echo '<pre>'; print_r($mod); echo '</pre>';
+			//echo '<pre>'; echo substr($object->module, 4) . ": ". $object->title; echo '</pre>';
+			
+			
+			// *****************************
 			// Set module parameter per item 
+			// *****************************
 			$mod_params	= $field->parameters->get( 'mod_params', '') ;
 			$mod_params	= preg_split("/[\s]*%%[\s]*/", $mod_params);
 			$mod_params = !empty($mod_params[0]) ? $mod_params : array();
 			
+			
+			// ***************************************************************************
+			// Apply per item configuration to the module (set module parameters per item)
+			// ***************************************************************************
 			$value = unserialize($values[0]);
 			$custom_mod_params = array();
 			foreach ($mod_params as $mod_param)
@@ -134,21 +151,25 @@ echo '</xmp>';
 			$_mod_params = FLEXI_J16GE ? new JRegistry($mod->params) : new JParameter($mod->params);
 			foreach ($custom_mod_params as $i => $v) $_mod_params->set($i,$v);
 			$mod->params = $_mod_params ->toString();
-
-/*
-echo '<xmp>';
-print_r($mod);
-echo '</xmp>';
-*/
+			
+			
+			// ************************
+			// Render the module's HTML
+			// ************************
 			$display = $renderer->render($mod, $mparams);
-
-		} else { // position case		
+		}
+		
+		
+		// ************************************
+		// CASE: all modules in module position
+		// ************************************
+		else {
 			if (!$position) { $field->{$prop} = 'Error'; return; }
 			foreach (JModuleHelper::getModules($position) as $mod)  {
 				$display .= $renderer->render($mod, $mparams);
 			}
 		}
-	
+		
 		$field->{$prop} = $display;
 	}
 	

@@ -463,7 +463,7 @@ window.addEvent('domready', function() {
 		</div>
 		
 		<div class="fc-mssg-inline fc-nobgimage fc-success">
-			<div style="display:inline-block; white-space:nowrap; padding:1px 0px 5px 0px;">
+			<div style="display:inline-block; white-space:nowrap; padding:2px 0px 5px 0px;">
 				<label class="label"><?php echo JText::_('FLEXI_ID'); ?></label>
 				<input type="text" name="filter_id" id="filter_id" size="4" value="<?php echo $this->lists['filter_id']; ?>" class="inputbox" />
 			</div>

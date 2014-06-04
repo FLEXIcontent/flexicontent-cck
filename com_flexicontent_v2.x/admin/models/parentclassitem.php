@@ -325,7 +325,7 @@ class ParentClassItem extends JModelAdmin
 			
 			// Variables controlling the version loading logic
 			$loadcurrent = JRequest::getVar('loadcurrent', false, 'request', 'boolean');  // loadcurrent request flag, ignored if version specified
-			$preview = JRequest::getVar('preview', false, 'request', 'boolean');   // preview request flag for viewing unapproved version in frontend
+			$preview = JRequest::getVar('preview', false, 'request', 'boolean');   // preview request flag for viewing latest (and possibly unapproved) version in frontend
 			$version = JRequest::getVar('version', 0, 'request', 'int' );          // the item version to load
 		
 			// -- Decide the version to load: (a) the one specified by request or (b) the current one or (c) the latest one

@@ -1,7 +1,7 @@
 function moveonly() {
-	jQuery('#maincat').attr('disabled', '');
-	jQuery('#keepseccats0').attr('disabled', '');
-	jQuery('#keepseccats1').attr('disabled', '');
+	jQuery('#maincat').removeAttr('disabled');
+	jQuery('#keepseccats0').removeAttr('disabled');
+	jQuery('#keepseccats1').removeAttr('disabled');
 	jQuery('#keeptags0').attr('disabled', 'disabled');
 	jQuery('#keeptags1').attr('disabled', 'disabled');
 	jQuery('#prefix').attr('disabled', 'disabled');
@@ -11,16 +11,16 @@ function moveonly() {
 	jQuery('.lang').attr('disabled', 'disabled');
 }
 function copymove() {
-	jQuery('#maincat').attr('disabled', '');
-	jQuery('#keepseccats0').attr('disabled', '');
-	jQuery('#keepseccats1').attr('disabled', '');
-	jQuery('#keeptags0').attr('disabled', '');
-	jQuery('#keeptags1').attr('disabled', '');
-	jQuery('#prefix').attr('disabled', '');
-	jQuery('#suffix').attr('disabled', '');
-	jQuery('#copynr').attr('disabled', '');
-	jQuery('#state').attr('disabled', '');
-	jQuery('.lang').attr('disabled', '');
+	jQuery('#maincat').removeAttr('disabled');
+	jQuery('#keepseccats0').removeAttr('disabled');
+	jQuery('#keepseccats1').removeAttr('disabled');
+	jQuery('#keeptags0').removeAttr('disabled');
+	jQuery('#keeptags1').removeAttr('disabled');
+	jQuery('#prefix').removeAttr('disabled');
+	jQuery('#suffix').removeAttr('disabled');
+	jQuery('#copynr').removeAttr('disabled');
+	jQuery('#state').removeAttr('disabled');
+	jQuery('.lang').removeAttr('disabled');
 }
 function copyonly() {
 	jQuery('#maincat').attr('disabled', 'disabled');
@@ -28,16 +28,16 @@ function copyonly() {
 	jQuery('#keepseccats0').attr('disabled', 'disabled');
 	jQuery('#keepseccats1').attr('checked', 'checked');
 	jQuery('#keepseccats1').attr('disabled', 'disabled');
-	jQuery('#keeptags0').attr('disabled', '');
-	jQuery('#keeptags1').attr('disabled', '');
-	jQuery('#prefix').attr('disabled', '');
-	jQuery('#suffix').attr('disabled', '');
-	jQuery('#copynr').attr('disabled', '');
-	jQuery('#state').attr('disabled', '');
-	jQuery('.lang').attr('disabled', '');
+	jQuery('#keeptags0').removeAttr('disabled');
+	jQuery('#keeptags1').removeAttr('disabled');
+	jQuery('#prefix').removeAttr('disabled');
+	jQuery('#suffix').removeAttr('disabled');
+	jQuery('#copynr').removeAttr('disabled');
+	jQuery('#state').removeAttr('disabled');
+	jQuery('.lang').removeAttr('disabled');
 }
 function secmove() {
-	jQuery('#seccats').attr('disabled', '');
+	jQuery('#seccats').removeAttr('disabled');
 }
 function secnomove() {
 	jQuery('#seccats').attr('disabled', 'disabled');
@@ -52,6 +52,6 @@ jQuery(document).ready(function(){
 	if (initial_behaviour!='copyonly' && jQuery('input[name=keepseccats]:checked').val() == 1) {
 		jQuery('#seccats').attr('disabled', 'disabled');
 	} else {
-		jQuery('#seccats').attr('disabled', '');
+		jQuery('#seccats').removeAttr('disabled');
 	}
 });

@@ -331,6 +331,7 @@ class plgSearchFlexisearch extends JPlugin
 			$query->select(''
 				.' i.id as id,'
 				.' i.title AS title,'
+				.' i.language AS language,'
 				.' i.metakey AS metakey,'
 				.' i.metadesc AS metadesc,'
 				.' i.modified AS created,'     // TODO ADD a PARAMETER FOR CONTROLING the use of modified by or created by date as "created"

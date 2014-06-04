@@ -435,7 +435,11 @@ class FlexicontentViewItems extends JViewLegacy {
 		// build the include non-published cats boolean list
 		$catsinstate[1] = JText::_( 'FLEXI_PUBLISHED' );
 		$catsinstate[0] = JText::_( 'FLEXI_UNPUBLISHED' );
-		$catsinstate[2] = JText::_( 'FLEXI_ANY' );
+		$catsinstate[99] = JText::_( 'FLEXI_ANY' );
+		if (FLEXI_J16GE) {
+			$catsinstate[2] = JText::_( 'FLEXI_ARCHIVED_STATE' );
+			$catsinstate[-2] = JText::_( 'FLEXI_TRASHED_STATE' );
+		}
 		/*$_catsinstate = array();
 		foreach ($catsinstate as $i => $v) {
 			$_catsinstate[] = JHTML::_('select.option', $i, $v);

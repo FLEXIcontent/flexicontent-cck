@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: copy.php 1738 2013-08-24 17:42:17Z ggppdk $
+ * @version 1.5 stable $Id: copy.php 1902 2014-05-10 16:06:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -155,7 +155,15 @@ $copy_behaviour = JRequest::getVar('copy_behaviour','copy/move');
 					<tr valign="top">
 						<td class="key"><label class="fckey"><?php echo JText::_( 'FLEXI_KEEP_TAGS' ); ?></label></td>
 						<td>
-							<?php echo JHTML::_('select.booleanlist', 'keeptags', 'class="inputbox"', 1 ); ?>
+							<input id="keeptags0" type="radio" name="keeptags" value="0" onclick="secmove();" />
+							<label for="keeptags0">
+								<?php echo JText::_( 'No' ); ?>
+							</label>
+							
+							<input id="keeptags1" type="radio" name="keeptags" value="1" onclick="secnomove();" checked="checked" />
+							<label for="keeptags1">
+								<?php echo JText::_( 'Yes' ); ?>
+							</label>
 						</td>						
 					</tr>
 					<tr valign="top">

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1655 2013-03-16 17:55:25Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1904 2014-05-20 12:21:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -152,22 +152,26 @@ class FlexicontentModelItem extends ParentClassItem
 			}
 			
 			// Calculate if item is active ... and viewable is also it's (current or All) categories are published
+			$preview = JRequest::getVar('preview', 0, 'request', 'int' );            // Get if trying to preview the item
+			$version = JRequest::getVar('version', 0, 'request', 'int' );            // Get item version to load
 			$item_active          = $item_is_published && !$item_is_scheduled && !$item_is_expired;
 			$item_n_cat_active    = $item_active && $cats_are_published;
-			$ignore_publication   = $canedititem || $caneditstate|| $isOwner;
+			$previewing_and_unlogged = (($preview || $version) && $user->guest); // this is a flag indicates to redirect to login instead of 404 error
+			$ignore_publication   = $canedititem || $caneditstate || $isOwner || $previewing_and_unlogged;
 			$inactive_notice_set = false;
 			$item_state_pending   = $this->_item->state == -3;
 			$item_state_draft			= $this->_item->state == -4;
 			
 			
-			//*************************************************************************************************************************
-			// STEP C: CHECK item state and ( UNLESS user is owner or cane dit the item ), do RAISE 404 (not found) HTTP Server Errors,
-			// NOTE: Asking all users to login when item is not active maybe wrong approach, so instead we raise 404 error
+			//***********************************************************************************************************************
+			// STEP C: CHECK item state, if publication state is not ignored terminate with 404 NOT found, otherwise add a notice
+			// NOTE: Asking all users to login when item is not active maybe wrong approach, so instead we raise 404 error, but we
+			// will ask them to login only if previewing a latest or specific version (so ignore publication FLAG includes this case)
 			// (a) Check that item is PUBLISHED (1,-5) or ARCHIVED (-1)
 			// (b) Check that item has expired publication date
 			// (c) Check that item has scheduled publication date
 			// (d) Check that current item category or all items categories are published
-			//*************************************************************************************************************************
+			//***********************************************************************************************************************
 			
 			// (a) Check that item is PUBLISHED (1,-5) or ARCHIVED (-1)
 			if ( !$caneditstate && ($item_state_pending || $item_state_draft) && $isOwner ) {
@@ -228,10 +232,9 @@ class FlexicontentModelItem extends ParentClassItem
 			// (e) finally raise a 403 forbidden Server Error if user is unauthorized to access item
 			//*******************************************************************************************
 			
-			// SPECIAL case when previewing an non-current version of an item
-			$version = JRequest::getVar('version', 0, 'request', 'int' );            // Get item version to load
+			// SPECIAL case when previewing an non-current version of an item, this is allowed only if user can edit the item
 			$current_version = FLEXIUtilities::getCurrentVersions($this->_id, true); // Get current item version
-			if ( $version && $version!=$current_version && !$canedititem )
+			if ( $version && $version!=$current_version && !$canedititem && !$previewing_and_unlogged )
 			{
 				// (a) redirect user previewing a non-current item version, to either current item version or to refer if has no edit permission
 				JError::raiseNotice(403, JText::_('FLEXI_ALERTNOTAUTH_PREVIEW_UNEDITABLE')."<br />". JText::_('FLEXI_ALERTNOTAUTH_TASK') );
@@ -243,7 +246,7 @@ class FlexicontentModelItem extends ParentClassItem
 			}
 			
 			// SPECIAL cases for inactive item
-			if ( !$item_n_cat_active ) {
+			else if ( !$item_n_cat_active && !$previewing_and_unlogged ) {
 				if ( !$caneditstate && ($item_state_pending || $item_state_draft) && $isOwner )
 				{
 					// no redirect, SET message to owners, to wait for approval or to request approval of their content
@@ -264,6 +267,8 @@ class FlexicontentModelItem extends ParentClassItem
 					$app->redirect($referer);
 				}
 			}
+			
+			// Cases for non-viewable and non-editable item
 			else if ( !$canviewitem && !$canedititem )
 			{
 				if($user->guest) {
@@ -292,8 +297,10 @@ class FlexicontentModelItem extends ParentClassItem
 						if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
 					}
 				}
-			} else {
-				// User can read item and item is active, no further actions
+			}
+			
+			// User can read item and item is active, no further actions
+			else {
 			}
 			
 		} // End of Existing item (not new)
