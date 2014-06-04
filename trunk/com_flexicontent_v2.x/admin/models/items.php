@@ -392,8 +392,8 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		
 		$done = true;
-		if ($checkNoExtData)  $done = $done && ($session->get('unbounded_noext',  false, 'flexicontent') !== false);
-		if ($checkInvalidCat) $done = $done && ($session->get('unbounded_badcat', false, 'flexicontent') !== false);
+		if ($checkNoExtData)  $done = $done && ($session->get('unbounded_noext',  false, 'flexicontent') === 0);
+		if ($checkInvalidCat) $done = $done && ($session->get('unbounded_badcat', false, 'flexicontent') === 0);
 		
 		if ( !$noCache && $done ) return $count_only ? 0 : array();
 		
@@ -910,15 +910,11 @@ class FlexicontentModelItems extends JModelLegacy
 				global $globalcats;
 				
 				$_sub_cids = array();
-				if ($filter_catsinstate == 2) {
+				if ($filter_catsinstate == 99) {
 					$_sub_cids = $globalcats[$filter_cats]->descendantsarray;
-				} else if ($filter_catsinstate == 1) {
+				} else {
 					foreach( $globalcats[$filter_cats]->descendantsarray as $_dcatid) {
-						if ($globalcats[$_dcatid]->published) $_sub_cids[] = $_dcatid;
-					}
-				} else if ($filter_catsinstate == 0) {
-					foreach( $globalcats[$filter_cats]->descendantsarray as $_dcatid) {
-						if ($globalcats[$_dcatid]->published!=1) $_sub_cids[] = $_dcatid;
+						if ($globalcats[$_dcatid]->published==$filter_catsinstate) $_sub_cids[] = $_dcatid;
 					}
 				}
 				if ( empty ($_sub_cids) ) $where[] = ' FALSE  ';
@@ -928,10 +924,8 @@ class FlexicontentModelItems extends JModelLegacy
 				$where[] = $cat_type.' = ' . $filter_cats;
 			}
 		} else {
-			if ($filter_catsinstate == 1) {
-				$where[] = '(rel.catid IN ( SELECT id FROM #__categories WHERE published=1 )' .' OR '. 'c.published = 1)';
-			} else if ($filter_catsinstate == 0) {
-				$where[] = '(rel.catid IN ( SELECT id FROM #__categories WHERE published=0 )' .' OR '. 'c.published = 0)';
+			if ($filter_catsinstate != 99) { // if not showing items in any category state
+				$where[] = '(rel.catid IN ( SELECT id FROM #__categories WHERE published='.$filter_catsinstate.' )' .' OR '. 'c.published = '.$filter_catsinstate.')';
 			}
 		}
 		

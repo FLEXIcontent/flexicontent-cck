@@ -85,8 +85,18 @@ if ( $show_mod )
 	
 	// FIELD FILTERS
 	$display_filter_list  = $params->get('display_filter_list', 0);
-	$filterids            = $params->get('filters', array());
+	$filter_ids            = $params->get('filters', array());
 	$limit_filters_to_cat = $display_filter_list==1 || $display_filter_list==3;
+	
+	// Check if array or comma separated list
+	if ( !is_array($filter_ids) ) {
+		$filter_ids = preg_split("/\s*,\s*/u", $filter_ids);
+		if ( empty($filter_ids[0]) ) unset($filter_ids[0]);
+	}
+	// Sanitize the given filter_ids ... just in case
+	$filter_ids = array_filter($filter_ids, 'is_numeric');
+	// array_flip to get unique filter ids as KEYS (due to flipping) ... and then array_keys to get filter_ids in 0,1,2, ... array
+	$filter_ids = array_keys(array_flip($filter_ids));
 	
 	$form_name = 'moduleFCform_'.$module->id;
 	
@@ -96,7 +106,7 @@ if ( $show_mod )
 		echo "WARNING: You have selected both: (a) a target category and also set this module not to display category list<br>";
 	else :*/
 	
-	//print_r($filterids);
+	//print_r($filter_ids);
 	
 	if ($display_cat_list)
 	{
@@ -151,29 +161,37 @@ if ( $show_mod )
 	// Get/Create current category model ... according to configuaration set above into the JRequest variables ...
 	$catmodel = new FlexicontentModelCategory();
 	$catparams = $catmodel->getParams();  // Get current's view category parameters this will if needed to get category specific filters ...
+	
 	// ALL filters
 	if ($display_filter_list==0) {
 		// WARNING: this CASE is supposed to get ALL filters regardless category,
 		// but __ALL_FILTERS__ ignores the 'use_filters' parameter, so we must check it separetely
+		// ... $params->set('filters_order', 1);  // respect filters ordering if so configured in category 
 		$filters = ! $params->get('use_filters', 0) ? array() : FlexicontentFields::getFilters('filters', '__ALL_FILTERS__', $catparams);
 	}
+	
 	// Filter selected in category configuration
 	else if ($display_filter_list==1) {
+		// ... $params->set('filters_order', 1);  // respect filters ordering if so configured in category 
 		$filters = FlexicontentFields::getFilters('filters', 'use_filters', $catparams);
 	}
+	
 	// Filters selected in module
 	else if ($display_filter_list==2) {
+		$params->set('filters_order', 1); // respect filters ordering
 		$filters = FlexicontentFields::getFilters('filters', 'use_filters', $params);
 	}
-	// Filters selected in module
+	
+	// Filters selected in module and intersect with current category
 	else if ($display_filter_list) {  // ==3
+		$params->set('filters_order', 1); // respect filters ordering
 		$cat_filters = FlexicontentFields::getFilters('filters', 'use_filters', $params);
 		
 		// Intersection of selected filters and of category assigned filters
 		$filters = array();
-		$filterids_indexed = array_flip($filterids);
+		$filter_ids_indexed = array_flip($filter_ids);
 		foreach ($cat_filters as $filter_name => $filter) {
-			if ( isset($filterids_indexed[$filter->id]) ) {
+			if ( isset($filter_ids_indexed[$filter->id]) ) {
 				$filters[] = $filter;
 			}
 		}

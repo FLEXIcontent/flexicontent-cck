@@ -130,7 +130,9 @@
 				<option value="2">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED</option>
 				<option value="3">FLEXI_FILTER_DISPLAYED_FILTERS_SELECTED_SET_IN_CAT_PARAMS</option>
 			</field>
-			<field name="filters" type="filters" size="5" columns="20" multiple="true" default="0" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" menu="hide" />
+			
+			<field name="filters" type="filters" multiple="false" default="" label="FLEXI_SELECT_FILTERS" description="FLEXI_SELECT_FILTERS_DESC" menu="hide" />
+			
 			<field name="show_filter_labels" type="radio" default="1" label="FLEXI_FILTER_LABELS" description="FLEXI_FILTER_LABELS_DESC" menu="hide" >
 				<option value="0">FLEXI_FIELD_CONFIGURED_BEHAVIOR</option>
 				<option value="1">FLEXI_OUTSIDE_FILTER</option>

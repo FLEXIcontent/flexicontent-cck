@@ -396,8 +396,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$field->html .= "</div>\n";
 		
 		$field->html .= "<div class='fcrelation_field_controls'>";
-		$field->html .= '<a href="JavaScript:void(0);" id="btn-add_'.$ri_field_name.'" class="fcfield-button" >Add &raquo;</a>'."\n";
-    $field->html .= '<a href="JavaScript:void(0);" id="btn-remove_'.$ri_field_name.'" class="fcfield-button" >&laquo; Remove</a>'."\n";
+		$field->html .= '<a href="JavaScript:void(0);" id="btn-add_'.$ri_field_name.'" class="fcfield-button" >'.JText::_('FLEXI_ADD').' &raquo;</a>'."\n";
+    $field->html .= '<a href="JavaScript:void(0);" id="btn-remove_'.$ri_field_name.'" class="fcfield-button" >&laquo; '.JText::_('FLEXI_REMOVE').'</a>'."\n";
 		$field->html .= "</div>\n";
     
 		$field->html .= "<div class='fcrelation_field_used_items'>";

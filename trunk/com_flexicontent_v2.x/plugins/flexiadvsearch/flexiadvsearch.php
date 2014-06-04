@@ -102,55 +102,95 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$params = clone( JComponentHelper::getParams('com_flexicontent') );
 		if ($menu) $params->merge($menu->params);
 		
-		// some parameter shortcuts
+		// some parameter shortcuts for SQL query
 		$show_noauth  = $params->get('show_noauth', 0);
-		$canseltypes  = $params->get('canseltypes', 1);
-		$txtmode      = $params->get('txtmode', 0);
 		$orderby_override = $params->get('orderby_override', 1);
-		$si_tbl = !$txtmode ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
 		
 		
-		// *****************
-		// Get Content Types
-		// *****************
 		
-		// Use HTTP request (if user is allowed to select them)
-		if ( $canseltypes ) $contenttypes = JRequest::getVar('contenttypes', array());
+		// ************************************************
+		// some parameter shortcuts common with search view
+		// ************************************************
+		$canseltypes  = $params->get('canseltypes', 1);
+		$txtmode      = $params->get('txtmode', 0);  // 0: BASIC Index, 1: ADVANCED Index without search fields user selection, 2: ADVANCED Index with search fields user selection
+		
+		// Get if text searching according to specific (single) content type
+		$show_txtfields = $params->get('show_txtfields', 1);  //0:hide, 1:according to content, 2:use custom configuration
+		$show_txtfields = $txtmode ? 0 : $show_txtfields;  // disable this flag if using BASIC index for text search
+		
+		// Get if filtering according to specific (single) content type
+		$show_filters   = $params->get('show_filters', 1);  //0:hide, 1:according to content, 2:use custom configuration
+		
+		// Force single type selection and showing the content type selector
+		$type_based_search = ($show_filters==1 || $show_txtfields==1);
+		$canseltypes = $type_based_search ? 1 : $canseltypes;
+		
+		
+		
+		// ********************************************************************
+		// Get Content Types allowed for user selection in the Search Form
+		// Also retrieve their configuration, plus the currently selected types
+		// ********************************************************************
+		// Get them from configuration
+		$contenttypes = $params->get('contenttypes', array());
 		
 		// Sanitize them
 		$contenttypes = !is_array($contenttypes)  ?  array($contenttypes)  :  $contenttypes;
 		$contenttypes = array_unique(array_map('intval', $contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
+		
+		// Create a comma list of them
+		$contenttypes_list = count($contenttypes) ? implode(",", $contenttypes) : "";
+		
+		// Force hidden content type selection if only 1 content type was initially configured
+		$canseltypes = count($contenttypes)<=1 ? 0 : $canseltypes;
+		
+		// Type data and configuration (parameters), if no content types specified then all will be retrieved
+		$types_data = flexicontent_db::getTypeData($contenttypes_list);
+		$contenttypes = array();
+		foreach($types_data as $tdata) $contenttypes[] = $tdata->id;
+		
+		// Get Content Types to use either those currently selected in the Search Form, or those hard-configured in the search menu item
+		if ( $canseltypes ) {
+			$form_contenttypes = JRequest::getVar('contenttypes', array());
+			
+			// Sanitize them
+			$form_contenttypes = !is_array($form_contenttypes)  ?  array($form_contenttypes)  :  $form_contenttypes;
+			$form_contenttypes = array_unique(array_map('intval', $form_contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
+			
+			$contenttypes = array_intersect($contenttypes, $form_contenttypes);
+		}
+		
+		// Check for zero content type (can occur during sanitizing content ids to integers)
 		if ( !empty($contenttypes) ) {
 			foreach($contenttypes as $i => $v) if (!strlen($contenttypes[$i])) unset($contenttypes[$i]);
 		}
 		
-		// Fallback to configuration if user did not set them in HTTP request (or if user is not allowed to use them)
-		if( !$canseltypes || empty($contenttypes) )  $contenttypes = $params->get('contenttypes', array());
-		
-		// Create a comma list of them
-		$contenttypes_list = count($contenttypes) ? "'".implode("','", $contenttypes)."'"  :  "";
+		// Type based seach, get a single content type (first one, if more than 1 were given ...)
+		if ($type_based_search && !empty($contenttypes)) {
+			$single_contenttype = reset($contenttypes);
+			$contenttypes = array($single_contenttype);
+		} else {
+			$single_contenttype = false;
+		}
 		
 		
 		
 		// *************************************
 		// Text Search Fields of the search form
 		// *************************************
-		
-		// Using Basic Search Index for Text Search
 		if ( !$txtmode ) {
 			$txtflds = array();
 			$fields_text = array();
 		}
 		
-		// Using Advanced Search Index for Text Search
 		else {
-			// Fallback to configuration if user did not set them in HTTP request (or if user is not allowed to use them)
-			if( $txtmode==1 || empty($txtflds) ) $txtflds = $params->get('txtflds', '');
-			
-			// Use HTTP request (if user is allowed to select them)
-			if ( $txtmode==2 ) {
-				$txtflds = JRequest::getVar('txtflds', array());
-				if ( is_array($txtflds) ) $txtflds = implode(',', $txtflds);
+			$txtflds = '';
+			if ( $show_txtfields ) {
+				if ( $show_txtfields==1 ) {
+					$txtflds = $single_contenttype ? $types_data[$single_contenttype]->params->get('searchable', '') : '';
+				} else {
+					$txtflds = $params->get('txtflds', '');
+				}
 			}
 			
 			// Sanitize them
@@ -164,17 +204,29 @@ class plgSearchFlexiadvsearch extends JPlugin
 			// Retrieve field properties/parameters, verifying the support to be used as Text Search Fields
 			// This will return all supported fields if field limiting list is empty
 			$fields_text = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', $txtflds_list, $contenttypes, $load_params=true, 0, 'search');
-			if ( !count($fields_text) )  // all entries of field limiting list were invalid , get ALL
-				$fields_text = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'search');
+			if ( empty($fields_text) ) { // all entries of field limiting list were invalid , get ALL
+				if( !empty($contenttypes) ) {
+					$fields_text = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'search');
+				} else {
+					$fields_text = array();
+				}
+			}
 		}
+		
 		
 		
 		// ********************************
 		// Filter Fields of the search form
 		// ********************************
-		
-		// Get them from configuration
-		$filtflds = $params->get('filtflds', '');
+		// Get them from type configuration or from search menu item
+		$filtflds = '';
+		if ( $show_filters ) {
+			if ( $show_filters==1 ) {
+				$filtflds = $single_contenttype ? $types_data[$single_contenttype]->params->get('filters', '') : '';
+			} else {
+				$filtflds = $params->get('filtflds', '');
+			}
+		}
 		
 		// Sanitize them
 		$filtflds = preg_replace("/[\"'\\\]/u", "", $filtflds);
@@ -186,12 +238,33 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		// Retrieve field properties/parameters, verifying the support to be used as Filter Fields
 		// This will return all supported fields if field limiting list is empty
-		if ( count($filtflds) )
-			$fields_filter = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', $filtflds_list, $contenttypes, $load_params=true, 0, 'filter');
-		else
-			$fields_filter = array();
-		//if ( !count($fields_filter) )  // all entries of field limiting list were invalid , get ALL
-		//	$fields_filter = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'filter');
+		if ( count($filtflds) ) {
+			$filters_tmp = FlexicontentFields::getSearchFields($key='name', $indexer='advanced', $filtflds_list, $contenttypes, $load_params=true, 0, 'filter');
+			
+			// Use custom order
+			$filters = array();
+			if ($canseltypes && $show_filters) {
+				foreach( $filtflds as $field_name) {
+					if ( empty($filters_tmp[$field_name]) ) continue;
+					$filter_id = $filters_tmp[$field_name]->id;
+					$filters[$filter_id] = $filters_tmp[$field_name];
+				}
+			} else {
+				foreach( $filters_tmp as $filter) {
+					$filters[$filter->id] = $filter;  // index by filter_id in this case too (for consistency, although we do not use the array index ?)
+				}
+			}
+			unset($filters_tmp);
+		}
+		
+		// If configured filters were not found/invalid for the current content type(s)
+		// then retrieve all fields marked as filterable for the give content type(s) this is useful to list per content type filters automatically, even when not set or misconfigured
+		if ( empty($filters) ) {
+			if( !empty($contenttypes) )
+				$filters = FlexicontentFields::getSearchFields($key='id', $indexer='advanced', null, $contenttypes, $load_params=true, 0, 'filter');
+			else
+				$filters = array();
+		}
 		
 		
 		
@@ -238,6 +311,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		// Create WHERE clause part for Text Search 
 		// ****************************************
 		
+		$si_tbl = !$txtmode ? 'flexicontent_items_ext' : 'flexicontent_advsearch_index';
 		$text = trim( $text );
 		if( strlen($text) )
 		{
@@ -480,7 +554,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		$return_sql = true;
 		$filters_where = array();
-		foreach($fields_filter as $field)
+		foreach($filters as $field)
 		{
 			// Get value of current filter, and SKIP it if value is EMPTY
 			$filtervalue = JRequest::getVar('filter_'.$field->id, '');

@@ -100,9 +100,9 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		$controller = FLEXI_J30GE ? $jinput->get('controller', '', 'string') : JRequest::getVar('controller');
 		$component  = FLEXI_J30GE ? $jinput->get('component', '', 'string')  : JRequest::getVar('component');
 		
-		if ($option=='com_config' || $option=='com_menus') {
-			$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_shared.css');
-		}
+		//if ($option=='com_config' || $option=='com_menus' || $option=='com_modules') {
+		$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_shared.css');
+		//}
 		
 		$js = '';
 		if ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') {

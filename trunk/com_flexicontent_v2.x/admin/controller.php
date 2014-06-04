@@ -50,13 +50,20 @@ class FlexicontentController extends JControllerLegacy
 		// NOTE, POSTINSTALL WILL NOT LET USER USE ANYTHING UNTIL ALL TASKS ARE COMPLETED
 		$postinst_integrity_ok = $session->get('flexicontent.postinstall');
 		$recheck_aftersave = $session->get('flexicontent.recheck_aftersave');
+		
+		//$valArray = array(false => 'false', true => 'true', null=>'null');
+		//echo  "postinst_integrity_ok: " . (isset($valArray[$postinst_integrity_ok])  ?  $valArray[$postinst_integrity_ok]  :  $postinst_integrity_ok) ."<br/>\n";
+		//echo  "recheck_aftersave: " . (isset($valArray[$recheck_aftersave])  ?  $valArray[$recheck_aftersave]  :  $recheck_aftersave) ."<br/>\n";
+		
 		$format	= JRequest::getCmd('format', null);
-		 if ( $format!="raw"  &&  ($postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave) ) {
+		if ( $format!="raw"  &&  ($postinst_integrity_ok===NULL || $postinst_integrity_ok===false || $recheck_aftersave) ) {
 			// NULL mean POSTINSTALL tasks has not been checked YET (current PHP user session),
 			// false means it has been checked during current session, but has failed one or more tasks
 			// In both cases we must evaluate the POSTINSTALL tasks,  and set the session variable
 			if ( $print_logging_info ) $start_microtime = microtime(true);
-			$session->set('flexicontent.postinstall', $postinst_integrity_ok = $this->getPostinstallState());
+			$postinst_integrity_ok = $this->getPostinstallState();
+			//echo  "set postinst_integrity_ok: " . (isset($valArray[$postinst_integrity_ok])  ?  $valArray[$postinst_integrity_ok]  :  $postinst_integrity_ok) ."<br/>\n";
+			$session->set('flexicontent.postinstall', $postinst_integrity_ok);
 			$session->set('unbounded_count', false, 'flexicontent');  // indicate to item manager to recheck unbound items
 			if ( $print_logging_info ) @$fc_run_times['post_installation_tasks'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
@@ -64,8 +71,10 @@ class FlexicontentController extends JControllerLegacy
 		// SET recheck_aftersave FLAG to indicate rechecking of (a) post installation tasks AND (b) integrity checks after configuration save or article importing
 		if ($config_saved) {
 			$session->set('flexicontent.recheck_aftersave', !$postinst_integrity_ok);
+			//echo  "set recheck_aftersave: " . (isset($valArray[!$postinst_integrity_ok])  ?  $valArray[!$postinst_integrity_ok]  :  !$postinst_integrity_ok) ."<br/>\n";
 		} else {
 			$session->set('flexicontent.recheck_aftersave', true);
+			//echo  "set recheck_aftersave: true" ."<br/>\n";
 		}
 		
 		if ( $print_logging_info ) $start_microtime = microtime(true);
