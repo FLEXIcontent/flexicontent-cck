@@ -19,8 +19,7 @@
 defined('_JEXEC') or die('Restricted access');
 
 if (FLEXI_J16GE) {
-	jimport('joomla.database.tableasset');
-	jimport('joomla.access.accessrules');
+	jimport('joomla.access.rules');
 }
 
 class _flexicontent_types_common extends JTable {
@@ -185,7 +184,7 @@ class flexicontent_types extends _flexicontent_types
 			}
 			
 			// (b) Assign the rules
-			$rules = new JRules($array['rules']);
+			$rules = new JAccessRules($array['rules']);
 			$this->setRules($rules);
 		}
 		
@@ -270,7 +269,7 @@ class flexicontent_types extends _flexicontent_types
 		$asset->name		= $name;
 		$asset->title		= $title;
 
-		if ($this->_rules instanceof JRules) {
+		if ($this->_rules instanceof JAccessRules) {
 			$asset->rules = (string) $this->_rules;
 		}
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1902 2014-05-10 16:06:11Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1907 2014-05-27 12:35:36Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -24,6 +24,9 @@ $permissions = FlexicontentHelperPerm::getPerm();
 $session = JFactory::getSession();
 $document = JFactory::getDocument();
 
+$close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
+$alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
+
 // Load JS tabber lib
 $document->addScript( JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js' );
 $document->addStyleSheet( JURI::root().'components/com_flexicontent/assets/css/tabber.css' );
@@ -31,322 +34,330 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 ?>
 
 <div id="flexicontent" class="flexicontent">
-<table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;" id="filemanager-zone">
-	<tr>
-		<td>
-			<div class="fctabber" style=''>
-			
-			<!-- File(s) by uploading -->
-			<?php
-			//echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
-			
-			if ($this->CanUpload) :
-				/*echo FLEXI_J16GE ?
-					JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
-					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;*/
-			?>
-			<div class="tabbertab" style="padding: 0px;" id="local_tab" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ); ?> </h3>
-				<?php if ($this->require_ftp): ?>
-            <form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>ftpValidate" name="ftpForm" id="ftpForm" method="post">
-                <fieldset title="<?php echo JText::_( 'FLEXI_DESCFTPTITLE' ); ?>">
-                    <legend><?php echo JText::_( 'FLEXI_DESCFTPTITLE' ); ?></legend>
-                    <?php echo JText::_( 'FLEXI_DESCFTP' ); ?>
-                    <table class="adminform nospace">
-                        <tbody>
-                            <tr>
-                                <td width="120">
-                                    <label for="username"><?php echo JText::_( 'FLEXI_USERNAME' ); ?>:</label>
-                                </td>
-                                <td>
-                                    <input type="text" id="username" name="username" class="input_box" size="70" value="" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="120">
-                                    <label for="password"><?php echo JText::_( 'FLEXI_PASSWORD' ); ?>:</label>
-                                </td>
-                                <td>
-                                    <input type="password" id="password" name="password" class="input_box" size="70" value="" />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </fieldset>
-            </form>
-				<?php endif; ?>
-			
-			<!-- File Upload Form -->
+
+<?php if (!$this->CanUpload) :?>
+	<?php echo sprintf( $alert_box, '', 'note', '', JText::_('FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') ); ?>
+<?php endif; ?>
+
+
+<div class="fctabber" style=''>
+	<?php
+	//echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
+	?>
+	
+	<!-- File(s) by uploading -->
+	
+	<?php if ($this->CanUpload):
+		//echo FLEXI_J16GE ?
+		//	JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
+		//	$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
+	?>
+	<div class="tabbertab" style="padding: 0px;" id="local_tab" >
+		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ); ?> </h3>
+		<?php if ($this->require_ftp): ?>
+        <form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>ftpValidate" name="ftpForm" id="ftpForm" method="post">
+            <fieldset title="<?php echo JText::_( 'FLEXI_DESCFTPTITLE' ); ?>">
+                <legend><?php echo JText::_( 'FLEXI_DESCFTPTITLE' ); ?></legend>
+                <?php echo JText::_( 'FLEXI_DESCFTP' ); ?>
+                <table class="adminform nospace">
+                    <tbody>
+                        <tr>
+                            <td width="120">
+                                <label for="username"><?php echo JText::_( 'FLEXI_USERNAME' ); ?>:</label>
+                            </td>
+                            <td>
+                                <input type="text" id="username" name="username" class="input_box" size="70" value="" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="120">
+                                <label for="password"><?php echo JText::_( 'FLEXI_PASSWORD' ); ?>:</label>
+                            </td>
+                            <td>
+                                <input type="password" id="password" name="password" class="input_box" size="70" value="" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </fieldset>
+        </form>
+		<?php endif; ?>
+	
+	<!-- File Upload Form -->
+	<fieldset class="filemanager-tab" >
+		<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
+		
+		<fieldset class="actions" id="filemanager-1">
 			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
-				<fieldset class="filemanager-tab" >
-					<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
-					<fieldset class="actions" id="filemanager-1">
-						
-						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
-							
-							<tr>
-								<td class="key">
-									<label for="file-upload">
-									<?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?>
-									</label>
-								</td>
-								<td width="260">
-									<input type="file" id="file-upload" name="Filedata" />
-								</td>
-								
-								<td class="key">
-									<label>
-									<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
-									</label>
-								</td>
-								<td>
-									<?php echo $this->lists['file-lang']; ?>
-								</td>
-							</tr>
-							
-							<tr>
-								<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_CHOOSE_DIR' ); ?>">
-									<label>
-									<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
-									</label>
-								</td>
-								<td>
-									<?php echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_uploadFileForm' ); ?>
-								</td>
-								
-								<td class="key" rowspan="3">
-									<label for="file-desc_uploadFileForm">
-									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
-									</label>
-								</td>
-								<td valign="top" rowspan="3">
-									<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm"></textarea>
-								</td>
-							</tr>
-							
-							<tr>
-								<td class="key">
-									<label for="file-title">
-									<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
-									</label>
-								</td>
-								<td>
-									<input type="text" id="file-title" size="44" class="required" name="file-title" />
-								</td>
-							</tr>
-							
-						</table>
-						
-						<input type="submit" id="file-upload-submit" class="fc_button fcsimple" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
-						<span id="upload-clear"></span>
-						
-					</fieldset>
+				
+				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
 					
-					<ul class="upload-queue" id="upload-queue">
-						<li style="display: none"></li>
-					</ul>
-				</fieldset>
+					<tr>
+						<td class="key">
+							<label for="file-upload">
+							<?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?>
+							</label>
+						</td>
+						<td width="260">
+							<input type="file" id="file-upload" name="Filedata" />
+						</td>
+						
+						<td class="key">
+							<label>
+							<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo $this->lists['file-lang']; ?>
+						</td>
+					</tr>
+					
+					<tr>
+						<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_CHOOSE_DIR' ); ?>">
+							<label>
+							<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_uploadFileForm' ); ?>
+						</td>
+						
+						<td class="key" rowspan="3">
+							<label for="file-desc_uploadFileForm">
+							<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+							</label>
+						</td>
+						<td valign="top" rowspan="3">
+							<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm"></textarea>
+						</td>
+					</tr>
+					
+					<tr>
+						<td class="key">
+							<label for="file-title">
+							<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
+							</label>
+						</td>
+						<td>
+							<input type="text" id="file-title" size="44" class="required" name="file-title" />
+						</td>
+					</tr>
+					
+				</table>
+				
+				<input type="submit" id="file-upload-submit" class="fc_button fcsimple" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
+				<span id="upload-clear"></span>
+				
 				<?php echo JHTML::_( 'form.token' ); ?>
 				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
 			</form>
-			<?php /*echo FLEXI_J16GE ? '' : $this->pane->endPanel();*/ ?>
-			</div>
-			<?php endif; ?>
 			
-			
-			<!-- File URL by Form -->
-			<?php
-				/*echo FLEXI_J16GE ?
-					JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) :
-					$this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) ;*/
-			?>
-			<div class="tabbertab" style="padding: 0px;" id="fileurl_tab" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_BY_URL' ); ?> </h3>
-			
-			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="addUrlForm" id="addUrlForm" method="post">
-				<fieldset class="filemanager-tab" >
-					<legend><?php echo JText::_( 'FLEXI_ADD_FILE_BY_URL' ); ?></legend>
-					<fieldset class="actions" id="filemanager-2">
+		</fieldset>
+		
+		
+	</fieldset>
+	
+	</div>
+	<?php
+	//echo FLEXI_J16GE ? '' : $this->pane->endPanel();
+	?>
+	<?php endif; ?>
+	
+	
+	<!-- File URL by Form -->
+	<?php
+		//echo FLEXI_J16GE ?
+		//	JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) :
+		//	$this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_BY_URL' ), 'fileurl' ) ;
+	?>
+	<div class="tabbertab" style="padding: 0px;" id="fileurl_tab" >
+		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_BY_URL' ); ?> </h3>
+	
+	<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addurl&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="addUrlForm" id="addUrlForm" method="post">
+		<fieldset class="filemanager-tab" >
+			<legend><?php echo JText::_( 'FLEXI_ADD_FILE_BY_URL' ); ?></legend>
+			<fieldset class="actions" id="filemanager-2">
+				
+				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
+					
+					<tr>
+						<td class="key">
+							<label for="file-url-data">
+							<?php echo JText::_( 'FLEXI_FILE_URL' ); ?>
+							</label>
+						</td>
+						<td width="260">
+							<input type="text" id="file-url-data" size="44" class="required" name="file-url-data" />
+						</td>
 						
-						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
-							
-							<tr>
-								<td class="key">
-									<label for="file-url-data">
-									<?php echo JText::_( 'FLEXI_FILE_URL' ); ?>
-									</label>
-								</td>
-								<td width="260">
-									<input type="text" id="file-url-data" size="44" class="required" name="file-url-data" />
-								</td>
-								
-								<td class="key">
-									<label>
-									<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
-									</label>
-								</td>
-								<td>
-									<?php echo str_replace('file-lang', 'file-url-lang', $this->lists['file-lang']); ?>
-								</td>
-							</tr>
-							
-							<tr>
-								<td class="key">
-									<label for="file-url-ext">
-									<?php echo JText::_( 'FLEXI_FILEEXT' ); ?>
-									</label>
-								</td>
-								<td>
-									<input type="text" id="file-url-ext" size="5" class="required" name="file-url-ext" />
-								</td>
-								<td class="key" rowspan="3">
-									<label for="file-url-desc">
-									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
-									</label>
-								</td>
-								<td rowspan="3">
-									<textarea name="file-url-desc" cols="24" rows="3" id="file-url-desc"></textarea>
-								</td>
-							</tr>
-							
-							<tr>
-								<td class="key">
-									<label for="file-url-title">
-									<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
-									</label>
-								</td>
-								<td>
-									<input type="text" id="file-url-title" size="44" class="required" name="file-url-title" />
-								</td>
-							</tr>
-							
-						</table>
-						
-						<input type="submit" id="file-url-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>"/>
-					</fieldset>
-				</fieldset>
-				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
-			</form>
-			<?php /*echo FLEXI_J16GE ? '' : $this->pane->endPanel();*/ ?>
-			</div>
-			
-			
-			<!-- File(s) from server Form -->
-			<?php
-			if ($this->CanUpload) :
-				/*echo FLEXI_J16GE ?
-					JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' ) :
-					$this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' ) ;*/
-			?>
-			<div class="tabbertab" style="padding: 0px;" id="server_tab" >
-				<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ); ?> </h3>
-			
-			<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="addFileForm" id="addFileForm" method="post">
-				<fieldset class="filemanager-tab" >
-					<legend>
-						<?php echo JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ); ?>
-					</legend>
-					<fieldset class="actions" id="filemanager-3">
+						<td class="key">
+							<label>
+							<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo str_replace('file-lang', 'file-url-lang', $this->lists['file-lang']); ?>
+						</td>
+					</tr>
+					
+					<tr>
+						<td class="key">
+							<label for="file-url-ext">
+							<?php echo JText::_( 'FLEXI_FILEEXT' ); ?>
+							</label>
+						</td>
+						<td>
+							<input type="text" id="file-url-ext" size="5" class="required" name="file-url-ext" />
+						</td>
+						<td class="key" rowspan="3">
+							<label for="file-url-desc">
+							<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+							</label>
+						</td>
+						<td rowspan="3">
+							<textarea name="file-url-desc" cols="24" rows="3" id="file-url-desc"></textarea>
+						</td>
+					</tr>
+					
+					<tr>
+						<td class="key">
+							<label for="file-url-title">
+							<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
+							</label>
+						</td>
+						<td>
+							<input type="text" id="file-url-title" size="44" class="required" name="file-url-title" />
+						</td>
+					</tr>
+					
+				</table>
+				
+				<input type="submit" id="file-url-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_FILE' ); ?>"/>
+			</fieldset>
+		</fieldset>
+		<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
+	</form>
+	<?php /*echo FLEXI_J16GE ? '' : $this->pane->endPanel();*/ ?>
+	</div>
+	
+	
+	<!-- File(s) from server Form -->
+	<?php
+	if ($this->CanUpload) :
+		/*echo FLEXI_J16GE ?
+			JHtml::_('tabs.panel', JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' ) :
+			$this->pane->startPanel( JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ), 'server' ) ;*/
+	?>
+	<div class="tabbertab" style="padding: 0px;" id="server_tab" >
+		<h3 class="tabberheading"> <?php echo JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ); ?> </h3>
+	
+	<form action="index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>addlocal&amp;<?php echo $session->getName().'='.$session->getId(); ?>&amp;<?php echo (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());?>=1" class="form-validate" name="addFileForm" id="addFileForm" method="post">
+		<fieldset class="filemanager-tab" >
+			<legend>
+				<?php echo JText::_( 'FLEXI_ADD_FILE_FROM_SERVER' ); ?>
+			</legend>
+			<fieldset class="actions" id="filemanager-3">
 
-						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
-							
-							<tr>
-								<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_CHOOSE_DIR_PATH_DESC' ); ?>">
-									<label for="file-dir-path">
-									<?php echo JText::_( 'FLEXI_CHOOSE_DIR_PATH' ); ?>
-									</label>
-								</td>
-								<td width="260">
-									<input type="text" id="file-dir-path" size="50" value="/tmp" class="required" name="file-dir-path" />
-								</td>
-								
-								<td class="key">
-									<label>
-									<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
-									</label>
-								</td>
-								<td>
-									<?php echo
-										str_replace('id="file-lang', 'id="_file-lang',
-										str_replace('id="file-lang', 'id="_file-lang', $this->lists['file-lang'])
-										); ?>
-								</td>
-							</tr>
-							
-							<tr>
-								<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_FILE_FILTER_EXT' ); ?>::<?php echo JText::_( 'FLEXI_FILE_FILTER_EXT_DESC' ); ?>">
-									<label for="file-filter-ext">
-									<?php echo JText::_( 'FLEXI_FILE_FILTER_EXT' ); ?>
-									</label>
-								</td>
-								<td>
-									<input type="text" id="file-filter-ext" size="50" value="" name="file-filter-ext" />
-								</td>
-								
-								<td class="key" rowspan="4">
-									<label for="file-desc_addFileForm">
-									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
-									</label>
-								</td>
-								<td rowspan="4">
-									<textarea name="file-desc" cols="24" rows="6" id="file-desc_addFileForm"></textarea>
-								</td>
-							</tr>
-							
-							<tr>
-								<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_FILE_FILTER_REGEX' ); ?>::<?php echo JText::_( 'FLEXI_FILE_FILTER_REGEX_DESC' ); ?>">
-									<label for="file-filter-re">
-									<?php echo JText::_( 'FLEXI_FILE_FILTER_REGEX' ); ?>
-									</label>
-								</td>
-								<td>
-									<input type="text" id="file-filter-re" size="50" value="" name="file-filter-re" />
-								</td>
-							</tr>
-							
-							<tr>
-								<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_KEEP_ORIGINAL_FILE_DESC' ); ?>">
-									<label>
-									<?php echo JText::_( 'FLEXI_KEEP_ORIGINAL_FILE' ); ?>
-									</label>
-								</td>
-								<td>
-									<?php
-									echo JHTML::_('select.booleanlist', 'keep', 'class="inputbox"', 1, JText::_( 'FLEXI_YES' ), JText::_( 'FLEXI_NO' ) );
-									?>
-								</td>
-							</tr>
-							
-							<tr>
-								<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_CHOOSE_DIR' ); ?>">
-									<label>
-									<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
-									</label>
-								</td>
-								<td>
-									<?php
-									echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_addFileForm' );
-									?>
-								</td>
-							</tr>
-							
-						</table>
+				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
+					
+					<tr>
+						<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_CHOOSE_DIR_PATH_DESC' ); ?>">
+							<label for="file-dir-path">
+							<?php echo JText::_( 'FLEXI_CHOOSE_DIR_PATH' ); ?>
+							</label>
+						</td>
+						<td width="260">
+							<input type="text" id="file-dir-path" size="50" value="/tmp" class="required" name="file-dir-path" />
+						</td>
 						
-						<input type="submit" id="file-dir-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_DIR' ); ?>"/>
-					</fieldset>
-				</fieldset>
-				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
-			</form>
-			<?php /*echo FLEXI_J16GE ? '' : $this->pane->endPanel();*/ ?>
-			</div>
-			<?php endif; ?>
+						<td class="key">
+							<label>
+							<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php echo
+								str_replace('id="file-lang', 'id="_file-lang',
+								str_replace('id="file-lang', 'id="_file-lang', $this->lists['file-lang'])
+								); ?>
+						</td>
+					</tr>
+					
+					<tr>
+						<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_FILE_FILTER_EXT' ); ?>::<?php echo JText::_( 'FLEXI_FILE_FILTER_EXT_DESC' ); ?>">
+							<label for="file-filter-ext">
+							<?php echo JText::_( 'FLEXI_FILE_FILTER_EXT' ); ?>
+							</label>
+						</td>
+						<td>
+							<input type="text" id="file-filter-ext" size="50" value="" name="file-filter-ext" />
+						</td>
+						
+						<td class="key" rowspan="4">
+							<label for="file-desc_addFileForm">
+							<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+							</label>
+						</td>
+						<td rowspan="4">
+							<textarea name="file-desc" cols="24" rows="6" id="file-desc_addFileForm"></textarea>
+						</td>
+					</tr>
+					
+					<tr>
+						<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_FILE_FILTER_REGEX' ); ?>::<?php echo JText::_( 'FLEXI_FILE_FILTER_REGEX_DESC' ); ?>">
+							<label for="file-filter-re">
+							<?php echo JText::_( 'FLEXI_FILE_FILTER_REGEX' ); ?>
+							</label>
+						</td>
+						<td>
+							<input type="text" id="file-filter-re" size="50" value="" name="file-filter-re" />
+						</td>
+					</tr>
+					
+					<tr>
+						<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_KEEP_ORIGINAL_FILE_DESC' ); ?>">
+							<label>
+							<?php echo JText::_( 'FLEXI_KEEP_ORIGINAL_FILE' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php
+							echo JHTML::_('select.booleanlist', 'keep', 'class="inputbox"', 1, JText::_( 'FLEXI_YES' ), JText::_( 'FLEXI_NO' ) );
+							?>
+						</td>
+					</tr>
+					
+					<tr>
+						<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_CHOOSE_DIR' ); ?>">
+							<label>
+							<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
+							</label>
+						</td>
+						<td>
+							<?php
+							echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_addFileForm' );
+							?>
+						</td>
+					</tr>
+					
+				</table>
+				
+				<input type="submit" id="file-dir-submit" class="fc_button fcsimple validate" value="<?php echo JText::_( 'FLEXI_ADD_DIR' ); ?>"/>
+			</fieldset>
+		</fieldset>
+		<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=filemanager'); ?>" />
+	</form>
+	<?php /*echo FLEXI_J16GE ? '' : $this->pane->endPanel();*/ ?>
+	</div>
+	<?php endif; ?>
+	
+	<?php /*echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane();*/ ?>
+
+</div><!-- fctabber end -->
+
+
 			
-			<?php /*echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane();*/ ?>
-			</div>
-			
-		</td>
-	</tr>
-</table>
+<div class="fcclear"></div>
 
 <form action="<?php echo JURI::base(); ?>index.php" method="post" name="adminForm" id="adminForm">
 

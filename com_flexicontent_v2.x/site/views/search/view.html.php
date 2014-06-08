@@ -203,14 +203,11 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$contenttypes = !is_array($contenttypes)  ?  array($contenttypes)  :  $contenttypes;
 		$contenttypes = array_unique(array_map('intval', $contenttypes));  // Make sure these are integers since we will be using them UNQUOTED
 		
-		// Create a comma list of them
-		$contenttypes_list = count($contenttypes) ? implode(",", $contenttypes) : "";
-		
 		// Force hidden content type selection if only 1 content type was initially configured
 		$canseltypes = count($contenttypes)<=1 ? 0 : $canseltypes;
 		
 		// Type data and configuration (parameters), if no content types specified then all will be retrieved
-		$types_data = flexicontent_db::getTypeData($contenttypes_list);
+		$types_data = flexicontent_db::getTypeData( implode(",", $contenttypes) );
 		$contenttypes = array();
 		foreach($types_data as $tdata) $contenttypes[] = $tdata->id;
 		

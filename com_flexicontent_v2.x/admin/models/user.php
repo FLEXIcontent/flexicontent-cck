@@ -19,7 +19,6 @@
 defined('_JEXEC') or die;
 
 jimport('joomla.application.component.modeladmin');
-jimport('joomla.access.access');
 require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_users'.DS.'models'.DS.'user.php');
 
 /**

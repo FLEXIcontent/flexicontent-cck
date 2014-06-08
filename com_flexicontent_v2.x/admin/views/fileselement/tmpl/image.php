@@ -24,6 +24,9 @@ $ctrl_task  = FLEXI_J16GE ? 'task=filemanager.'  :  'controller=filemanager&amp;
 $del_task   = FLEXI_J16GE ? 'filemanager.remove'  :  'remove';
 $session = JFactory::getSession();
 
+$close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
+$alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
+
 // Load plupload JS framework
 $doc = JFactory::getDocument();
 $pluploadlib = JURI::root().'components/com_flexicontent/librairies/plupload/';
@@ -142,93 +145,101 @@ flexicontent_html::loadFramework('flexi-lib');
 ?>
 
 <div class="flexicontent">
-<table width="100%" border="0" style="padding: 5px; margin-bottom: 10px;" id="filemanager-zone">
-	<tr>
-		<td>
-			<?php
-			echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
-			if ($this->CanUpload) :
-				echo FLEXI_J16GE ?
-					JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
-					$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
-			?>
-			
-			<button id="single_multi_uploader" class="" onclick="jQuery('#filemanager-1').toggle(); jQuery('#filemanager-2').toggle(); jQuery('#flash_uploader').height(330); setTimeout(function(){showUploader()}, 100);">
-				<?php echo JText::_( 'FLEXI_SINGLE_MULTIPLE_UPLOADER' ); ?>
-			</button>
-			<div class="fcclear"></div>
-			
-			<!-- File Upload Form -->
-			<fieldset class="filemanager-tab" >
-				<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
-				
-				<fieldset class="actions" id="filemanager-1">
-					<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" id="uploadForm" method="post" enctype="multipart/form-data">
-						
-						<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
-							
-							<tr>
-								<td class="key">
-									<label for="file-upload">
-									<?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?>
-									</label>
-								</td>
-								<td>
-									<div id="img_preview_msg" style="float:left;"></div>
-									<img id="img_preview" src="" style="float:left;"/>
-									<input type="file" id="file-upload" name="Filedata" onchange="loadImagePreview(this.id,'img_preview', 'img_preview_msg', 60, 60);" />
-								</td>
-							</tr>
-<?php if (!$this->folder_mode) { ?>
-							<tr>
-								<td class="key">
-									<label for="file-desc">
-									<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
-									</label>
-								</td>
-								<td>
-									<textarea name="file-desc" cols="24" rows="3" id="file-desc"></textarea>
-								</td>
-							</tr>
-							
-							<tr>
-								<td class="key">
-									<label for="file-title">
-									<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
-									</label>
-								</td>
-								<td>
-									<input type="text" id="file-title" size="44" class="required" name="file-title" />
-								</td>
-							</tr>
-<?php } ?>
-						</table>
-						<input type="submit" id="file-upload-submit" class="fc_button fcsimple" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
-						<span id="upload-clear"></span>
-						
-						<?php echo JHTML::_( 'form.token' ); ?>
-						<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
-						<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
-						<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
-						<input type="hidden" name="secure" value="0" />
-						<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
-					</form>
-					
-				</fieldset>
-				
-				<fieldset class="actions" id="filemanager-2" style="display:none;">
-					<div id="flash_uploader" style="width: auto; height: 0px;">Your browser doesn't have Flash installed.</div>
-				</fieldset>
-				
-			</fieldset>
-			
-			<?php echo FLEXI_J16GE ? '' : $this->pane->endPanel(); ?>
 
-			<?php endif; ?>
-			<?php echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane(); ?>
-		</td>
-	</tr>
-</table>
+<?php if (!$this->CanUpload) :?>
+	<?php echo sprintf( $alert_box, '', 'note', '', JText::_('FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') ); ?>
+<?php else: ?>
+
+
+	<?php
+	echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
+	?>
+	
+	<!-- File(s) by uploading -->
+	
+	<?php
+		echo FLEXI_J16GE ?
+			JHtml::_('tabs.panel', JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) :
+			$this->pane->startPanel( JText::_( 'FLEXI_UPLOAD_LOCAL_FILE' ), 'local' ) ;
+	?>
+	
+	<button id="single_multi_uploader" class="" onclick="jQuery('#filemanager-1').toggle(); jQuery('#filemanager-2').toggle(); jQuery('#flash_uploader').height(330); setTimeout(function(){showUploader()}, 100);">
+		<?php echo JText::_( 'FLEXI_SINGLE_MULTIPLE_UPLOADER' ); ?>
+	</button>
+	<div class="fcclear"></div>
+	
+	<!-- File Upload Form -->
+	<fieldset class="filemanager-tab" >
+		<legend><?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?> [ <?php echo JText::_( 'FLEXI_MAX' ); ?>&nbsp;<?php echo ($this->params->get('upload_maxsize') / 1000000); ?>M ]</legend>
+		
+		<fieldset class="actions" id="filemanager-1">
+			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
+				
+				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
+					
+					<tr>
+						<td class="key">
+							<label for="file-upload">
+							<?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?>
+							</label>
+						</td>
+						<td>
+							<div id="img_preview_msg" style="float:left;"></div>
+							<img id="img_preview" src="" style="float:left;"/>
+							<input type="file" id="file-upload" name="Filedata" onchange="loadImagePreview(this.id,'img_preview', 'img_preview_msg', 60, 60);" />
+						</td>
+					</tr>
+	<?php if (!$this->folder_mode) { ?>
+					<tr>
+						<td class="key">
+							<label for="file-desc">
+							<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
+							</label>
+						</td>
+						<td>
+							<textarea name="file-desc" cols="24" rows="3" id="file-desc"></textarea>
+						</td>
+					</tr>
+					
+					<tr>
+						<td class="key">
+							<label for="file-title">
+							<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
+							</label>
+						</td>
+						<td>
+							<input type="text" id="file-title" size="44" class="required" name="file-title" />
+						</td>
+					</tr>
+	<?php } ?>
+				</table>
+				
+				<input type="submit" id="file-upload-submit" class="fc_button fcsimple" value="<?php echo JText::_( 'FLEXI_START_UPLOAD' ); ?>"/>
+				<span id="upload-clear"></span>
+				
+				<?php echo JHTML::_( 'form.token' ); ?>
+				<input type="hidden" name="fieldid" value="<?php echo $this->fieldid; ?>" />
+				<input type="hidden" name="u_item_id" value="<?php echo $this->u_item_id; ?>" />
+				<input type="hidden" name="folder_mode" value="<?php echo $this->folder_mode; ?>" />
+				<input type="hidden" name="secure" value="0" />
+				<input type="hidden" name="return-url" value="<?php echo base64_encode('index.php?option=com_flexicontent&view=fileselement&tmpl=component&field='.$this->fieldid.'&folder_mode='.$this->folder_mode.'&layout=image&filter_secure=M'); ?>" />
+			</form>
+			
+		</fieldset>
+		
+		<fieldset class="actions" id="filemanager-2" style="display:none;">
+			<div id="flash_uploader" style="width: auto; height: 0px;">Your browser doesn't have Flash installed.</div>
+		</fieldset>
+		
+	</fieldset>
+	
+	<?php
+	echo FLEXI_J16GE ? '' : $this->pane->endPanel();
+	echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane();
+	?>
+
+<?php endif; ?>
+
 
 <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;view=fileselement&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component&amp;layout=image&amp;filter_secure=M" method="post" name="adminForm" id="adminForm">
 

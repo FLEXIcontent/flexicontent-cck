@@ -543,8 +543,9 @@ class FlexicontentHelperPerm
 			$rules_string	= $db->loadResult(); // $db->loadColumn();
 			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 			
-			// Instantiate a JRules object for the asset rules
-			$rules = new JRules($rules_string);       //SAME AS: $rules = new JRules(); $rules->merge($rules_string);
+			// Instantiate a JAccessRules object for the asset rules
+			jimport('joomla.access.rules');
+			$rules = new JAccessRules($rules_string);       //SAME AS: $rules = new JAccessRules(); $rules->merge($rules_string);
 			
 			// Get user's groups (user identities)
 			$groups = $user->getAuthorisedGroups();   //SAME AS: $groups = JAccess::getGroupsByUser($uid, $recursive);

@@ -20,7 +20,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.model');
-if (FLEXI_J16GE) jimport('joomla.access.accessrules');
+if (FLEXI_J16GE) {
+	jimport('joomla.access.rules');
+}
 
 /**
  * FLEXIcontent Component Model
