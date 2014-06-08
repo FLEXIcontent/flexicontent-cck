@@ -20,7 +20,9 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.model');
-if (FLEXI_J16GE) jimport('joomla.access.accessrules');
+if (FLEXI_J16GE) {
+	jimport('joomla.access.rules');
+}
 
 /**
  * FLEXIcontent Component Model
@@ -1545,7 +1547,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$asset	= JTable::getInstance('asset');
 		if ($comp_section = $asset->loadByName($component_name)) {  // Try to load component asset, if missing it returns false
 			// ok, component asset not missing, proceed to cross check for deleted / added actions
-			$rules = new JRules($asset->rules);
+			$rules = new JAccessRules($asset->rules);
 			$rules_data = $rules->getData();
 			$component_actions = JAccess::getActions($component_name, 'component');
 			
@@ -1641,7 +1643,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			
 			// Create initial component rules and set them into the asset
 			$initial_rules = $this->_createComponentRules($component_name);
-			$component_rules = new JRules(json_encode($initial_rules));
+			$component_rules = new JAccessRules(json_encode($initial_rules));
 			$asset->rules = $component_rules->__toString();
 			
 			// Save the asset into the DB
@@ -1654,7 +1656,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			// The assets entry already exists: We will check if it has exactly the actions specified in component's access.xml file
 			
 			// Get existing DB rules and component's actions from the access.xml file
-			$existing_rules = new JRules($asset->rules);
+			$existing_rules = new JAccessRules($asset->rules);
 			$rules_data = $existing_rules->getData();
 			$component_actions = JAccess::getActions('com_flexicontent', 'component');
 			
@@ -1670,7 +1672,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				
 				// First merge the existing component (db) rules into the initial rules
 				$initial_rules = $this->_createComponentRules($component_name);
-				$component_rules = new JRules(json_encode($initial_rules));
+				$component_rules = new JAccessRules(json_encode($initial_rules));
 				$component_rules->merge($existing_rules);
 				
 				// Second, check if obsolete rules are contained in the existing component (db) rules, if so create a new rules object without the obsolete rules
@@ -1679,7 +1681,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					foreach($deleted_actions as $action_name) {
 						unset($rules_data[$action_name]);
 					}
-					$component_rules = new JRules($rules_data);
+					$component_rules = new JAccessRules($rules_data);
 				}
 				
 				// Set asset rules
@@ -1729,7 +1731,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					$asset->id 		= null;
 					
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
-					$asset->rules = new JRules();
+					$asset->rules = new JAccessRules();
 					
 					/*if ($parentId == $component_asset->id) {				
 						$actions	= JAccess::getActions($component_name, 'category');
@@ -1737,7 +1739,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 						foreach ($actions as $action) {
 							$catrules[$action->name] = $rules->{$action->name};
 						}
-						$rules = new JRules(json_encode($catrules));
+						$rules = new JAccessRules(json_encode($catrules));
 						$asset->rules = $rules->__toString();
 					} else {
 						$parent = JTable::getInstance('asset');
@@ -1808,7 +1810,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					$asset->id 		= null;
 					
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
-					$asset->rules = new JRules();
+					$asset->rules = new JAccessRules();
 					
 					//if ($parentId == $component_asset->id) {				
 					//	$actions	= JAccess::getActions($component_name, 'article');
@@ -1816,7 +1818,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					//	foreach ($actions as $action) {
 					//		$catrules[$action->name] = $rules->{$action->name};
 					//	}
-					//	$rules = new JRules(json_encode($catrules));
+					//	$rules = new JAccessRules(json_encode($catrules));
 					//	$asset->rules = $rules->__toString();
 					//} else {
 					//	$parent = JTable::getInstance('asset');
@@ -1885,14 +1887,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					$asset->setLocation($component_asset->id, 'last-child');     // Permissions of fields are directly inheritted by component
 					
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
-					$asset->rules = new JRules();
+					$asset->rules = new JAccessRules();
 					/*
 					$actions	= JAccess::getActions($component_name, 'field');
 					$rules 		= json_decode($component_asset->rules);		
 					foreach ($actions as $action) {
 						$fieldrules[$action->name] = $rules->{$action->name};
 					}
-					$rules = new JRules(json_encode($fieldrules));
+					$rules = new JAccessRules(json_encode($fieldrules));
 					$asset->rules = $rules->__toString();
 					*/
 					
@@ -1949,14 +1951,14 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 					$asset->setLocation($component_asset->id, 'last-child');     // Permissions of types are directly inheritted by component
 					
 					// Set asset rules to empty, (DO NOT set any ACTIONS, just let them inherit ... from parent)
-					$asset->rules = new JRules();
+					$asset->rules = new JAccessRules();
 					/*
 					$actions	= JAccess::getActions($component_name, 'type');
 					$rules 		= json_decode($component_asset->rules);		
 					foreach ($actions as $action) {
 						$typerules[$action->name] = $rules->{$action->name};
 					}
-					$rules = new JRules(json_encode($typerules));
+					$rules = new JAccessRules(json_encode($typerules));
 					$asset->rules = $rules->__toString();
 					*/
 					
@@ -2008,7 +2010,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		// Get Joomla ACTION names
 		$root = JTable::getInstance('asset');
 		$root->loadByName('root.1');
-		$joomla_rules = new JRules( $root->rules );
+		$joomla_rules = new JAccessRules( $root->rules );
 		foreach ($joomla_rules->getData() as $action_name => $data) {
 			$joomla_action_names[] = $action_name;
 		}

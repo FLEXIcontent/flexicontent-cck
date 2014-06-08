@@ -211,12 +211,30 @@
 		
 		<field type="jparamstab" title="FLEXI_ITEM_LIST_BASIC_OPTIONS" description="FLEXI_ITEM_LIST_BASIC_OPTIONS_DESC" />
 
-			<field name="" type="separator" default="FLEXI_FEATURED_STANDARD_ITEMS" description="" level="level1" />
+			<field name="" type="separator" default="FLEXI_UMOD_FEATURED_STANDARD_ITEMS" description="" level="level1" />
 			<field name="count" type="text" default="5" size="3" label="FLEXI_COUNT" description="FLEXI_COUNT_DESC" />
 			<field name="count_feat" type="text" default="1" size="3" label="FLEXI_COUNT_FEAT" description="FLEXI_COUNT_FEAT_DESC" />
-			<field name="item_columns" type="list" default="1" label="FLEXI_COLS_DEFAULT_ITEMS" description="FLEXI_COLS_DEFAULT_ITEMS_DESC">
+			
+			<field name="" type="separator" default="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC" level="level2" />
+			<field name="item_columns_feat" type="list" default="1" label="FLEXI_FEAT" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC">
 				<option value="1">1</option>
 				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+			</field>
+			<field name="item_columns" type="list" default="2" label="FLEXI_STD" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC">
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_ORDER_ORDERING" description="FLEXI_ORDERING_MULTIPLE" level="level1" menu="hide" />

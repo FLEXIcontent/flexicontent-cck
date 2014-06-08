@@ -65,13 +65,76 @@
 	background-color: #f9f9f9;
 }
 
-/* EXTERNAL ITEM CONTAINER (TWO COLUMNS) */
-.news.mod_flexicontent_wrapper .mod_flexicontent.twocol .mod_flexicontent_standard_wrapper {
-	width:46%!important;
-	margin-left:1%!important;
-	margin-right:1%!important;
+/* EXTERNAL ITEM CONTAINER (2-COLUMNS) */
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_2,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_2 {
+	width:46.8%!important;
+	margin-left:0.6%!important;
+	margin-right:0.6%!important;
 	padding: 1%!important;
+	border-width:0px !important;
 }
+
+/* EXTERNAL ITEM CONTAINER (3-COLUMNS) */
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_3,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_3 {
+	width:30.8%!important;
+	margin-left:0.6%!important;
+	margin-right:0.6%!important;
+	padding: 0.6%!important;
+	border-width:0px !important;
+}
+
+/* EXTERNAL ITEM CONTAINER (4-COLUMNS) */
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_4 {
+	width:23%!important;
+	margin-left:0.5%!important;
+	margin-right:0.5%!important;
+	padding: 0.5%!important;
+	border-width:0px !important;
+}
+
+/* EXTERNAL ITEM CONTAINER (5-COLUMNS) */
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_5,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_5 {
+	width:18.4%!important;
+	margin-left:0.4%!important;
+	margin-right:0.4%!important;
+	padding: 0.4%!important;
+	border-width:0px !important;
+}
+
+/* EXTERNAL ITEM CONTAINER (6-COLUMNS) */
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_6,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_6 {
+	width:15.4%!important;
+	margin-left:0.3%!important;
+	margin-right:0.3%!important;
+	padding: 0.3%!important;
+	border-width:0px !important;
+}
+
+/* EXTERNAL ITEM CONTAINER (7-COLUMNS) */
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_7,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_7 {
+	width:13.28%!important;
+	margin-left:0.25%!important;
+	margin-right:0.25%!important;
+	padding: 0.25%!important;
+	border-width:0px !important;
+}
+
+/* EXTERNAL ITEM CONTAINER (8-COLUMNS) */
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_8,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_8 {
+	width:11.62%!important;
+	margin-left:0.22%!important;
+	margin-right:0.22%!important;
+	padding: 0.22%!important;
+	border-width:0px !important;
+}
+
 
 
 /* EXTERNAL CONTAINER STYLING ODD EVEN (COUNTING) */

@@ -23,7 +23,7 @@ defined('_JEXEC') or die('Restricted access');
  * @since		1.0
  */
 jimport('joomla.database.tablenested');
-jimport('joomla.access.accessrules');
+jimport('joomla.access.rules');
 
 class _flexicontent_categories_common extends JTableNested {
 	protected function __getAssetParentId(JTable $table = null, $id = null)
@@ -278,7 +278,7 @@ class flexicontent_categories extends _flexicontent_categories
 					}
 				}
 			}
-			$rules = new JRules($array['rules']);
+			$rules = new JAccessRules($array['rules']);
 			$this->setRules($rules);
 		}
 		

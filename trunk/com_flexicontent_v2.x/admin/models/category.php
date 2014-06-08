@@ -317,8 +317,8 @@ class FlexicontentModelCategory extends JModelAdmin
 					}
 				}
 			}
-			jimport('joomla.access.accessrules');
-			$rules = new JRules($data['rules']);
+			jimport('joomla.access.rules');
+			$rules = new JAccessRules($data['rules']);
 			$table->setRules($rules);
 		}
 		echo "<pre>";

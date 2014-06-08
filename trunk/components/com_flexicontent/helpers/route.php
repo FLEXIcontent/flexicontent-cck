@@ -540,7 +540,7 @@ class FlexicontentHelperRoute
 			foreach($component_menuitems as $menuitem)
 			{
 				if ( !isset($menuitem->query) || !isset($menuitem->query['view']) ) continue;  // view not set
-				if ( !FLEXI_J16GE || $menuitem->language != $language ) continue;   // wrong language
+				if ( FLEXI_J16GE && $menuitem->language != $language ) continue;   // wrong language
 				
 				// Do not match menu items that override category configuration parameters, these items will be selectable only
 				// (a) via direct click on the menu item or

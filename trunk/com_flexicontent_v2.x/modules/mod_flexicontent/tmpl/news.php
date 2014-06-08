@@ -90,8 +90,10 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 	
 	$separator = "";
 	$rowtoggler = 0;
-	$item_columns = $params->get('item_columns', 1);
-	$twocols = $item_columns == 2;
+	$item_columns_feat = $params->get('item_columns_feat', 1);
+	$item_columns_std  = $params->get('item_columns', 2);
+	$cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
+	$cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
 	
 	foreach ($ordering as $ord) :
   	echo $separator;
@@ -102,21 +104,35 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
   	  continue;
   	}
 	?>
-	<div id="<?php echo 'order_'.( $ord ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent <?php echo ($twocols) ? 'twocol' : ''; ?>">
+	<div id="<?php echo 'order_'.( $ord ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent">
 		
 		<?php	if ($ordering_addtitle && $ord) : ?>
 		<div class='order_group_title'><?php echo $ord_titles[$ord]; ?></div>
 		<?php endif; ?>
+	
 		
 	<?php if (isset($list[$ord]['featured'])) : ?>
+	
 		<!-- BOF featured items -->
+		<div class="mod_flexicontent_featured_listing">
+		
+		<?php	$rowcount = 0; ?>
+		
 		<div class="mod_flexicontent_featured" id="mod_fcitems_box_featured<?php echo $module->id ?>">
 			
-			<?php foreach ($list[$ord]['featured'] as $item) : ?>
-			<?php $rowtoggler = !$rowtoggler; ?>
+			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; ?>
 			
+			<?php foreach ($list[$ord]['featured'] as $item) : ?>
+			<?php
+				if ($rowcount%$item_columns_feat==0) {
+					$oe_class = $oe_class=='odd' ? 'even' : 'odd';
+					$rowtoggler = !$rowtoggler;
+				}
+				$rowcount++;
+			?>
+						
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler) ? 'odd' : 'even'; ?> <?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>">
+			<div class="mod_flexicontent_featured_wrapper<?php echo ' '.$oe_class; ?><?php echo $item->is_active_item ? ' fcitem_active' : ''; ?><?php echo $cols_class_feat ? ' '.$cols_class_feat : ''; ?>">
 				
 				<!-- BOF current item's title -->	
 				<?php if ($display_title_feat) : ?>
@@ -237,31 +253,40 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 				
 			</div>
 			<!-- EOF current item -->
+			<?php echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
 			
 		</div>
+		
+		</div>
 		<!-- EOF featured items -->
+		
 	<?php endif; ?>
-		
 	
+	
+		
 	<?php if (isset($list[$ord]['standard'])) : ?>
+	
 		<!-- BOF standard items -->
+		<div class="mod_flexicontent_standard_listing">
+		
 		<?php	$rowcount = 0; ?>
-		
-		
+				
 		<div class="mod_flexicontent_standard" id="mod_fcitems_box_standard<?php echo $module->id ?>">
 			
 			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; ?>
+			
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
 			<?php
-				if ($rowcount%$item_columns==0) {
+				if ($rowcount%$item_columns_std==0) {
 					$oe_class = $oe_class=='odd' ? 'even' : 'odd';
+					$rowtoggler = !$rowtoggler;
 				}
 				$rowcount++;
 			?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_standard_wrapper <?php echo $oe_class; ?> <?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>"
+			<div class="mod_flexicontent_standard_wrapper <?php echo ' '.$oe_class; ?><?php echo $item->is_active_item ? ' fcitem_active' : ''; ?><?php echo $cols_class_std ? ' '.$cols_class_std : ''; ?>"
 				onmouseover=""
 				onmouseout=""
 			>
@@ -382,9 +407,11 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 				
 			</div>
 			<!-- EOF current item -->
-			<?php echo !($rowcount%2) ? '<div class="modclear"></div>' : ''; ?>
+			<?php echo !($rowcount%$item_columns_std) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
 			
+		</div>
+		
 		</div>
 		<!-- EOF standard items -->
 	
