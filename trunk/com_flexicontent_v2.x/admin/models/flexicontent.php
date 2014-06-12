@@ -2050,9 +2050,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				if (in_array('core.edit.state.own', $flexi_action_names)) $flexi_rules['core.edit.state.own'][$group->id] = 1;  //CanPublishOwn
 			}
 			if( !empty($flexi_rules['core.edit'][$group->id]) || !empty($flexi_rules['core.edit.own'][$group->id])) {
-				if (in_array('core.change.cat', $flexi_action_names)) $flexi_rules['core.change.cat'][$group->id] = 1;  // CanChangeCat
-				if (in_array('core.change.cat.sec', $flexi_action_names)) $flexi_rules['core.change.cat.sec'][$group->id] = 1;  // CanChangeSecCat
-				if (in_array('core.change.cat.feat', $flexi_action_names)) $flexi_rules['core.change.cat.feat'][$group->id] = 1;  // CanChangeFeatCat
+				if (in_array('flexicontent.change.cat', $flexi_action_names)) $flexi_rules['flexicontent.change.cat'][$group->id] = 1;  // CanChangeCat
+				if (in_array('flexicontent.change.cat.sec', $flexi_action_names)) $flexi_rules['flexicontent.change.cat.sec'][$group->id] = 1;  // CanChangeSecCat
+				if (in_array('flexicontent.change.cat.feat', $flexi_action_names)) $flexi_rules['flexicontent.change.cat.feat'][$group->id] = 1;  // CanChangeFeatCat
 				if (in_array('flexicontent.uploadfiles', $flexi_action_names)) $flexi_rules['flexicontent.uploadfiles'][$group->id] = 1;  // CanUploadFiles
 			}
 			// By default give to everybody the edit field values privelege

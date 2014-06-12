@@ -325,22 +325,22 @@ var JFormValidator = new Class({
 	attachToForm: function(form)
 	{
 		// Iterate through the form object and attach the validate method to all input fields.
-		var formElements = (MooTools.version>="1.2.4")  ?  form.getElements('input,textarea,select,button')  :  $A(form.elements);
-		formElements.each(function(el){
-			el = (MooTools.version>="1.2.4")  ?  document.id(el)  :  $(el);
-			if (el.hasClass('required')) {
-				(MooTools.version>="1.2.4") ? el.set('required', 'required') : el.setProperty('required', 'required');
-				if (flexi_j16ge) el.set('aria-required', 'true');
+		jQuery(form).find('input,textarea,select,button').each(function(){
+			el = jQuery(this);
+			if ( el.hasClass('required') || el.attr('aria-required')=='true' ) {
+				el.attr('required', 'required');
+				el.attr('aria-required', 'true');
 			}
-			var validate_flag = (MooTools.version>="1.2.4")  ?  (el.get('tag') == 'input' || el.get('tag') == 'button') && el.get('type') == 'submit'  :  (el.getTag() == 'input' || el.getTag() == 'button') && el.getProperty('type') == 'submit';
+			var tag_name = el.prop("tagName").toLowerCase();
+			var validate_flag = (tag_name == 'input' || tag_name == 'button') && el.prop('type') == 'submit';
 			if (validate_flag) {
 				if (el.hasClass('validate')) {
 					el.onclick = function(){return document.formvalidator.isValid(this.form);};
 				}
 			} else {
-				el.addEvent('blur', function(){return document.formvalidator.validate(this);});
-				if ( MooTools.version>="1.2.4" && el.hasClass('validate-email') && Browser.Features.inputemail ) {
-					el.type = 'email';
+				el.on('blur', function(){return document.formvalidator.validate(this);});
+				if ( flexi_j16ge && el.hasClass('validate-email') ) {
+					el.attr('type', 'email');
 				}
 			}
 		});
@@ -350,32 +350,29 @@ var JFormValidator = new Class({
 	{
 		if(MooTools.version>="1.2.4") {
 		  el = document.id(el);
-			el_value = el.get('value');
 		} else {
 			document.id = $;
 		  el = document.id(el);
-			el.get = el.getProperty;
-			el.set = el.setProperty;
-			el_value = el.getValue();
 		}
-		el_name = el.get('name');
+		el_value = jQuery(el).val();
+		el_name  = jQuery(el).attr('name');
 		
 		// Executed only once to retrieve and hash all label via their for property
 		if ( !fcflabels )
 		{
 			fcflabels = new Object;
-			labels = $$('label');
-			labels.each( function(g) {
-				label_for = (MooTools.version>="1.2.4") ? g.get('for_bck') : g.getProperty('for_bck');
-				if ( !label_for ) label_for = (MooTools.version>="1.2.4") ? g.get('for') : g.getProperty('for');
-				if ( label_for )  fcflabels[ label_for ] = g;
+			jQuery('label').each( function(g) {
+				g = jQuery(this);
+				label_for = g.attr('for_bck');
+				if ( !label_for ) label_for = g.attr('for');
+				if ( label_for )  fcflabels[ label_for ] = this;
 			} );
 			//var fcflabels_size = Object.size(fcflabels);  alert(fcflabels_size);
 		}
 		
 		// Find the label object for the given field if it exists
-		var el_id = (MooTools.version>="1.2.4") ? el.get('id') : el.getProperty('id');
-		var el_grpid = (MooTools.version>="1.2.4") ? el.get('element_group_id') : el.getProperty('element_group_id');
+		var el_id = jQuery(el).attr('id');
+		var el_grpid = jQuery(el).attr('element_group_id');
 		if ( !(el.labelref) && (el_id || el_grpid) )
 		{
 			var lblfor = el_grpid ? el_grpid : el_id;
@@ -389,14 +386,14 @@ var JFormValidator = new Class({
 		}
 		
 		// Ignore the element if its currently disabled, because are not submitted for the http-request. For those case return always true.
-		if(el.get('disabled')) {
+		if(jQuery(el).attr('disabled')) {
 			this.handleResponse(true, el);
 			return true;
 		}
 
 		// If the field is required make sure it has a value
-		if (el.hasClass('required')) {
-			if(el.get('type') == 'radio' || el.get('type') == 'checkbox') {
+		if ( jQuery(el).hasClass('required') || jQuery(el).attr('aria-required')=='true' ) {
+			if(jQuery(el).attr('type') == 'radio' || jQuery(el).attr('type') == 'checkbox') {
 				// Checked specially bellow
 			}
 			else if (!el_value || el_value == false) {
@@ -428,7 +425,7 @@ var JFormValidator = new Class({
 				this.handleResponse(false, el);
 				return false;
 			}
-	  } else if( !(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox") ){
+	  } else if( !(jQuery(el).attr('type') == "radio" || jQuery(el).attr('type') == "checkbox") ){
 	  	if ( typeof auto_filled[el_name] != 'undefined' ) {
 				// Execute the validation handler and return result
 				if (this.handlers[handler].exec(el) != true) {
@@ -442,19 +439,19 @@ var JFormValidator = new Class({
 					return false;
 				}
 			}
-	  } else {
-	     if ((handler) && (handler != 'none') && (this.handlers[handler])) {
-	        if(el.getProperty('type') == "radio" || el.getProperty('type') == "checkbox"){
-	          if ($(el).hasClass('required')) {
-							// Execute the validation handler and return result
-							if (this.handlers[handler].exec(el.parentNode) != true) {
-								this.handleResponse(false, el);
-								return false;
-							}
-	           }
-	        }
-	     }
-	  }
+		} else {
+			if ((handler) && (handler != 'none') && (this.handlers[handler])) {
+				if(jQuery(el).attr('type') == "radio" || jQuery(el).attr('type') == "checkbox"){
+					if (jQuery(el).hasClass('required')) {
+						// Execute the validation handler and return result
+						if (this.handlers[handler].exec(el.parentNode) != true) {
+							this.handleResponse(false, el);
+							return false;
+						}
+					}
+				}
+			}
+		}
 	
 		// Return validation state
 		this.handleResponse(true, el);
@@ -468,7 +465,7 @@ var JFormValidator = new Class({
 
 		// Validate form fields
 		if (flexi_j16ge)
-			var elements = form.getElements('fieldset').concat(Array.from(form.elements));
+			var elements = jQuery(form).find('fieldset').toArray().concat(Array.from(form.elements));
 		else
 			var elements = form.elements;
 		
@@ -554,15 +551,17 @@ var JFormValidator = new Class({
 			el.addClass('invalid');
 			if (flexi_j16ge) el.set('aria-invalid', 'true');
 			if (el.labelref && el.labelref!='-1') {
-				document.id(el.labelref).addClass('invalid');
-				if (flexi_j16ge) document.id(el.labelref).set('aria-invalid', 'true');
+				var labelref = jQuery(el.labelref);
+				labelref.addClass('invalid');
+				labelref.attr('aria-invalid', 'true');
 			}
 		} else {
 			el.removeClass('invalid');
 			if (flexi_j16ge) el.set('aria-invalid', 'false');
 			if (el.labelref && el.labelref!='-1') {
-				document.id(el.labelref).removeClass('invalid');
-				if (flexi_j16ge) document.id(el.labelref).set('aria-invalid', 'false');
+				var labelref = jQuery(el.labelref);
+				labelref.removeClass('invalid');
+				labelref.attr('aria-invalid', 'false');
 			}
 		}
 	}
