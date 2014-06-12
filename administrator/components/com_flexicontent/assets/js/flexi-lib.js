@@ -53,8 +53,8 @@ window.addEvent('domready', function(){
 		},
 		revert: 100,
 		start: function(event, ui) {
+			jQuery("#fcorder_notes_box").hide();
 			jQuery("#fcorder_save_warn_box").show('slide');
-			jQuery("#fcorder_notes_box").hide('slide');
 			moved_row_order = ui.item.find("td input[name=order\\[\\]]").val();
 			row_old_index  = ui.item.index();
 		},

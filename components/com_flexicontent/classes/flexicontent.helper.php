@@ -1526,13 +1526,12 @@ class flexicontent_html
 			}
 			
 			if ($canAdd === NULL && $user->id) {
+				// Perfomance concern (NULL for $canAdd) means SOFT DENY, also check for logged user
+				// thus to avoid checking some/ALL categories for "create" privelege for unlogged users
 				$specific_catids = $submit_cat ? @ $submit_cat->ids  :  false;
 				if ($specific_catids && count($specific_catids) > 3) $specific_catids = false;
 				$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.create'), $require_all=true, $check_published = true, $specific_catids, $find_first = true );
 				$canAdd = count($allowedcats);
-			} else {
-				// Avoid SOFT DENY leading to checking some/ALL categories for "create" privelege for unlogged users
-				$canAdd = false;
 			}
 		}
 		
@@ -1554,8 +1553,11 @@ class flexicontent_html
 		// Create link
 		// ***********
 		
-		// Add Itemid (if given)
-		$link = $menu_itemid  ?  'index.php?Itemid='.$menu_itemid  :  'index.php?view='.FLEXI_ITEMVIEW.'&task=add';
+		// Add Itemid (if given) and do SEF URL routing it --before-- appending more variables, so that
+		// ... menu item URL variables from given menu item ID will be appended if SEF URLs are OFF
+		$link  = 'index.php?option=com_flexicontent';
+		$link .= $menu_itemid  ? '&Itemid='.$menu_itemid  :  '&view='.FLEXI_ITEMVIEW.'&task=add';
+		$link  = JRoute::_($link);
 		
 		// Add main category ID (if given)
 		$link .= ($submit_cat && $submit_cat->id)  ?  '&maincat='.$submit_cat->id  :  '';
@@ -1564,6 +1566,7 @@ class flexicontent_html
 		if ($auto_relations) foreach ( $auto_relations as $auto_relation ) {
 			$link .= '&autorelation_'.$auto_relation->fieldid.'='.$auto_relation->itemid;
 		}
+		
 		
 		// ***************************************
 		// Finally create the submit icon / button
@@ -1575,12 +1578,12 @@ class flexicontent_html
 			$image = FLEXI_J16GE ?
 				JHTML::image('components/com_flexicontent/assets/images/'.'add.png', $submit_lbl, $attribs) :
 				JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $submit_lbl, $attribs) ;
-			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$tip_text.'">'.$image.'</a>';
+			$output	= '<a href="'.$link.'" class="editlinktip hasTip" title="'.$tip_text.'">'.$image.'</a>';
 		} else {
-			$output	= '<a href="'.JRoute::_($link).'" class="hasTip fc_button fcsimple" title="'.$tip_text.'">'.$submit_lbl.'</a>';
+			$output	= '<a href="'.$link.'" class="hasTip fc_button fcsimple" title="'.$tip_text.'">'.$submit_lbl.'</a>';
 		}
 		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
-		
+				
 		return $output;
 	}
 

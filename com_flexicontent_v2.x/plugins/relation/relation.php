@@ -485,11 +485,14 @@ jQuery(document).ready(function() {
 		$field->{$prop} = '';
 		$values = $values ? $values : $field->value;
 		
+		$show_total_only     = $field->parameters->get('show_total_only', 0);
+		$total_show_auto_btn = $field->parameters->get('total_show_auto_btn', 0);
+		$total_show_list     = $field->parameters->get('total_show_list', 0);
+		
 		
 		// *******************************************
 		// Check for special display : total info only
 		// *******************************************
-		$show_total_only = $field->parameters->get('show_total_only', 0);
 		
 		if ($prop=='display_total') {
 			$display_total = true;
@@ -517,10 +520,7 @@ jQuery(document).ready(function() {
 		
 		if ($display_total)
 		{
-			$total_append_text   = $field->parameters->get('total_append_text', '');
-			$total_show_list     = $field->parameters->get('total_show_list', 0);
-			$total_show_auto_btn = $field->parameters->get('total_show_auto_btn', 0);
-			
+			$total_append_text = $field->parameters->get('total_append_text', '');
 			$field->{$prop} .= '<span class="fcrelation_field_total">'. count($values) .' '. $total_append_text .'<span>';
 			
 			// Terminate if not adding any extra information
