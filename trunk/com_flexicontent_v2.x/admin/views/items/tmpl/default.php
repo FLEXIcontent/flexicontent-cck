@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1907 2014-05-27 12:35:36Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1909 2014-06-04 16:44:49Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -439,7 +439,6 @@ window.addEvent('domready', function() {
 		
 		<div class="fc-mssg-inline fc-nobgimage fc-success">
 			<div style="display:inline-block; white-space:nowrap; padding:1px 0px 5px 0px;">
-				<span style="display:none; color:darkred;" class="fc_nice_box" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
 				<?php echo $ordering_type_tip; ?>
 				<label class="label"><?php echo JText::_('FLEXI_ORDER_TYPE'); ?></label>
 				<?php echo $this->lists['filter_order_type']; ?>
@@ -501,6 +500,32 @@ window.addEvent('domready', function() {
 		<span class="radio"><?php echo $this->lists['filter_catsinstate']; ?></span>
 		</div>
 	</div>
+	
+
+	<div class="clear"></div>
+	<span style="display:none; margin-bottom:0px!important;" class="fc-mssg-inline fc-note" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
+	
+	<?php
+	$order_msg = '';
+	
+	if (!$this->filter_order_type && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')):
+		$order_msg .= JText::_('Joomla order, GROUPING BY main category') .'. ';
+	elseif ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')):
+		$order_msg .= JText::_('Grouping by first listed category') .'. ';
+	endif;
+	
+	if ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')):
+		$order_msg .= JText::_('FLEXI_FCORDER_USE_CATEGORY_FILTER');
+	endif;
+	?>
+	
+	<?php if ($order_msg): ?>
+	<span class="fc-mssg-inline fc-success" id="fcorder_notes_box">
+		<?php echo $order_msg;?>
+	</span>
+	<?php endif; ?>
+	
+	<div class="fcclear"></div>
 	
 	<table id="adminListTableFCitems" class="adminlist" cellspacing="1" style="margin-top:12px;">
 	<thead>
@@ -660,18 +685,10 @@ window.addEvent('domready', function() {
 			<?php endforeach; ?>
 			
 			<td>
-				<?php if ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
-					<span style="color:darkgreen; white-space:nowrap;" class="fc_nice_box" id="fcorder_notes_box"><?php echo JText::_('FLEXI_FCORDER_USE_CATEGORY_FILTER'); ?></span>
-				<?php endif; ?>
 			</td>
 			
 			<td></td>
 			<td>
-				<?php if (!$this->filter_order_type && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
-					<span style="color:darkgreen;" class="fc_nice_box"><?php echo JText::_('Joomla order, GROUPING BY main category'); ?></span>
-				<?php elseif ($this->filter_order_type && !$this->filter_cats && ($this->filter_order=='i.ordering' || $this->filter_order=='catsordering')): ?>
-					<span style="color:darkgreen; white-space:nowrap;" class="fc_nice_box"><?php echo JText::_('Grouping by first listed category'); ?></span>
-				<?php endif; ?>
 			</td>
 			<td></td>
 			<td></td>

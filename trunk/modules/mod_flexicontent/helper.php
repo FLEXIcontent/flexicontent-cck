@@ -1562,42 +1562,53 @@ class modFlexicontentHelper
 		
 		if ($behaviour_filt==1 || $behaviour_filt==2)
 		{
-			// 1. Get ids of dynamic filters
-			$dynamic_filter_ids = preg_split("/[\s]*,[\s]*/", $dynamic_filters);
-			
-			// 2. Get values of dynamic filters
-			$where2 = (count($dynamic_filter_ids) > 1) ? ' AND field_id IN ('.implode(',', $dynamic_filter_ids).')' : ' AND field_id = '.$dynamic_filter_ids[0];
-			// select the item ids related to current item via the relation fields
-			$query2 = 'SELECT DISTINCT value, field_id' .
-				' FROM #__flexicontent_fields_item_relations' .
-				' WHERE item_id = '.(int) $id .
-				$where2
-				;
-			$db->setQuery($query2);
-			$curritem_vals = $db->loadObjectList();
-			
-			// 3. Group values by field
-			$_vals = array();
-			foreach ($curritem_vals as $v) {
-				$_vals[$v->field_id][] = $v->value;
+			if ( !$isflexi_itemview ) {
+				return;  // current view is not item view ... , nothing to display
 			}
 			
-			foreach ($dynamic_filter_ids as $filter_id)
-			{
-				// Handle non-existent value by requiring that matching item do not have a value for this field either
-				if ( !isset($_vals[$filter_id]) ) {
-					$where_field_filters .= ' AND reldyn'.$filter_id.'.value IS NULL';
+			// 1. Get ids of dynamic filters
+			//$dynamic_filter_ids = preg_split("/[\s]*,[\s]*/", $dynamic_filters);
+			
+			$dynamic_filter_ids = FLEXIUtilities::paramToArray($dynamic_filters, "/[\s]*,[\s]*/", "intval");
+			if ( empty($dynamic_filter_ids) ) {
+				echo "Please enter at least 1 field in Custom field filtering SCOPE, or set behaviour to static";
+			} else {
+			
+				// 2. Get values of dynamic filters
+				$where2 = (count($dynamic_filter_ids) > 1) ? ' AND field_id IN ('.implode(',', $dynamic_filter_ids).')' : ' AND field_id = '.$dynamic_filter_ids[0];
+				// select the item ids related to current item via the relation fields
+				$query2 = 'SELECT DISTINCT value, field_id' .
+					' FROM #__flexicontent_fields_item_relations' .
+					' WHERE item_id = '.(int) $id .
+					$where2
+					;
+				$db->setQuery($query2);
+				$curritem_vals = $db->loadObjectList();
+				//echo "<pre>"; print_r($curritem_vals); echo "</pre>";
+				
+				// 3. Group values by field
+				$_vals = array();
+				foreach ($curritem_vals as $v) {
+					$_vals[$v->field_id][] = $v->value;
 				}
 				
-				// Single or Multi valued filter , handle by requiring ANY value
-				else if ( isset($filter_values[0]) )
+				foreach ($dynamic_filter_ids as $filter_id)
 				{
-					$in_values = array();
-					foreach ($curritem_vals as $v) $in_values[] = $db->Quote( $v->value );
-					$where_field_filters .= ' AND reldyn'.$filter_id.'.value IN ('.implode(',', $in_values).') ';
+					// Handle non-existent value by requiring that matching item do not have a value for this field either
+					if ( !isset($_vals[$filter_id]) ) {
+						$where_field_filters .= ' AND reldyn'.$filter_id.'.value IS NULL';
+					}
+					
+					// Single or Multi valued filter , handle by requiring ANY value
+					else {
+						$in_values = array();
+						foreach ($_vals[$filter_id] as $v) $in_values[] = $db->Quote( $v );
+						$where_field_filters .= ' AND reldyn'.$filter_id.'.value IN ('.implode(',', $in_values).') ' ."\n";
+					}
+					
+					$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS reldyn'.$filter_id.' ON reldyn'.$filter_id.'.item_id=i.id AND reldyn'.$filter_id.'.field_id = ' . $filter_id ."\n";
 				}
-				
-				$join_field_filters .= ' JOIN #__flexicontent_fields_item_relations AS reldyn'.$filter_id.' ON reldyn'.$filter_id.'.item_id=i.id AND reldyn'.$filter_id.'.field_id = ' . $filter_id;
+				//echo "<pre>"."\n\n".$join_field_filters ."\n\n".$where_field_filters."</pre>";
 			}
 		}
 
