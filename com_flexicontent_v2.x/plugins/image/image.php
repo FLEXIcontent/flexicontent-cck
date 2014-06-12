@@ -1296,7 +1296,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title,'s');
 					$group_str = '';   // no support for image grouping
 					$field->{$prop}[] = '
-						<a href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.$title_attr.'">
+						<a href="'.$srcl.'" rel="rokbox['.$wl.' '.$hl.']" '.$group_str.' title="'.$title_attr.'" data-rokbox data-rokbox-caption="'.$title_attr.'">
 							'.$img_nolegend.'
 						</a>
 						';

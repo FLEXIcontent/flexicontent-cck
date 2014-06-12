@@ -1459,18 +1459,20 @@ class FlexicontentViewItems  extends JViewLegacy
 				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
 				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
-				$perms['canchange_cat'] = $user->authorise('core.change.cat', $asset);
-				$perms['canchange_seccat'] = $user->authorise('core.change.cat.sec', $asset);
-				$perms['canchange_featcat'] = $user->authorise('core.change.cat.feat', $asset);
+				// not inherited
+				//$perms['canchange_cat'] = $user->authorise('core.change.cat', $asset);
+				//$perms['canchange_seccat'] = $user->authorise('core.change.cat.sec', $asset);
+				//$perms['canchange_featcat'] = $user->authorise('core.change.cat.feat', $asset);
 			}
 			else if (FLEXI_ACCESS) {
 				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 				$perms['canedit']			= ($user->gid < 25) ? ( (in_array('editown', $rights) && $isOwner) || (in_array('edit', $rights)) ) : 1;
 				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
 				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $isOwner) || (in_array('delete', $rights)) ) : 1;
-				$perms['canchange_cat'] = 1;
-				$perms['canchange_seccat'] = 1;
-				$perms['canchange_featcat'] = 1;
+				// not inherited
+				//$perms['canchange_cat'] = 1;
+				//$perms['canchange_seccat'] = 1;
+				//$perms['canchange_featcat'] = 1;
 				// Only FLEXI_ACCESS has per item rights permission
 				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
 			}

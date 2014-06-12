@@ -130,23 +130,9 @@ class FlexicontentHelperPerm
 			$permission->CanDeleteOwn = count($allowedcats) > 0;
 		}
 		
-		$permission->CanChangeCat= $user->authorise('core.change.cat',	'com_flexicontent');
-		if ($permission->CanChangeCat === NULL) {
-			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat'), $require_all=true, $check_published = true, false, $find_first = true );
-			$permission->CanChangeCat = count($allowedcats) > 0;
-		}
-		
-		$permission->CanChangeSecCat= $user->authorise('core.change.cat.sec',	'com_flexicontent');
-		if ($permission->CanChangeSecCat === NULL) {
-			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat.sec'), $require_all=true, $check_published = true, false, $find_first = true );
-			$permission->CanChangeSecCat = count($allowedcats) > 0;
-		}
-		
-		$permission->CanChangeFeatCat= $user->authorise('core.change.cat.feat',	'com_flexicontent');
-		if ($permission->CanChangeFeatCat === NULL) {
-			$allowedcats = FlexicontentHelperPerm::getAllowedCats( $user, $actions_allowed=array('core.change.cat.feat'), $require_all=true, $check_published = true, false, $find_first = true );
-			$permission->CanChangeFeatCat = count($allowedcats) > 0;
-		}
+		$permission->CanChangeCat= $user->authorise('flexicontent.change.cat',	'com_flexicontent');
+		$permission->CanChangeSecCat= $user->authorise('flexicontent.change.cat.sec',	'com_flexicontent');
+		$permission->CanChangeFeatCat= $user->authorise('flexicontent.change.cat.feat',	'com_flexicontent');
 		
 		// Permission for changing the ACL rules of items and categories that user can edit
 		// Currently given to user that can edit component configuration
