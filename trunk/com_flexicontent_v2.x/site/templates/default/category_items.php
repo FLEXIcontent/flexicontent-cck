@@ -117,7 +117,7 @@ endif;
 		<tr>
 			<?php if ( $buttons_exists || $comments_non_zero || $show_title || count($item->css_markups) ) : ?>
 				<th id="flexi_title" scope="col">
-					<?php echo $show_title ? JText::_( 'FLEXI_ITEMS' ) : ''; ?>
+					<?php echo $show_title ? ( $this->params->get('orderby', 'rdate')=='default'?JHtml::_('grid.sort', 'FLEXI_ITEMS' , 'i.title', $this->lists['filter_order_Dir'], $this->lists['filter_order'] ) : JText::_('FLEXI_ITEMS') ): ''; ?>
 				</th>
 			<?php endif; ?>
 			

@@ -174,8 +174,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('limitstart', $limitstart);
 
 		// Set filter order variables into state
-		$this->setState('filter_order', 'i.title');
-		$this->setState('filter_order_dir', 'ASC');
+		$this->setState('filter_order', JRequest::getCmd('filter_order', 'i.title', 'default'));
+		$this->setState('filter_order_Dir', JRequest::getCmd('filter_order_Dir', 'ASC', 'default'));
 		
 		// Get minimum word search length
 		$app = JFactory::getApplication();
@@ -632,8 +632,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		$request_var = $this->_params->get('orderby_override') ? 'orderby' : '';
 		$default_order = $this->getState('filter_order');
-		$default_order_dir = $this->getState('filter_order_dir');
-		
+		$default_order_dir = $this->getState('filter_order_Dir');
+	
 		// Precedence: $request_var ==> $order ==> $config_param ==> $default_order
 		return flexicontent_db::buildItemOrderBy(
 			$this->_params,
