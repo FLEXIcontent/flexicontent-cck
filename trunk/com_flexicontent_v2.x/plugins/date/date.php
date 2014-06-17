@@ -67,6 +67,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$multiple   = $field->parameters->get( 'allow_multiple', 1 ) ;
 		$max_values = (int) $field->parameters->get( 'max_values', 0 ) ;
+		$disable_keyboardinput = $field->parameters->get('disable_keyboardinput', 0);
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
@@ -165,8 +166,15 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					button:			img.attr('id'),
 					align:			'Tl',
 					singleClick:	true
-				});
+				});";
+
+			if($disable_keyboardinput) {
+				$js .="
+						jQuery('#'+input.attr('id')).on('keydown keypress keyup', false);
+						";
+			}
 				
+			$js .="
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
 					containment: 'parent',
@@ -214,7 +222,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$js = '';
 			$css = '';
 		}
-		
+
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 		
@@ -233,7 +241,15 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				'.$move2.'
 				'.$remove_button.'
 				';
-			
+
+			if($disable_keyboardinput) {
+				$document->addScriptDeclaration("
+								jQuery(document).ready(function(){
+									jQuery('#".$elementid_n."').on('keydown keypress keyup', false);
+								});
+							");
+			}
+
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
