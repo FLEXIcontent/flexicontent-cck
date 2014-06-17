@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1902 2014-05-10 16:06:11Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1912 2014-06-12 14:16:43Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -133,7 +133,7 @@ class flexicontent_html
 		$this->params_saved = @$this->params;
 		$this->params = & $item->parameters;
 		$this->tmpl = '.item.'.$ilayout;
-		$this->print_link = JRoute::_('index.php?view=items&id='.$item->slug.'&pop=1&tmpl=component');
+		$this->print_link = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&id='.$item->slug.'&pop=1&tmpl=component');
 		$this->pageclass_sfx = '';
 		$this->item->event->beforeDisplayContent = '';
 		$this->item->event->afterDisplayTitle = '';
@@ -1031,44 +1031,42 @@ class flexicontent_html
 	 */
 	static function feedbutton($view, &$params, $slug = null, $itemslug = null )
 	{
-		if ( $params->get('show_feed_icon', 1) && !JRequest::getCmd('print') ) {
+		if ( !$params->get('show_feed_icon', 1) || JRequest::getCmd('print') ) return;
+		
+		$uri    = JURI::getInstance();
+		$base  	= $uri->toString( array('scheme', 'host', 'port'));
 
-			$uri    = JURI::getInstance();
-			$base  	= $uri->toString( array('scheme', 'host', 'port'));
-
-			//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
-			if($view == 'category') {
-				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
-			} elseif($view == FLEXI_ITEMVIEW) {
-				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug.'&format=feed&type=rss', false );
-			} elseif($view == 'tags') {
-				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug.'&format=feed&type=rss', false );
-			} else {
-				$link 	= $base.JRoute::_( 'index.php?view='.$view.'&format=feed&type=rss', false );
-			}
-			// Fix for J1.7+ format variable removed from URL and added as URL suffix
-			if (!preg_match('/format\=feed/',$link)) {
-				$link .= "&amp;format=feed";
-			}
-
-			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
-
-			if ($params->get('show_icons')) 	{
-				$image = FLEXI_J16GE ?
-					JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), NULL) :
-					JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_FEED' )) ;
-			} else {
-				$image = '&nbsp;'.JText::_( 'FLEXI_FEED' );
-			}
-
-			$overlib = JText::_( 'FLEXI_FEED_TIP' );
-			$text = JText::_( 'FLEXI_FEED' );
-
-			$output	= '<a href="'. $link .'" class="editlinktip hasTip" onclick="window.open(this.href,\'win2\',\''.$status.'\'); return false;" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
-
-			return $output;
+		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
+		if($view == 'category') {
+			$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
+		} elseif($view == FLEXI_ITEMVIEW) {
+			$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug.'&format=feed&type=rss', false );
+		} elseif($view == 'tags') {
+			$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug.'&format=feed&type=rss', false );
+		} else {
+			$link 	= $base.JRoute::_( 'index.php?view='.$view.'&format=feed&type=rss', false );
 		}
-		return;
+		// Fix for J1.7+ format variable removed from URL and added as URL suffix
+		if (!preg_match('/format\=feed/',$link)) {
+			$link .= "&amp;format=feed";
+		}
+
+		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
+
+		if ($params->get('show_icons')) 	{
+			$image = FLEXI_J16GE ?
+				JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), NULL) :
+				JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_FEED' )) ;
+		} else {
+			$image = '&nbsp;'.JText::_( 'FLEXI_FEED' );
+		}
+
+		$overlib = JText::_( 'FLEXI_FEED_TIP' );
+		$text = JText::_( 'FLEXI_FEED' );
+
+		$output	= '<a href="'. $link .'" class="editlinktip hasTip" onclick="window.open(this.href,\'win2\',\''.$status.'\'); return false;" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+
+		return $output;
 	}
 
 	/**
@@ -1080,33 +1078,31 @@ class flexicontent_html
 	 */
 	static function printbutton( $print_link, &$params )
 	{
-		if ( $params->get('show_print_icon') || JRequest::getCmd('print') ) {
+		if ( !$params->get('show_print_icon') || JRequest::getCmd('print') ) return;
+		
+		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
 
-			$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
-
-			// checks template image directory for image, if non found default are loaded
-			if ( $params->get( 'show_icons' ) ) {
-				$image = FLEXI_J16GE ?
-					JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), NULL) :
-					JHTML::_('image.site', 'printButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_PRINT' )) ;
-			} else {
-				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_PRINT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
-			}
-
-			if (JRequest::getInt('pop')) {
-				//button in popup
-				$output = '<a href="javascript:;" onclick="window.print();return false;">'.$image.'</a>';
-			} else {
-				//button in view
-				$overlib = JText::_( 'FLEXI_PRINT_TIP' );
-				$text = JText::_( 'FLEXI_PRINT' );
-
-				$output	= '<a href="'. JRoute::_($print_link) .'" class="editlinktip hasTip" onclick="window.open(this.href,\'win2\',\''.$status.'\'); return false;" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
-			}
-
-			return $output;
+		// checks template image directory for image, if non found default are loaded
+		if ( $params->get( 'show_icons' ) ) {
+			$image = FLEXI_J16GE ?
+				JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), NULL) :
+				JHTML::_('image.site', 'printButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_PRINT' )) ;
+		} else {
+			$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_PRINT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 		}
-		return;
+
+		if (JRequest::getInt('pop')) {
+			//button in popup
+			$output = '<a href="javascript:;" onclick="window.print();return false;">'.$image.'</a>';
+		} else {
+			//button in view
+			$overlib = JText::_( 'FLEXI_PRINT_TIP' );
+			$text = JText::_( 'FLEXI_PRINT' );
+
+			$output	= '<a href="'. JRoute::_($print_link) .'" class="editlinktip hasTip" onclick="window.open(this.href,\'win2\',\''.$status.'\'); return false;" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+		}
+
+		return $output;
 	}
 
 	/**
@@ -1178,24 +1174,22 @@ class flexicontent_html
 	 */
 	static function pdfbutton( $item, &$params)
 	{
-		if ( !FLEXI_J16GE && $params->get('show_pdf_icon') && !JRequest::getCmd('print') ) {
-
-			if ( $params->get('show_icons') ) {
-				$image = FLEXI_J16GE ?
-					JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), NULL) :
-					JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
-			} else {
-				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_CREATE_PDF' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
-			}
-			$overlib = JText::_( 'FLEXI_CREATE_PDF_TIP' );
-			$text = JText::_( 'FLEXI_CREATE_PDF' );
-
-			$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
-			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
-
-			return $output;
+		if ( FLEXI_J16GE || !$params->get('show_pdf_icon') || JRequest::getCmd('print') ) return;
+		
+		if ( $params->get('show_icons') ) {
+			$image = FLEXI_J16GE ?
+				JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), NULL) :
+				JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
+		} else {
+			$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_CREATE_PDF' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
 		}
-		return;
+		$overlib = JText::_( 'FLEXI_CREATE_PDF_TIP' );
+		$text = JText::_( 'FLEXI_CREATE_PDF' );
+
+		$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
+		$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+
+		return $output;
 	}
 
 
@@ -1208,6 +1202,8 @@ class flexicontent_html
 	 */
 	static function statebutton( $item, &$params, $addToggler=true )
 	{
+		if ( !$params->get('show_state_icon', 1) || JRequest::getCmd('print') ) return;
+		
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();
 		$document = JFactory::getDocument();
@@ -1377,6 +1373,8 @@ class flexicontent_html
 	 */
 	static function approvalbutton( $item, &$params)
 	{
+		if ( JRequest::getCmd('print') ) return;
+		
 		$user	= JFactory::getUser();
 
 		// Skip not-owned items, and items not in draft state
@@ -1431,6 +1429,8 @@ class flexicontent_html
 	 */
 	static function editbutton( $item, &$params)
 	{
+		if ( !$params->get('show_editbutton', 1) || JRequest::getCmd('print') ) return;
+		
 		$user	= JFactory::getUser();
 
 		// Determine if current user can edit the given item
@@ -1479,6 +1479,8 @@ class flexicontent_html
 	 */
 	static function addbutton(&$params, &$submit_cat = null, $menu_itemid = 0, $submit_text = '', $auto_relations = false, $ignore_unauthorized = false)
 	{
+		if ( !$params->get('show_addbutton', 1) || JRequest::getCmd('print') ) return;
+		
 		// Currently add button will appear to logged users only
 		// ... unless unauthorized users are allowed
 		$user	= JFactory::getUser();

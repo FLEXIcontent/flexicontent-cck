@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1900 2014-05-03 07:25:51Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1911 2014-06-12 01:55:58Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -434,8 +434,13 @@ class FlexicontentViewItem  extends JViewLegacy
 			$pathway->addItem( $this->escape($item->title), JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, 0, $item)) );
 		}
 		
-		// Create links, etc
-		$print_link = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component&print=1');
+		// **********************************************************************
+		// Print link ... must include layout and current filtering url vars, etc
+		// **********************************************************************
+		
+    $curr_url = $_SERVER['REQUEST_URI'];
+    $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';//.(count($filt_vars)? '&amp;' : '').implode("&amp;", $filt_vars);
+		//$print_link = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&pop=1&tmpl=component&print=1');
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('item' , 				$item);

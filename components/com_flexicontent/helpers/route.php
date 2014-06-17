@@ -637,16 +637,17 @@ class FlexicontentHelperRoute
 		foreach($needles as $needle => $cid)  {
 
 			// Get access level of the FLEXIcontent category
-			$cat_acclevel = $cid ? $globalcats[$cid]->access : 0;
+			$cat_acclevel = $cid && isset($globalcats[$cid]) ? $globalcats[$cid]->access : 0;
 			
 			// Prefer current menu item if pointing to given category url ...
 			if ($menu && 
 				@$menu->query['view'] == $needle &&
 				@$menu->query['cid'] == $cid &&
 				// these variables must be explicitely checked, we must not rely on the urlvars loop below !
-				@$menu->query['layout'] == @$urlvars['layout'] && // match layout "author", "myitems", "mcats" etc
+				@$menu->query['layout'] == @$urlvars['layout'] && // match layout "author", "myitems", "mcats", "favs", "tags" etc
 				@$menu->query['authorid'] == @$urlvars['authorid'] && // match "authorid" for user id of author
-				@$menu->query['cids'] == @$urlvars['cids'] // match "cids" of "mcats" (multi-category view)
+				@$menu->query['cids'] == @$urlvars['cids'] && // match "cids" of "mcats" (multi-category view)
+				@$menu->query['tagid'] == @$urlvars['tagid'] // match "tagid" of "tags" view
 			) {
 				$match = $menu;
 				break;
@@ -668,9 +669,10 @@ class FlexicontentHelperRoute
 					@$menuitem->query['view'] != $needle ||
 					@$menuitem->query['cid'] != $cid ||
 					// these variables must be explicitely checked, we must not rely on the urlvars loop below !
-					@$menuitem->query['layout'] != @$urlvars['layout'] || // match layout "author", "myitems", "mcats" etc
+					@$menuitem->query['layout'] != @$urlvars['layout'] || // match layout "author", "myitems", "mcats", "favs", "tags" etc
 					@$menuitem->query['authorid'] != @$urlvars['authorid'] || // match "authorid" for user id of author
-					@$menuitem->query['cids'] != @$urlvars['cids'] // match "cids" of "mcats" (multi-category view)
+					@$menuitem->query['cids'] != @$urlvars['cids'] || // match "cids" of "mcats" (multi-category view)
+					@$menu->query['tagid'] != @$urlvars['tagid'] // match "tagid" of "tags" view
 				) continue;
 				
 				// Try to match any other given url variables, if these were specified and thus are required
@@ -714,7 +716,7 @@ class FlexicontentHelperRoute
 		foreach($needles as $needle => $cid)  {
 
 			// Get access level of the FLEXIcontent category
-			$cat_acclevel = $cid ? $globalcats[$cid]->access : 0;
+			$cat_acclevel = $cid && isset($globalcats[$cid]) ? $globalcats[$cid]->access : 0;
 
 			foreach($component_menuitems as $menuitem) {
 
@@ -731,7 +733,7 @@ class FlexicontentHelperRoute
 				if ( @$menuitem->query['view'] != 'flexicontent' ) continue;
 				
 				// Check non-related directory view
-				if ($cid) {
+				if ($cid && isset($globalcats[$cid])) {
 					$matched_parent = @$menuitem->query['rootcat'] == $globalcats[$cid]->parent_id;
 					if ( !$matched_parent ) continue;
 				}

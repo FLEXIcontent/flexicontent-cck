@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category_items.php 1872 2014-03-15 15:50:42Z ggppdk $
+ * @version 1.5 stable $Id: category_items.php 1904 2014-05-20 12:21:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -105,20 +105,23 @@ if ($this->limitstart != 0) $leadnum = 0;
 			?>
 			
 			<?php if ($this->params->get('show_editbutton', 1)) : ?>
+				
 				<?php $editbutton = flexicontent_html::editbutton( $item, $this->params ); ?>
 				<?php if ($editbutton) : ?>
 					<div class="fc_edit_link"><?php echo $editbutton;?></div>
 				<?php endif; ?>
+				
 				<?php $statebutton = flexicontent_html::statebutton( $item, $this->params ); ?>
 				<?php if ($statebutton) : ?>
 					<div class="fc_state_toggle_link"><?php echo $statebutton;?></div>
 				<?php endif; ?>
+				
 			<?php endif; ?>
 			
 			<?php $approvalbutton = flexicontent_html::approvalbutton( $item, $this->params ); ?>
 			<?php if ($approvalbutton) : ?>
 				<div class="fc_approval_request_link"><?php echo $approvalbutton;?></div>
-			<?php endif; ?>	
+			<?php endif; ?>
 			
 			<?php if ($this->params->get('show_comments_count')) : ?>
 				<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
@@ -403,19 +406,18 @@ if ($count > $leadnum) :
 				<?php if ($editbutton) : ?>
 					<div class="fc_edit_link"><?php echo $editbutton;?></div>
 				<?php endif; ?>
-
+				
 				<?php $statebutton = flexicontent_html::statebutton( $item, $this->params ); ?>
 				<?php if ($statebutton) : ?>
 					<div class="fc_state_toggle_link"><?php echo $statebutton;?></div>
 				<?php endif; ?>
-
-				<?php $approvalbutton = flexicontent_html::approvalbutton( $item, $this->params ); ?>
-				<?php if ($approvalbutton) : ?>
-					<div class="fc_approval_request_link"><?php echo $approvalbutton;?></div>
-				<?php endif; ?>
-					
+				
 			<?php endif; ?>
 			
+			<?php $approvalbutton = flexicontent_html::approvalbutton( $item, $this->params ); ?>
+			<?php if ($approvalbutton) : ?>
+				<div class="fc_approval_request_link"><?php echo $approvalbutton;?></div>
+			<?php endif; ?>
 			
 			<?php
 				$header_shown =

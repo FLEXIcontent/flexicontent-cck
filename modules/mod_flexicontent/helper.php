@@ -380,6 +380,7 @@ class modFlexicontentHelper
 		    		}
 					}
 					$lists[$ord]['featured'][$i] = new stdClass();
+					$lists[$ord]['featured'][$i]->_row = $row;
 					$lists[$ord]['featured'][$i]->id = $row->id;
 					$lists[$ord]['featured'][$i]->is_active_item = ($isflexi_itemview && $row->id==$active_item_id);
 					
@@ -514,6 +515,7 @@ class modFlexicontentHelper
 					// START population of item's custom properties
 					
 					$lists[$ord]['standard'][$i] = new stdClass();
+					$lists[$ord]['standard'][$i]->_row = $row;
 					$lists[$ord]['standard'][$i]->id = $row->id;
 					$lists[$ord]['standard'][$i]->is_active_item = ($isflexi_itemview && $row->id==$active_item_id);
 					

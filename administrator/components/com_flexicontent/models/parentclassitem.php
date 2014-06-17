@@ -255,7 +255,9 @@ class ParentClassItem extends JModelLegacy
 		// --. Failed to load existing item, or check_view_access indicates not to create a new item object
 		else if ( $pk || $check_view_access===2 )
 		{
-			$msg = JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $pk);
+			$msg = $pk ?
+				JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_NOT_FOUND', $pk) :   // ID is set, indicate that it was not found
+				JText::_( 'FLEXI_REQUESTED_PAGE_COULD_NOT_BE_FOUND' );  // ID is not set propably some bad URL so give a more general message
 			if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
 		}
 		

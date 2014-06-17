@@ -2206,13 +2206,13 @@ class FlexicontentFields
 			// *** Limiting of displayed filter values according to current category filtering, but show all field values if filter is active
 			if ( $isCategoryView ) {
 				// category view, use parameter to decide if limitting filter values
-				global $fc_catviev;
+				global $fc_catview;
 				if ( $faceted_filter ) {
-					$view_join = @ $fc_catviev['join_clauses'];
-					$view_where = $fc_catviev['where_conf_only'];
-					$filters_where = $fc_catviev['filters_where'];
-					$view_total = isset($fc_catviev['view_total']) ? $fc_catviev['view_total'] : 0;
-					if ($fc_catviev['alpha_where']) $filters_where['alpha'] = $fc_catviev['alpha_where'];  // we use count bellow ... so add it only if it is non-empty
+					$view_join = @ $fc_catview['join_clauses'];
+					$view_where = $fc_catview['where_conf_only'];
+					$filters_where = $fc_catview['filters_where'];
+					$view_total = isset($fc_catview['view_total']) ? $fc_catview['view_total'] : 0;
+					if ($fc_catview['alpha_where']) $filters_where['alpha'] = $fc_catview['alpha_where'];  // we use count bellow ... so add it only if it is non-empty
 				}
 			} else if ( $isSearchView ) {
 				// search view, use parameter to decide if limitting filter values
@@ -2621,9 +2621,9 @@ class FlexicontentFields
 					. $view_where."\n"
 					;
 				
-				global $fc_run_times, $fc_jprof, $fc_catviev;
+				global $fc_run_times, $fc_jprof, $fc_catview;
 				$start_microtime = microtime(true);
-				$view_total = (int) @ $fc_catviev['view_total'];
+				$view_total = (int) @ $fc_catview['view_total'];
 				$use_item_list_below = 0;
 				
 				if ($view_total >= $use_item_list_below) {

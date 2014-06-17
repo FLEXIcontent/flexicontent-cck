@@ -263,6 +263,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
 		
 		$usebutton    = $field->parameters->get( 'usebutton', 1 ) ;
+		$buttonsposition = $field->parameters->get('buttonsposition', 1);
 		$use_infoseptxt   = $field->parameters->get( 'use_infoseptxt', 1 ) ;
 		$use_actionseptxt = $field->parameters->get( 'use_actionseptxt', 1 ) ;
 		$infoseptxt   = $use_infoseptxt   ?  ' '.$field->parameters->get( 'infoseptxt', '' ).' '    :  ' ';
@@ -677,11 +678,18 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				}
 			}
 			
-			$str .= (count($actions_arr) ?  $infoseptxt : "")
-				.'<span class="fcfile_actions">'
-				.  implode($actions_arr, $actionseptxt)
-				.'</span>';
-			
+			//Display the buttons "DOWNLOAD, SHARE, ADD TO CART" before or after the filename
+			if ($buttonsposition) {
+				$str .= (count($actions_arr) ?  $infoseptxt : "")
+					.'<span class="fcfile_actions">'
+					.  implode($actions_arr, $actionseptxt)
+					.'</span>';
+			} else {
+				$str = (count($actions_arr) ?  $infoseptxt : "")
+					.'<span class="fcfile_actions">'
+					.  implode($actions_arr, $actionseptxt)
+					.'</span>'.$str;
+			}
 			
 			// [4]: Add the file description (if displayed inline)
 			if ($descr_inline) $str .= $descr_inline;

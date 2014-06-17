@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: router.php 1871 2014-03-14 00:21:45Z ggppdk $
+ * @version 1.5 stable $Id: router.php 1908 2014-05-29 01:39:07Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -102,9 +102,6 @@ function FLEXIcontentBuildRoute(&$query)
 	// 4. Handle known views formulating segments of SEF URL appropriately
 	$view = isset($query['view']) ? $query['view'] : '';
 	switch ($view) {	
-	/*case 'search':
-		//TODO something if needed
-		break;*/
 	case FLEXI_ITEMVIEW:
 		if ( isset($query['cid']) && ($mcid != (int)$query['cid']  ||  $mview != 'category') )	{  // cid EXISTs and doesnot much cid variable of current menu item
 			// IMPLY view = FLEXI_ITEMVIEW when count($segments) == 2
@@ -116,28 +113,33 @@ function FLEXIcontentBuildRoute(&$query)
 			// EXPLICIT view ('item' be contained in the url), but only if configured to add 'item'
 			if ($add_item_sef_segment) {
 				$segments[] = 'item';
+				unset($query['view']);
 			}
 			$segments[] = @$query['id'];  // Required ...
 			unset($query['cid']);
 			unset($query['id']);
 		}
 		break;
+	
 	case 'category':
-		if (!$add_item_sef_segment && $mview == 'category') {
+		if ( $mview != 'category' || ($mview == 'category' && !$add_item_sef_segment) ) {
 			// Adding explicit view /item/ is disabled for item URLs, and current menu item is category and so is this URL,
 			// so ... we explicitly declare than URL is a category URL, otherwise it will be wrongly interpreted as 'item' URL
 			$segments[] = 'category';
+			unset($query['view']);
 		}
 		// IMPLY view = 'category' when count($segments) == 1
-		$segments[] = @$query['cid'];  // Required ...
+		if ( (int)$query['cid']!=$mcid || $mview!='category' ) $segments[] = @$query['cid'];  // Required ...
 		unset($query['cid']);
 		break;
+	
 	case 'tag':
 		// EXPLICIT view (will be contained in the url)
 		$segments[] = 'tag';
 		$segments[] = @$query['id'];  // Required ...
 		unset($query['id']);
 		break;
+	
 	case 'flexicontent':    // (aka directory view)
 		if (isset($query['rootcat'])) {
 			$segments[] = 'catalog';
@@ -147,6 +149,7 @@ function FLEXIcontentBuildRoute(&$query)
 			// IMPLY view = 'flexicontent' when count($segments) == 0
 		}
 		break;
+	
 	case 'favourites': case 'fileselement': case 'search': default:
 		// EXPLICIT view (will be contained in the url)
 		if($view!='') $segments[] = $view;
@@ -159,7 +162,12 @@ function FLEXIcontentBuildRoute(&$query)
 		// We leave remaining $query variables untouched, so that these variables will be inserted in the SEF URL as /index/value/ ...
 		break;
 	}
-	unset($query['view']);
+	
+	// Unset view if it matches the given menu item, and was not already unset
+	if ( isset($query['view']) && $mview==$query['view']) {
+		unset($query['view']);
+	}
+	
 	return $segments;
 }
 
@@ -225,7 +233,7 @@ function FLEXIcontentParseRoute($segments)
 	// 4.b 'category' view
 	if($segments[0] == 'category') {
 		$vars['view'] 	= 'category';
-		$vars['cid'] 	= $segments[1];
+		$vars['cid'] 	= @ $segments[1];  // it is optional, some category view layouts do not use category id
 		return $vars;
 	}
 	
@@ -264,11 +272,23 @@ function FLEXIcontentParseRoute($segments)
 	}
 
 	// 5.b Segments Length 1 is 'category' view, unless current menu item is a category menu item, and adding /item/ is not enabled
-	if($count == 1) {
+	// ... BUT detect bad 2-segments URL (Segments must be integer prefixed)
+	if ($count == 1) {
+		// Check for bad URLs, THIS is needed for bad URLs with invalid MENU ALIAS segments,
+		// that are routed to FLEXIcontent because the PARENT menu is FLEXIcontent MENU ITEM
+		$element_id_0 = (int) $segments[0];
+		if ( !$element_id_0 ) {
+			// Force article error page
+			$vars['view'] = FLEXI_ITEMVIEW;
+			$vars['cid']  = '0';
+			$vars['id']   = '0';
+			return $vars;
+		}
+		
 		$iscat_menu_item = $menu && @$menu->query['view']=='category' && @$menu->query['cid'];
 		if ($iscat_menu_item && !$add_item_sef_segment) {
 			$vars['view'] = FLEXI_ITEMVIEW;
-			$vars['cid']  = (int) $menu->query['cid'];
+			$vars['cid']  = $menu->query['cid'];
 			$vars['id']   = $segments[0];
 			return $vars;
 		} else {
@@ -279,7 +299,20 @@ function FLEXIcontentParseRoute($segments)
 	}
 
 	// 5.c Segments Length 2 is 'item(s)' view
-	if($count == 2) {
+	// ... BUT detect bad 2-segments URL (Segments must be integer prefixed)
+	if ($count == 2) {
+		// Check for bad URLs, THIS is needed for bad URLs with invalid MENU ALIAS segments,
+		// that are routed to FLEXIcontent because the PARENT menu is FLEXIcontent MENU ITEM
+		$element_id_0 = (int) $segments[0];
+		$element_id_1 = (int) $segments[1];
+		if ( !$element_id_0 || !$element_id_1 ) {
+			// Force article error page
+			$vars['view'] = FLEXI_ITEMVIEW;
+			$vars['cid']  = '0';
+			$vars['id']   = '0';
+			return $vars;
+		}
+		
 		$vars['view'] = FLEXI_ITEMVIEW;
 		$vars['cid'] 	= $segments[0];
 		$vars['id'] 	= $segments[1];
