@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: file.php 1862 2014-03-07 03:29:42Z ggppdk $
+ * @version 1.0 $Id: file.php 1904 2014-05-20 12:21:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.file
@@ -679,16 +679,16 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			}
 			
 			//Display the buttons "DOWNLOAD, SHARE, ADD TO CART" before or after the filename
-			if($buttonsposition) {
+			if ($buttonsposition) {
 				$str .= (count($actions_arr) ?  $infoseptxt : "")
-				.'<span class="fcfile_actions">'
-				.  implode($actions_arr, $actionseptxt)
-				.'</span>';
-			}else {
+					.'<span class="fcfile_actions">'
+					.  implode($actions_arr, $actionseptxt)
+					.'</span>';
+			} else {
 				$str = (count($actions_arr) ?  $infoseptxt : "")
-				.'<span class="fcfile_actions">'
-				.  implode($actions_arr, $actionseptxt)
-				.'</span>'.$str;
+					.'<span class="fcfile_actions">'
+					.  implode($actions_arr, $actionseptxt)
+					.'</span>'.$str;
 			}
 			
 			// [4]: Add the file description (if displayed inline)

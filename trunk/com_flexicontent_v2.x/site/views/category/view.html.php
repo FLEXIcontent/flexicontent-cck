@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1889 2014-04-26 03:25:28Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1896 2014-05-01 18:12:25Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -138,7 +138,8 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Get URL variables
 		$cid = JRequest::getInt('cid', 0);
 		$authorid = JRequest::getInt('authorid', 0);
-		$layout = JRequest::getCmd('layout', '');
+		$tagid    = JRequest::getInt('tagid', 0);
+		$layout   = JRequest::getCmd('layout', '');
 		
 		$mcats_list = JRequest::getVar('cids', '');
 		if ( !is_array($mcats_list) ) {
@@ -189,7 +190,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			$cid_ok      = $cid       == (int) @$menu->query['cid'];
 			$layout_ok   = $layout    == @$menu->query['layout'];   // null is equal to empty string
 			$authorid_ok = $authorid  == (int) @$menu->query['authorid']; // null is equal to zero
-			$menu_matches = $view_ok && $cid_ok && $layout_ok && $authorid_ok;
+			$tagid_ok    = $tagid     == (int) @$menu->query['tagid']; // null is equal to zero
+			$menu_matches = $view_ok && $cid_ok && $layout_ok && $authorid_ok && $tagid_ok;
 			//$menu_params = FLEXI_J16GE ? $menu->params : new JParameter($menu->params);  // Get active menu item parameters
 		} else {
 			$menu_matches = false;
@@ -743,43 +745,45 @@ class FlexicontentViewCategory extends JViewLegacy
 			FlexicontentFields::renderFilters( $params, $filters, $form_name );
 		}
 		
+		
+		// ****************************
 		// Create the pagination object
+		// ****************************
+		
 		$pageNav = $this->get('pagination');
 		$resultsCounter = $pageNav->getResultsCounter();  // for overriding model's result counter
 		
-		// Create category link
+		
+		// *********************************************************************
+		// Create category link, but also consider current 'layout', and use the 
+		// layout specific variables so that filtering form will work properly
+		// *********************************************************************
+		
 		$Itemid = $menu ? $menu->id : 0;
-		$urlvars = array();
-		if ($layout)   $urlvars['layout']   = $layout;
-		if ($authorid) $urlvars['authorid'] = $authorid;
-		if ($cids)     $urlvars['cids'] = $cids;
+		$layout_vars = array();
+		if ($layout)   $layout_vars['layout']   = $layout;
+		if ($authorid) $layout_vars['authorid'] = $authorid;
+		if ($tagid)    $layout_vars['tagid']    = $tagid;
+		if ($cids)     $layout_vars['cids']     = $cids;
 		
-		// Current url basic variables to be able to link to subcategories ...
-    $curr_url_basic = 'index.php?Itemid='.$Itemid;
-    foreach ($urlvars as $urlvar_name => $urlvar_val) $curr_url_basic .= '&'.$urlvar_name.'='.$urlvar_val;
-	
-	$vars = array();
-	if(is_array($_GET)) {
-		foreach($_GET as $k=>$v) {
-			if(substr($k, 0, 7)=='filter_') {
-				if(is_array($_GET[$k])) {
-					foreach($v as $k2=>$v2) {
-						$vars[] = "{$k}[{$k2}]={$v2}";
-					}
-				}else{
-					$vars[] = "{$k}={$v}";
-				}
-			}
-		}
-	}
-    
     // Category link for single/multiple category(-ies)  --OR--  "current layout" link for myitems/author layouts
-		$category_link = ($layout=='myitems' || $layout=='author') ? JRoute::_( $curr_url_basic ) :
-			JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, $Itemid, $urlvars), false);
+    if ($cid) {
+			$category_link = JRoute::_(FlexicontentHelperRoute::getCategoryRoute($category->slug, $Itemid, $layout_vars), false);
+    } else {
+	    $urlvars_str = '';
+	    foreach ($layout_vars as $urlvar_name => $urlvar_val) {
+	    	$urlvars_str .= '&'.$urlvar_name.'='.$urlvar_val;
+	    }
+			$category_link = JRoute::_('index.php?Itemid='.$Itemid.'&option=com_flexicontent&view=category'.$urlvars_str.($Itemid ? '&Itemid='.$Itemid : ''));
+		}
 		
-		// Print link ... must include current filtering url vars
-    $curr_url = JURI::root(true) . $_SERVER['REQUEST_URI'];
-    $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;'.implode("&amp;", $vars);
+		
+		// **********************************************************************
+		// Print link ... must include layout and current filtering url vars, etc
+		// **********************************************************************
+		
+    $curr_url = $_SERVER['REQUEST_URI'];
+    $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
     
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		

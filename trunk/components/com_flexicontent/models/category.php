@@ -100,6 +100,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 	var $_authorid = 0;
 	
 	/**
+	 * Tag id (used by TAGS layout)
+	 *
+	 * @var integer
+	 */
+	var $_tagid = 0;
+	
+	/**
 	 * Category layout
 	 *
 	 * @var string
@@ -141,9 +148,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($this->_layout=='author') {
 			$this->_authorid = JRequest::getInt('authorid', 0);
 		}
-		else if ($this->_layout=='myitems') {
+		else if ($this->_layout=='myitems' || $this->_layout=='favs') {
 			$user = JFactory::getUser();
 			$this->_authorid = $user->id;
+		}
+		else if ($this->_layout=='tags') {
+			$_tagid = JRequest::getInt('tagid', '');
+			$this->_tagid = $_tagid;
 		}
 		else if ($this->_layout=='mcats') {
 			$_cids = JRequest::getVar('cids', '');
@@ -154,6 +165,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 			// make sure given data are integers ... !!
 			$this->_ids = array();
 			foreach ($_cids as $i => $_id)  if ((int)$_id) $this->_ids[] = (int)$_id;
+			
+			// Clear category id, it is not used by this layout
+			$this->_id = 0;
 		}
 		else if (!$this->_id) {
 		}
@@ -174,8 +188,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->setState('limitstart', $limitstart);
 
 		// Set filter order variables into state
-		$this->setState('filter_order', 'i.title');
-		$this->setState('filter_order_dir', 'ASC');
+		$this->setState('filter_order', JRequest::getCmd('filter_order', 'i.title', 'default'));
+		$this->setState('filter_order_Dir', JRequest::getCmd('filter_order_Dir', 'ASC', 'default'));
 		
 		// Get minimum word search length
 		$app = JFactory::getApplication();
@@ -269,8 +283,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 				}
 			}
 			// Assign total number of items found this will be used to decide whether to do item counting per filter value
-			global $fc_catviev;
-			$fc_catviev['view_total']  = $this->_total;
+			global $fc_catview;
+			$fc_catview['view_total']  = $this->_total;
 			
 			/*if ((int)$this->getState('limitstart') < (int)$this->_total) {
 				$this->_data = $this->_getList( $query, $this->getState('limitstart'), $this->getState('limit') );
@@ -632,8 +646,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	{
 		$request_var = $this->_params->get('orderby_override') ? 'orderby' : '';
 		$default_order = $this->getState('filter_order');
-		$default_order_dir = $this->getState('filter_order_dir');
-		
+		$default_order_dir = $this->getState('filter_order_Dir');
+	
 		// Precedence: $request_var ==> $order ==> $config_param ==> $default_order
 		return flexicontent_db::buildItemOrderBy(
 			$this->_params,
@@ -682,6 +696,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$from_clause  = !$counting ? ' FROM #__content AS i' : ' FROM #__flexicontent_items_tmp AS i';
 		$join_clauses = ''
 			. (!$tmp_only ? ' JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id' : '')
+			. ($this->_layout=='favs' ? ' JOIN #__flexicontent_favourites AS fav ON fav.itemid = i.id' : '')
+			. ($this->_layout=='tags' ? ' JOIN #__flexicontent_tags_item_relations AS tag ON tag.itemid = i.id' : '')
 			. ' JOIN #__flexicontent_types AS ty ON '. (!$tmp_only ? 'ie.' : 'i.') .'type_id = ty.id'
 			. ' JOIN #__flexicontent_cats_item_relations AS rel ON rel.itemid = i.id'
 			. ' JOIN #__categories AS c ON c.id = i.catid'
@@ -691,8 +707,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 			. (FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON  i.id = gi.axo AND gi.aco = "read" AND gi.axosection = "item"' : '')
 			;
 		
-		global $fc_catviev;
-		if ($counting) $fc_catviev['join_clauses'] = $join_clauses;
+		global $fc_catview;
+		if ($counting) $fc_catview['join_clauses'] = $join_clauses;
 		
 		$fromjoin[$counting] = $from_clause.$join_clauses;
 		return $fromjoin[$counting];
@@ -707,8 +723,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _buildItemWhere( $wherepart='where', $counting = false )
 	{
-		global $globalcats, $fc_catviev;
-		if ( isset($fc_catviev[$wherepart]) ) return $fc_catviev[$wherepart];
+		global $globalcats, $fc_catview;
+		if ( isset($fc_catview[$wherepart]) ) return $fc_catview[$wherepart];
 		
 		$option = JRequest::getVar('option');
 		$user		= JFactory::getUser();
@@ -735,9 +751,17 @@ class FlexicontentModelCategory extends JModelLegacy {
 		if ($this->_authorid)
 			$where .= ' AND i.created_by = ' . $db->Quote($this->_authorid);
 		
-		// Prevent author's description item from appearing in the author listings
+		// Prevent author's profile item from appearing in the author listings
 		if ($this->_authorid && (int)$this->_params->get('authordescr_itemid'))
 			$where .= ' AND i.id != ' . (int)$this->_params->get('authordescr_itemid');
+		
+		// Limit to favourites
+		if ($this->_layout=='favs')
+			$where .= ' AND fav.userid = ' . $db->Quote($this->_authorid);
+		
+		// Limit to give tag id
+		if ($this->_layout=='tags')
+			$where .= ' AND tag.tid = ' . $db->Quote($this->_tagid);
 		
 		if ($this->_id || count($this->_ids)) {
 			$id_arr = $this->_id ? array($this->_id) : $this->_ids;
@@ -823,18 +847,18 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$filters_where = $this->_buildFiltersWhere();
 		$alpha_where   = $this->_buildAlphaIndexWhere();
 		
-		$fc_catviev['filters_where'] = $filters_where;
-		$fc_catviev['alpha_where'] = $alpha_where;
+		$fc_catview['filters_where'] = $filters_where;
+		$fc_catview['alpha_where'] = $alpha_where;
 		
 		$filters_where = implode(' ', $filters_where);
 		
-		$fc_catviev['where_no_alpha']   = $where . $filters_where;
-		$fc_catviev['where_no_filters'] = $where . $alpha_where;
-		$fc_catviev['where_conf_only']  = $where;
+		$fc_catview['where_no_alpha']   = $where . $filters_where;
+		$fc_catview['where_no_filters'] = $where . $alpha_where;
+		$fc_catview['where_conf_only']  = $where;
 		
-		$fc_catviev['where'] = $where . $filters_where . $alpha_where;
+		$fc_catview['where'] = $where . $filters_where . $alpha_where;
 		
-		return $fc_catviev[$wherepart];
+		return $fc_catview[$wherepart];
 	}
 	
 	
@@ -846,7 +870,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 	 */
 	function _buildFiltersWhere()
 	{
-		global $fc_catviev;
+		global $fc_catview;
 		$app      = JFactory::getApplication();
 		$option   = JRequest::getVar('option');
 		$cparams  = $this->_params;
@@ -857,7 +881,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Get value of search text ('filter') from URL or SESSION (which is set new value if not already set)
 		// *** Commented out to get variable only by HTTP GET or POST
 		// thus supporting FULL PAGE CACHING (e.g. Joomla's system plugin 'Cache')
-		/*if ($this->_id) {
+		/*if (!$this->_layout) {
 			$text  = $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter', 'filter', '', 'string' );
 		} else if ($this->_layout=='author') {
 			$text  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter', 'filter', '', 'string' );
@@ -865,6 +889,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$text  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
 		} else if ($this->_layout=='myitems') {
 			$text  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
+		} else if ($this->_layout=='favs') {
+			$text  = $app->getUserStateFromRequest( $option.'favs'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
+		} else if ($this->_layout=='tags') {
+			$text  = $app->getUserStateFromRequest( $option.'tags'.$this->_menu_itemid.'.filter', 'filter', '', 'string' );
 		} else {
 			$text  = JRequest::getString('filter', '', 'default');
 		}*/
@@ -962,7 +990,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		{
 			// Get filter values, setting into appropriate session variables
 			// *** Commented out to get variable only by HTTP GET or POST thus supporting FULL PAGE CACHING (e.g. Joomla's system plugin 'Cache')
-			/*if ($this->_id) {
+			/*if (!$this->_layout) {
 				$filt_vals 	= $app->getUserStateFromRequest( $option.'.category'.$this->_id.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
 			} else if ($this->_layout=='author') {
 				$filt_vals  = $app->getUserStateFromRequest( $option.'.author'.$this->_authorid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
@@ -970,6 +998,10 @@ class FlexicontentModelCategory extends JModelLegacy {
 				$filt_vals  = $app->getUserStateFromRequest( $option.'.mcats'.$this->_menu_itemid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
 			} else if ($this->_layout=='myitems') {
 				$filt_vals  = $app->getUserStateFromRequest( $option.'.myitems'.$this->_menu_itemid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
+			} else if ($this->_layout=='favs') {
+				$filt_vals  = $app->getUserStateFromRequest( $option.'.favs'.$this->_menu_itemid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
+			} else if ($this->_layout=='tags') {
+				$filt_vals  = $app->getUserStateFromRequest( $option.'.tags'.$this->_menu_itemid.'.filter_'.$filter->id, 'filter_'.$filter->id, '', '' );
 			} else {
 				$filt_vals  = JRequest::getVar('filter_'.$filter->id, '', '');
 			}*/
@@ -1422,32 +1454,65 @@ class FlexicontentModelCategory extends JModelLegacy {
 		//initialize some vars
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
+		$cparams = $this->_params;
 		if ($pk) $this->_id = $pk;  // Set a specific id
 		
-		// get category data
-		if ($this->_id) {
+		
+		$cat_usable = !$this->_layout || $this->_layout!='mcats';
+		if ($this->_id && $cat_usable)
+		{
+			// ************************************************************************************************************
+			// Retrieve category data, but ONLY if current layout can use it, ('mcats' does not since it uses multiple ids)
+			// ************************************************************************************************************
+			
 			$query 	= 'SELECT c.*,'
-					. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
-					. ' FROM #__categories AS c'
-					. ' WHERE c.id = '.$this->_id
-					. ' AND c.published = 1'
-					;
-	
+				. ' CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(\':\', c.id, c.alias) ELSE c.id END as slug'
+				. ' FROM #__categories AS c'
+				. ' WHERE c.id = '.$this->_id
+				. ' AND c.published = 1 '.(FLEXI_J16GE ? ' AND c.extension='.$this->_db->Quote(FLEXI_CAT_EXTENSION) : '')
+				;
 			$this->_db->setQuery($query);
-			$this->_category = $this->_db->loadObject();
+			$_category = $this->_db->loadObject();
 			if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');
 		}
-		else if ($this->_layout) {
-			if ( !in_array($this->_layout, array('mcats','myitems','author')) ||
-				( $this->_layout=='myitems' && !$this->_authorid ) ||
-				( $this->_layout=='author' && !$this->_authorid )
-			) {
-				$_layout_not_found = true;
-				$this->_category = false;
+		
+		else {
+			$_category = false;
+		}
+		
+		
+		// ************************************************************************************
+		// Check category was found / is published, and throw an error. NOTE: an empty default
+		// category object was created by layouts for which a specific category is optional
+		// ************************************************************************************
+		
+		if ($this->_id && $cat_usable && !$_category) {
+			$err_mssg = $err_type = false;
+			if (!$this->_category) {
+				$err_mssg = JText::sprintf( 'FLEXI_CONTENT_CATEGORY_NOT_FOUND_OR_NOT_PUBLISHED', $this->_id );
+				$err_type = 404;
+			}
+			
+			// Throw error -OR- return if errors suppresed
+			if ($err_mssg) {
+				if (!$raiseErrors) return false;
+				if (FLEXI_J16GE) throw new Exception($err_mssg, $err_type); else JError::raiseError($err_type, $err_mssg);
+			}
+		}
+		
+		
+		// *********************************************************************
+		// Some layouts optionally limit to a specific category, for these
+		// create an empty category data object (if one was not created already)
+		// *********************************************************************
+		
+		if ($this->_layout) {
+			if ( $this->_layout!='mcats' && !empty($_category) ) {
+				$this->_category = $_category;
 			} else {
 				$this->_category = new stdClass;
 				$this->_category->published = 1;
-				$this->_category->id = $this->_id;   // can be zero for author/myitems/etc layouts
+				$this->_category->id = $this->_id;   // can be zero for layouts: author/myitems/favs/tags, etc 
 				$this->_category->title = '';
 				$this->_category->description = '';
 				$this->_category->slug = '';
@@ -1455,41 +1520,78 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 		}
 		else {
-			$this->_category = false;
+			$this->_category = $_category;
 		}
 		
-		// Make sure the category was found and is published
-		if (!$this->_category) {
-			if (!$raiseErrors) return false;
+		
+		// *****************************************************
+		// Check for proper layout configuration and throw error
+		// *****************************************************
+		
+		if ($this->_layout) {
+			$err_mssg = $err_type = false;
 			
-			if ( $this->_layout=='myitems' && !$this->_authorid ) {
-				$msg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
-				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
+			if ( !in_array($this->_layout, array('favs','tags','mcats','myitems','author')) ) {
+				$err_mssg = JText::sprintf( 'FLEXI_CONTENT_LIST_LAYOUT_IS_NOT_SUPPORTED', $this->_layout );
+				$err_type = 404;
 			}
 			else if ( $this->_layout=='author' && !$this->_authorid ) {
-				$msg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_AUTHORID_NOT_SET');
-				if (FLEXI_J16GE) throw new Exception($msg, 403); else JError::raiseError(403, $msg);
+				$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_AUTHORID_NOT_SET');
+				$err_type = 404;
 			}
-			else if ( $_layout_not_found ) {
-				$msg = JText::sprintf( 'FLEXI_CONTENT_LIST_LAYOUT_IS_NOT_SUPPORTED', $this->_layout );
-				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+			else if ( $this->_layout=='tags' && !$this->_tagid ) {
+				$err_mssg = JText::_( 'FLEXI_CANNOT_LIST_CONTENT_TAGID_NOT_SET');
+				$err_type = 404;
 			}
-			else if ($this->_id) {
-				$msg = JText::sprintf( 'FLEXI_CONTENT_CATEGORY_NOT_FOUND_OR_NOT_PUBLISHED', $this->_id );
-				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+			else if ( $this->_layout=='myitems' && !$this->_authorid ) {
+				$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
+				$err_type = 403;
+				$login_redirect = true;
 			}
-			else { // !$this->_id
-				// This is not category view instead a category menu item is being used for a non-existent page
-				$msg = JText::_( 'FLEXI_REQUESTED_PAGE_COULD_NOT_BE_FOUND' );
-				if (FLEXI_J16GE) throw new Exception($msg, 404); else JError::raiseError(404, $msg);
+			else if ( $this->_layout=='favs' && !$this->_authorid ) {
+				$err_mssg = JText::_( 'FLEXI_LOGIN_TO_DISPLAY_YOUR_CONTENT');
+				$err_type = 403;
+				$login_redirect = true;
+			}
+			
+			// Raise a notice and redirect
+			if ($err_mssg)
+			{
+				if (!$raiseErrors) return false;
+				
+				if (!empty($login_redirect)) {
+					// redirect unlogged user to login
+					$uri		= JFactory::getURI();
+					$return	= $uri->toString();
+					$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
+					$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
+					$return = strtr(base64_encode($return), '+/=', '-_,');
+					$url .= '&return='.$return; // '&return='.base64_encode($return);
+					$url .= '&isfcurl=1';
+					
+					JError::raiseWarning( $err_type, $err_mssg);
+					$app->redirect( $url );
+				} else {
+					if (FLEXI_J16GE) throw new Exception($err_mssg, $err_type); else JError::raiseError($err_type, $err_mssg);
+				}
 			}
 		}
 		
+		
+		// *******************************************************
 		// Set category parameters, these have already been loaded
+		// *******************************************************
+		
 		$this->_category->parameters = $this->_params;
-		$cparams = $this->_params;
-
-		//check whether category access level allows access
+		
+		
+		// ******************************************************************
+		// Check whether category access level allows access and throw errors
+		// but skip checking Access if so requested via function parameter
+		// ******************************************************************
+		
+		if (!$checkAccess) return $this->_category;
+		
 		$canread = true;
 		if ($this->_id) {
 			if (FLEXI_J16GE) {
@@ -1501,19 +1603,18 @@ class FlexicontentModelCategory extends JModelLegacy {
 			}
 		}
 		
-		// Skip checking Access
-		if (!$checkAccess) return $this->_category;
-		
 		if (!$canread && $this->_id!=0)
 		{
 			if($user->guest) {
 				// Redirect to login
 				$uri		= JFactory::getURI();
-				$return		= $uri->toString();
+				$return	= $uri->toString();
 				$com_users = FLEXI_J16GE ? 'com_users' : 'com_user';
 				$url  = $cparams->get('login_page', 'index.php?option='.$com_users.'&view=login');
-				$url .= '&return='.base64_encode($return);
-
+				$return = strtr(base64_encode($return), '+/=', '-_,');
+				$url .= '&return='.$return; // '&return='.base64_encode($return);
+				$url .= '&isfcurl=1';
+				
 				JError::raiseWarning( 403, JText::sprintf("FLEXI_LOGIN_TO_ACCESS", $url));
 				$app->redirect( $url );
 			} else {
@@ -1642,11 +1743,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 			$view_ok      = @$menu->query['view']     == 'category';
 			$cid_ok       = @$menu->query['cid']      == $this->_id;
 			$layout_ok    = @$menu->query['layout']   == $this->_layout;
-			$authorid_ok  = (@$menu->query['authorid'] == $this->_authorid) || ($this->_layout=='myitems');  // Ignore empty author_id when layout is 'myitems'
+			// Ignore empty author_id when layout is 'myitems' or 'favs', for them this is set explicitely (* see populateCategoryState() function)
+			$authorid_ok  = (@$menu->query['authorid'] == $this->_authorid) || ($this->_layout=='myitems' || $this->_layout=='favs');
+			$tagid_ok     = (@$menu->query['tagid'] == $this->_tagid) || ($this->_layout!='tags');  // Examine tagid only for tags layout
 			
 			// We will merge menu parameters last, thus overriding the default categories parameters if either
-			// (a) override is enabled in the menu or (b) category Layout is 'myitems' which has no default parameters
-			$overrideconf = $menu_params->get('override_defaultconf',0) || $this->_layout=='myitems' || $this->_layout=='mcats';
+			// (a) override is enabled in the menu or (b) category Layout is 'myitems' or 'favs' or 'tags' or 'mcats' which has no default parameters
+			$overrideconf = $menu_params->get('override_defaultconf',0) || $this->_layout=='myitems' || $this->_layout=='favs' || $this->_layout=='mcats' || $this->_layout=='tags';
 			$menu_matches = $view_ok && $cid_ok & $layout_ok && $authorid_ok;
 			
 			if ( $menu_matches && $overrideconf ) {
@@ -1689,8 +1792,8 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$this->_params = $params;
 		
 		// Also set into a global variable
-		global $fc_catviev;
-		$fc_catviev['params'] = $params;
+		global $fc_catview;
+		$fc_catview['params'] = $params;
 	}
 	
 	

@@ -70,6 +70,11 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			<field name="show_state_icon" type="radio" default="" label="FLEXI_STATE_ICON" description="FLEXI_STATE_ICON_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
 			
 			<!--field name="" type="separator" default="FLEXI_PDF_VIEW_CONF" level="level2"  />
 			<field name="pdf_format_fields" type="textarea" default="" rows="3" cols="60" label="FLEXI_PDF_FORMAT_FIELDS" description="FLEXI_PDF_FORMAT_FIELDS_DESC"  /-->

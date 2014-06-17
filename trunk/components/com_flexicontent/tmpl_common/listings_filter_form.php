@@ -20,7 +20,7 @@ if ( empty($filter_form_body) ) return;
 
 	<input type="hidden" name="option" value="com_flexicontent" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['filter_order']; ?>" />
-	<input type="hidden" name="filter_order_Dir" value="" />
+	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['filter_order_Dir']; ?>" />
 	<input type="hidden" name="view" value="category" />
 	<input type="hidden" name="letter" value="<?php echo JRequest::getVar('letter');?>" id="alpha_index" />
 	<input type="hidden" name="task" value="" />

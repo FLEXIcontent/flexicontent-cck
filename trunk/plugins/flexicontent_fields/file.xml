@@ -103,6 +103,12 @@
 				<option value="0">FLEXI_FIELD_LINKS</option>
 				<option value="1">FLEXI_FIELD_BUTTONS</option>
 			</field>
+			
+			<field name="buttonsposition" type="radio" default="1" label="FLEXI_FIELD_BUTTONS_POSITION" description="FLEXI_FIELD_BUTTONS_POSITION_DESC">
+				<option value="0">FLEXI_FIELD_BEFORE</option>
+				<option value="1">FLEXI_FIELD_AFTER</option>
+			</field>
+
 			<field name="use_actionseptxt" type="radio" default="1" label="FLEXI_FIELD_FILE_USE_SEP_CHARS" description="FLEXI_FIELD_FILE_USE_SEP_CHARS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: date.php 1862 2014-03-07 03:29:42Z ggppdk $
+ * @version 1.0 $Id: date.php 1904 2014-05-20 12:21:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.date
@@ -166,14 +166,15 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					button:			img.attr('id'),
 					align:			'Tl',
 					singleClick:	true
-				});";
-
+				});
+			";
+			
 			if($disable_keyboardinput) {
 				$js .="
-						jQuery('#'+input.attr('id')).on('keydown keypress keyup', false);
-						";
+					jQuery('#'+input.attr('id')).on('keydown keypress keyup', false);
+				";
 			}
-				
+			
 			$js .="
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
@@ -222,7 +223,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$js = '';
 			$css = '';
 		}
-
+		
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 		
@@ -241,15 +242,15 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				'.$move2.'
 				'.$remove_button.'
 				';
-
+			
 			if($disable_keyboardinput) {
 				$document->addScriptDeclaration("
-								jQuery(document).ready(function(){
-									jQuery('#".$elementid_n."').on('keydown keypress keyup', false);
-								});
-							");
+					jQuery(document).ready(function(){
+						jQuery('#".$elementid_n."').on('keydown keypress keyup', false);
+					});
+				");
 			}
-
+			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
