@@ -919,8 +919,42 @@ class FlexicontentViewItem  extends JViewLegacy
 		//Load the JEditor object
 		$editor = JFactory::getEditor();
 		
+		// Because the application sets a default page title,
+		// we need to get it from the menu item itself
+		
+		if ($menu)
+		{
+			$default_heading = FLEXI_J16GE ? $menu->title : $menu->name;
+			
+			// Cross set (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->def('page_heading', $params->get('page_title',   $default_heading));
+			$params->def('page_title',   $params->get('page_heading', $default_heading));
+		}
+		else
+		{
+			// Calculate default page heading (=called page title in J1.5), which in turn will be document title below !! ...
+			$default_heading =!$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' );
+
+			// Set both (show_) page_heading / page_title for compatibility of J2.5+ with J1.5 template (and for J1.5 with J2.5 template)
+			$params->set('page_title',   $default_heading);
+			$params->set('page_heading', $default_heading);
+		}
+
+		$title = $params->def('page_title');
+
+		// Check and prepend or append site name
+		if (FLEXI_J16GE) {  // Not available in J1.5
+			// Add Site Name to page title
+			if ($app->getCfg('sitename_pagetitles', 0) == 1) {
+				$title = $app->getCfg('sitename') ." - ". $title ;
+			}
+			elseif ($app->getCfg('sitename_pagetitles', 0) == 2) {
+				$title = $title ." - ". $app->getCfg('sitename') ;
+			}
+		}
+
 		// Set page title
-		$title = !$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' );
+		//$title = !$isnew ? JText::_( 'FLEXI_EDIT' ) : JText::_( 'FLEXI_NEW' );
 		$document->setTitle($title);
 
 		// Add title to pathway
