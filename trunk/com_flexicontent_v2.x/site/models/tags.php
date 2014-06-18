@@ -609,7 +609,7 @@ class FlexicontentModelTags extends JModelLegacy
 	 */
 	function storetag($data)
 	{
-		$row  =& $this->getTable('flexicontent_tags', '');
+		$row  = $this->getTable('flexicontent_tags', '');
 		
 		// bind it to the table
 		if (!$row->bind($data)) {
