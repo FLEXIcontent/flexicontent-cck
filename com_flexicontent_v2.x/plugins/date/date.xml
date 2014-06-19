@@ -55,16 +55,16 @@
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2" />
-			<field name="disable_keyboardinput" type="radio" default="0" label="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT" description="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
 			<field name="date_allowtime" type="list" default="1" label="FLEXI_DATE_ALLOWTIME" description="FLEXI_DATE_ALLOWTIME_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="2">FLEXI_YES_FORCE_ZERO_TIME</option>
 			</field>
 			<field name="use_editor_tz" type="radio" default="0" label="FLEXI_DATE_TIMEZONE_EDITORS" description="FLEXI_DATE_TIMEZONE_EDITORS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="disable_keyboardinput" type="radio" default="0" label="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT" description="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

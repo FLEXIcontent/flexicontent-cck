@@ -584,7 +584,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			;
 		
 		// AND-WHERE sub-clauses ... (shared with filters)
-		$and_where =  ' 1 '
+		$conf_where =  ' WHERE 1 '
 			. ' AND i.state IN (1,-5'. ($search_archived ? ','.(FLEXI_J16GE ? 2:-1) :'' ) .') '
 			. ' AND c.published = 1 '
 			. ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'
@@ -611,7 +611,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 		
 		global $fc_searchview;
 		$fc_searchview['join_clauses'] = $join_clauses;
-		$fc_searchview['where_conf_only'] = $and_where;    // WHERE of the view (mainly configuration dependent)
+		$fc_searchview['where_conf_only'] = $conf_where;    // WHERE of the view (mainly configuration dependent)
 		$fc_searchview['filters_where'] = $filters_where;  // WHERE of the filters
 		if ($text_where) $fc_searchview['filters_where']['txtsearch'] = $text_where;      // WHERE of text search
 		$fc_searchview['params'] = $params; // view's parameters
@@ -646,8 +646,7 @@ class plgSearchFlexiadvsearch extends JPlugin
 			. $join_textsearch
 			. $join_clauses
 			. $joinaccess
-			. ' WHERE '
-			. $and_where
+			. $conf_where
 			. $and_where_text_n_filters 
 			. ' GROUP BY i.id '
 			. $orderby

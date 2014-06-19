@@ -1200,9 +1200,10 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function statebutton( $item, &$params, $addToggler=true )
+	static function statebutton( $item, &$params=null, $addToggler=true )
 	{
-		if ( !$params->get('show_state_icon', 1) || JRequest::getCmd('print') ) return;
+		// Check for empty params too
+		if ( $params && !$params->get('show_state_icon', 1) || JRequest::getCmd('print') ) return;
 		
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();

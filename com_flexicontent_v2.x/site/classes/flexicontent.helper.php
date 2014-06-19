@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1912 2014-06-12 14:16:43Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1916 2014-06-17 19:18:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1200,9 +1200,10 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function statebutton( $item, &$params, $addToggler=true )
+	static function statebutton( $item, &$params=null, $addToggler=true )
 	{
-		if ( !$params->get('show_state_icon', 1) || JRequest::getCmd('print') ) return;
+		// Check for empty params too
+		if ( $params && !$params->get('show_state_icon', 1) || JRequest::getCmd('print') ) return;
 		
 		$user = JFactory::getUser();
 		$db   = JFactory::getDBO();

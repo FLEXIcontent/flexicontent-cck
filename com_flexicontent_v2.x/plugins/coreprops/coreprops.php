@@ -174,14 +174,40 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 		$props_type = $filter->parameters->get('props_type');
 		switch ($props_type)
 		{
-			case 'language':     // Authors
-				
+			case 'language':
 				$filter->filter_colname    = 'language';
 				$filter->filter_valuesjoin = ' ';   // ... a space, (indicates not needed)
 				$filter->filter_valueformat = ' ';
 				
 				// Dates are given in user calendar convert them to valid SQL dates
 				$sql = FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
+				break;
+			default:
+				$sql = '';
+				break;
+		}
+		return $sql;
+	}
+	
+	
+	// Method to get the active filter result (an array of item ids matching field filter, or subquery returning item ids)
+	// This is for search view
+	function getFilteredSearch(&$filter, $value)
+	{
+		if ( !in_array($filter->field_type, self::$field_types) ) return;
+	
+		$props_type = $filter->parameters->get('props_type');
+		switch ($props_type)
+		{
+			case 'language':
+				$sql = "AND i.id IN "
+					." ( "
+					." SELECT DISTINCT c.id FROM ". (FLEXI_J16GE ? '#__content' : '#__flexicontent_items_ext') ." AS c "
+					." WHERE c.language='".implode('',$value)."' "
+					." ) ";
+				break;
+			default:
+				$sql = '';
 				break;
 		}
 		return $sql;

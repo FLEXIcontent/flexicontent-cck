@@ -3965,20 +3965,23 @@ class ParentClassItem extends JModelAdmin
 		{
 			$body .= '<u>'.JText::_( 'FLEXI_NF_VIEW_IN_FRONTEND' ) . "</u> : <br/>\r\n &nbsp; ";
 			$link = JRoute::_( JURI::root(false).FlexicontentHelperRoute::getItemRoute($this->get('id'), $this->get('catid')) . $lang);
-			$body .= $link . "<br/>\r\n<br/>\r\n";
+			$body .= '<a href="' . $link . '" target="_blank">' . $link . "</a><br/>\r\n<br/>\r\n";  // THIS IS BOGUS *** for unicode menu aliases
+			//$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 		if ( in_array('editlinkfe',$nf_extra_properties) )
 		{
 			$body .= '<u>'.JText::_( 'FLEXI_NF_EDIT_IN_FRONTEND' ) . "</u> : <br/>\r\n &nbsp; ";
 			$link = JRoute::_( JURI::root(false).'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&cid='.$this->get('catid').'&id='.$this->get('id').'&task=edit');
-			$body .= $link . "<br/>\r\n<br/>\r\n";
+			$body .= '<a href="' . $link . '" target="_blank">' . $link . "</a><br/>\r\n<br/>\r\n";  // THIS IS BOGUS *** for unicode menu aliases
+			//$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 		if ( in_array('editlinkbe',$nf_extra_properties) )
 		{
 			$body .= '<u>'.JText::_( 'FLEXI_NF_EDIT_IN_BACKEND' ) . "</u> : <br/>\r\n &nbsp; ";
 			$fc_ctrl_task = FLEXI_J16GE ? 'task=items.edit' : 'controller=items&task=edit';
 			$link = JRoute::_( JURI::root(false).'administrator/index.php?option=com_flexicontent&'.$fc_ctrl_task.'&cid='.$this->get('id'));
-			$body .= $link . "<br/>\r\n<br/>\r\n";
+			$body .= '<a href="' . $link . '" target="_blank">' . $link . "</a><br/>\r\n<br/>\r\n";  // THIS IS BOGUS *** for unicode menu aliases
+			//$body .= $link . "<br/>\r\n<br/>\r\n";
 		}
 		
 		// ADD INFO for introtext/fulltext
