@@ -46,6 +46,37 @@
 			<field name="prefix" type="textarea" cols="21" rows="5" default="" label="Prefix" description="Enter the custom HTML code that will be placed before the fields" />
 			<field name="suffix" type="textarea" cols="21" rows="5" default="" label="Suffix" description="Enter the custom HTML code that will be placed after the fields" />
 			
+			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
+			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
+			<field name="display_label_filter_s" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_OUTSIDE_FILTER</option>
+				<option value="2">FLEXI_INSIDE_FILTER</option>
+			</field>
+			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
+				<option value="0">FLEXI_DISPLAY_AS_DROP_DOWN</option>
+				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
+				<option value="2">FLEXI_DISPLAY_AS_DROP_DOWN_RANGE</option>
+				<option value="3">FLEXI_DISPLAY_AS_TEXT_SEARCH_RANGE</option>
+				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
+				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
+			</field>
+			<field name="faceted_filter_s" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
+				<option value="0">FLEXI_FS_NONE</option>
+				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
+				<option value="2">FLEXI_FS_ACTIVE_FILTERS</option>
+			</field>
+			
+			<field name="" type="separator" default="FLEXI_FACETED_BEHAVIOR_ACTIVE_FILTERS" level="level3" />
+			<field name="show_matching_items_s" type="radio" default="1" label="FLEXI_FILTER_SHOW_MATCHING_ITEMS" description="FLEXI_FILTER_SHOW_MATCHING_ITEMS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="hide_disabled_values_s" type="radio" default="0" label="FLEXI_FILTER_UNAVAILABLE_VALUES" description="FLEXI_FILTER_UNAVAILABLE_VALUES_DESC">
+				<option value="0">FLEXI_DISABLE</option>
+				<option value="1">FLEXI_HIDE</option>
+			</field>
 		</params>
 	
 	<languages>

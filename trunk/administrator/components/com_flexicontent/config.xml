@@ -252,6 +252,10 @@ addpath="/administrator/components/com_flexicontent/elements">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</param>
+			<param name="show_editbutton" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" menu="hide" >
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</param>
 			<param name="show_state_icon" type="radio" default="1" label="FLEXI_STATE_ICON" description="FLEXI_STATE_ICON_DESC" menu="hide">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -510,7 +514,7 @@ addpath="/administrator/components/com_flexicontent/elements">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</param>
-			<param name="show_editbutton" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" menu="hide" >
+			<param name="show_editbutton_lists" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS" description="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS_DESC" menu="hide" >
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</param>

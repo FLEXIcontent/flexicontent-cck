@@ -398,6 +398,7 @@ class FlexicontentModelItem extends ParentClassItem
 		$catParams = FLEXI_J16GE ? new JRegistry($catParams) : new JParameter($catParams);
 		$catParams->set('show_title', '');       // Prevent show_title from propagating ... to the item, it is meant for category view only
 		$catParams->set('title_linkable', '');   // Prevent title_linkable from propagating ... to the item, it is meant for category view only
+		$catParams->set('show_editbutton', '');  // Prevent title_linkable from propagating ... to the item, it is meant for category view only
 		$params->merge($catParams);
 		
 		// c. Merge TYPE parameters into the page configuration

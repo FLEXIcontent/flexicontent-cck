@@ -375,6 +375,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$formfieldname = 'filter_'.$filter->id;
 		
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
+		$disable_keyboardinput = $filter->parameters->get('disable_keyboardinput', 0);
 		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
 		
 		// Create first prompt option of drop-down select
@@ -511,6 +512,30 @@ class plgFlexicontent_fieldsCore extends JPlugin
 				else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; $date_txtformat='%Y-%b'; }
 				else { $date_valformat='%Y-%m-%d'; $date_txtformat='%Y-%b-%d'; }
 				
+				if($disable_keyboardinput)
+				{
+					$filter_ffid   = $formName.'_'.$filter->id.'_val';
+					$document =  JFactory::getDocument();
+					switch ($display_filter_as)
+					{
+						case 1:
+							$document->addScriptDeclaration("
+										jQuery(document).ready(function(){
+											jQuery('#".$filter_ffid."').on('keydown keypress keyup', false);
+										});
+									");
+						break;
+						case 3:
+							$document->addScriptDeclaration("
+										jQuery(document).ready(function(){
+											jQuery('#".$filter_ffid."1').on('keydown keypress keyup', false);
+											jQuery('#".$filter_ffid."2').on('keydown keypress keyup', false);
+										});
+									");	
+						break;
+					}
+				}
+
 				$nullDate = $db->getNullDate();
 				$valuecol = sprintf(' CASE WHEN i.%s='.$db->Quote($nullDate).' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_valformat);
 				$textcol  = sprintf(' CASE WHEN i.%s='.$db->Quote($nullDate).' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(i.%s, "%s") END ', $filter->field_type, $filter->field_type, $date_txtformat);

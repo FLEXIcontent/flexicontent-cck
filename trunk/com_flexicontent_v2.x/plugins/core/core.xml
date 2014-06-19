@@ -109,6 +109,11 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+
+			<field name="disable_keyboardinput" type="radio" default="0" label="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT" description="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 			
 			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level2" />
 			<field name="display_label_filter" type="radio" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC" class="btn-group btn-group-yesno">
@@ -298,6 +303,11 @@
 			<field name="filter_values_combination_tip" type="radio" default="0" label="FLEXI_FILTER_VALUES_REQUIRE_ALL_TIP" description="FLEXI_FILTER_VALUES_REQUIRE_ALL_TIP_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
+			</field>
+
+			<field name="disable_keyboardinput" type="radio" default="0" label="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT" description="FLEXI_FIELD_DISABLE_KEYBOARD_INPUT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_CONTENT_LISTS_CONF" level="level2" />

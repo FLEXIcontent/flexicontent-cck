@@ -11,23 +11,13 @@ var existing_cats_fc  = [];
 var max_cat_overlimit_msg_fc = 'Too many categories selected. You are allowed a maximum number of ';
 var fcflabels = null;
 
-if (flexi_j16ge) {  // Instruction browser of new type of fields
-	Object.append(Browser.Features, {
-		inputemail: (function() {
-			var i = document.createElement("input");
-			i.setAttribute("type", "email");
-			return i.type !== "text";
-		})()
-	});
-}
-
-Object.size = function(obj) {
-    var size = 0, key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
-    }
-    return size;
-};
+/*Object.size = function(obj) {
+	var size = 0, key;
+	for (key in obj) {
+		if (obj.hasOwnProperty(key)) size++;
+	}
+	return size;
+};*/
 
 
 /**
@@ -339,9 +329,6 @@ var JFormValidator = new Class({
 				}
 			} else {
 				el.on('blur', function(){return document.formvalidator.validate(this);});
-				if ( flexi_j16ge && el.hasClass('validate-email') ) {
-					el.attr('type', 'email');
-				}
 			}
 		});
 	},

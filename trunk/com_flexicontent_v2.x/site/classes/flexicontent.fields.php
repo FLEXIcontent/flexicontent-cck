@@ -578,7 +578,7 @@ class FlexicontentFields
 		// Initialize field for plugin triggering
 		$field->text = isset($field->{$method}) ? $field->{$method} : '';
 		$field->title = $item->title;
-		$field->slug = $item->slug;
+		$field->slug = isset($item->slug) ? $item->slug : $item->id;
 		$field->sectionid = !FLEXI_J16GE ? $item->sectionid : false;
 		$field->catid = $item->catid;
 		$field->catslug = @$item->categoryslug;
@@ -2226,7 +2226,13 @@ class FlexicontentFields
 				}
 			}
 			$createFilterValues = !$isSearchView ? 'createFilterValues' : 'createFilterValuesSearch';
-			
+
+			// This is hack for filter core properties to be filterable in search view without being added to the adv search index
+			if( $filter->field_type == 'coreprops' &&  $view=='search' )
+			{ 
+				$createFilterValues = 'createFilterValues';
+			}
+
 			// Get filter values considering PAGE configuration (regardless of ACTIVE filters)
 			if (  $apply_cache ) {
 				$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expiration to default e.g. one hour
@@ -2726,7 +2732,6 @@ class FlexicontentFields
 					.' FROM #__flexicontent_advsearch_index AS ai'."\n"
 					.' JOIN #__content i ON ai.item_id = i.id'."\n"
 					. $view_join."\n"
-					.' WHERE '."\n"
 					. $view_where."\n"
 					;
 				$db->setQuery($sub_query);

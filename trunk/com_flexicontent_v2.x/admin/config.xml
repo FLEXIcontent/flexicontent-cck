@@ -251,6 +251,10 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			<field name="show_editbutton" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" menu="hide" >
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
 			<field name="show_state_icon" type="radio" default="1" label="FLEXI_STATE_ICON" description="FLEXI_STATE_ICON_DESC" menu="hide">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -531,7 +535,7 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="show_editbutton" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" menu="hide" >
+			<field name="show_editbutton_lists" type="radio" default="1" label="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS" description="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS_DESC" menu="hide" >
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
@@ -573,7 +577,6 @@
 				<option value="commented">FLEXI_ORDER_MOST_COMMENTED</option>
 				<option value="rated">FLEXI_ORDER_BEST_RATED</option>
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
-				<option value="default">FLEXI_ORDER_SORT_BY_COLUMN</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" menu="hide" />
 			<field name="orderbycustomfield" type="radio" default="1" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" menu="hide" >
@@ -608,7 +611,6 @@
 				<option value="commented">FLEXI_ORDER_MOST_COMMENTED</option>
 				<option value="rated">FLEXI_ORDER_BEST_RATED</option>
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
-				<option value="default">FLEXI_ORDER_SORT_BY_COLUMN</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_CUSTOM_FIELD_ORDERING" description="" level="level3" menu="hide" />
 			<field name="orderbycustomfield_2nd" type="radio" default="1" label="FLEXI_ORDER_CUSTOM_FIELD_ENABLE" description="FLEXI_ORDER_CUSTOM_FIELD_ENABLE_DESC" menu="hide" >
