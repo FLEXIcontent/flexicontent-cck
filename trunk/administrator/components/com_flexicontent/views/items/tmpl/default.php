@@ -957,15 +957,12 @@ window.addEvent('domready', function() {
 
 		    // Field value for current item
 		    $field_value = & $row->extra_field_value[$field->name];
-
-		    if ( !empty($field_value) )
-		    {
-					// Create field's display HTML, via calling FlexicontentFields::renderField() for the given method name
-					FlexicontentFields::renderField($row, $field, $field_value, $method=$field->methodname);
-
-					// Output the field's display HTML
-					echo @$field->{$field->methodname};
-				}
+		    
+				// Create field's display HTML, via calling FlexicontentFields::renderField() for the given method name
+				FlexicontentFields::renderField($row, $field, $field_value, $method=$field->methodname);
+				
+				// Output the field's display HTML
+				echo @$field->{$field->methodname};
 		    ?>
 			</td>
 		<?php endforeach; ?>

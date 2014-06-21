@@ -334,7 +334,12 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	$field = $this->fields['title'];
 	$field_description = $field->description ? $field->description :
 		JText::_(FLEXI_J16GE ? $this->form->getField('title')->__get('description') : 'TIPTITLEFIELD');
-	$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
+	if(FLEXI_J30GE){
+		JHtml::_('bootstrap.tooltip');
+		$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim($field->label, ':'), $field_description, 0).'"';
+	}else{
+		$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
+	}
 	?>
 	<label id="title-lbl" for="title" <?php echo $label_tooltip; ?> >
 		<?php echo $field->label; //JText::_( 'FLEXI_TITLE' ); ?>
@@ -377,7 +382,12 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 	<?php
 	$field_description = JText::_(FLEXI_J16GE ? $this->form->getField('alias')->__get('description') : 'ALIASTIP');
-	$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
+	if(FLEXI_J30GE){
+		JHtml::_('bootstrap.tooltip');
+		$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_( 'FLEXI_ALIAS' ), ':'), $field_description, 0).'"';
+	}else{
+		$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
+	}
 	?>
 	<label id="alias-lbl" for="alias" <?php echo $label_tooltip; ?> >
 		<?php echo JText::_( 'FLEXI_ALIAS' ); ?>
@@ -421,7 +431,12 @@ if ($typeid==0) : ob_start();  // type ?>
 	$field = $this->fields['document_type'];
 	$field_description = $field->description ? $field->description :
 		JText::_(FLEXI_J16GE ? $this->form->getField('type_id')->__get('description') : 'FLEXI_TYPE_DESC');
-	$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
+	if(FLEXI_J30GE){
+		JHtml::_('bootstrap.tooltip');
+		$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(@$field->label ? $field->label : JText::_( 'FLEXI_TYPE' ), ':'), $field_description, 0).'"';
+	}else{
+		$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
+	}
 	?>
 	<label id="type_id-lbl" for="type_id" for_bck="type_id" <?php echo $label_tooltip; ?> >
 		<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_TYPE' ); ?>
@@ -448,7 +463,12 @@ if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item
 	$field = $this->fields['state'];
 	$field_description = $field->description ? $field->description :
 		JText::_(FLEXI_J16GE ? $this->form->getField('state')->__get('description') : 'FLEXI_STATE_DESC');
-	$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
+	if(FLEXI_J30GE){
+		JHtml::_('bootstrap.tooltip');
+		$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(@$field->label ? $field->label : JText::_( 'FLEXI_STATE' ), ':'), $field_description, 0).'"';
+	}else{
+		$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
+	}
 	?>
 	<label id="state-lbl" for="state" <?php echo $label_tooltip; ?> >
 		<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_STATE' ); ?>
@@ -468,7 +488,12 @@ if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item
 			<div style="float:left; width:50%;">
 				<?php
 					//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
-					$label_tooltip = 'class="hasTip flexi_label fcdualline" title="'.htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC' ), ENT_COMPAT, 'UTF-8').'"';
+					if(FLEXI_J30GE){
+						JHtml::_('bootstrap.tooltip');
+						$label_tooltip = 'class="hasTooltip flexi_label fcdualline" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_PUBLIC_DOCUMENT_CHANGES'), ':'), htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC' ), ENT_COMPAT, 'UTF-8'), 0).'"';
+					}else{
+						$label_tooltip = 'class="hasTip flexi_label fcdualline" title="'.htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC' ), ENT_COMPAT, 'UTF-8').'"';
+					}
 				?>
 				<label id="vstate-lbl" for="vstate" <?php echo $label_tooltip; ?> >
 					<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
@@ -500,7 +525,12 @@ if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item
 
 if ( $typeid && $this->params->get('allowdisablingcomments_fe') ) : ob_start();  // disable_comments ?>
 	<?php
-	$label_tooltip = 'class="hasTip flexi_label" title="'.htmlspecialchars(JText::_ ( 'FLEXI_ALLOW_COMMENTS' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_ALLOW_COMMENTS_DESC' ), ENT_COMPAT, 'UTF-8').'"';
+	if(FLEXI_J30GE){
+		JHtml::_('bootstrap.tooltip');
+		$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_ALLOW_COMMENTS'), ':'), htmlspecialchars(JText::_( 'FLEXI_ALLOW_COMMENTS_DESC' ), ENT_COMPAT, 'UTF-8'), 0).'"';
+	}else{
+		$label_tooltip = 'class="hasTip flexi_label" title="'.htmlspecialchars(JText::_ ( 'FLEXI_ALLOW_COMMENTS' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_ALLOW_COMMENTS_DESC' ), ENT_COMPAT, 'UTF-8').'"';
+	}
 	?>
 	<label id="params_comments-title" <?php echo $label_tooltip; ?> >
 		<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
@@ -514,7 +544,12 @@ if ( $typeid && $this->params->get('allowdisablingcomments_fe') ) : ob_start(); 
 
 if ( $typeid && $this->params->get('allow_subscribers_notify_fe', 0) && $this->subscribers) :  ob_start();  // notify_subscribers ?>
 	<?php
-	$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars(JText::_( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8').'"';
+		if(FLEXI_J30GE){
+			JHtml::_('bootstrap.tooltip');
+			$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_NOTIFY_FAVOURING_USERS'), ':'), htmlspecialchars(JText::_( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8'), 0).'"';
+		}else{
+			$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars(JText::_( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8').'"';
+		}
 	?>
 	<label id="notify-lbl" for="notify" <?php echo $label_tooltip; ?> >
 		<?php echo JText::_( 'FLEXI_NOTIFY_FAVOURING_USERS' ); ?>
@@ -584,7 +619,12 @@ if ($tags_displayed) : ob_start();  // tags ?>
 		
 		<?php
 		$field = $this->fields['tags'];
-		$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
+		if(FLEXI_J30GE){
+			JHtml::_('bootstrap.tooltip');
+			$label_tooltip = $field->description ? 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim($field->label, ':'), htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8'), 0).'"':'class="flexi_label"';
+		}else{
+			$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
+		}
 		?>
 		<label id="tag-lbl" for="tag" <?php echo $label_tooltip; ?> >
 			<?php echo $field->label; ?>
@@ -649,7 +689,12 @@ if ((FLEXI_FISH || FLEXI_J16GE) && $this->params->get('uselang_fe', 1)) : ob_sta
 
 			<div class="fcclear"></div>
 			<?php
-				$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8').'"';
+				if(FLEXI_J30GE){
+					JHtml::_('bootstrap.tooltip');
+					$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_ORIGINAL_CONTENT_ITEM'), ':'), htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8'), 0).'"';
+				}else{
+					$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8').'"';
+				}
 			?>
 			<label id="lang_parent_id-lbl" for="lang_parent_id" <?php echo $label_tooltip; ?> >
 				<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
@@ -706,8 +751,11 @@ if ((FLEXI_FISH || FLEXI_J16GE) && $this->params->get('uselang_fe', 1)) : ob_sta
 					if ($assoc_item->id==$this->item->id) continue;
 					
 					$_link  = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='. $assoc_item->id;
-					$_title = htmlspecialchars(JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
-					echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
+					if(FLEXI_J30GE)
+						$_title = JHtml::tooltipText(trim(JText::_('FLEXI_EDIT_ASSOC_TRANSLATION'), ':'),'['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8') , 0);
+					else
+						$_title = htmlspecialchars(JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
+					echo "<a class='fc_assoc_translation editlinktip ".FLEXI_J30GE?'hasTooltip':'hasTip'."' target='_blank' href='".$_link."' title='".$_title."' >";
 					//echo $assoc_item->id;
 					if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
 						echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
@@ -1044,8 +1092,8 @@ if ($this->fields && $typeid) :
 			// field has tooltip
 			$edithelp = $field->edithelp ? $field->edithelp : 1;
 			if ( $field->description && ($edithelp==1 || $edithelp==2) ) {
-				 $lbl_class .= ' hasTip'.($edithelp==2 ? ' fc_tooltip_icon_fe' : '');
-				 $lbl_title = '::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8');
+				 $lbl_class .= (FLEXI_J30GE?' hasTooltip':' hasTip').($edithelp==2 ? ' fc_tooltip_icon_fe' : '');
+				 $lbl_title = FLEXI_J30GE?(JHtml::tooltipText(trim($field->label, ':'), htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8'), 0)):('::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8'));
 			}
 			// field is required
 			$required = $field->parameters->get('required', 0 );
