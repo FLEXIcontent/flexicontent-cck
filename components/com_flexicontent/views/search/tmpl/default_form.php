@@ -70,10 +70,16 @@ if($autodisplayadvoptions) {
 $this->document->addScriptDeclaration($js);
 
 $infoimage = JHTML::image ( 'components/com_flexicontent/assets/images/information.png', '', ' style="float:left; margin: 0px 8px 0px 2px;" ' );
-$text_search_title_tip   = ' title="'.JText::_('FLEXI_TEXT_SEARCH').'::'.JText::_('FLEXI_TEXT_SEARCH_INFO').'" ';
-$field_filters_title_tip = ' title="'.JText::_('FLEXI_FIELD_FILTERS').'::'.JText::_('FLEXI_FIELD_FILTERS_INFO').'" ';
-$other_search_areas_title_tip = ' title="'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS').'::'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS_TIP').'" ';
-
+if(FLEXI_J30GE){
+	JHtml::_('bootstrap.tooltip');
+	$text_search_title_tip   = ' title="'.JHtml::tooltipText(trim(JText::_('FLEXI_TEXT_SEARCH'), ':'), JText::_('FLEXI_TEXT_SEARCH_INFO'), 0).'" ';
+	$field_filters_title_tip = 'title="'.JHtml::tooltipText(trim(JText::_('FLEXI_FIELD_FILTERS'), ':'), JText::_('FLEXI_FIELD_FILTERS_INFO'), 0).'" ';
+	$other_search_areas_title_tip = 'title="'.JHtml::tooltipText(trim(JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS'), ':'), JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS_TIP'), 0).'" ';
+} else {
+	$text_search_title_tip   = ' title="'.JText::_('FLEXI_TEXT_SEARCH').'::'.JText::_('FLEXI_TEXT_SEARCH_INFO').'" ';
+	$field_filters_title_tip = ' title="'.JText::_('FLEXI_FIELD_FILTERS').'::'.JText::_('FLEXI_FIELD_FILTERS_INFO').'" ';
+	$other_search_areas_title_tip = ' title="'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS').'::'.JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS_TIP').'" ';
+}
 $r = 0;
 ?>
 
@@ -82,7 +88,7 @@ $r = 0;
 	<?php if ($this->params->get('canseltypes', 1) && isset($this->lists['contenttypes'])) : ?>
 	<fieldset id='fc_contenttypes_set' class='fc_search_set'>
 		<legend>
-			<span class='hasTip' title='<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>::<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE_TIP'); ?>'><?php echo $infoimage; ?></span>
+			<span class='<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>' title='<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_SEARCH_CONTENT_TYPE'), ':'), JText::_('FLEXI_SEARCH_CONTENT_TYPE_TIP'), 0):JText::_('FLEXI_SEARCH_CONTENT_TYPE')."::".JText::_('FLEXI_SEARCH_CONTENT_TYPE_TIP'); ?>'><?php echo $infoimage; ?></span>
 			<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>
 		</legend>
 		
@@ -101,7 +107,7 @@ $r = 0;
 	
 	<fieldset id='fc_textsearch_set' class='fc_search_set'>
 		<legend>
-			<span class="hasTip" <?php echo $text_search_title_tip;?> ><?php echo $infoimage; ?></span>
+			<span class="<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" <?php echo $text_search_title_tip;?> ><?php echo $infoimage; ?></span>
 			<?php echo JText::_('FLEXI_TEXT_SEARCH'); ?>
 		</legend>
 		
@@ -109,7 +115,7 @@ $r = 0;
 			
 			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 				<td class='fc_search_label_cell' width="1%">
-					<label for="search_searchword" class='hasTip' title='<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS'); ?>::<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS_TIP'); ?>'>
+					<label for="search_searchword" class='<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>' title='<?php  echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_SEARCH_SEARCHWORDS'), ':'), JText::_('FLEXI_SEARCH_SEARCHWORDS_TIP'), 0):JText::_('FLEXI_SEARCH_SEARCHWORDS').'::'.JText::_('FLEXI_SEARCH_SEARCHWORDS_TIP'); ?>'>
 						<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS'); ?>:
 					</label>
 				</td>
@@ -161,7 +167,7 @@ $r = 0;
 			<?php /*if ( $show_searchphrase ) : ?>
 			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 				<td class='fc_search_label_cell'>
-					<label class='hasTip' title='<?php echo JText::_('FLEXI_SEARCH_KEYWORD_REQUIREMENT'); ?>::<?php echo JText::_('FLEXI_SEARCH_KEYWORD_REQUIREMENT_TIP'); ?>'>
+					<label class='<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>' title='<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_SEARCH_KEYWORD_REQUIREMENT'), ':'), JText::_('FLEXI_SEARCH_KEYWORD_REQUIREMENT_TIP'), 0):JText::_('FLEXI_SEARCH_KEYWORD_REQUIREMENT').'::'.JText::_('FLEXI_SEARCH_KEYWORD_REQUIREMENT_TIP'); ?>'>
 						<?php echo JText::_('FLEXI_SEARCH_KEYWORD_REQUIREMENT'); ?>:
 					</label>
 				</td>
@@ -177,7 +183,7 @@ $r = 0;
 			
 				<tr id="fcsearch_txtflds_row" class="fc_search_row_<?php echo (($r++)%2);?>">
 					<td class='fc_search_label_cell' valign='top'>
-						<label for="txtflds" class='hasTip' title='<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS'); ?>::<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS_TIP'); ?>'>
+						<label for="txtflds" class='<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>' title='<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS'), ':'), JText::_('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS_TIP'), 0):JText::_('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS').'::'.JText::_('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS_TIP'); ?>'>
 							<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS_IN_FIELDS'); ?>:
 						</label>
 					</td>
@@ -203,7 +209,7 @@ $r = 0;
 		<?php if ( count($this->filters) > 0 ) : ?>
 			<fieldset id='fc_fieldfilters_set' class='fc_search_set'>
 				<legend>
-					<span class="hasTip" <?php echo $field_filters_title_tip;?> ><?php echo $infoimage; ?></span>
+					<span class="<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" <?php echo $field_filters_title_tip;?> ><?php echo $infoimage; ?></span>
 					<?php echo JText::_('FLEXI_FIELD_FILTERS')." ".JText::_('FLEXI_TO_FILTER_TEXT_SEARCH_RESULTS'); ?>
 				</legend>
 				
@@ -212,7 +218,7 @@ $r = 0;
 				<?php /*if($show_operator = $this->params->get('show_filtersop', 1)) : ?>
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 						<td colspan="4" class="fc_search_option_cell">
-							<label for="operator" class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_FILTERS_REQUIRED'); ?>::<?php echo JText::_('FLEXI_SEARCH_FILTERS_REQUIRED_TIP'); ?>'>
+							<label for="operator" class="<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" title='<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_SEARCH_FILTERS_REQUIRED'), ':'), JText::_('FLEXI_SEARCH_FILTERS_REQUIRED_TIP'), 0):JText::_('FLEXI_SEARCH_FILTERS_REQUIRED').'::'.JText::_('FLEXI_SEARCH_FILTERS_REQUIRED_TIP'); ?>'>
 								<?php echo JText::_("FLEXI_SEARCH_FILTERS_REQUIRED"); ?>:
 							</label>
 							<span class="fc_filter_html">
@@ -232,11 +238,11 @@ $r = 0;
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 						<td class='fc_search_label_cell' valign='top'>
 						<?php if ($descr) : ?>
-							<label for="<?php echo $filt->name; ?>" class="hasTip" title="<?php echo $label; ?>::<?php echo $descr; ?>">
+							<label for="<?php echo $filt->name; ?>" class="<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim($label, ':'), $descr, 0):$label.'::'.$descr; ?>">
 								<?php echo JText::_($label); ?>:
 							</label>
 						<?php else : ?>
-							<label for="<?php echo $filt->name; ?>" class="hasTip" title="<?php echo JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'); ?>::<?php echo JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $label ); ?>">
+							<label for="<?php echo $filt->name; ?>" class="<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'), ':'), JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $label ), 0):JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR').'::'.JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $label ); ?>">
 								<?php echo $label; ?>:
 							</label>
 						<?php endif; ?>
@@ -265,14 +271,14 @@ $r = 0;
 			
 			<fieldset id='fc_search_behavior_set' class='fc_search_set'>
 				<legend>
-					<span class="hasTip" <?php echo $other_search_areas_title_tip;?> ><?php echo $infoimage; ?></span><?php echo JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS'); ?>
+					<span class="<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" <?php echo $other_search_areas_title_tip;?> ><?php echo $infoimage; ?></span><?php echo JText::_('FLEXI_SEARCH_ALSO_SEARCH_IN_AREAS'); ?>
 				</legend>
 				
 				<table id="fc_search_behavior_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
 					
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 						<td class='fc_search_label_cell' valign='top'>
-							<label class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_INCLUDE_AREAS'); ?>::<?php echo JText::_('FLEXI_SEARCH_INCLUDE_AREAS_TIP'); ?>'>
+							<label class="<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" title='<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_SEARCH_INCLUDE_AREAS'), ':'), JText::_('FLEXI_SEARCH_INCLUDE_AREAS_TIP'), 0):JText::_('FLEXI_SEARCH_INCLUDE_AREAS').'::'.JText::_('FLEXI_SEARCH_INCLUDE_AREAS_TIP'); ?>'>
 								<?php echo JText::_( 'FLEXI_SEARCH_INCLUDE_AREAS' );?> :
 							</label>
 						</td>
@@ -287,7 +293,7 @@ $r = 0;
 					
 					<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 						<td class='fc_search_label_cell' valign='top'>
-							<label for="ordering" class="hasTip" title='<?php echo JText::_('FLEXI_SEARCH_ORDERING'); ?>::<?php echo JText::_('FLEXI_SEARCH_ORDERING_TIP'); ?>'>
+							<label for="ordering" class="<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" title='<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_SEARCH_ORDERING'), ':'), JText::_('FLEXI_SEARCH_ORDERING_TIP'), 0):JText::_('FLEXI_SEARCH_ORDERING').'::'.JText::_('FLEXI_SEARCH_ORDERING_TIP'); ?>'>
 								<?php echo JText::_( 'FLEXI_SEARCH_ORDERING' );?>:
 							</label>
 						</td>
@@ -322,13 +328,13 @@ $r = 0;
 		<?php endif; ?>
 		
 		<?php if ( @$this->lists['limit'] ) : ?>
-			<span class="fc_limit_label hasTip" title="<?php echo JText::_('FLEXI_PAGINATION'); ?>::<?php echo JText::_('FLEXI_PAGINATION_INFO'); ?>">
+			<span class="fc_limit_label <?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_PAGINATION'), ':'), JText::_('FLEXI_PAGINATION_INFO'), 0):JText::_('FLEXI_PAGINATION').'::'.JText::_('FLEXI_PAGINATION_INFO'); ?>">
 				<span class="fc_limit_selector"><?php echo $this->lists['limit']; ?></span>
 			</span>
 		<?php endif; ?>
 		
 		<?php if ( @$this->lists['orderby'] ) : ?>
-			<span class="fc_orderby_label hasTip" title="<?php echo JText::_('FLEXI_ORDERBY'); ?>::<?php echo JText::_('FLEXI_ORDERBY_INFO'); ?>">
+			<span class="fc_orderby_label <?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_ORDERBY'), ':'), JText::_('FLEXI_ORDERBY_INFO'), 0):JText::_('FLEXI_ORDERBY').'::'.JText::_('FLEXI_ORDERBY_INFO'); ?>">
 				<span class="fc_orderby_selector"><?php echo $this->lists['orderby']; ?></span>
 			</span>
 		<?php endif; ?>

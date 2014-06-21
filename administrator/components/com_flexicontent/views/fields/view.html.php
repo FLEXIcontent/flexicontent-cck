@@ -191,7 +191,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$lists['fftype'] = JHTML::_('select.genericlist', $fftype, 'filter_fieldtype', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_fieldtype );
 		if (!FLEXI_J16GE) $lists['fftype'] = str_replace('<optgroup label="">', '</optgroup>', $lists['fftype']);
 		
-		//build arphaned/assigned filter
+		//build orphaned/assigned filter
 		$assigned 	= array();
 		$assigned[] = JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_FIELDS' ) .' -' );
 		$assigned[] = JHTML::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
@@ -203,11 +203,10 @@ class FlexicontentViewFields extends JViewLegacy
 		$lists['filter_type'] = flexicontent_html::buildtypesselect($types, 'filter_type', $filter_type, true, 'class="use_select2_lib" size="1" onchange="submitform( );"', 'filter_type');
 		
 		//publish unpublished filter
-		//build arphaned/assigned filter
 		$states 	= array();
-		$states[] = JHTML::_('select.option',  '', '- '. JText::_( 'FLEXI_ALL_FIELDS' ) .' -' );
-		$states[] = JHTML::_('select.option',  'O', JText::_( 'FLEXI_ORPHANED' ) );
-		$states[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ASSIGNED' ) );
+		$states[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_SELECT_STATE' ) );
+		$states[] = JHTML::_('select.option',  'P', JText::_( 'FLEXI_PUBLISHED' ) );
+		$states[] = JHTML::_('select.option',  'U', JText::_( 'FLEXI_UNPUBLISHED' ) );
 		
 		//$lists['state']	= JHTML::_('grid.state', $filter_state );
 		$lists['state'] = JHTML::_('select.genericlist', $states, 'filter_state', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );

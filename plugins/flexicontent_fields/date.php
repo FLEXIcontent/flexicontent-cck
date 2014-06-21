@@ -293,8 +293,20 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		// DO NOT terminate yet if value is empty since a default value on empty may have been defined
 		
 		$date_source = $field->parameters->get('date_source', 0);
-		if ( $date_source ) {
+		if ( $date_source )
+		{
+			static $nullDate, $never_date;
+			if ($nullDate == null) {
+				$nullDate = JFactory::getDBO()->getNullDate();
+				$never_date = ''; //JText::_('FLEXI_NEVER');
+			}
+			
 			$_value = ($date_source == 1) ? $item->publish_up : $item->publish_down;
+			if ($_value == $nullDate) {
+				$field->{$prop} = $date_source==2 ? $never_date : '';
+				return;
+			}
+			
 			$values = array($_value);
 		}
 		

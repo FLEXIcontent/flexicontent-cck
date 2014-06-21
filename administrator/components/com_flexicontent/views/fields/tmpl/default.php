@@ -327,7 +327,7 @@ $ord_grp = 1;
 				?>
 			</td>
 
-			<td align="center">
+			<td align="left">
 				<?php
 				echo $padspacer;
 				

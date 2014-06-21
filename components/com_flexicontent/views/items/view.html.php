@@ -984,7 +984,7 @@ class FlexicontentViewItems  extends JViewLegacy
 
 		// Add title to pathway
 		$pathway = $app->getPathWay();
-		$pathway->addItem($title, '');
+		$pathway->addItem($doc_title, '');
 
 		// Get pageclass suffix
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
