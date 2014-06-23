@@ -189,7 +189,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			//if ($max_values && $i >= $max_values) break;  // break out of the loop, if maximum file limit was reached
 		}
 		
-		$field->html = '<li>'. implode('</li><li>', $field->html) .'</li>';
+		$field->html = count($field->html)?'<li>'. implode('</li><li>', $field->html) .'</li>':'';
 		$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 		
 		$user = JFactory::getUser();
