@@ -325,7 +325,7 @@ fieldset.flexiaccess legend {
 	padding-right: 22px !important;
 	line-height: 18px !important;
 	cursor: pointer !important;
-	color: #0B55C4 !important;
+	color: #3276B1 !important;
 }
 option[disabled], option[readonly] { color: #bbb; }
 /* Categories in the items view */
@@ -892,9 +892,13 @@ dl.tabs dt.open h3 a {
 table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 
 #flexicontent span.flexi_label label {
-	float:right; margin:0px; padding:0px;
-	color:auto; font-size: 12px;
-	font-style: normal; font-family: georgia, tahoma;
+	float:right; 
+	margin:0px; 
+	padding:0px;
+	color:auto; 
+	font-size: 12px;
+	font-style: normal;
+/* 	font-family: georgia, tahoma; */
 }
 #flexicontent span.flexi_label label label { float:right; margin:auto; padding:auto; }
 
@@ -908,20 +912,17 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	float: left !important;
 	clear: left !important;
 	color: black;
-  background-color: #eee;
+	background-color: #eee;
   border-bottom: 1px solid #D0D0D0;
   border-right: 1px solid #D0D0D0;
   font-size: 12px;
-  /*font-family: georgia, tahoma;*/
-  font-weight: bold;
   text-align: right !important;
   width: 16%;
   max-width:150px;
   min-width:auto !important;
   margin: 2px 1% 3px 0% !important;
   padding: 4px 1% 4px 1% !important;
-  border-radius:6px;
-  /*text-shadow: 1px 3px 2px rgba(0,0,0,0.3);*/
+  border-radius:3px;
 }
 
 #flexicontent .flexi_params .fcdualline_container { margin: 0px; padding: 0px; float: left; min-width: 430px; }
@@ -1000,10 +1001,11 @@ fieldset.flexiaccess, fieldset.adminform,
 	min-width: inherit !important; /* workaround for chrome fieldset width bug */
 	display: block;
 }
-#flexicontent fieldset legend { padding:0px 6px; width:auto; border:0px; margin:0px; font-size:14px; font-family:georgia; font-weight:bold; }
-#flexicontent fieldset.basicfields_set legend { color: #483D8B; }
+#flexicontent fieldset legend { padding:0px 6px; width:auto; border:0px; margin:0px; font-size:14px; /* font-family:georgia */; font-weight:bold; }
+#flexicontent fieldset.basicfields_set legend { color: #3276B1; }
 
 fieldset.flexiaccess, fieldset.adminform { margin-bottom: 1em !important; }
+fieldset.flexiaccess { margin-top: 8px; }
 fieldset.flexiaccess legend, fieldset.adminform legend { font-weight:bold; font-size: 14px; }
 
 #flexicontent form input,

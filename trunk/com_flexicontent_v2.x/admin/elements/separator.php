@@ -178,15 +178,15 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		
 		if ($level == 'tblbreak') {
 			$style = '';
+/*
 		} else if ($level == 'level1') {
 			$style = '';
 		} else if ($level == 'level2') {
-			$pos_left   = FLEXI_J16GE ? 'left:4%;' : 'left:2%;';
-			$width_vals = FLEXI_J16GE ? 'width:86%;' : 'width:91%;';
 			$style = ''.$pos_left.$width_vals;
 		} else if ($level == 'level3') {
-			$pos_left = FLEXI_J16GE ? 'left:144px;' : 'left:4%;';
+			$pos_left = FLEXI_J16GE ? 'left:4%;' : 'left:4%;';
 			$style = ''.$pos_left;
+*/
 		} else {
 			$style = '';
 		}

@@ -161,7 +161,7 @@ ul.tabbernav li.tabberactive a:hover
 	padding-top: 4px !important;
 	padding-bottom: 5px !important;
 	display: inline-block !important;
-	border-radius: 8px 8px 0px 0px !important;
+	border-radius: 3px 3px 0px 0px !important;
 	/*box-shadow: 0px -1px 1px lightgray;*/
 	border-left: 1px solid #D0D0D0;
 	border-top: 1px solid #B0B0B0;
@@ -176,10 +176,10 @@ ul.tabbernav li.tabberactive a:hover
 }
 
 #flexicontent ul.tabbernav li:hover a {
-	background: none repeat scroll 0 0 #aa0000;
-	border-left: 1px solid #aa5555;
-	border-top: 1px solid #995555;
-	border-right: 1px solid #775555;
+	background: none repeat scroll 0 0 #5bb75b;
+	border-left: 1px solid #cccccc;
+	border-top: 1px solid #cccccc;
+	border-right: 1px solid #cccccc;
 	color: white;
 }
 

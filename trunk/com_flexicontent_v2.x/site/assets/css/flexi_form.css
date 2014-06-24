@@ -401,6 +401,7 @@ body.contentpane  {
 	font-family:tahoma;
 	font-size:12px;
 }
+/*
 .fcsep_level0 {
 	padding:6px 2% 6px 1%;
 	margin:2px 0% 0 0%;
@@ -432,7 +433,7 @@ body.contentpane  {
 	font-weight:normal;
 	font-family:tahoma;
 	font-size:14px;
-	border-radius:8px;
+	border-radius:3px;
 }
 .fcsep_level2 {
 	padding:6px 2%;
@@ -447,7 +448,7 @@ body.contentpane  {
 	font-weight:bold;
 	font-family:tahoma;
 	font-size:12px;
-	border-radius:8px;
+	border-radius:3px;
 }
 .fcsep_level3 {
 	padding:4px 3%;
@@ -462,5 +463,6 @@ body.contentpane  {
 	background-color:#eee;
 	color:#000;
 	font-weight:bold;
-	border-radius:8px;
+	border-radius:3px;
 }
+*/
