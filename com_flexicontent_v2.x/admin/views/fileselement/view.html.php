@@ -254,9 +254,11 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// Build languages list
 		//$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		//$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+		$display_file_lang_as = $params->get('display_file_lang_as', 3);
+		
 		$allowed_langs = null;
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', '', '*', 3, $allowed_langs, $published_only=false);
+			$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', '', '*', $display_file_lang_as, $allowed_langs, $published_only=false);
 		} else {
 			$lists['file-lang'] = flexicontent_html::getSiteDefaultLang() . '<input type="hidden" name="file-lang" value="'.flexicontent_html::getSiteDefaultLang().'" />';
 		}
