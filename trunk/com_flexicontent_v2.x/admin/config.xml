@@ -210,7 +210,14 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			
+			<field name="display_file_lang_as" type="list" default="0" label="FLEXI_DISPLAY_FILE_LANG_AS" description="FLEXI_DISPLAY_FILE_LANG_AS_DESC">
+				<option value="1">FLEXI_DISPLAY_LANG_AS_DROP_DOWN_WITHOUT</option>
+				<option value="2">FLEXI_DISPLAY_LANG_AS_DROP_DOWN</option>
+				<option value="3">FLEXI_DISPLAY_LANG_AS_RADIO_WITHOUT</option>
+				<option value="4">FLEXI_DISPLAY_LANG_AS_RADIO</option>
+				<option value="5">FLEXI_DISPLAY_LANG_AS_RADIO_EXCLUDE</option>
+				<option value="6">FLEXI_DISPLAY_LANG_AS_CHECKBOXES</option>
+			</field>
 		<field name="" type="separator" default="FLEXI_HITS_UNIQUE_CONF" label="" level="level1" menu="hide" />
 			
 			<field name="hits_count_unique" type="radio" default="0" label="FLEXI_HITS_COUNT_UNIQUE" description="FLEXI_HITS_COUNT_UNIQUE_DESC" menu="hide">
