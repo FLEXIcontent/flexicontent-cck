@@ -44,8 +44,10 @@ class FlexicontentControllerImport extends FlexicontentController
 	
 	function getlineno() {
 		$session = JFactory::getSession();
+		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
+		
 		$conf   = $session->get('csvimport_config', "", 'flexicontent');
-		$conf		= unserialize( $conf ? zlib_decode(base64_decode($conf)) : "" );
+		$conf		= unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
 		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 		if ( !empty($conf) )
 			echo 'success|'.count($conf['contents_parsed']).'|'.$lineno.'|'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken());

@@ -163,6 +163,7 @@ class JElementSeparator extends JElement
 		
 		if ($level == 'tblbreak') {
 			$style = '';
+/*
 		} else if ($level == 'level1') {
 			$style = '';
 		} else if ($level == 'level2') {
@@ -172,6 +173,7 @@ class JElementSeparator extends JElement
 		} else if ($level == 'level3') {
 			$pos_left = FLEXI_J16GE ? 'left:144px;' : 'left:4%;';
 			$style = ''.$pos_left;
+*/
 		} else {
 			$style = '';
 		}
@@ -227,6 +229,11 @@ class JElementSeparator extends JElement
 			<tr><td>
 			';
 		}
-		return '<span style="'.$style.'" class="'.$class.'" title="'.$title.'" >'.JText::_($value).'</span>';
+		$pad = '';
+		if ($level=='level0') $pad .= ' ';
+		else if ($level=='level1') $pad .= ' &nbsp; ';
+		else if ($level=='level2') $pad .= ' &nbsp; &nbsp; ';
+		else if ($level=='level3') $pad .= '';
+		return '<div class="fcclear clear"> </div> <div style="'.$style.'" class="'.$class.'" title="'.$title.'" >'.$pad.JText::_($value).'</div>';
 	}
 }

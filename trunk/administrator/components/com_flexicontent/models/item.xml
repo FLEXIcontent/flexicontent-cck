@@ -17,39 +17,39 @@
 	<params group="basic">
 		
 		<field name="" type="separator" default="FLEXI_PARAMETERS_ICONS" description="..." level="level2" />
-		<field name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC">
+		<field name="show_pdf_icon" type="radio" default="" label="FLEXI_PDF_ICON" description="FLEXI_PDF_ICON_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_print_icon" type="radio" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC">
+		<field name="show_print_icon" type="radio" default="" label="FLEXI_PRINT_ICON" description="FLEXI_PRINT_ICON_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_email_icon" type="radio" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC">
+		<field name="show_email_icon" type="radio" default="" label="FLEXI_EMAIL_ICON" description="FLEXI_EMAIL_ICON_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_editbutton" type="radio" default="" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC">
+		<field name="show_editbutton" type="radio" default="" label="FLEXI_SHOW_EDIT_BUTTON" description="FLEXI_SHOW_EDIT_BUTTON_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_state_icon" type="radio" default="" label="FLEXI_STATE_ICON" description="FLEXI_STATE_ICON_DESC">
+		<field name="show_state_icon" type="radio" default="" label="FLEXI_STATE_ICON" description="FLEXI_STATE_ICON_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
 		
 		<field name="" type="separator" default="FLEXI_PARAMETERS_CONTENT" description="..." level="level2" />
-		<field name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC">
+		<field name="show_title" type="radio" default="" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="show_intro" type="radio" default="" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT_DESC">
+		<field name="show_intro" type="radio" default="" label="FLEXI_SHOW_INTROTXT" description="FLEXI_SHOW_INTROTXT_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
@@ -60,13 +60,13 @@
 	<params group="advanced">
 		
 		<field name="" type="separator" default="FLEXI_ADVANCED" description="..." level="level2" />
-		<field name="comments" type="radio" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC">
+		<field name="comments" type="radio" default="" label="FLEXI_ENABLE_COMMENTS" description="FLEXI_ENABLE_COMMENTS_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_JCOMMENTS</option>
 			<option value="2">FLEXI_JOMCOMMENTS</option>
 		</field>
-		<field name="automatic_pathways" type="radio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide">
+		<field name="automatic_pathways" type="radio" default="" label="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY" description="FLEXI_CREATE_PATHWAYS_AUTOMATICALLY_DESC" menu="hide" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
@@ -84,12 +84,12 @@
 			<option value="1">FLEXI_YES</option>
 		</field>
 		<field name="custom_ititle" type="text" default="" size="30" label="FLEXI_CUSTOM_TITLE" description="FLEXI_CUSTOM_TITLE_DESC" class="fcfield_textval" />
-		<field name="addcat_title" type="radio" default="" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC" >
+		<field name="addcat_title" type="radio" default="" label="FLEXI_ADDCAT_PAGETTITLE" description="FLEXI_ADDCAT_PAGETTITLE_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>
 		</field>
-		<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC">
+		<field name="add_canonical" type="radio" default="" label="FLEXI_ADD_CANONICAL" description="FLEXI_ADD_CANONICAL_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
 			<option value="0">FLEXI_NO</option>
 			<option value="1">FLEXI_YES</option>

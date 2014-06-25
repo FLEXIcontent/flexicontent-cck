@@ -80,6 +80,7 @@ class FlexicontentControllerImport extends FlexicontentController
 		$db    = JFactory::getDBO();
 		$user  = JFactory::getUser();
 		$session = JFactory::getSession();
+		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 		
 		$parse_log = "\n\n\n".'<b>please click</b> <a href="JavaScript:window.history.back();">here</a> to return previous page'."\n\n\n";
 		$log_filename = 'importcsv_'.($user->id).'.php';
@@ -97,7 +98,8 @@ class FlexicontentControllerImport extends FlexicontentController
 		if ($task == 'clearcsv')
 		{
 			// Clear any import data from session
-			$conf		= base64_encode(zlib_encode(serialize(null), -15));
+			$conf = $has_zlib ? base64_encode(zlib_encode(serialize(null), -15)) : base64_encode(serialize(null));
+			
 			$session->set('csvimport_config', $conf, 'flexicontent');
 			$session->set('csvimport_lineno', 0, 'flexicontent');
 			
@@ -111,7 +113,8 @@ class FlexicontentControllerImport extends FlexicontentController
 		else if ($task == 'importcsv')
 		{
 			$conf   = $session->get('csvimport_config', "", 'flexicontent');
-			$conf		= unserialize( $conf ? zlib_decode(base64_decode($conf)) : "" );
+			$conf		= unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
+			
 			$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 			if ( empty($conf) ) {
 				$app->enqueueMessage( 'Can not continue import, import task not initialized or already finished:' , 'warning' );
@@ -465,7 +468,10 @@ class FlexicontentControllerImport extends FlexicontentController
 			if ($task == 'initcsv')
 			{
 				// Set import configuration and file data into session
-				$session->set('csvimport_config', base64_encode(zlib_encode(serialize($conf), -15)), 'flexicontent');
+				$session->set('csvimport_config',
+					( $has_zlib ? base64_encode(zlib_encode(serialize($conf), -15)) : base64_encode(serialize($conf)) ),
+					'flexicontent');
+				
 				$session->set('csvimport_lineno', 0, 'flexicontent');
 				
 				// Set a total results message and redirect
