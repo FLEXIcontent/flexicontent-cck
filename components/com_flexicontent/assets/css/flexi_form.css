@@ -401,66 +401,61 @@ body.contentpane  {
 	font-family:tahoma;
 	font-size:12px;
 }
+
 .fcsep_level0 {
-	padding:6px 2% 6px 1%;
-	margin:2px 0% 0 0%;
-	clear:both; display:block;
+	background-color: #0066AA;
+	color: white;
+	padding: 0.8em 1%;
+	margin: 48px 0% 2px 0%;
+	display: block;
+	position: relative;
+	border-radius: 5px;
+	font-weight: bold;
+	clear: both;
 	float:left;
-	position:relative;
-	left:0%;
-	width:97%;
-	border:3px double;
-	background-color:darkcyan;
-	color:#fff;
-	font-weight:normal;
-	font-family:tahoma;
-	font-size:14px;
-	border-radius:0px;
+	width:98%;
+	font-size:12px;
 }
 .fcsep_level1 {
-	padding:6px 2% 6px 2%;
-	margin:3px 0 0px 3px;
-	clear:both;
-	display:block;
+	background-color: #2096C9;
+	color: white;
+	padding: 0.8em 1%;
+	margin: 8px 0% 2px 0%;
+	display: block;
+	position: relative;
+	border-radius: 5px;
+	clear: both;
 	float:left;
-	position:relative;
-	left:0%;
-	width:95%;
-	border:none;
-	background-color:#333;
-	color:#fff;
-	font-weight:normal;
-	font-family:tahoma;
-	font-size:14px;
-	border-radius:8px;
+	width:98%;
+	font-size:12px;
 }
 .fcsep_level2 {
-	padding:6px 2%;
-	margin:2px 0% 0 0%;
-	clear:both;
-	display:block;
+	background-color: #BFE1F2;
+	color: #3A87AD;
+	padding: 0.8em 1%;
+	margin: 3px 0% 2px 0%;
+	display: block;
+	position: relative;
+	border-radius: 5px;
+	clear: both;
 	float:left;
-	position:relative;
-	border: 1px outset #E9E9E9;
-	background-color:#aaa;
-	color:#000;
-	font-weight:bold;
-	font-family:tahoma;
+	width:98%;
 	font-size:12px;
-	border-radius:8px;
 }
+
+/* prevent margin when parameter list starts */
+li:first-child > .fcsep_level0, li:first-child > .fcsep_level1, li:first-child > .fcsep_level2 {margin-top:0px;}
+
 .fcsep_level3 {
-	padding:4px 3%;
-	margin:2px 0% 0 0%;
-	clear:both;
-	display:block;
-	float:left;
-	position:relative;
-	min-width:266px;
+	background: #FCF8E3 url(../images/note.gif) no-repeat 10px 50%;
+	color: #C09853 !important;
+	border-color: #FBEED5 !important;
+	padding: 8px 10px 12px 36px !important;
+	margin: 5px 0;
+/* 	margin: 5px 0 5px 240px; */
+	display: block;
+	position: relative;
+	border-radius: 5px;
+	clear: both;
 	max-width:60%;
-	border:1px dashed #bbb;
-	background-color:#eee;
-	color:#000;
-	font-weight:bold;
-	border-radius:8px;
 }

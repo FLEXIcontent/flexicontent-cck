@@ -865,7 +865,7 @@ dl.tabs dt {
 	border-radius: 8px 8px 0px 0px;
 	border-bottom: 0px solid gray !important;
 	margin: 4px 6px 0px 0px !important;
-	background-color: #3276B1 !important;
+	background-color: #777 !important;
 	padding: 8px 12px !important;
 }
 dd.tabs dl.tabs dt.open,

@@ -117,7 +117,7 @@ input, select {
 .form-horizontal .chzn-container .chzn-drop {
 	width: 100% !important;
 	max-width: 500px !important;
-	border: 1px solid lightgray !important;
+/* 	border: 1px solid lightgray !important; */
 }
 .form-horizontal .controls {
 	margin:0px !important;
@@ -129,11 +129,13 @@ input, select {
 .form-horizontal .nav-tabs {
 }
 .form-horizontal .nav-tabs {
-	padding-bottom: 2px;
+/* 	padding-bottom: 2px; */
 }
+/*
 .form-horizontal .nav-tabs > li {
 	margin-bottom: 6px;
 }
+
 .form-horizontal .nav-tabs > li > a {
 	border:1px solid darkgray;
 	background-color: #eee;
@@ -144,10 +146,12 @@ input, select {
 	background-color: white;
 	color: black;
 }
+*/
 .form-horizontal .chzn-container-single .chzn-single {
 	width:auto;
 	float:left;
 }
+/*
 .form-horizontal .chzn-container-single .chzn-search {
 	border: 1px solid lightgray;
 }
@@ -157,6 +161,7 @@ input, select {
 .form-horizontal .tabs-left > .nav-tabs .active > a:focus {
     border-color: #A9A9A9 rgba(0, 0, 0, 0) #A9A9A9 #A9A9A9;
 }
+*/
 
 /********************
  * Permissions slider

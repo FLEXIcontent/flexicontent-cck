@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1883 2014-04-09 17:49:21Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1902 2014-05-10 16:06:11Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -51,6 +51,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$user 		= JFactory::getUser();
 		$document	= JFactory::getDocument();
 		$context	= 'com_flexicontent';
+		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 		
 		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		JHTML::_('behavior.tooltip');
@@ -68,7 +69,8 @@ class FlexicontentViewImport extends JViewLegacy
 		// Get session information
 		$session = JFactory::getSession();
 		$conf   = $session->get('csvimport_config', "", 'flexicontent');
-		$conf		= unserialize( $conf ? zlib_decode(base64_decode($conf)) : "" );
+		$conf		= unserialize( $conf ? ($has_zlib ? zlib_decode(base64_decode($conf)) : base64_decode($conf)) : "" );
+		
 		$lineno = $session->get('csvimport_lineno', 999999, 'flexicontent');
 		$session->set('csvimport_parse_log', null, 'flexicontent');
 		
