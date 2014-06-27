@@ -129,7 +129,7 @@ function FLEXIcontentBuildRoute(&$query)
 			unset($query['view']);
 		}
 		// IMPLY view = 'category' when count($segments) == 1
-		if ( (int)$query['cid']!=$mcid || $mview!='category' ) $segments[] = @$query['cid'];  // Required ...
+		if ( (int)@$query['cid']!=$mcid || $mview!='category' ) $segments[] = @$query['cid'];  // Required ...
 		unset($query['cid']);
 		break;
 	
