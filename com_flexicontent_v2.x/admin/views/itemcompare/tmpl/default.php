@@ -51,7 +51,7 @@ table#itemcompare s{
 							if ( $field->iscore == 0 || ($field->field_type == 'maintext' && (!$this->tparams->get('hide_maintext'))) ) {
 							// set the specific label for the maintext field
 								if ($field->field_type == 'maintext') {
-									$field->label 			= $this->tparams->get('maintext_label', $field->label);
+									$field->label 			= JText::_($this->tparams->get('maintext_label', $field->label));
 									$field->description 	= $this->tparams->get('maintext_desc', $field->description);
 									$field->display			= $field->value ? flexicontent_html::nl2space($field->value[0]) : JText::_( 'FLEXI_NO_VALUE' );									
 									$field->displayversion	= $field->version ? flexicontent_html::nl2space($field->version[0]) : JText::_( 'FLEXI_NO_VALUE' );
@@ -62,7 +62,7 @@ table#itemcompare s{
 						<tr>
 							<td class="key">
 								<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
-									<?php echo $field->label; ?>
+									<?php echo JText::_($field->label); ?>
 								</label>
 							</td>
 							<td valign="top">
