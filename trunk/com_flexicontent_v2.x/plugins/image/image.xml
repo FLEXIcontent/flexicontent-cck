@@ -108,11 +108,11 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_IMGFIELD_INFORMATION" level="level3" />
-			<field name="showtitle" type="list" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC">
+			<field name="showtitle" type="radio" default="0" label="FLEXI_FIELD_SHOW_TITLE" description="FLEXI_FIELD_SHOW_TITLE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="showdesc" type="list" default="0" label="FLEXI_FIELD_SHOW_LONGDESC" description="FLEXI_FIELD_SHOW_LONGDESC_DESC">
+			<field name="showdesc" type="radio" default="0" label="FLEXI_FIELD_SHOW_LONGDESC" description="FLEXI_FIELD_SHOW_LONGDESC_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -251,11 +251,11 @@
 				<option value="0">FLEXI_FIELD_THIS_FIELD</option>
 				<option value="1">FLEXI_FIELD_ANY_FIELD_OR_FM</option>
 			</field>
-			<field name="limit_by_uploader" type="list" default="0" label="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED" description="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED_DESC">
+			<field name="limit_by_uploader" type="radio" default="0" label="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED" description="FLEXI_FIELD_LIMIT_TO_USER_UPLOADED_DESC" class="btn-group btn-group-yesno">
 				<option value="1">FLEXI_FIELD_CURRENT_USER</option>
 				<option value="0">FLEXI_FIELD_ANY_USER</option>
 			</field>
-			<field name="unique_thumb_method" type="list" default="0" label="FLEXI_FIELD_UNIQUE_THUMB_METHOD" description="FLEXI_FIELD_UNIQUE_THUMB_METHOD_DESC">
+			<field name="unique_thumb_method" type="radio" default="0" label="FLEXI_FIELD_UNIQUE_THUMB_METHOD" description="FLEXI_FIELD_UNIQUE_THUMB_METHOD_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_FIELD_UNIQUE_THUMB_FIELD_ID</option>
 				<option value="1">FLEXI_FIELD_UNIQUE_THUMB_FOLDER</option>
 			</field>

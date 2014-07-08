@@ -93,7 +93,7 @@
 				<option value="3">FLEXI_NEVER_UNLESS_IN_POSITION</option>
 			</param>
 			
-			<param name="" type="separator" default="FLEXI_CACHE_CONF" label="" level="level1" menu="hide" />
+			<param name="" type="separator" default="FLEXI_CACHE_CONF" label="" level="level3" menu="hide" />
 			
 			<param name="advcache" type="radio" default="1" label="FLEXI_ADV_CACHE" description="FLEXI_ADV_CACHE_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -662,6 +662,12 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</param>
+			<param name="limit_override_label" type="radio" default="0" label="FLEXI_NUM_PER_PAGE_LABEL" description="FLEXI_NUM_PER_PAGE_LABEL_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_OUTSIDE</option>
+				<option value="2">FLEXI_INSIDE</option>
+			</param>
+			
 			<param name="orderby_override" type="radio" default="1" label="FLEXI_ORDER_1ST" description="FLEXI_ORDER_1ST_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -968,12 +974,13 @@
 				checkoptions="FLEXI_APPLY,FLEXI_SAVE_A_PREVIEW,FLEXI_PREVIEW_LATEST"
 				checkvals="apply,save_preview,preview_latest" defaultvals="apply,save_preview,preview_latest"
 				label="FLEXI_MENU_ALLOW_BUTTONS" description="FLEXI_MENU_ALLOW_BUTTONS_DESC"  menu="hide"/>
-			<param name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level2" menu="hide" />
+			
+			<param name="" label="" type="separator" default="FLEXI_INSTRUCTIONS_REDIRECTIONS_ETC" level="level3" menu="hide" />
 			<param name="submit_message" type="textarea" default="" rows="3" cols="30" label="FLEXI_MENU_SUBMIT_INSTRUCTIONS" description="FLEXI_MENU_SUBMIT_INSTRUCTIONS_DESC" />
 			<param name="submit_redirect_url_fe" type="text" default="" size="106" label="FLEXI_FORM_SUBMIT_REDIRECT_URL" description="FLEXI_FORM_SUBMIT_REDIRECT_URL_DESC" menu="hide" />
 			<param name="notauthurl" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_CANNOTAUTHOR_URL" description="FLEXI_CANNOTAUTHOR_URL_DESC" menu="hide" />
 			
-			<param name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level2" menu="hide" />
+			<param name="" type="separator" default="FLEXI_SHOW_CAPTCHA_CRITERIA" label="" level="level3" menu="hide" />
 			<param name="use_captcha" type="radio" default="1" label="FLEXI_USER_TYPE" description="FLEXI_USER_TYPE_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NEVER</option>
 				<option value="1">FLEXI_GUESTS_RECOMMENEDED</option>

@@ -40,6 +40,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 		// Check for request forgeries
 		JRequest::checkToken('request') or jexit( 'Invalid Token' );
 		
+		flexicontent_html::loadJQuery();
+		flexicontent_html::loadFramework('select2');
 		JHTML::_('behavior.tooltip');
 		// Load the form validation behavior
 		JHTML::_('behavior.formvalidation');
@@ -269,7 +271,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		 *************/
 		
 		// language filter
-		$lists['language'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();" size="1" ', $filter_lang, 2);
+		$lists['language'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="submitform();" size="1" ', $filter_lang, 2);
 		
 		// search
 		$lists['search'] 	= $search;
@@ -278,7 +280,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$filters = array();
 		$filters[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_FILENAME' ) );
 		$filters[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_FILE_TITLE' ) );
-		$lists['filter'] = JHTML::_('select.genericlist', $filters, 'filter', 'size="1" class="inputbox"', 'value', 'text', $filter );
+		$lists['filter'] = JHTML::_('select.genericlist', $filters, 'filter', 'size="1" class="use_select2_lib"', 'value', 'text', $filter );
 
 		//build url/file filterlist
 		$url 	= array();
@@ -286,7 +288,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$url[] 	= JHTML::_('select.option',  'F', JText::_( 'FLEXI_FILE' ) );
 		$url[] 	= JHTML::_('select.option',  'U', JText::_( 'FLEXI_URL' ) );
 
-		$lists['url'] = JHTML::_('select.genericlist', $url, 'filter_url', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_url );
+		$lists['url'] = JHTML::_('select.genericlist', $url, 'filter_url', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_url );
 
 		//item lists
 		/*$items_list = array();
@@ -294,7 +296,7 @@ class FlexicontentViewFileselement extends JViewLegacy
 		foreach($items as $item) {
 			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) . ' (#' . $item->id . ')' );
 		}
-		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );*/
+		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" class="use_select2_lib" onchange="submitform( );"', 'value', 'text', $filter_item );*/
 		$lists['item_id'] = '<input type="text" name="item_id" size="1" class="inputbox" onchange="submitform( );" value="'.$filter_item.'" />';
 		
 		//build secure/media filterlist
@@ -303,13 +305,13 @@ class FlexicontentViewFileselement extends JViewLegacy
 		$secure[] 	= JHTML::_('select.option',  'S', JText::_( 'FLEXI_SECURE_DIR' ) );
 		$secure[] 	= JHTML::_('select.option',  'M', JText::_( 'FLEXI_MEDIA_DIR' ) );
 
-		$lists['secure'] = JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_secure );
+		$lists['secure'] = JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_secure );
 
 		//build ext filterlist
-		$lists['ext'] = flexicontent_html::buildfilesextlist('filter_ext', 'class="inputbox" size="1" onchange="submitform( );"', $filter_ext);
+		$lists['ext'] = flexicontent_html::buildfilesextlist('filter_ext', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_ext);
 
 		//build uploader filterlist
-		$lists['uploader'] = flexicontent_html::builduploaderlist('filter_uploader', 'class="inputbox" size="1" onchange="submitform( );"', $filter_uploader);
+		$lists['uploader'] = flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_uploader);
 
 		// table ordering
 		$lists['order_Dir']	= $filter_order_Dir;

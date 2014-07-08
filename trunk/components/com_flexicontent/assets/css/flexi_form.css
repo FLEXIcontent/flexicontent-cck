@@ -420,7 +420,7 @@ body.contentpane  {
 	background-color: #2096C9;
 	color: white;
 	padding: 0.8em 1%;
-	margin: 8px 0% 2px 0%;
+	margin: 16px 0% 2px 0%;
 	display: block;
 	position: relative;
 	border-radius: 5px;
@@ -432,7 +432,7 @@ body.contentpane  {
 .fcsep_level2 {
 	background-color: #BFE1F2;
 	color: #3A87AD;
-	padding: 0.8em 1%;
+	padding: 0.4em 1%;
 	margin: 3px 0% 2px 0%;
 	display: block;
 	position: relative;
@@ -445,16 +445,19 @@ body.contentpane  {
 
 /* prevent margin when parameter list starts */
 li:first-child > .fcsep_level0, li:first-child > .fcsep_level1, li:first-child > .fcsep_level2 {margin-top:0px;}
+div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-of-type > div > .fcsep_level1, div.control-group:first-of-type > div > .fcsep_level2 {margin-top:0px;}
 
 .fcsep_level3 {
-	background: #FCF8E3 url(../images/note.gif) no-repeat 10px 50%;
-	color: #C09853 !important;
-	border-color: #FBEED5 !important;
-	padding: 8px 10px 12px 36px !important;
-	margin: 5px 0;
+	/*background: #FCF8E3 url(../images/note.gif) no-repeat 10px 50%;*/
+	background: #FCF8E3 no-repeat 10px 50%;
+	/*color: #C09853 !important;*/
+	color: #C09853;
+	float:left;
+	border: 1px solid #C09853 !important;
+	padding: 8px 24px 8px 24px !important;
+	margin: 5px 5%;
 /* 	margin: 5px 0 5px 240px; */
 	display: block;
-	position: relative;
 	border-radius: 5px;
 	clear: both;
 	max-width:60%;

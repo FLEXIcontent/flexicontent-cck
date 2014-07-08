@@ -165,7 +165,7 @@ class flexicontent_html
 
 		$app	= JFactory::getApplication();
 		//$orderby = $app->getUserStateFromRequest( $option.'.category'.$category->id.'.filter_order_Dir', 'filter_order', 'i.title', 'string' );
-		$limit = $app->getUserStateFromRequest( 'limit', 'limit', ''/*$params->get('limit')*/, 'string' );
+		$limit = $app->getUserStateFromRequest( 'limit', 'limit', $params->get('limit'), 'string' );
 
 		flexicontent_html::loadFramework('select2');
 		$classes  = "fc_field_filter use_select2_lib";
@@ -176,12 +176,21 @@ class flexicontent_html
 		$limit_options = preg_split("/[\s]*,[\s]*/", $limit_options);
 
 		$limiting = array();
-		$limiting[] = JHTML::_('select.option', '', JText::_('Default'));
+		$limit_override_label = $params->get('limit_override_label', 2);
+		//$limiting[] = JHTML::_('select.option', '', JText::_('Default'));
+		$inside_label = $limit_override_label==2 ? ' '.JText::_('FLEXI_PER_PAGE') : '';
+		//$default_limit = $params->get('limit');
 		foreach($limit_options as $limit_option) {
-			$limiting[] = JHTML::_('select.option', $limit_option, $limit_option);
+			//$limit_isdefault = ($default_limit == $limit_option) ? ' ('.JText::_('FLEXI_DEFAULT').') ' : '';
+			$limiting[] = JHTML::_('select.option', $limit_option, $limit_option .$inside_label /*.$limit_isdefault*/);
 		}
-
-		return JHTML::_('select.genericlist', $limiting, 'limit', $attribs, 'value', 'text', $limit );
+		
+		// Outside label
+		$outside_label = '';
+		if ($limit_override_label==1) {
+			$outside_label = '<span class="flexi label limit_override_label">'.JText::_('FLEXI_PER_PAGE').'</span>';
+		}
+		return $outside_label.JHTML::_('select.genericlist', $limiting, 'limit', $attribs, 'value', 'text', $limit );
 	}
 
 	static function ordery_selector(&$params, $formname='adminForm', $autosubmit=1, $extra_order_types=array(), $sfx='')

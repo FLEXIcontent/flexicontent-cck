@@ -108,10 +108,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
 				
 				filelist.appendChild(li);
+				li.appendChild(txt);
 				li.appendChild(span);
 				span.appendChild(img);
 				li.appendChild(button);
-				li.appendChild(txt);
 				li.appendChild(hid);
 				
 				jQuery('#sortables_".$field->id."').sortable({
@@ -145,7 +145,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			else valcounter.value = '';
 			
 			var row = jQuery(el).closest('li');
-			jQuery(row).hide('slideUp', function() { $(this).remove(); } );
+			jQuery(row).hide('slideUp', function() { jQuery(this).remove(); } );
 		}
 		";
 		
@@ -178,11 +178,12 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			'  <input class="fcfield_textval inputbox inline_style_published" size="'.$size.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.'" readonly="readonly" dir="rtl"/>' :
 			'  <input class="fcfield_textval inputbox inline_style_unpublished" size="'.$size.'" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.' [UNPUBLISHED]" readonly="readonly" dir="rtl"/>'
 			)*/
-			$field->html[] = $move2 . $remove_button .
+			$field->html[] =
 				($file_data->published ?
 				'  <span class="fcfield_textval inputbox inline_style_published" type="text" id="a_name'.$i.'" readonly="readonly" >'.$file_data->filename.'</span>' :
 				'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" [UNPUBLISHED]" readonly="readonly" >'.$file_data->filename.'</span>'
 				)
+				. $move2 . $remove_button
 				.'  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file_id.'" />'
 			;
 			$i++;

@@ -344,7 +344,13 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 			<td align="left">
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' );?>::<?php echo $row->filename; ?>">
 					<a style="cursor:pointer" id="file<?php echo $row->id;?>" rel="<?php echo $filename; ?>" onclick="<?php echo $img_assign_link; ?>">
-					<?php echo htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'); ?>
+					<?php 
+							if (JString::strlen($row->filename) > 25) {
+								echo JString::substr( htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
+							} else {
+								echo htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8');
+							}
+						?>
 					</a>
 				</span>
 			</td>

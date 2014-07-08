@@ -23,6 +23,7 @@ $use_advsearch_options = JRequest::getInt('use_advsearch_options', $autodisplaya
 //$default_filtersop = $this->params->get('default_filtersop', 'all');
 
 $show_searchareas = $this->params->get( 'show_searchareas', 0 );
+$type_class = isset($this->contenttypes[0]) ? 'contenttype_'.$this->contenttypes[0] : '';
 
 $js ="";
 
@@ -116,7 +117,7 @@ $r = 0;
 			<tr class="fc_search_row_<?php echo (($r++)%2);?>">
 				<td class='fc_search_label_cell' width="1%">
 					<label for="search_searchword" class='<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>' title='<?php  echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_SEARCH_SEARCHWORDS'), ':'), JText::_('FLEXI_SEARCH_SEARCHWORDS_TIP'), 0):JText::_('FLEXI_SEARCH_SEARCHWORDS').'::'.JText::_('FLEXI_SEARCH_SEARCHWORDS_TIP'); ?>'>
-						<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS'); ?>:
+						<?php echo JText::_('FLEXI_SEARCH_SEARCHWORDS'); ?>
 					</label>
 				</td>
 				<td colspan="3" class="fc_search_option_cell" style="position:relative;">
@@ -207,7 +208,7 @@ $r = 0;
 		<legend><?php echo JText::_('FLEXI_SEARCH_ADVANCED_SEARCH_OPTIONS'); ?></legend-->
 		
 		<?php if ( count($this->filters) > 0 ) : ?>
-			<fieldset id='fc_fieldfilters_set' class='fc_search_set'>
+			<fieldset id='fc_fieldfilters_set' class='fc_search_set <?php echo $type_class; ?>'>
 				<legend>
 					<span class="<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" <?php echo $field_filters_title_tip;?> ><?php echo $infoimage; ?></span>
 					<?php echo JText::_('FLEXI_FIELD_FILTERS')." ".JText::_('FLEXI_TO_FILTER_TEXT_SEARCH_RESULTS'); ?>
@@ -239,11 +240,11 @@ $r = 0;
 						<td class='fc_search_label_cell' valign='top'>
 						<?php if ($descr) : ?>
 							<label for="<?php echo $filt->name; ?>" class="<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim($label, ':'), $descr, 0):$label.'::'.$descr; ?>">
-								<?php echo JText::_($label); ?>:
+								<?php echo JText::_($label); ?>
 							</label>
 						<?php else : ?>
 							<label for="<?php echo $filt->name; ?>" class="<?php echo FLEXI_J30GE?'hasTooltip':'hasTip'; ?>" title="<?php echo FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR'), ':'), JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $label ), 0):JText::_('FLEXI_SEARCH_MISSING_FIELD_DESCR').'::'.JText::sprintf('FLEXI_SEARCH_MISSING_FIELD_DESCR_TIP', $label ); ?>">
-								<?php echo $label; ?>:
+								<?php echo $label; ?>
 							</label>
 						<?php endif; ?>
 						</td>

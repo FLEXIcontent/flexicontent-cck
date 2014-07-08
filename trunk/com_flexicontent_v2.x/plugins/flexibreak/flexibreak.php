@@ -80,10 +80,10 @@ class plgContentFlexiBreak extends JPlugin
 		$limitstart = JRequest::getInt('limitstart', 0);
 		$type_id = isset($row->type_id) ? $row->type_id : 0;
 		$prev_link = $limitstart > 0 ?
-			JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid).'&showall=&limitstart='. ($limitstart-1)) :
+			JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid, 0, $row).'&showall=&limitstart='. ($limitstart-1)) :
 			'';
 		$next_link = $limitstart < $textscount - 1 ?
-			JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid).'&showall=&limitstart='. ($limitstart+1)) :
+			JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid, 0, $row).'&showall=&limitstart='. ($limitstart+1)) :
 			'';
 		
 		$this->assignRef('pages', $pages);
@@ -121,7 +121,12 @@ class plgContentFlexiBreak extends JPlugin
 		if (2 == $pagenav && $display_method != 0) $row->text .= $this->loadTemplate('pagination_js');
 		
 		// Table of Contents
-		$row->text .= $this->loadTemplate('default_js');
+		$toc_placement = $pagenav = $this->params->get('toc_placement', 1);
+		if ($toc_placement) {
+			$row->text .= $this->loadTemplate('default_js');
+		} else {
+			$row->toc = $this->loadTemplate('default_js');
+		}
 		
 		// Concatenated text of all pages encapsulated in containers (or e.g. having anchors)
 		$row->text .= $this->_text;
@@ -142,7 +147,7 @@ class plgContentFlexiBreak extends JPlugin
 			//$result->title	= $this->params->get('intro_text') != "" ? $this->params->get('intro_text') : $this->article->title ;
 			$result->title = ' - '. JText::_($this->params->get('custom_introtext', 'FLEXIBREAK_INTRO_TEXT')) .' - ';
 			$result->name = $result->id = 'start';
-			$result->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid).'&showall=&limitstart=');
+			$result->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid, 0, $row).'&showall=&limitstart=');
 			$this->pagescount++;
 		}
 		else
@@ -153,12 +158,13 @@ class plgContentFlexiBreak extends JPlugin
 				$attrs = JUtility::parseAttributes($this->pages[$index-1][0]);
 			$result->title	= isset($attrs['title']) ? $attrs['title'] : 'unknown';
 			$result->name	= isset($attrs['name']) ? $attrs['name'] : preg_replace('/[ \t]+/u', '', $result->title);
-			$result->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid).'&showall=&limitstart='. ($index));
+			$result->link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $row->catid, 0, $row).'&showall=&limitstart='. ($index));
 			
 			$result->id		= $result->name ? $result->name : 'start';
 		}
 		
 		$curr_index = $this->texts[0] == "" ? $index+1 : $index;
+		if ( !isset($this->_text) ) $this->_text = '';
 		switch ($display_method) {
 		case 0:
 			$this->_text .= '<a id="'.$result->id.'_toc_page"></a>'.$this->texts[$curr_index];  // add an anchor link for scrolling

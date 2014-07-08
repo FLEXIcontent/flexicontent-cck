@@ -157,7 +157,9 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$required 	= $required ? ' required' : '';
 		$select_items_prompt = $field->parameters->get( 'select_items_prompt', 'FLEXI_RIFLD_SELECT_ITEMS_PROMPT' ) ;
 		$selected_items_label = $field->parameters->get( 'selected_items_label', 'FLEXI_RIFLD_SELECTED_ITEMS_LABEL' ) ;
-		
+		$display_cat_filter_label = $field->parameters->get( 'display_cat_filter_label', 1 );
+		$display_title_filter_label = $field->parameters->get( 'display_title_filter_label', 1 );
+		$default_value_title_filter = $field->parameters->get( 'default_value_title_filter', '' );
 		
 		// ***********************************************
 		// Get & check Global category related permissions
@@ -360,7 +362,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$field->html .= "<div class='fcrelation_field_filters'>";
 		
 		$field->html .= " <span class='fcrelation_field_filter_by_cat'>";
-		$field->html .= "  <span class='label'>".JText::_('FLEXI_RIFLD_FILTER_BY_CAT')."</span>\n";
+		if($display_cat_filter_label)
+			$field->html .= "  <span class='label'>".JText::_('FLEXI_RIFLD_FILTER_BY_CAT')."</span>\n";
 		$field->html .= flexicontent_cats::buildcatselect(
 			$allowedtree, $ri_field_name.'_fccats', $catvals="",
 			$top=2, // (adds first option "please select") Important otherwise single entry in select cannot initiate onchange event
@@ -373,13 +376,14 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		
 		$field->html .= " <div class='fcclear'></div>";
 		$field->html .= " <span class='fcrelation_field_filter_by_title'>";
-		$field->html .= "  <span class='label'>".JText::_('FLEXI_RIFLD_FILTER_BY_TITLE')."</span>\n";
+		if ($display_title_filter_label)	
+			$field->html .= "  <span class='label'>".JText::_('FLEXI_RIFLD_FILTER_BY_TITLE')."</span>\n";
     
     if ($title_filter)
     {
 			$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/filterlist.js' );
 			$field->html.=	''
-				.'<input class="fcfield_textval" id="'.$ri_field_name.'_regexp" name="'.$ri_field_name.'_regexp" onKeyUp="'.$ri_field_name.'_titlefilter.set(this.value)" size="30" />'
+				.'<input class="fcfield_textval" id="'.$ri_field_name.'_regexp" name="'.$ri_field_name.'_regexp" onKeyUp="'.$ri_field_name.'_titlefilter.set(this.value)" size="30" onfocus="if (this.value==\''.$default_value_title_filter.'\') this.value=\'\';" onblur="if (this.value==\'\') this.value=\''.$default_value_title_filter.'\';" value="'.$default_value_title_filter.'" />'
 				//.'<input style="margin-left:0px!important; margin-top:6px;" class="fcfield-button" type="button" onclick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_RIFLD_FILTER').'" />'
 				.'<input style="margin-left:0px!important; margin-top:6px;" class="fcfield-button" type="button" onclick="'.$ri_field_name.'_titlefilter.reset();this.form.'.$ri_field_name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_RIFLD_RESET').'" />'
 				;
