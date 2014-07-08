@@ -766,8 +766,16 @@ ul.fc_field_filter.fc_checkradio_group label {
 #flexicontent .item_total .flexi.item_total_label {
 	display: inline-block !important;
 	float:left !important;
-	margin-right: 6px !important;
 	font-weight: bold !important;
+	margin-right: 6px !important;
+	margin-top: 0px !important;
+}
+#flexicontent .fc_limit_selector .flexi.limit_override_label {
+	display: inline-block !important;
+	float:left !important;
+	font-weight: bold !important;
+	margin-right: 4px !important;
+	margin-top: 8px !important;
 }
 
 #flexicontent .item_total .flexi.item_total_value {

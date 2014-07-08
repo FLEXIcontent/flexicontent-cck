@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1907 2014-05-27 12:35:36Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1910 2014-06-08 17:48:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -514,7 +514,16 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 				</span>
 			</td>
 			<td align="left">
-				<?php echo ' <a href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;cid[]='.$row->id.'">'.htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8').'</a>'; ?>
+				<?php
+					if (JString::strlen($row->filename) > 25) {
+						$filename = JString::substr( htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
+					} else {
+						$filename = htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8');
+					}
+				?>
+				<span class="editlinktip hasTip" title="<?php echo JText::_('FLEXI_FILENAME'); ?>::<?php echo htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'); ?>">
+				<?php echo ' <a href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;cid[]='.$row->id.'">'.$filename.'</a>'; ?>
+				</span>
 			</td>
 			<td>
 				<?php

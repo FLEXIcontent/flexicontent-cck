@@ -143,7 +143,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			{
 				if(rowCount".$field->id." <= 1) return;
 				var row = jQuery(el).closest('li');
-				jQuery(row).hide('slideUp', function() { this.remove(); } );
+				jQuery(row).hide('slideUp', function() { jQuery(this).remove(); } );
 				rowCount".$field->id."--;
 			}
 			";

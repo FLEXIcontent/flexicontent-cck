@@ -78,6 +78,18 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
+			<field name="display_cat_filter_label" type="radio" default="1" label="FLEXI_RIFLD_DISPLAY_CAT_FILTER_LABEL" description="FLEXI_RIFLD_DISPLAY_CAT_FILTER_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+
+			<field name="display_title_filter_label" type="radio" default="1" label="FLEXI_RIFLD_DISPLAY_TITLE_FILTER_LABEL" description="FLEXI_RIFLD_DISPLAY_TITLE_FILTER_LABEL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="default_value_title_filter" type="text" default="" label="FLEXI_RIFLD_DEFAULT_VALUE_TITLE_FILTER" description="FFLEXI_RIFLD_DEFAULT_VALUE_TITLE_FILTER_DESC" />
+			
 			<field name="" type="separator" default="FLEXI_RIFLD_ITEMS_SCOPES" description="FLEXI_RIFLD_ITEMS_SCOPES_DESC" hr="false" level="level2" menu="hide" />
 			<field name="" type="separator" default="FLEXI_RIFLD_CAT_SCOPE" hr="false" level="level3" menu="hide" />
 			<field name="method_cat" type="fcmethod" default="1" label="FLEXI_RIFLD_METHOD" description="FLEXI_RIFLD_METHOD_DESC" />

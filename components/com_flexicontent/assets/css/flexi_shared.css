@@ -873,6 +873,9 @@ dl.tabs dt.open {
 	border-bottom: 0px solid gray !important;
 	background-color: white !important;
 }
+dl.tabs dt:not(.open):hover, .flexicontent dl.tabs dt:not(.open):hover {
+	background: darkred !important;
+}
 
 dl.tabs dt span,
 dl.tabs dt h3 a {

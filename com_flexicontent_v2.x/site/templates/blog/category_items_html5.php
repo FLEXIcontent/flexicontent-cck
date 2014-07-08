@@ -495,7 +495,7 @@ if ($count > $leadnum) :
 			<?php echo $markup_tags; ?>
 			
 			<?php if ( $header_shown ) : ?>
-			<header class="group">
+			</header>
 			<?php endif; ?>
 
 

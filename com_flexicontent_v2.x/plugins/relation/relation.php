@@ -376,8 +376,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		
 		$field->html .= " <div class='fcclear'></div>";
 		$field->html .= " <span class='fcrelation_field_filter_by_title'>";
-	if($display_title_filter_label)	
-		$field->html .= "  <span class='label'>".JText::_('FLEXI_RIFLD_FILTER_BY_TITLE')."</span>\n";
+		if ($display_title_filter_label)	
+			$field->html .= "  <span class='label'>".JText::_('FLEXI_RIFLD_FILTER_BY_TITLE')."</span>\n";
     
     if ($title_filter)
     {
@@ -400,8 +400,8 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		$field->html .= "</div>\n";
 		
 		$field->html .= "<div class='fcrelation_field_controls'>";
-		$field->html .= '<a href="JavaScript:void(0);" id="btn-add_'.$ri_field_name.'" class="fcfield-button" >'.JText::_('FLEXI_RELATION_ADD').' &raquo;</a>'."\n";
-    $field->html .= '<a href="JavaScript:void(0);" id="btn-remove_'.$ri_field_name.'" class="fcfield-button" >&laquo; '.JText::_('FLEXI_RELATION_REMOVE').'</a>'."\n";
+		$field->html .= '<a href="JavaScript:void(0);" id="btn-add_'.$ri_field_name.'" class="fcfield-button" >'.JText::_('FLEXI_ADD').' &raquo;</a>'."\n";
+    $field->html .= '<a href="JavaScript:void(0);" id="btn-remove_'.$ri_field_name.'" class="fcfield-button" >&laquo; '.JText::_('FLEXI_REMOVE').'</a>'."\n";
 		$field->html .= "</div>\n";
     
 		$field->html .= "<div class='fcrelation_field_used_items'>";
