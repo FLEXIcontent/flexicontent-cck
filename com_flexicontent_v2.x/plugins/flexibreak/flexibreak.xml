@@ -30,10 +30,6 @@
 					<option value="0">No</option>
 					<option value="1">Yes</option>
 				</field>
-				<field name="toc_placement" type="radio" default="1" label="Table of Contents placement" description="You may select to prepend Table of Contents to item's description or placing via item->toc variable in the latter case, please customize item.php/item_htnl5.php of your template</field>">
-					<option value="0">Output via item->toc variable</option>
-					<option value="1">Prepend to description</option>
-				</field>
 				<field name="pagination" type="list" default="3" label="Show Page Navigation" description="Defines where navigation controls are displayed">
 					<option value="0">No</option>
 					<option value="1">Yes, below TOC</option>
@@ -52,6 +48,10 @@
 				</field>
 				
 				<field name="" type="separator" default="Table of contents configuration" level="level2" />
+				<field name="toc_placement" type="radio" default="1" label="Table of Contents placement" description="You may select to prepend Table of Contents to item's description or placing via item->toc variable in the latter case, please customize item.php/item_htnl5.php of your template">
+					<option value="0">Output via item->toc variable</option>
+					<option value="1">Prepend to description</option>
+				</field>
 				<field name="allpages_link" type="radio" default="1" label="Show all pages link" description="Display a link to allow user to display all content pages at once">
 					<option value="0">No</option>
 					<option value="1">Yes</option>
