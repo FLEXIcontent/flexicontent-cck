@@ -154,15 +154,16 @@ class FlexicontentViewCategory extends JViewLegacy
 	  			</a>
 	  			<p>".$description."</p>";
 	  		}
-				if ($extra_fields) {
-					foreach($extra_fields as $fieldname) {
-						if ( $row->fields[$fieldname]->display ) {
-			  			$description .= '<br/><b>'.$row->fields[$fieldname]->label .":</b> ". $row->fields[$fieldname]->display;
-						}
+  		}
+			
+			if ($extra_fields) {
+				foreach($extra_fields as $fieldname) {
+					if ( $row->fields[$fieldname]->display ) {
+		  			$description .= '<br/><b>'.$row->fields[$fieldname]->label .":</b> ". $row->fields[$fieldname]->display;
 					}
 				}
-  		}
-	  	
+			}
+			
 			//$author = $row->created_by_alias ? $row->created_by_alias : $row->author;
 			@$date    = ( $row->created ? date( 'r', strtotime($row->created) ) : '' );
 
