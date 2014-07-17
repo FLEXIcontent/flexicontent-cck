@@ -3705,7 +3705,13 @@ class ParentClassItem extends JModelLegacy
 				$query = "SELECT DISTINCT email FROM #__users";
 				$where_clauses = array();
 				if ( count($_user_ids) )   $where_clauses[] = " id IN (".implode(",",$_user_ids).") ";
-				if ( count($_user_names) ) $where_clauses[] = " username IN (".implode(",",$_user_names).") ";
+				if ( count($_user_names) ) {
+					$_user_names_quoted = array();
+					foreach ($_user_names as $_user_name) {
+						$_user_names_quoted[] = $db->Quote($_user_name);
+					}
+					$where_clauses[] = " username IN (".implode(",",$_user_names_quoted).") ";
+				}
 				$query .= " WHERE " . implode (' OR ', $where_clauses);
 				$db->setQuery( $query );
 				$user_emails_ulist = FLEXI_J16GE ? $db->loadColumn() : $db->loadResultArray();

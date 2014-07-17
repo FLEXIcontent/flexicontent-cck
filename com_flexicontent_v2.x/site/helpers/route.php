@@ -226,7 +226,7 @@ class FlexicontentHelperRoute
 		}
 		
 		// Do not do 1 SQL query per item, to get the type id and language  ...  1. for type_id, we ignore, 2. for language we will use current language
-		$language = !FLEXI_J16GE || !$item ? $current_language : $item->language;
+		$language = !FLEXI_J16GE || !$item || @!$item->language ? $current_language : $item->language;
 		$type_id = ($item && isset($item->type_id))? $item->type_id : 0;
 		
 		
