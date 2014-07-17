@@ -576,7 +576,9 @@ ob_start();  // categories ?>
 			<?php
 				if ($cats_canselect_sec) {
 					// display secondary categories if permitted
-					$mcats_tooltip = 'class="editlinktip '.FLEXI_J30GE?'hasTooltip':'hasTip'.'" style="display:inline-block;" title="'.FLEXI_J30GE?JHtml::tooltipText(trim(JText::_('FLEXI_NOTES'), ':'), htmlspecialchars(JText::_( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8'), 0):htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'
+					$mcats_tooltip = 'class="editlinktip '.(FLEXI_J30GE?'hasTooltip':'hasTip').'"'.
+						' style="display:inline-block;" title="'.
+						(FLEXI_J30GE ? JHtml::tooltipText(trim(JText::_('FLEXI_NOTES'), ':'), htmlspecialchars(JText::_( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8'), 0):htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8')).'::'
 						.htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8').'" ';
 					echo '<span '.$mcats_tooltip.'>'.$infoimage.'</span>';
 				}

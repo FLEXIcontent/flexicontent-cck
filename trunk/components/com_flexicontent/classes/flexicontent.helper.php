@@ -4160,7 +4160,7 @@ class FLEXIUtilities
 				.' ORDER BY version_id DESC'
 				;
 		$db->setQuery($query, ($max-1), 1);
-		$firstversion = $db->loadResult();
+		$firstversion = (int)$db->loadResult();  // return zero if no version is found
 		return $firstversion;
 	}
 
