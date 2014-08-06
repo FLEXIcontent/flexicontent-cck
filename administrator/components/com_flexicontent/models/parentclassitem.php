@@ -2294,6 +2294,7 @@ class ParentClassItem extends JModelLegacy
 		// to give chance to ALL fields to check their DATA and cancel item saving process before saving any new field values
 		// ******************************************************************************************************************
 		$searchindex = array();
+		//$qindex = array();
 		if ($fields)
 		{
 			foreach($fields as $field)
@@ -2346,6 +2347,8 @@ class ParentClassItem extends JModelLegacy
 				// Trigger plugin Event 'onBeforeSaveField'
 				$fieldname = $field->iscore ? 'core' : $field->field_type;
 				$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item ));
+				//$qindex[$field->name] = NULL;
+				//$result = FLEXIUtilities::call_FC_Field_Func($fieldname, 'onBeforeSaveField', array( &$field, &$postdata[$field->name], &$files[$field->name], &$item, &$qindex[$field->name] ));
 				if ($result===false) {
 					// Field requested to abort item saving
 					$this->setError( JText::sprintf('FLEXI_FIELD_VALUE_IS_INVALID', $field->label) );
@@ -2471,6 +2474,7 @@ class ParentClassItem extends JModelLegacy
 			{
 				// -- Add the new values to the database 
 				$postvalues = $this->formatToArray( $postdata[$field->name] );
+				//$qindex_values = $qindex[$field->name];
 				$i = 1;
 				
 				foreach ($postvalues as $postvalue)
@@ -2484,6 +2488,9 @@ class ParentClassItem extends JModelLegacy
 					
 					// Serialize the properties of the value, normally this is redudant, since the field must have had serialized the parameters of each value already
 					$obj->value = is_array($postvalue) ? serialize($postvalue) : $postvalue;
+					//$obj->qindex01 = isset($qindex_values['qindex01']) ? $qindex_values['qindex01'] : NULL;
+					//$obj->qindex02 = isset($qindex_values['qindex02']) ? $qindex_values['qindex02'] : NULL;
+					//$obj->qindex03 = isset($qindex_values['qindex03']) ? $qindex_values['qindex03'] : NULL;
 					
 					// -- a. Add versioning values, but do not version the 'hits' or 'state' or 'voting' fields
 					if ($record_versioned_data && $field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting') {
@@ -2491,7 +2498,10 @@ class ParentClassItem extends JModelLegacy
 						if ( isset($obj->value) && JString::strlen(trim($obj->value)) )
 						{
 							if (! $mval_query) $this->_db->insertObject('#__flexicontent_items_versions', $obj);
-							else $ver_query_vals[] = "(".$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->version."," .$this->_db->Quote($obj->value).")";
+							else $ver_query_vals[] = "("
+								.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$obj->version. "," .$this->_db->Quote($obj->value)
+								//. "," .$this->_db->Quote($obj->qindex01) . "," .$this->_db->Quote($obj->qindex02) . "," .$this->_db->Quote($obj->qindex03)
+							.")";
 						}
 					}
 					//echo $field->field_type." - ".$field->name." - ".JString::strlen(trim($obj->value))." ".$field->iscore."<br/>";
@@ -2504,7 +2514,10 @@ class ParentClassItem extends JModelLegacy
 						if ( isset($obj->value) && JString::strlen(trim($obj->value)) )
 						{
 							if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-							else $rel_query_vals[] = "(".$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$this->_db->Quote($obj->value).")";
+							else $rel_query_vals[] = "("
+								.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$this->_db->Quote($obj->value)
+								//. "," .$this->_db->Quote($obj->qindex01) . "," .$this->_db->Quote($obj->qindex02) . "," .$this->_db->Quote($obj->qindex03)
+							.")";
 							
 							// Save field value in all translating items, if current field is untranslatable
 							// NOTE: item itself is not include in associated translations, no need to check for it and skip it
@@ -2512,7 +2525,10 @@ class ParentClassItem extends JModelLegacy
 								foreach($assoc_item_ids as $t_item_id) {
 									$obj->item_id = $t_item_id;
 									if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
-									else $rel_query_vals[] = "(".$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$this->_db->Quote($obj->value).")";
+									else $rel_query_vals[] = "("
+										.$obj->field_id. "," .$obj->item_id. "," .$obj->valueorder. "," .$this->_db->Quote($obj->value)
+										//. "," .$this->_db->Quote($obj->qindex01) . "," .$this->_db->Quote($obj->qindex02) . "," .$this->_db->Quote($obj->qindex03)
+									.")";
 								}
 							}
 						}
@@ -2528,7 +2544,9 @@ class ParentClassItem extends JModelLegacy
 			
 			if ( count($ver_query_vals) ) {
 				$query = "INSERT INTO #__flexicontent_items_versions "
-					." (field_id,item_id,valueorder,version,value) VALUES "
+					." (field_id,item_id,valueorder,version,value"
+					//.",qindex01,qindex02,qindex03"
+					.") VALUES "
 					."\n".implode(",\n", $ver_query_vals);
 				$this->_db->setQuery($query);
 				$this->_db->query();
@@ -2542,7 +2560,9 @@ class ParentClassItem extends JModelLegacy
 			
 			if ( count($rel_query_vals) ) {
 				$query = "INSERT INTO #__flexicontent_fields_item_relations "
-					." (field_id,item_id,valueorder,value) VALUES "
+					." (field_id,item_id,valueorder,value"
+					//.",qindex01,qindex02,qindex03"
+					.") VALUES "
 					."\n".implode(",\n", $rel_query_vals);
 				$this->_db->setQuery($query);
 				$this->_db->query();

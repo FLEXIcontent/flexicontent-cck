@@ -340,6 +340,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		$display_hits = $field->parameters->get( 'display_hits', 0 ) ;
 		$add_hits_img = $display_hits == 1 || $display_hits == 3;
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
+		$rel_nofollow = $field->parameters->get( 'add_rel_nofollow', 0 ) ? ' rel="nofollow"'    : '';
 		
 		// This is field 's MAIN value property
 		$link_usage   = $field->parameters->get( 'default_link_usage', 0 ) ;
@@ -461,6 +462,7 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			$link_params .= $class ? ' class="'.$class.'"' : '';
 			$link_params .= $id    ? ' id="'   .$id.'"'    : '';
 			$link_params .= $target_param;
+			$link_params .= $rel_nofollow;
 			
 			if ( $field->parameters->get( 'use_direct_link', 0 ) )
 				// Direct access to the web-link, hits counting not possible
