@@ -442,6 +442,14 @@ class com_flexicontentInstallerScript
 		
 		// Get DB table information
 		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_fields_item_relations"';
+		$db->setQuery($query);
+		$fi_rels_tbl_exists = (boolean) count($db->loadObjectList());
+		
+		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_items_versions"';
+		$db->setQuery($query);
+		$fi_vers_tbl_exists = (boolean) count($db->loadObjectList());
+		
 		$query = 'SHOW TABLES LIKE "' . $app->getCfg('dbprefix') . 'flexicontent_files"';
 		$db->setQuery($query);
 		$files_tbl_exists = (boolean) count($db->loadObjectList());
@@ -532,6 +540,8 @@ class com_flexicontentInstallerScript
 					<td>
 					<?php
 					$tbls = array();
+					if ($fi_rels_tbl_exists) $tbls[] = "#__flexicontent_fields_item_relations";
+					if ($fi_vers_tbl_exists) $tbls[] = "#__flexicontent_items_versions";
 					if ($files_tbl_exists)   $tbls[] = "#__flexicontent_files";
 					if ($fields_tbl_exists)  $tbls[] = "#__flexicontent_fields";
 					if ($types_tbl_exists)   $tbls[] = "#__flexicontent_types";
@@ -555,6 +565,27 @@ class com_flexicontentInstallerScript
 						if (!array_key_exists('lang_parent_id', $tbl_fields['#__flexicontent_items_ext'])) $_querycols[] = " ADD `lang_parent_id` INT(11) UNSIGNED NOT NULL DEFAULT '0' AFTER `type_id`";
 						if (!empty($_querycols)) $queries[] = $_query . implode(",", $_querycols);
 					}
+					
+					/*if ($fi_rels_tbl_exists && !array_key_exists('qindex01', $tbl_fields['#__flexicontent_fields_item_relations'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `qindex01` MEDIUMTEXT NULL DEFAULT NULL AFTER `value`";
+					}
+					if ($fi_rels_tbl_exists && !array_key_exists('qindex02', $tbl_fields['#__flexicontent_fields_item_relations'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `qindex02` MEDIUMTEXT NULL DEFAULT NULL AFTER `qindex01`";
+					}
+					if ($fi_rels_tbl_exists && !array_key_exists('qindex03', $tbl_fields['#__flexicontent_fields_item_relations'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_fields_item_relations` ADD `qindex03` MEDIUMTEXT NULL DEFAULT NULL AFTER `qindex02`";
+					}
+					
+					if ($fi_vers_tbl_exists && !array_key_exists('qindex01', $tbl_fields['#__flexicontent_items_versions'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `qindex01` MEDIUMTEXT NULL DEFAULT NULL AFTER `value`";
+					}
+					if ($fi_vers_tbl_exists && !array_key_exists('qindex02', $tbl_fields['#__flexicontent_items_versions'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `qindex02` MEDIUMTEXT NULL DEFAULT NULL AFTER `qindex01`";
+					}
+					if ($fi_vers_tbl_exists && !array_key_exists('qindex03', $tbl_fields['#__flexicontent_items_versions'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `qindex03` MEDIUMTEXT NULL DEFAULT NULL AFTER `qindex02`";
+					}*/
+					
 					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__flexicontent_files'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL DEFAULT '' AFTER `altname`";
 					}

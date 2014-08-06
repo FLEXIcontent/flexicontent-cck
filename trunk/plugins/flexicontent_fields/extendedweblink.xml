@@ -62,8 +62,12 @@
 				<option value="_top">open in the full body of the window</option>
 			</field>
 	    <field name="use_direct_link" type="list" default="0" label="FLEXI_FIELD_USE_DIRECT_LINKS" description="FLEXI_FIELD_USE_DIRECT_LINKS_DESC">
-	       <option value="0">No, </option>
+	       <option value="0">FLEXI_NO</option>
 	       <option value="1">Yes, (disable hits counting)</option>
+	    </field>
+	    <field name="add_rel_nofollow" type="list" default="0" label="FLEXI_FIELD_ADD_REL_NOFOLLOW" description="FLEXI_FIELD_ADD_REL_NOFOLLOW_DESC">
+	       <option value="0">FLEXI_FIELD_NO_ALLOW_INDEXING</option>
+	       <option value="1">FLEXI_FIELD_YES_ALLOW_INDEXING</option>
 	    </field>
 			<field name="default_link" type="text" default="" label="FLEXI_EXTWL_DEFAULT_LINK" description="FLEXI_EXTWL_DEFAULT_LINK_DESC" />
 			<field name="default_link_usage" type="list" default="0" label="FLEXI_EXTWL_DEFAULT_LINK_USAGE" description="FLEXI_EXTWL_DEFAULT_LINK_USAGE_DESC">

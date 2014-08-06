@@ -329,7 +329,8 @@ class FlexicontentModelField extends JModelLegacy
 		// Build attibutes INI string
 		if (FLEXI_J16GE) {
 			// JSON encoding allows to use new lines etc
-			$attibutes = json_encode($attibutes);
+			// handled by 'flexicontent_types' (extends JTable for flexicontent_types)
+			//$field->attribs = json_encode($attibutes);
 		} else {
 			if (is_array($attibutes))
 			{

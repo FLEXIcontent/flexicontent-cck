@@ -295,18 +295,24 @@ class FlexicontentModelType extends JModelAdmin
 		$attibutes = !FLEXI_J16GE ? $data['params'] : $data['attribs'];
 		
 		// Build attibutes INI string
-		if (is_array($attibutes))
-		{
-			$txt = array ();
-			foreach ($attibutes as $k => $v) {
-				if (is_array($v)) {
-					$v = implode('|', $v);
+		if (FLEXI_J16GE) {
+			// JSON encoding allows to use new lines etc
+			// handled by 'flexicontent_types' (extends JTable for flexicontent_types)
+			//$type->attribs = json_encode($attibutes);
+		} else {
+			if (is_array($attibutes))
+			{
+				$txt = array ();
+				foreach ($attibutes as $k => $v) {
+					if (is_array($v)) {
+						$v = implode('|', $v);
+					}
+					$txt[] = "$k=$v";
 				}
-				$txt[] = "$k=$v";
+				$type->attribs = implode("\n", $txt);
 			}
-			$type->attribs = implode("\n", $txt);
 		}
-
+		
 		// Put the new types in last position, currently this column is missing
 		/*if (!$type->id) {
 			$type->ordering = $type->getNextOrder();
