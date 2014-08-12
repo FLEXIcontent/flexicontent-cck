@@ -315,10 +315,12 @@ window.addEvent('domready', function() {
 ";
 		$doc->addScriptDeclaration($js);
 }
-		
+		// Compute the current selected values
+		$selected = array($this->value);
+
 		// Create form element
 		return JHTML::_('select.groupedlist', $groups, $fieldname,
-			array('id' =>  $element_id, 'group.id' => 'id', 'list.attr' => $attribs, 'list.select' => $value)
+			array('id' =>  $element_id, 'group.id' => 'id', 'list.attr' => $attribs, 'list.select' => $selected)
 		);
 	}
 }
