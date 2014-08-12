@@ -68,7 +68,7 @@ class JFormFieldFclayout extends JFormFieldList
 		
 		
 		// Initialize variables.
-		$options = array();
+		//$options = array();
 		
 		// Initialize some field attributes.
 		$filter   = (string) @ $attributes['filter'];
@@ -84,13 +84,21 @@ class JFormFieldFclayout extends JFormFieldList
 		// For using directory in url
 		$directory = str_replace('\\', '/', $directory);
 		
+		// Prepare the grouped list
+		$groups = array();
+		$groups['_'] = array();
+		$groups['_']['id'] = $this->id . '__';
+		$groups['_']['text'] = JText::sprintf('JOPTION_FROM_MODULE');
+		$groups['_']['items'] = array();
+
 		// Prepend some default options based on field attributes.
-		if (!$hideNone)    $options[] = JHTML::_('select.option', '-1', JText::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
-		if (!$hideDefault) $options[] = JHTML::_('select.option', '', JText::alt('JOPTION_USE_DEFAULT', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
+		if (!$hideNone)   $groups['_']['items'][] = JHTML::_('select.option', '-1', JText::alt('JOPTION_DO_NOT_USE', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
+		if (!$hideDefault) $groups['_']['items'][] = JHTML::_('select.option', '', JText::alt('JOPTION_USE_DEFAULT', preg_replace('/[^a-zA-Z0-9_\-]/', '_', $this->fieldname)));
 		
 		// Get a list of files in the search path with the given filter.
 		$files = JFolder::files($path, $filter);
 		
+		$module_layouts = array();
 		// Build the options list from the list of files.
 		if ( is_array($files) )  foreach ($files as $file)
 		{
@@ -100,12 +108,126 @@ class JFormFieldFclayout extends JFormFieldList
 			// If the extension is to be stripped, do it.
 			if ($stripExt)  $file = JFile::stripExt($file);
 			
-			$options[] = JHTML::_('select.option', $file, $file);
-			$layouts[] = $file;
+			$groups['_']['items'][] = JHTML::_('select.option', $file, $file);
+			$module_layouts[] = $file;
+		}
+		// Merge any additional options in the XML definition.
+		//if (FLEXI_J16GE) $options = array_merge(parent::getOptions(), $options);
+		// Merge any additional options in the XML definition.
+		$options = parent::getOptions();
+		if(count($options)>0) {
+			$groups['extended'] = array();
+			$groups['extended']['id'] = $this->id . '_extended';
+			$groups['extended']['text'] = JText::sprintf('From xml options elements');
+			$groups['extended']['items'] = $options;
 		}
 		
-		// Merge any additional options in the XML definition.
-		if (FLEXI_J16GE) $options = array_merge(parent::getOptions(), $options);
+		// Get the database object and a new query object.
+		$db = JFactory::getDbo();
+		$query = $db->getQuery(true);
+		
+		// Get the client id.
+		$clientId = $this->element['client_id'];
+
+		if (is_null($clientId) && $this->form instanceof JForm)
+		{
+			$clientId = $this->form->getValue('client_id');
+		}
+		$clientId = (int) $clientId;
+
+		$client = JApplicationHelper::getClientInfo($clientId);
+		
+		// Get the module.
+		$module = (string) $this->element['module'];
+
+		if (empty($module) && ($this->form instanceof JForm))
+		{
+			$module = $this->form->getValue('module');
+		}
+
+		$module = preg_replace('#\W#', '', $module);
+		
+		// Get the template.
+		$template = (string) $this->element['template'];
+		$template = preg_replace('#\W#', '', $template);
+		
+		// Get the style.
+		if ($this->form instanceof JForm)
+		{
+			$template_style_id = $this->form->getValue('template_style_id');
+		}
+
+		$template_style_id = preg_replace('#\W#', '', $template_style_id);
+
+		// Build the query.
+		$query->select('element, name')
+			->from('#__extensions as e')
+			->where('e.client_id = ' . (int) $clientId)
+			->where('e.type = ' . $db->quote('template'))
+			->where('e.enabled = 1');
+
+		if ($template)
+		{
+			$query->where('e.element = ' . $db->quote($template));
+		}
+
+		if ($template_style_id)
+		{
+			$query->join('LEFT', '#__template_styles as s on s.template=e.element')
+				->where('s.id=' . (int) $template_style_id);
+		}
+
+		// Set the query and load the templates.
+		$db->setQuery($query);
+		$templates = $db->loadObjectList('element');
+		
+		// Load language file
+		$lang = JFactory::getLanguage();
+		$lang->load($module . '.sys', $client->path, null, false, true)
+			|| $lang->load($module . '.sys', $client->path . '/modules/' . $module, null, false, true);
+		
+		// Loop on all templates
+		if ($templates) {
+			foreach ($templates as $template) {
+				// Load language file
+				$lang->load('tpl_' . $template->element . '.sys', $client->path, null, false, true)
+					|| $lang->load('tpl_' . $template->element . '.sys', $client->path . '/templates/' . $template->element, null, false, true);
+
+				$template_path = JPath::clean($client->path . '/templates/' . $template->element . '/html/' . $module);
+
+				// Add the layout options from the template path.
+				if (is_dir($template_path) && ($files = JFolder::files($template_path, '^[^_]*\.php$')))
+				{
+					foreach ($files as $i => $file)
+					{
+						// Remove layout that already exist in component ones
+						if (in_array(basename($file, '.php'), $module_layouts))
+						{
+							unset($files[$i]);
+						}
+					}
+
+					if (count($files))
+					{
+						// Create the group for the template
+						$groups[$template->element] = array();
+						$groups[$template->element]['id'] = $this->id . '_' . $template->element;
+						$groups[$template->element]['text'] = JText::sprintf('JOPTION_FROM_TEMPLATE', $template->name);
+						$groups[$template->element]['items'] = array();
+
+						foreach ($files as $file)
+						{
+							// Add an option to the template group
+							$value = basename($file, '.php');
+							$text = $lang->hasKey($key = strtoupper('TPL_' . $template->element . '_' . $module . '_LAYOUT_' . $value))
+								? JText::_($key) : $value;
+							$groups[$template->element]['items'][] = JHtml::_('select.option', $template->element . ':' . $value, $text);
+						}
+					}
+				}
+			}
+		}
+		// end templates
 		
 		// Element name and id
 		$_name	= FLEXI_J16GE ? $this->fieldname : $name;
@@ -128,7 +250,7 @@ class JFormFieldFclayout extends JFormFieldList
 		// For modules we can not use method 'file' (external xml file), because J2.5+ does form validation on the XML file ...
 		$params_source = (string) @ $attributes['params_source'];
 		$container_sx = FLEXI_J16GE ? '-options' : '-page';
-		
+
 if ( ! @$attributes['skipparams'] ) {
 		$doc 	= JFactory::getDocument();
 		$js 	= "
@@ -167,7 +289,7 @@ function fc_getLayout(el) {
 	var container = $('" . $tmpl_container . $container_sx ."');
 	if (container) container.getParent().setStyle('display', 'none');
 	
-	var layouts = new Array('".implode("','", $layouts)."');
+	var layouts = new Array('".implode("','", $module_layouts)."');
 	for (i=0; i<layouts.length; i++) {
 		var container = $('" . $tmpl_container."_' + layouts[i] + '".$container_sx."');
 		if (container) container.getParent().setStyle('display', 'none');
@@ -195,6 +317,8 @@ window.addEvent('domready', function() {
 }
 		
 		// Create form element
-		return JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $value, $element_id);
+		return JHTML::_('select.groupedlist', $groups, $fieldname,
+			array('id' =>  $element_id, 'group.id' => 'id', 'list.attr' => $attribs, 'list.select' => $value)
+		);
 	}
 }
