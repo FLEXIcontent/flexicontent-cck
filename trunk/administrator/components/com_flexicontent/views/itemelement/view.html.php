@@ -94,6 +94,7 @@ class FlexicontentViewItemelement extends JViewLegacy {
 		$state[] = JHTML::_('select.option',  'PE', JText::_( 'FLEXI_PENDING' ) );
 		$state[] = JHTML::_('select.option',  'OQ', JText::_( 'FLEXI_TO_WRITE' ) );
 		$state[] = JHTML::_('select.option',  'IP', JText::_( 'FLEXI_IN_PROGRESS' ) );
+		$state[] = JHTML::_('select.option',  'A', JText::_( 'FLEXI_ARCHIVED' ) );
 
 		$lists['state'] = JHTML::_('select.genericlist',   $state, 'filter_state', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_state );
 
