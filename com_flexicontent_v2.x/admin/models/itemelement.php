@@ -209,8 +209,7 @@ class FlexicontentModelItemelement extends JModelLegacy
 		$search = trim( JString::strtolower( $search ) );
 
 		$where = array();
-		$where[] = ' i.state != -1';
-		$where[] = ' i.state != -2';
+		$where[] = ' i.state != -2'; // Exclude trashed
 		if (!FLEXI_J16GE) $where[] = ' sectionid = ' . FLEXI_SECTION;
 
 		if ( $filter_state ) {
@@ -224,6 +223,8 @@ class FlexicontentModelItemelement extends JModelLegacy
 				$where[] = 'i.state = -4';
 			} else if ($filter_state == 'IP' ) {
 				$where[] = 'i.state = -5';
+			} else if ($filter_state == 'A' ) {
+				$where[] = 'i.state = '.(FLEXI_J16GE ? 2:-1);
 			}
 		}
 		
