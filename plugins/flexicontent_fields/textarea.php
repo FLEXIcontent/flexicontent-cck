@@ -132,7 +132,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			if (!$use_html) {
 				$field->html[0]	 = '<textarea id="'.$field_idtag.'_0" name="' . $field->tab_names[0] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$field_value.'</textarea>'."\n";
 			} else {
-				$field->html[0] = $editor->display( $field->tab_names[0], $field_value, '100%', $height, $cols, $rows, $skip_buttons_arr );
+				$field->html[0] = $editor->display( $field->tab_names[0], $field_value, '100%', $height, $cols, $rows, $skip_buttons_arr, $field_idtag.'_0' );
 			}
 			$field->html = $field->html[0];
 		}

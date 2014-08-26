@@ -227,15 +227,19 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 			
 			// OPEN GRAPH: title
 			if ($field->parameters->get('add_og_title')) {
-				$title = trim(strip_tags($item->title));
+				$title = flexicontent_html::striptagsandcut($item->title);
 				$document->addCustomTag("<meta property=\"og:title\" content=\"{$title}\" />");
 			}
 			
 			// OPEN GRAPH: description
 			if ($field->parameters->get('add_og_descr'))
 			{
-				$text = trim(strip_tags($item->text));
-				$document->addCustomTag("<meta property=\"og:description\" content=\"{$text}\" />");
+				if ( $item->metadesc ) {
+					$document->addCustomTag('<meta property="og:description" content="'.$item->metadesc.'" />');
+				} else {
+					$text = flexicontent_html::striptagsandcut($item->text);
+					$document->addCustomTag("<meta property=\"og:description\" content=\"{$text}\" />");
+				}
 			}
 			
 			// OPEN GRAPH: type

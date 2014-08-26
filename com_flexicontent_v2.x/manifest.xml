@@ -151,6 +151,7 @@
 	<plugin name="selectmultiple"   folder="plugins/selectmultiple"   instfolder="flexicontent_fields">FLEXIcontent - Select Multiple</plugin>
 	<plugin name="sharedaudio"      folder="plugins/sharedaudio"      instfolder="flexicontent_fields">FLEXIcontent - Shared Audio (SoundCloud,Spotify,Last.fm,etc)</plugin>
 	<plugin name="sharedvideo"      folder="plugins/sharedvideo"      instfolder="flexicontent_fields">FLEXIcontent - Shared Video (YouTube,Vimeo,DailyMotion,etc)</plugin>
+	<plugin name="termlist"         folder="termlist"                 instfolder="flexicontent_fields">FLEXIcontent - List of terms</plugin>
 	<plugin name="text"             folder="plugins/text"             instfolder="flexicontent_fields">FLEXIcontent - Text (number/time/etc/custom validation)</plugin>
 	<plugin name="textarea"         folder="plugins/textarea"         instfolder="flexicontent_fields">FLEXIcontent - Textarea</plugin>
 	<plugin name="textselect"       folder="plugins/textselect"       instfolder="flexicontent_fields">FLEXIcontent - TextSelect (Text with existing value selection)</plugin>

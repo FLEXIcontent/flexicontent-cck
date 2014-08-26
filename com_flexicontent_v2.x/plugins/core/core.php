@@ -308,8 +308,12 @@ class plgFlexicontent_fieldsCore extends JPlugin
 					
 					if ($useogp && $field->{$prop}) {
 						if ( in_array($view, $ogpinview) ) {
-							$content_val = flexicontent_html::striptagsandcut($field->display, $ogpmaxlen);
-							JFactory::getDocument()->addCustomTag('<meta property="og:description" content="'.$content_val.'" />');
+							if ( $item->metadesc ) {
+								JFactory::getDocument()->addCustomTag('<meta property="og:description" content="'.$item->metadesc.'" />');
+							} else {
+								$content_val = flexicontent_html::striptagsandcut($field->display, $ogpmaxlen);
+								JFactory::getDocument()->addCustomTag('<meta property="og:description" content="'.$content_val.'" />');
+							}
 						}
 					}
 					
