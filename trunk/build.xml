@@ -186,6 +186,10 @@
 		<copy file="plugins/flexicontent_fields/sharedaudio.xml" tofile="flexipack/plugins/sharedaudio/sharedaudio.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_sharedaudio.ini" tofile="flexipack/plugins/sharedaudio/en-GB.plg_flexicontent_fields_sharedaudio.ini" />
 		
+		<copy file="plugins/flexicontent_fields/termlist.php" tofile="flexipack/plugins/termlist/termlist.php" />
+		<copy file="plugins/flexicontent_fields/termlist.xml" tofile="flexipack/plugins/termlist/termlist.xml" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_termlist.ini" tofile="flexipack/plugins/text/en-GB.plg_flexicontent_fields_termlist.ini" />
+		
 		<copy file="plugins/flexicontent_fields/text.php" tofile="flexipack/plugins/text/text.php" />
 		<copy file="plugins/flexicontent_fields/text.xml" tofile="flexipack/plugins/text/text.xml" />
 		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_text.ini" tofile="flexipack/plugins/text/en-GB.plg_flexicontent_fields_text.ini" />
