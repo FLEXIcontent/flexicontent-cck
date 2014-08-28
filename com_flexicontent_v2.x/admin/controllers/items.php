@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1892 2014-04-26 23:22:21Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1905 2014-05-26 23:37:05Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -83,15 +83,75 @@ class FlexicontentControllerItems extends FlexicontentController
 		$params->merge($tparams);
 		
 		
-		// Get data from request and validate them
-		if (FLEXI_J16GE) {
+		// *********************
+		// Get data from request
+		// *********************
+		
+		if (FLEXI_J16GE)
+		{
 			// Retrieve form data these are subject to basic filtering
 			$data   = JRequest::getVar('jform', array(), 'post', 'array');   // Core Fields and and item Parameters
 			$custom = JRequest::getVar('custom', array(), 'post', 'array');  // Custom Fields
 			$jfdata = JRequest::getVar('jfdata', array(), 'post', 'array');  // Joomfish Data
-			
+		}
+		
+		else {
+			// Retrieve form data these are subject to basic filtering
+			$data = JRequest::get( 'post' );  // Core & Custom Fields and item Parameters
+		}
+		
+		// Set data id into model in case not already set ?
+		$model->setId((int) $data['id']);
+		
+		
+		
+		// *************************************
+		// ENFORCE can change category ACL perms
+		// *************************************
+		
+		$perms = FlexicontentHelperPerm::getPerm();
+		
+		$featured_cats_parent = $params->get('featured_cats_parent', 0);
+		$featured_cats = array();
+		
+		$enable_featured_cid_selector = $perms->MultiCat && ($isnew || $perms->CanChangeFeatCat);
+		$enable_cid_selector = $perms->MultiCat && ($isnew || $perms->CanChangeSecCat);
+		$enable_catid_selector =  $isnew || $perms->CanChangeCat;
+		
+		$featured_cats_parent = $params->get('featured_cats_parent', 0);
+		$featured_cats = array();
+		if ( $featured_cats_parent && !$enable_featured_cid_selector )
+		{
+			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
+			$featured_cid = array();
+			foreach($model->get('cats') as $item_cat) if (isset($featured_tree[$item_cat])) $featured_cid[] = $item_cat;
+			$data['featured_cid'] = $featured_cid;
+		}
+		
+		if (!$enable_cid_selector) {
+			if ( isset($featured_cid) ) {
+				$featured_cid_arr = array_flip($featured_cid);
+				$sec_cid = array();
+				foreach($model->get('cats') as $item_cat) if (!isset($featured_cid_arr[$item_cat])) $sec_cid[] = $item_cat;
+				$data['cid'] = $sec_cid;
+			} else {
+				$data['cid'] = $model->get('cid');
+			}
+		}
+		
+		if (!$enable_catid_selector) {
+			$data['catid'] = $model->get('catid');
+		}
+		
+		
+		
+		// **************************
+		// Basic Form data validation
+		// **************************
+		
+		if (FLEXI_J16GE)
+		{
 			// Validate Form data for core fields and for parameters
-			$model->setId((int) $data['id']);   // Set data id into model in case some function tries to get a property and item gets loaded
 			$form = $model->getForm();          // Do not pass any data we only want the form object in order to validate the data and not create a filled-in form
 			$post = $model->validate($form, $data);
 			if (!$post) {
@@ -114,9 +174,10 @@ class FlexicontentControllerItems extends FlexicontentController
 				$post['attribs']['layouts'] = $data['layouts'];
 				//echo "<pre>"; print_r($post['attribs']); exit;
 			}
-		} else {
-			// Retrieve form data these are subject to basic filtering
-			$post = JRequest::get( 'post' );  // Core & Custom Fields and item Parameters
+		}
+		
+		else {
+			$post = $data;
 			
 			// Some values need to be assigned after validation
 			$post['text'] = JRequest::getVar( 'text', '', 'post', 'string', JREQUEST_ALLOWRAW ); // Workaround for allowing raw text field

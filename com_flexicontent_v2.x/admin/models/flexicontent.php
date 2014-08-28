@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.php 1884 2014-04-13 10:38:52Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.php 1910 2014-06-08 17:48:19Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -2049,12 +2049,13 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			if( !empty($flexi_rules['core.edit.state'][$group->id]) ) {
 				if (in_array('core.edit.state.own', $flexi_action_names)) $flexi_rules['core.edit.state.own'][$group->id] = 1;  //CanPublishOwn
 			}
-			if( !empty($flexi_rules['core.edit'][$group->id]) || !empty($flexi_rules['core.edit.own'][$group->id])) {
+			// Give these regardless of edit privelege, since if the do not have edit then they cannot access item form and save task anyway
+			//if( !empty($flexi_rules['core.edit'][$group->id]) || !empty($flexi_rules['core.edit.own'][$group->id])) {
 				if (in_array('flexicontent.change.cat', $flexi_action_names)) $flexi_rules['flexicontent.change.cat'][$group->id] = 1;  // CanChangeCat
 				if (in_array('flexicontent.change.cat.sec', $flexi_action_names)) $flexi_rules['flexicontent.change.cat.sec'][$group->id] = 1;  // CanChangeSecCat
 				if (in_array('flexicontent.change.cat.feat', $flexi_action_names)) $flexi_rules['flexicontent.change.cat.feat'][$group->id] = 1;  // CanChangeFeatCat
 				if (in_array('flexicontent.uploadfiles', $flexi_action_names)) $flexi_rules['flexicontent.uploadfiles'][$group->id] = 1;  // CanUploadFiles
-			}
+			//}
 			// By default give to everybody the edit field values privelege
 			if (in_array('flexicontent.editfieldvalues', $flexi_action_names)) $flexi_rules['flexicontent.editfieldvalues'][$group->id] = 1;  //CanEditFieldValues
 		}

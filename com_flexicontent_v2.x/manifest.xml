@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <extension type="component" version="2.5.0" method="upgrade">
 	<name>FLEXIcontent</name>
-	<creationDate>05 August 2014</creationDate>
+	<creationDate>28 August 2014</creationDate>
 	<author>Emmanuel Danan, Georgios Papadakis</author>
 	<copyright>(C) 2009-2013 Emmanuel Danan</copyright>
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
 	<authorUrl>http://www.flexicontent.org</authorUrl>
-	<version>2.2.0 r1933</version>
+	<version>2.2.0 r1938</version>
 	<description>A flexible content management system for Joomla! J1.5/J2.5/J3.2</description>
 
 	<languages folder="site/language">
@@ -151,7 +151,7 @@
 	<plugin name="selectmultiple"   folder="plugins/selectmultiple"   instfolder="flexicontent_fields">FLEXIcontent - Select Multiple</plugin>
 	<plugin name="sharedaudio"      folder="plugins/sharedaudio"      instfolder="flexicontent_fields">FLEXIcontent - Shared Audio (SoundCloud,Spotify,Last.fm,etc)</plugin>
 	<plugin name="sharedvideo"      folder="plugins/sharedvideo"      instfolder="flexicontent_fields">FLEXIcontent - Shared Video (YouTube,Vimeo,DailyMotion,etc)</plugin>
-	<plugin name="termlist"         folder="termlist"                 instfolder="flexicontent_fields">FLEXIcontent - List of terms</plugin>
+	<plugin name="termlist"         folder="plugins/termlist"         instfolder="flexicontent_fields">FLEXIcontent - List of terms</plugin>
 	<plugin name="text"             folder="plugins/text"             instfolder="flexicontent_fields">FLEXIcontent - Text (number/time/etc/custom validation)</plugin>
 	<plugin name="textarea"         folder="plugins/textarea"         instfolder="flexicontent_fields">FLEXIcontent - Textarea</plugin>
 	<plugin name="textselect"       folder="plugins/textselect"       instfolder="flexicontent_fields">FLEXIcontent - TextSelect (Text with existing value selection)</plugin>
