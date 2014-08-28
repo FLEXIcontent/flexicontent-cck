@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1901 2014-05-07 02:37:25Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1911 2014-06-12 01:55:58Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -210,7 +210,7 @@ class FlexicontentViewItem extends JViewLegacy
 				}
 			}
 			
-			$previewlink     = /*$server .*/ $item_url.'&preview=1';
+			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? ':' : '?') .'preview=1';
 			//$previewlink     = str_replace('&amp;', '&', $previewlink);
 			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)) .$autologin;
 
@@ -227,7 +227,7 @@ class FlexicontentViewItem extends JViewLegacy
 				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_active_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$item->current_version.']</a>', 'preview' );
 
 				// Add a preview button for currently LATEST version of the item
-				$previewlink_last_ver = $previewlink .'&preview=1'; //'&version='.$item->last_version;
+				$previewlink_last_ver = $previewlink; //'&version='.$item->last_version;
 				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_last_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$item->last_version.']</a>', 'preview' );
 			}
 			JToolBarHelper::spacer();
@@ -534,7 +534,7 @@ class FlexicontentViewItem extends JViewLegacy
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
 			$featured_sel = array();
-			foreach($selectedcats as $featured_cat) if (isset($featured_tree[$featured_cat])) $featured_sel[] = $featured_cat;
+			foreach($selectedcats as $item_cat) if (isset($featured_tree[$item_cat])) $featured_sel[] = $item_cat;
 			
 			$class  = "use_select2_lib select2_list_selected";
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';

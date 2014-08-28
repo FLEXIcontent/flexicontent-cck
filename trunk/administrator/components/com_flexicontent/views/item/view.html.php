@@ -210,7 +210,7 @@ class FlexicontentViewItem extends JViewLegacy
 				}
 			}
 			
-			$previewlink     = /*$server .*/ $item_url.'&preview=1';
+			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? ':' : '?') .'preview=1';
 			//$previewlink     = str_replace('&amp;', '&', $previewlink);
 			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)) .$autologin;
 
@@ -227,7 +227,7 @@ class FlexicontentViewItem extends JViewLegacy
 				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_active_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_FRONTEND_ACTIVE_VERSION').' ['.$item->current_version.']</a>', 'preview' );
 
 				// Add a preview button for currently LATEST version of the item
-				$previewlink_last_ver = $previewlink .'&preview=1'; //'&version='.$item->last_version;
+				$previewlink_last_ver = $previewlink; //'&version='.$item->last_version;
 				$toolbar->appendButton( 'Custom', '<a class="preview btn btn-small" href="'.$previewlink_last_ver.'" target="_blank"><span title="'.JText::_('Preview').'" class="icon-32-preview"></span>'.JText::_('FLEXI_PREVIEW_LATEST_SAVED_VERSION').' ['.$item->last_version.']</a>', 'preview' );
 			}
 			JToolBarHelper::spacer();
@@ -534,7 +534,7 @@ class FlexicontentViewItem extends JViewLegacy
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
 			$featured_sel = array();
-			foreach($selectedcats as $featured_cat) if (isset($featured_tree[$featured_cat])) $featured_sel[] = $featured_cat;
+			foreach($selectedcats as $item_cat) if (isset($featured_tree[$item_cat])) $featured_sel[] = $item_cat;
 			
 			$class  = "use_select2_lib select2_list_selected";
 			$attribs  = 'class="'.$class.'" multiple="multiple" size="8"';
@@ -827,20 +827,12 @@ class FlexicontentViewItem extends JViewLegacy
 				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
 				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
-				// not inherited
-				//$perms['canchange_cat'] = $user->authorise('core.change.cat', $asset);
-				//$perms['canchange_seccat'] = $user->authorise('core.change.cat.sec', $asset);
-				//$perms['canchange_featcat'] = $user->authorise('core.change.cat.feat', $asset);
 			}
 			else if (FLEXI_ACCESS) {
 				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 				$perms['canedit']			= ($user->gid < 25) ? ( (in_array('editown', $rights) && $isOwner) || (in_array('edit', $rights)) ) : 1;
 				$perms['canpublish']	= ($user->gid < 25) ? ( (in_array('publishown', $rights) && $isOwner) || (in_array('publish', $rights)) ) : 1;
 				$perms['candelete']		= ($user->gid < 25) ? ( (in_array('deleteown', $rights) && $isOwner) || (in_array('delete', $rights)) ) : 1;
-				// not inherited
-				//$perms['canchange_cat'] = 1;
-				//$perms['canchange_seccat'] = 1;
-				//$perms['canchange_featcat'] = 1;
 				// Only FLEXI_ACCESS has per item rights permission
 				$perms['canright']		= ($user->gid < 25) ? ( (in_array('right', $rights)) ) : 1;
 			}

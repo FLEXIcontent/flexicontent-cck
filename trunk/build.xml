@@ -188,7 +188,7 @@
 		
 		<copy file="plugins/flexicontent_fields/termlist.php" tofile="flexipack/plugins/termlist/termlist.php" />
 		<copy file="plugins/flexicontent_fields/termlist.xml" tofile="flexipack/plugins/termlist/termlist.xml" />
-		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_termlist.ini" tofile="flexipack/plugins/text/en-GB.plg_flexicontent_fields_termlist.ini" />
+		<copy file="administrator/language/en-GB/en-GB.plg_flexicontent_fields_termlist.ini" tofile="flexipack/plugins/termlist/en-GB.plg_flexicontent_fields_termlist.ini" />
 		
 		<copy file="plugins/flexicontent_fields/text.php" tofile="flexipack/plugins/text/text.php" />
 		<copy file="plugins/flexicontent_fields/text.xml" tofile="flexipack/plugins/text/text.xml" />
