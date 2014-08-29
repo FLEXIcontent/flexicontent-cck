@@ -2688,7 +2688,7 @@ class ParentClassItem extends JModelLegacy
 		// ****************************
 		// Save joomfish data in the db
 		// ****************************
-		if ( FLEXI_FISH && $editjf_translations==1 )   // 0:disable with warning about found translations,  1:disable without warning about found translations,  2:edit-save translations, 
+		if ( FLEXI_FISH && $editjf_translations==2 )   // 0:disable with warning about found translations,  1:disable without warning about found translations,  2:edit-save translations, 
 			$this->_saveJFdata( $data['jfdata'], $item );
 		
 		
