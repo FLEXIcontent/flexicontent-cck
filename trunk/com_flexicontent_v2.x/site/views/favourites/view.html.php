@@ -158,6 +158,10 @@ class FlexicontentViewFavourites extends JViewLegacy
 		// Set document's META tags
 		// ************************
 		
+		// Workaround for Joomla not setting the default value for 'robots', so component must do it
+		$app_params = $app->getParams();
+		if (($_mp=$app_params->get('robots')))    $document->setMetadata('robots', $_mp);
+		
 		// Overwrite with menu META data if menu matched
 		if (FLEXI_J16GE) {
 			if ($menu_matches) {

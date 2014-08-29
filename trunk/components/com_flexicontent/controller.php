@@ -320,13 +320,24 @@ class FlexicontentController extends JControllerLegacy
 		// *************************************
 		
 		$perms = FlexicontentHelperPerm::getPerm();
+		// Per content type change category permissions
+		if (FLEXI_J16GE) {
+			$current_type_id  = $isnew ? $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
+			$CanChangeFeatCat = $isnew || $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
+			$CanChangeSecCat  = $isnew || $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $current_type_id);
+			$CanChangeCat     = $isnew || $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $current_type_id);
+		} else {
+			$CanChangeFeatCat = 1;
+			$CanChangeSecCat  = 1;
+			$CanChangeCat     = 1;
+		}
 		
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
 		$featured_cats = array();
 		
-		$enable_featured_cid_selector = $perms->MultiCat && ($isnew || $perms->CanChangeFeatCat);
-		$enable_cid_selector = $perms->MultiCat && ($isnew || $perms->CanChangeSecCat);
-		$enable_catid_selector =  $isnew || $perms->CanChangeCat;
+		$enable_featured_cid_selector = $perms->MultiCat && $CanChangeFeatCat;
+		$enable_cid_selector = $perms->MultiCat && $CanChangeSecCat;
+		$enable_catid_selector = $CanChangeCat;
 		
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
 		$featured_cats = array();
@@ -345,7 +356,7 @@ class FlexicontentController extends JControllerLegacy
 				foreach($model->get('cats') as $item_cat) if (!isset($featured_cid_arr[$item_cat])) $sec_cid[] = $item_cat;
 				$data['cid'] = $sec_cid;
 			} else {
-				$data['cid'] = $model->get('cid');
+				$data['cid'] = $model->get('cats');
 			}
 		}
 		

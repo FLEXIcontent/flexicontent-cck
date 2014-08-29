@@ -308,17 +308,17 @@ class FlexicontentHelperRoute
 		// Priority 2: Type's default before categories (if so configured): ... giving an object means no-lookup and just use it
 		if ($type && $type_menu_itemid_usage==1 && $type->typeMenuItem)  $needles['type_before'] = $type->typeMenuItem;
 		
-		// Priority 3: Category view menu items of given category IDs ... item's category and its parent categories in ascending order
+		// Priority 3: Currently active menu item that matches current category view ... giving an object means no-lookup and just use it
+		if ($curr_catmenu)  $needles['current_category'] = $curr_catmenu;
+		
+		// Priority 4: Category view menu items of given category IDs ... item's category and its parent categories in ascending order
 		$needles['category'] = $parents_ids;
 		
-		// Priority 4: Directory view menu items ... pointing to same category IDs as above
+		// Priority 5: Directory view menu items ... pointing to same category IDs as above
 		$needles['flexicontent'] = $needles['category'];
 		
-		// Priority 5: Type's default after categories (if so configured): ... giving an object means no-lookup and just use it
+		// Priority 6: Type's default after categories (if so configured): ... giving an object means no-lookup and just use it
 		if ($type && $type_menu_itemid_usage==2 && $type->typeMenuItem)  $needles['type_after'] = $type->typeMenuItem;
-		
-		// Priority 6: Currently active menu item that matches current category view ... giving an object means no-lookup and just use it
-		if ($curr_catmenu)  $needles['current_category'] = $curr_catmenu;
 		
 		// Do not add component's default menu item to allow trying "ALL" language items ? before component default ?
 		
@@ -530,9 +530,9 @@ class FlexicontentHelperRoute
 		unset($needles['_language']);
 		
 		
-		// **********************************************************************************************************
-		// DONCE ONCE: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup hash
-		// **********************************************************************************************************
+		// *********************************************************************************************************
+		// DONE ONCE: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup hash
+		// *********************************************************************************************************
 		
 		if ( !isset(self::$lookup[$language]) ) {
 			self::$lookup[$language] = array();
@@ -574,7 +574,7 @@ class FlexicontentHelperRoute
 		}
 		
 		
-		// No find menu item for given needles of item, this will be usually 1 lookup for item's 
+		// Now find menu item for given needles of item, this will be usually 1 lookup for item's 
 		$level = 0;
 		if ($needles)
 		{
@@ -623,8 +623,8 @@ class FlexicontentHelperRoute
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		$db = JFactory::getDBO();
 		
-		// Get current menu item, we will prefer current menu if it points to given tag,
-		// thus maintaining current menu item if multiple menu items to same tag exist !!
+		// Get current menu item, we will prefer current menu if it points to given category,
+		// thus maintaining current menu item if multiple menu items to same category exist !!
 		static $menu = null;
 		if ($menu == null) {
 			$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!

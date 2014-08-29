@@ -279,7 +279,11 @@ class FlexicontentViewItems  extends JViewLegacy
 		// ************************
 		// Set document's META tags
 		// ************************
-
+		
+		// Workaround for Joomla not setting the default value for 'robots', so component must do it
+		$app_params = $app->getParams();
+		if (($_mp=$app_params->get('robots')))    $document->setMetadata('robots', $_mp);
+		
 		// Set item's META data: desc, keyword, title, author
 		if ($item->metadesc)		$document->setDescription( $item->metadesc );
 		if ($item->metakey)			$document->setMetadata('keywords', $item->metakey);
@@ -1523,6 +1527,10 @@ class FlexicontentViewItems  extends JViewLegacy
 				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
 				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
+				
+				$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $item->type_id);
+				$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $item->type_id);
+				$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $item->type_id);
 			}
 			else if (FLEXI_ACCESS) {
 				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);

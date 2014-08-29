@@ -61,7 +61,10 @@ $ord_grp = 1;
 				<div style="float:left; margin:2px 48px 0px 0px;">
 					<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
 					<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
-				</div>
+					<div id="fc-filter-buttons">
+						<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
+						<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+					</div>
 				
 				<div class="limit" style="display: inline-block;">
 					<label class="label">
