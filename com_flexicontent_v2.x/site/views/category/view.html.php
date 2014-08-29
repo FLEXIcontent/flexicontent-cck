@@ -269,6 +269,10 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Set document's META tags
 		// ************************
 		
+		// Workaround for Joomla not setting the default value for 'robots', so component must do it
+		$app_params = $app->getParams();
+		if (($_mp=$app_params->get('robots')))    $document->setMetadata('robots', $_mp);
+		
 		if ($category->id) {   // possibly not set for author items OR my items
 			if (FLEXI_J16GE) {
 				if ($category->metadesc) $document->setDescription( $category->metadesc );

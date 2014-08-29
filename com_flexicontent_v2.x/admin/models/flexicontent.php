@@ -2051,11 +2051,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			}
 			// Give these regardless of edit privelege, since if the do not have edit then they cannot access item form and save task anyway
 			//if( !empty($flexi_rules['core.edit'][$group->id]) || !empty($flexi_rules['core.edit.own'][$group->id])) {
+			if( 1 ) {
 				if (in_array('flexicontent.change.cat', $flexi_action_names)) $flexi_rules['flexicontent.change.cat'][$group->id] = 1;  // CanChangeCat
 				if (in_array('flexicontent.change.cat.sec', $flexi_action_names)) $flexi_rules['flexicontent.change.cat.sec'][$group->id] = 1;  // CanChangeSecCat
 				if (in_array('flexicontent.change.cat.feat', $flexi_action_names)) $flexi_rules['flexicontent.change.cat.feat'][$group->id] = 1;  // CanChangeFeatCat
 				if (in_array('flexicontent.uploadfiles', $flexi_action_names)) $flexi_rules['flexicontent.uploadfiles'][$group->id] = 1;  // CanUploadFiles
-			//}
+			}
 			// By default give to everybody the edit field values privelege
 			if (in_array('flexicontent.editfieldvalues', $flexi_action_names)) $flexi_rules['flexicontent.editfieldvalues'][$group->id] = 1;  //CanEditFieldValues
 		}

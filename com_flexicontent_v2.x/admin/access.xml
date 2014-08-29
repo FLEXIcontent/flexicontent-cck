@@ -101,6 +101,9 @@
 	
 	<section name="type">
 		<action name="core.create" title="create items" description="Allow users in the group to create new items in this type. Users not being able to create items of this type will not see this type listed, when selecting type or will receive an error message for submit links that contain this type." />
+		<action name="flexicontent.change.cat" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; change category assignment" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="flexicontent.change.cat.sec" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; change secondary category assignments" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
+		<action name="flexicontent.change.cat.feat" title="&lt;b&gt;Items (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Item edit Form&lt;/span&gt;):&lt;/b&gt; change featured category assignments" description="Allow users in the group to change the categories assigned to an item (after the item has been created). NOTE: You can explicitely deny per category/item, but if set to deny here, you cann't expicitely allow per category/item." />
 	</section>
 	
 </access>
