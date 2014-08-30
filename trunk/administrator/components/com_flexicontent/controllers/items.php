@@ -114,9 +114,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Per content type change category permissions
 		if (FLEXI_J16GE) {
 			$current_type_id  = $isnew ? $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
-			$CanChangeFeatCat = $isnew || $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
-			$CanChangeSecCat  = $isnew || $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $current_type_id);
-			$CanChangeCat     = $isnew || $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $current_type_id);
+			$CanChangeFeatCat = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
+			$CanChangeSecCat  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $current_type_id);
+			$CanChangeCat     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $current_type_id);
 		} else {
 			$CanChangeFeatCat = 1;
 			$CanChangeSecCat  = 1;
@@ -127,7 +127,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		$featured_cats = array();
 		
 		$enable_featured_cid_selector = $perms->MultiCat && $CanChangeFeatCat;
-		$enable_cid_selector = $perms->MultiCat && $CanChangeSecCat;
+		$enable_cid_selector   = $perms->MultiCat && $CanChangeSecCat;
 		$enable_catid_selector = $CanChangeCat;
 		
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
@@ -141,7 +141,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		if (!$enable_cid_selector) {
-			if ( isset($featured_cid) ) {
+			if ($isnew) {
+				$data['cid'] = $tparams->get('cid_default');
+			} else if ( isset($featured_cid) ) {
 				$featured_cid_arr = array_flip($featured_cid);
 				$sec_cid = array();
 				foreach($model->get('cats') as $item_cat) if (!isset($featured_cid_arr[$item_cat])) $sec_cid[] = $item_cat;
@@ -152,7 +154,10 @@ class FlexicontentControllerItems extends FlexicontentController
 		}
 		
 		if (!$enable_catid_selector) {
-			$data['catid'] = $model->get('catid');
+			if ($isnew)
+				$data['catid'] = $tparams->get('catid_default');
+			else if ($tparams->get('catid_default'))
+				$data['catid'] = $model->get('catid');
 		}
 		
 		

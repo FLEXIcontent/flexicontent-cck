@@ -932,7 +932,7 @@
 			</field>
 			<field name="" type="separator" default="FLEXI_FEATURED_CATS_TIP" level="level3" menu="hide" />
 			<field name="featured_cats_parent" type="flexicategories" top="2"
-				published_only="1" parent_id=""	depth_limit="1" multiple="false"
+				published_only="1" parent_id=""	depth_limit="2" multiple="false"
 				default="" label="FLEXI_FEATURED_CATS_PARENT" description="FLEXI_FEATURED_CATS_PARENT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_CONTENT_MARKUPS_CONF" level="level0" menu="hide" />

@@ -120,11 +120,6 @@ class FlexicontentViewItem extends JViewLegacy
 		$cid = $model->getId();
 		$isnew = ! $cid;
 		
-		// Get user allowed permissions on the item ... to be used by the form rendering
-		// Also hide parameters panel if user can not edit parameters
-		$perms = $this->_getItemPerms($item);
-		if (!$perms['canparams'])  $document->addStyleDeclaration( (FLEXI_J16GE ? '#details-options' : '#det-pane') .'{display:none;}');
-		
 		// Create and set a unique item id for plugins that needed it
 		JRequest::setVar( 'unique_tmp_itemid', $cid ? $cid : date('_Y_m_d_h_i_s_', time()) . uniqid(true) );
 		
@@ -168,6 +163,12 @@ class FlexicontentViewItem extends JViewLegacy
 		$tparams    = $this->get( 'Typeparams' );
 		$tparams    = FLEXI_J16GE ? new JRegistry($tparams) : new JParameter($tparams);
 		$params->merge($tparams);       // Apply type configuration if it type is set
+		
+		// Get user allowed permissions on the item ... to be used by the form rendering
+		// Also hide parameters panel if user can not edit parameters
+		$perms = $this->_getItemPerms($item, $typesselected);
+		if (!$perms['canparams'])  $document->addStyleDeclaration( (FLEXI_J16GE ? '#details-options' : '#det-pane') .'{display:none;}');
+		
 		
 		
 		// ******************
@@ -342,6 +343,14 @@ class FlexicontentViewItem extends JViewLegacy
 			} else {
 				$selectedcats = array();
 			}
+			
+			if ( $tparams->get('cid_default') ) {
+				$selectedcats = $tparams->get('cid_default');
+			}
+			if ( $tparams->get('catid_default') ) {
+				$item->catid = $tparams->get('catid_default');
+			}
+			
 		} else {
 			// NOTE: This will normally return the already set versioned value of categories ($item->categories)
 			$selectedcats = $this->get( 'Catsselected' );
@@ -529,7 +538,7 @@ class FlexicontentViewItem extends JViewLegacy
 		// Featured categories form field
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
 		$featured_cats = array();
-		$enable_featured_cid_selector = $perms['multicat'] && ($isnew || $perms['canchange_featcat']);
+		$enable_featured_cid_selector = $perms['multicat'] && $perms['canchange_featcat'];
 		if ( $featured_cats_parent )
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
@@ -552,9 +561,15 @@ class FlexicontentViewItem extends JViewLegacy
 		
 		// Multi-category form field, for user allowed to use multiple categories
 		$lists['cid'] = '';
-		$enable_cid_selector = $perms['multicat'] && ($isnew || $perms['canchange_seccat']);
+		$enable_cid_selector = $perms['multicat'] && $perms['canchange_seccat'];
 		if ( 1 )
 		{
+			if ($tparams->get('cid_allowed_parent')) {
+				$cid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('cid_allowed_parent'), $depth_limit=0);
+			} else {
+				$cid_tree = & $categories;
+			}
+			
 			// Get author's maximum allowed categories per item and set js limitation
 			$max_cat_assign = !$authorparams ? 0 : intval($authorparams->get('max_cat_assign',0));
 			$document->addScriptDeclaration('
@@ -572,7 +587,7 @@ class FlexicontentViewItem extends JViewLegacy
 			$fieldname = FLEXI_J16GE ? 'jform[cid][]' : 'cid[]';
 			$skip_subtrees = $featured_cats_parent ? array($featured_cats_parent) : array();
 			$lists['cid'] = ($enable_cid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($categories, $fieldname, $selectedcats, false, $attribs, true, true,
+				flexicontent_cats::buildcatselect($cid_tree, $fieldname, $selectedcats, false, $attribs, true, true,
 				$actions_allowed, $require_all=true, $skip_subtrees, $disable_subtrees=array());
 		}
 		else {
@@ -597,12 +612,18 @@ class FlexicontentViewItem extends JViewLegacy
 		$attribs = 'class="'.$class.'"';
 		$fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
 		
-		$enable_catid_selector =  $isnew || $perms['canchange_cat'];
+		$enable_catid_selector = empty($item->catid) || $perms['canchange_cat'];
 		if ( 1 ) {
+			if ($tparams->get('catid_allowed_parent')) {
+				$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('catid_allowed_parent'), $depth_limit=0);
+			} else {
+				$catid_tree = & $categories;
+			}
+			
 			$disabled = $enable_catid_selector ? '' : ' disabled="disabled"';
 			$attribs .= $disabled;
 			$lists['catid'] = ($enable_catid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
-				flexicontent_cats::buildcatselect($categories, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed);
+				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed);
 		} else {
 			$lists['catid'] = $globalcats[$item->catid]->title;
 		}
@@ -788,7 +809,7 @@ class FlexicontentViewItem extends JViewLegacy
 	 *
 	 * @since 1.0
 	 */
-	function _getItemPerms( &$item )
+	function _getItemPerms( &$item, &$type )
 	{
 		$user = JFactory::getUser();	// get current user\
 		$isOwner = ( $item->created_by == $user->get('id') );
@@ -827,10 +848,6 @@ class FlexicontentViewItem extends JViewLegacy
 				$perms['canedit']			= $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $isOwner);
 				$perms['canpublish']	= $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $isOwner);
 				$perms['candelete']		= $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $isOwner);
-				
-				$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $item->type_id);
-				$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $item->type_id);
-				$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $item->type_id);
 			}
 			else if (FLEXI_ACCESS) {
 				$rights = FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
@@ -842,6 +859,15 @@ class FlexicontentViewItem extends JViewLegacy
 			}
 			else {
 				// J1.5 permissions with no FLEXIaccess are only general, no item specific permissions
+			}
+		}
+		
+		if ( $type->id )
+		{
+			if (FLEXI_J16GE) {
+				$perms['canchange_cat']     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $type->id);
+				$perms['canchange_seccat']  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $type->id);
+				$perms['canchange_featcat'] = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $type->id);
 			}
 		}
 		

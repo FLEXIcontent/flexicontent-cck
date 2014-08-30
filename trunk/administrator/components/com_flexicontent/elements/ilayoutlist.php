@@ -28,6 +28,10 @@ if (FLEXI_J16GE) {
 	require_once(JPATH_ROOT.DS.'libraries'.DS.'joomla'.DS.'html'.DS.'html'.DS.'select.php');
 }
 
+FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+flexicontent_html::loadFramework('jQuery');
+flexicontent_html::loadFramework('select2');
+
 /**
  * Renders a author element
  *
@@ -68,7 +72,7 @@ class JElementIlayoutlist extends JElement
 		// Field parameter (attributes)
 		$attribs = '';
 		
-		$classes = 'inputbox ';
+		$classes = 'use_select2_lib ';
 		if ( $node->attributes('required') && $node->attributes('required')=='true' ) {
 			$classes .= 'required ';
 		}
@@ -77,17 +81,19 @@ class JElementIlayoutlist extends JElement
 		}
 		$attribs = ' class="'.$classes.'" '.$attribs;
 		
-		$attribs = 'style="float:left;"';
+		$attribs .= ' style="float:left;" ';
 		if (@$attributes['multiple']=='multiple' || @$attributes['multiple']=='true' ) {
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="6" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
+			//$maximize_link = "<a style='display:inline-block;".(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px')."' href='javascript:;' onclick='$element_id = document.getElementById(\"$element_id\"); if ($element_id.size<16) { ${element_id}_oldsize=$element_id.size; $element_id.size=16;} else { $element_id.size=${element_id}_oldsize; } ' >Maximize/Minimize</a>";
 		} else {
 			array_unshift($types, JHTML::_('select.option', '', JText::_('FLEXI_PLEASE_SELECT')));
 			$attribs .= 'class="inputbox"';
-			$maximize_link = '';
+			//$maximize_link = '';
 		}
+		$maximize_link = '';
+		
 		if ($onchange = @$attributes['onchange']) {
 			$attribs .= ' onchange="'.$onchange.'"';
 		}

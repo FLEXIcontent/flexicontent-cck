@@ -3,7 +3,32 @@
 	<name>Type Edit Form</name>
 	<params addpath="/administrator/components/com_flexicontent/elements">
 			
+			
+			<field name="" type="separator" default="Item form" level="level1" menu="hide" />
+			
+			<field name="" type="separator" default="Main category" level="level2" menu="hide" />
+			<field name="catid_allowed_parent" type="flexicategories" top="2"
+				published_only="1" parent_id=""	depth_limit="0" multiple="false"
+				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be used for selecting main category" />
+			<field name="catid_default" type="flexicategories" top="2"
+				published_only="1" parent_id=""	depth_limit="0" multiple="false"
+				default="" label="Default category" description="Select the category subtree that will be allowed to be used as main category" />
+			
+			<field name="" type="separator" default="Secondary categories" level="level2" menu="hide" />
+			<field name="cid_allowed_parent" type="flexicategories" top="2"
+				published_only="1" parent_id=""	depth_limit="0" multiple="false"
+				default="" label="Allowed subtree &lt;br&gt;&lt;small&gt;--Blank allows all--&lt;/small&gt;" description="Select the category subtree that will be allowed to be used for selecting secondary categories" />
+			<field name="cid_default" type="flexicategories" top="2"
+				published_only="1" parent_id=""	depth_limit="0" multiple="true"
+				default="" label="Default categories" description="Select the default secondary categories" />
+			
+			<field name="" type="separator" default="Item layout" level="level2" menu="hide" />
 			<field name="allowed_ilayouts" type="ilayoutlist" default="" multiple="true" size="12" label="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT" description="FLEXI_CHOOSE_ALLOWED_TYPEITEMS_LAYOUT_DESC" />
+			
+			
+			<field name="" type="separator" default="Item view" level="level1" menu="hide" />
+			
+			<field name="" type="separator" default="Menu Item" level="level2" menu="hide" />
 			<field name="type_menu_itemid" type="menuitem" default="" disable="separator" state="1" published="1" label="FLEXI_TYPE_MENU_ITEM_FOR_URLS" description="FLEXI_TYPE_MENU_ITEM_FOR_URLS_DESC" />
 			<field name="type_menu_itemid_usage" type="radio" default="0" label="FLEXI_TYPE_MENU_ITEM_USAGE" description="FLEXI_TYPE_MENU_ITEM_USAGE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NONE</option>
