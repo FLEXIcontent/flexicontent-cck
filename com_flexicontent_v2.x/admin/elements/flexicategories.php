@@ -27,6 +27,11 @@ JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'
 // Load the category class
 require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.categories.php');
 
+		
+FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+flexicontent_html::loadFramework('jQuery');
+flexicontent_html::loadFramework('select2');
+
 /**
  * Renders a category list
  *
@@ -78,7 +83,7 @@ class JFormFieldFlexicategories extends JFormField
 			$attribs .= ' multiple="multiple" ';
 			$attribs .= (@$attributes['size']) ? ' size="'.$attributes['size'].'" ' : ' size="8" ';
 			$fieldname .= !FLEXI_J16GE ? "[]" : "";  // NOTE: this added automatically in J2.5
-			$onclick = ""
+			/*$onclick = ""
 				."${element_id} = document.getElementById(\"${element_id}\");"
 				."if (${element_id}.size<40) {"
 				."	${element_id}_oldsize = ${element_id}.size;"
@@ -93,14 +98,15 @@ class JFormFieldFlexicategories extends JFormField
 				."if (parent.hasClass(\"jpane-slider\")) parent.setStyle(\"height\", \"auto\");"
 			;
 			$style = 'display:inline-block;'.(FLEXI_J16GE ? 'float:left; margin: 6px 0px 0px 18px;':'margin:0px 0px 6px 12px');
-			$maximize_link = "<a style='$style' href='javascript:;' onclick='$onclick' >Maximize/Minimize</a>";
+			$maximize_link = "<a style='$style' href='javascript:;' onclick='$onclick' >Maximize/Minimize</a>";*/
 		} else {
-			$maximize_link = '';
+			//$maximize_link = '';
 		}
+		$maximize_link = '';
 		
 		$top = @$attributes['top'] ? $attributes['top'] : false;
 		
-		$classes = ' inputbox ';
+		$classes = 'use_select2_lib ';
 		$classes .= ( @$attributes['required'] && @$attributes['required']!='false' ) ? ' required' : '';
 		$classes .= $node->attributes('validation_class') ? ' '.$node->attributes('validation_class') : '';
 		$classes = ' class="'.$classes.'"';

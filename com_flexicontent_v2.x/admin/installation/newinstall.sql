@@ -1,7 +1,7 @@
 INSERT INTO `#__flexicontent_fields`
 	(`id`,`field_type`,`name`,`label`,`description`,`isfilter`,`iscore`,`issearch`,`isadvsearch`,`untranslatable`,`formhidden`,`valueseditable`,`edithelp`,`positions`,`published`,`attribs`,`checked_out`,`checked_out_time`,`access`,`ordering`)
 VALUES
-	(1,'maintext','text','Description','Main description text (introtext/fulltext)',0,1,1,0,0,0,0,2,'description.items.default',1,'display_label=0\ntrigger_onprepare_content=0',0,'0000-00-00 00:00:00',1,2),
+	(1,'maintext','text','Description','Main description text (introtext/fulltext)',0,1,1,0,0,0,0,2,'description.items.default',1,'display_label=0\ntrigger_onprepare_content=1',0,'0000-00-00 00:00:00',1,2),
 	(2,'created','created','Created','Date this item was created',0,1,1,0,0,0,0,2,'top.items.default\nabove-description-line1-nolabel.category.blog',1,'display_label=1\ndate_format=DATE_FORMAT_LC1\ncustom_date=\npretext=\nposttext=',0,'0000-00-00 00:00:00',1,3),
 	(3,'createdby','created_by','Created by','User who created this item',0,1,1,0,0,0,0,2,'top.items.default\nabove-description-line1-nolabel.category.blog',1,'display_label=1\npretext=\nposttext=',0,'0000-00-00 00:00:00',1,4),
 	(4,'modified','modified','Last modified','Date this item was last modified',0,1,1,0,0,0,0,2,'top.items.default',1,'display_label=1\ndate_format=DATE_FORMAT_LC1\ncustom_date=\npretext=\nposttext=',0,'0000-00-00 00:00:00',1,5),
