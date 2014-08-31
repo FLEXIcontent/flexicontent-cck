@@ -397,6 +397,8 @@ class FlexicontentHelperRoute
 			$link .= '&Itemid='.$menuitem->id;
 		} else if ($menuitem = FlexicontentHelperRoute::_findDirectory($needles)) {
 			$link .= '&Itemid='.$menuitem->id;
+			$link = str_replace('view=category', 'view=flexicontent', $link);
+			$link = str_replace('cid=', 'rootcat=', $link);
 		} else {
 			if ($component_default_menuitem_id === null)
 				$component_default_menuitem_id = FlexicontentHelperRoute::_setComponentDefaultMenuitemId();
