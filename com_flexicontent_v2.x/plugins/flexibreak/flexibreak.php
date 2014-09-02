@@ -106,7 +106,8 @@ class plgContentFlexiBreak extends JPlugin
 		// Add Javascript instant navigation
 		if ($display_method == 1)
 		{
-			JHTML::_('behavior.mootools');
+			FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+			flexicontent_html::loadFramework('jQuery');
 			if ($this->params->get('plugin_css', 1))
 				$document->addScript($base.'.js');
 		}
