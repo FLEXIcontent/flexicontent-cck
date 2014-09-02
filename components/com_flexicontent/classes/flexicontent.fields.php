@@ -431,21 +431,32 @@ class FlexicontentFields
 		static $_created = array();
 		$flexiview = JRequest::getVar('view');
 		
+		if (is_array($_items) && is_string($_field)) ;  // ok
+		else if (is_object($_items) && is_object($_field)) ; // ok
+		else {
+			echo "renderField() must be called with: renderField(array of items, 'field_name',...) or  renderField(item object, field object,...)<br/>";
+			exit;
+		}
+		
 		// If $method (e.g. display method) is already created,
 		// then return the $field without recreating the $method
 		if ( is_object($_field) && isset($_field->{$method}) ) return $_field;
-		$field_name = !is_object($_field) ?  $_field  :  $_field->name;
 		
 		// Handle multi-item call
 		if (!is_array($_items)) {
-			$_items_ = array( & $_items );
+			$all_items = array( & $_items );
+			$field_name = $_field->name;
+			$field_object = $_field;
 		} else {
-			$_items_ = & $_items ;
+			$all_items = & $_items ;
+			$field_name = $_field;
+			$item = reset($_items);
+			$field_object = $item->fields[$field_name];
 		}
 		
 		// Skip items that have already created the given 'method' for this 'field'
 		$items = array();
-		foreach ($_items_ as $_item_) {
+		foreach ($all_items as $_item_) {
 			if (isset($_created[$method][$field_name][$_item_->id])) continue;  // Skip this item
 			$items[] = $_item_;
 			$_created[$method][$field_name][$_item_->id] = 1;
@@ -455,7 +466,7 @@ class FlexicontentFields
 		// Create field parameters (and values) in an optimized way, and also apply Type Customization for CORE fields
 		// ***********************************************************************************************************
 		foreach($items as $item) {
-			$field = $item->fields[$field_name];
+			$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
 			$field->item_id = (int)$item->id;
 			
 			// NOTE: currently ignored and overwritten by all CORE fields
@@ -497,7 +508,7 @@ class FlexicontentFields
 		{
 			// DOES NOT support multiple items YET, do it 1 at a time
 			foreach($items as $item) {
-				$field = $item->fields[$field_name];
+				$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
 				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array(&$field, $item, null, $method) );
 			}
@@ -519,8 +530,12 @@ class FlexicontentFields
 		
 		// Just get configuration out of the field of the first item,
 		// if this was different per $field, then we should move it inside the item loop (below)
-		$item = reset($items);
-		$field = $item->fields[$field_name];
+		if ( !is_array($_items) ) {
+			$field = $_field;
+		} else {
+			$item = reset($items);
+			$field = $item->fields[$field_name];
+		}
 		if ( !isset($_trigger_plgs_ft[$field_name]) ) {
 			$_t = $field->parameters->get('trigger_onprepare_content', 0);
 			if ($flexiview=='category') $_t = $_t && $field->parameters->get('trigger_plgs_incatview', 1);
@@ -529,7 +544,7 @@ class FlexicontentFields
 			
 		// DOES NOT support multiple items, do it 1 at a time
 		foreach($items as $item) {
-			$field = $item->fields[$field_name];
+			$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
 			//echo "RENDER: ".$field_name."<br/>";
 			if ( $_trigger_plgs_ft[$field_name] ) {
 				if ($print_logging_info)  $start_microtime = microtime(true);	
@@ -694,17 +709,18 @@ class FlexicontentFields
 		
 		$always_create_fields_display = $params->get('always_create_fields_display',0);
 		
-		// Render some fields by default, for compatibility reasons, but avoid rendering these fields again (2nd time), because there are in template positions
+		// Render some fields by default, this is done for compatibility reasons, but avoid rendering these fields again (2nd time),
+		// since some of them may also be in template positions. NOTE: this is not needed since renderField() should detect this case
 		$_rendered = array();
 		if ($always_create_fields_display != 3) { // value 3 means never create for any view (blog template incompatible)
 			
-			$item = reset($items);
+			$item = reset($items); // get the first item ... so that we can get the name of CORE fields out of it
 			
 		  // 'description' item field is implicitly used by category layout of some templates (blog), render it
 		  $custom_values = null;
 		  if ($view == 'category') {
 		    if (isset($item->fields['text'])) {
-		    	$field = $item->fields['text'];
+		    	$_field_name_ = 'text';
 		    	FlexicontentFields::renderField($items, 'text', $custom_values, $method='display', $view);
 		    }
 		    $_rendered['ALL']['text'] = 1;
@@ -714,7 +730,8 @@ class FlexicontentFields
 		    $_rendered['ALL']['core'] = 1;
 				foreach ($item->fields as $field) {
 					if ($field->iscore) {
-						FlexicontentFields::renderField($item, $field, $custom_values, $method='display', $view);
+						$_field_name_ = $field->name;
+						FlexicontentFields::renderField($items, $_field_name_, $custom_values, $method='display', $view);
 					}
 				}
 			}
