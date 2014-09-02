@@ -721,7 +721,7 @@ class FlexicontentFields
 		  if ($view == 'category') {
 		    if (isset($item->fields['text'])) {
 		    	$_field_name_ = 'text';
-		    	FlexicontentFields::renderField($items, 'text', $custom_values, $method='display', $view);
+		    	FlexicontentFields::renderField($items, $_field_name_, $custom_values, $method='display', $view);
 		    }
 		    $_rendered['ALL']['text'] = 1;
 		  }
