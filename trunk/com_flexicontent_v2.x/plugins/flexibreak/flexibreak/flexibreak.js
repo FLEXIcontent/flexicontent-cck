@@ -9,23 +9,23 @@ var flexibreak = new Class({
 		}, options || {});
 		this.current = 0;
 		
-		this.el = $(element);
+		this.el   = jQuery('#'+element);
 		this.elid = element;
 		
-		this.titles = $$('#' + this.elid + ' ul li .tocLink');
-		this.panels = $$('.articlePage');
-		this.show = $$('.tocAll');
+		this.titles = jQuery('#' + this.elid + ' ul li .tocLink').toArray();
+		this.panels = jQuery('.articlePage').toArray();
+		this.show = jQuery('.tocAll').toArray();
 		
 		this.titles.each(function(item) {
-			item.addEvent('click', function(){
-					index = this.titles.indexOf($(item));
+			jQuery(item).bind('click', function(){
+					index = this.titles.indexOf(item);
 					this.activate(this.panels[index]);
 				}.bind(this)
 			);
 		}.bind(this));
 
 		this.show.each(function(item) {
-			item.addEvent('click', function(){
+			jQuery(item).bind('click', function(){
 					this.showall(item);
 				}.bind(this)
 			);
@@ -48,18 +48,18 @@ var flexibreak = new Class({
 		if(page == this.activeTitle) {
 			return;
 		}
-		if(!$defined(skipAnim))
+		if(skipAnim==null)
 		{
 			skipAnim = false;
 		}
 		
-		var newPage = page.getProperty('id');
-		this.panels.removeClass('active');
-		this.show.removeClass('active');
-		$$('.tocNav').setStyle('display', 'block');
+		var newPage = jQuery(page).attr('id');
+		jQuery(this.panels).removeClass('active');
+		jQuery(this.show).removeClass('active');
+		jQuery('.tocNav').css('display', 'block');
 		
-		this.activePanel = (MooTools.version>='1.2.4') ? this.panels.filter("#"+newPage)[0] : this.panels.filterById(newPage)[0];
-		this.activePanel.addClass('active');
+		this.activePanel = jQuery(this.panels).filter("#"+newPage)[0];
+		jQuery(this.activePanel).addClass('active');
 
 		/*if(this.options.changeTransition != 'none' && skipAnim==false)
 		{
@@ -72,24 +72,24 @@ var flexibreak = new Class({
 			});
 		}*/
 
-		this.titles.removeClass('active');
-		this.current = this.panels.indexOf($(page));
-		this.titles[this.current].addClass('active');
+		jQuery(this.titles).removeClass('active');
+		this.current = this.panels.indexOf(page);
+		jQuery(this.titles[this.current]).addClass('active');
 		this.activeTitle = page;
 		
 		if (this.options.wrap == false) {
 			if (this.current == 0) {
-				$$('.tocPrev').setStyle('display', 'none');
-				$$('.tocNext').setStyle('display', 'inline-block');
+				jQuery('.tocPrev').css('display', 'none');
+				jQuery('.tocNext').css('display', 'inline-block');
 			} else if (this.current == this.panels.length - 1) {
-				$$('.tocNext').setStyle('display', 'none');
-				$$('.tocPrev').setStyle('display', 'inline-block');
+				jQuery('.tocNext').css('display', 'none');
+				jQuery('.tocPrev').css('display', 'inline-block');
 			} else {
-				$$('.tocPrev').setStyle('display', 'inline-block');
-				$$('.tocNext').setStyle('display', 'inline-block');
+				jQuery('.tocPrev').css('display', 'inline-block');
+				jQuery('.tocNext').css('display', 'inline-block');
 			}
 			var outoftotal = '['+(this.current+1)+'/'+this.panels.length+']';
-			(MooTools.version>='1.2.4') ? $$('.tocPrevNextCnt').set('html', outoftotal) : $$('.tocPrevNextCnt').setHTML(outoftotal);
+			jQuery('.tocPrevNextCnt').html(outoftotal);
 		}
 	},
 
@@ -110,11 +110,11 @@ var flexibreak = new Class({
 	},
 	
 	showall: function(page){
-		$$('.tocNav').setStyle('display', 'none');
-		this.panels.addClass('active');
-				
-		this.titles.removeClass('active');
-		page.addClass('active');
+		jQuery('.tocNav').css('display', 'none');
+		jQuery(this.panels).addClass('active');
+		
+		jQuery(this.titles).removeClass('active');
+		jQuery(page).addClass('active');
 		this.activeTitle = page;
 	}
 });

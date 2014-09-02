@@ -651,16 +651,16 @@ $js ='
 			
 			onWalk: function(currentItem, currentPageHandle, currentItemHandle){
 				this.items.removeClass("mod_fc_activeitem");
-				currentItem.addClass("mod_fc_activeitem");
+				jQuery(currentItem).addClass("mod_fc_activeitem");
 				
 				'.( !$show_page_handles ? '' : '
 				this.page_handles.removeClass("active");
-				currentPageHandle.addClass("active");
+				jQuery(currentPageHandle).addClass("active");
 				').'
 				
 				'.( !$show_item_handles ? '' : '
 				this.item_handles.removeClass("active");
-				currentItemHandle.addClass("active");
+				jQuery(currentItemHandle).addClass("active");
 				').'
 				
 				'.( !$show_curritem_info ? '' : '
