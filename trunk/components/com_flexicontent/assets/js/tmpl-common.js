@@ -360,47 +360,49 @@ jQuery(document).ready(function() {
 
 
 	// add Tag-Like text search autocomplete
-	jQuery('input.fc_index_complete_tlike').select2(
-	{
-		placeholder: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
-		multiple: true,
-		minimumInputLength: 1,
-		separator: " ",
-		allowClear: true,
-	
-		initSelection : function (element, callback) {
-			var data = [];
-			jQuery(element.val().split(" ")).each(function () {
-				data.push({id: this, text: this});
-			});
-			callback(data);
-		},
-	
-		ajax: {
-			quietMillis: 200,
-			url: "index.php?option=com_flexicontent&tmpl=component",
-			dataType: 'json',
-			//Our search term and what page we are on
-			data: function (term, page) {
-				return {
-					type: (jQuery(this).hasClass('fc_adv_complete') ? "adv_index" : "basic_index"),
-					task: "txtautocomplete",
-					text: term,
-					pageSize: fc_select_pageSize,
-					pageNum: page,
-					cid: parseInt(_FC_GET['cid']),
-					cids: _FC_GET['cids'],
-					filter_13: _FC_GET['filter_13']
-				};
+	if(typeof jQuery('input.fc_index_complete_tlike').select2!=='undefined') {
+		jQuery('input.fc_index_complete_tlike').select2(
+		{
+			placeholder: Joomla.JText._('FLEXI_TYPE_TO_LIST'),
+			multiple: true,
+			minimumInputLength: 1,
+			separator: " ",
+			allowClear: true,
+		
+			initSelection : function (element, callback) {
+				var data = [];
+				jQuery(element.val().split(" ")).each(function () {
+					data.push({id: this, text: this});
+				});
+				callback(data);
 			},
-			results: function (data, page) {
-				//Used to determine whether or not there are more results available,
-				//and if requests for more data should be sent in the infinite scrolling
-				var more = (page * fc_select_pageSize) < data.Total;
-				return { results: data.Matches, more: more };
+		
+			ajax: {
+				quietMillis: 200,
+				url: "index.php?option=com_flexicontent&tmpl=component",
+				dataType: 'json',
+				//Our search term and what page we are on
+				data: function (term, page) {
+					return {
+						type: (jQuery(this).hasClass('fc_adv_complete') ? "adv_index" : "basic_index"),
+						task: "txtautocomplete",
+						text: term,
+						pageSize: fc_select_pageSize,
+						pageNum: page,
+						cid: parseInt(_FC_GET['cid']),
+						cids: _FC_GET['cids'],
+						filter_13: _FC_GET['filter_13']
+					};
+				},
+				results: function (data, page) {
+					//Used to determine whether or not there are more results available,
+					//and if requests for more data should be sent in the infinite scrolling
+					var more = (page * fc_select_pageSize) < data.Total;
+					return { results: data.Matches, more: more };
+				}
 			}
-		}
-	});
+		});
+	}
 	
 	jQuery('body').prepend(
 	 	"<span id='fc_filter_form_blocker'>" +
