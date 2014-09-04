@@ -122,13 +122,13 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 		// Make the filename safe
 		jimport('joomla.filesystem.file');
-		$file['name']	= JFile::makeSafe($file['name']);
 
 		// Sanitize filename further and make unique
 		$params = null;
+		$filename_original = strip_tags($file['name']);  // Store original filename before sanitizing the filename
 		$upload_check = flexicontent_upload::check( $file, $err, $params );
-		$filename 	= flexicontent_upload::sanitize($path, $file['name']);
-		$filepath 	= JPath::clean($path.strtolower($filename));
+		$filename 	  = flexicontent_upload::sanitize($path, $file['name']);
+		$filepath 	  = JPath::clean($path.strtolower($filename));
 		
 		// Check if uploaded file is valid
 		if (!$upload_check) {
@@ -205,7 +205,8 @@ class FlexicontentControllerFilemanager extends FlexicontentController
 
 				$obj = new stdClass();
 				$obj->filename    = $filename;
-				$obj->altname     = $filetitle ? $filetitle : $filename;
+				$obj->filename_original = $filename_original;
+				$obj->altname     = $filetitle ? $filetitle : $filename_original;
 				$obj->url         = 0;
 				$obj->secure      = $secure;
 				$obj->ext         = $ext;

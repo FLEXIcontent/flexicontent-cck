@@ -534,6 +534,10 @@ class FlexicontentViewItems  extends JViewLegacy
 		// Load custom behaviours: form validation, popup tooltips
 		//JHTML::_('behavior.formvalidation');
 		JHTML::_('behavior.tooltip');
+		if (FLEXI_J30GE) {
+			JHtml::_('bootstrap.tooltip');
+		}
+		
 		//JHTML::_('script', 'joomla.javascript.js', 'includes/js/');
 
 		// Add css files to the document <head> section (also load CSS joomla template override)

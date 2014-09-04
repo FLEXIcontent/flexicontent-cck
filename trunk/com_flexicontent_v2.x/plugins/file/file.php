@@ -178,10 +178,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			'  <input class="fcfield_textval inputbox inline_style_published" size="'.$size.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.'" readonly="readonly" dir="rtl"/>' :
 			'  <input class="fcfield_textval inputbox inline_style_unpublished" size="'.$size.'" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.' [UNPUBLISHED]" readonly="readonly" dir="rtl"/>'
 			)*/
+			$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
 			$field->html[] =
 				($file_data->published ?
-				'  <span class="fcfield_textval inputbox inline_style_published" type="text" id="a_name'.$i.'" readonly="readonly" >'.$file_data->filename.'</span>' :
-				'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" [UNPUBLISHED]" readonly="readonly" >'.$file_data->filename.'</span>'
+				'  <span class="fcfield_textval inputbox inline_style_published" type="text" id="a_name'.$i.'" readonly="readonly" >'.$filename_original.'</span>' :
+				'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" [UNPUBLISHED]" readonly="readonly" >'.$filename_original.'</span>'
 				)
 				. $move2 . $remove_button
 				.'  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file_id.'" />'
@@ -218,6 +219,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		static $langs = null;
 		if ($langs === null) $langs = FLEXIUtilities::getLanguages('code');
 		
+		static $tooltips_added = false;
 		static $isMobile = null;
 		static $isTablet = null;
 		static $useMobile = null;
@@ -231,6 +233,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$isTablet = $mobileDetector->isTablet();
 			//$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 			//printf('<br/>-- [Detect Mobile: %.3f s] ', $time_passed/1000000);
+		}
+		if (!$tooltips_added) {
+			FLEXI_J30GE ? JHtml::_('bootstrap.tooltip') : JHTML::_('behavior.tooltip');
+			$tooltips_added = true;
 		}
 		
 		$field->label = JText::_($field->label);
@@ -255,6 +261,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$link_filename      = $field->parameters->get( 'link_filename', 1 ) ;
 		$display_filename	= $field->parameters->get( 'display_filename', 1 ) ;
 		$display_lang     = $field->parameters->get( 'display_lang', 1 ) ;
+		$display_size			= $field->parameters->get( 'display_size', 0 ) ;
 		$display_hits     = $field->parameters->get( 'display_hits', 0 ) ;
 		$display_descr		= $field->parameters->get( 'display_descr', 1 ) ;
 		
@@ -383,7 +390,17 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		// Optimization, do some stuff outside the loop
 		static $hits_icon = null;
 		if ($hits_icon===null && ($display_hits==1 || $display_hits==3)) {
-			$_attribs = $display_hits==1 ? 'class="icon-hits hasTip" title=":: %s '.JText::_( 'FLEXI_HITS', true ).'"' : 'class="icon-hits"';
+
+			if ($display_hits==1) {
+				$_tooltip_title   = '';
+				$_tooltip_content = '%s '.JText::_( 'FLEXI_HITS', true );
+				$_attribs = FLEXI_J30GE ?
+					'class="hasTooltip icon-hits" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"' :
+					'class="hasTip icon-hits" title="'.$_tooltip_title.'::'.$_tooltip_content.'"';
+			} else {
+				$_attribs = ' class="icon-hits"';
+			}
+			
 			$hits_icon = FLEXI_J16GE ?
 				JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) :
 				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
@@ -394,6 +411,14 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		foreach($files_data as $file_id => $file_data)
 		{
+			// Check if it exists and get file size
+			$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
+			$abspath = str_replace(DS, '/', JPath::clean($basePath.DS.$file_data->filename));
+			if ($display_size) {
+				$path_exists = file_exists($abspath);
+				$file_data->size = $path_exists ? filesize($abspath) : 0;
+			}
+			
 			// *****************************
 			// Check user access on the file
 			// *****************************
@@ -408,7 +433,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$is_public  = $file_data->access <= $public_acclevel;
 				}
 			}
-
+			
 			// If no access and set not to show then continue
 			if ( !$authorized && !$noaccess_display ) continue;
 			
@@ -426,7 +451,11 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$icon = '';
 			if ($useicon) {
 				$file_data	= $this->addIcon( $file_data );
-				$icon = JHTML::image($file_data->icon, $file_data->ext, 'class="icon-mime hasTip" title="'.JText::_('FLEXI_FIELD_FILE_TYPE').'::'.$file_data->ext.'"');
+				$_tooltip_title   = '';
+				$_tooltip_content = JText::_( 'FLEXI_FIELD_FILE_TYPE', true ) .': '. $file_data->ext;
+				$icon = FLEXI_J30GE ?
+					JHTML::image($file_data->icon, $file_data->ext, 'class="icon-mime hasTooltip" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 1, 0).'"'):
+					JHTML::image($file_data->icon, $file_data->ext, 'class="icon-mime hasTip" title="'.$_tooltip_title.'::'.$_tooltip_content.'"');
 				$icon = '<span class="fcfile_mime">'.$icon.'</span>';
 			}
 			
@@ -439,10 +468,13 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				$lang = '<span class="fcfile_lang">';
 				if ( $add_lang_img && @ $langs->{$file_data->language}->imgsrc ) {
 					if (!$add_lang_txt) {
-						$lang_tip = JText::_( 'FLEXI_LANGUAGE', true ).'::'.($file_data->language=='*' ? JText::_("All") : $langs->{$file_data->language}->name);
-						$_attribs = '" class="icon-lang hasTip" title="'.$lang_tip.'"';
+						$_tooltip_title   = JText::_( 'FLEXI_LANGUAGE', true );
+						$_tooltip_content = $file_data->language=='*' ? JText::_("All") : $langs->{$file_data->language}->name;
+						$_attribs = FLEXI_J30GE ?
+							'class="hasTooltip icon-lang" title="'.JHtml::tooltipText($_tooltip_title, $_tooltip_content, 0, 0).'"' :
+							'class="hasTip icon-lang" title="'.$_tooltip_title.'::'.$_tooltip_content.'"';
 					} else {
-						$_attribs = '" class="icon-lang"';
+						$_attribs = ' class="icon-lang"';
 					}
 					$lang .= "\n".'<img src="'.$langs->{$file_data->language}->imgsrc.'" '.$_attribs.' /> ';
 				}
@@ -453,7 +485,22 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			}
 			
 			
-			// c. HITS: either as icon or as inline text or both
+			// c. SIZE: in KBs / MBs
+			$sizeinfo = '';
+			if ($display_size)
+			{
+				$sizeinfo = '<span class="fcfile_size">';
+				if ($display_size==1)
+					$sizeinfo .= '('.number_format($file_data->size / 1024, 0).'&nbsp;'.JTEXT::_('FLEXI_KBS').')';
+				else if ($display_size==2)
+					$sizeinfo .= '('.number_format($file_data->size / 1048576, 2).'&nbsp;'.JTEXT::_('FLEXI_MBS').')';
+				else
+					$sizeinfo .= '('.number_format($file_data->size / 1073741824, 2).'&nbsp;'.JTEXT::_('FLEXI_GBS').')';
+				$sizeinfo .= '</span>';
+			}
+			
+			
+			// d. HITS: either as icon or as inline text or both
 			$hits = '';
 			if ($display_hits)
 			{
@@ -468,15 +515,20 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			}
 			
 			
-			// d. FILENAME / TITLE: decide whether to show it (if we do not use button, then displaying of filename is forced)
+			// e. FILENAME / TITLE: decide whether to show it (if we do not use button, then displaying of filename is forced)
 			$_filetitle = $file_data->altname ? $file_data->altname : $file_data->filename;
 			if ($lowercase_filename) $_filetitle = mb_strtolower( $_filetitle, "UTF-8");
-			$name_str   = $display_filename==2 ? $file_data->filename : $_filetitle;
+			
+			$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
+			$$filename_original = str_replace( array("'", "\""), array("\\'", ""), $filename_original );
+			$filename_original = htmlspecialchars($filename_original, ENT_COMPAT, 'UTF-8');
+			
+			$name_str   = $display_filename==2 ? $filename_original : $_filetitle;
 			$name_classes = $file_classes.($file_classes ? ' ' : '').'fcfile_title';
 			$name_html  = '<span class="'.$name_classes.'">'. $name_str . '</span>';
 			
 			
-			// e. DESCRIPTION: either as tooltip or as inline text
+			// f. DESCRIPTION: either as tooltip or as inline text
 			$descr_tip = $descr_inline = $descr_icon = '';
 			if (!empty($file_data->description)) {
 				if ( !$authorized ) {
@@ -525,6 +577,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 				$info_arr[] = $icon .' '. $name_html;
 			}
 			if ($lang) $info_arr[] = $lang;
+			if ($sizeinfo) $info_arr[] = $sizeinfo;
 			if ($hits) $info_arr[] = $hits;
 			if ($descr_icon) $info_arr[] = $descr_icon;
 			$str .= implode($info_arr, $infoseptxt);
@@ -701,9 +754,8 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			
 			// Some extra data for developers: (absolute) file URL and (absolute) file path
 			$field->url[]      = $dl_link;
+			$file->abspath[] = $abspath;
 			$field->file_data[] = $file_data;
-			$basePath = $file_data->secure ? COM_FLEXICONTENT_FILEPATH : COM_FLEXICONTENT_MEDIAPATH;
-			$file->abspath[] = str_replace(DS, '/', JPath::clean($basePath.DS.$file_data->filename));
 			
 			$n++;
 		}
@@ -835,7 +887,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		}
-		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('description'), $properties_spacer=' ', $filter_func='strip_tags');
+		FlexicontentFields::onIndexAdvSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('altname', 'description'), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
 	
@@ -857,7 +909,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$field->field_valuesjoin   = ' JOIN #__flexicontent_files AS file ON file.id = fi.value';
 			$field->field_groupby      = null;
 		}
-		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('description'), $properties_spacer=' ', $filter_func='strip_tags');
+		FlexicontentFields::onIndexSearch($field, $values, $item, $required_properties=array('filename'), $search_properties=array('altname', 'description'), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
 	
@@ -885,7 +937,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		{
 			// Only query files that are not already cached
 			$db = JFactory::getDBO();
-			$query = 'SELECT * '. $extra_select //filename, altname, description, ext, id'
+			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
 					. ' FROM #__flexicontent_files'
 					. ' WHERE id IN ('. implode(',', $new_ids) . ')'
 					. ($published ? '  AND published = 1' : '')

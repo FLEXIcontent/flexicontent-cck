@@ -35,6 +35,8 @@ class flexicontent_files extends JTable
 	/** @var string */
 	var $filename			= '';
 	/** @var string */
+	var $filename_original = '';
+	/** @var string */
 	var $altname			= '';
 	/** @var int */
 	var $url				= 0;

@@ -1,8 +1,8 @@
 var flexibreak = new Class({
 	initialize: function(element, options) {
 		this.options = Object.extend({
-			changeTransition:	Fx.Transitions.Expo.easeOut,
-			duration:	200,
+			/*changeTransition:	Fx.Transitions.Expo.easeOut,
+			duration:	200,*/
 			mouseOverClass:	'active',
 			activateOnLoad:	'first',
 			wrap:	false

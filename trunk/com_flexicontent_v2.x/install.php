@@ -527,6 +527,9 @@ if (!FLEXI_J16GE) {
 						$queries[] = "ALTER TABLE `#__flexicontent_items_versions` ADD `qindex03` MEDIUMTEXT NULL DEFAULT NULL AFTER `qindex02`";
 					}*/
 					
+					if ( $files_tbl_exists && !array_key_exists('filename_original', $tbl_fields['#__flexicontent_files'])) {
+						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `filename_original` VARCHAR(255) NOT NULL DEFAULT '' AFTER `filename`";
+					}
 					if ( $files_tbl_exists && !array_key_exists('description', $tbl_fields['#__flexicontent_files'])) {
 						$queries[] = "ALTER TABLE `#__flexicontent_files` ADD `description` TEXT NOT NULL DEFAULT '' AFTER `altname`";
 					}
