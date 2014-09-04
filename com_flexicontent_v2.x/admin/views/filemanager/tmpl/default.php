@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1910 2014-06-08 17:48:19Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1929 2014-07-08 17:04:16Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -408,6 +408,7 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 			<th width="5"><input type="checkbox" name="toggle" value="" onclick="<?php echo FLEXI_J30GE ? 'Joomla.checkAll(this);' : 'checkAll('.count( $this->rows).');'; ?>" /></th>
 			<th width="5"><?php echo JText::_( 'FLEXI_THUMB' ); ?></th>
 			<th class="title"><?php echo JHTML::_('grid.sort', 'FLEXI_FILENAME', 'f.filename', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
+			<th class=""><?php echo JHTML::_('grid.sort', 'FLEXI_ORIGINAL_FILENAME', 'f.filename_original', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width=""><?php echo JHTML::_('grid.sort', 'FLEXI_FILE_TITLE', 'f.altname', $this->lists['order_Dir'], $this->lists['order'] ); ?></th>
 			<th width="1%" nowrap="nowrap"><?php echo JText::_( 'FLEXI_PUBLISHED' ); ?></th>
 			<th width=""><?php echo JText::_( 'FLEXI_ACCESS' ); ?></th>
@@ -459,6 +460,9 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 		foreach ($this->rows as $row) {
 			unset($thumb_or_icon);
 			$filename    = str_replace( array("'", "\""), array("\\'", ""), $row->filename );
+			$filename_original = str_replace( array("'", "\""), array("\\'", ""), $row->filename_original );
+			$display_filename  = $filename_original ? $filename_original : $filename;
+			
 			if ( !in_array($row->ext, $imageexts)) $thumb_or_icon = JHTML::image($row->icon, $row->filename);
 			
 			$checked 	= @ JHTML::_('grid.checkedout', $row, $i );
@@ -474,8 +478,8 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 			
 			$file_path    = str_replace('\\', '/', $file_path);
 			if ( empty($thumb_or_icon) ) {
-				$thumb_or_icon = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&amp;w=60&amp;h=60';
-				$thumb_or_icon = "<img src=\"$thumb_or_icon\" alt=\"$filename\" />";
+				$thumb_or_icon = JURI::root() . 'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $file_path . '&w=60&h=60';
+				$thumb_or_icon = "<img src=\"$thumb_or_icon\" alt=\"$display_filename\" />";
 			}
 			
 			$row->count_assigned = 0;
@@ -523,6 +527,18 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 				?>
 				<span class="editlinktip hasTip" title="<?php echo JText::_('FLEXI_FILENAME'); ?>::<?php echo htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'); ?>">
 				<?php echo ' <a href="index.php?option=com_flexicontent&amp;'.$ctrl_task.'edit&amp;cid[]='.$row->id.'">'.$filename.'</a>'; ?>
+				</span>
+			</td>
+			<td align="left">
+				<?php
+					if (JString::strlen($row->filename_original) > 25) {
+						$filename = JString::substr( htmlspecialchars($row->filename_original, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
+					} else {
+						$filename = htmlspecialchars($row->filename_original, ENT_QUOTES, 'UTF-8');
+					}
+				?>
+				<span class="editlinktip hasTip" title="<?php echo JText::_('FLEXI_FILENAME'); ?>::<?php echo htmlspecialchars($row->filename_original, ENT_QUOTES, 'UTF-8'); ?>">
+				<?php echo $row->filename_original; ?>
 				</span>
 			</td>
 			<td>

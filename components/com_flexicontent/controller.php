@@ -1768,7 +1768,7 @@ class FlexicontentController extends JControllerLegacy
 			$field_type = $fields_props[$field_id]->field_type;
 			
 			$lta = FLEXI_J16GE ? 'i' : 'ie';
-			$query  = 'SELECT f.id, f.filename, f.altname, f.secure, f.url'
+			$query  = 'SELECT f.id, f.filename, f.filename_original, f.altname, f.secure, f.url'
 					. ', i.title as item_title, i.introtext as item_introtext, i.fulltext as item_fulltext, u.email as item_owner_email'
 					. ', i.access as item_access, '.$lta.'.language as item_language, ie.type_id as item_type_id'
 					
@@ -2170,10 +2170,11 @@ class FlexicontentController extends JControllerLegacy
 		header("Cache-Control: private", false); // required for certain browsers
 		header("Content-Type: ".$dlfile->ctype);
 		//quotes to allow spaces in filenames
+		$download_filename = isset($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
 		if ($method == 'view') {
-			header("Content-Disposition: inline; filename=\"".$dlfile->filename."\";" );
+			header("Content-Disposition: inline; filename=\"".$download_filename."\";" );
 		} else {
-			header("Content-Disposition: attachment; filename=\"".$dlfile->filename."\";" );
+			header("Content-Disposition: attachment; filename=\"".$download_filename."\";" );
 		}
 		header("Content-Transfer-Encoding: binary");
 		header("Content-Length: ".$dlfile->size);

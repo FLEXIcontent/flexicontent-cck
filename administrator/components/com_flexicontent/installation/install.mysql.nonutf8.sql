@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS `#__flexicontent_fields_type_relations` (
 CREATE TABLE IF NOT EXISTS `#__flexicontent_files` (
   `id` int(11) NOT NULL auto_increment,
   `filename` varchar(255) NOT NULL,
+  `filename_original` varchar(255) NOT NULL default '',
   `altname` varchar(255) NOT NULL,
   `description` text NOT NULL default '',
   `url` tinyint(3) unsigned NOT NULL default '0',

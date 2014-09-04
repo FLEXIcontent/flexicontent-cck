@@ -53,6 +53,16 @@ function submitbutton(pressbutton) {
 		<tr>
 			<td class="key">
 				<label for="altname">
+					<?php echo JText::_( 'FLEXI_ORIGINAL_FILENAME' ).':'; ?>
+				</label>
+			</td>
+			<td>
+				<input name="filename_original" value="<?php echo $this->row->filename_original; ?>" size="50" maxlength="100" />
+			</td>
+		</tr>
+		<tr>
+			<td class="key">
+				<label for="altname">
 					<?php echo JText::_( 'FLEXI_FILE_TITLE' ).':'; ?>
 				</label>
 			</td>
