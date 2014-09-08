@@ -446,20 +446,22 @@ class FlexicontentFields
 		if (!is_array($_items)) {
 			$all_items = array( & $_items );
 			$field_name = $_field->name;
-			$field_object = $_field;
 		} else {
 			$all_items = & $_items ;
 			$field_name = $_field;
-			$item = reset($_items);
-			$field_object = $item->fields[$field_name];
 		}
 		
-		// Skip items that have already created the given 'method' for this 'field'
+		// Skip items that have already created the given 'method' for this 'field' and for the given view
+		// we also use VIEW so that we can reder different displays of the field e.g. item VIEW and module view
 		$items = array();
 		foreach ($all_items as $_item_) {
-			if (isset($_created[$method][$field_name][$_item_->id])) continue;  // Skip this item
+			if (isset($_created[$view][$method][$field_name][$_item_->id])) continue;  // Skip this item
 			$items[] = $_item_;
-			$_created[$method][$field_name][$_item_->id] = 1;
+			$_created[$view][$method][$field_name][$_item_->id] = 1;
+		}
+		// Check if item array is empty (all items already rendered)
+		if (empty($items)) {
+			return !is_object($_field) ? null : $_field;
 		}
 		
 		// ***********************************************************************************************************
@@ -497,6 +499,12 @@ class FlexicontentFields
 		if ($print_logging_info)  global $fc_run_times;
 		if ($print_logging_info)  $start_microtime = microtime(true);
 		
+		if ( !is_array($_items) ) {
+			$field = $_field;
+		} else {
+			$item = reset($items);
+			$field = $item->fields[$field_name];
+		}
 		if ($field->iscore == 1)  // CORE field
 		{
 			//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$item->parameters, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
@@ -541,7 +549,7 @@ class FlexicontentFields
 			if ($flexiview=='category') $_t = $_t && $field->parameters->get('trigger_plgs_incatview', 1);
 			$_trigger_plgs_ft[$field_name] = $_t;
 		}
-			
+		
 		// DOES NOT support multiple items, do it 1 at a time
 		foreach($items as $item) {
 			$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
@@ -727,15 +735,15 @@ class FlexicontentFields
 		  }
 			// 'core' item fields are IMPLICITLY used by some item layout of some templates (blog), render them
 			else if ($view == FLEXI_ITEMVIEW) {
-		    $_rendered['ALL']['core'] = 1;
 				foreach ($item->fields as $field) {
 					if ($field->iscore) {
 						$_field_name_ = $field->name;
 						FlexicontentFields::renderField($items, $_field_name_, $custom_values, $method='display', $view);
 					}
 				}
+		    $_rendered['ALL']['core'] = 1;
 			}
-	  }
+		}
 		
 		
 		// *** RENDER fields on DEMAND, (if present in template positions)
@@ -751,15 +759,16 @@ class FlexicontentFields
 				if (!isset($item->fields[$f]))  continue;
 				$field = $item->fields[$f];
 				
+				// Render ANY CORE field with single call for all items (check if already rendered)
 				if ($field->iscore) {
-					// Check if already rendered
 					if ( !isset($_rendered['ALL']['core']) && !isset($_rendered['ALL'][$f]) ) {
-						$_rendered['ALL'][$f] = 1;
 						$values = null;
 						FlexicontentFields::renderField($items, $f, $values, $method, $view);
+						$_rendered['ALL'][$f] = 1;
 					}
 				}
 				
+				// Render ANY non-CORE field with per item call (check if already rendered)
 				else foreach ($items as $item) {
 					// Check if already rendered
 					if ( !isset($_rendered['ALL'][$f]) && !isset($_rendered[$item->id][$f]) ) {
@@ -1770,7 +1779,10 @@ class FlexicontentFields
 	// Get a language specific handler for parsing the text to be added to the search index
 	// e.g. doing word segmentation for a language that does not space-separate the words
 	static function getLangHandler($language) {
-		if ($language == 'th-TH') {
+		$cparams   = JComponentHelper::getParams('com_flexicontent');
+		$filter_word_like_any = $cparams->get('filter_word_like_any', 0);
+		
+		if ($language == 'th-TH' && $filter_word_like_any==0) {
 			$segmenter_path = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'THSplitLib'.DS.'segment.php';
 			if ( JFile::exists($segmenter_path) )
 			{

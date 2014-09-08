@@ -18,6 +18,13 @@
 				<option value="0">No, Use all below</option>
 				<option value="1">Yes</option>
 			</field>
+
+			<field name="show_type_label" type="list" default="" label="FLEXI_TYPE_SEARCH_LABEL" description="FLEXI_TYPE_SEARCH_LABEL_DESC">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
+
 			<field name="contenttypes" type="types" default="" label="Searchable Types &lt;br/&gt; &lt;small&gt;(Select NONE for -ALL-)&lt;/small&gt;" description="The content types the search will include, selecting none will include ALL. NOTE: You can allow user to select Content Types. If you do then the selection list will be LIMITED to display ONLY the types specified here" multiple="true" />
 			
 			

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1916 2014-06-17 19:18:48Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1931 2014-07-17 16:32:27Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1012,7 +1012,10 @@ class flexicontent_html
 
 		// Clean cache
 		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache();
+			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+			$cache = FLEXIUtilities::getCache($group='', 1);
 			$cache->clean('com_flexicontent_items');
 			$cache->clean('com_flexicontent_filters');
 		} else {
@@ -1442,7 +1445,7 @@ class flexicontent_html
 		if ( !$params->get('show_editbutton', 1) || JRequest::getCmd('print') ) return;
 		
 		$user	= JFactory::getUser();
-
+		
 		// Determine if current user can edit the given item
 		$has_edit = false;
 		if (FLEXI_J16GE) {
@@ -1471,9 +1474,16 @@ class flexicontent_html
 			}
 			$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 			$text 		= JText::_( 'FLEXI_EDIT' );
-
-			$link = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit'.'&cid='.$item->categoryslug.'&id='.$item->slug; //.'&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1'.'&typeid='.$item->type_id
-			$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+			
+			// maintain menu item ? e.g. current category view, 
+			$Itemid = JRequest::getInt('Itemid', 0);
+			
+			//$Itemid = 0;
+			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
+			$link = $item_url
+				.(strstr($item_url, '?') ? '&' : '?')
+				.'task=edit';
+			$output	= '<a href="'.$link.'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
 
 			return $output;
 		}
@@ -3941,7 +3951,9 @@ class FLEXIUtilities
 			
 			foreach ($languages as $lang) {
 				// Calculate/Fix languages data
-				$lang->shortcode = substr($lang->code, 0, strpos($lang->code,'-'));
+				$lang->shortcode = strpos($lang->code,'-') ?
+					substr($lang->code, 0, strpos($lang->code,'-')) :
+					$lang->code;
 				//$lang->id = $lang->extension_id;
 				$image_prefix = $lang->image_prefix ? $lang->image_prefix : $lang->shortcode;
 				// $lang->image, holds a custom image path
@@ -4006,13 +4018,18 @@ class FLEXIUtilities
 	 */
 	static function getLanguages($hash='code')
 	{
-		$langs = new stdClass();
+		static $langs = array();
+		static $languages;
+		
+		if (isset($langs[$hash])) return $langs[$hash];
+		if (!$languages) $languages = FLEXIUtilities::getlanguageslist();
+		
+		$langs[$hash] = new stdClass();
+		foreach ($languages as $language) {
+			$langs[$hash]->{$language->$hash} = $language;
+		}
 
-		$languages = FLEXIUtilities::getlanguageslist();
-		foreach ($languages as $language)
-			$langs->{$language->$hash} = $language;
-
-		return $langs;
+		return $langs[$hash];
 	}
 
 

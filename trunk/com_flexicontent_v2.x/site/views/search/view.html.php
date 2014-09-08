@@ -579,7 +579,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		// put the filtered results back into the model
 		// for next release, the checks should be done in the model perhaps...
 		$state->set('keyword', $searchword);
-
+		$filter_word_like_any = $params->get('filter_word_like_any', 0);
+		
 		if(!$error)
 		{
 			$results	= $this->get('data' );
@@ -612,10 +613,14 @@ class FLEXIcontentViewSearch extends JViewLegacy
 					$result->text = implode($parts, " <br/> ");
 					
 					$replace_count_total = 0;
-					foreach ($searchwords as $_word) {
-						$searchRegex = '#('. preg_quote($_word, '#') .'[^\s]*)#iu';
-						$result->text = preg_replace($searchRegex, '<span class="highlight">\0</span>', $result->text, 1, $replace_count );
-						if ($replace_count) $replace_count_total++;
+					
+					// This is for LIKE %word% search for languages without spaces
+					if ($filter_word_like_any == 0) {
+						foreach ($searchwords as $_word) {
+							$searchRegex = '#('. preg_quote($_word, '#') .'[^\s]*)#iu';
+							$result->text = preg_replace($searchRegex, '<span class="highlight">\0</span>', $result->text, 1, $replace_count );
+							if ($replace_count) $replace_count_total++;
+						}
 					}
 					
 					// Add some message about matches

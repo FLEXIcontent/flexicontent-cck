@@ -359,7 +359,8 @@ class FlexicontentHelperRoute
 			return $link;
 		}
 		
-		// Try 2: given item's language (or current language), this will fallback to also try '*' (language 'ALL')
+		// Try 2: given item's language (or current language)
+		// IMPORTAT NOTE: this will fallback to also try '*' (language 'ALL') ONLY IF none menu items of current language are found
 		if ($menuitem = FlexicontentHelperRoute::_findItem($needles)) {
 			$link .= '&Itemid='.$menuitem->id;
 			return $link;
@@ -562,6 +563,7 @@ class FlexicontentHelperRoute
 				}
 				if ($view == FLEXI_ITEMVIEW) {
 					if ( !empty($menuitem->query['id']) )  self::$lookup[$language][$view][$menuitem->query['id']] = (int) $menuitem->id;
+					//if ( !empty($menuitem->query['id']) )  echo FLEXI_ITEMVIEW ." - ". $menuitem->query['id'] . ": ".$menuitem->id."<br/>";
 				} else if ($view == 'category') {
 					if ( !empty($menuitem->query['cid']) )  self::$lookup[$language][$view][$menuitem->query['cid']] = (int) $menuitem->id;
 				} else if ($view == 'flexicontent') {

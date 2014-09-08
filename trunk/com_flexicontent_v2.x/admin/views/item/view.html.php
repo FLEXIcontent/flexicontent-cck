@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1911 2014-06-12 01:55:58Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1941 2014-08-30 18:54:42Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -211,7 +211,7 @@ class FlexicontentViewItem extends JViewLegacy
 				}
 			}
 			
-			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? ':' : '?') .'preview=1';
+			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? '&' : '?') .'preview=1';
 			//$previewlink     = str_replace('&amp;', '&', $previewlink);
 			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)) .$autologin;
 

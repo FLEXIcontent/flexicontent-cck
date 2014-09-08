@@ -903,7 +903,13 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		$text = JRequest::getString('filter', '', 'default');
 		//$text = $this->_params->get('use_search') ? $text : '';
-		$phrase = JRequest::getVar('searchphrase', 'exact', 'default');
+		// Check for LIKE %word% search, for languages without spaces
+		$filter_word_like_any = $cparams->get('filter_word_like_any', 0);
+		if ($filter_word_like_any) {
+			$phrase = JRequest::getVar('searchphrase', 'any', 'default');
+		} else {
+			$phrase = JRequest::getVar('searchphrase', 'exact', 'default');
+		}
 		$si_tbl = 'flexicontent_items_ext';
 		
 		$text = trim( $text );
@@ -959,17 +965,22 @@ class FlexicontentModelCategory extends JModelLegacy {
 				
 				case 'any':
 				default:
-					$words = preg_split('/\s\s*/u', $text);
-					$stopwords = array();
-					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
-					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
-					JRequest::setVar('shortwords', implode(' ', $shortwords));
-					
-					$newtext = implode( '* ', $words ) . '*';
-					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
-					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					// Check for LIKE %word% search, for languages without spaces
+					if ($filter_word_like_any) {
+						$_text_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
+					} else {
+						$words = preg_split('/\s\s*/u', $text);
+						$stopwords = array();
+						$shortwords = array();
+						$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
+						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+						JRequest::setVar('shortwords', implode(' ', $shortwords));
+						
+						$newtext = implode( '* ', $words ) . '*';
+						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+						$quoted_text = $db->Quote( $quoted_text, false );
+						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					}
 					break;
 			}
 			

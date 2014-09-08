@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: form.php 1901 2014-05-07 02:37:25Z ggppdk $
+ * @version 1.5 stable $Id: form.php 1949 2014-09-04 01:22:18Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -217,7 +217,9 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	?>
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
-
+		
+		<?php ob_start();  ?>
+		
 		<div id="flexi_form_submit_msg">
 			<?php echo JText::_('FLEXI_FORM_IS_BEING_SUBMITTED'); ?>
 		</div>
@@ -259,7 +261,13 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			</button>
 			
 		</div>
-    
+		<?php $form_buttons_html = ob_get_clean(); ?>
+		
+		<?php if ( $this->params->get('buttons_placement_fe', 0)==0 ) : ?>
+			<?php /* PLACE buttons at TOP of form*/ ?>
+			<?php echo $form_buttons_html; ?>
+		<?php endif; ?>
+		
 		<?php
 			$submit_msg = $approval_msg = '';
 			// A message about submitting new Content via configuration parameter
@@ -571,8 +579,10 @@ ob_start();  // categories ?>
 					// display secondary categories if permitted
 					$mcats_tooltip = 'class="editlinktip '.(FLEXI_J30GE?'hasTooltip':'hasTip').'"'.
 						' style="display:inline-block;" title="'.
-						(FLEXI_J30GE ? JHtml::tooltipText(trim(JText::_('FLEXI_NOTES'), ':'), htmlspecialchars(JText::_( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8'), 0):htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8')).'::'
-						.htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8').'" ';
+						(FLEXI_J30GE ?
+							JHtml::tooltipText(trim(JText::_('FLEXI_NOTES'), ':'), htmlspecialchars(JText::_( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8'), 0) :
+							htmlspecialchars(JText::_ ( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_ ( 'FLEXI_CATEGORIES_NOTES' ), ENT_COMPAT, 'UTF-8').'" '
+						);
 					echo '<span '.$mcats_tooltip.'>'.$infoimage.'</span>';
 				}
 			?>
@@ -1533,6 +1543,11 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 // REMAINING FORM
 // **************
 ?>
+		<?php if ( $this->params->get('buttons_placement_fe', 0)==1 ) : ?>
+			<?php /* PLACE buttons at BOTTOM of form*/ ?>
+			<br class="clear" />
+			<?php echo $form_buttons_html; ?>
+		<?php endif; ?>
 		
 		<br class="clear" />
 		<?php echo JHTML::_( 'form.token' ); ?>
