@@ -96,11 +96,24 @@ $r = 0;
 		<table id="fc_textsearch_tbl" class="fc_search_tbl <?php echo $this->escape($this->params->get('pageclass_sfx')); ?>" cellspacing="1">
 		
 			<tr id="fcsearch_contenttypes_row" class="fc_search_row_<?php echo (($r++)%2);?>">
+				<?php if($this->params->get('show_type_label', 1)): ?>
+				<td class='fc_search_label_cell' width="1%">
+					<label for="contenttypes">
+						<?php echo JText::_('FLEXI_SEARCH_CONTENT_TYPE'); ?>
+					</label>
+				</td>
+				<td class="fc_search_option_cell">
+					<span class="fc_filter_html">
+						<?php echo $this->lists['contenttypes'];?>
+					</span>
+				</td>
+				<?php else: ?>
 				<td colspan="1" class="fc_search_option_cell">
 					<span class="fc_filter_html">
 						<?php echo $this->lists['contenttypes'];?>
 					</span>
 				</td>
+				<?php endif; ?>
 			</tr>
 		</table>
 	</fieldset>

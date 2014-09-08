@@ -392,12 +392,17 @@ class FlexicontentModelCategory extends JModelAdmin
 	 *
 	 * @since	1.6
 	 */
-	protected function cleanCache($group = NULL, $client_id = 0)
+	protected function cleanCache($group = NULL, $client_id = -1)
 	{
-		$cache = JFactory::getCache('com_flexicontent');
-		$cache->clean();
-		$catscache = JFactory::getCache('com_flexicontent_cats');
-		$catscache->clean();
+		if ($client_id == -1) {  // -1 means both
+			parent::cleanCache($group='com_flexicontent', 0);
+			parent::cleanCache($group='com_flexicontent_cats', 0);
+			parent::cleanCache($group='com_flexicontent', 1);
+			parent::cleanCache($group='com_flexicontent_cats', 1);
+		} else {
+			parent::cleanCache($group='com_flexicontent', $client_id);
+			parent::cleanCache($group='com_flexicontent_cats', $client_id);
+		}
 	}
 	
 	/**

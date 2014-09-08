@@ -721,7 +721,10 @@ class FlexicontentController extends JControllerLegacy
 		// CLEAN THE CACHE so that our changes appear realtime
 		// ***************************************************
 		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache();
+			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+			$cache = FLEXIUtilities::getCache($group='', 1);
 			$cache->clean('com_flexicontent_items');
 			$cache->clean('com_flexicontent_filters');
 		} else {
@@ -828,13 +831,15 @@ class FlexicontentController extends JControllerLegacy
 		
 		// REDIRECT CASE FOR APPLYING: Save and reload the item edit form
 		if ($task=='apply') {
-			
 			$msg = JText::_( 'FLEXI_ITEM_SAVED' );
+			
 			// Create the URL
-			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug) . $autologin );
+			global $globalcats;
+			$Itemid = JRequest::getInt('Itemid', 0);  // maintain current menu item if this was given
+			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $globalcats[$item->catid]->slug, $Itemid));
 			$link = $item_url
-				.(strstr($item_url, '?') ? ':' : '?')
-				.'option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&task=edit&id='.(int) $model->_item->id .'&'. (FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()) .'=1';
+				.(strstr($item_url, '?') ? '&' : '?').'task=edit'
+				;
 			
 			// Important pass referer back to avoid making the form itself the referer
 			// but also check that referer URL is 'safe' (allowed) , e.g. not an offsite URL, otherwise set referer to HOME page

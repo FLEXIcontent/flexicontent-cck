@@ -211,7 +211,7 @@ class FlexicontentViewItem extends JViewLegacy
 				}
 			}
 			
-			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? ':' : '?') .'preview=1';
+			$previewlink     = /*$server .*/ $item_url. (strstr($item_url, '?') ? '&' : '?') .'preview=1';
 			//$previewlink     = str_replace('&amp;', '&', $previewlink);
 			//$previewlink = JRoute::_(JURI::root() . FlexicontentHelperRoute::getItemRoute($item->id.':'.$item->alias, $categories[$item->catid]->slug)) .$autologin;
 

@@ -217,7 +217,9 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	?>
 
 	<form action="<?php echo $this->action ?>" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data">
-
+		
+		<?php ob_start();  ?>
+		
 		<div id="flexi_form_submit_msg">
 			<?php echo JText::_('FLEXI_FORM_IS_BEING_SUBMITTED'); ?>
 		</div>
@@ -259,7 +261,13 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 			</button>
 			
 		</div>
-    
+		<?php $form_buttons_html = ob_get_clean(); ?>
+		
+		<?php if ( $this->params->get('buttons_placement_fe', 0)==0 ) : ?>
+			<?php /* PLACE buttons at TOP of form*/ ?>
+			<?php echo $form_buttons_html; ?>
+		<?php endif; ?>
+		
 		<?php
 			$submit_msg = $approval_msg = '';
 			// A message about submitting new Content via configuration parameter
@@ -485,7 +493,7 @@ if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item
 				<?php
 					//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
 					if(FLEXI_J30GE){
-										$label_tooltip = 'class="hasTooltip flexi_label fcdualline" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_PUBLIC_DOCUMENT_CHANGES'), ':'), htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC' ), ENT_COMPAT, 'UTF-8'), 0).'"';
+						$label_tooltip = 'class="hasTooltip flexi_label fcdualline" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_PUBLIC_DOCUMENT_CHANGES'), ':'), htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC' ), ENT_COMPAT, 'UTF-8'), 0).'"';
 					}else{
 						$label_tooltip = 'class="hasTip flexi_label fcdualline" title="'.htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC' ), ENT_COMPAT, 'UTF-8').'"';
 					}
@@ -539,7 +547,7 @@ if ( $typeid && $this->params->get('allowdisablingcomments_fe') ) : ob_start(); 
 if ( $typeid && $this->params->get('allow_subscribers_notify_fe', 0) && $this->subscribers) :  ob_start();  // notify_subscribers ?>
 	<?php
 		if(FLEXI_J30GE){
-				$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_NOTIFY_FAVOURING_USERS'), ':'), htmlspecialchars(JText::_( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8'), 0).'"';
+			$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_NOTIFY_FAVOURING_USERS'), ':'), htmlspecialchars(JText::_( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8'), 0).'"';
 		}else{
 			$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars(JText::_( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8').'"';
 		}
@@ -614,7 +622,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 		<?php
 		$field = $this->fields['tags'];
 		if(FLEXI_J30GE){
-				$label_tooltip = $field->description ? 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim($field->label, ':'), htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8'), 0).'"':'class="flexi_label"';
+			$label_tooltip = $field->description ? 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim($field->label, ':'), htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8'), 0).'"':'class="flexi_label"';
 		}else{
 			$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
 		}
@@ -683,7 +691,7 @@ if ((FLEXI_FISH || FLEXI_J16GE) && $this->params->get('uselang_fe', 1)) : ob_sta
 			<div class="fcclear"></div>
 			<?php
 				if(FLEXI_J30GE){
-								$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_ORIGINAL_CONTENT_ITEM'), ':'), htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8'), 0).'"';
+					$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_ORIGINAL_CONTENT_ITEM'), ':'), htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8'), 0).'"';
 				}else{
 					$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8').'"';
 				}
@@ -1442,6 +1450,11 @@ if ( count($tab_fields['below']) || count($captured) ) : ?>
 // REMAINING FORM
 // **************
 ?>
+		<?php if ( $this->params->get('buttons_placement_fe', 0)==1 ) : ?>
+			<?php /* PLACE buttons at BOTTOM of form*/ ?>
+			<br class="clear" />
+			<?php echo $form_buttons_html; ?>
+		<?php endif; ?>
 		
 		<br class="clear" />
 		<?php echo JHTML::_( 'form.token' ); ?>
