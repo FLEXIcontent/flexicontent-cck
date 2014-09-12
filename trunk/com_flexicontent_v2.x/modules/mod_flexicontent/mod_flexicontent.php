@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: mod_flexicontent.php 1840 2014-02-01 18:12:56Z ggppdk $
+ * @version 1.2 $Id: mod_flexicontent.php 1904 2014-05-20 12:21:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -138,6 +138,9 @@ if ( $show_mod )
 	
 	// Create Item List Data
 	$list_arr = modFlexicontentHelper::getList($params);
+	
+	// Get comments for the items (if enabled), NOTE !! TODO: modify templates and XML file so that this used
+	$comments_arr = modFlexicontentHelper::getComments($params, $list_arr);
 	
 	$mod_fc_run_times['category_data_retrieval'] = $modfc_jprof->getmicrotime();
 	

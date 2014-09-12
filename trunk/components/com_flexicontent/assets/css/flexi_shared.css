@@ -907,6 +907,10 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 
 #flexicontent .flexi_label.fcdualline { width:32%; padding: 6px 2% 6px 2% !important; }
 
+#flexicontent .pane-sliders .group-rules label.hasTip {
+  width: auto;
+}
+
 #flexicontent .pane-sliders label.hasTip, #flexicontent .pane-sliders label.hasTooltip,
 #flexicontent .params_set label.hasTip, #flexicontent .params_set label.hasTooltip,
 #flexicontent .flexi_params label.hasTip, #flexicontent .flexi_params label.hasTooltip,

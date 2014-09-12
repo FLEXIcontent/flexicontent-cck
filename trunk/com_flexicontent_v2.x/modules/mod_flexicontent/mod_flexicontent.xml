@@ -771,7 +771,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FEAT" level="level3" menu="hide" />
-			<field name="display_comments_feat" type="radio" default="1" label="FLEXI_DISPLAY_comments" description="FLEXI_DISPLAY_comments_DESC" >
+			<field name="display_comments_feat" type="radio" default="1" label="FLEXI_DISPLAY_comments" description="FLEXI_DISPLAY_COMMENTS_DESC" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -781,6 +781,20 @@
 				<option value="2">FLEXI_NO</option>
 			</field>
 			
+			<!--field name="" type="separator" default="FLEXI_COMMENTS_PARAMS" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_STD" level="level3" menu="hide" />
+			<field name="list_comments" type="radio" default="0" label="FLEXI_LIST_COMMENTS" description="FLEXI_LIST_COMMENTS_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="comments_limit" type="text" default="4" label="FLEXI_UMOD_COMMENTS_LIST_LIMIT" description="FLEXI_UMOD_COMMENTS_LIST_LIMIT_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_FEAT" level="level3" menu="hide" />
+			<field name="list_comments_feat" type="radio" default="0" label="FLEXI_LIST_COMMENTS" description="FLEXI_LIST_COMMENTS_DESC" >
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="comments_limit_feat" type="text" default="4" label="FLEXI_UMOD_COMMENTS_LIST_LIMIT" description="FLEXI_UMOD_COMMENTS_LIST_LIMIT_DESC" /-->
 			
 			<field name="" type="separator" default="FLEXI_FIELDS_PARAMS" level="level1" menu="hide" />
 			<field name="" type="separator" default="FLEXI_STD" level="level3" menu="hide" />

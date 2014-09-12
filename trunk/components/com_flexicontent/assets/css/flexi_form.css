@@ -256,6 +256,7 @@ html button {
 	-webkit-border-radius: 6px !important;
 	-moz-border-radius: 6px !important;
 	border-radius: 6px !important;
+	line-height:1.4em !important;
 	font-size:12px !important;
 	font-family:arial, helvetica, sans-serif !important;
 	padding: 5px 10px 5px 10px !important;

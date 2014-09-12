@@ -441,18 +441,18 @@ fieldset.fc_filter_set {
 	height: 16px !important;
 	border: 0px solid !important;
 	padding: 0px !important;
-	margin: 0px 0px 10px 0px !important;
+	margin: 0px 0px 10px 2px !important;
 	display: inline-block !important;
 	vertical-align: bottom !important;
 }
 
 /* displayed in date picker */
-#flexicontent .fc_filter .input-append,
-#flexicontent .fc_filter .input-prepend {
-	margin:0px !important;
+#flexicontent .fc_filter_html .input-append,
+#flexicontent .fc_filter_html .input-prepend {
+	margin:0px 4px 0px 0px !important;
 }
-#flexicontent .fc_filter .input-append button,
-#flexicontent .fc_filter .input-prepend button {
+#flexicontent .fc_filter_html .input-append button,
+#flexicontent .fc_filter_html .input-prepend button {
 	margin-top:6px !important;
 }
 
@@ -579,6 +579,9 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_filter_html .fc_filter_element { display:inline-block; white-space: nowrap; position: relative; }
 
 /* The form element(s) of each field filter inside filter's HTML */
+.fc_field_filter label, .flexicontent .fc_field_filter {
+	font-size: 11px !important;
+}
 .fc_text_filter, .flexicontent .fc_text_filter,
 .fc_field_filter, .flexicontent .fc_field_filter {
 	color: black !important;

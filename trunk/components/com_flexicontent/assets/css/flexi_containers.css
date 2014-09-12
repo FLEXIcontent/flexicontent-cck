@@ -116,10 +116,11 @@
  ****************/
 
 ul.statetoggler {
-	float: right !important;
+	/*float: right !important;*/
+	vertical-align: top;
 	display: inline-block !important;
 	list-style: none !important;
-	margin: 2px 0px 0px 10px !important;
+	margin: 4px 0px 0px 8px !important;
 	padding: 0 !important;
 	width: auto !important;
 }
