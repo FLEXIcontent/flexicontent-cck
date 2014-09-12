@@ -139,6 +139,9 @@ if ( $show_mod )
 	// Create Item List Data
 	$list_arr = modFlexicontentHelper::getList($params);
 	
+	// Get comments for the items (if enabled), NOTE !! TODO: modify templates and XML file so that this used
+	$comments_arr = modFlexicontentHelper::getComments($params, $list_arr);
+	
 	$mod_fc_run_times['category_data_retrieval'] = $modfc_jprof->getmicrotime();
 	
 	// Get Category List Data

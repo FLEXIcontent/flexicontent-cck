@@ -59,10 +59,44 @@ class flexicontent_html
 	}
 	
 	
+	/**
+	 * Function to create the tooltip text regardless of Joomla version
+	 *
+	 * @return 	string  : the HTML of the tooltip for usage in the title paramter of the HTML tag
+	 * @since 1.5
+	 */
+	static function getToolTip($title = '', $content = '', $translate = 1, $escape = 1) {
+		if (FLEXI_J30GE) {
+			return JHtml::tooltipText($title, $content, $translate, $escape);
+		}
+		
+		else {
+			// Return empty in no title or content is given.
+			if ($title == '' && $content == '') return '';
+			
+			// Pass texts through the JText.
+			if ($translate) {
+				$title = JText::_($title);
+				$content = JText::_($content);
+			}
+			
+			// Escape the texts.
+			if ($escape) {
+				$title = htmlspecialchars($title, ENT_COMPAT, 'UTF-8');
+				$content = htmlspecialchars($content, ENT_COMPAT, 'UTF-8');
+			}
+			
+			// Return only the title or content if no title or content is given respectively
+			return $title.'::'.$content;
+		}
+	}
+	
+	
 	static function escape($str) {
 		return addslashes(htmlspecialchars($str, ENT_COMPAT, 'UTF-8'));
 	}
-
+	
+	
 	static function get_basedomain($url)
 	{
 		$pieces = parse_url($url);
@@ -1064,19 +1098,35 @@ class flexicontent_html
 		}
 
 		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
-
-		if ($params->get('show_icons')) 	{
+		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
+		
+		// This checks template image directory for image, if none found, default image is returned
+		$show_icons = $params->get('show_icons');
+		if ( $show_icons ) {
+			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
 			$image = FLEXI_J16GE ?
-				JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), NULL) :
-				JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_FEED' )) ;
+				JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), $attribs) :
+				JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_FEED' ), $attribs);
 		} else {
-			$image = '&nbsp;'.JText::_( 'FLEXI_FEED' );
+			$image = '';
 		}
-
+		
 		$overlib = JText::_( 'FLEXI_FEED_TIP' );
 		$text = JText::_( 'FLEXI_FEED' );
-
-		$output	= '<a href="'. $link .'" class="editlinktip hasTip" onclick="window.open(this.href,\'win2\',\''.$status.'\'); return false;" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+		
+		if ( $show_icons==1 ) {
+			$caption = '';
+			$tooltip_class = 'editlinktip';
+		} else {
+			$caption = $text;
+			$tooltip_class = 'fc_button';
+		}
+		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
+		
+		// $link as set above
+		$output	= '<a href="'.$link.'" class="'.$tooltip_class.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
 	}
@@ -1093,26 +1143,42 @@ class flexicontent_html
 		if ( !$params->get('show_print_icon') || JRequest::getCmd('print') ) return;
 		
 		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
-
-		// checks template image directory for image, if non found default are loaded
-		if ( $params->get( 'show_icons' ) ) {
+		
+		if ( JRequest::getInt('pop') ) {
+			$onclick = ' window.print(); return false; ';
+			$link = 'javascript:;';
+		} else {
+			$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
+			$link = JRoute::_($print_link);
+		}
+		
+		// This checks template image directory for image, if none found, default image is returned
+		$show_icons = $params->get('show_icons');
+		if ( $show_icons ) {
+			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
 			$image = FLEXI_J16GE ?
-				JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), NULL) :
-				JHTML::_('image.site', 'printButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_PRINT' )) ;
+				JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), $attribs) :
+				JHTML::_('image.site', 'printButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_PRINT' ), $attribs);
 		} else {
-			$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_PRINT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
+			$image = '';
 		}
-
-		if (JRequest::getInt('pop')) {
-			//button in popup
-			$output = '<a href="javascript:;" onclick="window.print();return false;">'.$image.'</a>';
+		
+		$overlib = JText::_( 'FLEXI_PRINT_TIP' );
+		$text = JText::_( 'FLEXI_PRINT' );
+		
+		if ( $show_icons==1 ) {
+			$caption = '';
+			$tooltip_class = 'editlinktip';
 		} else {
-			//button in view
-			$overlib = JText::_( 'FLEXI_PRINT_TIP' );
-			$text = JText::_( 'FLEXI_PRINT' );
-
-			$output	= '<a href="'. JRoute::_($print_link) .'" class="editlinktip hasTip" onclick="window.open(this.href,\'win2\',\''.$status.'\'); return false;" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+			$caption = $text;
+			$tooltip_class = 'fc_button';
 		}
+		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
+		
+		// $link as set above
+		$output	= '<a href="'.$link.'" class="'.$tooltip_class.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
 	}
@@ -1157,23 +1223,38 @@ class flexicontent_html
 			$link 	= $base . JRoute::_( 'index.php?view='.$view, false );
 		}
 
-		$url 	= 'index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink($link);
-
+		$mail_to_url = JRoute::_('index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink($link));
 		$status = 'width=400,height=300,menubar=yes,resizable=yes';
-
-		if ($params->get('show_icons')) 	{
+		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
+		
+		// This checks template image directory for image, if none found, default image is returned
+		$show_icons = $params->get('show_icons');
+		if ( $show_icons ) {
+			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
 			$image = FLEXI_J16GE ?
-				JHTML::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), NULL) :
-				JHTML::_('image.site', 'emailButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EMAIL' )) ;
+				JHTML::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), $attribs) :
+				JHTML::_('image.site', 'emailButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EMAIL' ), $attribs);
 		} else {
-			$image = '&nbsp;'.JText::_( 'FLEXI_EMAIL' );
+			$image = '';
 		}
-
+		
 		$overlib = JText::_( 'FLEXI_EMAIL_TIP' );
 		$text = JText::_( 'FLEXI_EMAIL' );
-
-		$output	= '<a href="'. JRoute::_($url) .'" class="editlinktip hasTip" onclick="window.open(this.href,\'win2\',\''.$status.'\'); return false;" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
-
+		
+		if ( $show_icons==1 ) {
+			$caption = '';
+			$tooltip_class = 'editlinktip';
+		} else {
+			$caption = $text;
+			$tooltip_class = 'fc_button';
+		}
+		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
+		
+		// emailed link was set above
+		$output	= '<a href="'.$mail_to_url.'" class="'.$tooltip_class.'" title="'.$tooltip_title.'" onclick="'.$onclick.'" >'.$image.$caption.'</a>';
+		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		
 		return $output;
 	}
 
@@ -1188,18 +1269,32 @@ class flexicontent_html
 	{
 		if ( FLEXI_J16GE || !$params->get('show_pdf_icon') || JRequest::getCmd('print') ) return;
 		
-		if ( $params->get('show_icons') ) {
+		$show_icons = $params->get('show_icons');
+		if ( $show_icons ) {
+			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
 			$image = FLEXI_J16GE ?
-				JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), NULL) :
-				JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ));
+				JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), $attribs) :
+				JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ), $attribs);
 		} else {
-			$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_CREATE_PDF' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
+			$image = '';
 		}
+		
 		$overlib = JText::_( 'FLEXI_CREATE_PDF_TIP' );
 		$text = JText::_( 'FLEXI_CREATE_PDF' );
-
-		$link 	= 'index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf';
-		$output	= '<a href="'.JRoute::_($link).'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
+		
+		if ( $show_icons==1 ) {
+			$caption = '';
+			$tooltip_class = 'editlinktip';
+		} else {
+			$caption = $text;
+			$tooltip_class = 'fc_button';
+		}
+		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
+		
+		$link 	= JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&cid='.$item->categoryslug.'&id='.$item->slug.'&format=pdf');
+		$output	= '<a href="'.$link.'" class="'.$tooltip_class.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 
 		return $output;
 	}
@@ -1267,8 +1362,16 @@ class flexicontent_html
 			$document->addScriptDeclaration($js);
 			$js_and_css_added = true;
 	 	}
-
-
+	 	
+	 	static $state_names = null;
+	 	static $state_descrs = null;
+	 	static $state_imgs = null;
+	 	if ( !$state_names ) {
+			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>'FLEXI_UNKNOWN');
+			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_ITEM_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_ITEM_PENDING'), -4=>JText::_('FLEXI_SET_ITEM_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
+			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+		}
+		
 		// Create state icon
 		$state = $item->state;
 		$state_text ='';
@@ -1327,31 +1430,34 @@ class flexicontent_html
 			if ($has_archive)    $state_ids[] = FLEXI_J16GE ? 2:-1;
 			if ($has_delete)     $state_ids[]  = -2;
 
-			$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
-			$state_descrs = array(1=>'FLEXI_PUBLISH_THIS_ITEM', -5=>'FLEXI_SET_ITEM_IN_PROGRESS', 0=>'FLEXI_UNPUBLISH_THIS_ITEM', -3=>'FLEXI_SET_ITEM_PENDING', -4=>'FLEXI_SET_ITEM_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVE_THIS_ITEM', -2=>'FLEXI_TRASH_THIS_ITEM');
-			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png');
-
 			$box_css = ''; //$app->isSite() ? 'width:182px; left:-100px;' : '';
 			$publish_info .= '<br><br>'.JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
+			
+			$tooltip_class = 'editlinktip';
+			$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
 			$output ='
 			<ul class="statetoggler">
 				<li class="topLevel">
 					<a href="javascript:void(0);" class="opener" style="outline:none;">
 					<span id="row'.$item->id.'">
-						<span class="editlinktip hasTip" title="'.flexicontent_html::escape(JText::_('FLEXI_PUBLISH_INFORMATION')).'::'.flexicontent_html::escape($publish_info).'">
+						<span class="'.$tooltip_class.'" title="'.$tooltip_title.'">
 							'.$stateicon.'
 						</span>
 					</span>
 					</a>
 					<div class="options" style="'.$box_css.'">
 						<ul>';
-
+				
+				$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+				$title_header = JText::_( 'FLEXI_ACTION' );
 				foreach ($state_ids as $i => $state_id) {
+					$tooltip_title = flexicontent_html::getToolTip($title_header, $state_descrs[$state_id], 0);
 					$spacer = in_array($state_id,$separators_at) ? '' : '';
 					$output .='
 							<li>
-								<a href="javascript:void(0);" onclick="dostate(\''.$state_id.'\', \''.$item->id.'\')" class="closer hasTip" title="'.JText::_( 'FLEXI_ACTION' ).'::'.JText::_( $state_descrs[$state_id] ).'">
-									<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" border="0" alt="'.JText::_( $state_names[$state_id] ).'" />
+								<a href="javascript:void(0);" onclick="dostate(\''.$state_id.'\', \''.$item->id.'\')" class="closer '.$tooltip_class.'" title="'.$tooltip_title.'">
+									<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" border="0" alt="'.$state_names[$state_id].'" />
 								</a>
 							</li>';
 				}
@@ -1363,12 +1469,18 @@ class flexicontent_html
 
 		} else if ($app->isAdmin()) {
 			if ($canChangeState) $publish_info .= '<br><br>'.JText::_('FLEXI_STATE_CHANGER_DISABLED');
+
+			$tooltip_class = 'editlinktip';
+			$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
+			
 			$output = '
 				<div id="row'.$item->id.'">
-					<span class="editlinktip hasTip" title="'.JText::_( 'FLEXI_PUBLISH_INFORMATION' ).'::'.$publish_info.'">
+					<span class="'.$tooltip_class.'" title="'.$tooltip_title.'">
 						'.$stateicon.'
 					</span>
 				</div>';
+			$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
 		} else {
 			$output = '';  // frontend with no permissions to edit / delete / archive
 		}
@@ -1409,27 +1521,37 @@ class flexicontent_html
 			$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
 		}
 
-		// Create the approval button if user cannot edit the item (**note check at top of this method)
-		if ( !$has_edit_state ) {
-			if ( $params->get('show_icons') ) {
-				$attribs = ' style="margin:4px;" width="16" align="top" ';
-				$image = FLEXI_J16GE ?
-					JHTML::image('components/com_flexicontent/assets/images/'.'person2_f2.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) :
-					JHTML::_('image.site', 'person2_f2.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) ;
-			} else {
-				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
-			}
-			$overlib 	= JText::_( 'FLEXI_APPROVAL_REQUEST_INFO' );
-			$text 		= JText::_( 'FLEXI_APPROVAL_REQUEST' );
-
-			$link = 'index.php?option=com_flexicontent&task=approval&cid='.$item->id;
-			$caption = JText::_( 'FLEXI_APPROVAL_REQUEST' );
-			$output	= '<a style="float:right;	padding: 2px 2px 0px 0px !important;" href="'.$link.'" class="fc_bigbutton rc5  editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.$caption.'</a>';
-
-			return $output;
+		// Create the approval button only if user cannot edit the item (**note check at top of this method)
+		if ( $has_edit_state ) return;
+		
+		$show_icons = 2; //$params->get('show_icons');
+		if ( $show_icons ) {
+			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
+			$image = FLEXI_J16GE ?
+				JHTML::image('components/com_flexicontent/assets/images/'.'key_add.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) :
+				JHTML::_('image.site', 'key_add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) ;
+		} else {
+			$image = '';
 		}
-
-		return;
+		
+		$overlib 	= JText::_( 'FLEXI_APPROVAL_REQUEST_INFO' );
+		$text 		= JText::_( 'FLEXI_APPROVAL_REQUEST' );
+		
+		if ( $show_icons==1 ) {
+			$caption = '';
+			$tooltip_class = 'editlinktip';
+		} else {
+			$caption = $text;
+			$tooltip_class = 'fc_button';
+		}
+		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
+		
+		$link = 'index.php?option=com_flexicontent&task=approval&cid='.$item->id;
+		$output	= '<a href="'.$link.'" class="'.$tooltip_class.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		
+		return $output;
 	}
 
 
@@ -1447,48 +1569,56 @@ class flexicontent_html
 		$user	= JFactory::getUser();
 		
 		// Determine if current user can edit the given item
-		$has_edit = false;
+		$has_edit_state = false;
 		if (FLEXI_J16GE) {
 			$asset = 'com_content.article.' . $item->id;
-			$has_edit = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $item->created_by == $user->get('id'));
+			$has_edit_state = $user->authorise('core.edit', $asset) || ($user->authorise('core.edit.own', $asset) && $item->created_by == $user->get('id'));
 			// ALTERNATIVE 1
 			//$rights = FlexicontentHelperPerm::checkAllItemAccess($user->get('id'), 'item', $item->id);
-			//$has_edit = in_array('edit', $rights) || (in_array('edit.own', $rights) && $item->created_by == $user->get('id')) ;
+			//$has_edit_state = in_array('edit', $rights) || (in_array('edit.own', $rights) && $item->created_by == $user->get('id')) ;
 		} else if ($user->gid >= 25) {
-			$has_edit = true;
+			$has_edit_state = true;
 		} else if (FLEXI_ACCESS) {
 			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
-			$has_edit = in_array('edit', $rights) || (in_array('editown', $rights) && $item->created_by == $user->get('id')) ;
+			$has_edit_state = in_array('edit', $rights) || (in_array('editown', $rights) && $item->created_by == $user->get('id')) ;
 		} else {
-			$has_edit = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id'));
+			$has_edit_state = $user->authorize('com_content', 'edit', 'content', 'all') || ($user->authorize('com_content', 'edit', 'content', 'own') && $item->created_by == $user->get('id'));
 		}
 
-		// Create the edit button and return it
-		if ($has_edit) {
-			if ( $params->get('show_icons') ) {
-				$image = FLEXI_J16GE ?
-					JHTML::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), NULL) :
-					JHTML::_('image.site', 'edit.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EDIT' )) ;
-			} else {
-				$image = JText::_( 'FLEXI_ICON_SEP' ) .'&nbsp;'. JText::_( 'FLEXI_EDIT' ) .'&nbsp;'. JText::_( 'FLEXI_ICON_SEP' );
-			}
-			$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
-			$text 		= JText::_( 'FLEXI_EDIT' );
-			
-			// maintain menu item ? e.g. current category view, 
-			$Itemid = JRequest::getInt('Itemid', 0);
-			
-			//$Itemid = 0;
-			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
-			$link = $item_url
-				.(strstr($item_url, '?') ? '&' : '?')
-				.'task=edit';
-			$output	= '<a href="'.$link.'" class="editlinktip hasTip" title="'.$text.'::'.$overlib.'">'.$image.'</a>';
-
-			return $output;
+		// Create the edit button only if user can edit the give item
+		if ( !$has_edit_state ) return;
+		
+		$show_icons = $params->get('show_icons');
+		if ( $show_icons ) {
+			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
+			$image = FLEXI_J16GE ?
+				JHTML::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), $attribs) :
+				JHTML::_('image.site', 'edit.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EDIT' ), $attribs) ;
+		} else {
+			$image = '';
 		}
-
-		return;
+		
+		$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
+		$text 		= JText::_( 'FLEXI_EDIT' );
+		
+		if ( $show_icons==1 ) {
+			$caption = '';
+			$tooltip_class = 'editlinktip';
+		} else {
+			$caption = $text;
+			$tooltip_class = 'fc_button';
+		}
+		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
+		
+		// Maintain menu item ? e.g. current category view, 
+		$Itemid = JRequest::getInt('Itemid', 0);  //$Itemid = 0;
+		$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $item->categoryslug, $Itemid, $item));
+		$link = $item_url  .(strstr($item_url, '?') ? '&' : '?').  'task=edit';
+		$output	= '<a href="'.$link.'" class="'.$tooltip_class.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		
+		return $output;
 	}
 
 	/**
@@ -1594,18 +1724,34 @@ class flexicontent_html
 		// Finally create the submit icon / button
 		// ***************************************
 		
-		$tip_text = JText::_( 'FLEXI_ADD' ) .'::'. $submit_lbl;
-		if ( $params->get('show_icons') && !$auto_relations ) {
-			$attribs = ' style="margin-right:4px;" width="16" align="top" ';
+		$overlib = $submit_lbl;
+		$text = JText::_( 'FLEXI_ADD' );
+		
+		$show_icons = 2; //$params->get('show_icons');
+		if ( $show_icons && !$auto_relations ) {
+			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
 			$image = FLEXI_J16GE ?
-				JHTML::image('components/com_flexicontent/assets/images/'.'add.png', $submit_lbl, $attribs) :
-				JHTML::_('image.site', 'add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $submit_lbl, $attribs) ;
-			$output	= '<a href="'.$link.'" class="editlinktip hasTip" title="'.$tip_text.'">'.$image.'</a>';
+				JHTML::image('components/com_flexicontent/assets/images/'.'plus-button.png', $submit_lbl, $attribs) :
+				JHTML::_('image.site', 'plus-button.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $submit_lbl, $attribs) ;
 		} else {
-			$output	= '<a href="'.$link.'" class="hasTip fc_button fcsimple" title="'.$tip_text.'">'.$submit_lbl.'</a>';
+			$image = '';
 		}
-		$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
-				
+		
+		if ( $show_icons==1 && !$auto_relations ) {
+			$caption = '';
+			$tooltip_class = 'editlinktip';
+		} else {
+			$caption = $text;
+			$tooltip_class = $auto_relations ? 'fc_button fcsimple' : 'fc_button';
+		}
+		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
+		
+		$output	= '<a href="'.$link.'" class="'.$tooltip_class.'" title="'.$tooltip_title.'">'.$image.$caption.'</a>';
+		if (!$auto_relations) {
+			$output	= JText::_( 'FLEXI_ICON_SEP' ) .$output. JText::_( 'FLEXI_ICON_SEP' );
+		}
+		
 		return $output;
 	}
 
@@ -1618,62 +1764,62 @@ class flexicontent_html
 	 */
 	static function stateicon( $state, &$params, &$state_text=null )
 	{
-		// Create image filename and state name
-		if ( $state == 1 ) {
-			$img = 'tick.png';
-			$alt = JText::_( 'FLEXI_PUBLISHED' );
-		} else if ( $state == 0 ) {
-			$img = 'publish_x.png';
-			$alt = JText::_( 'FLEXI_UNPUBLISHED' );
-		} else if ( $state == (FLEXI_J16GE ? 2:-1) ) {
-			$img = 'archive.png';
-			$alt = JText::_( 'FLEXI_ARCHIVED' );
-		} else if ( $state == -2 ) {
-			$img = 'trash.png';
-			$alt = JText::_( 'FLEXI_TRASHED' );
-		} else if ( $state == -3 ) {
-			$img = 'publish_r.png';
-			$alt = JText::_( 'FLEXI_PENDING' );
-		} else if ( $state == -4 ) {
-			$img = 'publish_y.png';
-			$alt = JText::_( 'FLEXI_TO_WRITE' );
-		} else if ( $state == -5 ) {
-			$img = 'publish_g.png';
-			$alt = JText::_( 'FLEXI_IN_PROGRESS' );
-		} else {
-			$img = 'unknown.png';
-			$alt = JText::_( 'FLEXI_UNKNOWN' );
+	 	static $state_names = null;
+	 	static $state_descrs = null;
+	 	static $state_imgs = null;
+	 	static $state_basictips = null;
+	 	static $state_fulltips = null;
+	 	if ( !$state_names ) {
+			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>'FLEXI_UNKNOWN');
+			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_ITEM_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_ITEM_PENDING'), -4=>JText::_('FLEXI_SET_ITEM_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
+			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
 		}
-
-
+		
+	 	if ( !$state_fulltips ) {
+			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$title = JText::_( 'FLEXI_STATE' );
+			foreach($state_names as $state_id => $state_name) {
+				$content = str_replace('::', '-', $state_name);
+				$state_fulltips[$state_id] = flexicontent_html::getToolTip($title, $content, 0);
+			}
+		}
+		
+	 	if ( !$state_basictips ) {
+			foreach($state_names as $state_id => $state_name) {
+				$content = !FLEXI_J30GE ? str_replace('::', '-', $state_name) : $state_name;
+				$state_basictips[$state_id] = $title.' : '.$content;
+			}
+		}
+		
+		// Check for invalid state
+		if ( !isset($state_names[$state]) ) $state = '';
+		
 		// Create popup text
-		$title = JText::_( 'FLEXI_STATE' );
-		$descr = str_replace('::', '-', $alt);
-		$state_text = $title.' : '.$descr;
 		switch ( $params->get('stateicon_popup', 'full') )
 		{
 			case 'basic':
-				$attribs = 'title="'.$state_text.'"';
+				$attribs = 'title="'.$state_basictips[$state].'"';
 				break;
 			case 'none':
 				$attribs = '';
 				break;
 			case 'full': default:
-				$attribs = 'class="editlinktip hasTip" title="'.$title.'::'.$descr.'"';
+				$attribs = 'class="editlinktip '.$tooltip_class.'" title="'.$state_fulltips[$state].'"';
 				break;
 		}
-
+		
 		// Create state icon image
 		$app = JFactory::getApplication();
 		$path = (!FLEXI_J16GE && $app->isAdmin() ? '../' : '').'components/com_flexicontent/assets/images/';
 		if ( $params->get('show_icons', 1) ) {
+			$img = $state_imgs[$state];
 			$icon = FLEXI_J16GE ?
-				JHTML::image($path.$img, $alt, $attribs) :
-				JHTML::_('image.site', $img, $path, NULL, NULL, $alt, $attribs) ;
+				JHTML::image($path.$img, $state_names[$state], $attribs) :
+				JHTML::_('image.site', $img, $path, NULL, NULL, $state_names[$state], $attribs) ;
 		} else {
-			$icon = $descr;
+			$icon = $state_names[$state];
 		}
-
+		
 		return $icon;
 	}
 
@@ -1710,7 +1856,8 @@ class flexicontent_html
 	 */
 	static function voteicons($item, &$params)
 	{
-		if ( $params->get('show_icons') ) {
+		$show_icons = $params->get('show_icons');
+		if ( $show_icons ) {
 			$voteup = FLEXI_J16GE ?
 				JHTML::image('components/com_flexicontent/assets/images/'.'thumb_up.png', JText::_( 'FLEXI_GOOD' ), NULL) :
 				JHTML::_('image.site', 'thumb_up.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_GOOD' ) ) ;
@@ -2480,15 +2627,24 @@ class flexicontent_html
 	 */
 	static function buildstateslist($name, $attribs, $selected, $type=1)
 	{
+	 	static $state_names = null;
+	 	static $state_descrs = null;
+	 	static $state_imgs = null;
+	 	if ( !$state_names ) {
+			$state_names = array(1=>JText::_('FLEXI_PUBLISHED'), -5=>JText::_('FLEXI_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISHED'), -3=>JText::_('FLEXI_PENDING'), -4=>JText::_('FLEXI_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVED'), -2=>JText::_('FLEXI_TRASHED'), ''=>'FLEXI_UNKNOWN');
+			$state_descrs = array(1=>JText::_('FLEXI_PUBLISH_THIS_ITEM'), -5=>JText::_('FLEXI_SET_ITEM_IN_PROGRESS'), 0=>JText::_('FLEXI_UNPUBLISH_THIS_ITEM'), -3=>JText::_('FLEXI_SET_ITEM_PENDING'), -4=>JText::_('FLEXI_SET_ITEM_TO_WRITE'), (FLEXI_J16GE ? 2:-1)=>JText::_('FLEXI_ARCHIVE_THIS_ITEM'), -2=>JText::_('FLEXI_TRASH_THIS_ITEM'), ''=>'FLEXI_UNKNOWN');
+			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png', ''=>'unknown.png');
+		}
+		
 		$state[] = JHTML::_('select.option',  '', JText::_( 'FLEXI_DO_NOT_CHANGE' ) );
-		$state[] = JHTML::_('select.option',  -4, JText::_( 'FLEXI_TO_WRITE' ) );
-		$state[] = JHTML::_('select.option',  -3, JText::_( 'FLEXI_PENDING' ) );
-		$state[] = JHTML::_('select.option',  -5, JText::_( 'FLEXI_IN_PROGRESS' ) );
-		$state[] = JHTML::_('select.option',   1, JText::_( 'FLEXI_PUBLISHED' ) );
-		$state[] = JHTML::_('select.option',   0, JText::_( 'FLEXI_UNPUBLISHED' ) );
-		$state[] = JHTML::_('select.option',  (FLEXI_J16GE ? 2:-1), JText::_( 'FLEXI_ARCHIVED' ) );
-		$state[] = JHTML::_('select.option',  -2, JText::_( 'FLEXI_TRASHED' ) );
-
+		$state[] = JHTML::_('select.option',  -4, $state_names[-4] );
+		$state[] = JHTML::_('select.option',  -3, $state_names[-3] );
+		$state[] = JHTML::_('select.option',  -5, $state_names[-5] );
+		$state[] = JHTML::_('select.option',   1, $state_names[1] );
+		$state[] = JHTML::_('select.option',   0, $state_names[0] );
+		$state[] = JHTML::_('select.option',  (FLEXI_J16GE ? 2:-1), $state_names[(FLEXI_J16GE ? 2:-1)] );
+		$state[] = JHTML::_('select.option',  -2, $state_names[-2] );
+		
 		if ($type==1) {
 			$list = JHTML::_('select.genericlist', $state, $name, $attribs, 'value', 'text', $selected );
 		} else if ($type==2) {
@@ -2497,17 +2653,14 @@ class flexicontent_html
 			$state_ids[] = FLEXI_J16GE ? 2:-1;
 			$state_ids[]  = -2;
 
-			$state_names = array(1=>'FLEXI_PUBLISHED', -5=>'FLEXI_IN_PROGRESS', 0=>'FLEXI_UNPUBLISHED', -3=>'FLEXI_PENDING', -4=>'FLEXI_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVED', -2=>'FLEXI_TRASHED');
-			$state_descrs = array(1=>'FLEXI_PUBLISH_THIS_ITEM', -5=>'FLEXI_SET_ITEM_IN_PROGRESS', 0=>'FLEXI_UNPUBLISH_THIS_ITEM', -3=>'FLEXI_SET_ITEM_PENDING', -4=>'FLEXI_SET_ITEM_TO_WRITE', (FLEXI_J16GE ? 2:-1)=>'FLEXI_ARCHIVE_THIS_ITEM', -2=>'FLEXI_TRASH_THIS_ITEM');
-			$state_imgs = array(1=>'tick.png', -5=>'publish_g.png', 0=>'publish_x.png', -3=>'publish_r.png', -4=>'publish_y.png', (FLEXI_J16GE ? 2:-1)=>'archive.png', -2=>'trash.png');
 			$img_path = JURI::root(true)."/components/com_flexicontent/assets/images/";
 
 			$list = '';
 			foreach ($state_ids as $i => $state_id) {
 				$checked = $state_id==$selected ? ' checked="checked"' : '';
 				$list 	.= '<input id="state'.$state_id.'" type="radio" name="state" class="state" value="'.$state_id.'" '.$checked.'/>';
-				$list 	.= '<label class="state_box" for="state'.$state_id.'" title="'.JText::_( $state_names[$state_id] ).'" >';
-				$list 	.= '<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" border="0" alt="'.JText::_( $state_names[$state_id] ).'" />';
+				$list 	.= '<label class="state_box" for="state'.$state_id.'" title="'.$state_names[$state_id].'" >';
+				$list 	.= '<img src="'.$img_path.$state_imgs[$state_id].'" width="16" height="16" border="0" alt="'.$state_names[$state_id].'" />';
 				$list 	.= '</label>';
 			}
 			$checked = $selected==='' ? ' checked="checked"' : '';

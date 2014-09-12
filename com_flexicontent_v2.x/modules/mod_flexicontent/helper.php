@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1889 2014-04-26 03:25:28Z ggppdk $
+ * @version 1.2 $Id: helper.php 1916 2014-06-17 19:18:48Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1484,7 +1484,8 @@ class modFlexicontentHelper
 		// Additional select and joins for comments
 		$select_comments     = $add_comments ? ', count(com.object_id) AS comments_total' : '';
 		$join_comments_type  = $ordering[1]=='commented' ? ' INNER JOIN' : ' LEFT JOIN';   // Do not require most commented for 2nd level ordering
-		$join_comments       = $add_comments ? $join_comments_type.' #__jcomments AS com ON com.object_id = i.id' : '' ;
+		$join_comments       = $add_comments ?
+			$join_comments_type .' #__jcomments AS com ON com.object_id = i.id AND com.object_group="com_flexicontent"' : '' ;
 		
 		
 		// **********************************************************
@@ -1895,6 +1896,51 @@ class modFlexicontentHelper
 			$params->set('display_comments', 0);
 			$params->set('display_comments_feat', 0);
 		}
+	}
+	
+	
+	/*
+	 * Retrieve comments for given items, item array has the structure: items[catid][ordername][]
+	 */
+	public static function getComments(&$params, &$items) {
+		$db = JFactory::getDBO();
+		
+		$list_comments = $params->get('list_comments');
+		$list_comments_feat = $params->get('list_comments_feat');
+		if (!$list_comments && !$list_comments_feat) return array();
+		
+		$item_ids = array();
+		foreach($items as $catid => $cat_items) {
+			foreach($cat_items as $ord => $ord_items) {
+				if ($list_comments)
+					foreach($ord_items['standard'] as $item) $item_ids[] = $item->id;
+				if ($list_comments_feat)
+					foreach($ord_items['featured'] as $item) $item_ids[] = $item->id;
+			}
+		}
+		
+		if (empty($item_ids)) return array();
+		
+		// Get comment ids ordered
+		$query = 'SELECT id FROM #__jcomments AS com '
+			.' WHERE com.object_id IN (' . implode($item_ids, ",") .') AND com.object_group="com_flexicontent" '
+			.' ORDER BY com.object_id, com.date DESC';
+		$db->setQuery($query);
+		$comment_ids = FLEXI_J16GE ? $db->loadColumn(0) : $db->loadResultArray(0);
+		
+		// Get comments data
+		$query = 'SELECT * FROM #__jcomments AS com '
+			.' WHERE com.id IN (' . implode($comment_ids, ",") .')';
+		$db->setQuery($query);
+		$_comments = $db->loadObjectList('id');
+		
+		// Order comments and return them, indexing them at first level by item ID
+		$comments = array();
+		foreach($comment_ids as $_id) {
+			$comment = $_comments[$_id];
+			$comments[$comment->object_id][] = $comment;
+		}
+		return $comments;
 	}
 }
 ?>
