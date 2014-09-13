@@ -62,13 +62,20 @@
 	padding: 0px !important;
 }
 
-#flexicontent .buttons > a >img {
-	border: none;
-}
-
 #flexicontent .buttons > a {
-	height: 16px;
-	line-height: 16px;
+	text-decoration:none;
+}
+#flexicontent .buttons > a.btn {
+	margin-right: 6px;
+}
+#flexicontent .buttons > a > img {
+	border: none;
+	vertical-align:top;
+	margin:2px 6px 0px 0px;
+}
+#flexicontent .buttons > a:not(.btn) {
+	height: 1.4em;
+	line-height: 1.4em;
 	padding: 0 0 0 5px;
 }
 
@@ -455,6 +462,10 @@ fieldset.fc_filter_set {
 #flexicontent .fc_filter_html .input-prepend button {
 	margin-top:6px !important;
 }
+#flexicontent .fc_filter_html .input-append button.btn,
+#flexicontent .fc_filter_html .input-prepend button.btn {
+	margin-top:2px !important;
+}
 
 /* removing filter choices */
 .fc_delall_filters {
@@ -649,13 +660,16 @@ ul.fc_field_filter.fc_checkradio_group label {
 	display: block;
 	*line-height: 1.5em !important;  /* ie6/ie7 */
 	*height: 1.5em !important;  /* ie6/ie7 */
-	padding-left:4px;
+	padding: 0px 0px 0px 4px;
 	font-size:12px;
 }
 
 .fc_has_inner_label.fc_has_inner_label_input,
 .fc_has_inner_prompt.fc_has_inner_prompt_input {
-	left:14px !important; top:10px !important; color: black !important;
+	left:14px !important; top:10px !important;
+	color: black !important;
+	line-height: 1em !important;
+	padding: 0px 0px 0px 4px !important;
 }
 .fc_has_inner_label.fc_has_inner_label_select2,
 .fc_has_inner_prompt.fc_has_inner_prompt_select2 {

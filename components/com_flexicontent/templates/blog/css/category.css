@@ -32,14 +32,10 @@
 	float: right;
 }
 
-#flexicontent .buttons img { 
- border: none; 
+#flexicontent .buttons > a > img { 
 }
 
-#flexicontent .buttons a { 
-	padding: 0 0 0 5px; 
-	height: 16px; 
-	line-height: 16px; 
+#flexicontent .buttons > a { 
 }
 
 
