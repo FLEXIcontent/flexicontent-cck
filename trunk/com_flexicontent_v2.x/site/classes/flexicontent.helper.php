@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1931 2014-07-17 16:32:27Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1952 2014-09-12 08:25:57Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1103,7 +1103,7 @@ class flexicontent_html
 		// This checks template image directory for image, if none found, default image is returned
 		$show_icons = $params->get('show_icons');
 		if ( $show_icons ) {
-			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
+			$attribs = '';
 			$image = FLEXI_J16GE ?
 				JHTML::image(FLEXI_ICONPATH.'livemarks.png', JText::_( 'FLEXI_FEED' ), $attribs) :
 				JHTML::_('image.site', 'livemarks.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_FEED' ), $attribs);
@@ -1119,7 +1119,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'fc_button';
+			$tooltip_class = 'btn btn-small';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1155,7 +1155,7 @@ class flexicontent_html
 		// This checks template image directory for image, if none found, default image is returned
 		$show_icons = $params->get('show_icons');
 		if ( $show_icons ) {
-			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
+			$attribs = '';
 			$image = FLEXI_J16GE ?
 				JHTML::image(FLEXI_ICONPATH.'printButton.png', JText::_( 'FLEXI_PRINT' ), $attribs) :
 				JHTML::_('image.site', 'printButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_PRINT' ), $attribs);
@@ -1171,7 +1171,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'fc_button';
+			$tooltip_class = 'btn btn-small';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1230,7 +1230,7 @@ class flexicontent_html
 		// This checks template image directory for image, if none found, default image is returned
 		$show_icons = $params->get('show_icons');
 		if ( $show_icons ) {
-			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
+			$attribs = '';
 			$image = FLEXI_J16GE ?
 				JHTML::image(FLEXI_ICONPATH.'emailButton.png', JText::_( 'FLEXI_EMAIL' ), $attribs) :
 				JHTML::_('image.site', 'emailButton.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EMAIL' ), $attribs);
@@ -1246,7 +1246,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'fc_button';
+			$tooltip_class = 'btn btn-small';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1271,7 +1271,7 @@ class flexicontent_html
 		
 		$show_icons = $params->get('show_icons');
 		if ( $show_icons ) {
-			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
+			$attribs = '';
 			$image = FLEXI_J16GE ?
 				JHTML::image(FLEXI_ICONPATH.'pdf_button.png', JText::_( 'FLEXI_CREATE_PDF' ), $attribs) :
 				JHTML::_('image.site', 'pdf_button.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_CREATE_PDF' ), $attribs);
@@ -1287,7 +1287,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'fc_button';
+			$tooltip_class = 'btn btn-small';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1526,7 +1526,7 @@ class flexicontent_html
 		
 		$show_icons = 2; //$params->get('show_icons');
 		if ( $show_icons ) {
-			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
+			$attribs = '';
 			$image = FLEXI_J16GE ?
 				JHTML::image('components/com_flexicontent/assets/images/'.'key_add.png', JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) :
 				JHTML::_('image.site', 'key_add.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_APPROVAL_REQUEST' ), $attribs) ;
@@ -1542,7 +1542,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'fc_button';
+			$tooltip_class = 'btn btn-small';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1590,7 +1590,7 @@ class flexicontent_html
 		
 		$show_icons = $params->get('show_icons');
 		if ( $show_icons ) {
-			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
+			$attribs = '';
 			$image = FLEXI_J16GE ?
 				JHTML::image(FLEXI_ICONPATH.'edit.png', JText::_( 'FLEXI_EDIT' ), $attribs) :
 				JHTML::_('image.site', 'edit.png', FLEXI_ICONPATH, NULL, NULL, JText::_( 'FLEXI_EDIT' ), $attribs) ;
@@ -1606,7 +1606,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'fc_button';
+			$tooltip_class = 'btn btn-small';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1729,7 +1729,7 @@ class flexicontent_html
 		
 		$show_icons = 2; //$params->get('show_icons');
 		if ( $show_icons && !$auto_relations ) {
-			$attribs = ' style="vertical-align:top; margin:0px 6px 0px 0px;" width="16" ';
+			$attribs = '';
 			$image = FLEXI_J16GE ?
 				JHTML::image('components/com_flexicontent/assets/images/'.'plus-button.png', $submit_lbl, $attribs) :
 				JHTML::_('image.site', 'plus-button.png', 'components/com_flexicontent/assets/images/', NULL, NULL, $submit_lbl, $attribs) ;
@@ -1742,7 +1742,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = $auto_relations ? 'fc_button fcsimple' : 'fc_button';
+			$tooltip_class = $auto_relations ? 'btn btn-small btn-success' : 'btn btn-small';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1776,7 +1776,6 @@ class flexicontent_html
 		}
 		
 	 	if ( !$state_fulltips ) {
-			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 			$title = JText::_( 'FLEXI_STATE' );
 			foreach($state_names as $state_id => $state_name) {
 				$content = str_replace('::', '-', $state_name);
@@ -1804,6 +1803,7 @@ class flexicontent_html
 				$attribs = '';
 				break;
 			case 'full': default:
+				$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 				$attribs = 'class="editlinktip '.$tooltip_class.'" title="'.$state_fulltips[$state].'"';
 				break;
 		}
