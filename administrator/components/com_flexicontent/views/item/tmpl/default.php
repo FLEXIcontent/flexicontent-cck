@@ -566,7 +566,7 @@ $tabCnt[$tabSetCnt] = 0;
 				</div>
 
 <?php
-if (file_exists('development_tmp.php'))  include('development_tmp.php');
+//include('development_tmp.php');
 ?>
 
 				<div class="fcclear"></div>

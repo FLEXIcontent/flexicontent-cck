@@ -154,6 +154,7 @@ class FlexicontentHelperPerm
 		$permission->AssocAnyTrans		= $user->authorise('flexicontent.assocanytrans',		'com_flexicontent'); // (item edit form) associate any translation
 		$permission->EditCreationDate	= $user->authorise('flexicontent.editcreationdate',	'com_flexicontent'); // (item edit form) edit creation date (frontend)
 		$permission->IgnoreViewState	= $user->authorise('flexicontent.ignoreviewstate',	'com_flexicontent'); // (Frontend Content Lists) ignore view state
+		$permission->RequestApproval	= $user->authorise('flexicontent.requestapproval',	'com_flexicontent'); // (Workflow) Send Approval Requests (for ANY draft items)
 		
 		// CATEGORIES: management tab and usage
 		$permission->CanCats			= $user->authorise('flexicontent.managecats',	'com_flexicontent'); // (item edit form) view the categories which user cannot assign to items
