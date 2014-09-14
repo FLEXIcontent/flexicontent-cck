@@ -52,14 +52,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getPending()
 	{
 		$user = JFactory::getUser();
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$allitems	= $permission->DisplayAllItems;
-		} else if (FLEXI_ACCESS) {
-			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
-		} else {
-			$allitems 	= 1;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$allitems	= $permission->DisplayAllItems;
 		
 		$use_tmp = true;
 		$query_select_ids = 'SELECT c.id'; //SQL_CALC_FOUND_ROWS
@@ -99,14 +93,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getRevised()
 	{
 		$user = JFactory::getUser();
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$allitems	= $permission->DisplayAllItems;
-		} else if (FLEXI_ACCESS) {
-			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
-		} else {
-			$allitems 	= 1;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$allitems	= $permission->DisplayAllItems;
 		
 		$use_tmp = true;
 		$query_select_ids = 'SELECT c.id'.', c.version, MAX(fv.version_id)'; //SQL_CALC_FOUND_ROWS
@@ -149,14 +137,9 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getDraft()
 	{
 		$user = JFactory::getUser();
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$allitems	= $permission->DisplayAllItems;
-		} else if (FLEXI_ACCESS) {
-			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
-		} else {
-			$allitems 	= 1;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$allitems	= $permission->DisplayAllItems;
+		$requestApproval = @ $permission->RequestApproval;
 		
 		$use_tmp = true;
 		$query_select_ids = 'SELECT c.id'; //SQL_CALC_FOUND_ROWS
@@ -170,7 +153,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$query_where_orderby_having = ''
 				. ' WHERE state = -4'
 				. (!FLEXI_J16GE ? ' AND c.sectionid = ' . (int)FLEXI_SECTION : '')
-				. ($allitems ? '' : ' AND c.created_by = '.$user->id)
+				. (($allitems || $requestApproval) ? '' : ' AND c.created_by = '.$user->id)
 				. ' ORDER BY c.created DESC'
 				;
 		
@@ -196,14 +179,8 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	function getInprogress()
 	{
 		$user = JFactory::getUser();
-		if (FLEXI_J16GE) {
-			$permission = FlexicontentHelperPerm::getPerm();
-			$allitems	= $permission->DisplayAllItems;
-		} else if (FLEXI_ACCESS) {
-			$allitems	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'displayallitems', 'users', $user->gmid) : 1;
-		} else {
-			$allitems 	= 1;
-		}
+		$permission = FlexicontentHelperPerm::getPerm();
+		$allitems	= $permission->DisplayAllItems;
 		
 		$use_tmp = true;
 		$query_select_ids = 'SELECT c.id'; //SQL_CALC_FOUND_ROWS
@@ -1984,6 +1961,12 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 				}
 			}
 		}
+		
+		// Clear cache so that per user permissions objects are recalculated
+		$cache = FLEXIUtilities::getCache($group='', 0);
+		$cache->clean('com_flexicontent_cats');
+		$cache = FLEXIUtilities::getCache($group='', 1);
+		$cache->clean('com_flexicontent_cats');
 		
 		return true;
 	}

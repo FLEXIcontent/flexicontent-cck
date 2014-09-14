@@ -4087,16 +4087,17 @@ class ParentClassItem extends JModelLegacy
 	function isUserDraft($cid)
 	{
 		$user = JFactory::getUser();
-
+		
 		if ($cid)
 		{
-			$query 	= 'SELECT c.id, c.catid, c.created_by, c.title, cat.title AS cattitle from #__content AS c'
+			$query 	= 'SELECT c.id, c.catid, c.created_by, c.title, cat.title AS cattitle, c.checked_out'
+					. ' FROM #__content AS c'
 					. ' LEFT JOIN #__categories AS cat on cat.id = c.catid'
 					. ' WHERE c.state = -4'
-					. ' AND c.created_by = ' . (int) $user->get('id')
+					//. ' AND c.created_by = ' . (int) $user->get('id')
 					. (FLEXI_J16GE ? ' AND cat.extension="'.FLEXI_CAT_EXTENSION.'"' : '')
 					. ' AND c.id IN ( '. implode(',', $cid).' )'
-					. ' AND ( c.checked_out = 0 OR ( c.checked_out = ' . (int) $user->get('id'). ' ) )'
+					//. ' AND ( c.checked_out = 0 OR ( c.checked_out = ' . (int) $user->get('id'). ' ) )'
 					;
 			$this->_db->setQuery( $query );
 			$cids = $this->_db->loadObjectList();
@@ -4152,11 +4153,30 @@ class ParentClassItem extends JModelLegacy
 	function approval($cid)
 	{
 		$db = $this->_db;
+		$user = JFactory::getUser();
 		$approvables = $this->isUserDraft($cid);
 		
+		$permission = FlexicontentHelperPerm::getPerm();
+		$requestApproval = $permission->RequestApproval;
+		
 		$submitted = 0;
+		$noprivilege = array();
+		$checked_out = array();
 		$publishable = array();
-		foreach ($approvables as $approvable) {
+		foreach ($approvables as $approvable)
+		{
+			// Check if not owned (while not have global request approval privilege)
+			if ( !$requestApproval && $approvable->created_by != (int) $user->get('id') ) {
+				$noprivilege[] = $item->title;
+				continue;
+			}
+			
+			// Check if checked out (edited) by different user
+			if ( $approvable->checked_out != 0 && $approvable->checked_out != (int) $user->get('id') ) {
+				$checked_out[] = $item->title;
+				continue;
+			}
+			
 			// Get item setting it into the model, and get publish privilege
 			$item = $this->getItem($approvable->id, $check_view_access=false, $no_cache=true);
 			$canEditState = $this->canEditState( $item, $check_cat_perm=true );
@@ -4213,6 +4233,18 @@ class ParentClassItem extends JModelLegacy
 		// Number of excluded items, and message that items must be owned and in draft state
 		$excluded = count($cid) - $submitted;
 		$msg .= $excluded  ?  ' '. $excluded .' '. JText::_( 'FLEXI_APPROVAL_ITEMS_EXCLUDED' )  :  '';
+		
+		// Message about excluded non-owned items, that are being owned be a different user (this means current user does not have global request approval privilege)
+		if ( count($noprivilege) ) {
+			$noprivilege_str = '"'. implode('" , "', $noprivilege) .'"';
+			$msg .= '<div>'.JText::sprintf('FLEXI_APPROVAL_NO_REQUEST_PRIV_EXCLUDED', $noprivilege_str).'</div>';
+		}
+		
+		// Message about excluded checked_out items, that are being edited be a different user
+		if ( count($checked_out) ) {
+			$checked_out_str = '"'. implode('" , "', $checked_out) .'"';
+			$msg .= '<div>'.JText::sprintf('FLEXI_APPROVAL_CHECKED_OUT_EXCLUDED', $checked_out_str).'</div>';
+		}
 		
 		// Message about excluded publishable items, that can be published by the owner
 		if ( count($publishable) ) {

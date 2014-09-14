@@ -199,6 +199,7 @@ class FlexicontentHelperPerm
 		$permission->AssocAnyTrans		= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'assocanytrans', 'users', $user->gmid) : 1; // (item edit form) associate any translation
 		//$permission->EditCreationDate	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'editcreationdate', 'users', $user->gmid) : 1; // (item edit form) edit creation date (frontend)
 		$permission->IgnoreViewState	= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'ignoreviewstate', 'users', $user->gmid) : 1; // (Frontend Content Lists) ignore view state
+		$permission->RequestApproval	= 0; // No J1.5 privilege (Workflow) Send Approval Requests (for ANY draft items)
 		
 		// CATEGORIES: management tab and usage
 		$permission->CanCats			= ($user->gid < 25) ? FAccess::checkComponentAccess('com_flexicontent', 'categories', 'users', $user->gmid) : 1; // (backend) Allow management of Categories

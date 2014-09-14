@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1953 2014-09-13 09:12:33Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1954 2014-09-14 09:02:50Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1496,11 +1496,18 @@ class flexicontent_html
 	{
 		if ( JRequest::getCmd('print') ) return;
 		
-		$user	= JFactory::getUser();
+		static $user = null, $requestapproval = null;
+		if ($user === null) {
+			$user	= JFactory::getUser();
+			$requestApproval = FLEXI_J16GE ? $user->authorise('flexicontent.requestapproval',	'com_flexicontent') : 0;
+		}
 
-		// Skip not-owned items, and items not in draft state
-		if ( $item->state != -4 || $item->created_by != $user->get('id') )  return;
-
+		// Skip items not in draft state
+		if ( $item->state != -4 )  return;
+		
+		// Skip not-owned items, unless having privilege to send approval request for any item
+		if ( !$requestApproval && $item->created_by != $user->get('id') )  return;
+		
 		// Determine if current user can edit state of the given item
 		if (FLEXI_J16GE) {
 			$asset = 'com_content.article.' . $item->id;
