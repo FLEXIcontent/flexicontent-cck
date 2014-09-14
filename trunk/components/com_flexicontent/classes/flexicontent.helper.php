@@ -1119,7 +1119,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'btn btn-small';
+			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1171,7 +1171,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'btn btn-small';
+			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1246,7 +1246,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'btn btn-small';
+			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1287,7 +1287,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'btn btn-small';
+			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1433,18 +1433,14 @@ class flexicontent_html
 			$box_css = ''; //$app->isSite() ? 'width:182px; left:-100px;' : '';
 			$publish_info .= '<br><br>'.JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
 			
-			$tooltip_class = 'editlinktip';
+			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
 			$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
 			$output ='
 			<ul class="statetoggler">
 				<li class="topLevel">
-					<a href="javascript:void(0);" class="opener" style="outline:none;">
-					<span id="row'.$item->id.'">
-						<span class="'.$tooltip_class.'" title="'.$tooltip_title.'">
-							'.$stateicon.'
-						</span>
-					</span>
+					<a href="javascript:void(0);" style="outline:none;" id="row'.$item->id.'" class="opener '.$tooltip_class.'" title="'.$tooltip_title.'">
+						'.$stateicon.'
 					</a>
 					<div class="options" style="'.$box_css.'">
 						<ul>';
@@ -1470,7 +1466,7 @@ class flexicontent_html
 		} else if ($app->isAdmin()) {
 			if ($canChangeState) $publish_info .= '<br><br>'.JText::_('FLEXI_STATE_CHANGER_DISABLED');
 
-			$tooltip_class = 'editlinktip';
+			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button';
 			$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
 			
@@ -1542,7 +1538,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'btn btn-small';
+			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1606,7 +1602,7 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = 'btn btn-small';
+			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1742,7 +1738,9 @@ class flexicontent_html
 			$tooltip_class = 'editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = $auto_relations ? 'btn btn-small btn-success' : 'btn btn-small';
+			$tooltip_class =
+				(FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall')
+				.($auto_relations ? 'btn-success' : '');
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);

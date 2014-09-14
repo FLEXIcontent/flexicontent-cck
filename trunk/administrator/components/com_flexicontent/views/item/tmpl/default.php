@@ -565,6 +565,10 @@ $tabCnt[$tabSetCnt] = 0;
 				<?php endif; ?>
 				</div>
 
+<?php
+if (file_exists('development_tmp.php'))  include('development_tmp.php');
+?>
+
 				<div class="fcclear"></div>
 				<label id="langassocs-lbl" for="langassocs" class="flexi_label" >
 					<?php echo JText::_( 'FLEXI_ASSOC_TRANSLATIONS' );?>

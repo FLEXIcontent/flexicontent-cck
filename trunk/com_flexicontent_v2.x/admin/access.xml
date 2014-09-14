@@ -71,6 +71,10 @@
 		<action name="flexicontent.publishownfile" title="&lt;b&gt;Files: (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Global Only&lt;/span&gt;):&lt;/b&gt; publish own" description="Allow users in the group to publish OWNED files (uploaded by them)" />
 		<action name="flexicontent.deleteownfile" title="&lt;b&gt;Files: (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Global Only&lt;/span&gt;):&lt;/b&gt; delete own" description="Allow users in the group to delete OWNED files (uploaded by them)" />
 
+		<!-- WORKFLOW abilities -->
+		<!--action name="flexicontent.canrequestapproval" title="&lt;b&gt;WorkFlow: (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Global Only&lt;/span&gt;):&lt;/b&gt; can send approval requests for their draft-state items" description="Allow users in the group to send request for approval requests for their own items that are draft state (for publishing these newly created items)" /-->
+		<!--action name="flexicontent.canrequestapproval_any" title="&lt;b&gt;WorkFlow: (&lt;span style&#61;&#34;color:darkblue&#34;&gt;Global Only&lt;/span&gt;):&lt;/b&gt; can send item approval requests for any draft-state item" description="Allow users in the group to send request for approval requests for their own items that are draft state (for publishing these newly created items)" /-->
+		
 	</section>
 
 	<section name="category">
