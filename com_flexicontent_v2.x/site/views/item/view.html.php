@@ -64,7 +64,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		$menu  = $menus->getActive();
 		$uri   = JFactory::getURI();
 		$user  = JFactory::getUser();
-		$aid   = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id)() : (int) $user->get('aid');
+		$aid   = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id) : (int) $user->get('aid');
 		$db    = JFactory::getDBO();
 		$nullDate = $db->getNullDate();
 		

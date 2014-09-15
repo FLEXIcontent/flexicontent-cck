@@ -207,7 +207,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$subjoin = $suband = $join = $and = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$suband .= ' AND ty.access IN (0,'.$aid_list.')';
 				$suband .= ' AND cc.access IN (0,'.$aid_list.')';
@@ -284,7 +284,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$join = $and = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$and		= ' AND c.access IN (0,'.$aid_list.')';
 			} else {
@@ -384,7 +384,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 		$subjoin = $suband = $join = $and = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$suband .= ' AND ty.access IN (0,'.$aid_list.')';
 				$suband .= ' AND cc.access IN (0,'.$aid_list.')';

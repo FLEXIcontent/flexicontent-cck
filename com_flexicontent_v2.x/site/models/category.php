@@ -512,7 +512,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$andaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 			} else {
@@ -602,7 +602,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 			
 			// Access Flags for: content type, main category, item
 			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$select_access .= ', '
 					.' CASE WHEN '
@@ -801,7 +801,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		// Checking item, category, content type access levels
 		if (!$show_noauth && $this->_layout!='myitems') {
 			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$where .= ' AND ty.access IN (0,'.$aid_list.')';
 				$where .= ' AND  c.access IN (0,'.$aid_list.')';
@@ -1150,7 +1150,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$andaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 			} else {
@@ -1264,7 +1264,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$joinaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$where .= ' AND ty.access IN (0,'.$aid_list.')';
 				$where .= ' AND mc.access IN (0,'.$aid_list.')';
@@ -1327,7 +1327,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$andaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$andaccess .= ' AND c.access IN (0,'.$aid_list.')';
 			} else {
@@ -1606,7 +1606,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		$canread = true;
 		if ($this->_id) {
 			if (FLEXI_J16GE) {
-				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$canread = in_array($this->_category->access, $aid_arr);
 			} else {
 				$aid = (int) $user->get('aid');
