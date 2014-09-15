@@ -144,7 +144,7 @@ class FlexicontentController extends JControllerLegacy
 		/*if (!$show_noauth) {
 			$user = JFactory::getUser();
 			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
 				$aid_list = implode(",", $aid_arr);
 				$access_where .= ' AND ty.access IN (0,'.$aid_list.')';
 				$access_where .= ' AND mc.access IN (0,'.$aid_list.')';
@@ -1182,7 +1182,7 @@ class FlexicontentController extends JControllerLegacy
 		// *****************************************************
 		
 		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
-		else $aid_arr = $user->getAuthorisedViewLevels();
+		else $aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
 		$acclvl = (int) $field->parameters->get('submit_acclvl', FLEXI_J16GE ? 1 : 0);
 		$has_acclvl = FLEXI_J16GE ? in_array($acclvl, $aid_arr) : $acclvl <= $aid;
 		
@@ -2337,7 +2337,7 @@ class FlexicontentController extends JControllerLegacy
 		if ( $get_select_access ) {
 			$select_access = '';
 			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
 				$aid_list = implode(",", $aid_arr);
 				if ($include_file) $select_access .= ', CASE WHEN'.
 					'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
@@ -2376,7 +2376,7 @@ class FlexicontentController extends JControllerLegacy
 		
 		else {
 			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
 				$aid_list = implode(",", $aid_arr);
 				if ($include_file)
 					$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access

@@ -519,7 +519,7 @@ class FlexicontentHelperRoute
 		static $user_access = null;
 		if ($user_access===null) {
 			$user = JFactory::getUser();
-			$user_access = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
+			$user_access = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id)() : (int) $user->get('aid');
 		}
 		
 		if ( empty($needles[FLEXI_ITEMVIEW]) ) return null;
@@ -769,7 +769,7 @@ class FlexicontentHelperRoute
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		$user = JFactory::getUser();
 		if (FLEXI_J16GE)
-			$aid_arr = $user->getAuthorisedViewLevels();
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
 		else
 			$aid = (int) $user->get('aid');
 		
