@@ -318,7 +318,7 @@ class FlexicontentModelItem extends ParentClassItem
 	function _buildItemWhere()
 	{
 		$user		= JFactory::getUser();
-		$aid		= !FLEXI_J16GE ? (int) $user->get('aid', 0) : max ($user->getAuthorisedViewLevels()) ;
+		$aid		= !FLEXI_J16GE ? (int) $user->get('aid', 0) : max (JAccess::getAuthorisedViewLevels($user->id)()) ;
 
 		$jnow		= JFactory::getDate();
 		$now		= FLEXI_J16GE ? $jnow->toSql() : $jnow->toMySQL();

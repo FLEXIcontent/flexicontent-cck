@@ -151,7 +151,7 @@ class flexicontent_html
 		$itemmodel = FLEXI_J16GE ? new FlexicontentModelItem() : new FlexicontentModelItems();
 		$item = $itemmodel->getItem($item_id, $check_view_access=false);
 
-		$aid = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
+		$aid = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id)() : (int) $user->get('aid');
 		list($item) = FlexicontentFields::getFields($item, $view, $item->parameters, $aid);
 
 		$ilayout = $item->parameters->get('ilayout', '');
@@ -1989,7 +1989,7 @@ class flexicontent_html
 		// *****************************************************
 		
 		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
-		else $aid_arr = $user->getAuthorisedViewLevels();
+		else $aid_arr = JAccess::getAuthorisedViewLevels($user->id)();
 		$acclvl = (int) $field->parameters->get('submit_acclvl', FLEXI_J16GE ? 1 : 0);
 		$has_acclvl = FLEXI_J16GE ? in_array($acclvl, $aid_arr) : $acclvl <= $aid;
 		
@@ -3115,7 +3115,7 @@ class flexicontent_html
 		
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
-		$aids = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : array((int) $user->get('aid'));
+		$aids = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id)() : array((int) $user->get('aid'));
 		
 		
 		// **************************************

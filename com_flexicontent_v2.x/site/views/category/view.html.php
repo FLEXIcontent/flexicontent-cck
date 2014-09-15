@@ -52,7 +52,7 @@ class FlexicontentViewCategory extends JViewLegacy
 		$menu     = $menus->getActive();
 		$uri      = JFactory::getURI();
 		$user     = JFactory::getUser();
-		$aid      = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
+		$aid      = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id)() : (int) $user->get('aid');
 		
 		// Get category and set category parameters as VIEW's parameters (category parameters are merged with component/page/author parameters already)
 		$category = $this->get('Category');
