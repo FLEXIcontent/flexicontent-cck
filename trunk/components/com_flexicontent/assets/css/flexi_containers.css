@@ -120,7 +120,7 @@ ul.statetoggler {
 	vertical-align: top;
 	display: inline-block !important;
 	list-style: none !important;
-	margin: 0px 0px 0px 4px !important;
+	margin: 0px 4px !important; /* ignored for inline-* elements*/
 	padding: 0 !important;
 	width: auto !important;
 }
@@ -133,12 +133,12 @@ ul.statetoggler > li.topLevel > .options {
 	position: absolute !important;
 	font-size:14px !important;
 	width: auto !important;
+	height: 0;
 }
 
 ul.statetoggler > li.topLevel > .options > div {
 	display: inline-block !important;
 	padding:0px 4px;
-	width: 24px !important;
 }
 
 ul.statetoggler > li.topLevel > .options ul {
@@ -153,7 +153,6 @@ ul.statetoggler > li.topLevel > .options ul {
 ul.statetoggler > li.topLevel, .statetoggler > li.topLevel ul > li {
 	background: none repeat scroll 0 0 transparent !important;
 	overflow: visible !important;
-	width: 22px !important;
 	min-height: 20px !important;
 	display: -moz-inline-stack !important;
 	display: inline-block !important;

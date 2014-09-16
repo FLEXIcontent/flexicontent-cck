@@ -47,6 +47,7 @@
 .icon-32-import				{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-upload.png); }
 .icon-32-duplicate		{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png); }
 .icon-32-copy_wvalues	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-copy.png); }
+.icon-32-test,
 .icon-32-preview			{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-preview.png); }
 
 .icon-32-basicindex		{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png); }
@@ -57,7 +58,15 @@
 .icon-32-advindexdirty	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-batch.png); }
 .icon-32-advindexpurge	{ background-image: url(../../../../templates/hathor/images/toolbar/icon-32-purge.png); }
 
-
+.icon-test:before { content: "l";  color: #51a351; font-weight:bold; }
+.icon-savenew:before    { content: "\5d";   color: #51a351; }
+.icon-32-delete:before,
+.icon-32-trash:before   { content: "\4c"; }
+.icon-copy_wvalues:before,
+.icon-params:before     { content: "\e018"; color: #51a351; }
+.icon-32-archive:before { content: "\50"; }
+.icon-import:before     { content: "\e022"; color: darkorange; }
+.icon-32-restore:before { content: "\6c"; }
 
 /**************
  * Small labels

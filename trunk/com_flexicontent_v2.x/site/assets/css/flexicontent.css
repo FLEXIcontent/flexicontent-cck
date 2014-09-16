@@ -64,9 +64,10 @@
 
 #flexicontent .buttons > a {
 	text-decoration:none;
+	margin: 0px 4px; /* ignored for inline-* elements*/
 }
 #flexicontent .buttons > a.btn {
-	margin-right: 6px;
+	margin: 0px 4px; /* ignored for inline-* elements*/
 }
 #flexicontent .buttons > a > img {
 	border: none;

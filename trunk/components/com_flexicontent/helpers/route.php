@@ -38,6 +38,9 @@ class FlexicontentHelperRoute
 {
 	protected static $lookup = null;
 	protected static $lang_lookup = array();
+	protected static $add_url_lang  = null;
+	protected static $interface_langs = null;
+	protected static $lang_homes = null;
 	
 	/**
 	 * function to retrieve component menuitems only once;
@@ -158,6 +161,8 @@ class FlexicontentHelperRoute
 	{
 		if(count(self::$lang_lookup) == 0)
 		{
+			// Create map of: item language code to SEF URL language code
+			// We don't use helper function so that we also get non-published ones
 			$db		= JFactory::getDbo();
 			$query	= $db->getQuery(true)
 				->select('a.sef AS sef')
@@ -170,9 +175,50 @@ class FlexicontentHelperRoute
 			{
 				self::$lang_lookup[$lang->lang_code] = $lang->sef;
 			}
+			
+			// Get configuration whether to remove SEF language code from URL
+			$plugin = JPluginHelper::getPlugin('system', 'languagefilter');
+			if (!empty($plugin)) {
+				$pluginParams = FLEXI_J16GE ? new JRegistry($plugin->params) : new JParameter($plugin->params);
+				self::$add_url_lang = ! $pluginParams->get('remove_default_prefix', 0);
+			} else {
+				self::$add_url_lang = 1;
+			}
+			
+			// No need to do more work since we will not add language code to the URLs
+			if ( !self::$add_url_lang ) return;
+			
+			// Get user's access levels
+			$user	= JFactory::getUser();
+			$levels = JAccess::getAuthorisedViewLevels($user->id);
+			
+			// Get home page menu items according to language, and 
+			self::_getHomes();
+			
+			// Get content languages and filter them to include only inteface languages
+			$content_langs = JLanguageHelper::getLanguages();
+			$interface_langs = array();
+			
+			foreach ($content_langs as $i => &$language)
+			{
+				// Do not display language without frontend UI
+				if (!JLanguage::exists($language->lang_code))
+					continue;
+				
+				// Do not display language without specific home menu
+				elseif (!isset(self::$lang_homes[$language->lang_code]))
+					continue;
+				
+				// Do not display language without authorized access level
+				elseif (isset($language->access) && $language->access && !in_array($language->access, $levels))
+					continue;
+				
+				self::$interface_langs[$language->lang_code] = $language;
+			}
+			// DEBUG print the filtered languages
+			//foreach (self::$interface_langs as $lang_code => $lang) echo $lang->title.'['.$lang_code.']'."<br/>\n";
 		}
 	}
-	
 	
 	
 	/**
@@ -207,7 +253,12 @@ class FlexicontentHelperRoute
 		if ($current_language===null) $current_language = JFactory::getLanguage()->getTag();
 		
 		static $use_language = null;
-		if ($use_language===null) $use_language = FLEXI_J16GE && JLanguageMultilang::isEnabled();
+		if ($use_language===null) {
+			$use_language = FLEXI_J16GE && JLanguageMultilang::isEnabled();
+			if ($use_language) {
+				self::buildLanguageLookup();
+			}
+		}
 		
 		$_id = (int) $id;
 		$_catid = (int) $catid;
@@ -266,19 +317,28 @@ class FlexicontentHelperRoute
 		if ($curr_catmenu === null) {
 			$current_cid = JRequest::getVar('cid');
 			
-			if ( is_array($current_cid) ) {
-				$curr_catmenu = false;
-			} else if ( (int) $current_cid ) {
+			$curr_catmenu = false;
+			$view_is_cat = JRequest::getVar('option') == 'com_flexicontent' && JRequest::getVar('view') == 'category';
+			if ( $view_is_cat && !is_array($current_cid) && (int)$current_cid ) {
 				$current_cid = (int) $current_cid;
 				$menus = JFactory::getApplication()->getMenu('site', array());   // this will work in J1.5 backend too !!!
 				$menu = $menus->getActive();
 				
-				if ( !$menu || !$current_cid ) {
-					$curr_catmenu = false;
-				} else {
-					$view_is_cat = JRequest::getVar('option') == 'com_flexicontent' && JRequest::getVar('view') == 'category';
+				$menu_cid = $menu && (int)@$menu->query['cid'] ? (int)@$menu->query['cid'] : 0;
+				if ( $menu_cid && isset($globalcats[$current_cid]->ancestorsarray) ) {
+					$current_cid_parents = array_reverse($globalcats[$current_cid]->ancestorsarray);
+					//print_r($current_cid_parents );
+					//exit;
 					$menu_is_cat = @$menu->query['option'] == 'com_flexicontent' && @$menu->query['view'] == 'category';
-					$menu_matches = $menu && $view_is_cat && $menu_is_cat &&@$menu->query['cid'] == $current_cid;
+					$menu_matches = false;
+					if ($menu_is_cat) {
+						foreach($current_cid_parents as $_catid) {
+							if ($_catid == $menu_cid) {
+								$menu_matches = true;
+								break;
+							}
+						}
+					}
 					$curr_catmenu = $menu_matches ? $menu : false;
 				}
 			}
@@ -340,10 +400,11 @@ class FlexicontentHelperRoute
 		// SEF language code as so configured
 		if ($use_language && $language && $language != "*")
 		{
-			self::buildLanguageLookup();
 			if(isset(self::$lang_lookup[$language]))
 			{
-				$link .= '&lang='.self::$lang_lookup[$language];
+				if ( self::$add_url_lang && isset(self::$interface_langs[$language]) ) {
+					$link .= '&lang='.self::$lang_lookup[$language];
+				}
 				$needles['_language'] = $language;
 			}
 		}
@@ -814,5 +875,22 @@ class FlexicontentHelperRoute
 
 		return $match;
 	}
+	
+	
+	static function _getHomes()
+	{
+		$menu = JFactory::getApplication()->getMenu('site', array());
+		
+		// Get menu home items
+		self::$lang_homes = array();
+		foreach ($menu->getMenu() as $item)
+		{
+			if ($item->home)
+			{
+				self::$lang_homes[$item->language] = $item;
+			}
+		}
+	}
+	
 }
 ?>
