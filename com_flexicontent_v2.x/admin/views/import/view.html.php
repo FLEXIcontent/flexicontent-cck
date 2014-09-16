@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1902 2014-05-10 16:06:11Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1925 2014-06-25 01:50:14Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -93,7 +93,7 @@ class FlexicontentViewImport extends JViewLegacy
 			if ($task!='processcsv') {
 				$ctrl_task = FLEXI_J16GE ? 'import.processcsv' : 'processcsv';
 				$import_btn_title = empty($lineno) ? 'FLEXI_IMPORT_START_TASK' : 'FLEXI_IMPORT_CONTINUE_TASK';
-				JToolBarHelper::custom( $ctrl_task, 'refresh.png', 'refresh.png', $import_btn_title, $list_check = false );
+				JToolBarHelper::custom( $ctrl_task, 'save.png', 'save.png', $import_btn_title, $list_check = false );
 			}
 			$ctrl_task = FLEXI_J16GE ? 'import.clearcsv' : 'clearcsv';
 			JToolBarHelper::custom( $ctrl_task, 'cancel.png', 'cancel.png', 'FLEXI_IMPORT_CLEAR_TASK', $list_check = false );
@@ -101,7 +101,7 @@ class FlexicontentViewImport extends JViewLegacy
 			$ctrl_task = FLEXI_J16GE ? 'import.initcsv' : 'initcsv';
 			JToolBarHelper::custom( $ctrl_task, 'import.png', 'import.png', 'FLEXI_IMPORT_PREPARE_TASK', $list_check = false );
 			$ctrl_task = FLEXI_J16GE ? 'import.testcsv' : 'testcsv';
-			JToolBarHelper::custom( $ctrl_task, 'preview.png', 'preview.png', 'FLEXI_IMPORT_TEST_FILE_FORMAT', $list_check = false );
+			JToolBarHelper::custom( $ctrl_task, 'test.png', 'test.png', 'FLEXI_IMPORT_TEST_FILE_FORMAT', $list_check = false );
 		}
 		//JToolBarHelper::Back();
 		if ($perms->CanConfig) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1954 2014-09-14 09:02:50Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1955 2014-09-14 17:03:40Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1499,7 +1499,7 @@ class flexicontent_html
 		static $user = null, $requestapproval = null;
 		if ($user === null) {
 			$user	= JFactory::getUser();
-			$requestApproval = FLEXI_J16GE ? $user->authorise('flexicontent.requestapproval',	'com_flexicontent') : 0;
+			$requestApproval = FLEXI_J16GE ? $user->authorise('flexicontent.requestapproval',	'com_flexicontent') : ($user->gid >= 20);
 		}
 
 		// Skip items not in draft state
@@ -4055,10 +4055,11 @@ class FLEXIUtilities
 		// ******************
 		if (FLEXI_J16GE) {   // Use J1.6+ language info
 			$query = 'SELECT DISTINCT lc.lang_id as id, lc.image as image_prefix, lc.lang_code as code, lc.title_native, '
-					. ' CASE WHEN CHAR_LENGTH(lc.title_native) THEN CONCAT(lc.title, " (", lc.title_native, ")") ELSE lc.title END as name '
-					.' FROM #__languages as lc '
-					.' WHERE 1 '.($published_only ? ' AND lc.published=1' : '')
-					;
+				. ' CASE WHEN CHAR_LENGTH(lc.title_native) THEN CONCAT(lc.title, " (", lc.title_native, ")") ELSE lc.title END as name '
+				.' FROM #__languages as lc '
+				.' WHERE 1 '.($published_only ? ' AND lc.published=1' : '')
+				. ' ORDER BY lc.ordering ASC '
+				;
 		} else if (FLEXI_FISH) {   // Use joomfish languages table
 			$query = 'SELECT l.* '
 				. ( FLEXI_FISH_22GE ? ', lext.* ' : '' )
@@ -4069,7 +4070,7 @@ class FLEXIUtilities
 				. ( FLEXI_FISH_22GE ? ' LEFT JOIN #__jf_languages_ext as lext ON l.lang_id=lext.lang_id ' : '')
 				. ' WHERE '.    (FLEXI_FISH_22GE ? ' l.published=1 ' : ' l.active=1 ')
 				. ' ORDER BY '. (FLEXI_FISH_22GE ? ' lext.ordering ASC ' : ' l.ordering ASC ')
-					;
+				;
 		} else {
 			JError::raiseWarning(500, 'getlanguageslist(): ERROR no joomfish installed');
 			return array();
@@ -4174,13 +4175,13 @@ class FLEXIUtilities
 	 * @return object
 	 * @since 1.5
 	 */
-	static function getLanguages($hash='code')
+	static function getLanguages($hash='code', $published_only=false)
 	{
 		static $langs = array();
 		static $languages;
 		
 		if (isset($langs[$hash])) return $langs[$hash];
-		if (!$languages) $languages = FLEXIUtilities::getlanguageslist();
+		if (!$languages) $languages = FLEXIUtilities::getlanguageslist($published_only);
 		
 		$langs[$hash] = new stdClass();
 		foreach ($languages as $language) {
