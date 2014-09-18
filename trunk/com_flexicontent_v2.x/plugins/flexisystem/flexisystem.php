@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexisystem.php 1901 2014-05-07 02:37:25Z ggppdk $
+ * @version 1.5 stable $Id: flexisystem.php 1905 2014-05-26 23:37:05Z ggppdk $
  * @plugin 1.1
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -53,8 +53,9 @@ class plgSystemFlexisystem extends JPlugin
 	{
 		// fix for return urls with unicode aliases
 		$return = JRequest::getVar('return', null);
+		$isfcurl = JRequest::getVar('isfcurl', null);
 		$fcreturn = JRequest::getVar('fcreturn', null);
-		if ($return && $fcreturn) JRequest::setVar('return', strtr($return, '-_,', '+/='));
+		if ($return && ($isfcurl || $fcreturn)) JRequest::setVar('return', strtr($return, '-_,', '+/='));
 		
 		$username	= JRequest::getVar('fcu', null);
 		$password	= JRequest::getVar('fcp', null);
@@ -139,8 +140,16 @@ class plgSystemFlexisystem extends JPlugin
 		if ( $session->get('clear_cats_cache', 0, 'flexicontent') )
 		{
 			$session->set('clear_cats_cache', 0, 'flexicontent');
-			$catscache = JFactory::getCache('com_flexicontent_cats');
-			$catscache->clean();
+			// Clean cache
+			if (FLEXI_J16GE) {
+				$cache = $this->getCache($group='', 0);
+				$cache->clean('com_flexicontent_cats');
+				$cache = $this->getCache($group='', 1);
+				$cache->clean('com_flexicontent_cats');
+			} else {
+				$catcache = JFactory::getCache('com_flexicontent_cats');
+				$catcache->clean();
+			}
 			//JFactory::getApplication()->enqueueMessage( "cleaned cache group 'com_flexicontent_cats'", 'message');
 		}
 		
@@ -966,6 +975,18 @@ class plgSystemFlexisystem extends JPlugin
 		//echo $query;
 		$db->setQuery($query);
 		$db->query();
+		
+		if ($clear_publish_down_date) {
+			$query = 'UPDATE #__flexicontent_items_tmp '.
+				' SET state = '.$archive_state.', publish_down = '.$db->Quote($nullDate).
+				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
+		} else {
+			$query = 'UPDATE #__flexicontent_items_tmp SET state = '.$archive_state.
+				' WHERE publish_down != '.$db->Quote($nullDate).' AND publish_down <= '.$_nowDate;
+		}
+		//echo $query;
+		$db->setQuery($query);
+		$db->query();
 	}
 	
 	
@@ -1200,5 +1221,21 @@ class plgSystemFlexisystem extends JPlugin
     
     return $access;
   }
-	
+
+
+	function getCache($group='', $client=0)
+	{
+		$conf = JFactory::getConfig();
+		//$client = 0;//0 is site, 1 is admin
+		$options = array(
+			'defaultgroup'	=> $group,
+			'storage' 		=> $conf->get('cache_handler', ''),
+			'caching'		=> true,
+			'cachebase'		=> ($client == 1) ? JPATH_ADMINISTRATOR . '/cache' : $conf->get('cache_path', JPATH_SITE . '/cache')
+		);
+
+		jimport('joomla.cache.cache');
+		$cache = JCache::getInstance('', $options);
+		return $cache;
+	}
 }

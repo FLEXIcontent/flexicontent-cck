@@ -151,7 +151,7 @@ class flexicontent_html
 		$itemmodel = FLEXI_J16GE ? new FlexicontentModelItem() : new FlexicontentModelItems();
 		$item = $itemmodel->getItem($item_id, $check_view_access=false);
 
-		$aid = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : (int) $user->get('aid');
+		$aid = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id) : (int) $user->get('aid');
 		list($item) = FlexicontentFields::getFields($item, $view, $item->parameters, $aid);
 
 		$ilayout = $item->parameters->get('ilayout', '');
@@ -1114,12 +1114,13 @@ class flexicontent_html
 		$overlib = JText::_( 'FLEXI_FEED_TIP' );
 		$text = JText::_( 'FLEXI_FEED' );
 		
+		$tooltip_class = 'fc_feedbutton';
 		if ( $show_icons==1 ) {
 			$caption = '';
-			$tooltip_class = 'editlinktip';
+			$tooltip_class .= ' editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
+			$tooltip_class .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1166,12 +1167,13 @@ class flexicontent_html
 		$overlib = JText::_( 'FLEXI_PRINT_TIP' );
 		$text = JText::_( 'FLEXI_PRINT' );
 		
+		$tooltip_class = 'fc_printbutton';
 		if ( $show_icons==1 ) {
 			$caption = '';
-			$tooltip_class = 'editlinktip';
+			$tooltip_class .= ' editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
+			$tooltip_class .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1241,12 +1243,13 @@ class flexicontent_html
 		$overlib = JText::_( 'FLEXI_EMAIL_TIP' );
 		$text = JText::_( 'FLEXI_EMAIL' );
 		
+		$tooltip_class = 'fc_mailbutton';
 		if ( $show_icons==1 ) {
 			$caption = '';
-			$tooltip_class = 'editlinktip';
+			$tooltip_class .= ' editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
+			$tooltip_class .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1282,12 +1285,13 @@ class flexicontent_html
 		$overlib = JText::_( 'FLEXI_CREATE_PDF_TIP' );
 		$text = JText::_( 'FLEXI_CREATE_PDF' );
 		
+		$tooltip_class = 'fc_pdfbutton';
 		if ( $show_icons==1 ) {
 			$caption = '';
-			$tooltip_class = 'editlinktip';
+			$tooltip_class .= ' editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
+			$tooltip_class .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1433,7 +1437,8 @@ class flexicontent_html
 			$box_css = ''; //$app->isSite() ? 'width:182px; left:-100px;' : '';
 			$publish_info .= '<br><br>'.JText::_('FLEXI_CLICK_TO_CHANGE_STATE');
 			
-			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
+			$tooltip_class = 'fc_statebutton';
+			$tooltip_class .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 			$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
 			$output ='
@@ -1540,12 +1545,13 @@ class flexicontent_html
 		$overlib 	= JText::_( 'FLEXI_APPROVAL_REQUEST_INFO' );
 		$text 		= JText::_( 'FLEXI_APPROVAL_REQUEST' );
 		
+		$tooltip_class = 'fc_approvalbutton';
 		if ( $show_icons==1 ) {
 			$caption = '';
-			$tooltip_class = 'editlinktip';
+			$tooltip_class .= ' editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
+			$tooltip_class .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1604,12 +1610,13 @@ class flexicontent_html
 		$overlib 	= JText::_( 'FLEXI_EDIT_TIP' );
 		$text 		= JText::_( 'FLEXI_EDIT' );
 		
+		$tooltip_class = 'fc_editbutton';
 		if ( $show_icons==1 ) {
 			$caption = '';
-			$tooltip_class = 'editlinktip';
+			$tooltip_class .= ' editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall';
+			$tooltip_class .= FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall';
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1740,14 +1747,15 @@ class flexicontent_html
 			$image = '';
 		}
 		
+		$tooltip_class = 'fc_addbutton';
 		if ( $show_icons==1 && !$auto_relations ) {
 			$caption = '';
-			$tooltip_class = 'editlinktip';
+			$tooltip_class .= ' editlinktip';
 		} else {
 			$caption = $text;
-			$tooltip_class =
-				(FLEXI_J30GE ? 'btn btn-small' : 'fc_button fcsimple fcsmall')
-				.($auto_relations ? 'btn-success' : '');
+			$tooltip_class .=
+				(FLEXI_J30GE ? ' btn btn-small' : ' fc_button fcsimple fcsmall')
+				.($auto_relations ? ' btn-success' : '');
 		}
 		$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$tooltip_title = flexicontent_html::getToolTip($text, $overlib, 0);
@@ -1989,7 +1997,7 @@ class flexicontent_html
 		// *****************************************************
 		
 		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
-		else $aid_arr = $user->getAuthorisedViewLevels();
+		else $aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 		$acclvl = (int) $field->parameters->get('submit_acclvl', FLEXI_J16GE ? 1 : 0);
 		$has_acclvl = FLEXI_J16GE ? in_array($acclvl, $aid_arr) : $acclvl <= $aid;
 		
@@ -3115,7 +3123,7 @@ class flexicontent_html
 		
 		$db   = JFactory::getDBO();
 		$user = JFactory::getUser();
-		$aids = FLEXI_J16GE ? $user->getAuthorisedViewLevels() : array((int) $user->get('aid'));
+		$aids = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id) : array((int) $user->get('aid'));
 		
 		
 		// **************************************

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: com_flexicontent.php 1452 2012-08-24 06:51:30Z ggppdk $
+ * @version 1.5 stable $Id: com_flexicontent.php 1500 2012-09-29 07:21:46Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -117,11 +117,13 @@ if($format == 'raw') {
 	if ($task == 'ajaxvote' || $task == 'ajaxfav') return;
 }
 
-
 switch ($view) {
 	
 	case 'items' : 	case 'item' :
 
+		// Do not convert to SEF urls, the urls for item form
+		if ($layout == 'form' || $task == 'edit' || $task == 'add') return;
+		
 		if (!empty($id)) {
 		
 			if (!$task) {

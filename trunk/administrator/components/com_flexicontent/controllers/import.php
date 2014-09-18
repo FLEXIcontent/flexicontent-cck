@@ -678,7 +678,10 @@ class FlexicontentControllerImport extends FlexicontentController
 		if ($lineno == $itemcount) {
 			// Clean item's cache, but is this needed when adding items ?
 			if (FLEXI_J16GE) {
-				$cache = FLEXIUtilities::getCache();
+				$cache = FLEXIUtilities::getCache($group='', 0);
+				$cache->clean('com_flexicontent_items');
+				$cache->clean('com_flexicontent_filters');
+				$cache = FLEXIUtilities::getCache($group='', 1);
 				$cache->clean('com_flexicontent_items');
 				$cache->clean('com_flexicontent_filters');
 			} else {

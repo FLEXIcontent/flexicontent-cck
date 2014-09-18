@@ -117,11 +117,13 @@ if($format == 'raw') {
 	if ($task == 'ajaxvote' || $task == 'ajaxfav') return;
 }
 
-
 switch ($view) {
 	
 	case 'items' : 	case 'item' :
 
+		// Do not convert to SEF urls, the urls for item form
+		if ($layout == 'form' || $task == 'edit' || $task == 'add') return;
+		
 		if (!empty($id)) {
 		
 			if (!$task) {

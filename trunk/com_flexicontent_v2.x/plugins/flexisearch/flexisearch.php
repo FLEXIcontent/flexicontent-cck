@@ -251,7 +251,7 @@ class plgSearchFlexisearch extends JPlugin
 		
 		if ( !$show_noauth ) {   // User not allowed to LIST unauthorized items
 			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$andaccess .= ' AND ty.access IN (0,'.$aid_list.')';
 				$andaccess .= ' AND  c.access IN (0,'.$aid_list.')';
@@ -276,7 +276,7 @@ class plgSearchFlexisearch extends JPlugin
 		else {
 			// Access Flags for: content type, main category, item
 			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$select_access .= ', '
 					.' CASE WHEN '

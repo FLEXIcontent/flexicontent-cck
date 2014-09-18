@@ -54,7 +54,7 @@ class modFlexiTagCloudHelper
 		// filter by permissions
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
-				$aid_arr  = $user->getAuthorisedViewLevels();
+				$aid_arr  = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$where  .= ' AND i.access IN ('.$aid_list.')';
 			} else {
