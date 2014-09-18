@@ -644,6 +644,7 @@ class FlexicontentFields
 		// Initialize field for plugin triggering
 		$field->text = isset($field->{$method}) ? $field->{$method} : '';
 		$field->introtext = $field->text;  // needed by some plugins that do not use or clear ->text property
+		$field->created_by = $item->created_by;
 		$field->title = $item->title;
 		$field->slug = isset($item->slug) ? $item->slug : $item->id;
 		$field->sectionid = !FLEXI_J16GE ? $item->sectionid : false;

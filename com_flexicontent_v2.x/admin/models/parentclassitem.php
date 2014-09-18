@@ -394,7 +394,7 @@ class ParentClassItem extends JModelAdmin
 					
 					// Access Flags for: content type, main category, item
 					if (FLEXI_J16GE) {
-						$aid_arr = $user->getAuthorisedViewLevels();
+						$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 						$aid_list = implode(",", $aid_arr);
 						$select_access .= ', CASE WHEN ty.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_type_access';
 						$select_access .= ', CASE WHEN mc.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_mcat_access';
@@ -1115,7 +1115,7 @@ class ParentClassItem extends JModelAdmin
 		else {
 			// The access filter has not been set, we will set access flag(s) if not set already
 			// the layout takes some responsibility for display of limited information,
-			$groups = $user->getAuthorisedViewLevels();
+			$groups = JAccess::getAuthorisedViewLevels($user->id);
 			
 			if ( !isset($this->_item->has_item_access) ) {
 				$this->_item->has_item_access = in_array($this->_item->access, $groups);
@@ -4254,7 +4254,10 @@ class ParentClassItem extends JModelAdmin
 		
 		// This may not be needed since the item was already in unpublished stated ??
 		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache();
+			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent_items');
+			$cache->clean('com_flexicontent_filters');
+			$cache = FLEXIUtilities::getCache($group='', 1);
 			$cache->clean('com_flexicontent_items');
 			$cache->clean('com_flexicontent_filters');
 		} else {

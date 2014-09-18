@@ -317,26 +317,12 @@ class FlexicontentModelItem extends ParentClassItem
 	 */
 	function _buildItemWhere()
 	{
-		$user		= JFactory::getUser();
-		$aid		= !FLEXI_J16GE ? (int) $user->get('aid', 0) : max (JAccess::getAuthorisedViewLevels($user->id)) ;
-
-		$jnow		= JFactory::getDate();
-		$now		= FLEXI_J16GE ? $jnow->toSql() : $jnow->toMySQL();
-		$nullDate	= $this->_db->getNullDate();
-
 		//
 		// First thing we need to do is assert that the content article is the one
 		// we are looking for and we have access to it.
 		//
 		$where = ' WHERE i.id = '. (int) $this->_id;
 		
-		// Commented out to allow retrieval of the item and set appropriate 404 Server Error for expired/scheduled items
-		//if ($aid < 2)
-		//{
-		//	$where .= ' AND ( i.publish_up = '.$this->_db->Quote($nullDate).' OR i.publish_up <= '.$this->_db->Quote($now).' )';
-		//	$where .= ' AND ( i.publish_down = '.$this->_db->Quote($nullDate).' OR i.publish_down >= '.$this->_db->Quote($now).' )';
-		//}
-
 		return $where;
 	}
 

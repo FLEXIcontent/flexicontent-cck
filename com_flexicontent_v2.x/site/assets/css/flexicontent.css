@@ -62,18 +62,25 @@
 	padding: 0px !important;
 }
 
+#flexicontent .fc_editbutton,
 #flexicontent .buttons > a {
 	text-decoration:none;
 	margin: 0px 4px; /* ignored for inline-* elements*/
 }
+#flexicontent .fc_editbutton,
 #flexicontent .buttons > a.btn {
 	margin: 0px 4px; /* ignored for inline-* elements*/
 }
+#flexicontent .fc_editbutton > img,
 #flexicontent .buttons > a > img {
-	border: none;
-	vertical-align:top;
-	margin:2px 6px 0px 0px;
+	border: none !important;
+	vertical-align:top !important;
+	margin:2px 6px 0px 0px !important;
 }
+#flexicontent .fc_editbutton > img {
+	margin-top: 0px !important;
+}
+#flexicontent .fc_editbutton,
 #flexicontent .buttons > a:not(.btn) {
 	height: 1.4em;
 	line-height: 1.4em;

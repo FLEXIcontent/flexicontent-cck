@@ -161,7 +161,7 @@ class FlexicontentFields
 		
 		// Calculate access if it was not providden
 		if (FLEXI_J16GE) {
-			$aid = is_array($aid) ? $aid : $user->getAuthorisedViewLevels();
+			$aid = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
 		} else {
 			$aid = $aid!==false ? (int) $aid : (int) $user->get('aid');
 		}
@@ -277,7 +277,7 @@ class FlexicontentFields
 			if ( !isset($type_fields[$item->type_id]) )
 			{
 				if (FLEXI_J16GE) {
-					$aid_arr = is_array($aid) ? $aid : $user->getAuthorisedViewLevels();
+					$aid_arr = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
 					$aid_list = implode(",", $aid);
 					$andaccess 	= ' AND fi.access IN (0,'.$aid_list.')' ;
 					$joinaccess = '';
@@ -644,6 +644,7 @@ class FlexicontentFields
 		// Initialize field for plugin triggering
 		$field->text = isset($field->{$method}) ? $field->{$method} : '';
 		$field->introtext = $field->text;  // needed by some plugins that do not use or clear ->text property
+		$field->created_by = $item->created_by;
 		$field->title = $item->title;
 		$field->slug = isset($item->slug) ? $item->slug : $item->id;
 		$field->sectionid = !FLEXI_J16GE ? $item->sectionid : false;
@@ -3024,7 +3025,7 @@ class FlexicontentFields
 		$and_access = '';
 		if ($check_access) {
 			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$and_access = ' AND fi.access IN (0,'.$aid_list.') ';
 			} else {

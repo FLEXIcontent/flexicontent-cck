@@ -120,7 +120,7 @@ ul.statetoggler {
 	vertical-align: top;
 	display: inline-block !important;
 	list-style: none !important;
-	margin: 0 !important;
+	margin: 0 4px !important;
 	padding: 0 !important;
 	width: auto !important;
 }
@@ -154,6 +154,7 @@ ul.statetoggler > li.topLevel, .statetoggler > li.topLevel ul > li {
 	background: none repeat scroll 0 0 transparent !important;
 	overflow: visible !important;
 	min-height: 20px !important;
+	width: auto !important;
 	display: -moz-inline-stack !important;
 	display: inline-block !important;
 	vertical-align: top !important;

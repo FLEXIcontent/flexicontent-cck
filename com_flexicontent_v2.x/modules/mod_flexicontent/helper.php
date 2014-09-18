@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1916 2014-06-17 19:18:48Z ggppdk $
+ * @version 1.2 $Id: helper.php 1952 2014-09-12 08:25:57Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -38,7 +38,7 @@ class modFlexicontentHelper
 		$user = JFactory::getUser();
 		// Get IDs of user's access view levels
 		if (!FLEXI_J16GE) $aid = (int) $user->get('aid');
-		else $aid_arr = $user->getAuthorisedViewLevels();
+		else $aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 		
 		// get the component parameters
 		$flexiparams = JComponentHelper::getParams('com_flexicontent');
@@ -625,7 +625,6 @@ class modFlexicontentHelper
 		// Initialize variables
 		$db				= JFactory::getDBO();
 		$user			= JFactory::getUser();
-		$gid			= !FLEXI_J16GE ? (int)$user->get('aid')  :  max($user->getAuthorisedViewLevels());
 		$view			= JRequest::getVar('view');
 		$option		= JRequest::getVar('option');
 		$fparams 	= $app->getParams('com_flexicontent');
@@ -751,7 +750,7 @@ class modFlexicontentHelper
 		$joinaccess = '';
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$where .= ' AND ty.access IN (0,'.$aid_list.')';
 				$where .= ' AND mc.access IN (0,'.$aid_list.')';

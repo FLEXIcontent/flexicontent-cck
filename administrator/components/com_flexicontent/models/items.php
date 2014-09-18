@@ -392,8 +392,8 @@ class FlexicontentModelItems extends JModelLegacy
 		if ( $print_logging_info )  $start_microtime = microtime(true);
 		
 		$done = true;
-		if ($checkNoExtData)  $done = $done && ($session->get('unbounded_noext',  false, 'flexicontent') !== false);
-		if ($checkInvalidCat) $done = $done && ($session->get('unbounded_badcat', false, 'flexicontent') !== false);
+		if ($checkNoExtData)  $done = $done && ($session->get('unbounded_noext',  false, 'flexicontent') === 0);
+		if ($checkInvalidCat) $done = $done && ($session->get('unbounded_badcat', false, 'flexicontent') === 0);
 		
 		if ( !$noCache && $done ) return $count_only ? 0 : array();
 		
@@ -841,7 +841,7 @@ class FlexicontentModelItems extends JModelLegacy
 		$joinaccess = "";
 		if (!$allitems && $viewable_items) {
 			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$where[] = ' t.access IN (0,'.$aid_list.')';
 				$where[] = ' c.access IN (0,'.$aid_list.')';
@@ -1078,7 +1078,7 @@ class FlexicontentModelItems extends JModelLegacy
 			$_FISH22GE = (boolean) count($this->_db->loadObjectList());
 		}
 		
-		$_NEW_LANG_TBL = FLEXI_J16GE || _FISH22GE;
+		$_NEW_LANG_TBL = FLEXI_J16GE || $_FISH22GE;
 		
 		
 		// Get if translation is to be performed, 1: FLEXI_DUPLICATEORIGINAL,  2: FLEXI_USE_JF_DATA,  3: FLEXI_AUTO_TRANSLATION,  4: FLEXI_FIRST_JF_THEN_AUTO

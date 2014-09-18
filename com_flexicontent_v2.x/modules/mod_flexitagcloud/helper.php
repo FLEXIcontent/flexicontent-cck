@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.1 $Id: helper.php 1264 2012-05-04 15:55:52Z ggppdk $
+ * @version 1.1 $Id: helper.php 1762 2013-09-14 16:42:09Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Tag Cloud Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -54,7 +54,7 @@ class modFlexiTagCloudHelper
 		// filter by permissions
 		if (!$show_noauth) {
 			if (FLEXI_J16GE) {
-				$aid_arr  = $user->getAuthorisedViewLevels();
+				$aid_arr  = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				$where  .= ' AND i.access IN ('.$aid_list.')';
 			} else {

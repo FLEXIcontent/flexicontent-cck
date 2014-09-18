@@ -377,7 +377,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 
 		// Get user access level (these are multiple for J2.5)
 		$user = JFactory::getUser();
-		if (FLEXI_J16GE) $aid_arr = $user->getAuthorisedViewLevels();
+		if (FLEXI_J16GE) $aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 		else             $aid = (int) $user->get('aid');
 
 		$n = 0;
@@ -1298,7 +1298,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if ( $get_select_access ) {
 			$select_access = '';
 			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				if ($include_file) $select_access .= ', CASE WHEN'.
 					'   f.access IN (0,'.$aid_list.')  THEN 1 ELSE 0 END AS has_file_access';
@@ -1337,7 +1337,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		else {
 			if (FLEXI_J16GE) {
-				$aid_arr = $user->getAuthorisedViewLevels();
+				$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
 				$aid_list = implode(",", $aid_arr);
 				if ($include_file)
 					$andacc .= ' AND  f.access IN (0,'.$aid_list.')';  // AND file access

@@ -169,7 +169,7 @@ class FlexicontentModelQfcategoryelement extends JModelList
 		// Implement View Level Access
 		if (!$user->authorise('core.admin'))
 		{
-			$groups	= implode(',', $user->getAuthorisedViewLevels());
+			$groups	= implode(',', JAccess::getAuthorisedViewLevels($user->id));
 			$query->where('c.access IN ('.$groups.')');
 		}
 		

@@ -103,7 +103,9 @@ class FlexicontentControllerItems extends FlexicontentController
 		$model->resetHits($id);
 		
 		if (FLEXI_J16GE) {
-			$cache = FLEXIUtilities::getCache();
+			$cache = FLEXIUtilities::getCache($group='', 0);
+			$cache->clean('com_flexicontent_items');
+			$cache = FLEXIUtilities::getCache($group='', 1);
 			$cache->clean('com_flexicontent_items');
 		} else {
 			$itemcache = JFactory::getCache('com_flexicontent_items');
