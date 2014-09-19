@@ -186,7 +186,7 @@ class FlexicontentViewImport extends JViewLegacy
 		// we could also create a new class and override getInput() method but maybe this is an overkill, we may do it in the future
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$default_lang = $cparams->get('import_lang', '*');
-			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $default_lang, 6, $allowed_langs, $default_lang);
+			$lists['languages'] = flexicontent_html::buildlanguageslist('language', '', $default_lang, 6, $allowed_langs, $published_only=true);
 		} else {
 			$default_lang = flexicontent_html::getSiteDefaultLang();
 			$_langs[] = JHTML::_('select.option', $default_lang, JText::_( 'Default' ).' ('.flexicontent_html::getSiteDefaultLang().')' );

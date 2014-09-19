@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: route.php 1950 2014-09-08 08:23:41Z ggppdk $
+ * @version 1.5 stable $Id: route.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -57,7 +57,7 @@ class FlexicontentHelperRoute
 		//     (a) are of currently selected language - OR - language '*' (=ALL) and
 		//     (b) have any of the access levels given to the current user
 		//     this is what we need, since using a menu item with incorrect language or incorrect access level will cause problems with SEF URLs ...
-		//     if language filtering is disable then menu item of any language is returned BUT WE WILL USE ONLY:
+		//     if language filtering is disabled then menu item of any language is returned BUT WE WILL USE ONLY:
 		//     (a) item's language (if not given we will use currently active language)
 		//     (b) also try to find menu items of 'ALL' language (='*')
 		//
@@ -325,7 +325,7 @@ class FlexicontentHelperRoute
 				$menu = $menus->getActive();
 				
 				$menu_cid = $menu && (int)@$menu->query['cid'] ? (int)@$menu->query['cid'] : 0;
-				if ( $menu_cid && isset($globalcats[$current_cid]->ancestorsarray) ) {
+				if ( $menu_cid && isset($globalcats[$current_cid]) ) {
 					$current_cid_parents = array_reverse($globalcats[$current_cid]->ancestorsarray);
 					//print_r($current_cid_parents );
 					//exit;
@@ -368,23 +368,21 @@ class FlexicontentHelperRoute
 		// Priority 2: Type's default before categories (if so configured): ... giving an object means no-lookup and just use it
 		if ($type && $type_menu_itemid_usage==1 && $type->typeMenuItem)  $needles['type_before'] = $type->typeMenuItem;
 		
-		// Priority 3: Currently active menu item that matches current category view ... giving an object means no-lookup and just use it
-		if ($curr_catmenu)  $needles['current_category'] = $curr_catmenu;
-		
-		// Priority 4: Category view menu items of given category IDs ... item's category and its parent categories in ascending order
+		// Priority 3: Category view menu items of given category IDs ... item's category and its parent categories in ascending order
 		$needles['category'] = $parents_ids;
 		
-		// Priority 5: Directory view menu items ... pointing to same category IDs as above
+		// Priority 4: Directory view menu items ... pointing to same category IDs as above
 		$needles['flexicontent'] = $needles['category'];
 		
-		// Priority 6: Type's default after categories (if so configured): ... giving an object means no-lookup and just use it
+		// Priority 5: Type's default after categories (if so configured): ... giving an object means no-lookup and just use it
 		if ($type && $type_menu_itemid_usage==2 && $type->typeMenuItem)  $needles['type_after'] = $type->typeMenuItem;
 		
 		// Do not add component's default menu item to allow trying "ALL" language items ? before component default ?
 		
-		// These will be unset and not used needles lookup loop
+		// These will be unset and will not be used as needles in lookup loop of _findItem()
 		$needles['_item'] = $item;   
-		$needles['_language'] = 0;   // we will overwrite language below if needed, ()
+		$needles['_language'] = 0;   // we will overwrite language below if needed
+		$needles['_cat_menu'] = $curr_catmenu;  // currently active menu item that matches current category view ...
 		
 		
 		// ***************
@@ -444,14 +442,58 @@ class FlexicontentHelperRoute
 	{
 		static $component_default_menuitem_id = null;  // Calculate later only if needed
 		
-		$needles = array(
-			'category' => (int) $catid
-		);
+		static $current_language = null;
+		if ($current_language===null) $current_language = JFactory::getLanguage()->getTag();
+		
+		static $use_language = null;
+		if ($use_language===null) {
+			$use_language = FLEXI_J16GE && JLanguageMultilang::isEnabled();
+			if ($use_language) {
+				self::buildLanguageLookup();
+			}
+		}
+		
+		$_catid = (int) $catid;
+		
+		// **********************************************************************************
+		// Get item's parent categores to be used in search a menu item of type category view
+		// **********************************************************************************
+		
+		$parents_ids = array();
+		global $globalcats;
+		if ( $_catid && isset($globalcats[$_catid]->ancestorsarray) ) {
+			$parents_ids = array_reverse($globalcats[$_catid]->ancestorsarray);
+		}
+		
+		$needles = array();
+		
+		// Priority 1: Category view menu items of given category ID ... and parent categories in ascending order
+		$needles['category'] = $parents_ids;
+		
+		// Get language of category
+		$language = isset($globalcats[$_catid]->language) ? $globalcats[$_catid]->language : $current_language;
+		$needles['_language'] = 0;   // we will overwrite language below if needed
+		
 		
 		//Create the link
 		$link = 'index.php?option=com_flexicontent&view=category&cid='.$catid;
+		
 		// Append given variables
 		foreach ($urlvars as $varname => $varval) $link .= '&'.$varname.'='.$varval;
+		
+		
+		// SEF language code as so configured
+		if ($use_language && $language && $language != "*")
+		{
+			if(isset(self::$lang_lookup[$language]))
+			{
+				if ( self::$add_url_lang && isset(self::$interface_langs[$language]) ) {
+					$link .= '&lang='.self::$lang_lookup[$language];
+				}
+				$needles['_language'] = $language;
+			}
+		}
+		
 		
 		if ($Itemid) { // USE the itemid provided, if we were given one it means it is "appropriate and relevant"
 			$link .= '&Itemid='.$Itemid;
@@ -573,7 +615,7 @@ class FlexicontentHelperRoute
 	
 	static function _findItem($needles)
 	{
-		// These will be added to a reverse lookup hash for O(1) lookup
+		// These will be added to a reverse lookup table for O(1) lookup
 		static $component_menuitems = null;
 		if ($component_menuitems === null) $component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		
@@ -583,110 +625,100 @@ class FlexicontentHelperRoute
 			$user_access = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id) : (int) $user->get('aid');
 		}
 		
-		if ( empty($needles[FLEXI_ITEMVIEW]) ) return null;
+		if ( !$needles ) return false;
 		
 		$min_matched = 99;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
-		
 		
 		// Get language to match
 		$language = $needles['_language'];
 		unset($needles['_language']);
 		
+		// Get item to match
+		$item = $needles['_item'];
+		unset($needles['_item']);
 		
-		// *********************************************************************************************************
-		// DONE ONCE: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup hash
-		// *********************************************************************************************************
+		// Get current matched category menu
+		$cat_menu = $needles['_cat_menu'];
+		unset($needles['_cat_menu']);
 		
+		
+		// *****************************************************************************************************************
+		// Done ONCE per language: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup
+		// table for the given language, not if given language is missing the an '*' menu item will be allowed in its place
+		// *****************************************************************************************************************
 		if ( !isset(self::$lookup[$language]) ) {
-			self::$lookup[$language] = array();
-			
-			foreach($component_menuitems as $menuitem)
-			{
-				if ( !isset($menuitem->query) || !isset($menuitem->query['view']) ) continue;  // view not set
-				if ( FLEXI_J16GE && $menuitem->language != $language ) continue;   // wrong language
-				
-				// Do not match menu items that override category configuration parameters, these items will be selectable only
-				// (a) via direct click on the menu item or
-				// (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
-				// (c) they are currently active ...
-				if ( @$menuitem->query['view'] == 'category'      // match category menu items ...
-					&& @$menuitem->query['cid'] == $needles['category']   // ... that point to item's category
-					&& @$menuitem->query['layout'] == '' // ... but do not match "author", "my items", etc, limited to the specific category
-				) {
-					if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? $menuitem->params : new JParameter($menuitem->params);
-					if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
-				}
-				
-				$view = $menuitem->query['view'];
-				if (!isset(self::$lookup[$language][$view])) {
-					self::$lookup[$language][$view] = array();
-				}
-				if ($view == FLEXI_ITEMVIEW) {
-					if ( !empty($menuitem->query['id']) )  self::$lookup[$language][$view][$menuitem->query['id']] = (int) $menuitem->id;
-					//if ( !empty($menuitem->query['id']) )  echo FLEXI_ITEMVIEW ." - ". $menuitem->query['id'] . ": ".$menuitem->id."<br/>";
-				} else if ($view == 'category') {
-					if ( !empty($menuitem->query['cid']) )  self::$lookup[$language][$view][$menuitem->query['cid']] = (int) $menuitem->id;
-				} else if ($view == 'flexicontent') {
-					if ( !empty($menuitem->query['rootcat']) )  {
-						//echo $menuitem->id . " - ". $menuitem->query['rootcat'];
-						self::$lookup[$language][$view][$menuitem->query['rootcat']] = (int) $menuitem->id;
-					}
-				}
-				
-				
-			}
+			FlexicontentHelperRoute::populateLookupTable($language);
 		}
 		
 		
 		// Now find menu item for given needles of item, this will be usually 1 lookup for item's 
-		$level = 0;
-		if ($needles)
+		foreach ($needles as $view => $ids)
 		{
-			foreach ($needles as $view => $ids)
+			if ( is_object($ids) ) return $ids;  // done, this an already appropriate menu item object
+			
+			// Lookup if then given ids for the given view exists for the given language
+			if ( !isset(self::$lookup[$language][$view]) ) continue;
+			
+			foreach($ids as $id)
 			{
-				if ( is_object($ids) ) return $ids;  // done, this an already appropriate menu item object
+				if ( !isset(self::$lookup[$language][$view][(int)$id]) ) continue;  // not found
 				
-				// Lookup if then given ids for the given view exists for the given language
-				if (isset(self::$lookup[$language][$view]))
-				{
-					foreach($ids as $id)
-					{
-						if ( !isset(self::$lookup[$language][$view][(int)$id]) ) continue;  // not found
-						
-						//echo "$language $view $id : ". self::$lookup[$language][$view][(int)$id] ."<br/>";
-						$menuid = self::$lookup[$language][$view][(int)$id];
-						$menuitem = $component_menuitems[$menuid];
-						
-						// In J1.5 we need menu access level lower/equal to user's access level, in J2.5+ this is already done by JMenuSite::getItems()
-						if (!FLEXI_J16GE && $menuitem->access > $user_access) continue;
-						
-						return $menuitem;
-					}
+				//echo "$language $view $id : ". self::$lookup[$language][$view][(int)$id] ."<br/>";
+				$menuid = self::$lookup[$language][$view][(int)$id];
+				$menuitem = $component_menuitems[$menuid];
+				
+				// In J1.5 we also need to check the menu access level (that it is lower/equal to user's access level)
+				// In J2.5+ this is already done by JMenuSite::getItems()
+				if (!FLEXI_J16GE && $menuitem->access > $user_access) continue;
+				
+				// Use current category menu if it is a category menu for same category was matched
+				if ( $view=='category' && $cat_menu && $cat_menu->query['cid'] == $menuitem->query['cid'] ) {
+					$menuitem = $cat_menu;
 				}
+				
+				return $menuitem;
 			}
 		}
 		
-		if ($language != '*')
-		{
-			$needles['_language'] = '*';
-			return self::_findItem($needles);
-		}
+		// not found, restore passed data
+		$needles['_language'] = $language;
+		$needles['_item'] = $item;
+		$needles['_cat_menu'] = $cat_menu;
 		
-		// not found
 		return false;
 	}
 	
 	
 	static function _findCategory($needles, $urlvars=array())
 	{
+		// These will be added to a reverse lookup table for O(1) lookup
 		static $component_menuitems = null;
 		if ($component_menuitems === null) $component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
 		global $globalcats;
 		
+		static $user_access = null;
+		if ($user_access===null) {
+			$user = JFactory::getUser();
+			$user_access = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id) : (int) $user->get('aid');
+		}
+		
 		$match = null;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
-		$db = JFactory::getDBO();
+		
+		// Get language to match
+		$language = $needles['_language'];
+		unset($needles['_language']);
+		
+		
+		// *****************************************************************************************************************
+		// Done ONCE per language: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup
+		// table for the given language, not if given language is missing the an '*' menu item will be allowed in its place
+		// *****************************************************************************************************************
+		if ( !isset(self::$lookup[$language]) ) {
+			FlexicontentHelperRoute::populateLookupTable($language);
+		}
+		
 		
 		// Get current menu item, we will prefer current menu if it points to given category,
 		// thus maintaining current menu item if multiple menu items to same category exist !!
@@ -699,14 +731,11 @@ class FlexicontentHelperRoute
 		
 		// multiple needles, because maybe searching for multiple categories,
 		// also earlier needles (catids) takes priority over later ones
-		foreach($needles as $needle => $cid)  {
-
-			// Get access level of the FLEXIcontent category
-			$cat_acclevel = $cid && isset($globalcats[$cid]) ? $globalcats[$cid]->access : 0;
-			
+		foreach($needles as $view => $cid)
+		{
 			// Prefer current menu item if pointing to given category url ...
 			if ($menu && 
-				@$menu->query['view'] == $needle &&
+				@$menu->query['view'] == $view &&
 				@$menu->query['cid'] == $cid &&
 				// these variables must be explicitely checked, we must not rely on the urlvars loop below !
 				@$menu->query['layout'] == @$urlvars['layout'] && // match layout "author", "myitems", "mcats", "favs", "tags" etc
@@ -717,27 +746,38 @@ class FlexicontentHelperRoute
 				$match = $menu;
 				break;
 			}
-			
-			foreach($component_menuitems as $menuitem)
-			{
-				// Require appropriate access level of the menu item, to avoid access problems and redirecting guest to login page
-				if (!FLEXI_J16GE) {
-					// In J1.5 we need menu access level lower than category access level
-					if ($menuitem->access > $cat_acclevel) continue;
-				} else {
-					// In J2.5 we need menu access level public or the access level of the category
-					if ($menuitem->access!=$public_acclevel && $menuitem->access==$cat_acclevel) continue;
-				}
+		}
+		
+		
 
-				// Try to match important menu / url variables
+		// Now find menu item for given needles of item, this will be usually 1 lookup for item's 
+		foreach ($needles as $view => $ids)
+		{
+			if ( is_object($ids) ) return $ids;  // done, this an already appropriate menu item object
+			if ( $view=='_language' ) continue;
+			
+			// Lookup if then given ids for the given view exists for the given language
+			if ( !isset(self::$lookup[$language][$view]) ) continue;
+			
+			foreach($ids as $id)
+			{
+				if ( !isset(self::$lookup[$language][$view][(int)$id]) ) continue;  // not found
+				
+				//echo "$language $view $id : ". self::$lookup[$language][$view][(int)$id] ."<br/>";
+				$menuid = self::$lookup[$language][$view][(int)$id];
+				$menuitem = $component_menuitems[$menuid];
+				
+				// In J1.5 we also need to check the menu access level (that it is lower/equal to user's access level)
+				// In J2.5+ this is already done by JMenuSite::getItems()
+				if (!FLEXI_J16GE && $menuitem->access > $user_access) continue;
+				
+				// Try to match important menu / url variables. NOTE: view and cid variables were already matched via table lookup
 				if (
-					@$menuitem->query['view'] != $needle ||
-					@$menuitem->query['cid'] != $cid ||
 					// these variables must be explicitely checked, we must not rely on the urlvars loop below !
 					@$menuitem->query['layout'] != @$urlvars['layout'] || // match layout "author", "myitems", "mcats", "favs", "tags" etc
 					@$menuitem->query['authorid'] != @$urlvars['authorid'] || // match "authorid" for user id of author
 					@$menuitem->query['cids'] != @$urlvars['cids'] || // match "cids" of "mcats" (multi-category view)
-					@$menu->query['tagid'] != @$urlvars['tagid'] // match "tagid" of "tags" view
+					@$menuitem->query['tagid'] != @$urlvars['tagid'] // match "tagid" of "tags" view
 				) continue;
 				
 				// Try to match any other given url variables, if these were specified and thus are required
@@ -747,20 +787,13 @@ class FlexicontentHelperRoute
 				}
 				if ( !$all_matched ) continue;
 				
-				// All important menu variables and the optional urlvars were matched, an appropriate menu item was found
-				// ... but do not match menu items that override category configuration parameters, these items will be selectable only
-				// (a) via direct click on the menu item or (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
-				if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? $menuitem->params : new JParameter($menuitem->params);
-				if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
-
-				$match = $menuitem;
-				break;
+				return $menuitem;
 			}
-			
-			if (isset($match))  break;  // If a menu item for a category found, do not search for next needles (category ids)
 		}
-
-		return $match;
+		
+		// not found, restore passed data
+		$needles['_language'] = $language;
+		return false;
 	}
 	
 	
@@ -773,14 +806,26 @@ class FlexicontentHelperRoute
 		$match = null;
 		$public_acclevel = !FLEXI_J16GE ? 0 : 1;
 		
-		global $globalcats;
-		$db = JFactory::getDBO();
+		// Get language to match
+		$language = $needles['_language'];
+		unset($needles['_language']);
+		
+			
+		// *****************************************************************************************************************
+		// Done ONCE per language: Iterate through menu items pointing to FLEXIcontent component, to create a reverse lookup
+		// table for the given language, not if given language is missing the an '*' menu item will be allowed in its place
+		// *****************************************************************************************************************
+		if ( !isset(self::$lookup[$language]) ) {
+			FlexicontentHelperRoute::populateLookupTable($language);
+		}
+		
 		
 		// multiple needles, because maybe searching for multiple categories,
 		// also earlier needles (catids) takes priority over later ones
-		foreach($needles as $needle => $cid)  {
+		foreach($needles as $view => $ids)  {
 
 			// Get access level of the FLEXIcontent category
+			$cid = reset($ids);
 			$cat_acclevel = $cid && isset($globalcats[$cid]) ? $globalcats[$cid]->access : 0;
 
 			foreach($component_menuitems as $menuitem) {
@@ -892,5 +937,63 @@ class FlexicontentHelperRoute
 		}
 	}
 	
+	
+	static function populateLookupTable($language)
+	{
+		// These will be added to a reverse lookup table for O(1) lookup
+		static $component_menuitems = null;
+		if ($component_menuitems === null) $component_menuitems = FlexicontentHelperRoute::_setComponentMenuitems();
+		
+		// Every VIEW may have a different variable for the lookup table in which we will add the menu items
+		static $view_varnames = array(FLEXI_ITEMVIEW=>'id', 'category'=>'cid', 'flexicontent'=>'rootcatid');
+		
+		self::$lookup[$language] = array();
+		$user = JFactory::getUser();
+		
+		foreach($component_menuitems as $menuitem)
+		{
+			if ( !isset($menuitem->query) || !isset($menuitem->query['view']) ) continue;  // view not set
+			if ( FLEXI_J16GE && $menuitem->language != $language ) continue;   // wrong language
+			
+			if ( @$menuitem->query['view'] == 'category' ) {     // CHECK if category menu items ... need to be skipped
+				
+				if (@$menuitem->query['layout']=='author' && $menuitem->query['authorid']!=$user->id)
+					// Do not match "author" if specific author is not current user
+					continue;
+			
+				else if (@$menuitem->query['layout']=='myitems' && !$user->id)
+					// Do not match "myitems" if current user is unlogged
+					continue;
+				
+				else if (@$menuitem->query['layout'])
+					// Do not match custom layouts, limited to a category id
+					continue;
+				
+				// Do not match menu items that override category configuration parameters, these items will be selectable only
+				// (a) via direct click on the menu item or
+				// (b) if their specific Itemid is passed to getCategoryRoute(), getItemRoute()
+				// (c) they are currently active ...
+				//if (!isset($menuitem->jparams)) $menuitem->jparams = FLEXI_J16GE ? $menuitem->params : new JParameter($menuitem->params);
+				//if ( $menuitem->jparams->get('override_defaultconf',0) ) continue;
+			}
+			
+			// Create lookup table for view if it does not exist already
+			$view = $menuitem->query['view'];
+			if (!isset(self::$lookup[$language][$view]))  self::$lookup[$language][$view] = array();
+			
+			// Check if view 's variable (used in lookup table) exists in the menu item
+			if ( !isset($view_varnames[$view]) ) continue;
+			$_index_name = $view_varnames[$view];
+			if ( empty($menuitem->query[$_index_name]) ) continue;
+			$_index_val = $menuitem->query[$_index_name];
+			
+			// Only a specific language menu item can override an existing lookup entry
+			if ( isset(self::$lookup[$language][$view][$_index_val]) && $menuitem->language == '*' ) continue;
+			
+			// Finally set new lookup entry or override existing lookup entry with language specific menu item
+			self::$lookup[$language][$view][$_index_val] = (int) $menuitem->id;
+		}
+	}
+		
 }
 ?>

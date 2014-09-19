@@ -258,7 +258,7 @@ html button {
 	-webkit-border-radius: 6px !important;
 	-moz-border-radius: 6px !important;
 	border-radius: 6px !important;
-	line-height:1.8em !important;
+	line-height:1.5em !important;
 	font-size:12px !important;
 	font-family:arial, helvetica, sans-serif !important;
 	padding: 5px 10px 5px 10px !important;
@@ -467,6 +467,12 @@ body.contentpane  {
 }
 
 /* prevent margin when parameter list starts */
+table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level0,
+table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level1,
+table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,
+table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level0,
+table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level1,
+table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
 li:first-child > .fcsep_level0, li:first-child > .fcsep_level1, li:first-child > .fcsep_level2 {margin-top:0px;}
 div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-of-type > div > .fcsep_level1, div.control-group:first-of-type > div > .fcsep_level2 {margin-top:0px;}
 
