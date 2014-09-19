@@ -83,7 +83,7 @@ class JElementFccheckbox extends JElement
 		
 		$html = '<fieldset id="'.$element_id.'" class="radio" style="border-width:0px;'.(FLEXI_J16GE ? "width:60%; " : "").'">';
 		
-		$inline_style  = "float:left; white-space:nowrap; ".(!FLEXI_J16GE ? "margin-right:12px; " : "");
+		$inline_style  = "float:left; white-space:nowrap;";
 		$disable_all = '';
 		if ( @$attributes['display_useglobal'] ) {
 			$check_global='';

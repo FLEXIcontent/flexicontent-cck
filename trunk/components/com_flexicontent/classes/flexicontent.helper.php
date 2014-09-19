@@ -4080,16 +4080,18 @@ class FLEXIUtilities
 				. ' ORDER BY '. (FLEXI_FISH_22GE ? ' lext.ordering ASC ' : ' l.ordering ASC ')
 				;
 		} else {
-			JError::raiseWarning(500, 'getlanguageslist(): ERROR no joomfish installed');
-			return array();
+			//echo "<pre>"; debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS); echo "</pre>";
+			//JError::raiseNotice(500, 'getlanguageslist(): Notice no joomfish installed');
+			//return array();
 		}
-		$db->setQuery($query);
-		$languages = $db->loadObjectList('id');
-		//echo "<pre>"; print_r($languages); echo "</pre>"; exit;
-		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
-		if ( !$languages )  return array();
-
-
+		if ( !empty($query) ) {
+			$db->setQuery($query);
+			$languages = $db->loadObjectList('id');
+			//echo "<pre>"; print_r($languages); echo "</pre>"; exit;
+			if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
+		}
+		
+		
 		// *********************
 		// Calculate image paths
 		// *********************
@@ -4100,22 +4102,40 @@ class FLEXIUtilities
 			$imgpath	= $app->isAdmin() ? '../images/':'images/';
 			$mediapath	= $app->isAdmin() ? '../components/com_joomfish/images/flags/' : 'components/com_joomfish/images/flags/';
 		}
-
-
+		
+		
 		// ************************
 		// Prepare language objects
 		// ************************
+		$_languages = array();
+		
+		// J1.6+ add 'ALL' also add 'ALL' if no languages found, since this is default for J1.6+
+		if (FLEXI_J16GE && $add_all) {
+			$lang_all = new stdClass();
+			$lang_all->code = '*';
+			$lang_all->name = JText::_('FLEXI_ALL');
+			$lang_all->shortcode = '*';
+			$lang_all->id = 0;
+			$_languages = array( 0 => $lang_all);
+		}
+		
+		// J1.5 add default site language if no languages found, e.g. no Joom!Fish installed
+		if (!FLEXI_J16GE && empty($languages)) {
+			$lang_default = new stdClass();
+			$lang_default->code = flexicontent_html::getSiteDefaultLang();
+			$lang_default->name = $lang_default->code;
+			$lang_default->shortcode = strpos($lang_default->code,'-') ?
+				substr($lang_default->code, 0, strpos($lang_default->code,'-')) :
+				$lang_default->code;
+			$lang_default->id = 0;
+			$_languages = array( 0 => $lang_default);
+		}
+		
+		// Check if no languages found and return
+		if ( empty($languages) )  return $_languages;
+		
 		if (FLEXI_J16GE)  // FLEXI_J16GE, based on J1.6+ language data and images
 		{
-			if ($add_all) {
-				$lang_all = new stdClass();
-				$lang_all->code = '*';
-				$lang_all->name = JText::_('FLEXI_ALL');
-				$lang_all->shortcode = '*';
-				$lang_all->id = 0;
-				$_languages = array( 0 => $lang_all);
-			}
-			
 			foreach ($languages as $lang) {
 				// Calculate/Fix languages data
 				$lang->shortcode = strpos($lang->code,'-') ?
@@ -4127,7 +4147,6 @@ class FLEXIUtilities
 				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $image_prefix . '.gif';
 				$_languages[$lang->id] = $lang;
 			}
-			$languages = $_languages;
 
 			// Also prepend '*' (ALL) language to language array
 			//echo "<pre>"; print_r($languages); echo "</pre>"; exit;
@@ -4142,6 +4161,7 @@ class FLEXIUtilities
 				// Get image path via helper function
 				$_imgsrc = JoomfishExtensionHelper::getLanguageImageSource($lang);
 				$lang->imgsrc = JURI::root(true).($_imgsrc[0]!='/' ? '/' : '').$_imgsrc;
+				$_languages[$lang->id] = $lang;
 			}
 		}
 		else      // JoomFish until v2.1
@@ -4149,34 +4169,20 @@ class FLEXIUtilities
 			foreach ($languages as $lang) {
 				// $lang->image, holds a custom image path
 				$lang->imgsrc = @$lang->image ? $imgpath . $lang->image : $mediapath . $lang->shortcode . '.gif';
+				$_languages[$lang->id] = $lang;
 			}
 		}
+		$languages = $_languages;
 		
 		if ( $published_only ) {
-			$pub_languages = $languages;
-		} else if (FLEXI_J16GE) {
-			$all_languages = $languages;
+			$pub_languages = $_languages;
 		} else {
-			if ($add_all) {
-				$lang_all = new stdClass();
-				$lang_all->code = '*';
-				$lang_all->name = JText::_('FLEXI_ALL');
-				$lang_all->shortcode = '*';
-				$lang_all->id = 0;
-				$lang_all->imgsrc = '';
-				
-				$all_languages[0] = $lang_all;
-			}
-			
-			foreach($languages as $lang) {
-				$all_languages[] = $lang;
-				$languages = $all_languages;
-			}
+			$all_languages = $_languages;
 		}
-		return $languages;
+		return $_languages;
 	}
-
-
+	
+	
 	/**
 	 * Method to build an array of languages hashed by id or by language code
 	 *

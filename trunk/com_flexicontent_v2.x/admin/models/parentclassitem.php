@@ -1374,7 +1374,8 @@ class ParentClassItem extends JModelAdmin
 			}
 			
 			// Decide default language
-			$default_lang = $app->isSite() ? $cparams->get('default_language_fe', '*') : (FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang());
+			$default_lang = FLEXI_J16GE ? '*' : flexicontent_html::getSiteDefaultLang();
+			$default_lang = $app->isSite() ? $cparams->get('default_language_fe', $default_lang) : $default_lang;
 			
 			// Override defaults values, we assigned all properties, 
 			// despite many of them having the correct value already

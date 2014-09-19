@@ -647,10 +647,8 @@ class FlexicontentViewItem extends JViewLegacy
 		$language_fieldname = FLEXI_J16GE ? 'jform[language]' : 'language';
 		if (FLEXI_FISH || FLEXI_J16GE) {
 			$lists['languages'] = flexicontent_html::buildlanguageslist($language_fieldname, '', $item->language, 3, $allowed_langs);
-		} else {
-			$item->language = flexicontent_html::getSiteDefaultLang();
 		}
-
+		
 		// Label for current item state: published, unpublished, archived etc
 		switch ($item->state) {
 			case 0:

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: textarea.php 1624 2013-01-12 04:21:10Z ggppdk $
+ * @version 1.0 $Id: textarea.php 1937 2014-08-26 10:27:07Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.textarea
@@ -61,6 +61,11 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$height       = $field->parameters->get( 'height', ($field->field_type == 'textarea') ? '300px' : '400px' ) ;
 		if ($height != (int)$height) $height .= 'px';
 		
+		
+		// ************************************
+		// Decide editor plugin buttons to SKIP
+		// ************************************
+		
 		$show_buttons = $field->parameters->get( 'show_buttons', 1 ) ;
 		$skip_buttons = $field->parameters->get( 'skip_buttons', '' ) ;
 		
@@ -69,13 +74,28 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		} else if ( !is_array($skip_buttons) ) {
 			$skip_buttons = array($skip_buttons);
 		}
+		// Clear empty value
+		if (empty($skip_buttons[0]))  unset($skip_buttons[0]);
+		
+		// Force skipping pagebreak and readmore for CUSTOM textarea fields
 		if ($field->field_type == 'textarea') {
 			if ( !in_array('pagebreak', $skip_buttons) ) $skip_buttons[] = 'pagebreak';
 			if ( !in_array('readmore',  $skip_buttons) )  $skip_buttons[] = 'readmore';
 		}
+		
 		$skip_buttons_arr = ($show_buttons && $editor_name=='jce' && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
 		
-		// tabbing parameters
+		
+		// ****************************************
+		// Override parameters of the editor plugin
+		// ****************************************
+		$editor_plg_params = array(); // nothing yet
+		
+		
+		// *********************
+		// Tabbing configuration
+		// *********************
+		
 		$editorarea_per_tab = $field->parameters->get('editorarea_per_tab', 0);
 		$allow_tabs_code_editing = $field->parameters->get('allow_tabs_code_editing', 0);
 		$merge_tabs_code_editor = $field->parameters->get('merge_tabs_code_editor', 1);
@@ -132,7 +152,12 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			if (!$use_html) {
 				$field->html[0]	 = '<textarea id="'.$field_idtag.'_0" name="' . $field->tab_names[0] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$field_value.'</textarea>'."\n";
 			} else {
-				$field->html[0] = $editor->display( $field->tab_names[0], $field_value, '100%', $height, $cols, $rows, $skip_buttons_arr, $field_idtag.'_0' );
+				// Only J1.6+ support TAG ID parameter ... the display function has different signature
+				//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
+				//display($name, $html, $width, $height, $col, $row, $buttons = true, $params = array())
+				$field->html[0] = FLEXI_J16GE ? 
+					$editor->display( $field->tab_names[0], $field_value, '100%', $height, $cols, $rows, $skip_buttons_arr, $field_idtag.'_0', $_asset_ = null, $_author_ = null, $editor_plg_params) :
+					$editor->display( $field->tab_names[0], $field_value, '100%', $height, $cols, $rows, $skip_buttons_arr, $editor_plg_params);
 			}
 			$field->html = $field->html[0];
 		}

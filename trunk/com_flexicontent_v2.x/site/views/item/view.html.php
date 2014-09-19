@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1949 2014-09-04 01:22:18Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1486,7 +1486,6 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		
 		// find user's allowed languages
-		$site_default_lang = flexicontent_html::getSiteDefaultLang();
 		$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
 		if (!$isnew && $allowed_langs) $allowed_langs[] = $item->language;
@@ -1496,15 +1495,13 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// Build languages list
 		if (FLEXI_J16GE || FLEXI_FISH) {
-			$item_lang = $isnew ? $site_default_lang : $item->language;
+			$item_lang = $isnew ? $default_lang : $item->language;  // Model has already set default language, so this is somewhat redundant
 			$langdisplay = $params->get('langdisplay_fe', 3);
 			$langconf = array();
 			$langconf['flags'] = $params->get('langdisplay_flags_fe', 1);
 			$langconf['texts'] = $params->get('langdisplay_texts_fe', 1);
 			$field_attribs = $langdisplay==2 ? 'class="use_select2_lib"' : '';
-			$lists['languages'] = flexicontent_html::buildlanguageslist( (FLEXI_J16GE ? 'jform[language]' : 'language') , $field_attribs, $item_lang, $langdisplay, $allowed_langs, $published_only=1, $disable_langs, $add_all=true, $langconf);
-		} else {
-			$item->language = $site_default_lang;
+			$lists['languages'] = flexicontent_html::buildlanguageslist( (FLEXI_J16GE ? 'jform[language]' : 'language') , $field_attribs, $item->language, $langdisplay, $allowed_langs, $published_only=1, $disable_langs, $add_all=true, $langconf);
 		}
 
 		return $lists;
