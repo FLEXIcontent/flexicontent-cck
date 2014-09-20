@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1950 2014-09-08 08:23:41Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -753,54 +753,63 @@ class FlexicontentFields
 		  // RENDER fields if they are present in a template position (or in a dummy template position ... e.g. when called by module)
 			foreach ($pos->fields as $c => $f) {
 				
-				// Render field (if already rendered above, the function will return result immediately)
+				// CORE/CUSTOM: Render field (if already rendered above, the function will return result immediately)
 				$method = (isset($pos->methods[$c]) && $pos->methods[$c]) ? $pos->methods[$c] : 'display';
 				
-				// Check that field with given name: $f exists, (this will handle deleted fields, that still exist in a template position)
+				// Render ANY CORE field with single call for all items, CORE fields are assigned to ALL types,
+				// try to get field out of first item, if it does not exist, then field is a CUSTOM field
 				$item = reset($items);
-				if (!isset($item->fields[$f]))  continue;
-				$field = $item->fields[$f];
+				$field = @ $item->fields[$f];
 				
-				// Render ANY CORE field with single call for all items (check if already rendered)
-				if ($field->iscore) {
-					if ( !isset($_rendered['ALL']['core']) && !isset($_rendered['ALL'][$f]) ) {
-						$values = null;
-						FlexicontentFields::renderField($items, $f, $values, $method, $view);
-						$_rendered['ALL'][$f] = 1;
-					}
-				}
-				
-				// Render ANY non-CORE field with per item call (check if already rendered)
-				else foreach ($items as $item) {
+				if ($field && $field->iscore)
+				{
 					// Check if already rendered
-					if ( !isset($_rendered['ALL'][$f]) && !isset($_rendered[$item->id][$f]) ) {
-						$_rendered[$item->id][$f] = 1;
-						
-						$field = $item->fields[$f];
-						
-						// Set field values, currently, this exists for CUSTOM fields only, OR versioned CORE/CUSTOM fields too ...
-						$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
-						
-						$field 	= FlexicontentFields::renderField($item, $field, $values, $method, $view);
-					}
+					if ( isset($_rendered['ALL']['core']) || isset($_rendered['ALL'][$f]) ) continue;
+					
+					// No custom values for CORE fields, values are decided inside the CORE field
+					$values = null;
+					FlexicontentFields::renderField($items, $f, $values, $method, $view);
+					$_rendered['ALL'][$f] = 1;
 				}
 				
-				foreach ($items as $item) {
+				// Render ANY CUSTOM field with per item call
+				// *** TODO: (future optimization) render a field at once for ALL ITEMs of SAME content type
+				else foreach ($items as $item)
+				{
+					// Check that field with given name: $f exists for current item (AKA, that it is assigned to the item's type)
+					if ( !isset($item->fields[$f]) )  continue;
+					
+					// Check if already rendered
+					if ( isset($_rendered['ALL'][$f]) || isset($_rendered[$item->id][$f]) ) continue;
+					
+					// Get field and field values, currently, custom field values can be passed only for CUSTOM fields, OR versioned CORE/CUSTOM fields too ...
+					$field  = $item->fields[$f];
+					$values = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
+					
+					// Render the field's display
+					$field 	= FlexicontentFields::renderField($item, $field, $values, $method, $view);
+					$_rendered[$item->id][$f] = 1;
+				}
+				
+				foreach ($items as $item)
+				{
+					// Check that field with given name: $f exists for current item (AKA, that it is assigned to the item's type)
+					if ( !isset($item->fields[$f]) )  continue;
 					$field = $item->fields[$f];
 					
-					// Set template position field data
-					if (isset($field->display) && strlen($field->display))
-					{
-						if (!isset($item->positions[$pos->position]))
-							$item->positions[$pos->position] = new stdClass();
-						$item->positions[$pos->position]->{$f} = new stdClass();
-						
-						$item->positions[$pos->position]->{$f}->id				= $field->id;
-						$item->positions[$pos->position]->{$f}->id				= $field->id;
-						$item->positions[$pos->position]->{$f}->name			= $field->name;
-						$item->positions[$pos->position]->{$f}->label		= $field->parameters->get('display_label') ? $field->label : '';
-						$item->positions[$pos->position]->{$f}->display	= $field->display;
-					}
+					// Skip field if empty display was produced
+					if ( !isset($field->display) || !strlen($field->display) ) continue;
+					
+					// Set field display HTML/data in the template position,
+					if (!isset($item->positions[$pos->position]))
+						$item->positions[$pos->position] = new stdClass();
+					$item->positions[$pos->position]->{$f} = new stdClass();
+					
+					$item->positions[$pos->position]->{$f}->id				= $field->id;
+					$item->positions[$pos->position]->{$f}->id				= $field->id;
+					$item->positions[$pos->position]->{$f}->name			= $field->name;
+					$item->positions[$pos->position]->{$f}->label		= $field->parameters->get('display_label') ? $field->label : '';
+					$item->positions[$pos->position]->{$f}->display	= $field->display;
 				}
 			}
 		}
