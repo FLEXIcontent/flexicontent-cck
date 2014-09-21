@@ -27,6 +27,39 @@ if (!function_exists('json_encode')) { // PHP < 5.2 lack support for json
 
 class flexicontent_html
 {
+	static function getDefaultCanonical()
+	{
+		$app = JFactory::getApplication();
+		$doc = JFactory::getDocument();
+
+		if ($app->getName() != 'site' || $doc->getType() !== 'html')
+		{
+			return;
+		}
+
+		$router = $app::getRouter();
+		
+		$uri = clone JUri::getInstance();
+		// Get configuration from plugin
+		$plugin = JPluginHelper::getPlugin('system', 'sef');
+		$domain = null;
+		if (!empty($plugin)) {
+			$pluginParams = FLEXI_J16GE ? new JRegistry($plugin->params) : new JParameter($plugin->params);
+			$domain = $pluginParams->get('domain');
+		}
+
+		if ($domain === null || $domain === '')
+		{
+			$domain = $uri->toString(array('scheme', 'host', 'port'));
+		}
+
+		$parsed = $router->parse($uri);
+		$fakelink = 'index.php?' . http_build_query($parsed);
+		$link = $domain . JRoute::_($fakelink, false);
+
+		return ($uri !== $link) ? htmlspecialchars($link) : false;
+	}
+
 
 	// *** Output the javascript to dynamically hide/show columns of a table
 	static function jscode_to_showhide_table($container_div_id,$data_tbl_id, $lbltext) {
