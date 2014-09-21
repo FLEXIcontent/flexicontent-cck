@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1959 2014-09-18 00:15:15Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1963 2014-09-21 10:13:43Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -3898,11 +3898,11 @@ class flexicontent_tmpl
 		// Log content plugin and other performance information
 		if ($print_logging_info) { global $fc_run_times; $start_microtime = microtime(true); }
 
-		if ( !FLEXI_J30GE && FLEXI_CACHE) {
+		if ( !FLEXI_J30GE ) {  // && FLEXI_CACHE  ,  Ignore cache settings since XML parsing in J1.5/J2.5 is costly
 			// add the templates to templates cache
 			$tmplcache = JFactory::getCache('com_flexicontent_tmpl');
-			$tmplcache->setCaching(1); 		//force cache
-			$tmplcache->setLifeTime(84600); //set expiry to one day
+			$tmplcache->setCaching(1);         // Force cache ON
+			$tmplcache->setLifeTime(24*3600);  // Set expire time (hard-code this to 1 day), since it is costly
 			$tmpls = $tmplcache->call(array('flexicontent_tmpl', 'parseTemplates'));
 			$cached = 1;
 		}

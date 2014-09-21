@@ -23,17 +23,20 @@ class FlexicontentHelperPerm
 		static $permission = null;
 		if ($permission && !$force) return $permission;
 		
-		// Return cached data
-		$catscache = JFactory::getCache('com_flexicontent_cats');  // Get Joomla Cache of '...items' Caching Group
-		$catscache->setCaching(1); 		              // Force cache ON
-		$catscache->setLifeTime(84600); //set expiry to one day
+		$user_id = JFactory::getUser()->id;
 		
-		if (FLEXI_J16GE || !FLEXI_ACCESS) {
-			$user_id = JFactory::getUser()->id;
+		// Return cached data, for J2.5 or J1.5 without FLEXIaccess
+		if ((FLEXI_J16GE || !FLEXI_ACCESS) && FLEXI_CACHE) {
+			$catscache = JFactory::getCache('com_flexicontent_cats');  // Get Joomla Cache of '...items' Caching Group
+			$catscache->setCaching(1); 		              // Force cache ON
+			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
+			
 			$permission = $catscache->call(array('FlexicontentHelperPerm', 'getUserPerms'), $user_id);
-		} else {
-			// No Caching for FLEXI_ACCESS
-			$permission = FlexicontentHelperPerm::getUserPerms();
+		}
+		
+		else {
+			// Caching disabled or ... FLEXI_ACCESS installed
+			$permission = FlexicontentHelperPerm::getUserPerms($user_id);
 		}
 		
 		return $permission;
@@ -224,12 +227,16 @@ class FlexicontentHelperPerm
 	static function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false, $find_first = false )
 	{
 		// Return cached data
-		$catscache = JFactory::getCache('com_flexicontent_cats');  // Get Joomla Cache of '...items' Caching Group
-		$catscache->setCaching(1); 		              // Force cache ON
-		$catscache->setLifeTime(84600); //set expiry to one day
-		
-		$user_id = $user ? $user->id : JFactory::getUser()->id;
-		$allowedCats = $catscache->call(array('FlexicontentHelperPerm', '_getAllowedCats'), $user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first);
+		if (FLEXI_CACHE) {
+			$catscache = JFactory::getCache('com_flexicontent_cats');  // Get Joomla Cache of '...items' Caching Group
+			$catscache->setCaching(1); 		              // Force cache ON
+			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // set expire time (default is 1 hour)
+			
+			$user_id = $user ? $user->id : JFactory::getUser()->id;
+			$allowedCats = $catscache->call(array('FlexicontentHelperPerm', '_getAllowedCats'), $user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first);
+		} else {
+			$allowedCats = FlexicontentHelperPerm::_getAllowedCats($user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first);
+		}
 		
 		return $allowedCats;
 	}

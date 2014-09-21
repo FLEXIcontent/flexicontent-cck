@@ -354,7 +354,7 @@ class modFlexicontentHelper
 								$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0] );
 							} else {
 								$src = '';
-								$thumb = $img_field->thumbs_src[ $mod_use_image_feat ][0];
+								$thumb = @ $img_field->thumbs_src[ $mod_use_image_feat ][0];
 							}
 							if ( (!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value) ) {
 								$src = flexicontent_html::extractimagesrc($row);
@@ -486,7 +486,7 @@ class modFlexicontentHelper
 								$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0] );
 							} else {
 								$src = '';
-								$thumb = $img_field->thumbs_src[ $mod_use_image ][0];
+								$thumb = @ $img_field->thumbs_src[ $mod_use_image ][0];
 							}
 							if ( (!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value) ) {
 								$src = flexicontent_html::extractimagesrc($row);

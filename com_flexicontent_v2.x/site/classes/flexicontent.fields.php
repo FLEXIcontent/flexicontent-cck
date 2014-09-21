@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1959 2014-09-18 00:15:15Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1961 2014-09-20 07:49:53Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -38,7 +38,6 @@ class FlexicontentFields
 	{
 		require_once (JPATH_ADMINISTRATOR.DS.'components/com_flexicontent/defineconstants.php');
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
-		//require_once("components/com_flexicontent/classes/flexicontent.fields.php");
 		require_once("components/com_flexicontent/classes/flexicontent.helper.php");
 		
 		
@@ -66,45 +65,8 @@ class FlexicontentFields
 		$items = $db->loadObjectList();
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
 		if (!$items) return false;
+		
 		foreach ($items as $i => $item) $_item_id_map[$item->id] = & $items[$i];
-		
-		
-		// **************
-		// Get Field info
-		// **************
-		/*if ( $using_ids )
-		{
-			$field_ids = array_unique(array_map('intval', $_field_ids));
-			$field_ids_list = implode("," , $field_ids) ;
-			
-			$field_where = ' WHERE f.id IN ('. $field_ids_list .')';
-		}
-		else {
-			foreach ($field_names as $i => $field_name) {
-				$field_names[$i] = preg_replace("/[\"'\\\]/u", "", $field_name);
-			}
-			$field_names_list = "'". implode("','" , $field_names) ."'";
-			
-			$field_where = 'f.name IN ('. $field_names_list .')';
-		}
-		
-		$query = 'SELECT f.*'
-			. ' FROM #__flexicontent_fields AS f'
-			. ' WHERE 1 '.$field_where
-			;
-		$db->setQuery($query);
-		$fields = $db->loadObjectList('id');
-		if (!$fields) return false;*/
-		
-		
-		// *********************************
-		// Render Display Variable of Fields
-		// *********************************
-		
-		// Get Field values at once to minimized performance impact, null 'params' mean only retrieve values 
-		/*if ($item_per_field && count($items)>1)
-			// we have at least 2 item and item is per field, this will retrieve all values with single SQL query
-			FlexicontentFields::getFields($items, $view, $params = null, $aid = false);*/
 		
 		$return = array();
 		foreach ($field_names as $i => $field_name)
@@ -144,7 +106,6 @@ class FlexicontentFields
 	 */
 	static function &getFields(&$_items, $view = FLEXI_ITEMVIEW, $params = null, $aid = false, $use_tmpl = true)
 	{
-		static $apply_cache = null;
 		static $expired_cleaned = false;
 		
 		if (!$_items) return $_items;
@@ -159,7 +120,7 @@ class FlexicontentFields
 			$start_microtime = microtime(true);
 		}
 		
-		// Calculate access if it was not providden
+		// Calculate access for current user if it was not given or if given access is invalid
 		if (FLEXI_J16GE) {
 			$aid = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
 		} else {
@@ -167,23 +128,15 @@ class FlexicontentFields
 		}
 		
 		// Apply cache to public (unlogged) users only 
-		/*if ($apply_cache === null) {
-			if (FLEXI_J16GE) {
-				$apply_cache = max($aid) <= 1;  // ACCESS LEVEL : PUBLIC 1 , REGISTERED 2
-			} else {
-				//$apply_cache = FLEXI_ACCESS ? ($user->gmid == '0' || $user->gmid == '0,1') : ($user->gid <= 18); // This is for registered too
-				$apply_cache = $aid <= 0;  // ACCESS LEVEL : PUBLIC 0 , REGISTERED 1
-			}
-			$apply_cache = $apply_cache && FLEXI_CACHE;
-		}
+		/*$apply_cache = !$user->id && FLEXI_CACHE;
 		if ($apply_cache) {
 			$itemcache = JFactory::getCache('com_flexicontent_items');  // Get Joomla Cache of '...items' Caching Group
 			$itemcache->setCaching(1); 		              // Force cache ON
-			$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expiration to default e.g. one hour
+			$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 			
 			$filtercache = JFactory::getCache('com_flexicontent_filters');  // Get Joomla Cache of '...filters' Caching Group
 			$filtercache->setCaching(1); 		              // Force cache ON
-			$filtercache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expiration to default e.g. one hour
+			$filtercache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 			
 			// Auto-clean expired item & filters cache, only done here once
 			if (FLEXI_GC && !$expired_cleaned) {
@@ -191,6 +144,7 @@ class FlexicontentFields
 				$filtercache->gc();
 				$expired_cleaned = true;
 			}
+			// ... now retrieved CACHED ... code removed ...
 		}*/
 		
 		// @TODO : move to the constructor
@@ -209,30 +163,38 @@ class FlexicontentFields
 		
 		if ( $print_logging_info )  @$fc_run_times['field_values_params'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		
+		$_rendered = array();
 		if ($params)  // NULL/empty parameters mean only retrieve field values
 		{
 			$always_create_fields_display = $cparams->get('always_create_fields_display',0);
-			$flexiview = JRequest::getVar('view', false);
+			$flexiview = JRequest::getVar('view');
 			
 			// CHECK if 'always_create_fields_display' enabled and create the display for all item's fields
 			// *** This should be normally set to ZERO (never), to avoid a serious performance penalty !!!
-			foreach ($items as $i => $item)
+			
+			// 0: never, 1: always, 2: only in item view, 3: never unless in a template position,  this effects function:  renderPositions()
+			if ($always_create_fields_display==1 || ($always_create_fields_display==2 && $flexiview==FLEXI_ITEMVIEW && $view==FLEXI_ITEMVIEW) )
 			{
-				// 0: never, 1: always, 2: only in item view 
-				if ($always_create_fields_display==1 || ($always_create_fields_display==2 && $flexiview==FLEXI_ITEMVIEW) ) {
+				$field_names = array();
+				foreach ($items as $i => $item)
+				{
 					if ($items[$i]->fields)
 					{
 						foreach ($items[$i]->fields as $field)
 						{
 							$values = isset($items[$i]->fieldvalues[$field->id]) ? $items[$i]->fieldvalues[$field->id] : array();
 							$field 	= FlexicontentFields::renderField($items[$i], $field, $values, $method='display', $view);
+							$field_names[$field->name] = 1;
 						}
 					}
+				}
+				foreach ($field_names as $field_name => $_ignore) {
+					$_rendered['ALL'][$field_name] = 1;
 				}
 			}
 			
 			// Render field positions
-			$items = FlexicontentFields::renderPositions($items, $view, $params, $use_tmpl);
+			$items = FlexicontentFields::renderPositions($items, $view, $params, $use_tmpl, $_rendered);
 		}
 		return $items;
 	}
@@ -696,7 +658,7 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function &renderPositions(&$items, $view = FLEXI_ITEMVIEW, $params = null, $use_tmpl = true)
+	static function &renderPositions(&$items, $view = FLEXI_ITEMVIEW, $params = null, $use_tmpl = true, & $_rendered = array())
 	{
 		if (!$items) return;
 		if (!$params) return $items;
@@ -721,7 +683,6 @@ class FlexicontentFields
 		
 		// Render some fields by default, this is done for compatibility reasons, but avoid rendering these fields again (2nd time),
 		// since some of them may also be in template positions. NOTE: this is not needed since renderField() should detect this case
-		$_rendered = array();
 		if ($always_create_fields_display != 3) { // value 3 means never create for any view (blog template incompatible)
 			
 			$item = reset($items); // get the first item ... so that we can get the name of CORE fields out of it
@@ -729,7 +690,7 @@ class FlexicontentFields
 		  // 'description' item field is implicitly used by category layout of some templates (blog), render it
 		  $custom_values = null;
 		  if ($view == 'category') {
-		    if (isset($item->fields['text'])) {
+		    if (isset($item->fields['text']) && !isset($_rendered['ALL']['text'])) {
 		    	$_field_name_ = 'text';
 		    	FlexicontentFields::renderField($items, $_field_name_, $custom_values, $method='display', $view);
 		    }
@@ -738,7 +699,7 @@ class FlexicontentFields
 			// 'core' item fields are IMPLICITLY used by some item layout of some templates (blog), render them
 			else if ($view == FLEXI_ITEMVIEW) {
 				foreach ($item->fields as $field) {
-					if ($field->iscore) {
+					if ($field->iscore && !isset($_rendered['ALL'][$field->name])) {
 						$_field_name_ = $field->name;
 						FlexicontentFields::renderField($items, $_field_name_, $custom_values, $method='display', $view);
 					}
@@ -764,11 +725,12 @@ class FlexicontentFields
 				if ($field && $field->iscore)
 				{
 					// Check if already rendered
-					if ( isset($_rendered['ALL']['core']) || isset($_rendered['ALL'][$f]) ) continue;
-					
-					// No custom values for CORE fields, values are decided inside the CORE field
-					$values = null;
-					FlexicontentFields::renderField($items, $f, $values, $method, $view);
+					if ( !isset($_rendered['ALL']['core']) && !isset($_rendered['ALL'][$f]) )
+					{
+						// No custom values for CORE fields, values are decided inside the CORE field
+						$values = null;
+						FlexicontentFields::renderField($items, $f, $values, $method, $view);
+					}
 					$_rendered['ALL'][$f] = 1;
 				}
 				
@@ -1798,9 +1760,10 @@ class FlexicontentFields
 			if ( JFile::exists($segmenter_path) )
 			{
 				require_once ($segmenter_path);
+				// Apply caching to dictionary parsing regardless of cache setting ...
 				$handlercache = JFactory::getCache('com_flexicontent_lang_handlers');  // Get Joomla Cache of '... lang_handlers' Caching Group
-				$handlercache->setCaching(1);           // Force cache ON
-				$handlercache->setLifeTime(24*3600);    // Set expiration to 24 hours
+				$handlercache->setCaching(1);         // Force cache ON
+				$handlercache->setLifeTime(24*3600);  // Set expire time (hard-code this to 1 day), since it is costly
 				$dictionary = $handlercache->call(array('Segment', 'loadDictionary'));
 				Segment::setDictionary($dictionary);
 				$handler = new Segment();
@@ -2246,12 +2209,12 @@ class FlexicontentFields
 			$start_microtime = microtime(true);
 		}
 		
-		// Apply caching to public or just registered users
+		// Apply caching to filters regardless of cache setting ...
 		$apply_cache = 1;
 		if ($apply_cache) {
 			$itemcache = JFactory::getCache('com_flexicontent_filters');  // Get Joomla Cache of '...items' Caching Group
 			$itemcache->setCaching(1); 		              // Force cache ON
-			$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expiration to default e.g. one hour
+			$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expire time (default is 1 hour)
 		}
 		
 		$isdate = in_array($filter->field_type, array('date','created','modified')) || $filter->parameters->get('isdate',0);
@@ -2329,8 +2292,7 @@ class FlexicontentFields
 			}
 
 			// Get filter values considering PAGE configuration (regardless of ACTIVE filters)
-			if (  $apply_cache ) {
-				$itemcache->setLifeTime(FLEXI_CACHE_TIME); 	// Set expiration to default e.g. one hour
+			if ( $apply_cache ) {
 				$results_page = $itemcache->call(array('FlexicontentFields', $createFilterValues), $filter, $view_join, $view_where, array(), $indexed_elements, $search_prop);
 			} else {
 				if (!$isSearchView)

@@ -88,8 +88,8 @@ class plgSystemFlexisystem extends JPlugin
 			{
 				// add the category tree to categories cache
 				$catscache = JFactory::getCache('com_flexicontent_cats');
-				$catscache->setCaching(1); 		//force cache
-				$catscache->setLifeTime(84600); //set expiry to one day
+				$catscache->setCaching(1);                  // Force cache ON
+				$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
 				$globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
 			} else {
 				$globalcats = $this->getCategoriesTree();

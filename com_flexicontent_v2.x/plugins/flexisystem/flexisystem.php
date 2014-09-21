@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexisystem.php 1905 2014-05-26 23:37:05Z ggppdk $
+ * @version 1.5 stable $Id: flexisystem.php 1962 2014-09-21 09:30:47Z ggppdk $
  * @plugin 1.1
  * @package Joomla
  * @subpackage FLEXIcontent
@@ -88,8 +88,8 @@ class plgSystemFlexisystem extends JPlugin
 			{
 				// add the category tree to categories cache
 				$catscache = JFactory::getCache('com_flexicontent_cats');
-				$catscache->setCaching(1); 		//force cache
-				$catscache->setLifeTime(84600); //set expiry to one day
+				$catscache->setCaching(1);                  // Force cache ON
+				$catscache->setLifeTime(FLEXI_CACHE_TIME);  // Set expire time (default is 1 hour)
 				$globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
 			} else {
 				$globalcats = $this->getCategoriesTree();

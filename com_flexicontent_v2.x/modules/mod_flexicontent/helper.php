@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.2 $Id: helper.php 1952 2014-09-12 08:25:57Z ggppdk $
+ * @version 1.2 $Id: helper.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent Module
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -354,7 +354,7 @@ class modFlexicontentHelper
 								$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0] );
 							} else {
 								$src = '';
-								$thumb = $img_field->thumbs_src[ $mod_use_image_feat ][0];
+								$thumb = @ $img_field->thumbs_src[ $mod_use_image_feat ][0];
 							}
 							if ( (!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value) ) {
 								$src = flexicontent_html::extractimagesrc($row);
@@ -486,7 +486,7 @@ class modFlexicontentHelper
 								$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0] );
 							} else {
 								$src = '';
-								$thumb = $img_field->thumbs_src[ $mod_use_image ][0];
+								$thumb = @ $img_field->thumbs_src[ $mod_use_image ][0];
 							}
 							if ( (!$src && $mod_image_fallback_img==1) || ($src && $mod_image_fallback_img==2 && $img_field->using_default_value) ) {
 								$src = flexicontent_html::extractimagesrc($row);
