@@ -93,14 +93,14 @@ class FlexicontentHelperRoute
 		
 		// Assign menu item objects to per language array, and also index by menu id
 		self::$menuitems[$language] = array();
-		if ($_menuitems) foreach ($_menuitems as $item)
+		if ($_menuitems) foreach ($_menuitems as $menuitem)
 		{
 			// In J1.5 filter by access levels of current user
 			// In J2.5+ this is already done by JMenuSite::getItems()
 			if (!FLEXI_J16GE && $menuitem->access > $user_access) continue;
 			
 			// Index by menu id
-			self::$menuitems[$language][$item->id] = $item;
+			self::$menuitems[$language][$menuitem->id] = $menuitem;
 		}
 		
 		return self::$menuitems[$language];
@@ -162,8 +162,7 @@ class FlexicontentHelperRoute
 			if ($menu && @ $menu->query['option']=='com_flexicontent' )
 			{
 				// For J1.5 check access and for J2.5+ check language
-				$item_matches = !FLEXI_J16GE  ?  ($menuitem->access <= $aid)  :  ($curr_langtag == '*' || in_array($menu->language, array('*', $curr_langtag)) || !JLanguageMultilang::isEnabled());
-				
+				$item_matches = !FLEXI_J16GE  ?  ($menu->access <= $aid)  :  ($curr_langtag == '*' || in_array($menu->language, array('*', $curr_langtag)) || !JLanguageMultilang::isEnabled());
 				
 				// If matched set default and return it
 				if ($item_matches)  return  $_component_default_menuitem_id = $menu->id;
@@ -1015,7 +1014,7 @@ class FlexicontentHelperRoute
 			$_index_val = $menuitem->query[$_index_name];
 			
 			// Only a specific language menu item can override an existing lookup entry
-			if ( isset(self::$lookup[$language][$view][$_index_val]) && $menuitem->language == '*' ) continue;
+			if ( isset(self::$lookup[$language][$view][$_index_val]) && FLEXI_J16GE && $menuitem->language == '*' ) continue;
 			
 			// Finally set new lookup entry or override existing lookup entry with language specific menu item
 			self::$lookup[$language][$view][$_index_val] = (int) $menuitem->id;
