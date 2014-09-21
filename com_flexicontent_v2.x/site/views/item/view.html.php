@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1959 2014-09-18 00:15:15Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1960 2014-09-19 02:20:50Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -317,7 +317,8 @@ class FlexicontentViewItem  extends JViewLegacy
 		$ucanonical = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $globalcats[$item->maincatid]->slug, 0, $item));  // $item->categoryslug
 		if ($params->get('add_canonical')) {
 			$head_obj = $document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
-			if ( FLEXI_J30GE && $defaultCanonical = flexicontent_html::getDefaultCanonical() ) {
+			$defaultCanonical = flexicontent_html::getDefaultCanonical();
+			if ( FLEXI_J30GE && $defaultCanonical != $ucanonical ) {
 				unset($head_obj->_links[$defaultCanonical]);
 			}
 		}

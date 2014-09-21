@@ -317,7 +317,8 @@ class FlexicontentViewItems  extends JViewLegacy
 		$ucanonical = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($item->slug, $globalcats[$item->maincatid]->slug, 0, $item));  // $item->categoryslug
 		if ($params->get('add_canonical')) {
 			$head_obj = $document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
-			if ( FLEXI_J30GE && $defaultCanonical = flexicontent_html::getDefaultCanonical() ) {
+			$defaultCanonical = flexicontent_html::getDefaultCanonical();
+			if ( FLEXI_J30GE && $defaultCanonical != $ucanonical ) {
 				unset($head_obj->_links[$defaultCanonical]);
 			}
 		}
