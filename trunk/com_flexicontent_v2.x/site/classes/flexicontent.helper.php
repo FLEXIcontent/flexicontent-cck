@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1963 2014-09-21 10:13:43Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1965 2014-09-21 16:27:07Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1504,7 +1504,7 @@ class flexicontent_html
 		} else if ($app->isAdmin()) {
 			if ($canChangeState) $publish_info .= '<br><br>'.JText::_('FLEXI_STATE_CHANGER_DISABLED');
 
-			$tooltip_class = FLEXI_J30GE ? 'btn btn-small' : 'fc_button';
+			$tooltip_class = FLEXI_J30GE ? '' : '';
 			$tooltip_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 			$tooltip_title = flexicontent_html::getToolTip(JText::_( 'FLEXI_PUBLISH_INFORMATION' ), $publish_info, 0);
 			
