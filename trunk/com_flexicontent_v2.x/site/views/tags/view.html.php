@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: view.html.php 1887 2014-04-24 23:53:14Z ggppdk $
+ * @version 1.5 stable $Id: view.html.php 1940 2014-08-29 17:55:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -192,7 +192,10 @@ class FlexicontentViewTags extends JViewLegacy
 		$start = $start ? "&start=".$start : "";
 		$ucanonical = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id).$start);
 		if ($params->get('add_canonical')) {
-			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
+			$head_obj = $document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
+			if ( FLEXI_J30GE && $defaultCanonical = flexicontent_html::getDefaultCanonical() ) {
+				unset($head_obj->_links[$defaultCanonical]);
+			}
 		}
 		
 		//ordering

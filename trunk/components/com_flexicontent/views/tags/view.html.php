@@ -192,7 +192,10 @@ class FlexicontentViewTags extends JViewLegacy
 		$start = $start ? "&start=".$start : "";
 		$ucanonical = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->id).$start);
 		if ($params->get('add_canonical')) {
-			$document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
+			$head_obj = $document->addHeadLink( $ucanonical, 'canonical', 'rel', '' );
+			if ( FLEXI_J30GE && $defaultCanonical = flexicontent_html::getDefaultCanonical() ) {
+				unset($head_obj->_links[$defaultCanonical]);
+			}
 		}
 		
 		//ordering
