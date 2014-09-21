@@ -489,13 +489,14 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 	
 	
 	function fversion(&$tpl, &$params) {
-		//updatecheck
-		if( $params->get('show_updatecheck', 1) == 1) {
+		// Cache update check of FLEXIcontent version
+		if( $params->get('show_updatecheck', 1) )
+		{
 			$cache = JFactory::getCache('com_flexicontent');
 			$cache->setCaching( 1 );
-			$cache->setLifeTime( 600 );
+			$cache->setLifeTime( 24*3600 );  // Set expire time (hard-code this to 1 day), since it is costly
 			$check = $cache->get(array( 'FlexicontentViewFlexicontent', 'getUpdateComponent'), array('component'));
-			$this->assignRef('check'		, $check);
+			$this->assignRef('check', $check);
 		}
 		parent::display($tpl);
 	}
