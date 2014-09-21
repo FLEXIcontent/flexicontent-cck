@@ -61,11 +61,46 @@ class plgSystemFlexisystem extends JPlugin
 		$password	= JRequest::getVar('fcp', null);
 		$fparams 	= JComponentHelper::getParams('com_flexicontent');
 		$option   = JRequest::getVar('option', null);
+		$session = JFactory::getSession();
+		
+		
+		// Clear categories cache if previous page has saved FC component configuration
+		if ( $session->get('clear_cats_cache', 0, 'flexicontent') )
+		{
+			$session->set('clear_cats_cache', 0, 'flexicontent');
+			// Clean cache
+			if (FLEXI_J16GE) {
+				$cache = $this->getCache($group='', 0);
+				$cache->clean('com_flexicontent_cats');
+				$cache = $this->getCache($group='', 1);
+				$cache->clean('com_flexicontent_cats');
+			} else {
+				$catcache = JFactory::getCache('com_flexicontent_cats');
+				$catcache->clean();
+			}
+			//JFactory::getApplication()->enqueueMessage( "cleaned cache group 'com_flexicontent_cats'", 'message');
+		}
+		
+		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
+			global $globalcats;
+			$start_microtime = microtime(true);
+			if (FLEXI_CACHE) 
+			{
+				// add the category tree to categories cache
+				$catscache = JFactory::getCache('com_flexicontent_cats');
+				$catscache->setCaching(1); 		//force cache
+				$catscache->setLifeTime(84600); //set expiry to one day
+				$globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
+			} else {
+				$globalcats = $this->getCategoriesTree();
+			}
+			$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
+			//JFactory::getApplication()->enqueueMessage( "recalculated categories data, execution time: ". sprintf('%.2f s', $time_passed/1000000), 'message');
+		}
 		
 		// REMEMBER last value of the fcdebug parameter, and use it to enable statistics display
 		if ( $option=='com_flexicontent' && $fparams->get('print_logging_info')==1 )
 		{
-			$session = JFactory::getSession();
 			// Try request variable first then session variable
 			$fcdebug = JRequest::getVar('fcdebug', '');
 			$fcdebug = strlen($fcdebug) ? (int)$fcdebug : $session->get('fcdebug', 0, 'flexicontent');
@@ -136,39 +171,7 @@ class plgSystemFlexisystem extends JPlugin
 		}
 		//if( $option=='com_content' && $view=='articles' && $layout=='modal' && $tmpl=='component' ) return;
 
-		// Clear categories cache if previous page has saved FC component configuration
-		if ( $session->get('clear_cats_cache', 0, 'flexicontent') )
-		{
-			$session->set('clear_cats_cache', 0, 'flexicontent');
-			// Clean cache
-			if (FLEXI_J16GE) {
-				$cache = $this->getCache($group='', 0);
-				$cache->clean('com_flexicontent_cats');
-				$cache = $this->getCache($group='', 1);
-				$cache->clean('com_flexicontent_cats');
-			} else {
-				$catcache = JFactory::getCache('com_flexicontent_cats');
-				$catcache->clean();
-			}
-			//JFactory::getApplication()->enqueueMessage( "cleaned cache group 'com_flexicontent_cats'", 'message');
-		}
-		
-		if (FLEXI_SECTION || FLEXI_CAT_EXTENSION) {
-			global $globalcats;
-			$start_microtime = microtime(true);
-			if (FLEXI_CACHE) 
-			{
-				// add the category tree to categories cache
-				$catscache = JFactory::getCache('com_flexicontent_cats');
-				$catscache->setCaching(1); 		//force cache
-				$catscache->setLifeTime(84600); //set expiry to one day
-				$globalcats = $catscache->call(array('plgSystemFlexisystem', 'getCategoriesTree'));
-			} else {
-				$globalcats = $this->getCategoriesTree();
-			}
-			$time_passed = round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
-			//JFactory::getApplication()->enqueueMessage( "recalculated categories data, execution time: ". sprintf('%.2f s', $time_passed/1000000), 'message');
-		}
+
 		
 		// Detect saving configuration, e.g. set a flag to indicate cleaning categories cache on next page load
 		$this->trackSaveConf();
@@ -427,7 +430,7 @@ class plgSystemFlexisystem extends JPlugin
 
 		// get the category tree and append the ancestors to each node
 		if (FLEXI_J16GE) {
-			$query	= 'SELECT id, parent_id, published, access, title, level, lft, rgt,'
+			$query	= 'SELECT id, parent_id, published, access, title, level, lft, rgt, language,'
 				. ' CASE WHEN CHAR_LENGTH(alias) THEN CONCAT_WS(\':\', id, alias) ELSE id END as slug'
 				. ' FROM #__categories as c'
 				. ' WHERE c.extension="'.FLEXI_CAT_EXTENSION.'" AND lft > ' . FLEXI_LFT_CATEGORY . ' AND rgt < ' . FLEXI_RGT_CATEGORY
@@ -472,6 +475,7 @@ class plgSystemFlexisystem extends JPlugin
 			$cat->ancestors          = implode(',', $cat->ancestors);
 			$cat->descendantsarray   = plgSystemFlexisystem::_getDescendants($cat);
 			$cat->descendants        = implode(',', $cat->descendantsarray);
+			$cat->language           = isset($cat->language) ? $cat->language : '';
 		}
 		
 		return $globalcats;
