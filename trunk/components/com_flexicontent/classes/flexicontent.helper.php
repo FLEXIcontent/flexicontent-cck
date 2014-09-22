@@ -37,7 +37,7 @@ class flexicontent_html
 			return;
 		}
 
-		$router = $app::getRouter();
+		$router = $app->getRouter();
 		
 		$uri = clone JUri::getInstance();
 		// Get configuration from plugin

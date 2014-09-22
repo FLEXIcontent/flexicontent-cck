@@ -225,7 +225,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			
 			if ($usetitle) $title = '
 				<br/><label class="label labeltitle" for="'.$elementid.'_title">'.JText::_( 'FLEXI_FIELD_TERMTITLE' ).' '.($multiple?($n+1):'').':</label><br/>
-				<textarea class="fcfield_textval termtitle'.$required.'" id="'.$elementid.'_title" name="'.$fieldname.'[title]" cols="80" rows="2">'.$value['title'].'</textarea><br/><br/>
+				<textarea class="fcfield_textval termtitle'.$required.'" id="'.$elementid.'_title" name="'.$fieldname.'[title]" cols="'.$cols.'" rows="'.$rows.'">'.$value['title'].'</textarea><br/><br/>
 			';
 			
 			/*if ($usetitle) $text = '

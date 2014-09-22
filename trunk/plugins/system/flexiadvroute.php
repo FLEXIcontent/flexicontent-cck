@@ -254,8 +254,9 @@ class plgSystemFlexiadvroute extends JPlugin
 	  //if ( !empty(JRequest::getVar('task')) ) return;
 		
 	  // Get associated translating item for current language
+	  $lta = FLEXI_J16GE || $use_tmp ? 'i': 'ie';
 	  $db = JFactory::getDBO();
-	  $query = "SELECT i.id, CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(':', i.id, i.alias) ELSE i.id END as slug"
+	  $query = "SELECT i.id, CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(':', i.id, i.alias) ELSE i.id END as slug, ".$lta.".language, ie.type_id"
 	  . " FROM #__content AS i "
 	  . " LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id "
 	  . " WHERE ie.language LIKE ".$db->Quote( $curr_lang .'%' )." AND ie.lang_parent_id = (SELECT lang_parent_id FROM #__flexicontent_items_ext WHERE item_id=".(int) $item_id.")";
@@ -270,7 +271,7 @@ class plgSystemFlexiadvroute extends JPlugin
 			$app->enqueueMessage( "*** Found translation of item {$item_id} for language $curr_lang. <br>Translating item is {$translation->id}<br><br>", 'message');
 		
 		if (FLEXI_J16GE) {
-			$item_url = JRoute::_( FlexicontentHelperRoute::getItemRoute($translation->slug, $cat_slug).'&lang='.$curr_lang, false );
+			$item_url = JRoute::_( FlexicontentHelperRoute::getItemRoute($translation->slug, $cat_id, 0, $translation), false );
 			$session->set('flexi_lang_switched', 1);
 			$app->redirect( $item_url );
 		} else {

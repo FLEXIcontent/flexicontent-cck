@@ -45,7 +45,7 @@ $is_fc_component = 1;
 
 // Get component parameters and add tooltips css and js code
 $cparams = JComponentHelper::getParams('com_flexicontent');
-if (FLEXI_J30GE) JHtml::_('bootstrap.loadCss', true);
+if (FLEXI_J30GE && $cparams->get('loadfw_bootstrap_css', 2)==1 ) JHtml::_('bootstrap.loadCss', true);
 
 $print_logging_info = $cparams->get('print_logging_info');
 if ( $print_logging_info ) {

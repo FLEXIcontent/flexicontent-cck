@@ -519,7 +519,7 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 			</td>
 			<td align="left">
 				<?php
-					if (JString::strlen($row->filename) > 25) {
+					if (JString::strlen($row->filename) > 100) {
 						$filename = JString::substr( htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
 					} else {
 						$filename = htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8');
@@ -531,7 +531,7 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 			</td>
 			<td align="left">
 				<?php
-					if (JString::strlen($row->filename_original) > 25) {
+					if (JString::strlen($row->filename_original) > 100) {
 						$filename = JString::substr( htmlspecialchars($row->filename_original, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
 					} else {
 						$filename = htmlspecialchars($row->filename_original, ENT_QUOTES, 'UTF-8');
@@ -543,7 +543,7 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 			</td>
 			<td>
 				<?php
-				if (JString::strlen($row->altname) > 25) {
+				if (JString::strlen($row->altname) > 100) {
 					echo JString::substr( htmlspecialchars($row->altname, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
 				} else {
 					echo htmlspecialchars($row->altname, ENT_QUOTES, 'UTF-8');

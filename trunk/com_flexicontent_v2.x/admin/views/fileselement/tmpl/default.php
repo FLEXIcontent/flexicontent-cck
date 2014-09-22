@@ -349,7 +349,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 				<span class="editlinktip hasTip" title="<?php echo JText::_( 'FLEXI_SELECT' );?>::<?php echo $row->filename; ?>">
 					<a style="cursor:pointer" id="file<?php echo $row->id;?>" rel="<?php echo $filename; ?>" onclick="<?php echo $img_assign_link; ?>">
 					<?php 
-							if (JString::strlen($row->filename) > 25) {
+							if (JString::strlen($row->filename) > 100) {
 								echo JString::substr( htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
 							} else {
 								echo htmlspecialchars($row->filename, ENT_QUOTES, 'UTF-8');
@@ -360,7 +360,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 			</td>
 			<td align="left">
 				<?php
-					if (JString::strlen($row->filename_original) > 25) {
+					if (JString::strlen($row->filename_original) > 100) {
 						$filename = JString::substr( htmlspecialchars($row->filename_original, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
 					} else {
 						$filename = htmlspecialchars($row->filename_original, ENT_QUOTES, 'UTF-8');
@@ -372,7 +372,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 			</td>
 			<td>
 				<?php
-				if (JString::strlen($row->altname) > 25) {
+				if (JString::strlen($row->altname) > 100) {
 					echo JString::substr( htmlspecialchars($row->altname, ENT_QUOTES, 'UTF-8'), 0 , 25).'...';
 				} else {
 					echo htmlspecialchars($row->altname, ENT_QUOTES, 'UTF-8');
