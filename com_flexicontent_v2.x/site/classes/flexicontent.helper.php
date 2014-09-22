@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.helper.php 1965 2014-09-21 16:27:07Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.helper.php 1966 2014-09-21 17:33:27Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -37,7 +37,7 @@ class flexicontent_html
 			return;
 		}
 
-		$router = $app::getRouter();
+		$router = $app->getRouter();
 		
 		$uri = clone JUri::getInstance();
 		// Get configuration from plugin

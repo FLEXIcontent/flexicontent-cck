@@ -106,7 +106,8 @@ class plgSearchFlexiadvsearch extends JPlugin
 		$show_noauth  = $params->get('show_noauth', 0);
 		$orderby_override = $params->get('orderby_override', 1);
 		
-		
+		// Compatibility text search (LIKE %word%) for language without spaces
+		$filter_word_like_any = $params->get('filter_word_like_any', 0);
 		
 		// ************************************************
 		// some parameter shortcuts common with search view
@@ -319,7 +320,11 @@ class plgSearchFlexiadvsearch extends JPlugin
 			switch ($phrase)
 			{
 				case 'natural':
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.') ';
+					if ($filter_word_like_any) {
+						$_text_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
+					} else {
+						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.') ';
+					}
 					break;
 				
 				case 'natural_expanded':
@@ -362,17 +367,21 @@ class plgSearchFlexiadvsearch extends JPlugin
 				
 				case 'any':
 				default:
-					$words = preg_split('/\s\s*/u', $text);
-					$stopwords = array();
-					$shortwords = array();
-					$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
-					JRequest::setVar('ignoredwords', implode(' ', $stopwords));
-					JRequest::setVar('shortwords', implode(' ', $shortwords));
-					
-					$newtext = implode( '* ', $words ) . '*';
-					$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
-					$quoted_text = $db->Quote( $quoted_text, false );
-					$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					if ($filter_word_like_any) {
+						$_text_match = ' LOWER ('.$ts.'.search_index) LIKE '.$db->Quote( '%'.$escaped_text.'%', false );
+					} else {
+						$words = preg_split('/\s\s*/u', $text);
+						$stopwords = array();
+						$shortwords = array();
+						$words = flexicontent_db::removeInvalidWords($words, $stopwords, $shortwords, $si_tbl, 'search_index', $isprefix=1);
+						JRequest::setVar('ignoredwords', implode(' ', $stopwords));
+						JRequest::setVar('shortwords', implode(' ', $shortwords));
+						
+						$newtext = implode( '* ', $words ) . '*';
+						$quoted_text = FLEXI_J16GE ? $db->escape($newtext, true) : $db->getEscaped($newtext, true);
+						$quoted_text = $db->Quote( $quoted_text, false );
+						$_text_match = ' MATCH ('.$ts.'.search_index) AGAINST ('.$quoted_text.' IN BOOLEAN MODE) ';
+					}
 					break;
 			}
 			

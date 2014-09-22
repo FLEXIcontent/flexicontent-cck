@@ -150,7 +150,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		";
 		
 		$css = '
-		#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+		#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: normal; }
 		#sortables_'.$field->id.' li {
 			clear: both;
 			display: block;
@@ -181,8 +181,10 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
 			$field->html[] =
 				($file_data->published ?
-				'  <span class="fcfield_textval inputbox inline_style_published" type="text" id="a_name'.$i.'" readonly="readonly" >'.$filename_original.'</span>' :
-				'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" [UNPUBLISHED]" readonly="readonly" >'.$filename_original.'</span>'
+				'  <span class="fcfield_textval inputbox inline_style_published" type="text" id="a_name'.$i.'" readonly="readonly" >'.$filename_original.'</span> '
+					.($file_data->url ? ' ['.$file_data->altname.']' : '') :
+				'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" [UNPUBLISHED]" readonly="readonly" >'.$filename_original.'</span> '
+					.($file_data->url ? ' ['.$file_data->altname.']' : '')
 				)
 				. $move2 . $remove_button
 				.'  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file_id.'" />'

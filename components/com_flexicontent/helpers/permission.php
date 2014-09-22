@@ -273,12 +273,12 @@ class FlexicontentHelperPerm
 	static function getAllowedCats( &$user, $actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=true, $check_published = false, $specific_catids=false, $find_first = false )
 	{
 		// Return cached data
+		$user_id = $user ? $user->id : JFactory::getUser()->id;
 		if (FLEXI_CACHE) {
 			$catscache = JFactory::getCache('com_flexicontent_cats');  // Get Joomla Cache of '...items' Caching Group
 			$catscache->setCaching(1); 		              // Force cache ON
 			$catscache->setLifeTime(FLEXI_CACHE_TIME);  // set expire time (default is 1 hour)
 			
-			$user_id = $user ? $user->id : JFactory::getUser()->id;
 			$allowedCats = $catscache->call(array('FlexicontentHelperPerm', '_getAllowedCats'), $user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first);
 		} else {
 			$allowedCats = FlexicontentHelperPerm::_getAllowedCats($user_id, $actions_allowed, $require_all, $check_published, $specific_catids, $find_first);

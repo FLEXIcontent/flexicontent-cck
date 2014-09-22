@@ -83,6 +83,10 @@
 				<option value="1">FLEXI_BOTH</option>
 				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
 			</field>
+			<field name="loadfw_bootstrap_css" type="radio" default="2" label="bootstrap.css" description="FLEXI_USE_BROWSER_FRAMEWORKS_DESC" menu="hide"  class="btn-group btn-group-yesno">
+				<option value="1">FLEXI_BOTH</option>
+				<option value="2">FLEXI_MANUALLY_IN_FRONTEND</option>
+			</field>
 				
 		<field name="" type="separator" default="FLEXI_PERFORMANCE_CONF" label="" level="level0" menu="hide" />
 			
