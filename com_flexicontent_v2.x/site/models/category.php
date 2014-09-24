@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: category.php 1919 2014-06-19 03:01:27Z ggppdk $
+ * @version 1.5 stable $Id: category.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -1492,14 +1492,14 @@ class FlexicontentModelCategory extends JModelLegacy {
 		}
 		
 		
-		// ************************************************************************************
-		// Check category was found / is published, and throw an error. NOTE: an empty default
-		// category object was created by layouts for which a specific category is optional
-		// ************************************************************************************
+		// *******************************************************************************
+		// Check category was found / is published, and throw an error. Note that an empty
+		// layout means single category view, so raise an error if category id is missing
+		// *******************************************************************************
 		
-		if ($this->_id && $cat_usable && !$_category) {
+		if (($this->_id || $this->_layout=='') && $cat_usable && !$_category) {
 			$err_mssg = $err_type = false;
-			if (!$this->_category) {
+			if (!$_category) {
 				$err_mssg = JText::sprintf( 'FLEXI_CONTENT_CATEGORY_NOT_FOUND_OR_NOT_PUBLISHED', $this->_id );
 				$err_type = 404;
 			}
