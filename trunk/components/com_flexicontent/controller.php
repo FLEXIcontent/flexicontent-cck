@@ -2192,7 +2192,7 @@ class FlexicontentController extends JControllerLegacy
 		header("Cache-Control: private", false); // required for certain browsers
 		header("Content-Type: ".$dlfile->ctype);
 		//quotes to allow spaces in filenames
-		$download_filename = isset($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
+		$download_filename = strlen($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
 		if ($method == 'view') {
 			header("Content-Disposition: inline; filename=\"".$download_filename."\";" );
 		} else {

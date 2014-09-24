@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: controller.php 1949 2014-09-04 01:22:18Z ggppdk $
+ * @version 1.5 stable $Id: controller.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -2192,7 +2192,7 @@ class FlexicontentController extends JControllerLegacy
 		header("Cache-Control: private", false); // required for certain browsers
 		header("Content-Type: ".$dlfile->ctype);
 		//quotes to allow spaces in filenames
-		$download_filename = isset($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
+		$download_filename = strlen($dlfile->filename_original) ? $dlfile->filename_original : $dlfile->filename;
 		if ($method == 'view') {
 			header("Content-Disposition: inline; filename=\"".$download_filename."\";" );
 		} else {

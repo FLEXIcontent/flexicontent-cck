@@ -275,6 +275,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 		// Value handling parameters
 		$multiple       = $field->parameters->get( 'allow_multiple', 1 ) ;
 		
+		// Language filter the values
+		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
+		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
@@ -324,7 +327,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		{
 			if ( !strlen($value) ) continue;
 			
-			$field->{$prop}[$n]	= $pretext.$value.$posttext;
+			$field->{$prop}[$n]	= $pretext . ($lang_filter_values ? JText::_($value) : $value) . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
@@ -518,9 +521,10 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$field_prompt = $field->parameters->get('select_field_prompt', $default_prompt);
 		$options[] = JHTML::_('select.option', '', '-'.JText::_($field_prompt).'-');
 		
+		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
 		if ($results) foreach($results as $result) {
 			if ( !strlen($result->value) ) continue;
-			$options[] = JHTML::_('select.option', $result->value, JText::_($result->text));
+			$options[] = JHTML::_('select.option', $result->value, ($lang_filter_values ? JText::_($result->text) : $result->text));
 		}
 		return $options;
 	}

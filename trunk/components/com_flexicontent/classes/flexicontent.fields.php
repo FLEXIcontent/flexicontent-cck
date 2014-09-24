@@ -417,7 +417,8 @@ class FlexicontentFields
 		// we also use VIEW so that we can reder different displays of the field e.g. item VIEW and module view
 		$items = array();
 		foreach ($all_items as $_item_) {
-			if (isset($_created[$view][$method][$field_name][$_item_->id])) continue;  // Skip this item
+			// Commented out, TODO: examine if we can return cached value here !!
+			//if (isset($_created[$view][$method][$field_name][$_item_->id])) continue;  // Skip this item
 			$items[] = $_item_;
 			$_created[$view][$method][$field_name][$_item_->id] = 1;
 		}
@@ -2390,7 +2391,7 @@ class FlexicontentFields
 			
 			foreach($results as $result) {
 				if ( !strlen($result->value) ) continue;
-				$options[] = JHTML::_('select.option', $result->value, JText::_($result->text), 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
+				$options[] = JHTML::_('select.option', $result->value, $result->text, 'value', 'text', $disabled = ($faceted_filter==2 && !$result->found));
 			}
 			if ($display_filter_as==6 && $combine_tip) {
 				$filter->html	.= ' <span class="fc_filter_tip_inline">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ';
@@ -2488,7 +2489,7 @@ class FlexicontentFields
 					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 				}
 				$filter->html .= '<label class="'.$checked_class.'" for="'.$filter_ffid.$i.'">';
-				$filter->html .= JText::_($result->text);
+				$filter->html .= $result->text;
 				$filter->html .= '</label>';
 				$filter->html .= '</li>';
 				$i++;
@@ -2559,6 +2560,7 @@ class FlexicontentFields
 		$faceted_filter = $filter->parameters->get( 'faceted_filter', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items', 1 );
 		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
@@ -2601,13 +2603,16 @@ class FlexicontentFields
 			$results = & $_results;
 		}
 		
-		foreach ($results as $i => $result) {
-			$results[$i]->text = JText::_($result->text);
+		// Language filter labels
+		if ($lang_filter_values) {
+			foreach ($results as $i => $result) {
+				$results[$i]->text = JText::_($result->text);
+			}
 		}
 		
 		// Skip sorting for indexed elements, DB query or element entry is responsible
 		// for ordering indexable fields, also skip if ordering is done by the filter
-		if ( !$indexed_elements && empty($filter->filter_orderby) ) uksort($results, 'strcasecmp');
+		if ( !$indexed_elements && empty($filter->filter_orderby) ) uksort($results, 'strnatcasecmp');
 		
 		return $results;
 	}
@@ -2619,6 +2624,7 @@ class FlexicontentFields
 		$faceted_filter = $filter->parameters->get( 'faceted_filter_s', 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as_s', 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
 		
 		//$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
 		//$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
@@ -2627,13 +2633,16 @@ class FlexicontentFields
 		$_results = FlexicontentFields::getFilterValuesSearch($filter, $view_join, $view_where, $filters_where);
 		$results = & $_results;
 		
-		foreach ($results as $i => $result) {
-			$results[$i]->text = JText::_($result->text);
+		// Language filter labels
+		if ($lang_filter_values) {
+			foreach ($results as $i => $result) {
+				$results[$i]->text = JText::_($result->text);
+			}
 		}
 		
 		// Skip sorting for indexed elements, DB query or element entry is responsible
 		// for ordering indexable fields, also skip if ordering is done by the filter
-		if ( !$indexed_elements && empty($filter->filter_orderby) ) uksort($results, 'strcasecmp');
+		if ( !$indexed_elements && empty($filter->filter_orderby) ) uksort($results, 'strnatcasecmp');
 		
 		return $results;
 	}
