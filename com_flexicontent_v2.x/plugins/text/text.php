@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.0 $Id: text.php 1904 2014-05-20 12:21:09Z ggppdk $
+ * @version 1.0 $Id: text.php 1968 2014-09-24 00:03:41Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @subpackage plugin.text
@@ -276,7 +276,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$multiple       = $field->parameters->get( 'allow_multiple', 1 ) ;
 		
 		// Language filter the values
-		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
+		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -521,7 +521,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$field_prompt = $field->parameters->get('select_field_prompt', $default_prompt);
 		$options[] = JHTML::_('select.option', '', '-'.JText::_($field_prompt).'-');
 		
-		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
+		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
 		if ($results) foreach($results as $result) {
 			if ( !strlen($result->value) ) continue;
 			$options[] = JHTML::_('select.option', $result->value, ($lang_filter_values ? JText::_($result->text) : $result->text));
