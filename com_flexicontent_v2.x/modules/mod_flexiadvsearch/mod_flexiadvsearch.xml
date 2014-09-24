@@ -44,8 +44,8 @@
 			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" level="level1" menu="hide" />
 			
 			<field name="" type="separator" default="FLEXI_MOD_TEXT_SEARCH_FIELD" level="level2" menu="hide" />
-			<field name="width" type="text" default="20" label="FLEXI_MOD_TEXT_SEARCH_WIDTH" description="FLEXI_MOD_TEXT_SEARCH_WIDTH_DESC" />
-			<field name="text" type="text" default="FLEXI_ADV_MOD_SEARCH_PROMPT" label="FLEXI_MOD_TEXT_SEARCH_PROMPT" description="FLEXI_MOD_TEXT_SEARCH_PROMPT_DESC" />
+			<field name="search_inner_width" type="text" default="20" label="FLEXI_MOD_TEXT_SEARCH_WIDTH" description="FLEXI_MOD_TEXT_SEARCH_WIDTH_DESC" />
+			<field name="search_inner_prompt" type="text" default="FLEXI_ADV_MOD_SEARCH_PROMPT" label="FLEXI_MOD_TEXT_SEARCH_PROMPT" description="FLEXI_MOD_TEXT_SEARCH_PROMPT_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_MOD_GO_BUTTON" level="level2" menu="hide" />
 			<field name="button" type="radio" default="" label="FLEXI_MOD_SHOW_GO_BUTTON" description="FLEXI_MOD_SHOW_GO_BUTTON_DESC">
