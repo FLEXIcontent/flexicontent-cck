@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1907 2014-05-27 12:35:36Z ggppdk $
+ * @version 1.5 stable $Id: default.php 1940 2014-08-29 17:55:03Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -55,17 +55,17 @@ $ord_grp = 1;
 <div class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
-	<table style="white-space:nowrap;margin-bottom:16px;">
-		<tr class="filterbuttons_head">
-			<td>
-				<div style="float:left; margin:2px 48px 0px 0px;">
-					<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
-					<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
-					<div id="fc-filter-buttons">
-						<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
-						<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
-					</div>
-				
+	<table class="adminform">
+		<tr>
+			<td align="left">
+				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
+				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
+				<div id="fc-filter-buttons">
+					<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
+					<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
+				</div>
+			</td>
+			<td nowrap="nowrap">
 				<div class="limit" style="display: inline-block;">
 					<label class="label">
 						<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
@@ -76,27 +76,27 @@ $ord_grp = 1;
 					?>
 				</div>
 				
-				<span style="display: inline-block; margin-right:32px">
-					<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
-						<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
-					</span>
-					
-					<span class="fc_pages_counter" style="display:inline-block; white-space:nowrap;">
-						<?php echo $this->pagination->getPagesCounter(); ?>
-					</span>
+				<span class="fc_item_total_data fc_nice_box" style="margin-right:10px;" >
+					<?php echo @$this->resultsCounter ? $this->resultsCounter : $this->pagination->getResultsCounter(); // custom Results Counter ?>
 				</span>
 				
-				<?php echo $this->lists['assigned'] ."\n"; ?>
-				<?php echo $this->lists['fftype'] ."\n"; ?>
-				<?php echo $this->lists['filter_type'] ."\n"; ?>
-				<?php echo $this->lists['state'] ."\n"; ?>
+				<span class="fc_pages_counter">
+					<?php echo $this->pagination->getPagesCounter(); ?>
+				</span>
+			</td>
+			<td style="text-align:right;">
+				<div class="filter-select fltrt">
+					<?php echo $this->lists['assigned'] ."\n"; ?>
+					<?php echo $this->lists['fftype'] ."\n"; ?>
+					<?php echo $this->lists['filter_type'] ."\n"; ?>
+					<?php echo $this->lists['state'] ."\n"; ?>
+				</div>
 			</td>
 		</tr>
 	</table>
 	
 	
 	<span style="display:none; color:darkred;" class="fc_nice_box" id="fcorder_save_warn_box"><?php echo JText::_('FLEXI_FCORDER_CLICK_TO_SAVE'); ?></span>
-	
 	
 	<table class="adminlist" cellspacing="1" style="width:auto!important;">
 	<thead>
@@ -345,13 +345,15 @@ $ord_grp = 1;
 					}
 					if ($canCheckin) {
 						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'types.', $canCheckin);
-						$task_str = FLEXI_J16GE ? 'types.checkin' : 'checkin';
+						$task_str = FLEXI_J16GE ? 'fields.checkin' : 'checkin';
 						if ($row->checked_out == $user->id) {
 							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
 						} else {
-							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none;">';
+							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">';
 							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
 						}
+					} else {
+						echo '<span class="fc-noauth">'.JText::sprintf('FLEXI_RECORD_CHECKED_OUT_DIFF_USER').'</span><br/>';
 					}
 				}
 				

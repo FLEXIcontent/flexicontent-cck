@@ -50,7 +50,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 		<tr>
 			<td align="left">
 				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
-				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="text_area" onchange="document.adminForm.submit();" />
+				<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 				<div id="fc-filter-buttons">
 					<button class="fc_button fcsimple" onclick="this.form.submit();"><?php echo JText::_( 'FLEXI_GO' ); ?></button>
 					<button class="fc_button fcsimple" onclick="this.form.getElementById('search').value='';this.form.submit();"><?php echo JText::_( 'FLEXI_RESET' ); ?></button>
@@ -58,8 +58,10 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			</td>
 			<td nowrap="nowrap">
 				<div class="limit" style="display: inline-block;">
+					<label class="label">
+						<?php echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM'); ?>
+					</label>
 					<?php
-					echo JText::_(FLEXI_J16GE ? 'JGLOBAL_DISPLAY_NUM' : 'DISPLAY NUM');
 					$pagination_footer = $this->pagination->getListFooter();
 					if (strpos($pagination_footer, '"limit"') === false) echo $this->pagination->getLimitBox();
 					?>
@@ -84,7 +86,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 			</td>
 		</tr>
 	</table>
-
+	
 	<table class="adminlist" cellspacing="1">
 	<thead>
 		<tr>
@@ -218,9 +220,11 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 						if ($row->checked_out == $user->id) {
 							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_YOUR_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
 						} else {
-							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none;">';
+							echo '<input id="cb'.$i.'" type="checkbox" value="'.$row->id.'" name="cid[]" style="display:none!important;">';
 							echo JText::sprintf('FLEXI_CLICK_TO_RELEASE_FOREIGN_LOCK', $row->editor, $row->checked_out_time, '"cb'.$i.'"', '"'.$task_str.'"');
 						}
+					} else {
+						echo '<span class="fc-noauth">'.JText::sprintf('FLEXI_RECORD_CHECKED_OUT_DIFF_USER').'</span><br/>';
 					}
 				}
 				
