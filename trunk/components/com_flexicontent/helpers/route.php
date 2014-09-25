@@ -763,6 +763,7 @@ class FlexicontentHelperRoute
 		// Now find menu item for given needles
 		$matched_menu = false;
 		
+		//JFactory::getApplication()->enqueueMessage("Finding Item: ".$item->id ."<br/>Language:".$language." <br/> ". print_r(self::$lookup[$language]['item'], true)."<br/>".print_r($needles,true),'message');
 		foreach ($needles as $view => $ids)
 		{
 			if ( is_object($ids) ) return $ids;  // done, this an already appropriate menu item object
@@ -774,7 +775,7 @@ class FlexicontentHelperRoute
 			{
 				if ( !isset(self::$lookup[$language][$view][(int)$id]) ) continue;  // not found
 				
-				//echo "$language $view $id : ". self::$lookup[$language][$view][(int)$id] ."<br/>";
+				//JFactory::getApplication()->enqueueMessage("MATCHED $language $view $id : ". self::$lookup[$language][$view][(int)$id],'message');
 				$menuid = self::$lookup[$language][$view][(int)$id];
 				$menuitem = $component_menuitems[$menuid];
 				
@@ -782,6 +783,7 @@ class FlexicontentHelperRoute
 				$matched_menu = $menuitem;
 				break;
 			}
+			if ($matched_menu) break;
 		}
 
 
@@ -875,6 +877,7 @@ class FlexicontentHelperRoute
 				$matched_menu = $menuitem;
 				break;
 			}
+			if ($matched_menu) break;
 		}
 		
 		// Prefer current category menu item if also appropriate
@@ -948,6 +951,7 @@ class FlexicontentHelperRoute
 				$matched_menu = $menuitem;
 				break;
 			}
+			if ($matched_menu) break;
 		}
 		
 		// Prefer current tags menu item if also appropriate

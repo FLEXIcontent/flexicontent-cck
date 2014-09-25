@@ -13,6 +13,7 @@
 		<filename plugin="linkslist">linkslist.php</filename>
 		<filename>index.html</filename>
 	</files>
+	
 	<config>
 	
 	<fields name="attribs">
@@ -22,10 +23,15 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
 		</fieldset>
 		
 		<fieldset name="group-linkslist" addfieldpath="/administrator/components/com_flexicontent/elements">
-		
+			
 			<field name="" type="separator" default="FLEXI_ITEM_FORM" description="" level="level1" />
 			
 			<field name="field_elements" type="textarea" default="Title1[id=&quot;tagid1&quot; class=&quot;cssclass1&quot; link=&quot;#link1&quot;] :: &#13; Title2[id=&quot;tagid2&quot; class=&quot;cssclass2&quot; link=&quot;#link2&quot;] :: &#13; Title3[id=&quot;tagid3&quot; class=&quot;cssclass3&quot; link=&quot;#link3&quot;]" class="required" rows="5" cols="40" label="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS" description="FLEXI_FIELD_LINKSLIST_LIST_ELEMENTS_DESC" />

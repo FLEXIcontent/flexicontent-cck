@@ -9,18 +9,22 @@
 	<authorUrl>www.flexicontent.org</authorUrl>
 	<version>1.0</version>
 	<description>Form Field Group Marker Field Plugin for FLEXIcontent. This field is used to mark the start/end of FLEXIcontent field groups in ITEM edit FORM. Group will appear inside Tabs/Fieldsets/etc. Take care to match all openings with a closing marker appropriately.</description>
-	
 	<files>
 		<filename plugin="groupmarker">groupmarker.php</filename>
 	</files>
 	
 		<params group="standard">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
 		</params>
-	
+		
 		<params group="group-groupmarker" addpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="marker_type" type="multilist" default="fieldset_open" label="Marker type" description="BE CAREFULL to match-close all open type of markers with an appropriate closing type. BE CAREFULL to which content types you assign the field to.">
