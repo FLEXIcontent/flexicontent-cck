@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1968 2014-09-24 00:03:41Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1971 2014-09-25 00:39:06Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -421,6 +421,12 @@ class FlexicontentFields
 		static $cparams = null;
 		if ($cparams === null) $cparams = JComponentHelper::getParams( 'com_flexicontent' );
 		
+		static $aid;
+		if ($aid === null) {
+			$user = JFactory::getUser();
+			$aid = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id) : (int) $user->get('aid');
+		}
+		
 		if (is_array($_item) && is_string($_field)) ;  // ok
 		else if (is_object($_item) && is_object($_field)) ; // ok
 		else {
@@ -462,7 +468,7 @@ class FlexicontentFields
 		// Create field parameters (and values) in an optimized way, and also apply Type Customization for CORE fields
 		// ***********************************************************************************************************
 		foreach($items as $item) {
-			$field = is_object($_field) ? $_field : $item->fields[$field_name];
+			$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
 			$field->item_id = (int)$item->id;
 			
 			// CHECK IF only rendering single field object for a single item  -->  thus we need to use custom values if these were given !
@@ -483,7 +489,10 @@ class FlexicontentFields
 		// Return no access message if user has no ACCESS
 		// **********************************************
 		
-		
+		// Calculate has_access flag if it is missing ... FLEXI_ACCESS ... no longer supported here ...
+		if ( !isset($first_item_field->has_access) ) {
+			$first_item_field->has_access = FLEXI_J16GE ? in_array($first_item_field->access, $aid) : $first_item_field->access <= $aid;
+		}
 		if ( !$first_item_field->has_access ) {
 			// Get configuration out of the field of the first item, any CONFIGURATION that is different
 			// per content TYPE, must not use this, instead it must be retrieved inside the item loops
@@ -491,7 +500,8 @@ class FlexicontentFields
 			$no_acc_msg = $first_item_field->parameters->get('no_acc_msg');
 			$no_acc_msg = JText::_( $no_acc_msg ? $no_acc_msg : 'FLEXI_FIELD_NO_ACCESS');
 			foreach($items as $item) {
-				$item->fields[$field_name]->$method = $show_acc_msg ? '<span class="fc-noauth fcfield_inaccessible_'.$field->id.'">'.$no_acc_msg.'</span>' : '';
+				$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
+				$field->$method = $show_acc_msg ? '<span class="fc-noauth fcfield_inaccessible_'.$field->id.'">'.$no_acc_msg.'</span>' : '';
 			}
 			
 			// Return field only if single item was given (with a field object)

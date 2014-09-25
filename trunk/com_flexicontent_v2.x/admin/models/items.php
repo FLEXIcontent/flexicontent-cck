@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1909 2014-06-04 16:44:49Z ggppdk $
+ * @version 1.5 stable $Id: items.php 1959 2014-09-18 00:15:15Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -273,6 +273,7 @@ class FlexicontentModelItems extends JModelLegacy
 	{
 		$app    = JFactory::getApplication();
 		$option = JRequest::getVar('option');
+		$user = JFactory::getUser();
 		$flexiparams = JComponentHelper::getParams( 'com_flexicontent' );
 		$filter_type = $app->getUserStateFromRequest( $option.'.items.filter_type', 	'filter_type', '', 'int' );
 		
@@ -300,10 +301,29 @@ class FlexicontentModelItems extends JModelLegacy
 			$methodnames[$fieldname] = empty($methodname) ? 'display' : $methodname;
 		}
 		
+		// Add column of has_access flag
+		$select_access = '';
+		$joinaccess = '';
+		// Field's has_access flag
+		if (FLEXI_J16GE) {
+			$aid_arr = JAccess::getAuthorisedViewLevels($user->id);
+			$aid_list = implode(",", $aid_arr);
+			$select_access .= ', CASE WHEN fi.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_access';
+		} else {
+			$aid = $user->get('aid');
+			if (FLEXI_ACCESS) {
+				$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"';
+				$select_access .= ', CASE WHEN (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_access';
+			} else {
+				$select_access .= ', CASE WHEN (fi.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_access';
+			}
+		}
 		$query = ' SELECT fi.*'
-		   .' FROM #__flexicontent_fields AS fi'
-		   .' WHERE fi.name IN ("' . implode('","',array_keys($methodnames)) . '")'
-		   .' ORDER BY FIELD(fi.name, "'. implode('","',array_keys($methodnames)) . '" )';
+			.$select_access
+			.' FROM #__flexicontent_fields AS fi'
+			.$joinaccess 
+			.' WHERE fi.name IN ("' . implode('","',array_keys($methodnames)) . '")'
+			.' ORDER BY FIELD(fi.name, "'. implode('","',array_keys($methodnames)) . '" )';
 		$this->_db->setQuery($query);
 		$extra_fields = $this->_db->loadObjectList();
 		if ($this->_db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($this->_db->getErrorMsg()),'error');

@@ -94,7 +94,7 @@
 
 .fc-noauth {
 	display: inline-block;
-	background: #FCF8E3 url(../images/warning.png) no-repeat 10px 50%;
+	background: #FCF8CA url(../images/warning.png) no-repeat 10px 50%;
 	color: #C09853 !important;
 	border: 1px solid #FBEED5 !important;
 	border-radius: 6px !important;
