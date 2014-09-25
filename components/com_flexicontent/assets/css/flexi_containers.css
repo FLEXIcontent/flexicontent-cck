@@ -92,21 +92,32 @@
 	padding-left: 36px;
 }
 
-
-
-
-
 .fc-noauth {
-	background: #FEEFB3 url(../images/warning.png) no-repeat 10px 50%;
-	color:#9F6000 !important;
-	border-color: #9F6000 !important;
+	display: inline-block;
+	background: #FCF8E3 url(../images/warning.png) no-repeat 10px 50%;
+	color: #C09853 !important;
+	border: 1px solid #FBEED5 !important;
+	border-radius: 6px !important;
 	padding: 3px 6px 4px 36px !important;
+	margin: 0 0 5px 0 !important;
+	font-family: tahoma;
+	font-size:11px;
+	white-space: normal;
+	line-height: 140%;
 }
 .fc-caption {
+	display: inline-block;
 	background: lightgray url(../images/comment.png) no-repeat 10px 50%;
 	color: black !important;
-	border-color: #ddd !important;
+	border: 1px solid #ddd !important;
+	border-radius: 6px !important;
 	padding: 3px 6px 4px 36px !important;
+	margin: 0 0 5px 0 !important;
+	font-family: tahoma;
+	font-size:11px;
+	white-space: normal;
+	line-height: 140%;
+
 }
 
 

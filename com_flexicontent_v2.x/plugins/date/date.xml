@@ -13,6 +13,7 @@
 		<filename plugin="date">date.php</filename>
 		<filename>index.html</filename>
 	</files>
+	
 	<config>
 	
 	<fields name="attribs">
@@ -22,6 +23,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="show_acc_msg" type="radio" default="0" label="FLEXI_FIELD_SHOW_NOACCESS" description="FLEXI_FIELD_SHOW_NOACCESS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
 		</fieldset>
 		
 		<fieldset name="group-date" addfieldpath="/administrator/components/com_flexicontent/elements">

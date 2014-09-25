@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1965 2014-09-21 16:27:07Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1968 2014-09-24 00:03:41Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -238,23 +238,41 @@ class FlexicontentFields
 			// ONCE per Content Item Type
 			if ( !isset($type_fields[$item->type_id]) )
 			{
+				$select_access = '';
+				$joinaccess = '';
+				// Field's has_access flag
 				if (FLEXI_J16GE) {
+					$aid_arr = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
+					$aid_list = implode(",", $aid_arr);
+					$select_access .= ', CASE WHEN fi.access IN (0,'.$aid_list.') THEN 1 ELSE 0 END AS has_access';
+				} else {
+					$aid = $aid!==false ? $aid : $user->get('aid');
+					if (FLEXI_ACCESS) {
+						$joinaccess .= ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"';
+						$select_access .= ', CASE WHEN (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_access';
+					} else {
+						$select_access .= ', CASE WHEN (fi.access <= '. (int) $aid . ') THEN 1 ELSE 0 END AS has_access';
+					}
+				}
+				
+				/*if (FLEXI_J16GE) {
 					$aid_arr = is_array($aid) ? $aid : JAccess::getAuthorisedViewLevels($user->id);
 					$aid_list = implode(",", $aid);
 					$andaccess 	= ' AND fi.access IN (0,'.$aid_list.')' ;
 					$joinaccess = '';
 				} else {
 					$aid = $aid!==false ? (int) $aid : (int) $user->get('aid');
-					$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. $aid . ')' : ' AND fi.access <= '.$aid ;
+					$andaccess 	= FLEXI_ACCESS ? ' AND (gi.aro IN ( '.$user->gmid.' ) OR fi.access <= '. (int) $aid . ')' : ' AND fi.access <= '.$aid ;
 					$joinaccess	= FLEXI_ACCESS ? ' LEFT JOIN #__flexiaccess_acl AS gi ON fi.id = gi.axo AND gi.aco = "read" AND gi.axosection = "field"' : '' ;
-				}
+				}*/
 				
 				$query 	= 'SELECT fi.*'
+						. $select_access
 						. ' FROM #__flexicontent_fields AS fi'
 						. ' LEFT JOIN #__flexicontent_fields_type_relations AS ftrel ON ftrel.field_id = fi.id AND ftrel.type_id = '.$item->type_id
 						. $joinaccess
 						. ' WHERE fi.published = 1'
-						. $andaccess
+						//. $andaccess
 						. ' GROUP BY fi.id'
 						. ' ORDER BY ftrel.ordering, fi.ordering, fi.name'
 						;
@@ -297,6 +315,13 @@ class FlexicontentFields
 			
 			// custom field values
 			$item->fieldvalues = $custom;
+			
+			// !!! ??? Remove values for no accessible fields, in case custom code tries to use them
+			// This is not best, but some template may simply check if field exists
+			// and ... then show value via custom code ??
+			/*foreach($item->fields as $field)
+				if ( !$field->has_access )  $item->fieldvalues[$field->id] = null;
+			}*/
 			
 			/*if ($item->fields) {
 				// IMPORTANT the items model and possibly other will set item PROPERTY version_id to indicate loading an item version,
@@ -387,30 +412,36 @@ class FlexicontentFields
 	 * @return object
 	 * @since 1.5
 	 */
-	static function renderField(&$_items, &$_field, &$values, $method='display', $view=FLEXI_ITEMVIEW)
+	static function renderField(&$_item, &$_field, &$values, $method='display', $view=FLEXI_ITEMVIEW)
 	{
 		static $_trigger_plgs_ft = array();
 		static $_created = array();
 		$flexiview = JRequest::getVar('view');
 		
-		if (is_array($_items) && is_string($_field)) ;  // ok
-		else if (is_object($_items) && is_object($_field)) ; // ok
+		static $cparams = null;
+		if ($cparams === null) $cparams = JComponentHelper::getParams( 'com_flexicontent' );
+		
+		if (is_array($_item) && is_string($_field)) ;  // ok
+		else if (is_object($_item) && is_object($_field)) ; // ok
 		else {
 			echo "renderField() must be called with: renderField(array of items, 'field_name',...) or  renderField(item object, field object,...)<br/>";
 			exit;
 		}
 		
 		// If $method (e.g. display method) is already created,
-		// then return the $field without recreating the $method
+		// then return the field object without recreating the method
 		if ( is_object($_field) && isset($_field->{$method}) ) return $_field;
 		
 		// Handle multi-item call
-		if (!is_array($_items)) {
-			$all_items = array( & $_items );
+		if (!is_array($_item)) {
+			$all_items = array( & $_item );
 			$field_name = $_field->name;
+			$first_item_field = & $_field;
 		} else {
-			$all_items = & $_items ;
+			$all_items = & $_item ;
 			$field_name = $_field;
+			$item = reset($_item);
+			$first_item_field = & $item->fields[$field_name];
 		}
 		
 		// Skip items that have already created the given 'method' for this 'field' and for the given view
@@ -431,19 +462,40 @@ class FlexicontentFields
 		// Create field parameters (and values) in an optimized way, and also apply Type Customization for CORE fields
 		// ***********************************************************************************************************
 		foreach($items as $item) {
-			$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
+			$field = is_object($_field) ? $_field : $item->fields[$field_name];
 			$field->item_id = (int)$item->id;
 			
-			// NOTE: currently ignored and overwritten by all CORE fields
-			// For custom fields, we will use this only if a rendering a single item, thus $values may have been given
-			// TODO ...
-			if ( !is_array($_items) && $values!==null ) {
+			// CHECK IF only rendering single field object for a single item  -->  thus we need to use custom values if these were given !
+			// NOTE: values are overwritten by onDisplayCoreFieldValue() of CORE fields, and only used by onDisplayFieldValue() of CUSTOM fields
+			if ( is_object($_field) && $values!==null ) {
+				// CUSTOM VALUEs give for single field rendering, TODO (maybe): in future we may make values an array indexed by item ID
 				$field->value = $values;
 			} else {
+				// CUSTOM VALUEs not given or rendering multiple items
 				$field->value = isset($item->fieldvalues[$field->id]) ? $item->fieldvalues[$field->id] : array();
 			}
 			
 			FlexicontentFields::loadFieldConfig($field, $item);
+		}
+		
+		
+		// **********************************************
+		// Return no access message if user has no ACCESS
+		// **********************************************
+		
+		
+		if ( !$first_item_field->has_access ) {
+			// Get configuration out of the field of the first item, any CONFIGURATION that is different
+			// per content TYPE, must not use this, instead it must be retrieved inside the item loops
+			$show_acc_msg = $first_item_field->parameters->get('show_acc_msg', 0);
+			$no_acc_msg = $first_item_field->parameters->get('no_acc_msg');
+			$no_acc_msg = JText::_( $no_acc_msg ? $no_acc_msg : 'FLEXI_FIELD_NO_ACCESS');
+			foreach($items as $item) {
+				$item->fields[$field_name]->$method = $show_acc_msg ? '<span class="fc-noauth fcfield_inaccessible_'.$field->id.'">'.$no_acc_msg.'</span>' : '';
+			}
+			
+			// Return field only if single item was given (with a field object)
+			return !is_object($_field) ? null : $_field;
 		}
 		
 		
@@ -457,21 +509,14 @@ class FlexicontentFields
 		// ****************************************************************************************************
 		// Log content plugin and other performance information
 		
-		$cparams = JComponentHelper::getParams('com_flexicontent');
 		$print_logging_info = $cparams->get('print_logging_info');
 		if ($print_logging_info)  global $fc_run_times;
 		if ($print_logging_info)  $start_microtime = microtime(true);
 		
-		if ( !is_array($_items) ) {
-			$field = $_field;
-		} else {
-			$item = reset($items);
-			$field = $item->fields[$field_name];
-		}
-		if ($field->iscore == 1)  // CORE field
+		if ($first_item_field->iscore == 1)  // CORE field
 		{
-			//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$field, $item, &$item->parameters, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote ));
-			//FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$_field, & $items, &$item->parameters, $item->tags, $item->cats, $item->favs, $item->fav, $item->vote, null, $method ) );
+			//$results = $dispatcher->trigger('onDisplayCoreFieldValue', array( &$_field, $_item, &$_item->parameters, $_item->tags, $_item->cats, $_item->favs, $_item->fav, $_item->vote ));
+			//FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$_field, & $_item, &$_item->parameters, $_item->tags, $_item->cats, $_item->favs, $_item->fav, $_item->vote, null, $method ) );
 			$items_params = null;
 			FLEXIUtilities::call_FC_Field_Func('core', 'onDisplayCoreFieldValue', array( &$_field, &$items, &$items_params, false, false, false, false, false, null, $method ) );
 		}
@@ -499,9 +544,9 @@ class FlexicontentFields
 		// Trigger content plugins on the field text
 		// *****************************************
 		
-		// Just get configuration out of the field of the first item,
-		// if this was different per $field, then we should move it inside the item loop (below)
-		if ( !is_array($_items) ) {
+		// Get configuration out of the field of the first item, if this CONFIGURATION was
+		// different per content TYPE, then we should move this inside the item loop (below)
+		if ( !is_array($_item) ) {
 			$field = $_field;
 		} else {
 			$item = reset($items);
@@ -514,10 +559,11 @@ class FlexicontentFields
 		}
 		
 		// DOES NOT support multiple items, do it 1 at a time
-		foreach($items as $item) {
-			$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
+		if ( $_trigger_plgs_ft[$field_name] )
+		{
 			//echo "RENDER: ".$field_name."<br/>";
-			if ( $_trigger_plgs_ft[$field_name] ) {
+			foreach($items as $item) {
+				$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
 				if ($print_logging_info)  $start_microtime = microtime(true);	
 				FlexicontentFields::triggerContentPlugins($field, $item, $method, $view);
 				if ( $print_logging_info ) @$fc_run_times['content_plg'] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
@@ -525,10 +571,7 @@ class FlexicontentFields
 		}
 		
 		// Return field only if single item was given (with a field object)
-		if (!is_object($_field))
-			return null;
-		else
-			return $field;
+		return !is_object($_field) ? null : $_field;
 	}
 	
 	
