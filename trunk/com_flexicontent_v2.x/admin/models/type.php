@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: type.php 1340 2012-06-06 02:30:49Z ggppdk $
+ * @version 1.5 stable $Id: type.php 1933 2014-08-06 15:24:37Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -285,25 +285,46 @@ class FlexicontentModelType extends JModelAdmin
 		$isnew = ! (boolean) $data['id'];
 		if ($data['id'])  $type->load($data['id']);
 		
-		// bind it to the table
-		if (!$type->bind($data)) {
-			$this->setError( $this->_db->getErrorMsg() );
-			return false;
-		}
-		
-		// Get field attibutes, for J1.5 is params for J2.5 is attribs
-		$attibutes = !FLEXI_J16GE ? $data['params'] : $data['attribs'];
-		
 		// Build attibutes INI string
 		if (FLEXI_J16GE) {
-			// JSON encoding allows to use new lines etc
-			// handled by 'flexicontent_types' (extends JTable for flexicontent_types)
-			//$type->attribs = json_encode($attibutes);
-		} else {
-			if (is_array($attibutes))
+			// Retrieve form data these are subject to basic filtering
+			$jform = JRequest::getVar('jform', array(), 'post', 'array');
+			
+			$ilayout = $data['attribs']['ilayout'];
+			if( !empty($jform['layouts'][$ilayout]) ) {
+				$data['attribs'] = array_merge($data['attribs'], $jform['layouts'][$ilayout]);
+			}
+			
+			// JSON encoding allows to use new lines etc, handled by 'flexicontent_types' (extends JTable for flexicontent_types)
+			//$data['attribs'] = json_encode($data['attribs']);
+			// bind it to the table
+			if (!$type->bind($data)) {
+				$this->setError( $this->_db->getErrorMsg() );
+				return false;
+			}
+		}
+		
+		else {
+			// bind it to the table
+			if (!$type->bind($data)) {
+				$this->setError( $this->_db->getErrorMsg() );
+				return false;
+			}
+			
+			if (is_array($data['params']))
 			{
+				// Get layout parameters
+				$ilayout = $data['params']['ilayout'];
+				$tmpl_params = $data['layouts'][$ilayout];
+				
+				// Clear parameters of all layouts
+				unset($data['layouts']);
+				
+				// Merge the parameters of currently selected layout
+				$data['params'] = array_merge($data['params'], $tmpl_params);
+				
 				$txt = array ();
-				foreach ($attibutes as $k => $v) {
+				foreach ($data['params'] as $k => $v) {
 					if (is_array($v)) {
 						$v = implode('|', $v);
 					}
