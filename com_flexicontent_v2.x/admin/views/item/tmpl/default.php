@@ -1103,7 +1103,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 			echo JHtml::_('sliders.start','theme-sliders-'.$this->form->getValue("id"), array('useCookie'=>1));
 			$groupname = 'attribs';  // Field Group name this is for name of <fields name="..." >
 			
-			foreach ($this->tmpls as $tmpl) :
+			foreach ($this->tmpls as $tmplname => $tmpl) :
 				$fieldSets = $tmpl->params->getFieldsets($groupname);
 				foreach ($fieldSets as $fsname => $fieldSet) :
 					$label = !empty($fieldSet->label) ? $fieldSet->label : JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
@@ -1125,9 +1125,9 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 								);
 						endforeach; ?>
 					</fieldset>
-				<?php endforeach; ?>
-			<?php endforeach; ?>
-				
+				<?php endforeach; //fieldSets ?>
+			<?php endforeach; //tmpls ?>
+			
 			<?php echo JHtml::_('sliders.end'); ?>
 		</fieldset>
 		

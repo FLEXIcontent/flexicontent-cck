@@ -131,7 +131,14 @@ defined('_JEXEC') or die('Restricted access');
 				foreach ($this->tmpls as $tmpl) {
 					$title = JText::_( 'FLEXI_PARAMETERS_THEMES_SPECIFIC' ) . ' : ' . $tmpl->name;
 					echo $this->pane->startPanel( $title, "params-".$tmpl->name );
-					echo $tmpl->params->render();
+					echo
+						str_replace('id="layouts', 'id="layouts_'.$tmpl->name.'_', 
+							str_replace('for="layouts', 'for="layouts_'.$tmpl->name.'_', 
+								str_replace('name="layouts[', 'name="layouts['.$tmpl->name.'][',
+									$tmpl->params->render('layouts')
+								)
+							)
+						);
 					echo $this->pane->endPanel();
 				}
 
