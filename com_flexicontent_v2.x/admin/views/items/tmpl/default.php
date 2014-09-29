@@ -378,9 +378,9 @@ window.addEvent('domready', function() {
 					<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 				</div>
 				
-				<input type="button" class="fc_button" onclick="jQuery('#mainChooseColBox').slideToggle();" value="<?php echo JText::_( 'Columns' ); ?>" />
-				<input type="button" class="fc_button" onclick="jQuery('#stateGroupsBox').slideToggle();" value="<?php echo JText::_( 'State Groups' ); ?>" />
-				<input type="button" class="fc_button" onclick="jQuery('#filterline').slideToggle('slow');" value="<?php echo JText::_( 'Filters' ); ?>" />
+				<input type="button" class="fc_button" onclick="jQuery('#mainChooseColBox').slideToggle();" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+				<input type="button" class="fc_button" onclick="jQuery('#stateGroupsBox').slideToggle();" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
+				<input type="button" class="fc_button" onclick="jQuery('#filterline').slideToggle('slow');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
 				<!--
 				<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
 				<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />
