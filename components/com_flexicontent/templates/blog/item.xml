@@ -7,7 +7,7 @@
 	<version>1.2</version>
 	<release>20 May 2014</release>
 	<description>HTML5 layout</description>
-	<params>  
+	<params addpath="/administrator/components/com_flexicontent/elements">
 		<param name="title_cut_text" type="text" size="3" default="" label="FLEXI_TITLE_MAXLEN" description="FLEXI_TITLE_MAXLEN_DESC" />
 		<param name="show_author" type="radio" default="" label="FLEXI_SHOWAUTHOR" description="FLEXI_SHOWAUTHOR_DESC" class="btn-group btn-group-yesno">
 			<option value="">FLEXI_USE_GLOBAL</option>
