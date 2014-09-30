@@ -37,6 +37,8 @@ class FlexicontentViewFilemanager extends JViewLegacy
 	 */
 	function display( $tpl = null )
 	{
+		flexicontent_html::loadJQuery();
+		flexicontent_html::loadFramework('select2');
 		JHTML::_('behavior.tooltip');
 		// Load the form validation behavior
 		JHTML::_('behavior.formvalidation');
@@ -136,9 +138,10 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		// Build languages list
 		//$allowed_langs = !$authorparams ? null : $authorparams->get('langs_allowed',null);
 		//$allowed_langs = !$allowed_langs ? null : FLEXIUtilities::paramToArray($allowed_langs);
+		$display_file_lang_as = $params->get('display_file_lang_as', 3);
 		$allowed_langs = null;
 		if (FLEXI_FISH || FLEXI_J16GE) {
-			$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', '', '*', 3, $allowed_langs, $published_only=false);
+			$lists['file-lang'] = flexicontent_html::buildlanguageslist('file-lang', '', '*', $display_file_lang_as, $allowed_langs, $published_only=false);
 		} else {
 			$lists['file-lang'] = flexicontent_html::getSiteDefaultLang() . '<input type="hidden" name="file-lang" value="'.flexicontent_html::getSiteDefaultLang().'" />';
 		}
@@ -149,7 +152,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		 *************/
 		
 		// language filter
-		$lists['language'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="inputbox" onchange="submitform();" size="1" ', $filter_lang, 2);
+		$lists['language'] = flexicontent_html::buildlanguageslist('filter_lang', 'class="use_select2_lib" onchange="submitform();" size="1" ', $filter_lang, 2);
 		
 		// search
 		$lists['search'] 	= $search;
@@ -158,7 +161,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$filters = array();
 		$filters[] = JHTML::_('select.option', '1', JText::_( 'FLEXI_FILENAME' ) );
 		$filters[] = JHTML::_('select.option', '2', JText::_( 'FLEXI_FILE_TITLE' ) );
-		$lists['filter'] = JHTML::_('select.genericlist', $filters, 'filter', 'size="1" class="inputbox"', 'value', 'text', $filter );
+		$lists['filter'] = JHTML::_('select.genericlist', $filters, 'filter', 'size="1" class="use_select2_lib"', 'value', 'text', $filter );
 
 		//build url/file filterlist
 		$url 	= array();
@@ -166,7 +169,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$url[] 	= JHTML::_('select.option',  'F', JText::_( 'FLEXI_FILE' ) );
 		$url[] 	= JHTML::_('select.option',  'U', JText::_( 'FLEXI_URL' ) );
 
-		$lists['url'] = JHTML::_('select.genericlist', $url, 'filter_url', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_url );
+		$lists['url'] = JHTML::_('select.genericlist', $url, 'filter_url', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_url );
 
 		//item lists
 		/*$items_list = array();
@@ -174,7 +177,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		foreach($items as $item) {
 			$items_list[] = JHTML::_('select.option', $item->id, JText::_( $item->title ) . ' (#' . $item->id . ')' );
 		}
-		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" class="inputbox" onchange="submitform( );"', 'value', 'text', $filter_item );*/
+		$lists['item_id'] = JHTML::_('select.genericlist', $items_list, 'item_id', 'size="1" class="use_select2_lib" onchange="submitform( );"', 'value', 'text', $filter_item );*/
 		$lists['item_id'] = '<input type="text" name="item_id" size="1" class="inputbox" onchange="submitform( );" value="'.$filter_item.'" />';
 		
 		//build secure/media filterlist
@@ -183,20 +186,20 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$secure[] 	= JHTML::_('select.option',  'S', JText::_( 'FLEXI_SECURE_DIR' ) );
 		$secure[] 	= JHTML::_('select.option',  'M', JText::_( 'FLEXI_MEDIA_DIR' ) );
 
-		$lists['secure'] = JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="inputbox" size="1" onchange="submitform( );"', 'value', 'text', $filter_secure );
+		$lists['secure'] = JHTML::_('select.genericlist', $secure, 'filter_secure', 'class="use_select2_lib" size="1" onchange="submitform( );"', 'value', 'text', $filter_secure );
 
 		//build ext filterlist
-		$lists['ext'] = flexicontent_html::buildfilesextlist('filter_ext', 'class="inputbox" size="1" onchange="submitform( );"', $filter_ext);
+		$lists['ext'] = flexicontent_html::buildfilesextlist('filter_ext', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_ext);
 
 		//build uploader filterlist
-		$lists['uploader'] = flexicontent_html::builduploaderlist('filter_uploader', 'class="inputbox" size="1" onchange="submitform( );"', $filter_uploader);
+		$lists['uploader'] = flexicontent_html::builduploaderlist('filter_uploader', 'class="use_select2_lib" size="1" onchange="submitform( );"', $filter_uploader);
 
 		// table ordering
 		$lists['order_Dir']	= $filter_order_Dir;
 		$lists['order']			= $filter_order;
 		
 		// uploadstuff
-		if ($params->get('enable_flash', 1)) {
+		if ($params->get('enable_flash', 1) && !FLEXI_J30GE) {
 			JHTML::_('behavior.uploader', 'file-upload', array('onAllComplete' => 'function(){ window.location.reload(); }') );
 		}
 		jimport('joomla.client.helper');

@@ -199,7 +199,7 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$lists['order']			= $filter_order;
 		
 		// uploadstuff
-		if ($params->get('enable_flash', 1)) {
+		if ($params->get('enable_flash', 1) && !FLEXI_J30GE) {
 			JHTML::_('behavior.uploader', 'file-upload', array('onAllComplete' => 'function(){ window.location.reload(); }') );
 		}
 		jimport('joomla.client.helper');

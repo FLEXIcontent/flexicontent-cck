@@ -1355,28 +1355,31 @@ class flexicontent_html
 		$nullDate = $db->getNullDate();
 		$app = JFactory::getApplication();
 
-		// Determine priveleges of the current user on the given item
+		// Determine general archive privilege
+		static $has_archive = null;
+		if ($has_archive === null) {
+			$permission  = FlexicontentHelperPerm::getPerm();
+			$has_archive = $permission->CanArchives;
+		}
+		
+		// Determine edit state, delete privileges of the current user on the given item
 		if (FLEXI_J16GE) {
 			$asset = 'com_content.article.' . $item->id;
 			$has_edit_state = $user->authorise('core.edit.state', $asset) || ($user->authorise('core.edit.state.own', $asset) && $item->created_by == $user->get('id'));
 			$has_delete     = $user->authorise('core.delete', $asset) || ($user->authorise('core.delete.own', $asset) && $item->created_by == $user->get('id'));
-			// ...
-			$permission = FlexicontentHelperPerm::getPerm();
-			$has_archive    = $permission->CanArchives;
 		} else if ($user->gid >= 25) {
 			$has_edit_state = true;
 			$has_delete     = true;
-			$has_archive    = true;
 		} else if (FLEXI_ACCESS) {
 			$rights 	= FAccess::checkAllItemAccess('com_content', 'users', $user->gmid, $item->id, $item->catid);
 			$has_edit_state = in_array('publish', $rights) || (in_array('publishown', $rights) && $item->created_by == $user->get('id')) ;
 			$has_delete     = in_array('delete', $rights) || (in_array('deleteown', $rights) && $item->created_by == $user->get('id')) ;
-			$has_archive    = FAccess::checkComponentAccess('com_flexicontent', 'archives', 'users', $user->gmid);
 		} else {
 			$has_edit_state = $user->authorize('com_content', 'publish', 'content', 'all');
 			$has_delete     = $user->gid >= 23; // is at least manager
-			$has_archive    = $user->gid >= 23; // is at least manager
 		}
+		
+		// Display state toggler if it can do any of state change
 		$canChangeState = $has_edit_state || $has_delete || $has_archive;
 
 		static $js_and_css_added = false;

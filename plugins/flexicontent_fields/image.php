@@ -1509,12 +1509,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Execute once
 		static $initialized = null;
 		static $srcpath_original = '';
-		if ( $is_importcsv && !$initialized ) {
+		if ( !$initialized ) {
 			$initialized = 1;
 			jimport('joomla.filesystem.folder');
 			jimport('joomla.filesystem.jpath');
-			$srcpath_original  = JPath::clean( JPATH_SITE .DS. $import_media_folder .DS );
-			require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');
+			if ( $is_importcsv ) {
+				$srcpath_original = JPath::clean( JPATH_SITE .DS. $import_media_folder .DS );
+				require_once(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'controllers'.DS.'filemanager.php');
+			}
 		}
 
 		

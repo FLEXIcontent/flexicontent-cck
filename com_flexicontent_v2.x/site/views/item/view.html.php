@@ -1499,7 +1499,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		
 		// Build languages list
 		if (FLEXI_J16GE || FLEXI_FISH) {
-			$item_lang = $isnew ? $default_lang : $item->language;  // Model has already set default language, so this is somewhat redundant
+			$item_lang = $item->language;  // Model has already set default language according to parameters
 			$langdisplay = $params->get('langdisplay_fe', 3);
 			$langconf = array();
 			$langconf['flags'] = $params->get('langdisplay_flags_fe', 1);
