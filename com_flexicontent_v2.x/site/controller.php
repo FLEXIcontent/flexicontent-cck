@@ -419,8 +419,8 @@ class FlexicontentController extends JControllerLegacy
 			$post['jfdata']  = & $jfdata;          // Assign array of Joomfish field values, they are in the 'jfdata' form array instead of jform
 			
 			// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
-			$ilayout = $data['attribs']['ilayout'];
-			if( !empty($data['layouts'][$ilayout]) )   $post['attribs']['layouts'] = $data['layouts'];
+			$ilayout = @ $data['attribs']['ilayout'];  // normal not be set if frontend template editing is not shown
+			if( $ilayout && !empty($data['layouts'][$ilayout]) )   $post['attribs']['layouts'] = $data['layouts'];
 			//echo "<pre>"; print_r($post['attribs']); exit;
 		}
 		
@@ -431,8 +431,8 @@ class FlexicontentController extends JControllerLegacy
 			$post['text'] = JRequest::getVar( 'text', '', 'post', 'string', JREQUEST_ALLOWRAW ); // Workaround for allowing raw text field
 			
 			// Assign template parameters of the select ilayout as an sub-array (the DB model will handle the merging of parameters)
-			$ilayout = $post['params']['ilayout'];
-			if( !empty($post['layouts'][$ilayout]) )  $post['params']['layouts'] = $post['layouts'];
+			$ilayout = @ $post['params']['ilayout'];  // normal not be set if frontend template editing is not shown
+			if( $ilayout && !empty($post['layouts'][$ilayout]) )  $post['params']['layouts'] = $post['layouts'];
 			//echo "<pre>"; print_r($post['params']); exit;
 			
 		}
