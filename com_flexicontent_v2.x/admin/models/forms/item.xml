@@ -103,7 +103,7 @@
 			<option value="0">FLEXI_HIDE</option>
 			<option value="1">FLEXI_SHOW</option>
 		</field>
-		<field name="readmore" type="text" size="30" default="" label="Alternative Read more text" description="PARAMALTREADMORE" class="fcfield_textval" />
+		<field name="readmore" type="text" size="30" default="" label="FLEXI_ALTLINK_TEXTE" description="PARAMALTREADMORE" class="fcfield_textval" />
 	</fieldset>
 	
 	<fieldset name="params-advanced" label="FLEXI_PARAMETERS_ITEM_ADVANCED">
@@ -156,7 +156,7 @@
 
 <fields name="images" label="Images" description="">
 		
-		<field name="" type="separator" default="Images (Joomla Built-in Views and modules)" description="..." level="level2" />
+		<field name="" type="separator" default="FLEXI_IMAGES_COMP" description="FLEXI_IMAGES_COMP_DESC" level="level2" />
 		
 		<field name="" type="separator" default="Intro Images (Joomla category/featured/etc views)" description="..." level="level3" />
 		<field name="image_intro" type="media" label="COM_CONTENT_FIELD_INTRO_LABEL" description="COM_CONTENT_FIELD_INTRO_DESC" />
@@ -169,7 +169,7 @@
 		<field name="image_intro_alt" type="text" label="COM_CONTENT_FIELD_IMAGE_ALT_LABEL" description="COM_CONTENT_FIELD_IMAGE_ALT_DESC" class="inputbox" size="20" />
 		<field name="image_intro_caption" type="text" label="COM_CONTENT_FIELD_IMAGE_CAPTION_LABEL" description="COM_CONTENT_FIELD_IMAGE_CAPTION_DESC" class="inputbox" size="20" />
 		
-		<field name="" type="separator" default="Full Images (Joomla article view)" description="..." level="level3" />
+		<field name="" type="separator" default="FLEXI_IMAGES_COMP_FULLIMAGE" description="FLEXI_IMAGES_COMP_FULLIMAGE_DESC" level="level3" />
 		<field name="image_fulltext" type="media" label="COM_CONTENT_FIELD_FULL_LABEL" description="COM_CONTENT_FIELD_FULL_DESC" />
 		<field name="float_fulltext" type="radio" label="COM_CONTENT_FLOAT_LABEL" description="COM_CONTENT_FLOAT_DESC" class="btn-group btn-group-yesno">
 			<option value="">JGLOBAL_USE_GLOBAL</option>
@@ -184,9 +184,9 @@
 
 <fields name="urls" label="Links" description="">
 		
-		<field name="" type="separator" default="Links (Joomla built-in views and modules)" description="..." level="level2" />
+		<field name="" type="separator" default="FLEXI_LINK_COMP" description="FLEXI_LINK_COMP_DESC" level="level2" />
 		
-		<field name="" type="separator" default="Link A" description="..." level="level3" />
+		<field name="" type="separator" default="FLEXI_LINK_A" description="FLEXI_LINK_A_DESC" level="level3" />
 		<field name="urla" type="url" validate="url" filter="url" label="COM_CONTENT_FIELD_URLA_LABEL" description="COM_CONTENT_FIELD_URL_DESC" />
 		<field name="urlatext" type="text" label="COM_CONTENT_FIELD_URLA_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" class="inputbox" size="20" />
 		<field name="targeta" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" class="inputbox">
@@ -197,7 +197,7 @@
 			<option value="3">JBROWSERTARGET_MODAL</option>
 		</field>
 		
-		<field name="" type="separator" default="Link B" description="..." level="level3" />
+		<field name="" type="separator" default="FLEXI_LINK_B" description="FLEXI_LINK_B_DESC" level="level3" />
 		<field name="urlb" type="url" validate="url" filter="url" label="COM_CONTENT_FIELD_URLB_LABEL" description="COM_CONTENT_FIELD_URL_DESC" />
 		<field name="urlbtext" type="text" label="COM_CONTENT_FIELD_URLB_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" class="inputbox" size="20" />
 		<field name="targetb" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" class="inputbox">
@@ -208,7 +208,7 @@
 			<option value="3">JBROWSERTARGET_MODAL</option>
 		</field>
 
-		<field name="" type="separator" default="Link C" description="..." level="level3" />
+		<field name="" type="separator" default="FLEXI_LINK_C" description="FLEXI_LINK_C_DESC" level="level3" />
 		<field name="urlc" type="url" validate="url" filter="url" label="COM_CONTENT_FIELD_URLC_LABEL" description="COM_CONTENT_FIELD_URL_DESC" />
 		<field name="urlctext" type="text" label="COM_CONTENT_FIELD_URLC_LINK_TEXT_LABEL" description="COM_CONTENT_FIELD_URL_LINK_TEXT_DESC" class="inputbox" size="20" />
 		<field name="targetc" type="list" label="COM_CONTENT_URL_FIELD_BROWSERNAV_LABEL" description="COM_CONTENT_URL_FIELD_BROWSERNAV_DESC" default="" filter="options" class="inputbox">
