@@ -283,7 +283,7 @@
 				<option value="multibox">FLEXI_FIELD_MODAL_POPUP_WIN</option>
 			</field>
 			
-			<field name="" type="separator" default="Alternative Text" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_ALTERN_TEXT" level="level3" menu="hide" />
 			<field name="use_alt" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -295,7 +295,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 
-			<field name="" type="separator" default="Tooltip Title" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_TOOLTIP_TITLE" level="level3" menu="hide" />
 			<field name="use_title" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -307,7 +307,7 @@
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
 			
-			<field name="" type="separator" default="Tooltip Description" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_TOOLTIP_DESCRIPTION" level="level3" menu="hide" />
 			<field name="use_desc" type="radio" default="1" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

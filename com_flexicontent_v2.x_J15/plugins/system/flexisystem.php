@@ -184,13 +184,13 @@ class plgSystemFlexisystem extends JPlugin
 	
 	
 	/**
-   * Utility Function:
-   * Force backend specific redirestions like joomla category management and joomla article management to the
-   * respective managers of FLEXIcontent. Some configured exclusions and special case exceptions are checked here
-   *
-   * @access public
-   * @return void
-   */
+	 * Utility Function:
+	 * Force backend specific redirestions like joomla category management and joomla article management to the
+	 * respective managers of FLEXIcontent. Some configured exclusions and special case exceptions are checked here
+	 *
+	 * @access public
+	 * @return void
+	 */
 	function redirectAdminComContent()
 	{
 		$app    = JFactory::getApplication();
@@ -284,7 +284,7 @@ class plgSystemFlexisystem extends JPlugin
 				} else {
 					if( $user->gid > $mincats ) return false;
 				}
- 				
+				
 				// Default (target) redirection url
 				$urlItems = 'index.php?option=com_flexicontent&view=categories';
 				
@@ -317,13 +317,13 @@ class plgSystemFlexisystem extends JPlugin
 	
 	
 	/**
-   * Utility Function:
-   * Force frontend specific redirestions most notably redirecting the joomla ARTICLE VIEW to the FLEXIcontent ITEM VIEW
-   * Some special cases are handled e.g. redirecting the joomla article form to FLEXIcontent item form
-   *
-   * @access public
-   * @return void
-   */
+	 * Utility Function:
+	 * Force frontend specific redirestions most notably redirecting the joomla ARTICLE VIEW to the FLEXIcontent ITEM VIEW
+	 * Some special cases are handled e.g. redirecting the joomla article form to FLEXIcontent item form
+	 *
+	 * @access public
+	 * @return void
+	 */
 	function redirectSiteComContent()
 	{
 		//include the route helper files
@@ -343,9 +343,9 @@ class plgSystemFlexisystem extends JPlugin
 		// NOTE: we do not redirect/reroute Joomla's category views (blog,list,featured for J2.5 etc),
 		//       thus site administrator can still utilize them
 		if ( $option == 'com_content' && (
-	      $view == 'article'       ||  // a. CASE :  com_content ARTICLE link that is redirected/rerouted to its corresponding flexicontent link
-	      $view == FLEXI_ITEMVIEW  ||  // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
-		    $view == 'form'              // c. CASE :  com_content link to article edit form (J2.5 only)
+				$view == 'article'       ||  // a. CASE :  com_content ARTICLE link that is redirected/rerouted to its corresponding flexicontent link
+				$view == FLEXI_ITEMVIEW  ||  // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
+				$view == 'form'              // c. CASE :  com_content link to article edit form (J2.5 only)
 				)
 		) {
 			// For J1.5 both article view and edit form are view==article, for J1.5 
@@ -373,33 +373,33 @@ class plgSystemFlexisystem extends JPlugin
 			
 			if ($this->params->get('redirect_method_fe', 1) == 1)
 			{
-	      // Set new request variables:
-	      // NOTE: we only need to set REQUEST variable that must be changed,
-	      //       but setting any other variables to same value will not hurt
-	      if (
-		      $view == 'article'   ||   // a. CASE :  com_content ARTICLE link that is rerouted to its corresponding flexicontent link
-		      $view == FLEXI_ITEMVIEW   // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
-		    ) {
-		      $newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
-		    } else if (
-			    $view == 'form'           // c. CASE :  com_content link to article edit form (J2.5 only)
-		    ) {
-		      $newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'task'=>'edit', 'layout'=>'form', 'id' => $id, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
-		    } else {
-		    	// Unknown CASE ?? unreachable ?
-		    	return;
-		    }
-	      JRequest::set( $newRequest, 'get');
-	     
-	      // Set variable also in the router, for best compatibility
-	      $router = $app->getRouter();
-	      $router->setVars( $newRequest, false);
+				// Set new request variables:
+				// NOTE: we only need to set REQUEST variable that must be changed,
+				//       but setting any other variables to same value will not hurt
+				if (
+					$view == 'article'   ||   // a. CASE :  com_content ARTICLE link that is rerouted to its corresponding flexicontent link
+					$view == FLEXI_ITEMVIEW   // b. CASE :  com_flexicontent ITEM VIEW / ITEM FORM link with com_content active menu item
+				) {
+					$newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
+				} else if (
+					$view == 'form'           // c. CASE :  com_content link to article edit form (J2.5 only)
+				) {
+					$newRequest = array ('option' => 'com_flexicontent', 'view' => FLEXI_ITEMVIEW, 'task'=>'edit', 'layout'=>'form', 'id' => $id, 'Itemid' => JRequest::getInt( 'Itemid'), 'lang' => JRequest::getCmd( 'lang'));
+				} else {
+					// Unknown CASE ?? unreachable ?
+					return;
+				}
+				JRequest::set( $newRequest, 'get');
+			 
+				// Set variable also in the router, for best compatibility
+				$router = $app->getRouter();
+				$router->setVars( $newRequest, false);
 				
 				//$app->enqueueMessage( "Set com_flexicontent item view instead of com_content article view", 'message');
-	    } else {
-	    	if ($view=='form') {
-	    		$urlItem = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&id='.$id.'&task=edit&layout=form';
-	    	} else {
+			} else {
+				if ($view=='form') {
+					$urlItem = 'index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.'&id='.$id.'&task=edit&layout=form';
+				} else {
 					$itemslug	= JRequest::getVar('id');
 					$catslug	= JRequest::getVar('catid');
 				
@@ -452,7 +452,7 @@ class plgSystemFlexisystem extends JPlugin
 		$parents = array();
 		
 		//set depth limit
-   	$levellimit = 30;
+		$levellimit = 30;
 		
 		foreach ($cats as $child) {
 			$parent = $child->parent_id;
@@ -566,14 +566,14 @@ class plgSystemFlexisystem extends JPlugin
 	
 	
 	/**
-   * Utility Function:
-   * to detect if configuration of flexicontent component was saved
-   * and perform some needed operations like cleaning cached data,
-   * this is useful for non-FLEXIcontent views where such code can be directly executed
-   *
-   * @access public
-   * @return void
-   */
+	 * Utility Function:
+	 * to detect if configuration of flexicontent component was saved
+	 * and perform some needed operations like cleaning cached data,
+	 * this is useful for non-FLEXIcontent views where such code can be directly executed
+	 *
+	 * @access public
+	 * @return void
+	 */
 	function trackSaveConf() 
 	{
 		$option   = JRequest::getVar('option');
@@ -1132,10 +1132,10 @@ class plgSystemFlexisystem extends JPlugin
 		return 0;
 	}
 	
-  
-  /*
-   * Function to restore serialized form data
-   */
+	
+	/*
+	 * Function to restore serialized form data
+	 */
 	function parse_json_decode($string) {
 		$result = array();
 		$pairs = json_decode($string, true);
@@ -1193,38 +1193,38 @@ class plgSystemFlexisystem extends JPlugin
 	
 	// Function by decide type of user, currently unused since we used user access level instead of this function
 	function getUserType() {
-    
-    // Joomla default user groups
-    $author_grp = 3;
-    $editor_grp = 4;
-    $publisher_grp = 5;
-    $manager_grp = 6;
-    $admin_grp = 7;
-    $super_admin_grp = 8;
-    
-    $user = JFactory::getUser();
-    $coreUserGroups = $user->getAuthorisedGroups();
-    // $coreViewLevels = $user->getAuthorisedViewLevels();
-    $aid = max ($user->getAuthorisedViewLevels());
-    
-    $access = '';
-    if ($aid == 1)
-    	$access = 'public'; // public
-    if ($aid == 2 || $aid > 3)
-    	$access = 'registered'; // registered user or member of custom joomla group
-    if ($aid == 3
-    	|| in_array($author_grp,$coreUserGroups)  	|| in_array($editor_grp,$coreUserGroups)
-    	|| in_array($publisher_grp,$coreUserGroups)	|| in_array($manager_grp,$coreUserGroups)
-    	|| max($coreUserGroups)>8
-    )
-    	$access = 'special'; // special user
-    if (in_array($admin_grp,$coreUserGroups))
-    	$access = 'admin'; // is admin user
-    if (in_array($super_admin_grp,$coreUserGroups))
-    	$access = 'superadmin'; // is super admin user
-    
-    return $access;
-  }
+		
+		// Joomla default user groups
+		$author_grp = 3;
+		$editor_grp = 4;
+		$publisher_grp = 5;
+		$manager_grp = 6;
+		$admin_grp = 7;
+		$super_admin_grp = 8;
+		
+		$user = JFactory::getUser();
+		$coreUserGroups = $user->getAuthorisedGroups();
+		// $coreViewLevels = $user->getAuthorisedViewLevels();
+		$aid = max ($user->getAuthorisedViewLevels());
+		
+		$access = '';
+		if ($aid == 1)
+			$access = 'public'; // public
+		if ($aid == 2 || $aid > 3)
+			$access = 'registered'; // registered user or member of custom joomla group
+		if ($aid == 3
+			|| in_array($author_grp,$coreUserGroups)  	|| in_array($editor_grp,$coreUserGroups)
+			|| in_array($publisher_grp,$coreUserGroups)	|| in_array($manager_grp,$coreUserGroups)
+			|| max($coreUserGroups)>8
+		)
+			$access = 'special'; // special user
+		if (in_array($admin_grp,$coreUserGroups))
+			$access = 'admin'; // is admin user
+		if (in_array($super_admin_grp,$coreUserGroups))
+			$access = 'superadmin'; // is super admin user
+		
+		return $access;
+	}
 
 
 	function getCache($group='', $client=0)

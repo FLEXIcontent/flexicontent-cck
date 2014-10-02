@@ -27,28 +27,28 @@
 		
 		<params group="group-groupmarker" addpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="marker_type" type="multilist" default="fieldset_open" label="Marker type" description="BE CAREFULL to match-close all open type of markers with an appropriate closing type. BE CAREFULL to which content types you assign the field to.">
-				<group label="Tabs">
-					<option value="tabset_start"   >Tab-set: START</option>
-					<option value="tab_open"       >Tab: open</option>
-					<option value="tab_close"      >Tab: close</option>
-					<option value="tabset_end"     >Tab-set: END</option>
+			<field name="marker_type" type="multilist" default="fieldset_open" label="FLEXI_MARKER" description="FLEXI_MARKER_DESC">
+				<group label="FLEXI_TABS">
+					<option value="tabset_start"   >FLEXI_TABS_START</option>
+					<option value="tab_open"       >FLEXI_TAB_OPEN</option>
+					<option value="tab_close"      >FLEXI_TAB_CLOSE</option>
+					<option value="tabset_end"     >FLEXI_TABS_END</option>
 				</group>
-				<group label="Fieldsets">
-					<option value="fieldset_open"  >Field-set: open</option>
-					<option value="fieldset_close" >Field-set: close</option>
+				<group label="FLEXI_FIELDSET">
+					<option value="fieldset_open"  >FLEXI_FIELDSET_OPEN</option>
+					<option value="fieldset_close" >FLEXI_FIELDSET_CLOSE</option>
 				</group>
-				<group label="Other">
-					<option value="html_separator" >Custom HTML Separator</option>
+				<group label="FLEXI_OTHER">
+					<option value="html_separator" >FLEXI_HTML</option>
 				</group>
 			</field>
 			
-			<field name="" type="separator" default="Tab/Fieldset" level="level3" menu="hide" />
-			<field name="cont_label"    type="text" size="24" default="" label="Tab/Fieldset Label"     description="Label of tab / fieldset / etc, only appropriate 'opening' markers" />
-			<field name="cont_cssclass" type="text" size="24" default="" label="Container CSS class" description="CSS class of tab / fieldset / etc inner container, only appropriate 'opening' markers" />
+			<field name="" type="separator" default="FLEXI_TABS_FIELDSET" level="level3" menu="hide" />
+			<field name="cont_label"    type="text" size="24" default="" label="FLEXI_TABS_FIELDSET_LABEL"     description="FLEXI_TABS_FIELDSET_LABEL_DESC" />
+			<field name="cont_cssclass" type="text" size="24" default="" label="FLEXI_CONTAINER_CSS" description="FLEXI_CONTAINER_CSS_DESC" />
 			
-			<field name="" type="separator" default="Custom HTML Separator" level="level3" menu="hide" />
-			<field name="custom_html_sep" type="textarea" cols="21" rows="5" default="&lt;hr style='clear:both;' /&gt;" label="Custom HTML" description="Enter the custom HTML code that will be placed between the fields" />
+			<field name="" type="separator" default="FLEXI_CUSTOM_HTML_SEP" level="level3" menu="hide" />
+			<field name="custom_html_sep" type="textarea" cols="21" rows="5" default="&lt;hr style='clear:both;' /&gt;" label="FLEXI_CUSTOM_HTML" description="FLEXI_CUSTOM_HTML_DESC" />
 			
 		</params>
 	

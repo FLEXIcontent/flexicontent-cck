@@ -66,6 +66,12 @@
 				<option value="2">FLEXI_YES_AS_TEXT</option>
 				<option value="3">FLEXI_YES_BOTH</option>
 			</field>
+			<field name="display_size" type="list" default="0" label="FLEXI_FIELD_FILE_SHOW_SIZE" description="FLEXI_FIELD_FILE_SHOW_SIZE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">KBs</option>
+				<option value="2">MBs</option>
+				<option value="3">GBs</option>
+			</field>
 			<field name="display_hits" type="list" default="0" label="FLEXI_FIELD_SHOW_HITS" description="FLEXI_FIELD_SHOW_HITS">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_AS_ICON</option>
@@ -120,7 +126,7 @@
 			</field>
 			<field name="actionseptxt" type="text" default="" label="FLEXI_FIELD_FILE_ACTION_SEP_CHARS" description="FLEXI_FIELD_FILE_ACTION_SEP_CHARS_DESC" />
 			
-			<field name="" type="separator" default="Downloads" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_DOWNLOADS" level="level3" menu="hide" />
 			<field name="allowdownloads" type="radio" default="1" label="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD" description="FLEXI_FIELD_FILE_ALLOW_DOWNLOAD_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -128,7 +134,7 @@
 			</field>
 			<field name="downloadstext" type="text" size="40" default="FLEXI_DOWNLOAD" label="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_DOWNLOAD_TEXT_DESC"/>
 			
-			<field name="" type="separator" default="In-browser viewing" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_BROWSER_VIEWING" level="level3" menu="hide" />
 			<field name="allowview" type="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_VIEW" description="FLEXI_FIELD_FILE_ALLOW_VIEW_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -136,7 +142,7 @@
 			</field>
 			<field name="viewtext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_VIEW_TEXT_DESC"/>
 			
-			<field name="" type="separator" default="Sharing" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_SHARING" level="level3" menu="hide" />
 			<field name="allowshare" type="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_SHARE" description="FLEXI_FIELD_FILE_ALLOW_SHARE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -144,7 +150,7 @@
 			</field>
 			<field name="sharetext" type="text" size="40" default="" label="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT" description="FLEXI_FIELD_FILE_CUSTOM_SHARE_TEXT_DESC"/>
 			
-			<field name="" type="separator" default="Downloads manager module (installed separetely)" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_DOWNLOADS_MANAGER" level="level3" menu="hide" />
 			<field name="use_downloads_manager" type="radio" default="0" label="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART" description="FLEXI_FIELD_FILE_ALLOW_ADD_TO_CART_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -181,21 +187,21 @@
 			<field name="coupon_expiration_days" type="text" size="5" default="15" label="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS" description="FLEXI_FIELD_FILE_COUPON_EXPIRATION_DAYS_DESC"/>
 			
 			
-			<field name="" type="separator" default="Email notifications &lt;br&gt; &lt;small&gt; when a file is downloaded (hit) &lt;/small&gt;" level="level1" />
-			<field name="send_notifications" type="radio" default="0" label="Send hit notifications" description="Enable this to send notifications emails when a file is downloaded">
+			<field name="" type="separator" default="FLEXI_DOWNLOAD_NOTIFICATION" level="level1" />
+			<field name="send_notifications" type="radio" default="0" label="FLEXI_DOWNLOAD_HIT_NOTIFICATION" description="FLEXI_DOWNLOAD_HIT_NOTIFICATION_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES_EVERY_HIT</option>
 			</field>
 			
-			<field name="notification_tmpl" type="textarea" cols="50" rows="10" default="%%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" size="50" label="Notification text" description="The text that will be sent for every file. &lt;br/&gt;&lt;br/&gt; &lt;b&gt;NOTE:&lt;/b&gt; &lt;br/&gt; you may use these replacements: &lt;br/&gt; %%language_string%%, &lt;br/&gt; __file_id__ &lt;br/&gt; __file_name__ &lt;br/&gt; __item_title__ &lt;br/&gt; __item_url__" />
+			<field name="notification_tmpl" type="textarea" cols="50" rows="10" default="%%FLEXI_FDN_FILE_NO%% __FILE_ID__:  [__FILE_TITLE__] &#10; %%FLEXI_FDN_FILE_IN_ITEM%% __ITEM_TITLE__: &#10; __ITEM_URL__" size="50" label="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE" description="FLEXI_NOTIFICATION_DOWNLOAD_TEXTE_DESC" />
 			
-			<field name="" type="separator" default="Send TO" level="level3" />
-			<field name="send_all_to_email" type="text" default="" size="50" label="to specific emails" description="Notifications for any file will be sent these email(s) seperate emails with comma ," />
-			<field name="send_to_current_item_owner" type="radio" default="0" label="to content item owner" description="Send email to owner of the content item that contains the downloaded file">
+			<field name="" type="separator" default="FLEXI_SEND_TO" level="level3" />
+			<field name="send_all_to_email" type="text" default="" size="50" label="FLEXI_SPE_EMAIL" description="FLEXI_SPE_EMAIL_DESC" />
+			<field name="send_to_current_item_owner" type="radio" default="0" label="FLEXI_CONTENT_OWNER" description="FLEXI_CONTENT_OWNER_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="send_to_email_field" type="fields" field_type="email" label="to emails of EMAIL field" description="The email field must have value(s) in the SAME content item that the file field is contained, e.g. both file field and email field are displayed inside item 'A'" />
+			<field name="send_to_email_field" type="fields" field_type="email" label="FLEXI_EMAIL_FIELD" description="FLEXI_EMAIL_FIELD_DESC" />
 			
 			
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />

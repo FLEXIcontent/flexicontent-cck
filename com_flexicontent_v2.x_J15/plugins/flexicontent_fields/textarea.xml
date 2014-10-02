@@ -32,13 +32,13 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC"  menu="hide">
+			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
 			<field name="container_width" type="text" default="" size="6" label="FLEXI_FIELD_CONTAINER_WIDTH" description="FLEXI_FIELD_CONTAINER_WIDTH_DESC" />
-			<field name="filter_size" type="text" default="30" size="2" label="Filter Size" description="Size of text field filter" />
+			<field name="filter_size" type="text" default="30" size="2" label="FLEXI_FILTER_SIZE" description="FLEXI_FILTER_SIZE_DESC" />
 			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -94,44 +94,44 @@
 				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
 			
-			<field name="" type="separator" default="Textarea Tabbing Parameters" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_TABBING_PARAMS" level="level1" menu="hide" />
 			
-			<field name="" type="separator" default="FOR DEVELOPERS ONLY. &lt;br/&gt; -- Do not enable on fields that already have value without testing first, (as it may lead to data loss if users click save).  &lt;br/&gt;&lt;br/&gt; -- The following parameters allows to make your textarea TABBED, in both ITEM DISPLAY VIEW and in ITEM EDIT FORM.&lt;br/&gt;&lt;br/&gt; -- Enabling this requires very good knowledge of regular expressions, AND knowledge of the syntax of some TAB-CREATING joomla plugins. &lt;br/&gt;&lt;br/&gt; -- Future versions may come with predefined configurations, thus allowing easy use." level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_TABBING_PARAMS_DESC" level="level3" menu="hide" />
 		
-			<field name="editorarea_per_tab" type="radio" default="0" label="One editor area per tab" description="...">
+			<field name="editorarea_per_tab" type="radio" default="0" label="FLEXI_ONE_PER_TABS" description="FLEXI_ONE_PER_TABS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="allow_tab_insertion" type="radio" default="0" label="Allow insertion of tabs" description="...">
+			<field name="allow_tab_insertion" type="radio" default="0" label="FLEXI_ALLOW_INSER_TABS" description="FLEXI_ALLOW_INSER_TABS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="allow_tabs_code_editing" type="radio" default="1" label="Allow edit of tabs code" description="Display the code of tabs in editable areas so that it can be changed">
+			<field name="allow_tabs_code_editing" type="radio" default="1" label="FLEXI_ALLOW_EDIT_TABS" description="FLEXI_ALLOW_EDIT_TABS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="force_beforetabs" type="radio" default="1" label="Force before tabs editor textarea" description="Display editor area even if no text exists">
+			<field name="force_beforetabs" type="radio" default="1" label="FLEXI_FORCE_BEFORE_TABS" description="FLEXI_FORCE_BEFORE_TABS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="force_aftertabs" type="radio" default="1" label="Force after tabs editor textarea" description="Display editor area even if no text exists">
+			<field name="force_aftertabs" type="radio" default="1" label="FLEXI_FORCE_AFTER_TABS" description="FLEXI_FORCE_AFTER_TABS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="start_of_tabs_pattern" type="text" default="" size="56" label="Start of tabs pattern" description="..." />
-			<field name="start_of_tabs_default_text" type="textarea" default="" cols="31" rows="4" label="start of tabs default text" description="..." />
-			<field name="start_of_tab_pattern" type="text" default="" size="56" label="Start of tab pattern" description="..." />
+			<field name="start_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_START_TABS_PATERNS" description="FLEXI_START_TABS_PATERNS_DESC" />
+			<field name="start_of_tabs_default_text" type="textarea" default="" cols="31" rows="4" label="FLEXI_START_TABS_DEF_TEXT" description="FLEXI_START_TABS_DEF_TEXT_DESC" />
+			<field name="start_of_tab_pattern" type="text" default="" size="56" label="FLEXI_START_TAB_PATERNS" description="FLEXI_START_TAB_PATERNS_DESC" />
 			
-			<field name="title_tab_pattern" type="text" default="" size="56" label="Tab title pattern" description="..." />
-			<field name="default_tab_list" type="textarea" default="" cols="31" rows="4" label="Default tab list" description="..." />
+			<field name="title_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_TITLE_PATTERN" description="FLEXI_TAB_TITLE_PATTERN_DESC" />
+			<field name="default_tab_list" type="textarea" default="" cols="31" rows="4" label="FLEXI_DEFAULT_TAB_LIST" description="LEXI_DEFAULT_TAB_LIST_DESC" />
 			
-			<field name="end_of_tab_pattern" type="text" default="" size="56" label="End of tab" description="Can be empty for some type of tabs" />
-			<field name="end_of_tabs_pattern" type="text" default="" size="56" label="End of tabs" description="..." />
+			<field name="end_of_tab_pattern" type="text" default="" size="56" label="FLEXI_END_TAB" description="FLEXI_END_TAB" />
+			<field name="end_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_END_TABS" description="FLEXI_END_TABS_DESC" />
 			
 	</params>
 	

@@ -55,8 +55,8 @@
 			
 			<field name="" type="separator" default="FLEXI_FIELD_LINKSLIST_LIST_TAG_PARAMS" level="level3" />
 			<field name="list_type" type="list" default="ul" label="FLEXI_FIELD_LIST_TYPE" description="FLEXI_FIELD_LIST_TYPE_DESC">
-				<option value="ul">Unordered list</option>
-				<option value="ol">Ordered list</option>
+				<option value="ul">FLEXI_FIELD_LIST_UNORDER</option>
+				<option value="ol">FLEXI_FIELD_LIST_ORDER</option>
 			</field>
 			<field name="list_class" type="text" default="" label="FLEXI_FIELD_LIST_CLASS" description="FLEXI_FIELD_LIST_CLASS_DESC" />
 			<field name="list_id" type="text" default="" label="FLEXI_FIELD_LIST_ID" description="FLEXI_FIELD_LIST_ID_DESC" />

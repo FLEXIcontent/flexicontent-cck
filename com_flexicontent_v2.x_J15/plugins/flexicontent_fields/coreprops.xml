@@ -15,36 +15,36 @@
 	
 		<params group="standard" addpath="/administrator/components/com_flexicontent/elements">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
-				<option value="0">No</option>
-				<option value="1">Yes</option>
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
 			</field>
 		</params>
 		
 		<params group="group-coreprops">
 			
-			<field name="" type="separator" default="For placing: title, state, created, createdby, modified, modified, please use the existing CORE fields" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_CORE_PROPS_DESCRIPTION" level="level3" menu="hide" />
 			
-			<field name="props_type" type="groupedlist" default="" label="Property type" description="Select the CORE property or CORE property group (normally these will appear in a TAB by default), that you want to place in item form">
-				<group label="Basic or Single properties">
-					<option value="alias"             >Alias</option>
-					<option value="language"          >Language and associations</option>
-					<option value="disable_comments"  >Disable comments</option>
-					<option value="notify_subscribers" >Notify subscibers</option>
+			<field name="props_type" type="multilist" default="" label="FLEXI_COREPRPS_PROPRI" description="FLEXI_COREPRPS_PROPRI_DESC">
+				<group label="FLEXI_BASIC_SINGLE_PROPS">
+					<option value="alias"             >FLEXI_ALIAS</option>
+					<option value="language"          >FLEXI_LANGUAGE</option>
+					<option value="disable_comments"  >FLEXI_COMMENT</option>
+					<option value="notify_subscribers" >FLEXI_NOTIFY</option>
 				</group>
-				<group label="Property groups">
+				<group label="FLEXI_GROUPS_PROPRY">
 					<option value="publishing_details">Publishing details</option>
-					<option value="perms"             >Permissions</option>
-					<option value="metadata"          >META data</option>
-					<option value="seoconf"           >SEO configuration</option>
-					<option value="display_params"    >Displaying parameters</option>
-					<option value="layout_selection"  >Layout selection</option>
-					<option value="layout_params"     >Layout parameters</option>
+					<option value="perms"             >FLEXI_PERMISSIONS</option>
+					<option value="metadata"          >FLEXI_META</option>
+					<option value="seoconf"           >FLEXI_SEO</option>
+					<option value="display_params"    >FLEXI_DISP_PARAMS</option>
+					<option value="layout_selection"  >FLEXI_LAYOUT_SELECT</option>
+					<option value="layout_params"     >FLEXI_LAYOUT_PARAMS</option>
 				</group>
 			</field>
 			
-			<field name="" type="separator" default="Prefix/Suffix" level="level3" menu="hide" />
-			<field name="prefix" type="textarea" cols="21" rows="5" default="" label="Prefix" description="Enter the custom HTML code that will be placed before the fields" />
-			<field name="suffix" type="textarea" cols="21" rows="5" default="" label="Suffix" description="Enter the custom HTML code that will be placed after the fields" />
+			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX" level="level3" menu="hide" />
+			<field name="prefix" type="textarea" cols="21" rows="5" default="" label="FLEXI_PREFIX" description="Enter the custom HTML code that will be placed before the fields" />
+			<field name="suffix" type="textarea" cols="21" rows="5" default="" label="FLEXI_SUFFIX" description="Enter the custom HTML code that will be placed after the fields" />
 			
 			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />

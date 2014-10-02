@@ -48,7 +48,7 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_OPTIONAL_PROPERTIES" description="FLEXI_OPTIONAL_PROPERTIES_DESC" level="level2" menu="hide" />
-			<field name="" type="separator" default="Title (used as Link Text)" level="level3" menu="hide" />
+			<field name="" type="separator" default="FLEXI_EMAIL_TITLE" level="level3" menu="hide" />
 			<field name="use_title" type="radio" default="0" label="FLEXI_ENABLE_PROPERTY" description="FLEXI_ENABLE_PROPERTY_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
