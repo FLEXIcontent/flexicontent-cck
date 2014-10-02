@@ -322,7 +322,7 @@ class FlexicontentController extends JControllerLegacy
 		$perms = FlexicontentHelperPerm::getPerm();
 		// Per content type change category permissions
 		if (FLEXI_J16GE) {
-			$current_type_id  = $isnew ? $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
+			$current_type_id  = ($isnew || !$model->get('type_id')) ? $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
 			$CanChangeFeatCat = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
 			$CanChangeSecCat  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $current_type_id);
 			$CanChangeCat     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $current_type_id);
@@ -337,18 +337,22 @@ class FlexicontentController extends JControllerLegacy
 		
 		$enable_featured_cid_selector = $perms->MultiCat && $CanChangeFeatCat;
 		$enable_cid_selector   = $perms->MultiCat && $CanChangeSecCat;
-		$enable_catid_selector = $CanChangeCat;
+		$enable_catid_selector = ($isnew && !$tparams->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
 		
+		// Enforce maintaining featured categories
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
 		$featured_cats = array();
 		if ( $featured_cats_parent && !$enable_featured_cid_selector )
 		{
 			$featured_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$featured_cats_parent, $depth_limit=0);
 			$featured_cid = array();
-			foreach($model->get('cats') as $item_cat) if (isset($featured_tree[$item_cat])) $featured_cid[] = $item_cat;
+			if (!$isnew) {
+				foreach($model->get('categories') as $item_cat) if (isset($featured_tree[$item_cat])) $featured_cid[] = $item_cat;
+			}
 			$data['featured_cid'] = $featured_cid;
 		}
 		
+		// Enforce maintaining secondary categories
 		if (!$enable_cid_selector) {
 			if ($isnew) {
 				$data['cid'] = $tparams->get('cid_default');
@@ -362,10 +366,10 @@ class FlexicontentController extends JControllerLegacy
 			}
 		}
 		
-		if (!$CanChangeCat) {
-			if ($isnew)
+		if (!$enable_catid_selector) {
+			if ($isnew && $tparams->get('catid_default'))
 				$data['catid'] = $tparams->get('catid_default');
-			else if ($tparams->get('catid_default'))
+			else if ($model->get('catid'))
 				$data['catid'] = $model->get('catid');
 		}
 		
@@ -406,12 +410,37 @@ class FlexicontentController extends JControllerLegacy
 			// Validate Form data for core fields and for parameters
 			$form = $model->getForm();          // Do not pass any data we only want the form object in order to validate the data and not create a filled-in form
 			$post = $model->validate($form, $data);
+			
+			// Check for validation error
 			if (!$post) {
+				// Get the validation messages.
+				$errors	= $form->getErrors();
+	
+				// Push up to three validation messages out to the user.
+				for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++) {
+					if ($errors[$i] instanceof Exception)
+						$app->enqueueMessage($errors[$i]->getMessage(), 'notice');
+					else
+						$app->enqueueMessage($errors[$i], 'notice');
+				}
+	
+				// Save the jform data in the session.
+				$app->setUserState($form->option.'.edit.'.$form->context.'.data', $data);
+				// Save the custom fields data in the session.
+				$app->setUserState($form->option.'.edit.'.$form->context.'.custom', $custom);
+				
+				// Redirect back to the registration form.
+				$this->setRedirect( $_SERVER['HTTP_REFERER'] );
+				return false;
+				//die('error');
+			}
+			
+			/*if (!$post) {
 				//JError::raiseWarning( 500, "Error while validating data: " . $model->getError() );
 				echo "Error while validating data: " . $model->getError();
 				echo '<span class="fc_return_msg">'.JText::sprintf('FLEXI_CLICK_HERE_TO_RETURN', '"JavaScript:window.history.back();"').'</span>';
 				jexit();
-			}
+			}*/
 			
 			// Some values need to be assigned after validation
 			$post['attribs'] = @$data['attribs'];  // Workaround for item's template parameters being clear by validation since they are not present in item.xml

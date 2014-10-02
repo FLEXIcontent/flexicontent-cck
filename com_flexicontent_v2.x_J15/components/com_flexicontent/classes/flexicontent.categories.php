@@ -149,7 +149,9 @@ class flexicontent_cats
 		if ($published_only) {
 			$where[] = 'published = 1';
 		}
-		if ( $parent_id && isset($globalcats[(int)$parent_id]) ) {
+		
+		$parent_id = isset($globalcats[(int)$parent_id]) ? (int)$parent_id : 0;
+		if ( $parent_id ) {
 			// Limit category list to those contain in the subtree of the choosen category
 			$where[] = 'id IN (' . $globalcats[(int)$parent_id]->descendants . ')';
 		}
@@ -182,7 +184,7 @@ class flexicontent_cats
 		}
 		
 		//get list of the items
-		$ROOT_CATEGORY_ID = !FLEXI_J16GE ? 0 : 1;
+		$ROOT_CATEGORY_ID = $parent_id ? $globalcats[$parent_id]->parent_id : (!FLEXI_J16GE ? 0 : 1);
 		$list = flexicontent_cats::treerecurse($ROOT_CATEGORY_ID, '', array(), $children, true, max(0, $level_limit-1));
 
 		return $list;

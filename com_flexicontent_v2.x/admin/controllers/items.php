@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: items.php 1941 2014-08-30 18:54:42Z ggppdk $
+ * @version 1.5 stable $Id$
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -113,7 +113,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		// Per content type change category permissions
 		// Per content type change category permissions
 		if (FLEXI_J16GE) {
-			$current_type_id  = $isnew ? $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
+			$current_type_id  = ($isnew || !$model->get('type_id')) ? $data['type_id'] : $model->get('type_id');  // GET current (existing/old) item TYPE ID
 			$CanChangeFeatCat = $user->authorise('flexicontent.change.cat.feat', 'com_flexicontent.type.' . $current_type_id);
 			$CanChangeSecCat  = $user->authorise('flexicontent.change.cat.sec', 'com_flexicontent.type.' . $current_type_id);
 			$CanChangeCat     = $user->authorise('flexicontent.change.cat', 'com_flexicontent.type.' . $current_type_id);
@@ -128,7 +128,7 @@ class FlexicontentControllerItems extends FlexicontentController
 		
 		$enable_featured_cid_selector = $perms->MultiCat && $CanChangeFeatCat;
 		$enable_cid_selector   = $perms->MultiCat && $CanChangeSecCat;
-		$enable_catid_selector = $CanChangeCat;
+		$enable_catid_selector = ($isnew && !$tparams->get('catid_default')) || (!$isnew && !$model->get('catid')) || $CanChangeCat;
 		
 		$featured_cats_parent = $params->get('featured_cats_parent', 0);
 		$featured_cats = array();
