@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: form.php 1949 2014-09-04 01:22:18Z ggppdk $
+ * @version 1.5 stable $Id$
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -63,6 +63,12 @@ if ($return) {
 	$referer = base64_decode( $return );
 } else {
 	$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
+}
+
+// Print message about zero allowed categories
+if ( !$this->lists['catid'] && !$this->menuCats ) {
+	echo sprintf( $alert_box, '', 'warning', '', JText::_("FLEXI_CANNOT_SUBMIT_IN_TYPE_ALLOWED_CATS") );
+	return;
 }
 
 

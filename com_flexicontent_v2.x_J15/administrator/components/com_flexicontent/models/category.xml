@@ -692,8 +692,8 @@
 				<option value="1">FLEXI_CROP</option>
 			</field>
 			
-			<field name="" type="separator" default="Display custom fields &lt;br/&gt; &lt;small&gt; do not add fields that will break feeds display&lt;/small&gt;" description="..." level="level2" menu="hide" />
-			<field name="feed_extra_fields" type="textarea" rows="4" cols="60" label="Extra fields &lt;br/&gt; &lt;small&gt; comma separated list of field names&lt;/small&gt;" description="Fields that requires extra CSS/JS will not work properly, fields that might be suitable are fields like e.g. date,text,select,etc. Enter a comma separated list of field names" />
+			<field name="" type="separator" default="FLEXI_DISPLAY_CUSTOM_FIELDS" description="FLEXI_DISPLAY_CUSTOM_FIELDS_DESC" level="level2" menu="hide" />
+			<field name="feed_extra_fields" type="textarea" rows="4" cols="60" label="FLEXI_DISPLAY_CUSTOM_FIELDS_LIST" description="FLEXI_DISPLAY_CUSTOM_FIELDS_LIST_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
 			<field name="feed_orderby" type="list" default="" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC" >

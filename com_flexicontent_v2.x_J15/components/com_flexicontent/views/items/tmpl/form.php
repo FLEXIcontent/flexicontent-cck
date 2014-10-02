@@ -65,6 +65,12 @@ if ($return) {
 	$referer = str_replace(array('"', '<', '>', "'"), '', @$_SERVER['HTTP_REFERER']);
 }
 
+// Print message about zero allowed categories
+if ( !$this->lists['catid'] && !$this->menuCats ) {
+	echo sprintf( $alert_box, '', 'warning', '', JText::_("FLEXI_CANNOT_SUBMIT_IN_TYPE_ALLOWED_CATS") );
+	return;
+}
+
 
 // Placement configuration
 $via_core_field   = $this->placementConf['via_core_field'];

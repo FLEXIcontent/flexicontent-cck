@@ -1189,7 +1189,7 @@ class FlexicontentViewItems  extends JViewLegacy
 		
 		if ($isnew) {
 			// Case for preselected main category for new items
-			$maincat = JRequest::getInt('maincat', 0);
+			$maincat = $item->catid ? $item->catid : JRequest::getInt('maincat', 0);
 			if ($maincat) {
 				$selectedcats = array($maincat);
 				$item->catid = $maincat;
@@ -1429,19 +1429,21 @@ class FlexicontentViewItems  extends JViewLegacy
 		$attribs = 'class="'.$class.'"';
 		$fieldname = FLEXI_J16GE ? 'jform[catid]' : 'catid';
 		
-		$enable_catid_selector = empty($item->catid) || $perms['canchange_cat'];
-		if ( 1 ) {
-			if ($tparams->get('catid_allowed_parent')) {
-				$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('catid_allowed_parent'), $depth_limit=0);
-			} else {
-				$catid_tree = & $categories;
-			}
-			
+		$enable_catid_selector = ($isnew && !$tparams->get('catid_default')) || (!$isnew && empty($item->catid)) || $perms['canchange_cat'];
+		
+		if ($tparams->get('catid_allowed_parent')) {
+			$catid_tree = flexicontent_cats::getCategoriesTree($published_only=1, $parent_id=$tparams->get('catid_allowed_parent'), $depth_limit=0);
+		} else {
+			$catid_tree = & $categories;
+		}
+		
+		$lists['catid'] = false;
+		if ( !empty($catid_tree) ) {
 			$disabled = $enable_catid_selector ? '' : ' disabled="disabled"';
 			$attribs .= $disabled;
 			$lists['catid'] = ($enable_catid_selector ? '' : '<label class="label" style="float:none; margin:0 6px 0 0 !important;">locked</label>').
 				flexicontent_cats::buildcatselect($catid_tree, $fieldname, $item->catid, 2, $attribs, true, true, $actions_allowed);
-		} else {
+		} else if ( !$isnew && $item->catid ) {
 			$lists['catid'] = $globalcats[$item->catid]->title;
 		}
 		

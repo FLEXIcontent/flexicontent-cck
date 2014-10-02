@@ -948,6 +948,9 @@ class ParentClassItem extends JModelLegacy
 		if (empty($form)) {
 			return false;
 		}
+		$form->option = $this->option;
+		$form->context = $this->getName();
+		
 		$this->_item->images = $images;
 		$this->_item->urls   = $urls;
 		$this->_item->attribs  = $attribs;
@@ -1013,11 +1016,34 @@ class ParentClassItem extends JModelLegacy
 	protected function loadFormData() {
 		// Check the session for previously entered form data.
 		$data = JFactory::getApplication()->getUserState('com_flexicontent.edit.'.$this->getName().'.data', array());
-
+		JFactory::getApplication()->setUserState('com_flexicontent.edit.'.$this->getName().'.data', false);
+		
 		if (empty($data)) {
 			$data = $this->getItem();
+		} else {
+			//print_r($data);
+			// Split text to introtext & fulltext
+			if ( !JString::strlen(trim(@$data['introtext'])) && !JString::strlen(trim(@$data['fulltext'])) ) {
+				$pattern = '#<hr\s+id=("|\')system-readmore("|\')\s*\/*>#i';
+				$tagPos	= preg_match($pattern, @ $data['text']);
+				if ($tagPos == 0)	{
+					$data['introtext'] = @ $data['text'];
+					$data['fulltext']  = '';
+				} else 	{
+					list($data['introtext'], $data['fulltext']) = preg_split($pattern, $data['text'], 2);
+					$data['fulltext'] = JString::strlen( trim($data['fulltext']) ) ? $data['fulltext'] : '';
+				}
+			}
+			
+			if ($this->_item) {
+				if ( JString::strlen(trim(@$data['text'])) )      $this->_item->text      = $data['text'];
+				if ( JString::strlen(trim(@$data['introtext'])) ) $this->_item->introtext = $data['introtext'];
+				if ( JString::strlen(trim(@$data['fulltext'])) )  $this->_item->fulltext  = $data['fulltext'];
+				if ( isset($data['language']) )  $this->_item->language  = $data['language'];
+				if ( isset($data['catid']) )     $this->_item->catid  = $data['catid'];
+			}
 		}
-
+		
 		return $data;
 	}
 	
@@ -1588,8 +1614,8 @@ class ParentClassItem extends JModelLegacy
 			else if ( in_array($fc_state, array(0,-3,-4)) ) $jm_state = 0;   // unpublished states
 			else $jm_state = $fc_state;                                      // trashed & archive states
 			
-			// Frontend SECURITY concern: ONLY allow to set item type for new items !!!
-			if( !$app->isAdmin() ) 
+			// Frontend SECURITY concern: ONLY allow to set item type for new items !!! ... or for items without type ?!
+			if( !$app->isAdmin() && $item->type_id ) 
 				unset($data['type_id']);
 		} else {
 			$item->categories = array();
