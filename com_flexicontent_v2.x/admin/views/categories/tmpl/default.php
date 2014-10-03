@@ -315,7 +315,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 
 	</table>
 	
-	<sup>[1]</sup> Params not saved yet, default values will be used.
+	<?php echo JText::_( 'FLEXI_PARAMS_CAT' );?>
 	
 	<input type="hidden" name="boxchecked" value="0" />
 	<input type="hidden" name="option" value="com_flexicontent" />
