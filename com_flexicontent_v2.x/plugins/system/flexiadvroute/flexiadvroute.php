@@ -269,7 +269,9 @@ class plgSystemFlexiadvroute extends JPlugin
 		$query = "SELECT i.id, CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(':', i.id, i.alias) ELSE i.id END as slug, ".$lta.".language, ie.type_id"
 		. " FROM #__content AS i "
 		. " LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id "
-		. " WHERE ie.language LIKE ".$db->Quote( $curr_lang .'%' )." AND ie.lang_parent_id = (SELECT lang_parent_id FROM #__flexicontent_items_ext WHERE item_id=".(int) $item_id.")";
+		. " WHERE "
+		. " ie.language LIKE ".$db->Quote( $curr_lang .'%' )." AND "
+		. " ie.lang_parent_id = (SELECT lang_parent_id FROM #__flexicontent_items_ext WHERE item_id=".(int) $item_id.")";
 		;
 		$db->setQuery($query);
 		$translation = $db->loadObject();
