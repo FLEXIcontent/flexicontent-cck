@@ -335,15 +335,17 @@ class modFlexicontentHelper
 					{
 						if ($mod_image_custom_display)
 						{
-							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_display);
+							@list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_display);
 							$fieldname = trim($fieldname); $varname = trim($varname);
+							$varname = $varname ? $varname : 'display';
 							$thumb_rendered = FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname, 'module');
 							$src = '';
 						}
 						else if ($mod_image_custom_url)
 						{
-							list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_url);
+							@list($fieldname, $varname) = preg_split('/##/',$mod_image_custom_url);
 							$fieldname = trim($fieldname); $varname = trim($varname);
+							$varname = $varname ? $varname : 'display';
 							$src =  FlexicontentFields::getFieldDisplay($row, $fieldname, null, $varname, 'module');
 						}
 						else if ($mod_image)
@@ -481,7 +483,6 @@ class modFlexicontentHelper
 						{
 							FlexicontentFields::getFieldDisplay($row, $mod_image_name, null, 'display', 'module');
 							$img_field = & $row->fields[$mod_image_name];
-							
 							if ($mod_use_image==1) {
 								$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src['large'][0] );
 							} else {
