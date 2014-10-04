@@ -1,6 +1,0 @@
-# do not allow direct access and also deny scripts
-<FilesMatch ".*">
-  Order Allow,Deny
-  Deny from all
-</FilesMatch>
-OPTIONS -Indexes -ExecCGI
