@@ -1,0 +1,73 @@
+/* Default Theme : category template CSS file */
+
+.subcategorieslist {
+	margin: 0 0 1em;
+}
+
+/* =============================================
+   Bootstrap adjustments
+============================================= */
+#fc_alpha .btn.fc_alpha_index,
+#fc_alpha .btn.fc_alpha_index_sep {
+	margin-top:0;
+	margin-bottom:0;
+}
+
+/* ===============================================
+   "micro" clearfix 
+   http://nicolasgallagher.com/micro-clearfix-hack/
+   =============================================== */
+
+/**
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *    contenteditable attribute is included anywhere else in the document.
+ *    Otherwise it causes space to appear at the top and bottom of elements
+ *    that are clearfixed.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *    `:before` to contain the top-margins of child elements.
+ */
+.group:before,
+.group:after {
+	content: " "; /* 1 */
+	display: table; /* 2 */
+}
+
+.group:after {
+	clear: both;
+}
+
+/**
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+.group {
+	/* for IE 6/7 */
+	*zoom: expression(this.runtimeStyle.zoom="1", this.appendChild(document.createElement("br")).style.cssText="clear:both;font:0/0 serif");
+	/* non-JS fallback */
+	*zoom: 1;
+}
+
+
+.fc_item_title {
+	display: inline-block;
+	float: left;
+	font-size: 14px;
+	font-weight:bold;
+	margin-left: 16px;
+}
+
+
+.fc_title_row_box {
+	display:inline-block;
+	float:left;
+	max-width: 100%;
+	padding: 0%;
+	margin-left: 16px;
+}
+
+.fc_item_separator_row {
+	display:block;
+	clear:both;
+	height: 40px;
+	border: 0px solid;
+}

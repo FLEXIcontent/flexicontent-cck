@@ -1,0 +1,61 @@
+
+/**************
+ * Small labels
+ **************/
+
+.label, .badge, .flexicontent label.label {
+	background-color: #999999;
+	color: #FFFFFF;
+	display: inline-block;
+	font-size: 10.998px;
+	font-weight: bold;
+	line-height: 14px;
+	padding: 2px 4px;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	vertical-align: baseline;
+	white-space: nowrap;
+	border-radius: 4px;
+	margin: 0px 2px 2px 4px !important;
+}
+.label.highlight, .badge.highlight {
+	color: darkred;
+}
+
+
+
+/***********************
+ * pane TABS and sliders
+ ***********************/
+
+.pane-sliders .panel {
+	border: 1px solid #CCCCCC;
+	margin-bottom: 3px;
+}
+.pane-sliders .panel h3 {
+	background: none repeat scroll 0 0 #FAFAFA;
+	color: #666666;
+}
+.pane-sliders .title {
+	color: #666666;
+	cursor: pointer;
+	margin: 0;
+	padding: 2px 2px 2px 5px;
+}
+.pane-sliders .content {
+	background-color: white !important;
+}
+
+
+
+/*********************************************
+ * JCE EDITOR FIXES (most frontend templates?) 
+ *********************************************/
+
+#flexicontent #editor-xtd-buttons .button2-left {
+	margin:4px 0px 0px 4px !important;
+}
+
+/* ITEM form */
+#fcform_language_container {
+	margin:8px 0px 16px 0px;
+}

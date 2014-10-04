@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" version="1.6" group="flexicontent" method="upgrade">
+	<name>PLG_FLEXICONTENT_FLEXINOTIFY</name>
+	<author>Emmanuel Danan</author>
+	<creationDate>April 2011</creationDate>
+	<copyright>Copyright (C) 2009 - 2011 Emmanuel Danan. All rights reserved.</copyright>
+	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<authorEmail>emmanuel@vistamedia.fr</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>PLG_FLEXICONTENT_FLEXINOTIFY_DESCRIPTION</description>
+	<files>
+		<filename plugin="flexinotify">flexinotify.php</filename>
+		<filename>index.html</filename>
+	</files>
+	<config>
+	<fields name="params">
+		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="debug_notifications" type="list" default="0" label="FLEXI_DEBUG_NOTIFICATIONS" description="FLEXI_DEBUG_NOTIFICATIONS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_SHOW_TO_ALL_EDITORS</option>
+				<option value="2">FLEXI_SHOW_TO_ALL_SUPER_ADMINS</option>
+			</field>
+			<field name="" type="separator" default="FLEXI_BASIC_CONFIGURATION" description="..." level="level2" />
+			<field name="mailsubject" type="text" size="40" default="" label="FLEXI_SUBJECT" description="FLEXI_SUBJECT_DESC" />
+			<field name="sendername" type="text" size="40" default="" label="FLEXI_FROM_NAME" description="FLEXI_FROM_NAME_DESC" />
+			<field name="senderemail" type="text" size="40" default="" label="FLEXI_FROM_EMAIL" description="FLEXI_FROM_EMAIL_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_PERSONALIZED_NOTIFICATIONS" description="FLEXI_PERSONALIZED_NOTIFICATIONS_DESC" level="level2" />
+			<field name="send_personalized" type="list" default="1" label="FLEXI_ENABLE_PERSONALIZED_NOTIFICATIONS" description="FLEXI_ENABLE_PERSONALIZED_NOTIFICATIONS_DESC">
+				<option value="0">FLEXI_NO_SEND_SAME_EMAIL</option>
+				<option value="1">FLEXI_YES_SEND_SEPARATE_EMAILS</option>
+			</field>
+			<field name="personalized_limit" type="text" default="50" label="FLEXI_SUBSCRIBER_LIMIT" description="FLEXI_SUBSCRIBER_LIMIT_DESC" />
+			<field name="" type="separator" default="FLEXI_CUSTOMIZATIONS_PER_EMAIL" description="..." level="level3" />
+			<field name="autologin" type="radio" default="1" label="FLEXI_AUTOLOGIN_IN_URL" description="FLEXI_AUTOLOGIN_IN_URL_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="include_fullname" type="radio" default="1" label="FLEXI_INCLUDE_FULLNAME" description="FLEXI_INCLUDE_FULLNAME_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+		</fieldset>
+	</fields>
+	</config>
+	<languages>
+		<language tag="en-GB">en-GB.plg_flexicontent_flexinotify.ini</language>
+	</languages>
+</extension>

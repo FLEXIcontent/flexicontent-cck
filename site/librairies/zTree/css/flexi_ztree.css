@@ -1,0 +1,61 @@
+ul.ztree div, ul.ztree span, ul.ztree applet, ul.ztree object, ul.ztree iframe,
+ul.ztree h1, ul.ztree h2, ul.ztree h3, ul.ztree h4, ul.ztree h5, ul.ztree h6,
+ul.ztree p, ul.ztree blockquote, ul.ztree pre, ul.ztree a, ul.ztree abbr,
+ul.ztree acronym, ul.ztree address, ul.ztree big, ul.ztree cite, ul.ztree code,
+ul.ztree del, ul.ztree dfn, ul.ztree em, ul.ztree font, ul.ztree img, ul.ztree ins, ul.ztree kbd,
+ul.ztree q, ul.ztree s, ul.ztree samp, ul.ztree small, ul.ztree strike, ul.ztree strong, ul.ztree sub, ul.ztree sup,
+ul.ztree tt, ul.ztree var, ul.ztree dl, ul.ztree dt, ul.ztree dd, ul.ztree ol, ul.ztree ul, ul.ztree li,
+ul.ztree fieldset, ul.ztree form, ul.ztree label, ul.ztree legend, ul.ztree table, ul.ztree caption,
+ul.ztree tbody, ul.ztree tfoot, ul.ztree thead, ul.ztree tr, ul.ztree th, ul.ztree td
+{
+	position: relative !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	outline: 0 !important;
+	font-weight: inherit !important;
+	font-style: inherit !important;
+	font-size: 100% !important;
+	font-family: inherit !important;
+	vertical-align: baseline !important;
+}
+.zTreeBackground {
+	color: #2f332a !important;
+	font: 15px/21px Arial, Helvetica, simsun, sans-serif !important;
+	background: #f0f6e4 !important;
+	text-align:left !important;
+}
+
+ul.ztree {
+	margin-top: 10px !important;
+	border: 1px solid #617775 !important;
+	background: #f0f6e4 !important;
+	height:360px !important;
+	overflow-y:scroll !important;
+	overflow-x:auto !important;
+	font-size: 11px !important;
+	font-family: arial !important;
+}
+
+ul.ztree h1, ul.ztree h2, ul.ztree h3,
+ul.ztree h4, ul.ztree h5, ul.ztree h6 {color: #2f332a !important; font-weight: bold !important; font-family: Helvetica, Arial, sans-serif !important; padding-bottom: 5px !important;}
+ul.ztree h1 {font-size: 24px !important; line-height: 34px !important; text-align: center !important;}
+ul.ztree h2 {font-size: 14px !important; line-height: 24px !important; padding-top: 5px !important;}
+ul.ztree h6 {font-weight: normal !important; font-size: 12px !important; letter-spacing: 1px !important; line-height: 24px !important; text-align: center !important;}
+ul.ztree li a {color: black  !important; text-decoration: none  !important;}
+ul.ztree li a:hover {background-color: gray !important; color: white !important; text-decoration: none !important;}
+ul.ztree input.radio {margin: 0 2px 0 8px !important;}
+ul.ztree input.radio.first {margin-left:0 !important;}
+ul.ztree input.empty {color: lightgray !important;}
+ul.ztree code {color: #2f332a !important;}
+ul.ztree .highlight_red {color:#A60000 !important;}
+ul.ztree .highlight_green {color:#A7F43D !important;}
+
+.zTreeBackground ul.log {border: 1px solid #617775 !important;background: #f0f6e4 !important;width:300px !important;height:170px !important;overflow: hidden !important;}
+.zTreeBackground ul.log.small {height:45px !important;}
+.zTreeBackground ul.log li {color: #666666 !important;list-style: none !important;padding-left: 10px !important;}
+.zTreeBackground ul.log li.dark {background-color: #E3E3E3 !important;}
+
+ul.ztree li ul { right: 0 !important;  width: auto !important; }
+ul.ztree li a.curSelectedNode { width: 90% !important; display:block; }
+ul.ztree li a.curSelectedNode input.rename { width: 94% !important; padding 0px 1% !important;}
