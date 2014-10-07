@@ -60,7 +60,7 @@
 				<option value="order">FLEXI_ORDER_CONFIGURED_ORDER</option>
 			</field>
 			
-			<field name="" type="separator" default="HTML" level="level2" menu="hide" />
+			<field name="" type="separator" default="FLEXI_HTML" level="level2" menu="hide" />
 			<field name="relitem_html_form" type="textarea" cols="38" rows="5" default="__display_text__" label="FLEXI_ITEM_HTML_WITH_REPLACEMENTS" description="FLEXI_ITEM_HTML_WITH_REPLACEMENTS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_RELATED_DISPLAY_TEXT_COMPOSITION" level="level3" menu="hide" />
