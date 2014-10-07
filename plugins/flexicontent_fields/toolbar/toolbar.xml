@@ -35,9 +35,9 @@
 		
 		<fieldset name="group-toolbar" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="" type="separator" default="Basic Configuration" level="level1" />
+			<field name="" type="separator" default="FLEXI_BASCI_CONFIGURATION" level="level1" />
 
-			<field name="" type="separator" default="Various Controls" level="level2" />
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_VARIOUS_CONTROLS" level="level2" />
 			<field name="display_comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
@@ -55,14 +55,14 @@
 				<option value="0">FLEXI_NO</option>
 			</field-->
 			
-			<field name="" type="separator" default="Voice Controls" level="level2" />
+			<field name="" type="separator" default="" level="level2" />
 			<field name="display_voice" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_VOICE" description="FLEXI_FIELD_TOOLBAR_VOICE_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="voicetarget" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_VOICE_TARGET" description="FLEXI_FIELD_TOOLBAR_VOICE_TARGET_DESC" />
 			
-			<field name="" type="separator" default="Resize Controls" level="level2" />
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_REZIZE_CONTROLS" level="level2" />
 			<field name="display_resizer" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_RESIZER" description="FLEXI_FIELD_TOOLBAR_RESIZER_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
@@ -72,7 +72,7 @@
 			<field name="target" type="text" default="flexicontent" label="FLEXI_FIELD_TOOLBAR_TARGET" description="FLEXI_FIELD_TOOLBAR_TARGET_DESC" />
 			
 			
-			<field name="" type="separator" default="Social Buttons (via AddThis) " level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SOCIAL_BUTTONS" level="level1" />
 			
 			<field name="display_social" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS" description="FLEXI_FIELD_TOOLBAR_SHOW_ADDTHIS_DESC">
 				<option value="1">FLEXI_YES</option>
@@ -80,76 +80,76 @@
 			</field>
 			<field name="addthis_user" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_USERNAME" description="FLEXI_FIELD_TOOLBAR_USERNAME_DESC" />
 			<field name="addthis_pubid" type="text" default="" size="20" label="FLEXI_FIELD_TOOLBAR_PUBID" description="FLEXI_FIELD_TOOLBAR_PUBID_DESC" />
-			<field name="addthis_outside_toolbar" type="radio" default="1" label="Place outside of toolbar" description="Place AddThis social buttons outside of toolbar. &lt;br/&gt; &lt;b&gt;Note:&lt;b&gt; This only effects display of inline buttons and is ignored when using the floating buttons">
+			<field name="addthis_outside_toolbar" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_SOCIAL_POSITION" description="FLEXI_FIELD_TOOLBAR_SOCIAL_POSITION_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
 			</field>
 			
-			<field name="" type="separator" default="CASE A: Predefined HTML Code" description="" level="level2" />
-			<field name="addthis_custom_predefined" type="list" default="3" label="(Addthis) HTML Code" description="A list of predefined styles">
-				<option value="1">Horizontal (inline) Common Counters</option>
-				<option value="2">Horizontal (inline) Popular Buttons 32</option>
-				<option value="3">Horizontal (inline) Popular Buttons 16</option>
-				<option value="4">Horizontal (inline) Single Share Button</option>
-				<option value="5">Vertical (floating) Common Counters</option>
-				<option value="6">Vertical (floating) Popular Buttons 32</option>
-				<option value="7">Vertical (floating) Popular Buttons 16</option>
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_CASE_A" description="" level="level2" />
+			<field name="addthis_custom_predefined" type="list" default="3" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE_DESC">
+				<option value="1">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_1</option>
+				<option value="2">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_2</option>
+				<option value="3">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_3</option>
+				<option value="4">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_4</option>
+				<option value="5">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_5</option>
+				<option value="6">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_6</option>
+				<option value="7">FLEXI_FIELD_TOOLBAR_ADDTHIS_DISPLAY_7</option>
 			</field>
 			
-			<field name="" type="separator" default="CASE B: Custom HTML code (overrides above)" description="" level="level2" />
-			<field name="addthis_custom_code" type="textarea" default="" label="(Addthis) HTML Code" description="Enter custom -AddThis- HTML code. First, please read AddThis online documentation, and make sure not to enter broken HTML code" rows="20" cols="38"  filter="raw" />
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_CASE_B" description="" level="level2" />
+			<field name="addthis_custom_code" type="textarea" default="" label="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE" description="FLEXI_FIELD_TOOLBAR_ADDTHIS_CODE2_DESC" rows="20" cols="38"  filter="raw" />
 			
 			<field name="" type="separator" default="FLEXI_SOCIAL_SUPPORT" description="FLEXI_SOCIAL_SUPPORT_IMG_DESC" level="level2" />
 			
-			<field name="" type="separator" default="Site name" description="page" level="level3" />
-			<field name="add_og_site_name" type="list" default="0" label="FLEXI_ADD" description="Select what should be suggested as site name of current page">
+			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_SITENAME" description="page" level="level3" />
+			<field name="add_og_site_name" type="list" default="0" label="FLEXI_ADD" description="FLEXI_FIELD_TOOLBAR_SITENAME_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">Real site name</option>
+				<option value="1">FLEXI_FIELD_TOOLBAR_REAL_SITENAME</option>
 				<!--option value="2">Custom Field</option-->
 			</field>
 			<!--field name="og_site_name_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
 			
-			<field name="" type="separator" default="Title" description="" level="level3" />
-			<field name="add_og_title" type="list" default="0" label="FLEXI_ADD" description="Select what should be suggested as title of current page">
+			<field name="" type="separator" default="FLEXI_TITLE" description="" level="level3" />
+			<field name="add_og_title" type="list" default="0" label="FLEXI_ADD" description="FLEXI_TOOLBAR_ADD_TITLE_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">Item's title</option>
+				<option value="1">FLEXI_TOOLBAR_ITEM_TITLE</option>
 				<!--option value="2">Custom Field</option-->
 			</field>
 			<!--field name="og_title_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
 			<!--field name="og_title_maxlen" type="text" default="100" label="Max length" description="Max length of the text" /-->
 			
-			<field name="" type="separator" default="Description" description="" level="level3" />
-			<field name="add_og_descr" type="list" default="0" label="FLEXI_ADD" description="Select what should be suggested as description of current page">
+			<field name="" type="separator" default="FLEXI_TOOLBAR_DESCRIPTION" description="" level="level3" />
+			<field name="add_og_descr" type="list" default="0" label="FLEXI_ADD" description="FLEXI_TOOLBAR_DESCRIPTION_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="1">Item's description</option>
+				<option value="1">FLEXI_TOOLBAR_ITEM_DESCRIPTION</option>
 				<!--option value="2">Custom Field</option-->
 			</field>
 			<!--field name="og_descr_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text or textarea field" /-->
 			<!--field name="og_descr_maxlen" type="text" default="300" label="Max length" description="Max length of the text" /-->
 			
-			<field name="" type="separator" default="Content type" description="page" level="level3" />
-			<field name="add_og_type" type="list" default="article" label="FLEXI_ADD" description="Select what should be suggested as content type of current page">
+			<field name="" type="separator" default="FLEXI_TOOLBAR_CONTENT_TYPE" description="page" level="level3" />
+			<field name="add_og_type" type="list" default="article" label="FLEXI_ADD" description="FLEXI_TOOLBAR_CONTENT_TYPE_DESC">
 				<option value="0">FLEXI_NO</option>
-				<option value="article">Use 'article'</option>
-				<option value="website">Use 'website'</option>
+				<option value="article">FLEXI_TOOLBAR_CONTENT_TYPE_ARTICLE</option>
+				<option value="website">FLEXI_TOOLBAR_CONTENT_TYPE_SITE</option>
 				<!--option value="1">Item's type name</option-->
 				<!--option value="2">Custom text Field</option-->
 			</field>
 			<!--field name="og_type_fieldid" type="text" default="" label="Custom field id" description="NOTE: usually, this should be a text field" /-->
 			
-			<field name="" type="separator" default="Image" description="page" level="level3" />
-			<field name="add_og_image" type="radio" default="0" label="FLEXI_ADD" description="Select what should be suggested as image of current page">
+			<field name="" type="separator" default="FLEXI_IMAGE" description="page" level="level3" />
+			<field name="add_og_image" type="radio" default="0" label="FLEXI_ADD" description="FLEXI_TOOLBAR_CONTENT_IMAGE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 
-			<field name="og_image_field" type="fcimage" default="" label="Image source" description="NOTE: usually, this should be an image field" />
+			<field name="og_image_field" type="fcimage" default="" label="FLEXI_TOOLBAR_CONTENT_IMAGE_SOURCE" description="FLEXI_TOOLBAR_CONTENT_IMAGE_SOURCE_DESC" />
 			<field name="og_image_fallback" type="list" default="" label="FLEXI_FIELD_TOOLBAR_FALLBACK_IMG" description="FLEXI_FIELD_TOOLBAR_FALLBACK_IMG_DESC" >
 				<option value="0">FLEXI_FIELD_TOOLBAR_NO_FALLBACK</option>
 				<option value="1">FLEXI_FIELD_TOOLBAR_USE_INTROTEXT_FALLBACK</option>
 				<option value="2">FLEXI_FIELD_TOOLBAR_USE_INTROTEXT_FALLBACK_IGNORE_DEFAULTIMG</option>
 			</field>
-			<field name="og_image_thumbsize" type="list" default="medium" label="Thumbnail size" description="Thumbnail size (if using image field)">
+			<field name="og_image_thumbsize" type="list" default="medium" label="FLEXI_TOOLBAR_CONTENT_IMAGE_THUMB" description="FLEXI_TOOLBAR_CONTENT_IMAGE_THUMB_DESC">
 				<option value="small">FLEXI_FIELD_TOOLBAR_SMALL_THUMB</option>
 				<option value="medium">FLEXI_FIELD_TOOLBAR_MEDIUM_THUMB</option>
 				<option value="large">FLEXI_FIELD_TOOLBAR_LARGE_THUMB</option>
