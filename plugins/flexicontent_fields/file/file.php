@@ -544,7 +544,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 					$descr_icon = '<img src="components/com_flexicontent/assets/images/comment.png" class="hasTip" title="'. $descr_tip .'"/>';
 					$descr_inline  = '';
 				} else if ($display_descr==2) {  // As inline text
-					$descr_inline = ' <span class="fcfile_descr_inline fc-mssg fc-caption" style="max-wdith">'. $file_data->description . '</span>';
+					$descr_inline = ' <span class="fcfile_descr_inline fc-mssg fc-caption" style="max-wdith">'. nl2br($file_data->description) . '</span>';
 				}
 				if ($descr_icon) $descr_icon = ' <span class="fcfile_descr_tip">'. $descr_icon . '</span>';
 			}

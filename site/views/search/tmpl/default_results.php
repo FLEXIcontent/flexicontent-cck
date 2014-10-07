@@ -158,7 +158,7 @@ if ( $use_infoflds && count($infoflds) ) {
 			<?php if ($src) : ?>
 			<div class="fc_search_result_image <?php echo $this->params->get('fcr_position') ? ' fcright' : ' fcleft'; ?>">
 				<?php if ($this->params->get('fcr_link_image', 1)) : ?>
-				<a href="<?php JRoute::_($result->href); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8'); ?>">
+				<a href="<?php echo JRoute::_($result->href); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8'); ?>">
 					<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8'); ?>" />
 				</a>
 				<?php else : ?>
