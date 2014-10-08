@@ -699,9 +699,24 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 	{
 		static $return;
 		if ($return === null) {
-			// Try to open phpThumb cache directory
+			jimport('joomla.filesystem.folder');
+			jimport('joomla.filesystem.jpath');
+			
 			$phpthumbcache 	= JPath::clean(JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'phpthumb'.DS.'cache');
+			
+			// CHECK phpThumb cache exists and create the folder
+			if ( !JFolder::exists($phpthumbcache) && !JFolder::create($phpthumbcache) ) {
+				JError::raiseWarning(100, 'Error: Unable to create phpThumb folder: '. $phpthumbcache .' image thumbnail will not work properly' );
+				return true;  // Cancel task !! to allow user to continue
+			}
+			
+			// CHECK phpThumb cache permissions
 			$return = preg_match('/rwxr.xr.x/i', JPath::getPermissions($phpthumbcache) ) ? true : false;
+			// If permissions not good check if we can change them
+			if ( !$return && !JPath::canChmod($phpthumbcache) ) {
+				JError::raiseWarning(100, 'Error: Unable to change phpThumb folder permissions: '. $phpthumbcache .' there maybe a wrong owner of the folder. Correct permissions are important for proper thumbnails and for -security-' );
+				return true;  // Cancel task !! to allow user to continue
+			}
 		}
 		return $return;
 	}
