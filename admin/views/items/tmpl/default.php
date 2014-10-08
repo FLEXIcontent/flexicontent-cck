@@ -375,12 +375,15 @@ window.addEvent('domready', function() {
 				<div style="float:left; margin:2px 48px 0px 0px;">
 					<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>
 					<span class="radio"><?php echo $this->lists['scope']; ?></span>
-					<input type="text" name="search" id="search" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
+					<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 				</div>
 				
-				<input type="button" class="fc_button" onclick="jQuery('#mainChooseColBox').slideToggle();" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
-				<input type="button" class="fc_button" onclick="jQuery('#stateGroupsBox').slideToggle();" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
-				<input type="button" class="fc_button" onclick="jQuery('#filterline').slideToggle('slow');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+				<?php $_class = FLEXI_J30GE ? ' btn btn-primary' : ' fc_button'; ?>
+				<div class="btn-group" style="margin: 2px 0 6px -3px;">
+				<input type="button" class="<?php echo $_class; ?>" onclick="jQuery('#mainChooseColBox').slideToggle();" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
+				<input type="button" class="<?php echo $_class; ?>" onclick="jQuery('#stateGroupsBox').slideToggle();" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
+				<input type="button" class="<?php echo $_class; ?>" onclick="jQuery('#filterline').slideToggle('slow');" value="<?php echo JText::_( 'FLEXI_FILTERS' ); ?>" />
+				</div>
 				<!--
 				<input type="button" class="button" id="hide_filters" value="<?php echo JText::_( 'FLEXI_HIDE_FILTERS' ); ?>" />
 				<input type="button" class="button" id="show_filters" value="<?php echo JText::_( 'FLEXI_DISPLAY_FILTERS' ); ?>" />

@@ -66,38 +66,38 @@
 				<option value="0">FLEXI_NO</option>
 			</field>
 			<field name="scroll_thumbnails" type="list" default="1" label="FLEXI_FIELD_DISPLAY_SCROLL_THUMBS" description="FLEXI_FIELD_DISPLAY_SCROLL_THUMBS">
-				<option value="1">Scroll one row/column</option>
-				<option value="0">Use multiple rows/columns</option>
+				<option value="1">FLEXI_FIELD_DISPLAY_SCROLL_THUMBS_1</option>
+				<option value="0">FLEXI_FIELD_DISPLAY_SCROLL_THUMBS_0</option>
 			</field>
 			<field name="delay" type="text" default="4000" size="4" label="FLEXI_FIELD_GALLERY_WAIT" description="FLEXI_FIELD_GALLERY_WAIT_DESC" />
 			<field name="duration" type="text" default="1000" size="4" label="FLEXI_FIELD_GALLERY_DURATION" description="FLEXI_FIELD_GALLERY_DURATION_DESC" />
-			<field name="usecaptions" type="radio" default="1" label="Use captions" description="Use captions">
+			<field name="usecaptions" type="radio" default="1" label="FLEXI_USE_CAPTIONS" description="FLEXI_USE_CAPTIONS_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
-				<option value="2">Use custom captions</option>
+				<option value="2">FLEXI_USE_CUSTOM_CAPTIONS</option>
 			</field>
-			<field name="customcaptions" type="text" default="This is a caption" label="Custom captions" description="Custom captions" />
-			<field name="slideshowtype" type="list" default="slideshow" label="Slide show type" description="Slide show type">
-				<option value="slideshow">Slideshow</option>
-				<option value="Flash">Flash</option>
-				<option value="Fold">Fold</option>
-				<option value="KenBurns">KenBurns</option>
-				<option value="Push">Push</option>
+			<field name="customcaptions" type="text" default="This is a caption" label="FLEXI_USE_CAPTIONS" description="FLEXI_USE_CAPTIONS_DESC" />
+			<field name="slideshowtype" type="list" default="slideshow" label="FLEXI_FIELD_GALLERY_SLIDESHOW_TYPE" description="FLEXI_FIELD_GALLERY_SLIDESHOW_TYPE_DESC">
+				<option value="slideshow">FLEXI_FIELD_GALLERY_SLIDESHOW_TYPE_SLIDESHOW</option>
+				<option value="Flash">FLEXI_FIELD_GALLERY_SLIDESHOW_TYPE_FLASH</option>
+				<option value="Fold">FLEXI_FIELD_GALLERY_SLIDESHOW_TYPE_FOLD</option>
+				<option value="KenBurns">FLEXI_FIELD_GALLERY_SLIDESHOW_TYPE_KENBURNS</option>
+				<option value="Push">FLEXI_FIELD_GALLERY_SLIDESHOW_TYPE_PUSH</option>
 			</field>
-			<field name="transition" type="list" default="back" label="Transition" description="Transition">
-				<option value="back">back</option>
-				<option value="elastic">elastic</option>
-				<option value="bounce">bounce</option>
+			<field name="transition" type="list" default="back" label="FLEXI_FIELD_GALERY_TRANSITION" description="FLEXI_FIELD_GALERY_TRANSITION_DESC">
+				<option value="back">FLEXI_FIELD_GALERY_TRANSITION_BACK</option>
+				<option value="elastic">FLEXI_FIELD_GALERY_TRANSITION_ELASTIC</option>
+				<option value="bounce">FLEXI_FIELD_GALERY_TRANSITION_BOUNCE</option>
 			</field>
-			<field name="t_dir" type="list" default="in" label="Transition direction" description="Transition direction">
-				<option value="in">in</option>
-				<option value="out">out</option>
-				<option value="in:out">in:out</option>
-				<option value="out:in">out:in</option>
+			<field name="t_dir" type="list" default="in" label="FLEXI_FIELD_GALERY_TRANSITION_DIRECTION" description="FLEXI_FIELD_GALERY_TRANSITION_DIRECTION_DESC">
+				<option value="in">FLEXI_FIELD_GALERY_TRANSITION_DIRECTION_IN</option>
+				<option value="out">FLEXI_FIELD_GALERY_TRANSITION_DIRECTION_OUT</option>
+				<option value="in:out">FLEXI_FIELD_GALERY_TRANSITION_DIRECTION_INOUT</option>
+				<option value="out:in">FLEXI_FIELD_GALERY_TRANSITION_DIRECTION_OUTIN</option>
 			</field>
-			<field name="otheroptions" type="textarea" default="" cols="40" rows="10" label="Other options" description="Other options. Example: color: ['tomato', 'palegreen', 'orangered', 'aquamarine'], overlap: false">
-				<option value="1">true</option>
-				<option value="0">false</option>
+			<field name="otheroptions" type="textarea" default="" cols="40" rows="10" label="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS" description="FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS_DESC">
+				<option value="1">FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS_TRUE</option>
+				<option value="0">FLEXI_FIELD_GALERY_TRANSITION_OTHER_OPTIONS_FALSE</option>
 			</field>
 			
 		</fieldset>
