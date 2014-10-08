@@ -35,7 +35,7 @@
 		
 		<fieldset name="group-toolbar" addfieldpath="/administrator/components/com_flexicontent/elements">
 
-			<field name="" type="separator" default="FLEXI_BASCI_CONFIGURATION" level="level1" />
+			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
 
 			<field name="" type="separator" default="FLEXI_FIELD_TOOLBAR_VARIOUS_CONTROLS" level="level2" />
 			<field name="display_comments" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_COMMENTS" description="FLEXI_FIELD_TOOLBAR_COMMENTS_DESC">

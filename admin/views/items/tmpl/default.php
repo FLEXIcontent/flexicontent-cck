@@ -378,7 +378,7 @@ window.addEvent('domready', function() {
 					<input type="text" name="search" id="search" placeholder="<?php echo JText::_( 'FLEXI_SEARCH' ); ?>" value="<?php echo $this->lists['search']; ?>" class="inputbox" />
 				</div>
 				
-				<?php $_class = FLEXI_J30GE ? ' btn btn-primary' : ' fc_button'; ?>
+				<?php $_class = FLEXI_J30GE ? ' btn' : ' fc_button'; ?>
 				<div class="btn-group" style="margin: 2px 0 6px -3px;">
 				<input type="button" class="<?php echo $_class; ?>" onclick="jQuery('#mainChooseColBox').slideToggle();" value="<?php echo JText::_( 'FLEXI_COLUMNS' ); ?>" />
 				<input type="button" class="<?php echo $_class; ?>" onclick="jQuery('#stateGroupsBox').slideToggle();" value="<?php echo JText::_( 'FLEXI_STATE_GROUPS' ); ?>" />
