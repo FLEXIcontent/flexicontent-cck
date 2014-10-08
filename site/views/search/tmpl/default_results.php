@@ -183,12 +183,12 @@ if ( $use_infoflds && count($infoflds) ) {
 		<div class="fc_search_result_fields">
 	
 		<?php foreach ($infoflds as $fieldname) : ?>
-			<span class="fc_field_container">
 			<?php if ( @$fcitems[$i]->fields[$fieldname]->display ) : ?>
+			<span class="fc_field_container">
 				<span class="fc_field_label"><?php echo $fcitems[$i]->fields[$fieldname]->label; ?></span>
 				<span class="fc_field_value"><?php echo $fcitems[$i]->fields[$fieldname]->display; ?></span>
-			<?php endif; ?>
 			</span>
+			<?php endif; ?>
 		<?php endforeach; ?>
 			
 		</div>
