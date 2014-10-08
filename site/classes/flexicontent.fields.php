@@ -2253,8 +2253,9 @@ class FlexicontentFields
 		$cparams   = JComponentHelper::getParams('com_flexicontent');  // createFilter maybe called in backend too ...
 		$print_logging_info = $cparams->get('print_logging_info');
 		
-		global $is_fc_component;
-		$view = JRequest::getVar('view');
+		$option = JRequest::getVar('option');
+		$view   = JRequest::getVar('view');
+		$is_fc_component = $option=='com_flexicontent';
 		$isCategoryView = $is_fc_component && $view=='category';
 		$isSearchView   = $is_fc_component && $view=='search';
 		
@@ -2264,7 +2265,7 @@ class FlexicontentFields
 		}
 		
 		// Apply caching to filters regardless of cache setting ...
-		$apply_cache = 1;
+		$apply_cache = FLEXI_CACHE;
 		if ($apply_cache) {
 			$itemcache = JFactory::getCache('com_flexicontent_filters');  // Get Joomla Cache of '...items' Caching Group
 			$itemcache->setCaching(1); 		              // Force cache ON
@@ -2617,6 +2618,12 @@ class FlexicontentFields
 		
 		$show_matching_items = $filter->parameters->get( 'show_matching_items', 1 );
 		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
+		
+		//echo "<b>FILTER NAME</b>: ". $filter->label ."<br/>\n";
+		//echo "<b> &nbsp; view_join</b>: <br/>". $view_join ."<br/>\n";
+		//echo "<b> &nbsp;view_where</b>: <br/>". $view_where ."<br/>\n";
+		//echo "<b> &nbsp;filters_where</b>: <br/>". print_r($filters_where, true) ."<br/><br/>\n";
+		//exit;
 		
 		if ($faceted_filter || !$indexed_elements) {
 			$_results = FlexicontentFields::getFilterValues($filter, $view_join, $view_where, $filters_where);
@@ -3095,7 +3102,7 @@ class FlexicontentFields
 		
 		// Order filters according to given order
 		$filters_tmp = array();
-		if ( $params->get('filters_order', 0) && !empty($filter_ids) ) {
+		if ( $params->get('filters_order', 0) && !empty($filter_ids) && $usage_param!='__ALL_FILTERS__' ) {
 			foreach( $filter_ids as $filter_id) {
 				if ( empty($filters[$filter_id]) ) continue;
 				$filter = $filters[$filter_id];

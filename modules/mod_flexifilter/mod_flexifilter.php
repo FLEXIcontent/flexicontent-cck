@@ -155,12 +155,20 @@ if ( $show_mod )
 	
 	$saved_cid = JRequest::getVar('cid', '');   // save cid ...
 	$saved_layout = JRequest::getVar('layout'); // save layout ...
-	JRequest::setVar('layout', $mcats_selection || !$catid ? 'mcats' : '');
-	JRequest::setVar('cid', $limit_filters_to_cat ? $catid : 0);
+	$saved_option = JRequest::getVar('option'); // save option ...
+	$saved_view = JRequest::getVar('view'); // save layout ...
+	
+	$target_layout = $mcats_selection || !$catid ? 'mcats' : '';
+	JRequest::setVar('layout', $target_layout);
+	JRequest::setVar($target_layout=='mcats' ? 'cids' : 'cid', $limit_filters_to_cat ? $catid : 0);
+	JRequest::setVar('option', 'com_flexicontent');
+	JRequest::setVar('view', 'category');
 	
 	// Get/Create current category model ... according to configuaration set above into the JRequest variables ...
 	$catmodel = new FlexicontentModelCategory();
 	$catparams = $catmodel->getParams();  // Get current's view category parameters this will if needed to get category specific filters ...
+	$catmodel->_buildItemWhere($wherepart='where', $counting=true);
+	$catmodel->_buildItemFromJoin($counting=true);
 	
 	// ALL filters
 	if ($display_filter_list==0) {
@@ -207,9 +215,6 @@ if ( $show_mod )
 		}
 	}
 	
-	JRequest::setVar('cid', $saved_cid); // restore cid
-	JRequest::setVar('layout', $saved_layout); // restore layout
-	
 	// Set filter values (initial or locked) via configuration parameters
 	FlexicontentFields::setFilterValues( $params, 'persistent_filters', $is_persistent=1);
 	FlexicontentFields::setFilterValues( $params, 'initial_filters'   , $is_persistent=0);
@@ -218,6 +223,12 @@ if ( $show_mod )
 	if ( !empty($filters) ) {
 		FlexicontentFields::renderFilters( $params, $filters, $form_name );
 	}
+	
+	// Restore variables
+	JRequest::setVar('cid', $saved_cid); // restore cid
+	JRequest::setVar('layout', $saved_layout); // restore layout
+	JRequest::setVar('option', $saved_option); // restore option
+	JRequest::setVar('view', $saved_view); // restore view
 	
 	// Load needed JS libs & CSS styles
 	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
