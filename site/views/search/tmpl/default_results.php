@@ -188,6 +188,7 @@ if ( $use_infoflds && count($infoflds) ) {
 				<span class="fc_field_label"><?php echo $fcitems[$i]->fields[$fieldname]->label; ?></span>
 				<span class="fc_field_value"><?php echo $fcitems[$i]->fields[$fieldname]->display; ?></span>
 			<?php endif; ?>
+			</span>
 		<?php endforeach; ?>
 			
 		</div>
