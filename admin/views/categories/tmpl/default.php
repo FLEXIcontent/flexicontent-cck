@@ -123,14 +123,6 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 
 	<tbody>
 		<?php
-		$k = 0;
-		$i = 0;
-		$n = count($this->rows);
-		if (FLEXI_J16GE) {
-			$originalOrders = array();
-			$extension	= 'com_content';
-		}
-				
 		if (FLEXI_J16GE) {
 			$canCheckinRecords = $user->authorise('core.admin', 'checkin');
 		} else if (FLEXI_ACCESS) {
@@ -138,6 +130,14 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 		} else {
 			$canCheckinRecords = $user->gid >= 24;
 		}
+		
+		if (FLEXI_J16GE) {
+			$originalOrders = array();
+			$extension	= 'com_content';
+		}
+		
+		$k = 0;
+		$i = 0;
 		foreach ($this->rows as $row)
 		{
 			if (FLEXI_J16GE) {
@@ -215,7 +215,7 @@ $infoimage  = JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 				
 				// Display an icon with checkin link, if current user has checked out current item
 				if ($row->checked_out) {
-					// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (a) record checked out by current user
+					// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
 					$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
 					if ($canCheckin) {
 						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'categories.', $canCheckin);

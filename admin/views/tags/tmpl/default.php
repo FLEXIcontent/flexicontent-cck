@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: default.php 1807 2013-11-14 01:43:15Z ggppdk $
+ * @version 1.5 stable $Id$
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -20,8 +20,7 @@ defined('_JEXEC') or die('Restricted access');
 
 $user      = JFactory::getUser();
 $cparams   = JComponentHelper::getParams( 'com_flexicontent' );
-$autologin = $cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
-
+$autologin = '';//$cparams->get('autoflogin', 1) ? '&amp;fcu='.$user->username . '&amp;fcp='.$user->password : '';
 
 $attribs_preview = ' style="float:right;" class="hasTip" title="'.JText::_('FLEXI_PREVIEW').':: Click to display the frontend view of this category in a new browser window" ';
 
@@ -93,7 +92,15 @@ $image_preview = FLEXI_J16GE ?
 
 	<tbody>
 		<?php
+		if (FLEXI_J16GE) {
+			$canCheckinRecords = $user->authorise('core.admin', 'checkin');
+		} else if (FLEXI_ACCESS) {
+			$canCheckinRecords = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
+		} else {
+			$canCheckinRecords = $user->gid >= 24;
+		}
 		$edit_task = FLEXI_J16GE ? 'task=tags.' : 'controller=tags&amp;task=';
+		
 		$k = 0;
 		for ($i=0, $n=count($this->rows); $i < $n; $i++)
 		{
@@ -123,13 +130,8 @@ $image_preview = FLEXI_J16GE ?
 				
 				// Display an icon with checkin link, if current user has checked out current item
 				if ($row->checked_out) {
-					if (FLEXI_J16GE) {
-						$canCheckin = $user->authorise('core.admin', 'checkin');
-					} else if (FLEXI_ACCESS) {
-						$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
-					} else {
-						$canCheckin = $user->gid >= 24;
-					}
+					// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
+					$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
 					if ($canCheckin) {
 						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'tags.', $canCheckin);
 						$task_str = FLEXI_J16GE ? 'tags.checkin' : 'checkin';

@@ -737,6 +737,14 @@ window.addEvent('domready', function() {
 
 	<tbody <?php echo $ordering_draggable && $this->CanOrder && $this->ordering ? 'id="sortable_fcitems"' : ''; ?> >
 		<?php
+		if (FLEXI_J16GE) {
+			$canCheckinRecords = $user->authorise('core.admin', 'checkin');
+		} else if (FLEXI_ACCESS) {
+			$canCheckinRecords = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
+		} else {
+			$canCheckinRecords = $user->gid >= 24;
+		}
+		
 		$k = 0;
 		if (FLEXI_J16GE)
 			$date_format = (($date_format = JText::_( 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE' )) == 'FLEXI_DATE_FORMAT_FLEXI_ITEMS_J16GE') ? "d/m/y H:i" : $date_format;
@@ -838,13 +846,8 @@ window.addEvent('domready', function() {
 
 				// Display an icon with checkin link, if current user has checked out current item
 				if ($row->checked_out) {
-					if (FLEXI_J16GE) {
-						$canCheckin = $user->authorise('core.admin', 'checkin');
-					} else if (FLEXI_ACCESS) {
-						$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
-					} else {
-						$canCheckin = $user->gid >= 24;
-					}
+					// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
+					$canCheckin = $canCheckinRecords || $row->checked_out == $user->id;
 					if ($canCheckin) {
 						//if (FLEXI_J16GE && $row->checked_out == $user->id) echo JHtml::_('jgrid.checkedout', $i, $row->editor, $row->checked_out_time, 'items.', $canCheckin);
 						$task_str = FLEXI_J16GE ? 'items.checkin' : 'checkin';

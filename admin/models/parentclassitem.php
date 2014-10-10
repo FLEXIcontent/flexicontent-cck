@@ -765,15 +765,6 @@ class ParentClassItem extends JModelAdmin
 					$item->category_access = $db->loadResult();
 				}
 				
-				
-				// Category access is retrieved here for J1.6+, for J1.5 we use FLEXIaccess
-				if (FLEXI_J16GE) {
-					// Get category access for the item's main category, used later to determine viewing of the item
-					$query = 'SELECT access FROM #__categories WHERE id = '. (int) $item->catid;
-					$db->setQuery($query);
-					$item->category_access = $db->loadResult();
-				}
-				
 				// Typecast some properties in case LEFT JOIN returned nulls
 				if ( !isset($item->type_access) ) {
 					$public_acclevel = !FLEXI_J16GE ? 0 : 1;
@@ -1059,7 +1050,6 @@ class ParentClassItem extends JModelAdmin
 		$iparams_extra = new JRegistry;
 		$user		= JFactory::getUser();
 		$asset	= 'com_content.article.'.$this->_id;
-		$permission	= FlexicontentHelperPerm::getPerm();  // Global component permissions
 		
 		// NOTE, technically in J1.6+ a guest may edit able to edit/delete an item, so we commented out the guest check bellow,
 		// this applies for creating item, but flexicontent already allows create to guests via menu item too, so no check there too
@@ -4183,8 +4173,7 @@ class ParentClassItem extends JModelAdmin
 		$user = JFactory::getUser();
 		$approvables = $this->isUserDraft($cid);
 		
-		$permission = FlexicontentHelperPerm::getPerm();
-		$requestApproval = $permission->RequestApproval;
+		$requestApproval = FLEXI_J16GE ? $user->authorise('flexicontent.requestapproval',	'com_flexicontent') : ($user->gid >= 20);  // or at least a J1.5 Editor
 		
 		$submitted = 0;
 		$noprivilege = array();

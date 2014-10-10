@@ -5172,15 +5172,15 @@ class flexicontent_db
 		$user = JFactory::getUser();
 		$controller->setRedirect( $redirect_url, '' );
 
-		static $canCheckin = null;
-		if ($canCheckin === null) {
+		static $canCheckinRecords = null;
+		if ($canCheckinRecords === null) {
 			if (FLEXI_J16GE) {
-				$canCheckin = $user->authorise('core.admin', 'checkin');
+				$canCheckinRecords = $user->authorise('core.admin', 'checkin');
 			} else if (FLEXI_ACCESS) {
-				$canCheckin = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
+				$canCheckinRecords = ($user->gid < 25) ? FAccess::checkComponentAccess('com_checkin', 'manage', 'users', $user->gmid) : 1;
 			} else {
 				// Only admin or super admin can check-in
-				$canCheckin = $user->gid >= 24;
+				$canCheckinRecords = $user->gid >= 24;
 			}
 		}
 
@@ -5195,9 +5195,9 @@ class flexicontent_db
 				return;// false;
 			}
 
-			// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (a) record checked out by current user
+			// Record check-in is allowed if either (a) current user has Global Checkin privilege OR (b) record checked out by current user
 			if ($table->checked_out) {
-				if ( !$canCheckin && $table->checked_out != $user->id) {
+				if ( !$canCheckinRecords && $table->checked_out != $user->id) {
 					$controller->setError(JText::_( 'FLEXI_RECORD_CHECKED_OUT_DIFF_USER'));
 					return;// false;
 				}
