@@ -45,9 +45,14 @@ function FLEXIcontentBuildRoute(&$query)
 	// 2. Try to match the variables against the variables of the menu item
 	if ( !empty($menu) ) {
 		$menuItem_matches = true;
-		foreach($query as $index => $value) {
-			// Skip URL query variable 'Itemid', since it does not exist PLUS we retrieve the menu item with the giveb Itemid
+		foreach($query as $index => $value)
+		{
+			// Skip URL query variable 'Itemid', since it does not exist PLUS we retrieve the menu item with the given Itemid
 			if ($index=='Itemid') continue;
+			
+			// Allow alternative display formats to match a given item
+			if ($index=='format') continue;
+			if ($index=='type') continue;
 			
 			// id and cid query variables can be contain 'slug', so we need to typecast them into integer
 			$value = in_array($index, array('id','cid')) ? (int)$query[$index] : $query[$index];
@@ -61,11 +66,15 @@ function FLEXIcontentBuildRoute(&$query)
 		
 		// If exact menu match then unset ALL $query array, only the menu item segments will appear
 		if ($menuItem_matches) {
-			foreach($query as $index => $value) {
-				if ( $index!="option" && $index!="Itemid")  // do not unset option and Itemid variables, these are needed
-				{
-					unset($query[$index]);
-				}
+			foreach($query as $index => $value)
+			{
+				// Do not unset option, Itemid and format variables, as these are needed / handled by JRoute
+				if ($index=="option" || $index=="Itemid" || $index=="format") continue;
+				
+				// Other variables to unset only if they match
+				if ($index=="type" && $value != @$menu->query[$index]) continue;
+				
+				unset($query[$index]);
 			}
 			return $segments;  // $segments is empty we will get variables from menuItem (it has them)
 		}
@@ -129,13 +138,13 @@ function FLEXIcontentBuildRoute(&$query)
 	case 'category':
 		$mcid = @$menu->query['cid']; // not set returns null
 		$cid  = !isset($query['cid']) ? null : (int)$query['cid'];
-		if ( $mview!=$view || !$add_item_sef_segment ) {
-			// Adding explicit view /item/ is disabled for no-cid item URLs (thus they are 1-segment URLs),
-			// or the given menu item is not of category view, so ... we need to explicitly declare
-			// that this URL is a category URL, otherwise it will be wrongly interpreted as 'item' URL
-			$segments[] = 'category';
-		}
 		if ( $mview!=$view || $mcid!=$cid) {
+			if (!$add_item_sef_segment) {
+				// Adding explicit view /item/ is disabled for no-cid item URLs (thus they are 1-segment URLs),
+				// or the given menu item is not of category view, so ... we need to explicitly declare
+				// that this URL is a category URL, otherwise it will be wrongly interpreted as 'item' URL
+				$segments[] = 'category';
+			}
 			// IMPLY view = 'category' when count($segments) == 1
 			$segments[] = @$query['cid'];  // it is optional, some category view layouts do not use category id
 		}
