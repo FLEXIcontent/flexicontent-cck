@@ -1108,7 +1108,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function feedbutton($view, &$params, $slug = null, $itemslug = null )
+	static function feedbutton($view, &$params, $slug = null, $itemslug = null, $item = null)
 	{
 		if ( !$params->get('show_feed_icon', 1) || JRequest::getCmd('print') ) return;
 		
@@ -1117,19 +1117,18 @@ class flexicontent_html
 
 		//TODO: clean this static stuff (Probs when determining the url directly with subdomains)
 		if($view == 'category') {
-			$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
+			$link = $base . JRoute::_(FlexicontentHelperRoute::getCategoryRoute($slug).'&format=feed&type=rss');
+			//$link = $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&format=feed&type=rss', false );
 		} elseif($view == FLEXI_ITEMVIEW) {
-			$link 	= $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug.'&format=feed&type=rss', false );
+			$link = $base . JRoute::_(FlexicontentHelperRoute::getItemRoute($itemslug, $slug, 0, $item).'&format=feed&type=rss');
+			//$link = $base.JRoute::_( 'index.php?view='.$view.'&cid='.$slug.'&id='.$itemslug.'&format=feed&type=rss', false );
 		} elseif($view == 'tags') {
-			$link 	= $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug.'&format=feed&type=rss', false );
+			$link = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($itemslug).'&format=feed&type=rss');
+			//$link = $base.JRoute::_( 'index.php?view='.$view.'&id='.$slug.'&format=feed&type=rss', false );
 		} else {
-			$link 	= $base.JRoute::_( 'index.php?view='.$view.'&format=feed&type=rss', false );
+			$link = $base . JRoute::_( 'index.php?view='.$view.'&format=feed&type=rss', false );
 		}
-		// Fix for J1.7+ format variable removed from URL and added as URL suffix
-		if (!preg_match('/format\=feed/',$link)) {
-			$link .= "&amp;format=feed";
-		}
-
+		
 		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
 		
@@ -1225,7 +1224,7 @@ class flexicontent_html
 	 * @param array $params
 	 * @since 1.0
 	 */
-	static function mailbutton($view, &$params, $slug = null, $itemslug = null, $item = null )
+	static function mailbutton($view, &$params, $slug = null, $itemslug = null, $item = null)
 	{
 		static $initialize = null;
 		static $uri, $base;
@@ -1255,7 +1254,7 @@ class flexicontent_html
 			$link = $base . JRoute::_(FlexicontentHelperRoute::getTagRoute($itemslug));
 			//$link = $base . JRoute::_( 'index.php?view='.$view.'&id='.$slug, false );
 		} else {
-			$link 	= $base . JRoute::_( 'index.php?view='.$view, false );
+			$link = $base . JRoute::_( 'index.php?view='.$view, false );
 		}
 
 		$mail_to_url = JRoute::_('index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink($link));
