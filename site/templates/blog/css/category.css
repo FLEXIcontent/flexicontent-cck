@@ -1,25 +1,25 @@
 /* Blog Theme : category template CSS file */
 
-#flexicontent .clear { 
-	border: 0; clear: both; 
-	float: none; 
-	font-size: 1px; 
-	height: 0; 
-	line-height: 1px; 
-	margin: 0; 
-	padding: 0; 
+#flexicontent .clear {
+	border: 0; clear: both;
+	float: none;
+	font-size: 1px;
+	height: 0;
+	line-height: 1px;
+	margin: 0;
+	padding: 0;
 	visibility: hidden;
 }
 
 #flexicontent .floattext:after { /* ie fix in conditional comments (html source) */
-	content: "."; 
-	display: block; 
-	height: 0; 
-	clear: both; 
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
 	visibility: hidden;
 }
 
-#flexicontent .floattext { 
+#flexicontent .floattext {
 	display:block; /* safari */
 }
 
@@ -28,14 +28,14 @@
  *
  * print, pdf, ...
  */
-#flexicontent .buttons { 
+#flexicontent .buttons {
 	float: right;
 }
 
-#flexicontent .buttons > a > img { 
+#flexicontent .buttons > a > img {
 }
 
-#flexicontent .buttons > a { 
+#flexicontent .buttons > a {
 }
 
 
@@ -47,7 +47,7 @@
 }
 
 #flexicontent h2 img {
-border: none;
+	border: none;
 }
 
 
@@ -56,24 +56,24 @@ border: none;
  *
  */
 #flexicontent .catimg {
-margin: 0 0.5em 0.5em 0;
-float: left;
-position: relative;
+	margin: 0 0.5em 0.5em 0;
+	float: left;
+	position: relative;
 }
 
 #flexicontent .catimg p {
-font-size: 0.9em; line-height: 180%;
-margin: 0 0 0.5em 0;
+	font-size: 0.9em; line-height: 180%;
+	margin: 0 0 0.5em 0;
 }
 
 #flexicontent .catdescription {
-margin: 0 0 0.5em 0;
+	margin: 0 0 0.5em 0;
 }
 
 #flexicontent .subcategories {
-/* font-size: 1.2em; font-weight: bold; */
-border-bottom: 2px solid #ddd;
-padding:0.5em 0.3em; margin: 0.8em 0;
+	/* font-size: 1.2em; font-weight: bold; */
+	border-bottom: 2px solid #ddd;
+	padding:0.5em 0.3em; margin: 0.8em 0;
 }
 
 /**
@@ -81,7 +81,7 @@ padding:0.5em 0.3em; margin: 0.8em 0;
  *
  */
 #flexicontent .taglist {
-margin: 5px 0 10px; padding: 0 5px;
+	margin: 5px 0 10px; padding: 0 5px;
 }
 
 
@@ -90,23 +90,23 @@ margin: 5px 0 10px; padding: 0 5px;
  *
  */
 div.subcategorieslist {
-margin: 0 0 1em 0;
+	margin: 0 0 1em 0;
 }
 
 #flexicontent #fc_filter {
-margin: 0 0 1em 0; padding: 0.5em;
-border: solid 1px #ddd;
+	margin: 0 0 1em 0; padding: 0.5em;
+	border: solid 1px #ddd;
 }
 
 #flexicontent .fc_fleft {
-float: left;
+	float: left;
 }
 
 #flexicontent .fc_fright {
-float: right;
+	float: right;
 }
 #flexicontent .fc_fright .filter {
-margin-left: 10px;
+	margin-left: 10px;
 }
 
 
@@ -199,25 +199,49 @@ div.comments {
 	line-height: inherit;
 }
 #flexicontent ul.introblock.two > li {
-	width: 48%;
+	width: 48.6%;
 }
-#flexicontent ul.introblock.two > li.fceven {
-	margin-left: 3%
+#flexicontent ul.introblock.two > li {
+	margin-left: 1%;
 }
 #flexicontent ul.introblock.three > li {
-   width: 30%;
+	width: 31.6%;
 }
-#flexicontent ul.introblock.three > li.fceven {
-   margin-left: 1%
+#flexicontent ul.introblock.three > li {
+	margin-left: 1%;
 }
 #flexicontent ul.introblock.four > li {
-   width: 23%;
+	width: 23.4%;
 }
-#flexicontent ul.introblock.four > li.fceven {
-   margin-left: 1%
+#flexicontent ul.introblock.four > li {
+	margin-left: 1%;
 }
 
-#flexicontent figure.image.right, 
+
+@media only screen and (min-width: 960px) and (max-width: 1160px) {
+}
+@media only screen and (min-width: 768px) and (max-width: 959px) {
+	#flexicontent ul.introblock.four  > li { width: 31.6%; }
+	#flexicontent ul.introblock.four  > li { margin-left: 1%; }
+}
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+	#flexicontent ul.introblock.three > li,
+	#flexicontent ul.introblock.four  > li { width: 48.2%; }
+	#flexicontent ul.introblock.three > li
+	#flexicontent ul.introblock.four  > li { margin-left: 1%; }
+}
+@media only screen and (max-width: 479px) {
+	#flexicontent ul.introblock.two   > li,
+	#flexicontent ul.introblock.three > li,
+	#flexicontent ul.introblock.four  > li { width: 100%; }
+	#flexicontent ul.introblock.two   > li,
+	#flexicontent ul.introblock.three > li,
+	#flexicontent ul.introblock.four  > li { margin-left: 0%; }
+}
+
+
+
+#flexicontent figure.image.right,
 #flexicontent div.image.right {
 	float: right !important;
 	margin: 8px 2px 0px 10px !important;
@@ -231,8 +255,8 @@ div.comments {
 	width:auto !important;
 }
 
-#flexicontent figure.image.right img, 
-#flexicontent figure.image.left img, 
+#flexicontent figure.image.right img,
+#flexicontent figure.image.left img,
 #flexicontent div.image.right img,
 #flexicontent div.image.left img {
 	padding: 1px;
