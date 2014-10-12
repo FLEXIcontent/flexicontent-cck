@@ -1,0 +1,35 @@
+
+PURPOSE:
+This script will link a local Joomla installation (with flexicontent already installed) to your local flexicontent-cck repository
+
+
+NOTE: flexicontent must be already installed in the Joomla live site
+NOTE: existing folders (or files) will get an _ at the end of their name  (for files extension is preserved)
+
+
+
+WARNING: After running the script,
+  edit FLEXIcontent component configuration to change the "secure" and media folder (component) parameters to point to:
+  components/com_flexicontent_/uploads/
+  components/com_flexicontent_/media/
+
+
+
+LINKS:
+(done by this script)
+ 
+ - component frontend
+ - component frontend language file
+ 
+ - component backend
+ - component backend language files (.sys.ini too)
+ - manifest.xml file
+
+ 
+ - individual module folders
+ - language files of modules (en-GB)
+ 
+ - individual plugin folders
+ - language files of plugins (en-GB)
+ 
+ 
