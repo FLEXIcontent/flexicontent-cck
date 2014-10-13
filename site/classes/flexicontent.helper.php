@@ -496,10 +496,9 @@ class flexicontent_html
 				break;
 			
 			case 'masonry':
-				if ($load_jquery) flexicontent_html::loadJQuery();
-				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/masonry';
-				$document->addScript($framework_path.'/jquery.masonry.min.js');
+				$document->addScript($framework_path.'/masonry.pkgd.min.js');
+				
 				break;
 			
 			case 'select2':
@@ -811,11 +810,8 @@ class flexicontent_html
 				break;
 			
 			case 'imagesLoaded':
-				if ($load_jquery) flexicontent_html::loadJQuery();
-				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/imagesLoaded';
-				$document->addScript($framework_path.'/imagesloaded.pkgd.js');
-				//$document->addScript($framework_path.'/imagesloaded.pkgd.min.js');
+				$document->addScript($framework_path.'/imagesloaded.pkgd.min.js');
 				break;
 			
 			case 'noobSlide':

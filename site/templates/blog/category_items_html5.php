@@ -21,6 +21,41 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // first define the template name
 $tmpl = $this->tmpl;
 $user = JFactory::getUser();
+
+// ITEMS as MASONRY tiles
+if ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_placement', 0)==1)
+{
+	flexicontent_html::loadFramework('masonry');
+	flexicontent_html::loadFramework('imagesLoaded');
+	
+	$js = "
+		jQuery(document).ready(function(){
+	";
+	if ($this->params->get('lead_placement', 0)==1) {
+		$js .= "
+			var container_lead = document.querySelector('ul.leadingblock');
+			var msnry_lead;
+			// initialize Masonry after all images have loaded
+			imagesLoaded( container_lead, function() {
+				msnry_lead = new Masonry( container_lead );
+			});
+		";
+	}
+	if ($this->params->get('lead_placement', 0)==1) {
+		$js .= "
+			var container_intro = document.querySelector('ul.introblock');
+			var msnry_intro;
+			// initialize Masonry after all images have loaded
+			imagesLoaded( container_intro, function() {
+				msnry_intro = new Masonry( container_intro );
+			});
+		";
+	}
+	$js .= "	
+		});
+	";
+	JFactory::getDocument()->addScriptDeclaration($js);
+}
 ?>
 
 <?php
@@ -60,11 +95,15 @@ $leadnum  = ($leadnum >= $count) ? $count : $leadnum;
 
 // ONLY FIRST PAGE has leading content items
 if ($this->limitstart != 0) $leadnum = 0;
+
+if ($leadnum) :
+	//added to intercept more columns (see also css changes)
+	$lead_cols = $this->params->get('lead_cols', 2);
+	$lead_cols_classes = array(1=>'one',2=>'two',3=>'three',4=>'four');
+	$classnum = $lead_cols_classes[$lead_cols];
 ?>
 
-<?php if ($leadnum) : ?>
-	
-	<ul class="leadingblock group row">
+	<ul class="leadingblock <?php echo $classnum; ?> group row">
 		<?php
 		if ($this->params->get('lead_use_image', 1) && $this->params->get('lead_image')) {
 			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', 'o'=>'original');
@@ -74,6 +113,8 @@ if ($this->limitstart != 0) $leadnum = 0;
 		for ($i=0; $i<$leadnum; $i++) :
 			$item = $items[$i];
 			$fc_item_classes = 'fc_bloglist_item';
+			$fc_item_classes .= $i%2 ? ' fceven' : ' fcodd';
+			$fc_item_classes .= ' fccol'.($i%$lead_cols + 1);
 			
 			$markup_tags = '<span class="fc_mublock">';
 			foreach($item->css_markups as $grp => $css_markups) {

@@ -198,22 +198,20 @@ div.comments {
 	_height: 10px;
 	line-height: inherit;
 }
+
+#flexicontent ul.leadingblock.two > li,
 #flexicontent ul.introblock.two > li {
 	width: 48.6%;
-}
-#flexicontent ul.introblock.two > li {
 	margin-left: 1%;
 }
+#flexicontent ul.leadingblock.three > li,
 #flexicontent ul.introblock.three > li {
 	width: 31.6%;
-}
-#flexicontent ul.introblock.three > li {
 	margin-left: 1%;
 }
+#flexicontent ul.leadingblock.four > li,
 #flexicontent ul.introblock.four > li {
 	width: 23.4%;
-}
-#flexicontent ul.introblock.four > li {
 	margin-left: 1%;
 }
 
@@ -221,22 +219,31 @@ div.comments {
 @media only screen and (min-width: 960px) and (max-width: 1160px) {
 }
 @media only screen and (min-width: 768px) and (max-width: 959px) {
-	#flexicontent ul.introblock.four  > li { width: 31.6%; }
-	#flexicontent ul.introblock.four  > li { margin-left: 1%; }
+	#flexicontent ul.leadingblock.two > li,
+	#flexicontent ul.introblock.four  > li {
+		width: 31.6%;
+		margin-left: 1%;
+	}
 }
 @media only screen and (min-width: 480px) and (max-width: 767px) {
+	#flexicontent ul.leadingblock.three > li,
+	#flexicontent ul.leadingblock.four > li,
 	#flexicontent ul.introblock.three > li,
-	#flexicontent ul.introblock.four  > li { width: 48.2%; }
-	#flexicontent ul.introblock.three > li
-	#flexicontent ul.introblock.four  > li { margin-left: 1%; }
+	#flexicontent ul.introblock.four  > li {
+		width: 48.2%;
+		margin-left: 1%;
+	}
 }
 @media only screen and (max-width: 479px) {
+	#flexicontent ul.leadingblock.two   > li,
+	#flexicontent ul.leadingblock.three > li,
+	#flexicontent ul.leadingblock.four  > li,
 	#flexicontent ul.introblock.two   > li,
 	#flexicontent ul.introblock.three > li,
-	#flexicontent ul.introblock.four  > li { width: 100%; }
-	#flexicontent ul.introblock.two   > li,
-	#flexicontent ul.introblock.three > li,
-	#flexicontent ul.introblock.four  > li { margin-left: 0%; }
+	#flexicontent ul.introblock.four  > li {
+		width: 100%;
+		margin-left: 0%;
+	}
 }
 
 
