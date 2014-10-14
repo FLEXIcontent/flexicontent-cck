@@ -67,9 +67,30 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
-<p class="buttons">
-	<?php echo flexicontent_html::mailbutton( 'tags', $this->params, $this->tag->slug ); ?>
-</p>
+
+<!-- BOF buttons -->
+<?php
+if (JRequest::getCmd('print')) {
+	if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
+		<script type="text/javascript">window.addEvent('domready', function() { window.print(); });</script>
+	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
+		<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
+	<?php endif;
+} else {
+	$pdfbutton = '';
+	$mailbutton = flexicontent_html::mailbutton( 'tags', $this->params, $this->tag->slug );
+	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
+	if ($pdfbutton || $mailbutton || $printbutton) {
+	?>
+	<p class="buttons">
+		<?php echo $pdfbutton; ?>
+		<?php echo $mailbutton; ?>
+		<?php echo $printbutton; ?>
+	</p>
+	<?php }
+}
+?>
+<!-- EOF buttons -->
 
 <?php if ( $this->params->get( 'show_page_heading', 1 ) ) : ?>
 	<h1 class="componentheading">

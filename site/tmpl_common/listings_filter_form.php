@@ -1,4 +1,5 @@
 <?php
+$form_style = JRequest::getCmd('print') ? 'display:none' : '';
 ob_start();
 
 // Body of form for (a) Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
@@ -10,7 +11,7 @@ ob_end_clean();
 if ( empty($filter_form_body) ) return;
 ?>
 
-<form action="<?php echo $this->action; ?>" method="post" id="adminForm" onsubmit="">
+<form action="<?php echo $this->action; ?>" method="post" id="adminForm" onsubmit="" style="<?php echo $form_style;?>">
 
 <?php echo $filter_form_body; ?>
 

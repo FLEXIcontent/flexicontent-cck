@@ -1,3 +1,8 @@
+
+<?php if (JRequest::getCmd('print')) : ?>
+<div style="display:none">
+<?php endif;?>
+
 <?php
 // ***********************************************************************************************************
 // Form for Text search, Field Filters, Alpha-Index, Items Total Statistics, Selectors(e.g. per page, orderby)
@@ -56,4 +61,8 @@ $orderby_selector_2nd = flexicontent_html::ordery_selector( $this->params, $form
 	</div>
 	<!-- BOF items total-->
 
+<?php endif; ?>
+
+<?php if (JRequest::getCmd('print')) : ?>
+</div>
 <?php endif; ?>

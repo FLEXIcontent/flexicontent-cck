@@ -20,8 +20,15 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	</h2>
 <?php endif; ?>
 
-	<!-- BOF buttons -->
-	<?php
+<!-- BOF buttons -->
+<?php
+if (JRequest::getCmd('print')) {
+	if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
+		<script type="text/javascript">window.addEvent('domready', function() { window.print(); });</script>
+	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
+		<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
+	<?php endif;
+} else {
 	$pdfbutton = '';
 	$mailbutton = '';
 	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
@@ -32,8 +39,10 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 		<?php echo $mailbutton; ?>
 		<?php echo $printbutton; ?>
 	</p>
-	<?php } ?>
-	<!-- EOF buttons -->
+	<?php }
+}
+?>
+<!-- EOF buttons -->
 
 <?php if (!JRequest::getVar('print',0)) echo $this->loadTemplate('form'); ?>
 <?php

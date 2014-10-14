@@ -277,6 +277,12 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
+			<field name="" type="separator" default="FLEXI_PRINT" label="" level="level3" menu="hide" />
+			<field name="print_behaviour" type="radio" default="auto" label="FLEXI_PRINT_METHOD" description="FLEXI_PRINT_METHOD_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="auto">FLEXI_AUTO</option>
+				<option value="button">FLEXI_BUTTON</option>
+			</field>
+			
 			<field name="" type="separator" default="FLEXI_ITEM_VIEW" label="" level="level1" menu="hide" />
 			<field name="show_title" type="radio" default="1" label="FLEXI_SHOWTITLE" description="FLEXI_SHOWTITLE" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>

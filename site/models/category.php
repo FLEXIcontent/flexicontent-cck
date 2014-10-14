@@ -1661,7 +1661,7 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// a. Clone component parameters ... we will use these as parameters base for merging
 		$params = FLEXI_J16GE ? clone ($comp_params) : new JParameter( $comp_params ); // clone( JComponentHelper::getParams('com_flexicontent') );
-		$debug_inheritcid = $params->get('debug_inheritcid');
+		$debug_inheritcid = JRequest::getCmd('print') ? 0 : $params->get('debug_inheritcid');
 		if ($debug_inheritcid)	$app->enqueueMessage("CLONED COMPONENT PARAMETERS<br/>\n");
 		
 		// b. Retrieve category parameters and create parameter object

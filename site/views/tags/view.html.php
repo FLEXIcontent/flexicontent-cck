@@ -214,7 +214,11 @@ class FlexicontentViewTags extends JViewLegacy
 		
 		// Create links, etc
 		$link = JRoute::_(FlexicontentHelperRoute::getTagRoute($tag->slug), false);
-		$print_link = JRoute::_('index.php?view=tags&id='.$tag->slug.'&pop=1&tmpl=component');
+		
+		//$print_link = JRoute::_('index.php?view=tags&id='.$tag->slug.'&pop=1&tmpl=component');
+    $curr_url = $_SERVER['REQUEST_URI'];
+    $print_link = $curr_url .(strstr($curr_url, '?') ? '&amp;'  : '?').'pop=1&amp;tmpl=component&amp;print=1';
+		
 		$pageclass_sfx = htmlspecialchars($params->get('pageclass_sfx'));
 		
 		$this->assignRef('action',    $link);  // $uri->toString()

@@ -149,10 +149,12 @@ class FlexicontentViewCategory extends JViewLegacy
 	  		
 	  		if ($thumb) {
 	  			$description = "
-	  			<a href='".$link."'>
-	  				<img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/>
-	  			</a>
-	  			<p>".$description."</p>";
+	  			<div class='feed-description'>
+		  			<a class='feed-readmore' target='_blank' href='".$link."'>
+		  				<img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/>
+		  			</a>
+		  			<p>".$description."</p>
+		  		</div>";
 	  		}
   		}
 			

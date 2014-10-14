@@ -211,7 +211,8 @@ if ($leadnum) :
 			<?php 
 				if ($this->params->get('lead_use_image', 1)) :
 					if (!empty($img_field_name)) :
-						FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display');
+						// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
+						/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
 						$img_field = & $item->fields[$img_field_name];
 						$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 					else :
@@ -543,7 +544,8 @@ if ($count > $leadnum) :
 			<?php 
 			if ($this->params->get('intro_use_image', 1)) :
 				if (!empty($img_field_name)) :
-					FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display');
+					// render method 'display_NNNN_src' to avoid CSS/JS being added to the page
+					/* $src = */FlexicontentFields::getFieldDisplay($item, $img_field_name, $values=null, $method='display_'.$img_field_size.'_src');
 					$img_field = & $item->fields[$img_field_name];
 					$src = str_replace(JURI::root(), '', @ $img_field->thumbs_src[$img_field_size][0] );
 				else :

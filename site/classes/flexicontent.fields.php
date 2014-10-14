@@ -3171,11 +3171,11 @@ class FlexicontentFields
 	
 	// Helper method to perform HTML replacements on given list of item ids (with optional catids too), the items list is either given
 	// as parameter or the list is created via the items that have as value the id of 'parentitem' for field with id 'reverse_field'
-	static function getItemsList(&$params, &$_itemids_catids=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, &$return_item_list=false)
+	static function getItemsList(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, &$return_item_list=false)
 	{
 		// Execute query to get item list data 
 		$db = JFactory::getDBO();
-		$query = FlexicontentFields::createItemsListSQL($params, $_itemids_catids, $isform, $reverse_field, $parentfield, $parentitem);
+		$query = FlexicontentFields::createItemsListSQL($params, $_item_data, $isform, $reverse_field, $parentfield, $parentitem);
 		$db->setQuery($query);
 		$item_list = $db->loadObjectList('id');
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
@@ -3186,14 +3186,14 @@ class FlexicontentFields
 		// No published related items or SQL query failed, return
 		if ( !$item_list ) return '';
 		
-		if ($_itemids_catids) foreach($item_list as $_item)   // if it exists ... add prefered catid to items list data
-			$_item->rel_catid = @ $_itemids_catids[$_item->id]->catid;
-		return FlexicontentFields::createItemsListHTML($params, $item_list, $isform, $parentfield, $parentitem);
+		if ($_item_data) foreach($item_list as $_item)   // if it exists ... add prefered catid to items list data
+			$_item->rel_catid = @ $_item_data[$_item->id]->catid;
+		return FlexicontentFields::createItemsListHTML($params, $item_list, $isform, $parentfield, $parentitem, $_item_data);
 	}
 	
 	
 	// Helper method to create SQL query for retrieving items list data
-	static function createItemsListSQL(&$params, &$_itemids_catids=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem)
+	static function createItemsListSQL(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem)
 	{
 		$db = JFactory::getDBO();
 		$sfx = $isform ? '_form' : '';
@@ -3222,7 +3222,7 @@ class FlexicontentFields
 		}
 		// item IDs via a given list (relation field and ... maybe other cases too)
 		else {
-			$item_where = ' AND i.id IN ('. implode(",", array_keys($_itemids_catids)) .')';
+			$item_where = ' AND i.id IN ('. implode(",", array_keys($_item_data)) .')';
 		}
 		
 		// Get orderby SQL CLAUSE ('ordering' is passed by reference but no frontend user override is used (we give empty 'request_var')
@@ -3282,7 +3282,7 @@ class FlexicontentFields
 	
 	
 	// Helper method to create HTML display of an item list according to replacements
-	static function createItemsListHTML(&$params, &$item_list, $isform=0, &$parentfield, &$parentitem)
+	static function createItemsListHTML(&$params, &$item_list, $isform=0, &$parentfield, &$parentitem, &$_item_data=null)
 	{
 		$db = JFactory::getDBO();
 		global $globalcats, $globalnoroute, $fc_run_times;
@@ -3362,7 +3362,6 @@ class FlexicontentFields
 		foreach ($translate_strings as $translate_string)
 			$relitem_html = str_replace('%%'.$translate_string.'%%', JText::_($translate_string), $relitem_html);
 		
-		
 		foreach($item_list as $result)
 		{
 			// Check if related item is published and skip if not published
@@ -3413,17 +3412,23 @@ class FlexicontentFields
 			if ($i_slave) $fc_run_times['render_subfields'][$i_slave] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
 		
+		$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 		$display = array();
 		foreach($item_list as $result)
 		{
+			$url_read_more = JText::_( isset($_item_data->url_read_more) ? $_item_data->url_read_more : 'FLEXI_READ_MORE_ABOUT' , 1);
+			$url_class = (isset($_item_data->url_class) ? $_item_data->url_class : 'relateditem');
+			
 			// Check if related item is published and skip if not published
 			if ($result->state != 1 && $result->state != -5) continue;
 			
 			// a. Replace some custom made strings
 			$item_url = JRoute::_(FlexicontentHelperRoute::getItemRoute($result->slug, $result->categoryslug, 0, $result));
 			$item_title_escaped = htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8');
-			$item_tooltip = ' class="hasTip relateditem" title="'. JText::_('FLEXI_READ_MORE_ABOUT').'::'.$item_title_escaped.'" ';
 			
+			$tooltip_title = flexicontent_html::getToolTip($url_read_more, $item_title_escaped, $translate=0, $escape=0);
+			$item_tooltip = ' class="'.$tooltip_class.' '.$url_class.'" title="'.$tooltip_title.'" ';
+						
 			$display_text = $displayway ? $result->title : $result->id;
 			$display_text = !$addlink ? $display_text : '<a href="'.$item_url.'"'.($addtooltip ? $item_tooltip : '').' >' .$display_text. '</a>';
 			
