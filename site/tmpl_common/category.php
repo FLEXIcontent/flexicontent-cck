@@ -32,25 +32,20 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 <div id="flexicontent" class="flexicontent <?php echo $page_classes; ?>" >
 
 <!-- BOF buttons -->
-	<?php if (JRequest::getCmd('print')) {
-		if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
-			<script type="text/javascript">window.addEvent('domready', function() { window.print(); });</script>
-		<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
-			<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
-		<?php endif;
-	} else if ( $this->params->get('show_print_icon')
-		|| $this->params->get('show_email_icon')
-		|| $this->params->get('show_feed_icon', 1)
-		|| $this->params->get('show_addbutton', 1)
-	) {
-	?>
+<?php if (JRequest::getCmd('print')) : ?>
+	<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
+		<script type="text/javascript">window.addEvent('domready', function() { window.print(); });</script>
+	<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
+		<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
+	<?php endif; ?>
+<?php elseif ( $this->params->get('show_print_icon') || $this->params->get('show_email_icon') || $this->params->get('show_feed_icon', 1) || $this->params->get('show_addbutton', 1) ) : ?>
 	<p class="buttons">
 		<?php echo flexicontent_html::addbutton( $this->params, $this->category ); ?>
 		<?php echo flexicontent_html::printbutton( $this->print_link, $this->params ); ?>
 		<?php echo flexicontent_html::mailbutton( 'category', $this->params, $this->category->slug ); ?>
 		<?php echo flexicontent_html::feedbutton( 'category', $this->params, $this->category->slug ); ?>
 	</p>
-	<?php } ?>
+<?php endif; ?>
 <!-- EOF buttons -->
 
 <!-- BOF page title -->

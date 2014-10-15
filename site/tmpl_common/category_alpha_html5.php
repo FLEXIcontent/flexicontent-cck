@@ -99,7 +99,7 @@ else $selected_letter = JRequest::getVar('letter', '', 'post');
 	?>
 	<div class="aichargrp <?php echo $groupcssclasses[$grp_no]; ?>">
 	<?php if($flag) {?>
-	<a class="btn btn-mini fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value='';document.getElementById('adminForm').submit();"><?php echo JText::_('FLEXI_ALL'); ?></a>
+	<a class="btn btn-medium fc_alpha_index" href="javascript:;" onclick="document.getElementById('alpha_index').value='';document.getElementById('adminForm').submit();"><?php echo JText::_('FLEXI_ALL'); ?></a>
 	<?php $flag = false;}?>
 	<?php
 		foreach ($letters as $letter) :
@@ -172,8 +172,8 @@ else $selected_letter = JRequest::getVar('letter', '', 'post');
 				endfor;
 			}
 			
-			if ($alphacharsep) $aiclass = "btn btn-mini fc_alpha_index_sep";
-			else $aiclass = "btn btn-mini fc_alpha_index";
+			if ($alphacharsep) $aiclass = "btn btn-medium fc_alpha_index_sep";
+			else $aiclass = "btn btn-medium fc_alpha_index";
 			$currentclass = '';
 			if($letter_label == $selected_letter){
 				$currentclass = 'current active';

@@ -67,23 +67,34 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 	<?php echo ( ($mainAreaTag == 'section') ? '<header>' : ''); ?>
 	
   <?php if ($item->event->beforeDisplayContent) : ?>
-	  <!-- BOF beforeDisplayContent -->
+		<!-- BOF beforeDisplayContent -->
 		<div class="fc_beforeDisplayContent group">
 			<?php echo $item->event->beforeDisplayContent; ?>
 		</div>
 		<!-- EOF beforeDisplayContent -->
 	<?php endif; ?>
 	
-	<?php
-	$pdfbutton = flexicontent_html::pdfbutton( $item, $this->params );
-	$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug, 0, $item );
-	$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
-	$editbutton = flexicontent_html::editbutton( $item, $this->params );
-	$statebutton = flexicontent_html::statebutton( $item, $this->params );
-	$approvalbutton = flexicontent_html::approvalbutton( $item, $this->params );
-	?>
+	<?php if (JRequest::getCmd('print')) : ?>
+		<!-- BOF Print handling -->
+		<?php if ($this->params->get('print_behaviour', 'auto') == 'auto') : ?>
+			<script type="text/javascript">window.addEvent('domready', function() { window.print(); });</script>
+		<?php	elseif ($this->params->get('print_behaviour') == 'button') : ?>
+			<input type='button' id='printBtn' name='printBtn' value='<?php echo JText::_('Print');?>' class='btn btn-info' onclick='this.style.display="none"; window.print(); return false;'>
+		<?php endif; ?>
+		<!-- EOF Print handling -->
+		
+	<?php else : ?>
 	
-	<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) : ?>
+		<?php
+		$pdfbutton = flexicontent_html::pdfbutton( $item, $this->params );
+		$mailbutton = flexicontent_html::mailbutton( FLEXI_ITEMVIEW, $this->params, $item->categoryslug, $item->slug, 0, $item );
+		$printbutton = flexicontent_html::printbutton( $this->print_link, $this->params );
+		$editbutton = flexicontent_html::editbutton( $item, $this->params );
+		$statebutton = flexicontent_html::statebutton( $item, $this->params );
+		$approvalbutton = flexicontent_html::approvalbutton( $item, $this->params );
+		?>
+		
+		<?php if ($pdfbutton || $mailbutton || $printbutton || $editbutton || $statebutton || $approvalbutton) : ?>
 		<!-- BOF buttons -->
 		<div class="buttons">
 			<?php echo $pdfbutton; ?>
@@ -94,6 +105,7 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 			<?php echo $approvalbutton; ?>
 		</div>
 		<!-- EOF buttons -->
+		<?php endif; ?>
 	<?php endif; ?>
 	
 	<?php if ( $this->params->get( 'show_page_heading', 1 ) ) : ?>

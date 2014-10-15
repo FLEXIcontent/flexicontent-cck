@@ -55,7 +55,7 @@
 				<option value="0">FLEXI_NO</option>
 			</field-->
 			
-			<field name="" type="separator" default="" level="level2" />
+			<field name="" type="separator" default="Voice Controls" level="level2" />
 			<field name="display_voice" type="radio" default="1" label="FLEXI_FIELD_TOOLBAR_VOICE" description="FLEXI_FIELD_TOOLBAR_VOICE_DESC">
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO</option>
