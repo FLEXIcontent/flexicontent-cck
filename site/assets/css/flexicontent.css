@@ -9,7 +9,7 @@
  ******************************************/
 #flexicontent {}
 
-.fcclear, .clear,
+.fcclear,
 #flexicontent .fcclear, 
 #flexicontent .clear {
 	border: 0;
@@ -456,23 +456,23 @@ fieldset.fc_filter_set {
 	height: 16px !important;
 	border: 0px solid !important;
 	padding: 0px !important;
-	margin: 0px 0px 10px 2px !important;
+	margin: 0px 0px 0px 2px !important;
 	display: inline-block !important;
-	vertical-align: bottom !important;
+	vertical-align: middle !important;
 }
 
 /* displayed in date picker */
-#flexicontent .fc_filter_html .input-append,
-#flexicontent .fc_filter_html .input-prepend {
+.fc_filter_html .input-append,
+.fc_filter_html .input-prepend {
 	margin:0px 4px 0px 0px !important;
 }
-#flexicontent .fc_filter_html .input-append button,
-#flexicontent .fc_filter_html .input-prepend button {
+.fc_filter_html .input-append button,
+.fc_filter_html .input-prepend button {
 	margin-top:6px !important;
 }
-#flexicontent .fc_filter_html .input-append button.btn,
-#flexicontent .fc_filter_html .input-prepend button.btn {
-	margin-top:2px !important;
+.fc_filter_html .input-append button.btn,
+.fc_filter_html .input-prepend button.btn {
+	margin-top:3px !important;
 }
 
 /* removing filter choices */
@@ -493,20 +493,20 @@ fieldset.fc_filter_set {
 	display: inline-block;
 	float: left;
 	white-space: normal;
-	border: 1px solid lightgray;
+	border: 0px solid lightgray;
 	border-radius: 2px;
 }
 .fc_filter {
 	clear: none;
-	margin: 0px 6px 6px 0px;
+	margin: 0px 2px 2px 0px;
 	padding: 1px 0% 1px 0%;
 	width: auto;
 	position: relative;
 }
 .fc_filter_line {
 	clear: both;
-	margin: 0px 0% 2px 0%;
-	padding: 4px 1%;
+	margin: 0px 0% 1px 0%;
+	padding: 0px 1%;
 	width: 98%;
 }
 form > .fc_filter_line {  /* filters placed directly inside form aka outside the filter_box */
@@ -515,7 +515,9 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 }
 
 .fc_filter .fc_filter_tip_inline,
-.fc_filter .fc_filter_label_inline {
+.fc_filter .fc_filter_label_inline,
+.fc_filter_line .fc_filter_tip_inline,
+.fc_filter_line .fc_filter_label_inline {
 	color: #FFFFFF;
 	display: inline-block;
 	font-size: 10.998px;
@@ -528,10 +530,12 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	border-radius: 4px;
 	margin: 0px 2px 2px 4px !important;
 }
-.fc_filter .fc_filter_label_inline {
+.fc_filter .fc_filter_label_inline,
+.fc_filter_line .fc_filter_label_inline {
 	background-color: #555;
 }
-.fc_filter .fc_filter_tip_inline {
+.fc_filter .fc_filter_tip_inline,
+.fc_filter_line .fc_filter_tip_inline {
 	background-color: darkgray;
 }
 
@@ -541,15 +545,15 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	float: left !important;
 	display: inline-block !important;
 	color: white !important;
-  background-color: #555 !important;
-  border-bottom: 1px solid #D0D0D0 !important;
-  border-right: 1px solid #D0D0D0 !important;
-  font-weight: normal !important;
-  font-size: 12px !important;
-  font-family: georgia,arial !important;
-  text-align: right !important;
-  border-radius: 6px !important;
-  text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
+	background-color: #555 !important;
+	border-bottom: 1px solid #D0D0D0 !important;
+	border-right: 1px solid #D0D0D0 !important;
+	font-weight: normal !important;
+	font-size: 12px !important;
+	font-family: georgia,arial !important;
+	text-align: right !important;
+	border-radius: 6px !important;
+	text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
 }
 
 .fc_filter .fc_filter_label {
@@ -557,21 +561,21 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	width: auto !important;
 	max-width: 150px !important;
 	padding: 3px 4px !important;
-  margin: 2px 8px 3px 8px !important;
+	margin: 2px 8px 3px 8px !important;
 }
 .fc_filter_line .fc_filter_label {
 	clear: none;
 	width: 15% !important;
 	max-width: 200px !important;
 	padding: 6px 1% !important;
-	margin: 2px 1% !important;
+	margin: 2px 2px 0px 0px !important;
 	text-align:left !important;
 }
 
 .fc_filter.fc_even,
 .fc_filter_line.fc_even { background: #E0E0E0 !important; display:block !important; }
 .fc_filter.fc_odd,
-.fc_filter_line.fc_odd { background: #EEEEEE !important; !important; display:block !important; }
+.fc_filter_line.fc_odd { background: #EEEEEE !important; display:block !important; }
 
 /* Container of each individual field filter HTML, either compact view (floating with separator element) or per line */
 .fc_filter .fc_filter_html,
@@ -579,11 +583,11 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	display: inline-block;
 	float: left;
 	font-size: 90%;
-  padding: 0px 0% 0px 0% !important;
-  margin: 0px 0% 0px 0% !important;
+	padding: 0px 0% 0px 0% !important;
+	margin: 0px 0% 0px 0% !important;
 }
 .fc_filter_html {  position: relative !important;  }
-.fc_filter .fc_filter_html {  clear: both;  }
+/*.fc_filter .fc_filter_html {  clear: both;  }*/
 .fc_filter_line .fc_filter_html {  clear: none; width: 80% !important;  }
 
 /* Clear filter label from filter html*/
@@ -601,12 +605,12 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 .fc_field_filter label, .flexicontent .fc_field_filter {
 	font-size: 11px !important;
 }
-.fc_text_filter, .flexicontent .fc_text_filter,
-.fc_field_filter, .flexicontent .fc_field_filter {
+.fc_filter_html .fc_text_filter,
+.fc_filter_html .fc_field_filter {
 	color: black !important;
 	font-size: 11px !important;
 	font-weight: normal !important;
-	display: inline-block;
+	display: inline-block !important;
 	padding: 2px 0px 2px 4px !important;
 	margin: 2px 0px 2px 4px !important;
 	border-radius: 5px !important;
@@ -614,10 +618,10 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	-webkit-border-radius: 5px !important;
 	width: auto !important;
 }
-.flexicontent input.fc_text_filter,
-.flexicontent input.fc_field_filter,
-input.fc_text_filter,  input.fc_text_filter:focus,
-input.fc_field_filter, input.fc_field_filter:focus {
+.fc_filter_html input.fc_text_filter,
+.fc_filter_html input.fc_field_filter,
+.fc_filter_html input.fc_text_filter:focus,
+.fc_filter_html input.fc_field_filter:focus {
 	height: 14px !important;
 	padding: 6px 26px 7px 4px !important;
 	margin: 3px 4px 4px 8px !important;
@@ -631,12 +635,12 @@ input.fc_field_filter, input.fc_field_filter:focus {
 	min-width: 120px !important;
 }
 /* enlarge field in views ... (non-module) */
-#flexicontent input.fc_text_filter:not(.fc_iscalendar),  #flexicontent input.fc_text_filter:not(.fc_iscalendar):focus,
-#flexicontent input.fc_field_filter:not(.fc_iscalendar), #flexicontent input.fc_field_filter:not(.fc_iscalendar):focus {
+input.fc_text_filter:not(.fc_iscalendar),  input.fc_text_filter:not(.fc_iscalendar):focus,
+input.fc_field_filter:not(.fc_iscalendar), input.fc_field_filter:not(.fc_iscalendar):focus {
 	min-width: 180px !important;
 }
-#flexicontent input.fc_text_filter.fc_iscalendar,
-#flexicontent input.fc_field_filter.fc_iscalendar {
+input.fc_text_filter.fc_iscalendar,
+input.fc_field_filter.fc_iscalendar {
 	min-width: 60px !important;
 }
 
@@ -734,9 +738,10 @@ ul.fc_field_filter.fc_checkradio_group label {
 #fc_alpha .fc_alpha_index {
 	background: #efefef;
 	border: 1px solid #c0c0c0;
+	border-radius: 6px;
 	float: left;
 	margin-right: 2px;
-	padding: 1px 2px;
+	padding: 6px;
 	position: relative;
 	right: 50%;
 	text-decoration: none;
@@ -785,7 +790,7 @@ ul.fc_field_filter.fc_checkradio_group label {
 #flexicontent .item_total .fc_item_total_data {
 	display:inline-block;
 	float:left;
-	padding: 8px 0px;
+	padding: 8px 0px 5px;
 }
 
 #flexicontent .item_total .flexi.item_total_label {
@@ -814,6 +819,8 @@ ul.fc_field_filter.fc_checkradio_group label {
 #flexicontent .item_total .fc_orderby_label {
 	display:inline-block;
 	float:left;
+	margin-top:4px;
+	margin-bottom:4px;
 }
 
 #flexicontent .item_total .fc_pages_counter {
@@ -1598,7 +1605,7 @@ div.fancybox-wrap a { background: none!important;}
 	/*float: left !important;*/
 	/*width: 79%;*/
 	padding: 0px !important;
-	margin: 3px 0% 3px 0% !important;
+	margin: 2px 0% 2px 0% !important;
 }
 
 
