@@ -633,6 +633,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	background: url(../images/magnifier-left.png) 96% 4px no-repeat white;
 	opacity: 0.5; filter:alpha(opacity=50);
 	min-width: 120px !important;
+	vertical-align: middle;
 }
 /* enlarge field in views ... (non-module) */
 input.fc_text_filter:not(.fc_iscalendar),  input.fc_text_filter:not(.fc_iscalendar):focus,

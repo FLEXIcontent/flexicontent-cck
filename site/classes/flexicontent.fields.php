@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 1.5 stable $Id: flexicontent.fields.php 1971 2014-09-25 00:39:06Z ggppdk $
+ * @version 1.5 stable $Id: flexicontent.fields.php 1990 2014-10-14 02:17:49Z ggppdk $
  * @package Joomla
  * @subpackage FLEXIcontent
  * @copyright (C) 2009 Emmanuel Danan - www.vistamedia.fr
@@ -88,7 +88,7 @@ class FlexicontentFields
 				FlexicontentFields::getFieldDisplay($items, $field_name, $values=null, $method, $view);
 				// Add to return array
 				foreach ($items as $item) {
-					$return[$item->id][$field_name] = $item->fields[$field_name]->display;
+					$return[$item->id][$field_name] = $item->fields[$field_name]->$method;
 				}
 			}
 		}
