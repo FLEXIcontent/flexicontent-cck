@@ -462,12 +462,12 @@ class ParentClassItem extends JModelAdmin
 						
 						// HANDLE J1.6+ ancestor category being unpublished, when badcats.id is not null,
 						// then the item is inside in an unpublished ancestor category, thus inaccessible
-						$query->select('CASE WHEN badcats.id is null THEN 1 ELSE 0 END AS ancestor_cats_published');
+						/*$query->select('CASE WHEN badcats.id is null THEN 1 ELSE 0 END AS ancestor_cats_published');
 						$subquery = ' (SELECT cat.id as id FROM #__categories AS cat JOIN #__categories AS parent ';
 						$subquery .= 'ON cat.lft BETWEEN parent.lft AND parent.rgt ';
 						$subquery .= 'WHERE parent.extension = ' . $db->Quote('com_content');
 						$subquery .= ' AND parent.published <= 0 GROUP BY cat.id)';
-						$query->join('LEFT', $subquery . ' AS badcats ON badcats.id = c.id');
+						$query->join('LEFT', $subquery . ' AS badcats ON badcats.id = c.id');*/
 						
 						if ($version) {
 							// NOTE: version_id is used by field helper file to load the specified version, the reason for left join here is to verify that the version exists

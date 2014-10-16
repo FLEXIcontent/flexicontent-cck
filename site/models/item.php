@@ -134,6 +134,11 @@ class FlexicontentModelItem extends ParentClassItem
 			{
 				// cid is set, check state of current item category only
 				// NOTE:  J1.6+ all ancestor categories from current one to the root, for J1.5 only the current one ($cid)
+				if ( FLEXI_J16GE && !isset($this->_item->ancestor_cats_published) ) {
+					$ancestor_cats_published = true;
+					foreach($globalcats[$cid]->ancestorsarray as $pcid)    $ancestor_cats_published = $ancestor_cats_published && ($globalcats[$pcid]->published==1);
+					$this->_item->ancestor_cats_published = $ancestor_cats_published;
+				}
 				$cats_are_published = FLEXI_J16GE ? $this->_item->ancestor_cats_published : $this->_item->catpublished;
 				$cats_np_err_mssg = JText::sprintf('FLEXI_CONTENT_UNAVAILABLE_ITEM_CURRCAT_UNPUBLISHED', $cid);
 			}
@@ -145,7 +150,7 @@ class FlexicontentModelItem extends ParentClassItem
 				foreach ($itemcats as $catid) {
 					$cats_are_published |= $globalcats[$catid]->published;
 					if (FLEXI_J16GE) {  // For J1.6+ check all ancestor categories from current one to the root
-						foreach($globalcats[$catid]->ancestorsarray as $pcid)    $cats_are_published |= $globalcats[$pcid]->published;
+						foreach($globalcats[$catid]->ancestorsarray as $pcid)    $cats_are_published = $cats_are_published && ($globalcats[$pcid]->published==1);
 					}
 				}
 				$cats_np_err_mssg = JText::_('FLEXI_CONTENT_UNAVAILABLE_ITEM_ALLCATS_UNPUBLISHED');
