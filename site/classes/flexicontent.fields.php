@@ -344,8 +344,10 @@ class FlexicontentFields
 	static function &getFieldDisplay(&$item_arr, $fieldname, $single_item_vals=null, $method='display', $view = FLEXI_ITEMVIEW)
 	{
 		// 1. Convert to array of items if not an array already
-		if ( empty($item_arr) )
-			return __FUNCTION__."(): empty item data given";
+		if ( empty($item_arr) ) {
+			$err_msg = __FUNCTION__."(): empty item data given";
+			return $err_msg;
+		}
 		else if ( !is_array($item_arr) ) 
 			$items = array( & $item_arr );
 		else

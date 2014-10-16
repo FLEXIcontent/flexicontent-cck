@@ -505,15 +505,34 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/select2';
+				$framework_folder = JPATH_SITE .DS.'components'.DS.'com_flexicontent'.DS.'librairies'.DS.'select2';
 				$document->addScript($framework_path.'/select2.min.js');
 				$document->addStyleSheet($framework_path.'/select2.css');
+				
+				$user_lang = flexicontent_html::getUserCurrentLang();
+				if ( $user_lang && $user_lang!='en' )
+				{
+					// Try language shortcode
+					$framework_folder.DS.'select2_locale_'.$user_lang.'.js';
+					if ( file_exists($framework_folder.DS.'select2_locale_'.$user_lang.'.js') ) {
+						$document->addScript($framework_path.'/select2_locale_'.$user_lang.'.js');
+					}
+					// Try coutry language code
+					else {
+						$languages = FLEXIUtilities::getLanguages($hash='shortcode');
+						$lang_code = isset($languages->$user_lang->code) ? $languages->$user_lang->code : false;
+						if ( $lang_code && file_exists($framework_folder.'/select2_locale_'.$lang_code.'.js') ) {
+							$document->addScript($framework_path.'/select2_locale_'.$lang_code.'.js');
+						}
+					}
+				}
 				
 				$js .= "
 					jQuery(document).ready(function() {
 						
 						"/* Attach select2 to specific to select elements having specific CSS class, show selected values as both: unselectable and disabled */."
 						jQuery('select.use_select2_lib').select2({
-							hideSelectionFromResult: function(selectedObject) { selectedObject.removeClass('select2-result-selectable').addClass('select2-result-unselectable').addClass('select2-disabled'); return false;/*return undefined;*/ }
+							/*hideSelectionFromResult: function(selectedObject) { selectedObject.removeClass('select2-result-selectable').addClass('select2-result-unselectable').addClass('select2-disabled'); return false; }*/
 						});
 						
 						jQuery('div.use_select2_lib').each(function() {
@@ -559,7 +578,7 @@ class flexicontent_html
 						});
 						
 						"/* MULTI-SELECT2: */."
-						jQuery('select.use_select2_lib').on('open', function() {
+						jQuery('select.use_select2_lib').on('select2-open', function() {
 							"/* Add events to handle focusing the text filter box (hide inner label) */."
 							var el_container = jQuery(this).parent();
 							var el = jQuery(this).parent().find('.select2-input');
@@ -573,7 +592,7 @@ class flexicontent_html
 								var els = jQuery('#select2-drop').find('.select2-selected');
 								els.addClass('select2-selected-highlight').addClass('select2-disabled').removeClass('select2-selected').removeClass('select2-result-selectable');
 							}
-						}).on('close', function() {
+						}).on('select2-close', function() {
 							"/* Add events to handle bluring the text filter box (show inner label) */."
 							var el_container = jQuery(this).parent();
 							var el = jQuery(this).parent().find('.select2-input');
