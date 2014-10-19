@@ -226,7 +226,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 	function getItemThumbs(&$params, &$items, $uprefix='item', $rprefix='nav')
 	{
 		if ( !$params->get($uprefix.'_use_image', 1) ) return array();
-		//if ( empty($items) ) return array();
+		if ( empty($items) ) return array();
 		
 		if ( $params->get($uprefix.'_image') ) {
 			$img_size_map   = array('l'=>'large', 'm'=>'medium', 's'=>'small', 'o'=>'original');
