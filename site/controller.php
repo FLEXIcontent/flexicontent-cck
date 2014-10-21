@@ -988,10 +988,15 @@ class FlexicontentController extends JControllerLegacy
 				// IF urlparams are empty then use the FULL URL request array (_GET)
 				if (empty($urlparams)) {
 					$safeurlparams = array();
+					// Add menu URL variables
+					$menu = JFactory::getApplication()->getMenu()->getActive();
+					if ($menu) foreach($menu->query as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
+					// Add any existing URL variables (=submitted via GET),  ... we only need variable names, (so can use them unfiltered)
 					foreach($_GET as $_varname => $_ignore) $safeurlparams[$_varname] = 'STRING';
 				} else {
 					$safeurlparams = & $urlparams;
 				}
+				//echo (int)$cachable." - "; print_r($safeurlparams);
 				
 				parent::display($cachable, $safeurlparams);
 			}
