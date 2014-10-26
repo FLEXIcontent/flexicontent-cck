@@ -1681,6 +1681,9 @@ class ParentClassItem extends JModelAdmin
 			}
 		}
 		
+		// trim title
+		$data['title'] = trim($data['title']);
+		
 		// Set back the altered categories and tags to the form data
 		$data['categories']  = $cats;  // Set it to real name of field: 'categories' INSTEAD OF 'cid'
 		$data['tags']        = $tags;  // Set it to real name of field: 'tags'       INSTEAD OF 'tag'
