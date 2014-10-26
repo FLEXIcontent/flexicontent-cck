@@ -346,7 +346,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 				$document->addStyleDeclaration($css);
 
-				$otheroptions .= ($otheroptions?','.$otheroptions:'');
+				$otheroptions = ($otheroptions?','.$otheroptions:'');
 				$js = "
 			  	window.addEvent('domready',function(){
 					var options = {
