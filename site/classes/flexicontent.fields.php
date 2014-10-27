@@ -2629,6 +2629,7 @@ class FlexicontentFields
 		
 		if ($faceted_filter || !$indexed_elements) {
 			$_results = FlexicontentFields::getFilterValues($filter, $view_join, $view_where, $filters_where);
+			//echo "<pre>". $filter->label.": ". print_r($_results, true) ."\n\n</pre>";
 		}
 		
 		// Support of value-indexed fields
@@ -2639,6 +2640,7 @@ class FlexicontentFields
 			
 			// Limit indexed element according to DB results found
 			$results = array_intersect_key($indexed_elements, $_results);
+			//echo "<pre>". $filter->label.": ". print_r($results, true) ."\n\n</pre>";
 			if ($faceted_filter==2 && $show_matches) foreach ($results as $i => $result) {
 				$result->found = $_results[$i]->found;
 			}
@@ -2688,12 +2690,30 @@ class FlexicontentFields
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
 		
-		//$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
-		//$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
+		$show_matching_items = $filter->parameters->get( 'show_matching_items_s', 1 );
+		$show_matches = $filter_as_range || !$faceted_filter ?  0  :  $show_matching_items;
 		
 		$filter->filter_isindexed = (boolean) $indexed_elements; 
-		$_results = FlexicontentFields::getFilterValuesSearch($filter, $view_join, $view_where, $filters_where);
-		$results = & $_results;
+		if ($faceted_filter || !$indexed_elements) {
+			$_results = FlexicontentFields::getFilterValuesSearch($filter, $view_join, $view_where, $filters_where);
+			//echo "<pre>". $filter->label.": ". print_r($_results, true) ."\n\n</pre>";
+		}
+		
+		// Support of value-indexed fields
+		if ( !$faceted_filter && $indexed_elements) {
+			$results = & $indexed_elements;
+		} else 
+		if ( $indexed_elements && is_array($indexed_elements) ) {
+			
+			// Limit indexed element according to DB results found
+			$results = array_intersect_key($indexed_elements, $_results);
+			//echo "<pre>". $filter->label.": ". print_r($indexed_elements, true) ."\n\n</pre>";
+			if ($faceted_filter==2 && $show_matches) foreach ($results as $i => $result) {
+				$result->found = $_results[$i]->found;
+			}
+		} else {
+			$results = & $_results;
+		}
 		
 		// Language filter labels
 		if ($lang_filter_values) {
@@ -2926,7 +2946,7 @@ class FlexicontentFields
 		}
 		
 		$db->setQuery($query);
-		$results = $db->loadObjectList('text');
+		$results = $db->loadObjectList('value');
 		//echo "<br/>". count($results) ."<br/>";
 		//echo nl2br($query) ."<br/><br/>";
 		
