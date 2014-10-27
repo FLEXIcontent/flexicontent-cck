@@ -139,7 +139,7 @@ $r = 0;
 					$text_search_class .= $search_autocomplete ? ($search_autocomplete==2 ? ' fc_index_complete_tlike '.$_ac_index : ' fc_index_complete_simple '.$_ac_index.' fc_label_internal') : ' fc_label_internal';
 					$text_search_label = JText::_($show_search_label==2 ? 'FLEXI_TEXT_SEARCH' : 'FLEXI_TYPE_TO_LIST');
 					?>
-					<span class="fc_filter">
+					<span class="fc_filter_html">
 						<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
 							data-fc_label_text="<?php echo $text_search_label; ?>" name="searchword" size="30" maxlength="120" 
 							id="search_searchword" value="<?php echo $this->escape($this->searchword);?>" />

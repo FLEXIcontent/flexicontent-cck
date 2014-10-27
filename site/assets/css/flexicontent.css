@@ -586,7 +586,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	padding: 0px 0% 0px 0% !important;
 	margin: 0px 0% 0px 0% !important;
 }
-.fc_filter_html {  position: relative !important;  }
+.fc_filter_html {  position: relative !important; display: inline-block !important;  }
 /*.fc_filter .fc_filter_html {  clear: both;  }*/
 .fc_filter_line .fc_filter_html {  clear: none; width: 80% !important;  }
 
