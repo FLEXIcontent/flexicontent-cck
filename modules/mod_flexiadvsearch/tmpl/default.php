@@ -34,7 +34,7 @@ $search_autocomplete = $params->get( 'search_autocomplete', 1 );
 	<div class="search<?php echo $params->get('moduleclass_sfx') ?>">
 		<input name="option" type="hidden" value="com_flexicontent" />
 		<input name="view" type="hidden" value="search" />
-		<span class="fc_filter fc_text_search">
+		<span class="fc_filter_html fc_text_search">
 		<?php
 		//$output = '<input name="searchword" id="mod_search_searchword-'.$module->id.'" maxlength="'.$maxlength.'" alt="'.$button_text.'" class="fc_field_filter inputbox" type="text" size="'.$width.'" value="'.$text.'"  onblur="if(this.value==\'\') this.value=\''.$text.'\';" onfocus="if(this.value==\''.$text.'\') this.value=\'\';" />';
 		
