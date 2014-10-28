@@ -73,8 +73,11 @@ abstract class FlexicontentHelperAssociation extends CategoryHelperAssociation
 	public static function getTranslations($item_id)
 	{
 		$db = JFactory::getDBO();
-		$query = "SELECT i.id, CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(':', i.id, i.alias) ELSE i.id END as catid, i.language, ie.type_id"
+		$query = "SELECT i.language, ie.type_id, "
+		. "   CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(':', i.id, i.alias) ELSE i.id END as id, "
+		. "   CASE WHEN CHAR_LENGTH(c.alias) THEN CONCAT_WS(':', c.id, c.alias) ELSE c.id END as catid "
 		. " FROM #__content AS i "
+		. " LEFT JOIN #__categories AS c ON c.id = i.catid "
 		. " LEFT JOIN #__flexicontent_items_ext AS ie ON ie.item_id = i.id "
 		. " WHERE "
 		. " ie.lang_parent_id = (SELECT lang_parent_id FROM #__flexicontent_items_ext WHERE item_id=".(int) $item_id.")";
