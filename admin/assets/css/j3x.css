@@ -68,6 +68,8 @@
 .icon-import:before     { content: "\e022"; color: darkorange; }
 .icon-32-restore:before { content: "\6c"; }
 
+.icon-translate:before {
+	content: "\25";}
 /**************
  * Small labels
  **************/
