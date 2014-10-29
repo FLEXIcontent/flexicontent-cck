@@ -171,7 +171,7 @@ class flexicontent_html
 	 * @return 	string  : the HTML of the item view, also the CSS / JS file would have been loaded
 	 * @since 1.5
 	 */
-	function renderItem($item_id, $view=FLEXI_ITEMVIEW) {
+	function renderItem($item_id, $view=FLEXI_ITEMVIEW, $ilayout='') {
 		require_once (JPATH_ADMINISTRATOR.DS.'components/com_flexicontent/defineconstants.php');
 		JTable::addIncludePath(JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'tables');
 		require_once("components/com_flexicontent/classes/flexicontent.fields.php");
@@ -186,9 +186,13 @@ class flexicontent_html
 
 		$aid = FLEXI_J16GE ? JAccess::getAuthorisedViewLevels($user->id) : (int) $user->get('aid');
 		list($item) = FlexicontentFields::getFields($item, $view, $item->parameters, $aid);
-
-		$ilayout = $item->parameters->get('ilayout', '');
-		if ($ilayout==='') {
+		
+		// Get Item's specific ilayout
+		if ($ilayout=='') {
+			$ilayout = $item->parameters->get('ilayout', '');
+		}
+		// Get type's ilayout
+		if ($ilayout=='') {
 			$type = JTable::getInstance('flexicontent_types', '');
 			$type->id = $item->type_id;
 			$type->load();
@@ -202,6 +206,7 @@ class flexicontent_html
 		$this->tmpl = '.item.'.$ilayout;
 		$this->print_link = JRoute::_('index.php?view='.FLEXI_ITEMVIEW.'&id='.$item->slug.'&pop=1&tmpl=component');
 		$this->pageclass_sfx = '';
+		if (!isset($this->item->event)) $this->item->event = new stdClass();
 		$this->item->event->beforeDisplayContent = '';
 		$this->item->event->afterDisplayTitle = '';
 		$this->item->event->afterDisplayContent = '';

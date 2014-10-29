@@ -1543,13 +1543,6 @@ class ParentClassItem extends JModelAdmin
 	 */
 	function store($data)
 	{
-		// Check for request forgeries
-		if ( !JFactory::getApplication()->isAdmin() ) {
-			// For flexible usage, e.g. when it is called by the new IMPORT TASK
-			JRequest::checkToken() or jexit( 'Invalid Token' );
-		}
-		
-		
 		// ****************************
 		// Initialize various variables
 		// ****************************

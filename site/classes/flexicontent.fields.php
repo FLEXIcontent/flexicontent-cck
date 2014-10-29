@@ -50,8 +50,8 @@ class FlexicontentFields
 		// Get item data, needed for rendering fields
 		$db = JFactory::getDBO();
 		
-		$item_ids = array_unique(array_map('intval', $item_ids));
-		$item_ids_list = implode("," , $item_ids) ;
+		$unique_item_ids = array_unique(array_map('intval', $item_ids));
+		$item_ids_list = implode("," , $unique_item_ids) ;
 		
 		$query = 'SELECT i.id, i.*, ie.*, '
 			. ' CASE WHEN CHAR_LENGTH(i.alias) THEN CONCAT_WS(\':\', i.id, i.alias) ELSE i.id END as slug,'
@@ -80,7 +80,7 @@ class FlexicontentFields
 				$_item = & $_item_id_map[$item_ids[$i]];
 				FlexicontentFields::getFieldDisplay($_item, $field_name, $values=null, $method, $view);
 				// Add to return array
-				$return[$_item->id][$field_name] = $_item->fields[$field_name]->$method;
+				$return[$_item->id][$field_name][$method] = $_item->fields[$field_name]->$method;
 			}
 			else
 			{
@@ -88,7 +88,7 @@ class FlexicontentFields
 				FlexicontentFields::getFieldDisplay($items, $field_name, $values=null, $method, $view);
 				// Add to return array
 				foreach ($items as $item) {
-					$return[$item->id][$field_name] = $item->fields[$field_name]->$method;
+					$return[$item->id][$field_name][$method] = $item->fields[$field_name]->$method;
 				}
 			}
 		}
