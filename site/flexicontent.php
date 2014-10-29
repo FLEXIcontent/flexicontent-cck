@@ -359,8 +359,8 @@ if ( $print_logging_info && JRequest::getWord('tmpl')!='component' && JRequest::
 	if (isset($fc_run_times['auto_checkin_auto_state']))
 		$msg = sprintf('** [Flexisystem PLG: Auto Checkin/Auto state(e.g. archive): %.2f s] ', $fc_run_times['auto_checkin_auto_state']/1000000) .'<br/>'.$msg.'<br/>';
 	
-	if (isset($fc_run_times['global_field_replacements']))
-		$msg = sprintf('** [Flexisystem PLG: Replace Field Times: %.2f s] ', $fc_run_times['global_field_replacements']/1000000) .'<br/>'.$msg.'<br/>';
+	if (isset($fc_run_times['global_replacements']))
+		$msg = sprintf('** [Flexisystem PLG: Replace Field/Items/etc Times Times: %.2f s] ', $fc_run_times['global_replacements']/1000000) .'<br/>'.$msg.'<br/>';
 	
 	global $fc_performance_msg;
 	$fc_performance_msg .= $msg . '<div class="fcclear"></div>';
