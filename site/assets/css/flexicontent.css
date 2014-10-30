@@ -645,6 +645,12 @@ input.fc_field_filter.fc_iscalendar {
 	min-width: 60px !important;
 }
 
+label.fc_filter_val { }
+.fc_filter_val_lbl { }
+.fc_filter_val_img:after { content: '\A'; white-space: pre; }
+.fc_filter_val_img > img { margin:2px 12px 2px 4px; vertical-align:top; }
+label.fc_filter_val + .fc_filter_val_img > img { margin-left:-24px; }
+
 
 form.fc_instant_filter { display: block; margin: 0px !important; padding: 0px !important; position: relative !important; }
 select.fc_field_filter { margin: 2px 2px 2px 2px !important; }

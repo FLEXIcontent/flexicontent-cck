@@ -2285,6 +2285,7 @@ class FlexicontentFields
 		$faceted_filter = $filter->parameters->get( 'faceted_filter'.$_s, 2);
 		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
+		$filter_vals_display = $filter->parameters->get( 'filter_vals_display'.$_s, 0 );
 		
 		$require_all = !in_array( $display_filter_as, array(1,2,3) ) ? $filter->parameters->get( 'filter_values_require_all', 0 ) : 0;
 		$combine_tip = $filter->parameters->get( 'filter_values_require_all_tip', 0 );
@@ -2535,6 +2536,8 @@ class FlexicontentFields
 				$checked_class .= $faceted_filter==2 && !$result->found ? ' fcdisabled ' : '';
 				$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
 				$filter->html .= '<li class="fc_checkradio_option'.$checked_class_li.'" style="'.$value_style.'">';
+				if ($filter_vals_display == 2)
+					$filter->html .= "<span class='fc_filter_val_img'><img onclick=\"jQuery(this).closest('li').find('input').click();\" src='" .$result->image_url. "' /></span>";
 				if ($display_filter_as==4) {
 					$filter->html .= ' <input href="javascript:;" onchange="fc_toggleClassGrp(this, \'fc_highlight\');" ';
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
@@ -2544,9 +2547,12 @@ class FlexicontentFields
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'['.$i.']" ';
 					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 				}
-				$filter->html .= '<label class="'.$checked_class.'" for="'.$filter_ffid.$i.'">';
-				$filter->html .= $result->text;
+				$filter->html .= '<label class="fc_filter_val '.$checked_class.'" for="'.$filter_ffid.$i.'">';
+				if ($filter_vals_display == 0 || $filter_vals_display == 2)
+					$filter->html .= "<span class='fc_filter_val_lbl'>" .$result->text. "</span>";
 				$filter->html .= '</label>';
+				if ($filter_vals_display == 1)
+					$filter->html .= "<span class='fc_filter_val_img'><img onclick=\"jQuery(this).closest('li').find('input').click();\" src='" .$result->image_url. "' /></span>";
 				$filter->html .= '</li>';
 				$i++;
 			}
