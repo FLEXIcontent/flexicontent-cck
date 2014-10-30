@@ -363,7 +363,7 @@ class plgFlexicontent_fieldsCore extends JPlugin
 		$indexed_elements = in_array($filter->field_type, array('tags', 'createdby', 'modifiedby', 'created', 'modified', 'type'));
 		
 		if ($filter->field_type == 'categories' || $filter->field_type == 'title') {
-			plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName);
+			plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 		} else {
 			FlexicontentFields::createFilter($filter, $value, $formName, $indexed_elements);
 		}
@@ -371,19 +371,20 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	
 	
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 		if($filter->iscore != 1) return; // performance check
 		
 		$db = JFactory::getDBO();
 		$formfieldname = 'filter_'.$filter->id;
 		
-		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
+		$_s = $isSearchView ? '_s' : '';
+		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
 		$disable_keyboardinput = $filter->parameters->get('disable_keyboardinput', 0);
-		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
+		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
 		// Create first prompt option of drop-down select
-		$label_filter = $filter->parameters->get( 'display_label_filter', 2 ) ;
+		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 2 ) ;
 		$first_option_txt = $label_filter==2 ? $filter->label : JText::_('FLEXI_ALL');
 		
 		// Prepend Field's Label to filter HTML

@@ -67,9 +67,8 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$js_popup_err	= $field->parameters->get( 'js_popup_err', 0 ) ;
 		
 		// image specific variables
-		$prefix   = JFactory::getApplication()->isAdmin() ? '../':'';
 		$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
-		$imgpath  = $prefix . $imagedir;
+		$imgpath  = JURI::root(true) .'/'. $imagedir;
 		
 		// when field is displayed as drop-down select (item edit form only)
 		$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
@@ -222,9 +221,8 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		$text_or_value= $field->parameters->get( 'text_or_value', 2 ) ;
 		
 		// image specific variables
-		$prefix   = JFactory::getApplication()->isAdmin() ? '../':'';
 		$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
-		$imgpath  = $prefix . $imagedir;
+		$imgpath  = JURI::root(true) .'/'. $imagedir;
 		
 		switch($separatorf)
 		{
@@ -376,20 +374,32 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		self::onDisplayFilter($filter, $value, $formName, $elements=true);
+		self::onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 	}
 	
 	
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
-
 		
 		// Get indexed element values
 		$item_pros = false;
 		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, self::$extra_props, $item_pros, $create_filter=true);
+		
+		$_s = $isSearchView ? '_s' : '';
+		$filter_vals_display = $filter->parameters->get( 'filter_vals_display'.$_s, 0 );
+		$filter_as_images = in_array($filter_vals_display, array(1,2)) ;
+		if ($filter_as_images && $elements)
+		{
+			// image specific variables
+			$imagedir = preg_replace('#^(/)*#', '', $filter->parameters->get( 'imagedir' ) );
+			$imgpath  = JURI::root(true) .'/'. $imagedir;
+			foreach($elements as $element) {
+				$element->image_url = $imgpath . $element->image;
+			}
+		}
 		
 		// Check for error during getting indexed field elements
 		if ( !$elements ) {

@@ -68,7 +68,7 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 		
 		//$indexed_elements = in_array($props_type, array('language'));
 		
-		$this->onDisplayFilter($filter, $value, $formName);
+		$this->onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 		//if ($props_type =='...') {
 		//	plgFlexicontent_fieldsCore::onDisplayFilter($filter, $value, $formName);
 		//} else {
@@ -80,18 +80,19 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 	
 
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		$db = JFactory::getDBO();
 		$formfieldname = 'filter_'.$filter->id;
 		
-		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
-		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
+		$_s = $isSearchView ? '_s' : '';
+		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
+		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
 		// Create first prompt option of drop-down select
-		$label_filter = $filter->parameters->get( 'display_label_filter', 2 ) ;
+		$label_filter = $filter->parameters->get( 'display_label_filter'.$_s, 2 ) ;
 		$first_option_txt = $label_filter==2 ? $filter->label : JText::_('FLEXI_ALL');
 		
 		// Prepend Field's Label to filter HTML

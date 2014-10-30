@@ -168,6 +168,11 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
+			<field name="filter_vals_display" type="radio" default="0" label="FLEXI_FILTER_VALS_DISPLAY" description="FLEXI_FILTER_VALS_DISPLAY_DESC">
+				<option value="0">FLEXI_LABEL</option>
+				<option value="1">FLEXI_IMAGE</option>
+				<option value="2">FLEXI_BOTH</option>
+			</field>
 			<field name="faceted_filter" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>
 				<option value="1">FLEXI_FS_PAGE_CONFIGURATION</option>
@@ -198,6 +203,11 @@
 				<option value="4">FLEXI_DISPLAY_AS_RADIO</option>
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
+			</field>
+			<field name="filter_vals_display_s" type="radio" default="0" label="FLEXI_FILTER_VALS_DISPLAY" description="FLEXI_FILTER_VALS_DISPLAY_DESC">
+				<option value="0">FLEXI_LABEL</option>
+				<option value="1">FLEXI_IMAGE</option>
+				<option value="2">FLEXI_BOTH</option>
 			</field>
 			<field name="faceted_filter_s" type="list" default="2" label="FLEXI_FILTER_FACETED_FILTER_USING" description="FLEXI_FILTER_FACETED_FILTER_USING_DESC">
 				<option value="0">FLEXI_FS_NONE</option>

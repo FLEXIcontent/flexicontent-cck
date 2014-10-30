@@ -536,16 +536,17 @@ class plgFlexicontent_fieldsDate extends JPlugin
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		self::onDisplayFilter($filter, $value, $formName);
+		self::onDisplayFilter($filter, $value, $formName, $isSearchView=1);
 	}
 	
 	
 	// Method to display a category filter for the category view
-	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
+	function onDisplayFilter(&$filter, $value='', $formName='adminForm', $isSearchView=0)
 	{
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		$date_filter_group = $filter->parameters->get('date_filter_group', 'month');
+		$_s = $isSearchView ? '_s' : '';
+		$date_filter_group = $filter->parameters->get('date_filter_group'.$_s, 'month');
 		if ($date_filter_group=='year') { $date_valformat='%Y'; $date_txtformat='%Y'; }
 		else if ($date_filter_group=='month') { $date_valformat='%Y-%m'; $date_txtformat='%Y-%b'; }
 		else { $date_valformat='%Y-%m-%d'; $date_txtformat='%Y-%b-%d'; }
@@ -562,8 +563,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$textcol  = sprintf(' CASE WHEN %s='.$db->Quote($nullDate).' THEN "'.JText::_('FLEXI_NEVER').'" ELSE DATE_FORMAT(%s, "%s") END ', $_value_col, $_value_col, $date_txtformat);
 		}
 		
-		$display_filter_as = $filter->parameters->get( 'display_filter_as', 0 );  // Filter Type of Display
-		$filter_as_range = in_array($display_filter_as, array(2,3,)) ;
+		$display_filter_as = $filter->parameters->get( 'display_filter_as'.$_s, 0 );  // Filter Type of Display
+		$filter_as_range = in_array($display_filter_as, array(2,3)) ;
 		
 		// WARNING: we can not use column alias in from, join, where, group by, can use in having (some DB e.g. mysql) and in order by
 		// partial SQL clauses
