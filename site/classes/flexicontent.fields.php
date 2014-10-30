@@ -2384,6 +2384,7 @@ class FlexicontentFields
 			$update_found = !$use_active_vals && isset($results_active);
 			
 			// Set usage counters
+			$add_usage_counters = $faceted_filter==2 && $show_matches;
 			$results = array();
 			foreach ($results_shown as $i => $result) {
 				$results[$i] = $result;
@@ -2404,10 +2405,11 @@ class FlexicontentFields
 				else ;
 				
 				// Append value usage to value's label
-				if ($faceted_filter==2 && $show_matches && $results[$i]->found)
+				if ($add_usage_counters && $results[$i]->found)
 					$results[$i]->text .= ' ('.$results[$i]->found.')';
 			}
 		} else {
+			$add_usage_counters = false;
 			$faceted_filter = 0; // clear faceted filter flag
 		}
 		
@@ -2527,6 +2529,7 @@ class FlexicontentFields
 				.($combine_tip ? ' <span class="fc_filter_tip_inline">'.JText::_(!$require_all ? 'FLEXI_ANY_OF' : 'FLEXI_ALL_OF').'</span> ' : '')
 				.' </li>';
 			$i++;
+			
 			foreach($results as $result) {
 				if ( !strlen($result->value) ) continue;
 				$checked = ($display_filter_as==5) ? in_array($result->value, $value) : $result->value==$value;
@@ -2536,8 +2539,11 @@ class FlexicontentFields
 				$checked_class .= $faceted_filter==2 && !$result->found ? ' fcdisabled ' : '';
 				$checked_class_li = $checked ? ' fc_checkradio_checked' : '';
 				$filter->html .= '<li class="fc_checkradio_option'.$checked_class_li.'" style="'.$value_style.'">';
+				
+				// *** PLACE image before label (and e.g. (default) above the label)
 				if ($filter_vals_display == 2)
 					$filter->html .= "<span class='fc_filter_val_img'><img onclick=\"jQuery(this).closest('li').find('input').click();\" src='" .$result->image_url. "' /></span>";
+				
 				if ($display_filter_as==4) {
 					$filter->html .= ' <input href="javascript:;" onchange="fc_toggleClassGrp(this, \'fc_highlight\');" ';
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="radio" name="'.$filter_ffname.'" ';
@@ -2547,12 +2553,20 @@ class FlexicontentFields
 					$filter->html .= '  id="'.$filter_ffid.$i.'" type="checkbox" name="'.$filter_ffname.'['.$i.']" ';
 					$filter->html .= '  value="'.$result->value.'" '.$checked_attr.$disable_attr.' class="fc_checkradio" />';
 				}
-				$filter->html .= '<label class="fc_filter_val '.$checked_class.'" for="'.$filter_ffid.$i.'">';
+				
+				$filter->html .= '<label class="fc_filter_val fc_cleared '.$checked_class.'" for="'.$filter_ffid.$i.'">';
 				if ($filter_vals_display == 0 || $filter_vals_display == 2)
 					$filter->html .= "<span class='fc_filter_val_lbl'>" .$result->text. "</span>";
+				else if ($add_usage_counters && $result->found)
+					$filter->html .= "<span class='fc_filter_val_lbl'>(".$result->found.")</span>";
 				$filter->html .= '</label>';
+				
+				// *** PLACE image after label (and e.g. (default) next to the label)
 				if ($filter_vals_display == 1)
-					$filter->html .= "<span class='fc_filter_val_img'><img onclick=\"jQuery(this).closest('li').find('input').click();\" src='" .$result->image_url. "' /></span>";
+					$filter->html .= "<span class='fc_filter_val_img'>"
+					."<img onclick=\"jQuery(this).closest('li').find('input').click();\" src='" .$result->image_url. "' />"
+					."</span>";
+				
 				$filter->html .= '</li>';
 				$i++;
 			}
