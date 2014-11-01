@@ -15,6 +15,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.plugin.plugin');
 jimport('joomla.html.pagination');
+if (!defined('DS'))  define('DS',DIRECTORY_SEPARATOR);
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
 
 /**
  * Page break plugin
@@ -107,7 +109,10 @@ class plgContentFlexiBreak extends JPlugin
 		if ($display_method == 1)
 		{
 			FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-			flexicontent_html::loadFramework('jQuery');
+			if (class_exists('flexicontent_html')) {
+				require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
+				flexicontent_html::loadFramework('jQuery');
+			}
 			if ($this->params->get('plugin_css', 1))
 				$document->addScript($base.'.js');
 		}
