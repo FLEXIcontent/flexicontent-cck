@@ -218,9 +218,9 @@ class flexicontent_html
 		if ( file_exists(JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout) )
 			include JPATH_SITE.DS.'templates'.DS.$app->getTemplate().DS.'html'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'item.php';
 		else if (file_exists(JPATH_COMPONENT.DS.'templates'.DS.$ilayout))
-			include JPATH_COMPONENT.DS.'templates'.DS.$ilayout.DS.'item.php';
+			include JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.$ilayout.DS.'item.php';
 		else
-			include JPATH_COMPONENT.DS.'templates'.DS.'default'.DS.'item.php';
+			include JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'templates'.DS.'default'.DS.'item.php';
 
 		// done with the requested template; get the buffer and clear it.
 		$item_html = ob_get_contents();
@@ -1781,7 +1781,7 @@ class flexicontent_html
 		
 		// Append autorelate information to the URL (if given)
 		if ($auto_relations) foreach ( $auto_relations as $auto_relation ) {
-			$link .= '&autorelation_'.$auto_relation->fieldid.'='.$auto_relation->itemid;
+			$link .= (strstr($link, '?') ? '&' : '?') . 'autorelation_'.$auto_relation->fieldid.'='.$auto_relation->itemid;
 		}
 		
 		
