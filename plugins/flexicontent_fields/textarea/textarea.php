@@ -131,8 +131,9 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$required = '';
 		}
 		$field_value = & $field->value[0];
+		
 		// Convert ampersands, to allow editing of tags inside the textarea, this effects editing and not saving ...
-		$field_value = str_replace('&', '&amp;', $field_value);
+		//$field_value = str_replace('&', '&amp;', $field_value); // no longer needed we will encode textarea value
 		
 		// Try to parse tabs
 		$this->parseTabs($field, $item);
@@ -156,8 +157,14 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 				//display($name, $html, $width, $height, $col, $row, $buttons = true, $params = array())
 				$field->html[0] = FLEXI_J16GE ? 
-					$editor->display( $field->tab_names[0], $field_value, '100%', $height, $cols, $rows, $skip_buttons_arr, $field_idtag.'_0', $_asset_ = null, $_author_ = null, $editor_plg_params) :
-					$editor->display( $field->tab_names[0], $field_value, '100%', $height, $cols, $rows, $skip_buttons_arr, $editor_plg_params);
+					$editor->display(
+						$field->tab_names[0], htmlspecialchars( $field_value, ENT_COMPAT, 'UTF-8' ), '100%', $height, $cols, $rows,
+						$skip_buttons_arr, $field_idtag.'_0', $_asset_ = null, $_author_ = null, $editor_plg_params
+					) :
+					$editor->display(
+						$field->tab_names[0], htmlspecialchars( $field_value, ENT_COMPAT, 'UTF-8' ), '100%', $height, $cols, $rows,
+						$skip_buttons_arr, $editor_plg_params)
+					;
 			}
 			$field->html = $field->html[0];
 		}
@@ -174,8 +181,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				if (!$use_html) {
 					$field->html[$ta_count]	 = '<textarea id="'.$field_idtag.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$ti->beforetabs.'</textarea>'."\n";
 				} else {
-					//$ti->beforetabs = htmlspecialchars( $ti->beforetabs, ENT_NOQUOTES, 'UTF-8' );
-					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $ti->beforetabs, '100%', $height, $cols, $rows, $skip_buttons_arr );
+					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], htmlspecialchars( $ti->beforetabs, ENT_COMPAT, 'UTF-8' ), '100%', $height, $cols, $rows, $skip_buttons_arr );
 				}
 				$ta_count++;
 			}
@@ -203,8 +209,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				if (!$use_html) {
 					$field->html[$ta_count]	 = '<textarea id="'.$field_idtag.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$tab_content.'</textarea>'."\n";
 				} else {
-					//$tab_content = htmlspecialchars( $tab_content, ENT_NOQUOTES, 'UTF-8' );
-					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $tab_content, '100%', $height, $cols, $rows, $skip_buttons_arr );
+					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], htmlspecialchars( $tab_content, ENT_COMPAT, 'UTF-8' ), '100%', $height, $cols, $rows, $skip_buttons_arr );
 				}
 				$ta_count++;
 				
@@ -232,8 +237,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				if (!$use_html) {
 					$field->html[$ta_count]	 = '<textarea id="'.$field_idtag.'_'.$ta_count.'" name="' . $field->tab_names[$ta_count] . '" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'">'.$ti->aftertabs.'</textarea>'."\n";
 				} else {
-					//$ti->aftertabs = htmlspecialchars( $ti->aftertabs, ENT_NOQUOTES, 'UTF-8' );
-					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], $ti->aftertabs, '100%', $height, $cols, $rows, $skip_buttons_arr );
+					$field->html[$ta_count] = $editor->display( $field->tab_names[$ta_count], htmlspecialchars( $ti->aftertabs, ENT_COMPAT, 'UTF-8' ), '100%', $height, $cols, $rows, $skip_buttons_arr );
 				}
 				$ta_count++;
 			}
