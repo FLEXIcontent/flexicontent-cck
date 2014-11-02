@@ -548,7 +548,7 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 			." WHERE 1 " . (!FLEXI_J16GE ? ' AND i.sectionid = ' . (int)FLEXI_SECTION : '')
 			;
 		foreach ($tbl_fields as $col_name) {
-			if ($col_name == "id")
+			if ($col_name == "id" || $col_name == "hits")
 				continue;
 			else if ( (!FLEXI_J16GE && $col_name=='language') || $col_name=='type_id' || $col_name=='lang_parent_id')
 				$query .= " AND ie.`".$col_name."`=ca.`".$col_name."`";
@@ -821,7 +821,10 @@ class FlexicontentModelFlexicontent extends JModelLegacy
 
 								$query = 'INSERT INTO #__flexicontent_templates (`template`, `layout`, `position`, `fields`) VALUES(' . $this->_db->Quote($folder) . ',' . $this->_db->Quote($view) . ',' . $this->_db->Quote($group) . ',' . $this->_db->Quote($field) . ')';
 								$this->_db->setQuery($query);
-								$this->_db->query();
+								// By catching SQL error (e.g. layout configuration of template already exists),
+								// we will allow execution to continue, thus clearing "positions" column in fields table
+								try { $this->_db->query(); } catch (Exception $e) { }
+								if ($this->_db->getErrorNum()) echo $this->_db->getErrorMsg();
 							}
 						}
 					}
