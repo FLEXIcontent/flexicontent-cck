@@ -12,3 +12,7 @@
 	margin:0px;
 	border:0px solid;
 }
+#search_searchword {
+  margin-left: 0 !important;
+  min-width: 150px !important;
+}
