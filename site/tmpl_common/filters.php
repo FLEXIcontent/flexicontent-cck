@@ -7,6 +7,13 @@ $filter_autosubmit = $params->get('filter_autosubmit', 0);
 $filter_instructions = $params->get('filter_instructions', 1);
 $filter_placement = $params->get( 'filter_placement', 1 );
 
+$flexi_button_class_go =  ($params->get('flexi_button_class_go' ,'') != '-1')  ?
+    $params->get('flexi_button_class_go' ,'')   :
+    $params->get('flexi_button_class_go_custom', 'fc_button')  ;
+$flexi_button_class_reset =  ($params->get('flexi_button_class_reset','') != '-1')  ?
+    $params->get('flexi_button_class_reset','')   :
+    $params->get('flexi_button_class_reset_custom', 'fc_button')  ;
+
 $filter_container_class  = $filter_placement ? 'fc_filter_line' : 'fc_filter';
 $filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
 
@@ -97,14 +104,14 @@ if ($filter_instructions == 1) {
 					<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 					<span class="fc_buttons">
 						<?php if ($show_search_go) : ?>
-						<button class="fc_button button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;">
-							<span class="fcbutton_go"><?php echo JText::_( $use_filters ? 'FLEXI_APPLY_FILTERING' : 'FLEXI_GO' ); ?></span>
+						<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;">
+							<span class=""><?php echo JText::_( $use_filters ? 'FLEXI_APPLY_FILTERING' : 'FLEXI_GO' ); ?></span>
 						</button>
 						<?php endif; ?>
 						
 						<?php if ($show_search_reset) : ?>
-						<button class="fc_button button_reset" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 1); return false;">
-							<span class="fcbutton_reset"><?php echo JText::_( $use_filters ? 'FLEXI_REMOVE_FILTERING' : 'FLEXI_RESET' ); ?></span>
+						<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 1); return false;">
+							<span class=""><?php echo JText::_( $use_filters ? 'FLEXI_REMOVE_FILTERING' : 'FLEXI_RESET' ); ?></span>
 						</button>
 						<?php endif; ?>
 						
@@ -187,12 +194,12 @@ if ($filter_instructions == 1) {
 			<span class="fc_filter">
 				<span id="<?php echo $form_id; ?>_submitWarn" class="fc-mssg fc-note" style="display:none;"><?php echo JText::_('FLEXI_FILTERS_CHANGED_CLICK_TO_SUBMIT'); ?></span>
 				<span class="fc_buttons">
-					<button class="fc_button button_go" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;">
+					<button class="<?php echo $flexi_button_class_go; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormPrepare(form, 2); return false;">
 						<span class="fcbutton_go"><?php echo JText::_( 'FLEXI_APPLY_FILTERING' ); ?></span>
 					</button>
 					
 					<?php if ($show_search_reset && !$buttons_added_already) : ?>
-					<button class="fc_button button_reset" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 1); return false;">
+					<button class="<?php echo $flexi_button_class_reset; ?>" onclick="var form=document.getElementById('<?php echo $form_id; ?>'); adminFormClearFilters(form); adminFormPrepare(form, 1); return false;">
 						<span class="fcbutton_reset"><?php echo JText::_( 'FLEXI_REMOVE_FILTERING' ); ?></span>
 					</button>
 					<?php endif; ?>
