@@ -83,6 +83,11 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 			    break;
 		endswitch;
 		echo $output;
+
+		if ($direct_button) : 
+		 echo '<input type="submit" name="direct" value="'.$direct_text.'" class="fc_button flexiadvdirectlink" onclick="this.form.searchword.focus();"/>';
+		endif;
+		
 		?>
 		<?php if ($linkadvsearch) : ?>
 	<a href="<?php echo $action; ?>" class="<?php echo $flexi_button_class_advanced;?>"><?php echo $linkadvsearch_txt;?></a>
