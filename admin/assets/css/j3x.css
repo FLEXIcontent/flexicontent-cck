@@ -113,7 +113,7 @@ fieldset legend {
 	padding:4px;
 }
 
-input, select {
+/*input, */select {
 	width: auto !important;
 }
 
