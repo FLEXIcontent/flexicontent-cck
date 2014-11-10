@@ -614,7 +614,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	color: black !important;
 	font-size: 11px !important;
 	font-weight: normal !important;
-	display: inline-block !important;
+	display: inline-block /*!important*/; /*important problematic for hidding*/
 	padding: 2px 0px 2px 4px !important;
 	margin: 2px 0px 2px 4px !important;
 	border-radius: 5px !important;

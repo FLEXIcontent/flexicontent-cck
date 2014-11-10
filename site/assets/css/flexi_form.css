@@ -372,7 +372,7 @@ html button {
 }
 .flexicontent select {
 	font-size: 11px !important;
-	display: inline-block !important;
+	display: inline-block;  /* important causes problem hidden elements */
 	/*float: none !important;*/ /* problem with */
 	margin: 1px 2px 1px 3px !important;
 	padding: 4px 2px !important;
