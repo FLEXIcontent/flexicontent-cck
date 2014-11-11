@@ -26,6 +26,12 @@ $form_name = "default_form_".$module->id;
 $txtmode = $params->get('txtmode', 0);
 $show_search_label = $params->get('show_search_label', 1);
 $search_autocomplete = $params->get( 'search_autocomplete', 1 );
+$flexi_button_class_go =  ($params->get('flexi_button_class_go' ,'') != '-1')  ?
+    $params->get('flexi_button_class_go' ,'')   :
+    $params->get('flexi_button_class_go_custom', 'fc_button')  ;
+$flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'') != '-1')  ?
+    $params->get('flexi_button_class_advanced' ,'')   :
+    $params->get('flexi_button_class_advanced_custom', 'fc_button fcsimple flexiadvsearchlink')  
 ?>
 
 <div class="mod_flexiadvsearch_wrapper mod_flexiadvsearch_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexiadvsearch_default<?php echo $module->id ?>">
@@ -51,9 +57,9 @@ $search_autocomplete = $params->get( 'search_autocomplete', 1 );
 		
 		if ($button) :
 		    if ($button_as) :
-		        $button = '<input type="image" value="'.$button_text.'" class="button" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
+		        $button = '<input type="image" value="'.$button_text.'" class="'.$flexi_button_class_go.'" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
 		    else :
-		        $button = '<input type="submit" value="'.$button_text.'" class="fc_button" onclick="this.form.searchword.focus();"/>';
+		        $button = '<input type="submit" value="'.$button_text.'" class="'.$flexi_button_class_go.'" onclick="this.form.searchword.focus();"/>';
 		    endif;
 		endif;
 		switch ($button_pos) :
@@ -78,12 +84,15 @@ $search_autocomplete = $params->get( 'search_autocomplete', 1 );
 		endswitch;
 		echo $output;
 		?>
+		
+		<?php if ($linkadvsearch) : ?>
+		<a href="<?php echo $action; ?>" class="<?php echo $flexi_button_class_advanced;?>"><?php echo $linkadvsearch_txt;?></a>
+		<?php endif; ?>
+		
 		</span>
 	</div>
 	
-	<?php if ($linkadvsearch) : ?>
-	<a href="<?php echo $action; ?>" class="fc_button fcsimple flexiadvsearchlink"><?php echo $linkadvsearch_txt;?></a>
-	<?php endif; ?>
+	
 	
 </form>
 

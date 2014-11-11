@@ -52,6 +52,17 @@
 				<option value="">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="flexi_button_class_go" type="list" default="" label="FLEXI_BUTTON_CLASS_GO" description="FLEXI_BUTTON_CLASS_GO_DESC" class="btn-group btn-group-yesno">
+				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
+				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
+				<option value="btn btn-success">FLEXI_BUTTON_CLASS_SUCCESS</option>
+				<option value="btn btn-info">FLEXI_BUTTON_CLASS_INFO</option>
+				<option value="btn btn-warning">FLEXI_BUTTON_CLASS_WARNING</option>
+				<option value="btn btn-danger">FLEXI_BUTTON_CLASS_DANGER</option>
+				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
+				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
+			</field>
+			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" />
 			<field name="button_pos" type="list" default="right" label="FLEXI_MOD_BUTTON_POSITION" description="FLEXI_MOD_BUTTON_POSITION_DESC">
 				<option value="right">FLEXI_BUTTON_RIGHT</option>
 				<option value="left">FLEXI_BUTTON_LEFT</option>
@@ -71,6 +82,17 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="linkadvsearch_txt" type="text" default="FLEXI_ADV_MOD_ADVANCED_SEARCH" label="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT" description="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT_DESC" />
+			<field name="flexi_button_class_advanced" type="list" default="" label="FLEXI_BUTTON_CLASS_ADVANCED" description="FLEXI_BUTTON_CLASS_ADVANCED_DESC" class="btn-group btn-group-yesno">
+				<option value="fc_button fcsimple flexiadvsearchlink">FLEXI_BUTTON_CLASS_FCBUTTON</option>
+				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
+				<option value="btn btn-success">FLEXI_BUTTON_CLASS_SUCCESS</option>
+				<option value="btn btn-info">FLEXI_BUTTON_CLASS_INFO</option>
+				<option value="btn btn-warning">FLEXI_BUTTON_CLASS_WARNING</option>
+				<option value="btn btn-danger">FLEXI_BUTTON_CLASS_DANGER</option>
+				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
+				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
+			</field>
+			<field name="flexi_button_class_advanced_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_ADVANCED_CUSTOM" description="FLEXI_BUTTON_CLASS_ADVANCED_CUSTOM_DESC" />
 		</fieldset>
 		
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
