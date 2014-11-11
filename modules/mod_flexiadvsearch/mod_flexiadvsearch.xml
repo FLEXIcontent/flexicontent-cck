@@ -94,6 +94,7 @@
 			</field>
 			<field name="flexi_button_class_advanced_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_ADVANCED_CUSTOM" description="FLEXI_BUTTON_CLASS_ADVANCED_CUSTOM_DESC" />
 		</fieldset>
+		
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
 			<field name="combine_show_rules" type="radio" default="AND" label="FLEXI_COMBINE_SHOW_RULES" description="FLEXI_COMBINE_SHOW_RULES_DESC">
 				<option value="OR">FLEXI_OR</option>

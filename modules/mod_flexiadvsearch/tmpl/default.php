@@ -84,9 +84,11 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		endswitch;
 		echo $output;
 		?>
+		
 		<?php if ($linkadvsearch) : ?>
-	<a href="<?php echo $action; ?>" class="<?php echo $flexi_button_class_advanced;?>"><?php echo $linkadvsearch_txt;?></a>
-	<?php endif; ?>
+		<a href="<?php echo $action; ?>" class="<?php echo $flexi_button_class_advanced;?>"><?php echo $linkadvsearch_txt;?></a>
+		<?php endif; ?>
+		
 		</span>
 	</div>
 	

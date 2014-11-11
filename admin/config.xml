@@ -730,6 +730,10 @@
 				<option value="0">FLEXI_AUTO</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			<field name="show_search_reset" type="radio" default="1" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" menu="hide" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
 			<field name="flexi_button_class_go" type="list" default="" label="FLEXI_BUTTON_CLASS_GO" description="FLEXI_BUTTON_CLASS_GO_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
@@ -742,10 +746,6 @@
 				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
 			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" />
-			<field name="show_search_reset" type="radio" default="1" label="FLEXI_SEARCH_RESET_BUTTON" description="FLEXI_SEARCH_RESET_BUTTON_DESC" menu="hide" class="btn-group btn-group-yesno">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
 			<field name="flexi_button_class_reset" type="list" default="" label="FLEXI_BUTTON_CLASS_RESET" description="FLEXI_BUTTON_CLASS_RESET_DESC" menu="hide">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>

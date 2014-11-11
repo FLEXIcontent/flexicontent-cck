@@ -633,7 +633,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	/* background: transparent; ... does not work properly with ie8/9, it causes: */
 	/* any element with less z-index to be placed above this element, */
 	/* e.g. the span element for showing an inner is placed above, thus preventing focusing of the input !! */
-	border: 1px solid #a2a2a2 !important;
+	border: 1px solid black !important;
 	background: url(../images/magnifier-left.png) 96% 4px no-repeat white;
 	opacity: 0.5; filter:alpha(opacity=50);
 	min-width: 120px !important;
