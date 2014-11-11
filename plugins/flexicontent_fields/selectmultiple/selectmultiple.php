@@ -112,7 +112,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		$options = array();
 		if ($usefirstoption && !$useselect2) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 		foreach ($elements as $element) {
-			$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
+			$options[] = JHTML::_('select.option', $element->value, $element->text);
 		}
 		$field->html  = ($usefirstoption && $useselect2) ? '<span class="fcselect_lbl">'.JText::_($firstoptiontext).':</span> ' : '';
 		$field->html .= JHTML::_('select.genericlist', $options, $fieldname, $attribs, 'value', 'text', $field->value, $elementid);
@@ -223,7 +223,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		if ( $display_all ) foreach ($elements as $val => $element)
 		{
 			if ($text_or_value == 0) $disp = $element->value;
-			else if ($text_or_value == 1) $disp =JText::_($element->text);
+			else if ($text_or_value == 1) $disp =$element->text;
 			
 			$is_selected = isset($indexes[$val]);
 			
@@ -238,7 +238,7 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			if ( !$element ) continue;
 			
 			if ($text_or_value == 0) $disp = $element->value;
-			else if ($text_or_value == 1) $disp =JText::_($element->text);
+			else if ($text_or_value == 1) $disp =$element->text;
 			
 			$display[] = $pretext.$disp.$posttext;
 			$display_index[] = $element->value;

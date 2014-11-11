@@ -122,7 +122,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 			$options = array();
 			if ($usefirstoption) $options[] = JHTML::_('select.option', '', JText::_($firstoptiontext));
 			foreach ($elements as $element) {
-				$options[] = JHTML::_('select.option', $element->value, JText::_($element->text));
+				$options[] = JHTML::_('select.option', $element->value, $element->text);
 			}
 			$field->html	= JHTML::_('select.genericlist', $options, $fieldname, 'class="'.$required.'"', 'value', 'text', $field->value);
 			return;
@@ -150,9 +150,9 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 			$input_fld = ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />';
 			$options[] = ''
 				.($prettycheckable_added ? $input_fld : '')
-				.'<label for="'.$elementid_no.'" class="hasTip fccheckradio_lbl" title="'.$field->label.'::'.JText::_($element->text).'" >'
+				.'<label for="'.$elementid_no.'" class="hasTip fccheckradio_lbl" title="'.$field->label.'::'.$element->text.'" >'
 				. (!$prettycheckable_added ? $input_fld : '')
-				.' <img src="'.$imgpath . $element->image .'"  alt="'.JText::_($element->text).'" />'
+				.' <img src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />'
 				.'</label>'
 				;
 			$i++;
@@ -268,8 +268,8 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		if ( $display_all ) foreach ($elements as $val => $element)
 		{
 			if ($text_or_value == 0) $disp = $element->value;
-			else if ($text_or_value == 1) $disp =JText::_($element->text);
-			else $disp = '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.JText::_($element->text).'" />';
+			else if ($text_or_value == 1) $disp =$element->text;
+			else $disp = '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.$element->text.'" />';
 			
 			$is_selected = $index == $val;
 			
@@ -284,8 +284,8 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 			if ( !$element ) return '';
 			
 			if ($text_or_value == 0) $disp = $element->value;
-			else if ($text_or_value == 1) $disp =JText::_($element->text);
-			else $disp = '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.JText::_($element->text).'" />';
+			else if ($text_or_value == 1) $disp =$element->text;
+			else $disp = '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.$element->text.'" />';
 			
 			$display[] = $pretext.$disp.$posttext;
 			$display_index[] = $element->value;
