@@ -59,6 +59,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		
 		$required = $field->parameters->get( 'required', 0 ) ;
 		//$required = $required ? ' required validate-checkbox' : '';
+		$form_vals_display = $field->parameters->get( 'form_vals_display', 1 ) ;
 		$max_values		= $field->parameters->get( 'max_values', 0 ) ;
 		$min_values		= $field->parameters->get( 'min_values', 0 ) ;
 		$exact_values	= $field->parameters->get( 'exact_values', 0 ) ;
@@ -167,7 +168,9 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 				.($prettycheckable_added ? $input_fld : '')
 				.'<label for="'.$elementid_no.'" class="hasTip fccheckradio_lbl" title="'.$field->label.'::'.$element->text.'" >'
 				. (!$prettycheckable_added ? $input_fld : '')
-				.' <img src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />'
+				.($form_vals_display!=1 ? $element->text : '')
+				.($form_vals_display==2 ? ' <br/>' : '')
+				.($form_vals_display >0 ? ' <img src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />' : '')
 				.'</label>'
 				;
 			$i++;

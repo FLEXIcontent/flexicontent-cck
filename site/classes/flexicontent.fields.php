@@ -1361,7 +1361,7 @@ class FlexicontentFields
 		
 		$sql_mode = $field->parameters->get( 'sql_mode', 0 ) ;   // For fields that use this parameter
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
-		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
+		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
 		
 		if ($create_filter) {
 			$filter_customize_options = $field->parameters->get('filter_customize_options', 0);
@@ -2412,7 +2412,7 @@ class FlexicontentFields
 				
 				// Append value usage to value's label
 				if ($add_usage_counters && $results[$i]->found)
-					$results[$i]->text .= ' ('.$results[$i]->found.')';
+					$results[$i]->text .= ' ('.$results[$i]->found.')';  // THESE for indexed fields should have been cloned, so it is ok to modify
 			}
 		} else {
 			$add_usage_counters = false;
@@ -2660,7 +2660,11 @@ class FlexicontentFields
 		
 		// Support of value-indexed fields
 		if ( !$faceted_filter && $indexed_elements) {
-			$results = & $indexed_elements;
+			// Clone 'indexed_elements' because they maybe modified
+			$results = array();
+			foreach ($indexed_elements as $i => $result) {
+				$results[$i] = clone($result);
+			}
 		} else 
 		if ( $indexed_elements ) {
 			
@@ -2669,6 +2673,8 @@ class FlexicontentFields
 			//echo "<pre>". $filter->label.": ". print_r($results, true) ."\n\n</pre>";
 			if ($faceted_filter==2 && $show_matches) foreach ($results as $i => $result) {
 				$result->found = $_results[$i]->found;
+				// Clone 'indexed_elements' because they maybe modified
+				$results[$i] = clone($result);
 			}
 			
 		// Support for multi-property fields
@@ -2727,7 +2733,11 @@ class FlexicontentFields
 		
 		// Support of value-indexed fields
 		if ( !$faceted_filter && $indexed_elements) {
-			$results = & $indexed_elements;
+			// Clone 'indexed_elements' because they maybe modified
+			$results = array();
+			foreach ($indexed_elements as $i => $result) {
+				$results[$i] = clone($result);
+			}
 		} else 
 		if ( $indexed_elements && is_array($indexed_elements) ) {
 			
@@ -2736,6 +2746,8 @@ class FlexicontentFields
 			//echo "<pre>". $filter->label.": ". print_r($indexed_elements, true) ."\n\n</pre>";
 			if ($faceted_filter==2 && $show_matches) foreach ($results as $i => $result) {
 				$result->found = $_results[$i]->found;
+				// Clone 'indexed_elements' because they maybe modified
+				$results[$i] = clone($result);
 			}
 		} else {
 			$results = & $_results;

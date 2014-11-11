@@ -36,7 +36,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="field_elements" type="textarea" default="" class="required" rows="5" cols="25" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
+			<field name="field_elements" type="textarea" default="" class="required" rows="5" cols="70" label="FLEXI_FIELD_ELEMENTS" description="FLEXI_FIELD_ELEMENTS_DESC" />
 			<field name="lang_filter_values" type="radio" default="1" label="FLEXI_LANG_FILTER_LABELS" description="FLEXI_LANG_FILTER_LABELS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -90,6 +90,11 @@
 			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="form_vals_display" type="radio" default="1" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC">
+				<option value="0">FLEXI_LABEL</option>
+				<option value="1">FLEXI_IMAGE</option>
+				<option value="2">FLEXI_BOTH</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" level="level2" />
@@ -160,7 +165,7 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="filter_vals_display" type="radio" default="0" label="FLEXI_FILTER_VALS_DISPLAY" description="FLEXI_FILTER_VALS_DISPLAY_DESC">
+			<field name="filter_vals_display" type="radio" default="0" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC">
 				<option value="0">FLEXI_LABEL</option>
 				<option value="1">FLEXI_IMAGE</option>
 				<option value="2">FLEXI_BOTH</option>
@@ -196,7 +201,7 @@
 				<option value="5">FLEXI_DISPLAY_AS_CHECKBOXES</option>
 				<option value="6">FLEXI_DISPLAY_AS_TAG_LIKE</option>
 			</field>
-			<field name="filter_vals_display_s" type="radio" default="0" label="FLEXI_FILTER_VALS_DISPLAY" description="FLEXI_FILTER_VALS_DISPLAY_DESC">
+			<field name="filter_vals_display_s" type="radio" default="0" label="FLEXI_FIELD_VALS_DISPLAY" description="FLEXI_FIELD_VALS_DISPLAY_DESC">
 				<option value="0">FLEXI_LABEL</option>
 				<option value="1">FLEXI_IMAGE</option>
 				<option value="2">FLEXI_BOTH</option>
