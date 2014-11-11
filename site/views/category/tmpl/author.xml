@@ -455,7 +455,7 @@
 				<option value="1">FLEXI_NORMAL_ONLY</option>
 				<option value="2">FLEXI_FEATURED_ONLY</option> 
 			</field>
-			<!--field name="display_cats_featured" type="list" default="" label="FLEXI_DISPLAY_CATS_FEATURED" description="FLEXI_DISPLAY_CATS_FEATURED_DESC">
+			<!--field name="display_cats_featured" type="radio" default="" label="FLEXI_DISPLAY_CATS_FEATURED" description="FLEXI_DISPLAY_CATS_FEATURED_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_BOTH</option>
 				<option value="1">FLEXI_NORMAL_ONLY</option>
@@ -594,6 +594,30 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			<field name="flexi_button_class_go" type="list" default="" label="FLEXI_BUTTON_CLASS_GO" description="FLEXI_BUTTON_CLASS_GO_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
+				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
+				<option value="btn btn-success">FLEXI_BUTTON_CLASS_SUCCESS</option>
+				<option value="btn btn-info">FLEXI_BUTTON_CLASS_INFO</option>
+				<option value="btn btn-warning">FLEXI_BUTTON_CLASS_WARNING</option>
+				<option value="btn btn-danger">FLEXI_BUTTON_CLASS_DANGER</option>
+				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
+				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
+			</field>
+			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" />
+			<field name="flexi_button_class_reset" type="list" default="" label="FLEXI_BUTTON_CLASS_RESET" description="FLEXI_BUTTON_CLASS_RESET_DESC" class="btn-group btn-group-yesno">
+				<option value="">FLEXI_USE_GLOBAL</option>
+				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
+				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
+				<option value="btn btn-success">FLEXI_BUTTON_CLASS_SUCCESS</option>
+				<option value="btn btn-info">FLEXI_BUTTON_CLASS_INFO</option>
+				<option value="btn btn-warning">FLEXI_BUTTON_CLASS_WARNING</option>
+				<option value="btn btn-danger">FLEXI_BUTTON_CLASS_DANGER</option>
+				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
+				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
+			</field>
+			<field name="flexi_button_class_reset_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_RESET_CUSTOM" description="FLEXI_BUTTON_CLASS_RESET_CUSTOM_DESC" />
 			<field name="filter_autosubmit" type="radio" default="" label="FLEXI_FILTER_FORM_AUTO_SUBMIT" description="FLEXI_FILTER_FORM_AUTO_SUBMIT_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_NO</option>
@@ -737,8 +761,8 @@
 				<option value="1">FLEXI_CROP</option>
 			</field>
 			
-			<field name="" type="separator" default="Display custom fields &lt;br/&gt; &lt;small&gt; do not add fields that will break feeds display&lt;/small&gt;" description="..." level="level2" menu="hide" />
-			<field name="feed_extra_fields" type="textarea" rows="4" cols="60" label="Extra fields &lt;br/&gt; &lt;small&gt; comma separated list of field names&lt;/small&gt;" description="Fields that requires extra CSS/JS will not work properly, fields that might be suitable are fields like e.g. date,text,select,etc. Enter a comma separated list of field names" />
+			<field name="" type="separator" default="FLEXI_DISPLAY_CUSTOM_FIELDS" description="FLEXI_DISPLAY_CUSTOM_FIELDS_DESC" level="level2" menu="hide" />
+			<field name="feed_extra_fields" type="textarea" rows="4" cols="60" label="FLEXI_DISPLAY_CUSTOM_FIELDS_LIST" description="FLEXI_DISPLAY_CUSTOM_FIELDS_LIST_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
 			<field name="feed_orderby" type="list" default="" label="FLEXI_ORDER_BY_CORE" description="FLEXI_ORDER_BY_CORE_DESC" >
@@ -825,6 +849,6 @@
 			<field name="" type="separator" default="Template parameters ..." description="Please note you cannot set template parameters here. &lt;br&gt;&lt;br&gt; Template parameters for the choosen template will be retrieved from the author configuration. &lt;br&gt;&lt;br&gt;For fields shown, please add your fields in layout positions in template configuration management tab" level="level2"/>
 			
 		</fieldset>
-		
+	
 	</fields>
 </metadata>
