@@ -59,6 +59,8 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		
 		$required = $field->parameters->get( 'required', 0 ) ;
 		$required = $required ? ' required validate-radio' : '';
+		$form_vals_display = $field->parameters->get( 'form_vals_display', 1 ) ;
+		
 		// image specific variables
 		$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
 		$imgpath  = JURI::root(true) .'/'. $imagedir;
@@ -152,7 +154,9 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 				.($prettycheckable_added ? $input_fld : '')
 				.'<label for="'.$elementid_no.'" class="hasTip fccheckradio_lbl" title="'.$field->label.'::'.$element->text.'" >'
 				. (!$prettycheckable_added ? $input_fld : '')
-				.' <img src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />'
+				.($form_vals_display!=1 ? $element->text : '')
+				.($form_vals_display==2 ? ' <br/>' : '')
+				.($form_vals_display >0 ? ' <img src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />' : '')
 				.'</label>'
 				;
 			$i++;
