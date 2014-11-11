@@ -140,11 +140,11 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		foreach ($elements as $element) {
 			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
 			$elementid_no = $elementid.'_'.$i;
-			$extra_params = $prettycheckable_added ? ' data-label="'.JText::_($element->text).'" data-labelPosition="right" data-customClass="fcradiocheck"' : '';
+			$extra_params = $prettycheckable_added ? ' data-label="'.$element->text.'" data-labelPosition="right" data-customClass="fcradiocheck"' : '';
 			$options[] = ''
 				.(!$prettycheckable_added ? '<label class="fccheckradio_lbl">' : '')
 				.' <input type="checkbox" id="'.$elementid_no.'" element_group_id="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />'
-				.(!$prettycheckable_added ? '&nbsp;'.JText::_($element->text).'</label>' : '')
+				.(!$prettycheckable_added ? '&nbsp;'.$element->text.'</label>' : '')
 				;
 			$i++;
 		}
@@ -262,7 +262,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 		if ( $display_all ) foreach ($elements as $val => $element)
 		{
 			if ($text_or_value == 0) $disp = $element->value;
-			else if ($text_or_value == 1) $disp =JText::_($element->text);
+			else if ($text_or_value == 1) $disp =$element->text;
 			
 			$is_selected = isset($indexes[$val]);
 			
@@ -277,7 +277,7 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			if ( !$element ) continue;
 			
 			if ($text_or_value == 0) $disp = $element->value;
-			else if ($text_or_value == 1) $disp =JText::_($element->text);
+			else if ($text_or_value == 1) $disp =$element->text;
 			
 			$display[] = $pretext.$disp.$posttext;
 			$display_index[] = $element->value;

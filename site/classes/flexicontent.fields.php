@@ -1361,6 +1361,7 @@ class FlexicontentFields
 		
 		$sql_mode = $field->parameters->get( 'sql_mode', 0 ) ;   // For fields that use this parameter
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
+		$lang_filter_values = $filter->parameters->get( 'lang_filter_values', 1);
 		
 		if ($create_filter) {
 			$filter_customize_options = $field->parameters->get('filter_customize_options', 0);
@@ -1393,6 +1394,11 @@ class FlexicontentFields
 				$db->setQuery($query);
 				$results = $db->loadObjectList('value');
 			}
+			if ($lang_filter_values) {
+				foreach ($results as $val=>$result) {
+					$results[$val]->text  = JText::_($result->text);  // the text label
+				}
+			}
 			
 			// !! CHECK: DB query failed or produced no data
 			if (!$query || !is_array($results)) {
@@ -1421,7 +1427,7 @@ class FlexicontentFields
 				$val = $listelement_props[0];
 				$results[$val] = new stdClass();
 				$results[$val]->value = $listelement_props[0];
-				$results[$val]->text  = JText::_($listelement_props[1]);  // the text label
+				$results[$val]->text  = $lang_filter_values ? JText::_($listelement_props[1]) : $listelement_props[1];
 				$el_prop_count = 2;
 				foreach ($extra_props as $extra_prop) {
 					$results[$val]->{$extra_prop} = @ $listelement_props[$el_prop_count];  // extra property for fields that use it
@@ -2735,8 +2741,8 @@ class FlexicontentFields
 			$results = & $_results;
 		}
 		
-		// Language filter labels
-		if ($lang_filter_values) {
+		// Language filter values/labels (for indexed fields this is already done)
+		if ($lang_filter_values && !$indexed_elements) {
 			foreach ($results as $i => $result) {
 				$results[$i]->text = JText::_($result->text);
 			}
