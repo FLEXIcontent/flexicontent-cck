@@ -64,22 +64,26 @@ if ( $show_mod )
 	$width     = intval($params->get('width', 20));
 	$maxlength = $width > 20 ? $width : 20;
 	
-	// display buttons and its position
+	// Buttons and their positions
+	
 	// Go button
 	$button        = $params->get('button', '');
 	$button_pos    = $params->get('button_pos', 'left');
+	
 	//Direct button
-	$direct_button = $params->get('direct_button', '');
+	$direct        = $params->get('direct_button', '');
 	$direct_pos    = $params->get('direct_pos', 'left');
 	
-	// buttons as image or as text
+	// Buttons as image or as text
+	
 	// Go button
 	$button_as    = $params->get('button_as', '');
 	$button_text  = JText::_($params->get('button_text', 'FLEXI_ADV_MOD_GO'));
 	$button_image = $params->get('button_image', '');
+	
 	// Direct button
 	$direct_as    = $params->get('direct_as', '');
-	$direct_text  = JText::_($params->get('direct_text', 'FLEXI_ADV_DIRECT_GO'));
+	$direct_text  = JText::_($params->get('direct_text', 'FLEXI_ADV_MOD_DIRECT'));
 	$direct_image = $params->get('direct_image', '');
 
 	$linkadvsearch     = $params->get('linkadvsearch', 1);

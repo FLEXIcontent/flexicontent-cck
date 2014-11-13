@@ -29,6 +29,9 @@ $search_autocomplete = $params->get( 'search_autocomplete', 1 );
 $flexi_button_class_go =  ($params->get('flexi_button_class_go' ,'') != '-1')  ?
     $params->get('flexi_button_class_go' ,'')   :
     $params->get('flexi_button_class_go_custom', 'fc_button')  ;
+$flexi_button_class_direct =  ($params->get('flexi_button_class_direct' ,'') != '-1')  ?
+    $params->get('flexi_button_class_direct' ,'')   :
+    $params->get('flexi_button_class_direct_custom', 'fc_button')  ;
 $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'') != '-1')  ?
     $params->get('flexi_button_class_advanced' ,'')   :
     $params->get('flexi_button_class_advanced_custom', 'fc_button fcsimple flexiadvsearchlink')  
@@ -55,6 +58,8 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 				data-fc_label_text="'.$search_inner_prompt.'" name="searchword" width="'.$search_inner_width.'" size="" maxlength="'.$maxchars.'" 
 				id="search_searchword" value="" />';
 		
+		
+		// Search GO button
 		if ($button) :
 		    if ($button_as) :
 		        $button = '<input type="image" value="'.$button_text.'" class="'.$flexi_button_class_go.'" src="'.JURI::base().$button_image.'" onclick="this.form.searchword.focus();"/>';
@@ -62,34 +67,41 @@ $flexi_button_class_advanced =  ($params->get('flexi_button_class_advanced' ,'')
 		        $button = '<input type="submit" value="'.$button_text.'" class="'.$flexi_button_class_go.'" onclick="this.form.searchword.focus();"/>';
 		    endif;
 		endif;
+		
 		switch ($button_pos) :
-		    case 'top' :
-			    $button = $button.'<br />';
-			    $output = $button.$output;
-			    break;
-	
-		    case 'bottom' :
-			    $button = '<br />'.$button;
-			    $output = $output.$button;
-			    break;
-	
-		    case 'right' :
-			    $output = $output.$button;
-			    break;
-	
-		    case 'left' :
-		    default :
-			    $output = $button.$output;
-			    break;
+		    case 'top'   : $output = $button.'<br />'.$output;  break;
+		    case 'bottom': $output = $output.'<br />'.$button;  break;
+		    case 'right' : $output = $output.$button;  break;
+		    case 'left'  :
+		    default      : $output = $button.$output; break;
 		endswitch;
-		echo $output;
-
-		if ($direct_button) : 
-		 echo '<input type="submit" name="direct" value="'.$direct_text.'" class="fc_button flexiadvdirectlink" onclick="this.form.searchword.focus();"/>';
+		
+		
+		// Search DIRECT (lucky) button
+		if ($direct) :
+		    if ($direct_as) :
+		        $direct = '<input type="image" value="'.$direct_text.'" class="'.$flexi_button_class_direct.'" src="'.JURI::base().$direct_image.'" onclick="this.form.direct.value=1; this.form.searchword.focus();"/>';
+		        $direct .= '<input type="hidden" name="direct" value="" />'; // workaround for image button not being able to submit a value
+		    else :
+		        $direct = '<input type="submit" name="direct" value="'.$direct_text.'" class="'.$flexi_button_class_direct.'" onclick="this.form.searchword.focus();"/>';
+		    endif;
 		endif;
 		
-		?>
+		switch ($direct_pos) :
+		    case 'top'   : $output = $direct.'<br />'.$output;  break;
+		    case 'bottom': $output = $output.'<br />'.$direct;  break;
+		    case 'right' : $output = $output.$direct;  break;
+		    case 'left'  :
+		    default      : $output = $direct.$output; break;
+		endswitch;
 		
+		
+		// Display search box and the optional buttons
+		echo $output;
+		
+		
+		// Display advanced search link
+		?>
 		<?php if ($linkadvsearch) : ?>
 		<a href="<?php echo $action; ?>" class="<?php echo $flexi_button_class_advanced;?>"><?php echo $linkadvsearch_txt;?></a>
 		<?php endif; ?>
