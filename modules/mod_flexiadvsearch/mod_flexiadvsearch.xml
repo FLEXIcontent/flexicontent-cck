@@ -76,6 +76,24 @@
 			<field name="button_image" type="text" default="" label="FLEXI_MOD_BUTTON_IMAGE_SRC" description="FLEXI_MOD_BUTTON_IMAGE_SRC" />
 			<field name="button_text"  type="text" default="FLEXI_ADV_MOD_GO" label="FLEXI_MOD_BUTTON_TEXT" description="FLEXI_MOD_BUTTON_TEXT_DESC" />
 			
+			<field name="" type="separator" default="FLEXI_MOD_DIRECT_BUTTON" level="level2" menu="hide" />
+			<field name="direct_button" type="radio" default="" label="FLEXI_MOD_SHOW_DIRECT_BUTTON" description="FLEXI_MOD_SHOW_DIRECT_BUTTON_DESC">
+				<option value="">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="direct_pos" type="list" default="right" label="FLEXI_MOD_DIRECT_POSITION" description="FLEXI_MOD_DIRECT_POSITION_DESC">
+				<option value="right">FLEXI_DIRECT_RIGHT</option>
+				<option value="left">FLEXI_DIRECT_LEFT</option>
+				<option value="top">FLEXI_DIRECT_TOP</option>
+				<option value="bottom">FLEXI_DIRECT_BOTTOM</option>
+			</field>
+			<field name="imagebutton" type="radio" default="0" label="FLEXI_MOD_DIRECT_AS" description="FLEXI_MOD_DIRECT_AS_DESC">
+				<option value="0">FLEXI_MOD_DIRECT_AS_TEXT</option>
+				<option value="1">FLEXI_MOD_DIRECT_AS_IMAGE</option>
+			</field>
+			<field name="direct_image" type="text" default="" label="FLEXI_MOD_DIRECT_IMAGE_SRC" description="FLEXI_MOD_DIRECT_IMAGE_SRC" />
+			<field name="direct_text"  type="text" default="FLEXI_ADV_MOD_DIRECT" label="FLEXI_MOD_DIRECT_TEXT" description="FLEXI_MOD_DIRECT_TEXT_DESC" />
+
 			<field name="" type="separator" default="FLEXI_MOD_ADV_SEARCH" description="FLEXI_MOD_ADV_SEARCH_DESC" level="level2" menu="hide" />
 			<field name="linkadvsearch" type="radio" default="1" label="FLEXI_MOD_ADV_SEARCH_SHOW_LINK" description="FLEXI_MOD_ADV_SEARCH_SHOW_LINK_DESC">
 				<option value="0">FLEXI_NO</option>

@@ -47,7 +47,8 @@ if (JRequest::getCmd('print')) {
 <?php if (!JRequest::getVar('print',0)) echo $this->loadTemplate('form'); ?>
 <?php
 if(!$this->error && count($this->results) > 0) :
-	echo $this->loadTemplate('results');
+	if(isset($_POST['direct'])) { header('Location: '.JRoute::_($this->results[0]->href)); }
+	else{ echo $this->loadTemplate('results'); }
 else :
 	echo $this->loadTemplate('error');
 endif;
