@@ -75,6 +75,8 @@ if ( ! @$attributes['skipparams'] ) {
 var tmpl = ['".$lays."'];	
 
 function disablePanel(element) {
+	if ( ! $(element+'-attribs-options') ) return;
+
 	var panel 	= $(element+'-attribs-options').getNext();
 	var selects = panel.getElements('select');
 	var inputs 	= panel.getElements('input');
@@ -89,6 +91,8 @@ function disablePanel(element) {
 }
 
 function enablePanel(element) {
+	if ( ! $(element+'-attribs-options') ) return;
+
 	var panel 	= $(element+'-attribs-options').getNext();
 	var selects = panel.getElements('select');
 	var inputs 	= panel.getElements('input');
