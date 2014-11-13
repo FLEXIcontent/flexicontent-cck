@@ -52,7 +52,7 @@
 				<option value="">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="flexi_button_class_go" type="list" default="" label="FLEXI_BUTTON_CLASS_GO" description="FLEXI_BUTTON_CLASS_GO_DESC" class="btn-group btn-group-yesno">
+			<field name="flexi_button_class_go" type="list" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="btn-group btn-group-yesno">
 				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
 				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success">FLEXI_BUTTON_CLASS_SUCCESS</option>
@@ -62,27 +62,56 @@
 				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
 				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
-			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_GO_CUSTOM" description="FLEXI_BUTTON_CLASS_GO_CUSTOM_DESC" />
+			<field name="flexi_button_class_go_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_CUSTOM" description="FLEXI_BUTTON_CLASS_CUSTOM_DESC" />
 			<field name="button_pos" type="list" default="right" label="FLEXI_MOD_BUTTON_POSITION" description="FLEXI_MOD_BUTTON_POSITION_DESC">
 				<option value="right">FLEXI_BUTTON_RIGHT</option>
 				<option value="left">FLEXI_BUTTON_LEFT</option>
 				<option value="top">FLEXI_BUTTON_TOP</option>
 				<option value="bottom">FLEXI_BUTTON_BOTTOM</option>
 			</field>
-			<field name="imagebutton" type="radio" default="0" label="FLEXI_MOD_BUTTON_AS" description="FLEXI_MOD_BUTTON_AS_DESC">
+			<field name="button_as" type="radio" default="0" label="FLEXI_MOD_BUTTON_AS" description="FLEXI_MOD_BUTTON_AS_DESC">
 				<option value="0">FLEXI_MOD_BUTTON_AS_TEXT</option>
 				<option value="1">FLEXI_MOD_BUTTON_AS_IMAGE</option>
 			</field>
 			<field name="button_image" type="text" default="" label="FLEXI_MOD_BUTTON_IMAGE_SRC" description="FLEXI_MOD_BUTTON_IMAGE_SRC" />
 			<field name="button_text"  type="text" default="FLEXI_ADV_MOD_GO" label="FLEXI_MOD_BUTTON_TEXT" description="FLEXI_MOD_BUTTON_TEXT_DESC" />
 			
+			<field name="" type="separator" default="FLEXI_MOD_DIRECT_BUTTON" level="level2" menu="hide" />
+			<field name="direct_button" type="radio" default="" label="FLEXI_MOD_SHOW_DIRECT_BUTTON" description="FLEXI_MOD_SHOW_DIRECT_BUTTON_DESC">
+				<option value="">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="flexi_button_class_direct" type="list" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="btn-group btn-group-yesno">
+				<option value="fc_button">FLEXI_BUTTON_CLASS_FCBUTTON</option>
+				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
+				<option value="btn btn-success">FLEXI_BUTTON_CLASS_SUCCESS</option>
+				<option value="btn btn-info">FLEXI_BUTTON_CLASS_INFO</option>
+				<option value="btn btn-warning">FLEXI_BUTTON_CLASS_WARNING</option>
+				<option value="btn btn-danger">FLEXI_BUTTON_CLASS_DANGER</option>
+				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
+				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
+			</field>
+			<field name="flexi_button_class_direct_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_CUSTOM" description="FLEXI_BUTTON_CLASS_CUSTOM_DESC" />
+			<field name="direct_pos" type="list" default="right" label="FLEXI_MOD_DIRECT_POSITION" description="FLEXI_MOD_DIRECT_POSITION_DESC">
+				<option value="right">FLEXI_DIRECT_RIGHT</option>
+				<option value="left">FLEXI_DIRECT_LEFT</option>
+				<option value="top">FLEXI_DIRECT_TOP</option>
+				<option value="bottom">FLEXI_DIRECT_BOTTOM</option>
+			</field>
+			<field name="direct_as" type="radio" default="0" label="FLEXI_MOD_DIRECT_AS" description="FLEXI_MOD_DIRECT_AS_DESC">
+				<option value="0">FLEXI_MOD_DIRECT_AS_TEXT</option>
+				<option value="1">FLEXI_MOD_DIRECT_AS_IMAGE</option>
+			</field>
+			<field name="direct_image" type="text" default="" label="FLEXI_MOD_DIRECT_IMAGE_SRC" description="FLEXI_MOD_DIRECT_IMAGE_SRC" />
+			<field name="direct_text"  type="text" default="FLEXI_ADV_MOD_DIRECT" label="FLEXI_MOD_DIRECT_TEXT" description="FLEXI_MOD_DIRECT_TEXT_DESC" />
+
 			<field name="" type="separator" default="FLEXI_MOD_ADV_SEARCH" description="FLEXI_MOD_ADV_SEARCH_DESC" level="level2" menu="hide" />
 			<field name="linkadvsearch" type="radio" default="1" label="FLEXI_MOD_ADV_SEARCH_SHOW_LINK" description="FLEXI_MOD_ADV_SEARCH_SHOW_LINK_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="linkadvsearch_txt" type="text" default="FLEXI_ADV_MOD_ADVANCED_SEARCH" label="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT" description="FLEXI_MOD_ADV_SEARCH_LINKED_TEXT_DESC" />
-			<field name="flexi_button_class_advanced" type="list" default="" label="FLEXI_BUTTON_CLASS_ADVANCED" description="FLEXI_BUTTON_CLASS_ADVANCED_DESC" class="btn-group btn-group-yesno">
+			<field name="flexi_button_class_advanced" type="list" default="" label="FLEXI_BUTTON_CLASS" description="FLEXI_BUTTON_CLASS_DESC" class="btn-group btn-group-yesno">
 				<option value="fc_button fcsimple flexiadvsearchlink">FLEXI_BUTTON_CLASS_FCBUTTON</option>
 				<option value="btn btn-primary">FLEXI_BUTTON_CLASS_PRIMARY</option>
 				<option value="btn btn-success">FLEXI_BUTTON_CLASS_SUCCESS</option>
@@ -92,7 +121,7 @@
 				<option value="btn btn-inverse">FLEXI_BUTTON_CLASS_INVERSE</option>
 				<option value="-1">FLEXI_USE_CUSTOM_BELOW</option>
 			</field>
-			<field name="flexi_button_class_advanced_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_ADVANCED_CUSTOM" description="FLEXI_BUTTON_CLASS_ADVANCED_CUSTOM_DESC" />
+			<field name="flexi_button_class_advanced_custom" type="text" size="20" default="" label="FLEXI_BUTTON_CLASS_CUSTOM" description="FLEXI_BUTTON_CLASS_CUSTOM_DESC" />
 		</fieldset>
 		
 		<fieldset name="FLEXI_MODULE_DISPLAYING_RULES" label="FLEXI_MODULE_DISPLAYING_RULES" description="FLEXI_MODULE_DISPLAYING_RULES_DESC">
