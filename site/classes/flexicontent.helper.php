@@ -696,6 +696,28 @@ class flexicontent_html
 				";
 				break;
 			
+			case 'multibox':
+			case 'jmultibox':
+				if ($load_jquery) flexicontent_html::loadJQuery();
+				
+				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/jmultibox';
+				
+				// Add JS
+				$document->addScript($framework_path.'/js/jmultibox.js');
+				$document->addScript($framework_path.'/js/jquery.vegas.js');
+				
+				// Add CSS
+				$document->addStyleSheet($framework_path.'/styles/multibox.css');
+				$document->addStyleSheet($framework_path.'/styles/jquery.vegas.css');
+				if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
+					$document->addStyleSheet($framework_path.'/styles/multibox-ie6.css');
+				}
+				
+				// Attach multibox to ..
+				$js .= "
+				";
+				break;
+
 			case 'fancybox':
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
