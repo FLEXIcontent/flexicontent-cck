@@ -15,43 +15,37 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-
-// no direct access
-defined ( '_JEXEC' ) or die ( 'Restricted access' );
-
-require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+defined( '_JEXEC' ) or die( 'Direct Access to this location is not allowed.' );
 
 // ------------------  standard plugin initialize function - don't change ---------------------------
+global $sh_LANG;
+$sefConfig 		= & shRouter::shGetConfig();
+$shLangName = '';
+$shLangIso = '';
+$title = array();
+$shItemidString = '';
+$dosef = shInitializePlugin( $lang, $shLangName, $shLangIso, $option);
+if ($dosef == false) return;
+// ------------------  standard plugin initialize function - don't change ---------------------------
 
-global $sh_LANG, $globalcats, $globalnopath, $globalnoroute;
+// ------------------  load language file - adjust as needed ----------------------------------------
+$shLangIso = shLoadPluginLanguage ( 'com_flexicontent', $shLangIso, '_SH404SEF_FLEXICONTENT_ADD', JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'sef_ext'.DS.'lang'.DS );
+// ------------------  load language file - adjust as needed ----------------------------------------
+
+
+require_once (JPATH_ADMINISTRATOR.DS.'components'.DS.'com_flexicontent'.DS.'defineconstants.php');
+global $globalcats, $globalnopath, $globalnoroute;
+
+// Get some needed HTTP Request variable
+$layout	= JRequest::getVar('layout', null);
+$typeid	= JRequest::getInt('typeid', null);
+$fcu	= JRequest::getVar('fcu', null);
+$fcp	= JRequest::getInt('fcp', null);
 
 // Insure that the global vars are array
 if (!is_array($globalnopath))	$globalnopath	= array();
 if (!is_array($globalnoroute))	$globalnoroute	= array();
 
-$sefConfig 		= & shRouter::shGetConfig();
-$shLangName 	= '';
-$shLangIso 		= '';
-$title 			= array ( );
-$shItemidString = '';
-$dosef	 		= shInitializePlugin ( $lang, $shLangName, $shLangIso, $option );
-$layout 		= JRequest::getVar('layout', null);
-$typeid	 		= JRequest::getInt('typeid', null);
-$fcu	 		= JRequest::getVar('fcu', null);
-$fcp	 		= JRequest::getInt('fcp', null);
-
-if ($dosef == false) {
-	return;
-}
-
-// ------------------  /standard plugin initialize function - don't change ---------------------------
-
-
-// ------------------  load language file - adjust as needed ----------------------------------------
-
-$shLangIso = shLoadPluginLanguage ( 'com_flexicontent', $shLangIso, '_SH404SEF_FLEXICONTENT_ADD', JPATH_ROOT.DS.'components'.DS.'com_flexicontent'.DS.'sef_ext'.DS.'lang'.DS );
-
-// ------------------  /load language file - adjust as needed ----------------------------------------
 
 
 // do something about that Itemid thing
@@ -80,7 +74,7 @@ $task 		= isset($task) ? @$task : null;
 $format		= isset($format) ? @$format : null;
 $return 	= isset ($return) ? @$return : null;
 
-// V 1.2.4.m
+// remove common URL from GET vars list, so that they don't show up as query string in the URL
 shRemoveFromGETVarsList('option');
 shRemoveFromGETVarsList('lang');
 if (!empty($Itemid))      shRemoveFromGETVarsList('Itemid');
@@ -376,14 +370,11 @@ if (isset($limitstart))
 //if (!empty($return))
 //	shRemoveFromGETVarsList ( 'return' );
 
-
-	
-// ------------------  standard plugin finalize function - don't change ---------------------------  
-
-
-if ($dosef) {
-	$string = shFinalizePlugin ( $string, $title, $shAppendString, $shItemidString, (isset ( $limit ) ? @$limit : null), (isset ( $limitstart ) ? @$limitstart : null), (isset ( $shLangName ) ? @$shLangName : null) );
+// ------------------  standard plugin finalize function - don't change ---------------------------
+if ($dosef){
+  $string = shFinalizePlugin( $string, $title, $shAppendString, $shItemidString,
+      (isset($limit) ? @$limit : null), (isset($limitstart) ? @$limitstart : null),
+      (isset($shLangName) ? @$shLangName : null));
 }
+// ------------------  standard plugin finalize function - don't change ---------------------------
 
-// ------------------  /standard plugin finalize function - don't change ---------------------------
-?>
