@@ -323,7 +323,9 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
-			<field name="addbutton_menu_itemid" type="menuitem" default="" label="FLEXI_ADD_TO_LIST_MENU_ITEM" description="FLEXI_ADD_TO_LIST_MENU_ITEM_DESC" />
+			<field name="addbutton_menu_itemid" type="menuitem" default="" label="FLEXI_ADD_TO_LIST_MENU_ITEM" description="FLEXI_ADD_TO_LIST_MENU_ITEM_DESC" menu="hide">
+				<option value="">FLEXI_USE_GLOBAL</option>
+			</field>
 			<field name="show_editbutton_lists" type="radio" default="" label="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS" description="FLEXI_SHOW_EDIT_BUTTON_IN_LISTS_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
