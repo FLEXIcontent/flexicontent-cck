@@ -45,9 +45,13 @@ Joomla.submitform = function (pressbutton){
 			// Submit the form
 			form.submit();
 		} else {
-			var invalid = $$('.invalid');
-			new Fx.Scroll(window).toElement(invalid[0]);
+			var invalid = jQuery('.invalid');
+			jQuery('html, body').animate({
+				scrollTop: invalid.offset().top - 80
+			}, 1000);
 			invalid[0].focus();
+			//new Fx.Scroll(window).toElement(invalid[0]);
+			//invalid[0].focus();
 		}
 	} else {
 		// Store the button task into the form
