@@ -130,8 +130,7 @@ class plgSystemFlexisystem extends JPlugin
 		if (FLEXI_J16GE && $redirect_pdf_format && JRequest::getVar('format') == 'pdf' ) {
 			JRequest::setVar('format', 'html');
 			if ($redirect_pdf_format==2) {
-				$app = JFactory::getApplication();
-				$app->enqueueMessage('PDF generation is not supported, the HTML version is displayed instead', 'notice');
+				JFactory::getApplication()->enqueueMessage('PDF generation is not supported, the HTML version is displayed instead', 'notice');
 			}
 		}
 		
@@ -1242,4 +1241,65 @@ class plgSystemFlexisystem extends JPlugin
 		$cache = JCache::getInstance('', $options);
 		return $cache;
 	}
+	
+	
+	/*
+	 * Add custom LAYOUT parameters to components that clear them during validation e.g. modules, menus
+	 * DONE modules, TODO: menus
+	 */
+	function onExtensionBeforeSave($context, $table, $isNew)
+	{
+		// Check for com_modules context
+		if ($context=='com_modules.module')
+		{
+			// Check for non-empty layout parameter
+			$layout = $_POST['jform']['params']['layout'];
+			if (empty($layout)) return;
+			
+			// Check if layout XML parameter file exists
+			$client = JApplicationHelper::getClientInfo($table->client_id);
+			$layoutpath = JPath::clean($client->path . '/modules/' . $table->module . '/tmpl/' . $layout .'.xml');
+			if (!file_exists($layoutpath)) return;
+			
+			// Load XML file
+			if (FLEXI_J30GE) {
+				$xml = simplexml_load_file($layoutpath);
+				$xmldoc = & $xml;
+			} else {
+				$xml = JFactory::getXMLParser('Simple');
+				$xml->loadFile($layoutpath);
+				$xmldoc = & $xml->document;
+			}
+			//echo "<pre>"; print_r($xmldoc); echo "</pre>";
+			
+			// Create form object loading the , (form name seems not to cause any problem)
+			$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+			$tmpl_params = FLEXI_J30GE ? $xmldoc->asXML() : $xmldoc->toString();
+			$jform->load($tmpl_params);
+			
+			// Set cleared layout parameters
+			$_post = & $_POST['jform']['params'];  //echo "<pre>"; print_r($_post); echo "</pre>";
+			$params = new JRegistry($table->params);
+			$grpname = 'params';
+			
+			$isValid = !$jform->validate($_post, $grpname);
+			if ($isValid) {
+				JFactory::getApplication()->enqueueMessage('Error validating layout posted parameters. Layout parameters were not saved', 'error');
+				return;
+			}
+			
+			foreach ($jform->getGroup($grpname) as $field) {
+				$fieldname =  $field->__get('fieldname');
+				if (substr($fieldname, 0, 2)=="__") continue;
+				$value = $_post[$fieldname];
+				$params->set($fieldname, $value);
+			}
+			
+			// Set parameters back to module's DB table object
+			$table->params = $params->toString();
+			//echo "<pre>"; print_r($table->params); echo "</pre>";
+			//die('onExtensionBeforeSave: '. $layoutpath);
+		}
+	}
+	
 }
