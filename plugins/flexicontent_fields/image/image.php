@@ -903,7 +903,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if (!$multiboxadded)
 			{
 				flexicontent_html::loadFramework('jmultibox');  //echo $field->name.": multiboxadded";
-				$box = "
+				$js = "
 				window.addEvent('domready', function(){
 					jQuery('a.mb').jmultibox({
 						initialWidth: 250,  //(number) the width of the box when it first opens while loading the item. Default: 250
@@ -931,7 +931,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						ratio:'90'             //(number) window ratio Default: '90'
 					});
 				})";
-				$document->addScriptDeclaration($box);
+				$document->addScriptDeclaration($js);
 				
 				$multiboxadded = true;
 			}
@@ -961,6 +961,65 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				if (!$gallerifficadded) {
 					flexicontent_html::loadFramework('galleriffic');
 					$gallerifficadded = true;
+					
+					$js = "
+					//document.write('<style>.noscript { display: none; }</style>');
+					jQuery(document).ready(function() {
+						// We only want these styles applied when javascript is enabled
+						jQuery('div.navigation').css({'width' : '150px', 'float' : 'left'});
+						jQuery('div.content').css({'display' : 'inline-block', 'float' : 'none'});
+		
+						// Initially set opacity on thumbs and add
+						// additional styling for hover effect on thumbs
+						var onMouseOutOpacity = 0.67;
+						jQuery('#gf_thumbs ul.thumbs li').opacityrollover({
+							mouseOutOpacity:   onMouseOutOpacity,
+							mouseOverOpacity:  1.0,
+							fadeSpeed:         'fast',
+							exemptionSelector: '.selected'
+						});
+						
+						// Initialize Advanced Galleriffic Gallery
+						jQuery('#gf_thumbs').galleriffic({
+							/*enableFancybox: true,*/
+							delay:                     2500,
+							numThumbs:                 4,
+							preloadAhead:              10,
+							enableTopPager:            true,
+							enableBottomPager:         true,
+							maxPagesToShow:            20,
+							imageContainerSel:         '#gf_slideshow',
+							controlsContainerSel:      '#gf_controls',
+							captionContainerSel:       '#gf_caption',
+							loadingContainerSel:       '#gf_loading',
+							renderSSControls:          true,
+							renderNavControls:         true,
+							playLinkText:              'Play Slideshow',
+							pauseLinkText:             'Pause Slideshow',
+							prevLinkText:              '&lsaquo; Previous Photo',
+							nextLinkText:              'Next Photo &rsaquo;',
+							nextPageLinkText:          'Next &rsaquo;',
+							prevPageLinkText:          '&lsaquo; Prev',
+							enableHistory:             false,
+							autoStart:                 false,
+							syncTransitions:           true,
+							defaultTransitionDuration: 900,
+							onSlideChange:             function(prevIndex, nextIndex) {
+								// 'this' refers to the gallery, which is an extension of jQuery('#gf_thumbs')
+								this.find('ul.thumbs').children()
+									.eq(prevIndex).fadeTo('fast', onMouseOutOpacity).end()
+									.eq(nextIndex).fadeTo('fast', 1.0);
+							},
+							onPageTransitionOut:       function(callback) {
+								this.fadeTo('fast', 0.0, callback);
+							},
+							onPageTransitionIn:        function() {
+								this.fadeTo('fast', 1.0);
+							}
+						});
+					});
+					";
+					$document->addScriptDeclaration($js);
 				}
 				break;
 			

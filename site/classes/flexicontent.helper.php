@@ -713,9 +713,8 @@ class flexicontent_html
 					$document->addStyleSheet($framework_path.'/styles/multibox-ie6.css');
 				}
 				
-				// Attach multibox to ..
-				$js .= "
-				";
+				// Attach multibox to ... this will be left to the caller so that it will create a multibox object with custom options
+				//$js .= "";
 				break;
 
 			case 'fancybox':
@@ -747,70 +746,14 @@ class flexicontent_html
 			
 			case 'galleriffic':
 				if ($load_jquery) flexicontent_html::loadJQuery();
+				//flexicontent_html::loadFramework('fancybox');
 				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/galleriffic';
-				$document->addStyleSheet($framework_path.'/css/basic.css');
+				//$document->addStyleSheet($framework_path.'/css/basic.css');  // This is too generic and should not be loaded
 				$document->addStyleSheet($framework_path.'/css/galleriffic-3.css');
 				$document->addScript($framework_path.'/js/jquery.galleriffic.js');
 				$document->addScript($framework_path.'/js/jquery.opacityrollover.js');
 				
-				//$view_width = 500;
-				$js = "
-				//document.write('<style>.noscript { display: none; }</style>');
-				jQuery(document).ready(function() {
-					// We only want these styles applied when javascript is enabled
-					jQuery('div.navigation').css({'width' : '150px', 'float' : 'left'});
-					jQuery('div.content').css({'display' : 'inline-block', 'float' : 'none'});
-	
-					// Initially set opacity on thumbs and add
-					// additional styling for hover effect on thumbs
-					var onMouseOutOpacity = 0.67;
-					jQuery('#gf_thumbs ul.thumbs li').opacityrollover({
-						mouseOutOpacity:   onMouseOutOpacity,
-						mouseOverOpacity:  1.0,
-						fadeSpeed:         'fast',
-						exemptionSelector: '.selected'
-					});
-					
-					// Initialize Advanced Galleriffic Gallery
-					var gallery = jQuery('#gf_thumbs').galleriffic({
-						delay:                     2500,
-						numThumbs:                 4,
-						preloadAhead:              10,
-						enableTopPager:            true,
-						enableBottomPager:         true,
-						maxPagesToShow:            20,
-						imageContainerSel:         '#gf_slideshow',
-						controlsContainerSel:      '#gf_controls',
-						captionContainerSel:       '#gf_caption',
-						loadingContainerSel:       '#gf_loading',
-						renderSSControls:          true,
-						renderNavControls:         true,
-						playLinkText:              'Play Slideshow',
-						pauseLinkText:             'Pause Slideshow',
-						prevLinkText:              '&lsaquo; Previous Photo',
-						nextLinkText:              'Next Photo &rsaquo;',
-						nextPageLinkText:          'Next &rsaquo;',
-						prevPageLinkText:          '&lsaquo; Prev',
-						enableHistory:             false,
-						autoStart:                 false,
-						syncTransitions:           true,
-						defaultTransitionDuration: 900,
-						onSlideChange:             function(prevIndex, nextIndex) {
-							// 'this' refers to the gallery, which is an extension of jQuery('#gf_thumbs')
-							this.find('ul.thumbs').children()
-								.eq(prevIndex).fadeTo('fast', onMouseOutOpacity).end()
-								.eq(nextIndex).fadeTo('fast', 1.0);
-						},
-						onPageTransitionOut:       function(callback) {
-							this.fadeTo('fast', 0.0, callback);
-						},
-						onPageTransitionIn:        function() {
-							this.fadeTo('fast', 1.0);
-						}
-					});
-				});
-				";
 				break;
 			
 			case 'elastislide':
@@ -840,7 +783,7 @@ class flexicontent_html
 				//$document->addScript($framework_path.'/lib/jquery.animate-enhanced.min.js');
 				$document->addScript($framework_path.'/code.photoswipe.min.js');
 				
-				$js = "
+				$js .= "
 				jQuery(document).ready(function() {
 					var myPhotoSwipe = jQuery('.photoswipe_fccontainer a').photoSwipe(); 
 				});
@@ -905,7 +848,7 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				flexicontent_html::loadFramework('select2');  // make sure select2 is loaded
 				
-				$js = "
+				$js .= "
 					var _FC_GET = ".json_encode($_GET).";
 				";
 				//var _FC_POST = ".json_encode($_POST).";
