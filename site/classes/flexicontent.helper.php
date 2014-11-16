@@ -1737,6 +1737,7 @@ class flexicontent_html
 		
 		// Add Itemid (if given) and do SEF URL routing it --before-- appending more variables, so that
 		// ... menu item URL variables from given menu item ID will be appended if SEF URLs are OFF
+		$menu_itemid = $menu_itemid ? $menu_itemid : (int)$params->get('addbutton_menu_itemid', 0);
 		$link  = 'index.php?option=com_flexicontent';
 		$link .= $menu_itemid  ? '&Itemid='.$menu_itemid  :  '&view='.FLEXI_ITEMVIEW.'&task=add';
 		$link  = JRoute::_($link);
