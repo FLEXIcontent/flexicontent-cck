@@ -1,0 +1,26 @@
+/**************************************************************
+	MultiBox
+	v1.3
+**************************************************************/
+.MultiBoxContainer{position:absolute;border:10px solid #000;background-color:#FFF;display:none;z-index:2;text-align:left;
+-moz-border-radius: 8px;
+-webkit-border-radius: 8px;
+border-radius: 8px;
+/*IE 7 AND 8 DO NOT SUPPORT BORDER RADIUS*/
+-moz-box-shadow: 0px 0px 9px #000000;
+-webkit-box-shadow: 0px 0px 9px #000000;
+box-shadow: 0px 0px 9px #000000;
+/*IE 7 AND 8 DO NOT SUPPORT BLUR PROPERTY OF SHADOWS*/
+}
+.MultiBoxLoading{background:url(../images/loader.gif) no-repeat center}
+.MultiBoxContent{position:relative;width:100%;height:100%;overflow:hidden}
+.MultiBoxClose{position:absolute;top:-26px;right:-26px;background:url(../images/close.png) no-repeat;width:24px;height:24px;cursor:pointer}
+.MultiBoxControlsContainer{overflow:hidden;height:0;width:100%;position:relative;background-color: #000}
+.MultiBoxControls{width:100%;height:auto;background-color:#000;padding-bottom:2px;position:absolute;bottom:0}
+.MultiBoxPrevious{position:absolute;background:url(../images/left.png) no-repeat;width:24px;height:24px;left:0;margin-top:5px;cursor:pointer}
+.MultiBoxNext{position:absolute;background:url(../images/right.png) no-repeat;width:24px;height:24px;right:0;margin-top:5px;cursor:pointer}
+.MultiBoxNextDisabled{cursor:default;background:url(../images/rightDisabled.png) no-repeat}
+.MultiBoxPreviousDisabled{cursor:default;background:url(../images/leftDisabled.png) no-repeat}
+.MultiBoxTitle{position:relative;float:left;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:11px;color:#FFF;font-weight:700;text-align:left;margin:10px 0 0 35px}
+.MultiBoxNumber{position:relative;width:50px;float:right;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:11px;color:#FFF;text-align:right;margin:10px 35px 0 0}
+.MultiBoxDescription{clear:left;position:relative;padding-top:5px;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:11px;color:#FFF;text-align:left;margin:0 35px}

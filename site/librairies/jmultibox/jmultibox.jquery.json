@@ -1,0 +1,32 @@
+{
+	"name": "jmultibox",
+	"title": "jMultiBox",
+	"description": "jQuery lightbox plugin",
+	"keywords": [
+		"multibox",
+		"MultiBox"
+	],
+	"version": "0.1.0",
+	"author": {
+		"name": "Yoshiki Kozaki",
+		"url": "http://www.joomler.net/",
+		"email": "info@joomler.net"
+	},
+	"licenses": [
+		{
+			"type":"The MIT License (MIT)",
+			"url":"http://opensource.org/licenses/MIT"
+		},
+		{
+			"type": "GNU General Public License, version 2 (GPL-2.0)",
+			"url" : "http://opensource.org/licenses/GPL-2.0"
+		}
+	],
+	"bugs": "https://github.com/YoshikiKozaki/MultiBoxForJQuery/issues",
+	"homepage": "https://github.com/YoshikiKozaki/MultiBoxForJQuery",
+	"docs": "https://github.com/YoshikiKozaki/MultiBoxForJQuery/wiki",
+	"download": "https://github.com/YoshikiKozaki/MultiBoxForJQuery/archive/master.zip",
+	"dependencies": {
+		"jquery": ">=1.4"
+	}
+}

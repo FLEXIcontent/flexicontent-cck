@@ -900,85 +900,39 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$config_needs_mb = $isLinkToPopup  || ($usepopup && $popuptype == 1);
 		if ( $view_allows_mb && $config_needs_mb )
 		{
-			if (!$multiboxadded) {
-				//echo $field->name.": multiboxadded";
-				FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+			if (!$multiboxadded)
+			{
+				flexicontent_html::loadFramework('jmultibox');  //echo $field->name.": multiboxadded";
+				$box = "
+				window.addEvent('domready', function(){
+					jQuery('a.mb').jmultibox({
+						initialWidth: 250,  //(number) the width of the box when it first opens while loading the item. Default: 250
+						initialHeight: 250, //(number) the width of the box when it first opens while loading the item. Default: 250
+						container: document.body, //(element) the element that the box will take it coordinates from. Default: document.body
+						contentColor: '#000', //(string) the color of the content area inside the box. Default: #000
+						showNumbers: ".($isItemsManager ? 'false' : 'true').",    //(boolean) show the number of the item e.g. 2/10. Default: true
+						showControls: ".($isItemsManager ? 'false' : 'true').",   //(boolean) show the navigation controls. Default: true
+						descClassName: 'multiBoxDesc',  //(string) the classname of the divs that contain the description for the item. Default: false
+						descMinWidth: 400,     //(number) the min width of the description text, useful when the item is small. Default: 400
+						descMaxWidth: 600,     //(number) the max width of the description text, so it can wrap to multiple lines instead of being on a long single line. Useful when the item is large. Default: 600
+						movieWidth: 576,    //(number) the default width of the box that contains content of a movie type. Default: 576
+						movieHeight: 324,   //(number) the default height of the box that contains content of a movie type. Default: 324
+						offset: {x: 0, y: 0},  //(object) containing x & y coords that adjust the positioning of the box. Default: {x:0, y:0}
+						fixedTop: false,       //(number) gives the box a fixed top position relative to the container. Default: false
+						path: '',            //(string) location of the resources files, e.g. flv player, etc. Default: ''
+						openFromLink: true,  //(boolean) opens the box relative to the link location. Default: true
+						opac:0.7,            //(decimal) overlay opacity Default: 0.7
+						useOverlay:false,    //(boolean) use a semi-transparent background. Default: false
+						overlaybg:'01.png',  //(string) overlay image in 'overlays' folder. Default: '01.png'
+						onOpen:function(){},   //(object) a function to call when the box opens. Default: function(){} 
+						onClose:function(){},  //(object) a function to call when the box closes. Default: function(){} 
+						easing:'swing',        //(string) effect of jQuery Default: 'swing'
+						useratio:false,        //(boolean) windows size follows ratio. (iframe or Youtube) Default: false
+						ratio:'90'             //(number) window ratio Default: '90'
+					});
+				})";
+				$document->addScriptDeclaration($box);
 				
-				// Multibox integration use different version for FC v2x
-				if (FLEXI_J16GE) {
-					
-					// Include MultiBox CSS files
-					$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/multibox/Styles/multiBox.css');
-					
-					// NEW ie6 hack
-					if (substr($_SERVER['HTTP_USER_AGENT'],0,34)=="Mozilla/4.0 (compatible; MSIE 6.0;") {
-						$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/multibox/Styles/multiBoxIE6.css');
-					}  // This is the new code for new multibox version, old multibox hack is the following lines
-					
-					// Include MultiBox Javascript files
-					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/multibox/Scripts/overlay.js');
-					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/multibox/Scripts/multiBox.js');
-					
-					// Add js code for creating a multibox instance
-					$extra_options = '';
-					if ($isItemsManager) $extra_options .= ''
-							.',showNumbers: false'  //show numbers such as "4 of 12"
-							.',showControls: false' //show the previous/next, title, download etc
-							;
-					$box = "
-						window.addEvent('domready', function(){
-							//call multiBox
-							var initMultiBox = new multiBox({
-								mbClass: '.mb',//class you need to add links that you want to trigger multiBox with (remember and update CSS files)
-								container: $(document.body),//where to inject multiBox
-								descClassName: 'multiBoxDesc',//the class name of the description divs
-								path: './Files/',//path to mp3 and flv players
-								useOverlay: true,//use a semi-transparent background. default: false;
-								maxSize: {w:4000, h:3000},//max dimensions (width,height) - set to null to disable resizing
-								addDownload: false,//do you want the files to be downloadable?
-								pathToDownloadScript: './Scripts/forceDownload.asp',//if above is true, specify path to download script (classicASP and ASP.NET versions included)
-								addRollover: true,//add rollover fade to each multibox link
-								addOverlayIcon: true,//adds overlay icons to images within multibox links
-								addChain: true,//cycle through all images fading them out then in
-								recalcTop: true,//subtract the height of controls panel from top position
-								addTips: true,//adds MooTools built in 'Tips' class to each element (see: http://mootools.net/docs/Plugins/Tips)
-								autoOpen: 0//to auto open a multiBox element on page load change to (1, 2, or 3 etc)
-								".$extra_options."
-							});
-						});
-					";
-					$document->addScriptDeclaration($box);
-				} else {
-					
-					// Include MultiBox CSS files
-					$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/librairies/multibox/multibox.css');
-					
-					// OLD ie6 hack
-					$csshack = '
-					<!--[if lte IE 6]>
-					<style type="text/css">
-					.MultiBoxClose, .MultiBoxPrevious, .MultiBoxNext, .MultiBoxNextDisabled, .MultiBoxPreviousDisabled { 
-						behavior: url('.'components/com_flexicontent/librairies/multibox/iepngfix.htc); 
-					}
-					</style>
-					<![endif]-->
-					';
-					$document->addCustomTag($csshack);
-					
-					// Include MultiBox Javascript files
-					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/multibox/js/overlay.js');
-					$document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/multibox/js/multibox.js');
-					
-					// Add js code for creating a multibox instance
-					$extra_options = $isItemsManager ? ', showNumbers: false, showControls: false' : '';
-					$box = "
-						var box = {};
-						window.addEvent('domready', function(){
-							box = new MultiBox('mb', {descClassName: 'multiBoxDesc', useOverlay: true".$extra_options." });
-						});
-					";
-					$document->addScriptDeclaration($box);
-				}
 				$multiboxadded = true;
 			}
 		}
@@ -1120,14 +1074,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if ($urllink && false === strpos($urllink, '://')) $urllink = 'http://' . $urllink;
 			
 			// Create a popup tooltip (legend)
-			$tip = $title . '::' . $desc;
-			$tip = flexicontent_html::escapeJsText($tip,'s');
-			$legend = ($uselegend && (!empty($title) || !empty($desc) ) )? ' class="hasTip" title="'.$tip.'"' : '' ;
+			$class = 'fc_field_image';
+			if ($uselegend && (!empty($title) || !empty($desc) ) ) {
+				$class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+				$legend = ' title="'.flexicontent_html::getToolTip($title, $desc, 0, 1).'"';
+			} else {
+				$legend = '';
+			}
 			
 			// Create a unique id for the link tags, and a class name for image tags
 			$uniqueid = $field->item_id . '_' . $field->id . '_' . $i;
-			$class_img_field = 'fc_field_image';
-			
 			
 			// Decide thumbnail to use
 			$thumb_size = 0;
@@ -1206,28 +1162,28 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			switch ($prop)
 			{
 				case 'display_backend':
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcb.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcb.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcb.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcb.'" alt="'.$alt.'" class="'.$class.'" />';
 					break;
 				case 'display_small':
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcs.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcs.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcs.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcs.'" alt="'.$alt.'" class="'.$class.'" />';
 					break;
 				case 'display_medium':
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcm.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcm.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcm.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcm.'" alt="'.$alt.'" class="'.$class.'" />';
 					break;
 				case 'display_large':
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcl.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcl.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$srcl.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srcl.'" alt="'.$alt.'" class="'.$class.'" />';
 					break;
 				case 'display_original':
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$srco.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srco.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$srco.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$srco.'" alt="'.$alt.'" class="'.$class.'" />';
 					break;
 				case 'display': default:
-					$img_legend   = '<img src="'.JURI::root(true).'/'.$src.'" alt="'.$alt.'"'.$legend.' class="'.$class_img_field.'" />';
-					$img_nolegend = '<img src="'.JURI::root(true).'/'.$src.'" alt="'.$alt.'" class="'.$class_img_field.'" />';
+					$img_legend   = '<img src="'.JURI::root(true).'/'.$src.'" alt="'.$alt.'"'.$legend.' class="'.$class.'" />';
+					$img_nolegend = '<img src="'.JURI::root(true).'/'.$src.'" alt="'.$alt.'" class="'.$class.'" />';
 					break;
 			}
 			
@@ -1346,7 +1302,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					// *** NEEDS: thumbnail list must be created with large size thubmnails, these will be then thumbnailed by the JS gallery code
 					$title_attr = flexicontent_html::escapeJsText($desc ? $desc : $title,'s');
 					$img_legend_custom ='
-						 <img src="'.JURI::root(true).'/'.$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class_img_field.'"
+						 <img src="'.JURI::root(true).'/'.$src.'" alt ="'.$alt.'"'.$legend.' class="'.$class.'"
 						 	data-large="' . JURI::root(true).'/'.$srcl . '" data-description="'.$title_attr.'"/>
 					';
 					$group_str = $group_name ? 'rel="['.$group_name.']"' : '';
