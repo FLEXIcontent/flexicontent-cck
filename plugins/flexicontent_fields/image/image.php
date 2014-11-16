@@ -579,12 +579,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			if ($linkto_url) $urllink =
 				'<tr>
-					<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).':</td>
+					<td class="key">'.JText::_( 'FLEXI_FIELD_LINKTO_URL' ).'</td>
 					<td><input class="imglink" size="40" name="'.$fieldname.'[urllink]" value="'.(isset($value['urllink']) ? $value['urllink'] : '').'" type="text" /></td>
 				</tr>';
 			if ($usealt) $alt =
 				'<tr>
-					<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).')</td>
+					<td class="key">'.JText::_( 'FLEXI_FIELD_ALT' ).'</td>
 					<td><input class="imgalt" size="40" name="'.$fieldname.'[alt]" value="'.(isset($value['alt']) ? $value['alt'] : $default_alt).'" type="text" /></td>
 				</tr>';
 			if ($usetitle) $title =
