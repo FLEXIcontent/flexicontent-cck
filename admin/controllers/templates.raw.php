@@ -137,9 +137,9 @@ class FlexicontentControllerTemplates extends FlexicontentController
 		}
 		
 		//Get data from the model
-		if (FLEXI_J16GE) {
-			$grpname = 'params'; // this name of <fields> container
-			
+		if (FLEXI_J16GE)
+		{
+			// Load XML file
 			if (FLEXI_J30GE) {
 				$xml = simplexml_load_file($layoutpath);
 				$xmldoc = & $xml;
@@ -149,14 +149,14 @@ class FlexicontentControllerTemplates extends FlexicontentController
 				$xmldoc = & $xml->document;
 			}
 			
-			$tmpl_params = FLEXI_J30GE ? $xmldoc->asXML() : $xmldoc->toString();
-			
 			// Create form object, (form name seems not to cause any problem)
 			$jform = new JForm('com_flexicontent.template.item', array('control' => 'jform', 'load_data' => true));
+			$tmpl_params = FLEXI_J30GE ? $xmldoc->asXML() : $xmldoc->toString();
 			$jform->load($tmpl_params);
 			
 			// Load existing layout values into the object (that we got from DB)
 			$ext_params = new JRegistry($ext_params_str); // and for J1.5:  new JParameter($ext_params_str);
+			$grpname = 'params'; // this is the name of <fields> container
 			foreach ($jform->getGroup($grpname) as $field) {
 				$fieldname =  $field->__get('fieldname');
 				$value = $ext_params->get($fieldname);
@@ -179,6 +179,7 @@ class FlexicontentControllerTemplates extends FlexicontentController
 				?>
 				<fieldset class="panelform"><ul class="adminformlist">
 					<?php
+					$grpname = 'params'; // this is the name of <fields> container
 					foreach ($jform->getGroup($grpname) as $field) {
 						echo '<li>'. $field->label . $field->input .'</li>';
 					}
