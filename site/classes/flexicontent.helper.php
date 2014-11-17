@@ -3720,16 +3720,16 @@ class flexicontent_tmpl
 					$css     = & $document->cssitem;
 					$cssfile = & $css->file;
 					if ($cssfile) {
+						$themes->items->{$tmpl}->css = new stdClass();
 						for ($n=0; $n<count($cssfile); $n++) {
-							$themes->items->{$tmpl}->css = new stdClass();
 							$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$cssfile[$n];
 						}
 					}
 					$js 		= & $document->jsitem;
 					$jsfile	= & $js->file;
 					if ($jsfile) {
+						$themes->items->{$tmpl}->js = new stdClass();
 						for ($n=0; $n<count($jsfile); $n++) {
-							$themes->items->{$tmpl}->js = new stdClass();
 							$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$jsfile[$n];
 						}
 					}
@@ -3754,16 +3754,16 @@ class flexicontent_tmpl
 					$css     = $document->getElementByPath('cssitem');
 					$cssfile = & $css->file;
 					if ($cssfile) {
+						$themes->items->{$tmpl}->css = new stdClass();
 						for ($n=0; $n<count($cssfile); $n++) {
-							$themes->items->{$tmpl}->css = new stdClass();
 							$themes->items->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->data();
 						}
 					}
 					$js 		= $document->getElementByPath('jsitem');
 					$jsfile	=& $js->file;
 					if ($jsfile) {
+						$themes->items->{$tmpl}->js = new stdClass();
 						for ($n=0; $n<count($jsfile); $n++) {
-							$themes->items->{$tmpl}->js = new stdClass();
 							$themes->items->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->data();
 						}
 					}
@@ -3810,7 +3810,6 @@ class flexicontent_tmpl
 					$themes->category->{$tmpl}->version 	= @$document->version;
 					$themes->category->{$tmpl}->release 	= @$document->release;
 					$themes->category->{$tmpl}->description= @$document->description;
-
 					$groups = & $document->fieldgroups;
 					$pos    = & $groups->group;
 					if ($pos) {
@@ -3825,16 +3824,16 @@ class flexicontent_tmpl
 					$css     = & $document->csscategory;
 					$cssfile = & $css->file;
 					if ($cssfile) {
+						$themes->category->{$tmpl}->css = new stdClass();
 						for ($n=0; $n<count($cssfile); $n++) {
-							$themes->category->{$tmpl}->css = new stdClass();
 							$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$cssfile[$n];
 						}
 					}
 					$js     = & $document->jscategory;
 					$jsfile = & $js->file;
 					if ($jsfile) {
+						$themes->category->{$tmpl}->js = new stdClass();
 						for ($n=0; $n<count($jsfile); $n++) {
-							$themes->category->{$tmpl}->js = new stdClass();
 							$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'. (string)$jsfile[$n];
 						}
 					}
@@ -3846,31 +3845,30 @@ class flexicontent_tmpl
 					$themes->category->{$tmpl}->version 	= @$document->version[0] ? $document->version[0]->data() : '';
 					$themes->category->{$tmpl}->release 	= @$document->release[0] ? $document->release[0]->data() : '';
 					$themes->category->{$tmpl}->description = @$document->description[0] ? $document->description[0]->data() : '';
-
-						$groups 	= $document->getElementByPath('fieldgroups');
-						$pos	 	=& $groups->group;
-						if ($pos) {
-							for ($n=0; $n<count($pos); $n++) {
-								$themes->category->{$tmpl}->attributes[$n] = $pos[$n]->_attributes;
-								$themes->category->{$tmpl}->positions[$n] = $pos[$n]->data();
-							}
+					$groups = $document->getElementByPath('fieldgroups');
+					$pos    = & $groups->group;
+					if ($pos) {
+						for ($n=0; $n<count($pos); $n++) {
+							$themes->category->{$tmpl}->attributes[$n] = $pos[$n]->_attributes;
+							$themes->category->{$tmpl}->positions[$n] = $pos[$n]->data();
 						}
-						$css 		= $document->getElementByPath('csscategory');
-						$cssfile	=& $css->file;
-						if ($cssfile) {
-							for ($n=0; $n<count($cssfile); $n++) {
-								$themes->category->{$tmpl}->css = new stdClass();
-								$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->data();
-							}
+					}
+					$css     = $document->getElementByPath('csscategory');
+					$cssfile = & $css->file;
+					if ($cssfile) {
+						$themes->category->{$tmpl}->css = new stdClass();
+						for ($n=0; $n<count($cssfile); $n++) {
+							$themes->category->{$tmpl}->css->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$cssfile[$n]->data();
 						}
-						$js 		= $document->getElementByPath('jscategory');
-						$jsfile	=& $js->file;
-						if ($jsfile) {
-							for ($n=0; $n<count($jsfile); $n++) {
-								$themes->category->{$tmpl}->js = new stdClass();
-								$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->data();
-							}
+					}
+					$js     = $document->getElementByPath('jscategory');
+					$jsfile = & $js->file;
+					if ($jsfile) {
+						$themes->category->{$tmpl}->js = new stdClass();
+						for ($n=0; $n<count($jsfile); $n++) {
+							$themes->category->{$tmpl}->js->$n = 'components/com_flexicontent/templates/'.$tmpl.'/'.$jsfile[$n]->data();
 						}
+					}
 				}
 
 			}
