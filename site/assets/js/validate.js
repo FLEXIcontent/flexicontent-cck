@@ -553,9 +553,11 @@ var JFormValidator = new Class({
 		}
 	}
 });
+var JFormValidator_fc = JFormValidator();
 
-document.formvalidator = new JFormValidator();
+document.formvalidator = null;
 jQuery(document).ready(function() {
+	document.formvalidator = new JFormValidator_fc();
 	jQuery('form.form-validate').each(function(){
 		document.formvalidator.attachToForm($(this));
 	});
