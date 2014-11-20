@@ -683,7 +683,7 @@ class flexicontent_html
 				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/prettyCheckable';
 				$document->addScript($framework_path.'/dev/prettyCheckable.js');
-				$document->addStyleSheet($framework_path.'/dist/prettyCheckable.css');
+				$document->addStyleSheet($framework_path.'/prettyCheckable.css');
 				$js .= "
 					jQuery(document).ready(function(){
 						jQuery('input.use_prettycheckable').each(function() {
@@ -5333,7 +5333,7 @@ class fcjsJText extends JText
 	 * //use this method call for each string you will be needing in javascript
 	 * fcjsJText::script("MY_FIRST_COMPONENT_STRING_NEEDED_IN_JS");
 	 * fcjsJText::script("MY_NTH_COMPONENT_STRING_NEEDED_IN_JS");  
-	 * // and so on…
+	 * // and so onÂ…
 	 * // you must then call load(), as below:
 	 * fcjsJText::load();
 	 *
