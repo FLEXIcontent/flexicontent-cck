@@ -160,7 +160,7 @@ class FlexicontentViewCategory extends JViewLegacy
 			
 			if ($extra_fields) {
 				foreach($extra_fields as $fieldname) {
-					if ( $row->fields[$fieldname]->display ) {
+					if ( isset($row->fields[$fieldname]->display) ) {
 		  			$description .= '<br/><b>'.$row->fields[$fieldname]->label .":</b> ". $row->fields[$fieldname]->display;
 					}
 				}
