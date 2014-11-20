@@ -127,7 +127,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		foreach ($elements as $element) {
 			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
 			$elementid_no = $elementid.'_'.$i;
-			$extra_params = $prettycheckable_added ? ' data-label="'.$element->text.'" data-labelPosition="right" data-customClass="fcradiocheck"' : '';
+			$extra_params = $prettycheckable_added ? ' data-labeltext="'.$element->text.'" data-labelPosition="right" data-customClass="fcradiocheck"' : '';
 			$options[] = ''
 				.(!$prettycheckable_added ? '<label class="fccheckradio_lbl">' : '')
 				.' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />'

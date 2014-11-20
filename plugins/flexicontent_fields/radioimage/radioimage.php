@@ -64,6 +64,7 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		// image specific variables
 		$imagedir = preg_replace('#^(/)*#', '', $field->parameters->get( 'imagedir' ) );
 		$imgpath  = JURI::root(true) .'/'. $imagedir;
+		$imgfolder = JPATH_SITE .DS. $imagedir;
 		
 		// when field is displayed as drop-down select (item edit form only)
 		$firstoptiontext = $field->parameters->get( 'firstoptiontext', 'FLEXI_SELECT' ) ;
@@ -150,13 +151,14 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 			$elementid_no = $elementid.'_'.$i;
 			$extra_params = $prettycheckable_added ? ' data-customClass="fcradiocheckimage"' : '';
 			$input_fld = ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />';
+			$img_exists = file_exists($imgfolder . $element->image);
 			$options[] = ''
 				.($prettycheckable_added ? $input_fld : '')
 				.'<label for="'.$elementid_no.'" class="hasTip fccheckradio_lbl" title="'.$field->label.'::'.$element->text.'" >'
 				. (!$prettycheckable_added ? $input_fld : '')
 				.($form_vals_display!=1 ? $element->text : '')
 				.($form_vals_display==2 ? ' <br/>' : '')
-				.($form_vals_display >0 ? ' <img src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />' : '')
+				.($form_vals_display >0 ? ($img_exists ? ' <img src="'.$imgpath . $element->image .'"  alt="'.$element->text.'" />' : '[NOT found]: '. $imgpath . $element->image) : '')
 				.'</label>'
 				;
 			$i++;
