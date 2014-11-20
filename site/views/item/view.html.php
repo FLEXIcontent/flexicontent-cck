@@ -1303,7 +1303,7 @@ class FlexicontentViewItem  extends JViewLegacy
 			$checked = $option_id==2 ? ' checked="checked"' : '';
 			$elementid_no = $elementid.'_'.$i;
 			if (!$prettycheckable_added) $lists['vstate'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
-			$extra_params = !$prettycheckable_added ? '' : ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+			$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
 			$lists['vstate'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
 				.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
 			if (!$prettycheckable_added) $lists['vstate'] .= '&nbsp;'.JText::_($option_label).'</label>';
@@ -1332,7 +1332,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				$attribs = ' class="'.$classes.'" ';
 				$lbltxt = $subscribers .' '. JText::_( $subscribers>1 ? 'FLEXI_SUBSCRIBERS' : 'FLEXI_SUBSCRIBER' );
 				if (!$prettycheckable_added) $lists['notify'] .= '<label class="fccheckradio_lbl" for="'.$elementid.'">';
-				$extra_params = !$prettycheckable_added ? '' : ' data-label="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.$lbltxt.'" data-labelPosition="right" data-customClass="fcradiocheck"';
 				$lists['notify'] = ' <input type="checkbox" id="'.$elementid.'" element_group_id="'.$elementid
 					.'" name="'.$fieldname.'" '.$attribs.' value="1" '.$extra_params.' checked="checked" />';
 				if (!$prettycheckable_added) $lists['notify'] .= '&nbsp;'.$lbltxt.'</label>';
@@ -1482,7 +1482,7 @@ class FlexicontentViewItem  extends JViewLegacy
 				$checked = $option_id===$fieldvalue ? ' checked="checked"' : '';
 				$elementid_no = $elementid.'_'.$i;
 				if (!$prettycheckable_added) $lists['disable_comments'] .= '<label class="fccheckradio_lbl" for="'.$elementid_no.'">';
-				$extra_params = !$prettycheckable_added ? '' : ' data-label="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
+				$extra_params = !$prettycheckable_added ? '' : ' data-labeltext="'.JText::_($option_label).'" data-labelPosition="right" data-customClass="fcradiocheck"';
 				$lists['disable_comments'] .= ' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid
 					.'" name="'.$fieldname.'" '.$attribs.' value="'.$option_id.'" '.$checked.$extra_params.' />';
 				if (!$prettycheckable_added) $lists['disable_comments'] .= '&nbsp;'.JText::_($option_label).'</label>';

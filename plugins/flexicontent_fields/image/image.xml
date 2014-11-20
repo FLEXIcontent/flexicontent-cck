@@ -35,7 +35,7 @@
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_IMAGE_HANDLING_LABEL" description="" level="level2" />
-			<field name="image_source" type="list" default="0" label="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" >
+			<field name="image_source" type="list" default="1" label="FLEXI_FIELD_IMAGE_SOURCE_MODE" description="FLEXI_FIELD_IMAGE_SOURCE_MODE_DESC" >
 				<!--option value="-1">Joomla article images: (intro + full)</option-->
 				<option value="0">FLEXI_FIELD_REUSABLE_DB_MODE</option>
 				<option value="1">FLEXI_FIELD_ITEM_SPECIFIC_FOLDER_MODE</option>
@@ -48,7 +48,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC" class="btn-group btn-group-yesno">
+			<field name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -72,7 +72,7 @@
 			<field name="popupinview" type="fccheckbox" default=""
 				checkoptions="FLEXI_ITEMS,FLEXI_CATEGORY,FLEXI_MODULE,FLEXI_BACKEND" checkvals="item,category,module,backend" defaultvals="item,category,module,backend"
 				label="FLEXI_FIELD_ENABLE_IN_VIEWS" description="FLEXI_FIELD_ENABLE_IN_VIEWS_DESC" />
-			<field name="popuptype" type="list" default="1" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC">
+			<field name="popuptype" type="list" default="4" label="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT" description="FLEXI_FIELD_IMAGE_GALLERY_LAYOUT_DESC">
 				<option value="1">FLEXI_FIELD_IMAGE_MULTIBOX_BUILTIN</option>
 				<option value="2">FLEXI_FIELD_IMAGE_ROKBOX_NEEDS_ROCKETTHEME</option>
 				<option value="3">FLEXI_FIELD_IMAGE_JCEMEDIABOX_NEEDS_JCE</option>

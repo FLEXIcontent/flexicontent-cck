@@ -403,7 +403,7 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 			<?php
 				$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars(JText::_( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8').'"';
 			?>
-			<label id="jform_notify-lbl" for="jform_notify" <?php echo $label_tooltip; ?> >
+			<label id="jform_notify-msg" <?php echo $label_tooltip; ?> >
 				<?php echo JText::_( 'FLEXI_NOTIFY_FAVOURING_USERS' ); ?>
 			</label>
 			<div class="container_fcfield container_fcfield_name_notify">

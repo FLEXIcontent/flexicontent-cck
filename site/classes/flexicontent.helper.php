@@ -682,16 +682,16 @@ class flexicontent_html
 				if ($load_jquery) flexicontent_html::loadJQuery();
 				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/prettyCheckable';
-				$document->addScript($framework_path.'/prettyCheckable.js');
-				$document->addStyleSheet($framework_path.'/prettyCheckable.css');
+				$document->addScript($framework_path.'/dev/prettyCheckable.js');
+				$document->addStyleSheet($framework_path.'/dist/prettyCheckable.css');
 				$js .= "
 					jQuery(document).ready(function(){
-						jQuery('input.use_prettycheckable').prettyCheckable();
-						jQuery('div.fcradiocheckimage').each(
-							function() {
-								jQuery(this).find('label').append(jQuery(this).next('label').html());
-								jQuery(this).next('label').remove();
+						jQuery('input.use_prettycheckable').each(function() {
+							jQuery(this).prettyCheckable({
+								/*color: 'blue',*/
+								label: jQuery(this).next('label').html()
 							});
+						});
 					});
 				";
 				break;
