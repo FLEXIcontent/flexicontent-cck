@@ -90,20 +90,26 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$thumb_h_s = $field->parameters->get( 'h_s', 90 );
 		
 		// optional properies configuration
-		$linkto_url = $field->parameters->get('linkto_url',0);
+		$linkto_url  = $field->parameters->get('linkto_url', 0 );
 		$alt_usage   = $field->parameters->get( 'alt_usage', 0 ) ;
 		$title_usage = $field->parameters->get( 'title_usage', 0 ) ;
 		$desc_usage  = $field->parameters->get( 'desc_usage', 0 ) ;
+		$cust1_usage = $field->parameters->get( 'cust1_usage', 0 );
+		$cust2_usage = $field->parameters->get( 'cust2_usage', 0 );
 		
 		$default_alt    = ($item->version == 0 || $alt_usage > 0) ? $field->parameters->get( 'default_alt', '' ) : '';
 		$default_title  = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
 		$default_desc   = ($item->version == 0 || $desc_usage > 0) ? $field->parameters->get( 'default_desc', '' ) : '';
+		$default_cust1  = ($item->version == 0 || $cust1_usage > 0) ? $field->parameters->get( 'default_cust1', '' ) : '';
+		$default_cust2  = ($item->version == 0 || $cust2_usage > 0) ? $field->parameters->get( 'default_cust2', '' ) : '';
 		
 		$usealt    = $field->parameters->get( 'use_alt', 1 ) ;
 		$usetitle  = $field->parameters->get( 'use_title', 1 ) ;
 		$usedesc   = $field->parameters->get( 'use_desc', 1 ) ;
+		$usecust1  = $field->parameters->get( 'use_cust1', 0 ) ;
+		$usecust2  = $field->parameters->get( 'use_cust2', 0 ) ;
 		
-		$none_props = !$linkto_url && !$usealt && !$usetitle && !$usedesc;
+		$none_props = !$linkto_url && !$usealt && !$usetitle && !$usedesc && !$usecust1 && !$usecust2;
 		
 		if ( !$common_js_css_added ) {
 			$js = "
@@ -248,6 +254,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				thisNewField.getElements('textarea.imgdesc').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][desc]');
 				";
 				
+			if ($usecust1) $js .= "
+				thisNewField.getElements('input.imgcust1').setProperty('value','".$default_cust1."');
+				thisNewField.getElements('input.imgcust1').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust1]');
+				";
+				
+			if ($usecust2) $js .= "
+				thisNewField.getElements('input.imgcust2').setProperty('value','".$default_cust2."');
+				thisNewField.getElements('input.imgcust2').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust2]');
+				";
+			
 			$js .= "
 				jQuery(thisNewField).insertAfter( jQuery(thisField) );
 				".// We need to re-execute setting of modal popup since when this run the current element did not exist
@@ -597,6 +613,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					<td class="key">'.JText::_( 'FLEXI_FIELD_LONGDESC' ).': <br/>('.JText::_('FLEXI_FIELD_TOOLTIP').')</td>
 					<td><textarea class="imgdesc" name="'.$fieldname.'[desc]" rows="5" cols="28" >'.(isset($value['desc']) ? $value['desc'] : $default_desc).'</textarea></td>
 				</tr>';
+			if ($usecust1) $cust1 =
+				'<tr>
+					<td class="key">'.JText::_( 'FLEXI_FIELD_IMG_CUST1' ).'</td>
+					<td><input class="imgcust1" size="40" name="'.$fieldname.'[cust1]" value="'.(isset($value['cust1']) ? $value['cust1'] : $default_cust1).'" type="text" /></td>
+				</tr>';
+			if ($usecust2) $cust2 =
+				'<tr>
+					<td class="key">'.JText::_( 'FLEXI_FIELD_IMG_CUST2' ).'</td>
+					<td><input class="imgcust2" size="40" name="'.$fieldname.'[cust2]" value="'.(isset($value['cust2']) ? $value['cust2'] : $default_cust2).'" type="text" /></td>
+				</tr>';
 			
 			$curr_select = str_replace('__FORMFLDNAME__', $fieldname.'[existingname]', $select);
 			$curr_select = str_replace('__FORMFLDID__', $elementid.'_existingname', $curr_select);
@@ -615,7 +641,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			</div>
 			'
 			
-			.(($linkto_url || $usealt || $usetitle || $usedesc) ?
+			.(($linkto_url || $usealt || $usetitle || $usedesc || $usecust1 || $usecust2) ?
 			'
 			<div style="float:left; clear:none;" class="img_value_props">
 				<table class="admintable"><tbody>
@@ -623,6 +649,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					'.@$alt.'
 					'.@$title.'
 					'.@$desc.'
+					'.@$cust1.'
+					'.@$cust2.'
 				</tbody></table>
 			</div>'
 			: '').
@@ -733,6 +761,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$desc_usage    = $field->parameters->get( 'desc_usage', 0 ) ;
 		$default_desc  = ($desc_usage == 2)  ?  $field->parameters->get( 'default_desc', '' ) : '';
 		
+		$usecust1      = $field->parameters->get( 'use_cust1', 0 ) ;
+		$cust1_usage   = $field->parameters->get( 'cust1_usage', 0 ) ;
+		$default_cust1 = ($cust1_usage == 2)  ?  JText::_($field->parameters->get( 'default_cust1', '' )) : '';
+		
+		$usecust2      = $field->parameters->get( 'use_cust2', 0 ) ;
+		$cust2_usage   = $field->parameters->get( 'cust2_usage', 0 ) ;
+		$default_cust2 = ($cust2_usage == 2)  ?  JText::_($field->parameters->get( 'default_cust2', '' )) : '';
+		
 		// Separators / enclosing characters
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
 		$pretext		= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'pretext', '' ), 'pretext' );
@@ -790,6 +826,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$image_by_params['alt']   = $item->images->get($_image_name.'_alt', '');
 				$image_by_params['title'] = $item->images->get($_image_name.'_alt', '');
 				$image_by_params['desc']  = $item->images->get($_image_name.'_caption', '');
+				$image_by_params['cust1'] = '';
+				$image_by_params['cust2'] = '';
 				$image_by_params['urllink'] = '';
 				$values = array(serialize($image_by_params));
 			}
@@ -818,6 +856,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$default_image_val['alt'] = $default_alt;
 				$default_image_val['title'] = $default_title;
 				$default_image_val['desc'] = $default_desc;
+				$default_image_val['cust1'] = $default_cust1;
+				$default_image_val['cust2'] = $default_cust2;
 				$default_image_val['urllink'] = '';
 				
 				// Create thumbnails for default image
@@ -1106,6 +1146,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$field->thumbs_src['medium'] = array();
 		$field->thumbs_src['large'] = array();
 		$field->thumbs_src['original'] = array();
+		$cust1_label = JText::_('FLEXI_FIELD_IMG_CUST1');
+		$cust2_label = JText::_('FLEXI_FIELD_IMG_CUST2');
 		foreach ($values as $val)
 		{
 			// Unserialize value's properties and check for empty original name property
@@ -1117,10 +1159,18 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// Create thumbnails urls, note thumbnails have already been verified above
 			$wl = $field->parameters->get( 'w_l', 800 );
 			$hl = $field->parameters->get( 'h_l', 600 );
-			$title	= @$value['title'] ? $value['title'] : '';
-			$alt	= @$value['alt'] ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
+			
+			// Optional properties
+			$title	= ($usetitle && @$value['title']) ? $value['title'] : '';
+			$alt	= ($usealt && @$value['alt']) ? $value['alt'] : flexicontent_html::striptagsandcut($item->title, 60);
 			$alt	= flexicontent_html::escapeJsText($alt,'s');
-			$desc	= @$value['desc'] ? $value['desc'] : '';
+			$desc	= ($usedesc && @$value['desc']) ? $value['desc'] : '';
+			
+			// Optional custom properties
+			$cust1	= ($usecust1 && @$value['cust1']) ? $value['cust1'] : '';
+			$desc .= $cust1 ? $cust1_label.': '.$cust1 : '';  // ... Append custom properties to description
+			$cust2	= ($usecust2 && @$value['cust2']) ? $value['cust2'] : '';
+			$desc .= $cust2 ? $cust2_label.': '.$cust2 : '';  // ... Append custom properties to description
 
 			$srcb	= $thumb_urlpath . '/b_' .$extra_prefix. $image_name;  // backend
 			$srcs	= $thumb_urlpath . '/s_' .$extra_prefix. $image_name;  // small
