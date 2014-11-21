@@ -298,17 +298,20 @@ $infoimage 	= JHTML::image ( 'administrator/components/com_flexicontent/assets/i
 					<h3 id="standard-page" class="title pane-toggler-down"><span><?php echo JText::_( 'FLEXI_STANDARD_FIELDS_PROPERTIES' ); ?></span></h3>
 					<div class="jpane-slider content" style="border-top: medium none; border-bottom: medium none; overflow: hidden; padding-top: 6px; padding-bottom: 6px;">
 						
-						<?php
-						foreach($this->form->getFieldset('basic') as $field) :
-							//$input = str_replace("name=\"".$field->inputName."\"", "name=\"params[".$field->inputName."]\"", $field->input);
-							?>
+						<?php foreach($this->form->getFieldset('basic') as $field) : ?>
 							<fieldset class="panelform">
 							<?php echo $field->label; ?>
 							<?php echo $field->input; ?>
 							</fieldset>
-							<?php
-						endforeach;
-						?>
+						<?php endforeach; ?>
+						
+						<?php foreach($this->form->getFieldset('standard') as $field) : ?>
+							<fieldset class="panelform">
+							<?php echo $field->label; ?>
+							<?php echo $field->input; ?>
+							</fieldset>
+						<?php endforeach; ?>
+						
 					</div>
 					
 				</div>

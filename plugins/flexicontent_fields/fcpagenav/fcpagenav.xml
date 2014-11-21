@@ -19,7 +19,7 @@
 	
 	<fields name="attribs">
 		
-		<fieldset name="basic">
+		<fieldset name="standard" repeat="1">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -33,7 +33,7 @@
 			<field name="backend_hidden" type="hidden" default="1" />
 		</fieldset>
 		
-		<fieldset name="group-fcpagenav" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-fcpagenav" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="load_css" type="radio" default="1" label="FLEXI_FIELD_PAGENAV_CSS" description="FLEXI_FIELD_PAGENAV_CSS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

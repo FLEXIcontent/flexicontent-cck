@@ -17,7 +17,7 @@
 	<config>
 	<fields name="attribs">
 	
-		<fieldset name="basic">
+		<fieldset name="standard" repeat="1">
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -29,7 +29,7 @@
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
 		</fieldset>
 		
-		<fieldset name="group-sharedaudio" addpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="group-sharedaudio" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="pretext" type="text" default="" label="FLEXI_FIELD_PREFIX_TEXT" description="FLEXI_FIELD_PREFIX_TEXT_DESC" />
 			<field name="posttext" type="text" default="" label="FLEXI_FIELD_SUFFIX_TEXT" description="FLEXI_FIELD_SUFFIX_TEXT_DESC" />
 			<field name="display_title" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE" description="PLG_FLEXICONTENT_FIELDS_SHAREDAUDIO_DISPLAY_TITLE_DESC">

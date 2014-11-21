@@ -16,7 +16,7 @@
 	<config>
 	<fields name="attribs">
 		
-		<fieldset name="basic" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="standard" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="display_label" type="radio" default="1" label="FLEXI_FIELD_DISPLAY_LABEL" description="FLEXI_FIELD_DISPLAY_LABEL_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
@@ -41,7 +41,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-title" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- title -->
+		<fieldset name="group-title" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- title -->
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
@@ -85,7 +85,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-created" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- created date -->
+		<fieldset name="group-created" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- created date -->
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1"  />
 			<field name="date_format" type="list" default="" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
@@ -194,7 +194,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-createdby" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- created by (author) -->
+		<fieldset name="group-createdby" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- created by (author) -->
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1"  />
 			<field name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
@@ -280,7 +280,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-modified" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- modified date -->
+		<fieldset name="group-modified" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- modified date -->
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1"  />
 			<field name="date_format" type="list" default="DATE_FORMAT_LC1" label="FLEXI_FIELD_DATE_FORMAT" description="FLEXI_FIELD_CUSTOM_FORMAT_J16GE_DESC">
@@ -389,7 +389,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-modifiedby" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- modified by (modifier) -->
+		<fieldset name="group-modifiedby" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- modified by (modifier) -->
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1"  />
 			<field name="name_username" type="radio" default="1" label="FLEXI_DISPLAY_NAME_USERNAME" description="FLEXI_DISPLAY_NAME_USERNAME_DESC">
@@ -475,7 +475,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-state" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- state -->
+		<fieldset name="group-state" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- state -->
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1"  />
 			<field name="show_icons" type="radio" default="1" label="FLEXI_SHOW_ICONS" description="FLEXI_SHOW_ICONS_DESC">
@@ -521,7 +521,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-hits" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- hits -->
+		<fieldset name="group-hits" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- hits -->
 
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
@@ -533,7 +533,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-type" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- document type -->
+		<fieldset name="group-type" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- document type -->
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
@@ -609,7 +609,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-version" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- version -->
+		<fieldset name="group-version" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- version -->
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
@@ -621,7 +621,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-voting" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- voting -->
+		<fieldset name="group-voting" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- voting -->
 			
 			<field name="" type="separator" default="FLEXI_FIELD_VOTE_SUBMISSION" description="FLEXI_FIELD_VOTE_SUBMISSION_DESC" level="level1" />
 			<field name="submit_acclvl" type="accesslevel" default="1" size="1" label="FLEXI_FIELD_VOTE_SUBMIT_ACCESS" description="FLEXI_FIELD_VOTE_SUBMIT_ACCESS_DESC" />
@@ -689,7 +689,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-favourites" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- favourites -->
+		<fieldset name="group-favourites" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- favourites -->
 			
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1"  />
 			<field name="display_favoured_userlist" type="list" default="0" label="FLEXI_FAVOURED_USERLIST" description="FLEXI_FAVOURED_USERLIST_DESC">
@@ -710,7 +710,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-categories" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- categories -->
+		<fieldset name="group-categories" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- categories -->
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
@@ -758,7 +758,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-tags" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- tags -->
+		<fieldset name="group-tags" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- tags -->
 			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
 			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC" class="btn-group btn-group-yesno">
@@ -850,7 +850,7 @@
 			
 		</fieldset>
 		
-		<fieldset name="group-maintext" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- Maintext Intro+Full -->
+		<fieldset name="group-maintext" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements"><!-- Maintext Intro+Full -->
 			
 			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level1"  />
 			<field name="hide_html" type="radio" default="0" label="FLEXI_HIDE_HTML" description="FLEXI_HIDE_HTML_DESC">
