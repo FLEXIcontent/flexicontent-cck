@@ -67,6 +67,13 @@ foreach ($this->items as $item) :
 endforeach;
 
 $items = & $this->items;
+$count 	= count($items);
+// Calculate common data outside the item loops
+if ($count) {
+	$_read_more_about = JText::_( 'FLEXI_READ_MORE_ABOUT' );
+	$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
+	$_comments_container_params = 'class="fc_comments_count_nopad '.$tooltip_class.'" title="'.flexicontent_html::getToolTip('FLEXI_NUM_OF_COMMENTS', 'FLEXI_NUM_OF_COMMENTS_TIP', 1, 1).'"';
+}
 
 // Decide whether to show the edit column
 $buttons_exists = false;
@@ -160,7 +167,7 @@ endif;
 			
 			<?php if ($this->params->get('show_comments_count')) : ?>
 				<?php if ( isset($this->comments[ $item->id ]->total) ) : ?>
-				<div class="fc_comments_count_nopad hasTip" alt="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>" title="<?php echo JText::_('FLEXI_NUM_OF_COMMENTS');?>::<?php echo JText::_('FLEXI_NUM_OF_COMMENTS_TIP');?>">
+				<div <?php echo $_comments_container_params; ?> >
 					<?php echo $this->comments[ $item->id ]->total; ?>
 				</div>
 				<?php endif; ?>

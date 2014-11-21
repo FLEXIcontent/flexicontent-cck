@@ -1875,7 +1875,9 @@ class flexicontent_html
 		//we do the rounding here and not in the query to get better ordering results
 		$rating = round($item->votes);
 
-		$output = '<span class="qf_ratingbarcontainer editlinktip hasTip" title="'.JText::_( 'FLEXI_RATING' ).'::'.JText::_( 'FLEXI_SCORE' ).': '.$rating.'%">';
+		$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+		$tooltip_title = flexicontent_html::getToolTip(JText::_('FLEXI_RATING'), JText::_( 'FLEXI_SCORE' ).': '.$rating.'%', 0, 1);
+		$output = '<span class="qf_ratingbarcontainer editlinktip '.$tooltip_class.'" title="'.$tooltip_title.'">';
 		$output .= '<span class="qf_ratingbar" style="width:'.$rating.'%;">&nbsp;</span></span>';
 
 		return $output;
