@@ -2527,8 +2527,10 @@ class FlexicontentFields
 				$filter->html .= '  value="" '.$checked_attr.' class="fc_checkradio" />';
 			}
 			
-			$filter->html .= '<label class="hasTip '.$checked_class.'" for="'.$filter_ffid.$i.'" '
-				.' title="::'.JText::_('FLEXI_REMOVE_ALL').'"'
+			$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+			$tooltip_title = flexicontent_html::getToolTip('FLEXI_REMOVE_ALL', '', $translate=1, $escape=1);
+			$filter->html .= '<label class="'.$checked_class.$tooltip_class.'" for="'.$filter_ffid.$i.'" '
+				.' title="'.$tooltip_title.'"'
 				.($checked ? ' style="display:none!important;" ' : 'style="background:none!important; padding-left:0px!important;"').'>'.
 				'<span class="fc_delall_filters"></span>';
 			$filter->html .= '</label> '

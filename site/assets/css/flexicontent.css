@@ -523,12 +523,12 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	font-size: 10.998px;
 	font-weight: bold;
 	line-height: 14px;
-	padding: 3px 4px;
+	padding: 4px 4px;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 	vertical-align: baseline;
 	white-space: nowrap;
-	border-radius: 4px;
-	margin: 2px 2px 2px 4px !important;
+	border-radius: 5px;
+	margin: 0px 2px 0px 4px !important;
 }
 .fc_filter .fc_filter_label_inline,
 .fc_filter_line .fc_filter_label_inline {
@@ -546,8 +546,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	display: inline-block !important;
 	color: white !important;
 	background-color: #555 !important;
-	border-bottom: 1px solid #D0D0D0 !important;
-	border-right: 1px solid #D0D0D0 !important;
+	border-width: 0px !important;
 	font-weight: normal !important;
 	font-size: 12px !important;
 	font-family: georgia,arial !important;
@@ -558,7 +557,7 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 
 .fc_filter.fc_filter_text_search .fc_filter_label,
 .fc_filter_line.fc_filter_text_search .fc_filter_label {
-	margin-top: 4px;
+	margin: 5px 8px 0px 8px !important;
 }
 .fc_filter .fc_filter_label {
 	clear: both;
@@ -1586,31 +1585,30 @@ div.fancybox-wrap a { background: none!important;}
 }
 
 #flexicontent .flexi.label, .flexi.label {
-  white-space: normal !important;
+	white-space: normal !important;
 	float: left !important;
-  /*width: 16% !important;*/
-	display: block !important;
+	/*width: 16%;*/
+	display: inline-block !important;
 	
-	background-color: gray !important;
-	color: #FFFFFF !important;
+	background-color: #999 !important;
+	color: #fff !important;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
 	
-	font-size: 10.998px !important;
+	font-size: 11.844px !important;
 	font-weight: bold !important;
 	line-height: 14px !important;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
 	vertical-align: baseline !important;
 	
-  border-bottom: 1px solid #D0D0D0 !important;
-  border-right: 1px solid #D0D0D0 !important;
-  font-style: normal !important;
-  font-family: arial !important;
-  text-align: right !important;
-  max-width: 120px !important;
-  min-width: auto !important;
-  margin: 2px 6px 2px 2px !important;
+	border-width: 0px !important;
+	font-style: normal !important;
+	font-family: arial !important;
+	text-align: right !important;
+	max-width: 120px !important;
+	min-width: auto !important;
+	margin: 2px 6px 2px 2px !important;
 	padding: 3px 4px !important;
-  border-radius: 6px !important;
+	border-radius: 5px !important;
 }
 
 #flexicontent .flexi.value, .flexi.value {
