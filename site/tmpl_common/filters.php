@@ -36,16 +36,19 @@ $filter_instructions = ($use_search || $use_filters) ? $filter_instructions : 0;
 $legend_class = 'fc_legend_text';
 $legend_tip = '';
 if ($filter_instructions == 1) {
-	$legend_class .= ' hasTip';
-	$legend_tip  = '::';
-	$legend_tip .= $use_search ? '&lt;b&gt;'.JText::_('FLEXI_TEXT_SEARCH').'&lt;/b&gt;&lt;br/&gt;'.JText::_('FLEXI_TEXT_SEARCH_INFO') : '';
-	$legend_tip .= ($use_search || $use_filters) ? '&lt;br/&gt;&lt;br/&gt;' : '';
-	$legend_tip .= $use_filters ? '&lt;b&gt;'.JText::_('FLEXI_FIELD_FILTERS').'&lt;/b&gt;&lt;br/&gt;'.JText::_('FLEXI_FIELD_FILTERS_INFO') : '';
+	$legend_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+	$legend_tip =
+		 ($use_search ? '<b>'.JText::_('FLEXI_TEXT_SEARCH').'</b><br/>'.JText::_('FLEXI_TEXT_SEARCH_INFO') : '')
+		.(($use_search || $use_filters) ? '<br/><br/>' : '')
+		.($use_filters ? '<b>'.JText::_('FLEXI_FIELD_FILTERS').'</b><br/>'.JText::_('FLEXI_FIELD_FILTERS_INFO') : '')
+		;
+	$legend_tip = flexicontent_html::getToolTip(null, $legend_tip, 0, 1);
 } else if ($filter_instructions == 2) {
-	$legend_inline ='';
-	$legend_inline .= $use_search ? '<strong>'.JText::_('FLEXI_TEXT_SEARCH').'</strong><br/>'.JText::_('FLEXI_TEXT_SEARCH_INFO') : '';
-	$legend_inline .= ($use_search || $use_filters) ? '<br/><br/>' : '';
-	$legend_inline .= $use_filters ? '<strong>'.JText::_('FLEXI_FIELD_FILTERS').'</strong><br/>'.JText::_('FLEXI_FIELD_FILTERS_INFO') : '';
+	$legend_inline =
+		 ($use_search ? '<strong>'.JText::_('FLEXI_TEXT_SEARCH').'</strong><br/>'.JText::_('FLEXI_TEXT_SEARCH_INFO') : '')
+		.(($use_search || $use_filters) ? '<br/><br/>' : '')
+		.($use_filters ? '<strong>'.JText::_('FLEXI_FIELD_FILTERS').'</strong><br/>'.JText::_('FLEXI_FIELD_FILTERS_INFO') : '')
+		;
 }
 
 ?>

@@ -52,17 +52,13 @@ class FlexicontentViewItems extends JViewLegacy {
 		$enable_translation_groups = $cparams->get("enable_translation_groups") && ( FLEXI_J16GE || FLEXI_FISH ) ;
 		$print_logging_info = $cparams->get('print_logging_info');
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		
 		if($task == 'copy') {
 			$this->setLayout('copy');
 			$this->_displayCopyMove($tpl, $cid);
 			return;
 		}
 		
-		flexicontent_html::loadJQuery();
 		flexicontent_html::loadFramework('select2');
-		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.calendar');
 
 		// Get filters

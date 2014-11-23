@@ -3474,7 +3474,7 @@ class FlexicontentFields
 			if ($i_slave) $fc_run_times['render_subfields'][$i_slave] += round(1000000 * 10 * (microtime(true) - $start_microtime)) / 10;
 		}
 		
-		$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
+		$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 		$display = array();
 		foreach($item_list as $result)
 		{
@@ -3489,7 +3489,7 @@ class FlexicontentFields
 			$item_title_escaped = htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8');
 			
 			$tooltip_title = flexicontent_html::getToolTip($url_read_more, $item_title_escaped, $translate=0, $escape=0);
-			$item_tooltip = ' class="'.$tooltip_class.' '.$url_class.'" title="'.$tooltip_title.'" ';
+			$item_tooltip = ' class="'.$url_class.$tooltip_class.'" title="'.$tooltip_title.'" ';
 						
 			$display_text = $displayway ? $result->title : $result->id;
 			$display_text = !$addlink ? $display_text : '<a href="'.$item_url.'"'.($addtooltip ? $item_tooltip : '').' >' .$display_text. '</a>';

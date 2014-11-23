@@ -43,9 +43,6 @@ class FlexicontentViewItemcompare extends JViewLegacy {
 		$codemode = JRequest::getInt('codemode',0);
 		$cparams  = JComponentHelper::getParams('com_flexicontent');
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		flexicontent_html::loadFramework('jQuery');
-		JHTML::_('behavior.tooltip');
 		JHTML::_('behavior.modal');
 
 		//a trick to avoid loosing general style in modal window

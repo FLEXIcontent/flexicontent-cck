@@ -114,12 +114,23 @@ if (!FLEXI_J16GE) {
 // Load common js libs / frameworks
 // ********************************
 
-if ($cparams->get('add_tooltips', 1)) {
+if ( JRequest::getWord('format')!='raw')
+{
 	// Load mootools
 	FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-	JHTML::_('behavior.tooltip');
+	
+	// Load jquery Framework
+	flexicontent_html::loadJQuery();
+	
+	if ($cparams->get('add_tooltips', 1))
+	{
+		// Load J2.5 (non-bootstrap tooltips) tooltips, we still need regardless of using J3.x, since some code may still use them
+		JHTML::_('behavior.tooltip');
+		
+		// J3.0+ tooltips (bootstrap based)
+		JHtml::_('bootstrap.tooltip');
+	}
 }
-
 
 
 // ***********************************

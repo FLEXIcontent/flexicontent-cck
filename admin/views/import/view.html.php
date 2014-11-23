@@ -53,9 +53,6 @@ class FlexicontentViewImport extends JViewLegacy
 		$context	= 'com_flexicontent';
 		$has_zlib = version_compare(PHP_VERSION, '5.4.0', '>=');
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		JHTML::_('behavior.tooltip');
-
 		//add css to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');

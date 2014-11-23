@@ -1544,7 +1544,7 @@ class modFlexicontentHelper
 				{
 					$in_values = array();
 					foreach ($filter_values as $val) $in_values[] = $db->Quote( $val );   // Quote in case they are strings !!
-					$where_field_filters .= ' AND '.$negage_op.' (rel'.$filter_id.'.value IN ('.implode(',', $in_values).') ) ';
+					$where_field_filters .= ' AND '.$negate_op.' (rel'.$filter_id.'.value IN ('.implode(',', $in_values).') ) ';
 				}
 				
 				// Range value filter
@@ -1553,7 +1553,7 @@ class modFlexicontentHelper
 					$value_empty = !strlen(@$filter_values[1]) && strlen(@$filter_values[2]) ? ' OR rel'.$filter_id.'.value="" OR rel'.$filter_id.'.value IS NULL ' : '';
 					
 					if ( strlen(@$filter_values[1]) || ( strlen(@$filter_values[2]) ) ) {
-						$where_field_filters .= ' AND '.$negage_op.' ( 1 ';
+						$where_field_filters .= ' AND '.$negate_op.' ( 1 ';
 						if ( strlen(@$filter_values[1]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value >=' . $filter_values[1] . ') ';
 						if ( strlen(@$filter_values[2]) ) $where_field_filters .= ' AND (rel'.$filter_id.'.value <=' . $filter_values[2] . $value_empty . ') ';
 						$where_field_filters .= ' )';

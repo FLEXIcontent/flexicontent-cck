@@ -651,11 +651,12 @@ class FlexicontentViewItem  extends JViewLegacy
 					JPluginHelper::importPlugin('captcha');
 					$dispatcher->trigger('onInit','dynamic_recaptcha_1');
 					
-					$field_description = JText::_( 'FLEXI_CAPTCHA_ENTER_CODE_DESC' );
-					$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
+					$label_class  = 'flexi_label';
+					$label_class .= FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+					$label_tooltip = flexicontent_html::getToolTip(null, 'FLEXI_CAPTCHA_ENTER_CODE_DESC', 1, 1);
 					
 					$captcha_field = '
-						<label id="recaptcha_response_field-lbl" for="recaptcha_response_field" '.$label_tooltip.' >
+						<label id="recaptcha_response_field-lbl" for="recaptcha_response_field" class="'.$label_class.'" title="'.$label_tooltip.'" >
 						'. JText::_( 'FLEXI_CAPTCHA_ENTER_CODE' ).'
 						</label>
 						<div class="container_fcfield container_fcfield_name_captcha">

@@ -116,10 +116,6 @@ class FlexicontentViewUser extends JViewLegacy
 		// Load pane behavior
 		jimport('joomla.html.pane');
 		
-		// Load tooltips
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		JHTML::_('behavior.tooltip');
-		
 		// Add css to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');

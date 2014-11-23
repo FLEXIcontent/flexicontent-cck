@@ -39,7 +39,7 @@ function FCFav(id) {
 				if(response>0){
 					if (div) {
 						var newtotal = Math.abs(response);
-						link.innerHTML='<img src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
+						link.innerHTML='<img alt="'+fcfav_text[7]+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />';
 						var newfavs=newtotal+' '+fcfav_text[5];
 						div.innerHTML='<small>['+newfavs+']</small>';
 					}
@@ -47,7 +47,7 @@ function FCFav(id) {
 				else if(response<0){
 					if (div) {
 						var newtotal = Math.abs(response);
-						link.innerHTML='<img src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
+						link.innerHTML='<img alt="'+fcfav_text[7]+'" src="'+live_site+'/components/com_flexicontent/assets/images/heart_add.png" border="0" />';
 						var newfavs=newtotal+' '+fcfav_text[5];
 						div.innerHTML='<small>['+newfavs+']</small>';
 					}

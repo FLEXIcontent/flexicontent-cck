@@ -12,12 +12,14 @@
 	$fav_tip_hover	= JText::_( 'FLEXI_ADDREMOVE_FAVOURITE_TIP' );
 	$fav_show_item	= JText::_( 'READ MORE...' );
 	$forced_itemid = $params->get('forced_itemid');
+	$alt_add = JText::_( 'FLEXI_FAVOURE' );
+	$alt_delete = JText::_( 'FLEXI_REMOVE_FAVOURITE' );
 	$js = '
     var fl_currentURL   = window.location;
     var fl_base_folder  = "'.JURI::base(true).'";
     var fl_live_site    = fl_currentURL.protocol+"//" + fl_currentURL.host + fl_base_folder;
-    var fl_del_icon=\'<img align="top" src="\'+fl_live_site+\'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />\';
-    var fl_add_icon=\'<img align="top" src="\'+fl_live_site+\'/components/com_flexicontent/assets/images/heart_add.png" border="0" />\';
+    var fl_del_icon=\'<img align="top" alt="'.$alt_delete.'" src="\'+fl_live_site+\'/components/com_flexicontent/assets/images/heart_delete.png" border="0" />\';
+    var fl_add_icon=\'<img align="top" alt="'.$alt_add.'" src="\'+fl_live_site+\'/components/com_flexicontent/assets/images/heart_add.png" border="0" />\';
     var fl_icon_title="'.$fav_tip_hover.'";
     var fl_show_item="'.$fav_show_item.'";
     var fl_item_link="index.php?option=com_flexicontent&view='.FLEXI_ITEMVIEW.($forced_itemid?'&itemid='.$forced_itemid:'').'&id=";

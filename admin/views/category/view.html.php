@@ -136,8 +136,6 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Include needed files and add needed js / css files
 		// **************************************************
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('select2');
 		
 		// Load pane behavior
