@@ -72,24 +72,23 @@ class FlexicontentViewItem extends JViewLegacy
 		// Load JS/CSS files
 		// *****************
 		
-		flexicontent_html::loadFramework('select2');
-		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
-		
-		// Load custom behaviours: form validation, popup tooltips
-		//JHTML::_('behavior.formvalidation');
-		
 		// Add css to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 		
-		// Add js function to overload the joomla submitform
-		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
-		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
+		
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
 		
 		// Add js function for custom code used by FLEXIcontent item form
-		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/itemscreen.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/itemscreen.js');
 		
 		
 		// ***********************

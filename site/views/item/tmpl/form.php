@@ -56,6 +56,7 @@ $infoimage = JHTML::image ( 'components/com_flexicontent/assets/images/icon-16-h
 $close_btn = FLEXI_J30GE ? '<a class="close" data-dismiss="alert">&#215;</a>' : '<a class="fc-close" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">&#215;</a>';
 $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</div>' : '<div %s class="fc-mssg fc-%s %s">'.$close_btn.'%s</div>';
 $btn_class = FLEXI_J30GE ? 'btn' : 'fc_button';
+$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 
 // Calculate refer parameter for returning to this page when user ends editing/submitting
 $return = JRequest::getString('return', '', 'get');
@@ -89,17 +90,17 @@ if ($this->params->get('form_extra_js'))     $this->document->addScriptDeclarati
 if ($this->params->get('form_extra_js_fe'))  $this->document->addScriptDeclaration($this->params->get('form_extra_js_fe'));
 
 // Load JS tabber lib
-$this->document->addScript( JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js' );
-$this->document->addStyleSheet( JURI::root().'components/com_flexicontent/assets/css/tabber.css' );
+$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js' );
+$this->document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css' );
 $this->document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');  // temporarily hide the tabbers until javascript runs
 
 if ( $this->perms['cantags'] && $this->params->get('usetags_fe', 1)==1 ) {
-	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js');
-	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js');
-	$this->document->addScript(JURI::root().'components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js');
+	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.bgiframe.min.js');
+	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.ajaxQueue.js');
+	$this->document->addScript(JURI::root(true).'/components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.min.js');
 	// These are not used in frontend form (in order to keep it simpler, maybe we will add via parameter ...)
-	//$this->document->addScript(JURI::root().'components/com_flexicontent/assets/js/jquery.pager.js');     // e.g. pagination for item versions
-	//$this->document->addScript(JURI::root().'components/com_flexicontent/assets/js/jquery.autogrow.js');  // e.g. autogrow version comment textarea
+	//$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.pager.js');     // e.g. pagination for item versions
+	//$this->document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/jquery.autogrow.js');  // e.g. autogrow version comment textarea
 	
 	$this->document->addStyleSheet('components/com_flexicontent/librairies/jquery-autocomplete/jquery.autocomplete.css');
 	$this->document->addScriptDeclaration("
@@ -348,13 +349,9 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 	$field = $this->fields['title'];
 	$field_description = $field->description ? $field->description :
 		JText::_(FLEXI_J16GE ? $this->form->getField('title')->__get('description') : 'TIPTITLEFIELD');
-	if(FLEXI_J30GE){
-		$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim($field->label, ':'), $field_description, 0).'"';
-	}else{
-		$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
-	}
+	$label_tooltip = 'class="'.$tooltip_class.' flexi_label" title="'.flexicontent_html::getToolTip(trim($field->label, ':'), $field_description, 0, 1).'"';
 	?>
-	<label id="jform_title-lbl" for="jform_title" <?php echo $label_tooltip; ?> >
+	<label id="jform_title-lbl" for="jform_title" for_bck="jform_title" <?php echo $label_tooltip; ?> >
 		<?php echo $field->label; //JText::_( 'FLEXI_TITLE' ); ?>
 	</label>
 	<?php /*echo $this->form->getLabel('title');*/ ?>
@@ -395,13 +392,9 @@ $page_classes .= $this->pageclass_sfx ? ' page'.$this->pageclass_sfx : '';
 if ($this->params->get('usealias_fe', 1)) : ob_start();  // alias ?>
 	<?php
 	$field_description = JText::_(FLEXI_J16GE ? $this->form->getField('alias')->__get('description') : 'ALIASTIP');
-	if(FLEXI_J30GE){
-		$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_( 'FLEXI_ALIAS' ), ':'), $field_description, 0).'"';
-	}else{
-		$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
-	}
+	$label_tooltip = 'class="'.$tooltip_class.' flexi_label" title="'.flexicontent_html::getToolTip(trim(JText::_( 'FLEXI_ALIAS' ), ':'), $field_description, 0, 1).'"';
 	?>
-	<label id="jform_alias-lbl" for="jform_alias" <?php echo $label_tooltip; ?> >
+	<label id="jform_alias-lbl" for="jform_alias" for_bck="jform_alias" <?php echo $label_tooltip; ?> >
 		<?php echo JText::_( 'FLEXI_ALIAS' ); ?>
 	</label>
 	
@@ -443,11 +436,7 @@ if ($typeid==0) : ob_start();  // type ?>
 	$field = $this->fields['document_type'];
 	$field_description = $field->description ? $field->description :
 		JText::_(FLEXI_J16GE ? $this->form->getField('type_id')->__get('description') : 'FLEXI_TYPE_DESC');
-	if(FLEXI_J30GE){
-		$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(@$field->label ? $field->label : JText::_( 'FLEXI_TYPE' ), ':'), $field_description, 0).'"';
-	}else{
-		$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
-	}
+	$label_tooltip = 'class="'.$tooltip_class.' flexi_label" title="'.flexicontent_html::getToolTip(trim(@$field->label ? $field->label : JText::_( 'FLEXI_TYPE' ), ':'), $field_description, 0, 1).'"';
 	?>
 	<label id="jform_type_id-lbl" for="jform_type_id" for_bck="jform_type_id" <?php echo $label_tooltip; ?> >
 		<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_TYPE' ); ?>
@@ -474,13 +463,9 @@ if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item
 	$field = $this->fields['state'];
 	$field_description = $field->description ? $field->description :
 		JText::_(FLEXI_J16GE ? $this->form->getField('state')->__get('description') : 'FLEXI_STATE_DESC');
-	if(FLEXI_J30GE){
-		$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(@$field->label ? $field->label : JText::_( 'FLEXI_STATE' ), ':'), $field_description, 0).'"';
-	}else{
-		$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field_description, ENT_COMPAT, 'UTF-8').'"';
-	}
+	$label_tooltip = 'class="'.$tooltip_class.' flexi_label" title="'.flexicontent_html::getToolTip(trim(@$field->label ? $field->label : JText::_( 'FLEXI_STATE' ), ':'), $field_description, 0, 1).'"';
 	?>
-	<label id="jform_state-lbl" for="jform_state" <?php echo $label_tooltip; ?> >
+	<label id="jform_state-lbl" for="jform_state" for_bck="jform_state" <?php echo $label_tooltip; ?> >
 		<?php echo @$field->label ? $field->label : JText::_( 'FLEXI_STATE' ); ?>
 	</label>
 	
@@ -498,13 +483,9 @@ if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item
 			<div style="float:left; width:50%;">
 				<?php
 					//echo "<br/>".$this->form->getLabel('vstate') . $this->form->getInput('vstate');
-					if(FLEXI_J30GE){
-						$label_tooltip = 'class="hasTooltip flexi_label fcdualline" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_PUBLIC_DOCUMENT_CHANGES'), ':'), htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC' ), ENT_COMPAT, 'UTF-8'), 0).'"';
-					}else{
-						$label_tooltip = 'class="hasTip flexi_label fcdualline" title="'.htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC' ), ENT_COMPAT, 'UTF-8').'"';
-					}
+					$label_tooltip = 'class="'.$tooltip_class.' flexi_label fcdualline" title="'.flexicontent_html::getToolTip('FLEXI_PUBLIC_DOCUMENT_CHANGES', 'FLEXI_PUBLIC_DOCUMENT_CHANGES_DESC', 1, 1).'"';
 				?>
-				<label id="jform_vstate-lbl" for="jform_vstate" <?php echo $label_tooltip; ?> >
+				<label id="jform_vstate-lbl" for="jform_vstate" for_bck="jform_vstate" <?php echo $label_tooltip; ?> >
 					<?php echo JText::_( 'FLEXI_PUBLIC_DOCUMENT_CHANGES' ); ?>
 				</label>
 				<div class="container_fcfield container_fcfield_name_vstate fcdualline">
@@ -534,11 +515,7 @@ if ( $isnew && $this->params->get('autopublished') ) :  // Auto publish new item
 
 if ( $typeid && $this->params->get('allowdisablingcomments_fe') ) : ob_start();  // disable_comments ?>
 	<?php
-	if(FLEXI_J30GE){
-		$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_ALLOW_COMMENTS'), ':'), htmlspecialchars(JText::_( 'FLEXI_ALLOW_COMMENTS_DESC' ), ENT_COMPAT, 'UTF-8'), 0).'"';
-	}else{
-		$label_tooltip = 'class="hasTip flexi_label" title="'.htmlspecialchars(JText::_ ( 'FLEXI_ALLOW_COMMENTS' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_ALLOW_COMMENTS_DESC' ), ENT_COMPAT, 'UTF-8').'"';
-	}
+	$label_tooltip = 'class="'.$tooltip_class.' flexi_label" title="'.flexicontent_html::getToolTip('FLEXI_ALLOW_COMMENTS', 'FLEXI_ALLOW_COMMENTS_DESC', 1, 1).'"';
 	?>
 	<label id="jform_attribs_comments-title" <?php echo $label_tooltip; ?> >
 		<?php echo JText::_( 'FLEXI_ALLOW_COMMENTS' );?>
@@ -552,11 +529,7 @@ if ( $typeid && $this->params->get('allowdisablingcomments_fe') ) : ob_start(); 
 
 if ( $typeid && $this->params->get('allow_subscribers_notify_fe', 0) && $this->subscribers) :  ob_start();  // notify_subscribers ?>
 	<?php
-		if(FLEXI_J30GE){
-			$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_NOTIFY_FAVOURING_USERS'), ':'), htmlspecialchars(JText::_( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8'), 0).'"';
-		}else{
-			$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars(JText::_( 'FLEXI_NOTIFY_NOTES' ), ENT_COMPAT, 'UTF-8').'"';
-		}
+	$label_tooltip = 'class="'.$tooltip_class.' flexi_label" title="'.flexicontent_html::getToolTip('FLEXI_NOTIFY_FAVOURING_USERS', 'FLEXI_NOTIFY_NOTES', 1, 1).'"';
 	?>
 	<label id="jform_notify-msg" <?php echo $label_tooltip; ?> >
 		<?php echo JText::_( 'FLEXI_NOTIFY_FAVOURING_USERS' ); ?>
@@ -629,11 +602,7 @@ if ($tags_displayed) : ob_start();  // tags ?>
 		
 		<?php
 		$field = $this->fields['tags'];
-		if(FLEXI_J30GE){
-			$label_tooltip = $field->description ? 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim($field->label, ':'), htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8'), 0).'"':'class="flexi_label"';
-		}else{
-			$label_tooltip = $field->description ? 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8').'"' : 'class="flexi_label"';
-		}
+		$label_tooltip = $field->description ? 'class="'.$tooltip_class.' flexi_label" title="'.flexicontent_html::getToolTip(trim($field->label, ':'), $field->description, 0, 1).'"':'class="flexi_label"';
 		?>
 		<label id="jform_tag-lbl" for="jform_tag" <?php echo $label_tooltip; ?> >
 			<?php echo $field->label; ?>
@@ -698,11 +667,7 @@ if ((FLEXI_FISH || FLEXI_J16GE) && $this->params->get('uselang_fe', 1)) : ob_sta
 
 			<div class="fcclear"></div>
 			<?php
-				if(FLEXI_J30GE){
-					$label_tooltip = 'class="hasTooltip flexi_label" title="'.JHtml::tooltipText(trim(JText::_('FLEXI_ORIGINAL_CONTENT_ITEM'), ':'), htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8'), 0).'"';
-				}else{
-					$label_tooltip = 'class="hasTip flexi_label" title="'.'::'.htmlspecialchars(JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC' ), ENT_COMPAT, 'UTF-8').'"';
-				}
+			$label_tooltip = 'class="'.$tooltip_class.' flexi_label" title="'.flexicontent_html::getToolTip('FLEXI_ORIGINAL_CONTENT_ITEM', 'FLEXI_ORIGINAL_CONTENT_ITEM_DESC', 1, 1).'"';
 			?>
 			<label id="jform_lang_parent_id-lbl" for="jform_lang_parent_id" <?php echo $label_tooltip; ?> >
 				<?php echo JText::_( 'FLEXI_ORIGINAL_CONTENT_ITEM' );?>
@@ -1159,8 +1124,8 @@ if ($this->fields && $typeid) :
 			// field has tooltip
 			$edithelp = $field->edithelp ? $field->edithelp : 1;
 			if ( $field->description && ($edithelp==1 || $edithelp==2) ) {
-				 $lbl_class .= (FLEXI_J30GE?' hasTooltip':' hasTip').($edithelp==2 ? ' fc_tooltip_icon_fe' : '');
-				 $lbl_title = FLEXI_J30GE?(JHtml::tooltipText(trim($field->label, ':'), htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8'), 0)):('::'.htmlspecialchars($field->description, ENT_COMPAT, 'UTF-8'));
+				 $lbl_class .= ($edithelp==2 ? ' fc_tooltip_icon_fe ' : ' ') .$tooltip_class;
+				 $lbl_title = flexicontent_html::getToolTip(trim($field->label, ':'), $field->description, 0, 1);
 			}
 			// field is required
 			$required = $field->parameters->get('required', 0 );

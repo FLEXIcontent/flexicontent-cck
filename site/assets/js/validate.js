@@ -29,9 +29,15 @@ var fcflabels = null;
  * @subpackage	Forms
  * @since		1.5
  */
+var JFormValidator_fc = null;
 var JFormValidator = new Class({
 	initialize: function()
 	{
+		// Joomla form validator should be loaded before this script, to avoid potential conflicts
+		// we prevent Joomla form validation JS script to create 2nd validation object
+		if (JFormValidator_fc) return JFormValidator_fc;  //
+		//alert('Initializing FLEXIcontent form validator');
+		
 		// Initialize variables
 		this.handlers	= Object();
 		this.custom		= Object();
@@ -553,11 +559,13 @@ var JFormValidator = new Class({
 		}
 	}
 });
-var JFormValidator_fc = JFormValidator();
+
+//alert('Loading FLEXIcontent form validator');
+JFormValidator_fc = new JFormValidator();
 
 document.formvalidator = null;
 jQuery(document).ready(function() {
-	document.formvalidator = new JFormValidator_fc();
+	document.formvalidator = JFormValidator_fc;
 	jQuery('form.form-validate').each(function(){
 		document.formvalidator.attachToForm($(this));
 	});

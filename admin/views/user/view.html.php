@@ -55,9 +55,14 @@ class FlexicontentViewUser extends JViewLegacy
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
-		//add js function to overload the joomla submitform
-		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
-		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
+		
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+		
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
 		
 		// load language file for com_users component
 		JFactory::getLanguage()->load('com_users', JPATH_ADMINISTRATOR, 'en-GB', true);

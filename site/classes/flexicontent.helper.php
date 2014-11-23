@@ -2114,7 +2114,7 @@ class flexicontent_html
 				JHTML::_('behavior.tooltip');
 				
 				// J3.0+ tooltips (bootstrap based)
-				JHtml::_('bootstrap.tooltip');
+				if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
 			}
 			
 			$document = JFactory::getDocument();
@@ -2300,7 +2300,7 @@ class flexicontent_html
 				JHTML::_('behavior.tooltip');
 				
 				// J3.0+ tooltips (bootstrap based)
-				JHtml::_('bootstrap.tooltip');
+				if (FLEXI_J30GE) JHtml::_('bootstrap.tooltip');
 			}
 			
 			$document	= JFactory::getDocument();

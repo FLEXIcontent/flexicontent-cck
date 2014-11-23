@@ -29,7 +29,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 
 // Load plupload JS framework
 $doc = JFactory::getDocument();
-$pluploadlib = JURI::root().'components/com_flexicontent/librairies/plupload/';
+$pluploadlib = JURI::root(true).'/components/com_flexicontent/librairies/plupload/';
 $plupload_mode = 'runtime';  // 'runtime,ui'
 flexicontent_html::loadFramework('plupload', $plupload_mode);
 

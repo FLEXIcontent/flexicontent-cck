@@ -136,22 +136,22 @@ class FlexicontentViewCategory extends JViewLegacy
 		// Include needed files and add needed js / css files
 		// **************************************************
 		
-		flexicontent_html::loadFramework('select2');
-		
-		// Load pane behavior
-		jimport('joomla.html.pane');
-		// Load tooltips
-		JHTML::_('behavior.tooltip');
-		
 		// Add css to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		if      (FLEXI_J30GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		else if (FLEXI_J16GE) $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 		else                  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j15.css');
 		
-		// Add js function to overload the joomla submitform
-		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
-		$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
+		// Add JS frameworks
+		flexicontent_html::loadFramework('select2');
+		
+		// Add js function to overload the joomla submitform validation
+		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
+		$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
+		
+		//Load pane behavior
+		jimport('joomla.html.pane');
 		
 		
 		// ********************

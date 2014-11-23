@@ -91,7 +91,7 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		
 		$document = JFactory::getDocument();
 		$document->addStyleDeclaration($css);
-		$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_form.css');
+		$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form.css');
 		
 		// WORKAROUNDs of for 2 issues in com_config: slow chosen JS and PHP 5.3.9+ 'max_input_vars' limit
 		if (FLEXI_J30GE) $jinput = JFactory::getApplication()->input;
@@ -101,13 +101,13 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		$component  = FLEXI_J30GE ? $jinput->get('component', '', 'string')  : JRequest::getVar('component');
 		
 		//if ($option=='com_config' || $option=='com_menus' || $option=='com_modules') {
-		$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/flexi_shared.css');
+		$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css');
 		//}
 		
 		$js = '';
 		if ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') {
-			$document->addStyleSheet(JURI::root().'components/com_flexicontent/assets/css/tabber.css');
-			$document->addScript(JURI::root().'components/com_flexicontent/assets/js/tabber-minimized.js');
+			$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
+			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
 			$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
 			
 			if (FLEXI_J30GE) {
@@ -140,8 +140,10 @@ class JFormFieldSeparator extends JFormFieldSpacer
 			require_once (JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'classes'.DS.'flexicontent.helper.php');
 			FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 			flexicontent_html::loadJQuery();
-			$document->addScript(JURI::root().'components/com_flexicontent/assets/js/admin.js');
-			$document->addScript(JURI::root().'components/com_flexicontent/assets/js/validate.js');
+			// Add js function to overload the joomla submitform validation
+			JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden
+			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/admin.js');
+			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/validate.js');
 			//if (!FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j25.css');
 			if (FLEXI_J30GE)  $document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/j3x.css');
 		}
