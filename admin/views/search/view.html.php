@@ -236,12 +236,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$document->addScriptDeclaration($js);
 	}
 	
-	function indexer($tpl) {
-		$document = JFactory::getDocument();
-		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		flexicontent_html::loadJQuery();
-		
+	function indexer($tpl)
+	{		
 		parent::display($tpl);
 	}
 }

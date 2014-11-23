@@ -46,10 +46,6 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$db       = JFactory::getDBO();
 		$print_logging_info = $params->get('print_logging_info');
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		flexicontent_html::loadFramework('jQuery');
-		JHTML::_('behavior.tooltip');
-		
 		// Special displaying when getting flexicontent version
 		$layout = JRequest::getVar('layout', 'default');
 		if($layout=='fversion') {

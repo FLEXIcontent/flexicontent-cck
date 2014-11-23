@@ -102,7 +102,12 @@ if (JRequest::getCmd('print')) {
 	</h2>
 <?php endif; ?>
 
-<?php if (!count($this->items)) : ?>
+
+<?php
+$items	= & $this->items;
+?>
+
+<?php if (!count($items)) : ?>
 
 	<div class="note">
 		<?php echo JText::_( 'FLEXI_NO_ITEMS_TAGGED' ); ?>
@@ -111,15 +116,18 @@ if (JRequest::getCmd('print')) {
 <?php else : ?>
 
 <?php
-if ($use_fields && count($fields)) {
-	foreach ($this->items as $i => $item) {
-		foreach ($fields as $fieldname) {
-			// IMPORTANT: below we must use $this->items[$i], and not $item, otherwise joomla will not cache value !!!
-			FlexicontentFields::getFieldDisplay($this->items[$i], $fieldname, $values=null, $method='display');
-			if ( !empty($this->items[$i]->fields[$fieldname]->display) )  $found_fields[$fieldname] = 1;
+	$_read_more_about = JText::_( 'FLEXI_READ_MORE_ABOUT' );
+	$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
+	
+	if ($use_fields && count($fields)) {
+		foreach ($items as $i => $item) {
+			foreach ($fields as $fieldname) {
+				// IMPORTANT: below we must use $items[$i], and not $item, otherwise joomla will not cache value !!!
+				FlexicontentFields::getFieldDisplay($items[$i], $fieldname, $values=null, $method='display');
+				if ( !empty($items[$i]->fields[$fieldname]->display) )  $found_fields[$fieldname] = 1;
+			}
 		}
 	}
-}
 ?>
 
 <form action="<?php echo $this->action; ?>" method="POST" id="adminForm" name="adminForm" onsubmit="">
@@ -155,14 +163,14 @@ if ($use_fields && count($fields)) {
 			<?php if ($use_fields && count($fields)) : ?>
 				<?php foreach ($fields as $fieldname) : ?>
 					<?php	if ( empty($found_fields[$fieldname]) ) continue; ?>
-					<th id="fc_<?php echo $fieldname; ?>" ><?php echo $this->items[0]->fields[$fieldname]->label; ?></th>
+					<th id="fc_<?php echo $fieldname; ?>" ><?php echo $items[0]->fields[$fieldname]->label; ?></th>
 				<?php endforeach; ?>
 			<?php endif; ?>
 		</tr>
 	</thead>
 	<tbody>	
 	<?php
-	foreach ($this->items as $i => $item) :
+	foreach ($items as $i => $item) :
 		if ($use_image) {
 			$src = '';
 			$thumb = '';
@@ -223,12 +231,13 @@ if ($use_fields && count($fields)) {
 			<td headers="fc_image" align="center">
 				<?php if (!empty($thumb)) : ?>
 				
+					<?php $title_encoded = htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>
 					<?php if ($this->params->get('link_image', 1)) { ?>
-						<a href="<?php echo $item_link; ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($item->title, ENT_COMPAT, 'UTF-8'); ?>">
-							<img src="<?php echo $thumb; ?>" />
+						<a href="<?php echo $item_link; ?>" >
+							<img src="<?php echo $thumb; ?>" alt="<?php echo $title_encoded; ?>" class="<?php echo $tooltip_class;?>" title="<?php echo flexicontent_html::getToolTip($_read_more_about, $title_encoded, 0, 0); ?>"/>
 						</a>
 					<?php } else { ?>
-						<img src="<?php echo $thumb; ?>" />
+						<img src="<?php echo $thumb; ?>" alt="<?php echo $title_encoded; ?>" title="<?php echo $title_encoded; ?>" />
 					<?php } ?>
 					
 				<?php else : ?>
@@ -237,7 +246,9 @@ if ($use_fields && count($fields)) {
 			</td>
 		<?php endif; ?>
 			<td headers="fc_title">
-				<a href="<?php echo $item_link; ?>"><?php echo $this->escape($item->title); ?></a>
+				<a href="<?php echo $item_link; ?>">
+					<?php echo $this->escape($item->title); ?>
+				</a>
 				<?php echo $markup_tags; ?>
 			</td>
 			<td headers="fc_intro">

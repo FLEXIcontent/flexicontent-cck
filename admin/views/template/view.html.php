@@ -39,12 +39,9 @@ class FlexicontentViewTemplate extends JViewLegacy {
 		$document = JFactory::getDocument();
 		$user     = JFactory::getUser();
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		$use_jquery_sortable = true; //FLEXI_J16GE ? true : false;
 		
-		if ($use_jquery_sortable) {
-			flexicontent_html::loadJQuery();
-		} else {
+		if (!$use_jquery_sortable) {
 			// mootools sortable
 			$document->addScript( JURI::base().'components/com_flexicontent/assets/js/sortables.js' );
 		}

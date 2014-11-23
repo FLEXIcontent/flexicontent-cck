@@ -72,14 +72,11 @@ class FlexicontentViewItem extends JViewLegacy
 		// Load JS/CSS files
 		// *****************
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('select2');
 		$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
 		
 		// Load custom behaviours: form validation, popup tooltips
 		//JHTML::_('behavior.formvalidation');
-		JHTML::_('behavior.tooltip');
 		
 		// Add css to document
 		$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');

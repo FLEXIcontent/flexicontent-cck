@@ -44,11 +44,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$document  = JFactory::getDocument();
 		$option    = JRequest::getVar('option');
 		
-		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('select2');
-		
-		JHTML::_('behavior.tooltip');
 		
 		//get vars
 		$filter_assigned  = $app->getUserStateFromRequest( $option.'.fields.filter_assigned', 	'filter_assigned', 	'', 'word' );

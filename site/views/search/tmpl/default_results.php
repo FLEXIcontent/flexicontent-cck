@@ -83,6 +83,8 @@ if ( $use_infoflds && count($infoflds) ) {
 			}
 			$markup_tags .= '</span>';
 		}
+		
+		$item_link = JRoute::_($result->href);
 	?>
 	<fieldset id="searchlist_item_<?php echo $i; ?>" class="<?php echo $fc_item_classes; ?>">
 	 <div class="search-results<?php echo $this->pageclass_sfx; ?>">
@@ -90,7 +92,7 @@ if ( $use_infoflds && count($infoflds) ) {
 		<div class="fc_search_result_title">
 			<?php echo $this->pageNav->limitstart + $result->count.'. ';?>
 			<?php if ($result->href) :?>
-				<a href="<?php echo JRoute::_($result->href); ?>"<?php if ($result->browsernav == 1) :?> target="_blank"<?php endif;?>>
+				<a href="<?php echo $item_link; ?>"<?php if ($result->browsernav == 1) :?> target="_blank"<?php endif;?>>
 					<?php echo $this->escape($result->title);?>
 				</a>
 			<?php else:?>
@@ -157,13 +159,16 @@ if ( $use_infoflds && count($infoflds) ) {
 		
 			<?php if ($src) : ?>
 			<div class="fc_search_result_image <?php echo $this->params->get('fcr_position') ? ' fcright' : ' fcleft'; ?>">
+				
+				<?php $title_encoded = htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8'); ?>
 				<?php if ($this->params->get('fcr_link_image', 1)) : ?>
-				<a href="<?php echo JRoute::_($result->href); ?>" class="hasTip" title="<?php echo JText::_( 'FLEXI_READ_MORE_ABOUT' ) . '::' . htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8'); ?>">
-					<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8'); ?>" />
-				</a>
+					<a href="<?php echo $item_link; ?>" >
+						<img src="<?php echo $thumb; ?>" alt="<?php echo $title_encoded; ?>" class="<?php echo $tooltip_class;?>" title="<?php echo flexicontent_html::getToolTip($_read_more_about, $title_encoded, 0, 0); ?>"/>
+					</a>
 				<?php else : ?>
-				<img src="<?php echo $thumb; ?>" alt="<?php echo htmlspecialchars($result->title, ENT_COMPAT, 'UTF-8'); ?>" />
+					<img src="<?php echo $thumb; ?>" alt="<?php echo $title_encoded; ?>" title="<?php echo $title_encoded; ?>" />
 				<?php endif; ?>
+				
 			</div>
 			<?php endif; ?>
 			
