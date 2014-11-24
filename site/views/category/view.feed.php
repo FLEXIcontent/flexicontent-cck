@@ -99,6 +99,8 @@ class FlexicontentViewCategory extends JViewLegacy
 			}
 		}
 		
+		$uri = clone JUri::getInstance();
+		$domain = $uri->toString(array('scheme', 'host', 'port'));
 		foreach ( $rows as $row )
 		{
 			// strip html from feed item title
@@ -145,18 +147,23 @@ class FlexicontentViewCategory extends JViewLegacy
 					$thumb = JURI::base(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 				} else {
 					// Do not resize image when (a) image src path not set or (b) using image field's already created thumbnails
+					if ($src) {
+						// !!! this should be unreachable ... src must be SET only if resizing
+						$thumb = (!preg_match("#^http|^https|^ftp|^/#i", $src) ?  JURI::base(true).'/' : '') . $src ;  // Prepend site base folder
+					}
 				}
-	  		
-	  		if ($thumb) {
-	  			$description = "
-	  			<div class='feed-description'>
-		  			<a class='feed-readmore' target='_blank' href='".$link."'>
-		  				<img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/>
-		  			</a>
-		  			<p>".$description."</p>
-		  		</div>";
-	  		}
-  		}
+				
+				if ($thumb) {
+					$thumb = (!preg_match("#^http|^https|^ftp#i", $thumb) ?  $domain : '') . $thumb;  // Prepend site 's URL protocol, domain and port
+					$description = "
+					<div class='feed-description'>
+						<a class='feed-readmore' target='_blank' href='".$link."'>
+							<img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/>
+						</a>
+						<p>".$description."</p>
+					</div>";
+				}
+			}
 			
 			if ($extra_fields) {
 				foreach($extra_fields as $fieldname) {
