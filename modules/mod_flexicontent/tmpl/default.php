@@ -1,5 +1,7 @@
 <?php // no direct access
 defined('_JEXEC') or die('Restricted access');
+
+$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 ?>
 
 <div class="default mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_default<?php echo $module->id ?>">
@@ -52,8 +54,8 @@ defined('_JEXEC') or die('Restricted access');
 			<li class="<?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>" >
 				<?php if ($add_tooltips) : ?>
 				<a href="<?php echo $item->link; ?>"
-						class="hasTip fcitem_link"
-						title="<?php echo htmlspecialchars($item->fulltitle, ENT_COMPAT, "UTF-8").'::'.htmlspecialchars($item->text, ENT_COMPAT, "UTF-8"); ?>">
+						class="fcitem_link <?php echo $tooltip_class; ?>"
+						title="<?php echo flexicontent_html::getToolTip($item->fulltitle, $item->text, 0, 1); ?>">
 					<?php echo $item->title; ?>
 				</a>
 				<?php else : ?>
@@ -77,8 +79,8 @@ defined('_JEXEC') or die('Restricted access');
 			<li class="<?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>" >
 				<?php if ($add_tooltips) : ?>
 				<a href="<?php echo $item->link; ?>"
-						class="hasTip fcitem_link"
-						title="<?php echo htmlspecialchars($item->fulltitle, ENT_COMPAT, "UTF-8").'::'.htmlspecialchars($item->text, ENT_COMPAT, "UTF-8"); ?>">
+						class="fcitem_link <?php echo $tooltip_class; ?>"
+						title="<?php echo flexicontent_html::getToolTip($item->fulltitle, $item->text, 0, 1); ?>">
 					<?php echo $item->title; ?>
 				</a>
 				<?php else : ?>

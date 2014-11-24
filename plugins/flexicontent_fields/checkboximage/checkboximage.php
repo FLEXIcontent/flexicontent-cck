@@ -168,7 +168,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			$img_exists = file_exists($imgfolder . $element->image);
 			$options[] = ''
 				.($prettycheckable_added ? $input_fld : '')
-				.'<label for="'.$elementid_no.'" class="hasTip fccheckradio_lbl" title="'.$field->label.'::'.$element->text.'" >'
+				.'<label for="'.$elementid_no.'" class="'.(FLEXI_J30GE ? 'hasTooltip' : 'hasTip').' fccheckradio_lbl" title="'.flexicontent_html::getToolTip(null, $element->text, 0, 1).'" >'
 				. (!$prettycheckable_added ? $input_fld : '')
 				.($form_vals_display!=1 ? $element->text : '')
 				.($form_vals_display==2 ? ' <br/>' : '')
@@ -260,6 +260,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			break;
 		}
 		
+		$tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 		
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
@@ -296,7 +297,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		{
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp =$element->text;
-			else $disp = '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.$element->text.'" />';
+			else $disp = '<img src="'.$imgpath . $element->image .'" class="'.$tooltip_class.'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'" alt="'.$element->text.'" />';
 			
 			$is_selected = isset($indexes[$val]);
 			
@@ -312,7 +313,7 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 			
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp =$element->text;
-			else $disp = '<img src="'.$imgpath . $element->image .'" class="hasTip" title="'.$field->label.'::'.$element->text.'" alt="'.$element->text.'" />';
+			else $disp = '<img src="'.$imgpath . $element->image .'" class="'.$tooltip_class.'" title="'.flexicontent_html::getToolTip(null, $element->text, 0).'" alt="'.$element->text.'" />';
 			
 			$display[] = $pretext.$disp.$posttext;
 			$display_index[] = $element->value;

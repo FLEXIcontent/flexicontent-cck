@@ -344,7 +344,8 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		// Optimization, do some stuff outside the loop
 		static $hits_icon = null;
 		if ($hits_icon===null && ($display_hits==1 || $display_hits==3)) {
-			$_attribs = $display_hits==1 ? 'class="hasTip" title=":: %s '.JText::_( 'FLEXI_HITS', true ).'"' : '';
+			$_hits_tip = flexicontent_html::getToolTip(null, '%s '.JText::_( 'FLEXI_HITS', true ), 0, 0);
+			$_attribs = $display_hits==1 ? 'class="'.(FLEXI_J30GE ? 'hasTooltip' : 'hasTip').'" title="'.$_hits_tip.'"' : '';
 			$hits_icon = FLEXI_J16GE ?
 				JHTML::image('components/com_flexicontent/assets/images/'.'user.png', JText::_( 'FLEXI_HITS' ), $_attribs) :
 				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);

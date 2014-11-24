@@ -49,6 +49,8 @@
 // no direct access
 defined('_JEXEC') or die('Restricted access');
 
+$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
+
 $mod_width_feat 	= (int)$params->get('mod_width', 110);
 $mod_height_feat 	= (int)$params->get('mod_height', 110);
 $mod_width 				= (int)$params->get('mod_width', 80);
@@ -550,12 +552,13 @@ if ($interval < $duration) {
 				<?php $img_path = JURI::base(true) .'/'; ?>
 				<?php foreach ($list[$ord]['standard'] as $item) : ?>
 					<?php
-						$tip_text = '';
-						if ($item_handle_title == 1)  $tip_text .= flexicontent_html::escape($item->title) . '::';
-						if ($item_handle_text  == 1)  $tip_text .= flexicontent_html::escape($item->text);
-						$classes = 'mod_fc_item_handle' . ($tip_text ? ' hasTip' : '');
+						$tip_html = '';
+						if ( $item_handle_title==1 || $item_handle_text==1) {
+							$tip_html = flexicontent_html::getToolTip( ($item_handle_title==1 ? $item->title : null), ($item_handle_text==1 ? $item->text : null), 0, 1);
+						}
+						$classes = 'mod_fc_item_handle' . ($tip_html ? $tooltip_class : '');
 					?>
-						<span class="<?php echo $classes; ?>" title="<?php echo $tip_text; ?>" >
+						<span class="<?php echo $classes; ?>" title="<?php echo $tip_html; ?>" >
 							<img alt="" width="<?php echo $item_handle_width; ?>" height="<?php echo $item_handle_height; ?>" src="<?php echo @ $item->image ? $item->image : $img_path.'components/com_flexicontent/assets/images/image.png'; ?>" />
 						</span>
 					<?php endforeach; ?>
