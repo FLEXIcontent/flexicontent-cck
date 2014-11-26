@@ -301,6 +301,20 @@ function fc_getLayout(el)
 			panel_header.html('<a href=\"javascript:void(0);\"><span>Layout: <small>'+layout_name+'</small></span></a>');
 		 	panel_header.parent().css('display', '');
 			panel.html(str);
+			".( FLEXI_J30GE ? "
+				jQuery('.hasTooltip').tooltip({'html': true,'container': panel});
+			" : "
+				var tipped_elements = panel.find('.hasTip');
+				tipped_elements.each(function() {
+					var title = this.get('title');
+					if (title) {
+						var parts = title.split('::', 2);
+						this.store('tip:title', parts[0]);
+						this.store('tip:text', parts[1]);
+					}
+				});
+				var ajax_JTooltips = new Tips($('".$tmpl_container.$container_sx."').getNext().getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
+			")."
 		}
 	});
 }
