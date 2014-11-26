@@ -4,30 +4,27 @@
 /**************/
 
 /* Suffixe -green : green borders and links */
-.carousel.mod_flexicontent_wrap-green .mod_flexicontent_featured_wrapper,
-.carousel.mod_flexicontent_wrap-green .mod_flexicontent_standard_wrapper {
+.carousel.mod_flexicontent_wrap-green .mod_flexicontent_featured_wrapper_innerbox,
+.carousel.mod_flexicontent_wrap-green .mod_flexicontent_standard_wrapper_innerbox {
 	border-color: darkgreen!important;
-	border-width:1px 0px;
 }
 .carousel.mod_flexicontent_wrap-green a {
 	color: darkgreen!important;
 }
 
 /* Suffixe -red : red borders and links */
-.carousel.mod_flexicontent_wrap-red .mod_flexicontent_featured_wrapper,
-.carousel.mod_flexicontent_wrap-red .mod_flexicontent_standard_wrapper {
+.carousel.mod_flexicontent_wrap-red .mod_flexicontent_featured_wrapper_innerbox,
+.carousel.mod_flexicontent_wrap-red .mod_flexicontent_standard_wrapper_innerbox {
 	border-color: darkred!important;
-	border-width:1px 0px;
 }
 .carousel.mod_flexicontent_wrap-red a {
 	color: darkred!important;
 }
 
 /* Suffixe -orange : orange borders and links */
-.carousel.mod_flexicontent_wrap-orange .mod_flexicontent_featured_wrapper,
-.carousel.mod_flexicontent_wrap-orange .mod_flexicontent_standard_wrapper {
+.carousel.mod_flexicontent_wrap-orange .mod_flexicontent_featured_wrapper_innerbox,
+.carousel.mod_flexicontent_wrap-orange .mod_flexicontent_standard_wrapper_innerbox {
 	border-color: darkorange!important;
-	border-width:1px 0px;
 }
 .carousel.mod_flexicontent_wrap-orange a {
 	color: darkorange!important;
@@ -93,38 +90,51 @@
 
 /* CONTAINER OF EACH ORDERING GROUP */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent {
-	width:100%;
-	margin:0px!important;
-	padding:0px!important;
+	width: 100%;
+	margin: 0% !important;
+	padding: 0% !important;
+	border-width: 0%;
 	float:left;
 	clear:both;
 }
 
 
 /* EXTERNAL ITEM CONTAINER (ONE COLUMNS) */
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper {
-	float: left;
-	width: 96%;
-	margin-left: 0.9%;
-	margin-right:0%;
-	padding: 1%;
-	float: left;
-	margin-bottom:4px;
-	border-radius:0px;
-	border: 1px solid;
-	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
-	background-color: #EFEFEF;
-	border-radius: 0px;
-	/*box-shadow: 4px 4px 2px #EFEFEF;*/
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper {
+	display: table !important;
+	float: left !important;
+	margin: 0% !important;
+	padding: 0% !important;
+	border-width: 0% !important;
+	border-style: solid !important;
+	border-collapse: separate !important;
+	
+	/* will be overriden with element style setting via JS script */
+	width: auto;
+	height: auto;
 }
+.carousel.mod_flexicontent_wrapper .mod_flexicontent  .mod_flexicontent_featured_wrapper_innerbox,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent  .mod_flexicontent_standard_wrapper_innerbox {
+	display: table-cell !important;
+	float: none !important;
+	width: auto !important;
+	height:100% !important;
+	margin: 0% !important;
+	
+	/* can be overriden via user 's CSS */
+	padding: 4px;
+	border-width: 0px;
+	border-style: solid;
+	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
+	border-radius:0px;
+	background-color: #EFEFEF;
+}
+
 
 /* EXTERNAL ITEM CONTAINER (TWO COLUMNS) */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent.twocol .mod_flexicontent_standard_wrapper {
-	width:46%!important;
-	margin-left:1%!important;
-	margin-right:1%!important;
-	padding: 1%!important;
+	width:50%!important;
 }
 
 
@@ -136,16 +146,17 @@
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.even {
 }
 
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_fc_activeitem:hover,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_fc_activeitem:hover,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover {
-	border-color: #555 #222 #222 #555 !important;
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_fc_activeitem:hover .mod_flexicontent_featured_wrapper_innerbox,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_fc_activeitem:hover .mod_flexicontent_standard_wrapper_innerbox,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover .mod_flexicontent_featured_wrapper_innerbox,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover .mod_flexicontent_standard_wrapper_innerbox {
+	background-color: #D0D0D0;
+	border-color: black;
 	/*box-shadow: 4px 4px 2px darkgray;*/
 }
 
 
-/* INTERNAL ITEM CONTAINER (ONE COLUMN MODE) */
+/* INTERNAL ITEM-LIST CONTAINER (ONE COLUMN MODE) */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent_featured,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent_standard {
 	margin-top: 0px!important;
@@ -166,7 +177,7 @@
 	left:0px;
 }
 
-/* INTERNAL ITEM CONTAINER (TWO COLUMN MODE for standard items) */
+/* INTERNAL ITEM-LIST CONTAINER (TWO COLUMN MODE for standard items) */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent.twocol .mod_flexicontent_standard {
 	/*background: url('images/vdot.gif') repeat-y 50% 0;*/
 }
@@ -355,10 +366,10 @@
 /*********************/
 
 /* CURRENTLY ACTIVATED item container */
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_fc_activeitem,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_fc_activeitem {
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_fc_activeitem .mod_flexicontent_featured_wrapper_innerbox,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_fc_activeitem .mod_flexicontent_standard_wrapper_innerbox {
 	background-color: #D0D0D0;
-	border-color: #D0D0D0;
+	border-color: gray;
 	/*box-shadow: 4px 4px 2px darkgray;*/
 }
 /* image of CURRENTLY ACTIVATED item container */
@@ -589,7 +600,7 @@
 	margin: 0 1% !important;
 	padding: 0 !important;
 	width: 98% !important;
-	height: auto !important;
+	height: auto;
 }
 
 .mod_fc_carousel_mask.fc_has_nav.fc_horizontal {

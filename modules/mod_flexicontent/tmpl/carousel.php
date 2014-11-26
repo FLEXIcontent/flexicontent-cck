@@ -70,12 +70,11 @@ $padding_left_right = (int)$params->get('carousel_padding_left_right', 12);
 $border_width = (int)$params->get('carousel_border_width', 1);
 
 // Direction specific Dimensions : HORIZONTAL
-$hdir_item_width   = (int)$params->get('carousel_hdir_item_width', 250);
-$hdir_margin_right = (int)$params->get('carousel_hdir_margin_right', 12);
+$responsive   = (int)$params->get('carousel_responsive', 1);
+$item_size_px = (int)$params->get('carousel_item_size_px', 240);
 
 // Direction specific Dimensions : VERTICAL
-$vdir_items = (int)$params->get('carousel_vdir_items', 2);
-$vdir_margin_bottom = (int)$params->get('carousel_vdir_margin_bottom', 6);
+$items_per_page = (int)$params->get('carousel_items_per_page', 2);
 
 // Autoplay, autoplay interval, autoplay method
 $edgewrap = (int)$params->get('carousel_edgewrap', 1);
@@ -123,18 +122,13 @@ $easing_name = ($easing == 'linear' || $easing == 'swing') ?  $easing  :  $easin
 // ... decide if showing handle onHover item info
 $show_curritem_info = $item_handle_title==2 || $item_handle_text==2;
 
-// Please examine CSS of 'mod_flexicontent_standard_wrapper' below to SUM up (a) horizontal Padding (b) horizontal Margin (c) vertical   Border
-$extra_width  = 2*$padding_left_right + $hdir_margin_right  + 2*$border_width;
-
-// Please examine CSS of 'mod_flexicontent_standard_wrapper' below to SUM up (a) vertical   Padding (b) vertical   Margin (c) horizontal Border
-$extra_height = 2*$padding_top_bottom + $vdir_margin_bottom + 2*$border_width;
-
 // Carousel specially created parameter values
 $_fcx_edgeWrap     = $edgewrap ? "true" : "false";
 $_fcx_autoPlay     = $autoplay ? "true" : "false";
 $_fcx_fxOptions    = '{ duration:'.$duration.', easing: "'.$easing_name.'" }';
-$_fcx_item_size    = $mode=="horizontal" ? $hdir_item_width + $extra_width : 240;  // 240 is just a default for vertical it will be recalulated after page load ends
-$_fcx_items_per_page = $mode=="horizontal" ? 0 : $vdir_items;  // ZERO for horizontal, this value will be overwritten by auto-calulation, after page load ends
+$_fcx_item_size    = $item_size_px;  // item width (horizontal) OR height (vertical) in case of fixed item size
+$_fcx_responsive   = $responsive;  // 0: px, 1: percentage
+$_fcx_items_per_page = $items_per_page;  // ZERO for horizontal, this value will be overwritten by auto-calulation, after page load ends
 
 if ($interval < $duration) {
 	echo "autoplay interval must not be smaller than the EFFECT (scroll/fade/etc) duration (even if autoplay is disabled), please correct in module configuration";
@@ -195,6 +189,7 @@ if ($interval < $duration) {
 			
 			<!-- BOF current item -->	
 			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler) ? 'odd' : 'even'; ?> <?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>">
+			<div class="mod_flexicontent_featured_wrapper_innerbox">
 				
 				<!-- BOF current item's title -->	
 				<?php if ($display_title_feat) : ?>
@@ -315,7 +310,8 @@ if ($interval < $duration) {
 				</div> <!-- EOF current item's content -->
 				<?php endif; ?>
 				
-			</div>
+			</div>  <!-- EOF wrapper_innerbox -->
+			</div>  <!-- EOF wrapper -->
 			<!-- EOF current item -->
 			<?php endforeach; ?>
 			
@@ -357,6 +353,7 @@ if ($interval < $duration) {
 				onmouseover="mod_fc_carousel<?php echo $module->id; ?>.stop(); mod_fc_carousel<?php echo $module->id; ?>.autoPlay=false;"
 				onmouseout="if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==-1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 			>
+			<div class="mod_flexicontent_standard_wrapper_innerbox">
 
 				<?php if ($display_title || $item_handle_title==2) : ?>
 				<div class="fc_block" <?php echo !$display_title ? 'style="display:none!important;"' : ''; ?> >
@@ -474,7 +471,8 @@ if ($interval < $duration) {
 				</div> <!-- EOF current item's content -->
 				<?php endif; ?>
 				
-			</div>
+			</div>  <!-- EOF wrapper_innerbox -->
+			</div>  <!-- EOF wrapper -->
 			<!-- EOF current item -->
 			<?php endforeach; ?>
 			
@@ -620,7 +618,7 @@ $js ='
 			items_mask: jQuery("#mod_fc_carousel_mask'.$module->id.'"),
 			items_per_page: '.$_fcx_items_per_page.',
 			item_size: '.$_fcx_item_size.',
-			item_hdir_marginr: '.$hdir_margin_right.',
+			responsive: '.$_fcx_responsive.',
 			
 			'.( !$show_page_handles ? '' : '
 			page_handles: jQuery("#mod_fc_page_handles'.$module->id.'").find("span.mod_fc_page_handle"),
@@ -682,24 +680,6 @@ $js ='
 		jQuery("#next_page_fcmod_'.$module->id.'").css("visibility", "visible");
 		jQuery("#previous_page_fcmod_'.$module->id.'").css("visibility", "visible");
 		
-		// Set height of floating elements
-		var maxHeight = 0;
-		mod_fc_carousel'.$module->id.'.items.each(function() {
-			maxHeight = Math.max(maxHeight, this.clientHeight - '.(2*$padding_top_bottom).');
-		});
-		mod_fc_carousel'.$module->id.'.items.each(function() {
-			this.style.height = maxHeight + "px";
-		});
-		
-		// For vertical carousel, decide real item height after page loads ...
-		'.($mode!="vertical" ? '':'
-		mod_fcitems_box_standard'.$module->id.'.style.height = (('.$vdir_items.' * (maxHeight +'.$extra_height.'))-'.($vdir_margin_bottom).') + "px";
-		mod_fc_carousel'.$module->id.'.item_size = maxHeight +'.$extra_height.';
-		').'
-		
-		// For vertical carousel, decide real item height after page loads ...
-		// TODO convert item handles to be vertical and add height calculation for them like above
-		
 		'.
 		// Alternative but it includes padding
 		// var maxHeight = jQuery("#mod_fcitems_box_standard'.$module->id.'")[0].clientHeight;
@@ -740,15 +720,27 @@ $css = ''.
 
 /* CAROUSEL container (internal) is the inner CONTAINER of standard items */'
 #mod_fcitems_box_standard'.$module->id.' div.mod_flexicontent_standard_wrapper {
-	border-width: 1px !important;
+	border-width: 0px!important;
+	padding-top: 0px !important;
+	padding-bottom: 0px !important;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+	margin: 0px!important;
+	width: '.($mode=="vertical" ? "100%" : 'auto').';  /* will be overriden with element style setting */
+	float: '.($mode=="vertical" ? "none" : 'left').' !important;
+	overflow: hidden !important;
+}
+#mod_fcitems_box_standard'.$module->id.' div.mod_flexicontent_standard_wrapper_innerbox {
+	border-width: '.$border_width.'px!important;
 	padding-top: '.$padding_top_bottom.'px !important;
 	padding-bottom: '.$padding_top_bottom.'px !important;
-	padding-left: '.($mode=="vertical" ? "" : $padding_left_right.'px!important').';
-	padding-right: '.($mode=="vertical" ? "" : $padding_left_right.'px!important').';
-	margin: '.($mode=="vertical" ? '0px 0px '.$vdir_margin_bottom.'px 0.4%' : '0px '.$hdir_margin_right.'px 0px 0px').' !important;
-	width: '.($mode=="vertical" ? "97%" : $hdir_item_width.'px!important').';
-	float: '.($mode=="vertical" ? "none" : 'left').' !important;
-	overflow: '.($mode=="vertical" ? "hidden" : 'hidden').' !important;
+	padding-left: '.$padding_left_right.'px!important;
+	padding-right: '.$padding_left_right.'px!important;
+	margin: 0px!important;
+	width: auto!important;
+	float: none !important;
+	overflow: hidden !important;
+	height:100%;  /* will be overriden with element style setting */
 	'.
 	// CSS trick to force same height for all items, but crops border
 	//margin-bottom: -99999px; padding-bottom: 99999px;

@@ -22,19 +22,18 @@
 				<option value="vertical">Vertical</option>
 				<option value="horizontal">Horizontal</option>
 			</field>
+			<field name="carousel_responsive" type="radio" default="1" label="Sizing method" description="Select to set number of items or fixed size, width (horizontal mode) OR height (vertical mode)">
+				<option value="0">fixed size (px)</option>
+				<option value="1"># items (responsive)</option>
+			</field>
+			<field name="carousel_item_size_px" type="text" default="250" label="Fixed size (px)" description="Item width (horizontal) or height (vertical) size in pixels" />
+			<field name="carousel_items_per_page" type="text" default="2" label="# items" description="Number of items that will be displayed, use 1 for 'slideshow' effect" />
 			
 			<field name="" type="separator" default="Item dimensions (px)" level="level3" />
 			<field name="carousel_padding_top_bottom" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="carousel_padding_left_right" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
 			<field name="carousel_border_width" type="text" default="1" label="border width" description="This is the border width applied around the items" />
 			
-			<field name="" type="separator" default="Horizontal Layout" level="level3" />
-			<field name="carousel_hdir_item_width" type="text" default="250" label="item width (px)" description="Width of items when scrolling horizontally" />
-			<field name="carousel_hdir_margin_right" type="text" default="1" label="item margin right (px)" description="This is the margin applied at right of items in a horizontal carousel" />
-			
-			<field name="" type="separator" default="Vertical Layout" level="level3" />
-			<field name="carousel_vdir_items" type="text" default="2" label="# items" description="Number of items that will be displayed when scrolling vertically" />
-			<field name="carousel_vdir_margin_bottom" type="text" default="1" label="item margin bottom (px)" description="This is the margin applied at bottom of items in a vertical carousel" />
 			
 			<field name="" type="separator" default="Navigation" level="level1" />
 			<field name="carousel_edgewrap" type="radio" default="1" label="Edge wrap around" description="When an edge is reached wrap around to the other edge">

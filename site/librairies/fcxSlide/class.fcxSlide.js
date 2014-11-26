@@ -58,7 +58,7 @@ Parameters:
 	items_mask: dom element | required
 	items_per_page: int | default: 1
 	item_size: int | item size (px) | default: 240
-	item_hdir_marginr: int | item right margin for horizontal scroll | default: 0
+	responsive: int | item size (0: px, 1: percentage) | default: 0
 	
 	page_handles: dom collection | default: null
 	page_handle_event: string | event type| default: 'click'
@@ -100,7 +100,7 @@ Properties:
 	items_mask: dom element
 	items_per_page: int
 	item_size: int
-	item_hdir_marginr: int
+	responsive: int
 	
 	page_handles: dom collection
 	page_handle_event: string
@@ -170,7 +170,8 @@ var fcxSlide = new Class({
 		this.items_mask = params.items_mask;
 		this.items_per_page = params.items_per_page || 1;
 		this.item_size = params.item_size || 240;
-		this.item_hdir_marginr = params.item_hdir_marginr || 0;
+		this.item_size_px = params.item_size;
+		this.responsive = params.responsive || 0;
 		
 		this.page_handles = params.page_handles || null;
 		this.page_handle_event = params.page_handle_event || 'click';
@@ -196,10 +197,6 @@ var fcxSlide = new Class({
 		this.playMethod   = params.playMethod || 'page';
 		
 		this.autoPlay_timer = null;
-		
-		// Set appropriate size for the items box (although this should not be needed if box has appropriate CSS)
-		this.mode_to_css = {horizontal:['left','width'], vertical:['top','height']};
-		jQuery(this.items_box).css(this.mode_to_css[this.mode][1],(this.item_size*this.items.length)+'px');
 		
 		if (this.item_handles)  this.bindItemHandles(this.item_handles);
 		if (this.page_handles)  this.bindPageHandles(this.page_handles);
@@ -305,13 +302,58 @@ var fcxSlide = new Class({
 	
 	walk: function(item,manual,noFx, force)
 	{
-		/* Detect container width */
+		/* Detect ITEMs per page for horizontal */
 		var _items_per_page;
-		if (this.items_mask && this.mode=='horizontal') {
-			_items_per_page = (this.items_mask[0].clientWidth+this.item_hdir_marginr) / this.item_size;
+		if (this.items_mask && this.mode=='horizontal' && this.responsive==0) {
+			_items_per_page = (this.items_mask[0].clientWidth) / this.item_size_px;
 			this.items_per_page = parseInt(_items_per_page);
 		}
 		if (!this.items_per_page) this.items_per_page = 1;  // if width detection fails
+		
+		var width_changed = !this.items_mask || !this.mask_width || this.mask_width != this.items_mask[0].clientWidth;
+		if (this.items_mask) this.mask_width = this.items_mask[0].clientWidth;
+		
+		if (this.mode=='horizontal') {
+			if (this.responsive==1) {
+				var forcedWidth = 0;
+				if (this.items_mask) forcedWidth = this.items_mask[0].clientWidth / this.items_per_page;
+				forcedWidth = forcedWidth ? forcedWidth : 240;  // if detection fails, use default
+				this.item_size_px = forcedWidth;
+			}
+			if (width_changed) {
+				for(i=0; i<this.items.length; i++) {
+					jQuery(this.items[i]).css('width', this.item_size_px);
+				}
+			}
+		}
+		
+		// Set height of elements to max ITEM height for both HORIZONTAL and VERTICAL modes (* vertical configuration may force fixed height)
+		if (width_changed && (this.responsive==1 || !this.item_height_px_OLD)) {
+			this.item_height_px_OLD = 0; // Force updating height
+			var maxHeight = 0;
+			this.items.each(function() { this.style.height = "auto"; });
+			this.items.each(function() { maxHeight = Math.max(maxHeight, this.clientHeight); });
+			//alert('Setting item height to:' + maxHeight);
+			
+			// Set item size for vertical
+			if (this.mode=='vertical') this.item_size_px = maxHeight;
+			this.item_height_px = maxHeight;
+		} else if (this.mode=='vertical') {
+			this.item_height_px = this.item_size_px;
+		}
+		
+		// Force height
+		if (!this.item_height_px_OLD || this.item_height_px_OLD != this.item_height_px) {
+			for(i=0; i<this.items.length; i++) {
+				jQuery(this.items[i]).css('height', this.item_height_px);
+			}
+		}
+		this.item_height_px_OLD = this.item_height_px;
+				
+		// Set appropriate size for the items box
+		this.mode_to_css = {horizontal:['left','width'], vertical:['top','height']};
+		jQuery(this.items_box).css(this.mode_to_css[this.mode][1],(this.item_size_px*this.items.length)+'px');
+		jQuery(this.items_mask).css(this.mode_to_css[this.mode][1],(this.item_size_px*this.items_per_page)+'px');
 		
 		
 		/* Detect number of pages, current page and position of 1st item at last page */
@@ -422,11 +464,15 @@ var fcxSlide = new Class({
 			
 			// Start the item transistion
 			if (this.transition=='0') {
-				jQuery(this.items_box).css('left', '' + (this.item_size*-offSetIndex) + 'px');
+				this.mode=='horizontal' ?
+					jQuery(this.items_box).css('left', '' + (this.item_size_px*-offSetIndex) + 'px') :
+					jQuery(this.items_box).css('top', '' + (this.item_size_px*-offSetIndex) + 'px');
 			}
 			
 			else if (this.transition=='scroll') {
-				jQuery(this.items_box).animate({ left: this.item_size*-offSetIndex }, this.fxOptions);
+				this.mode=='horizontal' ?
+					jQuery(this.items_box).animate({ left: this.item_size_px*-offSetIndex }, this.fxOptions) :
+					jQuery(this.items_box).animate({ top: this.item_size_px*-offSetIndex }, this.fxOptions);
 			}
 			
 			else {
@@ -456,12 +502,12 @@ var fcxSlide = new Class({
 					jQuery(this.items[offSetIndex+i]).css('position', 'absolute');
 					if (scrollPage) {
 						this.mode=='horizontal' ?
-							jQuery(this.items[offSetIndex+i]).css('left', '' + (i*this.item_size) + 'px') :
-							jQuery(this.items[offSetIndex+i]).css('top', '' + (i*this.item_size) + 'px');
+							jQuery(this.items[offSetIndex+i]).css('left', '' + (i*this.item_size_px) + 'px') :
+							jQuery(this.items[offSetIndex+i]).css('top', '' + (i*this.item_size_px) + 'px');
 					} else {
 						this.mode=='horizontal' ?
-							jQuery(this.items[offSetIndex+i]).animate( {left: (i*this.item_size)}, this.transition_visible_duration ) :
-							jQuery(this.items[offSetIndex+i]).animate( {top : (i*this.item_size)}, this.transition_visible_duration );
+							jQuery(this.items[offSetIndex+i]).animate( {left: (i*this.item_size_px)}, this.transition_visible_duration ) :
+							jQuery(this.items[offSetIndex+i]).animate( {top : (i*this.item_size_px)}, this.transition_visible_duration );
 					}
 					
 					//alert('' + (offSetIndex+i) + ' ' + jQuery(this.items[offSetIndex+i]).css('display'));
