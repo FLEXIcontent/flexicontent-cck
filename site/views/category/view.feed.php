@@ -109,10 +109,11 @@ class FlexicontentViewCategory extends JViewLegacy
 
 			// url link to article
 			// & used instead of &amp; as this is converted by feed creator
-			$link = JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $category->slug, 0, $row));
+			$link = $domain . JRoute::_(FlexicontentHelperRoute::getItemRoute($row->slug, $category->slug, 0, $row));
 
 			// strip html from feed item description text
 			$description	= $feed_summary ? $row->introtext.$row->fulltext : $row->introtext;
+			$item_desc_cut = mb_strlen($description) > $feed_summary_cut; 
 			$description = flexicontent_html::striptagsandcut( $description, $feed_summary_cut);
 			
 	  	if ($feed_use_image) {  // feed image is enabled
@@ -155,11 +156,11 @@ class FlexicontentViewCategory extends JViewLegacy
 				
 				if ($thumb) {
 					$thumb = (!preg_match("#^http|^https|^ftp#i", $thumb) ?  $domain : '') . $thumb;  // Prepend site 's URL protocol, domain and port
+					$_img = "<img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/>";
+					if ($feed_link_image) $_img = "<a class='feed-readmore' target='_blank' href='".$link."'>".$_img."</a>";
 					$description = "
 					<div class='feed-description'>
-						<a class='feed-readmore' target='_blank' href='".$link."'>
-							<img src='".$thumb."' alt='".$title."' title='".$title."' align='left'/>
-						</a>
+						".$_img."
 						<p>".$description."</p>
 					</div>";
 				}
@@ -172,6 +173,15 @@ class FlexicontentViewCategory extends JViewLegacy
 					}
 				}
 			}
+			
+			
+			// Add readmore link to description if introtext is shown, show_readmore is true and fulltext exists
+			$more_text_exists = (!$feed_summary && $row->fulltext) || $item_desc_cut;
+			if ($params->get('feed_show_readmore', 0) && $more_text_exists)
+			{
+				$description .= '<p class="feed-readmore"><a target="_blank" href ="' . $link . '">' .  JText::sprintf('FLEXI_READ_MORE', $title) . '</a></p>';
+			}
+			
 			
 			//$author = $row->created_by_alias ? $row->created_by_alias : $row->author;
 			@$date    = ( $row->created ? date( 'r', strtotime($row->created) ) : '' );
