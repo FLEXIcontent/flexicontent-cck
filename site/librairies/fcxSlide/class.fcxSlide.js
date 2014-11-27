@@ -150,7 +150,7 @@ Methods:
 		wait: boolean | required
 	stop(): stop auto walk
 
-	walk(item,manual,noFx, force): walk to item (or to page if negative)
+	walk(item,manual,noFx,force): walk to item (or to page if negative)
 		item: int | required
 		manual: bolean | default:false
 		noFx: boolean | default:false
@@ -190,6 +190,7 @@ var fcxSlide = new Class({
 		this.currentIndex = 0;
 		this.lastIndex = null;
 		this.currentPage = 0;
+		this.resizeTimeout = null;
 		
 		this.edgeWrap     = params.edgeWrap || false;
 		this.autoPlay     = params.autoPlay || false;
@@ -206,9 +207,19 @@ var fcxSlide = new Class({
 		}
 		
 		this.walk((params.startItem||0),true,true,true);
+		
+		// Make sure we update carousel and rescroll to current item when window is resized
+		
+		jQuery(window).resize({_carousel: this}, this.resize);
 	},
-
-
+	
+	resize: function(event){
+		clearTimeout(this.resizeTimeout); // Clear any other pending resizing within the timeout limit e.g. 100 ms
+		this.resizeTimeout = setTimeout(function(){
+			event.data._carousel.walk(event.data._carousel.currentIndex,true,true,true);
+		}, 100);
+	},
+	
 	bindItemHandles: function(item_handles){
 		var slider = this;
 		for(var i=0;i<item_handles.length;i++){
@@ -270,7 +281,6 @@ var fcxSlide = new Class({
 		this.walk('next_page', manual, false);
 	},
 	
-	
 	previous: function(manual){
 		this.walk((this.currentIndex>0 ? this.currentIndex-1 : (!this.edgeWrap ? 0 : this.items.length-1)), manual, false);
 	},
@@ -278,7 +288,6 @@ var fcxSlide = new Class({
 	next: function(manual){
 		this.walk((this.currentIndex<this.items.length-1 ? this.currentIndex+1 : (!this.edgeWrap ? this.items.length-1 : 0)), manual, false);
 	},
-	
 	
 	play: function(interval,direction,wait){
 		this.stop();
@@ -299,8 +308,7 @@ var fcxSlide = new Class({
 		clearTimeout(this.autoPlay_timer);
 	},
 	
-	
-	walk: function(item,manual,noFx, force)
+	walk: function(item,manual,noFx,force)
 	{
 		/* Detect ITEMs per page for horizontal */
 		var _items_per_page;
@@ -318,6 +326,7 @@ var fcxSlide = new Class({
 				var forcedWidth = 0;
 				if (this.items_mask) forcedWidth = this.items_mask[0].clientWidth / this.items_per_page;
 				forcedWidth = forcedWidth ? forcedWidth : 240;  // if detection fails, use default
+				// Round to closest lower integer (aka 'floor') to avoid problems while scrolling, also since is this less than items container, it should not be a problem
 				this.item_size_px = forcedWidth;
 			}
 			if (width_changed) {
@@ -716,3 +725,31 @@ jQuery.extend( jQuery.easing,
 		return jQuery.easing.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
 	}
 });
+
+(function($,sr){
+
+  // debouncing function from John Hann
+  // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
+  var debounce = function (func, threshold, execAsap) {
+      var timeout;
+
+      return function debounced () {
+          var obj = this, args = arguments;
+          function delayed () {
+              if (!execAsap)
+                  func.apply(obj, args);
+              timeout = null; 
+          };
+
+          if (timeout)
+              clearTimeout(timeout);
+          else if (execAsap)
+              func.apply(obj, args);
+
+          timeout = setTimeout(delayed, threshold || 100); 
+      };
+  }
+	// smartresize 
+	jQuery.fn[sr] = function(fn){  return fn ? this.bind('resize', debounce(fn)) : this.trigger(sr); };
+
+})(jQuery,'fcx_smartresize');

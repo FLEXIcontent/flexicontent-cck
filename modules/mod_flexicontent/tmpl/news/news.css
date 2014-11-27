@@ -136,7 +136,6 @@
 }
 
 
-
 /* EXTERNAL CONTAINER STYLING ODD EVEN (COUNTING) */
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.odd,
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.odd {
@@ -147,8 +146,8 @@
 	background-color: #f9f9f9;
 }
 
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover {
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover {
 	border-color: darkgray !important;
 }
 
@@ -156,13 +155,13 @@
 /* INTERNAL ITEM CONTAINER (ONE COLUMN MODE) */
 .news.mod_flexicontent_wrapper .mod_flexicontent_featured,
 .news.mod_flexicontent_wrapper .mod_flexicontent_standard {
-	margin-top:0px!important;
-	margin-bottom:0px!important;
+	margin-top: 0px!important;
+	margin-bottom: 0px!important;
 	margin-left: 0%!important;
 	margin-right: 0%!important;
 	
-	padding-top:0px!important;
-	padding-bottom:0px!important;
+	padding-top: 0px!important;
+	padding-bottom: 0px!important;
 	padding-left: 0%!important;
 	padding-right: 0%!important;
 	
@@ -193,7 +192,7 @@
 .news.mod_flexicontent_wrapper .fcitem_title {
 	padding:1px 4px 1px 4px;  margin: 2px 0px 2px 0px;
 	/*border: 1px dashed #bbbbbb;*/
-	font-size: 110%;  font-weight:bold;	text-align:left;
+	font-size: 120%;  font-weight:bold;	text-align:left;
 }
 .news.mod_flexicontent_wrapper .fcitem_title:hover {
 	/*border: 1px dashed black;*/
@@ -201,20 +200,23 @@
 
 /* item title styling (link, etc) */
 .news.mod_flexicontent_wrapper .fcitem_title a {
-	background-color: transparent; color: #555555;
+	background-color: transparent;
+	color: #08c;
 	text-decoration:none;
+	text-shadow: 0px 0px 3px #000, -1px -1px #000, 1px 1px #000;
 }
 .news.mod_flexicontent_wrapper .fcitem_title:hover a,
 .news.mod_flexicontent_wrapper .fcitem_title a:hover {
-	background-color: transparent;  color: darkred;
+	background-color: transparent;
+	color: darkred;
 	text-decoration: none;
+	text-shadow: 0px 0px 3px #000, -1px -1px #000, 1px 1px #000;
 }
 
 
 /* CONTAINER of item date */
 .news.mod_flexicontent_wrapper .fcitem_date { /* for label and value (contained inside) see more below */
 	background: url("images/date.png") no-repeat scroll 0px 1px;
-	font-size:12px;
 	padding:2px 6px 2px 20px;
 }
 
@@ -222,20 +224,18 @@
 .news.mod_flexicontent_wrapper .date_label,
 .news.mod_flexicontent_wrapper .date_label_feat {
 	display:inline;
-	color: black;
-  font-weight: bold;
-  margin: 0;
-  padding: 0;
-  white-space: nowrap;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
 }
 .news.mod_flexicontent_wrapper .date_value,
 .news.mod_flexicontent_wrapper .date_value_feat {
 	display:inline-block;
-	color: black;
-  font-weight: normal;
-  margin: 2px 0;
-  padding: 0;
-  white-space: nowrap;
+	font-weight: normal;
+	margin: 2px 0;
+	padding: 0;
+	white-space: nowrap;
 }
 
 
@@ -243,6 +243,7 @@
 .news.mod_flexicontent_wrapper .fcitem_text { /* for image (not contained inside) see more below */
 	text-align:justify;
 	margin:0px; padding:0px;
+	line-height: 160%;
 }
 
 
@@ -250,7 +251,7 @@
 .news.mod_flexicontent_wrapper .image_featured,
 .news.mod_flexicontent_wrapper .image_standard {
 	float: left;
-	margin: 0 5px 5px 0;
+	margin: 0 6px 6px 0;
 }
 
 /* item image styling (link, image, etc) */
@@ -284,10 +285,10 @@
 .news.mod_flexicontent_wrapper .comments_label {
 	display:inline;
 	color: black;
-  font-weight: bold;
-  margin: 0;
-  padding: 0;
-  white-space: nowrap;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
 }
 
 /* force voting to display in same row as label */
@@ -298,6 +299,8 @@
 
 /* CONTAINER of other item fields */
 .news.mod_flexicontent_wrapper .fcitem_fields {
+	display: inline-block !important;
+	line-height: 140%;
 }
 
 /* other item fields styling (label, value, etc) */
@@ -340,13 +343,12 @@
 /* item read more styling (link, etc) */
 .news.mod_flexicontent_wrapper .fcitem_readon a.readon,
 .news.mod_flexicontent_wrapper .fcitem_readon a.readon span {
-	font-size:12px;
 	font-weight:bold;
 	line-height:18px;
 	padding: 0px;
 	background:none;
 	text-decoration: none!important;
-	color: darkred;
+	color: #08c;
 	cursor:pointer;
 }
 .news.mod_flexicontent_wrapper .fcitem_readon:hover a.readon,
@@ -354,5 +356,5 @@
 	padding: 0px;
 	background:none;
 	text-decoration: none!important;
-	color: darkred;
+	color: red;
 }

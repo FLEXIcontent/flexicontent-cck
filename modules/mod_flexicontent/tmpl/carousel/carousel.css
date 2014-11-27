@@ -38,8 +38,8 @@
 	position: relative;
 	top: 0;
 	left: 0;
-	width: 98%;
-	margin: 0 1%;
+	width: 100%;
+	margin: 0 0;
 }
 
 .carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_horizontal {
@@ -104,18 +104,18 @@
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper {
 	display: table !important;
 	float: left !important;
-	margin: 0% !important;
-	padding: 0% !important;
-	border-width: 0% !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border-width: 0 !important;
 	border-style: solid !important;
-	border-collapse: separate !important;
 	
 	/* will be overriden with element style setting via JS script */
-	width: auto;
+	width: 100%;
 	height: auto;
 }
-.carousel.mod_flexicontent_wrapper .mod_flexicontent  .mod_flexicontent_featured_wrapper_innerbox,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent  .mod_flexicontent_standard_wrapper_innerbox {
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper_innerbox,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper_innerbox {
+	position: relative !important;
 	display: table-cell !important;
 	float: none !important;
 	width: auto !important;
@@ -146,12 +146,12 @@
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.even {
 }
 
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_fc_activeitem:hover .mod_flexicontent_featured_wrapper_innerbox,
+/*.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_fc_activeitem:hover .mod_flexicontent_featured_wrapper_innerbox,*/
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_fc_activeitem:hover .mod_flexicontent_standard_wrapper_innerbox,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover .mod_flexicontent_featured_wrapper_innerbox,
+/*.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover .mod_flexicontent_featured_wrapper_innerbox,*/
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover .mod_flexicontent_standard_wrapper_innerbox {
 	background-color: #D0D0D0;
-	border-color: black;
+	border-color: #888 #555 #555 #888;
 	/*box-shadow: 4px 4px 2px darkgray;*/
 }
 
@@ -196,7 +196,7 @@
 .carousel.mod_flexicontent_wrapper .fcitem_title {
 	padding:1px 4px 1px 4px;  margin: 2px 0px 2px 0px;
 	/*border: 1px dashed #bbbbbb;*/
-	font-size: 110%;  font-weight:bold;	text-align:left;
+	font-size: 120%;  font-weight:bold;	text-align:left;
 }
 .carousel.mod_flexicontent_wrapper .fcitem_title:hover {
 	/*border: 1px dashed black;*/
@@ -204,20 +204,23 @@
 
 /* item title styling (link, etc) */
 .carousel.mod_flexicontent_wrapper .fcitem_title a {
-	background-color: transparent; color: #555555;
+	background-color: transparent;
+	color: #08c;
 	text-decoration:none;
+	text-shadow: 0px 0px 3px #000, -1px -1px #000, 1px 1px #000;
 }
 .carousel.mod_flexicontent_wrapper .fcitem_title:hover a,
 .carousel.mod_flexicontent_wrapper .fcitem_title a:hover {
-	background-color: transparent;  color: darkred;
+	background-color: transparent;
+	color: darkred;
 	text-decoration: none;
+	text-shadow: 0px 0px 3px #000, -1px -1px #000, 1px 1px #000;
 }
 
 
 /* CONTAINER of item date */
 .carousel.mod_flexicontent_wrapper .fcitem_date { /* for label and value (contained inside) see more below */
 	background: url("images/date.png") no-repeat scroll 0px 1px;
-	font-size:12px;
 	padding:2px 6px 2px 20px;
 }
 
@@ -225,20 +228,18 @@
 .carousel.mod_flexicontent_wrapper .date_label,
 .carousel.mod_flexicontent_wrapper .date_label_feat {
 	display:inline;
-	color: black;
-  font-weight: bold;
-  margin: 0;
-  padding: 0;
-  white-space: nowrap;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
 }
 .carousel.mod_flexicontent_wrapper .date_value,
 .carousel.mod_flexicontent_wrapper .date_value_feat {
 	display:inline-block;
-	color: black;
-  font-weight: normal;
-  margin: 2px 0;
-  padding: 0;
-  white-space: nowrap;
+	font-weight: normal;
+	margin: 2px 0;
+	padding: 0;
+	white-space: nowrap;
 }
 
 
@@ -246,6 +247,7 @@
 .carousel.mod_flexicontent_wrapper .fcitem_text { /* for image (not contained inside) see more below */
 /*	text-align:justify;*/
 	margin:0px; padding:0px;
+	line-height: 160%;
 }
 
 
@@ -253,7 +255,7 @@
 .carousel.mod_flexicontent_wrapper .image_featured,
 .carousel.mod_flexicontent_wrapper .image_standard {
 	float: left;
-	margin: 0 5px 5px 0;
+	margin: 0 6px 6px 0;
 }
 
 /* item image styling (link, image, etc) */
@@ -287,10 +289,10 @@
 .carousel.mod_flexicontent_wrapper .comments_label {
 	display:inline;
 	color: black;
-  font-weight: bold;
-  margin: 0;
-  padding: 0;
-  white-space: nowrap;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
 }
 
 /* force voting to display in same row as label */
@@ -301,6 +303,8 @@
 
 /* CONTAINER of other item fields */
 .carousel.mod_flexicontent_wrapper .fcitem_fields {
+	display: inline-block !important;
+	line-height: 140%;
 }
 
 /* other item fields styling (label, value, etc) */
@@ -336,20 +340,19 @@
 	border: solid gray;
 	border-width:1px 0px;
 	padding: 0px 6px 0px 20px;
-	margin: 3px 3x 3px 4px;
+	margin: 3px 3px 3px 4px;
 	display:inline-block;
 }
 
 /* item read more styling (link, etc) */
 .carousel.mod_flexicontent_wrapper .fcitem_readon a.readon,
 .carousel.mod_flexicontent_wrapper .fcitem_readon a.readon span {
-	font-size:12px;
 	font-weight:bold;
 	line-height:18px;
 	padding: 0px;
 	background:none;
 	text-decoration: none!important;
-	color: darkred;
+	color: #08c;
 	cursor:pointer;
 }
 .carousel.mod_flexicontent_wrapper .fcitem_readon:hover a.readon,
@@ -357,7 +360,7 @@
 	padding: 0px;
 	background:none;
 	text-decoration: none!important;
-	color: darkred;
+	color: red;
 }
 
 
@@ -366,15 +369,15 @@
 /*********************/
 
 /* CURRENTLY ACTIVATED item container */
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_fc_activeitem .mod_flexicontent_featured_wrapper_innerbox,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_fc_activeitem .mod_flexicontent_standard_wrapper_innerbox {
-	background-color: #D0D0D0;
-	border-color: gray;
+.carousel.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.mod_fc_activeitem .mod_flexicontent_featured_wrapper_innerbox,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.mod_fc_activeitem .mod_flexicontent_standard_wrapper_innerbox {
+	background-color: #E0E0E0;
+	border-color: #afafaf #8f8f8f #8f8f8f #afafaf;
 	/*box-shadow: 4px 4px 2px darkgray;*/
 }
 /* image of CURRENTLY ACTIVATED item container */
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_fc_activeitem .image_standard img,
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_fc_activeitem .image_featured img
+.carousel.mod_flexicontent_wrapper .mod_fc_activeitem .image_standard img,
+.carousel.mod_flexicontent_wrapper .mod_fc_activeitem .image_featured img
 {
   border:1px solid #444444;
 }
@@ -456,9 +459,9 @@
 	/*visibility: hidden;*/
 	position: relative !important;
 	/*overflow: auto !important;*/ /* ie displays unneeded scrollbar */
-	margin: 0 1% !important;
+	margin: 0 !important;
 	padding: 0 !important;
-	width: 98% !important;
+	width: 100% !important;
 	height: auto !important;
 }
 
@@ -625,4 +628,63 @@
 
 .carousel.mod_flexicontent_wrapper .mCSB_horizontal > .mCSB_container {
 	margin-bottom: 20px;
+}
+
+
+.carousel.mod_flexicontent_wrapper .fc_overlayed {
+	/* Fallback for web browsers that don't support RGBa */
+	background-color: rgb(0, 0, 0);
+	/* RGBa with 0.6 opacity */
+	background-color: rgba(0, 0, 0, 0.3);
+	/* For IE 5.5 - 7 */
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000);
+	/* For IE 8+ */
+	-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#4C000000, endColorstr=#4C000000)";
+	width: 96%;
+	height: auto;
+	padding: 2%;
+	margin: 0%;
+	position: absolute;
+	left: 0px;
+}
+.carousel.mod_flexicontent_wrapper .fc_overlayed .fc_block {
+	font-family: Raleway;
+	font-weight:900;
+	font-size: 14px;
+	line-height: 140%;
+	color: white;
+	text-shadow: 0px 0px 3px #000, -1px -1px #000, 1px 1px #000;
+}
+
+.carousel.mod_flexicontent_wrapper .fc_bottom {	bottom: 0px; }
+.carousel.mod_flexicontent_wrapper .fc_top { top: 0px; }
+.carousel.mod_flexicontent_wrapper .fc_full { top: 0px; height:100%; }
+
+.carousel.mod_flexicontent_wrapper .fc_stretch {
+	width:100% !important;
+	border: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	float: none !important;
+	display: block;
+}
+.carousel.mod_flexicontent_wrapper .fc_float_left {
+	float: left !important;
+	margin: 0 6px 0 6px;
+	display: block;
+}
+.carousel.mod_flexicontent_wrapper .fc_float_right {
+	float: right !important;
+	margin: 0 6px 0 6px;
+	display: block;
+}
+.carousel.mod_flexicontent_wrapper .fc_clear {
+	clear: both !important;
+}
+.carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper .fc_auto_show {
+	visibility: hidden;
+}
+.carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,  /* force showing content of active item */
+.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover .fc_auto_show {   /* force showing content if item under mouse */
+	visibility: visible;
 }

@@ -22,12 +22,35 @@
 				<option value="vertical">Vertical</option>
 				<option value="horizontal">Horizontal</option>
 			</field>
+			
+			<field name="" type="separator" default="Responsive or Fixed" level="level3" />
 			<field name="carousel_responsive" type="radio" default="1" label="Sizing method" description="Select to set number of items or fixed size, width (horizontal mode) OR height (vertical mode)">
 				<option value="0">fixed size (px)</option>
 				<option value="1"># items (responsive)</option>
 			</field>
 			<field name="carousel_item_size_px" type="text" default="250" label="Fixed size (px)" description="Item width (horizontal) or height (vertical) size in pixels" />
 			<field name="carousel_items_per_page" type="text" default="2" label="# items" description="Number of items that will be displayed, use 1 for 'slideshow' effect" />
+
+			<field name="" type="separator" default="Content/Image placement" level="level3" />
+			<field name="carousel_content_layout" type="radio" default="6" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
+				<option value="0">Floated (Right)</option>
+				<option value="1">Floated (Left)</option>
+				<option value="2">Cleared (Above)</option>
+				<option value="3">Cleared (Below)</option>
+				<option value="4">Overlayed (Top)</option>
+				<option value="5">Overlayed (Bottom **)</option>
+				<option value="6">Overlayed (Full)</option>
+			</field>
+			<field name="carousel_content_display" type="radio" default="1" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+				<option value="0">Always visible</option>
+				<option value="1">On mouse over / item active</option>
+				<option value="2">On mouse over</option>
+			</field>
+			<field name="carousel_img_fit" type="radio" default="1" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+				<option value="0">Auto-Fit</option>
+				<option value="1">Auto-Fit and Stretch</option>
+			</field>
+			<field name="carousel_default_img" type="text" size="80" default="components/com_flexicontent/assets/images/image.png" label="Default image" description="This is the image to show if item has no image" />
 			
 			<field name="" type="separator" default="Item dimensions (px)" level="level3" />
 			<field name="carousel_padding_top_bottom" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
@@ -76,6 +99,7 @@
 				<option value="mouseover">Mouse Over</option>
 				<option value="click">Click</option>
 			</field>
+			
 			<field name="" type="separator" default="Item Info" level="level3" />
 			<field name="carousel_handle_title" type="radio" default="0" label="Title" description="Display a title for the thumbnail, e.g. as tooltip or caption">
 				<option value="0">FLEXI_NO</option>
@@ -89,7 +113,7 @@
 			</field>
 			
 			<field name="" type="separator" default="Playback controls" level="level2" />
-			<field name="carousel_show_controls" type="radio" default="0" label="Enable" description="Display  previous, next, previous page, next page, play, playback, stop, etc controls. The integrated controls will be placed inside or at the edges of the ITEM display area usually as big arrows but maybe customized to display differently. Integrated controls can be configured to transition single item or a full page">
+			<field name="carousel_show_controls" type="radio" default="1" label="Enable" description="Display  previous, next, previous page, next page, play, playback, stop, etc controls. The integrated controls will be placed inside or at the edges of the ITEM display area usually as big arrows but maybe customized to display differently. Integrated controls can be configured to transition single item or a full page">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">Intergrated</option>
 				<option value="2">Detached controls</option>
