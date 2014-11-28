@@ -63,23 +63,25 @@ $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 
 // Carousel direction and Common Dimensions
 $mode = $params->get('carousel_mode', 'horizontal');
-$padding_top_bottom = (int)$params->get('carousel_padding_top_bottom', 8);
-$padding_left_right = (int)$params->get('carousel_padding_left_right', 12);
-$border_width = (int)$params->get('carousel_border_width', 1);
 
 // Fixed size / Responsive
 $responsive   = (int)$params->get('carousel_responsive', 1);
 $item_size_px = (int)$params->get('carousel_item_size_px', 240);
 $items_per_page = (int)$params->get('carousel_items_per_page', 2);
 
+// Item Dimensions
+$padding_top_bottom = (int)$params->get('carousel_padding_top_bottom', 8);
+$padding_left_right = (int)$params->get('carousel_padding_left_right', 12);
+$border_width = (int)$params->get('carousel_border_width', 1);
+
 // Content placement and default image
 $content_display = $params->get('carousel_content_display', 1);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
-$content_layout = $params->get('carousel_content_layout', 6);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+$content_layout = $params->get('carousel_content_layout', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
 
 switch ($content_layout) {
 	case 0: case 1:
 		$img_container_class = ($content_layout==0 ? 'fc_float_left' : 'fc_float_right');
-		$content_container_class = '';
+		$content_container_class = 'fc_floated';
 		break;
 	case 2: case 3:
 		$img_container_class = 'fc_stretch fc_clear';
@@ -99,8 +101,8 @@ switch ($content_layout) {
 }
 
 // Default image and image fitting
-$item_default_img = $params->get('carousel_default_img', 'components/com_flexicontent/assets/images/image.png');
-$item_img_fit = $params->get('carousel_img_fit', 1);
+$mod_default_img_path = $params->get('mod_default_img_path', 'components/com_flexicontent/assets/images/image.png');
+$item_img_fit = $params->get('carousel_img_fit', 0);
 $img_path = JURI::base(true) .'/'; 
 
 $img_force_dims_feat="max-width:".$mod_width_feat."px; max-height:".$mod_height_feat."px; width: auto; height: auto; display: block!important;";
@@ -199,8 +201,10 @@ if ($interval < $duration) {
 	
 	$separator = "";
 	$rowtoggler = 0;
-	$item_columns = $params->get('item_columns', 1);
-	$twocols = $item_columns == 2;
+	$item_columns_feat = $params->get('item_columns_feat', 1);
+	$item_columns_std  = 1;
+	$cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
+	$cols_class_std  = '';
 	
 	foreach ($ordering as $ord) :
   	echo $separator;
@@ -211,37 +215,36 @@ if ($interval < $duration) {
   	  continue;
   	}
 	?>
-	<div id="<?php echo 'order_'.( $ord ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent <?php echo ($twocols) ? 'twocol' : ''; ?>">
+	<div id="<?php echo 'order_'.( $ord ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent">
 		
 		<?php	if ($ordering_addtitle && $ord) : ?>
 		<div class='order_group_title'><?php echo $ord_titles[$ord]; ?></div>
 		<?php endif; ?>
+	
 		
 	<?php if (isset($list[$ord]['featured'])) : ?>
+	
 		<!-- BOF featured items -->
+		<?php	$rowcount = 0; ?>
+		
 		<div class="mod_flexicontent_featured" id="mod_fcitems_box_featured<?php echo $module->id ?>">
 			
+			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; ?>
+			
 			<?php foreach ($list[$ord]['featured'] as $item) : ?>
-			<?php $rowtoggler = !$rowtoggler; ?>
+			<?php
+				if ($rowcount%$item_columns_feat==0) {
+					$oe_class = $oe_class=='odd' ? 'even' : 'odd';
+					$rowtoggler = !$rowtoggler;
+				}
+				$rowcount++;
+			?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_featured_wrapper <?php echo ($rowtoggler) ? 'odd' : 'even'; ?> <?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>">
+			<div class="mod_flexicontent_featured_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_feat ? ' '.$cols_class_feat : ''); ?>">
 			<div class="mod_flexicontent_featured_wrapper_innerbox">
-				
-				<!-- BOF current item's title -->	
-				<?php if ($display_title_feat) : ?>
-				<div class="fc_block" >
-					<div class="fc_inline_block fcitem_title">
-						<?php if ($link_title_feat) : ?>
-						<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
-						<?php else : ?>	
-						<?php echo $item->title; ?>
-						<?php endif; ?>
-					</div>
-				</div>
-				<?php endif; ?>
-				<!-- EOF current item's title -->	
-				
+			
+				<?php ob_start(); ?>
 				<!-- BOF current item's image -->	
 				<?php if ($mod_use_image_feat && $item->image_rendered) : ?>
 
@@ -267,11 +270,28 @@ if ($interval < $duration) {
 				
 				<?php endif; ?>
 				<!-- BOF current item's image -->
+				<?php $captured_image = ob_get_clean(); ?>
+				
+				<?php echo $content_layout!=2 ? $captured_image : '';?>
 				
 				<!-- BOF current item's content -->
 				<?php if ($display_date_feat || $display_text_feat || $display_hits_feat || $display_voting_feat || $display_comments_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
 				<div class="content_featured">
 					
+					<!-- BOF current item's title -->	
+					<?php if ($display_title_feat) : ?>
+					<div class="fc_block" >
+						<div class="fc_inline_block fcitem_title">
+							<?php if ($link_title_feat) : ?>
+							<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+							<?php else : ?>	
+							<?php echo $item->title; ?>
+							<?php endif; ?>
+						</div>
+					</div>
+					<?php endif; ?>
+					<!-- EOF current item's title -->	
+				
 					<?php if ($display_date_feat && $item->date_created) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_date created">
@@ -347,18 +367,25 @@ if ($interval < $duration) {
 				</div> <!-- EOF current item's content -->
 				<?php endif; ?>
 				
+				<?php echo $content_layout==2 ? $captured_image : '';?>
+				
 			</div>  <!-- EOF wrapper_innerbox -->
 			</div>  <!-- EOF wrapper -->
 			<!-- EOF current item -->
+			<?php echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
 			
 		</div>
+		
 		<!-- EOF featured items -->
+		
 	<?php endif; ?>
 		
 	<div class="modclear"></div>
 	
+		
 	<?php if (isset($list[$ord]['standard'])) : ?>
+	
 		<!-- BOF standard items -->
 		<?php	$rowcount = 0; ?>
 		
@@ -377,17 +404,19 @@ if ($interval < $duration) {
 		<div class="mod_flexicontent_standard" id="mod_fcitems_box_standard<?php echo $module->id ?>">
 			
 			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; $n=-1; ?>
+			
 			<?php foreach ($list[$ord]['standard'] as $item) : ?>
 			<?php
-				/*if ($rowcount%$item_columns==0) {
+				if ($rowcount%$item_columns_std==0) {
 					$oe_class = $oe_class=='odd' ? 'even' : 'odd';
-				}*/
+					$rowtoggler = !$rowtoggler;
+				}
 				$rowcount++;
 				$n++;
 			?>
 			
 			<!-- BOF current item -->	
-			<div class="mod_flexicontent_standard_wrapper <?php echo $oe_class; ?> <?php echo $item->is_active_item ? 'fcitem_active' : ''; ?>"
+			<div class="mod_flexicontent_standard_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>"
 				onmouseover="mod_fc_carousel<?php echo $module->id; ?>.stop(); mod_fc_carousel<?php echo $module->id; ?>.autoPlay=false; mod_fc_carousel<?php echo $module->id; ?>.walk(<?php echo $n; ?>,true,true,true);"
 				onmouseout="if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==-1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 			>
@@ -404,22 +433,21 @@ if ($interval < $duration) {
 					<?php endif; ?>
 				</div>
 				
-				<?php elseif ($mod_use_image && ($item->image || $item_default_img)) : ?>
+				<?php elseif ($mod_use_image && $item->image) : ?>
 				
 				<div class="image_standard <?php echo $img_container_class;?>">
 					<?php if ($mod_link_image) : ?>
 						<a href="<?php echo $item->link; ?>">
-							<img style="<?php echo $img_force_dims; ?>" src="<?php echo $item->image ? $item->image : $img_path.$item_default_img; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+							<img style="<?php echo $img_force_dims; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 						</a>
 					<?php else : ?>
-						<img style="<?php echo $img_force_dims; ?>" src="<?php echo $item->image ? $item->image : $img_path.$item_default_img; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
+						<img style="<?php echo $img_force_dims; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
 					<?php endif; ?>
 				</div>
 				
 				<?php endif; ?>
 				<!-- BOF current item's image -->	
 				<?php $captured_image = ob_get_clean(); ?>
-				
 				
 				<?php echo $content_layout!=2 ? $captured_image : '';?>
 				
@@ -603,7 +631,7 @@ if ($interval < $duration) {
 						$classes = 'mod_fc_item_handle' . ($tip_html ? $tooltip_class : '');
 					?>
 						<span class="<?php echo $classes; ?>" title="<?php echo $tip_html; ?>" >
-							<img alt="" src="<?php echo @ $item->image ? $item->image : $img_path.$item_default_img; ?>" style="<?php echo 'width:'.$item_handle_width.'px; height:'.$item_handle_height.'px'; ?>" />
+							<img alt="" src="<?php echo @ $item->image ? $item->image : $img_path.$mod_default_img_path; ?>" style="<?php echo 'width:'.$item_handle_width.'px; height:'.$item_handle_height.'px'; ?>" />
 						</span>
 					<?php endforeach; ?>
 				
@@ -752,7 +780,6 @@ $css = ''.
 
 /* Featured items are not part of the carousel this is their inner CONTAINER, add some styling */'
 #mod_fcitems_box_featured'.$module->id.' div.mod_flexicontent_featured_wrapper_innerbox {
-	border-width: 1px;
 }'.
 
 /* The MASK that contains the CAROUSEL (mask clips it) */'

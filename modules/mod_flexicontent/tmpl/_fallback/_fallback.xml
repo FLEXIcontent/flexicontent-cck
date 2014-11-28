@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+	<name>mod_flexicontent - Genenal Custom Layout</name>
+	<author>ggppdk</author>
+	<creationDate>August 2013</creationDate>
+	<copyright>Copyright (C) 2013 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>flexicontentck@gmail.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Flexicontent Universal Content Module, Genenal Custom Layout parameters for templates without parameters</description>
+	
+	<fields name="params">
+		
+		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="FLEXI_CUSTOM_PARAMS" level="level1" menu="hide" />
+			<field name="custom1" type="textarea" cols="35" rows="2" default="" label="'custom1' parameter" description="FLEXI_CUSTOM_DESC" />
+			<field name="custom2" type="textarea" cols="35" rows="2" default="" label="'custom2' parameter" description="FLEXI_CUSTOM_DESC" />
+			<field name="custom3" type="textarea" cols="35" rows="2" default="" label="'custom3' parameter" description="FLEXI_CUSTOM_DESC" />
+			<field name="custom4" type="textarea" cols="35" rows="2" default="" label="'custom4' parameter" description="FLEXI_CUSTOM_DESC" />
+			<field name="custom5" type="textarea" cols="35" rows="2" default="" label="'custom5' parameter" description="FLEXI_CUSTOM_DESC" />
+			
+		</fieldset>
+		
+	</fields>
+	
+</form>

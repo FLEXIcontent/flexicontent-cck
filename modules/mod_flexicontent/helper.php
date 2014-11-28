@@ -76,6 +76,8 @@ class modFlexicontentHelper
 		$mod_use_image 		= $params->get('mod_use_image');
 		$mod_image 				= $params->get('mod_image');
 		$mod_link_image		= $params->get('mod_link_image');
+		$mod_default_img_show = $params->get('mod_default_img_show', 1);
+		$mod_default_img_path = $params->get('mod_default_img_path', 'components/com_flexicontent/assets/images/image.png');
 		$mod_width 				= (int)$params->get('mod_width', 80);
 		$mod_height 			= (int)$params->get('mod_height', 80);
 		$mod_method 			= (int)$params->get('mod_method', 1);
@@ -109,6 +111,35 @@ class modFlexicontentHelper
 			$mod_image_dbdata = $db->loadObject();
 			$mod_image_name = $mod_image_dbdata->name;
 			//$img_fieldparams = FLEXI_J16GE ? new JRegistry($mod_image_dbdata->attribs) : new JParameter($mod_image_dbdata->attribs);
+		}
+		if ($mod_default_img_show) {
+			$src = $mod_default_img_path;
+			
+			// Default image featured
+			$h		= '&amp;h=' . $mod_height;
+			$w		= '&amp;w=' . $mod_width;
+			$aoe	= '&amp;aoe=1';
+			$q		= '&amp;q=95';
+			$zc		= $mod_method ? '&amp;zc=' . $mod_method : '';
+			$ext = pathinfo($src, PATHINFO_EXTENSION);
+			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			
+			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
+			$thumb_default = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
+			
+			// Default image standard
+			$h		= '&amp;h=' . $mod_height_feat;
+			$w		= '&amp;w=' . $mod_width_feat;
+			$aoe	= '&amp;aoe=1';
+			$q		= '&amp;q=95';
+			$zc		= $mod_method_feat ? '&amp;zc=' . $mod_method_feat : '';
+			$ext = pathinfo($src, PATHINFO_EXTENSION);
+			$f = in_array( $ext, array('png', 'ico', 'gif') ) ? '&amp;f='.$ext : '';
+			$conf	= $w . $h . $aoe . $q . $zc . $f;
+			
+			$base_url = (!preg_match("#^http|^https|^ftp|^/#i", $src)) ?  JURI::base(true).'/' : '';
+			$thumb_default_feat = JURI::base().'components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='.$base_url.$src.$conf;
 		}
 		
 		// Retrieve custom displayed field data (including their parameters and access):  hits/voting/etc
@@ -366,6 +397,10 @@ class modFlexicontentHelper
 						{
 							$src = flexicontent_html::extractimagesrc($row);
 						}
+						
+						if (!$thumb && !$src && $mod_default_img_show) {
+							$thumb = $thumb_default_feat;
+						}
 
 						if ($src) {
 							$h		= '&amp;h=' . $mod_height_feat;
@@ -499,6 +534,10 @@ class modFlexicontentHelper
 							$src = flexicontent_html::extractimagesrc($row);
 						}
 						
+						if (!$thumb && !$src && $mod_default_img_show) {
+							$thumb = $thumb_default;
+						}
+
 						if ($src) {
 							$h		= '&amp;h=' . $mod_height;
 							$w		= '&amp;w=' . $mod_width;

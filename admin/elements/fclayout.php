@@ -298,7 +298,7 @@ function fc_getLayout(el)
 		type: 'GET',
 		url: 'index.php?option=com_flexicontent&task=templates.getlayoutparams&ext_view=".$view."&ext_id=".$pk."&directory=".$directory."&layout_name='+layout_name+'&format=raw',
 		success: function(str) {
-			panel_header.html('<a href=\"javascript:void(0);\"><span>Layout: <small>'+layout_name+'</small></span></a>');
+			panel_header.html('<a href=\"javascript:void(0);\"><span>Layout: '+layout_name+'</span></a>');
 		 	panel_header.parent().css('display', '');
 			panel.html(str);
 			".( FLEXI_J30GE ? "

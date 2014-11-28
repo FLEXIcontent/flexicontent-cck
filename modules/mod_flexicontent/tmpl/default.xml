@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+
+	<name>mod_flexicontent - 'default' Layout</name>
+	<author>ggppdk</author>
+	<creationDate>August 2013</creationDate>
+	<copyright>Copyright (C) 2013 ggppdk</copyright>
+	<license>GNU/GPL v2</license>
+	<authorEmail>flexicontentck@gmail.com</authorEmail>
+	<authorUrl>www.flexicontent.org</authorUrl>
+	<version>1.0</version>
+	<description>Flexicontent Universal Content Module, 'default' Layout parameters</description>
+	
+	<fields name="params">
+		
+		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
+			
+			<field name="" type="separator" default="Currently selected layout, does not have layout specific parameters" level="level1" menu="hide" />
+			
+		</fieldset>
+		
+	</fields>
+	
+</form>
