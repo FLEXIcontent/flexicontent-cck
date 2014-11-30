@@ -95,7 +95,7 @@
 				<option value="0">No, recommended</option>
 				<option value="1">Yes, (experimental)</option>
 			</field>
-			<field name="carousel_drag_margin" type="text" default="100" label="Drag margin (px)" description="Minimum margin in pixel for doing a walk of the carouse via touch or mouse drag">
+			<field name="carousel_drag_margin" type="text" default="100" label="Drag margin (px)" description="Minimum margin in pixel for doing a walk of the carousel via touch or mouse drag">
 			
 			<field name="" type="separator" default="Autoplay" level="level2" />
 			<field name="carousel_autoplay" type="radio" default="1" label="Enable" description="Start playing after page loads">

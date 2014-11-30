@@ -209,7 +209,7 @@ if ($interval < $duration) {
 	
 	$separator = "";
 	$rowtoggler = 0;
-	$item_columns_feat = 4;//$params->get('item_columns_feat', 1);
+	$item_columns_feat = $params->get('item_columns_feat', 1);
 	$item_columns_std  = 1;
 	$cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
 	$cols_class_std  = '';
@@ -425,7 +425,7 @@ if ($interval < $duration) {
 			
 			<!-- BOF current item -->	
 			<div class="mod_flexicontent_standard_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>"
-				onmouseover="mod_fc_carousel<?php echo $module->id; ?>.stop(); mod_fc_carousel<?php echo $module->id; ?>.autoPlay=false; /*mod_fc_carousel<?php echo $module->id; ?>.walk(<?php echo $n; ?>,true,false,true);*/"
+				onmouseover="mod_fc_carousel<?php echo $module->id; ?>.stop(); mod_fc_carousel<?php echo $module->id; ?>.autoPlay=false;"
 				onmouseout="if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==-1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 			>
 			<div class="mod_flexicontent_standard_wrapper_innerbox">
