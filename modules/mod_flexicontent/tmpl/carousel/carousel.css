@@ -51,19 +51,18 @@
 /* EXTERNAL ITEM CONTAINER inner container for border, padding etc */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper_innerbox,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper_innerbox {
-	position: relative !important;
-	display: table-cell !important;
+	position: relative;
+	display: block;
 	float: none !important;
-	width: auto !important;
-	height:100% !important;
-	margin: 0% !important;
+	width: auto;
+	height: auto;
+	margin: 8px !important;
 	
 	/* can be overriden via user 's CSS */
 	padding: 4px;
 	border-width: 1px;
 	border-style: solid;
-	/*border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;*/
-	border-color: white;
+	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
 	border-radius:0px;
 	background-color: #EFEFEF;
 }
@@ -72,14 +71,13 @@
 /* EXTERNAL ITEM CONTAINER (ONE COLUMNS) */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper {
-	display: table !important;
-	float: left !important;
-	margin: 0 !important;
-	padding: 0 !important;
-	border-width: 0 !important;
-	border-style: solid !important;
-	
-	/* will be overriden with element style setting via JS script */
+	/* DO NOT OVERRIDE THESE !!! this is the slider container, override margin,padding,border of inner container only */
+	display: block;
+	float: left;
+	margin: 0;
+	padding: 0;
+	border-width: 0;
+	border-style: solid;
 	width: 100%;
 	height: 100%;
 }
@@ -107,7 +105,7 @@
 /* EXTERNAL ITEM CONTAINER (4-COLUMNS) */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_4 {
-	width:25!important;
+	width:25%!important;
 	margin-left:0%!important;
 	margin-right:0%!important;
 	padding: 0%!important;
@@ -274,6 +272,15 @@
 	float: left;
 	margin: 0 6px 6px 0;
 }
+.carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper .image_standard img {
+	opacity:0.7;
+	filter:alpha(opacity=70);
+}
+.carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper:hover .image_standard img,
+.carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.mod_fc_activeitem .image_standard img {
+	opacity:1;
+	filter:alpha(opacity=100);
+}
 
 /* item image styling (link, image, etc) */
 .carousel.mod_flexicontent_wrapper .image_featured a:hover,
@@ -291,9 +298,9 @@
 
 
 /* CONTAINER of item hits, voting, comments */
-.carousel.mod_flexicontent_wrapper .fcitem_hits { padding: 2px 0px 1px 0px; display: inline-block !important; }
-.carousel.mod_flexicontent_wrapper .fcitem_voting { padding: 0px 0px 2px 0px; display: inline-block !important; }
-.carousel.mod_flexicontent_wrapper .fcitem_comments{ padding: 2px 0px 1px 0px; display: inline-block !important; }
+.carousel.mod_flexicontent_wrapper .fcitem_hits { padding: 2px 0px 1px 0px; display: inline-block }
+.carousel.mod_flexicontent_wrapper .fcitem_voting { padding: 0px 0px 2px 0px; display: inline-block }
+.carousel.mod_flexicontent_wrapper .fcitem_comments{ padding: 2px 0px 1px 0px; display: inline-block }
 
 .carousel.mod_flexicontent_wrapper .fcitem_hits img,
 .carousel.mod_flexicontent_wrapper .fcitem_comments img {

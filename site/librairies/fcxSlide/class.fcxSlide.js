@@ -3,22 +3,28 @@ Author:	ggppdk
 
 Requires: jQuery 1.7 or later
 
-License: GPL3 (for the scroller), the easing functions have BSD License, maybe move to separate file
+License: GPL3 (for the slider), the easing functions have BSD License, maybe move to separate file
 
 Description:
-	a jQuery scroller written almost from scratch (easing functions by George McGinley, see License below)
+	a jQuery slider written almost from scratch (easing functions by George McGinley, see License below)
 	with advanced responsive design and complex walk calculation for items, item handles and page handles
 	
-		- jQuery based
+		- jQuery based, performance wise
 		
-		- Dynamic size (width) calculation for both items and pages
+		- Fixed ITEM size (fixed width OR height) of Dynamic ITEM size (items per_page)
 		
-		- Horizontal responsive behaviour (that detects container width change)
+		- Semi-responsive / fully-responsive, detects vieport width change
+			and resizes the 1 item dimension (the non-fixed dimension) or both dimensions for full-responsive mode with 'items per page'
+		
+		- Mobile touch-drag sliding
+		- Mouse click-drag sliding
 		
 		- Supports
 			a. item handles
 			b. page handles (Pagination support !)
 			c. action handles
+		
+		- Dynamice page buttons recalulation
 		
 		- Walk either items OR pages or both (!)
 		
@@ -32,7 +38,7 @@ Description:
 		
 		- Handle transition of already visible items intuitively (move them instead of sliding or fading them)
 		
-		- Walk carousel ONLY IF needed (if target item or page not already within view-port), otherwise just "activate" next/previous item
+		- Walk the slider ONLY IF needed (if target item or page not already within view-port), otherwise just "activate" next/previous item
 			
 		- Auto-scroll for item handles container
 			a. auto-scroll at edges
@@ -40,7 +46,6 @@ Description:
 			c. support for mSCB jQuery scroller
 			
 		- TODO: improve above description
-		- TODO: write more
 
 
 Class Name:
@@ -54,11 +59,17 @@ Parameters:
 	transition_visible_duration: int | default: 100
 	
 	items: dom collection | required
+	items_inner: dom collection | optional
 	items_box: dom element | required
 	items_mask: dom element | required
+	
+	responsive: int | default 0
 	items_per_page: int | default: 1
 	item_size: int | item size (px) | default: 240
-	responsive: int | item size (0: px, 1: percentage) | default: 0
+	
+	touch_walk: boolean | default: true
+	mouse_walk: boolean | default: false
+	drag_margin: int | default: 100
 	
 	page_handles: dom collection | default: null
 	page_handle_event: string | event type| default: 'click'
@@ -93,14 +104,20 @@ Properties:
 	mode: string
 	transition: string
 	fxOptions: object
-	transition_visible_duration: int   // for moving already visible items
+	transition_visible_duration: int     // ... duration of moving already visible items
 	
 	items: dom collection
+	items_inner: dom collection
 	items_box: dom element
 	items_mask: dom element
+	
+	responsive: int        // ... 0:fixed ITEM size using 'item_size' (px), 1:automatic ITEM size to match 'items_per_page'
 	items_per_page: int
 	item_size: int
-	responsive: int
+	
+	touch_walk: boolean
+	mouse_walk: boolean
+	drag_margin: int
 	
 	page_handles: dom collection
 	page_handle_event: string
@@ -144,17 +161,19 @@ Methods:
 	next(manual): walk to next item
 		manual: bolean | default:false
 
-	play (interval,direction,wait): start auto walk items
+	play(interval,direction,wait): start auto walk items
 		interval: int | required
 		direction: string | "previous" or "next" (!do not append '_page', since this is automatically inside the function) | required
 		wait: boolean | required
-	stop(): stop auto walk
+	stop(halt): stop scheduled auto walk
+		halt: bolean | default:false
 
 	walk(item,manual,noFx,force): walk to item (or to page if negative)
 		item: int | required
 		manual: bolean | default:false
 		noFx: boolean | default:false
-
+	
+	addTouchDrag(): add touch/drag events
 */
 var fcxSlide = new Class({
 
@@ -166,12 +185,17 @@ var fcxSlide = new Class({
 		this.transition_visible_duration = params.transition_visible_duration || 100;
 		
 		this.items = params.items;
+		this.items_inner = params.items_inner || null;
 		this.items_box = params.items_box;
 		this.items_mask = params.items_mask;
+		
+		this.responsive = params.responsive || 0;
 		this.items_per_page = params.items_per_page || 1;
 		this.item_size = params.item_size || 240;
-		this.item_size_px = params.item_size;
-		this.responsive = params.responsive || 0;
+		
+		this.touch_walk = params.touch_walk || 1;
+		this.mouse_walk = params.mouse_walk || 0;
+		this.drag_margin = params.drag_margin || 100;
 		
 		this.page_handles = params.page_handles || null;
 		this.page_handle_event = params.page_handle_event || 'click';
@@ -191,6 +215,7 @@ var fcxSlide = new Class({
 		this.lastIndex = null;
 		this.currentPage = 0;
 		this.resizeTimeout = null;
+		this.suppressTimeout = null;
 		
 		this.edgeWrap     = params.edgeWrap || false;
 		this.autoPlay     = params.autoPlay || false;
@@ -206,17 +231,26 @@ var fcxSlide = new Class({
 			this.bindActionHandles(params.action_handles);
 		}
 		
-		this.walk((params.startItem||0),true,true,true);
+		this.walk((params.startItem||0),true,false,true);
 		
-		// Make sure we update carousel and rescroll to current item when window is resized
+		// Update slider and rescroll to current item when window is resized
+		jQuery(window).resize({slider: this}, this.resize);
 		
-		jQuery(window).resize({_carousel: this}, this.resize);
+		// Add mobile support
+		this.addTouchDrag();
 	},
 	
 	resize: function(event){
 		clearTimeout(this.resizeTimeout); // Clear any other pending resizing within the timeout limit e.g. 100 ms
 		this.resizeTimeout = setTimeout(function(){
-			event.data._carousel.walk(event.data._carousel.currentIndex,true,true,true);
+			event.data.slider.walk(event.data.slider.currentIndex,true,false,true);
+		}, 100);
+	},
+	
+	suppress: function(event){
+		//clearTimeout(this.suppressTimeout); // Clear any other pending suppress timeouts
+		this.suppressTimeout = setTimeout(function(){
+			event.data.slider.resizeTimeout = false;
 		}, 100);
 	},
 	
@@ -257,7 +291,7 @@ var fcxSlide = new Class({
 			for(var i=0; i<action_set.length; i++){
 				switch(action)
 				{
-					case 'stop':     action_set[i].on(this.action_handle_event, { }, function(param) { slider.stop(); } ); break;
+					case 'stop':     action_set[i].on(this.action_handle_event, { }, function(param) { slider.stop(true); } ); break;
 					case 'playback': action_set[i].on(this.action_handle_event, { }, function(param) { slider.play(slider.playInterval,'previous',false); } ); break;
 					case 'play':     action_set[i].on(this.action_handle_event, { }, function(param) { slider.play(slider.playInterval,'next',false); } ); break;
 					
@@ -290,33 +324,42 @@ var fcxSlide = new Class({
 	},
 	
 	play: function(interval,direction,wait){
+		// Clear the current pending autoplay timer, because we want to reschedule a new one
 		this.stop();
+		
+		// Decide if doing PAGE or ITEM walk (configuration)
 		direction_func = direction + (this.playMethod=='page' ? '_page' : '' );
 		if(!wait){
 			this[direction_func](false);
 		}
-		var obj = this;
+		var slider = this;
 		this.autoPlay_timer = setInterval(
 			function() {
-				obj[direction_func].call(obj,[false])
+				slider[direction_func].call(slider,[false])
 			},
 			interval
 		);
+		this.autoPlay = true;
 	},
 	
-	stop: function(){
+	stop: function(halt){
 		clearTimeout(this.autoPlay_timer);
+		if (halt) {
+			this.autoPlay = false;
+		}
 	},
 	
 	walk: function(item,manual,noFx,force)
 	{
 		/* Detect ITEMs per page for horizontal */
-		var _items_per_page;
+		var items_per_page_float = this.items_per_page;
 		if (this.items_mask && this.mode=='horizontal' && this.responsive==0) {
-			_items_per_page = (this.items_mask[0].clientWidth) / this.item_size_px;
-			this.items_per_page = parseInt(_items_per_page);
+			items_per_page_float = (this.items_mask[0].clientWidth) / this.item_size;
+			this.items_per_page = parseInt(items_per_page_float);
 		}
-		if (!this.items_per_page) this.items_per_page = 1;  // if width detection fails
+		if (!this.items_per_page) { // if width detection fails
+			items_per_page_float = this.items_per_page = 1;
+		}
 		
 		var width_changed = !this.items_mask || !this.mask_width || this.mask_width != this.items_mask[0].clientWidth;
 		if (this.items_mask) this.mask_width = this.items_mask[0].clientWidth;
@@ -327,11 +370,11 @@ var fcxSlide = new Class({
 				if (this.items_mask) forcedWidth = this.items_mask[0].clientWidth / this.items_per_page;
 				forcedWidth = forcedWidth ? forcedWidth : 240;  // if detection fails, use default
 				// Round to closest lower integer (aka 'floor') to avoid problems while scrolling, also since is this less than items container, it should not be a problem
-				this.item_size_px = forcedWidth;
+				this.item_size = forcedWidth;
 			}
 			if (width_changed) {
 				for(i=0; i<this.items.length; i++) {
-					jQuery(this.items[i]).css('width', this.item_size_px);
+					jQuery(this.items[i]).css('width', this.item_size);
 				}
 			}
 		}
@@ -345,24 +388,36 @@ var fcxSlide = new Class({
 			//alert('Setting item height to:' + maxHeight);
 			
 			// Set item size for vertical
-			if (this.mode=='vertical') this.item_size_px = maxHeight;
+			if (this.mode=='vertical') this.item_size = maxHeight;
 			this.item_height_px = maxHeight;
 		} else if (this.mode=='vertical') {
-			this.item_height_px = this.item_size_px;
+			this.item_height_px = this.item_size;
 		}
 		
 		// Force height
 		if (!this.item_height_px_OLD || this.item_height_px_OLD != this.item_height_px) {
-			for(i=0; i<this.items.length; i++) {
-				jQuery(this.items[i]).css('height', this.item_height_px);
+			//var start = new Date().getTime();  // execution time of setting/forcing the -height- of item containers
+			// Set height of item containers
+			jQuery(this.items).css('height', this.item_height_px);
+			
+			// Set height of item inner containers (used for padding/margin)
+			if (this.items_inner) {
+				var innerEl = jQuery(this.items_inner[0]);
+				var bordT = innerEl.outerHeight() - innerEl.innerHeight();
+				var paddT = innerEl.innerHeight() - innerEl.height();
+				var margT = innerEl.outerHeight(true) - innerEl.outerHeight();
+				jQuery(this.items_inner).css('height', this.item_height_px - bordT - paddT - margT);
 			}
+			//var end = new Date().getTime();
+			//var time = end - start;
+			//if ( window.console && window.console.log ) window.console.log ('Execution time of setting height of item containers: ' + time);
 		}
 		this.item_height_px_OLD = this.item_height_px;
-				
+		
 		// Set appropriate size for the items box
 		this.mode_to_css = {horizontal:['left','width'], vertical:['top','height']};
-		jQuery(this.items_box).css(this.mode_to_css[this.mode][1],(this.item_size_px*this.items.length)+'px');
-		jQuery(this.items_mask).css(this.mode_to_css[this.mode][1],(this.item_size_px*this.items_per_page)+'px');
+		jQuery(this.items_box).css(this.mode_to_css[this.mode][1],(this.item_size*this.items.length)+'px');
+		jQuery(this.items_mask).css(this.mode_to_css[this.mode][1],(this.item_size*this.items_per_page)+'px');
 		
 		
 		/* Detect number of pages, current page and position of 1st item at last page */
@@ -381,6 +436,7 @@ var fcxSlide = new Class({
 		}
 		this.lastPageCount = page_count;
 		
+		
 		/* WALK item or full page */
 		if (item=='next_page' || item=='previous_page') {
 			var scrollPage = true;
@@ -390,23 +446,45 @@ var fcxSlide = new Class({
 			if (scrollPage) new_page = -item;
 		}
 		
+		// If doing page slide, then decide item to show, checking item is within item limits,
+		var smoothWrap = 0;
 		if (scrollPage) {
 			// WRAP around if page is out of limits
+			if (new_page >= page_count && this.edgeWrap) smoothWrap = this.items_per_page;
 			new_page = new_page < page_count ? new_page : (!this.edgeWrap ? page_count - 1 : 0);
+			
+			if (new_page < 0 && this.edgeWrap) smoothWrap = -this.items_per_page;
 			new_page = new_page >= 0         ? new_page : (!this.edgeWrap ? 0 : page_count - 1);
 			item = -new_page;
 			
-			// Decide item to show, checking item is within item limits, (we do this step, for both cases of WALKING item OR page)
 			item = this.items_per_page * (-item);
+		} else {
+			if (this.currentIndex==this.items.length-1 && item==0)
+				smoothWrap = this.items_per_page;
+			else if (this.currentIndex==this.items.length-1 && item==0)
+				smoothWrap = -this.items_per_page;
 		}
+		
 		// Update currentpage index
 		this.currentPage = Math.floor(item / this.items_per_page);
 		
-		// Force item within limits
+		// Make sure item within limits
 		item = item < this.items.length ? item : this.items.length-1;
+		
 		
 		if (item!=this.currentIndex || force)
 		{
+			// Stop current jQuery animation on the items box, forcing it to complete
+			// NOTE: this -NOT- the stop() method of the slider (that stops the scheduled autoplay)
+			jQuery(this.items_box).stop(false, true);
+			
+			
+			// **********
+			// WALK START
+			// **********
+			
+			// 1. Update position indexes of the slider (lastIndex, currentIndex),
+			//    and offSetIndex (= how many items to offset the items box), this depends if doing a page walk
 			this.lastIndex = this.lastIndex || 0;
 			this.currentIndex = item;
 			
@@ -430,7 +508,8 @@ var fcxSlide = new Class({
 			offSetIndex = offSetIndex || 0;  // not needed ?
 			this.lastIndex = offSetIndex;
 			
-			// Scroll the item handles box, to include current item
+			
+			// 2. Scroll the item handles box, to include current item
 			if (this.item_handles_box) {
 				
 				var use_mCSB = jQuery(this.item_handles_box).hasClass('mCustomScrollbar');
@@ -469,32 +548,44 @@ var fcxSlide = new Class({
 				}
 			}
 			
-			if (manual) jQuery(this.items_box).stop();
 			
-			// Start the item transistion
+			// 3. Start transition in items box (aka -WALK- the slider)
 			if (this.transition=='0') {
 				this.mode=='horizontal' ?
-					jQuery(this.items_box).css('left', '' + (this.item_size_px*-offSetIndex) + 'px') :
-					jQuery(this.items_box).css('top', '' + (this.item_size_px*-offSetIndex) + 'px');
+					jQuery(this.items_box).css('left', '' + (this.item_size*-offSetIndex) + 'px') :
+					jQuery(this.items_box).css('top', '' + (this.item_size*-offSetIndex) + 'px');
 			}
 			
 			else if (this.transition=='scroll') {
+				if (smoothWrap) {
+					this.mode=='horizontal' ?
+						jQuery(this.items_box).css('left', '' + (this.item_size*(-offSetIndex+smoothWrap)) + 'px') :
+						jQuery(this.items_box).css('top', '' + (this.item_size*(-offSetIndex+smoothWrap)) + 'px');
+				}
 				this.mode=='horizontal' ?
-					jQuery(this.items_box).animate({ left: this.item_size_px*-offSetIndex }, this.fxOptions) :
-					jQuery(this.items_box).animate({ top: this.item_size_px*-offSetIndex }, this.fxOptions);
+					jQuery(this.items_box).animate({ left: this.item_size*-offSetIndex }, this.fxOptions) :
+					jQuery(this.items_box).animate({ top: this.item_size*-offSetIndex }, this.fxOptions);
 			}
 			
 			else {
+				//var start = new Date().getTime();  // execution time of -scheduling- the transition effect
 				
 				if (this.items_mask && this.mode=='horizontal') {
 					jQuery(this.items_mask).css('min-height', '' + this.items_mask[0].clientHeight + 'px');
 				}
+				this.mode=='horizontal' ?
+					jQuery(this.items_box).css('left', '0px') :
+					jQuery(this.items_box).css('top', '0px');
 				
 				// Calculate items shown per page including any partial item visible more than 20%,
 				// make total duration according to item show, is using pages
-				limit = noFx ? this.items.length - offSetIndex : this.items_per_page + (_items_per_page - this.items_per_page > 0.2 ? 1 : 0);
+				limit = noFx ? this.items.length - offSetIndex : this.items_per_page + (items_per_page_float - this.items_per_page > 0.2 ? 1 : 0);
 				
-				//alert('offSetIndex: ' + offSetIndex + ' , limit: ' + limit);
+				//alert('offSetIndex: ' + offSetIndex + ' , limit: ' + limit + ' , items_per_page: ' + items_per_page_float);
+				// Stop any running animations on the items, and complete them
+				for(i=0; i<this.items.length; i++) {
+					jQuery(this.items[i]).stop(false, true);
+				}
 				for(i=0; i<offSetIndex; i++) {
 					if (i >= this.items.length) break;
 					jQuery(this.items[i]).hide();
@@ -511,12 +602,12 @@ var fcxSlide = new Class({
 					jQuery(this.items[offSetIndex+i]).css('position', 'absolute');
 					if (scrollPage) {
 						this.mode=='horizontal' ?
-							jQuery(this.items[offSetIndex+i]).css('left', '' + (i*this.item_size_px) + 'px') :
-							jQuery(this.items[offSetIndex+i]).css('top', '' + (i*this.item_size_px) + 'px');
+							jQuery(this.items[offSetIndex+i]).css('left', '' + (i*this.item_size) + 'px') :
+							jQuery(this.items[offSetIndex+i]).css('top', '' + (i*this.item_size) + 'px');
 					} else {
 						this.mode=='horizontal' ?
-							jQuery(this.items[offSetIndex+i]).animate( {left: (i*this.item_size_px)}, this.transition_visible_duration ) :
-							jQuery(this.items[offSetIndex+i]).animate( {top : (i*this.item_size_px)}, this.transition_visible_duration );
+							jQuery(this.items[offSetIndex+i]).animate( {left: (i*this.item_size)}, this.transition_visible_duration ) :
+							jQuery(this.items[offSetIndex+i]).animate( {top : (i*this.item_size)}, this.transition_visible_duration );
 					}
 					
 					//alert('' + (offSetIndex+i) + ' ' + jQuery(this.items[offSetIndex+i]).css('display'));
@@ -524,6 +615,7 @@ var fcxSlide = new Class({
 						jQuery(this.items[offSetIndex+i]).stop(false, true);  // Stop current animation forcing it to complete, but do not remove pending animations
 						continue;
 					}
+					
 					if (noFx) {
 						jQuery(this.items[offSetIndex+i]).show();
 					} else if (this.transition=='fade') {
@@ -536,12 +628,22 @@ var fcxSlide = new Class({
 						jQuery(this.items[offSetIndex+i]).show();
 					}
 				}
+				
+				//var end = new Date().getTime();
+				//var time = end - start;
+				//if ( window.console && window.console.log ) window.console.log ('Execution time of transition effect: ' + time);
 			}
 			
-			// Schedule autoplay if enabled
+			// ********
+			// WALK END
+			// ********
+			
+			
+			// Restart (aka clear and reschedule) the autoplay timer, (if this was a MANUAL walk)
 			if(manual && this.autoPlay){
 				this.play(this.playInterval,'next',true);
 			}
+			
 			// Update current item/page data
 			if(this.onWalk){
 				var currentItem = this.items[this.currentIndex] || null;
@@ -550,6 +652,77 @@ var fcxSlide = new Class({
 				this.onWalk(currentItem, currentPageHandle, currentItemHandle);
 			}
 		}
+	},
+
+	addTouchDrag: function(){
+		if (!this.touch_walk && !this.mouse_walk) return;  // nothing to do
+		
+		var slider = this;
+		var sliderBox = document.getElementById(this.items_mask.attr('id'));
+		
+		var boxPos = 0;
+		var startPos = 0;
+		var dist = 0;
+		
+		var startEvents = (this.mouse_walk ? 'mousedown' : '') + (this.touch_walk ? ' touchstart' : '');
+		jQuery(sliderBox).on(startEvents, function(ev){
+			var e = ev.originalEvent;  // Get original event
+			var obj = ev.type!='touchstart' ? e : e.changedTouches[0]; // reference first touch point for this event
+			
+			boxPos = parseInt(jQuery(slider.items_box).css(slider.mode=='horizontal' ? 'left' : 'top'));
+			startPos = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY);
+			//if ( window.console && window.console.log ) window.console.log ('Status: mousedown<br /> ClientX: ' + startPos + 'px');
+			//e.preventDefault();
+		});
+		
+		
+		var startEvents = (this.mouse_walk ? 'mousemove' : '') + (this.touch_walk ? ' touchmove' : '');
+		jQuery(sliderBox).on(startEvents, function(ev){
+			var e = ev.originalEvent;  // Get original event
+			var obj = ev.type!='touchmove' ? e : e.changedTouches[0]; // reference first touch point for this event
+			if (startPos==0) return;
+			
+			var dist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
+			jQuery(slider.items_box).css('cursor', (slider.mode=='horizontal' ? (dist<0 ? 'w-resize' : 'e-resize') : (dist<0 ? 'n-resize' : 's-resize')) );
+			currPos = parseInt(jQuery(slider.items_box).css(slider.mode=='horizontal' ? 'left' : 'top'));
+			//if (Math.abs(dist) < slider.drag_margin / 10) return;
+			//if (Math.abs(boxPos+dist - currPos) < 10 ) return;
+			//if ( window.console && window.console.log ) ; //window.console.log ('Status: mousemove<br /> Horizontal distance traveled: ' + dist + 'px');
+			
+			// Stop current jQuery animations but force them to complete
+			jQuery(slider.items_box).stop(false, true);
+			jQuery(slider.items_box).css(slider.mode=='horizontal' ? 'left' : 'top', '' + (boxPos+dist) + 'px');
+			//e.preventDefault();
+		});
+		
+		
+		var endEvents = (this.mouse_walk ? 'mouseleave mouseup' : '') + (this.touch_walk ? ' touchend' : '');
+		jQuery(sliderBox).on(endEvents, function(ev){
+			var e = ev.originalEvent;  // Get original event
+			var obj = ev.type!='touchend' ? e : e.changedTouches[0]; // reference first touch point for this event
+			jQuery(slider.items_box).css('cursor', 'auto');  // restore mouse pointer
+			if (startPos==0) return;  // initial click was not inside the slider
+			var dist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
+			startPos = 0;
+			
+			if (Math.abs(dist) > slider.drag_margin)
+			{
+				slider.stop(true);  // Cancel autoplay, to avoid confusion to the user
+			  (dist < 0) ?        // Walk the slider
+			  	slider.next_page(true) :
+			  	slider.previous_page(true) ;
+			}
+			
+			else {
+				jQuery(slider.items_box).stop(false, true);
+				(slider.mode=='horizontal') ?
+					jQuery(slider.items_box).animate({ left: boxPos }, {}) :
+					jQuery(slider.items_box).animate({ top: boxPos }, {}) ;
+			}
+			
+			//if ( window.console && window.console.log ) window.console.log ('Status: mouseup<br /> Resting x coordinate: ' + obj.clientX + 'px');
+			//e.preventDefault();
+		});
 	}
 });
 

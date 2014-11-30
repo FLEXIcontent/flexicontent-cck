@@ -795,6 +795,7 @@ class flexicontent_html
 				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/fcxSlide';
 				$document->addScript($framework_path.'/class.fcxSlide.js');
+				$document->addStyleSheet($framework_path.'/fcxSlide.css');
 				//$document->addScript($framework_path.'/class.fcxSlide.packed.js');
 				break;
 			

@@ -70,8 +70,11 @@ $item_size_px = (int)$params->get('carousel_item_size_px', 240);
 $items_per_page = (int)$params->get('carousel_items_per_page', 2);
 
 // Item Dimensions
+$inner_inline_css = (int)$params->get('carousel_inner_inline_css', 1);
 $padding_top_bottom = (int)$params->get('carousel_padding_top_bottom', 8);
 $padding_left_right = (int)$params->get('carousel_padding_left_right', 12);
+$margin_top_bottom= (int)$params->get('carousel_margin_left_right', 0);
+$margin_left_right = (int)$params->get('carousel_margin_left_right', 0);
 $border_width = (int)$params->get('carousel_border_width', 1);
 
 // Content placement and default image
@@ -114,9 +117,12 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 	$img_force_dims .= $_img_limit_dims_;
 }
 
+// Edge behaviour, touch/mouse drag support
+$edgewrap = (int)$params->get('carousel_edgewrap', 1);
+$touch_walk = (int)$params->get('carousel_touch_walk', 1);
+$mouse_walk = (int)$params->get('carousel_mouse_walk', 0);
 
 // Autoplay, autoplay interval, autoplay method
-$edgewrap = (int)$params->get('carousel_edgewrap', 1);
 $autoplay = (int)$params->get('carousel_autoplay', 1);
 $interval = (int)$params->get('carousel_interval', 5000);
 $method   = $params->get('carousel_method', 'page');  // page, item
@@ -163,6 +169,8 @@ $show_curritem_info = $item_handle_title==2 || $item_handle_text==2;
 
 // Carousel specially created parameter values
 $_fcx_edgeWrap     = $edgewrap ? "true" : "false";
+$_fcx_touch_walk   = $touch_walk ? "true" : "false";
+$_fcx_mouse_walk   = $mouse_walk ? "true" : "false";
 $_fcx_autoPlay     = $autoplay ? "true" : "false";
 $_fcx_fxOptions    = '{ duration:'.$duration.', easing: "'.$easing_name.'" }';
 $_fcx_item_size    = $item_size_px;  // item width (horizontal) OR height (vertical) in case of fixed item size
@@ -201,7 +209,7 @@ if ($interval < $duration) {
 	
 	$separator = "";
 	$rowtoggler = 0;
-	$item_columns_feat = $params->get('item_columns_feat', 1);
+	$item_columns_feat = 4;//$params->get('item_columns_feat', 1);
 	$item_columns_std  = 1;
 	$cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
 	$cols_class_std  = '';
@@ -417,7 +425,7 @@ if ($interval < $duration) {
 			
 			<!-- BOF current item -->	
 			<div class="mod_flexicontent_standard_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>"
-				onmouseover="mod_fc_carousel<?php echo $module->id; ?>.stop(); mod_fc_carousel<?php echo $module->id; ?>.autoPlay=false; mod_fc_carousel<?php echo $module->id; ?>.walk(<?php echo $n; ?>,true,true,true);"
+				onmouseover="mod_fc_carousel<?php echo $module->id; ?>.stop(); mod_fc_carousel<?php echo $module->id; ?>.autoPlay=false; /*mod_fc_carousel<?php echo $module->id; ?>.walk(<?php echo $n; ?>,true,false,true);*/"
 				onmouseout="if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $module->id ?>_autoPlay==-1) mod_fc_carousel<?php echo $module->id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 			>
 			<div class="mod_flexicontent_standard_wrapper_innerbox">
@@ -688,6 +696,7 @@ $js ='
 			transition_visible_duration: '.$transition_visible_duration.',
 			
 			items: jQuery("#mod_fcitems_box_standard'.$module->id.'").find("div.mod_flexicontent_standard_wrapper"),
+			items_inner: jQuery("#mod_fcitems_box_standard'.$module->id.'").find("div.mod_flexicontent_standard_wrapper_innerbox"),
 			items_box: jQuery("#mod_fcitems_box_standard'.$module->id.'"),
 			items_mask: jQuery("#mod_fc_carousel_mask'.$module->id.'"),
 			items_per_page: '.$_fcx_items_per_page.',
@@ -720,6 +729,8 @@ $js ='
 			').'
 			
 			edgeWrap: '.$_fcx_edgeWrap.',
+			touch_walk: '.$_fcx_touch_walk.',
+			mouse_walk: '.$_fcx_mouse_walk.',
 			autoPlay: '.$_fcx_autoPlay.',
 			playInterval: '.$interval.',
 			playMethod: "'.$method.'",
@@ -791,27 +802,13 @@ $css = ''.
 
 /* CAROUSEL container (internal) is the inner CONTAINER of standard items */'
 #mod_fcitems_box_standard'.$module->id.' div.mod_flexicontent_standard_wrapper {
-	border-width: 0px!important;
-	padding-top: 0px !important;
-	padding-bottom: 0px !important;
-	padding-left: 0px !important;
-	padding-right: 0px !important;
-	margin: 0px!important;
-	width: '.($mode=="vertical" ? "100%" : 'auto').';  /* will be overriden with element style setting */
-	float: '.($mode=="vertical" ? "none" : 'left').' !important;
-	overflow: hidden !important;
 }
 #mod_fcitems_box_standard'.$module->id.' div.mod_flexicontent_standard_wrapper_innerbox {
+	'.($inner_inline_css ? '
+	padding: '.$padding_top_bottom.'px '.$padding_left_right.'px !important;
 	border-width: '.$border_width.'px!important;
-	padding-top: '.$padding_top_bottom.'px !important;
-	padding-bottom: '.$padding_top_bottom.'px !important;
-	padding-left: '.$padding_left_right.'px!important;
-	padding-right: '.$padding_left_right.'px!important;
-	margin: 0px!important;
-	width: auto!important;
-	float: none !important;
-	overflow: hidden !important;
-	height:100%;  /* will be overriden with element style setting */
+	margin: '.$margin_top_bottom.'px '.$margin_left_right.'px !important;
+	' : '').'
 	'.
 	// CSS trick to force same height for all items, but crops border
 	//margin-bottom: -99999px; padding-bottom: 99999px;

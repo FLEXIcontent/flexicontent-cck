@@ -40,7 +40,7 @@
 				<option value="horizontal">Horizontal</option>
 			</field>
 			
-			<field name="" type="separator" default="Responsive or Fixed" level="level3" />
+			<field name="" type="separator" default="Responsive or Fixed" level="level2" />
 			<field name="carousel_responsive" type="radio" default="1" label="Sizing method" description="Select to set number of items or fixed size, width (horizontal mode) OR height (vertical mode)">
 				<option value="0">fixed size (px)</option>
 				<option value="1"># items (responsive)</option>
@@ -48,7 +48,7 @@
 			<field name="carousel_item_size_px" type="text" default="250" label="Fixed size (px)" description="Item width (horizontal) or height (vertical) size in pixels" />
 			<field name="carousel_items_per_page" type="text" default="2" label="# items" description="Number of items that will be displayed, use 1 for 'slideshow' effect" />
 
-			<field name="" type="separator" default="Content/Image placement of standard items (carousel items)" level="level3" />
+			<field name="" type="separator" default="Content/Image placement of standard items (carousel items)" level="level2" />
 			<field name="carousel_content_layout" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
@@ -68,10 +68,16 @@
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
 			
-			<field name="" type="separator" default="Item dimensions (px)" level="level3" />
+			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
+			<field name="carousel_inner_inline_css" type="radio" default="1" label="FLEXI_ENABLE" description="Select to set styling of inner item containers">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">No (use default/custom CSS)</option>
+			</field>
 			<field name="carousel_padding_top_bottom" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="carousel_padding_left_right" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
 			<field name="carousel_border_width" type="text" default="1" label="border width" description="This is the border width applied around the items" />
+			<field name="carousel_margin_top_bottom" type="text" default="0" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
+			<field name="carousel_margin_left_right" type="text" default="0" label="margin left/right" description="This is the margin applied at left and right of the items" />
 			
 			
 			<field name="" type="separator" default="Navigation" level="level1" />
@@ -79,6 +85,17 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			
+			<field name="" type="separator" default="Touch (mobile) / mouse support" level="level2" />
+			<field name="carousel_touch_walk" type="radio" default="1" label="Walk via touch drag" description="Allow mobile user to walk the carousel via touch drag">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="carousel_mouse_walk" type="radio" default="0" label="Walk via mouse drag" description="Allow desktop user to walk the carousel via mouse drag">
+				<option value="0">No, recommended</option>
+				<option value="1">Yes, (experimental)</option>
+			</field>
+			<field name="carousel_drag_margin" type="text" default="100" label="Drag margin (px)" description="Minimum margin in pixel for doing a walk of the carouse via touch or mouse drag">
 			
 			<field name="" type="separator" default="Autoplay" level="level2" />
 			<field name="carousel_autoplay" type="radio" default="1" label="Enable" description="Start playing after page loads">
@@ -167,7 +184,7 @@
 				<option value="slide">Slide</option>
 				<option value="fade-slide">Fade + Slide</option>
 			</field>
-			<field name="carousel_duration" type="text" default="800" label="Duration (ms)" description="Milliseconds that a carousel change will last" />
+			<field name="carousel_duration" type="text" default="1500" label="Duration (ms)" description="Milliseconds that a carousel change will last" />
 			
 			<field name="" type="separator" default="Transition smoothing" level="level3" />
 			<field name="carousel_easing" type="groupedlist" default="quart" label="Method" description="Select the method for easing the above selected effect" >
