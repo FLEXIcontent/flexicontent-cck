@@ -22,7 +22,7 @@ $tmpl = $this->tmpl;
 $user = JFactory::getUser();
 
 // ITEMS as MASONRY tiles
-if ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_placement', 0)==1)
+if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_placement', 0)==1))
 {
 	flexicontent_html::loadFramework('masonry');
 	flexicontent_html::loadFramework('imagesLoaded');
@@ -35,9 +35,11 @@ if ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_plac
 			var container_lead = document.querySelector('ul.leadingblock');
 			var msnry_lead;
 			// initialize Masonry after all images have loaded
-			imagesLoaded( container_lead, function() {
-				msnry_lead = new Masonry( container_lead );
-			});
+			if (container_lead) {
+				imagesLoaded( container_lead, function() {
+					msnry_lead = new Masonry( container_lead );
+				});
+			}
 		";
 	}
 	if ($this->params->get('lead_placement', 0)==1) {
@@ -45,9 +47,11 @@ if ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_plac
 			var container_intro = document.querySelector('ul.introblock');
 			var msnry_intro;
 			// initialize Masonry after all images have loaded
-			imagesLoaded( container_intro, function() {
-				msnry_intro = new Masonry( container_intro );
-			});
+			if (container_intro) {
+				imagesLoaded( container_intro, function() {
+					msnry_intro = new Masonry( container_intro );
+				});
+			}
 		";
 	}
 	$js .= "	
