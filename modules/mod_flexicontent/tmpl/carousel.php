@@ -840,6 +840,14 @@ $document = JFactory::getDocument();
 	
 	/* The MASK that contains the CAROUSEL (mask clips it) */'
 	#mod_fc_carousel_mask'.$uniq_ord_id.' {
+	border: 5px solid #fff;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 1px 1px 5px #ccc;
+    -webkit-box-shadow: 1px 1px 5px #ccc;
+    box-shadow: 1px 1px 5px #ccc;
+    z-index: 10
 	}'.
 	
 	/* Active item information */'

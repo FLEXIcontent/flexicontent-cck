@@ -450,27 +450,54 @@
 }
 /* Page buttons */
 .carousel.mod_flexicontent_wrapper .mod_fc_page_handles > span.mod_fc_page_handle {
+	background: none repeat scroll 0 0 #ddd;
+    border-color: #ccc;
+    -moz-border-radius: 16px;
+    -webkit-border-radius: 16px;
+    border-radius: 16px;
+    border-style: solid;
+    border-width: 2px;
+    -moz-box-shadow: 0 0 5px #ccc;
+    -webkit-box-shadow: 0 0 5px #ccc;
+    box-shadow: 0 0 5px #ccc;
 	position:relative !important;
 	display: inline-block;
 	float: left !important;
 	clear: none !important;
 	border: 2px solid transparent;
+	font-weight: bold;
+    margin: 0 0 6px 5px;
+    overflow: hidden;
+    padding: 0;
+    position: relative !important;
+    text-decoration: none;
 	padding: 0;
 	margin: 0 2px;
 	overflow:hidden;
 }
 .carousel.mod_flexicontent_wrapper .mod_fc_page_handles > span.mod_fc_page_handle:hover {
-	border-color: #777;
+	border-color: #adadad;
+    -moz-border-radius: 16px;
+    -webkit-border-radius: 16px;
+    border-radius: 16px
 }
 
 .carousel.mod_flexicontent_wrapper .mod_fc_page_handles > span.mod_fc_page_handle.active {
-	border-color: #aaa;
+	background-color: #ccc;
+    -moz-border-radius: 16px;
+    -webkit-border-radius: 16px;
+    border-radius: 16px;
+    height: 12px;
+    width: 12px
 }
 
 .carousel.mod_flexicontent_wrapper .mod_fc_page_handles > span.mod_fc_page_handle > div.mod_fc_page_handle_ico {
-	background: url(images/shape_square.png) no-repeat 0px 0px;
-	width: 16px;
-	height: 16px;
+	background-color: #ccc;
+    -moz-border-radius: 16px;
+    -webkit-border-radius: 16px;
+    border-radius: 16px;
+    height: 12px;
+    width: 12px
 }
 
 
@@ -502,22 +529,26 @@
 	width: 100% !important;
 }
 .carousel.mod_flexicontent_wrapper .mod_fc_item_handles span.mod_fc_item_handle {
-	position:relative !important;
-	display: inline-block;
-	float: left !important;
-	clear: none !important;
-	color:#444;
-	text-decoration:none;
-	font-weight:bold;
-	background:#ddd;
-	margin:0px 0px 0px 0px;
-	padding:0em 0em;
-	border-left:2px solid #ddd;
-	border-top:2px solid #ddd;
-	border-right:2px solid #aaa;
-	border-bottom:2px solid #aaa;
-	border-radius: 0px;
-	overflow:hidden;
+	background: none repeat scroll 0 0 #ddd;
+    border-color: #ccc;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 2px;
+    -moz-box-shadow: 0 0 5px #ccc;
+    -webkit-box-shadow: 0 0 5px #ccc;
+    box-shadow: 0 0 5px #ccc;
+    clear: none !important;
+    color: #444;
+    display: inline-block;
+    float: left !important;
+    font-weight: bold;
+    margin: 0 0 6px 5px;
+    overflow: hidden;
+    padding: 0;
+    position: relative !important;
+    text-decoration: none;
 }
 .carousel.mod_flexicontent_wrapper .mod_fc_item_handles span.mod_fc_item_handle:hover {
 	background:#bbb;
@@ -629,18 +660,42 @@
 }
 
 .carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_horizontal {
-	background: url("images/nav.png") no-repeat scroll -20% 50% #999 !important;
-	position: absolute !important;
-	height: 100% !important;
-	width: 28px;
-	border-radius: 10px 0 0 10px !important;
+	background-attachment: scroll !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    background-color: #fff !important;
+    background-image: url(images/nav.png) !important;
+    -webkit-background-origin: padding-box !important;
+    background-origin: padding-box !important;
+    background-position: -20% 50% !important;
+    background-repeat: no-repeat !important;
+    -webkit-background-size: auto auto !important;
+    background-size: auto auto !important;
+    -moz-border-radius: 10px 0 0 10px !important;
+    -webkit-border-radius: 10px 0 0 10px !important;
+    border-radius: 10px 0 0 10px !important;
+    -moz-box-shadow: 1px 1px 5px #ccc;
+    -webkit-box-shadow: 1px 1px 5px #ccc;
+    box-shadow: 1px 1px 5px #ccc;
+    height: 33px !important;
+    margin-left: 11px;
+    margin-right: 8px;
+    position: absolute !important;
+    top: 37%;
+    width: 28px
 }
 .carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_vertical {
-	background: url("images/nav_vertical.png") no-repeat scroll 50% -20% #999 !important;
-	position: relative !important;
-	height: 28px;
-	width: 100%;
-	border-radius: 10px 10px 0 0 !important;
+	background: url(images/nav_vertical.png) no-repeat scroll 50% -20% #fff !important;
+    -moz-border-radius: 10px 10px 0 0 !important;
+    -webkit-border-radius: 10px 10px 0 0 !important;
+    border-radius: 10px 10px 0 0 !important;
+    -moz-box-shadow: 0 0 5px #ccc;
+    -webkit-box-shadow: 0 0 5px #ccc;
+    box-shadow: 0 0 5px #ccc;
+    height: 31px;
+    margin-left: 48%;
+    position: relative !important;
+    width: 41px
 }
 .carousel.mod_flexicontent_wrapper span.mod_fc_nav {
 	display: block !important;
@@ -662,9 +717,12 @@
 }
 .carousel.mod_flexicontent_wrapper span.mod_fc_nav.fc_vertical.fc_next {
 	background-position: 50% 115% !important;
-	border-radius: 0 0 10px 10px !important;
-	left: auto !important;
-	right: 0 !important;
+    -moz-border-radius: 0 0 10px 10px !important;
+    -webkit-border-radius: 0 0 10px 10px !important;
+    border-radius: 0 0 10px 10px !important;
+    left: auto !important;
+    right: 0 !important;
+    top: -7px
 }
 .carousel.mod_flexicontent_wrapper span.mod_fc_nav:hover {
 	opacity: 1 !important;
@@ -691,7 +749,7 @@
 }
 
 .mod_fc_carousel_mask.fc_has_nav.fc_vertical {
-	margin: 6px 0px !important;
+	margin: 6px 9px !important;
 	width: auto !important;
 }
 
@@ -707,6 +765,8 @@
 
 .carousel.mod_flexicontent_wrapper .mCSB_horizontal > .mCSB_container {
 	margin-bottom: 20px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 
@@ -727,8 +787,8 @@
 	left: 0px;
 }
 .carousel.mod_flexicontent_wrapper .fc_overlayed .fc_block {
-	font-family: Raleway;
-	font-weight:900;
+	/*font-family: Raleway;
+	font-weight:900;*/
 	font-size: 14px;
 	line-height: 140%;
 	color: white;
@@ -770,4 +830,7 @@
 .carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,  /* force showing content of active item */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover .fc_auto_show {   /* force showing content if item under mouse */
 	visibility: visible;
+}
+.mod_fc_nav.fc_previous.fc_vertical {
+  top: 6px !important;
 }
