@@ -638,6 +638,9 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	min-width: 120px !important;
 	vertical-align: middle;
 }
+.fc_filter_html input.fc_text_filter, .fc_filter_html input.fc_text_filter:focus{
+	height: 28px !important;
+}
 /* enlarge field in views ... (non-module) */
 input.fc_text_filter:not(.fc_iscalendar),  input.fc_text_filter:not(.fc_iscalendar):focus,
 input.fc_field_filter:not(.fc_iscalendar), input.fc_field_filter:not(.fc_iscalendar):focus {
