@@ -1371,6 +1371,7 @@ class FlexicontentFields
 				$sql_mode =  $filter_customize_options==1;
 				$field_elements = $filter_custom_options;
 			} else if ( !$field_elements ) {
+				$sql_mode = 1;
 				$field_elements = "SELECT value, value as text FROM #__flexicontent_fields_item_relations as fir WHERE field_id='{field_id}' AND value != '' GROUP BY value";
 			}
 			// Set parameters may be used later
