@@ -25,7 +25,6 @@
 			
 			<field name="" type="separator" default="FLEXI_CONFIGURATION_CATEGORY" description="FLEXI_CONFIGURATION_CATEGORY_DESC" level="level2" />
 			
-			<field name="" type="separator" default="FLEXI_MENU_ITEM_SELECTABLE_VIA_DIRECT_CLICK_ONLY" description="" level="level3" />
 			<field name="override_defaultconf" default="0" type="radio" label="FLEXI_ENABLE_OVERRIDE_CATEGORY" description="FLEXI_ENABLE_OVERRIDE_CATEGORY_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_OVERRIDE_CONF_NO</option>
 				<option value="1">FLEXI_OVERRIDE_CONF_YES</option>
@@ -849,7 +848,7 @@
 		
 		</fieldset>
 		
-		<fieldset name="layout_themes" label="FLEXI_PARAMETERS_LAYOUT_THEMES_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="layout_themes" label="FLEXI_PARAMETERS_CAT_LAYOUT_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="clayout" type="categorylayout" skipparams="1" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
 			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />
