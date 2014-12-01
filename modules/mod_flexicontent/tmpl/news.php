@@ -61,13 +61,24 @@ $hide_label_onempty_feat = (int)$params->get('hide_label_onempty_feat', 0);
 $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 
 
-// Item Dimensions
+// Item Dimensions featured
+$inner_inline_css_feat = (int)$params->get('news_inner_inline_css_feat', 0);
+$padding_top_bottom_feat = (int)$params->get('news_padding_top_bottom_feat', 8);
+$padding_left_right_feat = (int)$params->get('news_padding_left_right_feat', 12);
+$margin_top_bottom_feat = (int)$params->get('news_margin_left_right_feat', 4);
+$margin_left_right_feat = (int)$params->get('news_margin_left_right_feat', 4);
+$border_width_feat = (int)$params->get('news_border_width_feat', 1);
+
+// Item Dimensions standard
+$inner_inline_css = (int)$params->get('news_inner_inline_css', 0);
 $padding_top_bottom = (int)$params->get('news_padding_top_bottom', 8);
 $padding_left_right = (int)$params->get('news_padding_left_right', 12);
+$margin_top_bottom = (int)$params->get('news_margin_left_right', 4);
+$margin_left_right = (int)$params->get('news_margin_left_right', 4);
 $border_width = (int)$params->get('news_border_width', 1);
 
 // Content placement and default image
-$content_display = $params->get('news_content_display', 1);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
+$content_display = $params->get('news_content_display', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
 $content_layout = $params->get('news_content_layout', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
 
 switch ($content_layout) {
@@ -105,11 +116,27 @@ $_img_limit_dims_=" max-width:".$mod_width."px; max-height:".$mod_height."px;";
 if ($item_img_fit==0 || $content_layout <= 1) {
 	$img_force_dims .= $_img_limit_dims_;
 }
+$img_force_dims_feat .= $_img_limit_dims_;
 
 
+// Featured
+$item_columns_feat = $params->get('item_columns_feat', 1);
+$item_placement_feat = $params->get('news_item_placement_feat', 0);  // 0: cleared, 1: as masonry tiles
+$cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
+	
+// Standard
+$item_placement_std = $params->get('news_item_placement', 0);  // 0: cleared, 1: as masonry tiles
+$item_columns_std = $params->get('item_columns', 2);
+$cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
+
+if ( ($item_placement_feat == 1 && $item_columns_feat > 1) || ($item_placement_std == 1 && $item_columns_std > 1) ) {
+	flexicontent_html::loadFramework('masonry');
+	flexicontent_html::loadFramework('imagesLoaded');
+}
+$document = JFactory::getDocument();
 ?>
 
-<div class="news mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_news<?php echo $module->id ?>">
+<div class="news mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_news<?php echo $module->id; ?>">
 	
 	<?php
 	// Display FavList Information (if enabled)
@@ -136,10 +163,6 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 	
 	$separator = "";
 	$rowtoggler = 0;
-	$item_columns_feat = $params->get('item_columns_feat', 1);
-	$item_columns_std  = $params->get('item_columns', 2);
-	$cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
-	$cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
 	
 	foreach ($ordering as $ord) :
   	echo $separator;
@@ -149,8 +172,11 @@ if ($item_img_fit==0 || $content_layout <= 1) {
   	  $separator = "";
   	  continue;
   	}
+  	// PREPEND ORDER if using more than 1 orderings ...
+  	$order_name = $ord ? $ord : 'default';
+		$uniq_ord_id = (count($list)>1 ? '_'.$order_name : '').$module->id;
 	?>
-	<div id="<?php echo 'order_'.( $ord ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent">
+	<div id="<?php echo 'order_'.$order_name.$module->id; ?>" class="mod_flexicontent">
 		
 		<?php	if ($ordering_addtitle && $ord) : ?>
 		<div class='order_group_title'><?php echo $ord_titles[$ord]; ?></div>
@@ -162,7 +188,7 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 		<!-- BOF featured items -->
 		<?php	$rowcount = 0; ?>
 		
-		<div class="mod_flexicontent_featured" id="mod_fcitems_box_featured<?php echo $module->id ?>">
+		<div class="mod_flexicontent_featured mod_flexicontent_featured<?php echo $module->id; ?>" id="mod_fcitems_box_featured<?php echo $uniq_ord_id; ?>">
 			
 			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; ?>
 			
@@ -307,7 +333,7 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 			</div>  <!-- EOF wrapper_innerbox -->
 			</div>  <!-- EOF wrapper -->
 			<!-- EOF current item -->
-			<?php echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : ''; ?>
+			<?php if ($item_placement_feat==0) echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
 			
 		</div>
@@ -324,7 +350,7 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 		<!-- BOF standard items -->
 		<?php	$rowcount = 0; ?>
 		
-		<div class="mod_flexicontent_standard" id="mod_fcitems_box_standard<?php echo $module->id ?>">
+		<div class="mod_flexicontent_standard mod_flexicontent_standard<?php echo $module->id; ?>" id="mod_fcitems_box_standard<?php echo $uniq_ord_id; ?>">
 			
 			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; $n=-1; ?>
 			
@@ -471,7 +497,7 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 			</div>  <!-- EOF wrapper_innerbox -->
 			</div>  <!-- EOF wrapper -->
 			<!-- EOF current item -->
-			<?php echo !($rowcount%$item_columns_std) ? '<div class="modclear"></div>' : ''; ?>
+			<?php if ($item_placement_std==0) echo !($rowcount%$item_columns_std) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
 			
 		</div>
@@ -482,6 +508,89 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 	<div class="modclear"></div>
 	
 	</div>
+	
+	<?php
+	// We need this inside the loop since ... we may have multiple orderings thus we may
+	// have multiple container (1 item list container per order) being effected by JS
+	$js = ''
+		;
+	if ($js) $document->addScriptDeclaration($js);
+	
+	
+	// ***********************************************************
+	// Module specific styling (we use names containing module ID)
+	// ***********************************************************
+	
+	$css = ''.
+	/* CONTAINER of featured items */'
+	#mod_fcitems_box_featured'.$uniq_ord_id.' {
+	}'.
+	/* CONTAINER of each featured item */'
+	#mod_fcitems_box_featured'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
+	}'.
+	/* inner CONTAINER of each standard item */'
+	#mod_fcitems_box_featured'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
+		'.($inner_inline_css_feat ? '
+		padding: '.$padding_top_bottom_feat.'px '.$padding_left_right_feat.'px !important;
+		border-width: '.$border_width_feat.'px!important;
+		margin: '.$margin_top_bottom_feat.'px '.$margin_left_right_feat.'px !important;
+		' : '').'
+	}'.
+	
+	/* CONTAINER of standard items */'
+	#mod_fcitems_box_standard'.$uniq_ord_id.' {
+	}'.
+	/* CONTAINER of each standard item */'
+	#mod_fcitems_box_standard'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
+	}'.
+	/* inner CONTAINER of each standard item */'
+	#mod_fcitems_box_standard'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
+		'.($inner_inline_css ? '
+		padding: '.$padding_top_bottom.'px '.$padding_left_right.'px !important;
+		border-width: '.$border_width.'px!important;
+		margin: '.$margin_top_bottom.'px '.$margin_left_right.'px !important;
+		' : '').'
+	}'.
+	
+	''
+	;
+	
+	if ($css) $document->addStyleDeclaration($css);
+	
+	if ($item_placement_feat == 1 && $item_columns_feat > 1)
+	{
+		$js = "
+		jQuery(document).ready(function(){
+			var container = document.querySelector('div#mod_fcitems_box_featured".$uniq_ord_id."');
+			var msnry;
+			// initialize Masonry after all images have loaded
+			if (container) {
+				imagesLoaded( container, function() {
+					msnry = new Masonry( container );
+				});
+			}
+		});
+		";
+		if ($js) $document->addScriptDeclaration($js);
+	}
+	if ($item_placement_std == 1 && $item_columns_std > 1)
+	{
+		$js = "
+		jQuery(document).ready(function(){
+			var container = document.querySelector('div#mod_fcitems_box_standard".$uniq_ord_id."');
+			var msnry;
+			// initialize Masonry after all images have loaded
+			if (container) {
+				imagesLoaded( container, function() {
+					msnry = new Masonry( container );
+				});
+			}
+		});
+		";
+		if ($js) $document->addScriptDeclaration($js);
+	}
+	?>
+	
 	<?php endforeach; ?>
 	
 	<?php
@@ -490,51 +599,3 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 	?>
 	
 </div>
-
-<?php
-$document = JFactory::getDocument();
-// ***********************************************************
-// Module specific styling (we use names containing module ID)
-// ***********************************************************
-
-$css = ''.
-
-'
-#mod_fcitems_box_featured'.$module->id.' div.mod_flexicontent_featured_wrapper_innerbox {
-}'.
-
-/* CONTAINER of standard items */'
-#mod_fcitems_box_standard'.$module->id.' {}'.
-
-/* inner CONTAINER of standard items */'
-#mod_fcitems_box_standard'.$module->id.' div.mod_flexicontent_standard_wrapper {
-	border-width: 0px!important;
-	padding-top: 0px !important;
-	padding-bottom: 0px !important;
-	padding-left: 0px !important;
-	padding-right: 0px !important;
-	margin: 0px!important;
-	width: auto;
-	float: left !important;
-	overflow: hidden !important;
-}
-#mod_fcitems_box_standard'.$module->id.' div.mod_flexicontent_standard_wrapper_innerbox {
-	border-width: '.$border_width.'px!important;
-	padding-top: '.$padding_top_bottom.'px !important;
-	padding-bottom: '.$padding_top_bottom.'px !important;
-	padding-left: '.$padding_left_right.'px!important;
-	padding-right: '.$padding_left_right.'px!important;
-	margin: 0px!important;
-	width: auto!important;
-	float: none !important;
-	overflow: hidden !important;
-	height:100%;  /* will be overriden with element style setting */
-	'.
-	// CSS trick to force same height for all items, but crops border
-	//margin-bottom: -99999px; padding-bottom: 99999px;
-	'
-}'.
-''
-;
-
-$document->addStyleDeclaration($css);

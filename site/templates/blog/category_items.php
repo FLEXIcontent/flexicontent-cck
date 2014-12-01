@@ -42,7 +42,7 @@ if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this
 			}
 		";
 	}
-	if ($this->params->get('lead_placement', 0)==1) {
+	if ($this->params->get('intro_placement', 0)==1) {
 		$js .= "
 			var container_intro = document.querySelector('ul.introblock');
 			var msnry_intro;

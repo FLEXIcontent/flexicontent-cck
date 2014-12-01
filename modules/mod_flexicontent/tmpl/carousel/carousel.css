@@ -53,12 +53,12 @@
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper_innerbox {
 	position: relative;
 	display: block;
-	float: none !important;
+	float: none;
 	width: auto;
 	height: auto;
-	margin: 8px !important;
 	
 	/* can be overriden via user 's CSS */
+	margin: 4px;
 	padding: 4px;
 	border-width: 1px;
 	border-style: solid;
@@ -71,7 +71,7 @@
 /* EXTERNAL ITEM CONTAINER (ONE COLUMNS) */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper {
-	/* DO NOT OVERRIDE THESE !!! this is the slider container, override margin,padding,border of inner container only */
+	/* DO NOT OVERRIDE THESE !!! this is the placement container, override margin,padding,border of inner container only */
 	display: block;
 	float: left;
 	margin: 0;
@@ -79,7 +79,7 @@
 	border-width: 0;
 	border-style: solid;
 	width: 100%;
-	height: 100%;
+	/*height: 100%;*/ /* problematic with masonry */
 }
 
 /* EXTERNAL ITEM CONTAINER (2-COLUMNS) */
@@ -298,9 +298,9 @@
 
 
 /* CONTAINER of item hits, voting, comments */
-.carousel.mod_flexicontent_wrapper .fcitem_hits { padding: 2px 0px 1px 0px; display: inline-block }
-.carousel.mod_flexicontent_wrapper .fcitem_voting { padding: 0px 0px 2px 0px; display: inline-block }
-.carousel.mod_flexicontent_wrapper .fcitem_comments{ padding: 2px 0px 1px 0px; display: inline-block }
+.carousel.mod_flexicontent_wrapper .fcitem_hits { padding: 2px 0px 1px 0px; display: inline-block; }
+.carousel.mod_flexicontent_wrapper .fcitem_voting { padding: 0px 0px 2px 0px; display: inline-block; }
+.carousel.mod_flexicontent_wrapper .fcitem_comments{ padding: 2px 0px 1px 0px; display: inline-block; }
 
 .carousel.mod_flexicontent_wrapper .fcitem_hits img,
 .carousel.mod_flexicontent_wrapper .fcitem_comments img {

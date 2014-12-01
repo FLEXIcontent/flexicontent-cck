@@ -22,7 +22,7 @@
 			</field>
 			<field name="lead_placement" type="radio" default="" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
-				<option value="0">FLEXI_NONE</option>
+				<option value="0">FLEXI_CLEARED</option>
 				<option value="1">FLEXI_AS_MASONRY_TILES</option>
 			</field>
 			

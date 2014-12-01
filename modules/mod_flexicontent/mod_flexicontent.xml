@@ -40,7 +40,7 @@
 						hide_default="1"  hide_none="1"  stripext="1"  filter="\.php$"  exclude="^_"
 						tmpl_container="mod_tmpl_layout" params_source="file"
 						/> <!-- params_source="inline" -->
-			<field name="" type="separator" default="Please SET parameters in Layout TAB/Slider" description="" level="level3" />
+			<field name="" type="separator" default="Please set layout parameters in Layout TAB/Slider" description="" level="level3" />
 			<field name="" type="separator" default="CSS/HTML developers please read: &lt;a href='http://www.flexicontent.org/documentation/faq/69-templating-module-plugin-content/274-how-to-create-a-custom-template-for-universal-content-module.html' target='_blank' a&gt;Custom templates HOW-TO&lt;/a&gt;" description="" level="level3" />
 			
 			<field name="" type="separator" default="FLEXI_MENU_ITEM" level="level1" menu="hide" />
