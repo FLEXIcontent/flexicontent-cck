@@ -787,8 +787,8 @@
 	left: 0px;
 }
 .carousel.mod_flexicontent_wrapper .fc_overlayed .fc_block {
-	font-family: Raleway;
-	font-weight:900;
+	/*font-family: Raleway;
+	font-weight:900;*/
 	font-size: 14px;
 	line-height: 140%;
 	color: white;
