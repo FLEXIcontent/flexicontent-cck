@@ -461,7 +461,7 @@ fieldset.fc_filter_set {
 	vertical-align: middle !important;
 }
 
-/* displayed in date picker */
+/* handle input append / prepend */
 .fc_filter_html .input-append,
 .fc_filter_html .input-prepend {
 	margin:0px 4px 0px 0px !important;
