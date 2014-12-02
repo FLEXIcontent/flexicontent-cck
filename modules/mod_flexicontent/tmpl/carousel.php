@@ -141,6 +141,7 @@ $page_handle_event  = $params->get('carousel_page_handle_event', 'click');
 
 // Item Buttons (= carousel item handles)
 $show_item_handles    = (int)$params->get('carousel_show_handles', 1);
+$item_handles_dir     = 'horizontal'; //$params->get('carousel_handles_dir', 'horizontal');  // horizontal, vertical
 $item_handle_duration = (int)$params->get('carousel_handle_duration', 400);
 $item_handle_width    = (int)$params->get('carousel_handle_width', 64);
 $item_handle_height   = (int)$params->get('carousel_handle_height', 64);
@@ -650,21 +651,22 @@ $document = JFactory::getDocument();
 		
 		<?php if ($show_item_handles) : ?>
 		
-			<!-- fc_add_scroller_horizontal -->
 			<div class="mod_fc_handles_outer">
-				<div id="mod_fc_item_handles<?php echo $uniq_ord_id; ?>" class="mod_fc_item_handles fc_add_scroller_horizontal"
-						onmouseover="mod_fc_carousel<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel<?php echo $uniq_ord_id; ?>.autoPlay=false;"
-						onmouseout="if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
+				<div id="mod_fc_item_handles<?php echo $uniq_ord_id; ?>"
+					class="mod_fc_item_handles <?php echo $item_handles_dir=='horizontal' ? 'fc_add_scroller_horizontal fc_scrollbox_h' : 'fc_add_scroller fc_scrollbox_v';?>"
+					onmouseover="mod_fc_carousel<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel<?php echo $uniq_ord_id; ?>.autoPlay=false;"
+					onmouseout="if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 				>
 				
 				<?php $img_path = JURI::base(true) .'/'; ?>
+				<?php $handle_classes = 'mod_fc_item_handle' . ($item_handles_dir=='horizontal' ? ' fc_scrollitem_h' : ' fc_scrollitem_v'); ?>
 				<?php foreach ($list[$ord]['standard'] as $item) : ?>
 					<?php
 						$tip_html = '';
 						if ( $item_handle_title==1 || $item_handle_text==1) {
 							$tip_html = flexicontent_html::getToolTip( ($item_handle_title==1 ? $item->title : null), ($item_handle_text==1 ? $item->text : null), 0, 1);
 						}
-						$classes = 'mod_fc_item_handle' . ($tip_html ? $tooltip_class : '');
+						$classes = $handle_classes . ($tip_html ? $tooltip_class : '');
 					?>
 						<span class="<?php echo $classes; ?>" title="<?php echo $tip_html; ?>" >
 							<img alt="" src="<?php echo @ $item->image ? $item->image : $img_path.$mod_default_img_path; ?>" style="<?php echo 'width:'.$item_handle_width.'px; height:'.$item_handle_height.'px'; ?>" />
@@ -731,6 +733,7 @@ $document = JFactory::getDocument();
 				'.( !$show_item_handles ? '' : '
 				item_handles_box: jQuery("#mod_fc_item_handles'.$uniq_ord_id.'"),
 				item_handles: jQuery("#mod_fc_item_handles'.$uniq_ord_id.'").find("span.mod_fc_item_handle"),
+				item_handles_dir: "'.$item_handles_dir.'",
 				item_handle_event: "'.$item_handle_event.'",
 				item_handle_duration: '.$item_handle_duration.',
 				').'

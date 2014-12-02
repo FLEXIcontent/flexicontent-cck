@@ -43,7 +43,7 @@ Description:
 		- Auto-scroll for item handles container
 			a. auto-scroll at edges
 			b. auto-scroll on page change
-			c. support for mSCB jQuery scroller
+			c. support for mCSB jQuery scroller
 			
 		- TODO: improve above description
 
@@ -76,6 +76,7 @@ Parameters:
 	
 	item_handles: dom collection | default: null
 	item_handles_box: dom element | optional
+	item_handles_dir: string | 'horizontal', 'vertical
 	item_handle_event: string | event type| default: 'click'
 	item_handle_duration: int | default: 400
 	
@@ -124,6 +125,7 @@ Properties:
 	
 	item_handles: dom collection
 	item_handles_box: dom element
+	item_handles_dir: string
 	item_handle_event: string
 	item_handle_duration: int
 	
@@ -202,6 +204,7 @@ var fcxSlide = new Class({
 		
 		this.item_handles = params.item_handles || null;
 		this.item_handles_box = params.item_handles_box || false;
+		this.item_handles_dir = params.item_handles_dir || 'horizontal';
 		this.item_handle_event = params.item_handle_event || 'click';
 		this.item_handle_duration = params.item_handle_duration || 400;
 		
@@ -513,38 +516,56 @@ var fcxSlide = new Class({
 			if (this.item_handles_box) {
 				
 				var use_mCSB = jQuery(this.item_handles_box).hasClass('mCustomScrollbar');
-				
 				var handlebox = jQuery(this.item_handles[0]).parent(); // works with mCSB too //jQuery(this.item_handles_box);
-				var scrollWidth = handlebox[0].scrollWidth;
 				
-				var item_width = scrollWidth / this.items.length;
-				var item_pos   = item_width * item;
+				// Enforce some CSS
+				this.item_handles_dir=='horizontal' ?
+					jQuery(handlebox).css('overflowY', 'hidden').css('overflowX', 'auto') :
+					jQuery(handlebox).css('overflowX', 'hidden').css('overflowY', 'auto') ;
+				if (!use_mCSB) {
+					this.item_handles_dir=='horizontal' ?
+						jQuery(handlebox).css('width', '100%').css('min-height', (jQuery(this.item_handles[0]).outerHeight(true)+16) + 'px') :
+						jQuery(handlebox).css('width', '' + '' + (jQuery(this.item_handles[0]).outerWidth(true)+24) + 'px') ;
+				}
+				if (this.item_handles_dir!='horizontal') jQuery(handlebox).css('max-height', '' + this.items_mask[0].clientHeight + 'px') ;
 				
-				var left_most  = 0;
-				var right_most = this.items.length * item_width;
+				var scrollSize  = this.item_handles_dir=='horizontal' ? handlebox[0].scrollWidth : handlebox[0].scrollHeight;
+				var handle_size = scrollSize / this.items.length;
+				var item_pos    = handle_size * item;
 				
-				var prev_item_left  = item_pos - item_width;
-				var next_item_right = item_pos + 2*item_width;
+				var prev_most = 0;
+				var next_most = this.items.length * handle_size;
 				
-				var viewport_width = handlebox.parent().width();
-				var viewport_left  = ( use_mCSB ? -parseInt(handlebox.css('left')) : handlebox.scrollLeft() ) - 1;
-				var viewport_right = viewport_width + viewport_left + 1;
+				var prev_item_startpos = item_pos - handle_size;
+				var prev_item_endpos   = item_pos + 2*handle_size;
 				
-				//alert('' + viewport_right + ' < ' + next_item_right + ' && ' + viewport_right + ' < ' + right_most);
-				//alert('' + viewport_left  + ' > ' + prev_item_left  + ' && ' + viewport_left  + ' > ' + left_most );
+				var viewport_size  = this.item_handles_dir=='horizontal' ? handlebox.parent().width() : handlebox.parent().height() ;
+				var viewport_start = this.item_handles_dir=='horizontal' ?
+					(( use_mCSB ? -parseInt(handlebox.css('left')) : handlebox.scrollLeft() ) - 1) :
+					(( use_mCSB ? -parseInt(handlebox.css('top'))  : handlebox.scrollTop()  ) - 1) ;
+				var viewport_end   = viewport_size + viewport_start + 1;
+				
+				//alert('' + viewport_end + ' < ' + prev_item_endpos + ' && ' + viewport_end + ' < ' + next_most);
+				//alert('' + viewport_start  + ' > ' + prev_item_startpos  + ' && ' + viewport_start  + ' > ' + prev_most );
 				
 				// Viewport (a) does not includes next item fully  AND  (b) not at right most
-				if ( (viewport_right < next_item_right)  &&  (viewport_right < right_most) ) {
+				if ( (viewport_end < prev_item_endpos)  &&  (viewport_end < next_most) ) {
 					! use_mCSB ?
-						handlebox.animate({ scrollLeft: next_item_right - viewport_width }, this.item_handle_duration)  :
-						jQuery(this.item_handles_box).mCustomScrollbar("scrollTo", next_item_right - viewport_width, { scrollInertia: this.item_handle_duration });
+						(this.item_handles_dir=='horizontal' ?
+							handlebox.animate({ scrollLeft: prev_item_endpos - viewport_size }, this.item_handle_duration) :
+							handlebox.animate({ scrollTop:  prev_item_endpos - viewport_size }, this.item_handle_duration)
+						) :
+						jQuery(this.item_handles_box).mCustomScrollbar("scrollTo", prev_item_endpos - viewport_size, { scrollInertia: this.item_handle_duration });
 				}
 				
 				// Viewport (a) does not include prev item fully  AND  (b) not at left most
-				else if ( (viewport_left > prev_item_left)  &&  (viewport_left > left_most) ) {
+				else if ( (viewport_start > prev_item_startpos)  &&  (viewport_start > prev_most) ) {
 					! use_mCSB ?
-					handlebox.animate({ scrollLeft: prev_item_left }, this.item_handle_duration) :
-					jQuery(this.item_handles_box).mCustomScrollbar("scrollTo", prev_item_left, { scrollInertia: this.item_handle_duration } );
+						(this.item_handles_dir=='horizontal' ?
+							handlebox.animate({ scrollLeft: prev_item_startpos }, this.item_handle_duration) :
+							handlebox.animate({ scrollTop:  prev_item_startpos }, this.item_handle_duration)
+						) :
+					jQuery(this.item_handles_box).mCustomScrollbar("scrollTo", prev_item_startpos, { scrollInertia: this.item_handle_duration } );
 				}
 			}
 			
