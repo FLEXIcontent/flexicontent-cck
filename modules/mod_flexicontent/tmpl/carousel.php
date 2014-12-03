@@ -51,43 +51,69 @@ defined('_JEXEC') or die('Restricted access');
 
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 
-$mod_width_feat 	= (int)$params->get('mod_width', 110);
-$mod_height_feat 	= (int)$params->get('mod_height', 110);
+$mod_width_feat 	= (int)$params->get('mod_width_feat', 110);
+$mod_height_feat 	= (int)$params->get('mod_height_feat', 110);
 $mod_width 				= (int)$params->get('mod_width', 80);
 $mod_height 			= (int)$params->get('mod_height', 80);
-
 
 $hide_label_onempty_feat = (int)$params->get('hide_label_onempty_feat', 0);
 $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 
 
-// Carousel direction and Common Dimensions
-$mode = $params->get('carousel_mode', 'horizontal');
-
-// Fixed size / Responsive
-$responsive   = (int)$params->get('carousel_responsive', 1);
-$item_size_px = (int)$params->get('carousel_item_size_px', 240);
-$items_per_page = (int)$params->get('carousel_items_per_page', 2);
-
 // Item Dimensions featured
-$inner_inline_css_feat = (int)$params->get('carousel_inner_inline_css_feat', 0);
-$padding_top_bottom_feat = (int)$params->get('carousel_padding_top_bottom_feat', 8);
-$padding_left_right_feat = (int)$params->get('carousel_padding_left_right_feat', 12);
-$margin_top_bottom_feat= (int)$params->get('carousel_margin_left_right_feat', 4);
-$margin_left_right_feat = (int)$params->get('carousel_margin_left_right_feat', 4);
-$border_width_feat = (int)$params->get('carousel_border_width_feat', 1);
+$inner_inline_css_feat = (int)$params->get($layout.'_inner_inline_css_feat', 0);
+$padding_top_bottom_feat = (int)$params->get($layout.'_padding_top_bottom_feat', 8);
+$padding_left_right_feat = (int)$params->get($layout.'_padding_left_right_feat', 12);
+$margin_top_bottom_feat = (int)$params->get($layout.'_margin_left_right_feat', 4);
+$margin_left_right_feat = (int)$params->get($layout.'_margin_left_right_feat', 4);
+$border_width_feat = (int)$params->get($layout.'_border_width_feat', 1);
 
 // Item Dimensions standard
-$inner_inline_css = (int)$params->get('carousel_inner_inline_css', 0);
-$padding_top_bottom = (int)$params->get('carousel_padding_top_bottom', 8);
-$padding_left_right = (int)$params->get('carousel_padding_left_right', 12);
-$margin_top_bottom= (int)$params->get('carousel_margin_left_right', 0);
-$margin_left_right = (int)$params->get('carousel_margin_left_right', 0);
-$border_width = (int)$params->get('carousel_border_width', 1);
+$inner_inline_css = (int)$params->get($layout.'_inner_inline_css', 0);
+$padding_top_bottom = (int)$params->get($layout.'_padding_top_bottom', 8);
+$padding_left_right = (int)$params->get($layout.'_padding_left_right', 12);
+$margin_top_bottom = (int)$params->get($layout.'_margin_left_right', 4);
+$margin_left_right = (int)$params->get($layout.'_margin_left_right', 4);
+$border_width = (int)$params->get($layout.'_border_width', 1);
 
-// Content placement and default image
-$content_display = $params->get('carousel_content_display', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
-$content_layout = $params->get('carousel_content_layout', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+
+// *****************************************************
+// Content placement and default image of featured items
+// *****************************************************
+$content_display_feat = $params->get($layout.'_content_display_feat', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
+$content_layout_feat = $params->get($layout.'_content_layout_feat', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+$item_img_fit_feat = $params->get($layout.'_img_fit_feat', 0);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
+
+switch ($content_layout_feat) {
+	case 0: case 1:
+		$img_container_class_feat = ($content_layout_feat==0 ? 'fc_float_left' : 'fc_float_right');
+		$content_container_class_feat = 'fc_floated';
+		break;
+	case 2: case 3:
+		$img_container_class_feat = 'fc_stretch fc_clear';
+		$content_container_class_feat = '';
+		break;
+	case 4: case 5: case 6:
+		$img_container_class_feat = 'fc_stretch';
+		$content_container_class_feat = 'fc_overlayed '
+			.($content_layout_feat==4 ? 'fc_top' : '')
+			.($content_layout_feat==5 ? 'fc_bottom' : '')
+			.($content_layout_feat==6 ? 'fc_full' : '')
+			;
+		if ($content_display_feat >= 1) $content_container_class_feat .= ' fc_auto_show';
+		if ($content_display_feat == 1) $content_container_class_feat .= ' fc_show_active';
+		break;
+	default: $img_container_class_feat = '';  break;
+}
+
+
+
+// *****************************************************
+// Content placement and default image of standard items
+// *****************************************************
+$content_display = $params->get($layout.'_content_display', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
+$content_layout = $params->get($layout.'_content_layout', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+$item_img_fit = $params->get($layout.'_img_fit', 0);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
 
 switch ($content_layout) {
 	case 0: case 1:
@@ -111,19 +137,40 @@ switch ($content_layout) {
 	default: $img_container_class = '';  break;
 }
 
+
+
+// *******************************
 // Default image and image fitting
+// *******************************
 $mod_default_img_path = $params->get('mod_default_img_path', 'components/com_flexicontent/assets/images/image.png');
-$item_img_fit = $params->get('carousel_img_fit', 0);
 $img_path = JURI::base(true) .'/'; 
 
-$img_force_dims_feat="max-width:".$mod_width_feat."px; max-height:".$mod_height_feat."px; width: auto; height: auto; display: block!important;";
-$img_force_dims=" width: 100%; height: auto; display: block!important; border: 0 !important;";
-
-// Limit auto-fit to image max-dimensions to avoid stretching
-$_img_limit_dims_=" max-width:".$mod_width."px; max-height:".$mod_height."px;";
-if ($item_img_fit==0 || $content_layout <= 1) {
-	$img_force_dims .= $_img_limit_dims_;
+// image of FEATURED items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
+$img_force_dims_feat=" width: 100%; height: auto; display: block !important; border: 0 !important;";
+$img_limit_dims=" max-width:".$mod_width_feat."px; max-height:".$mod_height_feat."px;";
+if ($item_img_fit_feat==0 || $content_layout_feat <= 1) {
+	$img_force_dims_feat .= $img_limit_dims;
 }
+
+// image of STANDARD items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
+$img_force_dims=" width: 100%; height: auto; display: block !important; border: 0 !important;";
+$img_limit_dims=" max-width:".$mod_width."px; max-height:".$mod_height."px;";
+if ($item_img_fit==0 || $content_layout <= 1) {
+	$img_force_dims .= $img_limit_dims;
+}
+
+
+// *****************************************
+// Parameters for fcxSlider JS configuration
+// *****************************************
+
+// Carousel direction and Common Dimensions
+$mode = $params->get('carousel_mode', 'horizontal');
+
+// Fixed size / Responsive
+$responsive   = (int)$params->get('carousel_responsive', 1);
+$item_size_px = (int)$params->get('carousel_item_size_px', 240);
+$items_per_page = (int)$params->get('carousel_items_per_page', 2);
 
 // Edge behaviour, touch/mouse drag support
 $edgewrap = (int)$params->get('carousel_edgewrap', 1);
@@ -197,13 +244,13 @@ flexicontent_html::loadFramework('imagesLoaded');
 
 // Featured
 $item_columns_feat = $params->get('item_columns_feat', 1);
-$item_placement_feat = $params->get('carousel_item_placement_feat', 0);  // 0: cleared, 1: as masonry tiles
+$item_placement_feat = $params->get($layout.'_item_placement_feat', 0);  // 0: cleared, 1: as masonry tiles
 $cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
 	
 // Standard, these are ignored / unsed since we items are place inside the carousel
-$item_placement_std = 0;
+$item_placement_std = -1;  // -1: other, 0: cleared, 1: as masonry tiles
 $item_columns_std = 1;
-$cols_class_std  = '';
+$cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
 
 if ( ($item_placement_feat == 1 && $item_columns_feat > 1) || ($item_placement_std == 1 && $item_columns_std > 1) ) {
 	flexicontent_html::loadFramework('masonry');
@@ -250,7 +297,7 @@ $document = JFactory::getDocument();
   	}
   	// PREPEND ORDER if using more than 1 orderings ...
   	$order_name = $ord ? $ord : 'default';
-		$uniq_ord_id = (count($list)>1 ? '_'.$order_name : '').$module->id;
+		$uniq_ord_id = (count($list)>1 ? $order_name : '').$module->id;
 	?>
 	<div id="<?php echo 'order_'.$order_name.$module->id; ?>" class="mod_flexicontent">
 		
@@ -264,7 +311,7 @@ $document = JFactory::getDocument();
 		<!-- BOF featured items -->
 		<?php	$rowcount = 0; ?>
 		
-		<div class="mod_flexicontent_featured mod_flexicontent_featured<?php echo $module->id; ?>" id="mod_fcitems_box_featured<?php echo $uniq_ord_id; ?>">
+		<div class="mod_flexicontent_featured mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>" id="mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>">
 			
 			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; ?>
 			
@@ -281,8 +328,24 @@ $document = JFactory::getDocument();
 			<div class="mod_flexicontent_featured_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_feat ? ' '.$cols_class_feat : ''); ?>">
 			<div class="mod_flexicontent_featured_wrapper_innerbox">
 			
+				<!-- BOF current item's title -->	
 				<?php ob_start(); ?>
+				<?php if ($display_title_feat) : ?>
+				<div class="fc_block" >
+					<div class="fc_inline_block fcitem_title">
+						<?php if ($link_title_feat) : ?>
+						<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+						<?php else : ?>	
+						<?php echo $item->title; ?>
+						<?php endif; ?>
+					</div>
+				</div>
+				<?php endif; ?>
+				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
+				<!-- EOF current item's title -->	
+				
 				<!-- BOF current item's image -->	
+				<?php ob_start(); ?>
 				<?php if ($mod_use_image_feat && $item->image_rendered) : ?>
 
 				<div class="image_featured">
@@ -295,7 +358,7 @@ $document = JFactory::getDocument();
 				
 				<?php elseif ($mod_use_image_feat && $item->image) : ?>
 				
-				<div class="image_featured">
+				<div class="image_featured <?php echo $img_container_class_feat;?>">
 					<?php if ($mod_link_image_feat) : ?>
 						<a href="<?php echo $item->link; ?>">
 							<img style="<?php echo $img_force_dims_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
@@ -306,29 +369,17 @@ $document = JFactory::getDocument();
 				</div>
 				
 				<?php endif; ?>
+				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
 				<!-- BOF current item's image -->
-				<?php $captured_image = ob_get_clean(); ?>
 				
-				<?php echo $content_layout!=2 ? $captured_image : '';?>
+				<?php echo $content_layout_feat!=2 ? $captured_image : '';?>
 				
 				<!-- BOF current item's content -->
-				<?php if ($display_date_feat || $display_text_feat || $display_hits_feat || $display_voting_feat || $display_comments_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
-				<div class="content_featured">
+				<?php if ($hasTitle || $display_date_feat || $display_text_feat || $display_hits_feat || $display_voting_feat || $display_comments_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
+				<div class="content_featured <?php echo $content_container_class_feat;?>">
 					
-					<!-- BOF current item's title -->	
-					<?php if ($display_title_feat) : ?>
-					<div class="fc_block" >
-						<div class="fc_inline_block fcitem_title">
-							<?php if ($link_title_feat) : ?>
-							<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
-							<?php else : ?>	
-							<?php echo $item->title; ?>
-							<?php endif; ?>
-						</div>
-					</div>
-					<?php endif; ?>
-					<!-- EOF current item's title -->	
-				
+					<?php echo $captured_title; ?>
+					
 					<?php if ($display_date_feat && $item->date_created) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_date created">
@@ -404,12 +455,12 @@ $document = JFactory::getDocument();
 				</div> <!-- EOF current item's content -->
 				<?php endif; ?>
 				
-				<?php echo $content_layout==2 ? $captured_image : '';?>
+				<?php echo $content_layout_feat==2 ? $captured_image : '';?>
 				
 			</div>  <!-- EOF wrapper_innerbox -->
 			</div>  <!-- EOF wrapper -->
 			<!-- EOF current item -->
-			<?php if ($item_placement_feat==0) echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : ''; ?>
+			<?php if ($item_placement_feat==0) /* 0: clear, 1: as masonry tiles */ echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
 			
 		</div>
@@ -426,7 +477,7 @@ $document = JFactory::getDocument();
 		<!-- BOF standard items -->
 		<?php	$rowcount = 0; ?>
 		
-		<div id="mod_fc_carousel_mask<?php echo $uniq_ord_id; ?>_loading" class="mod_fc_carousel_mask_loading">
+		<div id="mod_fc_carousel_mask_<?php echo $uniq_ord_id; ?>_loading" class="mod_fc_carousel_mask_loading">
 			... <?php echo  JText::_('FLEXI_MOD_CAROUSEL_LOADING_IMAGES'); ?> <img alt="" src="<?php echo JURI::root(); ?>components/com_flexicontent/assets/images/ajax-loader.gif" align="middle" />
 		</div>
 		
@@ -436,9 +487,9 @@ $document = JFactory::getDocument();
 	<span id="previous<?php echo $_icontrols_method; ?>_fcmod_<?php echo $uniq_ord_id; ?>"  class="mod_fc_nav fc_previous fc_<?php echo $mode; ?>" ></span> 
 	<?php endif; ?>
 	
-	<div id="mod_fc_carousel_mask<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_mask <?php echo $show_controls==1 ? 'fc_has_nav fc_'.$mode : ''; ?>">
+	<div id="mod_fc_carousel_mask_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_mask <?php echo $show_controls==1 ? 'fc_has_nav fc_'.$mode : ''; ?>">
 		
-		<div class="mod_flexicontent_standard mod_fcitems_box_standard<?php echo $module->id; ?>" id="mod_fcitems_box_standard<?php echo $uniq_ord_id; ?>">
+		<div class="mod_flexicontent_standard mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?>" id="mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?>">
 			
 			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; $n=-1; ?>
 			
@@ -454,13 +505,29 @@ $document = JFactory::getDocument();
 			
 			<!-- BOF current item -->	
 			<div class="mod_flexicontent_standard_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>"
-				onmouseover="mod_fc_carousel<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel<?php echo $uniq_ord_id; ?>.autoPlay=false;"
-				onmouseout="if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
+				onmouseover="mod_fc_carousel_<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel_<?php echo $uniq_ord_id; ?>.autoPlay=false;"
+				onmouseout="if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 			>
 			<div class="mod_flexicontent_standard_wrapper_innerbox">
-
+				
+				<!-- BOF current item's title -->	
 				<?php ob_start(); ?>
+				<?php if ($display_title || $item_handle_title==2) : ?>
+				<div class="fc_block" <?php echo !$display_title ? 'style="display:none!important;"' : ''; ?> >
+					<div class="fc_inline_block fcitem_title">
+						<?php if ($link_title) : ?>
+							<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+						<?php else : ?>	
+							<?php echo $item->title; ?>
+						<?php endif; ?>
+					</div>
+				</div>
+				<?php endif; ?>
+				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
+				<!-- EOF current item's title -->	
+				
 				<!-- BOF current item's image -->	
+				<?php ob_start(); ?>
 				<?php if ($mod_use_image && $item->image_rendered) : ?>
 				<div class="image_standard">
 					<?php if ($mod_link_image) : ?>
@@ -483,26 +550,16 @@ $document = JFactory::getDocument();
 				</div>
 				
 				<?php endif; ?>
+				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
 				<!-- BOF current item's image -->	
-				<?php $captured_image = ob_get_clean(); ?>
 				
 				<?php echo $content_layout!=2 ? $captured_image : '';?>
 				
 				<!-- BOF current item's content -->
-				<?php if ($display_date || $display_text || $display_hits || $display_voting || $display_comments || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
+				<?php if ($hasTitle || $display_date || $display_text || $display_hits || $display_voting || $display_comments || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
 				<div class="content_standard <?php echo $content_container_class;?>">
 					
-					<?php if ($display_title || $item_handle_title==2) : ?>
-					<div class="fc_block" <?php echo !$display_title ? 'style="display:none!important;"' : ''; ?> >
-						<div class="fc_inline_block fcitem_title">
-							<?php if ($link_title) : ?>
-								<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
-							<?php else : ?>	
-								<?php echo $item->title; ?>
-							<?php endif; ?>
-						</div>
-					</div>
-					<?php endif; ?>
+					<?php echo $captured_title; ?>
 					
 					<?php if ($display_date && $item->date_created) : ?>
 					<div class="fc_block">
@@ -577,14 +634,14 @@ $document = JFactory::getDocument();
 					<div class="clearfix"></div> 
 					
 				</div> <!-- EOF current item's content -->
+				<?php endif; ?>
 				
 				<?php echo $content_layout==2 ? $captured_image : '';?>
-				
-				<?php endif; ?>
 				
 			</div>  <!-- EOF wrapper_innerbox -->
 			</div>  <!-- EOF wrapper -->
 			<!-- EOF current item -->
+			<?php if ($item_placement_std==0) echo !($rowcount%$item_columns_std) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
 			
 		</div>
@@ -600,9 +657,9 @@ $document = JFactory::getDocument();
 		
 		<?php if ($show_page_handles) : ?>
 			<div class="mod_fc_pages_outer">
-				<div id="mod_fc_page_handles<?php echo $uniq_ord_id; ?>" class="mod_fc_page_handles"
-						onmouseover="mod_fc_carousel<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel<?php echo $uniq_ord_id; ?>.autoPlay=false;"
-						onmouseout="if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
+				<div id="mod_fc_page_handles_<?php echo $uniq_ord_id; ?>" class="mod_fc_page_handles"
+						onmouseover="mod_fc_carousel_<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel_<?php echo $uniq_ord_id; ?>.autoPlay=false;"
+						onmouseout="if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 				>
 					<?php $count=1; ?>
 					<?php foreach ($list[$ord]['standard'] as $item) : ?>
@@ -618,16 +675,16 @@ $document = JFactory::getDocument();
 		<?php if (($show_controls==2) && ($dcontrols_auto || $dcontrols_pages || $dcontrols_items)) : ?>
 			<div class="mod_fc_carousel_buttons_outer">
 				<div class="mod_fc_carousel_buttons"
-					onmouseover="mod_fc_carousel<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel<?php echo $uniq_ord_id; ?>.autoPlay=false;"
-					onmouseout="if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
+					onmouseover="mod_fc_carousel_<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel_<?php echo $uniq_ord_id; ?>.autoPlay=false;"
+					onmouseout="if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 				>
 					<?php if ($dcontrols_auto) : ?>
 						<?php if ($dcontrols_labels) : ?>
 							<span id="autoplay_controls_label_fcmod_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_controls_label"><?php echo JText::_('FLEXI_MOD_CAROUSEL_AUTOPLAY'); ?></span>
 						<?php endif; ?>
-						<span id="stop_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay=0;" class="mod_fc_carousel_btn fc_stop" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_STOP'); ?>"></span>
-						<span id="backward_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay=-1;" class="mod_fc_carousel_btn fc_backward" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_BACKWARD'); ?>"></span>
-						<span id="forward_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay=1;" class="mod_fc_carousel_btn fc_forward" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_FORWARD'); ?>"></span>
+						<span id="stop_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay=0;" class="mod_fc_carousel_btn fc_stop" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_STOP'); ?>"></span>
+						<span id="backward_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay=-1;" class="mod_fc_carousel_btn fc_backward" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_BACKWARD'); ?>"></span>
+						<span id="forward_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay=1;" class="mod_fc_carousel_btn fc_forward" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_FORWARD'); ?>"></span>
 					<?php endif; ?>
 					
 					<?php if ($dcontrols_pages) : ?>
@@ -652,10 +709,10 @@ $document = JFactory::getDocument();
 		<?php if ($show_item_handles) : ?>
 		
 			<div class="mod_fc_handles_outer">
-				<div id="mod_fc_item_handles<?php echo $uniq_ord_id; ?>"
+				<div id="mod_fc_item_handles_<?php echo $uniq_ord_id; ?>"
 					class="mod_fc_item_handles <?php echo $item_handles_dir=='horizontal' ? 'fc_add_scroller_horizontal fc_scrollbox_h' : 'fc_add_scroller fc_scrollbox_v';?>"
-					onmouseover="mod_fc_carousel<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel<?php echo $uniq_ord_id; ?>.autoPlay=false;"
-					onmouseout="if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
+					onmouseover="mod_fc_carousel_<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel_<?php echo $uniq_ord_id; ?>.autoPlay=false;"
+					onmouseout="if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
 				>
 				
 				<?php $img_path = JURI::base(true) .'/'; ?>
@@ -679,14 +736,14 @@ $document = JFactory::getDocument();
 	
 		<?php if ($show_curritem_info) : ?>
 		
-			<div id="mod_fc_activeitem_info<?php echo $uniq_ord_id; ?>" class="mod_fc_activeitem_info" >
+			<div id="mod_fc_activeitem_info_<?php echo $uniq_ord_id; ?>" class="mod_fc_activeitem_info" >
 				<?php /*echo JText::_( 'FLEXI_MOD_CAROUSEL_DISPLAYING').': ';*/ ?>
 				<?php if ($item_handle_title==2) : ?>
-					<span id="mod_fc_info_title<?php echo $uniq_ord_id; ?>" class="mod_fc_activeitem_info_title"></span>
+					<span id="mod_fc_info_title_<?php echo $uniq_ord_id; ?>" class="mod_fc_activeitem_info_title"></span>
 				<?php endif; ?>
 				
 				<?php if ($item_handle_text==2) : ?>
-					<span id="mod_fc_info_text<?php echo $uniq_ord_id; ?>" class="mod_fc_activeitem_info_text"></span>
+					<span id="mod_fc_info_text_<?php echo $uniq_ord_id; ?>" class="mod_fc_activeitem_info_text"></span>
 				<?php endif; ?>
 			</div>
 			
@@ -703,36 +760,36 @@ $document = JFactory::getDocument();
 	// have multiple container (1 item list container per order) being effected by JS
 	$js = ''
 		.'
-		var mod_fc_carousel'.$uniq_ord_id.'_ns_fxOptions='.$_fcx_fxOptions.';
-		var mod_fc_carousel'.$uniq_ord_id.'_autoPlay='.$autoplay.';
-		var mod_fc_carousel'.$uniq_ord_id.';
+		var mod_fc_carousel_'.$uniq_ord_id.'_ns_fxOptions='.$_fcx_fxOptions.';
+		var mod_fc_carousel_'.$uniq_ord_id.'_autoPlay='.$autoplay.';
+		var mod_fc_carousel_'.$uniq_ord_id.';
 		
 		jQuery(document).ready(function() {
 		 jQuery("#mod_fc_carousel_container_'.$uniq_ord_id.'").imagesLoaded(function(){
 		
-			mod_fc_carousel'.$uniq_ord_id.' = new fcxSlide({
+			mod_fc_carousel_'.$uniq_ord_id.' = new fcxSlide({
 			
 				mode: "'.$mode.'",
 				transition: "'.$transition.'",
-				fxOptions: mod_fc_carousel'.$uniq_ord_id.'_ns_fxOptions,
+				fxOptions: mod_fc_carousel_'.$uniq_ord_id.'_ns_fxOptions,
 				transition_visible_duration: '.$transition_visible_duration.',
 				
-				items: jQuery("#mod_fcitems_box_standard'.$uniq_ord_id.'").find("div.mod_flexicontent_standard_wrapper"),
-				items_inner: jQuery("#mod_fcitems_box_standard'.$uniq_ord_id.'").find("div.mod_flexicontent_standard_wrapper_innerbox"),
-				items_box: jQuery("#mod_fcitems_box_standard'.$uniq_ord_id.'"),
-				items_mask: jQuery("#mod_fc_carousel_mask'.$uniq_ord_id.'"),
+				items: jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'").find("div.mod_flexicontent_standard_wrapper"),
+				items_inner: jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'").find("div.mod_flexicontent_standard_wrapper_innerbox"),
+				items_box: jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'"),
+				items_mask: jQuery("#mod_fc_carousel_mask_'.$uniq_ord_id.'"),
 				items_per_page: '.$_fcx_items_per_page.',
 				item_size: '.$_fcx_item_size.',
 				responsive: '.$_fcx_responsive.',
 				
 				'.( !$show_page_handles ? '' : '
-				page_handles: jQuery("#mod_fc_page_handles'.$uniq_ord_id.'").find("span.mod_fc_page_handle"),
+				page_handles: jQuery("#mod_fc_page_handles_'.$uniq_ord_id.'").find("span.mod_fc_page_handle"),
 				page_handle_event: "'.$page_handle_event.'",
 				').'
 				
 				'.( !$show_item_handles ? '' : '
-				item_handles_box: jQuery("#mod_fc_item_handles'.$uniq_ord_id.'"),
-				item_handles: jQuery("#mod_fc_item_handles'.$uniq_ord_id.'").find("span.mod_fc_item_handle"),
+				item_handles_box: jQuery("#mod_fc_item_handles_'.$uniq_ord_id.'"),
+				item_handles: jQuery("#mod_fc_item_handles_'.$uniq_ord_id.'").find("span.mod_fc_item_handle"),
 				item_handles_dir: "'.$item_handles_dir.'",
 				item_handle_event: "'.$item_handle_event.'",
 				item_handle_duration: '.$item_handle_duration.',
@@ -773,14 +830,14 @@ $document = JFactory::getDocument();
 					').'
 					
 					'.( !$show_curritem_info ? '' : '
-						jQuery("#mod_fc_info_title'.$uniq_ord_id.'").html( jQuery(currentItem).find(".fcitem_title").html() );
-						jQuery("#mod_fc_info_text'.$uniq_ord_id.'").html( jQuery(currentItem).find(".fcitem_text").html() );
+						jQuery("#mod_fc_info_title_'.$uniq_ord_id.'").html( jQuery(currentItem).find(".fcitem_title").html() );
+						jQuery("#mod_fc_info_text_'.$uniq_ord_id.'").html( jQuery(currentItem).find(".fcitem_text").html() );
 					').'
 				}
 			});
 			
-			jQuery("#mod_fc_carousel_mask'.$uniq_ord_id.'_loading").css("display", "none");
-			jQuery("#mod_fc_carousel_mask'.$uniq_ord_id.'").css("visibility", "visible");
+			jQuery("#mod_fc_carousel_mask_'.$uniq_ord_id.'_loading").css("display", "none");
+			jQuery("#mod_fc_carousel_mask_'.$uniq_ord_id.'").css("visibility", "visible");
 			
 			jQuery("#next_fcmod_'.$uniq_ord_id.'").css("visibility", "visible");
 			jQuery("#previous_fcmod_'.$uniq_ord_id.'").css("visibility", "visible");
@@ -790,11 +847,11 @@ $document = JFactory::getDocument();
 			
 			'.
 			// Alternative but it includes padding
-			// var maxHeight = jQuery("#mod_fcitems_box_standard'.$uniq_ord_id.'")[0].clientHeight;
+			// var maxHeight = jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'")[0].clientHeight;
 			
 			// Alternative to use computed style, requires ie9+
-			//var maxHeight_withpx = getComputedStyle(jQuery("#mod_fcitems_box_standard'.$uniq_ord_id.'")[0], null).getPropertyValue("height")
-			//mod_fc_carousel'.$uniq_ord_id.'.items.each(function() {
+			//var maxHeight_withpx = getComputedStyle(jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'")[0], null).getPropertyValue("height")
+			//mod_fc_carousel_'.$uniq_ord_id.'.items.each(function() {
 			//	this.style.height = maxHeight_withpx;
 			//});
 			'
@@ -812,13 +869,13 @@ $document = JFactory::getDocument();
 	
 	$css = ''.
 	/* CONTAINER of featured items */'
-	#mod_fcitems_box_featured'.$uniq_ord_id.' {
+	#mod_fcitems_box_featured_'.$uniq_ord_id.' {
 	}'.
 	/* CONTAINER of each featured item */'
-	#mod_fcitems_box_featured'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
+	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
 	}'.
 	/* inner CONTAINER of each standard item */'
-	#mod_fcitems_box_featured'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
+	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
 		'.($inner_inline_css_feat ? '
 		padding: '.$padding_top_bottom_feat.'px '.$padding_left_right_feat.'px !important;
 		border-width: '.$border_width_feat.'px!important;
@@ -827,13 +884,13 @@ $document = JFactory::getDocument();
 	}'.
 	
 	/* CONTAINER of standard items */'
-	#mod_fcitems_box_standard'.$uniq_ord_id.' {
+	#mod_fcitems_box_standard_'.$uniq_ord_id.' {
 	}'.
 	/* CONTAINER of each standard item */'
-	#mod_fcitems_box_standard'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
+	#mod_fcitems_box_standard_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
 	}'.
 	/* inner CONTAINER of each standard item */'
-	#mod_fcitems_box_standard'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
+	#mod_fcitems_box_standard_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
 		'.($inner_inline_css ? '
 		padding: '.$padding_top_bottom.'px '.$padding_left_right.'px !important;
 		border-width: '.$border_width.'px!important;
@@ -842,29 +899,25 @@ $document = JFactory::getDocument();
 	}'.
 	
 	/* The MASK that contains the CAROUSEL (mask clips it) */'
-	#mod_fc_carousel_mask'.$uniq_ord_id.' {
-	border: 5px solid #fff;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    -moz-box-shadow: 1px 1px 5px #ccc;
-    -webkit-box-shadow: 1px 1px 5px #ccc;
-    box-shadow: 1px 1px 5px #ccc;
-    z-index: 10
+	#mod_fc_carousel_mask_'.$uniq_ord_id.' {
+		border: 5px solid #fff;
+		border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px;
+		box-shadow: 1px 1px 5px #ccc; -webkit-box-shadow: 1px 1px 5px #ccc; -moz-box-shadow: 1px 1px 5px #ccc;
+		z-index: 10
 	}'.
 	
 	/* Active item information */'
-	#mod_fc_activeitem_info'.$uniq_ord_id.' {}'.
+	#mod_fc_activeitem_info_'.$uniq_ord_id.' {}'.
 	
 	/* Item button handles (instantly display respective item)*/'
-	#mod_fc_item_handles'.$uniq_ord_id.' {}'.
+	#mod_fc_item_handles_'.$uniq_ord_id.' {}'.
 	
 	/* CAROUSEL item/page handles clickable */'
-	#mod_fc_item_handles'.$uniq_ord_id.' span.mod_fc_item_handle:hover {
-		'.($item_handle_event=='click' ? 'cursor:pointer;' : '').'
+	#mod_fc_item_handles_'.$uniq_ord_id.' span.mod_fc_item_handle:hover {
+		'.($item_handle_event=='click' ? 'cursor:pointer;' : 'cursor:default;').'
 	}
-	#mod_fc_page_handles'.$uniq_ord_id.' span.mod_fc_page_handle:hover {
-		'.($page_handle_event=='click' ? 'cursor:pointer;' : '').'
+	#mod_fc_page_handles_'.$uniq_ord_id.' span.mod_fc_page_handle:hover {
+		'.($page_handle_event=='click' ? 'cursor:pointer;' : 'cursor:default;').'
 	}'
 	;
 	
@@ -874,7 +927,7 @@ $document = JFactory::getDocument();
 	{
 		$js = "
 		jQuery(document).ready(function(){
-			var container = document.querySelector('div#mod_fcitems_box_featured".$uniq_ord_id."');
+			var container = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
 			var msnry;
 			// initialize Masonry after all images have loaded
 			if (container) {
@@ -890,7 +943,7 @@ $document = JFactory::getDocument();
 	{
 		$js = "
 		jQuery(document).ready(function(){
-			var container = document.querySelector('div#mod_fcitems_box_standard".$uniq_ord_id."');
+			var container = document.querySelector('div#mod_fcitems_box_standard_".$uniq_ord_id."');
 			var msnry;
 			// initialize Masonry after all images have loaded
 			if (container) {

@@ -56,6 +56,7 @@
 	float: none;
 	width: auto;
 	height: auto;
+	overflow: hidden;
 	
 	/* can be overriden via user 's CSS */
 	margin: 4px;
@@ -827,15 +828,22 @@
 }
 .carousel.mod_flexicontent_wrapper .fc_floated {}
 
+.carousel.mod_flexicontent_wrapper .image_featured.fc_float_left img,
+.carousel.mod_flexicontent_wrapper .image_featured.fc_float_right img,
 .carousel.mod_flexicontent_wrapper .image_standard.fc_float_left img,
 .carousel.mod_flexicontent_wrapper .image_standard.fc_float_right img { border-radius: 8px; }
+.carousel.mod_flexicontent_wrapper .image_featured.fc_float_left img,
+.carousel.mod_flexicontent_wrapper .image_featured.fc_float_right img,
 .carousel.mod_flexicontent_wrapper .image_standard.fc_float_left img,
 .carousel.mod_flexicontent_wrapper .image_standard.fc_float_right img { border-radius: 8px; }
 
 .carousel.mod_flexicontent_wrapper .fc_clear { clear: both !important; }
 
+.carousel.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper .fc_auto_show,
 .carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper .fc_auto_show { visibility: hidden; }
+.carousel.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,  /* force showing content of active item */
+.carousel.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper:hover .fc_auto_show,  /* force showing content if item under mouse */
 .carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,  /* force showing content of active item */
-.carousel.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover .fc_auto_show {   /* force showing content if item under mouse */
+.carousel.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper:hover .fc_auto_show {   /* force showing content if item under mouse */
 	visibility: visible;
 }
