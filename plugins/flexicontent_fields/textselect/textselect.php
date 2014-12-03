@@ -21,6 +21,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 {
 	static $field_types = array('textselect');
 	static $extra_props = array();
+	static $can_group = false;
 	
 	// ***********
 	// CONSTRUCTOR
