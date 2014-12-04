@@ -19,7 +19,9 @@ jimport('joomla.event.plugin');
 class plgFlexicontent_fieldsText extends JPlugin
 {
 	static $field_types = array('text', 'textselect');
-	static $can_group = true;
+	static $capabilities = array(
+		"canGroup" => true
+	);
 	
 	// ***********
 	// CONSTRUCTOR
@@ -82,8 +84,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		}
 		
 		// Field name and HTML TAG id
-		$fieldname = 'custom['.$field->name.']'.($count!=null ? '['.$count.']': '').'[]';
-		$elementid = 'custom_'.$field->name.($count!=null ? '_'.$count: '');
+		$fieldname = 'custom['.$field->name.']'.($gcount!=null ? '['.$gcount.']': '').'[]';
+		$elementid = 'custom_'.$field->name.($gcount!=null ? '_'.$gcount: '');
 		
 		$js = "";
 		

@@ -3323,7 +3323,7 @@ class FlexicontentFields
 		}
 		
 		// Because query includes specific items it should be fast
-		$query = 'SELECT i.*, ext.type_id,'
+		$query = 'SELECT i.*, ext.*,'
 			.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
 			.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
 			. @ $orderby_col

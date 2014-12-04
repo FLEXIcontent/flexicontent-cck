@@ -113,11 +113,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		if ( !$common_js_css_added ) {
 			$js = "
-				function fx_toggle_upload_select_tbl (obj_changed, obj_disp_toggle) {
-					if (jQuery(obj_disp_toggle).length == 0)
+				function fx_toggle_upload_select_tbl (obj_changed, objid_disp_toggle) {
+					if (jQuery('#'+objid_disp_toggle).length == 0)
 						obj_disp_toggle = jQuery(obj_changed).closest('.fcfieldval_container').find('table.img_upload_select');
 					else
-						obj_disp_toggle = jQuery(obj_disp_toggle);
+						obj_disp_toggle = jQuery('#'+objid_disp_toggle);
 					if (obj_changed.checked)
 						obj_disp_toggle.css('display', 'table');
 					else
@@ -171,13 +171,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					return 'cancel';
 				}
 				
-				var thisField 	 = $(el).getPrevious().getLast();
-				var thisNewField = thisField.clone();
-				if (MooTools.version>='1.2.4') {
-					var fx = new Fx.Morph(thisNewField, {duration: 0, transition: Fx.Transitions.linear});
-				} else {
-					var fx = thisNewField.effects({duration: 0, transition: Fx.Transitions.linear});
-				}
+				var lastField 	 = jQuery(el).prev().children().last();
+				var thisNewField = lastField.clone();
 				
 			".( $image_source ? "" :"
 				var has_imagepicker = jQuery(thisNewField).find('ul.image_picker_selector').length != 0;
@@ -187,29 +182,29 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				").
 			"
 			
-				thisNewField.getElements('input.newfile').setProperty('value','');
-				thisNewField.getElements('input.newfile').setProperty('name','".$field->name."['+uniqueRowNum".$field->id."+']');
-				thisNewField.getElements('input.newfile').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_newfile');
+				jQuery(thisNewField).find('input.newfile').val('');
+				jQuery(thisNewField).find('input.newfile').attr('name','".$field->name."['+uniqueRowNum".$field->id."+']');
+				jQuery(thisNewField).find('input.newfile').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_newfile');
 				
-				thisNewField.getElements('input.originalname').setProperty('value','');
-				thisNewField.getElements('input.originalname').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][originalname]');
-				thisNewField.getElements('input.originalname').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_originalname');
+				jQuery(thisNewField).find('input.originalname').val('');
+				jQuery(thisNewField).find('input.originalname').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][originalname]');
+				jQuery(thisNewField).find('input.originalname').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_originalname');
 				
-				thisNewField.getElements('.existingname').setProperty('value','');
-				thisNewField.getElements('.existingname').addClass('no_value_selected');
-				thisNewField.getElements('.existingname').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][existingname]');
-				thisNewField.getElements('.existingname').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_existingname');
+				jQuery(thisNewField).find('.existingname').val('');
+				jQuery(thisNewField).find('.existingname').addClass('no_value_selected');
+				jQuery(thisNewField).find('.existingname').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][existingname]');
+				jQuery(thisNewField).find('.existingname').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_existingname');
 				
 			".( $image_source ? "" :"
 				if (has_imagepicker && ".$auto_enable_imgpicker." ) jQuery(thisNewField).find('select.image-picker').imagepicker({ hide_select:false, show_label:true });
 				if (has_select2)  jQuery(thisNewField).find('select.use_select2_lib').select2();
 				").
 			"
-				thisNewField.getElements('a.addfile_".$field->id."').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
-				thisNewField.getElements('a.addfile_".$field->id."').setProperty('href','".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$thumb_w_s.'&thumb_h='.$thumb_h_s.'&autoassign='.$autoassign."');
+				jQuery(thisNewField).find('a.addfile_".$field->id."').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
+				jQuery(thisNewField).find('a.addfile_".$field->id."').attr('href','".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid."_'+uniqueRowNum".$field->id."+'_existingname&thumb_w=".$thumb_w_s.'&thumb_h='.$thumb_h_s.'&autoassign='.$autoassign."');
 				
 				// COPYING an existing value
-				if (thisNewField.getElement('img.preview_image')) {
+				if (jQuery(thisNewField).find('img.preview_image')) {
 					var tmpDiv = jQuery('<div class=\"empty_image empty_image".$field->id."\" style=\"height:".$field->parameters->get('h_s')."px; width:".$field->parameters->get('w_s')."px;\"></div>');
 					tmpDiv.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
 					tmpDiv.insertAfter( jQuery(thisNewField).find('img.preview_image') );
@@ -217,7 +212,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				}
 				
 				// COPYING an empty value
-				else if (thisNewField.getElement('div.empty_image')) {
+				else if (jQuery(thisNewField).find('div.empty_image')) {
 					jQuery(thisNewField).find('div.empty_image').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_preview_image');
 					jQuery(thisNewField).find('div.empty_image').html('');
 				}
@@ -228,60 +223,55 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					imgchange_toggler.prop('id','".$elementid."_'+uniqueRowNum".$field->id."+'_change');
 					imgchange_toggler.parent().find('label').prop('for','".$elementid."_'+uniqueRowNum".$field->id."+'_change');
 					
-					thisNewField.getElements('table.img_upload_select').setProperty('id','".$field->name."_upload_select_tbl_'+uniqueRowNum".$field->id.");
-					thisNewField.getElements('table.img_upload_select').setStyle('display', 'table');
+					jQuery(thisNewField).find('table.img_upload_select').attr('id','".$field->name."_upload_select_tbl_'+uniqueRowNum".$field->id.");
+					jQuery(thisNewField).find('table.img_upload_select').css('display', 'table');
 					jQuery(thisNewField).find('input.imgchange').prop('checked', true);
 				}
 				";
 				
 			if ($linkto_url) $js .= "
-				thisNewField.getElements('input.imglink').setProperty('value','');
-				thisNewField.getElements('input.imglink').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][urllink]');
+				jQuery(thisNewField).find('input.imglink').val('');
+				jQuery(thisNewField).find('input.imglink').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][urllink]');
 				";
 				
 			if ($usealt) $js .= "
-				thisNewField.getElements('input.imgalt').setProperty('value','".$default_alt."');
-				thisNewField.getElements('input.imgalt').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][alt]');
+				jQuery(thisNewField).find('input.imgalt').val('".$default_alt."');
+				jQuery(thisNewField).find('input.imgalt').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][alt]');
 				";
 				
 			if ($usetitle) $js .= "
-				thisNewField.getElements('input.imgtitle').setProperty('value','".$default_title."');
-				thisNewField.getElements('input.imgtitle').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				jQuery(thisNewField).find('input.imgtitle').val('".$default_title."');
+				jQuery(thisNewField).find('input.imgtitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				";
 				
 			if ($usedesc) $js .= "
-				thisNewField.getElements('textarea.imgdesc').setProperty('value','".$default_desc."');
-				thisNewField.getElements('textarea.imgdesc').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][desc]');
+				jQuery(thisNewField).find('textarea.imgdesc').val('".$default_desc."');
+				jQuery(thisNewField).find('textarea.imgdesc').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][desc]');
 				";
 				
 			if ($usecust1) $js .= "
-				thisNewField.getElements('input.imgcust1').setProperty('value','".$default_cust1."');
-				thisNewField.getElements('input.imgcust1').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust1]');
+				jQuery(thisNewField).find('input.imgcust1').val('".$default_cust1."');
+				jQuery(thisNewField).find('input.imgcust1').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust1]');
 				";
 				
 			if ($usecust2) $js .= "
-				thisNewField.getElements('input.imgcust2').setProperty('value','".$default_cust2."');
-				thisNewField.getElements('input.imgcust2').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust2]');
+				jQuery(thisNewField).find('input.imgcust2').val('".$default_cust2."');
+				jQuery(thisNewField).find('input.imgcust2').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust2]');
 				";
 			
 			$js .= "
-				jQuery(thisNewField).insertAfter( jQuery(thisField) );
+				jQuery(thisNewField).insertAfter( lastField );
 				".// We need to re-execute setting of modal popup since when this run the current element did not exist
 				"
 				
-				SqueezeBox.initialize({});
-				if (MooTools.version>='1.2.4') {
-					SqueezeBox.assign($$('a.addfile_".$field->id."'), {
-						parse: 'rel'
+				// Add jQuery modal window to the select image file button
+				jQuery('a.addfile_".$field->id."').each(function(index, value) {
+					jQuery(this).on('click', function() {
+						var url = jQuery(this).attr('href');
+						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container');
+						return false;
 					});
-				} else {
-					$$('a.addfile_".$field->id."').each(function(el) {
-						el.addEvent('click', function(e) {
-							new Event(e).stop();
-							SqueezeBox.fromElement(el);
-						});
-					});
-				}
+				});
 				
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
@@ -289,14 +279,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					tolerance: 'pointer'
 				});
 
-				fx.start({ 'opacity': 1 }).chain(function(){
-					this.setOptions({duration: 600});
-					this.start({ 'opacity': 0 });
-					})
-					.chain(function(){
-						this.setOptions({duration: 300});
-						this.start({ 'opacity': 1 });
-					});
+				jQuery(thisNewField).fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
 
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
@@ -304,21 +287,22 @@ class plgFlexicontent_fieldsImage extends JPlugin
 
 			function deleteField".$field->id."(el)
 			{
-				var field	= $(el);
+				var row = jQuery(el).parent();
+				jQuery(el).remove();  // Destroy the remove button, so that it is not clicked again
 				
 				if(rowCount".$field->id." == 1)
 				{
-					addField".$field->id."(field.getParent().getParent().getParent().getElement('input.fcfield-addvalue'));
+					addField".$field->id."(row.parent().parent().find('input.fcfield-addvalue').first());
 				}
 				
 				var originalfftag = 'input.originalname';
 				var existingfftag = '".($image_source ? "input" :"select")."' + '.existingname';
 				
-				var originalname = jQuery(field).parent().find( originalfftag ).val();
-				var existingname = jQuery(field).parent().find( existingfftag ).val();
+				var originalname = row.find( originalfftag ).val();
+				var existingname = row.find( existingfftag ).val();
 				
 				if ( originalname != '' || existingname != '' ) {
-					var valcounter = $('".$field->name."');
+					var valcounter = jQuery('#".$field->name."');
 					if ( !valcounter.value || valcounter.value=='1' ) valcounter.value = '';
 					else valcounter.value = parseInt(valcounter.value) - 1;
 					//alert(valcounter.value);
@@ -326,19 +310,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				if(rowCount".$field->id." > 0)
 				{
-					var row		= field.getParent();
-					if (MooTools.version>='1.2.4') {
-						var fx = new Fx.Morph(row, {duration: 300, transition: Fx.Transitions.linear});
-					} else {
-						var fx = row.effects({duration: 300, transition: Fx.Transitions.linear});
-					}
-					
-					fx.start({
-						'height': 0,
-						'opacity': 0
-						}).chain(function(){
-							(MooTools.version>='1.2.4')  ?  row.destroy()  :  row.remove();
-						});
+					row.slideUp(400, function(){ this.remove(); });
 					rowCount".$field->id."--;
 				}
 			}
@@ -352,8 +324,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			#sortables_'.$field->id.' li {
 				'.($none_props ?
 					'float:left!important; clear:none!important; white-space:normal!important;' :
-					'clear:both!important;').'
-				display: block!important;
+					'float:left!important; clear:both!important;').'
+				display: block;
 				list-style: none!important;
 				position: relative;  .'/* do not make important */.'
 			}
@@ -382,43 +354,41 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				var replacestr = (tagid.indexOf('_existingname') > -1) ? '_existingname' : '_newfile';
 				var elementid = tagid.replace(replacestr,'');
 				
-				var originalname = $( elementid + '_originalname' ).getProperty('value');
-				var existingname = $( elementid + '_existingname' ).getProperty('value');
+				var originalname = jQuery('#' + elementid + '_originalname' ).val();
+				var existingname = jQuery('#' + elementid + '_existingname' ).val();
 				
-				var valcounter = $('".$field->name."');
+				var valcounter = jQuery('#".$field->name."');
 				
 				if (file=='') {  // DB-mode
 				
-					var newfilename  = $( elementid + '_newfile' ).getProperty('value');
+					var newfilename  = jQuery('#' + elementid + '_newfile' ).val();
 					
 					if ( replacestr == '_newfile' ) {
 					
-						if ( $( elementid + '_newfile' ).hasClass('no_value_selected') && newfilename!='' ) {
+						if ( jQuery('#' + elementid + '_newfile' ).hasClass('no_value_selected') && newfilename!='' ) {
 							var modify = ( originalname=='' && existingname=='' );
-							$( elementid + '_newfile' ).removeClass('no_value_selected');
-						} else if ( !$( elementid + '_newfile' ).hasClass('no_value_selected') && newfilename=='' ) {
+							jQuery('#' + elementid + '_newfile' ).removeClass('no_value_selected');
+						} else if ( !jQuery('#' + elementid + '_newfile' ).hasClass('no_value_selected') && newfilename=='' ) {
 							var modify = -1;
-							$( elementid + '_newfile' ).addClass('no_value_selected');
+							jQuery('#' + elementid + '_newfile' ).addClass('no_value_selected');
 						} else {
 							var modify = 0;
 						}
 						
-						$( elementid + '_existingname' ).setProperty('value', '');
-						$( elementid + '_existingname' ).addClass('no_value_selected');
+						jQuery('#' + elementid + '_existingname' ).addClass('no_value_selected').val('');
 					} else {
 					
-						if ( $( elementid + '_existingname' ).hasClass('no_value_selected') && existingname!='' ) {
+						if ( jQuery('#' + elementid + '_existingname' ).hasClass('no_value_selected') && existingname!='' ) {
 							var modify = ( originalname=='' && newfilename=='' );
-							$( elementid + '_existingname' ).removeClass('no_value_selected');
-						} else if ( !$( elementid + '_existingname' ).hasClass('no_value_selected') && existingname=='' ) {
+							jQuery('#' + elementid + '_existingname' ).removeClass('no_value_selected');
+						} else if ( !jQuery('#' + elementid + '_existingname' ).hasClass('no_value_selected') && existingname=='' ) {
 							var modify = -1;
-							$( elementid + '_existingname' ).addClass('no_value_selected');
+							jQuery('#' + elementid + '_existingname' ).addClass('no_value_selected');
 						} else {
 							var modify = 0;
 						}
 						
-						$( elementid + '_newfile' ).setProperty('value', '');
-						$( elementid + '_newfile' ).addClass('no_value_selected');
+						jQuery('#' + elementid + '_newfile' ).addClass('no_value_selected').val('');
 					}
 					
 					if (modify>0) {
@@ -439,20 +409,20 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				//alert(valcounter.value);
 				
-				var existing_obj = $( elementid + '_existingname' );
-				var original_obj = $( elementid + '_originalname' );
+				var existing_obj = jQuery('#' + elementid + '_existingname' );
+				var original_obj = jQuery('#' + elementid + '_originalname' );
 				
-				var prv_obj = $( elementid + '_preview_image' );
+				var prv_obj = jQuery('#' + elementid + '_preview_image' );
 				
 				// Folder-Mode
-				if (file != '')  existing_obj.setProperty('value', file);
-				original_obj.setProperty('value', '');
+				if (file != '')  existing_obj.val(file);
+				original_obj.val('');
 				// DB-Mode
 				if (file == '') jQuery( '#' + elementid + '_imgdelete' ).remove();
 				
 				if (prv_obj) {
 					preview_msg = '<span id=\"'+elementid+'_preview_msg\"></span>';
-					if (file || !$( elementid + '_existingname' ).hasClass('no_value_selected') ) {
+					if (file || !jQuery('#' + elementid + '_existingname' ).hasClass('no_value_selected') ) {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"'+file_url+'\" style=\"border: 1px solid silver; float:left;\" alt=\"Preview image\" />';
 					} else {
 						var preview_container = '<img class=\"preview_image\" id=\"'+elementid+'_preview_image\" src=\"\" style=\"border: 1px solid silver; float:left;\" alt=\"Preview image\" />';
@@ -464,17 +434,17 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					}
 					
 					var tmpDiv = jQuery(preview_container);
-					tmpDiv.insertAfter( jQuery(prv_obj) );
+					tmpDiv.insertAfter( prv_obj );
 					var tmpDiv = jQuery(preview_msg);
-					tmpDiv.insertAfter( jQuery(prv_obj) );
-					jQuery(prv_obj).remove();
+					tmpDiv.insertAfter( prv_obj );
+					prv_obj.remove();
 					
-					if (file || !$( elementid + '_existingname' ).hasClass('no_value_selected') ) {
+					if (file || !jQuery('#' + elementid + '_existingname' ).hasClass('no_value_selected') ) {
 					} else {
-						loadImagePreview(tagid, elementid+'_preview_image', elementid+'_preview_msg', ".$thumb_w_s.", ".$thumb_h_s.");
+						fc_loadImagePreview(tagid, elementid+'_preview_image', elementid+'_preview_msg', ".$thumb_w_s.", ".$thumb_h_s.");
 					}
 				}
-				(MooTools.version>='1.2.4') ?  window.SqueezeBox.close()  :  window.document.getElementById('sbox-window').close();
+				fc_field_dialog_handle_".$field->id.".dialog('close');
 			}
 		";
 		$css .='
@@ -490,14 +460,26 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		flexicontent_html::loadFramework('flexi-lib');
 		
 		if ( $image_source ) {
-			JHTML::_('behavior.modal', 'a.addfile_'.$field->id);
+			$js ="
+			var fc_field_dialog_handle_".$field->id.";
+			jQuery(document).ready(function() {
+				// Add jQuery modal window to the select image file button, the container will be created if it does not exist already
+				jQuery('a.addfile_".$field->id."').each(function(index, value) {
+					jQuery(this).on('click', function() {
+						var url = jQuery(this).attr('href');
+						fc_field_dialog_handle_".$field->id." = fc_showDialog(url, 'fc_modal_popup_container');
+						return false;
+					});
+				});
+			});
+			";
+			if ($js)  $document->addScriptDeclaration($js);
 		} else {
 			$select = $this->buildSelectList( $field );
 		}
 		
 		$class = ' class="'.$required.' "';
 		$onchange= ' onchange="';
-		//$onchange .= ($required) ? ' fx_img_toggle_required(this,$(\''.$field->name.'originalname\')); ' : '';
 		
 		$onchange .= " qmAssignFile".$field->id."(this.id, '', '');";
 		$js_submit = FLEXI_J16GE ? "Joomla.submitbutton('items.apply')" : "submitbutton('apply')";
@@ -588,7 +570,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			if ( !$image_source ) {
 				$change .= !$multiple ?
-					' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, $(\''.$field->name.'_upload_select_tbl_'.$n.'\'))" value="1" '.($image_name ? '' : ' checked="checked" ').'/>' :
+					' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this, \''.$field->name.'_upload_select_tbl_'.$n.'\')" value="1" '.($image_name ? '' : ' checked="checked" ').'/>' :
 					' <input class="imgchange" style="display:none;" type="checkbox" name="'.$fieldname.'[change]" id="'.$elementid.'_change" onchange="fx_toggle_upload_select_tbl(this)" value="1" '.($image_name ? '' : ' checked="checked" ').' />' ;
 				$change .= ' <span></span><label class="fcfield-button" style="margin: 0px 0px 4px 0px !important;" for="'.$elementid.'_change">'.JText::_( 'FLEXI_TOGGLE_IMAGE_SELECTOR' ).'</label>';
 			}

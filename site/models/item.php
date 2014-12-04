@@ -148,6 +148,7 @@ class FlexicontentModelItem extends ParentClassItem
 				$itemcats = $this->_item->categories;
 				$cats_are_published = true;
 				foreach ($itemcats as $catid) {
+					if (!isset($globalcats[$catid])) continue;
 					$cats_are_published |= $globalcats[$catid]->published;
 					if (FLEXI_J16GE) {  // For J1.6+ check all ancestor categories from current one to the root
 						foreach($globalcats[$catid]->ancestorsarray as $pcid)    $cats_are_published = $cats_are_published && ($globalcats[$pcid]->published==1);

@@ -20,7 +20,9 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 {
 	static $field_types = array('radioimage');
 	static $extra_props = array('image');
-	static $can_group = true;
+	static $capabilities = array(
+		"canGroup" => true
+	);
 	
 	// ***********
 	// CONSTRUCTOR
@@ -108,8 +110,8 @@ class plgFlexicontent_fieldsRadioimage extends JPlugin
 		}
 		
 		// Field name and HTML TAG id
-		$fieldname = 'custom['.$field->name.']'.($count!=null ? '['.$count.']': '');
-		$elementid = 'custom_'.$field->name.($count!=null ? '_'.$count: '');
+		$fieldname = 'custom['.$field->name.']'.($gcount!=null ? '['.$gcount.']': '');
+		$elementid = 'custom_'.$field->name.($gcount!=null ? '_'.$gcount: '');
 		
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);

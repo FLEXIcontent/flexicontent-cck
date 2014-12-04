@@ -186,7 +186,7 @@ flexicontent_html::loadFramework('flexi-lib');
 						<td>
 							<div id="img_preview_msg" style="float:left;"></div>
 							<img id="img_preview" src="" style="float:left;"/>
-							<input type="file" id="file-upload" name="Filedata" onchange="loadImagePreview(this.id,'img_preview', 'img_preview_msg', 60, 60);" />
+							<input type="file" id="file-upload" name="Filedata" onchange="fc_loadImagePreview(this.id,'img_preview', 'img_preview_msg', 60, 60);" />
 						</td>
 					</tr>
 	<?php if (!$this->folder_mode) { ?>
