@@ -17,6 +17,8 @@
  */
 
 defined('_JEXEC') or die('Restricted access');
+
+$tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 ?>
 <style type="text/css">
 table#itemcompare u{
@@ -35,12 +37,12 @@ table#itemcompare s{
 					<?php endif; ?>
 					<table class="admintable">
 						<tr>
-							<th align="right" width="16%" style="font-size:16px;">
+							<th align="right" width="" style="font-size:16px;">
 							</th>
-							<th align="left" width="42%" style="font-size:16px;">
+							<th align="left" width="" style="font-size:16px;">
 								<?php echo JText::_( 'FLEXI_VERSION_NR' ) . $this->rev; ?>
 							</th>
-							<th align="left" width="42%" style="font-size:16px;">
+							<th align="left" width="" style="font-size:16px;">
 								<?php echo JText::_( 'FLEXI_CURRENT_VERSION' ); ?>
 							</th>
 						</tr>
@@ -60,8 +62,8 @@ table#itemcompare s{
 								$html = flexicontent_html::flexiHtmlDiff($field->displayversion, $field->display, $this->codemode);
 						?>
 						<tr>
-							<td class="key">
-								<label for="<?php echo $field->name; ?>" class="hasTip" title="<?php echo $field->label; ?>::<?php echo $field->description; ?>">
+							<td class="key" style="text-align:right;'">
+								<label for="<?php echo $field->name; ?>" class="label <?php echo $tooltip_class; ?>" title="<?php echo flexicontent_html::getToolTip($field->label, $field->description, 0); ?>">
 									<?php echo JText::_($field->label); ?>
 								</label>
 							</td>

@@ -19,9 +19,6 @@ jimport('joomla.event.plugin');
 class plgFlexicontent_fieldsText extends JPlugin
 {
 	static $field_types = array('text', 'textselect');
-	static $capabilities = array(
-		"canGroup" => true
-	);
 	
 	// ***********
 	// CONSTRUCTOR
@@ -40,7 +37,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// *******************************************
 	
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item, $gcount=null)
+	function onDisplayField(&$field, &$item, $ingroup=false)
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
@@ -55,7 +52,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$default_value     = ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		$maxlength	= (int)$field->parameters->get( 'maxlength', 0 ) ;
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
-		$multiple   = $gcount!==null ? 0 : $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple   = $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
@@ -84,8 +81,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		}
 		
 		// Field name and HTML TAG id
-		$fieldname = 'custom['.$field->name.']'.($gcount!=null ? '['.$gcount.']': '').'[]';
-		$elementid = 'custom_'.$field->name.($gcount!=null ? '_'.$gcount: '');
+		$fieldname = 'custom['.$field->name.']'.'[]';
+		$elementid = 'custom_'.$field->name;
 		
 		$js = "";
 		

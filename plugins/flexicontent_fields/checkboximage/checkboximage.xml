@@ -27,6 +27,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
+			<field name="can_group" type="hidden" default="0" />
 		</fieldset>
 		
 		<fieldset name="group-checkboximage" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">

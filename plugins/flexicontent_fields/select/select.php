@@ -20,9 +20,6 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 {
 	static $field_types = array('select');
 	static $extra_props = array();
-	static $capabilities = array(
-		"canGroup" => true
-	);
 	
 	// ***********
 	// CONSTRUCTOR
@@ -41,7 +38,7 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 	// *******************************************
 	
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item, $gcount=null)
+	function onDisplayField(&$field, &$item, $ingroup=false)
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
@@ -70,8 +67,8 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		}
 		
 		// Field name and HTML TAG id
-		$fieldname = 'custom['.$field->name.']'.($gcount!=null ? '['.$gcount.']': '');
-		$elementid = 'custom_'.$field->name.($gcount!=null ? '_'.$gcount: '');
+		$fieldname = 'custom['.$field->name.']';
+		$elementid = 'custom_'.$field->name;
 		
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);

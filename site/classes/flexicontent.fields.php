@@ -1203,6 +1203,9 @@ class FlexicontentFields
 				// CUSTOM field or CORE field with no type
 				$fdata[$tindex][$field->name] = new stdClass();
 				$fdata[$tindex][$field->name]->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
+				if ($field->field_type=='maintext' && $fdata[$tindex][$field->name]->parameters->get('trigger_onprepare_content', '')==='') {
+					$fdata[$tindex][$field->name]->parameters->set(1);  // Default for maintext (description field) is to trigger plugins
+				}
 				
 			} else {
 				
