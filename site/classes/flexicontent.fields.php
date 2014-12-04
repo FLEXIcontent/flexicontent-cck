@@ -3234,11 +3234,11 @@ class FlexicontentFields
 	
 	// Helper method to perform HTML replacements on given list of item ids (with optional catids too), the items list is either given
 	// as parameter or the list is created via the items that have as value the id of 'parentitem' for field with id 'reverse_field'
-	static function getItemsList(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, &$return_item_list=false)
+	static function getItemsList(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, &$return_item_list=false, $states=array(1,-5,2))
 	{
 		// Execute query to get item list data 
 		$db = JFactory::getDBO();
-		$query = FlexicontentFields::createItemsListSQL($params, $_item_data, $isform, $reverse_field, $parentfield, $parentitem);
+		$query = FlexicontentFields::createItemsListSQL($params, $_item_data, $isform, $reverse_field, $parentfield, $parentitem, $states);
 		$db->setQuery($query);
 		$item_list = $db->loadObjectList('id');
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
@@ -3256,7 +3256,7 @@ class FlexicontentFields
 	
 	
 	// Helper method to create SQL query for retrieving items list data
-	static function createItemsListSQL(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem)
+	static function createItemsListSQL(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, $states=array(1,-5,2))
 	{
 		$db = JFactory::getDBO();
 		$sfx = $isform ? '_form' : '';
@@ -3276,6 +3276,9 @@ class FlexicontentFields
 			
 			$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'; 
 			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )';
+		}
+		if (count($states)) {
+			$publish_where .= ' AND i.state IN ('.implode(',',$states).')';
 		}
 		
 		// item IDs via reversing a relation field
