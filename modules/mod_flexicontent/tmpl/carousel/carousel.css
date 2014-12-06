@@ -684,8 +684,8 @@
 	-webkit-box-shadow: 1px 1px 5px #ccc;
 	box-shadow: 1px 1px 5px #ccc;
 	height: 33px !important;
-	margin-left: 11px;
-	margin-right: 8px;
+	margin-left: 3px;
+	margin-right: 3px;
 	position: absolute !important;
 	top: 37%;
 	width: 28px;
@@ -753,7 +753,7 @@
 }
 
 .carousel.mod_flexicontent_wrapper .mod_fc_carousel_mask.fc_has_nav.fc_horizontal {
-	margin: 0px 36px 0px 36px !important;
+	margin: 0px 30px !important;
 	width: auto !important;
 }
 

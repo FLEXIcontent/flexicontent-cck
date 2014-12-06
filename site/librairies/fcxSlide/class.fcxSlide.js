@@ -9,15 +9,15 @@ Description:
 	a jQuery slider written almost from scratch (easing functions by George McGinley, see License below)
 	with advanced responsive design and complex walk calculation for items, item handles and page handles
 	
-		- jQuery based, performance wise
+		- jQuery based, smooth scroll/drag and performance wise
 		
 		- Fixed ITEM size (fixed width OR height) of Dynamic ITEM size (items per_page)
 		
 		- Semi-responsive / fully-responsive, detects vieport width change
 			and resizes the 1 item dimension (the non-fixed dimension) or both dimensions for full-responsive mode with 'items per page'
 		
-		- Mobile touch-drag sliding
-		- Mouse click-drag sliding
+		- Touch-drag sliding
+		- Mouse-drag sliding
 		
 		- Supports
 			a. item handles
@@ -69,7 +69,8 @@ Parameters:
 	
 	touch_walk: boolean | default: true
 	mouse_walk: boolean | default: false
-	drag_margin: int | default: 100
+	dragstart_margin: int | default: 20
+	dragwalk_margin: int | default: 100
 	
 	page_handles: dom collection | default: null
 	page_handle_event: string | event type| default: 'click'
@@ -100,7 +101,7 @@ Parameters:
 	startItem: int | default: 0
 
 
-Properties:
+Properties (parameter initializable):
 	
 	mode: string
 	transition: string
@@ -118,7 +119,8 @@ Properties:
 	
 	touch_walk: boolean
 	mouse_walk: boolean
-	drag_margin: int
+	dragstart_margin: int
+	dragwalk_margin: int
 	
 	page_handles: dom collection
 	page_handle_event: string
@@ -132,17 +134,27 @@ Properties:
 	action_handles: object
 	action_handle_event: string
 	
-	lastPageCount: int
-	currentIndex: int    // currently focused item
-	lastIndex: int       // previously focused item
-	currentPage: int
-	
 	edgeWrap: boolean
 	autoPlay: boolean
 	playInterval: int
 	playMethod: string
-	onWalk: function
 	
+	onWalk: function
+	startItem: int
+
+
+Properties (non-parameter initializable):
+
+	pageCount: int       // currently active pages
+	currentPage: int     // currently focused page
+	currentIndex: int    // currently focused item
+	lastIndex: int       // previously focused item
+	
+	resizeTimeout     // timeout TIMER object to fire ONCE the resize handling function
+	autoPlayInterval  // interval TIMER object to fire REGULARLY the autoplay handling function
+	
+	isDragging: boolean  // touch/mouse movement is over drag start threshold
+
 
 Methods:
 
@@ -175,8 +187,10 @@ Methods:
 		manual: bolean | default:false
 		noFx: boolean | default:false
 	
-	addTouchDrag(): add touch/drag events
+	resize(event): update carousel display on window resize
+	addTouchDrag(): add touch/drag events to the items container
 */
+
 var fcxSlide = new Class({
 
 	initialize: function(params)
@@ -197,7 +211,8 @@ var fcxSlide = new Class({
 		
 		this.touch_walk = params.touch_walk || 1;
 		this.mouse_walk = params.mouse_walk || 0;
-		this.drag_margin = params.drag_margin || 100;
+		this.dragstart_margin = params.dragstart_margin || 20;
+		this.dragwalk_margin = params.dragwalk_margin || 100;
 		
 		this.page_handles = params.page_handles || null;
 		this.page_handle_event = params.page_handle_event || 'click';
@@ -208,25 +223,29 @@ var fcxSlide = new Class({
 		this.item_handle_event = params.item_handle_event || 'click';
 		this.item_handle_duration = params.item_handle_duration || 400;
 		
+		//params.action_handles  // NOTE: the member variable is different than the parameter
 		this.action_handle_event = params.action_handle_event || 'click';
-		//params.action_handles
-		
-		this.onWalk = params.onWalk || null;
-		
-		this.lastPageCount = 0;
-		this.currentIndex = 0;
-		this.lastIndex = null;
-		this.currentPage = 0;
-		this.resizeTimeout = null;
-		this.suppressTimeout = null;
 		
 		this.edgeWrap     = params.edgeWrap || false;
 		this.autoPlay     = params.autoPlay || false;
 		this.playInterval = params.playInterval || 5000;
 		this.playMethod   = params.playMethod || 'page';
+		this.startItem    = params.startItem || 0;
 		
-		this.autoPlay_timer = null;
+		this.onWalk = params.onWalk || null;
 		
+		// member variables, not initialized via parameters
+		this.pageCount = 0;
+		this.currentPage = 0;
+		this.currentIndex = 0;
+		this.lastIndex = null;
+		
+		this.resizeTimeout = null;
+		this.autoPlayInterval = null;
+		
+		this.isDragging = false;
+		
+		// Add Item/Page/Action Handles
 		if (this.item_handles)  this.bindItemHandles(this.item_handles);
 		if (this.page_handles)  this.bindPageHandles(this.page_handles);
 		if (params.action_handles) {
@@ -234,27 +253,14 @@ var fcxSlide = new Class({
 			this.bindActionHandles(params.action_handles);
 		}
 		
-		this.walk((params.startItem||0),true,false,true);
+		// Walk to initial item
+		this.walk(this.startItem,true,false,true);
 		
-		// Update slider and rescroll to current item when window is resized
+		// Add listener ON window resize event, to update the slider and rescroll to current item
 		jQuery(window).resize({slider: this}, this.resize);
 		
-		// Add mobile support
+		// Add touch event support (mobile devices, etc), and optionally mouse drag support too
 		this.addTouchDrag();
-	},
-	
-	resize: function(event){
-		clearTimeout(this.resizeTimeout); // Clear any other pending resizing within the timeout limit e.g. 100 ms
-		this.resizeTimeout = setTimeout(function(){
-			event.data.slider.walk(event.data.slider.currentIndex,true,false,true);
-		}, 100);
-	},
-	
-	suppress: function(event){
-		//clearTimeout(this.suppressTimeout); // Clear any other pending suppress timeouts
-		this.suppressTimeout = setTimeout(function(){
-			event.data.slider.resizeTimeout = false;
-		}, 100);
 	},
 	
 	bindItemHandles: function(item_handles){
@@ -294,16 +300,18 @@ var fcxSlide = new Class({
 			for(var i=0; i<action_set.length; i++){
 				switch(action)
 				{
-					case 'stop':     action_set[i].on(this.action_handle_event, { }, function(param) { slider.stop(true); } ); break;
-					case 'playback': action_set[i].on(this.action_handle_event, { }, function(param) { slider.play(slider.playInterval,'previous',false); } ); break;
-					case 'play':     action_set[i].on(this.action_handle_event, { }, function(param) { slider.play(slider.playInterval,'next',false); } ); break;
+					case 'stop':     action_set[i].on(this.action_handle_event, { }, function(ev) { slider.stop(true); } ); break;
+					case 'playback': action_set[i].on(this.action_handle_event, { }, function(ev) { slider.play(slider.playInterval,'previous',false); } ); break;
+					case 'play':     action_set[i].on(this.action_handle_event, { }, function(ev) { slider.play(slider.playInterval,'next',false); } ); break;
 					
-					case 'previous_page': action_set[i].on(this.action_handle_event, { }, function(param) { slider.previous_page(true); } ); break;
-					case 'next_page':     action_set[i].on(this.action_handle_event, { }, function(param) { slider.next_page(true); } ); break;
+					case 'previous_page': action_set[i].on(this.action_handle_event, { }, function(ev) { slider.previous_page(true); } ); break;
+					case 'next_page':     action_set[i].on(this.action_handle_event, { }, function(ev) { slider.next_page(true); } ); break;
 					
-					case 'previous': action_set[i].on(this.action_handle_event, { }, function(param) { slider.previous(true); } ); break;
-					case 'next':     action_set[i].on(this.action_handle_event, { }, function(param) { slider.next(true); } ); break;
+					case 'previous': action_set[i].on(this.action_handle_event, { }, function(ev) {  slider.previous(true); } ); break;
+					case 'next':     action_set[i].on(this.action_handle_event, { }, function(ev) { slider.next(true); } ); break;
 				}
+				// Prevent actions on mousedonwn of the action handles, e.g. text selection
+				action_set[i].on('mousedown', { }, function(ev) { ev.preventDefault(); } ); 
 				this.action_handles[action].push(action_set[i]);
 			}
 		}
@@ -336,7 +344,7 @@ var fcxSlide = new Class({
 			this[direction_func](false);
 		}
 		var slider = this;
-		this.autoPlay_timer = setInterval(
+		this.autoPlayInterval = setInterval(
 			function() {
 				slider[direction_func].call(slider,[false])
 			},
@@ -346,7 +354,7 @@ var fcxSlide = new Class({
 	},
 	
 	stop: function(halt){
-		clearTimeout(this.autoPlay_timer);
+		clearTimeout(this.autoPlayInterval);
 		if (halt) {
 			this.autoPlay = false;
 		}
@@ -429,7 +437,7 @@ var fcxSlide = new Class({
 		var last_page_item = page_count * this.items_per_page;
 		
 		/* Update page handles according to new page detection */
-		if (this.page_handles && this.lastPageCount != page_count) {
+		if (this.page_handles && this.pageCount != page_count) {
 			for(var i=0; i<page_count; i++){
 				jQuery(this.page_handles[i]).css('display', 'inline-block');
 			}
@@ -437,7 +445,7 @@ var fcxSlide = new Class({
 				jQuery(this.page_handles[i]).css('display', 'none');
 			}
 		}
-		this.lastPageCount = page_count;
+		this.pageCount = page_count;
 		
 		
 		/* WALK item or full page */
@@ -479,7 +487,8 @@ var fcxSlide = new Class({
 		{
 			// Stop current jQuery animation on the items box, forcing it to complete
 			// NOTE: this -NOT- the stop() method of the slider (that stops the scheduled autoplay)
-			jQuery(this.items_box).stop(false, true);
+			// cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump
+			jQuery(this.items_box).stop(true, false);
 			
 			
 			// **********
@@ -674,7 +683,14 @@ var fcxSlide = new Class({
 			}
 		}
 	},
-
+	
+	resize: function(event){
+		clearTimeout(this.resizeTimeout); // Clear any other pending resizing within the timeout limit e.g. 100 ms
+		this.resizeTimeout = setTimeout(function(){
+			event.data.slider.walk(event.data.slider.currentIndex,true,false,true);
+		}, 100);
+	},
+	
 	addTouchDrag: function(){
 		if (!this.touch_walk && !this.mouse_walk) return;  // nothing to do
 		
@@ -683,66 +699,102 @@ var fcxSlide = new Class({
 		
 		var boxPos = 0;
 		var startPos = 0;
-		var dist = 0;
+		var travelDist = 0;
+		
+		// Prevent click if a drag was started (minor drags are not considered, see dragstart_margin parameter)
+		jQuery(sliderBox).on('click', function(ev){
+			// Click event is scheduled/queued after mouseup event, isDragging FLAG is cleared via setTimeout, thus we can use it here to prevent clicks
+			if (slider.isDragging) {
+				var e = ev.originalEvent;
+				e.preventDefault();
+				e.stopPropagation();
+			}
+		});
 		
 		var startEvents = (this.mouse_walk ? 'mousedown' : '') + (this.touch_walk ? ' touchstart' : '');
 		jQuery(sliderBox).on(startEvents, function(ev){
 			var e = ev.originalEvent;  // Get original event
+			if (ev.type=='mousedown') {
+				// In the case of using mouse events, we need to prevent events for 'mousedown'
+				e.preventDefault(); e.stopPropagation();  // this may create undesired effects in some cases
+			}
+			
 			var obj = ev.type!='touchstart' ? e : e.changedTouches[0]; // reference first touch point for this event
 			
+			// Indicate draging by changing mouse cursor
+			//jQuery(slider.items_box).css('cursor', (slider.mode=='horizontal' ? (travelDist<0 ? 'w-resize' : 'e-resize') : (travelDist<0 ? 'n-resize' : 's-resize')) );
+			jQuery(slider.items_box).css('cursor', "pointer" );
+			
+			// Stop all jQuery animations and force them to complete, to get proper current position of the slider
+			jQuery(slider.items_box).stop(true, true);
 			boxPos = parseInt(jQuery(slider.items_box).css(slider.mode=='horizontal' ? 'left' : 'top'));
 			startPos = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY);
-			//if ( window.console && window.console.log ) window.console.log ('Status: mousedown<br /> ClientX: ' + startPos + 'px');
-			//e.preventDefault();
+			//if ( window.console && window.console.log ) window.console.log ('Status: mousedown<br /> Start coordinate: ' + startPos + 'px');
 		});
 		
 		
-		var startEvents = (this.mouse_walk ? 'mousemove' : '') + (this.touch_walk ? ' touchmove' : '');
-		jQuery(sliderBox).on(startEvents, function(ev){
+		var moveEvents = (this.mouse_walk ? 'mousemove' : '') + (this.touch_walk ? ' touchmove' : '');
+		jQuery(sliderBox).on(moveEvents, function(ev){
 			var e = ev.originalEvent;  // Get original event
+			//e.preventDefault();	//e.stopPropagation();
+			
 			var obj = ev.type!='touchmove' ? e : e.changedTouches[0]; // reference first touch point for this event
-			if (startPos==0) return;
+			var moveStarted = (startPos!=0);
+			if (!moveStarted) return;
 			
-			var dist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
-			jQuery(slider.items_box).css('cursor', (slider.mode=='horizontal' ? (dist<0 ? 'w-resize' : 'e-resize') : (dist<0 ? 'n-resize' : 's-resize')) );
-			currPos = parseInt(jQuery(slider.items_box).css(slider.mode=='horizontal' ? 'left' : 'top'));
-			//if (Math.abs(dist) < slider.drag_margin / 10) return;
-			//if (Math.abs(boxPos+dist - currPos) < 10 ) return;
-			//if ( window.console && window.console.log ) ; //window.console.log ('Status: mousemove<br /> Horizontal distance traveled: ' + dist + 'px');
+			var travelDist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
+			//if ( window.console && window.console.log ) ; //window.console.log ('Status: mousemove<br /> Distance traveled: ' + travelDist + 'px');
 			
-			// Stop current jQuery animations but force them to complete
-			jQuery(slider.items_box).stop(false, true);
-			jQuery(slider.items_box).css(slider.mode=='horizontal' ? 'left' : 'top', '' + (boxPos+dist) + 'px');
-			//e.preventDefault();
+			// Check if drap distance is over the drag start threshold
+			if (!slider.isDragging && Math.abs(travelDist) < slider.dragstart_margin) return;
+			slider.isDragging = true;
+			
+			// Touch/Mouse Drag is at new point, retarget to new point,
+			// cancel all animations without completing them, to allow continuing from current position, thus avoiding position jump to previous touch position
+			jQuery(slider.items_box).stop(true, false);
+			(slider.mode=='horizontal') ?
+				jQuery(slider.items_box).animate({ left: boxPos+travelDist }, "fast") :
+				jQuery(slider.items_box).animate({ top: boxPos+travelDist }, "fast") ;
 		});
 		
 		
 		var endEvents = (this.mouse_walk ? 'mouseleave mouseup' : '') + (this.touch_walk ? ' touchend' : '');
 		jQuery(sliderBox).on(endEvents, function(ev){
 			var e = ev.originalEvent;  // Get original event
-			var obj = ev.type!='touchend' ? e : e.changedTouches[0]; // reference first touch point for this event
-			jQuery(slider.items_box).css('cursor', 'auto');  // restore mouse pointer
-			if (startPos==0) return;  // initial click was not inside the slider
-			var dist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
-			startPos = 0;
+			//e.preventDefault(); //e.stopPropagation();
 			
-			if (Math.abs(dist) > slider.drag_margin)
+			var obj = ev.type!='touchend' ? e : e.changedTouches[0]; // reference first touch point for this event
+			
+			var moveStarted = (startPos!=0);
+			if (!moveStarted) return;  // check if initial click was not inside the slider
+			var travelDist = parseInt(slider.mode=='horizontal' ? obj.clientX : obj.clientY) - startPos;
+			//if ( window.console && window.console.log ) window.console.log ('Status: mouseup<br /> End coordinate: ' + (slider.mode=='horizontal' ? obj.clientX : obj.clientY) + 'px');
+			
+			jQuery(slider.items_box).css('cursor', 'auto');  // restore mouse pointer
+			
+			// Check if drap distance is over the drag walk threshold
+			if (Math.abs(travelDist) > slider.dragwalk_margin)
 			{
+				// Drag is under walk threshold, walk the slider to proper direction,
+				// cancel all animations without completing them, to allow walking from current position, thus avoiding position jump to last touch position
+				jQuery(slider.items_box).stop(true, false);
 				slider.stop(true);  // Cancel autoplay, to avoid confusion to the user
-			  (dist < 0) ?        // Walk the slider
+			  (travelDist < 0) ?        // Walk the slider
 			  	slider.next_page(true) :
 			  	slider.previous_page(true) ;
 			}
 			
 			else {
-				jQuery(slider.items_box).stop(false, true);
+				// Drag is under threshold, return slider to original position before dragging was stated,
+				// cancel all animations without completing, to allow returning from current position, thus avoiding position jump to last touch position
+				jQuery(slider.items_box).stop(true, false);
 				(slider.mode=='horizontal') ?
-					jQuery(slider.items_box).animate({ left: boxPos }, {}) :
-					jQuery(slider.items_box).animate({ top: boxPos }, {}) ;
+					jQuery(slider.items_box).animate({ left: boxPos }, "fast") :
+					jQuery(slider.items_box).animate({ top: boxPos }, "fast") ;
 			}
 			
-			//if ( window.console && window.console.log ) window.console.log ('Status: mouseup<br /> Resting x coordinate: ' + obj.clientX + 'px');
-			//e.preventDefault();
+			startPos = 0;
+			setTimeout(function(){ slider.isDragging = false; }, 100);
 		});
 	}
 });

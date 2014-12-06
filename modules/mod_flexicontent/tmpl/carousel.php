@@ -229,8 +229,8 @@ $_fcx_touch_walk   = $touch_walk ? "true" : "false";
 $_fcx_mouse_walk   = $mouse_walk ? "true" : "false";
 $_fcx_autoPlay     = $autoplay ? "true" : "false";
 $_fcx_fxOptions    = '{ duration:'.$duration.', easing: "'.$easing_name.'" }';
-$_fcx_item_size    = $item_size_px;  // item width (horizontal) OR height (vertical) in case of fixed item size
 $_fcx_responsive   = $responsive;  // 0: px, 1: percentage
+$_fcx_item_size    = $item_size_px;  // item width (horizontal) OR height (vertical) in case of fixed item size
 $_fcx_items_per_page = $items_per_page;  // ZERO for horizontal, this value will be overwritten by auto-calulation, after page load ends
 
 if ($interval < $duration) {
@@ -778,9 +778,15 @@ $document = JFactory::getDocument();
 				items_inner: jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'").find("div.mod_flexicontent_standard_wrapper_innerbox"),
 				items_box: jQuery("#mod_fcitems_box_standard_'.$uniq_ord_id.'"),
 				items_mask: jQuery("#mod_fc_carousel_mask_'.$uniq_ord_id.'"),
+				
+				touch_walk: '.$_fcx_touch_walk.',
+				mouse_walk: '.$_fcx_mouse_walk.',
+				dragstart_margin: 20,
+				dragwalk_margin: 100,
+				
+				responsive: '.$_fcx_responsive.',
 				items_per_page: '.$_fcx_items_per_page.',
 				item_size: '.$_fcx_item_size.',
-				responsive: '.$_fcx_responsive.',
 				
 				'.( !$show_page_handles ? '' : '
 				page_handles: jQuery("#mod_fc_page_handles_'.$uniq_ord_id.'").find("span.mod_fc_page_handle"),
@@ -809,11 +815,10 @@ $document = JFactory::getDocument();
 				').'
 				
 				edgeWrap: '.$_fcx_edgeWrap.',
-				touch_walk: '.$_fcx_touch_walk.',
-				mouse_walk: '.$_fcx_mouse_walk.',
 				autoPlay: '.$_fcx_autoPlay.',
 				playInterval: '.$interval.',
 				playMethod: "'.$method.'",
+				startItem: 0,
 				
 				onWalk: function(currentItem, currentPageHandle, currentItemHandle){
 					this.items.removeClass("mod_fc_activeitem");
