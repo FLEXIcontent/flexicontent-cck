@@ -17,7 +17,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
-class plgFlexicontent_fieldsTextSelect extends JPlugin
+class plgFlexicontent_fieldsTextselect extends JPlugin
 {
 	static $field_types = array('textselect');
 	static $extra_props = array();
@@ -26,7 +26,7 @@ class plgFlexicontent_fieldsTextSelect extends JPlugin
 	// CONSTRUCTOR
 	// ***********
 	
-	function plgFlexicontent_fieldsTextSelect( &$subject, $params ) {
+	function plgFlexicontent_fieldsTextselect( &$subject, $params ) {
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_text', JPATH_ADMINISTRATOR);
 		JPlugin::loadLanguage('plg_flexicontent_fields_select', JPATH_ADMINISTRATOR);

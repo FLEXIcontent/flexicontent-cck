@@ -44,6 +44,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
+		$isgrouped = $field->parameters->get('isgrouped', 0);
 		
 		$app      = JFactory::getApplication();
 		$user     = JFactory::getUser();
@@ -52,7 +53,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		static $common_js_css_added = false;
 		
 		// some parameter shortcuts
-		$multiple     = $field->parameters->get('allow_multiple', 1);
+		$multiple     = $isgrouped || $field->parameters->get('allow_multiple', 1);
 		$max_values   = (int)$field->parameters->get('max_values', 0);
 		$image_source = $field->parameters->get('image_source', 0);
 		if ($image_source > 1) {
@@ -509,10 +510,12 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				// For non-empty value set a message when we have examined all values
 				if ($image_name) $skipped_vals[] = $image_name;
 				
-				// Skip current value but add and an empty image container if no other image exists
-				if ($image_added || ($i+1) < count($field->value) ) {
+				// Skip current value but add and an empty image container if :
+				// (a) no other image exists or  (b) field is in a group
+				if (!$isgrouped && ($image_added || ($i+1) < count($field->value)) ) {
 					continue;
 				} else {
+					// 1st value or empty value for fieldgroup position
 					$image_name = '';
 				}
 			} else {
@@ -660,7 +663,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		if ($multiple) { // handle multiple records
+		if ($isgrouped) { // do not convert the array to string if field is in a group
+		} else if ($multiple) { // handle multiple records
 			$field->html = '<li class="fcfieldval_container">'. implode('</li><li class="fcfieldval_container">', $field->html) .'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
 			$field->html .= '<input type="button" class="fcfield-addvalue" style="float:left; clear:both;" onclick="addField'.$field->id.'(this);" value=" -- '.JText::_( 'FLEXI_ADD_IMAGE_CONTAINER' ).' -- " />';
@@ -668,7 +672,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$field->html = '<div class="fcfieldval_container">' . $field->html[0] .'</div>';
 		}
 		
-		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
+		// This is field HTML that is created regardless of values
+		$extra_html = '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($count_vals ? $count_vals : '').'" />';
+		if ($isgrouped) {
+			$field->html[-1] = $extra_html;
+		} else {
+			$field->html .= $extra_html;
+		}
 		
 		if ( count($skipped_vals) )
 			$app->enqueueMessage( JText::sprintf('FLEXI_FIELD_EDIT_VALUES_SKIPPED', $field->label, implode(',',$skipped_vals)), 'notice' );
@@ -678,6 +688,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
+		$isgrouped = $field->parameters->get('isgrouped', 0);
+		
 		// Get isMobile / isTablet Flags
 		static $isMobile = null;
 		static $isTablet = null;
@@ -897,8 +909,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ($view=='module' && !in_array('module',$popupinview)) $usepopup = 0;
 		if ($isItemsManager && !in_array('backend',$popupinview)) $usepopup = 0;
 		
-		// FORCE multibox popup in backend ...
-		if ($isItemsManager) $popuptype = 1;
+		// Only allow multibox and fancybox in items manager, in other cases force fancybox
+		if ($isItemsManager && !in_array($popuptype, array(1,2))) $popuptype = 2;
 		
 		// remaining parameters shortcuts
 		$showtitle = $field->parameters->get( 'showtitle', 0 ) ;
@@ -907,6 +919,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$linkto_url	= $field->parameters->get('linkto_url',0);
 		$url_target = $field->parameters->get('url_target','_self');
 		$isLinkToPopup = $linkto_url && $url_target=='multibox';
+		
+		// Force opening in new window in backend
+		if ($isItemsManager && $linkto_url && $url_target!='multibox') $url_target = "_blank";
 		
 		$useogp     = $field->parameters->get('useogp', 0);
 		$ogpinview  = $field->parameters->get('ogpinview', array());
@@ -1135,7 +1150,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// Unserialize value's properties and check for empty original name property
 			$value	= unserialize($val);
 			$image_name = trim(@$value['originalname']);
-			if ( !strlen($image_name) ) continue;
+			if ( !strlen($image_name) ) {
+				if ($isgrouped) $field->{$prop}[] = '';  // add empty position to the display array
+				continue;
+			}
 			$i++;
 			
 			// Create thumbnails urls, note thumbnails have already been verified above
@@ -1283,23 +1301,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			// FINALLY CREATE the field display variable ...
 			// *********************************************
 			
-			if ($isItemsManager) {
-				
-				// CASE 1: Handle image displayed in backend items manager
-				
-				if ($usepopup) {
-					$field->{$prop} = '
-					<a href="../'.$srcl.'" id="mb'.$uniqueid.'" class="mb" rel="[images]" >
-						'.$img_legend.'
-					</a>
-					<div class="multiBoxDesc mb'.$uniqueid.'">'.($desc ? $desc : $title).'</div>
-					';
-				} else {
-					$field->{$prop} = $img_legend;
-				}
-				return;  // Single image always ...
-				
-			} else if ($linkto_url && $urllink) {
+			if ($linkto_url && $urllink) {
 				
 				// CASE 2: Handle linking to a URL instead of image zooming popup
 				
@@ -1444,9 +1446,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		// Check for no values found
 		if ( !count($field->{$prop}) ) {
-			$field->{$prop} = '';
+			$field->{$prop} = $isgrouped ? array() : '';
 			return;
 		}
+		
+		// Displays that need special container are not allowed when field in a group
+		$no_container_needed = array(1,2,3,4,6);
+		if ( $isgrouped && !in_array($popuptype, $no_container_needed) ) $popuptype = 2;
 		
 		// Galleriffic inline slideshow gallery
 		if ($usepopup && $popuptype == 5) {
@@ -1499,7 +1505,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		}
 		
 		// PhotoSwipe popup carousel gallery
-		else if ($usepopup && $popuptype == 8) { 
+		else if ($usepopup && $popuptype == 8) {
 			$field->{$prop} = '
 			<span class="photoswipe_fccontainer" >
 				'. implode($separatorf, $field->{$prop}) .'
@@ -1526,6 +1532,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
+		
+		$isgrouped = $field->parameters->get('isgrouped', 0);
 		
 		// Check if field has posted data
 		if ( empty($post) ) return;
@@ -1613,7 +1621,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$new = 0;
     foreach ($post as $n => $v)
     {
-    	if (empty($v)) continue;
+    	if (empty($v)) {
+    		if ($isgrouped) {  // empty value for group
+					$newpost[$new] = array('originalname' => '');
+					$new++;
+				}
+    		continue;
+    	}
     	
 			// support for basic CSV import / export
 			if ( $is_importcsv && !is_array($v) ) {
