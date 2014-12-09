@@ -1760,9 +1760,15 @@ class modFlexicontentHelper
 		$option = JRequest::getVar('option');
 		
 		$currcat_custom_display = $params->get('currcat_custom_display', 0);
-		$isflexi_itemview       = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW);
+		$currcat_source = $params->get('currcat_source', 0);  // 0 item view, 1 category view
+		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW);
+		$isflexi_catview  = ($option == 'com_flexicontent' && $view == 'category');
 		
-		if ($currcat_custom_display && $isflexi_itemview) {
+		$currcat_valid_case =
+			($currcat_source==2 && ($isflexi_itemview || $isflexi_catview))
+			|| ($currcat_source==0 && $isflexi_itemview)
+			|| ($currcat_source==1 && $isflexi_catview);
+		if ($currcat_custom_display && $currcat_valid_case) {
 			$id   = JRequest::getInt('id', 0);   // id of current item
 			$cid  = JRequest::getInt('cid', 0);  // current category id of current item
 			

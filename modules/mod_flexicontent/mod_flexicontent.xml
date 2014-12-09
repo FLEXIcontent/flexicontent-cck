@@ -750,6 +750,11 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			<field name="currcat_source" type="radio" default="0" label="Current category is" description="Select which category is considered current category" >
+				<option value="0">Category of Item, in item view</option>
+				<option value="1">Category shown, in category view</option>
+				<option value="2">Both</option>
+			</field>
 			<field name="currcat_fallback_maincat" type="radio" default="0" label="FLEXI_FALLBACK_MAINCAT" description="FLEXI_FALLBACK_MAINCAT_DESC" >
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
