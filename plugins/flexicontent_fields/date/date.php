@@ -77,7 +77,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
 		
-		$timezone = false;
+		$timezone = FLEXI_J16GE ? 'UTC' : 0; // Default is not to use TIMEZONE
 		$append_str = '';
 		if ($date_allowtime)
 		{

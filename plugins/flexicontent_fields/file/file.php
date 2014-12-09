@@ -60,7 +60,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		
 		if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 		$js = "
-			var value_counter".$field->id."=".count($field->value).";
+			var value_counter".$field->id."=".count($files_data).";
 			var maxValues".$field->id."=".$max_values.";
 			
 			function qfSelectFile".$field->id."(id, file) {
