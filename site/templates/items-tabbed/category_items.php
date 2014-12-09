@@ -290,9 +290,10 @@ foreach ($items as $i => $item) :
 	
 	
 	<?php
+		$readmore_forced = $this->params->get('show_readmore', 1) == -1;
 		$readmore_shown  = $this->params->get('show_readmore', 1) && strlen(trim($item->fulltext)) >= 1;
-		$footer_shown = $readmore_shown ||
-			isset($item->positions['bottom']) || $item->event->afterDisplayContent;
+		$readmore_shown  = $readmore_shown || $readmore_forced;
+		$footer_shown = $readmore_shown || isset($item->positions['bottom']) || $item->event->afterDisplayContent;
 	?>
 	
 	

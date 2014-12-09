@@ -72,7 +72,7 @@ function tabberObj(argsObj)
   /* Elements that might contain the title for the tab, only used if a
      title is not specified in the TITLE attribute of DIV classTab.
   */
-  this.titleElements = ['h2','h3','h4','h5','h6'];
+  this.titleElements = ['h3','h2','h4','h5','h6'];
 
   /* Should we strip out the HTML from the innerHTML of the title elements?
      This should usually be true.

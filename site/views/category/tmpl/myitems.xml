@@ -346,6 +346,7 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
+				<option value="-1">FLEXI_SHOW_ALWAYS</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
