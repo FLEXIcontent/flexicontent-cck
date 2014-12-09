@@ -55,6 +55,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		$required   = $field->parameters->get('required', 0 );
 		$required   = $required ? ' required' : '';
 		
+		$files_data = !empty($field->value) ? $this->getFileData( $field->value, $published=false ) : array();
 		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
 		
 		if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
@@ -122,10 +123,9 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			}
 			";
 		
-		if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
 		
 		// Add the drag and drop sorting feature
-		$js .= "
+		if (count($files_data)) $js .= "
 		jQuery(document).ready(function(){
 			jQuery('#sortables_".$field->id."').sortable({
 				handle: '.fcfield-drag',
@@ -170,7 +170,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 		if ($css) $document->addStyleDeclaration($css);
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		
-		$files_data = !empty($field->value) ? $this->getFileData( $field->value, $published=false ) : array();
 		$field->html = array();
 		$i = 0;
 		foreach($files_data as $file_id => $file_data) {

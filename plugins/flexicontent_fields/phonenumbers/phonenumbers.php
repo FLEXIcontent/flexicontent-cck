@@ -57,8 +57,6 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		
 		if ($multiple) // handle multiple records
 		{
-			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
-			
 			//add the drag and drop sorting feature
 			$js = "
 			jQuery(document).ready(function(){

@@ -78,3 +78,30 @@
 		var theDialog = container.dialog('open');
 		return theDialog;
 	}
+	
+	// Scroll into view
+	function fc_scrollIntoView (elem, smooth)
+	{
+		var cTop = elem.offset().top;
+		var cHeight = elem.outerHeight(true);
+		var windowTop = jQuery(window).scrollTop();
+		var visibleHeight = jQuery(window).height();
+		var top_extra = 90;
+		var bottom_extra = 80;
+	
+		//window.console.log ('cTop: ' + cTop + ' , windowTop: ' + windowTop);
+		//window.console.log ('cHeight: ' + cHeight + ' , visibleHeight: ' + visibleHeight);
+		if (cTop - top_extra < windowTop) {
+			if (smooth) {
+				jQuery('html, body').animate({scrollTop: cTop - top_extra}, 400);
+			} else {
+				jQuery('html, body').scrollTop(cTop - top_extra);
+			}
+		} else if (cTop + cHeight + bottom_extra > windowTop + visibleHeight) {
+			if (smooth) {
+				jQuery('html, body').animate({scrollTop: cTop - visibleHeight + cHeight + bottom_extra}, 400);
+			} else {
+				jQuery('html, body').scrollTop(cTop - visibleHeight + cHeight + bottom_extra);
+			}
+		}
+	}

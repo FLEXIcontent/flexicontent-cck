@@ -172,8 +172,8 @@ class FlexicontentViewFileselement extends JViewLegacy
 				var delfilename = '".$delfilename."';
 				var remove_existing_files_from_list = 0;
 				var remove_new_files_from_list = 0;
-				original_objs = $(window.parent.document.body).getElement('#container_fcfield_".$fieldid."').getElements('.originalname');
-				existing_objs = $(window.parent.document.body).getElement('#container_fcfield_".$fieldid."').getElements('.existingname');
+				original_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .originalname');
+				existing_objs = jQuery(window.parent.document.body).find('.fcfieldval_container_".$fieldid." .existingname');
 				
 				var imgobjs = Array();
 				for(i=0,n=original_objs.length; i<n; i++)  {

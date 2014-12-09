@@ -143,10 +143,9 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			jQuery(row).hide('slideUp', function() { $(this).remove(); } );
 		}
 		";
-		$document->addScriptDeclaration($js);
 		
 		// Add the drag and drop sorting feature
-		$js = "
+		if (!empty($field->value)) $js .= "
 		jQuery(document).ready(function(){
 			jQuery('#sortables_".$field->id."').sortable({
 				handle: '.fcfield-drag',
@@ -155,8 +154,7 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 			});
 		});
 		";
-		if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
-		$document->addScriptDeclaration($js);
+		
 
 		$css = '
 		#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
@@ -175,7 +173,8 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		#sortables_'.$field->id.' li input.fcfield-button { float:left!important; }
 		#sortables_'.$field->id.' li span.fcfield-drag img { float:left!important; margin:2px 0px 0px 0px!important; }
 		';
-		$document->addStyleDeclaration($css);
+		if ($css) $document->addStyleDeclaration($css);
+		if ($js) $document->addScriptDeclaration($js);
 		
 		$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		

@@ -43,6 +43,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if ($use_ingroup) $field->formhidden = 3;
+		if ($use_ingroup && empty($field->ingroup)) return;
 		
 		// initialize framework objects and other variables
 		$document  = JFactory::getDocument();
@@ -52,9 +55,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$default_value     = ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		$maxlength	= (int)$field->parameters->get( 'maxlength', 0 ) ;
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
-		$multiple   = $field->parameters->get( 'allow_multiple', 0 ) ;
-		$max_values = (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $field->parameters->get( 'required', 0 ) ;
+		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
+		$required   = $use_ingroup ? 0 : $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
 	  // add setMask function on the document.ready event
@@ -81,17 +84,15 @@ class plgFlexicontent_fieldsText extends JPlugin
 		}
 		
 		// Field name and HTML TAG id
-		$fieldname = 'custom['.$field->name.']'.'[]';
+		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
 		
 		$js = "";
 		
 		if ($multiple) // handle multiple records
 		{
-			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
-			
 			// Add the drag and drop sorting feature
-			$js .= "
+			if (!$use_ingroup) $js .="
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
@@ -107,56 +108,83 @@ class plgFlexicontent_fieldsText extends JPlugin
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
 
-			function addField".$field->id."(el) {
+			function addField".$field->id."(el, groupval_box, fieldval_box, params)
+			{
+				remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
+				scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
+				animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
 				
-				var thisField 	 = jQuery(el).prev().children().last();
-				var thisNewField = thisField.clone();
+				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last() ;
+				var newField = lastField.clone();
 				
-				jQuery(thisNewField).find('input').first().val('');  /* First element is the value input field, second is e.g remove button */
+				var theInput = newField.find('input').first();  /* First element is the value input field, second is e.g remove button */
+				theInput.val('');
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']');
+				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
 
-				var has_inputmask = jQuery(thisNewField).find('input.has_inputmask').length != 0;
-				if (has_inputmask)  jQuery(thisNewField).find('input.has_inputmask').inputmask();
+				var has_inputmask = newField.find('input.has_inputmask').length != 0;
+				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
 				
-				var has_select2 = jQuery(thisNewField).find('div.select2-container').length != 0;
+				var has_select2 = newField.find('div.select2-container').length != 0;
 				if (has_select2) {
-					jQuery(thisNewField).find('div.select2-container').remove();
-					jQuery(thisNewField).find('select.use_select2_lib').select2();
+					newField.find('div.select2-container').remove();
+					newField.find('select.use_select2_lib').select2();
 				}
-				
-				jQuery(thisNewField).css('display', 'none');
-				jQuery(thisNewField).insertAfter( jQuery(thisField) );
+			";
+			
+			// Add to new field to DOM
+			$js .= "
+				newField.insertAfter( lastField );
+				if (remove_previous) lastField.remove();
 
-				var input = jQuery(thisNewField).find('input').first();
-				input.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 				";
 			
 			if ($field->field_type=='textselect') $js .= "
-				thisNewField.parent().find('select.fcfield_textselval').val('');
-				";
+				newField.parent().find('select.fcfield_textselval').val('');
+			";
 			
-			$js .= "
+			// Add new element to sortable objects (if field not in group)
+			if (!$use_ingroup) $js .="
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
-				
-				jQuery(thisNewField).show('slideDown');
+			";
+			
+			// Show new field, increment counters
+			$js .="
+				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
+				if (scroll_visible) fc_scrollIntoView(newField, 1);
+				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
-			function deleteField".$field->id."(el)
+			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
-				if(rowCount".$field->id." <= 1) return;
-				var row = jQuery(el).closest('li');
-				jQuery(row).hide('slideUp', function() { this.remove(); } );
-				rowCount".$field->id."--;
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				// Add empty container if last element, instantly removing the given field value container
+				// (doing no hide/delete effect since we will add a new empty container with add effect)
+				if(rowCount".$field->id." == 1)
+					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
+				
+				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
+				if(rowCount".$field->id." > 1) {
+					// Destroy the remove button, so that it is not reclicked again, while we do the hide effect (before DOM removal)
+					if (el) jQuery(el).remove();
+					// Do hide effect then remove from DOM
+					row.slideUp(400, function(){ this.remove(); });
+					rowCount".$field->id."--;
+				}
 			}
 			";
 			
@@ -220,24 +248,27 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
+		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
+			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
-			$text_field = '<input '. $validate_mask .' id="'.$elementid_n.'" name="'.$fieldname.'" class="'.$classes.'" type="text" size="'.$size.'" value="'.$value.'" '.$attribs.' />';
+			$text_field = '<input '. $validate_mask .' id="'.$elementid_n.'" name="'.$fieldname_n.'" class="'.$classes.'" type="text" size="'.$size.'" value="'.$value.'" '.$attribs.' />';
 			
 			$field->html[] = '
 				'.$text_field.'
 				'.$select_field.'
-				'.$move2.'
-				'.$remove_button.'
+				'.($use_ingroup ? '' : $move2).'
+				'.($use_ingroup ? '' : $remove_button).'
 				';
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		if ($multiple) { // handle multiple records
+		if ($use_ingroup) { // do not convert the array to string if field is in a group
+		} else if ($multiple) { // handle multiple records
 			$_list = "<li>". implode("</li>\n<li>", $field->html) ."</li>\n";
 			$field->html = '
 				<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$_list. '</ul>
@@ -376,7 +407,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-		if ( !is_array($post) && !strlen($post) ) return;
+		
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -386,13 +419,17 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			if ($post[$n] !== '')
+			if ($post[$n] !== '' || $use_ingroup)
 			{
 				$newpost[$new] = $post[$n];
 				$new++;
 			}
 		}
 		$post = $newpost;
+		/*if ($use_ingroup) {
+			$app = JFactory::getApplication();
+			$app->enqueueMessage( print_r($post, true), 'warning');
+		}*/
 	}
 	
 	

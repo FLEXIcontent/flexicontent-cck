@@ -2498,6 +2498,7 @@ class ParentClassItem extends JModelAdmin
 					$obj->item_id 		= $item->id;
 					$obj->valueorder	= $i;
 					$obj->version			= (int)$last_version+1;
+					$use_ingroup = $field->parameters->get('use_ingroup', 0);
 					
 					// Serialize the properties of the value, normally this is redudant, since the field must have had serialized the parameters of each value already
 					$obj->value = is_array($postvalue) ? serialize($postvalue) : $postvalue;
@@ -2508,7 +2509,7 @@ class ParentClassItem extends JModelAdmin
 					// -- a. Add versioning values, but do not version the 'hits' or 'state' or 'voting' fields
 					if ($record_versioned_data && $field->field_type!='hits' && $field->field_type!='state' && $field->field_type!='voting') {
 						// Insert only if value non-empty
-						if ( isset($obj->value) && JString::strlen(trim($obj->value)) )
+						if ( isset($obj->value) && ($use_ingroup || JString::strlen(trim($obj->value))) )
 						{
 							if (! $mval_query) $this->_db->insertObject('#__flexicontent_items_versions', $obj);
 							else $ver_query_vals[] = "("
@@ -2524,7 +2525,7 @@ class ParentClassItem extends JModelAdmin
 					{
 						// UNSET version it it used only verion data table, and insert only if value non-empty
 						unset($obj->version);
-						if ( isset($obj->value) && JString::strlen(trim($obj->value)) )
+						if ( isset($obj->value) && ($use_ingroup || JString::strlen(trim($obj->value))) )
 						{
 							if (! $mval_query) $this->_db->insertObject('#__flexicontent_fields_item_relations', $obj);
 							else $rel_query_vals[] = "("
