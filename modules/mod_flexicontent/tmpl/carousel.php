@@ -203,6 +203,7 @@ $dcontrols_labels = (int)$params->get('carousel_dcontrols_labels', 1);
 $dcontrols_auto   = (int)$params->get('carousel_dcontrols_auto', 1);
 $dcontrols_pages  = (int)$params->get('carousel_dcontrols_pages', 1);
 $dcontrols_items  = (int)$params->get('carousel_dcontrols_items', 1);
+$dcontrols_icon   = (int)$params->get('carousel_dcontrols_icon', 0);
 // Intergrated controls
 $icontrols_method  = $params->get('carousel_icontrols_method', 'page');
 $_icontrols_method = ($icontrols_method=='page' ? '_page' : '');
@@ -504,6 +505,7 @@ $document = JFactory::getDocument();
 			?>
 			
 			<!-- BOF current item -->	
+			
 			<div class="mod_flexicontent_standard_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : ''); ?>"
 				onmouseover="mod_fc_carousel_<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel_<?php echo $uniq_ord_id; ?>.autoPlay=false;"
 				onmouseout="if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'next',true);	else if (mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay==-1) mod_fc_carousel_<?php echo $uniq_ord_id; ?>.play(<?php echo $interval; ?>,'previous',true);"
@@ -656,6 +658,7 @@ $document = JFactory::getDocument();
 </div> <!-- mod_fc_carousel -->
 		
 		<?php if ($show_page_handles) : ?>
+		
 			<div class="mod_fc_pages_outer">
 				<div id="mod_fc_page_handles_<?php echo $uniq_ord_id; ?>" class="mod_fc_page_handles"
 						onmouseover="mod_fc_carousel_<?php echo $uniq_ord_id; ?>.stop(); mod_fc_carousel_<?php echo $uniq_ord_id; ?>.autoPlay=false;"
@@ -682,25 +685,25 @@ $document = JFactory::getDocument();
 						<?php if ($dcontrols_labels) : ?>
 							<span id="autoplay_controls_label_fcmod_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_controls_label"><?php echo JText::_('FLEXI_MOD_CAROUSEL_AUTOPLAY'); ?></span>
 						<?php endif; ?>
-						<span id="stop_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay=0;" class="mod_fc_carousel_btn fc_stop" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_STOP'); ?>"></span>
-						<span id="backward_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay=-1;" class="mod_fc_carousel_btn fc_backward" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_BACKWARD'); ?>"></span>
-						<span id="forward_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay=1;" class="mod_fc_carousel_btn fc_forward" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_FORWARD'); ?>"></span>
+						<span id="stop_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay=0;" class="<?php if ($dcontrols_icon) : ?>mod_fc_carousel_btn_boot<?php else : ?>mod_fc_carousel_btn fc_stop<?php endif; ?>" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_STOP'); ?>"><?php if ($dcontrols_icon) : ?><i class="icon-pause"></i><?php endif; ?></span>
+						<span id="backward_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay=-1;" class="<?php if ($dcontrols_icon) : ?>mod_fc_carousel_btn_boot<?php else : ?>mod_fc_carousel_btn fc_backward<?php endif; ?>" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_BACKWARD'); ?>"><?php if ($dcontrols_icon) : ?><i class="icon-backward"></i><?php endif; ?></span>
+						<span id="forward_fcmod_<?php echo $uniq_ord_id; ?>" onclick="mod_fc_carousel_<?php echo $uniq_ord_id; ?>_autoPlay=1;" class="<?php if ($dcontrols_icon) : ?>mod_fc_carousel_btn_boot<?php else : ?>mod_fc_carousel_btn fc_forward<?php endif; ?>" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_FORWARD'); ?>"><?php if ($dcontrols_icon) : ?><i class="icon-forward"></i><?php endif; ?></span>
 					<?php endif; ?>
 					
 					<?php if ($dcontrols_pages) : ?>
 						<?php if ($dcontrols_labels) : ?>
 							<span id="pages_controls_label_fcmod_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_controls_label"><?php echo JText::_('FLEXI_MOD_CAROUSEL_PAGES'); ?></span>
 						<?php endif; ?>
-						<span id="previous_page_fcmod_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_btn fc_previous_page" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_PREVIOUS_PAGE'); ?>"></span>
-						<span id="next_page_fcmod_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_btn fc_next_page" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_NEXT_PAGE'); ?>"></span>
+						<span id="previous_page_fcmod_<?php echo $uniq_ord_id; ?>" class="<?php if ($dcontrols_icon) : ?>mod_fc_carousel_btn_boot<?php else : ?>mod_fc_carousel_btn fc_previous_page<?php endif; ?>" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_PREVIOUS_PAGE'); ?>"><?php if ($dcontrols_icon) : ?><i class="icon-first"></i><?php endif; ?></span>
+						<span id="next_page_fcmod_<?php echo $uniq_ord_id; ?>" class="<?php if ($dcontrols_icon) : ?>mod_fc_carousel_btn_boot<?php else : ?>mod_fc_carousel_btn fc_next_page<?php endif; ?>" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_NEXT_PAGE'); ?>"><?php if ($dcontrols_icon) : ?><i class="icon-last"></i><?php endif; ?></span>
 					<?php endif; ?>
 					
 					<?php if ($dcontrols_items) : ?>
 						<?php if ($dcontrols_labels) : ?>
 							<span id="items_controls_label_fcmod_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_controls_label"><?php echo JText::_('FLEXI_MOD_CAROUSEL_ITEMS'); ?></span>
 						<?php endif; ?>
-						<span id="previous_fcmod_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_btn fc_previous" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_PREVIOUS'); ?>"></span>
-						<span id="next_fcmod_<?php echo $uniq_ord_id; ?>" class="mod_fc_carousel_btn fc_next" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_NEXT'); ?>"></span>
+						<span id="previous_fcmod_<?php echo $uniq_ord_id; ?>" class="<?php if ($dcontrols_icon ==1) : ?>mod_fc_carousel_btn_boot<?php else : ?>mod_fc_carousel_btn fc_previous<?php endif; ?>" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_PREVIOUS'); ?>"><?php if ($dcontrols_icon ==1) : ?><i class="icon-arrow-left"></i><?php endif; ?></span>
+						<span id="next_fcmod_<?php echo $uniq_ord_id; ?>" class="<?php if ($dcontrols_icon ==1) : ?>mod_fc_carousel_btn_boot<?php else : ?>mod_fc_carousel_btn fc_next<?php endif; ?>" title="<?php echo JText::_('FLEXI_MOD_CAROUSEL_NEXT'); ?>"><?php if ($dcontrols_icon ==1) : ?><i class="icon-arrow-right"></i><?php endif; ?></span>
 					<?php endif; ?>
 				</div>
 			</div>
