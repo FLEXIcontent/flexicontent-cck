@@ -120,13 +120,18 @@
 	function adminFormClearFilters (form) {
 		for(i=0; i<form.elements.length; i++) {
 			var element = form.elements[i];
+			if (typeof element.name === "undefined" || element.name === null || !element.name) continue;
 			
 			if (element.name=='filter_order') {	element.value=='i.title'; continue; }
 			if (element.name=='filter_order_Dir') { element.value=='ASC'; continue; }
 			
 			var matches = element.name.match(/(filter[.]*|letter)/);
 			if (matches) {
-				element.value = '';
+				if (jQuery(element).data('select2')) {
+					jQuery(element).select2('val', '');
+				} else {
+					element.value = '';
+				}
 			}
 		}
 	}
