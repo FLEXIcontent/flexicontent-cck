@@ -133,7 +133,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 				var has_select2 = newField.find('div.select2-container').length != 0;
 				if (has_select2) {
 					newField.find('div.select2-container').remove();
-					newField.find('select.use_select2_lib').select2();
+					newField.find('select.use_select2_lib').select2('destroy').show().select2();
 				}
 			";
 			
@@ -141,7 +141,6 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$js .= "
 				newField.insertAfter( lastField );
 				if (remove_previous) lastField.remove();
-
 				";
 			
 			if ($field->field_type=='textselect') $js .= "

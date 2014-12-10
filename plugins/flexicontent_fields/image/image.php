@@ -210,7 +210,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 			".( $image_source ? "" :"
 				if (has_imagepicker && ".$auto_enable_imgpicker." ) newField.find('select.image-picker').imagepicker({ hide_select:false, show_label:true });
-				if (has_select2)  newField.find('select.use_select2_lib').select2();
+				if (has_select2)  newField.find('select.use_select2_lib').show().select2();
 				").
 			"
 				newField.find('a.addfile_".$field->id."').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_addfile');
