@@ -195,6 +195,10 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			<field name="carousel_dcontrols_icon" type="radio" default="0" label="Icons type" description="Choose to display images, or bootstrap based icons (needs J3+)">
+				<option value="0">FLEXI_IMAGE</option>
+				<option value="1">Bootstrap</option>
+			</field>			
 			<field name="carousel_dcontrols_auto" type="radio" default="1" label="Autoplay controls" description="Display Autoplay controls">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -204,10 +208,6 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			<field name="carousel_dcontrols_items" type="radio" default="1" label="Item controls" description="Display Item controls">
-				<option value="0">FLEXI_HIDE</option>
-				<option value="1">FLEXI_SHOW</option>
-			</field>
-			<field name="carousel_dcontrols_icon" type="radio" default="0" label="Bootstrap icons" description="If you choose no that display image, yes option is only work on Joomla3!">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>

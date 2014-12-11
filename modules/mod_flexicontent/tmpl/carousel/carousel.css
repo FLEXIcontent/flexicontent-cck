@@ -615,17 +615,7 @@
 	white-space: normal !important;
 }
 
-.mod_fc_carousel_buttons span.mod_fc_carousel_btn {
-	float: left;
-	display: inline-block;
-	padding: 2px 2px 0px 18px;
-	margin-right: 4px;
-	border: 1px solid lightgray;
-	background-color: #eeeeee !important;
-	border-radius: 8px;
-	height: 24px;
-	font-size: 14px;
-}
+.mod_fc_carousel_buttons span.mod_fc_carousel_btn,
 .mod_fc_carousel_buttons span.mod_fc_carousel_btn_boot {
 	float: left;
 	display: inline-block;
@@ -634,41 +624,40 @@
 	border: 1px solid lightgray;
 	background-color: #eeeeee !important;
 	border-radius: 8px;
-	height: 24px;
 	font-size: 14px;
 	cursor:pointer;
 }
-.mod_fc_carousel_buttons span.mod_fc_carousel_btn:hover {
-	background-color: #dddddd !important;
-	cursor: pointer !important;
-}
+.mod_fc_carousel_buttons span.mod_fc_carousel_btn { padding: 16px; }
+.mod_fc_carousel_buttons span.mod_fc_carousel_btn_boot { padding: 8px 8px 10px 8px; }
+
+.mod_fc_carousel_buttons span.mod_fc_carousel_btn:hover,
 .mod_fc_carousel_buttons span.mod_fc_carousel_btn_boot:hover {
 	background-color: #dddddd !important;
 	cursor: pointer !important;
 }
 
 .mod_fc_carousel_btn.fc_stop {
-	background: url(images/control-pause.png) no-repeat 2px 5px;
+	background: url(images/control-pause.png) no-repeat 8px 8px;
 }
 .mod_fc_carousel_btn.fc_backward {
-	background: url(images/control-double-180.png) no-repeat 2px 5px;
+	background: url(images/control-double-180.png) no-repeat 8px 8px;
 }
 .mod_fc_carousel_btn.fc_forward {
-	background: url(images/control-double.png) no-repeat 2px 5px;
+	background: url(images/control-double.png) no-repeat 8px 8px;
 }
 
 .mod_fc_carousel_btn.fc_previous_page {
-	background: url(images/control-skip-180.png) no-repeat 2px 5px;
+	background: url(images/control-skip-180.png) no-repeat 8px 8px;
 }
 .mod_fc_carousel_btn.fc_next_page {
-	background: url(images/control-skip.png) no-repeat 2px 5px;
+	background: url(images/control-skip.png) no-repeat 8px 8px;
 }
 
 .mod_fc_carousel_btn.fc_previous {
-	background: url(images/control-180.png) no-repeat 2px 5px;
+	background: url(images/control-180.png) no-repeat 8px 8px;
 }
 .mod_fc_carousel_btn.fc_next {
-	background: url(images/control.png) no-repeat 2px 5px;
+	background: url(images/control.png) no-repeat 8px 8px;
 }
 
 
