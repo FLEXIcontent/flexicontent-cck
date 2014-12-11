@@ -545,3 +545,7 @@ dl#content-pane.tabs {
 	display: inline-block;
 	margin: 2px 0 0 4px;
 }
+
+#j-sidebar-container {
+	height: 100%
+}

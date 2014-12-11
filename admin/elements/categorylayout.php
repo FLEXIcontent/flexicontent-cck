@@ -56,7 +56,7 @@ class JFormFieldCategorylayout extends JFormFieldList
 		$tmpls	= $themes->category;
 		$view	= JRequest::getVar('view');
 		$value = FLEXI_J16GE ? $this->value : $value;
-		$value = $value ? $value : $attributes['default'];
+		//$value = $value ? $value : $attributes['default'];
 		
 		$lays = array();
 		foreach ($tmpls as $tmpl) {
@@ -130,9 +130,9 @@ window.addEvent('domready', function(){
 			$layouts[] = JHTMLSelect::option('', JText::_( $attributes['firstoption'] ));
 		}
 		if ($tmpls !== false) {
-			if ($view != 'category' && $view != 'user') {
-				$layouts[] = JHTMLSelect::option('', JText::_( 'FLEXI_USE_GLOBAL' ));
-			}
+			//if ($view != 'category' && $view != 'user') {
+				$layouts[] = JHTMLSelect::option('', '-- '.JText::_( 'FLEXI_USE_GLOBAL' ). ' --');
+			//}
 			foreach ($tmpls as $tmpl) {
 				$layouts[] = JHTMLSelect::option($tmpl->name, $tmpl->name); 
 			}
