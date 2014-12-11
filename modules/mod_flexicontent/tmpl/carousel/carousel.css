@@ -626,7 +626,23 @@
 	height: 24px;
 	font-size: 14px;
 }
+.mod_fc_carousel_buttons span.mod_fc_carousel_btn_boot {
+	float: left;
+	display: inline-block;
+	padding: 8px 8px 0px 7px;
+	margin-right: 4px;
+	border: 1px solid lightgray;
+	background-color: #eeeeee !important;
+	border-radius: 8px;
+	height: 24px;
+	font-size: 14px;
+	cursor:pointer;
+}
 .mod_fc_carousel_buttons span.mod_fc_carousel_btn:hover {
+	background-color: #dddddd !important;
+	cursor: pointer !important;
+}
+.mod_fc_carousel_buttons span.mod_fc_carousel_btn_boot:hover {
 	background-color: #dddddd !important;
 	cursor: pointer !important;
 }

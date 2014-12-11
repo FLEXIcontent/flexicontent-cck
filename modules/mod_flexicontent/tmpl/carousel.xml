@@ -207,6 +207,10 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			<field name="carousel_dcontrols_icon" type="radio" default="0" label="Bootstrap icons" description="If you choose no that display image, yes option is only work on Joomla3!">
+				<option value="0">FLEXI_HIDE</option>
+				<option value="1">FLEXI_SHOW</option>
+			</field>
 			
 			<field name="" type="separator" default="Transition Effects" level="level1" />
 			<field name="carousel_transition" type="list" default="scroll" label="Enable" description="Select the effect to be used when carousel updates" >
