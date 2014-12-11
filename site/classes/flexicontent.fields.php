@@ -2318,7 +2318,6 @@ class FlexicontentFields
 		// Escape values for output
 		if (!is_array($value)) $value = htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
 		else foreach($value as $i => $v) $value[$i] = htmlspecialchars($value[$i], ENT_COMPAT, 'UTF-8');
-		echo 'filter_'.$filter->id.": "; print_r($value); echo "<br/>";
 		
 		// Alter search property name (indexed fields only), remove underscore _ at start & end of it
 		if ($indexed_elements && $search_prop) {
