@@ -166,6 +166,7 @@ class FlexicontentViewTags extends JViewLegacy
 		$this->assignRef('rows'      	, $rows);
 		$this->assignRef('pagination'	, $pagination);
 
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 }

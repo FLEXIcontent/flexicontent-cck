@@ -92,6 +92,7 @@ class FlexicontentViewTemplates extends JViewLegacy
 		$this->assignRef('source'      		, $source);
 		$this->assignRef('dest'      		, $dest);
 
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 }

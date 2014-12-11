@@ -369,6 +369,15 @@ window.addEvent('domready', function() {
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
+<?php if (!empty( $this->sidebar)) : ?>
+	<div id="j-sidebar-container" class="span2">
+		<?php echo $this->sidebar; ?>
+	</div>
+	<div id="j-main-container" class="span10">
+<?php else : ?>
+	<div id="j-main-container">
+<?php endif;?>
+
 	<table style="white-space:nowrap">
 		<tr class="filterbuttons_head">
 			<td>
@@ -1142,5 +1151,7 @@ window.addEvent('domready', function() {
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
 	<?php echo JHTML::_( 'form.token' ); ?>
+	
+	</div>
 </form>
 </div>

@@ -100,7 +100,8 @@ class FlexicontentViewStats extends JViewLegacy
 		$this->assignRef('votesstats'	, $votesstats);
 		$this->assignRef('creators'		, $creators);
 		$this->assignRef('editors'		, $editors);
-		
+
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 }

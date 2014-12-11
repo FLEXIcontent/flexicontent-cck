@@ -156,6 +156,8 @@ class FLEXIcontentViewSearch extends JViewLegacy
 		$this->assignRef('total', $total);
 		$this->assignRef('limitstart', $limitstart);
 		$this->assignRef('f_active', $f_active);
+		
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 	

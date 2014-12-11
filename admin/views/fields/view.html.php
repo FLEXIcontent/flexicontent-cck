@@ -230,6 +230,7 @@ class FlexicontentViewFields extends JViewLegacy
 		$this->assignRef('ordering'		, $ordering);
 		$this->assignRef('pagination'	, $pagination);
 
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 }

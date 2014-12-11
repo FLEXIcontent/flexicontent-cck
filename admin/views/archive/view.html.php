@@ -77,8 +77,8 @@ class FlexicontentViewArchive extends JViewLegacy
 		}
 
 		//Get data from the model
-		$rows			= & $this->get( 'Data');
-		$pageNav	= & $this->get( 'Pagination' );
+		$rows			= $this->get( 'Data');
+		$pageNav	= $this->get( 'Pagination' );
 		
 		// search filter
 		$lists['search']= $search;
@@ -96,6 +96,7 @@ class FlexicontentViewArchive extends JViewLegacy
 		$this->assignRef('ordering'		, $ordering);
 		$this->assignRef('user'				, $user);
 
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 }
