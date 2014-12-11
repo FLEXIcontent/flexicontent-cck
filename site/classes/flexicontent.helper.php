@@ -1161,7 +1161,7 @@ class flexicontent_html
 	{
 		if ( !$params->get('show_print_icon') || JRequest::getCmd('print') ) return;
 		
-		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
+		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
 		
 		if ( JRequest::getInt('pop') ) {
 			$onclick = ' window.print(); return false; ';
@@ -1244,7 +1244,7 @@ class flexicontent_html
 		}
 
 		$mail_to_url = JRoute::_('index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink($link));
-		$status = 'width=400,height=300,menubar=yes,resizable=yes';
+		$status = 'width=800,height=600,menubar=yes,resizable=yes';
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
 		
 		// This checks template image directory for image, if none found, default image is returned

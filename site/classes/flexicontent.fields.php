@@ -2314,7 +2314,11 @@ class FlexicontentFields
 		} else {
 			if (is_array($value)) $value = @ $value[0];
 		}
-		//print_r($value);
+		
+		// Escape values for output
+		if (!is_array($value)) $value = htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
+		else foreach($value as $i => $v) $value[$i] = htmlspecialchars($value[$i], ENT_COMPAT, 'UTF-8');
+		echo 'filter_'.$filter->id.": "; print_r($value); echo "<br/>";
 		
 		// Alter search property name (indexed fields only), remove underscore _ at start & end of it
 		if ($indexed_elements && $search_prop) {
@@ -2476,8 +2480,8 @@ class FlexicontentFields
 		case 1: case 3:  // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars
 			$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isdate ? 'FLEXI_CLICK_CALENDAR' : 'FLEXI_TYPE_TO_LIST');
 			$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
-			$attribs_str = ' class="fc_field_filter fc_label_internal fc_iscalendar" data-fc_label_text="'.$_inner_lb.'"';
-			$attribs_arr = array('class'=>'fc_field_filter fc_label_internal fc_iscalendar', 'data-fc_label_text' => $_inner_lb );
+			$attribs_str = ' class="fc_field_filter fc_label_internal '.($isdate ? 'fc_iscalendar' : '').'" data-fc_label_text="'.$_inner_lb.'"';
+			$attribs_arr = array('class'=>'fc_field_filter fc_label_internal '.($isdate ? 'fc_iscalendar' : '').'', 'data-fc_label_text' => $_inner_lb );
 			
 			if ($display_filter_as==1) {
 				if ($isdate) {
