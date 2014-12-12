@@ -398,6 +398,9 @@ tabberObj.prototype.tabShow = function(tabberIndex)
 
   /* Remove classTabHide from the div */
   div.className = div.className.replace(this.REclassTabHide, '');
+  if (typeof jQuery != 'undefined') {
+  	jQuery(div).css({opacity: 0.5}).animate({ opacity: 1 }, 400);
+  }
 
   /* Mark this tab navigation link as "active" */
   this.navSetActive(tabberIndex);

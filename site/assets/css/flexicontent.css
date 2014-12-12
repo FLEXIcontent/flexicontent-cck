@@ -1,6 +1,5 @@
 @import url('flexi_form.css');
 @import url('flexi_containers.css');
-@import url('tabber.css');
 
 /* FLEXIcontent base CSS */
 
@@ -469,10 +468,12 @@ fieldset.fc_filter_set {
 .fc_filter_html .input-append button,
 .fc_filter_html .input-prepend button {
 	margin-top:6px !important;
+	height:29px !important;
 }
 .fc_filter_html .input-append button.btn,
 .fc_filter_html .input-prepend button.btn {
 	margin-top:3px !important;
+	height:29px !important;
 }
 
 /* removing filter choices */
@@ -616,10 +617,17 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	display: inline-block /*!important*/; /*important problematic for hidding*/
 	padding: 2px 0px 2px 4px !important;
 	margin: 2px 0px 2px 4px !important;
+	width: auto !important;
+}
+.fc_filter_html .fc_text_filter.select2-container.select2-container-multi,
+.fc_filter_html .fc_field_filter.select2-container.select2-container-multi {
+	margin: 1px 0px 1px 4px !important;
+}
+.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_text_filter,
+.fc_filter_html :not(.input-prepend):not(.input-append) > .fc_field_filter {
 	border-radius: 5px !important;
 	-moz-border-radius: 5px !important;
 	-webkit-border-radius: 5px !important;
-	width: auto !important;
 }
 .fc_filter_html input.fc_text_filter,
 .fc_filter_html input.fc_field_filter,
@@ -632,11 +640,28 @@ form > .fc_filter_line {  /* filters placed directly inside form aka outside the
 	/* background: transparent; ... does not work properly with ie8/9, it causes: */
 	/* any element with less z-index to be placed above this element, */
 	/* e.g. the span element for showing an inner is placed above, thus preventing focusing of the input !! */
-	border: 1px solid black !important;
+	border: 1px solid gray !important;
 	background: url(../images/magnifier-left.png) 96% 4px no-repeat white;
 	opacity: 0.5; filter:alpha(opacity=50);
 	min-width: 120px !important;
 	vertical-align: middle;
+}
+.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_text_filter,
+.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_field_filter,
+.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_text_filter:focus,
+.fc_filter_html :not(.input-prepend):not(.input-append) > .input.fc_field_filter:focus {
+}
+.fc_filter_html .input-append > input.fc_text_filter,
+.fc_filter_html .input-append > input.fc_field_filter,
+.fc_filter_html .input-append > input.fc_text_filter:focus,
+.fc_filter_html .input-append > input.fc_field_filter:focus {
+	margin-right:0px !important; border-top-right-radius:0px !important;  border-bottom-right-radius:0px !important;
+}
+.fc_filter_html .input-prepend > input.fc_text_filter,
+.fc_filter_html .input-prepend > input.fc_field_filter,
+.fc_filter_html .input-prepend > input.fc_text_filter:focus,
+.fc_filter_html .input-prepend > input.fc_field_filter:focus {
+	margin-left:0px !important; border-top-left-radius:0px !important;  border-bottom-left-radius:0px !important;
 }
 /* enlarge field in views ... (non-module) */
 input.fc_text_filter:not(.fc_iscalendar),  input.fc_text_filter:not(.fc_iscalendar):focus,
@@ -1073,6 +1098,7 @@ div.current dd {
 }
 
 /* strange property in japurity /-) */
+#flexicontent .hasToolTip img,
 #flexicontent .hasTip img {
 	margin: 0;
 }

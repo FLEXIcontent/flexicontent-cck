@@ -933,8 +933,8 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	float: left !important;
 	clear: left !important;
 	color: white;
-	background-color: #444;
-	border: 1px solid gray;
+	background-color: #555;
+	border: 0px solid !important; /* non-zero causes wrapping */
 	font-size: 12px;
 	font-weight: bold;
 	text-align: right !important;
@@ -1189,7 +1189,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 
 .fckey_high { color:darkred !important; }
-.container_fcfield { float:left!important; padding:0px!important;  margin: 2px 0% 3px 0%!important; width: 77%; }
+.container_fcfield { float:left!important; padding:0px!important;  margin: 2px 0% 3px 0%!important; width: 81% !important; }
 .container_fcfield.fcfield_row0 {}
 .container_fcfield.fcfield_row1 {}
 .container_fcfield .fc_mini_note_box,
@@ -1227,7 +1227,6 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent .fcfield_textval {
 	background-clip: padding-box !important;
 	background-color: #FFFFFF !important;
-/*	background-image: -moz-linear-gradient(center bottom , #EEEEEE 0%, white 50%) !important;*/
 	border: 1px solid #AAAAAA !important;
 	border-radius: 4px 4px 4px 4px !important;
 	color: #444444 !important;

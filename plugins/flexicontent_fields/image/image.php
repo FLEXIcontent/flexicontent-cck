@@ -184,8 +184,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					return 'cancel';
 				}
 				
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last() ;
-				var newField = lastField.clone();
+				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
+				var newField  = lastField.clone();
 				
 			".( $image_source ? "" :"
 				var has_imagepicker = newField.find('ul.image_picker_selector').length != 0;
@@ -749,7 +749,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$values = $values ? $values : $field->value;
 		$view   = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
-		$multiple     = $field->parameters->get('allow_multiple', 0 ) ;
+		$multiple     = $field->parameters->get('allow_multiple', 1 ) ;
 		$image_source = $field->parameters->get('image_source', 0);
 		if ($image_source > 1) {
 			global $fc_folder_mode_err;

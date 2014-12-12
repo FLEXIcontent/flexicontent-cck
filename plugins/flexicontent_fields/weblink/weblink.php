@@ -147,7 +147,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			";
 			
 			$css = '
-			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: normal; }
 			#sortables_'.$field->id.' li {
 				clear: both;
 				display: block;
@@ -196,20 +196,27 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$elementid_n = $elementid.'_'.$n;
 			
 			$link = '
+				<div class="nowrap_box">
 				<label class="label">'.JText::_( 'FLEXI_FIELD_URL' ).':</label>
 				<input class="urllink fcfield_textval'.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['link'].'" />
+				</div>
 			';
 			
 			$title = '';
 			if ($usetitle) $title = '
+				<div class="nowrap_box">
 				<label class="label">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</label>
 				<input class="urltitle fcfield_textval" name="'.$fieldname_n.'[title]" type="text" size="'.$size.'" value="'.@$value['title'].'" />
+				</div>
 			';
 			
 			$hits = (int) @ $value['hits'];
 			$hits = '
-					<input class="urlhits" name="'.$fieldname_n.'[hits]" type="hidden" value="'.$hits.'" />
-					<span class="hits"><span class="hitcount">'.$hits.'</span> '.JText::_( 'FLEXI_FIELD_HITS' ).'</span>
+				<div class="nowrap_box">
+				<label class="label hits">'.JText::_( 'FLEXI_FIELD_HITS' ).':</label>
+				<span class="hitcount">'.$hits.'</span> 
+				<input class="urlhits" name="'.$fieldname_n.'[hits]" type="hidden" value="'.$hits.'" />
+				</div>
 			';
 			
 			$field->html[] = '

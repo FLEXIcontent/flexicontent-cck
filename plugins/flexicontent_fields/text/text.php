@@ -37,7 +37,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 	// *******************************************
 	
 	// Method to create field's HTML display for item form
-	function onDisplayField(&$field, &$item, $ingroup=false)
+	function onDisplayField(&$field, &$item)
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
@@ -55,9 +55,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$default_value     = ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		$maxlength	= (int)$field->parameters->get( 'maxlength', 0 ) ;
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
-		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 1 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
-		$required   = $use_ingroup ? 0 : $field->parameters->get( 'required', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
 	  // add setMask function on the document.ready event
@@ -119,13 +119,13 @@ class plgFlexicontent_fieldsText extends JPlugin
 					return 'cancel';
 				}
 				
-				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last() ;
-				var newField = lastField.clone();
+				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
+				var newField  = lastField.clone();
 				
 				var theInput = newField.find('input').first();  /* First element is the value input field, second is e.g remove button */
 				theInput.val('');
-				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']');
-				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
+				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
+				theInput.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
 
 				var has_inputmask = newField.find('input.has_inputmask').length != 0;
 				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
@@ -137,15 +137,16 @@ class plgFlexicontent_fieldsText extends JPlugin
 				}
 			";
 			
+			if ($field->field_type=='textselect')
+				$js .= "
+				newField.parent().find('select.fcfield_textselval').val('');
+				";
+			
 			// Add to new field to DOM
 			$js .= "
 				newField.insertAfter( lastField );
 				if (remove_previous) lastField.remove();
 				";
-			
-			if ($field->field_type=='textselect') $js .= "
-				newField.parent().find('select.fcfield_textselval').val('');
-			";
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .="
@@ -168,13 +169,13 @@ class plgFlexicontent_fieldsText extends JPlugin
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
-				
 				// Add empty container if last element, instantly removing the given field value container
 				// (doing no hide/delete effect since we will add a new empty container with add effect)
 				if(rowCount".$field->id." == 1)
 					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
+				
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if(rowCount".$field->id." > 1) {
@@ -188,7 +189,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			";
 			
 			$css = '
-			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: normal; }
 			#sortables_'.$field->id.' li {
 				clear: both;
 				display: block;
