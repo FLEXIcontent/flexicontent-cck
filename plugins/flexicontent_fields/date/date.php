@@ -176,6 +176,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				newField.insertAfter( lastField );
 				if (remove_previous) lastField.remove();
 				
+				// This needs to be after field is added to DOM (unlike e.g. select2 / inputmask JS scripts)
 				Calendar.setup({
 					inputField:	theInput.attr('id'),
 					ifFormat:		'%Y-%m-%d',
@@ -549,10 +550,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			}
 		}
 		$post = $newpost;
-		if ($use_ingroup) {
+		/*if ($use_ingroup) {
 			$app = JFactory::getApplication();
 			$app->enqueueMessage( print_r($post, true), 'warning');
-		}
+		}*/
 	}
 	
 	

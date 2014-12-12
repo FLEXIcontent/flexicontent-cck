@@ -169,13 +169,13 @@ class plgFlexicontent_fieldsText extends JPlugin
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
 				// Add empty container if last element, instantly removing the given field value container
 				// (doing no hide/delete effect since we will add a new empty container with add effect)
 				if(rowCount".$field->id." == 1)
 					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-				
-				// Find field value container
-				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if(rowCount".$field->id." > 1) {
