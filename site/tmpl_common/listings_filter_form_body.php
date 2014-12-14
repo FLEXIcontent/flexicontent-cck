@@ -57,7 +57,7 @@ $tooltip_class = FLEXI_J30GE ? 'hasTooltip' : 'hasTip';
 		<?php endif; ?>
 		
 		<span class="fc_pages_counter">
-			<small><?php echo $this->pageNav->getPagesCounter(); ?></small>
+			<span class="label"><?php echo $this->pageNav->getPagesCounter(); ?></span>
 		</span>
 	
 	</div>

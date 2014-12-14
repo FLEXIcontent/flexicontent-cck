@@ -141,7 +141,7 @@
 			</field>
 			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" description="FLEXI_TEXT_SEARCH_FILTER_CONF_DESC" level="level1" />
+			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level1" />
 		
 			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_CONF" description="" level="level2" menu="hide" />
 			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_WARNING" description="" level="level3" menu="hide" />			
@@ -158,7 +158,7 @@
 			</field>
 			<field name="filter_firstoptiontext" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
+			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
 			
 			<field name="filter_compare_type" type="list" default="0" label="FLEXI_FILTER_VALUE_COMPARISON" description="FLEXI_FILTER_VALUE_COMPARISON_DESC">
 				<option value="0">FLEXI_ALPHANUMERIC</option>

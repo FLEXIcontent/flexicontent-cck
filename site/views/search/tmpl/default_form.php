@@ -357,9 +357,11 @@ $r = 0;
 			</span>
 		<?php endif; ?>
 		
+		<?php if (@$this->pageNav) : ?>
 		<span class="fc_pages_counter">
-			<small><?php if (@$this->pageNav) echo $this->pageNav->getPagesCounter(); ?></small>
+			<span class="label"><?php echo $this->pageNav->getPagesCounter(); ?></span>
 		</span>
+		<?php endif; ?>
 	
 	</div>
 	<!-- BOF items total-->

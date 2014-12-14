@@ -63,7 +63,7 @@
 			<field name="prefix" type="textarea" cols="21" rows="5" default="" label="FLEXI_PREFIX" description="Enter the custom HTML code that will be placed before the fields" />
 			<field name="suffix" type="textarea" cols="21" rows="5" default="" label="FLEXI_SUFFIX" description="Enter the custom HTML code that will be placed after the fields" />
 			
-			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
+			<field name="" type="separator" default="FLEXI_FILTERING_CONF" level="level1" />
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
 			<field name="display_label_filter_s" type="list" default="2" label="FLEXI_LABEL_FILTER_WITH_OVERRIDE" description="FLEXI_LABEL_FILTER_WITH_OVERRIDE_DESC">
 				<option value="0">FLEXI_NO</option>
