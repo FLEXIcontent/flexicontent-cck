@@ -41,11 +41,22 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-			<field name="container_width" type="text" default="" size="6" label="FLEXI_FIELD_CONTAINER_WIDTH" description="FLEXI_FIELD_CONTAINER_WIDTH_DESC" />
-			<field name="filter_size" type="text" default="30" size="2" label="FLEXI_FILTER_SIZE" description="FLEXI_FILTER_SIZE_DESC" />
+			
+			<field name="" type="separator" default="FLEXI_ITEM_FORM" level="level1" />
+			
 			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="validation" type="radio" default="1" label="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION" description="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION_DESC">
+				<option value="2">FLEXI_FIELD_TEXTAREA_TEXT_FILTERS</option>
+				<option value="1">FLEXI_FIELD_TEXTAREA_SAFE_HTML</option>
+				<option value="0">FLEXI_FIELD_TEXTAREA_PLAIN_TEXT</option>
+			</field>
+			<field name="maxlength" type="text" default="0" size="6" label="Maximum Characters" description="This is the maximum number of characters (client/server side), if using an HTML editor, then this must be supported by the editor (client side only)" />
+			<field name="use_html" type="radio" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC">
+				<option value="1">FLEXI_HTML_EDITOR</option>
+				<option value="0">FLEXI_SIMPLE_TEXTAREA</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_SIMPLE_TEXTAREA" description="FLEXI_SIMPLE_TEXTAREA_DESC" level="level2" />
@@ -53,11 +64,9 @@
 			<field name="cols" type="text" default="75" size="2" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" />
-			<field name="use_html" type="radio" default="0" label="FLEXI_FIELD_USE_HTML" description="FLEXI_FIELD_USE_HTML_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
+			<!--field name="container_width" type="text" default="" size="6" label="FLEXI_FIELD_CONTAINER_WIDTH" description="FLEXI_FIELD_CONTAINER_WIDTH_DESC" /-->
 			<field name="height" type="text" default="350px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
+			
 			<field name="" type="separator" default="FLEXI_EDITOR_BUTTONS" description="..." level="level3" />
 			<field name="show_buttons" type="radio" default="1" label="FLEXI_SHOW_EDITOR_BUTTONS" description="FLEXI_SHOW_EDITOR_BUTTONS_DESC">
 				<option value="0">FLEXI_NO</option>
