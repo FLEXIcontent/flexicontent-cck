@@ -68,7 +68,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		// some parameter shortcuts
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
-		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 1 ) ;
+		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
@@ -346,7 +346,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		}
 		
 		// Value handling parameters
-		$multiple       = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$multiple       = $field->parameters->get( 'allow_multiple', 0 ) ;
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;

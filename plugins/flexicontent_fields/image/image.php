@@ -55,9 +55,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		static $common_js_css_added = false;
 		
 		// some parameter shortcuts
-		$multiple   = $use_ingroup || $field->parameters->get('allow_multiple', 1);
-		$max_values = $use_ingroup ? 0 : (int)$field->parameters->get('max_values', 0);
-		$required   = $use_ingroup ? 0 : $field->parameters->get( 'required', 0 ) ;
+		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		$max_values = $use_ingroup ? 0 : (int)$field->parameters->get( 'max_values', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
 		$image_source = $field->parameters->get('image_source', 0);
@@ -135,7 +135,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		
 		$field->html = '';
 		
-		// Make sure value is an array of values
+		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
 			$field->value[0]['originalname'] = '';
@@ -149,11 +149,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$js = "
 			var fc_field_dialog_handle_".$field->id.";
 		";
-		$css = '';
+		$css = "";
 		
 		if ($multiple) // handle multiple records
 		{
-			//add the drag and drop sorting feature
+			// Add the drag and drop sorting feature
 			if (!$use_ingroup) $js .="
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
@@ -171,7 +171,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id."	= ".$max_values.";
+			var maxValues".$field->id." = ".$max_values.";
 			
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
@@ -749,8 +749,8 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$values = $values ? $values : $field->value;
 		$view   = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
-		$multiple     = $field->parameters->get('allow_multiple', 1 ) ;
-		$image_source = $field->parameters->get('image_source', 0);
+		$multiple     = $field->parameters->get( 'allow_multiple', 0 ) ;
+		$image_source = $field->parameters->get( 'image_source', 0 );
 		if ($image_source > 1) {
 			global $fc_folder_mode_err;
 			if (empty($fc_folder_mode_err[$field->id])) {

@@ -14,7 +14,6 @@
  */
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-//jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
 
 class plgFlexicontent_fieldsTermlist extends JPlugin
@@ -44,9 +43,12 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if ($use_ingroup) $field->formhidden = 3;
+		if ($use_ingroup && empty($field->ingroup)) return;
 		
 		// initialize framework objects and other variables
-		$document  = JFactory::getDocument();
+		$document = JFactory::getDocument();
 		$app  = JFactory::getApplication();
 		$user = JFactory::getUser();
 		
@@ -54,30 +56,77 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		// Create the editor object of editor prefered by the user,
 		// this will also add the needed JS to the HTML head
 		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
-		$editor = JFactory::getEditor($editor_name);
+		$editor  = JFactory::getEditor($editor_name);
+		$editor_plg_params = array();  // Override parameters of the editor plugin, nothing yet
+		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
 		
 		
-		// Some field parameters for the textarea
-		$show_buttons = false;//(boolean) $field->parameters->get( 'show_buttons', 1 ) ;
+		// ****************
+		// Number of values
+		// ****************
+		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
 		
-		// some parameter shortcuts
-		$size      = $field->parameters->get( 'size', 30 ) ;
-		$cols      = $field->parameters->get( 'cols', 75 ) ;
-		$rows      = $field->parameters->get( 'rows', 20 ) ;
-		$multiple  = $field->parameters->get( 'allow_multiple', 1 ) ;
-		$max_values= (int)$field->parameters->get( 'max_values', 0 ) ;
 		
-		// This is field 's MAIN value property
+		// ******************************
+		// Term title (optional property)
+		// ******************************
+		
+		// Label
+		$title_label = JText::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
+		
+		// Default value
+		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
+		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$title_size      = $field->parameters->get( 'title_size', 80 ) ;
+		
+		// Input validation & editing
+		$title_maxlength = $field->parameters->get( 'title_size', 0 ) ;
+		
+		
+		// ***********************
+		// Term text (description)
+		// ***********************
+		
+		// Label
+		$value_label = JText::_($field->parameters->get('value_label', 'FLEXI_FIELD_TERMTEXT'));
+		
+		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		
-		// Optional value properties
-		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
-		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
+		// Input validation & editing
+		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
+		$validation= $field->parameters->get( 'validation', $field->field_type == 'maintext' ? 2 : 1 ) ;  // server side enforced
+		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 1 );  // load HTML editor
 		
-		$required   = $field->parameters->get( 'required', 0 ) ;
-		$required   = $required ? ' required' : '';
+		// *** Simple Textarea configuration  ***
+		$cols  = $field->parameters->get( 'cols', 75 ) ;
+		$rows  = $field->parameters->get( 'rows', 20 ) ;
+		
+		// *** HTML Editor configuration  ***
+		
+		$height = $field->parameters->get( 'height', ($field->field_type == 'textarea') ? '300px' : '400px' ) ;
+		if ($height != (int)$height) $height .= 'px';
+		
+		// Decide editor plugin buttons to SKIP
+		$show_buttons = $field->parameters->get( 'show_buttons', 1 ) ;
+		$skip_buttons = $field->parameters->get( 'skip_buttons', '' ) ;
+		$skip_buttons = is_array($skip_buttons) ? $skip_buttons : explode('|',$skip_buttons);
+		
+		// Clear empty value
+		if (empty($skip_buttons[0]))  unset($skip_buttons[0]);
+		
+		// Force skipping pagebreak and readmore for CUSTOM textarea fields
+		if ($field->field_type == 'textarea') {
+			if ( !in_array('pagebreak', $skip_buttons) ) $skip_buttons[] = 'pagebreak';
+			if ( !in_array('readmore',  $skip_buttons) )  $skip_buttons[] = 'readmore';
+		}
+		
+		$skip_buttons_arr = ($show_buttons && $editor_name=='jce' && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
+		
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
@@ -87,12 +136,17 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			$field->value[0] = serialize($field->value[0]);
 		}
 		
+		// Field name and HTML TAG id
+		$fieldname = 'custom['.$field->name.']';
+		$elementid = 'custom_'.$field->name;
+		
 		$js = "";
+		$css = "";
 		
 		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
-			$js .= "
+			if (!$use_ingroup) $js .="
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
@@ -102,88 +156,117 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			});
 			";
 			
-			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
-			$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
-			
 			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
 			$js .= "
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
-			var maxValues".$field->id."		= ".$max_values.";
-
-			function addField".$field->id."(el) {
+			var maxValues".$field->id." = ".$max_values.";
+			
+			function addField".$field->id."(el, groupval_box, fieldval_box, params)
+			{
+				remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
+				scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
+				animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
-
-				var thisField 	 = $(el).getPrevious().getLast();
-				var thisNewField = thisField.clone();
 				
-				jQuery(thisNewField.getElements('label.labeltitle')).text('".JText::_( 'FLEXI_FIELD_TERMTITLE' )." '+parseInt(rowCount".$field->id."+1)+':');
-				jQuery(thisNewField.getElements('label.labeltext')).text('".JText::_( 'FLEXI_FIELD_TERMTEXT' )." '+parseInt(rowCount".$field->id."+1)+':');
-				jQuery(thisNewField).find('label.labeltitle').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_title');
-				jQuery(thisNewField).find('label.labeltext').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-				";
+				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
+				var newField  = lastField.clone();
 				
-			if ($usetitle) $js .= "
-				jQuery(thisNewField.getElements('textarea.termtitle')).val('');
-				thisNewField.getElements('textarea.termtitle').setProperty('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
-				thisNewField.getElements('textarea.termtitle').setProperty('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
+				//newField.find('label.labeltitle').text('".$title_label." '+parseInt(rowCount".$field->id."+1)+':');
+				//newField.find('label.labeltitle').text('".$value_label." '+parseInt(rowCount".$field->id."+1)+':');
+				newField.find('label.labeltitle').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_title');
+				newField.find('label.labeltext').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
 				";
 				
 			$js .= "
-				var container = jQuery(thisNewField).find('.fctextbox');
-				container.after('<div class=\"fctextbox\"></div>');
-				container.find('textarea').show().appendTo(container.next());
-				container.remove();
-				jQuery(thisNewField).find('.fctextbox').find('textarea').val('');
-				jQuery(thisNewField).find('.fctextbox').find('textarea').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
-				jQuery(thisNewField).find('.fctextbox').find('textarea').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-				jQuery(thisNewField).find('.fctextbox').find('textarea').removeClass();
-				jQuery(thisNewField).find('.fctextbox').find('textarea').addClass('termtext');
+				newField.find('input.termtitle').val('');
+				newField.find('input.termtitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				newField.find('input.termtitle').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				";
 				
 			$js .= "
-				jQuery(thisNewField).css('display', 'none');
-				jQuery(thisNewField).insertAfter( jQuery(thisField) );
+				// Create a new textarea
+				var boxClass = 'termtext';
+				var container = newField.find('.fc_'+boxClass);
+				container.after('<div class=\"fc_'+boxClass+'\"></div>');  // Append a new container box
+				container.find('textarea').show().appendTo(container.next()); // Copy only the textarea (first make it visible) into the new container
+				container.remove(); // Remove old (cloned) container box along with all the contents
 				
+				// Prepare the new textarea for attaching the HTML editor
+				theArea = newField.find('.fc_'+boxClass).find('textarea');
+				theArea.val('');
+				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
+				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+				theArea.removeClass(); // Remove all classes from the textarea
+				theArea.addClass(boxClass);
+				";
+			
+			// Add to new field to DOM
+			$js .= "
+				newField.insertAfter( lastField );
+				if (remove_previous) lastField.remove();
+				
+				// Attach a new JS HTML editor object
+				tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+			";
+			
+			// Add new element to sortable objects (if field not in group)
+			if (!$use_ingroup) $js .="
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
-				
-				//jQuery(thisNewField).show('slideDown');
-				jQuery(thisNewField).show();
-				tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+			";
+			
+			// Show new field, increment counters
+			$js .="
+				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
+				if (scroll_visible) fc_scrollIntoView(newField, 1);
+				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
-			function deleteField".$field->id."(el)
+			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
-				if(rowCount".$field->id." <= 1) return;
-				var row = jQuery(el).closest('li');
-				jQuery(row).hide('slideUp', function() { jQuery(this).remove(); } );
-				rowCount".$field->id."--;
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				// Add empty container if last element, instantly removing the given field value container
+				if(rowCount".$field->id." == 1)
+					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
+				
+				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
+				if(rowCount".$field->id." > 1) {
+					// Destroy the remove button, so that it is not reclicked again, while we do the hide effect (before DOM removal)
+					if (el) jQuery(el).remove();
+					// Do hide effect then remove from DOM
+					row.slideUp(400, function(){ this.remove(); });
+					rowCount".$field->id."--;
+				}
 			}
 			";
 			
-			$css = '
-			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+			$css .= '
+			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: normal; }
 			#sortables_'.$field->id.' li {
-				clear: both !important;
+				clear: both;
+				float: left;
 				display: block;
-				list-style: none !important;
-				height: auto !important;
-				position: relative !important;
-				background:#EAEAEA !important;
+				list-style: none;
+				height: auto;
+				position: relative;
+				background: white!important;
 				border-radius:5px !important;
 				margin-bottom:10px !important;
 				padding:5px !important;
-				border:1px solid #ccc !important;
+				border:1px dashed #444 !important;
 			}
 			#sortables_'.$field->id.' li.sortabledisabled {
 				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
@@ -199,12 +282,12 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$move2 	= '<span class="fcfield-drag">'.JHTML::image( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		} else {
 			$remove_button = '';
 			$move2 = '';
-			$js = '';
-			$css = '';
+			$js .= '';
+			$css .= '';
 		}
 		
 		if ($js)  $document->addScriptDeclaration($js);
@@ -212,53 +295,66 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
-		foreach ($field->value as $value) {
+		foreach ($field->value as $value)
+		{
+			// Compatibility for unserialized values
 			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
 				$value = unserialize($value);
 			} else {
 				$value = array('title' => $value, 'text' => '');
 			}
-			$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']['.$n.']' : $field->name.'['.$n.']';
-			$elementid = FLEXI_J16GE ? 'custom_'.$field->name.'_'.$n : $field->name.'_'.$n;
+			// Validate the value, this should have been done by save task already ... but
+			$value['text'] = $validation ?
+				($validation==2 ? JComponentHelper::filterText($value['text']) : $ifilter->clean($value['text'], 'string')) :  // SAFE HTML
+				flexicontent_html::striptagsandcut($value['text'], $maxlength) ;  // PLAIN TEXT ... OR PLAIN TEXT VIA ... JFilterOutput::cleanText($value['text']) ;
 			
-			if ($usetitle) $title = '
-				<br/><label class="label labeltitle" for="'.$elementid.'_title">'.JText::_( 'FLEXI_FIELD_TERMTITLE' ).' '.($multiple?($n+1):'').':</label><br/>
-				<textarea class="fcfield_textval termtitle'.$required.'" id="'.$elementid.'_title" name="'.$fieldname.'[title]" cols="'.$cols.'" rows="'.$rows.'">'.$value['title'].'</textarea><br/><br/>
+			$fieldname_n = $fieldname.'['.$n.']';
+			$elementid_n = $elementid.'_'.$n;
+			
+			$title = '
+				<label class="label label-info labeltitle" for="'.$elementid_n.'_title">'.$title_label./*' '.($multiple?($n+1):'').*/'</label><br/>
+				<div class="fc_termtitle">
+					<input class="fcfield_textval termtitle" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" maxlength="'.$title_maxlength.'" value="'.htmlspecialchars( @$value['title'], ENT_COMPAT, 'UTF-8' ).'" /><br/>
+				</div>
 			';
 			
-			/*if ($usetitle) $text = '
-				<label class="label labeltext" for="'.$fieldname.'[text]">'.JText::_( 'FLEXI_FIELD_TERMTEXT' ).' '.($multiple?($n+1):'').':</label>
-				<input class="fcfield_textval termtext" name="'.$fieldname.'[text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
-			';*/
+			$text = !$use_html ? '
+				<textarea class="fcfield_textval termtext" id="'.$elementid_n.'_text" name="'.$fieldname_n.'[text]" cols="'.$cols.'" rows="'.$rows.'">'
+					.htmlspecialchars( @$value['text'], ENT_COMPAT, 'UTF-8' ).
+				'</textarea>
+				' : ''
+					.$editor->display($fieldname_n.'[text]', htmlspecialchars( @$value['text'], ENT_COMPAT, 'UTF-8' ), $width='100%', $height='100%', $cols, $rows, $show_buttons, $elementid_n.'_text').
+				'';
+			
 			$text = '
-				<label class="label labeltext" for="'.$elementid.'_text">'.JText::_( 'FLEXI_FIELD_TERMTEXT' ).' '.($multiple?($n+1):'').':</label>
-				'.
-				//<textarea class="fcfield_textval termtext" name="'.$fieldname.'[text]" cols="'.$cols.'" rows="'.$rows.'">'.@$value['text'].'</textarea>
-				'<div class="fctextbox">'.$editor->display($fieldname.'[text]', $value['text'], $width='100%', $height='100%', $cols, $rows, $show_buttons, $elementid.'_text') . '</div>
-			';
-			
+				<label class="label label-info labeltext" for="'.$elementid_n.'_text">'.$value_label.' './*($multiple?($n+1):'').*/'</label>
+				<div class="fc_termtext">
+					'.$text.'
+				</div>
+				';
 			
 			$field->html[] = '
-				'.@$title.'
+				'.($use_ingroup ? '' : $move2).'
+				'.($use_ingroup ? '' : $remove_button).'
+				<div class="clear"></div>
+				'.$title.'
 				'.$text.'
-				<div class="clear"></div>
-				'.$move2.'
-				'.$remove_button.'
-				<div class="clear"></div>
 				';
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		if ($multiple) { // handle multiple records
-			$_list = "<li>". implode("</li>\n<li>", $field->html) ."</li>\n";
-			$field->html = '
-				<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$_list. '</ul>
-				<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />
-			';
+		if ($use_ingroup) { // do not convert the array to string if field is in a group
+		} else if ($multiple) { // handle multiple records
+			$field->html =
+				'<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">'.
+					implode('</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			$field->html .= '<input type="button" class="fcfield-addvalue" style="float:left; clear:both;" onclick="addField'.$field->id.'(this);" value=" -- '.JText::_( 'FLEXI_ADD_VALUE' ).' -- " />';
 		} else {  // handle single values
-			$field->html = $field->html[0];
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
 	}
 	
@@ -271,31 +367,57 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
-		// some parameter shortcuts
+		// Some variables
+		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
+		$maxlength = $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
+		$validation= $field->parameters->get( 'validation', $field->field_type == 'maintext' ? 2 : 1 ) ;  // server side enforced
 		
-		// This is field 's MAIN value property
+		// Term Title
+		$title_label = JText::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
+		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
+		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		
+		// Term (description) Text
+		$value_label = JText::_($field->parameters->get('value_label', 'FLEXI_FIELD_TERMTEXT'));
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
 		
-		// Optional value properties
-		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
-		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
-		
-		// Get field values
+		// Get field values, do not terminate yet if value is empty, since a default value on empty may have been defined
 		$values = $values ? $values : $field->value;
 		
-		// Handle default value loading, instead of empty value
-		if ( empty($values) && !strlen($default_value) ) {
-			$field->{$prop} = '';
-			return;
-		} else if ( empty($values) && strlen($default_value) ) {
+		// Load default value
+		if ( empty($values) ) {
+			if (!strlen($default_value)) {
+				$field->{$prop} = '';
+				return;
+			}
 			$values = array();
 			$values[0]['title'] = JText::_($default_title);
 			$values[0]['text'] = JText::_($default_value);
 			$values[0] = serialize($values[0]);
 		}
+		// Clean output
+		else {
+			foreach ($values as & $value) {
+				if ( empty($value) ) continue;
+				
+				// Compatibility for unserialized values
+				if ( @unserialize($value)!== false || $value === 'b:0;' ) {
+					$value = unserialize($value);
+				} else {
+					$value = array('title' => $value, 'text' => '');
+				}
+				
+				$value['title'] = $ifilter->clean($value['title'], 'string');
+				$value['text']  = $ifilter->clean($value['text'], 'string');
+			}
+		}
 		
+		// Value handling parameters
+		$multiple       = $field->parameters->get( 'allow_multiple', 0 ) ;
+		
+		// Language filter the values
+		//$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -346,32 +468,19 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		{
 			if ( empty($value) ) continue;
 			
-			// Compatibility for old unserialized values
-			$value = (@unserialize($value)!== false || $value === 'b:0;') ? unserialize($value) : $value;
-			if ( is_array($value) ) {
-				$title = $value['title'];
-				$text = $value['text'];
-			} else {
-				$title = $value;
-				$text = '';
-			}
+			$title = '<label class="fc_termtitle label label-success">'.$value['title'].'</label>';
+			$text  = '<div class="fc_termdesc">'.$value['text'].'</div>';
 			
-			// If not using property or property is empty, then use default property value
-			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
-			$text = ($usetitle && strlen($title))  ?  $title  :  $default_title;
-			
-			$title = '<label class="label">'.JText::_( 'FLEXI_FIELD_TERMTITLE' ).' '.($n+1).':</label>'.$title;
-			$text = '<div class="fcclear"></div><label class="label">'.JText::_('FLEXI_FIELD_TERMTEXT').' '.($n+1).':</label>'.$text;
-
 			// Add prefix / suffix
 			$field->{$prop}[]	= $pretext. $title . $text . $posttext;
 			
 			$n++;
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
-
-		// Apply seperator and open/close tags
-		if(count($field->{$prop})) {
-			$field->{$prop} = implode($separatorf, $field->{$prop});
+		
+		// Apply separator and open/close tags
+		$field->{$prop} = implode($separatorf, $field->{$prop});
+		if ( $field->{$prop}!=='' ) {
 			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 		} else {
 			$field->{$prop} = '';
@@ -389,9 +498,14 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-		if ( !is_array($post) && !strlen($post) ) return;
+		
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';
+		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
+		$maxlength = $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
+		$validation= $field->parameters->get( 'validation', $field->field_type == 'maintext' ? 2 : 1 ) ;  // server side enforced
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -410,11 +524,13 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				}
 			}
 			
-			if ($post[$n]['title'] !== '')
+			if ($post[$n]['title'] !== '' || $use_ingroup)
 			{
 				$newpost[$new] = $post[$n];
-				$newpost[$new]['title'] = $post[$n]['title'];
-				$newpost[$new]['text'] = strip_tags(@$post[$n]['text']);
+				$newpost[$new]['title'] = $post[$n]['title'];  // NO TAG STRIPPING, this should be encoded when displayed !!!
+				$newpost[$new]['text']  = $validation ?
+					($validation==2 ? JComponentHelper::filterText($post[$n]['text']) : $ifilter->clean($post[$n]['text'], 'string')) :  // SAFE HTML
+					flexicontent_html::striptagsandcut($post[$n]['text'], $maxlength) ;  // PLAIN TEXT ... OR PLAIN TEXT VIA ... JFilterOutput::cleanText($post[$n]) ;
 				$new++;
 			}
 		}
@@ -424,6 +540,10 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		foreach($post as $i => $v) {
 			$post[$i] = serialize($v);
 		}
+		/*if ($use_ingroup) {
+			$app = JFactory::getApplication();
+			$app->enqueueMessage( print_r($post, true), 'warning');
+		}*/
 	}
 	
 	
@@ -474,7 +594,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
-		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('text'), $search_properties=array('title','text'), $properties_spacer=' ', $filter_func=null);
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('title'), $search_properties=array('title','text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	
@@ -485,7 +605,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
-		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('text'), $search_properties=array('title','text'), $properties_spacer=' ', $filter_func=null);
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('title'), $search_properties=array('title','text'), $properties_spacer=' ', $filter_func=null);
 		return true;
 	}
 	

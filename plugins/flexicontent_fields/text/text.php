@@ -48,19 +48,33 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ($use_ingroup && empty($field->ingroup)) return;
 		
 		// initialize framework objects and other variables
-		$document  = JFactory::getDocument();
+		$document = JFactory::getDocument();
 		
-		// some parameter shortcuts
-		$default_value_use = $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_value     = ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
-		$maxlength	= (int)$field->parameters->get( 'maxlength', 0 ) ;
-		$size       = (int) $field->parameters->get( 'size', 30 ) ;
-		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 1 ) ;
+		
+		// ****************
+		// Number of values
+		// ****************
+		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
-	  // add setMask function on the document.ready event
+		
+		// **************
+		// Value handling
+		// **************
+		// Default value
+		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
+		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
+		
+		// Input validation & editing
+		$size       = (int) $field->parameters->get( 'size', 30 ) ;
+		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced
+		
+		
+		// **********************
+	  // Create validation mask
+		// **********************
 		$inputmask	= $field->parameters->get( 'inputmask', false ) ;
 		$custommask = $field->parameters->get( 'custommask', false ) ;
 		static $inputmask_added = false;
@@ -77,10 +91,11 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ( !$field->value ) {
 			$field->value = array();
 			$field->value[0] = JText::_($default_value);
-		} else {
-			for ($n=0; $n<count($field->value); $n++) {
-				$field->value[$n] = htmlspecialchars( $field->value[$n], ENT_QUOTES, 'UTF-8' );
-			}
+		}
+		
+		// Encode to prepare for form
+		for ($n=0; $n<count($field->value); $n++) {
+			$field->value[$n] = htmlspecialchars( $field->value[$n], ENT_COMPAT, 'UTF-8' );
 		}
 		
 		// Field name and HTML TAG id
@@ -88,6 +103,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$elementid = 'custom_'.$field->name;
 		
 		$js = "";
+		$css = "";
 		
 		if ($multiple) // handle multiple records
 		{
@@ -107,7 +123,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
-
+			
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
 				remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
@@ -146,7 +162,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$js .= "
 				newField.insertAfter( lastField );
 				if (remove_previous) lastField.remove();
-				";
+			";
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .="
@@ -173,7 +189,6 @@ class plgFlexicontent_fieldsText extends JPlugin
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
 				
 				// Add empty container if last element, instantly removing the given field value container
-				// (doing no hide/delete effect since we will add a new empty container with add effect)
 				if(rowCount".$field->id." == 1)
 					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
 				
@@ -188,7 +203,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			}
 			";
 			
-			$css = '
+			$css .= '
 			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: normal; }
 			#sortables_'.$field->id.' li {
 				clear: both;
@@ -211,8 +226,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		} else {
 			$remove_button = '';
 			$move2 = '';
-			$js = '';
-			$css = '';
+			$js .= '';
+			$css .= '';
 		}
 		
 		// Drop-Down select for textselect field type
@@ -269,13 +284,14 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
-			$_list = "<li>". implode("</li>\n<li>", $field->html) ."</li>\n";
-			$field->html = '
-				<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$_list. '</ul>
-				<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />
-			';
+			$field->html =
+				'<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">'.
+					implode('</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			$field->html .= '<input type="button" class="fcfield-addvalue" style="float:left; clear:both;" onclick="addField'.$field->id.'(this);" value=" -- '.JText::_( 'FLEXI_ADD_VALUE' ).' -- " />';
 		} else {  // handle single values
-			$field->html = $field->html[0];
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
 	}
 	
@@ -287,24 +303,30 @@ class plgFlexicontent_fieldsText extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
-		
-		
-		// Get field values
-		$values = $values ? $values : $field->value;
-		// DO NOT terminate yet if value is empty since a default value on empty may have been defined
+		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
 		
 		// Handle default value loading, instead of empty value
-		$default_value_use= $field->parameters->get( 'default_value_use', 0 ) ;
-		$default_value		= ($default_value_use == 2) ? $field->parameters->get( 'default_value', '' ) : '';
-		if ( empty($values) && !strlen($default_value) ) {
-			$field->{$prop} = '';
-			return;
-		} else if ( empty($values) && strlen($default_value) ) {
-			$values = array($default_value);
+		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
+		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
+		
+		// Get field values, do not terminate yet if value is empty, since a default value on empty may have been defined
+		$values = $values ? $values : $field->value;
+		
+		// Handle default value loading, instead of empty value
+		if ( empty($values) ) {
+			if (!strlen($default_value)) {
+				$field->{$prop} = '';
+				return;
+			}
+			$values = array(JText::_($default_value));
+		} else {
+			foreach ($values as & $value) {
+				$value = $ifilter->clean($value, 'string');  // SAFE HTML
+			}
 		}
 		
 		// Value handling parameters
-		$multiple       = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$multiple       = $field->parameters->get( 'allow_multiple', 0 ) ;
 		
 		// Language filter the values
 		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
@@ -358,7 +380,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		{
 			if ( !strlen($value) ) continue;
 			
-			$field->{$prop}[$n]	= $pretext . ($lang_filter_values ? JText::_($value) : $value) . $posttext;
+			// Language filter values and add prefix / suffix
+			$field->{$prop}[]	= $pretext . ($lang_filter_values ? JText::_($value) : $value) . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
@@ -411,6 +434,11 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
+		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
+		$inputmask = $field->parameters->get( 'inputmask', false );
+		$custommask = $field->parameters->get( 'custommask', false ) ;
+		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
+		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
 		
@@ -421,7 +449,15 @@ class plgFlexicontent_fieldsText extends JPlugin
 		{
 			if ($post[$n] !== '' || $use_ingroup)
 			{
-				$newpost[$new] = $post[$n];
+				$v = $maxlength ? substr($post[$n], 0, $maxlength) : $post[$n];
+				if (!$inputmask || $custommask)
+					$v = JComponentHelper::filterText($v);  // Filter according to user group Text Filters
+				else switch ($inputmask) {
+					case 'decimal': $v = $ifilter->clean($v, 'double'); break;  // decimal
+					case 'integer': $v = $ifilter->clean($v, 'int'); break;  // integer
+					default: $v = $ifilter->clean($v, 'string'); break;  // safe HTML
+				}
+				$newpost[$new] = $v;
 				$new++;
 			}
 		}

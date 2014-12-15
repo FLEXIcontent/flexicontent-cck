@@ -127,7 +127,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="" type="separator" default="FLEXI_EDITING_PARAMETERS" level="level2"  />
-			<field name="maintext_hide_html" type="radio" default="" label="FLEXI_HIDE_HTML" description="FLEXI_HIDE_HTML_DESC" class="btn-group btn-group-yesno">
+			<field name="maintext_hide_html" type="radio" default="" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC" class="btn-group btn-group-yesno">
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HTML_EDITOR</option>
 				<option value="1">FLEXI_SIMPLE_TEXTAREA</option>

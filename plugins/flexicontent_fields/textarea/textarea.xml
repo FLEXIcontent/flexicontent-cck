@@ -13,8 +13,8 @@
 		<filename plugin="textarea">textarea.php</filename>
 		<filename>index.html</filename>
 	</files>
-	
 	<config>
+	
 	<fields name="attribs">
 		
 		<fieldset name="standard" repeat="1">
@@ -27,33 +27,40 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
+			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 		</fieldset>
 		
 		<fieldset name="group-textarea" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
-			<field name="" type="separator" default="FLEXI_BASIC_PARAMS_LABEL" level="level1" />
-			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+			<field name="" type="separator" default="FLEXI_ITEM_FORM" level="level0" />
+			
+			<field name="" type="separator" default="FLEXI_FIELD_NUMBER_OF_VALUES" description="" level="level1" />
+			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_ALLOW_MULTIPLE" description="FLEXI_FIELD_ALLOW_MULTIPLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-			
-			<field name="" type="separator" default="FLEXI_ITEM_FORM" level="level1" />
-			
+			<field name="max_values" type="text" default="0" size="2" label="FLEXI_FIELD_MAX_VALUES" description="FLEXI_FIELD_MAX_VALUES_DESC" />
 			<field name="required" type="radio" default="0" label="FLEXI_REQUIRED" description="FLEXI_REQUIRED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
+			<field name="default_value" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="default_value_use" type="list" default="0" label="FLEXI_FIELD_DEFAULT_VALUE_USE" description="FLEXI_FIELD_DEFAULT_VALUE_USE_DESC">
+				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
+				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
+				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
+			</field>
+			<field name="maxlength" type="text" default="0" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="validation" type="radio" default="1" label="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION" description="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION_DESC">
 				<option value="2">FLEXI_FIELD_TEXTAREA_TEXT_FILTERS</option>
 				<option value="1">FLEXI_FIELD_TEXTAREA_SAFE_HTML</option>
 				<option value="0">FLEXI_FIELD_TEXTAREA_PLAIN_TEXT</option>
 			</field>
-			<field name="maxlength" type="text" default="0" size="6" label="Maximum Characters" description="This is the maximum number of characters (client/server side), if using an HTML editor, then this must be supported by the editor (client side only)" />
 			<field name="use_html" type="radio" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC">
 				<option value="1">FLEXI_HTML_EDITOR</option>
 				<option value="0">FLEXI_SIMPLE_TEXTAREA</option>
@@ -64,9 +71,7 @@
 			<field name="cols" type="text" default="75" size="2" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" />
-			<!--field name="container_width" type="text" default="" size="6" label="FLEXI_FIELD_CONTAINER_WIDTH" description="FLEXI_FIELD_CONTAINER_WIDTH_DESC" /-->
 			<field name="height" type="text" default="350px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
-			
 			<field name="" type="separator" default="FLEXI_EDITOR_BUTTONS" description="..." level="level3" />
 			<field name="show_buttons" type="radio" default="1" label="FLEXI_SHOW_EDITOR_BUTTONS" description="FLEXI_SHOW_EDITOR_BUTTONS_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -74,7 +79,35 @@
 			</field>
 			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_BUTTONS_JCE_ONLY" description="FLEXI_SKIP_BUTTONS_JCE_ONLY_DESC" />
 			
+			
+			<field name="" type="separator" default="FLEXI_FRONTEND" level="level0" />
+			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
+			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
+			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="trigger_plgs_incatview" type="radio" default="0" label="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW" description="FLEXI_TRIGGER_ONPREPARECONTENT_EVENT_INCATVIEW_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="plugins" type="pluginlist" label="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS" description="FLEXI_FIELD_CHOOSE_SPECIFIC_PLUGINS_DESC" />
+			
 			<field name="" type="separator" default="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL" description="FLEXI_PREFIX_SUFFIX_SEPARATOR_LABEL_DESC_FIELD" level="level1" />
+			<field name="remove_space" type="radio" default="0" label="FLEXI_REMOVE_SPACE" description="FLEXI_REMOVE_SPACE_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
+				<option value="0">FLEXI_SPACE</option>
+				<option value="1">FLEXI_LINE_BREAK</option>
+				<option value="2">FLEXI_PIPE</option>
+				<option value="3">FLEXI_COMMA</option>
+				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
+				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
+			</field>
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
@@ -92,22 +125,14 @@
 			</field>
 			<field name="ogpmaxlen" type="text" default="300" label="FLEXI_SOCIAL_TXT_MAXLEN_LISTING" description="FLEXI_SOCIAL_TXT_MAXLEN_LISTING_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
-			<field name="default_value" type="text" default="" label="FLEXI_FIELD_DEFAULT_VALUE" description="FLEXI_FIELD_DEFAULT_VALUE_DESC" />
-			<field name="default_value_use" type="list" default="0" label="FLEXI_FIELD_DEFAULT_VALUE_USE" description="FLEXI_FIELD_DEFAULT_VALUE_USE_DESC">
-				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
-				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
-				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
-			</field>
-			
-			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level1" />
+			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level0" />
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
 				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_TABBING_PARAMS" level="level1" menu="hide" />
+			<field name="" type="separator" default="FLEXI_TABBING_PARAMS" level="level0" />
 			
 			<field name="" type="separator" default="FLEXI_TABBING_PARAMS_DESC" level="level3" menu="hide" />
 		
@@ -149,6 +174,7 @@
 		</fieldset>
 	</fields>
 	</config>
+	
 	<languages>
 		<language tag="en-GB">en-GB.plg_flexicontent_fields_textarea.ini</language>
 	</languages>

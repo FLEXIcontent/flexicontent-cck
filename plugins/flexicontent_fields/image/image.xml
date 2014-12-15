@@ -53,7 +53,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC" class="btn-group btn-group-yesno">
+			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

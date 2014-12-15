@@ -49,7 +49,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		// some parameter shortcuts
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
-		$multiple   = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$multiple   = $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
@@ -302,7 +302,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		}
 		
 		// Value handling parameters
-		$multiple       = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$multiple       = $field->parameters->get( 'allow_multiple', 0 ) ;
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;

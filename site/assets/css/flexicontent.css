@@ -1610,13 +1610,15 @@ div.fancybox-wrap a { background: none!important;}
 	font-weight: bold;
 }
 
+.flexi.label:not(.label-success):not(.label-primary):not(.label-w):not(.label-success):not(.label-success):not(.label-success) {
+	background-color: #999 !important;
+}
 #flexicontent .flexi.label, .flexi.label {
 	white-space: normal !important;
 	float: left !important;
 	/*width: 16%;*/
 	display: inline-block !important;
 	
-	background-color: #999 !important;
 	color: #fff !important;
 	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
 	
