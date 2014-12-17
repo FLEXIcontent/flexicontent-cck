@@ -27,6 +27,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
+			<field name="" type="separator" default="The following requires the groupfield, do not enable if you do not have this field" level="level2" />
 			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
@@ -56,31 +57,37 @@
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_FORM_FIELD_CONF" description="FLEXI_FORM_FIELD_CONF_DESC" level="level2" />
 			<field name="title_maxlength" type="text" default="0" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="title_size" type="text" default="80" size="3" label="FLEXI_FIELD_SIZE" description="FLEXI_FIELD_SIZE_DESC" />
 			
 			<field name="" type="separator" default="Term decription" level="level1" />
+			
 			<field name="value_label" type="text" default="FLEXI_FIELD_TERMTEXT" size="30" label="FLEXI_LABEL" description="Label, this is language filtered" />
-			<field name="default_value" type="text" default="" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
+			<field name="default_value" type="text" default="" size="50" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
 			<field name="default_value_use" type="list" default="0" label="FLEXI_FIELD_DEFAULT_VALUE_USE" description="FLEXI_FIELD_DEFAULT_VALUE_USE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
 			</field>
-			<field name="maxlength" type="text" default="0" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
-			<field name="validation" type="radio" default="1" label="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION" description="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION_DESC">
-				<option value="2">FLEXI_FIELD_TEXTAREA_TEXT_FILTERS</option>
-				<option value="1">FLEXI_FIELD_TEXTAREA_SAFE_HTML</option>
-				<option value="0">FLEXI_FIELD_TEXTAREA_PLAIN_TEXT</option>
+			<field name="validation" type="list" default="2" label="FLEXI_FIELD_SERVER_SIDE_VALIDATION" description="FLEXI_FIELD_TEXTAREA_INPUT_VALIDATION_DESC">
+				<option value="2">FLEXI_FIELD_UGRP_TEXT_FILTERS</option>
+				<option value="1">FLEXI_FIELD_SAFE_HTML</option>
+				<option value="RAW">FLEXI_FIELD_UNSAFE_HTML</option>
+				<option value="STRING">FLEXI_FIELD_PLAIN_TEXT_DECODE_ENTITIES</option>
+				<option value="HTML">FLEXI_FIELD_PLAIN_TEXT_ALLOW_ENTITIES</option>
 			</field>
+			
+			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="use_html" type="radio" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC">
 				<option value="1">FLEXI_HTML_EDITOR</option>
 				<option value="0">FLEXI_SIMPLE_TEXTAREA</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_SIMPLE_TEXTAREA" description="FLEXI_SIMPLE_TEXTAREA_DESC" level="level2" />
-			<field name="rows" type="text" default="10" size="2" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" />
-			<field name="cols" type="text" default="75" size="2" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
+			<field name="rows" type="text" default="6" size="2" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" />
+			<field name="cols" type="text" default="80" size="2" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" />
 			<field name="height" type="text" default="350px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
@@ -94,6 +101,16 @@
 			
 			<field name="" type="separator" default="FLEXI_FRONTEND" level="level0" />
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
+			<field name="encode_output" type="radio" default="0" label="FLEXI_ENCODE_OUTPUT" description="FLEXI_ENCODE_OUTPUT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			<field name="clean_output" type="radio" default="0" label="FLEXI_CLEAN_OUTPUT" description="FLEXI_CLEAN_OUTPUT_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_UNSAFE_HTML</option>
+				<option value="2">FLEXI_ALL_HTML</option>
+			</field>
+			
 			<field name="" type="separator" default="FLEXI_FIELD_CONTENT_PLUGINS" description="FLEXI_FIELD_CONTENT_PLUGINS_DESC" level="level2"  />
 			<field name="trigger_onprepare_content" type="radio" default="0" label="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT" description="FLEXI_ENABLE_TRIGGER_ONPREPARECONTENT_EVENT_DESC">
 				<option value="0">FLEXI_NO</option>
@@ -110,8 +127,8 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="pretext" type="text" default="" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
-			<field name="posttext" type="text" default="" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
+			<field name="pretext" type="text" default="" size="50" label="FLEXI_FIELD_VALUE_PREFIX_TEXT" description="FLEXI_FIELD_VALUE_PREFIX_TEXT_DESC" />
+			<field name="posttext" type="text" default="" size="50" label="FLEXI_FIELD_VALUE_SUFFIX_TEXT" description="FLEXI_FIELD_VALUE_SUFFIX_TEXT_DESC" />
 			<field name="separatorf" type="list" default="1" label="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS" description="FLEXI_VALUE_SEPARATOR_FRONTEND_VIEWS_DESC">
 				<option value="0">FLEXI_SPACE</option>
 				<option value="1">FLEXI_LINE_BREAK</option>
@@ -120,9 +137,10 @@
 				<option value="4">FLEXI_CLOSE_OPEN_TEXTS_AS_SEP</option>
 				<option value="5">FLEXI_NOCHAR_EMPTY_SEPARATOR</option>
 			</field>
-			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
-			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
+			<field name="opentag" type="text" default="" size="50" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
+			<field name="closetag" type="text" default="" size="50" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
+
 			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level0" />
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />

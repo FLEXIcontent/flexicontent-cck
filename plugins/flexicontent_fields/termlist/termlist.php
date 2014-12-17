@@ -58,7 +58,6 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
 		$editor  = JFactory::getEditor($editor_name);
 		$editor_plg_params = array();  // Override parameters of the editor plugin, nothing yet
-		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
 		
 		
 		// ****************
@@ -80,9 +79,9 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		// Default value
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
-		$title_size      = $field->parameters->get( 'title_size', 80 ) ;
 		
-		// Input validation & editing
+		// Input field display size & max characters
+		$title_size      = $field->parameters->get( 'title_size', 80 ) ;
 		$title_maxlength = $field->parameters->get( 'title_size', 0 ) ;
 		
 		
@@ -97,14 +96,13 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		
-		// Input validation & editing
+		// Input max characters & editing
 		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
-		$validation= $field->parameters->get( 'validation', $field->field_type == 'maintext' ? 2 : 1 ) ;  // server side enforced
 		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 1 );  // load HTML editor
 		
 		// *** Simple Textarea configuration  ***
-		$cols  = $field->parameters->get( 'cols', 75 ) ;
-		$rows  = $field->parameters->get( 'rows', 20 ) ;
+		$rows  = $field->parameters->get( 'rows', 6 ) ;
+		$cols  = $field->parameters->get( 'cols', 80 ) ;
 		
 		// *** HTML Editor configuration  ***
 		
@@ -176,23 +174,16 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				
-				//newField.find('label.labeltitle').text('".$title_label." '+parseInt(rowCount".$field->id."+1)+':');
-				//newField.find('label.labeltitle').text('".$value_label." '+parseInt(rowCount".$field->id."+1)+':');
-				newField.find('label.labeltitle').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_title');
-				newField.find('label.labeltext').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-				";
-				
-			$js .= "
+				// Handle the new term title
 				newField.find('input.termtitle').val('');
 				newField.find('input.termtitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				newField.find('input.termtitle').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
-				";
 				
-			$js .= "
-				// Create a new textarea
+				// Handle the new term description
 				var boxClass = 'termtext';
 				var container = newField.find('.fc_'+boxClass);
 				container.after('<div class=\"fc_'+boxClass+'\"></div>');  // Append a new container box
+				container.find('label.labeltext').show().appendTo(container.next()); // Copy the label
 				container.find('textarea').show().appendTo(container.next()); // Copy only the textarea (first make it visible) into the new container
 				container.remove(); // Remove old (cloned) container box along with all the contents
 				
@@ -203,19 +194,27 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
 				theArea.removeClass(); // Remove all classes from the textarea
 				theArea.addClass(boxClass);
+				
+				// Update the labels
+				//newField.find('label.labeltitle').text('".$title_label." '+parseInt(rowCount".$field->id."+1)+':');
+				//newField.find('label.labeltitle').text('".$value_label." '+parseInt(rowCount".$field->id."+1)+':');
+				newField.find('label.labeltitle').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_title');
+				newField.find('label.labeltext').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
 				";
 			
 			// Add to new field to DOM
 			$js .= "
 				newField.insertAfter( lastField );
 				if (remove_previous) lastField.remove();
-				
-				// Attach a new JS HTML editor object
-				tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+			";
+			
+			// Attach a new JS HTML editor object
+			if ($use_html) $js .= "
+				if (typeof tinyMCE !== 'undefined') tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
 			";
 			
 			// Add new element to sortable objects (if field not in group)
-			if (!$use_ingroup) $js .="
+			if (!$use_ingroup) $js .= "
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
 					containment: 'parent',
@@ -254,31 +253,9 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			";
 			
 			$css .= '
-			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: normal; }
-			#sortables_'.$field->id.' li {
-				clear: both;
-				float: left;
-				display: block;
-				list-style: none;
-				height: auto;
-				position: relative;
-				background: white!important;
-				border-radius:5px !important;
-				margin-bottom:10px !important;
-				padding:5px !important;
-				border:1px dashed #444 !important;
-			}
-			#sortables_'.$field->id.' li.sortabledisabled {
-				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
-			}
-			#sortables_'.$field->id.' li input { cursor: text;}
-			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
-			#sortables_'.$field->id.' li .admintable { text-align: left; }
 			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
-			#sortables_'.$field->id.' label.label, #sortables_'.$field->id.' .termtitle, #sortables_'.$field->id.' .termtext, #sortables_'.$field->id.' input.fcfield-button {
-				float: none;
-				display: inline-block;
-			}
+			.fcfieldval_container_'.$field->id.' .fc_termtitle, .fcfieldval_container_'.$field->id.' .fc_termtext { float: left; display: inline-block; }
+			.fcfieldval_container_'.$field->id.' .fc_termtitle label, .fcfieldval_container_'.$field->id.' .fc_termtext label { vertical-align: top; }
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
@@ -295,6 +272,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
+		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
 			// Compatibility for unserialized values
@@ -303,18 +281,14 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			} else {
 				$value = array('title' => $value, 'text' => '');
 			}
-			// Validate the value, this should have been done by save task already ... but
-			$value['text'] = $validation ?
-				($validation==2 ? JComponentHelper::filterText($value['text']) : $ifilter->clean($value['text'], 'string')) :  // SAFE HTML
-				flexicontent_html::striptagsandcut($value['text'], $maxlength) ;  // PLAIN TEXT ... OR PLAIN TEXT VIA ... JFilterOutput::cleanText($value['text']) ;
 			
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
 			$title = '
-				<label class="label label-info labeltitle" for="'.$elementid_n.'_title">'.$title_label./*' '.($multiple?($n+1):'').*/'</label><br/>
 				<div class="fc_termtitle">
-					<input class="fcfield_textval termtitle" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" maxlength="'.$title_maxlength.'" value="'.htmlspecialchars( @$value['title'], ENT_COMPAT, 'UTF-8' ).'" /><br/>
+					<label class="label label-info labeltitle" for="'.$elementid_n.'_title">'.$title_label./*' '.($multiple?($n+1):'').*/'</label>
+					<input class="fcfield_textval termtitle" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" maxlength="'.$title_maxlength.'" value="'.htmlspecialchars( @$value['title'], ENT_COMPAT, 'UTF-8' ).'" />
 				</div>
 			';
 			
@@ -327,8 +301,8 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				'';
 			
 			$text = '
-				<label class="label label-info labeltext" for="'.$elementid_n.'_text">'.$value_label.' './*($multiple?($n+1):'').*/'</label>
 				<div class="fc_termtext">
+					<label class="label label-info labeltext" for="'.$elementid_n.'_text">'.$value_label.' './*($multiple?($n+1):'').*/'</label>
 					'.$text.'
 				</div>
 				';
@@ -336,7 +310,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			$field->html[] = '
 				'.($use_ingroup ? '' : $move2).'
 				'.($use_ingroup ? '' : $remove_button).'
-				<div class="clear"></div>
+				'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
 				'.$title.'
 				'.$text.'
 				';
@@ -368,9 +342,14 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// Some variables
-		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
-		$maxlength = $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
-		$validation= $field->parameters->get( 'validation', $field->field_type == 'maintext' ? 2 : 1 ) ;  // server side enforced
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
+		
+		// Value handling parameters
+		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
+		$clean_output = $field->parameters->get('clean_output', 0);
+		$encode_output = $field->parameters->get('encode_output', 0);
+		$multiple = $field->parameters->get( 'allow_multiple', 0 ) ;
 		
 		// Term Title
 		$title_label = JText::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
@@ -396,9 +375,12 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			$values[0]['text'] = JText::_($default_value);
 			$values[0] = serialize($values[0]);
 		}
-		// Clean output
-		else {
-			foreach ($values as & $value) {
+		
+		// Clean output, SAFE HTML
+		if ($language_filter || $clean_output || $encode_output) {
+			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
+			foreach ($values as & $value)
+			{
 				if ( empty($value) ) continue;
 				
 				// Compatibility for unserialized values
@@ -407,17 +389,17 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				} else {
 					$value = array('title' => $value, 'text' => '');
 				}
-				
-				$value['title'] = $ifilter->clean($value['title'], 'string');
-				$value['text']  = $ifilter->clean($value['text'], 'string');
+				if ($clean_output) {
+					$value['title'] = $ifilter->clean($value['title'], 'string');
+					$value['text']  = $ifilter->clean($value['text'], 'string');
+				}
+				if ($encode_output) {
+					$value['title'] = htmlspecialchars( $value['title'], ENT_QUOTES, 'UTF-8' );
+					$value['text']  = htmlspecialchars( $value['text'], ENT_QUOTES, 'UTF-8' );
+				}
 			}
 		}
 		
-		// Value handling parameters
-		$multiple       = $field->parameters->get( 'allow_multiple', 0 ) ;
-		
-		// Language filter the values
-		//$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -466,7 +448,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$n = 0;
 		foreach ($values as $value)
 		{
-			if ( empty($value) ) continue;
+			if ( empty($value) && !$use_ingroup ) continue;
 			
 			$title = '<label class="fc_termtitle label label-success">'.$value['title'].'</label>';
 			$text  = '<div class="fc_termdesc">'.$value['text'].'</div>';
@@ -478,12 +460,15 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		// Apply separator and open/close tags
-		$field->{$prop} = implode($separatorf, $field->{$prop});
-		if ( $field->{$prop}!=='' ) {
-			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-		} else {
-			$field->{$prop} = '';
+		if (!$use_ingroup)  // do not convert the array to string if field is in a group
+		{
+			// Apply separator and open/close tags
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+			if ( $field->{$prop}!=='' ) {
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			} else {
+				$field->{$prop} = '';
+			}
 		}
 	}
 	
@@ -503,9 +488,10 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';
-		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
-		$maxlength = $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
-		$validation= $field->parameters->get( 'validation', $field->field_type == 'maintext' ? 2 : 1 ) ;  // server side enforced
+		
+		// Server side validation
+		$validation = $field->parameters->get( 'validation', 2 ) ;
+		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -524,15 +510,14 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				}
 			}
 			
-			if ($post[$n]['title'] !== '' || $use_ingroup)
-			{
-				$newpost[$new] = $post[$n];
-				$newpost[$new]['title'] = $post[$n]['title'];  // NO TAG STRIPPING, this should be encoded when displayed !!!
-				$newpost[$new]['text']  = $validation ?
-					($validation==2 ? JComponentHelper::filterText($post[$n]['text']) : $ifilter->clean($post[$n]['text'], 'string')) :  // SAFE HTML
-					flexicontent_html::striptagsandcut($post[$n]['text'], $maxlength) ;  // PLAIN TEXT ... OR PLAIN TEXT VIA ... JFilterOutput::cleanText($post[$n]) ;
-				$new++;
-			}
+			// Do server-side validation and skip empty values
+			$post[$n]['title'] = trim(flexicontent_html::dataFilter($post[$n]['title'], $maxlength, 'HTML', 0));
+			$post[$n]['text']  = trim(flexicontent_html::dataFilter($post[$n]['text'], $maxlength, $validation, 0));
+			
+			if (!strlen($post[$n]['title']) && !$use_ingroup) continue; // skip empty values
+			
+			$newpost[$new] = $post[$n];
+			$new++;
 		}
 		$post = $newpost;
 		
@@ -594,7 +579,16 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
-		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('title'), $search_properties=array('title','text'), $properties_spacer=' ', $filter_func=null);
+		// a. Each of the values of $values array will be added to the advanced search index as searchable text (column value)
+		// b. Each of the indexes of $values will be added to the column 'value_id',
+		//    and it is meant for fields that we want to be filterable via a drop-down select
+		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
+		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
+		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('title'), $search_properties=array('title','text'), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
 	
@@ -605,7 +599,13 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
-		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('title'), $search_properties=array('title','text'), $properties_spacer=' ', $filter_func=null);
+		// a. Each of the values of $values array will be added to the basic search index (one record per item)
+		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
+		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('title'), $search_properties=array('title','text'), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
 	

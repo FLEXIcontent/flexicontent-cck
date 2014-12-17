@@ -913,7 +913,34 @@ class flexicontent_html
 		}
 		return $arr_str;
 	}
-
+	
+	
+	// Server-Side validation
+	static function dataFilter( $v, $maxlength=0, $validation='string', $check_callable=0 )
+	{
+		if ($validation==0) return flexicontent_html::striptagsandcut( $v, $maxlength );
+		
+		$v = $maxlength ? substr($v, 0, $maxlength) : $v;
+		if ($check_callable) {
+			if (strpos($validation, '::') !== false && is_callable(explode('::', $validation)))
+				return call_user_func(explode('::', $validation), $v);   // A callback class method
+			
+			elseif (function_exists($validation))
+				return call_user_func($validation, $v);  // A callback function
+		}
+		
+		// Do filtering 
+		if ($validation==1) $safeHtmlFilter = JFilterInput::getInstance(null, null, 1, 1);
+		else if ($validation!=2) $noHtmlFilter = JFilterInput::getInstance();
+		switch ($validation) {
+			case  1: $v = $safeHtmlFilter->clean($v, 'string'); break; // Allow safe HTML
+			case  2: $v = JComponentHelper::filterText($v); break;  // Filter according to user group Text Filters
+			default: $v = $noHtmlFilter->clean($v, $validation); break;  // Filter using JFilterInput
+		}
+		return $v;
+	}
+	
+	
 	/**
 	 * Strip html tags and cut after x characters
 	 *
