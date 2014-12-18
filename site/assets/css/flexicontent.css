@@ -1119,6 +1119,9 @@ div.current dd {
 	-moz-border-radius: 5px !important;
 	-webkit-border-radius: 5px !important;
 }
+.fc_image_thumb {
+	display: inline-block;
+}
 
 /* ADD button used by fields (item form) */
 .button-add a {

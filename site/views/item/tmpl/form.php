@@ -1139,7 +1139,7 @@ if ($this->fields && $typeid) :
 			?>
 			
 			<div class='fcclear'></div>
-			<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
+			<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
 				<?php echo $field->label; ?>
 			</label>
 			

@@ -343,6 +343,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		
 		// Some variables
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Value handling parameters
@@ -376,29 +377,33 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			$values[0] = serialize($values[0]);
 		}
 		
-		// Clean output, SAFE HTML
-		if ($language_filter || $clean_output || $encode_output) {
+		// Unserialize and clean output, SAFE HTML
+		if ($clean_output) {
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
-			foreach ($values as & $value)
-			{
-				if ( empty($value) ) continue;
-				
-				// Compatibility for unserialized values
-				if ( @unserialize($value)!== false || $value === 'b:0;' ) {
-					$value = unserialize($value);
-				} else {
-					$value = array('title' => $value, 'text' => '');
-				}
-				if ($clean_output) {
-					$value['title'] = $ifilter->clean($value['title'], 'string');
-					$value['text']  = $ifilter->clean($value['text'], 'string');
-				}
-				if ($encode_output) {
-					$value['title'] = htmlspecialchars( $value['title'], ENT_QUOTES, 'UTF-8' );
-					$value['text']  = htmlspecialchars( $value['text'], ENT_QUOTES, 'UTF-8' );
-				}
-			}
 		}
+		foreach ($values as & $value)
+		{
+			if ( empty($value) ) continue;
+			
+			// Compatibility for unserialized values
+			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
+				$value = unserialize($value);
+			} else {
+				$value = array('title' => $value, 'text' => '');
+			}
+			if ($lang_filter_values) {
+				$value['title'] = JText::_($value['title']);
+				$value['text']  = JText::_($value['text']);
+			}
+			if ($clean_output) {
+				$value['title'] = $ifilter->clean($value['title'], 'string');
+				$value['text']  = $ifilter->clean($value['text'], 'string');
+			}
+			if ($encode_output) {
+				$value['title'] = htmlspecialchars( $value['title'], ENT_QUOTES, 'UTF-8' );
+				$value['text']  = htmlspecialchars( $value['text'], ENT_QUOTES, 'UTF-8' );
+			}
+		}		
 		
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
@@ -450,11 +455,16 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		{
 			if ( empty($value) && !$use_ingroup ) continue;
 			
-			$title = '<label class="fc_termtitle label label-success">'.$value['title'].'</label>';
-			$text  = '<div class="fc_termdesc">'.$value['text'].'</div>';
+			$html = '';
+			if ( strlen($value['title']) ) {
+				$html .= '
+					<label class="fc_termtitle label label-success">'.$value['title'].'</label>
+					<div class="fc_termdesc">'.$value['text'].'</div>
+				';
+			} 
 			
 			// Add prefix / suffix
-			$field->{$prop}[]	= $pretext. $title . $text . $posttext;
+			$field->{$prop}[]	= !$add_enclosers ? $html : $pretext . $html . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist

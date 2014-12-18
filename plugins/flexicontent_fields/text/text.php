@@ -299,6 +299,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		
 		// Some variables
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Value handling parameters
@@ -325,8 +326,11 @@ class plgFlexicontent_fieldsText extends JPlugin
 		}
 		
 		// Clean output, SAFE HTML
-		if ($language_filter || $clean_output || $encode_output) {
+		if ($clean_output) {
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
+		}
+		if ($lang_filter_values || $clean_output || $encode_output)
+		{
 			foreach ($values as & $value)
 			{
 				if ( empty($value) ) continue;
@@ -394,7 +398,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			if ( !strlen($value) && !$use_ingroup ) continue;
 			
 			// Add prefix / suffix
-			$field->{$prop}[]	= $pretext . $value . $posttext;
+			$field->{$prop}[]	= !$add_enclosers ? $value : $pretext . $value . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
@@ -431,7 +435,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 					default: $usagetype = ''; break;
 				}
 				if ($usagetype) {
-					$content_val = flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen);
+					$content_val = !$use_ingroup ? flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen) :
+						flexicontent_html::striptagsandcut($opentag.implode($separatorf, $field->{$prop}).$closetag, $ogpmaxlen) ;
 					JFactory::getDocument()->addCustomTag('<meta property="og:'.$usagetype.'" content="'.$content_val.'" />');
 				}
 			}

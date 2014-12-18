@@ -64,14 +64,15 @@
 				<option value="HTML">FLEXI_FIELD_PLAIN_TEXT_ALLOW_ENTITIES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_SIMPLE_TEXTAREA" description="FLEXI_SIMPLE_TEXTAREA_DESC" level="level2" />
-			<field name="rows" type="text" default="6" size="2" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" />
-			<field name="cols" type="text" default="80" size="2" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
 			<field name="maxlength" type="text" default="" size="6" label="FLEXI_MAX_TXT_LEN" description="FLEXI_MAX_TXT_LEN_DESC" />
 			<field name="use_html" type="radio" default="0" label="FLEXI_FIELD_TEXTAREA_EDITOR_MODE" description="FLEXI_FIELD_TEXTAREA_EDITOR_MODE_DESC">
 				<option value="1">FLEXI_HTML_EDITOR</option>
 				<option value="0">FLEXI_SIMPLE_TEXTAREA</option>
 			</field>
+			
+			<field name="" type="separator" default="FLEXI_SIMPLE_TEXTAREA" description="FLEXI_SIMPLE_TEXTAREA_DESC" level="level2" />
+			<field name="rows" type="text" default="6" size="2" label="FLEXI_FIELD_ROWS" description="FLEXI_FIELD_ROWS_DESC" />
+			<field name="cols" type="text" default="80" size="2" label="FLEXI_FIELD_COLS" description="FLEXI_FIELD_COLS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_HTML_EDITOR" description="FLEXI_HTML_EDITOR_DESC" level="level2" />
 			<field name="height" type="text" default="350px" size="6" label="FLEXI_FIELD_HEIGHT" description="FLEXI_FIELD_HEIGHT_DESC" />
@@ -138,7 +139,6 @@
 			</field>
 			<field name="ogpmaxlen" type="text" default="300" label="FLEXI_SOCIAL_TXT_MAXLEN_LISTING" description="FLEXI_SOCIAL_TXT_MAXLEN_LISTING_DESC" />
 
-
 			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level0" />
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
@@ -146,10 +146,8 @@
 				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_TABBING_PARAMS" level="level0" />
+			<field name="" type="separator" default="FLEXI_TABBING_PARAMS" description="FLEXI_TABBING_PARAMS_DESC" level="level0" />
 			
-			<field name="" type="separator" default="FLEXI_TABBING_PARAMS_DESC" level="level3" menu="hide" />
-		
 			<field name="editorarea_per_tab" type="radio" default="0" label="FLEXI_ONE_PER_TABS" description="FLEXI_ONE_PER_TABS_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

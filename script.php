@@ -69,7 +69,7 @@ class com_flexicontentInstallerScript
 		}
 		
 		// first check if PHP5 is running
-		$PHP_VERSION_NEEDED = FLEXI_J16GE ? '5.3.0' : '5.1.0';
+		$PHP_VERSION_NEEDED = '5.3.0';
 		if (version_compare(PHP_VERSION, $PHP_VERSION_NEEDED, '<'))
 		{
 			// load english language file for 'com_flexicontent' component then override with current language file
@@ -261,7 +261,7 @@ class com_flexicontentInstallerScript
 				</td>
 				<td valign="top" width="100%">
 		       	 	<strong>FLEXIcontent</strong><br/>
-		       	 	<span>Flexible content management system for Joomla! J1.5/J2.5/J3.2</span><br />
+		       	 	<span>Flexible content management system for Joomla! J2.5/J3.x</span><br />
 		        	<font class="small">by <a href="http://www.vistamedia.fr" target="_blank">Emmanuel Danan</a>,
 							Georgios Papadakis<br/>
 		        	<font class="small">and <a href="http://www.marvelic.co.th" target="_blank">Marvelic Engine Co.,Ltd.</a><br/>

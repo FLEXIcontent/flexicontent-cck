@@ -129,14 +129,14 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			if ($prev_id) {
 				$field->prev = $rows[$prev_id];
 				$field->prevtitle = $field->prev->title;
-				$field->prevurl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->prev->slug, $field->prev->categoryslug));
+				$field->prevurl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->prev->slug, $field->prev->categoryslug, 0, $field->prev));
 			}
 			
 			// next content item
 			if ($next_id) {
 				$field->next = $rows[$next_id];
 				$field->nexttitle = $field->next->title;
-				$field->nexturl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->next->slug, $field->next->categoryslug));
+				$field->nexturl = JRoute::_(FlexicontentHelperRoute::getItemRoute($field->next->slug, $field->next->categoryslug, 0, $field->next));
 			}
 		}
 		
@@ -157,7 +157,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			if (!empty($rows[$item->id]->categoryslug)) {
 				$html .= '
 				<span class="return_category">
-					<a class="btn" href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)).'?start='.$start .'">' . htmlspecialchars($category_label, ENT_NOQUOTES)
+					<a class="btn" href="'. JRoute::_(FlexicontentHelperRoute::getCategoryRoute($rows[$item->id]->categoryslug)).'?start='.$start .'">' . htmlspecialchars($category_label, ENT_NOQUOTES, 'UTF-8')
 					.($cat_image ? '<br/><img src="'.$cat_image.'"/>' : '') .'
 					</a>
 				</span>';
@@ -179,7 +179,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($tooltip_title_prev, $field->prevtitle, 0) .'"' : '';
 			$html .= '
 			<span class="pagenav_prev' . ($use_tooltip ? $tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . '>
-				<a class="btn" href="'. $field->prevurl .'">' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES) )
+				<a class="btn" href="'. $field->prevurl .'">' . ( $use_title ? $field->prevtitle : htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8') )
 				.(isset($thumbs[$field->prev->id]) ? '<br/><img src="'.$thumbs[$field->prev->id].'"/>' : '') .'
 				</a>
 			</span>'
@@ -187,7 +187,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		} else {
 			$html .= '
 			<span class="pagenav_prev">
-				<span class="noprevnext">'.htmlspecialchars($prev_label, ENT_NOQUOTES).'</span>
+				<span class="noprevnext">'.htmlspecialchars($prev_label, ENT_NOQUOTES, 'UTF-8').'</span>
 			</span>'
 			;
 		}
@@ -198,7 +198,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 			$tooltip = $use_tooltip ? ' title="'. flexicontent_html::getToolTip($tooltip_title_next, $field->nexttitle, 0) .'"' : '';
 			$html .= '
 			<span class="pagenav_next' . ($use_tooltip ? $tooltip_class : '') . '" ' . ($use_tooltip ? $tooltip : '') . '>
-				<a class="btn" href="'. $field->nexturl .'">' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES) ) 
+				<a class="btn" href="'. $field->nexturl .'">' . ( $use_title ? $field->nexttitle : htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8') ) 
 				.(isset($thumbs[$field->next->id]) ? '<br/><img src="'.$thumbs[$field->next->id].'"/>' : '') .'
 				</a>
 			</span>'
@@ -206,7 +206,7 @@ class plgFlexicontent_fieldsFcpagenav extends JPlugin
 		} else {
 			$html .= '
 			<span class="pagenav_next">
-				<span class="noprevnext">'.htmlspecialchars($next_label, ENT_NOQUOTES).'</span>
+				<span class="noprevnext">'.htmlspecialchars($next_label, ENT_NOQUOTES, 'UTF-8').'</span>
 			</span>'
 			;
 		}
