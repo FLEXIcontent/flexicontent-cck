@@ -5100,8 +5100,8 @@ class flexicontent_db
 				$order_dir	= 'DESC';
 				break;
 			case 'order': case 'catorder': /* 2nd is for module */
-				$order_col	= $rel_as.'.catid, '.$rel_as.'.ordering';
-				$order_dir	= 'ASC';
+				$order_col	= $rel_as.'.catid, '.$rel_as.'.ordering ASC, '.$rel_as.'.id DESC';
+				$order_dir	= '';
 				break;
 
 			// SPECIAL case custom field

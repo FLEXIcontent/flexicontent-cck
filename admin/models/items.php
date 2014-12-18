@@ -421,8 +421,7 @@ class FlexicontentModelItems extends JModelLegacy
 		if ($checkNoExtData)  $match_rules[] = 'ie.item_id IS NULL';
 		if ($checkInvalidCat) $match_rules[] = 'cat.id IS NULL';
 		if ( empty($match_rules) ) return $count_only ? 0 : array();
-		$query 	= 'SELECT '. ($count_only ? 'COUNT(*)' : 'c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state')
-			. (FLEXI_J16GE ? ', c.language' : '')
+		$query 	= 'SELECT '. ($count_only ? 'COUNT(*)' : 'c.id, c.title, c.introtext, c.`fulltext`, c.catid, c.created, c.created_by, c.modified, c.modified_by, c.version, c.state, c.language')
 			. ' FROM #__content as c'
 			. ($checkNoExtData  ? ' LEFT JOIN #__flexicontent_items_ext as ie ON c.id=ie.item_id' : '')
 			. ($checkInvalidCat ? ' LEFT JOIN #__categories as cat ON c.catid=cat.id' : '')
@@ -756,9 +755,9 @@ class FlexicontentModelItems extends JModelLegacy
 		if ($filter_order == 'ie.lang_parent_id') {
 			$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir .", i.id ASC";
 		} else if ($filter_order == 'i.ordering') {
-			$orderby 	= ' ORDER BY i.catid, ' .$extra_order. $filter_order .' '. $filter_order_Dir .", i.id ASC";
+			$orderby 	= ' ORDER BY i.catid, ' .$extra_order. $filter_order .' '. $filter_order_Dir .", i.id DESC";
 		} else if ($filter_order == 'catsordering') {
-			$orderby 	= ' ORDER BY rel.catid, ' .$extra_order. $filter_order.' '.$filter_order_Dir .", i.id ASC";
+			$orderby 	= ' ORDER BY rel.catid, ' .$extra_order. $filter_order.' '.$filter_order_Dir .", i.id DESC";
 		} else {
 			$orderby 	= ' ORDER BY '.$filter_order.' '.$filter_order_Dir;
 		}
