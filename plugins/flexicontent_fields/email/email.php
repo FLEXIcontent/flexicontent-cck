@@ -190,20 +190,24 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
+			$value['addr'] = htmlspecialchars(JStringPunycode::emailToUTF8($value['addr']), ENT_COMPAT, 'UTF-8');
 			$addr = '
 				<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
 				<input class="emailaddr fcfield_textval validate-email'.$required.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['addr'].'" />
-			';
+				';
 			
-			if ($usetitle) $text = '
+			$text = '';
+			if ($usetitle) {
+				$value['text'] = isset($value['text']) ? htmlspecialchars($value['text'], ENT_COMPAT, 'UTF-8') : '';
+				$text = '
 				<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILTITLE' ).':</label>
-				<input class="emailtext fcfield_textval" name="'.$fieldname_n.'[text]" type="text" size="'.$size.'" value="'.@$value['text'].'" />
-			';
-			
+				<input class="emailtext fcfield_textval" name="'.$fieldname_n.'[text]" type="text" size="'.$size.'" value="'.$value['text'].'" />
+				';
+			}
 			
 			$field->html[] = '
 				'.$addr.'
-				'.@$text.'
+				'.$text.'
 				'.$move2.'
 				'.$remove_button.'
 				';
@@ -330,10 +334,11 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 						$pretext. JHTML::_('email.cloak', $addr, 1, $text, 0) .$posttext :
 						$pretext. '<a href="mailto:'.$addr.'" target="_blank">' .$text. '</a>' .$posttext;
 			} else {
+				$utf8_addr = JStringPunycode::emailToUTF8($addr);  // email in Punycode to UTF8, for the purpose of displaying it
 				$field->{$prop}[]	=
 					($format!='feed') ?
-						$pretext. JHTML::_('email.cloak', $addr) .$posttext :
-						$pretext. '<a href="mailto:'.$addr.'" target="_blank">' .$addr. '</a>' .$posttext;
+						$pretext. JHTML::_('email.cloak', $addr, $addr!=$utf8_addr, $utf8_addr) .$posttext :
+						$pretext. '<a href="mailto:'.$addr.'" target="_blank">' .$utf8_addr. '</a>' .$posttext;
 			}
 			
 			$n++;
@@ -382,8 +387,14 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			
 			if ($post[$n]['addr'] !== '')
 			{
-				$newpost[$new] = $post[$n];
-				$newpost[$new]['addr'] = $post[$n]['addr'];
+				// Check for valid email before cleaning it
+				$email_regexp = "/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/";
+				if (!preg_match($email_regexp, $post[$n]['addr'])) {
+					$post[$n]['addr'] = invalid;
+				}
+				$post[$n]['addr'] = flexicontent_html::dataFilter($post[$n]['addr'], 0, 'EMAIL', 0);
+				
+				$newpost[$new]['addr'] = JStringPunycode::emailToPunycode( $prefix.$post[$n]['addr'] );
 				$newpost[$new]['text'] = strip_tags(@$post[$n]['text']);
 				$new++;
 			}

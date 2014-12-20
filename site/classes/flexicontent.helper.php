@@ -935,8 +935,17 @@ class flexicontent_html
 		switch ($validation) {
 			case  1: $v = $safeHtmlFilter->clean($v, 'string'); break; // Allow safe HTML
 			case  2: $v = JComponentHelper::filterText($v); break;  // Filter according to user group Text Filters
+			case 'URL': case 'url':
+				$v = trim($noHtmlFilter->clean($v, 'HTML')); // This cleans some of the more dangerous characters but leaves special characters that are valid.
+				$v = str_replace(array('<', '>', '"'), '', $v);  // <>" are never valid in a uri see http://www.ietf.org/rfc/rfc1738.txt.
+				break;
+			case 'EMAIL': case 'email':
+				$v = trim($noHtmlFilter->clean($v, 'HTML')); // This cleans some of the more dangerous characters but leaves special characters that are valid.
+				$v = str_replace(array('<', '>', '"'), '', $v);  // <>" are never valid in a email ?
+				break;
 			default: $v = $noHtmlFilter->clean($v, $validation); break;  // Filter using JFilterInput
 		}
+		$v = trim($v);
 		return $v;
 	}
 	

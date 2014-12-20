@@ -57,23 +57,28 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		// This is field 's MAIN value property
 		$link_usage   = $field->parameters->get( 'default_link_usage', 0 ) ;
 		$default_link = ($item->version == 0 || $link_usage > 0) ? $field->parameters->get( 'default_link', '' ) : '';
+		$default_link = $default_link ? JText::_($default_link) : '';
 		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
 		
 		// Optional value properties
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_title', '' )) : '';
+		$default_title = $default_title ? JText::_($default_title) : '';
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		
 		$text_usage   = $field->parameters->get( 'text_usage', 0 ) ;
 		$default_text = ($item->version == 0 || $text_usage > 0) ? $field->parameters->get( 'default_text', '' ) : '';
+		$default_text = $default_text ? JText::_($default_text) : '';
 		$usetext      = $field->parameters->get( 'use_text', 0 ) ;
 		
 		$class_usage   = $field->parameters->get( 'class_usage', 0 ) ;
 		$default_class = ($item->version == 0 || $class_usage > 0) ? $field->parameters->get( 'default_class', '' ) : '';
+		$default_class = $default_class ? JText::_($default_class) : '';
 		$useclass      = $field->parameters->get( 'use_class', 0 ) ;
 		
 		$id_usage   = $field->parameters->get( 'id_usage', 0 ) ;
 		$default_id = ($item->version == 0 || $id_usage > 0) ? $field->parameters->get( 'default_id', '' ) : '';
+		$default_id = $default_id ? JText::_($default_id) : '';
 		$useid      = $field->parameters->get( 'use_id', 0 ) ;
 		
 		$class_choices = $field->parameters->get( 'class_choices', '') ;
@@ -81,11 +86,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
-			$field->value[0]['link']  = JText::_($default_link);
-			$field->value[0]['title'] = JText::_($default_title);
-			$field->value[0]['text']  = JText::_($default_text);
-			$field->value[0]['class'] = JText::_($default_class);
-			$field->value[0]['id']    = JText::_($default_id);
+			$field->value[0]['link']  = $default_link;
+			$field->value[0]['title'] = $default_title;
+			$field->value[0]['linktext']  = $default_text;
+			$field->value[0]['class'] = $default_class;
+			$field->value[0]['id']    = $default_id;
 			$field->value[0]['hits']  = 0;
 			$field->value[0] = serialize($field->value[0]);
 		}
@@ -166,6 +171,22 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				
 				jQuery(thisNewField).show('slideDown');
 				
+				// Enable tooltips on new element
+				".( FLEXI_J30GE ? "
+					jQuery(thisNewField).find('.hasTooltip').tooltip({'html': true,'container': jQuery(thisNewField)});
+				" : "
+					var tipped_elements = jQuery(thisNewField).find('.hasTip');
+					tipped_elements.each(function() {
+						var title = this.get('title');
+						if (title) {
+							var parts = title.split('::', 2);
+							this.store('tip:title', parts[0]);
+							this.store('tip:text', parts[1]);
+						}
+					});
+					var ajax_JTooltips = new Tips($(#sortables_".$field->id."').getNext().getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
+				")."
+				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
@@ -180,20 +201,21 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			";
 			
 			$css = '
-			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
+			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: normal; }
 			#sortables_'.$field->id.' li {
 				clear: both;
 				display: block;
 				list-style: none;
 				height: auto;
 				position: relative;
+				width: 100%;
 			}
 			#sortables_'.$field->id.' li.sortabledisabled {
 				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
 			}
 			#sortables_'.$field->id.' li input { cursor: text;}
 			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
-			#sortables_'.$field->id.' li .admintable { text-align: left; }
+			#sortables_'.$field->id.' li .admintable { text-align: left; width: 100%; }
 			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
 			';
 			
@@ -219,56 +241,78 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			if ( !strlen($value) ) continue;
 			
 			$value = unserialize($value);
+			
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
-			$has_prefix = preg_match("#^http|^https|^ftp#i", $value['link']);
+			$value['link'] = !empty($value['link']) ? $value['link'] : $default_link;
+			$value['link'] = htmlspecialchars(JStringPunycode::urlToUTF8($value['link']), ENT_COMPAT, 'UTF-8');
 			$link = '
 				<tr><td class="key">' .JText::_( 'FLEXI_FIELD_URL' ). '</td><td>
-					<input class="urllink '.$required.'" id="'.$elementid_n.'" name="'.$fieldname_n.'[link]" type="text" size="'.$size.'" value="'.$value['link'].'" />
+					<input class="urllink fcfield_textval '.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['link'].'" />
 				</td></tr>';
 			
 			$autoprefix = '';
-			if ($allow_relative_addrs==2) $autoprefix = '
-				<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_AUTOPREFIX' ). '</td><td>
-					<input class="autoprefix" id="'.$elementid.'_autoprefix_0" name="'.$fieldname_n.'[autoprefix]" type="radio" value="0" '.( !$has_prefix ? 'checked="checked"' : '' ).'/>
-					<label for="'.$elementid.'_autoprefix_0">'.JText::_('FLEXI_NO').'</label>
-					<input class="autoprefix" id="'.$elementid.'_autoprefix_1" name="'.$fieldname_n.'[autoprefix]" type="radio" value="1" '.( $has_prefix ? 'checked="checked"' : '' ).'/>
-					<label for="'.$elementid.'_autoprefix_1">'.JText::_('FLEXI_YES').'</label>
+			if ($allow_relative_addrs==2) {
+				$_tip_title  = flexicontent_html::getToolTip(null, 'FLEXI_EXTWL_IS_RELATIVE_DESC', 1, 1);
+				$_tip_class  = (FLEXI_J30GE ? 'hasTooltip' : 'hasTip');
+				$is_absolute = (boolean) parse_url($value['link'], PHP_URL_SCHEME); // preg_match("#^http|^https|^ftp#i", $value['link']);
+				$autoprefix = '
+				<tr><td class="key '.$_tip_class.'" title="'.$_tip_title.'">'.JText::_( 'FLEXI_EXTWL_IS_RELATIVE' ). ' *</td><td>
+					<input class="autoprefix" id="'.$elementid.'_autoprefix_0" name="'.$fieldname_n.'[autoprefix]" type="radio" value="0" '.( !$is_absolute ? 'checked="checked"' : '' ).'/>
+					<label for="'.$elementid.'_autoprefix_0">'.JText::_('FLEXI_YES').'</label>
+					<input class="autoprefix" id="'.$elementid.'_autoprefix_1" name="'.$fieldname_n.'[autoprefix]" type="radio" value="1" '.( $is_absolute ? 'checked="checked"' : '' ).'/>
+					<label for="'.$elementid.'_autoprefix_1">'.JText::_('FLEXI_NO').'</label>
 				</td></tr>';
+			}
 			
 			$title = '';
-			if ($usetitle) $title = '
+			if ($usetitle) {
+				$value['title'] = !empty($value['title']) ? $value['title'] : $default_title;
+				$value['title'] = htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8');
+				$title = '
 				<tr><td class="key">'.JText::_( 'FLEXI_EXTWL_URLTITLE' ). '</td><td>
-					<input class="urltitle" name="'.$fieldname_n.'[title]" type="text" size="'.$size.'" value="'.(@$value['title'] ? $value['title'] : $default_title).'" />
+					<input class="urltitle fcfield_textval" name="'.$fieldname_n.'[title]" type="text" size="'.$size.'" value="'.$value['title'].'" />
 				</td></tr>';
+			}
 				
 			$linktext = '';
-			if ($usetext) $linktext = '
+			if ($usetext) {
+				$value['linktext'] = !empty($value['linktext']) ? $value['linktext'] : $default_text;
+				$value['linktext'] = htmlspecialchars($value['linktext'], ENT_COMPAT, 'UTF-8');
+				$linktext = '
 				<tr><td class="key">' .JText::_( 'FLEXI_EXTWL_URLLINK_TEXT' ). '</td><td>
-					<input class="urllinktext" name="'.$fieldname_n.'[linktext]" type="text" size="'.$size.'" value="'.(@$value['linktext'] ? $value['linktext'] : $default_text).'" />
+					<input class="urllinktext fcfield_textval" name="'.$fieldname_n.'[linktext]" type="text" size="'.$size.'" value="'.$value['linktext'].'" />
 				</td></tr>';
+			}
 			
 			$class = '';
+			if ($useclass) {
+				$value['class'] = !empty($value['class']) ? $value['class'] : $default_class;
+				$value['class'] = htmlspecialchars($value['class'], ENT_COMPAT, 'UTF-8');
+			}
 			if ($useclass==1) {
 				$class = '
 					<tr><td class="key">' .JText::_( 'FLEXI_EXTWL_URLCLASS' ). '</td><td>
-						<input class="urlclass" name="'.$fieldname_n.'[class]" type="text" size="'.$size.'" value="'.(@$value['class'] ? $value['class'] : $default_class).'" />
+						<input class="urlclass fcfield_textval" name="'.$fieldname_n.'[class]" type="text" size="'.$size.'" value="'.$value['class'].'" />
 					</td></tr>';
 			} else if ($useclass==2) {
-				$class_value = (@ $value['class'] ? $value['class'] : $default_class);
 				$class_attribs = ' class="urlclass" ';
 				$class = '
 					<tr><td class="key">' .JText::_( 'FLEXI_EXTWL_URLCLASS' ). '</td><td>
-						'.JHTML::_('select.genericlist', $class_options, $fieldname_n.'[class]', $class_attribs, 'value', 'text', $class_value, $class_elementid = '').'
+						'.JHTML::_('select.genericlist', $class_options, $fieldname_n.'[class]', $class_attribs, 'value', 'text', $value['class'], $class_elementid = '').'
 					</td></tr>';
 			}
 			
 			$id = '';
-			if ($useid) $id = '
+			if ($useid) {
+				$value['id'] = !empty($value['id']) ? $value['id'] : $default_id;
+				$value['id'] = htmlspecialchars($value['id'], ENT_COMPAT, 'UTF-8');
+				$id = '
 				<tr><td class="key">' .JText::_( 'FLEXI_EXTWL_URLID' ). '</td><td>
-					<input class="urlid" name="'.$fieldname_n.'[id]" type="text" size="'.$size.'" value="'.(@$value['id'] ? $value['id'] : $default_id).'" />
+					<input class="urlid" name="'.$fieldname_n.'[id]" type="text" size="'.$size.'" value="'.$value['id'].'" />
 				</td></tr>';
+			}
 			
 			$hits = (int) @ $value['hits'];
 			$hits = '
@@ -343,23 +387,28 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		// This is field 's MAIN value property
 		$link_usage   = $field->parameters->get( 'default_link_usage', 0 ) ;
 		$default_link = ($link_usage == 2) ? $field->parameters->get( 'default_link', '' ) : '';
+		$default_link = $default_link ? JText::_($default_link) : '';
 		
 		// Optional value properties
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_title', '' )) : '';
+		$default_title = $default_title ? JText::_($default_title) : '';
 		
 		$usetext      = $field->parameters->get( 'use_text', 0 ) ;
 		$text_usage   = $field->parameters->get( 'text_usage', 0 ) ;
 		$default_text = ($text_usage == 2)  ?  $field->parameters->get( 'default_text', '' ) : '';
+		$default_text = $default_text ? JText::_($default_text) : '';
 		
 		$useclass      = $field->parameters->get( 'use_class', 0 ) ;
 		$class_usage   = $field->parameters->get( 'class_usage', 0 ) ;
 		$default_class = ($class_usage == 2)  ?  $field->parameters->get( 'default_class', '' ) : '';
+		$default_class = $default_class ? JText::_($default_class) : '';
 		
 		$useid      = $field->parameters->get( 'use_id', 0 ) ;
 		$id_usage	  = $field->parameters->get( 'id_usage', 0 ) ;
 		$default_id = ($id_usage == 2)  ?  $field->parameters->get( 'default_id', '' ) : '';
+		$default_id = $default_id ? JText::_($default_id) : '';
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
@@ -371,11 +420,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 			return;
 		} else if ( empty($values) && strlen($default_link) ) {
 			$values = array();
-			$values[0]['link']  = JText::_($default_link);
-			$values[0]['title'] = JText::_($default_title);
-			$values[0]['text']  = JText::_($default_text);
-			$values[0]['class'] = JText::_($default_class);
-			$values[0]['id']    = JText::_($default_id);
+			$values[0]['link']  = $default_link;
+			$values[0]['title'] = $default_title;
+			$values[0]['text']  = $default_text;
+			$values[0]['class'] = $default_class;
+			$values[0]['id']    = $default_id;
 			$values[0]['hits']  = 0;
 			$values[0] = serialize($values[0]);
 		}
@@ -521,6 +570,11 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 		
 		$allow_relative_addrs = $field->parameters->get( 'allow_relative_addrs', 0 ) ;
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$host = JURI::getInstance('SERVER')->gethost();
+		
+		// Check if field has posted data
+		if ( empty($post) && !$use_ingroup) return;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -539,21 +593,47 @@ class plgFlexicontent_fieldsExtendedWeblink extends JPlugin
 				}
 			}
 			
-			if ($post[$n]['link'] !== '')
-			{
-				if ( $allow_relative_addrs ==1 || ($allow_relative_addrs==2 && !@$post[$n]['autoprefix']) ) {
-					$http_prefix = (!preg_match("#^/#i", $post[$n]['link'])) ? '/' : '';
-				} else {
-					$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
-				}
-				$newpost[$new]['link']    = $http_prefix.$post[$n]['link'];
-				$newpost[$new]['title']   = strip_tags(@$post[$n]['title']);
-				$newpost[$new]['id']      = strip_tags(@$post[$n]['id']);
-				$newpost[$new]['class']   = strip_tags(@$post[$n]['class']);
-				$newpost[$new]['linktext']= strip_tags(@$post[$n]['linktext']);
-				$newpost[$new]['hits']    = (int) @ $post[$n]['hits'];
-				$new++;
+			// Skip empty values
+			if ( empty($post[$n]['link']) && !$use_ingroup ) continue;
+			
+			
+			// ************
+			// Validate URL
+			// ************
+			
+			// Clean bad text/html
+			$link = flexicontent_html::dataFilter($post[$n]['link'], 0, 'URL', 0);
+			
+			// Check absolute/relative URLs
+			$force_absolute = $allow_relative_addrs==0 || ($allow_relative_addrs==2 && (int)$post[$n]['autoprefix']);
+			
+			// Has protocol nothing to do
+			if ( parse_url($link, PHP_URL_SCHEME) ) $prefix = '';
+			// Has current domain but no protocol just add http://
+			else if (strpos($link, $host) === 0) $prefix = 'http://';
+			// Relative URLs allowed, do to not add Joomla ROOT, to allow website to be moved and change subfolder
+			else if ( !$force_absolute ) $prefix = ''; //substr($link, 0, 1) == '/') ? '' : JURI::root(true) . '/';
+			// Absolute URLs are forced
+			else {
+				if (substr($link, 0, 10) == '/index.php')  $link = substr($link, 1);
+				$prefix = (substr($link, 0, 9) == 'index.php') ? JURI::root() : 'http://';
 			}
+			
+			// Convert to Punycode string
+			$newpost[$new]['link']    = JStringPunycode::urlToPunycode( $prefix.$link );
+			
+			
+			// *******************************
+			// Validate other value properties
+			//********************************
+			
+			// Validate other value properties
+			$newpost[$new]['title']   = flexicontent_html::dataFilter(@$post[$n]['title'], 0, 'STRING', 0);
+			$newpost[$new]['id']      = flexicontent_html::dataFilter(@$post[$n]['id'], 0, 'STRING', 0);
+			$newpost[$new]['class']   = flexicontent_html::dataFilter(@$post[$n]['class'], 0, 'STRING', 0);
+			$newpost[$new]['linktext']= flexicontent_html::dataFilter(@$post[$n]['linktext'], 0, 'STRING', 0);
+			$newpost[$new]['hits']    = (int) @ $post[$n]['hits'];
+			$new++;
 		}
 		$post = $newpost;
 		

@@ -802,6 +802,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	position: static;
 	margin:0px!important;
 	padding:0px!important;
+	width: 100%;
 }
 #flexicontent .fcfield-sortables > li { margin:0px 0px 4px 0px; padding:0px; }
 #flexicontent .fcfield-sortables > li .input-append,
