@@ -66,6 +66,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
+		$default_value = $default_value ? JText::_($default_value) : '';
 		
 		// Input field display size & max characters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
@@ -90,18 +91,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
-			$field->value[0] = JText::_($default_value);
+			$field->value[0] = $default_value;
 		}
-		
-		// Prepare for form field displaying, skipping empty values
-		$_values = array();
-		for ($n=0; $n<count($field->value); $n++) {
-			if (!strlen($field->value[$n]) && !$use_ingroup) continue;
-			$_values[] = $field->value[$n];
-		}
-		
-		// Making sure at least 1 value exists
-		$field->value =  !empty($_values) ? $_values : array('');
 		
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -143,14 +134,17 @@ class plgFlexicontent_fieldsText extends JPlugin
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				
-				var theInput = newField.find('input.fcfield_textval').first();  /* First element is the value input field, second is e.g remove button */
+				// Update the new text field
+				var theInput = newField.find('input.fcfield_textval').first();
 				theInput.val('');
 				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theInput.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
-
+				
+				// Update inputmask
 				var has_inputmask = newField.find('input.has_inputmask').length != 0;
 				if (has_inputmask)  newField.find('input.has_inputmask').inputmask();
 				
+				// Destroy any select2 elements
 				var has_select2 = newField.find('div.select2-container').length != 0;
 				if (has_select2) {
 					newField.find('div.select2-container').remove();
@@ -158,12 +152,13 @@ class plgFlexicontent_fieldsText extends JPlugin
 				}
 			";
 			
+			// Update select for textselect if it exists
 			if ($field->field_type=='textselect')
 				$js .= "
 				newField.parent().find('select.fcfield_textselval').val('');
 				";
 			
-			// Add to new field to DOM
+			// Add new field to DOM
 			$js .= "
 				newField.insertAfter( lastField );
 				if (remove_previous) lastField.remove();
@@ -257,6 +252,8 @@ class plgFlexicontent_fieldsText extends JPlugin
 		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
+			if ( empty($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+			
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
@@ -306,43 +303,43 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
 		$clean_output = $field->parameters->get('clean_output', 0);
 		$encode_output = $field->parameters->get('encode_output', 0);
-		$multiple = $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
 		
 		
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
 		
-		// Get field values, do not terminate yet if value is empty, since a default value on empty may have been defined
+		// Get field values
 		$values = $values ? $values : $field->value;
 		
 		// Load default value
 		if ( empty($values) ) {
 			if (!strlen($default_value)) {
-				$field->{$prop} = '';
+				$field->{$prop} = $use_ingroup ? array() : '';
 				return;
 			}
 			$values = array(JText::_($default_value));  // Default value is always language filtered
 		}
 		
-		// Clean output, SAFE HTML
+		// Language filter, clean output, encode HTML (* BECAUSE OF THIS, the value display loop expects unserialized values)
 		if ($clean_output) {
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
 		if ($lang_filter_values || $clean_output || $encode_output)
 		{
-			foreach ($values as & $value)
+			foreach ($values as $n => $value)
 			{
-				if ( empty($value) ) continue;
+				if ( empty($value) ) continue;  // skip further actions
 				
 				if ($lang_filter_values) {
-					$value = JText::_($value);
+					$values[$n] = JText::_($value);
 				}
 				if ($clean_output) {
-					$value = $ifilter->clean($value, 'string');
+					$values[$n] = $ifilter->clean($value, 'string');
 				}
 				if ($encode_output) {
-					$value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+					$values[$n] = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
 				}
 			}
 		}
@@ -398,7 +395,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			if ( !strlen($value) && !$use_ingroup ) continue;
 			
 			// Add prefix / suffix
-			$field->{$prop}[]	= !$add_enclosers ? $value : $pretext . $value . $posttext;
+			$field->{$prop}[$n]	= !$add_enclosers ? $value : $pretext . $value . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
@@ -471,7 +468,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		foreach ($post as $n => $v)
 		{
 			// Do server-side validation and skip empty values
-			$post[$n] = trim(flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0));
+			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
 			
 			if (!strlen($post[$n]) && !$use_ingroup) continue; // skip empty values
 			

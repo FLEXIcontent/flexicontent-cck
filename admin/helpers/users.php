@@ -162,6 +162,7 @@ class UsersHelper
 		{
 			$option->text = str_repeat('- ', $option->level).$option->text;
 		}
+		unset($option);  // unset the variable reference to avoid trouble if variable is reused, thus overwritting last pointed variable
 
 		return $options;
 	}

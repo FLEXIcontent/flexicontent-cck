@@ -112,16 +112,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$field->value[0] = JText::_($default_value);
 		}
 		
-		// Prepare for form field displaying, skipping empty values
-		$_values = array();
-		for ($n=0; $n<count($field->value); $n++) {
-			if (!strlen($field->value[$n]) && !$use_ingroup) continue;
-			$_values[] = $field->value[$n];
-		}
-		
-		// Making sure at least 1 value exists
-		$field->value =  !empty($_values) ? $_values : array('');
-		
 		// Field name and HTML TAG id
 		if ($field->field_type == 'textarea')
 		{
@@ -201,7 +191,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				theArea.addClass(boxClass);
 				";
 			
-			// Add to new field to DOM
+			// Add new field to DOM
 			$js .= "
 				newField.insertAfter( lastField );
 				if (remove_previous) lastField.remove();
@@ -280,6 +270,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					return;
 				}
 			}
+			if ( empty($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
 			$fieldname_n = $field->field_type == 'maintext' ? $fieldname : $fieldname.'['.$n.']';
 			$elementid_n = $field->field_type == 'maintext' ? $elementid : $elementid.'_'.$n;
@@ -291,7 +282,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 			$txtarea = !$use_html ? '
 				<textarea id="'.$elementid_n.'" name="' . $fieldname_n . '" style="width:auto;" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
-					.htmlspecialchars( $field->value[$n], ENT_COMPAT, 'UTF-8' ).
+					.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : $editor->display(
 					$fieldname_n, htmlspecialchars( $field->value[$n], ENT_COMPAT, 'UTF-8' ), '100%', $height, $cols, $rows,
@@ -346,34 +337,34 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
 		$clean_output = $field->parameters->get('clean_output', 0);
 		$encode_output = $field->parameters->get('encode_output', 0);
-		$multiple = $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
 		
 		
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
 		
-		// Get field values, do not terminate yet if value is empty, since a default value on empty may have been defined
+		// Get field values
 		$values = $values ? $values : $field->value;
 		
 		// Load default value
 		if ( empty($values) ) {
 			if (!strlen($default_value)) {
-				$field->{$prop} = '';
+				$field->{$prop} = $use_ingroup ? array() : '';
 				return;
 			}
 			$values = array($default_value);
 		}
 		
-		// Clean output, SAFE HTML
+		// Language filter, clean output, encode HTML
 		if ($clean_output) {
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
 		if ($lang_filter_values || $clean_output || $encode_output)
 		{
-			foreach ($values as & $value)
+			foreach ($values as &$value)
 			{
-				if ( empty($value) ) continue;
+				if ( empty($value) ) continue;  // skip further actions
 				
 				if ($lang_filter_values) {
 					$value = JText::_($value);
@@ -386,6 +377,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				}
 			}
 		}
+		unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
@@ -511,7 +503,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		foreach ($post as $n => $v)
 		{
 			// Do server-side validation and skip empty values
-			$post[$n] = trim(flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0));
+			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
 			
 			if (!strlen($post[$n]) && !$use_ingroup) continue; // skip empty values
 			

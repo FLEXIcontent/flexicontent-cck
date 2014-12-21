@@ -69,9 +69,9 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$required   = $required ? ' required' : '';
 		
 		
-		// ******************************
-		// Term title (optional property)
-		// ******************************
+		// **********
+		// Term title
+		// **********
 		
 		// Label
 		$title_label = JText::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
@@ -79,6 +79,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		// Default value
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$default_title = $default_title ? JText::_($default_title) : '';
 		
 		// Input field display size & max characters
 		$title_size      = $field->parameters->get( 'title_size', 80 ) ;
@@ -95,6 +96,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
+		$default_value = $default_value ? JText::_($default_value) : '';
 		
 		// Input max characters & editing
 		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
@@ -129,8 +131,8 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
-			$field->value[0]['title'] = JText::_($default_title);
-			$field->value[0]['text']  = JText::_($default_value);
+			$field->value[0]['title'] = $default_title;
+			$field->value[0]['text']  = $default_value;
 			$field->value[0] = serialize($field->value[0]);
 		}
 		
@@ -202,7 +204,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				newField.find('label.labeltext').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
 				";
 			
-			// Add to new field to DOM
+			// Add new field to DOM
 			$js .= "
 				newField.insertAfter( lastField );
 				if (remove_previous) lastField.remove();
@@ -254,8 +256,6 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			
 			$css .= '
 			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
-			.fcfieldval_container_'.$field->id.' .fc_termtitle, .fcfieldval_container_'.$field->id.' .fc_termtext { float: left; display: inline-block; }
-			.fcfieldval_container_'.$field->id.' .fc_termtitle label, .fcfieldval_container_'.$field->id.' .fc_termtext label { vertical-align: top; }
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
@@ -281,31 +281,30 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 			} else {
 				$value = array('title' => $value, 'text' => '');
 			}
+			if ( empty($value['title']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
 			$title = '
-				<div class="fc_termtitle">
+				<div class="nowrap_box fc_termtitle">
 					<label class="label label-info labeltitle" for="'.$elementid_n.'_title">'.$title_label./*' '.($multiple?($n+1):'').*/'</label>
 					<input class="fcfield_textval termtitle" id="'.$elementid_n.'_title" name="'.$fieldname_n.'[title]" type="text" size="'.$title_size.'" maxlength="'.$title_maxlength.'" value="'.htmlspecialchars( @$value['title'], ENT_COMPAT, 'UTF-8' ).'" />
-				</div>
-			';
+				</div>';
 			
 			$text = !$use_html ? '
 				<textarea class="fcfield_textval termtext" id="'.$elementid_n.'_text" name="'.$fieldname_n.'[text]" cols="'.$cols.'" rows="'.$rows.'">'
-					.htmlspecialchars( @$value['text'], ENT_COMPAT, 'UTF-8' ).
+					.htmlspecialchars( $value['text'], ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : ''
-					.$editor->display($fieldname_n.'[text]', htmlspecialchars( @$value['text'], ENT_COMPAT, 'UTF-8' ), $width='100%', $height='100%', $cols, $rows, $show_buttons, $elementid_n.'_text').
+					.$editor->display($fieldname_n.'[text]', htmlspecialchars( $value['text'], ENT_COMPAT, 'UTF-8' ), $width='100%', $height='100%', $cols, $rows, $show_buttons, $elementid_n.'_text').
 				'';
 			
 			$text = '
-				<div class="fc_termtext">
+				<div class="nowrap_box fc_termtext">
 					<label class="label label-info labeltext" for="'.$elementid_n.'_text">'.$value_label.' './*($multiple?($n+1):'').*/'</label>
 					'.$text.'
-				</div>
-				';
+				</div>';
 			
 			$field->html[] = '
 				'.($use_ingroup ? '' : $move2).'
@@ -350,47 +349,54 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
 		$clean_output = $field->parameters->get('clean_output', 0);
 		$encode_output = $field->parameters->get('encode_output', 0);
-		$multiple = $field->parameters->get( 'allow_multiple', 0 ) ;
+		$multiple = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
 		
 		// Term Title
 		$title_label = JText::_($field->parameters->get('title_label', 'FLEXI_FIELD_TERMTITLE'));
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$default_title = $default_title ? JText::_($default_title) : '';
 		
 		// Term (description) Text
 		$value_label = JText::_($field->parameters->get('value_label', 'FLEXI_FIELD_TERMTEXT'));
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
+		$default_value = $default_value ? JText::_($default_value) : '';
 		
-		// Get field values, do not terminate yet if value is empty, since a default value on empty may have been defined
+		// Get field values
 		$values = $values ? $values : $field->value;
 		
 		// Load default value
 		if ( empty($values) ) {
 			if (!strlen($default_value)) {
-				$field->{$prop} = '';
+				$field->{$prop} = $use_ingroup ? array() : '';
 				return;
 			}
 			$values = array();
-			$values[0]['title'] = JText::_($default_title);
-			$values[0]['text'] = JText::_($default_value);
+			$values[0]['title'] = $default_title;
+			$values[0]['text']  = $default_value;
 			$values[0] = serialize($values[0]);
 		}
 		
-		// Unserialize and clean output, SAFE HTML
+		
+		// ******************************************
+		// Language filter, clean output, encode HTML
+		// ******************************************
+		
 		if ($clean_output) {
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
-		foreach ($values as & $value)
+		// (* BECAUSE OF THIS, the value display loop expects unserialized values)
+		foreach ($values as &$value)
 		{
-			if ( empty($value) ) continue;
-			
-			// Compatibility for unserialized values
-			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
-				$value = unserialize($value);
+			// Compatibility for unserialized values or for NULL values in a field group
+			$v = !empty($value) ? @unserialize($value) : false;
+			if ( $v !== false || $v === 'b:0;' ) {
+				$value = $v;
 			} else {
 				$value = array('title' => $value, 'text' => '');
 			}
+			
 			if ($lang_filter_values) {
 				$value['title'] = JText::_($value['title']);
 				$value['text']  = JText::_($value['text']);
@@ -403,7 +409,8 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				$value['title'] = htmlspecialchars( $value['title'], ENT_QUOTES, 'UTF-8' );
 				$value['text']  = htmlspecialchars( $value['text'], ENT_QUOTES, 'UTF-8' );
 			}
-		}		
+		}
+		unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
@@ -453,7 +460,7 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		$n = 0;
 		foreach ($values as $value)
 		{
-			if ( empty($value) && !$use_ingroup ) continue;
+			if ( empty($value['title']) && !$use_ingroup ) continue;
 			
 			$html = '';
 			if ( strlen($value['title']) ) {
@@ -520,13 +527,18 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 				}
 			}
 			
-			// Do server-side validation and skip empty values
-			$post[$n]['title'] = trim(flexicontent_html::dataFilter($post[$n]['title'], $maxlength, 'HTML', 0));
-			$post[$n]['text']  = trim(flexicontent_html::dataFilter($post[$n]['text'], $maxlength, $validation, 0));
 			
-			if (!strlen($post[$n]['title']) && !$use_ingroup) continue; // skip empty values
+			// **************************************************************
+			// Validate data, skipping values that are empty after validation
+			// **************************************************************
 			
-			$newpost[$new] = $post[$n];
+			$title = flexicontent_html::dataFilter($post[$n]['title'], $maxlength, 'HTML', 0);
+			if (!strlen($title) && !$use_ingroup) continue; // Skip empty values
+			
+			$newpost[$new] = array();
+			$newpost[$new]['title'] = $title;
+			$newpost[$new]['text']  = flexicontent_html::dataFilter($post[$n]['text'], $maxlength, $validation, 0);
+			
 			$new++;
 		}
 		$post = $newpost;

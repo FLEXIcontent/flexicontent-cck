@@ -58,7 +58,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// Number of values
 		// ****************
 		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
-		$max_values = $use_ingroup ? 0 : (int)$field->parameters->get( 'max_values', 0 ) ;
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
@@ -277,7 +277,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				newField.find('input.imgcust2').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust2]');
 				";
 			
-			// Add to new field to DOM
+			// Add new field to DOM
 			$js .= "
 				newField.insertAfter( lastField );
 				if (remove_previous) lastField.remove();

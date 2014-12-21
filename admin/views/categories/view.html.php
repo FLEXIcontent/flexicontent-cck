@@ -205,6 +205,7 @@ class FlexicontentViewCategories extends JViewLegacy
 			foreach ($rows as &$item) {
 				$this->ordering[$item->parent_id][] = $item->id;
 			}
+			unset($item);  // unset the variable reference to avoid trouble if variable is reused, thus overwritting last pointed variable
 		}
 		$pagination 	= $this->get( 'Pagination' );
 		

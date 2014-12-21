@@ -498,7 +498,7 @@ table.paramlist.flexi > tbody > tr:nth-child(2) > td > .fcsep_level2,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level0,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level1,
 table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
-li:first-child > .fcsep_level0, li:first-child > .fcsep_level1, li:first-child > .fcsep_level2 {margin-top:0px;}
+:first-child > .fcsep_level0, :first-child > .fcsep_level1, :first-child > .fcsep_level2 {margin-top:0px !important;}
 div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-of-type > div > .fcsep_level1, div.control-group:first-of-type > div > .fcsep_level2 {margin-top:0px;}
 
 .fcsep_level3 {
