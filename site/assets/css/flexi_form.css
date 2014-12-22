@@ -30,10 +30,14 @@
 	margin-right: 12px;
 }
 
-#flexicontent .nowrap_box , .flexicontent .nowrap_box {
+#flexicontent .nowrap_box, .flexicontent .nowrap_box {
 	white-space: nowrap !important;
 	display: inline-block;
 	float: none;
+	vertical-align: top !important;
+}
+#flexicontent .nowrap_box .label, .flexicontent .nowrap_box .label {
+	vertical-align: top !important;
 }
 
 

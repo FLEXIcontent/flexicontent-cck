@@ -775,8 +775,8 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	position: relative;
 	/*background: lightyellow;*/
 	/*border: 1px solid lightgray;*/
-	margin: 0 8px 4px 0;
-	padding: 4px;
+	margin: 0 0% 4px 0%;
+	padding: 4px 1%;
 	float: left;
 }
 #flexicontent ul.ui-sortable > li.fcfieldval_container.valuebox {
@@ -784,12 +784,18 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 }
 .container_fcfield > ul.ui-sortable > li.fcfieldval_container.valuebox {
 	width: 100%;
+	padding: 1% !important;
+	margin: 0% !important;
 }
 .container_fcfield > ul.ui-sortable > li.fcfieldval_container.valuebox .flexi.label.sub_label {
 	width: 16% !important;
+	padding: 4px 1% !important;
+	margin: 0 1% 0 0 !important;
 }
 .container_fcfield > ul.ui-sortable > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-	width: 81%;
+	width: 81% !important;
+	padding: 6px 1% !important;
+	margin: 0% !important;
 }
 .container_fcfield .fcfieldval_container.valuebox {
 	width: 100%;

@@ -335,13 +335,13 @@ class plgFlexicontent_fieldsText extends JPlugin
 				if ( empty($value) ) continue;  // skip further actions
 				
 				if ($lang_filter_values) {
-					$values[$n] = JText::_($value);
+					$value = JText::_($value);
 				}
 				if ($clean_output) {
-					$values[$n] = $ifilter->clean($value, 'string');
+					$value = $ifilter->clean($value, 'string');
 				}
 				if ($encode_output) {
-					$values[$n] = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+					$value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
 				}
 			}
 			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!

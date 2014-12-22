@@ -2197,7 +2197,9 @@ class FlexicontentFields
 					// Do not use distinct on column, it makes it is very slow, despite column having an index !!
 					// e.g. HAVING COUNT(DISTINCT colname) = ...
 					// Instead the field code should make sure that no duplicate values are saved in the DB !!
-					$query .= ' GROUP BY rel.item_id ' .' HAVING COUNT(*) >= '.count($value);
+					$query .=
+						' GROUP BY rel.item_id ' .' HAVING COUNT(*) >= '.count($value).
+						' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
 				}
 		}
 		//$query .= ' GROUP BY id';   // BAD PERFORMANCE ?
