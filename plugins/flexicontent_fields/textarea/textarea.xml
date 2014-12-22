@@ -51,7 +51,7 @@
 			
 			<field name="" type="separator" default="FLEXI_VALUE_CREATION_LABEL" level="level1" />
 			<field name="default_value" type="text" default="" size="50" label="FLEXI_PROPERTY_DEFAULT" description="FLEXI_PROPERTY_DEFAULT_DESC" />
-			<field name="default_value_use" type="list" default="0" label="FLEXI_FIELD_DEFAULT_VALUE_USE" description="FLEXI_FIELD_DEFAULT_VALUE_USE_DESC">
+			<field name="default_value_use" type="list" default="0" label="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE" description="FLEXI_OPTIONAL_PROPERTIES_DEFAULT_USAGE_DESC">
 				<option value="0">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_NEW</option>
 				<option value="1">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_ALL</option>
 				<option value="2">FLEXI_FIELD_DEFAULT_VALUE_LOAD_ON_EDIT_AND_ON_EMPTY</option>
@@ -83,6 +83,43 @@
 			</field>
 			<field name="skip_buttons" type="pluginlist" plggroup="editors-xtd" default="" label="FLEXI_SKIP_BUTTONS_JCE_ONLY" description="FLEXI_SKIP_BUTTONS_JCE_ONLY_DESC" />
 			
+			
+			<field name="" type="separator" default="FLEXI_TABBING_PARAMS" description="FLEXI_TABBING_PARAMS_DESC" level="level1" />
+			
+			<field name="editorarea_per_tab" type="radio" default="0" label="FLEXI_ONE_PER_TABS" description="FLEXI_ONE_PER_TABS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="allow_tab_insertion" type="radio" default="0" label="FLEXI_ALLOW_INSER_TABS" description="FLEXI_ALLOW_INSER_TABS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="allow_tabs_code_editing" type="radio" default="1" label="FLEXI_ALLOW_EDIT_TABS" description="FLEXI_ALLOW_EDIT_TABS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="force_beforetabs" type="radio" default="1" label="FLEXI_FORCE_BEFORE_TABS" description="FLEXI_FORCE_BEFORE_TABS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="force_aftertabs" type="radio" default="1" label="FLEXI_FORCE_AFTER_TABS" description="FLEXI_FORCE_AFTER_TABS_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
+			
+			<field name="start_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_START_TABS_PATERNS" description="FLEXI_START_TABS_PATERNS_DESC" />
+			<field name="start_of_tabs_default_text" type="textarea" default="" cols="31" rows="4" label="FLEXI_START_TABS_DEF_TEXT" description="FLEXI_START_TABS_DEF_TEXT_DESC" />
+			<field name="start_of_tab_pattern" type="text" default="" size="56" label="FLEXI_START_TAB_PATERNS" description="FLEXI_START_TAB_PATERNS_DESC" />
+			
+			<field name="title_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_TITLE_PATTERN" description="FLEXI_TAB_TITLE_PATTERN_DESC" />
+			<field name="default_tab_list" type="textarea" default="" cols="31" rows="4" label="FLEXI_DEFAULT_TAB_LIST" description="LEXI_DEFAULT_TAB_LIST_DESC" />
+			
+			<field name="end_of_tab_pattern" type="text" default="" size="56" label="FLEXI_END_TAB" description="FLEXI_END_TAB" />
+			<field name="end_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_END_TABS" description="FLEXI_END_TABS_DESC" />
 			
 			<field name="" type="separator" default="FLEXI_FRONTEND" level="level0" />
 			<field name="" type="separator" default="FLEXI_DISPLAY_PARAMETERS" level="level1" />
@@ -145,43 +182,6 @@
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">
 				<option value="1">FLEXI_DISPLAY_AS_TEXT_SEARCH</option>
 			</field>
-			
-			<field name="" type="separator" default="FLEXI_TABBING_PARAMS" description="FLEXI_TABBING_PARAMS_DESC" level="level0" />
-			
-			<field name="editorarea_per_tab" type="radio" default="0" label="FLEXI_ONE_PER_TABS" description="FLEXI_ONE_PER_TABS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="allow_tab_insertion" type="radio" default="0" label="FLEXI_ALLOW_INSER_TABS" description="FLEXI_ALLOW_INSER_TABS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="allow_tabs_code_editing" type="radio" default="1" label="FLEXI_ALLOW_EDIT_TABS" description="FLEXI_ALLOW_EDIT_TABS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="force_beforetabs" type="radio" default="1" label="FLEXI_FORCE_BEFORE_TABS" description="FLEXI_FORCE_BEFORE_TABS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="force_aftertabs" type="radio" default="1" label="FLEXI_FORCE_AFTER_TABS" description="FLEXI_FORCE_AFTER_TABS_DESC">
-				<option value="0">FLEXI_NO</option>
-				<option value="1">FLEXI_YES</option>
-			</field>
-			
-			<field name="start_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_START_TABS_PATERNS" description="FLEXI_START_TABS_PATERNS_DESC" />
-			<field name="start_of_tabs_default_text" type="textarea" default="" cols="31" rows="4" label="FLEXI_START_TABS_DEF_TEXT" description="FLEXI_START_TABS_DEF_TEXT_DESC" />
-			<field name="start_of_tab_pattern" type="text" default="" size="56" label="FLEXI_START_TAB_PATERNS" description="FLEXI_START_TAB_PATERNS_DESC" />
-			
-			<field name="title_tab_pattern" type="text" default="" size="56" label="FLEXI_TAB_TITLE_PATTERN" description="FLEXI_TAB_TITLE_PATTERN_DESC" />
-			<field name="default_tab_list" type="textarea" default="" cols="31" rows="4" label="FLEXI_DEFAULT_TAB_LIST" description="LEXI_DEFAULT_TAB_LIST_DESC" />
-			
-			<field name="end_of_tab_pattern" type="text" default="" size="56" label="FLEXI_END_TAB" description="FLEXI_END_TAB" />
-			<field name="end_of_tabs_pattern" type="text" default="" size="56" label="FLEXI_END_TABS" description="FLEXI_END_TABS_DESC" />
 			
 		</fieldset>
 	</fields>

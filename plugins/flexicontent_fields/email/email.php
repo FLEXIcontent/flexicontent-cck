@@ -50,9 +50,6 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		// initialize framework objects and other variables
 		$document = JFactory::getDocument();
 		
-		// some parameter shortcuts
-		$size       = (int) $field->parameters->get( 'size', 30 ) ;
-		
 		
 		// ****************
 		// Number of values
@@ -72,6 +69,13 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$default_addr = ($item->version == 0 || $addr_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		$default_addr = $default_addr ? JText::_($default_addr) : '';
 		
+		// Input field display size & max characters
+		$size       = (int) $field->parameters->get( 'size', 30 ) ;
+		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced
+		
+		// create extra HTML TAG parameters for the text form field
+		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
+		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
 		
 		// *************************************
 		// Email title & linking text (optional)
@@ -208,7 +212,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
-		if ($use_ingroup) {print_r($field->value);}
+		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
 			// Compatibility for unserialized values
@@ -230,7 +234,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$addr = '
 				<div class="nowrap_box">
 					<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
-					<input class="emailaddr fcfield_textval validate-email'.$required.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['addr'].'" />
+					<input class="emailaddr fcfield_textval validate-email'.$required.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['addr'].'" '.$attribs.' />
 				</div>';
 			
 			$text = '';
@@ -374,27 +378,32 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		foreach ($values as $value)
 		{
 			if ( empty($value['addr']) && !$use_ingroup ) continue;
-			
-			$addr = $value['addr'];
-			$text = @$value['text'];
+			if ( empty($value['addr']) ) {
+				$field->{$prop}[$n++]	= '';
+				continue;
+			}
 			
 			// If not using property or property is empty, then use default property value
 			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
+			$addr = $value['addr'];
+			$text = @$value['text'];
 			$text = ($usetitle && strlen($text))  ?  $text  :  $default_title;
 			
-			// Create cloacked email address with custom displayed text
-			if ( strlen($text) && $usetitle ) {
-				$field->{$prop}[]	=
-					($format!='feed') ?
-						$pretext. JHTML::_('email.cloak', $addr, 1, $text, 0) .$posttext :
-						$pretext. '<a href="mailto:'.$addr.'" target="_blank">' .$text. '</a>' .$posttext;
+			if ( !strlen($text) || !$usetitle ) {
+				$text = FLEXI_J30GE ? JStringPunycode::emailToUTF8($addr) : $addr;  // email in Punycode to UTF8, for the purpose of displaying it
+				$text_is_email = 1;
 			} else {
-				$utf8_addr = FLEXI_J30GE ? JStringPunycode::emailToUTF8($addr) : $addr;  // email in Punycode to UTF8, for the purpose of displaying it
-				$field->{$prop}[]	=
-					($format!='feed') ?
-						$pretext. JHTML::_('email.cloak', $addr, $addr!=$utf8_addr, $utf8_addr) .$posttext :
-						$pretext. '<a href="mailto:'.$addr.'" target="_blank">' .$utf8_addr. '</a>' .$posttext;
+				$text_is_email = strpos($text,'@') !== false;
 			}
+			
+			// Create field's display
+			// A cloacked email address with custom linking text
+			$html = $format != 'feed' ?
+				JHTML::_('email.cloak', $addr, $addr!=$text, $text, $text_is_email) :
+				'<a href="mailto:'.$addr.'" target="_blank">' .$text. '</a>';
+			
+			// Add prefix / suffix
+			$field->{$prop}[$n]	= !$add_enclosers ? $html : $pretext . $html . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
@@ -429,6 +438,10 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';
 		
+		// Server side validation
+		//$validation = $field->parameters->get( 'validation', 'EMAIL' ) ;
+		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
+		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
 		
@@ -451,7 +464,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			// Validate data, skipping values that are empty after validation
 			// **************************************************************
 			
-			$addr = flexicontent_html::dataFilter($post[$n]['addr'], 0, 'EMAIL', 0);  // Clean bad text/html
+			$addr = flexicontent_html::dataFilter($post[$n]['addr'], $maxlength, 'EMAIL', 0);  // Clean bad text/html
 			if (!strlen($addr) && !$use_ingroup) continue; // Skip empty values
 			
 			$newpost[$new] = array();

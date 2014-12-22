@@ -132,20 +132,23 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				
-				newField.find('input.urllink').val('".$default_link."');
-				newField.find('input.urllink').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
-				newField.find('input.urllink').attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
+				theInput = newField.find('input.urllink').first();
+				theInput.val('".$default_link."');
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
+				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
 				";
 				
 			if ($usetitle) $js .= "
-				newField.find('input.urltitle').val('".$default_title."');
-				newField.find('input.urltitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				theInput = newField.find('input.urltitle').first();
+				theInput.val('".$default_title."');
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				";
 				
 				
 			$js .= "
-				newField.find('input.urlhits').val('0');
-				newField.find('input.urlhits').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
+				theInput = newField.find('input.urlhits').first();
+				theInput.val('0');
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
 				
 				// Set hits to zero for new row value
 				newField.find('span span').html('0');
@@ -232,12 +235,13 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
-		if ($use_ingroup) {print_r($field->value);}
+		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
-			// Compatibility for unserialized values
-			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
-				$value = unserialize($value);
+			// Compatibility for unserialized values or for NULL values in a field group
+			$v = !empty($value) ? @unserialize($value) : false;
+			if ( $v !== false || $v === 'b:0;' ) {
+				$value = $v;
 			} else {
 				$value = array('link' => $value, 'title' => '', 'hits'=>0);
 			}
@@ -246,7 +250,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
-			$value['link'] = !empty($value['link']) ? $value['link'] : '';
+			$value['link'] = !empty($value['link']) ? $value['link'] : $default_link;
 			$value['link'] = htmlspecialchars(
 				(FLEXI_J30GE ? JStringPunycode::urlToUTF8($value['link']) : $value['link']),
 				ENT_COMPAT, 'UTF-8'
@@ -259,7 +263,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			
 			$title = '';
 			if ($usetitle) {
-				$value['title'] = !empty($value['title']) ? $value['title'] : '';
+				$value['title'] = !empty($value['title']) ? $value['title'] : $default_title;
 				$value['title'] = htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8');
 				$title = '
 				<div class="nowrap_box">
@@ -360,7 +364,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		// Load default value
 		if ( empty($values) ) {
-			if (!strlen($default_value)) {
+			if (!strlen($default_link)) {
 				$field->{$prop} = $use_ingroup ? array() : '';
 				return;
 			}
@@ -370,6 +374,19 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$values[0]['hits']  = 0;
 			$values[0] = serialize($values[0]);
 		}
+		
+		// (* BECAUSE OF THIS, the value display loop expects unserialized values)
+		foreach ($values as &$value)
+		{
+			// Compatibility for unserialized values or for NULL values in a field group
+			$v = !empty($value) ? @unserialize($value) : false;
+			if ( $v !== false || $v === 'b:0;' ) {
+				$value = $v;
+			} else {
+				$value = array('link' => $value, 'title' => '', 'hits'=>0);
+			}
+		}
+		unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
@@ -424,23 +441,16 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
 		}
 		
-		// needed for backend display
-		//if ($display_hits)
-		//	$isAdmin = JFactory::getApplication()->isAdmin();
-		
 		// initialise property
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)
 		{
-			// Compatibility for unserialized values or for NULL values in a field group
-			$v = !empty($value) ? @unserialize($value) : false;
-			if ( $v !== false || $v === 'b:0;' ) {
-				$value = $v;
-			} else {
-				$value = array('link' => $value, 'title' => '', 'hits'=>0);
-			}
 			if ( empty($value['link']) && !$use_ingroup ) continue;  // no link ...
+			if ( empty($value['link']) ) {
+				$field->{$prop}[$n++]	= '';
+				continue;
+			}
 			
 			// If not using property or property is empty, then use default property value
 			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
@@ -464,7 +474,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				$linktext = $title ? $title : $this->cleanurl(
 					(FLEXI_J30GE ? JStringPunycode::urlToUTF8($value['link']) : $value['link'])    // If using URL convert from Punycode to UTF8
 				);
-			$field->{$prop}[$n] = $pretext. '<a href="' .$href. '" '.$link_params.'>' .$linktext. '</a>' .$posttext;
+			$html = '<a href="' .$href. '" '.$link_params.'>' .$linktext. '</a>';
 			
 			// HITS: either as icon or as inline text or both
 			$hits_html = '';
@@ -479,10 +489,13 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				}
 				$hits_html .= '</span>';
 				if ($prop == 'display_hitsonly')
-					$field->{$prop}[$n] = $hits_html;
+					$html = $hits_html;
 				else
-					$field->{$prop}[$n] .= ' '. $hits_html;
+					$html .= ' '. $hits_html;
 			}
+			
+			// Add prefix / suffix
+			$field->{$prop}[$n]	= !$add_enclosers ? $html : $pretext . $html . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist

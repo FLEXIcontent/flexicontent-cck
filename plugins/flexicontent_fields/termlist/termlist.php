@@ -461,17 +461,17 @@ class plgFlexicontent_fieldsTermlist extends JPlugin
 		foreach ($values as $value)
 		{
 			if ( empty($value['title']) && !$use_ingroup ) continue;
+			if ( empty($value['title']) ) {
+				$field->{$prop}[$n++]	= '';
+				continue;
+			}
 			
-			$html = '';
-			if ( strlen($value['title']) ) {
-				$html .= '
-					<label class="fc_termtitle label label-success">'.$value['title'].'</label>
-					<div class="fc_termdesc">'.$value['text'].'</div>
-				';
-			} 
+			$html = '
+				<label class="fc_termtitle label label-success">'.$value['title'].'</label>
+				<div class="fc_termdesc">'.$value['text'].'</div>';
 			
 			// Add prefix / suffix
-			$field->{$prop}[]	= !$add_enclosers ? $html : $pretext . $html . $posttext;
+			$field->{$prop}[$n]	= !$add_enclosers ? $html : $pretext . $html . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist

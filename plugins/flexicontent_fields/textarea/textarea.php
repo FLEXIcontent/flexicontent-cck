@@ -428,6 +428,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		foreach ($values as $value)
 		{
 			if ( !strlen($value) && !$use_ingroup ) continue;
+			if ( strlen($value) ) {
+				$field->{$prop}[$n++]	= '';
+				continue;
+			}
 			
 			// Add prefix / suffix
 			$field->{$prop}[]	= !$add_enclosers ? $value : $pretext . $value . $posttext;

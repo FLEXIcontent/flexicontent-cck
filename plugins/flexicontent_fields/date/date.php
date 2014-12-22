@@ -336,7 +336,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$date_source = $field->parameters->get('date_source', 0);
 		$show_no_value  = $field->parameters->get( 'show_no_value', 0) ;
 		$no_value_msg   = $field->parameters->get( 'no_value_msg', 'FLEXI_NO_VALUE') ;
-		
+		$no_value_msg   = $show_no_value ? JText::_($no_value_msg) : '';
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
@@ -462,6 +462,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		foreach ($values as $value)
 		{
 			if ( !strlen($value) && !$use_ingroup ) continue;
+			if ( !strlen($value) ) {
+				$field->{$prop}[$n++]	= $no_value_msg;
+				continue;
+			}
 			
 			// Check if dates are allowed to have time part
 			if ($date_allowtime) $date = $value;
@@ -489,7 +493,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			if ( $field->{$prop}!=='' ) {
 				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
 			} else {
-				$field->{$prop} = $show_no_value ? JText::_($no_value_msg) : '';
+				$field->{$prop} = $no_value_msg;
 			}
 		}
 	}

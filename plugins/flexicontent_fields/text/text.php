@@ -63,6 +63,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		// **************
 		// Value handling
 		// **************
+		
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
@@ -72,6 +73,9 @@ class plgFlexicontent_fieldsText extends JPlugin
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced
 		
+		// create extra HTML TAG parameters for the text form field
+		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
+		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
 		
 		// **********************
 	  // Create validation mask
@@ -83,10 +87,6 @@ class plgFlexicontent_fieldsText extends JPlugin
 			$inputmask_added = true;
 			flexicontent_html::loadFramework('inputmask');
 		}
-		
-		// create extra HTML TAG parameters for the text form field
-		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
-		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
@@ -309,6 +309,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
+		$default_value = $default_value ? JText::_($default_value) : '';
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
@@ -319,16 +320,17 @@ class plgFlexicontent_fieldsText extends JPlugin
 				$field->{$prop} = $use_ingroup ? array() : '';
 				return;
 			}
-			$values = array(JText::_($default_value));  // Default value is always language filtered
+			$values = array($default_value);
 		}
 		
-		// Language filter, clean output, encode HTML (* BECAUSE OF THIS, the value display loop expects unserialized values)
+		// Language filter, clean output, encode HTML
 		if ($clean_output) {
 			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
 		}
 		if ($lang_filter_values || $clean_output || $encode_output)
 		{
-			foreach ($values as $n => $value)
+			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
+			foreach ($values as &$value)
 			{
 				if ( empty($value) ) continue;  // skip further actions
 				
@@ -342,6 +344,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 					$values[$n] = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
 				}
 			}
+			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		}
 		
 		
@@ -393,6 +396,10 @@ class plgFlexicontent_fieldsText extends JPlugin
 		foreach ($values as $value)
 		{
 			if ( !strlen($value) && !$use_ingroup ) continue;
+			if ( !strlen($value) ) {
+				$field->{$prop}[$n++]	= '';
+				continue;
+			}
 			
 			// Add prefix / suffix
 			$field->{$prop}[$n]	= !$add_enclosers ? $value : $pretext . $value . $posttext;
@@ -472,6 +479,7 @@ class plgFlexicontent_fieldsText extends JPlugin
 			
 			if (!strlen($post[$n]) && !$use_ingroup) continue; // skip empty values
 			
+			$newpost[$new] = array();
 			$newpost[$new] = $post[$n];
 			$new++;
 		}
