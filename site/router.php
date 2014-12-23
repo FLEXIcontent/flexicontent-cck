@@ -152,6 +152,7 @@ function FLEXIcontentBuildRoute(&$query)
 		unset($query['cid']);
 		break;
 	
+	case 'tags':
 	case 'tag':
 		// EXPLICIT view (will be contained in the url)
 		$segments[] = 'tag';
@@ -276,7 +277,7 @@ function FLEXIcontentParseRoute($segments)
 	// 'tags' view
 	if ($segments[0] == 'tag' || $segments[0] == 'tags') {
 		$vars['view'] = 'tags';
-		$vars['id'] = $segments[2];
+		$vars['id'] = $segments[1];
 		return $vars;
 	}
 	
@@ -311,7 +312,7 @@ function FLEXIcontentParseRoute($segments)
 	//  The 1 segment item URLs are possible only if (e.g.) menu item is a matching 'category' menu item,
 	//  in this case the category URLs become explicit with /category/ segment after the category menu item
 	//  so that they are not 1 segment of length
-		// ... BUT detect bad 1-segments URL (Segments must be integer prefixed)
+	// ... BUT detect bad 1-segments URL (Segments must be integer prefixed)
 	if ($count == 1) {
 		// Check for bad URLs, THIS is needed for bad URLs with invalid MENU ALIAS segments,
 		// that are routed to FLEXIcontent because the PARENT menu is FLEXIcontent MENU ITEM
@@ -359,10 +360,8 @@ function FLEXIcontentParseRoute($segments)
 	}
 	
 	
-	// ***********************************************************
-	// 6. OTHER explicit view, when Segments Length GREATER that 2
-	// ***********************************************************
-	
+	// SEGMENT LENGTH > 2: explicit view at segment 0
+	// then handle segments 1 and higher, as "/variable/value/" pairs
 	if ($count > 2) { // COMPATIBILITY with old code of router.php
 		$flexi_view_paths = glob( JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'views'.DS.'[a-zA-Z_0-9]*', GLOB_ONLYDIR);
 		foreach ($flexi_view_paths as $flexi_view_path) {

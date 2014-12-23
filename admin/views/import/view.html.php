@@ -234,6 +234,7 @@ class FlexicontentViewImport extends JViewLegacy
 		$this->assignRef('cparams', $cparams);
 		$this->assignRef('file_fields', $file_fields);
 
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 }

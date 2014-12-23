@@ -183,7 +183,9 @@ class FlexicontentModelCategory extends JModelLegacy {
 		
 		// Set the pagination variables into state (We get them from http request OR use default category parameters)
 		$limit = JRequest::getInt('limit') ? JRequest::getInt('limit') : $cparams->get('limit');
-		$limitstart	= JRequest::getInt('limitstart', 0, '', 'int');
+		$limitstart	= JRequest::getInt('limitstart', JRequest::getInt('start', 0, '', 'int'), '', 'int');
+		JRequest::setVar('limitstart', $limitstart);  // Make sure it is limitstart is set
+		
 		$this->setState('limit', $limit);
 		$this->setState('limitstart', $limitstart);
 

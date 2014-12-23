@@ -185,8 +185,8 @@ flexicontent_html::loadFramework('flexi-lib');
 						</td>
 						<td>
 							<div id="img_preview_msg" style="float:left;"></div>
-							<img id="img_preview" src="" style="float:left;"/>
-							<input type="file" id="file-upload" name="Filedata" onchange="loadImagePreview(this.id,'img_preview', 'img_preview_msg', 60, 60);" />
+							<img id="img_preview" src="" style="float:left; display:none;" />
+							<input type="file" id="file-upload" name="Filedata" onchange="fc_loadImagePreview(this.id,'img_preview', 'img_preview_msg', 60, 60);" />
 						</td>
 					</tr>
 	<?php if (!$this->folder_mode) { ?>
@@ -264,6 +264,8 @@ flexicontent_html::loadFramework('flexi-lib');
 		</tr>
 	</table>
 <?php endif; ?>
+
+	<div class="fcclear"></div>
 
 	<table class="adminlist" cellspacing="1">
 	<thead>

@@ -339,7 +339,7 @@
 			
 		<field name="" type="separator" default="FLEXI_PARAMETERS_CAT_INFO_OPTIONS" label="" level="level1" menu="hide" />
 			
-			<field name="inheritcid" type="radio" default="0" label="FLEXI_CATS_INHERIT_PARAMS" description="FLEXI_CATS_INHERIT_PARAMS_DESC" menu="hide" class="btn-group btn-group-yesno">
+			<field name="inheritcid" type="radio" default="-1" label="FLEXI_CATS_INHERIT_PARAMS" description="FLEXI_CATS_INHERIT_PARAMS_DESC" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_COMPONENT_ONLY</option>
 				<option value="-1">FLEXI_PARENT_CAT_MULTI_LEVEL</option>
 			</field>
@@ -587,9 +587,10 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="show_readmore" type="radio" default="1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK" menu="hide" class="btn-group btn-group-yesno">
+			<field name="show_readmore" type="radio" default="-1" label="FLEXI_Read_More_Link" description="FLEXI_TIPIFSETTOSHOWREADMORELINK" menu="hide" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
+				<option value="-1">FLEXI_SHOW_ALWAYS</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level1" menu="hide" />

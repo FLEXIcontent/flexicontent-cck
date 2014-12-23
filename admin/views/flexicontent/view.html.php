@@ -321,6 +321,7 @@ class FlexicontentViewFlexicontent extends JViewLegacy
 		$this->assignRef('perms'		, $perms);
 		$this->assignRef('document'		, $document);
 
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 
 	}

@@ -1,3 +1,43 @@
+/************************
+ * Input / select styling
+ ************************/
+
+.flexicontent :not(.input-prepend):not(.input-append) > input[type="text"] {
+	font-size:11px !important;
+	display: inline-block !important;
+	/*float: none;*/ /* problem with ... */
+	margin: 2px 2px 1px 3px !important;
+	padding: 4px 2px 5px !important;
+	border-radius: 4px !important;
+}
+.flexicontent select {
+	font-size: 11px !important;
+	display: inline-block;  /* important causes problem hidden elements */
+	/*float: none;*/ /* problem with ... */
+	margin: 1px 2px 1px 3px !important;
+	padding: 4px 2px !important;
+	border-radius: 4px !important;
+}
+
+
+
+/********************************
+ * Label and property field boxes
+ ********************************/
+#flexicontent label, .flexicontent label {
+	display: inline-block;  /* important causes problem hidden labels */
+	/*float: none;*/
+	margin-right: 12px;
+}
+
+#flexicontent .nowrap_box , .flexicontent .nowrap_box {
+	white-space: nowrap !important;
+	display: inline-block;
+	float: none;
+}
+
+
+
 /*****************************************
  * Checkbox / Radio styling (and hide them)
  *****************************************/
@@ -357,28 +397,6 @@ html button {
 
 /*div table.adminform select,  .flexicontenttable.adminlist select*/
 
-.flexicontent label {
-	display: inline-block;  /* important causes problem hidden labels */
-	float: none !important;
-	margin-right: 12px !important;
-}
-.flexicontent input[type=text] {
-	font-size:11px !important;
-	display: inline-block !important;
-	/*float: none !important;*/ /* problem with */
-	margin: 2px 2px 1px 3px !important;
-	padding: 4px 2px 5px !important;
-	border-radius: 4px !important;
-}
-.flexicontent select {
-	font-size: 11px !important;
-	display: inline-block;  /* important causes problem hidden elements */
-	/*float: none !important;*/ /* problem with */
-	margin: 1px 2px 1px 3px !important;
-	padding: 4px 2px !important;
-	border-radius: 4px !important;
-}
-
 
 
 /***********************************
@@ -391,6 +409,12 @@ html button {
 	display:none;
 	padding: 4px 0px 4px 30px;
 	background: white url(../images/ajax-loader.gif) 0px 3px no-repeat;
+}
+.fc_loading_msg {
+	font-size: 14px;
+	font-size: times;
+	padding: 4px 0px 4px 30px;
+	background: white url(../images/ajax-loader.gif) 6px 5px no-repeat;
 }
 #flexi_form_submit_btns {
 	font-size:11px;
@@ -492,3 +516,6 @@ div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-o
 	clear: both;
 	max-width:60%;
 }
+
+#flexicontent div.input-append > input { margin-right:0px !important; border-top-right-radius:0px !important;  border-bottom-right-radius:0px !important; }
+#flexicontent div.input-prepend > input { margin-left:0px !important; border-top-left-radius:0px !important;  border-bottom-left-radius:0px !important; }

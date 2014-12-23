@@ -16,7 +16,7 @@
 		<fieldset name="layout" addfieldpath="/administrator/components/com_flexicontent/elements">
 			<field name="" type="separator" level="level2" default="NOTE: Only standard items are placed inside the carousel. &lt;br/&gt; -- the featured items are display statically above the carousel. Set featured items to zero to only show items inside carousel" />
 			
-			<field name="" type="separator" default="Featured item (non-carousel items)" description="Placed before the carousel" level="level0" />
+			<field name="" type="separator" default="Featured items (non-carousel items)" description="Placed before the carousel" level="level0" />
 			<field name="item_columns_feat" type="list" default="1" label="FLEXI_UMOD_NUM_OF_COLUMNS" description="FLEXI_UMOD_NUM_OF_COLUMNS_DESC">
 				<option value="1">1</option>
 				<option value="2">2</option>
@@ -27,28 +27,47 @@
 				<option value="7">7</option>
 				<option value="8">8</option>
 			</field>
+			<field name="carousel_item_placement_feat" type="radio" default="0" label="FLEXI_ITEMS_PLACEMENT" description="FLEXI_ITEMS_PLACEMENT_DESC" class="btn-group btn-group-yesno">
+				<option value="0">FLEXI_CLEARED</option>
+				<option value="1">FLEXI_AS_MASONRY_TILES</option>
+			</field>
+			
+			<field name="" type="separator" default="Content / image placement" level="level2" />
 			<field name="carousel_content_layout_feat" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
 				<option value="0">Floated (Right)</option>
+				<option value="1">Floated (Left)</option>
+				<option value="2">Cleared (Above)</option>
+				<option value="3">Cleared (Below)</option>
+				<option value="4">Overlayed (Top)</option>
+				<option value="5">Overlayed (Bottom **)</option>
+				<option value="6">Overlayed (Full)</option>
 			</field>
+			<field name="carousel_content_display_feat" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+				<option value="0">Always visible</option>
+				<!--option value="1">On mouse over / item active</option-->
+				<option value="2">On mouse over</option>
+			</field>
+			<field name="carousel_img_fit_feat" type="radio" default="0" label="Image fit &lt;br/&gt; &lt;small&gt; for cleared / overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+				<option value="0">Auto-Fit</option>
+				<option value="1">Auto-Fit and Stretch</option>
+			</field>
+			
+			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
+			<field name="carousel_inner_inline_css_feat" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">No (use default/custom CSS)</option>
+			</field>
+			<field name="carousel_padding_top_bottom_feat" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
+			<field name="carousel_padding_left_right_feat" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
+			<field name="carousel_border_width_feat" type="text" default="1" label="border width" description="This is the border width applied around the items" />
+			<field name="carousel_margin_top_bottom_feat" type="text" default="4" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
+			<field name="carousel_margin_left_right_feat" type="text" default="4" label="margin left/right" description="This is the margin applied at left and right of the items" />
 			
 			
 			<field name="" type="separator" default="Standard items (inside carousel)" description="Placed inside the carousel" level="level0" />
 			
-			<field name="" type="separator" default="Carousel Layout" level="level1" />
-			<field name="carousel_mode" type="radio" default="horizontal" label="Direction" description="Description of scrolling">
-				<option value="vertical">Vertical</option>
-				<option value="horizontal">Horizontal</option>
-			</field>
 			
-			<field name="" type="separator" default="Responsive or Fixed" level="level3" />
-			<field name="carousel_responsive" type="radio" default="1" label="Sizing method" description="Select to set number of items or fixed size, width (horizontal mode) OR height (vertical mode)">
-				<option value="0">fixed size (px)</option>
-				<option value="1"># items (responsive)</option>
-			</field>
-			<field name="carousel_item_size_px" type="text" default="250" label="Fixed size (px)" description="Item width (horizontal) or height (vertical) size in pixels" />
-			<field name="carousel_items_per_page" type="text" default="2" label="# items" description="Number of items that will be displayed, use 1 for 'slideshow' effect" />
-
-			<field name="" type="separator" default="Content/Image placement of standard items (carousel items)" level="level3" />
+			<field name="" type="separator" default="Content / image placement" level="level2" />
 			<field name="carousel_content_layout" type="radio" default="0" label="Content Placement &lt;br/&gt; &lt;small&gt; in regards to image &lt;/small&gt;" description="Select to placement content next, or above/below (cleared) or over (ovelayed) the item image. Note: bottom ** overlayed may crop content that does not from top part which is undesired">
 				<option value="0">Floated (Right)</option>
 				<option value="1">Floated (Left)</option>
@@ -58,7 +77,7 @@
 				<option value="5">Overlayed (Bottom **)</option>
 				<option value="6">Overlayed (Full)</option>
 			</field>
-			<field name="carousel_content_display" type="radio" default="1" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
+			<field name="carousel_content_display" type="radio" default="0" label="Content visible &lt;br/&gt; &lt;small&gt; for overlayed &lt;/small&gt;" description="Select how image is fitted into the container">
 				<option value="0">Always visible</option>
 				<option value="1">On mouse over / item active</option>
 				<option value="2">On mouse over</option>
@@ -68,17 +87,47 @@
 				<option value="1">Auto-Fit and Stretch</option>
 			</field>
 			
-			<field name="" type="separator" default="Item dimensions (px)" level="level3" />
+			<field name="" type="separator" default="(inline) CSS Styles for Inner Container (px)" level="level2" />
+			<field name="carousel_inner_inline_css" type="radio" default="0" label="FLEXI_ENABLE" description="Select to set styling of inner item containers">
+				<option value="1">FLEXI_YES</option>
+				<option value="0">No (use default/custom CSS)</option>
+			</field>
 			<field name="carousel_padding_top_bottom" type="text" default="8" label="padding top/bottom" description="This is the padding applied at top and bottom of the items" />
 			<field name="carousel_padding_left_right" type="text" default="12" label="padding left/right" description="This is the padding applied at left and right of the items" />
 			<field name="carousel_border_width" type="text" default="1" label="border width" description="This is the border width applied around the items" />
+			<field name="carousel_margin_top_bottom" type="text" default="0" label="margin top/bottom" description="This is the margin applied at top and bottom of the items" />
+			<field name="carousel_margin_left_right" type="text" default="0" label="margin left/right" description="This is the margin applied at left and right of the items" />
 			
+			<field name="" type="separator" default="Carousel Layout" level="level0" />
+			<field name="carousel_mode" type="radio" default="horizontal" label="Direction" description="Description of scrolling">
+				<option value="vertical">Vertical</option>
+				<option value="horizontal">Horizontal</option>
+			</field>
+			
+			<field name="" type="separator" default="Responsive or Fixed" level="level2" />
+			<field name="carousel_responsive" type="radio" default="1" label="Sizing method" description="Select to set number of items or fixed size, width (horizontal mode) OR height (vertical mode)">
+				<option value="0">fixed size (px)</option>
+				<option value="1"># items (responsive)</option>
+			</field>
+			<field name="carousel_item_size_px" type="text" default="250" label="Fixed size (px)" description="Item width (horizontal) or height (vertical) size in pixels" />
+			<field name="carousel_items_per_page" type="text" default="2" label="# items" description="Number of items that will be displayed, use 1 for 'slideshow' effect" />
 			
 			<field name="" type="separator" default="Navigation" level="level1" />
 			<field name="carousel_edgewrap" type="radio" default="1" label="Edge wrap around" description="When an edge is reached wrap around to the other edge">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
+			
+			<field name="" type="separator" default="Touch (mobile) / mouse support" level="level2" />
+			<field name="carousel_touch_walk" type="radio" default="1" label="Walk via touch drag" description="Allow mobile user to walk the carousel via touch drag">
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+			</field>
+			<field name="carousel_mouse_walk" type="radio" default="0" label="Walk via mouse drag" description="Allow desktop user to walk the carousel via mouse drag">
+				<option value="0">No, recommended</option>
+				<option value="1">Yes, (experimental)</option>
+			</field>
+			<field name="carousel_drag_margin" type="text" default="100" label="Drag margin (px)" description="Minimum margin in pixel for doing a walk of the carousel via touch or mouse drag"/>
 			
 			<field name="" type="separator" default="Autoplay" level="level2" />
 			<field name="carousel_autoplay" type="radio" default="1" label="Enable" description="Start playing after page loads">
@@ -146,6 +195,10 @@
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
 			</field>
+			<field name="carousel_dcontrols_icon" type="radio" default="0" label="Icons type" description="Choose to display images, or bootstrap based icons (needs J3+)">
+				<option value="0">FLEXI_IMAGE</option>
+				<option value="1">Bootstrap</option>
+			</field>			
 			<field name="carousel_dcontrols_auto" type="radio" default="1" label="Autoplay controls" description="Display Autoplay controls">
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
@@ -159,7 +212,7 @@
 				<option value="1">FLEXI_SHOW</option>
 			</field>
 			
-			<field name="" type="separator" default="Transition Effect" level="level1" />
+			<field name="" type="separator" default="Transition Effects" level="level1" />
 			<field name="carousel_transition" type="list" default="scroll" label="Enable" description="Select the effect to be used when carousel updates" >
 				<option value="0">No, instant</option>
 				<option value="scroll">Scroll</option>
@@ -167,9 +220,9 @@
 				<option value="slide">Slide</option>
 				<option value="fade-slide">Fade + Slide</option>
 			</field>
-			<field name="carousel_duration" type="text" default="800" label="Duration (ms)" description="Milliseconds that a carousel change will last" />
+			<field name="carousel_duration" type="text" default="1500" label="Duration (ms)" description="Milliseconds that a carousel change will last" />
 			
-			<field name="" type="separator" default="Transition smoothing" level="level3" />
+			<field name="" type="separator" default="Transition smoothing" level="level2" />
 			<field name="carousel_easing" type="groupedlist" default="quart" label="Method" description="Select the method for easing the above selected effect" >
 				<group label="Basic">
 					<option value="linear">Linear</option>
@@ -194,7 +247,7 @@
 				<option value="easeInOut">easeInOut</option>
 			</field>
 			
-			<field name="" type="separator" default="Already visible items handling (for fade/slide effects)" level="level3" />
+			<field name="" type="separator" default="Already visible items handling (for fade/slide effects)" level="level2" />
 			<field name="carousel_transition_visible_duration" type="text" default="100" label="Moving Duration (ms)" description="Already visible item will be moved instead of fading, select the moving duration in milliseconds. NOTE: this is for non-scroll transitions" />
 			
 		</fieldset>

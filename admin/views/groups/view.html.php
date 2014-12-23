@@ -56,6 +56,7 @@ class FlexicontentViewGroups extends JViewLegacy
 		$document->setTitle($doc_title .' - '. $site_title);
 		
 		// Create the toolbar
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		$this->addToolbar();
 		parent::display($tpl);
 	}

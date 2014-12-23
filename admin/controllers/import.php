@@ -348,7 +348,7 @@ class FlexicontentControllerImport extends FlexicontentController
 				echo "window.history.back();";
 				echo "</script>";
 				jexit();
-			} else if ($conf['metadesc_col']) $core_props['metadesc'] = 'Creator - Author';
+			} else if ($conf['metadesc_col']) $core_props['metadesc'] = 'META Description';
 			
 			if ( $conf['metakey_col'] && !in_array('metakey', $conf['columns']) ) {
 				echo "<script>alert ('CSV file lacks column \'metakey\' (META Keywords)');";

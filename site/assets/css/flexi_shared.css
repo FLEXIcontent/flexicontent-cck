@@ -767,10 +767,24 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
   background-color: #eee !important;
 }
 
-#flexicontent .fcfield-sortables { margin:0px!important; padding:0px!important; }
-#flexicontent .fcfield-sortables li { margin:0px 0px 4px 0px; padding:0px;  }
-#flexicontent .fcfield-sortables li .input-append,
-#flexicontent .fcfield-sortables li .input-prepend { float:left; }
+#flexicontent .ui-sortable > li.fcfieldval_container.valuebox,
+.fcfieldval_container.valuebox {
+	/*background: lightyellow;
+	border: 1px solid lightgray;*/
+	margin: 0 8px 4px 0 !important;
+	padding: 4px !important;
+	float: left;
+}
+#flexicontent .fcfield-sortables {
+	display: block;
+	list-style: none!important;
+	position: static;
+	margin:0px!important;
+	padding:0px!important;
+}
+#flexicontent .fcfield-sortables > li { margin:0px 0px 4px 0px; padding:0px; }
+#flexicontent .fcfield-sortables > li .input-append,
+#flexicontent .fcfield-sortables > li .input-prepend { float:left; }
 
 /* buttons in forms, special class for add button */
 #flexicontent .fcfield-button,
@@ -779,7 +793,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 
 /* special classes for button-like add-link */
 #flexicontent .fcfield-button-add {	float:none!important; margin:0px; padding:0px; }
-#flexicontent .fcfield-button-add a { padding:6px 8px !important; margin:2px 2px 0px 6px !important; }
+#flexicontent .fcfield-button-add a { padding:4px 8px !important; margin:0px 2px 0px 6px !important; }
 
 #flexicontent .fcfield-addvalue,
 #flexicontent .fcfield-button,
@@ -918,18 +932,18 @@ table.adminform td #search { margin-bottom: 0px; padding: 4px !important; }
 	display: block;
 	float: left !important;
 	clear: left !important;
-	color: black;
-	background-color: #eee;
-  border-bottom: 1px solid #D0D0D0;
-  border-right: 1px solid #D0D0D0;
-  font-size: 12px;
-  text-align: right !important;
-  width: 16%;
-  max-width:150px;
-  min-width:auto !important;
-  margin: 2px 1% 3px 0% !important;
-  padding: 4px 1% 4px 1% !important;
-  border-radius:3px;
+	color: white;
+	background-color: #555;
+	border: 0px solid !important; /* non-zero causes wrapping */
+	font-size: 12px;
+	font-weight: bold;
+	text-align: right !important;
+	width: 16%;
+	max-width:150px;
+	min-width:auto !important;
+	margin: 2px 1% 3px 0% !important;
+	padding: 4px 1% 4px 1% !important;
+	border-radius: 8px;
 }
 
 #flexicontent .flexi_params .fcdualline_container { margin: 0px; padding: 0px; float: left; min-width: 430px; }
@@ -1175,7 +1189,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 }
 
 .fckey_high { color:darkred !important; }
-.container_fcfield { float:left!important; padding:0px!important;  margin: 2px 0% 3px 0%!important; width: 77%; }
+.container_fcfield { float:left!important; padding:0px!important;  margin: 2px 0% 3px 0%!important; width: 81% !important; }
 .container_fcfield.fcfield_row0 {}
 .container_fcfield.fcfield_row1 {}
 .container_fcfield .fc_mini_note_box,
@@ -1213,7 +1227,6 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent .fcfield_textval {
 	background-clip: padding-box !important;
 	background-color: #FFFFFF !important;
-/*	background-image: -moz-linear-gradient(center bottom , #EEEEEE 0%, white 50%) !important;*/
 	border: 1px solid #AAAAAA !important;
 	border-radius: 4px 4px 4px 4px !important;
 	color: #444444 !important;
@@ -1232,6 +1245,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	line-height: 26px !important;
 	overflow: hidden !important;
 	min-width:24%;
+	vertical-align: top;
 }
 #flexicontent select.fcfield_selectval {
 	padding: 4px 0 2px 4px !important;

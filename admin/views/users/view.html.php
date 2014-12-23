@@ -362,6 +362,7 @@ class FlexicontentViewUsers extends JViewLegacy
 		$this->assignRef('startdate'		, $startdate);
 		$this->assignRef('enddate'			, $enddate);
 		
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 }

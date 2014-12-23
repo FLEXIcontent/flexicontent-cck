@@ -35,10 +35,18 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 
 <div id="flexicontent" class="flexicontent">
 
+<?php if (!empty( $this->sidebar)) : ?>
+	<div id="j-sidebar-container" class="span2">
+		<?php echo $this->sidebar; ?>
+	</div>
+	<div id="j-main-container" class="span10">
+<?php else : ?>
+	<div id="j-main-container">
+<?php endif;?>
+
 <?php if (!$this->CanUpload) :?>
 	<?php echo sprintf( $alert_box, '', 'note', '', JText::_('FLEXI_YOUR_ACCOUNT_CANNOT_UPLOAD') ); ?>
 <?php endif; ?>
-
 
 <div class="fctabber" style=''>
 	<?php
@@ -628,5 +636,9 @@ $document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctab
 	<input type="hidden" name="task" value="" />
 	<input type="hidden" name="filter_order" value="<?php echo $this->lists['order']; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $this->lists['order_Dir']; ?>" />
+	
 </form>
+
+	</div>  <!-- sidebar -->
+
 </div>

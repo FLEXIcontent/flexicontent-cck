@@ -28,6 +28,11 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
+			<field name="" type="separator" default="The following requires the groupfield, do not enable if you do not have this field" level="level2" />
+			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+				<option value="0">FLEXI_NO</option>
+				<option value="1">FLEXI_YES</option>
+			</field>
 		</fieldset>
 		
 		<fieldset name="group-image" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -48,7 +53,7 @@
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
-			<field name="allow_multiple" type="radio" default="1" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC" class="btn-group btn-group-yesno">
+			<field name="allow_multiple" type="radio" default="0" label="FLEXI_FIELD_GALLERY_MODE" description="FLEXI_FIELD_GALLERY_MODE_DESC" class="btn-group btn-group-yesno">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>
@@ -100,13 +105,13 @@
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_IMGFIELD_THUMBNAILS" level="level3" />
-			<field name="thumbinitemview" type="list" default="2" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC">
+			<field name="thumbincatview" type="list" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC">
 				<option value="1">FLEXI_SMALL</option>
 				<option value="2">FLEXI_MEDIUM</option>
 				<option value="3">FLEXI_LARGE</option>
 				<option value="4">FLEXI_ORIGINAL</option>
 			</field>
-			<field name="thumbincatview" type="list" default="1" label="FLEXI_FIELD_THUMB_IN_CAT" description="FLEXI_FIELD_THUMB_IN_CAT_DESC">
+			<field name="thumbinitemview" type="list" default="2" label="FLEXI_FIELD_THUMB_IN_ITEM" description="FLEXI_FIELD_THUMB_IN_ITEM_DESC">
 				<option value="1">FLEXI_SMALL</option>
 				<option value="2">FLEXI_MEDIUM</option>
 				<option value="3">FLEXI_LARGE</option>
@@ -365,7 +370,7 @@
 			<field name="opentag" type="text" default="" label="FLEXI_FIELD_OPENING_TEXT" description="FLEXI_FIELD_OPENING_TEXT_DESC" />
 			<field name="closetag" type="text" default="" label="FLEXI_FIELD_CLOSING_TEXT" description="FLEXI_FIELD_CLOSING_TEXT_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
+			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level1" />
 			
 			<field name="" type="separator" default="FLEXI_ADVANCED_SEARCH_VIEW" level="level2" />
 			<field name="display_filter_as_s" type="list" default="0" label="FLEXI_DISPLAY_FILTER_AS" description="FLEXI_DISPLAY_FILTER_AS_DESC">

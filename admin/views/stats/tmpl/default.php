@@ -20,10 +20,22 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 $ctrl_items = FLEXI_J16GE ? "task=items." : "controller=items&amp;task=";
 $ctrl_users = FLEXI_J16GE ? "task=users." : "controller=users&amp;task=";
+?>
 
+<?php if (!empty( $this->sidebar)) : ?>
+	<div id="j-sidebar-container" class="span2">
+		<?php echo $this->sidebar; ?>
+	</div>
+	<div id="j-main-container" class="span10">
+<?php else : ?>
+	<div id="j-main-container">
+<?php endif;?>
+
+<?php
 echo FLEXI_J16GE ? JHtml::_('tabs.start') : $this->pane->startPane( 'stat-pane' );
 echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_GENERAL_STATS' ), 'general' ) : $this->pane->startPanel( JText::_( 'FLEXI_GENERAL_STATS' ), 'general' ) ;
 ?>
+
 <table border="0">
 <tr><td>
 
@@ -363,3 +375,5 @@ echo FLEXI_J16GE ? JHtml::_('tabs.panel', JText::_( 'FLEXI_USER_STATS' ), 'users
 echo FLEXI_J16GE ? '' : $this->pane->endPanel();
 echo FLEXI_J16GE ? JHtml::_('tabs.end') : $this->pane->endPane();
 ?>
+
+	</div><!-- sidebar -->

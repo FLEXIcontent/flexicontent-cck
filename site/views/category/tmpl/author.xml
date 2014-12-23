@@ -26,7 +26,6 @@
 			
 			<field name="" type="separator" default="FLEXI_CONFIGURATION_AUTHOR" description="FLEXI_CONFIGURATION_AUTHOR_DESC" level="level2" />
 			
-			<field name="" type="separator" default="FLEXI_MENU_ITEM_SELECTABLE_VIA_DIRECT_CLICK_ONLY" description="" level="level3" />
 			<field name="override_defaultconf" default="0" type="list" label="FLEXI_ENABLE_OVERRIDE_AUTHOR" description="FLEXI_ENABLE_OVERRIDE_AUTHOR_DESC" >
 				<option value="0">FLEXI_OVERRIDE_CONF_NO</option>
 				<option value="1">FLEXI_OVERRIDE_CONF_YES</option>
@@ -355,6 +354,7 @@
 				<option value="">FLEXI_USE_GLOBAL</option>
 				<option value="0">FLEXI_HIDE</option>
 				<option value="1">FLEXI_SHOW</option>
+				<option value="-1">FLEXI_SHOW_ALWAYS</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_ITEMS_ORDER_1ST_LEVEL" description="FLEXI_ITEMS_ORDER_DESC" level="level2" />
@@ -850,7 +850,7 @@
 		
 		</fieldset>
 		
-		<fieldset name="layout_themes" label="FLEXI_PARAMETERS_LAYOUT_THEMES_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
+		<fieldset name="layout_themes" label="FLEXI_PARAMETERS_CAT_LAYOUT_OVERRIDE" addfieldpath="/administrator/components/com_flexicontent/elements">
 			
 			<field name="clayout" type="categorylayout" skipparams="1" default="blog" label="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_CATEGORY_LAYOUT_DESC" />
 			<field name="clayout_mobile" type="categorylayout" skipparams="1" enableparam="use_mobile_layouts" firstoption="FLEXI_USE_DESKTOP" default="" label="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT" description="FLEXI_CHOOSE_SPECIFIC_MOBILE_LAYOUT_DESC" />

@@ -1,0 +1,51 @@
+.fcx_wrapper {
+	display: block;
+	float: left !important;
+	overflow: hidden !important;
+	
+	width: auto;
+	height: auto;
+	
+	margin: 0 !important;
+	padding: 0 !important;
+	border-width: 0 !important;
+	border-style: solid !important;
+}
+
+.fcx_wrapper_inner {
+	display: block;
+	float: left !important;
+	overflow: hidden !important;
+	
+	width: auto;
+	height: auto;
+	
+	margin: 0 !important;
+	padding: 0 !important;
+	border-width: 0 !important;
+	border-style: solid !important;
+}
+
+.fcx_scroll {
+	height: auto;
+}
+.fcx_scrollbox_h {
+	white-space: nowrap;
+	overflow-y: hidden;
+	overflow-x: auto;
+	width: 100%;
+}
+.fcx_scrollbox_v {
+	white-space: normal;
+	overflow-x: hidden;
+	overflow-y: auto;
+	width: auto;
+}
+.fcx_scrollitem_h {
+	float: none;
+	clear: none;
+}
+.fcx_scrollitem_v {
+	float: left;
+	clear: both;
+}

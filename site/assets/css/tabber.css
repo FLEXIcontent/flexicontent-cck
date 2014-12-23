@@ -125,8 +125,8 @@ ul.tabbernav li.tabberactive a:hover
 
 #flexicontent .tabbertab {
 	margin: 0px !important;
-	padding: 5px 3px 3px 5px !important;
-	width: 99% !important;
+	padding: 5px 1% 3px 1% !important;
+	width: 98% !important;
 	float: left;
 }
 
@@ -134,11 +134,13 @@ ul.tabbernav li.tabberactive a:hover
 
 #flexicontent ul.tabbernav {
 	line-height: 100% !important;
-	border-bottom: 1px solid #808080 !important;
+	border-bottom: 1px solid #cccccc !important;
+	border-left: 1px solid transparent;
+	border-right: 2px solid transparent;
 	font: bold 11px Verdana,sans-serif !important;
 	margin: 0 !important;
-	padding: 0px 6px 0px 4px !important;
-	width: 99% !important;
+	padding: 0px 1% 0px 1% !important;
+	width: 98% !important;
 	display: inline-block !important;
 	float:left;
 }

@@ -94,34 +94,18 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 		});
 		
 		jQuery(document).ready(function() {
-			// Initialize popup container
-			var winwidth = jQuery( window ).width() - 80;
-			var winheight= jQuery( window ).height() - 80;
-			jQuery('#fc_modal_popup_container').dialog({
-			   autoOpen: false,
-			   width: winwidth,
-			   height: winheight,
-			   modal: true,
-			   position: [40, 40]
-			});
-			
 			// For the initially displayed versions page:  Add onclick event that opens compare in popup 
 			jQuery('a.modal-versions').each(function(index, value) {
 				jQuery(this).on('click', function() {
+					// Load given URL in an popup dialog
 					var url = jQuery(this).attr('href');
-					showDialog(url);
+					fc_showDialog(url, 'fc_modal_popup_container');
 					return false;
 				});
 			});
 			// Attach pagination for versions listing
 			jQuery('#fc_pager').pager({ pagenumber: ".$this->current_page.", pagecount: ".$this->pagecount.", buttonClickCallback: PageClick });
 		});
-		
-		// Load given URL in an open dialog
-		function showDialog(url){
-			jQuery('#fc_modal_popup_container').load(url);
-			jQuery('#fc_modal_popup_container').dialog('open');         
-		}
 		
 		PageClick = function(pageclickednumber) {
 			jQuery.ajax({ url: 'index.php?option=com_flexicontent&".$task_items."getversionlist&id=".$this->row->id."&active=".$this->row->version."&".(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken())."=1&format=raw&page='+pageclickednumber, context: jQuery('#result'), success: function(str){
@@ -136,8 +120,9 @@ if ($this->perms['cantags'] || $this->perms['canversion']) {
 				// Attach click event to version compare links of the newly created page
 				jQuery(this).find('a.modal-versions').each(function(index, value) {
 					jQuery(this).on('click', function() {
+						// Load given URL in an popup dialog
 						var url = jQuery(this).attr('href');
-						showDialog(url);
+						fc_showDialog(url, 'fc_modal_popup_container');
 						return false;
 					});
 				});
@@ -222,7 +207,6 @@ if (isset($this->row->item_translations)) foreach ($this->row->item_translations
 
 
 <div id="flexicontent" class="flexi_edit" >
-<div id="fc_modal_popup_container"></div>
 
 <form action="index.php" method="post" name="adminForm" id="adminForm" class="form-validate" enctype="multipart/form-data" >
 <table width="100%"><tr>

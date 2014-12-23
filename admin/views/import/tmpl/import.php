@@ -100,6 +100,16 @@ function submitbutton(task) {
 <div class="flexicontent" id="flexicontent">
 
 <form action="index.php" method="post" enctype="multipart/form-data" name="adminForm" id="adminForm">
+
+<?php if (!empty( $this->sidebar)) : ?>
+	<div id="j-sidebar-container" class="span2">
+		<?php echo $this->sidebar; ?>
+	</div>
+	<div id="j-main-container" class="span10">
+<?php else : ?>
+	<div id="j-main-container">
+<?php endif;?>
+
 	<table cellspacing="10" cellpadding="0" border="0" width="100%">
 		
 		<tr>
@@ -504,5 +514,7 @@ function submitbutton(task) {
 	<input type="hidden" name="view" value="import" />
 	<input type="hidden" name="task" value="" />
 	<?php echo JHTML::_( 'form.token' ); ?>
+	
+	</div>
 </form>
 </div>

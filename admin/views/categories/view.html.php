@@ -284,7 +284,8 @@ class FlexicontentViewCategories extends JViewLegacy
 		}
 		$this->assignRef('pagination'	, $pagination);
 		$this->assignRef('user'				, $user);
-
+		
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 }

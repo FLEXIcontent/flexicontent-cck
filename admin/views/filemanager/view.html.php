@@ -223,7 +223,8 @@ class FlexicontentViewFilemanager extends JViewLegacy
 		$this->assignRef('assigned_fields_labels' , $assigned_fields_labels);
 		$this->assignRef('assigned_fields_icons'  , $assigned_fields_icons);
 		$this->assignRef('langs', $langs);
-		
+
+		$this->sidebar = FLEXI_J30GE ? JHtmlSidebar::render() : null;
 		parent::display($tpl);
 	}
 }

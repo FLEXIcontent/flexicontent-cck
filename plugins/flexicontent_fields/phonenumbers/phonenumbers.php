@@ -36,7 +36,7 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		$default_value_use 	= $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value     	= ($item->version == 0 || $default_value_use > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		
-		$multiple   = $field->parameters->get( 'allow_multiple', 1 ) ;
+		$multiple   = $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $field->parameters->get( 'max_values', 0 ) ;
 		$remove_space =$field->parameters->get( 'remove_space', 0 ) ;
 		
@@ -57,8 +57,6 @@ class plgFlexicontent_fieldsPhonenumbers extends JPlugin
 		
 		if ($multiple) // handle multiple records
 		{
-			if (!FLEXI_J16GE) $document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/sortables.js' );
-			
 			//add the drag and drop sorting feature
 			$js = "
 			jQuery(document).ready(function(){

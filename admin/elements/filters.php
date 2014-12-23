@@ -162,8 +162,8 @@ class JFormFieldFilters extends JFormFieldList
 			$and .= " AND isadvfilter='{$isadvfilter}'";
 		}
 		
-		$isfilter = (int) @$attributes['isfilter'];
-		if ( $isfilter || (!$issearch && !$isadvsearch && !$isadvfilter)) {
+		$isfilter = strlen(@$attributes['isfilter']) ? (int)$attributes['isfilter'] : 1;  // Force 'isfilter' if not set
+		if ($isfilter) {
 			$and .= " AND isfilter='1'";
 		}
 		
@@ -200,13 +200,23 @@ class JFormFieldFilters extends JFormFieldList
 		$db->setQuery($query);
 		$fields = $db->loadObjectList($ovalue);
 		//echo "<pre>"; print_r($fields); exit;
+
+		$groupables = @$attributes['groupables'];
+		if ($groupables) {
+			$_fields = array();
+			foreach($fields as $field) {
+				$field->params = new JRegistry($field->attribs);
+				if ($field->params->get('use_ingroup')) $_fields[$field->id] = $field;
+			}
+			$fields = $_fields;
+		}
 		
 		$values = FLEXI_J16GE ? $this->value : $value;
 		if ( empty($values) ) {
 			$values = array();
 		}
 		if ( !is_array($values) ) {
-			$values = preg_split("/[\|,]/", $values);;
+			$values = preg_split("/[\|,]/", $values);
 		}
 		//echo "<pre>"; print_r($values); exit;
 		

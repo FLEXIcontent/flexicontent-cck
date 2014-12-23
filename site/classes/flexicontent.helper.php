@@ -795,6 +795,7 @@ class flexicontent_html
 				
 				$framework_path = JURI::root(true).'/components/com_flexicontent/librairies/fcxSlide';
 				$document->addScript($framework_path.'/class.fcxSlide.js');
+				$document->addStyleSheet($framework_path.'/fcxSlide.css');
 				//$document->addScript($framework_path.'/class.fcxSlide.packed.js');
 				break;
 			
@@ -1160,7 +1161,7 @@ class flexicontent_html
 	{
 		if ( !$params->get('show_print_icon') || JRequest::getCmd('print') ) return;
 		
-		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=640,height=480,directories=no,location=no';
+		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
 		
 		if ( JRequest::getInt('pop') ) {
 			$onclick = ' window.print(); return false; ';
@@ -1243,7 +1244,7 @@ class flexicontent_html
 		}
 
 		$mail_to_url = JRoute::_('index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink($link));
-		$status = 'width=400,height=300,menubar=yes,resizable=yes';
+		$status = 'width=800,height=600,menubar=yes,resizable=yes';
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
 		
 		// This checks template image directory for image, if none found, default image is returned
@@ -5335,22 +5336,24 @@ function FLEXISubmenu($cando)
 	$view = JRequest::getVar('view', 'flexicontent');
 	
 	// Create Submenu, Dashboard (HOME is always added, other will appear only if post-installation tasks are done)
-	JSubMenuHelper::addEntry( JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
+	$addEntry = array(FLEXI_J30GE ? 'JHtmlSidebar' : 'JSubMenuHelper', 'addEntry');
+	
+	call_user_func($addEntry, JText::_( 'FLEXI_HOME' ), 'index.php?option=com_flexicontent', !$view || $view=='flexicontent');
 	if ($dopostinstall && version_compare(PHP_VERSION, '5.0.0', '>'))
 	{
-		JSubMenuHelper::addEntry( JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items');
-		if ($perms->CanTypes)			JSubMenuHelper::addEntry( JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
-		if ($perms->CanCats) 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
-		if ($perms->CanFields) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
-		if ($perms->CanTags) 			JSubMenuHelper::addEntry( JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
-		if ($perms->CanTemplates)	JSubMenuHelper::addEntry( JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
-		if ($perms->CanAuthors)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_AUTHORS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
-		if ($perms->CanGroups)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups');
-	//if ($perms->CanArchives)	JSubMenuHelper::addEntry( JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
-		if ($perms->CanFiles) 		JSubMenuHelper::addEntry( JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
-		if ($perms->CanIndex)			JSubMenuHelper::addEntry( JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
-		if ($perms->CanImport)		JSubMenuHelper::addEntry( JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
-		if ($perms->CanStats)			JSubMenuHelper::addEntry( JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
+		call_user_func($addEntry, JText::_( 'FLEXI_ITEMS' ), 'index.php?option=com_flexicontent&view=items', $view=='items');
+		if ($perms->CanTypes)			call_user_func($addEntry, JText::_( 'FLEXI_TYPES' ), 'index.php?option=com_flexicontent&view=types', $view=='types');
+		if ($perms->CanCats) 			call_user_func($addEntry, JText::_( 'FLEXI_CATEGORIES' ), 'index.php?option=com_flexicontent&view=categories', $view=='categories');
+		if ($perms->CanFields) 		call_user_func($addEntry, JText::_( 'FLEXI_FIELDS' ), 'index.php?option=com_flexicontent&view=fields', $view=='fields');
+		if ($perms->CanTags) 			call_user_func($addEntry, JText::_( 'FLEXI_TAGS' ), 'index.php?option=com_flexicontent&view=tags', $view=='tags');
+		if ($perms->CanTemplates)	call_user_func($addEntry, JText::_( 'FLEXI_TEMPLATES' ), 'index.php?option=com_flexicontent&view=templates', $view=='templates');
+		if ($perms->CanAuthors)		call_user_func($addEntry, JText::_( 'FLEXI_AUTHORS' ), 'index.php?option=com_flexicontent&view=users', $view=='users');
+		if ($perms->CanGroups)		call_user_func($addEntry, JText::_( 'FLEXI_GROUPS' ), 'index.php?option=com_flexicontent&view=groups', $view=='groups');
+	//if ($perms->CanArchives)	call_user_func($addEntry, JText::_( 'FLEXI_ARCHIVE' ), 'index.php?option=com_flexicontent&view=archive', $view=='archive');
+		if ($perms->CanFiles) 		call_user_func($addEntry, JText::_( 'FLEXI_FILEMANAGER' ), 'index.php?option=com_flexicontent&view=filemanager', $view=='filemanager');
+		if ($perms->CanIndex)			call_user_func($addEntry, JText::_( 'FLEXI_SEARCH_INDEXES' ), 'index.php?option=com_flexicontent&view=search', $view=='search');
+		if ($perms->CanImport)		call_user_func($addEntry, JText::_( 'FLEXI_IMPORT' ), 'index.php?option=com_flexicontent&view=import', $view=='import');
+		if ($perms->CanStats)			call_user_func($addEntry, JText::_( 'FLEXI_STATISTICS' ), 'index.php?option=com_flexicontent&view=stats', $view=='stats');
 	}
 }
 

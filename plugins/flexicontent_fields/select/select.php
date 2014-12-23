@@ -56,7 +56,8 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 		$required = $field->parameters->get( 'required', 0 ) ;
 		$required = $required ? ' required' : '';
 		
-		// initialise property
+		
+		// Initialise property with default value
 		if (!$field->value && $default_value!=='') {
 			$field->value = array();
 			$field->value[0] = $default_value;
@@ -65,8 +66,9 @@ class plgFlexicontent_fieldsSelect extends JPlugin
 			$field->value[0] = '';
 		}
 		
-		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
-		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		// Field name and HTML TAG id
+		$fieldname = 'custom['.$field->name.']';
+		$elementid = 'custom_'.$field->name;
 		
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);

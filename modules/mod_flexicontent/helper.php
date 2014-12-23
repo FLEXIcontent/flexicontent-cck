@@ -819,6 +819,7 @@ class modFlexicontentHelper
 		// *******************************************************
 		
 		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW && JRequest::getInt('id'));
+		$isflexi_catview  = ($option == 'com_flexicontent' && $view == 'category' && (JRequest::getInt('cid') || JRequest::getVar('cids')));
 		$curritem_date_field_needed =
 			$behaviour_dates &&  // Dynamic
 			$date_compare && // Comparing to current item
@@ -965,7 +966,7 @@ class modFlexicontentHelper
 		if ( !$behaviour_cat && $method_cat == 1 )
 		{
 			if ($apply_config_per_category) {
-				echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item<br/>";
+				echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item / or current category of category view<br/>";
 				return;
 			}
 		}
@@ -991,7 +992,7 @@ class modFlexicontentHelper
 			
 			if ($method_cat == 2) { // exclude method
 				if ($apply_config_per_category) {
-					echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item<br/>";
+					echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item / or current category of category view<br/>";
 					return;
 				}
 				$where .= ' AND c.id NOT IN (' . implode(',', $catids_arr) . ')';
@@ -1010,26 +1011,53 @@ class modFlexicontentHelper
 		// non-ZERO 'behaviour' means dynamically decided records
 		else
 		{
-			if ( !$isflexi_itemview ) {
-				return;  // current view is not item view ... , nothing to display
-			}
-			
-			if ($behaviour_cat == 2 && $apply_config_per_category) {
-				echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item<br/>";
+			if (($behaviour_cat == 2 || $behaviour_cat == 4) && $apply_config_per_category) {
+				echo "<b>WARNING:</b> Misconfiguration warning, APPLY CONFIGURATION PER CATEGORY is possible only if CATEGORY SCOPE is set to either (a) INCLUDE(static selection of categories) or (b) items in same category as current item / or current category of category view<br/>";
 				return;
 			}
 			
+			$currcat_valid_case = ($behaviour_cat==1 && $isflexi_itemview) || ($behaviour_cat==3 && $isflexi_catview);
+			if ( !$currcat_valid_case ) {
+				return;  // current view is not item OR category view ... , nothing to display
+			}
+			
 			// IF $cid is not set then use the main category id of the (current) item
-			$cid = $cid ? $cid : $curitem->catid;
+			if ($isflexi_itemview)
+			{
+				$cid = $cid ? $cid : $curitem->catid;
+				
+				// Retrieve extra categories, such children or parent categories
+				$catids_arr = flexicontent_cats::getExtraCats(array($cid), $treeinclude, $curritemcats);
+			}
+			
+			else if ($isflexi_catview)
+			{
+				$cid = JRequest::getInt('cid', 0);
+				if (!$cid) {
+					$_cids = JRequest::getVar('cids', '');
+					if ( !is_array($_cids) ) {
+						$_cids = preg_replace( '/[^0-9,]/i', '', (string) $_cids );
+						$_cids = explode(',', $_cids);
+					}
+					// make sure given data are integers ... !!
+					$cids = array();
+					foreach ($_cids as $i => $_id)  if ((int)$_id) $cids[] = (int)$_id;
+					
+					// Retrieve extra categories, such children or parent categories
+					$catids_arr = flexicontent_cats::getExtraCats(array($cid), $treeinclude, array());
+				}
+			} else {
+				return;  // nothing to display
+			}
 			
 			// Retrieve extra categories, such children or parent categories
-			$catids_arr = flexicontent_cats::getExtraCats(array($cid), $treeinclude, $curritemcats);
+			$catids_arr = flexicontent_cats::getExtraCats(array($cid), $treeinclude, $isflexi_itemview ? $curritemcats : array());
 			if (empty($catids_arr)) {
 				if ($show_nocontent_msg) echo JText::_("No viewable content in Current View for your Access Level");
 				return;
 			}
 			
-			if ($behaviour_cat == 1) {
+			if ($behaviour_cat == 1 || $behaviour_cat == 3) {
 				if (!$apply_config_per_category) {
 					$where .= ' AND c.id IN (' . implode(',', $catids_arr) . ')';
 				} else {
@@ -1760,9 +1788,15 @@ class modFlexicontentHelper
 		$option = JRequest::getVar('option');
 		
 		$currcat_custom_display = $params->get('currcat_custom_display', 0);
-		$isflexi_itemview       = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW);
+		$currcat_source = $params->get('currcat_source', 0);  // 0 item view, 1 category view, 2 both
+		$isflexi_itemview = ($option == 'com_flexicontent' && $view == FLEXI_ITEMVIEW);
+		$isflexi_catview  = ($option == 'com_flexicontent' && $view == 'category');
 		
-		if ($currcat_custom_display && $isflexi_itemview) {
+		$currcat_valid_case =
+			($currcat_source==2 && ($isflexi_itemview || $isflexi_catview))
+			|| ($currcat_source==0 && $isflexi_itemview)
+			|| ($currcat_source==1 && $isflexi_catview);
+		if ($currcat_custom_display && $currcat_valid_case) {
 			$id   = JRequest::getInt('id', 0);   // id of current item
 			$cid  = JRequest::getInt('cid', 0);  // current category id of current item
 			

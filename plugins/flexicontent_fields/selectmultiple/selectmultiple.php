@@ -66,7 +66,8 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 		if ($exact_values) $max_values = $min_values = $exact_values;
 		$js_popup_err	= $field->parameters->get( 'js_popup_err', 0 ) ;
 
-		// initialise property
+		
+		// Initialise property with default value
 		if (!$field->value && $default_values!=='') {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
@@ -74,8 +75,9 @@ class plgFlexicontent_fieldsSelectmultiple extends JPlugin
 			$field->value[0] = '';
 		}
 		
-		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
-		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		// Field name and HTML TAG id
+		$fieldname = 'custom['.$field->name.']'.'[]';
+		$elementid = 'custom_'.$field->name;
 		
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);

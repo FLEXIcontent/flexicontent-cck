@@ -36,7 +36,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="plugins" type="pluginlist" label="PLG_FLEXICONTENT_FIELDS_CHOOSE_SPECIFIC_PLUGINS" description="PLG_FLEXICONTENT_FIELDS_CHOOSE_SPECIFIC_PLUGINS_DESC" />
-			<field name="allow_multiple" type="radio" default="1" label="PLG_FLEXICONTENT_FIELDS_ALLOW_MULTIPLE" description="PLG_FLEXICONTENT_FIELDS_ALLOW_MULTIPLE_DESC">
+			<field name="allow_multiple" type="radio" default="0" label="PLG_FLEXICONTENT_FIELDS_ALLOW_MULTIPLE" description="PLG_FLEXICONTENT_FIELDS_ALLOW_MULTIPLE_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>
 			</field>

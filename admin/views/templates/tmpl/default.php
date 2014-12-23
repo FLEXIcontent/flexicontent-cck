@@ -46,6 +46,15 @@ JFactory::getDocument()->addScriptDeclaration($js);
 
 <form action="index.php" method="post" name="adminForm" id="adminForm">
 
+<?php if (!empty( $this->sidebar)) : ?>
+	<div id="j-sidebar-container" class="span2">
+		<?php echo $this->sidebar; ?>
+	</div>
+	<div id="j-main-container" class="span10">
+<?php else : ?>
+	<div id="j-main-container">
+<?php endif;?>
+
 	<table class="adminlist" cellspacing="1">
 	
 	<thead>
@@ -132,4 +141,6 @@ JFactory::getDocument()->addScriptDeclaration($js);
 	<input type="hidden" name="view" value="templates" />
 	<input type="hidden" name="task" value="" />
 	<?php echo JHTML::_( 'form.token' ); ?>
+	
+	</div>
 </form>

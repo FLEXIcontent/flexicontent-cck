@@ -1203,6 +1203,9 @@ class FlexicontentFields
 				// CUSTOM field or CORE field with no type
 				$fdata[$tindex][$field->name] = new stdClass();
 				$fdata[$tindex][$field->name]->parameters = FLEXI_J16GE ? new JRegistry($field->attribs) : new JParameter($field->attribs);
+				if ($field->field_type=='maintext' && $fdata[$tindex][$field->name]->parameters->get('trigger_onprepare_content', '')==='') {
+					$fdata[$tindex][$field->name]->parameters->set(1);  // Default for maintext (description field) is to trigger plugins
+				}
 				
 			} else {
 				
@@ -1371,6 +1374,7 @@ class FlexicontentFields
 				$sql_mode =  $filter_customize_options==1;
 				$field_elements = $filter_custom_options;
 			} else if ( !$field_elements ) {
+				$sql_mode = 1;
 				$field_elements = "SELECT value, value as text FROM #__flexicontent_fields_item_relations as fir WHERE field_id='{field_id}' AND value != '' GROUP BY value";
 			}
 			// Set parameters may be used later
@@ -2310,7 +2314,10 @@ class FlexicontentFields
 		} else {
 			if (is_array($value)) $value = @ $value[0];
 		}
-		//print_r($value);
+		
+		// Escape values for output
+		if (!is_array($value)) $value = htmlspecialchars($value, ENT_COMPAT, 'UTF-8');
+		else foreach($value as $i => $v) $value[$i] = htmlspecialchars($value[$i], ENT_COMPAT, 'UTF-8');
 		
 		// Alter search property name (indexed fields only), remove underscore _ at start & end of it
 		if ($indexed_elements && $search_prop) {
@@ -2472,8 +2479,8 @@ class FlexicontentFields
 		case 1: case 3:  // (TODO: autocomplete) ... 1: Text input, 3: Dual text input (value range), both of these can be JS date calendars
 			$_inner_lb = $label_filter==2 ? $filter->label : JText::_($isdate ? 'FLEXI_CLICK_CALENDAR' : 'FLEXI_TYPE_TO_LIST');
 			$_inner_lb = flexicontent_html::escapeJsText($_inner_lb,'s');
-			$attribs_str = ' class="fc_field_filter fc_label_internal fc_iscalendar" data-fc_label_text="'.$_inner_lb.'"';
-			$attribs_arr = array('class'=>'fc_field_filter fc_label_internal fc_iscalendar', 'data-fc_label_text' => $_inner_lb );
+			$attribs_str = ' class="fc_field_filter fc_label_internal '.($isdate ? 'fc_iscalendar' : '').'" data-fc_label_text="'.$_inner_lb.'"';
+			$attribs_arr = array('class'=>'fc_field_filter fc_label_internal '.($isdate ? 'fc_iscalendar' : '').'', 'data-fc_label_text' => $_inner_lb );
 			
 			if ($display_filter_as==1) {
 				if ($isdate) {
@@ -3233,11 +3240,11 @@ class FlexicontentFields
 	
 	// Helper method to perform HTML replacements on given list of item ids (with optional catids too), the items list is either given
 	// as parameter or the list is created via the items that have as value the id of 'parentitem' for field with id 'reverse_field'
-	static function getItemsList(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, &$return_item_list=false)
+	static function getItemsList(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, &$return_item_list=false, $states=array(1,-5,2))
 	{
 		// Execute query to get item list data 
 		$db = JFactory::getDBO();
-		$query = FlexicontentFields::createItemsListSQL($params, $_item_data, $isform, $reverse_field, $parentfield, $parentitem);
+		$query = FlexicontentFields::createItemsListSQL($params, $_item_data, $isform, $reverse_field, $parentfield, $parentitem, $states);
 		$db->setQuery($query);
 		$item_list = $db->loadObjectList('id');
 		if ($db->getErrorNum())  JFactory::getApplication()->enqueueMessage(__FUNCTION__.'(): SQL QUERY ERROR:<br/>'.nl2br($db->getErrorMsg()),'error');
@@ -3255,7 +3262,7 @@ class FlexicontentFields
 	
 	
 	// Helper method to create SQL query for retrieving items list data
-	static function createItemsListSQL(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem)
+	static function createItemsListSQL(&$params, &$_item_data=null, $isform=0, $reverse_field=0, &$parentfield, &$parentitem, $states=array(1,-5,2))
 	{
 		$db = JFactory::getDBO();
 		$sfx = $isform ? '_form' : '';
@@ -3275,6 +3282,9 @@ class FlexicontentFields
 			
 			$publish_where  = ' AND ( i.publish_up = '.$db->Quote($nullDate).' OR i.publish_up <= '.$_nowDate.' )'; 
 			$publish_where .= ' AND ( i.publish_down = '.$db->Quote($nullDate).' OR i.publish_down >= '.$_nowDate.' )';
+		}
+		if (count($states)) {
+			$publish_where .= ' AND i.state IN ('.implode(',',$states).')';
 		}
 		
 		// item IDs via reversing a relation field
@@ -3322,7 +3332,7 @@ class FlexicontentFields
 		}
 		
 		// Because query includes specific items it should be fast
-		$query = 'SELECT i.*, ext.type_id,'
+		$query = 'SELECT i.*, ext.*,'
 			.' GROUP_CONCAT(c.id SEPARATOR  ",") AS catidlist, '
 			.' GROUP_CONCAT(c.alias SEPARATOR  ",") AS  cataliaslist '
 			. @ $orderby_col

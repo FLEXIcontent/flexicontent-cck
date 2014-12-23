@@ -22,7 +22,7 @@ $tmpl = $this->tmpl;
 $user = JFactory::getUser();
 
 // ITEMS as MASONRY tiles
-if ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_placement', 0)==1)
+if (!empty($this->items) && ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_placement', 0)==1))
 {
 	flexicontent_html::loadFramework('masonry');
 	flexicontent_html::loadFramework('imagesLoaded');
@@ -35,19 +35,23 @@ if ($this->params->get('lead_placement', 0)==1 || $this->params->get('intro_plac
 			var container_lead = document.querySelector('ul.leadingblock');
 			var msnry_lead;
 			// initialize Masonry after all images have loaded
-			imagesLoaded( container_lead, function() {
-				msnry_lead = new Masonry( container_lead );
-			});
+			if (container_lead) {
+				imagesLoaded( container_lead, function() {
+					msnry_lead = new Masonry( container_lead );
+				});
+			}
 		";
 	}
-	if ($this->params->get('lead_placement', 0)==1) {
+	if ($this->params->get('intro_placement', 0)==1) {
 		$js .= "
 			var container_intro = document.querySelector('ul.introblock');
 			var msnry_intro;
 			// initialize Masonry after all images have loaded
-			imagesLoaded( container_intro, function() {
-				msnry_intro = new Masonry( container_intro );
-			});
+			if (container_intro) {
+				imagesLoaded( container_intro, function() {
+					msnry_intro = new Masonry( container_intro );
+				});
+			}
 		";
 	}
 	$js .= "	
@@ -367,7 +371,7 @@ if ($leadnum) :
 			<!-- EOF under-description-line2-nolabel block -->
 
 			<?php
-				$readmore_forced = $this->params->get('lead_strip_html', 1) == 1 ;  // option 2 strip-cuts without forcing read more
+				$readmore_forced = $this->params->get('show_readmore', 1) == -1 || $this->params->get('lead_strip_html', 1) == 1 ;
 				$readmore_shown  = $this->params->get('show_readmore', 1) && strlen(trim($item->fulltext)) >= 1;
 				$readmore_shown  = $readmore_shown || $readmore_forced;
 				$footer_shown = $readmore_shown || $item->event->afterDisplayContent;
@@ -673,7 +677,7 @@ if ($count > $leadnum) :
 
 
 			<?php
-				$readmore_forced = $this->params->get('intro_strip_html', 1) == 1 ;  // option 2 strip-cuts without forcing read more
+				$readmore_forced = $this->params->get('show_readmore', 1) == -1 || $this->params->get('intro_strip_html', 1) == 1 ;
 				$readmore_shown  = $this->params->get('show_readmore', 1) && strlen(trim($item->fulltext)) >= 1;
 				$readmore_shown  = $readmore_shown || $readmore_forced;
 				$footer_shown = $readmore_shown || $item->event->afterDisplayContent;

@@ -172,6 +172,7 @@ endif;
 				<?php endif; ?>
 			<?php endif; ?>
 			
+			<div class="fcclear fc_afterbutton"></div>
 			<!-- BOF item title -->
 			<?php if ($show_title) : ?>
 				<?php if ($link_titles) : ?>
@@ -180,6 +181,7 @@ endif;
 			<?php endif; ?>
 			<!-- EOF item title -->
 			
+			<div class="fcclear fc_beforemarkups"></div>
 			<?php echo $markup_tags; ?>
 			
 			</td>

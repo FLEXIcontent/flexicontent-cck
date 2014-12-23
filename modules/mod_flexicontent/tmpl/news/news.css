@@ -51,19 +51,19 @@
 /* EXTERNAL ITEM CONTAINER inner container for border, padding etc */
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper_innerbox,
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper_innerbox {
-	position: relative !important;
-	display: table-cell !important;
-	float: none !important;
-	width: auto !important;
-	height:100% !important;
-	margin: 0% !important;
+	position: relative;
+	display: block;
+	float: none;
+	width: auto;
+	height: auto;
+	overflow: hidden;
 	
 	/* can be overriden via user 's CSS */
+	margin: 4px;
 	padding: 4px;
 	border-width: 1px;
 	border-style: solid;
-	/*border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;*/
-	border-color: white;
+	border-color: #dfdfdf #9f9f9f #9f9f9f #dfdfdf;
 	border-radius:0px;
 	background-color: #EFEFEF;
 }
@@ -72,16 +72,15 @@
 /* EXTERNAL ITEM CONTAINER (ONE COLUMNS) */
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper,
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper {
-	display: table !important;
-	float: left !important;
-	margin: 0 !important;
-	padding: 0 !important;
-	border-width: 0 !important;
-	border-style: solid !important;
-	
-	/* will be overriden with element style setting via JS script */
+	/* DO NOT OVERRIDE THESE !!! this is the placement container, override margin,padding,border of inner container only */
+	display: block;
+	float: left;
+	margin: 0;
+	padding: 0;
+	border-width: 0;
+	border-style: solid;
 	width: 100%;
-	height: 100%;
+	/*height: 100%;*/ /* problematic with masonry */
 }
 
 /* EXTERNAL ITEM CONTAINER (2-COLUMNS) */
@@ -107,7 +106,7 @@
 /* EXTERNAL ITEM CONTAINER (4-COLUMNS) */
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.cols_4,
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.cols_4 {
-	width:25!important;
+	width:25%!important;
 	margin-left:0%!important;
 	margin-right:0%!important;
 	padding: 0%!important;
@@ -164,13 +163,13 @@
 }
 
 /*.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper.mod_fc_activeitem:hover .mod_flexicontent_featured_wrapper_innerbox,
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover .mod_flexicontent_featured_wrapper_innerbox,
+.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_featured_wrapper:hover .mod_flexicontent_featured_wrapper_innerbox,*/
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper.mod_fc_activeitem:hover .mod_flexicontent_standard_wrapper_innerbox,
 .news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover .mod_flexicontent_standard_wrapper_innerbox {
 	background-color: #D0D0D0;
 	border-color: #888 #555 #555 #888;
 	/*box-shadow: 4px 4px 2px darkgray;*/
-}*/
+}
 
 
 /* INTERNAL ITEM CONTAINER (ONE COLUMN MODE) */
@@ -291,9 +290,9 @@
 
 
 /* CONTAINER of item hits, voting, comments */
-.news.mod_flexicontent_wrapper .fcitem_hits { padding: 2px 0px 1px 0px; display: inline-block !important; }
-.news.mod_flexicontent_wrapper .fcitem_voting { padding: 0px 0px 2px 0px; display: inline-block !important; }
-.news.mod_flexicontent_wrapper .fcitem_comments{ padding: 2px 0px 1px 0px; display: inline-block !important; }
+.news.mod_flexicontent_wrapper .fcitem_hits { padding: 2px 0px 1px 0px; display: inline-block; }
+.news.mod_flexicontent_wrapper .fcitem_voting { padding: 0px 0px 2px 0px; display: inline-block; }
+.news.mod_flexicontent_wrapper .fcitem_comments{ padding: 2px 0px 1px 0px; display: inline-block; }
 
 .news.mod_flexicontent_wrapper .fcitem_hits img,
 .news.mod_flexicontent_wrapper .fcitem_comments img {
@@ -398,8 +397,8 @@
 	left: 0px;
 }
 .news.mod_flexicontent_wrapper .fc_overlayed .fc_block {
-	font-family: Raleway;
-	font-weight:900;
+	/*font-family: Raleway;
+	font-weight:900;*/
 	font-size: 14px;
 	line-height: 140%;
 	color: white;
@@ -430,15 +429,22 @@
 }
 .news.mod_flexicontent_wrapper .fc_floated {}
 
+.news.mod_flexicontent_wrapper .image_featured.fc_float_left img,
+.news.mod_flexicontent_wrapper .image_featured.fc_float_right img,
 .news.mod_flexicontent_wrapper .image_standard.fc_float_left img,
 .news.mod_flexicontent_wrapper .image_standard.fc_float_right img { border-radius: 8px; }
+.news.mod_flexicontent_wrapper .image_featured.fc_float_left img,
+.news.mod_flexicontent_wrapper .image_featured.fc_float_right img,
 .news.mod_flexicontent_wrapper .image_standard.fc_float_left img,
 .news.mod_flexicontent_wrapper .image_standard.fc_float_right img { border-radius: 8px; }
 
 .news.mod_flexicontent_wrapper .fc_clear { clear: both !important; }
 
+.news.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper .fc_auto_show,
 .news.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper .fc_auto_show { visibility: hidden; }
+.news.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,  /* force showing content of active item */
+.news.mod_flexicontent_wrapper .mod_flexicontent_featured_wrapper:hover .fc_auto_show,  /* force showing content if item under mouse */
 .news.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper.mod_fc_activeitem .fc_auto_show.fc_show_active,  /* force showing content of active item */
-.news.mod_flexicontent_wrapper .mod_flexicontent .mod_flexicontent_standard_wrapper:hover .fc_auto_show {   /* force showing content if item under mouse */
+.news.mod_flexicontent_wrapper .mod_flexicontent_standard_wrapper:hover .fc_auto_show {   /* force showing content if item under mouse */
 	visibility: visible;
 }

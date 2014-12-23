@@ -100,7 +100,7 @@ if ($filter_instructions == 1) {
 				<span class="fc_filter_html">
 					<input type="<?php echo $search_autocomplete==2 ? 'hidden' : 'text'; ?>" class="<?php echo $text_search_class; ?>"
 						data-fc_label_text="<?php echo $text_search_label; ?>" name="filter"
-						id="<?php echo $form_id; ?>_filter" value="<?php echo $text_search_val;?>" />
+						id="<?php echo $form_id; ?>_filter" value="<?php echo htmlspecialchars($text_search_val, ENT_COMPAT, 'UTF-8');?>" />
 					<?php echo $searchphrase_selector; ?>
 					
 					<?php if ( $filter_placement && ($show_search_go || $show_search_reset) ) : ?>

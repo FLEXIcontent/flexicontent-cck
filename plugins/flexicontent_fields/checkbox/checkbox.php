@@ -92,8 +92,8 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			$separator = '&nbsp;';
 			break;
 		}
-
-		// initialise property
+		
+		// Initialise property with default value
 		if (!$field->value && $default_values!=='') {
 			$field->value = explode(",", $default_values);
 		} else if (!$field->value) {
@@ -101,8 +101,9 @@ class plgFlexicontent_fieldsCheckbox extends JPlugin
 			$field->value[0] = '';
 		}
 		
-		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
-		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		// Field name and HTML TAG id
+		$fieldname = 'custom['.$field->name.']'.'[]';
+		$elementid = 'custom_'.$field->name;
 		
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);

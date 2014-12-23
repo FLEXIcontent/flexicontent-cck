@@ -27,6 +27,10 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			<field name="no_acc_msg" type="text" default="" label="FLEXI_FIELD_NOACCESS_MSG" description="FLEXI_FIELD_NOACCESS_MSG_DESC"/>
+			<field name="" type="separator" default="The following requires the groupfield, do not enable if you do not have this field" level="level2" />
+			<field name="use_ingroup" type="radio" default="0" label="FLEXI_USE_IN_FIELD_GROUP" description="FLEXI_USE_IN_FIELD_GROUP_DESC">
+				<option value="0">FLEXI_NO</option>
+			</field>
 		</fieldset>
 		
 		<fieldset name="group-selectmultiple" repeat="1" addfieldpath="/administrator/components/com_flexicontent/elements">
@@ -106,7 +110,7 @@
 				<option value="1">FLEXI_YES</option>
 			</field>
 			
-			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" description="FLEXI_TEXT_SEARCH_FILTER_CONF_DESC" level="level1" />
+			<field name="" type="separator" default="FLEXI_FILTERING_CONF" description="FLEXI_FILTERING_CONF_DESC" level="level1" />
 		
 			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_CONF" description="" level="level2" menu="hide" />
 			<field name="" type="separator" default="FLEXI_FILTER_OPTIONS_CREATION_WARNING" description="" level="level3" menu="hide" />			
@@ -123,7 +127,7 @@
 			</field>
 			<field name="filter_firstoptiontext" type="text" default="FLEXI_ALL" label="FLEXI_FILTER_FIRST_OPTION_TEXT" description="FLEXI_FILTER_FIRST_OPTION_TEXT_DESC" />
 			
-			<field name="" type="separator" default="FLEXI_TEXT_SEARCH_FILTER_CONF" level="level1" />
+			<field name="" type="separator" default="FLEXI_FILTER_VALUE_COMPARISON" level="level2" />
 			
 			<field name="filter_compare_type" type="list" default="0" label="FLEXI_FILTER_VALUE_COMPARISON" description="FLEXI_FILTER_VALUE_COMPARISON_DESC">
 				<option value="0">FLEXI_ALPHANUMERIC</option>

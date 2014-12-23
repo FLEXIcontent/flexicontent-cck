@@ -467,15 +467,15 @@ class FlexicontentViewCategory extends JViewLegacy
 			$item->event = new stdClass();
 			
 			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterTitle', array('com_content.category', &$item, &$params, 0));
-			else              $results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $limitstart));
+			else              $results = $dispatcher->trigger('onAfterDisplayTitle', array (&$item, &$params, $_page=0));
 			$item->event->afterDisplayTitle = trim(implode("\n", $results));
 	
 			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentBeforeDisplay', array('com_content.category', &$item, &$params, 0));
-			else              $results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $params, $limitstart));
+			else              $results = $dispatcher->trigger('onBeforeDisplayContent', array (& $item, & $params, $_page=0));
 			$item->event->beforeDisplayContent = trim(implode("\n", $results));
 	
 			if (FLEXI_J16GE)  $results = $dispatcher->trigger('onContentAfterDisplay', array('com_content.category', &$item, &$params, 0));
-			else              $results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $limitstart));
+			else              $results = $dispatcher->trigger('onAfterDisplayContent', array (& $item, & $params, $_page=0));
 			$item->event->afterDisplayContent = trim(implode("\n", $results));
 							
 			// Set the option back to 'com_flexicontent'

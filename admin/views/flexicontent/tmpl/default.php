@@ -34,9 +34,20 @@ if (version_compare(PHP_VERSION, '5.0.0', '<'))
 
 $ctrl = FLEXI_J16GE ? 'items.' : '';
 $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
-
 ?>
+
+<div class="flexicontent">
 <form action="index.php" method="post" name="adminForm" id="adminForm">
+
+<?php if (!empty( $this->sidebar)) : ?>
+	<div id="j-sidebar-container" class="span2">
+		<?php echo $this->sidebar; ?>
+	</div>
+	<div id="j-main-container" class="span10">
+<?php else : ?>
+	<div id="j-main-container">
+<?php endif;?>
+
 	<table cellspacing="0" cellpadding="0" border="0" width="">
 		<tr>
 			<td valign="top">
@@ -529,4 +540,7 @@ $items_task = FLEXI_J16GE ? 'task=items.' : 'controller=items&amp;task=';
 	<input type="hidden" name="view" value="" />
 	<input type="hidden" name="task" value="" />
 	<?php echo JHTML::_( 'form.token' ); ?>
+	
+	</div>
 </form>
+</div>

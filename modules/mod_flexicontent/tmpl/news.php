@@ -51,24 +51,69 @@ defined('_JEXEC') or die('Restricted access');
 
 $tooltip_class = FLEXI_J30GE ? ' hasTooltip' : ' hasTip';
 
-$mod_width_feat 	= (int)$params->get('mod_width', 110);
-$mod_height_feat 	= (int)$params->get('mod_height', 110);
+$mod_width_feat 	= (int)$params->get('mod_width_feat', 110);
+$mod_height_feat 	= (int)$params->get('mod_height_feat', 110);
 $mod_width 				= (int)$params->get('mod_width', 80);
 $mod_height 			= (int)$params->get('mod_height', 80);
-
 
 $hide_label_onempty_feat = (int)$params->get('hide_label_onempty_feat', 0);
 $hide_label_onempty      = (int)$params->get('hide_label_onempty', 0);
 
 
-// Item Dimensions
-$padding_top_bottom = (int)$params->get('news_padding_top_bottom', 8);
-$padding_left_right = (int)$params->get('news_padding_left_right', 12);
-$border_width = (int)$params->get('news_border_width', 1);
+// Item Dimensions featured
+$inner_inline_css_feat = (int)$params->get($layout.'_inner_inline_css_feat', 0);
+$padding_top_bottom_feat = (int)$params->get($layout.'_padding_top_bottom_feat', 8);
+$padding_left_right_feat = (int)$params->get($layout.'_padding_left_right_feat', 12);
+$margin_top_bottom_feat = (int)$params->get($layout.'_margin_left_right_feat', 4);
+$margin_left_right_feat = (int)$params->get($layout.'_margin_left_right_feat', 4);
+$border_width_feat = (int)$params->get($layout.'_border_width_feat', 1);
 
-// Content placement and default image
-$content_display = $params->get('news_content_display', 1);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
-$content_layout = $params->get('news_content_layout', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+// Item Dimensions standard
+$inner_inline_css = (int)$params->get($layout.'_inner_inline_css', 0);
+$padding_top_bottom = (int)$params->get($layout.'_padding_top_bottom', 8);
+$padding_left_right = (int)$params->get($layout.'_padding_left_right', 12);
+$margin_top_bottom = (int)$params->get($layout.'_margin_left_right', 4);
+$margin_left_right = (int)$params->get($layout.'_margin_left_right', 4);
+$border_width = (int)$params->get($layout.'_border_width', 1);
+
+
+// *****************************************************
+// Content placement and default image of featured items
+// *****************************************************
+$content_display_feat = $params->get($layout.'_content_display_feat', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
+$content_layout_feat = $params->get($layout.'_content_layout_feat', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+$item_img_fit_feat = $params->get($layout.'_img_fit_feat', 0);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
+
+switch ($content_layout_feat) {
+	case 0: case 1:
+		$img_container_class_feat = ($content_layout_feat==0 ? 'fc_float_left' : 'fc_float_right');
+		$content_container_class_feat = 'fc_floated';
+		break;
+	case 2: case 3:
+		$img_container_class_feat = 'fc_stretch fc_clear';
+		$content_container_class_feat = '';
+		break;
+	case 4: case 5: case 6:
+		$img_container_class_feat = 'fc_stretch';
+		$content_container_class_feat = 'fc_overlayed '
+			.($content_layout_feat==4 ? 'fc_top' : '')
+			.($content_layout_feat==5 ? 'fc_bottom' : '')
+			.($content_layout_feat==6 ? 'fc_full' : '')
+			;
+		if ($content_display_feat >= 1) $content_container_class_feat .= ' fc_auto_show';
+		if ($content_display_feat == 1) $content_container_class_feat .= ' fc_show_active';
+		break;
+	default: $img_container_class_feat = '';  break;
+}
+
+
+
+// *****************************************************
+// Content placement and default image of standard items
+// *****************************************************
+$content_display = $params->get($layout.'_content_display', 0);  // 0: always visible, 1: On mouse over / item active, 2: On mouse over
+$content_layout = $params->get($layout.'_content_layout', 0);  // 0/1: floated (right/left), 2/3: cleared (above/below), 4/5/6: overlayed (top/bottom/full)
+$item_img_fit = $params->get($layout.'_img_fit', 0);   // 0: Auto-fit, 1: Auto-fit and stretch to larger
 
 switch ($content_layout) {
 	case 0: case 1:
@@ -92,24 +137,48 @@ switch ($content_layout) {
 	default: $img_container_class = '';  break;
 }
 
+
+
+// *******************************
 // Default image and image fitting
+// *******************************
 $mod_default_img_path = $params->get('mod_default_img_path', 'components/com_flexicontent/assets/images/image.png');
-$item_img_fit = $params->get('news_img_fit', 0);
 $img_path = JURI::base(true) .'/'; 
 
-$img_force_dims_feat="max-width:".$mod_width_feat."px; max-height:".$mod_height_feat."px; width: auto; height: auto; display: block!important;";
-$img_force_dims=" width: 100%; height: auto; display: block!important; border: 0 !important;";
+// image of FEATURED items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
+$img_force_dims_feat=" width: 100%; height: auto; display: block !important; border: 0 !important;";
+$img_limit_dims=" max-width:".$mod_width_feat."px; max-height:".$mod_height_feat."px;";
+if ($item_img_fit_feat==0 || $content_layout_feat <= 1) {
+	$img_force_dims_feat .= $img_limit_dims;
+}
 
-// Limit auto-fit to image max-dimensions to avoid stretching
-$_img_limit_dims_=" max-width:".$mod_width."px; max-height:".$mod_height."px;";
+// image of STANDARD items, auto-fit and (optionally) limit to image max-dimensions to avoid stretching
+$img_force_dims=" width: 100%; height: auto; display: block !important; border: 0 !important;";
+$img_limit_dims=" max-width:".$mod_width."px; max-height:".$mod_height."px;";
 if ($item_img_fit==0 || $content_layout <= 1) {
-	$img_force_dims .= $_img_limit_dims_;
+	$img_force_dims .= $img_limit_dims;
 }
 
 
+
+// Featured
+$item_columns_feat = $params->get('item_columns_feat', 1);
+$item_placement_feat = $params->get($layout.'_item_placement_feat', 0);  // 0: cleared, 1: as masonry tiles
+$cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
+	
+// Standard
+$item_placement_std = $params->get($layout.'_item_placement', 0);  // -1: other, 0: cleared, 1: as masonry tiles
+$item_columns_std = $params->get('item_columns', 2);
+$cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
+
+if ( ($item_placement_feat == 1 && $item_columns_feat > 1) || ($item_placement_std == 1 && $item_columns_std > 1) ) {
+	flexicontent_html::loadFramework('masonry');
+	flexicontent_html::loadFramework('imagesLoaded');
+}
+$document = JFactory::getDocument();
 ?>
 
-<div class="news mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_news<?php echo $module->id ?>">
+<div class="news mod_flexicontent_wrapper mod_flexicontent_wrap<?php echo $moduleclass_sfx; ?>" id="mod_flexicontent_news<?php echo $module->id; ?>">
 	
 	<?php
 	// Display FavList Information (if enabled)
@@ -136,10 +205,6 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 	
 	$separator = "";
 	$rowtoggler = 0;
-	$item_columns_feat = $params->get('item_columns_feat', 1);
-	$item_columns_std  = $params->get('item_columns', 2);
-	$cols_class_feat = ($item_columns_feat <= 1)  ?  ''  :  'cols_'.$item_columns_feat;
-	$cols_class_std  = ($item_columns_std  <= 1)  ?  ''  :  'cols_'.$item_columns_std;
 	
 	foreach ($ordering as $ord) :
   	echo $separator;
@@ -149,8 +214,11 @@ if ($item_img_fit==0 || $content_layout <= 1) {
   	  $separator = "";
   	  continue;
   	}
+  	// PREPEND ORDER if using more than 1 orderings ...
+  	$order_name = $ord ? $ord : 'default';
+		$uniq_ord_id = (count($list)>1 ? $order_name : '').$module->id;
 	?>
-	<div id="<?php echo 'order_'.( $ord ? $ord : 'default' ) . $module->id; ?>" class="mod_flexicontent">
+	<div id="<?php echo 'order_'.$order_name.$module->id; ?>" class="mod_flexicontent">
 		
 		<?php	if ($ordering_addtitle && $ord) : ?>
 		<div class='order_group_title'><?php echo $ord_titles[$ord]; ?></div>
@@ -162,7 +230,7 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 		<!-- BOF featured items -->
 		<?php	$rowcount = 0; ?>
 		
-		<div class="mod_flexicontent_featured" id="mod_fcitems_box_featured<?php echo $module->id ?>">
+		<div class="mod_flexicontent_featured mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>" id="mod_fcitems_box_featured_<?php echo $uniq_ord_id; ?>">
 			
 			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; ?>
 			
@@ -179,8 +247,24 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 			<div class="mod_flexicontent_featured_wrapper<?php echo ' '.$oe_class .($item->is_active_item ? ' fcitem_active' : '') .($cols_class_feat ? ' '.$cols_class_feat : ''); ?>">
 			<div class="mod_flexicontent_featured_wrapper_innerbox">
 			
+				<!-- BOF current item's title -->	
 				<?php ob_start(); ?>
+				<?php if ($display_title_feat) : ?>
+				<div class="fc_block" >
+					<div class="fc_inline_block fcitem_title">
+						<?php if ($link_title_feat) : ?>
+						<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+						<?php else : ?>	
+						<?php echo $item->title; ?>
+						<?php endif; ?>
+					</div>
+				</div>
+				<?php endif; ?>
+				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
+				<!-- EOF current item's title -->	
+				
 				<!-- BOF current item's image -->	
+				<?php ob_start(); ?>
 				<?php if ($mod_use_image_feat && $item->image_rendered) : ?>
 
 				<div class="image_featured">
@@ -193,7 +277,7 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 				
 				<?php elseif ($mod_use_image_feat && $item->image) : ?>
 				
-				<div class="image_featured">
+				<div class="image_featured <?php echo $img_container_class_feat;?>">
 					<?php if ($mod_link_image_feat) : ?>
 						<a href="<?php echo $item->link; ?>">
 							<img style="<?php echo $img_force_dims_feat; ?>" src="<?php echo $item->image; ?>" alt="<?php echo flexicontent_html::striptagsandcut($item->fulltitle, 60); ?>" />
@@ -204,29 +288,17 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 				</div>
 				
 				<?php endif; ?>
+				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
 				<!-- BOF current item's image -->
-				<?php $captured_image = ob_get_clean(); ?>
 				
-				<?php echo $content_layout!=2 ? $captured_image : '';?>
+				<?php echo $content_layout_feat!=2 ? $captured_image : '';?>
 				
 				<!-- BOF current item's content -->
-				<?php if ($display_date_feat || $display_text_feat || $display_hits_feat || $display_voting_feat || $display_comments_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
-				<div class="content_featured">
+				<?php if ($hasTitle || $display_date_feat || $display_text_feat || $display_hits_feat || $display_voting_feat || $display_comments_feat || $mod_readmore_feat || ($use_fields_feat && @$item->fields && $fields_feat)) : ?>
+				<div class="content_featured <?php echo $content_container_class_feat;?>">
 					
-					<!-- BOF current item's title -->	
-					<?php if ($display_title_feat) : ?>
-					<div class="fc_block" >
-						<div class="fc_inline_block fcitem_title">
-							<?php if ($link_title_feat) : ?>
-							<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
-							<?php else : ?>	
-							<?php echo $item->title; ?>
-							<?php endif; ?>
-						</div>
-					</div>
-					<?php endif; ?>
-					<!-- EOF current item's title -->	
-				
+					<?php echo $captured_title; ?>
+					
 					<?php if ($display_date_feat && $item->date_created) : ?>
 					<div class="fc_block">
 						<div class="fc_inline fcitem_date created">
@@ -302,12 +374,12 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 				</div> <!-- EOF current item's content -->
 				<?php endif; ?>
 				
-				<?php echo $content_layout==2 ? $captured_image : '';?>
+				<?php echo $content_layout_feat==2 ? $captured_image : '';?>
 				
 			</div>  <!-- EOF wrapper_innerbox -->
 			</div>  <!-- EOF wrapper -->
 			<!-- EOF current item -->
-			<?php echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : ''; ?>
+			<?php if ($item_placement_feat==0) /* 0: clear, 1: as masonry tiles */ echo !($rowcount%$item_columns_feat) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
 			
 		</div>
@@ -324,7 +396,7 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 		<!-- BOF standard items -->
 		<?php	$rowcount = 0; ?>
 		
-		<div class="mod_flexicontent_standard" id="mod_fcitems_box_standard<?php echo $module->id ?>">
+		<div class="mod_flexicontent_standard mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?>" id="mod_fcitems_box_standard_<?php echo $uniq_ord_id; ?>">
 			
 			<?php $oe_class = $rowtoggler ? 'odd' : 'even'; $n=-1; ?>
 			
@@ -344,9 +416,25 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 				onmouseout=""
 			>
 			<div class="mod_flexicontent_standard_wrapper_innerbox">
-
+				
+				<!-- BOF current item's title -->	
 				<?php ob_start(); ?>
+				<?php if ($display_title) : ?>
+				<div class="fc_block" >
+					<div class="fc_inline_block fcitem_title">
+						<?php if ($link_title) : ?>
+							<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
+						<?php else : ?>	
+							<?php echo $item->title; ?>
+						<?php endif; ?>
+					</div>
+				</div>
+				<?php endif; ?>
+				<?php $captured_title = ob_get_clean(); $hasTitle = (boolean) trim($captured_title); ?>
+				<!-- EOF current item's title -->	
+				
 				<!-- BOF current item's image -->	
+				<?php ob_start(); ?>
 				<?php if ($mod_use_image && $item->image_rendered) : ?>
 				<div class="image_standard">
 					<?php if ($mod_link_image) : ?>
@@ -369,26 +457,16 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 				</div>
 				
 				<?php endif; ?>
+				<?php $captured_image = ob_get_clean(); $hasImage = (boolean) trim($captured_image); ?>
 				<!-- BOF current item's image -->	
-				<?php $captured_image = ob_get_clean(); ?>
 				
 				<?php echo $content_layout!=2 ? $captured_image : '';?>
 				
 				<!-- BOF current item's content -->
-				<?php if ($display_date || $display_text || $display_hits || $display_voting || $display_comments || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
+				<?php if ($hasTitle || $display_date || $display_text || $display_hits || $display_voting || $display_comments || $mod_readmore || ($use_fields && @$item->fields && $fields)) : ?>
 				<div class="content_standard <?php echo $content_container_class;?>">
 					
-					<?php if ($display_title) : ?>
-					<div class="fc_block" >
-						<div class="fc_inline_block fcitem_title">
-							<?php if ($link_title) : ?>
-								<a href="<?php echo $item->link; ?>"><?php echo $item->title; ?></a>
-							<?php else : ?>	
-								<?php echo $item->title; ?>
-							<?php endif; ?>
-						</div>
-					</div>
-					<?php endif; ?>
+					<?php echo $captured_title; ?>
 					
 					<?php if ($display_date && $item->date_created) : ?>
 					<div class="fc_block">
@@ -463,15 +541,14 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 					<div class="clearfix"></div> 
 					
 				</div> <!-- EOF current item's content -->
+				<?php endif; ?>
 				
 				<?php echo $content_layout==2 ? $captured_image : '';?>
-				
-				<?php endif; ?>
 				
 			</div>  <!-- EOF wrapper_innerbox -->
 			</div>  <!-- EOF wrapper -->
 			<!-- EOF current item -->
-			<?php echo !($rowcount%$item_columns_std) ? '<div class="modclear"></div>' : ''; ?>
+			<?php if ($item_placement_std==0) echo !($rowcount%$item_columns_std) ? '<div class="modclear"></div>' : ''; ?>
 			<?php endforeach; ?>
 			
 		</div>
@@ -482,6 +559,89 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 	<div class="modclear"></div>
 	
 	</div>
+	
+	<?php
+	// We need this inside the loop since ... we may have multiple orderings thus we may
+	// have multiple container (1 item list container per order) being effected by JS
+	$js = ''
+		;
+	if ($js) $document->addScriptDeclaration($js);
+	
+	
+	// ***********************************************************
+	// Module specific styling (we use names containing module ID)
+	// ***********************************************************
+	
+	$css = ''.
+	/* CONTAINER of featured items */'
+	#mod_fcitems_box_featured_'.$uniq_ord_id.' {
+	}'.
+	/* CONTAINER of each featured item */'
+	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
+	}'.
+	/* inner CONTAINER of each standard item */'
+	#mod_fcitems_box_featured_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
+		'.($inner_inline_css_feat ? '
+		padding: '.$padding_top_bottom_feat.'px '.$padding_left_right_feat.'px !important;
+		border-width: '.$border_width_feat.'px!important;
+		margin: '.$margin_top_bottom_feat.'px '.$margin_left_right_feat.'px !important;
+		' : '').'
+	}'.
+	
+	/* CONTAINER of standard items */'
+	#mod_fcitems_box_standard_'.$uniq_ord_id.' {
+	}'.
+	/* CONTAINER of each standard item */'
+	#mod_fcitems_box_standard_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper {
+	}'.
+	/* inner CONTAINER of each standard item */'
+	#mod_fcitems_box_standard_'.$uniq_ord_id.' div.mod_flexicontent_standard_wrapper_innerbox {
+		'.($inner_inline_css ? '
+		padding: '.$padding_top_bottom.'px '.$padding_left_right.'px !important;
+		border-width: '.$border_width.'px!important;
+		margin: '.$margin_top_bottom.'px '.$margin_left_right.'px !important;
+		' : '').'
+	}'.
+	
+	''
+	;
+	
+	if ($css) $document->addStyleDeclaration($css);
+	
+	if ($item_placement_feat == 1 && $item_columns_feat > 1)
+	{
+		$js = "
+		jQuery(document).ready(function(){
+			var container = document.querySelector('div#mod_fcitems_box_featured_".$uniq_ord_id."');
+			var msnry;
+			// initialize Masonry after all images have loaded
+			if (container) {
+				imagesLoaded( container, function() {
+					msnry = new Masonry( container );
+				});
+			}
+		});
+		";
+		if ($js) $document->addScriptDeclaration($js);
+	}
+	if ($item_placement_std == 1 && $item_columns_std > 1)
+	{
+		$js = "
+		jQuery(document).ready(function(){
+			var container = document.querySelector('div#mod_fcitems_box_standard_".$uniq_ord_id."');
+			var msnry;
+			// initialize Masonry after all images have loaded
+			if (container) {
+				imagesLoaded( container, function() {
+					msnry = new Masonry( container );
+				});
+			}
+		});
+		";
+		if ($js) $document->addScriptDeclaration($js);
+	}
+	?>
+	
 	<?php endforeach; ?>
 	
 	<?php
@@ -490,51 +650,3 @@ if ($item_img_fit==0 || $content_layout <= 1) {
 	?>
 	
 </div>
-
-<?php
-$document = JFactory::getDocument();
-// ***********************************************************
-// Module specific styling (we use names containing module ID)
-// ***********************************************************
-
-$css = ''.
-
-'
-#mod_fcitems_box_featured'.$module->id.' div.mod_flexicontent_featured_wrapper_innerbox {
-}'.
-
-/* CONTAINER of standard items */'
-#mod_fcitems_box_standard'.$module->id.' {}'.
-
-/* inner CONTAINER of standard items */'
-#mod_fcitems_box_standard'.$module->id.' div.mod_flexicontent_standard_wrapper {
-	border-width: 0px!important;
-	padding-top: 0px !important;
-	padding-bottom: 0px !important;
-	padding-left: 0px !important;
-	padding-right: 0px !important;
-	margin: 0px!important;
-	width: auto;
-	float: left !important;
-	overflow: hidden !important;
-}
-#mod_fcitems_box_standard'.$module->id.' div.mod_flexicontent_standard_wrapper_innerbox {
-	border-width: '.$border_width.'px!important;
-	padding-top: '.$padding_top_bottom.'px !important;
-	padding-bottom: '.$padding_top_bottom.'px !important;
-	padding-left: '.$padding_left_right.'px!important;
-	padding-right: '.$padding_left_right.'px!important;
-	margin: 0px!important;
-	width: auto!important;
-	float: none !important;
-	overflow: hidden !important;
-	height:100%;  /* will be overriden with element style setting */
-	'.
-	// CSS trick to force same height for all items, but crops border
-	//margin-bottom: -99999px; padding-bottom: 99999px;
-	'
-}'.
-''
-;
-
-$document->addStyleDeclaration($css);
