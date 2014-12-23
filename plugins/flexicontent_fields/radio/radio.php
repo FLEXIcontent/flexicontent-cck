@@ -292,10 +292,13 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		// Reformat the posted data
 		$newpost = array();
 		$new = 0;
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
 		foreach ($post as $n=>$v)
 		{
 			if ($post[$n] !== '')
 			{
+				$element = @$elements[ $v ];
+				if ( !$element ) continue;
 				$newpost[$new] = $post[$n];
 			}
 			$new++;
@@ -334,7 +337,7 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
-
+		
 		// Get indexed element values
 		$item_pros = false;
 		$elements = FlexicontentFields::indexedField_getElements($filter, $item=null, self::$extra_props, $item_pros, $create_filter=true);

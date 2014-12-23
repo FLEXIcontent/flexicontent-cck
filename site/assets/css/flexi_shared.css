@@ -767,20 +767,48 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
   background-color: #eee !important;
 }
 
-#flexicontent .ui-sortable > li.fcfieldval_container.valuebox,
-.fcfieldval_container.valuebox {
-	/*background: lightyellow;
-	border: 1px solid lightgray;*/
-	margin: 0 8px 4px 0 !important;
-	padding: 4px !important;
+#flexicontent ul.ui-sortable > li.fcfieldval_container.valuebox,
+#flexicontent .fcfieldval_container.valuebox {
+	clear: none;
+	display: block;
+	height: auto;
+	position: relative;
+	/*background: lightyellow;*/
+	/*border: 1px solid lightgray;*/
+	margin: 0 0% 4px 0%;
+	padding: 4px 1%;
 	float: left;
 }
+#flexicontent ul.ui-sortable > li.fcfieldval_container.valuebox {
+	list-style: none;
+}
+.container_fcfield > ul.ui-sortable > li.fcfieldval_container.valuebox {
+	width: 100%;
+	padding: 1% !important;
+	margin: 0% !important;
+}
+.container_fcfield > ul.ui-sortable > li.fcfieldval_container.valuebox .flexi.label.sub_label {
+	width: 16% !important;
+	padding: 4px 1% !important;
+	margin: 0 1% 0 0 !important;
+}
+.container_fcfield > ul.ui-sortable > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+	width: 81% !important;
+	padding: 6px 1% !important;
+	margin: 0% !important;
+}
+.container_fcfield .fcfieldval_container.valuebox {
+	width: 100%;
+}
+
+
 #flexicontent .fcfield-sortables {
 	display: block;
 	list-style: none!important;
 	position: static;
 	margin:0px!important;
 	padding:0px!important;
+	width: 100%;
 }
 #flexicontent .fcfield-sortables > li { margin:0px 0px 4px 0px; padding:0px; }
 #flexicontent .fcfield-sortables > li .input-append,
@@ -788,7 +816,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 
 /* buttons in forms, special class for add button */
 #flexicontent .fcfield-button,
-#flexicontent .fcfield-addvalue { padding:6px 8px; margin:2px 2px 0px 6px !important; }
+#flexicontent .fcfield-addvalue { padding:6px 8px; margin:2px 2px 2px 6px !important; }
 #flexicontent .fcfield-addvalue { clear:both!important; display:block!important; float:left!important; }
 
 /* special classes for button-like add-link */
@@ -812,9 +840,15 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	text-decoration:none!important; border:1px solid darkred;
 }
 
-#flexicontent .fcfield-button { margin-left:6px!important; float:none!important; }
-#flexicontent .fcfield-drag {	float:none; margin:0px; padding:0px; }
-#flexicontent .fcfield-drag img { margin:2px 4px -3px 6px !important; cursor: move!important; float: none!important; display: inline!important; }
+#flexicontent .fcfield-button {
+	float: none!important; /* do not override breaks dragging */
+	margin-left: 6px;
+}
+#flexicontent .fcfield-drag {
+	float:none !important; /* do not override breaks dragging */
+	margin:0px; padding:0px;
+}
+#flexicontent .fcfield-drag img { margin:2px 4px -3px 6px !important; cursor: move!important; float: none!important; display: inline!important; vertical-align:baseline; }
 #flexicontent .fcfield-row img.calendar { margin:0px 0px 0px 2px !important; }
 
 #flexicontent div fieldset.panelform input,

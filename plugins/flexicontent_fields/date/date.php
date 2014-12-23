@@ -61,20 +61,31 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		}
 		
 		// initialize framework objects and other variables
-		$document  = JFactory::getDocument();
-		$config    = JFactory::getConfig();
-		$app       = JFactory::getApplication();
-		$user      = JFactory::getUser();
+		$document = JFactory::getDocument();
+		$config   = JFactory::getConfig();
+		$app      = JFactory::getApplication();
+		$user     = JFactory::getUser();
 		
-		// some parameter shortcuts
-		$size       = (int) $field->parameters->get( 'size', 30 ) ;
+		
+		// ****************
+		// Number of values
+		// ****************
 		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
-		$disable_keyboardinput = $field->parameters->get('disable_keyboardinput', 0);
 		
-		// find timezone and create user instructions, both according to given configuration
+		
+		// Input field display size & max characters
+		$size       = (int) $field->parameters->get( 'size', 30 ) ;
+		$disable_keyboardinput = (int) $field->parameters->get('disable_keyboardinput', 0);
+		
+		
+		// *******************************************
+		// Find timezone and create user instructions,
+		// both according to given configuration
+		// *******************************************
+		
 		$show_usage     = $field->parameters->get( 'show_usage', 0 ) ;
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
@@ -118,10 +129,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		}
 		
 		// Field name and HTML TAG id
-		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
-		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		$fieldname = 'custom['.$field->name.']';
+		$elementid = 'custom_'.$field->name;
 		
 		$js = "";
+		$css = "";
 		
 		if ($multiple) // handle multiple records
 		{
@@ -141,7 +153,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
-
+			
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
 				remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
@@ -156,22 +168,25 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				
-				var theInput = newField.find('input').first();  /* First element is the value input field, second is e.g remove button */
+				// Update the new text field
+				var theInput = newField.find('input.fcfield_textval').first();
 				theInput.val('');
 				theInput.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
 				theInput.attr('id', '".$elementid."_'+uniqueRowNum".$field->id.");
-
+				
+				// Update date picker
 				var thePicker = theInput.next();
 				thePicker.attr('id', '".$elementid."_' +uniqueRowNum".$field->id." +'_img');
 				
 			";
 			
+			// Disable keyboard input if so configured
 			if($disable_keyboardinput)
 				$js .= "
 				theInput.on('keydown keypress keyup', false);
 				";
 			
-			// Add to new field to DOM
+			// Add new field to DOM
 			$js .= "
 				newField.insertAfter( lastField );
 				if (remove_previous) lastField.remove();
@@ -184,10 +199,10 @@ class plgFlexicontent_fieldsDate extends JPlugin
 					align:			'Tl',
 					singleClick:	true
 				});
-				";
+			";
 			
 			// Add new element to sortable objects (if field not in group)
-			if (!$use_ingroup) $js .="
+			if (!$use_ingroup) $js .= "
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
 					containment: 'parent',
@@ -207,13 +222,12 @@ class plgFlexicontent_fieldsDate extends JPlugin
 
 			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
-				// Add empty container if last element, instantly removing the given field value container
-				// (doing no hide/delete effect since we will add a new empty container with add effect)
-				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
-				
 				// Find field value container
 				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				// Add empty container if last element, instantly removing the given field value container
+				if(rowCount".$field->id." == 1)
+					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if(rowCount".$field->id." > 1) {
@@ -226,21 +240,7 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			}
 			";
 			
-			$css = '
-			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
-			#sortables_'.$field->id.' li {
-				clear: both;
-				display: block;
-				list-style: none;
-				height: auto;
-				position: relative;
-			}
-			#sortables_'.$field->id.' li.sortabledisabled {
-				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
-			}
-			#sortables_'.$field->id.' li input { cursor: text;}
-			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
-			#sortables_'.$field->id.' li .admintable { text-align: left; }
+			$css .= '
 			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
 			';
 			
@@ -249,8 +249,8 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		} else {
 			$remove_button = '';
 			$move2 = '';
-			$js = '';
-			$css = '';
+			$js .= '';
+			$css .= '';
 		}
 		
 		if ($js)  $document->addScriptDeclaration($js);
@@ -262,19 +262,22 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
+			if ( empty($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+			
+			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
 			$calendar = FlexicontentFields::createCalendarField($value, $date_allowtime, $fieldname, $elementid_n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
-			if (!$calendar && !$use_ingroup) {
+			if (!$calendar) {
 				$skipped_vals[] = $value;
 				if (!$use_ingroup) continue;
 				$calendar = FlexicontentFields::createCalendarField('', $date_allowtime, $fieldname, $elementid_n, $attribs_arr=array('class'=>'fcfield_textval'.$required), $skip_on_invalid=true, $timezone);
 			}
 			
 			$field->html[] = '
-				'.$calendar.'
 				'.($use_ingroup ? '' : $move2).'
 				'.($use_ingroup ? '' : $remove_button).'
+				'.$calendar.'
 				';
 			
 			if($disable_keyboardinput) {
@@ -291,13 +294,14 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
-			$_list = "<li>". implode("</li>\n<li>", $field->html) ."</li>\n";
-			$field->html = '
-				<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$_list. '</ul>
-				<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />
-			';
+			$field->html =
+				'<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">'.
+					implode('</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			$field->html .= '<input type="button" class="fcfield-addvalue" style="float:left; clear:both;" onclick="addField'.$field->id.'(this);" value=" -- '.JText::_( 'FLEXI_ADD_VALUE' ).' -- " />';
 		} else {  // handle single values
-			$field->html = $field->html[0];
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
 		
 		if (!$use_ingroup) $field->html =
@@ -319,15 +323,25 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
-		// initialize framework objects and other variables
+		// Some variables
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
+		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		$config = JFactory::getConfig();
 		$user = JFactory::getUser();
 		
+		// Value handling parameters
+		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
+		$multiple = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		$date_source = $field->parameters->get('date_source', 0);
+		$show_no_value  = $field->parameters->get( 'show_no_value', 0) ;
+		$no_value_msg   = $field->parameters->get( 'no_value_msg', 'FLEXI_NO_VALUE') ;
+		$no_value_msg   = $show_no_value ? JText::_($no_value_msg) : '';
+		
 		// Get field values
 		$values = $values ? $values : $field->value;
-		// DO NOT terminate yet if value is empty since a default value on empty may have been defined
 		
-		$date_source = $field->parameters->get('date_source', 0);
+		// Load publish_up/publish_down values if so configured
 		if ( $date_source )
 		{
 			static $nullDate, $never_date;
@@ -345,15 +359,12 @@ class plgFlexicontent_fieldsDate extends JPlugin
 			$values = array($_value);
 		}
 		
-		// Value handling parameters
-		$multiple       = $field->parameters->get( 'allow_multiple', 0 ) ;
+		// Timezone configuration
 		$date_allowtime = $field->parameters->get( 'date_allowtime', 1 ) ;
 		$use_editor_tz  = $field->parameters->get( 'use_editor_tz', 0 ) ;
 		$use_editor_tz  = $date_allowtime ? $use_editor_tz : 0;
 		$customdate     = $field->parameters->get( 'custom_date', FLEXI_J16GE ? 'Y-m-d' : '%Y-%m-%d' ) ;
 		$dateformat     = $field->parameters->get( 'date_format', $customdate ) ;
-		$show_no_value  = $field->parameters->get( 'show_no_value', 0) ;
-		$no_value_msg   = $field->parameters->get( 'no_value_msg', 'FLEXI_NO_VALUE') ;
 		
 		$display_tz_logged   = $field->parameters->get( 'display_tz_logged', 2) ;
 		$display_tz_guests   = $field->parameters->get( 'display_tz_guests', 2) ;
@@ -450,7 +461,11 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$n = 0;
 		foreach ($values as $value)
 		{
-			if ( !strlen($value) ) continue;
+			if ( !strlen($value) && !$use_ingroup ) continue;
+			if ( !strlen($value) ) {
+				$field->{$prop}[$n++]	= $no_value_msg;
+				continue;
+			}
 			
 			// Check if dates are allowed to have time part
 			if ($date_allowtime) $date = $value;
@@ -464,18 +479,22 @@ class plgFlexicontent_fieldsDate extends JPlugin
 				$date = '';
 			}
 			
-			$field->{$prop}[$n]	= $pretext.$date.$posttext;
+			// Add prefix / suffix
+			$field->{$prop}[$n]	= !$add_enclosers ? $date : $pretext.$date.$posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		// Apply separator and open/close tags
-		$field->{$prop} = implode($separatorf, $field->{$prop});
-		if ( $field->{$prop}!=='' ) {
-			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-		} else {
-			$field->{$prop} = $show_no_value ? JText::_($no_value_msg) : '';
+		if (!$use_ingroup)  // do not convert the array to string if field is in a group
+		{
+			// Apply separator and open/close tags
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+			if ( $field->{$prop}!=='' ) {
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			} else {
+				$field->{$prop} = $no_value_msg;
+			}
 		}
 	}
 	
@@ -517,37 +536,39 @@ class plgFlexicontent_fieldsDate extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			if ($post[$n] !== '' || $use_ingroup)
+			// Do server-side validation and skip empty values
+			$post[$n] = flexicontent_html::dataFilter($post[$n], 200, 'STRING', 0);
+			
+			if (!strlen($post[$n]) && !$use_ingroup) continue; // skip empty values
+
+			// Check if dates are allowed to have time part
+			@list($date, $time) = preg_split('#\s+#', $post[$n], $limit=2);
+			$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
+				
+			if (!$date_allowtime)
 			{
-				// Check if dates are allowed to have time part
-				@list($date, $time) = preg_split('#\s+#', $post[$n], $limit=2);
-				$time = ($date_allowtime==2 && !$time) ? '00:00' : $time;
-				
-				if (!$date_allowtime)
-				{
-					// Time part not allowed
-					$post[$n] = $date;
-				}
-				else if ($time)
-				{
-					// Time part exists
-					$post[$n] = $date.' '.$time;
-				}
-				
-				if (!$use_editor_tz || !$time)
-				{
-					// Dates have no timezone information, because either :
-					// (a) ignoring timezone OR (b) no time given
-					$newpost[$new] = $post[$n];
-				}
-				else
-				{
-					// Dates are in user's timezone, convert to UTC+0
-					$date = new JDate($post[$n], $timezone);
-					$newpost[$new] = FLEXI_J16GE ? $date->toSql() : $date->toMySQL();
-				}
-				$new++;
+				// Time part not allowed
+				$post[$n] = $date;
 			}
+			else if ($time)
+			{
+				// Time part exists
+				$post[$n] = $date.' '.$time;
+			}
+				
+			if (!$use_editor_tz || !$time)
+			{
+				// Dates have no timezone information, because either :
+				// (a) ignoring timezone OR (b) no time given
+				$newpost[$new] = $post[$n];
+			}
+			else
+			{
+				// Dates are in user's timezone, convert to UTC+0
+				$date = new JDate($post[$n], $timezone);
+				$newpost[$new] = $date->toSql();
+			}
+			$new++;
 		}
 		$post = $newpost;
 		/*if ($use_ingroup) {

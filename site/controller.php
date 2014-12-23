@@ -2352,6 +2352,12 @@ class FlexicontentController extends JControllerLegacy
 		// get the url from the array
 		$url = $link['link'];
 		
+		// Check if url is absolute aka has protocol, if not check and prepend Joomla 's current root
+		$protocol = parse_url($url, PHP_URL_SCHEME);
+		if (!$protocol) {
+			$url .= (substr($url, 0, 1) == '/')  ?  ''  :  JURI::root(true) . '/';
+		}
+		
 		// update the hit count
 		$link['hits'] = (int)$link['hits'] + 1;
 		$value = serialize($link);

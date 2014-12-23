@@ -43,45 +43,66 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if ($use_ingroup) $field->formhidden = 3;
+		if ($use_ingroup && empty($field->ingroup)) return;
 		
 		// initialize framework objects and other variables
-		$document  = JFactory::getDocument();
+		$document = JFactory::getDocument();
 		
-		// some parameter shortcuts
-		$size       = (int) $field->parameters->get( 'size', 30 ) ;
-		$multiple   = $field->parameters->get( 'allow_multiple', 0 ) ;
-		$max_values = (int) $field->parameters->get( 'max_values', 0 ) ;
+		
+		// ****************
+		// Number of values
+		// ****************
+		$multiple   = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
-		// This is field 's MAIN value property
+		
+		// ***
+		// URL
+		// ***
+		
+		// Default value
 		$link_usage   = $field->parameters->get( 'link_usage', 0 ) ;
 		$default_link = ($item->version == 0 || $link_usage > 0) ? $field->parameters->get( 'default_value_link', '' ) : '';
+		$default_link = $default_link ? JText::_($default_link) : '';
 		
-		// Optional value properties
+		
+		// ***********************************
+		// URL title & linking text (optional)
+		// ***********************************
+		
+		// Default value
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
 		$default_title = ($item->version == 0 || $title_usage > 0) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$default_title = $default_title ? JText::_($default_title) : '';
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
+		
+		// Input field display size & max characters
+		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
-			$field->value[0]['link']  = JText::_($default_link);
-			$field->value[0]['title'] = JText::_($default_title);
+			$field->value[0]['link']  = $default_link;
+			$field->value[0]['title'] = $default_title;
 			$field->value[0]['hits']  = 0;
 			$field->value[0] = serialize($field->value[0]);
 		}
 		
 		// Field name and HTML TAG id
-		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.']' : $field->name;
-		$elementid = FLEXI_J16GE ? 'custom_'.$field->name : $field->name;
+		$fieldname = 'custom['.$field->name.']';
+		$elementid = 'custom_'.$field->name;
 		
 		$js = "";
+		$css = "";
 		
 		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
-			$js .= "
+			if (!$use_ingroup) $js .="
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
@@ -96,76 +117,108 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
 			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
 			var maxValues".$field->id." = ".$max_values.";
-
-			function addField".$field->id."(el) {
+			
+			function addField".$field->id."(el, groupval_box, fieldval_box, params)
+			{
+				remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
+				scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
+				animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
 				
-				var thisField 	 = jQuery(el).prev().children().last();
-				var thisNewField = thisField.clone();
+				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
+				var newField  = lastField.clone();
 				
-				jQuery(thisNewField).find('input.urllink').attr('value','".$default_link."');
-				jQuery(thisNewField).find('input.urllink').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
-				jQuery(thisNewField).find('input.urllink').attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
+				theInput = newField.find('input.urllink').first();
+				theInput.val('".$default_link."');
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
+				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
 				";
 				
 			if ($usetitle) $js .= "
-				jQuery(thisNewField).find('input.urltitle').attr('value','".$default_title."');
-				jQuery(thisNewField).find('input.urltitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				theInput = newField.find('input.urltitle').first();
+				theInput.val('".$default_title."');
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				";
 				
+				
 			$js .= "
-				jQuery(thisNewField).find('input.urlhits').attr('value','0');
-				jQuery(thisNewField).find('input.urlhits').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
+				theInput = newField.find('input.urlhits').first();
+				theInput.val('0');
+				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
 				
 				// Set hits to zero for new row value
-				jQuery(thisNewField).find('span span').html('0');
-				jQuery(thisNewField).css('display', 'none');
-				jQuery(thisNewField).insertAfter( jQuery(thisField) );
-				
+				newField.find('span span').html('0');
+				newField.css('display', 'none');
+				";
+			
+			// Add new field to DOM
+			$js .= "
+				newField.insertAfter( lastField );
+				if (remove_previous) lastField.remove();
+			";
+			
+			
+			// Add new element to sortable objects (if field not in group)
+			if (!$use_ingroup) $js .= "
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
+			";
+			
+			// Show new field, increment counters
+			$js .="
+				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
+				if (scroll_visible) fc_scrollIntoView(newField, 1);
+				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
 				
-				jQuery(thisNewField).show('slideDown');
+				// Enable tooltips on new element
+				".( FLEXI_J30GE ? "
+					newField.find('.hasTooltip').tooltip({'html': true,'container': newField});
+				" : "
+					var tipped_elements = newField.find('.hasTip');
+					tipped_elements.each(function() {
+						var title = this.get('title');
+						if (title) {
+							var parts = title.split('::', 2);
+							this.store('tip:title', parts[0]);
+							this.store('tip:text', parts[1]);
+						}
+					});
+					var ajax_JTooltips = new Tips($(#sortables_".$field->id."').getNext().getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
+				")."
 				
 				rowCount".$field->id."++;       // incremented / decremented
 				uniqueRowNum".$field->id."++;   // incremented only
 			}
 
-			function deleteField".$field->id."(el)
+			function deleteField".$field->id."(el, groupval_box, fieldval_box)
 			{
-				if(rowCount".$field->id." <= 1) return;
-				var row = jQuery(el).closest('li');
-				jQuery(row).hide('slideUp', function() { jQuery(this).remove(); } );
-				rowCount".$field->id."--;
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				// Add empty container if last element, instantly removing the given field value container
+				if(rowCount".$field->id." == 1)
+					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
+				
+				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
+				if(rowCount".$field->id." > 1) {
+					// Destroy the remove button, so that it is not reclicked again, while we do the hide effect (before DOM removal)
+					if (el) jQuery(el).remove();
+					// Do hide effect then remove from DOM
+					row.slideUp(400, function(){ this.remove(); });
+					rowCount".$field->id."--;
+				}
 			}
 			";
 			
-			$css = '
-			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: normal; }
-			#sortables_'.$field->id.' li {
-				clear: both;
-				display: block;
-				list-style: none;
-				height: auto;
-				position: relative;
-			}
-			#sortables_'.$field->id.' li.sortabledisabled {
-				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
-			}
-			#sortables_'.$field->id.' li input { cursor: text;}
-			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
-			#sortables_'.$field->id.' li .admintable { text-align: left; }
+			$css .= '
 			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
-			#sortables_'.$field->id.' label.label, #sortables_'.$field->id.' input.urllink, #sortables_'.$field->id.' input.urltitle, #sortables_'.$field->id.' input.fcfield-button {
-				float: none!important;
-				display: inline-block!important;
-			}
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
@@ -173,8 +226,8 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		} else {
 			$remove_button = '';
 			$move2 = '';
-			$js = '';
-			$css = '';
+			$js .= '';
+			$css .= '';
 		}
 		
 		if ($js)  $document->addScriptDeclaration($js);
@@ -182,63 +235,73 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
+		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
-			if ( !strlen($value) ) continue;
-			
-			// Compatibility for old unserialized values
-			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
-				$value = unserialize($value);
+			// Compatibility for unserialized values or for NULL values in a field group
+			$v = !empty($value) ? @unserialize($value) : false;
+			if ( $v !== false || $v === 'b:0;' ) {
+				$value = $v;
 			} else {
 				$value = array('link' => $value, 'title' => '', 'hits'=>0);
 			}
+			if ( empty($value['link']) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+			
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
+			$value['link'] = !empty($value['link']) ? $value['link'] : $default_link;
+			$value['link'] = htmlspecialchars(
+				(FLEXI_J30GE ? JStringPunycode::urlToUTF8($value['link']) : $value['link']),
+				ENT_COMPAT, 'UTF-8'
+			);
 			$link = '
 				<div class="nowrap_box">
-				<label class="label">'.JText::_( 'FLEXI_FIELD_URL' ).':</label>
-				<input class="urllink fcfield_textval'.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['link'].'" />
-				</div>
-			';
+					<label class="label">'.JText::_( 'FLEXI_FIELD_URL' ).'</label>
+					<input class="urllink fcfield_textval '.$required.'" name="'.$fieldname_n.'[link]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['link'].'" />
+				</div>';
 			
 			$title = '';
-			if ($usetitle) $title = '
+			if ($usetitle) {
+				$value['title'] = !empty($value['title']) ? $value['title'] : $default_title;
+				$value['title'] = htmlspecialchars($value['title'], ENT_COMPAT, 'UTF-8');
+				$title = '
 				<div class="nowrap_box">
-				<label class="label">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).':</label>
-				<input class="urltitle fcfield_textval" name="'.$fieldname_n.'[title]" type="text" size="'.$size.'" value="'.@$value['title'].'" />
-				</div>
-			';
+					<label class="label">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).'</label>
+					<input class="urltitle fcfield_textval" name="'.$fieldname_n.'[title]" type="text" size="'.$size.'" value="'.$value['title'].'" />
+				</div>';
+			}
 			
 			$hits = (int) @ $value['hits'];
 			$hits = '
 				<div class="nowrap_box">
-				<label class="label hits">'.JText::_( 'FLEXI_FIELD_HITS' ).':</label>
-				<span class="hitcount">'.$hits.'</span> 
-				<input class="urlhits" name="'.$fieldname_n.'[hits]" type="hidden" value="'.$hits.'" />
-				</div>
-			';
+					<label class="label hits">'.JText::_( 'FLEXI_FIELD_HITS' ).'</label>
+					<span class="hitcount">'.$hits.'</span> 
+					<input class="urlhits" name="'.$fieldname_n.'[hits]" type="hidden" value="'.$hits.'" />
+				</div>';
 			
 			$field->html[] = '
+				'.($use_ingroup ? '' : $move2).'
+				'.($use_ingroup ? '' : $remove_button).'
 				'.$link.'
 				'.$title.'
 				'.$hits.'
-				'.$move2.'
-				'.$remove_button.'
 				';
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		if ($multiple) { // handle multiple records
-			$_list = "<li>". implode("</li>\n<li>", $field->html) ."</li>\n";
-			$field->html = '
-				<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$_list. '</ul>
-				<input type="button" class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_ADD_VALUE' ).'" />
-			';
+		if ($use_ingroup) { // do not convert the array to string if field is in a group
+		} else if ($multiple) { // handle multiple records
+			$field->html =
+				'<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">'.
+					implode('</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			$field->html .= '<input type="button" class="fcfield-addvalue" style="float:left; clear:both;" onclick="addField'.$field->id.'(this);" value=" -- '.JText::_( 'FLEXI_ADD_VALUE' ).' -- " />';
 		} else {  // handle single values
-			$field->html = $field->html[0];
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
 	}
 	
@@ -268,6 +331,15 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		
 		$field->label = JText::_($field->label);
 		
+		// Some variables
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
+		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
+		
+		// Value handling parameters
+		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
+		$multiple = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		
 		// some parameter shortcuts
 		$target = $field->parameters->get( 'targetblank', 0 );
 		$target_param   = $target ? ' target="_blank"' : '';
@@ -276,33 +348,46 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$add_hits_txt = $display_hits == 2 || $display_hits == 3 || $isMobile;
 		$rel_nofollow = $field->parameters->get( 'add_rel_nofollow', 0 ) ? ' rel="nofollow"'    : '';
 		
-		// This is field 's MAIN value property
+		// URL value
 		$link_usage   = $field->parameters->get( 'link_usage', 0 ) ;
 		$default_link = ($link_usage == 2) ? $field->parameters->get( 'default_value_link', '' ) : '';
+		$default_link = $default_link ? JText::_($default_link) : '';
 		
-		// Optional value properties
+		// URL title & linking text (optional)
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		$title_usage   = $field->parameters->get( 'title_usage', 0 ) ;
-		$default_title = ($title_usage == 2)  ?  JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$default_title = ($title_usage == 2) ? JText::_($field->parameters->get( 'default_value_title', '' )) : '';
+		$default_title = $default_title ? JText::_($default_title) : '';
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
-		// DO NOT terminate yet if value is empty since a default value on empty may have been defined
 		
-		// Handle default value loading, instead of empty value
-		if ( empty($values) && !strlen($default_link) ) {
-			$field->{$prop} = '';
-			return;
-		} else if ( empty($values) && strlen($default_link) ) {
+		// Load default value
+		if ( empty($values) ) {
+			if (!strlen($default_link)) {
+				$field->{$prop} = $use_ingroup ? array() : '';
+				return;
+			}
 			$values = array();
-			$values[0]['link']  = JText::_($default_link);
-			$values[0]['title'] = JText::_($default_title);
+			$values[0]['link']  = $default_link;
+			$values[0]['title'] = $default_title;
 			$values[0]['hits']  = 0;
 			$values[0] = serialize($values[0]);
 		}
 		
-		// Value handling parameters
-		$multiple       = $field->parameters->get( 'allow_multiple', 0 ) ;
+		// (* BECAUSE OF THIS, the value display loop expects unserialized values)
+		foreach ($values as &$value)
+		{
+			// Compatibility for unserialized values or for NULL values in a field group
+			$v = !empty($value) ? @unserialize($value) : false;
+			if ( $v !== false || $v === 'b:0;' ) {
+				$value = $v;
+			} else {
+				$value = array('link' => $value, 'title' => '', 'hits'=>0);
+			}
+		}
+		unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
+		
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -356,28 +441,21 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
 		}
 		
-		// needed for backend display
-		//if ($display_hits)
-		//	$isAdmin = JFactory::getApplication()->isAdmin();
-		
 		// initialise property
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)
 		{
-			if ( !strlen($value) ) continue;
-			
-			// Compatibility for old unserialized values
-			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
-				$value = unserialize($value);
-			} else {
-				$value = array('link' => $value, 'title' => '', 'hits'=>0);
+			if ( empty($value['link']) && !$use_ingroup ) continue;  // no link ...
+			if ( empty($value['link']) ) {
+				$field->{$prop}[$n++]	= '';
+				continue;
 			}
-			if ( empty($value['link']) ) continue;  // no link ...
 			
 			// If not using property or property is empty, then use default property value
 			// NOTE: default property values have been cleared, if (propertyname_usage != 2)
 			$title    = ($usetitle && @$value['title']   )  ?  $value['title']    : $default_title;
+			$linktext = '';  // no linktext for weblink for extended web link field if this is needed
 			$hits     = (int) @ $value['hits'];
 			
 			$link_params  = $title ? ' title="'.$title.'"' : '';
@@ -392,8 +470,11 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				$href = JRoute::_( 'index.php?option=com_flexicontent&fid='. $field->id .'&cid='.$field->item_id.'&ord='.($n+1).'&task=weblink' );
 			
 			// Create indirect link to web-link address with custom displayed text
-			$linktext = $title ? $title: $this->cleanurl($value['link']);
-			$field->{$prop}[$n] = $pretext. '<a href="' .$href. '" '.$link_params.'>' .$linktext. '</a>' .$posttext;
+			if( empty($linktext) )
+				$linktext = $title ? $title : $this->cleanurl(
+					(FLEXI_J30GE ? JStringPunycode::urlToUTF8($value['link']) : $value['link'])    // If using URL convert from Punycode to UTF8
+				);
+			$html = '<a href="' .$href. '" '.$link_params.'>' .$linktext. '</a>';
 			
 			// HITS: either as icon or as inline text or both
 			$hits_html = '';
@@ -408,21 +489,27 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				}
 				$hits_html .= '</span>';
 				if ($prop == 'display_hitsonly')
-					$field->{$prop}[$n] = $hits_html;
+					$html = $hits_html;
 				else
-					$field->{$prop}[$n] .= ' '. $hits_html;
+					$html .= ' '. $hits_html;
 			}
+			
+			// Add prefix / suffix
+			$field->{$prop}[$n]	= !$add_enclosers ? $html : $pretext . $html . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		// Apply seperator and open/close tags
-		if(count($field->{$prop})) {
+		if (!$use_ingroup)  // do not convert the array to string if field is in a group
+		{
+			// Apply separator and open/close tags
 			$field->{$prop} = implode($separatorf, $field->{$prop});
-			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-		} else {
-			$field->{$prop} = '';
+			if ( $field->{$prop}!=='' ) {
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			} else {
+				$field->{$prop} = '';
+			}
 		}
 	}
 	
@@ -437,9 +524,13 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-		if ( !is_array($post) && !strlen($post) ) return;
+		
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
 		$is_importcsv = JRequest::getVar('task') == 'importcsv';
+		$host = JURI::getInstance('SERVER')->gethost();
+		
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -458,15 +549,33 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				}
 			}
 			
-			if ($post[$n]['link'] !== '')
-			{
-				$newpost[$new] = $post[$n];
-				$http_prefix = (!preg_match("#^http|^https|^ftp#i", $post[$n]['link'])) ? 'http://' : '';
-				$newpost[$new]['link']    = $http_prefix.$post[$n]['link'];
-				$newpost[$new]['title']   = strip_tags(@$post[$n]['title']);
-				$newpost[$new]['hits']    = (int) @ $post[$n]['hits'];
-				$new++;
+			
+			// ***********************************************************
+			// Validate URL, skipping URLs that are empty after validation
+			// ***********************************************************
+			
+			$link = flexicontent_html::dataFilter($post[$n]['link'], 0, 'URL', 0);  // Clean bad text/html
+			if ( empty($link) && !$use_ingroup ) continue;  // Skip empty values if not in field group
+			
+			// Sanitize the URL as absolute or relative
+			// Has protocol nothing to do
+			if ( parse_url($link, PHP_URL_SCHEME) ) $prefix = '';
+			// Has current domain but no protocol just add http://
+			else if (strpos($link, $host) === 0) $prefix = 'http://';
+			// URLs are absolute, for relative URL support you need extended web link field
+			else {
+				if (substr($link, 0, 10) == '/index.php')  $link = substr($link, 1);
+				$prefix = (substr($link, 0, 9) == 'index.php') ? JURI::root() : 'http://';
 			}
+			
+			$newpost[$new] = array();
+			$newpost[$new]['link'] = $prefix.$link;
+			
+			// Validate other value properties
+			$newpost[$new]['title']   = flexicontent_html::dataFilter(@$post[$n]['title'], 0, 'STRING', 0);
+			$newpost[$new]['hits']    = (int) @ $post[$n]['hits'];
+			
+			$new++;
 		}
 		$post = $newpost;
 		
@@ -474,6 +583,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		foreach($post as $i => $v) {
 			$post[$i] = serialize($v);
 		}
+		/*if ($use_ingroup) {
+			$app = JFactory::getApplication();
+			$app->enqueueMessage( print_r($post, true), 'warning');
+		}*/
 	}
 	
 	

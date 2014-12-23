@@ -487,6 +487,19 @@ class FlexicontentFields
 		}
 		
 		
+		// ***********************************************************************************************
+		// Return if field is in a group, since field display should be created only by the grouping field
+		// ***********************************************************************************************
+		/*if ( $first_item_field->parameters->get('use_ingroup', 0) )  {
+			if (is_object($_field)) $_field->{$method} = '
+				<span class="fc-mssg-inline fc-note">
+					This field ('.$field->label.') is configured for <b>grouping</b>. <br/>Please use a <b>grouping field</b> to edit and display this field
+				</span>
+			';
+			return !is_object($_field) ? null : $_field;
+		}*/
+		
+		
 		// **********************************************
 		// Return no access message if user has no ACCESS
 		// **********************************************
@@ -539,6 +552,7 @@ class FlexicontentFields
 				$field = is_object($_field) ? $_field : $item->fields[$field_name];  // only rendering 1 item the field object was given
 				//$results = $dispatcher->trigger('onDisplayFieldValue', array( &$field, $item ));
 				FLEXIUtilities::call_FC_Field_Func($field->field_type, 'onDisplayFieldValue', array(&$field, $item, null, $method) );
+				if ($field->parameters->get('use_ingroup', 0) && is_array($field->$method)) $field->$method = implode('', $field->$method);
 			}
 		}
 		if ($print_logging_info) {
@@ -2183,7 +2197,9 @@ class FlexicontentFields
 					// Do not use distinct on column, it makes it is very slow, despite column having an index !!
 					// e.g. HAVING COUNT(DISTINCT colname) = ...
 					// Instead the field code should make sure that no duplicate values are saved in the DB !!
-					$query .= ' GROUP BY rel.item_id ' .' HAVING COUNT(*) >= '.count($value);
+					$query .=
+						' GROUP BY rel.item_id ' .' HAVING COUNT(*) >= '.count($value).
+						' ORDER BY NULL';  // THIS should remove filesort in MySQL, and improve performance issue of REQUIRE ALL
 				}
 		}
 		//$query .= ' GROUP BY id';   // BAD PERFORMANCE ?

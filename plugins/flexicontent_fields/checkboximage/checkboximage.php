@@ -348,10 +348,13 @@ class plgFlexicontent_fieldsCheckboximage extends JPlugin
 		// Reformat the posted data
 		$newpost = array();
 		$new = 0;
+		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
 		foreach ($post as $n=>$v)
 		{
 			if ($post[$n] !== '')
 			{
+				$element = @$elements[ $v ];
+				if ( !$element ) continue;
 				$newpost[$new] = $post[$n];
 			}
 			$new++;

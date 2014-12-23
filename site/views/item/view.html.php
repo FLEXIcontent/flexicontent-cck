@@ -534,6 +534,7 @@ class FlexicontentViewItem  extends JViewLegacy
 		FLEXI_J30GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
 		flexicontent_html::loadFramework('jQuery');
 		flexicontent_html::loadFramework('select2');
+		flexicontent_html::loadFramework('flexi-lib');
 		
 		// Load custom behaviours: form validation, popup tooltips
 		JHTML::_('behavior.formvalidation');  // load default validation JS to make sure it is overriden

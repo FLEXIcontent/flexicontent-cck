@@ -308,9 +308,10 @@ class JFormFieldFilters extends JFormFieldList
 			if ($ordertip != -1) {
 				$style = 'display:inline-block;'.(FLEXI_J16GE ? 'float:left; margin: 0px 0px 0px 18px;':'margin:0px 0px 6px 12px');
 				$tip = 
-					"<span class='editlinktip hasTip' style='$style' title='".htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8')."::".htmlspecialchars(JText::_( 'FLEXI_SETTING_DEFAULT_FILTER_ORDER' ), ENT_COMPAT, 'UTF-8')."'>"
+					'<span class="editlinktip hasTip" style="'.$style.'" title="'
+						.htmlspecialchars(JText::_( 'FLEXI_NOTES' ), ENT_COMPAT, 'UTF-8').'::'.htmlspecialchars(JText::_( 'FLEXI_SETTING_DEFAULT_FILTER_ORDER' ), ENT_COMPAT, 'UTF-8').'">'
 						.JHTML::image ( 'administrator/components/com_flexicontent/assets/images/lightbulb.png', JText::_( 'FLEXI_NOTES' ) )
-					."</span>";
+					.'</span>';
 			}
 		}*/
 		

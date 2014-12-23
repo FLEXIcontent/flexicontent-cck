@@ -58,7 +58,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
 		$editor  = JFactory::getEditor($editor_name);
 		$editor_plg_params = array();  // Override parameters of the editor plugin, nothing yet
-		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
 		
 		
 		// ****************
@@ -77,14 +76,13 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
 		
-		// Input validation & editing
+		// Input field display size & max characters
 		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
-		$validation= $field->parameters->get( 'validation', $field->field_type == 'maintext' ? 2 : 1 ) ;  // server side enforced
 		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 1 );  // load HTML editor
 		
 		// *** Simple Textarea configuration  ***
-		$cols  = $field->parameters->get( 'cols', 75 ) ;
-		$rows  = $field->parameters->get( 'rows', 20 ) ;
+		$rows  = $field->parameters->get( 'rows', 6 ) ;
+		$cols  = $field->parameters->get( 'cols', 80 ) ;
 		
 		// *** HTML Editor configuration  ***
 		
@@ -176,9 +174,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
 				
-				";
 				
-			$js .= "
 				// Create a new textarea
 				var boxClass = 'txtarea';
 				var container = newField.find('.fc_'+boxClass);
@@ -195,17 +191,19 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				theArea.addClass(boxClass);
 				";
 			
-			// Add to new field to DOM
+			// Add new field to DOM
 			$js .= "
 				newField.insertAfter( lastField );
 				if (remove_previous) lastField.remove();
-				
-				// Attach a new JS HTML editor object
-				tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+			";
+			
+			// Attach a new JS HTML editor object
+			if ($use_html) $js .= "
+				if (typeof tinyMCE !== 'undefined') tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
 			";
 			
 			// Add new element to sortable objects (if field not in group)
-			if (!$use_ingroup) $js .="
+			if (!$use_ingroup) $js .= "
 				jQuery('#sortables_".$field->id."').sortable({
 					handle: '.fcfield-drag',
 					containment: 'parent',
@@ -244,31 +242,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			";
 			
 			$css .= '
-			#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: normal; }
-			#sortables_'.$field->id.' li {
-				clear: both;
-				float: left;
-				display: block;
-				list-style: none;
-				height: auto;
-				position: relative;
-				background: white!important;
-				border-radius:5px !important;
-				margin-bottom:10px !important;
-				padding:5px !important;
-				border:1px dashed #444 !important;
-			}
-			#sortables_'.$field->id.' li.sortabledisabled {
-				background : transparent url(components/com_flexicontent/assets/images/move3.png) no-repeat 0px 1px;
-			}
-			#sortables_'.$field->id.' li input { cursor: text;}
-			#add'.$field->name.' { margin-top: 5px; clear: both; display:block; }
-			#sortables_'.$field->id.' li .admintable { text-align: left; }
 			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
-			#sortables_'.$field->id.' label.label, #sortables_'.$field->id.' .termtitle, #sortables_'.$field->id.' .termtext, #sortables_'.$field->id.' input.fcfield-button {
-				float: none;
-				display: inline-block;
-			}
 			';
 			
 			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
@@ -285,13 +259,9 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		
 		$field->html = array();
 		$n = 0;
+		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
-			// Validate the value, this should have been done by save task already ... but
-			$field->value[$n] = $validation ?
-				($validation==2 ? JComponentHelper::filterText($field->value[$n]) : $ifilter->clean($field->value[$n], 'string')) :  // SAFE HTML
-				flexicontent_html::striptagsandcut($field->value[$n], $maxlength) ;  // PLAIN TEXT ... OR PLAIN TEXT VIA ... JFilterOutput::cleanText($$field->value[$n]) ;
-			
 			// Special case TABULAR representation of single value textarea
 			if ($n==0 && $field->parameters->get('editorarea_per_tab', 0)) {
 				$this->parseTabs($field, $item);
@@ -300,6 +270,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					return;
 				}
 			}
+			if ( empty($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
 			$fieldname_n = $field->field_type == 'maintext' ? $fieldname : $fieldname.'['.$n.']';
 			$elementid_n = $field->field_type == 'maintext' ? $elementid : $elementid.'_'.$n;
@@ -311,7 +282,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 			$txtarea = !$use_html ? '
 				<textarea id="'.$elementid_n.'" name="' . $fieldname_n . '" style="width:auto;" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
-					.htmlspecialchars( $field->value[$n], ENT_COMPAT, 'UTF-8' ).
+					.htmlspecialchars( $value, ENT_COMPAT, 'UTF-8' ).
 				'</textarea>
 				' : $editor->display(
 					$fieldname_n, htmlspecialchars( $field->value[$n], ENT_COMPAT, 'UTF-8' ), '100%', $height, $cols, $rows,
@@ -327,7 +298,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$field->html[] = '
 				'.($use_ingroup ? '' : $move2).'
 				'.($use_ingroup ? '' : $remove_button).'
-				<div class="clear"></div>
+				'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
 				'.$txtarea.'
 				';
 			
@@ -358,40 +329,56 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$field->label = JText::_($field->label);
 		
 		// Some variables
-		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
-		$maxlength = $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
-		$validation= $field->parameters->get( 'validation', $field->field_type == 'maintext' ? 2 : 1 ) ;  // server side enforced
-		
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
 		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
+		
+		// Value handling parameters
+		$lang_filter_values = 0;//$field->parameters->get( 'lang_filter_values', 1);
+		$clean_output = $field->parameters->get('clean_output', 0);
+		$encode_output = $field->parameters->get('encode_output', 0);
+		$multiple = $use_ingroup || $field->parameters->get( 'allow_multiple', 0 ) ;
+		
 		
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
 		
-		// Get field values, do not terminate yet if value is empty, since a default value on empty may have been defined
+		// Get field values
 		$values = $values ? $values : $field->value;
 		
 		// Load default value
 		if ( empty($values) ) {
 			if (!strlen($default_value)) {
-				$field->{$prop} = '';
+				$field->{$prop} = $use_ingroup ? array() : '';
 				return;
 			}
 			$values = array($default_value);
 		}
-		// Clean output
-		else {
-			foreach ($values as & $value) {
-				if ( empty($value) ) continue;
-				$value = $ifilter->clean($value, 'string');
+		
+		// Language filter, clean output, encode HTML
+		if ($clean_output) {
+			$ifilter = $clean_output == 1 ? JFilterInput::getInstance(null, null, 1, 1) : JFilterInput::getInstance();
+		}
+		if ($lang_filter_values || $clean_output || $encode_output)
+		{
+			foreach ($values as &$value)
+			{
+				if ( empty($value) ) continue;  // skip further actions
+				
+				if ($lang_filter_values) {
+					$value = JText::_($value);
+				}
+				if ($clean_output) {
+					$value = $ifilter->clean($value, 'string');
+				}
+				if ($encode_output) {
+					$value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
+				}
 			}
 		}
+		unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		
-		// Value handling parameters
-		$multiple       = $field->parameters->get( 'allow_multiple', 0 ) ;
-		
-		// Language filter the values
-		//$lang_filter_values = $field->parameters->get( 'lang_filter_values', 1);
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
 		$remove_space = $field->parameters->get( 'remove_space', 0 ) ;
@@ -440,24 +427,35 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$n = 0;
 		foreach ($values as $value)
 		{
-			if ( empty($value) ) continue;
+			if ( !strlen($value) && !$use_ingroup ) continue;
+			if ( strlen($value) ) {
+				$field->{$prop}[$n++]	= '';
+				continue;
+			}
 			
 			// Add prefix / suffix
-			$field->{$prop}[]	= $pretext. $value . $posttext;
+			$field->{$prop}[]	= !$add_enclosers ? $value : $pretext . $value . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		// Apply separator and open/close tags
-		$field->{$prop} = implode($separatorf, $field->{$prop});
-		if ( $field->{$prop}!=='' ) {
-			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
-		} else {
-			$field->{$prop} = '';
+		if (!$use_ingroup)  // do not convert the array to string if field is in a group
+		{
+			// Apply separator and open/close tags
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+			if ( $field->{$prop}!=='' ) {
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			} else {
+				$field->{$prop} = '';
+			}
 		}
 		
-		if ($field->parameters->get('useogp', 0) && $field->{$prop})
+		
+		// ************
+		// Add OGP tags
+		// ************
+		if ($field->parameters->get('useogp', 0) && !empty($field->{$prop}))
 		{
 			// Get ogp configuration
 			$ogpinview  = $field->parameters->get('ogpinview', array());
@@ -473,7 +471,8 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					default: $usagetype = ''; break;
 				}
 				if ($usagetype) {
-					$content_val = flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen);
+					$content_val = !$use_ingroup ? flexicontent_html::striptagsandcut($field->{$prop}, $ogpmaxlen) :
+						flexicontent_html::striptagsandcut($opentag.implode($separatorf, $field->{$prop}).$closetag, $ogpmaxlen) ;
 					JFactory::getDocument()->addCustomTag('<meta property="og:'.$usagetype.'" content="'.$content_val.'" />');
 				}
 			}
@@ -495,9 +494,9 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
 		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
 		
-		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
-		$maxlength = $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
-		$validation= $field->parameters->get( 'validation', $field->field_type == 'maintext' ? 2 : 1 ) ;  // server side enforced
+		// Server side validation
+		$validation = $field->parameters->get( 'validation', 2 ) ;
+		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -507,18 +506,19 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$new = 0;
 		foreach ($post as $n => $v)
 		{
-			if ($post[$n] !== '' || $use_ingroup)
-			{
-				$newpost[$new] = $validation ?
-					($validation==2 ? JComponentHelper::filterText($post[$n]) : $ifilter->clean($post[$n], 'string')) :  // SAFE HTML
-					flexicontent_html::striptagsandcut($post[$n], $maxlength) ;  // PLAIN TEXT ... OR PLAIN TEXT VIA ... JFilterOutput::cleanText($post[$n]) ;
-				$new++;
-			}
+			// Do server-side validation and skip empty values
+			$post[$n] = flexicontent_html::dataFilter($post[$n], $maxlength, $validation, 0);
+			
+			if (!strlen($post[$n]) && !$use_ingroup) continue; // skip empty values
+			
+			$newpost[$new] = $post[$n];
+			$new++;
 		}
 		$post = $newpost;
 		
 		// Reconstruct value if it has splitted up e.g. to tabs, MULTI-VALUE AND TAB-SPLIT not supported simutaneusly
-		if ($field->parameters->get('editorarea_per_tab', 0) && count($post)>1) {
+		if ($field->parameters->get('editorarea_per_tab', 0) && count($post)>1)
+		{
 			$post = array(implode(' ', $post));
 		}
 		/*if ($use_ingroup) {
@@ -575,6 +575,15 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		
+		// a. Each of the values of $values array will be added to the advanced search index as searchable text (column value)
+		// b. Each of the indexes of $values will be added to the column 'value_id',
+		//    and it is meant for fields that we want to be filterable via a drop-down select
+		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
+		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
@@ -586,6 +595,12 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->issearch ) return;
 		
+		// a. Each of the values of $values array will be added to the basic search index (one record per item)
+		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
+		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
+		// 'search_properties'   containts property fields that should be added as text
+		// 'properties_spacer'  is the spacer for the 'search_properties' text
+		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');
 		return true;
 	}
@@ -677,7 +692,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$editor_name = $user->getParam('editor', $app->getCfg('editor'));
 		$editor  = JFactory::getEditor($editor_name);
 		$editor_plg_params = array();  // Override parameters of the editor plugin, nothing yet
-		$ifilter = JFilterInput::getInstance(null, null, 1, 1);
 		
 		
 		$required = $field->parameters->get( 'required', 0 ) ;
@@ -688,13 +702,14 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// **************
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
+		
+		// Input max characters & editing
 		$maxlength = $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
-		$validation= $field->parameters->get( 'validation', $field->field_type == 'maintext' ? 2 : 1 ) ;  // server side enforced
 		$use_html  = $field->field_type == 'maintext' ? !$field->parameters->get( 'hide_html', 0 ) : $field->parameters->get( 'use_html', 1 );  // load HTML editor
 		
 		// *** Simple Textarea configuration  ***
-		$cols  = $field->parameters->get( 'cols', 75 ) ;
-		$rows  = $field->parameters->get( 'rows', 20 ) ;
+		$rows  = $field->parameters->get( 'rows', 6 ) ;
+		$cols  = $field->parameters->get( 'cols', 80 ) ;
 		
 		// *** HTML Editor configuration  ***
 		

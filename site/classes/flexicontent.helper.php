@@ -913,7 +913,73 @@ class flexicontent_html
 		}
 		return $arr_str;
 	}
-
+	
+	
+	// Server-Side validation
+	static function dataFilter( $v, $maxlength=0, $validation='string', $check_callable=0 )
+	{
+		if ($validation=='-1') return flexicontent_html::striptagsandcut( $v, $maxlength );
+		
+		$v = $maxlength ? substr($v, 0, $maxlength) : $v;
+		if ($check_callable) {
+			if (strpos($validation, '::') !== false && is_callable(explode('::', $validation)))
+				return call_user_func(explode('::', $validation), $v);   // A callback class method
+			
+			elseif (function_exists($validation))
+				return call_user_func($validation, $v);  // A callback function
+		}
+		
+		// Do filtering 
+		if ($validation=='1') $safeHtmlFilter = JFilterInput::getInstance(null, null, 1, 1);
+		else if ($validation!='2') $noHtmlFilter = JFilterInput::getInstance();
+		switch ($validation) {
+			case  '1':
+				// Allow safe HTML
+				$v = $safeHtmlFilter->clean($v, 'string');
+				break;
+				
+			case  '2':
+				// Filter according to user group Text Filters
+				$v = JComponentHelper::filterText($v);
+				break;
+				
+			case 'URL': case 'url':
+				// This cleans some of the more dangerous characters but leaves special characters that are valid.
+				$v = trim($noHtmlFilter->clean($v, 'HTML'));
+				
+				// <>" are never valid in a uri see http://www.ietf.org/rfc/rfc1738.txt.
+				$v = str_replace(array('<', '>', '"'), '', $v);
+				
+				// Convert to Punycode string
+				$v = FLEXI_J30GE ? JStringPunycode::urlToPunycode( $v ) : $v;
+				break;
+				
+			case 'EMAIL': case 'email':
+				// This cleans some of the more dangerous characters but leaves special characters that are valid.
+				$v = trim($noHtmlFilter->clean($v, 'HTML'));
+				
+				// <>" are never valid in a email ?
+				$v = str_replace(array('<', '>', '"'), '', $v);
+				
+				// Convert to Punycode string
+				$v = FLEXI_J30GE ? JStringPunycode::emailToPunycode( $v ) : $v;
+				
+				// Check for valid email (punycode is ASCII so this should work with UTF-8 too)
+				$email_regexp = "/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/";
+				if (!preg_match($email_regexp, $v)) $v = '';
+				break;
+				
+			default:
+				// Filter using JFilterInput
+				$v = $noHtmlFilter->clean($v, $validation);
+				break;
+		}
+		
+		$v = trim($v);
+		return $v;
+	}
+	
+	
 	/**
 	 * Strip html tags and cut after x characters
 	 *
@@ -1115,7 +1181,7 @@ class flexicontent_html
 			$link = $base . JRoute::_( 'index.php?view='.$view.'&format=feed&type=rss', false );
 		}
 		
-		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
+		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+(screen.width-100)+\',top=20,height=\'+(screen.height-160)+\',directories=no,location=no';
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
 		
 		// This checks template image directory for image, if none found, default image is returned
@@ -1161,7 +1227,7 @@ class flexicontent_html
 	{
 		if ( !$params->get('show_print_icon') || JRequest::getCmd('print') ) return;
 		
-		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=800,height=600,directories=no,location=no';
+		$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+(screen.width-100)+\',top=20,height=\'+(screen.height-160)+\',directories=no,location=no';
 		
 		if ( JRequest::getInt('pop') ) {
 			$onclick = ' window.print(); return false; ';
@@ -1243,8 +1309,8 @@ class flexicontent_html
 			$link = $base . JRoute::_( 'index.php?view='.$view, false );
 		}
 
-		$mail_to_url = JRoute::_('index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink($link));
-		$status = 'width=800,height=600,menubar=yes,resizable=yes';
+		$mail_to_url = JRoute::_('index.php?option=com_mailto&tmpl=component&link='.MailToHelper::addLink($link));$status = 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,left=50,width=\'+(screen.width-100)+\',top=20,height=\'+(screen.height-160)+\',directories=no,location=no';
+		$status = 'left=50,width=\'+((screen.width-100) > 800 ? 800 : (screen.width-100))+\',top=20,height=\'+((screen.width-160) > 800 ? 800 : (screen.width-160))+\',menubar=yes,resizable=yes';
 		$onclick = ' window.open(this.href,\'win2\',\''.$status.'\'); return false; ';
 		
 		// This checks template image directory for image, if none found, default image is returned
@@ -5073,8 +5139,8 @@ class flexicontent_db
 				$order_dir	= 'DESC';
 				break;
 			case 'order': case 'catorder': /* 2nd is for module */
-				$order_col	= $rel_as.'.catid, '.$rel_as.'.ordering';
-				$order_dir	= 'ASC';
+				$order_col	= $rel_as.'.catid, '.$rel_as.'.ordering ASC, '.$i_as.'.id DESC';
+				$order_dir	= '';
 				break;
 
 			// SPECIAL case custom field

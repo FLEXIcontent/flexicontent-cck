@@ -304,9 +304,9 @@ if ($menu) $page_classes .= ' menuitem'.$menu->id;
 		<div class="description group">
 			<?php foreach ($item->positions['description'] as $field) : ?>
 				<?php if ($field->label) : ?>
-			<div class="desc-title field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
+			<div class="desc-title flexi label field_<?php echo $field->name; ?>"><?php echo $field->label; ?></div>
 				<?php endif; ?>
-			<div class="desc-content field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
+			<div class="desc-content flexi value field_<?php echo $field->name; ?>"><?php echo $field->display; ?></div>
 			<?php endforeach; ?>
 		</div>
 		<!-- EOF description -->

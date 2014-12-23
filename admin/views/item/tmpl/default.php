@@ -595,7 +595,7 @@ $tabCnt[$tabSetCnt] = 0;
 						
 						$_link  = 'index.php?option=com_flexicontent&'.$task_items.'edit&cid='. $assoc_item->id;
 						$_title = htmlspecialchars(JText::_( 'FLEXI_EDIT_ASSOC_TRANSLATION' ), ENT_COMPAT, 'UTF-8').':: ['. $assoc_item->lang .'] '. htmlspecialchars($assoc_item->title, ENT_COMPAT, 'UTF-8');
-						echo "<a class='fc_assoc_translation editlinktip hasTip' target='_blank' href='".$_link."' title='".$_title."' >";
+						echo '<a class="fc_assoc_translation editlinktip hasTip" target="_blank" href="'.$_link.'" title="'.$_title.'" >';
 						//echo $assoc_item->id;
 						if ( !empty($assoc_item->lang) && !empty($this->langs->{$assoc_item->lang}->imgsrc) ) {
 							echo ' <img src="'.$this->langs->{$assoc_item->lang}->imgsrc.'" alt="'.$assoc_item->lang.'" />';
@@ -718,7 +718,7 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 				?>
 				
 				<div class='fcclear'></div>
-				<label for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
+				<label id="label_fcfield_<?php echo $field->id; ?>" for="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" for_bck="<?php echo (FLEXI_J16GE ? 'custom_' : '').$field->name;?>" class="<?php echo $lbl_class;?>" title="<?php echo $lbl_title;?>" >
 					<?php echo $field->label; ?>
 				</label>
 				
@@ -899,13 +899,13 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 					<!-- tabber start -->
 					<div class="fctabber" style='display:inline-block;'>
 						<div class="tabbertab" style="padding: 0px;" >
-							<h3 class="tabberheading"> <?php echo '-'.$itemlang.'-'; // $t->name; ?> </h3>
+							<h3 class="tabberheading"> <?php echo '-'.$itemlangname.'-'; // $itemlang; ?> </h3>
 							<?php echo $this->form->getInput('metadesc');?>
 						</div>
 						<?php foreach ($this->row->item_translations as $t): ?>
 							<?php if ($itemlang!=$t->shortcode && $t->shortcode!='*') : ?>
 								<div class="tabbertab" style="padding: 0px;" >
-									<h3 class="tabberheading"> <?php echo $t->shortcode; // $t->name; ?> </h3>
+									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 									<?php
 									$ff_id = 'jfdata_'.$t->shortcode.'_metadesc';
 									$ff_name = 'jfdata['.$t->shortcode.'][metadesc]';
@@ -932,13 +932,13 @@ $type_lbl = $this->row->type_id ? JText::_( 'FLEXI_ITEM_TYPE' ) . ' : ' . $this-
 					<!-- tabber start -->
 					<div class="fctabber" style='display:inline-block;'>
 						<div class="tabbertab" style="padding: 0px;" >
-							<h3 class="tabberheading"> <?php echo '-'.$itemlang.'-'; // $t->name; ?> </h3>
+							<h3 class="tabberheading"> <?php echo '-'.$itemlangname.'-'; // $itemlang; ?> </h3>
 							<?php echo $this->form->getInput('metakey');?>
 						</div>
 						<?php foreach ($this->row->item_translations as $t): ?>
 							<?php if ($itemlang!=$t->shortcode && $t->shortcode!='*') : ?>
 								<div class="tabbertab" style="padding: 0px;" >
-									<h3 class="tabberheading"> <?php echo $t->shortcode; // $t->name; ?> </h3>
+									<h3 class="tabberheading"> <?php echo $t->name; // $t->shortcode; ?> </h3>
 									<?php
 									$ff_id = 'jfdata_'.$t->shortcode.'_metakey';
 									$ff_name = 'jfdata['.$t->shortcode.'][metakey]';
