@@ -25,6 +25,7 @@ class plgFlexicontent_fieldsAddressint extends FCField
 		
 		// initialise property
 		$value = $this->parseValues($field->value);
+		$value = @$value[0];
 		if(empty($value)) {
 			$value['addr1'] = '';
 			$value['addr2'] = '';
