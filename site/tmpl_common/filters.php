@@ -1,4 +1,5 @@
 <?php
+$document = JFactory::getDocument();
 
 // Form (text search / filters) configuration
 $show_search_go = $params->get('show_search_go', 1);
@@ -14,8 +15,20 @@ $flexi_button_class_reset =  ($params->get('flexi_button_class_reset','') != '-1
     $params->get('flexi_button_class_reset','')   :
     $params->get('flexi_button_class_reset_custom', 'fc_button')  ;
 
-$filter_container_class  = $filter_placement ? 'fc_filter_line' : 'fc_filter';
+$filters_in_lines = $filter_placement==1 || $filter_placement==2;
+$filters_in_tabs  = $filter_placement==3;
+$filter_container_class  = $filters_in_lines ? 'fc_filter_line' : 'fc_filter';
 $filter_container_class .= $filter_placement==2 ? ' fc_clear_label' : '';
+
+// Prepare for filters inside TABs
+if ($filter_placement==3) {
+	$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
+	$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
+	$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
+	static $_filter_TABsetCnt = null;
+	if ($_filter_TABsetCnt === null) $_filter_TABsCnt = -1;
+	$tabSetCnt = 0;
+}
 
 // Text Search configuration
 $use_search  = $params->get('use_search', 1);
@@ -140,17 +153,18 @@ if ($filter_instructions == 1) {
 		<?php if ($use_filters): /* BOF filter */ ?>
 			<?php
 			// Prefix/Suffix texts
-			$pretext = $params->get( 'filter_pretext', '' );
+			$pretext  = $params->get( 'filter_pretext', '' );
 			$posttext = $params->get( 'filter_posttext', '' );
 			
 			// Open/Close tags
-			$opentag = $params->get( 'filter_opentag', '' );
-			$closetag = $params->get( 'filter_closetag', '' );
+			$opentag  = !$filters_in_tabs ? $params->get( 'filter_opentag', '' )  : '<div class="fctabber fields_tabset" id="fcform_tabset_'.(++$_filter_TABsetCnt).'" >';
+			$closetag = !$filters_in_tabs ? $params->get( 'filter_closetag', '' ) : '</div>';
 			?>
 			
 			<?php
 			$n=0;
 			$prepend_onchange = " adminFormPrepare(document.getElementById('".$form_id."'), 1); ";
+			$filters_html = array();
 			foreach ($filters as $filt) :
 				if (empty($filt->html)) continue;
 				
@@ -166,15 +180,46 @@ if ($filter_instructions == 1) {
 				
 				// Compatibility HACK 2
 				// These fields also need to have any 'adminForm' string present in their filter's HTML replaced with the name of our form
-				$filter_html[$filt->id] = preg_replace('/([\'"])adminForm([\'"])/', '${1}'.$form_name.'${2}', $filt->html);
+				$filt->html = preg_replace('/([\'"])adminForm([\'"])/', '${1}'.$form_name.'${2}', $filt->html);
 				
-				$_filter_html  = $pretext;
-				$_filter_html .= '<span class="'.$filter_container_class.(($n++)%2 ? ' fc_even': ' fc_odd').' fc_filter_id_'.$filt->id.'" >' ."\n";
-				$_filter_html .= ($show_filter_labels==1 || ($show_filter_labels==0 && $filt->parameters->get('display_label_filter')==1))
-					? ' <span class="fc_filter_label fc_label_field_'.$filt->id.'">' .$filt->label. '</span>' ."\n"  :  '';
-				$_filter_html .= ' <span class="fc_filter_html fc_html_field_'.$filt->id.'">' .$filt->html. '</span>' ."\n";
-				$_filter_html .= '</span>'."\n";
-				$_filter_html .= $posttext;
+				$label_outside  = !$filters_in_tabs && ($show_filter_labels==1 || ($show_filter_labels==0 && $filt->parameters->get('display_label_filter')==1));
+				$even_odd_class = !$filters_in_tabs ? (($n++)%2 ? ' fc_even': ' fc_odd') : '';
+				
+				// Highlight active filter
+				$filt_vals  = JRequest::getVar('filter_'.$filt->id, '', '');
+				$has_filt_vals_array  = is_array($filt_vals)  && strlen(trim(implode('',$filt_vals)));
+				$has_filt_vals_string = !is_array($filt_vals) && strlen(trim($filt_vals));
+				$filter_label_class = ($has_filt_vals_array || $has_filt_vals_string) ? 'fc_filter_active' : 'fc_filter_inactive';
+				
+				$_filter_html = 
+				
+					/* Optional TAB start and filter label as TAB title */
+					($filters_in_tabs ? '
+					<div class="tabbertab" id="fcform_tabset_'.$_filter_TABsetCnt.'_tab_'.($tabSetCnt++).'" >
+						<h3 class="tabberheading '.$filter_label_class.'">'.$filt->label.($has_filt_vals_array || $has_filt_vals_string ? ' *' : '' ).'</h3>' : '')
+						
+						/* External filter container */.'
+						<span class="'.$filter_container_class.$even_odd_class.' fc_filter_id_'.$filt->id.'" >'.
+						
+							/* Optional filter label before filter's HTML */
+							($label_outside ? '
+							<span class="fc_filter_label fc_label_field_'.$filt->id.'">' .$filt->label. '</span>' : '')
+							
+							/* Internal filter container and filter 's HTML */.'
+							<span class="fc_filter_html fc_html_field_'.$filt->id.'">'
+								.$filt->html.'
+							</span>
+							
+						</span>
+					'.
+					
+					/* Optional TAB end */
+					($filters_in_tabs ? '
+					</div>' : '').'
+				';
+				
+				$_filter_html = $filter_placement!=3 ? $pretext .$_filter_html. $posttext : $_filter_html;
+				
 				$filters_html[] = $_filter_html;
 			endforeach;
 			
@@ -248,6 +293,5 @@ $js .= '
 			});
 		});
 	';
-$document = JFactory::getDocument();
 $document->addScriptDeclaration($js);
 ?>

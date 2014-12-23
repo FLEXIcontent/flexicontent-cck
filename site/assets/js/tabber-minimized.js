@@ -186,10 +186,10 @@ tabberObj.prototype.init = function(e)
       this.tabs[this.tabs.length] = t;
 
       /* If the class name contains classTabDefault,
-	 then select this tab by default.
+         then select this tab by default.
       */
       if (childNodes[i].className.match(this.REclassTabDefault)) {
-	defaultTab = this.tabs.length-1;
+        defaultTab = this.tabs.length-1;
       }
     }
   }
@@ -213,23 +213,30 @@ tabberObj.prototype.init = function(e)
     /* Remove the title attribute to prevent a tooltip from appearing */
     if (this.removeTitle) { t.div.title = ''; }
 
+    var tab_classes = '';
     if (!t.headingText) {
 
       /* Title was not defined in the title of the DIV,
-	 So try to get the title from an element within the DIV.
-	 Go through the list of elements in this.titleElements
-	 (typically heading elements ['h2','h3','h4'])
+         So try to get the title from an element within the DIV.
+         Go through the list of elements in this.titleElements
+        (typically heading elements ['h2','h3','h4'])
       */
       for (i2=0; i2<this.titleElements.length; i2++) {
-	headingElement = t.div.getElementsByTagName(this.titleElements[i2])[0];
-	if (headingElement) {
-	  t.headingText = headingElement.innerHTML;
-	  if (this.titleElementsStripHTML) {
-	    t.headingText.replace(/<br>/gi," ");
-	    t.headingText = t.headingText.replace(/<[^>]+>/g,"");
-	  }
-	  break;
-	}
+        headingElement = t.div.getElementsByTagName(this.titleElements[i2])[0];
+        if (headingElement) {
+          t.headingText = headingElement.innerHTML;
+          if (typeof jQuery != 'undefined') {
+            tab_classes=jQuery(headingElement).attr('class');
+          }
+          if (this.titleElementsStripHTML) {
+            t.headingText.replace(/<br>/gi,"[br]");
+            t.headingText.replace(/<br\/>/gi,"[br]");
+            t.headingText.replace(/<br \/>/gi,"[br]");
+            t.headingText = t.headingText.replace(/<[^>]+>/g,"");
+            t.headingText = t.headingText.replace(/\[br\]/g,"<br/>");
+          }
+          break;
+        }
       }
     }
 
@@ -253,6 +260,9 @@ tabberObj.prototype.init = function(e)
     DOM_a.href = "javascript:void(null);";
     DOM_a.title = t.headingText;
     DOM_a.onclick = this.navClick;
+    if (typeof jQuery != 'undefined') {
+    	jQuery(DOM_a).addClass(tab_classes);
+    }
 
     /* Add some properties to the link so we can identify which tab
        was clicked. Later the navClick method will need this.

@@ -459,6 +459,10 @@ fieldset.fc_filter_set {
 	display: inline-block !important;
 	vertical-align: middle !important;
 }
+// highlight labels of active filters
+#flexicontent ul.tabbernav li a.tabberheading.fc_filter_inactive {}
+#flexicontent ul.tabbernav li a.tabberheading.fc_filter_active { color:orange!important; }
+#flexicontent ul.tabbernav li:hover a.tabberheading.fc_filter_active { color:red!important; }
 
 /* handle input append / prepend */
 .fc_filter_html .input-append,

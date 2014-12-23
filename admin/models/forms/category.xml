@@ -643,6 +643,7 @@
 				<option value="2">FLEXI_YES_BUT_FILTER_BELOW_LABEL</option>
 				<option value="1">FLEXI_YES</option>
 				<option value="0">FLEXI_NO_USE_SEPARATOR</option>
+				<option value="3">FLEXI_PLACE_IN_TABS</option>
 			</field>
 			
 			<field name="" type="separator" default="FLEXI_FILTER_ENCLOSING" level="level3" />
