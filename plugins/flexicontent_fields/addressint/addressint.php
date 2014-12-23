@@ -5,8 +5,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 jimport('joomla.event.plugin');
 JLoader::register('FCField', JPATH_SITE . '/plugins/flexicontent_fields/fcfield/parentfield.php');
 
-class plgFlexicontent_fieldsAddressint extends FCField
-{
+class plgFlexicontent_fieldsAddressint extends FCField {
 	static $field_types = array('addressint');
 
 	function onDisplayField(&$field, &$item) {
