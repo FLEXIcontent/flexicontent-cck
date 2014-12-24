@@ -4,7 +4,7 @@
 :: *********
 
 :: Disable echoing of MS-DOS commands
-@ ECHO ON
+@ ECHO OFF
 
 :: Store original folder path
 SET original_folder=%CD%

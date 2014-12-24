@@ -3,7 +3,7 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 
 //jimport('joomla.plugin.plugin');
 jimport('joomla.event.plugin');
-JLoader::register('FCField', JPATH_SITE . '/plugins/flexicontent_fields/fcfield/parentfield.php');
+JLoader::register('FCField', JPATH_ADMINISTRATOR . '/components/com_flexicontent/helpers/fcfield/parentfield.php');
 
 class plgFlexicontent_fieldsAddressint extends FCField {
 	static $field_types = array('addressint');
@@ -103,7 +103,7 @@ class plgFlexicontent_fieldsAddressint extends FCField {
 	}*/
 
 	
-	function onBeforeSaveField( $field, &$post, &$file )
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
 		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
