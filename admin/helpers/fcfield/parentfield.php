@@ -113,7 +113,7 @@ class FCField extends JPlugin{
 		
 		$field->label = JText::_($field->label);
 
-		$this->displayForm();
+		$this->displayField();
 	}
 	
 	// Method to create field's HTML display for frontend views
@@ -194,7 +194,7 @@ class FCField extends JPlugin{
 	 *
 	 * @since   1.5
 	 */
-	public static function getLayoutPath($plg, $layout = 'form') {
+	public static function getLayoutPath($plg, $layout = 'field') {
 		$template = JFactory::getApplication('site')->getTemplate();
 		$defaultLayout = $layout;
 
@@ -203,13 +203,13 @@ class FCField extends JPlugin{
 			$temp = explode(':', $layout);
 			$template = ($temp[0] == '_') ? $template : $temp[0];
 			$layout = $temp[1];
-			$defaultLayout = ($temp[1]) ? $temp[1] : 'form';
+			$defaultLayout = ($temp[1]) ? $temp[1] : 'field';
 		}
 
 		// Build the template and base path for the layout
 		$tPath = JPATH_ROOT . '/templates/' . $template . '/html/fcfields/' . $plg . '/' . $layout . '.php';
 		$bPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/' . $defaultLayout . '.php';
-		$dPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/form.php';
+		$dPath = JPATH_ROOT . '/plugins/flexicontent_fields/' . $plg . '/tmpl/field.php';
 
 		// If the template has a layout override use it
 		/*if (file_exists($tPath)) {
@@ -227,11 +227,11 @@ class FCField extends JPlugin{
 		}
 	}
 	
-	public function getFormPath($plg, $layout = 'form') {
+	public function getFormPath($plg, $layout = 'field') {
 		return $this->getLayoutPath($plg, $layout);
 	}
 	
-	public function getViewPath($plg, $layout = 'view') {
+	public function getViewPath($plg, $layout = 'value') {
 		return $this->getLayoutPath($plg, $layout);
 	}
 	
@@ -254,7 +254,7 @@ class FCField extends JPlugin{
 	 *
 	 * @since   3.3
 	 */
-	public function displayForm($params=NULL) {
+	public function displayField($params=NULL) {
 		$values = $this->parseValues($this->field->value);
 		$field = $this->getField();
 		$item = $this->getItem();
