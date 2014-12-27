@@ -4,12 +4,12 @@
  */
 
 var fcform_isValid = false;
-var flexi_j16ge = 1;
 var tab_focused;
 var max_cat_assign_fc = 0;
 var existing_cats_fc  = [];
 var max_cat_overlimit_msg_fc = 'Too many categories selected. You are allowed a maximum number of ';
 var fcflabels = null;
+var fcflabels_errcnt = null;  // Error counter for multi-value fields
 
 /*Object.size = function(obj) {
 	var size = 0, key;
@@ -160,8 +160,8 @@ var JFormValidator = new Class({
 				if (value) return true;
 				
 				// Retrieve selected values for secondary categories
-				var element_id = flexi_j16ge ? 'jform_cid' : 'cid';
-				var field_name = flexi_j16ge ? 'jform[cid][]' : 'cid[]';
+				var element_id = 'jform_cid';
+				var field_name = 'jform[cid][]';
 				
 				// If exactly one secondary category was selected then set it as primary
 				var values = jQuery(document.getElementsByName(field_name)).val();
@@ -181,9 +181,9 @@ var JFormValidator = new Class({
 				//var value = el.get('value');
 				
 				// Retrieve selected values for secondary categories
-				var element_id = flexi_j16ge ? 'jform_cid' : 'cid';
-				var field_name = flexi_j16ge ? 'jform[cid][]' : 'cid[]';
-				var field_name_catid = flexi_j16ge ? 'jform[catid]' : 'catid';
+				var element_id = 'jform_cid';
+				var field_name = 'jform[cid][]';
+				var field_name_catid = 'jform[catid]';
 					
 				if(MooTools.version>="1.2.4") {
 					//var values = $(element_id).getSelected();  // does not work in old template form overrides with no id parameter
@@ -354,11 +354,15 @@ var JFormValidator = new Class({
 		if ( !fcflabels )
 		{
 			fcflabels = new Object;
+			fcflabels_errcnt = new Object;  // error counter for multi-value fields
 			jQuery('label').each( function(g) {
 				g = jQuery(this);
 				label_for = g.attr('for_bck');
 				if ( !label_for ) label_for = g.attr('for');
-				if ( label_for )  fcflabels[ label_for ] = this;
+				if ( label_for )  {
+					fcflabels[ label_for ] = this;
+					fcflabels_errcnt[ label_for ] = 0;
+				}
 			} );
 			//var fcflabels_size = Object.size(fcflabels);  alert(fcflabels_size);
 		}
@@ -369,13 +373,14 @@ var JFormValidator = new Class({
 		if ( !(el.labelref) && (el_id || el_grpid) )
 		{
 			var lblfor = el_grpid ? el_grpid : el_id;
-			if ( !el.labelref )  el.labelref = fcflabels[   lblfor   ];
-			if ( !el.labelref )  el.labelref = fcflabels[   lblfor = lblfor.replace(/_[0-9]+$/, '')   ];
-			if (flexi_j16ge) {
-				if ( !el.labelref )   el.labelref = fcflabels[   lblfor = lblfor.replace(/custom_/, '')   ];
-				if ( !el.labelref )   el.labelref = fcflabels[   lblfor = 'custom_' + lblfor   ];
+			if ( !el.labelref )  el.labelref = fcflabels[  lblfor  ];
+			if ( !el.labelref )  el.labelref = fcflabels[  lblfor = lblfor.replace(/_[0-9]+$/, '')  ];
+			if ( !el.labelref )  el.labelref = fcflabels[  lblfor = lblfor.replace(/custom_/, '')  ];
+			if ( !el.labelref )  el.labelref = fcflabels[  lblfor = 'custom_' + lblfor  ];
+			if ( !el.labelref )  el.labelref = '-1';
+			else {
+				el.labelfor = lblfor; // store HTML tag id of the label, to use in error counter of multi-value fields
 			}
-			if ( !el.labelref )   el.labelref = '-1';
 		}
 		
 		// Ignore the element if its currently disabled, because are not submitted for the http-request. For those case return always true.
@@ -389,7 +394,7 @@ var JFormValidator = new Class({
 			if(jQuery(el).attr('type') == 'radio' || jQuery(el).attr('type') == 'checkbox') {
 				// Checked specially bellow
 			}
-			else if (!el_value || el_value == false) {
+			else if (el_value === null || el_value.length==0) {
 				this.handleResponse(false, el);
 				return false;
 			}
@@ -404,10 +409,7 @@ var JFormValidator = new Class({
 		
 		// We try to fill-in automatically the Primary Category Select Field, when it is empty
 		var auto_filled = new Object();
-		if (flexi_j16ge)
-			auto_filled['jform[catid]'] = 1;
-		else
-			auto_filled['catid'] = 1;
+		auto_filled['jform[catid]'] = 1;
 		
 		// Check the additional validation types
 	  // Individual radio & checkbox can have blank value, providing one element in group is set
@@ -457,10 +459,7 @@ var JFormValidator = new Class({
 		tab_focused = false; // global variable defined above, we use this to focus the first tab that contains required field
 
 		// Validate form fields
-		if (flexi_j16ge)
-			var elements = jQuery(form).find('fieldset').toArray().concat(Array.from(form.elements));
-		else
-			var elements = form.elements;
+		var elements = jQuery(form).find('fieldset').toArray().concat(Array.from(form.elements));
 		
 		for (var i=0;i < elements.length; i++) {
 			if (this.validate(elements[i]) == false) {
@@ -481,18 +480,18 @@ var JFormValidator = new Class({
 		if ( recaptcha.length ) {
 			if ( recaptcha.val() == '' ) {
 				recaptcha.addClass('invalid');
-				if (flexi_j16ge) recaptcha.attr('aria-invalid', 'true');
+				recaptcha.attr('aria-invalid', 'true');
 				if (recaptcha_lbl.length) {
 					recaptcha_lbl.addClass('invalid');
-					if (flexi_j16ge) recaptcha_lbl.attr('aria-invalid', 'true');
+					recaptcha_lbl.attr('aria-invalid', 'true');
 				}
 				valid = false;
 			} else {
 				recaptcha.removeClass('invalid');
-				if (flexi_j16ge) recaptcha.attr('aria-invalid', 'false');
+				recaptcha.attr('aria-invalid', 'false');
 				if (recaptcha_lbl.length) {
 					recaptcha_lbl.removeClass('invalid');
-					if (flexi_j16ge) recaptcha_lbl.attr('aria-invalid', 'false');
+					recaptcha_lbl.attr('aria-invalid', 'false');
 				}
 			}
 		}
@@ -542,19 +541,23 @@ var JFormValidator = new Class({
 		// Set the element and its label (if exists) invalid state
 		if (state == false) {
 			el.addClass('invalid');
-			if (flexi_j16ge) el.set('aria-invalid', 'true');
+			el.set('aria-invalid', 'true');
 			if (el.labelref && el.labelref!='-1') {
 				var labelref = jQuery(el.labelref);
+				fcflabels_errcnt[el.labelfor]++; // Increment error count for multi-value field
 				labelref.addClass('invalid');
 				labelref.attr('aria-invalid', 'true');
 			}
 		} else {
 			el.removeClass('invalid');
-			if (flexi_j16ge) el.set('aria-invalid', 'false');
+			el.set('aria-invalid', 'false');
 			if (el.labelref && el.labelref!='-1') {
 				var labelref = jQuery(el.labelref);
-				labelref.removeClass('invalid');
-				labelref.attr('aria-invalid', 'false');
+				fcflabels_errcnt[el.labelfor]--; // Decrement error count for multi-value field
+				if (fcflabels_errcnt[el.labelfor] == 0) { // Remove label error indication if error count is zero
+					labelref.removeClass('invalid');
+					labelref.attr('aria-invalid', 'false');
+				}
 			}
 		}
 	}

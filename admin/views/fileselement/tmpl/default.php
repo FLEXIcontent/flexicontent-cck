@@ -54,57 +54,57 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 		<fieldset class="actions" id="filemanager-1">
 			<form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;<?php echo $ctrl_task; ?>upload&amp;<?php echo $session->getName().'='.$session->getId(); ?>" name="uploadFileForm" id="uploadFileForm" method="post" enctype="multipart/form-data">
 				
-				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%">
+				<table class="admintable" cellspacing="0" cellpadding="0" border="0" width="100%" id="file-upload-form-container">
 					
 					<tr>
-						<td class="key">
-							<label for="file-upload">
+						<td id="file-upload-lbl-container" class="key">
+							<label for="file-upload" id="file-upload-lbl" >
 							<?php echo JText::_( 'FLEXI_CHOOSE_FILE' ); ?>
 							</label>
 						</td>
-						<td width="260">
+						<td id="file-upload-container" width="260">
 							<input type="file" id="file-upload" name="Filedata" />
 						</td>
 						
 	<?php if (!$this->folder_mode) { ?>
-						<td class="key">
-							<label>
+						<td id="file-lang-lbl-container" class="key">
+							<label id="file-lang-lbl">
 							<?php echo JText::_( 'FLEXI_LANGUAGE' ); ?>
 							</label>
 						</td>
-						<td>
+						<td id="file-lang-container">
 							<?php echo $this->lists['file-lang']; ?>
 						</td>
 	<?php } ?>
 					</tr>
 	<?php if (!$this->folder_mode) { ?>
 					<tr>
-						<td class="key hasTip"  title="<?php echo JText::_( 'FLEXI_CHOOSE_DIR' ); ?>">
-							<label>
+						<td id="secure-lbl-container" class="key hasTip"  title="<?php echo JText::_( 'FLEXI_CHOOSE_DIR' ); ?>">
+							<label id="secure-lbl">
 							<?php echo JText::_( 'FLEXI_FILE_DIRECTORY' ); ?>
 							</label>
 						</td>
-						<td>
-							<?php echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ) ); ?>
+						<td id="secure-container">
+							<?php echo JHTML::_('select.booleanlist', 'secure', 'class="inputbox"', 1, JText::_( 'FLEXI_SECURE' ), JText::_( 'FLEXI_MEDIA' ), 'secure_uploadFileForm' ); ?>
 						</td>
 						
-						<td class="key" rowspan="2">
-							<label for="file-desc">
+						<td id="file-desc-lbl-container" class="key" rowspan="2">
+							<label id="file-desc-lbl" for="file-desc_uploadFileForm">
 							<?php echo JText::_( 'FLEXI_DESCRIPTION' ); ?>
 							</label>
 						</td>
-						<td valign="top" rowspan="2">
-							<textarea name="file-desc" cols="24" rows="3" id="file-desc"></textarea>
+						<td id="file-desc-container" valign="top" rowspan="2">
+							<textarea name="file-desc" cols="24" rows="3" id="file-desc_uploadFileForm"></textarea>
 						</td>
 					</tr>
 					
 					<tr>
-						<td class="key">
-							<label for="file-title">
+						<td id="file-title-lbl-container" class="key">
+							<label id="file-title-lbl" for="file-title">
 							<?php echo JText::_( 'FLEXI_FILE_TITLE' ); ?>
 							</label>
 						</td>
-						<td>
+						<td id="file-title-container">
 							<input type="text" id="file-title" size="44" class="required" name="file-title" />
 						</td>
 					</tr>
@@ -214,7 +214,7 @@ $alert_box = FLEXI_J30GE ? '<div %s class="alert alert-%s %s">'.$close_btn.'%s</
 <form action="<?php echo JURI::base(); ?>index.php?option=com_flexicontent&amp;view=fileselement&amp;field=<?php echo $this->fieldid?>&amp;tmpl=component" method="post" name="adminForm" id="adminForm">
 
 <?php if (!$this->folder_mode) : ?>
-	<table class="adminform" border="0">
+	<table class="adminform fileselement-list-filters" border="0">
 		<tr>
 			<td align="left">
 				<label class="label"><?php echo JText::_( 'FLEXI_SEARCH' ); ?></label>

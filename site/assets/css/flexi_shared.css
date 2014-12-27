@@ -740,6 +740,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	padding:0px !important;
 	display:inline-block !important;
 	border: 0 none;
+	background-color: cyan;
 }
 
 #flexicontent div.fields_tabset,
@@ -767,89 +768,183 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
   background-color: #eee !important;
 }
 
-#flexicontent ul.ui-sortable > li.fcfieldval_container.valuebox,
-#flexicontent .fcfieldval_container.valuebox {
-	clear: none;
-	display: block;
-	height: auto;
-	position: relative;
-	/*background: lightyellow;*/
-	/*border: 1px solid lightgray;*/
-	margin: 0 0% 4px 0%;
-	padding: 4px 1%;
+
+/**********************/
+/* FLEXIContent FIELD */
+/**********************/
+
+/* FIELD: List of orderable value containers */
+#flexicontent ul.fcfield-sortables {
+	display: inline-block;
+	list-style: none !important;
+	position: static;
+	width: auto;
 	float: left;
-}
-#flexicontent ul.ui-sortable > li.fcfieldval_container.valuebox {
-	list-style: none;
-}
-.container_fcfield > ul.ui-sortable > li.fcfieldval_container.valuebox {
-	width: 100%;
-	padding: 1% !important;
+	padding: 0% !important;
 	margin: 0% !important;
 }
-.container_fcfield > ul.ui-sortable > li.fcfieldval_container.valuebox .flexi.label.sub_label {
+/* FIELD: value containers */
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox, /* multiple values (li, orderable) */
+#flexicontent div.fcfieldval_container.valuebox  /* single value (div) */
+{
+	clear: both;
+	display: inline-block;
+	height: auto;
+	position: relative;
+	background: transparent;
+	border: 0px solid lightgray;
+	margin: 0 4px 4px 0;
+	padding: 4px;
+	float: left;
+}
+/* FIELD: multiple-value container */
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox {
+	list-style: none !important;
+}
+/* FIELD: multiple-value container (not cleared) */
+#flexicontent ul.fcfield-sortables > li.fcfieldval_container.valuebox.floated {
+	clear: none;
+}
+/* FIELD: single-value container */
+#flexicontent div.fcfieldval_container.valuebox {
+}
+
+/* FIELD: special cases alignment, etc */
+#flexicontent .fcfield-sortables > li .input-append,
+#flexicontent .fcfield-sortables > li .input-prepend { float: left; margin-bottom: 0px; }
+#flexicontent .fcfield-sortables > li .input-append { margin-right: 10px; }
+#flexicontent .fcfield-sortables > li .use_select2_lib { vertical-align: top; }
+#flexicontent .fcfield-sortables > li * { vertical-align: top; }
+
+
+/* FIELD-GROUP: list of value containers */
+/* FIELD-GROUP: value container (contains grouped fields) */
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox {
+}
+/* FIELD-GROUP: label of grouped field */
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label {
 	width: 16% !important;
 	padding: 4px 1% !important;
 	margin: 0 1% 0 0 !important;
+	float:none !important;
+	clear:none;
+	display:inline-block;
+	border-width: 0px !important;
 }
-.container_fcfield > ul.ui-sortable > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-	width: 81% !important;
+/* FIELD-GROUP: value of grouped field */
+#flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
+	width: 79% !important;  /* reduce this if border-width is added */
 	padding: 6px 1% !important;
 	margin: 0% !important;
+	float:none !important;
+	clear:none;
+	display:inline-block;
+	border-width: 0px !important;
 }
-.container_fcfield .fcfieldval_container.valuebox {
-	width: 100%;
-}
 
-
-#flexicontent .fcfield-sortables {
-	display: block;
-	list-style: none!important;
-	position: static;
-	margin:0px!important;
-	padding:0px!important;
-	width: 100%;
-}
-#flexicontent .fcfield-sortables > li { margin:0px 0px 4px 0px; padding:0px; }
-#flexicontent .fcfield-sortables > li .input-append,
-#flexicontent .fcfield-sortables > li .input-prepend { float:left; }
-
-/* buttons in forms, special class for add button */
-#flexicontent .fcfield-button,
-#flexicontent .fcfield-addvalue { padding:6px 8px; margin:2px 2px 2px 6px !important; }
-#flexicontent .fcfield-addvalue { clear:both!important; display:block!important; float:left!important; }
-
-/* special classes for button-like add-link */
-#flexicontent .fcfield-button-add {	float:none!important; margin:0px; padding:0px; }
-#flexicontent .fcfield-button-add a { padding:4px 8px !important; margin:0px 2px 0px 6px !important; }
-
+/* FIELDs: various buttons */
 #flexicontent .fcfield-addvalue,
 #flexicontent .fcfield-button,
 #flexicontent .fcfield-button-add a {
-	display: inline-block;
-	font-family: tahoma; font-size:11px;
-	font-weight:bold!important; text-decoration:none!important;
-	background-color: white!important; color:gray!important;
-	border-radius:4px; border:1px solid lightgray;
+	float: none !important;
+	display: inline-block !important;
+	font-family: tahoma;
+	font-size: 11px;
+	
+	font-weight: bold;
+	text-decoration: none!important;
+	background-color: white!important;
+	color: gray!important;
+	
+	border-radius: 4px;
+	border: 1px solid lightgray;
+	vertical-align: top;
+	padding: 6px 8px;
+	margin: 4px 2px 0px 6px;
 }
 
+/* FIELDs: ADD link/button */
+#flexicontent .fcfield-button-add { vertical-align:top !important; float:none !important; margin:0px; padding:0px; }
+#flexicontent .fcfield-button-add a { padding:4px 8px !important; margin:2px 2px 0px 6px !important; }
+
+#flexicontent .fcfield-addvalue {
+	padding: 2px 12px 4px;
+	margin: 4px 2px 0px 6px;
+	display:inline-block;
+	clear:none; 
+	float:left;
+}
+#flexicontent .fcfield-addvalue.fccleared {
+	clear:both; 
+}
 #flexicontent .fcfield-addvalue:hover,
 #flexicontent .fcfield-button:hover,
 #flexicontent .fcfield-button-add a:hover {
-	background-color:darkred!important; color:white!important;
-	text-decoration:none!important; border:1px solid darkred;
+	background-color: darkgreen!important;
+	color: white!important;
+	text-decoration:none!important;
+	border: 1px solid transparent;
 }
 
-#flexicontent .fcfield-button {
-	float: none!important; /* do not override breaks dragging */
-	margin-left: 6px;
+/* FIELDs: DELETE button */
+#flexicontent .fcfield-delvalue {
+	margin: 0px;
+	padding: 12px !important;
+	background: url(../images/delete.png) 4px 4px no-repeat white !important;
 }
+#flexicontent .fcfield-delvalue:hover {
+	background-color:darkred!important; color:white!important;
+	text-decoration:none!important; border:1px solid transparent;
+}
+
+/* FIELDs: DRAG (sort) handle */
+#flexicontent .fcfield-drag-handle {
+	display: inline-block !important;  /* do not override breaks dragging */
+	cursor: move !important;
+	float: none !important;
+	
+	background: url(../images/move2.png) 4px 4px no-repeat white;
+	width: 16px;
+	height: 16px;
+	
+	border:1px solid lightgray;
+	border-radius: 4px;
+	margin: 0px 1px -3px 1px;
+	padding: 4px;
+}
+/* ... for compatibility, TO BE REMOVED ? */
 #flexicontent .fcfield-drag {
 	float:none !important; /* do not override breaks dragging */
 	margin:0px; padding:0px;
+	vertical-align:top;
 }
-#flexicontent .fcfield-drag img { margin:2px 4px -3px 6px !important; cursor: move!important; float: none!important; display: inline!important; vertical-align:baseline; }
-#flexicontent .fcfield-row img.calendar { margin:0px 0px 0px 2px !important; }
+#flexicontent .fcfield-drag img {
+	margin: 0px 1px -3px 1px !important;
+	padding: 4px;
+	border: 1px solid lightgray;
+	border-radius: 4px;
+	cursor: move !important;
+	float: none !important;
+	display: inline !important;
+	background-color: white;
+}
+
+
+#flexicontent ul.fcfield-sortables > li table.admintable {
+	text-align: left;
+	width: 100%;
+}
+#flexicontent ul.fcfield-sortables > li.ui-sortable-helper {  /* while dragging */
+	background-color: white !important;
+	border-radius: 4px;
+	moz-box-shadow: 10px 10px 5px rgba(0,0,0,.5);
+	-webkit-box-shadow: 10px 10px 5px rgba(0,0,0,.5);
+	box-shadow: 10px 10px 5px rgba(0,0,0,.5);
+}
+#flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle { /* disable only child */
+	cursor: default !important;
+	background: url(../images/move3.png) 4px 4px no-repeat white;
+}
 
 #flexicontent div fieldset.panelform input,
 #flexicontent div fieldset.panelform textarea,
@@ -1160,15 +1255,12 @@ div#cpanel div.icon  a {
 	margin: 0px !important;
 	padding: 0px !important;
 }
-
 .fc_drag_handle {
 	cursor: move;
 }
-
 .fc_drag_handle_none {
 	background: url(../images/move2_none.png) 0% 0% no-repeat transparent;
 }
-
 .fc_drag_handle.fc_drag_handle_disabled {
 	background: url(../images/move3.png) 0% 0% no-repeat transparent !important;
 	cursor: auto;

@@ -482,17 +482,17 @@ body.contentpane  {
 	font-size:12px;
 }
 .fcsep_level2 {
-	background-color: #BFE1F2;
-	color: #3A87AD;
+	background-color: #9fd1f2;
+	color: #3a77ad;
 	padding: 0.4em 1%;
-	margin: 3px 0% 2px 0%;
+	margin: 4px 0% 2px 0%;
 	display: block;
 	position: relative;
 	border-radius: 5px;
 	clear: both;
 	float:left;
 	width:98%;
-	font-size:12px;
+	font-size:13px;
 }
 
 /* prevent margin when parameter list starts */
@@ -506,15 +506,26 @@ table.paramlist > tbody > tr:nth-child(1) > td > .fcsep_level2,
 div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-of-type > div > .fcsep_level1, div.control-group:first-of-type > div > .fcsep_level2 {margin-top:0px;}
 
 .fcsep_level3 {
-	/*background: #FCF8E3 url(../images/note.gif) no-repeat 10px 50%;*/
-	background: #FCF8E3 no-repeat 10px 50%;
-	/*color: #C09853 !important;*/
-	color: #C09853;
+	background: #e7e7e7;
+	color: #333;
 	float:left;
-	border: 1px solid #C09853 !important;
-	padding: 8px 24px 8px 24px !important;
-	margin: 5px 5%;
-/* 	margin: 5px 0 5px 240px; */
+	border: 1px solid gray !important;
+	padding: 4px 24px 4px 24px !important;
+	margin: 5px 5% 1px;
+	display: block;
+	border-radius: 5px;
+	clear: both;
+	max-width:60%;
+}
+.fcsep_level4 {
+	background: #f7f7f7;
+	color: #333;
+	float:left;
+	font-weight: normal;
+	font-style: italic;
+	border: 1px dashed #777 !important;
+	padding: 2px 16px 2px 16px !important;
+	margin: 5px 10% 1px;
 	display: block;
 	border-radius: 5px;
 	clear: both;

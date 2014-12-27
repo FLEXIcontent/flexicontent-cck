@@ -118,7 +118,20 @@ class FlexicontentViewField extends JViewLegacy
 							url: 'index.php?option=com_flexicontent&".$_ctrl_task."&cid=".$_row_id."&field_type='+this.value+'&format=raw',
 							success: function(str) {
 								jQuery('#fieldspecificproperties').html(str);
-								var JTooltips = new Tips(jQuery('#fieldspecificproperties .hasTip'), { maxTitleChars: 50, fixed: false});									
+								".( FLEXI_J30GE ? "
+									jQuery('.hasTooltip').tooltip({'html': true,'container': jQuery('#fieldspecificproperties')});
+								" : "
+								var tipped_elements = jQuery('#fieldspecificproperties .hasTip');
+								tipped_elements.each(function() {
+									var title = this.get('title');
+									if (title) {
+										var parts = title.split('::', 2);
+										this.store('tip:title', parts[0]);
+										this.store('tip:text', parts[1]);
+									}
+								});
+								var ajax_JTooltips = new Tips($('fieldspecificproperties').getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
+								")."
 								jQuery('#field_typename').html(jQuery('".$_field_id."').val());
 							}
 						});

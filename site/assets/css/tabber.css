@@ -179,6 +179,7 @@ ul.tabbernav li.tabberactive a:hover
 	background-image: -ms-linear-gradient(top, #3093c7, #1c5a85);
 	background-image: -o-linear-gradient(top, #3093c7, #1c5a85);
 	background-image: linear-gradient(to bottom, #3093c7, #1c5a85);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#3093c7, endColorstr=#1c5a85);
+	border-bottom-width: 0;
 }
 
 #flexicontent ul.tabbernav li:hover a {
@@ -189,6 +190,7 @@ ul.tabbernav li.tabberactive a:hover
 	background-image: -ms-linear-gradient(top, #26759e, #133d5b);
 	background-image: -o-linear-gradient(top, #26759e, #133d5b);
 	background-image: linear-gradient(to bottom, #26759e, #133d5b);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=#26759e, endColorstr=#133d5b);
+	border-bottom-width: 0;
 }
 
 #flexicontent ul.tabbernav li.tabberactive a,
@@ -197,7 +199,7 @@ ul.tabbernav li.tabberactive a:hover
 	color: black !important;
 	background-color: white !important;
 	background-image: none;
-	border-bottom: 1px solid white !important;
+	border-bottom: 0px solid white !important;
 	border-left: 1px solid #D0D0D0;
 	border-top: 1px solid #B0B0B0;
 	border-right: 1px solid #808080;

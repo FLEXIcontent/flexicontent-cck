@@ -90,7 +90,6 @@ class FlexicontentViewFileselement extends JViewLegacy
 		//add css and submenu to document
 		if ($app->isSite()) {
 			$document->addStyleSheet( JURI::base().'components/com_flexicontent/assets/css/flexicontent.css' );
-			$document->addStyleSheet( JURI::base().'components/com_flexicontent/assets/css/flexi_shared.css' );  // NOTE: this is imported by main Frontend CSS file
 		} else {
 			$document->addStyleSheet(JURI::base().'components/com_flexicontent/assets/css/flexicontentbackend.css');
 		}

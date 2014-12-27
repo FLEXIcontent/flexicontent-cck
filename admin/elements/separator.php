@@ -91,7 +91,6 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		
 		$document = JFactory::getDocument();
 		$document->addStyleDeclaration($css);
-		$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form.css');
 		
 		// WORKAROUNDs of for 2 issues in com_config: slow chosen JS and PHP 5.3.9+ 'max_input_vars' limit
 		if (FLEXI_J30GE) $jinput = JFactory::getApplication()->input;
@@ -100,16 +99,20 @@ class JFormFieldSeparator extends JFormFieldSpacer
 		$controller = FLEXI_J30GE ? $jinput->get('controller', '', 'string') : JRequest::getVar('controller');
 		$component  = FLEXI_J30GE ? $jinput->get('component', '', 'string')  : JRequest::getVar('component');
 		
-		//if ($option=='com_config' || $option=='com_menus' || $option=='com_modules') {
-		$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css');
-		//}
-		
-		$js = '';
-		if ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') {
+		// NOTE: this is imported by main Frontend/Backend CSS file
+		// so import these only if it is not a flexicontent view
+		if ($option!='com_flexicontent') {
+			$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_form.css');  // NOTE: this is imported by main Frontend/Backend CSS file
+			$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/flexi_shared.css');  // NOTE: this is imported by main Frontend/Backend CSS file
+			// Add flexicontent specific TABBing to non-flexicontent views
 			$document->addStyleSheet(JURI::root(true).'/components/com_flexicontent/assets/css/tabber.css');
 			$document->addScript(JURI::root(true).'/components/com_flexicontent/assets/js/tabber-minimized.js');
 			$document->addScriptDeclaration(' document.write(\'<style type="text/css">.fctabber{display:none;}<\/style>\'); ');
+		}
+		
+		$js = '';
 			
+		if ($option=='com_config' && ($view == 'component' || $controller='component') && $component == 'com_flexicontent') {
 			if (FLEXI_J30GE) {
 				// Make sure chosen JS file is loaded before our code
 				JHtml::_('formbehavior.chosen', '#_some_iiidddd_');
