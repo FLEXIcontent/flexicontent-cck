@@ -35,6 +35,7 @@ $separatorf = isset($separators_arr[$separatorf]) ? $separators_arr[$separatorf]
 $cats_label = JText::_( $this->category->id ? 'FLEXI_PEERCATEGORIES' : 'FLEXI_CATEGORIES' );
 
 // Sub-category information parameters
+$show_empty_cats = $this->params->get('show_empty_peercats', 1);
 $show_label_peercats = $this->params->get('show_label_peercats', 1);
 $show_itemcount   = $this->params->get('show_itemcount_peercat', 0);
 $show_subcatcount = $this->params->get('show_subcatcount_peercat', 0);
@@ -52,6 +53,7 @@ $peercat_info_class = $show_description_peercat ? "fc_inline_clear" : "fc_inline
 
 $peercats_html = array();
 foreach ($this->peercats as $sub) {
+	if (!$show_empty_cats && $show_itemcount && $sub->assigneditems==0) continue;
 	$subsubcount = count($sub->subcats);
 	
 	// a. Optional sub-category image

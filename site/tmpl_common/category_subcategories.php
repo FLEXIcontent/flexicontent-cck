@@ -34,6 +34,7 @@ $separatorf = isset($separators_arr[$separatorf]) ? $separators_arr[$separatorf]
 $cats_label = JText::_( $this->category->id ? 'FLEXI_SUBCATEGORIES' : 'FLEXI_CATEGORIES' );
 
 // Sub-category information parameters
+$show_empty_cats = $this->params->get('show_empty_cats', 1);
 $show_label_subcats = $this->params->get('show_label_subcats', 1);
 $show_itemcount   = $this->params->get('show_itemcount', 1);
 $show_subcatcount = $this->params->get('show_subcatcount', 0);
@@ -51,6 +52,7 @@ $subcat_info_class = $show_description_subcat ? "fc_inline_clear" : "fc_inline";
 
 $subcats_html = array();
 foreach ($this->categories as $sub) {
+	if (!$show_empty_cats && $show_itemcount && $sub->assigneditems==0) continue;
 	$subsubcount = count($sub->subcats);
 	
 	// a. Optional sub-category image
