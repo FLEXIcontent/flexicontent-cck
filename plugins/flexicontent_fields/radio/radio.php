@@ -40,25 +40,59 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if ($use_ingroup) $field->formhidden = 3;
+		if ($use_ingroup && empty($field->ingroup)) return;
+		
+		// initialize framework objects and other variables
+		$document = JFactory::getDocument();
 		
 		// some parameter shortcuts
 		$sql_mode				= $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements	= $field->parameters->get( 'field_elements' ) ;
-		$default_value	= $field->parameters->get( 'default_value', '' ) ;
 		
-		// Prefix - Suffix - Separator parameters, replacing other field values if found
+		
+		// ****************
+		// Number of values
+		// ****************
+		$multiple   = $use_ingroup || (int) $field->parameters->get( 'allow_multiple', 0 ) ;
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
+		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
+		
+		
+		// **************
+		// Value handling
+		// **************
+		
+		// Default value
+		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
+		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
+		
+		
+		// *************************
+		// Input field configuration
+		// *************************
+		
+		// DISPLAY using prettyCheckable JS
+		$use_jslib = $field->parameters->get( 'use_jslib', 2 ) ;
+		$use_prettycheckable = $use_jslib==2;
+		static $prettycheckable_added = null;
+	  if ( $use_prettycheckable && $prettycheckable_added === null ) $prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
+		
+		// Display text label, use checkbox/radio image field for more
+		$form_vals_display = 0;
+		
+		// Prefix - Suffix - Separator (item FORM) parameters, for the checkbox/radio elements
 		$pretext			= $field->parameters->get( 'pretext_form', '' ) ;
 		$posttext			= $field->parameters->get( 'posttext_form', '' ) ;
 		$separator		= $field->parameters->get( 'separator', 0 ) ;
 		$opentag			= $field->parameters->get( 'opentag_form', '' ) ;
 		$closetag			= $field->parameters->get( 'closetag_form', '' ) ;
-		
-		$required = $field->parameters->get( 'required', 0 ) ;
-		$required = $required ? ' required validate-radio' : '';
 		
 		switch($separator)
 		{
@@ -88,17 +122,157 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		}
 		
 		// Initialise property with default value
-		if (!$field->value && $default_value!=='') {
+		if ( !$field->value ) {
 			$field->value = array();
 			$field->value[0] = $default_value;
-		} else if (!$field->value) {
-			$field->value = array();
-			$field->value[0] = '';
 		}
+		
+		// CSS classes of value container
+		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
 		
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
+		
+		$js = "";
+		$css = "";
+		
+		if ($multiple) // handle multiple records
+		{
+			// Add the drag and drop sorting feature
+			if (!$use_ingroup) $js .="
+			jQuery(document).ready(function(){
+				jQuery('#sortables_".$field->id."').sortable({
+					handle: '.fcfield-drag-handle',
+					containment: 'parent',
+					tolerance: 'pointer'
+				});
+			});
+			";
+			
+			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			$js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+			
+			function addField".$field->id."(el, groupval_box, fieldval_box, params)
+			{
+				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
+				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
+				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
+				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				
+				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
+					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
+					return 'cancel';
+				}
+				
+				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
+				
+				// Remove prettyCheckable before cloning (if having appropriate CSS class)
+				lastField.find('input.use_prettycheckable:radio').each(function() { jQuery(this).prettyCheckable('destroy'); });
+				
+				var newField  = lastField.clone();
+				
+				// Re-add prettyCheckable after cloning (if having appropriate CSS class)
+				lastField.find('.use_prettycheckable').each(function() {
+					var elem = jQuery(this);
+					var lbl_html = elem.prev('label').html();
+					elem.prev('label').remove();
+					elem.prettyCheckable({ label: lbl_html });
+				});
+				
+				// Update the new radios
+				var theSet = newField.find('input:radio');
+				//window.console.log('theSet.length: ' + theSet.length);
+				var nr = 0;
+				theSet.each(function() {
+					var elem = jQuery(this);
+					elem.attr('name', '".$fieldname."['+uniqueRowNum".$field->id."+']');
+					elem.attr('id', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);
+					".($prettycheckable_added ?
+						"elem.prev('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" :
+						"elem.next('label').attr('for', '".$elementid."_'+uniqueRowNum".$field->id."+'_'+nr);" )."
+					nr++;
+				});
+				
+				// Add prettyCheckable to new radio set (if having appropriate CSS class)
+				newField.find('.use_prettycheckable').each(function() {
+					var elem = jQuery(this);
+					var lbl = elem.prev('label');
+					var lbl_html = lbl.html();
+					lbl.remove();
+					elem.prettyCheckable({ label: lbl_html });
+				});
+				";
+			
+			// Add new field to DOM
+			$js .= "
+				lastField ?
+					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
+					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
+				if (remove_previous) lastField.remove();
+				";
+			
+			// Add new element to sortable objects (if field not in group)
+			if (!$use_ingroup) $js .= "
+				jQuery('#sortables_".$field->id."').sortable({
+					handle: '.fcfield-drag-handle',
+					containment: 'parent',
+					tolerance: 'pointer'
+				});
+				";
+			
+			// Show new field, increment counters
+			$js .="
+				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
+				if (scroll_visible) fc_scrollIntoView(newField, 1);
+				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
+				
+				rowCount".$field->id."++;       // incremented / decremented
+				uniqueRowNum".$field->id."++;   // incremented only
+			}
+
+			function deleteField".$field->id."(el, groupval_box, fieldval_box)
+			{
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				// Add empty container if last element, instantly removing the given field value container
+				if(rowCount".$field->id." == 1)
+					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
+				
+				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
+				if(rowCount".$field->id." > 1) {
+					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
+					row.find('.fcfield-delvalue').remove();
+					row.find('.fcfield-insertvalue').remove();
+					row.find('.fcfield-drag-handle').remove();
+					// Do hide effect then remove from DOM
+					row.slideUp(400, function(){ this.remove(); });
+					rowCount".$field->id."--;
+				}
+			}
+			";
+			
+			$css .= '';
+			
+			$remove_button = '<span class="fcfield-delvalue" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="fcfield-drag-handle" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$add_here = '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="fcfield-insertvalue fc_before" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="fcfield-insertvalue fc_after"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
+		} else {
+			$remove_button = '';
+			$move2 = '';
+			$add_here = '';
+			$js .= '';
+			$css .= '';
+		}
+		
+		if ($js)  $document->addScriptDeclaration($js);
+		if ($css) $document->addStyleDeclaration($css);
 		
 		// Get indexed element values
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
@@ -110,49 +284,97 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 			return;
 		}
 		
-		static $prettycheckable_added = null;
-	  if ( $prettycheckable_added === null )
-	  {
-			$prettycheckable_added = flexicontent_html::loadFramework('prettyCheckable');
+		// Display as radio-set
+		$display_as_radioset = 1;
+		if ($display_as_radioset) {
+			$attribs  = '';
+			$classes  = ($prettycheckable_added ? ' use_prettycheckable ' : '');
+			$classes .= $required;
+			$onchange = "";
+			if ($required) $classes .= ' validate-radio ';  // if required then set appropriate validate-* CSS class (*=handler name)
+			if ($classes)  $attribs .= ' class="'.$classes.'" ';
+			if ($onchange) $attribs .= ' onchange="'.$onchange.'" ';
+			foreach ($elements as $element) {
+				if (!isset($element->label_tip))
+					$element->label_tip = '';
+			}
 		}
 		
-		$attribs  = '';
-		$classes  = ($prettycheckable_added ? ' use_prettycheckable ' : '');
-		$classes .= $required;
-		if ($classes)  $attribs .= ' class="'.$classes.'" ';
 		
+		// *****************************************
 		// Create field's HTML display for item form
-		// Display as radio buttons
-		$i = 0;
-		$options = array();
-		foreach ($elements as $element) {
-			$checked  = in_array($element->value, $field->value)  ?  ' checked="checked"'  :  '';
-			$elementid_no = $elementid.'_'.$i;
-			$extra_params = $prettycheckable_added ? ' data-labeltext="'.$element->text.'" data-labelPosition="right" data-customClass="fcradiocheck"' : '';
-			$options[] = ''
-				.(!$prettycheckable_added ? '<label class="fccheckradio_lbl">' : '')
-				.' <input type="radio" id="'.$elementid_no.'" element_group_id="'.$elementid.'" name="'.$fieldname.'" '.$attribs.' value="'.$element->value.'" '.$checked.$extra_params.' />'
-				.(!$prettycheckable_added ? '&nbsp;'.$element->text.'</label>' : '')
-				;
-			$i++;
+		// *****************************************
+		
+		$input_attribs = $prettycheckable_added ? ' data-labelPosition="right" data-customClass="fcradiocheck"' : '';
+		$label_class = 'fccheckradio_lbl'
+			;
+		$field->html = array();
+		$n = 0;
+		//if ($use_ingroup) {print_r($field->value);}
+		foreach ($field->value as $value)
+		{
+			if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+			
+			$fieldname_n = $fieldname.'['.$n.']';
+			$elementid_n = $elementid.'_'.$n;
+			
+			// Create form field options
+			$i = 0;
+			$options = array();
+			foreach ($elements as $element) {
+				$checked  = $element->value == $value  ?  ' checked="checked"'  :  '';
+				$elementid_no = $elementid_n.'_'.$i;
+				$input_fld = ' <input type="radio" id="'.$elementid_no.'" data-element-grpid="'.$elementid.'" name="'.$fieldname_n.'" '.$attribs.' value="'.$element->value.'" '.$checked . $input_attribs.' />';
+				$options[] = ''
+					.$pretext
+					.$input_fld
+					.'<label class="'.$label_class.'" for="'.$elementid_no.'" style="vertical-align: unset!important;" title="'.$element->label_tip.'">'
+						.($form_vals_display!=1 ? $element->text : '')
+					.'</label>'
+					.$posttext
+					;
+				$i++;
+			}
+			
+			// Apply (item form) separator and open/close tags to create the radio field
+			$radioset_field = $opentag . implode($separator, $options) . $closetag;
+			
+			$field->html[] = '
+				'.$radioset_field.'
+				'.($use_ingroup ? '' : $move2).'
+				'.($use_ingroup ? '' : $remove_button).'
+				'.($use_ingroup || !$add_position ? '' : $add_here).'
+				';
+			
+			$n++;
+			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
 		}
 		
-		// Apply values separator
-		$field->html = implode($separator, $options);
-		
-		// Apply field 's opening / closing texts
-		if ($field->html)
-			$field->html = $opentag . $field->html . $closetag;
+		if ($use_ingroup) { // do not convert the array to string if field is in a group
+		} else if ($multiple) { // handle multiple records
+			$field->html =
+				'<li class="'.$value_classes.'">'.
+					implode('</li><li class="'.$value_classes.'">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
+		} else {  // handle single values
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+		}
 	}
 	
 	
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
+		
+		// Some variables
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		$add_enclosers = !$use_ingroup || $field->parameters->get('add_enclosers_ingroup', 0);
+		$view = JRequest::getVar('flexi_callview', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
@@ -172,10 +394,10 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		if($pretext)  { $pretext  = $remove_space ? $pretext : $pretext . ' '; }
 		if($posttext) { $posttext = $remove_space ? $posttext : ' ' . $posttext; }
 		
-		// some parameter shortcuts
-		$sql_mode			= $field->parameters->get( 'sql_mode', 0 ) ;
+		// Value creation
+		$sql_mode = $field->parameters->get( 'sql_mode', 0 ) ;
 		$field_elements = $field->parameters->get( 'field_elements', '' ) ;
-		$text_or_value= $field->parameters->get( 'text_or_value', 1 ) ;
+		$text_or_value  = $field->parameters->get( 'text_or_value', 1 ) ;
 		
 		switch($separatorf)
 		{
@@ -222,13 +444,13 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		if ( empty($elements) )  { $field->{$prop} = ''; $field->display_index = ''; return; }
 		
 		// Create display of field
-		$display = array();
+		$field->{$prop} = array();
 		$display_index = array();
 		
 		// Prepare for looping
 		if ( !$values ) $values = array();
 		if ( $display_all ) {
-			$index = reset($values);
+			$indexes = array_flip($values);
 			
 			// non-selected value shortcuts
 	    $ns_pretext			= FlexicontentFields::replaceFieldValue( $field, $item, $field->parameters->get( 'ns_pretext', '' ), 'ns_pretext' );
@@ -239,38 +461,48 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	    $ns_posttext = $remove_space ? $ns_posttext : ' ' . $ns_posttext;
 		}
 		
-		// CASE a. Display ALL elements (selected and NON-selected)
-		if ( $display_all ) foreach ($elements as $val => $element)
+		// CASE a. Display ALL elements (selected and NON-selected).  NOTE: not supported if field in field group
+		if ( $display_all && !$use_ingroup ) foreach ($elements as $val => $element)
 		{
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp =$element->text;
 			
-			$is_selected = $index == $val;
+			$is_selected = isset($indexes[$val]);
 			
-			$display[] = $is_selected ?  $pretext.$disp.$posttext : $ns_pretext.$disp.$ns_posttext;
+			$field->{$prop}[] = $is_selected ?  $pretext.$disp.$posttext : $ns_pretext.$disp.$ns_posttext;
 			if ( $is_selected ) $display_index[] = $element->value;
 		}
 		
-		// CASE b. Display only selected elements
-		else if ( count($values) )
+		// CASE b. Display only selected elements. NOTE: This is forced if field is in field group
+		else foreach ($values as $n => $val)
 		{
-			$element = @$elements[ reset($values) ];
-			if ( !$element ) return '';
+			// Skip empty/invalid values but add empty display, if in field group
+			$element = !strlen($val) ? false : @$elements[ $val ];
+			if ( !$element ) {
+				if ( $use_ingroup ) $field->{$prop}[$n]	= '';
+				continue;
+			}
 			
 			if ($text_or_value == 0) $disp = $element->value;
 			else if ($text_or_value == 1) $disp =$element->text;
 			
-			$display[] = $pretext.$disp.$posttext;
+			$field->{$prop}[] = !$add_enclosers ? $disp : $pretext . $disp . $posttext;
 			$display_index[] = $element->value;
 		}
 		
-		// Apply values separator
-		$field->{$prop} = implode($separatorf, $display);
-		$field->display_index = implode($separatorf, $display_index);
-		
-		// Apply field 's opening / closing texts
-		if ($field->{$prop})
-			$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+		if (!$use_ingroup)  // do not convert the array to string if field is in a group
+		{
+			// Apply values separator
+			$field->{$prop} = implode($separatorf, $field->{$prop});
+			$field->display_index = implode($separatorf, $display_index);
+			
+			// Apply field 's opening / closing texts
+			if ( $field->{$prop}!=='' ) {
+				$field->{$prop} = $opentag . $field->{$prop} . $closetag;
+			} else {
+				$field->{$prop} = '';
+			}
+		}
 	}
 	
 	
@@ -282,9 +514,12 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-		if ( !is_array($post) && !strlen($post) ) return;
+		
+		$use_ingroup = $field->parameters->get('use_ingroup', 0);
+		if ( !is_array($post) && !strlen($post) && !$use_ingroup ) return;
+		
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		
 		// Make sure posted data is an array 
 		$post = !is_array($post) ? array($post) : $post;
@@ -293,17 +528,26 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 		$newpost = array();
 		$new = 0;
 		$elements = FlexicontentFields::indexedField_getElements($field, $item, self::$extra_props);
-		foreach ($post as $n=>$v)
+		foreach ($post as $n => $v)
 		{
-			if ($post[$n] !== '')
-			{
-				$element = @$elements[ $v ];
-				if ( !$element ) continue;
-				$newpost[$new] = $post[$n];
+			// Do server-side validation and skip empty/invalid values
+			$element = !strlen($post[$n]) ? false : @$elements[ $post[$n] ];
+			if ( !$element ) {
+				$post[$n] = '';  // clear invalid value
+				if (!$use_ingroup) continue;
 			}
+			// max values limitation
+			if ($max_values && $n > $max_values) continue;
+			
+			$newpost[$new] = array();
+			$newpost[$new] = $post[$n];
 			$new++;
 		}
 		$post = $newpost;
+		/*if ($use_ingroup) {
+			$app = JFactory::getApplication();
+			$app->enqueueMessage( print_r($post, true), 'warning');
+		}*/
 	}
 	
 	
@@ -325,17 +569,15 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	// Method to display a search filter for the advanced search view
 	function onAdvSearchDisplayFilter(&$filter, $value='', $formName='searchForm')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
-		self::onDisplayFilter($filter, $value, $formName, $elements=true);
+		self::onDisplayFilter($filter, $value, $formName);
 	}
 	
 	
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		// Get indexed element values
@@ -363,7 +605,6 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	// This is for content lists e.g. category view, and not for search view
 	function getFiltered(&$filter, $value)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
@@ -387,7 +628,8 @@ class plgFlexicontent_fieldsRadio extends JPlugin
 	// *************************
 	
 	// Method to create (insert) advanced search index DB records for the field values
-	function onIndexAdvSearch(&$field, &$post, &$item) {
+	function onIndexAdvSearch(&$field, &$post, &$item)
+	{
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		

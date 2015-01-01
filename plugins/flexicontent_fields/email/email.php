@@ -39,7 +39,6 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
@@ -58,6 +57,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
+		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		
 		// *************
@@ -73,9 +73,11 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		$maxlength  = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced
 		
-		// create extra HTML TAG parameters for the text form field
+		// create extra HTML TAG parameters for the form field
 		$attribs = $field->parameters->get( 'extra_attributes', '' ) ;
 		if ($maxlength) $attribs .= ' maxlength="'.$maxlength.'" ';
+		$attribs .= ' size="'.$size.'" ';
+		
 		
 		// *************************************
 		// Email title & linking text (optional)
@@ -95,6 +97,9 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$field->value[0] = serialize($field->value[0]);
 		}
 		
+		// CSS classes of value container
+		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
@@ -105,10 +110,10 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .="
+			if (!$use_ingroup) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag',
+					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
@@ -123,9 +128,10 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
-				remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
+				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
+				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
+				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
 				
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
@@ -144,25 +150,27 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				
 			if ($usetitle) $js .= "
 				// Update the new email linking text
-				var theInput = newField.find('input.emailtext').first();
+				theInput = newField.find('input.emailtext').first();
 				theInput.val('');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
 				";
 			
 			// Add new field to DOM
 			$js .= "
-				newField.insertAfter( lastField );
+				lastField ?
+					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
+					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
-			";
+				";
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
 				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag',
+					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
-			";
+				";
 			
 			// Show new field, increment counters
 			$js .="
@@ -181,12 +189,14 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 				
 				// Add empty container if last element, instantly removing the given field value container
 				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
+					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if(rowCount".$field->id." > 1) {
-					// Destroy the remove button, so that it is not reclicked again, while we do the hide effect (before DOM removal)
-					if (el) jQuery(el).remove();
+					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
+					row.find('.fcfield-delvalue').remove();
+					row.find('.fcfield-insertvalue').remove();
+					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
 					row.slideUp(400, function(){ this.remove(); });
 					rowCount".$field->id."--;
@@ -194,15 +204,17 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			}
 			";
 			
-			$css .= '
-			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
-			';
+			$css .= '';
 			
-			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$remove_button = '<span class="fcfield-delvalue" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="fcfield-drag-handle" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$add_here = '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="fcfield-insertvalue fc_before" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="fcfield-insertvalue fc_after"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		} else {
 			$remove_button = '';
 			$move2 = '';
+			$add_here = '';
 			$js .= '';
 			$css .= '';
 		}
@@ -210,14 +222,20 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 		
+		
+		// *****************************************
+		// Create field's HTML display for item form
+		// *****************************************
+		
 		$field->html = array();
 		$n = 0;
 		//if ($use_ingroup) {print_r($field->value);}
 		foreach ($field->value as $value)
 		{
-			// Compatibility for unserialized values
-			if ( @unserialize($value)!== false || $value === 'b:0;' ) {
-				$value = unserialize($value);
+			// Compatibility for unserialized values or for NULL values in a field group
+			$v = !empty($value) ? @unserialize($value) : false;
+			if ( $v !== false || $v === 'b:0;' ) {
+				$value = $v;
 			} else {
 				$value = array('addr' => $value, 'text' => '');
 			}
@@ -234,11 +252,12 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			$addr = '
 				<div class="nowrap_box">
 					<label class="label">'.JText::_( 'FLEXI_FIELD_EMAILADDRESS' ).':</label>
-					<input class="emailaddr fcfield_textval validate-email'.$required.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" size="'.$size.'" value="'.$value['addr'].'" '.$attribs.' />
+					<input class="emailaddr fcfield_textval validate-email'.$required.'" name="'.$fieldname_n.'[addr]" id="'.$elementid_n.'" type="text" value="'.$value['addr'].'" '.$attribs.' />
 				</div>';
 			
 			$text = '';
 			if ($usetitle) {
+				$value['text'] = !empty($value['text']) ? $value['text'] : $default_title;
 				$value['text'] = isset($value['text']) ? htmlspecialchars($value['text'], ENT_COMPAT, 'UTF-8') : '';
 				$text = '
 				<div class="nowrap_box">
@@ -248,10 +267,11 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 			}
 			
 			$field->html[] = '
-				'.($use_ingroup ? '' : $move2).'
-				'.($use_ingroup ? '' : $remove_button).'
 				'.$addr.'
 				'.$text.'
+				'.($use_ingroup ? '' : $move2).'
+				'.($use_ingroup ? '' : $remove_button).'
+				'.($use_ingroup || !$add_position ? '' : $add_here).'
 				';
 			
 			$n++;
@@ -261,11 +281,11 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
 			$field->html =
-				'<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">'.
-					implode('</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">', $field->html).
+				'<li class="'.$value_classes.'">'.
+					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" style="float:left; clear:both;" onclick="addField'.$field->id.'(this);" value=" -- '.JText::_( 'FLEXI_ADD_VALUE' ).' -- " />';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
@@ -275,7 +295,6 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
@@ -430,7 +449,6 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
@@ -539,7 +557,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
 		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
-		// 'search_properties'   containts property fields that should be added as text
+		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('addr'), $search_properties=array('addr','text'), $properties_spacer=' ', $filter_func=null);
@@ -556,7 +574,7 @@ class plgFlexicontent_fieldsEmail extends JPlugin
 		// a. Each of the values of $values array will be added to the basic search index (one record per item)
 		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
-		// 'search_properties'   containts property fields that should be added as text
+		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('addr'), $search_properties=array('addr','text'), $properties_spacer=' ', $filter_func=null);

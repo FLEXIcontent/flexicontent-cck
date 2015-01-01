@@ -28,7 +28,6 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 	function onDisplayField(&$field, &$item)
 	{
 		// displays the field when editing content item
-		// execute the code only if the field type match the plugin type
 		$field->label = JText::_($field->label);
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 
@@ -211,7 +210,6 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 	{
 		// displays the field in the frontend
 		
-		// execute the code only if the field type match the plugin type
 		$field->label = JText::_($field->label);
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
@@ -284,7 +282,6 @@ class plgFlexicontent_fieldsSharedvideo extends JPlugin
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( $field, &$post, &$file )
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// Check if field has posted data

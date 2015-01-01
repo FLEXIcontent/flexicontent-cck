@@ -24,205 +24,244 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 	// ***********
 	// CONSTRUCTOR
 	// ***********
-
+	
 	function plgFlexicontent_fieldsMinigallery( &$subject, $params )
 	{
 		parent::__construct( $subject, $params );
 		JPlugin::loadLanguage('plg_flexicontent_fields_minigallery', JPATH_ADMINISTRATOR);
 	}
-
-
-
+	
+	
+	
 	// *******************************************
 	// DISPLAY methods, item form & frontend views
 	// *******************************************
-
+	
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		$field->label = JText::_($field->label);
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-
-		// some parameter shortcuts
-		$document		= JFactory::getDocument();
-		$app				= JFactory::getApplication();
-		$client			= $app->isAdmin() ? '../' : '';
-		$flexiparams= JComponentHelper::getParams('com_flexicontent');
-		$mediapath	= $flexiparams->get('media_path', 'components/com_flexicontent/medias');
 		
-		$size				= $field->parameters->get('size', 30 );
-		$max_values = (int)$field->parameters->get('max_values', 0);
-		$required 	= $field->parameters->get('required', 0 );
-		$required 	= $required ? ' required' : '';
-
-		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
-
-		if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-		$js = "
-		function randomString() {
-			var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
-			var string_length = 6;
-			var randomstring = '';
-			for (var i=0; i<string_length; i++) {
-				var rnum = Math.floor(Math.random() * chars.length);
-				randomstring += chars.substring(rnum,rnum+1);
-			}
-			return randomstring;
+		$field->label = JText::_($field->label);
+		$use_ingroup = 0;  // Not supported
+		if ($use_ingroup) $field->formhidden = 3;
+		if ($use_ingroup && empty($field->ingroup)) return;
+		
+		// initialize framework objects and other variables
+		$document = JFactory::getDocument();
+		$app  = JFactory::getApplication();
+		
+		
+		// ****************
+		// Number of values
+		// ****************
+		$multiple   = $use_ingroup || 1;
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
+		$required   = $required ? ' required' : '';
+		
+		// Input field configuration
+		$size = (int) $field->parameters->get( 'size', 30 ) ;
+		$client = $app->isAdmin() ? '../' : '';
+		$flexiparams = JComponentHelper::getParams('com_flexicontent');
+		$mediapath   = $flexiparams->get('media_path', 'components/com_flexicontent/medias');
+		
+		// Load file data
+		if ( !$field->value ) {
+			$files_data = array();
+			$field->value = array();
+		} else {
+			$files_data = $this->getFileData( $field->value, $published=false );
+			$field->value = array();
+			foreach($files_data as $file_id => $file_data) $field->value[] = $file_id;
 		}
-
-		var value_counter".$field->id."=".count($field->value).";
-		var maxValues".$field->id."=".$max_values.";
-
-		function qfSelectFile".$field->id."(id, file) {
-			if((value_counter".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
-				alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
-				return 'cancel';
-			}
-			
-		  value_counter".$field->id."++;
-		  var valcounter = $('".$field->name."');
-			valcounter.value = value_counter".$field->id.";
-
-			var name 	= 'a_name'+id;
-			var ixid 	= randomString();
-			var li 		= document.createElement('li');
-			var thumb	= document.createElement('img');
-			var hid		= document.createElement('input');
-			var span	= document.createElement('span');
-			var img		= document.createElement('img');
-
-			var filelist = document.getElementById('sortables_".$field->id."');
-			if(file.substring(0,7)!='http://')
-				file = '".str_replace('\\','/', JPATH_ROOT)."/".$mediapath."/'+file;
-			$(li).addClass('minigallery');
-			$(thumb).addClass('thumbs');
-			$(span).addClass('fcfield-drag');
-
-			var button = document.createElement('input');
-			button.type = 'button';
-			button.name = 'removebutton_'+id;
-			button.id = 'removebutton_'+id;
-			$(button).addClass('fcfield-button');
-			$(button).addEvent('click', function() { deleteField".$field->id."(this) });
-			button.value = '".JText::_( 'FLEXI_REMOVE_FILE',true )."';
-
-			thumb.src = '".JURI::root(true)."/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
-			thumb.alt ='".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
-
-			hid.type = 'hidden';
-			hid.name = '".$fieldname."';
-			hid.value = id;
-			hid.id = ixid;
-
-			img.src = '".JURI::base()."components/com_flexicontent/assets/images/move2.png';
-			img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
-
-			filelist.appendChild(li);
-			li.appendChild(thumb);
-			li.appendChild(span);
-			span.appendChild(img);
-			li.appendChild(button);
-			li.appendChild(hid);
-
-			jQuery('#sortables_".$field->id."').sortable({
-				handle: '.fcfield-drag',
-				containment: 'parent',
-				tolerance: 'pointer'
+		
+		// CSS classes of value container
+		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		$value_classes .= ' floated';
+		
+		// Field name and HTML TAG id
+		$fieldname = 'custom['.$field->name.'][]';
+		//$elementid = 'custom_'.$field->name;
+		
+		$js = "";
+		$css = "";
+		
+		if ($multiple) // handle multiple records
+		{
+			// Add the drag and drop sorting feature
+			if (!$use_ingroup) $js .= "
+			jQuery(document).ready(function(){
+				jQuery('#sortables_".$field->id."').sortable({
+					handle: '.fcfield-drag-handle',
+					containment: 'parent',
+					tolerance: 'pointer'
+				});
 			});
-		}
-
-		function deleteField".$field->id."(el) {
-		  value_counter".$field->id."--;
-
-		  var valcounter = $('".$field->name."');
-			if ( value_counter".$field->id." > 0 ) valcounter.value = value_counter".$field->id.";
-			else valcounter.value = '';
+			";
 			
-			var row = jQuery(el).closest('li');
-			jQuery(row).hide('slideUp', function() { $(this).remove(); } );
-		}
-		";
-		
-		// Add the drag and drop sorting feature
-		if (!empty($field->value)) $js .= "
-		jQuery(document).ready(function(){
-			jQuery('#sortables_".$field->id."').sortable({
-				handle: '.fcfield-drag',
-				containment: 'parent',
-				tolerance: 'pointer'
-			});
-		});
-		";
-		
-
-		$css = '
-		#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: nowrap; }
-		#sortables_'.$field->id.' li {
-			list-style: none;
-			height: 130px;
-			width: 100px;
-			margin: 8px 0px 0px 12px !important;
-			float:left;
-		}
-		#sortables_'.$field->id.' li img.thumbs {
-			border: 1px solid silver;
-			padding: 0;  margin: 0px 0px 6px 0px;
-			float: left; clear:both;
+			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			$js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+			
+			function qfSelectFile".$field->id."(id, file)
+			{
+				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
+				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
+				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
+				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				
+				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
+					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
+					return 'cancel';
+				}
+				
+				if (file.substring(0,7)!='http://' || file.substring(0,8)!='https://') {
+					file = '".str_replace('\\','/', JPATH_ROOT)."/".$mediapath."/'+file;
+				}
+				thumb_src = '".JURI::root(true)."/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src='+file+'&w=100&h=100&zc=1';
+				
+				var lastField = null;
+				var newField = jQuery('\
+				<li class=\"".$value_classes."\">\
+					<img alt=\"Thumbnail\" src=\"'+thumb_src+'\" class=\"thumbs\">\
+					<input type=\"hidden\" id=\"a_id'+id+'_".$field->id."\" name=\"".$fieldname."\" value=\"'+id+'\"/> \
+					<span class=\"fcfield-drag-handle\" title=\"".JText::_( 'FLEXI_CLICK_TO_DRAG' )."\"></span> \
+					<span class=\"fcfield-button fcfield-delvalue\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\" onclick=\"deleteField".$field->id."(this);\"></span> \
+				</li>\
+				');
+					";
+			
+			// Add new field to DOM
+			$js .= "
+				lastField ?
+					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
+					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
+				if (remove_previous) lastField.remove();
+				";
+			
+			// Add new element to sortable objects (if field not in group)
+			if (!$use_ingroup) $js .= "
+				jQuery('#sortables_".$field->id."').sortable({
+					handle: '.fcfield-drag-handle',
+					containment: 'parent',
+					tolerance: 'pointer'
+				});
+				";
+			
+			// Show new field, increment counters
+			$js .="
+				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
+				if (scroll_visible) fc_scrollIntoView(newField, 1);
+				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
+				
+				rowCount".$field->id."++;       // incremented / decremented
+				uniqueRowNum".$field->id."++;   // incremented only
 			}
-		#sortables_'.$field->id.' li input.fcfield-button { float:left!important; }
-		#sortables_'.$field->id.' li span.fcfield-drag img { float:left!important; margin:2px 0px 0px 0px!important; }
-		';
+
+			function deleteField".$field->id."(el, groupval_box, fieldval_box)
+			{
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				// Add empty container if last element, instantly removing the given field value container
+				if(rowCount".$field->id." == 0)
+					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
+				
+				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
+				if(rowCount".$field->id." > 0) {
+					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
+					row.find('.fcfield-delvalue').remove();
+					row.find('.fcfield-insertvalue').remove();
+					row.find('.fcfield-drag-handle').remove();
+					// Do hide effect then remove from DOM
+					row.slideUp(400, function(){ this.remove(); });
+					rowCount".$field->id."--;
+				}
+			}
+			";
+			
+			$css .= '
+			#sortables_'.$field->id.' li img.thumbs { border:1px solid silver; padding:0;  margin:0px 0px 6px 0px; float:left; clear:both; }
+			';
+			
+			$remove_button = '<span class="fcfield-delvalue" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="fcfield-drag-handle" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+		} else {
+			$remove_button = '';
+			$move2 = '';
+			$js .= '';
+			$css .= '';
+		}
+		
+		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
-		if ($js) $document->addScriptDeclaration($js);
-		
-		$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
-		
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		
-		$i = 0;
-		$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">';
-		if($field->value) {
-			foreach($field->value as $file) {
-				$field->html .= '<li>';
-				$filename = $this->getFileName( $file );
-				$img_path = $filename->filename;
-				if(substr($filename->filename, 0, 7)!='http://')
-					$img_path = JPATH_ROOT . DS . $mediapath . DS . $filename->filename;
-				$src = JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
-
-				$field->html .= ' <img class="thumbs" src="'.$src.'" alt="Thumbnail" />';
-				$field->html .= '  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file.'" />';
-				$field->html .= $move2;
-				$field->html .= '  <input class="inputbox fcfield-button" type="button" onclick="deleteField'.$field->id.'(this);" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" />';
-				$field->html .= '</li>';
-				$i++;
-			}
+		$field->html = array();
+		$n = 0;
+		foreach($files_data as $file_id => $file_data)
+		{
+			$img_path = (substr($file_data->filename, 0,7)!='http://' || substr($file_data->filename, 0,8)!='https://') ?
+				JPATH_ROOT . DS . $mediapath . DS . $file_data->filename :
+				$file_data->filename ;
+			$src = JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w=100&h=100&zc=1';
+			
+			$field->html[] = '
+				<img class="thumbs" src="'.$src.'" alt="Thumbnail" />
+				'.'
+				'.'<input type="hidden" id="a_id'.$file_id.'_'.$field->id.'" name="'.$fieldname.'" value="'.$file_id.'" />'.'
+				'.($use_ingroup ? '' : $move2).'
+				'.($use_ingroup ? '' : $remove_button).'
+				';
+			
+			$n++;
+			//if ($max_values && $n >= $max_values) break;  // break out of the loop, if maximum file limit was reached
 		}
-
+		
+		if ($use_ingroup) { // do not convert the array to string if field is in a group
+		} else if ($multiple) { // handle multiple records
+			$field->html =
+				'<li class="'.$value_classes.'">'.
+					implode('</li><li class="'.$value_classes.'">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+		} else {  // handle single values
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+		}
+		
+		// Add button for popup file selection
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
-		$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$i.'&amp;autoselect='.$autoselect.'&amp;field='.$field->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+		$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;layout=image&amp;filter_secure=M&amp;index='.$n.'&amp;autoselect='.$autoselect.'&amp;field='.$field->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
 		$field->html .= "
-		</ul>
-		<div class='fcclear'></div>
-		<div class=\"fcfield-button-add\">
-			<div class=\"blank\">
+			<span class=\"fcfield-button-add\">
 				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
-			</div>
-		</div>
-		";
-		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($i ? $i : '').'" />';
+			</span>
+				";
+		
+		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
 	}
-
-
+	
+	
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		$field->label = JText::_($field->label);
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
-
-		$values = $values ? $values : $field->value ;
+		
+		$field->label = JText::_($field->label);
+		
+		$values = $values ? $values : $field->value;
+		// Load file data
+		if ( !$values ) {
+			$files_data = array();
+			$values = array();
+		} else {
+			$files_data = $this->getFileData( $values, $published=false );
+			$values = array();
+			foreach($files_data as $file_id => $file_data) $values[] = $file_id;
+		}
 
 		$mainframe = JFactory::getApplication();
 
@@ -283,141 +322,137 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 		$slideshowtype = $field->parameters->get( 'slideshowtype', 'Flash' );// default is normal slideshow
 		$slideshowClass = 'Slideshow';
 
-		if ($values)
-		{
-			if (!$js_and_css_added) {
-				if (FLEXI_J16GE) {
-					$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/minigallery/css/minigallery.css');
-				  FLEXI_J16GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-				  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.js');
-				  if($slideshowtype!='slideshow') {
-				  	$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
-				  	$slideshowClass .= '.'.$slideshowtype;
-				  }
-				} else {
-					$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/minigallery/minigallery.css');
-				  FLEXI_J16GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
-				  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/backgroundslider.js');
-				  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/slideshow.js');
-				}
-			  // this allows you to override the default css files
-			  $csspath = JPATH_ROOT.'/templates/'.$mainframe->getTemplate().'/css/minigallery.css';
-			  if(file_exists($csspath)) {
-					$document->addStyleSheet(JURI::root(true).'/templates/'.$mainframe->getTemplate().'/css/minigallery.css');
+		if (empty($values)) return;
+		
+		if (!$js_and_css_added) {
+			if (FLEXI_J16GE) {
+				$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/minigallery/css/minigallery.css');
+			  FLEXI_J16GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+			  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.js');
+			  if($slideshowtype!='slideshow') {
+			  	$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/js/slideshow.'.strtolower($slideshowtype).'.js');
+			  	$slideshowClass .= '.'.$slideshowtype;
 			  }
+			} else {
+				$document->addStyleSheet(JURI::root(true).'/plugins/flexicontent_fields/minigallery/minigallery.css');
+			  FLEXI_J16GE ? JHtml::_('behavior.framework', true) : JHTML::_('behavior.mootools');
+			  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/backgroundslider.js');
+			  $document->addScript(JURI::root(true).'/plugins/flexicontent_fields/minigallery/slideshow.js');
 			}
-			$js_and_css_added = true;
-
-			$htmltag_id = "slideshowContainer_".$field->name."_".$item->id;
-			$slidethumb = "slideshowThumbnail_".$field->name."_".$item->id;
-			$transition = $field->parameters->get( 'transition', 'back' );
-			$t_dir = $field->parameters->get( 't_dir', 'in' );
-			$thumbnails = $field->parameters->get( 'thumbnails', '1' );
-			$thumbnails = $thumbnails ? 'true' : 'false';
-			$controller = $field->parameters->get( 'controller', '1' );
-			$controller = $controller ? 'true' : 'false';
-			$otheroptions = $field->parameters->get( 'otheroptions', '' );
-
-			if ( !isset($item_field_arr[$item->id][$field->id]) )
-			{
-				$item_field_arr[$item->id][$field->id] = 1;
-
-				$css = "
-				#$htmltag_id {
-					width: ".$w_l."px;
-					height: ".$h_l."px;
-					margin-".$marginpos.": ".(($marginval+8)*$series)."px;
-				}
-				";
-
-				if ($thumbposition == 2 || $thumbposition == 4) {
-					$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($series_size+4)."px; height: 100%; width: ".($series_size+4)."px; top:0px; }";
-					$css .= "div .slideshow-thumbnails ul { width: ".$series_size."px; }";
-					$css .= "div .slideshow-thumbnails ul li {  }";
-				} else if ($thumbposition==1 || $thumbposition==3) {
-					$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($series_size+4)."px; height: ".$series_size."px; }";
-					if ($series > 1) $css .= "div .slideshow-thumbnails ul { width:100%!important; }";
-					$css .= "div .slideshow-thumbnails ul li { float: left!important;}";
-				} else { // inside TODO
-					$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($marginval+8)."px; height: ".($h_s+8)."px; top:0px; z-index:100; }";
-					$css .= "div .slideshow-thumbnails ul { width: 100%!important;}";
-					$css .= "div .slideshow-thumbnails ul li { float: left!important;}";
-				}
-
-				$document->addStyleDeclaration($css);
-
-				$otheroptions = ($otheroptions?','.$otheroptions:'');
-				$js = "
-			  	window.addEvent('domready',function(){
-					var options = {
-						delay: ".$field->parameters->get( 'delay', 4000 ).",
-						hu:'{$mediapath}/',
-						transition:'{$transition}:{$t_dir}',
-						duration: ".$field->parameters->get( 'duration', 1000 ).",
-						width: {$w_l},
-						height: {$h_l},
-						thumbnails: {$thumbnails},
-						controller: {$controller}
-						{$otheroptions}
-					}
-					show = new {$slideshowClass}('{$htmltag_id}', null, options);
-				});
-				";
-				$document->addScriptDeclaration($js);
-			}
-
-			$display = array();
-			$thumbs = array();
-
-			$usecaptions = (int)$field->parameters->get( 'usecaptions', 1 );
-			$captions = '';
-			if($usecaptions===2)
-				$captions = $field->parameters->get( 'customcaptions', 'This is a caption' );
-			$field->{$prop} = '';
-			$field->{$prop} .= '<div id="'.$htmltag_id.'" class="slideshow">';
-			$n = 0;
-			foreach ($values as $value) {
-				$filename = $this->getFileName( $value );
-				if ($filename) {
-					$img_path = $filename->filename;
-					if(substr($filename->filename,0,7)!='http://') {
-						$img_path = JURI::root(true) . '/' . $mediapath . '/' . $filename->filename;
-					}
-					$srcs	= JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
-					$srcb	= JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
-					$ext = pathinfo($img_path, PATHINFO_EXTENSION);
-					if ( in_array( $ext, array('png', 'ico', 'gif') ) ) {
-						$srcs .= '&f='. $ext;
-						$srcb .= '&f='. $ext;
-					}
-
-					if($usecaptions===1) $captions = $filename->altname;
-					$display[] = "<a href=\"javascript:;\"><img src=\"".$srcb."\" id=\"".$htmltag_id.'_'.$n."\" alt=\"{$captions}\" border=\"0\" /></a>\n";
-					$thumbs[] = "<li><a href=\"#{$htmltag_id}_{$n}\"><img src=\"{$srcs}\" border=\"0\" /></a></li>\n";
-					$n++;
-				}
-			}
-
-			$field->{$prop} .= '<div class="slideshow-images">';
-			$field->{$prop} .= implode("\n", $display);
-			$field->{$prop} .= "</div>\n";
-			$field->{$prop} .= '<div class="slideshow-thumbnails">';
-			$field->{$prop} .= '<ul>'.implode("\n", $thumbs).'</ul>';
-			$field->{$prop} .= "</div>\n";
-			$field->{$prop} .= "</div><div class=\"clr\"></div><div class=\"clear\"></div>\n";
+		  // this allows you to override the default css files
+		  $csspath = JPATH_ROOT.'/templates/'.$mainframe->getTemplate().'/css/minigallery.css';
+		  if(file_exists($csspath)) {
+				$document->addStyleSheet(JURI::root(true).'/templates/'.$mainframe->getTemplate().'/css/minigallery.css');
+		  }
 		}
+		$js_and_css_added = true;
+
+		$htmltag_id = "slideshowContainer_".$field->name."_".$item->id;
+		$slidethumb = "slideshowThumbnail_".$field->name."_".$item->id;
+		$transition = $field->parameters->get( 'transition', 'back' );
+		$t_dir = $field->parameters->get( 't_dir', 'in' );
+		$thumbnails = $field->parameters->get( 'thumbnails', '1' );
+		$thumbnails = $thumbnails ? 'true' : 'false';
+		$controller = $field->parameters->get( 'controller', '1' );
+		$controller = $controller ? 'true' : 'false';
+		$otheroptions = $field->parameters->get( 'otheroptions', '' );
+
+		if ( !isset($item_field_arr[$item->id][$field->id]) )
+		{
+			$item_field_arr[$item->id][$field->id] = 1;
+
+			$css = "
+			#$htmltag_id {
+				width: ".$w_l."px;
+				height: ".$h_l."px;
+				margin-".$marginpos.": ".(($marginval+8)*$series)."px;
+			}
+				";
+
+			if ($thumbposition == 2 || $thumbposition == 4) {
+				$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($series_size+4)."px; height: 100%; width: ".($series_size+4)."px; top:0px; }";
+				$css .= "div .slideshow-thumbnails ul { width: ".$series_size."px; }";
+				$css .= "div .slideshow-thumbnails ul li {  }";
+			} else if ($thumbposition==1 || $thumbposition==3) {
+				$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($series_size+4)."px; height: ".$series_size."px; }";
+				if ($series > 1) $css .= "div .slideshow-thumbnails ul { width:100%!important; }";
+				$css .= "div .slideshow-thumbnails ul li { float: left!important;}";
+			} else { // inside TODO
+				$css .= "div .slideshow-thumbnails { ".$marginpos.": -".($marginval+8)."px; height: ".($h_s+8)."px; top:0px; z-index:100; }";
+				$css .= "div .slideshow-thumbnails ul { width: 100%!important;}";
+				$css .= "div .slideshow-thumbnails ul li { float: left!important;}";
+			}
+
+			$document->addStyleDeclaration($css);
+
+			$otheroptions = ($otheroptions?','.$otheroptions:'');
+			$js = "
+		  	window.addEvent('domready',function(){
+				var options = {
+					delay: ".$field->parameters->get( 'delay', 4000 ).",
+					hu:'{$mediapath}/',
+					transition:'{$transition}:{$t_dir}',
+					duration: ".$field->parameters->get( 'duration', 1000 ).",
+					width: {$w_l},
+					height: {$h_l},
+					thumbnails: {$thumbnails},
+					controller: {$controller}
+					{$otheroptions}
+				}
+				show = new {$slideshowClass}('{$htmltag_id}', null, options);
+			});
+			";
+			$document->addScriptDeclaration($js);
+		}
+
+		$display = array();
+		$thumbs = array();
+
+		$usecaptions = (int)$field->parameters->get( 'usecaptions', 1 );
+		$captions = '';
+		if($usecaptions===2)
+			$captions = $field->parameters->get( 'customcaptions', 'This is a caption' );
+		$field->{$prop} = '';
+		$field->{$prop} .= '<div id="'.$htmltag_id.'" class="slideshow">';
+		$n = 0;
+		foreach($files_data as $file_id => $file_data)
+		{
+			if ($file_data) {
+				$img_path = (substr($file_data->filename, 0,7)!='http://' || substr($file_data->filename, 0,8)!='https://') ?
+					JURI::root(true) . '/' . $mediapath . '/' . $file_data->filename :
+					$file_data->filename ;
+				$srcs	= JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_s.'&h='.$h_s.'&zc=1';
+				$srcb	= JURI::root(true).'/components/com_flexicontent/librairies/phpthumb/phpThumb.php?src=' . $img_path . '&w='.$w_l.'&h='.$h_l.'&zc=1';
+				$ext = pathinfo($img_path, PATHINFO_EXTENSION);
+				if ( in_array( $ext, array('png', 'ico', 'gif') ) ) {
+					$srcs .= '&f='. $ext;
+					$srcb .= '&f='. $ext;
+				}
+
+				if($usecaptions===1) $captions = $file_data->altname;
+				$display[] = "<a href=\"javascript:;\"><img src=\"".$srcb."\" id=\"".$htmltag_id.'_'.$n."\" alt=\"{$captions}\" border=\"0\" /></a>\n";
+				$thumbs[] = "<li><a href=\"#{$htmltag_id}_{$n}\"><img src=\"{$srcs}\" border=\"0\" /></a></li>\n";
+				$n++;
+			}
+		}
+
+		$field->{$prop} .= '<div class="slideshow-images">';
+		$field->{$prop} .= implode("\n", $display);
+		$field->{$prop} .= "</div>\n";
+		$field->{$prop} .= '<div class="slideshow-thumbnails">';
+		$field->{$prop} .= '<ul>'.implode("\n", $thumbs).'</ul>';
+		$field->{$prop} .= "</div>\n";
+		$field->{$prop} .= "</div><div class=\"clr\"></div><div class=\"clear\"></div>\n";
 	}
-
-
-
+	
+	
 	// **************************************************************
 	// METHODS HANDLING before & after saving / deleting field events
 	// **************************************************************
-
+	
 	// Method to handle field's values before they are saved into the DB
-	function onBeforeSaveField($field, &$post, $file)
+	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 
@@ -425,13 +460,13 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 
 		$post = array_unique($post);
 	}
-
-
+	
+	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
 	}
-
-
+	
+	
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
 	}
@@ -441,47 +476,47 @@ class plgFlexicontent_fieldsMinigallery extends JPlugin
 	// **********************
 	// VARIOUS HELPER METHODS
 	// **********************
-
-	function getFileName( $value )
+	
+	function getFileData( $value, $published=1, $extra_select='' )
 	{
-		$db = JFactory::getDBO();
-
-		$query = 'SELECT filename, altname, ext'
-				. ' FROM #__flexicontent_files'
-				. ' WHERE id = '. (int) $value
-				;
-		$db->setQuery($query);
-		$filename = $db->loadObject();
-
-		return $filename;
-	}
-
-
-	function addIcon( &$file )
-	{
-		switch ($file->ext)
-		{
-			// Image
-			case 'jpg':
-			case 'png':
-			case 'gif':
-			case 'xcf':
-			case 'odg':
-			case 'bmp':
-			case 'jpeg':
-				$file->icon = JURI::root(true).'/components/com_flexicontent/assets/images/mime-icon-16/image.png';
-			break;
-
-			// Non-image document
-			default:
-				$icon = JPATH_SITE.DS.'components'.DS.'com_flexicontent'.DS.'assets'.DS.'images'.DS.'mime-icon-16'.DS.$file->ext.'.png';
-				if (file_exists($icon)) {
-					$file->icon = JURI::root(true).'/components/com_flexicontent/assets/images/mime-icon-16/'.$file->ext.'.png';
-				} else {
-					$file->icon = JURI::root(true).'/components/com_flexicontent/assets/images/mime-icon-16/unknown.png';
-				}
-			break;
+		// Find which file data are already cached, and if no new file ids to query, then return cached only data
+		static $cached_data = array();
+		$return_data = array();
+		$new_ids = array();
+		$values = is_array($value) ? $value : array($value);
+		foreach ($values as $file_id) {
+			$f = (int)$file_id;
+			if ( !isset($cached_data[$f]) && $f)
+				$new_ids[] = $f;
 		}
-		return $file;
+		
+		// Get file data not retrieved already
+		if ( count($new_ids) )
+		{
+			// Only query files that are not already cached
+			$db = JFactory::getDBO();
+			$query = 'SELECT * '. $extra_select //filename, filename_original, altname, description, ext, id'
+					. ' FROM #__flexicontent_files'
+					. ' WHERE id IN ('. implode(',', $new_ids) . ')'
+					. ($published ? '  AND published = 1' : '')
+					;
+			$db->setQuery($query);
+			$new_data = $db->loadObjectList('id');
+
+			if ($new_data) foreach($new_data as $file_id => $file_data) {
+				$cached_data[$file_id] = $file_data;
+			}
+		}
+		
+		// Finally get file data in correct order
+		foreach($values as $file_id) {
+			$f = (int)$file_id;
+			if ( isset($cached_data[$f]) && $f)
+				$return_data[$file_id] = $cached_data[$f];
+		}
+
+		return !is_array($value) ? @$return_data[(int)$value] : $return_data;
 	}
+
+
 }

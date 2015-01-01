@@ -687,9 +687,13 @@ class flexicontent_html
 				$js .= "
 					jQuery(document).ready(function(){
 						jQuery('input.use_prettycheckable').each(function() {
-							jQuery(this).prettyCheckable({
-								/*color: 'blue',*/
-								label: jQuery(this).next('label').html()
+							var elem = jQuery(this);
+							var lbl = elem.next('label');
+							var lbl_html = elem.next('label').html();
+							lbl.remove();
+							elem.prettyCheckable({
+								color: 'blue',
+								label: lbl_html
 							});
 						});
 					});

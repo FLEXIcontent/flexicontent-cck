@@ -39,7 +39,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
@@ -67,14 +66,17 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
+		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		
 		// **************
 		// Value handling
 		// **************
+		
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($item->version == 0 || $value_usage > 0) ? $field->parameters->get( 'default_value', '' ) : '';
+		$default_value = $default_value ? JText::_($default_value) : '';
 		
 		// Input field display size & max characters
 		$maxlength = (int) $field->parameters->get( 'maxlength', 0 ) ;   // client/server side enforced when using textarea, otherwise this will depend on the HTML editor (and only will be client size only)
@@ -102,15 +104,16 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			if ( !in_array('pagebreak', $skip_buttons) ) $skip_buttons[] = 'pagebreak';
 			if ( !in_array('readmore',  $skip_buttons) )  $skip_buttons[] = 'readmore';
 		}
-		
 		$skip_buttons_arr = ($show_buttons && $editor_name=='jce' && count($skip_buttons)) ? $skip_buttons : (boolean) $show_buttons;   // JCE supports skipping buttons
-		
 		
 		// Initialise property with default value
 		if ( !$field->value ) {
 			$field->value = array();
-			$field->value[0] = JText::_($default_value);
+			$field->value[0] = $default_value;
 		}
+		
+		// CSS classes of value container
+		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
 		
 		// Field name and HTML TAG id
 		if ($field->field_type == 'textarea')
@@ -144,10 +147,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .="
+			if (!$use_ingroup) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag',
+					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
@@ -162,9 +165,10 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
-				remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
+				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
+				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
+				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
 				
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
@@ -173,9 +177,11 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
-				
-				
-				// Create a new textarea
+				";
+			
+			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
+			// Update the new textarea
+			$js .= "
 				var boxClass = 'txtarea';
 				var container = newField.find('.fc_'+boxClass);
 				container.after('<div class=\"fc_'+boxClass+'\"></div>');  // Append a new container box
@@ -185,31 +191,33 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				// Prepare the new textarea for attaching the HTML editor
 				theArea = newField.find('.fc_'+boxClass).find('textarea');
 				theArea.val('');
-				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][text]');
-				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_text');
+				theArea.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+']');
+				theArea.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
 				theArea.removeClass(); // Remove all classes from the textarea
 				theArea.addClass(boxClass);
 				";
 			
 			// Add new field to DOM
 			$js .= "
-				newField.insertAfter( lastField );
+				lastField ?
+					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
+					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
-			";
+				";
 			
 			// Attach a new JS HTML editor object
 			if ($use_html) $js .= "
 				if (typeof tinyMCE !== 'undefined') tinyMCE.execCommand('mceAddControl', false, '".$elementid."_'+uniqueRowNum".$field->id."+'_text');
-			";
+				";
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
 				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag',
+					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
-			";
+				";
 			
 			// Show new field, increment counters
 			$js .="
@@ -228,12 +236,14 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 				
 				// Add empty container if last element, instantly removing the given field value container
 				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
+					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if(rowCount".$field->id." > 1) {
-					// Destroy the remove button, so that it is not reclicked again, while we do the hide effect (before DOM removal)
-					if (el) jQuery(el).remove();
+					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
+					row.find('.fcfield-delvalue').remove();
+					row.find('.fcfield-insertvalue').remove();
+					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
 					row.slideUp(400, function(){ this.remove(); });
 					rowCount".$field->id."--;
@@ -241,21 +251,28 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			}
 			";
 			
-			$css .= '
-			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
-			';
+			$css .= '';
 			
-			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$remove_button = '<span class="fcfield-delvalue" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="fcfield-drag-handle" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$add_here = '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="fcfield-insertvalue fc_before" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="fcfield-insertvalue fc_after"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		} else {
 			$remove_button = '';
 			$move2 = '';
+			$add_here = '';
 			$js .= '';
 			$css .= '';
 		}
 		
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
+		
+		
+		// *****************************************
+		// Create field's HTML display for item form
+		// *****************************************
 		
 		$field->html = array();
 		$n = 0;
@@ -270,7 +287,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					return;
 				}
 			}
-			if ( empty($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
+			if ( !strlen($value) && !$use_ingroup && $n) continue;  // If at least one added, skip empty if not in field group
 			
 			$fieldname_n = $field->field_type == 'maintext' ? $fieldname : $fieldname.'['.$n.']';
 			$elementid_n = $field->field_type == 'maintext' ? $elementid : $elementid.'_'.$n;
@@ -279,6 +296,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$field->tab_names[$n]  = $field->field_type == 'maintext' ? $fieldname : $fieldname_n;
 			$field->tab_labels[$n] = $field->field_type == 'maintext' ? $field->label : $field->label." ".$n ;
 			
+			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			//display($name, $html, $width, $height, $col, $row, $buttons = true, $id = null, $asset = null, $author = null, $params = array())
 			$txtarea = !$use_html ? '
 				<textarea id="'.$elementid_n.'" name="' . $fieldname_n . '" style="width:auto;" cols="'.$cols.'" rows="'.$rows.'" class="'.$required.'" '.($maxlength ? 'maxlength="'.$maxlength.'"' : '').'>'
@@ -298,6 +316,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			$field->html[] = '
 				'.($use_ingroup ? '' : $move2).'
 				'.($use_ingroup ? '' : $remove_button).'
+				'.($use_ingroup || !$add_position ? '' : $add_here).'
 				'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
 				'.$txtarea.'
 				';
@@ -309,11 +328,11 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
 			$field->html =
-				'<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">'.
-					implode('</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">', $field->html).
+				'<li class="'.$value_classes.'">'.
+					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" style="float:left; clear:both;" onclick="addField'.$field->id.'(this);" value=" -- '.JText::_( 'FLEXI_ADD_VALUE' ).' -- " />';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
@@ -323,7 +342,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
@@ -343,6 +361,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// Default value
 		$value_usage   = $field->parameters->get( 'default_value_use', 0 ) ;
 		$default_value = ($value_usage == 2) ? $field->parameters->get( 'default_value', '' ) : '';
+		$default_value = $default_value ? JText::_($default_value) : '';
 		
 		// Get field values
 		$values = $values ? $values : $field->value;
@@ -362,6 +381,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		}
 		if ($lang_filter_values || $clean_output || $encode_output)
 		{
+			// (* BECAUSE OF THIS, the value display loop expects unserialized values)
 			foreach ($values as &$value)
 			{
 				if ( empty($value) ) continue;  // skip further actions
@@ -376,8 +396,8 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 					$value = htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' );
 				}
 			}
+			unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		}
-		unset($value); // Unset this or you are looking for trouble !!!, because it is a reference and reusing it will overwrite the pointed variable !!!
 		
 		
 		// Prefix - Suffix - Separator parameters, replacing other field values if found
@@ -422,19 +442,19 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 			break;
 		}
 		
-		// initialise property
+		// Initialise property with default value
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)
 		{
 			if ( !strlen($value) && !$use_ingroup ) continue;
-			if ( strlen($value) ) {
+			if ( !strlen($value) ) {
 				$field->{$prop}[$n++]	= '';
 				continue;
 			}
 			
 			// Add prefix / suffix
-			$field->{$prop}[]	= !$add_enclosers ? $value : $pretext . $value . $posttext;
+			$field->{$prop}[$n]	= !$add_enclosers ? $value : $pretext . $value . $posttext;
 			
 			$n++;
 			if (!$multiple) break;  // multiple values disabled, break out of the loop, not adding further values even if the exist
@@ -488,7 +508,6 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
@@ -530,11 +549,13 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 	}
 	
 	
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
+		if ( !in_array($field->field_type, self::$field_types) ) return;
 	}
 	
 	
@@ -581,7 +602,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
 		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
-		// 'search_properties'   containts property fields that should be added as text
+		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');
@@ -598,7 +619,7 @@ class plgFlexicontent_fieldsTextarea extends JPlugin
 		// a. Each of the values of $values array will be added to the basic search index (one record per item)
 		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
-		// 'search_properties'   containts property fields that should be added as text
+		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array(), $search_properties=array(), $properties_spacer=' ', $filter_func='strip_tags');

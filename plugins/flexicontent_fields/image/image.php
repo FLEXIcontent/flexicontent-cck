@@ -40,7 +40,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
@@ -61,6 +60,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
+		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		$image_source = $field->parameters->get('image_source', 0);
 		if ($image_source > 1) {
@@ -130,7 +130,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						value_container.css('width', '');
 					}
 				}
-				";
+					";
 			$document->addScriptDeclaration($js);
 			$common_js_css_added = true;
 		}
@@ -143,6 +143,9 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			$field->value[0]['originalname'] = '';
 			$field->value[0] = serialize($field->value[0]);
 		}
+		
+		// CSS classes of value container
+		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
 		
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
@@ -159,7 +162,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			if (!$use_ingroup) $js .="
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag',
+					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
@@ -177,9 +180,10 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
-				remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
+				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
+				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
+				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
 				
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
@@ -242,44 +246,46 @@ class plgFlexicontent_fieldsImage extends JPlugin
 					newField.find('table.img_upload_select').css('display', 'table');
 					newField.find('input.imgchange').prop('checked', true);
 				}
-				";
+					";
 				
 			if ($linkto_url) $js .= "
 				newField.find('input.imglink').val('');
 				newField.find('input.imglink').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][urllink]');
 				newField.find('input.imglink').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_urllink');
-				";
+					";
 				
 			if ($usealt) $js .= "
 				newField.find('input.imgalt').val('".$default_alt."');
 				newField.find('input.imgalt').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][alt]');
 				newField.find('input.imgalt').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_alt');
-				";
+					";
 				
 			if ($usetitle) $js .= "
 				newField.find('input.imgtitle').val('".$default_title."');
 				newField.find('input.imgtitle').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
 				newField.find('input.imgtitle').attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
-				";
+					";
 				
 			if ($usedesc) $js .= "
 				newField.find('textarea.imgdesc').val('".$default_desc."');
 				newField.find('textarea.imgdesc').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][desc]');
-				";
+					";
 				
 			if ($usecust1) $js .= "
 				newField.find('input.imgcust1').val('".$default_cust1."');
 				newField.find('input.imgcust1').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust1]');
-				";
+					";
 				
 			if ($usecust2) $js .= "
 				newField.find('input.imgcust2').val('".$default_cust2."');
 				newField.find('input.imgcust2').attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][cust2]');
-				";
+					";
 			
 			// Add new field to DOM
 			$js .= "
-				newField.insertAfter( lastField );
+				lastField ?
+					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
+					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
 				
 				// Add jQuery modal window to the select image file button
@@ -290,16 +296,16 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						return false;
 					});
 				});
-			";
+				";
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .="
 				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag',
+					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
-			";
+				";
 			
 			// Show new field, increment counters
 			$js .="
@@ -329,12 +335,14 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				
 				// Add empty container if last element, instantly removing the given field value container
 				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
+					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if(rowCount".$field->id." > 1) {
-					// Destroy the remove button, so that it is not reclicked again, while we do the hide effect (before DOM removal)
-					if (el) jQuery(el).remove();
+					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
+					row.find('.fcfield-delvalue').remove();
+					row.find('.fcfield-insertvalue').remove();
+					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
 					row.slideUp(400, function(){ this.remove(); });
 					rowCount".$field->id."--;
@@ -355,18 +363,19 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				list-style: none!important;
 				position: relative;  .'/* do not make important */.'
 			}
-			ul#sortables_'.$field->id.' li:only-child span.fcfield-drag { display:none; }
-			/*ul#sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }*/
 			.fcfieldval_container_'.$field->id.' input { cursor:text; }
-			.fcfieldval_container_'.$field->id.' .admintable { text-align:left; }
 			.fcfieldval_container_'.$field->id.' .fcimg_preview_box { min-width:'.($thumb_w_s+6).'px; min-height:'.($thumb_h_s+8).'px; }
 			';
 			
-			$remove_button = '<input class="fcfield-button" style="margin: 0px 0px 4px 8px !important;" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= ($none_props ? '<br/>' : ''). '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$remove_button = '<span class="fcfield-delvalue" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="fcfield-drag-handle" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$add_here = '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="fcfield-insertvalue fc_before" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="fcfield-insertvalue fc_after"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		} else {
 			$remove_button = '';
 			$move2 = '';
+			$add_here = '';
 			$js .= '';
 			$css .= '';
 		}
@@ -559,13 +568,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 				$select = "
 				<input class='existingname fcfield_textval' id='".$elementid_n."_existingname' name='".$fieldname_n."[existingname]' value='".$image_name."' readonly='readonly' style='float:none;' />
 				".($none_props ? '<br/>' : '')."
-				<div class=\"fcfield-button-add\" style='margin: 0px 0px 4px -4px; display:inline-block;'>
+				<span class=\"fcfield-button-add\">
 					<a class=\"addfile_".$field->id."\" id='".$elementid_n."_addfile' title=\"".JText::_( 'FLEXI_SELECT_IMAGE' )."\"
 						".//href=\"#\" style=\"margin: 0px;\" onmouseover=\"this.href=imgfld_fileelement_url(this,".$field->id.",'".$u_item_id."',".$thumb_w_s.",".$thumb_h_s.")\"
 						"href=\"".JURI::base(true).'/index.php?option=com_flexicontent&view=fileselement&tmpl=component&layout=image&filter_secure=M&folder_mode=1&'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1&field='.$field->id.'&u_item_id='.$u_item_id.'&targetid='.$elementid_n."_existingname&thumb_w=$thumb_w_s&thumb_h=$thumb_h_s&autoassign=".$autoassign."\"
 						rel=\"{handler: 'iframe', size: {x: (MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_SELECT_IMAGE' )."</a>
-				</div>
-				";
+				</span>
+					";
 			}
 			
 			// Add current image or add an empty image container
@@ -645,8 +654,13 @@ class plgFlexicontent_fieldsImage extends JPlugin
 			
 			$field->html[] = '
 			'.($image_source ? $curr_select : $change).'
-			'.($use_ingroup ?  '' : $move2).'
-			'.($use_ingroup ?  '' : $remove_button).'<br/>
+			'.($use_ingroup || !$none_props ? '' : '<div class="fcclear"></div>').'
+			'.($use_ingroup ? '' : '<div class="nowrap_box">').'
+			'.($use_ingroup ? '' : $move2).'
+			'.($use_ingroup ? '' : $remove_button).'
+			'.($use_ingroup || !$add_position ? '' : $add_here).'
+			'.($use_ingroup ? '' : '</div>').'
+			'.($use_ingroup ? '' : '<div class="fcclear"></div>').'
 			<div class="fcimg_preview_box" style="float:left!important; clear:none!important; margin-right:5px!important;">
 				'.$imgpreview.'
 				'.$originalname.'
@@ -697,11 +711,11 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
 			$field->html =
-				'<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">'.
-					implode('</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">', $field->html).
+				'<li class="'.$value_classes.'">'.
+					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" style="float:left; clear:both;" onclick="addField'.$field->id.'(this);" value=" -- '.JText::_( 'FLEXI_ADD_IMAGE_CONTAINER' ).' -- " />';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue fccleared" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
@@ -722,7 +736,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
@@ -1178,7 +1191,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 								}
 							});
 						});
-						";
+							";
 						$document->addScriptDeclaration($js);
 					}
 					break;
@@ -1690,7 +1703,6 @@ class plgFlexicontent_fieldsImage extends JPlugin
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
@@ -1963,7 +1975,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
 		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
-		// 'search_properties'   containts property fields that should be added as text
+		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('originalname'), $search_properties=array('title','desc'), $properties_spacer=' ', $filter_func=null);
@@ -1980,7 +1992,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 		// a. Each of the values of $values array will be added to the basic search index (one record per item)
 		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
-		// 'search_properties'   containts property fields that should be added as text
+		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('originalname'), $search_properties=array('title','desc'), $properties_spacer=' ', $filter_func=null);
@@ -2594,7 +2606,7 @@ class plgFlexicontent_fieldsImage extends JPlugin
 						if (has_imagepicker) jQuery(obj).parent().find('ul.image_picker_selector').remove();
 						else                 jQuery(obj).parent().find('select.image-picker').imagepicker({ hide_select:false, show_label:true })
 					}
-				";
+					";
 			}
 		}
 		

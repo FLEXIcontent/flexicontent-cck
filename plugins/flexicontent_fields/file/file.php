@@ -41,180 +41,209 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
+		$use_ingroup = 0;  // Not supported
+		if ($use_ingroup) $field->formhidden = 3;
+		if ($use_ingroup && empty($field->ingroup)) return;
 		
-		// some parameter shortcuts
-		$document  = JFactory::getDocument();
-		$app				= JFactory::getApplication();
+		// initialize framework objects and other variables
+		$document = JFactory::getDocument();
+		$app  = JFactory::getApplication();
+		$user = JFactory::getUser();
 		
-		$size       = $field->parameters->get('size', 30 );
-		$max_values = (int)$field->parameters->get('max_values', 0 );
-		$required   = $field->parameters->get('required', 0 );
+		
+		// ****************
+		// Number of values
+		// ****************
+		$multiple   = $use_ingroup || 1;
+		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
+		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
 		
-		$files_data = !empty($field->value) ? $this->getFileData( $field->value, $published=false ) : array();
-		$fieldname = FLEXI_J16GE ? 'custom['.$field->name.'][]' : $field->name.'[]';
+		// Input field configuration
 		
-		if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
-		$js = "
-			var value_counter".$field->id."=".count($files_data).";
-			var maxValues".$field->id."=".$max_values.";
+		// Load file data
+		if ( !$field->value ) {
+			$files_data = array();
+			$field->value = array();
+		} else {
+			$files_data = $this->getFileData( $field->value, $published=false );
+			$field->value = array();
+			foreach($files_data as $file_id => $file_data) $field->value[] = $file_id;
+		}
+		
+		// CSS classes of value container
+		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		//$value_classes .= ' floated';
+		
+		// Field name and HTML TAG id
+		$fieldname = 'custom['.$field->name.'][]';
+		//$elementid = 'custom_'.$field->name;
+		
+		$js = "";
+		$css = "";
+		
+		if ($multiple) // handle multiple records
+		{
+			// Add the drag and drop sorting feature
+			if (!$use_ingroup) $js .= "
+			jQuery(document).ready(function(){
+				jQuery('#sortables_".$field->id."').sortable({
+					handle: '.fcfield-drag-handle',
+					containment: 'parent',
+					tolerance: 'pointer'
+				});
+			});
+			";
 			
-			function qfSelectFile".$field->id."(id, file) {
-				if((value_counter".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
+			if ($max_values) FLEXI_J16GE ? JText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true) : fcjsJText::script("FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED", true);
+			$js .= "
+			var uniqueRowNum".$field->id."	= ".count($field->value).";  // Unique row number incremented only
+			var rowCount".$field->id."	= ".count($field->value).";      // Counts existing rows to be able to limit a max number of values
+			var maxValues".$field->id." = ".$max_values.";
+			
+			function qfSelectFile".$field->id."(id, file)
+			{
+				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
+				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
+				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
+				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				
+				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
 					return 'cancel';
 				}
 				
-			  value_counter".$field->id."++;
-			  var valcounter = $('".$field->name."');
-				valcounter.value = value_counter".$field->id.";
-				
-				var name 	= 'a_name'+id;
-				var ixid 	= 'a_id'+id;
-				var li 		= document.createElement('li');
-				var txt		= document.createElement('span');
-				var hid		= document.createElement('input');
-				var span	= document.createElement('span');
-				var img		= document.createElement('img');
-				
-				var filelist = document.getElementById('sortables_".$field->id."');
-				
-				$(span).addClass('fcfield-drag');
-				
-				var button = document.createElement('input');
-				button.type = 'button';
-				button.name = 'removebutton_'+id;
-				button.id = 'removebutton_'+id;
-				$(button).addClass('fcfield-button');
-				$(button).addEvent('click', function() { deleteField".$field->id."(this) });
-				button.value = '".JText::_( 'FLEXI_REMOVE_FILE',true )."';
-				
-				txt.type = 'text';
-				txt.size = '".$size."';
-				txt.readonly = 'readonly';  /*txt.disabled = 'disabled';*/  /*txt.dir='rtl';*/
-				txt.id	= name;
-				txt.innerHTML	= file;
-				txt.addClass('fcfield_textval inputbox inline_style_published');
-				
-				hid.type = 'hidden';
-				hid.name = '".$fieldname."';
-				hid.value = id;
-				hid.id = ixid;
-				
-				img.src = '".JURI::base()."components/com_flexicontent/assets/images/move2.png';
-				img.alt = '".JText::_( 'FLEXI_CLICK_TO_DRAG',true )."';
-				
-				filelist.appendChild(li);
-				li.appendChild(txt);
-				li.appendChild(span);
-				span.appendChild(img);
-				li.appendChild(button);
-				li.appendChild(hid);
-				
+				var lastField = null;
+				var newField = jQuery('\
+				<li class=\"".$value_classes."\">\
+					<span class=\"fcfield_textval inputbox inline_style_published\" id=\"a_name'+id+'\">'+file+'</span> \
+					<input type=\"hidden\" id=\"a_id'+id+'_".$field->id."\" name=\"".$fieldname."\" value=\"'+id+'\"/> \
+					<span class=\"fcfield-drag-handle\" title=\"".JText::_( 'FLEXI_CLICK_TO_DRAG' )."\"></span> \
+					<span class=\"fcfield-button fcfield-delvalue\" title=\"".JText::_( 'FLEXI_REMOVE_VALUE' )."\" onclick=\"deleteField".$field->id."(this);\"></span> \
+				</li>\
+				');
+					";
+			
+			// Add new field to DOM
+			$js .= "
+				lastField ?
+					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
+					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
+				if (remove_previous) lastField.remove();
+				";
+			
+			// Add new element to sortable objects (if field not in group)
+			if (!$use_ingroup) $js .= "
 				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag',
+					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
+				";
+			
+			// Show new field, increment counters
+			$js .="
+				//newField.fadeOut({ duration: 400, easing: 'swing' }).fadeIn({ duration: 200, easing: 'swing' });
+				if (scroll_visible) fc_scrollIntoView(newField, 1);
+				if (animate_visible) newField.css({opacity: 0.1}).animate({ opacity: 1 }, 800);
+				
+				rowCount".$field->id."++;       // incremented / decremented
+				uniqueRowNum".$field->id."++;   // incremented only
+			}
+
+			function deleteField".$field->id."(el, groupval_box, fieldval_box)
+			{
+				// Find field value container
+				var row = fieldval_box ? fieldval_box : jQuery(el).closest('li');
+				
+				// Add empty container if last element, instantly removing the given field value container
+				if(rowCount".$field->id." == 0)
+					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
+				
+				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
+				if(rowCount".$field->id." > 0) {
+					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
+					row.find('.fcfield-delvalue').remove();
+					row.find('.fcfield-insertvalue').remove();
+					row.find('.fcfield-drag-handle').remove();
+					// Do hide effect then remove from DOM
+					row.slideUp(400, function(){ this.remove(); });
+					rowCount".$field->id."--;
+				}
 			}
 			";
-		
-		
-		// Add the drag and drop sorting feature
-		if (count($files_data)) $js .= "
-		jQuery(document).ready(function(){
-			jQuery('#sortables_".$field->id."').sortable({
-				handle: '.fcfield-drag',
-				containment: 'parent',
-				tolerance: 'pointer'
-			});
-		});
-		";
-		
-		$js .= "					
-		function deleteField".$field->id."(el)
-		{
-		  value_counter".$field->id."--;
 			
-		  var valcounter = $('".$field->name."');
-			if ( value_counter".$field->id." > 0 ) valcounter.value = value_counter".$field->id.";
-			else valcounter.value = '';
+			$css .= '
+			#sortables_'.$field->id.' li span.fcfield_textval { cursor:text; padding:4px!important; font-family:tahoma!important; white-space:pre-wrap!important; word-wrap:break-word!important; min-width:220px;}
+			#sortables_'.$field->id.' li span.inline_style_published   { color:#444!important; }
+			#sortables_'.$field->id.' li span.inline_style_unpublished { background: #ffffff; color:gray; border-width:0px; text-decoration:line-through; }
+			';
 			
-			var row = jQuery(el).closest('li');
-			jQuery(row).hide('slideUp', function() { jQuery(this).remove(); } );
+			$remove_button = '<span class="fcfield-delvalue" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="fcfield-drag-handle" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+		} else {
+			$remove_button = '';
+			$move2 = '';
+			$js .= '';
+			$css .= '';
 		}
-		";
-		
-		$css = '
-		#sortables_'.$field->id.' { float:left; margin: 0px; padding: 0px; list-style: none; white-space: normal; }
-		#sortables_'.$field->id.' li {
-			clear: both;
-			display: block;
-			list-style: none;
-			height: auto;
-			position: relative;
-		}
-		#sortables_'.$field->id.' li span.fcfield_textval { cursor:text; padding:4px!important; font-family:tahoma!important; white-space:pre-wrap!important; word-wrap:break-word!important; }
-		#sortables_'.$field->id.' li span.inline_style_published   { color:#444!important; }
-		#sortables_'.$field->id.' li span.inline_style_unpublished { background: #ffffff; color:gray; border-width:0px; text-decoration:line-through; }
-		';
-		
-		$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_FILE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-		$move2 	= '<span class="fcfield-drag">'.JHTML::image ( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
 		
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
 		JHTML::_('behavior.modal', 'a.modal_'.$field->id);
 		
 		$field->html = array();
-		$i = 0;
-		foreach($files_data as $file_id => $file_data) {
-			/*$field->html[] = ($file_data->published ?
-			'  <input class="fcfield_textval inputbox inline_style_published" size="'.$size.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.'" readonly="readonly" dir="rtl"/>' :
-			'  <input class="fcfield_textval inputbox inline_style_unpublished" size="'.$size.'" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" value="'.$file_data->filename.' [UNPUBLISHED]" readonly="readonly" dir="rtl"/>'
-			)*/
+		$n = 0;
+		foreach($files_data as $file_id => $file_data)
+		{
 			$filename_original = $file_data->filename_original ? $file_data->filename_original : $file_data->filename;
-			$field->html[] =
-				($file_data->published ?
-				'  <span class="fcfield_textval inputbox inline_style_published" type="text" id="a_name'.$i.'" readonly="readonly" >'.$filename_original.'</span> '
+			
+			$field->html[] = '
+				'.($file_data->published ?
+				'  <span class="fcfield_textval inputbox inline_style_published" id="a_name'.$n.'">'.$filename_original.'</span> '
 					.($file_data->url ? ' ['.$file_data->altname.']' : '') :
-				'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" type="text" id="a_name'.$i.'" [UNPUBLISHED]" readonly="readonly" >'.$filename_original.'</span> '
+				'  <span class="fcfield_textval inputbox inline_style_unpublished" style="'.$inline_style_unpublished.'" id="a_name'.$n.'" [UNPUBLISHED]">'.$filename_original.'</span> '
 					.($file_data->url ? ' ['.$file_data->altname.']' : '')
-				)
-				. $move2 . $remove_button
-				.'  <input type="hidden" id="a_id'.$i.'" name="'.$fieldname.'" value="'.$file_id.'" />'
-			;
-			$i++;
-			//if ($max_values && $i >= $max_values) break;  // break out of the loop, if maximum file limit was reached
+				).'
+				'.'<input type="hidden" id="a_id'.$file_id.'_'.$field->id.'" name="'.$fieldname.'" value="'.$file_id.'" />'.'
+				'.($use_ingroup ? '' : $move2).'
+				'.($use_ingroup ? '' : $remove_button).'
+				';
+			
+			$n++;
+			//if ($max_values && $n >= $max_values) break;  // break out of the loop, if maximum file limit was reached
 		}
 		
-		$field->html = count($field->html)?'<li>'. implode('</li><li>', $field->html) .'</li>':'';
-		$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+		if ($use_ingroup) { // do not convert the array to string if field is in a group
+		} else if ($multiple) { // handle multiple records
+			$field->html =
+				'<li class="'.$value_classes.'">'.
+					implode('</li><li class="'.$value_classes.'">', $field->html).
+				'</li>';
+			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
+		} else {  // handle single values
+			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
+		}
 		
-		$user = JFactory::getUser();
+		// Add button for popup file selection
 		$autoselect = $field->parameters->get( 'autoselect', 1 ) ;
-		$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$i.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;autoselect='.$autoselect.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
+		$linkfsel = JURI::base(true).'/index.php?option=com_flexicontent&amp;view=fileselement&amp;tmpl=component&amp;index='.$n.'&amp;field='.$field->id.'&amp;itemid='.$item->id.'&amp;autoselect='.$autoselect.'&amp;items=0&amp;filter_uploader='.$user->id.'&amp;'.(FLEXI_J30GE ? JSession::getFormToken() : JUtility::getToken()).'=1';
 		$field->html .= "
-		<div class=\"fcclear\"></div>
-		<div class=\"fcfield-button-add\">
-			<div class=\"blank\">
+			<span class=\"fcfield-button-add\">
 				<a class=\"modal_".$field->id."\" title=\"".JText::_( 'FLEXI_ADD_FILE' )."\" href=\"".$linkfsel."\" rel=\"{handler: 'iframe', size: {x:(MooTools.version>='1.2.4' ? window.getSize().x : window.getSize().size.x)-100, y: (MooTools.version>='1.2.4' ? window.getSize().y : window.getSize().size.y)-100}}\">".JText::_( 'FLEXI_ADD_FILE' )."</a>
-			</div>
-		</div>
-		";
+			</span>
+				";
 		
-		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($i ? $i : '').'" />';
+		$field->html .= '<input id="'.$field->name.'" class="'.$required.'" style="display:none;" name="__fcfld_valcnt__['.$field->name.']" value="'.($n ? $n : '').'" />';
 	}
 	
 	
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		static $langs = null;
@@ -373,7 +402,7 @@ class plgFlexicontent_fieldsFile extends JPlugin
 			break;
 		}
 		
-		// initialise property
+		// Initialise property with default value
 		$field->{$prop} = array();
 
 		// Get user access level (these are multiple for J2.5)
@@ -780,7 +809,6 @@ class plgFlexicontent_fieldsFile extends JPlugin
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// Check if field has posted data

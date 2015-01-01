@@ -39,7 +39,6 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
@@ -58,6 +57,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$max_values = $use_ingroup ? 0 : (int) $field->parameters->get( 'max_values', 0 ) ;
 		$required   = $field->parameters->get( 'required', 0 ) ;
 		$required   = $required ? ' required' : '';
+		$add_position = (int) $field->parameters->get( 'add_position', 3 ) ;
 		
 		
 		// ***
@@ -80,7 +80,14 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		$default_title = $default_title ? JText::_($default_title) : '';
 		$usetitle      = $field->parameters->get( 'use_title', 0 ) ;
 		
-		// Input field display size & max characters
+		
+		// **********
+		// Hits usage
+		// **********
+		$usehits    = $field->parameters->get( 'use_hits', 1 ) ;
+		
+		
+		// Form fields display parameters
 		$size       = (int) $field->parameters->get( 'size', 30 ) ;
 		
 		// Initialise property with default value
@@ -92,6 +99,9 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$field->value[0] = serialize($field->value[0]);
 		}
 		
+		// CSS classes of value container
+		$value_classes  = 'fcfieldval_container valuebox fcfieldval_container_'.$field->id;
+		
 		// Field name and HTML TAG id
 		$fieldname = 'custom['.$field->name.']';
 		$elementid = 'custom_'.$field->name;
@@ -102,10 +112,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		if ($multiple) // handle multiple records
 		{
 			// Add the drag and drop sorting feature
-			if (!$use_ingroup) $js .="
+			if (!$use_ingroup) $js .= "
 			jQuery(document).ready(function(){
 				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag',
+					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
@@ -120,9 +130,10 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			
 			function addField".$field->id."(el, groupval_box, fieldval_box, params)
 			{
-				remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
-				scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
-				animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
+				var insert_before   = (typeof params!== 'undefined' && typeof params.insert_before   !== 'undefined') ? params.insert_before   : 0;
+				var remove_previous = (typeof params!== 'undefined' && typeof params.remove_previous !== 'undefined') ? params.remove_previous : 0;
+				var scroll_visible  = (typeof params!== 'undefined' && typeof params.scroll_visible  !== 'undefined') ? params.scroll_visible  : 1;
+				var animate_visible = (typeof params!== 'undefined' && typeof params.animate_visible !== 'undefined') ? params.animate_visible : 1;
 				
 				if((rowCount".$field->id." >= maxValues".$field->id.") && (maxValues".$field->id." != 0)) {
 					alert(Joomla.JText._('FLEXI_FIELD_MAX_ALLOWED_VALUES_REACHED') + maxValues".$field->id.");
@@ -131,45 +142,51 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				
 				var lastField = fieldval_box ? fieldval_box : jQuery(el).prev().children().last();
 				var newField  = lastField.clone();
-				
+				";
+			
+			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
+			// Update new URL's address
+			$js .= "
 				theInput = newField.find('input.urllink').first();
 				theInput.val('".$default_link."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][link]');
 				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id.");
 				";
 				
+			// Update new URL optional properties
 			if ($usetitle) $js .= "
 				theInput = newField.find('input.urltitle').first();
 				theInput.val('".$default_title."');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][title]');
+				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_title');
 				";
 				
-				
-			$js .= "
+			if ($usehits) $js .="
 				theInput = newField.find('input.urlhits').first();
 				theInput.val('0');
 				theInput.attr('name','".$fieldname."['+uniqueRowNum".$field->id."+'][hits]');
+				theInput.attr('id','".$elementid."_'+uniqueRowNum".$field->id."+'_hits');
 				
 				// Set hits to zero for new row value
 				newField.find('span span').html('0');
-				newField.css('display', 'none');
 				";
 			
 			// Add new field to DOM
 			$js .= "
-				newField.insertAfter( lastField );
+				lastField ?
+					(insert_before ? newField.insertBefore( lastField ) : newField.insertAfter( lastField ) ) :
+					newField.appendTo( jQuery('#sortables_".$field->id."') ) ;
 				if (remove_previous) lastField.remove();
-			";
-			
+				";
 			
 			// Add new element to sortable objects (if field not in group)
 			if (!$use_ingroup) $js .= "
 				jQuery('#sortables_".$field->id."').sortable({
-					handle: '.fcfield-drag',
+					handle: '.fcfield-drag-handle',
 					containment: 'parent',
 					tolerance: 'pointer'
 				});
-			";
+				";
 			
 			// Show new field, increment counters
 			$js .="
@@ -190,7 +207,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 							this.store('tip:text', parts[1]);
 						}
 					});
-					var ajax_JTooltips = new Tips($(#sortables_".$field->id."').getNext().getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
+					var ajax_JTooltips = new Tips($('#sortables_".$field->id."').getNext().getElements('.hasTip'), { maxTitleChars: 50, fixed: false});
 				")."
 				
 				rowCount".$field->id."++;       // incremented / decremented
@@ -204,12 +221,14 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				
 				// Add empty container if last element, instantly removing the given field value container
 				if(rowCount".$field->id." == 1)
-					addField".$field->id."(null, groupval_box, fieldval_box, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
+					addField".$field->id."(null, groupval_box, row, {remove_previous: 1, scroll_visible: 0, animate_visible: 0});
 				
 				// Remove if not last one, if it is last one, we issued a replace (copy,empty new,delete old) above
 				if(rowCount".$field->id." > 1) {
-					// Destroy the remove button, so that it is not reclicked again, while we do the hide effect (before DOM removal)
-					if (el) jQuery(el).remove();
+					// Destroy the remove/add/etc buttons, so that they are not reclicked, while we do the hide effect (before DOM removal of field value)
+					row.find('.fcfield-delvalue').remove();
+					row.find('.fcfield-insertvalue').remove();
+					row.find('.fcfield-drag-handle').remove();
 					// Do hide effect then remove from DOM
 					row.slideUp(400, function(){ this.remove(); });
 					rowCount".$field->id."--;
@@ -217,21 +236,28 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			}
 			";
 			
-			$css .= '
-			#sortables_'.$field->id.' li:only-child span.fcfield-drag, #sortables_'.$field->id.' li:only-child input.fcfield-button { display:none; }
-			';
+			$css .= '';
 			
-			$remove_button = '<input class="fcfield-button" type="button" value="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);" />';
-			$move2 	= '<span class="fcfield-drag">'.JHTML::image( JURI::base().'components/com_flexicontent/assets/images/move2.png', JText::_( 'FLEXI_CLICK_TO_DRAG' ) ) .'</span>';
+			$remove_button = '<span class="fcfield-delvalue" title="'.JText::_( 'FLEXI_REMOVE_VALUE' ).'" onclick="deleteField'.$field->id.'(this);"></span>';
+			$move2 = '<span class="fcfield-drag-handle" title="'.JText::_( 'FLEXI_CLICK_TO_DRAG' ).'"></span>';
+			$add_here = '';
+			$add_here .= $add_position==2 || $add_position==3 ? '<span class="fcfield-insertvalue fc_before" onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 1});" title="'.JText::_( 'FLEXI_ADD_BEFORE' ).'"></span> ' : '';
+			$add_here .= $add_position==1 || $add_position==3 ? '<span class="fcfield-insertvalue fc_after"  onclick="addField'.$field->id.'(null, jQuery(this).closest(\'ul\'), jQuery(this).closest(\'li\'), {insert_before: 0});" title="'.JText::_( 'FLEXI_ADD_AFTER' ).'"></span> ' : '';
 		} else {
 			$remove_button = '';
 			$move2 = '';
+			$add_here = '';
 			$js .= '';
 			$css .= '';
 		}
 		
 		if ($js)  $document->addScriptDeclaration($js);
 		if ($css) $document->addStyleDeclaration($css);
+		
+		
+		// *****************************************
+		// Create field's HTML display for item form
+		// *****************************************
 		
 		$field->html = array();
 		$n = 0;
@@ -250,6 +276,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 			$fieldname_n = $fieldname.'['.$n.']';
 			$elementid_n = $elementid.'_'.$n;
 			
+			// NOTE: HTML tag id of this form element needs to match the -for- attribute of label HTML tag of this FLEXIcontent field, so that label will be marked invalid when needed
 			$value['link'] = !empty($value['link']) ? $value['link'] : $default_link;
 			$value['link'] = htmlspecialchars(
 				(FLEXI_J30GE ? JStringPunycode::urlToUTF8($value['link']) : $value['link']),
@@ -268,24 +295,28 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				$title = '
 				<div class="nowrap_box">
 					<label class="label">'.JText::_( 'FLEXI_FIELD_URLTITLE' ).'</label>
-					<input class="urltitle fcfield_textval" name="'.$fieldname_n.'[title]" type="text" size="'.$size.'" value="'.$value['title'].'" />
+					<input class="urltitle fcfield_textval" name="'.$fieldname_n.'[title]" id="'.$elementid_n.'_title" type="text" size="'.$size.'" value="'.$value['title'].'" />
 				</div>';
 			}
 			
-			$hits = (int) @ $value['hits'];
-			$hits = '
-				<div class="nowrap_box">
-					<label class="label hits">'.JText::_( 'FLEXI_FIELD_HITS' ).'</label>
-					<span class="hitcount">'.$hits.'</span> 
-					<input class="urlhits" name="'.$fieldname_n.'[hits]" type="hidden" value="'.$hits.'" />
-				</div>';
+			$hits = ''; $usehits = 1;
+			if ($usehits) {
+				$hits = (int) @ $value['hits'];
+				$hits = '
+					<div class="nowrap_box">
+						<label class="label hits">'.JText::_( 'FLEXI_FIELD_HITS' ).'</label>
+						<span class="hitcount">'.$hits.'</span> 
+						<input class="urlhits" name="'.$fieldname_n.'[hits]" id="'.$elementid_n.'_hits" type="hidden" value="'.$hits.'" />
+					</div>';
+			}
 			
 			$field->html[] = '
-				'.($use_ingroup ? '' : $move2).'
-				'.($use_ingroup ? '' : $remove_button).'
 				'.$link.'
 				'.$title.'
 				'.$hits.'
+				'.($use_ingroup ? '' : $move2).'
+				'.($use_ingroup ? '' : $remove_button).'
+				'.($use_ingroup || !$add_position ? '' : $add_here).'
 				';
 			
 			$n++;
@@ -295,11 +326,11 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		if ($use_ingroup) { // do not convert the array to string if field is in a group
 		} else if ($multiple) { // handle multiple records
 			$field->html =
-				'<li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">'.
-					implode('</li><li class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">', $field->html).
+				'<li class="'.$value_classes.'">'.
+					implode('</li><li class="'.$value_classes.'">', $field->html).
 				'</li>';
 			$field->html = '<ul class="fcfield-sortables" id="sortables_'.$field->id.'">' .$field->html. '</ul>';
-			$field->html .= '<input type="button" class="fcfield-addvalue" style="float:left; clear:both;" onclick="addField'.$field->id.'(this);" value=" -- '.JText::_( 'FLEXI_ADD_VALUE' ).' -- " />';
+			if (!$add_position) $field->html .= '<span class="fcfield-addvalue" onclick="addField'.$field->id.'(this);" title="'.JText::_( 'FLEXI_ADD_TO_BOTTOM' ).'"></span>';
 		} else {  // handle single values
 			$field->html = '<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">' . $field->html[0] .'</div>';
 		}
@@ -309,7 +340,6 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// Get isMobile / isTablet Flags
@@ -441,7 +471,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 				JHTML::_('image.site', 'user.png', 'components/com_flexicontent/assets/images/', NULL, NULL, JText::_( 'FLEXI_HITS' ), $_attribs);
 		}
 		
-		// initialise property
+		// Initialise property with default value
 		$field->{$prop} = array();
 		$n = 0;
 		foreach ($values as $value)
@@ -522,7 +552,6 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$use_ingroup = $field->parameters->get('use_ingroup', 0);
@@ -643,7 +672,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		// c. If $values is null then only the column 'value' will be added to the search index after retrieving 
 		//    the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
-		// 'search_properties'   containts property fields that should be added as text
+		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexAdvSearch($field, $post, $item, $required_properties=array('link','title'), $search_properties=array('title'), $properties_spacer=' ', $filter_func=null);
@@ -660,7 +689,7 @@ class plgFlexicontent_fieldsWeblink extends JPlugin
 		// a. Each of the values of $values array will be added to the basic search index (one record per item)
 		// b. If $values is null then the column value from table 'flexicontent_fields_item_relations' for current field / item pair will be used
 		// 'required_properties' is meant for multi-property fields, do not add to search index if any of these is empty
-		// 'search_properties'   containts property fields that should be added as text
+		// 'search_properties'   contains property fields that should be added as text
 		// 'properties_spacer'  is the spacer for the 'search_properties' text
 		// 'filter_func' is the filtering function to apply to the final text
 		FlexicontentFields::onIndexSearch($field, $post, $item, $required_properties=array('link','title'), $search_properties=array('title'), $properties_spacer=' ', $filter_func=null);

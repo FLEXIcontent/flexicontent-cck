@@ -39,7 +39,6 @@ class plgFlexicontent_fieldsCore extends JPlugin
 	function onDisplayCoreFieldValue( &$_field, & $_item, &$params, $_tags=null, $_categories=null, $_favourites=null, $_favoured=null, $_vote=null, $values=null, $prop='display' )
 	{
 		// this function is a mess and need complete refactoring
-		// execute the code only if the field type match the plugin type
 		$view = JRequest::setVar('view', JRequest::getVar('view', FLEXI_ITEMVIEW));
 		
 		static $cat_links = array();

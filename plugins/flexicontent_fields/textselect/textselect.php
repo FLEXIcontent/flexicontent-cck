@@ -43,7 +43,6 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item) {
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// field_type is not changed text field can handle this field type
@@ -54,7 +53,6 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// field_type is not changed text field can handle this field type
@@ -70,7 +68,6 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// field_type is not changed text field can handle this field type
@@ -80,7 +77,6 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	
 	// Method to take any actions/cleanups needed after field's values are saved into the DB
 	function onAfterSaveField( &$field, &$post, &$file, &$item ) {
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// field_type is not changed text field can handle this field type
@@ -90,7 +86,6 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	
 	// Method called just before the item is deleted to remove custom item data related to the field
 	function onBeforeDeleteField(&$field, &$item) {
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		// field_type is not changed text field can handle this field type
@@ -115,7 +110,6 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	// Method to display a category filter for the category view
 	function onDisplayFilter(&$filter, $value='', $formName='adminForm')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		// Prepare field as IF it is a select field
@@ -135,7 +129,6 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	// Get item ids having the value(s) of filter
 	function getFiltered(&$filter, $value)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($filter->field_type, self::$field_types) ) return;
 		
 		return FlexicontentFields::getFiltered($filter, $value, $return_sql=true);
@@ -159,7 +152,6 @@ class plgFlexicontent_fieldsTextselect extends JPlugin
 	
 	// Method to create (insert) advanced search index DB records for the field values
 	function onIndexAdvSearch(&$field, &$post, &$item) {
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if ( !$field->isadvsearch && !$field->isadvfilter ) return;
 		

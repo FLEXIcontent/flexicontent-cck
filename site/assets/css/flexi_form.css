@@ -48,6 +48,9 @@
 
 /* Labels with these classes must have input/select placed inside them */
 
+#flexicontent .fcradiocheckimage label.fccheckradio_lbl {
+	vertical-align:unset !important;
+}
 label.fccheckradio_lbl,
 span.fcselect_lbl {
 	display:inline-block;
@@ -55,7 +58,7 @@ span.fcselect_lbl {
 	padding-right: 8px;
 	min-width:0px;
 	margin: 0px 0px 0px 2px;
-	float: left;
+	float: none;
 	clear: none;
 }
 
@@ -523,6 +526,7 @@ div.control-group:first-of-type > div > .fcsep_level0, div.control-group:first-o
 	float:left;
 	font-weight: normal;
 	font-style: italic;
+	font-size: 11px;
 	border: 1px dashed #777 !important;
 	padding: 2px 16px 2px 16px !important;
 	margin: 5px 10% 1px;

@@ -43,6 +43,10 @@
 			
 			<field name="" type="separator" default="FLEXI_RIFLD_EDIT_OPTIONS" level="level1" menu="hide" />
 			
+			<field name="initial_placement" type="list" default="h" label="FLEXI_RIFLD_INITIAL_PLACEMENT" description="FLEXI_RIFLD_INITIAL_PLACEMENT_DESC">
+				<option value="h">FLEXI_RIFLD_SINGLE_ROW_FIT</option>
+				<option value="v">FLEXI_RIFLD_MULTI_ROW_FIT</option>
+			</field>
 			<field name="required" type="radio" default="0" label="FLEXI_FIELD_REQUIRED" description="FLEXI_REQUIRED_DESC">
 				<option value="0">FLEXI_NO</option>
 				<option value="1">FLEXI_YES</option>

@@ -740,7 +740,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	padding:0px !important;
 	display:inline-block !important;
 	border: 0 none;
-	background-color: cyan;
+	/*background-color: cyan;*/ /* for testing */
 }
 
 #flexicontent div.fields_tabset,
@@ -814,12 +814,14 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 #flexicontent .fcfield-sortables > li .input-prepend { float: left; margin-bottom: 0px; }
 #flexicontent .fcfield-sortables > li .input-append { margin-right: 10px; }
 #flexicontent .fcfield-sortables > li .use_select2_lib { vertical-align: top; }
-#flexicontent .fcfield-sortables > li * { vertical-align: top; }
+#flexicontent .fcfield-sortables > li > * { vertical-align: top; }
 
 
 /* FIELD-GROUP: list of value containers */
 /* FIELD-GROUP: value container (contains grouped fields) */
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox {
+	border: 1px dashed gray;
+	border-radius: 8px !important;
 }
 /* FIELD-GROUP: label of grouped field */
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .flexi.label.sub_label {
@@ -827,91 +829,184 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	padding: 4px 1% !important;
 	margin: 0 1% 0 0 !important;
 	float:none !important;
+	
 	clear:none;
 	display:inline-block;
 	border-width: 0px !important;
 }
 /* FIELD-GROUP: value of grouped field */
 #flexicontent ul.fcfield-sortables.fcfield-group > li.fcfieldval_container.valuebox .fcfieldval_container.valuebox {
-	width: 79% !important;  /* reduce this if border-width is added */
+	/* important to allow only specific overrides, (remember to do value label too!) */
+	/* padding, margin, border, width must be percentage and must be a total of 100% (including label) */
+	border-width: 0 !important;
+	width: 79% !important;
 	padding: 6px 1% !important;
 	margin: 0% !important;
-	float:none !important;
+	float: none !important;
+	
 	clear:none;
 	display:inline-block;
-	border-width: 0px !important;
 }
 
+
 /* FIELDs: various buttons */
-#flexicontent .fcfield-addvalue,
-#flexicontent .fcfield-button,
+#flexicontent .fcfield-drag-handle,
+#flexicontent .fcfield-list-add, #flexicontent .fcfield-list-del,
+#flexicontent .fcfield-placement-h, #flexicontent .fcfield-placement-v,
+#flexicontent .fcfield-addvalue, #flexicontent .fcfield-insertvalue,
+#flexicontent .fcfield-delvalue, #flexicontent .fcfield-button,
 #flexicontent .fcfield-button-add a {
-	float: none !important;
-	display: inline-block !important;
+	/* avoid overriding these */
+	float: none ;
+	clear: none ;
+	display: inline-block ;
+	
+	/* style these */
+	color: #444;
 	font-family: tahoma;
 	font-size: 11px;
-	
+	line-height: 100%;
 	font-weight: bold;
-	text-decoration: none!important;
-	background-color: white!important;
-	color: gray!important;
 	
 	border-radius: 4px;
 	border: 1px solid lightgray;
 	vertical-align: top;
 	padding: 6px 8px;
-	margin: 4px 2px 0px 6px;
-}
+	margin: 0px 2px 0px 6px;
 
-/* FIELDs: ADD link/button */
-#flexicontent .fcfield-button-add { vertical-align:top !important; float:none !important; margin:0px; padding:0px; }
-#flexicontent .fcfield-button-add a { padding:4px 8px !important; margin:2px 2px 0px 6px !important; }
-
-#flexicontent .fcfield-addvalue {
-	padding: 2px 12px 4px;
-	margin: 4px 2px 0px 6px;
-	display:inline-block;
-	clear:none; 
-	float:left;
+	background-color: white; background-image: -webkit-gradient(linear, left top, left bottom, from(white), to(lightgray));
+	background-image: -webkit-linear-gradient(top, white, lightgray);
+	background-image: -moz-linear-gradient(top, white, lightgray);
+	background-image: -ms-linear-gradient(top, white, lightgray);
+	background-image: -o-linear-gradient(top, white, lightgray);
+	background-image: linear-gradient(to bottom, white, lightgray);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=white, endColorstr=lightgray);
 }
-#flexicontent .fcfield-addvalue.fccleared {
-	clear:both; 
+/* default hover styling which we make more specific below */
+#flexicontent .fcfield-drag-handle:hover,
+#flexicontent .fcfield-list-add:hover, #flexicontent .fcfield-list-del:hover,
+#flexicontent .fcfield-placement-h:hover, #flexicontent .fcfield-placement-v:hover,
+#flexicontent .fcfield-addvalue:hover, #flexicontent .fcfield-insertvalue:hover,
+#flexicontent .fcfield-delvalue:hover,
+#flexicontent .fcfield-button-add:hover a {
+	background-color: lightgray;
+	color: white;
+	border: 1px solid transparent;
 }
-#flexicontent .fcfield-addvalue:hover,
 #flexicontent .fcfield-button:hover,
-#flexicontent .fcfield-button-add a:hover {
+#flexicontent .fcfield-button-add:hover a { 
+	color: white;
+	border: 1px solid transparent;
+	background-color: green; background-image: -webkit-gradient(linear, left top, left bottom, from(green), to(darkgreen));
+	background-image: -webkit-linear-gradient(top, green, darkgreen);
+	background-image: -moz-linear-gradient(top, green, darkgreen);
+	background-image: -ms-linear-gradient(top, green, darkgreen);
+	background-image: -o-linear-gradient(top, green, darkgreen);
+	background-image: linear-gradient(to bottom, green, darkgreen);filter:progid:DXImageTransform.Microsoft.gradient(GradientType=0,startColorstr=green, endColorstr=darkgreen);
+}
+
+/* FIELDs: ADD link container */
+#flexicontent .fcfield-button-add {
+	/* allow only explicitely coded override, since normally style must be done only at the inner link */
+	vertical-align: top !important;
+	float: none !important;
+	margin: 0px !important;
+	padding: 0px !important;
+}
+/* FIELDs: ADD link (inner) */
+/* we do not want joomla template link styling here !!!, allow only explicitly coded override */
+#flexicontent .fcfield-button-add a { 
+	padding: 6px 8px;
+	margin: 4px 2px 0px 6px;
+	text-decoration: none!important;
+	background-color: white!important;
+	color: gray!important;
+}
+#flexicontent .fcfield-button-add:hover a { 
 	background-color: darkgreen!important;
 	color: white!important;
-	text-decoration:none!important;
 	border: 1px solid transparent;
 }
 
-/* FIELDs: DELETE button */
+
+/* FIELDs: ADD (append value) button */
+#flexicontent input.fcfield-addvalue {
+	padding: 5px 12px 6px;
+	margin: 4px 2px 0px 6px;
+}
+#flexicontent span.fcfield-addvalue {
+	margin: 4px 2px 0px 6px;
+	padding: 12px;
+	background: url(../images/plus-button.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-addvalue.fccleared {
+	clear: both !important;
+	float: left !important;
+}
+
+
+/* FIELDs: add/del to/from list */
+#flexicontent .fcfield-list-add, #flexicontent .fcfield-list-del,
+#flexicontent .fcfield-placement-h, #flexicontent .fcfield-placement-v {
+	margin:0px 0px 2px 0px;
+	padding: 12px;
+}
+#flexicontent .fcfield-placement-h { background: url(../images/arrow-resize.png) 4px 4px no-repeat white; }
+#flexicontent .fcfield-placement-v { background: url(../images/arrow-resize-090.png) 4px 4px no-repeat white; }
+#flexicontent .fcfield-placement-h.fc_toggle, #flexicontent .fcfield-placement-v.fc_toggle { background: url(../images/arrow-in-out.png) 4px 4px no-repeat white; }
+
+#flexicontent .fcfield-list-add { background: url(../images/list_add_v.png) 4px 4px no-repeat white; }
+#flexicontent .fcfield-list-del { background: url(../images/list_del_v.png) 4px 4px no-repeat white; }
+#flexicontent .fcfield-list-add.fc_horizontal { background: url(../images/list_add_h.png) 4px 4px no-repeat white; }
+#flexicontent .fcfield-list-del.fc_horizontal { background: url(../images/list_del_h.png) 4px 4px no-repeat white; }
+
+#flexicontent .fcfield-placement-h:hover, #flexicontent .fcfield-placement-v:hover,
+#flexicontent .fcfield-list-add:hover, #flexicontent .fcfield-list-del:hover {
+	background-color: lightgray;
+	color: white;
+}
+
+
+/* FIELDs: Insert value button */
+#flexicontent .fcfield-insertvalue {
+	margin:0px 0px 2px 0px;
+	padding: 12px;
+	background: url(../images/plus-button.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-insertvalue.fc_after {
+	background: url(../images/insert_after_180.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-insertvalue.fc_before {
+	background: url(../images/insert_before_180.png) 4px 4px no-repeat white;
+}
+#flexicontent .fcfield-insertvalue:hover {
+	background-color: lightgray;
+	color: white;
+}
+
+
+/* FIELDs: Delete value button */
 #flexicontent .fcfield-delvalue {
-	margin: 0px;
-	padding: 12px !important;
-	background: url(../images/delete.png) 4px 4px no-repeat white !important;
+	margin:0px 0px 2px 0px;
+	padding: 12px;
+	background: url(../images/delete.png) 4px 4px no-repeat white;
 }
 #flexicontent .fcfield-delvalue:hover {
-	background-color:darkred!important; color:white!important;
-	text-decoration:none!important; border:1px solid transparent;
+	background-color: lightgray;
+	color: white;
 }
+
 
 /* FIELDs: DRAG (sort) handle */
 #flexicontent .fcfield-drag-handle {
-	display: inline-block !important;  /* do not override breaks dragging */
-	cursor: move !important;
-	float: none !important;
-	
+	margin:0px 0px 2px 0px;
+	padding: 12px;
 	background: url(../images/move2.png) 4px 4px no-repeat white;
-	width: 16px;
-	height: 16px;
-	
-	border:1px solid lightgray;
-	border-radius: 4px;
-	margin: 0px 1px -3px 1px;
-	padding: 4px;
 }
+#flexicontent .fcfield-drag-handle:hover {
+	background-color: lightgray;
+	color: white;
+}
+
 /* ... for compatibility, TO BE REMOVED ? */
 #flexicontent .fcfield-drag {
 	float:none !important; /* do not override breaks dragging */
@@ -929,6 +1024,11 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 	background-color: white;
 }
 
+.fcimg_preview_box img.preview_image {
+	border-radius: 4px;
+	border: 1px solid gray;
+}
+
 
 #flexicontent ul.fcfield-sortables > li table.admintable {
 	text-align: left;
@@ -937,6 +1037,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 #flexicontent ul.fcfield-sortables > li.ui-sortable-helper {  /* while dragging */
 	background-color: white !important;
 	border-radius: 4px;
+	border: 1px solid #d0d0d0 !important;
 	moz-box-shadow: 10px 10px 5px rgba(0,0,0,.5);
 	-webkit-box-shadow: 10px 10px 5px rgba(0,0,0,.5);
 	box-shadow: 10px 10px 5px rgba(0,0,0,.5);
@@ -944,6 +1045,7 @@ ul.fcimport_field_value_list li { margin-bottom:0em; }
 #flexicontent ul.fcfield-sortables > li:only-child span.fcfield-drag-handle { /* disable only child */
 	cursor: default !important;
 	background: url(../images/move3.png) 4px 4px no-repeat white;
+	border: 1px solid lightgray;
 }
 
 #flexicontent div fieldset.panelform input,
@@ -1169,6 +1271,7 @@ fieldset.flexiaccess legend, fieldset.adminform legend { font-weight:bold; font-
 	padding: 0.1em 0.4em 0.1em 0.2em;
 }
 
+#flexicontent form textarea.invalid,
 #flexicontent form input.invalid,
 #flexicontent form select.invalid {
 	border: 1px dotted #ff0000 !important;
@@ -1344,6 +1447,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 	margin: 0 !important;
 	padding: 0 !important;
 	visibility: hidden !important;
+	display: block;
 }
 
 /* Styling for textinput fields*/
@@ -1351,17 +1455,17 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent .fcfield_selectval,
 #flexicontent .fcfield_selectmulval,
 #flexicontent .fcfield_textval {
-	background-clip: padding-box !important;
+	background-clip: padding-box;
 	background-color: #FFFFFF !important;
-	border: 1px solid #AAAAAA !important;
-	border-radius: 4px 4px 4px 4px !important;
-	color: #444444 !important;
-	display: inline-block !important;
-	padding: 0 0 0px 8px !important;
+	color: #444 !important;
+	border: 1px solid #AAAAAA;
+	border-radius: 4px;
+	display: inline-block;
+	padding: 0 6px 0px 6px !important;
 	margin: 0px 6px 2px 0 !important;
-	position: relative !important;
-	text-decoration: none !important;
-	white-space: nowrap !important;
+	position: relative;
+	text-decoration: none;
+	white-space: nowrap;
 	font-size: 12px;
 }
 
@@ -1369,7 +1473,7 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent input.fcfield_textval {
 	height: 26px !important;
 	line-height: 26px !important;
-	overflow: hidden !important;
+	overflow: auto;
 	min-width:24%;
 	vertical-align: top;
 }
@@ -1379,10 +1483,17 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 #flexicontent select.fcfield_selectmulval,
 #flexicontent textarea.fcfield_textareaval {
 	line-height: 1em !important;
-	overflow: auto !important;
+	overflow: auto;
 	padding: 4px 0 2px 4px !important;
 }
-
+#flexicontent select.fcfield_selectval.inlineval,
+#flexicontent select.fcfield_selectmulval.inlineval,
+#flexicontent input.fcfield_textval.inlineval {
+	margin-left: 0px !important;
+	margin-right: 0px !important;
+	min-width: 0 !important;
+	width: auto !important;
+}
 
 /* pluploader CSS compatibility fixes */
 #flash_uploader_container {
@@ -1403,6 +1514,5 @@ ul.thumbnails.image_picker_selector li div.thumbnail p {
 
 
 /* Common field CSS for forms */
-#flexicontent .admintable .fcfield_textval { height:22px !important; margin-top:0px !important; margin-bottom: 0px!important;  }
-#flexicontent .admintable .fcfield-button { padding:3px 6px !important; }
+#flexicontent .admintable .fcfield_textval { height:22px; line-height:100%; margin-top:0px !important; margin-bottom: 0px!important;  }
 #flexicontent .ui-sortable > li { background-color: white; }

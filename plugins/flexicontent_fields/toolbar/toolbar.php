@@ -188,17 +188,17 @@ class plgFlexicontent_fieldsToolbar extends JPlugin
 				$document->addScript(JURI::root(true).'/plugins/flexicontent_fields/toolbar'.(FLEXI_J16GE ? '/toolbar' : '').'/th.js');
 				$display .="
 					<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"openwindow('".$voicetarget."','".$lang."');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
-				";
+					";
 			} else {
 				$document->addScript('http://vozme.com/get_text.js');
 				$display .="
 					<span class=\"voice-legend flexi-legend\"><a href=\"javascript:void(0);\" onclick=\"get_id('".$voicetarget."','".$lang."','fm');\" class=\"mainlevel-toolbar-article-horizontal\" rel=\"nofollow\">" . JTEXT::_('FLEXI_FIELD_TOOLBAR_VOICE') . "</a></span>
-				";
+					";
 			}
 			$display .="
 			</div>
 			<div class=\"toolbar-spacer\"".$spacer."></div>
-			";
+				";
 		}
 
 		// pdf button

@@ -38,7 +38,6 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 	// Method to create field's HTML display for item form
 	function onDisplayField(&$field, &$item)
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		$field->label = JText::_($field->label);
 		
@@ -317,9 +316,9 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		}
 		
 		
-		// *************************************************
-		// Create the HTML for editing/entering field values
-		// *************************************************
+		// *****************************************
+		// Create field's HTML display for item form
+		// *****************************************
 		
 		static $common_css_js_added = false;
 	  if ( !$common_css_js_added )
@@ -328,9 +327,21 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			flexicontent_html::loadFramework('select2');
 			
 			$css = ''
-				.'.fcrelation_field_filters span.label { min-width:140px !important; }'
-				.'.fcrelation_field_used_items select, .fcrelation_field_unused_items select { min-width: 90% !important; }'
-				.'.fcrelation_field_controls { margin: 2px 20% 6px 20%; }'
+				.'.fcrelation_field_used_items, .fcrelation_field_unused_items, .fcrelation_field_controls { display:inline-block; float:left !important; margin: 0 0 8px 0; }'
+				
+				.'.fcrelation_field_used_items.fc_vertical,   .fcrelation_field_unused_items.fc_vertical   { min-width: 100%; }'
+				.'.fcrelation_field_used_items.fc_horizontal, .fcrelation_field_unused_items.fc_horizontal { width: 46%; margin: 8px 0%; }'
+				
+				.'.fcrelation_field_controls.fc_vertical   { min-width: 100%; }'
+				.'.fcrelation_field_controls.fc_horizontal { max-width:6%; margin: 48px 1% 0 1%; width: auto; }'
+				
+				.'.fcrelation_field_controls.fc_horizontal span.fcrelation_btn { float: left !important; clear: both !important; }'
+				.'.fcfield-placement-h.fc_horizontal { display: none !important; }'
+				.'.fcfield-placement-v.fc_vertical { display: none !important; }'
+				
+				.'.fcrelation_field_filters { display:inline-block; float:left !important; }'
+				.'.fcrelation_field_filters span.label { min-width: 140px; }'
+				.'.fcrelation_field_used_items select, .fcrelation_field_unused_items select { min-width: 100%; margin:0px; }'
 				;
 			if ($css) $document->addStyleDeclaration($css);
 		}
@@ -359,12 +370,7 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 		}
 		
 		
-		$field->html .= "<div class='fcrelation_field_filters'>";
-		
-		$field->html .= " <span class='fcrelation_field_filter_by_cat'>";
-		if($display_cat_filter_label)
-			$field->html .= "  <span class='label'>".JText::_('FLEXI_RIFLD_FILTER_BY_CAT')."</span>\n";
-		$field->html .= flexicontent_cats::buildcatselect(
+		$_cat_selector = flexicontent_cats::buildcatselect(
 			$allowedtree, $ri_field_name.'_fccats', $catvals="",
 			$top=2, // (adds first option "please select") Important otherwise single entry in select cannot initiate onchange event
 			' class="use_select2_lib inputbox '.$ri_field_name.'_fccats" ',
@@ -372,54 +378,67 @@ class plgFlexicontent_fieldsRelation extends JPlugin
 			$actions_allowed=array('core.create', 'core.edit', 'core.edit.own'), $require_all=false,
 			$skip_subtrees=array(), $disable_subtrees=array(), $custom_options=array('__ALL__'=>'FLEXI_RIFLD_FILTER_LIST_ALL')
 		);
-		$field->html .= " </span>\n";
-		
-		$field->html .= " <div class='fcclear'></div>";
-		$field->html .= " <span class='fcrelation_field_filter_by_title'>";
-		if ($display_title_filter_label)	
-			$field->html .= "  <span class='label'>".JText::_('FLEXI_RIFLD_FILTER_BY_TITLE')."</span>\n";
-    
     if ($title_filter)
     {
 			$document->addScript( JURI::root(true).'/components/com_flexicontent/assets/js/filterlist.js' );
-			$field->html.=	''
+			$_title_filtering =	''
 				.'<input class="fcfield_textval" id="'.$ri_field_name.'_regexp" name="'.$ri_field_name.'_regexp" onKeyUp="'.$ri_field_name.'_titlefilter.set(this.value)" size="30" onfocus="if (this.value==\''.$default_value_title_filter.'\') this.value=\'\';" onblur="if (this.value==\'\') this.value=\''.$default_value_title_filter.'\';" value="'.$default_value_title_filter.'" />'
-				//.'<input style="margin-left:0px!important; margin-top:6px;" class="fcfield-button" type="button" onclick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_RIFLD_FILTER').'" />'
-				.'<input style="margin-left:0px!important; margin-top:6px;" class="fcfield-button" type="button" onclick="'.$ri_field_name.'_titlefilter.reset();this.form.'.$ri_field_name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_RIFLD_RESET').'" />'
+				//.'<input class="fcfield-button" type="button" onclick="'.$ri_field_name.'_titlefilter.set(this.form.'.$ri_field_name.'_regexp.value)" value="'.JText::_('FLEXI_RIFLD_FILTER').'" />'
+				.'<input class="fcfield-button" type="button" onclick="'.$ri_field_name.'_titlefilter.reset();this.form.'.$ri_field_name.'_regexp.value=\'\'" value="'.JText::_('FLEXI_RIFLD_RESET').'" />'
 				;
     }
-		$field->html .= " </span>\n";
 		
-		$field->html .= "</div>\n";  // fcrelation_field_filters
+		$field->html .= '
+		<div class="fcfieldval_container valuebox fcfieldval_container_'.$field->id.'">
+			<span class="fcrelation_field_filters">
+				
+				<span class="fcrelation_field_filter_by_cat nowrap_box">
+					'.($display_cat_filter_label ? '<span class="label">'.JText::_('FLEXI_RIFLD_FILTER_BY_CAT').'</span>' : '').'
+					'.$_cat_selector.'
+				</span>
+				
+				'.($title_filter ? '
+				<span class="fcrelation_field_filter_by_title nowrap_box">
+					'.($display_title_filter_label ? '<span class="label">'.JText::_('FLEXI_RIFLD_FILTER_BY_TITLE').'</span>' : '').'
+	    		'.$_title_filtering.'
+				</span>
+				' : '').'
+				
+			</span>
+		';
     
+		$initial_placement = $field->parameters->get( 'initial_placement', 'h' ) ;
+		$placement_class = $initial_placement=='h' ? ' fc_horizontal' : ' fc_vertical';
+		$field->html .= '
+			<span class="fcrelation_field_unused_items'.$placement_class.'">
+				<span class="label">'.JText::_($select_items_prompt).'</span><br/>
+				<select id="'.$ri_field_name.'_visitems" name="'.$ri_field_name.'_visitems[]" multiple="multiple" class="fcfield_selectmulval" '.$size.' >
+				</select>
+			</span>
 		
-		$field->html .= "<div class='fcrelation_field_unused_items'>";
-		$field->html .= "<span class='label'>".JText::_($select_items_prompt)."</span><br/>\n";
-		$field->html .= '<select id="'.$ri_field_name.'_visitems" name="'.$ri_field_name.'_visitems[]" multiple="multiple" class="fcfield_selectmulval" '.$size.' >'."\n";
-		$field->html .= '</select>'."\n";
-		$field->html .= "</div>\n";
-		
-		$field->html .= "<div class='fcrelation_field_controls'>";
-		$field->html .= '<a href="JavaScript:void(0);" id="btn-add_'.$ri_field_name.'" class="fcfield-button" >'.JText::_('FLEXI_ADD').' &raquo;</a>'."\n";
-    $field->html .= '<a href="JavaScript:void(0);" id="btn-remove_'.$ri_field_name.'" class="fcfield-button" >&laquo; '.JText::_('FLEXI_REMOVE').'</a>'."\n";
-		$field->html .= "</div>\n";
-    
-		$field->html .= "<div class='fcrelation_field_used_items'>";
-		$field->html .= "<span class='label'>".JText::_($selected_items_label)."</span><br/>\n";
-		
-		$field->html .= '<select id="'.$ri_field_name.'" name="'.$fieldname.'" multiple="multiple" class="'.$required.'" style="display:none;" '.$size.' >';
-		$field->html .= $items_options_select;
-		$field->html .= '</select>'."\n";
-		
-		$field->html .= '<select id="'.$ri_field_name.'_selitems" name="'.$ri_field_name.'_selitems[]" multiple="multiple" class="fcfield_selectmulval" '.$size.' >';
-		$field->html .= $items_options;
-		$field->html .= '</select>'."\n";
-		
-		$field->html .= '<select id="'.$ri_field_name.'_hiditems" name="'.$ri_field_name.'_hiditems" style="display:none;" >';
-		$field->html .= $items_options_unused;
-		$field->html .= '</select>'."\n";
-		$field->html .= "</div>\n";
-		
+			<span class="fcrelation_field_controls'.$placement_class.'">
+				<span id="btn-add_'.$ri_field_name.'" class="fcrelation_btn fcfield-list-add '.$placement_class.'" title="'.JText::_('FLEXI_ADD').'"></span>
+				<span id="btn-remove_'.$ri_field_name.'" class="fcrelation_btn fcfield-list-del '.$placement_class.'" title="'.JText::_('FLEXI_REMOVE').'"></span>
+				<span id="btn-toggle_horizontal_'.$ri_field_name.'" class="fcrelation_btn fcfield-placement-h fc_toggle '.$placement_class.'" onclick="jQuery(this).closest(\'.valuebox\').find(\'.fc_vertical\').removeClass(\'fc_vertical\').addClass(\'fc_horizontal\');" title="'.JText::_('FLEXI_HORIZONTAL').'"></span>
+				<span id="btn-toggle_vertical_'.$ri_field_name.'" class="fcrelation_btn fcfield-placement-v fc_toggle '.$placement_class.'" onclick="jQuery(this).closest(\'.valuebox\').find(\'.fc_horizontal\').removeClass(\'fc_horizontal\').addClass(\'fc_vertical\');" title="'.JText::_('FLEXI_VERTICAL').'"></span>
+			</span>
+    	
+    	<span class="fcrelation_field_used_items'.$placement_class.'">
+				<span class="label">'.JText::_($selected_items_label).'</span><br/>
+				<select id="'.$ri_field_name.'" name="'.$fieldname.'" multiple="multiple" class="'.$required.'" style="display:none;" '.$size.' >
+					'.$items_options_select.'
+				</select>
+				
+				<select id="'.$ri_field_name.'_selitems" name="'.$ri_field_name.'_selitems[]" multiple="multiple" class="fcfield_selectmulval" '.$size.' >
+					'.$items_options.'
+				</select>
+				
+				<select id="'.$ri_field_name.'_hiditems" name="'.$ri_field_name.'_hiditems" style="display:none;" >
+					'.$items_options_unused.'
+				</select>
+			</span>
+		</div>
+		';
 		
 		$js= ($title_filter ? ' var filteredfield, '.$ri_field_name.'_titlefilter;' : '')."
 
@@ -482,7 +501,6 @@ jQuery(document).ready(function() {
 	// Method to create field's HTML display for frontend views
 	function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		$field->label = JText::_($field->label);
@@ -615,7 +633,6 @@ jQuery(document).ready(function() {
 	// Method to handle field's values before they are saved into the DB
 	function onBeforeSaveField( &$field, &$post, &$file, &$item )
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		if(!is_array($post) && !strlen($post)) return;
 	}

@@ -35,7 +35,6 @@ class plgFlexicontent_fieldsCoreprops extends JPlugin
 	// Method to create field's HTML display for frontend views
 	public function onDisplayFieldValue(&$field, $item, $values=null, $prop='display')
 	{
-		// execute the code only if the field type match the plugin type
 		if ( !in_array($field->field_type, self::$field_types) ) return;
 		
 		static $all_langs = null;
