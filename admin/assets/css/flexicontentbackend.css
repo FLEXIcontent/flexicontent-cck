@@ -1,7 +1,55 @@
 @import url('../../../../../components/com_flexicontent/assets/css/flexi_form.css');
 @import url('../../../../../components/com_flexicontent/assets/css/flexi_containers.css');
 @import url('../../../../../components/com_flexicontent/assets/css/flexi_shared.css');
-
+/***********
+HEADER ICONS
+************/
+.icon-flexicontent:before {
+	content: "\e250";
+}
+.icon-items:before {
+	content: "\e242";
+}
+.icon-itemedit:before, .icon-itemadd:before {
+	content: "\2c";
+}
+.icon-types:before, icon-typeadd:before, .icon-typeedit:before {
+	content: "\e020";
+}
+.icon-fc_categories:before, .icon-fc_categoryadd:before, .icon-fc_categoryedit:before {
+	content: "\2d";
+}
+.icon-fields:before, .icon-fieldadd:before, .icon-fieldedit:before {
+	content: "\e230";
+}
+.icon-tags:before {
+	content: "\e264";
+}
+.icon-tagadd:before, .icon-tagedit:before {
+	content: "\e262";
+}
+.icon-templates:before {
+	content: "\3c";
+}
+.icon-authors:before {
+	content: "\e01f";
+}
+.icon-authoredit:before, .icon-authoradd:before {
+	content: "\22";
+}
+.icon-groups:before, .icon-groupedit:before, .icon-groups-add:before {
+	content: "\e01f";
+}
+.icon-files:before {
+	content: "\30";
+}
+.icon-searchtext:before {
+	content: "\53";
+}
+.icon-stats:before {
+	content: "\75";
+}
+/*********************/
 .flexicontent #adminForm a.saveorder {
 	float: none !important;
 	vertical-align: middle !important;
